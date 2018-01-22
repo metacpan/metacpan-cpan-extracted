@@ -4,19 +4,19 @@
       "Rocco Caputo <rcaputo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-ChangelogFromGit",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -28,24 +28,24 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime" : "1.10",
-            "DateTime::Infinite" : "1.10",
-            "Dist::Zilla::File::InMemory" : "5.019",
-            "Dist::Zilla::Role::FileGatherer" : "5.019",
-            "Git::Repository::Log::Iterator" : "1.311",
-            "IPC::Cmd" : "0.92",
-            "Moose" : "2.1005",
-            "Moose::Autobox" : "0.15",
-            "Software::Release" : "0.03",
-            "Software::Release::Change" : "0.03",
-            "Text::Wrap" : "2009.0305"
+            "DateTime" : "0",
+            "DateTime::Infinite" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Git::Repository::Log::Iterator" : "0",
+            "IPC::Cmd" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Software::Release" : "0",
+            "Software::Release::Change" : "0",
+            "Text::Wrap" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Carp" : "1.26",
-            "Scalar::Util" : "1.39",
-            "Test::More" : "1.001002",
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.94",
             "perl" : "5.004",
             "strict" : "0",
             "warnings" : "0"
@@ -65,6 +65,7 @@
          "web" : "https://github.com/rcaputo/dzp-changelogfromgit"
       }
    },
-   "version" : "0.016"
+   "version" : "0.017",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

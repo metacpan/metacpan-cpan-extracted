@@ -3,6 +3,10 @@ Revision history for perl module BDB.
 TODO: DB_RECNUM/DB_SET_RECNO?
 TODO: 4.8 set_partition
 
+1.92 Thu Jan 18 17:43:14 CET 2018
+	- further USE_SOCKETS_AS_HANDLES fixes (Z59).
+	- new requests: db_env_lsn_reset, db_env_fileid_reset.
+
 1.91 Fri Apr 11 06:22:38 CEST 2014
 	- perl5porters broke Async::Interrupt, BDB, EV, IO::AIO, OpenCL
           without warning by switching the meaning of USE_SOCKETS_AS_HANDLES

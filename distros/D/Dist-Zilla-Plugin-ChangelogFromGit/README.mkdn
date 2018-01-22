@@ -2,10 +2,6 @@
 
 Dist::Zilla::Plugin::ChangelogFromGit - Write a Changes file from a project's git log.
 
-# VERSION
-
-version 0.016
-
 # SYNOPSIS
 
 Here's an example dist.ini section showing all the current options and
@@ -53,6 +49,24 @@ default value:
 `max_age` is intended to limit the size of change logs for large,
 long-term projects that don't want to include the entire, huge commit
 history in every release.
+
+## min\_releases = INTEGER
+
+`min_releases` sets the minimum number of releases that should be
+included.  It defaults to 1 so that at least the current release is
+added, regardless of `max_age`.
+
+        [ChangelogFromGit]
+        min_releases = 5
+
+## max\_releases = INTEGER
+
+c&lt;max\_releases> allows you limit the number of releases included.
+`max_age` will still be the limiting factor if it contains fewer
+releases than the max specified.
+
+        [ChangelogFromGit]
+        max_releases = 15
 
 ## tag\_regexp = REGULAR\_EXPRESSION
 
@@ -492,6 +506,22 @@ skipped\_release\_count() contains the number of releases truncated by
 max\_age().  The default render\_changelog\_footer() uses it to display
 the number of changes that have been omitted from the log.
 
+# INTERNAL METHODS
+
+Dist::Zilla::Plugin::ChangelogFromGit implements a couple of
+"unpublished" methods.  These are not intended for general use.
+
+## gather\_files()
+
+Find all release tags back to the earliest changelog date.
+
+Add a virtual release for the most recent change in the repository. This lets us
+include changes after the last releases, up to "HEAD".
+
+## rungit()
+
+A wrapper to run git commands.
+
 # Subversion and CVS
 
 This plugin is almost entirely a copy-and-paste port of a command-line
@@ -525,7 +555,7 @@ overridable.
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010-2013 by Rocco Caputo.
+This software is copyright (c) 2010-2018 by Rocco Caputo.
 
 This is free software; you may redistribute it and/or modify it under
 the same terms as the Perl 5 programming language itself.

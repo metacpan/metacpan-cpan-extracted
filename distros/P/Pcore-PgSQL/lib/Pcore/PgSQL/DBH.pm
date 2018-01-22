@@ -162,49 +162,47 @@ sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHo
 sub _start_listen ($self) {
     weaken $self;
 
-    $self->{h}->on_read(
-        sub {
-            my \$rbuf = \$_[0]->{rbuf};
+    $self->{h}->on_read( sub {
+        my \$rbuf = \$_[0]->{rbuf};
 
-          REDO:
-            if ( length $rbuf > 4 ) {
-                my ( $type, $msg_len ) = unpack 'AN', $rbuf;
+      REDO:
+        if ( length $rbuf > 4 ) {
+            my ( $type, $msg_len ) = unpack 'AN', $rbuf;
 
-                if ( length $rbuf > $msg_len ) {
-                    my $data = substr $rbuf, 0, $msg_len + 1, q[];
+            if ( length $rbuf > $msg_len ) {
+                my $data = substr $rbuf, 0, $msg_len + 1, q[];
 
-                    substr $data, 0, 5, q[];
+                substr $data, 0, 5, q[];
 
-                    # GENERAL MESSAGES
-                    if    ( $type eq $PG_MSG_AUTHENTICATION )   { $self->_ON_AUTHENTICATION( \$data ) }
-                    elsif ( $type eq $PG_MSG_PARAMETER_STATUS ) { $self->_ON_PARAMETER_STATUS( \$data ) }
-                    elsif ( $type eq $PG_MSG_BACKEND_KEY_DATA ) { $self->_ON_BACKEND_KEY_DATA( \$data ) }
-                    elsif ( $type eq $PG_MSG_READY_FOR_QUERY )  { $self->_ON_READY_FOR_QUERY( \$data ) }
-                    elsif ( $type eq $PG_MSG_ERROR_RESPONSE )   { $self->_ON_ERROR_RESPONSE( \$data ) }
-                    elsif ( $type eq $PG_MSG_NOTICE_RESPONSE )  { $self->_ON_NOTICE_RESPONSE( \$data ) }
+                # GENERAL MESSAGES
+                if    ( $type eq $PG_MSG_AUTHENTICATION )   { $self->_ON_AUTHENTICATION( \$data ) }
+                elsif ( $type eq $PG_MSG_PARAMETER_STATUS ) { $self->_ON_PARAMETER_STATUS( \$data ) }
+                elsif ( $type eq $PG_MSG_BACKEND_KEY_DATA ) { $self->_ON_BACKEND_KEY_DATA( \$data ) }
+                elsif ( $type eq $PG_MSG_READY_FOR_QUERY )  { $self->_ON_READY_FOR_QUERY( \$data ) }
+                elsif ( $type eq $PG_MSG_ERROR_RESPONSE )   { $self->_ON_ERROR_RESPONSE( \$data ) }
+                elsif ( $type eq $PG_MSG_NOTICE_RESPONSE )  { $self->_ON_NOTICE_RESPONSE( \$data ) }
 
-                    # STH RELATED MESSAGES
-                    elsif ( $type eq $PG_MSG_PARSE_COMPLETE )   { $self->_ON_PARSE_COMPLETE }
-                    elsif ( $type eq $PG_MSG_BIND_COMPLETE )    { $self->_ON_BIND_COMPLETE }
-                    elsif ( $type eq $PG_MSG_ROW_DESCRIPTION )  { $self->_ON_ROW_DESCRIPTION( \$data ) }
-                    elsif ( $type eq $PG_MSG_NO_DATA )          { $self->_ON_NO_DATA }
-                    elsif ( $type eq $PG_MSG_DATA_ROW )         { $self->_ON_DATA_ROW( \$data ) }
-                    elsif ( $type eq $PG_MSG_PORTAL_SUSPENDED ) { $self->_ON_PORTAL_SUSPENDED }
-                    elsif ( $type eq $PG_MSG_COMMAND_COMPLETE ) { $self->_ON_COMMAND_COMPLETE( \$data ) }
-                    elsif ( $type eq $PG_MSG_CLOSE_COMPLETE )   { $self->_ON_CLOSE_COMPLETE }
+                # STH RELATED MESSAGES
+                elsif ( $type eq $PG_MSG_PARSE_COMPLETE )   { $self->_ON_PARSE_COMPLETE }
+                elsif ( $type eq $PG_MSG_BIND_COMPLETE )    { $self->_ON_BIND_COMPLETE }
+                elsif ( $type eq $PG_MSG_ROW_DESCRIPTION )  { $self->_ON_ROW_DESCRIPTION( \$data ) }
+                elsif ( $type eq $PG_MSG_NO_DATA )          { $self->_ON_NO_DATA }
+                elsif ( $type eq $PG_MSG_DATA_ROW )         { $self->_ON_DATA_ROW( \$data ) }
+                elsif ( $type eq $PG_MSG_PORTAL_SUSPENDED ) { $self->_ON_PORTAL_SUSPENDED }
+                elsif ( $type eq $PG_MSG_COMMAND_COMPLETE ) { $self->_ON_COMMAND_COMPLETE( \$data ) }
+                elsif ( $type eq $PG_MSG_CLOSE_COMPLETE )   { $self->_ON_CLOSE_COMPLETE }
 
-                    # UNSUPPORTED MESSAGE EXCEPTION
-                    else {
-                        die qq[Unknown message "$type"];
-                    }
-
-                    goto REDO;
+                # UNSUPPORTED MESSAGE EXCEPTION
+                else {
+                    die qq[Unknown message "$type"];
                 }
-            }
 
-            return;
+                goto REDO;
+            }
         }
-    );
+
+        return;
+    } );
 
     return;
 }
@@ -584,8 +582,8 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
 
     # extended query mode
     else {
-        my $query_id = $self->{sth}->{id} // q[];
-        my $portal_id = q[];    # uuid_str;
+        my $query_id  = $self->{sth}->{id} // q[];
+        my $portal_id = q[];                         # uuid_str;
 
         # parse query
         if ( !$self->{sth}->{is_parse_complete} ) {
@@ -980,20 +978,20 @@ sub quote ( $self, $var, $type = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |    3 | 178                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 525                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
+## |    3 | 523                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 897                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 895                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 25, 148, 358, 516,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 582, 592, 608, 613,  |                                                                                                                |
-## |      | 618, 624, 633, 640,  |                                                                                                                |
-## |      | 644, 648, 652, 655   |                                                                                                                |
+## |    2 | 25, 148, 356, 514,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 580, 590, 606, 611,  |                                                                                                                |
+## |      | 616, 622, 631, 638,  |                                                                                                                |
+## |      | 642, 646, 650, 653   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 734, 897             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 732, 895             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 773                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 771                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

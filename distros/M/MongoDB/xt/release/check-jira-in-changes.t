@@ -8,17 +8,17 @@ use warnings;
 use Test::More tests => 1;
 
 my @commits = split /\n/, <<'EOC';
-e468cc26 PERL-761 Use killCursors command for MongoDB 3.2+
-60c88bd9 PERL-713 PERL-714 Username no longer required for X509
-9796032b PERL-763 Makefile.PL fails with no '.' in @INC
-278d0e0d PERL-760 Switch to binary type SASL payloads
-ecb38e8b PERL-730: CI: test with repo-specific prereq library
-808ed3e6 PERL-717 Force localhost to connect via IPv4
-9618b03b PERL-730 Update deprecated 'last_error' test
-8dd7b713 PERL-730 Fix app_name test for multi-shard topologies
-760a4b78 PERL-730 Skip direct connect test if auth needed
-a01d2774 PERL-746 Fix GridFS tests on Windows
-9cc39b5b PERL-730 CI: Add stable 1.x branch to CI testing
+8c82a43a PERL-803 Fix Kerberos authentication
+0b3d40eb PERL-803 Make kerberos test configurable from env vars
+cf7bc0d0 PERL-844 Bump IO::Socket::IP prereq to 0.32
+6fa53042 PERL-832 Skip threaded cursor test on Windows with SASL
+425a2317 PERL-770 Prevent short reads from throwing a protocol error
+0ae4745f PERL-800 CI: Stop testing 2.4 on Evergreen
+37508847 PERL-828 Stop sending maxAwaitTimeMS if not set
+ac887869 PERL-825 Fix insert_many exception for unack'd writes
+c2f9e545 (shadowcat/maint-v1.x) PERL-798 Update Tutorial.pod to fix typos
+803e068a PERL-796 Improve resolution of GridFS uploadDate
+3928f760 PERL-795 Document GridFS uniqueness constraints
 
 EOC
 

@@ -85,7 +85,7 @@ for my $service ( 'factors', 'insights', 'score' ) {
         for my $error (
             'AUTHORIZATION_INVALID', 'LICENSE_KEY_REQUIRED',
             'USER_ID_REQUIRED'
-            ) {
+        ) {
             subtest $error => sub {
                 _test_ws_error(
                     $service,

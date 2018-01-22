@@ -1,0 +1,65 @@
+Usage:
+        nddiff [OPTIONS] <file1> <file2>
+
+Options:
+    --brief
+        Show where differences has happend, but don't show what exactly
+        changed.
+
+    --[no]colors
+        On/Off colors for diff.
+
+    --ctx-text [int]
+        Amount of lines for multiline values context. Default is 3.
+
+    --full
+        Don't suppresss common items in JSON mode.
+
+    --full-headers
+        Print full headers (delta printed by default).
+
+    --grep <path>
+        Grep substructures to diff. See path syntax description at
+        <https://metacpan.org/pod/Struct::Path::PerlStyle>
+
+    --help|-h
+        Print a help message and exit.
+
+    --ifmt <JSON|YAML>
+        Force specified input format usage. Automatically choosed (using
+        file extension) if omitted.
+
+    --ignore <path>
+        Ignore substructure. May be used several times.
+
+    --json
+        Use JSON as output diff format.
+
+    --[no]pretty
+        On/Off pretty-print for JSON. Enabled by default.
+
+    --quiet|-q
+        Don't show diff, only exit code shows exists diff or not.
+
+    --rules
+        Dump diff in nsproc-rules format.
+
+    --show
+        Visualize diff (JSON formatted diff file must be provided as
+        argument).
+
+    --verbose|-v [int]
+        Increase verbosity, max level - 4.
+
+    --version|-V
+        Print version and exit.
+
+Examples:
+    Human-friendly diff:
+
+        nddiff a.json b.json
+
+    Machine-readable diff:
+
+        nddiff --json a.json b.json
+

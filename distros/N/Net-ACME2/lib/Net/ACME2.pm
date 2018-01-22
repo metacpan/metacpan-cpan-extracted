@@ -7,7 +7,9 @@ use warnings;
 
 =head1 NAME
 
-Net::ACME2 - L<IETF|https://www.ietf.org>-standard ACME client protocol in Perl
+Net::ACME2 - L<IETF|https://www.ietf.org>-standard ACME (Let’s Encrypt) client
+
+X<Lets Encrypt> X<Let's Encrypt> X<letsencrypt>
 
 =head1 SYNOPSIS
 

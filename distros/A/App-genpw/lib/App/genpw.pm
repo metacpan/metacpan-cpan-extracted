@@ -1,7 +1,7 @@
 package App::genpw;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,11 +12,13 @@ use List::Util qw(shuffle);
 
 our %SPEC;
 
-my $symbols            = [split //, q(~`!@#$%^&*()_-+={}[]|\\:;"'<>,.?/)];
-my $letters            = ["A".."Z","a".."z"];
-my $digits             = ["0".."9"];
-my $letterdigits       = [@$letters, @$digits];
-my $letterdigitsymbols = [@$letterdigits, @$symbols];
+my $symbols            = [split //, q(~`!@#$%^&*()_-+={}[]|\\:;"'<>,.?/)];                          # %s
+my $letters            = ["A".."Z","a".."z"];                                                       # %l
+my $digits             = ["0".."9"];                                                                # %d
+my $letterdigits       = [@$letters, @$digits];                                                     # %a
+my $letterdigitsymbols = [@$letterdigits, @$symbols];                                               # %x
+my $base58characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789)]; # %b
+my $base56characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789)];   # %B
 
 our %arg_patterns = (
     patterns => {
@@ -37,6 +39,8 @@ be used as-is. Available conversions:
     %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
     %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
     %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+    %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
     %%   A literal percent sign
     %w   Random word
 
@@ -65,6 +69,10 @@ sub _fill_conversion {
         return join("", map {$symbols->[rand(@$symbols)]} 1..$len);
     } elsif ($matches->{CONV} eq 'x') {
         return join("", map {$letterdigitsymbols->[rand(@$letterdigitsymbols)]} 1..$len);
+    } elsif ($matches->{CONV} eq 'b') {
+        return join("", map {$base58characters->[rand(@$base58characters)]} 1..$len);
+    } elsif ($matches->{CONV} eq 'B') {
+        return join("", map {$base56characters->[rand(@$base56characters)]} 1..$len);
     } elsif ($matches->{CONV} eq 'w') {
         die "Ran out of words while trying to fill out conversion '$matches->{all}'" unless @$words;
         my $i = 0;
@@ -110,7 +118,7 @@ sub _set_case {
 sub _fill_pattern {
     my ($pattern, $words) = @_;
 
-    $pattern =~ s/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[adlswx%]))/
+    $pattern =~ s/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdlswx%]))/
         _fill_conversion({%+}, $words)/eg;
 
     $pattern;
@@ -204,7 +212,7 @@ App::genpw - Generate random password
 
 =head1 VERSION
 
-This document describes version 0.002 of App::genpw (from Perl distribution App-genpw), released on 2018-01-09.
+This document describes version 0.003 of App::genpw (from Perl distribution App-genpw), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -276,6 +284,8 @@ be used as-is. Available conversions:
  %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
  %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
  %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+ %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+ %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
  %%   A literal percent sign
  %w   Random word
 

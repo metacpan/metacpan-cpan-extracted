@@ -10,7 +10,7 @@ configure_requires:
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0.03'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   mRuby:
     file: lib/mRuby.pm
-    version: '0.12'
+    version: '0.14'
   mRuby::Bool:
     file: lib/mRuby/Bool.pm
   mRuby::Symbol:
@@ -43,9 +43,10 @@ resources:
   bugtracker: https://github.com/tokuhirom/mRuby.pm/issues
   homepage: https://github.com/tokuhirom/mRuby.pm
   repository: git://github.com/tokuhirom/mRuby.pm.git
-version: '0.12'
+version: '0.14'
 x_contributors:
-  - 'karupanerura <karupanerura@users.noreply.github.com>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'karupanerura <karupa@cpan.org>'
+  - 'karupanerura <karupanerura@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

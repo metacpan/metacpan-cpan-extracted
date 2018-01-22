@@ -28,9 +28,10 @@ use DBIx::Class ();
 use Encode qw/encode decode/;
 use List::Util qw/all any none/;
 use File::Temp 'tempfile';
+use curry;
 use namespace::clean;
 
-our $VERSION = '0.07047';
+our $VERSION = '0.07048';
 
 __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 schema
@@ -2594,7 +2595,7 @@ sub _make_column_accessor_name {
 
     my $accessor = $self->_run_user_map(
         $self->col_accessor_map,
-        sub { $self->_default_column_accessor_name( shift ) },
+        $self->curry::_default_column_accessor_name,
         $column_name,
         $column_context_info,
     );
@@ -2847,7 +2848,7 @@ sub _table2moniker {
 
     $self->_run_user_map(
         $self->moniker_map,
-        sub { $self->_default_table2moniker( shift ) },
+        $self->curry::_default_table2moniker,
         $table
     );
 }

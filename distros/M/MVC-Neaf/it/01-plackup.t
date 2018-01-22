@@ -22,9 +22,7 @@ die "Example app not found: $example"
     unless -f $example;
 
 # make sure example compiles at all
-my $sub = eval {
-    do $example;
-};
+my $sub = do $example;
 
 is (ref $sub, 'CODE', "$example lives and returns coderef")
     or die "Example failed to load: ".($@ || $! || "unexpected return");

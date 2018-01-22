@@ -9,15 +9,15 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-Github-Email
 requires:
-  Email::Address: '0'
   Getopt::Long::Descriptive: '0'
+  JSON: '0'
   LWP::Online: '0'
   LWP::UserAgent: '0'
   List::MoreUtils: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/faraco/App-Github-Email/issues
   homepage: https://github.com/faraco/App-Github-Email
   repository: https://github.com/faraco/App-Github-Email.git
-version: 0.2.0
+version: 0.2.1
 x_serialization_backend: 'YAML::Tiny version 1.69'

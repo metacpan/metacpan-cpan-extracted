@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -32,12 +32,13 @@ Here's a brief overview of what a Neaf request returns:
     $req->script_name  = /mathing/route
     $req->path_info    = some/more/slashes
 
-    # params and cookies require a regexp
+    # params and cookies require a regex
     $req->param( foo => '\d+' ) = 1
 
 =head1 REQUEST METHODS
 
-The concrete Request object the App gets is going to be a subclass of this.
+The actual Request object the application gets is going to be
+a subclass of this.
 Thus it is expected to have the following methods.
 
 =cut
@@ -45,18 +46,23 @@ Thus it is expected to have the following methods.
 use Carp;
 use URI::Escape;
 use Encode;
-use HTTP::Headers;
+use HTTP::Headers::Fast;
+use Time::HiRes ();
+use Sys::Hostname ();
+use Digest::MD5 qw(md5_base64);
 
 use MVC::Neaf::Util qw(http_date run_all_nodie canonize_path);
 use MVC::Neaf::Upload;
 use MVC::Neaf::Exception;
 
-=head2 new( %args )
+=head2 new()
+
+    MVC::Neaf::Request->new( %arguments )
 
 The application is not supposed to make its own requests,
 so this constructor is really for testing purposes only.
 
-For now, just swallows whatever given to it.
+For now, just swallows whatever is given to it.
 Restrictions MAY BE added in the future though.
 
 =cut
@@ -73,7 +79,8 @@ sub new {
 
 =head2 client_ip()
 
-Returns the IP of the client. Note this may be mangled by proxy...
+Returns the IP of the client.
+If C<X-Forwarded-For> header is set, returns that instead.
 
 =cut
 
@@ -88,7 +95,7 @@ sub client_ip {
 
 =head2 http_version()
 
-Returns version number of http protocol.
+Returns version number of C<http> protocol.
 
 =cut
 
@@ -104,7 +111,7 @@ sub http_version {
 
 =head2 scheme()
 
-Returns http or https, depending on how the request was done.
+Returns C<http> or C<https>, depending on how the request was done.
 
 =cut
 
@@ -120,7 +127,7 @@ sub scheme {
 
 =head2 secure()
 
-Returns true if https:// is used, false otherwise.
+Returns true if C<https> is used, false otherwise.
 
 =cut
 
@@ -132,8 +139,9 @@ sub secure {
 
 =head2 method()
 
-Return the HTTP method being used.
-GET is the default value if cannot find out (useful for CLI debugging).
+Return the C<HTTP> method being used.
+C<GET> is the default value if cannot determine
+(useful for command-line debugging).
 
 =cut
 
@@ -162,7 +170,7 @@ sub is_post {
 
 =head2 hostname()
 
-Returns the hostname which was requested, or "localhost" if cannot detect.
+Returns the hostname that was requested, or C<localhost> if cannot detect.
 
 =cut
 
@@ -187,7 +195,7 @@ sub port {
 
 =head2 path()
 
-Returns the path part of the uri. Path is guaranteed to start with a slash.
+Returns the path part of the URI. Path is guaranteed to start with a slash.
 
 =cut
 
@@ -197,14 +205,16 @@ sub path {
     return $self->{path} ||= $self->do_get_path;
 };
 
-=head2 set_path( $new_path )
+=head2 set_path()
+
+    $req->set_path( $new_path )
 
 Set path() to new value. This may be useful in C<pre_route> hook.
 
 Path will be canonized.
 
 If no argument given, or it is C<undef>, resets path() value to
-what was given to system value (if any).
+underlying driver's C<do_get_path>.
 
 Returns self.
 
@@ -228,7 +238,7 @@ application being executed.
 Guaranteed to start with slash.
 Unless C<set_path> was called, it is a prefix of C<path()>.
 
-Not avilable before routing was applied to request.
+Not available before routing was applied to request.
 
 =cut
 
@@ -236,7 +246,7 @@ sub script_name {
     my $self = shift;
 
     carp "NEAF: script_name call before routing was applied is DEPRECATED"
-        unless $self->{route};
+        unless $self->{endpoint};
 
     return $self->{script_name} ||= $self->path;
 };
@@ -245,28 +255,40 @@ sub script_name {
 
 Get scheme, server, and port of the application.
 
-B<EXPERIMENTAL> Name and meaning subject to change.
+B<[EXPERIMENTAL]> Name and meaning subject to change.
 
-=head2 get_url_rel( %override )
+=head2 get_url_rel( ... )
+
+=over
+
+=item * C<$req-E<gt>get_url_rel( %override )>
+
+=back
 
 Produce a relative link to the page being served,
 possibly overriding some parameters.
 
-Parameter order is NOT preserved. If parameter is empty or undef,
+Parameter order is NOT preserved. If parameter is empty or C<undef>,
 it is skipped.
 
-B<CAUTION> Multi-values are ignored, this MAY change in the future.
+B<[CAUTION]> Multiple values are ignored, this MAY change in the future.
 
-B<CAUTION> For a POST request, normal parameters are used instead of URL
+B<[CAUTION]> For a POST request, normal parameters are used instead of URL
 parameters (see C<url_param>). This MAY change in the future.
 
-B<EXPERIMENTAL> Name and meaning subject to change.
+B<[EXPERIMENTAL]> Name and meaning subject to change.
 
-=head2 get_url_full( %override )
+=head2 get_url_full( ... )
+
+=over
+
+=item * C<$req-E<gt>get_url_full( %override )>
+
+=back
 
 Same as above, but prefixed with schema, server name, and port.
 
-B<EXPERIMENTAL> Name and meaning subject to change.
+B<[EXPERIMENTAL]> Name and meaning subject to change.
 
 =cut
 
@@ -310,10 +332,10 @@ Contrary to the
 L<CGI specification|https://tools.ietf.org/html/rfc3875#section-4.1.5>,
 the leading slash is REMOVED.
 
-The validation regexp for this value MUST be specified during application
+The validation regex for this value MUST be specified during application
 setup as C<path_info_regex>. See C<route> in L<MVC::Neaf>.
 
-B<NOTE> Experimental. This part of API is undergoing changes.
+B<[EXPERIMENTAL]> This part of API is undergoing changes.
 
 =cut
 
@@ -323,11 +345,11 @@ sub path_info {
     return $self->{path_info};
 };
 
-=head2 path_info_split
+=head2 path_info_split()
 
 Return a list of matched capture groups found in path_info_regex, if any.
 
-B<EXPERIMENTAL> Name and meaning subject to change.
+B<[EXPERIMENTAL]> Name and meaning subject to change.
 
 =cut
 
@@ -337,57 +359,11 @@ sub path_info_split {
     return @{ $self->{path_info_split} || [] };
 };
 
-=head2 set_full_path( $path )
-
-=head2 set_full_path( $script_name, $path_info )
-
-Set new path elements which will be returned from this point onward.
-
-Also updates path() value so that path = script_name + path_info
-still holds.
-
-set_full_path(undef) resets script_name to whatever returned
-by the underlying driver.
-
-Returns self.
-
-B<DEPRECATED> Use set_path() and set_path_info() instead.
-
-=cut
-
-sub set_full_path {
-    my ($self, $script_name, $path_info) = @_;
-
-    carp "NEAF: set_full_path() is DEPRECATED and will be removed in 0.20";
-
-    if (!defined $script_name) {
-        $script_name = $self->do_get_path;
-    };
-
-    # CANONIZE
-    $script_name =~ s#^/*#/#;
-    $self->{script_name} = $script_name;
-
-    if (defined $path_info) {
-        # Make sure path_info always has a slash if nonempty
-        $path_info =~ s#^/+##;
-        $self->{path_info} = Encode::is_utf8($path_info)
-                ? $path_info
-                : decode_utf8(uri_unescape($path_info));
-    } elsif (!defined $self->{path_info}) {
-        $self->{path_info} = '';
-    };
-    # assert $self->{path_info} is defined by now
-
-    $self->{path} = "$self->{script_name}"
-        .(length $self->{path_info} ? "/$self->{path_info}" : '');
-    return $self;
-};
 
 sub _import_route {
     my ($self, $route, $path, $path_info, $tail) = @_;
 
-    $self->{route}        = $route;
+    $self->{endpoint}        = $route;
     $self->{script_name}  = $path;
     $self->{path_info}    = $path_info;
     $self->{path_info_split}   = $tail;
@@ -395,7 +371,13 @@ sub _import_route {
     return $self;
 };
 
-=head2 set_path_info ( $path_info )
+=head2 set_path_info( ... )
+
+=over
+
+=item * C<$req-E<gt>set_path_info( $path_info )>
+
+=back
 
 Sets path_info to new value.
 
@@ -420,34 +402,52 @@ sub set_path_info {
     return $self;
 };
 
-=head2 param($name, $regex [, $default])
+=head2 param( ... )
 
-Return param, if it passes regex check, default value or undef otherwise.
+=over
+
+=item * $req->param( $name, $regex )
+
+=item * $req->param( $name, $regex, $default )
+
+=back
+
+Return parameter, if it passes regex check, default value or C<undef> otherwise.
 
 The regular expression is applied to the WHOLE string,
 from beginning to end, not just the middle.
 Use '.*' if you really trust the data.
 
-B<EXPERIMENTAL> If C<param_regex> hash was given during route definition,
+B<[EXPERIMENTAL]> If C<param_regex> hash was given during route definition,
 C<$regex> MAY be omitted for params that were listed there.
 This feature is not stable yet, though. Use with care.
 
 If method other than GET/HEAD is being used, whatever is in the
 address line after ? is IGNORED.
-Use url_param() (see below) if you intend to mix GET/POST parameters.
+Use L<url_param> (see below) if you intend to mix GET/POST parameters.
 
-B<NOTE> param() ALWAYS returns a single value, even in list context.
-Use multi_param() (see below) if you really want a list.
+B<[NOTE]> C<param()> ALWAYS returns a single value, even in list context.
+Use C<multi_param()> (see below) if you really want a list.
 
-B<NOTE> Behaviour changed since 0.11 - missing default value no more
-interpreted as '', returns undef.
+B<[NOTE]> C<param()> has I<nothing to do> with getting parameter list from request.
+Instead, use form with wildcards:
+
+    neaf form => "my_form" => [ [ 'guest\d+' => '.*'], [ 'arrival\d+' => '.*' ] ],
+        engine => 'Wildcard';
+
+    # later in controller
+    my $guests = $req->form("my_form");
+    $guests->fields; # has guest1 & arrival1, guest2 & arrival2 etc
+    $guests->error;  # hash with values that didn't match regex
+
+See L<MVC::Neaf::X::Form::Wildcard>.
 
 =cut
 
 sub param {
     my ($self, $name, $regex, $default) = @_;
 
-    $regex ||= $self->{route}{param_regex}{$name};
+    $regex ||= $self->{endpoint}{param_regex}{$name};
 
     $self->_croak( "NEAF: param(): a validation regex is REQUIRED" )
         unless defined $regex;
@@ -462,9 +462,15 @@ sub param {
     return $default;
 };
 
-=head2 url_param( name => qr/regex/ )
+=head2 url_param( ... )
 
-If method is GET or HEAD, identic to param.
+=over
+
+=item * C<$req-E<gt>url_param( name =E<gt> qr/regex/ )>
+
+=back
+
+If method is GET or HEAD, identical to C<param>.
 
 Otherwise would return the parameter from query string,
 AS IF it was a GET request.
@@ -504,18 +510,24 @@ sub url_param {
         : $default;
 };
 
-=head2 multi_param( name => qr/regex/ )
+=head2 multi_param( ... )
 
-Get a single multivalue GET/POST parameter as a @list.
+=over
+
+=item * C<$req-E<gt>multi_param( name =E<gt> qr/regex/ )>
+
+=back
+
+Get a multiple value GET/POST parameter as a C<@list>.
 The name generally follows that of newer L<CGI> (4.08+).
 
 ALL values must match the regex, or an empty list is returned.
 
-B<EXPERIMENTAL> If C<param_regex> hash was given during route definition,
+B<[EXPERIMENTAL]> If C<param_regex> hash was given during route definition,
 C<$regex> MAY be omitted for params that were listed there.
 This feature is not stable yet, though. Use with care.
 
-B<EXPERIMENTAL> This method's behaviour MAY change in the future.
+B<[EXPERIMENTAL]> This method's behavior MAY change in the future.
 Please be careful when upgrading.
 
 =cut
@@ -526,7 +538,7 @@ Please be careful when upgrading.
 sub multi_param {
     my ($self, $name, $regex) = @_;
 
-    $regex ||= $self->{route}{param_regex}{$name};
+    $regex ||= $self->{endpoint}{param_regex}{$name};
     $self->_croak( "validation regex is REQUIRED" )
         unless defined $regex;
 
@@ -538,7 +550,13 @@ sub multi_param {
     return (grep { !/^(?:$regex)$/s } @$ret) ? () : @$ret;
 };
 
-=head2 set_param( name => $value )
+=head2 set_param( ... )
+
+=over
+
+=item * C<$req-E<gt>set_param( name =E<gt> $value )>
+
+=back
 
 Override form parameter. Returns self.
 
@@ -551,22 +569,49 @@ sub set_param {
     return $self;
 };
 
-=head2 form( $validator )
+=head2 form( ... )
+
+=over
+
+=item * C<$req-E<gt>form( $validator )>
+
+=back
 
 Apply validator to raw params and return whatever it returns.
 
-Validator MUST either be a CODEREF,
-or be an object with validate() method accepting a hashref.
+A validator MUST be an object with C<validate> method, or a coderef,
+or a symbolic name registered earlier via C<neaf form ...>.
 
-See L<MVC::Neaf::X::Form> for details on Neaf's built in validator.
+Neaf's own validators, C<MVC::Neaf::X::Form> and C<MVC::Neaf::X::Form::LIVR>,
+will return a C<MVC::Neaf::X::Form::Data> object with the following methods:
+
+=over
+
+=item * is_valid - tells whether data passed validation
+
+=item * error - hash of errors, can also be modified if needed:
+
+    $result->error( myfield => "Correct, but not found in database" );
+
+=item * data - hash of valid, cleaned data
+
+=item * raw - hash of data entered initially, may be useful to display
+input form again.
+
+=back
+
+You are encouraged to use this return format from your own validation class
+or propose improvements.
 
 =cut
 
 sub form {
     my ($self, $validator) = @_;
 
-    $self->_croak("Validator must be a CODEREF or an object")
-        unless ref $validator;
+    if (!ref $validator) {
+        $validator = $self->{_neaf} && $self->{_neaf}->get_form( $validator )
+            || $self->_croak("Unknown form name $validator");
+    };
 
     if (ref $validator eq 'CODE') {
         return $validator->( $self->_all_params );
@@ -575,26 +620,26 @@ sub form {
     };
 };
 
-=head2 get_form_as_hash ( name => qr/.../, name2 => qr/..../, ... )
+=head2 get_form_as_list( ... )
 
-B<DEPRECATED> and dies. Use L<MVC::Neaf::X::Form> instead.
+=over
 
-=cut
+=item * C<$req-E<gt>get_form_as_list( qr/.../, qw(name1 name2 ...)  )>
 
-sub get_form_as_hash {
-    my ($self, %spec) = @_;
+=back
 
-    $self->_croak( "DEPRECATED. use MVC::Neaf::X::Form and form() method" );
-};
+=head2 get_form_as_list( ... )
 
-=head2 get_form_as_list ( qr/.../, qw(name1 name2 ...)  )
+=over
 
-=head2 get_form_as_list ( [ qr/.../, "default" ], qw(name1 name2 ...)  )
+=item * C<$req-E<gt>get_form_as_list( [ qr/.../, "default" ], qw(name1 name2 ...)  )>
+
+=back
 
 Return a group of uniform parameters as a list, in that order.
-Values that fail validation are returned as undef, unless default given.
+Values that fail validation are returned as C<undef>, unless default given.
 
-B<EXPERIMENTAL>. The name MAY be changed in the future.
+B<[EXPERIMENTAL]> The name MAY be changed in the future.
 
 =cut
 
@@ -629,7 +674,7 @@ sub _all_params {
 Returns request body for PUT/POST requests.
 This is not regex-checked - the check is left for the user.
 
-Also the data is NOT converted to utf8.
+Also the data is NOT converted to C<utf8>.
 
 =cut
 
@@ -641,50 +686,19 @@ sub body {
     return $self->{body};
 };
 
-=head2 set_default( key => $value, ... )
+=head2 upload_utf8( ... )
 
-Set default values for your return hash.
-May be useful inside C<pre_route> and C<pre_logic> hooks.
+=head2 upload_raw( ... )
 
-Returns self.
+=over
 
-B<DEPRECATED>. Use path-based defaults and/or $request->stash instead.
-This will be removed in v.0.20+.
-
-=cut
-
-sub set_default {
-    my ($self, %args) = @_;
-
-    # TODO 0.20 remove
-    carp "NEAF:set_default() DEPRECATED. Use path-based defaults or stash()";
-    foreach (keys %args) {
-        defined $args{$_}
-            ? $self->{defaults}{$_} = $args{$_}
-            : delete $self->{defaults}{$_};
-    };
-
-    return $self;
-};
-
-=head2 get_default()
-
-Returns a hash of previously set default values.
-
-B<EXPERIMANTAL>. API and naming subject to change.
-
-=cut
-
-sub get_default {
-    my $self = shift;
-
-    return $self->{defaults} || {};
-};
-
-=head2 upload( "name" )
+=item * C<$req-E<gt>upload_utf8( "name" )>
 
 Returns an L<MVC::Neaf::Upload> object corresponding to an uploaded file,
 if such uploaded file is present.
+
+All data read from such upload will be converted to unicode,
+raising an exception if decoding ever fails.
 
 An upload object has at least C<handle> and C<content> methods to work with
 data:
@@ -706,26 +720,49 @@ or just
         };
     };
 
+=item * C<$req-E<gt>upload_raw( "name" )>
+
+Like above, but no decoding whatsoever is performed.
+
+=back
+
 =cut
 
-sub upload {
-    my ($self, $id) = @_;
+sub upload_utf8 {
+    my ($self, $name) = @_;
+    return $self->_upload( id => $name, utf8 => 1 );
+};
 
+sub upload_raw {
+    my ($self, $name) = @_;
+    return $self->_upload( id => $name, utf8 => 0 );
+};
+
+# TODO 0.30 do something about upload's content type
+# TODO 0.30 and btw, restrict content types!
+sub _upload {
+    my ($self, %args) = @_;
+
+    my $id = $args{id}
+        or $self->_croak( "upload name is required for upload" );
     # caching undef as well, so exists()
     if (!exists $self->{uploads}{$id}) {
         my $raw = $self->do_get_upload( $id );
-        # This would create NO upload objects for objects
-        # And also will return undef as undef - just as we want
-        #    even though that's side effect
         $self->{uploads}{$id} = (ref $raw eq 'HASH')
-            ? MVC::Neaf::Upload->new( %$raw, id => $id )
-            : $raw;
+            ? MVC::Neaf::Upload->new( %$raw, %args )
+            : undef;
     };
 
     return $self->{uploads}{$id};
 };
 
-=head2 get_cookie ( "name" => qr/regex/ [, "default" ] )
+=head2 get_cookie( ... )
+
+=over
+
+=item * C<$req-E<gt>get_cookie( "name" =E<gt> qr/regex/ [, "default" ] )>
+
+=back
 
 Fetch client cookie.
 The cookie MUST be sanitized by regular expression.
@@ -758,30 +795,36 @@ sub get_cookie {
     return $value =~ /^$regex$/ ? $value : $default;
 };
 
-=head2 set_cookie( name => "value", %options )
-
-Set HTTP cookie. %options may include:
+=head2 set_cookie( ... )
 
 =over
 
-=item * regex - regular expression to check outgoing value
+=item * C<$req-E<gt>set_cookie( name =E<gt> "value", %options )>
 
-=item * ttl - time to live in seconds.
-0 means no ttl.
-Use negative ttl and empty value to delete cookie.
+=back
 
-=item * expire - unix timestamp when the cookie expires
-(overridden by ttl).
+Set HTTP cookie. C<%options> may include:
 
-=item * expires - DEPRECATED - use 'expire' instead (w/o 's')
+=over
 
-=item * domain
+=item * C<regex> - regular expression to check outgoing value
 
-=item * path
+=item * C<ttl> - time to live in seconds.
+0 means no C<ttl>.
+Use negative C<ttl> and empty value to delete cookie.
 
-=item * httponly - flag
+=item * C<expire> - UNIX time stamp when the cookie expires
+(overridden by C<ttl>).
 
-=item * secure - flag
+=item * C<expires> - B<[DEPRECATED]> - use 'expire' instead (without trailing "s")
+
+=item * C<domain>
+
+=item * C<path>
+
+=item * C<httponly> - flag
+
+=item * C<secure> - flag
 
 =back
 
@@ -795,7 +838,8 @@ sub set_cookie {
     defined $opt{regex} and $cook !~ /^$opt{regex}$/
         and $self->_croak( "output value doesn't match regex" );
     if (exists $opt{expires}) {
-        carp( "NEAF set_cookie(): 'expires' parameter detected, use 'expire' instead" );
+        # TODO 0.30 kill it and croak
+        carp( "NEAF set_cookie(): 'expires' parameter DEPRECATED, use 'expire' instead" );
         $opt{expire} = delete $opt{expires};
     };
 
@@ -814,11 +858,17 @@ sub set_cookie {
     return $self;
 };
 
-=head2 delete_cookie( "name" )
+=head2 delete_cookie( ... )
+
+=over
+
+=item * C<$req-E<gt>delete_cookie( "name" )>
+
+=back
 
 Remove cookie by setting value to an empty string,
 and expiration in the past.
-B<NOTE> It is up to the user agent to actually remove cookie.
+B<[NOTE]> It is up to the user agent to actually remove cookie.
 
 Returns self.
 
@@ -863,14 +913,20 @@ sub format_cookies {
     return \@out;
 };
 
-=head2 error ( status )
+=head2 error( ... )
+
+=over
+
+=item * C<$req-E<gt>error( status )>
+
+=back
 
 Report error to the CORE.
 
-This throws an MVC::Neaf::Exception object.
+This throws an C<MVC::Neaf::Exception> object.
 
-If you're planning calling $req->error within eval block,
-consider using neaf_err function to let it propagate:
+If you're planning calling C<$req-E<gt>error> within C<eval> block,
+consider using C<neaf_err> function to let it propagate:
 
     use MVC::Neaf::Exception qw(neaf_err);
 
@@ -892,7 +948,13 @@ sub error {
     die MVC::Neaf::Exception->new(@_);
 };
 
-=head2 redirect( $location )
+=head2 redirect( ... )
+
+=over
+
+=item * C<$req-E<gt>redirect( $location )>
+
+=back
 
 Redirect to a new location.
 
@@ -912,21 +974,28 @@ sub redirect {
     );
 };
 
-=head2 header_in()
+=head2 header_in( ... )
 
-=head2 header_in( "header_name" )
+=over
+
+=item * C<header_in()> - return headers as-is
+
+=item * C<$req-E<gt>header_in( "header_name" )>
+
+=back
 
 Fetch HTTP header sent by client.
-Header names are lowercased, dashes converted to underscores.
-So "Http-Header", "HTTP_HEADER" and "http_header" are all the same.
+Header names are canonized,
+so C<Http-Header>, C<HTTP_HEADER> and C<http_header> are all the same.
 
-Without argument, returns a L<HTTP::Headers> object.
+Without argument, returns a L<HTTP::Headers::Fast> object.
 
 With a name, returns all values for that header in list context,
 or ", " - joined value as one scalar in scalar context -
-this is actually a frontend to HTTP::Headers header() method.
+this is actually a frontend to HTTP::Headers::Fast C<header()> method.
 
-B<EXPERIMENTAL> The return value format MAY change in the near future.
+B<[NOTE]> No regex checks are made (yet) on headers, these may be added
+in the future.
 
 =cut
 
@@ -941,32 +1010,11 @@ sub header_in {
     return $self->{header_in}->header( $name );
 };
 
-=head2 header_in_keys ()
-
-Return all keys in header_in object as a list.
-
-B<EXPERIMENTAL>. This may change or disappear altogether.
-
-=cut
-
-sub header_in_keys {
-    my $self = shift;
-
-    my $head = $self->header_in;
-    my %hash;
-    $head->scan( sub {
-        my ($k, $v) = @_;
-        $hash{$k}++;
-    } );
-
-    return keys %hash;
-};
-
 =head2 referer
 
-Get/set referer.
+Get/set HTTP referrer - i.e. where the request pretends to come from.
 
-B<NOTE> Avoid using referer for anything serious - too easy to forge.
+B<[NOTE]> Avoid using this for anything serious/secure - too easy to forge.
 
 =cut
 
@@ -983,7 +1031,7 @@ sub referer {
 
 Get/set user_agent.
 
-B<NOTE> Avoid using user_agent for anything serious - too easy to forge.
+B<[NOTE]> Avoid using user_agent for anything serious - too easy to forge.
 
 =cut
 
@@ -1028,7 +1076,7 @@ sub dump {
 =head2 session()
 
 Get reference to session data.
-This reference is guaranteed to be the same throughtout the request lifetime.
+This reference is guaranteed to be the same throughout the request lifetime.
 
 If MVC::Neaf->set_session_handler() was called during application setup,
 this data will be initialized by that handler;
@@ -1083,7 +1131,13 @@ sub load_session {
     return $self->{session};
 };
 
-=head2 save_session( [$replace] )
+=head2 save_session( ... )
+
+=over
+
+=item * C<$req-E<gt>save_session( [$replace] )>
+
+=back
 
 Save whatever is in session data reference.
 
@@ -1156,19 +1210,25 @@ to client.
 However, sometimes more fine-grained control is required.
 
 In this case, a number of methods help stashing your data
-(headers, cookies etc) in the request object until the responce is sent.
+(headers, cookies etc) in the request object until the response is sent.
 
 Also some lengthly actions (e.g. writing request statistics or
 sending confirmation e-mail) may be postponed until the request is served.
 
-=head2 header_out( [$param] )
+=head2 header_out( ... )
 
-Without parameters returns a L<HTTP::Headers> object containing all headers
-to be returned to client.
+=over
+
+=item * C<$req-E<gt>header_out( [$header_name] )>
+
+=back
+
+Without parameters returns a L<HTTP::Headers::Fast>-compatible object
+containing all headers to be returned to client.
 
 With one parameter returns this header.
 
-Returned values are just proxied L<HTTP::Headers> returns.
+Returned values are just proxied L<HTTP::Headers::Fast> returns.
 It is generally advised to use them in list context as multiple
 headers may return trash in scalar context.
 
@@ -1180,30 +1240,40 @@ or
 
     my $old_value = [ $req->header_out( foobar => delete => 1 ) ];
 
-B<NOTE> This format may change in the future.
+B<[NOTE]> This format may change in the future.
 
 =cut
 
 sub header_out {
     my $self = shift;
 
-    my $head = $self->{response}{header} ||= HTTP::Headers->new;
+    my $head = $self->{response}{header} ||= HTTP::Headers::Fast->new;
     return $head unless @_;
 
     my $name = shift;
     return $head->header( $name );
 };
 
-=head2 set_header( $name, $value || [] )
+=head2 set_header( ... )
 
-=head2 push_header( $name, $value || [] )
+=head2 push_header( ... )
 
-=head2 remove_header( $name )
+=head2 remove_header( ... )
+
+=over
+
+=item * C<$req-E<gt>set_header( $name, $value || [] )>
+
+=item * C<$req-E<gt>push_header( $name, $value || [] )>
+
+=item * C<$req-E<gt>remove_header( $name )>
+
+=back
 
 Set, append, and delete values in the header_out object.
-See L<HTTP::Headers>.
+See L<HTTP::Headers::Fast>.
 
-Arrayrefs are ok and will set multiple values for a given header.
+Arrayrefs are fine and will set multiple values for a given header.
 
 =cut
 
@@ -1225,12 +1295,10 @@ sub remove_header {
 =head2 reply
 
 Returns reply hashref that was returned by controller, if any.
-Returns undef unless the controller was actually called.
+Returns C<undef> unless the controller was actually called.
 This may be useful in postponed actions or hooks.
 
 This is killed by a C<clear()> call.
-
-B<EXPERIMENTAL>. This function MAY be removed or changed in the future.
 
 =cut
 
@@ -1246,27 +1314,39 @@ sub _set_reply {
     return $self;
 }
 
-=head2 stash()
+=head2 stash( ... )
 
-=head2 stash( "name" )
+Stash (ah, the naming...) is a temporary set of data that only lives
+throughtout request's lifetime and never gets to the client.
 
-=head2 stash( %save_data )
+This may be useful to maintain shared data across hooks and callbacks.
+Usage is as follows:
 
-A hashref that is guaranteed to persist throughout the request lifetime.
+=over
 
-This may be useful to maintain shared data accross hooks and callbacks.
+=item * C<$req-E<gt>stash()> - get the whole stash as hash.
 
-Use C<session> if you intend to share data between requests.
+=item * C<$req-E<gt>stash( "name" )> - get a single value
 
-Use C<reply> if you intend to render the data for the user.
+=item * C<$req-E<gt>stash( %save_data )> - set multiple values, old data
+is overridden rather than replaced.
 
-Use C<stash> as a last resort for temporary, private data.
+=back
 
-Stash is not killed by C<clear()> function so that cleanup isn't
+As a rule of thumb,
+
+=over
+
+=item * use C<session> if you intend to share data between requests;
+
+=item * use C<reply> if you intend to render the data for the user;
+
+=item * use C<stash> as a last resort for temporary, private data.
+
+=back
+
+Stash is not killed by C<clear()> function so that cleanup hooks aren't
 botched accidentally.
-
-B<EXPERIMENTAL>. This function MAY be removed if hooks turn out to be
-too cumbersome.
 
 =cut
 
@@ -1283,20 +1363,25 @@ sub stash {
     return $self;
 };
 
-=head2 postpone( CODEREF->(req) )
+=head2 postpone( ... )
 
-=head2 postpone( [ CODEREF->(req), ... ] )
+=over
+
+=item * C<$req-E<gt>postpone( CODEREF-E<gt>($request) )>
+
+=item * C<$req-E<gt>postpone( [ CODEREF-E<gt>($request), ... ] )>
+
+=back
 
 Execute a function (or several) right after the request is served.
 
 Can be called multiple times.
 
-B<CAVEAT>: If CODEREF contains reference to the request,
+B<[CAVEAT]> If CODEREF contains reference to the request,
 the request will never be destroyed due to circular reference.
 Thus CODEREF may not be executed.
 
-Don't pass request to CODEREF, use C<my $req = shift>
-instead if really needed.
+Don't pass request to CODEREF, use C<my $req = shift> instead.
 
 Returns self.
 
@@ -1317,7 +1402,13 @@ sub postpone {
     return $self;
 };
 
-=head2 write( $data )
+=head2 write( ... )
+
+=over
+
+=item * C<$req-E<gt>write( $data )>
+
+=back
 
 Write data to client inside C<-continue> callback, unless C<close> was called.
 
@@ -1379,24 +1470,45 @@ sub clear {
 Lazily fetch unique request id. These are guaranteed to be unique
 on a given machine within a reasonable timeframe.
 
+Current id-generation mechanism involves URI-safe md5_base64 C<[-_]>,
+but this MAY change in the future.
+
+B<[CAUTION]> Don't use this id for anything secure.
+Use L<MVC::Neaf::X::Session>'s ids instead.
+This one is just for information.
+
 =cut
 
-my $lastid;
+# TODO 0.30 provide a configurable mechanism to generate ids
+my $host = Sys::Hostname::hostname();
+my $lastid = 0;
 sub id {
     my $self = shift;
 
-    # Technically it is possible to repeat it by running a new process
-    # in the same second as the same pid... But who would?
-    return $self->{id} ||= unpack "H*", pack "N*", $$, CORE::time, ++$lastid;
+    # We don't really need to protect anything here
+    # Just avoid accidental matches for which md5 seems good enough
+    return $self->{id} ||= do {
+        my $str = md5_base64( join ".", $host, $$, Time::HiRes::time, ++$lastid );
+        $lastid = 0 unless $lastid < 4_000_000_000;
+        $str =~ tr/+\//-_/;
+        $str;
+    };
 };
 
-=head2 set_id( $new_value )
+=head2 set_id( ... )
+
+=over
+
+=item * C<$req-E<gt>set_id( $new_value )>
+
+=back
 
 Set the id above to a user-supplied value.
 
 If a false value given, just generate a new one next time id is requested.
 
-Symbols outside ascii, as well as shitespace and C<"> and C"\", are prohibited.
+Symbols outside C<ascii>, as well as whitespace and C<"> and C"\",
+are prohibited.
 
 Returns the request object.
 
@@ -1412,20 +1524,46 @@ sub set_id {
     return $self;
 };
 
-=head2 endpoint_origin
+=head2 log_error( ... )
 
-Returns file:line where the route was created.
+=over
 
-B<EXPERIMENTAL>. Name and semantics subject to change.
+=item * C<$req-E<gt>log_error( $message )>
+
+=back
+
+Log an error message, annotated with request id and the route being processed.
+
+Currently works via warn, but this may change in the future.
+
+B<[EXPERIMENTAL]> This feature is still under development.
+
+One can count on C<log_error> to be available in the future and do
+some king of logging.
 
 =cut
 
-sub endpoint_origin {
+sub log_error {
+    my ($self, $msg) = @_;
+    $self->do_log_error( $self->_log_mark($msg) );
+};
+
+sub _where {
     my $self = shift;
 
-    return '(unspecified file):0' unless $self->{route}{caller};
-    return join ":", @{ $self->{route}{caller} }[1,2];
+    return $self->{script_name} || "pre_route";
 };
+
+sub _log_mark {
+    my ($self, $msg) = @_;
+
+    $msg ||= Carp::shortmess( "Something bad happened" );
+    $msg =~ s/\s*$//s;
+
+    return "req_id=".$self->id." in ".$self->_where.": $msg";
+};
+
+# See do_log_error below
 
 # If called outside user's code, carp() will point at http server
 #     which is misleading.
@@ -1477,7 +1615,7 @@ sub DESTROY {
 The following methods MUST be implemented in every Request subclass
 to create a working Neaf backend.
 
-They shall not generally be called directly inside the app.
+They SHOULD NOT be called directly inside the application.
 
 =over
 
@@ -1497,19 +1635,23 @@ They shall not generally be called directly inside the app.
 
 =item * do_get_params()
 
-=item * do_get_param_as_array() - get single GET/POST param in list context
+=item * do_get_param_as_array() - get single GET/POST parameter in list context
 
 =item * do_get_upload()
 
 =item * do_get_body()
 
-=item * do_get_header_in() - returns a HTTP::Headers object.
+=item * do_get_header_in() - returns a L<HTTP::Headers>-compatible object.
 
 =item * do_reply( $status, $content ) - write reply to client
 
-=item * do_write
+=item * do_reply( $status ) - only send headers to client
 
-=item * do_close
+=item * do_write( $data )
+
+=item * do_close()
+
+=item * do_log_error()
 
 =back
 
@@ -1533,6 +1675,13 @@ foreach (qw(
 # by default, just skip - the handle will auto-close anyway at some point
 sub do_close { return 1 };
 
+# by default, write to STDERR - ugly but at least it will get noticed
+sub do_log_error {
+    my ($self, $msg) = @_;
+
+    warn "ERROR $msg\n";
+};
+
 sub _croak {
     my ($self, $msg) = @_;
 
@@ -1540,5 +1689,182 @@ sub _croak {
     $where =~ s/.*:://;
     croak( (ref $self || $self)."->$where: $msg" );
 };
+
+=head1 DEPRECATED METHODS
+
+Some methods become obsolete during Neaf development.
+Anything that is considered deprecated will continue to be supported
+I<for at least three minor versions> after official deprecation
+and a corresponding warning being added.
+
+Please keep an eye on C<Changes> though.
+
+Here are these methods, for the sake of completeness.
+
+=head2 header_in_keys ()
+
+Return all keys in header_in object as a list.
+
+B<[DEPRECATED]> Use C<$req-E<gt>header_in-E<gt>header_field_names> instead.
+
+=cut
+
+sub header_in_keys {
+    my $self = shift;
+
+    carp( (ref $self)."->header_in_keys: DEPRECATED, use header_in()->header_field_names instead" );
+    my $head = $self->header_in;
+    $head->header_field_names;
+};
+
+=head2 upload( ... )
+
+B<[DEPRECATED]> Same as upload_raw, but issues a warning.
+Use upload_utf8() for text files, or upload_raw() for binary ones.
+
+=cut
+
+# TODO 0.25 kill
+sub upload {
+    my ($self, $name) = @_;
+
+    carp "NEAF: req->upload() is DEPRECATED, use upload_utf8 or upload_raw instead";
+    return $self->_upload( id => $name, utf8 => 0 );
+};
+
+=head2 endpoint_origin
+
+Returns file:line where controller was defined.
+
+B<[DEPRECATED]> This function was added prematurely and shall not be used.
+
+=cut
+
+sub endpoint_origin {
+    my $self = shift;
+
+    return '(unspecified file):0' unless $self->{endpoint}{caller};
+    return join " line ", @{ $self->{endpoint}{caller} }[1,2];
+};
+
+=head2 set_full_path( ... )
+
+=over
+
+=item * C<$req-E<gt>set_full_path( $path )>
+
+=item * C<$req-E<gt>set_full_path( $script_name, $path_info )>
+
+=back
+
+Set new path elements which will be returned from this point onward.
+
+Also updates path() value so that path = script_name + path_info
+still holds.
+
+C<set_full_path(undef)> resets C<script_name> to whatever returned
+by the underlying driver.
+
+Returns self.
+
+B<[DEPRECATED]> Use C<set_path()> and C<set_path_info()> instead.
+
+=cut
+
+# TODO 0.25 kill it
+sub set_full_path {
+    my ($self, $script_name, $path_info) = @_;
+
+    carp "NEAF: set_full_path() is DEPRECATED and will be removed in 0.25";
+
+    if (!defined $script_name) {
+        $script_name = $self->do_get_path;
+    };
+
+    # CANONIZE
+    $script_name =~ s#^/*#/#;
+    $self->{script_name} = $script_name;
+
+    if (defined $path_info) {
+        # Make sure path_info always has a slash if nonempty
+        $path_info =~ s#^/+##;
+        $self->{path_info} = Encode::is_utf8($path_info)
+                ? $path_info
+                : decode_utf8(uri_unescape($path_info));
+    } elsif (!defined $self->{path_info}) {
+        $self->{path_info} = '';
+    };
+    # assert $self->{path_info} is defined by now
+
+    $self->{path} = "$self->{script_name}"
+        .(length $self->{path_info} ? "/$self->{path_info}" : '');
+    return $self;
+};
+
+=head2 get_form_as_hash( ... )
+
+=over
+
+=item * C<$req-E<gt>get_form_as_hash( name =E<gt> qr/.../, name2 =E<gt> qr/..../, ... )>
+
+=back
+
+B<[DEPRECATED]> and dies. Use L<MVC::Neaf::X::Form> instead.
+
+=cut
+
+sub get_form_as_hash {
+    my ($self, %spec) = @_;
+
+    $self->_croak( "DEPRECATED. use neaf->add_form( name, ...) + \$req->form( name )" );
+};
+
+=head2 set_default( ... )
+
+=over
+
+=item * C<$req-E<gt>set_default( key =E<gt> $value, ... )>
+
+=back
+
+As of v.0.20 this dies.
+
+Use path-based defaults, or stash().
+
+=cut
+
+sub set_default {
+    my ($self, %args) = @_;
+
+    # TODO 0.30 remove completely
+    $self->_croak( "DEPRECATED. Use path-based defaults or stash()" );
+};
+
+=head2 get_default()
+
+As of v.0.20 this dies.
+
+Use path-based defaults, or stash().
+
+=cut
+
+sub get_default {
+    my $self = shift;
+
+    # TODO 0.30 remove completely
+    $self->_croak( "DEPRECATED. Use path-based defaults or stash()" );
+};
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
 
 1;

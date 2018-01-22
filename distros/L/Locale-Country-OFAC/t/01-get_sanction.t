@@ -24,9 +24,6 @@ cmp_ok( get_sanction_by_code('IR'),
 cmp_ok( get_sanction_by_code('CU'),
     '==', $SANCTIONED_STATUS, 'Cuba is sanctioned' );
 
-cmp_ok( get_sanction_by_code('SD'),
-    '==', $SANCTIONED_STATUS, 'Sudan is sanctioned' );
-
 cmp_ok( get_sanction_by_code('KP'),
     '==', $SANCTIONED_STATUS, 'North Korea is sanctioned' );
 
@@ -38,9 +35,6 @@ cmp_ok( get_sanction_by_code('IRN'),
 
 cmp_ok( get_sanction_by_code('CUB'),
     '==', $SANCTIONED_STATUS, 'Cuba is sanctioned' );
-
-cmp_ok( get_sanction_by_code('SDN'),
-    '==', $SANCTIONED_STATUS, 'Sudan is sanctioned' );
 
 cmp_ok( get_sanction_by_code('PRK'),
     '==', $SANCTIONED_STATUS, 'North Korea is sanctioned' );

@@ -1,6 +1,6 @@
-examples/BitVectorDemo.pl
-examples/README
-examples/testinput.txt
+Examples/BitVectorDemo.pl
+Examples/README
+Examples/testinput.txt
 lib/Algorithm/BitVector.pm
 Makefile.PL
 MANIFEST			This list of files

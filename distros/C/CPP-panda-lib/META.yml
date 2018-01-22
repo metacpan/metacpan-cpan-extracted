@@ -27,5 +27,5 @@ requires:
   CPP::catch::test: v1.0.0
   Panda::Install: v1.2.9
   perl: '5.010000'
-version: v1.0.6
+version: v1.0.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

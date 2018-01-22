@@ -1,6 +1,6 @@
 package Bio::MUST::Core::ColorScheme;
 # ABSTRACT: Color scheme for taxonomic annotations
-$Bio::MUST::Core::ColorScheme::VERSION = '0.180140';
+$Bio::MUST::Core::ColorScheme::VERSION = '0.180190';
 use Moose;
 use namespace::autoclean;
 
@@ -209,7 +209,7 @@ Bio::MUST::Core::ColorScheme - Color scheme for taxonomic annotations
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 

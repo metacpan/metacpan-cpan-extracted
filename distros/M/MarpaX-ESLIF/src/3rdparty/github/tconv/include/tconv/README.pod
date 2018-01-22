@@ -15,6 +15,13 @@ tconv_ext - tconv extended API
   char *tconv_error(tconv_t tconvp);
   char *tconv_fromcode(tconv_t tconvp);
   char *tconv_tocode(tconv_t tconvp);
+  short tconv_fuzzy_set(tconv_t tconvp, short fuzzyb);
+  short tconv_fuzzy(tconv_t tconvp);
+  short tconv_helper(tconv_t  tconvp,
+                     void    *contextp,
+                     short   (*producerp)(void *contextp, char **bufpp, size_t *countlp, short *eofbp),
+                     short   (*consumerp)(void *contextp, char *bufp, size_t countl, short eofb, size_t *resultlp)
+                     );
 
 =head1 DESCRIPTION
 
@@ -346,6 +353,40 @@ Get the source codeset.
 
 Get the destination codeset.
 
+=head2 tconv_fuzzy_set
+
+  short tconv_fuzzy_set(tconv_t tconvp, short fuzzyb);
+
+Sets and return the fuzzy mode. In some rare cases, it is possible that tconv cannot determine the converter I<family> of the two charsets. In this case, and if the two normalised charset strings are equivalent, then a direct mode will happen. This is the meaning of I<fuzzy>. This does never happen with the ICU built-in convert, but can happen with the ICONV built-in.
+
+Fuzzy mode is prefered over doing iconv with the same charsets in input and output, because some iconv implementations simply fail to do that. The only side of the fuzzy mode is that it does I<not> provide any charset validation. This is why the next method exists, in case the end-user application want to do something special when fuzzy mode is on.
+
+=head2 tconv_fuzzy
+
+  short tconv_fuzzy(tconv_t tconvp);
+
+A true value means that fuzzy mode is on.
+
+=head2 tconv_helper
+
+  short tconv_helper(tconv_t  tconvp,
+                     void    *contextp,
+                     short   (*producerp)(void *contextp, char **bufpp, size_t *countlp, short *eofbp),
+                     short   (*consumerp)(void *contextp, char *bufp, size_t countl, short eofb, size_t *resultlp)
+                     );
+
+From an end-user point of viez, the only important thing is to produce bytes that must be converted and to consume them. The C<tconv_helper> method is totally hiding all the iconv API subtilities, leaving only the two methods that are meaningul for the vast majority of applications. The parameters are:
+
+=over
+
+=item C<tconvp>
+
+=item a producer
+
+=item a consumer
+
+=back
+
 =head1 NOTES
 
 =over
@@ -357,6 +398,10 @@ I<tconv> can trace itself, unless I<tconv> has been compiled with -DTCONV_NDEBUG
 =item specific error string
 
 I<tconv> internally limit the length of such string to 1024 bytes (including NUL).
+
+=item normalized charset name
+
+A charset name contains only letters in the range [a-z0-9+.:].
 
 =back
 

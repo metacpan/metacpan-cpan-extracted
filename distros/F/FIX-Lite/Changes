@@ -1,5 +1,11 @@
 Revision history for Perl extension FIX::Lite.
 
+0.08  Mon Jab 22 2018
+- Fixed MsgSeqNum for multiple sessions
+
+0.07  Fri Sep 29 2017
+- Fixed SendingTime generating
+
 0.06  Thu Jul 06 2017
 - Fixed synopsis in pod
 

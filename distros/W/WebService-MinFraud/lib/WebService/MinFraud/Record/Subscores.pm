@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Subscores;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005001';
+our $VERSION = '1.006000';
 
 use WebService::MinFraud::Types qw( Num );
 
@@ -27,10 +27,10 @@ has [
         shipping_address_distance_to_ip_location
         time_of_day
         )
-    ] => (
+] => (
     is  => 'ro',
     isa => Num,
-    );
+);
 
 1;
 
@@ -48,7 +48,7 @@ WebService::MinFraud::Record::Subscores - Contains minFraud Factors subscores
 
 =head1 VERSION
 
-version 1.005001
+version 1.006000
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

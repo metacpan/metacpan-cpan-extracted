@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 use 5.008001;
-use lib '.';
+BEGIN { unshift @INC, '.' unless $INC[-1] eq '.'; }
 use inc::Module::Install 1.00;
 
 use Getopt::Long();
@@ -44,6 +44,7 @@ requires 'Class::Accessor::Grouped'    => '0.10008';
 requires 'Class::C3::Componentised'    => '1.0008';
 requires 'Class::Inspector'            => '1.27';
 requires 'Class::Unload'               => '0.07';
+requires 'curry'                       => '1.000000',
 requires 'Data::Dump'                  => '1.06';
 requires 'DBIx::Class'                 => '0.08127';
 requires 'Hash::Merge'                 => '0.12';

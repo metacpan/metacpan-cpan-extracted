@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-LinuxMint-Releases"
       }
    },
-   "version" : "0.030",
+   "version" : "0.031",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -162,7 +162,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.590"
+            "version" : "0.591"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -459,9 +459,9 @@
             "version" : "0.03"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Acme::CPANLists::Blacklist",
-            "name" : "@Author::PERLANCAR/Acme::CPANLists::Blacklist",
-            "version" : "0.04"
+            "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
+            "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",

@@ -1,3 +1,49 @@
+version 0.008; 2018-01-19
+
+  * bugfix: in the ->new_from_local_source constructor, don't get confused
+    by a source directory whose supplied name begins with "-"
+
+  * when extracting data file names from the Olson makefile, handle
+    changes in the makefile rules from version 2018b onwards
+
+  * when downloading database version 2016g or later, use the new
+    tzdb.tar.lz rather than tz{code,data}.tar.gz
+
+  * don't put downloaded tarballs in the same directory as the unpacked
+    Olson source
+
+  * when downloading database version 2016g or later, check PGP signatures
+    on downloaded files
+
+  * when downloading database version 2016g or later, check that the
+    downloaded file is the version we think we're downloading, by looking
+    at the "version" file in the tarball
+
+  * when downloading database versions prior to 2016g, check the SHA-512
+    hash of the downloaded files against known hashes, except for a
+    handful of files for which no hash is currently known
+
+  * correctly handle the desynchronised version numbers for code and
+    data parts of the database that occurred from 1993 to 2012
+
+  * handle the special-case filename for version 2006b of the code part
+    of the database
+
+  * when downloading a specified version of the database, request the
+    correct files directly, rather than listing the whole directory
+
+  * when determining the latest version of the database, request listing
+    of only recent database distributions, rather than listing the
+    whole directory
+
+  * fix the style of an error message
+
+  * take full advantage of GNU tar and GNU make facilities, having
+    started to rely on GNU tar to handle tzdb.tar.lz
+
+  * restructure calls to external commands to avoid the need for shell
+    quoting
+
 version 0.007; 2017-10-23
 
   * when extracting data file names from the Olson makefile, handle the

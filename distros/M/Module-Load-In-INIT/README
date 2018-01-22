@@ -1,14 +1,23 @@
-SYNOPSIS
+NAME
+    Module::Load::In::INIT - Load modules in INIT phase
 
+VERSION
+    This document describes version 0.004 of Module::Load::In::INIT (from
+    Perl distribution Module-Load-In-INIT), released on 2018-01-15.
+
+SYNOPSIS
     In the command-line:
 
      % perl -MModule::Load::In::INIT=Mod::One,Mod::Two='Some;Import;Args' somescript.pl
 
-    Mod::One and Mod::Two will be loaded in the INIT phase instead of BEGIN
-    phase.
+    "Mod::One" and "Mod::Two" will be loaded in the INIT phase instead of
+    BEGIN phase.
+
+    Specify options for Module::Load::In::INIT itself:
+
+     % perl -MModule::Load::In::INIT=-ignore_load_error,Mod::One,Mod::Two
 
 DESCRIPTION
-
     This module can load (or perhaps defer loading) modules in the INIT
     phase instead of the BEGIN phase. One use-case where it is useful:
     monkey-patching a module (using a Module::Patch-based module) in a
@@ -16,18 +25,50 @@ DESCRIPTION
 
      % perl -MSome::Module::Patch::Foo fatpacked-script.pl
 
-    Some::Module::Patch::Foo will try to load Some::Module then patch it.
-    This might fail when module is loaded by the fatpack handler (which is
-    a require hook) as by the time Some::Module::Patch::Foo is loaded, the
-    fatpack handler has not been setup yet, and Some::Module is not
+    "Some::Module::Patch::Foo" will try to load "Some::Module" then patch
+    it. This might fail when module is loaded by the fatpack handler (which
+    is a require hook) as by the time "Some::Module::Patch::Foo" is loaded,
+    the fatpack handler has not been setup yet, and "Some::Module" is not
     available elsewhere (on the filesystem). This, however, works:
 
      % perl -MModule::Load::In::INIT=Some::Module::Patch::Foo fatpacked-script.pl
 
-    Loading of Some::Module::Patch::Foo (and by extension, Some::Module) is
-    deferred to the INIT phase. By that time, the fatpack require hook has
-    been setup and Some::Module can be (or might already be) loaded by it.
+    Loading of "Some::Module::Patch::Foo" (and by extension, "Some::Module")
+    is deferred to the INIT phase. By that time, the fatpack require hook
+    has been setup and "Some::Module" can be (or might already be) loaded by
+    it.
 
-    Caveat: Module::Load::In::INIT itself must be loaded in the BEGIN
-    phase, or INIT phase at the latest.
+    Caveat: Module::Load::In::INIT itself must be loaded in the BEGIN phase,
+    or INIT phase at the latest.
+
+OPTIONS
+    You can specify options for Module::Load::In::INIT itself via import
+    argument that starts with dash ("-"). Known options:
+
+    -ignore_load_error
+        If set, then require() error will be ignored.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Load-In-INIT>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Load-In-INIT>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-In-INIT>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

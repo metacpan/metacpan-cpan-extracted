@@ -12,6 +12,8 @@ BEGIN {
     $ENV{APICAST_OPENRESTY_BINARY} = $ENV{TEST_NGINX_BINARY};
 }
 
+our $ApicastBinary = $ENV{TEST_NGINX_APICAST_BINARY} || 'bin/apicast';
+
 add_block_preprocessor(sub {
     my $block = shift;
     my $seq = $block->seq_num;
@@ -83,7 +85,7 @@ my $write_nginx_config = sub {
     my $echo_port = Test::APIcast::get_random_port();
 
     my $sites_d = $block->sites_d;
-
+    my $apicast_cli = $block->apicast || $ApicastBinary;
 
     my $configuration = $block->configuration;
     my $conf;
@@ -128,7 +130,7 @@ return {
 _EOC_
     close $env;
 
-    my $apicast = `APICAST_CONFIGURATION_LOADER="" bin/apicast start --test --environment $env_file --configuration $configuration_file 2>&1`;
+    my $apicast = `APICAST_CONFIGURATION_LOADER="" $apicast_cli start --test --environment $env_file --configuration $configuration_file 2>&1`;
     if ($apicast =~ /configuration file (?<file>.+?) test is successful/)
     {
         move($+{file}, $ConfFile);

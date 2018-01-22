@@ -79,31 +79,28 @@ sub _build_api ($self) {
 }
 
 sub _build_http_server ($self) {
-    return Pcore::HTTP::Server->new(
-        {   listen            => $self->listen,
-            keepalive_timeout => $self->keepalive_timeout,
-            app               => $self->router,
-        }
-    );
+    return Pcore::HTTP::Server->new( {
+        listen            => $self->listen,
+        keepalive_timeout => $self->keepalive_timeout,
+        app               => $self->router,
+    } );
 }
 
 # TODO init appliacation
 around run => sub ( $orig, $self, $cb = undef ) {
     my $cv = AE::cv sub {
-        $self->$orig(
-            sub {
+        $self->$orig( sub {
 
-                # start HTTP server
-                $self->http_server->run;
+            # start HTTP server
+            $self->http_server->run;
 
-                say qq[Listen: @{[$self->listen]}] if $self->listen;
-                say qq[App "@{[$self->name]}" started];
+            say qq[Listen: @{[$self->listen]}] if $self->listen;
+            say qq[App "@{[$self->name]}" started];
 
-                $cb->($self) if $cb;
+            $cb->($self) if $cb;
 
-                return;
-            }
-        );
+            return;
+        } );
 
         return;
     };
@@ -119,15 +116,13 @@ around run => sub ( $orig, $self, $cb = undef ) {
     if ( $self->api ) {
 
         # connect api
-        $self->api->connect_api(
-            sub ($status) {
-                exit if !$status;
+        $self->api->connect_api( sub ($status) {
+            exit if !$status;
 
-                $cv->send;
+            $cv->send;
 
-                return;
-            }
-        );
+            return;
+        } );
     }
     else {
 

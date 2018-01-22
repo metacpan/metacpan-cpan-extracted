@@ -50,7 +50,8 @@
             "Devel::Cover" : "0",
             "LWP::Protocol::rsync" : "0",
             "Paws" : "0",
-            "Perl::Critic" : "0"
+            "Perl::Critic" : "0",
+            "Web::Query" : "0"
          },
          "requires" : {
             "AnyEvent" : "0",
@@ -65,12 +66,11 @@
             "Class::Refresh" : "0",
             "Data::Printer" : "0",
             "Devel::Confess" : "0",
-            "Future" : "0",
-            "IO::Async" : "0",
             "Import::Base" : "0",
             "Minilla" : "0",
             "Mojolicious" : "0",
             "Moo" : "0",
+            "Net::Async::HTTP" : "0",
             "Perl::Tidy" : "0",
             "Plack" : "0",
             "Pod::Cpandoc" : "0",
@@ -80,7 +80,6 @@
             "Text::Markdown" : "0",
             "Type::Tiny" : "0",
             "Version::Next" : "0",
-            "Web::Query" : "0",
             "perl" : "5.014002"
          }
       },
@@ -93,7 +92,7 @@
    "provides" : {
       "Task::BeLike::ZAKAME" : {
          "file" : "lib/Task/BeLike/ZAKAME.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -107,7 +106,7 @@
          "web" : "https://github.com/zakame/Task-BeLike-ZAKAME"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "Zak B. Elep <zak.elep@yoyo.ph>",
       "Zak B. Elep <zakame@zakame.net>"

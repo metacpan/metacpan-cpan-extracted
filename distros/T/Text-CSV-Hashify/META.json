@@ -53,6 +53,6 @@
          "web" : "https://github.com/jkeenan/text-csv-hashify"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

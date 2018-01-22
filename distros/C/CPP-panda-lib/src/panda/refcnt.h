@@ -65,7 +65,7 @@ private:
 using RefCounted = RefCountedImpl<int32_t>;
 
 template<bool SAFE = true>
-using RefCountedThreadSafe = RefCountedImpl< std::conditional_t<SAFE, std::atomic<int32_t>, int32_t> >;
+using RefCountedThreadSafe = RefCountedImpl< typename std::conditional<SAFE, std::atomic<int32_t>, int32_t>::type >;
 
 template <typename T, bool A = IsRefCounted<T>::value>
 class shared_ptr {};

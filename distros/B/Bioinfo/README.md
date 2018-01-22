@@ -4,7 +4,7 @@ Bioinfo - my perl module and CLIs for Biology
 
 # VERSION
 
-version 0.1.13
+version 0.1.14
 
 # SYNOPSIS
 

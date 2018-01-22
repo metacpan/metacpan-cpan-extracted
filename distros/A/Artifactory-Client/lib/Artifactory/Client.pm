@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.5.1
+Version 1.5.2
 
 =cut
 
-our $VERSION = 'v1.5.1';
+our $VERSION = 'v1.5.2';
 
 =head1 SYNOPSIS
 
@@ -2105,6 +2105,18 @@ sub calculate_bower_index {
     return $self->_handle_repository_reindex("/bower/$repository/reindex");
 }
 
+=head2 calculate_helm_chart_index
+
+Calculates Helm chart index on the specified path (local repositories only).
+
+=cut
+
+sub calculate_helm_chart_index {
+    my ( $self, %args ) = @_;
+    my $repository = $args{repository} || $self->repository();
+    return $self->_handle_repository_reindex("/helm/$repository/reindex");
+}
+
 =head1 SYSTEM & CONFIGURATION
 
 =cut
@@ -2320,26 +2332,6 @@ sub get_reverse_proxy_snippet {
 
     my $url = $self->_api_url() . "/system/configuration/reverseProxy/nginx";
     return $self->get($url);
-}
-
-=head2 create_bootstrap_bundle
-
-This rest is relevant for High Availability set up. It will create a bootstrap bundle on the primary node of an
-Artifactory HA installation that will include all the relevant keys so a new node can access the database and fetch all
-the relevant configuration files. The same bundle must be installed on all nodes during an installation of new nodes or
-if upgrading from a version older than 5.0. For more details, please refer to Installing Artifactory HA.
-
-=cut
-
-sub create_bootstrap_bundle {
-    my ( $self, $file ) = @_;
-    my $url = $self->_api_url() . "/system/bootstrap_bundle";
-
-    return $self->post(
-        $url,
-        'Content-Type' => 'application/json',
-        content        => $self->_json->encode( { file => $file } )
-    );
 }
 
 =head1 PLUGINS

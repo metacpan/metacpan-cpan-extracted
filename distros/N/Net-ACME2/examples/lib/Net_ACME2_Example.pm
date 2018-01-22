@@ -92,9 +92,9 @@ sub run {
         $acme->poll_order($order);
     }
 
-    print "$/Certificate key:$/$key$/$/";
+    print "Certificate key:$/$key$/$/";
 
-    print "$/Certificate URL: " . $order->certificate() . $/;
+    print "$/Certificate URL: " . $order->certificate() . $/ . $/;
 
     print HTTP::Tiny->new()->get($order->certificate())->{'content'};
 
@@ -113,12 +113,9 @@ sub _get_domains {
         chomp $d;
 
         if (!defined $d || !length $d) {
-            if (@domains) {
-                warn "Give at least one domain.$/";
-            }
-            else {
-                last;
-            }
+            last if @domains;
+
+            warn "Give at least one domain.$/";
         }
         else {
             if ($d =~ tr<*><> && !$self->CAN_WILDCARD) {

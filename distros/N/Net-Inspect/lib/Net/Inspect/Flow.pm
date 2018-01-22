@@ -49,7 +49,9 @@ sub new {
 		no strict 'refs';
 		*{ "${clname}::$method" } = sub {
 		    my $self = shift;
-		    for my $flow (@{$self->{flows}}) {
+		    # copy, might change due detach in GuessProtocol
+		    my @flows = @{$self->{flows}};
+		    for my $flow (@flows) {
 			if ( wantarray ) {
 			    my @rv = $flow->$method(@_) or next;
 			    return @rv

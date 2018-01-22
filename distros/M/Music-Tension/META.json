@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -45,13 +45,20 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
-   "x_homepageresources" : {
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thrig/Music-Tension/issues"
+      },
+      "homepage" : "https://github.com/thrig/Music-Tension",
+      "license" : [
+         "https://opensource.org/licenses/BSD-3-Clause"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/thrig/Music-Tension.git",
          "web" : "https://github.com/thrig/Music-Tension"
       }
    },
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

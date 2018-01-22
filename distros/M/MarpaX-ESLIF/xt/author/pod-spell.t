@@ -19,8 +19,6 @@ Grammar
 Interface
 Introduction
 Jean
-Jeffrey
-Kegler
 Level
 Logger
 MarpaX
@@ -33,5 +31,4 @@ Tutorial
 Type
 Value
 jeandamiendurand
-jeffreykegler
 lib

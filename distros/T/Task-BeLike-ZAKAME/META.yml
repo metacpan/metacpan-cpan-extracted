@@ -26,7 +26,7 @@ no_index:
 provides:
   Task::BeLike::ZAKAME:
     file: lib/Task/BeLike/ZAKAME.pm
-    version: '0.13'
+    version: '0.14'
 recommends:
   App::rainbarf: '0'
   App::scan_prereqs_cpanfile: '0'
@@ -37,6 +37,7 @@ recommends:
   LWP::Protocol::rsync: '0'
   Paws: '0'
   Perl::Critic: '0'
+  Web::Query: '0'
 requires:
   AnyEvent: '0'
   App::Ack: '0'
@@ -50,12 +51,11 @@ requires:
   Class::Refresh: '0'
   Data::Printer: '0'
   Devel::Confess: '0'
-  Future: '0'
-  IO::Async: '0'
   Import::Base: '0'
   Minilla: '0'
   Mojolicious: '0'
   Moo: '0'
+  Net::Async::HTTP: '0'
   Perl::Tidy: '0'
   Plack: '0'
   Pod::Cpandoc: '0'
@@ -65,13 +65,12 @@ requires:
   Text::Markdown: '0'
   Type::Tiny: '0'
   Version::Next: '0'
-  Web::Query: '0'
   perl: '5.014002'
 resources:
   bugtracker: https://github.com/zakame/Task-BeLike-ZAKAME/issues
   homepage: https://github.com/zakame/Task-BeLike-ZAKAME
   repository: git://github.com/zakame/Task-BeLike-ZAKAME.git
-version: '0.13'
+version: '0.14'
 x_contributors:
   - 'Zak B. Elep <zak.elep@yoyo.ph>'
   - 'Zak B. Elep <zakame@zakame.net>'

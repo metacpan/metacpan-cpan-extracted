@@ -1,6 +1,6 @@
 0xx = if this fails, stop
 1xx = core modules standalone
-2xx = core modules via mini-apps (TODO some of 1xx belong here, must rename)
+2xx = core modules via mini-apps
 3xx = sane defaults
 4xx = error handling
 8xx = plugins

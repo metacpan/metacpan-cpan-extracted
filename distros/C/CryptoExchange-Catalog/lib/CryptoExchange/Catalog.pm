@@ -1,7 +1,7 @@
 package CryptoExchange::Catalog;
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '20180109'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '20180116'; # VERSION
 
 use 5.010001;
 use strict;
@@ -82,7 +82,7 @@ CryptoExchange::Catalog - Catalog of cryptoexchanges
 
 =head1 VERSION
 
-This document describes version 20180109 of CryptoExchange::Catalog (from Perl distribution CryptoExchange-Catalog), released on 2018-01-09.
+This document describes version 20180116 of CryptoExchange::Catalog (from Perl distribution CryptoExchange-Catalog), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,6 @@ Abucoins	abucoins
 AidosMarket	aidos-market
 Allcoin	allcoin
 Altcoin Trader	altcoin-trader
-BCC Exchange	bcc-exchange
 BCEX	bcex
 BITHOLIC	bitholic
 BL3P	bl3p
@@ -172,6 +171,7 @@ BTCC	btcc
 BTCTurk	btcturk
 BX Thailand	bx-thailand
 Bancor Network	bancor-network
+BarterDEX	barterdex
 Bibox	bibox
 BigONE	bigone
 Binance	binance
@@ -192,6 +192,7 @@ BitcoinTrade	bitcointrade
 Bitex.la	bitex-la
 Bitfinex	bitfinex
 Bithumb	bithumb
+Bitinka	bitinka
 Bitlish	bitlish
 Bitmaszyna	bitmaszyna
 Bitonic	bitonic
@@ -211,21 +212,23 @@ C2CX	c2cx
 CEX.IO	cex-io
 COSS	coss
 ChaoEX	chaoex
+Cobinhood	cobinhood
 CoinCorner	coincorner
 CoinEgg	coinegg
+CoinEx	coinex
 CoinExchange	coinexchange
 CoinFalcon	coinfalcon
 CoinMate	coinmate
 Coinbene	coinbene
 Coinfloor	coinfloor
 Coingi	coingi
+Coinhouse	coinhouse
 Coinnest	coinnest
 Coinone	coinone
 Coinrail	coinrail
 Coinrate	coinrate
 Coinroom	coinroom
 CoinsBank	coinsbank
-CoinsMarkets	coinsmarkets
 Coinsecure	coinsecure
 Coinsquare	coinsquare
 Coinut	coinut
@@ -243,7 +246,6 @@ Dgtmarket	dgtmarket
 ETHEXIndia	ethexindia
 EXX	exx
 EtherDelta	etherdelta
-Ethfinex	ethfinex
 ExcambrioRex	excambriorex
 Exmo	exmo
 Exrates	exrates
@@ -296,12 +298,14 @@ OasisDEX	oasisdex
 OkCoin Intl.	okcoin-intl
 Omni DEX	omni-dex
 OpenLedger DEX	openledger
+Ore.Bz	ore-bz
 Paribu	paribu
 Poloniex	poloniex
 QBTC	qbtc
 Qryptos	qryptos
 QuadrigaCX	quadrigacx
 Quoine	quoine
+Radar Relay	radar-relay
 RightBTC	rightbtc
 Rippex	rippex
 Ripple China	ripple-china
@@ -320,6 +324,7 @@ Token Store	token-store
 Trade Satoshi	trade-satoshi
 Tripe Dice Exchange	triple-dice-exchange
 Tux Exchange	tux-exchange
+Upbit	upbit
 VirtacoinWorld	virtacoinworld
 WEX	wex
 Waves Decentralized Exchange	waves-dex

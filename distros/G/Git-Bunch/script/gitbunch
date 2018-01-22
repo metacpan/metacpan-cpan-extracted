@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-11-24'; # DATE
-our $VERSION = '0.621'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.622'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.621 of gitbunch (from Perl distribution Git-Bunch), released on 2017-11-24.
+This document describes version 0.622 of gitbunch (from Perl distribution Git-Bunch), released on 2018-01-17.
 
 =head1 SYNOPSIS
 
@@ -489,6 +489,16 @@ Directory to check.
 
 =over
 
+=item B<--action>=I<s>
+
+Default value:
+
+ "sync"
+
+Valid values:
+
+ ["sync","list-source-repos"]
+
 =item B<--backup>
 
 Whether doing backup to target.
@@ -739,6 +749,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand sync
 
+ action (see --action)
  backup (see --backup)
  create_bare_target (see --create-bare-target)
  delete_branch (see --delete-branch)
@@ -807,7 +818,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

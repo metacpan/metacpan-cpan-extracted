@@ -32,7 +32,7 @@ use DateTime::TimeZone;
         Indian
         Pacific
         )
-        ) {
+    ) {
         ok( $cats{$c}, "$c is in categories list" );
     }
 

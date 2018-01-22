@@ -3,9 +3,9 @@ NAME
     catalog
 
 VERSION
-    This document describes version 20180109 of
+    This document describes version 20180116 of
     WordLists::CryptoCurrency::Catalog (from Perl distribution
-    WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
+    WordLists-CryptoCurrency-Catalog), released on 2018-01-16.
 
 DESCRIPTION
     This distribution contains the following modules:

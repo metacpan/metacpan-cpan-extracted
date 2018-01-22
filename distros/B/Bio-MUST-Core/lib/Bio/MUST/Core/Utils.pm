@@ -1,35 +1,22 @@
 package Bio::MUST::Core::Utils;
 # ABSTRACT: Utility functions for enabling multiple file processing
-$Bio::MUST::Core::Utils::VERSION = '0.180140';
+$Bio::MUST::Core::Utils::VERSION = '0.180190';
 use strict;
 use warnings;
 use autodie;
 
 use File::Basename;
-use File::HomeDir;
 use Path::Class qw(file);
 use Test::Files;
+use Test::Most;
 
 use Exporter::Easy (
-    OK   => [ qw(fix_homedir secure_outfile :filenames cmp_store) ],
+    OK   => [ qw(secure_outfile :filenames :tests) ],
     TAGS => [
         filenames => [ qw(insert_suffix change_suffix append_suffix) ],
+        tests     => [ qw(cmp_store cmp_float) ],
     ],
 );
-
-
-# TODO: replace by calls to Path::Class::dir
-
-sub fix_homedir {
-    my $dir = shift;
-
-    # workaround for '~-like' paths
-    if ($dir =~ m{ \A ~ (.*) }xms) {
-        $dir = File::HomeDir->my_home . $1;
-    }
-
-    return $dir;
-}
 
 
 sub secure_outfile {
@@ -94,6 +81,16 @@ sub cmp_store {
 	return;
 }
 
+
+sub cmp_float {
+    my ($got, $expect, $epsilon, $test) = @_;
+
+    # compare got and expect to epsilon precision
+    cmp_ok abs($got - $expect), '<', $epsilon, $test;
+
+    return;
+}
+
 1;
 
 __END__
@@ -106,7 +103,7 @@ Bio::MUST::Core::Utils - Utility functions for enabling multiple file processing
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 

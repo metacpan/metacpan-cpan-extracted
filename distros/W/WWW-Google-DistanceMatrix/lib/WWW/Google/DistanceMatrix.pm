@@ -1,6 +1,6 @@
 package WWW::Google::DistanceMatrix;
 
-$WWW::Google::DistanceMatrix::VERSION   = '0.15';
+$WWW::Google::DistanceMatrix::VERSION   = '0.19';
 $WWW::Google::DistanceMatrix::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::DistanceMatrix - Interface to Google Distance Matrix API.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.19
 
 =cut
 
@@ -23,7 +23,7 @@ use WWW::Google::UserAgent::DataTypes -all;
 use WWW::Google::DistanceMatrix::Params qw(validate $FIELDS);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 extends 'WWW::Google::UserAgent';
 
 our $BASE_URL = 'https://maps.googleapis.com/maps/api/distancematrix';
@@ -336,7 +336,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-DistanceMatrix>
+L<https://github.com/manwar/WWW-Google-DistanceMatrix>
 
 =head1 BUGS
 

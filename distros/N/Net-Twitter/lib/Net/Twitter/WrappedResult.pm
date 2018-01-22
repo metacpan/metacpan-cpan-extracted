@@ -1,5 +1,5 @@
 package Net::Twitter::WrappedResult;
-$Net::Twitter::WrappedResult::VERSION = '4.01042';
+$Net::Twitter::WrappedResult::VERSION = '4.01043';
 use Moose;
 
 # decoded JSON Twitter API response
@@ -43,7 +43,7 @@ Net::Twitter::WrappedResult - Wrap an HTTP response and Twitter result
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

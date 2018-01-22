@@ -3,25 +3,26 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Warn;
 use URI::Escape;
 use Encode;
+use HTTP::Headers::Fast;
 
 use MVC::Neaf::Request;
 
-my $warn = 0;
-$SIG{__WARN__} = sub { $warn++; warn $_[0]; };
+warnings_like {
 
 my $copy = uri_unescape( "%C2%A9" ); # a single (c) symbol
 $copy = decode_utf8($copy);
 
 my $req = MVC::Neaf::Request->new(
     cached_params => { x => 42 },
-    header_in => HTTP::Headers->new(
+    header_in => HTTP::Headers::Fast->new(
         Cookie => 'cook=%C2%A9; guy=bad',
         Referer => 'http://google.com',
         User_Agent => 'test bot',
     ),
-    route => {}, # this one to avoid warnings
+    endpoint => {}, # this one to avoid warnings
                  # - normally script_name is unavailable before routing occurs
 );
 $req->set_path("/foo/bar");
@@ -69,8 +70,11 @@ my $flag = 0;
 $req->postpone( sub { $_[0]->close; $flag++ } );
 is ($flag, 0, "postpone(): no immediate effect");
 
-is_deeply( [sort $req->header_in_keys], [sort qw[Referer User-Agent Cookie]]
-    , "header_in_keys (who needs it anyway?)" );
+
+is_deeply(
+    [sort $req->header_in->header_field_names],
+    [sort qw[Referer User-Agent Cookie]]
+    , "List header keys (who needs it anyway?)" );
 
 my $dump = $req->dump;
 is( ref $dump, 'HASH', "Dump works");
@@ -86,6 +90,6 @@ is ($req->header_out( "foobar" ), 42, "Header set");
 $req->clear;
 is ($req->header_out( "foobar" ), undef, "Clear removed header" );
 
-ok !$warn, "$warn warnings issued";
+} [], "No warnings issued";
 
 done_testing;

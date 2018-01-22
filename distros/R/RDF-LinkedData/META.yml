@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - 'Semantic Web'
 license: perl
@@ -34,10 +34,10 @@ optional_features: {}
 provides:
   Plack::App::RDF::LinkedData:
     file: lib/Plack/App/RDF/LinkedData.pm
-    version: '1.02'
+    version: '1.92'
   RDF::LinkedData:
     file: lib/RDF/LinkedData.pm
-    version: '1.02'
+    version: '1.92'
 recommends:
   Config::ZOMG: '0'
   JSON: '0'
@@ -71,13 +71,11 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#perlrdf
   Identifier: http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project
-  Mailinglist: http://lists.perlrdf.org/listinfo/dev
-  Wiki: http://wiki.perlrdf.org/
   bugtracker: https://github.com/kjetilk/RDF-LinkedData/issues
   homepage: https://metacpan.org/release/RDF-LinkedData
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/RDF-LinkedData/
-version: '1.02'
+version: '1.92'
 x_contributors:
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
   - 'Richard Lewis'
@@ -86,3 +84,4 @@ x_provides_scripts:
   linked_data.psgi:
     file: script/linked_data.psgi
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -33,17 +33,17 @@ constant (pTHX_ const char *name, STRLEN len) {
      Regenerate these constant functions by feeding this entire source file to
      perl -x
 
-#!/usr/bin/perl -w
+#!/opt/local/bin/perl5.24 -w
 use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 
 my $types = {map {($_, 1)} qw()};
 my @names = (qw());
 
-print constant_types(); # macro defs
+print constant_types(), "\n"; # macro defs
 foreach (C_constant ("XML::CanonicalizeXML", 'constant', 'IV', $types, undef, 3, @names) ) {
     print $_, "\n"; # C constant subs
 }
-print "#### XS Section:\n";
+print "\n#### XS Section:\n";
 print XS_constant ("XML::CanonicalizeXML", $types);
 __END__
    */

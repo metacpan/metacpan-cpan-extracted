@@ -6,13 +6,13 @@ package MarpaX::ESLIF::ECMA404;
 
 # ABSTRACT: JSON Data Interchange Format following ECMA-404 specification
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 
 use Carp qw/croak/;
-use MarpaX::ESLIF 2.0.13;   # String literal, hide-separator features
+use MarpaX::ESLIF 2.0.32;   # Fixes tconv character validation
 use MarpaX::ESLIF::ECMA404::RecognizerInterface;
 use MarpaX::ESLIF::ECMA404::ValueInterface;
 use Scalar::Util qw/looks_like_number/;
@@ -155,7 +155,7 @@ MarpaX::ESLIF::ECMA404 - JSON Data Interchange Format following ECMA-404 specifi
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Log::Any::Adapter::Util qw(cmp_deeply read_file);
 
-plan tests => 25;
+plan tests => 27;
 my $__FILE__ = quotemeta __FILE__;
 
 require Log::Any::Adapter;
@@ -38,6 +38,16 @@ require Log::Any::Adapter;
         like $warnings[0],
             qr{Invalid log level "FOOBAR"\. Defaulting to "trace" at $__FILE__ line \d+},
             'warning is correct';
+    }
+
+    { # Test that File adapter accepts binmode properly
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, $_[0] };
+        Log::Any::Adapter->set( {lexically => \my $lex}, 'File', $file, binmode => 'raw' );
+        my $log = Log::Any->get_logger();
+        $log->warn("\x{263A} \x{263B}");
+        like( scalar( read_file($file) ), qr/\x{263A} \x{263B}$/ms, "warn logged raw to file" );
+        like $warnings[0], qr{Wide character in print}, 'got warning printing UTF-8 as raw';
     }
 }
 

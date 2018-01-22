@@ -1,0 +1,12 @@
+name: Statistics-Descriptive-Weighted
+module_name: Statistics::Descriptive::Weighted
+version: 0.2
+author: David H. Ardell
+license: perl
+distribution_type: module
+requires:
+  Statistics::Descriptive: 2.6
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

@@ -1,0 +1,7 @@
+Revision history for AnyEvent-PgRecvlogical
+
+0.002     2018-01-21 15:29:16-05:00 America/New_York
+    - POD typo
+
+0.001     2018-01-21 14:56:06-05:00 America/New_York
+    - inital release

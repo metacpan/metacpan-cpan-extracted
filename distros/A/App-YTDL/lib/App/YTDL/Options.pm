@@ -469,10 +469,10 @@ sub set_options {
 
 sub _opt_settings_menu {
     my ( $opt, $sub_menu, $current, $prompt ) = @_;
-    my $changed = settings_menu( $sub_menu, $current, { prompt => $prompt, in_place => 0 } );
+    my $changed = settings_menu( $sub_menu, $current, { prompt => $prompt } );
     return if ! $changed;
-    for my $key ( keys %$changed ) {
-        $opt->{$key} = $changed->{$key};
+    for my $key ( keys %$current ) {
+        $opt->{$key} = $current->{$key};
     }
     $opt->{change}++;
 }

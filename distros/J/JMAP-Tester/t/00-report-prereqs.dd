@@ -43,6 +43,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'HTTP::Response' => '0',
                                    'JSON::Typist' => '0.005',
                                    'Test::Abortable' => '0',
                                    'Test::Deep' => '0',

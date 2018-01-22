@@ -7,7 +7,7 @@
 #ifndef MRUBY_VALUE_H
 #define MRUBY_VALUE_H
 
-#include "mruby/common.h"
+#include "common.h"
 
 /**
  * MRuby Value definition functions and macros.
@@ -22,29 +22,54 @@ struct mrb_state;
 # error "You can't define MRB_INT16 and MRB_INT64 at the same time."
 #endif
 
+#if defined _MSC_VER && _MSC_VER < 1800
+# define PRIo64 "llo"
+# define PRId64 "lld"
+# define PRIx64 "llx"
+# define PRIo16 "ho"
+# define PRId16 "hd"
+# define PRIx16 "hx"
+# define PRIo32 "o"
+# define PRId32 "d"
+# define PRIx32 "x"
+#else
+# include <inttypes.h>
+#endif
+
 #if defined(MRB_INT64)
   typedef int64_t mrb_int;
 # define MRB_INT_BIT 64
 # define MRB_INT_MIN (INT64_MIN>>MRB_FIXNUM_SHIFT)
 # define MRB_INT_MAX (INT64_MAX>>MRB_FIXNUM_SHIFT)
+# define MRB_PRIo PRIo64
+# define MRB_PRId PRId64
+# define MRB_PRIx PRIx64
 #elif defined(MRB_INT16)
   typedef int16_t mrb_int;
 # define MRB_INT_BIT 16
 # define MRB_INT_MIN (INT16_MIN>>MRB_FIXNUM_SHIFT)
 # define MRB_INT_MAX (INT16_MAX>>MRB_FIXNUM_SHIFT)
+# define MRB_PRIo PRIo16
+# define MRB_PRId PRId16
+# define MRB_PRIx PRIx16
 #else
   typedef int32_t mrb_int;
 # define MRB_INT_BIT 32
 # define MRB_INT_MIN (INT32_MIN>>MRB_FIXNUM_SHIFT)
 # define MRB_INT_MAX (INT32_MAX>>MRB_FIXNUM_SHIFT)
+# define MRB_PRIo PRIo32
+# define MRB_PRId PRId32
+# define MRB_PRIx PRIx32
 #endif
 
+
+#ifndef MRB_WITHOUT_FLOAT
+MRB_API double mrb_float_read(const char*, char**);
 #ifdef MRB_USE_FLOAT
   typedef float mrb_float;
-# define str_to_mrb_float(buf) strtof(buf, NULL)
 #else
   typedef double mrb_float;
-# define str_to_mrb_float(buf) strtod(buf, NULL)
+#endif
 #endif
 
 #if defined _MSC_VER && _MSC_VER < 1900
@@ -56,13 +81,12 @@ MRB_API int mrb_msvc_vsnprintf(char *s, size_t n, const char *format, va_list ar
 MRB_API int mrb_msvc_snprintf(char *s, size_t n, const char *format, ...);
 # define vsnprintf(s, n, format, arg) mrb_msvc_vsnprintf(s, n, format, arg)
 # define snprintf(s, n, format, ...) mrb_msvc_snprintf(s, n, format, __VA_ARGS__)
-# if _MSC_VER < 1800
+# if _MSC_VER < 1800 && !defined MRB_WITHOUT_FLOAT
 #  include <float.h>
 #  define isfinite(n) _finite(n)
 #  define isnan _isnan
 #  define isinf(n) (!_finite(n) && !_isnan(n))
 #  define signbit(n) (_copysign(1.0, (n)) < 0.0)
-#  define strtof (float)strtod
 static const unsigned int IEEE754_INFINITY_BITS_SINGLE = 0x7F800000;
 #  define INFINITY (*(float *)&IEEE754_INFINITY_BITS_SINGLE)
 #  define NAN ((float)(INFINITY - INFINITY))
@@ -93,10 +117,12 @@ enum mrb_vtype {
   MRB_TT_ENV,         /*  20 */
   MRB_TT_DATA,        /*  21 */
   MRB_TT_FIBER,       /*  22 */
-  MRB_TT_MAXDEFINE    /*  23 */
+  MRB_TT_ISTRUCT,     /*  23 */
+  MRB_TT_BREAK,       /*  24 */
+  MRB_TT_MAXDEFINE    /*  25 */
 };
 
-#include "mruby/object.h"
+#include <mruby/object.h>
 
 #ifdef MRB_DOCUMENTATION_BLOCK
 
@@ -134,7 +160,9 @@ typedef void mrb_value;
 #ifndef mrb_bool
 #define mrb_bool(o)   (mrb_type(o) != MRB_TT_FALSE)
 #endif
+#ifndef MRB_WITHOUT_FLOAT
 #define mrb_float_p(o) (mrb_type(o) == MRB_TT_FLOAT)
+#endif
 #define mrb_symbol_p(o) (mrb_type(o) == MRB_TT_SYMBOL)
 #define mrb_array_p(o) (mrb_type(o) == MRB_TT_ARRAY)
 #define mrb_string_p(o) (mrb_type(o) == MRB_TT_STRING)
@@ -147,6 +175,7 @@ MRB_API mrb_bool mrb_regexp_p(struct mrb_state*, mrb_value);
 /*
  * Returns a float in Ruby.
  */
+#ifndef MRB_WITHOUT_FLOAT
 MRB_INLINE mrb_value mrb_float_value(struct mrb_state *mrb, mrb_float f)
 {
   mrb_value v;
@@ -154,6 +183,7 @@ MRB_INLINE mrb_value mrb_float_value(struct mrb_state *mrb, mrb_float f)
   SET_FLOAT_VALUE(mrb, v, f);
   return v;
 }
+#endif
 
 static inline mrb_value
 mrb_cptr_value(struct mrb_state *mrb, void *p)
@@ -187,6 +217,8 @@ mrb_obj_value(void *p)
 {
   mrb_value v;
   SET_OBJ_VALUE(v, (struct RBasic*)p);
+  mrb_assert(p == mrb_ptr(v));
+  mrb_assert(((struct RBasic*)p)->tt == mrb_type(v));
   return v;
 }
 
@@ -241,6 +273,14 @@ mrb_undef_value(void)
 }
 
 #ifdef MRB_USE_ETEXT_EDATA
+#if (defined(__APPLE__) && defined(__MACH__))
+#include <mach-o/getsect.h>
+static inline mrb_bool
+mrb_ro_data_p(const char *p)
+{
+  return (const char*)get_etext() < p && p < (const char*)get_edata();
+}
+#else
 extern char _etext[];
 #ifdef MRB_NO_INIT_ARRAY_START
 extern char _edata[];
@@ -258,6 +298,7 @@ mrb_ro_data_p(const char *p)
 {
   return _etext < p && p < (char*)&__init_array_start;
 }
+#endif
 #endif
 #else
 # define mrb_ro_data_p(p) FALSE

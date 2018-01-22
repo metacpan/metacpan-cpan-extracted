@@ -1,5 +1,8 @@
 Revision history for Perl module XML::Saxtract
 
+1.04 2018-01-20
+    - fixed typos in the documentation
+
 1.03 2016-10-31
     - added support for subspec type 'sub'
 

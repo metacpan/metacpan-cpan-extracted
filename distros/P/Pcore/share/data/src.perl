@@ -72,7 +72,7 @@
     DEFAULT_GUESS_ENCODING => ['cp1251'],
 
     # http://perltidy.sourceforge.net/perltidy.html
-    PERLTIDY => q[--perl-best-practices --tight-secret-operators --continuation-indentation=2 --maximum-line-length=0 --format-skipping --format-skipping-begin="# <<<" --format-skipping-end="# >>>" --converge --nostandard-output --character-encoding=utf8],
+    PERLTIDY => q[--perl-best-practices --tight-secret-operators --continuation-indentation=2 --weld-nested-containers --maximum-line-length=0 --format-skipping --format-skipping-begin="# <<<" --format-skipping-end="# >>>" --converge --nostandard-output --character-encoding=utf8],
 
     HTML_BEAUTIFY => q[--indent-scripts normal],
 
@@ -151,7 +151,7 @@
             'Subroutines::ProhibitAmpersandSigils'          => { severity           => 4 },
             'Subroutines::ProhibitUnusedPrivateSubroutines' => { private_name_regex => '_(?!_?build_)\w+', },
             'Subroutines::RequireArgUnpacking'              => undef,
-            'Subroutines::ProhibitSubroutinePrototypes'     => undef,               # TODO [PCORE-27] - remove this policy, https://github.com/Perl-Critic/Perl-Critic/issues/591
+            'Subroutines::ProhibitSubroutinePrototypes' => undef,    # TODO [PCORE-27] - remove this policy, https://github.com/Perl-Critic/Perl-Critic/issues/591
 
             # TestingAndDebugging
             'TestingAndDebugging::RequireUseStrict'   => { equivalent_modules              => 'common::header Pcore' },

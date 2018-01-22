@@ -4,13 +4,20 @@
       "Michael Wayne Arnold <marmanold@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "advent",
+      "christmas",
+      "lectionary",
+      "christian",
+      "liturgical"
+   ],
    "license" : [
-      "perl_5"
+      "freebsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Date-Advent",
    "no_index" : {
@@ -37,10 +44,17 @@
             "Carp" : "1.38",
             "Date::Lectionary::Time" : "1.20160727",
             "Moose" : "2.1804",
+            "MooseX::StrictConstructor" : "0.21",
             "Time::Piece" : "1.31",
             "namespace::autoclean" : "0.28",
             "perl" : "5.022"
          }
+      }
+   },
+   "provides" : {
+      "Date::Advent" : {
+         "file" : "lib/Date/Advent.pm",
+         "version" : "1.20171223"
       }
    },
    "release_status" : "stable",
@@ -51,6 +65,7 @@
          "web" : "https://github.com/marmanold/Date-Advent"
       }
    },
-   "version" : "1.20161222",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.20171223",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_twitter" : "https://www.twitter.com/marmanold/"
 }

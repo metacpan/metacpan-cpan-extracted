@@ -1,7 +1,6 @@
 use strict;
 use Test::More;
 
-use List::Util;
 use List::Flatten::XS 'flatten';
 
 my $pattern = +[

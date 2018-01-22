@@ -23,7 +23,7 @@ require Exporter;
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(fcopy rcopy dircopy fmove rmove dirmove pathmk pathrm pathempty pathrmdir rcopy_glob rmove_glob);
 
-$VERSION = '0.39';
+$VERSION = '0.40';
 
 $MaxDepth = 0;
 $KeepMode = 1;
@@ -90,7 +90,7 @@ my $glob = sub {
     require File::Glob;
 
     my @rt;
-    for my $path ( File::Glob::glob($src_glob) ) {
+    for my $path ( File::Glob::bsd_glob($src_glob) ) {
         my @call = [ $do->( $path, @args ) ] or return;
         push @rt, \@call;
     }
@@ -237,11 +237,12 @@ sub dircopy {
 
         $DirPerms = oct($DirPerms) if substr( $DirPerms, 0, 1 ) eq '0';
         mkdir( $end, $DirPerms ) or return if !-d $end;
-        chmod scalar( ( stat($str) )[2] ), $end if $KeepMode;
         if ( $MaxDepth && $MaxDepth =~ m/^\d+$/ && $level >= $MaxDepth ) {
+            chmod scalar( ( stat($str) )[2] ), $end if $KeepMode;
             return ( $filen, $dirn, $level ) if wantarray;
             return $filen;
         }
+
         $level++;
 
         my @files;
@@ -308,7 +309,9 @@ sub dircopy {
             }
         }
         $level--;
+        chmod scalar( ( stat($str) )[2] ), $end if $KeepMode;
         1;
+
     };
 
     $recurs->( $_zero, $_one, $_[2] ) or return;
@@ -333,24 +336,30 @@ sub rmove_glob {
 sub dirmove { $move->( 0, @_ ) }
 
 sub pathmk {
-    my @parts   = File::Spec->splitpath( shift() );
+    my ( $vol, $dir, $file ) = File::Spec->splitpath( shift() );
     my $nofatal = shift;
-    my $pth     = $parts[0];
-    my $zer     = 0;
-    if ( !$pth ) {
-        $pth = File::Spec->catpath( $parts[0], $parts[1], '' );
-        $zer = 1;
+
+    $DirPerms = oct($DirPerms) if substr( $DirPerms, 0, 1 ) eq '0';
+
+    if ( defined($dir) ) {
+        my (@dirs) = File::Spec->splitdir($dir);
+
+        for ( my $i = 0; $i < scalar(@dirs); $i++ ) {
+            my $newdir = File::Spec->catdir( @dirs[ 0 .. $i ] );
+            my $newpth = File::Spec->catpath( $vol, $newdir, "" );
+
+            mkdir( $newpth, $DirPerms ) or return if !-d $newpth && !$nofatal;
+            mkdir( $newpth, $DirPerms ) if !-d $newpth && $nofatal;
+        }
     }
-    if ( !$pth ) {
-        $pth = File::Spec->catpath( $parts[0], $parts[1], $parts[2] );
-        $zer = 2;
+
+    if ( defined($file) ) {
+        my $newpth = File::Spec->catpath( $vol, $dir, $file );
+
+        mkdir( $newpth, $DirPerms ) or return if !-d $newpth && !$nofatal;
+        mkdir( $newpth, $DirPerms ) if !-d $newpth && $nofatal;
     }
-    for ( $zer .. $#parts ) {
-        $DirPerms = oct($DirPerms) if substr( $DirPerms, 0, 1 ) eq '0';
-        mkdir( $pth, $DirPerms ) or return if !-d $pth && !$nofatal;
-        mkdir( $pth, $DirPerms ) if !-d $pth && $nofatal;
-        $pth = File::Spec->catdir( $pth, $parts[ $_ + 1 ] ) unless $_ == $#parts;
-    }
+
     1;
 }
 
@@ -546,7 +555,7 @@ This is important because if it's a directory in list context and there is only 
 
 =head2 rcopy_glob()
 
-This function lets you specify a pattern suitable for perl's File::Glob::glob() as the first argument. Subsequently each path returned by perl's File::Glob::glob() gets rcopy()ied.
+This function lets you specify a pattern suitable for perl's File::Glob::bsd_glob() as the first argument. Subsequently each path returned by perl's File::Glob::bsd_glob() gets rcopy()ied.
 
 It returns and array whose items are array refs that contain the return value of each rcopy() call.
 

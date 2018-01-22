@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
+BEGIN { push @INC, '.' }
 use builder::MyBuilder;
 use File::Basename;
 use File::Spec;
@@ -19,6 +20,26 @@ my %args = (
 
     configure_requires => {
         'Module::Build' => '0.4005',
+    },
+
+    requires => {
+        'Encode' => '0',
+        'Exporter' => '5.57',
+        'parent' => '0',
+        'perl' => '5.008008',
+    },
+
+    recommends => {
+    },
+
+    suggests => {
+    },
+
+    build_requires => {
+    },
+
+    test_requires => {
+        'Test::More' => '0',
     },
 
     name            => 'mRuby',

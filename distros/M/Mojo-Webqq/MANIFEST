@@ -18,6 +18,7 @@ lib/Mojo/Webqq/Base.pm
 lib/Mojo/Webqq/Cache.pm
 lib/Mojo/Webqq/Client.pm
 lib/Mojo/Webqq/Client/Cron.pm
+lib/Mojo/Webqq/Client/Remote/_check_login.pm
 lib/Mojo/Webqq/Client/Remote/_check_sig.pm
 lib/Mojo/Webqq/Client/Remote/_check_verify_code.pm
 lib/Mojo/Webqq/Client/Remote/_cookie_proxy.pm

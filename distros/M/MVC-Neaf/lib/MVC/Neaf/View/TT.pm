@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -19,6 +19,25 @@ MVC::Neaf::View::TT - Template toolkit-based view module for Neaf.
         title => 'Page title',
         ....
     };
+    # Neaf knows it's time to render foo.tt with returned data as stash
+    # and return result to user
+
+    # What actually happens
+    my $view = MVC::Neaf::View::TT->new;
+    my $content = $view->render( { ... } );
+
+    # And if in foo.tt
+    <title>[% title %]</title>
+
+    # Then in $content it becomes
+    <title>Page title</title>
+
+=head1 DESCRIPTION
+
+This module is one of core rendering engines of L<MVC::Neaf>
+known under C<TT> alias.
+
+See also C<neaf view>.
 
 =head1 METHODS
 
@@ -26,6 +45,7 @@ MVC::Neaf::View::TT - Template toolkit-based view module for Neaf.
 
 use Carp;
 use Template;
+use Template::Provider;
 
 our @CARP_NOT = qw(MVC::Neaf::View MVC::Neaf MVC::Neaf::Request);
 
@@ -41,15 +61,25 @@ use parent qw(MVC::Neaf::View);
 
 =item * preserve_dash - don't strip dashed options. Useful for debugging.
 
-=back
+=item * preload => { name => 'in-memory template' } - preload some templates.
+See C<preload()> below.
 
 Also any UPPERCASE OPTIONS will be forwarded to the backend
 (i.e. Template object) w/o changes.
 
-B<NOTE> No input checks are made whatsoever,
-but this MAY change in the future.
+Any extra options except those above will cause an exception.
+
+=back
 
 =cut
+
+my %new_opt;
+$new_opt{$_}++ for qw( template preserve_dash engine preload preload_auto );
+
+my @opt_provider = qw(
+    INCLUDE_PATH ABSOLUTE RELATIVE DEFAULT ENCODING CACHE_SIZE STAT_TTL
+    COMPILE_EXT COMPILE_DIR TOLERANT PARSER DEBUG EVAL_PERL
+);
 
 sub new {
     my ($class, %opt) = @_;
@@ -57,9 +87,43 @@ sub new {
     my %tt_opt;
     $tt_opt{$_} = delete $opt{$_}
         for grep { /^[A-Z]/ } keys %opt;
-    $opt{engine} ||= Template->new (%tt_opt);
+    my @extra = grep { !$new_opt{$_} } keys %opt;
+    croak( "$class->new: Unknown options @extra" )
+        if @extra;
 
-    return $class->SUPER::new(%opt);
+    $opt{engine} ||= do {
+        my %prov_opt;
+        $tt_opt{INCLUDE_PATH} ||= [];
+        $prov_opt{$_} = $tt_opt{$_}
+            for @opt_provider;
+        defined $prov_opt{$_} or delete $prov_opt{$_}
+            for keys %prov_opt;
+
+        my $prov = delete $tt_opt{LOAD_TEMPLATES} || [
+            Template::Provider->new(\%prov_opt)
+        ];
+        $opt{engine_preload} = Template::Provider->new({
+            %prov_opt,
+            CACHE_SIZE => undef,
+            STAT_TTL   => 4_000_000_000,
+        });
+        # shallow copy (not unshift) to avoid spoiling original values
+        $prov = [ $opt{engine_preload}, @$prov ];
+
+        Template->new (%tt_opt, LOAD_TEMPLATES => $prov);
+    };
+
+    my $pre = delete $opt{preload};
+    my $self = $class->SUPER::new(%opt);
+
+    # TODO 0.40 automagically preload from the calling file's DATA section
+    if ( ref $pre eq 'HASH' ) {
+        $self->preload( $_ => $pre->{$_} )
+            for keys %$pre;
+    } elsif ($pre) {
+        $self->_croak("preload must be a hash, not ".(ref $pre || "a scalar") );
+    };
+    return $self;
 };
 
 =head2 render( \%data )
@@ -84,14 +148,54 @@ sub render {
 
     my $out;
     $self->{engine}->process( $template, $data, \$out )
-        or croak $self->{engine}->error;
+        or $self->_croak( $self->{engine}->error );
 
-    return ($out, "text/html");
+    return wantarray ? ($out, "text/html") : $out;
+};
+
+=head2 preload ( name => "[% in_memory_template %]", ... )
+
+Store precompiled templates under given names.
+
+Returns self, dies on error.
+
+=cut
+
+sub preload {
+    my ($self, %tpls) = @_;
+
+    foreach (keys %tpls) {
+        my $compiled = eval { $self->{engine}->template( \$tpls{$_} ) }
+            or $self->_croak( "$_: $@" );
+
+        $self->{engine_preload}->store( $_, $compiled );
+    };
+
+    return $self;
+};
+
+sub _croak {
+    my ($self, @msg) = @_;
+
+    my $where = [caller(1)]->[3];
+    $where =~ s/.*:://;
+
+    croak join "", (ref $self || $self), '->', $where, "(): ", @msg;
 };
 
 =head1 SEE ALSO
 
 L<Template> - the template toolkit used as backend.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
 
 =cut
 

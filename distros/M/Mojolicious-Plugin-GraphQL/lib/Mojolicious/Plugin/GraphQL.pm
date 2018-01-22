@@ -10,7 +10,7 @@ use Module::Runtime qw(require_module);
 use Mojo::Promise;
 use Exporter 'import';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our @EXPORT_OK = qw(promise_code);
 
 use constant promise_code => +{
@@ -21,7 +21,7 @@ use constant promise_code => +{
       @_;
     # only actually works when first promise-instance is a
     # Mojo::Promise, so force it to be one. hoping will be fixed soon
-    Mojo::Promise->new->resolve->all(@promises)->then(sub { shift; @_ })
+    Mojo::Promise->all(@promises);
   },
   # currently only instance methods. not wasteful at all.
   resolve => sub { Mojo::Promise->new->resolve(@_) },
@@ -99,8 +99,9 @@ sub register {
         variablesString  => _safe_serialize( $c->req->query_params->param('variables') ),
       );
     }
-    my $body = decode_json($c->req->body);
-    my $data = eval { $handler->($c, $body, EXECUTE()) };
+    my $data;
+    my $body = eval { decode_json($c->req->body) };
+    $data = eval { $handler->($c, $body, EXECUTE()) } if !$@;
     $data = { errors => [ { message => $@ } ] } if $@;
     return $data->then(sub { $c->render(json => shift) }) if is_Promise($data);
     $c->render(json => $data);

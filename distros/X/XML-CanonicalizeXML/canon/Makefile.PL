@@ -21,6 +21,8 @@ pure_all :: static
 
 static ::       libcanon$(LIB_EXT)
 
+dynamic ::
+
 libcanon$(LIB_EXT): $(O_FILES)
 	$(AR) cr libcanon$(LIB_EXT) $(O_FILES)
 	$(RANLIB) libcanon$(LIB_EXT)

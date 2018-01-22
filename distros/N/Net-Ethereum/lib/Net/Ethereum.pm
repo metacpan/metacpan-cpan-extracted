@@ -10,9 +10,8 @@ use JSON;
 use Math::BigInt;
 use Math::BigFloat;
 use File::Slurper 'read_text';
-use Data::Dumper;
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 
 
 =pod

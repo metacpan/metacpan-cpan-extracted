@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 our @ISA;
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -42,6 +42,8 @@ Text::CaboCha - Alternate Interface To libcabocha
 
 =head1 SYNOPSIS
 
+    use utf8;
+    use Encode;
     use Text::CaboCha;
     my $cabocha = Text::CaboCha->new({
         output_format => $output_format,
@@ -61,6 +63,7 @@ Text::CaboCha - Alternate Interface To libcabocha
         output        => $output_file
     });
 
+    my $text = encode(Text::CaboCha::ENCODING, "太郎は次郎が持っている本を花子に渡した。");
     my $tree = $cabocha->parse($text);
     $tree->tostr(Text::CaboCha::CABOCHA_FORMAT_TREE); # You can check the tree.
 
@@ -194,7 +197,9 @@ Path to cabocha-config, if available.
 =back
 
 =head1 SEE ALSO
-https://taku910.github.io/cabocha/  
+
+https://taku910.github.io/cabocha/
+
 L<Text::CaboCha|Text::CaboCha>
 
 =head1 LICENSE

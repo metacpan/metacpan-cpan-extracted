@@ -40,5 +40,5 @@ requires:
   namespace::clean: '0'
   strict: '0'
   warnings: '0'
-version: 0.1.13
+version: 0.1.14
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,11 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader
 
+0.07048  2018-01-20
+        - Fix for PostgreSQL enums not in the schema search path (RT#123234)
+        - Fix 'default now()' test for PostgreSQL v10
+        - Work around incompatible change in Hash::Merge (GH#16)
+        - Fix skip count for non-InnoDB MySQL test
+
 0.07047  2017-05-26
         - Avoid upcoming DBIC warning on implicit SELECT * invocation
           (RT#118178)

@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-App"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

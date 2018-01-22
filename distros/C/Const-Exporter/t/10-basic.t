@@ -82,7 +82,7 @@ is(baz, $num + 1, "Reference pre-defined constant in expression");
 
 is_deeply( [sort @EXPORT], [sort qw/ nam nam2 $num $str @arr %hash $pre $post $ref aa0 aa1 aa2 aa3 ab1 ab2 ab3 ab4 $ac1 $ac2 $ac3 /], '@EXPORT');
 
-is_deeply( [sort @EXPORT_OK], [sort qw/ nam nam2 $num $str @arr %hash $pre $post $ref aa0 aa1 aa2 aa3 ab1 ab2 ab3 ab4 $ac1 $ac2 $ac3 foo bar baz /], '@EXPORT_OK');
+is_deeply( [sort @EXPORT_OK], [sort qw/ const nam nam2 $num $str @arr %hash $pre $post $ref aa0 aa1 aa2 aa3 ab1 ab2 ab3 ab4 $ac1 $ac2 $ac3 foo bar baz /], '@EXPORT_OK');
 
 is_deeply( [sort keys %EXPORT_TAGS], [qw/ all default tag1 tag2 /], '%EXPORT_TAGS' );
 

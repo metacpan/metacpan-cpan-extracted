@@ -3,13 +3,13 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.16';
 
 sub new {
-    my ( $class, $browser, $parameters ) = @_;
+    my ( $class, $browser, %parameters ) = @_;
     my $element = bless {
         browser => $browser,
-        %{$parameters}
+        %parameters
     }, $class;
     return $element;
 }
@@ -69,6 +69,11 @@ sub switch_to_frame {
     return $self->browser()->switch_to_frame($self);
 }
 
+sub switch_to_shadow_root {
+    my ($self) = @_;
+    return $self->browser()->switch_to_shadow_root($self);
+}
+
 sub selfie {
     my ( $self, %extra ) = @_;
     return $self->browser()->selfie( $self, %extra );
@@ -98,7 +103,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.09
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -152,6 +157,10 @@ returns the current L<position and size|Firefox::Marionette::Element::Rect> of t
 =head2 send_keys
 
 accepts a scalar string as a parameter.  It sends the string to this L<element|Firefox::Marionette::Element>, such as filling out a text box. This method returns L<the browser|Firefox::Marionette> to aid in chaining methods.
+
+=head2 switch_to_shadow_root
+
+switches to this element's L<shadow root|https://www.w3.org/TR/shadow-dom/>
 
 =head2 switch_to_frame
 

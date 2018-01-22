@@ -1,20 +1,772 @@
-SYNOPSIS
+NAME
+    App::lcpan - Manage your local CPAN mirror
 
+VERSION
+    This document describes version 1.020 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2018-01-15.
+
+SYNOPSIS
     See lcpan script.
 
-HISTORY
+FUNCTIONS
+  authors
+    Usage:
 
+     authors(%args) -> [status, msg, result, meta]
+
+    List authors.
+
+    Examples:
+
+    *   List all authors:
+
+         authors();
+
+    *   Find CPAN IDs which start with something:
+
+         authors( query => ["MICHAEL%"]); # -> ["MICHAEL", "MICHAELW", undef, {}]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    By default will return an array of CPAN ID's. If you set "detail" to
+    true, will return array of records.
+
+  deps
+    Usage:
+
+     deps(%args) -> [status, msg, result, meta]
+
+    List dependencies.
+
+    By default only runtime requires are displayed. To see prereqs for other
+    phases (e.g. configure, or build, or ALL) or for other relationships
+    (e.g. recommends, or ALL), use the "--phase" and "--rel" options.
+
+    Note that dependencies information are taken from "META.json" or
+    "META.yml" files. Not all releases (especially older ones) contain them.
+    lcpan (like MetaCPAN) does not extract information from "Makefile.PL" or
+    "Build.PL" because that requires running (untrusted) code.
+
+    Also, some releases specify dynamic config, so there might actually be
+    more dependencies.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   flatten => *bool*
+
+        Instead of showing tree-like information, flatten it.
+
+        When recursing, the default is to show the final result in a
+        tree-like table, i.e. indented according to levels, e.g.:
+
+         % lcpan deps -R MyModule
+         | module            | author  | version |
+         |-------------------|---------|---------|
+         | Foo               | AUTHOR1 | 0.01    |
+         |   Bar             | AUTHOR2 | 0.23    |
+         |   Baz             | AUTHOR3 | 1.15    |
+         | Qux               | AUTHOR2 | 0       |
+
+        To be brief, if "Qux" happens to also depends on "Bar", it will not
+        be shown in the result. Thus we don't know the actual "Bar" version
+        that is needed by the dependency tree of "MyModule". For example, if
+        "Qux" happens to depends on "Bar" version 0.45 then "MyModule"
+        indirectly requires "Bar" 0.45.
+
+        To list all the direct and indirect dependencies on a single flat
+        list, with versions already resolved to the largest version
+        required, use the "flatten" option:
+
+         % lcpan deps -R --flatten MyModule
+         | module            | author  | version |
+         |-------------------|---------|---------|
+         | Foo               | AUTHOR1 | 0.01    |
+         | Bar               | AUTHOR2 | 0.45    |
+         | Baz               | AUTHOR3 | 1.15    |
+         | Qux               | AUTHOR2 | 0       |
+
+        Note that "Bar"'s required version is already 0.45 in the above
+        example.
+
+    *   include_core => *bool* (default: 1)
+
+        Include core modules.
+
+    *   include_noncore => *bool* (default: 1)
+
+        Include non-core modules.
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   level => *int* (default: 1)
+
+        Recurse for a number of levels (-1 means unlimited).
+
+    *   modules* => *array[perl::modname]*
+
+    *   perl_version => *str* (default: "v5.26.1")
+
+        Set base Perl version for determining core modules.
+
+    *   phase => *str* (default: "runtime")
+
+    *   rel => *str* (default: "requires")
+
+    *   with_xs_or_pp => *bool*
+
+        Check each dependency as XS/PP.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  dists
+    Usage:
+
+     dists(%args) -> [status, msg, result, meta]
+
+    List distributions.
+
+    Examples:
+
+    *   List all distributions:
+
+         dists( cpan => "/cpan");
+
+    *   List all distributions (latest version only):
+
+         dists( cpan => "/cpan", latest => 1);
+
+    *   Grep by distribution name, return detailed record:
+
+         dists( query => ["data-table"], cpan => "/cpan");
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *str*
+
+        Filter by author.
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   has_buildpl => *bool*
+
+    *   has_makefilepl => *bool*
+
+    *   has_metajson => *bool*
+
+    *   has_metayml => *bool*
+
+    *   has_multiple_rels => *bool*
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   latest => *bool*
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    *   rel_mtime_newer_than => *date*
+
+    *   sort => *array[str]* (default: ["dist"])
+
+        Sort the result.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    By default will return an array of distribution names. If you set
+    "detail" to true, will return array of records.
+
+  modules
+    Usage:
+
+     modules(%args) -> [status, msg, result, meta]
+
+    List modules/packages.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *str*
+
+        Filter by author.
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   dist => *perl::distname*
+
+        Filter by distribution.
+
+    *   include_core => *bool* (default: 1)
+
+        Include core modules.
+
+    *   include_noncore => *bool* (default: 1)
+
+        Include non-core modules.
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   latest => *bool*
+
+    *   namespaces => *array[str]*
+
+        Select modules belonging to certain namespace(s).
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   perl_version => *str* (default: "v5.26.1")
+
+        Set base Perl version for determining core modules.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    *   sort => *array[str]* (default: ["module"])
+
+        Sort the result.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    By default will return an array of package names. If you set "detail" to
+    true, will return array of records.
+
+  namespaces
+    Usage:
+
+     namespaces(%args) -> [status, msg, result, meta]
+
+    List namespaces.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   from_level => *int*
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   level => *int*
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    *   sort => *str* (default: "name")
+
+    *   to_level => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  packages
+    Usage:
+
+     packages(%args) -> [status, msg, result, meta]
+
+    List modules/packages.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *str*
+
+        Filter by author.
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   dist => *perl::distname*
+
+        Filter by distribution.
+
+    *   include_core => *bool* (default: 1)
+
+        Include core modules.
+
+    *   include_noncore => *bool* (default: 1)
+
+        Include non-core modules.
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   latest => *bool*
+
+    *   namespaces => *array[str]*
+
+        Select modules belonging to certain namespace(s).
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   perl_version => *str* (default: "v5.26.1")
+
+        Set base Perl version for determining core modules.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    *   sort => *array[str]* (default: ["module"])
+
+        Sort the result.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    By default will return an array of package names. If you set "detail" to
+    true, will return array of records.
+
+  rdeps
+    Usage:
+
+     rdeps(%args) -> [status, msg, result, meta]
+
+    List reverse dependencies.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   authors => *array[str]*
+
+        Filter certain author.
+
+        This can be used to select certain author(s).
+
+    *   authors_arent => *array[str]*
+
+        Filter out certain author.
+
+        This can be used to filter out certain author(s). For example if you
+        want to know whether a module is being used by another CPAN author
+        instead of just herself.
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   level => *int* (default: 1)
+
+        Recurse for a number of levels (-1 means unlimited).
+
+    *   modules* => *array[perl::modname]*
+
+    *   phase => *str* (default: "ALL")
+
+    *   rel => *str* (default: "ALL")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  releases
+    Usage:
+
+     releases(%args) -> [status, msg, result, meta]
+
+    List releases/tarballs.
+
+    The status field is the processing status of the file/release by lcpan.
+    "ok" means file has been extracted and the meta files parsed, "nofile"
+    means file is not found in mirror (possibly because the mirroring
+    process excludes the file e.g. due to file size too large), "nometa"
+    means file does not contain META.{yml,json}, "unsupported" means file
+    archive format is not supported (e.g. rar), "err" means some other error
+    in processing file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *str*
+
+        Filter by author.
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   detail => *bool*
+
+    *   full_path => *bool*
+
+    *   has_buildpl => *bool*
+
+    *   has_makefilepl => *bool*
+
+    *   has_metajson => *bool*
+
+    *   has_metayml => *bool*
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   latest => *bool*
+
+    *   no_path => *bool*
+
+    *   or => *bool*
+
+        When there are more than one query, perform OR instead of AND logic.
+
+    *   query => *array[str]*
+
+        Search query.
+
+    *   query_type => *str* (default: "any")
+
+    *   sort => *array[str]* (default: ["name"])
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  reset
+    Usage:
+
+     reset(%args) -> [status, msg, result, meta]
+
+    Reset (empty) the database index.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  stats
+    Usage:
+
+     stats(%args) -> [status, msg, result, meta]
+
+    Statistics of your local CPAN mirror.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update
+    Usage:
+
+     update(%args) -> [status, msg, result, meta]
+
+    Create/update local CPAN mirror.
+
+    This subcommand first create/update the mirror files by downloading from
+    a remote CPAN mirror, then update the index.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cpan => *dirname*
+
+        Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+        Defaults to "~/cpan".
+
+    *   exclude_author => *array[str]*
+
+        Exclude files from certain author(s).
+
+    *   force_update_index => *bool*
+
+        Update the index even though there is no change in files.
+
+    *   include_author => *array[str]*
+
+        Only include files from certain author(s).
+
+    *   index_name => *filename* (default: "index.db")
+
+        Filename of index.
+
+    *   max_file_size => *int*
+
+        If set, skip downloading files larger than this.
+
+    *   remote_url => *str*
+
+        Select CPAN mirror to download from.
+
+    *   skip_file_indexing_pass_1 => *bool*
+
+    *   skip_file_indexing_pass_2 => *bool*
+
+    *   skip_file_indexing_pass_3 => *bool*
+
+    *   skip_index_files => *array[str]*
+
+        Skip one or more files from being indexed.
+
+    *   skip_sub_indexing => *bool* (default: 1)
+
+        Since sub indexing is still experimental, it is not enabled by
+        default. To enable it, pass the "--no-skip-sub-indexing" option.
+
+    *   update_files => *bool* (default: 1)
+
+        Update the files.
+
+    *   update_index => *bool* (default: 1)
+
+        Update the index.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HISTORY
     This application began as CPAN::SQLite::CPANMeta, an extension of
-    CPAN::SQLite. CPAN::SQLite parses 02packages.details.txt.gz and
-    01mailrc.txt.gz and puts the parse result into a SQLite database.
-    CPAN::SQLite::CPANMeta parses the META.json/META.yml files in
+    CPAN::SQLite. "CPAN::SQLite" parses "02packages.details.txt.gz" and
+    "01mailrc.txt.gz" and puts the parse result into a SQLite database.
+    "CPAN::SQLite::CPANMeta" parses the "META.json"/"META.yml" files in
     individual release files and adds it to the SQLite database.
 
     In order to simplify things for the users (one-step indexing) and get
-    more freedom in database schema, lcpan skips using CPAN::SQLite and
+    more freedom in database schema, "lcpan" skips using "CPAN::SQLite" and
     creates its own SQLite database. It also parses
-    02packages.details.txt.gz but does not parse distribution names from it
-    but instead uses META.json and META.yml files extracted from the
-    release files. If no META.* files exist, then it will use the module
+    "02packages.details.txt.gz" but does not parse distribution names from
+    it but instead uses "META.json" and "META.yml" files extracted from the
+    release files. If no "META.*" files exist, then it will use the module
     name.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-lcpan>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

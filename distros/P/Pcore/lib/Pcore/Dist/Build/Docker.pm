@@ -69,14 +69,13 @@ sub init ( $self, $args ) {
 
         $files->add_dir( $ENV->share->get_storage( 'pcore', 'Pcore' ) . '/docker/' );
 
-        $files->render_tmpl(
-            {   author                        => $self->dist->cfg->{author},
-                dist_path                     => lc $self->dist->name,
-                dockerhub_dist_repo_namespace => $repo_namespace,
-                dockerhub_dist_repo_name      => $repo_name,
-                dockerhub_pcore_repo_id       => $ENV->pcore->docker->{repo_id},
-            }
-        );
+        $files->render_tmpl( {
+            author                        => $self->dist->cfg->{author},
+            dist_path                     => lc $self->dist->name,
+            dockerhub_dist_repo_namespace => $repo_namespace,
+            dockerhub_dist_repo_name      => $repo_name,
+            dockerhub_pcore_repo_id       => $ENV->pcore->docker->{repo_id},
+        } );
 
         $files->write_to( $self->dist->root );
     }
@@ -535,12 +534,12 @@ sub trigger_build ( $self, $tag ) {
 ## |    3 | 23                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 118                  | * Subroutine "status" with high complexity score (26)                                                          |
-## |      | 292                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 117                  | * Subroutine "status" with high complexity score (26)                                                          |
+## |      | 291                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 477                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 476                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 261, 340, 470        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 260, 339, 469        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -4,20 +4,23 @@ use strict;
 use warnings;
 use overload '""' => 'string';
 
+our $VERSION = '0.16';
+
 sub throw {
-	my ($class, $response) = @_;
-	my $self = bless { response => $response }, $class;
-	Carp::croak($self);
+    my ( $class, $response ) = @_;
+    my $self = bless { response => $response }, $class;
+    Carp::croak($self);
 }
 
 sub string {
-	my ($self) = @_;
-	return $self->{response}->error()->{error} . q[: ] . $self->{response}->error()->{message};
+    my ($self) = @_;
+    return $self->{response}->error()->{error} . q[: ]
+      . $self->{response}->error()->{message};
 }
 
 sub trace {
-	my ($self) = @_;
-	return $self->{response}->error()->{stacktrace};
+    my ($self) = @_;
+    return $self->{response}->error()->{stacktrace};
 }
 
 1;    # Magic true value required at end of module
@@ -29,7 +32,7 @@ Firefox::Marionette::Exception::Response - Represents a Marionette protocol resp
 
 =head1 VERSION
 
-Version 0.09
+Version 0.16
 
 =head1 SYNOPSIS
 

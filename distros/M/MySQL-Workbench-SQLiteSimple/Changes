@@ -1,6 +1,14 @@
 Change history for MySQL::Workbench::SQLiteSimple
 =================================================
 
+0.03 2018-01-15
+
+    [IMPROVEMENTS]
+    * now you can pass no_files => 1 to create_sql to only get the SQL
+
+    [DOCUMENTATION]
+    * replaced ::DBIC with ::SQLiteSimple
+
 0.02 2014-12-13
 
     [BUGFIX]

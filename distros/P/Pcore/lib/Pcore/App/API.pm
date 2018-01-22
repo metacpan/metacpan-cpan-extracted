@@ -116,107 +116,103 @@ sub connect_api ( $self, $cb ) {
 
     print q[Initialising API backend ... ];
 
-    $self->{backend}->init(
-        sub ($res) {
-            die qq[Error initialising API auth backend: $res] if !$res;
+    $self->{backend}->init( sub ($res) {
+        die qq[Error initialising API auth backend: $res] if !$res;
 
-            say 'done';
+        say 'done';
 
-            my $connect_app_instance = sub {
-                print q[Connecting app instance ... ];
+        my $connect_app_instance = sub {
+            print q[Connecting app instance ... ];
 
-                $self->{backend}->connect_app_instance(
-                    $self->app->{instance_id},
-                    "@{[$self->app->version]}",
-                    $self->roles,
-                    $self->permissions,
-                    sub ($res) {
-                        say $res;
+            $self->{backend}->connect_app_instance(
+                $self->app->{instance_id},
+                "@{[$self->app->version]}",
+                $self->roles,
+                $self->permissions,
+                sub ($res) {
+                    say $res;
 
-                        if ( !$res ) {
-                            $cb->($res);
+                    if ( !$res ) {
+                        $cb->($res);
+                    }
+                    else {
+                        if ( $self->{backend}->is_local ) {
+
+                            # create root user
+                            $self->{backend}->create_root_user( sub ($res) {
+
+                                # root user creation error
+                                if ( !$res && $res != 304 ) {
+                                    $cb->($res);
+                                }
+
+                                # root user created
+                                else {
+                                    say qq[Root password: $res->{data}->{root_password}] if $res;
+
+                                    $cb->( result 200 );
+                                }
+
+                                return;
+                            } );
                         }
                         else {
-                            if ( $self->{backend}->is_local ) {
-
-                                # create root user
-                                $self->{backend}->create_root_user(
-                                    sub ($res) {
-
-                                        # root user creation error
-                                        if ( !$res && $res != 304 ) {
-                                            $cb->($res);
-                                        }
-
-                                        # root user created
-                                        else {
-                                            say qq[Root password: $res->{data}->{root_password}] if $res;
-
-                                            $cb->( result 200 );
-                                        }
-
-                                        return;
-                                    }
-                                );
-                            }
-                            else {
-                                $cb->($res);
-                            }
+                            $cb->($res);
                         }
-
-                        return;
                     }
-                );
 
-                return;
-            };
-
-            # get app instance credentials from local config
-            $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0];
-            $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1];
-            $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2];
-
-            # sending app instance registration request
-            if ( !$self->app->{instance_token} ) {
-                print q[Sending app instance registration request ... ];
-
-                # register app on backend, get and init message broker
-                $self->{backend}->register_app_instance(
-                    $self->app->name,
-                    $self->app->desc,
-                    $self->permissions,
-                    P->sys->hostname,
-                    "@{[$self->app->version]}",
-                    sub ( $res ) {
-                        die qq[Error registering app: $res] if !$res;
-
-                        say 'done';
-
-                        # store app instance credentials
-                        {
-                            $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0] = $res->{app_id};
-                            $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1] = $res->{app_instance_id};
-                            $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2] = $res->{app_instance_token};
-
-                            $self->app->store_instance_auth;
-                        }
-
-                        # connect app instance
-                        $connect_app_instance->();
-
-                        return;
-                    }
-                );
-            }
-
-            # connecting app instance
-            else {
-                $connect_app_instance->();
-            }
+                    return;
+                }
+            );
 
             return;
+        };
+
+        # get app instance credentials from local config
+        $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0];
+        $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1];
+        $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2];
+
+        # sending app instance registration request
+        if ( !$self->app->{instance_token} ) {
+            print q[Sending app instance registration request ... ];
+
+            # register app on backend, get and init message broker
+            $self->{backend}->register_app_instance(
+                $self->app->name,
+                $self->app->desc,
+                $self->permissions,
+                P->sys->hostname,
+                "@{[$self->app->version]}",
+                sub ( $res ) {
+                    die qq[Error registering app: $res] if !$res;
+
+                    say 'done';
+
+                    # store app instance credentials
+                    {
+                        $self->app->{id}             = $self->app->instance_auth->{ $self->{backend}->host }->[0] = $res->{app_id};
+                        $self->app->{instance_id}    = $self->app->instance_auth->{ $self->{backend}->host }->[1] = $res->{app_instance_id};
+                        $self->app->{instance_token} = $self->app->instance_auth->{ $self->{backend}->host }->[2] = $res->{app_instance_token};
+
+                        $self->app->store_instance_auth;
+                    }
+
+                    # connect app instance
+                    $connect_app_instance->();
+
+                    return;
+                }
+            );
         }
-    );
+
+        # connecting app instance
+        else {
+            $connect_app_instance->();
+        }
+
+        return;
+    } );
 
     return;
 }
@@ -426,15 +422,13 @@ sub remove_app_instance ( $self, $app_instance_id, $cb = undef ) {
 sub get_users ( $self, $cb = undef ) {
     my $blocking_cv = defined wantarray ? AE::cv : undef;
 
-    $self->{backend}->get_users(
-        sub ( $res ) {
-            $cb->($res) if $cb;
+    $self->{backend}->get_users( sub ( $res ) {
+        $cb->($res) if $cb;
 
-            $blocking_cv->($res) if $blocking_cv;
+        $blocking_cv->($res) if $blocking_cv;
 
-            return;
-        }
-    );
+        return;
+    } );
 
     return $blocking_cv ? $blocking_cv->recv : ();
 }
@@ -614,11 +608,11 @@ sub remove_user_session ( $self, $user_session_id, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 225, 459, 480, 540   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 221, 453, 474, 534   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 258                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 254                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 534                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 528                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

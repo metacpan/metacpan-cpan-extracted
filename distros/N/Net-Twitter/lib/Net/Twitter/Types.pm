@@ -1,5 +1,5 @@
 package Net::Twitter::Types;
-$Net::Twitter::Types::VERSION = '4.01042';
+$Net::Twitter::Types::VERSION = '4.01043';
 use Moose::Util::TypeConstraints;
 use URI;
 
@@ -19,6 +19,6 @@ Net::Twitter::Types - types and coercions for Net::Twitter
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =cut

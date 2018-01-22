@@ -11,11 +11,10 @@ sub CLI ($self) {
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     require Pcore::API::PAUSE;
 
-    my $pause = Pcore::API::PAUSE->new(
-        {   username => $ENV->user_cfg->{PAUSE}->{username},
-            password => $ENV->user_cfg->{PAUSE}->{password},
-        }
-    );
+    my $pause = Pcore::API::PAUSE->new( {
+        username => $ENV->user_cfg->{PAUSE}->{username},
+        password => $ENV->user_cfg->{PAUSE}->{password},
+    } );
 
     print 'clean PAUSE ... ';
 

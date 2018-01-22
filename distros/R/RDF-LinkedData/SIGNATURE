@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,25 +14,25 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 7acaef345d24cacd1c4bd8afed31ca8ea1949b7e COPYRIGHT
+SHA1 54c5a3aeaac2348d871d659fde2898ec4ce67ea9 COPYRIGHT
 SHA1 5d7242049e5d873099981de7b7824130beb8f07d CREDITS
-SHA1 961da6e4d58bdb44244aef8b3ecc80957455a8f2 Changes
+SHA1 940d0742906e8ee165d5774c991411a3f80dd5a6 Changes
 SHA1 a545b0fdb29256f6b04bd794e34de8e0aa421a99 INSTALL
-SHA1 7afae05d67ecea9c5e9328c4c29442c9d343da86 LICENSE
+SHA1 2454ea67cbcfa62e76ec0cafc958c03287d7ab41 LICENSE
 SHA1 59dca5582266a861d9d5e14a08f228a8a481964e MANIFEST
-SHA1 8aa05e9023adc99bfe540e5d6fb33cf64afd9884 META.json
-SHA1 4f5f5e30c38e1b91327f89258efef83f2b6ab787 META.yml
-SHA1 247fbb6fa1e4a079788a17c5312829c3d9c16676 Makefile.PL
-SHA1 c25e1561966494c1e11db02d704fbd4a56ff8e1a README
+SHA1 d4b078fdf4fe3377efa31594772b8988537dfbe3 META.json
+SHA1 a722fe3528bec3f46f1710f237152ae3105cdff6 META.yml
+SHA1 33ef59da0abef38aba2dfc4db1ff57ce08848936 Makefile.PL
+SHA1 19a81ee6a58fe8db0a70db63dc63fa1c86626f8a README
 SHA1 157d43e84e6d5cfd366437aee68e9ef433d697b7 dist.ini
-SHA1 6d6fe65e862529ce3f5468c883c2e8d738db8227 doap.ttl
-SHA1 776143aa19ec143f638cf0b40830dba63e37d8e3 lib/Plack/App/RDF/LinkedData.pm
-SHA1 13537a02873c0195fde950d48e2e68a92ad01f8f lib/RDF/LinkedData.pm
+SHA1 d04c5e4f972de67730f0d22d69b24a1e71e6d477 doap.ttl
+SHA1 5d171cb2f23dad660c64600d80047feb43d442de lib/Plack/App/RDF/LinkedData.pm
+SHA1 aaad1601d85090c4198797d072323696b0d14f15 lib/RDF/LinkedData.pm
 SHA1 7890d0364e0d89d03b38f8de3f086c36be390e57 rdf_linkeddata.json
 SHA1 48e075eb90e32fda410fffbeba517c3bbb3adea3 rdf_linkeddata_dev.json
 SHA1 4f9198217c1a849b4d9c8713b017f34039789b2c rdf_linkeddata_end.json
 SHA1 c6f589ed77ca675ad6c6fecc79f2f42707d3f02f rdf_linkeddata_void.json
-SHA1 30e091ff92a851e46b9fa8579fc5adbe2512d943 script/linked_data.psgi
+SHA1 550151d1224b3b8fa49c122bf4d68a36ed1bdc5b script/linked_data.psgi
 SHA1 af175eb27d75d4dc2890b917d845a2e2b04b5d49 t/00-load.t
 SHA1 281696a176bc56e8708f0dd6d2061319d81aa325 t/10-basic.t
 SHA1 e627ae83c66dacec243ae55d2cd6f0f646673a2c t/11-constructor.t
@@ -41,26 +41,25 @@ SHA1 18afe5a28033b00f5cbf1e0532a8e45a65e4943f t/16-void.t
 SHA1 8979bf395e4dc1dcaf4e3361f606ebab7fe8a8ae t/17-hypermedia-ro.t
 SHA1 5464dc4233bc152e12b29cc5184afc2386affb79 t/18-fragments.t
 SHA1 2d9cf5d5d1cf5f586edf8e6252abeeac7fdc8013 t/19_config_file.t
-SHA1 d888f678c1edf754e23e7d16a2895565580abeda t/20-psgi-basic.t
+SHA1 ca5f612141312b5b9aecdb189ae85301de55ac54 t/20-psgi-basic.t
 SHA1 91839254de8fd93c2695519022a615308703d712 t/25-psgi-endpoint.t
 SHA1 04e9b463bb9fc1d39d2c5ba106284497e2c9bb8f t/28-psgi-void.t
 SHA1 f637dccab2e10c22988378721c189153468a0846 t/data/add.ttl
 SHA1 a0946a1631578df073be5dbef1e81694bcd83fd2 t/data/basic.ttl
 SHA1 262ba8c31b0d06304f5cdd1dbfcf1e6ad8e189d5 t/data/fragments.ttl
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIVAwUBWaP9OX++6N86nkqlAQhgUg//UH4ziPrjPXSSrwIhxZ3QqZ1eYLUvyFqA
-5SOWAPq/bQ3p7Y5mrOnxbB7SLHekAmIY1Kl57qQ1LoI9cxxlCqe5yhG4KkX3sk7j
-Cm38DlYBulHZjIrl+7SKZ+O+ty83Cr+ZX6j8yvynx97MRXz7xDAX1wJIsHwjck20
-mPUf5Z0zzIqSC8NXRrGBEfxAasEECSWCMdR+yjar4emWRcGiwouJ4pyCN55pul8b
-R7hNWP00mXk5Cend3e47eNjvCuNwjPxyvz4dinbIyvUQ0nDUAVfGZyoQwXpydiVu
-FHJe0FAvKW+pN8/APke4PFdn7mbBXq7cVd6+g/amvJ4QVCMueINASIEpZH/zGZJ7
-dEaXZQT19+viQQn1hcJ0pn+9k5wgmvnzd1ai32qNn4H3EecbnLPTWAage4IeJy+X
-3bsvaMBmSXsujowjZNJscTzPSnPd/+ZC/7fqOza7VVptnhD0OwMPOCv4FOnkThqG
-3iok+YiBU3koj7x4GTTeNvTWxOq7OQhPf8ZP521+FINNwgXqL4jsnIy7796J6+Dx
-dgWM4OD/0PMmCEIuTVXw6Y6Jg0sEn2r8QE5C6+HaGLj5qEtAqfQ5QAZFBRRz9uJN
-P1pYUGjhf6RKttgoGLzj7dxKrTvnxieCH6OVcpSNBL4pJaOIJJA0LaLT8Z2g5Hny
-BaF8PKu1pn8=
-=y8hN
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlpehQIACgkQf77o3zqe
+SqUkEhAApwn+WzJEPpcQG++g0FqOlbhRvknt4wxe9G/JLYON1tOQw+E6C01R4nKe
+xRxCKJEkwQscruL7UGzdVoRbmmNip57LhGkpx43ktNHibqS90KQfSX8jkgR0Ot5P
+Kbb00oSxhcezexzTqwrYIhPLSvbpgtJoFrH7DReGtO0qFEZ9AV3fRaYqSh9S2JyF
+un9k9b5cPEoAZ+kQau94Mjp1odZFhpfTXYrXMADZVXqoiW94H0ZHZTkPXgVzPL0p
+eQPSoDRYG78TytSjqdr0/zvnFkGR+TYwjGAR5kWenw1BqlvhcOCt00t4RcFG0qVd
+o26Avh5E3PHLpvyhe8pKHUnkKBUN/RYeds+V9JR+sBaGzhWtKN86mzDLZwlyXa2j
+m3wExDunTePUYuw6JFN0aEjt4uk4h39DgVz9f/0WbgRBBpDbn1xeEnUbXEhRbmpY
+hSRuGDq560ehwqhJkATn2N00kl2hbNAN+uXUGO09qyZZ+9KDklHVsTUcYVaClP4W
+cVqgoFXtv6zGoi+1yFV2g+MnAFZV/fSQ5v8eE2voS5fGVB3YuaI7NbhlPT6J1e0N
+VPITqRRGa2umcJwdQA2pCvTWf7WkrsJwa+v7OmzzCN5DgnKSnOLQzWiU/Q7si2Ob
+1rjkaTP+hD2aICzL4s3TVHrBZx7NzjiCnU+167+CuwQrwvCujTc=
+=Ljn3
 -----END PGP SIGNATURE-----

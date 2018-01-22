@@ -4,7 +4,7 @@
       "Konstantin S. Uvarin <khedin@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,43 +35,36 @@
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "GD::Simple" : "0",
+            "LWP::UserAgent" : "0",
+            "Lingua::Ispell" : "0",
+            "Test::Pod::Spelling" : "0",
             "Validator::LIVR" : "0"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "0",
+            "Validator::LIVR" : "0"
+         },
          "requires" : {
-            "Carp" : "0",
-            "Data::Dumper" : "0",
-            "Digest::MD5" : "0",
-            "Digest::SHA" : "0",
-            "Encode" : "0",
-            "Fcntl" : "0",
-            "File::Basename" : "0",
-            "Getopt::Long" : "0",
-            "HTTP::Headers" : "0",
-            "JSON" : "0",
-            "MIME::Base64" : "0",
-            "Module::Load" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "HTTP::Headers::Fast" : "0.21",
+            "JSON::MaybeXS" : "0",
             "Plack::Request" : "0",
-            "Scalar::Util" : "0",
-            "Sys::Hostname" : "0",
             "Template" : "0",
-            "Time::HiRes" : "0",
             "URI::Escape" : "0",
-            "overload" : "0",
-            "parent" : "0",
             "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
             "File::Temp" : "0",
-            "IO::Handle" : "0",
-            "Test::More" : "0.87"
+            "Test::More" : "0.87",
+            "Test::Warn" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.1901,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : 0.2202,
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

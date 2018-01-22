@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.056';
+our $VERSION = '1.058';
 
 use List::Util qw( none any );
 
@@ -59,7 +59,6 @@ sub __delete_table {
 sub __delete_table_confirm {
     my ( $self, $sql, $dbh, $table, $qt_table, $sql_type ) = @_;
     my $stmt = "SELECT * FROM " . $qt_table;
-    $stmt .= " LIMIT " . $self->{opt}{table}{max_rows};
     my $sth = $dbh->prepare( $stmt );
     $sth->execute();
     my $col_names = $sth->{NAME};
@@ -67,7 +66,9 @@ sub __delete_table_confirm {
     my $table_rows = @$all_arrayref;
     unshift @$all_arrayref, $col_names;
     my $prompt_pt = "Table '$table'  -  Close with ENTER";
-    print_table( $all_arrayref, { %{$self->{opt}{table}}, prompt => $prompt_pt } );
+
+    print_table( $all_arrayref, { %{$self->{opt}{table}}, prompt => $prompt_pt, max_rows => 0 } );
+
     my $auxil = App::DBBrowser::Auxil->new( $self->{info} );
     my $lyt_1 = Term::Choose->new( $self->{info}{lyt_1} );
     my $prompt = sprintf 'Drop table \'%s\' (%d %s)?', $table, $table_rows, $table_rows == 1 ? 'row' : 'rows';

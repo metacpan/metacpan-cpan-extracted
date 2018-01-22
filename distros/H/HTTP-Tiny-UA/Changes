@@ -1,5 +1,11 @@
 Revision history for HTTP-Tiny-UA
 
+0.005     2018-01-17 15:08:40-05:00 America/New_York
+
+    [CHANGED]
+
+    - Set Class::Tiny minimum version to 1.000
+
 0.004     2015-08-12 10:22:46-04:00 America/New_York
 
     [CHANGED]

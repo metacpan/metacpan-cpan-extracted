@@ -1,0 +1,16 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/RDF/Trine/Serializer/RDFa.pm
+t/01basic.t
+t/serializer-rdfa.t

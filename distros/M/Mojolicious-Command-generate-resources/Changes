@@ -24,3 +24,16 @@ Revision history for Perl module Mojolicious::Command::generate::routes
     - Added pod and manifest tests.
     - Made path to test.db more specific.
 
+0.06 Mon Jan 15 22:49:50 CET 2018
+    - Fixed failing tests on Windows.
+
+0.07 Wed Jan 17 12:10:35 CET 2018
+
+    - Templates' folder can be copied and pushed to app->renderer->paths for
+      customisation.
+    - Strictly require Perl 5.20.1
+
+0.08 Sat Jan 20 09:52:49 CET 2018
+    - Using signatures wherever feasible.
+    - Fixed failing tests on Windows again.
+    - Small change in show.html.ep

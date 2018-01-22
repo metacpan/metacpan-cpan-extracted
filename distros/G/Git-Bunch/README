@@ -3,8 +3,8 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.621 of Git::Bunch (from Perl
-    distribution Git-Bunch), released on 2017-11-24.
+    This document describes version 0.622 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2018-01-17.
 
 SYNOPSIS
     See the included gitbunch script.
@@ -320,6 +320,8 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   action => *str* (default: "sync")
+
     *   backup => *bool*
 
         Whether doing backup to target.
@@ -493,8 +495,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
-    by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012,
+    2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

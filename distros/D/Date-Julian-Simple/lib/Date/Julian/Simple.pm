@@ -1,6 +1,6 @@
 package Date::Julian::Simple;
 
-$Date::Julian::Simple::VERSION   = '0.03';
+$Date::Julian::Simple::VERSION   = '0.04';
 $Date::Julian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Julian::Simple - Represents Julian date.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -20,7 +20,7 @@ use Time::localtime;
 use Date::Exception::InvalidDay;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

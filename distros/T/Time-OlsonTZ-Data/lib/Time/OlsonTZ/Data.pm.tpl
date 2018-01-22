@@ -4,12 +4,9 @@ Time::OlsonTZ::Data - Olson timezone data
 
 =head1 SYNOPSIS
 
-    use Time::OlsonTZ::Data qw(
-	olson_version olson_code_version olson_data_version);
+    use Time::OlsonTZ::Data qw(olson_version);
 
     $version = olson_version;
-    $version = olson_code_version;
-    $version = olson_data_version;
 
     use Time::OlsonTZ::Data qw(
 	olson_canonical_names olson_link_names olson_all_names
@@ -85,20 +82,26 @@ use constant olson_version => "<?version_lettered?>";
 =item olson_code_version
 
 Returns the version number of the code part of the database that this
-module encapsulates.
+module encapsulates.  This is now always the same as the value returned
+by L</olson_version>.  Until late 2012 the database was distributed in
+two parts, each with their own version number, so this was a distinct
+piece of information.
 
 =cut
 
-use constant olson_code_version => "<?code_version_lettered?>";
+use constant olson_code_version => "<?version_lettered?>";
 
 =item olson_data_version
 
 Returns the version number of the data part of the database that this
-module encapsulates.
+module encapsulates.  This is now always the same as the value returned
+by L</olson_version>.  Until late 2012 the database was distributed in
+two parts, each with their own version number, so this was a distinct
+piece of information.
 
 =cut
 
-use constant olson_data_version => "<?data_version_lettered?>";
+use constant olson_data_version => "<?version_lettered?>";
 
 =back
 
@@ -338,7 +341,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

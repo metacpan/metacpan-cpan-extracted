@@ -1,0 +1,86 @@
+{
+   "D" : [
+      {
+         "U" : {
+            "File" : [
+               {
+                  "id" : "file_new",
+                  "label" : "New"
+               },
+               {
+                  "id" : "file_open",
+                  "label" : "Open"
+               },
+               {
+                  "id" : "file_save",
+                  "label" : "Save"
+               }
+            ]
+         }
+      },
+      {
+         "D" : {
+            "Edit" : {
+               "D" : [
+                  {
+                     "U" : {
+                        "id" : "edit_cut",
+                        "label" : "Cut"
+                     }
+                  },
+                  {
+                     "U" : {
+                        "id" : "edit_copy",
+                        "label" : "Copy"
+                     }
+                  },
+                  {
+                     "U" : {
+                        "id" : "edit_paste",
+                        "label" : "Paste"
+                     }
+                  },
+                  {
+                     "U" : null
+                  },
+                  {
+                     "U" : {
+                        "id" : "edit_find",
+                        "label" : "Find"
+                     }
+                  },
+                  {
+                     "A" : {
+                        "id" : "edit_replace",
+                        "label" : "Replace"
+                     }
+                  },
+                  {
+                     "U" : null
+                  },
+                  {
+                     "U" : {
+                        "id" : "edit_settings",
+                        "label" : "Settings"
+                     }
+                  }
+               ]
+            }
+         }
+      },
+      {
+         "U" : {
+            "View" : [
+               {
+                  "id" : "view_encoding",
+                  "label" : "Encoding"
+               },
+               {
+                  "id" : "view_wrapping",
+                  "label" : "Text wrapping"
+               }
+            ]
+         }
+      }
+   ]
+}

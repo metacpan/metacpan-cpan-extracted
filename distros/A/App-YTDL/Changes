@@ -1,6 +1,9 @@
 Revision history for App-YTDL
 
 
+0.255   2018-01-17
+        - 'Term::Choose::Util::settings_menu': remove the option "in_place".
+
 0.254   2016-11-30
         - Fix "duration".
 

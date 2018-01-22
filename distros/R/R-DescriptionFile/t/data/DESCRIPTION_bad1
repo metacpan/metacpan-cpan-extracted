@@ -1,0 +1,22 @@
+Package: Rcpp
+Title: Seamless R and C++ Integration
+Version: 0.12.14
+Date: 2017-11-17
+Author: Dirk Eddelbuettel, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou,
+ Nathan Russell, Douglas Bates and John Chambers
+Depends: R (>= 3.0.0)
+Imports: methods, utils
+Suggests: RUnit, inline, rbenchmark, knitr, rmarkdown, pinp, pkgKitten
+        (>= 0.1.2)
+VignetteBuilder: knitr
+URL: http://www.rcpp.org, http://dirk.eddelbuettel.com/code/rcpp.html,
+        https://github.com/RcppCore/Rcpp
+License: GPL (>= 2)
+BugReports: https://github.com/RcppCore/Rcpp/issues
+MailingList: Please send questions and comments regarding Rcpp to
+        rcpp-devel@lists.r-forge.r-project.org
+RoxygenNote: 6.0.1
+NeedsCompilation: yes
+Packaged: 2017-11-17 12:51:38.259396 UTC; edd
+Repository: CRAN
+Date/Publication: 2017-11-23 21:24:19 UTC

@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.13 2018-01-20T08:11:30Z
+    - add users.profile methods
+
 0.12 2017-11-19T05:30:02Z
     - add the dialog.open method (thx zostay)
 

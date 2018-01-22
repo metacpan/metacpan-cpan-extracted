@@ -17,7 +17,7 @@ use Devel::OverloadInfo;
 {
     package SubFoo;
     # Must have subclass inheriting the overload
-    use base 'Foo';
+    use parent -norequire => 'Foo';
 }
 
 Devel::OverloadInfo::overload_info('SubFoo');

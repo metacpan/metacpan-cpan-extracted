@@ -3,10 +3,6 @@
 
 cPanel::TaskQueue::Scheduler - Priority queue of Tasks to Queue at some time in the future.
 
-=head1 VERSION
-
-This document describes cPanel::TaskQueue::Scheduler version 0.700.
-
 =head1 SYNOPSIS
 
     use cPanel::TaskQueue;

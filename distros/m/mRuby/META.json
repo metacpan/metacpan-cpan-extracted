@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "mRuby" : {
          "file" : "lib/mRuby.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "mRuby::Bool" : {
          "file" : "lib/mRuby/Bool.pm"
@@ -81,11 +81,12 @@
          "web" : "https://github.com/tokuhirom/mRuby.pm"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
-      "karupanerura <karupanerura@users.noreply.github.com>",
       "Syohei YOSHIDA <syohex@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>",
-      "karupanerura <karupa@cpan.org>"
-   ]
+      "karupanerura <karupa@cpan.org>",
+      "karupanerura <karupanerura@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

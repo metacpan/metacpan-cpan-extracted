@@ -4,7 +4,6 @@ author:
   - 'David Dick <ddick@cpan.org>'
 build_requires:
   Digest::SHA: '0'
-  MIME::Base64: '0'
   Test::More: '0'
   Test::NeedsDisplay: '0'
 configure_requires:
@@ -21,7 +20,12 @@ no_index:
     - t
     - inc
 requires:
+  Config: '0'
+  Config::INI::Reader: '0'
+  Crypt::URandom: '0'
+  Digest::MD5: '0'
   English: '0'
+  Fcntl: '0'
   File::Spec: '0'
   File::Temp: '0'
   FileHandle: '0'
@@ -31,5 +35,6 @@ requires:
   Socket: '0'
   URI: '0'
   overload: '0'
-version: '0.09'
+  perl: '5.006'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

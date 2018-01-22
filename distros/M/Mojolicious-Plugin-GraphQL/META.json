@@ -40,7 +40,7 @@
       "runtime" : {
          "requires" : {
             "GraphQL" : "0.26",
-            "Mojolicious" : "7.53",
+            "Mojolicious" : "7.60",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -48,7 +48,7 @@
       },
       "test" : {
          "requires" : {
-            "Mojolicious" : "7.53",
+            "Mojolicious" : "7.60",
             "Test::More" : "0.92"
          }
       }
@@ -67,6 +67,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

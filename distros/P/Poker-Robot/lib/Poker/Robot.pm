@@ -14,15 +14,15 @@ use EV;
 
 =head1 NAME
 
-Poker::Robot - base class for building custom poker robots 
+Poker::Robot - base class for building L<Mojo Poker|https://github.com/nathanielgraham/Mojo-Poker> poker robots 
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ our $VERSION = '0.01';
 
     # Note: you must pick a unique username!
     $robot = Poker::Robot::Mybot->new(
-      websocket => 'wss://aitestbed.com:443/websocket',
+      websocket => 'wss://localhost:443/websocket',
       username => 'Mybot',  
       ring_ids => [ 1 ], 
     );
@@ -55,7 +55,7 @@ Handlers are automatically executed at appropriate stages of the game, allowing 
 
 =head1 SERVERS
 
-https://aitestbed.com is the default test server.  This is where you can deploy your bot once it is ready and have it compete against other bots and humans in real-time.
+Download and install L<Mojo Poker|https://github.com/nathanielgraham/Mojo-Poker> to set up your own poker server. This is where you can deploy your bot once it is ready and have it compete against other bots and humans in real-time.
 
 =head1 LOGGING
 
@@ -65,7 +65,7 @@ To see what your bot is doing, do a tail -f on robot.log
 
 =head2 websocket
 
-Websocket address of the test server.  Default is wss://aitestbed:443/websocket
+Websocket address of the test server.  Default is wss://localhost/websocket
 
 =cut
 
@@ -75,7 +75,7 @@ has 'websocket' => (
 );
 
 sub _build_websocket {
-  return 'wss://aitestbed.com:443/websocket';
+  return 'wss://localhost:443/websocket';
 }
 
 =head2 ring_ids

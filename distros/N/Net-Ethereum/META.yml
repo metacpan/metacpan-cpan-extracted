@@ -17,5 +17,11 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.28'
+requires:
+  File::Slurper: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Math::BigFloat: '0'
+  Math::BigInt: '0'
+version: '0.30'

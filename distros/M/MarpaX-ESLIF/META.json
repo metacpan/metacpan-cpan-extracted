@@ -122,43 +122,43 @@
    "provides" : {
       "MarpaX::ESLIF" : {
          "file" : "lib/MarpaX/ESLIF.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Event::Type" : {
          "file" : "lib/MarpaX/ESLIF/Event/Type.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Grammar" : {
          "file" : "lib/MarpaX/ESLIF/Grammar.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Grammar::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Properties.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Grammar::Rule::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Grammar::Symbol::Properties" : {
          "file" : "lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Logger::Level" : {
          "file" : "lib/MarpaX/ESLIF/Logger/Level.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Rule::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Symbol::PropertyBitSet" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       },
       "MarpaX::ESLIF::Symbol::Type" : {
          "file" : "lib/MarpaX/ESLIF/Symbol/Type.pm",
-         "version" : "v2.0.31"
+         "version" : "v2.0.32"
       }
    },
    "release_status" : "stable",
@@ -174,12 +174,8 @@
          "web" : "https://github.com/jddurand/c-marpaeslif"
       }
    },
-   "version" : "2.0.31",
+   "version" : "2.0.32",
    "x_authority" : "cpan:JDDPAUSE",
-   "x_contributors" : [
-      "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>",
-      "Jeffrey Kegler <jeffreykegler@jeffreykegler.com>"
-   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

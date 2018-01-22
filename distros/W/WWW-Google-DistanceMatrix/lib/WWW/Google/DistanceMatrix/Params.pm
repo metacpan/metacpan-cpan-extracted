@@ -1,6 +1,6 @@
 package WWW::Google::DistanceMatrix::Params;
 
-$WWW::Google::DistanceMatrix::Params::VERSION   = '0.15';
+$WWW::Google::DistanceMatrix::Params::VERSION   = '0.19';
 $WWW::Google::DistanceMatrix::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,19 +9,16 @@ WWW::Google::DistanceMatrix::Params - Placeholder for parameters for WWW::Google
 
 =head1 VERSION
 
-Version 0.15
+Version 0.19
 
 =cut
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
+use parent 'Exporter';
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw(validate $FIELDS);
+our @EXPORT_OK = qw(validate $FIELDS);
 
 my $LANGUAGES = {
     'ar' => 1, 'eu' => 1, 'bg'    => 1, 'bn'    => 1, 'ca'    => 1, 'cs'    => 1, 'da'    => 1, 'de' => 1,
@@ -114,7 +111,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-DistanceMatrix>
+L<https://github.com/manwar/WWW-Google-DistanceMatrix>
 
 =head1 BUGS
 

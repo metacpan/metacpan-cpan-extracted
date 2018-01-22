@@ -1,0 +1,4 @@
++ {files}{"/etc/cron.d/beta"}
+! {files}{"/etc/hostname"}
+! {fqdn}
+! {mtime}

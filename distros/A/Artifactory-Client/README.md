@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.5.1
+Version 1.5.2
 
 # SYNOPSIS
 
@@ -679,6 +679,10 @@ feed location).
 
 Recalculates the index for a Bower repository.
 
+## calculate\_helm\_chart\_index
+
+Calculates Helm chart index on the specified path (local repositories only).
+
 # SYSTEM & CONFIGURATION
 
 ## system\_info
@@ -740,13 +744,6 @@ Updates the reverse proxy configuration
 ## get\_reverse\_proxy\_snippet
 
 Gets the reverse proxy configuration snippet in text format
-
-## create\_bootstrap\_bundle
-
-This rest is relevant for High Availability set up. It will create a bootstrap bundle on the primary node of an
-Artifactory HA installation that will include all the relevant keys so a new node can access the database and fetch all
-the relevant configuration files. The same bundle must be installed on all nodes during an installation of new nodes or
-if upgrading from a version older than 5.0. For more details, please refer to Installing Artifactory HA.
 
 # PLUGINS
 

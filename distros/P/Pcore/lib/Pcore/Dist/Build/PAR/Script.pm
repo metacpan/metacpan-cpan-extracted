@@ -84,20 +84,18 @@ sub run ($self) {
         my $member;
 
         if ( ref $file->{content} ) {
-            $member = $zip->addString(
-                {   string           => $file->{content},
-                    zipName          => $file->{path},
-                    compressionLevel => 9,
-                }
-            );
+            $member = $zip->addString( {
+                string           => $file->{content},
+                zipName          => $file->{path},
+                compressionLevel => 9,
+            } );
         }
         else {
-            $member = $zip->addFile(
-                {   filename         => $file->{source_path},
-                    zipName          => $file->{path},
-                    compressionLevel => 9,
-                }
-            );
+            $member = $zip->addFile( {
+                filename         => $file->{source_path},
+                zipName          => $file->{path},
+                compressionLevel => 9,
+            } );
         }
 
         $member->unixFileAttributes( oct 666 );
@@ -324,18 +322,17 @@ sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = u
         $src = PAR::Filter->new('PatchContent')->apply( $src, $module );
     }
 
-    $src = Pcore::Src::File->new(
-        {   action      => $Pcore::Src::SRC_COMPRESS,
-            path        => $target,
-            is_realpath => 0,
-            in_buffer   => $src,
-            filter_args => {
-                perl_compress_keep_ln => 1,
-                perl_strip_comment    => 1,
-                perl_strip_pod        => 1,
-            },
-        }
-    )->run->out_buffer;
+    $src = Pcore::Src::File->new( {
+        action      => $Pcore::Src::SRC_COMPRESS,
+        path        => $target,
+        is_realpath => 0,
+        in_buffer   => $src,
+        filter_args => {
+            perl_compress_keep_ln => 1,
+            perl_strip_comment    => 1,
+            perl_strip_pod        => 1,
+        },
+    } )->run->out_buffer;
 
     # crypt sources, do not crypt CPAN modules
     if ( !$is_cpan_module && $self->crypt && ( !$module || $module ne 'Filter/Crypto/Decrypt.pm' ) ) {
@@ -430,17 +427,16 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
         if ( $filename =~ /[.](?:pl|pm)\z/sm ) {
 
             # compress perl sources
-            $file_section->{$filename} = Pcore::Src::File->new(
-                {   action      => $Pcore::Src::SRC_COMPRESS,
-                    path        => $filename,
-                    is_realpath => 0,
-                    in_buffer   => \$content,
-                    filter_args => {                            #
-                        perl_compress         => 1,
-                        perl_compress_keep_ln => 0,
-                    },
-                }
-            )->run->out_buffer;
+            $file_section->{$filename} = Pcore::Src::File->new( {
+                action      => $Pcore::Src::SRC_COMPRESS,
+                path        => $filename,
+                is_realpath => 0,
+                in_buffer   => \$content,
+                filter_args => {                            #
+                    perl_compress         => 1,
+                    perl_compress_keep_ln => 0,
+                },
+            } )->run->out_buffer;
         }
         else {
             $file_section->{$filename} = \$content;
@@ -533,15 +529,15 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 181                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |    3 | 179                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 313                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 311                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 403                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 400                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 488, 491             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 484, 487             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 420, 426             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 417, 423             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,0 +1,77 @@
+Usage:
+        ndquery [OPTIONS] <arguments>
+
+Options:
+    --[no]colors
+        On/Off colors in --list mode.
+
+    --delete|--ignore <path>
+        Delete substructure. May be used several times.
+
+    --depth|-d <int>
+        Combined with --list allows to define how much levels must be
+        listed.
+
+    --grep <path>
+        Grep specified by path elements from structure. May be used several
+        times.
+
+    --help|-h
+        Print a help message and exit.
+
+    --ifmt <JSON|YAML>
+        Force specified input format usage. Automatically choosed (using
+        file extension) if omitted.
+
+    --items
+        List keys for hash maps and indexes for arrays, other types printed
+        as is.
+
+    --list|-l
+        List structure's paths.
+
+    --md5
+        Calculate MD5 sum for structure.
+
+    --path|-p <path>
+        Path in the structure to deal with.
+
+    --[no]pretty
+        On/Off pretty-print for JSON. Enabled by default.
+
+    --raw-output
+        Dont't format result simple things (strings/numbers) - dump them as
+        is.
+
+    --replace
+        Replace original files by query result.
+
+    --[no]strict
+        Fail if unexisted path specified. Enabled by default.
+
+    --values|--vals
+        Values will be printed if combined with --list opt.
+
+    --verbose|-v [int]
+        Increase verbosity, max level - 4.
+
+    --version|-V
+        Print version and exit.
+
+Examples:
+    Show as pretty printed canonical JSON:
+
+        ndquery struct.json
+
+    Get specified path from document:
+
+        ndquery --path '{some}{path}[2]' struct.json
+
+    List subpaths:
+
+        ndquery --list --path '{some}{path}[2]' struct.json
+
+    Checksum for substructures:
+
+        ndquery --md5 --path '{some}{path}' struct.json another.json
+

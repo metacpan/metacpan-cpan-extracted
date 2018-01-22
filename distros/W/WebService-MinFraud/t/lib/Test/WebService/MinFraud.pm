@@ -160,6 +160,11 @@ sub test_ip_address {
         'GeoIP2::Record::Country', '$model->ip_address->country'
     );
 
+    ok(
+        $model->ip_address->country->is_in_european_union,
+        '$model->ip_address->country->is_in_european_union'
+    );
+
     isa_ok(
         $model->ip_address->location,
         'GeoIP2::Record::Location', '$model->ip_address->location'
@@ -174,13 +179,17 @@ sub test_ip_address {
         $model->ip_address->registered_country,
         'GeoIP2::Record::Country', '$model->ip_address->registered_country'
     );
-    if ( defined $model->ip_address->represented_country ) {
-        isa_ok(
-            $model->ip_address->represented_country,
-            'GeoIP2::Record::RepresentedCountry',
-            '$model->ip_address->represented_country'
-        );
-    }
+
+    ok(
+        !$model->ip_address->registered_country->is_in_european_union,
+        '$model->ip_address->registered_country->is_in_european_union'
+    );
+
+    isa_ok(
+        $model->ip_address->represented_country,
+        'GeoIP2::Record::RepresentedCountry',
+        '$model->ip_address->represented_country'
+    );
 
     if ( defined $model->ip_address->most_specific_subdivision ) {
         isa_ok(

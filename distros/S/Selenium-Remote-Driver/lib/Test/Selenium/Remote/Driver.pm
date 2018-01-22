@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::Driver;
-$Test::Selenium::Remote::Driver::VERSION = '1.20';
+$Test::Selenium::Remote::Driver::VERSION = '1.21';
 # ABSTRACT: Useful testing subclass for Selenium::Remote::Driver
 
 use Moo;
@@ -41,6 +41,10 @@ has func_list => (
     },
 );
 
+=for Pod::Coverage has_args
+
+=cut
+
 sub has_args {
     my $self          = shift;
     my $fun_name      = shift;
@@ -59,10 +63,9 @@ sub has_args {
 
 with 'Test::Selenium::Remote::Role::DoesTesting';
 
-has verbose => (
-    is => 'rw',
-);
+=for Pod::Coverage BUILD
 
+=cut
 
 sub BUILD {
     my $self = shift;
@@ -108,12 +111,14 @@ Set the Selenium server address with C<$TWD_HOST> and C<$TWD_PORT>.
 Pick which browser is used using the  C<$TWD_BROWSER>, C<$TWD_VERSION>,
 C<$TWD_PLATFORM>, C<$TWD_JAVASCRIPT>, C<$TWD_EXTRA_CAPABILITIES>.
 
-See L<Selenium::Driver::Remote> for the meanings of these options.
+See L<Selenium::Remote::Driver> for the meanings of these options.
+
+=for Pod::Coverage BUILDARGS
 
 =cut
 
 sub BUILDARGS {
-    my ( $class, %p ) = @_;
+    my ( undef, %p ) = @_;
 
     for my $opt (
         qw/remote_server_addr port browser_name version platform
@@ -128,6 +133,16 @@ sub BUILDARGS {
     return \%p;
 }
 
+=head2 verbose
+
+Enable/disable debugging output, or view the status of verbosity.
+
+=cut
+
+has verbose => (
+    is => 'rw',
+);
+
 =head2 server_is_running( $host, $port )
 
 Returns true if a Selenium server is running.  The host and port
@@ -139,7 +154,6 @@ determine the server to check.
 =cut
 
 sub server_is_running {
-    my $class_or_self = shift;
     my $host          = $ENV{TWD_HOST} || shift || 'localhost';
     my $port          = $ENV{TWD_PORT} || shift || 4444;
 
@@ -149,7 +163,6 @@ sub server_is_running {
         PeerPort => $port,
       );
     return;
-
 }
 
 =head2 error_handler
@@ -201,12 +214,13 @@ webdriver error, because, as exceptions are not caught anymore when you specify 
 handler, the function will not fail anymore, which translates to a 'ok' in your TAP
 output if you do not handle it properly.
 
-
 =head1 Testing Methods
 
 The following testing methods are available. For
 more documentation, see the related test methods in L<Selenium::Remote::Driver>
 (And feel free to submit a patch to flesh out the documentation for these here).
+Defaults for optional arguments B<should> be the same as for their analogues in
+L<Selenium::Remote::Driver> and L<Selenium::Remote::WebElement>.
 
     alert_text_is
     alert_text_isnt
@@ -286,13 +300,13 @@ more documentation, see the related test methods in L<Selenium::Remote::Driver>
 
 =cut
 
-
 # function composing a find_element with locator with a webelement test
 
 sub _find_element_with_action {
     my $self   = shift;
     my $method = shift;
     my ( $locator, $locator_strategy, $params, $desc ) = @_;
+    $locator_strategy //= 'xpath';
 
     # case 4 args
     if ($desc) {
@@ -332,7 +346,6 @@ sub _find_element_with_action {
       ->$method( $params, $desc );
 }
 
-
 =head2 $twd->type_element_ok($search_target [,$locator], $keys, [, $desc ]);
 
    $twd->type_element_ok( $search_target [,$locator], $keys [, $desc ] );
@@ -341,7 +354,6 @@ Use L<Selenium::Remote::Driver/find_element> to resolve the C<$search_target>
 to a web element and an optional locator, and then type C<$keys> into it, providing an optional test
 label.
 
-
 =cut
 
 sub type_element_ok {
@@ -349,7 +361,6 @@ sub type_element_ok {
     my $method = 'send_keys_ok';
     return $self->_find_element_with_action( $method, @_ );
 }
-
 
 =head2 $twd->element_text_is($search_target[,$finder],$expected_text [,$desc]);
 
@@ -441,9 +452,6 @@ is passed to L<Selenium::Remote::Driver/find_element> using a finder or the C<de
 if none passed.
 See there for more details on the format for C<find_element_ok()>.
 
-=cut
-
-
 =head2 $twd->find_no_element_ok($search_target [,$finder, $desc ]);
 
    $twd->find_no_element_ok( $search_target [,$finder, $desc ] );
@@ -451,9 +459,6 @@ See there for more details on the format for C<find_element_ok()>.
 Returns true if C<$search_target> is I<not> found on the page. C<$search_target>
 is passed to L<Selenium::Remote::Driver/find_element> using a finder or the
 C<default_finder> if none passed. See there for more details on the format for C<find_no_element_ok()>.
-
-=cut
-
 
 =head2 $twd->content_like( $regex [, $desc ] )
 

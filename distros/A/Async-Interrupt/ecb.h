@@ -42,7 +42,7 @@
 #define ECB_H
 
 /* 16 bits major, 16 bits minor */
-#define ECB_VERSION 0x00010004
+#define ECB_VERSION 0x00010005
 
 #ifdef _WIN32
   typedef   signed char   int8_t;
@@ -76,8 +76,11 @@
   #endif
 #endif
 
+#define ECB_GCC_AMD64 (__amd64 || __amd64__ || __x86_64 || __x86_64__)
+#define ECB_MSVC_AMD64 (_M_AMD64 || _M_X64)
+
 /* work around x32 idiocy by defining proper macros */
-#if __amd64 || __x86_64 || _M_AMD64 || _M_X64
+#if ECB_GCC_AMD64 || ECB_MSVC_AMD64
   #if _ILP32
     #define ECB_AMD64_X32 1
   #else
@@ -149,13 +152,18 @@
   #define ECB_MEMORY_FENCE do { } while (0)
 #endif
 
+/* http://www-01.ibm.com/support/knowledgecenter/SSGH3R_13.1.0/com.ibm.xlcpp131.aix.doc/compiler_ref/compiler_builtins.html */
+#if __xlC__ && ECB_CPP
+  #include <builtins.h>
+#endif
+
 #ifndef ECB_MEMORY_FENCE
   #if ECB_GCC_VERSION(2,5) || defined __INTEL_COMPILER || (__llvm__ && __GNUC__) || __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
     #if __i386 || __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ (""                        : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("")
-    #elif __amd64 || __amd64__ || __x86_64 || __x86_64__
+    #elif ECB_GCC_AMD64
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("mfence"   : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ (""         : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("")
@@ -169,7 +177,7 @@
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb"      : : : "memory")
     #elif __aarch64__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("dmb ish"  : : : "memory")
-    #elif (__sparc || __sparc__) && !__sparcv8
+    #elif (__sparc || __sparc__) && !(__sparc_v8__ || defined __sparcv8)
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("membar #LoadStore | #LoadLoad | #StoreStore | #StoreLoad" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ ("membar #LoadStore | #LoadLoad"                            : : : "memory")
       #define ECB_MEMORY_FENCE_RELEASE __asm__ __volatile__ ("membar #LoadStore             | #StoreStore")
@@ -304,6 +312,7 @@ typedef int ecb_bool;
 #define ECB_CONCAT(a, b) ECB_CONCAT_(a, b)
 #define ECB_STRINGIFY_(a) # a
 #define ECB_STRINGIFY(a) ECB_STRINGIFY_(a)
+#define ECB_STRINGIFY_EXPR(expr) ((expr), ECB_STRINGIFY_ (expr))
 
 #define ecb_function_ ecb_inline
 
@@ -350,15 +359,32 @@ typedef int ecb_bool;
   #define ecb_deprecated ecb_attribute ((__deprecated__))
 #endif
 
-#define ecb_noinline   ecb_attribute ((__noinline__))
+#if _MSC_VER >= 1500
+  #define ecb_deprecated_message(msg) __declspec (deprecated (msg))
+#elif ECB_GCC_VERSION(4,5)
+  #define ecb_deprecated_message(msg) ecb_attribute ((__deprecated__ (msg))
+#else
+  #define ecb_deprecated_message(msg) ecb_deprecated
+#endif
+
+#if _MSC_VER >= 1400
+  #define ecb_noinline __declspec (noinline)
+#else
+  #define ecb_noinline ecb_attribute ((__noinline__))
+#endif
+
 #define ecb_unused     ecb_attribute ((__unused__))
 #define ecb_const      ecb_attribute ((__const__))
 #define ecb_pure       ecb_attribute ((__pure__))
 
-/* TODO http://msdn.microsoft.com/en-us/library/k6ktzx3s.aspx __declspec(noreturn) */
 #if ECB_C11 || __IBMC_NORETURN
-  /* http://pic.dhe.ibm.com/infocenter/compbg/v121v141/topic/com.ibm.xlcpp121.bg.doc/language_ref/noreturn.html */
+  /* http://www-01.ibm.com/support/knowledgecenter/SSGH3R_13.1.0/com.ibm.xlcpp131.aix.doc/language_ref/noreturn.html */
   #define ecb_noreturn   _Noreturn
+#elif ECB_CPP11
+  #define ecb_noreturn   [[noreturn]]
+#elif _MSC_VER >= 1200
+  /* http://msdn.microsoft.com/en-us/library/k6ktzx3s.aspx */
+  #define ecb_noreturn   __declspec (noreturn)
 #else
   #define ecb_noreturn   ecb_attribute ((__noreturn__))
 #endif
@@ -424,7 +450,7 @@ typedef int ecb_bool;
   ecb_function_ ecb_const int
   ecb_ctz64 (uint64_t x)
   {
-    int shift = x & 0xffffffffU ? 0 : 32;
+    int shift = x & 0xffffffff ? 0 : 32;
     return ecb_ctz32 (x >> shift) + shift;
   }
 
@@ -528,9 +554,18 @@ ecb_inline ecb_const uint64_t ecb_rotl64 (uint64_t x, unsigned int count) { retu
 ecb_inline ecb_const uint64_t ecb_rotr64 (uint64_t x, unsigned int count) { return (x << (64 - count)) | (x >> count); }
 
 #if ECB_GCC_VERSION(4,3) || (ECB_CLANG_BUILTIN(__builtin_bswap32) && ECB_CLANG_BUILTIN(__builtin_bswap64))
+  #if ECB_GCC_VERSION(4,8) || ECB_CLANG_BUILTIN(__builtin_bswap16)
+  #define ecb_bswap16(x)  __builtin_bswap16 (x)
+  #else
   #define ecb_bswap16(x) (__builtin_bswap32 (x) >> 16)
+  #endif
   #define ecb_bswap32(x)  __builtin_bswap32 (x)
   #define ecb_bswap64(x)  __builtin_bswap64 (x)
+#elif _MSC_VER
+  #include <stdlib.h>
+  #define ecb_bswap16(x) ((uint16_t)_byteswap_ushort ((uint16_t)(x)))
+  #define ecb_bswap32(x) ((uint32_t)_byteswap_ulong  ((uint32_t)(x)))
+  #define ecb_bswap64(x) ((uint64_t)_byteswap_uint64 ((uint64_t)(x)))
 #else
   ecb_function_ ecb_const uint16_t ecb_bswap16 (uint16_t x);
   ecb_function_ ecb_const uint16_t
@@ -575,7 +610,7 @@ ecb_byteorder_helper (void)
   /* the reason why we have this horrible preprocessor mess */
   /* is to avoid it in all cases, at least on common architectures */
   /* or when using a recent enough gcc version (>= 4.6) */
-#if __i386 || __i386__ || _M_X86 || __amd64 || __amd64__ || _M_X64
+#if ((__i386 || __i386__) && !__VOS__) || _M_IX86 || ECB_GCC_AMD64 || ECB_MSVC_AMD64
   return 0x44;
 #elif __BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
   return 0x44;
@@ -629,6 +664,102 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
   #define ecb_array_length(name) (sizeof (name) / sizeof (name [0]))
 #endif
 
+ecb_function_ ecb_const uint32_t ecb_binary16_to_binary32 (uint32_t x);
+ecb_function_ ecb_const uint32_t
+ecb_binary16_to_binary32 (uint32_t x)
+{
+  unsigned int s = (x & 0x8000) << (31 - 15);
+  int          e = (x >> 10) & 0x001f;
+  unsigned int m =  x        & 0x03ff;
+
+  if (ecb_expect_false (e == 31))
+    /* infinity or NaN */
+    e = 255 - (127 - 15);
+  else if (ecb_expect_false (!e))
+    {
+      if (ecb_expect_true (!m))
+        /* zero, handled by code below by forcing e to 0 */
+        e = 0 - (127 - 15);
+      else
+        {
+          /* subnormal, renormalise */
+          unsigned int s = 10 - ecb_ld32 (m);
+
+          m = (m << s) & 0x3ff; /* mask implicit bit */
+          e -= s - 1;
+        }
+    }
+
+  /* e and m now are normalised, or zero, (or inf or nan) */
+  e += 127 - 15;
+
+  return s | (e << 23) | (m << (23 - 10));
+}
+
+ecb_function_ ecb_const uint16_t ecb_binary32_to_binary16 (uint32_t x);
+ecb_function_ ecb_const uint16_t
+ecb_binary32_to_binary16 (uint32_t x)
+{
+  unsigned int s =  (x >> 16) & 0x00008000; /* sign bit, the easy part */
+  unsigned int e = ((x >> 23) & 0x000000ff) - (127 - 15); /* the desired exponent */
+  unsigned int m =   x        & 0x007fffff;
+
+  x &= 0x7fffffff;
+
+  /* if it's within range of binary16 normals, use fast path */
+  if (ecb_expect_true (0x38800000 <= x && x <= 0x477fefff))
+    {
+      /* mantissa round-to-even */
+      m += 0x00000fff + ((m >> (23 - 10)) & 1);
+
+      /* handle overflow */
+      if (ecb_expect_false (m >= 0x00800000))
+        {
+          m >>= 1;
+          e +=  1;
+        }
+
+      return s | (e << 10) | (m >> (23 - 10));
+    }
+
+  /* handle large numbers and infinity */
+  if (ecb_expect_true (0x477fefff < x && x <= 0x7f800000))
+    return s | 0x7c00;
+
+  /* handle zero, subnormals and small numbers */
+  if (ecb_expect_true (x < 0x38800000))
+    {
+      /* zero */
+      if (ecb_expect_true (!x))
+        return s;
+
+      /* handle subnormals */
+
+      /* too small, will be zero */
+      if (e < (14 - 24)) /* might not be sharp, but is good enough */
+        return s;
+
+      m |= 0x00800000; /* make implicit bit explicit */
+
+      /* very tricky - we need to round to the nearest e (+10) bit value */
+      {
+        unsigned int bits = 14 - e;
+        unsigned int half = (1 << (bits - 1)) - 1;
+        unsigned int even = (m >> bits) & 1;
+
+        /* if this overflows, we will end up with a normalised number */
+        m = (m + half + even) >> bits;
+      }
+
+      return s | m;
+    }
+
+  /* handle NaNs, preserve leftmost nan bits, but make sure we don't turn them into infinities */
+  m >>= 13;
+
+  return s | 0x7c00 | m | !m;
+}
+
 /*******************************************************************************/
 /* floating point stuff, can be disabled by defining ECB_NO_LIBM */
 
@@ -636,7 +767,7 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
 /* the only noteworthy exception is ancient armle, which uses order 43218765 */
 #if 0 \
     || __i386 || __i386__ \
-    || __amd64 || __amd64__ || __x86_64 || __x86_64__ \
+    || ECB_GCC_AMD64 \
     || __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__ \
     || defined __s390__ || defined __s390x__ \
     || defined __mips__ \
@@ -646,7 +777,7 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
     || defined __m68k__ \
     || defined __m88k__ \
     || defined __sh__ \
-    || defined _M_IX86 || defined _M_AMD64 || defined _M_IA64 \
+    || defined _M_IX86 || defined ECB_MSVC_AMD64 || defined _M_IA64 \
     || (defined __arm__ && (defined __ARM_EABI__ || defined __EABI__ || defined __VFP_FP__ || defined _WIN32_WCE || defined __ANDROID__)) \
     || defined __aarch64__
   #define ECB_STDFP 1
@@ -674,26 +805,11 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
 
   #if ECB_C99 || _XOPEN_VERSION >= 600 || _POSIX_VERSION >= 200112L
     #define ecb_ldexpf(x,e) ldexpf ((x), (e))
+    #define ecb_frexpf(x,e) frexpf ((x), (e))
   #else
-    #define ecb_ldexpf(x,e) (float) ldexp ((x), (e))
+    #define ecb_ldexpf(x,e) (float) ldexp ((double) (x), (e))
+    #define ecb_frexpf(x,e) (float) frexp ((double) (x), (e))
   #endif
-
-  /* converts an ieee half/binary16 to a float */
-  ecb_function_ ecb_const float ecb_binary16_to_float (uint16_t x);
-  ecb_function_ ecb_const float
-  ecb_binary16_to_float (uint16_t x)
-  {
-    int e = (x >> 10) & 0x1f;
-    int m = x & 0x3ff;
-    float r;
-
-    if      (!e     ) r = ecb_ldexpf (m        ,    -24);
-    else if (e != 31) r = ecb_ldexpf (m + 0x400, e - 25);
-    else if (m      ) r = ECB_NAN;
-    else              r = ECB_INFINITY;
-
-    return x & 0x8000 ? -r : r;
-  }
 
   /* convert a float to ieee single/binary32 */
   ecb_function_ ecb_const uint32_t ecb_float_to_binary32 (float x);
@@ -714,7 +830,7 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
       if (x < -3.40282346638528860e+38f) return 0xff800000U;
       if (x != x                       ) return 0x7fbfffffU;
 
-      m = frexpf (x, &e) * 0x1000000U;
+      m = ecb_frexpf (x, &e) * 0x1000000U;
 
       r = m & 0x80000000U;
 
@@ -833,6 +949,22 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
     #endif
 
     return r;
+  }
+
+  /* convert a float to ieee half/binary16 */
+  ecb_function_ ecb_const uint16_t ecb_float_to_binary16 (float x);
+  ecb_function_ ecb_const uint16_t
+  ecb_float_to_binary16 (float x)
+  {
+    return ecb_binary32_to_binary16 (ecb_float_to_binary32 (x));
+  }
+
+  /* convert an ieee half/binary16 to float */
+  ecb_function_ ecb_const float ecb_binary16_to_float (uint16_t x);
+  ecb_function_ ecb_const float
+  ecb_binary16_to_float (uint16_t x)
+  {
+    return ecb_binary32_to_float (ecb_binary16_to_binary32 (x));
   }
 
 #endif

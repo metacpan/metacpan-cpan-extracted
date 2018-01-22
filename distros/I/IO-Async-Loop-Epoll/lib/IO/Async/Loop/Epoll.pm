@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2018 -- leonerd@leonerd.org.uk
 
 package IO::Async::Loop::Epoll;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 use constant API_VERSION => '0.49';
 
 # Only Linux is known always to be able to report EOF conditions on
@@ -28,6 +28,10 @@ use Scalar::Util qw( refaddr );
 
 use constant _CAN_WATCHDOG => 1;
 use constant WATCHDOG_ENABLE => IO::Async::Loop->WATCHDOG_ENABLE;
+
+use Struct::Dumb;
+
+struct SignalWatch => [qw( code pending orig )];
 
 =head1 NAME
 
@@ -110,7 +114,7 @@ sub new
 
    $self->{fakeevents} = {};
 
-   $self->{signals} = {};
+   $self->{signals} = {}; # {$name} => SignalWatch
    $self->{masks} = {};
 
    # epoll gets very upset if applications close() filehandles without telling
@@ -207,9 +211,9 @@ sub loop_once
 
    my $signals = $self->{signals};
    foreach my $sigslot ( values %$signals ) {
-      if( $sigslot->[1] ) {
-         $sigslot->[0]->();
-         $sigslot->[1] = 0;
+      if( $sigslot->pending ) {
+         $sigslot->pending = 0;
+         $sigslot->code->();
          $count++;
       }
    }
@@ -379,8 +383,8 @@ sub watch_signal
    # Instead, we'll store a tiny piece of code that just sets a flag, and
    # check the flags on return from the epoll_pwait call.
 
-   $self->{signals}{$signal} = [ $code, 0, $SIG{$signal} ];
-   my $pending = \$self->{signals}{$signal}[1];
+   $self->{signals}{$signal} = SignalWatch( $code, 0, $SIG{$signal} );
+   my $pending = \$self->{signals}{$signal}->pending;
 
    my $signum = $self->signame2num( $signal );
    sigprocmask( SIG_BLOCK, POSIX::SigSet->new( $signum ) );
@@ -400,7 +404,7 @@ sub unwatch_signal
 
    # When we saved the original value, we might have got an undef. But %SIG
    # doesn't like having undef assigned back in, so we need to translate
-   $SIG{$signal} = $self->{signals}{$signal}[2] || 'DEFAULT';
+   $SIG{$signal} = $self->{signals}{$signal}->orig || 'DEFAULT';
 
    delete $self->{signals}{$signal};
    

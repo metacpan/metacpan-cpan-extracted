@@ -47,7 +47,30 @@ use List::Util qw( sum );
    is( scalar $fret->get, 6, '$fret now ready after done' );
 }
 
-# outside
+# Captured outside
+{
+   {
+      # Ensure the captured lexical lives in its own scope that is ended before
+      # the tests run
+      my $capture = "outer";
+
+      async sub inner
+      {
+         await $_[0];
+         return $capture;
+      }
+   }
+
+   my $f1 = Future->new;
+   my $fret = inner( $f1 );
+
+   ok( !$fret->is_ready, '$fret is not immediate with capture' );
+
+   $f1->done;
+   is( scalar $fret->get, "outer", '$fret now ready after done' );
+}
+
+# Closure with outside
 # Make sure to test this twice because of pad lexical sharing - see RT124026
 {
    my $capture = "outer";
@@ -81,6 +104,7 @@ use List::Util qw( sum );
 
       my $captured = "A";
       my $subB = sub {
+         is( $captured, "A", '$captured in subB' );
          $captured .= "B";
       };
 
@@ -91,6 +115,7 @@ use List::Util qw( sum );
       $captured .= "C";
 
       my $subD = sub {
+         is( $captured, "ABC", '$captured in subD' );
          $captured .= "D";
       };
 

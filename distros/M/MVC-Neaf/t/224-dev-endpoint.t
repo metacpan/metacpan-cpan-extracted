@@ -16,7 +16,7 @@ get '/foo' => sub {
 
 neaf->run_test( '/foo/bar' );
 
-like $capture->endpoint_origin, qr/^$file:(\d+)$/, "Origin in this file";
+like $capture->endpoint_origin, qr/^$file line (\d+)$/, "Origin in this file";
 note $capture->endpoint_origin;
 
 done_testing;

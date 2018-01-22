@@ -32,11 +32,11 @@ RDF::LinkedData - A Linked Data server implementation
 
 =head1 VERSION
 
-Version 1.02
+Version 1.92
 
 =cut
 
- our $VERSION = '1.02';
+ our $VERSION = '1.92';
 
 
 =head1 SYNOPSIS
@@ -79,7 +79,7 @@ Data" manner.
 =item C<< new ( store => $store, model => $model, base_uri => $base_uri, 
                 hypermedia => 1, namespaces_as_vocabularies => 1, 
                 request => $request, endpoint_config => $endpoint_config, 
-                void_config => $void_config ) >>
+                void_config => $void_config, writes_enabled => 0 ) >>
 
 Creates a new handler object based on the named parameters, given a store
 config (recommended usage is to pass a hashref of the type that can be
@@ -97,6 +97,9 @@ and vocabularies used using the L<VoID vocabulary|http://vocab.deri.ie/void>.
 Finally, it can provide experimental L<Triple Pattern
 Fragments|http://www.hydra-cg.com/spec/latest/triple-pattern-fragments/>
 support.
+
+Read-write  support is  even  more experimental,  and  is provided  by
+L<RDF::LinkedData::RWHypermedia>.
 
 =item C<< BUILD >>
 
@@ -127,6 +130,17 @@ sub BUILD {
  	} else {
 		$self->log->info('No endpoint config found');
 	}
+
+	if ($self->writes_enabled) {
+		$self->log->info('Writes are enabled!');
+		$self->log->error('Hypermedia is off, so users will not be able to discover how to write') unless ($self->hypermedia);
+		unless (can_load( modules => { 'RDF::LinkedData::RWHypermedia' => 0 })) {
+			croak "RDF::LinkedData::RWHypermedia is required for write operations but not installed.";
+		}
+	} else {
+		$self->log->info('Setup is read-only.');
+	}
+
 
  	if ($self->has_void_config) {
 		$self->log->debug('VoID config found with parameters: ' . Dumper($self->void_config) );
@@ -159,18 +173,39 @@ around BUILDARGS => sub
   {
 	  my ($next, $self) = (shift, shift);
 	  my $args = $self->$next(@_);
-	  for (keys %$args) {
-		  delete $args->{$_} if not defined $args->{$_};
+	  foreach my $key (keys %$args) {
+		  # Figure out how to configure the application
+		  if ((not defined $args->{$key}) || $self->_options_blacklist($key) ) { # Undef values need not be kept
+			  delete $args->{$key};
+			  next;
+		  }
+		  if ($self->can($key . '_config')) { # Check if we have an attribute with _config appended
+		  	  $args->{$key . '_config'} = $args->{$key}; # If so, rename
+		  	  delete $args->{$key};
+		  	  next;
+		  }
+		  next if ($self->can($key)); # Can be passed directly
+#		  $self->log->warn("$next didn't recognize key: $key \nValue: " . Dumper($args->{$key}));
 	  }
 	  return $args;
   };
+
+
+# Contains a hash with the options that shouldn't be passed to the constructor
+
+sub _options_blacklist {
+	my ($self, $key) = @_;
+	my %list = ('namespaces' => 1, 'cors' => 1, 'class' => 1);
+	return $list{$key};
+}
 
 has store => (is => 'rw', isa => HashRef | Str );
 
 
 =item C<< model >>
 
-Returns the RDF::Trine::Model object.
+The model that contains the entire database of linked data. 
+This method returns a L<RDF::Trine::Model> object.
 
 =cut
 
@@ -199,6 +234,22 @@ sub _load_model {
 }
 
 
+=item C<< response_model >>
+
+This model contains response, it is used to build the response to one particular request. This
+method returns a L<RDF::Trine::Model> object of a temporary model.
+
+=cut
+
+has response_model => (is => 'ro', isa => InstanceOf['RDF::Trine::Model'], lazy => 1, builder => '_build_response_model');
+
+
+sub _build_response_model {
+	my $self = shift;
+	return $self->temporary_model
+}
+
+
 =item C<< base_uri >>
 
 Returns or sets the base URI for this handler.
@@ -209,6 +260,14 @@ has base_uri => (is => 'rw', isa => Str, default => '' );
 
 has hypermedia => (is => 'ro', isa => Bool, default => 1);
 
+=item C<< writes_enabled >>
+
+Attribute that indicates whether write operations are permitted.
+
+=cut
+  
+has writes_enabled => (is => 'ro', isa => Bool, default => 0);
+
 has namespaces_as_vocabularies => (is => 'ro', isa => Bool, default => 1);
 
 has endpoint_config => (is => 'rw', isa=>Maybe[HashRef], predicate => 'has_endpoint_config');
@@ -217,6 +276,15 @@ has void_config => (is => 'rw', isa=>Maybe[HashRef], predicate => 'has_void_conf
 
 has fragments_config => (is => 'rw', isa=>Maybe[HashRef], predicate => 'has_fragments');
 
+has rwhypermedia_config => (is => 'rw', isa=>Maybe[HashRef], predicate => 'has_rwhypermedia_config');
+
+=item C<< does_read_operation >>
+
+Returns or sets whether the current request is a read operation.
+
+=cut
+
+has does_read_operation => (is => 'rw', isa => Bool, default => 0);
 
 
 =item C<< request ( [ $request ] ) >>
@@ -403,7 +471,8 @@ sub response {
 	}
 
 	if ($self->has_void) {
-		my $void_resp = $self->_void_content($uri, $endpoint_path);
+	   my $void_resp = $self->_void_content($uri, $endpoint_path);
+		$self->log->error("The dataset URI does not start with the base URI") unless (index($self->void->dataset_uri->as_string, $self->base_uri) == 1);
 		return $void_resp if (defined($void_resp));
 	}
 
@@ -581,6 +650,10 @@ sub _content {
 					}
 				}
 			}
+			# Now, add write triples
+
+			$self->add_rw_pointer($hmmodel, $node) if ($self->writes_enabled);
+
 			$iter = $iter->concat($hmmodel->as_stream);
 		}
 		$output{body} = $s->serialize_iterator_to_string ( $iter );
@@ -848,9 +921,9 @@ You can find documentation for this module with the perldoc command.
 
     perldoc RDF::LinkedData
 
-The perlrdf mailing list is the right place to seek help and discuss this module:
+The perlrdf IRC channel is the right place to seek help and discuss this module:
 
-L<http://lists.perlrdf.org/listinfo/dev>
+L<irc://irc.perl.org/#perlrdf>
 
 =head1 TODO
 
@@ -872,7 +945,7 @@ Copyright 2010 Gregory Todd Williams
 
 Copyright 2010 ABC Startsiden AS
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kjetil Kjernsmo
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

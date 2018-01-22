@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # Want latest & greates Neaf, not the system's one!
-use File::Basename qw(dirname);
+use File::Basename qw(dirname basename);
 use lib dirname(__FILE__)."/../lib";
 
 use MVC::Neaf qw(:sugar);
@@ -19,20 +19,22 @@ foreach my $file (@files) {
         or die $@ || "Failed to load '$dir/$file':".( $! || "for no reason");
 };
 
-# TODO callback introspection!
-my $all = neaf->get_routes;
-
 my @list;
-foreach my $path (sort keys %$all) {
-    my $descr = $all->{$path}{GET}{description} or next;
-    $descr =~ /^Static/ and next;
+neaf->get_routes(sub {
+    my ($route, $path, $method) = @_;
 
-    warn "Found $path - $descr";
+    my $descr = $route->{description};
+    return unless $method eq 'GET' and $descr and $descr !~ /^Static/;
+
     push @list, {
         path  => $path,
         descr => $descr,
     };
-};
+});
+
+@list = sort { $a->{path} cmp $b->{path} } @list;
+warn basename(__FILE__).": Found $_->{path} - $_->{descr}\n"
+    for @list;
 
 get '/' => sub {
     return {

@@ -10,13 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mruby.h"
-#include "mruby/proc.h"
-#include "mruby/data.h"
-#include "mruby/compile.h"
-#include "mruby/string.h"
-#include "mruby/variable.h"
-#include "mruby/array.h"
+#include <mruby.h>
+#include <mruby/proc.h>
+#include <mruby/data.h>
+#include <mruby/compile.h>
+#include <mruby/string.h>
+#include <mruby/variable.h>
+#include <mruby/array.h>
 
 void
 mrb_init_mrbtest(mrb_state *);
@@ -60,12 +60,13 @@ static void
 t_printstr(mrb_state *mrb, mrb_value obj)
 {
   char *s;
-  int len;
+  mrb_int len;
 
   if (mrb_string_p(obj)) {
     s = RSTRING_PTR(obj);
     len = RSTRING_LEN(obj);
     fwrite(s, len, 1, stdout);
+    fflush(stdout);
   }
 }
 
@@ -93,6 +94,14 @@ mrb_init_test_driver(mrb_state *mrb, mrb_bool verbose)
   mrb_define_const(mrb, mrbtest, "FIXNUM_MAX", mrb_fixnum_value(MRB_INT_MAX));
   mrb_define_const(mrb, mrbtest, "FIXNUM_MIN", mrb_fixnum_value(MRB_INT_MIN));
   mrb_define_const(mrb, mrbtest, "FIXNUM_BIT", mrb_fixnum_value(MRB_INT_BIT));
+
+#ifndef MRB_WITHOUT_FLOAT
+#ifdef MRB_USE_FLOAT
+  mrb_define_const(mrb, mrbtest, "FLOAT_TOLERANCE", mrb_float_value(mrb, 1e-6));
+#else
+  mrb_define_const(mrb, mrbtest, "FLOAT_TOLERANCE", mrb_float_value(mrb, 1e-12));
+#endif
+#endif
 
   if (verbose) {
     mrb_gv_set(mrb, mrb_intern_lit(mrb, "$mrbtest_verbose"), mrb_true_value());

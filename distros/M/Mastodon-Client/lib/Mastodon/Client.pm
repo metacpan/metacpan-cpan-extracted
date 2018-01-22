@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Carp;
 use Mastodon::Types qw( Acct Account DateTime Image URI Instance );
@@ -552,7 +552,7 @@ Mastodon::Client - Talk to a Mastodon server
 
   $client->post_status('Posted to a Mastodon server!');
   $client->post_status('And now in secret...',
-    { visibility => 'unlisted ' }
+    { visibility => 'unlisted' }
   )
 
   # Streaming interface might change!

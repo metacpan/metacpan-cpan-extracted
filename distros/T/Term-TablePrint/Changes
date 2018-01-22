@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.060   2018-01-16
+        - Modified "Reached Limit" single row output
+
 0.059   2018-01-11
         - Bugfix: uninitialized value
 

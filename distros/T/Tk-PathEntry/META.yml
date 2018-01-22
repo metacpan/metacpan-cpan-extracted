@@ -1,0 +1,25 @@
+---
+abstract: 'Entry widget for selecting paths with completion'
+author:
+  - 'Slaven Rezic <srezic@cpan.org>'
+  - 'Klaus Wittrock <wittrock@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Tk-PathEntry
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Tk: 800.02
+resources:
+  repository: git://github.com/eserte/tk-pathentry.git
+version: 3.07

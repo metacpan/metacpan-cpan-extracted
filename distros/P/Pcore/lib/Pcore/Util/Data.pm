@@ -325,17 +325,16 @@ sub to_perl ( $data, %args ) {
     if ( $args{readable} ) {
         state $init1 = !!require Pcore::Src::File;
 
-        $res = Pcore::Src::File->new(
-            {   action      => $Pcore::Src::SRC_DECOMPRESS,
-                path        => 'config.perl',                 # mark file as perl config
-                is_realpath => 0,
-                in_buffer   => $res,
-                filter_args => {
-                    perl_tidy   => '--comma-arrow-breakpoints=0',
-                    perl_critic => 0,
-                },
-            }
-        )->run->out_buffer;
+        $res = Pcore::Src::File->new( {
+            action      => $Pcore::Src::SRC_DECOMPRESS,
+            path        => 'config.perl',                 # mark file as perl config
+            is_realpath => 0,
+            in_buffer   => $res,
+            filter_args => {
+                perl_tidy   => '--comma-arrow-breakpoints=0',
+                perl_critic => 0,
+            },
+        } )->run->out_buffer;
     }
 
     return $res;
@@ -826,10 +825,10 @@ sub to_xor ( $buf, $mask ) {
 ## |    3 | 76, 255              | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 380, 433             | * Postfix control "for" used                                                                                   |
-## |      | 806                  | * Postfix control "while" used                                                                                 |
+## |      | 379, 432             | * Postfix control "for" used                                                                                   |
+## |      | 805                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 670                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 669                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

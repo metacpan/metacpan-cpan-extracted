@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Find::Rule;
+use Text::TFIDF::Ngram;
+
+my $dir    = shift || die "Usage: perl $0 /some/corpus size top stopwords phrase";
+my $size   = shift || 2;
+my $top    = shift // 0;
+my $stop   = shift // 1;
+my $phrase = shift || '';
+
+my @files = File::Find::Rule->file()->name('*.txt')->in($dir);
+
+my $t = Text::TFIDF::Ngram->new(
+    files     => \@files,
+    size      => $size,
+    stopwords => $stop,
+);
+
+# If the top phrases is requested...
+if ( $top ) {
+    my $x = $t->tfidf_by_file();
+
+    my $i = 0;
+    for my $file ( sort keys %$x ) {
+        $i++;
+
+        print "$i. $file\n";
+
+        my $n = 0;
+        for my $p ( sort { $x->{$file}{$b} <=> $x->{$file}{$a} } keys %{ $x->{$file} } ) {
+            last if ++$n > $top;
+            print "\t$n. $p = ", $x->{$file}{$p}, "\n";
+        }
+    }
+}
+
+# If an analysis of a single phrase is requested...
+if ( $phrase ) {
+    print "Word: '$phrase' IDF: ", $t->idf($phrase), "\n";
+
+    my $i = 0;
+    for my $file ( @{ $t->files } ) {
+        $i++;
+
+        print "$i. File: $file\n";
+
+        print "\tTF: ", $t->tf( $file, $phrase ), "\n";
+
+        my $tfidf = $t->tfidf( $file, $phrase );
+        print "\tTF-IDF: $tfidf\n" if $tfidf;
+    }
+}
+
+__END__
+!perl % ~/Documents/lit/inaugural/ 2 5
+!perl % ~/Documents/lit/inaugural/ 2 0 1 'public good'

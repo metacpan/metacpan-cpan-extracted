@@ -8,14 +8,16 @@ my $build = Module::Build->new(
    requires => {
       'IO::Async' => '0.24',
       'Linux::Epoll' => '0.005',
+      'Struct::Dumb' => 0,
    },
-   build_requires => {
+   configure_requires => {
+      'Module::Build' => '0.4004',  # test_requires
+   },
+   test_requires => {
       'Test::More' => 0,
       'IO::Async::LoopTests' => '0.24',
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

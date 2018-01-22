@@ -1,3 +1,102 @@
+20180116  2018-01-16 (PERLANCAR)
+
+          - Update to CMC 2018-01-16.
+
+          - New coins:
+            + AICHAIN (AIT)
+            + AI Doctor (AIDOC)
+            + Aigang (AIX)
+            + ATN (ATN)
+            + AWARE (AWR)
+            + Bankex (BKX)
+            + Bean Cash (BITB)
+            + Bitcoin Atom [Futures] (BCA)
+            + Bitcoin God (GOD)
+            + BitDegree (BDG)
+            + Bloom (BLT)
+            + Bottos (BTO)
+            + CFun (CFUN)
+            + Cloud (CLD)
+            + CoffeeCoin (CFC)
+            + Coinlancer (CL)
+            + Commodity Ad Network (CDX)
+            + Content and AD Network (CANETWORK)
+            + CryptopiaFeeShares (CEFS)
+            + EchoLink (EKO)
+            + EtherDelta Token (EDT)
+            + FairGame (FAIRGAME)
+            + GameChain System (GCS)
+            + Global Jobcoin (GJC)
+            + GET Protocol (GET)
+            + Hacken (HKN)
+            + Hackspace Capital (HAC)
+            + High Performance Blockchain (HPB)
+            + Ignition (IC)
+            + INS Ecosystem (INS)
+            + Internet Node Token (INT)
+            + InvestDigital (IDT)
+            + IOStoken (IOST)
+            + Jingtum Tech (SWTC)
+            + Karma (KRM)
+            + Kcash (KCASH)
+            + KemCredit (KMC)
+            + Kzcash (KZC)
+            + Leek Coin (LEEK)
+            + LendConnect (LCT)
+            + Leverj (LEV)
+            + Measurable Data Token (MDT)
+            + Mixin (MIXIN)
+            + MOAC (MOAC)
+            + Nimfamoney (NIMFA)
+            + Numus (NMS)
+            + NumusCash (NUMUS)
+            + OneRoot Network (RNT)
+            + OP Coin (OPC)
+            + Polis (POLIS)
+            + Qube (QUBE)
+            + QunQun (QUN)
+            + Rebellious (REBL)
+            + Selfkey (KEY)
+            + Show (SHOW)
+            + Spectre.ai Dividend Token (SXDT)
+            + Spectre.ai Utility (SXUT)
+            + Steneum Coin (STN)
+            + SwftCoin (SWFTC)
+            + Swisscoin (SIC)
+            + Telcoin (TEL)
+            + TokenClub (TCT)
+            + TOKYO (TOKC)
+            + TopChain (TOPC)
+            + Trade Token (TIO)
+            + ugChain (UGC)
+            + United Traders Token (UTT)
+            + Vezt (VZT)
+            + WaykiChain (WAYKI)
+            + WETH (WETH)
+            + Zap (ZAP)
+
+          - Removed coins:
+            + BitBean (BITB)
+            + Bitcoin Unlimited (BTU)
+            + Bongger (BGR)
+            + CasinoCoin (CSC)
+            + EmberCoin (EMB)
+            + Kittehcoin (MEOW)
+            + QCash (QC)
+            + Wyvern (WYV)
+
+          - Changed coins:
+            + BitcoinX (BCX) changed name from BitcoinX [Futures]
+            + ChanCoin (CHAN) changed symbol from 4CHN
+            + MediBloc (MED) changed name from Medibloc
+            + Oyster (PRL) changed name from Oyster Pearl
+            + Presearch (PRS) changed symbol from PRE
+            + SegWit2x (B2X) changed name from Segwit2x [Futures]
+            + Simple Token (OST) changed symbol from ST
+
+          - Total coins now 1450 (from 1387)
+
+
 20180109  2018-01-09 (PERLANCAR)
 
 	  - Update to CMC 2018-01-09 (new coins: AppCoins (APPC), CanYaCoin

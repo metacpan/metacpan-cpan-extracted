@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CGI::Pure;
 use Encode qw(decode_utf8);
 use Test::More 'tests' => 22;

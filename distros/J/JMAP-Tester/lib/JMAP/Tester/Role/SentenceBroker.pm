@@ -1,5 +1,5 @@
 package JMAP::Tester::Role::SentenceBroker;
-$JMAP::Tester::Role::SentenceBroker::VERSION = '0.016';
+$JMAP::Tester::Role::SentenceBroker::VERSION = '0.017';
 use Moo::Role;
 
 requires 'client_ids_for_items';
@@ -24,7 +24,7 @@ JMAP::Tester::Role::SentenceBroker
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 AUTHOR
 

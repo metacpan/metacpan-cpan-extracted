@@ -20,7 +20,7 @@ package MongoDB::GridFSBucket::UploadStream;
 # ABSTRACT: File handle abstraction for uploading
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Moo;
 use Encode;
@@ -28,6 +28,7 @@ use DateTime;
 use MongoDB::Error;
 use MongoDB::OID;
 use MongoDB::BSON::Binary;
+use Time::HiRes qw/time/;
 use Types::Standard qw(
   Str
   Bool
@@ -308,7 +309,7 @@ sub close {
         _id        => $self->id,
         length     => $self->_length,
         chunkSize  => $self->chunk_size_bytes,
-        uploadDate => DateTime->now,
+        uploadDate => DateTime->from_epoch( epoch => time ),
         md5        => $self->_md5->hexdigest,
         filename   => $self->filename,
     };
@@ -456,7 +457,7 @@ MongoDB::GridFSBucket::UploadStream - File handle abstraction for uploading
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 
@@ -661,7 +662,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MongoDB, Inc.
+This software is Copyright (c) 2018 by MongoDB, Inc.
 
 This is free software, licensed under:
 

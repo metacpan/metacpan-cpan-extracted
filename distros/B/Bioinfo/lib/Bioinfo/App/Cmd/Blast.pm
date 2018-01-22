@@ -4,7 +4,7 @@ use Moo;
 use MooX::Cmd;
 use MooX::Options prefer_commandline => 1;
 
-our $VERSION = '0.1.13'; # VERSION: 
+our $VERSION = '0.1.14'; # VERSION: 
 # ABSTRACT: various operator related to Blast+
 
 
@@ -28,7 +28,7 @@ Bioinfo::App::Cmd::Blast - various operator related to Blast+
 
 =head1 VERSION
 
-version 0.1.13
+version 0.1.14
 
 =head1 SYNOPSIS
 

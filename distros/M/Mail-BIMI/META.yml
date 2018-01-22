@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +18,7 @@ requires:
   Data::Dumper: '0'
   English: '0'
   Mail::DMARC: '0'
+  Mail::DMARC::PurePerl: '0'
   Net::DNS::Resolver: '0'
-version: '1.20170626'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.20180122'
+x_serialization_backend: 'YAML::Tiny version 1.70'

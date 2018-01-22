@@ -6,8 +6,11 @@ Text::CaboCha::Tree - CaboCha Tree Object
 
 =head1 SYNOPSIS
 
+    use utf8;
+    use Encode;
     use Text::CaboCha;
     my $cabocha = Text::CaboCha->new();
+    my $text = encode(Text::CaboCha::ENCODING, "太郎は次郎が持っている本を花子に渡した。");
     my $tree = $cabocha->parse($text);
 
     $tree->tostr(Text::CaboCha::CABOCHA_FORMAT_TREE); # You can check the tree.

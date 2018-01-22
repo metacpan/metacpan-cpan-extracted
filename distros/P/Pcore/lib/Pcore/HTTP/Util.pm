@@ -160,13 +160,11 @@ sub http_request ($args) {
                 }
             );
 
-            $h->on_eof(
-                sub {
-                    $runtime->{finish}->( $runtime->{on_error_status}, 'Unexpected end-of-file' );
+            $h->on_eof( sub {
+                $runtime->{finish}->( $runtime->{on_error_status}, 'Unexpected end-of-file' );
 
-                    return;
-                }
-            );
+                return;
+            } );
 
             $h->timeout( $args->{timeout} );
 
@@ -663,12 +661,12 @@ sub _read_body ( $args, $runtime, $cb ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 26                   | * Subroutine "http_request" with high complexity score (26)                                                    |
-## |      | 273                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
-## |      | 392                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
+## |      | 271                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
+## |      | 390                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 372                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 370                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 604                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 602                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

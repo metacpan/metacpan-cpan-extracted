@@ -20,6 +20,7 @@ WriteMakefile
             Test::More      	0
             Test::Deep          0
             File::Basename      0
+			ExtUtils::MakeMaker	0
         )
     },
 );

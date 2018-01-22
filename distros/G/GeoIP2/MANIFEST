@@ -49,7 +49,17 @@ lib/GeoIP2/Types.pm
 lib/GeoIP2/WebService/Client.pm
 maxmind-db/LICENSE
 maxmind-db/MaxMind-DB-spec.md
+maxmind-db/MaxMind-DB-test-metadata-pointers.mmdb
 maxmind-db/README.md
+maxmind-db/bad-data/README.md
+maxmind-db/bad-data/libmaxminddb/libmaxminddb-offset-integer-overflow.mmdb
+maxmind-db/bad-data/maxminddb-golang/cyclic-data-structure.mmdb
+maxmind-db/bad-data/maxminddb-golang/invalid-bytes-length.mmdb
+maxmind-db/bad-data/maxminddb-golang/invalid-data-record-offset.mmdb
+maxmind-db/bad-data/maxminddb-golang/invalid-map-key-length.mmdb
+maxmind-db/bad-data/maxminddb-golang/invalid-string-length.mmdb
+maxmind-db/bad-data/maxminddb-golang/metadata-is-an-uint128.mmdb
+maxmind-db/bad-data/maxminddb-golang/unexpected-bytes.mmdb
 maxmind-db/perltidyrc
 maxmind-db/source-data/GeoIP2-Anonymous-IP-Test.json
 maxmind-db/source-data/GeoIP2-City-Test.json
@@ -60,6 +70,7 @@ maxmind-db/source-data/GeoIP2-Domain-Test.json
 maxmind-db/source-data/GeoIP2-Enterprise-Test.json
 maxmind-db/source-data/GeoIP2-ISP-Test.json
 maxmind-db/source-data/GeoIP2-Precision-Enterprise-Test.json
+maxmind-db/source-data/GeoIP2-User-Count-Test.json
 maxmind-db/source-data/GeoLite2-ASN-Test.json
 maxmind-db/source-data/README
 maxmind-db/test-data/GeoIP2-Anonymous-IP-Test.mmdb
@@ -73,6 +84,7 @@ maxmind-db/test-data/GeoIP2-Domain-Test.mmdb
 maxmind-db/test-data/GeoIP2-Enterprise-Test.mmdb
 maxmind-db/test-data/GeoIP2-ISP-Test.mmdb
 maxmind-db/test-data/GeoIP2-Precision-Enterprise-Test.mmdb
+maxmind-db/test-data/GeoIP2-User-Count-Test.mmdb
 maxmind-db/test-data/GeoLite2-ASN-Test.mmdb
 maxmind-db/test-data/MaxMind-DB-no-ipv4-search-tree.mmdb
 maxmind-db/test-data/MaxMind-DB-string-value-entries.mmdb

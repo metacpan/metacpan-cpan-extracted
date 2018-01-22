@@ -27,35 +27,31 @@ sub on_accept ( $fh, $host, $port ) {
 
             $HDL->{$id} = $h;
 
-            $h->on_error(
-                sub {
-                    delete $HDL->{$id};
+            $h->on_error( sub {
+                delete $HDL->{$id};
 
-                    return;
-                }
-            );
+                return;
+            } );
 
-            $h->on_read(
-                sub ($h) {
-                    $h->unshift_read(
-                        line => sub ( $h, $msg, $eol ) {
+            $h->on_read( sub ($h) {
+                $h->unshift_read(
+                    line => sub ( $h, $msg, $eol ) {
 
-                            # decode message, ignore invalid json
-                            eval { $msg = from_json $msg; 1; } or return;
+                        # decode message, ignore invalid json
+                        eval { $msg = from_json $msg; 1; } or return;
 
-                            my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // q[] );
+                        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // q[] );
 
-                            return if !$cmd || !main->can($cmd);
+                        return if !$cmd || !main->can($cmd);
 
-                            main->$cmd( $h, $msg->[0], $msg->[1] );
+                        main->$cmd( $h, $msg->[0], $msg->[1] );
 
-                            return;
-                        }
-                    );
+                        return;
+                    }
+                );
 
-                    return;
-                }
-            );
+                return;
+            } );
 
             return;
         }
@@ -76,14 +72,13 @@ sub CMD_src ( $self, $h, $id, $args ) {
         }
     }
 
-    my $res = Pcore::Src::File->new(
-        {   action      => $args->{action},
-            path        => $path,
-            is_realpath => $args->{path} ? 1 : 0,
-            in_buffer   => \encode_utf8 $args->{content},
-            dry_run     => 0,
-        }
-    )->run;
+    my $res = Pcore::Src::File->new( {
+        action      => $args->{action},
+        path        => $path,
+        is_realpath => $args->{path} ? 1 : 0,
+        in_buffer   => \encode_utf8 $args->{content},
+        dry_run     => 0,
+    } )->run;
 
     my $json = to_json [
         $id,

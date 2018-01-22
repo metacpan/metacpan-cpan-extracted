@@ -42,6 +42,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bay-max1/Win32-NTFS-Symlink/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bay-max1/Win32-NTFS-Symlink.git",
+         "web" : "https://github.com/bay-max1/Win32-NTFS-Symlink"
+      }
+   },
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

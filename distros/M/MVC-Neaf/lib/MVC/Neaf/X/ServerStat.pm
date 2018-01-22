@@ -3,7 +3,7 @@ package MVC::Neaf::X::ServerStat;
 use strict;
 use warnings;
 
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -11,10 +11,14 @@ MVC::Neaf::X::ServerStat - server request/performance statistics.
 
 =head1 DESCRIPTION
 
+B<[DEPRECATED]> This module is  severely outdated and shall not be used.
+Replacement in progress.
+See L</BUGS>.
+
 This module provides a simple interface to gather request timing statistics.
 
 Despite being a part of Neaf (Not Even A Framework), it does not depend on
-the rest of it and can be used se[parately.
+the rest of it and can be used separately.
 
 =head1 SYNOPSIS
 
@@ -26,7 +30,7 @@ use Carp;
 use Time::HiRes qw(time);
 use Scalar::Util qw(weaken);
 
-=head2 new( %args )
+=head2 new( %options )
 
 Valid options:
 
@@ -36,7 +40,7 @@ Valid options:
 to flush data.
 
 CODEREF is a function that receiver an arrayref containing arrayrefs with
-the following data: script_name(), http status, time spent in controller,
+the following data: script_name(), HTTP status, time spent in controller,
 total time spent, and Unix time when request came in. E.g.
 
     [
@@ -45,10 +49,10 @@ total time spent, and Unix time when request came in. E.g.
 
 This format MAY be extended in the future.
 
-iitem * write_thresh_count (n) -
+=item * write_thresh_count (n) -
 how many records may be accumulated before writing.
 
-=item * write_thresh_time (n.nn) -
+=item * write_thresh_time (n.n) -
 for how much time (in seconds) the data may be accumulated.
 
 Set either to -1 to ensure EVERY record flushes immediately.
@@ -86,7 +90,7 @@ sub new {
 
 =head2 record_start()
 
-Start motinoring a request.
+Start monitoring a request.
 
 =cut
 
@@ -169,7 +173,7 @@ sub record_finish {
 If this method is implemented in a subclass,
 it will be used instead of on_write callback if no such callback provided.
 
-The first argument is the stat object itself,
+The first argument is the C<ServerStat> object itself,
 the second one is the same as for on_write.
 
 =cut
@@ -182,5 +186,23 @@ sub DESTROY {
         $self->{on_write}->( delete $self->{queue} );
     };
 };
+
+=head1 BUGS
+
+Due to its sequential nature, C<ServerStat> cannot really be used with
+C<-continue>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+
 
 1;

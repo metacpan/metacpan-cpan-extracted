@@ -8,8 +8,8 @@ use utf8;
 use Carp qw( croak );
 use Cwd qw( abs_path );
 use File::Basename qw( dirname );
-use File::Slurp qw( read_file write_file );
-use JSON::XS qw( decode_json );
+use File::Slurper qw( read_binary write_binary );
+use Cpanel::JSON::XS qw( decode_json );
 use Math::Int128 qw( uint128 );
 use MaxMind::DB::Writer::Serializer 0.100004;
 use MaxMind::DB::Writer::Tree 0.100004;
@@ -133,13 +133,13 @@ sub write_broken_pointers_test_db {
 sub write_broken_search_tree_db {
     my $filename = ( write_test_db(@_) )[1];
 
-    my $content = read_file( $filename, { binmode => ':raw' } );
+    my $content = read_binary($filename);
 
     # This causes the right record of the first node to be 0, meaning it
     # points back to the top of the tree. This should never happen in a
     # database that follows the spec.
     substr( $content, 5, 1 ) = "\0";
-    write_file( $filename, $content, { binmode => ':raw' } );
+    write_binary( $filename, $content );
 
     return;
 }
@@ -229,12 +229,13 @@ sub write_test_db {
                 en =>
                     'MaxMind DB Decoder Test database - contains every MaxMind DB data type',
             },
-            alias_ipv6_to_ipv4    => 1,
-            map_key_type_callback => sub {
+            alias_ipv6_to_ipv4       => 1,
+            remove_reserved_networks => 0,
+            map_key_type_callback    => sub {
                 my $key = $_[0];
                 $key =~ s/X$//;
                 return $key eq 'array' ? [ 'array', 'uint32' ] : $key;
-            }
+            },
         );
 
         my @subnets
@@ -329,18 +330,19 @@ sub write_test_db {
 }
 
 sub write_geoip2_dbs {
-    _write_geoip2_db( @{$_}, 'Test' )
+    _write_geoip2_db( @{$_}[ 0, 1 ], 'Test' )
         for (
-        [ 'GeoIP2-Anonymous-IP',         1 ],
-        [ 'GeoIP2-City',                 0 ],
-        [ 'GeoIP2-Connection-Type',      0 ],
-        [ 'GeoIP2-Country',              0 ],
-        [ 'GeoIP2-DensityIncome',        0 ],
-        [ 'GeoIP2-Domain',               0 ],
-        [ 'GeoIP2-Enterprise',           0 ],
-        [ 'GeoIP2-ISP',                  0 ],
-        [ 'GeoIP2-Precision-Enterprise', 0 ],
-        [ 'GeoLite2-ASN',                  0 ],
+        [ 'GeoIP2-Anonymous-IP', {} ],
+        ['GeoIP2-City'],
+        ['GeoIP2-Connection-Type'],
+        ['GeoIP2-Country'],
+        ['GeoIP2-DensityIncome'],
+        ['GeoIP2-Domain'],
+        ['GeoIP2-Enterprise'],
+        ['GeoIP2-ISP'],
+        ['GeoIP2-Precision-Enterprise'],
+        ['GeoIP2-User-Count'],
+        ['GeoLite2-ASN'],
         );
 }
 
@@ -394,10 +396,16 @@ sub _universal_map_key_type_callback {
         country                        => 'map',
         domain                         => 'utf8_string',
         geoname_id                     => 'uint32',
+        ipv4_24                        => 'uint32',
+        ipv4_32                        => 'uint32',
+        ipv6_32                        => 'uint32',
+        ipv6_48                        => 'uint32',
+        ipv6_64                        => 'uint32',
         is_anonymous                   => 'boolean',
         is_anonymous_proxy             => 'boolean',
         is_anonymous_vpn               => 'boolean',
         is_hosting_provider            => 'boolean',
+        is_in_european_union           => 'boolean',
         is_legitimate_proxy            => 'boolean',
         is_public_proxy                => 'boolean',
         is_satellite_provider          => 'boolean',
@@ -444,9 +452,9 @@ ERROR
 }
 
 sub _write_geoip2_db {
-    my $type                  = shift;
-    my $populate_all_networks = shift;
-    my $description           = shift;
+    my $type                            = shift;
+    my $populate_all_networks_with_data = shift;
+    my $description                     = shift;
 
     my $writer = MaxMind::DB::Writer::Tree->new(
         ip_version    => 6,
@@ -455,22 +463,20 @@ sub _write_geoip2_db {
         database_type => $type,
         languages     => [ 'en', $type eq 'GeoIP2-City' ? ('zh') : () ],
         description   => {
-            en =>
-                ($type =~ s/-/ /gr) . " $description Database (fake GeoIP2 data, for example purposes only)",
+            en => ( $type =~ s/-/ /gr )
+                . " $description Database (fake GeoIP2 data, for example purposes only)",
             $type eq 'GeoIP2-City' ? ( zh => '小型数据库' ) : (),
         },
         alias_ipv6_to_ipv4    => 1,
         map_key_type_callback => _universal_map_key_type_callback(),
     );
 
-    _populate_all_networks($writer) if $populate_all_networks;
+    _populate_all_networks( $writer, $populate_all_networks_with_data )
+        if $populate_all_networks_with_data;
 
-    my $nodes = decode_json(
-        read_file(
-            "$Dir/../source-data/$type-Test.json",
-            binmode => ':raw'
-        )
-    );
+    my $value = shift;
+    my $nodes
+        = decode_json( read_binary("$Dir/../source-data/$type-Test.json") );
 
     for my $node (@$nodes) {
         for my $network ( keys %$node ) {
@@ -491,6 +497,7 @@ sub _write_geoip2_db {
 
 sub _populate_all_networks {
     my $writer = shift;
+    my $data   = shift;
 
     my $max_uint128 = uint128(0) - 1;
     my @networks    = Net::Works::Network->range_as_subnets(
@@ -505,7 +512,7 @@ sub _populate_all_networks {
     );
 
     for my $network (@networks) {
-        $writer->insert_network( $network => {} );
+        $writer->insert_network( $network => $data );
     }
 }
 
@@ -521,8 +528,9 @@ sub write_no_ipv4_tree_db {
         description   => {
             en => 'MaxMind DB No IPv4 Search Tree',
         },
-        root_data_type        => 'utf8_string',
-        map_key_type_callback => sub { {} },
+        remove_reserved_networks => 0,
+        root_data_type           => 'utf8_string',
+        map_key_type_callback    => sub { {} },
     );
 
     my $subnet = Net::Works::Network->new_from_string( string => '::/64' );
@@ -600,7 +608,7 @@ sub write_db_with_metadata_pointers {
 
     );
 
-    _populate_all_networks($writer);
+    _populate_all_networks( $writer, {} );
 
     open my $fh, '>', 'MaxMind-DB-test-metadata-pointers.mmdb';
 

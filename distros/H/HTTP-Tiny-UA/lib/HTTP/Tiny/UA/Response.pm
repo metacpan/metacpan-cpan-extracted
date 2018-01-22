@@ -4,12 +4,12 @@ use warnings;
 package HTTP::Tiny::UA::Response;
 # ABSTRACT: Wrap HTTP::Tiny response as objects with accessors
 
-our $VERSION = '0.004'; # from HTTP-Tiny-UA-0.004.tar.gz
+our $VERSION = '0.005';
 
 # Declare custom accessor before Class::Tiny loads
 use subs 'headers';
 
-use Class::Tiny qw( success url status reason content protocol headers );
+use Class::Tiny 1.000 qw( success url status reason content protocol headers );
 
 #pod =attr success
 #pod
@@ -82,7 +82,7 @@ HTTP::Tiny::UA::Response - Wrap HTTP::Tiny response as objects with accessors
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

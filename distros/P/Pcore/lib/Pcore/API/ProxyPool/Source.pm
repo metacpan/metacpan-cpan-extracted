@@ -34,42 +34,40 @@ around load => sub ( $orig, $self ) {
 
     $self->{_load_in_progress} = 1;
 
-    $self->$orig(
-        sub ($uris) {
-            my $pool = $self->pool;
+    $self->$orig( sub ($uris) {
+        my $pool = $self->pool;
 
-            my $has_new_proxies;
+        my $has_new_proxies;
 
-            for my $uri ( $uris->@* ) {
-                my $proxy = Pcore::API::ProxyPool::Proxy->new( $uri, $self );
+        for my $uri ( $uris->@* ) {
+            my $proxy = Pcore::API::ProxyPool::Proxy->new( $uri, $self );
 
-                # proxy object wasn't created, generally due to uri parsing errors
-                next if !$proxy;
+            # proxy object wasn't created, generally due to uri parsing errors
+            next if !$proxy;
 
-                # proxy already exists
-                next if exists $pool->{list}->{ $proxy->hostport };
+            # proxy already exists
+            next if exists $pool->{list}->{ $proxy->hostport };
 
-                $has_new_proxies = 1;
+            $has_new_proxies = 1;
 
-                # add proxy to the list
-                $pool->list->{ $proxy->hostport } = $proxy;
+            # add proxy to the list
+            $pool->list->{ $proxy->hostport } = $proxy;
 
-                # add proxy to the storage
-                $pool->storage->add_proxy($proxy);
-            }
-
-            # update next source load timeout
-            $self->{_load_next_time} = time + $self->load_timeout;
-
-            $self->{_load_in_progress} = 0;
-
-            # throw pool on status change event if has new proxies added
-            # waiting threads can start immediately
-            $pool->_on_status_change if $has_new_proxies;
-
-            return;
+            # add proxy to the storage
+            $pool->storage->add_proxy($proxy);
         }
-    );
+
+        # update next source load timeout
+        $self->{_load_next_time} = time + $self->load_timeout;
+
+        $self->{_load_in_progress} = 0;
+
+        # throw pool on status change event if has new proxies added
+        # waiting threads can start immediately
+        $pool->_on_status_change if $has_new_proxies;
+
+        return;
+    } );
 
     return;
 };

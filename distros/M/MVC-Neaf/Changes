@@ -1,7 +1,53 @@
 Revision history for MVC-Neaf
 
-0.1901  Wed Nov 29 2017
-        - BUG Fix local SIG{WARN} on load that caused havoc
+0.2202  Fri Jan 19 2018
+        - TST Fix tests under Plack < 1.043 https://rt.cpan.org/Ticket/Display.html?id=124124
+
+0.2201  Thu Jan 18 2018
+        - DOC Fix escaping in docs
+
+0.22    Thu Jan 18 2018
+        - DOC Rearrange core doc sections
+        - DOC Deprecate X::Stat module, say replacement pending
+        - API BREAK Deprecate server_stat method
+        - API BREAK Reprecate req->header_in_keys
+        - BUG Work around HTTP::XSHeaders not providing flatten* methods
+        - TST Add a performance statistics example
+        - TST Fix(?) tests on older perls
+
+0.21    Thu Dec 7 2017
+        - API Add any, put, patch, and del for DELETE to sugar
+        - API route(): Add 'public', 'tentative', 'override' flags
+        - MOD static '/path' => [ "content" ] to serve in-memory files
+        - TPL Add View::TT->preload for in-memory templates
+        - API Experimental load_resources for Mojo-like @@ files in __DATA__
+        - TPL Minor fixes in View::JS, add want_pretty and want_sorted options
+        - DEV Add callback(\%, path, method) to get_routes
+        - REF unify die 404 with MVC::Neaf::Exception
+        - REF Use HTTP::Headers::Fast everywhere
+        - BUG Tighten dependencies, add more workarounds for failing deps
+        - BUG Fix error reporting in diamond upload test
+        - TST Improve test suite somewhat
+
+0.2002  Fri Dec 1 2017
+        - BUG Fixed escapes in POD
+
+0.2001  Fri Dec 1 2017
+        - Version bump NOCODE
+
+0.20    Fri Dec 1 2017
+        - API Add 'neaf form => name => {...}' for kosher input validation
+        - MOD Add X::Form::Wildcard module to handle unforeknown request params
+        - API Add public log_error() method to Request, use it for all errors
+        - API BREAK Split upload() into upload_utf8() and upload_raw()
+        - API BREAK Remove req->set,get_default for good
+        - REF Replace JSON dependency with JSON::MaybeXS
+        - REF Replace concatenation with md5 in req->id generator (todo SHA3)
+        - DOC Improve Neaf documentation NOCODE
+        - BUG Multiple bugs fixed, new ones added
+
+0.1901  Tue Nov 28 2017
+        - BUG Fix local $SIG{__WARN__} in BEGIN section
 
 0.19    Fri Nov 24 2017
         - CLI Add --listen option to CLI interface

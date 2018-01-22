@@ -1,6 +1,6 @@
 package HPC::Runner::Command;
 
-use MooseX::App qw(Color);
+use MooseX::App 1.39 qw(Color);
 
 with 'BioSAILs::Utils::Plugin';
 with 'BioSAILs::Utils::LoadConfigs';
@@ -54,7 +54,7 @@ has 'submission_uuid' => (
     predicate => 'has_submissions_uuid',
 );
 
-our $VERSION = '3.2.12';
+our $VERSION = '3.2.14';
 
 app_strict 0;
 

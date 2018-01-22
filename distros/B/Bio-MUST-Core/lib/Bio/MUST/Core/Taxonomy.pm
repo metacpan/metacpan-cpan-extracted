@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.180140';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.180190';
 use Moose;
 use namespace::autoclean;
 
@@ -32,7 +32,7 @@ use Bio::Phylo::IO qw(parse);
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:ncbi :files);
-use Bio::MUST::Core::Utils qw(fix_homedir change_suffix);
+use Bio::MUST::Core::Utils qw(change_suffix);
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::IdMapper';
@@ -150,11 +150,10 @@ sub _build_ncbi_tax {
     local $_ = q{};     # to avoid loosing $_ due to Bio::LITE... constructor
 
     # open pipes from (possibly) multiple names.dmp and nodes.dmp
-    my $tax_dir = $self->tax_dir;
-    my $names_txid = file($tax_dir, 'names*.dmp'   );
-    my $names_gca  = file($tax_dir, 'gca*names.dmp');
-    my $nodes_txid = file($tax_dir, 'nodes*.dmp'   );
-    my $nodes_gca  = file($tax_dir, 'gca*nodes.dmp');
+    my $names_txid = file($self->tax_dir, 'names*.dmp'   );
+    my $names_gca  = file($self->tax_dir, 'gca*names.dmp');
+    my $nodes_txid = file($self->tax_dir, 'nodes*.dmp'   );
+    my $nodes_gca  = file($self->tax_dir, 'gca*nodes.dmp');
 
     # Note: gca files are loaded last to get precedence in get_taxid_from_name
     my @names_files = ($names_txid, $names_gca);
@@ -319,9 +318,8 @@ sub _build_strain_taxid_for {
 
     # open pipe from (possibly) multiple names.dmp
     # TODO: try to avoid code duplication with _build_ncbi_tax
-    my $tax_dir    = $self->tax_dir;
-    my $names_txid = file($tax_dir, 'names*.dmp'   );
-    my $names_gca  = file($tax_dir, 'gca*names.dmp');
+    my $names_txid = file($self->tax_dir, 'names*.dmp'   );
+    my $names_gca  = file($self->tax_dir, 'gca*names.dmp');
 
     my @names_files = ($names_txid, $names_gca);
     open my $names_fh, '-|', "cat @names_files";
@@ -1223,7 +1221,7 @@ sub new_from_cache {                        ## no critic (RequireArgUnpacking)
     my %args  = @_;                         # TODO: handle HashRef?
 
     ### Loading NCBI Taxonomy from binary cache file...
-    my $tax_dir = fix_homedir( $args{tax_dir} );
+    my $tax_dir = glob $args{tax_dir};
     my $cachefile = file($tax_dir, $CACHEDB);
     my $tax = $class->load($cachefile, inject => { tax_dir => $tax_dir } );
 
@@ -1253,12 +1251,12 @@ sub setup_taxdir {
 
     my $gi_mapper = $args->{gi_mapper} // 0;
 
+    # setup local directory
+    $tax_dir = dir( glob $tax_dir );
+    $tax_dir->mkpath();
+
     ### Installing NCBI Taxonomy database to: $tax_dir
     ### Please be patient...
-
-    # setup local directory
-    my $dir = dir( fix_homedir($tax_dir) )->absolute;
-    $dir->mkpath();
 
     # setup remote archive access
     my $base = 'ftp://ftp.ncbi.nih.gov/pub/taxonomy';
@@ -1274,7 +1272,7 @@ sub setup_taxdir {
         my $url  = "$base/$target";
 
         ### Downloading: $url
-        my $zipfile = file($dir, $target)->stringify;
+        my $zipfile = file($tax_dir, $target)->stringify;
         my $ret_code = getstore($url, $zipfile);
         croak "Error: cannot download $url: error $ret_code; aborting!"
             unless $ret_code == 200;
@@ -1287,16 +1285,17 @@ sub setup_taxdir {
             push @dmpfiles, change_suffix( $zipfile, q{} );
         }
         else {                                      # main tax archive
-            system("tar -xzf $zipfile -C $dir");
+            system("tar -xzf $zipfile -C $tax_dir");
             file($zipfile)->remove;
         }
     }
 
     #... second, the accession_id version
-    $class->_make_gca_files($dir);
+    $class->_make_gca_files($tax_dir);
 
     # return true on success (only check main files)
-    if ( -r file($dir, 'gca0-names.dmp') && -r file($dir, 'gca0-nodes.dmp') ) {
+    if ( -r file($tax_dir, 'gca0-names.dmp') &&
+         -r file($tax_dir, 'gca0-nodes.dmp') ) {
         ### Successfully wrote GCA-based files!
     }
 
@@ -1306,7 +1305,7 @@ sub setup_taxdir {
 
     # optionally build binary GI mapper from GI-to-taxid flat files
     if ($gi_mapper) {
-        my $mrgfile = file($dir, 'gi_taxid_nucl_prot.dmp')->stringify;
+        my $mrgfile = file($tax_dir, 'gi_taxid_nucl_prot.dmp')->stringify;
         ### Merging GI-to-taxid flat files to: $mrgfile
         system("sort -nm @dmpfiles > $mrgfile");
         my $binfile = change_suffix($mrgfile, '.bin');
@@ -1316,7 +1315,7 @@ sub setup_taxdir {
     }
 
     # return true on success (only check main files)
-    if ( -r file($dir, 'names.dmp') && -r file($dir, 'nodes.dmp') ) {
+    if ( -r file($tax_dir, 'names.dmp') && -r file($tax_dir, 'nodes.dmp') ) {
         ### Successfully wrote taxid files!
         ### Done!
         return 1;
@@ -1327,8 +1326,8 @@ sub setup_taxdir {
 }
 
 sub _make_gca_files {
-    my $class = shift;
-    my $dir   = shift;
+    my $class   = shift;
+    my $tax_dir = shift;
 
     const my $FS       => qq{\t|\t};
     const my $FS_REGEX => qr{\t \| \t}xms;
@@ -1337,7 +1336,7 @@ sub _make_gca_files {
     my %parent_taxid_for;
 
     # open nodes.dmp file
-    my $nodes = file($dir, 'nodes.dmp');
+    my $nodes = file($tax_dir, 'nodes.dmp');
     open my $in, '<', $nodes;
 
     # get taxon_id and parent_taxon_id from nodes.dmp file
@@ -1350,7 +1349,7 @@ sub _make_gca_files {
     }
 
     # create helper Taxonomy object
-    my $tax = $class->new( tax_dir => $dir );
+    my $tax = $class->new( tax_dir => $tax_dir );
 
     # define remote assembly reports filenames
     # Note: the order is significant (last files dominate over first files)
@@ -1371,7 +1370,7 @@ sub _make_gca_files {
         #### $target
 
         my $url = "$base_acc/$target";
-        my $file = join '/', $dir, $target;
+        my $file = join '/', $tax_dir, $target;
         #### $file
 
         ### Downloading: $url
@@ -1410,7 +1409,7 @@ sub _make_gca_files {
     }
 
     # write names.dmp
-    my $names_gca_file = join '/', $dir, 'gca0-names.dmp';
+    my $names_gca_file = join '/', $tax_dir, 'gca0-names.dmp';
     open my $names_out, '>', $names_gca_file;
 
     for my $accession ( keys %name_for ) {
@@ -1423,7 +1422,7 @@ sub _make_gca_files {
     }
 
     # write nodes.dmp
-    my $nodes_gca_file = join '/', $dir, 'gca0-nodes.dmp';
+    my $nodes_gca_file = join '/', $tax_dir, 'gca0-nodes.dmp';
     open my $nodes_out, '>', $nodes_gca_file;
 
     for my $accession ( keys %node_for ) {
@@ -1536,7 +1535,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 

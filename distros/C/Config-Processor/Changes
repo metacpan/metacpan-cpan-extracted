@@ -1,5 +1,9 @@
 Revision history for Perl extension Config::Processor.
 
+0.28 Sun Jan 21 17:34:53 MSK 2018
+  - Fixed issue #3 "Behavior 'CONFIG_PRECEDENT' does not exist".
+    Thanks to Slaven Rezić.
+
 0.26 Fri Mar 24 11:22:54 MSK 2017
   - README.pod replaced by README.md.
 

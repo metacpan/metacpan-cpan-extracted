@@ -1,3 +1,19 @@
+version 0.201802; 2018-01-18
+
+  * Olson database version 2018b: 388 canonical zones, 204 links
+
+version 0.201801; 2018-01-16
+
+  * Olson database version 2018a: 388 canonical zones, 204 links
+
+  * do not bundle non-source files that are included in the Olson
+    database distribution
+
+  * no longer treat olson_code_version and olson_data_version as distinct
+    values, now that both halves are released in lockstep upstream
+
+  * in prebuild, handle new kinds of download files
+
 version 0.201703; 2017-10-23
 
   * Olson database version 2017c (code 2017c, data 2017c): 387 canonical

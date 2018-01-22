@@ -1,0 +1,80 @@
+[
+   {
+      "File" : [
+         {
+            "id" : "file_new",
+            "label" : "New"
+         },
+         {
+            "id" : "file_open",
+            "label" : "Open"
+         },
+         {
+            "id" : "file_save",
+            "label" : "Save"
+         }
+      ]
+   },
+   {
+      "Edit" : [
+         {
+            "id" : "edit_cut",
+            "label" : "Cut"
+         },
+         {
+            "id" : "edit_copy",
+            "label" : "Copy"
+         },
+         {
+            "id" : "edit_paste",
+            "label" : "Paste"
+         },
+         null,
+         {
+            "id" : "edit_find",
+            "label" : "Find"
+         },
+         null,
+         {
+            "id" : "edit_settings",
+            "label" : "Settings"
+         }
+      ]
+   },
+   {
+      "View" : [
+         {
+            "id" : "view_encoding",
+            "label" : "Encoding"
+         },
+         {
+            "id" : "view_wrapping",
+            "label" : "Text wrapping"
+         }
+      ]
+   },
+   {
+      "builtin" : {
+         "rules" : [
+            {
+               "modname" : "Remove",
+               "path" : [
+                  "[1]{Edit}[5]"
+               ]
+            },
+            {
+               "modname" : "Remove",
+               "path" : [
+                  "[1]{Edit}[3]"
+               ]
+            },
+            {
+               "modname" : "Remove",
+               "path" : [
+                  "[1]{Edit}[1]"
+               ]
+            }
+         ]
+      }
+   }
+]

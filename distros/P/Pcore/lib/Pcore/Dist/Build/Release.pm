@@ -340,11 +340,10 @@ sub _upload_to_cpan ($self) {
   REDO:
     print 'Uploading to CPAN ... ';
 
-    my $pause = Pcore::API::PAUSE->new(
-        {   username => $ENV->user_cfg->{PAUSE}->{username},
-            password => $ENV->user_cfg->{PAUSE}->{password},
-        }
-    );
+    my $pause = Pcore::API::PAUSE->new( {
+        username => $ENV->user_cfg->{PAUSE}->{username},
+        password => $ENV->user_cfg->{PAUSE}->{password},
+    } );
 
     my $res = $pause->upload($tgz);
 
@@ -449,7 +448,7 @@ TXT
 ## |    2 | 143, 163, 218, 223,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## |      | 228, 233             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 380                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 379                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

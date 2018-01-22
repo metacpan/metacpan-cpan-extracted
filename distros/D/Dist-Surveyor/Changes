@@ -1,5 +1,8 @@
 Revision history for Dist-Surveyor
 
+0.021     2018-01-21 13:45:53-05:00 America/New_York
+	- Fix get_release_info to return the correct data structure from the MetaCPAN API
+
 0.020     2017-07-13 21:02:03-04:00 America/New_York
 	- Update documentation to use cpanm --from instead of --mirror for local installation
 	- Move compile test to author-only tests

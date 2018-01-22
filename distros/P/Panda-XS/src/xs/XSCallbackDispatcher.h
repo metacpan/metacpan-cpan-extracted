@@ -20,6 +20,8 @@ XSCallbackDispatcher* make_xs_wrapper(CallbackDispatcher<void, Args...>& dispatc
 
 namespace {
 
+using xs::my_perl;
+
 template <typename... Args>
 struct ArgsConverter {
     template <typename T>
@@ -47,7 +49,7 @@ struct ArgsConverter {
     void operator ()(Args... args) {
         std::vector<SV*> sv_args;
         push(sv_args, args...);
-        xs::call_sub_void(cv.get<CV>(), sv_args.data(), sv_args.size());
+        xs::call_sub_void(aTHX_ cv.get<CV>(), sv_args.data(), sv_args.size());
     }
 
     bool operator ==(const ArgsConverter& o) const {

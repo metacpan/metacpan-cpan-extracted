@@ -1,5 +1,5 @@
 package JMAP::Tester::Role::SentenceCollection;
-$JMAP::Tester::Role::SentenceCollection::VERSION = '0.016';
+$JMAP::Tester::Role::SentenceCollection::VERSION = '0.017';
 use Moo::Role;
 
 requires 'sentence_broker';
@@ -281,36 +281,37 @@ sub paragraph_by_client_id {
   return $self->paragraph_for_items(\@selected);
 }
 
-#pod =method as_struct
+#pod =method as_triples
 #pod
-#pod =method as_stripped_struct
+#pod =method as_stripped_triples
 #pod
 #pod This method returns an arrayref of arrayrefs, holding the data returned by the
-#pod JMAP server.  With C<as_struct>, some of the JSON data may be in objects provided by
-#pod L<JSON::Typist>. If you'd prefer raw data, use the C<as_stripped_struct> form.
+#pod JMAP server.  With C<as_triples>, some of the JSON data may be in objects
+#pod provided by L<JSON::Typist>. If you'd prefer raw data, use the
+#pod C<as_stripped_triples> form.
 #pod
 #pod =cut
 
-sub as_struct {
+sub as_triples {
   my ($self) = @_;
 
   return [
-    map {; $self->sentence_for_item($_)->as_struct }
+    map {; $self->sentence_for_item($_)->as_triple }
     $self->items
   ];
 }
 
-sub as_stripped_struct {
+sub as_stripped_triples {
   my ($self) = @_;
 
-  return $self->strip_json_types($self->as_struct);
+  return $self->strip_json_types($self->as_triples);
 }
 
 #pod =method as_pairs
 #pod
 #pod =method as_stripped_pairs
 #pod
-#pod These methods do the same thing as C<as_struct> and <as_stripped_struct>,
+#pod These methods do the same thing as C<as_triples> and <as_stripped_triples>,
 #pod but omit client ids.
 #pod
 #pod =cut
@@ -344,7 +345,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 METHODS
 
@@ -412,19 +413,20 @@ exactly C<$n>.  Otherwise, it aborts.
 This returns the paragraph for the given client id.  If there is no paragraph
 for that client id, an empty list is returned.
 
-=head2 as_struct
+=head2 as_triples
 
-=head2 as_stripped_struct
+=head2 as_stripped_triples
 
 This method returns an arrayref of arrayrefs, holding the data returned by the
-JMAP server.  With C<as_struct>, some of the JSON data may be in objects provided by
-L<JSON::Typist>. If you'd prefer raw data, use the C<as_stripped_struct> form.
+JMAP server.  With C<as_triples>, some of the JSON data may be in objects
+provided by L<JSON::Typist>. If you'd prefer raw data, use the
+C<as_stripped_triples> form.
 
 =head2 as_pairs
 
 =head2 as_stripped_pairs
 
-These methods do the same thing as C<as_struct> and <as_stripped_struct>,
+These methods do the same thing as C<as_triples> and <as_stripped_triples>,
 but omit client ids.
 
 =head1 AUTHOR

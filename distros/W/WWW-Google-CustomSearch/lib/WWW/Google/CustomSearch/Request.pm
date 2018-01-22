@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Request;
 
-$WWW::Google::CustomSearch::Request::VERSION   = '0.35';
+$WWW::Google::CustomSearch::Request::VERSION   = '0.37';
 $WWW::Google::CustomSearch::Request::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Request - Placeholder for Google JSON/Atom Custom Sea
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use WWW::Google::CustomSearch::Page;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'page'    => (is => 'ro');
 has 'api_key' => (is => 'ro', required => 1);
@@ -65,7 +65,7 @@ Mohammad S Anwar, C<< <mohammad.anwar at yahoo.com> >>
 
 =head1 REPOSITORY
 
-L<https://github.com/Manwar/WWW-Google-CustomSearch>
+L<https://github.com/manwar/WWW-Google-CustomSearch>
 
 =head1 CONTRIBUTORS
 

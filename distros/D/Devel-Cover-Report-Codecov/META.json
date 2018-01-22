@@ -57,7 +57,7 @@
             "Module::Find" : "0.13",
             "Sub::Retry" : "0.06",
             "URI" : "1.60",
-            "perl" : "5.010000"
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -84,10 +84,13 @@
    "provides" : {
       "Devel::Cover::Report::Codecov" : {
          "file" : "lib/Devel/Cover/Report/Codecov.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Devel::Cover::Report::Codecov::Service::AppVeyor" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm"
+      },
+      "Devel::Cover::Report::Codecov::Service::Bitrise" : {
+         "file" : "lib/Devel/Cover/Report/Codecov/Service/Bitrise.pm"
       },
       "Devel::Cover::Report::Codecov::Service::Circle" : {
          "file" : "lib/Devel/Cover/Report/Codecov/Service/Circle.pm"
@@ -134,13 +137,14 @@
          "web" : "https://github.com/codecov/codecov-perl"
       }
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_authority" : "cpan:PINE",
    "x_contributors" : [
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
       "M Somerville <dracos@users.noreply.github.com>",
       "Pedro Melo <melo@simplicidade.org>",
       "Pine Mizune <pinemz@gmail.com>",
       "stevepeak <steve@stevepeak.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

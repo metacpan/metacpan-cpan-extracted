@@ -112,12 +112,12 @@ use base 'Exporter';
 our $VERSION;
 
 BEGIN {
-   $VERSION = '1.91';
+   $VERSION = '1.92';
 
    our @BDB_REQ = qw(
       db_env_open db_env_close db_env_txn_checkpoint db_env_lock_detect
       db_env_memp_sync db_env_memp_trickle db_env_dbrename db_env_dbremove
-      db_env_log_archive
+      db_env_log_archive db_env_lsn_reset db_env_fileid_reset
       db_open db_close db_compact db_sync db_verify db_upgrade
       db_put db_exists db_get db_pget db_del db_key_range
       db_txn_commit db_txn_abort db_txn_finish
@@ -205,6 +205,8 @@ Functions in the BDB namespace, exported by default:
    db_env_dbremove (DB_ENV *env, DB_TXN_ornull *txnid, bdb_filename file, bdb_filename database, U32 flags = 0, SV *callback = 0)
    db_env_dbrename (DB_ENV *env, DB_TXN_ornull *txnid, bdb_filename file, bdb_filename database, bdb_filename newname, U32 flags = 0, SV *callback = 0)
    db_env_log_archive (DB_ENV *env, SV *listp, U32 flags = 0, SV *callback = 0)
+   db_env_lsn_reset (DB_ENV *env, bdb_filename db, U32 flags = 0, SV *callback = 0)
+   db_env_fileid_reset (DB_ENV *env, bdb_filename db, U32 flags = 0, SV *callback = 0)
 
    $db = db_create (DB_ENV *env = 0, U32 flags = 0)
       flags: XA_CREATE

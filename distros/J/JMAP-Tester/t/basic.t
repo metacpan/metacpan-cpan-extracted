@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use HTTP::Response;
+use JMAP::Tester;
 use JMAP::Tester::Response;
 use JSON::Typist 0.005; # $typist->number
 
@@ -50,14 +52,15 @@ subtest "the basic basics" => sub {
     subtest "structure tests on $pair->[0]" => sub {
       my $call = $pair->[1];
 
+      my $triple_method = $pair->[0] eq 'sentence' ? 'triple' : 'triples';
       jcmp_deeply(
-        $call->('as_struct'),
+        $call->("as_${triple_method}"),
         [
           jstr('atePies'),
           { howMany => jnum(100), tastiestPieId => jstr(123) },
           jstr('a'),
         ],
-        "as_struct",
+        "as_${triple_method}",
       );
 
       my $pair_method = $pair->[0] eq 'sentence' ? 'pair' : 'pairs';
@@ -71,7 +74,7 @@ subtest "the basic basics" => sub {
       );
 
       jcmp_deeply(
-        $call->('as_stripped_struct'),
+        $call->("as_stripped_${triple_method}"),
         [ 'atePies', { howMany => 100, tastiestPieId => 123 }, 'a' ],
         "as_stripped_struct",
       );
@@ -339,6 +342,43 @@ subtest "miscellaneous error conditions" => sub {
     re('found more than one sentence with name "welcome"'),
     "ambiguous by name",
   );
+};
+
+subtest "interpreting HTTP responses" => sub {
+  my $tester = JMAP::Tester->new;
+
+  my $new_hres = sub {
+    return HTTP::Response->new(
+      200,
+      "OK",
+      [ 'Content-Type', 'application/json' ],
+      $_[0],
+    );
+  };
+
+  {
+    my $hres = $new_hres->( '{"methodResponses": [["foo", {"a":1}, "c"]] }' );
+
+    my $jres = $tester->_jresponse_from_hresponse($hres);
+
+    jcmp_deeply(
+      $jres->as_pairs,
+      [ [ "foo", {a=>1} ] ],
+      "JMAP response from Object-wrapped JSON",
+    );
+  }
+
+  {
+    my $hres = $new_hres->( '[["foo", {"a":1}, "c"]]' );
+
+    my $jres = $tester->_jresponse_from_hresponse($hres);
+
+    jcmp_deeply(
+      $jres->as_pairs,
+      [ [ "foo", {a=>1} ] ],
+      "JMAP response from Object-wrapped JSON",
+    );
+  }
 };
 
 sub aborts_ok {

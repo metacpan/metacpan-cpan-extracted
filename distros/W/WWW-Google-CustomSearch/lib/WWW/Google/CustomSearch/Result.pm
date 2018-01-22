@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Result;
 
-$WWW::Google::CustomSearch::Result::VERSION   = '0.35';
+$WWW::Google::CustomSearch::Result::VERSION   = '0.37';
 $WWW::Google::CustomSearch::Result::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Result - Placeholder for Google JSON/Atom Custom Sear
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
@@ -20,22 +20,10 @@ use WWW::Google::CustomSearch::Page;
 use WWW::Google::CustomSearch::Request;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
-has 'api_key' => (is => 'ro',  required => 1);
-has 'raw'     => (is => 'ro',  required => 1);
-
-has 'kind'                  => (is => 'ro');
-has 'formattedTotalResults' => (is => 'ro');
-has 'formattedSearchTime'   => (is => 'ro');
-has 'totalResults'          => (is => 'ro');
-has 'searchTime'            => (is => 'ro');
-has 'url_template'          => (is => 'ro');
-has 'url_type'              => (is => 'ro');
-has 'request'               => (is => 'ro');
-has 'nextPage'              => (is => 'ro');
-has 'previousPage'          => (is => 'ro');
-has 'items'                 => (is => 'ro');
+has [qw(api_key raw)] => (is => 'ro', required => 1);
+has [qw(kind formattedTotalResults formattedSearchTime totalResults searchTime url_template url_type request nextPage previousPage items)] => (is => 'ro');
 
 sub BUILD {
     my ($self) = @_;

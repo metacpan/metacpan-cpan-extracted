@@ -6,11 +6,10 @@ use warnings;
 use vars qw/$AUTOLOAD/;
 
 use Carp;
-use Module::Load;
 
 use parent 'ActiveRecord::Simple';
 
-use ActiveRecord::Simple::Utils;
+use ActiveRecord::Simple::Utils qw/load_module/;
 
 
 our $MAXIMUM_LIMIT = 100_000_000_000;
@@ -360,8 +359,12 @@ sub _find_many_to_many {
     my $root_class_opts = {};
 
     if ($param->{m_class}) {
-        eval { load $param->{m_class} };
-
+        #eval { load $param->{m_class} };
+        #if (!is_loaded $param->{m_class}) {
+        #    load $param->{m_class};
+        #    mark_as_loaded
+        #}
+        load_module $param->{m_class};
 
 
         for my $opts ( values %{ $param->{m_class}->_get_relations } ) {

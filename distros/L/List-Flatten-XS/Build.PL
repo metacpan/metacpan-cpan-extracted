@@ -35,6 +35,7 @@ my %args = (
     },
 
     test_requires => {
+        'Test::Exception' => '0',
         'Test::LeakTrace' => '0',
         'Test::More' => '0.98',
         'Test::Valgrind' => '0',

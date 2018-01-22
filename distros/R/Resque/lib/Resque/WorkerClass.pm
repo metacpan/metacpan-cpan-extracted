@@ -1,6 +1,6 @@
 package Resque::WorkerClass;
 # ABSTRACT: Resque adaptor to create moose based jobs
-$Resque::WorkerClass::VERSION = '0.34';
+$Resque::WorkerClass::VERSION = '0.35';
 use Moose ();
 use Moose::Exporter;
 
@@ -36,7 +36,7 @@ Resque::WorkerClass - Resque adaptor to create moose based jobs
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 SYNOPSIS
 

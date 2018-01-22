@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.005001';
+our $VERSION = '1.006000';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.005001
+version 1.006000
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Rolsky Florian Ragwitz Greg Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro
+=for stopwords Andy Jack Dave Rolsky Florian Ragwitz Greg Mark Fowler Olaf Alders Patrick Cronin Ruben Navarro Will Storey
 
 =over 4
 
@@ -138,11 +138,15 @@ Patrick Cronin <PatrickCronin@users.noreply.github.com>
 
 Ruben Navarro <rbnx@users.noreply.github.com>
 
+=item *
+
+Will Storey <will@summercat.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 ---
 abstract: 'Common Gateway Interface Class.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
   Error::Pure::Utils: 0.16
@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.18'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,4 +42,4 @@ resources:
   homepage: https://github.com/tupinek/CGI-Pure
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/tupinek/CGI-Pure
-version: '0.05'
+version: '0.07'

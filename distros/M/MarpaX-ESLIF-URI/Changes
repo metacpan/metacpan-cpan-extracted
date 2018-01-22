@@ -1,6 +1,10 @@
 Changelog for MarpaX-ESLIF-URI
 
-0.003 2017-11-17T05:21:09
+0.004 2018-01-16T06:00:35
+ [Jean-Damien Durand]
+ - t/*.t: use Data::Dumper::OneLine
+
+0.003 2017-11-17T05:21:09Z
  [Jean-Damien Durand]
  - dzil xtest
  - better synopsis

@@ -23,6 +23,7 @@ t/blog/lib/Blog/Controller.pm
 t/blog/lib/Blog/Controller/Posts.pm
 t/blog/lib/Blog/Model/Posts.pm
 t/blog/migrations/blog.sql
+t/blog/resources_templates/show.html.ep
 t/blog/script/blog
 t/blog/t/blog.t
 t/blog/templates/layouts/blog.html.ep

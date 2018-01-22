@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: An API from the legacy Metabase::Web to the local database
 
 #pod =head1 SYNOPSIS
@@ -238,7 +238,7 @@ CPANTesters::Web::Legacy::Metabase - An API from the legacy Metabase::Web to the
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

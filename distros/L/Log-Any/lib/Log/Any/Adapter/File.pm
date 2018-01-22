@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::File;
 
 # ABSTRACT: Simple adapter for logging to files
-our $VERSION = '1.704';
+our $VERSION = '1.705';
 
 use Config;
 use Fcntl qw/:flock/;
@@ -37,7 +37,7 @@ sub init {
         $self->{log_level} = $trace_level;
     }
     my $file = $self->{file};
-    my $binmode ||= ':utf8';
+    my $binmode = $self->{binmode} || ':utf8';
     $binmode = ":$binmode" unless substr($binmode,0,1) eq ':';
     open( $self->{fh}, ">>$binmode", $file )
       or die "cannot open '$file' for append: $!";
@@ -80,7 +80,7 @@ Log::Any::Adapter::File - Simple adapter for logging to files
 
 =head1 VERSION
 
-version 1.704
+version 1.705
 
 =head1 SYNOPSIS
 

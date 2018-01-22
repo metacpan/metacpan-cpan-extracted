@@ -4,7 +4,7 @@
       "Brad Fitzpatrick <brad@danga.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -61,9 +61,11 @@
       },
       "homepage" : "http://www.mogilefs.org",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/mogilefs/MogileFS-Server.git"
       },
       "x_MailingList" : "http://groups.google.com/group/mogile"
    },
-   "version" : "2.72"
+   "version" : "2.73",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

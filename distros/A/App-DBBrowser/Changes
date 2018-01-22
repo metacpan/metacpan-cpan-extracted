@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+1.058   2018-01-22
+        - No "Auto Limit" when showing the table before drop table.
+
+1.057   2018-01-22
+        - Bugfix in delete table: show the right row number.
+        - Code refactoring.
+
 1.056   2018-01-11
         - Minimum version "Term::TablePrint" is "0.058".
         - Minimum version "Term::Choose" is "1.509".

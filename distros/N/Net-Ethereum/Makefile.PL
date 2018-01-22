@@ -5,7 +5,14 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Net::Ethereum',
     VERSION_FROM      => 'lib/Net/Ethereum.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+      "HTTP::Request" => 0,
+      "LWP::UserAgent" => 0,
+      "JSON" => 0,
+      "Math::BigInt" => 0,
+      "Math::BigFloat" => 0,
+      "File::Slurper" => 0
+    }, # e.g., Module::Name => 1.1
 #    ABSTRACT_FROM     => 'lib/Net/Ethereum.pm', # retrieve abstract from module
     AUTHOR            => 'Alexandre Frolov <frolov@itmatrix.ru>',
     #LICENSE           => 'perl',

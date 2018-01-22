@@ -1,6 +1,6 @@
 package Import::Base;
 # ABSTRACT: Import a set of modules into the calling module
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 use strict;
 use warnings;
@@ -200,13 +200,13 @@ Import::Base - Import a set of modules into the calling module
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
     ### Static API
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
 
     # Modules that are always imported
     our @IMPORT_MODULES = (
@@ -271,7 +271,7 @@ A common base module should probably include L<strict|strict>,
 L<warnings|warnings>, and a L<feature|feature> set.
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
 
     our @IMPORT_MODULES = (
         'strict',
@@ -299,7 +299,7 @@ In addition to a set of modules, we can also create optional bundles with the
 C<%IMPORT_BUNDLES> package variable.
 
     package My::Bundles;
-    use base 'My::Base';
+    use parent 'My::Base';
 
     # Modules that will always be included
     our @IMPORT_MODULES
@@ -332,14 +332,14 @@ We can further extend our base module to create more specialized modules for
 classes and testing.
 
     package My::Class;
-    use base 'My::Base';
+    use parent 'My::Base';
     our @IMPORT_MODULES = (
         'Moo::Lax',
         'Types::Standard' => [qw( :all )],
     );
 
     package My::Test;
-    use base 'My::Base';
+    use parent 'My::Base';
     our @IMPORT_MODULES = (
         'Test::More',
         'Test::Deep',
@@ -363,7 +363,7 @@ By prefixing the module name with a C<->, Import::Base will act like C<no>
 instead of C<use>.
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
     our @IMPORT_MODULES = (
         'strict',
         'warnings',
@@ -437,7 +437,7 @@ To force a module to the front or the back of the list of imports, you can prefi
 the module name with C<E<lt>> or C<E<gt>>.
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
     our @IMPORT_MODULES = (
         feature => [qw( postderef )],
         # Disable this warning last!
@@ -468,7 +468,7 @@ To get a little bit of dynamic support in the otherwise static module lists, you
 add sub references to generate module imports.
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
     our @IMPORT_MODULES = (
         sub {
             my ( $bundles, $args ) = @_;
@@ -505,7 +505,7 @@ Here's an example for applying a role (L<Moo::Role>, L<Role::Tiny>,
 L<Moose::Role>, and anything that uses C<with>) when importing a bundle:
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
     our %IMPORT_BUNDLES = (
         'Plugin' => [
             'Moo',
@@ -541,7 +541,7 @@ Instead of providing C<@IMPORT_MODULES> and C<%IMPORT_BUNDLES>, you can override
 C<modules()> method to do anything you want.
 
     package My::Bundles;
-    use base 'My::Base';
+    use parent 'My::Base';
 
     sub modules {
         my ( $class, $bundles, $args ) = @_;
@@ -576,7 +576,7 @@ completely control the order that modules are imported, even from superclasses.
 Import::Base inherits from Exporter and allows for EXPORT_OK usage.
 
     package My::Base;
-    use base 'Import::Base';
+    use parent 'Import::Base';
 
     our @EXPORT_OK = qw($joy);
 
@@ -796,13 +796,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Brian Medley Doug Bell
+=for stopwords Brian Medley Dan Book Doug Bell
 
 =over 4
 
 =item *
 
 Brian Medley <pub-github@bmedley.org>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
 
 =item *
 

@@ -6,10 +6,12 @@ use warnings;
 require Exporter;
 
 use Module::Load;
+use Module::Loaded;
+
 use Scalar::Util qw/blessed/;
 
 our @ISA = qw/Exporter/;
-our @EXPORT = qw/class_to_table_name all_blessed/;
+our @EXPORT = qw/class_to_table_name all_blessed load_module/;
 
 
 sub quote_sql_stmt {
@@ -70,6 +72,15 @@ sub all_blessed {
     }
 
     return 1;
+}
+
+sub load_module {
+    my ($module_name) = @_;
+
+    if (!is_loaded $module_name) {
+        eval { load $module_name; };
+        mark_as_loaded $module_name;
+    }
 }
 
 1;

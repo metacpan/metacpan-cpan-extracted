@@ -1,5 +1,5 @@
 package Consul::API::Agent;
-$Consul::API::Agent::VERSION = '0.022';
+$Consul::API::Agent::VERSION = '0.023';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -67,14 +67,14 @@ sub maintenance {
 sub join {
     my ($self, $address, %args) = @_;
     croak 'usage: $agent->join($address, [%args])' if grep { !defined } ($address);
-    $$self->_api_exec($$self->_agent_endpoint."/join/".$address, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/join/".$address, 'PUT', %args);
     return;
 }
 
 sub force_leave {
     my ($self, $node, %args) = @_;
     croak 'usage: $agent->force_leave($node, [%args])' if grep { !defined } ($node);
-    $$self->_api_exec($$self->_agent_endpoint."/force-leave/".$node, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/force-leave/".$node, 'PUT', %args);
     return;
 }
 
@@ -92,28 +92,28 @@ sub check_register {
 sub check_deregister {
     my ($self, $check_id, %args) = @_;
     croak 'usage: $agent->check_deregister($check_id, [%args])' if grep { !defined } ($check_id);
-    $$self->_api_exec($$self->_agent_endpoint."/check/deregister/".$check_id, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/check/deregister/".$check_id, 'PUT', %args);
     return;
 }
 
 sub check_pass {
     my ($self, $check_id, %args) = @_;
     croak 'usage: $agent->check_pass($check_id, [%args])' if grep { !defined } ($check_id);
-    $$self->_api_exec($$self->_agent_endpoint."/check/pass/".$check_id, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/check/pass/".$check_id, 'PUT', %args);
     return;
 }
 
 sub check_warn {
     my ($self, $check_id, %args) = @_;
     croak 'usage: $agent->check_warn($check_id, [%args])' if grep { !defined } ($check_id);
-    $$self->_api_exec($$self->_agent_endpoint."/check/warn/".$check_id, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/check/warn/".$check_id, 'PUT', %args);
     return;
 }
 
 sub check_fail {
     my ($self, $check_id, %args) = @_;
     croak 'usage: $agent->check_fail($check_id, [%args])' if grep { !defined } ($check_id);
-    $$self->_api_exec($$self->_agent_endpoint."/check/fail/".$check_id, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/check/fail/".$check_id, 'PUT', %args);
     return;
 }
 
@@ -128,7 +128,7 @@ sub service_register {
 sub service_deregister {
     my ($self, $service_id, %args) = @_;
     croak 'usage: $agent->service_deregister($check_id, [%args])' if grep { !defined } ($service_id);
-    $$self->_api_exec($$self->_agent_endpoint."/service/deregister/".$service_id, 'GET', %args);
+    $$self->_api_exec($$self->_agent_endpoint."/service/deregister/".$service_id, 'PUT', %args);
     return;
 }
 
@@ -140,7 +140,7 @@ sub service_maintenance {
 }
 
 package Consul::API::Agent::Check;
-$Consul::API::Agent::Check::VERSION = '0.022';
+$Consul::API::Agent::Check::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(Str);
 
@@ -154,7 +154,7 @@ has service_id   => ( is => 'ro', isa => Str, init_arg => 'ServiceID',   require
 has service_name => ( is => 'ro', isa => Str, init_arg => 'ServiceName', required => 1 );
 
 package Consul::API::Agent::Service;
-$Consul::API::Agent::Service::VERSION = '0.022';
+$Consul::API::Agent::Service::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(Str Int ArrayRef);
 
@@ -165,7 +165,7 @@ has port    => ( is => 'ro', isa => Int,           init_arg => 'Port',    requir
 has tags    => ( is => 'ro', isa => ArrayRef[Str], init_arg => 'Tags',    required => 1, coerce => sub { $_[0] || [] } );
 
 package Consul::API::Agent::Member;
-$Consul::API::Agent::Member::VERSION = '0.022';
+$Consul::API::Agent::Member::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(Str Int HashRef);
 
@@ -182,7 +182,7 @@ has delegate_max => ( is => 'ro', isa => Int,          init_arg => 'DelegateMax'
 has delegate_cur => ( is => 'ro', isa => Int,          init_arg => 'DelegateCur', required => 1 );
 
 package Consul::API::Agent::Self;
-$Consul::API::Agent::Self::VERSION = '0.022';
+$Consul::API::Agent::Self::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(HashRef);
 use Type::Utils qw(class_type);

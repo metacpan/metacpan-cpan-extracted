@@ -326,7 +326,7 @@ sub handleUpload {
     if (not $upload){
         return $self->render(text=>encode_json({exception=>{message=>'Upload Missing',code=>9384}}));
     }
-    my $obj = $self->config->instanciatePlugin($name,CallBackery::User->new(controller=>$self));
+    my $obj = $self->config->instanciatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){
@@ -396,7 +396,7 @@ sub handleDownload {
         return $self->render(text=>encode_json({exception=>{message=>'Plugin Name missing',code=>3923}}));
     }
 
-    my $obj = $self->config->instanciatePlugin($name,CallBackery::User->new(controller=>$self));
+    my $obj = $self->config->instanciatePlugin($name,$self->user);
 
     my $form;
     if (my $formData = $self->req->param('formData')){

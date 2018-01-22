@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2017-09-07'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -71,32 +71,41 @@ sub import {
     );
 
     # add Screen
-    unless ($is_daemon) {
+    {
+        last if $is_daemon;
+        my $level = _level_from_env("SCREEN_");
+        last if defined $level && $level eq 'off';
         $conf{outputs}{Screen} = {
             conf   => { formatter => sub { "$progname: $_[0]" } },
-            level  => _level_from_env("SCREEN_"),
+            level  => $level,
             #layout => [Pattern => {format => '%m'}],
         };
     }
 
     # add File
-    unless ($0 eq '-') {
+    {
+        last if $0 eq '-';
         require PERLANCAR::File::HomeDir;
         my $path = $> ?
             PERLANCAR::File::HomeDir::get_my_home_dir()."/$progname.log" :
               "/var/log/$progname.log";
+        my $level = _level_from_env("FILE_");
+        last if defined $level && $level eq 'off';
         $conf{outputs}{File} = {
             conf   => { path => $path },
-            level  => _level_from_env("FILE_"),
+            level  => $level,
             layout => [Pattern => {format => '[pid %P] [%d] %m'}],
         };
     }
 
     # add Syslog
-    if ($is_daemon) {
+    {
+        last unless $is_daemon;
+        my $level = _level_from_env("SYSLOG_");
+        last if defined $level && $level eq 'off';
         $conf{outputs}{Syslog} = {
             conf => { ident => $progname, facility => 'daemon' },
-            level => _level_from_env("SYSLOG_"),
+            level => $level,
         };
     }
 
@@ -124,7 +133,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -251,7 +260,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

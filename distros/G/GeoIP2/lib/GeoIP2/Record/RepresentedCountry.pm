@@ -3,7 +3,7 @@ package GeoIP2::Record::RepresentedCountry;
 use strict;
 use warnings;
 
-our $VERSION = '2.004000';
+our $VERSION = '2.005000';
 
 use Moo;
 
@@ -35,7 +35,7 @@ GeoIP2::Record::RepresentedCountry - Contains data for the represented country r
 
 =head1 VERSION
 
-version 2.004000
+version 2.005000
 
 =head1 SYNOPSIS
 
@@ -79,6 +79,14 @@ Enterprise database.
 This returns a C<geoname_id> for the country.
 
 This attribute is returned by all end points.
+
+=head2 $country_rec->is_in_european_union()
+
+This returns a true value if the country is a member state of the European
+Union and a false value otherwise.
+
+This attribute is available from all web service end points and the GeoIP2
+Country, City, and Enterprise databases.
 
 =head2 $country_rec->iso_code()
 
@@ -143,7 +151,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2013 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

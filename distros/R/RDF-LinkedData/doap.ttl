@@ -1,892 +1,808 @@
-@prefix dc:    <http://purl.org/dc/terms/> .
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
-@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
-@prefix doap-deps: <http://ontologi.es/doap-deps#> .
-@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-@prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix prov:  <http://www.w3.org/ns/prov#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix types: <http://rdfs.org/sioc/types#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-
-<file:///mnt/robin/kjetil/dev/RDF-LinkedData/meta/project.ttl>
-	dc:creator           <http://www.kjetil.kjernsmo.net/foaf#me>;
-	dc:subject           <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project>;
-	dc:title             "DOAP for RDF-LinkedData"@en.
-
-<http://dbpedia.org/resource/Category:Semantic_Web>
-	rdfs:label           "Semantic Web"@en.
-
-<http://kasei.us/about/foaf.xrdf#greg>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:gwilliams@cpan.org>;
-	foaf:name            "Gregory Todd Williams";
-	owl:sameAs           <http://purl.org/NET/cpan-uri/person/gwilliams>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre>
-	a                    doap:Version;
-	rdfs:label           "Code on Github by Gregory Todd Williams."@en;
-	dc:issued            "2010-04-28"^^xsd:date;
-	doap:revision        "0.001_01"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project>
-	a                    doap:Project;
-	dc:identifier        "RDF::LinkedData"^^doap-deps:CpanId;
-	doap-deps:runtime-recommendation [ doap-deps:on "Config::ZOMG"^^doap-deps:CpanId ], [ doap-deps:on "JSON"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Endpoint 0.05"^^doap-deps:CpanId ], [
-		doap-deps:on "Plack::Middleware::CrossOrigin"^^doap-deps:CpanId;
+_:r1516143849r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/RDF-LinkedData/> ;
+	a <http://usefulinc.com/ns/doap#GitRepository> ;
+	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#> .
+_:r1516143849r1 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Allow a class config option that can add functionality."@en
 	], [
-		doap-deps:on "Plack::Middleware::Expires"^^doap-deps:CpanId;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Implement functionality to check if a read operation is given."@en
 	], [
-		doap-deps:on "RDF::Generator::Void 0.04"^^doap-deps:CpanId;
-	], [ doap-deps:on "Log::Any::Adapter"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [ doap-deps:on "MooX::Log::Any"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.133"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "Plack 0.9939"^^doap-deps:CpanId ], [
-		doap-deps:on "namespace::autoclean 0.12"^^doap-deps:CpanId;
-	], [ doap-deps:on "HTTP::Headers"^^doap-deps:CpanId ], [
-		doap-deps:on "RDF::Helper::Properties 0.10"^^doap-deps:CpanId;
-	], [ doap-deps:on "URI 1.52"^^doap-deps:CpanId ], [
-		doap-deps:on "URI::NamespaceMap 0.32"^^doap-deps:CpanId;
-	], [ doap-deps:on "RDF::NS::Curated"^^doap-deps:CpanId ], [
-		doap-deps:on "Module::Load::Conditional"^^doap-deps:CpanId;
-	], [ doap-deps:on "Encode"^^doap-deps:CpanId ], [
-		doap-deps:on "RDF::RDFa::Generator 0.102"^^doap-deps:CpanId;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add a possible controls type."@en
 	], [
-		doap-deps:on "HTML::HTML5::Writer"^^doap-deps:CpanId;
-	], [ doap-deps:on "Digest::MD5"^^doap-deps:CpanId ], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ], [ doap-deps:on "parent"^^doap-deps:CpanId ], [ doap-deps:on "List::Util 1.33"^^doap-deps:CpanId ];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.88"^^doap-deps:CpanId ], [ doap-deps:on "Test::RDF 1.16"^^doap-deps:CpanId ], [ doap-deps:on "FindBin"^^doap-deps:CpanId ], [
-		doap-deps:on "Test::WWW::Mechanize::PSGI"^^doap-deps:CpanId;
-	], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Log::Any::Adapter"^^doap-deps:CpanId ], [ doap-deps:on "Config::ZOMG"^^doap-deps:CpanId ], [ doap-deps:on "Test::JSON"^^doap-deps:CpanId ], [ doap-deps:on "RDF::RDFa::Parser"^^doap-deps:CpanId ];
-	doap:bug-database    <https://github.com/kjetilk/RDF-LinkedData/issues>;
-	doap:category        <http://dbpedia.org/resource/Category:Semantic_Web>;
-	doap:created         "2009-04-23"^^xsd:date;
-	doap:developer       <http://kasei.us/about/foaf.xrdf#greg>;
-	doap:download-page   <https://metacpan.org/release/RDF-LinkedData>;
-	doap:homepage        <https://metacpan.org/release/RDF-LinkedData>;
-	doap:license         <http://dev.perl.org/licenses/>;
-	doap:mailing-list    <http://lists.perlrdf.org/listinfo/dev>;
-	doap:maintainer      <http://www.kjetil.kjernsmo.net/foaf#me>;
-	doap:name            "RDF-LinkedData";
-	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02>;
-	doap:repository      [
-		a doap:GitRepository;
-		doap:browse <https://github.com/kjetilk/RDF-LinkedData/>;
-		prov:has_provenance <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#>;
-	];
-	doap:shortdesc       "Base class and scripts for servers that serve RDF as Linked Data."@en;
-	doap:support-forum   <irc://irc.perl.org/#perlrdf>;
-	doap:wiki            <http://wiki.perlrdf.org/>;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstream>;
-	rdfs:seeAlso         <http://packages.qa.debian.org/libr/librdf-linkeddata-perl.ttl>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58>
-	a                    doap:Version;
-	rdfs:label           "Stability and modernization release."@en;
-	dc:issued            "2013-07-23"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Simplify setting headers by removing call to HTTP::Headers."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix newline bug causing problems."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Allow POST requests to the endpoint."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Add the use of content type to Etag to work around some bugs."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Use URI::NamespaceMap for namespaces."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Change packaging to use Module::Package::RDF."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Improved tests."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Enable optional use of environment for config."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove write_sqlite script."@en;
-		];
-	];
-	doap:revision        "0.58"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.58>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60>
-	a                    doap:Version;
-	rdfs:label           "Install script."@en;
-	dc:issued            "2013-07-23"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "The PSGI script wasn't installed."@en;
-		];
-	];
-	doap:revision        "0.60"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.60>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62>
-	a                    doap:Version;
-	rdfs:label           "Add Server header."@en;
-	dc:issued            "2013-10-27"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Add a Server header."@en;
-		];
-	];
-	doap:revision        "0.62"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.62>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64>
-	a                    doap:Version;
-	rdfs:label           "Fix bug in vocabulary URIs."@en;
-	dc:issued            "2014-05-26"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix a bug that caused some vocabularies to show up as URI::Namespace-strings."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add git2prov links to the meta information, so there's a linked data chain from Github."@en;
-		];
-	];
-	doap:revision        "0.64"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.64>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66>
-	a                    doap:Version;
-	rdfs:label           "Fix bug in ETag handling."@en;
-	dc:issued            "2014-07-11"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "ETags could have the URI prefixed."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "RFC2616 says ETags have to be quoted."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Make ETags use base64 encoding rather than a hex."@en;
-		];
-	];
-	doap:revision        "0.66"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.66>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68>
-	a                    doap:Version;
-	rdfs:label           "Documentation updates and small fixes."@en;
-	dc:issued            "2014-07-22"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Use Try::Tiny instead of eval."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Drop the weak ETag checking."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Many smaller documentation updates."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Document the use of the PERLRDF_STORE environment variable."@en;
-		];
-	];
-	doap:revision        "0.68"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.68>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70>
-	a                    doap:Version;
-	rdfs:label           "Triple Pattern Fragments support and modernization."@en;
-	dc:issued            "2014-10-17"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Triple Pattern Fragments support."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Improve documentation."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add the use of Expires module."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Support the .well-known/void magic URL."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Hand-maintain README."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Migrate object system from Moose to Moo."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use Log::Contextual to manage the logging."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use Dist::Inkt to package."@en;
-		];
-	];
-	doap:revision        "0.70"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.70>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72>
-	a                    doap:Version;
-	rdfs:label           "Triple Pattern Fragments improvement."@en;
-	dc:issued            "2015-02-14"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Adding support to download the complete datasets as fragments."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/hochsten>;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Set explicit Perl version."@en;
-		];
-	];
-	doap:revision        "0.72"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.72>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74>
-	a                    doap:Version;
-	rdfs:label           "Fix Triple Pattern Fragments bugfix."@en;
-	dc:issued            "2015-03-04"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix the template to be Hydra compliant."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/hochsten>;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Move Perl version setting to makefile."@en;
-		];
-	];
-	doap:revision        "0.74"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.74>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76>
-	a                    doap:Version;
-	rdfs:label           "Improve Namespace handling and hypermedia controls."@en;
-	dc:issued            "2017-01-02"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Update;
-			rdfs:label "Use URI::NamespaceMap properly."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Use MooX::Log::Any for logging."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Hypermedia controls for the 'all' fragment."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Also check the request path for the endpoints."@en;
-			doap-changeset:blame <http://richardlewis.me.uk/richardlewis.foaf.rdf#rjl>;
-		];
-	];
-	doap:revision        "0.76"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78>
-	a                    doap:Version;
-	rdfs:label           "Use Config::ZOMG for config."@en;
-	dc:issued            "2017-01-03"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix packaging bug with Config::ZOMG."@en;
-		];
-	];
-	doap:revision        "0.78"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01>
-	a                    doap:Version;
-	rdfs:label           "Initial release. Kjetil Kjernsmo refactored Gregs code to separate the web server logic from the rest."@en;
-	dc:issued            "2010-04-29"^^xsd:date;
-	doap:revision        "0.01"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02>
-	a                    doap:Version;
-	rdfs:label           "Use RDF::Trine's conneg and bounded description code."@en;
-	dc:issued            "2010-05-05"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [ rdfs:label "Require RDF::Trine 0.121."@en ], [
-			a doap-changeset:Addition;
-			rdfs:label "Use RDF::Trine's content negotiation code."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use RDF::Trine's bounded description code."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use a HTTP::Headers object for conneg."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add some log messages."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add and improve a type method that returns page or data."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove the negotiate method."@en;
-		];
-	];
-	doap:revision        "0.02"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03>
-	a                    doap:Version;
-	rdfs:label           "Add page method to use foaf:page for redirects."@en;
-	dc:issued            "2010-05-06"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Really does require RDF::Trine 0.122."@en;
-		], [ rdfs:label "Minor cleanups."@en ], [
-			a doap-changeset:Addition;
-			rdfs:label "Add a page method that uses foaf:homepage or foaf:page to override the default page for redirect."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove boilerplate tests."@en;
-		];
-	];
-	doap:revision        "0.03"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05>
-	a                    doap:Version;
-	rdfs:label           "Major refactor, use Moose and Plack."@en;
-	dc:issued            "2010-06-13"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [ rdfs:label "Many smaller changes."@en ], [
-			a doap-changeset:Addition;
-			rdfs:label "use Moose"@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "A response method contains most of the logic."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More tests, also unit testing."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Create RDF::LinkedData::ProviderRole, a Moose::Role with a default implementation."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Create a RDF::LinkedData::Predicates with a title, description and page methods."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use Config::JFDI for configuration."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More documentation."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use Plack::Response and HTTP::Headers in the role itself."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Create a Plack PSGI script to run the server. This also serves as a basic usage example."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove Mojolicious::Lite script."@en;
-		];
-	];
-	doap:revision        "0.05"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06>
-	a                    doap:Version;
-	rdfs:label           "Minor POD syntax documentation bug fix release."@en;
-	dc:issued            "2010-06-13"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix minor POD bugs."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add number of PSGI tests."@en;
-		];
-	];
-	doap:revision        "0.06"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08>
-	a                    doap:Version;
-	rdfs:label           "Update to use config hashrefs and various fixes for recent RDF::Trine."@en;
-	dc:issued            "2010-08-02"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Update;
-			rdfs:label "Require RDF::Trine 0.125."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Explicitly ask for text/html in tests since RDF::Trine 0.124 needs it."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "No Accept header will return turtle data."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Now use a hashref config for new_with_config instead of config string."@en;
-		];
-	];
-	doap:revision        "0.08"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1>
-	a                    doap:Version;
-	rdfs:label           "Refactor helper modules; ."@en;
-	dc:issued            "2010-08-18"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Update;
-			rdfs:label "Split off RDF::LinkedData::Predicates into distribution of its own."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add namespaces method to set a hashref with RDF namespaces."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Move POD-tests to xt."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Remove -T switch from load.t, since it borks on some systems."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "create a helper_properties method to pass the properties."@en;
-		];
-	];
-	doap:revision        "0.09_1"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10>
-	a                    doap:Version;
-	rdfs:label           "Better tested release."@en;
-	dc:issued            "2010-08-19"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Add TODO test to check whether Firefox' default Accept header returns data."@en;
-		];
-	];
-	doap:revision        "0.10"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12>
-	a                    doap:Version;
-	rdfs:label           "Support base URI."@en;
-	dc:issued            "2010-08-24"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Support base URI in serializations for RDF::Trine 0.127_02."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use Module::Install::AuthorTests."@en;
-		];
-	];
-	doap:revision        "0.12"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14>
-	a                    doap:Version;
-	rdfs:label           "Use URI object."@en;
-	dc:issued            "2010-08-26"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Minor documentation fixes."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Using URI objects throughout makes more intensive use of absolute URIs."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Fix the warning described in http://search.cpan.org/~shlomif/Error-0.17016/lib/Error.pm#COMPATIBILITY"@en;
-		];
-	];
-	doap:revision        "0.14"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16>
-	a                    doap:Version;
-	rdfs:label           "Instantiate on startup; Many small fixes."@en;
-	dc:issued            "2010-12-09"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Many minor documentation fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Many minor test and code fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "No main-namespaced variable needed for tests."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Remove logging unless in verbose mode."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Move ld instantiation to outside of the coderef for big performance gain."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add basic support for Access-Control-Allow-Origin."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Support setting namespace in config."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add tests for more Accept headers (TODO stuff)."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use the base if the source has not set its own."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use a memory model for testing that loads the file directly"@en;
-		];
-	];
-	doap:revision        "0.16"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18>
-	a                    doap:Version;
-	rdfs:label           "Minor JSON syntax documentation bug fix release."@en;
-	dc:issued            "2010-12-09"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Found out the hard way that JSON doesn't allow single quotes."@en;
-		];
-	];
-	doap:revision        "0.18"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20>
-	a                    doap:Version;
-	rdfs:label           "Improved conneg; use Test::RDF; Many small fixes."@en;
-	dc:issued            "2011-02-08"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Many minor documentation fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Many minor test and code fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use the new Test::RDF module for testing."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Now requires RDF::Trine 0.133."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Consistently name the base URI base_uri."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Content negotation much improved."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Gives HTML page for default Firefox Accept header."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add tests for more browser Accept headers."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Improve documentation of configuration (thanks to Thomas Kappler for input)."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Now use the RDF::Trine::Store->new method, since it now supports checking the type itself."@en;
-		];
-	];
-	doap:revision        "0.20"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30>
-	a                    doap:Version;
-	rdfs:label           "Use RDF::Endpoint for the same data."@en;
-	dc:issued            "2011-06-09"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Optionally use RDF::Endpoint to set up a SPARQL endpoint for the data."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Many minor documentation fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Many minor test and code fixes."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "headers_in method removed."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Added request method to pass the whole request rather than just headers."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Remove Test::NoWarnings; too many false positives."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Correct test dep to Test::JSON rather than just JSON."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Add the subject URI to the HTML output, since this would often break."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Allow namespaces to be skipped from the config."@en;
-		];
-	];
-	doap:revision        "0.30"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40>
-	a                    doap:Version;
-	rdfs:label           "Refactoring and code improvements."@en;
-	dc:issued            "2012-04-04"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Use Module::Install::RDF to manage the metadata."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Restructure the documentation."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Many minor test and code fixes."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove the Moose::Role, not clear that we need it."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use RDF::RDFa::Generator. This alters the HTML output significantly."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Major refactor to improve the RDF::LinkedData class."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Major refactor to create a Plack::App::RDF::LinkedData."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add Etag support"@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use several Middleware modules in the psgi (For HEAD requests, CORS and Etag)."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use MooseX::UndefTolerant to allow the endpoint_config to be undef."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add URI::Escape configure_requires."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More tests on HTML/RDFa content."@en;
-		];
-	];
-	doap:revision        "0.40"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42>
-	a                    doap:Version;
-	rdfs:label           "Enable very basic VoID for hypermedia."@en;
-	dc:issued            "2012-06-11"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Add hypermedia method which will be on by default to enable hypermedia."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add namespaces_as_vocabularies method which will be on by default to use declared namespaces as vocabularies."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add void:endpoint and void:vocabulary to all output if enabled."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "TODO test about content type now pass."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Some minor test and code fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use Test::RDF 0.26."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use the github issue tracker."@en;
-		];
-	];
-	doap:revision        "0.42"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44>
-	a                    doap:Version;
-	rdfs:label           "Bugfix release."@en;
-	dc:issued            "2012-06-12"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Some minor fixes."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "The endpoint path was not correctly sent to the hypermedia."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Actually, the TODO test about content type failed for everyone else."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More tests (obviously)."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use empty string as default base_uri"@en;
-		];
-	];
-	doap:revision        "0.44"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50>
-	a                    doap:Version;
-	rdfs:label           "Use VoID Generator."@en;
-	dc:issued            "2012-06-29"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Some minor fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "The content method is now private."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "RDF::LinkedData now can use RDF::Generator::Void, but not all its features."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add descriptions to POD and README."@en;
-		], [
-			a doap-changeset:Removal;
-			rdfs:label "Remove SQLite generator script."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use current_etag instead of etag"@en;
-		];
-	];
-	doap:revision        "0.50"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52>
-	a                    doap:Version;
-	rdfs:label           "Bugfix release."@en;
-	dc:issued            "2012-06-30"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "A bad plan caused by superfluous BEGIN block caused test failures."@en;
-		];
-	];
-	doap:revision        "0.52"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54>
-	a                    doap:Version;
-	rdfs:label           "Improve VoID generator use."@en;
-	dc:issued            "2012-06-30"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Some minor fixes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Add a pagetitle config parameter for RDFa title."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use the Generators new feature to add a model with arbitrary data to load a file."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Make it possible to use the Generators property attributes."@en;
-		];
-	];
-	doap:revision        "0.54"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56>
-	a                    doap:Version;
-	rdfs:label           "Bugfix release."@en;
-	dc:issued            "2012-07-29"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix major UTF8 breakage by encoding all strings."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Some cosmetic fixes."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "More tests."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix performance problems caused by regeneration of VoID descriptions for every request."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix performance problems by stat-ing the external VoID-file to see if needs reloading."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Improve the way different HTML serializations are returned."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Skip some tests when Redland is installed, causes test-specific bugs."@en;
-		];
-	];
-	doap:revision        "0.56"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00>
-	a                    doap:Version;
-	rdfs:label           "Clean up for Milestone 1.0."@en;
-	dc:issued            "2017-08-25"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Remove the final eval, use Try::Tiny."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use can_load to check for optionals in tests."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "A few smaller changes."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Proofread and improve documentation."@en;
-			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/shlomif>;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Check that Integer URI is OK in test."@en;
-		], [
-			a doap-changeset:Update;
-			rdfs:label "Can't rely on . in @INC."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Return Turtle rather than RDF/XML if no content type is given."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Tests had wrong base_uri attribute."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Remove the Error module, use Carp::croak."@en;
-		];
-	];
-	doap:revision        "1.00"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.00>.
-
-<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02>
-	a                    doap:Version;
-	rdfs:label           "Skip some tests if no RDFa parser is present."@en;
-	dc:issued            "2017-08-28"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Skip some tests if no RDFa parser is present."@en;
-		];
-	];
-	doap:revision        "1.02"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.02>.
-
-<http://purl.org/NET/cpan-uri/person/hochsten>
-	a                    foaf:Person;
-	foaf:homepage        <http://hochstenbach.wordpress.com/>;
-	foaf:mbox            <mailto:patrick.hochstenbach@gmail.com>;
-	foaf:name            "Patrick Hochstenbach";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Patrick-Hochstenbach>.
-
-<http://purl.org/NET/cpan-uri/person/shlomif>
-	a                    foaf:Person;
-	foaf:name            "Shlomi Fish";
-	foaf:nick            "SHLOMIF";
-	foaf:page            <https://metacpan.org/author/SHLOMIF>;
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Shlomi-Fish>.
-
-<http://richardlewis.me.uk/richardlewis.foaf.rdf#rjl>
-	a                    foaf:Person;
-	foaf:homepage        <http://www.richard-lewis.me.uk/>;
-	foaf:name            "Richard Lewis";
-	foaf:nick            "ironChicken".
-
-<http://www.kjetil.kjernsmo.net/foaf#me>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:kjetilk@cpan.org>;
-	foaf:name            "Kjetil Kjernsmo";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
-
-<irc://irc.perl.org/#perlrdf>
-	a                    types:ChatChannel.
-
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add auth_required method to check if an operation requires authentication."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Check for RDF::LinkedData::RWHypermedia if writes are enabled."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improve handling of configuration options."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many smaller improvements."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Document read-write features."@en
+	] .
+_:r1516143849r10 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Skip some tests if no RDFa parser is present."@en
+	] .
+_:r1516143849r100 a <http://ontologi.es/doap-changeset#Addition> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add namespaces_as_vocabularies method which will be on by default to use declared namespaces as vocabularies."@en .
+_:r1516143849r101 a <http://ontologi.es/doap-changeset#Addition> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add void:endpoint and void:vocabulary to all output if enabled."@en .
+_:r1516143849r102 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "TODO test about content type now pass."@en .
+_:r1516143849r103 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Some minor test and code fixes."@en .
+_:r1516143849r104 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use Test::RDF 0.26."@en .
+_:r1516143849r105 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use the github issue tracker."@en .
+_:r1516143849r106 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add URI::Escape configure_requires."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "More tests on HTML/RDFa content."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Module::Install::RDF to manage the metadata."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Restructure the documentation."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor test and code fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove the Moose::Role, not clear that we need it."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::RDFa::Generator. This alters the HTML output significantly."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Major refactor to improve the RDF::LinkedData class."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Major refactor to create a Plack::App::RDF::LinkedData."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add Etag support"@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use several Middleware modules in the psgi (For HEAD requests, CORS and Etag)."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use MooseX::UndefTolerant to allow the endpoint_config to be undef."@en
+	] .
+_:r1516143849r119 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Optionally use RDF::Endpoint to set up a SPARQL endpoint for the data."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor documentation fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor test and code fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "headers_in method removed."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Added request method to pass the whole request rather than just headers."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove Test::NoWarnings; too many false positives."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Correct test dep to Test::JSON rather than just JSON."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add the subject URI to the HTML output, since this would often break."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Allow namespaces to be skipped from the config."@en
+	] .
+_:r1516143849r12 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#thanks> <http://purl.org/NET/cpan-uri/person/shlomif> ;
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Proofread and improve documentation."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Check that Integer URI is OK in test."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Can't rely on . in @INC."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Return Turtle rather than RDF/XML if no content type is given."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Tests had wrong base_uri attribute."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove the Error module, use Carp::croak."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove the final eval, use Try::Tiny."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use can_load to check for optionals in tests."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "A few smaller changes."@en
+	] .
+_:r1516143849r129 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor documentation fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor test and code fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use the new Test::RDF module for testing."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Now requires RDF::Trine 0.133."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Consistently name the base URI base_uri."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Content negotation much improved."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Gives HTML page for default Firefox Accept header."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add tests for more browser Accept headers."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improve documentation of configuration (thanks to Thomas Kappler for input)."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Now use the RDF::Trine::Store->new method, since it now supports checking the type itself."@en
+	] .
+_:r1516143849r140 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Found out the hard way that JSON doesn't allow single quotes."@en
+	] .
+_:r1516143849r142 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor documentation fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many minor test and code fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "No main-namespaced variable needed for tests."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove logging unless in verbose mode."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Move ld instantiation to outside of the coderef for big performance gain."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add basic support for Access-Control-Allow-Origin."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Support setting namespace in config."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add tests for more Accept headers (TODO stuff)."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use the base if the source has not set its own."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use a memory model for testing that loads the file directly"@en
+	] .
+_:r1516143849r153 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Minor documentation fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Using URI objects throughout makes more intensive use of absolute URIs."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix the warning described in http://search.cpan.org/~shlomif/Error-0.17016/lib/Error.pm#COMPATIBILITY"@en
+	] .
+_:r1516143849r157 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Support base URI in serializations for RDF::Trine 0.127_02."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Module::Install::AuthorTests."@en
+	] .
+_:r1516143849r160 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add TODO test to check whether Firefox' default Accept header returns data."@en
+	] .
+_:r1516143849r162 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Split off RDF::LinkedData::Predicates into distribution of its own."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add namespaces method to set a hashref with RDF namespaces."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Move POD-tests to xt."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove -T switch from load.t, since it borks on some systems."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "create a helper_properties method to pass the properties."@en
+	] .
+_:r1516143849r168 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Require RDF::Trine 0.125."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Explicitly ask for text/html in tests since RDF::Trine 0.124 needs it."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "No Accept header will return turtle data."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Now use a hashref config for new_with_config instead of config string."@en
+	] .
+_:r1516143849r173 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix minor POD bugs."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add number of PSGI tests."@en
+	] .
+_:r1516143849r176 <http://ontologi.es/doap-changeset#item> [
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many smaller changes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "use Moose"@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "A response method contains most of the logic."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "More tests, also unit testing."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Create RDF::LinkedData::ProviderRole, a Moose::Role with a default implementation."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Create a RDF::LinkedData::Predicates with a title, description and page methods."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Config::JFDI for configuration."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "More documentation."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Plack::Response and HTTP::Headers in the role itself."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Create a Plack PSGI script to run the server. This also serves as a basic usage example."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove Mojolicious::Lite script."@en
+	] .
+_:r1516143849r188 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Really does require RDF::Trine 0.122."@en
+	], [
+		<http://www.w3.org/2000/01/rdf-schema#label> "Minor cleanups."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add a page method that uses foaf:homepage or foaf:page to override the default page for redirect."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove boilerplate tests."@en
+	] .
+_:r1516143849r193 <http://ontologi.es/doap-changeset#item> [
+		<http://www.w3.org/2000/01/rdf-schema#label> "Require RDF::Trine 0.121."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::Trine's content negotiation code."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::Trine's bounded description code."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use a HTTP::Headers object for conneg."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add some log messages."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add and improve a type method that returns page or data."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove the negotiate method."@en
+	] .
+_:r1516143849r22 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix packaging bug with Config::ZOMG."@en
+	] .
+_:r1516143849r24 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use URI::NamespaceMap properly."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use MooX::Log::Any for logging."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Hypermedia controls for the 'all' fragment."@en
+	], [
+		<http://ontologi.es/doap-changeset#blame> <http://richardlewis.me.uk/richardlewis.foaf.rdf#rjl> ;
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Also check the request path for the endpoints."@en
+	] .
+_:r1516143849r29 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/hochsten> ;
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix the template to be Hydra compliant."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Move Perl version setting to makefile."@en
+	] .
+_:r1516143849r32 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/hochsten> ;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Adding support to download the complete datasets as fragments."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Set explicit Perl version."@en
+	] .
+_:r1516143849r35 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Triple Pattern Fragments support."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improve documentation."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add the use of Expires module."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Support the .well-known/void magic URL."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Hand-maintain README."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Migrate object system from Moose to Moo."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Log::Contextual to manage the logging."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Dist::Inkt to package."@en
+	] .
+_:r1516143849r44 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Try::Tiny instead of eval."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Drop the weak ETag checking."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Many smaller documentation updates."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Document the use of the PERLRDF_STORE environment variable."@en
+	] .
+_:r1516143849r49 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "ETags could have the URI prefixed."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "RFC2616 says ETags have to be quoted."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Make ETags use base64 encoding rather than a hex."@en
+	] .
+_:r1516143849r53 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix a bug that caused some vocabularies to show up as URI::Namespace-strings."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add git2prov links to the meta information, so there's a linked data chain from Github."@en
+	] .
+_:r1516143849r56 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add a Server header."@en
+	] .
+_:r1516143849r58 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "The PSGI script wasn't installed."@en
+	] .
+_:r1516143849r60 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Simplify setting headers by removing call to HTTP::Headers."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix newline bug causing problems."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Allow POST requests to the endpoint."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add the use of content type to Etag to work around some bugs."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Update> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use URI::NamespaceMap for namespaces."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Change packaging to use Module::Package::RDF."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improved tests."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Enable optional use of environment for config."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove write_sqlite script."@en
+	] .
+_:r1516143849r70 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix major UTF8 breakage by encoding all strings."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Some cosmetic fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "More tests."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix performance problems caused by regeneration of VoID descriptions for every request."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix performance problems by stat-ing the external VoID-file to see if needs reloading."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improve the way different HTML serializations are returned."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Skip some tests when Redland is installed, causes test-specific bugs."@en
+	] .
+_:r1516143849r78 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Some minor fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add a pagetitle config parameter for RDFa title."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use the Generators new feature to add a model with arbitrary data to load a file."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Make it possible to use the Generators property attributes."@en
+	] .
+_:r1516143849r83 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "A bad plan caused by superfluous BEGIN block caused test failures."@en
+	] .
+_:r1516143849r85 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Some minor fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "The content method is now private."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "RDF::LinkedData now can use RDF::Generator::Void, but not all its features."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add descriptions to POD and README."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove SQLite generator script."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use current_etag instead of etag"@en
+	] .
+_:r1516143849r92 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Some minor fixes."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "The endpoint path was not correctly sent to the hypermedia."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Actually, the TODO test about content type failed for everyone else."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "More tests (obviously)."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use empty string as default base_uri"@en
+	] .
+_:r1516143849r98 <http://ontologi.es/doap-changeset#item> _:r1516143849r100, _:r1516143849r101, _:r1516143849r102, _:r1516143849r103, _:r1516143849r104, _:r1516143849r105, [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add hypermedia method which will be on by default to enable hypermedia."@en
+	] .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r0 <http://ontologi.es/doap-deps#on> "Config::ZOMG"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r1 <http://ontologi.es/doap-deps#on> "JSON"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r10 <http://ontologi.es/doap-deps#on> "parent"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r11 <http://ontologi.es/doap-deps#on> "List::Util 1.33"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r12 <http://ontologi.es/doap-deps#on> "Types::Standard"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r13 <http://ontologi.es/doap-deps#on> "MooX::Log::Any"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r14 <http://ontologi.es/doap-deps#on> "RDF::Trine 0.133"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r15 <http://ontologi.es/doap-deps#on> "Scalar::Util"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r16 <http://ontologi.es/doap-deps#on> "Plack 0.9939"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r17 <http://ontologi.es/doap-deps#on> "namespace::autoclean 0.12"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r18 <http://ontologi.es/doap-deps#on> "HTTP::Headers"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r19 <http://ontologi.es/doap-deps#on> "RDF::Helper::Properties 0.10"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r2 <http://ontologi.es/doap-deps#on> "RDF::Endpoint 0.05"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r20 <http://ontologi.es/doap-deps#on> "URI 1.52"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r21 <http://ontologi.es/doap-deps#on> "URI::NamespaceMap 0.32"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r22 <http://ontologi.es/doap-deps#on> "RDF::NS::Curated"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r23 <http://ontologi.es/doap-deps#on> "Module::Load::Conditional"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r24 <http://ontologi.es/doap-deps#on> "Encode"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r25 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Generator 0.102"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r26 <http://ontologi.es/doap-deps#on> "HTML::HTML5::Writer"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r27 <http://ontologi.es/doap-deps#on> "Digest::MD5"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r28 <http://ontologi.es/doap-deps#on> "Try::Tiny"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r29 <http://ontologi.es/doap-deps#on> "perl 5.006"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r3 <http://ontologi.es/doap-deps#on> "Plack::Middleware::CrossOrigin"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r30 <http://ontologi.es/doap-deps#on> "Test::More 0.88"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r31 <http://ontologi.es/doap-deps#on> "Test::RDF 1.16"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r32 <http://ontologi.es/doap-deps#on> "FindBin"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r33 <http://ontologi.es/doap-deps#on> "Test::WWW::Mechanize::PSGI"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r34 <http://ontologi.es/doap-deps#on> "Test::Exception"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r35 <http://ontologi.es/doap-deps#on> "Log::Any::Adapter"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r36 <http://ontologi.es/doap-deps#on> "Config::ZOMG"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r37 <http://ontologi.es/doap-deps#on> "Test::JSON"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r38 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Parser"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r4 <http://ontologi.es/doap-deps#on> "Plack::Middleware::Expires"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r5 <http://ontologi.es/doap-deps#on> "RDF::Generator::Void 0.04"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r6 <http://ontologi.es/doap-deps#on> "Log::Any::Adapter"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r7 <http://ontologi.es/doap-deps#on> "Log::Any::Adapter::Screen"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r8 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rba872d7b4b90c4305b615fbc52c1fb2d6r9 <http://ontologi.es/doap-deps#on> "Moo"^^<http://ontologi.es/doap-deps#CpanId> .
+<file:///home/kjetil/dev/RDF-LinkedData/meta/project.ttl> <http://purl.org/dc/terms/creator> <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://purl.org/dc/terms/subject> <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project> ;
+	<http://purl.org/dc/terms/title> "DOAP for RDF-LinkedData"@en .
+<http://dbpedia.org/resource/Category:Semantic_Web> <http://www.w3.org/2000/01/rdf-schema#label> "Semantic Web"@en .
+<http://kasei.us/about/foaf.xrdf#greg> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://purl.org/NET/cpan-uri/person/gwilliams> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:gwilliams@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Gregory Todd Williams" .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre> <http://purl.org/dc/terms/issued> "2010-04-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.001_01"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Code on Github by Gregory Todd Williams."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rba872d7b4b90c4305b615fbc52c1fb2d6r7, _:rba872d7b4b90c4305b615fbc52c1fb2d6r8 ;
+	<http://ontologi.es/doap-deps#runtime-recommendation> _:rba872d7b4b90c4305b615fbc52c1fb2d6r0, _:rba872d7b4b90c4305b615fbc52c1fb2d6r1, _:rba872d7b4b90c4305b615fbc52c1fb2d6r2, _:rba872d7b4b90c4305b615fbc52c1fb2d6r3, _:rba872d7b4b90c4305b615fbc52c1fb2d6r4, _:rba872d7b4b90c4305b615fbc52c1fb2d6r5, _:rba872d7b4b90c4305b615fbc52c1fb2d6r6 ;
+	<http://ontologi.es/doap-deps#runtime-requirement> _:rba872d7b4b90c4305b615fbc52c1fb2d6r10, _:rba872d7b4b90c4305b615fbc52c1fb2d6r11, _:rba872d7b4b90c4305b615fbc52c1fb2d6r12, _:rba872d7b4b90c4305b615fbc52c1fb2d6r13, _:rba872d7b4b90c4305b615fbc52c1fb2d6r14, _:rba872d7b4b90c4305b615fbc52c1fb2d6r15, _:rba872d7b4b90c4305b615fbc52c1fb2d6r16, _:rba872d7b4b90c4305b615fbc52c1fb2d6r17, _:rba872d7b4b90c4305b615fbc52c1fb2d6r18, _:rba872d7b4b90c4305b615fbc52c1fb2d6r19, _:rba872d7b4b90c4305b615fbc52c1fb2d6r20, _:rba872d7b4b90c4305b615fbc52c1fb2d6r21, _:rba872d7b4b90c4305b615fbc52c1fb2d6r22, _:rba872d7b4b90c4305b615fbc52c1fb2d6r23, _:rba872d7b4b90c4305b615fbc52c1fb2d6r24, _:rba872d7b4b90c4305b615fbc52c1fb2d6r25, _:rba872d7b4b90c4305b615fbc52c1fb2d6r26, _:rba872d7b4b90c4305b615fbc52c1fb2d6r27, _:rba872d7b4b90c4305b615fbc52c1fb2d6r28, _:rba872d7b4b90c4305b615fbc52c1fb2d6r29, _:rba872d7b4b90c4305b615fbc52c1fb2d6r9 ;
+	<http://ontologi.es/doap-deps#test-requirement> _:rba872d7b4b90c4305b615fbc52c1fb2d6r30, _:rba872d7b4b90c4305b615fbc52c1fb2d6r31, _:rba872d7b4b90c4305b615fbc52c1fb2d6r32, _:rba872d7b4b90c4305b615fbc52c1fb2d6r33, _:rba872d7b4b90c4305b615fbc52c1fb2d6r34, _:rba872d7b4b90c4305b615fbc52c1fb2d6r35, _:rba872d7b4b90c4305b615fbc52c1fb2d6r36, _:rba872d7b4b90c4305b615fbc52c1fb2d6r37, _:rba872d7b4b90c4305b615fbc52c1fb2d6r38 ;
+	<http://purl.org/dc/terms/identifier> "RDF::LinkedData"^^<http://ontologi.es/doap-deps#CpanId> ;
+	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/RDF-LinkedData/issues> ;
+	<http://usefulinc.com/ns/doap#category> <http://dbpedia.org/resource/Category:Semantic_Web> ;
+	<http://usefulinc.com/ns/doap#created> "2009-04-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#developer> <http://kasei.us/about/foaf.xrdf#greg> ;
+	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/RDF-LinkedData> ;
+	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/RDF-LinkedData> ;
+	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
+	<http://usefulinc.com/ns/doap#maintainer> <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://usefulinc.com/ns/doap#name> "RDF-LinkedData" ;
+	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
+	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/pre>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02>, <http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-92> ;
+	<http://usefulinc.com/ns/doap#repository> _:r1516143849r0 ;
+	<http://usefulinc.com/ns/doap#shortdesc> "Base class and scripts for servers that serve RDF as Linked Data."@en ;
+	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
+	a <http://usefulinc.com/ns/doap#Project> ;
+	<http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://packages.qa.debian.org/libr/librdf-linkeddata-perl.ttl> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstream> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-58> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r60 ;
+	<http://purl.org/dc/terms/issued> "2013-07-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.58"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Stability and modernization release."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.58> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-60> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r58 ;
+	<http://purl.org/dc/terms/issued> "2013-07-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.60"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Install script."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.60> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-62> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r56 ;
+	<http://purl.org/dc/terms/issued> "2013-10-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.62"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add Server header."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.62> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-64> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r53 ;
+	<http://purl.org/dc/terms/issued> "2014-05-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.64"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Fix bug in vocabulary URIs."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.64> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-66> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r49 ;
+	<http://purl.org/dc/terms/issued> "2014-07-11"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.66"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Fix bug in ETag handling."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.66> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-68> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r44 ;
+	<http://purl.org/dc/terms/issued> "2014-07-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.68"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Documentation updates and small fixes."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.68> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-70> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r35 ;
+	<http://purl.org/dc/terms/issued> "2014-10-17"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.70"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Triple Pattern Fragments support and modernization."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.70> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-72> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r32 ;
+	<http://purl.org/dc/terms/issued> "2015-02-14"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.72"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Triple Pattern Fragments improvement."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.72> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-74> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r29 ;
+	<http://purl.org/dc/terms/issued> "2015-03-04"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.74"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Fix Triple Pattern Fragments bugfix."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_0.74> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-76> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r24 ;
+	<http://purl.org/dc/terms/issued> "2017-01-02"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.76"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Improve Namespace handling and hypermedia controls."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0-78> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r22 ;
+	<http://purl.org/dc/terms/issued> "2017-01-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.78"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use Config::ZOMG for config."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_01> <http://purl.org/dc/terms/issued> "2010-04-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release. Kjetil Kjernsmo refactored Gregs code to separate the web server logic from the rest."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_02> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r193 ;
+	<http://purl.org/dc/terms/issued> "2010-05-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::Trine's conneg and bounded description code."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_03> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r188 ;
+	<http://purl.org/dc/terms/issued> "2010-05-06"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.03"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add page method to use foaf:page for redirects."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_05> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r176 ;
+	<http://purl.org/dc/terms/issued> "2010-06-13"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.05"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Major refactor, use Moose and Plack."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_06> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r173 ;
+	<http://purl.org/dc/terms/issued> "2010-06-13"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.06"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Minor POD syntax documentation bug fix release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_08> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r168 ;
+	<http://purl.org/dc/terms/issued> "2010-08-02"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.08"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Update to use config hashrefs and various fixes for recent RDF::Trine."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_09_1> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r162 ;
+	<http://purl.org/dc/terms/issued> "2010-08-18"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.09_1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Refactor helper modules; ."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_10> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r160 ;
+	<http://purl.org/dc/terms/issued> "2010-08-19"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.10"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Better tested release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_12> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r157 ;
+	<http://purl.org/dc/terms/issued> "2010-08-24"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.12"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Support base URI."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_14> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r153 ;
+	<http://purl.org/dc/terms/issued> "2010-08-26"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.14"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use URI object."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_16> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r142 ;
+	<http://purl.org/dc/terms/issued> "2010-12-09"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.16"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Instantiate on startup; Many small fixes."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_18> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r140 ;
+	<http://purl.org/dc/terms/issued> "2010-12-09"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.18"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Minor JSON syntax documentation bug fix release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_20> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r129 ;
+	<http://purl.org/dc/terms/issued> "2011-02-08"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.20"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Improved conneg; use Test::RDF; Many small fixes."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_30> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r119 ;
+	<http://purl.org/dc/terms/issued> "2011-06-09"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.30"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use RDF::Endpoint for the same data."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_40> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r106 ;
+	<http://purl.org/dc/terms/issued> "2012-04-04"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.40"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Refactoring and code improvements."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_42> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r98 ;
+	<http://purl.org/dc/terms/issued> "2012-06-11"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.42"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Enable very basic VoID for hypermedia."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_44> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r92 ;
+	<http://purl.org/dc/terms/issued> "2012-06-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.44"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Bugfix release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_50> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r85 ;
+	<http://purl.org/dc/terms/issued> "2012-06-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.50"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Use VoID Generator."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_52> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r83 ;
+	<http://purl.org/dc/terms/issued> "2012-06-30"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.52"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Bugfix release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_54> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r78 ;
+	<http://purl.org/dc/terms/issued> "2012-06-30"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.54"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Improve VoID generator use."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_0_56> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r70 ;
+	<http://purl.org/dc/terms/issued> "2012-07-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.56"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Bugfix release."@en .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-00> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r12 ;
+	<http://purl.org/dc/terms/issued> "2017-08-25"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.00"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Clean up for Milestone 1.0."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.00> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-02> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r10 ;
+	<http://purl.org/dc/terms/issued> "2017-08-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Skip some tests if no RDFa parser is present."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.02> .
+<http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/v_1-92> <http://ontologi.es/doap-changeset#changeset> _:r1516143849r1 ;
+	<http://purl.org/dc/terms/issued> "2018-01-16"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.92"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Overhaul with 6 year development history to enable read and write."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/librdf-linkeddata-perl#upstreamsrc_1.92> .
+<http://purl.org/NET/cpan-uri/person/hochsten> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Patrick-Hochstenbach> ;
+	<http://xmlns.com/foaf/0.1/homepage> <http://hochstenbach.wordpress.com/> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:patrick.hochstenbach@gmail.com> ;
+	<http://xmlns.com/foaf/0.1/name> "Patrick Hochstenbach" .
+<http://purl.org/NET/cpan-uri/person/shlomif> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Shlomi-Fish> ;
+	<http://xmlns.com/foaf/0.1/name> "Shlomi Fish" ;
+	<http://xmlns.com/foaf/0.1/nick> "SHLOMIF" ;
+	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/SHLOMIF> .
+<http://richardlewis.me.uk/richardlewis.foaf.rdf#rjl> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://xmlns.com/foaf/0.1/homepage> <http://www.richard-lewis.me.uk/> ;
+	<http://xmlns.com/foaf/0.1/name> "Richard Lewis" ;
+	<http://xmlns.com/foaf/0.1/nick> "ironChicken" .
+<http://www.kjetil.kjernsmo.net/foaf#me> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FRDF-LinkedData&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" .
+<irc://irc.perl.org/#perlrdf> a <http://rdfs.org/sioc/types#ChatChannel> .

@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "overload" => 0
   },
-  "VERSION" => "2.15",
+  "VERSION" => "2.16",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -102,7 +102,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 if ( $^O eq '=DTTZBundle/OSPrereqs' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone::Local::Win32'} = '1.98';
+	$WriteMakefileArgs{PREREQ_PM}{'DateTime::TimeZone::Local::Win32'} = '1.99';
 }
 
 WriteMakefile(%WriteMakefileArgs);

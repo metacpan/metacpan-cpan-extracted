@@ -1,5 +1,12 @@
 Revision history for HPC-Runner-Command
 
+3.2.14  2018-01-22 10:51:11 GST
+	- Pinned List::MoreUtils 0.428
+	- Pinned MooseX::App 1.39
+
+3.2.13  2018-01-21 11:52:41 GST
+	- Cleaned up dependencies
+
 3.2.12  2018-01-10 14:18:45 GST
 	- added back in stats command
 
@@ -80,4 +87,4 @@ Revision history for HPC-Runner-Command
 	- Bug fixes for cpan tests
 
 3.0.0  2017-01-05 12:26:17 GST
-        - This is the beta release of HPC::Runner::Command 
+        - This is the beta release of HPC::Runner::Command

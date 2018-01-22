@@ -28,7 +28,7 @@ COPYRIGHT AND LICENCE
 
 Put the correct copyright and licence information here.
 
-Copyright (C) 2015-2017 by Vitaly Agapov
+Copyright (C) 2015-2018 by Vitaly Agapov
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

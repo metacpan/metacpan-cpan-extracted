@@ -1,5 +1,8 @@
 Revision history for Test-Data-Split
 
+0.2.1   2018-01-19
+    - Convert to the @SHLOMIF dzil PluginBundle.
+
 v0.2.0  2016-04-22
     - Now passing the data to contents_cb so it can be serialised into the
     file.

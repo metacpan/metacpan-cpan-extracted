@@ -4,7 +4,7 @@ Net::Twitter - A perl interface to the Twitter API
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 
@@ -52,8 +52,12 @@ L<Net::Twitter::Manual::MigratingToV1_1>.
 
 =head1 DESCRIPTION
 
+This module has been superseded by L<Twitter::API>. Please update as
+soon as you possibly can to use new features and the new API
+versions. This module will no longer be supported.
+
 This module provides a perl interface to the Twitter APIs.  See
-L<http://dev.twitter.com/doc> for a full description of the Twitter APIs.
+L<http://dev.twitter.com/docs> for a full description of the Twitter APIs.
 
 =head1 TWITTER API VERSION 1.1
 
@@ -304,7 +308,7 @@ C<useragent_class>, above.  It defaults to {} (an empty HASH ref).
 =item useragent
 
 The value for C<User-Agent> HTTP header.  It defaults to
-"Net::Twitter/4.01042 (Perl)".
+"Net::Twitter/4.01043 (Perl)".
 
 =item source
 
@@ -889,7 +893,14 @@ Twitter API documentation: L<POST lists/create|https://dev.twitter.com/rest/refe
 
 =back
 
-add metadata to media
+Adds metadata -- alt text, in particular -- to a previously uploaded media
+object, specified by its ID. (One knows this ID via the return value of the
+preceding C<upload> call.)
+
+The C<alt_text> parameter must have as its value a hashref containing a single
+key-value pair. The key must be C<text>, and the value is the alt text to assign
+to the media object. The text must be 400 characters or fewer in length.
+
 
 Returns: HashRef
 
@@ -3238,7 +3249,7 @@ Returns: ExtendedUser
 
 Twitter API documentation: L<POST account/update_profile_image|https://dev.twitter.com/rest/reference/post/account/update_profile_image>
 
-=item B<update_with_media>
+=item B<update_with_media> B<DEPRECATED>
 
 =item B<update_with_media(status, media[])>
 
@@ -3253,6 +3264,10 @@ Twitter API documentation: L<POST account/update_profile_image|https://dev.twitt
 =back
 
 Updates the authenticating user's status and attaches media for upload.
+
+Note that Twitter has marked this endpoint as B<deprecated>, and recommends
+instead calling C<upload>, then (optionally) C<create_media_metadata>, then
+C<update>.
 
 The C<media[]> parameter is an arrayref with the following interpretation:
 
@@ -3278,8 +3293,6 @@ will return an HTTP 403 error.
 
 Returns: Status
 
-Twitter API documentation: L<POST statuses/update_with_media|https://dev.twitter.com/rest/reference/post/statuses/update_with_media>
-
 =item B<upload>
 
 =item B<upload(media)>
@@ -3294,9 +3307,13 @@ Twitter API documentation: L<POST statuses/update_with_media|https://dev.twitter
 
 =back
 
-Upload images to twitter without posting them on the timeline
+Uploads an image to twitter without immediately posting it to the
+authenticating user's timeline. Its return-value hashref notably contains a
+C<media_id> value that's useful as a parameter value in various other
+endpoint calls, such as C<update> and C<create_media_metadata>.
 
-Returns: Image
+
+Returns: HashRef
 
 Twitter API documentation: L<POST media/upload|https://dev.twitter.com/rest/reference/post/media/upload>
 

@@ -3,7 +3,7 @@ package Mastodon::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Type::Library -base;
 

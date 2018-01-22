@@ -1,5 +1,5 @@
 package Net::Twitter::Role::WrapResult;
-$Net::Twitter::Role::WrapResult::VERSION = '4.01042';
+$Net::Twitter::Role::WrapResult::VERSION = '4.01043';
 use Moose::Role;
 use Net::Twitter::WrappedResult;
 
@@ -29,7 +29,7 @@ Net::Twitter::Role::WrapResult - Wrap Twitter API response and HTTP Response
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

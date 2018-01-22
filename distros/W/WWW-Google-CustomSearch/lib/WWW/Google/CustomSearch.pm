@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch;
 
-$WWW::Google::CustomSearch::VERSION   = '0.35';
+$WWW::Google::CustomSearch::VERSION   = '0.37';
 $WWW::Google::CustomSearch::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch - Interface to Google JSON/Atom Custom Search.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
@@ -25,7 +25,7 @@ use WWW::Google::CustomSearch::Result;
 
 use Moo;
 use Types::Standard qw(Bool);
-use namespace::clean;
+use namespace::autoclean;
 extends 'WWW::Google::UserAgent';
 
 our $BASE_URL = "https://www.googleapis.com/customsearch/v1";

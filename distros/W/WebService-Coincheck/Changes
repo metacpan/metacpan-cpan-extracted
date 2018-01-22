@@ -1,5 +1,12 @@
 Revision history for Perl extension WebService::Coincheck
 
+0.04    Sat Jan 20 07:31:55 JST 2018
+        - add http client option
+
+0.03    Sat Jan 20 06:57:40 JST 2018
+        - fix POST/DELETE requests
+        - fix args of subclasses
+
 0.02    Sat Jan  6 20:04:04 JST 2018
         - remove build status and coverage from POD
 

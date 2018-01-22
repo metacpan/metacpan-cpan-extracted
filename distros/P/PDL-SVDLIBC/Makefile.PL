@@ -2,7 +2,7 @@ use PDL::Core::Dev;
 use ExtUtils::MakeMaker;
 
 ##-- read in user variables
-do "Config.PL";
+do "./Config.PL";
 die "$0: reading 'Config.PL' failed: $@" if ($@);
 
 ##-- check for required SVDLIBC source directory

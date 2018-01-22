@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use JSON;
+use MVC::Neaf::Util qw(JSON encode_json decode_json);
 
 use MVC::Neaf;
 

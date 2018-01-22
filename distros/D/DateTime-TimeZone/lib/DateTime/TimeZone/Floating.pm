@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone::OffsetOnly';
 
@@ -59,7 +59,7 @@ DateTime::TimeZone::Floating - A time zone that is always local
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 
@@ -73,9 +73,9 @@ A floating time has no time zone, and has an effective offset of zero.
 
 =head1 USAGE
 
-This class has the same methods as a real time zone object, but the
-C<short_name_for_datetime()>, and C<category()> methods both return
-undef.
+This class has the same methods as a real time zone object. The
+C<short_name_for_datetime()> method returns the string "floating" and the
+C<category()> method returns C<undef>.
 
 =head1 SUPPORT
 
@@ -93,7 +93,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

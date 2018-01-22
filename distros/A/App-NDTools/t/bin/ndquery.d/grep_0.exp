@@ -1,0 +1,16 @@
+[
+   {
+      "File" : [
+         {
+            "id" : "file_open"
+         }
+      ]
+   },
+   {
+      "View" : [
+         {
+            "id" : "view_wrapping"
+         }
+      ]
+   }
+]

@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '7.15'
+  'Mojolicious' => '7.28'
 }
 ,
   META_MERGE     => {

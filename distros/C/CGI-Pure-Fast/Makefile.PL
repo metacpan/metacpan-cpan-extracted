@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Fast Common Gateway Interface Class for CGI::Pure.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.01;
 author_requires 'Test::Pod' => 0;
@@ -27,7 +26,7 @@ resources 'repository' => 'git://github.com/tupinek/CGI-Pure-Fast';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.08';
 
 # Run.
 WriteAll();

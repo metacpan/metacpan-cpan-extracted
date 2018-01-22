@@ -3,10 +3,6 @@
 
 cPanel::TaskQueue::PluginManager - Supplies support for loading the Queue task processing plugins.
 
-=head1 VERSION
-
-This document describes C<cPanel::TaskQueue::PluginManager> version 0.700.
-
 =head1 SYNOPSIS
 
    use cPanel::TaskQueue::PluginManager;

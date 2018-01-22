@@ -1,0 +1,7 @@
+alpha.example.org
+1462431001
+{
+   "/etc/hostname" : "alpha",
+   "/etc/hosts" : "127.0.0.1    localhost",
+   "/etc/resolv.conf" : "nameserver 8.8.8.8"
+}

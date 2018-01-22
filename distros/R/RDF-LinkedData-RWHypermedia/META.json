@@ -1,0 +1,90 @@
+{
+   "abstract" : "Experimental read-write hypermedia support for Linked Data",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RDF-LinkedData-RWHypermedia",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001",
+            "Log::Any::Adapter::Screen" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Config::ZOMG" : "0",
+            "Log::Any::Adapter" : "0"
+         },
+         "requires" : {
+            "Moo" : "0",
+            "RDF::LinkedData" : "1.90_02",
+            "RDF::Trine" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::ZOMG" : "0",
+            "FindBin" : "0",
+            "HTTP::Request" : "0",
+            "Log::Any::Adapter" : "0",
+            "Test::More" : "0.96",
+            "Test::RDF" : "1.21",
+            "Test::WWW::Mechanize::PSGI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "RDF::LinkedData::RWHypermedia" : {
+         "file" : "lib/RDF/LinkedData/RWHypermedia.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-rdf-linkeddata-rwhypermedia/issues"
+      },
+      "homepage" : "https://metacpan.org/release/RDF-LinkedData-RWHypermedia",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-rdf-linkeddata-rwhypermedia.git",
+         "web" : "https://github.com/kjetilk/p5-rdf-linkeddata-rwhypermedia"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-LinkedData-RWHypermedia/project"
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

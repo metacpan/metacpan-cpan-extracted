@@ -1,4 +1,10 @@
+0.023     2018-01-21 11:31:20+11:00 Australia/Melbourne
+- Bugfix: Updated several agent endpoints to use PUT instead of GET.
+- Bugfix: Setting a value to 0 in the KV store would store an empty
+  string.  Now it stores 0.
+
 0.022     2017-08-03 17:00:44+10:00 Australia/Melbourne
+- Bugfix: get_all now returns empty array when no nodes found
 
 0.021     2017-07-21 17:54:30+10:00 Australia/Melbourne
 - Support setting and getting null values in the KV store

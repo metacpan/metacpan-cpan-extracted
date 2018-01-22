@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::modules;
 
-our $DATE = '2017-06-19'; # DATE
-our $VERSION = '1.019'; # VERSION
+our $DATE = '2018-01-15'; # DATE
+our $VERSION = '1.020'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::lcpan::Cmd::modules - List modules/packages
 
 =head1 VERSION
 
-This document describes version 1.019 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2017-06-19.
+This document describes version 1.020 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2018-01-15.
 
 =head1 FUNCTIONS
 
@@ -86,7 +86,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.24.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -139,7 +139,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

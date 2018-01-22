@@ -1,10 +1,70 @@
 ==================================================
-Changes from 2017-01-15 00:00:00 +0000 to present.
+Changes from 2017-01-18 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.1.0 at 2018-01-15 01:51:01 +0000
+version 2.2.0 at 2018-01-18 06:19:57 +0000
 ------------------------------------------
+
+  Change: 853897beb30fb1fca5516d702afff0221e98c845
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 14:16:31 +0000
+
+    Add more methods and more doc. 
+
+  Change: 6ab4ff09dd318780effdf20d00c28bfc85a6f4e7
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 13:09:28 +0000
+
+    Add repos method. 
+
+  Change: 740f5faf833e41b1ecc5a8b93bf60023b20ab48e
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 01:42:29 +0000
+
+    Update doc. 
+
+  Change: 627109a1868d5990df346006c7123616b184454a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 01:37:31 +0000
+
+    Add orgs method. 
+
+  Change: fddddccacb39828f055d93b242c36a72e2b5fcae
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 01:05:14 +0000
+
+    Set minimal testing. 
+
+  Change: 5a64ddde970321d4f5fde456371796d2c1195651
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-18 01:04:30 +0000
+
+    Generate doc. 
+
+  Change: 721ec305fa712c40e5ef0b4ec484b22f3936d7e6
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 23:09:52 +0000
+
+    Generate README.pod. 
+
+  Change: 73e51d96c816198d75bd3c8224a66f58914ad40c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 23:09:19 +0000
+
+    Add badges. 
+
+  Change: a3c5b2766afb9f8f4bffc5becfaf8bc0cfba815e
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 23:02:22 +0000
+
+    Update documentation. 
+
+  Change: ba40b28272e4ed22ef76b60b0eb453f8cf4a93ad
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-15 11:38:42 +0000
+
+    Fixed missing object. 
 
   Change: d837d092ed53a562883b58031684d92f0a128996
   Author: faraco <skelic3@gmail.com>

@@ -1,17 +1,23 @@
 package Const::Exporter;
 
+# ABSTRACT: Declare constants for export.
+
 use v5.10.0;
 
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('v0.2.4');
+our $VERSION = 'v0.3.1';
 
 use Carp;
 use Const::Fast;
 use Exporter ();
 use Package::Stash;
-use Scalar::Util qw/ blessed reftype /;
+use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_ref /;
+
+# RECOMMEND PREREQ: Package::Stash::XS
+# RECOMMEND PREREQ: Ref::Util::XS
+# RECOMMEND PREREQ: Storable
 
 sub import {
     my $pkg = shift;
@@ -29,7 +35,10 @@ sub import {
     my $export_tags = $stash->get_or_add_symbol('%EXPORT_TAGS');
 
     $stash->add_symbol( '&import', \&Exporter::import )
-        unless ( $stash->has_symbol('&import') );
+      unless ( $stash->has_symbol('&import') );
+
+    _add_symbol( $stash, 'const', \&Const::Fast::const );
+    _export_symbol( $stash, 'const' );
 
     while ( my $tag = shift ) {
 
@@ -38,15 +47,15 @@ sub import {
         my $defs = shift;
 
         croak "An array reference required for tag '${tag}'"
-            unless ( ref $defs ) eq 'ARRAY';
+          unless is_arrayref($defs);
 
         while ( my $item = shift @{$defs} ) {
 
-            for ( ref $item ) {
+            for ($item) {
 
                 # Array reference means a list of enumerated symbols
 
-                if (/^ARRAY$/) {
+                if ( is_arrayref($_) ) {
 
                     my @enums = @{$item};
                     my $start = shift @{$defs};
@@ -58,7 +67,7 @@ sub import {
                     while ( my $symbol = shift @enums ) {
 
                         croak "${symbol} already exists"
-                            if ( $stash->has_symbol($symbol) );
+                          if ( $stash->has_symbol($symbol) );
 
                         $value = @values ? ( shift @values ) : ++$value;
 
@@ -72,12 +81,12 @@ sub import {
 
                 # A scalar is a name of a symbol
 
-                if (/^$/) {
+                if ( !is_ref($_) ) {
 
                     my $symbol = $item;
                     my $sigil  = _get_sigil($symbol);
-                    my $norm
-                        = ( $sigil eq '&' ) ? ( $sigil . $symbol ) : $symbol;
+                    my $norm =
+                      ( $sigil eq '&' ) ? ( $sigil . $symbol ) : $symbol;
 
                     # If the symbol is already defined, that we add it
                     # to the exports for that tag and assume no value
@@ -137,19 +146,22 @@ sub _add_symbol {
     my $sigil = _get_sigil($symbol);
     if ( $sigil ne '&' ) {
 
-        if ( blessed $value) {
+        if ( is_blessed_ref $value) {
 
             $stash->add_symbol( $symbol, \$value );
             Const::Fast::_make_readonly( $stash->get_symbol($symbol) => 1 );
 
-        } else {
+        }
+        else {
             $stash->add_symbol( $symbol, $value );
             Const::Fast::_make_readonly( $stash->get_symbol($symbol) => 1 );
         }
 
-    } else {
+    }
+    else {
 
-        $stash->add_symbol( '&' . $symbol, sub {$value} );
+        $stash->add_symbol( '&' . $symbol,
+            is_coderef($value) ? $value : sub { $value } );
 
     }
 }
@@ -161,6 +173,8 @@ sub _export_symbol {
 
     my $export_ok   = $stash->get_symbol('@EXPORT_OK');
     my $export_tags = $stash->get_symbol('%EXPORT_TAGS');
+
+    $tag //= 'all';
 
     $export_tags->{$tag} //= [];
 
@@ -207,38 +221,25 @@ sub _uniq {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Const::Exporter - Declare constants for export.
 
-=begin readme
+=head1 VERSION
 
-=head1 REQUIREMENTS
-
-This module requires Perl v5.10 or newer, and the following non-core
-modules:
-
-=over
-
-=item L<Const::Fast>
-
-=item L<Hash::Objectify> (for testing)
-
-=item L<Package::Stash>
-
-=item L<Test::Most> (for testing)
-
-=back
-
-=end readme
+version v0.3.1
 
 =head1 SYNOPSIS
 
 Define a constants module:
 
   package MyApp::Constants;
-
-  use Const::Fast;
 
   our $zoo => 1234;
 
@@ -270,7 +271,7 @@ Define a constants module:
 
      ],
 
-     default => [qw/ fo $bar /]; # exported by default
+     default => [qw/ foo $bar /]; # exported by default
 
 and use that module:
 
@@ -279,6 +280,26 @@ and use that module:
   use MyApp::Constants qw/ $zoo :tag_a /;
 
   ...
+
+=head2 Dynamically Creating Constants
+
+You may also import a predefined hash of constants for exporting dynamically:
+
+ use Const::Exporter;
+
+ my %myconstants = (
+        'foo'  => 1,
+        '$bar' => 2,
+        '@baz' => [qw/ a b c /],
+        '%bo'  => { a => 1 },
+ );
+
+ # ... do stuff
+
+ Const::Exporter->import(
+      constants => [%myconstants],        # define constants for exporting
+      default   => [ keys %myconstants ], # export everything in %myconstants by default
+ );
 
 =head1 DESCRIPTION
 
@@ -459,7 +480,9 @@ The C<:default> tag is the same as not specifying any exports.
 
 The C<:all> tag exports all symbols.
 
-=head2 Using as part of a module with exported functions
+=head1 KNOWN ISSUES
+
+=head2 Exporting Functions
 
 L<Const::Exporter> is not intended for use with modules that also
 export functions.
@@ -495,55 +518,43 @@ This module only allows you to declare function symbol constants, akin
 to the L<constant> module by defining functions that are only called
 as needed.  The interface is rather complex.
 
+=item L<Const::Fast::Exporter>
+
+This module will export all constants declared in the package's
+namespace.
+
 =back
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Const-Exporter>
+and may be cloned from L<git://github.com/robrwo/Const-Exporter.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/Const-Exporter/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
-Robert Rothenberg, C<< <rrwo at cpan.org> >>
+Robert Rothenberg <rrwo@cpan.org>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 CONTRIBUTOR
 
-Copyright 2014-2015 Robert Rothenberg.
+=for stopwords B. Estrade
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+B. Estrade <estrabd@gmail.com>
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+=head1 COPYRIGHT AND LICENSE
 
-=for readme stop
+This software is Copyright (c) 2018 by Robert Rothenberg.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+This is free software, licensed under:
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=for readme continue
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

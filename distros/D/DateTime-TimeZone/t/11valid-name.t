@@ -15,7 +15,7 @@ foreach (
     Pacific/Midway
     EST
     )
-    ) {
+) {
     ok(
         DateTime::TimeZone->is_valid_name($_),
         "$_ is a valid timezone name"
@@ -29,7 +29,7 @@ foreach (
     adhdsjghs;dgohas098huqjy4ily
     1000:0001
     )
-    ) {
+) {
     ok(
         !DateTime::TimeZone->is_valid_name($_),
         "$_ is not a valid timezone name"

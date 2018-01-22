@@ -65,4 +65,18 @@ lives_ok { $r = $kv->get_all("foo") } "KV get_all succeeded";
 ok defined($r) && ref($r) eq 'ARRAY', "get_all returned an arrayref";
 is scalar(@$r), 0, "0 keys returned";
 
+subtest 'zero value works' => sub{
+  lives_ok { $r = $kv->get("foozero") } "KV get succeeded";
+  is $r, undef, "key not found";
+
+  lives_ok { $r = $kv->put(foozero => 0) } "KV put succeeded";
+  ok $r, "key was updated";
+
+  lives_ok { $r = $kv->get("foozero") } "KV get succeeded";
+  is $r->value, 0, "returned KV has correct value";
+
+  lives_ok { $r = $kv->delete("foozero") } "KV delete succeeded";
+  is $kv->get("foo"), undef, "key not found";
+};
+
 done_testing;

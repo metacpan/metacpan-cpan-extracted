@@ -8,7 +8,8 @@ extends 'HPC::Runner::Command';
 with 'HPC::Runner::Command::Logger::JSON';
 with 'HPC::Runner::Command::Utils::Base';
 with 'HPC::Runner::Command::Utils::Log';
-with 'HPC::Runner::Command::Utils::Git';
+# with 'HPC::Runner::Command::Utils::Git';
+with 'BioSAILs::Integrations::Github';
 with 'HPC::Runner::Command::execute_job::Utils::MCE';
 
 command_short_description 'Execute commands';

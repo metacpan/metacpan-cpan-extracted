@@ -1,6 +1,7 @@
 {
    "abstract" : "Perl Client for Selenium Remote Driver",
    "author" : [
+      "George S. Baugh <george@troglodyne.net>",
       "Aditya Ivaturi <ivaturi@gmail.com>",
       "Daniel Gempesaw <gempesaw@gmail.com>",
       "Emmanuel Peroumalna\u00efk <peroumalnaik.emmanuel@gmail.com>",
@@ -8,13 +9,13 @@
       "Mark Stosberg <mark@stosberg.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Selenium-Remote-Driver",
    "prereqs" : {
@@ -26,15 +27,28 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
             "Archive::Zip" : "0",
             "Carp" : "0",
+            "Clone" : "0",
             "Cwd" : "0",
             "Data::Dumper" : "0",
             "Exporter" : "0",
@@ -61,6 +75,7 @@
             "Sub::Install" : "0",
             "Test::Builder" : "0",
             "Test::LongString" : "0",
+            "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "XML::Simple" : "0",
             "base" : "0",
@@ -73,9 +88,13 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
             "File::stat" : "0",
             "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::Builder::Tester" : "0",
+            "Test::Deep" : "0",
             "Test::Fatal" : "0",
             "Test::LWP::UserAgent" : "0",
             "Test::More" : "0",
@@ -85,23 +104,146 @@
          }
       }
    },
+   "provides" : {
+      "Selenium::ActionChains" : {
+         "file" : "lib/Selenium/ActionChains.pm",
+         "version" : "1.21"
+      },
+      "Selenium::CanStartBinary" : {
+         "file" : "lib/Selenium/CanStartBinary.pm",
+         "version" : "1.21"
+      },
+      "Selenium::CanStartBinary::FindBinary" : {
+         "file" : "lib/Selenium/CanStartBinary/FindBinary.pm",
+         "version" : "1.21"
+      },
+      "Selenium::CanStartBinary::ProbePort" : {
+         "file" : "lib/Selenium/CanStartBinary/ProbePort.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Chrome" : {
+         "file" : "lib/Selenium/Chrome.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Firefox" : {
+         "file" : "lib/Selenium/Firefox.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Firefox::Binary" : {
+         "file" : "lib/Selenium/Firefox/Binary.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Firefox::Profile" : {
+         "file" : "lib/Selenium/Firefox/Profile.pm",
+         "version" : "1.21"
+      },
+      "Selenium::InternetExplorer" : {
+         "file" : "lib/Selenium/InternetExplorer.pm",
+         "version" : "1.21"
+      },
+      "Selenium::PhantomJS" : {
+         "file" : "lib/Selenium/PhantomJS.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Commands" : {
+         "file" : "lib/Selenium/Remote/Commands.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Driver" : {
+         "file" : "lib/Selenium/Remote/Driver.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Driver::CanSetWebdriverContext" : {
+         "file" : "lib/Selenium/Remote/Driver/CanSetWebdriverContext.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Driver::Firefox::Profile" : {
+         "file" : "lib/Selenium/Remote/Driver/Firefox/Profile.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::ErrorHandler" : {
+         "file" : "lib/Selenium/Remote/ErrorHandler.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Finders" : {
+         "file" : "lib/Selenium/Remote/Finders.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Mock::Commands" : {
+         "file" : "lib/Selenium/Remote/Mock/Commands.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Mock::RemoteConnection" : {
+         "file" : "lib/Selenium/Remote/Mock/RemoteConnection.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::RemoteConnection" : {
+         "file" : "lib/Selenium/Remote/RemoteConnection.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::Spec" : {
+         "file" : "lib/Selenium/Remote/Spec.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::WDKeys" : {
+         "file" : "lib/Selenium/Remote/WDKeys.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Remote::WebElement" : {
+         "file" : "lib/Selenium/Remote/WebElement.pm",
+         "version" : "1.21"
+      },
+      "Selenium::Waiter" : {
+         "file" : "lib/Selenium/Waiter.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::Chrome" : {
+         "file" : "lib/Test/Selenium/Chrome.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::Firefox" : {
+         "file" : "lib/Test/Selenium/Firefox.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::InternetExplorer" : {
+         "file" : "lib/Test/Selenium/InternetExplorer.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::PhantomJS" : {
+         "file" : "lib/Test/Selenium/PhantomJS.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::Remote::Driver" : {
+         "file" : "lib/Test/Selenium/Remote/Driver.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::Remote::Role::DoesTesting" : {
+         "file" : "lib/Test/Selenium/Remote/Role/DoesTesting.pm",
+         "version" : "1.21"
+      },
+      "Test::Selenium::Remote::WebElement" : {
+         "file" : "lib/Test/Selenium/Remote/WebElement.pm",
+         "version" : "1.21"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/gempesaw/Selenium-Remote-Driver/issues"
+         "web" : "https://github.com/teodesian/Selenium-Remote-Driver/issues"
       },
-      "homepage" : "https://github.com/gempesaw/Selenium-Remote-Driver",
+      "homepage" : "https://github.com/teodesian/Selenium-Remote-Driver",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/gempesaw/Selenium-Remote-Driver.git",
-         "web" : "https://github.com/gempesaw/Selenium-Remote-Driver"
+         "url" : "https://github.com/teodesian/Selenium-Remote-Driver.git",
+         "web" : "https://github.com/teodesian/Selenium-Remote-Driver"
       }
    },
-   "version" : "1.20",
+   "version" : "1.21",
    "x_contributors" : [
       "Allen Lew <allen@alew.org>",
       "A.MacLeay <a.macleay@gmail.com>",
       "Andy Jack <andyjack@users.noreply.github.com>",
+      "Andy Jack <github@veracity.ca>",
       "Bas Bloemsaat <bas@bloemsaat.com>",
       "Brian Horakh <brianh@zoovy.com>",
       "Charles Howes <charles.howes@globalrelay.net>",
@@ -111,7 +253,7 @@
       "Dmitry Karasik <dmitry@karasik.eu.org>",
       "Eric Johnson <eric.git@iijo.org>",
       "Gabor Szabo <gabor@szabgab.com>",
-      "George S. Baugh <george@troglodyne.net>",
+      "Gerhard Jungwirth <gjungwirth@sipwise.com>",
       "Gordon Child <gordon@gordonchild.com>",
       "GreatFlamingFoo <greatflamingfoo@gmail.com>",
       "Ivan Kurmanov <duraley@gmail.com>",
@@ -122,6 +264,8 @@
       "lembark <lembark@wrkhors.com>",
       "Luke Closs <lukec@users.noreply.github.com>",
       "Martin Gruner <martin.gruner@otrs.com>",
+      "Max O'Cull <maxattax97@gmail.com>",
+      "Michael Prokop <mprokop@sipwise.com>",
       "Peter Mottram (SysPete) <peter@sysnix.com>",
       "Phil Kania <phil@vivox.com>",
       "Phil Mitchell <phil.mitchell@pobox.com>",
@@ -135,6 +279,6 @@
       "Vishwanath Janmanchi <jvishwanath@gmail.com>",
       "Vi\u0165as Str\u00e1dal <vitas@matfyz.cz>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0210"
 }
 

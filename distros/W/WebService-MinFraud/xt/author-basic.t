@@ -67,7 +67,7 @@ subtest 'factors' => sub {
         issuer_id_number
         time_of_day
         )
-        ) {
+    ) {
         ok(
             defined $response->subscores->$subscore,
             "$subscore subscore"

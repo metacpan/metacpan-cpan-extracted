@@ -101,17 +101,16 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     P->file->chdir( $ENV->{START_DIR} );
 
     my $exit_code = eval {
-        my $src = Pcore::Src->new(
-            {   interactive => 1,
-                path        => $arg->{path},
-                action      => $opt->{action},
-                stdin_files => $opt->{stdin_files},
-                no_critic   => $opt->{no_critic},
-                dry_run     => $opt->{dry_run},
-                ( exists $opt->{type}     ? ( type     => $opt->{type} )     : () ),
-                ( exists $opt->{filename} ? ( filename => $opt->{filename} ) : () ),
-            }
-        );
+        my $src = Pcore::Src->new( {
+            interactive => 1,
+            path        => $arg->{path},
+            action      => $opt->{action},
+            stdin_files => $opt->{stdin_files},
+            no_critic   => $opt->{no_critic},
+            dry_run     => $opt->{dry_run},
+            ( exists $opt->{type}     ? ( type     => $opt->{type} )     : () ),
+            ( exists $opt->{filename} ? ( filename => $opt->{filename} ) : () ),
+        } );
 
         $src->run;
     };
@@ -201,14 +200,13 @@ sub _source_stdin ($self) {
 
     my $path = ref $self->filename ? $self->filename : P->path( $self->filename );
 
-    my $res = Pcore::Src::File->new(
-        {   action      => $self->action,
-            path        => $path->encoded,
-            is_realpath => 0,
-            in_buffer   => $in_buffer,
-            dry_run     => $self->dry_run,
-        }
-    )->run;
+    my $res = Pcore::Src::File->new( {
+        action      => $self->action,
+        path        => $path->encoded,
+        is_realpath => 0,
+        in_buffer   => $in_buffer,
+        dry_run     => $self->dry_run,
+    } )->run;
 
     $self->_set_exit_code( $res->severity_range_is('ERROR') ? Pcore::Src::File->cfg->{EXIT_CODES}->{SOURCE_ERROR} : Pcore::Src::File->cfg->{EXIT_CODES}->{SOURCE_VALID} );
 
@@ -441,9 +439,9 @@ sub _set_exit_code ( $self, $exit_code ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 309                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 307                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 281                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 279                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

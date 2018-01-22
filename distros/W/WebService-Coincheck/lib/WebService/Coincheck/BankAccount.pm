@@ -17,13 +17,13 @@ sub new {
 }
 
 sub create {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        bank_name   => $params->{bank_name},
-        branch_name => $params->{branch_name},
-        number      => $params->{number},
-        name        => $params->{name},
+        bank_name   => $params{bank_name},
+        branch_name => $params{branch_name},
+        number      => $params{number},
+        name        => $params{name},
     };
 
     my $res = $self->client->request(
@@ -35,7 +35,7 @@ sub create {
 }
 
 sub all {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -48,10 +48,10 @@ sub all {
 }
 
 sub delete {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        id => $params->{id},
+        id => $params{id},
     };
 
     my $res = $self->client->request(

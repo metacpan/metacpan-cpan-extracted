@@ -85,9 +85,10 @@ void set_native_logger(CV* cb) {
         xs::SvIntrPtr cb;
     
         virtual void log(panda::logger::Level l, panda::logger::CodePoint cp, const std::string& s) override {
+            dTHX;
             auto cp_str = cp.to_string();
             SV* args[] = {newSViv(l), newSVpv(cp_str.c_str(), cp_str.size()), newSVpv(s.c_str(), s.size())};
-            xs::call_sub_void(cb.get<CV>(), args, 2);
+            xs::call_sub_void(aTHX_ cb.get<CV>(), args, 2);
         }
     };
     auto log = new CatchLogger;

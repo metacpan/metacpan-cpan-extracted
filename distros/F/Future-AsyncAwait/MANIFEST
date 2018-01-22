@@ -1,5 +1,15 @@
 Build.PL
 Changes
+hax/block_end.c.inc
+hax/block_start.c.inc
+hax/COP_SEQ_RANGE_HIGH_set.c.inc
+hax/cx_pushblock.c.inc
+hax/cx_pusheval.c.inc
+hax/pad_block_start.c.inc
+hax/pad_leavemy.c.inc
+hax/README
+hax/save_clearpadrange.c.inc
+hax/scalarseq.c.inc
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
 LICENSE
@@ -13,6 +23,7 @@ t/02await-immediate.t
 t/03await.t
 t/04await-twice.t
 t/05await-expr.t
+t/06await-nested.t
 t/10pad.t
 t/11contexts.t
 t/12closure.t

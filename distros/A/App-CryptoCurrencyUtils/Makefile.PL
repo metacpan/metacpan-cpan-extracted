@@ -14,8 +14,9 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-CryptoCurrencyUtils",
   "EXE_FILES" => [
-    "script/cmc-currency",
-    "script/grepcrypto"
+    "script/coin-cmc",
+    "script/coin-mno",
+    "script/grepcoin"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::CryptoCurrencyUtils",
@@ -23,11 +24,13 @@ my %WriteMakefileArgs = (
     "App::wordlist" => "0.261",
     "Browser::Open" => 0,
     "CryptoCurrency::Catalog" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.80",
     "Perinci::Result::Format::Lite" => "0.26",
     "Sah::Schema::cryptocurrency::symbol_or_name" => 0,
+    "URI::Escape" => 0,
     "WordList::CryptoCurrency::Catalog::NameSymbol" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -38,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +52,7 @@ my %FallbackPrereqs = (
   "App::wordlist" => "0.261",
   "Browser::Open" => 0,
   "CryptoCurrency::Catalog" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -58,6 +62,7 @@ my %FallbackPrereqs = (
   "Perinci::Result::Format::Lite" => "0.26",
   "Sah::Schema::cryptocurrency::symbol_or_name" => 0,
   "Test::More" => 0,
+  "URI::Escape" => 0,
   "WordList::CryptoCurrency::Catalog::NameSymbol" => 0,
   "strict" => 0,
   "warnings" => 0

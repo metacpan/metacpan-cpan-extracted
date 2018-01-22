@@ -17,11 +17,11 @@ sub new {
 }
 
 sub create {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        address => $params->{address},
-        amount  => $params->{amount},
+        address => $params{address},
+        amount  => $params{amount},
     };
 
     my $res = $self->client->request(
@@ -33,10 +33,10 @@ sub create {
 }
 
 sub all {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        currency => $params->{currency},
+        currency => $params{currency},
     };
 
     my $res = $self->client->request(

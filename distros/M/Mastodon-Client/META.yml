@@ -3,7 +3,6 @@ abstract: 'Talk to a Mastodon server'
 author:
   - 'José Joaquín Atria <jjatria@cpan.org>'
 build_requires:
-  AnyEvent: '7.13'
   Config::Tiny: '0'
   HTML::FormatText::WithLinks: '0'
   Lingua::EN::Inflexion: '0'
@@ -26,7 +25,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,72 +34,71 @@ name: Mastodon-Client
 provides:
   Mastodon::Client:
     file: lib/Mastodon/Client.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Account:
     file: lib/Mastodon/Entity/Account.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Application:
     file: lib/Mastodon/Entity/Application.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Attachment:
     file: lib/Mastodon/Entity/Attachment.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Card:
     file: lib/Mastodon/Entity/Card.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Context:
     file: lib/Mastodon/Entity/Context.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Error:
     file: lib/Mastodon/Entity/Error.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Instance:
     file: lib/Mastodon/Entity/Instance.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Mention:
     file: lib/Mastodon/Entity/Mention.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Notification:
     file: lib/Mastodon/Entity/Notification.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Relationship:
     file: lib/Mastodon/Entity/Relationship.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Report:
     file: lib/Mastodon/Entity/Report.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Results:
     file: lib/Mastodon/Entity/Results.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Status:
     file: lib/Mastodon/Entity/Status.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Entity::Tag:
     file: lib/Mastodon/Entity/Tag.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Listener:
     file: lib/Mastodon/Listener.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Role::Entity:
     file: lib/Mastodon/Role/Entity.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Role::UserAgent:
     file: lib/Mastodon/Role/UserAgent.pm
-    version: '0.012'
+    version: '0.013'
   Mastodon::Types:
     file: lib/Mastodon/Types.pm
-    version: '0.012'
+    version: '0.013'
 requires:
-  AnyEvent: '7.13'
-  AnyEvent::Emitter: '0.02'
-  AnyEvent::HTTP: '2.23'
   Carp: '0'
   Class::Load: '0'
   Data::Dumper: '0'
-  DateTime: '1.42'
+  DateTime: '0'
   DateTime::Format::Strptime: '1.73'
   Encode: '0'
+  Future: '0.35'
   HTTP::Request::Common: '0'
+  IO::Async::Loop: '0.66'
   Image::Info: '0'
   JSON::MaybeXS: '1.003009'
   LWP::UserAgent: '6.25'
@@ -109,7 +107,9 @@ requires:
   MIME::Base64: '0'
   Moo: '2.003002'
   Moo::Role: '0'
+  Net::Async::HTTP: '0.41'
   Path::Tiny: '0'
+  Role::EventEmitter: '0.002'
   Try::Tiny: '0.28'
   Type::Library: '0'
   Type::Params: '1.000006'
@@ -125,8 +125,9 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/Mastodon-Client/issues
   repository: git://gitlab.com/jjatria/Mastodon-Client.git
-version: '0.012'
+version: '0.013'
 x_contributors:
   - 'Al Beano <albino@autistici.org>'
+  - 'Florian Obser <florian+gitlab@narrans.de>'
   - 'Lance Wicks <lancew@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

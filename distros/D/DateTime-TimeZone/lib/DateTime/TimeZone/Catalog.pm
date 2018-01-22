@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 
 our @ALL =
 qw(
@@ -31,6 +31,7 @@ qw(
   Africa/Monrovia
   Africa/Nairobi
   Africa/Ndjamena
+  Africa/Sao_Tome
   Africa/Tripoli
   Africa/Tunis
   Africa/Windhoek
@@ -407,6 +408,7 @@ Maputo
 Monrovia
 Nairobi
 Ndjamena
+Sao_Tome
 Tripoli
 Tunis
 Windhoek
@@ -1719,7 +1721,6 @@ our %LINKS =
   'Africa/Nouakchott' => 'Africa/Abidjan',
   'Africa/Ouagadougou' => 'Africa/Abidjan',
   'Africa/Porto-Novo' => 'Africa/Lagos',
-  'Africa/Sao_Tome' => 'Africa/Abidjan',
   'Africa/Timbuktu' => 'Africa/Abidjan',
   'America/Anguilla' => 'America/Port_of_Spain',
   'America/Antigua' => 'America/Port_of_Spain',
@@ -1896,7 +1897,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2017c' }
+sub OlsonVersion { '2018b' }
 
 
 1;
@@ -1935,6 +1936,7 @@ so that applications can easily present a list of timezones.
   Africa/Monrovia
   Africa/Nairobi
   Africa/Ndjamena
+  Africa/Sao_Tome
   Africa/Tripoli
   Africa/Tunis
   Africa/Windhoek
@@ -3496,7 +3498,6 @@ A linked zone is an alias from one name to another.
   Africa/Nouakchott => Africa/Abidjan
   Africa/Ouagadougou => Africa/Abidjan
   Africa/Porto-Novo => Africa/Lagos
-  Africa/Sao_Tome => Africa/Abidjan
   Africa/Timbuktu => Africa/Abidjan
   America/Anguilla => America/Port_of_Spain
   America/Antigua => America/Port_of_Spain

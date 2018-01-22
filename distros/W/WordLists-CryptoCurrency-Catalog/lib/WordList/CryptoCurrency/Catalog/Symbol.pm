@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::Symbol;
 
-our $DATE = '2018-01-12'; # DATE
-our $VERSION = '20180109'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '20180116'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words",1387,"shortest_word_len",1,"num_words_contains_unicode",0,"longest_word_len",13,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",2,"avg_word_len",3.6027397260274); # STATS
+our %STATS = ("longest_word_len",13,"avg_word_len",3.60413793103448,"shortest_word_len",1,"num_words",1450,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",2,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency symbols
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::Symbol - List of cryptocurrency symbols
 
 =head1 VERSION
 
-This document describes version 20180109 of WordList::CryptoCurrency::Catalog::Symbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
+This document describes version 20180116 of WordList::CryptoCurrency::Catalog::Symbol (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -44,17 +44,17 @@ This document describes version 20180109 of WordList::CryptoCurrency::Catalog::S
 
 =head1 STATISTICS
 
- +----------------------------------+-----------------+
- | key                              | value           |
- +----------------------------------+-----------------+
- | avg_word_len                     | 3.6027397260274 |
- | longest_word_len                 | 13              |
- | num_words                        | 1387            |
- | num_words_contains_nonword_chars | 2               |
- | num_words_contains_unicode       | 0               |
- | num_words_contains_whitespace    | 0               |
- | shortest_word_len                | 1               |
- +----------------------------------+-----------------+
+ +----------------------------------+------------------+
+ | key                              | value            |
+ +----------------------------------+------------------+
+ | avg_word_len                     | 3.60413793103448 |
+ | longest_word_len                 | 13               |
+ | num_words                        | 1450             |
+ | num_words_contains_nonword_chars | 2                |
+ | num_words_contains_unicode       | 0                |
+ | num_words_contains_whitespace    | 0                |
+ | shortest_word_len                | 1                |
+ +----------------------------------+------------------+
 
 The statistics is available in the C<%STATS> package variable.
 
@@ -95,7 +95,6 @@ $$$
 2GIVE
 300
 42
-4CHN
 611
 808
 888
@@ -131,8 +130,11 @@ AGRS
 AHT
 AI
 AIB
+AIDOC
 AION
 AIR
+AIT
+AIX
 AKY
 ALIS
 ALL
@@ -175,6 +177,7 @@ ATL
 ATM
 ATMC
 ATMS
+ATN
 ATOM
 ATS
 ATX
@@ -182,6 +185,7 @@ AU
 AUR
 AV
 AVT
+AWR
 AXIOM
 B2B
 B2X
@@ -196,6 +200,7 @@ BAY
 BBP
 BBR
 BBT
+BCA
 BCAP
 BCC
 BCD
@@ -207,6 +212,7 @@ BCO
 BCPT
 BCX
 BCY
+BDG
 BDL
 BELA
 BENJI
@@ -214,7 +220,6 @@ BERN
 BEST
 BET
 BETACOIN
-BGR
 BIG
 BIGUP
 BIOB
@@ -238,6 +243,7 @@ BITSILVER
 BITUSD
 BITZ
 BIX
+BKX
 BLAS
 BLAZR
 BLC
@@ -247,6 +253,7 @@ BLN
 BLOCK
 BLOCKPAY
 BLRY
+BLT
 BLU
 BLUE
 BLX
@@ -298,11 +305,11 @@ BTDX
 BTE
 BTG
 BTM
+BTO
 BTPL
 BTQ
 BTS
 BTSR
-BTU
 BTWTY
 BTX
 BUB
@@ -322,6 +329,7 @@ CACH
 CAG
 CALC
 CAN
+CANETWORK
 CANN
 CAPP
 CARBON
@@ -340,17 +348,24 @@ CCRB
 CCT
 CDN
 CDT
+CDX
+CEFS
 CESC
 CF
+CFC
 CFD
 CFI
 CFT
+CFUN
+CHAN
 CHC
 CHEAP
 CHESS
 CHIPS
 CJ
+CL
 CLAM
+CLD
 CLOAK
 CLUB
 CME
@@ -393,7 +408,6 @@ CRTM
 CRW
 CRX
 CRYPT
-CSC
 CSNO
 CTIC2
 CTIC3
@@ -502,6 +516,7 @@ EDG
 EDO
 EDR
 EDRC
+EDT
 EFL
 EFYT
 EGAS
@@ -509,6 +524,7 @@ EGC
 EGG
 EGO
 EGOLD
+EKO
 EL
 ELC
 ELE
@@ -519,7 +535,6 @@ ELLA
 ELS
 ELTC2
 ELTCOIN
-EMB
 EMC
 EMC2
 EMD
@@ -562,6 +577,7 @@ EXN
 EXP
 EXRN
 FAIR
+FAIRGAME
 FAP
 FAZZ
 FBL
@@ -631,9 +647,12 @@ GBYTE
 GCC
 GCN
 GCR
+GCS
 GEERT
 GEO
+GET
 GIM
+GJC
 GLC
 GLD
 GLS
@@ -644,6 +663,7 @@ GMX
 GNO
 GNT
 GNX
+GOD
 GOLF
 GOLOS
 GOOD
@@ -668,6 +688,7 @@ GUN
 GUP
 GVT
 GXS
+HAC
 HAL
 HALLO
 HAT
@@ -681,6 +702,7 @@ HEAT
 HERO
 HGT
 HIGH
+HKN
 HMC
 HMP
 HMQ
@@ -688,6 +710,7 @@ HNC
 HODL
 HOLD
 HONEY
+HPB
 HPC
 HPY
 HSR
@@ -708,6 +731,7 @@ HYTV
 I0C
 IBANK
 IBTC
+IC
 ICE
 ICN
 ICOB
@@ -716,6 +740,7 @@ ICON
 ICOO
 ICOS
 ICX
+IDT
 IETH
 IFC
 IFLT
@@ -732,12 +757,15 @@ INFX
 INK
 INN
 INPAY
+INS
 INSN
+INT
 INTLDIAMOND
 INXT
 IOC
 ION
 IOP
+IOST
 IPY
 IQT
 IRL
@@ -762,34 +790,42 @@ KARMA
 KASHH
 KAYI
 KBR
+KCASH
 KCS
 KED
 KEK
+KEY
 KICK
 KIN
 KINGN
 KLC
 KLN
+KMC
 KMD
 KNC
 KOBO
 KORE
 KRB
+KRM
 KRONE
 KURT
 KUSH
+KZC
 LA
 LANA
 LAZ
 LBC
 LBTC
 LCP
+LCT
 LDCN
 LDOGE
 LEA
+LEEK
 LEND
 LEO
 LEPEN
+LEV
 LEX
 LGD
 LIFE
@@ -843,11 +879,11 @@ MCRN
 MDA
 MDC
 MDS
+MDT
 MEC
 MED
 MEME
 MEN
-MEOW
 MER
 METAL
 MGC
@@ -857,6 +893,7 @@ MILO
 MINEX
 MINT
 MIOTA
+MIXIN
 MKR
 MLN
 MMXVI
@@ -865,6 +902,7 @@ MND
 MNE
 MNM
 MNX
+MOAC
 MOD
 MOIN
 MOJO
@@ -912,12 +950,14 @@ NEU
 NEVA
 NEWB
 NGC
+NIMFA
 NIO
 NKA
 NLC2
 NLG
 NMC
 NMR
+NMS
 NOBL
 NODC
 NOTE
@@ -929,6 +969,7 @@ NTRN
 NTWK
 NUKO
 NULS
+NUMUS
 NVC
 NVST
 NXC
@@ -953,12 +994,14 @@ ONION
 ONX
 OP
 OPAL
+OPC
 OPES
 OPT
 ORB
 ORLY
 ORME
 OS76
+OST
 OTN
 OTX
 OX
@@ -1010,6 +1053,7 @@ PND
 PNX
 POE
 POKE
+POLIS
 POLL
 PONZI
 POP
@@ -1024,7 +1068,6 @@ PPT
 PPY
 PR
 PRC
-PRE
 PRES
 PRG
 PRIMU
@@ -1035,6 +1078,7 @@ PRN
 PRO
 PROCHAIN
 PROCURRENCY
+PRS
 PRX
 PST
 PSY
@@ -1055,7 +1099,6 @@ QAU
 QBC
 QBK
 QBT
-QC
 QCN
 QLC
 QORA
@@ -1064,6 +1107,8 @@ QRL
 QSP
 QTL
 QTUM
+QUBE
+QUN
 QVT
 QWARK
 R
@@ -1080,6 +1125,7 @@ RCOIN
 RDD
 RDN
 REAL
+REBL
 REC
 RED
 REE
@@ -1100,6 +1146,7 @@ RLC
 RLT
 RMC
 RNS
+RNT
 ROC
 ROOFS
 ROYAL
@@ -1145,7 +1192,9 @@ SHELL
 SHIFT
 SHND
 SHORTY
+SHOW
 SIB
+SIC
 SIFT
 SIGMA
 SIGT
@@ -1194,7 +1243,6 @@ SPT
 SRC
 SRN
 SSS
-ST
 STA
 STAK
 STAR
@@ -1204,6 +1252,7 @@ STC
 STEEM
 STEPS
 STEX
+STN
 STORJ
 STORM
 STRAT
@@ -1216,11 +1265,15 @@ SUB
 SUMO
 SUPER
 SUR
+SWFTC
 SWIFT
 SWING
 SWP
 SWT
+SWTC
 SXC
+SXDT
+SXUT
 SYNX
 SYS
 TAAS
@@ -1232,8 +1285,10 @@ TAU
 TCC
 TCOIN
 TCR
+TCT
 TEAM
 TEK
+TEL
 TELL
 TER
 TERA
@@ -1246,6 +1301,7 @@ THC
 THS
 TIE
 TIME
+TIO
 TIPS
 TIT
 TIX
@@ -1258,9 +1314,11 @@ TNT
 TOA
 TODAY
 TOK
+TOKC
 TOKEN
 TOP
 TOPAZ
+TOPC
 TOR
 TRC
 TRCT
@@ -1289,6 +1347,7 @@ UBTC
 UET
 UFO
 UFR
+UGC
 UGT
 UIS
 UKG
@@ -1315,6 +1374,7 @@ USNBT
 UTA
 UTC
 UTK
+UTT
 V
 VAL
 VASH
@@ -1349,6 +1409,7 @@ VTC
 VTR
 VUC
 VULC
+VZT
 WA
 WABI
 WAND
@@ -1356,10 +1417,12 @@ WARP
 WAVES
 WAX
 WAY
+WAYKI
 WBB
 WC
 WCT
 WDC
+WETH
 WGO
 WGR
 WHL
@@ -1376,7 +1439,6 @@ WRC
 WSX
 WTC
 WTT
-WYV
 X2
 XAS
 XAU
@@ -1453,6 +1515,7 @@ YES
 YOC
 YOYOW
 YTN
+ZAP
 ZBC
 ZCG
 ZCL

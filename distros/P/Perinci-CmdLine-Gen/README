@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.483 of Perinci::CmdLine::Gen (from
-    Perl distribution Perinci-CmdLine-Gen), released on 2017-11-06.
+    This document describes version 0.484 of Perinci::CmdLine::Gen (from
+    Perl distribution Perinci-CmdLine-Gen), released on 2018-01-17.
 
 FUNCTIONS
   gen_pericmd_script
@@ -44,6 +44,14 @@ FUNCTIONS
     *   config_filename => *str|hash|array[str|hash]*
 
         Will be passed to Perinci::CmdLine constructor.
+
+    *   copt_help_enable => *bool* (default: 1)
+
+    *   copt_help_getopt => *str*
+
+    *   copt_version_enable => *bool* (default: 1)
+
+    *   copt_version_getopt => *str*
 
     *   default_dry_run => *bool*
 
@@ -251,6 +259,14 @@ FUNCTIONS
 
         Will be passed to Perinci::CmdLine constructor.
 
+    *   copt_help_enable => *bool* (default: 1)
+
+    *   copt_help_getopt => *str*
+
+    *   copt_version_enable => *bool* (default: 1)
+
+    *   copt_version_getopt => *str*
+
     *   default_dry_run => *bool*
 
         Whether to set default_dry_run, will be passed to Perinci::CmdLine
@@ -437,7 +453,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

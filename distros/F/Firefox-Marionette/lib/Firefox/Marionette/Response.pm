@@ -4,38 +4,45 @@ use strict;
 use warnings;
 use Firefox::Marionette::Exception::Response();
 
+our $VERSION = '0.16';
+
+sub _TYPE_INDEX       { return 0 }
+sub _MESSAGE_ID_INDEX { return 1 }
+sub _ERROR_INDEX      { return 2 }
+sub _RESULT_INDEX     { return 3 }
+
 sub new {
-	my ($class, $parameters) = @_;
-	my $response = bless {
-			type => $parameters->[0],
-			message_id => $parameters->[1],
-			error => $parameters->[2],
-			result => $parameters->[3],
-		}, $class;
-	if ($response->error()) {
-		Firefox::Marionette::Exception::Response->throw($response);
-	}
-	return $response;
+    my ( $class, $parameters ) = @_;
+    my $response = bless {
+        type       => $parameters->[ _TYPE_INDEX() ],
+        message_id => $parameters->[ _MESSAGE_ID_INDEX() ],
+        error      => $parameters->[ _ERROR_INDEX() ],
+        result     => $parameters->[ _RESULT_INDEX() ],
+    }, $class;
+    if ( $response->error() ) {
+        Firefox::Marionette::Exception::Response->throw($response);
+    }
+    return $response;
 }
 
 sub type {
-	my ($self) = @_;
-	return $self->{type};
+    my ($self) = @_;
+    return $self->{type};
 }
 
 sub message_id {
-	my ($self) = @_;
-	return $self->{message_id};
+    my ($self) = @_;
+    return $self->{message_id};
 }
 
 sub error {
-	my ($self) = @_;
-	return $self->{error};
+    my ($self) = @_;
+    return $self->{error};
 }
 
 sub result {
-	my ($self) = @_;
-	return $self->{result};
+    my ($self) = @_;
+    return $self->{result};
 }
 
 1;    # Magic true value required at end of module
@@ -47,7 +54,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.09
+Version 0.16
 
 =head1 SYNOPSIS
 

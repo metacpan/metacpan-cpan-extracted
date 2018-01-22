@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
     "MooseX::Log::Log4perl" => 0,
     "MooseX::Params::Validate" => 0,
     "Try::Tiny" => 0,
+    "URL::Encode" => 0,
     "YAML" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "MooseX::Params::Validate" => 0,
   "Test::More" => 0,
   "Try::Tiny" => 0,
+  "URL::Encode" => 0,
   "YAML" => 0,
   "strict" => 0,
   "warnings" => 0

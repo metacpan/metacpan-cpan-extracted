@@ -1,5 +1,8 @@
 ChangeLog for perl/PDL module PDL::SVDLIBC
 
+v0.19 Mon, 15 Jan 2018 14:57:11 +0100 moocow
+	+ path-tweaking for Makefile.PL
+
 v0.18 Tue, 06 Jun 2017 11:12:21 +0200 moocow
 	+ Makefile.PL: explicit "./pdlmaker.plm" (RT bug #121661)
 	+ fixed new errors `svd requires input piddles to have m >= n (you have m=6 and n=7). Try inputting the transpose.' with PDL-2.018

@@ -1,5 +1,5 @@
 package Net::Twitter;
-$Net::Twitter::VERSION = '4.01042';
+$Net::Twitter::VERSION = '4.01043';
 use Moose;
 use Carp::Clan qw/^(?:Net::Twitter|Moose|Class::MOP)/;
 use JSON::MaybeXS;
@@ -160,8 +160,8 @@ Net::Twitter - A perl interface to the Twitter API
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 DESCRIPTION
 
-See Net/Twitter.pod
+This module has been superseded by L<Twitter::API>. Please update your applications and/or downstream dependent modules as soon as possible. 

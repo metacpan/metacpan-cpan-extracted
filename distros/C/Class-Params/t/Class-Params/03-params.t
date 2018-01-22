@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Params qw(params);
 use English;
 use Error::Pure::Utils qw(clean);

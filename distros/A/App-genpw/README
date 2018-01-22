@@ -2,8 +2,8 @@ NAME
     App::genpw - Generate random password
 
 VERSION
-    This document describes version 0.002 of App::genpw (from Perl
-    distribution App-genpw), released on 2018-01-09.
+    This document describes version 0.003 of App::genpw (from Perl
+    distribution App-genpw), released on 2018-01-16.
 
 SYNOPSIS
     See the included script genpw.
@@ -69,6 +69,8 @@ FUNCTIONS
          %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
          %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
          %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+         %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+         %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
          %%   A literal percent sign
          %w   Random word
 

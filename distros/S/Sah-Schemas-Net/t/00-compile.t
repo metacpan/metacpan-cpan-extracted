@@ -2,16 +2,20 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/obj/str_net_ipv4.pm',
+    'Sah/Schema/net/hostname.pm',
     'Sah/Schema/net/ipv4.pm',
+    'Sah/Schema/net/port.pm',
+    'Sah/SchemaR/net/hostname.pm',
     'Sah/SchemaR/net/ipv4.pm',
+    'Sah/SchemaR/net/port.pm',
     'Sah/Schemas/Net.pm'
 );
 
@@ -46,7 +50,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { +require blib; blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

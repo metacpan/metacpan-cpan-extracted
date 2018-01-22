@@ -3,6 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 use Test::Differences;
+use Data::Dumper::OneLine qw/Dumper/;
 
 BEGIN {
     use_ok( 'MarpaX::ESLIF::URI' ) || print "Bail out!\n";
@@ -84,7 +85,7 @@ foreach my $origin (sort keys %DATA) {
       my $expected = $methods->{$method}->{$type};
       my $test_name = "\$uri->$method('$type')";
       if (ref($expected)) {
-        eq_or_diff($got, $expected, "$test_name is " . (defined($expected) ? (ref($expected) eq 'ARRAY' ? "[" . join(", ", map { "'$_'" } @{$expected}) . "]" : "$expected") : "undef"));
+        eq_or_diff($got, $expected, "$test_name is " . (defined($expected) ? Dumper($expected) : "undef"));
       } else {
         is($got, $expected, "$test_name is " . (defined($expected) ? "'$expected'" : "undef"));
       }

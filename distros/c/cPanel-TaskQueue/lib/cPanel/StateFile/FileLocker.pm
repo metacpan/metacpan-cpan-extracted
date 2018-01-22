@@ -1,31 +1,5 @@
 package cPanel::StateFile::FileLocker;
-$cPanel::StateFile::FileLocker::VERSION = '0.800';
-# cpanel - cPanel/StateFile/FileLocker.pm         Copyright(c) 2014 cPanel, Inc.
-#                                                           All rights Reserved.
-# copyright@cpanel.net                                         http://cpanel.net
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of the owner nor the names of its contributors may
-#       be used to endorse or promote products derived from this software
-#       without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL  BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+$cPanel::StateFile::FileLocker::VERSION = '0.850';
 #use warnings;
 use strict;
 use Fcntl ();
@@ -40,10 +14,10 @@ sub new {
         max_wait      => 300,    # five minutes
         max_age       => 300,    # five minutes
         flock_timeout => 60,
-        sleep_secs    => 1,
+        sleep_secs    => 0.1,
         %{$args_hr},
     );
-    $args{sleep_secs} = 1 if $args{sleep_secs} < 1;
+    $args{sleep_secs} = 0.05 if $args{sleep_secs} < 0.05;
 
     return bless \%args, $class;
 }
@@ -81,7 +55,7 @@ sub file_lock {
 
                 # couldn't read the file. If it doesn't exist, try to create.
                 next ATTEMPT unless -e $lockfile;
-                sleep $self->{sleep_secs};
+                select( undef, undef, undef, $self->{sleep_secs} );
                 next;
             }
             if ( time > $max_time ) {
@@ -110,7 +84,7 @@ sub file_lock {
                 next ATTEMPT;
             }
 
-            sleep $self->{sleep_secs};
+            select( undef, undef, undef, $self->{sleep_secs} );
         }
     }
 
@@ -202,7 +176,7 @@ sub _read_lock_file {
 
             close $fh;
             unless ($pid) {    # retry, we got between open and lock (probably).
-                sleep $self->{sleep_secs};
+                select( undef, undef, undef, $self->{sleep_secs} );
                 next;
             }
 
@@ -215,7 +189,7 @@ sub _read_lock_file {
         return unless -e $lockfile;    # file vanished, no longer locked.
 
         $self->_throw("Cannot open lock file '$lockfile' for reading.") unless -r _;
-        sleep $self->{sleep_secs};
+        select( undef, undef, undef, $self->{sleep_secs} );
     }
 
     my $lock_age = time - ( stat($lockfile) )[9];

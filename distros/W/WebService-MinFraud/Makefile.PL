@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Validate::URI" => 0,
     "DateTime::Format::RFC3339" => 0,
     "Exporter" => 0,
-    "GeoIP2::Record::Country" => "2.004000",
+    "GeoIP2::Record::Country" => "2.005000",
     "GeoIP2::Record::Location" => 0,
     "GeoIP2::Role::Model::HasSubdivisions" => 0,
     "GeoIP2::Role::Model::Location" => "2.004000",
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.005001",
+  "VERSION" => "1.006000",
   "test" => {
     "TESTS" => "t/*.t t/WebService/MinFraud/*.t t/WebService/MinFraud/Model/*.t t/WebService/MinFraud/Record/*.t"
   }
@@ -86,7 +86,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "GeoIP2::Record::Country" => "2.004000",
+  "GeoIP2::Record::Country" => "2.005000",
   "GeoIP2::Record::Location" => 0,
   "GeoIP2::Role::Model::HasSubdivisions" => 0,
   "GeoIP2::Role::Model::Location" => "2.004000",

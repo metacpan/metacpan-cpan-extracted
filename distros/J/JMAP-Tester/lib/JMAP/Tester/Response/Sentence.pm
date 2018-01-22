@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Sentence;
 # ABSTRACT: a single triple within a JMAP response
-$JMAP::Tester::Response::Sentence::VERSION = '0.016';
+$JMAP::Tester::Response::Sentence::VERSION = '0.017';
 use Moo;
 
 use namespace::clean;
@@ -36,30 +36,31 @@ sub _strip_json_types {
   $self->sentence_broker->strip_json_types($whatever);
 }
 
-#pod =method as_struct
+#pod =method as_triple
 #pod
-#pod =method as_stripped_struct
+#pod =method as_stripped_triple
 #pod
-#pod C<as_struct> returns the underlying JSON data of the sentence, which may include
-#pod objects used to convey type information for booleans, strings, and numbers.
+#pod C<as_triple> returns the underlying JSON data of the sentence, which may
+#pod include objects used to convey type information for booleans, strings, and
+#pod numbers.
 #pod
-#pod For raw data, use C<as_stripped_struct>.
+#pod For unblessed data, use C<as_stripped_triple>.
 #pod
 #pod These return a three-element arrayref.
 #pod
 #pod =cut
 
-sub as_struct { [ $_[0]->name, $_[0]->arguments, $_[0]->client_id ] }
+sub as_triple { [ $_[0]->name, $_[0]->arguments, $_[0]->client_id ] }
 
-sub as_stripped_struct {
-  $_[0]->sentence_broker->strip_json_types($_[0]->as_struct);
+sub as_stripped_triple {
+  $_[0]->sentence_broker->strip_json_types($_[0]->as_triple);
 }
 
 #pod =method as_pair
 #pod
 #pod =method as_stripped_pair
 #pod
-#pod C<as_pair> returns the same thing as C<as_struct>, but without the
+#pod C<as_pair> returns the same thing as C<as_triple>, but without the
 #pod C<client_id>.  That means it returns a two-element arrayref.
 #pod
 #pod C<as_stripped_pair> returns the same minus JSON type information.
@@ -126,7 +127,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 OVERVIEW
 
@@ -147,14 +148,15 @@ method.
 
 =head1 METHODS
 
-=head2 as_struct
+=head2 as_triple
 
-=head2 as_stripped_struct
+=head2 as_stripped_triple
 
-C<as_struct> returns the underlying JSON data of the sentence, which may include
-objects used to convey type information for booleans, strings, and numbers.
+C<as_triple> returns the underlying JSON data of the sentence, which may
+include objects used to convey type information for booleans, strings, and
+numbers.
 
-For raw data, use C<as_stripped_struct>.
+For unblessed data, use C<as_stripped_triple>.
 
 These return a three-element arrayref.
 
@@ -162,7 +164,7 @@ These return a three-element arrayref.
 
 =head2 as_stripped_pair
 
-C<as_pair> returns the same thing as C<as_struct>, but without the
+C<as_pair> returns the same thing as C<as_triple>, but without the
 C<client_id>.  That means it returns a two-element arrayref.
 
 C<as_stripped_pair> returns the same minus JSON type information.

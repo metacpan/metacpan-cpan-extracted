@@ -17,7 +17,7 @@ Mastodon::Client - Talk to a Mastodon server
 
     $client->post_status('Posted to a Mastodon server!');
     $client->post_status('And now in secret...',
-      { visibility => 'unlisted ' }
+      { visibility => 'unlisted' }
     )
 
     # Streaming interface might change!

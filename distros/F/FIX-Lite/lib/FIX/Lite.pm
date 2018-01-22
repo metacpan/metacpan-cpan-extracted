@@ -14,7 +14,7 @@ use Carp qw( croak );
 
 #@ISA = qw(Net::Cmd IO::Socket::INET);
 @ISA = qw(IO::Socket::INET);
-$VERSION = "0.06";
+$VERSION = "0.08";
 
 my $fixDict;
 my $MsgSeqNum = 0;
@@ -243,6 +243,8 @@ sub startServer {
                 $clnSel->remove($socket);
                 close($socket);
             } else {
+                $MsgSeqNum = (defined $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum})?
+                             $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum}:0;
                 print "----\nReceived FIX message:\n".readableFix($response)."\n" if ($arg{Debug});
 
                 #Split into each single msg
@@ -278,6 +280,9 @@ sub startServer {
                             print "Received logon with invalid TargetCompID ".$parsedResp->{TargetCompID}."\n" if ($arg{Debug});
                             next;
                         }
+                        if ($parsedResp->{ResetSeqNumFlag} eq 'Y') {
+                            $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum} = 0;
+                        }
                         $sessions{$socket->peerhost().':'.$socket->peerport()}->{TargetCompID} = $parsedResp->{SenderCompID};
                         $sessions{$parsedResp->{SenderCompID}} = $socket->peerhost().':'.$socket->peerport();
                         if ( $arg{AutoLogon} ) {
@@ -285,7 +290,7 @@ sub startServer {
                             logon($socket,
                                     SenderCompID => $parsedResp->{TargetCompID},
                                     TargetCompID => $parsedResp->{SenderCompID},
-                                    TargetSubID  => $parsedResp->{TargetSubID} || 'PRICE',
+                                    TargetSubID  => $parsedResp->{SenderSubID} || 'PRICE',
                                     Debug        => $arg{Debug},
                                     WaitResponse => 0
                                  );
@@ -322,6 +327,8 @@ sub startServer {
                     }
 
                 }
+                # Save the incremented MsgSeqNum for the session
+                $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum} = $MsgSeqNum;
             }
         }
 
@@ -344,7 +351,7 @@ sub startServer {
                             print "ERROR. Could not find writable socket for ". $client."\n" if ($arg{Debug});
                             next;
                         }
-
+                        $MsgSeqNum = $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum};
                         foreach my $msg (@{$MD->{$client}}) {
                             request($socket,
                                     SenderCompID => $arg{SenderCompID},
@@ -354,6 +361,7 @@ sub startServer {
                                     WaitResponse => 0
                                    )
                         }
+                        $sessions{$socket->peerhost().':'.$socket->peerport()}->{MsgSeqNum} = $MsgSeqNum;
                     } else {
                         print "Got a message for dead session $client. Dropping it.\n" if ($arg{Debug});
                         next;
@@ -426,9 +434,8 @@ sub constructMessage($$) {
     undef $arg->{MsgType};
     $MsgSeqNum++;
 
-    my $time = strftime "%Y%m%d-%H:%M:%S.".getMilliseconds(), gmtime;
     push @fields, getFieldNumber('MsgType')."=".getMessageType($msgtype);
-    push @fields, getFieldNumber('SendingTime')."=".$time;
+    push @fields, getFieldNumber('SendingTime')."=".getSendingTime();
     push @fields, getFieldNumber('MsgSeqNum')."=".$MsgSeqNum;
 
     my @allFields = ( @{getMessageHeader()}, @{getMessageFields($msgtype)} );
@@ -738,10 +745,11 @@ sub quit {
     $self->close;
 }
 
-sub getMilliseconds {
-    my $time = gettimeofday;
-    return sprintf("%03d",int(($time-int($time))*1000));
+sub getSendingTime {
+    my ( $s, $us ) = gettimeofday;
+    return strftime("%Y%m%d-%H:%M:%S.", gmtime($s)).sprintf("%03d",int($us*0.001));
 }
+
 1; # End of FIX::Lite
 __END__
 
@@ -751,7 +759,7 @@ FIX::Lite - Simple FIX (Financial Information eXchange) protocol module
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -874,13 +882,21 @@ FIX::Lite can also help you to create an own simple FIX feeder. Please see the e
     # These are the examples for &msgHandler and &periodicHandler functions
 
     # msgHandler receives the parsed incoming messages from the clients (except for Hearbeats, TestRequests
-    # and Logons if AutoLogon is enabled
+    # and Logons if AutoLogon is enabled).
     # msgHandler can return the hash reference with the description of the message to send back to client.
     our %subscriptions;
     sub msgHandler {
         my $resp = shift;
         print "Start handling message ".$resp->{MsgType}."\n";
-        if ( $resp->{MsgType} eq 'V' ) {
+        if ( $resp->{MsgType} eq 'A' ) {
+            print 'Got LOGON from SenderCompID '.$resp->{SenderCompID}."\n";
+            my %msg = (
+                MsgType => 'Logon'
+            );
+            undef $subscriptions{$resp->{SenderCompID}};
+            return \%msg;
+        }
+        elsif ( $resp->{MsgType} eq 'V' ) {
             print 'Got MARKET DATA REQUEST for symbol '.$resp->{MDReqID}.' from SenderCompID '.$resp->{SenderCompID}."\n";
             push @{$subscriptions{$resp->{SenderCompID}}}, $resp->{MDReqID};
         }
@@ -974,7 +990,7 @@ Vitaly Agapov, E<lt>agapov.vitaly@gmail.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015-2017 "Vitaly Agapov".
+Copyright 2015-2018 "Vitaly Agapov".
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

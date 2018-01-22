@@ -51,7 +51,7 @@
          "web" : "https://github.com/frioux/Log-Contextual"
       }
    },
-   "version" : "0.008000",
+   "version" : "0.008001",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

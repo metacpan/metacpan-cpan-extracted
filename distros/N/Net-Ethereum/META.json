@@ -31,9 +31,16 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "File::Slurper" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Math::BigFloat" : "0",
+            "Math::BigInt" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.28"
+   "version" : "0.30"
 }

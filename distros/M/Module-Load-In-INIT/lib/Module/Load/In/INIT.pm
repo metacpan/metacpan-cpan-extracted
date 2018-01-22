@@ -1,7 +1,7 @@
 package Module::Load::In::INIT;
 
-our $DATE = '2017-07-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-01-15'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 #use warnings; # warns: Too late to run INIT block
@@ -15,14 +15,26 @@ sub import {
 }
 
 INIT {
+    my %opts;
     for my $mod (@mods) {
+        if ($mod =~ /^-(.+?)(?:=(.*))?\z/) {
+            $opts{$1} = defined $2 ? $2 : 1;
+            next;
+        }
         my @import_args;
         if ($mod =~ s!=(.*)!!) {
             @import_args = split /;/, $1;
         }
         (my $mod_pm = "$mod.pm") =~ s!::!/!g;
-        require $mod_pm;
-        $mod->import(@import_args);
+        eval { require $mod_pm; 1 };
+        if ($@) {
+            if ($opts{ignore_load_error}) {
+                next;
+            } else {
+                die;
+            }
+            $mod->import(@import_args);
+        }
     }
 }
 
@@ -42,7 +54,7 @@ Module::Load::In::INIT - Load modules in INIT phase
 
 =head1 VERSION
 
-This document describes version 0.003 of Module::Load::In::INIT (from Perl distribution Module-Load-In-INIT), released on 2017-07-04.
+This document describes version 0.004 of Module::Load::In::INIT (from Perl distribution Module-Load-In-INIT), released on 2018-01-15.
 
 =head1 SYNOPSIS
 
@@ -52,6 +64,10 @@ In the command-line:
 
 C<Mod::One> and C<Mod::Two> will be loaded in the INIT phase instead of BEGIN
 phase.
+
+Specify options for Module::Load::In::INIT itself:
+
+ % perl -MModule::Load::In::INIT=-ignore_load_error,Mod::One,Mod::Two
 
 =head1 DESCRIPTION
 
@@ -77,6 +93,19 @@ setup and C<Some::Module> can be (or might already be) loaded by it.
 Caveat: Module::Load::In::INIT itself must be loaded in the BEGIN phase, or INIT
 phase at the latest.
 
+=head1 OPTIONS
+
+You can specify options for Module::Load::In::INIT itself via import argument
+that starts with dash ("-"). Known options:
+
+=over
+
+=item -ignore_load_error
+
+If set, then require() error will be ignored.
+
+=back
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Module-Load-In-INIT>.
@@ -99,7 +128,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

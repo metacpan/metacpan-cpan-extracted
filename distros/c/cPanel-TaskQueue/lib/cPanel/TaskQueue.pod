@@ -3,10 +3,6 @@
 
 cPanel::TaskQueue - FIFO queue of tasks to perform
 
-=head1 VERSION
-
-This document describes cPanel::TaskQueue version 0.700
-
 =head1 SYNOPSIS
 
     use cPanel::TaskQueue ();
@@ -15,6 +11,7 @@ This document describes cPanel::TaskQueue version 0.700
 
     $queue->queue_task( "init_quota" );
     $queue->queue_task( "edit_quota fred 0" );
+    $queue->queue_tasks( "init_quota", "edit_quota fred 0" );
 
     # Processing loop
     while (1) {
@@ -133,6 +130,32 @@ If the task was not queued, a false value is returned.
 
 The C<queue_task> method can also be called with a C<cPanel::TaskQueue::Task>
 object which will be tested and inserted as usual.
+
+=item $q->queue_tasks( $command, $command, ... )
+
+Create new tasks from the commands and put them at the end of the queue if they meet
+certain minimum criteria.  This method will only lock the StateFile once.
+
+=over 4
+
+=item Commands must be legal.
+
+The command type must have been registered with the TaskQueue module.
+
+=item Commands must not duplicate a command already in the queue.
+
+Each command type can have its own definition of duplicate. It can depend on
+one or more of the arguments or not.
+
+=back
+
+This returns a list of I<uuid>s: one for each successfully queued task,
+in the order in which the tasks were given.
+
+If a task is not queued for whatever reason, the I<uuid> is undef.
+
+The C<queue_tasks> method can also be called with C<cPanel::TaskQueue::Task>
+objects which will be tested and inserted as usual.
 
 =item $q->unqueue_task( $uuid )
 

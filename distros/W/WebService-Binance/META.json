@@ -51,6 +51,7 @@
             "MooseX::Log::Log4perl" : "0",
             "MooseX::Params::Validate" : "0",
             "Try::Tiny" : "0",
+            "URL::Encode" : "0",
             "YAML" : "0"
          }
       },
@@ -70,7 +71,7 @@
    "provides" : {
       "WebService::Binance" : {
          "file" : "lib/WebService/Binance.pm",
-         "version" : "0.016"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -81,7 +82,7 @@
          "web" : "https://github.com/robin13/WebService-Binance"
       }
    },
-   "version" : "0.016",
+   "version" : "0.018",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -318,7 +319,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.016",
+                  "tag" : "v0.018",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -21,7 +21,7 @@ package MongoDB::BulkWrite;
 # ABSTRACT: MongoDB bulk write interface
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use MongoDB::Error;
 use MongoDB::Op::_BulkWrite;
@@ -290,7 +290,7 @@ MongoDB::BulkWrite - MongoDB bulk write interface
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 
@@ -469,7 +469,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MongoDB, Inc.
+This software is Copyright (c) 2018 by MongoDB, Inc.
 
 This is free software, licensed under:
 

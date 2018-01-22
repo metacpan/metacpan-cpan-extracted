@@ -1,0 +1,117 @@
+
+BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
+  }
+}
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::NoTabs 0.15
+
+use Test::More 0.88;
+use Test::NoTabs;
+
+my @files = (
+    'lib/Selenium/ActionChains.pm',
+    'lib/Selenium/CanStartBinary.pm',
+    'lib/Selenium/CanStartBinary/FindBinary.pm',
+    'lib/Selenium/CanStartBinary/ProbePort.pm',
+    'lib/Selenium/Chrome.pm',
+    'lib/Selenium/Firefox.pm',
+    'lib/Selenium/Firefox/Binary.pm',
+    'lib/Selenium/Firefox/Profile.pm',
+    'lib/Selenium/InternetExplorer.pm',
+    'lib/Selenium/PhantomJS.pm',
+    'lib/Selenium/Remote/Commands.pm',
+    'lib/Selenium/Remote/Driver.pm',
+    'lib/Selenium/Remote/Driver/CanSetWebdriverContext.pm',
+    'lib/Selenium/Remote/Driver/Firefox/Profile.pm',
+    'lib/Selenium/Remote/ErrorHandler.pm',
+    'lib/Selenium/Remote/Finders.pm',
+    'lib/Selenium/Remote/Mock/Commands.pm',
+    'lib/Selenium/Remote/Mock/RemoteConnection.pm',
+    'lib/Selenium/Remote/RemoteConnection.pm',
+    'lib/Selenium/Remote/Spec.pm',
+    'lib/Selenium/Remote/WDKeys.pm',
+    'lib/Selenium/Remote/WebElement.pm',
+    'lib/Selenium/Waiter.pm',
+    'lib/Test/Selenium/Chrome.pm',
+    'lib/Test/Selenium/Firefox.pm',
+    'lib/Test/Selenium/InternetExplorer.pm',
+    'lib/Test/Selenium/PhantomJS.pm',
+    'lib/Test/Selenium/Remote/Driver.pm',
+    'lib/Test/Selenium/Remote/Role/DoesTesting.pm',
+    'lib/Test/Selenium/Remote/WebElement.pm',
+    't/00-compile.t',
+    't/00-load.t',
+    't/01-driver-pac.t',
+    't/01-driver.t',
+    't/01-webdriver3.t',
+    't/02-webelement.t',
+    't/03-spec-coverage.t',
+    't/04-commands-implemented.t',
+    't/10-switch-to-window.t',
+    't/11-action-chains.t',
+    't/12-reuse-session.t',
+    't/CanSetWebdriverContext.t',
+    't/CanStartBinary.t',
+    't/Finders.t',
+    't/Firefox-Profile.t',
+    't/Remote-Connection.t',
+    't/Test-Selenium-Remote-Driver-google.t',
+    't/Test-Selenium-Remote-Driver.t',
+    't/Test-Selenium-Remote-WebElement.t',
+    't/Waiter.t',
+    't/author-critic.t',
+    't/author-eol.t',
+    't/author-mojibake.t',
+    't/author-no-tabs.t',
+    't/author-pod-coverage.t',
+    't/author-pod-linkcheck.t',
+    't/author-pod-syntax.t',
+    't/author-portability.t',
+    't/author-synopsis.t',
+    't/author-test-version.t',
+    't/bin/docker-record-linux',
+    't/bin/record.pl',
+    't/convenience.t',
+    't/error.t',
+    't/http-server.pl',
+    't/lib/TestHarness.pm',
+    't/mock-recordings/01-driver-mock.json',
+    't/mock-recordings/02-webelement-mock.json',
+    't/mock-recordings/10-switch-to-window-mock.json',
+    't/mock-recordings/11-action-chains-mock.json',
+    't/mock-recordings/12-reuse-session-mock.json',
+    't/mock-recordings/convenience-mock-darwin.json',
+    't/mock-recordings/convenience-mock.json',
+    't/mock-recordings/finders-mock.json',
+    't/mock-recordings/firefox-profile-mock.json',
+    't/mock-recordings/test-selenium-remote-driver-google-mock.json',
+    't/release-distmeta.t',
+    't/release-kwalitee.t',
+    't/release-meta-json.t',
+    't/release-minimum-version.t',
+    't/release-unused-vars.t',
+    't/uploadTest',
+    't/www/404.html',
+    't/www/alerts.html',
+    't/www/cookies.html',
+    't/www/dragAndDropTest.html',
+    't/www/encoded_profile.b64',
+    't/www/formPage.html',
+    't/www/frameset.html',
+    't/www/iframes.html',
+    't/www/index.html',
+    't/www/javascriptPage.html',
+    't/www/metakeys.html',
+    't/www/nestedElements.html',
+    't/www/popup.html',
+    't/www/xhtmlTest.html'
+);
+
+notabs_ok($_) foreach @files;
+done_testing;

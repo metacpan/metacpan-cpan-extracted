@@ -1,0 +1,18 @@
+[
+   {
+      "FALSE" : false,
+      "TRUE" : true,
+      "array" : [
+         true,
+         false
+      ]
+   },
+   [
+      {
+         "FALSE" : false,
+         "TRUE" : true
+      },
+      true,
+      false
+   ]
+]

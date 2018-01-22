@@ -2,7 +2,7 @@ use Test::More tests => 7;
 
 use_ok('LWP::UserAgent');
 use_ok('Getopt::Long::Descriptive');
-use_ok('Email::Address');
+use_ok('JSON');
 use_ok( 'List::MoreUtils', qw(uniq) );
 use_ok( 'LWP::Online',     qw(online) );
 use_ok('App::Github::Email');

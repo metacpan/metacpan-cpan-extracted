@@ -1,3 +1,11 @@
+2.16    2018-01-19
+
+- This release is based on version 2018b of the Olson database. This release
+  includes contemporary changes for São Tomé and Príncipe, Brazil, and
+  Ireland. The 2018a was skipped because it was missing a file, but there are
+  no data changes from 2018a to 2018b.
+
+
 2.15    2017-11-04
 
 - Make the local zone lookup code handle the case where /usr/share/zoneinfo is
@@ -6,7 +14,6 @@
 
 
 2.14    2017-10-28
-
 
 - This release is based on version 2017c of the Olson database. This release
   includes contemporary changes for Fiji, Namibia, Northern Cyprus, Sudan,

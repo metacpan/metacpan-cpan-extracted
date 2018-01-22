@@ -36,7 +36,7 @@ mRuby is mruby binding for perl5.
 
 Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF@ GMAIL COM>
 
-karupanerura &lt;karupa@cpan.org>
+karupanerura <karupa@cpan.org>
 
 # LOW LEVEL API
 

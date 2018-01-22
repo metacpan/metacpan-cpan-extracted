@@ -226,9 +226,12 @@ dbixcsl_common_tests->new(
                 )
             },
             q{
+                CREATE TYPE "dbicsl.test".pg_loader_test_enum2 AS ENUM ('wibble','wobble')
+            },
+            q{
                 CREATE TABLE "dbicsl.test".pg_loader_test7 (
                     id SERIAL PRIMARY KEY,
-                    value VARCHAR(100),
+                    value "dbicsl.test".pg_loader_test_enum2,
                     six_id INTEGER UNIQUE REFERENCES "dbicsl.test".pg_loader_test6 (id)
                 )
             },
@@ -294,7 +297,7 @@ dbixcsl_common_tests->new(
             'DROP VIEW pg_loader_test11',
         ],
         drop  => [ qw/pg_loader_test1 pg_loader_test2 pg_loader_test9 pg_loader_test10 pg_loader_test12/ ],
-        count => 11 + 30 * 2,   # regular + multi-schema * 2
+        count => 11 + 33 * 2,   # regular + multi-schema * 2
         run   => sub {
             my ($schema, $monikers, $classes) = @_;
 
@@ -454,6 +457,13 @@ dbixcsl_common_tests->new(
 
                 lives_and {
                     ok $rsrc = $test_schema->source('PgLoaderTest7');
+                    my $col_info = $rsrc->column_info('value');
+                    is $col_info->{data_type}, 'enum',
+                        'enum column in schema name with dot';
+                    is $col_info->{extra}{custom_type_name}, '"dbicsl.test".pg_loader_test_enum2',
+                        'original data type for enum in schema name with dot';
+                    is_deeply $col_info->{extra}{list}, [qw(wibble wobble)],
+                        'value list for for enum in schema name with dot';
                 } 'got source for table in schema name with dot';
 
                 %uniqs = try { $rsrc->unique_constraints };

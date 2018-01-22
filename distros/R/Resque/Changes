@@ -1,3 +1,8 @@
+0.35      2018-01-18 14:10:34+01:00 Europe/Madrid
+
+    - Allow graceful shutdown in "cant fork mode" (meru-akimbo)
+    - Stop being repetitive when working on verbose mode
+
 0.34      2017-06-03 12:58:24+02:00 Europe/Madrid
 
     - Fixed small bits of CLI docs

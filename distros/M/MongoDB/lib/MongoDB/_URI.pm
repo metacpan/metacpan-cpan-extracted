@@ -19,7 +19,7 @@ use warnings;
 package MongoDB::_URI;
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Moo;
 use MongoDB::Error;

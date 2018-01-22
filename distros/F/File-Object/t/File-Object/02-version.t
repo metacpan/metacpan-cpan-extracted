@@ -8,4 +8,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($File::Object::VERSION, 0.1, 'Version.');
+is($File::Object::VERSION, 0.11, 'Version.');

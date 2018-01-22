@@ -2,20 +2,20 @@
 
 ### code_after_shebang
 # Note: This script is a CLI  for Riap function /App/genpw/genpw
-# and generated automatically using Perinci::CmdLine::Gen version 0.483
+# and generated automatically using Perinci::CmdLine::Gen version 0.482
 
-# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw.conf","env_name":"GENPW_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw","script_summary":null,"script_version":"0.002","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/genpw","use_cleanser":1,"use_utf8":1,"validate_args":1}
+# PERICMD_INLINE_SCRIPT: {"code_after_shebang":"...","config_dirs":null,"config_filename":"genpw.conf","env_name":"GENPW_OPT","include":null,"log":null,"pack_deps":1,"pod":0,"read_config":1,"read_env":1,"script_name":"genpw","script_summary":null,"script_version":"0.003","shebang":"perl","skip_format":0,"subcommands":null,"url":"/App/genpw/genpw","use_cleanser":1,"use_utf8":1,"validate_args":1}
 
-my $_pci_metas = {""=>{args=>{case=>{default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},len=>{cmdline_aliases=>{l=>{}},schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this exact length"},max_len=>{schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this maximum length"},min_len=>{schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this minimum length"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"}},description=>"\nThis is yet another utility to generate random password. Features:\n\n* Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric\n  characters followed by a symbol.\n* Use strong random source (<pm:Math::Random::Secure>) when available, otherwise\n  fallback to Perl's builtin `rand()`.\n\n",examples=>[],result=>{},summary=>"Generate random password",v=>1.1}};
+my $_pci_metas = {""=>{args=>{case=>{default=>"default",description=>"\n`default` means to not change case. `random` changes casing some letters\nrandomly to lower-/uppercase. `lower` forces lower case. `upper` forces\nUPPER CASE. `title` forces Title case.\n\n",schema=>["str",{in=>["default","random","lower","upper","title"],req=>1},{}],summary=>"Force casing"},len=>{cmdline_aliases=>{l=>{}},schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this exact length"},max_len=>{schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this maximum length"},min_len=>{schema=>["posint",{req=>1},{}],summary=>"If no pattern is supplied, will generate random alphanum characters with this minimum length"},num=>{cmdline_aliases=>{n=>{}},default=>1,pos=>0,schema=>["int",{min=>1,req=>1},{}]},patterns=>{cmdline_aliases=>{p=>{}},description=>"\nA pattern is string that is similar to a printf pattern. %P (where P is certain\nletter signifying a format) will be replaced with some other string. %Nw (where\nN is a number) will be replaced by a word of length N, %N\$MP (where N and M is a\nnumber) will be replaced by a word of length between N and M. Anything else will\nbe used as-is. Available conversions:\n\n    %l   Random Latin letter (A-Z, a-z)\n    %d   Random digit (0-9)\n    %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)\n    %s   Random ASCII symbol, e.g. \"-\" (dash), \"_\" (underscore), etc.\n    %x   Random letter/digit/ASCII symbol (combination of %a and %s)\n    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)\n    %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)\n    %%   A literal percent sign\n    %w   Random word\n\n",schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"Pattern(s) to use","x.name.is_plural"=>1,"x.name.singular"=>"pattern"}},description=>"\nThis is yet another utility to generate random password. Features:\n\n* Allow specifying pattern(s), e.g. '%8a%s' means 8 random alphanumeric\n  characters followed by a symbol.\n* Use strong random source (<pm:Math::Random::Secure>) when available, otherwise\n  fallback to Perl's builtin `rand()`.\n\n",examples=>[],result=>{},summary=>"Generate random password",v=>1.1}};
 
-# This script is generated by Perinci::CmdLine::Inline version 0.541 on Tue Jan  9 22:36:38 2018.
+# This script is generated by Perinci::CmdLine::Inline version 0.541 on Tue Jan 16 16:06:53 2018.
 
 # Rinci metadata taken from these modules: App::genpw (no version)
 
 # You probably should not manually edit this file.
 
-our $DATE = '2018-01-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '0.003'; # VERSION
 # PODNAME: genpw
 # ABSTRACT: Generate random password
 
@@ -137,7 +137,7 @@ my $go_spec1 = {
     'no-config' => sub { $_pci_r->{read_config} = 0; },
     'no-env' => sub { $_pci_r->{read_env} = 0; },
     'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
-    'version|v' => sub { no warnings 'once'; require App::genpw; print "genpw version ", "0.002", ($App::genpw::DATE ? " ($App::genpw::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.541 (2017-08-16)\n"; exit 0 },
+    'version|v' => sub { no warnings 'once'; require App::genpw; print "genpw version ", "0.003", ($App::genpw::DATE ? " ($App::genpw::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.541 (2017-08-16)\n"; exit 0 },
 };
 my $go_spec2 = {
     'case=s' => sub {         $_pci_args{'case'} = $_[1];
@@ -276,7 +276,7 @@ genpw - Generate random password
 
 =head1 VERSION
 
-This document describes version 0.002 of main (from Perl distribution App-genpw), released on 2018-01-09.
+This document describes version 0.003 of main (from Perl distribution App-genpw), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -356,6 +356,8 @@ be used as-is. Available conversions:
     %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
     %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
     %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+    %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
+    %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
     %%   A literal percent sign
     %w   Random word
 

@@ -3,7 +3,7 @@
 ##
 ##    Typemap for Term::TtyWrite objects
 ##
-##    Copyright (c) 2016 Jeremy Mates
+##    Copyright (c) 2016,2018 Jeremy Mates
 ##    All rights reserved.
 ##
 ##    This typemap is designed specifically to make it easier to handle

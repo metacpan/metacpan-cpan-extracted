@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 use Carp;
 
@@ -108,10 +108,9 @@ implementation. Some things will randomly break. While it seems stable enough
 for small-scale development and experimental testing, don't expect to be able
 to use this module reliably in production yet.
 
-=head2 Things That Work Already
+=head2 Things That Work
 
-Most simple cases involving awaiting on still-pending futures should be
-working:
+Most cases involving awaiting on still-pending futures should work fine:
 
    async sub foo
    {
@@ -148,6 +147,13 @@ working:
       foreach my $var ( THINGs ) {
          await func();
       }
+   }
+
+   async sub quux
+   {
+      my $x = do {
+         await func();
+      };
    }
 
    async sub splat
@@ -240,6 +246,19 @@ As of C<Future::AsyncAwait> version 0.10 and L<Syntax::Keyword::Try> version
 inside an C<async sub> work correctly, including those that attempt to
 C<return> from inside C<try>.
 
+   use Syntax::Keyword::Try;
+
+   async sub attempt
+   {
+      try {
+         await func();
+         return "success";
+      }
+      catch {
+         return "failed";
+      }
+   }
+
 =cut
 
 sub import
@@ -271,7 +290,7 @@ sub import_into
 
 "Awaiting The Future" - TPC in Amsterdam 2017
 
-L<(slides)|https://docs.google.com/presentation/d/13x5l8Rohv_RjWJ0OTvbsWMXKoNEWREZ4GfKHVykqUvc/edit#slide=id.p>
+L<https://www.youtube.com/watch?v=Xf7rStpNaT0> L<(slides)|https://docs.google.com/presentation/d/13x5l8Rohv_RjWJ0OTvbsWMXKoNEWREZ4GfKHVykqUvc/edit#slide=id.p>
 
 =back
 
@@ -297,9 +316,15 @@ Clean up the implementation; check for and fix memory leaks.
 
 =item *
 
-Support older versions of perl than 5.24.
+Support older versions of perl than 5.18.
 
 L<https://rt.cpan.org/Ticket/Display.html?id=122252>
+
+=item *
+
+Support sub signatures in recent perls.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=123465>
 
 =back
 

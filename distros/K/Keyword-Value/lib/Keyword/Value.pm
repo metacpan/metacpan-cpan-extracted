@@ -1,7 +1,7 @@
 ########################################################################
 # housekeeping
 ########################################################################
-package Keyword::Value v0.1.1;
+package Keyword::Value v0.1.2;
 use v5.22;
 
 use Keyword::Declare;
@@ -96,6 +96,7 @@ Keyword::Value -- assign a constant to a variable or symbol.
     # about modifying a read-only value, disallowed key,
     # readonly offset, or readonly key.
 
+
     sub foo
     {
         # return a constant value to the caller.
@@ -103,8 +104,25 @@ Keyword::Value -- assign a constant to a variable or symbol.
         value sha256 @_
     }
 
-    # carp if the constant value is undef.
+    # carp if the constant value is undef since that
+    # usually indicates an error.
 
+    $ VERBOSE_KEYWORD_VALUE=1 someprog;
+
+
+    #!/bin/env perl
+    ...
+
+    sub blah
+    {
+        # restrict carp to one call-tree in order to 
+        # trace where the undef comes from.
+        
+        local $ENV{ VERBOSE_KEYWORD_VALUE } = 1;
+
+        ...
+    }
+   
     $ENV{ VERBOSE_KEYWORD_VALUE } = 1;
 
 =head1 DESCRIPTION
@@ -114,6 +132,12 @@ constant-valued varabies in Perl5. The "value" keyword can be applied
 to simple scalars, nested structures such as arrays or hashes, or 
 the return value of subroutine calls.
 
+The normal use case will be avoiding modification to values that 
+percolate through multiple levels of code or when tracking down 
+errors due to accidentally-modified variables.
+
+My aproach here is to use Data::Lock and an lvalue function to 
+modify $_[0] on the stack, which locks the referenced variable.
 
 =head1 SEE ALSO
 

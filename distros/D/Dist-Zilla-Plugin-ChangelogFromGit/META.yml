@@ -3,35 +3,36 @@ abstract: "Write a Changes file from a project's git log."
 author:
   - 'Rocco Caputo <rcaputo@cpan.org>'
 build_requires:
-  Carp: '1.26'
-  Scalar::Util: '1.39'
-  Test::More: '1.001002'
+  Carp: '0'
+  Scalar::Util: '0'
+  Test::More: '0.94'
   perl: '5.004'
   strict: '0'
   warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-Plugin-ChangelogFromGit
 requires:
-  DateTime: '1.10'
-  DateTime::Infinite: '1.10'
-  Dist::Zilla::File::InMemory: '5.019'
-  Dist::Zilla::Role::FileGatherer: '5.019'
-  Git::Repository::Log::Iterator: '1.311'
-  IPC::Cmd: '0.92'
-  Moose: '2.1005'
-  Moose::Autobox: '0.15'
-  Software::Release: '0.03'
-  Software::Release::Change: '0.03'
-  Text::Wrap: '2009.0305'
+  DateTime: '0'
+  DateTime::Infinite: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Git::Repository::Log::Iterator: '0'
+  IPC::Cmd: '0'
+  Moose: '0'
+  Moose::Autobox: '0'
+  Software::Release: '0'
+  Software::Release::Change: '0'
+  Text::Wrap: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ChangelogFromGit
   homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-ChangelogFromGit/
   repository: git://github.com/rcaputo/dzp-changelogfromgit.git
-version: '0.016'
+version: '0.017'
+x_serialization_backend: 'YAML::Tiny version 1.70'

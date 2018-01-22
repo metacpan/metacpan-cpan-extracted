@@ -3,10 +3,6 @@
 
 cPanel::TaskQueue::Processor - Processes an individual task from the cPanel::TaskQueue.
 
-=head1 VERSION
-
-This document describes cPanel::TaskQueue::Processor version 0.700.
-
 =head1 SYNOPSIS
 
     package NewTask;

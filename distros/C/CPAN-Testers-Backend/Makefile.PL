@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Metabase::User::Profile" => 0,
     "Minion" => 8,
     "Minion::Backend::SQLite" => 0,
-    "Minion::Backend::mysql" => "0.11",
+    "Minion::Backend::mysql" => "0.12",
     "Sereal" => 0
   },
   "TEST_REQUIRES" => {
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t t/migrate/*.t"
   }
@@ -67,7 +67,7 @@ my %FallbackPrereqs = (
   "Metabase::User::Profile" => 0,
   "Minion" => 8,
   "Minion::Backend::SQLite" => 0,
-  "Minion::Backend::mysql" => "0.11",
+  "Minion::Backend::mysql" => "0.12",
   "Sereal" => 0,
   "Test::More" => "1.001005"
 );

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.03
+    version 1.04
 
 SYNOPSIS
 
@@ -26,7 +26,7 @@ SYNOPSIS
         </root>
         XML
     
-        # get a list of all the people
+        # get the first person
         my $complex_spec = {
             'http://def' => 'k',
             '/root/person' => {
@@ -43,12 +43,12 @@ SYNOPSIS
         # Prints:
         # 1: Lucas
     
-        # get a list of all the people
+        # get a array of all the people
         my $complex_spec = {
             'http://def' => 'k',
             '/root/person' => {
                 name => 'people',
-                type => 'list',
+                type => 'array',
                 spec => {
                     '' => 'name',
                     '/@id' => 'id'

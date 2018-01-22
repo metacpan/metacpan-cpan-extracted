@@ -6,8 +6,11 @@ Text::CaboCha::Chunk - CaboCha Chunk Object
 
 =head1 SYNOPSIS
 
+    use utf8;
+    use Encode;
     use Text::CaboCha;
     my $cabocha = Text::CaboCha->new();
+    my $text = encode(Text::CaboCha::ENCODING, "太郎は次郎が持っている本を花子に渡した。");
     my $tree = $cabocha->parse($text);
 
     my $token_size = $tree->token_size;

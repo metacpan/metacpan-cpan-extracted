@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 # PODNAME: subsonic_sync_starred.pl
 # ABSTRACT: Download and/or sync starred media to a target directory
 use strict;
@@ -20,6 +20,7 @@ my ($opt,$usage) = describe_options('%c - %o <target_directory>',
         { default => "$ENV{HOME}/.subsonic_password", callback => { 'must be a valid file' => sub { -f $_[0] } } }
     ],
     ["insecure|http",     "Use Insecure HTTP for communication"],
+    ['api-version:s',     "Specify the API Version, defaults to using the WWW::Subsonic default."],
     [],
     ["Media Directories"],
     ["local-media-dir|local|l:s", "Local directory which might contain media files we can sync."],
@@ -58,6 +59,7 @@ my $subsonic = WWW::Subsonic->new(
     username => $opt->username,
     password => $password,
 	protocol => $opt->insecure ? 'http' : 'https',
+    $opt->api_version ? ( api_version => $opt->api_version ) : (),
 );
 
 # This is where we'll store information
@@ -156,7 +158,7 @@ subsonic_sync_starred.pl - Download and/or sync starred media to a target direct
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

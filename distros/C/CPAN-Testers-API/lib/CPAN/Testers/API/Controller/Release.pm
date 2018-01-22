@@ -1,5 +1,5 @@
 package CPAN::Testers::API::Controller::Release;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: API for test reports collected by CPAN release
 
 #pod =head1 DESCRIPTION
@@ -153,7 +153,7 @@ CPAN::Testers::API::Controller::Release - API for test reports collected by CPAN
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

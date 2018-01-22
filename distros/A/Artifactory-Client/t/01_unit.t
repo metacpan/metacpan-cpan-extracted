@@ -2525,6 +2525,15 @@ subtest 'calculate_bower_index', sub {
     is( $resp->code, 200, 'request succeeded' );
 };
 
+subtest 'calculate_helm_chart_index', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->calculate_helm_chart_index();
+    is( $resp->code, 200, 'request succeeded' );
+};
+
 subtest 'system_info', sub {
     my $client = setup();
     local *{'LWP::UserAgent::get'} = sub {
@@ -2808,30 +2817,6 @@ subtest 'get_reverse_proxy_snippet', sub {
     };
     my $resp = $client->get_reverse_proxy_snippet();
     is( $resp->code, 200, 'request succeeded' );
-};
-
-subtest 'create_bootstrap_bundle', sub {
-    my $client = setup();
-
-    local *{'LWP::UserAgent::post'} = sub {
-        return bless(
-            {
-                '_request' => bless(
-                    {
-                        '_uri' => bless(
-                            do { \( my $o = "http://example.com:7777/artifactory/api/system/bootstrap_bundle" ) },
-                            'URI::http'
-                        ),
-                    },
-                    'HTTP::Request'
-                )
-            },
-            'HTTP::Response'
-        );
-    };
-    my $resp            = $client->create_bootstrap_bundle('/opt/jfrog/artifactory/etc/bootstrap.bundle.tar.gz');
-    my $url_in_response = $resp->request->uri;
-    like( $url_in_response, qr|/api/system/bootstrap_bundle|, 'requsted URL looks sane' );
 };
 
 subtest 'execute_plugin_code', sub {

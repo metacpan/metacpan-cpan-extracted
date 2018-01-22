@@ -1,0 +1,58 @@
+Usage:
+        ndproc [OPTIONS] <arguments>
+
+Options:
+    --builtin-format <""|JSON>
+        Format for builtin things (--builtin-rules, --embed-rules). Raw
+        structure will be used if omitted or empty.
+
+    --builtin-rules <path>
+        Use builtin (in processed object) rules.
+
+    --disable-module <modname>
+        Skip (don't process) rules for specified module. May be used several
+        times.
+
+    --dump-blame <file>
+        Dump blame to file.
+
+    --dump-rules <file>
+        Dump rules to file.
+
+    --embed-blame <path>
+        Embed blame into processed structure, using provided path.
+
+    --embed-rules <path>
+        Embed used rules into processed structure, using provided path.
+
+    --help|-h
+        Print a help message and exit.
+
+    --ifmt <JSON|YAML>
+        Force specified input format usage. Automatically choosed (using
+        file extension) if omitted.
+
+    --list-modules|-l
+        List available modules.
+
+    --module|-m <name>
+        Process structure using specified module.
+
+    --rules <file>
+        Load rules from specified file. May be used several times.
+
+    --verbose|-v [int]
+        Increase verbosity, max level - 4.
+
+    --version|-V
+        Print version and exit.
+
+Examples:
+    Simply merge three files using module 'Merge':
+
+        ndproc --module Merge a.json --source b.json --source c.json
+
+    Print usage for 'Merge' module:
+
+        ndproc --module Merge --help
+

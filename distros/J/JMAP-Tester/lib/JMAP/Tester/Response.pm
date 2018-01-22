@@ -2,7 +2,7 @@ use v5.10.0;
 
 package JMAP::Tester::Response;
 # ABSTRACT: what you get in reply to a succesful JMAP request
-$JMAP::Tester::Response::VERSION = '0.016';
+$JMAP::Tester::Response::VERSION = '0.017';
 use Moo;
 with 'JMAP::Tester::Role::SentenceCollection', 'JMAP::Tester::Role::Result';
 
@@ -30,6 +30,10 @@ has items => (
   required => 1,
 );
 
+has wrapper_properties => (
+  is       => 'ro',
+);
+
 sub items { @{ $_[0]->_items } }
 
 sub add_items {
@@ -54,7 +58,7 @@ JMAP::Tester::Response - what you get in reply to a succesful JMAP request
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 OVERVIEW
 

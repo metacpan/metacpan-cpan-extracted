@@ -1,5 +1,5 @@
 package Net::Twitter::OAuth;
-$Net::Twitter::OAuth::VERSION = '4.01042';
+$Net::Twitter::OAuth::VERSION = '4.01043';
 use Moose;
 
 extends  'Net::Twitter::Core';
@@ -19,7 +19,7 @@ Net::Twitter::OAuth - Net::Twitter with 'Legacy' and 'OAuth' roles for backwards
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

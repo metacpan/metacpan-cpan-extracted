@@ -1,5 +1,5 @@
 package Net::Twitter::Role::AppAuth;
-$Net::Twitter::Role::AppAuth::VERSION = '4.01042';
+$Net::Twitter::Role::AppAuth::VERSION = '4.01043';
 use Moose::Role;
 use Carp::Clan   qw/^(?:Net::Twitter|Moose|Class::MOP)/;
 use HTTP::Request::Common qw/POST/;
@@ -119,7 +119,7 @@ Net::Twitter::Role::AppAuth - OAuth2 Application Only Authentication
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

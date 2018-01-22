@@ -1,3 +1,10 @@
+1.020   2018-01-15 (PERLANCAR)
+
+	- lcpanm, lcpanm-script: Observe LCPANM_PERL5OPT.
+
+        - Switch from Log::Any to Log::ger.
+
+
 1.019   2017-06-19 (PERLANCAR)
 
         - No functional changes.

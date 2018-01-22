@@ -1,0 +1,95 @@
+#!perl
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint command=_cpanm
+
+our $DATE = '2018-01-15'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+use File::Which;
+
+my $lcpanm_path = which("lcpanm") or die "Can't find lcpanm in PATH\n";
+
+$ENV{LCPANM_PERL5OPT} = join(
+    " ",
+    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::RunShcompgen=-warn_target_loaded;0",
+    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::UseURIFromFoundMirror=-warn_target_loaded;0",
+    (defined $ENV{LCPANM_PERL5OPT} ? ($ENV{LCPANM_PERL5OPT}) : ()),
+);
+
+my @cmd = (
+    $lcpanm_path,
+    @ARGV,
+);
+
+print "lcpanm-perlancar: exec: ".join(" ", @cmd), "\n" if $ENV{DEBUG};
+exec @cmd;
+
+# ABSTRACT: Install modules from local CPAN (PERLANCAR's flavor)
+# PODNAME: lcpanm-perlancar
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lcpanm-perlancar - Install modules from local CPAN (PERLANCAR's flavor)
+
+=head1 VERSION
+
+This document describes version 0.002 of lcpanm-perlancar (from Perl distribution App-cpanm-perlancar), released on 2018-01-15.
+
+=head1 SYNOPSIS
+
+Use like you would use L<lcpanm>:
+
+ % lcpanm-perlancar -n Some::Module ...
+
+To alias it as C<lcpanm> in your shell, e.g. in bash:
+
+ alias lcpanm=lcpanm-perlancar
+
+=head1 DESCRIPTION
+
+L<lcpanm-perlancar> is a wrapper over L<lcpanm>. It runs lcpanm patched with
+some patches (see the source for more details).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-perlancar>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-perlancar>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-perlancar>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<lcpanm>
+
+L<cpanm>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

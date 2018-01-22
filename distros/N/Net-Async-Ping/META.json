@@ -31,6 +31,7 @@
             "IO::Async" : "0.61",
             "Module::Runtime" : "0",
             "Moo" : "1",
+            "Net::Frame::Layer::ICMPv4" : "1.05",
             "Net::Frame::Layer::ICMPv6" : "1.1",
             "Net::Frame::Layer::IPv6" : "1.08",
             "Net::Frame::Simple" : "1.09",
@@ -59,7 +60,7 @@
          "web" : "https://github.com/frioux/Net-Async-Ping"
       }
    },
-   "version" : "0.003001",
+   "version" : "0.003003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

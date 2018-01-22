@@ -3,7 +3,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps::Assign
 use Moose::Role;
 
 use Memoize;
-use List::MoreUtils qw(first_index indexes uniq);
+use List::MoreUtils 0.428 qw(first_index indexes uniq);
 use List::Util qw(first);
 
 =head3 update_job_scheduler_ids_by_task

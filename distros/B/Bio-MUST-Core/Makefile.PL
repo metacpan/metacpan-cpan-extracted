@@ -58,7 +58,6 @@ my %WriteMakefileArgs = (
     "Exporter::Easy" => 0,
     "File::Basename" => 0,
     "File::Find::Rule" => 0,
-    "File::HomeDir" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
     "Getopt::Euclid" => 0,
@@ -95,10 +94,9 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Deep" => 0,
-    "Test::Most" => 0
+    "Test::Deep" => 0
   },
-  "VERSION" => "0.180140",
+  "VERSION" => "0.180190",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,7 +115,6 @@ my %FallbackPrereqs = (
   "Exporter::Easy" => 0,
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
-  "File::HomeDir" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Getopt::Euclid" => 0,

@@ -120,15 +120,13 @@ sub _read_body ( $self, $h, $env, $cb ) {
     if ( $self->{client_body_timeout} ) {
         $h->rtimeout_reset;
         $h->rtimeout( $self->{client_body_timeout} );
-        $h->on_rtimeout(
-            sub ($h) {
+        $h->on_rtimeout( sub ($h) {
 
-                # client body read timeout
-                $self->return_xxx( $h, 408 );
+            # client body read timeout
+            $self->return_xxx( $h, 408 );
 
-                return;
-            }
-        );
+            return;
+        } );
     }
 
     $h->read_http_body(
@@ -194,88 +192,84 @@ sub wait_headers ( $self, $h ) {
     # set keepalive timeout
     $h->rtimeout( $self->{keepalive_timeout} || $self->{client_header_timeout} );
 
-    $h->on_read(
-        sub {
+    $h->on_read( sub {
 
-            # clear on_read callback
-            $h->on_read(undef);
+        # clear on_read callback
+        $h->on_read(undef);
 
-            # set client header timeout
-            if ( $self->{client_header_timeout} ) {
-                $h->rtimeout_reset;
-                $h->rtimeout( $self->{client_header_timeout} );
-                $h->on_rtimeout(
-                    sub ($h) {
+        # set client header timeout
+        if ( $self->{client_header_timeout} ) {
+            $h->rtimeout_reset;
+            $h->rtimeout( $self->{client_header_timeout} );
+            $h->on_rtimeout( sub ($h) {
 
-                        # client header read timeout
-                        $self->return_xxx( $h, 408 );
+                # client header read timeout
+                $self->return_xxx( $h, 408 );
 
-                        return;
-                    }
-                );
-            }
-            else {
-
-                # clear keepalive timeout
-                $h->rtimeout(undef);
-            }
-
-            # read HTTP headers
-            $h->read_http_req_headers(
-                sub ( $h1, $env, $error_reason ) {
-                    if ($error_reason) {
-
-                        # HTTP headers parsing error, request is invalid
-                        # return standard error response and destroy the handle
-                        # 400 - Bad Request
-                        $self->return_xxx( $h, 400 );
-                    }
-                    else {
-
-                        # clear client header timeout
-                        $h->rtimeout(undef);
-
-                        # add default psgi env keys
-                        $env->@{ keys $PSGI_ENV->%* } = values $PSGI_ENV->%*;
-
-                        # read HTTP body
-                        $self->_read_body(
-                            $h, $env,
-                            sub ($body_error_status) {
-                                if ($body_error_status) {
-
-                                    # body read error
-                                    $self->return_xxx( $h, $body_error_status );
-                                }
-                                else {
-
-                                    # create request object
-                                    my $req = bless {
-                                        _server          => $self,
-                                        _h               => $h,
-                                        env              => $env,
-                                        _response_status => 0,
-                                      },
-                                      'Pcore::HTTP::Server::Request';
-
-                                    # evaluate application
-                                    eval { $self->{app}->($req); 1; } or do {
-                                        $@->sendlog if $@;
-                                    };
-                                }
-
-                                return;
-                            }
-                        );
-                    }
-
-                    return;
-                }
-            );
-
-            return;
+                return;
+            } );
         }
-    );
+        else {
+
+            # clear keepalive timeout
+            $h->rtimeout(undef);
+        }
+
+        # read HTTP headers
+        $h->read_http_req_headers(
+            sub ( $h1, $env, $error_reason ) {
+                if ($error_reason) {
+
+                    # HTTP headers parsing error, request is invalid
+                    # return standard error response and destroy the handle
+                    # 400 - Bad Request
+                    $self->return_xxx( $h, 400 );
+                }
+                else {
+
+                    # clear client header timeout
+                    $h->rtimeout(undef);
+
+                    # add default psgi env keys
+                    $env->@{ keys $PSGI_ENV->%* } = values $PSGI_ENV->%*;
+
+                    # read HTTP body
+                    $self->_read_body(
+                        $h, $env,
+                        sub ($body_error_status) {
+                            if ($body_error_status) {
+
+                                # body read error
+                                $self->return_xxx( $h, $body_error_status );
+                            }
+                            else {
+
+                                # create request object
+                                my $req = bless {
+                                    _server          => $self,
+                                    _h               => $h,
+                                    env              => $env,
+                                    _response_status => 0,
+                                  },
+                                  'Pcore::HTTP::Server::Request';
+
+                                # evaluate application
+                                eval { $self->{app}->($req); 1; } or do {
+                                    $@->sendlog if $@;
+                                };
+                            }
+
+                            return;
+                        }
+                    );
+                }
+
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }

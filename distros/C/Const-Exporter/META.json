@@ -1,0 +1,94 @@
+{
+   "abstract" : "Declare constants for export.",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Const-Exporter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Package::Stash::XS" : "0",
+            "Ref::Util::XS" : "0",
+            "Storable" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Const::Fast" : "0",
+            "Exporter" : "0",
+            "Package::Stash" : "0",
+            "Ref::Util" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "Hash::Objectify" : "0",
+            "Module::Metadata" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "if" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Const::Exporter" : {
+         "file" : "lib/Const/Exporter.pm",
+         "version" : "v0.3.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Const-Exporter/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Const-Exporter.git",
+         "web" : "https://github.com/robrwo/Const-Exporter"
+      }
+   },
+   "version" : "v0.3.1",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "B. Estrade <estrabd@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

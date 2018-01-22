@@ -1,3 +1,9 @@
+0.11 2018-01-22T11:56:21+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Update Module::Install to 1.18 version.
+ - Update author name.
+ - Update copyright years.
+
 0.10 2016-01-04T12:26:18+01:00
  - Add Path::Class to SEE ALSO section in doc.
  - Add SEE ALSO section to doc.

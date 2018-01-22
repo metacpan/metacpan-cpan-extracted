@@ -1,55 +1,46 @@
 SINCE VERSION | TBD VERSION | COMMENT
-    -- next --
-    -- backlog --
-0.18    0.20    API neaf prefix => '/path', $req->prefix to fetch, pop on run()
-0.17    0.20    MOD Add JSON body support w/form validation - pre-logic
-0.18    0.20    TPL pre_content TT-helper - populate title, root, etc
-0.17    0.20    TPL Predefined header/footer to spare user of boilerplate
-0.17    0.20    TPL More robust options for TPL view
-0.17    0.20    MOD Add well-known regexes from Regexp::Common to default Form
-0.16    0.20    MOD Oauth2 example/helper
-0.16    0.20    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
-0.16    0.20    TPL view default directory layout (./tpl or smth)
-0.19    0.20    API upload_utf8 with auto-decode
-0.19    0.30    API multiple uploads in some way
-0.19    0.30    MOD In-memory static files
-0.19    0.30    API Add any() analogue (method = '*'?)
-0.19    0.30    API Generate a catalog of public resources
-0.19    0.30    MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that
-0.19    0.30    API BREAK rename script_name, path_info => smth reasonable
-0.18    0.30    TPL variables -> js module for TT
-0.18    0.30    API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
-0.17    0.30    API Better and more robust exception handling
-0.18    0.30    NET deprecate apache backend
-0.18    0.30    TST rename all tests according to README
-0.13    0.30    TPL Add XSLate support
-0.16    0.30    API Add -charset for content encoding
-0.14    0.30    DEV iterate through get_routes w/callback
+    -- next version --
+    -- todo --
+0.19    0.25    API BREAK rename script_name, path_info => smth reasonable
+0.18    0.25    NET deprecate apache backend
+0.20    0.25    API body_json( validator ) - die 422 is !json || val fails
+0.17    0.25    TPL Predefined header/footer to spare user of boilerplate
+0.18    0.25    TPL variables -> js module for TT
+0.20    0.30    MOD Add json schema support to forms
+0.19    0.30    MOD Add clusterisation to wildcard form (thx @akuklev)
+0.16    0.30    MOD Oauth2 example/helper
+0.16    0.30    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
+0.19    0.30    API multiple uploads under same name, wildcard uploads
+0.14    0.30    API Add named forms to route defn JFYI
 0.13    0.30    MOD static: X-Accel-Redirect (@cono)
 0.16    0.30    API Param strict mode - die 422 if bad params
-0.17    0.30    MOD Add DSL sugar for forms
 0.12    0.30    MOD static file_regex, dir_regex
-0.09    0.30    MOD Add form defaults populating BOTH raw and data
-0.02    0.30    DOC HOWTO add dumper to TT view (pre-render)
-0.17    0.30    MOD form->data_hash instead of %{ form->data }
-0.07    0.30    MOD Add "cleanup" method to X::Session - for offline cleanups
-0.19    0.40    COR Anyevent support - start -continue sep. from pre-cleanup
+0.20    0.30    TPL Add default favicon for neaf
+    -- backlog --
+0.19    0.40    API Generate a catalog of public resources on 404
+0.19    0.40    REF Use Digest::SHA3 everywhere (thx @akuklev)
+0.19    0.40    MOD Session::Redis
+0.13    0.40    TPL Add XSLate support
+0.18    0.40    API neaf prefix => '/path', $req->prefix to fetch, pop on run()
+0.09    0.40    MOD Add form defaults populating BOTH raw and data
+0.02    0.40    DOC HOWTO add dumper to TT view (pre-render)
+0.17    0.40    MOD form->data_hash instead of %{ form->data }
+0.07    0.40    MOD Add "cleanup" method to X::Session - for offline cleanups
+0.19    0.40    COR Anyevent support - separate postponed actions
+0.17    0.40    MOD Add well-known regexes from Regexp::Common to default Form
 0.18    0.40    DEV last source file, complain if no run() at EOF
-0.10    0.40    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
 0.16    0.40    MOD rewrite performance stats
-0.08    0.40    API Add Req alias methods for -dashed -return -keys
-0.08    0.40    API Req->reply to return immediately
-0.13    0.90    NET Add FastCGI support
+0.18    0.40    API body_content() or smth - decoded as Content-Type suggests (ned accept_body => [ ... ])
+0.16    0.90    API Add -charset for content encoding
+0.10    0.90    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
 0.04    0.90    REF Req https detection: change to is_secure? http:https.
 0.06    0.90    NET POST/PUT request HMAC via HTTP header
 0.07    0.90    API Periodic actions in webapp
 0.04    0.90    DEV CGI wrapper: use wrapper; route(/) {...}; run();
 0.01    0.99    DEV REPL - term::readline + neaf->run_test
-
-    -- think --
-0.18    0.20    MOD api module: neaf crude => '/path' => $object; get /foo =>'method'
-0.14    0.30    API Add forms to route defn (how? named? array?)
-0.14    0.90    NET Generate schema from app conf (@cono)
+    -- think more --
+0.18    0.30    MOD api module: neaf crude => '/path' => $object; get /foo =>'method'
 0.05    0.90    API Add ability to deploy existing app under unoccupied path
 0.06    0.90    TPL TT View - prepend configurable path to ALL links (mason)
+0.19    0.30    MOD Deprecate form( { ... } ) in favor of form( rules => { ... } ) as we already have a shortened syntax for that
 

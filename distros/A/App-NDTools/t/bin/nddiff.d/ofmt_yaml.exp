@@ -1,0 +1,15 @@
+---
+D:
+  files:
+    D:
+      /etc/cron.d/beta:
+        A: '* * * * * root sleep 5'
+      /etc/hostname:
+        N: beta
+        O: alpha
+  fqdn:
+    N: beta.example.org
+    O: alpha.example.org
+  mtime:
+    N: 1462431002
+    O: 1462431001

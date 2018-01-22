@@ -2,18 +2,44 @@
 
 use strict;
 use warnings;
-BEGIN {
-    if (($^O ne 'MSWin32' && $^O ne 'darwin')) {
-		require Test::NeedsDisplay;
-		Test::NeedsDisplay->import();
-	}
-}
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 127;
+use Test::More tests => 152;
 use Firefox::Marionette();
 
 umask 0;
+my $binary = 'firefox';
+if ( $^O eq 'MSWin32' ) {
+    my $program_files_key;
+    foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
+        if ( $ENV{$possible} ) {
+            $program_files_key = $possible;
+            last;
+        }
+    }
+    $binary = File::Spec->catfile(
+        $ENV{$program_files_key},
+        'Mozilla Firefox',
+        'firefox.exe'
+    );
+}
+elsif ( $^O eq 'darwin' ) {
+    $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
+}
+my $version_string = `"$binary" -version`;
+diag("Version is $version_string");
+my $count = 0;
+foreach my $name (Firefox::Marionette::Profile->names()) {
+	my $profile = Firefox::Marionette::Profile->existing($name);
+	$count += 1;
+}
+ok(1, "Read $count existing profiles");
+diag("This firefox installation has $count existing profiles");
+my $profile;
+eval {
+	$profile = Firefox::Marionette::Profile->existing();
+};
+ok(1, "Read existing profile if any");
 my $firefox;
 eval {
 	$firefox = Firefox::Marionette->new(firefox_binary => '/firefox/is/not/here');
@@ -21,11 +47,15 @@ eval {
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with an incorrect path to a binary:$@");
 eval {
-	$firefox = Firefox::Marionette->new(firefox_binary => '/bin/ls');
+	$firefox = Firefox::Marionette->new(firefox_binary => $^X);
 };
 chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with a path to a non firefox binary:$@");
-ok($firefox = Firefox::Marionette->new(), "Firefox has started in Marionette mode");
+ok($firefox = Firefox::Marionette->new(debug => 1), "Firefox has started in Marionette mode");
+my $capabilities = $firefox->capabilities();
+diag("Browser version is " . $capabilities->browser_version());
+diag("Operating System is " . $capabilities->platform_name() . q[ ] . $capabilities->platform_version());
+diag("Profile Directory is " . $capabilities->moz_profile());
 ok($firefox->application_type(), "\$firefox->application_type() returns " . $firefox->application_type());
 ok($firefox->marionette_protocol(), "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
 ok($firefox->window_type() eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':" . $firefox->window_type());
@@ -41,8 +71,8 @@ ok($old->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $old->width());
 ok($old->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $old->height());
 ok($old->state() =~ /^\w+$/, "Window has a state of " . $old->state());
 my $rect = $firefox->window_rect();
-ok($rect->pos_x() =~ /^\d+([.]\d+)?$/, "Window has a X position of " . $rect->pos_x());
-ok($rect->pos_y() =~ /^\d+([.]\d+)?$/, "Window has a Y position of " . $rect->pos_y());
+ok($rect->pos_x() =~ /^[-]?\d+([.]\d+)?$/, "Window has a X position of " . $rect->pos_x());
+ok($rect->pos_y() =~ /^[-]?\d+([.]\d+)?$/, "Window has a Y position of " . $rect->pos_y());
 ok($rect->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $rect->width());
 ok($rect->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $rect->height());
 my $page_timeout = 45_043;
@@ -58,10 +88,12 @@ $timeouts = $firefox->timeouts($new);
 ok($timeouts->page_load() == $page_timeout, "\$timeouts->page_load() is $page_timeout");
 ok($timeouts->script() == $script_timeout, "\$timeouts->script() is $script_timeout");
 ok($timeouts->implicit() == $implicit_timeout, "\$timeouts->implicit() is $implicit_timeout");
+ok(not($firefox->script('window.open("https://duckduckgo.com", "duckduckgo");')), "Opening new window to duckduckgo.com via 'window.open' script");
+ok($firefox->close_current_window_handle(), "Closed new tab/window");
 ok($firefox->quit(), "Firefox has closed");
 
 ok($firefox = Firefox::Marionette->new(capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1)), "Firefox has started in Marionette mode with definable capabilities set to known values");
-my $capabilities = $firefox->capabilities();
+$capabilities = $firefox->capabilities();
 ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 ok($capabilities->page_load_strategy() eq 'eager', "\$capabilities->page_load_strategy() is 'eager'");
 ok($capabilities->accept_insecure_certs() == 1, "\$capabilities->accept_insecure_certs() is set to true");
@@ -80,13 +112,43 @@ ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessib
 ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
 ok($firefox->quit(), "Firefox has closed");
 
-ok($firefox = Firefox::Marionette->new(), "Firefox has started in Marionette mode without defined capabilities");
+ok($profile = Firefox::Marionette::Profile->new(), "Firefox::Marionette::Profile->new() correctly returns a new profile");
+ok(((defined $profile->get_value('marionette.port')) && ($profile->get_value('marionette.port') == 0)), "\$profile->get_value('marionette.port') correctly returns 0");
+ok($profile->set_value('browser.link.open_newwindow', 2), "\$profile->set_value('browser.link.open_newwindow', 2) to force new windows to appear");
+ok($firefox = Firefox::Marionette->new(debug => 1, profile => $profile), "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned on");
 ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
 ok($firefox->window_handle() =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $firefox->window_handle());
 ok($firefox->chrome_window_handle() =~ /^\d+$/, "\$firefox->chrome_window_handle() is an integer:" . $firefox->chrome_window_handle());
+ok($firefox->chrome_window_handle() == $firefox->current_chrome_window_handle(), "\$firefox->chrome_window_handle() is equal to \$firefox->current_chrome_window_handle()");
+ok(scalar $firefox->chrome_window_handles() == 1, "There is one window/tab open at the moment");
+ok(scalar $firefox->window_handles() == 1, "There is one actual window open at the moment");
+my ($original_chrome_window_handle) = $firefox->chrome_window_handles();
 foreach my $handle ($firefox->chrome_window_handles()) {
 	ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
 }
+my ($original_window_handle) = $firefox->window_handles();
+foreach my $handle ($firefox->window_handles()) {
+	ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+}
+ok(not($firefox->script('window.open("https://duckduckgo.com", "duckduckgo");')), "Opening new window to duckduckgo.com via 'window.open' script");
+ok(scalar $firefox->chrome_window_handles() == 2, "There are two windows/tabs open at the moment");
+ok(scalar $firefox->window_handles() == 2, "There are two actual windows open at the moment");
+my $new_chrome_window_handle;
+foreach my $handle ($firefox->chrome_window_handles()) {
+	ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+	if ($handle != $original_chrome_window_handle) {
+		$new_chrome_window_handle = $handle;
+	}
+}
+ok($new_chrome_window_handle, "New chrome window handle $new_chrome_window_handle detected");
+my $new_window_handle;
+foreach my $handle ($firefox->window_handles()) {
+	ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+	if ($handle != $original_window_handle) {
+		$new_window_handle = $handle;
+	}
+}
+ok($new_window_handle, "New window handle $new_window_handle detected");
 TODO: {
 	my $screen_orientation = q[];
 	eval {
@@ -101,10 +163,16 @@ TODO: {
 		}
 	};
 }
+ok($firefox->switch_to_window($original_window_handle), "\$firefox->switch_to_window() used to move back to the original window");
+ok($firefox->find_element('//frame[@name="target1"]')->switch_to_shadow_root(), "Switched to target1 shadow root");
 ok($firefox->find_element('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
 ok($firefox->active_frame()->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
 ok($firefox->switch_to_parent_frame(), "Switched to parent frame");
-ok($firefox->go("https://metacpan.org/"), "metacpan.org has been loaded");
+foreach my $handle ($firefox->close_current_chrome_window_handle()) {
+	ok($handle == $new_chrome_window_handle, "Closed original window, which means the remaining chrome window handle should be $new_chrome_window_handle:" . $handle);
+}
+ok($firefox->switch_to_window($new_window_handle), "\$firefox->switch_to_window() used to move to the new window");
+ok($firefox->go("https://metacpan.org/"), "metacpan.org has been loaded in the new window");
 my $uri = $firefox->uri();
 ok($uri eq 'https://metacpan.org/', "\$firefox->uri() is equal to https://metacpan.org/:$uri");
 ok($firefox->title() =~ /Search/, "metacpan.org has a title containing Search");
@@ -112,6 +180,8 @@ SKIP: {
 	local $SIG{ALRM} = sub { die "alarm\n" };
 	alarm 10;
 	if ((exists $ENV{XAUTHORITY}) && (defined $ENV{XAUTHORITY}) && ($ENV{XAUTHORITY} =~ /xvfb/smxi)) {
+		skip("Unable to change firefox screen size when xvfb is running", 3);	
+	} elsif ($firefox->xvfb()) {
 		skip("Unable to change firefox screen size when xvfb is running", 3);	
 	}
 	ok($firefox->full_screen(), "\$firefox->full_screen()");
@@ -154,6 +224,12 @@ ok($rect->width() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a width of " . $rect-
 ok($rect->height() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a height of " . $rect->height());
 ok(((scalar $firefox->cookies()) > 0), "\$firefox->cookies() shows cookies on " . $firefox->uri());
 ok($firefox->delete_cookies() && ((scalar $firefox->cookies()) == 0), "\$firefox->delete_cookies() clears all cookies");
+$capabilities = $firefox->capabilities();
+diag("Debug to aid in replicating 'X_GetImage: BadMatch' type crashes");
+diag("Mozilla PID is " . $capabilities->moz_process_id());
+if ($firefox->xvfb()) {
+	diag("Internal xvfb PID is " . $firefox->xvfb());
+}
 TODO: {
 	my $buffer;
 	eval {
@@ -225,12 +301,19 @@ TODO: {
 		$handle->read($buffer, 1_000_000) or die "Failed to read:$!";
 	}
 	my $correct_digest = Digest::SHA::sha256_hex(MIME::Base64::encode_base64($buffer, q[]));
+	local $TODO = $x_failed ? "X-windows sometimes fails with weird errors on screenshots" : "Digests can sometimes change for all platforms";
 	ok($actual_digest eq $correct_digest, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find_element('//button[\@name=\"lucky\"]') ]) returns the correct hex encoded SHA256 hash of the base64 encoded image");
 }
-foreach my $element ($firefox->find_elements('//a[contains(text(), "API")]')) {
-	ok($firefox->click($element), "Clicked the API link");
-	last;
+my $clicked;
+while ($firefox->uri() eq 'https://metacpan.org/') {
+	ELEMENT: foreach my $element ($firefox->find_elements('//a[@href="https://fastapi.metacpan.org"]')) {
+		$clicked = 1;
+		$firefox->click($element);
+		last ELEMENT;
+	}
 }
+ok($clicked, "Clicked the API link");
+ok($firefox->uri()->host() eq 'github.com', "\$firefox->uri()->host() is equal to github.com:" . $firefox->uri());
 my @cookies = $firefox->cookies();
 ok($cookies[0]->name() =~ /\w/, "The first cookie name is '" . $cookies[0]->name() . "'");
 ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
@@ -258,34 +341,21 @@ foreach my $element ($firefox->find_elements('//button[@name="lucky"]')) {
 my $alert_text = 'testing alert';
 $firefox->script(qq[alert('$alert_text')]);
 ok($firefox->alert_text() eq $alert_text, "\$firefox->alert_text() correctly detects alert text");
+ok($firefox->dismiss_alert(), "\$firefox->dismiss_alert() dismisses alert box");
+ok($firefox->async_script(qq[prompt("Please enter your name", "Roland Grelewicz");]), "Started async script containing a prompt");
 TODO: {
-	local $TODO = $^O eq 'MSWin32' ? "\$firefox->dismiss_alert() not perfect in Win32 yet" : undef;
-	eval {
-		$result = $firefox->dismiss_alert();
-	};
-	ok($result, "\$firefox->dismiss_alert() dismisses alert box");
-}
-TODO: {
-	local $TODO = $^O eq 'MSWin32' ? "\$firefox->dismiss_alert() not perfect in Win32 yet" : undef;
-	eval {
-		$result = $firefox->async_script(qq[prompt("Please enter your name", "Roland Grelewicz");]);
-	};
-	ok($result, "Started async script containing a prompt");
-
-}
-TODO: {
-	local $TODO = ($^O eq 'MSWin32' or $^O eq 'darwin') ? "\$firefox->dismiss_alert() not perfect in Win32 yet" : undef;
+	local $TODO = ($^O eq 'MSWin32') ? "\$firefox->send_alert_text() not perfect in Win32 yet" : undef;
 	eval {
 		$result = $firefox->send_alert_text("John Cole");
 	};
 	ok($result, "\$firefox->send_alert_text() sends alert text");
 }
 TODO: {
-	local $TODO = ($^O eq 'MSWin32' or $^O eq 'darwin') ? "\$firefox->dismiss_alert() not perfect in Win32 yet" : undef;
+	local $TODO = ($^O eq 'MSWin32') ? "\$firefox->accept_dialog() not perfect in Win32 yet" : undef;
 	eval {
-		$result = $firefox->accept_dialog();
+		$firefox->accept_dialog();
 	};
-	ok($result, "\$firefox->accept_dialog() accepts dialog box");
+	ok($result, "\$firefox->accept_dialog() accepts the dialog box");
 }
 ok($firefox->current_chrome_window_handle() =~ /^\d+$/, "Returned the current chrome window handle as an integer");
 $capabilities = $firefox->capabilities();
@@ -307,7 +377,7 @@ ok($capabilities->moz_profile() =~ /firefox_marionette/, "\$capabilities->moz_pr
 ok($capabilities->moz_webdriver_click() =~ /^(1|0)$/, "\$capabilities->moz_webdriver_click() is a boolean:" . $capabilities->moz_webdriver_click());
 ok($capabilities->platform_name() =~ /\w+/, "\$capabilities->platform_version() contains alpha characters:" . $capabilities->platform_name());
 TODO: {
-	local $TODO = $^O eq 'MSWin32' ? "\$firefox->dismiss_alert() not perfect in Win32 yet" : ();
+	local $TODO = "\$firefox->dismiss_alert() not perfect yet";
 	eval {
 		$firefox->dismiss_alert();
 	};

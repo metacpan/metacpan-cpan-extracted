@@ -5,11 +5,12 @@ use LWP::UserAgent;
 use Log::Log4perl;
 use Moose;
 use MooseX::Params::Validate;
+use URL::Encode qw/url_encode/;
 use Try::Tiny;
 use YAML;
 
 BEGIN { Log::Log4perl->easy_init() };
-our $VERSION = 0.016;
+our $VERSION = 0.018;
 
 with "MooseX::Log::Log4perl";
 
@@ -96,18 +97,26 @@ Query the public API
 sub api_public {
     my ( $self, %params ) = validated_hash(
         \@_,
-        function        => { isa    => 'Str' },
-        parameters      => { isa    => 'Array', optional => 1 },
+        method          => { isa    => 'Str' },
+        parameters      => { isa    => 'HashRef', optional => 1 },
     );
 
-    my $url = $self->base_url . '/api/v' . $self->api_version . '/' . $params{function};
+    my $url = $self->base_url . '/api/v' . $self->api_version . '/' . $params{method};
     if( $params{parameters} ){
-        $self->log->error( "parameters passed, but not implemented yet" );
+        my @param_pairs;
+        foreach( sort keys( %{ $params{parameters} } ) ){
+            push( @param_pairs, sprintf( '%s=%s', $_, url_encode( $params{parameters}{$_} ) ) );
+        }
+        $url .= '?' . join( '&', @param_pairs );
     }
 
     $self->log->debug( "Getting: $url" );
     my $response = $self->user_agent->get( $url );
     $self->log->trace( Dump( $response ) ) if $self->log->is_trace;
+    if( ! $response->is_success ){
+        $self->log->error( "Failed ($url) with status: " . $response->status_line );
+        $self->log->logdie( "Response:\n" . $response->decoded_content );
+    }
 
     return decode_json( $response->decoded_content );
 }

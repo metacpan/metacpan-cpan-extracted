@@ -88,4 +88,13 @@ subtest 'GraphQL with promise' => sub {
   );
 };
 
+subtest 'GraphQL with JSON error' => sub {
+  my $tm = $t->post_ok('/graphql-promise',
+    { Content_Type => 'application/json' },
+    '{"query":"{helloWorld}""}',
+  )->content_like(
+    qr/Malformed JSON: Expected comma/
+  );
+};
+
 done_testing;

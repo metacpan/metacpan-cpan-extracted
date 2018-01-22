@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 372;
+plan tests => 373;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -26,6 +26,7 @@ my @module_files = (
     'DateTime/TimeZone/Africa/Monrovia.pm',
     'DateTime/TimeZone/Africa/Nairobi.pm',
     'DateTime/TimeZone/Africa/Ndjamena.pm',
+    'DateTime/TimeZone/Africa/Sao_Tome.pm',
     'DateTime/TimeZone/Africa/Tripoli.pm',
     'DateTime/TimeZone/Africa/Tunis.pm',
     'DateTime/TimeZone/Africa/Windhoek.pm',

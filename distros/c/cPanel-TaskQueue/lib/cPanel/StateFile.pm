@@ -1,37 +1,10 @@
 package cPanel::StateFile;
-$cPanel::StateFile::VERSION = '0.800';
-# cpanel - cPanel/StateFile.pm                    Copyright(c) 2014 cPanel, Inc.
-#                                                           All rights Reserved.
-# copyright@cpanel.net                                         http://cpanel.net
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of the owner nor the names of its contributors may
-#       be used to endorse or promote products derived from this software
-#       without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL  BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+$cPanel::StateFile::VERSION = '0.850';
 use strict;
 
 #use warnings;
 
 use Fcntl        ();
-use File::Path   ();
 use Scalar::Util ();
 
 my $the_logger;
@@ -52,7 +25,7 @@ my $pkg = __PACKAGE__;
 {
 
     package DefaultLogger;
-$DefaultLogger::VERSION = '0.800';
+$DefaultLogger::VERSION = '0.850';
 sub new {
         my ($class) = @_;
         return bless {}, $class;
@@ -119,13 +92,13 @@ my $are_policies_set = 0;
 #
 # This method allows changing the policies for logging and locking.
 sub import {
-    my $class = shift;
-    die 'Not an even number of arguments to the $pkg module' if @_ % 2;
+    my ( $class, @args ) = @_;
+    die 'Not an even number of arguments to the $pkg module' if @args % 2;
     die 'Policies already set elsewhere' if $are_policies_set;
-    return 1 unless @_;    # Don't set the policies flag.
+    return 1 unless @args;    # Don't set the policies flag.
 
-    while (@_) {
-        my ( $policy, $object ) = splice( @_, 0, 2 );
+    while (@args) {
+        my ( $policy, $object ) = splice( @args, 0, 2 );
         next unless defined $object;
         if ( '-logger' eq $policy ) {
             unless ( ref $object ) {
@@ -169,7 +142,7 @@ sub import {
     {
 
         package cPanel::StateFile::Guard;
-$cPanel::StateFile::Guard::VERSION = '0.800';
+$cPanel::StateFile::Guard::VERSION = '0.850';
 sub new {
             my ( $class, $args_ref ) = @_;
             $pkg->throw('Args parameter must be a hash reference.') unless 'HASH' eq ref $args_ref;
@@ -230,7 +203,7 @@ sub new {
         sub call_unlocked {
             my ( $self, $code ) = @_;
             my $state_file = $self->{state_file};
-            $state_file->throw('Cannot nest call_unlocked calls.') unless defined $self->{lock_file};
+            $state_file->throw('Cannot nest call_unlocked calls.')  unless defined $self->{lock_file};
             $state_file->throw('Missing coderef to call_unlocked.') unless 'CODE' eq ref $code;
 
             # unlock for the duration of the code execution
@@ -342,9 +315,14 @@ sub new {
         $dirname =~ s{/\./}{/}g;           # resolve self references
         $dirname =~ s{/\.$}{};
         if ( !-d $dirname ) {
-            File::Path::mkpath($dirname)
+            require File::Path;
+            File::Path::mkpath( $dirname, 0, 0700 )
               or $self->throw("Unable to create Cache directory ('$dirname').");
         }
+        else {
+            chmod( 0700, $dirname ) if ( ( stat(_) )[2] & 0777 ) != 0700;
+        }
+
         $self->{file_name} = "$dirname/$file";
 
         $self->{data_object}   = $data_obj;
@@ -388,30 +366,67 @@ sub new {
     sub synch {
         my ($self) = @_;
 
-        # need to set the lock asap to avoid any concurrency problem
-        my $guard = cPanel::StateFile::Guard->new( { state => $self } );
+        my $caller_needs_a_guard = defined wantarray;
 
-        if ( !-e $self->{file_name} or -z _ ) {
+        # need to set the lock asap to avoid any concurrency problem
+        my $guard;
+
+        if ( !-e $self->{file_name} ) {
+            $guard = cPanel::StateFile::Guard->new( { state => $self } );
 
             # File doesn't exist or is empty, initialize it.
             $guard->update_file();
         }
+        elsif ( -z _ ) {
+
+            # If the file is zero bytes this does not mean that
+            # it will be after we get a lock because another process
+            # could be writing to it while we did the stat
+            $guard = cPanel::StateFile::Guard->new( { state => $self } );
+
+            # After we got our lock we check again to see
+            # if its really zero and it wasn't just another process
+            # writing to it
+            if ( -z $self->{file_name} ) {
+
+                # Its really zero because we have a lock
+                # and we re-checked the file
+                $guard->update_file();
+            }
+            else {
+                # after the lock the other process
+                # had finished with it and its not
+                # zero anymore so we reload it now
+                # and continue on
+                my ( $mtime, $size ) = ( stat(_) )[ 9, 7 ];
+                $self->_resynch( $guard, $mtime, $size );
+
+            }
+        }
         else {
-            $self->_resynch($guard);
+            if ($caller_needs_a_guard) {
+                $guard = cPanel::StateFile::Guard->new( { state => $self } );
+            }
+            my ( $mtime, $size ) = ( stat(_) )[ 9, 7 ];
+            $self->_resynch( $guard, $mtime, $size );
         }
 
         # if not assigned anywhere, let the guard die.
-        return unless defined wantarray;
+        return if !$caller_needs_a_guard;
 
         # Otherwise return it.
         return $guard;
     }
 
     sub _resynch {
-        my ( $self, $guard ) = @_;
+        my ( $self, $guard, $mtime, $size ) = @_;
 
-        my ( $mtime, $size ) = ( stat( $self->{file_name} ) )[ 9, 7 ];
-        if ( $self->{file_mtime} < $mtime || $self->{file_size} != $size ) {
+        if ( !$mtime || !$size ) {
+            ( $mtime, $size ) = ( stat( $self->{file_name} ) )[ 9, 7 ];
+        }
+
+        # CPANEL-11795: Timewarp safety.  If time moves backwards we can loop forever
+        if ( $self->{file_mtime} < $mtime || $self->{file_size} != $size || $self->{file_mtime} > time() ) {
 
             # File is newer or a different size
             $guard ||= cPanel::StateFile::Guard->new( { state => $self } );

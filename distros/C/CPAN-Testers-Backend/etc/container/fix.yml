@@ -1,0 +1,13 @@
+$summary: Routines to fix data problems
+
+common:
+    $class: Beam::Wire
+    file: common.yml
+
+metabase:
+    $class: CPAN::Testers::Backend::Fix::TesterNoname
+    schema:
+        $ref: common/schema
+    metabase_dbh:
+        $ref: common/metabase_dbh
+

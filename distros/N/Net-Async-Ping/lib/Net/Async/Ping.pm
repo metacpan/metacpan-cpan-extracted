@@ -1,5 +1,5 @@
 package Net::Async::Ping;
-$Net::Async::Ping::VERSION = '0.003001';
+$Net::Async::Ping::VERSION = '0.003003';
 use strict;
 use warnings;
 
@@ -53,7 +53,7 @@ Net::Async::Ping - asyncronously check remote host for reachability
 
 =head1 VERSION
 
-version 0.003001
+version 0.003003
 
 =head1 SYNOPSIS
 

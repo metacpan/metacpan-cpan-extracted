@@ -72,60 +72,59 @@ sub run ( $class, $rpc_boot_args ) {
     }
 
     # start websocket server
-    my $http_server = Pcore::HTTP::Server->new(
-        {   listen => $listen,
-            app    => sub ($req) {
-                Pcore::WebSocket->accept_ws(
-                    'pcore', $req,
-                    sub ( $req, $accept, $reject ) {
+    my $http_server = Pcore::HTTP::Server->new( {
+        listen => $listen,
+        app    => sub ($req) {
+            Pcore::WebSocket->accept_ws(
+                'pcore', $req,
+                sub ( $req, $accept, $reject ) {
 
-                        # check token
-                        if ( $rpc_boot_args->{token} && ( !$req->{env}->{HTTP_AUTHORIZATION} || $req->{env}->{HTTP_AUTHORIZATION} !~ /\bToken\s+$rpc_boot_args->{token}\b/smi ) ) {
-                            $reject->(401);
-
-                            return;
-                        }
-
-                        no strict qw[refs];
-
-                        $accept->(
-                            max_message_size => 1_024 * 1_024 * 100,                # 100 Mb
-                            pong_interval    => 50,
-                            compression      => 0,                                  #
-                            on_listen_event  => sub ( $ws, $mask ) { return 1 },    # RPC client can listen server events
-                            on_fire_event    => sub ( $ws, $key ) { return 1 },     # RPC client can fire server events
-                            before_connect   => {
-                                listen_events  => $listen_events,
-                                forward_events => ${"$class\::RPC_FORWARD_EVENTS"},
-                            },
-                            ( $can_rpc_on_connect ? ( on_connect => sub ($ws) { $rpc->RPC_ON_CONNECT($ws); return } ) : () ),    #
-                            ( $can_rpc_on_disconnect ? ( on_disconnect => sub ( $ws, $status ) { $rpc->RPC_ON_DISCONNECT( $ws, $status ); return; } ) : () ),
-                            on_rpc => sub ( $ws, $req, $tx ) {
-                                my $method_name = "API_$tx->{method}";
-
-                                if ( $rpc->can($method_name) ) {
-
-                                    # call method
-                                    eval { $rpc->$method_name( $req, $tx->{data} ? $tx->{data}->@* : () ) };
-
-                                    $@->sendlog if $@;
-                                }
-                                else {
-                                    $req->( [ 400, q[Method not implemented] ] );
-                                }
-
-                                return;
-                            },
-                        );
+                    # check token
+                    if ( $rpc_boot_args->{token} && ( !$req->{env}->{HTTP_AUTHORIZATION} || $req->{env}->{HTTP_AUTHORIZATION} !~ /\bToken\s+$rpc_boot_args->{token}\b/smi ) ) {
+                        $reject->(401);
 
                         return;
-                    },
-                );
+                    }
 
-                return;
-            },
-        }
-    )->run;
+                    no strict qw[refs];
+
+                    $accept->(
+                        max_message_size => 1_024 * 1_024 * 100,                # 100 Mb
+                        pong_interval    => 50,
+                        compression      => 0,                                  #
+                        on_listen_event  => sub ( $ws, $mask ) { return 1 },    # RPC client can listen server events
+                        on_fire_event    => sub ( $ws, $key ) { return 1 },     # RPC client can fire server events
+                        before_connect   => {
+                            listen_events  => $listen_events,
+                            forward_events => ${"$class\::RPC_FORWARD_EVENTS"},
+                        },
+                        ( $can_rpc_on_connect ? ( on_connect => sub ($ws) { $rpc->RPC_ON_CONNECT($ws); return } ) : () ),    #
+                        ( $can_rpc_on_disconnect ? ( on_disconnect => sub ( $ws, $status ) { $rpc->RPC_ON_DISCONNECT( $ws, $status ); return; } ) : () ),
+                        on_rpc => sub ( $ws, $req, $tx ) {
+                            my $method_name = "API_$tx->{method}";
+
+                            if ( $rpc->can($method_name) ) {
+
+                                # call method
+                                eval { $rpc->$method_name( $req, $tx->{data} ? $tx->{data}->@* : () ) };
+
+                                $@->sendlog if $@;
+                            }
+                            else {
+                                $req->( [ 400, q[Method not implemented] ] );
+                            }
+
+                            return;
+                        },
+                    );
+
+                    return;
+                },
+            );
+
+            return;
+        },
+    } )->run;
 
     # open control handle
     if ($MSWIN) {

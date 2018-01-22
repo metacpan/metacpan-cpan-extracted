@@ -4,10 +4,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 use Exporter 'import';
-our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu choose_multi
-                     insert_sep length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
+our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
+                     length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
 
 use Cwd                   qw( realpath );
 use Encode                qw( decode encode );
@@ -24,11 +24,6 @@ use Term::ReadKey          qw( GetTerminalSize ReadKey ReadMode );
 use if $^O eq 'MSWin32', 'Win32::Console';
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
-
-
-sub choose_multi {
-    settings_menu( @_ );
-}
 
 
 sub _stringify_array { join( ', ', map { "\"$_\"" } @_ ) }
@@ -469,7 +464,7 @@ sub settings_menu {
     my ( $menu, $val, $opt ) = @_;
     $opt = {} if ! defined $opt;
     my $prompt   = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $in_place = defined $opt->{in_place}     ? $opt->{in_place}     : 1;
+    my $in_place = $opt->{in_place}; # DEPRECATED
     my $clear    = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
     my $mouse    = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
     #---------------------------------------#
@@ -477,6 +472,18 @@ sub settings_menu {
     my $back    = defined $opt->{back}          ? $opt->{back}         : 'BACK';
     $back    = '  ' . $back;
     $confirm = '  ' . $confirm;
+    # ###
+    if ( defined $in_place ) {
+        my $m = 'Please remove the option "in_place". In the next release the option "in-place" will be removed and "settings_menu" will always do an in-place edit of the configuration %hash.';
+        choose(
+            [ 'Close with ENTER' ],
+            { prompt => $m, clear_screen => 1 }
+        );
+    }
+    else {
+        $in_place = 1;
+    }
+    # ###
     my $longest = 0;
     my $tmp     = {};
     for my $sub ( @$menu ) {
@@ -520,7 +527,7 @@ sub settings_menu {
                     $change++;
                 }
             }
-            return if ! $change;
+            return if ! $change;        # pod return value
             return 1 if $in_place;
             return $tmp;
         }
@@ -670,7 +677,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.053
+Version 0.054
 
 =cut
 
@@ -972,18 +979,21 @@ Defaults to "Choose:".
 
 =back
 
-=head2 choose_multi DEPRECATED
-
-Use C<settings_menu> instead. C<choose_multi> will be removed.
-
 =head2 settings_menu
 
-    $tmp = settings_menu( $menu, $config, { in_place => 0 } )
-    if ( defined $tmp ) {
-        for my $key ( keys %$tmp ) {
-            $config->{$key} = $tmp->{$key};
-        }
-    }
+    $menu = [
+        [ 'enable_logging', "- Enable logging", [ 'NO', 'YES' ]   ],
+        [ 'case_sensitive', "- Case sensitive", [ 'NO', 'YES' ]   ],
+        [ 'attempts',       "- Attempts"      , [ '1', '2', '3' ] ]
+    ];
+
+    $config = {
+        'enable_logging' => 1,
+        'case_sensitive' => 1,
+        'attempts'       => 2
+    };
+
+    settings_menu( $menu, $config )
 
 The first argument is a reference to an array of arrays. These arrays have three elements:
 
@@ -1017,18 +1027,6 @@ the values (C<0> if not defined) are the indexes of the current value of the res
 
 =back
 
-    $menu = [
-        [ 'enable_logging', "- Enable logging", [ 'NO', 'YES' ] ],
-        [ 'case_sensitive', "- Case sensitive", [ 'NO', 'YES' ] ],
-        ...
-    ];
-
-    $config = {
-        'enable_logging' => 0,
-        'case_sensitive' => 1,
-        ...
-    };
-
 The optional third argument is a reference to a hash. The keys are
 
 =over
@@ -1043,9 +1041,11 @@ Values: 0,[1].
 
 =item
 
-in_place
+in_place DEPRECATED
 
-If enabled, the configuration hash (second argument) is edited in place.
+This option will be removed and C<settings_menu> will always do an in-place edit of the configuration hash (the second argument).
+
+If enabled, the configuration hash (second argument) is edited in place else a reference to the modified hash is returned.
 
 Values: 0,[1].
 

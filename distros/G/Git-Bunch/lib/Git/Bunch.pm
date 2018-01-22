@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2017-11-24'; # DATE
-our $VERSION = '0.621'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.622'; # VERSION
 
 use 5.010001;
 use strict;
@@ -818,6 +818,13 @@ changes). This setting will also implicitly turn on `create_bare` setting
 
 _
         },
+        action => {
+            schema => ['str*', in=>[
+                'sync',
+                'list-source-repos',
+            ]],
+            default => 'sync',
+        },
     },
     deps => {
         all => [
@@ -851,13 +858,14 @@ sub sync_bunch {
     my $target = $args{target};
     my $create_bare = $args{create_bare_target};
     my $backup = $args{backup};
+    my $action = $args{action} // 'sync';
     my $exit;
 
     $create_bare //= 1 if $backup;
 
     my $cmd;
 
-    unless ((-d $target) || $args{-dry_run}) {
+    unless ((-d $target) || $args{-dry_run} || $action eq 'list-source-repos') {
         log_debug("Creating target directory %s ...", $target);
         make_path($target)
             or return [500, "Can't create target directory $target: $!"];
@@ -867,7 +875,7 @@ sub sync_bunch {
     my $dbh_target;
     $dbh_target = App::reposdb::_connect_db({
         reposdb_path => "$target/repos.db",
-    }) unless $args{-dry_run};
+    }) unless $args{-dry_run} || $action eq 'list-source-repos';
 
     my $_a = $args{rsync_opt_maintain_ownership} ? "aH" : "rlptDH";
 
@@ -878,17 +886,26 @@ sub sync_bunch {
     @entries = _sort_entries_by_recent(@entries) if $args{min_repo_access_time};
     #log_trace("entries: %s", \@entries);
 
-    $CWD = $target;
+    $CWD = $target unless $action eq 'list-source-repos';
 
     my %res;
     my $i = 0;
     $progress->pos(0) if $progress;
     $progress->target(~~@entries) if $progress;
+
+    my @res;
+
   ENTRY:
     for my $e (@entries) {
         ++$i;
         next ENTRY if _skip_process_entry($e, \%args, "$source/$e->{name}");
         my $is_repo = _is_repo("$source/$e->{name}");
+
+        if ($action eq 'list-source-repos') {
+            push @res, $e->{name} if $is_repo;
+            next ENTRY;
+        }
+
         if (!$is_repo) {
             my $file_or_dir = $e->{name};
             $progress->update(pos => $i,
@@ -1025,9 +1042,14 @@ sub sync_bunch {
         }
         $res{$repo} = $res;
     }
-    system "touch", "$target/.gitbunch-sync-timestamp";
 
     $progress->finish if $progress;
+
+    if ($action eq 'list-source-repos') {
+        return [200, "OK", \@res];
+    }
+
+    system "touch", "$target/.gitbunch-sync-timestamp";
 
     [200,
      "OK",
@@ -1119,7 +1141,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.621 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-11-24.
+This document describes version 0.622 of Git::Bunch (from Perl distribution Git-Bunch), released on 2018-01-17.
 
 =head1 SYNOPSIS
 
@@ -1458,6 +1480,8 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<action> => I<str> (default: "sync")
+
 =item * B<backup> => I<bool>
 
 Whether doing backup to target.
@@ -1632,7 +1656,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

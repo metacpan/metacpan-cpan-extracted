@@ -11,7 +11,7 @@ use DBIx::Class::Schema::Loader::Utils qw/sigwarn_silencer/;
 
 use namespace::clean;
 
-our $VERSION = '0.07047';
+our $VERSION = '0.07048';
 
 =head1 NAME
 

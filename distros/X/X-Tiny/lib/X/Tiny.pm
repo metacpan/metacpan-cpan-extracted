@@ -3,7 +3,7 @@ package X::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =encoding utf-8
 
@@ -74,7 +74,7 @@ failures: if you’re given a set of instructions, and something goes wrong
 in one of those instructions, it makes sense to stop and go back to see what
 to do in response to the problem.
 
-Perl’s built-ins unwisely make the caller responsibile for error checking—as
+Perl’s built-ins unwisely make the caller responsible for error checking—as
 a result of which much Perl code fails to check for failures from those
 built-ins, which makes for far more difficult debugging when some code down
 the line just mysteriously produces an unexpected result.
@@ -183,7 +183,7 @@ Felipe Gasper (FELIPE)
 
 =head1 COPYRIGHT
 
-Copyright 2017 by L<Gasper Software Consulting, LLC|http://gaspersoftware.com>
+Copyright 2017 by L<Gasper Software Consulting|http://gaspersoftware.com>
 
 =head1 LICENSE
 

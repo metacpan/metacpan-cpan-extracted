@@ -2,7 +2,7 @@ package Test2::Formatter::QVF;
 use strict;
 use warnings;
 
-our $VERSION = '0.001045';
+our $VERSION = '0.001047';
 
 BEGIN { require Test2::Formatter::Test2; our @ISA = qw(Test2::Formatter::Test2) }
 
@@ -22,11 +22,12 @@ sub write {
 
     my $job_id = $f->{harness}->{job_id};
 
-    push @{$self->{+JOB_BUFFERS}->{$job_id}} => [$e, $num, $f];
+    push @{$self->{+JOB_BUFFERS}->{$job_id}} => [$e, $num, $f]
+        if $job_id;
 
     my $show = $self->update_active_disp($f);
 
-    if ($f->{harness_job_end}) {
+    if ($f->{harness_job_end} || !$job_id) {
         $show = 1;
 
         my $buffer = delete $self->{+JOB_BUFFERS}->{$job_id};

@@ -2,7 +2,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps;
 use 5.010;
 
 use Moose::Role;
-use List::MoreUtils qw(natatime);
+use List::MoreUtils 0.428 qw(natatime);
 use List::Util qw(first);
 use Storable qw(dclone);
 use Data::Dumper;

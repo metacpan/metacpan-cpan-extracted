@@ -1,5 +1,5 @@
 package Log::Contextual;
-$Log::Contextual::VERSION = '0.008000';
+$Log::Contextual::VERSION = '0.008001';
 # ABSTRACT: Simple logging interface with a contextual log
 
 use strict;
@@ -26,9 +26,17 @@ sub stash_name {
    return $cv->GV->STASH->NAME;
 }
 
-my @dlog = ((map "Dlog_$_", @levels), (map "DlogS_$_", @levels));
+my @dlog = (
+   (map "Dlog_$_", @levels),
+   (map "DlogS_$_",  @levels),
+   (map "Dslog_$_",  @levels),
+   (map "DslogS_$_", @levels));
 
-my @log = ((map "log_$_", @levels), (map "logS_$_", @levels));
+my @log = (
+   (map "log_$_", @levels),
+   (map "logS_$_",  @levels),
+   (map "slog_$_",  @levels),
+   (map "slogS_$_", @levels));
 
 sub _maybe_export {
    my ($spec, $target, $name, $new_code) = @_;
@@ -284,7 +292,7 @@ Log::Contextual - Simple logging interface with a contextual log
 
 =head1 VERSION
 
-version 0.008000
+version 0.008001
 
 =head1 SYNOPSIS
 
@@ -896,7 +904,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

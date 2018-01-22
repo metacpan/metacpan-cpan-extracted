@@ -85,45 +85,44 @@ supported, but not requires.
 
 # MORE EXAMPLES
 
-The `example/` directory has a number of them, including an app explaining
-HTTP in a nutshell, jsonp call sample and some stupid 200-line wiki engine.
+See [example](example/).
 
-In fact, the current development model relies on these examples
-as an additional test suite, and no major feature is considered complete
-until half a page micro-app can be written to demonstrate it works.
+Neaf uses examples as an additional test suite.
+
+No feature is considered complete until half a page code snipped is written
+to demonstrate it.
 
 # PHILOSOPHY
 
-* Start out simple, then scale up.
+* Start out simple, then grow up.
 
-* Don't rely on side effects. Use *explicit* functions receiving *arguments*
-and returning *a value*.
+* Data in, data out. A *function* should receive and *argument* and return
+a *value* or *die*.
 
-* Zeroconf: everything can be configured, nothing needs to be.
+* Sane defaults. Everything can be configured, nothing needs to be.
 
 * It's not software unless you can run it.
 
 * Trust nobody. Validate the data.
 
-* Force UTF8 if possible. It's 21st century.
+* Force UTF8 where possible. It's 21st century.
 
 # BUGS
 
 This package is still under heavy development
 (with a test coverage of about 80% though).
 
-* mod\_perl handler is a mess (but it works somehow);
+Use [github](https://github.com/dallaylaen/perl-mvc-neaf/issues)
+or [CPAN RT](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MVC-Neaf)
+to report bugs and propose features.
 
-* native form validator is a joke;
-
-* too few session mechanisms.
-
-Bug reports, patches, and proposals are welcome.
+Bug reports, feature requests, and overall critique are welcome.
 
 # CONTRIBUTING TO THIS PROJECT
 
-Please see STYLE.md for the style guide.
-Please see CHECKLIST if you plan a new major version.
+Please see [STYLE.md](STYLE.md) for the style guide.
+
+Please see [CHECKLIST](CHECKLIST) if you plan to release a version.
 
 # ACKNOWLEDGEMENTS
 
@@ -137,11 +136,16 @@ and also drove me towards functional programming and pure functions.
 [Akzhan Abdulin](https://github.com/akzhan)
 tricked me into making the hooks.
 
+[Cono](https://github.com/cono)
+made some early feedback and great feature proposals.
+
 Ideas were shamelessly stolen from PSGI, Dancer, and Catalyst.
+
+The CGI module was used heavily in the beginning of the project.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016 Konstantin S. Uvarin aka KHEDIN
+Copyright 2016-2017 Konstantin S. Uvarin aka KHEDIN
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,5 +1,9 @@
 Revision history for ZMQ-Raw
 
+0.23      2018-01-18 10:28:15+02:00 Africa/Johannesburg
+
+ - Scaling of timers has been improved
+
 0.22      2018-01-12 15:15:28+02:00 Africa/Johannesburg
 
  - Improved Poll implementation

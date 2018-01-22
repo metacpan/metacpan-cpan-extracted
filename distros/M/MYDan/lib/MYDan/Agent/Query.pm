@@ -107,6 +107,8 @@ sub load
 
     idie( "code format error:$query->{code}\n" ) unless $query->{code} =~ /^[A-Za-z0-9_\.]+$/;
 
+    $yaml = YAML::XS::Dump +{ map{ $_ => $query->{$_} }grep{ $_ !~ /^__/ }keys %$query };
+
     if( $o{'auth'} && $query->{code} !~ /^free\./ )
     {
         my $auth = delete $query->{auth};

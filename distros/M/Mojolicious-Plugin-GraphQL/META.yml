@@ -4,7 +4,7 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Mojolicious: '7.53'
+  Mojolicious: '7.60'
   Test::More: '0.92'
 configure_requires:
   ExtUtils::MakeMaker: 6.63_03
@@ -21,7 +21,7 @@ no_index:
     - inc
 requires:
   GraphQL: '0.26'
-  Mojolicious: '7.53'
+  Mojolicious: '7.60'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

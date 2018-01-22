@@ -10,6 +10,7 @@ use Test::Differences;
 use DBIx::Class::Schema::Loader;
 use Class::Unload;
 use File::Path 'rmtree';
+use curry;
 use DBI;
 use File::Find 'find';
 use Class::Unload ();
@@ -117,12 +118,9 @@ sub run_tests {
     my $extra_count = $self->{extra}{count} || 0;
 
     my $col_accessor_map_tests = 6;
-    my $num_rescans = 6;
-    $num_rescans++ if $self->{vendor} eq 'mssql';
-    $num_rescans++ if $self->{vendor} eq 'Firebird';
 
     plan tests => @connect_info *
-        (233 + $num_rescans * $col_accessor_map_tests + $extra_count + ($self->{data_type_tests}{test_count} || 0));
+        (233 + $col_accessor_map_tests + $extra_count + ($self->{data_type_tests}{test_count} || 0));
 
     foreach my $info_idx (0..$#connect_info) {
         my $info = $connect_info[$info_idx];
@@ -184,12 +182,12 @@ sub run_only_extra_tests {
 
         $self->test_data_types($conn);
         $self->{extra}{run}->($conn, $monikers, $classes, $self) if $self->{extra}{run};
+        $conn->storage->disconnect;
 
         if (not ($ENV{SCHEMA_LOADER_TESTS_NOCLEANUP} && $info_idx == $#$connect_info)) {
             $self->drop_extra_tables_only;
             rmtree DUMP_DIR;
         }
-        $conn->storage->disconnect;
     }
 }
 
@@ -234,6 +232,8 @@ sub setup_schema {
         $self->{use_moose} = 1;
     }
 
+    $self->{col_accessor_map_tests_run} = 0;
+
     my %loader_opts = (
         constraint              => $self->CONSTRAINT,
         result_namespace        => RESULT_NAMESPACE,
@@ -260,7 +260,7 @@ sub setup_schema {
         col_collision_map       => { '^(can)\z' => 'caught_collision_%s' },
         rel_collision_map       => { '^(set_primary_key)\z' => 'caught_rel_collision_%s' },
         relationship_attrs      => { many_to_many => { order_by => 'me.id' } },
-        col_accessor_map        => \&test_col_accessor_map,
+        col_accessor_map        => $self->curry::weak::test_col_accessor_map,
         result_components_map   => { LoaderTest2X => 'TestComponentForMap', LoaderTest1 => '+TestComponentForMapFQN' },
         uniq_to_primary         => 1,
         %{ $self->{loader_options} || {} },
@@ -634,7 +634,7 @@ qr/\n__PACKAGE__->load_components\("TestSchemaComponent", "\+TestSchemaComponent
         'is_nullable=1 detection';
 
     SKIP: {
-        skip $self->{skip_rels}, 149 if $self->{skip_rels};
+        skip $self->{skip_rels}, 143 if $self->{skip_rels};
 
         my $moniker3 = $monikers->{loader_test3};
         my $class3   = $classes->{loader_test3};
@@ -1390,9 +1390,9 @@ TODO: {
     diag $@ if $@ && (not $TODO);
 }
 
-    $self->drop_tables unless $ENV{SCHEMA_LOADER_TESTS_NOCLEANUP};
-
     $conn->storage->disconnect;
+
+    $self->drop_tables unless $ENV{SCHEMA_LOADER_TESTS_NOCLEANUP};
 }
 
 sub test_data_types {
@@ -2450,13 +2450,14 @@ sub rescan_without_warnings {
 }
 
 sub test_col_accessor_map {
-    my ( $column_name, $default_name, $context, $default_map ) = @_;
+    my ( $self, $column_name, $default_name, $context, $default_map ) = @_;
     if( lc($column_name) eq 'crumb_crisp_coating' ) {
 
-        is( $default_name, 'crumb_crisp_coating', 'col_accessor_map was passed the default name' );
-        ok( $context->{$_}, "col_accessor_map func was passed the $_" )
-            for qw( table table_name table_class table_moniker schema_class );
-
+        unless ($self->{col_accessor_map_tests_run}++) {
+            is( $default_name, 'crumb_crisp_coating', 'col_accessor_map was passed the default name' );
+            ok( $context->{$_}, "col_accessor_map func was passed the $_" )
+                for qw( table table_name table_class table_moniker schema_class );
+        }
         return 'trivet';
     } else {
         return $default_map->({

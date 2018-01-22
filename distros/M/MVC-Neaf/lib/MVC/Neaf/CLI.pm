@@ -2,7 +2,7 @@ package MVC::Neaf::CLI;
 
 use strict;
 use warnings;
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ But just for the sake of completeness...
 
 use Getopt::Long;
 use Carp;
-use HTTP::Headers;
+use HTTP::Headers::Fast;
 use File::Basename qw(basename);
 
 use MVC::Neaf;
@@ -166,7 +166,7 @@ sub run_test {
     };
 
     if (my @head = @{ delete $test{head} || [] }) {
-        $test{header_in} = HTTP::Headers->new (
+        $test{header_in} = HTTP::Headers::Fast->new (
             map { /^([^=]+)=(.*)$/ or croak "Bad header format"; $1=>$2 } @head
         );
     };
@@ -237,40 +237,34 @@ List registered Neaf routes.
 sub list {
     my ($self, $app) = @_;
 
-    my $routes = $app->get_routes;
+    my %inverse_descr; # {path+printable descr} = [method, method]
 
-    foreach my $path( sort keys %$routes ) {
-        my $batch = $routes->{$path};
+    my $routes = $app->get_routes( sub {
+        my ($route, $path, $method) = @_;
 
-        # first, group methods by description
-        my %descr_method;
-        foreach my $method ( sort keys %$batch ) {
-            my $route = $batch->{$method};
-            my @features;
-
-            if ( my $rex = $route->{path_info_regex} ) {
-                $rex = "$rex";
-                $rex =~ m#^\(.*?\((.*)\).*?\)$# and $rex = $1;
-                push @features, "/$rex"
-            };
-            my $param = join "&", map { "$_=$route->{param_regex}{$_}" }
-                sort keys %{ $route->{param_regex} };
-            push @features, "?$param" if $param;
-
-            push @features, " # $route->{description}"
-                if $route->{description};
-
-            my $descr = join "", @features;
-
-            push @{ $descr_method{$descr} }, $method;
+        my @features;
+        if ( my $rex = $route->{path_info_regex} ) {
+            $rex = "$rex";
+            $rex =~ m#^\(.*?\((.*)\).*?\)$# and $rex = $1;
+            push @features, "/$rex"
         };
+        my $param = join "&", map { "$_=$route->{param_regex}{$_}" }
+            sort keys %{ $route->{param_regex} };
+        push @features, "?$param" if $param;
 
-        # now process each group
-        foreach my $descr( sort keys %descr_method ) {
-            my $method = join ",", sort @{ $descr_method{$descr} };
-            $path ||= '/' unless $descr =~ /^\//;
-            print "[$method] $path$descr\n";
-        };
+        push @features, " # $route->{description}"
+            if $route->{description};
+
+        my $descr = join "", $path, @features;
+
+        push @{ $inverse_descr{$descr} }, $method;
+    } );
+
+    # Convert available methods to printable format
+    $_ = join ",", sort @$_ for values %inverse_descr;
+
+    foreach (sort keys %inverse_descr) {
+        printf "[%s] %s\n", $inverse_descr{$_}, $_;
     };
 };
 

@@ -107,7 +107,7 @@ qx.Class.define('callbackery.data.RemoteTableModel', {
                                 break;
                             case 'string':
                             case 'str':
-                                col[id] = new String(col[id]);
+                                col[id] = col[id] ? new String(col[id]) : '';
                                 break;
                             case 'number':
                             case 'num':

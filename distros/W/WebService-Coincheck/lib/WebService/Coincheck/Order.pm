@@ -17,7 +17,7 @@ sub new {
 }
 
 sub create {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -30,10 +30,10 @@ sub create {
 }
 
 sub cancel {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        id => $params->{id},
+        id => $params{id},
     };
 
     my $res = $self->client->request(
@@ -45,7 +45,7 @@ sub cancel {
 }
 
 sub opens {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -58,7 +58,7 @@ sub opens {
 }
 
 sub transactions {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 

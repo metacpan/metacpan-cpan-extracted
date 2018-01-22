@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Text-Yeti-Table",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.3.0",
   "license" => "perl",
   "module_name" => "Text::Yeti::Table",
   "recursive_test_files" => 1,
@@ -31,6 +31,7 @@ my %module_build_args = (
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "List::Util" => "1.33",
     "Test::Differences" => 0,
     "Test::More" => "0.96",
     "strict" => 0,
@@ -42,6 +43,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "List::Util" => "1.33",
   "Module::Build" => "0.28",
   "Test::Differences" => 0,
   "Test::More" => "0.96",

@@ -1,0 +1,26 @@
+Usage:
+        ndpatch [OPTIONS]
+        ndpatch [OPTIONS] <file> [<patchfile>]
+
+Options:
+    --help|-h
+        Print help message and exit.
+
+    --ifmt <JSON|YAML>
+        Force specified input format usage. Automatically choosed (using
+        file extension) if omitted.
+
+    --[no]pretty
+        On/Off pretty-print for JSON. Enabled by default.
+
+    --verbose|-v [int]
+        Increase verbosity, max level - 4.
+
+    --version|-V
+        Print version and exit.
+
+Examples:
+    Apply patch:
+
+        ndpatch struct.json patch.json
+

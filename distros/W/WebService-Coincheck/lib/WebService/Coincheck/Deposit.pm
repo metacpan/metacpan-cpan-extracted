@@ -17,11 +17,11 @@ sub new {
 }
 
 sub all {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
         currency => 'BTC',
-        %{$params || {}},
+        %params,
     };
 
     my $res = $self->client->request(
@@ -33,10 +33,10 @@ sub all {
 }
 
 sub fast {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        id => $params->{id},
+        id => $params{id},
     };
 
     my $res = $self->client->request(

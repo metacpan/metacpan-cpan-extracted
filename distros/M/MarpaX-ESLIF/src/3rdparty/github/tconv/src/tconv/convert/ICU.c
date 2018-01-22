@@ -1,12 +1,14 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <assert.h>
 
 #include <unicode/uconfig.h>
 #include <unicode/ucnv.h>
 #if !UCONFIG_NO_TRANSLITERATION
 #include <unicode/utrans.h>
 #endif
+#include <unicode/ures.h>
 #include <unicode/uset.h>
 #include <unicode/ustring.h>
 
@@ -27,6 +29,11 @@ tconv_convert_ICU_option_t tconv_convert_icu_option_default = {
   0,    /* signaturei */
 };
 
+/* The following is for testing when UCONFIG_NO_TRANSLITERATION is true */
+/*
+#undef UCONFIG_NO_TRANSLITERATION
+#define UCONFIG_NO_TRANSLITERATION 1
+*/
 /* Context */
 typedef struct tconv_convert_ICU_context {
   UConverter                 *uConverterFromp;   /* Input => UChar  */
@@ -50,10 +57,10 @@ typedef struct tconv_convert_ICU_context {
 } tconv_convert_ICU_context_t;
 
 size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *contextp, char **inbufpp, size_t *inbytesleftlp, char **outbufpp, size_t *outbytesleftlp, UBool flushb);
+static inline int32_t _cnvSigType(UConverter *uConverterp);
 
 #if !UCONFIG_NO_TRANSLITERATION
 static inline int32_t _getChunkLimit(const UChar *prevp, int32_t prevlenl, const UChar *p, int32_t lengthl);
-static inline int32_t _cnvSigType(UConverter *uConverterp);
 static inline UBool   _increaseChunkBuffer(tconv_convert_ICU_context_t *contextp, int32_t chunkcapacity);
 static inline UBool   _increaseOutBuffer(tconv_convert_ICU_context_t *contextp, int32_t outcapacity);
 #endif
@@ -77,7 +84,11 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
   const UChar                 *uCharBufLimitp   = NULL;
   int32_t                      uCharCapacityl   = 0;
 #if !UCONFIG_NO_TRANSLITERATION
+  UResourceBundle             *uResourceBundlep = NULL;
   UTransliterator             *uTransliteratorp = NULL;
+  UChar                       *uLocales         = NULL;
+  int32_t                      uLocaleLength;
+  const char                  *locales;
 #endif
   UConverter                  *uConverterTop    = NULL;
   UConverterFromUCallback      fromUCallbackp   = NULL;
@@ -95,8 +106,11 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
   UConverterUnicodeSet         whichSet;
 #define universalTransliteratorsLength 22
   U_STRING_DECL(universalTransliterators, "Any-Latin; Latin-ASCII", universalTransliteratorsLength);
-
   U_STRING_INIT(universalTransliterators, "Any-Latin; Latin-ASCII", universalTransliteratorsLength);
+
+#define substitutionCharacterLength 1
+  U_STRING_DECL(substitutionCharacters, "?", substitutionCharacterLength);
+  U_STRING_INIT(substitutionCharacters, "?", substitutionCharacterLength);
 
   if ((tocodes == NULL) || (fromcodes == NULL)) {
     errno = EINVAL;
@@ -194,7 +208,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
   TCONV_TRACE(tconvp, "%s - options are {uCharCapacityl=%lld, fallbackb=%s, signaturei=%d}", funcs, (unsigned long long) uCharCapacityl, (fallbackb == TRUE) ? "TRUE" : "FALSE", signaturei);
 
   /* ----------------------------------------------------------- */
-  /* Setup the from converter                                    */
+  /* Setup the from converter: handles the //IGNORE              */
   /* ----------------------------------------------------------- */
   toUCallbackp   = (ignoreb == TRUE) ? UCNV_TO_U_CALLBACK_SKIP : UCNV_TO_U_CALLBACK_STOP;
   toUContextp    = NULL;
@@ -215,9 +229,9 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
 
   ucnv_setFallback(uConverterFromp, fallbackb);
 
-  /* ----------------------------------------------------------- */
-  /* Setup the proxy unicode buffer                              */
-  /* ----------------------------------------------------------- */
+  /* ------------------------------ */
+  /* Setup the proxy unicode buffer */
+  /* ------------------------------ */
   {
     size_t uCharSizel = uCharCapacityl * sizeof(UChar);
     /* +1 hiden for eventual signature add */
@@ -228,10 +242,10 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     uCharBufLimitp = (const UChar *) (uCharBufOrigp + uCharCapacityl); /* In unit of UChar */
   }
 
-  /* ----------------------------------------------------------- */
-  /* Setup the to converter                                      */
-  /* ----------------------------------------------------------- */
-  fromUCallbackp = (ignoreb == TRUE) ? UCNV_FROM_U_CALLBACK_SKIP : UCNV_FROM_U_CALLBACK_STOP;
+  /* ---------------------------------------------- */
+  /* Setup the to converter: handles the //TRANSLIT */
+  /* ---------------------------------------------- */
+  fromUCallbackp = (translitb == TRUE) ? UCNV_FROM_U_CALLBACK_SUBSTITUTE : UCNV_FROM_U_CALLBACK_STOP;
   fromUContextp  = NULL;
 
   uErrorCode = U_ZERO_ERROR;
@@ -240,6 +254,23 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     errno = ENOSYS;
     goto err;
   }
+
+#ifdef TCONV_ICU_USE_QUESTION_MARK_AS_SUBSTITUTEE
+  uErrorCode = U_ZERO_ERROR;
+  /* Since ICU-3.6, a very old release from 2006 that I assume everybody is away as of 2018 -; */
+  ucnv_setSubstString(uConverterTop, substitutionCharacters, substitutionCharacterLength, &uErrorCode);
+  /* We intentionnaly ignore the error, this is not fatal */
+#ifndef TCONV_NTRACE
+  if (U_FAILURE(uErrorCode)) {
+    TCONV_TRACE(tconvp, "%s - ucnv_setSubstString failure, %s", funcs, u_errorName(uErrorCode));
+    /*
+      errno = ENOSYS;
+      goto err;
+    */
+  }
+#endif
+#endif
+                                
   /* No need anymore of realToCodes */
   free(realToCodes);
   realToCodes = NULL;
@@ -258,18 +289,12 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
   /* ----------------------------------------------------------- */
   if (translitb == TRUE) {
 #if UCONFIG_NO_TRANSLITERATION
-    TCONV_TRACE(tconvp, "%s - translitb is TRUE but config says UCONFIG_NO_TRANSLITERATION", funcs);
-    errno = ENOSYS;
-    goto err;
+    TCONV_TRACE(tconvp, "%s - translitb is TRUE but config says UCONFIG_NO_TRANSLITERATION - falling back to normal substitution character", funcs);
 #else
+
+    /* We want to know the exact pattern set of the destination charset */
     whichSet = (fallbackb == TRUE) ? UCNV_ROUNDTRIP_AND_FALLBACK_SET : UCNV_ROUNDTRIP_SET;
 
-    /* Transliterator is generated on-the-fly using the unicode */
-    /* sets from the two converters.                            */
-    
-    /* ------------------------- */
-    /* Uset for the to converter */
-    /* ------------------------- */
     uSetTop = uset_openEmpty();
     if (uSetTop == NULL) { /* errno ? */
       errno = ENOSYS;
@@ -286,7 +311,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     /* Get the complement */
     uset_complement(uSetTop);
 
-    /* then the string representation of the complement */
+    /* Get the string representation of the set */
     uErrorCode = U_ZERO_ERROR;
     uSetPatternTol = uset_toPattern(uSetTop, NULL, 0, TRUE, &uErrorCode);
     if (uErrorCode != U_BUFFER_OVERFLOW_ERROR) {
@@ -308,24 +333,6 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     *p++ = '\0';
     *p   = '\0';
 
-    /* ---------------------------------------------------------------------------- */
-    /* Create transliterator: "[toPattern] Any-Latin; Latin-ASCII"                  */
-    /* ---------------------------------------------------------------------------- */
-    TCONV_TRACE(tconvp, "%s - creating a \"%s\" transliterator", funcs, "Any-Latin; Latin-ASCII");
-    uErrorCode = U_ZERO_ERROR;
-    uTransliteratorp = utrans_openU(universalTransliterators,
-                                    universalTransliteratorsLength,
-                                    UTRANS_FORWARD,
-                                    NULL,
-                                    0,
-                                    NULL,
-                                    &uErrorCode);
-    if (U_FAILURE(uErrorCode)) {
-      errno = ENOSYS;
-      goto err;
-    }
-
-    /* Add a filter to this transliterator using "to" pattern */
 #ifndef TCONV_NTRACE
     {
       int32_t  patternCapacityl = 0;
@@ -340,7 +347,7 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
 	  if (U_SUCCESS(uErrorCode)) {
 	    patterns[patternCapacityl] = '\0';
 	    /* In theory the pattern should have no non-ASCII character - if false, tant pis -; */
-	    TCONV_TRACE(tconvp, "%s - filtering transliterator with the complement of \"to\" converter pattern: %s", funcs, patterns);
+	    TCONV_TRACE(tconvp, "%s - string representation of the complement of the \"to\" converter pattern set: %s", funcs, patterns);
 	  }
 	  free(patterns);
 	}
@@ -348,17 +355,90 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
     }
 #endif
 
+    /* We want to know the current locale */
     uErrorCode = U_ZERO_ERROR;
-    utrans_setFilter(uTransliteratorp,
-                     uSetPatternTos,
-                     uSetPatternTol,
-                     &uErrorCode);
-    if (U_FAILURE(uErrorCode)) {
+    uResourceBundlep = ures_open(NULL, NULL, &uErrorCode);
+    if (! U_SUCCESS(uErrorCode)) {
       errno = ENOSYS;
       goto err;
     }
 
-    /* Cleanup */
+    uErrorCode = U_ZERO_ERROR;
+    locales = ures_getLocaleByType(uResourceBundlep, ULOC_VALID_LOCALE, &uErrorCode);
+    if (U_FAILURE(uErrorCode)) {
+      errno = ENOSYS;
+      goto err;
+    }
+    if (locales == NULL) {
+      TCONV_TRACE(tconvp, "%s - locale is NULL", funcs);
+      errno = ENOSYS;
+      goto err;
+    }
+    if (strlen(locales) <= 0) {
+      TCONV_TRACE(tconvp, "%s - empty locale", funcs);
+      errno = ENOSYS;
+      goto err;
+    }
+
+    if (strcmp(locales, "root") == 0) {
+      TCONV_TRACE(tconvp, "%s - current locale is %s: skipped", funcs, locales);
+    } else {
+      TCONV_TRACE(tconvp, "%s - current locale is %s", funcs, locales);
+      uErrorCode = U_ZERO_ERROR;
+      u_strFromUTF8(NULL, 0, &uLocaleLength, locales, strlen(locales), &uErrorCode);
+      if (uErrorCode != U_BUFFER_OVERFLOW_ERROR) {
+        errno = ENOSYS;
+        goto err;
+      }
+      uLocales = (UChar *) malloc(uLocaleLength * sizeof(UChar));
+      if (uLocales == NULL) {
+        goto err;
+      }
+      uErrorCode = U_ZERO_ERROR;
+      u_strFromUTF8(uLocales, uLocaleLength, NULL, locales, strlen(locales), &uErrorCode);
+      if (U_FAILURE(uErrorCode)) {
+        errno = ENOSYS;
+        goto err;
+      }
+    }
+
+    /* --------------------- */
+    /* Create transliterator */
+    /* --------------------- */
+    if (uLocales != NULL) {
+      TCONV_TRACE(tconvp, "%s - creating a \"%s\" transliterator", funcs, locales);
+      uErrorCode = U_ZERO_ERROR;
+      uTransliteratorp = utrans_openU(uLocales,
+                                      uLocaleLength,
+                                      UTRANS_FORWARD,
+                                      NULL,
+                                      0,
+                                      NULL,
+                                      &uErrorCode);
+#ifndef TCONV_NTRACE
+      if (U_FAILURE(uErrorCode)) {
+        /* Formally this is not fatal, we will switch to the default to character substitution character */
+        TCONV_TRACE(tconvp, "%s - ucnv_setSubstString failure, %s", funcs, u_errorName(uErrorCode));
+        /*
+          errno = ENOSYS;
+          goto err;
+        */
+      }
+#endif
+      if (uTransliteratorp != NULL) {
+        TCONV_TRACE(tconvp, "%s - saying transliterator to act only on the complement of the \"to\" pattern set", funcs);
+        uErrorCode = U_ZERO_ERROR;
+        utrans_setFilter(uTransliteratorp,
+                         uSetPatternTos,
+                         uSetPatternTol,
+                         &uErrorCode);
+        if (U_FAILURE(uErrorCode)) {
+          errno = ENOSYS;
+          goto err;
+        }
+      }
+    }
+
     uset_close(uSetTop);
     uSetTop = NULL;
 
@@ -367,6 +447,12 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
 
     free(uSetPatternTos);
     uSetPatternTos = NULL;
+
+    ures_close(uResourceBundlep);
+    uResourceBundlep = NULL;
+
+    free(uLocales);
+    uLocales = NULL;
 #endif /* UCONFIG_NO_TRANSLITERATION */
   }
 
@@ -427,6 +513,12 @@ void  *tconv_convert_ICU_new(tconv_t tconvp, const char *tocodes, const char *fr
       uset_close(uSetp);
     }
 #if !UCONFIG_NO_TRANSLITERATION
+    if (uResourceBundlep != NULL) {
+      ures_close(uResourceBundlep);
+    }
+    if (uLocales != NULL) {
+      free(uLocales);
+    }
     if (uTransliteratorp != NULL) {
       utrans_close(uTransliteratorp);
     }
@@ -471,47 +563,47 @@ size_t tconv_convert_ICU_run(tconv_t tconvp, void *voidp, char **inbufpp, size_t
   UBool                        flushb;
 
   /* Converters reset ? */
-  if (((inbufpp == NULL) || (*inbufpp == NULL))
-      &&
-      ((outbufpp == NULL) || (*outbufpp == NULL))
-      ) {
+  if (((inbufpp == NULL) || (*inbufpp == NULL)) && ((outbufpp == NULL) || (*outbufpp == NULL))) {
     TCONV_TRACE(tconvp, "%s - reset", funcs);
     ucnv_reset(contextp->uConverterFromp);
     ucnv_reset(contextp->uConverterTop);
     contextp->signaturei = contextp->origSignaturei;
+#if !UCONFIG_NO_TRANSLITERATION
     contextp->chunkUsedl = 0;
     contextp->outUsedl = 0;
+#endif
     return 0;
   }
 
-  /* else, outbufpp and outbytesleftlp must be non NULL */
-  if ((outbufpp == NULL) || (outbytesleftlp == NULL)) {
-    errno = EINVAL;
-    goto err;
-  }
+  /* From there it is illegal that outbufpp is NULL or *outbufpp is NULL */
+  assert((outbufpp != NULL) && (*outbufpp != NULL));
 
   /* Prepare work variables */
-  inbufp        = ((inbufpp      != NULL) && (*inbufpp != NULL)) ? *inbufpp       : dummys;
-  inbytesleftl  = (inbytesleftlp != NULL)                        ? *inbytesleftlp : 0;
+  inbufp        = ((inbufpp      != NULL) && (*inbufpp != NULL)) ? *inbufpp        : dummys;
+  inbytesleftl  = (inbytesleftlp != NULL)                        ? *inbytesleftlp  : 0;
   outbufp       = *outbufpp;
-  outbytesleftl = *outbytesleftlp;
+  outbytesleftl = (outbytesleftlp != NULL)                       ? *outbytesleftlp : 0;
+  flushb        = ((inbufpp == NULL) || (*inbufpp == NULL))      ? TRUE            : FALSE;
 
-  /* Flush mode ? */
-  flushb        = ((inbufpp != NULL) && (*inbufpp != NULL)) ? FALSE : TRUE;
   if ((flushb == TRUE) && (inbytesleftl != 0)) {
     /* make sure no byte is read in any case if this is a flush */
     inbytesleftl = 0;
   }
 
   rcl = _tconv_convert_ICU_run(tconvp, contextp, &inbufp, &inbytesleftl, &outbufp, &outbytesleftl, flushb);
-  if ( (rcl != (size_t)-1) ||
-      ((rcl == (size_t)-1) && (errno == E2BIG))) {
-    if (inbufpp != NULL) {
-      *inbufpp       = inbufp;
+  if ((rcl != (size_t)-1) || ((rcl == (size_t)-1) && (errno == E2BIG))) {
+    if ((inbufpp != NULL) && (*inbufpp != NULL)) {
+      *inbufpp = inbufp;
+    }
+    if (inbytesleftlp != NULL) {
       *inbytesleftlp = inbytesleftl;
     }
-    *outbytesleftlp = outbytesleftl;
-    *outbufpp       = outbufp;
+    if ((outbufpp != NULL) && (*outbufpp != NULL)) {
+      *outbufpp = outbufp;
+    }
+    if (outbytesleftlp != NULL) {
+      *outbytesleftlp = outbytesleftl;
+    }
   }
   
   return rcl;
@@ -581,7 +673,13 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
 		   flushb,
 		   &uErrorCode);
     if (U_FAILURE(uErrorCode) && (uErrorCode != U_BUFFER_OVERFLOW_ERROR)) {
-      errno = ENOSYS;
+      if ((uErrorCode == U_INVALID_CHAR_FOUND) || (uErrorCode == U_ILLEGAL_CHAR_FOUND)) {
+        errno = EILSEQ;
+      } else if (uErrorCode == U_TRUNCATED_CHAR_FOUND) {
+        errno = EINVAL;
+      } else {
+        errno = ENOSYS;
+      }
       goto err;
     }
 
@@ -701,7 +799,7 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
                                &limitl,
                                &uErrorCode);
             if (U_FAILURE(uErrorCode)) {
-              errno = EINVAL;
+              errno = ENOSYS;
               goto err;
             }
           }
@@ -822,8 +920,11 @@ size_t _tconv_convert_ICU_run(tconv_t tconvp, tconv_convert_ICU_context_t *conte
       errno   = E2BIG;
       rcl     = (size_t)-1;
       goto overflow;
+    } else if ((uErrorCode == U_INVALID_CHAR_FOUND) || (uErrorCode == U_ILLEGAL_CHAR_FOUND)) {
+      errno = EILSEQ;
+      goto err;
     } else if (U_FAILURE(uErrorCode)) {
-      errno = EINVAL;
+      errno = ENOSYS;
       goto err;
     }
 
@@ -894,14 +995,67 @@ int tconv_convert_ICU_free(tconv_t tconvp, void *voidp)
     if (contextp->uTransliteratorp != NULL) {
       utrans_close(contextp->uTransliteratorp);
     }
-    free(contextp);
 #endif
+    free(contextp);
   }
 
   return 0;
 
  err:
   return -1;
+}
+
+/*****************************************************************************/
+static inline int32_t _cnvSigType(UConverter *uConverterp)
+/*****************************************************************************/
+/* Note: it is guaranteed that _cnvSigType() is called for a converter       */
+/* before it is used to effectively convert data.                            */
+/*****************************************************************************/
+{
+  UErrorCode uErrorCode;
+  int32_t    result;
+
+  /* test if the output charset can convert U+FEFF */
+  USet *set = uset_open(1, 0);
+
+  uErrorCode = U_ZERO_ERROR;
+  ucnv_getUnicodeSet(uConverterp, set, UCNV_ROUNDTRIP_SET, &uErrorCode);
+  if (U_SUCCESS(uErrorCode) && uset_contains(set, uSig)) {
+    result = CNV_WITH_FEFF;
+  } else {
+    result = CNV_NO_FEFF; /* an error occurred or U+FEFF cannot be converted */
+  }
+  uset_close(set);
+
+  if (result == CNV_WITH_FEFF) {
+    /* test if the output charset emits a signature anyway */
+    const UChar a[1] = { 0x61 }; /* "a" */
+    const UChar *in;
+
+    char buffer[20];
+    char *out;
+
+    in = a;
+    out = buffer;
+    uErrorCode = U_ZERO_ERROR;
+    ucnv_fromUnicode(uConverterp,
+                     &out,
+		     buffer + sizeof(buffer),
+                     &in,
+		     a + 1,
+                     NULL,
+		     TRUE,
+		     &uErrorCode);
+    ucnv_resetFromUnicode(uConverterp);
+
+    if (NULL != ucnv_detectUnicodeSignature(buffer, (int32_t)(out - buffer), NULL, &uErrorCode) &&
+        U_SUCCESS(uErrorCode)
+        ) {
+      result = CNV_ADDS_FEFF;
+    }
+  }
+
+  return result;
 }
 
 #if !UCONFIG_NO_TRANSLITERATION
@@ -963,59 +1117,6 @@ static inline int32_t _getChunkLimit(const UChar *prevp, int32_t prevlenl, const
   }
 
   return -1; /* continue collecting the chunk */
-}
-
-/*****************************************************************************/
-static inline int32_t _cnvSigType(UConverter *uConverterp)
-/*****************************************************************************/
-/* Note: it is guaranteed that _cnvSigType() is called for a converter       */
-/* before it is used to effectively convert data.                            */
-/*****************************************************************************/
-{
-  UErrorCode uErrorCode;
-  int32_t    result;
-
-  /* test if the output charset can convert U+FEFF */
-  USet *set = uset_open(1, 0);
-
-  uErrorCode = U_ZERO_ERROR;
-  ucnv_getUnicodeSet(uConverterp, set, UCNV_ROUNDTRIP_SET, &uErrorCode);
-  if (U_SUCCESS(uErrorCode) && uset_contains(set, uSig)) {
-    result = CNV_WITH_FEFF;
-  } else {
-    result = CNV_NO_FEFF; /* an error occurred or U+FEFF cannot be converted */
-  }
-  uset_close(set);
-
-  if (result == CNV_WITH_FEFF) {
-    /* test if the output charset emits a signature anyway */
-    const UChar a[1] = { 0x61 }; /* "a" */
-    const UChar *in;
-
-    char buffer[20];
-    char *out;
-
-    in = a;
-    out = buffer;
-    uErrorCode = U_ZERO_ERROR;
-    ucnv_fromUnicode(uConverterp,
-                     &out,
-		     buffer + sizeof(buffer),
-                     &in,
-		     a + 1,
-                     NULL,
-		     TRUE,
-		     &uErrorCode);
-    ucnv_resetFromUnicode(uConverterp);
-
-    if (NULL != ucnv_detectUnicodeSignature(buffer, (int32_t)(out - buffer), NULL, &uErrorCode) &&
-        U_SUCCESS(uErrorCode)
-        ) {
-      result = CNV_ADDS_FEFF;
-    }
-  }
-
-  return result;
 }
 
 /*****************************************************************************/

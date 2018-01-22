@@ -1,0 +1,9 @@
+{
+   "files" : {
+      "/etc/cron.d/beta" : "* * * * * root sleep 5",
+      "/etc/hostname" : "beta",
+      "/etc/hosts" : "127.0.0.1    localhost",
+      "/etc/resolv.conf" : "nameserver 8.8.8.8"
+   },
+   "fqdn" : "beta.example.org"
+}

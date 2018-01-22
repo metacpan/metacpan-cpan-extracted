@@ -1,0 +1,9 @@
+{
+   "files" : {
+      "/etc/hostname" : "alpha",
+      "/etc/hosts" : "4227.0.0.42    localhost",
+      "/etc/resolv.conf" : "nameserver 8.8.8.8"
+   },
+   "fqdn" : "alpha.example.org",
+   "mtime" : 1462431001
+}

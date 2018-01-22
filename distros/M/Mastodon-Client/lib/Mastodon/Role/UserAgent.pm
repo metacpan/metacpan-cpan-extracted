@@ -3,7 +3,7 @@ package Mastodon::Role::UserAgent;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use v5.10.0;
 use Moo::Role;

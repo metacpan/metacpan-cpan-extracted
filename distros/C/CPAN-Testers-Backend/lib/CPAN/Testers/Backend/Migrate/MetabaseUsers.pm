@@ -1,5 +1,5 @@
 package CPAN::Testers::Backend::Migrate::MetabaseUsers;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Migrate old metabase users to new table for metabase lookups
 
 #pod =head1 SYNOPSIS
@@ -71,7 +71,7 @@ CPAN::Testers::Backend::Migrate::MetabaseUsers - Migrate old metabase users to n
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

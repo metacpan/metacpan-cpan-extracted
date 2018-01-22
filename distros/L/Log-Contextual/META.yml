@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/frioux/Log-Contextual/issues
   homepage: https://github.com/frioux/Log-Contextual
   repository: https://github.com/frioux/Log-Contextual.git
-version: '0.008000'
+version: '0.008001'
 x_serialization_backend: 'YAML::Tiny version 1.70'

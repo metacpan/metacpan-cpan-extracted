@@ -1,0 +1,18 @@
+Tk::PathEntry Module
+
+This is an alternative to classic file selection dialogs. It's just an
+Entry widget which can do file completion using the <Tab> key like in
+modern shells.
+
+To install, type
+
+	$ perl Makefile.PL
+	$ make
+	$ make test
+	$ make install
+
+For Windows NT and ActiveState Perl, replace "make" with "nmake", if
+you have the Visual C++ compiler available or have nmake installed on
+your system. Otherwise, just copy PathEntry.pm to C:\Perl\lib\site\Tk.
+
+Send bug reports, comments and suggestions to srezic@cpan.org

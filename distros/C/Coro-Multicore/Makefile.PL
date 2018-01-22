@@ -77,6 +77,7 @@ WriteMakefile(Coro::MakeMaker::coro_args(
     NAME => "Coro::Multicore",
     VERSION_FROM => "Multicore.pm",
     CONFIGURE_REQUIRES => { "ExtUtils::MakeMaker" => 6.52, "Canary::Stability" => 0, "Coro" => 6.44 },
+    TEST_REQUIRES => { "Coro" => 6.44 },
     PREREQ_PM    => { "Coro" => 6.44, "AnyEvent" => 7 },
     INC          => $INC,
     LIBS         => $LIBS,

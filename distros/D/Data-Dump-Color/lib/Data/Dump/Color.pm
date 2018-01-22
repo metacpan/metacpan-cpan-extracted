@@ -1,7 +1,11 @@
+## no critic: Modules::ProhibitAutomaticExportation
+## no critic: BuiltinFunctions::RequireBlockGrep
+## no critic: ValuesAndExpressions::ProhibitCommaSeparatedStatements
+
 package Data::Dump::Color;
 
-our $DATE = '2014-10-29'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use strict;
@@ -509,6 +513,10 @@ sub _dump
 	    $cval =~ s/\n/\n$vpad/gm;
 	    my $kpad = $nl ? $INDENT : " ";
 	    $key .= " " x ($klen_pad - length($key)) if $nl;
+
+	    my $pad_len = ($klen_pad - length($key));
+	    if ($pad_len < 0) { $pad_len = 0; }
+	    $key .= " " x $pad_len if $nl;
             my $cpad = " " x ($maxkvlen - ($vmultiline ? -6+length($vpad) : length($key)) - $lenvlastline);
             #say "DEBUG: key=<$key>, vpad=<$vpad>, val=<$val>, lenvlastline=<$lenvlastline>, cpad=<$cpad>" if $DEBUG;
             my $visaid = "";
@@ -767,7 +775,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.23 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2014-10-29.
+This document describes version 0.240 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2018-01-17.
 
 =head1 SYNOPSIS
 
@@ -861,17 +869,6 @@ is at least this value.
 
 =back
 
-=head1 ENVIRONMENT
-
-=over
-
-=item * COLOR
-
-If set, then will force color output on or off. By default, will only output
-color when in interactive terminal. This is consulted when C<$COLOR> is not set.
-
-=back
-
 =head1 FAQ
 
 =head2 How do I turn off index comments?
@@ -889,9 +886,16 @@ Fiddle the colors in C<%Data::Dump::Color::COLORS>. There will probably be
 proper color theme support in the future (based on
 L<SHARYANTO::Role::ColorTheme>.
 
-=head1 SEE ALSO
+=head1 ENVIRONMENT
 
-L<Data::Dump>, L<JSON::Color>, L<YAML::Tiny::Color>
+=over
+
+=item * COLOR
+
+If set, then will force color output on or off. By default, will only output
+color when in interactive terminal. This is consulted when C<$COLOR> is not set.
+
+=back
 
 =head1 HOMEPAGE
 
@@ -909,13 +913,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Data::Dump>, L<JSON::Color>, L<YAML::Tiny::Color>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

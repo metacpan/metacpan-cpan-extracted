@@ -12,7 +12,7 @@
 
 use strict;
 use warnings;
-use JSON;
+use MVC::Neaf::Util qw(decode_json); # Just 'use JSON' in real code
 use MVC::Neaf qw(:sugar);
 
 # Finally an example where not everything is in one file.

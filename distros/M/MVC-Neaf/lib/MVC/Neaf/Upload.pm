@@ -14,8 +14,10 @@ L<MVC::Neaf::Request> object.
 
 =cut
 
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 use Carp;
+use Encode;
+use PerlIO::encoding;
 
 =head2 new(%options)
 
@@ -31,21 +33,51 @@ use Carp;
 
 =item * filename - user-supplied filename. Don't trust this.
 
+=item * utf8 - if set, all data read from the file will be utf8-decoded.
+
 =back
 
 =cut
 
+# TODO 0.25 figure out if GLOBs are worth the hassle
+# We use GLOB objects so that <$upload> works as expected.
+# This may turn out to be not worth it, so it's not even in the docs yet.
+# See also t/*diamond*.t
+
+my %new_opt;
+my @copy_fields = qw(id tempfile filename utf8);
+$new_opt{$_}++ for @copy_fields, "handle";
 sub new {
     my ($class, %args) = @_;
 
     # TODO 0.19 add "unicode" flag to open & slurp in utf8 mode
 
+    my @extra = grep { !$new_opt{$_} } keys %args;
+    croak( "$class->new(): unknown options @extra" )
+        if @extra;
     defined $args{id}
         or croak( "$class->new(): id option is required" );
-    defined $args{tempfile} || defined $args{handle}
-        or croak( "$class->new(): Either tempfile or handle option required" );
 
-    my $self = bless \%args, $class;
+    my $self;
+    if ($args{tempfile}) {
+        open $self, "<", $args{tempfile}
+            or croak "$class->new(): Failed to open $args{tempfile}: $!";
+    } elsif ($args{handle}) {
+        open $self, "<&", $args{handle}
+            or croak "$class->new(): Failed to dup handle $args{handle}: $!";
+    } else {
+        croak( "$class->new(): Either tempfile or handle option required" );
+    };
+
+    if ($args{utf8}) {
+        local $PerlIO::encoding::fallback = Encode::FB_CROAK;
+        binmode $self, ":encoding(UTF-8)"
+    };
+    bless $self, $class;
+
+    *$self->{$_} = $args{$_}
+        for @copy_fields;
+
     return $self;
 };
 
@@ -57,7 +89,7 @@ Return upload id.
 
 sub id {
     my $self = shift;
-    return $self->{id};
+    return *$self->{id};
 };
 
 =head2 filename()
@@ -69,8 +101,8 @@ Get user-supplied file name. Don't trust this value.
 sub filename {
     my $self = shift;
 
-    $self->{filename} = '/dev/null' unless defined $self->{filename};
-    return $self->{filename};
+    *$self->{filename} = '/dev/null' unless defined *$self->{filename};
+    return *$self->{filename};
 };
 
 =head2 size()
@@ -84,7 +116,7 @@ B<CAVEAT> May return 0 if file is a pipe.
 sub size {
     my $self = shift;
 
-    return $self->{size} ||= do {
+    return *$self->{size} ||= do {
         # calc size
         my $fd = $self->handle;
         my @stat = stat $fd;
@@ -101,12 +133,7 @@ Return file handle, opening temp file if needed.
 sub handle {
     my $self = shift;
 
-    return $self->{handle} ||= do {
-        # need write?
-        open my $fd, "<", $self->{tempfile}
-            or die "Upload $self->{id}: Failed to open(r) $self->{tempfile}: $!";
-        $fd;
-    };
+    return $self;
 };
 
 =head2 content()
@@ -122,22 +149,23 @@ B<NOTE> This breaks file current position, resetting it to the beginning.
 sub content {
     my $self = shift;
 
-    if (!defined $self->{content}) {
+    # TODO 0.30 remember where the  file was 1st time
+    if (!defined *$self->{content}) {
         $self->rewind;
         my $fd = $self->handle;
 
         local $/;
         my $content = <$fd>;
         if (!defined $content) {
-            my $fname = $self->{tempfile} || $fd;
-            croak( "Upload $self->{id}: failed to read file $fname: $!");
+            my $fname = *$self->{tempfile} || $fd;
+            croak( "Upload *$self->{id}: failed to read file $fname: $!");
         };
 
         $self->rewind;
-        $self->{content} = $content;
+        *$self->{content} = $content;
     };
 
-    return $self->{content};
+    return *$self->{content};
 };
 
 =head2 rewind()
@@ -156,8 +184,7 @@ sub rewind {
     return $self;
 };
 
-sub DESTROY {
-    # TODO 0.30 kill the file
-};
+# TODO 0.30 kill the tempfile, if any?
+# sub DESTROY { };
 
 1;

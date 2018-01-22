@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::ChangelogFromGit;
-$Dist::Zilla::Plugin::ChangelogFromGit::VERSION = '0.016';
+$Dist::Zilla::Plugin::ChangelogFromGit::VERSION = '0.017';
 # Indent style:
 #   http://www.emacswiki.org/emacs/SmartTabs
 #   http://www.vim.org/scripts/script.php?script_id=231
@@ -24,6 +24,18 @@ has max_age => (
 	is      => 'ro',
 	isa     => 'Int',
 	default => 365,
+);
+
+has min_releases => (
+	is      => 'ro',
+	isa     => 'Int',
+	default => 1,
+);
+
+has max_releases => (
+	is      => 'ro',
+	isa     => 'Int',
+	default => 0,
 );
 
 has tag_regexp => (
@@ -75,7 +87,7 @@ has skipped_release_count => (
 );
 
 has earliest_date => (
-	is      => 'ro',
+	is      => 'rw',
 	isa     => 'DateTime',
 	lazy    => 1,
 	default => sub {
@@ -157,12 +169,18 @@ sub gather_files {
 
 	{
 		my $i = $self->release_count();
+		my $included_releases = 0;
+		my $min_releases = $self->min_releases;
+		my $max_releases = $self->max_releases;
 		while ($i--) {
 			my $this_release = $self->get_release($i);
 
-			if (DateTime->compare($this_release->date, $earliest_date) == -1) {
-				$self->add_skipped_release(1);
-				next;
+			if ($min_releases <= $included_releases){
+				if ((DateTime->compare($this_release->date, $earliest_date) == -1) ||
+					($max_releases && ($max_releases <= $included_releases))){
+					$self->add_skipped_release(1);
+					next;
+				}
 			}
 
 			my $prev_version = (
@@ -179,6 +197,7 @@ sub gather_files {
 			my $include_message_re = $self->include_message();
 
 			my $iter = Git::Repository::Log::Iterator->new($release_range);
+			my $commit_date;
 			while (my $log = $iter->next) {
 				next if (
 					defined $exclude_message_re and
@@ -196,6 +215,7 @@ sub gather_files {
 					$self->debug()
 				);
 
+				$commit_date = DateTime->from_epoch(epoch => $log->committer_localtime);
 				$this_release->add_to_changes(
 					Software::Release::Change->new(
 						author_email    => $log->author_email,
@@ -203,11 +223,14 @@ sub gather_files {
 						change_id       => $log->commit,
 						committer_email => $log->committer_email,
 						committer_name  => $log->committer_name,
-						date            => DateTime->from_epoch(epoch => $log->committer_localtime),
+						date            => $commit_date,
 						description     => $log->message
 					)
 				);
 			};
+			if(++$included_releases == $max_releases){
+				$self->earliest_date($commit_date || $this_release->date);
+			}
 		}
 	}
 
@@ -406,7 +429,7 @@ sub format_datetime {
 
 sub rungit {
 	my ($self, $arrayp) = @_;
-	my $buf;
+	my $buf = '';
 	run(command => $arrayp, buffer => \$buf);
 	return split("\n", $buf);
 }
@@ -422,7 +445,7 @@ Dist::Zilla::Plugin::ChangelogFromGit - Write a Changes file from a project's gi
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -471,6 +494,24 @@ default value:
 C<max_age> is intended to limit the size of change logs for large,
 long-term projects that don't want to include the entire, huge commit
 history in every release.
+
+=head2 min_releases = INTEGER
+
+C<min_releases> sets the minimum number of releases that should be
+included.  It defaults to 1 so that at least the current release is
+added, regardless of C<max_age>.
+
+	[ChangelogFromGit]
+	min_releases = 5
+
+=head2 max_releases = INTEGER
+
+c<max_releases> allows you limit the number of releases included.
+C<max_age> will still be the limiting factor if it contains fewer
+releases than the max specified.
+
+	[ChangelogFromGit]
+	max_releases = 15
 
 =head2 tag_regexp = REGULAR_EXPRESSION
 
@@ -910,6 +951,22 @@ skipped_release_count() contains the number of releases truncated by
 max_age().  The default render_changelog_footer() uses it to display
 the number of changes that have been omitted from the log.
 
+=head1 INTERNAL METHODS
+
+Dist::Zilla::Plugin::ChangelogFromGit implements a couple of
+"unpublished" methods.  These are not intended for general use.
+
+=head2 gather_files()
+
+Find all release tags back to the earliest changelog date.
+
+Add a virtual release for the most recent change in the repository. This lets us
+include changes after the last releases, up to "HEAD".
+
+=head2 rungit()
+
+A wrapper to run git commands.
+
 =head1 Subversion and CVS
 
 This plugin is almost entirely a copy-and-paste port of a command-line
@@ -943,7 +1000,7 @@ overridable.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010-2013 by Rocco Caputo.
+This software is copyright (c) 2010-2018 by Rocco Caputo.
 
 This is free software; you may redistribute it and/or modify it under
 the same terms as the Perl 5 programming language itself.

@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Item;
 
-$WWW::Google::CustomSearch::Item::VERSION   = '0.35';
+$WWW::Google::CustomSearch::Item::VERSION   = '0.37';
 $WWW::Google::CustomSearch::Item::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Item - Placeholder for Google JSON/Atom Custom Search
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
@@ -17,18 +17,9 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
-has 'kind'             => (is => 'ro');
-has 'link'             => (is => 'ro');
-has 'displayLink'      => (is => 'ro');
-has 'snippet'          => (is => 'ro');
-has 'htmlSnippet'      => (is => 'ro');
-has 'cacheId'          => (is => 'ro');
-has 'formattedUrl'     => (is => 'ro');
-has 'htmlFormattedUrl' => (is => 'ro');
-has 'title'            => (is => 'ro');
-has 'htmlTitle'        => (is => 'ro');
+has [qw(kind link displayLink snippet htmlSnippet cacheId formattedUrl htmlFormattedUrl title htmlTitle)] => (is => 'ro');
 
 =head1 DESCRIPTION
 

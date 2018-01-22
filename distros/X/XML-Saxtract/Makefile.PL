@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "XML::SAX" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }

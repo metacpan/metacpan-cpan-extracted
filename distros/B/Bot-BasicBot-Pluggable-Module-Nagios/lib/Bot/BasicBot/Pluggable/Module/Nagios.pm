@@ -3,7 +3,7 @@ package Bot::BasicBot::Pluggable::Module::Nagios;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base 'Bot::BasicBot::Pluggable::Module';
 
@@ -57,12 +57,12 @@ sub help {
     return <<USAGE;
 A module to report Nagios alerts to IRC channels.
 
-   nagios add http://example.com/cgi-bin/status.cgi username password #chan
-   nagios list
-   nagios del 1
-   nagios set setting_name value
+   !nagios add http://example.com/cgi-bin/status.cgi username password #chan
+   !nagios list
+   !nagios del 1
+   !nagios set setting_name value
 
-Say "nagios set" with no setting name for a list of valid settings.
+Say "!nagios set" with no setting name for a list of valid settings.
 
 Full help is available at http://p3rl.org/Bot::BasicBot::Pluggable::Module::Nagios
 USAGE
@@ -71,7 +71,7 @@ USAGE
 sub told {
     my ($self, $mess) = @_;
 
-    return unless $mess->{address} && $mess->{body} =~ s/^nagios\s+//i;
+    return unless $mess->{address} && $mess->{body} =~ s/^!nagios\s+//i;
     my ($command, $params) = split /\s+/, $mess->{body}, 2;
     if (lc $command eq 'add') {
         my($url, $user, $pass, $channel_list) = split /\s+/, $params, 4;
@@ -531,43 +531,17 @@ find your work useful.
 (Reviews on cpanratings and/or ++'s on MetaCPAN are also very welcome.)
 
 
-=head1 BUGS
 
-Please report any bugs or feature requests to C<bug-bot-basicbot-pluggable-module-nagios at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-Module-Nagios>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
+=head1 SUPPORT / BUGS / FEATURE REQUESTS
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Bot::BasicBot::Pluggable::Module::Nagios
 
+You can report bugs or make feature requests using GitHub Issues:
 
-You can also look for information at:
+L<https://github.com/bigpresh/Bot-BasicBot-Pluggable-Module-Nagios/issues>
 
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Module-Nagios>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Nagios>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios/>
-
-=back
 
 
 =head1 ACKNOWLEDGEMENTS
@@ -575,7 +549,7 @@ L<http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Nagios/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2017 David Precious.
+Copyright 2011-2018 David Precious.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

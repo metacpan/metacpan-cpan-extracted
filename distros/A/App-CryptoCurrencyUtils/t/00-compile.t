@@ -6,15 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CryptoCurrencyUtils.pm'
 );
 
 my @scripts = (
-    'script/cmc-currency',
-    'script/grepcrypto'
+    'script/coin-cmc',
+    'script/coin-mno',
+    'script/grepcoin'
 );
 
 # no fake home requested

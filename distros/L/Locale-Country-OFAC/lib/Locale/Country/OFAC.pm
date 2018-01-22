@@ -14,7 +14,7 @@ Readonly my @CRIMEA_REGION => (95000..99999, 295000..299999 );
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw( get_sanction_by_code is_region_sanctioned );
 
-our $VERSION = '1.1.0'; # VERSION 1.1.0
+our $VERSION = '1.2.0'; # VERSION 1.1.0
 # ABSTRACT: Module to look up OFAC Sanctioned Countries
 
 =pod
@@ -85,8 +85,6 @@ Eris Caffee
 
 HostGator
 
-PerlMonks, L<< http://www.perlmonks.com >>
-
 =head1 COPYRIGHT
 
 This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -99,8 +97,6 @@ our %sanctioned_country_codes = (
   IR  => 1,
   CUB => 1,
   CU  => 1,
-  SDN => 1,
-  SD  => 1,
   PRK => 1,
   KP  => 1,
   SYR => 1,

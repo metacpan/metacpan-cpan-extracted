@@ -123,7 +123,7 @@ sub _build_body_data {
 
     # Not sure if these returns should not be exceptions...
     my $content_type = $self->content_type || return;
-    return unless ($self->method eq 'POST' || $self->method eq 'PUT');
+    return unless ($self->method eq 'POST' || $self->method eq 'PUT' || $self->method eq 'PATCH');
 
     my ($match) = grep { $content_type =~/$_/i }
       keys(%{$self->data_handlers});
@@ -132,8 +132,11 @@ sub _build_body_data {
       my $fh = $self->body;
       local $_ = $fh;
       return $self->data_handlers->{$match}->($fh, $self);
-    } else { 
-      Catalyst::Exception->throw("$content_type is does not have an available data handler");
+    } else {
+      Catalyst::Exception->throw(
+        sprintf '%s does not have an available data handler. Valid data_handlers are %s.',
+          $content_type, join ', ', sort keys %{$self->data_handlers}
+      );
     }
 }
 

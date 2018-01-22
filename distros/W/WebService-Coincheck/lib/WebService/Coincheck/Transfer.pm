@@ -17,11 +17,11 @@ sub new {
 }
 
 sub to_leverage {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        amount   => $params->{amount},
-        currency => $params->{currency},
+        amount   => $params{amount},
+        currency => $params{currency},
     };
 
     my $res = $self->client->request(
@@ -33,11 +33,11 @@ sub to_leverage {
 }
 
 sub from_leverage {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        amount   => $params->{amount},
-        currency => $params->{currency},
+        amount   => $params{amount},
+        currency => $params{currency},
     };
 
     my $res = $self->client->request(

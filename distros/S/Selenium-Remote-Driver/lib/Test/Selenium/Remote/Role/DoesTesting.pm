@@ -1,7 +1,7 @@
 package Test::Selenium::Remote::Role::DoesTesting;
 # ABSTRACT: Role to cope with everything that is related to testing (could
 # be reused in both testing classes)
-$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.20';
+$Test::Selenium::Remote::Role::DoesTesting::VERSION = '1.21';
 use Moo::Role;
 use Test::Builder;
 use Try::Tiny;

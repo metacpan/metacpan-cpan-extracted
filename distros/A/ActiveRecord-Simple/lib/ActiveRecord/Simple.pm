@@ -4,23 +4,18 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use utf8;
 use Carp;
-use Module::Load;
 use Scalar::Util qw/blessed/;
 
 use ActiveRecord::Simple::QueryManager;
-use ActiveRecord::Simple::Utils qw/all_blessed class_to_table_name/;
+use ActiveRecord::Simple::Utils qw/all_blessed class_to_table_name load_module/;
 use ActiveRecord::Simple::Connect;
 
 our $connector;
 my $qm = ActiveRecord::Simple::QueryManager->new();
-my @RESERVED_WORDS = qw/
-    foo 
-    bar
-/;
 
 
 sub new {
@@ -470,8 +465,12 @@ sub _get_relation_type {
 
     my $related_class = _get_related_class($relation);
 
-    eval { load $related_class }; ### TODO: check module is loaded
+    #eval { load $related_class }; ### TODO: check module is loaded
     #load $related_class;
+
+    #load $related_class unless is_loaded $related_class;
+    #mark_as_loaded $related_class;
+    load_module $related_class;
 
     my $rel_type = undef;
     while (my ($rel_key, $rel_opts) = each %{ $related_class->_get_relations }) {
@@ -673,7 +672,11 @@ sub _guess {
 
     return 'id' if $what_key eq 'primary_key';
 
-    eval { load $class }; ### TODO: check class has been loaded 
+    #eval { load $class }; ### TODO: check class has been loaded 
+    #load $class unless is_loaded $class;
+    #mark_as_loaded $class;
+    load_module $class;
+
 
     my $table_name = _what_is_the_table_name($class);
     

@@ -1,5 +1,5 @@
 package Net::Async::Ping::TCP;
-$Net::Async::Ping::TCP::VERSION = '0.003001';
+$Net::Async::Ping::TCP::VERSION = '0.003003';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -90,7 +90,7 @@ Net::Async::Ping::TCP
 
 =head1 VERSION
 
-version 0.003001
+version 0.003003
 
 =head1 DESCRIPTION
 

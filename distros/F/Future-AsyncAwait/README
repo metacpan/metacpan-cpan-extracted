@@ -91,10 +91,10 @@ EARLY-VERSION WARNING
     enough for small-scale development and experimental testing, don't
     expect to be able to use this module reliably in production yet.
 
- Things That Work Already
+ Things That Work
 
-    Most simple cases involving awaiting on still-pending futures should be
-    working:
+    Most cases involving awaiting on still-pending futures should work
+    fine:
 
        async sub foo
        {
@@ -131,6 +131,13 @@ EARLY-VERSION WARNING
           foreach my $var ( THINGs ) {
              await func();
           }
+       }
+    
+       async sub quux
+       {
+          my $x = do {
+             await func();
+          };
        }
     
        async sub splat
@@ -223,11 +230,24 @@ WITH OTHER MODULES
     inside an async sub work correctly, including those that attempt to
     return from inside try.
 
+       use Syntax::Keyword::Try;
+    
+       async sub attempt
+       {
+          try {
+             await func();
+             return "success";
+          }
+          catch {
+             return "failed";
+          }
+       }
+
 SEE ALSO
 
       * "Awaiting The Future" - TPC in Amsterdam 2017
 
-      (slides)
+      https://www.youtube.com/watch?v=Xf7rStpNaT0 (slides)
       <https://docs.google.com/presentation/d/13x5l8Rohv_RjWJ0OTvbsWMXKoNEWREZ4GfKHVykqUvc/edit#slide=id.p>
 
 TODO
@@ -245,9 +265,13 @@ TODO
 
       * Clean up the implementation; check for and fix memory leaks.
 
-      * Support older versions of perl than 5.24.
+      * Support older versions of perl than 5.18.
 
       https://rt.cpan.org/Ticket/Display.html?id=122252
+
+      * Support sub signatures in recent perls.
+
+      https://rt.cpan.org/Ticket/Display.html?id=123465
 
 ACKNOWLEDGEMENTS
 

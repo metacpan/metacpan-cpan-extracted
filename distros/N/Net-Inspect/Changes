@@ -1,3 +1,9 @@
+0.330 2018/02/19
+- L7::HTTP::Request::InspectChain
+  - support for brotli if IO::Uncompress::Brotli is installed
+  - better documentation
+- Flow: deal with changes to the attached flows from inside an executed method
+  (happens together with GuessProtocol)
 0.329 2017/11/22
 - L4::Tcp::pktin - fix merging of data into next packet if data were not
   handled in the upper layer yet (merging was done with last unhandled packet

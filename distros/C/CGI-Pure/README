@@ -173,14 +173,14 @@ SEE ALSO
         Common Gateway Interface Class for loading/saving object in file.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2004-2015 Michal Špaček
+     © 2004-2018 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.07
 

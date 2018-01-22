@@ -1,11 +1,9 @@
 package Class::Params;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 use Scalar::Util qw(blessed);
@@ -13,8 +11,7 @@ use Scalar::Util qw(blessed);
 # Export.
 Readonly::Array our @EXPORT_OK => qw(params);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Params processing.
 sub params {
@@ -294,15 +291,15 @@ L<https://github.com/tupinek/Class-Params>
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2011-2015
+ © Michal Josef Špaček 2011-2018
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

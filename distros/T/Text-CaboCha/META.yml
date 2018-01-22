@@ -31,12 +31,12 @@ no_index:
 provides:
   Text::CaboCha:
     file: lib/Text/CaboCha.pm
-    version: '0.05'
+    version: '0.06'
 resources:
   bugtracker: https://github.com/Code-Hex/Text-CaboCha/issues
   homepage: https://github.com/Code-Hex/Text-CaboCha
   repository: git://github.com/Code-Hex/Text-CaboCha.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:CODEHEX
 x_contributors:
   - 'Shoichi Kaji <skaji@cpan.org>'

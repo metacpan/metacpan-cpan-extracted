@@ -1,5 +1,9 @@
 Revision history for Bot-BasicBot-Pluggable-Module-Nagios
 
+0.06    2018-01-19
+        Change commands to be prefixed with "!" (e.g. "!nagios set") so that
+        the Auth module can protect them.
+
 0.05    2017-01-11
         Report failure to poll Nagios - added UPDATE_FAIL to report_statuses
         list to configure whether to report or not

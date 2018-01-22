@@ -71,29 +71,27 @@ sub _server ( $self, $cb ) {
 }
 
 sub _read ( $self, $cb ) {
-    $self->_server(
-        sub($hg) {
-            $hg->stdout->push_read(
-                chunk => 5,
-                sub ( $h, $data ) {
-                    my $channel = substr $data, 0, 1, q[];
+    $self->_server( sub($hg) {
+        $hg->stdout->push_read(
+            chunk => 5,
+            sub ( $h, $data ) {
+                my $channel = substr $data, 0, 1, q[];
 
-                    $h->push_read(
-                        chunk => unpack( 'L>', $data ),
-                        sub ( $h, $data ) {
-                            $cb->( $channel, $data );
+                $h->push_read(
+                    chunk => unpack( 'L>', $data ),
+                    sub ( $h, $data ) {
+                        $cb->( $channel, $data );
 
-                            return;
-                        }
-                    );
+                        return;
+                    }
+                );
 
-                    return;
-                }
-            );
+                return;
+            }
+        );
 
-            return;
-        }
-    );
+        return;
+    } );
 
     return;
 }
@@ -108,47 +106,45 @@ sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
 
     $buf = Encode::encode( $Pcore::WIN_ENC, $buf, Encode::FB_CROAK );
 
-    $self->_server(
-        sub ($hg) {
-            $hg->stdin->push_write( qq[runcommand\x0A] . pack( 'L>', length $buf ) . $buf );
+    $self->_server( sub ($hg) {
+        $hg->stdin->push_write( qq[runcommand\x0A] . pack( 'L>', length $buf ) . $buf );
 
-            my $res = {};
+        my $res = {};
 
-            my $read = sub ( $channel, $data ) {
-                if ( $channel ne 'r' ) {
-                    chomp $data;
+        my $read = sub ( $channel, $data ) {
+            if ( $channel ne 'r' ) {
+                chomp $data;
 
-                    decode_utf8( $data, encoding => $Pcore::WIN_ENC );
+                decode_utf8( $data, encoding => $Pcore::WIN_ENC );
 
-                    push $res->{$channel}->@*, $data;
+                push $res->{$channel}->@*, $data;
 
-                    $self->_read(__SUB__);
+                $self->_read(__SUB__);
+            }
+
+            # "r" channel - request is finished
+            else {
+                my $result;
+
+                if ( exists $res->{e} ) {
+                    $result = result [ 500, join q[ ], $res->{e}->@* ];
                 }
-
-                # "r" channel - request is finished
                 else {
-                    my $result;
-
-                    if ( exists $res->{e} ) {
-                        $result = result [ 500, join q[ ], $res->{e}->@* ];
-                    }
-                    else {
-                        $result = result 200, $res->{o};
-                    }
-
-                    $cb->($result) if $cb;
-
-                    $blocking_cv->($result) if $blocking_cv;
+                    $result = result 200, $res->{o};
                 }
 
-                return;
-            };
+                $cb->($result) if $cb;
 
-            $self->_read($read);
+                $blocking_cv->($result) if $blocking_cv;
+            }
 
             return;
-        }
-    );
+        };
+
+        $self->_read($read);
+
+        return;
+    } );
 
     return $blocking_cv ? $blocking_cv->recv : ();
 }
@@ -294,9 +290,9 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 105, 107, 113        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 103, 105, 110        | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 170                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 166                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

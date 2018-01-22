@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::Safename;
 
-our $DATE = '2018-01-12'; # DATE
-our $VERSION = '20180109'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '20180116'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("avg_word_len",8.69142033165105,"num_words_contains_whitespace",0,"longest_word_len",31,"num_words_contains_nonword_chars",264,"num_words_contains_unicode",0,"shortest_word_len",2,"num_words",1387); # STATS
+our %STATS = ("longest_word_len",31,"avg_word_len",8.72275862068966,"shortest_word_len",2,"num_words",1450,"num_words_contains_whitespace",0,"num_words_contains_nonword_chars",283,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency safenames (a.k.a. slugs)
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::Safename - List of cryptocurrency safenames (
 
 =head1 VERSION
 
-This document describes version 20180109 of WordList::CryptoCurrency::Catalog::Safename (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
+This document describes version 20180116 of WordList::CryptoCurrency::Catalog::Safename (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -47,10 +47,10 @@ This document describes version 20180109 of WordList::CryptoCurrency::Catalog::S
  +----------------------------------+------------------+
  | key                              | value            |
  +----------------------------------+------------------+
- | avg_word_len                     | 8.69142033165105 |
+ | avg_word_len                     | 8.72275862068966 |
  | longest_word_len                 | 31               |
- | num_words                        | 1387             |
- | num_words_contains_nonword_chars | 264              |
+ | num_words                        | 1450             |
+ | num_words_contains_nonword_chars | 283              |
  | num_words_contains_unicode       | 0                |
  | num_words_contains_whitespace    | 0                |
  | shortest_word_len                | 2                |
@@ -119,7 +119,10 @@ aeternity
 agoras-tokens
 agrello-delta
 agrolifecoin
+aichain
+aidoc
 aidos-kuneen
+aigang
 aion
 airswap
 airtoken
@@ -167,6 +170,7 @@ atbcoin
 atlant
 atmcoin
 atmos
+atn
 atomic-coin
 attention-token-of-media
 audiocoin
@@ -178,16 +182,19 @@ autonio
 avatarcoin
 aventus
 avoncoin
+aware
 axiom
 b2bx
 b3coin
 bancor
 bankcoin
+bankex
 basic-attention-token
 bastonet
 bata
 batcoin
 bcap
+bean-cash
 beatcoin
 beavercoin
 belacoin
@@ -214,7 +221,6 @@ bitasean
 bitbar
 bitbase
 bitbay
-bitbean
 bitboost
 bitbtc
 bitcedi
@@ -224,15 +230,16 @@ bitcny
 bitcoal
 bitcoin
 bitcoin-21
+bitcoin-atom
 bitcoin-cash
 bitcoin-diamond
+bitcoin-god
 bitcoin-gold
 bitcoin-planet
 bitcoin-plus
 bitcoin-red
 bitcoin-scrypt
 bitcoin-silver
-bitcoin-unlimited
 bitcoin2x
 bitcoindark
 bitcoinfast
@@ -243,6 +250,7 @@ bitcore
 bitcrystals
 bitcurrency
 bitdeal
+bitdegree
 bitdice
 biteur
 bitfid
@@ -283,16 +291,17 @@ blockpay
 blockpool
 blocktix
 blockv
+bloomtoken
 bluecoin
 bnrtxcoin
 bodhi
 bolenum
 bolivarcoin
-bongger
 bonpay
 boolberry
 boostcoin
 boscoin
+bottos
 bounty0x
 bowhead
 bowscoin
@@ -340,13 +349,13 @@ cash-poker-pro
 cashcoin
 cashme
 casino
-casinocoin
 catcoin
 cbd-crystals
 ccminer
 ccore
 centra
 centurion
+cfun
 chaincoin
 chainlink
 chancoin
@@ -363,20 +372,24 @@ civic
 clams
 clearpoll
 cloakcoin
+cloud
 clubcoin
 cobinhood
 coexistcoin
+coffeecoin
 cofound-it
 coimatic-2
 coimatic-3
 coin
 coin2-1
 coindash
+coinlancer
 coinonat
 coinonatx
 colossuscoin-v2
 colossuscoinxt
 comet
+commodity-ad-network
 compcoin
 compucoin
 comsa-eth
@@ -384,6 +397,7 @@ comsa-xem
 concoin
 condensate
 confido
+content-and-ad-network
 copico
 corethum
 corgicoin
@@ -412,6 +426,7 @@ cryptojacks
 cryptonex
 cryptonite
 cryptopay
+cryptopiafeeshares
 cryptoping
 cryptoworldx-token
 crystal-clear
@@ -512,6 +527,7 @@ ebittree-coin
 eboostcoin
 ebtcnew
 eccoin
+echolink
 ecobit
 ecocoin
 edgeless
@@ -532,7 +548,6 @@ ellaism
 eltc
 eltcoin
 elysium
-embercoin
 embers
 emerald
 emercoin
@@ -560,6 +575,7 @@ eternity
 ethbet
 ethbits
 ether-for-the-rest-of-the-world
+etherdelta-token
 ethereum
 ethereum-blue
 ethereum-classic
@@ -593,6 +609,7 @@ faceblock
 facecoin
 factom
 faircoin
+fairgame
 fantomcoin
 fapcoin
 farad
@@ -645,6 +662,7 @@ gaia
 gambit
 game
 gamebet-coin
+gamechain
 gamecredits
 gameleaguecoin
 gameunits
@@ -666,6 +684,7 @@ gimli
 glasscoin
 global-business-revolution
 global-currency-reserve
+global-jobcoin
 global-tour-coin
 globalboost-y
 globalcoin
@@ -698,7 +717,10 @@ guccionecoin
 gulden
 guncoin
 guppy
+guts-tickets
 gxshares
+hacken
+hackspace-capital
 halcyon
 halloween-coin
 happy-creator-coin
@@ -716,6 +738,7 @@ herocoin
 hexx
 hicoin
 high-gain
+high-performance-blockchain
 high-voltage
 hitcoin
 hive
@@ -750,6 +773,7 @@ icos
 idice
 iethereum
 ignis
+ignition
 impact
 impulsecoin
 incakoin
@@ -766,19 +790,23 @@ influxcoin
 ink
 innova
 inpay
+ins-ecosystem
 insanecoin-insn
 intelligent-trading-tech
 intensecoin
 international-diamond
+internet-node-token
 internet-of-people
 internet-of-things
 internxt
 interstellar-holdings
 interzone
+investdigital
 investfeed
 invisiblecoin
 iocoin
 ion
+iostoken
 iot-chain
 iota
 iquant
@@ -792,20 +820,23 @@ javascript-token
 jetcoin
 jewels
 jin-coin
+jingtum-tech
 jinn
 jobscoin
 joincoin
 joulecoin
 karbowanec
+karma
 karmacoin
 kashhcoin
 kayicoin
+kcash
 kekcoin
+kemcredit
 kickico
 kilocoin
 kin
 kingn-coin
-kittehcoin
 kobocoin
 kolion
 komodo
@@ -816,6 +847,7 @@ kucoin-shares
 kurrent
 kushcoin
 kyber-network
+kzcash
 lamden
 lampix
 lanacoin
@@ -824,10 +856,13 @@ lathaan
 latoken
 lazaruscoin
 leacoin
+leekico
 legends-room
+lendconnect
 leocoin
 lepen
 letitride
+leverj
 leviarcoin
 levoplus
 lex4all
@@ -881,6 +916,7 @@ mavro
 maxcoin
 mazacoin
 mcap
+measurable-data-token
 medibloc
 medishares
 megacoin
@@ -903,7 +939,9 @@ mineum
 minex
 minexcoin
 mintcoin
+mixin
 mmxvi
+moac
 mobilecash
 mobilego
 modum
@@ -960,6 +998,7 @@ newbium
 newyorkcoin
 nexium
 nexus
+nimfamoney
 nimiq
 noblecoin
 nodecoin
@@ -968,6 +1007,8 @@ novacoin
 nubits
 nuls
 numeraire
+numus
+numuscash
 nushares
 nvo
 nxt
@@ -984,8 +1025,10 @@ olympus-labs
 omicron
 omisego
 omni
+oneroot-network
 ongsocial
 onix
+op-coin
 opal
 open-trading-network
 operand
@@ -1050,6 +1093,7 @@ pluscoin
 pluton
 poet
 pokecoin
+polis
 poly-ai
 polybius
 ponzicoin
@@ -1093,7 +1137,6 @@ px
 pylon-network
 qash
 qbao
-qcash
 qibuck-asset
 qlink
 qora
@@ -1104,8 +1147,10 @@ quantum-resistant-ledger
 quark
 quatloo
 quazarcoin
+qube
 qubitcoin
 quebecoin
+qunqun
 quotient
 qvolta
 qwark
@@ -1120,6 +1165,7 @@ rchain
 rcoin
 real
 real-estate-tokens
+rebellious
 red-pulse
 redcoin
 reddcoin
@@ -1179,6 +1225,7 @@ secretcoin
 securecoin
 segwit2x
 selfiecoin
+selfkey
 senderon
 sequence
 sexcoin
@@ -1192,6 +1239,7 @@ shield-xsh
 shift
 shilling
 shorty
+show
 siacoin
 sibcoin
 sigmacoin
@@ -1231,6 +1279,8 @@ sophiatx
 sovereign-hero
 spacecoin
 spankchain
+spectre-dividend
+spectre-utility
 spectrecoin
 speedcash
 sphere
@@ -1251,6 +1301,7 @@ stealthcoin
 steem
 steem-dollars
 stellar
+steneum-coin
 steps
 sterlingcoin
 stex
@@ -1277,7 +1328,9 @@ swagbucks
 swapcoin
 swaptoken
 swarm-city
+swftcoin
 swing
+swisscoin
 sydpak
 syndicate
 synereo
@@ -1295,6 +1348,7 @@ tattoocoin-limited
 teamup
 techshares
 tekcoin
+telcoin
 tellurion
 tenx
 teracoin
@@ -1319,13 +1373,17 @@ tittiecoin
 toacoin
 todaycoin
 tokencard
+tokenclub
 tokes
 tokugawa
+tokyo
 topaz
+topchain
 topcoin
 torcoin-tor
 trackr
 tracto
+trade-token
 transfercoin
 trezarcoin
 triaconta
@@ -1348,6 +1406,7 @@ ubiq
 ufo-coin
 ug-token
 ugain
+ugchain
 ulatech
 ultimate-secure-cash
 ultracoin
@@ -1372,6 +1431,7 @@ usde
 useless-ethereum-token
 utacoin
 utrust
+uttoken
 valorbit
 vaperscoin
 vault-coin
@@ -1387,6 +1447,7 @@ veriumreserve
 veros
 version
 vertcoin
+vezt
 viacoin
 vibe
 viberate
@@ -1418,7 +1479,9 @@ waves-community-token
 wavesgo
 wax
 wayguide
+waykichain
 wearesatoshi
+weth
 whalecoin
 whitecoin
 wi-coin
@@ -1433,7 +1496,6 @@ woodcoin
 worldcoin
 worldcore
 wowcoin
-wyvern
 x-coin
 x2
 xaucoin
@@ -1454,6 +1516,7 @@ yenten
 yescoin
 yocoin
 yoyow
+zap
 zayedcoin
 zcash
 zcash-gold

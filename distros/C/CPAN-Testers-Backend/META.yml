@@ -29,19 +29,25 @@ no_index:
 provides:
   CPAN::Testers::Backend:
     file: lib/CPAN/Testers/Backend.pm
-    version: '0.003'
+    version: '0.004'
   CPAN::Testers::Backend::Base:
     file: lib/CPAN/Testers/Backend/Base.pm
-    version: '0.003'
+    version: '0.004'
+  CPAN::Testers::Backend::Fix::TesterNoname:
+    file: lib/CPAN/Testers/Backend/Fix/TesterNoname.pm
+    version: '0.004'
   CPAN::Testers::Backend::Migrate::MetabaseCache:
     file: lib/CPAN/Testers/Backend/Migrate/MetabaseCache.pm
-    version: '0.003'
+    version: '0.004'
   CPAN::Testers::Backend::Migrate::MetabaseUsers:
     file: lib/CPAN/Testers/Backend/Migrate/MetabaseUsers.pm
-    version: '0.003'
+    version: '0.004'
   CPAN::Testers::Backend::ProcessReports:
     file: lib/CPAN/Testers/Backend/ProcessReports.pm
-    version: '0.003'
+    version: '0.004'
+  CPAN::Testers::Backend::ViewMetabaseCache:
+    file: lib/CPAN/Testers/Backend/ViewMetabaseCache.pm
+    version: '0.004'
 requires:
   Beam::Minion: '0.007'
   Beam::Runner: '0.013'
@@ -57,16 +63,17 @@ requires:
   Metabase::User::Profile: '0'
   Minion: '8'
   Minion::Backend::SQLite: '0'
-  Minion::Backend::mysql: '0.11'
+  Minion::Backend::mysql: '0.12'
   Sereal: '0'
   perl: '5.024'
 resources:
   bugtracker: https://github.com/cpan-testers/cpantesters-backend/issues
   homepage: https://github.com/cpan-testers/cpantesters-backend
   repository: https://github.com/cpan-testers/cpantesters-backend.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'James E Keenan <jkeenan@cpan.org>'
   - 'Joel Berger <joel.a.berger@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

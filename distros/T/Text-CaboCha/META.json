@@ -56,7 +56,7 @@
    "provides" : {
       "Text::CaboCha" : {
          "file" : "lib/Text/CaboCha.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/Code-Hex/Text-CaboCha"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:CODEHEX",
    "x_contributors" : [
       "Shoichi Kaji <skaji@cpan.org>",

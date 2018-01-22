@@ -32,6 +32,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'List::Util' => '1.33',
                                    'Test::Differences' => '0',
                                    'Test::More' => '0.96',
                                    'strict' => '0',

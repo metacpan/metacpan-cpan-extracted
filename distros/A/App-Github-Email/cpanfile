@@ -1,5 +1,5 @@
-requires "Email::Address" => "0";
 requires "Getopt::Long::Descriptive" => "0";
+requires "JSON" => "0";
 requires "LWP::Online" => "0";
 requires "LWP::UserAgent" => "0";
 requires "List::MoreUtils" => "0";

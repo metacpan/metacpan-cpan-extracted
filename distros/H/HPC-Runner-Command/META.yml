@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -60,7 +60,6 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   File::stat: '0'
-  HPC::Runner::Command::Utils::Git: '0'
   IO::Dir: '0'
   IO::File: '0'
   IO::Interactive: '0'
@@ -70,7 +69,7 @@ requires:
   IPC::Run: '0'
   JSON: '0'
   JSON::XS: '0'
-  List::MoreUtils: '0'
+  List::MoreUtils: '0.428'
   List::Uniq: '0'
   List::Util: '0'
   Log::Log4perl: '0'
@@ -81,7 +80,7 @@ requires:
   Moose::Role: '0'
   Moose::Util: '0'
   Moose::Util::TypeConstraints: '0'
-  MooseX::App: '0'
+  MooseX::App: '1.39'
   MooseX::App::Command: '0'
   MooseX::App::Role: '0'
   MooseX::App::Role::Log4perl: '0'
@@ -107,7 +106,7 @@ resources:
   bugtracker: https://github.com/biosails/HPC-Runner-Command/issues
   homepage: https://github.com/biosails/HPC-Runner-Command
   repository: https://github.com/biosails/HPC-Runner-Command.git
-version: 3.2.12
+version: 3.2.14
 x_contributors:
   - 'Travis CI <nobody@nobody.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

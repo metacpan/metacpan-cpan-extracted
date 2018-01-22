@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Params;
 
-$WWW::Google::CustomSearch::Params::VERSION   = '0.35';
+$WWW::Google::CustomSearch::Params::VERSION   = '0.37';
 $WWW::Google::CustomSearch::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Params - Placeholders for parameters for WWW::Google:
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =head1 DESCRIPTION
 
@@ -21,11 +21,8 @@ use 5.006;
 use strict; use warnings;
 use Data::Dumper;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK);
-
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT_OK = qw($FIELDS);
+use parent 'Exporter';
+our @EXPORT_OK = qw($FIELDS);
 
 my $LANGUAGE = {
     'lang_ar' => 1, 'lang_bg' => 1, 'lang_ca' => 1, 'lang_zh-cn' => 1, 'lang_zh-tw' => 1,

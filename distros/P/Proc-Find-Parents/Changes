@@ -1,4 +1,13 @@
-Revision history for Proc-Find-Parents
+0.631   2018-01-17 (PERLANCAR)
+
+	- Typo.
+
+
+0.630   2018-01-17 (PERLANCAR)
+
+        - Add a couple more fields to the output: cmdline, uid, gid, pgrp, sess,
+          sgid, euid, egid, ttydev, ttynum (those that are used by pgrep).
+
 
 0.62    2014-12-05 (PERLANCAR)
 

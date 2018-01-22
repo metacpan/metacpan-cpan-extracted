@@ -19,13 +19,12 @@ around new => sub ( $orig, $self, $module, @inc ) {
     if ( ref $module eq 'SCALAR' ) {
 
         # module content is passed as ScalarRef
-        return $self->$orig(
-            {   name    => undef,
-                path    => undef,
-                lib     => undef,
-                content => $module,
-            }
-        );
+        return $self->$orig( {
+            name    => undef,
+            path    => undef,
+            lib     => undef,
+            content => $module,
+        } );
     }
     else {
 
@@ -213,9 +212,9 @@ sub clear ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 145                  | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 144                  | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 178                  | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 177                  | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

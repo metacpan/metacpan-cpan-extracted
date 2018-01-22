@@ -4,9 +4,8 @@ use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw( reftype looks_like_number );
-use Test::More tests => 22;
-use lib ('./lib');
 use Text::CSV::Hashify;
+use Test::More tests => 22;
 
 my ($obj, $source, $key, $href, $aref, $k, $z);
 

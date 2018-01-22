@@ -1,5 +1,39 @@
 # Change history for the MongoDB Perl driver:
 
+v1.8.1    2018-01-17 10:44:22-05:00 America/New_York
+
+  [Bug fixes]
+
+  - PERL-770 Repeated find_one queries sometime result in
+    MongoDB::ProtocolError on short network reads.
+
+  - PERL-796 Improve resolution of GridFS uploadDate.
+
+  - PERL-803 Kerberos authentication not working in 1.8.0 version
+    using some SASL backends.
+
+  - PERL-825 Unacknowledged insert_many throws an error.
+
+  - PERL-828 maxTimeMS incorrectly sent on tailable await cursors.
+
+  [Testing]
+
+  - PERL-800 CI testing no longer tests against EOL MongoDB 2.4.
+
+  - PERL-832 Skip Windows thread tests with SASL to avoid wrong pool in
+    global destruction test failures.
+
+  [Documentation]
+
+  - PERL-795 Document that GridFS filename+uploadDate must be unique.
+
+  - PERL-798 Fix typos in Tutorial.pod.
+
+  [Prerequisites]
+
+  - PERL-844 Timeout configs not supported for older IO::Socket::IP,
+    so minimum version bumped to 0.32.
+
 v1.8.0    2017-04-10 14:05:59-04:00 America/New_York
 
   [Additions]
@@ -24,6 +58,10 @@ v1.8.0    2017-04-10 14:05:59-04:00 America/New_York
 
   - PERL-761 Replace OP_KILL_CURSORS with killCursors command for
     compatibility with MongoDB Atlas Free Tier.
+
+  [Prerequisites]
+
+  - PERL-843 Bump IO::Socket::IP prereq to 0.32 for Timeout support
 
 v1.6.1    2017-01-10 09:26:56-05:00 America/New_York
 

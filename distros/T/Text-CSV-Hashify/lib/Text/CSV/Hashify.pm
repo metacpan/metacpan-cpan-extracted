@@ -2,6 +2,8 @@ package Text::CSV::Hashify;
 use strict;
 use 5.8.0;
 use Carp;
+use IO::File;
+use IO::Zlib;
 use Scalar::Util qw( reftype looks_like_number );
 use Text::CSV;
 use open qw( :encoding(UTF-8) :std );
@@ -9,7 +11,7 @@ use open qw( :encoding(UTF-8) :std );
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT);
-    $VERSION     = '0.08';
+    $VERSION     = '0.10';
     @ISA         = qw(Exporter);
     @EXPORT      = qw( hashify );
 }
@@ -20,8 +22,8 @@ Text::CSV::Hashify - Turn a CSV file into a Perl hash
 
 =head1 VERSION
 
-This document refers to version 0.08 of Text::CSV::Hashify.  This version was
-released March 15 2017.
+This document refers to version 0.10 of Text::CSV::Hashify.  This version was
+released Janaury 21 2018.
 
 =head1 SYNOPSIS
 
@@ -61,13 +63,37 @@ spreadsheets or the output of relational database queries in plain-text
 format.  However, since commas (or other designated field-separator
 characters) may be embedded within data entries, the parsing of delimited
 records is non-trivial.  Fortunately, in Perl this parsing is well handled by
-CPAN distribution Text::CSV.  This permits us to address more specific data
-manipulation problems by building modules on top of Text::CSV.
+CPAN distribution L<Text::CSV|http://search.cpan.org/dist/Text-CSV/>.  This
+permits us to address more specific data manipulation problems by building
+modules on top of F<Text::CSV>.
 
 B<Note:>  In this document we will use I<CSV> as a catch-all for tab-delimited
 files, pipe-delimited files, and so forth.  Please refer to the documentation
 for Text::CSV to learn how to handle field separator characters other than the
 comma.
+
+F<Text::CSV::Hashify> is designed for the case where you simply want to turn a
+CSV file into a Perl hash.  In particular, it is designed for the case where:
+
+=over 4
+
+=item *
+
+the CSV file's first record is a list of fields in the
+ancestral database table; and
+
+=item *
+
+one field (column) functions as a primary key, I<i.e.,> each record's entry in
+that field is non-null and is distinct from every other record's entry
+therein.
+
+=back
+
+F<Text::CSV::Hashify> turns that kind of CSV file into one big hash of hashes.
+
+F<Text::CSV::Hashify> can now take gzip-compressed (F<.gz>) files as input as
+well as uncompressed files.
 
 =head2 Primary Case: CSV (with primary key) to Hash of Hashes
 
@@ -145,8 +171,17 @@ Text::CSV::Hashify by default exports one function: C<hashify()>.
 
     $hash_ref = hashify('/path/to/file.csv', 'primary_key');
 
+or
+
+    $hash_ref = hashify('/path/to/file.csv.gz', 'primary_key');
+
 Function takes two arguments:  path to CSV file; field in that file which
-serves as primary key.
+serves as primary key.  If the path to the input file ends in F<.gz>, it is
+assumed to be compressed by F<gzip>.  If the file name ends in F<.psv> (or
+F<.psv.gz>), the separator character is assumed to be a pipe (C<|>).  If the
+file name ends in F<.tsv> (or F<.tsv.gz>), the separator character is assumed
+to be a tab (C<	>).  Otherwise, the separator character will be assumed to be
+a comma (C<,>).
 
 Returns a reference to a hash of hash references.
 
@@ -159,10 +194,17 @@ sub hashify {
     for (my $i=0;$i<=$#args;$i++) {
         croak "'hashify()' argument at index '$i' not true" unless $args[$i];
     }
-    my $obj = Text::CSV::Hashify->new( {
+    my %obj_args = (
         file    => $args[0],
         key     => $args[1],
-    } );
+    );
+    $obj_args{sep_char} =
+        ($obj_args{file} =~ m/\.psv(\.gz)?$/)
+            ? '|'
+            : ($obj_args{file} =~ m/\.tsv(\.gz)?$/)
+                ? "\t"
+                : ',';
+    my $obj = Text::CSV::Hashify->new( \%obj_args );
     return $obj->all();
 }
 
@@ -192,7 +234,8 @@ Single hash reference.  Required element is:
 
 =item * C<file>
 
-String: path to CSV file serving as input.
+String: path to CSV file serving as input.  If the path to the input file ends
+in F<.gz>, it is assumed to be compressed by F<gzip>.
 
 =back
 
@@ -275,8 +318,15 @@ sub new {
     $args->{binary} = 1;
     my $csv = Text::CSV->new ( $args )
         or croak "Cannot use CSV: ".Text::CSV->error_diag ();
-    open my $IN, "<", $data{file}
-        or croak "Unable to open '$data{file}' for reading";
+    my $IN;
+    if ($data{file} =~ m/\.gz$/) {
+        $IN = IO::Zlib->new($data{file}, "rb");
+    }
+    else {
+        $IN = IO::File->new($data{file}, "r");
+    }
+    croak "Unable to open '$data{file}' for reading"
+        unless defined $IN;
     my $header_ref = $csv->getline($IN);
     my %header_fields_seen;
     for (@{$header_ref}) {
@@ -321,6 +371,7 @@ sub new {
             );
         }
     }
+    $IN->close or croak "Unable to close $data{file} after reading";
     $data{all} = ($data{format} eq 'aoh') ? \@parsed_data : \%parsed_data;
     $data{keys} = \@keys_list if $data{format} eq 'hoh';
     $data{csv} = $csv;
@@ -513,7 +564,7 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-Copyright 2012-2017, James E Keenan.  All rights reserved.
+Copyright 2012-2018, James E Keenan.  All rights reserved.
 
 =head1 BUGS
 

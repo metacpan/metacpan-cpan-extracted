@@ -3,7 +3,7 @@ package Mail::BIMI::Record;
 use strict;
 use warnings;
 
-our $VERSION = '1.20170626'; # VERSION
+our $VERSION = '1.20180122'; # VERSION
 
 use Carp;
 use English qw( -no_match_vars );

@@ -1,3 +1,11 @@
+0.484   2018-01-17 (PERLANCAR)
+
+	- Add options: --no-copt-version-enable (to disable version),
+	  --copt-version-getopt (to change option name for version),
+	  --no-copt-help-enable (to disable help), --copt-help-getopt (to
+	  change option name for help).
+
+
 0.483   2017-11-06 (PERLANCAR)
 
 	- Bump generated prereq version Perinci::CmdLine::{Base,Lite} 1.79

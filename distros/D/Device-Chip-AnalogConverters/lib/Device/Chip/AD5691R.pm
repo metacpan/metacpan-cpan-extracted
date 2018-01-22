@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AD5691R;
 
@@ -10,8 +10,9 @@ use warnings;
 use base qw( Device::Chip );
 
 use Carp;
+use Future::AsyncAwait;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Data::Bitfield qw( bitfield boolfield enumfield );
 
@@ -103,7 +104,7 @@ initialised to power-on defaults, and tracked by the C<change_config> method.
 
 =cut
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
@@ -111,7 +112,7 @@ sub read_config
    # defaults. We'll track updates.
    my $config = $self->{config} //= 0;
 
-   return Future->done( { unpack_CONFIG( $config ) } );
+   return { unpack_CONFIG( $config ) };
 }
 
 =head2 change_config
@@ -123,18 +124,17 @@ their existing values.
 
 =cut
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
-      $self->{config} = pack_CONFIG( %$config, %changes );
+   my $config = await $self->read_config;
 
-      $self->protocol->write( pack "C S>",
-         CMD_WRITE_CTRL, $self->{config} << 11 );
-   });
+   $self->{config} = pack_CONFIG( %$config, %changes );
+
+   await $self->protocol->write( pack "C S>",
+      CMD_WRITE_CTRL, $self->{config} << 11 );
 }
 
 =head1 METHODS
@@ -154,12 +154,12 @@ the output voltage.
 
 =cut
 
-sub write_dac
+async sub write_dac
 {
    my $self = shift;
    my ( $value, $update ) = @_;
 
-   $self->protocol->write( pack "C S>",
+   await $self->protocol->write( pack "C S>",
       ( $update ? CMD_WRITE_AND_UPDATE : CMD_WRITE_INPUT ), $value << 4 );
 }
 
@@ -173,24 +173,22 @@ C<GAIN> config bit.
 
 =cut
 
-sub write_dac_voltage
+async sub write_dac_voltage
 {
    my $self = shift;
    my ( $voltage ) = @_;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
+   my $config = await $self->read_config;
 
-      my $value = $voltage * ( 1 << 12 ) / 2.5;
-      $value /= $config->{GAIN};
+   my $value = $voltage * ( 1 << 12 ) / 2.5;
+   $value /= $config->{GAIN};
 
-      croak "Cannot set DAC voltage to $voltage - too high"
-         if $value >= ( 1 << 12 );
-      croak "Cannot set DAC voltage to $voltage - too low"
-         if $value < 0;
+   croak "Cannot set DAC voltage to $voltage - too high"
+      if $value >= ( 1 << 12 );
+   croak "Cannot set DAC voltage to $voltage - too low"
+      if $value < 0;
 
-      $self->write_dac( $value, 1 );
-   });
+   await $self->write_dac( $value, 1 );
 }
 
 =head1 AUTHOR

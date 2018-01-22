@@ -1,6 +1,7 @@
 name     = "mRuby"
 badges   = ["travis"]
 c_source = ["src"]
+module_maker = "ModuleBuild"
 
 [build]
 build_class = "builder::MyBuilder"

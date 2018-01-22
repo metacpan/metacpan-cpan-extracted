@@ -358,7 +358,7 @@ Eugene Ponizovsky, <ponizovsky@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2016-2017, Eugene Ponizovsky, <ponizovsky@gmail.com>.
+Copyright (c) 2016-2018, Eugene Ponizovsky, <ponizovsky@gmail.com>.
 All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it under

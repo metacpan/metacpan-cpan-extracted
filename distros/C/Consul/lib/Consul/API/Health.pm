@@ -1,5 +1,5 @@
 package Consul::API::Health;
-$Consul::API::Health::VERSION = '0.022';
+$Consul::API::Health::VERSION = '0.023';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -58,7 +58,7 @@ sub state {
 }
 
 package Consul::API::Health::Check;
-$Consul::API::Health::Check::VERSION = '0.022';
+$Consul::API::Health::Check::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(Str);
 
@@ -72,7 +72,7 @@ has service_id   => ( is => 'ro', isa => Str, init_arg => 'ServiceID',   require
 has service_name => ( is => 'ro', isa => Str, init_arg => 'ServiceName', required => 1 );
 
 package Consul::API::Health::Service;
-$Consul::API::Health::Service::VERSION = '0.022';
+$Consul::API::Health::Service::VERSION = '0.023';
 use Moo;
 use Types::Standard qw(ArrayRef);
 use Type::Utils qw(class_type);

@@ -4,8 +4,6 @@ Makefile.PL
 Changes
 MANIFEST
 
-t/bin/01-PM_t
-t/01-lib~Keyword~Value.pm.t
 t/10-my.t
 t/11-our.t
 t/12-global.t
@@ -16,6 +14,5 @@ t/13-state.t
 t/23-state.t
 t/30-value-var-expr.t
 t/31-value-expr.t
-
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

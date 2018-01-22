@@ -1,5 +1,9 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.05    2018-01-18 16:19:14
+        [CHANGES]
+         * Rewrite logic to use Future::AsyncAwait as demonstration
+
 0.04    2017-11-11 00:46:06
         [CHANGES]
          * Added MAX11200 driver

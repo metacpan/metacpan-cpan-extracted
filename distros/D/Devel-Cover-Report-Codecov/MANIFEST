@@ -7,6 +7,7 @@ appveyor.yml
 cpanfile
 lib/Devel/Cover/Report/Codecov.pm
 lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm
+lib/Devel/Cover/Report/Codecov/Service/Bitrise.pm
 lib/Devel/Cover/Report/Codecov/Service/Circle.pm
 lib/Devel/Cover/Report/Codecov/Service/Codeship.pm
 lib/Devel/Cover/Report/Codecov/Service/Drone.pm
@@ -35,6 +36,8 @@ t/codecov/send_report.t
 t/codecov/send_report_once.t
 t/codecov/service/appveyor/configuration.t
 t/codecov/service/appveyor/detect.t
+t/codecov/service/bitrise/configuration.t
+t/codecov/service/bitrise/detect.t
 t/codecov/service/drone/configuration.t
 t/codecov/service/drone/detect.t
 t/codecov/service/git/configuration.t

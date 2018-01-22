@@ -25,7 +25,7 @@ A   B
 TABLE
 
     eq_or_diff( render_to_string( \@items, [ 'a', 'b', 'c' ] ), <<TABLE );
-A   B   C     
+A   B   C
 1   x   <none>
 2   y   <none>
 TABLE
@@ -41,7 +41,7 @@ TABLE
     my $spec = [ 'key1', 'key2', 'key3' ];
 
     eq_or_diff( render_to_string( \@items, $spec ), <<TABLE );
-KEY1      KEY2      KEY3   
+KEY1      KEY2      KEY3
 value11   value21   value31
 TABLE
 }
@@ -61,7 +61,7 @@ TABLE
       = [ 'name', 'id', 'node', 'address', [ 'tags', sub {"@{$_[0]}"} ] ];
 
     eq_or_diff( render_to_string( \@items, $spec ), <<TABLE );
-NAME      ID                                                                 NODE    ADDRESS     TAGS      
+NAME      ID                                                                 NODE    ADDRESS     TAGS
 catalog   34159a6075976c264811b2bb395e3357928a2b52f953871600412785ed601f41   dev89   172.0.0.1   devel v0.1
 TABLE
 }
@@ -79,7 +79,7 @@ TABLE
       = [ 'ServiceName', 'ServiceID', 'Node', [ 'Datacenter', undef, 'DC' ] ];
 
     eq_or_diff( render_to_string( \@items, $spec ), <<TABLE );
-SERVICE NAME   SERVICE ID      NODE       DC 
+SERVICE NAME   SERVICE ID      NODE       DC
 consul         e59689eb-7b58   consul22   LAX
 TABLE
 }

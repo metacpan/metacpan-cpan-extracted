@@ -1,0 +1,59 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-LinkedData-RWHypermedia
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+Source: https://metacpan.org/release/RDF-LinkedData-RWHypermedia
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/12-basicwrites.t
+ t/22-psgi-basicwrites.t
+Copyright: Copyright 2018 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ rdf_linkeddata_acl.json
+ t/data/acl.ttl
+ t/data/basic.ttl
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ README.pod
+ lib/RDF/LinkedData/RWHypermedia.pm
+Copyright: This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: dist.ini
+Copyright: Copyright 2017 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

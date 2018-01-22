@@ -28,41 +28,39 @@ sub run ( $self, $req ) {
             sub ( $req, $accept, $reject ) {
 
                 # authenticate request
-                $req->authenticate(
-                    sub ( $auth ) {
+                $req->authenticate( sub ( $auth ) {
 
-                        # accept websocket connection
-                        $accept->(
-                            max_message_size => $WS_MAX_MESSAGE_SIZE,
-                            pong_interval    => $WS_PONG_INTERVAL,
-                            compression      => $WS_COMPRESSION,
-                            on_listen_event  => sub ( $ws, $mask ) {
-                                return $self->on_listen_event( $ws, $mask );
-                            },
-                            on_fire_event => sub ( $ws, $key ) {
-                                return $self->on_fire_event( $ws, $key );
-                            },
-                            before_connect => undef,
-                            on_connect     => sub ($ws) {
+                    # accept websocket connection
+                    $accept->(
+                        max_message_size => $WS_MAX_MESSAGE_SIZE,
+                        pong_interval    => $WS_PONG_INTERVAL,
+                        compression      => $WS_COMPRESSION,
+                        on_listen_event  => sub ( $ws, $mask ) {
+                            return $self->on_listen_event( $ws, $mask );
+                        },
+                        on_fire_event => sub ( $ws, $key ) {
+                            return $self->on_fire_event( $ws, $key );
+                        },
+                        before_connect => undef,
+                        on_connect     => sub ($ws) {
 
-                                # store auth in websocket connection object
-                                $ws->{auth} = $auth;
+                            # store auth in websocket connection object
+                            $ws->{auth} = $auth;
 
-                                $self->on_connect($ws);
+                            $self->on_connect($ws);
 
-                                return;
-                            },
-                            on_disconnect => undef,
-                            on_rpc        => sub ( $ws, $req, $tx ) {
-                                $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{data}, $req );
+                            return;
+                        },
+                        on_disconnect => undef,
+                        on_rpc        => sub ( $ws, $req, $tx ) {
+                            $ws->{auth}->api_call_arrayref( $tx->{method}, $tx->{data}, $req );
 
-                                return;
-                            },
-                        );
+                            return;
+                        },
+                    );
 
-                        return;
-                    }
-                );
+                    return;
+                } );
 
                 return;
             },
@@ -110,39 +108,37 @@ sub run ( $self, $req ) {
         }
 
         # authenticate request
-        $req->authenticate(
-            sub ( $auth ) {
+        $req->authenticate( sub ( $auth ) {
 
-                # this is app connection, disabled
-                if ( $auth->{is_app} ) {
-                    $req->( [ 403, q[App must connect via WebSocket interface] ] )->finish;
-                }
-                else {
-                    $self->_http_api_router(
-                        $auth, $msg,
-                        sub ($res) {
-                            if ($CBOR) {
-
-                                # write HTTP response
-                                $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
-                            }
-                            else {
-
-                                # write HTTP response
-                                $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
-                            }
-
-                            # free HTTP request object
-                            undef $req;
-
-                            return;
-                        }
-                    );
-                }
-
-                return;
+            # this is app connection, disabled
+            if ( $auth->{is_app} ) {
+                $req->( [ 403, q[App must connect via WebSocket interface] ] )->finish;
             }
-        );
+            else {
+                $self->_http_api_router(
+                    $auth, $msg,
+                    sub ($res) {
+                        if ($CBOR) {
+
+                            # write HTTP response
+                            $req->( 200, [ 'Content-Type' => 'application/cbor' ], to_cbor $res )->finish;
+                        }
+                        else {
+
+                            # write HTTP response
+                            $req->( 200, [ 'Content-Type' => 'application/json' ], to_json $res)->finish;
+                        }
+
+                        # free HTTP request object
+                        undef $req;
+
+                        return;
+                    }
+                );
+            }
+
+            return;
+        } );
     }
 
     return;

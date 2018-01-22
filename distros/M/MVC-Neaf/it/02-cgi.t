@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Basename qw(dirname);
-use JSON;
+use MVC::Neaf::Util qw(JSON encode_json decode_json);
 
 my $perl = $^X;
 

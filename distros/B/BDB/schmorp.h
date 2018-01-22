@@ -306,7 +306,7 @@ s_pipe (int filedes [2])
 
   closesocket (listener);
 
-#ifdef USE_SOCKETS_AS_HANDLES
+#if defined(USE_SOCKETS_AS_HANDLES) || PERL_VERSION_ATLEAST(5,18,0)
   /* when select isn't winsocket, we also expect socket, connect, accept etc.
    * to work on fds */
   filedes [0] = sock [0];

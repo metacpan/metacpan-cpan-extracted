@@ -1,0 +1,44 @@
+---
+abstract: 'one line description'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::AllModules: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-BitFlyer
+provides:
+  WebService::BitFlyer:
+    file: lib/WebService/BitFlyer.pm
+    version: '0.01'
+  WebService::BitFlyer::API:
+    file: lib/WebService/BitFlyer/API.pm
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Digest::SHA: '0'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  URI::Query: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC:
+    url: irc://chat.freenode.org/#bayadev
+    web: http://webchat.freenode.net/?channels=%23bayadev
+  bugtracker: http://github.com/bayashi/WebService-BitFlyer/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/WebService-BitFlyer
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

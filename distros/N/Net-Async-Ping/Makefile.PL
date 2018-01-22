@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "IO::Async" => "0.61",
     "Module::Runtime" => 0,
     "Moo" => 1,
+    "Net::Frame::Layer::ICMPv4" => "1.05",
     "Net::Frame::Layer::ICMPv6" => "1.1",
     "Net::Frame::Layer::IPv6" => "1.08",
     "Net::Frame::Simple" => "1.09",
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.003001",
+  "VERSION" => "0.003003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "IO::Async" => "0.61",
   "Module::Runtime" => 0,
   "Moo" => 1,
+  "Net::Frame::Layer::ICMPv4" => "1.05",
   "Net::Frame::Layer::ICMPv6" => "1.1",
   "Net::Frame::Layer::IPv6" => "1.08",
   "Net::Frame::Simple" => "1.09",

@@ -6,7 +6,7 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ The following functions are exportable:
         cot coth acot acoth
         sec sech asec asech
         csc csch acsc acsch
-        atan2
+        atan2 deg2rad rad2deg
 
     :special
         log logn exp sqrt cbrt root
@@ -140,7 +140,7 @@ Multiplication of C<$x> and C<$y>, defined as:
 
 Division of C<$x> by C<$y>, defined as:
 
-    (a + b*i) / (x + y*i) = (a*x + b*y)/(x*x + y*y) + (b*x - a*y)/(x*x + y*y)*i
+    (a + b*i) / (x + y*i) = (a*x + b*y)/(x^2 + y^2) + (b*x - a*y)/(x^2 + y^2)*i
 
 =head2 mod
 
@@ -149,7 +149,7 @@ Division of C<$x> by C<$y>, defined as:
 
 Remainder of C<$x> when divided by C<$y>, defined as:
 
-    mod(x, y) = x - y*floor(x/y)
+    mod(a, b) = a - b * floor(a/b)
 
 =head2 neg
 
@@ -204,7 +204,7 @@ This section describes the special mathematical functions provided by this modul
 
 Natural logarithm of C<$x>, defined as:
 
-    log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a)*i
+    log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a) * i
 
 =head2 logn
 
@@ -221,7 +221,24 @@ Logarithm of C<$x> to base C<$y>, defined as:
 
 Natural exponentiation of C<$x>, defined as:
 
-    exp(a + b*i) = exp(a)*cos(b) + exp(a)*sin(b)*i
+    exp(a + b*i) = exp(a) * cos(b) + exp(a) * sin(b) * i
+
+=head2 pow
+
+    $x**$y
+    $x->pow($y)
+
+Raises C<$x> to power C<$y> and returns the result, defined as:
+
+    a^b = exp(log(a) * b)
+
+=head2 root
+
+    $x->root($y)
+
+Nth root of C<$x>, defined as:
+
+    root(a, b) = exp(log(a) / b)
 
 =head2 sqrt
 
@@ -240,23 +257,6 @@ Cube root of C<$x>, defined as:
 
     cbrt(x) = exp(log(x) / 3)
 
-=head2 root
-
-    $x->root($y)
-
-Nth root of C<$x>, defined as:
-
-    root(a, x) = a^(1/x)
-
-=head2 pow
-
-    $x**$y
-    $x->pow($y)
-
-Raises C<$x> to power C<$y> and returns the result, defined as:
-
-    a^x = exp(log(a) * x)
-
 =head1 TRIGONOMETRIC FUNCTIONS
 
 This section includes all the trigonometric functions provied by Math::GComplex.
@@ -272,9 +272,9 @@ Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
 
 Defined as:
 
-    sin(x) = (exp(x * i) - exp(-i * x))/(2*i)
-    sinh(x) = (exp(2*x) - 1) / (2*exp(x))
-    asin(x) = -i * log(i*x + sqrt(1 - x^2))
+      sin(x) = (exp(x * i) - exp(-i * x))/(2 * i)
+     sinh(x) = (exp(2 * x) - 1) / (2 * exp(x))
+     asin(x) = -i * log(i * x + sqrt(1 - x^2))
     asinh(x) = log(sqrt(x^2 + 1) + x)
 
 =head2 cos / cosh / acos / acosh
@@ -288,9 +288,9 @@ Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
 
 Defined as:
 
-    cos(x) = (exp(-i*x) + exp(i*x)) / 2
-    cosh(x) = (exp(2*x) + 1) / (2*exp(x))
-    acos(x) = -2*i*log(i*sqrt((1 - x)/2) + sqrt((1 + x)/2))
+      cos(x) = (exp(-i * x) + exp(i * x)) / 2
+     cosh(x) = (exp(2 * x) + 1) / (2 * exp(x))
+     acos(x) = -2 * i * log(i * sqrt((1 - x)/2) + sqrt((1 + x)/2))
     acosh(x) = log(x + sqrt(x - 1) * sqrt(x + 1))
 
 =head2 tan / tanh / atan / atanh
@@ -304,9 +304,9 @@ Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
 
 Defined as:
 
-    tan(x) = (2*i)/(exp(2*i*x) + 1) - i
-    tanh(x) = (exp(2*x) - 1) / (exp(2*x) + 1)
-    atan(x) = i * (log(1 - i*x) - log(1 + i*x)) / 2
+      tan(x) = (2 * i)/(exp(2 * i * x) + 1) - i
+     tanh(x) = (exp(2 * x) - 1) / (exp(2 * x) + 1)
+     atan(x) = i * (log(1 - i * x) - log(1 + i * x)) / 2
     atanh(x) = (log(1 + x) - log(1 - x)) / 2
 
 =head2 cot / coth / acot / acoth
@@ -320,9 +320,9 @@ Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotang
 
 Defined as:
 
-    cot(x) = (2*i)/(exp(2*i*x) - 1) + i
-    coth(x) = (exp(2*x) + 1) / (exp(2*x) - 1)
-    acot(x) = atan(1/x)
+      cot(x) = (2 * i)/(exp(2 * i * x) - 1) + i
+     coth(x) = (exp(2 * x) + 1) / (exp(2 * x) - 1)
+     acot(x) = atan(1/x)
     acoth(x) = atanh(1/x)
 
 =head2 sec / sech / asec / asech
@@ -336,9 +336,9 @@ Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
 
 Defined as:
 
-    sec(x) = 2/(exp(-i*x) + exp(i*x))
-    asec(x) = acos(1/x)
-    sech(x) = (2 * exp(x)) / (exp(2*x) + 1)
+      sec(x) = 2/(exp(-i * x) + exp(i * x))
+     sech(x) = (2 * exp(x)) / (exp(2 * x) + 1)
+     asec(x) = acos(1/x)
     asech(x) = acosh(1/x)
 
 =head2 csc / csch / acsc / acsch
@@ -352,9 +352,9 @@ Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
 
 Defined as:
 
-    csc(x) = -(2*i)/(exp(-i*x) - exp(i*x))
-    csch(x) = (2*exp(x)) / (exp(2*x) - 1)
-    acsc(x) = asin(1/x)
+      csc(x) = -(2 * i)/(exp(-i * x) - exp(i * x))
+     csch(x) = (2 * exp(x)) / (exp(2 * x) - 1)
+     acsc(x) = asin(1/x)
     acsch(x) = asinh(1/x)
 
 =head2 atan2
@@ -365,6 +365,24 @@ Defined as:
 The arc tangent of C<$x> and C<$y>, defined as:
 
     atan2(a, b) = -i * log((b + a*i) / sqrt(a^2 + b^2))
+
+=head2 deg2rad
+
+Returns the value of C<x> converted from degrees to radians.
+
+Defined as:
+
+    deg2rad(x) = x / 180 * atan2(0, -abs(x))
+
+=head2 rad2deg
+
+    my $deg = $x->rad2deg;
+
+Returns the value of C<x> converted from radians to degrees.
+
+Defined as:
+
+    rad2deg(x) = x * 180 / atan2(0, -abs(x))
 
 =head1 MISCELLANEOUS FUNCTIONS
 
@@ -476,7 +494,7 @@ Complex numbers are compared as:
 
 Absolute comparison of C<$x> and C<$y>, defined as:
 
-    acmp(x, y) = abs(x) <=> abs(y)
+    acmp(a, b) = abs(a) <=> abs(b)
 
 =head1 * Conversions
 

@@ -1,5 +1,24 @@
 Changelog for CPAN-Testers-Backend
 
+0.004     2018-01-16 16:03:56-06:00 America/Chicago
+
+    [Added]
+
+    - Added CPAN::Testers::Backend::Fix::TesterNoname to fix testers who
+      appear with `"NONAME"` in the test report list.
+
+    - Added CPAN::Testers::Backend::ViewMetabaseCache to view legacy
+      metabase cache entries to see how they differ from the actual test
+      report (and to see if they can be parsed at all).
+
+    - Added Rex task to disable a backend machine in case of
+      decommissioning.
+
+    [Fixed]
+
+    - Updated Minion::Backend::mysql dependency to finally work
+      correctly with Minion v7 and Minion v8
+
 0.003     2017-11-18 16:03:00-06:00 America/Chicago
 
     [Fixed]

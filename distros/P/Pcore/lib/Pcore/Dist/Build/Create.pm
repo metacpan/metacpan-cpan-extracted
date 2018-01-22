@@ -110,12 +110,11 @@ sub _create_upstream_repo ($self) {
 
     print 'Creating upstream repository ... ';
 
-    my $scm_upstream = Pcore::API::SCM::Upstream->new(
-        {   scm_type => $self->{upstream_scm_type},
-            hosting  => $self->{upstream_hosting},
-            repo_id  => $upstream_repo_id,
-        }
-    );
+    my $scm_upstream = Pcore::API::SCM::Upstream->new( {
+        scm_type => $self->{upstream_scm_type},
+        hosting  => $self->{upstream_hosting},
+        repo_id  => $upstream_repo_id,
+    } );
 
     my $hosting_api = $scm_upstream->get_hosting_api;
 

@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::_generic;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Carp qw/croak/;
 use Class::Method::Modifiers qw/fresh around/;
@@ -676,7 +676,7 @@ MarpaX::ESLIF::URI::_generic - URI Generic syntax as per RFC3986/RFC6874
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SUBROUTINES/METHODS
 

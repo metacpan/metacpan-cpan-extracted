@@ -1,7 +1,7 @@
 package Sah::SchemaR::net::ipv4;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["obj",[{isa=>"NetAddr::IP",summary=>"IPv4 address","x.perl.coerce_rules"=>["str_net_ipv4"]}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::net::ipv4 - IPv4 address
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2018-01-14.
+This document describes version 0.003 of Sah::SchemaR::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2018-01-17.
 
 =head1 DESCRIPTION
 

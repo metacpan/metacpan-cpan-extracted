@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.059';
+our $VERSION = '0.060';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -52,7 +52,7 @@ sub __validate_options {
         prompt          => '',
         undef           => '',
         #thsd_sep       => '',
-        #no_col         => '',
+        col_name        => '', # pod
     };
     for my $key ( keys %$opt ) {
         if ( ! exists $valid->{$key} ) {
@@ -87,8 +87,8 @@ sub __set_defaults {
     $self->{tab_width}      = 2      if ! defined $self->{tab_width};
     $self->{table_expand}   = 1      if ! defined $self->{table_expand};
     $self->{undef}          = ''     if ! defined $self->{undef};
+    $self->{col_name}       = 'col'  if ! defined $self->{col_name};
     $self->{thsd_sep} = ',';
-    $self->{no_col}   = 'col';
     $self->{tab_w}    = $self->{tab_width};
     $self->{tab_w}++    if $self->{grid} && ! ( $self->{tab_width} % 2 );
 }
@@ -120,7 +120,7 @@ sub print_table {
     # ###
 
     if ( $self->{add_header} ) {
-        unshift @$table_ref, [ map { $_ . '_' . $self->{no_col} } 1 .. @{$table_ref->[0]} ];
+        unshift @$table_ref, [ map { $_ . $self->{col_name} } 1 .. @{$table_ref->[0]} ];
     }
     my $last_row_idx = $self->{max_rows} && $self->{max_rows} < @$table_ref ? $self->{max_rows} : $#$table_ref;
     my $col_idxs = [];
@@ -246,6 +246,15 @@ sub __win_size_dependet_code {
                 }
             }
             $row_is_expanded = 1;
+            if ( $row > $self->{max_rows} ) {
+                $row-- if   $self->{keep_header};
+                $row++ if ! $self->{keep_header} && $self->{grid};
+                choose(
+                    [ $self->__reached_limit_message( $term_w ) ],
+                    { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse} }
+                );
+                next;
+            }
             $self->__print_single_row( $a_ref, $row, $self->{longest_col_name} + 1 );
         }
     }
@@ -596,7 +605,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.059
+Version 0.060
 
 =cut
 

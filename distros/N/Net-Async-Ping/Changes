@@ -1,5 +1,14 @@
 Revision history for Net-Async-Ping
 
+0.003003  2018-01-17 17:03:08+01:00 Europe/Vienna
+  - fix parsing of ICMP responses when using raw socket
+    also when falling back from ping socket to raw
+
+0.003002  2018-01-17 14:01:58+01:00 Europe/Vienna
+  - fix processing of unrelated ICMP and ICMPv6 error packets
+    by validating the source IP, identifier and sequence number
+  - fix incorrect ICMP checksum when using raw socket
+
 0.003001  2018-01-10 16:01:34+01:00 Europe/Vienna
   - use ICMP and ICMPv6 protocol constants from Socket
     instead of a getprotobyname lookup per ping

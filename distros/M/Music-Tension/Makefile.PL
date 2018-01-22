@@ -18,7 +18,7 @@ my %params = (
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/Music/Tension.pm',
 
-    LICENSE  => 'artistic_2',
+    LICENSE  => 'bsd',
     PL_FILES => {},
 
     CONFIGURE_REQUIRES => {
@@ -38,13 +38,16 @@ my %params = (
     },
 
     META_MERGE => {
-        'meta-spec'         => { version => 2 },
-        'homepageresources' => {
+        'meta-spec' => { version => 2 },
+        'resources' => {
             repository => {
                 url  => 'git://github.com/thrig/Music-Tension.git',
                 web  => 'https://github.com/thrig/Music-Tension',
                 type => 'git',
             },
+            bugtracker => { web => 'https://github.com/thrig/Music-Tension/issues' },
+            homepage => 'https://github.com/thrig/Music-Tension',
+            license  => ['https://opensource.org/licenses/BSD-3-Clause'],
         },
     },
 );

@@ -100,6 +100,8 @@ sub io_filter (&@) {
     if ($opt{STDERR}) {
 	open STDOUT, '>&', \*STDERR or die "dup: $!";
     }
+    binmode STDOUT, ':encoding(utf8)';
+    binmode STDERR, ':encoding(utf8)';
     local @ARGV;
     $sub->();
     exit 0;

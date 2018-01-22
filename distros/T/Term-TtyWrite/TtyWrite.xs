@@ -18,7 +18,7 @@
 
 typedef SV * Term_TtyWrite;
 
-MODULE = Term::TtyWrite		PACKAGE = Term::TtyWrite		
+MODULE = Term::TtyWrite		PACKAGE = Term::TtyWrite
 
 void
 DESTROY(obj)
@@ -26,55 +26,57 @@ DESTROY(obj)
 
     CODE:
         SV **svp;
-	if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
+        if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
             if (SvOK(*svp) && SvIOK(*svp))
                 close((int) SvIV(*svp));
-	}
+        }
 
 Term_TtyWrite
 new(...)
     INIT:
-    	char *classname;
-        int fd;
+        char *classname, *devname;
+        int fd, i;
+        STRLEN len;
 
-	/* get the class name if called as an object method */
-	if ( sv_isobject(ST(0)) ) {
-	    classname = HvNAME(SvSTASH(SvRV(ST(0))));
-	}
-	else {
-	    classname = (char *)SvPV_nolen(ST(0));
-	}
+        if ( sv_isobject(ST(0)) ) {
+            classname = HvNAME(SvSTASH(SvRV(ST(0))));
+        } else {
+            classname = (char *)SvPV_nolen(ST(0));
+        }
 
     CODE:
-    	/* This is a standard hash-based object */
-    	RETVAL = (Term_TtyWrite)newHV();
+        RETVAL = (Term_TtyWrite)newHV();
 
-	if (items == 2 && SvPOK(ST(1))) {
-            if ((fd = open(SvPV_nolen(ST(1)), O_WRONLY)) == -1) {
-	        Perl_croak(aTHX_ "could not open '%s': %s", SvPV_nolen(ST(1)), strerror(errno));
-            }
-	    hv_stores((HV *)RETVAL, "fd", newSViv(fd) );
-        } else {
-	    Perl_croak(aTHX_ "Usage: Term::TtyWrite->new(\"/dev/sometty\")\n");
-	}
+        if (items != 2 || !SvPOK(ST(1)))
+            Perl_croak(aTHX_ "Usage: Term::TtyWrite->new(\"/dev/sometty\")\n");
+
+        devname = SvPV(ST(1),len);
+        for (i = 0; i < len; i++) {
+            if (devname[i] == '\0')
+                Perl_croak(aTHX_ "invalid device name\n");
+        }
+        if ((fd = open(devname, O_WRONLY)) < 0)
+            Perl_croak(aTHX_ "could not open '%s': %s", devname, strerror(errno));
+
+        hv_stores((HV *)RETVAL, "fd", newSViv(fd) );
 
     OUTPUT:
-    	RETVAL
+        RETVAL
 
 void
 write(obj, ...)
     Term_TtyWrite obj
 
     INIT:
-	if (items != 2 || !SvPOK(ST(1)))
-	    Perl_croak(aTHX_ "Usage: $obj->write(\"some data\")");
+        if (items != 2 || !SvPOK(ST(1)))
+            Perl_croak(aTHX_ "Usage: $obj->write(\"some data\")");
 
     CODE:
         char *str;
         int fd;
         STRLEN len;
-    	SV **svp;
-	if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
+            SV **svp;
+        if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
             if (SvOK(*svp) && SvIOK(*svp)) {
                 fd = (int) SvIV(*svp);
                 str = SvPV(ST(1),len);
@@ -84,25 +86,25 @@ write(obj, ...)
             } else {
                 Perl_croak(aTHX_ "fd unexpectedly is not set");
             }
-	}
+        }
 
 void
 write_delay(obj, ...)
     Term_TtyWrite obj
 
     INIT:
-	if (items != 3 || !SvPOK(ST(1)) || !SvNIOK(ST(2)))
-	    Perl_croak(aTHX_ "Usage: $obj->write_delay(\"some data\", 250)");
+        if (items != 3 || !SvPOK(ST(1)) || !SvNIOK(ST(2)))
+            Perl_croak(aTHX_ "Usage: $obj->write_delay(\"some data\", 250)");
 
     CODE:
         char *str;
         int fd;
         IV delayms;
         STRLEN len;
-    	SV **svp;
+        SV **svp;
         useconds_t delay;
 
-	if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
+        if ((svp = hv_fetchs((HV*)obj, "fd", FALSE))) {
             if (SvOK(*svp) && SvIOK(*svp)) {
                 fd = (int) SvIV(*svp);
                 str = SvPV(ST(1),len);
@@ -116,4 +118,4 @@ write_delay(obj, ...)
             } else {
                 Perl_croak(aTHX_ "fd unexpectedly is not set");
             }
-	}
+        }

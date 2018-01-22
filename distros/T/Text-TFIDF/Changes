@@ -8,3 +8,6 @@ Revision history for Perl extension Text::TFIDF.
 0.03 Fri Apr 15 21:01:26 2016
 	- added Encode calls so that parsing files in other languages/character sets
 	  will work
+0.04 Tue Ja 16 19:49:09 2018
+	- Fixed computation of TF-IDF.  Resources for the equation include http://www.tfidf.com/ and https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Term_frequency%E2%80%93Inverse_document_frequency
+	- Updated the tests to reflect the new equation

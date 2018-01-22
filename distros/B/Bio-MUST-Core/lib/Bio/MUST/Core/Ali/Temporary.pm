@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Temporary;
 # ABSTRACT: Thin wrapper for a temporary mapped Ali written on disk
-$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180140';
+$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180190';
 use Moose;
 use namespace::autoclean;
 
@@ -27,12 +27,13 @@ has 'seqs' => (
     required => 1,
     coerce   => 1,
     handles  => [
-        qw(all_seq_ids has_uniq_ids is_protein is_aligned
-            get_seq get_seq_with_id all_seqs filter_seqs count_seqs)
-    ],
+        qw(count_comments all_comments get_comment
+            guessing all_seq_ids has_uniq_ids is_protein is_aligned
+            get_seq get_seq_with_id all_seqs filter_seqs count_seqs
+            gapmiss_regex
+        )
+    ],      # comment-related methods needed by IdList
 );
-
-# TODO: decide on which Ali/Listable methods should be available
 
 
 has 'args' => (
@@ -120,7 +121,7 @@ Bio::MUST::Core::Ali::Temporary - Thin wrapper for a temporary mapped Ali writte
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 
@@ -199,7 +200,8 @@ written in the associated temporary FASTA file. It can be specified either as
 a path to an ALI/FASTA file or as an C<Ali> object or as an ArrayRef of C<Seq>
 objects (see the SYNOPSIS for examples).
 
-It provides the following methods: C<all_seq_ids>, C<has_uniq_ids>,
+For now, it provides the following methods: C<count_comments>,
+C<all_comments>, C<get_comment>, C<guessing>, C<all_seq_ids>, C<has_uniq_ids>,
 C<is_protein>, C<is_aligned>, C<get_seq>, C<get_seq_with_id>, C<all_seqs>,
 C<filter_seqs> and C<count_seqs> (see L<Bio::MUST::Core::Ali>).
 

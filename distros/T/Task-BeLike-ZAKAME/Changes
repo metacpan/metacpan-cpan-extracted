@@ -1,5 +1,10 @@
 Revision history for Perl extension Task-BeLike-ZAKAME
 
+0.14 2018-01-17T03:10:26Z
+
+    - Add Net::Async::HTTP (which pulls in Future and IO::Async)
+    - Move Web::Query to recommends
+
 0.13 2018-01-12T08:12:56Z
 
     - Add Future and IO::Async

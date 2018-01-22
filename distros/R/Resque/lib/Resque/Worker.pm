@@ -1,6 +1,6 @@
 package Resque::Worker;
 # ABSTRACT: Does the hard work of babysitting Resque::Job's
-$Resque::Worker::VERSION = '0.34';
+$Resque::Worker::VERSION = '0.35';
 use Moose;
 with 'Resque::Encoder';
 
@@ -66,16 +66,22 @@ sub shutdown_now    { $_[0]->shutdown_please && $_[0]->kill_child }
 
 sub work {
     my $self = shift;
+    my $waiting; # Keep track for logging purposes only!
+
     $self->startup;
     while ( ! $self->shutdown ) {
         if ( !$self->paused && ( my $job = $self->reserve ) ) {
+            $waiting=0;
             $self->log("Got job $job");
             $self->work_tick($job);
         }
         elsif( $self->interval ) {
-            my $status = $self->paused ? "Paused" : 'Waiting for ' . join( ', ', @{$self->queues} );
-            $self->procline( $status );
-            $self->log( $status );
+            unless ( $waiting ) {
+                my $status = $self->paused ? "Paused" : 'Waiting for ' . join( ', ', @{$self->queues} );
+                $self->procline( $status );
+                $self->log( $status );
+                $waiting=1;
+            }
             sleep( $self->interval );
         }
     }
@@ -104,7 +110,9 @@ sub work_tick {
     else {
         undef $SIG{TERM};
         undef $SIG{INT};
-        undef $SIG{QUIT};
+
+        # Allow graceful shutdown in "cant fork mode"
+        undef $SIG{QUIT} unless $self->cant_fork;
 
         $self->procline( sprintf( "Processing %s since %s", $job->queue, $timestamp ) );
         $self->perform($job);
@@ -404,7 +412,7 @@ Resque::Worker - Does the hard work of babysitting Resque::Job's
 
 =head1 VERSION
 
-version 0.34
+version 0.35
 
 =head1 ATTRIBUTES
 

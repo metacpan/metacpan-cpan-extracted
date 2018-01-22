@@ -3,15 +3,13 @@ use warnings;
 
 use Test::More;
 use Function::Parameters;
-use v5.10;
+use feature 'say';
 
-BEGIN {
-    use_ok('Moo');
-    use_ok('WebService::Gitter');
-    use_ok( 'LWP::Online', 'online' );
-    use_ok('WebService::Client');
-    use_ok('Function::Parameters');
-}
+use_ok('Moo');
+use_ok('WebService::Gitter');
+use_ok( 'LWP::Online', 'online' );
+use_ok('WebService::Client');
+use_ok('Function::Parameters');
 
 my $true  = 1;
 my $false = 0;
@@ -141,6 +139,41 @@ SKIP:
         #    'Hello world3 is changed to Hi!',
         #    'Update previous sent message.'
         #);
+
+        fun key_exists() {
+            return 1
+              if defined $git->unread_items( $authenticated_user_id, $room_id2 )
+              ->{chat};
+        }
+
+        ok( key_exists, 'unread_items chat key exists.' );
+
+        cmp_ok( $git->orgs($authenticated_user_id)->[0]{room}{name},
+            'eq', 'perl6', "faraco's organization is Perl6?" );
+
+        fun blue_beanie_exists() {
+            my $list = $git->repos($authenticated_user_id);
+
+            foreach my $node ( @{$list} ) {
+                return 1 if $node->{name} eq 'faraco/blue-beanie';
+            }
+        }
+
+        ok( blue_beanie_exists, 'blue beanie repo exists!' );
+
+        cmp_ok(
+            $git->mark_unread_items(
+                $authenticated_user_id, '5880e3b6d73408ce4f44a1aa',
+                ['591444f733e9ee771c96b8ca']
+            )->{success},
+            '==', 1,
+            'Marking unread items as read.'
+        );
+
+        ok(
+            !$git->channels($authenticated_user_id),
+            "faraco's channels return empty."
+        );
     }
 }
 

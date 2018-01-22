@@ -3,41 +3,50 @@ use 5.020;
 use strict;
 use warnings;
 
-our $VERSION = "0.2.1";
+our $VERSION = "1.1.0";
 
 use Moose;
-use autobox::Core;
 use HTTP::Tiny;
 use Cpanel::JSON::XS;
 use IO::Async::Timer::Periodic;
+use Log::Any qw($log);
+use Try::Tiny::Retry;
 
-use feature 'say';
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-has credentials      => (is => 'ro', isa => 'HashRef');
+has credentials => (is => 'ro', isa => 'HashRef');
 
 has build_id_mapping => (is => 'ro', isa => 'HashRef');
 
 has http => (
-    is => 'ro', isa => 'HTTP::Tiny',
-    default => sub { HTTP::Tiny->new(timeout => 10)   }
+    is      => 'ro',
+    isa     => 'HTTP::Tiny',
+    default => sub { HTTP::Tiny->new(timeout => 10) }
 );
 
 has loop => (
-    is => 'ro', isa => 'IO::Async::Loop',
+    is  => 'ro',
+    isa => 'IO::Async::Loop',
 );
 
 has teamcity_builds => (
-    is => 'ro', isa => 'HashRef', default => sub { {} },
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} },
 );
 
 has poll_interval => (
-    is => 'ro', isa => 'Int', default => 10,
+    is      => 'ro',
+    isa     => 'Int',
+    default => 10,
 );
 
 has teamcity_auth_url => (
-    is => 'ro', isa => 'Str', lazy => 1, default => sub ($self) {
+    is      => 'ro',
+    isa     => 'Str',
+    lazy    => 1,
+    default => sub ($self) {
         my $url  = $self->credentials->{url};
         my $user = $self->credentials->{user};
         my $pass = $self->credentials->{pass};
@@ -48,59 +57,46 @@ has teamcity_auth_url => (
     }
 );
 
-
-sub http_request($self, $method, $url, $headers = {}, $content = '') {
-
-    my $desecretized_url = $url =~ s{(http[s]://)[^/]+:[^@]+@}{$1}r;
-    # say STDERR "# $method\t$desecretized_url";
-
+sub http_request ($self, $method, $url, $headers = {}, $content = '') {
     my $response;
 
-    my $retry = 0;
-    while (1) {
-        $response = $self->http->request($method, $url, {
-            headers => $headers,
-            content => $content,
-        });
+    # this code handles the teamcity authentification issues (sometimes authentification fails
+    # without a reason)
+    retry {
+        $response = $self->http->request(
+            $method, $url,
+            {
+                headers => $headers,
+                content => $content,
+            }
+        );
 
-        last if $response->{status} != 599;
-        print ' [TeamCity request retry: ' if !$retry;
-        print '.';
-        sleep 1;
-        $retry = 1;
-    }
-    print "] " if $retry;
+        if ($response->{status} == 599) {
+            $log->info("Authentification to teamcity failed, retrying.");
+            die 'Authentification to teamcity failed';
+        }
+    };
 
-    # say STDERR 'done';
-
-    if (! $response->{success} ) {
-        use Data::Dumper;
-        print Dumper $response;
-        die "HTTP $method request to $url failed: " .
-            "$response->{status}: $response->{reason}"
+    if (!$response->{success}) {
+        die "HTTP $method request to $url failed: " . "$response->{status}: $response->{reason}";
     }
 
-    return $response
+    return $response;
 }
 
-
-sub run_teamcity_build {
-    my ($self, $build_type_id, $properties, $build_name) = @_;
-
+sub run_teamcity_build ($self, $build_type_id, $properties, $build_name, $wait = 1) {
     $build_name //= 'unnamed-build';
 
-    my $build_queue_url =
-        $self->teamcity_auth_url . '/httpAuth/app/rest/buildQueue';
+    my $build_queue_url = $self->teamcity_auth_url . '/httpAuth/app/rest/buildQueue';
 
     my $xml_properties = '';
 
-    for my $key ($properties->keys) {
+    for my $key (keys %{$properties}) {
         my $value = $properties->{$key};
         $xml_properties .= qq{<property name="$key" value="$value" />\n};
     }
 
-    my $request_body =
-        qq{<build>
+    my $request_body = qq{<build>
             <buildType id="$build_type_id"/>
             <properties>
             $xml_properties
@@ -112,55 +108,56 @@ sub run_teamcity_build {
         $build_queue_url,
         {
             'Content-Type' => 'application/xml',
-            'Accept' => 'application/json',
+            'Accept'       => 'application/json',
         },
         $request_body,
     );
 
     my $json = decode_json $response->{content};
 
-    my $build_id = $json->{id};
-    my $build_href = $json->{href};
+    my $build_id          = $json->{id};
+    my $build_detail_href = $json->{webUrl};
+
     my $f = $self->loop->new_future();
 
-    $self->teamcity_builds->{$build_id} = {
-        id     => $build_id,
-        href   => $build_href,
-        name   => $build_name,
-        future => $f,
-    };
+    if ($wait) {
+        $self->teamcity_builds->{$build_id} = {
+            id          => $build_id,
+            status_href => $json->{href},
+            href        => $build_detail_href,
+            name        => $build_name,
+            params      => $properties,
+            future      => $f,
+        };
+    }
+    else {
+        $f->done({ id => $build_id, href => $build_detail_href, status => '', params => $properties, output => '' });
+    }
 
-    return $f, $build_id, $json->{webUrl}
+    return $f, $build_id, $json->{webUrl};
 }
 
-sub get_artifact_list($self, $build_result) {
+sub get_artifact_list ($self, $build_result) {
 
     # get build result
     my $result_url = $self->teamcity_auth_url . $build_result->{href};
-    my $response = $self->http_request(
-        'GET',
-        $result_url,
-        { 'Accept' => 'application/json' },
-    );
-    my $json = decode_json $response->{content};
+    my $response   = $self->http_request('GET', $result_url, { 'Accept' => 'application/json' },);
+    my $json       = decode_json $response->{content};
 
     # get artifacts summary
     my $artifacts_href = $json->{artifacts}{href};
-    my $artifacts_url = $self->teamcity_auth_url . $artifacts_href;
-    $response = $self->http_request(
-        'GET',
-        $artifacts_url,
-        { 'Accept' => 'application/json' },
-    );
+    my $artifacts_url  = $self->teamcity_auth_url . $artifacts_href;
+    $response = $self->http_request('GET', $artifacts_url, { 'Accept' => 'application/json' },);
 
     $json = decode_json $response->{content};
 
     my %artifacts;
+
     # get individual artifacts URLs
     for my $node ($json->{file}->elements) {
-        my $content_href = $node->{content}{href};
+        my $content_href  = $node->{content}{href};
         my $metadata_href = $node->{content}{href};
-        my $name = $node->{name};
+        my $name          = $node->{name};
         $artifacts{$name} = {
             name          => $name,
             content_href  => $content_href,
@@ -168,76 +165,82 @@ sub get_artifact_list($self, $build_result) {
         };
     }
 
-    return \%artifacts
+    return \%artifacts;
 }
 
-sub get_artifact_content($self, $build_result, $artifact_name) {
+sub get_artifact_content ($self, $build_result, $artifact_name) {
     my $artifact_list = $self->get_artifact_list($build_result);
 
-    my $content_url = $self->teamcity_auth_url .
-                        $artifact_list->{$artifact_name}{content_href};
+    my $content_url = $self->teamcity_auth_url . $artifact_list->{$artifact_name}{content_href};
     my $response = $self->http_request('GET', $content_url);
 
-    return $response->{content}
+    return $response->{content};
 }
 
+sub run ($self, $build_name, $properties = {}) {
 
-sub run($self, $build_name, $properties = {}) {
-    print "RUN\t$build_name(";
-    print join(', ', map { "$_: '$properties->{$_}'" } $properties->keys);
-    print ")";
+    my $teamcity_job_parameters = join(', ', map { "$_: '$properties->{$_}'" } keys %{$properties});
+    $log->info("RUN\t$build_name($teamcity_job_parameters)");
 
-    my ($f, $id, $url) = $self->run_teamcity_build(
-        $self->build_id_mapping->{$build_name},
-        $properties,
-        $build_name,
-    );
+    my ($f, $id, $url) = $self->run_teamcity_build($self->build_id_mapping->{$build_name}, $properties, $build_name,);
 
-    say " [$id]\n\t$url";
+    $log->info("\t[$id]\t$url");
+
+    return $f;
+}
+
+sub touch ($self, $build_name, $properties = {}) {
+    my $teamcity_job_parameters = join(', ', map { "$_: '$properties->{$_}'" } keys %{$properties});
+    $log->info("TOUCH\t$build_name($teamcity_job_parameters)");
+
+    my ($f, $id, $url) = $self->run_teamcity_build($self->build_id_mapping->{$build_name}, $properties, $build_name, 0);
+
+    $log->info("\t[$id]\t$url");
 
     return $f;
 }
 
 sub poll_teamcity_results($self) {
-    say '.';
-    for my $build ($self->teamcity_builds->values) {
-        my $url = $self->teamcity_auth_url . $build->{href};
-        my $response = $self->http_request(
-            'GET',
-            $url,
-            { 'Accept' => 'application/json' },
-        );
+    $log->info('.');
+
+    for my $build (values %{$self->teamcity_builds}) {
+        my $url = $self->teamcity_auth_url . $build->{status_href};
+        my $response = $self->http_request('GET', $url, { 'Accept' => 'application/json' },);
 
         my $json = decode_json $response->{content};
 
         my $state  = $json->{state};
         my $status = $json->{status};
 
-        say "$build->{name} [$build->{id}]: QUEUED" if $state eq 'queued';
+        $log->info("$build->{name} [$build->{id}]: QUEUED") if $state eq 'queued';
 
         next if $state ne 'finished';
 
-        say "RESULT\t$build->{name} [$build->{id}]: $status ($state)";
+        $log->info("RESULT\t$build->{name} [$build->{id}]: $status ($state)");
+
+        my $job_result = {
+            id     => $build->{id},
+            href   => $build->{href},
+            status => $status,
+            params => $build->{params},
+            output => $json
+        };
 
         if ($status eq 'SUCCESS') {
-            my $href = $json->{href};
-            $build->{future}->done({ id => $build->{id}, href => $href });
+            $build->{future}->done($job_result);
         }
-        elsif ($status eq 'FAILURE') {
-            $build->{future}->fail($json->{statusText});
-        }
-        elsif ($status eq 'UNKNOWN') {
-            $build->{future}->fail($json->{statusText});
+        else {
+            $build->{future}->fail($job_result);
         }
 
-        delete $self->teamcity_builds->{$build->{id}};
+        delete $self->teamcity_builds->{ $build->{id} };
     }
 }
 
 sub register_polling_timer($self) {
     my $timer = IO::Async::Timer::Periodic->new(
         interval => $self->poll_interval,
-        on_tick => sub {
+        on_tick  => sub {
             $self->poll_teamcity_results();
         },
     );
@@ -245,7 +248,6 @@ sub register_polling_timer($self) {
     $self->loop->add($timer);
     $timer->start();
 }
-
 
 1;
 __END__
@@ -260,6 +262,19 @@ Teamcity::Executor - Executor of TeamCity build configurations
 
     use Teamcity::Executor;
     use IO::Async::Loop;
+    use Log::Any::Adapter;
+
+    Log::Any::Adapter->set(
+        'Dispatch',
+        outputs => [
+            [
+                'Screen',
+                min_level => 'debug',
+                stderr    => 1,
+                newline   => 1
+            ]
+        ]
+    );
 
     my $loop = IO::Async::Loop->new;
     my $tc = Teamcity::Executor->new(
@@ -287,6 +302,18 @@ Teamcity::Executor - Executor of TeamCity build configurations
         },
         sub {
             print "Build failed\n";
+            exit 1
+        }
+    );
+
+    my $touch_future = $tc->touch('hello_name', { name => 'TeamCity' })->then(
+        sub {
+            my ($build) = @_;
+            print "Touch build started\n";
+            $loop->stop();
+        },
+        sub {
+            print "Touch build failed to start\n";
             exit 1
         }
     );

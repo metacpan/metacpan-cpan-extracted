@@ -27,7 +27,7 @@ use Storable;
         DateTime::TimeZone::OffsetOnly->new( offset => '+0100' ),
         DateTime::TimeZone::Floating->new(),
         DateTime::TimeZone::UTC->new(),
-        ) {
+    ) {
         test_thaw_and_clone($obj);
     }
 }

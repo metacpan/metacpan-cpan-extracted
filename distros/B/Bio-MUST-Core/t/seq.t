@@ -61,6 +61,25 @@ my @valid_seqs = (
         '  *masqnkee***ekkkvkklqksyfdvlgicctsevpiienilksl*d*gvkeysvivpsrtvivv ',
         60, 1, 0, 1, 3, undef, ('') x 6 ],
 
+    # seqs ending in '*'
+    # first is non-aligned ('*' means STOP)
+    # second is aligned (because of the second '*' at the beginning)
+    [ 'Arabidopsis halleri_81970@78182999',         # note the trailing '*'
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV*',
+        'Arabidopsis halleri_81970@78182999',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        60, 1, 0, 0, 0, undef, ('') x 6 ],
+    [ 'Arabidopsis halleri_81970@78182999',         # note the two '*'
+        '*MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV*',
+        'Arabidopsis halleri_81970@78182999',
+        '*MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV*',
+         'MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV',
+        '*MASQNKEEEKKKVKKLQKSYFDVLGICCTSEVPIIENILKSLDGVKEYSVIVPSRTVIVV*',
+        60, 1, 0, 1, 1, undef, ('') x 6 ],
+
+
     [ 'Chlamydomonas reinhardtii_3055@13699872',        # note the 'N', '?', 'X'
         'ATGCTTCAGAxCGCACCTATGCTTCCGGNCCTTGGGCCACACCTCGTCCCGCAA?TGGGAGCCCTGGC',
         'Chlamydomonas reinhardtii_3055@13699872',

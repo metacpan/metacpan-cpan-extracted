@@ -7,7 +7,7 @@ use Data::Dumper;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %actions);
-    $VERSION     = '0.05';
+    $VERSION     = '0.06';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -356,8 +356,6 @@ Class constructor. Returns object of Net::Cisco::ISE::Device on succes. The foll
 
 =item portCOA
 
-=back
-
 Formatting rules may be in place & enforced by Cisco ISE.
 
 =over 3
@@ -404,7 +402,7 @@ Array reference that contains hash entries of all IP information for the device 
 
 =item ips
 
-Cleaned up instance of C<subnet>.
+Cleaned up instance of C<subnet>. Not yet added... be patient!
 
 =item location
 

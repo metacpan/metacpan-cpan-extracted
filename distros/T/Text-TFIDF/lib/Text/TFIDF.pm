@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 require Encode;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 sub new {
@@ -67,7 +67,7 @@ sub IDF {
 		$count++ if (defined $self->{file}->{$el}->{$word});
 	}
 
-	return log(scalar(keys %{$self->{file}})/(1+$count))/log(10);
+	return log(scalar(keys %{$self->{file}})/($count))/log(10);
 }
 
 sub process_files {

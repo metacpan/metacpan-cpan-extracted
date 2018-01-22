@@ -1,10 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         XML-CanonicalizeXML
-version:      0.05
-version_from: lib/XML/CanonicalizeXML.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+---
+abstract: 'Perl extension for inclusive (1.0 and 1.1) and exclusive canonicalization of XML using libxml2'
+author:
+  - 'Stefan Zasada <sjz@zasada.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-CanonicalizeXML
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

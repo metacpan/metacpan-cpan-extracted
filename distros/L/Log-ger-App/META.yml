@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-App
   homepage: https://metacpan.org/release/Log-ger-App
   repository: git://github.com/perlancar/perl-Log-ger-App.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

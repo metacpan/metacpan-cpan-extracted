@@ -1,3 +1,6 @@
+1.0.7    17.01.2018
+    - C++14 requirements lowered to C++11
+    - new overloads for endian conversions
 1.0.6    12.01.2018
     - class panda::function - compareble version of std::function
     - class CallbackDispatcher - implementation of observer pattern

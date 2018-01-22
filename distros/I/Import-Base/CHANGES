@@ -1,5 +1,14 @@
 Changelog for Import-Base
 
+1.004     2018-01-16 13:18:57-06:00 America/Chicago
+
+    [Fixed]
+
+    - The documentation now recommends `use parent` instead of `use
+      base`. `use base` has some legacy cruft that makes it less
+      optimal. Thanks @grinnz!
+
+    - Removed out-of-date Build.PL from the dist. Thanks @grinnz!
 1.003     2017-02-16 14:09:34-06:00 America/Chicago
 
     [Fixes]

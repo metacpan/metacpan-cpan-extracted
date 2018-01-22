@@ -1,5 +1,12 @@
 Revision history for Perl extension File::Copy::Recursive.
 
+0.40 Tue Jan 16 10:00:09 2017
+    - github Issue #5 - Deep directories pathmk
+    - rt 123966 - switch to bsd_glob() since glob() will disappear in perl 5.30
+    - rt 123971 - skip symlink tests when the OS does not support symlinks
+    - rt 123970 - use Path::Tiny instead of File::Slurp in tests
+    - rt 117241 - add test for read only directories
+
 0.39 Fri Dec 29 13:26:12 2017
     - tidy code
     - Change into directory before emptying it

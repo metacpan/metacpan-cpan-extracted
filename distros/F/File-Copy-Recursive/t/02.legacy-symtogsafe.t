@@ -4,7 +4,12 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-if ( !-x "/bin/mv" || !-x "/bin/mkdir" ) {    # dragons! patches welcome
+use File::Copy::Recursive qw(pathempty pathrm pathrmdir);
+
+if ( !$File::Copy::Recursive::CopyLink ) {
+    plan skip_all => "symlink tests not applicable on systems w/ out symlink support ($^O)";
+}
+elsif ( !-x "/bin/mv" || !-x "/bin/mkdir" ) {    # dragons! patches welcome
     plan skip_all => 'Only operate on systems w/ /bin/mv and /bin/mkdir, for reasons see the cource code comments';
 }
 else {
@@ -14,7 +19,6 @@ else {
 use File::Temp;
 use Cwd;
 use File::Spec;
-use File::Copy::Recursive qw(pathempty pathrm pathrmdir);
 
 my $orig_dir = Cwd::cwd();
 my $dir      = File::Temp->newdir();

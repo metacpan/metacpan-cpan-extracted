@@ -19,3 +19,8 @@ Revision history for Perl module Net::Cisco::ISE
     
 0.05 Sun Aug 27 22:30:00 2017
     - Forgot to include Net::Cisco::ISE::NetworkDeviceGroup in MANIFEST
+    
+0.06 Wed Jan 17 21:19:00 2018
+    - Fixed flaws in XML namespace handling in Net::Cisco::ISE module. Now customizable
+    - Updated POD
+    - General cleanup

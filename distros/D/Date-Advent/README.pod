@@ -1,9 +1,19 @@
-
 =head1 NAME
 
-Date::Advent
+Date::Advent - Calculate the Sundays of Advent
+
+=head1 VERSION
+
+Version 1.20171223
+
+
+=cut
 
 =head1 SYNOPSIS
+
+Date::Advent takes a Time::Piece date and calculates all four Sundays of Advent for the current Christian liturgical year.
+
+As Advent is the beginning of the Christian liturgical calendar, this usually results in the date for Advent in the current year being dates in the past.  E.g. The Sundays of Advent returned for 12. March 2016 would be 29. November 2015, 6. December 2015, 13. December 2015, and 20. December 2015.
 
     use Time::Piece;
     use Date::Advent;
@@ -15,55 +25,108 @@ Date::Advent
     say $testAdvent->fourthSunday; #Gives date for fourth Sunday of Advent
     say $testAdvent->christmas; #Gives date of Christmas
 
-=head1 DESCRIPTION
-
-Date::Advent takes a Time::Piece date and calculates all four Sundays of Advent for the current Christian liturgical year.
-
-As Advent is the beginning of the Christian liturgical calendar, this usually results in the date for Advent in the current year being dates in the past.  E.g. The Sundays of Advent returned for 12. March 2016 would be 29. November 2015, 6. December 2015, 13. December 2015, and 20. December 2015.
-
-=head1 INSTALLATION
-
-To install this module, run the following commands:
-
-    perl Makefile.PL
-    make
-    make test
-    make install
-
 The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Advent> -- and tested via TravisCI.
 
-=for html <a href="https://travis-ci.org/marmanold/Date-Advent"><img src="https://travis-ci.org/marmanold/Date-Advent.svg?branch=master" /></a>
+=for html <a href='https://travis-ci.org/marmanold/Date-Advent'><img src='https://travis-ci.org/marmanold/Date-Advent.svg?branch=master' /></a>
 
 =for html <a href='https://coveralls.io/github/marmanold/Date-Advent?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Advent/badge.svg?branch=master' alt='Coverage Status' /></a>
 
-=head1 SUPPORT AND DOCUMENTATION
+=head1 Object Attributes
 
-After installing, you can find documentation for this module with the
-perldoc command.
+=head2 date
+
+Time::Piece date object.  Only attribute required at object construction.
+
+=head2 christmas
+
+Time::Piece attribute for Christmas Day as calculated from the C<date> given at object construction.
+
+=head2 firstSunday
+
+Time::Piece attribute for the first Sunday of Advent as calculated from the C<date> given at object construction.
+
+=head2 secondSunday
+
+Time::Piece attribute for the second Sunday of Advent as calculated from the C<date> given at object construction.
+
+=head2 thirdSunday
+
+Time::Piece attribute for the third Sunday of Advent as calculated from the C<date> given at object construction.
+
+=head2 fourthSunday
+
+Time::Piece attribute for the fourth Sunday of Advent as calculated from the C<date> given at object construction.
+
+
+=cut
+
+=head1 Object Constructor
+
+=head2 BUILD
+
+Constructor for the Date::Advent object.  Takes the Time::Piece argument of C<date> as the date to calculate the current Christian liturgical year's Sundays of Advent from.  The resulting object is immutable and cannot be changed once created.
+
+  my $testAdvent = Date::Advent->new(date => Time::Piece->strptime("2016-01-01", "%Y-%m-%d"));
+
+
+=cut
+
+=head1 AUTHOR
+
+Michael Wayne Arnold, C<< <marmanold at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-date-advent at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Advent>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
 
     perldoc Date::Advent
 
+
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Advent
+=over 4
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Date-Advent
+=item * RT: CPAN's request tracker (report bugs here)
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Date-Advent
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Advent>
 
-    Search CPAN
-        http://search.cpan.org/dist/Date-Advent/
+=item * AnnoCPAN: Annotated CPAN documentation
 
+L<http://annocpan.org/dist/Date-Advent>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Date-Advent>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Date-Advent/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016 Michael Wayne Arnold
+Copyright 2016-2017 MICHAEL WAYNE ARNOLD
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-See L<http://dev.perl.org/licenses/> for more information.
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+=cut
+

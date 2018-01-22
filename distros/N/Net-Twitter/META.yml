@@ -22,7 +22,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -68,5 +68,5 @@ resources:
   bugtracker: http://github.com/semifor/Net-Twitter/issues
   homepage: https://github.com/semifor/Net-Twitter
   repository: https://github.com/semifor/Net-Twitter.git
-version: '4.01042'
+version: '4.01043'
 x_serialization_backend: 'YAML::Tiny version 1.69'

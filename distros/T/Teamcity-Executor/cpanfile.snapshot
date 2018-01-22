@@ -528,6 +528,36 @@ DISTRIBUTIONS
       Mozilla::CA 20110101
       Net::HTTPS 6
       perl 5.008001
+  Log-Any-1.032
+    pathname: D/DA/DAGOLDEN/Log-Any-1.032.tar.gz
+    provides:
+      Log::Any 1.032
+      Log::Any::Adapter 1.032
+      Log::Any::Adapter::Base 1.032
+      Log::Any::Adapter::File 1.032
+      Log::Any::Adapter::Null 1.032
+      Log::Any::Adapter::Stderr 1.032
+      Log::Any::Adapter::Stdout 1.032
+      Log::Any::Adapter::Test 1.032
+      Log::Any::Adapter::Util 1.032
+      Log::Any::Manager 1.032
+      Log::Any::Proxy 1.032
+      Log::Any::Proxy::Test 1.032
+      Log::Any::Test 1.032
+    requirements:
+      B 0
+      Carp 0
+      Data::Dumper 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      Fcntl 0
+      IO::File 0
+      Test::Builder 0
+      base 0
+      constant 0
+      perl 5.008001
+      strict 0
+      warnings 0
   MRO-Compat-0.13
     pathname: H/HA/HAARG/MRO-Compat-0.13.tar.gz
     provides:
@@ -1398,6 +1428,19 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       constant 0
       perl 5.006
+      strict 0
+      warnings 0
+  Try-Tiny-Retry-0.004
+    pathname: D/DA/DAGOLDEN/Try-Tiny-Retry-0.004.tar.gz
+    provides:
+      Try::Tiny::Retry 0.004
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      Time::HiRes 0
+      Try::Tiny 0
+      parent 0
       strict 0
       warnings 0
   Types-Serialiser-1.0

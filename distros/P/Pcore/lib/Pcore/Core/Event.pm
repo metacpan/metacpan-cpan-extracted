@@ -46,12 +46,11 @@ sub listen_events ( $self, $masks, @listeners ) {
                 die q[Invalid listener type];
             }
 
-            my $listener = Pcore::Core::Event::Listener->new(
-                {   broker => $self,
-                    masks  => $masks,
-                    cb     => $cb,
-                }
-            );
+            my $listener = Pcore::Core::Event::Listener->new( {
+                broker => $self,
+                masks  => $masks,
+                cb     => $cb,
+            } );
 
             $self->{listeners}->{$mask}->{ $listener->{id} } = $listener;
 

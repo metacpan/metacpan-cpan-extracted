@@ -37,6 +37,9 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Cwd qw(abs_path);
 use List::Util qw(uniq);
+use Text::ParseWords qw(shellwords);
+use IO::File;
+use TOML;
 
 our $rcloader;
 our $debug;
@@ -46,33 +49,55 @@ our $mod_arg = 1;	# Process -M option in target command
 
 my($cmd_dir, $cmd_name) = ($0           =~ m{ (.*) / ([^/]+) $ }x) or die;
 my($abs_dir, $abs_name) = (abs_path($0) =~ m{ (.*) / ([^/]+) $ }x) or die;
-my $env_MODULE_OPT  = sprintf '%s_MODULE_OPT',  uc($abs_name);
 my $env_MODULE_PATH = sprintf '%s_MODULE_PATH', uc($abs_name);
 my $env_ROOT        = sprintf '%s_ROOT',        uc($abs_name);
 my $env_BINDIR      = sprintf '%s_BINDIR',      uc($abs_name);
+my $env_CONFIG      = sprintf '%s_CONFIG',      uc($abs_name);
 
 my $HOME = $ENV{HOME} or die "No \$HOME.\n";
 my $config_dir = $ENV{$env_ROOT} || "${HOME}/.${abs_name}.d";
 my $module_dir = $config_dir;
 my $bin_dir = $ENV{$env_BINDIR} || "$config_dir/bin";
+my $config_file = $ENV{$env_CONFIG} || "$config_dir/config.toml";
 
+##
+## load config file
+##
+my $config = sub {
+    my $file = shift;
+    my $fh = new IO::File $file or return {};
+    my $toml = do { local $/; <$fh> };
+    my($data, $err) = from_toml $toml;
+    die "$file: $err\n" unless $data;
+    $data;
+}->($config_file);
+my $alias = $config->{alias} //= {};
+my $nomodule = $config->{"no-module"} //= [];
+my %nomodule = do {
+    if (ref $nomodule eq 'ARRAY') {
+	map { $_ => 1 } @{$nomodule};
+    }
+    elsif (ref $nomodule eq 'HASH') {
+	%{$nomodule};
+    }
+    else {
+	($nomodule => 1);
+    }
+};
+
+##
+## setup Getopt::EX
+##
 require Getopt::EX::Loader;
 $rcloader = new Getopt::EX::Loader
     BASECLASS => [ '', 'App::optex' ],
     IGNORE_NO_MODULE => 1;
-if (my $opt = $ENV{$env_MODULE_OPT}) {
-    $mod_opt = $opt;
-    $rcloader->configure(MODULE_OPT => $opt);
-}
 
-sub load_rc {
-    my $rc = shift;
-    $rcloader->load(FILE => $rc);
-    warn "$abs_name: load $rc\n" if $debug;
-}
+load_rc("$config_dir/default.rc");
 
-load_rc "$config_dir/default.rc";
-
+##
+## setup module search path
+##
 my @private_mod_path = (
     do {
 	if (my $mod_path = $ENV{$env_MODULE_PATH}) {
@@ -86,6 +111,9 @@ my @private_mod_path = (
 
 prepend_path(@private_mod_path);
 
+##
+## get target command name
+##
 my $target_name = do {
     if ($cmd_name ne $abs_name) {
 	$cmd_name;
@@ -100,6 +128,30 @@ my $target_name = do {
     }
 };
 
+##
+## alias
+##
+if (my $alias = $alias->{$target_name}) {
+    my($name, @opts) = do {
+	if (ref $alias eq 'ARRAY') {
+	    @{$alias};
+	} else {
+	    shellwords $alias;
+	}
+    };
+    if ($name ne '') {
+	$target_name = $name;
+	unshift @ARGV, @opts;
+    }
+}
+
+if ($nomodule{$target_name}) {
+    $mod_arg = 0;
+}
+
+##
+## prepare command specific module path
+##
 my @command_mod_path =
     grep { -d $_ } map { "$_/$target_name" } @private_mod_path;
 
@@ -110,15 +162,36 @@ if ($mod_arg and @ARGV > 0 and $ARGV[0] eq $mod_opt) {
     exit;
 }
 
+##
+## load command specific rc file
+##
 unless ($no_operation) {
-    load_rc "$config_dir/$target_name.rc";
+    load_rc("$config_dir/$target_name.rc");
     $rcloader->configure(PARSE_MODULE_OPT => $mod_arg);
     $rcloader->deal_with(\@ARGV);
 }
 
+##
+## setup PATH
+##
 $ENV{PATH} = join(':',
 		  grep { not remove_path($_) }
 		  split /:+/, $ENV{PATH});
+
+warn "$abs_name: exec $target_name @ARGV\n" if $debug;
+
+##
+## execute target command
+##
+exit system($target_name, @ARGV) >> 8;
+
+######################################################################
+
+sub load_rc {
+    my $rc = shift;
+    $rcloader->load(FILE => $rc);
+    warn "$abs_name: load $rc\n" if $debug;
+}
 
 sub remove_path {
     my $dir = shift;
@@ -136,12 +209,6 @@ sub remove_path {
     }
     return 0;
 }
-
-warn "$abs_name: exec $target_name @ARGV\n" if $debug;
-
-exit system($target_name, @ARGV) >> 8;
-
-######################################################################
 
 sub self_option {
     my $argv = shift;
@@ -381,6 +448,15 @@ option preceding other option like this:
 
     % date --iso-8601 -u
 
+=head2 COMMAND ALIASES
+
+Command aliases can be set in the configuration file like this:
+
+    [alias]
+        pgrep = [ "greple", "-Mperl", "--code" ]
+
+Read CONFIGURATION FILE section.
+
 =head2 MACROS
 
 Complex string can be composed using macro C<define>.  Next example is
@@ -468,6 +544,10 @@ following content.
     % date -Mes
     domingo, 22 de octubre de 2017, 18:00:00 JST
 
+When the specified module was not found in library path, B<optex>
+ignores the option and stops argument processing immediately.  Ignored
+options are passed through to the target command.
+
 Module is also used with subroutine call.  Suppose
 F<~/.optex.d/env.pm> module look like:
 
@@ -490,7 +570,7 @@ because it does not have special characters to be escaped.
 Option aliases can be also declared in the module, at the end of file,
 following special literal C<__DATA__>.  Using this, you can prepare
 multiple set of options for different purposes.  Think about generic
-i18n module:
+B<i18n> module:
 
     package i18n;
     1;
@@ -553,7 +633,7 @@ Print debug messages.
 
 =head1 OPTIONS
 
-These options are not effective when B<optex> was executed from a
+These options are not effective when B<optex> was executed from
 symbolic link.
 
 =over 4
@@ -588,10 +668,45 @@ Stop option manipulation.  Use full pathname otherwise.
 
 B<optex> deals with module option (-M) on target command by default.
 However, there is a command which also uses same option for own
-purpose.  Option B<--nomodule> disables that behaviour.  Other option
+purpose.  Option B<--nomodule> disables that behavior.  Other option
 interpretation is still effective, and there is no problem using
 module option in rc or module files.
 
+
+=back
+
+
+=head1 CONFIGURATION FILE
+
+When starting up, B<optex> reads configuration file
+F<~/.optex.d/config.toml> which is supposed to be written in TOML
+format.
+
+=head2 PARAMETERS
+
+=over 4
+
+=item B<no-module>
+
+Set commands for which B<optex> does not interpret module option
+B<-M>.  If the target command is found in this list, it is executed as
+if option B<--no-module> is given to B<optex>.
+
+    no-module = [
+        "greple",
+        "pgrep",
+    ]
+
+=item B<alias>
+
+Set command aliases.  Example:
+
+    [alias]
+        pgrep = [ "greple", "-Mperl", "--code" ]
+        hello = "echo -n 'hello world!'"
+
+Command alias can be invoked either from symbolic link and command
+argument.
 
 =back
 
@@ -609,6 +724,11 @@ System module directory.
 =item F<~/.optex.d/>
 
 Personal root directory.
+
+
+=item F<~/.optex.d/config.toml>
+
+Configuration file.
 
 
 =item F<~/.optex.d/default.rc>
@@ -651,19 +771,18 @@ or create/remove symbolic links.
 
 Override default root directory F<~/.optex.d>.
 
+=item OPTEX_CONFIG
+
+Override default configuration file F<OPTEX_ROOT/config.toml>.
+
 =item OPTEX_MODULE_PATH
 
 Set module paths separated by colon (C<:>).  These are inserted before
 standard path.
 
-=item OPTEX_MODULE_OPT
-
-Passed to L<Getopt::EX::Loader> module, and standard module option
-B<-M> is replaced by its value.
-
 =item OPTEX_BINDIR
 
-Override default symbolic link directory F<~/.optex.d/bin>.
+Override default symbolic link directory F<OPTEX_ROOT/bin>.
 
 =back
 
@@ -675,7 +794,7 @@ L<Getopt::EX>, L<Getopt::EX::Loader>, L<Getopt::EX::Module>
 
 =head1 AUTHOR
 
-Kaz Utashiro
+Kazumasa Utashiro
 
 
 =head1 COPYRIGHT
@@ -684,10 +803,11 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017 Kazumasa Utashiro
+Copyright 2017-2018 Kazumasa Utashiro
 
 
 =cut
 
 
-#  LocalWords:  optex
+#  LocalWords:  optex rc iso greple awk pdf LANG ENV Oct JST domingo
+#  LocalWords:  setenv autoload PERLLIB BINDIR Utashiro Kazumasa

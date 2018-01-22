@@ -52,7 +52,7 @@
    "provides" : {
       "WebService::Coincheck" : {
          "file" : "lib/WebService/Coincheck.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "WebService::Coincheck::Account" : {
          "file" : "lib/WebService/Coincheck/Account.pm"
@@ -107,6 +107,6 @@
          "web" : "http://webchat.freenode.net/?channels=%23bayadev"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

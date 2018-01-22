@@ -1,5 +1,9 @@
 Revision history for IO-Async-Loop-Epoll
 
+0.18    2018-01-21 23:59:10
+        [BUGFIXES]
+         * Account for recursive loop calls during signal handlers (RT124084)
+
 0.17    2015/11/09 17:59:19
         [CHANGES]
          * Provide a more meaningful error message if the fd->filehandle

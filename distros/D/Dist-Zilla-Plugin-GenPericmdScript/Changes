@@ -1,3 +1,10 @@
+0.421   2018-01-17 (PERLANCAR)
+
+	- Update to Perinci::CmdLine::Gen 0.484, add configurations:
+	  copt_help_enable, copt_help_getopt, copt_version_enable,
+	  copt_version_getopt.
+
+
 0.420   2017-08-12 (PERLANCAR)
 
 	- Add configuration: read_config, read_env.

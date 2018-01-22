@@ -3,7 +3,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::ResolveDeps::BuildT
 use Moose::Role;
 
 use Memoize;
-use List::MoreUtils qw(first_index);
+use List::MoreUtils 0.428 qw(first_index);
 use Array::Compare;
 use List::Util qw(first);
 

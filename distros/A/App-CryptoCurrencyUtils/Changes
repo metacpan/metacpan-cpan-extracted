@@ -1,3 +1,15 @@
+0.004   2018-01-21 (PERLANCAR)
+
+	- coin-cmc, coin-mno: Accept many coins as arguments.
+
+
+0.003   2018-01-21 (PERLANCAR)
+
+        - Rename utilities: grepcrypto -> grepcoin, cmc-currency -> coin-cmc.
+
+        - Add utility: coin-mno.
+
+
 0.002   2018-01-12 (PERLANCAR)
 
 	- Add utility: cmc-currency.

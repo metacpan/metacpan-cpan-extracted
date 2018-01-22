@@ -1,6 +1,6 @@
 package WWW::Google::CustomSearch::Page;
 
-$WWW::Google::CustomSearch::Page::VERSION   = '0.35';
+$WWW::Google::CustomSearch::Page::VERSION   = '0.37';
 $WWW::Google::CustomSearch::Page::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::CustomSearch::Page - Placeholder for Google JSON/Atom Custom Search
 
 =head1 VERSION
 
-Version 0.35
+Version 0.37
 
 =cut
 
@@ -17,18 +17,12 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
-has  'api_key'        => (is => 'ro', required => 1);
-has  'cx'             => (is => 'ro', required => 1);
-has  'safe'           => (is => 'ro', default => sub { return 'off' });
-has  'count'          => (is => 'ro');
-has  'searchTerms'    => (is => 'ro', required => 1);
-has  'inputEncoding'  => (is => 'ro', required => 1);
-has  'startIndex'     => (is => 'ro', default  => sub { return 1 });
-has  'title'          => (is => 'ro', required => 1);
-has  'totalResults'   => (is => 'ro', required => 1);
-has  'outputEncoding' => (is => 'ro', required => 1);
+has [qw(api_key cx searchTerms inputEncoding title totalResults outputEncoding)] => (is => 'ro', required => 1);
+has 'count'      => (is => 'ro');
+has 'safe'       => (is => 'ro', default => sub { return 'off' });
+has 'startIndex' => (is => 'ro', default => sub { return 1 });
 
 =head1 DESCRIPTION
 

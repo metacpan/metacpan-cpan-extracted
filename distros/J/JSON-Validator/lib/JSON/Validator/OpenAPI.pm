@@ -28,9 +28,6 @@ sub load_and_validate_schema {
   return $self;
 }
 
-# deprecated
-sub load_and_validate_spec { goto &load_and_validate_schema }
-
 sub validate_input {
   my $self = shift;
   local $self->{validate_input} = 1;
@@ -155,7 +152,7 @@ sub _validate_request_value {
   my $type = $p->{type} || 'object';
   my @e;
 
-  return if !defined $value and !JSON::Validator::_is_true($p->{required});
+  return if !defined $value and !$p->{required};
 
   my $in     = $p->{in};
   my $schema = {

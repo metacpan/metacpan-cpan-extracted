@@ -4,12 +4,12 @@
 ** See Copyright Notice in mruby.h
 */
 
-#include "mruby.h"
-#include "mruby/string.h"
-#include "mruby/data.h"
-#include "mruby/class.h"
-#include "mruby/re.h"
-#include "mruby/irep.h"
+#include <mruby.h>
+#include <mruby/string.h>
+#include <mruby/data.h>
+#include <mruby/class.h>
+#include <mruby/re.h>
+#include <mruby/irep.h>
 
 MRB_API struct RData*
 mrb_data_object_alloc(mrb_state *mrb, struct RClass *klass, void *ptr, const mrb_data_type *type)
@@ -87,19 +87,27 @@ mrb_obj_to_sym(mrb_state *mrb, mrb_value name)
 }
 
 MRB_API mrb_int
+#ifdef MRB_WITHOUT_FLOAT
+mrb_fixnum_id(mrb_int f)
+#else
 mrb_float_id(mrb_float f)
+#endif
 {
   const char *p = (const char*)&f;
   int len = sizeof(f);
-  mrb_int id = 0;
+  uint32_t id = 0;
 
+#ifndef MRB_WITHOUT_FLOAT
+  /* normalize -0.0 to 0.0 */
+  if (f == 0) f = 0.0;
+#endif
   while (len--) {
     id = id*65599 + *p;
     p++;
   }
   id = id + (id>>5);
 
-  return id;
+  return (mrb_int)id;
 }
 
 MRB_API mrb_int
@@ -123,9 +131,13 @@ mrb_obj_id(mrb_value obj)
   case MRB_TT_SYMBOL:
     return MakeID(mrb_symbol(obj));
   case MRB_TT_FIXNUM:
+#ifdef MRB_WITHOUT_FLOAT
+    return MakeID(mrb_fixnum_id(mrb_fixnum(obj)));
+#else
     return MakeID2(mrb_float_id((mrb_float)mrb_fixnum(obj)), MRB_TT_FLOAT);
   case MRB_TT_FLOAT:
     return MakeID(mrb_float_id(mrb_float(obj)));
+#endif
   case MRB_TT_STRING:
   case MRB_TT_OBJECT:
   case MRB_TT_CLASS:
@@ -139,12 +151,14 @@ mrb_obj_id(mrb_value obj)
   case MRB_TT_EXCEPTION:
   case MRB_TT_FILE:
   case MRB_TT_DATA:
+  case MRB_TT_ISTRUCT:
   default:
     return MakeID(mrb_ptr(obj));
   }
 }
 
 #ifdef MRB_WORD_BOXING
+#ifndef MRB_WITHOUT_FLOAT
 MRB_API mrb_value
 mrb_word_boxing_float_value(mrb_state *mrb, mrb_float f)
 {
@@ -164,6 +178,7 @@ mrb_word_boxing_float_pool(mrb_state *mrb, mrb_float f)
   nf->f = f;
   return mrb_obj_value(nf);
 }
+#endif  /* MRB_WITHOUT_FLOAT */
 
 MRB_API mrb_value
 mrb_word_boxing_cptr_value(mrb_state *mrb, void *p)
@@ -179,7 +194,18 @@ mrb_word_boxing_cptr_value(mrb_state *mrb, void *p)
 MRB_API mrb_bool
 mrb_regexp_p(mrb_state *mrb, mrb_value v)
 {
-  return mrb_class_defined(mrb, REGEXP_CLASS) && mrb_obj_is_kind_of(mrb, v, mrb_class_get(mrb, REGEXP_CLASS));
+  if (mrb->flags & MRB_STATE_NO_REGEXP) {
+    return FALSE;
+  }
+  if ((mrb->flags & MRB_STATE_REGEXP) || mrb_class_defined(mrb, REGEXP_CLASS)) {
+    mrb->flags |= MRB_STATE_REGEXP;
+    return mrb_obj_is_kind_of(mrb, v, mrb_class_get(mrb, REGEXP_CLASS));
+  }
+  else {
+    mrb->flags |= MRB_STATE_REGEXP;
+    mrb->flags |= MRB_STATE_NO_REGEXP;
+  }
+  return FALSE;
 }
 
 #if defined _MSC_VER && _MSC_VER < 1900

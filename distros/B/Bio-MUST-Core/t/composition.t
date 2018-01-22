@@ -9,7 +9,7 @@ use List::AllUtils;
 use Path::Class qw(file);
 
 use Bio::MUST::Core;
-use Bio::MUST::Core::Utils qw(cmp_store);
+use Bio::MUST::Core::Utils qw(:tests);
 
 my $class = 'Bio::MUST::Core::PostPred';
 
@@ -104,17 +104,11 @@ my %zscore_for = (
     my $ali = Bio::MUST::Core::Ali->load_phylip($alifile);
 
     my $test = $class->comp_test( [ $ali, @alis ] );
-
-    # ensure that floating point values are comparable
-    my $dp = 12;
-    my %got_zscores = map {
-        $_ => sprintf "%.${dp}g", $test->zscore_for($_)
-    } $test->all_ids;
-    my %exp_zscores = map {
-        $_ => sprintf "%.${dp}g", $zscore_for{$_}
-    } keys %zscore_for;
-
-    is_deeply \%got_zscores, \%exp_zscores, 'got expected zscores';
+    my $epsilon = 1e-12;
+    for my $id ($test->all_ids) {
+        cmp_float $test->zscore_for($id), $zscore_for{$id}, $epsilon,
+            "got expected zscore for: $id";
+    }
 }
 
 done_testing;

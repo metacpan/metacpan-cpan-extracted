@@ -24,4 +24,4 @@ no_index:
     - inc
 requires:
   XSLoader: '0'
-version: '0.21'
+version: '0.22'

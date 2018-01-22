@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/robn/Consul/issues
   homepage: https://github.com/robn/Consul
   repository: https://github.com/robn/Consul.git
-version: '0.022'
+version: '0.023'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -147,10 +147,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.15.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -165,12 +165,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -178,16 +178,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.022'
+          tag: '0.023'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -196,10 +196,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.13.3
+          git_version: 2.15.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode::Factory;
 # ABSTRACT: Genetic code factory based on NCBI gc.prt file
-$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.180140';
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.180190';
 use Moose;
 use namespace::autoclean;
 
@@ -11,16 +11,17 @@ use Carp;
 use File::Spec;
 use LWP::Simple qw(get);
 use Path::Class qw(file);
+use Try::Tiny;
 
 use Bio::MUST::Core::Types;
-use Bio::MUST::Core::Utils qw(fix_homedir);
 use aliased 'Bio::MUST::Core::GeneticCode';
 
 
 # public path to NCBI Taxonomy dump directory
 has 'tax_dir' => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => 'Bio::MUST::Core::Types::Dir',
+    coerce   => 1,
 );
 
 
@@ -46,7 +47,7 @@ sub _build_code_for {
 
     # split file content into code blocks
     my @codes = $self->_get_gcprt_content =~ m/ \{ ( [^{}]+ ) \} /xmsgc;
-    croak "Error: cannot read 'gc.prt' file; aborting!" unless @codes;
+    croak "Error: cannot parse 'gc.prt' file; aborting!" unless @codes;
 
 # Genetic-code-table ::= {
 # ...
@@ -113,14 +114,17 @@ sub _build_code_for {
 sub _get_gcprt_content {
     my $self = shift;
 
-    # if available use local copy in NCBI Taxonomy dump
-    if (defined $self->tax_dir) {
-        my $tax_dir = fix_homedir($self->tax_dir);
-        return file($tax_dir, 'gc.prt')->slurp;
-    }
+    my $content;
 
-    # otherwise fetch it from the NCBI FTP server
-    return get('ftp://ftp.ncbi.nih.gov/entrez/misc/data/gc.prt');
+    # if available use local copy in NCBI Taxonomy dump
+    # otherwise try to fetch it from the NCBI FTP server
+    try   { $content = file($self->tax_dir, 'gc.prt')->slurp }
+    catch { $content = get('ftp://ftp.ncbi.nih.gov/entrez/misc/data/gc.prt') };
+
+    croak "Error: cannot read 'gc.prt' file; aborting!"
+        unless $content;
+
+    return $content;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -136,7 +140,7 @@ Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.pr
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 

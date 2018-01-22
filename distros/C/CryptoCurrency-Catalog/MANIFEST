@@ -6,14 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-devdata/catalog.csv
-devdata/cmc.html
-devdata/completion.csv
-devdata/scrape-result.csv
-devdata/symbol-change.csv
-devscript/gen-catalog
-devscript/scrape-cmc
-devscript/update
 dist.ini
 lib/CryptoCurrency/Catalog.pm
 t/00-compile.t

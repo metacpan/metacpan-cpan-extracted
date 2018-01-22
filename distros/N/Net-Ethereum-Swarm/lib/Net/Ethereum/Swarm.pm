@@ -8,10 +8,9 @@ use LWP::UserAgent;
 use File::Slurp;
 use HTTP::Request ();
 use JSON;
-use Data::Dumper;
 
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 
 
@@ -28,39 +27,39 @@ our $VERSION = '0.01';
 
 # Upload text file to Ethereum Swarm
 
-use Net::Ethereum::Swarm;
-my $uploaded_file_path = $ARGV[0];
-my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
-my $rc = $sw_node->_swarp_node_upload_text_file($uploaded_file_path, 'plain/text; charset=UTF-8');
-print Dumper($rc), "\n";
+  use Net::Ethereum::Swarm;
+  my $uploaded_file_path = $ARGV[0];
+  my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
+  my $rc = $sw_node->_swarp_node_upload_text_file($uploaded_file_path, 'plain/text; charset=UTF-8');
+  print Dumper($rc), "\n";
 
 
 # Upload binary file to Ethereum Swarm
 
-use Net::Ethereum::Swarm;
-my $uploaded_file_path = $ARGV[0];
-my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
-my $rc = $sw_node->_swarp_node_upload_binary_file($uploaded_file_path, 'image/jpeg');
-print Dumper($rc), "\n";
+  use Net::Ethereum::Swarm;
+  my $uploaded_file_path = $ARGV[0];
+  my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
+  my $rc = $sw_node->_swarp_node_upload_binary_file($uploaded_file_path, 'image/jpeg');
+  print Dumper($rc), "\n";
 
 
 # Get manifest by manifest id
 
-use Net::Ethereum::Swarm;
-my $manifest_id = $ARGV[0];
-my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
-my $rc = $sw_node->_swarp_node_get_manifest($manifest_id);
-print Dumper($rc), "\n";
+  use Net::Ethereum::Swarm;
+  my $manifest_id = $ARGV[0];
+  my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
+  my $rc = $sw_node->_swarp_node_get_manifest($manifest_id);
+  print Dumper($rc), "\n";
 
 
 # Get file from Ethereum Swarm
 
-use Net::Ethereum::Swarm;
-my $manifest_id = $ARGV[0];
-my $file_path_to_save = $ARGV[1];
-my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
-my $rc = $sw_node->_swarp_node_get_file($manifest_id, $file_path_to_save, 'plain/text; charset=UTF-8');
-print Dumper($rc), "\n";
+  use Net::Ethereum::Swarm;
+  my $manifest_id = $ARGV[0];
+  my $file_path_to_save = $ARGV[1];
+  my $sw_node = Net::Ethereum::Swarm->new('http://localhost:8500/');
+  my $rc = $sw_node->_swarp_node_get_file($manifest_id, $file_path_to_save, 'plain/text; charset=UTF-8');
+  print Dumper($rc), "\n";
 
 
 

@@ -3,7 +3,7 @@ package Slob;
 use 5.014000;
 use strict;
 use warnings;
-our $VERSION = '0.002';
+our $VERSION = '0.002002';
 
 use constant MAGIC => "!-1SLOB\x1F";
 
@@ -13,6 +13,9 @@ use Encode;
 use Compress::Raw::Bzip2;
 use Compress::Raw::Lzma;
 use Compress::Raw::Zlib;
+
+# MD5 only used for debugging output in tests
+use Digest::MD5 qw/md5_hex/;
 
 our %UNCOMPRESS = (
 	'' => sub { $_[0] },
@@ -62,7 +65,8 @@ sub new {
 	if (ref $path eq 'IO') {
 		$fh = $path
 	} else {
-		open $fh, '<', $path or croak "Cannot open \"$path\": $!"
+		open $fh, '<', $path or croak "Cannot open \"$path\": $!";
+		binmode $fh;
 	}
 	my $self = bless {path => $path, fh => $fh}, $class;
 	$self->{header} = $self->read_header;
@@ -156,8 +160,14 @@ sub ftell {
 }
 
 sub uncompress {
-	my ($self, $data) = @_;
-	$UNCOMPRESS{$self->{header}{compression}}->($data)
+       my ($self, $data) = @_;
+       my $compression = $self->{header}{compression};
+       if ($ENV{HARNESS_ACTIVE} && $compression eq 'lzma2') {
+               my $prefix = unpack 'H*', substr $data, 0, 10;
+               my $md5sum = md5_hex $data;
+               Test::More::diag "Uncompressing data starting '$prefix', md5sum $md5sum";
+       }
+       $UNCOMPRESS{$compression}->($data)
 }
 
 sub read_header {

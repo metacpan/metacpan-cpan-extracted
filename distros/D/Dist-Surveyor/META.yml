@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,16 @@ no_index:
 provides:
   Dist::Surveyor:
     file: lib/Dist/Surveyor.pm
-    version: '0.020'
+    version: '0.021'
   Dist::Surveyor::DB_File:
     file: lib/Dist/Surveyor/DB_File.pm
-    version: '0.020'
+    version: '0.021'
   Dist::Surveyor::Inquiry:
     file: lib/Dist/Surveyor/Inquiry.pm
-    version: '0.020'
+    version: '0.021'
   Dist::Surveyor::MakeCpan:
     file: lib/Dist/Surveyor/MakeCpan.pm
-    version: '0.020'
+    version: '0.021'
 requires:
   CPAN::DistnameInfo: '0'
   Compress::Zlib: '0'
@@ -54,7 +54,7 @@ requires:
 resources:
   homepage: https://github.com/Grinnz/Dist-Surveyor
   repository: https://github.com/Grinnz/Dist-Surveyor.git
-version: '0.020'
+version: '0.021'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Naveed Massjouni <naveedm9@gmail.com>'

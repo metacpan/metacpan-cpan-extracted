@@ -1,0 +1,68 @@
+Revision history for Perl extension Tk::PathEntry.
+
+3.07	2018-01-15 (SREZIC)
+	- stable release with the changes in 3.06_50
+
+3.06_50	2017-12-31 (SREZIC)
+	- make sure no interactive window placement happens
+	  in the test suite
+	- META.* update for repository change (now it's on github)
+
+3.05	2009-06-02 (WITTROCK)
+	- no functional changes, just corrected file permissions
+
+3.04
+	- Remove problem when the focus is in the choices listbox and the
+	  user clicks into a different widget
+	- Use standard Glob if File::Glob isn't installed (old Perl versions)
+
+3.03
+	- no functional changes, just declared File::Glob as a prerequisite
+
+3.02
+	- protect test scripts from non-existing DISPLAYs
+
+3.01
+	- fixed wrong usage of Finish() method
+
+3.00
+	- New options -pathcompletion, -dircolor, -height, -messagecommand
+	- User defined alternative for the Tab key for path completion
+	- Enable the options and bindings of Tk::Listbox for Tk::PathEntry
+	- Enable the options of Tk::PathEntry for Tk::PathEntry::Dialog
+	- Enable keyboard input in the choices listbox
+	- Dynamic size of the choices listbox
+	- Allow whitespace and non-Ascii characters in pathname
+	- Supplements to the POD
+
+2.23
+	- fixes for Windows
+
+2.21
+	- Tk804.025 compatibility fixes
+
+2.20
+	- make sure PathEntry dialog is closed before executing the callback
+
+2.19
+	- Tab loops through all choices, PageUp/PageDown also implemented
+	- dialog.t obeys BATCH variable
+
+2.18
+	- new -cancelcmd option
+	- -selectcmd is now documented and should be used instead of
+	  bind("<Return>">
+
+2.17
+	- ~ expansion
+	- new (yet undocumented) -autocomplete and -selectcmd option
+	- the choices widget is now a (selectable) Listbox, not a Label
+	- added Return binding to Tk::PathEntry::Dialog
+	- fixes
+
+2.10
+	- better POD
+	- added Changes and README files
+
+2.08
+	- first public CPAN release

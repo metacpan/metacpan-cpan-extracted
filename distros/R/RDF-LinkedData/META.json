@@ -4,7 +4,7 @@
       "Kjetil Kjernsmo <kjetilk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Semantic Web"
    ],
@@ -30,6 +30,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001",
+            "Log::Any::Adapter::Screen" : "0"
          }
       },
       "runtime" : {
@@ -83,11 +89,11 @@
    "provides" : {
       "Plack::App::RDF::LinkedData" : {
          "file" : "lib/Plack/App/RDF/LinkedData.pm",
-         "version" : "1.02"
+         "version" : "1.92"
       },
       "RDF::LinkedData" : {
          "file" : "lib/RDF/LinkedData.pm",
-         "version" : "1.02"
+         "version" : "1.92"
       }
    },
    "release_status" : "stable",
@@ -104,11 +110,9 @@
          "web" : "https://github.com/kjetilk/RDF-LinkedData/"
       },
       "x_IRC" : "irc://irc.perl.org/#perlrdf",
-      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project",
-      "x_mailinglist" : "http://lists.perlrdf.org/listinfo/dev",
-      "x_wiki" : "http://wiki.perlrdf.org/"
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-LinkedData/project"
    },
-   "version" : "1.02",
+   "version" : "1.92",
    "x_contributors" : [
       "Gregory Todd Williams <gwilliams@cpan.org>",
       "Richard Lewis",
@@ -119,5 +123,6 @@
          "file" : "script/linked_data.psgi"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

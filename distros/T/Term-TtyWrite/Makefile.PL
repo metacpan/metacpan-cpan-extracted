@@ -16,7 +16,7 @@ my %params = (
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/Term/TtyWrite.pm',
 
-    LICENSE  => 'artistic_2',
+    LICENSE  => 'bsd',
     PL_FILES => {},
 
     CONFIGURE_REQUIRES => {

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-CaboCha
 
+0.06 2018-01-20T12:19:33Z
+
+    - Fixed document
+
 0.05 2017-06-08T10:17:17Z
 
     - Fixed test case of not found Text::MeCab

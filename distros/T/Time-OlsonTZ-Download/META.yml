@@ -23,7 +23,7 @@ name: Time-OlsonTZ-Download
 provides:
   Time::OlsonTZ::Download:
     file: lib/Time/OlsonTZ/Download.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Carp: '0'
   Encode: '1.75'
@@ -34,7 +34,6 @@ requires:
   IPC::Filter: '0.002'
   Net::FTP: '3.07'
   Params::Classify: '0'
-  String::ShellQuote: '1.01'
   parent: '0'
   perl: '5.008'
   strict: '0'
@@ -43,5 +42,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Time-OlsonTZ-Download
   license: http://dev.perl.org/licenses/
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

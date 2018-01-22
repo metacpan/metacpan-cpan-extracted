@@ -4,6 +4,8 @@ Text::CaboCha - Alternate Interface To libcabocha
 
 # SYNOPSIS
 
+    use utf8;
+    use Encode;
     use Text::CaboCha;
     my $cabocha = Text::CaboCha->new({
         output_format => $output_format,
@@ -23,6 +25,7 @@ Text::CaboCha - Alternate Interface To libcabocha
         output        => $output_file
     });
 
+    my $text = encode(Text::CaboCha::ENCODING, "太郎は次郎が持っている本を花子に渡した。");
     my $tree = $cabocha->parse($text);
     $tree->tostr(Text::CaboCha::CABOCHA_FORMAT_TREE); # You can check the tree.
 
@@ -134,7 +137,9 @@ The version number, as returned by libcabocha's CaboCha::Parser::version()
     Path to cabocha-config, if available.
 
 # SEE ALSO
-https://taku910.github.io/cabocha/  
+
+https://taku910.github.io/cabocha/
+
 [Text::CaboCha](https://metacpan.org/pod/Text::CaboCha)
 
 # LICENSE

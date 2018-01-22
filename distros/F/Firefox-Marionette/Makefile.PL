@@ -47,11 +47,13 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')
       : ()),
+    ($ExtUtils::MakeMaker::VERSION >= 6.48
+      ? ('MIN_PERL_VERSION'=> '5.006')
+      : ()),
     PL_FILES       => {},
     BUILD_REQUIRES => {
         'Test::More'   => 0,
         'Digest::SHA'  => 0,
-        'MIME::Base64' => 0,
         (
               $^O eq 'MSWin32' ? ()
             : $^O eq 'darwin'  ? ()
@@ -59,22 +61,27 @@ WriteMakefile(
         ),
     },
     PREREQ_PM => {
-        'JSON'         => 0,
-        'FileHandle'   => 0,
-        'File::Temp'   => 0,
-        'File::Spec'   => 0,
-        'Socket'       => 0,
-        'English'      => 0,
-        'POSIX'        => 0,
-        'URI'          => 0,
-        'MIME::Base64' => 0,
-        'overload'     => 0,
+	'Config::INI::Reader' => 0,
+        'JSON'                => 0,
+	'Config'              => 0,
+        'Digest::MD5'         => 0,
+        'Crypt::URandom'      => 0,
+        'FileHandle'          => 0,
+        'File::Temp'          => 0,
+        'File::Spec'          => 0,
+        'Socket'              => 0,
+        'English'             => 0,
+        'POSIX'               => 0,
+        'URI'                 => 0,
+	'Fcntl'               => 0,
+        'MIME::Base64'        => 0,
+        'overload'            => 0,
         (
             $^O eq 'MSWin32'
             ? (
                 'Win32'                => 0,
                 'Win32::Process'       => 0,
-                'Win32::Process::Info' => 0
+                'Win32::Process::Info' => 1.022,
               )
             : ()
         ),

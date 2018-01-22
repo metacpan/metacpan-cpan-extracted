@@ -1,0 +1,51 @@
+diff --git a/NDTools/NDDiff.pm b/NDTools/NDDiff.pm
+index ecd51ac..438f515 100644
+--- a/NDTools/NDDiff.pm
++++ b/NDTools/NDDiff.pm
+@@ -374,10 +374,46 @@ sub term_value_diff {
+     return $self->term_value_diff_default($value, $status, $indent);
+ }
+ 
++sub format_term_value {
++    my ($value, $indent) = @_;
++    my @out;
++
++    if (ref $value eq 'ARRAY') {
++        if (@{$value}) {
++            #push @out, $indent . "  [";
++            map {
++                push @out, $indent . "  [$_]";
++                #my @tmp = format_term_value($value->[$_], $indent . '  ');
++                #$tmp[0] = $indent . "- " . $tmp[0];
++                #push @out, @tmp;
++                push @out, format_term_value($value->[$_], $indent . '  ');
++            } 0 .. $#{$value};
++            #push @out, $indent . "  ]";
++        } else {
++            push @out, $indent . '[]';
++        }
++    } elsif (ref $value eq 'HASH') {
++        if (keys %{$value}) {
++            map {
++                push @out, $indent . "  {$_}";
++                push @out, format_term_value($value->{$_}, $indent . '  ');
++            } sort keys %{$value};
++        } else {
++            push @out, $indent . '{}';
++        }
++    } else {
++        push @out, $indent . '  ' . (defined $value ? $value : 'null');
++    }
++
++    return @out;
++}
++
+ sub term_value_diff_default {
+     my ($self, $value, $status, $indent) = @_;
+     my @out;
+ 
++    push @out, format_term_value($value, $indent);
++
+     $value = JSON->new->allow_nonref->canonical->pretty($self->{OPTS}->{pretty})->encode($value)
+         if (ref $value or not defined $value);
+ 

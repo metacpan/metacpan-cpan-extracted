@@ -1,5 +1,8 @@
 Revision history for App-Adenosine
 
+2.002000  2018-01-19 09:07:26-08:00 America/Los_Angeles
+ - Remove pp again; `jq` is a bette option anyway.
+
 2.001008  2014-08-27 19:28:05-05:00 America/Chicago
  - Fix tests on win32
 

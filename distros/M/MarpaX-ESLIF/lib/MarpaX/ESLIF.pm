@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 use vars qw/$VERSION/;
 
 BEGIN {
-    our $VERSION = '2.0.31'; # VERSION
+    our $VERSION = '2.0.32'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -102,7 +102,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.31
+version 2.0.32
 
 =head1 SYNOPSIS
 
@@ -180,22 +180,6 @@ L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::
 =head1 AUTHOR
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
-
-=head1 CONTRIBUTORS
-
-=for stopwords Jean-Damien Durand Jeffrey Kegler
-
-=over 4
-
-=item *
-
-Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>
-
-=item *
-
-Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

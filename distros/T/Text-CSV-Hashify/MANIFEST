@@ -1,22 +1,30 @@
-.gitignore
 Changes
 lib/Text/CSV/Hashify.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-README.md
+README
 t/000-test-prep.t
 t/001-new.t
 t/002-functional.t
 t/003-methods.t
 t/004-passthru.t
 t/005-aoh.t
+t/006-gzipped-input.t
+t/data/cpan-river.csv
+t/data/cpan-river.csv.gz
+t/data/cpan-river.psv
+t/data/cpan-river.psv.gz
+t/data/cpan-river.tsv
+t/data/cpan-river.tsv.gz
 t/data/dupe_field_names.csv
 t/data/dupe_key_names.csv
 t/data/names.csv
 t/data/pipe_names.csv
 t/data/whitespace_names.csv
+t/data/xformat-cpan-river-1000-perl-5.27-master.csv.gz
+t/data/xformat-cpan-river-1000-perl-5.27-master.psv.gz
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

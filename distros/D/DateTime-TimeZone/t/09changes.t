@@ -504,7 +504,7 @@ SKIP:
         [ 2059, 7, 1, 1, 'CDT' ],
         [ 2060, 1, 1, 0, 'CST' ],
         [ 2060, 7, 1, 1, 'CDT' ],
-        ) {
+    ) {
         $dt->set_time_zone($utc_tz);
 
         $dt->add_duration($sixm);
@@ -550,7 +550,7 @@ SKIP:
         [ 2051, 1, 1, 0, 'EST' ],
         [ 2050, 7, 1, 1, 'EDT' ],
         [ 2050, 1, 1, 0, 'EST' ],
-        ) {
+    ) {
         $dt->set_time_zone($utc_tz);
 
         $dt->add_duration($neg_sixm);

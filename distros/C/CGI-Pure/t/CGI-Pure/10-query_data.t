@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CGI::Pure;
 use IO::Scalar;
 use Test::More 'tests' => 6;

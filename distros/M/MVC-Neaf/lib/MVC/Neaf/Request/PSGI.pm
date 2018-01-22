@@ -2,7 +2,7 @@ package MVC::Neaf::Request::PSGI;
 
 use strict;
 use warnings;
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -12,22 +12,40 @@ MVC::Neaf::Request::PSGI - Not Even A Framework: PSGI driver.
 
 =cut
 
+BEGIN {
+    # NOTE HACK prevent 'Can't locate object method seek via package IO::Handle'
+    # try preloading it by hand (errors ignored)
+    eval { require FileHandle }
+        if $] < 5.014;
+    # NOTE HACK - prevent load-time warnings from Cookie::Baker
+    #     which we aren't even using
+    eval {
+        local $SIG{__WARN__} = sub {};
+        require Cookie::Baker;
+    };
+};
+
 use URI::Escape qw(uri_unescape);
 use Encode;
 use Plack::Request;
-
-# NOTE HACK - prevent 'Can't locate object method seek via package IO::Handle'
-# try preloading it by hand (errors ignored)
-eval { require FileHandle }
-    if $] < 5.014;
-# NOTE HACK - prevent load-time warnings from Cookie::Baker
-#     which we aren't even using
-eval {
-    local $SIG{__WARN__} = sub {};
-    require Cookie::Baker;
-};
+use HTTP::Headers::Fast; # we want 0.21, but will tolerate older ones
 
 use parent qw(MVC::Neaf::Request);
+
+if (!HTTP::Headers::Fast->can( "psgi_flatten_without_sort" ) || HTTP::XSHeaders->can("new")) {
+    # NOTE HACK Versions below 0.21 don't support the method we call
+    # in do_reply() so fall back to failsafe emulation
+    # NOTE XSHeaders doesn't (yet) provide this method, so fallback as well
+    # See https://rt.cpan.org/Ticket/Display.html?id=123850
+    no warnings 'once', 'redefine'; ## no critic
+    *HTTP::Headers::Fast::psgi_flatten_without_sort = sub {
+        my $self = shift;
+        my @all;
+        $self->scan( sub { push @all, $_[0]=>$_[1] } );
+        return \@all;
+    };
+};
+
 
 =head2 new( env => $psgi_input )
 
@@ -221,10 +239,7 @@ rather relying on PSGI calling conventions.
 sub do_reply {
     my ($self, $status, $content) = @_;
 
-    my @header_array;
-    $self->header_out->scan( sub {
-            push @header_array, encode_utf8($_[0]), encode_utf8($_[1]);
-    });
+    my $header_array = $self->header_out->psgi_flatten_without_sort;
 
     # HACK - we're being returned by handler in MVC::Neaf itself in case of
     # PSGI being used.
@@ -239,7 +254,7 @@ sub do_reply {
             my $responder = shift;
 
             # TODO 0.90 should handle responder's failure somehow
-            $self->{writer} = $responder->( [ $status, \@header_array ] );
+            $self->{writer} = $responder->( [ $status, $header_array ] );
             $self->{writer}->write( $content ) if defined $content;
 
             # Now we may need to output more stuff
@@ -251,7 +266,7 @@ sub do_reply {
     };
 
     # Otherwise just return plain data.
-    return [ $status, \@header_array, [ $content ]];
+    return [ $status, $header_array, [ $content ]];
 };
 
 =head2 do_write( $data )

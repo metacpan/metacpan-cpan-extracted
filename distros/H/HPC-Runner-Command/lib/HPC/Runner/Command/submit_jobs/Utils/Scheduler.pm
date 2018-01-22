@@ -16,7 +16,7 @@ use Storable qw(dclone);
 
 use Text::ASCIITable;
 use Memoize;
-use List::MoreUtils qw(first_index);
+use List::MoreUtils 0.428 qw(first_index);
 
 use BioSAILs::Utils::Traits qw(ArrayRefOfStrs);
 

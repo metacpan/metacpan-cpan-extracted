@@ -1,5 +1,5 @@
 package Net::Async::Ping::ICMPv6;
-$Net::Async::Ping::ICMPv6::VERSION = '0.003001';
+$Net::Async::Ping::ICMPv6::VERSION = '0.003003';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -10,8 +10,8 @@ use IO::Socket;
 use IO::Async::Socket;
 use Scalar::Util qw( blessed );
 use Socket qw(
-    SOCK_RAW SOCK_DGRAM AF_INET6 IPPROTO_ICMPV6
-    inet_pton pack_sockaddr_in6 unpack_sockaddr_in6 inet_ntop
+    SOCK_RAW SOCK_DGRAM AF_INET6 IPPROTO_ICMPV6 NI_NUMERICHOST NIx_NOSERV
+    inet_pton pack_sockaddr_in6 unpack_sockaddr_in6 getnameinfo inet_ntop
 );
 use Net::Frame::Layer::ICMPv6 qw( :consts );
 use Net::Frame::Layer::ICMPv6::Echo;
@@ -107,8 +107,12 @@ sub ping {
        protocol => IPPROTO_ICMPV6,
        family   => AF_INET6,
     )->then( sub {
-        my $saddr = $_[0]->{addr};
-        my $f     = $loop->new_future;
+        my $saddr  = $_[0]->{addr};
+        my ($err, $dst_ip) = getnameinfo($saddr, NI_NUMERICHOST,
+            NIx_NOSERV);
+        croak "getnameinfo: $err"
+            if $err;
+        my $f      = $loop->new_future;
 
         my $socket = IO::Async::Socket->new(
             handle => $fh,
@@ -123,10 +127,9 @@ sub ping {
                 my $ping = shift or return; # weakref, may have disappeared
                 my ( $self, $recv_msg, $from_saddr ) = @_;
 
+                my $from_ip  = -1;
                 my $from_pid = -1;
                 my $from_seq = -1;
-                my ($from_port, $from_ip) = unpack_sockaddr_in6($from_saddr);
-
 
                 my $frame = Net::Frame::Simple->new(
                     raw        => $recv_msg,
@@ -136,27 +139,38 @@ sub ping {
                 my $icmpv6 = $layers[0];
                 my $icmpv6_payload = $layers[1];
 
+                # extract source ip, identifier and sequence depending on
+                # packet type
                 if ( $icmpv6->type == NF_ICMPv6_TYPE_ECHO_REPLY ) {
+                    (my $err, $from_ip) = getnameinfo($from_saddr,
+                      NI_NUMERICHOST, NIx_NOSERV);
+                    croak "getnameinfo: $err"
+                        if $err;
                     $from_pid = $icmpv6_payload->identifier;
                     $from_seq = $icmpv6_payload->sequenceNumber;
                 }
                 # an ICMPv6 error message includes the original header
                 # IPv6 + ICMPv6 + ICMPv6::Echo
-                # extract identifier and sequence from it
                 elsif ( scalar @layers >= 5
                     && $layers[3]->type == NF_ICMPv6_TYPE_ECHO_REQUEST ) {
+                    my $ipv6 = $layers[2];
                     my $icmpv6_echo = $layers[4];
 
+                    # the destination IPv6 of our ICMPv6 echo request packet
+                    $from_ip  = $ipv6->dst;
                     $from_pid = $icmpv6_echo->identifier;
                     $from_seq = $icmpv6_echo->sequenceNumber;
                 }
 
-                # Not needed for ping socket - kernel handles this for us
-                return if !$ping_socket && $from_pid != $ping->_pid;
-                return if $from_seq != $ping->seq;
+                # ignore received packets which are not a response to one of
+                # our echo requests
+                return
+                    unless $from_ip eq $dst_ip
+                 # Not needed for ping socket - kernel handles this for us
+                        && ( $ping_socket || $from_pid == $ping->_pid )
+                        && $from_seq == $ping->seq;
+
                 if ( $icmpv6->type == NF_ICMPv6_TYPE_ECHO_REPLY ) {
-                    my $ip = unpack_sockaddr_in6($saddr);
-                    return if inet_ntop(AF_INET6, $from_ip) ne inet_ntop(AF_INET6, $ip); # Does the packet check out?
                     $f->done;
                 }
                 elsif ( $icmpv6->type == NF_ICMPv6_TYPE_DESTUNREACH ) {
@@ -221,7 +235,7 @@ Net::Async::Ping::ICMPv6
 
 =head1 VERSION
 
-version 0.003001
+version 0.003003
 
 =head1 DESCRIPTION
 

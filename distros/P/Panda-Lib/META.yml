@@ -17,7 +17,7 @@ configure_requires:
   Panda::Install: v1.2.9
   Panda::XS: v2.1.8
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,5 +35,5 @@ requires:
   Panda::XS: v2.1.8
   Time::HiRes: '0'
   perl: '5.010000'
-version: v1.3.4
+version: v1.3.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

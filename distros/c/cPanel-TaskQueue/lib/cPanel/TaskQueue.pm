@@ -1,31 +1,5 @@
 package cPanel::TaskQueue;
-$cPanel::TaskQueue::VERSION = '0.800';
-# cpanel - cPanel/TaskQueue.pm                    Copyright(c) 2014 cPanel, Inc.
-#                                                           All rights Reserved.
-# copyright@cpanel.net                                         http://cpanel.net
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#     * Redistributions of source code must retain the above copyright
-#       notice, this list of conditions and the following disclaimer.
-#     * Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
-#     * Neither the name of the owner nor the names of its contributors may
-#       be used to endorse or promote products derived from this software
-#       without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL  BE LIABLE FOR ANY
-# DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+$cPanel::TaskQueue::VERSION = '0.850';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -129,12 +103,13 @@ sub _first (&@) {                                      ## no critic(ProhibitSubr
 # Namespace string used when creating task ids.
 my $taskqueue_uuid = 'TaskQueue';
 
-{
+# Class-wide definition of the valid processors
+my %valid_processors;
+END { undef %valid_processors } # case CPANEL-10871 to avoid a SEGV during global destruction
 
-    # Class-wide definition of the valid processors
-    my %valid_processors;
-    my $FILETYPE      = 'TaskQueue';    # Identifier at the beginning of the state file
-    my $CACHE_VERSION = 3;              # Cache file version number.
+{
+   my $FILETYPE      = 'TaskQueue';    # Identifier at the beginning of the state file
+   my $CACHE_VERSION = 3;              # Cache file version number.
 
     # State File
     #
@@ -384,32 +359,75 @@ my $taskqueue_uuid = 'TaskQueue';
         return $self->_serializer()->save( $fh, $FILETYPE, $CACHE_VERSION, $meta );
     }
 
+    sub queue_tasks {
+        my ( $self, @commands ) = @_;
+
+        # Let's throw right away before
+        # we have a lock in case something is wrong
+        foreach my $command (@commands) {
+            $self->throw('Cannot queue an empty command.') unless defined $command;
+            if ( !eval { $command->isa('cPanel::TaskQueue::Task') } ) {
+
+                # must have non-space characters to be a command.
+                $self->throw('Cannot queue an empty command.') unless $command =~ /\S/;
+            }
+        }
+
+        # Lock the queue here, because we begin looking what's currently in the queue
+        #  and don't want it to change under us.
+        my $guard = $self->{disk_state}->synch();
+
+        my ( @uuids, @invalid_tasks );
+        foreach my $command (@commands) {
+            my $task;
+
+            if ( eval { $command->isa('cPanel::TaskQueue::Task') } ) {
+                if ( 0 == $command->retries_remaining() ) {
+                    $self->info('Task with 0 retries not queued.');
+                    next;
+                }
+                $task = $command->mutate( { timeout => $self->{default_child_timeout} } );
+            }
+            else {
+                $task = cPanel::TaskQueue::Task->new(
+                    {
+                        cmd     => $command,
+                        nsid    => $taskqueue_uuid,
+                        id      => $self->{next_id}++,
+                        timeout => $self->{default_child_timeout},
+                    }
+                );
+            }
+
+            my $proc = _get_task_processor($task);
+            if ( !$proc || !$proc->is_valid_args($task) ) {
+                push @invalid_tasks, $task;
+                next;
+            }
+
+            if ( $self->_add_task_to_waiting_queue($task) ) {
+                push @uuids, $task->uuid();
+            } else {
+                push @uuids, undef; # failed task
+            }
+        }
+
+        # Changes to the queue are complete, save to disk.
+        $guard->update_file();
+
+        foreach my $task (@invalid_tasks) {
+            $self->_get_task_processor_for_task_or_throw($task);
+        }
+
+        return @uuids;
+    }
+
     sub queue_task {
         my ( $self, $command ) = @_;
 
-        $self->throw('Cannot queue an empty command.') unless defined $command;
+        my @uuids = $self->queue_tasks($command);
 
-        if ( eval { $command->isa('cPanel::TaskQueue::Task') } ) {
-            if ( 0 == $command->retries_remaining() ) {
-                $self->info('Task with 0 retries not queued.');
-                return;
-            }
-            my $task = $command->mutate( { timeout => $self->{default_child_timeout} } );
-            return $self->_queue_the_task($task);
-        }
-
-        # must have non-space characters to be a command.
-        $self->throw('Cannot queue an empty command.') unless $command =~ /\S/;
-
-        my $task = cPanel::TaskQueue::Task->new(
-            {
-                cmd     => $command,
-                nsid    => $taskqueue_uuid,
-                id      => $self->{next_id}++,
-                timeout => $self->{default_child_timeout},
-            }
-        );
-        return $self->_queue_the_task($task);
+        return @uuids ? $uuids[0] : ();
     }
 
     sub unqueue_task {
@@ -699,12 +717,8 @@ my $taskqueue_uuid = 'TaskQueue';
         return;
     }
 
-    # Perform all of the steps needed to put a task in the queue.
-    # Only queues legal commands, that are not duplicates.
-    # If successful, returns the new queue id.
-    sub _queue_the_task {
-        my ( $self, $task ) = @_;
-
+    sub _get_task_processor_for_task_or_throw {
+        my($self, $task) = @_;
         # Validate the incoming task.
         # It must be a command we recognize, have valid parameters, and not be a duplicate.
         my $proc = _get_task_processor($task);
@@ -714,10 +728,30 @@ my $taskqueue_uuid = 'TaskQueue';
         unless ( $proc->is_valid_args($task) ) {
             $self->throw( q{Requested command [} . $task->full_command() . q{] has invalid arguments.} );
         }
+        return $proc;
+    }
+
+    # Perform all of the steps needed to put a task in the queue.
+    # Only queues legal commands, that are not duplicates.
+    # If successful, returns the new queue id.
+    sub _queue_the_task {
+        my ( $self, $task ) = @_;
+
+        $self->_get_task_processor_for_task_or_throw($task);
 
         # Lock the queue here, because we begin looking what's currently in the queue
         #  and don't want it to change under us.
         my $guard = $self->{disk_state}->synch();
+
+        $self->_add_task_to_waiting_queue($task) or return;
+        # Changes to the queue are complete, save to disk.
+        $guard->update_file();
+
+        return $task->uuid();
+    }
+
+    sub _add_task_to_waiting_queue {
+        my ( $self, $task ) = @_;
 
         # Check overrides first and then duplicate. This seems backward, but
         # actually is not. See the tests labelled 'override, not dupe' in
@@ -731,10 +765,7 @@ my $taskqueue_uuid = 'TaskQueue';
 
         push @{ $self->{queue_waiting} }, $task;
 
-        # Changes to the queue are complete, save to disk.
-        $guard->update_file();
-
-        return $task->uuid();
+        return 1;
     }
 
     # Use either the timeout in the processor or the default timeout,

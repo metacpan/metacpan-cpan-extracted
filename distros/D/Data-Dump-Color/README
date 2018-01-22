@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.23 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2014-10-29.
+    This document describes version 0.240 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2018-01-17.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -83,13 +83,6 @@ VARIABLES
         Add string length visual aid for hash key/hash value/array element
         if length is at least this value.
 
-ENVIRONMENT
-    *   COLOR
-
-        If set, then will force color output on or off. By default, will
-        only output color when in interactive terminal. This is consulted
-        when $COLOR is not set.
-
 FAQ
   How do I turn off index comments?
     Set $Data::Dump::Color::INDEX to 0.
@@ -104,8 +97,12 @@ FAQ
     proper color theme support in the future (based on
     SHARYANTO::Role::ColorTheme.
 
-SEE ALSO
-    Data::Dump, JSON::Color, YAML::Tiny::Color
+ENVIRONMENT
+    *   COLOR
+
+        If set, then will force color output on or off. By default, will
+        only output color when in interactive terminal. This is consulted
+        when $COLOR is not set.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -122,11 +119,15 @@ BUGS
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
+SEE ALSO
+    Data::Dump, JSON::Color, YAML::Tiny::Color
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2014, 2013, 2012 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

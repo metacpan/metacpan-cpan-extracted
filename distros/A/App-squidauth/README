@@ -1,0 +1,85 @@
+NAME
+    App::squidauth - A simple authenticator program for Squid
+
+VERSION
+    This document describes version 0.001 of App::squidauth (from Perl
+    distribution App-squidauth), released on 2018-01-17.
+
+SYNOPSIS
+    See included script squidauth.
+
+FUNCTIONS
+  squidauth
+    Usage:
+
+     squidauth(%args) -> [status, msg, result, meta]
+
+    A simple authenticator program for Squid.
+
+    This utility can be used as an authenticator program for Squid. It reads
+    users & passwords from a simple, htpasswd-format text file (by default
+    at "/etc/proxypasswd") with the format like:
+
+     user1:$apr1$YFFyJK3J$PfuotoLCk7XQqQiH6I3Cb/
+     user2:$apr1$NOvdp7LN$YnH5zmfCn0IhNt/fKZdL2.
+     ...
+
+    To add entries to this file, you can use htpasswd (usually comes with
+    Apache httpd in an OS package like "httpd-tools") to add users to this
+    file, e.g.:
+
+     % htpasswd -c /etc/proxypasswd user1
+     % htpasswd    /etc/proxypasswd user2
+     ...
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   passwd_file => *pathname* (default: "/etc/proxypasswd")
+
+        Location of password file.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HISTORY
+    The "squidauth" script was created back in early 2000's or even late
+    1990's.
+
+    Converted to use Perinci::CmdLine and packaged as a CPAN distribution in
+    Jan 2018.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-squidauth>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-squidauth>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-squidauth>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

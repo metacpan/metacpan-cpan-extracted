@@ -100,14 +100,13 @@ sub print_issues ( $self, $issues ) {
         print $tbl->render_header;
 
         for my $issue ( sort { $STATUS_ID->{ $a->{status} } <=> $STATUS_ID->{ $b->{status} } or $PRIORITY_ID->{ $b->{priority} } <=> $PRIORITY_ID->{ $a->{priority} } or $b->{utc_last_updated} cmp $a->{utc_last_updated} } values $issues->%* ) {
-            print $tbl->render_row(
-                [   $issue->{local_id},    #
-                    $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
-                    $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
-                    $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
-                    $issue->{title}
-                ]
-            );
+            print $tbl->render_row( [
+                $issue->{local_id},    #
+                $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
+                $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
+                $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
+                $issue->{title}
+            ] );
         }
 
         print $tbl->finish;
@@ -147,14 +146,13 @@ sub print_issue ( $self, $issue, $print_content = 1 ) {
 
     print $tbl->render_header;
 
-    print $tbl->render_row(
-        [   $issue->{local_id},    #
-            $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
-            $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
-            $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
-            $issue->{title}
-        ]
-    );
+    print $tbl->render_row( [
+        $issue->{local_id},    #
+        $STATUS_COLOR->{ $issue->{status} } . " $issue->{status} " . $RESET,
+        $PRIORITY_COLOR->{ $issue->{priority} } . " $issue->{priority} " . $RESET,
+        $KIND->{ $issue->{metadata}->{kind} }->[1] . " $KIND->{ $issue->{metadata}->{kind} }->[0] " . $RESET,
+        $issue->{title}
+    ] );
 
     print $tbl->finish;
 

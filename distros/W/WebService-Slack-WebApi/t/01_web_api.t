@@ -22,7 +22,7 @@ subtest 'new' => sub {
     };
 };
 
-subtest 'methods' => sub {
+subtest 'types' => sub {
     my %methods = (
         client   => 'WebService::Slack::WebApi::Client',
         api      => 'WebService::Slack::WebApi::Api',
@@ -46,6 +46,8 @@ subtest 'methods' => sub {
     while (my ($method, $type) = each %methods) {
         isa_ok $obj->$method, $type;
     }
+
+    isa_ok $obj->users->profile, 'WebService::Slack::WebApi::Users::Profile';
 };
 
 subtest 'opts' => sub {

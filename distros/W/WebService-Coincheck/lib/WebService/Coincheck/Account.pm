@@ -17,7 +17,7 @@ sub new {
 }
 
 sub balance {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -30,7 +30,7 @@ sub balance {
 }
 
 sub leverage_balance {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -43,7 +43,7 @@ sub leverage_balance {
 }
 
 sub info {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 

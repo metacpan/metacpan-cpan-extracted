@@ -439,5 +439,22 @@ while (my ($ns, $methods) = each %tests) {
     };
 }
 
+# TODO: merge to `%tests`
+subtest 'users.profile' => sub {
+    isa_ok $slack->users->profile->get(
+        include_labels => 1,
+        user => 'hoge',
+    ), 'HASH';
+
+    isa_ok $slack->users->profile->set(
+        name    => 'first_name',
+        profile => {
+            first_name => 'piyo',
+        },
+        user    => 'hoge',
+        value   => 'fuga',
+    ), 'HASH';
+};
+
 done_testing;
 

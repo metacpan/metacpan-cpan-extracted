@@ -1,9 +1,28 @@
 ==================================================
-Changes from 2015-11-25 00:00:00 +0000 to present.
+Changes from 2016-01-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-11-24 16:47:35 +0000
+version 0.004 at 2018-01-18 03:56:52 +0000
+------------------------------------------
+
+  Change: 783b94ca19518ba8a57b72fe22f96c83484dadcd
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-01-17 19:55:52 +0000
+
+    Enable compatiblity with MadSonic v2 API
+
+    Allow version override in the tools and enable compatibility with the
+    MadSonic API. 
+
+  Change: 359efcccc5fc0d338491519263fc0a98fced6e43
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-24 11:17:31 +0000
+
+    Correct the shebang line for install. 
+
+------------------------------------------
+version 0.003 at 2017-11-24 16:47:27 +0000
 ------------------------------------------
 
   Change: 10dcef7071300f9cd257c6e3359077b13cac9033

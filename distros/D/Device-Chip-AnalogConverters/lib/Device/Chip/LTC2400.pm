@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::LTC2400;
 
@@ -9,7 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.04';
+use Future::AsyncAwait;
+
+our $VERSION = '0.05';
 
 use constant PROTOCOL => "SPI";
 
@@ -63,33 +65,33 @@ other fields will be provided.
 
 =cut
 
-sub read_adc
+async sub read_adc
 {
    my $self = shift;
-   $self->protocol->readwrite( "\x00" x 4 )->then( sub {
-      my ( $bytes ) = @_;
-      my $value = unpack "L>", $bytes;
 
-      if( $value & 1<<30 ) {
-         return Future->fail( "Expected dummy bit LOW" );
-      }
-      if( $value & 1<<31 ) {
-         return Future->done( { EOC => 0 } );
-      }
+   my $bytes = await $self->protocol->readwrite( "\x00" x 4 );
 
-      my $sig = ( $value & 1<<29 ) > 0;
-      my $exr = ( $value & 1<<28 ) > 0;
+   my $value = unpack "L>", $bytes;
 
-      $value &= ( 1<<28 )-1;
-      $value >>= 4;
+   if( $value & 1<<30 ) {
+      return Future->fail( "Expected dummy bit LOW" );
+   }
+   if( $value & 1<<31 ) {
+      return Future->done( { EOC => 0 } );
+   }
 
-      return Future->done( {
-         EOC   => 1,
-         SIG   => $sig,
-         EXR   => $exr,
-         VALUE => $value,
-      } );
-   });
+   my $sig = ( $value & 1<<29 ) > 0;
+   my $exr = ( $value & 1<<28 ) > 0;
+
+   $value &= ( 1<<28 )-1;
+   $value >>= 4;
+
+   return {
+      EOC   => 1,
+      SIG   => $sig,
+      EXR   => $exr,
+      VALUE => $value,
+   };
 }
 
 =head1 AUTHOR

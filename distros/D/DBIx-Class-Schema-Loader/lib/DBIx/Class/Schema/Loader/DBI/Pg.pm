@@ -5,7 +5,7 @@ use warnings;
 use base 'DBIx::Class::Schema::Loader::DBI::Component::QuotedDefault';
 use mro 'c3';
 
-our $VERSION = '0.07047';
+our $VERSION = '0.07048';
 
 =head1 NAME
 
@@ -286,22 +286,21 @@ EOF
                 ->selectrow_array(<<EOF, {}, $data_type);
 SELECT typtype
 FROM pg_catalog.pg_type
-WHERE typname = ?
+WHERE oid = ?::regtype
 EOF
             if ($typetype && $typetype eq 'e') {
                 # The following will extract a list of allowed values for the enum.
                 my $order_column = $self->dbh->{pg_server_version} >= 90100 ? 'enumsortorder' : 'oid';
                 $info->{extra}{list} = $self->dbh
-                    ->selectcol_arrayref(<<EOF, {}, $info->{data_type});
+                    ->selectcol_arrayref(<<EOF, {}, $data_type);
 SELECT e.enumlabel
 FROM pg_catalog.pg_enum e
-JOIN pg_catalog.pg_type t ON t.oid = e.enumtypid
-WHERE t.typname = ?
+WHERE e.enumtypid = ?::regtype
 ORDER BY e.$order_column
 EOF
 
                 # Store its original name in extra for SQLT to pick up.
-                $info->{extra}{custom_type_name} = $info->{data_type};
+                $info->{extra}{custom_type_name} = $data_type;
 
                 $info->{data_type} = 'enum';
 
@@ -309,24 +308,28 @@ EOF
             }
         }
 
-# process SERIAL columns
-        if (ref($info->{default_value}) eq 'SCALAR'
-                && ${ $info->{default_value} } =~ /\bnextval\('([^:]+)'/i) {
-            $info->{is_auto_increment} = 1;
-            $info->{sequence}          = $1;
-            delete $info->{default_value};
+        if (ref($info->{default_value}) eq 'SCALAR') {
+            # process SERIAL columns
+            if (${ $info->{default_value} } =~ /\bnextval\('([^:]+)'/i) {
+                $info->{is_auto_increment} = 1;
+                $info->{sequence}          = $1;
+                delete $info->{default_value};
+            }
+            # alias now() to current_timestamp for deploying to other DBs
+            elsif (lc ${ $info->{default_value} } eq 'now()') {
+                # do not use a ref to a constant, that breaks Data::Dump output
+                ${$info->{default_value}} = 'current_timestamp';
+
+                my $now = 'now()';
+                $info->{original}{default_value} = \$now;
+            }
+            elsif (${ $info->{default_value} } =~ /\bCURRENT_TIMESTAMP\b/) {
+                # PostgreSQL v10 upcases current_timestamp in default values
+                ${ $info->{default_value} } =~ s/\b(CURRENT_TIMESTAMP)\b/lc $1/ge;
+            }
         }
 
-# alias now() to current_timestamp for deploying to other DBs
-        if ((eval { lc ${ $info->{default_value} } }||'') eq 'now()') {
-            # do not use a ref to a constant, that breaks Data::Dump output
-            ${$info->{default_value}} = 'current_timestamp';
-
-            my $now = 'now()';
-            $info->{original}{default_value} = \$now;
-        }
-
-# detect 0/1 for booleans and rewrite
+        # detect 0/1 for booleans and rewrite
         if ($data_type =~ /^bool/i && exists $info->{default_value}) {
             if ($info->{default_value} eq '0') {
                 my $false = 'false';

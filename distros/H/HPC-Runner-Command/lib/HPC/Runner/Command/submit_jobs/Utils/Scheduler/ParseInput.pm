@@ -1,7 +1,7 @@
 package HPC::Runner::Command::submit_jobs::Utils::Scheduler::ParseInput;
 
 use Moose::Role;
-use List::MoreUtils qw(natatime);
+use List::MoreUtils 0.428 qw(natatime);
 use Storable qw(dclone);
 use Memoize;
 use Data::Dumper;

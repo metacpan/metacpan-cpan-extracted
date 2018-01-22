@@ -65,7 +65,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -132,6 +132,9 @@
       },
       "WebService::Slack::WebApi::Users" : {
          "file" : "lib/WebService/Slack/WebApi/Users.pm"
+      },
+      "WebService::Slack::WebApi::Users::Profile" : {
+         "file" : "lib/WebService/Slack/WebApi/Users/Profile.pm"
       }
    },
    "release_status" : "stable",
@@ -145,7 +148,7 @@
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_contributors" : [
       "Askar Timirgazin <anotheroneackap@gmail.com>",
       "Ivan Wills <Ivan.Wills2@optus.com.au>",

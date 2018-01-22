@@ -21,7 +21,7 @@ package MongoDB::Op::_Query;
 # Encapsulate a query operation; returns a MongoDB::QueryResult object
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use boolean;
 use Moo;
@@ -299,7 +299,6 @@ sub as_command {
 
     my $tailable = $self->{cursorType} =~ /^tailable/ ? $TRUE : $FALSE;
     my $await_data = $self->{cursorType} eq 'tailable_await' ? $TRUE : $FALSE;
-    my $max_time = $await_data ? $self->{maxAwaitTimeMS} : $self->{maxTimeMS} ;
 
     my $mod = $self->{modifiers};
 
@@ -321,7 +320,7 @@ sub as_command {
 
         ($self->{comment} ? (comment => $self->{comment}) : ()),
         (defined $mod->{'$maxScan'} ? (maxScan => $mod->{'$maxScan'}) : ()),
-        (defined $self->{maxTimeMS} ? (maxTimeMS => $self->{maxTimeMS}) : ()),
+        ($self->{maxTimeMS} ? (maxTimeMS => $self->{maxTimeMS}) : ()),
         (defined $mod->{'$max'} ? (max => $mod->{'$max'}) : ()),
         (defined $mod->{'$min'} ? (min => $mod->{'$min'}) : ()),
         (defined $mod->{'$returnKey'} ? (returnKey => $mod->{'$returnKey'}) : ()),

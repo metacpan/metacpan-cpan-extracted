@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "MarpaX::ESLIF" : "v2.0.13",
+            "MarpaX::ESLIF" : "v2.0.32",
             "Math::BigFloat" : "0",
             "Math::BigInt" : "0",
             "Scalar::Util" : "0",
@@ -81,7 +81,6 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::More::UTF8" : "0",
-            "blib" : "1.01",
             "perl" : "5.010"
          }
       }
@@ -89,7 +88,7 @@
    "provides" : {
       "MarpaX::ESLIF::ECMA404" : {
          "file" : "lib/MarpaX/ESLIF/ECMA404.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -105,8 +104,8 @@
          "web" : "https://github.com/jddurand/marpax-eslif-ecma404"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_authority" : "cpan:JDDPAUSE",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

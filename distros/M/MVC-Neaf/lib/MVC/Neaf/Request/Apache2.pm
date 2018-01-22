@@ -3,7 +3,7 @@ package MVC::Neaf::Request::Apache2;
 use strict;
 use warnings;
 
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ The following apache configuration should work with this module:
 
 use Carp;
 use URI::Escape;
-use HTTP::Headers;
+use HTTP::Headers::Fast;
 use Module::Load;
 
 my %fail_apache;
@@ -197,7 +197,7 @@ sub do_get_header_in {
         push @{ $head{$key} }, $val;
     });
 
-    return HTTP::Headers->new( %head );
+    return HTTP::Headers::Fast->new( %head );
 };
 
 =head2 do_get_upload( "name" )

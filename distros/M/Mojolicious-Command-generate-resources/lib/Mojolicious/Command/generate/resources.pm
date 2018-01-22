@@ -7,7 +7,7 @@ use Getopt::Long qw(GetOptionsFromArray :config auto_abbrev
 File::Spec::Functions->import(qw(catfile catdir));
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.05';
+our $VERSION   = '0.08';
 
 has args => sub { {} };
 has description     => 'Generate resources from database for your application';
@@ -67,13 +67,12 @@ has routes => sub {
   return $_[0]->{routes};
 };
 
-my $_начевамъ = sub {
-  my ($азъ, @args) = @_;
+my $_начевамъ = sub ($азъ, @options) {
   return $азъ if $азъ->{_initialised};
   my $args = $азъ->args({tables => []})->args;
 
   GetOptionsFromArray(
-    \@args,
+    \@options,
     'C|controller_namespace=s' => \$args->{controller_namespace},
     'L|lib=s'                  => \$args->{lib},
     'M|model_namespace=s'      => \$args->{model_namespace},
@@ -127,14 +126,21 @@ MSG
   return $азъ;
 };
 
+# Returns the full path to the first found template.
+# See http://localhost:3000/perldoc/Mojolicious/Renderer#template_path
+sub _template_path ($self, $template) {
+  state $paths      = $self->app->renderer->paths;
+  state $tmpls_path = $self->_templates_path;
+  -r and return $_ for map { catfile($_, $template) } @$paths, $tmpls_path;
+  return undef;
+}
 
-sub run {
-  my ($self) = shift->$_начевамъ(@_);
-  my $args   = $self->args;
-  my $app    = $self->app;
+sub run ($self, %options) {
+  $self->$_начевамъ(%options);
+  my $args = $self->args;
+  my $app  = $self->app;
 
   my $wrapper_helpers = '';
-  my $tmpls_path      = $self->_templates_path;
   for my $t (@{$args->{tables}}) {
 
     my $class_name = camelize($t);
@@ -150,7 +156,7 @@ sub run {
                          db_helper => $self->_db_helper,
                          columns   => $table_columns,
                         };
-    my $tmpl_file = catfile($tmpls_path, 'm_class.ep');
+    my $tmpl_file = $self->_template_path('m_class.ep');
     $self->render_template_to_file($tmpl_file, $m_file, $template_args);
 
     # Controllers
@@ -158,7 +164,7 @@ sub run {
     my $c_file = catfile($args->{lib}, class_to_path($class));
     $template_args
       = {%$args, class => $class, t => lc $t, columns => $table_columns};
-    $tmpl_file = catfile($tmpls_path, 'c_class.ep');
+    $tmpl_file = $self->_template_path('c_class.ep');
     $self->render_template_to_file($tmpl_file, $c_file, $template_args);
 
     # Templates
@@ -168,14 +174,14 @@ sub run {
     my @views = qw(index create show edit _form);
     for my $v (@views) {
       my $t_file = catfile($template_root, $template_dir, $v . '.html.ep');
-      my $tmpl_file = catfile($tmpls_path, $v . '.html.ep');
+      my $tmpl_file = $self->_template_path($v . '.html.ep');
       $self->render_template_to_file($tmpl_file, $t_file, $template_args);
     }
 
     # Helpers
     $template_args
       = {%$args, t => lc $t, db_helper => $self->_db_helper, class => $mclass};
-    $tmpl_file = catfile($tmpls_path, 'helper.ep');
+    $tmpl_file = $self->_template_path('helper.ep');
     $wrapper_helpers
       .= Mojo::Template->new->render_file($tmpl_file, $template_args);
   }    # end foreach tables
@@ -183,7 +189,7 @@ sub run {
   # Routes
   my $template_args
     = {%$args, helpers => $wrapper_helpers, routes => $self->routes};
-  my $tmpl_file = catfile($tmpls_path,       'TODO.ep');
+  my $tmpl_file = $self->_template_path('TODO.ep');
   my $todo_file = catfile($args->{home_dir}, 'TODO');
   $self->render_template_to_file($tmpl_file, $todo_file, $template_args);
   return $self;
@@ -199,9 +205,8 @@ sub _get_table_columns ($self, $table) {
   return \@columns;
 }
 
-sub render_template_to_file {
-  my ($self, $filename, $path) = (shift, shift, shift);
-  my $out = Mojo::Template->new->render_file($filename, @_);
+sub render_template_to_file ($self, $filename, $path, $args) {
+  my $out = Mojo::Template->new->render_file($filename, $args);
   return $self->write_file($path, $out);
 }
 
@@ -245,8 +250,9 @@ creating, updating and deleting records from the tables you specified on the
 command-line. The generated code is just boilerplate to give you a jump start,
 so you can concentrate on writing your business-specific code. It is assumed
 that you will modify the generated code to suit your specific needs. All the
-generated code is produced from templates which you also can put in your
-application renderer's path and modify to your taste.
+generated code is produced from templates. You can copy the folder with the
+templates, push it to C<@{$app-E<gt>renderer-E<gt>paths}> and modify to your
+taste. Please look into the C<t/blog> folder of this distribution for examples.
 
 The command expects to find and will use one of the commonly used helpers
 C<pg>, C<mysql> C<sqlite>. The supported wrappers are respectively L<Mojo::Pg>,
@@ -367,6 +373,7 @@ The work on the features may not go in the same order specified here. Some
 parts may be fully implemented while others may be left for later.
 
     - Improve documentation. Tests.
+    - Improve temlates to show more posibilities.
     - Tests for templates (views).
     - Tests for model classes.
     - Test the generated routes.

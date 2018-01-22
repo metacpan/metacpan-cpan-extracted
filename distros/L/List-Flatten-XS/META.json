@@ -4,7 +4,7 @@
       "K <x00.x7f@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.9",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::LeakTrace" : "0",
             "Test::More" : "0.98",
             "Test::Valgrind" : "0"
@@ -57,7 +58,7 @@
    "provides" : {
       "List::Flatten::XS" : {
          "file" : "lib/List/Flatten/XS.pm",
-         "version" : "0.02"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -71,7 +72,11 @@
          "web" : "https://github.com/Code-Hex/List-Flatten-XS"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_authority" : "cpan:CODEHEX",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_contributors" : [
+      "K <Code-Hex@users.noreply.github.com>",
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

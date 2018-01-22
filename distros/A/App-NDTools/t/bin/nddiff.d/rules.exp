@@ -1,0 +1,22 @@
+[
+   {
+      "modname" : "Insert",
+      "path" : "{mtime}",
+      "value" : 1462431002
+   },
+   {
+      "modname" : "Insert",
+      "path" : "{fqdn}",
+      "value" : "beta.example.org"
+   },
+   {
+      "modname" : "Insert",
+      "path" : "{files}{\"/etc/hostname\"}",
+      "value" : "beta"
+   },
+   {
+      "modname" : "Insert",
+      "path" : "{files}{\"/etc/cron.d/beta\"}",
+      "value" : "* * * * * root sleep 5"
+   }
+]

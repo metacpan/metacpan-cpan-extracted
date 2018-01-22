@@ -4,7 +4,7 @@
       "faraco <skelic3@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "mit"
    ],
@@ -40,14 +40,14 @@
             "LWP::Online" : "0",
             "Moo" : "0",
             "WebService::Client" : "0",
-            "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "feature" : "0"
          }
       }
    },
@@ -63,7 +63,7 @@
          "web" : "https://github.com/faraco/Webservice-gitter"
       }
    },
-   "version" : "2.1.0",
+   "version" : "2.2.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

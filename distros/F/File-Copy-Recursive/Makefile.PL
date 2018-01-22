@@ -9,14 +9,13 @@ WriteMakefile(
         Test::More      => 0,
         Test::Deep      => 0,
         Test::File      => 0,
-        File::Slurp     => 0,
         File::Temp      => 0,
-        Path::Iter      => 0,
         Test::Warn      => 0,
         File::Glob      => 0,
         Test::Exception => 0,
         Cwd             => 0,
         File::Spec      => 0,
+        Path::Tiny      => 0,
     },
     (
         $] >= 5.005

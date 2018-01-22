@@ -1,6 +1,9 @@
 package Selenium::Remote::WebElement;
-$Selenium::Remote::WebElement::VERSION = '1.20';
+$Selenium::Remote::WebElement::VERSION = '1.21';
 # ABSTRACT: Representation of an HTML Element used by Selenium Remote Driver
+
+use strict;
+use warnings;
 
 use Moo;
 use Carp qw(carp croak);
@@ -35,7 +38,6 @@ has 'id' => (
     }
 );
 
-
 has 'driver' => (
     is => 'ro',
     required => 1,
@@ -52,6 +54,7 @@ sub click {
 
 sub submit {
     my ($self) = @_;
+    return $self->driver->execute_script("return arguments[0].submit();", {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
     my $res = { 'command' => 'submitElement', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -67,9 +70,10 @@ sub send_keys {
     # corresponding value must be ('h', 'e', 'l', 'l', 'o' ). This
     # format conforms with the Spec AND works with the Selenium
     # standalone server.
-    my $strings = join('', map { $_ .= "" } @strings);
+    my $strings = join('', map { $_."" } @strings);
     my $params = {
-        'value' => [ split('', $strings) ]
+        'value' => [ split('', $strings) ],
+        text => $strings,
     };
     return $self->_execute_command( $res, $params );
 }
@@ -77,6 +81,8 @@ sub send_keys {
 
 sub is_selected {
     my ($self) = @_;
+
+    return $self->get_property('checked') if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
     my $res = { 'command' => 'isElementSelected', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -84,6 +90,10 @@ sub is_selected {
 
 sub set_selected {
     my ($self) = @_;
+    if ($self->driver->{is_wd3}) {
+        return if $self->is_selected();
+        return $self->click();
+    }
     my $res = { 'command' => 'setElementSelected', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -91,6 +101,10 @@ sub set_selected {
 
 sub toggle {
     my ($self) = @_;
+    if ($self->driver->{is_wd3}) {
+        return $self->click() unless $self->is_selected();
+        return $self->driver->execute_script(qq/ if (arguments[0].checked) { arguments[0].checked = 0 }; return arguments[0].checked; /, {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}});
+    }
     my $res = { 'command' => 'toggleElement', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -98,6 +112,7 @@ sub toggle {
 
 sub is_enabled {
     my ($self) = @_;
+    return $self->get_property('enabled') ? 1 : 0 if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
     my $res = { 'command' => 'isElementEnabled', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -105,13 +120,45 @@ sub is_enabled {
 
 sub get_element_location {
     my ($self) = @_;
+    if ($self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge})) {
+        my $data = $self->get_element_rect();
+        delete $data->{height};
+        delete $data->{width};
+        return $data;
+    }
     my $res = { 'command' => 'getElementLocation', 'id' => $self->id };
+    return $self->_execute_command($res);
+}
+
+
+sub get_size {
+    my ($self) = @_;
+    if ($self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge})) {
+        my $data = $self->get_element_rect();
+        delete $data->{x};
+        delete $data->{y};
+        return $data;
+    }
+    my $res = { 'command' => 'getElementSize', 'id' => $self->id };
+    return $self->_execute_command($res);
+}
+
+
+
+sub get_element_rect {
+    my ($self) = @_;
+    my $res = { 'command' => 'getElementRect', 'id' => $self->id };
     return $self->_execute_command($res);
 }
 
 
 sub get_element_location_in_view {
     my ($self) = @_;
+    return $self->driver->execute_script(qq{
+        arguments[0].scrollIntoView();
+        var pos = arguments[0].getBoundingClientRect();
+        return {y:pos.top,x:pos.left};
+    }, {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && grep { $self->driver->browser_name eq $_ } ('firefox','internet explorer');
     my $res = { 'command' => 'getElementLocationInView', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -132,10 +179,12 @@ sub clear {
 
 
 sub get_attribute {
-    my ( $self, $attr_name ) = @_;
+    my ( $self, $attr_name, $no_i_really_mean_it ) = @_;
     if ( not defined $attr_name ) {
         croak 'Attribute name not provided';
     }
+    return $self->get_property($attr_name) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge}) && !$no_i_really_mean_it;
+
     my $res = {
         'command' => 'getElementAttribute',
         'id'      => $self->id,
@@ -143,6 +192,15 @@ sub get_attribute {
     };
     return $self->_execute_command($res);
 }
+
+
+sub get_property {
+    my ($self,$prop) = @_;
+    return $self->get_attribute($prop) if $self->driver->{is_wd3} && (grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
+    my $res = { 'command' => 'getElementProperty', id => $self->id, name => $prop };
+    return $self->_execute_command($res);
+}
+
 
 
 sub get_value {
@@ -153,6 +211,10 @@ sub get_value {
 
 sub is_displayed {
     my ($self) = @_;
+    if ($self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge})) {
+        return 0 if $self->get_tag_name() eq 'input' && $self->get_property('type') eq 'hidden'; #hidden type inputs
+        return int($self->get_css_attribute('display') ne 'none');
+    }
     my $res = { 'command' => 'isElementDisplayed', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -165,14 +227,10 @@ sub is_hidden {
 
 
 sub drag {
-    carp 'drag is no longer available in the JSONWireProtocol.';
-}
-
-
-sub get_size {
-    my ($self) = @_;
-    my $res = { 'command' => 'getElementSize', 'id' => $self->id };
-    return $self->_execute_command($res);
+    my ($self,$target) = @_;
+    require Selenium::ActionChains;
+    my $chain = Selenium::ActionChians->new( driver => $self->driver );
+    return $chain->drag_and_drop($self,$target)->perform();
 }
 
 
@@ -203,6 +261,29 @@ sub describe {
     return $self->_execute_command($res);
 }
 
+
+sub screenshot {
+    my ($self, $scroll) = @_;
+    $scroll //= 1;
+    my $res = { 'command' => 'elementScreenshot', id => $self->id };
+    my $input = {scroll => int($scroll) };
+    return $self->_execute_command($res, $input);
+}
+
+
+sub capture_screenshot {
+    my ( $self, $filename, $scroll ) = @_;
+    croak '$filename is required' unless $filename;
+
+    open( my $fh, '>', $filename );
+    binmode $fh;
+    print $fh MIME::Base64::decode_base64( $self->screenshot($scroll) );
+    CORE::close $fh;
+    return 1;
+}
+
+
+
 1;
 
 __END__
@@ -217,7 +298,7 @@ Selenium::Remote::WebElement - Representation of an HTML Element used by Seleniu
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 DESCRIPTION
 
@@ -233,13 +314,17 @@ What is probably most useful on this page is the list of methods below
 that you can perform on an element once you've found one and S::R::D
 has made an instance of this for you.
 
-=head1 ATTRIBUTES
+=head1 CONSTRUCTOR
 
-=head2 id
+=head2 new
+
+=over 4
+
+=item B<id>
 
 Required: Pass in a string representing the ID of the object. The
 string should be obtained from the response object of making one of
-the C<find_element> calls from L</Selenium::Remote::Driver>.
+the C<find_element> calls from L<Selenium::Remote::Driver>.
 
 The attribute is also set up to handle spec compliant element response
 objects via its `coerce` such that any of the following will work and
@@ -265,17 +350,19 @@ and then after instantiation, all three would give the following for
 
     print $elem->id; # prints 1
 
-Again, for typical usage of S::R::D and this module, none of this
-matters and it should Just Work without you having to worry about it
-at all. For further reading, the L<W3C
-spec|https://www.w3.org/TR/webdriver/#elements> strictly dictates the
-exact behavior.
-
-=head2 driver
+=item B<driver>
 
 Required: Pass in a Selenium::Remote::Driver instance or one of its
 subclasses. The WebElement needs the appropriate Driver session to
 execute its commands properly.
+
+=back
+
+For typical usage of S::R::D and this module, none of this
+matters and it should Just Work without you having to worry about it
+at all. For further reading, the L<W3C
+spec|https://www.w3.org/TR/webdriver/#elements> strictly dictates the
+exact behavior.
 
 =head1 FUNCTIONS
 
@@ -335,11 +422,10 @@ execute its commands properly.
 
  Description:
     Select an OPTION element, or an INPUT element of type checkbox or radiobutton.
+    Forces selected=1 on the element..
 
  Usage:
     $elem->set_selected();
-
- Note: DEPRECATED -- use click instead
 
 =head2 toggle
 
@@ -352,8 +438,6 @@ execute its commands properly.
 
  Usage:
     $elem->toggle();
-
- Note: DEPRECATED -- use click instead
 
 =head2 is_enabled
 
@@ -372,11 +456,41 @@ execute its commands properly.
    Determine an element's location on the page. The point (0, 0) refers to the
    upper-left corner of the page.
 
+ Compatibility:
+    On WebDriver 3 enabled servers, this is an alias for get_element_rect().
+
  Output:
     HASH - The X and Y coordinates for the element on the page.
 
  Usage:
     $elem->get_element_location();
+
+ This method is DEPRECATED on webdriver3 enabled servers.
+
+=head2 get_size
+
+ Description:
+    Determine an element's size in pixels. The size will be returned with width
+    and height properties.
+
+ Compatibility:
+    On WebDriver 3 enabled servers, this is an alias for get_element_rect().
+
+ Output:
+    HASH - The width and height of the element, in pixels.
+
+ Usage:
+    $elem->get_size();
+
+ This method is DEPRECATED on webdriver3 enabled servers.
+
+=head2 get_element_rect
+
+Get the element's size AND location in a hash.
+
+Example Output:
+
+    { x => 0, y => 0, height => 10, width => 10 }
 
 =head2 get_element_location_in_view
 
@@ -386,6 +500,9 @@ execute its commands properly.
 
     Note: This is considered an internal command and should only be used to
     determine an element's location for correctly generating native events.
+
+ Compatibility:
+    Not available on WebDriver3 enabled selenium servers.
 
  Output:
     {x:number, y:number} The X and Y coordinates for the element on the page.
@@ -417,15 +534,31 @@ execute its commands properly.
  Description:
     Get the value of an element's attribute.
 
- Input: 1
+ Compatibility:
+    In older webDriver, this actually got the value of an element's property.
+    If you want to get the initial condition (e.g. the values in the tag hardcoded in HTML), pass 1 as the second argument.
+    This can only done on WebDriver 3 enabled servers.
+
+ Input: 2
     Required:
         STRING - name of the attribute of the element
+    Optional:
+        BOOLEAN - "I really mean that I want the initial condition, quit being so compatible!!!"
+
 
  Output:
     {STRING | NULL} The value of the attribute, or null if it is not set on the element.
 
  Usage:
-    $elem->get_attribute('name');
+    $elem->get_attribute('name',1);
+
+=head2 get_property
+
+Gets the C<Current Value> of an element's attribute.
+
+Takes a named property as an argument.
+
+Only available on WebDriver 3 enabled servers.
 
 =head2 get_value
 
@@ -438,10 +571,13 @@ execute its commands properly.
  Usage:
     $elem->get_value();
 
+=head2 get_style
+
 =head2 is_displayed
 
  Description:
     Determine if an element is currently displayed.
+    Note: This does *not* tell you an element's 'visibility' property; as it still takes up space in the DOM and is therefore considered 'displayed'.
 
  Output:
     BOOLEAN - Whether the element is displayed.
@@ -462,44 +598,13 @@ execute its commands properly.
 
 =head2 drag
 
- Description:
-    Drag and drop an element. The distance to drag an element should be
-    specified relative to the upper-left corner of the page and it starts at 0,0
+Alias for Selenium::ActionChains::drag_and_drop().
 
- Input: 2
-    Required:
-        NUMBER - X axis distance in pixels
-        NUMBER - Y axis distance in pixels
+Provide element you wish to drag to as argument.
 
- Usage:
-    $elem->drag(216,158);
-
- Note: DEPRECATED - drag is no longer available in the
- JSONWireProtocol. We are working on an ActionsChains implementation,
- but drag and drop doesn't currently work on the Webdriver side for
- HTML5 pages. For reference, see:
-
- http://elementalselenium.com/tips/39-drag-and-drop
- https://gist.github.com/rcorreia/2362544
-
- Check out the mouse_move_to_location, button_down, and button_up
- functions on Selenium::Remote::Driver.
-
- https://metacpan.org/pod/Selenium::Remote::Driver#mouse_move_to_location
- https://metacpan.org/pod/Selenium::Remote::Driver#button_down
- https://metacpan.org/pod/Selenium::Remote::Driver#button_up
-
-=head2 get_size
-
- Description:
-    Determine an element's size in pixels. The size will be returned with width
-    and height properties.
-
- Output:
-    HASH - The width and height of the element, in pixels.
-
- Usage:
-    $elem->get_size();
+    my $target = $driver->find_element('receptacle','id');
+    my $subject = $driver->find_element('thingy','id');
+    $subject->drag($target);
 
 =head2 get_text
 
@@ -540,6 +645,46 @@ execute its commands properly.
  Note: DEPRECATED as of 2.42.2 -- use get_text, get_value, is_displayed, or
  whatever appropriate WebElement function you need instead
 
+ Entirely unsupported on WebDriver 3 enabled servers.
+
+=head2 screenshot
+
+ Description:
+    Get a screenshot of the visible region that is a subset of the element's bounding box as a base64 encoded image.
+
+ Compatibility:
+    Only available on Webdriver3 enabled selenium servers.
+
+ Input (optional):
+    $scroll_into_view - BOOLEAN default true.  If false, will not scroll the element into the viewport first.
+    Failing to do so may result in an image being cropped partially or entirely.
+
+ Output:
+    STRING - base64 encoded image
+
+ Usage:
+    print $element->screenshot();
+
+To conveniently write the screenshot to a file, see L</capture_screenshot>.
+
+=head2 capture_screenshot
+
+ Description:
+    Capture a screenshot of said element and save as a PNG to provided file name.
+
+ Compatibility:
+    Only available on Webdriver3 enabled selenium servers.
+
+ Input (optional):
+    $scroll_into_view - BOOLEAN default true.  If false, will not scroll the element into the viewport first.
+    Failing to do so may result in an image being cropped partially or entirely.
+
+ Output:
+    TRUE - (Screenshot is written to file)
+
+ Usage:
+    $element->capture_screenshot($filename);
+
 =head1 SEE ALSO
 
 Please see those modules/websites for more information related to this module.
@@ -555,7 +700,7 @@ L<Selenium::Remote::Driver|Selenium::Remote::Driver>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/gempesaw/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

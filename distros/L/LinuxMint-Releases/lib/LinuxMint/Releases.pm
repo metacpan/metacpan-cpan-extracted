@@ -1,7 +1,7 @@
 package LinuxMint::Releases;
 
-our $DATE = '2017-09-08'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $DATE = '2018-01-19'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -371,9 +371,9 @@ our $data = do {
    {
      apache_httpd_version => "--",
      bash_version         => 4.3,
-     code_name            => "sonya",
+     code_name            => "sylvia",
      eoldate              => "2021-04",
-     linux_version        => 4.8,
+     linux_version        => "4.10.0",
      mariadb_version      => "--",
      mysql_version        => "--",
      nginx_version        => undef,
@@ -381,9 +381,9 @@ our $data = do {
      php_version          => "--",
      postgresql_version   => "--",
      python_version       => "2.7.11",
-     reldate              => "2017-07-02",
+     reldate              => "2017-11-27",
      ruby_version         => undef,
-     version              => 18.2,
+     version              => 18.3,
    },
  ]
 
@@ -412,7 +412,7 @@ LinuxMint::Releases - List LinuxMint releases
 
 =head1 VERSION
 
-This document describes version 0.030 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2017-09-08.
+This document describes version 0.031 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2018-01-19.
 
 =head1 SYNOPSIS
 
@@ -1175,7 +1175,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

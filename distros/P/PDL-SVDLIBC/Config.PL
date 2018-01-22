@@ -16,6 +16,7 @@ if (0 && -e "./Config.cache") {
 ##   + uses ExtUtils::MakeMaker::prompt() for cpan smoker-friendliness
 sub cprompt {
   my ($key, $msg, $default)=@_;
+  require ExtUtils::MakeMaker;
   return $cconfig{$key} if (defined($cconfig{$key}));
   $default = '' if (!defined($default)); 
   my $answer = ExtUtils::MakeMaker::prompt("<Config.PL> $msg [$default] ?");

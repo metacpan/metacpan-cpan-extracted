@@ -23,7 +23,6 @@ sub new {
 
 		bless $self, $class;
 	}
-	#$self->db_connect;
 
 	return $self;
 }
@@ -35,14 +34,6 @@ sub db_connect {
 		$self->{dsn},
 		$self->{username},
 		$self->{password},
-		#$self->{connection_parameters},
-		#{
-		#	HandleError => sub {
-		#		my ($a, $b, $c) = @_;
-		#
-		#		say 'Simple.Connect.db_connect.HandleError.a = ' . $a;
-		#	},
-		#}
 	) or die DBI->errstr;
 
 	return $self;

@@ -22,7 +22,7 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -107,7 +107,7 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 SYNOPSIS
 
@@ -299,7 +299,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Jason Carey Toffaletti Johann Rolschewski Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Michael Langner Rotmanov Mike Dirolf Mohammad S Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Uwe Voelker Whitney Jackson Xtreak Zhihong Zhang
+=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Michael Langner Rotmanov Mike Dirolf Mohammad S Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Uwe Voelker Whitney Jackson Xtreak Zhihong Zhang
 
 =over 4
 
@@ -406,6 +406,10 @@ Jason Toffaletti <jason@topsy.com>
 =item *
 
 Johann Rolschewski <rolschewski@gmail.com>
+
+=item *
+
+John A. Kunze <jak@ucop.edu>
 
 =item *
 
@@ -539,7 +543,7 @@ Zhihong Zhang <zzh_621@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MongoDB, Inc.
+This software is Copyright (c) 2018 by MongoDB, Inc.
 
 This is free software, licensed under:
 

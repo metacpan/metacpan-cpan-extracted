@@ -3,15 +3,15 @@ package Mastodon::Listener;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Moo;
-extends 'AnyEvent::Emitter';
+with 'Role::EventEmitter';
 
-use Carp;
 use Types::Standard qw( Int Str Bool );
 use Mastodon::Types qw( Instance to_Status to_Notification );
-use AnyEvent::HTTP;
+use IO::Async::Loop;
+use Net::Async::HTTP;
 use Try::Tiny;
 use JSON::MaybeXS qw( decode_json );
 
@@ -52,16 +52,17 @@ has access_token => (
   required => 1,
 );
 
-has connection_guard => (
+has _ua => (
   is => 'rw',
   init_arg => undef,
+  default => sub { Net::Async::HTTP->new },
 );
 
-has cv => (
+has _future => (
   is => 'rw',
   init_arg => undef,
   lazy => 1,
-  default => sub { AnyEvent->condvar },
+  default => sub { Future->new },
 );
 
 has coerce_entities => (
@@ -73,20 +74,89 @@ has coerce_entities => (
 
 sub BUILD {
   my ($self, $arg) = @_;
-  $self->reset;
+  IO::Async::Loop->new->add($self->_ua);
 }
 
 sub start {
-  return $_[0]->cv->recv;
+  my $self = shift;
+
+  my $current_event;
+  my @buffer;
+
+  my $on_error = sub { $self->emit( error => shift, shift, \@_ ) };
+
+  $self->_future(
+    $self->_ua->do_request(
+      uri => $self->url,
+      headers => {
+        Authorization => 'Bearer ' . $self->access_token,
+      },
+      on_error => sub { $on_error->( 1, shift, \@_ ) },
+      on_header => sub {
+        my $response = shift;
+        $on_error->( 1, $response->message, $response )
+          unless $response->is_success;
+
+        return sub {
+          my $chunk = shift;
+          push @buffer, split /\n/, $chunk;
+
+          while (my $line = shift @buffer) {
+            if ($line =~ /^(:thump|event: (\w+))$/) {
+              my $event = $2;
+
+              if (!defined $event) {
+                # Heartbeats have no data
+                $self->emit( 'heartbeat' );
+                next;
+              }
+              else {
+                $current_event = $event;
+              }
+            }
+
+            return unless $current_event;
+            return unless @buffer;
+
+            my $data = shift @buffer;
+            $data =~ s/^data:\s+//;
+
+            if ($current_event eq 'delete') {
+              # The payload for delete is a single integer
+              $self->emit( delete => $data );
+            }
+            else {
+              # Other events have JSON arrays or objects
+              try {
+                my $payload = decode_json $data;
+                $self->emit( $current_event => $payload );
+              }
+              catch {
+                $self->emit( error => 0,
+                  "Error decoding JSON payload: $_", $data
+                );
+              };
+            }
+
+            $current_event = undef;
+          }
+        }
+      },
+    )
+  );
+
+  $self->_future->get;
 }
 
 sub stop {
-  return shift->cv->send(@_);
+  my $self = shift;
+  $self->_future->done(@_) unless $self->_future->is_ready;
+  return $self;
 }
 
 sub reset {
-  $_[0]->connection_guard($_[0]->_set_connection);
-  return $_[0];
+  my $self = shift;
+  $self->stop->start;
 }
 
 around emit => sub {
@@ -101,90 +171,6 @@ around emit => sub {
 
   $self->$orig($event, $data, @rest);
 };
-
-sub _set_connection {
-  my $self = shift;
-  my $x = http_request GET => $self->url,
-    headers => { Authorization => 'Bearer ' . $self->access_token },
-    handle_params => {
-      max_read_size => 8168,
-    },
-    want_body_handle => 1,
-    sub {
-      my ($handle, $headers) = @_;
-
-      if ($headers->{Status} !~ /^2/) {
-        $self->emit( error => $handle, 1,
-          'Could not connect to ' . $self->url . ': ' . $headers->{Reason}
-        );
-        $self->stop;
-        undef $handle;
-        return;
-      }
-
-      unless ($handle) {
-        $self->emit( error => $handle, 1,
-          'Could not connect to ' . $self->url
-        );
-        $self->stop;
-        return;
-      }
-
-      my $event_pattern = qr{\s*(:thump|event: (\w+)).*?data:\s*}s;
-      my $skip_pattern  = qr{\s*}s;
-
-      my $parse_event;
-      $parse_event = sub {
-        shift;
-        my $chunk = shift;
-        my $event = $2;
-
-        if (!defined $event) {
-          # Heartbeats have no data
-          $self->emit( 'heartbeat' );
-          $handle->push_read( regex =>
-              $event_pattern, undef, $skip_pattern, $parse_event );
-        }
-        elsif ($event eq 'delete') {
-          # The payload for delete is a single integer
-          $handle->push_read( line => sub {
-            shift;
-            my $line = shift;
-            $self->emit( delete => $line );
-            $handle->push_read( regex =>
-              $event_pattern, undef, $skip_pattern, $parse_event );
-          });
-        }
-        else {
-          # Other events have JSON arrays or objects
-          $handle->push_read( json => sub {
-            shift;
-            my $json = shift;
-            $self->emit( $event => $json );
-            $handle->push_read( regex =>
-              $event_pattern, undef, $skip_pattern, $parse_event );
-          });
-        }
-      };
-
-      # Push initial reader: look for event name
-      $handle->on_read(sub {
-        $handle->push_read( regex => $event_pattern, $parse_event );
-      });
-
-      $handle->on_error(sub {
-        undef $handle;
-        $self->emit( error => @_ );
-      });
-
-      $handle->on_eof(sub {
-        undef $handle;
-        $self->emit( eof => @_ );
-      });
-
-    };
-  return $x;
-}
 
 1;
 
@@ -294,10 +280,13 @@ debugging purposes.
 
 =item B<error>
 
-Inherited from L<AnyEvent::Emitter>, will be emitted when an error was found.
-The callback will be called with the same arguments as the B<on_error> callback
-for L<AnyEvent::Handle>: the handle of the current connection, a fatal flag,
-and an error message.
+Inherited from L<Role::EventEmitter>, will be emitted when an error was found.
+The callback will be called with a fatal flag, an error message, and any
+relevant data as a single third arghument.
+
+If the error event is triggered in response to a 4xx or 5xx error, the data
+payload will be an array reference with the response and request objects
+as received from L<Net::Async::HTTP>.
 
 =back
 

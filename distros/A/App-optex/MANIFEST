@@ -14,6 +14,7 @@ minil.toml
 script/optex
 t/00_compile.t
 t/01_run.t
-t/Util.pm
+t/02_config.t
+t/home/_optex.d/config.toml
 META.yml
 MANIFEST

@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20171220';
+our $VERSION = '5.20180120';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -327,6 +327,7 @@ sub changes_between {
     5.027005 => '2017-10-20',
     5.027006 => '2017-11-20',
     5.027007 => '2017-12-20',
+    5.027008 => '2018-01-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14960,6 +14961,59 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.027008 => {
+        delta_from => 5.027007,
+        changed => {
+            'B'                     => '1.74',
+            'B::Deparse'            => '1.47',
+            'B::Op_private'         => '5.027008',
+            'Config'                => '5.027008',
+            'Cwd'                   => '3.72',
+            'Data::Dumper'          => '2.170',
+            'Devel::PPPort'         => '3.38',
+            'Digest::SHA'           => '6.01',
+            'Encode'                => '2.94',
+            'Encode::Alias'         => '2.24',
+            'ExtUtils::Miniperl'    => '1.08',
+            'File::Spec'            => '3.72',
+            'File::Spec::AmigaOS'   => '3.72',
+            'File::Spec::Cygwin'    => '3.72',
+            'File::Spec::Epoc'      => '3.72',
+            'File::Spec::Functions' => '3.72',
+            'File::Spec::Mac'       => '3.72',
+            'File::Spec::OS2'       => '3.72',
+            'File::Spec::Unix'      => '3.72',
+            'File::Spec::VMS'       => '3.72',
+            'File::Spec::Win32'     => '3.72',
+            'JSON::PP'              => '2.97001',
+            'JSON::PP::Boolean'     => '2.97001',
+            'Module::CoreList'      => '5.20180120',
+            'Module::CoreList::TieHashDelta'=> '5.20180120',
+            'Module::CoreList::Utils'=> '5.20180120',
+            'Opcode'                => '1.43',
+            'Pod::Functions'        => '1.13',
+            'Pod::Functions::Functions'=> '1.13',
+            'Pod::Html'             => '1.24',
+            'Pod::Man'              => '4.10',
+            'Pod::ParseLink'        => '4.10',
+            'Pod::Text'             => '4.10',
+            'Pod::Text::Color'      => '4.10',
+            'Pod::Text::Overstrike' => '4.10',
+            'Pod::Text::Termcap'    => '4.10',
+            'Socket'                => '2.027',
+            'Time::HiRes'           => '1.9752',
+            'Unicode::UCD'          => '0.70',
+            'XS::APItest'           => '0.95',
+            'XSLoader'              => '0.30',
+            'autodie::exception'    => '2.29002',
+            'feature'               => '1.51',
+            'overload'              => '1.30',
+            'utf8'                  => '1.21',
+            'warnings'              => '1.40',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -15797,6 +15851,13 @@ sub is_core
     },
     5.027007 => {
         delta_from => 5.027006,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.027008 => {
+        delta_from => 5.027007,
         changed => {
         },
         removed => {

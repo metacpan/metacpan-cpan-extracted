@@ -47,40 +47,46 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
        "Command is loaded and shows help message");
 }
 
-# Default settings
+# Default options + one custom generator template (show.html.ep)
 {
 
   $buffer = '';
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
-  my $cm = Mojolicious::Command::generate::resources->new(app => Blog->new)
+  my $blog = Blog->new;
+  push @{$blog->renderer->paths}, $blog->home->rel_file('resources_templates');
+
+  my $cm = Mojolicious::Command::generate::resources->new(app => $blog)
     ->run('-t' => 'users,groups');
   like($buffer,
-       qr{\[exist\].+?lib/Blog/Controller},
+       qr|\[exist\].+?lib.+Controller|,
        "Folder lib/Blog/Controller exists.");
   like($buffer,
-       qr{\[write\].+?lib/Blog/Controller/Users.pm},
+       qr|\[write\].+Controller[\\/]Users.pm|,
        "written lib/Blog/Controller/Users.pm");
   like($buffer,
-       qr{\[write\].+?lib/Blog/Model/Users.pm},
+       qr{\[write\].+?Model[\\/]Users.pm},
        "written lib/Blog/Model/Users.pm");
-  like($buffer, qr{\[mkdir\].+?templates/users}, "made dir templates/users");
   like($buffer,
-       qr{\[write\].+?templates/users/index.html.ep},
+       qr{\[mkdir\].+?templates[\\/]users},
+       "made dir templates/users");
+  like($buffer,
+       qr{\[write\].+?users[\\/]index.html.ep},
        "written templates/users/index.html.ep");
 
-
-  like($buffer, qr{\[write\].+?/blog/TODO}, "written /blog/TODO ... etc");
+  like($buffer,
+       qr{\[write\].+?blog[\\/]TODO},
+       "written /blog/TODO ... etc");
   my $home = $cm->app->home;
 
   # Default arguments
   is_deeply(
             $cm->args,
             {
-             lib            => catdir($home, 'lib'),
-             templates_root => catdir($home, 'templates'),
-             home_dir       => $home,
-             tables         => [qw(users groups)],
+             lib                  => $home->rel_file('lib'),
+             templates_root       => $home->rel_file('templates'),
+             home_dir             => $home,
+             tables               => [qw(users groups)],
              controller_namespace => $cm->app->routes->namespaces->[0],
              model_namespace      => ref($cm->app) . '::Model',
             },

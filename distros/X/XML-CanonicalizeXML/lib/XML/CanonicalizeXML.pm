@@ -17,16 +17,16 @@ our @ISA = qw(Exporter);
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	
+
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	
+
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.10';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -64,17 +64,17 @@ __END__
 
 =head1 NAME
 
-XML::CanonicalizeXML - Perl extension for inclusive and exclusive canonicalization of XML using libxml2
+XML::CanonicalizeXML - Perl extension for inclusive (1.0 and 1.1) and exclusive canonicalization of XML using libxml2
 
 
 =head1 SYNOPSIS
 
 use XML::CanonicalizeXML;
- 
+
 
 =head1 DESCRIPTION
 
-useage:  
+useage:
 
 canonicalize (xml, xpath, namespace, exclusive, with_comments)
 
@@ -86,7 +86,7 @@ xpath is a string containing an xpath statement to the part of the xml document 
 
 namespace is a string containing a list of namespaces to be included (only used in exclusive canonicalization)
 
-exclusive is an int to specify exclusive canonicalization (1 = exclusive, 0 = non-exclusive)
+exclusive is an int to specify exclusive canonicalization (1 = exclusive, 0 = non-exclusive, 2 = exclusive v1.1)
 
 with_comments is an int specifying whether comments are included in the canonicalized xml (0 = comments not included)
 
@@ -100,8 +100,8 @@ None by default.
 
 =head1 SEE ALSO
 
+https://github.com/sjzasada/XML-CanonicalizeXML for GitHub project
 http://www.xmlsoft.org for full details of libxml2
-
 
 =head1 AUTHOR
 

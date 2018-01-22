@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
 package Device::Chip::ADS1115;
 
@@ -10,7 +10,9 @@ use warnings;
 use base qw( Device::Chip::Base::RegisteredI2C );
 Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 
-our $VERSION = '0.04';
+use Future::AsyncAwait 0.13; # list-context bugfix
+
+our $VERSION = '0.05';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
@@ -97,14 +99,13 @@ bitfield { format => "bytes-BE" }, CONFIG =>
    COMP_LAT  => boolfield(2),
    COMP_QUE  => enumfield(0, qw( 1 2 4 DIS ));
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   $self->cached_read_reg( REG_CONFIG, 1 )->then( sub {
-      my ( $bytes ) = @_;
-      Future->done( $self->{config} = { unpack_CONFIG( $bytes ) } );
-   });
+   my $bytes = await $self->cached_read_reg( REG_CONFIG, 1 );
+
+   return $self->{config} = { unpack_CONFIG( $bytes ) };
 }
 
 =head2 change_config
@@ -116,20 +117,18 @@ their existing values.
 
 =cut
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   ( defined $self->{config} ? Future->done( $self->{config} ) :
-         $self->read_config )->then( sub {
-      my ( $config ) = @_;
-      %$config = ( %$config, %changes );
+   my $config = $self->{config} // await $self->read_config;
 
-      delete $self->{fullscale_f} if exists $changes{PGA};
+   %$config = ( %$config, %changes );
 
-      $self->cached_write_reg( REG_CONFIG, pack_CONFIG( %$config ) );
-   });
+   delete $self->{fullscale_f} if exists $changes{PGA};
+
+   await $self->cached_write_reg( REG_CONFIG, pack_CONFIG( %$config ) );
 }
 
 =head2 trigger
@@ -141,15 +140,14 @@ reading of the currently-selected input channel when in single-shot mode.
 
 =cut
 
-sub trigger
+async sub trigger
 {
    my $self = shift;
 
-   $self->read_config->then( sub {
-      my ( $config ) = @_;
-      # Not "cached" as OS is a volatile bit
-      $self->write_reg( REG_CONFIG, pack_CONFIG( %$config, OS => 1 ) );
-   });
+   my $config = await $self->read_config;
+
+   # Not "cached" as OS is a volatile bit
+   await $self->write_reg( REG_CONFIG, pack_CONFIG( %$config, OS => 1 ) );
 }
 
 =head2 read_adc
@@ -165,14 +163,13 @@ integer. To convert this into voltage use the L</read_adc_voltage> method.
 
 =cut
 
-sub read_adc
+async sub read_adc
 {
    my $self = shift;
 
-   $self->read_reg( REG_RESULT, 1 )->then( sub {
-      my ( $bytes ) = @_;
-      Future->done( unpack "S>", $bytes );
-   });
+   my $bytes = await $self->read_reg( REG_RESULT, 1 );
+
+   return unpack "S>", $bytes;
 }
 
 sub _fullscale
@@ -196,15 +193,14 @@ configuration option to scale it.
 
 =cut
 
-sub read_adc_voltage
+async sub read_adc_voltage
 {
    my $self = shift;
 
-   Future->needs_all( $self->_fullscale, $self->read_adc )->then( sub {
-      my ( $fullscale, $reading ) = @_;
+   my $f = Future->needs_all( $self->_fullscale, $self->read_adc );
+   my ( $fullscale, $reading ) = await $f;
 
-      Future->done( ( $reading * $fullscale ) / ( 1 << 15 ) );
-   });
+   return ( $reading * $fullscale ) / ( 1 << 15 );
 }
 
 =head1 AUTHOR

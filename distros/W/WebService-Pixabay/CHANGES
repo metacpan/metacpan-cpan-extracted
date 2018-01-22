@@ -1,10 +1,46 @@
 ==================================================
-Changes from 2017-01-15 00:00:00 +0000 to present.
+Changes from 2017-01-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.2.0 at 2018-01-15 02:41:35 +0000
+version 2.2.3 at 2018-01-17 13:43:48 +0000
 ------------------------------------------
+
+  Change: c3e20feb8723e63d2b76a8a8f64d3607359cd746
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 21:42:01 +0000
+
+    Remove extra long line. 
+
+  Change: 7b91fe94e87677b18b231c127200fbc48da2e332
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 21:36:33 +0000
+
+    Update doc. 
+
+  Change: abc1faf82f29f30e0e917c512036834786176199
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 20:54:32 +0000
+
+    Add badge and change LICENSE header. 
+
+  Change: 250984ac4437efb20c52b252c4432e5a9b5fc2e1
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 20:10:16 +0000
+
+    Changed doc. 
+
+  Change: 742e478ace2701717532267f48ddcd1d452cf2ac
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 19:58:27 +0000
+
+    Test badge. 
+
+  Change: ccf695bd254d09e915ffe8c6054aa977688bb432
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-17 19:27:34 +0000
+
+    Use feature instead. 
 
   Change: ca8da701bb8ca4fa7adb68c6f389fb810e6aa6b8
   Author: faraco <skelic3@gmail.com>

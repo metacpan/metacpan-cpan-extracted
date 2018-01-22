@@ -15,7 +15,7 @@ use URI::Escape;
 Readonly::Scalar my $EMPTY_STR => q{};
 
 # Version.
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -253,17 +253,17 @@ Fast Common Gateway Interface Class for CGI::Pure.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2004-2015 Michal Špaček
+ © 2004-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

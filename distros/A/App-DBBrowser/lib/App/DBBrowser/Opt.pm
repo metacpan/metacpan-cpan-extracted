@@ -6,7 +6,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.056';
+our $VERSION = '1.058';
 
 use File::Basename        qw( basename fileparse );
 use File::Spec::Functions qw( catfile );
@@ -37,6 +37,7 @@ sub defaults {
             menu_sql_memory      => 0,
             menus_db_memory      => 0,
             thsd_sep             => ',',
+            max_rows             => 50_000,
             metadata             => 0,
             lock_stmt            => 0,
             operators            => [ "REGEXP", "REGEXP_i", " = ", " != ", " < ", " > ", "IS NULL", "IS NOT NULL" ],
@@ -46,7 +47,6 @@ sub defaults {
         table => {
             table_expand         => 1,
             mouse                => 0,
-            max_rows             => 50_000,
             keep_header          => 0,
             progress_bar         => 40_000,
             min_col_width        => 30,
@@ -89,9 +89,9 @@ sub defaults {
 }
 
 
-sub __sub_menus_insert {
+sub __menu_insert {
     my ( $self, $group ) = @_;
-    my $sub_menus_insert = {
+    my $menu_insert = {
         main_insert => [
             { name => 'input_modes',           text => "- Read",          section => 'insert' },
             { name => 'files_dir',             text => "- File Dir",      section => 'insert' },
@@ -107,18 +107,18 @@ sub __sub_menus_insert {
             { name => '_options_csv', text => "-  Other attributes", section => 'insert' },
         ],
     };
-    return $sub_menus_insert->{$group};
+    return $menu_insert->{$group};
 }
 
 
-sub __config_insert {
+sub __set_insert {
     my ( $self ) = @_;
     my $old_idx = 0;
     my $backup_old_idx = 0;
     my $group  = 'main_insert';
 
     GROUP_INSERT: while ( 1 ) {
-        my $sub_menu_insert = $self->__sub_menus_insert( $group );
+        my $sub_menu_insert = $self->__menu_insert( $group );
 
         OPTION_INSERT: while ( 1 ) {
             my $prompt;
@@ -173,10 +173,10 @@ sub __config_insert {
             if ( $option eq 'input_modes' ) {
                     my $available = [ 'Cols', 'Rows', 'Multi-row', 'File' ];
                     my $prompt = 'Input Modes:';
-                    $self->__opt_choose_a_list( $opt_type, $section, $option, $available, $prompt );
+                    $self->__choose_a_subset_wrap( $opt_type, $section, $option, $available, $prompt );
             }
             elsif ( $option eq 'files_dir' ) {
-                $self->__opt_choose_a_dir( $opt_type, $section, $option );
+                $self->__choose_a_dir_wrap( $opt_type, $section, $option );
             }
             elsif ( $option eq 'file_encoding' ) {
                 my $items = [
@@ -188,13 +188,13 @@ sub __config_insert {
             elsif ( $option eq 'max_files' ) {
                 my $digits = 3;
                 my $prompt = '"Max file history"';
-                $self->__opt_number_range( $opt_type, $section, $option, $prompt, $digits );
+                $self->__choose_a_number_wrap( $opt_type, $section, $option, $prompt, $digits );
             }
             elsif ( $option eq 'parse_mode' ) {
                 my $prompt = 'Parsing CSV files';
                 my $list = [ 'Text::CSV', 'split', 'Spreadsheet::Read' ];
                 my $sub_menu = [ [ $option, "  Use", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq '_csv_char' ) {
                 my $items = [
@@ -214,7 +214,7 @@ sub __config_insert {
                     [ 'blank_is_undef',      "- blank_is_undef",      [ 'NO', 'YES' ] ],
                     [ 'empty_is_undef',      "- empty_is_undef",      [ 'NO', 'YES' ] ],
                 ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq '_parse_with_split' ) {
                 my $items = [
@@ -260,6 +260,7 @@ sub __menus {
             { name => 'mouse',         text => "- Mouse Mode",  section => 'table' },
         ],
         config_sql => [
+            { name => 'max_rows',     text => "- Auto Limit",  section => 'G' },
             { name => 'metadata',     text => "- Metadata",    section => 'G' },
             { name => 'operators',    text => "- Operators",   section => 'G' },
             { name => 'lock_stmt',    text => "- Lock Mode",   section => 'G' },
@@ -267,7 +268,6 @@ sub __menus {
 
         ],
         config_output => [
-            { name => 'max_rows',      text => "- Max Rows",    section => 'table' },
             { name => 'min_col_width', text => "- Colwidth",    section => 'table' },
             { name => 'progress_bar',  text => "- ProgressBar", section => 'table' },
             { name => 'tab_width',     text => "- Tabwidth",    section => 'table' },
@@ -328,7 +328,7 @@ sub __set_options {
             my $option = $idx <= $#pre ? $pre[$idx] : $menu->[$idx - @pre]{name};
             if ( $option eq 'config_insert' ) {
                 $backup_old_idx = $old_idx;
-                $self->__config_insert();
+                $self->__set_insert();
                 $old_idx = $backup_old_idx;
                 $group = 'main';
                 redo GROUP;
@@ -380,30 +380,30 @@ sub __set_options {
                     map { $installed_db_driver{( fileparse $_, '.pm' )[0]}++ } glob $glob_pattern;
                 }
                 my $prompt = 'Choose DB plugins:';
-                $self->__opt_choose_a_list( $opt_type, $section, $option, [ sort keys %installed_db_driver ], $prompt );
+                $self->__choose_a_subset_wrap( $opt_type, $section, $option, [ sort keys %installed_db_driver ], $prompt );
                 $self->__read_db_config_files();
             }
             elsif ( $option eq 'tab_width' ) {
                 my $digits = 3;
                 my $prompt = '"Tab width"';
-                $self->__opt_number_range( $opt_type, $section, $option, $prompt, $digits );
+                $self->__choose_a_number_wrap( $opt_type, $section, $option, $prompt, $digits );
             }
             elsif ( $option eq 'grid' ) {
                 my $prompt = '"Grid"';
                 my $list = [ 'NO', 'YES' ];
                 my $sub_menu = [ [ $option, "  Grid", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq 'keep_header' ) {
                 my $prompt = '"Header each Page"';
                 my $list = [ 'NO', 'YES' ];
                 my $sub_menu = [ [ $option, "  Keep Header", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq 'min_col_width' ) {
                 my $digits = 3;
                 my $prompt = '"Min column width"';
-                $self->__opt_number_range( $opt_type, $section, $option, $prompt, $digits );
+                $self->__choose_a_number_wrap( $opt_type, $section, $option, $prompt, $digits );
             }
             elsif ( $option eq 'undef' ) {
                 my $items = [
@@ -415,42 +415,42 @@ sub __set_options {
             elsif ( $option eq 'progress_bar' ) {
                 my $digits = 7;
                 my $prompt = '"Threshold ProgressBar"';
-                $self->__opt_number_range( $opt_type, $section, $option, $prompt, $digits );
+                $self->__choose_a_number_wrap( $opt_type, $section, $option, $prompt, $digits );
             }
             elsif ( $option eq 'max_rows' ) {
                 my $digits = 7;
                 my $prompt = '"Max rows"';
-                $self->__opt_number_range( $opt_type, $section, $option, $prompt, $digits );
+                $self->__choose_a_number_wrap( $opt_type, $section, $option, $prompt, $digits );
             }
             elsif ( $option eq 'lock_stmt' ) {
                 my $prompt = 'SQL statement: ';
                 my $list = [ 'Lk0', 'Lk1' ];
                 my $sub_menu = [ [ $option, "  Lock Mode", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq 'metadata' ) {
                 my $prompt = 'DB/schemas/tables: ';
                 my $list = $no_yes;
                 my $sub_menu = [ [ $option, "  Add metadata", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq '_parentheses' ) {
                 my $sub_menu = [
                     [ 'parentheses_w', "- Parens in WHERE",     [ 'NO', 'YES' ] ],
                     [ 'parentheses_h', "- Parens in HAVING TO", [ 'NO', 'YES' ] ],
                 ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu );
             }
             elsif ( $option eq 'operators' ) {
                 my $available = $self->{info}{avail_operators};
                 my $prompt = 'Choose operators:';
-                $self->__opt_choose_a_list( $opt_type, $section, $option, $available, $prompt );
+                $self->__choose_a_subset_wrap( $opt_type, $section, $option, $available, $prompt );
             }
             elsif ( $option eq 'mouse' ) {
                 my $prompt = 'Choose: ';
                 my $list = [ 0, 1, 2, 3, 4 ];
                 my $sub_menu = [ [ $option, "  Mouse mode", $list ] ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq '_menu_memory' ) {
                 my $prompt = 'Choose: ';
@@ -459,14 +459,14 @@ sub __set_options {
                     [ 'menu_sql_memory',     "- SQL    Menu",  [ 'Simple', 'Memory' ] ],
                     [ 'menus_db_memory',     "- DB     Menus", [ 'Simple', 'Memory' ] ],
                 ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             elsif ( $option eq '_table_expand' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
                     [ 'table_expand', "- Expand Rows",   [ 'NO', 'YES - fast back', 'YES' ] ],
                 ];
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
             }
             else { die "Unknown option: $option" }
         }
@@ -474,7 +474,7 @@ sub __set_options {
 }
 
 
-sub __opt_settings_menu {
+sub __settings_menu_wrap {
     my ( $self, $opt_type, $section, $sub_menu, $prompt ) = @_;
     my $changed = settings_menu( $sub_menu, $self->{$opt_type}{$section}, { prompt => $prompt } );
     return if ! $changed;
@@ -482,7 +482,7 @@ sub __opt_settings_menu {
 }
 
 
-sub __opt_choose_a_list {
+sub __choose_a_subset_wrap {
     my ( $self, $opt_type, $section, $option, $available, $prompt ) = @_;
     my $current = $self->{$opt_type}{$section}{$option};
     # Choose_list
@@ -495,7 +495,7 @@ sub __opt_choose_a_list {
 }
 
 
-sub __opt_number_range {
+sub __choose_a_number_wrap {
     my ( $self, $opt_type, $section, $option, $prompt, $digits ) = @_;
     my $current = $self->{$opt_type}{$section}{$option};
     $current = insert_sep( $current, $self->{opt}{G}{thsd_sep} );
@@ -530,7 +530,7 @@ sub __group_readline {
 }
 
 
-sub __opt_choose_a_dir {
+sub __choose_a_dir_wrap {
     my ( $self, $opt_type, $section, $option ) = @_;
     my $current = $self->{$opt_type}{$section}{$option};
     # Choose_a_dir
@@ -542,7 +542,7 @@ sub __opt_choose_a_dir {
 }
 
 
-sub __opt_choose_dirs {
+sub __choose_dirs_wrap {
     my ( $self, $opt_type, $section, $option ) = @_;
     my $current = $self->{$opt_type}{$section}{$option};
     # Choose_dirs
@@ -695,7 +695,7 @@ sub __database_setting {
                     }
                 }
                 my $prompt = 'Required fields (' . $db_plugin . '):';
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
                 next GROUP;
             }
             elsif ( $group eq 'env_variables' ) {
@@ -713,7 +713,7 @@ sub __database_setting {
                     }
                 }
                 my $prompt = 'Use ENV variables (' . $db_plugin . '):';
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
                 next GROUP;
             }
             elsif ( $group eq 'read_argument' ) {
@@ -744,12 +744,12 @@ sub __database_setting {
                     }
                 }
                 my $prompt = 'Options (' . $db_plugin . '):';
-                $self->__opt_settings_menu( $opt_type, $section, $sub_menu, $prompt );
+                $self->__settings_menu_wrap( $opt_type, $section, $sub_menu, $prompt );
                 next GROUP;
             }
             elsif ( $group eq 'sqlite_dir' ) {
                 my $option = 'directories_sqlite';
-                $self->__opt_choose_dirs( $opt_type, $section, $option );
+                $self->__choose_dirs_wrap( $opt_type, $section, $option );
                 next GROUP;
             }
         }

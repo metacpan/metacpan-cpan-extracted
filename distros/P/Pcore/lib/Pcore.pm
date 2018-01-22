@@ -1,4 +1,4 @@
-package Pcore v0.56.4;
+package Pcore v0.56.5;
 
 use v5.26.1;
 use common::header;
@@ -100,15 +100,13 @@ sub import {
             $SCRIPT_PATH   = $RPC_BOOT_ARGS->{script_path};
             $main::VERSION = version->new( $RPC_BOOT_ARGS->{version} );
 
-            B::Hooks::AtRuntime::after_runtime(
-                sub {
-                    require Pcore::RPC::Server;
+            B::Hooks::AtRuntime::after_runtime( sub {
+                require Pcore::RPC::Server;
 
-                    Pcore::RPC::Server::run( $caller, $RPC_BOOT_ARGS );
+                Pcore::RPC::Server::run( $caller, $RPC_BOOT_ARGS );
 
-                    exit;
-                }
-            );
+                exit;
+            } );
         }
 
         _CORE_INIT();
@@ -186,21 +184,19 @@ sub import {
         if ( $import->{pragma}->{class} || $import->{pragma}->{role} ) {
 
             # install universal serializer methods
-            B::Hooks::EndOfScope::XS::on_scope_end(
-                sub {
-                    _namespace_clean($caller);
+            B::Hooks::EndOfScope::XS::on_scope_end( sub {
+                _namespace_clean($caller);
 
-                    no strict qw[refs];
+                no strict qw[refs];
 
-                    if ( my $ref = $caller->can('TO_DATA') ) {
-                        *{"$caller\::TO_JSON"} = $ref unless $caller->can('TO_JSON');
+                if ( my $ref = $caller->can('TO_DATA') ) {
+                    *{"$caller\::TO_JSON"} = $ref unless $caller->can('TO_JSON');
 
-                        *{"$caller\::TO_CBOR"} = $ref unless $caller->can('TO_CBOR');
-                    }
-
-                    return;
+                    *{"$caller\::TO_CBOR"} = $ref unless $caller->can('TO_CBOR');
                 }
-            );
+
+                return;
+            } );
 
             $import->{pragma}->{types} = 1;
 
@@ -647,21 +643,21 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 85                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 252                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 248                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 327                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 447                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 323                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 443                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 359, 388, 391, 395,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 429, 432, 437, 440,  |                                                                                                                |
-## |      | 465, 491, 627        |                                                                                                                |
+## |    3 | 355, 384, 387, 391,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 425, 428, 433, 436,  |                                                                                                                |
+## |      | 461, 487, 623        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 553                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 549                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 262                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 258                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 363                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 359                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

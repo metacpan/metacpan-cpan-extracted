@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.056';
+our $VERSION = '1.058';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -598,11 +598,15 @@ sub __browse_the_table {
             $auxil->__print_error_message( $@, 'Print table' );
             next PRINT_TABLE;
         }
-        last PRINT_TABLE if ! defined $all_arrayref;
-        print_table( $all_arrayref, $self->{opt}{table} );
-        if ( defined $self->{info}{backup_max_rows} ) {
-            $self->{opt}{table}{max_rows} = delete $self->{info}{backup_max_rows};
+        if ( ! defined $all_arrayref ) {
+            last PRINT_TABLE;
         }
+
+
+        print_table( $all_arrayref, $self->{opt}{table} );
+
+
+        delete $self->{opt}{table}{max_rows};
     }
     if ( $db_plugin eq 'Debug' ) {
         my $obj_db = App::DBBrowser::DB->new( $self->{info}, $self->{opt} );
@@ -626,7 +630,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 1.056
+Version 1.058
 
 =head1 DESCRIPTION
 

@@ -29,7 +29,6 @@ lib/Net/ACME2/JWTMaker/ECC.pm
 lib/Net/ACME2/JWTMaker/RSA.pm
 lib/Net/ACME2/LetsEncrypt.pm
 lib/Net/ACME2/Order.pm
-lib/Net/ACME2/Utils.pm
 lib/Net/ACME2/X.pm
 lib/Net/ACME2/X/ACME.pm
 lib/Net/ACME2/X/Base.pm

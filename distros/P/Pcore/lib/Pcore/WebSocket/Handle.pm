@@ -150,98 +150,94 @@ sub on_connect ( $self, $h ) {
     );
 
     # start listen
-    $self->{h}->on_read(
-        sub ($h) {
-            if ( my $header = $self->_parse_frame_header( \$h->{rbuf} ) ) {
+    $self->{h}->on_read( sub ($h) {
+        if ( my $header = $self->_parse_frame_header( \$h->{rbuf} ) ) {
 
-                # check protocol errors
-                if ( $header->{fin} ) {
+            # check protocol errors
+            if ( $header->{fin} ) {
 
-                    # this is the last frame of the fragmented message
-                    if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
+                # this is the last frame of the fragmented message
+                if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
-                        # message was not started, return 1002 - protocol error
-                        return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
+                    # message was not started, return 1002 - protocol error
+                    return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
 
-                        # restore message "op", "rsv1"
-                        ( $header->{op}, $header->{rsv1} ) = ( $self->{_msg}->[1], $self->{_msg}->[2] );
-                    }
-
-                    # this is the single-frame message
-                    else {
-
-                        # set "rsv1" flag
-                        $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
-                    }
+                    # restore message "op", "rsv1"
+                    ( $header->{op}, $header->{rsv1} ) = ( $self->{_msg}->[1], $self->{_msg}->[2] );
                 }
+
+                # this is the single-frame message
                 else {
 
-                    # this is the next frame of the fragmented message
-                    if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
+                    # set "rsv1" flag
+                    $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
+                }
+            }
+            else {
 
-                        # message was not started, return 1002 - protocol error
-                        return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
+                # this is the next frame of the fragmented message
+                if ( $header->{op} == $WEBSOCKET_OP_CONTINUATION ) {
 
-                        # restore "rsv1" flag
-                        $header->{rsv1} = $self->{_msg}->[2];
-                    }
+                    # message was not started, return 1002 - protocol error
+                    return $self->disconnect( result [ 1002, $WEBSOCKET_STATUS_REASON ] ) if !$self->{_msg};
 
-                    # this is the first frame of the fragmented message
-                    else {
-
-                        # store message "op"
-                        $self->{_msg}->[1] = $header->{op};
-
-                        # set and store "rsv1" flag
-                        $self->{_msg}->[2] = $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
-                    }
+                    # restore "rsv1" flag
+                    $header->{rsv1} = $self->{_msg}->[2];
                 }
 
-                # empty frame
-                if ( !$header->{len} ) {
-                    $self->_on_frame( $header, undef );
-                }
+                # this is the first frame of the fragmented message
                 else {
 
-                    # check max. message size, return 1009 - message too big
-                    if ( $self->{max_message_size} ) {
-                        if ( $self->{_msg} && $self->{_msg}->[0] ) {
-                            return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} + length $self->{_msg}->[0] > $self->{max_message_size};
-                        }
-                        else {
-                            return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} > $self->{max_message_size};
-                        }
-                    }
+                    # store message "op"
+                    $self->{_msg}->[1] = $header->{op};
 
-                    if ( length $h->{rbuf} >= $header->{len} ) {
-                        $self->_on_frame( $header, \substr $h->{rbuf}, 0, $header->{len}, q[] );
-                    }
-                    else {
-                        $h->unshift_read(
-                            chunk => $header->{len},
-                            sub ( $h, $payload ) {
-                                $self->_on_frame( $header, \$payload );
-
-                                return;
-                            }
-                        );
-                    }
+                    # set and store "rsv1" flag
+                    $self->{_msg}->[2] = $header->{rsv1} = $self->{compression} && $header->{rsv1} ? 1 : 0;
                 }
             }
 
-            return;
+            # empty frame
+            if ( !$header->{len} ) {
+                $self->_on_frame( $header, undef );
+            }
+            else {
+
+                # check max. message size, return 1009 - message too big
+                if ( $self->{max_message_size} ) {
+                    if ( $self->{_msg} && $self->{_msg}->[0] ) {
+                        return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} + length $self->{_msg}->[0] > $self->{max_message_size};
+                    }
+                    else {
+                        return $self->disconnect( result [ 1009, $WEBSOCKET_STATUS_REASON ] ) if $header->{len} > $self->{max_message_size};
+                    }
+                }
+
+                if ( length $h->{rbuf} >= $header->{len} ) {
+                    $self->_on_frame( $header, \substr $h->{rbuf}, 0, $header->{len}, q[] );
+                }
+                else {
+                    $h->unshift_read(
+                        chunk => $header->{len},
+                        sub ( $h, $payload ) {
+                            $self->_on_frame( $header, \$payload );
+
+                            return;
+                        }
+                    );
+                }
+            }
         }
-    );
+
+        return;
+    } );
 
     # start autopong
     if ( my $pong_interval = $self->pong_interval ) {
-        $self->{h}->on_timeout(
-            sub ($h) {
-                $self->send_pong;
+        $self->{h}->on_timeout( sub ($h) {
+            $self->send_pong;
 
-                return;
-            }
-        );
+            return;
+        } );
 
         $self->{h}->timeout($pong_interval);
     }
@@ -469,17 +465,17 @@ sub _parse_frame_header ( $self, $buf_ref ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 88, 94, 342          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 88, 94, 338          | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 134                  | * Subroutine "on_connect" with high complexity score (27)                                                      |
-## |      | 252                  | * Subroutine "_on_frame" with high complexity score (30)                                                       |
+## |      | 248                  | * Subroutine "_on_frame" with high complexity score (30)                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 403, 405             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
+## |    3 | 399, 401             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 39, 268              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 39, 264              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 313                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 309                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

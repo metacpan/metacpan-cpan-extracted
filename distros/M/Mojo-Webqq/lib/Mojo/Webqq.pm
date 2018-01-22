@@ -1,7 +1,7 @@
 package Mojo::Webqq;
 use strict;
 use Carp ();
-$Mojo::Webqq::VERSION = "2.1.6";
+$Mojo::Webqq::VERSION = "2.1.7";
 use Mojo::Webqq::Base 'Mojo::EventEmitter';
 use Mojo::Webqq::Log;
 use Mojo::Webqq::Cache;
@@ -158,9 +158,10 @@ has send_msg_id            => sub {
 has uid                    => undef;
 has clientid               => 53999199;
 has psessionid             => undef;
-has vfwebqq                => undef;
 has ptwebqq                => undef;
 has skey                   => undef;
+has vfwebqq                => undef;
+
 has passwd_sig             => '';
 has verifycode             => undef;
 has pt_verifysession       => undef,
@@ -168,16 +169,13 @@ has ptvfsession            => undef;
 has md5_salt               => undef;
 has cap_cd                 => undef;
 has isRandSalt             => 0;
-has api_check_sig          => undef;
-has g_login_sig            => undef;
-has g_style                => 16;
-has g_mibao_css            => 'm_webqq';
-has g_daid                 => 164;
-has g_appid                => 501004106;
-has g_pt_version           => 10179;
 has rc                     => 1;
+
+has api_check_sig          => undef;
+has pt_login_sig           => undef;
+
 has csrf_token             => undef;
-has model_ext              => 0;
+has model_ext              => undef;
 #{user=>0,friend=>0,friend_ext=>0,group=>0,group_ext=>0,discuss=>0}
 has model_status           => sub {+{}}; 
 
@@ -294,6 +292,10 @@ sub new {
         my($self,$type,$status)=@_;
         $self->model_status->{$type} = $status;
         $self->emit("model_update_fail") if $self->get_model_status == 0;
+    });
+    $self->on(model_update_fail=>sub{
+        my $self = shift;
+        $self->relogin() if $self->login_type eq 'login';
     });
     $self->on(before_send_message=>sub{
         my($self,$msg) = @_;

@@ -1,0 +1,30 @@
+{
+   "another" : [
+      {
+         "path" : "blah-blah"
+      },
+      {
+         "path" : "blah-blah"
+      }
+   ],
+   "false" : false,
+   "list" : [
+      true,
+      false,
+      true,
+      false
+   ],
+   "same" : {
+      "false" : false,
+      "true" : true
+   },
+   "some" : [
+      {
+         "path" : "blah-blah"
+      },
+      {
+         "path" : "blah-blah"
+      }
+   ],
+   "true" : true
+}

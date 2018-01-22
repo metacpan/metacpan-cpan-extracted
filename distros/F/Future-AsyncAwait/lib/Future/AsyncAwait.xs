@@ -8,6 +8,39 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#undef DEBUG_SHOW_STACKS
+
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#if !HAVE_PERL_VERSION(5, 24, 0)
+  /* On perls before 5.24 we have to do some extra work to save the itervar
+   * from being thrown away */
+#  define HAVE_ITERVAR
+#endif
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+#  define OLDSAVEIX(cx)  (cx->blk_oldsaveix)
+#else
+#  define OLDSAVEIX(cx)  (PL_scopestack[cx->blk_oldscopesp-1])
+#endif
+
+#ifndef CX_CUR
+#  define CX_CUR() (&cxstack[cxstack_ix])
+#endif
+
+#include "save_clearpadrange.c.inc"
+
+#if !HAVE_PERL_VERSION(5, 24, 0)
+#  include "cx_pushblock.c.inc"
+#  include "cx_pusheval.c.inc"
+#endif
+
+#if !HAVE_PERL_VERSION(5, 22, 0)
+#  include "block_start.c.inc"
+#  include "block_end.c.inc"
+#endif
+
 typedef struct SuspendedFrame SuspendedFrame;
 struct SuspendedFrame {
   SuspendedFrame *next;
@@ -28,17 +61,28 @@ struct SuspendedFrame {
       struct {
         PADOFFSET padix;
         U32 count;
-      } clearpad; /* for SAVEt_CLEARSV and SAVEt_CLEARPADRANGE */
+      } clearpad;      /* for SAVEt_CLEARSV and SAVEt_CLEARPADRANGE */
       struct {
         void (*func)(pTHX_ void *data);
         void *data;
-      } dx;       /* for SAVEt_DESTRUCTOR_X */
+      } dx;            /* for SAVEt_DESTRUCTOR_X */
+      GV *gv;          /* for SAVEt_SV + cur.sv, saved.sv */
+      int *iptr;       /* for SAVEt_INT... */
+      STRLEN *lenptr;  /* for SAVEt_STRLEN + cur.len, saved.len */
+      PADOFFSET padix; /* for SAVEt_PADSV_AND_MORTALIZE */
       struct {
-        GV *gv;
-        SV *curval;   /* the current value of *var that we should restore to */
-        SV *savedval; /* the saved value we should push to the savestack on restore */
-      } sv;       /* for SAVEt_SV */
+        SV *sv;
+        U32 mask, set;
+      } svflags;       /* for SAVEt_SET_SVFLAGS */
     } u;
+
+    union {
+      SV    *sv;      /* for SAVEt_SV, SAVEt_FREESV */
+      void  *ptr;     /* for SAVEt_COMPPAD, */
+      int    i;       /* for SAVEt_INT... */
+      STRLEN len;     /* for SAVEt_STRLEN */
+    } cur,    /* the current value that *thing that we should restore to */
+      saved;  /* the saved value we should push to the savestack on restore */
   } *saved;
 
   union {
@@ -47,6 +91,9 @@ struct SuspendedFrame {
     } eval;
     struct block_loop loop;
   };
+#ifdef HAVE_ITERVAR
+  SV *itervar;
+#endif
 };
 
 typedef struct {
@@ -65,7 +112,7 @@ static void debug_sv_summary(const SV *sv)
   if(SvROK(sv))
     fprintf(stderr, ",ROK");
   else if(SvIOK(sv))
-    fprintf(stderr, ",IV=%d", SvIVX(sv));
+    fprintf(stderr, ",IV=%" IVdf, SvIVX(sv));
 
   fprintf(stderr, "}");
 }
@@ -96,19 +143,6 @@ static void debug_showstack(const char *name)
     fprintf(stderr, "\n");
   }
 #endif
-}
-
-#define save_clearpadrange(padix, count)  MY_save_clearpadrange(aTHX_ padix, count)
-static void MY_save_clearpadrange(pTHX_ PADOFFSET padix, U32 count)
-{
-  /* Code stolen from PP(pp_padrange) in pp_hot.c */
-  const UV payload = (UV)(
-                (padix << (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT))
-              | (count << SAVE_TIGHT_SHIFT)
-              | SAVEt_CLEARPADRANGE);
-  dSS_ADD;
-  SS_ADD_UV(payload);
-  SS_ADD_END(1);
 }
 
 /*
@@ -182,7 +216,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
   }
 
-  I32 old_saveix = cx->blk_oldsaveix;
+  I32 old_saveix = OLDSAVEIX(cx);
   /* This is an over-estimate but it doesn't matter. We just waste a bit of RAM
    * temporarily
    */
@@ -210,7 +244,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         I32 count = (uv >> SAVE_TIGHT_SHIFT) & OPpPADRANGE_COUNTMASK;
         PL_savestack_ix--;
 
-        saved->type = SAVEt_CLEARPADRANGE;
+        saved->type = count == 1 ? SAVEt_CLEARSV : SAVEt_CLEARPADRANGE;
         saved->u.clearpad.padix = padix;
         saved->u.clearpad.count = count;
 
@@ -221,9 +255,55 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         UV padix = (uv >> SAVE_TIGHT_SHIFT);
         PL_savestack_ix--;
 
-        saved->type = SAVEt_CLEARPADRANGE;
+        saved->type = SAVEt_CLEARSV;
         saved->u.clearpad.padix = padix;
-        saved->u.clearpad.count = 1;
+
+        break;
+      }
+
+      case SAVEt_COMPPAD: {
+        /* This occurs as a side-effect of Perl_pad_new on 5.22 */
+        PL_savestack_ix -= 2;
+        void *pad = PL_savestack[PL_savestack_ix].any_ptr;
+
+        saved->type      = SAVEt_COMPPAD;
+        saved->saved.ptr = pad;
+        saved->cur.ptr   = PL_comppad;
+
+        PL_comppad = pad;
+        PL_curpad = PL_comppad ? AvARRAY(PL_comppad) : NULL;
+
+        break;
+      }
+
+      case SAVEt_FREESV: {
+        PL_savestack_ix -= 2;
+        void *sv = PL_savestack[PL_savestack_ix].any_ptr;
+
+        saved->type     = SAVEt_FREESV;
+        saved->saved.sv = sv;
+
+        break;
+      }
+
+      case SAVEt_INT_SMALL: {
+        PL_savestack_ix -= 2;
+        int val = ((int)uv >> SAVE_TIGHT_SHIFT);
+        int *var = PL_savestack[PL_savestack_ix].any_ptr;
+
+        /* In general we don't want to support this; but specifically on perls
+         * older than 5.20, this might be PL_tmps_floor
+         */
+        if(var != (int *)&PL_tmps_floor)
+          croak("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor");
+
+        saved->type    = SAVEt_INT;
+        saved->u.iptr  = var;
+        saved->cur.i   = *var;
+        saved->saved.i = val;
+
+        /* restore it for now */
+        *var = val;
 
         break;
       }
@@ -244,6 +324,30 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         break;
       }
 
+#ifdef SAVEt_STRLEN
+      case SAVEt_STRLEN: {
+        PL_savestack_ix -= 3;
+        STRLEN  val = PL_savestack[PL_savestack_ix].any_iv;
+        STRLEN *var = PL_savestack[PL_savestack_ix+1].any_ptr;
+
+        /* In general we don't want to support this; but specifically on perls
+         * older than 5.24, this might be PL_tmps_floor
+         */
+        if(var != (STRLEN *)&PL_tmps_floor)
+          croak("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor");
+
+        saved->type      = SAVEt_STRLEN;
+        saved->u.lenptr  = var;
+        saved->cur.len   = *var;
+        saved->saved.len = val;
+
+        /* restore it for now */
+        *var = val;
+
+        break;
+      }
+#endif
+
       case SAVEt_SV: {
         PL_savestack_ix -= 3;
         /* despite being called SAVEt_SV, the first field actually points at
@@ -259,13 +363,48 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         if(gv != PL_errgv)
           croak("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv");
 
-        saved->type = SAVEt_SV;
-        saved->u.sv.gv       = gv;
-        saved->u.sv.curval   = GvSV(gv); /* steal ownership */
-        saved->u.sv.savedval = val;      /* steal ownership */
+        saved->type     = SAVEt_SV;
+        saved->u.gv     = gv;
+        saved->cur.sv   = GvSV(gv); /* steal ownership */
+        saved->saved.sv = val;      /* steal ownership */
 
         /* restore it for now */
         GvSV(gv) = SvREFCNT_inc(val);
+
+        break;
+      }
+
+      case SAVEt_PADSV_AND_MORTALIZE: {
+        PL_savestack_ix -= 4;
+        SV *val         = PL_savestack[PL_savestack_ix  ].any_ptr;
+        AV *padav       = PL_savestack[PL_savestack_ix+1].any_ptr;
+        PADOFFSET padix = PL_savestack[PL_savestack_ix+2].any_uv;
+
+        if(padav != PL_comppad)
+          croak("TODO: Unsure how to handle a savestack entry of SAVEt_PADSV_AND_MORTALIZE with padav != PL_comppad");
+
+        SvREFCNT_inc(PL_curpad[padix]); /* un-mortalize */
+
+        saved->type     = SAVEt_PADSV_AND_MORTALIZE;
+        saved->u.padix  = padix;
+        saved->cur.sv   = PL_curpad[padix]; /* steal ownership */
+        saved->saved.sv = val;              /* steal ownership */
+
+        AvARRAY(padav)[padix] = SvREFCNT_inc(val);
+
+        break;
+      }
+
+      case SAVEt_SET_SVFLAGS: {
+        PL_savestack_ix -= 4;
+        SV *sv   = PL_savestack[PL_savestack_ix  ].any_ptr;
+        U32 mask = (U32)PL_savestack[PL_savestack_ix+1].any_i32;
+        U32 set  = (U32)PL_savestack[PL_savestack_ix+2].any_i32;
+
+        saved->type           = SAVEt_SET_SVFLAGS;
+        saved->u.svflags.sv   = sv;
+        saved->u.svflags.mask = mask;
+        saved->u.svflags.set  = set;
 
         break;
       }
@@ -277,14 +416,19 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     frame->savedlen++;
   }
 
-  if(cx->blk_oldsaveix != PL_savestack_ix)
-    croak("TODO: handle cx->blk_oldsaveix");
+  if(OLDSAVEIX(cx) != PL_savestack_ix)
+    croak("TODO: handle OLDSAVEIX");
 }
 
 static bool padname_is_normal_lexical(PADNAME *pname)
 {
   /* PAD slots without names are certainly not lexicals */
-  if(!pname || !PadnameLEN(pname))
+  if(!pname ||
+#if !HAVE_PERL_VERSION(5, 20, 0)
+    /*  Perl before 5.20.0 could put PL_sv_undef in PADNAMEs */
+    pname == &PL_sv_undef || 
+#endif
+    !PadnameLEN(pname))
     return FALSE;
 
   /* Outer lexical captures are not lexicals */
@@ -334,8 +478,18 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
         /* nothing else special */
         continue;
 
+      case CXt_LOOP_PLAIN:
+        frame->type = type;
+        frame->loop = cx->blk_loop;
+        frame->gimme = cx->blk_gimme;
+        break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
       case CXt_LOOP_ARY:
       case CXt_LOOP_LIST:
+#else
+      case CXt_LOOP_FOR:
+#endif
       case CXt_LOOP_LAZYSV:
       case CXt_LOOP_LAZYIV:
         if(!CxPADLOOP(cx))
@@ -344,11 +498,25 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
            */
           croak("Cannot suspend a foreach loop on non-lexical iterator");
 
-        /* fallthrough */
-      case CXt_LOOP_PLAIN:
         frame->type = type;
         frame->loop = cx->blk_loop;
         frame->gimme = cx->blk_gimme;
+
+#ifdef HAVE_ITERVAR
+#  ifdef USE_ITHREADS
+        if(cx->blk_loop.itervar_u.svp != (SV **)PL_comppad)
+          croak("TODO: Unsure how to handle a foreach loop with itervar != PL_comppad");
+#  else
+        if(cx->blk_loop.itervar_u.svp != &PAD_SVl(cx->blk_loop.my_op->op_targ))
+          croak("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))");
+#  endif
+
+        frame->itervar = SvREFCNT_inc(*CxITERVAR(cx));
+#else
+        if(CxITERVAR(cx) != &PAD_SVl(cx->blk_loop.my_op->op_targ))
+          croak("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))");
+        SvREFCNT_inc(cx->blk_loop.itersave);
+#endif
 
         if(type == CXt_LOOP_LAZYSV) {
           /* these two fields are refcounted, so we need to save them from
@@ -357,6 +525,12 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
           SvREFCNT_inc(frame->loop.state_u.lazysv.cur);
           SvREFCNT_inc(frame->loop.state_u.lazysv.end);
         }
+#if !HAVE_PERL_VERSION(5, 24, 0)
+        else if(type == CXt_LOOP_FOR) {
+          if(frame->loop.state_u.ary.ary)
+            SvREFCNT_inc(frame->loop.state_u.ary.ary);
+        }
+#endif
 
         continue;
 
@@ -446,22 +620,68 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     struct Saved *saved = &frame->saved[i];
 
     switch(saved->type) {
+      case SAVEt_CLEARSV:
+        save_clearsv(PL_curpad + saved->u.clearpad.padix);
+        break;
+
       case SAVEt_CLEARPADRANGE:
-        if(saved->u.clearpad.count == 1)
-          save_clearsv(PL_curpad + saved->u.clearpad.padix);
-        else
-          save_clearpadrange(saved->u.clearpad.padix, saved->u.clearpad.count);
+        save_clearpadrange(saved->u.clearpad.padix, saved->u.clearpad.count);
         break;
 
       case SAVEt_DESTRUCTOR_X:
         save_pushptrptr(saved->u.dx.func, saved->u.dx.data, saved->type);
         break;
 
-      case SAVEt_SV:
-        save_pushptrptr(saved->u.sv.gv, saved->u.sv.savedval, SAVEt_SV);
+      case SAVEt_COMPPAD:
+        PL_comppad = saved->saved.ptr;
+        save_pushptr(PL_comppad, saved->type);
 
-        SvREFCNT_dec(GvSV(saved->u.sv.gv));
-        GvSV(saved->u.sv.gv) = saved->u.sv.curval;
+        PL_comppad = saved->cur.ptr;
+        PL_curpad = PL_comppad ? AvARRAY(PL_comppad) : NULL;
+        break;
+
+      case SAVEt_FREESV:
+        save_freesv(saved->saved.sv);
+        break;
+
+      case SAVEt_INT:
+        *(saved->u.iptr) = saved->saved.i;
+        save_int(saved->u.iptr);
+
+        *(saved->u.iptr) = saved->cur.i;
+        break;
+
+      case SAVEt_SV:
+        save_pushptrptr(saved->u.gv, saved->saved.sv, SAVEt_SV);
+
+        SvREFCNT_dec(GvSV(saved->u.gv));
+        GvSV(saved->u.gv) = saved->cur.sv;
+        break;
+
+#ifdef SAVEt_STRLEN
+      case SAVEt_STRLEN:
+        *(saved->u.lenptr) = saved->saved.len;
+        Perl_save_strlen(aTHX_ saved->u.lenptr);
+
+        *(saved->u.lenptr) = saved->cur.len;
+        break;
+#endif
+
+      case SAVEt_PADSV_AND_MORTALIZE:
+        /*
+        PL_curpad[saved->u.padix] = saved->saved.sv;
+        save_padsv_and_mortalize(saved->u.padix);
+
+        SvREFCNT_dec(PL_curpad[saved->u.padix]);
+        PL_curpad[saved->u.padix] = saved->cur.sv;
+        */
+        break;
+
+      case SAVEt_SET_SVFLAGS:
+        /*
+        save_set_svflags(saved->u.svflags.sv,
+          saved->u.svflags.mask, saved->u.svflags.set);
+        */
         break;
 
       default:
@@ -476,6 +696,20 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 #define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
 static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 {
+  if(state->padlen) {
+    PAD *pad = PadlistARRAY(CvPADLIST(cv))[CvDEPTH(cv)];
+    PADOFFSET i;
+
+    /* slot 0 is always the @_ AV */
+    for(i = 1; i < state->padlen; i++) {
+      if(!state->padslots[i-1])
+        continue;
+
+      SvREFCNT_dec(PadARRAY(pad)[i]);
+      PadARRAY(pad)[i] = state->padslots[i-1];
+    }
+  }
+
   SuspendedFrame *frame, *next;
   for(frame = state->frames; frame; frame = next) {
     next = frame->next;
@@ -489,13 +723,37 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
         break;
 
       case CXt_LOOP_PLAIN:
+        cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
+        /* don't call cx_pushloop_plain() because it will get this wrong */
+        cx->blk_loop = frame->loop;
+        break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
       case CXt_LOOP_ARY:
       case CXt_LOOP_LIST:
+#else
+      case CXt_LOOP_FOR:
+#endif
       case CXt_LOOP_LAZYSV:
       case CXt_LOOP_LAZYIV:
         cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
         /* don't call cx_pushloop_plain() because it will get this wrong */
         cx->blk_loop = frame->loop;
+#if HAVE_PERL_VERSION(5, 24, 0)
+        cx->cx_type |= CXp_FOR_PAD;
+#endif
+
+#ifdef HAVE_ITERVAR
+#  ifdef USE_ITHREADS
+        cx->blk_loop.itervar_u.svp = (SV **)PL_comppad;
+#  else 
+        cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
+#  endif
+        SvREFCNT_dec(*CxITERVAR(cx));
+        *CxITERVAR(cx) = frame->itervar;
+#else
+        cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
+#endif
         break;
 
       case CXt_EVAL:
@@ -513,20 +771,6 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     resume_block(frame, cx);
 
     Safefree(frame);
-  }
-
-  if(state->padlen) {
-    PAD *pad = PadlistARRAY(CvPADLIST(cv))[CvDEPTH(cv)];
-    PADOFFSET i;
-
-    /* slot 0 is always the @_ AV */
-    for(i = 1; i < state->padlen; i++) {
-      if(!state->padslots[i-1])
-        continue;
-
-      SvREFCNT_dec(PadARRAY(pad)[i]);
-      PadARRAY(pad)[i] = state->padslots[i-1];
-    }
   }
 }
 
@@ -697,18 +941,28 @@ static OP *pp_leaveasync(pTHX)
   dSP;
   dMARK;
 
+  PERL_CONTEXT *cx = CX_CUR();
   SV *f = NULL;
+  SV *ret;
+  SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
   SuspendedState *state = suspendedstate_get(find_runcv(0));
   if(state && state->returning_future)
     f = state->returning_future;
 
   if(SvTRUE(ERRSV)) {
-    PUSHs(future_fail(f, ERRSV));
+    ret = future_fail(f, ERRSV);
   }
   else {
-    PUSHs(future_done_from_stack(f, mark));
+    ret = future_done_from_stack(f, mark);
   }
+
+  /* Pop extraneous stack items */
+  while(SP > oldsp)
+    POPs;
+
+  PUSHs(ret);
+  PUTBACK;
 
   return PL_op->op_next;
 }
@@ -782,8 +1036,53 @@ static OP *pp_await(pTHX)
   debug_showstack("Stack before suspend");
 
   if(!state) {
+    CV *outside = CvOUTSIDE(curcv);
+    bool outside_was_zero = false;
+
+    if(outside && !CvDEPTH(outside)) {
+      /* Pretend for a moment that outside is live, to prevent cv_clone()
+       * falsely warning about captured lexicals not being available, as we're
+       * about to fix those up anyway
+       */
+      outside_was_zero = true;
+      CvDEPTH(outside) = 1;
+    }
+
     /* Clone the CV and then attach suspendedstate magic to it */
     curcv = cv_clone(curcv);
+
+    if(outside_was_zero)
+      CvDEPTH(outside) = 0;
+
+    {
+      /* cv_clone() hasn't quite done the right thing for captured lexicals
+       * (i.e. PadnameOUTER), because it will have walked up to CvOUTSIDE of
+       * here to find the SV to copy. If the outside pad is now stale (e.g.
+       * because of a returned scope) that won't be live any more. We'll have
+       * to fetch them back from the correct place
+       */
+      PADLIST *plist = CvPADLIST(origcv);
+      PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(plist));
+      SV **origpad = PadARRAY(PadlistARRAY(plist)[CvDEPTH(origcv)]);
+      SV **newpad = PadARRAY(PadlistARRAY(CvPADLIST(curcv))[1]);
+      PADOFFSET padix;
+
+      for(padix = 1; padix <= PadnamelistMAX(PadlistNAMES(plist)); padix++) {
+        PADNAME *pname = padnames[padix];
+        if(pname &&
+#if !HAVE_PERL_VERSION(5, 20, 0)
+    /*  Perl before 5.20.0 could put PL_sv_undef in PADNAMEs */
+           pname != &PL_sv_undef &&
+#endif
+           PadnameOUTER(pname)) {
+          if(newpad[padix] == origpad[padix])
+            continue;
+          SvREFCNT_dec(newpad[padix]);
+          newpad[padix] = SvREFCNT_inc(origpad[padix]);
+        }
+      }
+    }
+
     state = suspendedstate_new(curcv);
   }
 

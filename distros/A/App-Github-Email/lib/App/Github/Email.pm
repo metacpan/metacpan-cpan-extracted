@@ -1,13 +1,13 @@
 package App::Github::Email;
-$App::Github::Email::VERSION = '0.2.0';
+$App::Github::Email::VERSION = '0.2.1';
 # ABSTRACT: Search and print particular Github user emails.
 
 use strict;
 use warnings;
 use v5.10;
 
+use JSON;
 use LWP::UserAgent;
-use Email::Address;
 use List::MoreUtils qw(uniq);
 
 
@@ -20,7 +20,10 @@ sub get_user {
 
     if ( $get_json->is_success ) {
         my $raw_json    = $get_json->decoded_content;
-        my @addresses   = Email::Address->parse($raw_json);
+        my $dec_json    = decode_json $raw_json;
+        my @push_events = grep { $_->{type} eq 'PushEvent' } @{$dec_json};
+        my @commits     = map { @{$_->{payload}->{commits}} } @push_events;
+        my @addresses   = map { $_->{author}->{email} } @commits;
         my @unique_addr = uniq @addresses;
         my @retrieved_addrs;
 
@@ -52,15 +55,15 @@ App::Github::Email - Search and print particular Github user emails.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
-	github-email --username <Github username>
-    
+    github-email --username <Github username>
+
     # Example
-	github-email --username faraco
-	github-email --u faraco 
+    github-email --username faraco
+    github-email --u faraco
 
 =head2 Functions
 

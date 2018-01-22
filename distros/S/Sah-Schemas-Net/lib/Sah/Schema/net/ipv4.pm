@@ -1,7 +1,7 @@
 package Sah::Schema::net::ipv4;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [obj => {
     summary => 'IPv4 address',
@@ -26,7 +26,7 @@ Sah::Schema::net::ipv4 - IPv4 address
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2018-01-14.
+This document describes version 0.003 of Sah::Schema::net::ipv4 (from Perl distribution Sah-Schemas-Net), released on 2018-01-17.
 
 =head1 DESCRIPTION
 

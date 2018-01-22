@@ -24,6 +24,7 @@ my @files = (
     'lib/DateTime/TimeZone/Africa/Monrovia.pm',
     'lib/DateTime/TimeZone/Africa/Nairobi.pm',
     'lib/DateTime/TimeZone/Africa/Ndjamena.pm',
+    'lib/DateTime/TimeZone/Africa/Sao_Tome.pm',
     'lib/DateTime/TimeZone/Africa/Tripoli.pm',
     'lib/DateTime/TimeZone/Africa/Tunis.pm',
     'lib/DateTime/TimeZone/Africa/Windhoek.pm',

@@ -1,3 +1,9 @@
+0.003   2018-01-16 (PERLANCAR)
+
+	- Add conversion pattern: %b (base58 character) and %B (base56
+	  character).
+
+
 0.002   2018-01-09 (PERLANCAR)
 
 	- Tweak Rinci metadata: allow num as first arg.

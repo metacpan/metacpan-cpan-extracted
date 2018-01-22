@@ -1,19 +1,16 @@
 package CGI::Pure::Fast;
 
-# Pragmas.
 use base qw(CGI::Pure);
 use strict;
 use warnings;
 
-# Modules.
 use FCGI;
 use Readonly;
 
 # Constants.
 Readonly::Scalar my $FCGI_LISTEN_QUEUE_DEFAULT => 100;
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # External request.
 our $EXT_REQUEST;
@@ -143,17 +140,17 @@ Common Gateway Interface Class for loading/saving object in file.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

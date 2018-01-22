@@ -2,7 +2,7 @@ NAME
     Log::Contextual - Simple logging interface with a contextual log
 
 VERSION
-    version 0.008000
+    version 0.008001
 
 SYNOPSIS
      use Log::Contextual qw( :log :dlog set_logger with_logger );
@@ -567,7 +567,7 @@ AUTHOR
     Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+    This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

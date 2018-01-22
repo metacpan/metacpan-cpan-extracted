@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  HTTP::Response: '0'
   JSON::Typist: '0.005'
   Test::Abortable: '0'
   Test::Deep: '0'
@@ -47,7 +48,7 @@ resources:
   bugtracker: https://github.com/fastmail/JMAP-Tester/issues
   homepage: https://github.com/fastmail/JMAP-Tester
   repository: https://github.com/fastmail/JMAP-Tester.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -163,7 +164,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/Git::NextVersion'
       version: '2.043'
@@ -307,7 +308,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/@Git/Check'
       version: '2.043'
@@ -324,7 +325,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -337,11 +338,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.016'
+          tag: '0.017'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -356,7 +357,7 @@ x_Dist_Zilla:
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.15.1
           repo_root: .
       name: '@RJBS/@Git/Push'
       version: '2.043'
@@ -364,7 +365,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.14.2
+          git_version: 2.15.1
           include_authors: 0
           include_releaser: 1
           order_by: name

@@ -1,7 +1,7 @@
 package Sah::Schemas::Net;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to network (IP address, hostnames, etc)
@@ -18,7 +18,7 @@ Sah::Schemas::Net - Schemas related to network (IP address, hostnames, etc)
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2018-01-14.
+This document describes version 0.003 of Sah::Schemas::Net (from Perl distribution Sah-Schemas-Net), released on 2018-01-17.
 
 =head1 DESCRIPTION
 
@@ -29,10 +29,6 @@ Todo:
  net::ip_range
  net::ipv4_range
  net::ipv6_range
-
- net::hostname
-
- net::portnum
 
 =head1 HOMEPAGE
 

@@ -1,5 +1,9 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.11    Sun Jan 21 21:47:00 GMT 2018
+ - handle JSON-decoding errors
+ - Promise->all now class method
+
 0.10    Sun Jan  7 05:27:35 GMT 2018
  - exportable promise_code()
 

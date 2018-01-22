@@ -1,0 +1,85 @@
+NAME
+    AnyEvent::ZabbixSender - simple and efficient zabbix data submission
+
+SYNOPSIS
+       use AnyEvent::ZabbixSender;
+
+DESCRIPTION
+    This module is an AnyEvent user, you need to make sure that you use and
+    run a supported event loop.
+
+    I't implements the zabbix version 2.0-3.4 protocol for item data
+    submission.
+
+  METHODS
+    $zbx = new AnyEvent::ZabbixSender [key => value...]
+        Creates a (virtual) connection to a zabbix server. Since each
+        submission requires a new TCP connection, creating the connection
+        object does not actually contact the server.
+
+        The connection object will linger in the destructor until all data
+        has been submitted or thrown away.
+
+        You can specify various configuration parameters. The term @items
+        refers to an array with "[key, value, clock]" array-refs.
+
+        server => "$hostname:$port" (default: "localhost:10051")
+            The zabbix server to connect to.
+
+        host => $name (default: local nodename)
+            The submission host, the "technical" name from tghe zabbix
+            configuration.
+
+        delay => $seconds (default: 0)
+            If non-zero, then the module will gather data submissions for up
+            to this number of seconds before actually submitting them as a
+            single batch.
+
+            Submissions can get batched even if 0, as events submitted while
+            the connection is being established or retried will be batched
+            together in any case.
+
+        queue_time => $seconds (default: 3600)
+            The amount of time a data item will be queued until it is thrown
+            away when the server cannot be reached.
+
+        linger_time => $seconds (default: same as "queue_time")
+            The amount of time the module will linger in its destructor
+            until all items have been submitted.
+
+        retry_min => $seconds (default: 30)
+        retry_max => $seconds (default: 300)
+            The minimum and maximum retry times when the server cannot be
+            reached.
+
+        on_error => $cb->($zbx, \@items, $msg) (default: log and continue)
+            Called on any protocol errors - these generally indicate that
+            something other than a zabbix server is running on a port. The
+            given key-value pairs are the lost items.
+
+        on_loss => $cb->($zbx, \@items) (default: log and continue)
+            Will be called when some data items are thrown away (this
+            happens if the server isn't reachable for at least "queue_time"
+            seconds),
+
+        on_response => $cb->($zbx, \@items, \%response) (default: not
+        called)
+            Will be called with the (generally rather useless) response form
+            the zabbix server.
+
+    $zbx->submit ($k, $v[, $clock[, $host]])
+        Submits a new key-value pair to the zabbix server. If $clock is
+        missing or "undef", then "AE::now" is used for the event timestamp.
+        If $host is missing, then the default set during object creation is
+        used.
+
+    $zbx->submit_multiple ([ [$k, $v, $clock, $host]... ])
+        Like "submit", but submits many key-value pairs at once.
+
+SEE ALSO
+    AnyEvent.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

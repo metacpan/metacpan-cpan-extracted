@@ -1,0 +1,17 @@
+[
+   {
+      "R" : [
+         {
+            "Edit" : [
+               null,
+               {
+                  "id" : "edit_find",
+                  "label" : "Find"
+               },
+               null
+            ]
+         }
+      ],
+      "rule_id" : 0
+   }
+]

@@ -13,7 +13,6 @@ use strict;
 use warnings;
 
 use MVC::Neaf qw(:sugar);
-use MVC::Neaf::X::Form;
 
 # Some inline html
 my $tpl = <<'TT';
@@ -50,20 +49,20 @@ my $tpl = <<'TT';
 TT
 
 # Prepare a form once.
-my $rules = MVC::Neaf::X::Form->new({
+neaf form => "rules" => {
     name    => [ required => '\w+' ],
     email   => [ required => '\S+@\S+' ],
     email2  => [ required => '\S+@\S+' ],
     country => '..',
     age     => '\d+',
-});
+};
 
 # Apply to every incoming request
 get+post '/08/form' => sub {
     my $req = shift;
 
     # run basic validation
-    my $form = $req->form( $rules );
+    my $form = $req->form( "rules" );
 
     # Add custom rules that do not fit into form definition
     # All errors will be presented to the user

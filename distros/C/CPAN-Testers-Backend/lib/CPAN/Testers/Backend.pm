@@ -1,5 +1,5 @@
 package CPAN::Testers::Backend;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Backend processes for CPAN Testers data and operations
 
 #pod =head1 DESCRIPTION
@@ -43,7 +43,7 @@ CPAN::Testers::Backend - Backend processes for CPAN Testers data and operations
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -73,7 +73,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords James E Keenan Joel Berger
+=for stopwords James E Keenan Joel Berger Mohammad S Anwar
 
 =over 4
 
@@ -84,6 +84,10 @@ James E Keenan <jkeenan@cpan.org>
 =item *
 
 Joel Berger <joel.a.berger@gmail.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =back
 

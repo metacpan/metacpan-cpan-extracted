@@ -12,10 +12,10 @@ use Test::More;
 use Test::Deep;
 use Test::File;
 use Test::Warn;
+use Path::Tiny;
 
-use File::Slurp;
 use File::Temp;
-use Path::Iter;
+
 use File::Copy::Recursive qw(fcopy rcopy dircopy fmove rmove dirmove pathmk pathrm pathempty pathrmdir rcopy_glob rmove_glob);
 
 note "functionality w/ default globals";
@@ -66,11 +66,11 @@ note "functionality w/ default globals";
     {
         # that fcopy copies files and symlinks is covered by the dircopy tests, specifically _is_deeply_path()
         my $rv = fcopy( "$tmpd/orig/data", "$tmpd/fcopy" );
-        is( read_file("$tmpd/orig/data"), read_file("$tmpd/fcopy"), "fcopy() defaults as expected when target does not exist" );
+        is( path("$tmpd/orig/data")->slurp, path("$tmpd/fcopy")->slurp, "fcopy() defaults as expected when target does not exist" );
 
-        write_file( "$tmpd/fcopyexisty", "oh hai" );
+        path("$tmpd/fcopyexisty")->spew("oh hai");
         my @fcopy_rv = fcopy( "$tmpd/orig/data", "$tmpd/fcopyexisty" );
-        is( read_file("$tmpd/orig/data"), read_file("$tmpd/fcopyexisty"), "fcopy() defaults as expected when target does exist" );
+        is( path("$tmpd/orig/data")->slurp, path("$tmpd/fcopyexisty")->slurp, "fcopy() defaults as expected when target does exist" );
 
         $rv = fcopy( "$tmpd/orig", "$tmpd/fcopy" );
         ok( !$rv, "fcopy() returns false if source is a directory" );
@@ -80,12 +80,12 @@ note "functionality w/ default globals";
     {
 
         # that fmove copies files and symlinks is covered by the dirmove tests, specifically _is_deeply_path()
-        write_file( "$tmpd/data", "oh hai" );
+        path("$tmpd/data")->spew("oh hai");
         my $rv = fmove( "$tmpd/data", "$tmpd/fmove" );
         ok( $rv && !-e "$tmpd/data", "fmove() removes source file (target does not exist)" );
 
-        write_file( "$tmpd/existy",      "42" );
-        write_file( "$tmpd/fmoveexisty", "oh hai" );
+        path("$tmpd/existy")->spew("42");
+        path("$tmpd/fmoveexisty")->spew("oh hai");
         my @fmove_rv = fmove( "$tmpd/existy", "$tmpd/fmoveexisty" );
         ok( $rv && !-e "$tmpd/existy", "fmove() removes source file (target does exist)" );
 
@@ -119,14 +119,18 @@ note "functionality w/ default globals";
         File::Copy::Recursive::rcopy( "$tmpd/data_tnl", "$tmpd/rcopy/" );
         is( @fcopy_calls, 3, 'rcopy() dispatches file (w/ no trailing new line) to fcopy()' );
 
-        File::Copy::Recursive::rcopy( "$tmpd/symlink", "$tmpd/rcopy/" );
-        is( @fcopy_calls, 4, 'rcopy() dispatches symlink to fcopy()' );
+      SKIP: {
+            skip "symlink tests not applicable on systems w/ out symlink support ($^O)", 3 unless $File::Copy::Recursive::CopyLink;
 
-        File::Copy::Recursive::rcopy( "$tmpd/symlink-broken", "$tmpd/rcopy/" );
-        is( @fcopy_calls, 5, 'rcopy() dispatches broken symlink to fcopy()' );
+            File::Copy::Recursive::rcopy( "$tmpd/symlink", "$tmpd/rcopy/" );
+            is( @fcopy_calls, 4, 'rcopy() dispatches symlink to fcopy()' );
 
-        File::Copy::Recursive::rcopy( "$tmpd/symlink-loopy", "$tmpd/rcopy/" );
-        is( @fcopy_calls, 6, 'rcopy() dispatches loopish symlink to fcopy()' );
+            File::Copy::Recursive::rcopy( "$tmpd/symlink-broken", "$tmpd/rcopy/" );
+            is( @fcopy_calls, 5, 'rcopy() dispatches broken symlink to fcopy()' );
+
+            File::Copy::Recursive::rcopy( "$tmpd/symlink-loopy", "$tmpd/rcopy/" );
+            is( @fcopy_calls, 6, 'rcopy() dispatches loopish symlink to fcopy()' );
+        }
     }
 
     # rmove()
@@ -155,14 +159,18 @@ note "functionality w/ default globals";
         File::Copy::Recursive::rmove( "$tmpd/data_tnl", "$tmpd/rmove/" );
         is( @fmove_calls, 3, 'rmove() dispatches file (w/ no trailing new line) to fcopy()' );
 
-        File::Copy::Recursive::rmove( "$tmpd/symlink", "$tmpd/rmove/" );
-        is( @fmove_calls, 4, 'rmove() dispatches symlink to fcopy()' );
+      SKIP: {
+            skip "symlink tests not applicable on systems w/ out symlink support ($^O)", 3 unless $File::Copy::Recursive::CopyLink;
 
-        File::Copy::Recursive::rmove( "$tmpd/symlink-broken", "$tmpd/rmove/" );
-        is( @fmove_calls, 5, 'rmove() dispatches broken symlink to fcopy()' );
+            File::Copy::Recursive::rmove( "$tmpd/symlink", "$tmpd/rmove/" );
+            is( @fmove_calls, 4, 'rmove() dispatches symlink to fcopy()' );
 
-        File::Copy::Recursive::rmove( "$tmpd/symlink-loopy", "$tmpd/rmove/" );
-        is( @fmove_calls, 6, 'rmove() dispatches loopish symlink to fcopy()' );
+            File::Copy::Recursive::rmove( "$tmpd/symlink-broken", "$tmpd/rmove/" );
+            is( @fmove_calls, 5, 'rmove() dispatches broken symlink to fcopy()' );
+
+            File::Copy::Recursive::rmove( "$tmpd/symlink-loopy", "$tmpd/rmove/" );
+            is( @fmove_calls, 6, 'rmove() dispatches loopish symlink to fcopy()' );
+        }
     }
 
     # rcopy_glob()
@@ -234,7 +242,7 @@ note "functionality w/ 'behavior' globals";
 
         local $curr_unlink = sub { $! = 5; return; };
         mkdir "$tmpd/derp";
-        write_file( "$tmpd/derp/data", "I exist therefor I am." );
+        path("$tmpd/derp/data")->spew("I exist therefor I am.");
 
         warning_like {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp/data" );
@@ -255,7 +263,7 @@ note "functionality w/ 'behavior' globals";
 
         local $curr_unlink = sub { $! = 5; return; };
         mkdir "$tmpd/derp";
-        write_file( "$tmpd/derp/data", "I exist therefor I am." );
+        path("$tmpd/derp/data")->spew("I exist therefor I am.");
 
         warnings_are {
             my $rv = File::Copy::Recursive::fcopy( "$tmpd/orig/data", "$tmpd/derp/data" );
@@ -301,12 +309,14 @@ sub _get_fresh_tmp_dir {
     my $tmpd = File::Temp->newdir;
     for my $dir ( _get_dirs() ) {
         mkdir "$tmpd/$dir" or die "Could not mkdir($tmpd/$dir) :$!\n";
-        write_file( "$tmpd/$dir/empty",    "" );
-        write_file( "$tmpd/$dir/data",     "oh hai\n$tmpd/$dir" );
-        write_file( "$tmpd/$dir/data_tnl", "oh hai\n$tmpd/$dir\n" );
-        symlink( "data",    "$tmpd/$dir/symlink" );
-        symlink( "noexist", "$tmpd/$dir/symlink-broken" );
-        symlink( "..",      "$tmpd/$dir/symlink-loopy" );
+        path("$tmpd/$dir/empty")->spew("");
+        path("$tmpd/$dir/data")->spew("oh hai\n$tmpd/$dir");
+        path("$tmpd/$dir/data_tnl")->spew("oh hai\n$tmpd/$dir\n");
+        if ($File::Copy::Recursive::CopyLink) {
+            symlink( "data",    "$tmpd/$dir/symlink" );
+            symlink( "noexist", "$tmpd/$dir/symlink-broken" );
+            symlink( "..",      "$tmpd/$dir/symlink-loopy" );
+        }
     }
 
     return $tmpd;
@@ -325,7 +335,7 @@ sub _is_deeply_path {
             is( readlink("$got_dir/$path"), readlink("$expected_dir/$path"), "  - symlink target preserved (…$path)" );
         }
         elsif ( $got_tree_hr->{$path} eq "file" ) {
-            is( read_file("$got_dir/$path"), read_file("$expected_dir/$path"), "  - file contents preserved (…$path)" );
+            is( path("$got_dir/$path")->slurp, path("$expected_dir/$path")->slurp, "  - file contents preserved (…$path)" );
         }
     }
 }
@@ -335,7 +345,7 @@ sub _get_tree_hr {
     return if !-d $dir;
 
     my %tree;
-    my $fetch = Path::Iter::get_iterator($dir);
+    my $fetch = path($dir)->iterator;
 
     while ( my $next_path = $fetch->() ) {
         my $normalized_next_path = $next_path;

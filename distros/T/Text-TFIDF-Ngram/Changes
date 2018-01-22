@@ -1,0 +1,29 @@
+Revision history for Text-TFIDF-Ngram
+
+0.0205 2018-01-18 15:21:20
+    - Improved documentation.
+    - Added the previously hidden file_tfidf attribute.
+
+0.0204 2018-01-17 23:14:53
+    - Skip the token-allowed, lone single quote when processing ngrams.
+    - Fix the eg/analyze program slightly.
+
+0.0203 2018-01-17 19:53:18
+    - Improved documentation.
+    - Added a handy MANIFEST.SKIP!
+
+0.0202 2018-01-17 19:25:38
+    - Fixed the distribution name in the bugs and repo links.
+    - Specified the minimum version of List::Util to use.
+
+0.0201 2018-01-16 21:44:49
+    - Improved documentation.
+    - Improved the eg/analyze program.
+
+0.02 2018-01-16 19:12:16
+    - Added stopwords feature and tests.
+    - Improved documentation.
+
+0.01 2018-01-16 17:01:35
+    - Minted by Dist::Zilla.
+    - Imported some funtionality from Text::IFIDF.

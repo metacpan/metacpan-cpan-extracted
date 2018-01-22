@@ -4,7 +4,7 @@
       "Tim Bunce <Tim.Bunce@pobox.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -74,19 +74,19 @@
    "provides" : {
       "Dist::Surveyor" : {
          "file" : "lib/Dist/Surveyor.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "Dist::Surveyor::DB_File" : {
          "file" : "lib/Dist/Surveyor/DB_File.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "Dist::Surveyor::Inquiry" : {
          "file" : "lib/Dist/Surveyor/Inquiry.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       },
       "Dist::Surveyor::MakeCpan" : {
          "file" : "lib/Dist/Surveyor/MakeCpan.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -98,13 +98,13 @@
          "web" : "https://github.com/Grinnz/Dist-Surveyor"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>",
       "Naveed Massjouni <naveedm9@gmail.com>",
       "Nelo Onyiah <nelo.onyiah@gmail.com>",
       "Shmuel Fomberg <shmuelfomberg@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

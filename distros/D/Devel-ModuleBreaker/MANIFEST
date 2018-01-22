@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Devel/FileBreaker.pm
+lib/Devel/ModuleBreaker.pm
+lib/Devel/SubBreaker.pm
+t/00-load.t
+t/01-modulebreaker.t
+t/02-subbreaker.t
+t/03-filebreaker.t
+t/bptracker.pl
+t/Foo/Some/Module.pm
+t/IncludeAll.pm
+t/Some/Module.pm
+t/Some/Module/Submodule.pm
+t/Some/OtherModule.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+

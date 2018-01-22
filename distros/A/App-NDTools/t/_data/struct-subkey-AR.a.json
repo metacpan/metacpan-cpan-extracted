@@ -1,0 +1,4 @@
+{
+    "one": { "same": 1 },
+    "two": { "same": 1, "removed": 1 }
+}

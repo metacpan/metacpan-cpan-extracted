@@ -17,12 +17,12 @@ sub new {
 }
 
 sub create {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        bank_account_id => $params->{bank_account_id},
-        amount          => $params->{amount},
-        currency        => $params->{currency} || 'JPY',
+        bank_account_id => $params{bank_account_id},
+        amount          => $params{amount},
+        currency        => $params{currency} || 'JPY',
     };
 
     my $res = $self->client->request(
@@ -34,7 +34,7 @@ sub create {
 }
 
 sub all {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -47,10 +47,10 @@ sub all {
 }
 
 sub cancel {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        id => $params->{id},
+        id => $params{id},
     };
 
     my $res = $self->client->request(

@@ -29,12 +29,11 @@ around new => sub ( $orig, $self, $dist ) {
     if ( $ENV{PAR_TEMP} && $dist eq $ENV{PAR_TEMP} ) {
 
         # dist is the PAR dist
-        return $self->$orig(
-            {   root         => undef,
-                is_cpan_dist => 1,
-                share_dir    => P->path( $ENV{PAR_TEMP} . '/inc/share/' )->to_string,
-            }
-        );
+        return $self->$orig( {
+            root         => undef,
+            is_cpan_dist => 1,
+            share_dir    => P->path( $ENV{PAR_TEMP} . '/inc/share/' )->to_string,
+        } );
     }
 
     my $module_name;
@@ -51,12 +50,11 @@ around new => sub ( $orig, $self, $dist ) {
         if ( my $root = $self->find_dist_root($dist) ) {
 
             # path is a part of the dist
-            return $self->$orig(
-                {   root         => $root->to_string,
-                    is_cpan_dist => 0,
-                    share_dir    => $root . 'share/',
-                }
-            );
+            return $self->$orig( {
+                root         => $root->to_string,
+                is_cpan_dist => 0,
+                share_dir    => $root . 'share/',
+            } );
         }
         else {
 
@@ -109,25 +107,23 @@ around new => sub ( $orig, $self, $dist ) {
     if ( -f $module_lib . "auto/share/dist/$dist_name/dist.perl" ) {
 
         # module is installed
-        return $self->$orig(
-            {   root         => undef,
-                is_cpan_dist => 1,
-                share_dir    => $module_lib . "auto/share/dist/$dist_name/",
-                module       => P->perl->module( $module_name, $module_lib ),
-            }
-        );
+        return $self->$orig( {
+            root         => undef,
+            is_cpan_dist => 1,
+            share_dir    => $module_lib . "auto/share/dist/$dist_name/",
+            module       => P->perl->module( $module_name, $module_lib ),
+        } );
     }
     elsif ( $self->dir_is_dist_root("$module_lib/../") ) {
         my $root = P->path("$module_lib/../")->to_string;
 
         # module is a dist
-        return $self->$orig(
-            {   root         => $root,
-                is_cpan_dist => 0,
-                share_dir    => $root . 'share/',
-                module       => P->perl->module( $module_name, $module_lib ),
-            }
-        );
+        return $self->$orig( {
+            root         => $root,
+            is_cpan_dist => 0,
+            share_dir    => $root . 'share/',
+            module       => P->perl->module( $module_name, $module_lib ),
+        } );
     }
 
     return;
@@ -355,7 +351,7 @@ sub _build_docker ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 109, 159             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
+## |    3 | 107, 155             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -28,6 +28,7 @@ lib/WebService/Slack/WebApi/Search.pm
 lib/WebService/Slack/WebApi/Stars.pm
 lib/WebService/Slack/WebApi/Team.pm
 lib/WebService/Slack/WebApi/Users.pm
+lib/WebService/Slack/WebApi/Users/Profile.pm
 minil.toml
 t/00_compile.t
 t/01_web_api.t

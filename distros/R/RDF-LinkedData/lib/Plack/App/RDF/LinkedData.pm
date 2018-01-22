@@ -5,6 +5,9 @@ use parent qw( Plack::Component );
 use RDF::LinkedData;
 use URI::NamespaceMap;
 use Plack::Request;
+use Try::Tiny;
+use Carp;
+use Module::Load::Conditional qw[can_load];
 
 =head1 NAME
 
@@ -12,11 +15,11 @@ Plack::App::RDF::LinkedData - A Plack application for running RDF::LinkedData
 
 =head1 VERSION
 
-Version 1.02
+Version 1.92
 
 =cut
 
- our $VERSION = '1.02';
+ our $VERSION = '1.92';
 
 
 =head1 SYNOPSIS
@@ -52,6 +55,11 @@ It is possible to make it run with a single command line, e.g.:
 This will start a server with the default config on localhost on port
 5000, so the URIs you're going serve from the file data.ttl will have
 to have a base URI C<http://localhost:5000/>.
+
+There is also a C<LOG_ADAPTER> that can be set to any of
+L<Log::Any::Adapter> to send logging to the console. If used with
+L<Log::Any::Adapter::Screen>, several other environment variables can
+be used to further control it.
 
 =head3 Using perlrdf command line tool
 
@@ -272,6 +280,17 @@ checked on every request to see if the description must be
 regenerated. If you use the C<add_void> feature, you can force
 regeneration on the next request by touching the file.
 
+=head2 Read-write support
+
+Some recent effort has gone into experimental write support, which for
+this module has the implications that a boolean option
+C<writes_enabled> that configures the application for writes. This is
+also meant as security, unless set to true, writes will never be
+performed. To support writes, a C<class> option can be set with a
+class name, which can be instantiated to replace
+L<RDF::LinkedData>. See L<RDF::LinkedData::RWHypermedia> for more on
+this.
+
 =head1 FEEDBACK WANTED
 
 Please contact the author if this documentation is unclear. It is
@@ -309,20 +328,26 @@ Will be called by Plack to set the application up.
 
 Will be called by Plack to process the request.
 
-=back
-
 =cut
 
 
 sub prepare_app {
 	my $self = shift;
 	my $config = $self->{config};
-	$self->{linkeddata} = RDF::LinkedData->new(store => $config->{store},
-															 endpoint_config => $config->{endpoint},
-															 void_config => $config->{void},
-															 fragments_config => $config->{fragments},
-															 base_uri => $config->{base_uri}
-															);
+	if (defined $config->{'class'}) {
+	  my $class = $config->{'class'};
+	  unless (can_load( modules => { $class => 0 })) {
+		 croak "Configured $class cannot be loaded, is it installed?";
+	  }
+	  try {
+		 $self->{linkeddata} = $class->new($config);
+	  } catch {
+		 croak "Application cannot use $class as configured.";
+	  };
+	  croak "Configured $class not a subclass of RDF::LinkedData" unless ($self->{linkeddata}->isa('RDF::LinkedData'));
+	} else {
+	  $self->{linkeddata} = RDF::LinkedData->new($config);
+	}
 	$self->{linkeddata}->namespaces(URI::NamespaceMap->new($config->{namespaces})) if ($config->{namespaces});
 	# Ensure that certain namespaces are always declared
 	$self->{linkeddata}->guess_namespaces('rdf', 'dc', 'xsd', 'void');
@@ -334,12 +359,11 @@ sub call {
 	my $req = Plack::Request->new($env);
 	my $uri = $req->uri;
 	my $ld = $self->{linkeddata};
-	my $endpoint_path;
-	if ($ld->has_endpoint) {
-	  $endpoint_path = $ld->endpoint_config->{endpoint_path};
-	}
-	unless (($req->method eq 'GET') || ($req->method eq 'HEAD')
-			  || (($req->method eq 'POST') && defined($endpoint_path) && ($uri =~ m|$endpoint_path$|))) {
+
+	# Never return 405 here if writes are enabled by config, only do it if there isn't a read operation and writes are not enabled
+	my $does_read_operation = $self->does_read_operation($req);
+	$ld->does_read_operation($does_read_operation);
+	unless ($does_read_operation || $self->{config}->{writes_enabled}) {
 		return [ 405, [ 'Content-type', 'text/plain' ], [ 'Method not allowed' ] ];
 	}
 
@@ -347,17 +371,49 @@ sub call {
 		return [ 302, [ 'Location', $ld->base_uri . '/' ], [ '' ] ];
 	}
 
-	if ($uri->as_iri =~ m!^(.+?)/?(page|data)$!) {
-		$uri = URI->new($1);
-		$ld->type($2);
+	if ($uri->as_iri =~ m!^(.+?)/?(page|data|controls)$!) {
+	  $uri = URI->new($1);
+	  $ld->type($2);
+	} else {
+	  $ld->type('');
 	}
 	$ld->request($req);
 	return $ld->response($uri)->finalize;
 }
 
+=item C<< auth_required ( $request ) >>
+
+A method that returns true if the current request will require authorization.
+
+=cut
+
+sub auth_required {
+	my ($self, $req) = @_;
+	return ($self->{config}->{writes_enabled} && (! $self->does_read_operation($req)));
+}
+
+=item C<< does_read_operation ( $request ) >>
+
+A method that will return true if the current request is a pure read operation.
+
+=cut
+
+sub does_read_operation {
+	my ($self, $req) = @_;
+	my $uri = $req->uri;
+	my $endpoint_path;
+	my $ld = $self->{linkeddata}; # Might be a performance problem
+	if ($ld->has_endpoint) {
+	  $endpoint_path = $ld->endpoint_config->{endpoint_path};
+	}
+	return (($req->method eq 'GET') || ($req->method eq 'HEAD')
+			  || (($req->method eq 'POST') && defined($endpoint_path) && ($uri =~ m|$endpoint_path$|)))
+}
+
 1;
 
 
+=back
 
 =head1 AUTHOR
 
@@ -365,7 +421,7 @@ Kjetil Kjernsmo, C<< <kjetilk@cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo
+Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kjetil Kjernsmo
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

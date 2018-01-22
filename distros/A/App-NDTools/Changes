@@ -1,0 +1,9 @@
+Revision history for Struct-Path-JsonPointer
+
+0.5.0   2018-01-22
+        - Struct::* depends updated, related code fixed
+        - ndquery: --nopretty fixed
+        - nddiff: alert for deprecated '<<' hook in path removed
+        - nddiff: deprecated opt --path removed
+        - First cpan release.
+

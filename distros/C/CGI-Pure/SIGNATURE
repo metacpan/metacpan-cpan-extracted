@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,60 +12,60 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 119a99e9b9b48c34925697877ebcaf40877b2fcb Changes
-SHA1 637eba150e3f9d664c2dcd4e03d27ef167559947 LICENSE
+SHA1 ca0a741c91e26302638a8629d9218b11b1b3a214 Changes
+SHA1 c5776d57920d549e92bf2643709f0cfb57e52997 LICENSE
 SHA1 b050a10bf7798490910520ae47314028d17191b6 MANIFEST
-SHA1 a4b6be4a8c74703465e38c3e3b53e80d78b29050 META.yml
-SHA1 dad0180d49c8b67e1be1867295d4fc9c0e1e8eda Makefile.PL
-SHA1 1c255b538444368a4c835bcfc3f04bc0de9cdbfe Pure.pm
-SHA1 0c8656fdf6b5a4f2810928b677717eb6e2ceb60a Pure/Save.pm
-SHA1 df4e41beae3d8e64198ff09740bbb1fc8231cd29 README
+SHA1 41a3b6bb467b6972ffb7cda7e09d5c0d735e56c3 META.yml
+SHA1 2df8be21b27f1985a21b12e71e807dc1fb0313db Makefile.PL
+SHA1 722da12440ddcd7a64bd36271f2a6904b829f6b5 Pure.pm
+SHA1 15331ed70e45e1269ced4b934923fab619c460b7 Pure/Save.pm
+SHA1 f32582fb343cbfc0299098beb87ef19280ef0e18 README
 SHA1 9de42c42c9e37f6b3c8fa4931ff90b35267a76e7 examples/ex1.pl
 SHA1 877be8e9fb55d9b1392d079a4a29ab0b1df2de14 examples/ex2.pl
 SHA1 15de0d749430689ee091c80879d81ab698a52bd8 examples/ex3.pl
 SHA1 d58f2292af38f2940085617391408861a3320a9f examples/ex4.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
 SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 3488d3794d29a957302c7b63bcc7ab25960f5010 t/CGI-Pure-Save/01-use.t
-SHA1 8b5e03fd97e4f475f83c5618e5734f3895d21596 t/CGI-Pure-Save/02-version.t
-SHA1 84d67925af67b8fb09fc7c553d2c543259180e62 t/CGI-Pure-Save/03-new.t
-SHA1 603bd0d8031144d61d79999cf601fdd04bac2be4 t/CGI-Pure-Save/04-save.t
-SHA1 719f93615e90ece8e460021bd311425823c4f2f2 t/CGI-Pure-Save/05-load.t
-SHA1 ed10942a47940924e8bd9e8a40f54b00dd54e8d3 t/CGI-Pure/01-use.t
-SHA1 054579231b239effc668418ef884781775b326e4 t/CGI-Pure/02-version.t
-SHA1 750f1a516ee8050cb08d41ab45e75d4ae08cee60 t/CGI-Pure/03-new.t
-SHA1 88175e0df31eff578a698702abdfeb89d877b1a8 t/CGI-Pure/04-append_param.t
-SHA1 c992583ba130cec10adbfd338191fc001286d981 t/CGI-Pure/05-clone.t
-SHA1 5c2ba9a9f927bb3871f33a2b1e775ad603f75d23 t/CGI-Pure/06-delete_param.t
-SHA1 00f6010877a006e3194e464ad6adde34d605ebf2 t/CGI-Pure/07-delete_all_params.t
-SHA1 b1ea2d93235a410fbd0fe88b90adf719f8678854 t/CGI-Pure/08-param.t
-SHA1 436000cc3bc1ed36fa321a5e3b49a5a2a0769908 t/CGI-Pure/09-delete_all_params.t
-SHA1 9ea1fb2965fe99e6a488a2cb14f0a117300d378b t/CGI-Pure/10-query_data.t
-SHA1 e163a6902384f3a5c69f028861e98016451a5796 t/CGI-Pure/11-query_string.t
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 27cb07560c4ddeefae505156bffa71cea8a37587 t/CGI-Pure-Save/01-use.t
+SHA1 847a875e466d09f8a4edf6a7cd2337bb0abd0578 t/CGI-Pure-Save/02-version.t
+SHA1 7cd98e3c152a8acdd8e9bee34e5f353191e1e584 t/CGI-Pure-Save/03-new.t
+SHA1 56faafc16230ee8277d5656f129780bf6d0084cc t/CGI-Pure-Save/04-save.t
+SHA1 2d189e48dd0dbb67f21befc2813e8faf7962c716 t/CGI-Pure-Save/05-load.t
+SHA1 4822c2cd32b1bc95e8d5f8180587c2f3ed5f9fc7 t/CGI-Pure/01-use.t
+SHA1 a7ea3495b5e42e19ec3f72609d48ed4201200d60 t/CGI-Pure/02-version.t
+SHA1 49a021ae6d29a8d2223ff448b7da962253d08853 t/CGI-Pure/03-new.t
+SHA1 b7d37d0244dc75beaba1388d1d72c3103b18aaea t/CGI-Pure/04-append_param.t
+SHA1 a019df97305189c5075914aad33ff0559cdf55e9 t/CGI-Pure/05-clone.t
+SHA1 73b67e69de7e7cec03bbca10e07a9ca209debb0c t/CGI-Pure/06-delete_param.t
+SHA1 d7637e082f7fce8d6a3e653344c011b47c6db823 t/CGI-Pure/07-delete_all_params.t
+SHA1 3cc39037f5d2a0eb3dd3c1c5ba6ca5d5c7c5f588 t/CGI-Pure/08-param.t
+SHA1 4a90ec4f63a4a3decb8854b4fdda68f99e539747 t/CGI-Pure/09-delete_all_params.t
+SHA1 e6bf9629385b6afd9986a5777564d3fd9240be07 t/CGI-Pure/10-query_data.t
+SHA1 0017af0c0f157ebc3a2d9fa7c32e72edd466ce56 t/CGI-Pure/11-query_string.t
 SHA1 a09392e8d293ae1ea8d55c82eda8c842e8f926c7 t/data/params2
-SHA1 9934202a90fe0101d1d5b91e371601e812f984d4 xt/CGI-Pure-Save/01-pod_coverage.t
-SHA1 5ecc066341eef936538374780e52d0e261edd773 xt/CGI-Pure-Save/02-pod.t
-SHA1 8067575adab32e8a860e6555b6c12d7579330cdc xt/CGI-Pure/01-pod_coverage.t
-SHA1 019b8e1e948e854f60af4e905d8263ac5cd01ebe xt/CGI-Pure/02-pod.t
+SHA1 9f89da1b973ee7b4d838cd7046fb9d2f8f372666 xt/CGI-Pure-Save/01-pod_coverage.t
+SHA1 bfe94d94681bb0d014972cdf2126d2ffa9203b09 xt/CGI-Pure-Save/02-pod.t
+SHA1 212a0619902ce0cb5faa01cb96500025b58ecdf2 xt/CGI-Pure/01-pod_coverage.t
+SHA1 06b9f04516566b3af4986525aa54afd589311534 xt/CGI-Pure/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWB+1aAAoJEJe+XXKaIuTlEd4H/RT6h3xjra+QgfM1FHURhpCk
-2HtFbheJwZCG7yO8JUXD7JLtu2LYkIfezpMqAEHUP6q2bsn+GAJdrvhgmNLeL4gG
-NeY085elkpBsdcgJwKudDSUKStcCFSZAOrS6YXHyqMKFN64vXwxG6hJXwbcppDVS
-D/1NcqhbFkCCOAgp3BxK1J4cxl8vqCxRsjdnuJbEvaRWxRnO620ocm26qk5+KCIj
-QuBPFohbzE3m74HH7WrfeKEeIUQ1ZnLD8LYHo7uvhE0EqP1Awd5XNwZjBjss2YWp
-oiUUyNEo3Sdthmas9C/5zI/k8srFySM/yUBD/vlu84ixBLtI6Uxw/6gg2EA1fds=
-=Ap62
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlplsaMACgkQKyiOZjWe
+rHYdaggAwY0Taj+bva+J8wzWniDeQ05wj2S/nZQvOnlCogkvLVEec3xqCxBqjoCv
+Zf7N+v/xXqxJL/T0e868463tMk7zpJ3bOzwr5LZ5D9gjeuxd/nylZKh/68j1PR4m
+vYGs37vOvkQgXa9rZ/a4WG5wlyMfQPsxTY2zSEXnTKiSGfRTmCHwJ3kzmz75QqaR
+k7QKSxB20hGRgUL660jFrteOooCzTYStKBjsVIBSWBsPjulOk68L10SkPxQY1VKN
+9KUbnwh85RUamWVEaVmISj7gEwIhchctU8lGspT9Mi6+ZJU1ofbUUUCKU+Hl+5+N
+XjM1bH7xQyfxML9lnLzdO2Yw/KL+uw==
+=UhCj
 -----END PGP SIGNATURE-----

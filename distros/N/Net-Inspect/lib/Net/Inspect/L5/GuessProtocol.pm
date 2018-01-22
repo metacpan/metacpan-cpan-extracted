@@ -60,7 +60,7 @@ sub in {
     if ( my ($obj,$n) = $self->{upper_flow}->guess_protocol(
 	$self,$dir,$data,$eof,$time,$self->{meta}) ) {
 	$self->{fwd} = $obj;
-	# might consume not alle from the last data
+	# might consume not all from the last data
 	return $n;
     }
 
@@ -146,7 +146,7 @@ Called hooks:
 
 The flow should return an appropriate L<Net::Inspect::Connection> object if it
 does implement the protocol. If it does not implement the protocol it should
-detach itself from the C<$guess> flow using C<< $guess->attach(undef,$self) >>
+detach itself from the C<$guess> flow using C<< $guess->detach($self) >>
 and return ().  If it needs more data to decide it should simply return ().
 
 The hook must do it's own buffering of the given data and process them before

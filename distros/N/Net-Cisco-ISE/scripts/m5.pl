@@ -4,7 +4,8 @@ use lib qw(../lib);
 use Net::Cisco::ISE;
 use Data::Dumper;
 
-
-# users call only displayes a very limited set of information. Additional requests need to be made to retrieve explicit information
 my $ise = Net::Cisco::ISE->new(hostname => '10.0.0.1', username => 'admin', password => 'Secret');
-$ise->networkdevices;
+my $networkdevices = $ise->networkdevices;
+for my $name (keys %{$networkdevices})
+{  print Dumper $ise->networkdevices("id" => $networkdevices->{$name}->id);
+}

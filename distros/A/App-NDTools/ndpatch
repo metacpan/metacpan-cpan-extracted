@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+use App::NDTools::NDPatch;
+
+my $ndpatch = App::NDTools::NDPatch->new();
+$ndpatch->exec();
+
+__END__
+
+=head1 NAME
+
+ndpatch - apply diff to a structure
+
+=head1 SYNOPSIS
+
+    ndpatch [OPTIONS]
+    ndpatch [OPTIONS] <file> [<patchfile>]
+
+=head1 DESCRIPTION
+
+Apply diff file to original one.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help|-h>
+
+Print help message and exit.
+
+=item B<--ifmt> E<lt>JSON|YAMLE<gt>
+
+Force specified input format usage. Automatically choosed (using file
+extension) if omitted.
+
+=item B<--[no]pretty>
+
+On/Off pretty-print for JSON. Enabled by default.
+
+=item B<--verbose|-v> [int]
+
+Increase verbosity, max level - 4.
+
+=item B<--version|-V>
+
+Print version and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Apply patch:
+
+    ndpatch struct.json patch.json
+
+=head1 EXIT STATUS
+
+ 0   No errors occured.
+ 1   Generic error code.
+ 2   I/O Error.
+ 8   Diff/patch related errors.
+
+=head1 BUGS
+
+Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
+
+=head1 SEE ALSO
+
+L<patch(1)>
+
+L<nddiff(1)>, L<ndproc(1)>, L<ndquery(1)>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016,2017 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of GNU General Public License 3 or later versions.

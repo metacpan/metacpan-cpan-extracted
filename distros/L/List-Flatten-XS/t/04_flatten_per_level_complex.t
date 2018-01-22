@@ -1,7 +1,6 @@
 use strict;
 use Test::More;
 
-use List::Util;
 use List::Flatten::XS 'flatten';
 
 my $ref_1 = +{a => 10, b => 20, c => 'Hello'};

@@ -7,7 +7,7 @@
 
 package Term::TtyWrite;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Term::TtyWrite', $VERSION);
@@ -37,7 +37,7 @@ requires that the code be run as root, or on Linux that the appropriate
 capability has been granted.
 
 This module will throw an exception if anything goes awry; use C<eval>
-or L<Try::Tiny> to catch these, if necessary.
+or L<Syntax::Keyword::Try> to catch these, if necessary.
 
 =head1 METHODS
 
@@ -89,6 +89,9 @@ L<perlport> warns about. The security concerns of running as root. Lack
 of tests on account of being tricky to test what with the needing root
 and injecting characters into the terminal thing.
 
+OpenBSD has removed the TIOCSTI ioctl due to security concerns; this
+module will only work on older releases of OpenBSD.
+
 =head1 SEE ALSO
 
 An implementation in C:
@@ -106,12 +109,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Jeremy Mates
+Copyright (C) 2016,2018 by Jeremy Mates
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a copy
-of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

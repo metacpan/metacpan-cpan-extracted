@@ -21,7 +21,7 @@ like( $@, qr/Required logger/, 'Missing logger parameter' );
 my $locker = cPanel::StateFile::FileLocker->new( {max_age=>120, max_wait=>180, logger=>cPanel::FakeLogger->new()} );
 isa_ok( $locker, 'cPanel::StateFile::FileLocker', 'with_hashref' );
 
-$locker = cPanel::StateFile::FileLocker->new( {sleep_secs=>0.1, logger=>cPanel::FakeLogger->new()} );
+$locker = cPanel::StateFile::FileLocker->new( {sleep_secs=>0.001, logger=>cPanel::FakeLogger->new()} );
 isa_ok( $locker, 'cPanel::StateFile::FileLocker', 'with_hashref and subsecond sleep attempt' );
 # Peek inside for test, don't try this at home.
-is( $locker->{sleep_secs}, 1, 'Sub-second sleep repaired.' );
+is( $locker->{sleep_secs}, 0.05, 'Sleep less then 0.05 repaired.' );

@@ -5,15 +5,14 @@
 # See also:
 #   https://en.wikipedia.org/wiki/Floor_and_ceiling_functions#Continuity_and_series_expansions
 
-use 5.022;
+use 5.020;
 use warnings;
 
+use lib qw(../lib);
 use experimental qw(signatures);
 use Math::GComplex qw(:overload);
 
-sub tau() : prototype() {
-    log(-1) * -2*i;
-}
+use constant tau => log(-1) * -2*i;
 
 sub floor ($x) {
     $x + (i * (log(1 - exp(tau * i * $x)) - log(exp(-tau * i * $x) * (-1 + exp(tau * i * $x))))) / tau - 1/2;

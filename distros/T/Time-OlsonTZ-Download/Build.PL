@@ -32,7 +32,6 @@ Module::Build->subclass(code => q{
 		"IPC::Filter" => "0.002",
 		"Net::FTP" => "3.07",
 		"Params::Classify" => 0,
-		"String::ShellQuote" => "1.01",
 		"parent" => 0,
 		"perl" => "5.008",
 		"strict" => 0,

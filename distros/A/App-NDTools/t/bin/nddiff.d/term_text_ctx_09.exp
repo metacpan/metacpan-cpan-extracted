@@ -1,0 +1,17 @@
+  {some}
+    [5]
+      {text}
+        [0]
+          {buried}
+            [1]
+              {"deep down"}
+                {in}
+                  [0]
+                    {"the structure"}
+                      @@ 1,- -,- @@
+-                     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                      @@ 4,- -,- @@
++                     ADDED STRING
+                      @@ 6,- -,- @@
+-                     Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
++                     EXCEPTEUR sint occaecat cupidatat non proident, sunt in culpa qui officia

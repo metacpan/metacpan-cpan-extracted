@@ -16,15 +16,23 @@ our @EXPORT_OK = qw(
 =head1 NAME
 
 Struct::Path::JsonPointer - JsonPointer (L<rfc6901|https://tools.ietf.org/html/rfc6901>)
-frontend for L<Struct::Path|Struct::Path>.
+syntax frontend for L<Struct::Path|Struct::Path>
+
+=begin html
+
+<a href="https://travis-ci.org/mr-mixas/Struct-Path-JsonPointer.pm"><img src="https://travis-ci.org/mr-mixas/Struct-Path-JsonPointer.pm.svg?branch=master" alt="Travis CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/Struct-Path-JsonPointer.pm?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/Struct-Path-JsonPointer.pm/badge.svg?branch=master' alt='Coverage Status'/></a>
+<a href="https://badge.fury.io/pl/Struct-Path-JsonPointer"><img src="https://badge.fury.io/pl/Struct-Path-JsonPointer.svg" alt="CPAN version"></a>
+
+=end html
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -55,9 +63,9 @@ Nothing is exported by default.
 
 =head2 path2str
 
-Convert L<Struct::Path|Struct::Path> path to JsonPointer path.
+Convert L<Struct::Path|Struct::Path> path to JsonPointer.
 
-    $jp_path = path2str($sp_path);
+    $pointer = path2str($path);
 
 =cut
 
@@ -107,9 +115,9 @@ sub path2str {
 
 =head2 str2path
 
-Convert JsonPointer path to L<Struct::Path|Struct::Path> path.
+Convert JsonPointer to L<Struct::Path|Struct::Path> path.
 
-    $sp_path = str2path($jp_path);
+    $path = str2path($pointer);
 
 =cut
 

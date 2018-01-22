@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001045';
+our $VERSION = '0.001047';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -95,6 +95,10 @@ sub normalize_settings {
     $self->SUPER::normalize_settings();
 
     my $settings = $self->{+SETTINGS};
+
+    # Make sure -v overrides --qvf
+    $settings->{formatter} = '+Test2::Formatter::Test2'
+        if $settings->{verbose} && $settings->{formatter} eq '+Test2::Formatter::QVF';
 
     unless ($settings->{slack_url}) {
         die "\n--slack-url is required when using --slack.\n"      if $settings->{slack};

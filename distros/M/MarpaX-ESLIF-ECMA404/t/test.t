@@ -7,22 +7,22 @@ use File::Spec;
 use Test::More;
 use Test::More::UTF8;
 # use Log::Any qw/$log/;
-#use Log::Log4perl qw/:easy/;
-#use Log::Any::Adapter;
-#use Log::Any::Adapter::Log4perl;  # Just to make sure dzil catches it
+# use Log::Log4perl qw/:easy/;
+# use Log::Any::Adapter;
+# use Log::Any::Adapter::Log4perl;  # Just to make sure dzil catches it
 
 #
 # Init log
 #
-#our $defaultLog4perlConf = '
-#log4perl.rootLogger              = TRACE, Screen
-#log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
-#log4perl.appender.Screen.stderr  = 0
-#log4perl.appender.Screen.layout  = PatternLayout
-#log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
-#';
-#Log::Log4perl::init(\$defaultLog4perlConf);
-#Log::Any::Adapter->set('Log4perl');
+# our $defaultLog4perlConf = '
+# log4perl.rootLogger              = INFO, Screen
+# log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
+# log4perl.appender.Screen.stderr  = 0
+# log4perl.appender.Screen.layout  = PatternLayout
+# log4perl.appender.Screen.layout.ConversionPattern = %d %-5p %6P %m{chomp}%n
+# ';
+# Log::Log4perl::init(\$defaultLog4perlConf);
+# Log::Any::Adapter->set('Log4perl');
 
 BEGIN { require_ok('MarpaX::ESLIF::ECMA404') };
 
@@ -31,6 +31,9 @@ my $ecma404 = MarpaX::ESLIF::ECMA404->new(
                                          );
 isa_ok($ecma404, 'MarpaX::ESLIF::ECMA404');
 
+diag("###########################################################");
+diag("Testing inline JSON data");
+diag("###########################################################");
 foreach (sort __PACKAGE__->section_data_names) {
     my $want_ok = ($_ =~ /^ok/);
     my $want_ko = ($_ =~ /^ko/);
@@ -58,6 +61,9 @@ foreach (sort __PACKAGE__->section_data_names) {
 # From https://github.com/nst/JSONTestSuite/tree/master/test_parsing
 #      https://github.com/nst/JSONTestSuite/tree/master/test_transform
 #
+diag("#########################################################");
+diag("Testing files as per https://github.com/nst/JSONTestSuite");
+diag("#########################################################");
 foreach my $dir_basename (qw/test_parsing test_transform/) {
     my $test_dir = File::Spec->catdir($Bin, $dir_basename);
     opendir(my $d, $test_dir) || die "Failed to open $test_dir, $!";
@@ -79,8 +85,15 @@ foreach my $dir_basename (qw/test_parsing test_transform/) {
             $encoding = 'UTF-16BE';
         } elsif ($basename =~ /utf16le/i) {
             $encoding = 'UTF-16LE';
-        } elsif ($basename =~ /utf\-?8/i) {
+        } elsif ($basename =~ /utf[_-]?8/i) {
             $encoding = 'UTF-8';
+        } elsif ($basename =~ /latin[_-]?1/i) {
+            #
+            # it is NOT required that JSON parsers accept ONLY UTF-8, UTF-16 or UTF-32.
+            # For instance this file is in LATIN1, and we explicitly say so because
+            # guess would say this is UTF-8.
+            #
+            $encoding = 'LATIN1';
         } elsif (! ($basename =~ /bom/i)) {
             #
             # Just to please OLD versions of perl, 5.10 for example.
@@ -89,11 +102,60 @@ foreach my $dir_basename (qw/test_parsing test_transform/) {
             $encoding = 'UTF-8';
         }
 
-        my $want_ko = ($dir_basename eq 'test_transform') ? 0 : ($basename =~ /^n/);
-        if ($want_ko) {
-            ok(!defined($ecma404->decode($data, $encoding)), $basename);
+        my $want_ko;
+        my $reason = '';
+        #
+        # Some undefined cases - that we consider invididually.
+        # When the input has INVALID characters the default is to fail.
+        # Nevertheless it is conceivable to want to use the substitution
+        # character, and this is optional with MarpaX::ESLIF::ECMA404.
+        #
+        if ($basename eq 'i_string_UTF-8_invalid_sequence.json'         || # Invalid character
+            $basename eq 'i_string_UTF8_surrogate_U+D800.json'          || # Invalid character
+            $basename eq 'i_string_invalid_utf-8.json'                  || # Invalid character
+            $basename eq 'i_string_lone_utf8_continuation_byte.json'    || # Invalid character
+            $basename eq 'i_string_not_in_unicode_range.json'           || # Invalid character
+            $basename eq 'i_string_overlong_sequence_2_bytes.json'      || # Invalid character
+            $basename eq 'i_string_overlong_sequence_6_bytes.json'      || # Invalid character
+            $basename eq 'i_string_overlong_sequence_6_bytes_null.json' || # Invalid character
+            $basename eq 'i_string_truncated-utf-8.json'                || # Invalid character
+            $basename eq 'string_1_invalid_codepoint.json'              || # Invalid character
+            $basename eq 'string_2_invalid_codepoints.json'             || # Invalid character
+            $basename eq 'string_3_invalid_codepoints.json'                # Invalid character
+            ) {
+            $want_ko = 1;
+            $reason = ' (Invalid character)';
+        } elsif ($basename =~ /^i_/) {
+            $want_ko = 0;
         } else {
-            ok(defined($ecma404->decode($data, $encoding)), $basename);
+            #
+            # All other files falls in three categories:
+            #
+            if ($dir_basename eq 'test_transform') {
+                #
+                # Those in test_transform - always ok by construction.
+                #
+                $want_ko = 0;
+            } else {
+                if ($basename =~ /^n_/) {
+                    #
+                    # Those starting with "n_", always not ok.
+                    #
+                    $want_ko = 1;
+                    $reason = ' (Invalid JSON)';
+                } else {
+                    #
+                    # The rest, always ok.
+                    #
+                    $want_ko = 0;
+                }
+            }
+        }
+        # diag("Testing $file_path, expecting " . ($want_ko ? 'failure' : 'success') . "$reason");
+        if ($want_ko) {
+            ok(!defined($ecma404->decode($data, $encoding)), "ko / $basename$reason");
+        } else {
+            ok(defined($ecma404->decode($data, $encoding)), "ok / $basename$reason");
         }
     }
 }

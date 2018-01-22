@@ -18,7 +18,7 @@ my %module_build_args = (
     "Daniel Culver"
   ],
   "dist_name" => "Locale-Country-OFAC",
-  "dist_version" => "1.1.0",
+  "dist_version" => "1.2.0",
   "license" => "perl",
   "module_name" => "Locale::Country::OFAC",
   "recommends" => {},

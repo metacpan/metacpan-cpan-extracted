@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -15,10 +15,10 @@
    "name" : "HTTP-Tiny-UA",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -35,7 +35,6 @@
          "requires" : {
             "Dist::Zilla" : "5",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
-            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
@@ -44,9 +43,12 @@
             "Pod::Wordlist" : "0",
             "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Version" : "1",
             "perl" : "5.006"
@@ -54,7 +56,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Tiny" : "0",
+            "Class::Tiny" : "1.000",
             "HTTP::Tiny" : "0.036",
             "perl" : "5.006",
             "strict" : "0",
@@ -85,11 +87,11 @@
    "provides" : {
       "HTTP::Tiny::UA" : {
          "file" : "lib/HTTP/Tiny/UA.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "HTTP::Tiny::UA::Response" : {
          "file" : "lib/HTTP/Tiny/UA/Response.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -104,11 +106,13 @@
          "web" : "https://github.com/dagolden/HTTP-Tiny-UA"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "David Golden <xdg@xdg.me>",
       "Felipe Gasper <felipe@felipegasper.com>",
       "Graham Ollis <perl@wdlabs.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

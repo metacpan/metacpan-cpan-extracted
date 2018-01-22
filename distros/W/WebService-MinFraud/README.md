@@ -4,7 +4,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 # VERSION
 
-version 1.005001
+version 1.006000
 
 # SYNOPSIS
 
@@ -92,10 +92,11 @@ Mateu Hunter <mhunter@maxmind.com>
 - Olaf Alders <oalders@maxmind.com>
 - Patrick Cronin <PatrickCronin@users.noreply.github.com>
 - Ruben Navarro <rbnx@users.noreply.github.com>
+- Will Storey <will@summercat.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

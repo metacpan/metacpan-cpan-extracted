@@ -4,9 +4,19 @@ RDF-LinkedData
 Created:      2009-04-23
 Home page:    <https://metacpan.org/release/RDF-LinkedData>
 Bug tracker:  <https://github.com/kjetilk/RDF-LinkedData/issues>
-Wiki:         <http://wiki.perlrdf.org/>
-Mailing list: <http://lists.perlrdf.org/listinfo/dev>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
+
+1.92	2018-01-16	Overhaul with 6 year development history to enable read and write.
+
+ - Added: Add a possible controls type.
+ - Added: Add auth_required method to check if an operation requires
+   authentication.
+ - Added: Allow a class config option that can add functionality.
+ - Added: Check for RDF::LinkedData::RWHypermedia if writes are enabled.
+ - Added: Document read-write features.
+ - Added: Implement functionality to check if a read operation is given.
+ - Added: Improve handling of configuration options.
+ - Added: Many smaller improvements.
 
 1.02	2017-08-28	Skip some tests if no RDFa parser is present.
 

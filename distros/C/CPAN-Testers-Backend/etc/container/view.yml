@@ -1,0 +1,11 @@
+$summary: Routines to view data
+
+common:
+    $class: Beam::Wire
+    file: common.yml
+
+metabase:
+    $class: CPAN::Testers::Backend::ViewMetabaseCache
+    metabase_dbh:
+        $ref: common/metabase_dbh
+

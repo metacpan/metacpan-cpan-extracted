@@ -167,4 +167,27 @@ tconv_EXPORT char *tconv_error(tconv_t tconvp);
 tconv_EXPORT char *tconv_fromcode(tconv_t tconvp);
 tconv_EXPORT char *tconv_tocode(tconv_t tconvp);
 
+/**********************************************************************/
+/* If source and destination charsets are equivalent, implementations */
+/* MAY do fuzzy convertion (i.e. no conversion at all). The following */
+/* methods are setter and getter for this fuzzy state.                */
+/**********************************************************************/
+tconv_EXPORT short tconv_fuzzy_setb(tconv_t tconvp, short fuzzyb);
+tconv_EXPORT short tconv_fuzzy_getb(tconv_t tconvp, short *fuzzybp);
+
+/**********************************************************************/
+/* Helper                                                             */
+/**********************************************************************/
+typedef struct tconv_helper tconv_helper_t;
+typedef short (*tconv_producer_t)(tconv_helper_t *tconv_helperp, void *contextp, char **bufpp, size_t *countlp);
+typedef short (*tconv_consumer_t)(tconv_helper_t *tconv_helperp, void *contextp, char *bufp, size_t countl, size_t *countlp);
+
+tconv_EXPORT tconv_helper_t *tconv_helper_newp(tconv_t tconvp, void *contextp, tconv_producer_t producerp, tconv_consumer_t consumerp);
+tconv_EXPORT short           tconv_helper_runb(tconv_helper_t *tconv_helperp);
+tconv_EXPORT tconv_t         tconv_helper_tconvp(tconv_helper_t *tconv_helperp);
+tconv_EXPORT short           tconv_helper_pauseb(tconv_helper_t *tconv_helperp);
+tconv_EXPORT short           tconv_helper_endb(tconv_helper_t *tconv_helperp);
+tconv_EXPORT short           tconv_helper_stopb(tconv_helper_t *tconv_helperp);
+tconv_EXPORT void            tconv_helper_freev(tconv_helper_t *tconv_helperp);
+
 #endif /* TCONV_EXT_H */

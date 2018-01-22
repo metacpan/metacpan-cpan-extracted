@@ -1,0 +1,38 @@
+---
+abstract: 'perl port of pg_recvlogical'
+author:
+  - 'William Cox <mydimension@gmail.com>'
+build_requires:
+  File::Basename: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::PostgreSQL: '0'
+  ok: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AnyEvent-PgRecvlogical
+requires:
+  AnyEvent: '0'
+  AnyEvent::Util: '0'
+  Carp: '0'
+  DBD::Pg: v3.7.0
+  DBI: '0'
+  Moo: '0'
+  Promises: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  constant: '0'
+  namespace::clean: '0'
+resources:
+  homepage: https://github.com/mydimension/AnyEvent-PgRecvlogical
+  repository: https://github.com/mydimension/AnyEvent-PgRecvlogical.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.70'

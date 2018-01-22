@@ -6,6 +6,19 @@ Teamcity::Executor - Executor of TeamCity build configurations
 
     use Teamcity::Executor;
     use IO::Async::Loop;
+    use Log::Any::Adapter;
+
+    Log::Any::Adapter->set(
+        'Dispatch',
+        outputs => [
+            [
+                'Screen',
+                min_level => 'debug',
+                stderr    => 1,
+                newline   => 1
+            ]
+        ]
+    );
 
     my $loop = IO::Async::Loop->new;
     my $tc = Teamcity::Executor->new(
@@ -33,6 +46,18 @@ Teamcity::Executor - Executor of TeamCity build configurations
         },
         sub {
             print "Build failed\n";
+            exit 1
+        }
+    );
+
+    my $touch_future = $tc->touch('hello_name', { name => 'TeamCity' })->then(
+        sub {
+            my ($build) = @_;
+            print "Touch build started\n";
+            $loop->stop();
+        },
+        sub {
+            print "Touch build failed to start\n";
             exit 1
         }
     );

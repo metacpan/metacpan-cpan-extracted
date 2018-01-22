@@ -8,7 +8,6 @@ use diagnostics;
 
 use Term::ANSIColor qw(:constants);
 use Mastodon::Client;
-use AnyEvent;
 use Config::Tiny;
 
 # use Log::Any::Adapter;
@@ -88,14 +87,9 @@ $listener->on( notification => sub {
 });
 
 $listener->on( error => sub {
-  my ($listener, $handle, $fatal, $message) = @_;
+  my ($listener, $fatal, $message, $data) = @_;
   $fatal //= 0;
-  print BOLD YELLOW "$message ($fatal)\n\n";
-
-  if ($message eq 'Broken pipe') {
-    print BOLD YELLOW "...reconnecting...\n\n";
-    $listener->reset;
-  }
+  print BOLD YELLOW "ERROR: $message\n\n";
 });
 
 $listener->start;

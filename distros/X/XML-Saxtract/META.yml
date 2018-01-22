@@ -19,5 +19,5 @@ requires:
 resources:
   homepage: https://github.com/lucastheisen/saxtract-perl
   repository: https://github.com/lucastheisen/saxtract-perl.git
-version: '1.03'
+version: '1.04'
 x_serialization_backend: 'YAML::Tiny version 1.69'

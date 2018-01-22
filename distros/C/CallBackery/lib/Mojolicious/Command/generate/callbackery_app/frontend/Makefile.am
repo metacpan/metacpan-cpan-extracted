@@ -16,6 +16,8 @@ GENTARGETS := lint pretty migration translation api source-all source-hybrid sou
 $(GENTARGETS): $(shell find source/class/ $(CALLBACKERY_PATH) -type f) config.json
 	$(QOOXDOO_PATH)/tool/bin/generator.py -m QOOXDOO_PATH:$(QOOXDOO_PATH) -m CALLBACKERY_PATH:$(CALLBACKERY_PATH) -m CACHE:./cache $@
 
+all-local: source
+
 endif
 
 # clean-local:

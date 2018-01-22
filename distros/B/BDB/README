@@ -154,6 +154,8 @@ BERKELEYDB FUNCTIONS
        db_env_dbremove (DB_ENV *env, DB_TXN_ornull *txnid, bdb_filename file, bdb_filename database, U32 flags = 0, SV *callback = 0)
        db_env_dbrename (DB_ENV *env, DB_TXN_ornull *txnid, bdb_filename file, bdb_filename database, bdb_filename newname, U32 flags = 0, SV *callback = 0)
        db_env_log_archive (DB_ENV *env, SV *listp, U32 flags = 0, SV *callback = 0)
+       db_env_lsn_reset (DB_ENV *env, bdb_filename db, U32 flags = 0, SV *callback = 0)
+       db_env_fileid_reset (DB_ENV *env, bdb_filename db, U32 flags = 0, SV *callback = 0)
 
        $db = db_create (DB_ENV *env = 0, U32 flags = 0)
           flags: XA_CREATE

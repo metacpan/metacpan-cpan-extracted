@@ -4,7 +4,6 @@ author:
   - 'Denis BAURAIN <denis.baurain@uliege.be>'
 build_requires:
   Test::Deep: '0'
-  Test::Most: '0'
   perl: '5.013002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,7 +27,6 @@ requires:
   Exporter::Easy: '0'
   File::Basename: '0'
   File::Find::Rule: '0'
-  File::HomeDir: '0'
   File::Spec: '0'
   File::Temp: '0'
   Getopt::Euclid: '0'
@@ -64,5 +62,5 @@ requires:
   perl: '5.013002'
   strict: '0'
   warnings: '0'
-version: '0.180140'
+version: '0.180190'
 x_serialization_backend: 'YAML::Tiny version 1.69'

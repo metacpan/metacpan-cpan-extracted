@@ -43,8 +43,13 @@ TWITTER API V1.1 SUPPORT
     Net::Twitter::Manual::MigratingToV1_1.
 
 DESCRIPTION
+    This module has been superseded by Twitter::API. Please update as soon
+    as you possibly can to use new features and the new API versions. This
+    module will no longer be supported.
+
     This module provides a perl interface to the Twitter APIs. See
-    <http://dev.twitter.com/doc> for a full description of the Twitter APIs.
+    <http://dev.twitter.com/docs> for a full description of the Twitter
+    APIs.
 
 TWITTER API VERSION 1.1
     Twitter will (perhaps has by the time you read this) deprecated version
@@ -279,7 +284,7 @@ METHODS AND ARGUMENTS
 
         useragent
             The value for "User-Agent" HTTP header. It defaults to
-            "Net::Twitter/4.01042 (Perl)".
+            "Net::Twitter/4.01043 (Perl)".
 
         source
             Twitter on longer uses the "source" parameter. Support for it
@@ -735,7 +740,14 @@ REST API Methods
         Parameters: media_id, alt_text
         Required: media_id
 
-        add metadata to media
+        Adds metadata -- alt text, in particular -- to a previously uploaded
+        media object, specified by its ID. (One knows this ID via the return
+        value of the preceding "upload" call.)
+
+        The "alt_text" parameter must have as its value a hashref containing
+        a single key-value pair. The key must be "text", and the value is
+        the alt text to assign to the media object. The text must be 400
+        characters or fewer in length.
 
         Returns: HashRef
 
@@ -2389,7 +2401,7 @@ REST API Methods
         <https://dev.twitter.com/rest/reference/post/account/update_profile_
         image>
 
-    update_with_media
+    update_with_media DEPRECATED
     update_with_media(status, media[])
 
         Parameters: status, media[], possibly_sensitive,
@@ -2398,6 +2410,10 @@ REST API Methods
 
         Updates the authenticating user's status and attaches media for
         upload.
+
+        Note that Twitter has marked this endpoint as deprecated, and
+        recommends instead calling "upload", then (optionally)
+        "create_media_metadata", then "update".
 
         The "media[]" parameter is an arrayref with the following
         interpretation:
@@ -2423,19 +2439,19 @@ REST API Methods
 
         Returns: Status
 
-        Twitter API documentation: POST statuses/update_with_media
-        <https://dev.twitter.com/rest/reference/post/statuses/update_with_me
-        dia>
-
     upload
     upload(media)
 
         Parameters: media
         Required: media
 
-        Upload images to twitter without posting them on the timeline
+        Uploads an image to twitter without immediately posting it to the
+        authenticating user's timeline. Its return-value hashref notably
+        contains a "media_id" value that's useful as a parameter value in
+        various other endpoint calls, such as "update" and
+        "create_media_metadata".
 
-        Returns: Image
+        Returns: HashRef
 
         Twitter API documentation: POST media/upload
         <https://dev.twitter.com/rest/reference/post/media/upload>

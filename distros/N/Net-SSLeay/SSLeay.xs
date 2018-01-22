@@ -8,7 +8,7 @@
  *
  * Change data removed. See Changes
  *
- * $Id: SSLeay.xs 502 2017-10-13 02:47:21Z mikem-guest $
+ * $Id: SSLeay.xs 513 2018-01-03 21:46:53Z mikem-guest $
  * 
  * The distribution and use of this module are subject to the conditions
  * listed in LICENSE file at the root of the Net-SSLeay
@@ -665,6 +665,57 @@ static int ssleay_ctx_passwd_cb_invoke(char *buf, int size, int rwflag, void *us
     return strlen(buf);
 }
 
+#if OPENSSL_VERSION_NUMBER >= 0x1010006fL /* In OpenSSL 1.1.0 but actually called for $ssl from 1.1.0f */
+#ifndef LIBRESSL_VERSION_NUMBER
+#ifndef OPENSSL_IS_BORINGSSL
+static int ssleay_ssl_passwd_cb_invoke(char *buf, int size, int rwflag, void *userdata)
+{
+    dSP;
+    int count = -1;
+    char *res;
+    SV *cb_func, *cb_data;
+
+    PR1("STARTED: ssleay_ssl_passwd_cb_invoke\n");
+    cb_func = cb_data_advanced_get(userdata, "ssleay_ssl_passwd_cb!!func");
+    cb_data = cb_data_advanced_get(userdata, "ssleay_ssl_passwd_cb!!data");
+
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ssl_passwd_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(sp);
+    XPUSHs(sv_2mortal(newSViv(rwflag)));
+    XPUSHs(sv_2mortal(newSVsv(cb_data)));
+    PUTBACK;
+
+    count = call_sv( cb_func, G_SCALAR );
+
+    SPAGAIN;
+
+    if (count != 1)
+        croak("Net::SSLeay: ssleay_ssl_passwd_cb_invoke perl function did not return a scalar.\n");
+
+    res = POPp;
+
+    if (res == NULL) {
+        *buf = '\0';
+    } else {
+        strncpy(buf, res, size);
+        buf[size - 1] = '\0';
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return strlen(buf);
+}
+#endif /* !BoringSSL */
+#endif /* !LibreSSL */
+#endif /* >= 1.1.0f */
+
 int ssleay_ctx_cert_verify_cb_invoke(X509_STORE_CTX* x509_store_ctx, void* data)
 {
     dSP;
@@ -845,7 +896,7 @@ int session_ticket_ext_cb_invoke(SSL *ssl, const unsigned char *data, int len, v
 
 int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
                                     STACK_OF(SSL_CIPHER) *peer_ciphers,
-                                    SSL_CIPHER **cipher, void *arg)
+                                    const SSL_CIPHER **cipher, void *arg)
 {
     dSP;
     int count = -1, res, i;
@@ -868,7 +919,7 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
     secretsv = sv_2mortal( newSVpv(secret, *secret_len));
     XPUSHs(secretsv);
     for (i=0; i<sk_SSL_CIPHER_num(peer_ciphers); i++) {
-        SSL_CIPHER *c = sk_SSL_CIPHER_value(peer_ciphers,i);
+        const SSL_CIPHER *c = sk_SSL_CIPHER_value(peer_ciphers,i);
         av_store(ciphers, i, sv_2mortal(newSVpv(SSL_CIPHER_get_name(c), 0)));
     }
     XPUSHs(sv_2mortal(newRV_inc((SV*)ciphers)));
@@ -1064,7 +1115,7 @@ int next_proto_helper_protodata2AV(AV * list, const unsigned char *in, unsigned 
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG) && !defined(LIBRESSL_VERSION_NUMBER)
 
 int next_proto_select_cb_invoke(SSL *ssl, unsigned char **out, unsigned char *outlen,
                                 const unsigned char *in, unsigned int inlen, void *arg)
@@ -1696,8 +1747,20 @@ unsigned long
 SSLeay()
 
 const char *
-SSLeay_version(type=0)
+SSLeay_version(type=SSLEAY_VERSION)
         int type
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
+unsigned long
+OpenSSL_version_num()
+
+const char *
+OpenSSL_version(t=OPENSSL_VERSION)
+        int t
+
+#endif /* OpenSSL 1.1.0 */
+
 
 #define REM1 "============= SSL CONTEXT functions =============="
 
@@ -2471,10 +2534,46 @@ SSL_CTX_set_tlsext_servername_callback(ctx,callback=&PL_sv_undef,data=&PL_sv_und
 
 #endif
 
-BIO_METHOD *
+#if OPENSSL_VERSION_NUMBER >= 0x1010006fL /* In OpenSSL 1.1.0 but actually called for $ssl starting from 1.1.0f */
+#ifndef LIBRESSL_VERSION_NUMBER
+#ifndef OPENSSL_IS_BORINGSSL
+void
+SSL_set_default_passwd_cb(ssl,callback=&PL_sv_undef)
+        SSL * ssl
+        SV * callback
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_set_default_passwd_cb(ssl, NULL);
+            SSL_set_default_passwd_cb_userdata(ssl, NULL);
+            cb_data_advanced_put(ssl, "ssleay_ssl_passwd_cb!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ssl, "ssleay_ssl_passwd_cb!!func", newSVsv(callback));
+            SSL_set_default_passwd_cb_userdata(ssl, (void*)ssl);
+            SSL_set_default_passwd_cb(ssl, &ssleay_ssl_passwd_cb_invoke);
+        }
+
+void
+SSL_set_default_passwd_cb_userdata(ssl,data=&PL_sv_undef)
+        SSL * ssl
+        SV * data
+    CODE:
+        /* SSL_set_default_passwd_cb_userdata is set in SSL_set_default_passwd_cb */
+        if (data==NULL || !SvOK(data)) {
+            cb_data_advanced_put(ssl, "ssleay_ssl_passwd_cb!!data", NULL);
+        }
+        else {
+            cb_data_advanced_put(ssl, "ssleay_ssl_passwd_cb!!data", newSVsv(data));
+        }
+
+#endif /* !BoringSSL */
+#endif /* !LibreSSL */
+#endif /* >= 1.1.0f */
+
+const BIO_METHOD *
 BIO_f_ssl()
 
-BIO_METHOD *
+const BIO_METHOD *
 BIO_s_mem()
 
 unsigned long
@@ -3552,6 +3651,13 @@ void *
 X509V3_EXT_d2i(ext)
 	X509_EXTENSION *ext
 
+X509_STORE_CTX *
+X509_STORE_CTX_new()
+
+int
+X509_verify_cert(x509_store_ctx)
+     X509_STORE_CTX * 	x509_store_ctx
+    
 int
 X509_STORE_CTX_get_error(x509_store_ctx)
      X509_STORE_CTX * 	x509_store_ctx
@@ -4216,12 +4322,33 @@ SSLv3_method()
 #endif
 
 const SSL_METHOD *
+SSLv23_method()
+
+const SSL_METHOD *
+SSLv23_server_method()
+
+const SSL_METHOD *
+SSLv23_client_method()
+
+const SSL_METHOD *
 TLSv1_method()
+
+const SSL_METHOD *
+TLSv1_server_method()
+
+const SSL_METHOD *
+TLSv1_client_method()
 
 #ifdef SSL_TXT_TLSV1_1
 
 const SSL_METHOD *
 TLSv1_1_method()
+
+const SSL_METHOD *
+TLSv1_1_server_method()
+
+const SSL_METHOD *
+TLSv1_1_client_method()
 
 #endif
 
@@ -4230,7 +4357,73 @@ TLSv1_1_method()
 const SSL_METHOD *
 TLSv1_2_method()
 
+const SSL_METHOD *
+TLSv1_2_server_method()
+
+const SSL_METHOD *
+TLSv1_2_client_method()
+
 #endif
+
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x20020002L)
+
+const SSL_METHOD *
+TLS_method()
+
+const SSL_METHOD *
+TLS_server_method()
+
+const SSL_METHOD *
+TLS_client_method()
+
+#endif /* OpenSSL 1.1.0 or LibreSSL 2.2.2 */
+
+
+#if  (OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)) || (LIBRESSL_VERSION_NUMBER >= 0x2060000fL)
+
+int
+SSL_CTX_set_min_proto_version(ctx, version)
+     SSL_CTX *  ctx
+     int        version
+
+int
+SSL_CTX_set_max_proto_version(ctx, version)
+     SSL_CTX *  ctx
+     int        version
+
+int
+SSL_set_min_proto_version(ssl, version)
+     SSL *  ssl
+     int    version
+
+int
+SSL_set_max_proto_version(ssl, version)
+     SSL *  ssl
+     int    version
+
+#endif /* OpenSSL 1.1.0 or LibreSSL 2.6.0 */
+
+
+#if OPENSSL_VERSION_NUMBER >= 0x1010007fL && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_CTX_get_min_proto_version(ctx)
+     SSL_CTX *  ctx
+
+int
+SSL_CTX_get_max_proto_version(ctx)
+     SSL_CTX *  ctx
+
+int
+SSL_get_min_proto_version(ssl)
+     SSL *  ssl
+
+int
+SSL_get_max_proto_version(ssl)
+     SSL *  ssl
+
+#endif /* OpenSSL 1.1.0g */
 
 
 #if OPENSSL_VERSION_NUMBER < 0x10000000L
@@ -4570,6 +4763,16 @@ int
 SSL_CTX_use_certificate_chain_file(ctx,file)
      SSL_CTX *	ctx
      const char * file
+
+
+#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+
+int
+SSL_use_certificate_chain_file(ssl,file)
+     SSL * ssl
+     const char * file
+
+#endif /* OpenSSL 1.1.0 */
 
 int
 SSL_CTX_use_PrivateKey(ctx,pkey)
@@ -5824,6 +6027,80 @@ X509_VERIFY_PARAM_lookup(name)
 void
 X509_VERIFY_PARAM_table_cleanup()
 
+#if OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(LIBRESSL_VERSION_NUMBER) /* OpenSSL 1.0.2 */
+
+X509_VERIFY_PARAM *
+SSL_CTX_get0_param(ctx)
+   SSL_CTX * ctx
+
+X509_VERIFY_PARAM *
+SSL_get0_param(ssl)
+   SSL * ssl
+
+int
+X509_VERIFY_PARAM_set1_host(param, name)
+    X509_VERIFY_PARAM *param
+    PREINIT:
+    STRLEN namelen;
+    INPUT:
+    const char * name = SvPV(ST(1), namelen);
+    CODE:
+    RETVAL = X509_VERIFY_PARAM_set1_host(param, name, namelen);
+    OUTPUT:
+    RETVAL
+
+int
+X509_VERIFY_PARAM_add1_host(param, name)
+    X509_VERIFY_PARAM *param
+    PREINIT:
+    STRLEN namelen;
+    INPUT:
+    const char * name = SvPV(ST(1), namelen);
+    CODE:
+    RETVAL = X509_VERIFY_PARAM_add1_host(param, name, namelen);
+    OUTPUT:
+    RETVAL
+
+void
+X509_VERIFY_PARAM_set_hostflags(param, flags)
+    X509_VERIFY_PARAM *param
+    unsigned int flags
+
+char *
+X509_VERIFY_PARAM_get0_peername(param)
+    X509_VERIFY_PARAM *param
+
+int
+X509_VERIFY_PARAM_set1_email(param, email)
+    X509_VERIFY_PARAM *param
+    PREINIT:
+    STRLEN emaillen;
+    INPUT:
+    const char * email = SvPV(ST(1), emaillen);
+    CODE:
+    RETVAL = X509_VERIFY_PARAM_set1_email(param, email, emaillen);
+    OUTPUT:
+    RETVAL
+
+int
+X509_VERIFY_PARAM_set1_ip(param, ip)
+    X509_VERIFY_PARAM *param
+    PREINIT:
+    STRLEN iplen;
+    INPUT:
+    const unsigned char * ip = (const unsigned char *)SvPV(ST(1), iplen);
+    CODE:
+    RETVAL = X509_VERIFY_PARAM_set1_ip(param, ip, iplen);
+    OUTPUT:
+    RETVAL
+
+int
+X509_VERIFY_PARAM_set1_ip_asc(param, ipasc)
+    X509_VERIFY_PARAM *param
+    const char *ipasc
+
+#endif /* OpenSSL 1.0.2 */
+
 void
 X509_policy_tree_free(tree)
     X509_POLICY_TREE *tree
@@ -6053,7 +6330,7 @@ X509_get_X509_PUBKEY(x)
    XPUSHs(sv_2mortal(newSVpv((char*)pc,len)));
    Safefree(pc);
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG) && !defined(LIBRESSL_VERSION_NUMBER)
 
 int
 SSL_CTX_set_next_protos_advertised_cb(ctx,callback,data=&PL_sv_undef)
@@ -6309,7 +6586,7 @@ SSL_OCSP_cert2ids(ssl,...)
 	OCSP_CERTID *id;
 	int i;
 	STRLEN len;
-	unsigned char *pc,*pi;
+	unsigned char *pi;
 
 	if (!ssl) croak("not a SSL object");
 	ctx = SSL_get_SSL_CTX(ssl);
@@ -6324,15 +6601,15 @@ SSL_OCSP_cert2ids(ssl,...)
 	    if (!(issuer = find_issuer(cert,store,chain)))
 		croak("cannot find issuer certificate");
 	    if (!(id = OCSP_cert_to_id(EVP_sha1(),cert,issuer)))
-		croak("out of memory for generating OCSO certid");
-	    if (!(len = i2d_OCSP_CERTID(id,NULL)))
+		croak("out of memory for generating OCSP certid");
+
+	    pi = NULL;
+	    if (!(len = i2d_OCSP_CERTID(id,&pi)))
 		croak("OCSP certid has no length");
-	    Newx(pc,len,unsigned char);
-	    if (!pc) croak("out of memory");
-	    pi = pc;
-	    i2d_OCSP_CERTID(id,&pi);
-	    XPUSHs(sv_2mortal(newSVpv((char*)pc,len)));
-	    Safefree(pc);
+	    XPUSHs(sv_2mortal(newSVpvn((char *)pi, len)));
+
+	    free(pi);
+	    OCSP_CERTID_free(id);
 	}
 
 
@@ -6416,6 +6693,7 @@ SSL_OCSP_response_verify(ssl,rsp,svreq=NULL,flags=0)
 		 * So find this CA ourself and retry verification. */
 		X509 *issuer;
 		X509 *last = sk_X509_value(chain,sk_X509_num(chain)-1);
+		ERR_clear_error(); /* clear error from last OCSP_basic_verify */
 		if (last && (issuer = find_issuer(last,store,chain))) {
 		    OCSP_basic_add1_cert(bsr, issuer);
 		    TRACE(1,"run OCSP_basic_verify with issuer for last chain element");
@@ -6554,6 +6832,7 @@ OCSP_response_results(rsp,...)
 		croak("%s", error);
 	    }
 	}
+	OCSP_BASICRESP_free(bsr);
 	if (!want_array)
 	    XPUSHs(sv_2mortal(newSViv(nextupd)));
 

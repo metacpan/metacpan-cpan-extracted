@@ -5,9 +5,9 @@ use Test::Deep;
 
 use Keyword::Value;
 
-value $i = 1;
-value $j = [2];
-value $k = { qw( a b ) };
+value my $i = 1;
+value my $j = [2];
+value my $k = { qw( a b ) };
 
 cmp_deeply $i, 1,               '$i = 1'
 or BAIL_OUT 'mis-assigned $i';

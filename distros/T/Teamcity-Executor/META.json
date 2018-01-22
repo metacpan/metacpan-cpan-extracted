@@ -52,8 +52,9 @@
             "IO::Async::Loop" : "0",
             "IO::Async::Timer::Periodic" : "0",
             "IO::Socket::SSL" : "0",
+            "Log::Any" : "0",
             "Moose" : "0",
-            "autobox::Core" : "0",
+            "Try::Tiny::Retry" : "0",
             "perl" : "5.020"
          }
       },
@@ -66,7 +67,7 @@
    "provides" : {
       "Teamcity::Executor" : {
          "file" : "lib/Teamcity/Executor.pm",
-         "version" : "v0.2.1"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -80,14 +81,14 @@
          "web" : "https://github.com/avast/Teamcity-Executor"
       }
    },
-   "version" : "0.2.1",
+   "version" : "1.1.0",
    "x_authority" : "cpan:TYNOVSKY",
    "x_contributors" : [
       "tynovsky <tynovsky@seznam.cz>",
-      "Ondřej Hošák <ondrej-hosak@users.noreply.github.com>",
+      "Jan Seidl <janseidl@volny.cz>",
       "Jan Seidl <seidl@avast.com>",
       "Ondřej Hošák <ondrej.hosak@avast.com>",
-      "Jan Seidl <janseidl@volny.cz>"
+      "Ondřej Hošák <ondrej-hosak@users.noreply.github.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

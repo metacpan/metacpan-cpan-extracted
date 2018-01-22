@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Log::Any" => "1.045",
     "Log::Any::Adapter::MojoLog" => "0.02",
     "Mercury" => "0.015",
-    "Minion::Backend::mysql" => "0.08",
+    "Minion::Backend::mysql" => "0.12",
     "Mojolicious" => "7.40",
     "Mojolicious::Plugin::Config" => 0,
     "Mojolicious::Plugin::OpenAPI" => "1.21"
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t t/controller/*.t t/legacy/*.t"
   }
@@ -77,7 +77,7 @@ my %FallbackPrereqs = (
   "Log::Any" => "1.045",
   "Log::Any::Adapter::MojoLog" => "0.02",
   "Mercury" => "0.015",
-  "Minion::Backend::mysql" => "0.08",
+  "Minion::Backend::mysql" => "0.12",
   "Mock::MonkeyPatch" => 0,
   "Mojolicious" => "7.40",
   "Mojolicious::Plugin::Config" => 0,

@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.056';
+our $VERSION = '1.058';
 
 use Encode::Locale qw();
 
@@ -34,7 +34,7 @@ C<db-browser> - Browse SQLite/MySQL/PostgreSQL databases and their tables intera
 
 =head1 VERSION
 
-Version 1.056
+Version 1.058
 
 =cut
 
@@ -145,6 +145,9 @@ To reach the I<Create table>/I<Drop table> menu, select the prompt in the menu w
 
 To create a table without inserting anything, enter as the first and only row the column names and then choose "Use the
 first row as column names".
+
+I<Drop table>: the table is shown (here I<Auto Limit> has no effect, the whole table is fetched) before the user
+confirms to drop the table.
 
 =head3 Scalar functions
 

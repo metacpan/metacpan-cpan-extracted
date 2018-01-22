@@ -1,3 +1,23 @@
+20180116   2018-01-16 (PERLANCAR)
+
+          - New exchanges:
+            + BarterDEX
+            + Bitinka
+            + Cobinhood
+            + CoinEx
+            + Coinhouse
+            + Ore.Bz
+            + Radar Relay
+            + Upbit
+
+          - Removed exchanges:
+            + BCC Exchange
+            + CoinsMarkets
+            + Ethfinex
+
+          - Total exchanges now 182 (from 177)
+
+
 20180109   2018-01-09 (PERLANCAR)
 
            - First release.

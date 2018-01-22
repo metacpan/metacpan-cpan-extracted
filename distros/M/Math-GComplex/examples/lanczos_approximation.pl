@@ -7,6 +7,7 @@ use 5.020;
 use strict;
 use warnings;
 
+use lib qw(../lib);
 use Math::GComplex qw(:overload real imag);
 use experimental qw(signatures lexical_subs);
 

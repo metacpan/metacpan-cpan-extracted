@@ -1,9 +1,13 @@
-Revision history for Data-Dump-Color
+0.240   2018-01-17 (PERLANCAR)
+
+        - Avoid "Negative repeat count does nothing" warning (thanks Scott
+          Baker).
+
 
 0.23    2014-10-29 (PERLANCAR)
 
-	- [Bugfix] Use original strings (not dumped results) when printing
-	  element/key/value lengths.
+	- [Bugfix] Use length of original strings (not dumped results) when
+	  printing string length hints.
 
 
 0.22    2014-10-20 (PERLANCAR)

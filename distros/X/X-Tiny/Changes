@@ -1,5 +1,8 @@
 Revision history for Perl module X::Tiny
 
+0.13 Fri Jan 18 2018
+- Fix copyright notice and spelling (no production changes)
+
 0.12 Sat Jan 13 2018
 - Fix stack trace not to warn on undefined arguments in stack trace.
 This means that all scalar values will be quoted in the stack trace.

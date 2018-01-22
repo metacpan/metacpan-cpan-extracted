@@ -113,7 +113,6 @@ sub guess_protocol {
 	    $guess->detach($self);
 	} else {
 	    debug("need more data to decide if HTTP");
-	    return;
 	}
     } else {
 	# data from server but no request header from

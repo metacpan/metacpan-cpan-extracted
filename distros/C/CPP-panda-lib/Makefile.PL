@@ -6,11 +6,11 @@ my %params = (
     NAME          => 'CPP::panda::lib',
     VERSION_FROM  => 'lib/CPP/panda/lib.pm',
     ABSTRACT_FROM => 'lib/CPP/panda/lib.pod',
-    CPLUS         => 14,
+    CPLUS         => 11,
     SRC           => ['src'],
     INC           => '-Isrc',
     BIN_SHARE     => {
-        CPLUS    => 14,
+        CPLUS    => 11,
         INCLUDE  => {'src' => '/'},
     },
     BIN_DEPS => ['CPP::catch::test'],

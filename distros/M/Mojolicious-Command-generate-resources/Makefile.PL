@@ -1,5 +1,4 @@
-
-
+use 5.020001;
 use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -10,9 +9,9 @@ WriteMakefile(
     'lib/Mojolicious/Command/generate/resources.pm',    # finds \$VERSION
   AUTHOR        => 'Красимир Беров (berov@cpan.org)',
   ABSTRACT_FROM => 'lib/Mojolicious/Command/generate/resources.pm',
-  PREREQ_PM     => {'Mojolicious' => '7.60'},
+  PREREQ_PM     => {'Mojolicious' => '7.60', perl => '5.020001'},
   TEST_REQUIRES => {'Mojo::SQLite' => '3.000'},
-  test          => {TESTS => 't/*.t'},
+  test          => {TESTS          => 't/*.t'},
   META_MERGE    => {
     dynamic_config => 0,
     'meta-spec'    => {version => 2},

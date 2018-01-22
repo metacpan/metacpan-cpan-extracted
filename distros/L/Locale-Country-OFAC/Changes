@@ -1,3 +1,5 @@
+1.2.0 2018-01-18
+  - Removed Sudan from sanctioned countries list and test
 1.1.0 2015-02-11
   - Added is_region_sanctioned method
   - Added support for Crimea region

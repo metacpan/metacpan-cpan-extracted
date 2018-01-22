@@ -60,4 +60,19 @@ inline uint64_t h2le64 (uint64_t x) { return _am_i_little ? x : bswap64(x); }
 inline uint64_t be2h64 (uint64_t x) { return _am_i_little ? bswap64(x) : x; }
 inline uint64_t le2h64 (uint64_t x) { return _am_i_little ? x : bswap64(x); }
 
+inline uint16_t h2be (uint16_t x) { return h2be16(x); }
+inline uint16_t h2le (uint16_t x) { return h2le16(x); }
+inline uint16_t be2h (uint16_t x) { return be2h16(x); }
+inline uint16_t le2h (uint16_t x) { return le2h16(x); }
+
+inline uint32_t h2be (uint32_t x) { return h2be32(x); }
+inline uint32_t h2le (uint32_t x) { return h2le32(x); }
+inline uint32_t be2h (uint32_t x) { return be2h32(x); }
+inline uint32_t le2h (uint32_t x) { return le2h32(x); }
+
+inline uint64_t h2be (uint64_t x) { return h2be64(x); }
+inline uint64_t h2le (uint64_t x) { return h2le64(x); }
+inline uint64_t be2h (uint64_t x) { return be2h64(x); }
+inline uint64_t le2h (uint64_t x) { return le2h64(x); }
+
 }}

@@ -1,14 +1,12 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.180140';
+$Bio::MUST::Core::Types::VERSION = '0.180190';
 use Moose::Util::TypeConstraints;
 
 use autodie;
 use feature qw(say);
 
 use Path::Class qw(dir file);
-
-use Bio::MUST::Core::Utils qw(fix_homedir);
 
 # declare types without loading corresponding classes
 class_type('Bio::MUST::Core::Ali');
@@ -90,17 +88,21 @@ coerce 'Bio::MUST::Core::Types::full_ids'
 # quite tolerant subtype designed to preserve original casing
 # however FASTA '-' symbols are converted to ALI '*' during coercion
 # whereas spaces and '?' are left untouched
+# moreover single trailing '*' (explicit STOP codons) are deleted
 # Note: \A are \z are absolutely required for converting hard-wrapped seqs
 subtype 'Bio::MUST::Core::Types::Seq'
     => as 'Str'
-    => where { m{\A [\*\ A-Za-z\?]* \z}xms }
+    => where {
+            m{\A [\*\ A-Za-z\?]*    \z}xms  # possibly gapped seq
+        && !m{\A [    A-Za-z\?]* \* \z}xms  # but not plain seq ending in '*'
+       }
     => message { 'Only IUPAC codes and gaps [*-<space>?] are allowed.' }
 ;
 
 coerce 'Bio::MUST::Core::Types::Seq'
     => from 'Str'
-    => via { tr/-\n/*/dr }          # convert FASTA on the fly
-;                                   # ('-' => '*' and delete newlines)
+    => via { ( my $seq = tr{-\n}{*}dr ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq }
+;   # Note: s/// only modifies plain seqs ending in '*'
 
 class_type('Path::Class::Dir');
 class_type('Path::Class::File');
@@ -110,7 +112,7 @@ class_type('Path::Class::File');
 
 coerce 'Bio::MUST::Core::Ali'
     => from 'ArrayRef[Bio::MUST::Core::Seq]'
-    => via { Bio::MUST::Core::Ali->new( seqs => $_, guessing => 0 ) }
+    => via { Bio::MUST::Core::Ali->new( seqs => $_, guessing => 1 ) }
 
     => from 'Path::Class::File'
     => via { Bio::MUST::Core::Ali->load( $_->stringify ) }
@@ -173,10 +175,10 @@ subtype 'Bio::MUST::Core::Types::Dir'
 ;
 
 # avoid the need for 'isa' unions such as 'Str|Path::Class::Dir'...
-# ... and allow fixing '~/' paths on the fly
+# ... and allow fixing '~/' paths on the fly (through glob)
 coerce 'Bio::MUST::Core::Types::Dir'
     => from 'Str'
-    => via { dir( fix_homedir($_) ) }
+    => via { dir( glob $_ ) }
 ;
 
 # === borrowed from Bio::FastParsers to avoid depending on this module
@@ -188,10 +190,11 @@ subtype 'Bio::MUST::Core::Types::File'
 ;
 
 # avoid the need for 'isa' unions such as 'Str|Path::Class::File'...
+# ... and allow fixing '~/' paths on the fly (through glob)
 # ... and allow delegating to Path::Class::File methods (e.g., remove)
 coerce 'Bio::MUST::Core::Types::File'
     => from 'Str'
-    => via { file($_) }
+    => via { file( glob $_ ) }
 ;
 
 # ===
@@ -209,7 +212,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.180140
+version 0.180190
 
 =head1 SYNOPSIS
 

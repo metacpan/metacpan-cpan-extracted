@@ -27,7 +27,7 @@ use Net::Cisco::ISE::NetworkDeviceGroup;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $ERROR %actions);
-    $VERSION     = '0.05';
+    $VERSION     = '0.06';
     @ISA         = qw(Exporter);
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
@@ -73,7 +73,19 @@ has 'debug' => (
     isa => 'Str',
     default => '0',
 );
+
+has 'namespace3' => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'ns3:resources',
+);
     
+has 'namespace5' => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'ns5:resource',
+);
+
 sub internalusers # No Moose here :(
 {	my $self = shift;
     $ERROR = "";
@@ -585,9 +597,11 @@ sub parse_xml
   my $xml_ref = shift;
   my $xmlsimple = XML::Simple->new(SuppressEmpty => 1);
   my $xmlout = $xmlsimple->XMLin($xml_ref);
+  my $namespace3 = $self->namespace3;
+  my $namespace5 = $self->namespace5;
   if ($type eq "InternalUsers")
   { #my $users_ref = $xmlout->{"InternalUser"};
-    my $users_ref = $xmlout->{"resources"}{"resource"};
+    my $users_ref = $xmlout->{$namespace3}{$namespace5};
     my %users = ();
     for my $key (keys % {$users_ref})
     { my $user = Net::Cisco::ISE::InternalUser->new( name => $key, %{ $users_ref->{$key} } );
@@ -604,7 +618,7 @@ sub parse_xml
   }
 
   if ($type eq "IdentityGroups")
-  { my $identitygroups_ref = $xmlout->{"resources"}{"resource"};
+  { my $identitygroups_ref = $xmlout->{$namespace3}{$namespace5};
     my %identitygroups = ();
     # With Single entry, this approach will break!!!
     # !!BUG!!
@@ -623,8 +637,9 @@ sub parse_xml
   }
   
   if ($type eq "NetworkDevices")
-  { my $device_ref = $xmlout->{"resources"}{"resource"};
+  { my $device_ref = $xmlout->{$namespace3}{$namespace5};
     my %devices = (); 
+    warn Dumper $xml_ref if $self->debug;
     for my $key (keys % {$device_ref})
     { my $device = Net::Cisco::ISE::NetworkDevice->new( name => $key, id => $device_ref->{$key}{"id"} );
       $devices{$key} = $device;
@@ -640,7 +655,7 @@ sub parse_xml
   }
 
   if ($type eq "NetworkDeviceGroups")
-  { my $devicegroup_ref = $xmlout->{"resources"}{"resource"};
+  { my $devicegroup_ref = $xmlout->{$namespace3}{$namespace5};
     my %devicegroups = ();
 	for my $key (keys % {$devicegroup_ref})
     { my $devicegroup = Net::Cisco::ISE::NetworkDeviceGroup->new( name => $key, %{ $devicegroup_ref->{$key} } );
@@ -657,7 +672,7 @@ sub parse_xml
   }
   
   if ($type eq "Endpoints")
-  { my $host_ref = $xmlout->{"resources"}{"resource"};
+  { my $host_ref = $xmlout->{$namespace3}{$namespace5};
     my %hosts = ();
 	for my $key (keys % {$host_ref})
     { #my $host = Net::Cisco::ISE::Endpoint->new( macAddress => $key, %{ $host_ref->{$key} } );
@@ -674,7 +689,7 @@ sub parse_xml
   }
  
   if ($type eq "EndpointCertificates")
-  { my $host_ref = $xmlout->{"resources"}{"resource"};
+  { my $host_ref = $xmlout->{$namespace3}{$namespace5};
     my %hosts = ();
     for my $key (keys % {$host_ref})
     { #my $host = Net::Cisco::ISE::EndpointCertificate->new( name => $key, %{ $host_ref->{$key} } );
@@ -691,7 +706,7 @@ sub parse_xml
   }
 
   if ($type eq "EndpointIdentityGroups")
-  { my $host_ref = $xmlout->{"resources"}{"resource"};
+  { my $host_ref = $xmlout->{$namespace3}{$namespace5};
     my %hosts = ();
     for my $key (keys % {$host_ref})
     { #my $host = Net::Cisco::ISE::EndpointIdentityGroup->new( name => $key, %{ $host_ref->{$key} } );
@@ -708,7 +723,7 @@ sub parse_xml
   }
 
   if ($type eq "Portals")
-  { my $host_ref = $xmlout->{"resources"}{"resource"};
+  { my $host_ref = $xmlout->{$namespace3}{$namespace5};
     my %hosts = ();
     for my $key (keys % {$host_ref})
     { #my $host = Net::Cisco::ISE::Portal->new( name => $key, %{ $host_ref->{$key} } );
@@ -725,7 +740,7 @@ sub parse_xml
   }
 
   if ($type eq "Profiles")
-  { my $host_ref = $xmlout->{"resources"}{"resource"};
+  { my $host_ref = $xmlout->{$namespace3}{$namespace5};
     my %hosts = ();
     for my $key (keys % {$host_ref})
     { #my $host = Net::Cisco::ISE::Profile->new( name => $key, %{ $host_ref->{$key} } );
@@ -792,10 +807,10 @@ Net::Cisco::ISE - Access Cisco ISE functionality through REST API
 	my $identitygroup = $ise->identitygroups("id","4fffc260-9b96-11e6-93fb-005056ad1454");
 	# Faster call to request specific identity group information by ID (assigned by ISE, present in Net::Cisco::ISE::IdentityGroup)
 
-	my $device = $acs->networkdevices("name","MAIN_Router");
+	my $device = $ise->networkdevices("name","MAIN_Router");
 	# Faster call to request specific device information by name
 
-	my $device = $acs->networkdevices("id","250");
+	my $device = $ise->networkdevices("id","250");
 	# Faster call to request specific device information by ID (assigned by ISE, present in Net::Cisco::ISE::NetworkDevice)
 	
 	$user->id(0); # Required for new user!
@@ -842,7 +857,7 @@ Net::Cisco::ISE - Access Cisco ISE functionality through REST API
 	
 =head1 DESCRIPTION
 
-Net::Cisco::ISE is an implementation of the Cisco Identity Services Engine (ISE) REST API. Cisco ISE is a application / appliance that can be used for network access policy control. In short, it allows configuration of access policies for specific users onto specific devices and applications (either using RADIUS or TACACS+ authentication). Net::Cisco::ISE currently supports InternalUser and IdentityGroup.
+Net::Cisco::ISE is an implementation of the Cisco Identity Services Engine (ISE) REST API. Cisco ISE is a application / appliance that can be used for network access policy control. In short, it allows configuration of access policies for specific users onto specific devices and applications (either using RADIUS or TACISE+ authentication). Net::Cisco::ISE currently supports InternalUser and IdentityGroup.
 
 =head1 USAGE
 
@@ -875,6 +890,12 @@ Optional fields are
 
 =item ssl_options
 
+=item debug
+
+=item namespace3
+
+=item namespace5
+
 =back
 
 =item hostname
@@ -899,13 +920,25 @@ Value is passed directly to LWP::UserAGent as ssl_opt. Default value (hash-ref) 
 
 	{ 'SSL_verify_mode' => SSL_VERIFY_NONE, 'verify_hostname' => '0' }
 
+=item debug
+
+Set to true to enable debugging messages. This can be useful for troubleshooting.
+
+=item namespace3
+
+By default set to ns3:resources. This is used in the XML parsing. May be needed for tweaking. 
+
+=item namespace5
+
+By default set to ns5:resource. This is used in the XML parsing. May be needed for tweaking.
+
 =back
 
 From the class instance, call the different methods for retrieving values.
 
 =over 3
 
-=item users
+=item internalusers
 
 Returns hash or single instance, depending on context.
 
@@ -943,38 +976,38 @@ The returned hash contains instances of L<Net::Cisco::ISE::IdentityGroup>, using
 
 	print $identitygroup->id;
 	
-=item devices
+=item networkdevices
 
 Returns hash or single instance, depending on context.
 
-	my %devices = $acs->networkdevices(); # Slow
-	my $device = $acs->networkdevices()->{"Main_Router"};
+	my %devices = $ise->networkdevices(); # Slow
+	my $device = $ise->networkdevices()->{"Main_Router"};
 	print $device->name;
 	
 The returned hash contains instances of L<Net::Cisco::ISE::NetworkDevice>, using name (typically the sysname) as the hash key. Using a call to C<device> with no arguments will retrieve all devices and can take quite a few seconds (depending on the size of your database). When you know the hostname or ID, use the L<devices> call with arguments as listed below.
 	
-	my $device = $acs->device("name","Main_Router"); # Faster
+	my $device = $ise->networkdevices("name","Main_Router"); # Faster
 	# or
-	my $device = $acs->device("id","123"); # Faster
+	my $device = $ise->networkdevices("id","123"); # Faster
 	print $device->name;
 
 	The ID is typically generated by Cisco ISE when the entry is created. It can be retrieved by calling the C<id> method on the object.
 
 	print $device->id;
 
-=item devicegroups
+=item networkdevicegroups
 
 Returns hash or single instance, depending on context.
 
-	my %devicegroups = $acs->networkdevicegroups(); # Slow
-	my $devicegroup = $acs->networkdevicegroups()->{"All Locations:Main Site"};
+	my %devicegroups = $ise->networkdevicegroups(); # Slow
+	my $devicegroup = $ise->networkdevicegroups()->{"All Locations:Main Site"};
 	print $devicegroup->name;
 
 The returned hash contains instances of L<Net::Cisco::ISE::NetworkDeviceGroup>, using name (typically the device group name) as the hash key. Using a call to C<devicegroups> with no arguments will retrieve all device groups and can take quite a few seconds (depending on the size of your database). When you know the device group or ID, use the L<devicegroups> call with arguments as listed below.
 	
-	my $devicegroup = $acs->networkdevicegroups("name","All Locations::Main Site"); # Faster
+	my $devicegroup = $ise->networkdevicegroups("name","All Locations::Main Site"); # Faster
 	# or
-	my $devicegroup = $acs->networkdevicegroups("id","123"); # Faster
+	my $devicegroup = $ise->networkdevicegroups("id","123"); # Faster
 	print $devicegroup->name;
 
 The ID is typically generated by Cisco ISE when the entry is created. It can be retrieved by calling the C<id> method on the object.
@@ -997,12 +1030,12 @@ This method created a new entry in Cisco ISE, depending on the argument passed. 
 	print $Net::Cisco::ISE::ERROR unless $id;
 	# $Net::Cisco::ISE::ERROR contains details about failure
 
-	my $device = $acs->networkdevices("name","Main_Router");
+	my $device = $ise->networkdevices("name","Main_Router");
 	$device->name("AltRouter"); # Required field
 	$device->description("Standby Router"); 
 	$device->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # Change IP address! Overlap check is enforced!
 	$device->id(0); # Required for new device!
-	my $id = $acs->create($device);
+	my $id = $ise->create($device);
 	# Create new device based on Net::Cisco::ISE::NetworkDevice instance
 	# Return value is ID generated by ISE
 	print "Record ID is $id" if $id;
@@ -1043,10 +1076,10 @@ This method updates an existing entry in Cisco ISE, depending on the argument pa
 	print $Net::Cisco::ISE::ERROR unless $id;
 	# $Net::Cisco::ISE::ERROR contains details about failure
 
-	my $device = $acs->networkdevices("name","Main_Router");
+	my $device = $ise->networkdevices("name","Main_Router");
 	$user->description("To be ceased"); # Change description
 	$device->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # or Change IP address. Overlap check is enforced!
-	my $id = $acs->update($device);
+	my $id = $ise->update($device);
 	# Create new device based on Net::Cisco::ISE::NetworkDevice instance
 	# Return value is ID generated by ISE
 	print "Record ID is $id" if $id;
@@ -1069,15 +1102,15 @@ Multiple instances can be passed as an argument. Objects will be updated in bulk
 	# print $Net::Cisco::ISE::ERROR unless $id;
 	# $Net::Cisco::ISE::ERROR contains details about failure
 
-	my $device = $acs->networkdevices("name","Main_Router");
+	my $device = $ise->networkdevices("name","Main_Router");
 	$device->description("Main Router"); 
 	$device->ips([{netMask => "32", ipAddress=>"10.0.0.1"}]); # Change IP address! Overlap check is enforced!
 
-	my $device2 = $acs->networkdevices("name","Alt_Router");
+	my $device2 = $ise->networkdevices("name","Alt_Router");
 	$device2->description("Standby Router"); 
 	$device2->ips([{netMask => "32", ipAddress=>"10.0.0.2"}]); # Change IP address! Overlap check is enforced!
 	
-    my $id = $acs->create($device,$device2);
+        my $id = $ise->create($device,$device2);
 	# Update devices based on Net::Cisco::ISE::NetworkDevice instances in arguments
 	# Return value is ID generated by ISE but not guaranteed.
 	# print "Record ID is $id" if $id;

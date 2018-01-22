@@ -4,7 +4,7 @@ use Modern::Perl;
 use IO::All;
 use namespace::autoclean;
 
-our $VERSION = '0.1.13'; # VERSION: 
+our $VERSION = '0.1.14'; # VERSION: 
 # ABSTRACT: my perl module and CLIs for Biology
 
 
@@ -20,6 +20,14 @@ has name => (
   is  => 'rw',
   isa => 'Str',
   default => sub { 'yanxq' },
+  lazy => 1,
+);
+
+
+has queue_name => (
+  is  => 'rw',
+  isa => 'Str',
+  default => sub { 'batch' },
   lazy => 1,
 );
 
@@ -97,7 +105,8 @@ sub qsub {
   my $self = shift;
   my $sh_name = $self->get_sh;
   my ($name, $cpu) = ($self->name, $self->cpu);
-  my $qsub_result = `qsub -l nodes=1:ppn=$cpu -N $name $sh_name`;
+  my $queue_name = $self->queue_name;
+  my $qsub_result = `qsub -l nodes=1:ppn=$cpu -q $queue_name -N $name $sh_name`;
   say "qsub result: $qsub_result\n";
   if ($qsub_result =~/^(\d+?)\./) {
     say "job_id: $1\n";
@@ -150,7 +159,7 @@ Bioinfo::PBS - my perl module and CLIs for Biology
 
 =head1 VERSION
 
-version 0.1.13
+version 0.1.14
 
 =head1 SYNOPSIS
 
@@ -177,6 +186,8 @@ cpu number that will apply
 =head2 name
 
 prefix of output of STANDARD and ERR
+
+=head2 queue_name
 
 =head2 cmd
 

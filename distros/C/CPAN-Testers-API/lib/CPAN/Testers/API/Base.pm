@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::API::Base;
-our $VERSION = '0.022';
+our $VERSION = '0.023';
 # ABSTRACT: Base module for importing standard modules, features, and subs
 
 #pod =head1 SYNOPSIS
@@ -62,7 +62,7 @@ CPAN::Testers::API::Base - Base module for importing standard modules, features,
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

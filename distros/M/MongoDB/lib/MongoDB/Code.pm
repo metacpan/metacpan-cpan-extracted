@@ -22,7 +22,7 @@ package MongoDB::Code;
 # ABSTRACT: JavaScript Code
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 #pod =head1 NAME
 #pod
@@ -78,7 +78,7 @@ MongoDB::Code - JavaScript Code
 
 =head1 VERSION
 
-version v1.8.0
+version v1.8.1
 
 =head1 NAME
 
@@ -122,7 +122,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by MongoDB, Inc.
+This software is Copyright (c) 2018 by MongoDB, Inc.
 
 This is free software, licensed under:
 

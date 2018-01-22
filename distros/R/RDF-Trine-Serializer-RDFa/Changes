@@ -1,0 +1,11 @@
+RDF-Trine-Serializer-RDFa
+=========================
+
+Created:      2017-12-22
+Home page:    <https://metacpan.org/release/RDF-Trine-Serializer-RDFa>
+Bug tracker:  <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.02	2018-01-16	Improve documentation
+
+0.01	2018-01-16	Initial release

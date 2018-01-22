@@ -25,7 +25,7 @@ use warnings;
 package MongoDB::_Link;
 
 use version;
-our $VERSION = 'v1.8.0';
+our $VERSION = 'v1.8.1';
 
 use Moo;
 use Errno qw[EINTR EPIPE];
@@ -51,7 +51,7 @@ use Types::Standard qw(
 use namespace::clean;
 
 my $SOCKET_CLASS =
-  eval { require IO::Socket::IP; IO::Socket::IP->VERSION(0.25) }
+  eval { require IO::Socket::IP; IO::Socket::IP->VERSION(0.32) }
   ? 'IO::Socket::IP'
   : 'IO::Socket::INET';
 
@@ -426,6 +426,7 @@ sub read {
         }
 
         if ( !defined $len ) {
+            next if length($msg) < 4;
             $len = unpack( P_INT32, $msg );
             MongoDB::ProtocolError->throw(
                 qq/Server reply of size $len exceeds maximum of / . $self->{max_message_size_bytes} )

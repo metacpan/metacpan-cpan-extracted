@@ -1,0 +1,3811 @@
+#!perl
+
+our $DATE = '2018-01-15'; # DATE
+our $VERSION = '1.020'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Log::ger; BEGIN { $Log::ger::Current_Level = 4 }
+
+use PERLANCAR::Module::List;
+use Perinci::CmdLine::Any;
+
+my $prefix = '/App/lcpan/';
+my $mods = do {
+    # if we are being called during the building of our own dist by dzil (e.g.
+    # by Pod::Weaver::Plugin::Rinci), don't include subcommands installed
+    # outside our dist. otherwise we'll be documenting and depending on
+    # extraneous subcommands.
+    local @INC = ("lib")
+        if $ENV{DZIL} &&
+            # DZP:SetEnv always sets DZIL=1 so we need to know if it's our own
+            # dist that we're building
+            (!defined($ENV{DZIL_NAME}) || $ENV{DZIL_NAME} eq 'App-lcpan');
+
+    PERLANCAR::Module::List::list_modules(
+        "App::lcpan::Cmd::", {list_modules=>1});
+};
+my $subcommands = {};
+for my $mod (keys %$mods) {
+    (my $sc_name = $mod) =~ s/App::lcpan::Cmd:://;
+    $sc_name =~ s/_/-/g;
+
+    # old subcommands
+    next if $sc_name =~ /\A(update-files|update-index)\z/;
+
+    (my $url = $mod) =~ s!::!/!g;
+    $subcommands->{$sc_name} = {
+        url => "/$url/handle_cmd",
+    };
+}
+
+my $cli = Perinci::CmdLine::Any->new(
+    url => $prefix,
+    log => 1,
+    subcommands => $subcommands,
+);
+$cli->common_opts->{naked_res}{default} = 1;
+$cli->run;
+
+# ABSTRACT: Manage your local CPAN mirror
+# PODNAME: lcpan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lcpan - Manage your local CPAN mirror
+
+=head1 VERSION
+
+This document describes version 1.020 of lcpan (from Perl distribution App-lcpan), released on 2018-01-15.
+
+=head1 SYNOPSIS
+
+=head2 Update (download and index) your local CPAN mirror
+
+ % lcpan update
+
+A mini CPAN mirror will be downloaded in your C<~/cpan> directory. This will
+take a while (it downloads ~3.5GB of files, as of 2016-01-21; subsequent updates
+will of course take shorter time.)
+
+A SQLite database is also created/updated in C<~/cpan/index.db> which contains
+information about authors, modules/packages, distributions. This database is
+used to answer various queries.
+
+You can run the above command e.g. daily to keep your mirror up-to-date.
+
+=head2 Inject additional modules to your local CPAN mirror
+
+Sometimes, you only want to add one or a few modules to the local CPAN mirror.
+For example, you are on a bad/expensive Internet connection and cannot afford a
+full mirror update. Or, you have a module that is not indexed on CPAN but want
+to add to your local mirror. To do that:
+
+ % lcpan inject --author SOMEONE Foo-0.01.tar.gz Bar-Baz-2.34.tar.gz
+
+where C<SOMEONE> is an author ID (does not need to already exist) that you
+choose to put the modules under.
+
+This will add the files to the local mirror as well as update the index.
+
+=head2 Using your local CPAN mirror to install modules
+
+ % lcpanm -n Some::Module
+
+C<lcpanm> is a thin wrapper for C<cpanm>, the above command is equivalent to:
+
+ % cpanm --mirror ~/cpan --mirror-only -n Some::Module
+
+=head2 Querying your local CPAN mirror
+
+Info about your local CPAN mirror:
+
+ % lcpan stats
+ +------------------------------+----------------------+
+ | key                          | value                |
+ | last_index_time              | 2015-01-15T13:09:25Z |
+ | mirror_mtime                 | 2015-01-15T13:09:22Z |
+ | num_authors                  | 11981                |
+ | num_dists                    | 30376                |
+ | num_modules                  | 151927               |
+ | num_releases                 | 31877                |
+ | num_releases_with_buildpl    | 6521                 |
+ | num_releases_with_makefilepl | 28948                |
+ | num_releases_with_metajson   | 10625                |
+ | num_releases_with_metayml    | 10689                |
+ | schema_version               | 3                    |
+ +------------------------------+----------------------+
+
+Add C<--verbose> if you want more stats which normally are skipped because they
+can take a while to get (e.g. disk-space).
+
+B<List modules:>
+
+ % lcpan modules                                ;# list all mods
+ % lcpan mods <SOMEQUERY>... --detail           ;# show matching mods only (mods is alias for 'modules')
+ % lcpan mods Win32                             ;# list mods containing 'Win32' in their name/abstract
+ % lcpan mods Win32 API                         ;# list mods containing 'Win32' and 'API' in their name/abstract
+ % lcpan mods Win32 API --or                    ;# list mods containing 'Win32' *or* 'API' in their name/abstract
+ % lcpan mods 'Win32%'                          ;# perform SQL LIKE query (mods whose name/abstract begins with 'Win32')
+ % lcpan mods --or --query-type exact-name Module1 Module2 --detail  ;# show detail for several mods
+ % lcpan mods --author PERLANCAR                ;# mods by some author only
+ % lcpan mods --dist libwww-perl                ;# mods from certain dist only
+ % lcpan mods --namespace Getopt                ;# mods from certain namespace
+ % lcpan mods --namespace Getopt --sort -rdeps  ;# list "popular" modules first (sort by number of reverse deps)
+
+B<List namespaces:>
+
+ % lcpan namespaces                             ;# list all namespaces
+ % lcpan namespaces <SOMEQUERY>... --detail     ;# show matching namespaces only
+ % lcpan namespaces --or --exact-match Win32 MacOSX --detail  ;# show detail for several namespaces
+ % lcpan namespaces -l1 --detail --sort -num_modules ;# list top-level namespaces sorted by number of packages
+
+B<List distributions:>
+
+ % lcpan dists                                  ;# list all dists
+ % lcpan dists --latest                         ;# list all latest dists
+ % lcpan dists <SOMEQUERY>... --detail          ;# show matching dists only
+ % lcpan dists --or --exact-match Dist1 Dist2 --detail  ;# show detail for several dists
+ % lcpan dists --author PERLANCAR               ;# dists from certain author only
+
+B<List authors:>
+
+ % lcpan authors                                ;# list all authors
+ % lcpan authors <SOMEQUERY>... --detail        ;# list matching authors only
+ % lcpan authors --or --exact-match PERLANCAR KENTNL --detail  ;# show detail for several authors
+
+B<List releases (tarballs):>
+
+ % lcpan releases                               ;# list all releases
+ % lcpan rels <SOMEQUERY>... --detail           ;# rels is alias for 'releases'
+ % lcpan rels --or --exact-match Foo-1.23.tar.gz Bar-2.34.tar.gz --detail  ;# show detail for several rels
+ % lcpan rels --author PERLANCAR                ;# rels from certain authors only
+
+B<List contents (files inside release archives):>
+
+ % lcpan contents                               ;# WARNING: LOTS of output
+ % lcpan contents <SOMEQUERY> ... --detail      ;# search, show detail
+ % lcpan contents --dist File-Path              ;# list content of a single dist only
+
+B<List scripts:>
+
+ % lcpan scripts                                ;# WARNING: lots of output
+ % lcpan scripts <SOMEQUERY> ... --detail       ;# search, show detail
+ % lcpan scripts --dist App-PMUtils             ;# list scripts of a single dist only
+
+B<Show dependencies and reverse dependencies>:
+
+ % lcpan deps Text::ANSITable    ;# which modules does Text::ANSITable depend on?
+ % lcpan deps Text::ANSITable -R ;# recursive
+ % lcpan deps Text::ANSITable -R --flatten ;# recursive & flatten result
+ % lcpan deps Task::BeLike::CSSON --phase build
+ % lcpan deps Text::ANSITable --phase ALL --rel ALL
+
+ % lcpan rdeps Text::ANSITable ;# which dists depend on Text::ANSITable?
+
+B<Show mentions (references to modules/scripts from POD files within releases)>:
+
+ % lcpan mentions --mentioned-module Path::Tiny ;# who mentions Path::Tiny module?
+ % lcpan mentions --mentioned-script mpath      ;# who mentions mpath script?
+
+B<Some other utilities>:
+
+ % lcpan mod2dist Text::ANSITable::ColorTheme::Default ;# -> Text-ANSITable
+
+ % lcpan mod2rel  Text::ANSITable::ColorTheme::Default ;# -> Text-ANSITable-0.39.tar.gz
+ % lcpan mod2rel  Text::ANSITable --full-path          ;# -> /cpan/authors/id/P/PE/PERLANCAR/Text-ANSITable-0.39.tar.gz
+
+ % lcpan dist2rel Text-ANSITable             ;# -> Text-ANSITable-0.39.tar.gz
+ % lcpan dist2rel Text-ANSITable --full-path ;# -> /cpan/authors/id/P/PE/PERLANCAR/Text-ANSITable-0.39.tar.gz
+
+ % lcpan dist-mods Text-ANSITable ;# list modules in a distribution
+ Text::ANSITable
+ Text::ANSITable::BorderStyle::Default
+ Text::ANSITable::ColorTheme::Default
+ Text::ANSITable::StyleSet::AltRow
+
+ % lcpan dist-scripts Text-ANSITable ;# list scripts in a distribution
+
+ % lcpan author-mods PERLANCAR   ;# list an author's modules
+ % lcpan author-dists PERLANCAR  ;# list an author's dists
+ % lcpan author-rels PERLANCAR   ;# list an author's releases
+
+ # who are authors with the most number of releases?
+ % lcpan authors-by-rel-count
+
+ # who are authors with the most number of distributions?
+ % lcpan authors-by-dist-count
+
+ # who are authors with the most number of registered modules/packages?
+ % lcpan authors-by-mod-count
+
+ # show all other authors' distributions using one of your modules
+ % lcpan author-rdeps PERLANCAR --user-author-isnt PERLANCAR
+
+ # show your old releases (which you should probably delete from CPAN?)
+ % lcpan releases --author PERLANCAR --nolatest
+
+ # what are modules that are used the most by other distributions?
+ % lcpan mods-by-rdep-count
+
+ # show POD documentation for module/.pod/script (works for uninstalled
+ # modules/scripts since this works by extracting the POD from release tarballs
+ # in the mirror)
+ % lcpan doc Rinci            ;# looks for .pod, .pm, or script
+ % lcpan doc Rinci.pod        ;# specifically looks for .pod
+ % lcpan doc Rinci.pm         ;# specifically looks for .pm
+ % lcpan doc plackup          ;# script
+ % lcpan doc plackup -r       ;# dump the raw POD instead of rendering it
+
+More subcommands are available. lcpan is plugin-based, see/install
+C<App::lcpan::Cmd::*> modules for more subcommands.
+
+=head1 DESCRIPTION
+
+This application is a convenient bundling of C<CPAN::Mini> and an indexer so in
+addition to creating your local CPAN mirror and installing modules from it, you
+can also query various things about your local CPAN mirror quickly from the
+command-line (as well as programmatically). Powerful and more convenient
+querying is the main reason C<lcpan> is created.
+
+=head1 MORE EXAMPLE QUERIES AND COMMANDS FOR CPAN USERS
+
+=head2 Show how many dists will need to be installed if I install this module
+
+TODO
+
+=head2 Install all modules from a certain CPAN author
+
+ % lcpan author-mods PERLANCAR | cpanm -n
+
+or (if you want to install from local CPAN mirror):
+
+ % lcpan author-mods PERLANCAR | lcpanm -n
+
+or (specify release files directly):
+
+ % lcpan author-rels --latest PERLANCAR | cpanm -n
+
+=head2 Update all modules on your system, from local CPAN mirror
+
+ % cpan-outdated --mirror file:$HOME/cpan | lcpanm -n
+
+=head1 MORE EXAMPLE QUERIES AND COMMANDS FOR CPAN AUTHORS
+
+=head2 Count your CPAN modules, dists, and releases
+
+ % lcpan author-mods  PERLANCAR | wc -l
+ % lcpan author-dists PERLANCAR | wc -l
+ % lcpan author-rels  PERLANCAR | wc -l
+
+=head2 More complex queries
+
+For more complex queries, you can always access the SQLite database directly.
+See L<App::lcpan> for the database schema.
+
+=head1 SUBCOMMANDS
+
+=head2 B<author-deps>
+
+List dependencies for all of the dists of an author.
+
+=head2 B<author-deps-by-dependent-count>
+
+List all dependencies of dists of an author, sorted by number of dependent dists.
+
+=head2 B<author-dists>
+
+List distributions of an author.
+
+=head2 B<author-mods>
+
+List modules of an author.
+
+=head2 B<author-rdeps>
+
+Find distributions that use one of author's modules.
+
+=head2 B<author-rels>
+
+List releases of an author.
+
+=head2 B<author-scripts>
+
+List scripts of an author.
+
+=head2 B<authors>
+
+List authors.
+
+=head2 B<authors-by-dist-count>
+
+List authors ranked by number of dists.
+
+=head2 B<authors-by-filesize>
+
+List authors ranked by total size of their indexed releases.
+
+=head2 B<authors-by-mod-count>
+
+List authors ranked by number of modules.
+
+=head2 B<authors-by-mod-mention-count>
+
+List authors ranked by number of module mentions.
+
+This shows the list of most mentioned authors, that is, authors whose modules
+are linked/referred to the most in PODs.
+
+By default, each source module/script that mentions a module from author is
+counted as one mention (C<--count-per content>). Use C<--count-per dist> to only
+count mentions by modules/scripts from the same dist as one mention (so an
+author only gets a maximum of 1 vote per dist). Use C<--count-per author> to only
+count mentions by modules/scripts from the same author as one mention (so an
+author only gets a maximum of 1 vote per mentioning author).
+
+By default, only mentions from other authors are included. Use
+C<--include-self-mentions> to also include mentions from the same author.
+
+
+=head2 B<authors-by-rdep-count>
+
+List authors ranked by number of distributions using one of his/her modules.
+
+=head2 B<authors-by-rel-count>
+
+List authors ranked by number of releases.
+
+=head2 B<authors-by-script-count>
+
+List authors ranked by number of scripts.
+
+=head2 B<changes>
+
+Show Changes of distribution/module.
+
+This command will find a file named Changes/CHANGES/ChangeLog or other similar
+name in the top-level directory inside the release tarballs and show it.
+
+
+=head2 B<contents>
+
+List contents inside releases.
+
+This subcommand lists files inside release archives.
+
+
+=head2 B<copy-mod>
+
+Copy a module's latest release file to current directory.
+
+=head2 B<copy-rel>
+
+Copy a release file to current directory.
+
+=head2 B<copy-script>
+
+Copy a script's latest release file to current directory.
+
+=head2 B<delete-rel>
+
+Delete a release record in the database.
+
+Will delete records associated with a release in the database (including in the
+C<file> table, C<module>, C<dist>, C<dep>, and so on). If C<--delete-file> option is
+specified, will also remove the file from the local mirror.
+
+But currently will not remove/update the C<modules/02packages.details.txt.gz>
+index.
+
+
+=head2 B<deps>
+
+List dependencies.
+
+By default only runtime requires are displayed. To see prereqs for other phases
+(e.g. configure, or build, or ALL) or for other relationships (e.g. recommends,
+or ALL), use the C<--phase> and C<--rel> options.
+
+Note that dependencies information are taken from C<META.json> or C<META.yml>
+files. Not all releases (especially older ones) contain them. L<lcpan> (like
+MetaCPAN) does not extract information from C<Makefile.PL> or C<Build.PL> because
+that requires running (untrusted) code.
+
+Also, some releases specify dynamic config, so there might actually be more
+dependencies.
+
+
+=head2 B<deps-by-dependent-count>
+
+List dependencies, sorted by number of dependents.
+
+This subcommand is like C<deps>, except that this subcommand does not support
+recursing and it sorts the result by number of dependent dists. For example,
+Suppose that dist C<Foo> depends on C<Mod1> and C<Mod2>, C<Bar> depends on C<Mod2>
+and C<Mod3>, and C<Baz> depends on C<Mod2> and C<Mod3>, then C<lcpan
+deps-by-dependent-count Foo Bar Baz> will return C<Mod2> (3 dependents), C<Mod3>
+(2 dependents), C<Mod1> (1 dependent).
+
+
+=head2 B<dist-contents>
+
+List contents inside a distribution.
+
+This subcommand lists files inside a distribution.
+
+ % lcpan dist-contents Foo-Bar
+
+is basically equivalent to:
+
+ % lcpan contents --dist Foo-Bar
+
+
+=head2 B<dist-meta>
+
+Get distribution metadata.
+
+=head2 B<dist-mods>
+
+List modules in a distribution.
+
+=head2 B<dist-scripts>
+
+List scripts in a distribution.
+
+=head2 B<dist2author>
+
+Get author of distribution(s).
+
+=head2 B<dist2rel>
+
+Get (latest) release name of a distribution.
+
+=head2 B<dists>
+
+List distributions.
+
+=head2 B<dists-by-dep-count>
+
+List "heavy" distributions (ranked by number of dependencies).
+
+=head2 B<doc>
+
+Show POD documentation of module/.pod/script.
+
+This command extracts module (.pm)/.pod/script from release tarballs and render
+its POD documentation. Since the documentation is retrieved from the release
+tarballs in the mirror, the module/.pod/script needs not be installed.
+
+Note that currently this command has trouble finding documentation for core
+modules because those are contained in perl release tarballs instead of release
+tarballs of modules, and C<lcpan> is currently not designed to work with those.
+
+
+=head2 B<extract-mod>
+
+Extract a module's latest release file to current directory.
+
+=head2 B<extract-rel>
+
+Extract a release to current directory.
+
+=head2 B<extract-script>
+
+Extract a script's latest release file to current directory.
+
+=head2 B<inject>
+
+Inject one or more tarballs to the mirror.
+
+=head2 B<mentions>
+
+List mentions.
+
+This subcommand lists mentions (references to modules/scripts in POD files
+inside releases).
+
+Only mentions to modules/scripts in another release are indexed (i.e. mentions
+to modules/scripts in the same dist/release are not indexed). Only mentions to
+known scripts are indexed, but mentions to unknown modules are also indexed.
+
+
+=head2 B<mentions-by-mod>
+
+List POD mentions by module(s).
+
+This subcommand is a shortcut for:
+
+ % lcpan mentions --mentioner-module MOD
+
+
+=head2 B<mentions-by-script>
+
+List POD mentions by script(s).
+
+This subcommand is a shortcut for:
+
+ % lcpan mentions --mentioner-script SCRIPT
+
+
+=head2 B<mentions-for-all-mods>
+
+List PODs which mention all specified module(s).
+
+=head2 B<mentions-for-mod>
+
+List POD mentions for module(s).
+
+This subcommand is a shortcut for:
+
+ % lcpan mentions --type known-module --mentioned-module MOD
+
+
+=head2 B<mentions-for-script>
+
+List POD mentions for script(s).
+
+This subcommand is a shortcut for:
+
+ % lcpan mentions --type script --mentioned-script SCRIPT
+
+
+=head2 B<mod-contents>
+
+List contents inside a module's distribution.
+
+This subcommand lists files inside a module's distribution.
+
+ % lcpan mod-contents Foo::Bar
+
+is basically equivalent to:
+
+ % lcpan contents --dist C<lcpan mod2dist Foo::Bar>
+
+
+=head2 B<mod2author>
+
+Get author of module(s).
+
+=head2 B<mod2dist>
+
+Get distribution name of module(s).
+
+=head2 B<mod2rel>
+
+Get (latest) release name of a module.
+
+=head2 B<mods>
+
+Alias for 'modules'.
+
+=head2 B<mods-by-mention-count>
+
+List modules ranked by number of mentions.
+
+This shows the list of most mentioned modules, that is, modules who are
+linked/referred to the most in PODs.
+
+Unknown modules (modules not indexed) are not included. Note that mentions can
+refer to unknown modules.
+
+By default, each source module/script that mentions a module is counted as one
+mention (C<--count-per content>). Use C<--count-per dist> to only count mentions
+by modules/scripts from the same dist as one mention (so a module only gets a
+maximum of 1 vote per dist). Use C<--count-per author> to only count mentions by
+modules/scripts from the same author as one mention (so a module only gets a
+maximum of 1 vote per mentioning author).
+
+By default, only mentions from other authors are included. Use
+C<--include-self-mentions> to also include mentions from the same author.
+
+
+=head2 B<mods-by-rdep-count>
+
+List modules ranked by number of reverse dependencies.
+
+=head2 B<mods-from-same-dist>
+
+Given a module, list all modules in the same distribution.
+
+=head2 B<modules>
+
+List modules/packages.
+
+=head2 B<namespaces>
+
+List namespaces.
+
+=head2 B<rdeps>
+
+List reverse dependencies.
+
+=head2 B<related-mods>
+
+List other modules related to module(s).
+
+This subcommand lists other modules that might be related to the module(s) you
+specify. This is done by listing modules that tend be mentioned together in POD
+documentation.
+
+The scoring/ranking still needs to be tuned.
+
+
+=head2 B<releases>
+
+List releases/tarballs.
+
+The status field is the processing status of the file/release by lcpan. C<ok>
+means file has been extracted and the meta files parsed, C<nofile> means file is
+not found in mirror (possibly because the mirroring process excludes the file
+e.g. due to file size too large), C<nometa> means file does not contain
+META.{yml,json}, C<unsupported> means file archive format is not supported (e.g.
+rar), C<err> means some other error in processing file.
+
+
+=head2 B<rels>
+
+Alias for 'releases'.
+
+The status field is the processing status of the file/release by lcpan. C<ok>
+means file has been extracted and the meta files parsed, C<nofile> means file is
+not found in mirror (possibly because the mirroring process excludes the file
+e.g. due to file size too large), C<nometa> means file does not contain
+META.{yml,json}, C<unsupported> means file archive format is not supported (e.g.
+rar), C<err> means some other error in processing file.
+
+
+=head2 B<reset>
+
+Reset (empty) the database index.
+
+=head2 B<script2author>
+
+Get author name of script(s).
+
+=head2 B<script2dist>
+
+Get distribution(s) of script(s).
+
+=head2 B<script2mod>
+
+Get module(s) of script(s).
+
+This returns a module name from the same dist as the script, so one can do
+something like this (install dist which contains a specified script from CPAN):
+
+ % cpanm -n C<lcpan script2mod pmdir>
+
+
+=head2 B<script2rel>
+
+Get release(s) of script(s).
+
+=head2 B<scripts>
+
+List scripts.
+
+This subcommand lists scripts. Scripts are identified heuristically from
+contents of release archives matching this regex:
+
+ #         container dir,  script dir,       script name
+ \A (\./)? ([^/]+)/?       (s?bin|scripts?)/ ([^/]+) \z
+
+A few exception are excluded, e.g. if script name begins with a dot (e.g.
+C<bin/.exists> which is usually a marker only).
+
+Scripts are currently indexed by its release file and its name, so if a single
+release contains both C<bin/foo> and C<script/foo>, only one of those will be
+indexed. Normally a proper release shouldn't be like that though.
+
+
+=head2 B<scripts-by-mention-count>
+
+List scripts ranked by number of mentions.
+
+This shows the list of most mentioned scripts, that is, scripts who are
+linked/referred to the most in PODs.
+
+By default, each source module/script that mentions a script is counted as one
+mention (C<--count-per content>). Use C<--count-per dist> to only count mentions
+by modules/scripts from the same dist as one mention (so a script only gets a
+maximum of 1 vote per dist). Use C<--count-per author> to only count mentions by
+modules/scripts from the same author as one mention (so a script only gets a
+maximum of 1 vote per mentioning author).
+
+By default, only mentions from other authors are included. Use
+C<--include-self-mentions> to also include mentions from the same author.
+
+
+=head2 B<scripts-from-same-dist>
+
+Given a script, list all scripts in the same distribution.
+
+=head2 B<src>
+
+Show source of module/.pod/script.
+
+This command is a shortcut for:
+
+ % lcpan doc --raw MODULE_OR_POD_OR_SCRIPT
+
+
+=head2 B<stats>
+
+Statistics of your local CPAN mirror.
+
+=head2 B<stats-last-index-time>
+
+Return last index time of mirror.
+
+This is mostly to support L<App::lcpan::Call>. See also C<stats> subcommand
+which gives a more complete statistics, but can be much slower.
+
+
+=head2 B<subnames-by-count>
+
+List subroutine names ranked by number of occurrences.
+
+
+
+
+=head2 B<subs>
+
+List subroutines.
+
+This subcommand lists subroutines/methods/static methods.
+
+
+=head2 B<update>
+
+Create/update local CPAN mirror.
+
+This subcommand first create/update the mirror files by downloading from a
+remote CPAN mirror, then update the index.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--cpan>=I<s>
+
+Location of your local CPAN mirror, e.g. /path/to/cpan.
+
+Defaults to C<~/cpan>.
+
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--index-name>=I<s>
+
+Filename of index.
+
+Default value:
+
+ "index.db"
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--no-naked-res>
+
+When outputing as JSON, add result envelope.
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand author-deps
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author>=I<s>*
+
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+When recursing, the default is to show the final result in a tree-like table,
+i.e. indented according to levels, e.g.:
+
+    % lcpan deps -R MyModule
+    | module            | author  | version |
+    |-------------------|---------|---------|
+    | Foo               | AUTHOR1 | 0.01    |
+    |   Bar             | AUTHOR2 | 0.23    |
+    |   Baz             | AUTHOR3 | 1.15    |
+    | Qux               | AUTHOR2 | 0       |
+
+To be brief, if `Qux` happens to also depends on `Bar`, it will not be shown in
+the result. Thus we don't know the actual `Bar` version that is needed by the
+dependency tree of `MyModule`. For example, if `Qux` happens to depends on `Bar`
+version 0.45 then `MyModule` indirectly requires `Bar` 0.45.
+
+To list all the direct and indirect dependencies on a single flat list, with
+versions already resolved to the largest version required, use the `flatten`
+option:
+
+    % lcpan deps -R --flatten MyModule
+    | module            | author  | version |
+    |-------------------|---------|---------|
+    | Foo               | AUTHOR1 | 0.01    |
+    | Bar               | AUTHOR2 | 0.45    |
+    | Baz               | AUTHOR3 | 1.15    |
+    | Qux               | AUTHOR2 | 0       |
+
+Note that `Bar`'s required version is already 0.45 in the above example.
+
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--module-author-isnt>=I<s@>
+
+Do not list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-author>=I<s@>
+
+Only list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-authors-arent-json>=I<s>
+
+Do not list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author-isnt>.
+
+=item B<--module-authors-json>=I<s>
+
+Only list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=item B<--with-xs-or-pp>
+
+Check each dependency as XS/PP.
+
+=item B<-R>
+
+Recurse (alias for `--level -1`).
+
+See C<--level>.
+
+=back
+
+=head2 Options for subcommand author-deps-by-dependent-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--author>=I<s>*
+
+=item B<--author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--authors-arent-json>=I<s>
+
+See C<--author-isnt>.
+
+=item B<--authors-json>=I<s>
+
+See C<--author>.
+
+=item B<--module-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--module-author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--module-authors-arent-json>=I<s>
+
+See C<--module-author-isnt>.
+
+=item B<--module-authors-json>=I<s>
+
+See C<--module-author>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=back
+
+=head2 Options for subcommand author-dists
+
+=over
+
+=item B<--author>=I<s>*
+
+=item B<--detail>, B<-l>
+
+=item B<--latest>
+
+=back
+
+=head2 Options for subcommand author-mods
+
+=over
+
+=item B<--author>=I<s>*
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand author-rdeps
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author>=I<s>*
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--user-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--user-author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--user-authors-arent-json>=I<s>
+
+See C<--user-author-isnt>.
+
+=item B<--user-authors-json>=I<s>
+
+See C<--user-author>.
+
+=back
+
+=head2 Options for subcommand author-rels
+
+=over
+
+=item B<--author>=I<s>*
+
+=item B<--detail>, B<-l>
+
+=item B<--full-path>
+
+=item B<--latest>
+
+=item B<--sort-json>=I<s>
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["name"]
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand author-scripts
+
+=over
+
+=item B<--author>=I<s>*
+
+=item B<--detail>, B<-l>
+
+=back
+
+=head2 Options for subcommand authors
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","cpanid","exact-cpanid","fullname","email","exact-email"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type cpanid.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-cpanid.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand authors-by-mod-mention-count
+
+=over
+
+=item B<--count-per>=I<s>
+
+Default value:
+
+ "content"
+
+Valid values:
+
+ ["content","dist","author"]
+
+=item B<--include-self-mentions>
+
+=back
+
+=head2 Options for subcommand authors-by-rdep-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--exclude-same-author>
+
+=item B<--phase>=I<s>
+
+=item B<--rel>=I<s>
+
+=back
+
+=head2 Options for subcommand changes
+
+=over
+
+=item B<--module-or-dist-or-script>=I<s>*
+
+Module or dist or script name.
+
+=back
+
+=head2 Options for subcommand contents
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>
+
+Filter by file ID.
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--package>=I<s>
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","path","exact-path","package","exact-package"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand copy-mod
+
+=over
+
+=item B<--module>=I<s>*
+
+=item B<--overwrite>, B<-o>
+
+Whether to overwrite existing file.
+
+=back
+
+=head2 Options for subcommand copy-rel
+
+=over
+
+=item B<--overwrite>, B<-o>
+
+Whether to overwrite existing file.
+
+=item B<--release>=I<s>*
+
+=back
+
+=head2 Options for subcommand copy-script
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--overwrite>, B<-o>
+
+Whether to overwrite existing file.
+
+=item B<--script>=I<s>*
+
+=back
+
+=head2 Options for subcommand delete-rel
+
+=over
+
+=item B<--delete-file>
+
+Whether to delete the release file from the filesystem too.
+
+=item B<--release>=I<s>*
+
+=back
+
+=head2 Options for subcommand deps
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--flatten>
+
+Instead of showing tree-like information, flatten it.
+
+When recursing, the default is to show the final result in a tree-like table,
+i.e. indented according to levels, e.g.:
+
+    % lcpan deps -R MyModule
+    | module            | author  | version |
+    |-------------------|---------|---------|
+    | Foo               | AUTHOR1 | 0.01    |
+    |   Bar             | AUTHOR2 | 0.23    |
+    |   Baz             | AUTHOR3 | 1.15    |
+    | Qux               | AUTHOR2 | 0       |
+
+To be brief, if `Qux` happens to also depends on `Bar`, it will not be shown in
+the result. Thus we don't know the actual `Bar` version that is needed by the
+dependency tree of `MyModule`. For example, if `Qux` happens to depends on `Bar`
+version 0.45 then `MyModule` indirectly requires `Bar` 0.45.
+
+To list all the direct and indirect dependencies on a single flat list, with
+versions already resolved to the largest version required, use the `flatten`
+option:
+
+    % lcpan deps -R --flatten MyModule
+    | module            | author  | version |
+    |-------------------|---------|---------|
+    | Foo               | AUTHOR1 | 0.01    |
+    | Bar               | AUTHOR2 | 0.45    |
+    | Baz               | AUTHOR3 | 1.15    |
+    | Qux               | AUTHOR2 | 0       |
+
+Note that `Bar`'s required version is already 0.45 in the above example.
+
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=item B<--with-xs-or-pp>
+
+Check each dependency as XS/PP.
+
+=item B<-R>
+
+Recurse (alias for `--level -1`).
+
+See C<--level>.
+
+=back
+
+=head2 Options for subcommand deps-by-dependent-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--author>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--authors-arent-json>=I<s>
+
+See C<--author-isnt>.
+
+=item B<--authors-json>=I<s>
+
+See C<--author>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "runtime"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "requires"
+
+=back
+
+=head2 Options for subcommand dist-contents
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>*
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--package>=I<s>
+
+=back
+
+=head2 Options for subcommand dist-meta
+
+=over
+
+=item B<--dist>=I<s>*
+
+=back
+
+=head2 Options for subcommand dist-mods
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>*
+
+=back
+
+=head2 Options for subcommand dist-scripts
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>*
+
+=back
+
+=head2 Options for subcommand dist2author
+
+=over
+
+=item B<--dist>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--dists-json>=I<s>
+
+See C<--dist>.
+
+=back
+
+=head2 Options for subcommand dist2rel
+
+=over
+
+=item B<--dist>=I<s>*
+
+=item B<--full-path>
+
+=back
+
+=head2 Options for subcommand dists
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--has-buildpl>
+
+=item B<--has-makefilepl>
+
+=item B<--has-metajson>
+
+=item B<--has-metayml>
+
+=item B<--has-multiple-rels>
+
+Only list dists having multiple releases indexed.
+
+=item B<--latest>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name","abstract"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--rel-mtime-newer-than>=I<s>
+
+=item B<--sort-json>=I<s>
+
+Sort the result (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Sort the result.
+
+Default value:
+
+ ["dist"]
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand dists-by-dep-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--phase>=I<s>
+
+=item B<--rel>=I<s>
+
+=back
+
+=head2 Options for subcommand doc
+
+=over
+
+=item B<--format-arg>=I<s>
+
+Default value:
+
+ "man"
+
+Valid values:
+
+ ["raw","html","man"]
+
+=item B<--html>
+
+Show HTML documentation in browser instead of rendering as man.
+
+See C<--format-arg>.
+
+=item B<--man>
+
+Read as manpage (the default).
+
+See C<--format-arg>.
+
+=item B<--name>=I<s>*
+
+Module or script name.
+
+If the name matches both module name and script name, the module will be chosen.
+To choose the script, use `--script` (`-s`).
+
+
+=item B<--raw>
+
+Dump raw POD instead of rendering it.
+
+See C<--format-arg>.
+
+=item B<--script>, B<-s>
+
+Look for script first.
+
+=item B<-r>
+
+Same as --raw.
+
+See C<--format-arg>.
+
+=back
+
+=head2 Options for subcommand extract-mod
+
+=over
+
+=item B<--module>=I<s>*
+
+=back
+
+=head2 Options for subcommand extract-rel
+
+=over
+
+=item B<--release>=I<s>*
+
+=back
+
+=head2 Options for subcommand extract-script
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--script>=I<s>*
+
+=back
+
+=head2 Options for subcommand inject
+
+=over
+
+=item B<--author>=I<s>*, B<-a>
+
+=item B<--file>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand mentions
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioned-module>=I<s@>
+
+Filter by module name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-modules-json>=I<s>
+
+Filter by module name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-module>.
+
+=item B<--mentioned-script>=I<s@>
+
+Filter by script name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-scripts-json>=I<s>
+
+Filter by script name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-script>.
+
+=item B<--mentioner-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--mentioner-author>=I<s@>
+
+Filter by author(s) of POD that does the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-authors-arent-json>=I<s>
+
+See C<--mentioner-author-isnt>.
+
+=item B<--mentioner-authors-json>=I<s>
+
+Filter by author(s) of POD that does the mentioning (JSON-encoded).
+
+See C<--mentioner-author>.
+
+=item B<--mentioner-module>=I<s@>
+
+Filter by module(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-modules-json>=I<s>
+
+Filter by module(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-module>.
+
+=item B<--mentioner-script>=I<s@>
+
+Filter by script(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-scripts-json>=I<s>
+
+Filter by script(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-script>.
+
+=item B<--type>=I<s>
+
+Filter by type of things being mentioned.
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","script","module","unknown-module","known-module"]
+
+=back
+
+=head2 Options for subcommand mentions-by-mod
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioned-module>=I<s@>
+
+Filter by module name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-modules-json>=I<s>
+
+Filter by module name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-module>.
+
+=item B<--mentioned-script>=I<s@>
+
+Filter by script name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-scripts-json>=I<s>
+
+Filter by script name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-script>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--type>=I<s>
+
+Filter by type of things being mentioned.
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","script","module","unknown-module","known-module"]
+
+=back
+
+=head2 Options for subcommand mentions-by-script
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioned-module>=I<s@>
+
+Filter by module name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-modules-json>=I<s>
+
+Filter by module name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-module>.
+
+=item B<--mentioned-script>=I<s@>
+
+Filter by script name(s) being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-scripts-json>=I<s>
+
+Filter by script name(s) being mentioned (JSON-encoded).
+
+See C<--mentioned-script>.
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand mentions-for-all-mods
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioner-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--mentioner-author>=I<s@>
+
+Filter by author(s) of POD that does the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-authors-arent-json>=I<s>
+
+See C<--mentioner-author-isnt>.
+
+=item B<--mentioner-authors-json>=I<s>
+
+Filter by author(s) of POD that does the mentioning (JSON-encoded).
+
+See C<--mentioner-author>.
+
+=item B<--mentioner-module>=I<s@>
+
+Filter by module(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-modules-json>=I<s>
+
+Filter by module(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-module>.
+
+=item B<--mentioner-script>=I<s@>
+
+Filter by script(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-scripts-json>=I<s>
+
+Filter by script(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-script>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=back
+
+=head2 Options for subcommand mentions-for-mod
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioner-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--mentioner-author>=I<s@>
+
+Filter by author(s) of POD that does the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-authors-arent-json>=I<s>
+
+See C<--mentioner-author-isnt>.
+
+=item B<--mentioner-authors-json>=I<s>
+
+Filter by author(s) of POD that does the mentioning (JSON-encoded).
+
+See C<--mentioner-author>.
+
+=item B<--mentioner-module>=I<s@>
+
+Filter by module(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-modules-json>=I<s>
+
+Filter by module(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-module>.
+
+=item B<--mentioner-script>=I<s@>
+
+Filter by script(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-scripts-json>=I<s>
+
+Filter by script(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-script>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=back
+
+=head2 Options for subcommand mentions-for-script
+
+=over
+
+=item B<--mentioned-author>=I<s@>
+
+Filter by author(s) of module/script being mentioned.
+
+Can be specified multiple times.
+
+=item B<--mentioned-authors-json>=I<s>
+
+Filter by author(s) of module/script being mentioned (JSON-encoded).
+
+See C<--mentioned-author>.
+
+=item B<--mentioner-author-isnt>=I<s@>
+
+Can be specified multiple times.
+
+=item B<--mentioner-author>=I<s@>
+
+Filter by author(s) of POD that does the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-authors-arent-json>=I<s>
+
+See C<--mentioner-author-isnt>.
+
+=item B<--mentioner-authors-json>=I<s>
+
+Filter by author(s) of POD that does the mentioning (JSON-encoded).
+
+See C<--mentioner-author>.
+
+=item B<--mentioner-module>=I<s@>
+
+Filter by module(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-modules-json>=I<s>
+
+Filter by module(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-module>.
+
+=item B<--mentioner-script>=I<s@>
+
+Filter by script(s) that do the mentioning.
+
+Can be specified multiple times.
+
+=item B<--mentioner-scripts-json>=I<s>
+
+Filter by script(s) that do the mentioning (JSON-encoded).
+
+See C<--mentioner-script>.
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand mod-contents
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--module>=I<s>*
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--package>=I<s>
+
+=back
+
+=head2 Options for subcommand mod2author
+
+=over
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=back
+
+=head2 Options for subcommand mod2dist
+
+=over
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=back
+
+=head2 Options for subcommand mod2rel
+
+=over
+
+=item B<--full-path>
+
+=item B<--module>=I<s>*
+
+=back
+
+=head2 Options for subcommand mods
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>, B<-d>
+
+Filter by distribution.
+
+=item B<--latest>
+
+=item B<--namespace>=I<s@>, B<-N>
+
+Select modules belonging to certain namespace(s).
+
+Can be specified multiple times.
+
+=item B<--namespaces-json>=I<s>
+
+Select modules belonging to certain namespace(s) (JSON-encoded).
+
+See C<--namespace>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name","abstract"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort-json>=I<s>
+
+Sort the result (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Sort the result.
+
+Default value:
+
+ ["module"]
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand mods-by-mention-count
+
+=over
+
+=item B<--count-per>=I<s>
+
+Default value:
+
+ "content"
+
+Valid values:
+
+ ["content","dist","author"]
+
+=item B<--include-self-mentions>
+
+=back
+
+=head2 Options for subcommand mods-by-rdep-count
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--phase>=I<s>
+
+=item B<--rel>=I<s>
+
+=back
+
+=head2 Options for subcommand mods-from-same-dist
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--latest>
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=back
+
+=head2 Options for subcommand modules
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>, B<-d>
+
+Filter by distribution.
+
+=item B<--latest>
+
+=item B<--namespace>=I<s@>, B<-N>
+
+Select modules belonging to certain namespace(s).
+
+Can be specified multiple times.
+
+=item B<--namespaces-json>=I<s>
+
+Select modules belonging to certain namespace(s) (JSON-encoded).
+
+See C<--namespace>.
+
+=item B<--no-include-core>
+
+Exclude core modules.
+
+=item B<--no-include-noncore>
+
+Exclude non-core modules.
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Set base Perl version for determining core modules.
+
+Default value:
+
+ "v5.26.1"
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name","abstract"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort-json>=I<s>
+
+Sort the result (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Sort the result.
+
+Default value:
+
+ ["module"]
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand namespaces
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--from-level>=I<s>
+
+=item B<--level>=I<s>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort>=I<s>
+
+Default value:
+
+ "name"
+
+Valid values:
+
+ ["name","-name","num_modules","-num_modules"]
+
+=item B<--to-level>=I<s>
+
+=back
+
+=head2 Options for subcommand rdeps
+
+=over
+
+=item B<--all>
+
+Equivalent to --phase ALL --rel ALL.
+
+See C<--phase>.
+
+=item B<--author-isnt>=I<s@>
+
+Filter out certain author.
+
+This can be used to filter out certain author(s). For example if you want to
+know whether a module is being used by another CPAN author instead of just
+herself.
+
+
+Can be specified multiple times.
+
+=item B<--author>=I<s@>
+
+Filter certain author.
+
+This can be used to select certain author(s).
+
+
+Can be specified multiple times.
+
+=item B<--authors-arent-json>=I<s>
+
+Filter out certain author (JSON-encoded).
+
+See C<--author-isnt>.
+
+=item B<--authors-json>=I<s>
+
+Filter certain author (JSON-encoded).
+
+See C<--author>.
+
+=item B<--level>=I<s>, B<-l>
+
+Recurse for a number of levels (-1 means unlimited).
+
+Default value:
+
+ 1
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--phase>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<--rel>=I<s>
+
+Default value:
+
+ "ALL"
+
+=item B<-R>
+
+Recurse (alias for `--level 10`).
+
+See C<--level>.
+
+=back
+
+=head2 Options for subcommand related-mods
+
+=over
+
+=item B<--limit>=I<s>
+
+Maximum number of modules to return.
+
+Default value:
+
+ 20
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+See C<--module>.
+
+=item B<--skip-same-dist>
+
+Skip modules from the same distribution.
+
+=item B<--sort-json>=I<s>
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["-score","-num_mentions"]
+
+Can be specified multiple times.
+
+=item B<--with-scores>
+
+Return score-related fields.
+
+=back
+
+=head2 Options for subcommand releases
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--full-path>
+
+=item B<--has-buildpl>
+
+=item B<--has-makefilepl>
+
+=item B<--has-metajson>
+
+=item B<--has-metayml>
+
+=item B<--latest>
+
+=item B<--no-path>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort-json>=I<s>
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["name"]
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand rels
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--full-path>
+
+=item B<--has-buildpl>
+
+=item B<--has-makefilepl>
+
+=item B<--has-metajson>
+
+=item B<--has-metayml>
+
+=item B<--latest>
+
+=item B<--no-path>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort-json>=I<s>
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Default value:
+
+ ["name"]
+
+Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut --query-type exact-name.
+
+See C<--query-type>.
+
+=back
+
+=head2 Options for subcommand script2author
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand script2dist
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand script2mod
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand script2rel
+
+=over
+
+=item B<--all>, B<-a>
+
+=item B<--full-path>
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand scripts
+
+=over
+
+=item B<--author>=I<s>, B<-a>
+
+Filter by author.
+
+=item B<--detail>, B<-l>
+
+=item B<--dist>=I<s>, B<-d>
+
+Filter by distribution.
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name","abstract"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand scripts-by-mention-count
+
+=over
+
+=item B<--count-per>=I<s>
+
+Default value:
+
+ "content"
+
+Valid values:
+
+ ["content","dist","author"]
+
+=item B<--include-self-mentions>
+
+=back
+
+=head2 Options for subcommand scripts-from-same-dist
+
+=over
+
+=item B<--detail>, B<-l>
+
+=item B<--latest>
+
+=item B<--script>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--scripts-json>=I<s>
+
+See C<--script>.
+
+=back
+
+=head2 Options for subcommand src
+
+=over
+
+=item B<--name>=I<s>*
+
+Module or script name.
+
+If the name matches both module name and script name, the module will be chosen.
+To choose the script, use `--script` (`-s`).
+
+
+=item B<--script>, B<-s>
+
+Look for script first.
+
+=back
+
+=head2 Options for subcommand subs
+
+=over
+
+=item B<--author>=I<s@>
+
+Filter by author(s) of module.
+
+Can be specified multiple times.
+
+=item B<--authors-json>=I<s>
+
+Filter by author(s) of module (JSON-encoded).
+
+See C<--author>.
+
+=item B<--detail>, B<-l>
+
+=item B<--or>
+
+When there are more than one query, perform OR instead of AND logic.
+
+=item B<--package>=I<s@>
+
+Filter by package name(s).
+
+Can be specified multiple times.
+
+=item B<--packages-json>=I<s>
+
+Filter by package name(s) (JSON-encoded).
+
+See C<--package>.
+
+=item B<--query-json>=I<s>, B<-q>
+
+Search query (JSON-encoded).
+
+See C<--query>.
+
+=item B<--query-type>=I<s>
+
+Default value:
+
+ "any"
+
+Valid values:
+
+ ["any","name","exact-name"]
+
+=item B<--query>=I<s@>
+
+Search query.
+
+Can be specified multiple times.
+
+=item B<--sort-json>=I<s>
+
+Sort the result (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Sort the result.
+
+Default value:
+
+ ["sub"]
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand update
+
+=over
+
+=item B<--exclude-author-json>=I<s>
+
+Exclude files from certain author(s) (JSON-encoded).
+
+See C<--exclude-author>.
+
+=item B<--exclude-author>=I<s@>
+
+Exclude files from certain author.
+
+Can be specified multiple times.
+
+=item B<--force-update-index>
+
+Update the index even though there is no change in files.
+
+=item B<--include-author-json>=I<s>
+
+Only include files from certain author(s) (JSON-encoded).
+
+See C<--include-author>.
+
+=item B<--include-author>=I<s@>
+
+Only include files from certain author.
+
+Can be specified multiple times.
+
+=item B<--max-file-size>=I<s>
+
+If set, skip downloading files larger than this.
+
+=item B<--no-skip-sub-indexing>
+
+Since sub indexing is still experimental, it is not enabled by default. To
+enable it, pass the `--no-skip-sub-indexing` option.
+
+
+=item B<--no-update-files>
+
+Skip updating the files.
+
+=item B<--no-update-index>
+
+Skip updating the index.
+
+=item B<--remote-url>=I<s>
+
+Select CPAN mirror to download from.
+
+=item B<--skip-file-indexing-pass-1>
+
+=item B<--skip-file-indexing-pass-2>
+
+=item B<--skip-file-indexing-pass-3>
+
+=item B<--skip-index-file>=I<s@>
+
+Skip a file from being indexed.
+
+Can be specified multiple times.
+
+=item B<--skip-index-files-json>=I<s>
+
+Skip one or more files from being indexed (JSON-encoded).
+
+See C<--skip-index-file>.
+
+=item B<-F>=I<s@>
+
+Alias for --skip-index-file.
+
+See C<--skip-index-file>.
+
+Can be specified multiple times.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C lcpan lcpan
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete lcpan 'p/*/`lcpan`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 FAQ
+
+=head2 How to customize location of local CPAN mirror?
+
+By default CPAN mirror is put in C<~/cpan>. To customize this, use the C<--cpan>
+option, e.g.:
+
+ % lcpan update --cpan /path/to/my/cpan
+
+You can also create a configuration C<~/lcpan.conf> so you don't have to specify
+the C<--cpan> option everytime:
+
+ cpan=/path/to/my/cpan
+
+=head2 Where is the SQLite database (the index) located?
+
+In C<$cpan/index.db>.
+
+=head2 How do I see the SQL statements/queries being issued while running lcpan?
+
+You can try using L<Log::ger::DBI::Query>, e.g.:
+
+ % PERL5OPT=-MLog::ger::DBI::Query TRACE=1 lcpan ...
+
+=head2 How do I reindex from scratch (without downloading the mirror)?
+
+Run C<lcpan reset> (or delete C<index.db>) and run C<lcpan update
+--noupdate-files> again.
+
+=head2 Indexing error: Out of memory!
+
+Could happen when there is a corrupt archive or an archive that is too big. To
+see which file is the culprit, try running C<lcpan update --noupdate-files> with
+C<--verbose> (or even C<--debug> or C<--trace>). Then, you can skip the file by
+using C<-F> or adding this entry to your C<lcpan.conf>:
+
+ [update]
+ skip_index_files=The-Culprit-1.23.tar.gz
+
+Add more of such lines if you want to skip more files.
+
+=head2 How do I download the mirror without updating the indexing?
+
+Run C<lcpan update --noupdate-index>.
+
+=head2 How do I see how recent the mirror or the index is?
+
+Use C<lcpan stats>.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/lcpan.conf>, F<~/lcpan.conf>, or F</etc/lcpan.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ cpan (see --cpan)
+ format (see --format)
+ index_name (see --index-name)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand author-deps
+
+ author (see --author)
+ flatten (see --flatten)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ level (see --level)
+ module_authors (see --module-author)
+ module_authors_arent (see --module-author-isnt)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+ with_xs_or_pp (see --with-xs-or-pp)
+
+=head2 Configuration for subcommand author-deps-by-dependent-count
+
+ author (see --author)
+ authors (see --author)
+ authors_arent (see --author-isnt)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ module_authors (see --module-author)
+ module_authors_arent (see --module-author-isnt)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand author-dists
+
+ author (see --author)
+ detail (see --detail)
+ latest (see --latest)
+
+=head2 Configuration for subcommand author-mods
+
+ author (see --author)
+ detail (see --detail)
+
+=head2 Configuration for subcommand author-rdeps
+
+ author (see --author)
+ phase (see --phase)
+ rel (see --rel)
+ user_authors (see --user-author)
+ user_authors_arent (see --user-author-isnt)
+
+=head2 Configuration for subcommand author-rels
+
+ author (see --author)
+ detail (see --detail)
+ full_path (see --full-path)
+ latest (see --latest)
+ sort (see --sort)
+
+=head2 Configuration for subcommand author-scripts
+
+ author (see --author)
+ detail (see --detail)
+
+=head2 Configuration for subcommand authors
+
+ detail (see --detail)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+
+=head2 Configuration for subcommand authors-by-dist-count
+
+
+=head2 Configuration for subcommand authors-by-filesize
+
+
+=head2 Configuration for subcommand authors-by-mod-count
+
+
+=head2 Configuration for subcommand authors-by-mod-mention-count
+
+ count_per (see --count-per)
+ include_self_mentions (see --include-self-mentions)
+
+=head2 Configuration for subcommand authors-by-rdep-count
+
+ exclude_same_author (see --exclude-same-author)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand authors-by-rel-count
+
+
+=head2 Configuration for subcommand authors-by-script-count
+
+
+=head2 Configuration for subcommand changes
+
+ module_or_dist_or_script (see --module-or-dist-or-script)
+
+=head2 Configuration for subcommand contents
+
+ author (see --author)
+ detail (see --detail)
+ dist (see --dist)
+ or (see --or)
+ package (see --package)
+ query (see --query)
+ query_type (see --query-type)
+
+=head2 Configuration for subcommand copy-mod
+
+ module (see --module)
+ overwrite (see --overwrite)
+
+=head2 Configuration for subcommand copy-rel
+
+ overwrite (see --overwrite)
+ release (see --release)
+
+=head2 Configuration for subcommand copy-script
+
+ all (see --all)
+ overwrite (see --overwrite)
+ script (see --script)
+
+=head2 Configuration for subcommand delete-rel
+
+ delete_file (see --delete-file)
+ release (see --release)
+
+=head2 Configuration for subcommand deps
+
+ flatten (see --flatten)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ level (see --level)
+ modules (see --module)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+ with_xs_or_pp (see --with-xs-or-pp)
+
+=head2 Configuration for subcommand deps-by-dependent-count
+
+ authors (see --author)
+ authors_arent (see --author-isnt)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ modules (see --module)
+ perl_version (see --perl-version)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand dist-contents
+
+ author (see --author)
+ detail (see --detail)
+ dist (see --dist)
+ or (see --or)
+ package (see --package)
+
+=head2 Configuration for subcommand dist-meta
+
+ dist (see --dist)
+
+=head2 Configuration for subcommand dist-mods
+
+ detail (see --detail)
+ dist (see --dist)
+
+=head2 Configuration for subcommand dist-scripts
+
+ detail (see --detail)
+ dist (see --dist)
+
+=head2 Configuration for subcommand dist2author
+
+ dists (see --dist)
+
+=head2 Configuration for subcommand dist2rel
+
+ dist (see --dist)
+ full_path (see --full-path)
+
+=head2 Configuration for subcommand dists
+
+ author (see --author)
+ detail (see --detail)
+ has_buildpl (see --has-buildpl)
+ has_makefilepl (see --has-makefilepl)
+ has_metajson (see --has-metajson)
+ has_metayml (see --has-metayml)
+ has_multiple_rels (see --has-multiple-rels)
+ latest (see --latest)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+ rel_mtime_newer_than (see --rel-mtime-newer-than)
+ sort (see --sort)
+
+=head2 Configuration for subcommand dists-by-dep-count
+
+ author (see --author)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand doc
+
+ format (see --format-arg)
+ name (see --name)
+ script (see --script)
+
+=head2 Configuration for subcommand extract-mod
+
+ module (see --module)
+
+=head2 Configuration for subcommand extract-rel
+
+ release (see --release)
+
+=head2 Configuration for subcommand extract-script
+
+ all (see --all)
+ script (see --script)
+
+=head2 Configuration for subcommand inject
+
+ author (see --author)
+ files (see --file)
+
+=head2 Configuration for subcommand mentions
+
+ mentioned_authors (see --mentioned-author)
+ mentioned_modules (see --mentioned-module)
+ mentioned_scripts (see --mentioned-script)
+ mentioner_authors (see --mentioner-author)
+ mentioner_authors_arent (see --mentioner-author-isnt)
+ mentioner_modules (see --mentioner-module)
+ mentioner_scripts (see --mentioner-script)
+ type (see --type)
+
+=head2 Configuration for subcommand mentions-by-mod
+
+ mentioned_authors (see --mentioned-author)
+ mentioned_modules (see --mentioned-module)
+ mentioned_scripts (see --mentioned-script)
+ modules (see --module)
+ type (see --type)
+
+=head2 Configuration for subcommand mentions-by-script
+
+ mentioned_authors (see --mentioned-author)
+ mentioned_modules (see --mentioned-module)
+ mentioned_scripts (see --mentioned-script)
+ scripts (see --script)
+
+=head2 Configuration for subcommand mentions-for-all-mods
+
+ mentioned_authors (see --mentioned-author)
+ mentioner_authors (see --mentioner-author)
+ mentioner_authors_arent (see --mentioner-author-isnt)
+ mentioner_modules (see --mentioner-module)
+ mentioner_scripts (see --mentioner-script)
+ modules (see --module)
+
+=head2 Configuration for subcommand mentions-for-mod
+
+ mentioned_authors (see --mentioned-author)
+ mentioner_authors (see --mentioner-author)
+ mentioner_authors_arent (see --mentioner-author-isnt)
+ mentioner_modules (see --mentioner-module)
+ mentioner_scripts (see --mentioner-script)
+ modules (see --module)
+
+=head2 Configuration for subcommand mentions-for-script
+
+ mentioned_authors (see --mentioned-author)
+ mentioner_authors (see --mentioner-author)
+ mentioner_authors_arent (see --mentioner-author-isnt)
+ mentioner_modules (see --mentioner-module)
+ mentioner_scripts (see --mentioner-script)
+ scripts (see --script)
+
+=head2 Configuration for subcommand mod-contents
+
+ author (see --author)
+ detail (see --detail)
+ module (see --module)
+ or (see --or)
+ package (see --package)
+
+=head2 Configuration for subcommand mod2author
+
+ modules (see --module)
+
+=head2 Configuration for subcommand mod2dist
+
+ modules (see --module)
+
+=head2 Configuration for subcommand mod2rel
+
+ full_path (see --full-path)
+ module (see --module)
+
+=head2 Configuration for subcommand mods
+
+ author (see --author)
+ detail (see --detail)
+ dist (see --dist)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ latest (see --latest)
+ namespaces (see --namespace)
+ or (see --or)
+ perl_version (see --perl-version)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+
+=head2 Configuration for subcommand mods-by-mention-count
+
+ count_per (see --count-per)
+ include_self_mentions (see --include-self-mentions)
+
+=head2 Configuration for subcommand mods-by-rdep-count
+
+ author (see --author)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand mods-from-same-dist
+
+ detail (see --detail)
+ latest (see --latest)
+ modules (see --module)
+
+=head2 Configuration for subcommand modules
+
+ author (see --author)
+ detail (see --detail)
+ dist (see --dist)
+ include_core (see --no-include-core)
+ include_noncore (see --no-include-noncore)
+ latest (see --latest)
+ namespaces (see --namespace)
+ or (see --or)
+ perl_version (see --perl-version)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+
+=head2 Configuration for subcommand namespaces
+
+ detail (see --detail)
+ from_level (see --from-level)
+ level (see --level)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+ to_level (see --to-level)
+
+=head2 Configuration for subcommand rdeps
+
+ authors (see --author)
+ authors_arent (see --author-isnt)
+ level (see --level)
+ modules (see --module)
+ phase (see --phase)
+ rel (see --rel)
+
+=head2 Configuration for subcommand related-mods
+
+ limit (see --limit)
+ modules (see --module)
+ skip_same_dist (see --skip-same-dist)
+ sort (see --sort)
+ with_scores (see --with-scores)
+
+=head2 Configuration for subcommand releases
+
+ author (see --author)
+ detail (see --detail)
+ full_path (see --full-path)
+ has_buildpl (see --has-buildpl)
+ has_makefilepl (see --has-makefilepl)
+ has_metajson (see --has-metajson)
+ has_metayml (see --has-metayml)
+ latest (see --latest)
+ no_path (see --no-path)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+
+=head2 Configuration for subcommand rels
+
+ author (see --author)
+ detail (see --detail)
+ full_path (see --full-path)
+ has_buildpl (see --has-buildpl)
+ has_makefilepl (see --has-makefilepl)
+ has_metajson (see --has-metajson)
+ has_metayml (see --has-metayml)
+ latest (see --latest)
+ no_path (see --no-path)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+
+=head2 Configuration for subcommand reset
+
+
+=head2 Configuration for subcommand script2author
+
+ all (see --all)
+ scripts (see --script)
+
+=head2 Configuration for subcommand script2dist
+
+ all (see --all)
+ scripts (see --script)
+
+=head2 Configuration for subcommand script2mod
+
+ all (see --all)
+ scripts (see --script)
+
+=head2 Configuration for subcommand script2rel
+
+ all (see --all)
+ full_path (see --full-path)
+ scripts (see --script)
+
+=head2 Configuration for subcommand scripts
+
+ author (see --author)
+ detail (see --detail)
+ dist (see --dist)
+ or (see --or)
+ query (see --query)
+ query_type (see --query-type)
+
+=head2 Configuration for subcommand scripts-by-mention-count
+
+ count_per (see --count-per)
+ include_self_mentions (see --include-self-mentions)
+
+=head2 Configuration for subcommand scripts-from-same-dist
+
+ detail (see --detail)
+ latest (see --latest)
+ scripts (see --script)
+
+=head2 Configuration for subcommand src
+
+ name (see --name)
+ script (see --script)
+
+=head2 Configuration for subcommand stats
+
+
+=head2 Configuration for subcommand stats-last-index-time
+
+
+=head2 Configuration for subcommand subnames-by-count
+
+
+=head2 Configuration for subcommand subs
+
+ authors (see --author)
+ detail (see --detail)
+ or (see --or)
+ packages (see --package)
+ query (see --query)
+ query_type (see --query-type)
+ sort (see --sort)
+
+=head2 Configuration for subcommand update
+
+ exclude_author (see --exclude-author)
+ force_update_index (see --force-update-index)
+ include_author (see --include-author)
+ max_file_size (see --max-file-size)
+ remote_url (see --remote-url)
+ skip_file_indexing_pass_1 (see --skip-file-indexing-pass-1)
+ skip_file_indexing_pass_2 (see --skip-file-indexing-pass-2)
+ skip_file_indexing_pass_3 (see --skip-file-indexing-pass-3)
+ skip_index_files (see --skip-index-file)
+ skip_sub_indexing (see --no-skip-sub-indexing)
+ update_files (see --no-update-files)
+ update_index (see --no-update-index)
+
+=head1 ENVIRONMENT
+
+=head2 LCPAN_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/lcpan.conf>
+
+F<~/lcpan.conf>
+
+F</etc/lcpan.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lcpan>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-lcpan>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<setop>
+
+L<cpan-outdated>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

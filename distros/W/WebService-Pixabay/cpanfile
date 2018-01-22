@@ -3,7 +3,6 @@ requires "Function::Parameters" => "0";
 requires "LWP::Online" => "0";
 requires "Moo" => "0";
 requires "WebService::Client" => "0";
-requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
 

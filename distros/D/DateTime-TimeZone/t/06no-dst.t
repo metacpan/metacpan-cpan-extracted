@@ -47,7 +47,7 @@ use DateTime;
         [ 5,  00 ],
         [ 11, 29 ],
         [ 11, 30 ],
-        ) {
+    ) {
         my $dt = try {
             DateTime->new(
                 year      => 2007,     month  => 12, day => 9,

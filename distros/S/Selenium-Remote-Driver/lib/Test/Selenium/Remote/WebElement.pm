@@ -1,10 +1,13 @@
 package Test::Selenium::Remote::WebElement;
 # ABSTRACT: A sub-class of L<Selenium::Remote::WebElement>, with several test-specific method additions.
-$Test::Selenium::Remote::WebElement::VERSION = '1.20';
+$Test::Selenium::Remote::WebElement::VERSION = '1.21';
 use Moo;
 use Sub::Install;
 extends 'Selenium::Remote::WebElement';
 
+=for Pod::Coverage *EVERYTHING*
+
+=cut
 
 # list of test functions to be built
 

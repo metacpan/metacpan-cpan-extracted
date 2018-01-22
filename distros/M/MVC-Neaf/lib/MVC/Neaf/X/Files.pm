@@ -2,7 +2,7 @@ package MVC::Neaf::X::Files;
 
 use strict;
 use warnings;
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ is a bad idea.
 However, forcing the user to run a separate web-server just to test
 their CSS, JS, and images is an even worse one.
 
-So this module is here to fill the gap.
+So this module is here to fill the gap in L<MVC::Neaf>.
 
 =head1 METHODS
 
@@ -36,11 +36,28 @@ use MVC::Neaf::Util qw(http_date canonize_path);
 use MVC::Neaf::View::TT;
 use parent qw(MVC::Neaf::X);
 
+# Enumerate most common file types. Patches welcome.
+our %ExtType = (
+    css  => 'text/css',
+    gif  => 'image/gif',
+    htm  => 'text/html',
+    html => 'text/html',
+    jpeg => 'image/jpeg',
+    jpg  => 'image/jpeg',
+    js   => 'application/javascript',
+    pl   => 'text/plain',
+    png  => 'image/png',
+    txt  => 'text/plain',
+);
+
 =head2 new( %options )
 
 %options may include:
 
 =over
+
+=item * root - where to search for files. May point to asingle file, too.
+(Required).
 
 =item * buffer - buffer size for serving files.
 Currently this is also the size below which in-memory caching is on,
@@ -49,6 +66,13 @@ but this MAY change in the future.
 =item * cache_ttl - if given, files below the buffer size will be stored
 in memory for cache_ttl seconds.
 B<EXPERIMENTAL>. Cache API is not yet established.
+
+=item * in_memory = { name => [ "content", "type" ] }
+
+Serve some files from memory.
+Content-type defaults to text/plain.
+
+B<EXPERIMENTAL>. Name and signature MAY change in the future.
 
 =back
 
@@ -81,7 +105,7 @@ HTML
 
 my %static_options;
 $static_options{$_}++ for qw(
-    root base_url
+    root base_url in_memory
     description buffer cache_ttl allow_dots dir_index dir_template view );
 
 sub new {
@@ -108,7 +132,14 @@ sub new {
     $options{description} = "Static content at $options{root}"
         unless defined $options{description};
 
-    return $class->SUPER::new(%options);
+    # Don't store files twice
+    my $preload = delete $options{in_memory};
+    my $self = $class->SUPER::new(%options);
+
+    $self->preload( %$preload )
+        if ($preload);
+
+    return $self;
 };
 
 =head2 serve_file( $path )
@@ -131,19 +162,6 @@ B<EXPERIMENTAL>. New options MAY be added.
 
 =cut
 
-# Enumerate most common file types. Patches welcome.
-our %ExtType = (
-    css  => 'text/css',
-    gif  => 'image/gif',
-    htm  => 'text/html',
-    html => 'text/html',
-    jpeg => 'image/jpeg',
-    jpg  => 'image/jpeg',
-    js   => 'application/javascript',
-    png  => 'image/png',
-    txt  => 'text/plain',
-);
-
 sub serve_file {
     my ($self, $file) = @_;
 
@@ -153,23 +171,14 @@ sub serve_file {
     my @header;
 
     # sanitize file path before caching
-    $file = "/$file";
-    $file =~ s#/+#/#g;
-    $file =~ s#/$##;
+    $file = canonize_path($file);
 
     if (my $data = $self->{cache_content}{$file}) {
-        if ($data->{expire} < $time) {
+        if ($data->[1] and $data->[1] < $time) {
             delete $self->{cache_content}{$file};
-        } else {
-            push @header, content_disposition => $data->{disposition}
-                if $data->{disposition};
-            $data->{expire_head} ||= http_date( $data->{expire} );
-            push @header, expires => $data->{expire_head};
-            return {
-                -content => $data->{data},
-                -type => $data->{type},
-                -headers=>\@header,
-            };
+        }
+        else {
+            return $data->[0];
         };
     };
 
@@ -200,7 +209,7 @@ sub serve_file {
     # determine type, fallback to extention
     my $type;
     $xfile =~ m#(?:^|/)([^\/]+?(?:\.(\w+))?)$#;
-    $type = $ExtType{lc $2} if defined $2;
+    $type = $ExtType{lc $2} if defined $2; # TODO 0.40 unify with guess_type
 
     my $show_name = $1;
     $show_name =~ s/[\"\x00-\x19\\]/_/g;
@@ -213,15 +222,13 @@ sub serve_file {
 
     # return whole file if possible
     if ($size < $bufsize) {
+        my $ret = { -content => $buf, -type => $type, -headers => \@header };
         if ($self->{cache_ttl}) {
-            my %content;
-            $content{data} = $buf;
-            $content{expire} = $time + $self->{cache_ttl};
-            $content{type} = $type;
-            $content{disposition} = $disposition;
-            $self->{cache_content}{$file} = \%content;
+            my $expires = $time + $self->{cache_ttl};
+            push @{ $ret->{-headers} }, expires => http_date( $expires );
+            $self->save_cache( $file, $expires, $ret );
         };
-        return { -content => $buf, -type => $type, -headers => \@header }
+        return $ret;
     };
 
     # If file is big, print header & first data chunk ASAP
@@ -288,9 +295,98 @@ sub list_dir {
     };
 };
 
+=head2 preload( %files )
+
+Preload multiple in-memory files.
+
+Returns self.
+
+=cut
+
+sub preload {
+    my ($self, %files) = @_;
+
+    foreach (keys %files) {
+        my $spec = $files{$_};
+        # guess order: png; image/png; filename.png; screw it - text
+        my $type = $ExtType{$spec->[1] || ''} || $spec->[1]
+            || $self->guess_type( $_, $spec->[0] ) || 'text/plain';
+
+        $self->save_cache( $_, undef, {
+            -content => $spec->[0],
+            -type    => $type,
+        } );
+    };
+
+    return $self;
+};
+
+=head2 one_file_handler()
+
+Returns a simple closure that accepts a L<MVC::Neaf::Request> and
+serves the requested path as is, relative to the X::Files objects's
+root, or from cache.
+
+B<EXPERIMENTAL>. This is used internally by Neaf, name & meaning may change.
+
+=cut
+
+sub one_file_handler {
+    my $self = shift;
+
+    return $self->{one_file} ||= sub {
+        my $req = shift;
+        return $self->serve_file( $req->path );
+    };
+};
+
+=head2 save_cache( $name, $expires, \%data )
+
+Save data in cache.
+
+$name is canonized file name.
+
+$expires is unix timestamp. If undef, cache forever.
+
+=cut
+
+sub save_cache {
+    my ($self, $name, $expires, $content) = @_;
+
+    $name = canonize_path( $name );
+    $self->{cache_content}{$name} = [ $content, $expires ];
+
+    return $self;
+};
+
+=head2 guess_type( $filename, $content )
+
+Returns file's MIME type. As of current, content is ignored,
+and only file extention is considered.
+
+=cut
+
+sub guess_type {
+    my ($self, $name, $content) = @_;
+
+    return unless $name =~ /\.([a-z0-9]{1,4})$/;
+    return $ExtType{lc $1};
+};
+
+
 =head2 make_route()
 
-Returns list of arguments suitable for neaf->route(...);
+Returns list of arguments suitable for C<neaf-E<gt>route(...)>:
+
+=over
+
+=item * base url;
+
+=item * handler sub;
+
+=item * a hash of options: path_info_regex, cache_ttl, and description.
+
+=back
 
 =cut
 
@@ -318,24 +414,27 @@ sub make_route {
 
 =head2 make_handler
 
-Returns a Neaf-compatible hander sub.
+Returns a Neaf-compatible handler sub.
 
-B<DEPRECATED> Use make_route instead.
+B<DEPRECATED> Use make_route instead. This dies.
 
 =cut
 
 sub make_handler {
     my $self = shift;
-
-    # callback to be installed via stock ->route() mechanism
-    my $handler = sub {
-        my $req = shift;
-
-        my $file = $req->path_info();
-        return $self->serve_file( $file );
-    }; # end handler sub
-
-    return $handler;
+    $self->my_croak("DEPRECATED, use make_route() instead");
 };
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016-2017 Konstantin S. Uvarin C<khedin@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
 
 1;

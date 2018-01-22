@@ -435,7 +435,7 @@ subtest 'custom inputs' => sub {
         [ 'string that is too long', { too_long    => 'x' x 256 } ],
         [ 'string with newline',     { has_newline => "test\n" } ],
         [ 'arrayref custom inputs', [] ],
-        ) {
+    ) {
         like(
             exception {
                 !$validator->validate_request(

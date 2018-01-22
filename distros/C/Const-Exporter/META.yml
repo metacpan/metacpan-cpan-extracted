@@ -1,40 +1,45 @@
 ---
 abstract: 'Declare constants for export.'
 author:
-  - 'Robert Rothenberg, C<< <rrwo at cpan.org> >>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Hash::Objectify: 0
-  Test::Most: 0
+  File::Spec: '0'
+  Hash::Objectify: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  if: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.12'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Const-Exporter
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
+provides:
+  Const::Exporter:
+    file: lib/Const/Exporter.pm
+    version: v0.3.1
 recommends:
-  Package::Stash::XS: 0
-  Storable: 0
+  Package::Stash::XS: '0'
+  Ref::Util::XS: '0'
+  Storable: '0'
 requires:
-  Carp: 0
-  Const::Fast: 0.014
-  Exporter: 0
-  Package::Stash: 0
-  Scalar::Util: 0
-  perl: 5.10.1
-  version: 0
+  Carp: '0'
+  Const::Fast: '0'
+  Exporter: '0'
+  Package::Stash: '0'
+  Ref::Util: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
-  homepage: http://rrwo.tumblr.com
-  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/robrwo/Const-Exporter.git
-version: '0.002004'
+version: v0.3.1
+x_authority: cpan:RRWO
+x_contributors:
+  - 'B. Estrade <estrabd@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

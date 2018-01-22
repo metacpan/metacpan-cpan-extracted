@@ -13,5 +13,8 @@ lib/Win32/NTFS/Symlink.pm
 t/01-junction.t
 t/02-symlink-file.t
 t/03-symlink-directory.t
+t/04-override-built-ins-by-name.t
+t/05-override-built-ins-by-tag.t
+t/06-import-by-name-and-tags.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

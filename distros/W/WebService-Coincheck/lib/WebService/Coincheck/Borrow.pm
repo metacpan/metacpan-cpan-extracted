@@ -17,11 +17,11 @@ sub new {
 }
 
 sub create {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        amount   => $params->{amount},
-        currency => $params->{currency},
+        amount   => $params{amount},
+        currency => $params{currency},
     };
 
     my $res = $self->client->request(
@@ -33,7 +33,7 @@ sub create {
 }
 
 sub matches {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 
@@ -46,10 +46,10 @@ sub matches {
 }
 
 sub repay {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params = {
-        id => $params->{id},
+        id => $params{id},
     };
 
     my $res = $self->client->request(

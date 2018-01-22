@@ -8,12 +8,13 @@ use MVC::Neaf qw(neaf_err);
 use MVC::Neaf::Exception;
 
 my $res = eval {
-    neaf_err(500);
+    neaf_err("Failed here at /foo/bar line 123");
     1;
 };
 is ($@, '', "Plain text = no die");
 is ($res, 1, "Plain text = no die (2)");
 
+my $line = __LINE__;
 $res = eval {
     neaf_err(MVC::Neaf::Exception->new());
     1;
@@ -24,7 +25,13 @@ is (ref $err, 'MVC::Neaf::Exception', "Type holds");
 is ($err->{-status}, 500, "Unknown error = status 500");
 ok $err->is_sudden, "Unknown error = is_sudden";
 
-is_deeply( $err->TO_JSON, {-status=>500, -sudden => 1}, "json works");
+is_deeply( $err->TO_JSON, {
+    -status  => 500,
+    -sudden  => 1,
+    -file    => __FILE__,
+    -line    => $line + 2,
+    -reason  => 'unknown error',
+}, "json works");
 
 my $err404 = MVC::Neaf::Exception->new(404);
 ok !$err404->is_sudden, "Not sudden error";

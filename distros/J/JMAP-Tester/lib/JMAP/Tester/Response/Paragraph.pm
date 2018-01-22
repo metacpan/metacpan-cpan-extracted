@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Paragraph;
 # ABSTRACT: a group of sentences in a JMAP response
-$JMAP::Tester::Response::Paragraph::VERSION = '0.016';
+$JMAP::Tester::Response::Paragraph::VERSION = '0.017';
 use Moo;
 
 use JMAP::Tester::Abort 'abort';
@@ -141,21 +141,22 @@ sub sentence_named {
   return $sentences[0];
 }
 
-#pod =method as_struct
+#pod =method as_triples
 #pod
-#pod =method as_stripped_struct
+#pod =method as_stripped_triples
 #pod
-#pod C<as_struct> returns an arrayref containing the result of calling C<as_struct>
-#pod on each sentence in the paragraph. C<as_stripped_struct> removes JSON types.
+#pod C<as_triples> returns an arrayref containing the result of calling
+#pod C<as_triple> on each sentence in the paragraph. C<as_stripped_triples> removes
+#pod JSON types.
 #pod
 #pod =cut
 
-sub as_struct {
-  [ map {; $_->as_struct } $_[0]->sentences ]
+sub as_triples {
+  [ map {; $_->as_triple } $_[0]->sentences ]
 }
 
-sub as_stripped_struct {
-  [ map {; $_->as_stripped_struct } $_[0]->sentences ]
+sub as_stripped_triples {
+  [ map {; $_->as_stripped_triple } $_[0]->sentences ]
 }
 
 #pod =method as_pairs
@@ -187,7 +188,7 @@ JMAP::Tester::Response::Paragraph - a group of sentences in a JMAP response
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 OVERVIEW
 
@@ -242,12 +243,13 @@ exactly C<$n>.  Otherwise, it aborts.
 This method returns the sentence with the given name.  If no such sentence
 exists, or if two sentences with the name exist, the tester will abort.
 
-=head2 as_struct
+=head2 as_triples
 
-=head2 as_stripped_struct
+=head2 as_stripped_triples
 
-C<as_struct> returns an arrayref containing the result of calling C<as_struct>
-on each sentence in the paragraph. C<as_stripped_struct> removes JSON types.
+C<as_triples> returns an arrayref containing the result of calling
+C<as_triple> on each sentence in the paragraph. C<as_stripped_triples> removes
+JSON types.
 
 =head2 as_pairs
 

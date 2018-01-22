@@ -3,7 +3,7 @@ package WebService::MinFraud::Validator;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005001';
+our $VERSION = '1.006000';
 
 use Data::Delete 0.05;
 use Data::Rx;
@@ -219,6 +219,7 @@ sub _build_request_schema_definition {
                                 'conekta',
                                 'cuentadigital',
                                 'curopayments',
+                                'cybersource',
                                 'dalpay',
                                 'dibs',
                                 'digital_river',
@@ -285,6 +286,7 @@ sub _build_request_schema_definition {
                                 'stripe',
                                 'telerecargas',
                                 'towah',
+                                'transact_pro',
                                 'usa_epay',
                                 'vantiv',
                                 'verepay',
@@ -293,6 +295,7 @@ sub _build_request_schema_definition {
                                 'virtual_card_services',
                                 'vme',
                                 'vpos',
+                                'wirecard',
                                 'worldpay',
                             ],
 
@@ -386,7 +389,7 @@ WebService::MinFraud::Validator - Validation for the minFraud requests
 
 =head1 VERSION
 
-version 1.005001
+version 1.006000
 
 =head1 SYNOPSIS
 
@@ -422,7 +425,7 @@ Mateu Hunter <mhunter@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2015 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+PathEntry.pm
+README
+lib/Tk/PathEntry/Dialog.pm
+t/base.t
+t/timex.t
+t/dialog.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

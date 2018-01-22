@@ -1,12 +1,14 @@
-XML-CanonicalizeXML version 0.05
+XML-CanonicalizeXML version 0.10
 ================================
 
 This module provides a wrapper to the XML Canonicalization functions
 provided by libxml2 (http://www.xmlsoft.org/) to give Perl support to
-the the W3C defined algorithms c14n canonicalization 
-(http://www.w3.org/TR/2001/REC-xml-c14n-20010315) and c14n exclusive
+the the W3C defined algorithms c14n canonicalization
+(http://www.w3.org/TR/2001/REC-xml-c14n-20010315), c14n exclusive
 canonicalization (http://www.w3.org/TR/2002/REC-xml-exc-c14n-20020718/)
+and Canonical XML Version 1.1 (https://www.w3.org/TR/xml-c14n11/)
 
+For bugs etc, visit: https://github.com/sjzasada/XML-CanonicalizeXML
 
 INSTALLATION
 
@@ -29,5 +31,3 @@ COPYRIGHT AND LICENCE
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.3 or,
 at your option, any later version of Perl 5 you may have available.
-
-

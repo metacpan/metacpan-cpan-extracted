@@ -71,7 +71,8 @@ public:
             return e.next(std::forward<Args>(args)...);
         };
 
-        static_assert(panda::has_call_operator<decltype(wrapper), Event&, Args...>::value);
+        static_assert(panda::has_call_operator<decltype(wrapper), Event&, Args...>::value,
+                      "argument of CallbackDispatcher::add should be callable with Args..." );
 
         listeners.push_back(Wrapper(wrapper, callback));
     }

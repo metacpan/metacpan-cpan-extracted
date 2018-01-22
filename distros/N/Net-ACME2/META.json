@@ -1,5 +1,5 @@
 {
-   "abstract" : "L<IETF|https://www.ietf.org>-standard ACME client protocol in Perl",
+   "abstract" : "L<IETF|https://www.ietf.org>-standard ACME (Let’s Encrypt) client",
    "author" : [
       "Felipe Gasper"
    ],
@@ -39,7 +39,7 @@
             "HTTP::Tiny::UA::Response" : "0.004",
             "JSON" : "2.9",
             "MIME::Base64" : "3.11",
-            "X::Tiny" : "0",
+            "X::Tiny" : "0.12",
             "autodie" : "0",
             "constant" : "1.23",
             "parent" : "0.225",
@@ -64,6 +64,6 @@
          "web" : "https://github.com/FGasper/p5-Net-ACME2"
       }
    },
-   "version" : "0.02",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

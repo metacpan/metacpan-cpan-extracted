@@ -104,15 +104,13 @@ sub init_db ( $self, $cb ) {
 SQL
     );
 
-    $dbh->upgrade_schema(
-        sub ($status) {
-            die $status if !$status;
+    $dbh->upgrade_schema( sub ($status) {
+        die $status if !$status;
 
-            $cb->($status);
+        $cb->($status);
 
-            return;
-        }
-    );
+        return;
+    } );
 
     return;
 }

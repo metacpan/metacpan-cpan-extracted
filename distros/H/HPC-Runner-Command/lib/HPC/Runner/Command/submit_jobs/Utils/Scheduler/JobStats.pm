@@ -3,7 +3,7 @@ package HPC::Runner::Command::submit_jobs::Utils::Scheduler::JobStats;
 #use Moose::Role;
 use Moose;
 use JSON;
-use List::MoreUtils qw(firstidx);
+use List::MoreUtils 0.428 qw(firstidx);
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::JobStats
 

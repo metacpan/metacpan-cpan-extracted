@@ -1,0 +1,46 @@
+Revision history for Perl extension Statistics::Descriptive::Weighted.
+
+0.70 Mar 26, 2012
+
+Handle empty arguments to add_data.
+Fixed Bug ID 93761 "Error in get_data() when min value is 0"
+
+0.60 Mar 18, 2012
+
+Fixed an initialization error introduced by implementation changes
+to base-class Statistics::Descriptive. 
+
+Attribute "mean" seemed no longer to be initialized with base class new().
+
+This caused an initialization error at the first use of add_data().
+
+The mean attribute is now initialized in Statistics::Descriptive::Weighted.
+
+0.50 Oct 2009
+
+Contributed changes from Florent Angly:
+
+1) Fixed some installation/test errors arising from changes to base class
+2) Made second argument to add data, specifying weights, optional. If not
+specified, weights of arguments set to 1
+3) Revised some error messages
+
+other minor changes
+
+0.40 Feb 2009 
+
+     - Redefinition of variance() and standard_deviation() (to
+standard definitions of the unbiased estimators of those quantities,
+and addition of biased_variance() and biased_standard_deviation().
+
+0.30 Dec 2008 
+     - Fixed an error in the SYNOPSIS regarding percentile. Added
+more attribution to Andrew Johnson for Tree::Treap. Added contact
+information. Fixed errors in Description. 
+
+0.20 December 2008
+     - Ported to Module::Install to fix Tree::Treap.pm provided dependency
+testing bug
+
+0.10 December 2008
+     - Initital release

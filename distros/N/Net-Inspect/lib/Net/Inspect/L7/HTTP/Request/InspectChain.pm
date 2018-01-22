@@ -17,6 +17,17 @@ use Compress::Raw::Zlib;
 use Net::Inspect::Debug qw(debug trace $DEBUG);
 use Scalar::Util 'weaken';
 
+my ($can_brotli,$ce_rx);
+BEGIN {
+    if (eval { require IO::Uncompress::Brotli; 1 }) {
+	$can_brotli = 1;
+	$ce_rx = qr{(?:x-)(?<ce> gzip|deflate) | (?<ce> br)}xi;
+    } else {
+	$can_brotli = 0;
+	$ce_rx = qr{(?:x-)(?<ce> gzip|deflate)}xi;
+    }
+}
+
 ############################################################################
 # creation of object, adding hooks etc
 ############################################################################
@@ -407,10 +418,10 @@ sub _rphdr_unchunk {
 
 ############################################################################
 # 'uncompress_ce' and 'uncompress_te' hooks
-# Handling of gzip and deflate content
+# Handling of compressed content
 # the hook _rphdr_uncompress_* is added to respone_header and if it finds
 # a matching content-encoding/transfer_encoding it will remove it and add
-# _rpbody_uncompress as a hook for response_body
+# _rpbody_uncompress_* as a hook for response_body
 # To make sure we can decompress we have to either prohibit range requests
 # or prohibit compression if Range request occured.
 # This is done in _rqhdr_uncompress_ce
@@ -427,11 +438,15 @@ sub _rphdr_uncompress_ce {
     my ($self,$hdr_ref,$time,%opt) = @_;
     my $hdr = $self->response_header;
     my $oce = my $ce = $hdr->header('Content-Encoding') or return 0;
-    $ce =~s{\s*\b(?:x-)?(gzip|deflate)\b\s*}{}i or return 0;
-    $self->{info}{"ce_$1"}++;
-    $self->update_hook('uncompress_ce',{
-	response_body => [\&_rpbody_uncompress,{ typ => lc($1) }]
-    });
+    my $lce = $ce =~s{\s*\b$ce_rx\b\s*}{} && lc($+{ce}) or return 0;
+    $self->{info}{"ce_$lce"}++;
+    if (my $sub = UNIVERSAL::can(__PACKAGE__,'_rpbody_uncompress_'.$lce)) {
+	$self->update_hook('uncompress_ce',{
+	    response_body => [$sub,{ typ => $lce }]
+	});
+    } else {
+	croak("no handler to $lce content-encoding");
+    }
 
     if ( $hdr->header('Content-Range')) {
 	# should not happen, we blocked it!
@@ -465,12 +480,16 @@ sub _rphdr_uncompress_ce {
 sub _rphdr_uncompress_te {
     my ($self,$hdr_ref,$time,%opt) = @_;
     my $hdr = $self->response_header;
-    my $te = $hdr->header('Transfer-Encoding') or return 0;
-    my $ote = $te =~s{\s*\b(?:x-)?(gzip|deflate)\b\s*}{}i or return 0;
-    $self->{info}{"te_$1"}++;
-    $self->update_hook('uncompress_te',{
-	response_body => [\&_rpbody_uncompress,{ typ => lc($1) }]
-    });
+    my $ote = my $te = $hdr->header('Transfer-Encoding') or return 0;
+    my $lce = $te =~s{\s*\b$ce_rx\b\s*}{} && lc($+{ce}) or return 0;
+    $self->{info}{"te_$lce"}++;
+    if (my $sub = UNIVERSAL::can('_rpbody_uncompress_'.$lce)) {
+	$self->update_hook('uncompress_te',{
+	    response_body => [$sub,{ typ => $lce }]
+	});
+    } else {
+	croak("no handler to $lce transfer-encoding");
+    }
     if ( $te ne '' ) {
 	$hdr->header('Transfer-Encoding' => $te);
     } else {
@@ -502,7 +521,7 @@ sub _rqhdr_uncompress_ce {
     return 1;
 }
 
-sub _rpbody_uncompress {
+sub _rpbody_uncompress_gzip {
     my ($self,$data_ref,$eof,$time,$zlib) = @_;
     if ( ! $zlib->{inflate} ) {
 	# initialisation
@@ -518,7 +537,7 @@ sub _rpbody_uncompress {
 	    if ( $magic != 0x8b1f or $method != Z_DEFLATED or $flags & 0xe0 ) {
 		trace("error decoding content-encoding gzip - bad gzip header");
 		$zlib->{inflate} =
-		    Net::Inspect::L7::HTTP::Request::InspectChain::IgnoreBadGzip->new;
+		    Net::Inspect::L7::HTTP::Request::InspectChain::_IgnoreBadGzip->new;
 		goto bad_gzip;
 	    }
 	    if ( $flags & 4 ) {
@@ -599,20 +618,33 @@ sub _rpbody_uncompress {
     }
     return $data
 }
+*_rpbody_uncompress_deflate = \&_rpbody_uncompress_gzip;
 
-# fake inflater to handle invalid gzip as plain text
-# some server send Content-type: gzip with plain data when confronted
-# with a request for identity :(
-package Net::Inspect::L7::HTTP::Request::InspectChain::IgnoreBadGzip;
-use Compress::Raw::Zlib;
-sub new { return bless {},shift };
-sub inflate {
-    my ($self,$in,$out) = @_;
-    return Z_STREAM_END if $$in eq '';
-    $$out .= $$in;
-    $$in = '';
-    return Z_OK;
+{
+    # fake inflater to handle invalid gzip as plain text
+    # some server send Content-type: gzip with plain data when confronted
+    # with a request for identity :(
+    package Net::Inspect::L7::HTTP::Request::InspectChain::_IgnoreBadGzip;
+    use Compress::Raw::Zlib;
+    sub new { return bless {},shift };
+    sub inflate {
+	my ($self,$in,$out) = @_;
+	return Z_STREAM_END if $$in eq '';
+	$$out .= $$in;
+	$$in = '';
+	return Z_OK;
+    }
 }
+
+
+sub _rpbody_uncompress_br {
+    my ($self,$data_ref,$eof,$time,$state) = @_;
+    my $br = $state->{br} ||= IO::Uncompress::Brotli->create;
+    my $data = $br->decompress($$data_ref);
+    $$data_ref = '';
+    return $data;
+}
+
 
 
 1;
@@ -622,6 +654,29 @@ __END__
 
 Net::Inspect::L7::HTTP::Request::InspectChain - chained inspection
 and modification of HTTP request and response
+
+=head1 SYNOPSIS
+
+    my $http_request =
+	Net::Inspect::L7::HTTP::Request::InspectChain->new(
+	myHTTPRequest->new);
+    $http_request->add_hooks(
+	'-original-header-prefix' => 'X-Original-',
+	'unchunk',
+	'uncompress_ce'
+    );
+    my $http  = Net::Inspect::L7::HTTP->new($http_request);
+    ...
+
+    {
+	package myHTTPRequest;
+	use base 'Net::Inspect::L7::HTTP::Request::Simple';
+	sub in {
+	    my ($self,$dir,$data,$eof,$time) = @_;
+	    ... save already uncompressed data into file ...
+	}
+    }
+
 
 =head1 DESCRIPTION
 
@@ -723,11 +778,11 @@ header for alle changed headers with the given prefix.
 =item uncompress_ce
 
 will hook into C<response_header>. If it says, that the response has a
-C<Content-Encoding> of gzip or deflate it will remove the info from the header
-and update hook in C<response_body> to uncompress content.
+C<Content-Encoding> of gzip or deflate or br (if supported) it will remove the
+info from the header and update hook in C<response_body> to uncompress content.
 
-If compression was found and removed it will set C<$self->{info}{ce_gzip}> or
-C<$self->{info}{ce_deflate}>.
+If compression was found and removed it will set C<$self->{info}{ce_gzip}>,
+C<$self->{info}{ce_deflate}> or C<$self->{info}{ce_br}>.
 
 If option C<-original-header-prefix> is given it will preserver the original
 header for alle changed headers with the given prefix.
@@ -758,4 +813,5 @@ Can also be used to set new header.
 
 =head1 LIMITS
 
-Only gzip and deflate are supported for uncompression, no 'uncompress'
+Only gzip and deflate are supported for uncompression by default. If
+IO::Uncompress::Brotli is available also 'br' is supported.

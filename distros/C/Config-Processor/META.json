@@ -36,7 +36,7 @@
             "Carp" : "0",
             "Cpanel::JSON::XS" : "3.0104",
             "File::Spec" : "0",
-            "Hash::Merge" : "0.200",
+            "Hash::Merge" : "0.299",
             "Scalar::Util" : "0",
             "YAML::XS" : "0.41"
          }
@@ -55,5 +55,5 @@
          "url" : "https://github.com/iph0/Config-Processor"
       }
    },
-   "version" : "0.26"
+   "version" : "0.28"
 }

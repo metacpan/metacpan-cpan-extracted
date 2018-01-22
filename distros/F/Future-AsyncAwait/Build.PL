@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Future::AsyncAwait',
    requires => {
       'Future' => 0,
-      'perl' => '5.024', # PL_keyword_plugin, PERL_CONTEXT->blk_oldsaveix
+      'perl' => '5.018', # PL_keyword_plugin, SAVEt_CLEARPADRANGE, PADNAME, ...
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
@@ -24,7 +24,7 @@ my $build = Module::Build->new(
       },
    },
 
-   extra_compiler_flags => [qw( -std=c89 )],
+   extra_compiler_flags => [qw( -std=c89 -Ihax )],
 );
 
 $build->create_build_script;

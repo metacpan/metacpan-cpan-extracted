@@ -28,6 +28,20 @@ If C<tocode> is NULL, it will default to C<fromcode>.
 
 Testing if the return value is equal to C<(size_t) -1> or not, together with C<errno> value when it is C<(size_t) -1> as documented for C<iconv>, is the only reliable check: in theory it should return the number of non-reversible characters, and this is what will happen is this is C<iconv> running behind. In case of another convertion engine, the return value depend on this engine capabilities, or how the corresponding plugin is implemented.
 
+When the number of bytes left in the input is C<0>, the return value is equal to C<(size_t) -1>, and C<errno> is C<E2BIG>: you should not count on C<*ilp> position: the conversion engine may have an internal staging array that have consumed all the input bytes, but is waiting for more space to produce the output bytes. This is happening for instance:
+
+=over
+
+=item with the ICU convert engine
+
+Regardless if you use C<//TRANSLIT> option or not, the ICU convert engine is always doing two conversions internally, one from input encoding to UTF-16, then from UTF-16 to output encoding. This means that it is always eating entirely the input bytes into an internal staging area.
+
+=item with the ICONV convert engine
+
+When input and output encodings are of the same family, then iconv is turned into a validation mode, and is doing internally two conversions, like the ICU plugin. This is also using an internal staging area that always consumes all input bytes before converting them. If the input family is the same as "UTF-8", then the internal staging area is of type "UTF-32", else the internal staging area is of type "UTF-8".
+
+=back
+
 =head1 ENGINES
 
 tconv support two engine types: one for charset detection, one for character conversion, please refer to the L<tconv_open_ext> documentation for technical details. Engines, whatever their type, are supposed to have three entry points: C<new>, C<run> and C<free>. They can be:

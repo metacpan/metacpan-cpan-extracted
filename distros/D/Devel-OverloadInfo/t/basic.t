@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More 0.88;
 
-use Devel::OverloadInfo qw(overload_info is_overloaded);
+use Devel::OverloadInfo qw(overload_info overload_op_info is_overloaded);
 
 sub MyModule::negate { -$_[0] }
 
@@ -61,6 +61,9 @@ for my $class (qw(NoOverload)) {
     ok !is_overloaded($class), "$class is not overloaded";
 }
 
+is overload_op_info('BaseClass', 'cmp'), undef,
+    'overload_op_info() returns undef for non-overloaded op';
+
 my $boi = overload_info('BaseClass');
 
 # Whether undef fallback exists varies between perl versions
@@ -69,6 +72,13 @@ if (my $fallback = delete $boi->{fallback}) {
         class => 'BaseClass',
         value => undef,
     }, 'BaseClass fallback is undef';
+    is_deeply overload_op_info('BaseClass', 'fallback'),
+        $fallback,
+        "overload_op_info('BaseClass','fallback') matches overload_info()";
+}
+else {
+    is overload_op_info('BaseClass', 'fallback'), undef,
+        "overload_op_info('BaseClass','fallback') matches overload_info()";
 }
 
 is_deeply $boi,
@@ -127,9 +137,19 @@ is_deeply $coi,
     },
     "ChildClass overload info" or note explain $coi;
 
+for my $op (sort keys %$coi) {
+    is_deeply overload_op_info('ChildClass', $op),
+        $coi->{$op},
+        "overload_op_info('ChildClass', $op)";
+}
+
+
 is_deeply overload_info('InheritedOnly'),
     overload_info('BaseClass'),
     'InheritedOnly has same overloads as BaseClass';
+
+is overload_op_info('NoOverload', 'fallback'), undef,
+    'overload_op_info on non-overloaded class';
 
 is_deeply overload_info('NoOverload'), {},
     'NoOverload has no overloads';

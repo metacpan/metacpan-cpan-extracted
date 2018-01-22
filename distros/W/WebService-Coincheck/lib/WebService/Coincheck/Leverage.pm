@@ -17,7 +17,7 @@ sub new {
 }
 
 sub info {
-    my ($self, $params) = @_;
+    my ($self, %params) = @_;
 
     my $req_params;
 

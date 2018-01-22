@@ -480,53 +480,49 @@ sub read_http_body ( $self, $on_read, @ ) {
             }
         );
 
-        $self->on_read(
-            sub ($h) {
-                my $total_bytes_readed = $on_read_buf->( \delete $h->{rbuf}, undef );
+        $self->on_read( sub ($h) {
+            my $total_bytes_readed = $on_read_buf->( \delete $h->{rbuf}, undef );
 
-                if ( !$total_bytes_readed ) {
+            if ( !$total_bytes_readed ) {
 
-                    # remove "on_read" callback
-                    $h->on_read(undef);
+                # remove "on_read" callback
+                $h->on_read(undef);
 
-                    # remove "on_eof" callback
-                    $h->on_eof(undef);
-                }
-
-                return;
+                # remove "on_eof" callback
+                $h->on_eof(undef);
             }
-        );
+
+            return;
+        } );
     }
     else {    # read body with known length
-        $self->on_read(
-            sub ($h) {
-                my $total_bytes_readed = $on_read_buf->( \delete $h->{rbuf}, undef );
+        $self->on_read( sub ($h) {
+            my $total_bytes_readed = $on_read_buf->( \delete $h->{rbuf}, undef );
 
-                if ( !$total_bytes_readed ) {
+            if ( !$total_bytes_readed ) {
+
+                # remove "on_read" callback
+                $h->on_read(undef);
+            }
+            else {
+                if ( $total_bytes_readed == $args{length} ) {
 
                     # remove "on_read" callback
                     $h->on_read(undef);
+
+                    $on_read_buf->( undef, undef );
                 }
-                else {
-                    if ( $total_bytes_readed == $args{length} ) {
+                elsif ( $total_bytes_readed > $args{length} ) {
 
-                        # remove "on_read" callback
-                        $h->on_read(undef);
+                    # remove "on_read" callback
+                    $h->on_read(undef);
 
-                        $on_read_buf->( undef, undef );
-                    }
-                    elsif ( $total_bytes_readed > $args{length} ) {
-
-                        # remove "on_read" callback
-                        $h->on_read(undef);
-
-                        $on_read_buf->( undef, q[Readed body length is larger than expected] );
-                    }
+                    $on_read_buf->( undef, q[Readed body length is larger than expected] );
                 }
-
-                return;
             }
-        );
+
+            return;
+        } );
     }
 
     return;
@@ -589,13 +585,13 @@ sub get_connect ($connect) {
 ## |    2 | 283                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | Documentation::RequirePodLinksIncludeText                                                                      |
-## |      | 605                  | * Link L<AnyEvent::Handle> on line 611 does not specify text                                                   |
-## |      | 605                  | * Link L<AnyEvent::Handle> on line 619 does not specify text                                                   |
-## |      | 605                  | * Link L<AnyEvent::Handle> on line 647 does not specify text                                                   |
-## |      | 605                  | * Link L<AnyEvent::Handle> on line 663 does not specify text                                                   |
-## |      | 605                  | * Link L<AnyEvent::Socket> on line 663 does not specify text                                                   |
-## |      | 605, 605             | * Link L<Pcore::Proxy> on line 629 does not specify text                                                       |
-## |      | 605                  | * Link L<Pcore::Proxy> on line 663 does not specify text                                                       |
+## |      | 601                  | * Link L<AnyEvent::Handle> on line 607 does not specify text                                                   |
+## |      | 601                  | * Link L<AnyEvent::Handle> on line 615 does not specify text                                                   |
+## |      | 601                  | * Link L<AnyEvent::Handle> on line 643 does not specify text                                                   |
+## |      | 601                  | * Link L<AnyEvent::Handle> on line 659 does not specify text                                                   |
+## |      | 601                  | * Link L<AnyEvent::Socket> on line 659 does not specify text                                                   |
+## |      | 601, 601             | * Link L<Pcore::Proxy> on line 625 does not specify text                                                       |
+## |      | 601                  | * Link L<Pcore::Proxy> on line 659 does not specify text                                                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 45, 50               | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

@@ -217,6 +217,7 @@ sub action_get_olson(@) {
 		"present, they contain material derived from BSD and use the ".
 		"BSD 3-clause license. ".
 	"" or die "could not confirm general PD status\n";
+	filter("", "make", "-C", $dldir, "maintainer-clean");
 	find({
 		no_chdir => 1,
 		wanted => sub {
@@ -225,8 +226,10 @@ sub action_get_olson(@) {
 				die "downloaded file $_ in unexpected place\n";
 			}
 			my $lname = $1;
-			if(m#/tz(?:code|data)\.tar\.(?:Z|gz)\z#) {
-				# Is download tarball; not a source file.
+			if(m#/tz(?:db|code|data)\.tar\.(?:Z|gz|lz)
+					(?:\.asc)?\z#x) {
+				# Is download tarball or signature;
+				# not a source file.
 				return;
 			}
 			if($lname =~ /\A(?:date\.c|newstrftime\.3(?:\.txt)?|
@@ -256,8 +259,6 @@ sub action_get_olson(@) {
 	$dirdone = 1;
 	write_target_file("tzsrc.meta", "+".tabbed_pond({
 		version => $dl->version,
-		code_version => $dl->code_version,
-		data_version => $dl->data_version,
 		files => [ sort @files ],
 	})."\n");
 }
@@ -285,8 +286,6 @@ my %tpl_handler = (
 		$v =~ s/([a-z])/sprintf("%02d", ord($1)-0x60)/eg;
 		return $v;
 	},
-	code_version_lettered => sub ($) { $_[0]->code_version },
-	data_version_lettered => sub ($) { $_[0]->data_version },
 );
 
 sub expand_template_item($$) {
@@ -347,8 +346,6 @@ sub action_build_data(@) {
 	};
 	my $dl = Time::OlsonTZ::Download->new_from_local_source(
 		version => $tzsrc_meta->{version},
-		code_version => $tzsrc_meta->{code_version},
-		data_version => $tzsrc_meta->{data_version},
 		source_dir => "$target_dir/tzsrc",
 	);
 	if(exists $type{meta}) {
@@ -578,7 +575,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

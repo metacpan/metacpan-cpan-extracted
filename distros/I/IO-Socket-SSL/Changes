@@ -1,3 +1,20 @@
+2.054 2018/01/22
+- added missing test certificates to MANIFEST
+2.053 2018/01/21
+- small behavior fixes
+  - if SSL_fingerprint is used and matches don't check for OCSP
+  - Utils::CERT_create - small fixes to properly specific purpose, ability to
+    use predefined complex purpose but disable some features
+- update PublicSuffix
+- updates for documentation, especially regarding pitfalls with forking or using
+  non-blocking sockets. Spelling fixes.
+- test fixes and improvements
+  - stability improvements for live tests
+  - regenerate certificate in certs/ and make sure they are limited to the
+    correct purpose. Checkin program used to generate certificates.
+  - adjust tests since certificates have changed and some tests used
+    certificates intended for client authentication as server certificates,
+    which now no longer works
 2.052 2017/10/22
 - disable NPN support if LibreSSL>=2.6.1 is detected since they've replaced the
   functions with dummies instead of removing NPN completly or setting
@@ -10,7 +27,7 @@
   OpenSSL 1.1.0 on Windows) set $! to EPIPE to propagate a useful error up
   https://github.com/noxxi/p5-io-socket-ssl/issues/62
 2.050 2017/08/18
-- removed unecessary settings of SSL_version and SSL_cipher_list from tests
+- removed unnecessary settings of SSL_version and SSL_cipher_list from tests
 - protocol_version.t can now deal when TLS 1.0 and/or TLS 1.1 are not supported
   as is the case with openssl versions in latest Debian (buster)
 2.049 2017/06/12
@@ -107,8 +124,8 @@
 - remove internal sub session_cache and access cache directly (faster)
 2.029 2016/06/26
 - fix del_session method in case a single item was in the cache
-- use SSL_session_key as the real key for the cache and not some derivate of it,
-  so that it works to remove the entry using the same key
+- use SSL_session_key as the real key for the cache and not some derivative of
+  it, so that it works to remove the entry using the same key
 2.028 2016/06/26
 - add del_session method to session cache
 2.027 2016/04/20

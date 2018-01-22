@@ -1,5 +1,5 @@
 package Net::Twitter::API;
-$Net::Twitter::API::VERSION = '4.01042';
+$Net::Twitter::API::VERSION = '4.01043';
 use Moose ();
 use Carp::Clan qw/^(?:Net::Twitter|Moose|Class::MOP)/;
 use Moose::Exporter;
@@ -117,7 +117,7 @@ sub twitter_api_method {
 }
 
 package Net::Twitter::Meta::Method;
-$Net::Twitter::Meta::Method::VERSION = '4.01042';
+$Net::Twitter::Meta::Method::VERSION = '4.01043';
 use Moose;
 use Carp::Clan qw/^(?:Net::Twitter|Moose|Class::MOP)/;
 extends 'Moose::Meta::Method';
@@ -164,7 +164,7 @@ Net::Twitter::API - Moose sugar for defining Twitter API methods
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

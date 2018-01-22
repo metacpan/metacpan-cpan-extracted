@@ -1,0 +1,69 @@
+NAME
+    RDF::Trine::Serializer::RDFa - RDFa Serializer for RDF::Trine
+
+SYNOPSIS
+     use RDF::Trine::Serializer;
+
+     my $s = RDF::Trine::Serializer->new('RDFa', style => 'HTML::Hidden');
+     my $string = $s->serialize_model_to_string($model);
+
+DESCRIPTION
+    The RDF::Trine::Serializer class provides an API for serializing RDF
+    graphs to strings and files. This subclass provides RDFa serialization via
+    RDF::RDFa::Generator.
+
+    It is intended that this module will replace the RDF::Trine compatibility
+    methods in RDF::RDFa::Generator, which are now deprecated. This is done to
+    allow both RDF::Trine and Attean to use it, but not require them as
+    dependencies.
+
+METHODS
+    Beyond the methods documented below, this class inherits methods from the
+    RDF::Trine::Serializer class.
+
+    `new`
+        Returns a new RDFa serializer object. It can any arguments are passed
+        on to RDF::RDFa::Generator, see it's documentation for details. This
+        includes a `style` argument that names a module that formats the
+        output.
+
+    `serialize_model_to_file ( $fh, $model )`
+        Serializes the $model to RDFa, printing the results to the supplied
+        filehandle `<$fh`>.
+
+    `serialize_model_to_string ( $model )`
+        Serializes the $model to RDFa, returning the result as a string.
+
+    `serialize_iterator_to_file ( $file, $iter )`
+        Serializes the iterator to RDFa, printing the results to the supplied
+        filehandle `<$fh`>.
+
+    `serialize_iterator_to_string ( $iter )`
+        Serializes the iterator to RDFa, returning the result as a string.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa/issues>.
+
+SEE ALSO
+    RDF::RDFa::Generator, RDF::Trine, Attean
+
+ACKNOWLEDGEMENTS
+    This module is mostly a straightforward port with substantial cutnpaste
+    from RDF::RDFa::Generator and RDF::Trine by Toby Inkster and Gregory Todd
+    Williams respectively.
+
+AUTHOR
+    Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

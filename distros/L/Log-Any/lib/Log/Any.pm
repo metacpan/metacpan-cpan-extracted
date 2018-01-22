@@ -5,7 +5,7 @@ use warnings;
 package Log::Any;
 
 # ABSTRACT: Bringing loggers and listeners together
-our $VERSION = '1.704';
+our $VERSION = '1.705';
 
 use Log::Any::Manager;
 use Log::Any::Proxy::Null;
@@ -134,7 +134,7 @@ Log::Any - Bringing loggers and listeners together
 
 =head1 VERSION
 
-version 1.704
+version 1.705
 
 =head1 SYNOPSIS
 
@@ -389,8 +389,8 @@ used again.
 
 =head2 Configuring the proxy
 
-Any parameter passed on the import line or via the C<get_logger> method
-are passed on the the L<Log::Any::Proxy> constructor.
+Any parameters passed on the import line or via the C<get_logger> method
+are passed on to the L<Log::Any::Proxy> constructor.
 
     use Log::Any '$log', filter => \&myfilter;
 
@@ -475,7 +475,7 @@ Stephen Thirlwall <sdt@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords bj5004 cm-perl Karen Etheridge Konstantin S. Uvarin Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Philipp Gortan Phill Legault Shlomi Fish
+=for stopwords bj5004 cm-perl Karen Etheridge Konstantin S. Uvarin Lucas Kanashiro Maros Kollar Maxim Vuets mephinet Nick Tonkin Philipp Gortan Phill Legault Shlomi Fish
 
 =over 4
 
@@ -510,6 +510,10 @@ Maxim Vuets <maxim.vuets@booking.com>
 =item *
 
 mephinet <mephinet@gmx.net>
+
+=item *
+
+Nick Tonkin <1nickt@users.noreply.github.com>
 
 =item *
 

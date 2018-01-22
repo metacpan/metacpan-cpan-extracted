@@ -6,12 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-devdata/catalog.csv
-devdata/cmc.html
-devdata/scrape-result.csv
-devscript/gen-catalog
-devscript/scrape-cmc
-devscript/update
 dist.ini
 lib/CryptoExchange/Catalog.pm
 t/00-compile.t

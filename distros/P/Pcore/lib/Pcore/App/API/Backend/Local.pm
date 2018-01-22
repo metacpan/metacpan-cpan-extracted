@@ -39,36 +39,34 @@ sub _build_host ($self) {
 sub init ( $self, $cb ) {
     $self->{_hash_cache} = P->hash->limited( $self->{_hash_cache_size} );
 
-    $self->init_db(
-        sub {
+    $self->init_db( sub {
 
-            # create hash RPC
-            P->pm->run_rpc(
-                'Pcore::App::API::RPC::Hash',
-                workers   => undef,
-                buildargs => {
-                    argon2_time        => 3,
-                    argon2_memory      => '64M',
-                    argon2_parallelism => 1,
-                },
-                on_ready => sub ($rpc) {
-                    $self->{_hash_rpc} = $rpc;
+        # create hash RPC
+        P->pm->run_rpc(
+            'Pcore::App::API::RPC::Hash',
+            workers   => undef,
+            buildargs => {
+                argon2_time        => 3,
+                argon2_memory      => '64M',
+                argon2_parallelism => 1,
+            },
+            on_ready => sub ($rpc) {
+                $self->{_hash_rpc} = $rpc;
 
-                    $rpc->connect_rpc(
-                        on_connect => sub ($rpc) {
-                            $cb->( result 200 );
+                $rpc->connect_rpc(
+                    on_connect => sub ($rpc) {
+                        $cb->( result 200 );
 
-                            return;
-                        }
-                    );
+                        return;
+                    }
+                );
 
-                    return;
-                },
-            );
+                return;
+            },
+        );
 
-            return;
-        }
-    );
+        return;
+    } );
 
     return;
 }
@@ -342,15 +340,15 @@ sub _verify_token_hash ( $self, $private_token, $hash, $salt, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 78, 126, 245, 291,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 316                  |                                                                                                                |
+## |    3 | 76, 124, 243, 289,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 314                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 200                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 198                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 266                  | * Private subroutine/method '_generate_token' declared but not used                                            |
-## |      | 291                  | * Private subroutine/method '_generate_user_password_hash' declared but not used                               |
-## |      | 316                  | * Private subroutine/method '_verify_token_hash' declared but not used                                         |
+## |      | 264                  | * Private subroutine/method '_generate_token' declared but not used                                            |
+## |      | 289                  | * Private subroutine/method '_generate_user_password_hash' declared but not used                               |
+## |      | 314                  | * Private subroutine/method '_verify_token_hash' declared but not used                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

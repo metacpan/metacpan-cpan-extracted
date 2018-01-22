@@ -76,6 +76,15 @@ option preceding other option like this:
 
     % date --iso-8601 -u
 
+## COMMAND ALIASES
+
+Command aliases can be set in the configuration file like this:
+
+    [alias]
+        pgrep = [ "greple", "-Mperl", "--code" ]
+
+Read CONFIGURATION FILE section.
+
 ## MACROS
 
 Complex string can be composed using macro `define`.  Next example is
@@ -162,6 +171,10 @@ following content.
     % date -Mes
     domingo, 22 de octubre de 2017, 18:00:00 JST
 
+When the specified module was not found in library path, **optex**
+ignores the option and stops argument processing immediately.  Ignored
+options are passed through to the target command.
+
 Module is also used with subroutine call.  Suppose
 `~/.optex.d/env.pm` module look like:
 
@@ -184,7 +197,7 @@ because it does not have special characters to be escaped.
 Option aliases can be also declared in the module, at the end of file,
 following special literal `__DATA__`.  Using this, you can prepare
 multiple set of options for different purposes.  Think about generic
-i18n module:
+**i18n** module:
 
     package i18n;
     1;
@@ -241,7 +254,7 @@ addressed with and without `App::optex` prefix.
 
 # OPTIONS
 
-These options are not effective when **optex** was executed from a
+These options are not effective when **optex** was executed from
 symbolic link.
 
 - **--link**, **--ln** \[ _command_ \]
@@ -268,9 +281,39 @@ symbolic link.
 
     **optex** deals with module option (-M) on target command by default.
     However, there is a command which also uses same option for own
-    purpose.  Option **--nomodule** disables that behaviour.  Other option
+    purpose.  Option **--nomodule** disables that behavior.  Other option
     interpretation is still effective, and there is no problem using
     module option in rc or module files.
+
+# CONFIGURATION FILE
+
+When starting up, **optex** reads configuration file
+`~/.optex.d/config.toml` which is supposed to be written in TOML
+format.
+
+## PARAMETERS
+
+- **no-module**
+
+    Set commands for which **optex** does not interpret module option
+    **-M**.  If the target command is found in this list, it is executed as
+    if option **--no-module** is given to **optex**.
+
+        no-module = [
+            "greple",
+            "pgrep",
+        ]
+
+- **alias**
+
+    Set command aliases.  Example:
+
+        [alias]
+            pgrep = [ "greple", "-Mperl", "--code" ]
+            hello = "echo -n 'hello world!'"
+
+    Command alias can be invoked either from symbolic link and command
+    argument.
 
 # FILES AND DIRECTORIES
 
@@ -281,6 +324,10 @@ symbolic link.
 - `~/.optex.d/`
 
     Personal root directory.
+
+- `~/.optex.d/config.toml`
+
+    Configuration file.
 
 - `~/.optex.d/default.rc`
 
@@ -313,19 +360,18 @@ symbolic link.
 
     Override default root directory `~/.optex.d`.
 
+- OPTEX\_CONFIG
+
+    Override default configuration file `OPTEX_ROOT/config.toml`.
+
 - OPTEX\_MODULE\_PATH
 
     Set module paths separated by colon (`:`).  These are inserted before
     standard path.
 
-- OPTEX\_MODULE\_OPT
-
-    Passed to [Getopt::EX::Loader](https://metacpan.org/pod/Getopt::EX::Loader) module, and standard module option
-    **-M** is replaced by its value.
-
 - OPTEX\_BINDIR
 
-    Override default symbolic link directory `~/.optex.d/bin`.
+    Override default symbolic link directory `OPTEX_ROOT/bin`.
 
 # SEE ALSO
 
@@ -333,7 +379,7 @@ symbolic link.
 
 # AUTHOR
 
-Kaz Utashiro
+Kazumasa Utashiro
 
 # COPYRIGHT
 
@@ -341,4 +387,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017 Kazumasa Utashiro
+Copyright 2017-2018 Kazumasa Utashiro

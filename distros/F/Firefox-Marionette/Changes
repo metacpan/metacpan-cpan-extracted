@@ -1,5 +1,29 @@
 Revision history for Firefox-Marionette
 
+0.16  Sun Jan 21 20:19:00 2018
+       Added support for -safe-mode as a firefox argument via the addons argument
+
+0.15  Sat Jan 20 22:23:00 2018
+       Fixed documentation
+
+0.14  Sat Jan 20 22:01:00 2018
+       Improved the test suite to cope with high load averages on test machines
+       Added support for closing a tab/window
+
+0.13  Sat Jan 20 15:22:00 2018
+       Added additional dependencies to Makefile.PL
+
+0.12  Sat Jan 20 15:12:00 2018
+       Removing methods to update the profile while firefox is running until a method that works is discovered. 
+       Added debug parameter to cleanup firefox STDERR unless required.
+       Building Xvfb support into the module instead of just including it in the test suite
+
+0.11  Fri Jan 19 21:14:00 2018
+       Improving Profile support.  Adding more debugging for 'X_GetImage: BadMatch' exceptions.
+
+0.10  Wed Jan 17 06:30:00 2018
+       Catching negative window positions in test suite.  Adding Profile support
+
 0.09  Mon Jan 15 21:30:00 2018
        Improved handling of 'X_GetImage: BadMatch' exceptions in test suite
 

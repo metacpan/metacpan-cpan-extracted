@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use t::Util;
 use File::Spec;
 
 my $lib = File::Spec->rel2abs('lib');
@@ -12,10 +11,14 @@ is(optex(), 2);
 
 $ENV{PATH} = "/bin:/usr/bin";
 is(optex('true'),  0);
-is(optex('false'), 1);
+isnt(optex('false'), 0);
 
 is(optex('-Mhelp', 'true'),  0);
 is(optex('-MApp::optex::help', 'true'),  0);
+is(optex('-MApp::optex::debug', 'true'),  0);
+is(optex('-MApp::optex::util', 'true'),  0);
+is(optex('-MApp::optex::util::filter', 'true'),  0);
+is(optex('-MApp::optex::util::argv', 'true'),  0);
 
 done_testing;
 

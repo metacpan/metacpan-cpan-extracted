@@ -53,17 +53,16 @@ sub CLI ($self) {
 sub CLI_RUN ( $self, $opt, $arg, $rest ) {
     require Pcore::Dist::Build;
 
-    my $status = Pcore::Dist::Build->new->create(
-        {   base_path               => $ENV->{START_DIR},
-            dist_namespace          => $arg->{dist_namespace},
-            is_cpan                 => $opt->{cpan},
-            upstream_hosting        => $opt->{hosting},
-            is_private              => $opt->{private},
-            upstream_scm_type       => $opt->{scm},
-            local_scm_type          => $opt->{local_scm},
-            upstream_repo_namespace => $opt->{namespace},
-        }
-    );
+    my $status = Pcore::Dist::Build->new->create( {
+        base_path               => $ENV->{START_DIR},
+        dist_namespace          => $arg->{dist_namespace},
+        is_cpan                 => $opt->{cpan},
+        upstream_hosting        => $opt->{hosting},
+        is_private              => $opt->{private},
+        upstream_scm_type       => $opt->{scm},
+        local_scm_type          => $opt->{local_scm},
+        upstream_repo_namespace => $opt->{namespace},
+    } );
 
     exit 3 if !$status;
 

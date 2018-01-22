@@ -21,4 +21,4 @@ requires:
   Bot::BasicBot::Pluggable::Module: '0'
   Nagios::Scrape: '0'
   Test::More: '0'
-version: '0.05'
+version: '0.06'

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Usage;
 # ABSTRACT: the usage description for GLD
-$Getopt::Long::Descriptive::Usage::VERSION = '0.100';
+$Getopt::Long::Descriptive::Usage::VERSION = '0.101';
 use List::Util qw(max);
 
 #pod =head1 SYNOPSIS
@@ -273,7 +273,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 

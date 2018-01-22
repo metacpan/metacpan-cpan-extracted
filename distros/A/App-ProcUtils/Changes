@@ -1,4 +1,7 @@
-Revision history for App-ProcUtils
+0.030   2018-01-17 (PERLANCAR)
+
+        - Add utilities: ppgrep, proc-table.
+
 
 0.02    2016-01-18 (PERLANCAR)
 

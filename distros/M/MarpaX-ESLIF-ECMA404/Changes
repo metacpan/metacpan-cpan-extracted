@@ -1,6 +1,15 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.007 2017-07-04T17:48:37
+0.008 2018-01-19T04:36:12
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - MarpaX::ESLIF Version 2.0.32 changes some of the i_* results, basically
+   yells in the input have malformed characters: the standard says nothing
+   about that and the JSONTestSuite is correctly saying this is parser
+   specific, they are allowed to accept or not the input. We do not accept
+   corrupted input in character mode (else we would have gone to binary
+   mode and handle the failures)
+
+0.007 2017-07-04T17:48:37Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Fix RecognizerInterface POD
  - elements action bug fix

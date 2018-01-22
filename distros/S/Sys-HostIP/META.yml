@@ -3,18 +3,20 @@ abstract: 'Try extra hard to get IP address related info'
 author:
   - 'Sawyer X <xsawyerx@cpan.org>'
   - 'Jonathan Schatz <jon@divisionbyzero.com>'
+  - 'Paul Cochrane <paul@liekut.de>'
 build_requires:
   Data::Dumper: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::CPAN::Meta: '0'
+  Test::Kwalitee::Extra: '0'
   Test::More: '0'
   Test::Pod: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,14 +25,15 @@ name: Sys-HostIP
 provides:
   Sys::HostIP:
     file: lib/Sys/HostIP.pm
-    version: '2.000'
+    version: '2.100'
 requires:
   Carp: '0'
   Exporter: '0'
   File::Basename: '0'
+  parent: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/xsawyerx/sys-hostip/issues
   repository: git://github.com/xsawyerx/sys-hostip.git
-version: '2.000'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '2.100'
+x_serialization_backend: 'YAML::Tiny version 1.70'

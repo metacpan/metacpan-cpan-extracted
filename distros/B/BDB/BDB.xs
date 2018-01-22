@@ -163,7 +163,7 @@ enum {
   REQ_QUIT,
   REQ_ENV_OPEN, REQ_ENV_CLOSE, REQ_ENV_TXN_CHECKPOINT, REQ_ENV_LOCK_DETECT,
   REQ_ENV_MEMP_SYNC, REQ_ENV_MEMP_TRICKLE, REQ_ENV_DBREMOVE, REQ_ENV_DBRENAME,
-  REQ_ENV_LOG_ARCHIVE,
+  REQ_ENV_LOG_ARCHIVE, REQ_ENV_LSN_RESET, REQ_ENV_FILEID_RESET,
   REQ_DB_OPEN, REQ_DB_CLOSE, REQ_DB_COMPACT, REQ_DB_SYNC, REQ_DB_VERIFY, REQ_DB_UPGRADE,
   REQ_DB_PUT, REQ_DB_EXISTS, REQ_DB_GET, REQ_DB_PGET, REQ_DB_DEL, REQ_DB_KEY_RANGE,
   REQ_TXN_COMMIT, REQ_TXN_ABORT, REQ_TXN_FINISH,
@@ -861,6 +861,16 @@ bdb_request (bdb_req req)
         break;
 #endif
 
+#if DBVER >= 407
+      case REQ_ENV_LSN_RESET:
+        req->result = req->env->lsn_reset (req->env, req->buf1, req->uint1);
+        break;
+
+      case REQ_ENV_FILEID_RESET:
+        req->result = req->env->fileid_reset (req->env, req->buf1, req->uint1);
+        break;
+#endif
+
       case REQ_ENV_LOG_ARCHIVE:
         {
           char **listp = 0; /* DB_ARCH_REMOVE does not touch listp, contrary to docs */
@@ -1016,12 +1026,12 @@ static void atfork_child (void)
   if (callback && SvOK (callback))				\
     croak ("callback has illegal type or extra arguments");	\
 								\
-  Newz (0, req, 1, bdb_cb);	        			\
+  Newz (0, req, 1, bdb_cb);					\
   if (!req)							\
     croak ("out of memory during bdb_req allocation");		\
 								\
   req->callback = SvREFCNT_inc (cb);				\
-  req->type = (reqtype); 					\
+  req->type = (reqtype);					\
   req->pri  = req_pri;						\
   if (rsvcnt >= 1) req->rsv1 = SvREFCNT_inc (ST (0));		\
   if (rsvcnt >= 2) req->rsv2 = SvREFCNT_inc (ST (1));		\
@@ -1030,7 +1040,7 @@ static void atfork_child (void)
 #define REQ_SEND						\
   req_send (req)
 
-#define SvPTR(var, arg, type, stash, class, nullok)            			\
+#define SvPTR(var, arg, type, stash, class, nullok)				\
   if (!SvOK (arg))								\
     {										\
       if (nullok != 1)								\
@@ -1710,6 +1720,21 @@ db_env_dbrename (DB_ENV *env, DB_TXN_ornull *txnid, bdb_filename file, bdb_filen
         req->buf2  = strdup_ornull (database);
         req->buf3  = strdup_ornull (newname);
         req->uint1 = flags;
+        REQ_SEND;
+}
+
+void
+db_env_lsn_reset (DB_ENV *env, bdb_filename db, U32 flags = 0, SV *callback = 0)
+	ALIAS:
+        db_env_fileid_reset = 1
+	PREINIT:
+        CALLBACK
+	CODE:
+{
+        dREQ (ix ? REQ_ENV_FILEID_RESET : REQ_ENV_LSN_RESET, 1);
+        req->env   = env;
+        req->uint1 = flags;
+        req->buf1  = strdup_ornull (db);
         REQ_SEND;
 }
 

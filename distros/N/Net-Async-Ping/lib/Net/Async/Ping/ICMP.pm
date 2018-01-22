@@ -1,5 +1,5 @@
 package Net::Async::Ping::ICMP;
-$Net::Async::Ping::ICMP::VERSION = '0.003001';
+$Net::Async::Ping::ICMP::VERSION = '0.003003';
 use Moo;
 use warnings NONFATAL => 'all';
 
@@ -11,17 +11,15 @@ use Net::Ping;
 use IO::Async::Socket;
 use Scalar::Util qw/blessed/;
 
-use Socket qw( SOCK_RAW SOCK_DGRAM AF_INET IPPROTO_ICMP NI_NUMERICHOST inet_aton pack_sockaddr_in unpack_sockaddr_in getnameinfo inet_ntop);
+use Socket qw(
+    SOCK_RAW SOCK_DGRAM AF_INET IPPROTO_ICMP NI_NUMERICHOST NIx_NOSERV
+    inet_aton pack_sockaddr_in unpack_sockaddr_in getnameinfo inet_ntop
+);
+use Net::Frame::Layer::ICMPv4 qw( :consts );
+use Net::Frame::Layer::ICMPv4::Echo;
+use Net::Frame::Simple;
 
-use constant ICMP_ECHOREPLY   => 0; # ICMP packet types
-use constant ICMP_UNREACHABLE => 3; # ICMP packet types
-use constant ICMP_ECHO        => 8;
-use constant ICMP_TIME_EXCEEDED => 11; # ICMP packet types
-use constant ICMP_PARAMETER_PROBLEM => 12; # ICMP packet types
-use constant ICMP_STRUCT      => "C2 n3 A"; # Structure of a minimal ICMP packet
-use constant SUBCODE          => 0; # No ICMP subcode for ECHO and ECHOREPLY
 use constant ICMP_FLAGS       => 0; # No special flags for send or recv
-use constant ICMP_PORT        => 0; # No port with ICMP
 
 extends 'IO::Async::Notifier';
 
@@ -106,9 +104,12 @@ sub ping {
        protocol => IPPROTO_ICMP,
        family   => AF_INET,
     )->then( sub {
-
-        my $saddr = $_[0]->{addr};
-        my $f     = $loop->new_future;
+        my $saddr  = $_[0]->{addr};
+        my ($err, $dst_ip) = getnameinfo($saddr, NI_NUMERICHOST,
+            NIx_NOSERV);
+        croak "getnameinfo: $err"
+            if $err;
+        my $f      = $loop->new_future;
 
         my $socket = IO::Async::Socket->new(
             handle => $fh,
@@ -123,30 +124,70 @@ sub ping {
                 my $ping = shift or return; # weakref, may have disappeared
                 my ( $self, $recv_msg, $from_saddr ) = @_;
 
+                my $from_ip  = -1;
                 my $from_pid = -1;
                 my $from_seq = -1;
-                my ($from_port, $from_ip) = unpack_sockaddr_in($from_saddr);
-                my $offset = $ping_socket ? 0 : 20; # No offset needed for ping sockets
-                my ($from_type, $from_subcode) = unpack("C2", substr($recv_msg, $offset, 2));
 
-                if ($from_type == ICMP_ECHOREPLY) {
-                    ($from_pid, $from_seq) = unpack("n3", substr($recv_msg, $offset + 4, 4))
-                        if length $recv_msg >= $offset + 8;
-                } else {
-                    ($from_pid, $from_seq) = unpack("n3", substr($recv_msg, $offset + 32, 4))
-                        if length $recv_msg >= $offset + 36;
+                my @layers;
+                # ping sockets only return the ICMP packet
+                if ($ping_socket) {
+                   my $frame = Net::Frame::Simple->new(
+                        raw        => $recv_msg,
+                        firstLayer => 'ICMPv4',
+                    );
+                    @layers = $frame->layers;
+                }
+                # raw sockets return the IPv4 packet containing the ICMP payload
+                else {
+                   my $frame = Net::Frame::Simple->new(
+                        raw        => $recv_msg,
+                        firstLayer => 'IPv4',
+                    );
+                    @layers = $frame->layers;
+                    # discard the IPv4 layer
+                    shift @layers;
+                }
+                my $icmpv4 = $layers[0];
+                my $icmpv4_payload = $layers[1];
+
+                # extract source ip, identifier and sequence depending on
+                # packet type
+                if ( $icmpv4->type == NF_ICMPv4_TYPE_ECHO_REPLY ) {
+                    (my $err, $from_ip) = getnameinfo($from_saddr,
+                        NI_NUMERICHOST, NIx_NOSERV);
+                    croak "getnameinfo: $err"
+                        if $err;
+                    $from_pid = $icmpv4_payload->identifier;
+                    $from_seq = $icmpv4_payload->sequenceNumber;
+                }
+                # an ICMPv4 error message includes the original header
+                # IPv4 + ICMPv4 + ICMPv4::Echo
+                elsif ( scalar @layers >= 5
+                    && $layers[3]->type == NF_ICMPv4_TYPE_ECHO_REQUEST ) {
+                    my $ipv4 = $layers[2];
+                    my $icmpv4_echo = $layers[4];
+
+                    # the destination IPv4 of our ICMP echo request packet
+                    $from_ip  = $ipv4->dst;
+                    $from_pid = $icmpv4_echo->identifier;
+                    $from_seq = $icmpv4_echo->sequenceNumber;
                 }
 
+                # ignore received packets which are not a response to one of
+                # our echo requests
+                return
+                    unless $from_ip eq $dst_ip
                 # Not needed for ping socket - kernel handles this for us
-                return if !$ping_socket && $from_pid != $ping->_pid;
-                return if $from_seq != $ping->seq;
-                if ($from_type == ICMP_ECHOREPLY) {
-                    my $ip = unpack_sockaddr_in($saddr);
-                    return if inet_ntop(AF_INET, $from_ip) ne inet_ntop(AF_INET, $ip); # Does the packet check out?
+                        && ( $ping_socket || $from_pid == $ping->_pid )
+                        && $from_seq == $ping->seq;
+
+		if ( $icmpv4->type == NF_ICMPv4_TYPE_ECHO_REPLY ) {
                     $f->done;
-                } elsif ($from_type == ICMP_UNREACHABLE) {
+                }
+		elsif ( $icmpv4->type == NF_ICMPv4_TYPE_DESTUNREACH ) {
                     $f->fail('ICMP Unreachable');
-                } elsif ($from_type == ICMP_TIME_EXCEEDED) {
+                }
+		elsif ( $icmpv4->type == NF_ICMPv4_TYPE_TIMEEXCEED ) {
                     $f->fail('ICMP Timeout');
                 }
             },
@@ -171,18 +212,25 @@ sub ping {
     });
 }
 
-sub _msg
-{   my ($self, $ident) = @_;
-    # data_size to be implemented later
-    my $data_size = 0;
-    my $data      = '';
-    my $checksum  = 0;
-    my $msg = pack(ICMP_STRUCT . $data_size, ICMP_ECHO, SUBCODE,
-        $checksum, $ident, $self->seq, $data);
-    $checksum = Net::Ping->checksum($msg);
-    $msg = pack(ICMP_STRUCT . $data_size, ICMP_ECHO, SUBCODE,
-        $checksum, $ident, $self->seq, $data);
-    return $msg;
+sub _msg {
+    my ($self, $ident) = @_;
+
+    my $echo = Net::Frame::Layer::ICMPv4::Echo->new(
+        identifier     => $ident,
+        sequenceNumber => $self->seq,
+    );
+    my $icmpv4 = Net::Frame::Layer::ICMPv4->new(
+        type     => NF_ICMPv4_TYPE_ECHO_REQUEST,
+        code     => NF_ICMPv4_CODE_ZERO,
+        payload  => $echo->pack,
+    );
+
+    # FIXME: use Net::Frame::Simple after RT124015 is fixed
+    #my $echoReq = Net::Frame::Simple->new(layers => [ $icmpv4, $echo ]);
+    #return $echoReq->pack;
+    $icmpv4->computeLengths;
+    $icmpv4->computeChecksums([$echo]);
+    return $icmpv4->pack . $echo->pack;
 }
 
 1;
@@ -199,7 +247,7 @@ Net::Async::Ping::ICMP
 
 =head1 VERSION
 
-version 0.003001
+version 0.003003
 
 =head1 DESCRIPTION
 

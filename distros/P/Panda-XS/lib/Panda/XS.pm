@@ -1,7 +1,7 @@
 package Panda::XS;
 use 5.018;
 
-our $VERSION = '2.1.8';
+our $VERSION = '2.1.9';
 require Panda::XSLoader;
 Panda::XSLoader::load();
 

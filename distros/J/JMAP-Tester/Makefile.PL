@@ -42,6 +42,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "HTTP::Response" => 0,
     "JSON::Typist" => "0.005",
     "Test::Abortable" => 0,
     "Test::Deep" => 0,
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.016",
+  "VERSION" => "0.017",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "HTTP::Request" => 0,
+  "HTTP::Response" => 0,
   "JSON" => 0,
   "JSON::Typist" => "0.005",
   "LWP::UserAgent" => 0,

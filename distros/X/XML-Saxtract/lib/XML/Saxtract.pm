@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Saxtract;
-$XML::Saxtract::VERSION = '1.03';
+$XML::Saxtract::VERSION = '1.04';
 # ABSTRACT: Streaming parse XML data into a result hash based upon a specification hash
 # PODNAME: XML::Saxtract
 
@@ -45,7 +45,7 @@ sub saxtract_url {
 }
 
 package XML::Saxtract::ContentHandler;
-$XML::Saxtract::ContentHandler::VERSION = '1.03';
+$XML::Saxtract::ContentHandler::VERSION = '1.04';
 use parent qw(Class::Accessor);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(result));
@@ -256,7 +256,7 @@ XML::Saxtract - Streaming parse XML data into a result hash based upon a specifi
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -277,7 +277,7 @@ version 1.03
     </root>
     XML
 
-    # get a list of all the people
+    # get the first person
     my $complex_spec = {
         'http://def' => 'k',
         '/root/person' => {
@@ -294,12 +294,12 @@ version 1.03
     # Prints:
     # 1: Lucas
 
-    # get a list of all the people
+    # get a array of all the people
     my $complex_spec = {
         'http://def' => 'k',
         '/root/person' => {
             name => 'people',
-            type => 'list',
+            type => 'array',
             spec => {
                 '' => 'name',
                 '/@id' => 'id'

@@ -1,12 +1,17 @@
 Revision history for Perl extension Win32::NTFS::Symlink.
 
-0.03     2018-01-14 09:55:08 PST
+0.04 - 2018-01-15
+  - Added additional tests:
+    - To test if the overriding of built-ins is working as expected
+    - To test importing is working properly
+
+0.03 - 2018-01-14
   - Changed from using New() to Newx() in ntfs_readlink.c
   - Added Test::More to testing prerequisites
 
-0.02     2018-01-13 23:08:48 PST
+0.02 - 2018-01-13
   - Added List::Util to dependency list
 
-0.01     2018-01-09 21:07:47 PST
+0.01 - 2018-01-09
   - First release
 

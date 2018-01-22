@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0,
     "strict" => 0,
     "utf8" => 0,
+    "version" => "0.77",
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::Perl::Critic" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,6 +84,7 @@ my %FallbackPrereqs = (
   "namespace::autoclean" => 0,
   "strict" => 0,
   "utf8" => 0,
+  "version" => "0.77",
   "warnings" => 0
 );
 

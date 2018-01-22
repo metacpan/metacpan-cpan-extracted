@@ -60,65 +60,63 @@ sub _gather_files ($self) {
     # relocate files, apply cpan_manifest_skip
     my $cpan_manifest_skip = $self->dist->cfg->{cpan} && $self->dist->cfg->{cpan_manifest_skip} && $self->dist->cfg->{cpan_manifest_skip}->@* ? $self->dist->cfg->{cpan_manifest_skip} : undef;
 
-    $tree->find_file(
-        sub ($file) {
-            if ($cpan_manifest_skip) {
-                my $skipped;
+    $tree->find_file( sub ($file) {
+        if ($cpan_manifest_skip) {
+            my $skipped;
 
-                for my $skip_re ( $cpan_manifest_skip->@* ) {
-                    if ( $file->path =~ $skip_re ) {
-                        $skipped = 1;
+            for my $skip_re ( $cpan_manifest_skip->@* ) {
+                if ( $file->path =~ $skip_re ) {
+                    $skipped = 1;
 
-                        $file->remove;
-
-                        last;
-                    }
-                }
-
-                return if $skipped;
-            }
-
-            if ( $file->path =~ m[\Abin/(.+)\z]sm ) {
-
-                # relocate scripts from the /bin/ to /script/
-                my $name = $1;
-
-                if ( $file->path !~ m[[.].+\z]sm ) {    # no extension
-                    $file->move( 'script/' . $name );
-                }
-                elsif ( $file->path =~ m[[.](?:pl|sh|cmd|bat)\z]sm ) {    # allowed extensions
-                    $file->move( 'script/' . $name );
-                }
-                else {
                     $file->remove;
+
+                    last;
                 }
             }
-            elsif ( $file->path =~ m[\At/(.+)\z]sm && $file->path !~ m[[.]t\z]sm ) {
 
-                # olny *.t files are allowed in /t/ dir
+            return if $skipped;
+        }
+
+        if ( $file->path =~ m[\Abin/(.+)\z]sm ) {
+
+            # relocate scripts from the /bin/ to /script/
+            my $name = $1;
+
+            if ( $file->path !~ m[[.].+\z]sm ) {    # no extension
+                $file->move( 'script/' . $name );
+            }
+            elsif ( $file->path =~ m[[.](?:pl|sh|cmd|bat)\z]sm ) {    # allowed extensions
+                $file->move( 'script/' . $name );
+            }
+            else {
                 $file->remove;
             }
-            elsif ( $file->path =~ m[\Axt/(author|release|smoke)/(.+)\z]sm ) {
-
-                # patch /xt/*/.t files and relocate to the /t/ dir
-                my $test = $1;
-
-                my $name = $2;
-
-                # add common header to /xt/*.t file
-                if ( $file->path =~ m[[.]t\z]sm ) {
-                    $file->move("t/$test-$name");
-
-                    $self->_patch_xt( $file, $test );
-                }
-                else {
-                    $file->remove;
-                }
-            }
-
-            return;
         }
-    );
+        elsif ( $file->path =~ m[\At/(.+)\z]sm && $file->path !~ m[[.]t\z]sm ) {
+
+            # olny *.t files are allowed in /t/ dir
+            $file->remove;
+        }
+        elsif ( $file->path =~ m[\Axt/(author|release|smoke)/(.+)\z]sm ) {
+
+            # patch /xt/*/.t files and relocate to the /t/ dir
+            my $test = $1;
+
+            my $name = $2;
+
+            # add common header to /xt/*.t file
+            if ( $file->path =~ m[[.]t\z]sm ) {
+                $file->move("t/$test-$name");
+
+                $self->_patch_xt( $file, $test );
+            }
+            else {
+                $file->remove;
+            }
+        }
+
+        return;
+    } );
 
     for (qw[CHANGES cpanfile LICENSE README.md]) {
         $tree->add_file( $_, $self->dist->root . $_ );
@@ -145,13 +143,11 @@ PERL
     $self->_patch_xt( $tree->add_file( 't/author-pod-syntax.t', \$t ), 'author' );
 
     # remove /bin, /xt
-    $tree->find_file(
-        sub ($file) {
-            $file->remove if $file->path =~ m[\A(?:bin|xt)/]sm;
+    $tree->find_file( sub ($file) {
+        $file->remove if $file->path =~ m[\A(?:bin|xt)/]sm;
 
-            return;
-        }
-    );
+        return;
+    } );
 
     return $tree;
 }
@@ -286,7 +282,7 @@ PERL
 ## |======+======================+================================================================================================================|
 ## |    3 | 51                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (21)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 206                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |    2 | 202                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

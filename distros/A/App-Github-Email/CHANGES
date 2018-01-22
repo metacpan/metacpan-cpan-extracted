@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2017-01-15 00:00:00 +0000 to present.
+Changes from 2017-01-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.2.0 at 2018-01-15 03:16:50 +0000
+version 0.2.1 at 2018-01-20 12:55:09 +0000
 ------------------------------------------
+
+  Change: f68972d8a3e42affb33f8d1cf45f3ceb8f5c3e11
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 20:54:29 +0000
+
+    Updated documentation. 
+
+  Change: 044af77c33da9106fa17ff61e73bf357512d1ad8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2018-01-20 20:52:49 +0000
+
+    Patch release contributed by @pali. 
+
+  Change: 240cb36620c21090ddbade5435191b83a790457e
+  Author: faraco <skelic2@yandex.com>
+  Date : 2018-01-20 20:50:00 +0000
+
+    Merge pull request #2 from pali/master
+
+    Do not depend on insecure module Email::Address 
+
+  Change: b7f052280d1c8ae97bdefc106ca3cbba4aea7213
+  Author: Pali <pali@cpan.org>
+  Date : 2018-01-20 12:34:31 +0000
+
+    Do not depend on insecure module Email::Address
+
+    Method Email::Address->parse is vulnerable to CVE-2015-7686 and also
+    does not parse list of email addresses correctly. This patch replace
+    searching for email addresses by proper JSON API decoding. 
 
   Change: 11f405695590d38512fd18eb37b7c60ac6ab1fad
   Author: faraco <skelic3@gmail.com>

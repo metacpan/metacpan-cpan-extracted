@@ -1,5 +1,5 @@
 package Net::Twitter::Role::WrapError;
-$Net::Twitter::Role::WrapError::VERSION = '4.01042';
+$Net::Twitter::Role::WrapError::VERSION = '4.01043';
 use Moose::Role;
 use Try::Tiny;
 use Scalar::Util qw/blessed/;
@@ -35,7 +35,6 @@ around _parse_result => sub {
 
     my $r = try { $next->($self, $res, $sythetic_args, $datetime_parser) }
     catch {
-        $DB::single = 1;
         die $_ unless blessed $_ && $_->isa('Net::Twitter::Error');
 
         $self->_twitter_error($_->has_twitter_error
@@ -64,7 +63,7 @@ Net::Twitter::Role::WrapError - Wraps Net::Twitter exceptions
 
 =head1 VERSION
 
-version 4.01042
+version 4.01043
 
 =head1 SYNOPSIS
 

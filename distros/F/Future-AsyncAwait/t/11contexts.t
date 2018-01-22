@@ -53,6 +53,23 @@ use Future::AsyncAwait;
    is( scalar $fret->get, "immediate", '$fret now ready after done in if body immediate' );
 }
 
+# do await in body
+{
+   async sub with_do_body
+   {
+      return 1 + do {
+         my $f = $_[0];
+         await $f;
+      };
+   }
+
+   my $f1 = Future->new;
+   my $fret = with_do_body( $f1 );
+
+   $f1->done( 10 );
+   is( scalar $fret->get, 11, '$fret now ready after done in do body' );
+}
+
 # await in eval{}
 {
    async sub with_eval

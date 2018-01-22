@@ -9,6 +9,7 @@ use Firefox::Marionette::Window::Rect();
 use Firefox::Marionette::Element::Rect();
 use Firefox::Marionette::Timeouts();
 use Firefox::Marionette::Capabilities();
+use Firefox::Marionette::Profile();
 use JSON();
 use Socket();
 use English qw( -no_match_vars );
@@ -18,30 +19,38 @@ use URI();
 use File::Temp();
 use FileHandle();
 use MIME::Base64();
+use Digest::MD5();
+use Crypt::URandom();
+use Config;
 
 BEGIN {
     if ( $OSNAME eq 'MSWin32' ) {
         require Win32;
         require Win32::Process;
         require Win32::Process::Info;
-        Win32::Process::Info->import('NT');
+        Win32::Process::Info->import();
     }
 }
 
-our $VERSION = '0.09';
+our $VERSION = '0.16';
 
 sub _ANYPROCESS                    { return -1 }
 sub _COMMAND                       { return 0 }
 sub _DEFAULT_HOST                  { return 'localhost' }
-sub _ANY_PORT                      { return 0 }
-sub _WIN32_ERROR_SHARING_VIOLATION { return 32 }
+sub _WIN32_ERROR_SHARING_VIOLATION { return 0x20 }
+sub _NUMBER_OF_MCOOKIE_BYTES       { return 16 }
+sub _MAX_DISPLAY_LENGTH            { return 10 }
 
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
     my @arguments = ('-marionette');
     $self->{last_message_id} = 0;
+    if (!$parameters{addons}) {
+	push @arguments, '-safe-mode';
+    }
 
+    $self->{debug} = $parameters{debug};
     if (   ( defined $parameters{capabilities} )
         && ( $parameters{capabilities}->moz_headless() ) )
     {
@@ -51,11 +60,12 @@ sub new {
         $self->{firefox_binary} = $parameters{firefox_binary};
     }
     if ( $parameters{profile_name} ) {
-        $self->{profile} = $parameters{profile_name};
+        $self->{profile_name} = $parameters{profile_name};
         push @arguments, ( '-P', $self->{profile_name} );
     }
     else {
-        my $profile_directory = $self->_setup_new_profile();
+        my $profile_directory =
+          $self->_setup_new_profile( $parameters{profile} );
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
@@ -71,6 +81,11 @@ sub new {
     return $self;
 }
 
+sub _debug {
+    my ($self) = @_;
+    return $self->{debug};
+}
+
 sub _pid {
     my ($self) = @_;
     return $self->{_pid};
@@ -81,6 +96,15 @@ sub _launch {
     if ( $OSNAME eq 'MSWin32' ) {
         return $self->_launch_win32(@arguments);
     }
+    elsif (( $OSNAME ne 'darwin' )
+        && ( !$ENV{DISPLAY} )
+        && ( $self->_xvfb_exists() ) )
+    {
+        $self->_launch_xvfb();
+        local $ENV{DISPLAY}    = $self->_xvfb_display();
+        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        return $self->_launch_unix(@arguments);
+    }
     else {
         return $self->_launch_unix(@arguments);
     }
@@ -89,22 +113,230 @@ sub _launch {
 sub _launch_win32 {
     my ( $self, @arguments ) = @_;
     my $binary = $self->_binary();
-    Win32::Process::Create( my $process, "$binary",
-        'firefox ' . ( join q[ ], map { q["] . $_ . q["] } @arguments ),
-        0, Win32::Process::NORMAL_PRIORITY_CLASS(), q[.] )
-      || Carp::croak( Win32::FormatMessage( Win32::GetLastError() ) );
+    my ( $volume, $path, $name ) = File::Spec->splitpath($binary);
+    my $result =
+      Win32::Process::Create( my $process, $binary,
+        $name . q[ ] . ( join q[ ], map { q["] . $_ . q["] } @arguments ),
+        0, Win32::Process::NORMAL_PRIORITY_CLASS(), q[.] );
+    if ( !$result ) {
+        my $error = Win32::FormatMessage( Win32::GetLastError() );
+        $error =~ s/[\r\n]//smxg;
+        $error =~ s/[.]$//smxg;
+        chomp $error;
+        Carp::croak($error);
+    }
     $self->{_win32_process} = $process;
     return $process->GetProcessID();
+}
+
+sub _xvfb_binary {
+    return 'Xvfb';
+}
+
+sub _xvfb_exists {
+    my ($self)   = @_;
+    my $binary   = $self->_xvfb_binary();
+    my $dev_null = File::Spec->devnull();
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR == 0 ) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            open STDERR, q[>], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR");
+            open STDOUT, q[>], $dev_null
+              or Carp::croak(
+                "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR");
+            exec {$binary} $binary, '-help'
+              or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+        exit 1;
+    }
+}
+
+sub xvfb {
+    my ($self) = @_;
+    return $self->{_xvfb_pid};
+}
+
+sub _launch_xauth {
+    my ( $self, $display_number ) = @_;
+    my $mcookie =
+      Digest::MD5::md5_hex(
+        Crypt::URandom::urandom( _NUMBER_OF_MCOOKIE_BYTES() ) );
+    my $source_handle =
+      File::Temp::tempfile( File::Spec->tmpdir(),
+        'firefox_marionette_xauth_source_XXXXXXXXXXX' )
+      or Carp::Croak("Failed to open temporary file:$EXTENDED_OS_ERROR");
+    fcntl $source_handle, Fcntl::F_SETFD(), 0
+      or Carp::croak(
+"Failed to clear the close-on-exec flag on a temporary file:$EXTENDED_OS_ERROR"
+      );
+    my $xauth_proto = q[.];
+    $source_handle->print("add :$display_number $xauth_proto $mcookie\n");
+    seek $source_handle, 0, Fcntl::SEEK_SET()
+      or Carp::croak(
+        "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+    my $dev_null  = File::Spec->devnull();
+    my $binary    = 'xauth';
+    my @arguments = ( 'source', '/dev/fd/' . fileno $source_handle );
+
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR == 0 ) {
+        }
+        else {
+            Carp::croak('Failed to run xauth');
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            if ( !$self->_debug() ) {
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+                open STDOUT, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
+            exec {$binary} $binary, @arguments
+              or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+        exit 1;
+    }
+    return;
+}
+
+sub _xvfb_display {
+    my ($self) = @_;
+    return ":$self->{_xvfb_display_number}";
+}
+
+sub _xvfb_xauthority {
+    my ($self) = @_;
+    return File::Spec->catfile( $self->{_xvfb_authority_directory},
+        'Xauthority' );
+}
+
+sub _launch_xvfb {
+    my ($self) = @_;
+    $self->{_xvfb_fbdir_directory} = File::Temp->newdir(
+        File::Spec->catdir(
+            File::Spec->tmpdir(), 'firefox_marionette_xvfb_fbdir_XXXXXXXXXX'
+        )
+      )
+      or Carp::croak("Failed to create temporary directory:$EXTENDED_OS_ERROR");
+    my $display_no_handle =
+      File::Temp::tempfile( File::Spec->tmpdir(),
+        'firefox_marionette_xvfb_display_XXXXXXXXXXX' )
+      or Carp::Croak("Failed to open temporary file:$EXTENDED_OS_ERROR");
+    fcntl $display_no_handle, Fcntl::F_SETFD(), 0
+      or Carp::croak(
+"Failed to clear the close-on-exec flag on a temporary file:$EXTENDED_OS_ERROR"
+      );
+    my @arguments = (
+        '-displayfd', fileno $display_no_handle,
+        '-screen', '0', '1024x768x24', '-nolisten', 'tcp', '-fbdir',
+        "$self->{_xvfb_fbdir_directory}",
+    );
+    my $binary   = $self->_xvfb_binary();
+    my $dev_null = File::Spec->devnull();
+
+    if ( my $pid = fork ) {
+        $self->{_xvfb_pid} = $pid;
+        my $display_number = q[];
+        while ( $display_number !~ /^\d+$/smx ) {
+            seek $display_no_handle, 0, Fcntl::SEEK_SET()
+              or Carp::croak(
+                "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+            defined sysread $display_no_handle, $display_number,
+              _MAX_DISPLAY_LENGTH()
+              or Carp::croak(
+                "Failed to read from temporary file:$EXTENDED_OS_ERROR");
+            chomp $display_number;
+            if ( $display_number !~ /^\d+$/smx ) {
+                sleep 1;
+            }
+        }
+        $self->{_xvfb_display_number} = $display_number;
+        close $display_no_handle
+          or Carp::croak("Failed to close temporary file:$EXTENDED_OS_ERROR");
+        $self->{_xvfb_authority_directory} = File::Temp->newdir(
+            File::Spec->catdir(
+                File::Spec->tmpdir(), 'firefox_marionette_xvfb_auth_XXXXXXXXXX'
+            )
+          )
+          or Carp::croak(
+            "Failed to create temporary directory:$EXTENDED_OS_ERROR");
+        local $ENV{DISPLAY}    = $self->_xvfb_display();
+        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        my $auth_handle =
+          FileHandle->new( $ENV{XAUTHORITY},
+            Fcntl::O_CREAT() | Fcntl::O_WRONLY() | Fcntl::O_EXCL(),
+            Fcntl::S_IRWXU() )
+          or Carp::croak(
+            "Failed to open $ENV{XAUTHORITY} for writing:$EXTENDED_OS_ERROR");
+        $auth_handle->close()
+          or Carp::croak("Failed to close $ENV{XAUTHORITY}:$EXTENDED_OS_ERROR");
+        $self->_launch_xauth($display_number);
+    }
+    elsif ( defined $pid ) {
+        eval {
+            if ( !$self->_debug() ) {
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+                open STDOUT, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
+            exec {$binary} $binary, @arguments
+              or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+        exit 1;
+    }
+    return;
 }
 
 sub _launch_unix {
     my ( $self, @arguments ) = @_;
     my $binary = $self->_binary();
     my $pid;
+    my $dev_null = File::Spec->devnull();
     if ( $pid = fork ) {
     }
     elsif ( defined $pid ) {
         eval {
+            if ( !$self->_debug() ) {
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+                open STDOUT, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
             exec {$binary} $binary, @arguments
               or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
         } or do {
@@ -199,43 +431,22 @@ sub _setup_local_connection_to_firefox {
 }
 
 sub _setup_new_profile {
-    my ($self) = @_;
+    my ( $self, $profile ) = @_;
     my $profile_directory = File::Temp->newdir(
         File::Spec->catdir(
-            File::Spec->tmpdir(), 'firefox_marionette_XXXXXXXXXX'
+            File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXX'
         )
     );
     $self->{profile_directory} = $profile_directory;
     $self->{profile_path} =
       File::Spec->catfile( $profile_directory, 'prefs.js' );
-    my $profile_handle =
-      FileHandle->new( $self->{profile_path},
-        Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
-        Fcntl::S_IRWXU() )
-      or Carp::croak(
-        "Failed to open '$self->{profile_path}' for writing:$EXTENDED_OS_ERROR"
-      );
-    $self->_write_profile_contents($profile_handle)
-      or Carp::croak(
-        "Failed to write to '$self->{profile_path}':$EXTENDED_OS_ERROR");
-    $profile_handle->close()
-      or
-      Carp::croak("Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
+    if ($profile) {
+    }
+    else {
+        $profile = Firefox::Marionette::Profile->new();
+    }
+    $profile->save( $self->{profile_path} );
     return $profile_directory;
-}
-
-sub _write_profile_contents {
-    my ( $self, $profile_handle ) = @_;
-    my $port = _ANY_PORT();
-    return $profile_handle->print(<<"_PROFILE_");
-user_pref("browser.startup.homepage", "about:blank");
-user_pref("browser.startup.homepage_override.mstone", "ignore");
-user_pref("startup.homepage_welcome_url", "about:blank");
-user_pref("startup.homepage_welcome_url.additional", "about:blank");
-user_pref("xpinstall.signatures.required", false);
-user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);
-user_pref("marionette.port", $port);
-_PROFILE_
 }
 
 sub _get_port {
@@ -338,7 +549,7 @@ sub find_elements {
     );
     my $response = $self->_get_response($message_id);
     return
-      map { Firefox::Marionette::Element->new( $self, $_ ) }
+      map { Firefox::Marionette::Element->new( $self, %{$_} ) }
       @{ $response->result() };
 }
 
@@ -738,7 +949,7 @@ sub active_element {
         [ _COMMAND(), $message_id, 'WebDriver:GetActiveElement' ] );
     my $response = $self->_get_response($message_id);
     return Firefox::Marionette::Element->new( $self,
-        $response->result()->{value} );
+        %{ $response->result()->{value} } );
 }
 
 sub uri {
@@ -898,6 +1109,24 @@ sub window_handles {
     return @{ $response->result() };
 }
 
+sub close_current_chrome_window_handle {
+    my ($self) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, 'WebDriver:CloseChromeWindow' ] );
+    my $response = $self->_get_response($message_id);
+    return @{ $response->result() };
+}
+
+sub close_current_window_handle {
+    my ($self) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, 'WebDriver:CloseWindow' ] );
+    my $response = $self->_get_response($message_id);
+    return @{ $response->result() };
+}
+
 sub css {
     my ( $self, $element, $property_name ) = @_;
     my $message_id = $self->_new_message_id();
@@ -938,7 +1167,7 @@ sub find_element {
     );
     my $response = $self->_get_response($message_id);
     return Firefox::Marionette::Element->new( $self,
-        $response->result()->{value} );
+        %{ $response->result()->{value} } );
 }
 
 sub active_frame {
@@ -949,7 +1178,7 @@ sub active_frame {
     my $response = $self->_get_response($message_id);
     if ( defined $response->result()->{value} ) {
         return Firefox::Marionette::Element->new( $self,
-            $response->result()->{value} );
+            %{ $response->result()->{value} } );
     }
     else {
         return;
@@ -966,22 +1195,37 @@ sub title {
 
 sub quit {
     my ( $self, $flags ) = @_;
-    $flags ||=
-      ['eAttemptQuit'];    # ["eConsiderQuit", "eAttemptQuit", "eForceQuit"]
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [ _COMMAND(), $message_id, 'Marionette:Quit', { flags => $flags } ] );
-    my $response = $self->_get_response($message_id);
-    close $self->_socket()
-      or Carp::croak("Failed to close socket to firefox:$EXTENDED_OS_ERROR");
-    delete $self->{_socket};
-    if ( $OSNAME eq 'MSWin32' ) {
-        $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
+    if ( $self->_socket() ) {
+        $flags ||=
+          ['eAttemptQuit'];    # ["eConsiderQuit", "eAttemptQuit", "eForceQuit"]
+        my $message_id = $self->_new_message_id();
+        $self->_send_request(
+            [ _COMMAND(), $message_id, 'Marionette:Quit', { flags => $flags } ]
+        );
+        my $response = $self->_get_response($message_id);
+        close $self->_socket()
+          or
+          Carp::croak("Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+        delete $self->{_socket};
+        if ( $OSNAME eq 'MSWin32' ) {
+            $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
+        }
+        else {
+            while ( kill 0, $self->_pid() ) {
+                waitpid _ANYPROCESS(), POSIX::WNOHANG();
+            }
+        }
     }
-    else {
-        while ( kill 0, $self->_pid() ) {
+    if ( my $pid = $self->xvfb() ) {
+        my $signal = $self->_interrupt();
+        while ( kill 0, $pid ) {
+            kill $signal, $pid;
+            sleep 1;
             waitpid _ANYPROCESS(), POSIX::WNOHANG();
         }
+        delete $self->{_xvfb_display_number};
+        delete $self->{_xvfb_authority_directory};
+        delete $self->{_xvfb_pid};
     }
     return $self;
 }
@@ -1103,6 +1347,32 @@ sub window_type {
     return $response->result()->{value};
 }
 
+sub switch_to_shadow_root {
+    my ( $self, $element ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            'WebDriver:SwitchToShadowRoot', { element => $element->uuid() }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
+sub switch_to_window {
+    my ( $self, $window_handle ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            'WebDriver:SwitchToWindow', { name => $window_handle }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
 sub switch_to_frame {
     my ( $self, $element ) = @_;
     my $message_id = $self->_new_message_id();
@@ -1134,8 +1404,8 @@ my $x = <<'_DOC_';
 #  "WebDriver:AcceptDialog": GeckoDriver.prototype.acceptDialog,
 #  "WebDriver:AddCookie": GeckoDriver.prototype.addCookie,
 #  "WebDriver:Back": GeckoDriver.prototype.goBack,
-  "WebDriver:CloseChromeWindow": GeckoDriver.prototype.closeChromeWindow,
-  "WebDriver:CloseWindow": GeckoDriver.prototype.close,
+#  "WebDriver:CloseChromeWindow": GeckoDriver.prototype.closeChromeWindow,
+#  "WebDriver:CloseWindow": GeckoDriver.prototype.close,
 #  "WebDriver:DeleteAllCookies": GeckoDriver.prototype.deleteAllCookies,
 #  "WebDriver:DeleteCookie": GeckoDriver.prototype.deleteCookie,
   "WebDriver:DeleteSession": GeckoDriver.prototype.deleteSession,
@@ -1154,9 +1424,9 @@ my $x = <<'_DOC_';
 #  "WebDriver:GetAlertText": GeckoDriver.prototype.getTextFromDialog,
 #  "WebDriver:GetCapabilities": GeckoDriver.prototype.getSessionCapabilities,
 #  "WebDriver:GetChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-  "WebDriver:GetChromeWindowHandles": GeckoDriver.prototype.getChromeWindowHandles,
+#  "WebDriver:GetChromeWindowHandles": GeckoDriver.prototype.getChromeWindowHandles,
 #  "WebDriver:GetCookies": GeckoDriver.prototype.getCookies,
-  "WebDriver:GetCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
+#  "WebDriver:GetCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 #  "WebDriver:GetCurrentURL": GeckoDriver.prototype.getCurrentUrl,
 #  "WebDriver:GetElementAttribute": GeckoDriver.prototype.getElementAttribute,
 #  "WebDriver:GetElementCSSValue": GeckoDriver.prototype.getElementValueOfCssProperty,
@@ -1187,9 +1457,9 @@ my $x = <<'_DOC_';
 #  "WebDriver:SetTimeouts": GeckoDriver.prototype.setTimeouts,
 #  "WebDriver:SetWindowRect": GeckoDriver.prototype.setWindowRect,
 #  "WebDriver:SwitchToFrame": GeckoDriver.prototype.switchToFrame,
-  "WebDriver:SwitchToParentFrame": GeckoDriver.prototype.switchToParentFrame,
-  "WebDriver:SwitchToShadowRoot": GeckoDriver.prototype.switchToShadowRoot,
-  "WebDriver:SwitchToWindow": GeckoDriver.prototype.switchToWindow,
+#  "WebDriver:SwitchToParentFrame": GeckoDriver.prototype.switchToParentFrame,
+#  "WebDriver:SwitchToShadowRoot": GeckoDriver.prototype.switchToShadowRoot,
+#  "WebDriver:SwitchToWindow": GeckoDriver.prototype.switchToWindow,
 #  "WebDriver:TakeScreenshot": GeckoDriver.prototype.takeScreenshot,
 _DOC_
 
@@ -1271,11 +1541,22 @@ sub _get_response {
     return $response;
 }
 
+sub _interrupt {
+    my ($self) = @_;
+    my @sig_nums  = split q[ ], $Config{sig_num};
+    my @sig_names = split q[ ], $Config{sig_name};
+    my %signals_by_name;
+    my $idx = 0;
+    foreach my $sig_name (@sig_names) {
+        $signals_by_name{$sig_name} = $sig_nums[$idx];
+        $idx += 1;
+    }
+    return $signals_by_name{INT};
+}
+
 sub DESTROY {
     my ($self) = @_;
-    if ( $self->_socket() ) {
-        $self->quit();
-    }
+    $self->quit();
     return;
 }
 
@@ -1288,7 +1569,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.09
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -1321,11 +1602,17 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs>
 
-=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.
+=item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+
+=item * profile - create a new profile based on the supplied profile.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
+
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0".
+
+=item * addons - should any firefox extensions and themes be available in this session.  This defaults to "0".
 
 =back
 
-This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>
+This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  If necessary and possible, this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance to allow firefox to run in an environment without an accessible X server, so long as the method is not being run on Windows or MacOS.
  
 =head2 go
 
@@ -1443,6 +1730,14 @@ causes the browser to traverse one step forward in the joint history of the curr
 
 returns the current active L<frame|Firefox::Marionette::Element> if there is one in the current browsing context.  Otherwise, this method returns undef.
 
+=head2 switch_to_shadow_root
+
+accepts an L<elemnet|Firefox::Marionette::Element> as a parameter and switches to it's L<shadow root|https://www.w3.org/TR/shadow-dom/>
+
+=head2 switch_to_window
+
+accepts a window handle (either the result of L<window_handles|Firefox::Marionette#window_handles> or a window name as a parameter and switches focus to this window.
+
 =head2 switch_to_frame
 
 accepts a L<frame|Firefox::Marionette::Element> as a parameter and switches to it within the current window.
@@ -1450,6 +1745,14 @@ accepts a L<frame|Firefox::Marionette::Element> as a parameter and switches to i
 =head2 switch_to_parent_frame
 
 set the current browsing context for future commands to the parent of the current browsing context
+
+=head2 close_current_chrome_window_handle
+
+closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|Firefox::Marionette#switch_to_window> to use another window.
+
+=head2 close_current_window_handle
+
+closes the current window/tab.  It returns a list of still available window/tab handles.
 
 =head2 full_screen
 
@@ -1583,6 +1886,10 @@ returns the application type for the Marionette protocol.  Should be 'gecko'.
 
 returns the version for the Marionette protocol.  Current most recent version is '3'.
 
+=head2 xvfb
+
+returns the pid of the xvfb process if it exists.
+
 =head2 quit
 
 Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application
@@ -1607,13 +1914,25 @@ The module was found that firefox is reporting through it's L<Capabilities|Firef
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Firefox::Marionette requires no configuration files or environment variables.
+Firefox::Marionette requires no configuration files or environment variables.  It will however use the DISPLAY and XAUTHORITY environment variables to try to connect to an X Server.
 
 
 =head1 DEPENDENCIES
 
-None.
-
+Firefox::Marionette requires the following non-core Perl modules
+ 
+=over
+ 
+=item *
+L<JSON|JSON>
+ 
+=item *
+L<URI|URI>
+ 
+=item *
+L<Crypt::URandom|Crypt::URandom>
+ 
+=back
 
 =head1 INCOMPATIBILITIES
 

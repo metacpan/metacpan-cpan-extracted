@@ -3,15 +3,15 @@ abstract: 'MogileFS (distributed filesystem) server'
 author:
   - 'Brad Fitzpatrick <brad@danga.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132510'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: MogileFS-Server
 no_index:
   directory:
@@ -24,21 +24,22 @@ no_index:
     - MogPath
     - Mgd
 requires:
-  DBI: 0
-  Danga::Socket: 1.56
-  Getopt::Long: 0
-  IO::AIO: 0
-  MogileFS::Client: 0
-  Net::Netmask: 0
-  Perlbal: 1.79
-  Symbol: 0
-  Sys::Syscall: 0.22
-  Sys::Syslog: 0
-  Test::More: 0.88
-  fields: 0
+  DBI: '0'
+  Danga::Socket: '1.56'
+  Getopt::Long: '0'
+  IO::AIO: '0'
+  MogileFS::Client: '0'
+  Net::Netmask: '0'
+  Perlbal: '1.79'
+  Symbol: '0'
+  Sys::Syscall: '0.22'
+  Sys::Syslog: '0'
+  Test::More: '0.88'
+  fields: '0'
 resources:
   MailingList: http://groups.google.com/group/mogile
   bugtracker: http://code.google.com/p/mogilefs/issues/list
   homepage: http://www.mogilefs.org
   repository: git://github.com/mogilefs/MogileFS-Server.git
-version: 2.72
+version: '2.73'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

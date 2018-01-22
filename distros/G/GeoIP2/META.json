@@ -109,147 +109,147 @@
    "provides" : {
       "GeoIP2" : {
          "file" : "lib/GeoIP2.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Database::Reader" : {
          "file" : "lib/GeoIP2/Database/Reader.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Error::Generic" : {
          "file" : "lib/GeoIP2/Error/Generic.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Error::HTTP" : {
          "file" : "lib/GeoIP2/Error/HTTP.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Error::IPAddressNotFound" : {
          "file" : "lib/GeoIP2/Error/IPAddressNotFound.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Error::Type" : {
          "file" : "lib/GeoIP2/Error/Type.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Error::WebService" : {
          "file" : "lib/GeoIP2/Error/WebService.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::ASN" : {
          "file" : "lib/GeoIP2/Model/ASN.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::AnonymousIP" : {
          "file" : "lib/GeoIP2/Model/AnonymousIP.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::City" : {
          "file" : "lib/GeoIP2/Model/City.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::ConnectionType" : {
          "file" : "lib/GeoIP2/Model/ConnectionType.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::Country" : {
          "file" : "lib/GeoIP2/Model/Country.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::Domain" : {
          "file" : "lib/GeoIP2/Model/Domain.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::Enterprise" : {
          "file" : "lib/GeoIP2/Model/Enterprise.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::ISP" : {
          "file" : "lib/GeoIP2/Model/ISP.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Model::Insights" : {
          "file" : "lib/GeoIP2/Model/Insights.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::City" : {
          "file" : "lib/GeoIP2/Record/City.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Continent" : {
          "file" : "lib/GeoIP2/Record/Continent.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Country" : {
          "file" : "lib/GeoIP2/Record/Country.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Location" : {
          "file" : "lib/GeoIP2/Record/Location.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::MaxMind" : {
          "file" : "lib/GeoIP2/Record/MaxMind.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Postal" : {
          "file" : "lib/GeoIP2/Record/Postal.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::RepresentedCountry" : {
          "file" : "lib/GeoIP2/Record/RepresentedCountry.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Subdivision" : {
          "file" : "lib/GeoIP2/Record/Subdivision.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Record::Traits" : {
          "file" : "lib/GeoIP2/Record/Traits.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Error::HTTP" : {
          "file" : "lib/GeoIP2/Role/Error/HTTP.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::HasIPAddress" : {
          "file" : "lib/GeoIP2/Role/HasIPAddress.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::HasLocales" : {
          "file" : "lib/GeoIP2/Role/HasLocales.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Model" : {
          "file" : "lib/GeoIP2/Role/Model.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Model::Flat" : {
          "file" : "lib/GeoIP2/Role/Model/Flat.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Model::HasSubdivisions" : {
          "file" : "lib/GeoIP2/Role/Model/HasSubdivisions.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Model::Location" : {
          "file" : "lib/GeoIP2/Role/Model/Location.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Record::Country" : {
          "file" : "lib/GeoIP2/Role/Record/Country.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Role::Record::HasNames" : {
          "file" : "lib/GeoIP2/Role/Record/HasNames.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::Types" : {
          "file" : "lib/GeoIP2/Types.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       },
       "GeoIP2::WebService::Client" : {
          "file" : "lib/GeoIP2/WebService/Client.pm",
-         "version" : "2.004000"
+         "version" : "2.005000"
       }
    },
    "release_status" : "stable",
@@ -264,7 +264,7 @@
          "web" : "https://github.com/maxmind/GeoIP2-perl"
       }
    },
-   "version" : "2.004000",
+   "version" : "2.005000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -308,7 +308,7 @@
                }
             },
             "name" : "@MAXMIND/Git::GatherDir",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -616,7 +616,7 @@
                }
             },
             "name" : "@MAXMIND/Test::PodSpelling",
-            "version" : "2.007004"
+            "version" : "2.007005"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
@@ -736,7 +736,7 @@
                }
             },
             "name" : "@MAXMIND/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -757,7 +757,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -765,7 +765,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Contributors",
-            "version" : "0.030"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::SurgicalPodWeaver",
@@ -990,7 +990,7 @@
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1001,7 +1001,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1038,12 +1038,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Check",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1066,7 +1066,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1074,7 +1074,7 @@
                }
             },
             "name" : "@MAXMIND/Commit generated files",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -1083,12 +1083,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.004000",
+                  "tag" : "v2.005000",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1096,7 +1096,7 @@
                }
             },
             "name" : "@MAXMIND/Git::Tag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1108,12 +1108,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Git::Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -1128,7 +1128,7 @@
                }
             },
             "name" : "@MAXMIND/BumpVersionAfterRelease",
-            "version" : "0.015"
+            "version" : "0.016"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1148,7 +1148,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1156,7 +1156,7 @@
                }
             },
             "name" : "@MAXMIND/Commit version bump",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -1168,12 +1168,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/Push version bump",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",

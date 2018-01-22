@@ -307,6 +307,11 @@ struct marpaESLIFRecognizer {
   short                        _utfb;          /* A flag to say if input is UTF-8 correct. Automatically true if _charconv is true. Can set be regex engine as well. */
   short                        _charconvb;     /* A flag to say if latest stream chunk was converted to UTF-8 */
   genericHash_t                _marpaESLIFRecognizerHash; /* Cache of recognizers ready for re-use */
+  char                        *_lastFroms;     /* Last from encoding as per user, in user's encoding */
+  size_t                       _lastFroml;     /* Last from encoding length as per user, in user's encoding */
+  char                        *_bytelefts;     /* Buffer when character conversion needs to reread leftover bytes */
+  size_t                       _byteleftl;     /* Usable length of this buffer */
+  size_t                       _byteleftallocl;/* Allocated length of this buffer */
   /* --------------- End of internal elements that are shared with all children --------------------- */
 
   int                          leveli;         /* Recognizer level (!= grammar level) */
@@ -318,6 +323,12 @@ struct marpaESLIFRecognizer {
   short                       *eofbp;          /* Ditto for the EOF flag */
   short                       *utfbp;          /* Ditto for the UTF-8 correctness flag */
   short                       *charconvbp;     /* Ditto for the character conversion flag */
+  char                       **lastFromsp;     /* Ditto for last from encoding as per user, in user's encoding */
+  size_t                      *lastFromlp;     /* Ditto for last from encoding length as per user, in user's encoding */
+  char                       **byteleftsp;     /* Ditto for buffer when character conversion needs to reread leftover bytes */
+  size_t                      *byteleftlp;     /* Ditto for buffer length when character conversion needs to reread leftover bytes */
+  size_t                      *byteleftalloclp;/* Ditto for buffer allocated length when character conversion needs to reread leftover bytes */
+
   size_t                       parentDeltal;   /* Parent original delta - used to recovert parent current pointer at our free */
   char                        *inputs;         /* Current pointer in input - specific to every recognizer */
   size_t                       inputl;         /* Current remaining bytes - specific to every recognizer */
@@ -367,6 +378,14 @@ struct marpaESLIFRecognizer {
   int                          maxStartCompletionsi;
   int                          numberOfStartCompletionsi; /* Computed only if maxStartCompletionsi != 0 */
   size_t                       lastSizeBeforeCompletionl; /* Computed only if maxStartCompletionsi is != 0 */
+
+  /* When a recognizer needs to discard, we prepare storage for marpaESLIFGrammarp, marpaESLIFRecognizerOptionp and marpaESLIFValueOptionp. */
+  /* This a lazy initialization, driven by the grammarDiscardInitializedb flag. */
+  short                        grammarDiscardInitializedb;
+  marpaESLIFGrammar_t          marpaESLIFGrammarDiscard;
+  marpaESLIF_grammar_t         grammarDiscard;
+  marpaESLIFRecognizerOption_t marpaESLIFRecognizerOptionDiscard;
+  marpaESLIFValueOption_t      marpaESLIFValueOptionDiscard;
 };
 
 struct marpaESLIF_lexeme_data {

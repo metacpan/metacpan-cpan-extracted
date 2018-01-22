@@ -23,7 +23,7 @@ our @EXPORT_OK = ( @{$EXPORT_TAGS{ntfs_}}, @{$EXPORT_TAGS{package}} );
 
 ################################################################################
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Win32::NTFS::Symlink', $VERSION);
@@ -228,7 +228,7 @@ This isn't needed if you are using Vista or Server 2008 R1 (NT 6.0), or later.
 
 =head1 ACKNOWLEDGEMENTS
 
-I originally set out to fix L<Win32::Symlink>, whose C<symlink()> and
+I originally set out to fix L<Win32::Symlink>, whose C<symlink> and
 C<readlink> implementations (ironically) only worked with NTFS junctions,
 without any support for NTFS symlinks.
 

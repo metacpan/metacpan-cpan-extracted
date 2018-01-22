@@ -1,12 +1,12 @@
 package WordList::CryptoCurrency::Catalog::Name;
 
-our $DATE = '2018-01-12'; # DATE
-our $VERSION = '20180109'; # VERSION
+our $DATE = '2018-01-16'; # DATE
+our $VERSION = '20180116'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("avg_word_len",8.65897620764239,"num_words_contains_unicode",0,"shortest_word_len",2,"num_words",1387,"num_words_contains_nonword_chars",255,"longest_word_len",29,"num_words_contains_whitespace",237); # STATS
+our %STATS = ("avg_word_len",8.70344827586207,"longest_word_len",29,"num_words",1450,"shortest_word_len",2,"num_words_contains_whitespace",257,"num_words_contains_unicode",0,"num_words_contains_nonword_chars",275); # STATS
 
 1;
 # ABSTRACT: List of cryptocurrency names
@@ -21,7 +21,7 @@ WordList::CryptoCurrency::Catalog::Name - List of cryptocurrency names
 
 =head1 VERSION
 
-This document describes version 20180109 of WordList::CryptoCurrency::Catalog::Name (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-12.
+This document describes version 20180116 of WordList::CryptoCurrency::Catalog::Name (from Perl distribution WordLists-CryptoCurrency-Catalog), released on 2018-01-16.
 
 =head1 SYNOPSIS
 
@@ -47,12 +47,12 @@ This document describes version 20180109 of WordList::CryptoCurrency::Catalog::N
  +----------------------------------+------------------+
  | key                              | value            |
  +----------------------------------+------------------+
- | avg_word_len                     | 8.65897620764239 |
+ | avg_word_len                     | 8.70344827586207 |
  | longest_word_len                 | 29               |
- | num_words                        | 1387             |
- | num_words_contains_nonword_chars | 255              |
+ | num_words                        | 1450             |
+ | num_words_contains_nonword_chars | 275              |
  | num_words_contains_unicode       | 0                |
- | num_words_contains_whitespace    | 237              |
+ | num_words_contains_whitespace    | 257              |
  | shortest_word_len                | 2                |
  +----------------------------------+------------------+
 
@@ -97,6 +97,8 @@ __DATA__
 808Coin
 8Bit
 9COIN
+AI Doctor
+AICHAIN
 ALIS
 ALQO
 ANRYZE
@@ -106,6 +108,8 @@ ATBCoin
 ATLANT
 ATMChain
 ATMCoin
+ATN
+AWARE
 Abjcoin
 Abncoin
 Accelerator Network
@@ -127,6 +131,7 @@ Agoras Tokens
 Agrello
 AgrolifeCoin
 Aidos Kuneen
+Aigang
 Aion
 AirSwap
 AirToken
@@ -194,10 +199,12 @@ BTCtalkcoin
 BTSR
 Bancor
 Bankcoin
+Bankex
 Basic Attention Token
 Bastonet
 BatCoin
 Bata
+Bean Cash
 Beatcoin
 BeaverCoin
 Bela
@@ -221,11 +228,11 @@ BitAlphaCoin
 BitAsean
 BitBar
 BitBay
-BitBean
 BitBoost
 BitClave
 BitCoal
 BitConnect
+BitDegree
 BitDice
 BitQuark
 BitSend
@@ -239,19 +246,20 @@ Bitcedi
 Bitcloud
 Bitcoin
 Bitcoin 21
+Bitcoin Atom [Futures]
 Bitcoin Cash
 Bitcoin Diamond
 Bitcoin Fast
+Bitcoin God
 Bitcoin Gold
 Bitcoin Planet
 Bitcoin Plus
 Bitcoin Red
 Bitcoin Scrypt
 Bitcoin Silver
-Bitcoin Unlimited
 Bitcoin2x
 BitcoinDark
-BitcoinX [Futures]
+BitcoinX
 BitcoinZ
 Bitcore
 Bitcrystals
@@ -283,15 +291,16 @@ Blockchain Index
 Blocknet
 Blockpool
 Blocktix
+Bloom
 BlueCoin
 BnrtxCoin
 Bodhi
 Bolenum
 Bolivarcoin
-Bongger
 Bonpay
 Boolberry
 BoostCoin
+Bottos
 Bounty0x
 Bowhead
 BowsCoin
@@ -316,6 +325,7 @@ Bytom
 C-Bit
 CBD Crystals
 CCMiner
+CFun
 CHIPS
 COMSA [ETH]
 COMSA [XEM]
@@ -342,7 +352,6 @@ Cash Poker Pro
 Cashcoin
 Cashme
 Casino
-CasinoCoin
 Catcoin
 Ccore
 Centra
@@ -362,25 +371,30 @@ Civic
 Clams
 ClearPoll
 CloakCoin
+Cloud
 ClubCoin
 CoExistCoin
 Cobinhood
+CoffeeCoin
 Cofound.it
 Coimatic 2.0
 Coimatic 3.0
 Coin(O)
 Coin2.1
 CoinDash
+Coinlancer
 Coinonat
 CoinonatX
 ColossusCoinXT
 Colossuscoin V2
 Comet
+Commodity Ad Network
 Compcoin
 CompuCoin
 Concoin
 Condensate
 Confido
+Content and AD Network
 Copico
 Corethum
 CorgiCoin
@@ -409,6 +423,7 @@ Cryptojacks
 Cryptonex
 Cryptonite
 Cryptopay
+CryptopiaFeeShares
 Crystal Clear 
 Cthulhu Offerings
 Cubits
@@ -510,6 +525,7 @@ EXRNchain
 EagleCoin
 EarthCoin
 Ebittree Coin
+EchoLink
 EcoCoin
 Ecobit
 Edgeless
@@ -525,7 +541,6 @@ Elementrem
 Elixir
 Ellaism
 Elysium
-EmberCoin
 Embers
 Emerald Crypto
 Emercoin
@@ -546,6 +561,7 @@ Espers
 Eternity
 EthBet
 Ethbits
+EtherDelta Token
 Ethereum
 Ethereum Cash
 Ethereum Classic
@@ -579,6 +595,7 @@ Faceblock
 Facecoin
 Factom
 FairCoin
+FairGame
 Fantomcoin
 Farad
 Fargocoin
@@ -627,12 +644,14 @@ GAIA
 GAY Money
 GBCGoldCoin
 GCoin
+GET Protocol
 GOLD Reward Token
 GPU Coin
 GXShares
 Gambit
 Game
 GameBet Coin
+GameChain System
 GameCredits
 GameLeagueCoin
 GameUnits
@@ -650,6 +669,7 @@ Gimli
 GlassCoin
 Global Business Revolution
 Global Currency Reserve
+Global Jobcoin
 Global Tour Coin
 GlobalBoost-Y
 GlobalCoin
@@ -685,6 +705,8 @@ HODL Bucks
 HOdlcoin
 HTML5COIN
 HTMLCOIN
+Hacken
+Hackspace Capital
 Halcyon
 Halloween Coin
 Happy Creator Coin
@@ -700,6 +722,7 @@ HempCoin (HMP)
 Hexx
 HiCoin
 High Gain
+High Performance Blockchain
 High Voltage
 HitCoin
 Hive
@@ -723,11 +746,14 @@ ICO OpenLedger
 ICOBID
 ICON
 ICOS
+INS Ecosystem
 ION
+IOStoken
 IOTA
 Iconic
 Iconomi
 Ignis
+Ignition
 Impact
 ImpulseCoin
 InPay
@@ -748,11 +774,13 @@ InsaneCoin
 Intelligent Trading Tech
 IntenseCoin
 International Diamond
+Internet Node Token
 Internet of People
 Internet of Things
 Internxt
 Interstellar Holdings
 Interzone
+InvestDigital
 InvestFeed
 InvisibleCoin
 IoT Chain
@@ -764,20 +792,23 @@ JavaScript Token
 Jetcoin
 Jewels
 Jin Coin
+Jingtum Tech
 Jinn
 JobsCoin
 Joincoin
 Joulecoin
 Karbo
+Karma
 Karmacoin
 KashhCoin
 Kayicoin
+Kcash
 KekCoin
+KemCredit
 KickCoin
 KiloCoin
 Kin
 KingN Coin
-Kittehcoin
 Kobocoin
 Kolion
 Komodo
@@ -788,6 +819,7 @@ Kubera Coin
 Kurrent
 KushCoin
 Kyber Network
+Kzcash
 LAToken
 LAthaan
 LBRY Credits
@@ -802,8 +834,11 @@ LandCoin
 Lazaruscoin
 LePen
 LeaCoin
+Leek Coin
 Legends Room
+LendConnect
 LetItRide
+Leverj
 LeviarCoin
 LevoPlus
 Lex4All
@@ -832,6 +867,7 @@ Lykke
 MACRON
 MCAP
 MMXVI
+MOAC
 MSD
 MTMGaming
 Machinecoin
@@ -857,8 +893,9 @@ Matryx
 Mavro
 MaxCoin
 MazaCoin
+Measurable Data Token
+MediBloc
 MediShares
-Medibloc
 Megacoin
 Melon
 Memetic (PepeCoin)
@@ -879,6 +916,7 @@ Mineum
 Minex
 MinexCoin
 Mintcoin
+Mixin
 MobileCash
 MobileGo
 Modum
@@ -933,6 +971,7 @@ NewYorkCoin
 Newbium
 Nexium
 Nexus
+Nimfamoney
 Nimiq
 NoLimitCoin
 NobleCoin
@@ -942,12 +981,15 @@ NuBits
 NuShares
 Nuls
 Numeraire
+Numus
+NumusCash
 Nxt
 Nyancoin
 OAX
 OBITS
 OCOW
 OKCash
+OP Coin
 OX Fina
 Obsidian
 Oceanlab
@@ -957,6 +999,7 @@ Olympus Labs
 Omicron
 OmiseGO
 Omni
+OneRoot Network
 Onix
 Opal
 Open Trading Network
@@ -969,7 +1012,7 @@ Orlycoin
 Ormeus Coin
 OsmiumCoin
 Oxycoin
-Oyster Pearl
+Oyster
 P7Coin
 PACcoin
 PIECoin
@@ -1027,6 +1070,7 @@ Po.et
 PoSToken
 PoSW Coin
 PokeCoin
+Polis
 Polybius
 PonziCoin
 PopularCoin
@@ -1063,7 +1107,6 @@ PureVidz
 PutinCoin
 Pylon Network
 QASH
-QCash
 QLINK
 Qbao
 Qibuck Asset
@@ -1075,8 +1118,10 @@ Quantum Resistant Ledger
 Quark
 Quatloo
 QuazarCoin
+Qube
 QubitCoin
 Quebecoin
+QunQun
 Quotient
 Qvolta
 Qwark
@@ -1093,6 +1138,7 @@ Rasputin Online Coin
 Ratecoin
 Rawcoin
 Rcoin
+Rebellious
 Red Pulse
 RedCoin
 ReddCoin
@@ -1157,8 +1203,9 @@ Save and Gain
 Scorecoin
 SecretCoin
 SecureCoin
-Segwit2x [Futures]
+SegWit2x
 Selfiecoin
+Selfkey
 Senderon
 Sequence
 Sexcoin
@@ -1170,6 +1217,7 @@ ShellCoin
 Shift
 Shilling
 Shorty
+Show
 Siacoin
 Signatum
 Simple Token
@@ -1203,6 +1251,8 @@ SophiaTX
 Sovereign Hero
 SpaceCoin
 SpankChain
+Spectre.ai Dividend Token
+Spectre.ai Utility
 Spectrecoin
 Speedcash
 Sphere
@@ -1223,6 +1273,7 @@ Stealthcoin
 Steem
 Steem Dollars
 Stellar
+Steneum Coin
 Steps
 Sterlingcoin
 Storj
@@ -1246,7 +1297,9 @@ SwagBucks
 SwapToken
 Swapcoin
 Swarm City
+SwftCoin
 Swing
+Swisscoin
 SydPak
 Syndicate
 Synereo
@@ -1256,6 +1309,7 @@ T-coin
 TAGRcoin
 TEKcoin
 TIES Network
+TOKYO
 TRON
 TaaS
 TagCoin
@@ -1266,6 +1320,7 @@ TattooCoin (Limited)
 TattooCoin (Standard Edition)
 TeamUp
 TechShares
+Telcoin
 Tellurion
 TenX
 TeraCoin
@@ -1289,12 +1344,15 @@ TittieCoin
 ToaCoin
 TodayCoin
 TokenCard
+TokenClub
 Tokes
 Tokugawa
+TopChain
 TopCoin
 Topaz Coin
 Torcoin
 Tracto
+Trade Token
 TransferCoin
 TrezarCoin
 Triaconta
@@ -1327,6 +1385,7 @@ UniCoin
 Unify
 Unikoin Gold
 United Bitcoin
+United Traders Token
 Unitus
 Unity Ingot
 Universal Currency
@@ -1358,6 +1417,7 @@ VeriumReserve
 Veros
 Version
 Vertcoin
+Vezt
 Viacoin
 Viberate
 Virta Unique Coin
@@ -1375,6 +1435,7 @@ Vulcano
 WA Space
 WARP
 WAX
+WETH
 WINCOIN
 WMCoin
 WaBi
@@ -1385,6 +1446,7 @@ Waves
 Waves Community Token
 WavesGo
 WayGuide
+WaykiChain
 WeAreSatoshi
 WeTrust
 WhaleCoin
@@ -1399,7 +1461,6 @@ Woodcoin
 WorldCoin
 Worldcore
 Wowcoin
-Wyvern
 X-Coin
 X2
 XDE II
@@ -1423,6 +1484,7 @@ Yocoin
 ZClassic
 ZCoin
 ZSEcoin
+Zap
 Zayedcoin
 Zcash
 Zeitcoin
@@ -1473,5 +1535,6 @@ iTicoin
 iXledger
 netBit
 onG.social
+ugChain
 vSlice
 vTorrent

@@ -12,7 +12,7 @@ requires "Log::Any" => "1.046";
 requires "Metabase::User::Profile" => "0";
 requires "Minion" => "8";
 requires "Minion::Backend::SQLite" => "0";
-requires "Minion::Backend::mysql" => "0.11";
+requires "Minion::Backend::mysql" => "0.12";
 requires "Sereal" => "0";
 requires "perl" => "5.024";
 

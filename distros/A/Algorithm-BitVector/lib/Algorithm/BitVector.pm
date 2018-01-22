@@ -3,7 +3,7 @@ package Algorithm::BitVector;
 #!/usr/bin/perl -w
 
 #------------------------------------------------------------------------------------
-# Copyright (c) 2016 Avinash Kak. All rights reserved.  This program is free
+# Copyright (c) 2018 Avinash Kak. All rights reserved.  This program is free
 # software.  You may modify and/or distribute it under the same terms as Perl itself.
 # This copyright notice must remain attached to the file.
 #
@@ -16,12 +16,12 @@ package Algorithm::BitVector;
 use strict;
 use warnings;
 use Carp;
-use List::Util qw(pairmap max reduce any);
+use List::Util qw(pairmap min max reduce any);
 use Math::BigInt;
 use Math::Random;
 use Fcntl 'SEEK_CUR';
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 use overload  '+'        =>    '_join',
               '""'       =>    '_str',
@@ -193,7 +193,7 @@ sub new {
     return $self;
 }
 
-## Set the bit at the designated position to the value shown
+##  Set the bit at the designated position to the value shown
 sub set_bit {
     my $self = shift;
     my $posn = shift;
@@ -209,10 +209,11 @@ sub set_bit {
     }
 }
 
-## Get the bit from the designated position. This method can also return a slice of a
-## bitvector.  However, note that the slice is returned as a list of the bits in the
-## index range you specified. You can easily convert the list of bits returned into a
-## bitvector in your own code.
+##  Get the bit from the designated position. This method can also return a slice of a
+##  bitvector.  HOWEVER, NOTE THAT THE SLICE IS RETURNED AS A LIST OF THE BITS IN THE
+##  INDEX RANGE YOU SPECIFIED. You can either easily convert the list of bits returned
+##  into a bitvector in your own code or, starting with Version 1.26, you can call the
+##  get_slice() method.
 sub get_bit {
     my $self = shift;
     my $pos = shift;
@@ -221,8 +222,30 @@ sub get_bit {
         $pos = $self->{size} + $pos if $pos < 0;
         return ( $self->{_vector}->[int($pos/16)] >> ($pos&15) ) & 1;
     } 
-    my @slice = map $self->get_bit($_), (@$pos)[0..@$pos-1];
+#    my @slice = map $self->get_bit($_), (@$pos)[0..@$pos-1];
+    my @slice = map $self->get_bit($_), (@$pos)[0..@$pos-2];
     return \@slice;
+}
+
+##  Get the slice of bits from the bitvector corresponding to the index range specified
+##  by the argument.  The slice is returned as an instance of Algorithm::BitVector
+sub get_slice {
+    my $self = shift;
+    my $index_range = shift;
+    my $slice_bv =  Algorithm::BitVector->new( size => @$index_range - 1 );
+    map $slice_bv->set_bit($_ - $index_range->[0], $self->get_bit($_)), @$index_range[0..@$index_range-2];
+    return $slice_bv;
+}
+
+##  Set a slice of a BitVector from the bits in the argument BitVector object:
+sub set_slice {
+    my $self = shift;
+    my $index_range = shift;
+    my $values_bv = shift;
+    die "the width of the index range for slice setting does not equal the size of the values array"
+           unless @$index_range - 1 == $values_bv->length();
+#           unless @$index_range == $values_bv->length();
+    map $self->set_bit($_, $values_bv->get_bit($_ - $index_range->[0])), @$index_range[0..@$index_range-2];
 }
 
 ##  Overloading of the string conversion operator.  Return the string representation
@@ -532,7 +555,6 @@ sub int_value {
 ##  left and replacing each byte by its ASCII character (this is a useful thing
 ##  to do only if the length of the vector is an integral multiple of 8 and every
 ##  byte in your bitvector has a print representation)
-#sub get_text_from_bitvector {
 sub get_bitvector_in_ascii {
     my $self = shift;
     die "Abort: The get_bitvector_in_ascii() method invoked on an object that is " .
@@ -542,7 +564,8 @@ sub get_bitvector_in_ascii {
         if $self->{size} % 8;
     my $ascii = '';
     for (my $i=0; $i < $self->{size}; $i += 8) {
-        $ascii .= chr oct "0b". join '', @{$self->get_bit([$i..$i+7])};
+#        $ascii .= chr oct "0b". join '', @{$self->get_bit([$i..$i+7])};
+        $ascii .= chr oct "0b". join '', @{$self->get_bit([$i..$i+8])};
     }
     return $ascii;
 }
@@ -567,7 +590,8 @@ sub get_bitvector_in_hex {
         if $self->{size} % 4;
     my $hex = '';
     for (my $i=0; $i < $self->{size}; $i += 4) {
-        $hex .= sprintf "%x", oct "0b". join '', @{$self->get_bit([$i..$i+3])};
+#        $hex .= sprintf "%x", oct "0b". join '', @{$self->get_bit([$i..$i+3])};
+        $hex .= sprintf "%x", oct "0b". join '', @{$self->get_bit([$i..$i+4])};
     }
     return $hex;
 }
@@ -658,6 +682,7 @@ sub _circular_rotate_right_by_one {
 sub pad_from_left {
     my $self = shift;
     my $n = shift;
+    die "a negative value for index positions not allowed for padding from left" if $n < 0;
     my $new_str = ('0' x $n) . "$self";
     my $new_bitvec = Algorithm::BitVector->new( bitstring => $new_str );
     $self->{size} = length $new_str;
@@ -981,7 +1006,8 @@ sub gf_divide_by_modulus {
     }
     if ($remainder->{size} > $n) {
         $remainder = Algorithm::BitVector->new( 
-           bitlist => $remainder->get_bit([$remainder->{size}-$n .. $remainder->{size}-1]));
+#           bitlist => $remainder->get_bit([$remainder->{size}-$n .. $remainder->{size}-1]));
+           bitlist => $remainder->get_bit([$remainder->{size}-$n .. $remainder->{size}]));
     }
     return ($quotient, $remainder);
 }
@@ -1058,6 +1084,19 @@ sub runs {
     }
     push @allruns, $run;
     return @allruns
+}
+
+##  This method returns the "canonical" form of a BitVector instance that is obtained by
+##  circularly rotating the bit pattern through all possible shifts and returning the
+##  pattern with the maximum number of leading zeros.  This is also the minimum int value
+##  version of a bit pattern.  This method is useful in the "Local Binary Pattern"
+##  algorithm for characterizing image textures.  If you are curious as to how, see my
+##  tutorial on "Measuring Texture and Color in Images."
+sub min_canonical {
+    my $self = shift; 
+    my @intvals_for_circular_shifts = map {int($self << 1)} 0 .. $self->length();
+    my $min_int_val = min @intvals_for_circular_shifts;
+    return Algorithm::BitVector->new( intVal => $min_int_val, size => $self->length() );
 }
 
 ##  Check if the integer value of the bitvector is a prime through the Miller-Rabin
@@ -1207,6 +1246,14 @@ bit arrays and for logical and arithmetic operations on such arrays.
 
 
 =head1 CHANGES
+
+Version 1.26 incorporates the following changes: (1) It allows you to carry out
+slice-based set and get operations on a BitVector object. The two new methods for
+these operations are named C<get_slice()> and C<set_slice()>. (2) It includes a new
+method named C<min_canonical()> that returns a circularly rotated version of a
+BitVector with the least integer value.  For obvious reasons, this version would also
+have the largest number of leading zeros. And (3) It fixes a bug in the
+implementation of the method C<gf_divide_by_modulus()>.
 
 Version 1.25 incorporates bugfix for the case when you try to construct a bitvector
 of a specified length from a large integer that is supplied to the module constructor
@@ -1692,6 +1739,23 @@ method throws an exception if the size of the bitvector is not a multiple of 4.
 
 =back
 
+=head3 get_slice()
+
+=over 4
+
+You can use this method to get a slice of a BitVector that is within a specified range.
+You can specify the index range with the usual range operator in Perl.  If the index 
+range is, say, '5..11', the method will return all bits at index values 5 through 10.
+
+    my $bv9 = Algorithm::BitVector->new( intVal => 63437, size => 16 );
+    print "BitVector for testing get_slice(): $bv9\n";     # 1111011111001101                          
+    my $slice_bv = $bv9->get_slice( [5..11] );
+    print "slice BitVector for index values 5 through 10: $slice_bv\n";    # 111110    
+
+Note that the method returns the slice in the form of a BitVector object.
+
+=back
+
 =head3 gf_divide_by_modulus()
 
 =over 4
@@ -1873,6 +1937,18 @@ This method returns the total number of bits in a bitvector:
 
 Note that what C<length()> returns is the total size of a bitvector, including any
 leading zeros.
+
+=back
+
+=head3 min_canonical()
+
+=over 4
+
+This method returns the min-int-value circularly rotated version of a BitVector. I refer
+to this form of a BitVector as its "min canonical form".
+
+    $bv = Algorithm::BitVector->new( bitstring => "00011100010010" );
+    print $bv->min_canonical();                                   # 00001110001001
 
 =back
 
@@ -2082,6 +2158,24 @@ position of the bit you want to set and the second for the value of the bit.
 
 =back
 
+=head3 set_slice()
+
+=over 4
+
+You can set a slice in a given BitVector by calling this method.  It takes two
+arguments, with the first argument as the range of the position index values at which
+you want to set the bits and the second argument the bit values at those positions.
+
+    $bv =  Algorithm::BitVector->new( intVal => 63437, size => 16 );
+    $values_bv = Algorithm::BitVector->new( bitlist => [1,1,1,1] );
+    $bv->set_slice( [4..8], $values_bv );
+    print "BitVector after set_slice():  $bv\n";     # 1111111111001101
+
+When specifying the index values with the range operator in the form C<i..j>, you
+would be setting the bits at the positions C<i> through C<j-1>.
+
+=back
+
 =head3 set_value()
 
 =over 4
@@ -2212,9 +2306,9 @@ This module imports the following modules:
     Fcntl
 
 
-=head1 THE C<examples> DIRECTORY
+=head1 THE C<Examples> DIRECTORY
 
-The C<examples> directory contains the following script that invokes all of the
+The C<Examples> directory contains the following script that invokes all of the
 functionality of this module:
 
     BitVectorDemo.pl
@@ -2236,10 +2330,10 @@ the string 'BitVector' in the subject line.
 Download the archive from CPAN in any directory of your choice.  Unpack the archive
 with a command that on a Linux machine would look like:
 
-    tar zxvf Algorithm-BitVector-1.25.tar.gz
+    tar zxvf Algorithm-BitVector-1.26.tar.gz
 
 This will create an installation directory for you whose name will be
-C<Algorithm-BitVector-1.25>.  Enter this directory and execute the following commands
+C<Algorithm-BitVector-1.26>.  Enter this directory and execute the following commands
 for a standard install of the module if you have root privileges:
 
     perl Makefile.PL
@@ -2297,7 +2391,7 @@ If you send email, please place the string "BitVector" in your subject line to g
 This library is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.
 
- Copyright 2016 Avinash Kak
+ Copyright 2018 Avinash Kak
 
 =cut
 

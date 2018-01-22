@@ -4,12 +4,9 @@ Time::OlsonTZ::Data - Olson timezone data
 
 =head1 SYNOPSIS
 
-    use Time::OlsonTZ::Data qw(
-	olson_version olson_code_version olson_data_version);
+    use Time::OlsonTZ::Data qw(olson_version);
 
     $version = olson_version;
-    $version = olson_code_version;
-    $version = olson_data_version;
 
     use Time::OlsonTZ::Data qw(
 	olson_canonical_names olson_link_names olson_all_names
@@ -40,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.201703";
+our $VERSION = "0.201802";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -80,25 +77,31 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2017c";
+use constant olson_version => "2018b";
 
 =item olson_code_version
 
 Returns the version number of the code part of the database that this
-module encapsulates.
+module encapsulates.  This is now always the same as the value returned
+by L</olson_version>.  Until late 2012 the database was distributed in
+two parts, each with their own version number, so this was a distinct
+piece of information.
 
 =cut
 
-use constant olson_code_version => "2017c";
+use constant olson_code_version => "2018b";
 
 =item olson_data_version
 
 Returns the version number of the data part of the database that this
-module encapsulates.
+module encapsulates.  This is now always the same as the value returned
+by L</olson_version>.  Until late 2012 the database was distributed in
+two parts, each with their own version number, so this was a distinct
+piece of information.
 
 =cut
 
-use constant olson_data_version => "2017c";
+use constant olson_data_version => "2018b";
 
 =back
 
@@ -120,26 +123,27 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	Africa/Abidjan Africa/Accra Africa/Algiers Africa/Bissau Africa/Cairo
 	Africa/Casablanca Africa/Ceuta Africa/El_Aaiun Africa/Johannesburg
 	Africa/Juba Africa/Khartoum Africa/Lagos Africa/Maputo Africa/Monrovia
-	Africa/Nairobi Africa/Ndjamena Africa/Tripoli Africa/Tunis
-	Africa/Windhoek America/Adak America/Anchorage America/Araguaina
-	America/Argentina/Buenos_Aires America/Argentina/Catamarca
-	America/Argentina/Cordoba America/Argentina/Jujuy
-	America/Argentina/La_Rioja America/Argentina/Mendoza
-	America/Argentina/Rio_Gallegos America/Argentina/Salta
-	America/Argentina/San_Juan America/Argentina/San_Luis
-	America/Argentina/Tucuman America/Argentina/Ushuaia America/Asuncion
-	America/Atikokan America/Bahia America/Bahia_Banderas America/Barbados
-	America/Belem America/Belize America/Blanc-Sablon America/Boa_Vista
-	America/Bogota America/Boise America/Cambridge_Bay America/Campo_Grande
-	America/Cancun America/Caracas America/Cayenne America/Chicago
-	America/Chihuahua America/Costa_Rica America/Creston America/Cuiaba
-	America/Curacao America/Danmarkshavn America/Dawson America/Dawson_Creek
-	America/Denver America/Detroit America/Edmonton America/Eirunepe
-	America/El_Salvador America/Fort_Nelson America/Fortaleza
-	America/Glace_Bay America/Godthab America/Goose_Bay America/Grand_Turk
-	America/Guatemala America/Guayaquil America/Guyana America/Halifax
-	America/Havana America/Hermosillo America/Indiana/Indianapolis
-	America/Indiana/Knox America/Indiana/Marengo America/Indiana/Petersburg
+	Africa/Nairobi Africa/Ndjamena Africa/Sao_Tome Africa/Tripoli
+	Africa/Tunis Africa/Windhoek America/Adak America/Anchorage
+	America/Araguaina America/Argentina/Buenos_Aires
+	America/Argentina/Catamarca America/Argentina/Cordoba
+	America/Argentina/Jujuy America/Argentina/La_Rioja
+	America/Argentina/Mendoza America/Argentina/Rio_Gallegos
+	America/Argentina/Salta America/Argentina/San_Juan
+	America/Argentina/San_Luis America/Argentina/Tucuman
+	America/Argentina/Ushuaia America/Asuncion America/Atikokan
+	America/Bahia America/Bahia_Banderas America/Barbados America/Belem
+	America/Belize America/Blanc-Sablon America/Boa_Vista America/Bogota
+	America/Boise America/Cambridge_Bay America/Campo_Grande America/Cancun
+	America/Caracas America/Cayenne America/Chicago America/Chihuahua
+	America/Costa_Rica America/Creston America/Cuiaba America/Curacao
+	America/Danmarkshavn America/Dawson America/Dawson_Creek America/Denver
+	America/Detroit America/Edmonton America/Eirunepe America/El_Salvador
+	America/Fort_Nelson America/Fortaleza America/Glace_Bay America/Godthab
+	America/Goose_Bay America/Grand_Turk America/Guatemala America/Guayaquil
+	America/Guyana America/Halifax America/Havana America/Hermosillo
+	America/Indiana/Indianapolis America/Indiana/Knox
+	America/Indiana/Marengo America/Indiana/Petersburg
 	America/Indiana/Tell_City America/Indiana/Vevay
 	America/Indiana/Vincennes America/Indiana/Winamac America/Inuvik
 	America/Iqaluit America/Jamaica America/Juneau
@@ -295,7 +299,6 @@ my $li = q(+{
 	"Africa/Nouakchott" => "Africa/Abidjan",
 	"Africa/Ouagadougou" => "Africa/Abidjan",
 	"Africa/Porto-Novo" => "Africa/Lagos",
-	"Africa/Sao_Tome" => "Africa/Abidjan",
 	"Africa/Timbuktu" => "Africa/Abidjan",
 	"America/Anguilla" => "America/Port_of_Spain",
 	"America/Antigua" => "America/Port_of_Spain",
@@ -462,7 +465,6 @@ my $li = q(+{
 	"US/Michigan" => "America/Detroit",
 	"US/Mountain" => "America/Denver",
 	"US/Pacific" => "America/Los_Angeles",
-	"US/Pacific-New" => "America/Los_Angeles",
 	"US/Samoa" => "Pacific/Pago_Pago",
 	UTC => "Etc/UTC",
 	Universal => "Etc/UTC",
@@ -640,7 +642,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

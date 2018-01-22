@@ -1,5 +1,17 @@
 Revision history for Perl extension List-Flatten-XS
 
+0.05 2018-01-21T09:17:41Z
+
+    - Added function to throw exception using croak instead of into infinity loop when passed circular reference
+
+0.04 2018-01-21T06:43:26Z
+
+    - Supported to compile on thread perl
+
+0.03 2018-01-20T14:07:42Z
+
+    - Fixed not to flatten blessed array reference
+
 0.02 2017-03-31T12:57:40Z
 
     - Removed 'static_install' option from minil.toml

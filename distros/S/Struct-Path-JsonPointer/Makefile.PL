@@ -16,7 +16,8 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Struct::Path'  => 0.80,
+        'Clone'         => 0,
+        'Struct::Path'  => "0.80",
         'Test::More'    => 0,
     },
     PREREQ_PM => {

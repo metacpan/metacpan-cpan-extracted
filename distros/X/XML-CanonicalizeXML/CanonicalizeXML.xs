@@ -9,11 +9,11 @@
 #include <libxml/globals.h>
 #include "const-c.inc"
 
-MODULE = XML::CanonicalizeXML		PACKAGE = XML::CanonicalizeXML		
+MODULE = XML::CanonicalizeXML		PACKAGE = XML::CanonicalizeXML
 
 INCLUDE: const-xs.inc
 
-SV *  
+SV *
 canonicalize (xml,xpath,namespace,exclusive,with_comments)
 		char*     xml
 		char*     xpath
@@ -21,17 +21,18 @@ canonicalize (xml,xpath,namespace,exclusive,with_comments)
 		int exclusive
 		int with_comments
 	    PREINIT:
-               xmlChar *output               = NULL;	  
-	       int error = 0;  
+               xmlChar *output               = NULL;
+	       int error = 0;
 	    CODE:
 	        xmlInitParser();
-                error = canonicalize(xml,xpath,namespace,exclusive,with_comments,&output);	
+                error = canonicalizeXml(xml,xpath,namespace,exclusive,with_comments,&output);
 		if (error < 0 ) {
-		    croak("Failed to conanonicalize string");
-		} else {    
-		  RETVAL = newSVpvn( (const char *)output, xmlStrlen(output) ); 
+		    croak("Failed to canonicalize string");
+		} else {
+
+		  RETVAL = newSVpvn( (const char *)output, xmlStrlen(output) );
                   xmlFree(output);
-		}  
+		}
 		xmlCleanupParser();
 	    OUTPUT:
-		RETVAL  
+		RETVAL

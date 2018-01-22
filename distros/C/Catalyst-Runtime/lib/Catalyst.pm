@@ -27,7 +27,7 @@ use HTML::Entities;
 use Tree::Simple qw/use_weak_refs/;
 use Tree::Simple::Visitor::FindByUID;
 use Class::C3::Adopt::NEXT;
-use List::MoreUtils qw/uniq/;
+use List::Util qw/uniq/;
 use attributes;
 use String::RewritePrefix;
 use Catalyst::EngineLoader;
@@ -205,7 +205,7 @@ sub composed_stats_class {
 __PACKAGE__->_encode_check(Encode::FB_CROAK | Encode::LEAVE_SRC);
 
 # Remember to update this in Catalyst::Runtime as well!
-our $VERSION = '5.90115';
+our $VERSION = '5.90117';
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
 sub import {
@@ -1701,23 +1701,20 @@ sub uri_for {
       # somewhat lifted from URI::_query's query_form
       $query = '?'.join('&', map {
           my $val = $params->{$_};
-          #s/([;\/?:@&=+,\$\[\]%])/$URI::Escape::escapes{$1}/go; ## Commented out because seems to lead to double encoding - JNAP
-          s/ /+/g;
-          my $key = $_;
+          my $key = encode_utf8($_);
+          # using the URI::Escape pattern here so utf8 chars survive
+          $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
+          $key =~ s/ /+/g;
+
           $val = '' unless defined $val;
           (map {
-              my $param = "$_";
-              $param = encode_utf8($param);
+              my $param = encode_utf8($_);
               # using the URI::Escape pattern here so utf8 chars survive
               $param =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
               $param =~ s/ /+/g;
 
-              $key = encode_utf8($key);
-              # using the URI::Escape pattern here so utf8 chars survive
-              $key =~ s/([^A-Za-z0-9\-_.!~*'() ])/$URI::Escape::escapes{$1}/go;
-              $key =~ s/ /+/g;
-
-              "${key}=$param"; } ( ref $val eq 'ARRAY' ? @$val : $val ));
+              "${key}=$param";
+          } ( ref $val eq 'ARRAY' ? @$val : $val ));
       } @keys);
     }
 
@@ -4313,7 +4310,7 @@ abort the processing of the remaining actions to avoid running them
 when the application is in an unexpected state.
 
 Before version 5.90070, the default used to be false. To keep the old
-behaviour, you can explicitely set the value to false. E.g.
+behaviour, you can explicitly set the value to false. E.g.
 
     __PACKAGE__->config(abort_chain_on_error_fix => 0);
 
@@ -4914,19 +4911,19 @@ Caelum: Rafael Kitover <rkitover@io.com>
 
 chansen: Christian Hansen
 
-Chase Venters C<chase.venters@gmail.com>
+Chase Venters <chase.venters@gmail.com>
 
 chicks: Christopher Hicks
 
-Chisel Wright C<pause@herlpacker.co.uk>
+Chisel Wright <pause@herlpacker.co.uk>
 
-Danijel Milicevic C<me@danijel.de>
+Danijel Milicevic <me@danijel.de>
 
 davewood: David Schmidt <davewood@cpan.org>
 
 David Kamholz <dkamholz@cpan.org>
 
-David Naughton, C<naughton@umn.edu>
+David Naughton <naughton@umn.edu>
 
 David E. Wheeler
 
@@ -4948,7 +4945,7 @@ gabb: Danijel Milicevic
 
 Gary Ashton Jones
 
-Gavin Henry C<ghenry@perl.me.uk>
+Gavin Henry <ghenry@perl.me.uk>
 
 Geoff Richards
 
@@ -4960,7 +4957,7 @@ ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
 
 jcamacho: Juan Camacho
 
-jester: Jesse Sheidlower C<jester@panix.com>
+jester: Jesse Sheidlower <jester@panix.com>
 
 jhannah: Jay Hannah <jay@jays.net>
 
@@ -4970,9 +4967,9 @@ Johan Lindstrom
 
 jon: Jon Schutz <jjschutz@cpan.org>
 
-Jonathan Rockway C<< <jrockway@cpan.org> >>
+Jonathan Rockway <jrockway@cpan.org>
 
-Kieren Diment C<kd@totaldatasolution.com>
+Kieren Diment <kd@totaldatasolution.com>
 
 konobi: Scott McWhirter <konobi@cpan.org>
 
@@ -5008,7 +5005,9 @@ rafl: Florian Ragwitz <rafl@debian.org>
 
 random: Roland Lammel <lammel@cpan.org>
 
-Robert Sedlacek C<< <rs@474.at> >>
+revmischa: Mischa Spiegelmock <revmischa@cpan.org>
+
+Robert Sedlacek <rs@474.at>
 
 SpiceMan: Marcel Montes
 
@@ -5022,17 +5021,17 @@ Ulf Edvinsson
 
 vanstyn: Henry Van Styn <vanstyn@cpan.org>
 
-Viljo Marrandi C<vilts@yahoo.com>
+Viljo Marrandi <vilts@yahoo.com>
 
-Will Hawes C<info@whawes.co.uk>
+Will Hawes <info@whawes.co.uk>
 
 willert: Sebastian Willert <willert@cpan.org>
 
 wreis: Wallace Reis <wreis@cpan.org>
 
-Yuval Kogman, C<nothingmuch@woobling.org>
+Yuval Kogman <nothingmuch@woobling.org>
 
-rainboxx: Matthias Dietrich, C<perl@rainboxx.de>
+rainboxx: Matthias Dietrich <perl@rainboxx.de>
 
 dd070: Dhaval Dhanani <dhaval070@gmail.com>
 

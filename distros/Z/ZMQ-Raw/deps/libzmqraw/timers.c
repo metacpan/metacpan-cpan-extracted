@@ -214,6 +214,10 @@ static void zmq_raw_timers__stop (zmq_raw_timer *timer)
 	if (timer->running)
 	{
 		timer->running = 0;
+		/* explicitly set the interval to 0 so the next call
+		 * to zmq_timers_execute() cleans up the cancelled
+		 * timer immediately */
+		zmq_timers_set_interval (timer->timers->timers, timer->id, 0);
 		zmq_timers_cancel (timer->timers->timers, timer->id);
 	}
 }

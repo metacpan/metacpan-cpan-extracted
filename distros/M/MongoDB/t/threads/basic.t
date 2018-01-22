@@ -25,6 +25,8 @@ BEGIN { plan skip_all => 'requires threads' unless $Config{usethreads} }
 
 BEGIN { plan skip_all => 'threads not supported before Perl 5.8.5' unless $] ge "5.008005" }
 
+BEGIN { plan skip_all => 'threads tests flaky on older Windows Perls' if $^O eq "MSWin32" && $] lt "5.020000" }
+
 use MongoDB;
 use Try::Tiny;
 
@@ -64,7 +66,11 @@ $col->drop;
         threads->create(sub {
             $conn->reconnect;
             my $col = $conn->get_database($testdb->name)->get_collection('kooh');
-            map { $col->insert_one({ foo => threads->self->tid })->inserted_id } 1 .. $n_inserts;
+            my @ids = map { $col->insert_one({ foo => threads->self->tid })->inserted_id } 1 .. $n_inserts;
+            # reading our writes while still in the thread should ensure
+            # inserts are globally visible before the thread exits
+            $col->find_one({ _id => $_}) for @ids;
+            return @ids;
         })
     } 1 .. $n_threads;
 

@@ -130,6 +130,18 @@ It is a more lightweight but less powerful way to query RDF data than
 SPARQL. If you have this, it is recommended to have CORS enabled and
 required to have at least a minimal VoID setup.
 
+It is also worth noting that an environment variable LOG_ADAPTER can
+be set to send log statements to the console. I recommend installing
+Log::Any::Adapter::Screen, which can be used by setting this variable
+like LOG_ADAPTER=Screen. Its documentation details more environment
+variables that can be used to control log levels, etc.
+
+This module now also contains some facilities to support read-write
+hypermedia RDF, as well as the possibility to subclass RDF::LinkedData
+itself. The read-write functionality is provided by a separate module,
+RDF::LinkedData::RWHypermedia, but is highly experimental at this
+point.
+
 *Production server setup*
 
 In addition to the configuration above, a production system should set
@@ -176,10 +188,9 @@ SUPPORT
 
         perldoc RDF::LinkedData
 
-    The perlrdf mailing list is the right place to seek help and discuss
-    this module:
+    The perlrdf IRC channel is the right place to seek help and discuss this module:
 
-    <http://lists.perlrdf.org/listinfo/dev>
+    irc://irc.perl.org/#perlrdf
 
 ACKNOWLEDGEMENTS
     This module was started by Gregory Todd Williams "<gwilliams@cpan.org>"
@@ -190,7 +201,7 @@ COPYRIGHT & LICENSE
 
     Copyright 2010 ABC Startsiden AS
 
-    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kjetil Kjernsmo
+    Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kjetil Kjernsmo
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

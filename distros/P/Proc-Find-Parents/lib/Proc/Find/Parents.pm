@@ -1,7 +1,7 @@
 package Proc::Find::Parents;
 
-our $DATE = '2014-12-05'; # DATE
-our $VERSION = '0.62'; # VERSION
+our $DATE = '2018-01-17'; # DATE
+our $VERSION = '0.631'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,19 @@ sub get_parent_processes {
         state $pt = Proc::ProcessTable->new;
         for my $p (@{ $pt->table }) {
             $proc{ $p->{pid} } = {
-                name=>$p->{fname}, pid=>$p->{pid}, ppid=>$p->{ppid},
+                name => $p->{fname},
+                cmdline => $p->{cmndline},
+                pid  => $p->{pid},
+                ppid => $p->{ppid},
+                uid  => $p->{uid},
+                gid  => $p->{gid},
+                pgrp => $p->{pgrp},
+                sess => $p->{sess},
+                sgid => $p->{sgid},
+                euid => $p->{euid},
+                egid => $p->{egid},
+                ttydev => $p->{ttydev},
+                ttynum => $p->{ttynum},
             };
         }
     }
@@ -66,6 +78,7 @@ sub get_parent_processes {
     \@p;
 }
 
+1;
 # ABSTRACT: Find parents of a process (up to the root)
 
 __END__
@@ -80,7 +93,7 @@ Proc::Find::Parents - Find parents of a process (up to the root)
 
 =head1 VERSION
 
-This document describes version 0.62 of Proc::Find::Parents (from Perl distribution Proc-Find-Parents), released on 2014-12-05.
+This document describes version 0.631 of Proc::Find::Parents (from Perl distribution Proc-Find-Parents), released on 2018-01-17.
 
 =head1 SYNOPSIS
 
@@ -112,12 +125,6 @@ Unices).
 
 =back
 
-=head1 SEE ALSO
-
-L<Proc::ProcessTable>. Pros: does not depend on C<pstree> command, process names
-not truncated by C<pstree>, works on Windows. Cons: a little bit more
-heavyweight (uses File::Spec, Cwd, File::Find).
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Proc-Find-Parents>.
@@ -134,13 +141,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Proc::ProcessTable>. Pros: does not depend on C<pstree> command, process names
+not truncated by C<pstree>, works on Windows. Cons: a little bit more
+heavyweight (uses L<File::Spec>, L<Cwd>, L<File::Find>).
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

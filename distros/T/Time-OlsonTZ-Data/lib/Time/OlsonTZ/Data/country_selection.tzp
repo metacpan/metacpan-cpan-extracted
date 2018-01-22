@@ -2988,7 +2988,7 @@ use strict;
 		olson_name => "South Sudan",
 		regions => {
 			"" => {
-				location_coords => "+0451+03136",
+				location_coords => "+0451+03137",
 				olson_description => "",
 				timezone_name => "Africa/Juba",
 			},

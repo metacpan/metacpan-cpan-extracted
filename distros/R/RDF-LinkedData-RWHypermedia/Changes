@@ -1,0 +1,21 @@
+RDF-LinkedData-RWHypermedia
+===========================
+
+Created:      2017-07-22
+Home page:    <https://metacpan.org/release/RDF-LinkedData-RWHypermedia>
+Bug tracker:  <https://github.com/kjetilk/p5-rdf-linkeddata-rwhypermedia/issues>
+Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+
+0.002	2018-01-17	First non-dev release
+
+0.001_06	2018-01-17	Log user out when no username is supplied
+
+0.001_05	2018-01-16	Make credentials configurable
+
+0.001_04	2018-01-15	Add more control statements
+
+0.001_03	2018-01-12	Fix typo in docs
+
+0.001_02	2018-01-12	Bugfix and document
+
+0.001_01	2018-01-10	Initial release

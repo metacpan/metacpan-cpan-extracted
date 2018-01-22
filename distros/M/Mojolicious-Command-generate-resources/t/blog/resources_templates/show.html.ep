@@ -1,0 +1,8 @@
+% my $a = shift;
+%% my $title = "$<%= $a->{t} %>->{id} from table <%= $a->{t} %>";
+%% layout 'blog', 
+%%   title => $title;
+
+<h2><%%= $$title %> </h2>
+<p>TODO: Put the content here</p>
+%%= link_to 'Edit' => edit_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

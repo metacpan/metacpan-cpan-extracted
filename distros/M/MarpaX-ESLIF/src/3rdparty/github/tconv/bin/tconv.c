@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <locale.h>
 #ifndef _WIN32
 #  include <unistd.h>
 #else
@@ -53,6 +54,22 @@
 #define BUFSIZ 1024
 #endif
 
+typedef struct tconv_helper_context {
+  tconv_t tconvp;
+  char   *filenames;
+  int     fd;
+  int     outputFd;
+  char   *inbufp;
+  size_t  bufsizel;
+  short   guessb;
+  short   fromPrintb;
+  short   fuzzyb;
+  short   firstconsumercallb;
+#ifndef TCONV_NTRACE
+  short   verbose;
+#endif
+} tconv_helper_context_t;
+  
 static void _usage(char *argv0, short helpb);
 #ifndef TCONV_NTRACE
 static void traceCallback(void *userDatavp, const char *msgs);
@@ -62,7 +79,8 @@ static void fileconvert(int outputFd, char *filenames,
                         tconv_convert_t *convertp, tconv_charset_t *charsetp,
 			short guessb,
 			size_t bufsizel,
-			short fromPrintb
+			short fromPrintb,
+			short fuzzyb
 #ifndef TCONV_NTRACE
 			, short verbose
 #endif
@@ -73,11 +91,10 @@ int main(int argc, char **argv)
 /*****************************************************************************/
 {
   int                  longindex      = 0;
-  short                doneSomethingb = 0;
-
   short                fromPrintb     = 0;
   char                *fromcodes      = NULL;
   short                guessb         = 0;
+  short                fuzzyb         = 0;
   char                *charsetEngines = NULL;
   char                *convertEngines = NULL;
   short                helpb          = 0;
@@ -103,6 +120,7 @@ int main(int argc, char **argv)
     {       "verbose", 'v', OPTPARSE_OPTIONAL},
 #endif
     {       "version", 'V', OPTPARSE_OPTIONAL},
+    {         "fuzzy", 'z', OPTPARSE_OPTIONAL},
     {0}
   };
 
@@ -110,10 +128,11 @@ int main(int argc, char **argv)
   int                  outputFd;
   int                  option;
   struct optparse      options;
-  tconv_charset_t      *charsetp = NULL;
-  tconv_charset_t       charset;
-  tconv_convert_t      *convertp = NULL;
-  tconv_convert_t       convert;
+  tconv_charset_t     *charsetp = NULL;
+  tconv_charset_t      charset;
+  tconv_convert_t     *convertp = NULL;
+  tconv_convert_t      convert;
+  short                haveoptionsb = 0;
 
   optparse_init(&options, argv);
   while ((option = optparse_long(&options, longopts, &longindex)) != -1) {
@@ -187,6 +206,9 @@ int main(int argc, char **argv)
       GENERICLOGGER_INFOF(NULL, "tconv %s", TCONV_VERSION);
       exit(EXIT_SUCCESS);
       break;
+    case 'z':
+      fuzzyb = 1;
+      break;
     case '?':
       GENERICLOGGER_ERRORF(NULL, "%s: %s", argv[0], options.errmsg);
       _usage(argv[0], 0);
@@ -228,203 +250,30 @@ int main(int argc, char **argv)
     outputFd = fileno(stdout);
   }
 
-  while ((args = optparse_arg(&options)) != NULL) {
-    doneSomethingb = 1;
-    fileconvert(outputFd, args,
-		tocodes, fromcodes,
-                convertp, charsetp,
-		guessb,
-		bufsizel,
-		fromPrintb
+  setlocale(LC_ALL, "");
 #ifndef TCONV_NTRACE
-		, verbose
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb, verbose)
+#else
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb)
 #endif
-		);
+
+  while ((args = optparse_arg(&options)) != NULL) {
+    haveoptionsb = 1;
+    TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb);
+  }
+  if (! haveoptionsb) {
+    TCONV_FILECONVERT(outputFd, NULL, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb);
   }
 
   if ((outputFd >= 0) && (outputFd != fileno(stdout))) {
     if (close(outputFd) != 0) {
-      GENERICLOGGER_ERRORF(NULL, "Failed to close %s: %s", outputs, strerror(errno));
+      GENERICLOGGER_WARNF(NULL, "Failed to close %s: %s", outputs, strerror(errno));
     }
-  }
-
-  if (doneSomethingb == 0) {
-    /* Nothing processed ? */
-    _usage(argv[0], 0);
   }
 
   exit(EXIT_SUCCESS);
-}
-
-/*****************************************************************************/
-static void fileconvert(int outputFd, char *filenames,
-			char *tocodes, char *fromcodes,
-                        tconv_convert_t *convertp, tconv_charset_t *charsetp,
-			short guessb,
-			size_t bufsizel,
-			short fromPrintb
-#ifndef TCONV_NTRACE
-			, short verbose
-#endif
-			)
-/*****************************************************************************/
-{
-  char           *inbuforigp  = NULL;
-  char           *outbuforigp = NULL;
-  size_t          outsizel = bufsizel;
-  tconv_t         tconvp = (tconv_t)-1;
-  int             fd;
-  tconv_option_t  tconvOption;
-  size_t          nconvl;
-  size_t          nwritel;
-
-  inbuforigp = malloc(bufsizel);
-  if (inbuforigp == NULL) {
-    GENERICLOGGER_ERRORF(NULL, "malloc: %s", strerror(errno));
-    goto end;
-  }
-
-  /* We start with an outbuf size the same as inbuf */
-  outbuforigp = malloc(outsizel);
-  if (outbuforigp == NULL) {
-    GENERICLOGGER_ERRORF(NULL, "malloc: %s", strerror(errno));
-    goto end;
-  }
-
-  fd = open(filenames,
-            O_RDONLY
-#ifdef O_BINARY
-            |O_BINARY
-#endif
-            );
-  if (fd < 0) {
-    GENERICLOGGER_ERRORF(NULL, "Failed to open %s: %s", filenames, strerror(errno));
-    goto end;
-  }
-
-  tconvOption.charsetp = charsetp;
-  tconvOption.convertp = convertp;
-  tconvOption.traceCallbackp =
-#ifndef TCONV_NTRACE
-    (verbose != 0) ? traceCallback :
-#endif
-    NULL;
-  tconvOption.traceUserDatavp = NULL;
-  
-#ifndef TCONV_NTRACE
-  /* For very early trace */
-  putenv("TCONV_ENV_TRACE=1");
-#endif
-
-  tconvp = tconv_open_ext(tocodes, fromcodes, &tconvOption);
-  if (tconvp == (tconv_t) -1) {
-    GENERICLOGGER_ERRORF(NULL, "tconv_open_ext: %s", strerror(errno));
-    goto end;
-  }
-
-#ifndef TCONV_NTRACE
-  if (verbose != 0) {
-    tconv_trace_on(tconvp);
-  }
-#endif
-
-  while (1) {
-    char *inbufp    = inbuforigp;
-    char *outbufp   = outbuforigp;
-    size_t outleftl = outsizel;
-    short  eofb     = 0;
-    size_t inleftl  = (size_t) read(fd, inbuforigp, bufsizel);
-   
-    if (inleftl == (size_t)-1) {
-      GENERICLOGGER_ERRORF(NULL, "Failed to read from %s: %s", filenames, strerror(errno));
-      goto end;
-    } else if (inleftl == 0) {
-      eofb = 1;
-    }
-
-    if (guessb) {
-      /* Force an E2BIG situation */
-      outleftl = 0;
-    }
-
-    while (eofb || (inleftl > 0)) {
-    again:
-      nconvl = tconv(tconvp, eofb ? NULL : &inbufp, eofb ? NULL : &inleftl, &outbufp, &outleftl);
-      nwritel = outsizel - outleftl;
-      if (nwritel > 0) {
-	if (outputFd >= 0) {
-	  if (write(outputFd, outbuforigp, nwritel) != nwritel) {
-	    GENERICLOGGER_ERRORF(NULL, "Failed to write output: %s", strerror(errno));
-	    goto end;
-	  }
-	}
-        outbufp  = outbuforigp;
-        outleftl = outsizel;
-      }
-
-      if (nconvl == (size_t) -1) {
-	switch (errno) {
-	case E2BIG:
-	  if (guessb != 0) {
-	    /* Print from codeset, simulate eof and exit the loop, no writing */
-	    GENERICLOGGER_INFOF(NULL, "%s: %s", filenames, tconv_fromcode(tconvp));
-	    fromPrintb = 0;
-	    eofb = 1;
-	    break;
-	  }
-          /* We realloc only if we wrote nothing */
-	  if (nwritel <= 0) {
-	    char *tmp;
-	    
-	    tmp = realloc(outbuforigp, outsizel + bufsizel);
-	    if (tmp == NULL) {
-	      GENERICLOGGER_ERRORF(NULL, "realloc: %s", strerror(errno));
-	      goto end;
-	    }
-	    outbufp    = outbuforigp = tmp;
-            outsizel  += bufsizel;
-            outleftl   = outsizel;
-	  }
-          goto again;
-	  break;
-	default:
-	  GENERICLOGGER_ERRORF(NULL, "%s: %s", filenames, tconv_error(tconvp));
-	  goto end;
-	}
-      } else {
-	if (fromPrintb != 0) {
-	  GENERICLOGGER_INFOF(NULL, "%s: %s", filenames, tconv_fromcode(tconvp));
-	  fromPrintb = 0;
-	}
-      }
-
-      if (eofb) {
-        break;
-      }
-    }
-
-    if (eofb) {
-      break;
-    }
-  }
-
-  end:
-  if (fd >= 0) {
-    if (close(fd) != 0) {
-      GENERICLOGGER_ERRORF(NULL, "Failed to close %s: %s", filenames, strerror(errno));
-    }
-  }
-  if (tconvp != (tconv_t)-1) {
-    if (tconv_close(tconvp) != 0) {
-      GENERICLOGGER_ERRORF(NULL, "Failed to close tconv: %s", strerror(errno));
-    }
-  }
-  if (outbuforigp != NULL) {
-    free(outbuforigp);
-  }
-  if (inbuforigp != NULL) {
-    free(inbuforigp);
-  }
 }
 
 /*****************************************************************************/
@@ -470,6 +319,7 @@ static void _usage(char *argv0, short helpb)
 #ifndef TCONV_NTRACE
     printf("  -v, --verbose               Verbose mode.\n");
 #endif
+    printf("  -z, --fuzzy                 Show fuzzy conversion state.\n");
 
     printf("\n");
     printf("Examples:");
@@ -487,13 +337,13 @@ static void _usage(char *argv0, short helpb)
     printf("  %s -g *\n", argv0);
     printf("\n");
     printf("NOTES\n");
+    printf("- Any unprocessed argument is treaded as a filename, where \"-\" is an alias for standard input. If there is no unprocessed argument, standard input is assumed.\n");
     printf("- Entry points to a charset plugin are not available via options.\n\tThe environment variables TCONV_ENV_CHARSET_NEW, TCONV_ENV_CHARSET_RUN and TCONV_ENV_CHARSET_FREE can be used to overwrite the default function names.\n\tDefault functions entry point names are: \"tconv_charset_newp\", \"tconv_charset_run\" and \"tconv_charset_free\".\n");
     printf("- Entry points to a convert plugin are not available via options.\n\tThe environment variables TCONV_ENV_CONVERT_NEW, TCONV_ENV_CONVERT_RUN and TCONV_ENV_CONVERT_FREE can be used to overwrite the default function names.\n\tDefault functions entry point names are: \"tconv_convert_newp\", \"tconv_convert_run\" and \"tconv_convert_free\".\n");
     printf("- The default convert engine is ICU if tconv has been compiled with it, else iconv if it has been compiled with it, else none.\n");
     printf("\tIf the --convert-engine option value is \"ICU\", tconv is forced to use ICU, and will fail if it does not have this support.\n");
     printf("\tSimilarly for iconv, if the option value is \"ICONV\".\n");
     printf("\tAny other option value will be considered like a path to a plugin, that will be loaded dynamically. Up to the plugin to be able to get options via, eventually, environment variables.\n");
-    printf("\n");
     printf("- The default charset detection engine is cchardet and is always available. tconv optionally have support of ICU charset detection engine if it has been compiled with it.\n");
     printf("\tIf the --charset-engine option value is \"CCHARDET\", tconv will use cchardet.\n");
     printf("\tIf the option value is \"ICU\", tconv is forced to use ICU, and will fail if it does have this support.\n");
@@ -503,3 +353,188 @@ static void _usage(char *argv0, short helpb)
   }
 }
 
+/*****************************************************************************/
+static short producer(tconv_helper_t *tconv_helperp, void *voidp, char **bufpp, size_t *countlp)
+/*****************************************************************************/
+{
+  tconv_helper_context_t *contextp = (tconv_helper_context_t *) voidp;
+  size_t                  countl   = (size_t) read(contextp->fd, contextp->inbufp, contextp->bufsizel);
+
+#ifndef TCONV_NTRACE
+  if (contextp->verbose) {
+    GENERICLOGGER_TRACEF(NULL, "%s: reading %ld bytes returned %ld bytes", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", (unsigned long) contextp->bufsizel, (long) countl);
+  }
+#endif
+
+  if (countl == (size_t)-1) {
+    return 0;
+  }
+  *bufpp   = contextp->inbufp;
+  *countlp = countl;
+
+  if (contextp->guessb) {
+    /* We do not want to continue */
+#ifndef TCONV_NTRACE
+    if (contextp->verbose) {
+      GENERICLOGGER_TRACEF(NULL, "%s: guess mode - faking eof", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)");
+    }
+#endif
+    return tconv_helper_stopb(tconv_helperp);
+  } else if (countl == 0) {
+    /* For a file descriptor, if countl is 0 then this is a eof */
+#ifndef TCONV_NTRACE
+    if (contextp->verbose) {
+      GENERICLOGGER_TRACEF(NULL, "%s: eof", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)");
+    }
+#endif
+    return tconv_helper_endb(tconv_helperp);
+  } else {
+    return 1;
+  }
+}
+
+/*****************************************************************************/
+static short consumer(tconv_helper_t *tconv_helperp, void *voidp, char *bufp, size_t countl, size_t *countlp)
+/*****************************************************************************/
+{
+  tconv_helper_context_t *contextp  = (tconv_helper_context_t *) voidp;
+  size_t                  consumedl;
+  short                   fuzzyb;
+
+  if (contextp->outputFd >= 0) {
+    consumedl = write(contextp->outputFd, bufp, countl);
+  } else {
+    consumedl = 0;
+  }
+
+  *countlp = consumedl;
+
+  if (contextp->guessb || contextp->fromPrintb || contextp->fuzzyb) {
+    if (contextp->firstconsumercallb != 0) {
+      if (contextp->guessb || contextp->fromPrintb) {
+        GENERICLOGGER_INFOF(NULL, "%s: %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", tconv_fromcode(contextp->tconvp));
+      }
+      if (contextp->fuzzyb) {
+        if (! tconv_fuzzy_getb(contextp->tconvp, &fuzzyb)) {
+          return 0;
+        }
+        GENERICLOGGER_INFOF(NULL, "%s: fuzzy mode is %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", fuzzyb ? "on" : "off");
+      }
+      contextp->firstconsumercallb = 0;
+    }
+  }
+
+  return 1;
+}
+
+/*****************************************************************************/
+static void fileconvert(int outputFd, char *filenames,
+                        char *tocodes, char *fromcodes,
+                        tconv_convert_t *convertp, tconv_charset_t *charsetp,
+                        short guessb,
+                        size_t bufsizel,
+                        short fromPrintb,
+                        short fuzzyb
+#ifndef TCONV_NTRACE
+                        , short verbose
+#endif
+                        )
+/*****************************************************************************/
+{
+  char                   *inbufp = NULL;
+  int                     fd     = -1;
+  tconv_t                 tconvp = (tconv_t)-1;
+  tconv_option_t          tconvOption;
+  tconv_helper_t         *tconv_helperp = NULL;
+  tconv_helper_context_t  context;
+
+  inbufp = malloc(bufsizel);
+  if (inbufp == NULL) {
+    GENERICLOGGER_ERRORF(NULL, "malloc: %s", strerror(errno));
+    goto end;
+  }
+
+  if ((filenames == NULL) || (strcmp(filenames, "-") == 0)) {
+    fd = fileno(stdin);
+  } else {
+    fd = open(filenames,
+              O_RDONLY
+#ifdef O_BINARY
+              |O_BINARY
+#endif
+              );
+  }
+  if (fd < 0) {
+    GENERICLOGGER_ERRORF(NULL, "Failed to open %s: %s", filenames, strerror(errno));
+    goto end;
+  }
+
+  tconvOption.charsetp = charsetp;
+  tconvOption.convertp = convertp;
+  tconvOption.traceCallbackp =
+#ifndef TCONV_NTRACE
+    (verbose != 0) ? traceCallback :
+#endif
+    NULL;
+  tconvOption.traceUserDatavp = NULL;
+  
+#ifndef TCONV_NTRACE
+  /* For very early trace */
+  putenv("TCONV_ENV_TRACE=1");
+#endif
+
+  tconvp = tconv_open_ext(tocodes, fromcodes, &tconvOption);
+  if (tconvp == (tconv_t) -1) {
+    GENERICLOGGER_ERRORF(NULL, "tconv_open_ext: %s", strerror(errno));
+    goto end;
+  }
+
+#ifndef TCONV_NTRACE
+  if (verbose != 0) {
+    tconv_trace_on(tconvp);
+  }
+#endif
+
+  context.tconvp             = tconvp;
+  context.filenames          = filenames;
+  context.fd                 = fd;
+  context.outputFd           = outputFd;
+  context.inbufp             = inbufp;
+  context.bufsizel           = bufsizel;
+  context.guessb             = guessb;
+  context.fromPrintb         = fromPrintb;
+  context.fuzzyb             = fuzzyb;
+  context.firstconsumercallb = 1;
+#ifndef TCONV_NTRACE
+  context.verbose   = verbose;
+#endif
+
+  tconv_helperp = tconv_helper_newp(tconvp, &context, producer, consumer);
+  if (tconv_helperp == NULL) {
+    goto end;
+  }
+  
+  if (! tconv_helper_runb(tconv_helperp)) {
+    GENERICLOGGER_ERRORF(NULL, "%s: %s", filenames, strerror(errno));
+  }
+
+ end:
+  if (inbufp != NULL) {
+    free(inbufp);
+  }
+  if ((filenames != NULL) && (strcmp(filenames, "-") != 0)) {
+    if (fd >= 0) {
+      if (close(fd) != 0) {
+        GENERICLOGGER_WARNF(NULL, "Failed to close %s: %s", filenames, strerror(errno));
+      }
+    }
+  }
+  if (tconv_helperp != NULL) {
+    tconv_helper_freev(tconv_helperp);
+  }
+  if (tconvp != (tconv_t) -1) {
+    if (tconv_close(tconvp) != 0) {
+      GENERICLOGGER_WARNF(NULL, "Failed to close tconv: %s", strerror(errno));
+    }
+  }
+}

@@ -1,8 +1,8 @@
 Poker-Robot
 
-VERSION 0.01
+VERSION 0.02
 
-Simple API for interacting with Poker::Robot::Protocol poker servers. 
+Simple API for interacting with L<Mojo Poker|https://github.com/nathanielgraham/Mojo-Poker> poker servers. 
 
 SEE ALSO 
 

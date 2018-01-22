@@ -249,7 +249,7 @@ enum {
   SPVM_OPCODE_C_CODE_BOOL_FLOAT,
   SPVM_OPCODE_C_CODE_BOOL_DOUBLE,
   SPVM_OPCODE_C_CODE_BOOL_OBJECT,
-  SPVM_OPCODE_C_CODE_UNDEF,
+  SPVM_OPCODE_C_CODE_LOAD_UNDEF,
   SPVM_OPCODE_C_CODE_MOVE,
   SPVM_OPCODE_C_CODE_NEW_OBJECT,
   SPVM_OPCODE_C_CODE_NEW_STRING,
@@ -340,19 +340,24 @@ enum {
   SPVM_OPCODE_C_CODE_LOAD_CONSTANT_FLOAT_0,
   SPVM_OPCODE_C_CODE_LOAD_CONSTANT_DOUBLE_0,
   SPVM_OPCODE_C_CODE_CASE,
+  SPVM_OPCODE_C_CODE_IF_CROAK_CATCH,
+  SPVM_OPCODE_C_CODE_IF_CROAK_RETURN,
+  SPVM_OPCODE_C_CODE_SET_CROAK_FLAG_TRUE,
+};
+
+enum {
+  SPVM_OPCODE_C_FLAG_IS_LABEL = 1
 };
 
 extern const char* const SPVM_OPCODE_C_CODE_NAMES[];
 
 struct SPVM_opcode {
-  int32_t code;
+  int16_t code;
+  int8_t has_label;
+  int8_t dummy;
   int32_t operand0;
   int32_t operand1;
   int32_t operand2;
-  int32_t operand3;
-  int32_t operand4;
-  int32_t operand5;
-  int32_t operand6;
 };
 
 enum {

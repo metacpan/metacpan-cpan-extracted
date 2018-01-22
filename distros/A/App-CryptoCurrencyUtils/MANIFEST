@@ -8,8 +8,9 @@ Makefile.PL
 README
 dist.ini
 lib/App/CryptoCurrencyUtils.pm
-script/cmc-currency
-script/grepcrypto
+script/coin-cmc
+script/coin-mno
+script/grepcoin
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

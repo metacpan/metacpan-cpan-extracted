@@ -1,0 +1,45 @@
+---
+abstract: 'Main class for two-scalp tool'
+author:
+  - 'Denis BAURAIN <denis.baurain@uliege.be>'
+build_requires:
+  Path::Class: '0'
+  Test::Files: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-MUST-Apps-TwoScalp
+requires:
+  Bio::MUST::Core: '0'
+  Bio::MUST::Core::Ali: '0'
+  Bio::MUST::Core::Constants: '0'
+  Bio::MUST::Core::Seq: '0'
+  Bio::MUST::Core::SeqId: '0'
+  Bio::MUST::Core::SeqMask: '0'
+  Bio::MUST::Core::Utils: '0'
+  Bio::MUST::Drivers::Blast::Database::Temporary: '0'
+  Bio::MUST::Drivers::Blast::Query: '0'
+  Getopt::Euclid: '0'
+  List::AllUtils: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Smart::Comments: '0'
+  Test::Most: '0'
+  aliased: '0'
+  autodie: '0'
+  experimental: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+version: '0.180160'
+x_serialization_backend: 'YAML::Tiny version 1.69'

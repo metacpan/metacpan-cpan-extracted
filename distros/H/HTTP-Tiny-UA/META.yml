@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,21 +26,21 @@ meta-spec:
 name: HTTP-Tiny-UA
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   HTTP::Tiny::UA:
     file: lib/HTTP/Tiny/UA.pm
-    version: '0.004'
+    version: '0.005'
   HTTP::Tiny::UA::Response:
     file: lib/HTTP/Tiny/UA/Response.pm
-    version: '0.004'
+    version: '0.005'
 requires:
-  Class::Tiny: '0'
+  Class::Tiny: '1.000'
   HTTP::Tiny: '0.036'
   perl: '5.006'
   strict: '0'
@@ -51,8 +51,10 @@ resources:
   bugtracker: https://github.com/dagolden/HTTP-Tiny-UA/issues
   homepage: https://github.com/dagolden/HTTP-Tiny-UA
   repository: https://github.com/dagolden/HTTP-Tiny-UA.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'David Golden <xdg@xdg.me>'
   - 'Felipe Gasper <felipe@felipegasper.com>'
   - 'Graham Ollis <perl@wdlabs.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

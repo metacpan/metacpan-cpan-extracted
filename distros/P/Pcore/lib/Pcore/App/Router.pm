@@ -86,12 +86,11 @@ sub _get_host_map ( $self, $host, $ns ) {
 
         $route =~ s[::][/]smg;
 
-        my $obj = $class->new(
-            {   app  => $self->{app},
-                host => $host,
-                path => $route,
-            }
-        );
+        my $obj = $class->new( {
+            app  => $self->{app},
+            host => $host,
+            path => $route,
+        } );
 
         # get obj route
         $route = $obj->path;

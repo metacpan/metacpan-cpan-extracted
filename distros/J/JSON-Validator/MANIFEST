@@ -64,7 +64,6 @@ t/Helper.pm
 t/id-keyword.t
 t/invalid-ref.t
 t/issue-22-duplicate-error-messages.t
-t/issue-27-yaml-syck-false.t
 t/issue-42-cache-control.t
 t/issue-59-oneof-blessed-booleans.t
 t/issue-71-additionalproperties.t

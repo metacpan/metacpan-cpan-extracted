@@ -25,10 +25,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CryptoCurrency-Catalog
   homepage: https://metacpan.org/release/CryptoCurrency-Catalog
   repository: git://github.com/perlancar/perl-CryptoCurrency-Catalog.git
-version: '20180109'
+version: '20180116'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -101,7 +101,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.590'
+      version: '0.591'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -169,55 +169,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -245,11 +245,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
@@ -261,11 +261,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
-              version: '0.121550'
+              version: '0.163250'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -311,8 +311,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.054'
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'
@@ -334,9 +335,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
       version: '0.03'
     -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
-      name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
+      name: '@Author::PERLANCAR/Acme::CPANModules::Blacklist'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
@@ -349,6 +350,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
       version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: 'PruneFiles additional'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -411,5 +416,5 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.009'
 x_authority: cpan:PERLANCAR
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

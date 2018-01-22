@@ -1,0 +1,5 @@
+{files}{"/etc/hostname"}
+{files}{"/etc/hosts"}
+{files}{"/etc/resolv.conf"}
+{fqdn}
+{mtime}

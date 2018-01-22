@@ -151,7 +151,7 @@ my $base_uri = 'http://localhost/';
 {
     note "Post /bar/baz/bing";
     my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester);
-
+	 # TODO: This doesn't send the right Turtle to the application, but the test still tests for methods ok
     $mech->post("/bar/baz/bing", { 'Content-Type' => 'text/turtle', 
 														 Content => "<$base_uri/foo> <http://example.org/new2> \"Merged triple\"\@en" });
     is($mech->status, '405', "Method is not allowed");

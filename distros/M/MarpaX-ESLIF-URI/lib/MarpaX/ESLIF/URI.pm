@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Carp qw/croak/;
 use Class::Load qw/load_class/;
@@ -57,7 +57,7 @@ MarpaX::ESLIF::URI - URI as per RFC3986/RFC6874
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

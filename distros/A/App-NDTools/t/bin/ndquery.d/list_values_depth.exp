@@ -1,0 +1,12 @@
+[0]{File}[0] = {"id":"file_new","label":"New"}
+[0]{File}[1] = {"id":"file_open","label":"Open"}
+[0]{File}[2] = {"id":"file_save","label":"Save"}
+[1]{Edit}[0] = {"id":"edit_cut","label":"Cut"}
+[1]{Edit}[1] = {"id":"edit_copy","label":"Copy"}
+[1]{Edit}[2] = {"id":"edit_paste","label":"Paste"}
+[1]{Edit}[3] = null
+[1]{Edit}[4] = {"id":"edit_find","label":"Find"}
+[1]{Edit}[5] = null
+[1]{Edit}[6] = {"id":"edit_settings","label":"Settings"}
+[2]{View}[0] = {"id":"view_encoding","label":"Encoding"}
+[2]{View}[1] = {"id":"view_wrapping","label":"Text wrapping"}

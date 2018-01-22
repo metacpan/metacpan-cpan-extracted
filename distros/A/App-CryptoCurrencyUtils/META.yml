@@ -20,11 +20,13 @@ requires:
   App::wordlist: '0.261'
   Browser::Open: '0'
   CryptoCurrency::Catalog: '0'
+  Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Base: '1.80'
   Perinci::Result::Format::Lite: '0.26'
   Sah::Schema::cryptocurrency::symbol_or_name: '0'
+  URI::Escape: '0'
   WordList::CryptoCurrency::Catalog::NameSymbol: '0'
   strict: '0'
   warnings: '0'
@@ -32,15 +34,19 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CryptoCurrencyUtils
   homepage: https://metacpan.org/release/App-CryptoCurrencyUtils
   repository: git://github.com/perlancar/perl-App-CryptoCurrencyUtils.git
-version: '0.002'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript cmc-currency'
-      version: '0.420'
+      name: 'GenPericmdScript coin-cmc'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript coin-mno'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
@@ -148,7 +154,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -360,7 +366,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

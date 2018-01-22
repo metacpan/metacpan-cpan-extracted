@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 40)
+MYPACKAGESTART (tconv 1 0 45)
 
 ###########
 # Library #
@@ -124,35 +124,6 @@ IF (ICONV_FOUND)
   ENDIF ()
 ENDIF ()
 
-# -----------------------------------------------------------------------------------------------------
-# Some iconv implementation dislike very much when from and to charsets are the same (case insensitive)
-# We require that the the system provides a meaningul strcasecmp'like function.
-# As a last resort we will fall back to a horribe internal version.
-# The folloying CMake check is a copy/paste of what is doing luacom.
-# -----------------------------------------------------------------------------------------------------
-INCLUDE ( CheckSymbolExists )
-CHECK_SYMBOL_EXISTS ( _strnicmp string.h HAVE__STRNICMP )
-IF (HAVE__STRNICMP)
-  SET (STRNICMP _strnicmp)
-ENDIF ()
-IF (NOT STRNICMP)
-  CHECK_SYMBOL_EXISTS (strnicmp string.h HAVE_STRNICMP)
-  IF (HAVE_STRNICMP)
-    SET (STRNICMP strnicmp)
-  ENDIF ( )
-ENDIF ( )
-IF (NOT STRNICMP)
-  CHECK_SYMBOL_EXISTS (strncasecmp string.h HAVE_STRNCASECMP)
-  IF (HAVE_STRNCASECMP)
-    SET (STRNICMP strncasecmp)
-  ENDIF ()
-ENDIF ()
-IF (NOT STRNICMP)
-  MESSGE ( STATUS "_strnicmp, strnicmp, nor strncasecmp found - falling back to internal version _tconv_strnicmp" )
-  SET (STRNICMP _tconv_strnicmp)
-ENDIF ( )
-ADD_DEFINITIONS (-DC_STRNICMP=${STRNICMP} )
-
 MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/tconv_config.h.in
   ${INCLUDE_OUTPUT_PATH}/tconv_config.h
@@ -191,7 +162,7 @@ EXECUTE_PROCESS(
 MYPACKAGEEXECUTABLE(tconvExe bin/tconv.c)
 MYPACKAGEADDEXECUTABLESTOTESTS(tconvExe)
 FOREACH (_target tconvExe tconvExe_static)
-  TARGET_COMPILE_DEFINITIONS(${_target} PRIVATE -DOPTPARSE_IMPLEMENTATION -DOPTPARSE_API=static -DTCONV_VERSION="${TCONV_VERSION}")
+  TARGET_COMPILE_DEFINITIONS(${_target} PRIVATE -DOPTPARSE_IMPLEMENTATION -DOPTPARSE_API=static -DTCONV_VERSION="${${PROJECT_NAME}_VERSION}")
   TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${3RDPARTY_OUTPUT_PATH}/optparse)
   IF (${_target} STREQUAL "tconvExe")
     SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME tconv)
@@ -205,10 +176,20 @@ ENDFOREACH ()
 ################
 MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS)
 
+###############
+# Executables #
+###############
+MYPACKAGETESTEXECUTABLE(tconvExample test/example.c)
+FOREACH (_target tconvExample tconvExample_static)
+  TARGET_COMPILE_DEFINITIONS(${_target} PRIVATE -DOPTPARSE_IMPLEMENTATION -DOPTPARSE_API=static)
+  TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${3RDPARTY_OUTPUT_PATH}/optparse)
+ENDFOREACH ()
+
 #########
 # Tests #
 #########
 MYPACKAGECHECK(tconvExe -t UTF-16 -o tconv.tconv-UTF-16.c "${PROJECT_SOURCE_DIR}/src/tconv.c")
+MYPACKAGECHECK(tconvExample)
 
 ###########
 # Install #
@@ -220,6 +201,16 @@ MYPACKAGEMAN("include/tconv/README.pod" "TCONV_EXT" "3" "${TCONV_VERSION}")
 # Packaging #
 #############
 MYPACKAGEPACK ("" "Portable Iconv-like interface")
+
+###########
+# Codecov #
+###########
+SET (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/3rdparty/github/CMake-codecov/cmake")
+FIND_PACKAGE(codecov)
+FOREACH (_target tconv tconv_static tconvExe tconvExe_static tconvExample tconvExample_static)
+  add_coverage(${_target})
+ENDFOREACH ()
+coverage_evaluate()
 
 #########
 # Setup #

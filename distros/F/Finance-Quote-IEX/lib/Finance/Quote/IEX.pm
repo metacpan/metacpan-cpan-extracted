@@ -8,7 +8,7 @@ use DateTime;
 use JSON qw(decode_json);
 use HTTP::Status qw(status_message);
 
-our $VERSION = '0.001000'; # VERSION
+our $VERSION = '0.001001'; # VERSION
 
 sub methods {
     return (
@@ -51,7 +51,7 @@ sub iex {
     my $quoter = shift;
     my @stocks = @_;
 
-    my $iex_url = 'https://api.iextrading.com/1.0/stock/%s/quote';
+    my $iex_url  = 'https://api.iextrading.com/1.0/stock/%s/quote';
     my $errormsg = 'Error retrieving quote for "%s": GET "%s" resulted in'
         . ' HTTP response %d (%s)';
 
@@ -59,10 +59,10 @@ sub iex {
     my %info;
 
     foreach my $symbol (@stocks) {
-        my $url   = sprintf( $iex_url, $symbol );
+        my $url = sprintf( $iex_url, $symbol );
         my $response = $ua->get($url);
 
-        if (!$response->is_success) {
+        if ( !$response->is_success ) {
             my $code = $response->code;
             my $desc = status_message($code);
             $info{ $symbol, 'success' } = 0;
@@ -72,6 +72,30 @@ sub iex {
         }
 
         my $data = decode_json( $response->decoded_content );
+
+        if ( !defined $data->{latestPrice} ) {
+            my $code = $response->code;
+            my $desc = status_message($code);
+            $info{ $symbol, 'success' }  = 0;
+            $info{ $symbol, 'errormsg' } = sprintf(
+                'Error retrieving quote for "%s":'
+                    . ' no price found in response data',
+                $symbol
+            );
+            next;
+        }
+
+        if ( !defined $data->{latestUpdate} ) {
+            my $code = $response->code;
+            my $desc = status_message($code);
+            $info{ $symbol, 'success' }  = 0;
+            $info{ $symbol, 'errormsg' } = sprintf(
+                'Error retrieving quote for "%s":'
+                    . ' no date found in response data',
+                $symbol
+            );
+            next;
+        }
 
         $info{ $symbol, 'success' }  = 1;
         $info{ $symbol, 'method' }   = 'iex';
@@ -93,9 +117,10 @@ sub iex {
         $info{ $symbol, 'cap' }      = $data->{marketCap};
         $info{ $symbol, 'exchange' } = $data->{exchange};
 
-        # The Finance::Quote documentation indicates that the date shouldn't be
-        # parsed, but store_date does not support epoch time.
-        my $dt = DateTime->from_epoch( epoch => $data->{latestUpdate} );
+        # The Finance::Quote documentation indicates that the date shouldn't
+        # be parsed, but store_date does not support epoch time.
+        my $dt
+            = DateTime->from_epoch( epoch => $data->{latestUpdate} / 1000 );
         $info{ $symbol, 'time' }    = $dt->hms;
         $info{ $symbol, 'date' }    = $dt->strftime('%m/%d/%y');
         $info{ $symbol, 'isodate' } = $dt->ymd;
@@ -118,7 +143,7 @@ Finance::Quote::IEX - Retrieve stock quotes using the IEX API
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 SYNOPSIS
 

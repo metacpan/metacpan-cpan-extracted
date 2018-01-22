@@ -1,0 +1,111 @@
+NAME
+    RDF::LinkedData::RWHypermedia - Experimental read-write hypermedia support
+    for Linked Data
+
+SYNOPSIS
+    This module extends RDF::LinkedData, and you would most likely not call
+    this module directly, but rather configure it using the tools that
+    RDF::LinkedData provides.
+
+DESCRIPTION
+    This module is an experiment to manipulate Linked Data using human and
+    machine readable hypermedia descriptions. The intention is to have
+    messages that are intuitive to newcomers, so that they can get going using
+    it without much training. For now, it has very basic, prototypical
+    functionality, but it represents an implementation of an idea that the
+    author thinks is worth discussing.
+
+    To use it, please see the README of RDF::LinkedData. To that
+    configuration, add the two options
+
+        "class" : "RDF::LinkedData::RWHypermedia",
+        "writes_enabled" : 1,
+
+    Also, hypermedia is on by default, ensure that it isn't turned off.
+
+    Then, start the server as you would with Plack::App::RDF::LinkedData.
+
+  Behaviour
+    In addition to the behaviour documented in Plack::App::RDF::LinkedData,
+    this module will add a predicate to any data about a certain resource that
+    tells the user it can check a certain URI to see if it may edit the
+    resource description. If the user goes there, they will be challenged to
+    authenticate, and if authorized (currently, an authenticated user has all
+    privileges), they will be shown how to edit the resource description.
+
+    Extending the examples of Plack::App::RDF::LinkedData,
+    `http://host.name/rdf/example/data` points to
+    `http://host.name/rdf/example/controls`, which when authorized, shows the
+    users triples like
+
+      <http://host.name/rdf/example/data> hm:canBe hm:replaced .
+
+    thus encouraging the user to replace the data with a new resource
+    description. The idea is further that `hm:replaced` can be defined with
+    protocol-specific semantics, for example that in HTTP, it means that the
+    user may PUT data in an RDF format to the URL.
+
+  TODO
+    The idea is also that this approach should be extended to support
+    different identity (WebID is an obvious candidate) and authorization
+    regimes (I started implementing the W3C access control lists ontology, but
+    found it more urgent to get the hypermedia ideas coded). Eventually, I
+    think this approach should reach parity with the Linked Data Platform, but
+    without an out-of-band specification.
+
+METHODS AND ATTRIBUTES
+    `response`
+        This module wraps RDF::LinkedDatas `response` method, taking control
+        of write methods and data to be added to the response for controls and
+        data. The latter is achieved by also wrapping the private `_content`
+        method.
+
+    `user`
+        Can be read or set to the username of the logged in user.
+
+    `is_logged_in`
+        Indicates whether a user is logged in.
+
+    `log_out`
+        Log out user.
+
+    `add_rw_pointer ($hypermedia_model, $uri)`
+        A method that will add a triple to the data page for the given URI to
+        the model building the hypermedia of the response.
+
+    `credentials_ok`, `unauthorized`, `authenticator`, `credentials`
+        Methods that deals with authentication and authorization. This part is
+        really not stable, just for demo purposes at present. The last is
+        currently a hashref so that a configured username and password can be
+        passed to the authenticator.
+
+FEEDBACK
+    Since this is a prototype, I hope this will spark discussion. There are
+    some discussion items inline in the code. They include how and what data
+    should be merged to a given URL, what the responses should look like.
+
+    Apart from comments to my email, the IRC channels
+    <irc://irc.perl.org/#perlrdf> and <irc://irc.freenode.net/#swig> are good
+    forums for discussing this topic.
+
+    I will be blogging about this work at
+    <http://kjetil.kjernsmo.net/category/technology/hypermedia/>.
+
+  Bugs
+    Please report any bugs to
+    <https://github.com/kjetilk/p5-rdf-linkeddata-rwhypermedia/issues>.
+
+  Author
+    Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

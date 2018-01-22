@@ -1,3 +1,8 @@
+0.622   2018-01-17 (PERLANCAR)
+
+	- sync: Add action 'list-source-repos'.
+
+
 0.621   2017-11-24 (PERLANCAR)
 
 	- Add -M as shortcut for --skip-mtime-check.

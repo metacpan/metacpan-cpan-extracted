@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Compress-LZ4Frame",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Compress::LZ4Frame" : {
          "file" : "lib/Compress/LZ4Frame.pm",
-         "version" : "0.012001"
+         "version" : "0.012002"
       }
    },
    "release_status" : "stable",
@@ -53,7 +53,7 @@
          "web" : "https://github.com/autinitysystems/Compress-LZ4Frame"
       }
    },
-   "version" : "0.012001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "0.012002",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

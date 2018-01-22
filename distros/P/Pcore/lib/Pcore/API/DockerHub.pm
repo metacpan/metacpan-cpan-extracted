@@ -104,24 +104,22 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb ) {
         $request->();
     }
     else {
-        $self->_login(
-            sub ($res) {
+        $self->_login( sub ($res) {
 
-                # login ok
-                if ($res) {
-                    $request->();
-                }
-
-                # login failure
-                else {
-                    $cb->($res) if $cb;
-
-                    $blocking_cv->send($res) if $blocking_cv;
-                }
-
-                return;
+            # login ok
+            if ($res) {
+                $request->();
             }
-        );
+
+            # login failure
+            else {
+                $cb->($res) if $cb;
+
+                $blocking_cv->send($res) if $blocking_cv;
+            }
+
+            return;
+        } );
     }
 
     return $blocking_cv ? $blocking_cv->recv : ();
@@ -336,11 +334,10 @@ sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef )
         1,
         {   name                  => $webhook_name,
             expect_final_callback => \0,
-            webhooks              => [
-                {   name     => $webhook_name,
-                    hook_url => $webhook_url,
-                }
-            ],
+            webhooks              => [ {
+                name     => $webhook_name,
+                hook_url => $webhook_url,
+            } ],
         },
         $cb
     );
@@ -616,12 +613,12 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 77, 188, 322, 332,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 349, 377, 381, 416,  |                                                                                                                |
-## |      | 488, 507, 511, 555,  |                                                                                                                |
-## |      | 568                  |                                                                                                                |
+## |    3 | 77, 186, 320, 330,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 346, 374, 378, 413,  |                                                                                                                |
+## |      | 485, 504, 508, 552,  |                                                                                                                |
+## |      | 565                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 166                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 164                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

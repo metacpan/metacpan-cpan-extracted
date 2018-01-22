@@ -1,6 +1,6 @@
 package MySQL::Workbench::SQLiteSimple;
 
-# ABSTRACT: Create a simple .sql file for SQLite
+# ABSTRACT: Create a simple .sql file for SQLite from MySQL Workbench file (.mwb)
 
 use warnings;
 use strict;
@@ -11,22 +11,25 @@ use List::Util qw(first);
 use Moo;
 use MySQL::Workbench::Parser;
 
-# ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
-
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has output_path    => ( is => 'ro', required => 1, default => sub { '.' } );
 has file           => ( is => 'ro', required => 1 );
 
 sub create_sql {
     my $self = shift;
+    my %opts = @_;
     
     my $parser = MySQL::Workbench::Parser->new( file => $self->file ); 
     my @tables = @{ $parser->tables };
 
     my @tables_sql = $self->_create_tables( \@tables );
 
-    $self->_write_files( @tables_sql );
+    if ( !$opts{no_files} ) {
+        $self->_write_files( @tables_sql );
+    }
+
+    return @tables_sql;
 }
 
 sub _write_files{
@@ -136,11 +139,11 @@ __END__
 
 =head1 NAME
 
-MySQL::Workbench::SQLiteSimple - Create a simple .sql file for SQLite
+MySQL::Workbench::SQLiteSimple - Create a simple .sql file for SQLite from MySQL Workbench file (.mwb)
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -157,10 +160,10 @@ version 0.02
 
 =head2 new
 
-creates a new object of MySQL::Workbench::DBIC. You can pass some parameters
+creates a new object of MySQL::Workbench::SQLiteSimple. You can pass some parameters
 to new:
 
-  my $foo = MySQL::Workbench::DBIC->new(
+  my $foo = MySQL::Workbench::SQLiteSimple->new(
     output_path => '/path/to/dir',
     file        => '/path/to/dbdesigner.file',
   );
@@ -189,7 +192,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+
+use App::NDTools::NDProc;
+
+my $ndproc = App::NDTools::NDProc->new();
+$ndproc->exec();
+
+__END__
+
+=head1 NAME
+
+ndproc - nested data processor, extendable by modules
+
+=head1 SYNOPSIS
+
+    ndproc [OPTIONS] <arguments>
+
+=head1 DESCRIPTION
+
+Process nested data structures according provided rules
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--builtin-format> <""|JSON>
+
+Format for builtin things (--builtin-rules, --embed-rules). Raw structure
+will be used if omitted or empty.
+
+=item B<--builtin-rules> E<lt>pathE<gt>
+
+Use builtin (in processed object) rules.
+
+=item B<--disable-module> E<lt>modnameE<gt>
+
+Skip (don't process) rules for specified module. May be used several times.
+
+=item B<--dump-blame> E<lt>fileE<gt>
+
+Dump blame to file.
+
+=item B<--dump-rules> E<lt>fileE<gt>
+
+Dump rules to file.
+
+=item B<--embed-blame> E<lt>pathE<gt>
+
+Embed blame into processed structure, using provided path.
+
+=item B<--embed-rules> E<lt>pathE<gt>
+
+Embed used rules into processed structure, using provided path.
+
+=item B<--help|-h>
+
+Print a help message and exit.
+
+=item B<--ifmt> E<lt>JSON|YAMLE<gt>
+
+Force specified input format usage. Automatically choosed (using file
+extension) if omitted.
+
+=item B<--list-modules|-l>
+
+List available modules.
+
+=item B<--module|-m> E<lt>nameE<gt>
+
+Process structure using specified module.
+
+=item B<--rules> E<lt>fileE<gt>
+
+Load rules from specified file. May be used several times.
+
+=item B<--verbose|-v> [int]
+
+Increase verbosity, max level - 4.
+
+=item B<--version|-V>
+
+Print version and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Simply merge three files using module 'Merge':
+
+    ndproc --module Merge a.json --source b.json --source c.json
+
+Print usage for 'Merge' module:
+
+    ndproc --module Merge --help
+
+=head1 EXIT STATUS
+
+ 0   No errors occured.
+ 1   Generic error code.
+ 2   I/O Error.
+ 4   Path related errors.
+
+=head1 BUGS
+
+Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
+
+=head1 SEE ALSO
+
+L<jq(1)>
+
+L<nddiff(1)>, L<ndpatch(1)>, L<ndquery(1)>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016,2017 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of GNU General Public License 3 or later versions.

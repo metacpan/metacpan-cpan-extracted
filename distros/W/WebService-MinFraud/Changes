@@ -1,3 +1,14 @@
+1.006000 2018-01-18
+
+- Updated GeoIP2 dependency to GeoIP2 2.005000. This adds the
+  is_in_european_union() attribute to GeoIP2::Record::Country and
+  GeoIP2::Record::RepresentedCountry. This attribute is true if the
+  country is a member state of the European Union.
+- Added the following new values to the /payment/processor validation:
+  - cybersource
+  - transact_pro
+  - wirecard
+
 1.005001 2017-10-30
 
 - Updated GeoIP2 dependency to add support for GeoIP2 Precision Insights

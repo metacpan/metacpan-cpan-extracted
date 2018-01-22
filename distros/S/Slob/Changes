@@ -1,5 +1,11 @@
 Revision history for Perl extension Slob.
 
+0.002002 2018-01-20T17:25+00:00
+ - Open files in binary mode to fix MSWin32 test failures
+
+0.002_001 2018-01-13T21:55+02:00
+ - Make tests output more information to track down MSWin32 test failures
+
 0.002 2018-01-06T20:09+02:00
  - Add bzip2 and zlib compression support
 

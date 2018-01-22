@@ -2,6 +2,14 @@ Revision history for Perl extension Coro::Multicore.
 
 TODO: idle timeout, like IO::AIO
 
+TODO: add examples
+TODO: mysql perlmulticore more to do
+
+0.03 Thu Jan 18 17:43:14 CET 2018
+	- further USE_SOCKETS_AS_HANDLES fixes (Z59).
+        - vastly improved documentation.
+	- (experimental) catch exceptions and re-throw them.
+
 0.02  Mon Jun 29 22:24:18 CEST 2015
 	- actual first release, so experimental.
 

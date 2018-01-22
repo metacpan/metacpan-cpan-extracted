@@ -6,7 +6,6 @@
 
 use strict;
 use warnings;
-use Encode;
 
 use MVC::Neaf qw(:sugar);
 
@@ -32,12 +31,11 @@ get+post '/07/upload' => sub {
     my $req = shift;
 
     my @top;
-    my $up = $req->upload("count");
+    my $up = $req->upload_utf8("count");
     if ($up) {
         my $fd = $up->handle;
         my %count;
         while (<$fd>) {
-            $_ = decode_utf8($_);
             $count{$_}++ for /(\w\w\w+)/g;
         };
 

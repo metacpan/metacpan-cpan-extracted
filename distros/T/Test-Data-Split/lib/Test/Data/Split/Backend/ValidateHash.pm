@@ -1,5 +1,5 @@
 package Test::Data::Split::Backend::ValidateHash;
-
+$Test::Data::Split::Backend::ValidateHash::VERSION = '0.2.1';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ and transformation.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -55,6 +55,10 @@ See the tests.
 =head1 DESCRIPTION
 
 This inherits from L<Test::Data::Split::Backend::Hash> .
+
+=head1 VERSION
+
+version 0.2.1
 
 =head1 METHODS
 
@@ -83,8 +87,7 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Data-Split or by email to
-bug-test-data-split@rt.cpan.org.
+L<https://github.com/shlomif/perl-Test-Data-Split/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -98,7 +101,7 @@ feature.
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc Test::Data::Split
+  perldoc Test::Data::Split::Backend::ValidateHash
 
 =head2 Websites
 
@@ -113,7 +116,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Test-Data-Split>
+L<https://metacpan.org/release/Test-Data-Split>
 
 =item *
 
@@ -149,14 +152,6 @@ L<http://cpanratings.perl.org/d/Test-Data-Split>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Test-Data-Split>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -167,7 +162,7 @@ L<http://cpants.cpanauthors.org/dist/Test-Data-Split>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/T/Test-Data-Split>
 
@@ -203,6 +198,6 @@ from your repository :)
 
 L<https://github.com/shlomif/perl-Test-Data-Split>
 
-  git clone https://github.com/shlomif/perl-Test-Data-Split.git
+  git clone git://github.com/shlomif/perl-Test-Data-Split.git
 
 =cut

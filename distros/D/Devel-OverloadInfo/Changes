@@ -1,5 +1,8 @@
 Revision history for Devel-OverloadInfo
 
+0.005     2018-01-22 00:45:49+00:00 Europe/London
+  - Add overload_op_info() function for info about a single op
+
 0.004     2015-08-13 17:35:32+01:00 Europe/London
   - Document that existence of undef 'fallback' varies between perl versions
   - Add tests for empty, inherited-only and no overloading

@@ -1,0 +1,65 @@
+Welcome to Statistics::Descriptive::Weighted. This module partially extends
+Statistics::Descriptive to handle weighted variates.
+
+Although some functionality (particularly trimmed mean, least squares fit,
+geometric mean and others, see man page for full listing) of
+Statistics::Descriptive has been intentionally dropped from this extension,
+other functionality has been added. 
+
+In particular, besides adding support for weighted variates, a cdf function,
+a quantile function, a percentile function, and other related functions have
+been added (see man page for details). The quantile and percentile functions
+offer quite different definitions for similar concepts, please see man page
+for more info on that as well.
+
+The implementation uses Tree::Treap written by Andrew Johnson (version 0.02
+downloaded in Dec, 2008 from http://stuff.siaris.net and incorporated under
+the terms of Perl licensing) which, since it was not on CPAN, is provided
+and automatically installed with this package. This is an implementation of
+a randomized self-balancing binary search tree called a treap.
+
+To install this package please say:
+
+perl Makefile.pl
+make
+make test
+(sudo) make install
+man Statistics::Descriptive::Weighted
+
+David H. Ardell
+UC Merced
+October 14, 2009
+
+
+Lists of methods:
+
+Statistics::Descriptive::Weighted::Sparse
+----------------------------------
+add_data
+count
+mean
+weight
+sum
+variance
+min
+max
+standard_deviation
+sample_range
+biased_variance
+biased_standard_deviation
+
+Statistics::Descriptive::Weighted::Full
+----------------------------------
+All methods above and:
+
+get_data
+percentile
+median
+mode
+maxweight
+cdf
+survival
+rtp
+quantile
+print
+

@@ -2,7 +2,7 @@ package MVC::Neaf::X::Session::File;
 
 use strict;
 use warnings;
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -40,9 +40,9 @@ expiration, please specify expiration INSIDE the session, or use a database.
 =cut
 
 use Fcntl qw(:flock :seek);
-use JSON;
 use URI::Escape qw(uri_escape);
 
+use MVC::Neaf::Util qw(JSON encode_json decode_json);
 use parent qw(MVC::Neaf::X::Session);
 
 =head2 new( %options )

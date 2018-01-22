@@ -1,110 +1,80 @@
 ==================================================
-Changes from 2013-07-08 00:00:00 +0000 to present.
+Changes from 2017-01-18 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2014-07-08 07:20:57 +0000
+version 0.017 at 2018-01-18 03:15:19 +0000
 ------------------------------------------
 
-  Change: 69575d802510ce46f92d598e9e0f6341ad4b25f9
+  Change: b574d31c3f935427f956309a1ab45b774c4cd859
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2014-07-08 02:44:12 +0000
+  Date : 2018-01-17 22:06:38 +0000
 
-    rt.cpan.org 90394. Use Dist::Zilla::File::InMemory so it's always
-    loaded when needed.
+    Move the new documentation to its own section.
 
-    Thanks, Pete Smith, for reporting the problem. 
+    The inline POD was showing up in the wrong place in READMEs. 
 
-  Change: 0e8e0c907297022b645ad7f78ae637057a381a57
+  Change: 26b00843c663b53b3714a917326f02cd7ac01be5
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2014-07-08 02:43:49 +0000
+  Date : 2018-01-17 21:58:30 +0000
 
-    Looks like the AutoMetaResources plugin doesn't do license info
-    anymore. 
+    Merge branch 'use-readmeany' of
+    https://github.com/preaction/dzp-changelogfromgit into
+    preaction-use-readmeany 
 
-------------------------------------------
-version 0.015 at 2013-08-11 16:35:25 +0000
-------------------------------------------
-
-  Change: 26417b1c0c702540ab07e88e0cf3310c1b43c002
+  Change: 641c0a1d8ce7d1bedc89edee60cb070259927bf1
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-11 12:35:25 +0000
+  Date : 2018-01-17 21:56:07 +0000
 
-    Exclude some more perl core modules from the versioned dependencies. 
+    Merge branch 'fix-code-coverage' of
+    https://github.com/manwar/dzp-changelogfromgit into
+    manwar-fix-code-coverage 
 
-------------------------------------------
-version 0.012 at 2013-08-10 21:11:07 +0000
-------------------------------------------
-
-  Change: e4f06498bfb41e0465bfb90f1fc46377aa2dc651
+  Change: 10b054b494a4e23f9647ba862e7e8bf95f8fcf10
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-10 17:11:07 +0000
+  Date : 2018-01-17 21:46:26 +0000
 
-    Exclude versions for modules that would upgrade Perl. 
+    Merge branch 'master' of
+    https://github.com/dnmfarrell/dzp-changelogfromgit into
+    dnmfarrell-master 
 
-------------------------------------------
-version 0.011 at 2013-08-10 20:37:39 +0000
-------------------------------------------
+  Change: 273395e8b21a7d0761643bee55136146d8d8aed1
+  Author: Zach Thompson <zach@duckduckgo.com>
+  Date : 2018-01-17 21:44:39 +0000
 
-  Change: 28486ef8e4d364f31df78cf7ccbf2437ca0d4fa6
+    * Add min/max_releases * Consider skipping releases only when
+    min_releases is met * Limit by max_age, then max_releases, if
+    specified * Set the date after which no releases are considered based
+    on the last commit or release date * Document new attributes 
+
+  Change: ac0e21df420709b0106267d06bed4470efbb479a
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-10 16:37:39 +0000
+  Date : 2018-01-17 21:43:31 +0000
 
-    Set all prerequisite versions to what's installed.
+    Stop using Prereqs::MatchInstalled::All. 
 
-    Thanks, Kent Fredric, for responding to my bug report/wishlist
-    request with Dist::Zilla::Plugin::Prereqs::MatchInstalled::All. 
+  Change: 49eae219635e84fb0d571738502bce12fdefa96a
+  Author: Doug Bell <doug@preaction.me>
+  Date : 2018-01-16 14:23:19 +0000
 
-------------------------------------------
-version 0.010 at 2013-08-06 00:49:34 +0000
-------------------------------------------
+    use ReadmeAnyFromPod
 
-  Change: 4683677453582bf655374e531f8ccb11ca017875
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-05 20:49:34 +0000
+    This plugin prevents some warnings from using the ReadmeFromPod
+    plugin, and also provides the ReadmeMarkdownFromPod functionality in
+    a single module. 
 
-    More dist.ini modernization. 
+  Change: 74afbb244d5c1b7ceb4aceec3c835a0edf8a58b2
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-05-03 11:46:53 +0000
 
-------------------------------------------
-version 0.009 at 2013-08-05 07:08:02 +0000
-------------------------------------------
+    - Fixed pod coverage to 100%. 
 
-  Change: 2f3694e12d62da200657ada6e25b94275614a3db
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-05 03:08:02 +0000
+  Change: ea187ed1c6148f6ad0ad933a31449c434dcefdb8
+  Author: David Farrell <davidnmfarrell@gmail.com>
+  Date : 2015-12-07 22:17:32 +0000
 
-    Modernize dependencies and dist.ini idioms. 
+    avoid warning by initializing $buf 
 
-------------------------------------------
-version 0.008 at 2013-08-04 18:44:32 +0000
-------------------------------------------
-
-  Change: 5c00f5cd94ded7c9a19999d8c7f0dbc960ddbdc1
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-08-04 14:44:32 +0000
-
-    It's August 2013. About time I changed the copyright notice. 
-
-  Change: 4cd053ec73ce66858dd8b709cc55eb16b9acdce0
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-07-05 02:09:44 +0000
-
-    Add the new dependency upon IPC::Cmd. 
-
-  Change: 668a94a07d6ad4d07b0a644a9ec7d7cba6c5651e
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date : 2013-07-04 23:07:12 +0000
-
-    Merge pull request #9 from jddurand/master
-
-    Portability + log on HEAD detection 
-
-  Change: 2cfaaa70ee7f344d17e6a0de0072dd16daea6fd3
-  Author: Jean-Damien Durand <jeandamiendurand@free.fr>
-  Date : 2013-06-04 01:59:25 +0000
-
-    Portability + logic on detection of HEAD 
-
-================================================
-Plus 6 releases after 2013-07-08 00:00:00 +0000.
-================================================
+=================================================
+Plus 13 releases after 2017-01-18 00:00:00 +0000.
+=================================================

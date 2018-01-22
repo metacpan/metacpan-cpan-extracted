@@ -5,6 +5,12 @@ use utf8;
 
 use parent 'WebService::Slack::WebApi::Base';
 
+use WebService::Slack::WebApi::Users::Profile;
+
+use Class::Accessor::Lite::Lazy (
+    ro_lazy => [qw/ profile /],
+);
+
 use WebService::Slack::WebApi::Generator (
     delete_photo => +{},
     get_presence => {
@@ -25,6 +31,10 @@ use WebService::Slack::WebApi::Generator (
         presence => 'Str',
     },
 );
+
+sub _build_profile {
+    return WebService::Slack::WebApi::Users::Profile->new(client => shift->client);
+}
 
 1;
 

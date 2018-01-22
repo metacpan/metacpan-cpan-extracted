@@ -1,4 +1,8 @@
-Revision history for WWW-DistroWatch-ReleaseInfo
+0.06    2018-01-22 (PERLANCAR)
+
+	- [Bugfix] Update URL to https:// (otherwise the routines get empty
+	  data) [GH#1].
+
 
 0.05    2015-10-06 (PERLANCAR)
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.09
+    Version 0.16
 
 SYNOPSIS
 
@@ -43,10 +43,22 @@ SUBROUTINES/METHODS
       * profile_name - pick a specific existing profile to automate, rather
       than creating a new profile. Note that firefox <https://firefox.com>
       refuses to allow more than one instance of a profile to run at the
-      same time.
+      same time. Profile names can be obtained by using the
+      Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
+      any chagnes made to the profile on the disk while it is running.
+
+      * profile - create a new profile based on the supplied profile. NOTE:
+      firefox ignores any changes made to the profile on the disk while it
+      is running.
+
+      * debug - allow firefox's debug to be available via STDERR.
 
     This method returns a new Firefox::Marionette object, connected to an
-    instance of firefox <https://firefox.com>
+    instance of firefox <https://firefox.com>. If necessary and possible,
+    this method will also automatically start an Xvfb
+    <https://en.wikipedia.org/wiki/Xvfb> instance to allow firefox to run
+    in an environment without an accessible X server, so long as the method
+    is not being run on Windows or MacOS.
 
  go
 
@@ -197,6 +209,16 @@ SUBROUTINES/METHODS
     returns the current active frame if there is one in the current
     browsing context. Otherwise, this method returns undef.
 
+ switch_to_shadow_root
+
+    accepts an elemnet as a parameter and switches to it's shadow root
+    <https://www.w3.org/TR/shadow-dom/>
+
+ switch_to_window
+
+    accepts a window handle (either the result of window_handles or a
+    window name as a parameter and switches focus to this window.
+
  switch_to_frame
 
     accepts a frame as a parameter and switches to it within the current
@@ -206,6 +228,17 @@ SUBROUTINES/METHODS
 
     set the current browsing context for future commands to the parent of
     the current browsing context
+
+ close_current_chrome_window_handle
+
+    closes the current chrome window (that is the entire window, not just
+    the tabs). It returns a list of still available chrome window handles.
+    You will need to switch_to_window to use another window.
+
+ close_current_window_handle
+
+    closes the current window/tab. It returns a list of still available
+    window/tab handles.
 
  full_screen
 
@@ -383,6 +416,10 @@ SUBROUTINES/METHODS
 
     returns the version for the Marionette protocol. Current most recent
     version is '3'.
+
+ xvfb
+
+    returns the pid of the xvfb process if it exists.
 
  quit
 

@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use JSON;
 use Pod::Usage;
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 
 my %opt;
 
@@ -64,7 +64,10 @@ if ( $opt{tle} ) {
 %status = (
 EOD
 
+    my @summary;
+
     foreach my $body ( @{ $data } ) {
+	$summary[$body->[4]]++;
 	print <<"EOD";
     '$body->[0]'	=> {
 	'class'	=> 'Astro::Coord::ECI::TLE::Iridium',
@@ -77,7 +80,13 @@ EOD
 EOD
     }
 
-    print ");\n";
+    print ");\n\n# Summary:\n";
+    my $inx = 0;
+    my @name = qw{ Operational Spare Tumbling Decayed };
+    foreach my $count ( @summary ) {
+	printf "#%12s [%s]: %d\n", $name[$inx], $symbolic[$inx], $count;
+	$inx++;
+    }
 
 } else {
 
@@ -199,7 +208,7 @@ Tom Wyant (wyant at cpan dot org)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Thomas R. Wyant, III
+Copyright (C) 2017-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

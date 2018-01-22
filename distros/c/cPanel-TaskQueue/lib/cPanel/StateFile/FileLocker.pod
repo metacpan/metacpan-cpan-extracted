@@ -3,12 +3,6 @@
 
 cPanel::StateFile::FileLocker - Lock and unlock files using C<flock>.
 
-
-=head1 VERSION
-
-This document describes cPanel::StateFile::FileLocker version 0.700
-
-
 =head1 SYNOPSIS
 
     use cPanel::StateFile::FileLocker;
@@ -55,7 +49,7 @@ should be significantly less than the I<max_wait> value. The default value is
 
 The number of seconds to sleep between attempts to check the lock file. Higher
 numbers reduce CPU and disk load, but reduce responsiveness. The default value
-is the lowest allowed, 1.
+is 0.1. The lowest allowed value is 0.05.
 
 =back
 

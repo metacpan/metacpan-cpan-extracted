@@ -2,7 +2,7 @@ package MVC::Neaf::X::Form::Data;
 
 use strict;
 use warnings;
-our $VERSION = 0.1901;
+our $VERSION = 0.2202;
 
 =head1 NAME
 
@@ -29,6 +29,36 @@ use Digest::SHA qw(sha1_base64);
 use URI::Escape;
 
 use parent qw(MVC::Neaf::X);
+
+=head2 new( %options )
+
+%options may include:
+
+=over
+
+=item * data  - data that passed validation
+
+=item * error - fields that failed validation  with correspondent error messages.
+
+=item * raw   - data as it was before validation.
+This should in theory match data + error, but isn't check in any way.
+
+=back
+
+=cut
+
+=head2 fields()
+
+Return fields currently in either data or raw hashes.
+
+=cut
+
+sub fields {
+    my $self = shift;
+
+    my %megahash = (%{ $self->raw }, %{ $self->data });
+    return keys %megahash;
+};
 
 =head2 is_valid()
 
@@ -170,5 +200,19 @@ sub _default_sign {
     my ($data, $key) = @_;
     return sha1_base64( join "?", $key, $data, $key );
 };
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is part of the L<MVC::Neaf> suite.
+
+Copyright 2016-2017 Konstantin S. Uvarin.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
 
 1;

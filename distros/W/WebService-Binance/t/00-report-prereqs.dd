@@ -26,6 +26,7 @@ do { my $x = {
                                       'MooseX::Log::Log4perl' => '0',
                                       'MooseX::Params::Validate' => '0',
                                       'Try::Tiny' => '0',
+                                      'URL::Encode' => '0',
                                       'YAML' => '0'
                                     }
                     },

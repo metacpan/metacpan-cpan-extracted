@@ -24,7 +24,13 @@
   #define SvREFCNT_inc_NN(sv) SvREFCNT_inc (sv)
 #endif
 
-static pthread_key_t current_key;
+#define RECURSION_CHECK 0
+
+static X_TLS_DECLARE(current_key);
+#if RECURSION_CHECK
+static X_TLS_DECLARE(check_key);
+#endif
+
 
 static s_epipe ep;
 static void *perl_thx;
@@ -38,23 +44,11 @@ struct tctx
 {
   void *coro;
   int wait_f;
-  xcond_t wait_c;
+  xcond_t acquire_c;
+  int jeret;
 };
 
 static struct tctx *tctx_free;
-
-static int idle;
-static int min_idle = 1;
-
-static xmutex_t perl_m = X_MUTEX_INIT;
-static xcond_t perl_c = X_COND_INIT;
-static struct tctx *perl_f;
-
-static xmutex_t wait_m = X_MUTEX_INIT;
-
-static int wakeup_f;
-static struct tctx **waiters;
-static int waiters_count, waiters_max;
 
 static struct tctx *
 tctx_get (void)
@@ -64,7 +58,7 @@ tctx_get (void)
   if (!tctx_free)
     {
       ctx = malloc (sizeof (*tctx_free));
-      X_COND_CREATE (ctx->wait_c);
+      X_COND_CREATE (ctx->acquire_c);
     }
   else
     {
@@ -82,51 +76,90 @@ tctx_put (struct tctx *ctx)
   tctx_free = ctx;
 }
 
+/* a stack of tctxs */
+struct tctxs
+{
+  struct tctx **ctxs;
+  int cur, max;
+};
+
+static struct tctx *
+tctxs_get (struct tctxs *ctxs)
+{
+  return ctxs->ctxs[--ctxs->cur];
+}
+
+static void
+tctxs_put (struct tctxs *ctxs, struct tctx *ctx)
+{
+  if (ctxs->cur >= ctxs->max)
+    {
+      ctxs->max = ctxs->max ? ctxs->max * 2 : 16;
+      ctxs->ctxs = realloc (ctxs->ctxs, ctxs->max * sizeof (ctxs->ctxs[0]));
+    }
+
+  ctxs->ctxs[ctxs->cur++] = ctx;
+}
+
+static xmutex_t release_m = X_MUTEX_INIT;
+static xcond_t release_c = X_COND_INIT;
+static struct tctxs releasers;
+static int idle;
+static int min_idle = 1;
+static int curthreads, max_threads = 1; /* protected by release_m */
+
+static xmutex_t acquire_m = X_MUTEX_INIT;
+static struct tctxs acquirers;
+
 X_THREAD_PROC(thread_proc)
 {
   PERL_SET_CONTEXT (perl_thx);
 
   {
     dTHX; /* inefficient, we already have perl_thx, but I see no better way */
+    dJMPENV;
     struct tctx *ctx;
+    int catchret;
 
-    X_LOCK (perl_m);
+    X_LOCK (release_m);
 
     for (;;)
       {
-        while (!perl_f)
+        while (!releasers.cur)
           if (idle <= min_idle || 1)
-            X_COND_WAIT (perl_c, perl_m);
+            X_COND_WAIT (release_c, release_m);
           else
             {
               struct timespec ts = { time (0) + idle - min_idle, 0 };
 
-              if (X_COND_TIMEDWAIT (perl_c, perl_m, ts) == ETIMEDOUT)
-                if (idle > min_idle && !perl_f)
+              if (X_COND_TIMEDWAIT (release_c, release_m, ts) == ETIMEDOUT)
+                if (idle > min_idle && !releasers.cur)
                   break;
             }
 
-        ctx = perl_f;
-        perl_f = 0;
+        ctx = tctxs_get (&releasers);
         --idle;
-        X_UNLOCK (perl_m);
+        X_UNLOCK (release_m);
 
         if (!ctx) /* timed out? */
           break;
 
         pthread_sigmask (SIG_SETMASK, &cursigset, 0);
+        JMPENV_PUSH (ctx->jeret);
 
-        while (ctx->coro)
-          CORO_SCHEDULE;
+        if (!ctx->jeret)
+          while (ctx->coro)
+            CORO_SCHEDULE;
 
+        JMPENV_POP;
         pthread_sigmask (SIG_SETMASK, &fullsigset, &cursigset);
 
-        X_LOCK (wait_m);
+        X_LOCK (acquire_m);
         ctx->wait_f = 1;
-        X_COND_SIGNAL (ctx->wait_c);
-        X_UNLOCK (wait_m);
+        X_COND_SIGNAL (ctx->acquire_c);
+        X_UNLOCK (acquire_m);
 
-        X_LOCK (perl_m);
+        X_LOCK (release_m);
         ++idle;
       }
   }
@@ -137,6 +170,10 @@ start_thread (void)
 {
   xthread_t tid;
 
+  if (curthreads >= max_threads && 0)
+    return;
+
+  ++curthreads;
   ++idle;
   xthread_create (&tid, thread_proc, 0);
 }
@@ -144,9 +181,16 @@ start_thread (void)
 static void
 pmapi_release (void)
 {
-  if (!(thread_enable ? thread_enable & 1 : global_enable))
+  #if RECURSION_CHECK
+  if (X_TLS_GET (check_key))
+    croak ("perlinterp_release () called without valid perl context");
+
+  X_TLS_SET (check_key, &check_key);
+  #endif
+
+  if (! ((thread_enable ? thread_enable : global_enable) & 1))
     {
-      pthread_setspecific (current_key, 0);
+      X_TLS_SET (current_key, 0);
       return;
     }
 
@@ -154,45 +198,57 @@ pmapi_release (void)
   ctx->coro = SvREFCNT_inc_NN (CORO_CURRENT);
   ctx->wait_f = 0;
 
-  pthread_setspecific (current_key, ctx);
+  X_TLS_SET (current_key, ctx);
   pthread_sigmask (SIG_SETMASK, &fullsigset, &cursigset);
 
-  X_LOCK (perl_m);
+  X_LOCK (release_m);
 
   if (idle <= min_idle)
     start_thread ();
 
-  perl_f = ctx;
-  X_COND_SIGNAL (perl_c);
+  tctxs_put (&releasers, ctx);
+  X_COND_SIGNAL (release_c);
 
-  X_UNLOCK (perl_m);
+  while (!idle && releasers.cur)
+    {
+      X_UNLOCK (release_m);
+      X_LOCK (release_m);
+    }
+
+  X_UNLOCK (release_m);
 }
 
 static void
 pmapi_acquire (void)
 {
-  struct tctx *ctx = pthread_getspecific (current_key);
+  int jeret;
+  struct tctx *ctx = X_TLS_GET (current_key);
+
+  #if RECURSION_CHECK
+  if (X_TLS_GET (check_key) != &check_key)
+    croak ("perlinterp_acquire () called with valid perl context");
+
+  X_TLS_SET (check_key, 0);
+  #endif
 
   if (!ctx)
     return;
 
-  X_LOCK (wait_m);
+  X_LOCK (acquire_m);
 
-  if (waiters_count >= waiters_max)
-    {
-      waiters_max = waiters_max ? waiters_max * 2 : 16;
-      waiters = realloc (waiters, waiters_max * sizeof (*waiters));
-    }
-
-  waiters [waiters_count++] = ctx;
+  tctxs_put (&acquirers, ctx);
 
   s_epipe_signal (&ep);
   while (!ctx->wait_f)
-    X_COND_WAIT (ctx->wait_c, wait_m);
-  X_UNLOCK (wait_m);
+    X_COND_WAIT (ctx->acquire_c, acquire_m);
+  X_UNLOCK (acquire_m);
 
+  jeret = ctx->jeret;
   tctx_put (ctx);
   pthread_sigmask (SIG_SETMASK, &cursigset, 0);
+
+  if (jeret)
+    JMPENV_JUMP (jeret);
 }
 
 static void
@@ -207,11 +263,14 @@ PROTOTYPES: DISABLE
 
 BOOT:
 {
-	#ifndef _WIN32
+#ifndef _WIN32
 	sigfillset (&fullsigset);
-	#endif
+#endif
 
-        pthread_key_create (&current_key, 0);
+        X_TLS_INIT (current_key);
+#if RECURSION_CHECK
+        X_TLS_INIT (check_key);
+#endif
 
         if (s_epipe_new (&ep))
           croak ("Coro::Multicore: unable to initialise event pipe.\n");
@@ -220,14 +279,13 @@ BOOT:
 
 	I_CORO_API ("Coro::Multicore");
 
-        X_LOCK (perl_m);
+        X_LOCK (release_m);
         while (idle < min_idle)
           start_thread ();
-        start_thread ();//D
-        X_UNLOCK (perl_m);
+        X_UNLOCK (release_m);
 
-        /* not perfectly efficient to do it this way, but it's simple */
-	perl_multicore_init ();
+        /* not perfectly efficient to do it this way, but it is simple */
+	perl_multicore_init (); /* calls release */
         perl_multicore_api->pmapi_release = pmapi_release;
         perl_multicore_api->pmapi_acquire = pmapi_acquire;
 }
@@ -258,11 +316,11 @@ scoped_disable ()
 U32
 min_idle_threads (U32 min = NO_INIT)
 	CODE:
-        X_LOCK (wait_m);
+        X_LOCK (acquire_m);
         RETVAL = min_idle;
         if (items)
 	  min_idle = min;
-        X_UNLOCK (wait_m);
+        X_UNLOCK (acquire_m);
         OUTPUT:
         RETVAL
 	
@@ -278,15 +336,15 @@ void
 poll (...)
 	CODE:
         s_epipe_drain (&ep);
-	X_LOCK (wait_m);
-        while (waiters_count)
+	X_LOCK (acquire_m);
+        while (acquirers.cur)
           {
-            struct tctx *ctx = waiters [--waiters_count];
+            struct tctx *ctx = tctxs_get (&acquirers);
             CORO_READY ((SV *)ctx->coro);
             SvREFCNT_dec_NN ((SV *)ctx->coro);
             ctx->coro = 0;
           }
-	X_UNLOCK (wait_m);
+	X_UNLOCK (acquire_m);
 
 void
 sleep (NV seconds)

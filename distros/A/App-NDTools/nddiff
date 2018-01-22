@@ -1,0 +1,128 @@
+#!/usr/bin/env perl
+
+use App::NDTools::NDDiff;
+
+my $nddiff = App::NDTools::NDDiff->new();
+$nddiff->exec();
+
+__END__
+
+=head1 NAME
+
+nddiff - diff tool for nested data structures
+
+=head1 SYNOPSIS
+
+    nddiff [OPTIONS] <file1> <file2>
+
+=head1 DESCRIPTION
+
+Diff for nested data structures with human friendly (colored)
+and machine-readable (JSON) output format.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--brief>
+
+Show where differences has happend, but don't show what exactly changed.
+
+=item B<--[no]colors>
+
+On/Off colors for diff.
+
+=item B<--ctx-text> [int]
+
+Amount of lines for multiline values context. Default is 3.
+
+=item B<--full>
+
+Don't suppresss common items in JSON mode.
+
+=item B<--full-headers>
+
+Print full headers (delta printed by default).
+
+=item B<--grep> E<lt>pathE<gt>
+
+Grep substructures to diff. See path syntax description at
+L<https://metacpan.org/pod/Struct::Path::PerlStyle>
+
+=item B<--help|-h>
+
+Print a help message and exit.
+
+=item B<--ifmt> E<lt>JSON|YAMLE<gt>
+
+Force specified input format usage. Automatically choosed (using file
+extension) if omitted.
+
+=item B<--ignore> E<lt>pathE<gt>
+
+Ignore substructure. May be used several times.
+
+=item B<--json>
+
+Use JSON as output diff format.
+
+=item B<--[no]pretty>
+
+On/Off pretty-print for JSON. Enabled by default.
+
+=item B<--quiet|-q>
+
+Don't show diff, only exit code shows exists diff or not.
+
+=item B<--rules>
+
+Dump diff in nsproc-rules format.
+
+=item B<--show>
+
+Visualize diff (JSON formatted diff file must be provided as argument).
+
+=item B<--verbose|-v> [int]
+
+Increase verbosity, max level - 4.
+
+=item B<--version|-V>
+
+Print version and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Human-friendly diff:
+
+    nddiff a.json b.json
+
+Machine-readable diff:
+
+    nddiff --json a.json b.json
+
+=head1 EXIT STATUS
+
+ 0   No errors, no diff.
+ 1   Generic error code.
+ 2   I/O Error.
+ 4   Path related errors.
+ 8   Diff exists.
+
+=head1 BUGS
+
+Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
+
+=head1 SEE ALSO
+
+L<diff(1)>, L<sdiff(1)>
+
+L<ndpatch(1)>, L<ndproc(1)>, L<ndquery(1)>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016,2017 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of GNU General Public License 3 or later versions.

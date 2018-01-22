@@ -113,6 +113,18 @@ files, C<crontab> files, and user profile files.
 
 =cut
 
+my %cron_entry = (
+    'process-reports' => {
+        user => 'cpantesters',
+        minute => '*/10',
+        hour => '*',
+        day_of_month => '*',
+        month => '*',
+        day_of_week => '*',
+        command => 'beam run report process >>$HOME/var/log/report/process.log 2>&1',
+    },
+);
+
 task deploy_config =>
     group => 'backend',
     sub {
@@ -138,29 +150,43 @@ task deploy_config =>
         cron env => 'cpantesters' => add => {
             BEAM_PATH => '/home/cpantesters/etc/container',
         };
-        cron_entry 'process-reports',
-            user => 'cpantesters',
-            minute => '*/10',
-            hour => '*',
-            day_of_month => '*',
-            month => '*',
-            day_of_week => '*',
-            ensure => 'present',
-            command => 'beam run report process >>$HOME/var/log/report/process.log 2>&1',
-            ;
+        for my $key ( keys %cron_entry ) {
+            cron_entry $key, %{ $cron_entry{ $key } }, ensure => 'present';
+        }
 
         Rex::Logger::info( 'Ensuring user profile is correct' );
-        file '~/var/db', ensure => 'directory';
         for my $file ( qw( .profile .bash_profile ) ) {
             append_if_no_such_line '/home/cpantesters/' . $file,
                 'export BEAM_PATH=$HOME/etc/container';
-            delete_lines_according_to qr{^export BEAM_MINION=}, "/home/cpantesters/" . $file;
             append_if_no_such_line '/home/cpantesters/' . $file,
                 'export BEAM_MINION="mysql+dsn+dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application"';
         }
 
         Rex::Logger::info( 'Restarting services' );
         run 'sv restart ~/service/minion';
+    };
+
+=head2 disable
+
+    rex -E vm disable
+
+Disable the backend processes and cron entries to decommission a backend server.
+
+=cut
+
+task disable =>
+    group => 'backend',
+    sub {
+        Rex::Logger::info( 'Stopping services' );
+        run 'sv stop ./service/minion';
+
+        Rex::Logger::info( 'Removing service files' );
+        file '~/service/minion', ensure => 'absent';
+
+        Rex::Logger::info( 'Removing cron entries' );
+        for my $key ( keys %cron_entry ) {
+            cron_entry $key, %{ $cron_entry{ $key } }, ensure => 'absent';
+        }
     };
 
 #######################################################################

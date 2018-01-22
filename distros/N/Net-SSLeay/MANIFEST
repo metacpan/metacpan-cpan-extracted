@@ -68,6 +68,7 @@ t/data/test_CA1.key.der
 t/data/test_CA1.key.pem
 t/data/testcert_extended.crt.pem
 t/data/testcert_extended.crt.pem_dump
+t/data/testcert_key_2048.pem
 t/data/testcert_simple.crt.der
 t/data/testcert_simple.crt.pem
 t/data/testcert_simple.crt.pem_dump
@@ -75,6 +76,8 @@ t/data/testcert_strange.crt.pem
 t/data/testcert_strange.crt.pem_dump
 t/data/testcert_cdp.crt.pem
 t/data/testcert_cdp.crt.pem_dump
+t/data/testcert_wildcard.conf
+t/data/testcert_wildcard.crt.pem
 t/data/testreq1.der
 t/data/testreq1.pem
 t/data/verisign.crl.der
@@ -94,6 +97,7 @@ t/local/05_passwd_cb.t
 t/local/06_tcpecho.t
 t/local/07_sslecho.t
 t/local/08_pipe.t
+t/local/09_ctx_new.t
 t/local/15_bio.t
 t/local/20_autoload.t
 t/local/21_constants.t
