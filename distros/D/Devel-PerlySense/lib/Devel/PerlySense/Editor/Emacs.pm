@@ -16,7 +16,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Editor::Emacs;
-$Devel::PerlySense::Editor::Emacs::VERSION = '0.0218';
+$Devel::PerlySense::Editor::Emacs::VERSION = '0.0219';
 use base "Devel::PerlySense::Editor";
 
 

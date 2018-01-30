@@ -12,8 +12,12 @@ with 'Catmandu::Fix::SimpleGetValue';
 sub emit_value {
   my ($self, $var) = @_;
 
-  "${var} = Business::ISBN->new(${var})->as_isbn10->as_string if is_value(${var}) && length(${var});";
-
+  qq|
+if (is_value(${var}) && length(${var})) {
+  my \$isbn10 = Business::ISBN->new(${var})->as_isbn10;
+  ${var} = \$isbn10 ? \$isbn10->as_string : '';
+}
+|;
 }
 
 =head1 NAME

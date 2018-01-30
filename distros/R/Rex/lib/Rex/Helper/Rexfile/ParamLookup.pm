@@ -9,7 +9,7 @@ package Rex::Helper::Rexfile::ParamLookup;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Devel::Caller;
 use Data::Dumper;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::AbstractProvider;
-$Footprintless::Plugin::Database::AbstractProvider::VERSION = '1.04';
+$Footprintless::Plugin::Database::AbstractProvider::VERSION = '1.05';
 # ABSTRACT: A base class for database providers
 # PODNAME: Footprintless::Plugin::Database::AbstractProvider
 
@@ -372,7 +372,7 @@ Footprintless::Plugin::Database::AbstractProvider - A base class for database pr
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

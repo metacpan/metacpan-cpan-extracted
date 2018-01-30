@@ -43,7 +43,7 @@
   <TMPL_IF NAME="DISPLAY_RESETPASSWORD">
     <tr><td colspan="2">
       <div class="buttons">
-        <a class="positive" tabindex="5" href="<TMPL_VAR NAME="MAIL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF>">
+<a class="positive" tabindex="5" href="<TMPL_VAR NAME="MAIL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
           <img src="<TMPL_VAR NAME="SKIN_PATH">/common/email.png" alt="" />
           <lang en="Reset my password" fr="R&eacute;initialiser mon mot de passe"/>
         </a>
@@ -54,7 +54,7 @@
   <TMPL_IF NAME="DISPLAY_REGISTER">
     <tr><td colspan="2">
       <div class="buttons">
-        <a class="positive" tabindex="6" href="<TMPL_VAR NAME="REGISTER_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF>">
+        <a class="positive" tabindex="6" href="<TMPL_VAR NAME="REGISTER_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
           <img src="<TMPL_VAR NAME="SKIN_PATH">/common/vcard_edit.png" alt="" />
           <lang en="Create an account" fr="Cr&eacute;er un compte"/>
         </a>

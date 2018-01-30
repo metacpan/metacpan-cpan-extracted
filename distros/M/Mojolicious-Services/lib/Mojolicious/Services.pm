@@ -5,7 +5,7 @@ use Mojo::Loader qw/find_modules load_class/;
 use Mojo::Util qw/camelize decamelize/;
 use Scalar::Util;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.2';
 
 has services => sub{{}};
 has namespaces=>sub{["Mojolicious::Service"]};
@@ -93,12 +93,6 @@ sub _load {
 =head1 NAME
 
 Mojolicious::Services - Mojolicious::Services 是为Mojolicious框架提供的Service管理插件。
-
-
-=head1 VERSION
-
-Version 0.01
-
 
 =head1 SYNOPSIS
 

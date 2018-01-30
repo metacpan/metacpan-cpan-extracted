@@ -1,12 +1,25 @@
+=== README for Geo-Point version 0.97
+=   Generated on Tue Jan 23 19:44:55 2018 by OODoc 2.02
 
-Geo::Point
-===========
+There are various ways to install this module:
 
-Geo::Point tries to abstract coordinate systems.  It does not try
-to solve all the problems itself, but will call-out for helper
-modules when computation has to be done.
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
 
-The module is heavily resting on Math::Polygon.
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
 
-Improvements and additions please to
-       Mark Overmeer, <perl@overmeer.net>
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Geo-Point-0.97.tar.gz
+       tar -xf Geo-Point-0.97.tar
+       cd Geo-Point-0.97
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Geo-Point-0.97/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Geo-Point
+

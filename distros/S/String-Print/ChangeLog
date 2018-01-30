@@ -1,6 +1,12 @@
 
 ========== version history of String::Print
 
+version 0.93:
+
+	Improvements:
+	- convert to GIT
+	- publish via GitHUB
+
 version 0.92: Thu  6 Jul 12:31:36 CEST 2017
 
 	Fixes:

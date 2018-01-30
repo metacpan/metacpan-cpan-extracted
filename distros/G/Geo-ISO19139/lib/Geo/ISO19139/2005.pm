@@ -1,15 +1,19 @@
-# Copyrights 2008 by Mark Overmeer.
+# Copyrights 2008,2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.05.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo::ISO19139.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Geo::ISO19139::2005;
 use vars '$VERSION';
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use base 'Geo::GML';
+
+use warnings;
+use strict;
 
 use Geo::ISO19139::Util qw/:2005/;
 
@@ -40,6 +44,8 @@ sub init($)
     $self->importDefinitions(\@xsd);
     $self;
 }
+
+#-------------
 
 
 sub gmlVersion() {shift->SUPER::version}

@@ -39,6 +39,19 @@ sub prepare {
 
     my @instances = Test::mysqld->start_mysqlds($self->jobs, my_cnf => $self->my_cnf);
     $self->instances( \@instances );
+
+    my $orig = $SIG{INT};
+    $SIG{INT} = sub {
+        Test::mysqld->stop_mysqlds(grep {defined($_)} @instances);
+        $self->instances([]) if $self;
+        if ($orig) {
+            $orig->();
+        } else {
+            $SIG{INT} = 'DEFAULT';
+            kill INT => $$;
+        }
+    };
+
     if ($self->preparer) {
         $self->preparer->($_) for @instances;
     }
@@ -105,7 +118,7 @@ sub _pid_lives {
 
 sub DESTROY {
     my $self = shift;
-    Test::mysqld->stop_mysqlds(@{$self->instances})
+    Test::mysqld->stop_mysqlds(grep { defined($_) } @{$self->instances})
             if $self->instances && $$ == $self->_owner_pid;
 }
 

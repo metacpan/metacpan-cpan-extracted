@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root xml:lang="fr-CA" rootAttribute="rootAttributeValue">
+	<FirstRoot firstRootAttribute1="fra1" firstRootAttribute2="fra2" unknown="This is ignored">
+		<URL>https://example.com/</URL>
+		<Bizarre>41</Bizarre>
+		<Unsupported>This is ignored</Unsupported>
+	</FirstRoot>
+	<Metas>
+		<Meta name="email" value="foo1@example.com"/>
+		<Meta name="email" value="foo2@example.com"/>
+		<Meta name="email" value="foo3@example.com"/>
+		<Attribute type="color">Blue</Attribute>
+		<Attribute type="size">Small</Attribute>
+	</Metas>
+	<Depth>
+		<Base>
+			<Sub kind="foo">
+				<SubOne>TestSubOne1</SubOne>
+				<SubTwo>TestSubTwo1</SubTwo>
+			</Sub>
+			<Sub kind="bar">
+				<SubOne>TestSubOne2</SubOne>
+				<SubTwo>TestSubTwo2</SubTwo>
+			</Sub>
+		</Base>
+	</Depth>
+	<Shallow><Inside name="value"/></Shallow>
+	<ShallowIsh>
+		<Inside name="value">inside text</Inside>
+		<!-- This comment will be ignored -->
+		This is an example sentence.
+	</ShallowIsh>
+</Root>

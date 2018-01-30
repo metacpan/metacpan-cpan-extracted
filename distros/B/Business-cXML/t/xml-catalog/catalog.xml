@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+	<system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/cXML.dtd"              uri="cXML-1.2.036/cXML.dtd"/>
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Logistics.dtd"         uri="cXML-1.2.036/Logistics.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Contract.dtd"          uri="cXML-1.2.036/Contract.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Catalog.dtd"           uri="cXML-1.2.036/Catalog.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Quote.dtd"             uri="cXML-1.2.036/Quote.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Private.dtd"           uri="cXML-1.2.036/Private.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/PaymentRemittance.dtd" uri="cXML-1.2.036/PaymentRemittance.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/Fulfill.dtd"           uri="cXML-1.2.036/Fulfill.dtd"/ -->
+	<!-- system systemId="http://xml.cxml.org/schemas/cXML/1.2.036/InvoiceDetail.dtd"     uri="cXML-1.2.036/InvoiceDetail.dtd"/ -->
+</catalog>

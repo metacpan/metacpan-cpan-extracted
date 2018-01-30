@@ -9,7 +9,7 @@ package Rex::Interface::Exec::Local;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands;
@@ -120,7 +120,7 @@ sub _exec {
   my ( $pid, $writer, $reader, $error, $out, $err );
   $error = gensym;
 
-  if ( Rex::Config->get_no_tty ) {
+  if ( $^O !~ m/^MSWin/ && Rex::Config->get_no_tty ) {
     $pid = open3( $writer, $reader, $error, $cmd );
 
     ( $out, $err ) = $self->io_read( $reader, $error, $pid, $option );

@@ -1,0 +1,56 @@
+{
+   "abstract" : "process .elm files",
+   "author" : [
+      "Sandeep Chayapathi <sandeep@themighty.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-AssetPack-Pipe-ElmLang",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/csandeep/mojolicious-plugin-assetpack-pipe-elmlang/issues"
+      },
+      "homepage" : "https://github.com/csandeep/mojolicious-plugin-assetpack-pipe-elmlang",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/csandeep/mojolicious-plugin-assetpack-pipe-elmlang.git",
+         "web" : "https://github.com/csandeep/mojolicious-plugin-assetpack-pipe-elmlang"
+      }
+   },
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,4 +24,5 @@ resources:
   bugtracker: http://github.com/reneeb/Test-CheckManifest/issues
   homepage: http://github.com/reneeb/Test-CheckManifest
   repository: http://github.com/reneeb/Test-CheckManifest.git
-version: '1.31'
+version: '1.33'
+x_serialization_backend: 'YAML::Tiny version 1.69'

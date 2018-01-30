@@ -8,6 +8,11 @@ Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
 Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
+1.06	2018-01-27	Add each_map method.
+
+ - Added: Add each_map method
+ - Added: Check for Iri in scrubber
+
 1.04	2017-07-08	Append a hash to only to XSD URIs.
 
  [ Bug Fixes ]

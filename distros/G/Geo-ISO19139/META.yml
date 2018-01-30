@@ -1,20 +1,31 @@
---- #YAML:1.0
-name:                Geo-ISO19139
-version:             0.10
-abstract:            Geography metadata standard
-license:             perl
-author:              
-    - Mark Overmeer
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Geo::GML:                      0.12
-    Log::Report:                   0.19
-    Test::More:                    0.54
-    Test::Pod:                     1.00
-    XML::Compile:                  0.84
-    XML::Compile::Cache:           0.10
-    XML::Compile::Tester:          0.02
+---
+abstract: 'Geography metadata standard'
+author:
+  - 'Mark Overmeer'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-ISO19139
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Geo::GML: '0.18'
+  Log::Report: '0.19'
+  Test::More: '0.54'
+  XML::Compile: '0.84'
+  XML::Compile::Cache: '0.1'
+  XML::Compile::Tester: '0.02'
+resources:
+  repository: https://github.com/markov2/perl5-Geo-ISO19139.git
+version: '0.11'
+x_homepage: http://perl.overmeer.net/CPAN/
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

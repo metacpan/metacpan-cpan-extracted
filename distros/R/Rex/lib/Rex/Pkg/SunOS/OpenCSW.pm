@@ -9,7 +9,7 @@ package Rex::Pkg::SunOS::OpenCSW;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Commands::File;
 use Rex::Pkg::SunOS;

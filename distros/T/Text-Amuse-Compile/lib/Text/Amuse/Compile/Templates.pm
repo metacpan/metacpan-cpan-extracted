@@ -587,7 +587,11 @@ sub minimal_html {
   </head>
   <body>
     <div id="page">
-      [% text %]
+      <div id="thework">
+<!-- start body -->
+[% text %]
+<!-- end body -->
+      </div>
     </div>
   </body>
 </html>

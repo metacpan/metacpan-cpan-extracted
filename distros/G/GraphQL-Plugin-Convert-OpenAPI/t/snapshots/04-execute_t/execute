@@ -1,0 +1,12 @@
+{
+  'data' => {
+    'getPetById' => {
+      'category' => {
+        'id' => 0,
+        'name' => ''
+      },
+      'name' => 'asd',
+      'photoUrls' => []
+    }
+  }
+}

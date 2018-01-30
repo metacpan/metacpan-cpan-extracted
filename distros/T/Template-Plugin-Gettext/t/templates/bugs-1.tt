@@ -1,0 +1,8 @@
+[% USE gtx = Gettext %]
+
+[% "no parentheses around filter" | gettext %]
+[% "no parentheses around filter and filter following" | gettext | html %]
+
+The next one is debatable.  The translation can never be a reference, and
+therefore a translation cannot possibly be displayed in this case.
+[% "no parentheses around filter and dot following" | gettext.something %]

@@ -1,6 +1,7 @@
 use strict;
 use lib 't/lib';
 use MiniTest tests => 3;
+use Test::Scope::Guard;
 BEGIN {
   require B;
   B::minus_c();

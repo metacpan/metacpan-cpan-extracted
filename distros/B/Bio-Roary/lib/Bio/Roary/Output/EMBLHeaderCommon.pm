@@ -1,5 +1,5 @@
 package Bio::Roary::Output::EMBLHeaderCommon;
-$Bio::Roary::Output::EMBLHeaderCommon::VERSION = '3.11.3';
+$Bio::Roary::Output::EMBLHeaderCommon::VERSION = '3.12.0';
 # ABSTRACT: a role containing some common methods for embl header files
 
 
@@ -46,7 +46,7 @@ Bio::Roary::Output::EMBLHeaderCommon - a role containing some common methods for
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

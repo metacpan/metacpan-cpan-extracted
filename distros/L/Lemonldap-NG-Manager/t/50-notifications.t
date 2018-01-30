@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-#
 # Test notifications explorer API
 
 use Test::More;

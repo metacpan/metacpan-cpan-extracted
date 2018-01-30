@@ -1,15 +1,18 @@
-# Copyrights 2005-2014 by [Mark Overmeer].
+# Copyrights 2005-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-
-use strict;
-use warnings;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo-Point.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Geo::Shape;
 use vars '$VERSION';
-$VERSION = '0.96';
+$VERSION = '0.97';
 
+
+use strict;
+use warnings;
 
 use Geo::Proj;      # defines wgs84
 use Geo::Point      ();
@@ -27,7 +30,11 @@ use overload '""'     => 'string'
            , fallback => 1;
 
 
-sub new(@) { my $class = shift; (bless {}, $class)->init( {@_} ) }
+sub new(@) {
+    my ($thing, %args) = @_;
+    $args{proj} ||= $thing->proj if ref $thing;
+	(bless {}, ref $thing || $thing)->init(\%args);
+}
 
 sub init($)
 {   my ($self, $args) = @_;

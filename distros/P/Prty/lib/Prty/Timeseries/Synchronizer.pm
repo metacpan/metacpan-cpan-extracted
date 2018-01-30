@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Option;
 use Prty::Array;
@@ -167,7 +167,7 @@ sub new {
     if ($window) {
         if ($window > $interval/2) {
             $class->throw(
-                q{TSYNC-00099: Windowbreite groesser Intervallbreite},
+                q~TSYNC-00099: Windowbreite groesser Intervallbreite~,
                 WindowWidth=>$window,
                 IntervalWidth=>$interval,
             );
@@ -260,7 +260,7 @@ sub add {
 
         if (!$paramHash->{$param}) {
             $self->throw(
-                q{TSYNC-00099: Unbekannter Parameter},
+                q~TSYNC-00099: Unbekannter Parameter~,
                 Parameter=>$param,
             );
         }
@@ -452,7 +452,7 @@ sub rows {
 
         unless ($paramHash->{$param}) {
             $self->throw(
-                q{TSYNC-00099: Unbekannter Parameter},
+                q~TSYNC-00099: Unbekannter Parameter~,
                 Parameter=>$param,
             );
         }
@@ -503,7 +503,7 @@ sub rows {
             }
             else {
                 $self->throw(
-                    q{TSYNC-00099: Unbekannte Parameter-Option},
+                    q~TSYNC-00099: Unbekannte Parameter-Option~,
                     Option=>$opt,
                 );
             }
@@ -588,7 +588,7 @@ sub rows {
                 }
                 else {
                     $self->throw(
-                        q{TSYNC-00099: Unbekannte Parameter-Option},
+                        q~TSYNC-00099: Unbekannte Parameter-Option~,
                         Option=>$opt,
                     );
                 }
@@ -610,7 +610,7 @@ sub rows {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -618,7 +618,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

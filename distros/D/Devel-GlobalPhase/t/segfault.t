@@ -11,7 +11,7 @@ for my $layers ( 0, 3 ) {
     or die "can't run t/segfault.pl: $!";
 
   my $out = do { local $/; <$stdout> };
-  $out =~ s/\n+\z//;
+  $out =~ s/[\r\n]+\z//;
   waitpid $pid, 0;
   my $signal = $? & 255;
   my $exit = $? >> 8;

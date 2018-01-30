@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use POSIX ":sys_wait_h";
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 sub new {
   my $that  = shift;

@@ -28,7 +28,7 @@ provides:
     file: lib/Test2/Compare/JSON.pm
   Test2::Tools::JSON:
     file: lib/Test2/Tools/JSON.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   JSON::MaybeXS: '0'
   Test2: '0'
@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/akiym/Test2-Tools-JSON/issues
   homepage: https://github.com/akiym/Test2-Tools-JSON
   repository: git://github.com/akiym/Test2-Tools-JSON.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:AKIYM
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

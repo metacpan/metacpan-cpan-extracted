@@ -3,6 +3,7 @@ AnyEvent::PgRecvlogical
 
 [![Build Status](https://travis-ci.org/mydimension/AnyEvent-PgRecvlogical.svg?branch=master)](https://travis-ci.org/mydimension/AnyEvent-PgRecvlogical)
 [![Coverage Status](https://coveralls.io/repos/github/mydimension/AnyEvent-PgRecvlogical/badge.svg?branch=master)](https://coveralls.io/github/mydimension/AnyEvent-PgRecvlogical?branch=master)
+[![CPAN version](https://badge.fury.io/pl/AnyEvent-PgRecvlogical.svg)](https://badge.fury.io/pl/AnyEvent-PgRecvlogical)
 
 `AnyEvent::PgRecvlogical` provides perl bindings of similar functionality to that of
 [`pg_recvlogical`](https://www.postgresql.org/docs/current/static/app-pgrecvlogical.html).

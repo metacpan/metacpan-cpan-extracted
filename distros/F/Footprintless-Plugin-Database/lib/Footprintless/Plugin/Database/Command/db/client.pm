@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::Command::db::client;
-$Footprintless::Plugin::Database::Command::db::client::VERSION = '1.04';
+$Footprintless::Plugin::Database::Command::db::client::VERSION = '1.05';
 # ABSTRACT: start a command line client
 # PODNAME: Footprintless::Plugin::Database::Command::db::client
 
@@ -52,7 +52,7 @@ Footprintless::Plugin::Database::Command::db::client - start a command line clie
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

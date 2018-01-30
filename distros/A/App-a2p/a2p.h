@@ -13,21 +13,12 @@
 
 #include "config.h"
 
-#if defined(__STDC__) || defined(_AIX) || defined(__stdc__) || defined(__cplusplus)
-# define STANDARD_C 1
-#endif
-
 #ifdef WIN32
 #undef USE_STDIO_PTR		/* XXX fast gets won't work, must investigate */
-#  ifndef STANDARD_C
-#    define STANDARD_C
-#  endif
 #endif
 
 /* Use all the "standard" definitions? */
-#if defined(STANDARD_C) && defined(I_STDLIB)
-#   include <stdlib.h>
-#endif /* STANDARD_C */
+#include <stdlib.h>
 
 #include <stdio.h>
 
@@ -55,13 +46,6 @@
 #ifdef PERL_MEM_LOG
   typedef IVTYPE IV;
   typedef UVTYPE UV;
-#endif
-
-#ifndef STANDARD_C
-    Malloc_t malloc (MEM_SIZE nbytes);
-    Malloc_t calloc (MEM_SIZE elements, MEM_SIZE size);
-    Malloc_t realloc (Malloc_t where, MEM_SIZE nbytes);
-    Free_t   free (Malloc_t where);
 #endif
 
 #if defined(I_STRING) || defined(__cplusplus)
@@ -108,19 +92,6 @@
 #   include "vmsish.h"
 # endif
 #endif
-
-#ifndef STANDARD_C
-/* All of these are in stdlib.h or time.h for ANSI C */
-Time_t time();
-struct tm *gmtime(), *localtime();
-#if defined(OEMVS)
-char *(strchr)(), *(strrchr)();
-char *(strcpy)(), *(strcat)();
-#else
-char *strchr(), *strrchr();
-char *strcpy(), *strcat();
-#endif
-#endif /* ! STANDARD_C */
 
 #ifdef __cplusplus
 #  define PERL_EXPORT_C extern "C"

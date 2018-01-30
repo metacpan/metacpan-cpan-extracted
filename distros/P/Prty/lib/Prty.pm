@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 =encoding utf8
 
@@ -384,6 +384,18 @@ L<Prty::JavaScript> - Generierung von JavaScript-Code
 
 =item *
 
+L<Prty::LaTeX::Generator> - LaTeX-Generator
+
+=item *
+
+L<Prty::LineProcessor> - Verarbeite Datei als Array von Zeilen
+
+=item *
+
+L<Prty::LineProcessor::Line> - Zeile einer Datei
+
+=item *
+
 L<Prty::LockedCounter> - Persistenter Zähler mit Lock
 
 =item *
@@ -496,6 +508,10 @@ L<Prty::Sdoc::Line> - Zeile einer Sdoc-Quelldatei
 
 =item *
 
+L<Prty::Sdoc::Link> - Definition eines Link
+
+=item *
+
 L<Prty::Sdoc::List> - Liste
 
 =item *
@@ -596,14 +612,6 @@ L<Prty::Test::Class::Method> - Testmethode
 
 =item *
 
-L<Prty::TextFile> - Textdatei als Array von Zeilen
-
-=item *
-
-L<Prty::TextFile::Line> - Zeile einer Textdatei
-
-=item *
-
 L<Prty::Time> - Klasse zur Repräsentation von Datum und Uhrzeit
 
 =item *
@@ -666,7 +674,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -674,7 +682,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-#
 # Test if an UTF-8 char is well returned
 
 use Test::More;

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl implementation of cXML messaging",
+   "author" : [
+      "StÃ©phane Lavergne <https://github.com/vphantom/>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-cXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Pod::Coverage::CountParents" : "0",
+            "Test::Deep" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0",
+            "Test::Trap" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.20",
+            "Clone" : "0.31",
+            "DateTime" : "0.75",
+            "HTML::Entities" : "3.69",
+            "LWP::UserAgent" : "6.0",
+            "MIME::Base64" : "3.13",
+            "Scalar::Util" : "1.23",
+            "Sys::Hostname" : "1.16",
+            "XML::LibXML" : "2.0",
+            "XML::LibXML::Ferry" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.6.3"
+}

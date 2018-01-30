@@ -1,5 +1,11 @@
 Revision history for Crypt::SMIME
 
+0.23    Tue Jan 23 18:29:53 JST 2018
+        - Improve Makefile.PL (again) so it works on Windows too,
+          Suggested by Thomas Eckardt.
+        - README now has hints for installing the package on Windows,
+          Suggested by Thomas Eckardt.
+
 0.22    Mon Jan 22 13:07:10 JST 2018
         - Improve Makefile.PL so it works on Windows too, Suggested by
           Thomas Eckardt.

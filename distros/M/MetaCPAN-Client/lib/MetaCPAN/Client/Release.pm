@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.022000';
+$MetaCPAN::Client::Release::VERSION = '2.023000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -17,6 +17,7 @@ my %known_fields = (
         author
         authorized
         date
+        deprecated
         distribution
         download_url
         first
@@ -96,7 +97,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.022000
+version 2.023000
 
 =head1 SYNOPSIS
 
@@ -161,6 +162,10 @@ The release's version.
 =head2 version_numified
 
 The numified form of the release's version.
+
+=head2 deprecated
+
+The deprecated field value for this release.
 
 =head2 distribution
 

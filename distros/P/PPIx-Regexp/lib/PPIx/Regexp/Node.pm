@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{ FALSE MINIMUM_PERL NODE_UNKNOWN TRUE };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 
@@ -406,6 +406,20 @@ sub schildren {
     }
 }
 
+sub scontent {
+    my ( $self ) = @_;
+    # As of the invention of this method all nodes are significant, so
+    # the following statement is pure paranoia on my part. -- TRW
+    $self->significant()
+	or return;
+    # This needs to be elements(), not children() or schildren() -- or
+    # selements() if that is ever invented. Not children() or
+    # schildren() because those ignore the delimiters. Not selements()
+    # (if that ever comes to pass) because scontent() has to make the
+    # significance check, so selements() would be wasted effort.
+    return join( '', map{ $_->scontent() } $self->elements() );
+}
+
 sub tokens {
     my ( $self ) = @_;
     return ( map { $_->tokens() } $self->elements() );
@@ -476,7 +490,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2017 by Thomas R. Wyant, III
+Copyright (C) 2009-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

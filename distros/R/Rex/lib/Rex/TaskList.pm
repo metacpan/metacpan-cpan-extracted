@@ -9,7 +9,7 @@ package Rex::TaskList;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Data::Dumper;
 use Rex::Config;
@@ -56,9 +56,12 @@ sub run {
 
   my $task = ref $task_name ? $task_name : $class->get_task($task_name);
 
+  my $old_task = $class->{__current_task__};
   $class->{__current_task__} = $task;
 
   $_->($task) for @{ $task->{before_task_start} };
   $class->run( $task, %option );
   $_->($task) for @{ $task->{after_task_finished} };
+
+  $class->{__current_task__} = $old_task;
 }

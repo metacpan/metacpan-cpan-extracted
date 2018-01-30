@@ -1,16 +1,15 @@
 use ExtUtils::MakeMaker;
 
-use 5.008;
+use 5.010;
 
-my $version = '0.17';
+my $version = '0.18';
 
 my %prereq  =
-  ( XML::Compile         => '1.58'
+  ( XML::Compile         => '1.59'
   , XML::Compile::Cache  => '1.05'
-  , Log::Report          => '0.19'
+  , Log::Report          => '1.25'
  
   , Test::More           => '0.54'
-  , Test::Pod            => '1.00'
   );
 
 # Upgrade Geo::Point only if installed, to avoid difficult indirect
@@ -29,7 +28,7 @@ WriteMakefile
   , PREREQ_PM => \%prereq
   , EXE_FILES => []
   , AUTHOR    => 'Mark Overmeer'
-  , ABSTRACT  => 'Process Geography Markup Language'
+  , ABSTRACT  => 'process Geography Markup Language (GML)'
   , LICENSE   => 'perl'
   );
 
@@ -39,11 +38,10 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/geo-gml/raw
 DISTDIR         = ../public_html/geo-gml/source
-EXTENDS         = ../XMLCache:../XMLCompile
+EXTENDS         = ../../perl/XMLCache:../../perl/XMLCompile
 
 # for POD
 FIRST_YEAR      = 2008
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/geo/
-PODTAIL         = ../Geo-ogc-podtail
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 __POSTAMBLE

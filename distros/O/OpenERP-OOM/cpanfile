@@ -10,6 +10,7 @@ requires 'RPC::XML';
 requires 'DateTime';
 requires 'Try::Tiny::Retry';
 requires 'DateTime::Format::Strptime';
+requires 'Switch::Plain';
 
 requires 'OpenERP::XMLRPC::Client' => 0.22;
 requires 'MooseX::NotRequired';

@@ -2,6 +2,10 @@
 # Changes for Module::ExtractUse
 #-----------------------------------------------------------------
 
+0.342	2018-01-22T16:02:20
+    - Escape left (and right) braces to silence deprecation warnings (RT-124146) (Kenichi Ishigaki)
+
+
 0.341   2016-01-30T22:18:20
     - fixed 20_parse_self.t; version.pm is not used anymore (Kenichi Ishigaki)
 

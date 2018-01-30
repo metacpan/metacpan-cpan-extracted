@@ -1,32 +1,26 @@
-ISO/TS 19139 Schemas (2007 April 17)
------------------------------------------------
+ISO(c) ReadMe.txt
+------------------------------------------------------------------------------
 
-Technical Specification Abstract:
+Geographic Information - Metadata - XML Schema Implementation
 
-ISO/TS 19139:2007 defines Geographic MetaData XML (gmd) encoding, an XML
-Schema implementation derived from ISO 19115.
+This XML Schema implementation is composed of the following namespaces:
+- Geographic Common (GCO) extensible markup language 
+  (http://www.isotc211.org/2005/gco)
+- Geographic MetaData (GMD) extensible markup language
+  (http://www.isotc211.org/2005/gmd)
+- Geographic Metadata XML (GMX) Schema (http://www.isotc211.org/2005/gmx)
+- Geographic Spatial Schema (GSS) extensible markup language
+  (http://www.isotc211.org/2005/gss)
+- Geographic Spatial Referencing (GSR) extensible markup language
+  (http://www.isotc211.org/2005/gsr)
+- Geographic Temporal Schema (GTS) extensible markup language
+  (http://www.isotc211.org/2005/gts)
 
-Changes made to these GML 3.2.1 / ISO 19136 schemas:
-  * added ReadMe.txt
-  * changed gmd.xsd references to "../../iso/19139/20070417/gmd/gmd.xsd"
-  * changed xlink references to be relative to /xlink/1.0.0/xlinks.xsd
-    available from http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd .
-  * removed xlinks schema and directory
+The most current schemas are available at:
+http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/
 
-Changes made to these ISO 19139 schemas by OGC:
-  * added ReadMe.txt
-  * changed ISO_19136 path to /gml/3.2.1/
-  * changed xlink references to be relative to /xlink/1.0.0/xlinks.xsd
-    available from http://schemas.opengis.net/xlink/1.0.0/xlinks.xsd .
-  * removed xlinks schema and directory 
-  * validated with oXygen 8.2 (xerces-J 2.9.0) - Kevin Stegemoller
+XML resources related to those namespaces are also provided at this location.
 
-OGC GML 3.2.1 / ISO 19136 schemas files will be published at:
-- http://schemas.opengis.net/gml/3.2.1/
-- http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19136_Schemas/
+-------------------------------------------------------------------------------
 
-Files in the folder "ISO/19139/20070417" are also published at
-- http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/
-
--- 2007-07-17
-
+See X\ReadMe.txt for details of lineage and modification of the package X

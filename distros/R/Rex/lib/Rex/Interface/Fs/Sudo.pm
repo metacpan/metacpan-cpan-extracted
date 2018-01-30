@@ -9,13 +9,13 @@ package Rex::Interface::Fs::Sudo;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 require Rex::Commands;
 use Rex::Interface::Fs::Base;
 use Rex::Helper::Path;
 use Rex::Helper::Encode;
-use JSON::XS;
+use JSON::MaybeXS;
 use base qw(Rex::Interface::Fs::Base);
 use Data::Dumper;
 

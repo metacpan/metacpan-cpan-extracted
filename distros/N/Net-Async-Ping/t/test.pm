@@ -81,7 +81,7 @@ sub run_tests
                     unless $has_unreachable;
                 @params = $legacy ? ($loop, $unreach) : ($unreach);
                 my $f = $p->ping(@params, 5); # Longer timeout needed for unreachable packets
-                like exception { $f->get }, qr/ICMP(v6)? Unreachable/, "type: $type, legacy: $legacy, expected failure";
+                like exception { $f->get }, qr/ICMP(v6)? Unreachable/, "type: $type, legacy: $legacy, unreachable expected failure";
                 $expected++;
             }
         }
@@ -100,8 +100,20 @@ sub run_tests
            });
 
         like exception { $f->get }, qr/expected failure/, "type: $type, legacy: $legacy, expected failure";
-        $expected += 5; # 5 tests above, not including unreachable
 
+        @params = $legacy ? ($loop, 'localhost') : ('localhost');
+        $p->ping(@params)
+           ->then(sub {
+              pass "type: $type, legacy: $legacy, pinged localhost!";
+              note("success future: @_");
+              Future->done
+           })->else(sub {
+              fail "type: $type, legacy: $legacy, pinged localhost!";
+              note("failure future: @_");
+              Future->fail('failed to ping localhost!')
+           })->get;
+
+        $expected += 6; # 6 tests above, not including unreachable
         $loop->remove($p) if !$legacy;
     }
 

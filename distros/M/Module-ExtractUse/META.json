@@ -5,13 +5,13 @@
       "Kenichi Ishigaki <kishigaki@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-ExtractUse",
    "prereqs" : {
@@ -23,6 +23,11 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       },
       "runtime" : {
@@ -52,6 +57,7 @@
          "web" : "https://github.com/domm/Module-ExtractUse"
       }
    },
-   "version" : "0.341"
+   "version" : "0.342",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

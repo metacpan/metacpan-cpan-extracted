@@ -1,5 +1,5 @@
 ---
-abstract: 'Resources from database for your application'
+abstract: 'Generate M, V & C from database tables'
 author:
   - "Ð\x9AÑ\x80Ð°Ñ\x81Ð¸Ð¼Ð¸Ñ\x80 Ð\x91ÐµÑ\x80Ð¾Ð² (berov@cpan.org)"
 build_requires:
@@ -27,5 +27,5 @@ resources:
   homepage: https://github.com/kberov/Mojolicious-Command-generate-resources
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Mojolicious-Command-generate-resources.git
-version: '0.08'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,7 +9,7 @@ BEGIN {
     $DTRACE = Test2::Harness::Util::DepTracer->new;
 }
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use File::Spec();
 
@@ -166,12 +166,6 @@ App::Yath::Command::start
 =item --show-opts
 
 Exit after showing what yath thinks your options mean
-
-=item -h
-
-=item --help
-
-Exit after showing this help message
 
 =item -h
 

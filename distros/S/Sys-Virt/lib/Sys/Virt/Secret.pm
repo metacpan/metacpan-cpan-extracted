@@ -45,7 +45,7 @@ sub _new {
     my $class = ref($proto) || $proto;
     my %params = @_;
 
-    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
     my $self;
     if (exists $params{usageID} ||
 	exists $params{usageType}) {
@@ -200,7 +200,7 @@ Secret value change events
 
 The following constants allow secret lifecycle change events to be
 interpreted. The events contain both a state change, and a
-reason though the reason is currently unsed.
+reason though the reason is currently unused.
 
 =over 4
 

@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp;
 
@@ -43,8 +43,7 @@ waiting for L<Future>s to complete. This syntax aims to make code that
 performs asynchronous operations using futures look neater and more expressive
 than simply using C<then> chaining and other techniques on the futures
 themselves. It is also a similar syntax used by a number of other languages;
-notably C# 5, EcmaScript 6, Python 3, and lately even Rust is considering
-adding it.
+notably C# 5, EcmaScript 6, Python 3, Dart. Rust is considering adding it.
 
 The new syntax takes the form of two new keywords, C<async> and C<await>.
 
@@ -100,6 +99,30 @@ The converse is not true; just because a function is marked as C<async> does
 not require it to make use of the C<await> expression. It is still useful to
 turn the result of that function into a future, entirely without C<await>ing
 on any itself.
+
+Any function that doesn't actually await anything, and just returns immediate
+futures can be neatened by this module too.
+
+Instead of writing
+
+   sub imm
+   {
+      ...
+      return Future->done( @result );
+   }
+
+you can now simply write
+
+   async sub imm
+   {
+      ...
+      return @result;
+   }
+
+with the added side-benefit that any exceptions thrown by the elided code will
+be turned into an immediate-failed C<Future> rather than making the call
+itself propagate the exception, which is usually what you wanted when dealing
+with futures.
 
 =head1 EARLY-VERSION WARNING
 
@@ -198,6 +221,19 @@ disallowed.
       }
    }
 
+As C<map> and C<grep> involve implicit C<local> behaviour on the C<$_>
+variable, they also don't support C<await> inside them.
+
+   async sub quoo
+   {
+      grep { await ... } LIST;
+   }
+
+   async sub bah
+   {
+      map { await ... } LIST;
+   }
+
 Additionally, complications with the savestack appear to be affecting some
 uses of package-level C<our> variables captured by async functions:
 
@@ -210,32 +246,6 @@ uses of package-level C<our> variables captured by async functions:
    }
 
 See also the L</TODO> list for further things.
-
-=head2 Async Without Await
-
-Any function that doesn't actually await anything, and just returns immediate
-futures can be neatened by this module too.
-
-Instead of writing
-
-   sub imm
-   {
-      ...
-      return Future->done( @result );
-   }
-
-you can now simply write
-
-   async sub imm
-   {
-      ...
-      return @result;
-   }
-
-with the added side-benefit that any exceptions thrown by the elided code will
-be turned into an immediate-failed C<Future> rather than making the call
-itself propagate the exception, which is usually what you wanted when dealing
-with futures.
 
 =head1 WITH OTHER MODULES
 
@@ -316,7 +326,8 @@ Clean up the implementation; check for and fix memory leaks.
 
 =item *
 
-Support older versions of perl than 5.18.
+Currently this module requires perl version 5.16 or later. Support perl
+version 5.14.
 
 L<https://rt.cpan.org/Ticket/Display.html?id=122252>
 

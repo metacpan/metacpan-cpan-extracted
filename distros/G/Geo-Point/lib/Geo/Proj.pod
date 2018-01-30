@@ -50,7 +50,7 @@ wgs84 projection yourself.
 
 =over 4
 
-=item Geo::Proj-E<gt>B<new>([$nick], %options)
+=item Geo::Proj-E<gt>B<new>( [$nick], %options )
 
 Create a new object.
 
@@ -96,9 +96,9 @@ The full, official name of the projection
 
 Simple abbreviating of the projection.
 
-=item $obj-E<gt>B<proj4>([ <$nick|$proj4> ])
+=item $obj-E<gt>B<proj4>( [ <$nick|$proj4> ] )
 
-=item Geo::Proj-E<gt>B<proj4>([ <$nick|$proj4> ])
+=item Geo::Proj-E<gt>B<proj4>( [ <$nick|$proj4> ] )
 
 Returns the projection library handle (a L<Geo::Proj4|Geo::Proj4>) to be used by this
 component.  As class method, the $nick is specified for a lookup.  In case
@@ -121,13 +121,13 @@ The "Spatial Reference System ID" if known.
 
 =over 4
 
-=item Geo::Proj-E<gt>B<defaultProjection>([ <$nick|$proj> ])
+=item Geo::Proj-E<gt>B<defaultProjection>( [ <$nick|$proj> ] )
 
 The $nick must be defined with L<new()|Geo::Proj/"Constructors">.  Returned is the Geo::Proj object
 for the default projection.  The default is the first name created,
 which probably is 'wgs84' (when import() had a chance)
 
-=item Geo::Proj-E<gt>B<dumpProjections>([$fh])
+=item Geo::Proj-E<gt>B<dumpProjections>( [$fh] )
 
 Print details about the defined projections to the $fh, which
 defaults to the selected.  Especially useful for debugging.
@@ -136,7 +136,7 @@ defaults to the selected.  Especially useful for debugging.
 
 Returns a sorted lost of projection nicks.
 
-=item Geo::Proj-E<gt>B<projection>(<$nick|$proj>)
+=item Geo::Proj-E<gt>B<projection>( <$nick|$proj> )
 
 Returns the L<Geo::Proj|Geo::Proj> object, defined with $nick.  In case such an
 object is passed in as $proj, it is returned unaffected.  This method is
@@ -147,9 +147,9 @@ example:
  my $wgs84 = Geo::Proj->projection('wgs84');
  my $again = Geo::Proj->projection($wgs84);
 
-=item $obj-E<gt>B<to>([<$proj|$nick>], <$proj|$nick>, $point|ARRAY-of-$points)
+=item $obj-E<gt>B<to>( [<$proj|$nick>], <$proj|$nick>, $point|ARRAY-of-$points )
 
-=item Geo::Proj-E<gt>B<to>([<$proj|$nick>], <$proj|$nick>, $point|ARRAY-of-$points)
+=item Geo::Proj-E<gt>B<to>( [<$proj|$nick>], <$proj|$nick>, $point|ARRAY-of-$points )
 
 Expects an Geo::Proj to project the $point or $points to.  The work
 is done by L<Geo::Proj4::transform()|Geo::Proj4/"Converters">.  As class method, you have to
@@ -171,7 +171,7 @@ example:
 
 =over 4
 
-=item Geo::Proj-E<gt>B<UTMprojection>(<$datum|$proj|undef>, $zone)
+=item Geo::Proj-E<gt>B<UTMprojection>( <$datum|$proj|undef>, $zone )
 
 The $proj is a L<Geo::Proj|Geo::Proj> which is used to collect the datum
 information from if no $datum was specified explicitly.  It may also be
@@ -183,9 +183,9 @@ example:
  my $proj = Geo::Proj->UTMprojection('WGS84', 31) or die;
  print $proj->nick;    # for instance utm31-wgs84
 
-=item $obj-E<gt>B<bestUTMprojection>($point, [$proj|$nick])
+=item $obj-E<gt>B<bestUTMprojection>( $point, [$proj|$nick] )
 
-=item Geo::Proj-E<gt>B<bestUTMprojection>($point, [$proj|$nick])
+=item Geo::Proj-E<gt>B<bestUTMprojection>( $point, [$proj|$nick] )
 
 Returns the best UTM projection for some $point.  As class method, you
 specify the nickname or the object for the point.
@@ -223,27 +223,14 @@ Returns the nick-name for this projection.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.96,
-built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>,
-L</Math::Polygon>,
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Format::Envisat>, and
-L</Geo::Format::Landsat>.
-
-Please post questions or ideas to the mailinglist at
-F<http://geo-perl@list.hut.fi>
+This module is part of Geo-Point distribution version 0.97,
+built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -36,7 +36,7 @@ use constant DEBUG_MATCH => 0;
 use vars qw( $DEBUG $VERSION @EXPORT_OK %EXPORT_TAGS );
 use base 'Exporter';
 
-$VERSION = 1.125;
+$VERSION = 1.126;
 
 $DEBUG = 0 || $ENV{N_A_E_DEBUG};
 

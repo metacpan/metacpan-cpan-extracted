@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/Geo-Coordinates-MGRS-XS.t
+lib/Geo/Coordinates/MGRS/XS.pm
+mgrs.c
+mgrs.h
+polarst.c
+polarst.h
+tranmerc.c
+ups.c
+ups.h
+utm.c
+utm.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

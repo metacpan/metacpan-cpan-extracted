@@ -46,8 +46,6 @@ my $bitmap = Graphics::Raylib::Shape->bitmap(
     # uninitialized => 1 # It's fun. Try it :)
 );
 
-$g->clear(BLACK);
-
 my $i = 0;
 while (!$g->exiting && $i < $GENERATIONS)
 {
@@ -55,6 +53,7 @@ while (!$g->exiting && $i < $GENERATIONS)
     $bitmap->color = $rainbow->();
     $text->text = "Generation " . ($i++);
 
+    $g->clear(BLACK);
     Graphics::Raylib::draw {
         $bitmap->draw;
         $text->draw;

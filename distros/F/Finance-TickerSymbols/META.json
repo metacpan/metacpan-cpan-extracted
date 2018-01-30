@@ -1,10 +1,10 @@
 {
-   "abstract" : "Perl extension for getting symbols lists",
+   "abstract" : "Perl extension for getting symbols lists                          from web resources",
    "author" : [
       "Josef Ezra <jezra@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,10 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "LWP" : "5"
+            "LWP" : "6",
+            "LWP::Protocol::https" : "6"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.01"
+   "version" : "3.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

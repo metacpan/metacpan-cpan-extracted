@@ -1,10 +1,12 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 #
-# Test the releaze()
+# Test the realize()
 #
 
 use strict;
+use warnings;
+
 use Test;
 
 use lib 't', '.', 't/testmods', 'testmods';

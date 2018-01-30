@@ -21,7 +21,7 @@
 # ABSTRACT: Gettext Support For the Template Toolkit Version 2
 
 package Template::Plugin::Gettext;
-$Template::Plugin::Gettext::VERSION = '0.3';
+$Template::Plugin::Gettext::VERSION = '0.4';
 use strict;
 
 use Locale::TextDomain 1.20 qw(com.cantanea.Template-Plugin-Gettext);

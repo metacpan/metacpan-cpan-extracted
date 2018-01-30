@@ -1,8 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 # -*- perl -*-
 # By Slavan Rezic <slaven@rezic.de>   2003-07-29
 
 use strict;
+use warnings;
+
 use Test;
 
 use lib "t/testmods";

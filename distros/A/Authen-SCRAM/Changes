@@ -1,5 +1,22 @@
 Revision history for Authen-SCRAM
 
+0.007     2018-01-28 00:00:56-05:00 America/New_York
+
+    [Added]
+
+    - Public 'computed_keys' method on the client object to get
+      stored/server keys that a server needs to keep to authenticate a
+      user.
+
+    [Changed]
+
+    - Added 'minimum_iteration_count' on clients, defaulting to 4096, to
+      mitigate downgrade attacks.
+
+    [Tests]
+
+    - Added a SCRAM-SHA-256 test.
+
 0.006     2017-11-22 10:45:58-05:00 America/New_York
 
     [Added]

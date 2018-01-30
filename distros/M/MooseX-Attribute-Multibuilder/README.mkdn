@@ -1,0 +1,56 @@
+# NAME
+
+MooseX::Attribute::Multibuilder - Have several attributes share the same builder
+
+# VERSION
+
+version 0.0.1
+
+# SYNOPSIS
+
+```perl
+package Foo;
+use Moose;
+use MooseX::Attribute::Multibuilder;
+
+has bar => (
+    traits => [ 'Multibuilder' ],
+    is => 'ro',
+    multibuilder => '_build_them_all'
+);
+
+has baz => (
+    traits => [ 'Multibuilder' ],
+    is => 'ro',
+    multibuilder => '_build_them_all'
+);
+
+sub _build_them_all {
+    return {
+        bar => 'BAR',
+        baz => 'BAZ' 
+    };
+}
+
+
+my $foo = Foo->new;
+
+print $foo->bar; # BAR
+print $foo->baz; # BAZ
+```
+
+# DESCRIPTION
+
+Adds a `multibuilder` option, which is like Moose's `builder`, but is
+expected to return a hashref of attribute and their default values.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

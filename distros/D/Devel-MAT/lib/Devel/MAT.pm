@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -241,7 +241,7 @@ sub inref_graph
    }
 
    my $name;
-   if( $elide_sym and $name = $sv->name and
+   if( $elide_sym and $name = $sv->symname and
          $name !~ m/^&.*::__ANON__$/ ) {
       $graph->add_root( $sv,
          Devel::MAT::SV::Reference( "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'", strong => undef ) );

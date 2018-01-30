@@ -2,8 +2,9 @@ Hash::Wrap
 
 This module provides constructors which create light-weight objects from
 existing hashes, allowing access to hash elements via methods (and thus
-avoiding typos). Attempting to access a non-existent element via a
-method will result in an exception.
+avoiding typos). By default, attempting to access a non-existent element
+via a method will result in an exception, but this may be modified so
+that the undefined value is returned (see "-undef").
 
 Hash elements may be added to or deleted from the object after
 instantiation using the standard Perl hash operations, and changes will
@@ -28,6 +29,12 @@ The methods act as both accessors and setters, e.g.
 
 Only hash keys which are legal method names will be accessible via
 object methods.
+
+Accessors may optionally be used as lvalues, e.g.,
+
+  $obj->a = 3;
+
+in Perl version 5.16 or later. See "-lvalue".
 
   Object construction and constructor customization
 
@@ -72,6 +79,12 @@ The following options are available to customize the constructor.
 
     By default, the object uses the hash directly.
 
+"-undef" => *boolean*
+    Normally an attempt to use an accessor for an non-existent key will
+    result in an exception. The "-undef" option causes the accessor to
+    return "undef" instead. It does *not* create an element in the hash
+    for the key.
+
 "-lvalue" => *boolean*
     If true, the accessors will be lvalue routines, e.g. they can change
     the underlying hash value by assigning to them:
@@ -81,7 +94,7 @@ The following options are available to customize the constructor.
     The hash entry must already exist before using the accessor in this
     manner, or it will throw an exception.
 
-    This is only available on Perl 5.16 and higher.
+    This is only available on Perl version 5.16 and later.
 
   Object Classes
 

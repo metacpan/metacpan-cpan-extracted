@@ -114,4 +114,14 @@ subtest 'failture on nested' => sub {
     };
 };
 
+subtest 'utf8' => sub {
+    require Encode;
+
+    is {
+        json => Encode::encode_utf8('{"a":"あ"}'),
+    }, {
+        json => json({ 'a' => 'あ' }),
+    };
+};
+
 done_testing;

@@ -1,6 +1,6 @@
 
 package Dist::Zilla::PluginBundle::Author::FERREIRA;
-$Dist::Zilla::PluginBundle::Author::FERREIRA::VERSION = '0.3.0';
+$Dist::Zilla::PluginBundle::Author::FERREIRA::VERSION = '0.4.0';
 # ABSTRACT: Build a distribution like FERREIRA
 
 use Moose;
@@ -69,7 +69,7 @@ Dist::Zilla::PluginBundle::Author::FERREIRA - Build a distribution like FERREIRA
 
 =head1 VERSION
 
-version 0.3.0
+version 0.4.0
 
 =head1 DESCRIPTION
 

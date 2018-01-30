@@ -35,8 +35,10 @@ bin/tab2mapper.pl
 bin/tax-filter-ali.pl
 bin/tree2list.pl
 bin/tree2tpl.pl
+codegen/build_Factory.pl
 codegen/build_SeqId.pl
 codegen/make_seq_id_tests.pl
+codegen/templates/Factory.tt
 codegen/templates/SeqId.tt
 lib/Bio/MUST/Core.pm
 lib/Bio/MUST/Core/Ali.pm
@@ -50,6 +52,7 @@ lib/Bio/MUST/Core/IdList.pm
 lib/Bio/MUST/Core/IdMapper.pm
 lib/Bio/MUST/Core/PostPred.pm
 lib/Bio/MUST/Core/PostPred/Composition.pm
+lib/Bio/MUST/Core/Roles/Aliable.pm
 lib/Bio/MUST/Core/Roles/Commentable.pm
 lib/Bio/MUST/Core/Roles/Listable.pm
 lib/Bio/MUST/Core/Seq.pm
@@ -178,7 +181,9 @@ test/forest-ids
 test/forest.idm
 test/gapify.ali
 test/gapify_X.ali
+test/gapify_X.fasta
 test/gapify_gap.ali
+test/gapify_gap.fasta
 test/gb_loose.fasta
 test/gb_medium.fasta
 test/gb_strict.fasta

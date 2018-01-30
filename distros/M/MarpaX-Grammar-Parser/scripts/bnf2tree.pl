@@ -25,22 +25,17 @@ if ($option_parser -> getoptions
 	'marpa_bnf_file=s',
 	'maxlevel=s',
 	'minlevel=s',
-	'output_hashref=i',
 	'raw_tree_file=s',
+	'rules_file=s',
 	'user_bnf_file=s',
+	'verbose=i',
 ) )
 {
 	pod2usage(1) if ($option{'help'});
 
 	# Return 0 for success and 1 for failure.
 
-	my($parser) = MarpaX::Grammar::Parser -> new(%option);
-	my($exit)   = $parser -> run;
-	$exit       = $parser -> report_hashref if ($exit == 0);
-
-	# Return 0 for success and 1 for failure.
-
-	exit $exit;
+	exit MarpaX::Grammar::Parser -> new(%option) -> run;
 }
 else
 {
@@ -67,9 +62,10 @@ bnf2tree.pl [options]
 	-marpa_bnf_file aMarpaBNFFileName
 	-maxlevel logOption1
 	-minlevel logOption2
-	-output_hashref Boolean
 	-raw_tree_file aTextFileName
+	-rules_file aTextFileName
 	-user_bnf_file aUserBNFFileName
+	-verbose $Boolean
 
 Exit value: 0 for success, 1 for failure. Die upon error.
 
@@ -133,17 +129,17 @@ Default: 'error'.
 
 No lower levels are used.
 
-=item o -output_hashref Boolean
-
-Log (1) or skip (0) the hashref version of the cooked tree.
-
-Note: This needs -maxlevel elevated from its default value of 'notice' to 'info', to do anything.
-
-Default: 0.
-
 =item o -raw_tree_file aTextFileName
 
 The name of the text file to write containing the grammar as a raw tree.
+
+If '', the file is not written.
+
+Default: ''.
+
+=item o -rules_file aTextFileName
+
+The name of the text file to write containing the BNF generated from parsing the input.
 
 If '', the file is not written.
 
@@ -158,6 +154,12 @@ See share/stringparser.bnf for a sample.
 This option is mandatory.
 
 Default: ''.
+
+=item o -verbose $Boolean
+
+Display more or less during debugging.
+
+Default: 0.
 
 =back
 

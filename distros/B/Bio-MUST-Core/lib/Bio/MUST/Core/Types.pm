@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.180190';
+$Bio::MUST::Core::Types::VERSION = '0.180230';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -96,7 +96,10 @@ subtype 'Bio::MUST::Core::Types::Seq'
             m{\A [\*\ A-Za-z\?]*    \z}xms  # possibly gapped seq
         && !m{\A [    A-Za-z\?]* \* \z}xms  # but not plain seq ending in '*'
        }
-    => message { 'Only IUPAC codes and gaps [*-<space>?] are allowed.' }
+    => message {
+            'Only IUPAC codes, gaps [*-<blank>] '
+            . 'and missing states [X?] are allowed.'
+       }
 ;
 
 coerce 'Bio::MUST::Core::Types::Seq'
@@ -212,7 +215,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.180190
+version 0.180230
 
 =head1 SYNOPSIS
 

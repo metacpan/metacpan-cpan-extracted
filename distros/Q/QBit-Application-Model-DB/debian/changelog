@@ -1,3 +1,15 @@
+libqbit-application-model-db-perl (0.027) raring; urgency=low
+
+  * fix tests and error message
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 25 Jan 2018 00:03:02 +0300
+
+libqbit-application-model-db-perl (0.026) raring; urgency=low
+
+  * fix _log_sql
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 23 Jan 2018 20:32:39 +0300
+
 libqbit-application-model-db-perl (0.025) raring; urgency=low
 
   * added documentation

@@ -20,7 +20,7 @@ sub test_MockModule {
 
     my $MockObject = Test::Mockify->new('FakeModuleWithoutNew');
     my $MockedFakeModule = $MockObject->getMockObject();
-    is($MockedFakeModule->secondDummmyMethodForTestOverriding(),'A second dummmy method',"$SubTestName - test if the loaded module still have the unmocked methods");
+    is($MockedFakeModule->secondDummyMethodForTestOverriding(),'A second dummy method',"$SubTestName - test if the loaded module still have the unmocked methods");
 
     return;
 }

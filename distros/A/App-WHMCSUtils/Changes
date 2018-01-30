@@ -1,0 +1,28 @@
+0.005   2018-01-29 (PERLANCAR)
+
+	- Add total row to CSV.
+
+	- Tweak categorization.
+
+	- [ux] Tweak logging.
+
+	- [ux] Escape multiline description to make it easier to scan log
+	  lines.
+
+
+0.004   2018-01-26 (PERLANCAR)
+
+	- Allow extra rules to set to revenue, some fixes/improvements of
+	  rules.
+
+
+0.003   2018-01-25 (PERLANCAR)
+
+	- [ux] Order invoice items by date paid instead of invoice ID.
+
+	- [doc] Add usage instruction.
+
+
+0.002   2018-01-25 (PERLANCAR)
+
+        - First public release.

@@ -1,10 +1,58 @@
 ==================================================
-Changes from 2016-11-19 00:00:00 +0000 to present.
+Changes from 2017-01-24 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.025 at 2017-11-19 07:09:32 +0000
+version 0.027 at 2018-01-24 21:03:02 +0000
 ------------------------------------------
+
+  Change: ddf5a8694e1e49f93b3551324c24ef67b07754b5
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-01-25 00:02:12 +0000
+
+    Merge pull request #30 from Madskill/fix_test_and_error_message
+
+    fix tests and error message 
+
+  Change: 0bff4563c9f0bdc8ef54ad439462276a5530416e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-25 00:00:24 +0000
+
+    fix tests and error message 
+
+------------------------------------------
+version 0.026 at 2018-01-23 17:33:09 +0000
+------------------------------------------
+
+  Change: 9f8c44e9aa0160e799eca3fb2ddf826cb4c96e20
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-23 20:33:09 +0000
+
+    Version 0.026 
+
+  Change: 468bf3b9d78cb96fd07e2f6a9cc8f354d2e6447a
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-01-23 20:31:31 +0000
+
+    Merge pull request #29 from Madskill/fix_log_bug
+
+    fix _log_sql 
+
+  Change: 58254ec7fd89bcf0ee041249facb8e7153ab6fcc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-23 20:29:02 +0000
+
+    fix _log_sql 
+
+------------------------------------------
+version 0.025 at 2017-11-19 07:10:01 +0000
+------------------------------------------
+
+  Change: 881d3d300f254f926978a64f32a86e43079213a0
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 10:10:01 +0000
+
+    Version 0.025 
 
   Change: f07c0bd5603c142abd516afe930274388c012a4c
   Author: Igor <igor-sverdlov@mail.ru>
@@ -261,108 +309,6 @@ version 0.017 at 2017-08-27 08:06:31 +0000
 
     fix query and added methods: set_dbh, dbh 
 
-------------------------------------------
-version 0.016 at 2017-01-22 11:55:59 +0000
-------------------------------------------
-
-  Change: 4d76fcb7fedecb2628a9f02d249367e5c929b8c7
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-01-22 14:55:59 +0000
-
-    Version 0.016 
-
-  Change: d5147c6176b9ffc24ebb8ca0ef1ce475bfc0ab68
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-01-22 15:54:44 +0000
-
-    Merge pull request #18 from Madskill/added_accessors
-
-    added collate and engine into accessors 
-
-  Change: 0fdde6569326ef43f7a7125d5a5bcdeb0a3d4991
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-01-22 14:53:44 +0000
-
-    added collate and engine into accessors 
-
-------------------------------------------
-version 0.015 at 2016-12-18 23:03:49 +0000
-------------------------------------------
-
-  Change: d59c183690798aeb55d750de4aae2e4ed44bfbfc
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:03:49 +0000
-
-    Version 0.015 
-
-  Change: eed3a06d0a9365303d280023f1101afd6db04ace
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:02:11 +0000
-
-    Merge pull request #17 from Madskill/fix_exceptions
-
-    Fix exceptions 
-
-  Change: da95faf45f98688e9a606dcbed3b63a67fccba8b
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:00:42 +0000
-
-    Merge remote-tracking branch 'upstream/master' into fix_exceptions 
-
-  Change: a92eb97820e036335ff7210b049884fdd5b64d5e
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-19 02:00:28 +0000
-
-    fix exceptions 
-
-------------------------------------------
-version 0.014 at 2016-12-17 15:48:02 +0000
-------------------------------------------
-
-  Change: 939fd3214a05e2ed5fd505b95ab59dc87210c0cd
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-17 18:48:02 +0000
-
-    Version 0.014 
-
-  Change: 4f58db2540634b2ddb81f86cc68c8ad119eef436
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-17 18:46:58 +0000
-
-    Merge pull request #16 from Madskill/fix_transaction
-
-    fix rollback 
-
-  Change: 204b83ec7c08e95f86c6543baf66bcc277f2587a
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-17 18:45:15 +0000
-
-    fix rollback 
-
-------------------------------------------
-version 0.013 at 2016-12-01 23:33:04 +0000
-------------------------------------------
-
-  Change: 2d23b43399fff79bf8d7ce3398236eac3f90dfe8
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-02 02:33:04 +0000
-
-    Version 0.013 
-
-  Change: 64ea918975444d5ab89de6cd537ebd9ba826ebe1
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-02 02:31:54 +0000
-
-    Merge pull request #15 from Madskill/delete_reconnect
-
-    deleted connect if transaction 
-
-  Change: 7835456378d87ede684439d37eaa6ebbd7439a0b
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-02 02:28:51 +0000
-
-    deleted connect if transaction 
-
 =================================================
-Plus 12 releases after 2016-11-19 00:00:00 +0000.
+Plus 16 releases after 2017-01-24 00:00:00 +0000.
 =================================================

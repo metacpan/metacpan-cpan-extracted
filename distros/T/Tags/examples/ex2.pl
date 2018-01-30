@@ -1,23 +1,23 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Tags::Utils qw(encode_newline);
+use Dumpvalue;
+use Tags::Utils qw(encode_attr_entities);
 
-# Input text.
-my $text = <<'END';
-foo
-bar
-END
+# Input data.
+my @data = ('&', '<', '"');
 
-# Encode newlines.
-my $out = encode_newline($text);
+# Encode.
+encode_attr_entities(\@data);
 
-# Print out.
-print $out."\n";
+# Dump out.
+my $dump = Dumpvalue->new;
+$dump->dumpValues(\@data);
 
 # Output:
-# foo\nbar\n
+# 0  ARRAY(0x8b8f428)
+#    0  '&amp;'
+#    1  '&lt;'
+#    2  '&quot;'

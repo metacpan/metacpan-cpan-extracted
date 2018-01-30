@@ -32,6 +32,7 @@ lib/PPIx/Regexp/Structure/Quantifier.pm
 lib/PPIx/Regexp/Structure/Regexp.pm
 lib/PPIx/Regexp/Structure/RegexSet.pm
 lib/PPIx/Regexp/Structure/Replacement.pm
+lib/PPIx/Regexp/Structure/Script_Run.pm
 lib/PPIx/Regexp/Structure/Subexpression.pm
 lib/PPIx/Regexp/Structure/Switch.pm
 lib/PPIx/Regexp/Structure/Unknown.pm
@@ -56,6 +57,7 @@ lib/PPIx/Regexp/Token/GroupType/BranchReset.pm
 lib/PPIx/Regexp/Token/GroupType/Code.pm
 lib/PPIx/Regexp/Token/GroupType/Modifier.pm
 lib/PPIx/Regexp/Token/GroupType/NamedCapture.pm
+lib/PPIx/Regexp/Token/GroupType/Script_Run.pm
 lib/PPIx/Regexp/Token/GroupType/Subexpression.pm
 lib/PPIx/Regexp/Token/GroupType/Switch.pm
 lib/PPIx/Regexp/Token/Interpolation.pm

@@ -8,6 +8,7 @@ use warnings;
 use utf8;
 
 use Prty::Database::Connection;
+use Prty::Path;
 
 # -----------------------------------------------------------------------------
 

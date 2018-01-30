@@ -1,0 +1,9 @@
+lib/App/euro_lotto.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+script/euro_lotto
+script/euro_lotto.pl
+script/README.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

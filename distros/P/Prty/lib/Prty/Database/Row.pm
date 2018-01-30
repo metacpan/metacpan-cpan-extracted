@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Perl;
 use Prty::Database::ResultSet::Object;
@@ -104,7 +104,7 @@ sub tableClass {
         # Paranoia-Test
         if (!$found) {
             $class->throw(
-                q{ROW-00001: Datensatz-Klasse definiert keine Tabellenklasse},
+                q~ROW-00001: Datensatz-Klasse definiert keine Tabellenklasse~,
                 RowClass=>$class,
             );
         }
@@ -172,7 +172,7 @@ sub makeTable {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -180,7 +180,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,9 +1,9 @@
 {
-   "abstract" : "Support for NTFS junctions and symlinks on Windows",
+   "abstract" : "Support for NTFS symlinks and junctions on Microsoft Windows",
    "author" : [
       "Bayan Maxim <baymax@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -52,6 +52,6 @@
          "web" : "https://github.com/bay-max1/Win32-NTFS-Symlink"
       }
    },
-   "version" : "0.04",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

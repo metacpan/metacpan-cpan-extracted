@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::OrderedHash;
 use Prty::FileHandle;
@@ -102,7 +102,7 @@ sub new {
         if (@arr < 2 || @arr > 3) {
             # Prüfe Dateiaufbau
             $self->throw(
-                q{SEQ-00001: Falsche Kolumnen-Anzahl},
+                q~SEQ-00001: Falsche Kolumnen-Anzahl~,
                 File=>$file,
                 Line=>$.,
                 MaxColumns=>3,
@@ -201,7 +201,7 @@ sub def {
     my ($self,$key) = @_;
     my $arr = $self->oHash->get($key) || do {
         $self->throw(
-            q{IMGSET-00002: Schlüssel existiert nicht},
+            q~IMGSET-00002: Schlüssel existiert nicht~,
             File=>$self->file,
             Key=>$key,
         );
@@ -377,7 +377,7 @@ sub images {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -385,7 +385,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

@@ -68,7 +68,7 @@ sub Error {
     local $Data::Dumper::Pair = '=';
     local $Data::Dumper::Quotekeys = 0;
     my $MockedMethod = delete $hData->{'Method'} if defined $hData->{'Method'}; ## no critic (ProhibitConditionalDeclarations)
-    $MockedMethod //= '-not set-';
+    $MockedMethod //= '-no method set-';
     my $DumpedData = Dumper($hData);
     # print Callerstack
     my $CallerStack = '';

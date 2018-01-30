@@ -1,6 +1,6 @@
 
 package Importer::Zim::Base;
-$Importer::Zim::Base::VERSION = '0.12.0';
+$Importer::Zim::Base::VERSION = '0.12.1';
 # ABSTRACT: Base module for Importer::Zim backends
 
 use 5.010001;
@@ -86,6 +86,7 @@ sub _module_opts {
     exists $o->{-filter} and $opts{-filter} = $o->{-filter};
     exists $o->{-map}    and $opts{-map}    = $o->{-map}
       or exists $o->{-prefix} and $opts{-map} = sub { $o->{-prefix} . $_ };
+    exists $o->{-version} and $opts{-version} = $o->{-version};
 
     if ( my @bad = grep { !$IS_MODULE_OPTION->{$_} } keys %$o ) {
         carp qq{Ignoring unknown module options (@bad)\n};
@@ -187,7 +188,7 @@ Importer::Zim::Base - Base module for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.12.0
+version 0.12.1
 
 =head1 DESCRIPTION
 

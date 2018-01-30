@@ -13,7 +13,10 @@ meta-spec:
   version: '1.4'
 name: FIAS-SQL
 requires:
+  Carp: '0'
+  DBI: '0'
+  LWP::UserAgent: '0'
   Readonly: '0'
   XBase: '0'
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

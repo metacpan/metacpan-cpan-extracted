@@ -2,6 +2,16 @@
 Feature oriented Revision history for Devel-PerlySense
 ======================================================
 
+0.0219 -- 2018-01-26 14:40:53 UTC
+
+* Extract variable: fix replacement to be case sensitive
+
+* Config: default config contains well formed inc_dir
+
+* Fix deprecated Perl 5.26 regex syntax for {}
+
+
+
 0.0218 -- 2016-07-26 12:22:22 UTC
 
 * Fixed broken docs image links after a PAUSE cleanup.

@@ -1,5 +1,8 @@
 Revision history for perl module Catalyst::Controller::SimpleCAS
 
+1.002 2018-01-26
+    - Require Email::MIME::CreateHTML 1.042 (VANSTYN)
+
 1.001 2017-04-05
     - Use :raw mode on file handles - PR #6 (NERDVANA)
 

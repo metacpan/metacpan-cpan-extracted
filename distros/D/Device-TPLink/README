@@ -1,16 +1,29 @@
 Device-TPLink
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+Device::TPLink is a collection of pure perl modules designed for 
+controlling TP-Link's family of smart home products with Perl. It should 
+support all devices that are supported by the Kasa cloud service, but as 
+of now I have only been able to test with the HS200(US) smart light 
+switch and the HS105(US) mini smart plug. If you are on the same LAN as 
+the device (or can reach the device with a TCP connection, you can send 
+commands directly to the device, otherwise you will need to get a token 
+from the Kasa service and interact with the device through the cloud.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+I am not associated with TP-Link in any way, except as a user of their 
+products. The TP-Link protocol information came from several sources, 
+including the "IT Nerd Space" blog, softScheck's "tplink-smartplug" 
+project on GitHub, and GadgetReactor's "pyHS100" project on GitHub.
 
+Feedback is appreciated. Please use the GitHub issue tracker, linked
+below.
+
+RELEASE HISTORY
+
+    0.02 - 23 JAN 2018 (This release)
+        Documentation updates and general clean up.
+
+    0.01 - 21 JAN 2018
+        Initial release to CPAN.
 
 INSTALLATION
 
@@ -30,8 +43,11 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-TPLink
+    GitHub project
+        https://github.com/verlin/Device-TPLink
+
+    GitHub issue tracker (report bugs here)
+        https://github.com/verlin/Device-TPLink/issues
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Device-TPLink

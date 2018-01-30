@@ -4,10 +4,10 @@ require 5.008;
 
 WriteMakefile
   ( NAME        => 'Geo::Format::Envisat'
-  , VERSION     => '0.03'
+  , VERSION     => '0.90'
   , PREREQ_PM   =>
      { Test::More     => 0.47
-     , Geo::Point     => 0.10
+     , Geo::Point     => 0.96
      , IO::Uncompress::AnyUncompress => 2.015
      , POSIX          => 0
      , File::Basename => 0
@@ -24,13 +24,12 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/geo-format-envisat/raw
 DISTDIR         = ../public_html/geo-format-envisat/source
-LICENSE         = artistic
+LICENSE         = perl
 
 # for POD
 FIRST_YEAR      = 2008
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/geo/
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
-PODTAIL         = ../Geo-shared-podtail
 __POSTAMBLE
 

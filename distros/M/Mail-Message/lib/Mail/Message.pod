@@ -53,7 +53,7 @@ Mail::Message - general message object
 =head1 DESCRIPTION
 
 A C<Mail::Message> object is a container for MIME-encoded message information,
-as defined by RFC2822.  Everything what is not specificly related to storing
+as defined by RFC2822.  Everything what is not specificaly related to storing
 the messages in mailboxes (folders) is implemented in this class.  Methods
 which are related to folders is implemented in the L<Mail::Box::Message|Mail::Box::Message>
 extension.
@@ -326,11 +326,11 @@ is used mainly for recognizing discussion threads.
 
 Returns a string representing the location of this part.  In case the
 top message is a single message, 'undef' is returned.  When it is a
-multipart, '1' upto the number of multiparts is returned.  A multi-level
+multipart, '1' up to the number of multiparts is returned.  A multi-level
 nested part may for instance return '2.5.1'.
 
 Usually, this string is very short.  Numbering follows the IMAP4 design,
-see RFC2060 secion 6.4.5.
+see RFC2060 section 6.4.5.
 
 =item $obj-E<gt>B<print>( [$fh] )
 
@@ -625,7 +625,7 @@ defined.  The parameters will be stripped off.
 =item $obj-E<gt>B<decoded>(%options)
 
 Decodes the body of this message, and returns it as a body object.
-Short for C<<$msg->body->decoded>>  All %options are passed-on.
+Short for C<< $msg->body->decoded >>  All %options are passed-on.
 
 =item $obj-E<gt>B<encode>(%options)
 
@@ -1295,35 +1295,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.005,
-built on December 22, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Message distribution version 3.006,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

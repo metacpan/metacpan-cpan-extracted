@@ -15,7 +15,7 @@ Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
 
 # Version.
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 # Pretty print of backtrace.
 sub err_bt_pretty {
@@ -636,17 +636,17 @@ L<https://github.com/tupinek/Error-Pure-Output-Text>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2015 Michal Špaček
+ © 2008-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.22
+0.23
 
 =cut

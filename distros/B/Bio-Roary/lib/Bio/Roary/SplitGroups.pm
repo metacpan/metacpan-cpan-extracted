@@ -1,5 +1,5 @@
 package Bio::Roary::SplitGroups;
-$Bio::Roary::SplitGroups::VERSION = '3.11.3';
+$Bio::Roary::SplitGroups::VERSION = '3.12.0';
 # ABSTRACT: split groups
 
 
@@ -334,7 +334,7 @@ Bio::Roary::SplitGroups - split groups
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

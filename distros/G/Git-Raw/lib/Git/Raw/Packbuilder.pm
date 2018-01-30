@@ -1,5 +1,5 @@
 package Git::Raw::Packbuilder;
-$Git::Raw::Packbuilder::VERSION = '0.74';
+$Git::Raw::Packbuilder::VERSION = '0.75';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Packbuilder - Git packbuilder class
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 

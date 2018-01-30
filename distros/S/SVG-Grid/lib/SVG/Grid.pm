@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use warnings qw(FATAL utf8);
 
+use File::Slurper 'write_text';
+
 use Moo;
 
 use SVG;
@@ -103,7 +105,7 @@ has y_offset =>
 	required	=> 0,
 );
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 # ------------------------------------------------
 
@@ -447,9 +449,7 @@ sub write
 	my($self, %options)	= @_;
 	my($file_name)		= $options{output_file_name} || $self -> output_file_name;
 
-	open(my $fh, '>:encoding(UTF-8)', $file_name);
-	print $fh  $self -> svg -> xmlify;
-	close $fh;
+	write_text($file_name, $self -> svg -> xmlify);
 
 } # End of write.
 

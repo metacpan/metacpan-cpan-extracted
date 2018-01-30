@@ -8,4 +8,4 @@
 # 2 .. 5: Use for anything. E.g.: -maxlevel debug.
 
 perl -Ilib scripts/bnf2tree.pl -marpa_bnf share/metag.bnf -cooked share/$1.cooked.tree \
-	-raw share/$1.raw.tree -user_bnf share/$1.bnf $2 $3 $4 $5
+	-raw share/$1.raw.tree -user_bnf share/$1.bnf -rules share/$1.rules $2 $3 $4 $5

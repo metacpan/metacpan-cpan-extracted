@@ -14,7 +14,7 @@ use vars qw( @EXPORT_OK %EXPORT_TAGS );
 %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use vars '$VERSION';
-$VERSION = '1.16';
+$VERSION = '1.18';
 my $CPERL = $^V =~ /c$/ ? 1 : 0;
 
 use vars '@Scalars';
@@ -148,7 +148,7 @@ use vars '@Functions';
     bind
     binmode
     bless ),
-  ($] >= 5.009003 && ($] < 5.027007 || $CPERL) ? qw(
+  ($] >= 5.009003 && ($] < 5.027007 || $] >= 5.027008 || $CPERL) ? qw(
     break
   ) : ()), qw(
     caller
@@ -363,12 +363,12 @@ use vars '@Functions';
     waitpid
     wantarray
     warn ),
-  ($] >= 5.009003 && ($] < 5.027007 || $CPERL) ? qw(
+  ($] >= 5.009003 && ($] < 5.027007 || $] >= 5.027008 || $CPERL) ? qw(
     when
-  ) : qw(
+  ) : ($] >= 5.009003 && !$CPERL) ? qw(
     whereis
     whereso
-  )), qw(
+  ) : ()), qw(
     write
 
     -r -w -x -o
@@ -609,7 +609,7 @@ for patches and releases.
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2009 Joshua ben Jore, All rights reserved.
-Copyright 2013, 2015, 2017 Reini Urban, All rights reserved.
+Copyright 2013, 2015, 2017, 2018 Reini Urban, All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of either:

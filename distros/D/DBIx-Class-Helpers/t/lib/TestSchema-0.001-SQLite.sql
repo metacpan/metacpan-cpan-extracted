@@ -1,6 +1,6 @@
 -- 
 -- Created by SQL::Translator::Producer::SQLite
--- Created on Sun Mar 12 12:14:52 2017
+-- Created on Fri Jan 26 09:33:21 2018
 -- 
 
 BEGIN TRANSACTION;
@@ -49,6 +49,14 @@ CREATE TABLE "HasDateOps" (
 CREATE TABLE "Search" (
   "id" INTEGER PRIMARY KEY NOT NULL,
   "name" varchar NOT NULL
+);
+
+--
+-- Table: "SerializeAll"
+--
+CREATE TABLE "SerializeAll" (
+  "id" INTEGER PRIMARY KEY NOT NULL,
+  "text_column" text NOT NULL
 );
 
 --

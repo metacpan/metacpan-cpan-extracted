@@ -18,8 +18,9 @@ my @show_versions =
 foreach my $package (@show_versions)
 {   eval "require $package";
 
+    no strict 'refs';
     my $report
-      = !$@                    ? "version ". ($package->VERSION || 'unknown')
+      = !$@    ? "version ". (${"$package\::VERSION"} || 'unknown')
       : $@ =~ m/^Can't locate/ ? "not installed"
       : "reports error";
 

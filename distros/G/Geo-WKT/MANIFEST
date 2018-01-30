@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Geo/WKT.pm
 lib/Geo/WKT.pod
 t/01use.t

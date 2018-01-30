@@ -1,5 +1,8 @@
 Revision history for MVC-Neaf
 
+0.2203  Thu Jan 25 2018
+        - AUX Add github links to Makefile.PL
+
 0.2202  Fri Jan 19 2018
         - TST Fix tests under Plack < 1.043 https://rt.cpan.org/Ticket/Display.html?id=124124
 

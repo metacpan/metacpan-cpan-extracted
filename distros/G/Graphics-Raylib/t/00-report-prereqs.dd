@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::raylib' => '0.006'
+                                    'Alien::raylib' => '0.008'
                                   }
                   },
        'configure' => {
@@ -26,14 +26,16 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::raylib' => '0.006',
+                                      'Alien::raylib' => '0.008',
                                       'Import::Into' => '0',
                                       'perl' => '5.010'
                                     }
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'PDL' => '0',
+                                     'PDL::Matrix' => '0'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',

@@ -1,19 +1,21 @@
-# Copyrights 2009-2011 by Mark Overmeer.
+# Copyrights 2009-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.00.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Net-FTPSSL-Robust.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Net::FTPSSL::Robust;
 use vars '$VERSION';
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 use base 'Net::FTP::Robust', 'Exporter';
 
-our @EXPORT =
-  qw/SECURITY_TLS
-     SECURITY_SSL/;
+use warnings;
+use strict;
+
+our @EXPORT = qw/SECURITY_TLS SECURITY_SSL/;
 
 use Log::Report 'net-ftpssl-robust', syntax => 'SHORT';
 

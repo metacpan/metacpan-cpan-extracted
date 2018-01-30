@@ -55,8 +55,6 @@ struct tconv {
   tconv_convert_external_t convertExternal;
   /* 6. last error */
   char                     errors[TCONV_ERROR_SIZE];
-  /* 7. fuzzy state */
-  short                    fuzzyb;
 };
 
 #ifndef TCONV_HELPER_BUFSIZ
@@ -284,8 +282,6 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
   tconvp->errors[0] = '\0';
   /* Last byte can never change, because we do an strncpy */
   tconvp->errors[TCONV_ERROR_SIZE - 1] = '\0';
-  /* 7. fuzzy state */
-  tconvp->fuzzyb = 0;
 
   /* 1. trace */
   traces                       = getenv(TCONV_ENV_TRACE);
@@ -457,6 +453,12 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         tconvp->convertExternal.tconv_convert_runp  = tconv_convert_ICU_run;
         tconvp->convertExternal.tconv_convert_freep = tconv_convert_ICU_free;
         tconvp->convertExternal.optionp             = tconvOptionp->convertp->u.ICUOptionp;
+#else
+	TCONV_TRACE(tconvp, "%s - ICU converter is not available", funcs);
+        tconvp->convertExternal.tconv_convert_newp  = NULL;
+        tconvp->convertExternal.tconv_convert_runp  = NULL;
+        tconvp->convertExternal.tconv_convert_freep = NULL;
+        tconvp->convertExternal.optionp             = NULL;
 #endif
         break;
       case TCONV_CONVERT_ICONV:
@@ -466,6 +468,12 @@ tconv_t tconv_open_ext(const char *tocodes, const char *fromcodes, tconv_option_
         tconvp->convertExternal.tconv_convert_runp  = tconv_convert_iconv_run;
         tconvp->convertExternal.tconv_convert_freep = tconv_convert_iconv_free;
         tconvp->convertExternal.optionp             = tconvOptionp->convertp->u.iconvOptionp;
+#else
+	TCONV_TRACE(tconvp, "%s - ICONV converter is not available", funcs);
+        tconvp->convertExternal.tconv_convert_newp  = NULL;
+        tconvp->convertExternal.tconv_convert_runp  = NULL;
+        tconvp->convertExternal.tconv_convert_freep = NULL;
+        tconvp->convertExternal.optionp             = NULL;
 #endif
         break;
       default:
@@ -573,7 +581,7 @@ size_t tconv(tconv_t tconvp, char **inbufsp, size_t *inbytesleftlp, char **outbu
       TCONV_TRACE(tconvp, "%s - initializing convert engine: %p(%p, %p, %p, %p)", funcs, tconvp->convertExternal.tconv_convert_newp, tconvp, tconvp->tocodes, tconvp->fromcodes, convertOptionp);
       tconvp->errors[0] = '\0';
       convertContextp = tconvp->convertExternal.tconv_convert_newp(tconvp, tconvp->tocodes, tconvp->fromcodes, convertOptionp);
-      if (convertContextp == (void *)-1) {
+      if (convertContextp == NULL) {
 	goto err;
       }
     }
@@ -827,49 +835,6 @@ char *tconv_tocode(tconv_t tconvp)
 }
 
 /****************************************************************************/
-short tconv_fuzzy_setb(tconv_t tconvp, short fuzzyb)
-/****************************************************************************/
-{
-  static const char funcs[] = "tconv_fuzzy_setb";
-
-  if (tconvp == NULL) {
-    errno = EINVAL;
-    return 0;
-  }
-
-  TCONV_TRACE(tconvp, "%s(%p, %d)", funcs, tconvp, (int) fuzzyb);
-
-  tconvp->fuzzyb = fuzzyb;
-
-  TCONV_TRACE(tconvp, "%s - return %d (fuzzyb=%d)", funcs, (int) tconvp->fuzzyb);
-
-  return fuzzyb;
-}
-
-/****************************************************************************/
-short tconv_fuzzy_getb(tconv_t tconvp, short *fuzzybp)
-/****************************************************************************/
-{
-  static const char funcs[] = "tconv_fuzzy_get";
-
-  if (tconvp == NULL) {
-    errno = EINVAL;
-    return 0;
-  }
-
-
-  TCONV_TRACE(tconvp, "%s(%p)", funcs, tconvp);
-
-  if (fuzzybp != NULL) {
-    *fuzzybp = tconvp->fuzzyb;
-  }
-
-  TCONV_TRACE(tconvp, "%s - return %d (fuzzyb=%d)", funcs, (int) tconvp->fuzzyb);
-
-  return 1;
-}
-
-/****************************************************************************/
 tconv_helper_t *tconv_helper_newp(tconv_t tconvp, void *contextp, tconv_producer_t producerp, tconv_consumer_t consumerp)
 /****************************************************************************/
 {
@@ -878,7 +843,7 @@ tconv_helper_t *tconv_helper_newp(tconv_t tconvp, void *contextp, tconv_producer
   char              *toclones = NULL;
   char              *fromclones = NULL;
 
-  if ((tconvp == NULL) || (producerp == NULL) || (consumerp == NULL)) {
+  if ((tconvp == NULL) || (tconvp == (tconv_t)-1) || (producerp == NULL) || (consumerp == NULL)) {
     errno = EINVAL;
     return NULL;
   }

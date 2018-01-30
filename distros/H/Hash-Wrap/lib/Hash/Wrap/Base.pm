@@ -7,35 +7,15 @@ use 5.008009;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our $AUTOLOAD;
 
 use Hash::Wrap ();
 use Scalar::Util;
 
-our $generate_signature = sub {
-    return '';
-};
-
-our $generate_body = sub {
-
-    my ( $self, $method, $key ) = @_;
-
-    return qq{
-        my \$self = shift;
-
-        unless ( exists \$self->{'$key'} ) {
-            require Carp;
-            Carp::croak( qq[Can't locate object method "$key" via package \@{[ Scalar::Util::blessed( \$self ) ]} \n] );
-          }
-
-        \$self->{'$key'} = \$_[0] if \@_;
-
-        return \$self->{'$key'};
-   };
-};
-
+our $generate_signature = sub { '' };
+our $generate_validate = sub { 'exists $self->{<<KEY>>}' };
 
 #pod =begin pod_coverage
 #pod
@@ -58,7 +38,8 @@ sub can {
 
     ## no critic (ProhibitNoStrict)
     no strict 'refs';
-    return *{$method}{CODE} || Hash::Wrap::_generate_accessor( $self, $method, $key );
+    return *{$method}{CODE}
+      || Hash::Wrap::_generate_accessor( $self, $method, $key );
 }
 
 sub DESTROY { }
@@ -80,7 +61,7 @@ Hash::Wrap::Base - Hash::Wrap  base class
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =begin pod_coverage
 

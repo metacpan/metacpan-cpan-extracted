@@ -23,7 +23,7 @@ WriteMakefile(
         'Calendar::Gregorian' => '0.15',
         'Calendar::Hebrew'    => '0.02',
         'Calendar::Hijri'     => '0.33',
-        'Calendar::Julian'    => '0.02',
+        'Calendar::Julian'    => '0.07',
         'Calendar::Persian'   => '0.35',
         'Calendar::Saka'      => '1.34',
     },

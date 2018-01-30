@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Digest::SHA1" => 0,
     "Email::MIME" => "1.929",
-    "Email::MIME::CreateHTML" => "1.041",
+    "Email::MIME::CreateHTML" => "1.042",
     "Email::MIME::CreateHTML::Resolver::LWP" => 0,
     "Email::Simple" => "2.206",
     "Encode" => 0,
@@ -63,7 +63,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,7 +78,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "Digest::SHA1" => 0,
   "Email::MIME" => "1.929",
-  "Email::MIME::CreateHTML" => "1.041",
+  "Email::MIME::CreateHTML" => "1.042",
   "Email::MIME::CreateHTML::Resolver::LWP" => 0,
   "Email::Simple" => "2.206",
   "Encode" => 0,

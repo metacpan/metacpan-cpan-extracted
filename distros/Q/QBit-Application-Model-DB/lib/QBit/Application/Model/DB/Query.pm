@@ -1,5 +1,5 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.025';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.027';
 use base qw(Exception::DB);
 
 =head1 Name
@@ -13,7 +13,7 @@ Base class for DB queries.
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.025';
+$QBit::Application::Model::DB::Query::VERSION = '0.027';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -1333,7 +1333,9 @@ sub _field_to_sql {
               )
         );
     } else {
-        throw Exception::BadArguments gettext('Bad field expression:\n%s', Dumper($expr));
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 2;
+        throw Exception::BadArguments gettext("Bad expression:\n%s", Dumper($expr));
     }
 }
 

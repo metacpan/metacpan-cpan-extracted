@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Net::FTPSSL::Robust - download files over FTP
@@ -69,7 +71,7 @@ use
 =head2 Comparison
 
 Net::FTPSSL implements the FTP protocol over encrypted connections.
-C<Net::FTPSLL::Robust> adds retries and logging, to retrieve
+C<Net::FTPSSL::Robust> adds retries and logging, to retrieve
 data which takes hours to download, sometimes over quite instable
 connections.  It uses Log::Report which can connect to various logging
 frameworks for its messages.
@@ -80,15 +82,14 @@ See L<Net::FTP::Robust/Limitations>.
 
 =head1 SEE ALSO
 
-This module is part of Net-FTPSSL-Robust distribution version 0.05,
-built on August 22, 2011. Website: F<http://perl.overmeer.net>.  See also L<Net::FTP>.
+This module is part of Net-FTPSSL-Robust distribution version 0.06,
+built on January 22, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
-=head1 COPYRIGHTS
+=head1 LICENSE
 
-Copyrights of the perl code and the related documentation by
-2009-2011 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2009-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

@@ -2,8 +2,8 @@ NAME
     App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 VERSION
-    This document describes version 0.004 of App::CryptoCurrencyUtils (from
-    Perl distribution App-CryptoCurrencyUtils), released on 2018-01-21.
+    This document describes version 0.006 of App::CryptoCurrencyUtils (from
+    Perl distribution App-CryptoCurrencyUtils), released on 2018-01-30.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -12,7 +12,9 @@ DESCRIPTION
 
     *   coin-mno
 
-    *   grepcoin
+    *   grep-coin
+
+    *   list-coins
 
 FUNCTIONS
   coin_cmc
@@ -54,6 +56,31 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   symbols_or_names* => *array[cryptocurrency::symbol_or_name]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_coins
+    Usage:
+
+     list_coins() -> [status, msg, result, meta]
+
+    List cryptocurrency coins.
+
+    This utility lists coins from CryptoCurrency::Catalog, which in turn
+    gets its list from <https://coinmarketcap.com/>.
+
+    This function is not exported.
+
+    No arguments.
 
     Returns an enveloped result (an array).
 

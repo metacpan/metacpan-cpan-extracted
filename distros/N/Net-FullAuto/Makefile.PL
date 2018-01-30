@@ -1,7 +1,7 @@
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2017  Brian M. Kelly
+#    Copyright © 2000-2018  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000404';
+our $VERSION='1.0000405';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -269,7 +269,7 @@ my $fa_banner=<<END;
 
 
 
-   Copyright $c 2000-2017  Brian M. Kelly  Brian.Kelly\@FullAuto.com
+   Copyright $c 2000-2018  Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 
 END
@@ -2058,8 +2058,8 @@ END
    &fa_install_module('Sub::Install','install','Makefile');
    &fa_install_module('Data::OptList','install','Makefile');
    &fa_install_module('B::Hooks::OP::Check','install','Makefile');
+   &fa_install_module('Lexical::SealRequireHints','install','Build');
    &fa_install_module('multidimensional','install','Makefile');
-   &fa_install_module('Lexical::SealRequireHints','install','Makefile');
    &fa_install_module('bareword::filehandles','install','Makefile');
    &fa_install_module('indirect','install','Makefile');
    &fa_install_module('strictures','install','Makefile');
@@ -6231,7 +6231,7 @@ END
 
    *THANK YOU* For Trying FullAuto!   Net::FullAuto INSTALLATION PROGRAM
 
-   Copyright (C) 2000-2017   Brian M. Kelly   Brian.Kelly\@FullAuto.com
+   Copyright (C) 2000-2018   Brian M. Kelly   Brian.Kelly\@FullAuto.com
 
    This program comes with ABSOLUTELY NO WARRANTY; for details select 2.
    This is free software, and you are welcome to redistribute it under certain

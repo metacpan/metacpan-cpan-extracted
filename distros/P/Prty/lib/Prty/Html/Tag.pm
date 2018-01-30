@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Template;
 use Prty::String;
@@ -1311,7 +1311,7 @@ sub tag {
             }
             else {
                 $self->throw(
-                    q{HTML-00001: Unbekannte Option},
+                    q~HTML-00001: Unbekannte Option~,
                     Option=>$key,
                     Value=>$val,
                 );
@@ -1330,7 +1330,7 @@ sub tag {
     
         if ($endTagOnly) {
             $self->throw(
-                q{HTML-00004: Attribute bei Option -endTagOnly nicht erlaubt},
+                q~HTML-00004: Attribute bei Option -endTagOnly nicht erlaubt~,
                 Tag=>$tag,
                 Attribute=>$key,
                 Value=>$val,
@@ -1342,7 +1342,7 @@ sub tag {
         my $dom = $Attribute{$key} || '';
         if (!$dom && $checkLevel && $key !~ /^data-/) {
             $self->throw(
-                q{HTML-00003: Unbekanntes Attribut},
+                q~HTML-00003: Unbekanntes Attribut~,
                 Tag=>$tag,
                 Attribute=>$key,
                 Value=>$val,
@@ -1416,7 +1416,7 @@ sub tag {
     # Element prüfen
 
     if (!$e && $checkLevel) {
-        $self->throw(q{HTML-00002: Unbekanntes Element},Element=>$tag);
+        $self->throw(q~HTML-00002: Unbekanntes Element~,Element=>$tag);
     }
 
     # Content bestimmen
@@ -1488,7 +1488,7 @@ sub tag {
     }
     elsif ($fmt eq 'e' || $fmt eq 'E') {
         if (length $content) {
-            $self->throw(q{HTML-00003: Kein Content erwartet});
+            $self->throw(q~HTML-00003: Kein Content erwartet~);
         }
     }
     elsif ($fmt eq 'v' && $content !~ /\n/ || $fmt eq 'i') {
@@ -1519,7 +1519,7 @@ sub tag {
     }
     else {
         $self->throw(
-            q{HTML-00002: Unerlaubter Wert für Option -fmt},
+            q~HTML-00002: Unerlaubter Wert für Option -fmt~,
             Value=>$fmt,
         );
     }
@@ -1733,7 +1733,7 @@ sub cat {
         }
         #else {
         #    $self->throw(
-        #        q{HTML-00002: Unbekannte Option},
+        #        q~HTML-00002: Unbekannte Option~,
         #        Option=>$_[0],
         #    );
         #}
@@ -1827,7 +1827,7 @@ sub doctype {
         }
         else {
             $self->throw(
-                q{HTML-00001: Unbekannte Option},
+                q~HTML-00001: Unbekannte Option~,
                 Option=>$key,
                 Value=>shift,
             );
@@ -1867,7 +1867,7 @@ sub doctype {
     }
     else {
         $self->throw(
-            q{HTML-00002: Unbekannte HTML-Version},
+            q~HTML-00002: Unbekannte HTML-Version~,
             Version=>"'$version'",
         );
     }
@@ -1959,7 +1959,7 @@ sub optional {
         }
         else {
             $self->throw(
-                q{HTML--0001: Unbekannte Option},
+                q~HTML--0001: Unbekannte Option~,
                 Option=>$key,
                 Value=>$val,
             );
@@ -2101,7 +2101,7 @@ sub import {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -2109,7 +2109,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

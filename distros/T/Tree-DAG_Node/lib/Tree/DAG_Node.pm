@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 use File::Slurp::Tiny 'read_lines';
 
@@ -1083,7 +1083,7 @@ sub read_attributes
 	my($attributes);
 	my($name);
 
-	if ($s =~ /^(.+)\. Attributes: ({.*})$/)
+	if ($s =~ /^(.+)\. Attributes: (\{.*\})$/)
 	{
 		($name, $attributes) = ($1, $self -> string2hashref($2) );
 	}

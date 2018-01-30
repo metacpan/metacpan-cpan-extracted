@@ -7,8 +7,9 @@ package Devel::MAT::Tool::Inrefs;
 
 use strict;
 use warnings;
+use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use List::Util qw( any pairs );
 
@@ -37,22 +38,11 @@ refer to them.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my ( $pmat, %args ) = @_;
-
-   $class->patch_inrefs( $pmat->dumpfile, progress => $args{progress} );
-
-   return $class;
-}
-
-sub patch_inrefs
+sub init_tool
 {
    my $self = shift;
-   my ( $df, %args ) = @_;
 
-   my $progress = $args{progress};
+   my $df = $self->df;
 
    my $heap_total = scalar $df->heap;
    my $count = 0;
@@ -64,8 +54,8 @@ sub patch_inrefs
       }
 
       $count++;
-      $progress->( sprintf "Patching refs in %d of %d (%.2f%%)",
-         $count, $heap_total, 100*$count / $heap_total ) if $progress and ($count % 10000) == 0
+      $self->report_progress( sprintf "Patching refs in %d of %d (%.2f%%)",
+         $count, $heap_total, 100*$count / $heap_total ) if ($count % 10000) == 0
    }
 
    # Most SVs are not roots or on the stack. To save time later on we'll make
@@ -88,7 +78,7 @@ sub patch_inrefs
       $sv->{tool_inrefs}[IDX_STACK]++;
    }
 
-   $progress->() if $progress;
+   $self->report_progress();
 }
 
 =head1 SV METHODS
@@ -206,6 +196,59 @@ sub Devel::MAT::SV::inrefs_weak     { shift->_inrefs( qw( weak        )) }
 sub Devel::MAT::SV::inrefs_direct   { shift->_inrefs( qw( strong weak )) }
 sub Devel::MAT::SV::inrefs_indirect { shift->_inrefs( qw( indirect    )) }
 sub Devel::MAT::SV::inrefs_inferred { shift->_inrefs( qw( inferred    )) }
+
+=head1 COMANDS
+
+=cut
+
+=head2 inrefs
+
+   pmat> inrefs defstash
+   s  the hash  GLOB(%*) at 0x556e47243e40
+
+Shows the incoming references that refer to a given SV.
+
+Takes the following named options:
+
+=over 4
+
+=item --weak
+
+Include weak direct references in the output (by default only strong direct
+ones will be included).
+
+=item --all
+
+Include both weak and indirect references in the output.
+
+=back
+
+=cut
+
+use constant CMD => "inrefs";
+use constant CMD_DESC => "Show incoming references to a given SV";
+
+use constant CMD_OPTS => (
+   weak     => { help => "include weak references" },
+   all      => { help => "include weak and indirect references",
+                 alias => "a" },
+);
+
+use constant CMD_ARGS_SV => 1;
+
+sub run
+{
+   my $self = shift;
+   my %opts = %{ +shift };
+   my ( $sv ) = @_;
+
+   my $method = $opts{all}  ? "inrefs" :
+                $opts{weak} ? "inrefs_direct" :
+                              "inrefs_strong";
+
+   require Devel::MAT::Tool::Outrefs;
+   Devel::MAT::Tool::Outrefs->show_refs_by_method( $method, $sv );
+}
 
 =head1 AUTHOR
 

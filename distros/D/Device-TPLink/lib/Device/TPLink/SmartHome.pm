@@ -11,11 +11,11 @@ Device::TPLink::SmartHome - Base class for TPLink Smart Home devices
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has 'fwVer' => ( #"1.1.0 Build 160521 Rel.085826"
   is => 'rw',

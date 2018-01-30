@@ -10,7 +10,7 @@ BEGIN {
 }
 
 
-$Inline::Java::Protocol::VERSION = '0.53' ;
+$Inline::Java::Protocol::VERSION = '0.53_90' ;
 
 my %CLASSPATH_ENTRIES = () ;
 

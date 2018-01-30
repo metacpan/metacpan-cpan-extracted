@@ -1,25 +1,34 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Dumpvalue;
-use Tags::Utils qw(encode_attr_entities);
+use Tags::Output;
 
-# Input data.
-my @data = ('&', '<', '"');
+# Object.
+my $tags = Tags::Output->new;
 
-# Encode.
-encode_attr_entities(\@data);
+# Put all tag types.
+$tags->put(
+        ['b', 'tag'],
+        ['a', 'par', 'val'],
+        ['c', 'data', \'data'],
+        ['e', 'tag'],
+        ['i', 'target', 'data'],
+        ['b', 'tag'],
+        ['d', 'data', 'data'],
+        ['e', 'tag'],
+);
 
-# Dump out.
-my $dump = Dumpvalue->new;
-$dump->dumpValues(\@data);
+# Print out.
+print $tags->flush."\n";
 
 # Output:
-# 0  ARRAY(0x8b8f428)
-#    0  '&amp;'
-#    1  '&lt;'
-#    2  '&quot;'
+# Begin of tag
+# Attribute
+# Comment
+# End of tag
+# Instruction
+# Begin of tag
+# Data
+# End of tag

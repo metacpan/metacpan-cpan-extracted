@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
@@ -120,12 +120,6 @@ __END__
 =item --show-opts
 
 Exit after showing what yath thinks your options mean
-
-=item -h
-
-=item --help
-
-Exit after showing this help message
 
 =item -h
 

@@ -6,7 +6,7 @@ use warnings;
 use Algorithm::Combinatorics qw(subsets variations);
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 my$self;
 
@@ -31,6 +31,7 @@ sub new{
 			minLaplace => undef,
 			minJaccard => undef
 		},
+		precision => 3,
 		output => undef,
 		pathOutputFiles => "",
 		messages => undef,
@@ -78,6 +79,12 @@ sub input_data_file{
 		or die('Error: $apriori->input_data_file("datafile.txt",",") missing parameters path to data file and/or item separator!');
 	my$file=$_[1];
 	my$separator=$_[2];
+	(-e $file)
+		or die("Error: the file \"$file\" does not exists!");
+	(-r $file)
+		or die("Error: the file \"$file\" is not readable!");
+	(-T $file)
+		or die("Error: the file \"$file\" is not a text file!");
 	open(FILE,"<$file")
 		or die("Error: $!");
 	while(my$line=<FILE>){
@@ -110,7 +117,7 @@ sub association_rules{
 	my @frequentItemset;
 	if($self->{messages}){
 		print "\nLarge itemset of length $self->{largeItemsetLength}, ${\scalar(@largeItemset)} items ";
-		print "\nProcessing... ";
+		print "\nProcessing ...";
 	}
 	VARIATIONS:
 	foreach my$variation(@variations){
@@ -157,16 +164,16 @@ sub association_rules{
 			my $jaccard = ($support/($supportAntecedent+$supportConsequent-$support));
 			next if(defined $self->{metrics}{minJaccard} && $jaccard < $self->{metrics}{minJaccard});
 			$self->{rule}++;
-			$support = sprintf("%.4f", $support);
-			$confidence = sprintf("%.4f", $confidence);
-			$lift = sprintf("%.4f", $lift);
-			$leverage = sprintf("%.4f", $leverage);
-			$conviction = sprintf("%.4f", $conviction)if($conviction ne "NaN");
-			$coverage = sprintf("%.4f", $coverage);
-			$correlation = sprintf("%.4f", $correlation);
-			$cosine = sprintf("%.4f", $cosine);
-			$laplace = sprintf("%.4f", $laplace);
-			$jaccard = sprintf("%.4f", $jaccard);
+			$support = sprintf("%.$self->{precision}f", $support);
+			$confidence = sprintf("%.$self->{precision}f", $confidence);
+			$lift = sprintf("%.$self->{precision}f", $lift);
+			$leverage = sprintf("%.$self->{precision}f", $leverage);
+			$conviction = sprintf("%.$self->{precision}f", $conviction)if($conviction ne "NaN");
+			$coverage = sprintf("%.$self->{precision}f", $coverage);
+			$correlation = sprintf("%.$self->{precision}f", $correlation);
+			$cosine = sprintf("%.$self->{precision}f", $cosine);
+			$laplace = sprintf("%.$self->{precision}f", $laplace);
+			$jaccard = sprintf("%.$self->{precision}f", $jaccard);
 			$self->{associationRules}{$self->{rule}} = {
 				implication => "{ @antecedent } => { @consequent }",
 				support => $support, 
@@ -204,7 +211,7 @@ sub association_rules{
 
 sub stop{
 	if($self->{messages}){
-		print "\nStopping... ";
+		print "\nStopping ...";
 		$self->output if $self->{associationRules};
 		print "\nExit? (Y/N): ";
 		my $answer = <STDIN>;
@@ -213,7 +220,7 @@ sub stop{
 			exit;
 		}
 		else{
-			print "Processing... ";
+			print "Processing ...";
 		}
 	}
 	else{
@@ -235,7 +242,7 @@ sub output{
 
 sub file{
 	if($self->{messages}){
-		print "\nExporting to file $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.txt... ";
+		print "\nExporting to file $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.txt ...";
 	}
 	open(FILE,">$self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.txt")
 		or die("\nError: $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.txt $!");
@@ -286,7 +293,7 @@ sub file{
 sub excel{
 	require Excel::Writer::XLSX;
 	if($self->{messages}){
-		print "\nExporting to excel $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.xlsx... ";
+		print "\nExporting to excel $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.xlsx ...";
 	}
 	my $workbook  = Excel::Writer::XLSX->new("$self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.xlsx") 
 		or die("\nError: $self->{pathOutputFiles}output_large_itemset_length_$self->{largeItemsetLength}.xlsx $!");
@@ -412,32 +419,34 @@ Data::Mining::Apriori - Perl extension for implement the apriori algorithm of da
 
 	my $apriori = new Data::Mining::Apriori;
 
-	$apriori->{metrics}{minSupport}=0.0155; # The minimum support(required), default value is 0.01(1%)
+	$apriori->{metrics}{minSupport}=0.0155; # The minimum support (required), default value is 0.01 (1%)
 
-	$apriori->{metrics}{minConfidence}=0.0155; # The minimum confidence(required), default value is 0.10(10%)
+	$apriori->{metrics}{minConfidence}=0.0155; # The minimum confidence (required), default value is 0.10 (10%)
 
-	$apriori->{metrics}{minLift}=1; # The minimum lift(optional)
+	$apriori->{metrics}{minLift}=1; # The minimum lift (optional)
 
-	$apriori->{metrics}{minLeverage}=0; # The minimum leverage(optional)
+	$apriori->{metrics}{minLeverage}=0; # The minimum leverage (optional)
 
-	$apriori->{metrics}{minConviction}=0; # The minimum conviction(optional)
+	$apriori->{metrics}{minConviction}=0; # The minimum conviction (optional)
 
-	$apriori->{metrics}{minCoverage}=0; # The minimum coverage(optional)
+	$apriori->{metrics}{minCoverage}=0; # The minimum coverage (optional)
 
-	$apriori->{metrics}{minCorrelation}=0; # The minimum correlation(optional)
+	$apriori->{metrics}{minCorrelation}=0; # The minimum correlation (optional)
 
-	$apriori->{metrics}{minCosine}=0; # The minimum cosine(optional)
+	$apriori->{metrics}{minCosine}=0; # The minimum cosine (optional)
 
-	$apriori->{metrics}{minLaplace}=0; # The minimum laplace(optional)
+	$apriori->{metrics}{minLaplace}=0; # The minimum laplace (optional)
 
-	$apriori->{metrics}{minJaccard}=0; # The minimum jaccard(optional)
+	$apriori->{metrics}{minJaccard}=0; # The minimum jaccard (optional)
+
+	$apriori->{precision}=2; # Sets the floating point precision of the metrics (required), default value is 3
 
 	$apriori->{output}=1;
-	# The output type(optional): 1 - Export to text file delimited by tab; 2 - Export to excel file with chart.
+	# The output type (optional): 1 - Export to text file delimited by TAB; 2 - Export to excel file with chart.
 
-	$apriori->{pathOutputFiles}='data/'; # The path to output files(optional)
+	$apriori->{pathOutputFiles}='data/'; # The path to output files (optional)
 
-	$apriori->{messages}=1; # A value boolean to display the messages(optional)
+	$apriori->{messages}=1; # A value boolean to display the messages (optional)
 
 	$apriori->{keyItemsDescription}{'101'}='MILK'; # Hash table reference to add items by key and description
 	$apriori->{keyItemsDescription}{102}='BREAD';
@@ -458,7 +467,7 @@ Data::Mining::Apriori - Perl extension for implement the apriori algorithm of da
 	# or from a data file
 
 	$apriori->input_data_file("datafile.txt",",");
-	# Insert key items by line(transaction), accepts the arguments of path to data file and item separator
+	# Insert key items by line (transaction), accepts the arguments of path to data file and item separator
 
 	# file contents (example)
 
@@ -475,9 +484,9 @@ Data::Mining::Apriori - Perl extension for implement the apriori algorithm of da
 
 	print "\n${\$apriori->quantity_possible_rules}"; # Show the quantity of possible rules
 
-	$apriori->{limitRules}=10; # The limit of rules(optional)
+	$apriori->{limitRules}=10; # The limit of rules (optional)
 
-	$apriori->{limitSubsets}=12; # The limit of subsets(optional)
+	$apriori->{limitSubsets}=12; # The limit of subsets (optional)
 
 	$apriori->generate_rules;
 	# Generate association rules to no longer meet the minimum support, confidence, lift, leverage, conviction, coverage, correlation, cosine, laplace, jaccard or limit of rules
@@ -489,210 +498,85 @@ Data::Mining::Apriori - Perl extension for implement the apriori algorithm of da
 	12
 	3 items, 12 possible rules
 	Large itemset of length 2, 3 items
-	Processing...
-	Frequent itemset: { 101, 103, 102 }, 3 items
-	Exporting to file data/output_large_itemset_length_2.txt...
+	Processing ...
+	Frequent itemset: { 102, 103, 101 }, 3 items
+	Exporting to file data/output_large_itemset_length_2.txt ...
 	Large itemset of length 3, 3 items
-	Processing...
+	Processing ...
 	Frequent itemset: { 101, 102, 103 }, 3 items
-	Exporting to file data/output_large_itemset_length_3.txt...
+	Exporting to file data/output_large_itemset_length_3.txt ...
 	101, 102, 103
 
 	#output file "output_itemset_length_2.txt"
 
 	Rules	Support	Confidence	Lift	Leverage	Conviction	Coverage	Correlation	Cosine	Laplace	Jaccard
-	R1	0,7000	0,8750	1,2500	0,1400	2,4000	0,8000	0,7638	0,9354	0,6071	0,8750
-	R2	0,7000	0,8750	1,2500	0,1400	2,4000	0,8000	0,7638	0,9354	0,6071	0,8750
-	R3	0,7000	0,7778	1,1111	0,0700	1,3500	0,9000	0,5092	0,8819	0,5862	0,7778
-	R4	0,8000	0,8889	1,1111	0,0800	1,8000	0,9000	0,6667	0,9428	0,6207	0,8889
-	R5	0,7000	0,7778	1,1111	0,0700	1,3500	0,9000	0,5092	0,8819	0,5862	0,7778
-	R6	0,8000	0,8889	1,1111	0,0800	1,8000	0,9000	0,6667	0,9428	0,6207	0,8889
+	R1	0,80	0,89	1,11	0,08	1,80	0,90	0,67	0,94	0,62	0,89
+	R2	0,70	0,78	1,11	0,07	1,35	0,90	0,51	0,88	0,59	0,78
+	R3	0,80	0,89	1,11	0,08	1,80	0,90	0,67	0,94	0,62	0,89
+	R4	0,70	0,78	1,11	0,07	1,35	0,90	0,51	0,88	0,59	0,78
+	R5	0,70	0,87	1,25	0,14	2,40	0,80	0,76	0,94	0,61	0,87
+	R6	0,70	0,87	1,25	0,14	2,40	0,80	0,76	0,94	0,61	0,87
 
-	Rule R1: { 101 } => { 103 }
-	Support: 0,7000
-	Confidence: 0,8750
-	Lift: 1,2500
-	Leverage: 0,1400
-	Conviction: 2,4000
-	Coverage: 0,8000
-	Correlation: 0,7638
-	Cosine: 0,9354
-	Laplace: 0,6071
-	Jaccard: 0,8750
+	Rule R1: { 102 } => { 103 }
+	Support: 0,80
+	Confidence: 0,89
+	Lift: 1,11
+	Leverage: 0,08
+	Conviction: 1,80
+	Coverage: 0,90
+	Correlation: 0,67
+	Cosine: 0,94
+	Laplace: 0,62
+	Jaccard: 0,89
 	Items:
-	101 MILK
+	102 BREAD
 	103 CEREAL
 
-	to be continued...
+	#...
 
 	#output file "output_itemset_length_3.txt"
 
 	Rules	Support	Confidence	Lift	Leverage	Conviction	Coverage	Correlation	Cosine	Laplace	Jaccard
-	R7	0,6000	0,7500	1,2500	0,1200	1,6000	0,8000	0,6124	0,8660	0,5714	0,7500
-	R8	0,6000	0,8571	1,4286	0,1800	2,8000	0,7000	0,8018	0,9258	0,5926	0,8571
-	R9	0,6000	0,8571	1,4286	0,1800	2,8000	0,7000	0,8018	0,9258	0,5926	0,8571
-	R10	0,6000	0,6667	1,1111	0,0600	1,2000	0,9000	0,4082	0,8165	0,5517	0,6667
+	R7	0,60	0,67	1,11	0,06	1,20	0,90	0,41	0,82	0,55	0,67
+	R8	0,60	0,75	1,25	0,12	1,60	0,80	0,61	0,87	0,57	0,75
+	R9	0,60	0,86	1,43	0,18	2,80	0,70	0,80	0,93	0,59	0,86
+	R10	0,60	0,67	1,11	0,06	1,20	0,90	0,41	0,82	0,55	0,67
+	R11	0,60	0,86	1,43	0,18	2,80	0,70	0,80	0,93	0,59	0,86
+	R12	0,60	0,75	1,25	0,12	1,60	0,80	0,61	0,87	0,57	0,75
 
-	Rule R7: { 101 } => { 102, 103 }
-	Support: 0,6000
-	Confidence: 0,7500
-	Lift: 1,2500
-	Leverage: 0,1200
-	Conviction: 1,6000
-	Coverage: 0,8000
-	Correlation: 0,6124
-	Cosine: 0,8660
-	Laplace: 0,5714
-	Jaccard: 0,7500
+	Rule R7: { 102 } => { 101, 103 }
+	Support: 0,60
+	Confidence: 0,67
+	Lift: 1,11
+	Leverage: 0,06
+	Conviction: 1,20
+	Coverage: 0,90
+	Correlation: 0,41
+	Cosine: 0,82
+	Laplace: 0,55
+	Jaccard: 0,67
 	Items:
-	101 MILK
 	102 BREAD
-	103 CEREAL
-
-	Rule R8: { 101, 103 } => { 102 }
-	Support: 0,6000
-	Confidence: 0,8571
-	Lift: 1,4286
-	Leverage: 0,1800
-	Conviction: 2,8000
-	Coverage: 0,7000
-	Correlation: 0,8018
-	Cosine: 0,9258
-	Laplace: 0,5926
-	Jaccard: 0,8571
-	Items:
 	101 MILK
 	103 CEREAL
+
+	Rule R8: { 102, 103 } => { 101 }
+	Support: 0,60
+	Confidence: 0,75
+	Lift: 1,25
+	Leverage: 0,12
+	Conviction: 1,60
+	Coverage: 0,80
+	Correlation: 0,61
+	Cosine: 0,87
+	Laplace: 0,57
+	Jaccard: 0,75
+	Items:
 	102 BREAD
+	103 CEREAL
+	101 MILK
 
-	to be continued...
-
-	# or from a database
-
-	# CREATE TABLE dimension_product(
-		# product_key INTEGER NOT NULL PRIMARY KEY,
-		# product_alternate_key INTEGER NOT NULL,
-		# product_name TEXT NOT NULL,
-		# price REAL NOT NULL
-		# -- ...
-	# );
-
-	# INSERT INTO dimension_product VALUES(1,101,'MILK',10.00);
-	# INSERT INTO dimension_product VALUES(2,102,'BREAD',10.00);
-	# INSERT INTO dimension_product VALUES(3,103,'CEREAL',10.00);
-	# -- ...
-
-	# CREATE TABLE fact_sales(
-		# sales_order_number INTEGER NOT NULL,
-		# sales_order_line_number INTEGER NOT NULL,
-		# product_key INTEGER NOT NULL,
-		# quantity INTEGER NOT NULL,
-		# -- ...
-		# PRIMARY KEY(sales_order_number, sales_order_line_number),
-		# FOREIGN KEY(product_key) REFERENCES dimension_product(product_key)
-	# );
-
-	# INSERT INTO fact_sales VALUES(1101,1,3,1);
-	# INSERT INTO fact_sales VALUES(1101,2,1,1);
-	# INSERT INTO fact_sales VALUES(1102,1,3,1);
-	# INSERT INTO fact_sales VALUES(1102,2,2,1);
-	# INSERT INTO fact_sales VALUES(1103,1,1,1);
-	# INSERT INTO fact_sales VALUES(1103,2,2,1);
-	# INSERT INTO fact_sales VALUES(1103,3,3,1);
-	# INSERT INTO fact_sales VALUES(1104,1,1,1);
-	# INSERT INTO fact_sales VALUES(1104,2,2,1);
-	# INSERT INTO fact_sales VALUES(1104,3,3,1);
-	# INSERT INTO fact_sales VALUES(1105,1,1,1);
-	# INSERT INTO fact_sales VALUES(1105,2,2,1);
-	# INSERT INTO fact_sales VALUES(1106,1,1,1);
-	# INSERT INTO fact_sales VALUES(1106,2,2,1);
-	# INSERT INTO fact_sales VALUES(1106,3,3,1);
-	# INSERT INTO fact_sales VALUES(1107,1,1,1);
-	# INSERT INTO fact_sales VALUES(1107,2,2,1);
-	# INSERT INTO fact_sales VALUES(1107,3,3,1);
-	# INSERT INTO fact_sales VALUES(1108,1,3,1);
-	# INSERT INTO fact_sales VALUES(1108,2,2,1);
-	# INSERT INTO fact_sales VALUES(1109,1,1,1);
-	# INSERT INTO fact_sales VALUES(1109,2,2,1);
-	# INSERT INTO fact_sales VALUES(1109,3,3,1);
-	# INSERT INTO fact_sales VALUES(1110,1,1,1);
-	# INSERT INTO fact_sales VALUES(1110,2,2,1);
-	# INSERT INTO fact_sales VALUES(1110,3,3,1);
-	# -- ...
-
-	use DBD::SQLite;
-	use Data::Mining::Apriori;
-
-	my $apriori = new Data::Mining::Apriori;
-
-	$apriori->{metrics}{minSupport}=0.0155;
-
-	$apriori->{metrics}{minConfidence}=0.0155;
-
-	$apriori->{metrics}{minLift}=1;
-
-	$apriori->{metrics}{minLeverage}=0;
-
-	$apriori->{metrics}{minConviction}=0;
-
-	$apriori->{metrics}{minCoverage}=0;
-
-	$apriori->{metrics}{minCorrelation}=0;
-
-	$apriori->{metrics}{minCosine}=0;
-
-	$apriori->{metrics}{minLaplace}=0;
-
-	$apriori->{metrics}{minJaccard}=0;
-
-	$apriori->{output}=1;
-
-	$apriori->{pathOutputFiles}='data/';
-
-	$apriori->{messages}=1;
-
-	my $db = DBI->connect('dbi:SQLite:dbname=DW.db','','');
-
-	my$sql = qq~
-	SELECT DISTINCT(fs.sales_order_number)
-	FROM dimension_product dp
-	JOIN fact_sales fs ON
-	dp.product_key = fs.product_key
-	-- WHERE ...
-	~;
-
-	my$query = $db->prepare($sql);
-	$query->execute;
-	my$transactions=$query->fetchall_arrayref;
-
-	foreach my$transaction(@$transactions){
-		$sql = qq~
-		SELECT dp.product_alternate_key, dp.product_name
-		FROM dimension_product dp
-		JOIN fact_sales fs ON
-		dp.product_key = fs.product_key
-		WHERE fs.sales_order_number = $$transaction[0];
-		-- AND ...
-		~;
-		$query = $db->prepare($sql);
-		$query->execute;
-		my@items;
-		while(my($key,$description)=$query->fetchrow){
-			$apriori->{keyItemsDescription}{$key}=$description;
-			push@items,$key;
-		}
-		$apriori->insert_key_items_transaction(\@items);
-	}
-
-	print "\n${\$apriori->quantity_possible_rules}";
-
-	$apriori->{limitRules}=10;
-
-	$apriori->{limitSubsets}=12;
-
-	$apriori->generate_rules;
-
-	print "\n@{$apriori->{frequentItemset}}\n";
+	#...
 
 =head1 DESCRIPTION
 
@@ -712,63 +596,67 @@ The type of metrics
 
 =item minSupport
 
-The minimum support(required), default value is 0.01(1%)
+The minimum support (required), default value is 0.01 (1%)
 
 =item minConfidence
 
-The minimum confidence(required), default value is 0.10(10%)
+The minimum confidence (required), default value is 0.10 (10%)
 
 =item minLift
 
-The minimum lift(optional)
+The minimum lift (optional)
 
 =item minLeverage
 
-The minimum leverage(optional)
+The minimum leverage (optional)
 
 =item minConviction
 
-The minimum conviction(optional)
+The minimum conviction (optional)
 
 =item minCoverage
 
-The minimum coverage(optional)
+The minimum coverage (optional)
 
 =item minCorrelation
 
-The minimum correlation(optional)
+The minimum correlation (optional)
 
 =item minCosine
 
-The minimum cosine(optional)
+The minimum cosine (optional)
 
 =item minLaplace
 
-The minimum laplace(optional)
+The minimum laplace (optional)
 
 =item minJaccard
 
-The minimum jaccard(optional)
+The minimum jaccard (optional)
 
 =back
 
+=head2 precision
+
+Sets the floating point precision of the metrics (required), default value is 3
+
 =head2 limitRules
 
-The limit of rules(optional)
+The limit of rules (optional)
 
 =head2 limitSubsets
 
-The limit of subsets(optional)
+The limit of subsets (optional)
 
 =head2 output
 
-The output type(optional):
+The output type (optional):
 
 =over 4
 
 =item *
 
-1 - Text file delimited by tab;
+1 - Text file delimited by TAB;
 
 =item *
 
@@ -778,11 +666,11 @@ The output type(optional):
 
 =head2 pathOutputFiles
 
-The path to output files(optional)
+The path to output files (optional)
 
 =head2 messages
 
-A value boolean to display the messages(optional)
+A value boolean to display the messages (optional)
 
 =head2 keyItemsDescription
 
@@ -801,24 +689,24 @@ Frequent itemset.
 A data structure to store the name of the rule, key items, implication, support, confidence, lift, leverage, conviction, coverage, correlation, cosine, laplace and jaccard.
 
 	$self->{associationRules} = {
-	                            '1' => {
-	                                   'implication' => '{ 101 } => { 103 }',
-	                                   'jaccard' => '0,8750',
-	                                   'conviction' => '2,4000',
-	                                   'cosine' => '0,9354',
-	                                   'coverage' => '0,8000',
-	                                   'correlation' => '0,7638',
-	                                   'lift' => '1,2500',
-	                                   'leverage' => '0,1400',
-	                                   'laplace' => '0,6071',
-	                                   'support' => '0,7000',
-	                                   'confidence' => '0,8750',
-	                                   'items' => [
-	                                                '101',
-	                                                '103'
-	                                              ]
-	                                 },
-	                            # to be continued...
+								  '1' => {
+										   'confidence' => '0.89',
+										   'cosine' => '0.94',
+										   'implication' => '{ 102 } => { 103 }',
+										   'coverage' => '0.90',
+										   'laplace' => '0.62',
+										   'jaccard' => '0.89',
+										   'support' => '0.80',
+										   'correlation' => '0.67',
+										   'items' => [
+														'102',
+														'103'
+													  ],
+										   'conviction' => '1.80',
+										   'lift' => '1.11',
+										   'leverage' => '0.08'
+										 },
+									#...
 
 =head1 METHODS
 
@@ -840,7 +728,7 @@ An array reference to key items.
 
 =head2 input_data_file("datafile.txt",",")
 
-Insert items per line(transaction). Accepts the following arguments:
+Insert items per line (transaction). Accepts the following arguments:
 
 =over 4
 
@@ -885,7 +773,7 @@ Alex Graciano, E<lt>agraciano@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2016 by Alex Graciano
+Copyright (C) 2015-2018 by Alex Graciano
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.4 or,

@@ -1,28 +1,47 @@
 #!/usr/bin/env perl
 
-package Example3;
-
 # Pragmas.
 use strict;
 use warnings;
 
 # Modules.
-use Error::Pure::PrintVar qw(err);
+use Dumpvalue;
+use Error::Pure::Die qw(err);
+use Error::Pure::Utils qw(err_get);
 
-# Test with error.
-sub test {
-        err '1', '2', '3';
-}
+# Error in eval.
+eval { err '1', '2', '3'; };
 
-package main;
+# Error structure.
+my @err = err_get();
 
-# Pragmas.
-use strict;
-use warnings;
+# Dump.
+my $dump = Dumpvalue->new;
+$dump->dumpValues(\@err);
 
-# Run.
-Example3::test();
-
-# Output:
-# Example3: 1
-# 2: 3
+# In \@err:
+# [
+#         {
+#                 'msg' => [
+#                         '1',
+#                         '2',
+#                         '3',
+#                 ],
+#                 'stack' => [
+#                         {
+#                                 'args' => '(1)',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'err',
+#                         },
+#                         {
+#                                 'args' => '',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'eval {...}',
+#                         },
+#                 ],
+#         },
+# ],

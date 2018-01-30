@@ -4,7 +4,29 @@ Unless explicitly stated differently are all changes produced by
 Mark Overmeer.
 
 TODO:
- . Add source http://www.ltsw.se/knbase/internet/mime.htp ?
+	. Add source http://www.ltsw.se/knbase/internet/mime.htp ?
+
+version 2.17: Fri Jan 26 23:42:01 CET 2018
+
+	Fixes:
+	- when picking a preferred type for an extension, do prefer the type
+	  with the same minor-name.  Issue triggered by [Henry van Styn]
+	- remove iana obsoleted types
+
+version 2.16: Tue 23 Jan 12:14:39 CET 2018
+
+	Fixes:
+	- collecting of IANA info has stalled: logic rewritten
+	  Discovered by [Julien Lüthi]
+
+	Improvements:
+	- move scripts and source files into MANIFEST.extra
+	- update types and extensions
+
+version 2.15: Fri 19 Jan 17:23:56 CET 2018
+
+	Improvements:
+	- moved to GIT and GitHUB.
 
 version 2.14: Wed  8 Nov 17:45:22 CET 2017
 
@@ -440,6 +462,8 @@ version 0.12:  Wed Nov 28 09:39:44 CET 2001
 	Mark Overmeer took the namespace over from Jeff Okamoto
 	- In scalar context MIME::Types::type will return only the
 	  first type that fits.
+
+version 0.11:
 
 version 0.10:  Sat Nov  3 22:46:22 2001
 	Mark Overmeer

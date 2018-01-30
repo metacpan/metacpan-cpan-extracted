@@ -45,5 +45,6 @@ lib/Geo/ISO19139/xsd/2005/gts/temporalObjects.xsd
 t/01use.t
 t/10r2005.t
 t/11r2005.t
-t/pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

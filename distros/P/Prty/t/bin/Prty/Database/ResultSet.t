@@ -8,6 +8,9 @@ use warnings;
 use utf8;
 
 use Prty::Database::ResultSet::Array;
+use Prty::Test::Class;
+use Prty::FileHandle;
+use Prty::Perl;
 
 # -----------------------------------------------------------------------------
 

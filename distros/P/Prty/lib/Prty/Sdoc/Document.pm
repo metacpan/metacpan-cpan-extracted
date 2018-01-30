@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Sdoc::Line;
+use Prty::Sdoc::Link;
 use Prty::Sdoc::Node;
 use Prty::Sdoc::TableOfContents;
 use Prty::Sdoc::Figure;
@@ -26,7 +27,8 @@ use Prty::Sdoc::Item;
 use Prty::Sdoc::Quote;
 use Prty::Sdoc::PageBreak;
 use Prty::Option;
-use Prty::TextFile;
+use Prty::LineProcessor;
+use Prty::Hash;
 use Prty::OrderedHash;
 use Prty::Object;
 use Prty::Html::Tag;
@@ -84,7 +86,7 @@ Die Klasse repräsentiert einen Sdoc-Parsingbaum.
 
 =item -baseUrl => $url
 
-Setze in den Kopf der HTML-Seite eine <base>-Tag mit dem angegebenen URL.
+Setze in den Kopf der HTML-Seite einen <base>-Tag mit dem angegebenen URL.
 
 =item -centerTablesAndFigures => $bool (Default: 0)
 
@@ -180,9 +182,9 @@ sub new {
         );
     }
 
-    # Zunächst TextFile-Dokument instantiieren
+    # Zunächst LineProcessor-Dokument instantiieren
 
-    my $doc = Prty::TextFile->new($inp,
+    my $doc = Prty::LineProcessor->new($inp,
         -lineClass=>'Prty::Sdoc::Line',
         -lineContinuation=>'backslash',
         -skip=>$comments? qr/^#/: undef,
@@ -194,6 +196,7 @@ sub new {
         type=>'Document',
         parent=>undef,
         childs=>[],
+        links=>Prty::Hash->new->unlockKeys, # für Link-Definitionen
         anchorsGlob=>Prty::OrderedHash->new,
         generateAnchors=>1,
         html4=>$html4,
@@ -211,7 +214,6 @@ sub new {
         cssPrefix=>$cssPrefix,
         
     );
-    # $self->lockKeys;
 
     while (@{$doc->lines}) {
         my ($type,$arr) = $self->nextType($doc);
@@ -223,7 +225,8 @@ sub new {
         # alle Knoten sind dem Dokument untergeordet, daher
         # gibt es hier keine Abbruchbedingung
 
-        push @{$self->{'childs'}},"Prty::Sdoc::$type"->new($doc,$self,$arr);
+        push @{$self->{'childs'}},
+            "Prty::Sdoc::$type"->new($doc,$self,$arr);
     }
 
     # alle Knoten
@@ -274,7 +277,7 @@ sub new {
             for (my $i = 0; $i < $level; $i++) {
                 if (!defined $secNum[$i]) {
                     $self->throw(
-                        q{SDOC-00004: Abschnittsebene zu tief},
+                        q~SDOC-00004: Abschnittsebene zu tief~,
                         Depth=>$level,
                         DocumentTitle=>$self->{'title'},
                         SectionTitle=>$node->{'title'},
@@ -608,7 +611,7 @@ sub dump {
     }
 
     $self->throw(
-        q{SDOC-00002: Nicht-unterstütztes Format},
+        q~SDOC-00002: Nicht-unterstütztes Format~,
         Format=>$format,
     );
 }
@@ -617,7 +620,7 @@ sub dump {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -625,7 +628,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

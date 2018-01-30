@@ -4,7 +4,7 @@
       "David Morel <david.morel@amakuru.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "thrift",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Thrift-SASL-Transport",
    "prereqs" : {
@@ -36,6 +36,7 @@
          "requires" : {
             "Authen::SASL::XS" : "0",
             "Data::Dumper" : "0",
+            "Devel::CheckLib" : "0",
             "Thrift" : "v0.10.0",
             "Thrift::BinaryProtocol" : "0",
             "constant" : "0",
@@ -54,7 +55,6 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.010"
          }
       }
@@ -70,11 +70,11 @@
          "web" : "https://github.com/Perl-Hadoop/Thrift-SASL"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>",
       "David Morel <dmor@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

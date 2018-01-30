@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.180190';
+$Bio::MUST::Core::Ali::VERSION = '0.180230';
 use Moose;
 use namespace::autoclean;
 
@@ -23,8 +23,6 @@ use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:gaps :files);
 use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Core::SeqMask';
-with 'Bio::MUST::Core::Roles::Commentable',
-     'Bio::MUST::Core::Roles::Listable';
 
 # ATTRIBUTES
 
@@ -71,6 +69,10 @@ has 'guessing' => (
     },
 );
 
+
+with 'Bio::MUST::Core::Roles::Commentable',
+     'Bio::MUST::Core::Roles::Listable';
+with 'Bio::MUST::Core::Roles::Aliable';     ## no critic (ProhibitMultipleWiths)
 
 # CONSTRUCTORS
 
@@ -448,9 +450,10 @@ sub store_fasta {
     my $outfile = shift;
     my $args    = shift // {};          # HashRef (should not be empty...)
 
-    my $degap = $args->{degap} // 0;
-    my $clean = $args->{clean} // 0;
-    my $chunk = $args->{chunk} // 60;
+    my $degap = $args->{degap}  //  0;
+    my $clean = $args->{clean}  //  0;
+    my $gap   = $args->{gapify} // 'X';
+    my $chunk = $args->{chunk}  // 60;
     my $nowrap = $chunk < 0 ? 1 : 0;
     my $is_aligned = $self->is_aligned;
 
@@ -461,7 +464,7 @@ sub store_fasta {
 
         # optionally clean and/or degap seq
         $seq = $seq->clone  if $clean || $degap;    # clone seq only if needed
-        $seq->gapify('X')   if $clean;
+        $seq->gapify($gap)  if $clean;
         $seq->degap         if $degap;
 
         my $width = $seq->seq_len;
@@ -732,7 +735,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.180190
+version 0.180230
 
 =head1 SYNOPSIS
 
@@ -1181,7 +1184,7 @@ Long ids without abbreviated forms in the IdMapper are left untouched.
     my $ali = Ali->load('input.ali');
     my $mapper = IdMapper->std_mapper($ali, 'lcl|seq');
     $ali->shorten_ids($mapper);
-    $ali->store_fasta('input.4blast.ali');
+    $ali->store_fasta('input.4blast.fasta');
     # makeblastdb
 
     # Note: the temp_fasta method does exactly that
@@ -1311,7 +1314,8 @@ automatically forwards the call to C<store_fasta>.
     $ali->store('output.fasta');
     # output.fasta is written in FASTA format
 
-This method requires one argument.
+This method requires one argument (but see C<store_fasta> in case of automatic
+forwarding of the method call).
 
 =head2 store_fasta
 
@@ -1321,16 +1325,22 @@ For compatibility purposes, this method automatically fetches sequence ids
 using the C<foreign_id> method instead of the native C<full_id> method, both
 described in L<Bio::MUST::Core::SeqId>.
 
-    $ali->store_fasta('output.fasta');
-    $ali->store_fasta('output.fasta', {chunk => -1, degap => 1});
+    $ali->store_fasta( 'output.fasta' );
+    $ali->store_fasta( 'output.fasta', {chunk => -1, degap => 1} );
 
 This method requires one argument and accepts a second optional argument
 controlling the output format. It is a hash reference that may contain one
 or more of the following keys:
 
     - clean: replace all ambiguous and missing states by C<X> (default: false)
-    - chunk: line width (default is 60 chars; negative values means no wrap)
     - degap: boolean value controlling degapping (default: false)
+    - chunk: line width (default is 60 chars; negative values means no wrap)
+
+Finally, it is possible to fine-tune the behavior of the C<clean> option by
+providing another character than C<X> through the C<gapify> key. This can be
+useful to replace all ambiguous and missing states by gaps, as shown below:
+
+    $ali->store_fasta( 'output.fasta, { clean => 1, gapify => '*' } );
 
 =head2 temp_fasta
 
@@ -1340,7 +1350,7 @@ only a convenience method.
 
 In list context, returns the IdMapper object along with temporary filename.
 
-    my $infile = $ali->temp_fasta({ degap => 1 });
+    my $infile = $ali->temp_fasta( { degap => 1 } );
     my $output = `script.sh $infile`;
     ...
 
@@ -1386,7 +1396,7 @@ L<Bio::MUST::Core::IdMapper>.
     my $ali = Ali->load('input.ali');
     my $mapper = IdMapper->std_mapper($ali);
     $ali->shorten_ids($mapper);
-    $ali->store_phylip('input.phy', 50);
+    $ali->store_phylip( 'input.phy', { chunk => 50 } );
 
 This method requires one argument and accepts a second optional argument
 controlling the output format. It is a hash reference that may contain one

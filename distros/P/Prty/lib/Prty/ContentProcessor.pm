@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Path;
 use Prty::Option;
@@ -15,8 +15,8 @@ use Prty::DestinationTree;
 use Prty::Terminal;
 use Prty::Section::Parser;
 use Prty::Section::Object;
-use Prty::Formatter;
 use Prty::PersistentHash;
+use Prty::Formatter;
 
 # -----------------------------------------------------------------------------
 
@@ -125,7 +125,7 @@ Liste alle Entitäten vom Typ $type auf:
 
 =head2 Konstruktor
 
-=head3 new() - Instantiiere ContentProcessor
+=head3 new() - Instantiiere ContentProcessor-Objekt
 
 =head4 Synopsis
 
@@ -200,50 +200,48 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Sub-Abschnitte
+=head2 Storage
 
-=head3 processSubSection() - Verarbeite Sub-Abschnitt einer Entität
+=head3 storage() - Pfad zum oder innerhalb des Storage
 
 =head4 Synopsis
 
-    $cop->processSubSection($fileEnt,$ent,$mainSec,$sec);
+    $path = $cop->storage;
+    $path = $cop->storage($subPath);
 
 =head4 Arguments
 
 =over 4
 
-=item $fileEnt
+=item $subPath
 
-Entität, die Träger des gesamten Quelltextes ist. Diese ist im
-Quelltext mit [] gekennzeichnet.
-
-=item $ent
-
-Die aktuelle Entität. Kann identisch zu $fileEnt oder eine
-Sub-Entität (z.B. (File) oder (ProgramClass)) sein.
-
-=item $mainSec
-
-Die Entität oder Sub-Entität, der die mit <> gekennzeichneten
-Abschnitte zugeordnet werden.
-
-=item $sec
-
-Der aktuelle Abschnitt.
+Ein Sub-Pfad innerhalb des Storage.
 
 =back
 
 =head4 Returns
 
-nichts
+Pfad
+
+=head4 Description
+
+Liefere den Pfad des Storage, ggf. ergänzt um den Sub-Pfad
+$subPath.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub processSubSection {
-    my ($self,$fileEnt,$ent,$mainSec,$sec) = @_;
-    return;
+sub storage {
+    my $self = shift;
+    # @_: $subPath
+
+    my $path = $self->{'storage'};
+    if (@_) {
+        $path .= '/'.shift;
+    }
+
+    return $path;
 }
 
 # -----------------------------------------------------------------------------
@@ -329,9 +327,163 @@ sub registerType {
 
 # -----------------------------------------------------------------------------
 
+=head3 entityTypes() - Liste der Abschnitts-Typen
+
+=head4 Synopsis
+
+    @types | $typeA = $cop->entityTypes;
+
+=head4 Returns
+
+Liste von Abschnitts-Typen. Im Skalarkontext eine Referenz auf die
+Liste.
+
+=head4 Description
+
+Liefere die Liste der Abschnitts-Typen (Bezeichner), die per
+registerType() registriert wurden.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub entityTypes {
+    my $self = shift;
+
+    my $a = $self->memoize('entityTypeA',sub {
+        my ($self,$key) = @_;
+
+        my %h;
+        for my $plg (@{$self->{'pluginA'}}) {
+            $h{$plg->entityType}++;
+        }
+
+        return [sort keys %h];
+    });
+
+    return wantarray? @$a: $a;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 plugin() - Ermittele Plugin zu Abschnitts-Objekt
+
+=head4 Synopsis
+
+    $plg = $cop->plugin($sec);
+
+=head4 Arguments
+
+=over 4
+
+=item $sec
+
+Abschnitts-Objekt
+
+=back
+
+=head4 Returns
+
+Plugin-Objekt
+
+=head4 Description
+
+Ermittele das Plugin zu Abschnitts-Objekt $sec. Existiert
+kein Plugin zu dem Abschnitts-Objekt, liefere C<undef>.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+my %Plugins; # Section-Type => Liste der Plugins
+my $Plugin;  # Universelles Plugin (es sollte höchstens eins definiert sein)
+    
+sub plugin {
+    my ($self,$sec) = @_;
+
+    if (!%Plugins) {
+        # Indiziere Plugins nach Section-Type
+
+        for my $plg (@{$self->{'pluginA'}}) {
+            if (my $type = $plg->sectionType) {
+                # Normales Plugin
+                push @{$Plugins{$type}},$plg;
+            }
+            else {
+                # Universelles Plugin
+                $Plugin = $plg;
+            }
+        }
+    }
+        
+    # Prüfe Section gemäß Plugin-Kriterien
+
+    if (my $pluginA = $Plugins{$sec->type}) {
+        for my $plg (@$pluginA) {
+            my $ok = 1;
+            my $a = $plg->keyValA;
+            for (my $i = 0; $i < @$a; $i += 2) {
+                if ($sec->get($a->[$i]) ne $a->[$i+1]) {
+                    $ok = 0;
+                    last;
+                }
+            }
+            if ($ok) {
+                return $plg;
+            }
+        }
+    }
+    
+    # Kein Plugin zum SectionType gefunden. Wir liefern das
+    # universelle Plugin, sofern existent, oder undef
+
+    return $Plugin? $Plugin: undef;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Operationen
 
-=head3 commit() - Übertrage Veränderungen in den Storage
+=head3 init() - Erzeuge Storage
+
+=head4 Synopsis
+
+    $cop = $cop->init;
+
+=head4 Returns
+
+ContentProcessor-Objekt (für Method-Chaining)
+
+=head4 Description
+
+Erzeuge den Storage, falls er nicht existiert. Existiert er bereits,
+hat der Aufruf keinen Effekt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub init {
+    my $self = shift;
+
+    $self->msg(1,'%T ==init');
+
+    my $storage = $self->storage;
+    if (!-e $storage) {
+        for ('','/db','/def','/pure') {
+            my $dir = "$storage$_";
+            Prty::Path->mkdir($dir);
+            $self->msg(1,"$dir -- directory created");
+        }
+    }
+    
+    return $self;
+}
+    
+
+# -----------------------------------------------------------------------------
+
+=head3 commit() - Übertrage Änderungen in den Storage
 
 =head4 Synopsis
 
@@ -343,8 +495,8 @@ sub registerType {
 
 =item -incomplete => $bool (Default: 0)
 
-Lade fehlende Entitäten aus dem Storage nach anstatt sie zum Löschen
-anzubieten.
+Lade fehlende Entitäten aus dem Storage nach anstatt sie zum
+Löschen anzubieten.
 
 =back
 
@@ -356,8 +508,7 @@ ContentProcessor-Objekt (für Method-Chaining)
 
 Vergleiche den Quelltext jeder Entität gegen den Quelltext im
 Storage und übertrage etwaige Änderungen dorthin. Geänderte
-Entitäten werden in der in der Datenbank als geändert
-gekennzeichnet.
+Entitäten werden in der Datenbank als geändert gekennzeichnet.
 
 =cut
 
@@ -418,292 +569,6 @@ sub commit {
     return $self;
 }
     
-
-# -----------------------------------------------------------------------------
-
-=head3 fetch() - Erzeuge Verzeichnisstruktur mit Entitäts-Definitionen
-
-=head4 Synopsis
-
-    $cop = $cop->fetch($dir,$layout,@opt);
-
-=head4 Arguments
-
-=over 4
-
-=item $dir
-
-Verzeichnis, in welches die Entitäts-Definitionen geschrieben
-werden.
-
-=item $layout
-
-Bezeichnung für das Verzeichnis-Layout. Dieser Parameter wird von
-fetchFiles() der Basisklasse nicht genutzt und ist daher hier
-nicht dokumentiert. Siehe Dokumentation bei den Subklassen.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -overwrite => $bool (Default: 0)
-
-Stelle keine Rückfrage, wenn Verzeichnis $dir bereits existiert.
-
-=back
-
-=head4 Returns
-
-ContentProcessor-Objekt (für Method-Chaining)
-
-=head4 Description
-
-Übertrage alle Entitäts-Definitionen in Verzeichnis $dir (oder
-STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
-dabei ein konsistenter Stand hergestellt. Existiert Verzeichnis
-$dir nicht, wird es angelegt. Andernfalls wird eine Rückfrage
-gestellt, ob das Verzeichnis überschrieben werden soll (siehe
-auch Option --overwrite).
-
-Wird als Verzeichnis ein Bindestrich (-) angegeben, werden die
-Entitäts-Definitionen nach STDOUT geschrieben.
-
-Die Methode bezieht die zu schreibenden Dateien von der Methode
-L</fetchFiles>(), an die der Parameter $layout weiter gereicht
-wird. Die Methode kann in abgeleiteten Klassen überschrieben
-werden, um andere Strukturen zu generieren.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub fetch {
-    my ($self,$dir,$layout) = @_;
-
-    $self->msg(1,'%T ==fetch==');
-
-    # Optionen
-
-    my $overwrite = 0;
-
-    Prty::Option->extract(\@_,
-        -overwrite=>\$overwrite,
-    );
-
-    if ($dir eq '-') {
-        for my $e ($self->fetchFiles($layout)) {
-            # eof-Marker ergänzen
-    
-            my $ref = ref $e->[1]? $e->[1]: \$e->[1];
-            $$ref =~ s/\n+$//;
-            $$ref .= "\n\n# eof\n";
-
-            print $$ref;
-        }
-        return $self;
-    }
-    elsif (-d $dir && !$overwrite) {
-        my $answ = Prty::Terminal->askUser(
-            "Overwrite directory '$dir'?",
-            -values=>'y/n',
-            -default=>'y',
-            -outHandle=>\*STDERR,
-            -timer=>$self->getRef('t0'),
-        );
-        if ($answ ne 'y') {
-            return $self;
-        }
-    }
-    
-    my $dt = Prty::DestinationTree->new($dir,
-        -quiet=>0,
-        -language=>'en',
-        -outHandle=>\*STDERR,
-    );
-    $dt->addDir($dir);
-
-    for my $e ($self->fetchFiles($layout)) {
-        # eof-Marker ergänzen
-    
-        my $ref = ref $e->[1]? $e->[1]: \$e->[1];
-        $$ref =~ s/\n+$//;
-        $$ref .= "\n\n# eof\n";
-
-        $dt->addFile("$dir/$e->[0]",$ref,
-            -encoding=>'utf-8',
-            -skipEmptyFiles=>1, # Sub-Entities übergehen (z.B. ProgramClass)
-        );
-    }
-
-    # Lösche überzählige Storage-Dateien (nach Rückfrage)
-
-    $dt->cleanup(1,$self->getRef('t0'));
-    $dt->close;
-
-    return $self;
-}
-    
-
-# -----------------------------------------------------------------------------
-
-=head3 init() - Erzeuge Storage
-
-=head4 Synopsis
-
-    $cop = $cop->init;
-
-=head4 Returns
-
-ContentProcessor-Objekt (für Method-Chaining)
-
-=head4 Description
-
-Erzeuge den Storage, falls er nicht existiert. Existiert er bereits,
-hat der Aufruf keinen Effekt.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub init {
-    my $self = shift;
-
-    $self->msg(1,'%T ==init');
-
-    my $storage = $self->storage;
-    if (!-e $storage) {
-        for ('','/db','/def','/pure') {
-            my $dir = "$storage$_";
-            Prty::Path->mkdir($dir);
-            $self->msg(1,"$dir -- directory created");
-        }
-    }
-    
-    return $self;
-}
-    
-
-# -----------------------------------------------------------------------------
-
-=head3 parseFiles() - Parse Dateien zu Entitäten
-
-=head4 Synopsis
-
-    @entities | $entityA = $cop->parseFiles(@files);
-
-=head4 Arguments
-
-=over 4
-
-=item @files
-
-Liste der Dateien. '-' bedeutet STDIN.
-
-=back
-
-=head4 Returns
-
-Liste der Entitäten. Im Skalarkontext eine Referenz auf die Liste.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub parseFiles {
-    my ($self,@files) = @_;
-
-    # Instantiiere Parser
-
-    my $par = Prty::Section::Parser->new(
-        encoding=>'utf-8',
-    );
-
-    # Parse Dateien zu Entitäten
-
-    my (@entities,$fileEnt,$mainSec);
-    for my $file (@files) {
-        $par->parse($file,sub {
-            my $sec = Prty::Section::Object->new(@_);
-            # $sec->removeEofMarker;
-
-            my $brackets = $sec->brackets;
-            if ($brackets eq '[]') {
-                $fileEnt = $mainSec = $sec;
-            }
-            elsif ($brackets eq '()') {
-                $mainSec = $sec;
-            }
-
-            while (1) {
-                if ($sec->brackets eq '[]') {
-                    # Wandele Abschnitts-Objekt in Entität
-
-                    my $plg = $self->plugin($sec);
-                    if (!$plg) {
-                        # Fehler: Für jeden Haupt-Abschnitt muss ein
-                        # Plugin definiert worden sein
-
-                        $sec->error(
-                            q{COP-00001: Missing plugin for section},
-                            Section=>$sec->fullType,
-                        );
-                    }
-                    push @entities,$plg->class->create($sec,$self,$plg);
-                }
-                elsif (@entities) {
-                    # Verarbeite nächsten Sub-Abschnitt
-
-                    $self->processSubSection($fileEnt,$entities[-1],
-                        $mainSec,$sec);
-                    if ($sec->brackets eq '[]') {
-                        # Sub-Abschnitt als Entität verarbeiten
-                        # (Beispiel: ProgramClass => Class)
-                        redo;
-                    }
-                }
-                else {
-                    # Fehler: Erster Abschnitt ist kein []-Abschnitt
-
-                    $sec->error(
-                        q{COP-00002: First section must be a []-section},
-                         Section=>$sec->fullType,
-                    );
-                }
-                last;
-            }
-
-            # Datei-Entity um Abschnitts-Quelltext ergänzen
-            $fileEnt->appendFileSource($sec);
-
-            # Abschnittsobjekt gegen unabsichtliche Erweiterungen sperren
-            $sec->lockKeys;
-
-            return;
-        });
-
-        # "# eof" vom Dateiende entfernen
-
-        my $fileSourceR = $fileEnt->fileSourceRef;
-        $$fileSourceR =~ s/\n+# eof\s*$/\n\n/;
-
-        if (substr($$fileSourceR,-1,1) ne "\n") {
-            $fileEnt->error(
-                q{COP-00003: File entity must end with a newline},
-            );
-        }
-    }
-
-    # Statistische Daten speichern
-
-    $self->addNumber(parsedSections=>$par->get('parsedSections'));
-    $self->addNumber(parsedLines=>$par->get('parsedLines'));
-    $self->addNumber(parsedChars=>$par->get('parsedChars'));
-    $self->addNumber(parsedBytes=>$par->get('parsedBytes'));
-
-    return wantarray? @entities: \@entities;
-}
 
 # -----------------------------------------------------------------------------
 
@@ -783,91 +648,141 @@ sub load {
 
 # -----------------------------------------------------------------------------
 
-=head2 Entitäten
-
-=head3 entities() - Liefere Menge von Entities
+=head3 fetch() - Hole Entitäts-Definitionen aus dem Storage
 
 =head4 Synopsis
 
-    @entities | $entityA = $cop->entities;
-    @entities | $entityA = $cop->entities($type);
+    $cop = $cop->fetch($dir,$layout,@opt);
 
 =head4 Arguments
 
 =over 4
 
-=item $type
+=item $dir
 
-Abschnitts-Typ.
+Verzeichnis, in welches die Entitäts-Definitionen geschrieben
+werden.
+
+=item $layout
+
+Bezeichnung für das Verzeichnis-Layout. Dieser Parameter wird von
+filesToFetch() der Basisklasse nicht genutzt und ist daher hier
+nicht dokumentiert. Siehe Dokumentation bei den Subklassen.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -overwrite => $bool (Default: 0)
+
+Stelle keine Rückfrage, wenn Verzeichnis $dir bereits existiert.
 
 =back
 
 =head4 Returns
 
-Liste von Entitäten. Im Skalarkontext eine Referenz auf die Liste.
+ContentProcessor-Objekt (für Method-Chaining)
 
 =head4 Description
 
-Liefere die Liste aller geladenen Entities oder aller
-geladenen Entities vom Typ $type. Bei der Abfrage der Entities
-eines Typs werden die Entities nach Name sortiert geliefert.
+Übertrage alle Entitäts-Definitionen in Verzeichnis $dir (oder
+STDOUT, s.u.) gemäß Layout $layout. Per Differenzbildung wird
+dabei ein konsistenter Stand hergestellt. Existiert Verzeichnis
+$dir nicht, wird es angelegt. Andernfalls wird eine Rückfrage
+gestellt, ob das Verzeichnis überschrieben werden soll (siehe
+auch Option --overwrite).
+
+Wird als Verzeichnis ein Bindestrich (-) angegeben, werden die
+Entitäts-Definitionen nach STDOUT geschrieben.
+
+Die Methode bezieht die zu schreibenden Dateien von der Methode
+L</filesToFetch>(), an die der Parameter $layout weiter gereicht
+wird. Die Methode kann in abgeleiteten Klassen überschrieben
+werden, um andere Strukturen zu generieren.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub entities {
-    my ($self,$type) = @_;
+sub fetch {
+    my ($self,$dir,$layout) = @_;
 
-    if (!$type) {
-        my $entityA = $self->{'entityA'};
-        return wantarray? @$entityA: $entityA;
+    $self->msg(1,'%T ==fetch==');
+
+    # Optionen
+
+    my $overwrite = 0;
+
+    Prty::Option->extract(\@_,
+        -overwrite=>\$overwrite,
+    );
+
+    if ($dir eq '-') {
+        for my $e ($self->filesToFetch($layout)) {
+            # eof-Marker ergänzen
+    
+            my $ref = ref $e->[1]? $e->[1]: \$e->[1];
+            $$ref =~ s/\n+$//;
+            $$ref .= "\n\n# eof\n";
+
+            print $$ref;
+        }
+        return $self;
+    }
+    elsif (-d $dir && !$overwrite) {
+        my $answ = Prty::Terminal->askUser(
+            "Overwrite directory '$dir'?",
+            -values=>'y/n',
+            -default=>'y',
+            -outHandle=>\*STDERR,
+            -timer=>$self->getRef('t0'),
+        );
+        if ($answ ne 'y') {
+            return $self;
+        }
+    }
+    
+    my $dt = Prty::DestinationTree->new($dir,
+        -quiet=>0,
+        -language=>'en',
+        -outHandle=>\*STDERR,
+    );
+    $dt->addDir($dir);
+
+    for my $e ($self->filesToFetch($layout)) {
+        # eof-Marker ergänzen
+    
+        my $ref = ref $e->[1]? $e->[1]: \$e->[1];
+        $$ref =~ s/\n+$//;
+        $$ref .= "\n\n# eof\n";
+
+        $dt->addFile("$dir/$e->[0]",$ref,
+            -encoding=>'utf-8',
+            -skipEmptyFiles=>1, # Sub-Entities übergehen (z.B. ProgramClass)
+        );
     }
 
-    my $h = $self->memoize('typeH',sub {
-        my ($self,$key) = @_;
+    # Lösche überzählige Storage-Dateien (nach Rückfrage)
 
-        my $typeA = $self->entityTypes;
-    
-        # Hash mit allen Abschnittstypen aufbauen
-    
-        my %h;
-        for my $type (@$typeA) {
-            $h{$type} ||= [];
-        }
+    $dt->cleanup(1,$self->getRef('t0'));
+    $dt->close;
 
-        # Entitäten zuordnen
-    
-        for my $ent (@{$self->{'entityA'}}) {
-            push @{$h{$ent->entityType}},$ent;
-        }
-
-        # Entitäten nach Name sortieren
-    
-        for my $type (@$typeA) {
-            @{$h{$type}} = sort {$a->name cmp $b->name} @{$h{$type}};
-        }
-
-        return \%h;
-    });
-
-    my $a = $h->{$type} || $self->throw(
-        q{COP-00000: Unknown type},
-        Type=>$type,
-    );    
-    return wantarray? @$a: $a;
+    return $self;
 }
+    
 
 # -----------------------------------------------------------------------------
 
-=head2 Dateien
+=head2 Hilfsmethoden
 
-=head3 fetchFiles() - Liste der Dateien für fetch
+=head3 filesToFetch() - Liste der Dateien für fetch
 
 =head4 Synopsis
 
-    @files = $cop->fetchFiles;
-    @files = $cop->fetchFiles($layout);
+    @files = $cop->filesToFetch;
+    @files = $cop->filesToFetch($layout);
 
 =head4 Arguments
 
@@ -910,7 +825,7 @@ unterschieden werden.
 
 # -----------------------------------------------------------------------------
 
-sub fetchFiles {
+sub filesToFetch {
     my ($self,$layout) = @_;
 
     my @files;
@@ -923,85 +838,7 @@ sub fetchFiles {
 
 # -----------------------------------------------------------------------------
 
-=head2 Statistik
-
-=head3 info() - Informationszeile
-
-=head4 Synopsis
-
-    $str = $cop->info;
-
-=head4 Returns
-
-Zeichenkette
-
-=head4 Description
-
-Liefere eine Informationszeile mit statistischen Informationen, die
-am Ende der Verarbeitung ausgegeben werden kann.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub info {
-    my $self = shift;
-
-    my $entityA = $self->get('entityA');
-    my $entityCount = $entityA? @$entityA: 0;
-    
-    return sprintf '%.3f sec; Entities: %s; Sections: %s; Lines: %s'.
-            '; Bytes: %s; Chars: %s',
-        Time::HiRes::gettimeofday-$self->get('t0'),
-        Prty::Formatter->readableNumber($entityCount,','),
-        Prty::Formatter->readableNumber($self->get('parsedSections'),','),
-        Prty::Formatter->readableNumber($self->get('parsedLines'),','),
-        Prty::Formatter->readableNumber($self->get('parsedBytes'),','),
-        Prty::Formatter->readableNumber($self->get('parsedChars'),',');
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Intern
-
-=head3 entityTypes() - Liste der Abschnitts-Typen
-
-=head4 Synopsis
-
-    @types | $typeA = $cop->entityTypes;
-
-=head4 Returns
-
-Liste von Abschnitts-Typen. Im Skalarkontext eine Referenz auf die
-Liste.
-
-=head4 Description
-
-Liefere die Liste der Abschnitts-Typen (Bezeichner), die per
-registerType() registriert wurden.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub entityTypes {
-    my $self = shift;
-
-    my $a = $self->memoize('entityTypeA',sub {
-        my ($self,$key) = @_;
-
-        my %h;
-        for my $plg (@{$self->{'pluginA'}}) {
-            $h{$plg->entityType}++;
-        }
-
-        return [sort keys %h];
-    });
-
-    return wantarray? @$a: $a;
-}
-
-# -----------------------------------------------------------------------------
+=head2 Eingabedateien
 
 =head3 extensionRegex() - Regex zum Auffinden von Eingabe-Dateien
 
@@ -1099,6 +936,354 @@ sub findFiles {
 
 # -----------------------------------------------------------------------------
 
+=head3 parseFiles() - Parse Dateien zu Entitäten
+
+=head4 Synopsis
+
+    @entities | $entityA = $cop->parseFiles(@files);
+
+=head4 Arguments
+
+=over 4
+
+=item @files
+
+Liste der Dateien. '-' bedeutet STDIN.
+
+=back
+
+=head4 Returns
+
+Liste der Entitäten. Im Skalarkontext eine Referenz auf die Liste.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub parseFiles {
+    my ($self,@files) = @_;
+
+    # Instantiiere Parser
+
+    my $par = Prty::Section::Parser->new(
+        encoding=>'utf-8',
+    );
+
+    # Parse Dateien zu Entitäten
+
+    my (@entities,$fileEnt,$mainSec);
+    for my $file (@files) {
+        $par->parse($file,sub {
+            my $sec = Prty::Section::Object->new(@_);
+            # $sec->removeEofMarker;
+
+            my $brackets = $sec->brackets;
+            if ($brackets eq '[]') {
+                $fileEnt = $mainSec = $sec;
+            }
+            elsif ($brackets eq '()') {
+                $mainSec = $sec;
+            }
+
+            while (1) {
+                if ($sec->brackets eq '[]') {
+                    # Wandele Abschnitts-Objekt in Entität
+
+                    my $plg = $self->plugin($sec);
+                    if (!$plg) {
+                        # Fehler: Für jeden Haupt-Abschnitt muss ein
+                        # Plugin definiert worden sein
+
+                        $sec->error(
+                            q~COP-00001: Missing plugin for section~,
+                            Section=>$sec->fullType,
+                        );
+                    }
+                    push @entities,$plg->class->create($sec,$self,$plg);
+                }
+                elsif (@entities) {
+                    # Verarbeite nächsten Sub-Abschnitt
+
+                    $self->processSubSection($fileEnt,$entities[-1],
+                        $mainSec,$sec);
+                    if ($sec->brackets eq '[]') {
+                        # Sub-Abschnitt als Entität verarbeiten
+                        # (Beispiel: ProgramClass => Class)
+                        redo;
+                    }
+                }
+                else {
+                    # Fehler: Erster Abschnitt ist kein []-Abschnitt
+
+                    $sec->error(
+                        q~COP-00002: First section must be a []-section~,
+                         Section=>$sec->fullType,
+                    );
+                }
+                last;
+            }
+
+            # Datei-Entity um Abschnitts-Quelltext ergänzen
+            $fileEnt->appendFileSource($sec);
+
+            # Abschnittsobjekt gegen unabsichtliche Erweiterungen sperren
+            $sec->lockKeys;
+
+            return;
+        });
+
+        # "# eof" vom Dateiende entfernen
+
+        my $fileSourceR = $fileEnt->fileSourceRef;
+        $$fileSourceR =~ s/\n+# eof\s*$/\n\n/;
+
+        if (substr($$fileSourceR,-1,1) ne "\n") {
+            $fileEnt->error(
+                q~COP-00003: File entity must end with a newline~,
+            );
+        }
+    }
+
+    # Statistische Daten speichern
+
+    $self->addNumber(parsedSections=>$par->get('parsedSections'));
+    $self->addNumber(parsedLines=>$par->get('parsedLines'));
+    $self->addNumber(parsedChars=>$par->get('parsedChars'));
+    $self->addNumber(parsedBytes=>$par->get('parsedBytes'));
+
+    return wantarray? @entities: \@entities;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 processSubSection() - Verarbeite Sub-Abschnitt (abstrakt)
+
+=head4 Synopsis
+
+    $cop->processSubSection($fileEnt,$ent,$mainSec,$sec);
+
+=head4 Arguments
+
+=over 4
+
+=item $fileEnt
+
+Entität, die Träger des gesamten Quelltextes ist. Diese ist im
+Quelltext mit [] gekennzeichnet.
+
+=item $ent
+
+Die aktuelle Entität. Kann identisch zu $fileEnt oder eine
+Sub-Entität (z.B. (File) oder (ProgramClass)) sein.
+
+=item $mainSec
+
+Die Entität oder Sub-Entität, der die mit <> gekennzeichneten
+Abschnitte zugeordnet werden.
+
+=item $sec
+
+Der aktuelle Abschnitt.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub processSubSection {
+    my ($self,$fileEnt,$ent,$mainSec,$sec) = @_;
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Entitäten
+
+=head3 entities() - Liste der geladenen Entities
+
+=head4 Synopsis
+
+    @entities | $entityA = $cop->entities;
+    @entities | $entityA = $cop->entities($type);
+
+=head4 Arguments
+
+=over 4
+
+=item $type
+
+Abschnitts-Typ.
+
+=back
+
+=head4 Returns
+
+Liste von Entitäten. Im Skalarkontext eine Referenz auf die Liste.
+
+=head4 Description
+
+Liefere die Liste aller geladenen Entities oder aller
+geladenen Entities vom Typ $type. Bei der Abfrage der Entities
+eines Typs werden die Entities nach Name sortiert geliefert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub entities {
+    my ($self,$type) = @_;
+
+    if (!$type) {
+        my $entityA = $self->{'entityA'};
+        return wantarray? @$entityA: $entityA;
+    }
+
+    my $h = $self->memoize('typeH',sub {
+        my ($self,$key) = @_;
+
+        my $typeA = $self->entityTypes;
+    
+        # Hash mit allen Abschnittstypen aufbauen
+    
+        my %h;
+        for my $type (@$typeA) {
+            $h{$type} ||= [];
+        }
+
+        # Entitäten zuordnen
+    
+        for my $ent (@{$self->{'entityA'}}) {
+            push @{$h{$ent->entityType}},$ent;
+        }
+
+        # Entitäten nach Name sortieren
+    
+        for my $type (@$typeA) {
+            @{$h{$type}} = sort {$a->name cmp $b->name} @{$h{$type}};
+        }
+
+        return \%h;
+    });
+
+    my $a = $h->{$type} || $self->throw(
+        q~COP-00000: Unknown type~,
+        Type=>$type,
+    );    
+    return wantarray? @$a: $a;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Persistente Information
+
+=head3 needsTestDb() - Persistenter Hash für Test-Status
+
+=head4 Synopsis
+
+    $h = $cop->needsTestDb;
+
+=head4 Returns
+
+Hash-Referenz (persistenter Hash)
+
+=head4 Description
+
+Liefere eine Referenz auf den persistenten Hash, der den Status
+von Entitäten speichert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub needsTestDb {
+    my $self = shift;
+
+    return $self->memoize('needsTestDb',sub {
+        my ($self,$key) = @_;
+        
+        my $file = $self->storage('db/entity-needsTest.db');
+        return Prty::PersistentHash->new($file,'rw');
+    });
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 needsUpdateDb() - Persistenter Hash für Entitäts-Status
+
+=head4 Synopsis
+
+    $h = $cop->needsUpdateDb;
+
+=head4 Returns
+
+Hash-Referenz (persistenter Hash)
+
+=head4 Description
+
+Liefere eine Referenz auf den persistenten Hash, der den Status
+von Entitäten speichert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub needsUpdateDb {
+    my $self = shift;
+
+    return $self->memoize('needsUpdateDb',sub {
+        my ($self,$key) = @_;
+        
+        my $file = $self->storage('db/entity-needsUpdate.db');
+        return Prty::PersistentHash->new($file,'rw');
+    });
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Ausgabe von Information
+
+=head3 info() - Informationszeile
+
+=head4 Synopsis
+
+    $str = $cop->info;
+
+=head4 Returns
+
+Zeichenkette
+
+=head4 Description
+
+Liefere eine Informationszeile mit statistischen Informationen, die
+am Ende der Verarbeitung ausgegeben werden kann.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub info {
+    my $self = shift;
+
+    my $entityA = $self->get('entityA');
+    my $entityCount = $entityA? @$entityA: 0;
+    
+    return sprintf '%.3f sec; Entities: %s; Sections: %s; Lines: %s'.
+            '; Bytes: %s; Chars: %s',
+        Time::HiRes::gettimeofday-$self->get('t0'),
+        Prty::Formatter->readableNumber($entityCount,','),
+        Prty::Formatter->readableNumber($self->get('parsedSections'),','),
+        Prty::Formatter->readableNumber($self->get('parsedLines'),','),
+        Prty::Formatter->readableNumber($self->get('parsedBytes'),','),
+        Prty::Formatter->readableNumber($self->get('parsedChars'),',');
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 msg() - Gib Information aus
 
 =head4 Synopsis
@@ -1165,193 +1350,9 @@ sub msg {
 
 # -----------------------------------------------------------------------------
 
-=head3 plugin() - Ermittele Plugin zu Abschnitts-Objekt
-
-=head4 Synopsis
-
-    $plg = $cop->plugin($sec);
-
-=head4 Arguments
-
-=over 4
-
-=item $sec
-
-Abschnitts-Objekt
-
-=back
-
-=head4 Returns
-
-Plugin-Objekt
-
-=head4 Description
-
-Ermittele das Plugin zu Abschnitts-Objekt $sec. Existiert
-kein Plugin zu dem Abschnitts-Objekt, liefere C<undef>.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-my %Plugins; # Section-Type => Liste der Plugins
-my $Plugin;  # Universelles Plugin (es sollte höchstens eins definiert sein)
-    
-sub plugin {
-    my ($self,$sec) = @_;
-
-    if (!%Plugins) {
-        # Indiziere Plugins nach Section-Type
-
-        for my $plg (@{$self->{'pluginA'}}) {
-            if (my $type = $plg->sectionType) {
-                # Normales Plugin
-                push @{$Plugins{$type}},$plg;
-            }
-            else {
-                # Universelles Plugin
-                $Plugin = $plg;
-            }
-        }
-    }
-        
-    # Prüfe Section gemäß Plugin-Kriterien
-
-    if (my $pluginA = $Plugins{$sec->type}) {
-        for my $plg (@$pluginA) {
-            my $ok = 1;
-            my $a = $plg->keyValA;
-            for (my $i = 0; $i < @$a; $i += 2) {
-                if ($sec->get($a->[$i]) ne $a->[$i+1]) {
-                    $ok = 0;
-                    last;
-                }
-            }
-            if ($ok) {
-                return $plg;
-            }
-        }
-    }
-    
-    # Kein Plugin zum SectionType gefunden. Wir liefern das
-    # universelle Plugin, sofern existent, oder undef
-
-    return $Plugin? $Plugin: undef;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 needsTestDb() - Persistenter Hash für Test-Status
-
-=head4 Synopsis
-
-    $h = $cop->needsTestDb;
-
-=head4 Returns
-
-Hash-Referenz (persistenter Hash)
-
-=head4 Description
-
-Liefere eine Referenz auf den persistenten Hash, der den Status
-von Entitäten speichert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub needsTestDb {
-    my $self = shift;
-
-    return $self->memoize('needsTestDb',sub {
-        my ($self,$key) = @_;
-        
-        my $file = $self->storage('db/entity-needsTest.db');
-        return Prty::PersistentHash->new($file,'rw');
-    });
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 needsUpdateDb() - Persistenter Hash für Entitäts-Status
-
-=head4 Synopsis
-
-    $h = $cop->needsUpdateDb;
-
-=head4 Returns
-
-Hash-Referenz (persistenter Hash)
-
-=head4 Description
-
-Liefere eine Referenz auf den persistenten Hash, der den Status
-von Entitäten speichert.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub needsUpdateDb {
-    my $self = shift;
-
-    return $self->memoize('needsUpdateDb',sub {
-        my ($self,$key) = @_;
-        
-        my $file = $self->storage('db/entity-needsUpdate.db');
-        return Prty::PersistentHash->new($file,'rw');
-    });
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 storage() - Pfad zum oder innerhalb des Storage
-
-=head4 Synopsis
-
-    $path = $cop->storage;
-    $path = $cop->storage($subPath);
-
-=head4 Arguments
-
-=over 4
-
-=item $subPath
-
-Ein Sub-Pfad innerhalb des Storage.
-
-=back
-
-=head4 Returns
-
-Pfad
-
-=head4 Description
-
-Liefere den Pfad des Storage, ggf. ergänzt um den Sub-Pfad
-$subPath.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub storage {
-    my $self = shift;
-    # @_: $subPath
-
-    my $path = $self->{'storage'};
-    if (@_) {
-        $path .= '/'.shift;
-    }
-
-    return $path;
-}
-
-# -----------------------------------------------------------------------------
-
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -1359,7 +1360,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

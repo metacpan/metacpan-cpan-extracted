@@ -31,7 +31,7 @@
         </TMPL_IF>
       </div>
       <div class="panel-buttons">
-        <button type="button" class="positive" tabindex="1" onclick="location.href='<TMPL_VAR NAME="PORTAL_URL">';return false;">
+        <button type="button" class="positive" tabindex="1" onclick="location.href='<TMPL_VAR NAME="PORTAL_URL"><TMPL_IF NAME="AUTH_URL">/?url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>';return false;">
           <lang en="Go to portal" fr="Aller au portail" />
         </button>
         <button type="button" class="negative" tabindex="2" onclick="location.href='<TMPL_VAR NAME="LOGOUT_URL">';return false;">

@@ -41,27 +41,12 @@ extra analysis if the tool detects it can provide something useful; for
 example when the tool peeks inside objects of specific classes, and those
 classes are found in the file.
 
-=head2 new
+=head2 init_tool
 
-  $tool = CLASS->new( $pmat, %args )
+  $tool->init_tool()
 
-Constructs the instance of the tool. If the tool does not need to store any
-instance data, this may instead simply return the class name.
-
-This will be passed the L<Devel::MAT> object itself, and additional arguments
-as named parameters.
-
-=over 4
-
-=item progress => CODE
-
-If provided, the tool should call this function occasionally if it has to
-perform a long-running task, such as a calculation across the entire heap,
-that may take some time. The function should be passed a status string to
-indicate progress on the UI; the UI will display it and flush pending input
-events to ensure the interface remains moderately responsive to user input.
-
-=back
+Performs any required initialisation, typically tasks such as further bulk
+analysis performed on the entire dumpfile heap.
 
 =head2 init_ui
 

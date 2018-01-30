@@ -1,3 +1,7 @@
+2018-01-28  Kingpin  <martin@ubuntu>
+
+	* Changes: fixed contents of META.yml
+
 2016-02-07  Kingpin  <martin@localhost.localdomain>
 
 	* Ethernet.pm (get_addresses): removed warning

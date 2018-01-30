@@ -19,5 +19,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-UNIVERSAL-Object/issues
   repository: https://github.com/stevan/p5-UNIVERSAL-Object.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -3,9 +3,9 @@ abstract: 'Automate the Firefox browser with the Marionette protocol'
 author:
   - 'David Dick <ddick@cpan.org>'
 build_requires:
+  Cwd: '0'
   Digest::SHA: '0'
   Test::More: '0'
-  Test::NeedsDisplay: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -36,5 +36,5 @@ requires:
   URI: '0'
   overload: '0'
   perl: '5.006'
-version: '0.16'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

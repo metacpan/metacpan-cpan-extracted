@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.036/cXML.dtd">
+<cXML payloadID="123456789.2222.55123123@localhost" timestamp="2018-01-01T00:00:00-0500" xml:lang="en-US"><Response><Status code="200" xml:lang="en-US" text="OK"/><PunchOutSetupResponse><StartPage><URL/></StartPage></PunchOutSetupResponse></Response></cXML>

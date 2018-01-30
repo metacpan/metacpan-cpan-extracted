@@ -1,5 +1,33 @@
 NAME
 
-    Plack::Middleware::Signposting - a base class for Signposting
-    implementations
+    Plack::Middleware::Signposting - a base class for Plack implementations
+    of the <Signposting>( https://signposting.org) protocol
+
+METHODS
+
+      * to_link_format(ARRAYREF)
+
+      This method produces the format for the link header. It expects an
+      arrayref as input.
+
+MODULES
+
+      * Plack::Middleware::Signposting::JSON
+
+      * Plack::Middleware::Signposting::Catmandu
+
+AUTHOR
+
+    Vitali Peil, <vitali.peil at uni-bielefeld.de>
+
+    Nicolas Steenlant, <nicolas.steenlant at ugent.be>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Plack::Middleware
 

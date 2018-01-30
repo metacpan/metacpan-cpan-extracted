@@ -3,12 +3,14 @@ abstract: 'optex command module direcrtory'
 author:
   - 'Kaz Utashiro <kaz@utashiro.com>'
 build_requires:
+  File::Path: '0'
+  File::Spec: '0'
   Test::Command: '0.11'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +29,7 @@ no_index:
 provides:
   App::optex:
     file: lib/App/optex.pm
-    version: v0.0.10
+    version: v0.0.12
   App::optex::debug:
     file: lib/App/optex/debug.pm
   App::optex::help:
@@ -49,7 +51,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/optex/issues
   homepage: https://github.com/kaz-utashiro/optex
   repository: git://github.com/kaz-utashiro/optex.git
-version: v0.0.10
+version: v0.0.12
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

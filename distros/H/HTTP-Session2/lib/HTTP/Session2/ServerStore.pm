@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use 5.008_001;
 
-our $VERSION = "1.09";
+our $VERSION = "1.10";
 
 use Carp ();
 use Digest::HMAC;
@@ -49,6 +49,8 @@ sub load_session {
     # Load from cookie.
     my $cookies = Cookie::Baker::crush_cookie($self->env->{HTTP_COOKIE});
     if (my $session_id = $cookies->{$self->session_cookie->{name}}) {
+        # validate session_id
+        return if $session_id =~/[\x00-\x20\x7f-\xff]/ || length($session_id) > 40;
         my $data = $self->store->get($session_id);
         if (defined $data) {
             $self->{id}   = $session_id;
@@ -211,4 +213,3 @@ But, I recommend to use C<Cache::Memcached::Fast>.
 =head1 METHODS
 
 Methods are listed on L<HTTP::Session2::Base>.
-

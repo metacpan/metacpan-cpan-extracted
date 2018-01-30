@@ -39,4 +39,10 @@ is_deeply
   {},
   "missing isbn 10";
 
+is_deeply
+  $pkg->new('isbn_path')->fix({isbn_path => '979-10-90636-07-1'}),
+  { isbn_path => ''},
+  "non-convertible isbn 13";
+
+
 done_testing;

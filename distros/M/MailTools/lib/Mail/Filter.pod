@@ -38,7 +38,7 @@ mail object.
 
 =over 4
 
-=item Mail::Filter-E<gt>B<new>( [FILTER [, ... ]] )
+=item Mail::Filter-E<gt>B<new>(@filters)
 
 Create a new C<Mail::Filter> object with the given filter subroutines. Each
 filter may be either a code reference or the name of a method to call
@@ -50,9 +50,9 @@ on the <Mail::Filter> object.
 
 =over 4
 
-=item $obj-E<gt>B<add>( FILTER [, FILTER ...] )
+=item $obj-E<gt>B<add>(@filters)
 
-Add the given filters to the end of the filter list.
+Add the given @filters to the end of the filter list.
 
 =back
 
@@ -60,21 +60,21 @@ Add the given filters to the end of the filter list.
 
 =over 4
 
-=item $obj-E<gt>B<filter>(MAIL-OBJECT | MAIL-FOLDER)
+=item $obj-E<gt>B<filter>($mail|$folder)
 
-If the first argument is a C<Mail::Internet> object, then this object will
-be passed through the filter list. If the first argument is a C<Mail::Folder>
+If the first argument is a L<Mail::Internet|Mail::Internet> object, then this object will
+be passed through the filter list. If the first argument is a Mail::Folder
 object, then each message in turn will be passed through the filter list.
 
 =item $obj-E<gt>B<folder>()
 
-While the C<filter> method is called with a C<Mail::Folder> object, these
+While the L<filter()|Mail::Filter/"Processing"> method is called with a Mail::Folder object, these
 filter subroutines can call this method to obtain the folder object that is
 being processed.
 
 =item $obj-E<gt>B<msgnum>()
 
-If the C<filter> method is called with a C<Mail::Folder> object, then the
+If the L<filter()|Mail::Filter/"Processing"> method is called with a Mail::Folder object, then the
 filter subroutines may call this method to obtain the message number
 of the message that is being processed.
 

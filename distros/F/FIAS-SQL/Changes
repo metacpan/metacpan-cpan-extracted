@@ -1,5 +1,8 @@
 Revision history for Perl module FIAS::SQL.
 
+0.06  Jan 01 2017 Daniil Popov
+    - add functions for update existing base from fias.nalog.ru
+
 0.05  Jan 01 2017 Daniil Popov
     - fix POD
 

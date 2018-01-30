@@ -1,0 +1,34 @@
+---
+abstract: 'Convert lists into simple linguistic conjunctions'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Damian Conway <damian@conway.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Conjunction
+provides:
+  Lingua::Conjunction:
+    file: lib/Lingua/Conjunction.pm
+    version: v2.1.0
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/Lingua-Conjunction/issues
+  repository: git://github.com/robrwo/Lingua-Conjunction.git
+version: v2.1.0
+x_authority: cpan:RRWO
+x_serialization_backend: 'YAML::Tiny version 1.70'

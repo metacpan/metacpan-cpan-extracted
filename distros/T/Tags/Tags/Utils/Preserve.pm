@@ -1,10 +1,8 @@
 package Tags::Utils::Preserve;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use List::MoreUtils qw(any);
 use Readonly;
@@ -12,8 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $LAST_INDEX => -1;
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -179,11 +176,9 @@ __END__
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Utils::Preserve;
 
  # Begin element helper.
@@ -246,17 +241,17 @@ L<https://github.com/tupinek/Tags>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
+ © 2005-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

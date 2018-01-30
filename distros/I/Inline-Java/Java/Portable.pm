@@ -9,7 +9,7 @@ use Config ;
 use File::Find ;
 use File::Spec ;
 
-$Inline::Java::Portable::VERSION = '0.53' ;
+$Inline::Java::Portable::VERSION = '0.53_90' ;
 
 # Here is some code to figure out if we are running on command.com
 # shell under Windows.
@@ -58,15 +58,23 @@ sub make_classpath {
 	my @fcp = () ;
 	my %cp = map {$_ => 1} @cp ;
 	foreach my $p (@cp){
-		if (($p)&&(-e $p)){
-			if ($cp{$p}){
+		if ($cp{$p}){
+			if ($p =~ /^(.*)\/\*$/){
+				my $d = $1 ;
+				if (($d)&&(-d $d)){
+					Inline::Java::debug(2, "keeping wildcard classpath as '$p'") ;
+					my $fp = File::Spec->rel2abs($d) . '/*' ;
+					push @fcp, Inline::Java::Portable::portable("SUB_FIX_JAVA_PATH", $fp) ;
+				}
+			}
+			elsif (($p)&&(-e $p)){
 				my $fp = File::Spec->rel2abs($p) ;
 				push @fcp, Inline::Java::Portable::portable("SUB_FIX_JAVA_PATH", $fp) ;
-				delete $cp{$p} ;
 			}
-		}
-		else{
-			Inline::Java::debug(2, "classpath candidate '$p' scraped") ;
+			else{
+				Inline::Java::debug(2, "classpath candidate '$p' scraped") ;
+			}
+			delete $cp{$p} ;
 		}
 	}
 
@@ -222,7 +230,7 @@ my $map = {
 		PRE_WHOLE_ARCHIVE	=>  '-Wl',
 		POST_WHOLE_ARCHIVE	=>  '-Wl',
 	    GOT_SYMLINK			=>	1,
-           J2SDK_BIN        	=>  'Commands',
+		J2SDK_BIN        	=>  'Commands',
 		DEFAULT_J2SDK_DIR   =>  '/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK',
 		# Tim Bunce:
 		OTHERLDFLAGS		=>  '-framework JavaVM',

@@ -3,32 +3,37 @@ abstract: 'Log::Report translation table management'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Log-Report-Lexicon
 no_index:
   directory:
     - t
     - inc
 requires:
-  Encode: 0
-  Fcntl: 0
-  File::Basename: 0
-  File::Find: 0
-  File::Spec: 0
-  File::Temp: 0
-  IO::File: 0
-  List::Util: 0
-  Log::Report: 1.22
-  POSIX: 0
-  Pod::Usage: 0
-  Scalar::Util: 0
-  Test::More: 0.86
-version: 1.09
+  Data::Dumper: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::File: '0'
+  List::Util: '0'
+  Log::Report: '1.22'
+  POSIX: '0'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Test::More: '0.86'
+resources:
+  repository: https://github.com/markov2/perl5-Log-Report-Lexicon.git
+version: '1.10'
+x_homepage: http://perl.overmeer.net/CPAN/
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

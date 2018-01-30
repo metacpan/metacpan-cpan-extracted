@@ -1,11 +1,12 @@
 ChangeLog
 MANIFEST
 Makefile.PL
-PODTAIL.txt
 README
+README.md
 bin/ftp-get
 lib/Net/FTP/Robust.pm
 lib/Net/FTP/Robust.pod
 t/01use.t
-t/99pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

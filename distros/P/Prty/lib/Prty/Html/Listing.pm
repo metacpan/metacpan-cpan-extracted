@@ -4,7 +4,7 @@ use base qw/Prty::Html::Base/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::FileHandle;
 
@@ -198,7 +198,7 @@ sub html {
             }
             else {
                 $self->throw(
-                    q{LISTING-00002: Unbekannter Anker-Typ},
+                    q~LISTING-00002: Unbekannter Anker-Typ~,
                     Anchor=>$anchor,
                 );
             }
@@ -320,7 +320,7 @@ sub html {
             }
             else {
                 $self->throw(
-                    q{LISTING-00001: Unbekannte Sprache},
+                    q~LISTING-00001: Unbekannte Sprache~,
                     Language=>$lang,
                 );
             }
@@ -394,11 +394,9 @@ sub html {
     PREFIX-doc|Kennzeichnung Doku (bei Perl POD)
     PREFIX-comment|Kennzeichnung Kommentar
 
-PREFIX ist der cssPrefix (L<siehe Basisklasse|R1::Misc-Html.html#cssprefix>)
-
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -406,7 +404,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

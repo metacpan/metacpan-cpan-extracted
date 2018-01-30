@@ -72,7 +72,7 @@
    "provides" : {
       "Alien::raylib" : {
          "file" : "lib/Alien/raylib.pm",
-         "version" : "0.006"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -87,7 +87,7 @@
          "web" : "https://github.com/athreef/Alien-raylib"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -300,7 +300,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.15.0",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },
@@ -323,7 +323,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.15.0",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -340,12 +340,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.006",
+                  "tag" : "v0.008",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.15.0",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -365,7 +365,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.15.0",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },
@@ -386,7 +386,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.15.0",
+                  "git_version" : "2.16.1",
                   "repo_root" : "."
                }
             },

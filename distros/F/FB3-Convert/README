@@ -1,0 +1,50 @@
+FB3-Convert
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc FB3::Convert
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=FB3-Convert
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/FB3-Convert
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/FB3-Convert
+
+    Search CPAN
+        http://search.cpan.org/dist/FB3-Convert/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2018 Litres.ru
+
+The GNU Lesser General Public License version 3.0
+
+FB3::Convert is free software: you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3.0 of the License.
+
+FB3::Convert is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+License for more details.
+
+Full text of License L<http://www.gnu.org/licenses/lgpl-3.0.en.html>.

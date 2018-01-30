@@ -1,5 +1,5 @@
 package FIAS::SQL;
-$FIAS::SQL::VERSION = '0.05';
+$FIAS::SQL::VERSION = '0.06';
 # ABSTRACT: Модуль для минимальной работы с данными из базы ФИАC https://fias.nalog.ru/FiasInfo.aspx
 
 use strict;
@@ -8,6 +8,7 @@ use utf8;
 
 use DBI;
 use XBase;
+use LWP::UserAgent;
 use Carp qw ( confess );
 use Encode qw ( decode );
 use Readonly;
@@ -64,7 +65,10 @@ sub new {
 }
 
 sub load_files {
-    my ( $self, $directory ) = @_;
+    my ( $self, %params ) = @_;
+
+    my $directory   = delete $params{directory};
+    my $update_flag = delete $params{update};
 
     opendir( my $dh, $directory ) or confess $!;
 
@@ -85,12 +89,15 @@ sub load_files {
     #$dbh->do("CREATE DATABASE $basename");
     #$dbh->do("USE $basename");
 
+    # Хеш полей базы( используем при обновлении )
+    my %sql_tables_names;
     # перебираем все файлы
     for my $dbf_file_name ( @files ) {
 
         # Получаем имя таблицы для SQL без номера региона и расширения
         # HOUSE89.DBF превращается в HOUSE
         ( my $sql_table_name = $dbf_file_name ) =~ s/\d*\.[Dd][Bb][Ff]$//;
+
         # Информация в данных таблицах не нужна
         next if $dbf_file_name =~ /^D/
             || $sql_table_name eq 'NORDOC'
@@ -111,6 +118,11 @@ sub load_files {
         # массив количества знаков после запятой полей 'N' в таблице dbf
         my @dec   = $table->field_decimals;
 
+        # сохраняем имена таблиц для последующей обработки при обновлении
+        if ( $update_flag ) {
+            $sql_tables_names{ lc $sql_table_name} = 1;
+            $sql_table_name .= '_';
+        }
         $dbh->do(_create_table( $sql_table_name, $table ) );
 
         # счётчик записей
@@ -132,7 +144,7 @@ sub load_files {
             # необходимо закоммитить значения в таблицу, если конечно есть что коммитить
             if ( scalar @sqldata && !( scalar @sqldata % 5000) || $all_records == $index_of_last_record ) {
                 my $sql_table = lc $sql_table_name;
-                $dbh->do( "INSERT INTO $sql_table $fields_for_insert VALUES " . join(',', @sqldata ) )
+                $dbh->do( "REPLACE INTO $sql_table $fields_for_insert VALUES " . join(',', @sqldata ) )
                     or confess $DBI::errstr;
                 undef @sqldata;
             }
@@ -140,14 +152,20 @@ sub load_files {
        print "Table $dbf_file_name copied\n";
        $table->close;
     }
-    # создаём индексы
-    $dbh->do('ALTER TABLE addrob ADD KEY `aoguid`(`aoguid`)');
-    $dbh->do('ALTER TABLE addrob ADD KEY `aolevel`(`aolevel`)');
-    $dbh->do('ALTER TABLE addrob ADD KEY `parentguid`(`parentguid`)');
-    $dbh->do('ALTER TABLE house  ADD KEY `aoguid`(`aoguid`)');
-    $dbh->do('ALTER TABLE house  ADD KEY `houseguid`(`houseguid`)');
-    $dbh->do('ALTER TABLE room   ADD KEY `houseguid`(`houseguid`)');
-    $dbh->do('ALTER TABLE room   ADD KEY `roomguid`(`roomguid`)');
+
+    # после обработки файлов, при обновлении заменяем файлы
+    if ( $update_flag ){
+	   for my $table ( keys %sql_tables_names ) {
+	       my $tmp_table = $table . '_';
+	       $dbh->do( "DROP TABLE $table" ) or confess $DBI::errstr;
+	       $dbh->do( "ALTER TABLE $tmp_table RENAME $table") or confess $DBI::errstr;
+	   }
+    }
+    # Доработка таблиц для уменьшения и убыстрания
+    # TODO перенести в функции создания таблиц
+    $dbh->do('ALTER TABLE addrob DROP COLUMN nextid');
+    $dbh->do('ALTER TABLE house  DROP COLUMN enddate');
+    $dbh->do('ALTER TABLE room   DROP COLUMN nextid');
 }
 
 sub get_address_objects {
@@ -325,6 +343,39 @@ sub get_parent_record_chain_by_roomguid {
 
     return $levels_chain;
 }
+sub set_database_version {
+     my ( $self, $version ) = @_;
+
+    # хендлер базы
+    my $dbh = $self->{dbh};
+
+    # создаём индексы
+    $dbh->do( 'CREATE TABLE IF NOT EXISTS version ( database_version INT (8), restriction ENUM(\'\') PRIMARY KEY )' )
+                    or confess $DBI::errstr;
+    $dbh->do( "REPLACE INTO version (database_version) VALUES ( $version )" )
+                    or confess $DBI::errstr;
+}
+
+sub get_database_version {
+    my ( $self ) = @_;
+    # хендлер базы
+    my $dbh = $self->{dbh};
+
+    return $dbh->selectrow_arrayref('SELECT database_version FROM version')->[0];
+}
+sub get_link_for_full_database_dbf{
+    return 'http://fias.nalog.ru/Public/Downloads/Actual/fias_dbf.rar';
+}
+sub get_actual_base_version {
+    my $ua = LWP::UserAgent->new;
+    my $get = $ua->get( 'http://fias.nalog.ru/Public/Downloads/Actual/VerDate.txt', ':content_file'=>'version.txt' );
+    open my $file, '<', "version.txt";
+    my $firstline = <$file>;
+    $firstline =~ s/\.//g;
+    close $file;
+    unlink 'version.txt';
+    return $firstline;
+}
 
 sub _check_record_actuality {
     my ( $record ) = @_;
@@ -332,8 +383,9 @@ sub _check_record_actuality {
     # если есть поля свидетельствующие о неактуальности, то возвращаем 1.
     return 1
         if exists $record->{ACTSTATUS} && !$record->{ACTSTATUS}
-           || exists $record->{LIVESTATUS} && !$record->{LIVESTATUS}
-           || $record->{CURRSTATUS};
+        || exists $record->{LIVESTATUS} && !$record->{LIVESTATUS}
+        || $record->{NEXTID}
+        || exists $record->{ENDDATE} && $record->{ENDDATE} ne '20790606';
 
     return 0;
 }
@@ -345,14 +397,14 @@ sub _get_table_fields {
     # для того, чтобы не перегружать базу, записываем только необходимые поля, которые перечислены в этом хеше
     state $table_config = {
         ADDROB => {
-            fields => [ qw/AOGUID AOLEVEL OFFNAME SHORTNAME PARENTGUID POSTALCODE/ ],
+            fields => [ qw/AOGUID AOLEVEL OFFNAME SHORTNAME PARENTGUID POSTALCODE NEXTID/ ],
             #where  => 'WHERE ACTSTATUS = 1 AND LIVESTATUS = 1 AND CURRSTATUS = 0'
         },
         HOUSE  =>{
-            fields   => [ qw/HOUSENUM BUILDNUM STRUCNUM AOGUID HOUSEGUID POSTALCODE STATSTATUS STRSTATUS/ ],
+            fields   => [ qw/HOUSENUM BUILDNUM STRUCNUM AOGUID HOUSEGUID POSTALCODE STATSTATUS STRSTATUS ENDDATE/ ]
         },
         ROOM   => {
-            fields => [ qw/FLATNUMBER FLATTYPE HOUSEGUID ROOMGUID POSTALCODE ROOMNUMBER ROOMTYPE/ ],
+            fields => [ qw/FLATNUMBER FLATTYPE HOUSEGUID ROOMGUID POSTALCODE ROOMNUMBER ROOMTYPE NEXTID/ ],
             #where => 'WHERE LIVESTATUS = 1',
         },
     };
@@ -403,7 +455,19 @@ sub _create_table {
     # имя таблицы тоже переводим в нижний регистр
     $sql_table_name = lc $sql_table_name;
 
-    return "CREATE TABLE IF NOT EXISTS $sql_table_name (" . join( ', ', @sqlcommand ) . ') MAX_ROWS=1000000000';
+    my $create_string = "CREATE TABLE IF NOT EXISTS $sql_table_name (" . join( ', ', @sqlcommand );
+
+    if ( $sql_table_name eq 'house' ) {
+	    $create_string .= ", PRIMARY KEY \`houseguid\` (\`houseguid\`), KEY \`aoguid\`(\`aoguid\`)";
+    }
+    elsif (  $sql_table_name eq 'room' ) {
+	    $create_string .= ", PRIMARY KEY \`roomguid\` (\`roomguid\`), KEY \`houseguid\`(\`houseguid\`)";
+    }
+    elsif (  $sql_table_name eq 'addrob' ) {
+	    $create_string .= ", PRIMARY KEY \`aoguid\` (\`aoguid\`), KEY \`aolevel\`(\`aolevel\`), KEY \`aoguid\`(\`aoguid\`)";
+    }
+    $create_string .=  ') MAX_ROWS=1000000000';
+    return $create_string;
 }
 
 sub _convert_data {
@@ -479,7 +543,7 @@ FIAS::SQL - Модуль для минимальной работы с данн�
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
     # Создание объекта, подключение к базе
     my  $fias = FIAS::SQL->new(
@@ -535,6 +599,7 @@ version 0.05
     Метод для загрузки dbf файлов в базу
 
     $directory -- папка с DBF файлами
+    $update    -- флаг для обновления базы
 
 =item B<get_address_objects>
     Получение адресных объектов по уровню и родителю
@@ -716,6 +781,18 @@ version 0.05
         level   "region"
     }
 ]
+
+=item B<set_database_version>
+    Сохранение версии базы
+
+=item B<get_database_version>
+    Получение версии базы
+
+=item B<get_database_version>
+    Получение линка на актуальную базу
+
+=item B<get_database_version>
+    Получение версии актуальной базы
 
 =item B<_check_record_actuality>
     Проверка записи из DBF на актуальность

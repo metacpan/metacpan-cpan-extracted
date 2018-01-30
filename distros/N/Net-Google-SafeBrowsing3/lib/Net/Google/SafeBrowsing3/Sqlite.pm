@@ -62,7 +62,6 @@ Sqlite cache size. 20000 by default.
 
 =back
 
-
 =cut
 
 sub new {

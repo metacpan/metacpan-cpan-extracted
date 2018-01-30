@@ -17,11 +17,11 @@ URI::NamespaceMap - Class holding a collection of namespaces
 
 =head1 VERSION
 
-Version 1.04
+Version 1.06
 
 =cut
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 
 =head1 SYNOPSIS
@@ -34,6 +34,10 @@ our $VERSION = '1.04';
   $map->add_mapping(rdf => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' );
   $map->list_prefixes;  #  ( 'foaf', 'rdf', 'xsd' )
   $map->foaf; # Returns URI::Namespace object
+  while (my ($prefix, $nsURI) = $map->each_map) {
+	 $node->setNamespace($nsURI->as_string, $prefix); # For use with XML::LibXML
+  }
+
 
 =head1 DESCRIPTION
 
@@ -88,6 +92,11 @@ Returns an array of L<URI::Namespace> objects with all the namespaces.
 
 Returns an array of prefixes.
 
+=item C<< each_map >>
+
+Returns an 2-element list where the first element is a prefix and the
+second is the corresponding L<URI::Namespace> object.
+
 =cut
 
 around BUILDARGS => sub {
@@ -126,6 +135,7 @@ sub remove_mapping  { delete $_[0]->namespace_map->{$_[1]} }
 sub namespace_uri   { $_[0]->namespace_map->{$_[1]} }
 sub list_namespaces { values %{ $_[0]->namespace_map } }
 sub list_prefixes   { keys   %{ $_[0]->namespace_map } }
+sub each_map        { each   %{ $_[0]->namespace_map } }
 
 
 =item C<< guess_and_add ( @string_or_uri ) >>
@@ -182,6 +192,9 @@ sub _scrub_uri {
 	if (ref $uri) {
 		if (blessed $uri) {
 			if ($uri->isa('URI::Namespace')) {
+				$uri = $uri->as_string;
+			}
+			elsif ($uri->isa('IRI')) {
 				$uri = $uri->as_string;
 			}
 			elsif ($uri->isa('URI')) {
@@ -257,7 +270,6 @@ sub abbreviate {
 
 	my $prefix = $self->prefix_for($uri);
 
-	# XXX is this actually the most desirable behaviour?
 	return unless defined $prefix;
 
 	my $nsuri = _scrub_uri($self->namespace_uri($prefix));
@@ -382,7 +394,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012,2013,2014,2015,2016,2017 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo
+Copyright 2012,2013,2014,2015,2016,2017,2018 Gregory Todd Williams, Chris Prather and Kjetil Kjernsmo
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

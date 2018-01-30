@@ -1,0 +1,17 @@
+:default       ::= action => [name, value]
+
+lexeme default = action => [name,value] latm => 1
+
+Expr           ::= Number
+					|| '(' Expr ')'      assoc => group
+					|| Expr '**' Expr    assoc => right
+					|| Expr '*' Expr     # Left associativity is by default.
+					 | Expr '/' Expr
+					|| Expr '+' Expr
+					 | Expr '-' Expr
+
+Number         ~ [\d]+
+
+:discard       ~ whitespace
+
+whitespace     ~ [\s]+

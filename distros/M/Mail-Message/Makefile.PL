@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.005';
+my $VERSION = '3.006';
 
 my @optional =
 ( 
@@ -149,9 +149,22 @@ WriteMakefile
  ( NAME       => 'Mail::Message'
  , VERSION    => $VERSION
  , AUTHOR     => 'Mark Overmeer'
- , ABSTRACT   => 'MIME message handling'
+ , ABSTRACT   => 'Processing MIME messages'
  , PREREQ_PM  => \%prereq
  , LICENSE    => 'perl'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-Mail-Message.git'
+              , web  => 'https://github.com/markov2/perl5-Mail-Message'
+              }
+          }
+      , homepage => 'http://perl.overmeer.net/CPAN/'
+      , license  => [ 'http://dev.perl.org/licenses/' ]
+      }
  );
 
 ### used by oodist during production of distribution
@@ -162,12 +175,11 @@ RAWDIR          = ../public_html/mail-message/raw
 DISTDIR         = ../public_html/mail-message/source
 
 LICENSE         = perl
-EXTENDS			= ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../MailBox4:../MailTransport
+EXTENDS			= ../User-Identity:../MIME-Types:../Object-Realize-Later:../MailTools:../../perl/MailBoxC:../../perl/MailBox4:../Mail-Transport
 
 # for POD
 FIRST_YEAR      = 2001
 EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/mailbox/
-PODTAIL         = ../MailBox-shared-podtail
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
 __POSTAMBLE

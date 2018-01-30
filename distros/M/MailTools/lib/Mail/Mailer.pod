@@ -7,7 +7,7 @@ Mail::Mailer - send simple emails
 =head1 INHERITANCE
 
  Mail::Mailer
-   is a IO::Handle
+   is an IO::Handle
 
 =head1 SYNOPSIS
 
@@ -77,10 +77,10 @@ default mailer will be the first one found.
 
 =over 4
 
-=item Mail::Mailer-E<gt>B<new>(TYPE, ARGS)
+=item Mail::Mailer-E<gt>B<new>($type, %options)
 
-The TYPE is one of the back-end sender implementations, as described in
-the DESCRIPTION chapter of this manual page.  The ARGS are passed to
+The $type is one of the back-end sender implementations, as described in
+the DESCRIPTION chapter of this manual page.  The %options are passed to
 that back-end.
 
 =item $obj-E<gt>B<open>(HASH)

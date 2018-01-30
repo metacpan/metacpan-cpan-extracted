@@ -15,7 +15,7 @@ BEGIN {
 ok( ! $NetAddr::MAC::errstr, 'initial errstr empty before fcf8aeb721a9');
 my $ret = NetAddr::MAC->new('fcf8aeb721a9');
 ok( $ret, 'return value is true for fcf8aeb721a9' );
-ok( ref $ret eq 'NetAddr::MAC', 'return value is a NetAddr::MAC object for fcf8aeb721a9' );
+is( ref $ret, 'NetAddr::MAC', 'return value is a NetAddr::MAC object for fcf8aeb721a9' );
 ok( ! $NetAddr::MAC::errstr, 'again errstr empty after fcf8aeb721a9');
 
 }
@@ -37,7 +37,7 @@ like ($NetAddr::MAC::errstr,
 
 my $ret = NetAddr::MAC->new('742b62803518');
 ok( $ret, 'return value is true for 742b62803518' );
-ok( $ret->oui eq '74-2B-62', 'oui is 74-2B-62');
+is( $ret->oui, '74-2B-62', 'oui is 74-2B-62');
 ok( ! $NetAddr::MAC::errstr, 'errstr emptied after 742b62803518');
 
 }
@@ -47,8 +47,8 @@ ok( ! $NetAddr::MAC::errstr, 'errstr emptied after 742b62803518');
 
 my $ret = NetAddr::MAC->new('60#742b62803518');
 ok( $ret, 'return value is true for 60#742b62803518' );
-ok( $ret->{priority} == 60, 'internal priority is 60' );
-ok( $ret->as_bridge_id eq '60#742b.6280.3518', 'as_bridge_id is correct' );
+cmp_ok( $ret->{priority}, '==', 60, 'internal priority is 60' );
+is( $ret->as_bridge_id, '60#742b.6280.3518', 'as_bridge_id is correct' );
 
 }
 

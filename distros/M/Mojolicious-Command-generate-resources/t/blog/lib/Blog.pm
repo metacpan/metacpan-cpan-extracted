@@ -11,6 +11,9 @@ sub startup {
   $self->plugin('Config');
   $self->secrets($self->config('secrets'));
 
+  #Plugins
+  $self->plugin('TagHelpers');
+
   # Model
   $self->helper(
     sqlite => sub {

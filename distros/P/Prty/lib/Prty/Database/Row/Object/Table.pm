@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Perl;
 
@@ -196,7 +196,7 @@ sub primaryKeyWhere {
     my $val = $self->$key;
     if ($val eq '') {
         $self->throw(
-            q{ROW-00005: Primärschlüsselkolumne ist NULL},
+            q~ROW-00005: Primärschlüsselkolumne ist NULL~,
             PrimaryKeyColumn=>$key,
             Row=>$self->asString('|'),
         );
@@ -436,7 +436,7 @@ sub delete {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -444,7 +444,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

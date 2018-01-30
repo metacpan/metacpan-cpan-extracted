@@ -14,6 +14,7 @@
     <div class="form">
 
     <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+    <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
     <TMPL_IF NAME="CHOICE_VALUE">
       <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
     </TMPL_IF>
@@ -59,6 +60,7 @@
     <div class="form">
 
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <TMPL_IF NAME="CHOICE_VALUE">
         <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
       </TMPL_IF>
@@ -125,7 +127,7 @@
   </div>
 
   <div class="buttons">
-    <a href="<TMPL_VAR NAME="PORTAL_URL">?skin=<TMPL_VAR NAME="SKIN">" class="btn btn-primary" role="button">
+    <a href="<TMPL_VAR NAME="PORTAL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="CHOICE_VALUE">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="CHOICE_VALUE"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="btn btn-primary" role="button">
       <span class="glyphicon glyphicon-home"></span>
       <lang en="Go back to portal" fr="Retourner au portail" />
     </a>

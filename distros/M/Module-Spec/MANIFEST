@@ -10,7 +10,9 @@ README
 dist.ini
 lib/Module/Spec.pm
 lib/Module/Spec/OO.pm
+lib/Module/Spec/V0.pm
 lib/Module/Spec/V1.pm
+lib/Module/Spec/V2.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-load.t
@@ -19,7 +21,9 @@ t/lib/BadBadFoo.pm
 t/lib/BadFoo.pm
 t/lib/Foo.pm
 t/lib/NoVersion.pm
-t/need-module.t
-t/try-module.t
+t/v1-need-module.t
+t/v1-try-module.t
+t/v2-need-module.t
+t/v2-try-module.t
 xt/author/pod-syntax.t
 xt/release/changes_has_content.t

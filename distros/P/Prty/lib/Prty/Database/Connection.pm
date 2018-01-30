@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Sql;
 use Prty::Object;
@@ -147,11 +147,11 @@ sub new {
     my $udl = @_? shift: $ENV{'UDL'};
 
     if (!defined $udl || $udl eq '') {
-        $class->throw(q{DB-00002: Kein UDL});
+        $class->throw(q~DB-00002: Kein UDL~);
     }
     elsif (@_) {
         $class->throw(
-            q{DB-00002: Zu viele Parameter},
+            q~DB-00002: Zu viele Parameter~,
             Parameters=>join(',',@_),
         );
     }
@@ -1713,7 +1713,7 @@ sub save {
     }
     else {
         $self->throw(
-            q{DB-00003: Ungültiger Datensatz-Status},
+            q~DB-00003: Ungültiger Datensatz-Status~,
             RowStatus=>$stat,
         );
     }
@@ -1959,7 +1959,7 @@ sub lookup {
 
     if ($row2 && !($sloppy & 2)) {
         $self->throw(
-            q{DB-00003: Mehr als ein Datensatz gefunden},
+            q~DB-00003: Mehr als ein Datensatz gefunden~,
             Sql=>$stmt,
         );
     }
@@ -1972,7 +1972,7 @@ sub lookup {
             return;
         }
         $self->throw(
-            q{DB-00001: Datensatz nicht gefunden},
+            q~DB-00001: Datensatz nicht gefunden~,
             Sql=>$stmt,
         );
     }
@@ -2501,7 +2501,7 @@ sub update {
 
         #unless (@_) {
         #    $self->throw(
-        #        q{DB-00002: Keine WHERE-Bedingung für Datensatz-Update},
+        #        q~DB-00002: Keine WHERE-Bedingung für Datensatz-Update~,
         #        Table=>$table,
         #        Row=>$row->asString('|'),
         #    );
@@ -2552,7 +2552,7 @@ sub delete {
 
         unless (@_) {
             $self->throw(
-                q{DB-00002: Keine WHERE-Bedingung für Datensatz-Delete},
+                q~DB-00002: Keine WHERE-Bedingung für Datensatz-Delete~,
                 Table=>$table,
                 Row=>$row->asString('|'),
             );
@@ -4175,7 +4175,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -4183,7 +4183,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

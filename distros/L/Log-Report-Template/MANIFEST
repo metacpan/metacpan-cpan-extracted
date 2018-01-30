@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Log/Report/Template.pm
 lib/Log/Report/Template.pod
 lib/Log/Report/Template/Textdomain.pm

@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.834';
+our $VERSION = '1.835';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -51,6 +51,7 @@ my ( $_MNGD, $_DATA, $_DELY, $_LIST ) = ( {}, {}, {}, {} );
 my $_freeze = MCE::Shared::Server::_get_freeze();
 my $_thaw   = MCE::Shared::Server::_get_thaw();
 
+my $_is_MSWin32  = ($^O eq 'MSWin32') ? 1 : 0;
 my $_has_threads = $INC{'threads.pm'} ? 1 : 0;
 my $_tid = $_has_threads ? threads->tid() : 0;
 
@@ -107,12 +108,12 @@ sub init {
    if ( $mngd->{max_workers} ) {
       my $cpus = $mngd->{max_workers};
       $cpus = MCE::Util::get_ncpu() if $cpus eq 'auto';
-      $cpus = 1 if $cpus !~ /^\d+$/ || $cpus < 1;
-      $mngd->{max_workers} = $cpus;
+      $cpus = 1 if $cpus !~ /^[\d\.]+$/ || $cpus < 1;
+      $mngd->{max_workers} = int($cpus);
    }
 
    require POSIX
-      if ( $mngd->{on_finish} && !$INC{'POSIX.pm'} && $^O ne 'MSWin32' );
+      if ( $mngd->{on_finish} && !$INC{'POSIX.pm'} && !$_is_MSWin32 );
 
    return;
 }
@@ -136,7 +137,7 @@ sub async (&;@) {
 
 sub create {
    my $mngd = $_MNGD->{ "$$.$_tid.".caller() } // do {
-      # Unless defined, construct $mngd internally on first use.
+      # construct mngd internally on first use unless defined
       init(); $_MNGD->{ "$$.$_tid.".caller() };
    };
 
@@ -174,8 +175,10 @@ sub create {
    }
 
    # Wait for a slot if saturated.
-   MCE::Hobo->wait_one()
-      if ( $max_workers && keys %{ $list->[0] } >= $max_workers );
+   if ( $max_workers && keys(%{ $list->[0] }) >= $max_workers ) {
+      my $count = keys(%{ $list->[0] }) - $max_workers + 1;
+      MCE::Hobo->wait_one() for 1 .. $count;
+   }
 
    # ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
@@ -268,7 +271,7 @@ sub exit {
       sleep 0.030;
    }
 
-   if ($^O eq 'MSWin32') {
+   if ($_is_MSWin32) {
       CORE::kill('KILL', $wrk_id) if CORE::kill('ZERO', $wrk_id);
    } else {
       CORE::kill('QUIT', $wrk_id) if CORE::kill('ZERO', $wrk_id);
@@ -431,6 +434,27 @@ sub list_running {
    $list->vals();
 }
 
+sub max_workers {
+   _croak('Usage: MCE::Hobo->max_workers()') if ref($_[0]);
+   my $mngd = $_MNGD->{ "$$.$_tid.".caller() } // do {
+      # construct mngd internally on first use unless defined
+      init(); $_MNGD->{ "$$.$_tid.".caller() };
+   };
+   shift if ( $_[0] eq __PACKAGE__ );
+
+   if ( @_ ) {
+      $mngd->{max_workers} = shift;
+      if ( $mngd->{max_workers} ) {
+         my $cpus = $mngd->{max_workers};
+         $cpus = MCE::Util::get_ncpu() if $cpus eq 'auto';
+         $cpus = 1 if $cpus !~ /^[\d\.]+$/ || $cpus < 1;
+         $mngd->{max_workers} = int($cpus);
+      }
+   }
+
+   $mngd->{max_workers};
+}
+
 sub pending {
    _croak('Usage: MCE::Hobo->pending()') if ref($_[0]);
    my $pkg = "$$.$_tid.".caller();
@@ -526,7 +550,7 @@ sub _dispatch {
    my ( $mngd, $func, $args ) = @_;
    $mngd->{WRK_ID} = $_SELF->{WRK_ID} = $$;
 
-   $ENV{PERL_MCE_IPC} = 'win32' if ($^O eq 'MSWin32');
+   $ENV{PERL_MCE_IPC} = 'win32' if $_is_MSWin32;
    $SIG{TERM} = $SIG{INT} = $SIG{HUP} = \&_trap;
    $SIG{QUIT} = \&_quit;
 
@@ -575,18 +599,18 @@ sub _exit {
    $SIG{__DIE__}  = sub { } unless $_tid;
    $SIG{__WARN__} = sub { };
 
-   threads->exit($exit_status) if ( $_has_threads && $^O eq 'MSWin32' );
+   threads->exit($exit_status) if ( $_has_threads && $_is_MSWin32 );
 
    $SIG{HUP} = $SIG{INT} = $SIG{QUIT} = $SIG{TERM} = sub {
       $SIG{$_[0]} = $SIG{INT} = sub { };
-      CORE::kill($_[0], getppid()) if ( $_[0] eq 'INT' && $^O ne 'MSWin32' );
+      CORE::kill($_[0], getppid()) if ( $_[0] eq 'INT' && !$_is_MSWin32 );
       CORE::kill('KILL', $$);
    };
 
    my $posix_exit = ( exists $_SELF->{posix_exit} )
       ? $_SELF->{posix_exit} : $_MNGD->{ $_SELF->{PKG} }{posix_exit};
 
-   if ( $posix_exit && $^O ne 'MSWin32' ) {
+   if ( $posix_exit && !$_is_MSWin32 ) {
       eval { MCE::Mutex::Channel::_destroy() };
       POSIX::_exit($exit_status) if $INC{'POSIX.pm'};
       CORE::kill('KILL', $$);
@@ -610,7 +634,7 @@ sub _force_reap {
    $_LIST->{$pkg}->clear();
 
    warn "Finished with active Hobos [$pkg] ($count)\n"
-      if ($count && $^O ne 'MSWin32');
+      if ( $count && !$_is_MSWin32 );
 
    return;
 }
@@ -775,7 +799,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.834
+This document describes MCE::Hobo version 1.835
 
 =head1 SYNOPSIS
 
@@ -1210,6 +1234,14 @@ Returns a list of all hobos that have completed running. Thus, ready to be
 joined without blocking.
 
  @hobos = MCE::Hobo->list_joinable();
+
+=item MCE::Hobo->max_workers([ N ])
+
+Getter and setter for max_workers. Specify a number or 'auto' to acquire the
+total number of cores via MCE::Util::get_ncpu. Specify a false value to set
+back to no limit.
+
+API available since 1.835.
 
 =item MCE::Hobo->pending()
 

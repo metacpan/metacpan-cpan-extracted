@@ -1,5 +1,11 @@
 Revision history for Perl extension Teamcity-Executor
 
+1.2.0 2018-01-30T09:08:43Z
+  - extend logging of failed jobs
+
+1.1.1 2018-01-23T11:59:53Z
+    - fix retrieving artifacts
+
 1.1.0 2018-01-19T10:41:35Z
     - remove autobox dependency
 
@@ -20,5 +26,4 @@ Revision history for Perl extension Teamcity-Executor
     - minor fix in SYNOPSIS
 
 0.1.0 2017-09-19T12:20:24Z
-
     - original version

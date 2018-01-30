@@ -27,7 +27,7 @@ Mail::Message::Part - a part of a message, but a message by itself
 =head1 DESCRIPTION
 
 A C<Mail::Message::Part> object contains a message which is included in
-the body of an other message.  For instance I<attachments> are I<parts>.
+the body of another message.  For instance I<attachments> are I<parts>.
 
 READ L<Mail::Message|Mail::Message> FIRST.  A part is a special message: it has a
 reference to its parent message, and will usually not be sub-classed
@@ -615,35 +615,12 @@ be forcefully freed from memory. Consider L<delete()|Mail::Message/"Flags"> or L
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.005,
-built on December 22, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Message distribution version 3.006,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

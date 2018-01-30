@@ -4,7 +4,7 @@ use base qw/Prty::ContentProcessor::BaseType/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 # -----------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ C<undef>. Die Methode wird überschrieben.
 
 =head2 Erzeugung
 
-=head3 create() - Wandele Abschnitts-Objekt in Entität
+=head3 create() - Erzeuge Entität
 
 =head4 Synopsis
 
@@ -489,23 +489,23 @@ sub pureCode {
 
 =head2 Dateierzeugung
 
-=head3 files() - Liste der Ausgabedateien (abstrakt)
+=head3 outputFiles() - Liste der Ausgabedateien (abstrakt)
 
 =head4 Synopsis
 
-    @files = $ent->files;
+    @files = $ent->outputFiles;
 
 =head4 Description
 
-Liefere die Liste der Dateien, die die Entität generiert.
-Diese Basisklassenmethode liefert eine leere Liste. Sie wird
-in Subklassen überschrieben.
+Liefere die Liste der Dateien, die die Entität generiert. Diese
+Basisklassenmethode liefert eine leere Liste. Sie wird in
+Subklassen überschrieben.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub files {
+sub outputFiles {
     my $self = shift;
     return;
 }
@@ -661,7 +661,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -669,7 +669,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

@@ -3,9 +3,10 @@ require 5.008001;
 use ExtUtils::MakeMaker;
 
 WriteMakefile
- ( DISTNAME  => 'MailTools'
- , VERSION   => '2.19'
- , AUTHOR    => 'Mark Overmeer <perl@overmeer.net>'
+ ( NAME      => 'MailTools'
+ , DISTNAME  => 'MailTools'
+ , VERSION   => '2.20'
+ , AUTHOR    => 'Mark Overmeer'
  , ABSTRACT  => 'Various ancient e-mail related modules'
  , LICENSE   => 'perl'
 
@@ -17,18 +18,28 @@ WriteMakefile
    , Date::Format => 0
    , Date::Parse  => 0
 
-   # next deps missing on purpose, to avoid installing a lot which
-   # is rarely used.
+   #XXX next deps missing on purpose, to avoid installing a lot which
+   #XXX is rarely used:
+
    # Authen::SASL
    # Net::SMTP::SSL
    }
-);
 
-sub MY::postamble {
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-MailTools.git'
+              , web  => 'https://github.com/markov2/perl5-MailTools'
+              }
+          }
+      , homepage => 'http://perl.overmeer.net/CPAN/'
+      , license  => [ 'http://dev.perl.org/licenses/' ]
+      }
+ );
 
-  return '' unless $] >= 5.00503;
-
-<<'ESQ';
+sub MY::postamble { <<'__POSTAMBLE' };
 
 all:: ppd
 dist: ppd
@@ -36,13 +47,12 @@ dist: ppd
 # for OODoc's oodist, DIST
 RAWDIR		= ../public_html/mailtools/raw
 DISTDIR		= ../public_html/mailtools/source
-LICENSE		= artistic
+LICENSE		= perl
 
 # for OODoc's oodist, POD
 FIRST_YEAR	= 1995
-EMAIL		= perl@overmeer.net
-WEBSITE		= http://perl.overmeer.net/
+EMAIL		= markov@cpan.org
+WEBSITE		= http://perl.overmeer.net/CPAN/
 
-ESQ
-}
+__POSTAMBLE
 

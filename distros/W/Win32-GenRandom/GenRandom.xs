@@ -162,7 +162,21 @@ void rgr(pTHX_ SV * x, ...) {
       (BOOLEAN (APIENTRY *)(void*,ULONG))GetProcAddress(hLib,"SystemFunction036");
 
     for(i = 0; i < how_many; i++) {
-      if(pfn(buff,len)) XPUSHs(sv_2mortal(newSVpv(buff, len)));
+      if(pfn(buff,len)) {
+        XPUSHs(sv_2mortal(newSVpv(buff, len)));
+       /*
+          Now that we've finished with it, fill buffer with zeroes (as per MSDN recommendation).
+          We do this with SecureZeroMemory if its available, else we do it with ZeroMemory if
+          it's available, else we don't do it.
+       */
+#ifdef  SecureZeroMemory
+        SecureZeroMemory(buff, len);
+#else
+#ifdef  ZeroMemory
+        ZeroMemory(buff, len);
+#endif
+#endif
+      }
       else {
         warn("Call to 'SystemFunction036' failed");
         FreeLibrary(hLib);
@@ -327,6 +341,18 @@ SV * _PROV_SSL(pTHX) {
   return newSVuv(PROV_SSL);
 #else
   return &PL_sv_undef;
+#endif
+}
+
+SV * whw(pTHX) {
+#ifdef SecureZeroMemory
+       return newSVpv("SecureZeroMemory", 0);
+#else
+#ifdef ZeroMemory
+       return newSVpv("ZeroMemory", 0);
+#else
+       return newSVpv("None", 0);
+#endif
 #endif
 }
 
@@ -540,6 +566,13 @@ SV *
 _PROV_SSL ()
 CODE:
   RETVAL = _PROV_SSL (aTHX);
+OUTPUT:  RETVAL
+
+
+SV *
+whw ()
+CODE:
+  RETVAL = whw (aTHX);
 OUTPUT:  RETVAL
 
 

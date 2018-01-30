@@ -111,9 +111,6 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
   // Call subroutine argument stack top
   int32_t call_sub_arg_stack_top = -1;
   
-  // Current line
-  int32_t current_line = 0;
-  
   // Condition flag
   register int32_t condition_flag = 0;
   
@@ -1720,9 +1717,6 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         
         break;
       }
-      case SPVM_OPCODE_C_CODE_CURRENT_LINE:
-        current_line = opcode->operand0;
-        break;
       case SPVM_OPCODE_C_CODE_GOTO:
         opcode_index = opcode->operand0;
         continue;
@@ -1810,13 +1804,12 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         }
         break;
       }
-      case SPVM_OPCODE_C_CODE_CROAK: {
-        // Nothing to do
-        break;
-      }
       case SPVM_OPCODE_C_CODE_IF_CROAK_CATCH: {
         if (croak_flag) {
           croak_flag = 0;
+          
+          // Exception stack trace
+          api->set_exception(api, api->create_exception_stack_trace(api, sub_id, SPVM_INLINE_GET_EXCEPTION(), opcode->operand1));
           opcode_index = opcode->operand0;
           continue;
         }
@@ -1824,6 +1817,11 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
       }
       case SPVM_OPCODE_C_CODE_IF_CROAK_RETURN: {
         if (croak_flag) {
+          // Exception stack trace
+          api->set_exception(api, api->create_exception_stack_trace(api, sub_id, SPVM_INLINE_GET_EXCEPTION(), opcode->operand1));
+          if (!constant_pool_sub->is_void) {
+            memset(&return_value, 0, sizeof(SPVM_API_VALUE));
+          }
           goto label_SPVM_OPCODE_C_CODE_RETURN;
         }
         break;
@@ -1834,7 +1832,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
       }
       case SPVM_OPCODE_C_CODE_RETURN:
       {
-        // Get return value
+        // Set return value
         if (!constant_pool_sub->is_void) {
           return_value = vars[opcode->operand0];
         }
@@ -1934,16 +1932,7 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
     }
     
     // Croak
-    if (croak_flag) {
-      if (runtime->debug) {
-        // Exception stack trace
-        SPVM_API_OBJECT* exception_stack_trace = api->create_exception_stack_trace(api, sub_id, SPVM_INLINE_GET_EXCEPTION(), current_line);
-        api->set_exception(api, exception_stack_trace);
-      }
-      memset(&return_value, 0, sizeof(SPVM_API_VALUE));
-    }
-    // RETURN
-    else {
+    if (!croak_flag) {
       SPVM_INLINE_SET_EXCEPTION_NULL();
     }
     

@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Term::ANSIColor ();
 
@@ -29,7 +29,7 @@ L<Prty::Object>
 
 =head1 DESCRIPTION
 
-Die Klasse erlaubt es, Textausgaben - die typischerweise auf das
+Die  Klasse erlaubt es, Textausgaben - die typischerweise aufs
 Terminal gehen - mit ANSI Colorcodes auszuzeichnen und diese
 Auszeichnung zentral an- und ab-zuschalten. Die An- oder Abschaltung
 erfolgt bei Aufruf des Konstruktors.
@@ -54,7 +54,7 @@ angegeben, werden diese durch Leerzeichen getrennt.
 
 Beispiele: 'bold reverse' oder 'dark red on_green'
 
-=head2 Text mit Colorcodes verarbeiten
+=head2 Texte mit Colorcodes weiter verarbeiten
 
 Die im folgenden genannten Programme C<aha>, C<wkhtmltopdf> und C<less>
 sind im Debian-Repository enthalten.
@@ -87,8 +87,8 @@ sind im Debian-Repository enthalten.
 
 =item $bool
 
-Wenn wahr, findet eine Auszeichnung mit ANSI Colorcodes statt,
-wenn falsch, nicht.
+Wenn wahr, findet eine Auszeichnung mit ANSI Colorcodes durch die
+Klasse statt, wenn falsch, nicht.
 
 =back
 
@@ -167,7 +167,7 @@ sub str {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -175,7 +175,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

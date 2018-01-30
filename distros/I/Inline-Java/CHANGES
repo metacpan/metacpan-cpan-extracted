@@ -1,5 +1,32 @@
 Revision history for Perl extension Inline::Java
 ------------------------------------------------
+
+0.59 Mon Jan 29 07:02:52 GMT 2018
+ - zap no_index line
+ - put . in Makefile.PL @INC for perl 5.26+
+
+0.58 Sat Nov 29 09:18:45 2014 +0000
+ - add no_index metadata
+
+0.57 Sat Nov 29 07:09:57 2014 +0000
+ - Fix some language issues in the manual page.
+
+0.56 Fri Nov 21 15:35:10 2014 +0000
+ - Remove unnecessary imports
+ - Minor XS bug-fix
+
+0.55 Fri Nov 14 14:54:12 2014 +0000
+ - tests restored from 0.53
+
+0.540 Tue Sep 9 02:55:18 2014 +0100
+ - Update doc for case-insensitive args to Inline.
+ - Update metadata - git repo, Inline version.
+
+0.53_90 Tue Aug 19 07:32:57 2014 -0400
+	- Added AUTOSTUDY to PerlInterpreter
+	- Applied patch by Max Vohlen to fix JNI bug
+	- Applied patch by Charles Brabec to allow wildcards in CLASSPATH
+
 0.53  Sun Jan  9 08:15:06 EST 2011
     - Removed PerlNatives extension from the build because it is unmaintained and broken.
       It can still be enabled manually using the BUILD_PERL_NATIVES build configuration 

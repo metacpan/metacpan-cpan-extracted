@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Array;
 use Prty::Converter;
@@ -125,11 +125,11 @@ sub title {
 
 =head4 Synopsis
 
-    ($type,$attH) = $parent->nextType($doc);
+    ($type,$attibuteA) = $parent->nextType($doc);
 
 =head4 Description
 
-Analysiere die nächste nichtleere Zeile in TextFile $doc
+Analysiere die nächste nichtleere Zeile in LineProcessor $doc
 (Leerzeilen am Anfang werden von der Methode entfernt)
 hinsichtlich ihres Elementtyps und liefere die
 Typbezeichnung und Attribute - sofern spezifiziert - zurück.
@@ -184,16 +184,15 @@ Zeile, auf die keine der obigen Eigenschaften zutrifft.
 sub nextType {
     my ($self,$doc) = @_;
 
-    $doc->removeEmptyLines; # Leerzeilen am Anfang entfernen
+    $doc->removeEmptyLines; # Leerzeilen überlesen
 
     my $line = $doc->lines->[0];
     my $type = $line->type;
 
-    my $arr;
+    my $arr = [];
     if ($type eq 'Object') {
         ($type,$arr) = $self->parseObjectSpec($doc);
     }
-    $arr ||= []; # Prty::Array->new;
 
     if ($type eq 'Item') {
         # Wenn das nächste Element ein Item ist, prüfen wir, ob
@@ -206,8 +205,7 @@ sub nextType {
 
         my ($itemType) = $line->item;
         if (!$self->isa('Prty::Sdoc::List') ||
-            $self->{'itemType'} ne $itemType)
-        {
+                $self->{'itemType'} ne $itemType) {
             $type = 'List';
         }
     }
@@ -251,17 +249,18 @@ die Attribut/Wert-Paare des Objekts zurück.
 sub parseObjectSpec {
     my ($self,$doc) = @_;
 
-    my $ln = $doc->shiftLine;
-    my ($type,$str) = $ln->text =~ /%(\w+):(.*)/;
-    my $n = $ln->indentation;
+    my $line = $doc->shiftLine;
+    my ($type,$str) = $line->text =~ /%(\w+):(.*)/;
+
+    my $n = $line->indentation;
     if ($n || $type eq 'Code') {
         $str .= " indentation=$n";
     }
 
     while (@{$doc->lines}) {
-        $ln = $doc->lines->[0];
+        $line = $doc->lines->[0];
         # Wenn keine tiefere Einrückung oder Anfang ist nicht KEY=
-        if ($ln->indentation <= $n || $ln->text !~ /^\s+\w+=/) {
+        if ($line->indentation <= $n || $line->text !~ /^\s+\w+=/) {
             last;
         }
         $str .= $doc->shiftLine->text;
@@ -534,17 +533,35 @@ sub urlSegment {
     my $str = shift;
     # @_: @args
 
+    # Innere Zeilenumbrüche entfernen
+
     my $attH = Prty::Hash->new(
         text=>undef,
         target=>undef,
         noPodUrl=>0,
     );
-    # $attH->lockKeys;
 
     my $url = $str;
     if ($str =~ s/^"(.*?)"//) {
         $url = $1;
         $attH->set($str =~ /(\w+)="(.*?)"/g);
+    }
+
+    # Wenn U{TEXT} (d.h. kein Schema am Anfang, keine Extension am
+    # Ende), schlagen wir die Link-Definition (%Link:) mit TEXT nach
+    # und kopieren dessen Eigenschaften
+
+    if ($url !~ /^[a-z]+:/ && $url !~ /\.[a-z]+$/) {
+        $url =~ s/\n\s*/ /g; # innere Zeilenumbrüche durch ein Space ersetzen
+        my $lnk = $self->rootNode->links->get($url);
+        if (!$lnk) {
+            $self->throw(
+                q~SDOC-00005: Link ist nicht definiert~,
+                Link=>$url,
+            );
+        }
+        $attH->set(text=>$url);
+        $url = $lnk->url;
     }
 
     my $text = $attH->{'text'};
@@ -845,7 +862,7 @@ sub tableOfContents {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -853,7 +870,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

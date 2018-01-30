@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Show;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use List::Util qw( max );
 
@@ -73,6 +73,12 @@ sub run
       Devel::MAT::Cmd->printf( "  blessed as %s\n", $stash->stashname );
    }
 
+   if( my $symname = $sv->symname ) {
+      Devel::MAT::Cmd->printf( "  named as %s\n",
+         Devel::MAT::Cmd->format_symbol( $symname )
+      );
+   }
+
    my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
    my $method = "show_$type";
    $self->$method( $sv );
@@ -94,6 +100,8 @@ sub show_GLOB
    my $self = shift;
    my ( $gv ) = @_;
 
+   Devel::MAT::Cmd->printf( "  name=%s\n", $gv->name ) if $gv->name;
+
    say_with_sv '  stash=', $gv->stash if $gv->stash;
 
    say_with_sv '  SCALAR=', $gv->scalar if $gv->scalar;
@@ -110,12 +118,20 @@ sub show_SCALAR
    my $self = shift;
    my ( $sv ) = @_;
 
-   Devel::MAT::Cmd->printf( "  UV=%d\n", $sv->uv ) if defined $sv->uv;
-   Devel::MAT::Cmd->printf( "  IV=%d\n", $sv->iv ) if defined $sv->iv;
-   Devel::MAT::Cmd->printf( "  NV=%f\n", $sv->nv ) if defined $sv->nv;
+   Devel::MAT::Cmd->printf( "  UV=%s\n",
+      Devel::MAT::Cmd->format_value( $sv->uv, nv => 1 ),
+   ) if defined $sv->uv;
+   Devel::MAT::Cmd->printf( "  IV=%s\n",
+      Devel::MAT::Cmd->format_value( $sv->iv, nv => 1 ),
+   ) if defined $sv->iv;
+   Devel::MAT::Cmd->printf( "  NV=%s\n",
+      Devel::MAT::Cmd->format_value( $sv->nv, nv => 1 ),
+   ) if defined $sv->nv;
 
    if( defined( my $pv = $sv->pv ) ) {
-      Devel::MAT::Cmd->printf( "  PV=%s\n", $pv ) if length $pv < 40 and $pv !~ m/[\0-\x1f\x80-\x9f]/;
+      Devel::MAT::Cmd->printf( "  PV=%s\n",
+         Devel::MAT::Cmd->format_value( $pv, pv => 1 ),
+      );
       Devel::MAT::Cmd->printf( "  PVLEN %d\n", $sv->pvlen );
    }
 }
@@ -162,8 +178,8 @@ sub show_CODE
    my $self = shift;
    my ( $cv ) = @_;
 
-   $cv->name     ? Devel::MAT::Cmd->printf( "  name=%s\n", $cv->name )
-                 : Devel::MAT::Cmd->printf( "  no name\n" );
+   $cv->hekname  ? Devel::MAT::Cmd->printf( "  hekname=%s\n", $cv->hekname )
+                 : Devel::MAT::Cmd->printf( "  no hekname\n" );
 
    $cv->stash    ? say_with_sv( "  stash=", $cv->stash )
                  : Devel::MAT::Cmd->printf( "  no stash\n" );
@@ -180,8 +196,8 @@ sub show_CODE
    $cv->padlist  ? say_with_sv( "  padlist=", $cv->padlist )
                  : Devel::MAT::Cmd->printf( "  no padlist\n" );
 
-   $cv->padnames ? say_with_sv( "  padnames=", $cv->padnames )
-                 : Devel::MAT::Cmd->printf( "  no padnames\n" );
+   $cv->padnames_av ? say_with_sv( "  padnames_av=", $cv->padnames_av )
+                    : Devel::MAT::Cmd->printf( "  no padnames_av\n" );
 
    my @pads = $cv->pads;
    foreach my $depth ( 0 .. $#pads ) {
@@ -223,14 +239,14 @@ sub show_PAD
    foreach my $padix ( 1 .. $#elems ) {
       my $sv = $elems[$padix];
       if( $padnames[$padix] ) {
-         Devel::MAT::Cmd->printf( "  [%3d/%*s]=%s\n",
+         Devel::MAT::Cmd->printf( "  [%3d/%-*s]=%s\n",
             $padix,
-            $maxname, $padnames[$padix],
+            $maxname, Devel::MAT::Cmd->format_note( $padnames[$padix], 1 ),
             ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
          );
       }
       else {
-         Devel::MAT::Cmd->printf( "  [%3d %*s]=%s\n",
+         Devel::MAT::Cmd->printf( "  [%3d %-*s]=%s\n",
             $padix,
             $maxname, $padtype{$padix} // "",
             ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),

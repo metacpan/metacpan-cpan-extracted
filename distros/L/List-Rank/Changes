@@ -1,0 +1,8 @@
+0.002   2018-01-26 (PERLANCAR)
+
+	- [Bugfix] Forgot to set $VERSION in List::Rank.
+
+
+0.001   2018-01-25 (PERLANCAR)
+
+        - First version.

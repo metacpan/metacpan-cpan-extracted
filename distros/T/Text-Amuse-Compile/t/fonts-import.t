@@ -32,7 +32,7 @@ for (1..2) {
 my $fclist = $importer->import_with_fclist;
 my $im = $importer->import_with_imagemagick;
 
-foreach my $exp ('Charis SIL', 'TeX Gyre Pagella') {
+foreach my $exp ('Linux Libertine O', 'TeX Gyre Pagella') {
     is_deeply($fclist->{$exp}, $im->{$exp}, "Same $exp specifications from identify and fc-list");
 }
 my $imported = $importer->import_list;

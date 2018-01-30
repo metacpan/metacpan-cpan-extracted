@@ -1,3 +1,12 @@
+0.180270  2018-01-28 00:13:26+01:00 Europe/Brussels
+    - Additions
+      - CdHit: new driver
+    - Changes
+      - Blast: changed API for a database-centered view; breaks existing code!
+      - Hmmer: changed API for a model-centered view; breaks existing code!
+    - Fixes
+      - Blast::Database: now handles multipart databases (such as local nr)
+      - Blast: updated remote tests to BLAST 2.7.1+
+
 0.173510  2017-12-17 15:32:25+01:00 Europe/Brussels
-	- first release
-	
+    - first release

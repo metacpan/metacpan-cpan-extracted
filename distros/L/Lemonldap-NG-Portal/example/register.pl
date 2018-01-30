@@ -36,6 +36,7 @@ utf8::decode( $portal->{registerInfo}->{lastname} );
 
 $template->param(
     PORTAL_URL      => $portal_url,
+    AUTH_URL        => $portal->get_url,
     SKIN_PATH       => $portalPath . "skins",
     SKIN            => $skin,
     SKIN_BG         => $portal->{portalSkinBackground},

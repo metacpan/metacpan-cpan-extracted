@@ -1,3 +1,8 @@
+0.007   2018-01-24 (PERLANCAR)
+
+	- [ux] Use rsynccolor if available.
+
+
 0.006   2017-02-07 (PERLANCAR)
 
         - Add utility: newest-mtime.

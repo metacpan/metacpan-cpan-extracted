@@ -1,5 +1,5 @@
 package Selenium::Remote::Spec;
-$Selenium::Remote::Spec::VERSION = '1.21';
+$Selenium::Remote::Spec::VERSION = '1.23';
 use strict;
 use warnings;
 
@@ -37,10 +37,8 @@ POST    session/:sessionId/window                            1 switchToWindow   
 GET     session/:sessionId/window/handles                    0 getWindowHandles             Get Window Handles
 POST    session/:sessionId/frame                             1 switchToFrame                Switch To Frame
 POST    session/:sessionId/frame/parent                      1 switchToParentFrame          Switch To Parent Frame
-GET     session/:sessionId/window/rect                       0 getWindowSize                Get Window Size (v2->v3 shim)
-GET     session/:sessionId/window/rect                       0 getWindowPosition            Get Window Position (v2->v3 shim)
-POST    session/:sessionId/window/rect                       1 setWindowSize                Set Window Size (v2->v3 shim)
-POST    session/:sessionId/window/rect                       1 setWindowPosition            Set Window Position (v2->v3 shim)
+GET     session/:sessionId/window/rect                       0 getWindowRect                Get Window Size/Position (v2->v3 shim)
+POST    session/:sessionId/window/rect                       1 setWindowRect                Set Window Size/Position (v2->v3 shim)
 POST    session/:sessionId/window/maximize                   1 maximizeWindow               Maximize Window
 POST    session/:sessionId/window/minimize                   1 minimizeWindow               Minimize Window
 POST    session/:sessionId/window/fullscreen                 1 fullscreenWindow             Fullscreen Window
@@ -189,7 +187,7 @@ sub get_params {
         $data->{payload}->{type}     = 'implicit'; #XXX chrome doesn't follow the spec
     }
     $data->{payload}->{value}    = $args->{text}          if $args->{text} && $args->{command} ne 'sendKeysToElement';
-    $data->{payload}->{handle}   = $args->{window_handle} if grep { $args->{command} eq $_ } qw{setWindowSize getWindowSize setWindowPosition getWindowPosition fullscreenWindow minimizeWindow maximizeWindow};
+    $data->{payload}->{handle}   = $args->{window_handle} if grep { $args->{command} eq $_ } qw{fullscreenWindow minimizeWindow maximizeWindow};
     return $data;
 }
 
@@ -241,7 +239,7 @@ Selenium::Remote::Spec - Implement commands for Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =head1 DESCRIPTION
 

@@ -18,6 +18,7 @@ build_requires:
   strict: '0'
   warnings: '0'
 configure_requires:
+  ExtUtils::MakeMaker: '0'
   Module::Build::Tiny: '0.034'
   perl: '5.006'
 dynamic_config: 0
@@ -42,7 +43,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::MakeMaker::Awesome:
     file: lib/Dist/Zilla/Plugin/MakeMaker/Awesome.pm
-    version: '0.39'
+    version: '0.41'
 requires:
   CPAN::Meta::Requirements: '2.121'
   Dist::Zilla: '4.300039'
@@ -63,10 +64,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MakeMaker-Awesome
   homepage: https://github.com/avar/dist-zilla-plugin-makemaker-awesome
   repository: https://github.com/avar/dist-zilla-plugin-makemaker-awesome.git
-version: '0.39'
+version: '0.41'
 x_Dist_Zilla:
   perl:
-    version: '5.027004'
+    version: '5.027006'
   plugins:
     -
       class: Dist::Zilla::Plugin::Bootstrap::lib
@@ -82,6 +83,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FileFinder::Filter
       name: all_files_but_tabs_test
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/pluginbundle version'
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -131,7 +140,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::ETHER/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::ETHER/MetaYAML'
@@ -190,7 +199,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::ETHER/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
@@ -219,7 +228,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::ETHER/Test::ChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       name: '@Author::ETHER/Test::MinimumVersion'
@@ -247,7 +256,7 @@ x_Dist_Zilla:
             - irc
           wordlist: Pod::Wordlist
       name: '@Author::ETHER/Test::PodSpelling'
-      version: '2.007004'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::Test::Pod::No404s
       name: '@Author::ETHER/Test::Pod::No404s'
@@ -471,26 +480,18 @@ x_Dist_Zilla:
       name: '@Author::ETHER/MinimumPerl'
       version: '1.006'
     -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: recommends
-      name: '@Author::ETHER/pluginbundle_version'
-      version: '6.010'
-    -
       class: Dist::Zilla::Plugin::MakeMaker::Fallback
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
           version: '6.010'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.39'
+          version: '0.41'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
           version: '6.010'
       name: '@Author::ETHER/MakeMaker::Fallback'
-      version: '0.023'
+      version: '0.026'
     -
       class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
       config:
@@ -525,7 +526,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -586,7 +587,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20170920'
+          Module::CoreList: '5.20171220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.006'
     -
@@ -602,7 +603,7 @@ x_Dist_Zilla:
           git_version: 2.14.2
           repo_root: .
       name: '@Author::ETHER/initial check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
@@ -622,7 +623,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: '@Author::ETHER/Git::Remote::Check'
-      version: 0.2.0
+      version: 0.1.2
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@Author::ETHER/CheckPrereqsIndexed'
@@ -644,7 +645,7 @@ x_Dist_Zilla:
           git_version: 2.14.2
           repo_root: .
       name: '@Author::ETHER/after tests'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: '@Author::ETHER/CheckIssues'
@@ -665,7 +666,7 @@ x_Dist_Zilla:
             - ppport.h
           match: []
       name: '@Author::ETHER/copy generated files'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -673,6 +674,14 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Author::ETHER/ReadmeAnyFromPod'
       version: '0.163250'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: '@Author::ETHER/@Git::VersionManager/pluginbundle version'
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -689,7 +698,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaProvides::Update
       name: '@Author::ETHER/@Git::VersionManager/MetaProvides::Update'
-      version: '0.002'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -698,7 +707,7 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: '@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -721,7 +730,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/release snapshot'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -729,7 +738,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.39
+          tag: v0.41
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -738,7 +747,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/Git::Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -763,7 +772,9 @@ x_Dist_Zilla:
           commit_msg: 'increment $VERSION after %v release'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - Build.PL
             - Changes
+            - Makefile.PL
           allow_dirty_match:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
@@ -773,13 +784,13 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::ETHER/@Git::VersionManager/post-release commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: suggests
+          phase: x_Dist_Zilla
+          type: requires
       name: '@Author::ETHER/@Git::VersionManager/prereqs for @Git::VersionManager'
       version: '6.010'
     -
@@ -793,7 +804,7 @@ x_Dist_Zilla:
           git_version: 2.14.2
           repo_root: .
       name: '@Author::ETHER/Git::Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
@@ -831,8 +842,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: suggests
+          phase: x_Dist_Zilla
+          type: requires
       name: '@Author::ETHER/prereqs for @Author::ETHER'
       version: '6.010'
     -

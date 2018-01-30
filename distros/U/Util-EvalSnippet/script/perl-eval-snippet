@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+use v5.012;
+use Getopt::Long;
+use lib '/home/clive/git/Perl-Util-EvalSnippet/lib';
+use Util::EvalSnippet;
+use File::Slurp;
+
+use Data::Dumper 'Dumper';
+
+GetOptions(
+  'merge=s'=> \my $merge,
+) or die 'Unable to process options!';
+
+if ($merge) {
+  _merge($merge);
+}
+else {
+  usage();
+}
+
+sub usage {
+  say "Usage: perl-eval-snippet --merge NameOfExactSnippet::Or::SnippetClass";
+  say "'perldoc Util::EvalSnippet' for more info";
+  exit(0);
+}
+
+sub _merge {
+  my $class_path = shift || die "Can't merge mothing";
+  my $snippet_dir = Util::EvalSnippet::_snippet_dir();
+  opendir(my $dh,$snippet_dir) || die "Can't open snippet dir($snippet_dir)";
+  my @snippet_files = grep { /^$class_path/ } readdir($dh);
+  close($dh);
+
+  @snippet_files or die "No snippets found in $snippet_dir for namespace '$class_path'";
+
+  my %snippet_data;
+  foreach my $snippet_file (@snippet_files) {
+    my $snippet_file_path = $snippet_dir.'/'.$snippet_file;
+    my $content = read_file($snippet_file_path);
+    $content =~ /# file: (\S+)/ or die "Can't determine parent file for snippet $snippet_file";
+    my $snippet_parent_file_path = $1;
+    $content =~ s/.*# --snippet-info-header--\s*(.*?)\s*$/$1/s;
+    my $snippet_name='';
+    $snippet_file =~ /-(\w+)$/
+      and $snippet_name = $1;
+    push @{ $snippet_data{$snippet_parent_file_path} }, {
+      name     => $snippet_name,
+      content  => $content,
+      filepath => $snippet_file_path,
+    };
+  }
+
+  foreach my $file (keys %snippet_data) {
+    my @snippet_filepaths=();
+    my $file_content = read_file($file) || die "Can't opner sourcef ile ($file): $!";
+
+    # mere snippets into file
+    foreach my $data (@{ $snippet_data{$file} }) {
+      # *every* lazy regex
+      my $snippet_name    = $data->{name} || '';
+      my $snippet_content = $data->{content};
+      push @snippet_filepaths, $data->{filepath};
+      $file_content =~ s/eval_snippet\(["']?\Q$snippet_name\E["']?\);/$snippet_content/
+        or die "Can't insert snippet $snippet_name: $!";
+    }
+
+    # remove use statement if we've merged in all snippets
+    $file_content =~ /eval_snippet\([^\)]*\)/
+      or $file_content =~ s/use\s+Util::EvalSnippet[^;]*;\s*\n?//g;
+
+    write_file($file, $file_content);
+    say scalar(@snippet_filepaths)." snippet(s) merged into $file.";
+
+    if (unlink(@snippet_filepaths) == @snippet_filepaths) {
+      say "Snippet file(s) deleted.";
+    } else {
+      warn "Failed to delete one or more snippet file after merge.";
+    }
+  }
+}
+

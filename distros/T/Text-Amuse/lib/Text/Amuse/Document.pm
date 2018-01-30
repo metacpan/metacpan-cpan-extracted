@@ -796,6 +796,7 @@ sub _construct_element {
 
     # Pack the lines
     if ($current && $current->can_append($element)) {
+        # print "Packing " . Dumper($element) . ' into ' . Dumper($current);
         $current->append($element);
         return;
     }

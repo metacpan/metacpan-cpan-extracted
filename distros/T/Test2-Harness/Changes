@@ -1,3 +1,12 @@
+0.001049  2018-01-26 14:27:16-08:00 America/Los_Angeles
+
+    - Better 'renderer' handling
+
+0.001048  2018-01-23 10:42:16-08:00 America/Los_Angeles
+
+    - Make it possible to use multiple renderers at once
+    - Fix return via next issue
+
 0.001047  2018-01-19 21:58:13-08:00 America/Los_Angeles
 
     - Fix auto-reload for preload mode

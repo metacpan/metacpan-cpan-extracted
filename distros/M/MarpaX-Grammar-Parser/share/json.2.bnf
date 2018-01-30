@@ -21,7 +21,6 @@ value        ::= string action => ::first
                | 'false' bless => false
                | 'null' action => ::undef
 
-
 array        ::= ('[' ']')
                | ('[') elements (']') action => ::first
 

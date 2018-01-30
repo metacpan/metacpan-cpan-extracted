@@ -58,10 +58,11 @@ DESCRIPTION
     losslessly be convert to PICA+ and vice versa.
 
     Records in PICA::Data are encoded either as array of arrays, the inner
-    arrays representing PICA fields, or as an object with two fields, _id
-    and record, the latter holding the record as array of arrays, and the
+    arrays representing PICA fields, or as an object with two keys, _id and
+    record, the latter holding the record as array of arrays, and the
     former holding the record identifier, stored in field 003@, subfield 0.
-    For instance a minimal record with just one field 003@:
+    For instance a minimal record with just one field (having tag 003@ and
+    no occurrence):
 
         {
           _id    => '12345X',
@@ -75,7 +76,7 @@ DESCRIPTION
         [ [ '003@', undef, '0' => '12345X' ] ]
 
     PICA path expressions (see PICA::Path) can be used to facilitate
-    processing PICA+ records.
+    processing PICA+ records and PICA::Schema to validate PICA+ records.
 
 FUNCTIONS
 
@@ -88,10 +89,12 @@ FUNCTIONS
     is ignored and additional parameters are passed to the parser's
     constructor:
 
-      * PICA::Parser::Plus for type plus or picaplus (normalized PICA+)
+      * PICA::Parser::Binary for type binary (binary PICA+)
 
       * PICA::Parser::Plain for type plain or picaplain (human-readable
       PICA+)
+
+      * PICA::Parser::Plus for type plus or picaplus (normalized PICA+)
 
       * PICA::Parser::XML for type xml or picaxml (PICA-XML)
 
@@ -107,12 +110,19 @@ FUNCTIONS
     Create a PICA writer object (see PICA::Writer::Base) in the same way as
     pica_parser with one of
 
-      * PICA::Writer::XML for type xml or picaxml (PICA-XML)
+      * PICA::Writer::Binary for type binary (binary PICA)
 
-      * PICA::Writer::Plus for type plus or picaplus (normalized PICA+)
+      * PICA::Writer::Generic for type generic (PICA with self defined data
+      separators)
 
       * PICA::Writer::Plain for type plain or picaplain (human-readable
       PICA+)
+
+      * PICA::Writer::Plus for type plus or picaplus (normalized PICA+)
+
+      * PICA::Writer::XML for type xml or picaxml (PICA-XML)
+
+      * PICA::Writer::PPXML for type ppxml (PicaPlus-XML)
 
  pica_path( $path )
 
@@ -168,7 +178,7 @@ ACCESSORS
 
  fields( $path )
 
-    Returns a PICA record limited to fields specified in a PICA::path
+    Returns a PICA record limited to fields specified in a PICA::Path
     expression. Always returns an array reference.
 
  holdings

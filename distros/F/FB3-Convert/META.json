@@ -1,0 +1,59 @@
+{
+   "abstract" : "scripts and API for converting FB3 from and to different formats",
+   "author" : [
+      "www.litres.ru <gu@litres.ru>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "FB3-Convert",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "Clone" : "0",
+            "FB3" : "0",
+            "File::ShareDir" : "1.00",
+            "HTML::Entities" : "0",
+            "Hash::Merge" : "0",
+            "UUID::Tiny" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "FB3::Convert" : {
+         "file" : "lib/FB3/Convert.pm",
+         "version" : "0.01"
+      },
+      "FB3::Convert::Epub" : {
+         "file" : "lib/FB3/Convert/Epub.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/lgpl-license.php"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

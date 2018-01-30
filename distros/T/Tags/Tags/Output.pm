@@ -1,15 +1,13 @@
 package Tags::Output;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
 # Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -474,11 +472,9 @@ Constructor.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output;
 
  # Object.
@@ -530,17 +526,17 @@ L<https://github.com/tupinek/Tags>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
+ © 2005-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

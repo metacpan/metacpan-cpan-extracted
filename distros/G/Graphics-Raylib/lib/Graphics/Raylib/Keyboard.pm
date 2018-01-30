@@ -4,7 +4,7 @@ package Graphics::Raylib::Keyboard;
 use Graphics::Raylib::Key;
 
 # ABSTRACT: Deal with Keyboard Input
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Import::Into;
 sub import {
@@ -30,7 +30,7 @@ Graphics::Raylib::Keyboard - Deal with Keyboard Input
 
 =head1 VERSION
 
-version 0.009
+version 0.012
 
 =head1 SYNOPSIS
 

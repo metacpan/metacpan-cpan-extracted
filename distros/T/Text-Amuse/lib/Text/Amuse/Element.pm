@@ -302,6 +302,7 @@ sub can_merge_next {
         $self->type eq 'startblock' or
         $self->type eq 'null'       or
         $self->type eq 'table'      or
+        $self->type eq 'versep'     or
         $self->type eq 'newpage'    or
         $self->type eq 'inlinecomment' or
         $self->type eq 'comment') {
@@ -429,7 +430,7 @@ sub can_append {
         !$element->should_close_blocks) {
         return 1;
     }
-    # same type
+    # same type. Marked as can_merge_next => false
     foreach my $type (qw/table versep null/) {
         if ($self->type eq $type and $element->type eq $type) {
             return 1;

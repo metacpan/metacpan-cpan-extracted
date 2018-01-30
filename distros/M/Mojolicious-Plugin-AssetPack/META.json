@@ -1,10 +1,10 @@
 {
    "abstract" : "Compress and convert css, less, sass, javascript and coffeescript files",
    "author" : [
-      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -21,9 +21,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -36,6 +34,11 @@
             "IPC::Run3" : "0.048",
             "Mojolicious" : "7.17"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -45,9 +48,11 @@
       },
       "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack",
       "repository" : {
-         "url" : "https://github.com/marcus/mojolicious-plugin-assetpack"
+         "type" : "git",
+         "url" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack.git",
+         "web" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack"
       }
    },
-   "version" : "2.01",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

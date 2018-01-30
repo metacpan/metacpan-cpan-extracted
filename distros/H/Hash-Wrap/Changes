@@ -1,5 +1,22 @@
 Revision history for Hash-Wrap
 
+0.05      2018-01-29 11:59:46-05:00 America/New_York
+
+  [BUILD FIX]
+
+    * t/api.t was not completely updated for changes in version 0.04
+
+0.04      2018-01-29 11:59:46-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * it is now possible to create accessors which return undef
+      (rather than throwing an exception) if a hash element does not
+      exist.
+
+    * The underlying code has gone through a significant rewrite.
+
+
 0.03      2017-09-28 21:56:42-04:00 America/New_York
 
   [BUG FIX]

@@ -34,7 +34,7 @@ sub register{
     Scalar::Util::weaken $services->{models};
     $app->helper(service=>sub{
         my ($c,$name) = @_;
-        return $services->service($name);;
+        return $services->service($name)->c($c);
       }
     );
   }else{
@@ -86,7 +86,7 @@ register 方法中除接受Mojolicious对象为参数外，还接受一个config
     {
         dbi=>DBIx::Custom->new(),
         models=>DBIx::Custom->new->models,
-        namespaces=>s["Mojolicious::Service"],
+        namespaces=>["Mojolicious::Service"],
         services_class=>"T::Services",
         lazy => 1
     }

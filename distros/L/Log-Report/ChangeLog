@@ -7,6 +7,12 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.26:
+
+	Improvements:
+	- convert to GIT
+	- publish via GitHUB
+
 version 1.25: Fri  8 Dec 09:18:23 CET 2017
 
 	Fixes:
@@ -349,10 +355,10 @@ version 0.996: Wed Sep  4 17:23:11 CEST 2013
 	  with eval().  But better use try().
 
 version 0.995: Thu Aug 29 09:19:13 CEST 2013
+
 	Fixes:
 	- twice path '\'  in t/53log4perl.t in Windows [cpantesters]
 
-version 0.994: Thu Aug 22 16:12:08 CEST 2013
 	Fixes:
 	- link to paper [Richard Still]
 	- chicken-egg problem with error on illegal mode setting.

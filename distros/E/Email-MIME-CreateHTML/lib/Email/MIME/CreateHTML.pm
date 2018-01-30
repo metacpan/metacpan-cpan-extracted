@@ -13,7 +13,7 @@ use Email::MIME;
 use HTML::TokeParser::Simple;
 use HTML::Tagset;
 
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 
 use Email::MIME::CreateHTML::Resolver;
 

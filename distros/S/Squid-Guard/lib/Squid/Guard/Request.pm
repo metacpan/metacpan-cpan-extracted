@@ -7,7 +7,7 @@ use Carp;
 
 our @ISA = qw();
 
-our $VERSION = '0.15';
+our $VERSION = '0.24';
 
 
 =head1 NAME
@@ -198,6 +198,59 @@ sub AUTOLOAD {
 		}
 		goto &$AUTOLOAD;
 	}
+}
+
+
+
+=head2 $req->checksrcinnet($net, ...)
+
+Checks if a request' source address is in one or more IP networks
+For the moment, only IPv4 addresses are supported, in the forms used in squid.conf acl of type src
+
+=cut
+
+sub checksrcinnet($@) {
+        my ( $self, @arr ) = @_;
+	my $sa = Squid::Guard::Common::argton($self->addr);
+	foreach( @arr ) {
+		if( $_ =~ /^\d+\.\d+\.\d+\.\d+$/ ) {	# Explicit IP
+			return $_ if $sa eq Squid::Guard::Common::argton($_);
+		} elsif( $_ =~ m{^(\d+\.\d+\.\d+\.\d+)/(.+)$} ) {
+			my $base = Squid::Guard::Common::argton($1);
+			my $mask = Squid::Guard::Common::argton($2);
+			my $network = $base & $mask;
+			my $broadcast = $network | ((~$mask) & $Squid::Guard::Common::thirtytwobits);
+			#print STDERR "network: " . Squid::Guard::Common::ntoa($network) . " bcast: " . Squid::Guard::Common::ntoa($broadcast) . "\n";
+			return $_ if $sa >= $network && $sa <= $broadcast;
+		} elsif( $_ =~ m{^(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)$} ) {
+			my $begin = Squid::Guard::Common::argton($1);
+			my $end = Squid::Guard::Common::argton($2);
+			return $_ if $sa >= $begin && $sa <= $end;
+		} elsif( $_ =~ m{^(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/(.+)$} ) {	# want a range of whole networks
+			my $mask = Squid::Guard::Common::argton($3);
+			my $begin = Squid::Guard::Common::argton($1) & $mask;
+			my $end = Squid::Guard::Common::argton($2) | ((~$mask) & $Squid::Guard::Common::thirtytwobits);
+			return $_ if $sa >= $begin && $sa <= $end;
+		} else {
+			# IPv6 ranges are currently not supported
+			#print STDERR "Can't understand src address $_\n";
+			return '';
+		}
+	}
+}
+
+
+=head2 $req->checkinaddr()
+
+Checks if a request is for an explicit IP address
+
+=cut
+
+sub checkinaddr($) {
+        my ( $self ) = @_;
+	# TODO: Maybe the test should be more accurate and more general
+	return 1 if $self->host =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o;
+	return 0;
 }
 
 

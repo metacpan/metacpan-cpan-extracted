@@ -1,7 +1,7 @@
 package App::GitUtils;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2018-01-30'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
@@ -52,8 +52,12 @@ sub info {
     return [412, "Can't find .git dir, make sure you're inside a git repo"]
         unless defined $git_dir;
 
+    my ($repo_name) = $git_dir =~ m!.+/(.+)/\.git\z!
+        or return [500, "Can't extract repo name from git dir '$git_dir'"];
+
     [200, "OK", {
         git_dir => $git_dir,
+        repo_name => $repo_name,
         # more information in the future
     }];
 }
@@ -168,7 +172,7 @@ App::GitUtils - Day-to-day command-line utilities for git
 
 =head1 VERSION
 
-This document describes version 0.06 of App::GitUtils (from Perl distribution App-GitUtils), released on 2015-09-03.
+This document describes version 0.07 of App::GitUtils (from Perl distribution App-GitUtils), released on 2018-01-30.
 
 =head1 SYNOPSIS
 
@@ -183,6 +187,154 @@ This distribution provides the following command-line utilities:
 These utilities provide some shortcuts and tab completion to make it more
 convenient when working with git con the command-line.
 
+=head1 FUNCTIONS
+
+
+=head2 info
+
+Usage:
+
+ info() -> [status, msg, result, meta]
+
+Return information about git repository.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_hooks
+
+Usage:
+
+ list_hooks() -> [status, msg, result, meta]
+
+List available hooks for the repository.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 post_commit
+
+Usage:
+
+ post_commit() -> [status, msg, result, meta]
+
+Run post-commit hook.
+
+Basically the same as:
+
+ % .git/hooks/post-commit
+
+except can be done anywhere inside git repo.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 pre_commit
+
+Usage:
+
+ pre_commit() -> [status, msg, result, meta]
+
+Run pre-commit hook.
+
+Basically the same as:
+
+ % .git/hooks/pre-commit
+
+except can be done anywhere inside git repo.
+
+This function is not exported.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 run_hook
+
+Usage:
+
+ run_hook(%args) -> [status, msg, result, meta]
+
+Run a hook.
+
+Basically the same as:
+
+ % .git/hooks/<hook-name>
+
+except can be done anywhere inside git repo and provides tab completion.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<name>* => I<str>
+
+Hook name, e.g. post-commit.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 =head1 FAQ
 
 =head2 What is the purpose of this distribution? Haven't other similar utilities existed?
@@ -193,6 +345,22 @@ similar to L<pmversion> from L<App::PMUtils> distribution, and so on.
 
 True. The main point of these utilities is shell tab completion, to save
 typing.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-GitUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-GitUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
@@ -217,147 +385,13 @@ L<App::ProgUtils>, utilities related to programs.
 
 L<App::WeaverUtils>, utilities related to L<Pod::Weaver>.
 
-=head1 FUNCTIONS
-
-
-=head2 info() -> [status, msg, result, meta]
-
-Return information about git repository.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-=head2 list_hooks() -> [status, msg, result, meta]
-
-List available hooks for the repository.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-=head2 post_commit() -> [status, msg, result, meta]
-
-Run post-commit hook.
-
-Basically the same as:
-
- % .git/hooks/post-commit
-
-except can be done anywhere inside git repo.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-=head2 pre_commit() -> [status, msg, result, meta]
-
-Run pre-commit hook.
-
-Basically the same as:
-
- % .git/hooks/pre-commit
-
-except can be done anywhere inside git repo.
-
-No arguments.
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-=head2 run_hook(%args) -> [status, msg, result, meta]
-
-Run a hook.
-
-Basically the same as:
-
- % .git/hooks/<hook-name>
-
-except can be done anywhere inside git repo and provides tab completion.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<name>* => I<str>
-
-Hook name, e.g. post-commit.
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/App-GitUtils>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/perlancar/perl-App-GitUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GitUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

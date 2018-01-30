@@ -65,6 +65,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.2202,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dallaylaen/perl-mvc-neaf/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dallaylaen/perl-mvc-neaf.git",
+         "web" : "https://github.com/dallaylaen/perl-mvc-neaf"
+      }
+   },
+   "version" : 0.2203,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

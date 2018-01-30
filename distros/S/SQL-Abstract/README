@@ -318,7 +318,7 @@ METHODS
 
         When opening-closing-style quoting is used ("quote_char" is an
         arrayref) this parameter defaults to the closing (right)
-        "quote_char". Occurences of the opening (left) "quote_char" within
+        "quote_char". Occurrences of the opening (left) "quote_char" within
         the identifier are currently left untouched. The default for
         opening-closing-style quotes may change in future versions, thus you
         are strongly encouraged to specify the escape character explicitly.
@@ -491,7 +491,7 @@ EXPORTABLE FUNCTIONS
 
     *   The value is of the form "{ -value => $anything }"
 
-    On failure returns "undef", on sucess returns a scalar reference to the
+    On failure returns "undef", on success returns a scalar reference to the
     original supplied argument.
 
     *   Note
@@ -540,7 +540,7 @@ EXPORTABLE FUNCTIONS
 
     *   "\[ $sql_string, @bind_values ]"
 
-    On failure returns "undef", on sucess returns an array reference
+    On failure returns "undef", on success returns an array reference
     containing the unpacked version of the supplied literal SQL and bind
     values.
 
@@ -1195,7 +1195,7 @@ SPECIAL OPERATORS
         When supplied with a method name, it is simply called on the
         SQL::Abstract object as:
 
-         $self->$method_name ($field, $op, $arg)
+         $self->$method_name($field, $op, $arg)
 
          Where:
 
@@ -1261,7 +1261,7 @@ UNARY OPERATORS
         When supplied with a method name, it is simply called on the
         SQL::Abstract object as:
 
-         $self->$method_name ($op, $arg)
+         $self->$method_name($op, $arg)
 
          Where:
 

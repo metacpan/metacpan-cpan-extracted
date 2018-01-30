@@ -24,7 +24,7 @@ OpenERP::OOM::Link::Provider
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package CSS::DOM::Parser;
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use strict; use warnings; no warnings qw 'utf8 parenthesis';
 use re 'taint';
@@ -57,7 +57,7 @@ my $function  = qr/$ident\(/;
 # and $dim have to come before $num. 
 $token_re = qr/\G(?:
         ($url)|($uni_range)|($function)|($ident)|($at)|($str)|($invalid)|
-        ($hash)|($percent)|($dim)|($num)|(<!--|-->)|(;)|({)|(})|(\()|(\))
+        ($hash)|($percent)|($dim)|($num)|(<!--|-->)|(;)|(\{)|(})|(\()|(\))
        |(\[)|(])|($space)|(~=)|(\|=)|(,)|(:)|(.)
 )/xs;
 
@@ -704,7 +704,7 @@ CSS::DOM::Parser - Parser for CSS::DOM
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 DESCRIPTION
 

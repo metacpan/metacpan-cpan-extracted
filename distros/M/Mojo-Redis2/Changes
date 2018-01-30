@@ -1,4 +1,9 @@
 Revision history for perl distribution Mojo-Redis2
+0.31 2018-01-24T02:10:25-05:00
+ - Fix for timing issue where object is destroyed before read completes. #19, #34
+ - Fix erroneous shift() of waiting queue when receiving messages. #38
+   Contributor: Boris Blinov
+
 0.30 2017-12-05T21:03:44-0500
  - Check version of redis in tests and skip tests of unsupported functions. #31
    Contributor: Mike Magowan

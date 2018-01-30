@@ -1,15 +1,18 @@
 package Bio::MUST::Drivers;
 # ABSTRACT: Bio::MUST classes for driving external programs
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Drivers::VERSION = '0.173510';
+# CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+# CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
+$Bio::MUST::Drivers::VERSION = '0.180270';
 use strict;
 use warnings;
 
 use Bio::MUST::Drivers::Blast;
+use Bio::MUST::Drivers::Hmmer;
 use Bio::MUST::Drivers::Cap3;
+use Bio::MUST::Drivers::CdHit;
 use Bio::MUST::Drivers::Exonerate;
 use Bio::MUST::Drivers::Exonerate::Aligned;
-use Bio::MUST::Drivers::Hmmer;
 
 1;
 
@@ -23,7 +26,7 @@ Bio::MUST::Drivers - Bio::MUST classes for driving external programs
 
 =head1 VERSION
 
-version 0.173510
+version 0.180270
 
 =head1 SYNOPSIS
 
@@ -37,11 +40,25 @@ version 0.173510
 
 Denis BAURAIN <denis.baurain@uliege.be>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Arnaud DI FRANCO
+=for stopwords Arnaud DI FRANCO Amandine BERTRAND Loic MEUNIER
+
+=over 4
+
+=item *
 
 Arnaud DI FRANCO <arnaud.difranco@gmail.com>
+
+=item *
+
+Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
+
+=item *
+
+Loic MEUNIER <loic.meunier@doct.uliege.be>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

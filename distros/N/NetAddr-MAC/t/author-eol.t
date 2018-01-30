@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
@@ -16,7 +16,9 @@ use Test::EOL;
 
 my @files = (
     'lib/NetAddr/MAC.pm',
-    't/00-load.t',
+    't/00-compile.t',
+    't/00-report-prereqs.dd',
+    't/00-report-prereqs.t',
     't/130-utils-mac.t',
     't/131-utils-mac-properties.t',
     't/132-utils-mac-normals.t',
@@ -33,6 +35,7 @@ my @files = (
     't/author-portability.t',
     't/release-distmeta.t',
     't/release-kwalitee.t',
+    't/release-pause-permissions.t',
     't/release-unused-vars.t'
 );
 

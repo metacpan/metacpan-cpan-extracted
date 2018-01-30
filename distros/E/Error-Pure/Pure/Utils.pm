@@ -1,18 +1,15 @@
 package Error::Pure::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Cwd qw(abs_path);
 use Readonly;
 
 # Version.
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
-# Constants.
 Readonly::Array our @EXPORT_OK => qw(clean err_get err_helper err_msg err_msg_hr);
 Readonly::Scalar my $DOTS => '...';
 Readonly::Scalar my $EMPTY_STR => q{};
@@ -424,17 +421,17 @@ L<https://github.com/tupinek/Error-Pure>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2015 Michal Špaček
+ © 2008-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

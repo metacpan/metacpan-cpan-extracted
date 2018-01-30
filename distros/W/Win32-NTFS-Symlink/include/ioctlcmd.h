@@ -19,7 +19,7 @@ typedef struct _REPARSE_DATA_BUFFER {
             WORD   SubstituteNameLength;
             WORD   PrintNameOffset;
             WORD   PrintNameLength;
-            ULONG  Flags; /* 0=絶対パス, 1=相対パス */
+            ULONG  Flags;
             WCHAR  PathBuffer[1];
         } SymbolicLinkReparseBuffer;
         struct {
@@ -58,7 +58,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 #define FSCTL_DELETE_REPARSE_POINT      CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 43, METHOD_BUFFERED, FILE_ANY_ACCESS) // REPARSE_DATA_BUFFER,
 
 //
-// Symlinkの定義
+// Symlink
 //
 #define SYMLINKVERSION 0x106
 

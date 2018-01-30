@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Prove::Plugin::MySQLPool
 
+0.09 2018-01-24T11:51:25Z
+    - stop mysqld when "prove" is interuppted (gugod)
+
 0.08 2017-10-17T01:52:28Z
     - support -I and -b options to locate a preparer (charsbar)
 

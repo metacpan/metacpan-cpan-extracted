@@ -1,5 +1,5 @@
 {
-   "abstract" : "Resources from database for your application",
+   "abstract" : "Generate M, V & C from database tables",
    "author" : [
       "ÐÑÐ°ÑÐ¸Ð¼Ð¸Ñ ÐÐµÑÐ¾Ð² (berov@cpan.org)"
    ],
@@ -58,6 +58,6 @@
          "web" : "https://github.com/kberov/Mojolicious-Command-generate-resources"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

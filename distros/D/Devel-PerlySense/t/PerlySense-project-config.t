@@ -28,7 +28,7 @@ is_deeply(
     $oPerlySense->rhConfig->{project},
     {
         moniker => "The Project Without a Name",
-        inc_dir => [ ],
+        inc_dir => undef,
     },
     "The default config looks right",
 );

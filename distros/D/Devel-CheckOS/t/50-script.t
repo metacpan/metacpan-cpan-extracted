@@ -11,6 +11,9 @@ END { done_testing(); }
 
 my $cwd = getcwd();
 
+use Config ();
+our $Inc = join $Config::Config{path_sep}, @INC;
+
 emptydir();
 MakefilePLexists();
 BuildPLexists();
@@ -23,9 +26,9 @@ sub checkDashl {
     my $projectdir = File::Temp->newdir();
     chdir($projectdir);
     my $cmd = join(' ', map { qq{"$_"} } (
-        $^X, (map { "-I$_" } @INC), $cwd.'/bin/use-devel-assertos', '-l'
+        $^X, $cwd.'/bin/use-devel-assertos', '-l'
     ));
-    $cmd = `$cmd`;
+    do { local $ENV{PERL5LIB} = $Inc; $cmd = `$cmd` };
     chomp($cmd);
     is_deeply(
         [sort { $a cmp $b } (Devel::CheckOS::list_platforms())],
@@ -220,6 +223,8 @@ sub _getfile { open(my $fh, $_[0]) || return ''; local $/; return <$fh>; }
 sub _writefile { open(my $fh, '>', shift()) || return ''; print $fh @_; }
 sub _run_script {
     chdir(shift());
-    system($^X, (map { "-I$_" } @INC), $cwd.'/bin/use-devel-assertos', '-q', @_);
+    require Config;
+    local $ENV{PERL5LIB} = $Inc;
+    system($^X, $cwd.'/bin/use-devel-assertos', '-q', @_);
     chdir($cwd);
 }

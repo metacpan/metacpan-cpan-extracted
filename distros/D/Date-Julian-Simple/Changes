@@ -1,5 +1,8 @@
 Revision history for Date::Julian::Simple
 
+0.05  Mon Jan 22 16:40:00 2018
+      - Added test script (t/date-julian-simple.t).
+
 0.04  Mon Jan 15 19:00:00 2018
       - Using namespace::autoclean.
 

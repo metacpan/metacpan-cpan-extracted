@@ -1,5 +1,8 @@
 Revision history for perl module Email::MIME::CreateHTML
 
+1.042 2018-01-26
+    - Require MIME::Types 2.17 (2.16 had a breaking bug) (VANSTYN)
+
 1.041 2015-01-18
     - Support non-ASCII HTML (PR #1) - Christoph Halbartschlager (christophhalbi)
 

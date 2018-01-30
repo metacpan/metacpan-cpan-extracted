@@ -1,4 +1,4 @@
-DBIx::Class is Copyright (c) 2005-2016 by mst, castaway, ribasushi, and others.
+DBIx::Class is Copyright (c) 2005-2018 by mst, castaway, ribasushi, and others.
 See AUTHORS and LICENSE included with this distribution. All rights reserved.
 
 NAME
@@ -173,26 +173,15 @@ HOW TO CONTRIBUTE
     Contributions are always welcome, in all usable forms (we especially
     welcome documentation improvements). The delivery methods include git-
     or unified-diff formatted patches, GitHub pull requests, or plain bug
-    reports either via RT or the Mailing list. Contributors are generally
-    granted access to the official repository after their first several
-    patches pass successful review. Don't hesitate to contact either of the
-    "CAT HERDERS" with any further questions you may have.
+    reports either via RT or the Mailing list. Do not hesitate to get in
+    touch with any further questions you may have.
 
     This project is maintained in a git repository. The code and related
     tools are accessible at the following locations:
 
-    *   Official repo: <git://git.shadowcat.co.uk/dbsrgits/DBIx-Class.git>
+    *   Current git repository: <https://github.com/Perl5/DBIx-Class>
 
-    *   Official gitweb:
-        <http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.
-        git>
-
-    *   GitHub mirror: <https://github.com/dbsrgits/DBIx-Class>
-
-    *   Authorized committers:
-        <ssh://dbsrgits@git.shadowcat.co.uk/DBIx-Class.git>
-
-    *   Travis-CI log: <https://travis-ci.org/dbsrgits/dbix-class/builds>
+    *   Travis-CI log: <https://travis-ci.org/Perl5/DBIx-Class/branches>
 
 AUTHORS
     Even though a large portion of the source *appears* to be written by
@@ -204,7 +193,7 @@ AUTHORS
     questions and suggestions have been shown to catalyze monumental
     improvements in consistency, accuracy and performance.
 
-    List of the awesome contributors who made DBIC v0.082840 possible
+    List of the awesome contributors who made DBIC v0.082841 possible
 
         abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
 
@@ -238,7 +227,7 @@ AUTHORS
 
         ash: Ash Berlin <ash@cpan.org>
 
-        bert: Norbert Csongrádi <bert@cpan.org>
+        bert: Norbert CsongrÃ¡di <bert@cpan.org>
 
         bfwg: Colin Newell <colin.newell@gmail.com>
 
@@ -356,9 +345,9 @@ AUTHORS
 
         idn: Ian Norton <i.norton@shadowcat.co.uk>
 
-        ilmari: Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+        ilmari: Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>
 
-        ingy: Ingy döt Net <ingy@ingy.net>
+        ingy: Ingy dÃ¶t Net <ingy@ingy.net>
 
         initself: Mike Baas <mike@initselftech.com>
 
@@ -478,7 +467,7 @@ AUTHORS
 
         ovid: Curtis "Ovid" Poe <ovid@cpan.org>
 
-        oyse: Øystein Torget <oystein.torget@dnv.com>
+        oyse: Ã˜ystein Torget <oystein.torget@dnv.com>
 
         paulm: Paul Makepeace <paulm+pause@paulm.com>
 
@@ -486,9 +475,9 @@ AUTHORS
 
         perigrin: Chris Prather <chris@prather.org>
 
-        Peter Siklósi <einon@einon.hu>
+        Peter SiklÃ³si <einon@einon.hu>
 
-        Peter Valdemar Mørch <peter@morch.com>
+        Peter Valdemar MÃ¸rch <peter@morch.com>
 
         peter: Peter Collingbourne <peter@pcc.me.uk>
 
@@ -520,7 +509,7 @@ AUTHORS
 
         renormalist: Steffen Schwigon <schwigon@cpan.org>
 
-        ribasushi: Peter Rabbitson <ribasushi@cpan.org>
+        ribasushi: Peter Rabbitson <ribasushi@leporine.io>
 
         rjbs: Ricardo Signes <rjbs@cpan.org>
 
@@ -625,18 +614,6 @@ AUTHORS
     The canonical source of authors and their details is the AUTHORS file at
     the root of this distribution (or repository). The canonical source of
     per-line authorship is the git repository history itself.
-
-CAT HERDERS
-    The fine folks nudging the project in a particular direction:
-
-        ribasushi: Peter Rabbitson <ribasushi@cpan.org> (present day
-        maintenance and controlled evolution)
-
-        castaway: Jess Robinson <castaway@desert-island.me.uk> (lions share
-        of the reference documentation and manuals)
-
-        mst: Matt S Trout <mst@shadowcat.co.uk> (project founder - original
-        idea, architecture and implementation)
 
 COPYRIGHT AND LICENSE
     Copyright (c) 2005 by mst, castaway, ribasushi, and other DBIx::Class

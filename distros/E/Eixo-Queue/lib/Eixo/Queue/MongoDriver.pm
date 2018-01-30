@@ -19,7 +19,7 @@ has(
 );
 
 sub addJob{
-	my ($self, $job) = @_;
+	my ($self, $job, $collection) = @_;
 
 	unless($job->isa('Eixo::Queue::Job')){
 	
@@ -27,7 +27,7 @@ sub addJob{
 
 	}
 
-	$self->getCollection->insert_one({
+	$self->getCollection($collection)->insert_one({
         _id => $job->id,
         %{$job->to_hash}
     });
@@ -35,9 +35,10 @@ sub addJob{
 }
 
 sub updateJob{
-	my ($self, $job) = @_;
+	my ($self, $job, $collection) = @_;
 
-	$self->getCollection->update(
+	$self->getCollection($collection)->update(
+
         {_id=>$job->id} ,
 
         $job->to_hash
@@ -45,31 +46,43 @@ sub updateJob{
 }
 
 sub getJob{
-	my ($self, $id) = @_;
+	my ($self, $id, $collection, $class) = @_;
 
-	$self->__format(
+    my $method = ($class) ? "__formatClass" : "__format";
 
-		$self->getCollection->find({
+	$self->$method(
+
+		[
+            $self->getCollection($collection)->find({
 		
-			_id=>$id
+			    _id=>$id
 
-		})->next
+		    })->next
+        ],
+
+        $class
 
 	);
 }
 
 sub find{
-    my ($self, $query, $sort) = @_;
+    my ($self, $query, $sort, $collection, $class) = @_;
 
-    $self->__format(
+    my $method = ($class) ? "__formatClass" : "__format";
 
-        $self->getCollection
+    $self->$method(
+
+        [
+            $self->getCollection($collection)
         
-            ->find($query)
+                ->find($query)
      
-            ->sort($sort)
+                ->sort($sort)
 
-            ->all
+                ->all
+        ],
+
+        $class
     );
 }
 
@@ -85,32 +98,75 @@ sub getPendingJob{
 
 	$self->__format(
 
-		$self->getCollection->find_and_modify({
+		[
+            $self->getCollection->find_and_modify({
 
-			query =>$query,
-			sort => {creation_timestamp => 1},
-			update => {
-				'$set' => {
-					status => 'PROCESSING', 
-					start_timestamp => time
-				}
-			},
-			new => 1,
-		})
+			    query =>$query,
+			    sort => {creation_timestamp => 1},
+			    update => {
+				    '$set' => {
+					    status => 'PROCESSING', 
+					    start_timestamp => time
+				    }
+			    },
+			    new => 1,
+		    })
 
+        ]
 	);
 
 }
 
+sub getJobsCron{
+    my ($self, %args) = @_;
+
+    my $query = {
+
+        status => "ACTIVE",
+
+        cron=>1   
+        
+    };
+
+    $query->{queue} = $args{queue} if(defined( $args{queue}));
+
+    my @jobs = $self->getCollection(
+        $args{collection_cron}
+    )
+
+         ->find($query)
+
+         ->all;
+        
+    @jobs = map {
+
+        $args{class}->new(%$_)
+
+    } grep {ref($_) } @jobs;
+
+	wantarray ? @jobs : (@jobs < 2) ? $jobs[0] : \@jobs;
+}
 
 sub __format{
-	my ($self, @jobs) = @_;
+	my ($self, $jobs) = @_;
 
-	@jobs = map {
+	my @jobs = map {
 
 		Eixo::Queue::Job->new(%$_);
 
-	} grep { ref($_) } @jobs;
+	} grep { ref($_) } @$jobs;
+
+	wantarray ? @jobs : (@jobs < 2) ? $jobs[0] : \@jobs;
+}
+
+sub __formatClass{
+    my ($self, $jobs, $class) = @_;
+
+	my @jobs = map {
+
+		$class->new(%$_);
+
+	} grep { ref($_) } @$jobs;
 
 	wantarray ? @jobs : (@jobs < 2) ? $jobs[0] : \@jobs;
 }

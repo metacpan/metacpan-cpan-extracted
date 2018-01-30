@@ -1,13 +1,15 @@
 NAME
 
-    Catmandu::Identifier - Namespace for handling/fixing identifier, e.g.
-    ISBN, ISSN
+    Catmandu::Identifier - Namespace fixing around identifiers (for
+    normalization, validation, etc.), e.g. ISBN, ISSN
 
 MODULES
 
       * Catmandu::Fix::isbn10
 
       * Catmandu::Fix::isbn13
+
+      * Catmandu::Fix::isbn_versions
 
       * Catmandu::Fix::issn
 
@@ -52,6 +54,8 @@ AUTHOR
     Patrick Hochstenbach
 
     brian d foy
+
+    Ere Maijala
 
 LICENSE
 

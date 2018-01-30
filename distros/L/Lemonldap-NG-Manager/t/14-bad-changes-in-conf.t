@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-#
 # Verify that bas changes are detected
 
 use Test::More;

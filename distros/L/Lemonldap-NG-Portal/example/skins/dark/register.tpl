@@ -13,6 +13,7 @@
     <form action="#" method="post" class="login">
 
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <TMPL_IF NAME="CHOICE_VALUE">
         <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
       </TMPL_IF>
@@ -62,6 +63,7 @@
     <form action="#" method="post" class="login">
 
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
       <TMPL_IF NAME="CHOICE_VALUE">
         <input type="hidden" id="authKey" name="<TMPL_VAR NAME="CHOICE_PARAM">" value="<TMPL_VAR NAME="CHOICE_VALUE">" />
       </TMPL_IF>
@@ -121,7 +123,7 @@
   </TMPL_IF>
 
   <div class="link">
-    <a href="<TMPL_VAR NAME="PORTAL_URL">?skin=<TMPL_VAR NAME="SKIN">">
+    <a href="<TMPL_VAR NAME="PORTAL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="CHOICE_VALUE">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="CHOICE_VALUE"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
       <lang en="Go back to portal" fr="Retourner au portail" />
     </a>
   </div>

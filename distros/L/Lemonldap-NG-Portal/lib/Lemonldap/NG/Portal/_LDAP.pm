@@ -15,7 +15,7 @@ use Unicode::String qw(utf8);
 use strict;
 
 our @EXPORT   = qw(ldap);
-our $VERSION  = '1.9.7';
+our $VERSION  = '1.9.15';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -635,17 +635,25 @@ sub searchGroups {
 
                 # Launch group search
                 if ($group_value) {
+                    if ( $portal->{ldapGroupDuplicateCheck}->{$group_value} ) {
+                        $portal->lmLog(
+"Disable search for $group_value, as it was already searched",
+                            'debug'
+                        );
+                    }
+                    else {
+                        $portal->{ldapGroupDuplicateCheck}->{$group_value} = 1;
+                        $portal->lmLog( "Recursive search for $group_value",
+                            'debug' );
 
-                    $portal->lmLog( "Recursive search for $group_value",
-                        'debug' );
+                        my $recursive_groups =
+                          $self->searchGroups( $base, $key, $group_value,
+                            $attributes );
 
-                    my $recursive_groups =
-                      $self->searchGroups( $base, $key, $group_value,
-                        $attributes );
-
-                    my %allGroups = ( %$groups, %$recursive_groups )
-                      if ( ref $recursive_groups );
-                    $groups = \%allGroups;
+                        my %allGroups = ( %$groups, %$recursive_groups )
+                          if ( ref $recursive_groups );
+                        $groups = \%allGroups;
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-CSS::DOM, version 0.16
+CSS::DOM, version 0.17
 
 This module implements a CSS-specific subset of the interfaces
 described in the W3C DOM specification.
@@ -6,29 +6,22 @@ described in the W3C DOM specification.
 
 RECENT CHANGES
 
-0.016
+0.17
+-----
+• Fixed to work with bleadperl (5.27.9) (RT #124156).
+
+0.16
 -----
 • Work around an incompatible  change  in  Encode  2.77  (RT  #107221,
   #107043).
 • Specify Encoding in POD.  Thanks to Gregor Herrmann for  the  patch
   (RT #85955).
 
-0.015
+0.15
 -----
 • compute_style  no longer produces an  uninitialized  warning  under
   some circumstances (RT #79855).
 • A minor backtracking bug in CSS::DOM::PropertyParser has been fixed.
-
-0.014
------
-• The full text of the licence is now included  in  the  distribution.
-  Thanks to Ville Skyttä for providing  it  (RT  #60770).
-• A few pod syntax errors have been corrected, thanks to Nicholas Bam-
-  ber (RT #63388).
-• CSS::DOM::PropertyParser  has been fixed to work with  perl  5.13.8
-  and higher.
-• New getStringValue method of CSS::DOM::Value::Primitive
-
 
 INSTALLATION
 
@@ -70,7 +63,7 @@ Or try using man (it's faster, in my experience):
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007-15 Father Chrysostomos
+Copyright (C) 2007-18 Father Chrysostomos
 
 This program is free software; you may redistribute it and/or modify
 it under the same terms as perl. The full text of the license can be

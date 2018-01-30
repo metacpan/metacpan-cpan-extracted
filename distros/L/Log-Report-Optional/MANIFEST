@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Log/Report/Minimal.pm
 lib/Log/Report/Minimal.pod
 lib/Log/Report/Minimal/Domain.pm

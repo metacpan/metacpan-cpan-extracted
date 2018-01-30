@@ -22,7 +22,7 @@ no_index:
 requires:
   DBD::Pg: '3.005001'
   Mojolicious: '7.53'
-  SQL::Abstract: '1.81'
+  SQL::Abstract: '1.85'
   perl: '5.010001'
 resources:
   IRC: irc://irc.perl.org/#mojo
@@ -30,5 +30,5 @@ resources:
   homepage: http://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kraih/mojo-pg.git
-version: '4.04'
+version: '4.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

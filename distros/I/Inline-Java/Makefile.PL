@@ -5,6 +5,7 @@ use File::Spec ;
 use Cwd ;
 use Config ;
 
+use lib '.'; # perl 5.26+
 require "Java/Portable.pm" ;
 
 print "\nWelcome to the Inline::Java installation procedure.\n\n" ;
@@ -197,9 +198,11 @@ my $perlinterp_test = File::Spec->catdir('Java', 'PerlInterpreter', '_Inline_tes
 WriteMakefile(
 	NAME => 'Inline::Java',
 	VERSION_FROM => 'Java.pm',
+	MIN_PERL_VERSION => '5.008',
 	DIR => ['Java'],
 	PREREQ_PM => {
-		Inline	=> 0.44,
+		Inline => 0.68,
+		'Inline::C' => 0.62,
 		Test => 1.13,
 		'MIME::Base64' => 0,
 	},
@@ -210,9 +213,18 @@ WriteMakefile(
 		$user_arch => File::Spec->catfile('$(INST_LIBDIR)', $user_arch),
 	},
 	clean => {FILES => "$def_jdk _Inline_test $natives_test $perlinterp_test $obj_dir $server_arch $user_arch java.ts"},
-	($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-		(ABSTRACT_FROM  => 'Java.pod', # retrieve abstract from module
-		AUTHOR         => 'Patrick LeBoutillier <patl@cpan.org>') : ()),
+	ABSTRACT_FROM  => 'Java.pod', # retrieve abstract from module
+	AUTHOR         => 'Patrick LeBoutillier <patl@cpan.org>',
+	META_MERGE => {
+	  "meta-spec" => { version => 2 },
+	  resources => {
+	    repository => {
+	      type => 'git',
+	      url => 'https://github.com/ingydotnet/Inline-Java',
+	      web => 'https://github.com/ingydotnet/Inline-Java',
+	    },
+	  },
+	},
 ) ;
 
 

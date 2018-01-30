@@ -8,8 +8,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#undef DEBUG_SHOW_STACKS
-
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
@@ -29,7 +27,13 @@
 #  define CX_CUR() (&cxstack[cxstack_ix])
 #endif
 
-#include "save_clearpadrange.c.inc"
+#ifndef unshare_hek
+#  define unshare_hek(a)          Perl_unshare_hek(aTHX_ a)
+#endif
+
+#ifdef SAVEt_CLEARPADRANGE
+#  include "save_clearpadrange.c.inc"
+#endif
 
 #if !HAVE_PERL_VERSION(5, 24, 0)
 #  include "cx_pushblock.c.inc"
@@ -39,6 +43,24 @@
 #if !HAVE_PERL_VERSION(5, 22, 0)
 #  include "block_start.c.inc"
 #  include "block_end.c.inc"
+
+#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#endif
+
+#if !HAVE_PERL_VERSION(5, 18, 0)
+#  define PadARRAY(pad)           AvARRAY(pad)
+#  define PadMAX(pad)             AvFILLp(pad)
+
+typedef AV PADNAMELIST;
+#  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
+#  define PadlistNAMES(pl)        (*PadlistARRAY(pl))
+
+typedef SV PADNAME;
+#  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
+#  define PadnameLEN(pn)          SvCUR(pn)
+#  define PadnameOUTER(pn)        !!SvFAKE(pn)
+#  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
+#  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 #endif
 
 typedef struct SuspendedFrame SuspendedFrame;
@@ -90,7 +112,7 @@ struct SuspendedFrame {
       OP *retop;
     } eval;
     struct block_loop loop;
-  };
+  } el;
 #ifdef HAVE_ITERVAR
   SV *itervar;
 #endif
@@ -239,6 +261,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     struct Saved *saved = &frame->saved[frame->savedlen];
 
     switch(type) {
+#ifdef SAVEt_CLEARPADRANGE
       case SAVEt_CLEARPADRANGE: {
         UV padix = uv >> (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT);
         I32 count = (uv >> SAVE_TIGHT_SHIFT) & OPpPADRANGE_COUNTMASK;
@@ -250,6 +273,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
         break;
       }
+#endif
 
       case SAVEt_CLEARSV: {
         UV padix = (uv >> SAVE_TIGHT_SHIFT);
@@ -443,6 +467,123 @@ static bool padname_is_normal_lexical(PADNAME *pname)
   return TRUE;
 }
 
+#define cv_dup_for_suspend(orig)  MY_cv_dup_for_suspend(aTHX_ orig)
+static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
+{
+  /* Parts of this code stolen from S_cv_clone() in pad.c
+   */
+  CV *new = MUTABLE_CV(newSV_type(SVt_PVCV));
+  CvFLAGS(new) = CvFLAGS(orig);
+
+  CvFILE(new) = CvDYNFILE(orig) ? savepv(CvFILE(orig)) : CvFILE(orig);
+#if HAVE_PERL_VERSION(5, 18, 0)
+  if(CvNAMED(orig))
+    CvNAME_HEK_set(new, share_hek_hek(CvNAME_HEK(orig)));
+  else
+#endif
+    CvGV_set(new, CvGV(orig));
+  CvSTASH_set(new, CvSTASH(orig));
+  {
+    OP_REFCNT_LOCK;
+    CvROOT(new) = OpREFCNT_inc(CvROOT(orig));
+    OP_REFCNT_UNLOCK;
+  }
+  CvSTART(new) = NULL; /* intentionally left NULL because caller should fill this in */
+  CvOUTSIDE_SEQ(new) = CvOUTSIDE_SEQ(orig);
+
+  /* No need to bother with SvPV slot because that's the prototype, and it's
+   * too late for that here
+   */
+
+  {
+    ENTER;
+
+    SAVESPTR(PL_compcv);
+    PL_compcv = new;
+
+    CvOUTSIDE(new) = MUTABLE_CV(SvREFCNT_inc(CvOUTSIDE(orig)));
+
+    SAVESPTR(PL_comppad_name);
+    PL_comppad_name = PadlistNAMES(CvPADLIST(orig));
+    CvPADLIST_set(new, pad_new(padnew_CLONE|padnew_SAVE));
+#if HAVE_PERL_VERSION(5, 22, 0)
+    CvPADLIST(new)->xpadl_id = CvPADLIST(orig)->xpadl_id;
+#endif
+
+    PADNAMELIST *padnames = PadlistNAMES(CvPADLIST(orig));
+    const PADOFFSET fnames = PadnamelistMAX(padnames);
+    const PADOFFSET fpad = AvFILLp(PadlistARRAY(CvPADLIST(orig))[1]);
+    SV **origpad = AvARRAY(PadlistARRAY(CvPADLIST(orig))[CvDEPTH(orig)]);
+
+#if !HAVE_PERL_VERSION(5, 18, 0)
+/* Perls before 5.18.0 didn't copy the padnameslist
+ */
+    SvREFCNT_dec(PadlistNAMES(CvPADLIST(new)));
+    PadlistNAMES(CvPADLIST(new)) = (PADNAMELIST *)SvREFCNT_inc(PadlistNAMES(CvPADLIST(orig)));
+#endif
+
+    av_fill(PL_comppad, fpad);
+    PL_curpad = AvARRAY(PL_comppad);
+
+    PADNAME **pnames = PadnamelistARRAY(padnames);
+    PADOFFSET padix;
+    for(padix = 1; padix <= fpad; padix++) {
+      PADNAME *pname = (padix <= fnames) ? pnames[padix] : NULL;
+      SV *newval;
+
+      if(padname_is_normal_lexical(pname)) {
+        /* No point copying a normal lexical slot because the suspend logic is
+         * about to capture all the pad slots from the running CV (orig) and
+         * they'll be restored into this new one later by resume.
+         */
+        continue;
+      }
+      else if(pname && PadnamePV(pname)) {
+#if !HAVE_PERL_VERSION(5, 18, 0)
+        /* Before perl 5.18.0, inner anon subs didn't find the right CvOUTSIDE
+         * at runtime, so we'll have to patch them up here
+         */
+        CV *origproto;
+        if(PadnamePV(pname)[0] == '&' && 
+           CvOUTSIDE(origproto = MUTABLE_CV(origpad[padix])) == orig) {
+          /* quiet any "Variable $FOO is not available" warnings about lexicals
+           * yet to be introduced
+           */
+          ENTER;
+          SAVEINT(CvDEPTH(origproto));
+          CvDEPTH(origproto) = 1;
+
+          CV *newproto = cv_dup_for_suspend(origproto);
+          CvPADLIST_set(newproto, CvPADLIST(origproto));
+          CvSTART(newproto) = CvSTART(origproto);
+
+          SvREFCNT_dec(CvOUTSIDE(newproto));
+          CvOUTSIDE(newproto) = MUTABLE_CV(SvREFCNT_inc_simple_NN(new));
+
+          LEAVE;
+
+          newval = MUTABLE_SV(newproto);
+        }
+        else if(origpad[padix])
+          newval = SvREFCNT_inc_NN(origpad[padix]);
+#else
+        newval = SvREFCNT_inc_NN(origpad[padix]);
+#endif
+      }
+      else {
+        newval = newSV(0);
+        SvPADTMP_on(newval);
+      }
+
+      PL_curpad[padix] = newval;
+    }
+
+    LEAVE;
+  }
+
+  return new;
+}
+
 #define suspendedstate_suspend(state, cv)  MY_suspendedstate_suspend(aTHX_ state, cv)
 static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 {
@@ -480,7 +621,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 
       case CXt_LOOP_PLAIN:
         frame->type = type;
-        frame->loop = cx->blk_loop;
+        frame->el.loop = cx->blk_loop;
         frame->gimme = cx->blk_gimme;
         break;
 
@@ -499,7 +640,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
           croak("Cannot suspend a foreach loop on non-lexical iterator");
 
         frame->type = type;
-        frame->loop = cx->blk_loop;
+        frame->el.loop = cx->blk_loop;
         frame->gimme = cx->blk_gimme;
 
 #ifdef HAVE_ITERVAR
@@ -522,13 +663,13 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
           /* these two fields are refcounted, so we need to save them from
            * dounwind() throwing them away
            */
-          SvREFCNT_inc(frame->loop.state_u.lazysv.cur);
-          SvREFCNT_inc(frame->loop.state_u.lazysv.end);
+          SvREFCNT_inc(frame->el.loop.state_u.lazysv.cur);
+          SvREFCNT_inc(frame->el.loop.state_u.lazysv.end);
         }
 #if !HAVE_PERL_VERSION(5, 24, 0)
         else if(type == CXt_LOOP_FOR) {
-          if(frame->loop.state_u.ary.ary)
-            SvREFCNT_inc(frame->loop.state_u.ary.ary);
+          if(frame->el.loop.state_u.ary.ary)
+            SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
         }
 #endif
 
@@ -551,7 +692,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
         frame->type = CXt_EVAL;
         frame->gimme = cx->blk_gimme;
 
-        frame->eval.retop = cx->blk_eval.retop;
+        frame->el.eval.retop = cx->blk_eval.retop;
 
         continue;
       }
@@ -624,9 +765,11 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         save_clearsv(PL_curpad + saved->u.clearpad.padix);
         break;
 
+#ifdef SAVEt_CLEARPADRANGE
       case SAVEt_CLEARPADRANGE:
         save_clearpadrange(saved->u.clearpad.padix, saved->u.clearpad.count);
         break;
+#endif
 
       case SAVEt_DESTRUCTOR_X:
         save_pushptrptr(saved->u.dx.func, saved->u.dx.data, saved->type);
@@ -725,7 +868,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
       case CXt_LOOP_PLAIN:
         cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
         /* don't call cx_pushloop_plain() because it will get this wrong */
-        cx->blk_loop = frame->loop;
+        cx->blk_loop = frame->el.loop;
         break;
 
 #if HAVE_PERL_VERSION(5, 24, 0)
@@ -738,7 +881,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
       case CXt_LOOP_LAZYIV:
         cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
         /* don't call cx_pushloop_plain() because it will get this wrong */
-        cx->blk_loop = frame->loop;
+        cx->blk_loop = frame->el.loop;
 #if HAVE_PERL_VERSION(5, 24, 0)
         cx->cx_type |= CXp_FOR_PAD;
 #endif
@@ -759,7 +902,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
       case CXt_EVAL:
         cx = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, frame->gimme,
           PL_stack_sp, PL_savestack_ix);
-        cx_pusheval(cx, frame->eval.retop, NULL);
+        cx_pusheval(cx, frame->el.eval.retop, NULL);
         PL_in_eval = EVAL_INEVAL;
         CLEAR_ERRSV();
         break;
@@ -1036,53 +1179,8 @@ static OP *pp_await(pTHX)
   debug_showstack("Stack before suspend");
 
   if(!state) {
-    CV *outside = CvOUTSIDE(curcv);
-    bool outside_was_zero = false;
-
-    if(outside && !CvDEPTH(outside)) {
-      /* Pretend for a moment that outside is live, to prevent cv_clone()
-       * falsely warning about captured lexicals not being available, as we're
-       * about to fix those up anyway
-       */
-      outside_was_zero = true;
-      CvDEPTH(outside) = 1;
-    }
-
     /* Clone the CV and then attach suspendedstate magic to it */
-    curcv = cv_clone(curcv);
-
-    if(outside_was_zero)
-      CvDEPTH(outside) = 0;
-
-    {
-      /* cv_clone() hasn't quite done the right thing for captured lexicals
-       * (i.e. PadnameOUTER), because it will have walked up to CvOUTSIDE of
-       * here to find the SV to copy. If the outside pad is now stale (e.g.
-       * because of a returned scope) that won't be live any more. We'll have
-       * to fetch them back from the correct place
-       */
-      PADLIST *plist = CvPADLIST(origcv);
-      PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(plist));
-      SV **origpad = PadARRAY(PadlistARRAY(plist)[CvDEPTH(origcv)]);
-      SV **newpad = PadARRAY(PadlistARRAY(CvPADLIST(curcv))[1]);
-      PADOFFSET padix;
-
-      for(padix = 1; padix <= PadnamelistMAX(PadlistNAMES(plist)); padix++) {
-        PADNAME *pname = padnames[padix];
-        if(pname &&
-#if !HAVE_PERL_VERSION(5, 20, 0)
-    /*  Perl before 5.20.0 could put PL_sv_undef in PADNAMEs */
-           pname != &PL_sv_undef &&
-#endif
-           PadnameOUTER(pname)) {
-          if(newpad[padix] == origpad[padix])
-            continue;
-          SvREFCNT_dec(newpad[padix]);
-          newpad[padix] = SvREFCNT_inc(origpad[padix]);
-        }
-      }
-    }
-
+    curcv = cv_dup_for_suspend(curcv);
     state = suspendedstate_new(curcv);
   }
 
@@ -1239,12 +1337,6 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
     return KEYWORD_PLUGIN_STMT;
   }
   else {
-    /* Placate Perl RT#131519
-     * cv_clone() doesn't set CvOUTSIDE if !CvHASEVAL, and in doing so causes a
-     * subsequent cv_clone() on *that* CV to SEGV
-     */
-    CvHASEVAL_on(cv);
-
     *op_ptr = newUNOP(OP_REFGEN, 0,
       newSVOP(OP_ANONCODE, 0, (SV *)cv));
 

@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Net::FTP::Robust - download files over FTP
@@ -7,6 +9,7 @@ Net::FTP::Robust - download files over FTP
  my $ftp = Net::FTP::Robust->new
   ( Host    => $host
   , Port    => $port
+  , Passive => 1
   );
 
  # when needed, many attempts will be made to retrieve all
@@ -41,54 +44,42 @@ limitations.
 
 =head2 Constructors
 
-Net::FTP::Robust-E<gt>B<new>(OPTIONS)
-
 =over 4
+
+=item Net::FTP::Robust-E<gt>B<new>(OPTIONS)
 
 Use to connect to one ftp-server.
 All B<OPTIONS which start with capitals> are passed to Net::FTP
 method C<new()>.
 
- Option        --Default
- host            <undef>
- login_attempts  10
- login_delay     60
- password        '-anonymous@'
- skip_names      <skip hidden files>
- user            'anonymous'
+ -Option        --Default
+  host            <undef>
+  login_attempts  10
+  login_delay     60
+  password        '-anonymous@'
+  skip_names      <skip hidden files>
+  user            'anonymous'
 
-. host => HOSTNAME
+=over 2
 
-=over 4
+=item host => HOSTNAME
 
 Alternative for the C<Host> parameter for Net::FTP subroutine new.
 
-=back
-
-. login_attempts => INTEGER
-
-=over 4
+=item login_attempts => INTEGER
 
 How often will the connection be rebuilt. Between each attempt,
 we wait C<login_delay> seconds.  When '0' is specified, it will
 continue forever: you can solve problems discovered in the logs.
 
-=back
-
-. login_delay => INTEGER
-
-=over 4
+=item login_delay => INTEGER
 
 How much time to wait between retries which require to login again,
 in seconds.
 
-=back
+=item password => STRING
 
-. password => STRING
-
-. skip_names => CODE
-
-=over 4
+=item skip_names => CODE
 
 Do not attempt directories or files which contain certain patterns.
 When the CODE returns 1, then the element will be ignored.  Typically,
@@ -98,17 +89,17 @@ The CODE reference will get three arguments: the ftp object (Net::FTP)
 with established connection, the full remote path of the entry, and the
 basename of the entry.
 
-=back
+=item user => STRING
 
-. user => STRING
+=back
 
 =back
 
 =head2 Download
 
-$obj-E<gt>B<get>(FROM, [TO])
-
 =over 4
+
+=item $obj-E<gt>B<get>( FROM, [TO] )
 
 The FROM directory or file on the remote server is copied TO a local
 directory (defaults to '.')
@@ -148,15 +139,15 @@ will get copied from the source as well.
 
 =head1 SEE ALSO
 
-This module is part of Net-FTP-Robust distribution version 0.08,
-built on February 01, 2010. Website: F<http://perl.overmeer.net>.  See also L<Net::FTPSSL>.
+This module is part of Net-FTP-Robust distribution version 0.09,
+built on January 22, 2018. Website: F<http://perl.overmeer.net/CPAN/>.  See also L<Net::FTPSSL>.
 
 =head1 COPYRIGHTS
 
 Copyrights of the perl code and the related documentation by
-2009-2010 by Mark Overmeer. For other contributors see ChangeLog.
+2009-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

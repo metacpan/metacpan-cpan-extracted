@@ -21,7 +21,6 @@ Java/Server.pm
 Java/JNI.pm
 Java/JNI.xs
 Java/typemap
-Java/jvm.def
 Java/sources/org/perl/inline/java/InlineJavaArray.java
 Java/sources/org/perl/inline/java/InlineJavaCastException.java
 Java/sources/org/perl/inline/java/InlineJavaClass.java
@@ -79,3 +78,4 @@ t/types.class
 t/no_const.java
 t/no_const.class
 t/shared.java
+META.json                                Module JSON meta-data (added by MakeMaker)

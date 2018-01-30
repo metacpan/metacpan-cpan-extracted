@@ -1,0 +1,394 @@
+From: stro@cpan.org
+X-Test-Reporter-Distfile: STRO/CPAN-SQLite-0.211.tar.gz
+X-Test-Reporter-Perl: v5.26.1
+Subject: PASS CPAN-SQLite-0.211 x86_64-linux 2.6.32-696.6.3.el6.x86_64
+Report: This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Serguei Trouchelle,
+
+This is a computer-generated report for CPAN-SQLite-0.211
+on perl 5.26.1, created by CPAN-Reporter-1.2018.
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester:
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 "/home/stro/perl5/perlbrew/perls/perl-5.26.1/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00-all_prereqs.t ............... ok
+t/00-compile.t ................... ok
+# 
+# Versions for all modules listed in MYMETA.json (including optional ones):
+# 
+# === Configure Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.24
+# 
+# === Build Requires ===
+# 
+#     Module              Want Have
+#     ------------------- ---- ----
+#     ExtUtils::MakeMaker  any 7.24
+# 
+# === Test Requires ===
+# 
+#     Module              Want     Have
+#     ------------------- ---- --------
+#     CPAN::HandleConfig   any   5.5008
+#     CPAN::Version        any   5.5003
+#     Carp                 any     1.42
+#     DBD::SQLite          any     1.54
+#     ExtUtils::MakeMaker  any     7.24
+#     File::Copy           any     2.32
+#     File::Spec           any     3.67
+#     FindBin              any     1.51
+#     IO::Handle           any     1.36
+#     IPC::Open3           any     1.20
+#     Scalar::Util         any  1.46_02
+#     Test::More          0.94 1.302120
+#     base                 any     2.26
+#     lib                  any     0.64
+# 
+# === Test Recommends ===
+# 
+#     Module         Want     Have
+#     ---------- -------- --------
+#     CPAN::Meta 2.120900 2.150010
+# 
+# === Runtime Requires ===
+# 
+#     Module                Want    Have
+#     --------------------- ---- -------
+#     Archive::Tar          1.54    2.24
+#     CPAN                   any    2.18
+#     CPAN::DistnameInfo    0.09    0.12
+#     CPAN::Index           1.93    2.12
+#     Compress::Zlib         any   2.074
+#     Cwd                    any    3.67
+#     DBD::SQLite           1.27    1.54
+#     DBI                    any   1.639
+#     English                any    1.10
+#     Exporter               any    5.72
+#     File::Basename         any    2.85
+#     File::Find             any    1.34
+#     File::HomeDir          any   1.002
+#     File::Path             any 2.12_01
+#     File::Spec             any    3.67
+#     File::Spec::Functions  any    3.67
+#     Getopt::Long           any    2.49
+#     HTTP::Tiny             any   0.070
+#     IO::Zlib               any    1.10
+#     Safe                   any    2.40
+#     constant               any    1.33
+#     parent                 any   0.236
+#     strict                 any    1.11
+#     utf8                   any    1.19
+#     warnings               any    1.37
+# 
+t/00-report-prereqs.t ............ ok
+# Testing with Perl 5.026001, /home/stro/perl5/perlbrew/perls/perl-5.26.1/bin/perl
+#     CPAN version is 2.18
+#     CPAN::DistnameInfo version is 0.12
+#     CPAN::HandleConfig version is 5.5008
+#     CPAN::Version version is 5.5003
+#     Carp version is 1.42
+#     Compress::Zlib version is 2.074
+#     Cwd version is 3.67
+#     DBD::SQLite version is 1.54
+#     DBI version is 1.639
+#     English version is 1.10
+#     Exporter version is 5.72
+#     ExtUtils::MakeMaker version is 7.24
+#     File::Basename version is 2.85
+#     File::Copy version is 2.32
+#     File::Find version is 1.34
+#     File::HomeDir version is 1.002
+#     File::Path version is 2.1201
+#     File::Spec version is 3.67
+#     File::Spec::Functions version is 3.67
+#     FindBin version is 1.51
+#     Getopt::Long version is 2.49
+#     HTTP::Tiny version is 0.070
+#     IO::Handle version is 1.36
+#     IPC::Open3 version is 1.20
+#     Safe version is 2.40
+#     Scalar::Util version is 1.4602
+#     Test::More version is 1.302120
+#     base version is 2.26
+#     constant version is 1.33
+#     lib version is 0.64
+#     parent version is 0.236
+#     strict version is 1.11
+#     utf8 version is 1.19
+#     warnings version is 1.37
+t/000-report-versions.t .......... ok
+t/01basic.t ...................... ok
+t/02drop.t ....................... ok
+t/03info.t ....................... ok
+t/04search.t ..................... ok
+t/04search_everything.t .......... ok
+t/05meta_new.t ................... ok
+t/05meta_update.t ................ ok
+t/06retrieve.t ................... ok
+t/author-critic.t ................ skipped: these tests are for testing by the author
+t/author-eol.t ................... skipped: these tests are for testing by the author
+t/author-no-tabs.t ............... skipped: these tests are for testing by the author
+t/author-pod-spell.t ............. skipped: these tests are for testing by the author
+t/release-changes_has_content.t .. skipped: these tests are for release candidate testing
+t/release-distmeta.t ............. skipped: these tests are for release candidate testing
+t/release-fixme.t ................ skipped: these tests are for release candidate testing
+t/release-has-version.t .......... skipped: these tests are for release candidate testing
+t/release-kwalitee.t ............. skipped: these tests are for release candidate testing
+t/release-meta-json.t ............ skipped: these tests are for release candidate testing
+t/release-minimum-version.t ...... skipped: these tests are for release candidate testing
+t/release-pause-permissions.t .... skipped: these tests are for release candidate testing
+t/release-pod-linkcheck.t ........ skipped: these tests are for release candidate testing
+t/release-pod-syntax.t ........... skipped: these tests are for release candidate testing
+All tests successful.
+Files=26, Tests=11288,  7 wallclock secs ( 0.66 usr  0.06 sys +  4.66 cusr  0.42 csys =  5.80 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module              Need     Have    
+    ------------------- -------- --------
+    Archive::Tar        1.54     2.24    
+    Compress::Zlib      0        2.074   
+    CPAN::DistnameInfo  0.09     0.12    
+    CPAN::Index         1.93     2.12    
+    DBD::SQLite         1.27     1.54    
+    File::HomeDir       0        1.002   
+    File::Spec          0        3.67    
+    HTTP::Tiny          0        0.070   
+    IO::Zlib            0        1.10    
+    parent              0        0.236   
+
+build_requires:
+
+    Module              Need     Have    
+    ------------------- -------- --------
+    base                0        2.26    
+    Carp                0        1.42    
+    CPAN::HandleConfig  0        5.5008  
+    CPAN::Version       0        5.5003  
+    DBD::SQLite         0        1.54    
+    ExtUtils::MakeMaker 0        7.24    
+    File::Copy          0        2.32    
+    File::Spec          0        3.67    
+    FindBin             0        1.51    
+    IO::Handle          0        1.36    
+    IPC::Open3          0        1.20    
+    lib                 0        0.64    
+    Scalar::Util        0        1.46_02 
+    Test::More          0.94     1.302120
+
+configure_requires:
+
+    Module              Need     Have    
+    ------------------- -------- --------
+    ExtUtils::MakeMaker 0        7.24    
+
+opt_build_requires:
+
+    Module              Need     Have    
+    ------------------- -------- --------
+    CPAN::Meta          2.120900 2.150010
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    LANG = en_US.UTF-8
+    LD_LIBRARY_PATH = /usr/lib64/alliance/lib
+    NONINTERACTIVE_TESTING = 1
+    PATH = /home/stro/perl5/perlbrew/perls/perl-5.26.1/bin:/home/stro/perl5/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/lib64/alliance/bin:/home/stro/bin:/home/stro/bin:/home/stro/bin
+    PERL5LIB = /home/stro/perl5/lib/perl5:/site/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 25600
+    PERL5_CPAN_IS_RUNNING = 25600
+    PERL_LOCAL_LIB_ROOT = /home/stro/perl5
+    PERL_MB_OPT = --install_base "/home/stro/perl5"
+    PERL_MM_OPT = INSTALL_BASE=/home/stro/perl5
+    PERL_MM_USE_DEFAULT = 1
+    PERL_USE_UNSAFE_INC = 1
+    SHELL = /bin/bash
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/stro/perl5/perlbrew/perls/perl-5.26.1/bin/perl
+    $UID/$EUID = 500 / 500
+    $GID = 500 500
+    $EGID = 500 500
+
+Perl module toolchain versions installed:
+
+    Module              Have      
+    ------------------- ----------
+    CPAN                2.18      
+    CPAN::Meta          2.150010  
+    Cwd                 3.67      
+    ExtUtils::CBuilder  0.280225  
+    ExtUtils::Command   7.24      
+    ExtUtils::Install   2.04      
+    ExtUtils::MakeMaker 7.24      
+    ExtUtils::Manifest  1.70      
+    ExtUtils::ParseXS   3.34      
+    File::Spec          3.67      
+    JSON                n/a       
+    JSON::PP            2.27400_02
+    Module::Build       0.4224    
+    Module::Signature   n/a       
+    Parse::CPAN::Meta   2.150010  
+    Test::Harness       3.38      
+    Test::More          1.302120  
+    YAML                n/a       
+    YAML::Syck          n/a       
+    version             0.9917    
+
+
+--
+
+Summary of my perl5 (revision 5 version 26 subversion 1) configuration:
+   
+  Platform:
+    osname=linux
+    osvers=2.6.32-696.6.3.el6.x86_64
+    archname=x86_64-linux
+    uname='linux localhost.localdomain 2.6.32-696.6.3.el6.x86_64 #1 smp wed jul 12 14:17:22 utc 2017 x86_64 x86_64 x86_64 gnulinux '
+    config_args='-de -Dprefix=/home/stro/perl5/perlbrew/perls/perl-5.26.1 -Aeval:scriptdir=/home/stro/perl5/perlbrew/perls/perl-5.26.1/bin'
+    hint=recommended
+    useposix=true
+    d_sigaction=define
+    useithreads=undef
+    usemultiplicity=undef
+    use64bitint=define
+    use64bitall=define
+    uselongdouble=undef
+    usemymalloc=n
+    default_inc_excludes_dot=define
+    bincompat5005=undef
+  Compiler:
+    cc='cc'
+    ccflags ='-fwrapv -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2'
+    optimize='-O2'
+    cppflags='-fwrapv -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include'
+    ccversion=''
+    gccversion='4.4.7 20120313 (Red Hat 4.4.7-11)'
+    gccosandvers=''
+    intsize=4
+    longsize=8
+    ptrsize=8
+    doublesize=8
+    byteorder=12345678
+    doublekind=3
+    d_longlong=define
+    longlongsize=8
+    d_longdbl=define
+    longdblsize=16
+    longdblkind=3
+    ivtype='long'
+    ivsize=8
+    nvtype='double'
+    nvsize=8
+    Off_t='off_t'
+    lseeksize=8
+    alignbytes=8
+    prototype=define
+  Linker and Libraries:
+    ld='cc'
+    ldflags =' -fstack-protector -L/usr/local/lib'
+    libpth=/usr/local/lib /usr/lib /lib/../lib64 /usr/lib/../lib64 /lib /lib64 /usr/lib64 /usr/local/lib64
+    libs=-lpthread -lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc
+    perllibs=-lpthread -lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=libc-2.12.so
+    so=so
+    useshrplib=false
+    libperl=libperl.a
+    gnulibc_version='2.12'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs
+    dlext=so
+    d_dlsymun=undef
+    ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC'
+    lddlflags='-shared -O2 -L/usr/local/lib -fstack-protector'
+
+
+Characteristics of this binary (from libperl): 
+  Compile-time options:
+    HAS_TIMES
+    PERLIO_LAYERS
+    PERL_COPY_ON_WRITE
+    PERL_DONT_CREATE_GVSV
+    PERL_MALLOC_WRAP
+    PERL_OP_PARENT
+    PERL_PRESERVE_IVUV
+    USE_64_BIT_ALL
+    USE_64_BIT_INT
+    USE_LARGE_FILES
+    USE_LOCALE
+    USE_LOCALE_COLLATE
+    USE_LOCALE_CTYPE
+    USE_LOCALE_NUMERIC
+    USE_LOCALE_TIME
+    USE_PERLIO
+    USE_PERL_ATOF
+  Locally applied patches:
+    Devel::PatchPerl 1.48
+  Built under linux
+  Compiled at Jan 24 2018 12:58:59
+  %ENV:
+    PERL5LIB="/home/stro/perl5/lib/perl5:/site/lib"
+    PERL5OPT=""
+    PERL5_CPANPLUS_IS_RUNNING="25600"
+    PERL5_CPAN_IS_RUNNING="25600"
+    PERL_LOCAL_LIB_ROOT="/home/stro/perl5"
+    PERL_MB_OPT="--install_base "/home/stro/perl5""
+    PERL_MM_OPT="INSTALL_BASE=/home/stro/perl5"
+    PERL_MM_USE_DEFAULT="1"
+    PERL_USE_UNSAFE_INC="1"
+  @INC:
+    /home/stro/perl5/lib/perl5/x86_64-linux
+    /home/stro/perl5/lib/perl5
+    /site/lib
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1/x86_64-linux
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1/x86_64-linux
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1
+    .

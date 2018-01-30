@@ -22,7 +22,7 @@ Revision history for Perl extension Finance::TickerSymbols.
 1.00 Thu Nov 30 16:45:06 EST 2006
          - documentation fix (thank you Robert)
          - hopefully it's mature enough to become 1.00
-         
+
 1.02 Fri Oct 10 10:16:00 EST 2008
            [reported and solved by Steffen Netz - Thank you]
          - support proxy via environment variables
@@ -34,10 +34,19 @@ Revision history for Perl extension Finance::TickerSymbols.
 1.04 Wed May  8 - 2013
            [reported and solved by Matt W via RT]
           - eliminate warning at premature use of prototyped function
-          
+
 1.041 Fri May 10 - 2013
           - fix syntax warning in a test
 
 2.01  Tue May 13 - 2014
           - adjust to http://www.nasdaq.com refusal to serve perl agenss. Is
-            that the humble beginning of a brain war? 
+            that the humble beginning of a brain war?
+
+3.00  Sut Jan 27 - 2018
+         - adjust to new yahoo react schem
+
+3.01  Sun Jan 28 - 2018
+         - adjust to some web inconsistency
+
+3.02  Mon Jan 29 - 2018
+         - add a pre-requirement of LWP::Protocol::https version 6

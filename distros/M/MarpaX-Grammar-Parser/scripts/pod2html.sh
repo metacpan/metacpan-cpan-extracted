@@ -1,10 +1,11 @@
 #!/bin/bash
 
-NAME=MarpaX/Grammar/Parser
-export NAME
+PREFIX=Perl-modules/html/MarpaX/Grammar/
+FILE=$PREFIX/Parser.html
 
-pod2html.pl -i lib/$NAME.pm -o /dev/shm/html/Perl-modules/html/$NAME.html
+mkdir -p $DR/$PREFIX
+mkdir -p ~/savage.net.au/$PREFIX
 
-NAME=Data/TreeDumper/Renderer/Marpa
+pod2html.pl -i lib/MarpaX/Grammar/Parser.pm -o $DR/$FILE
 
-pod2html.pl -i lib/$NAME.pm -o /dev/shm/html/Perl-modules/html/$NAME.html
+cp $DR/$FILE ~/savage.net.au/$FILE

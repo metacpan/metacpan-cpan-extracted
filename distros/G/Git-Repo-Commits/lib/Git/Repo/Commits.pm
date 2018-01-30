@@ -5,7 +5,7 @@ use strict;
 use Carp;
 use Git;
 
-use version; our $VERSION = qv('0.0.5');
+use version; our $VERSION = qv('0.1.0'); # Work with a few files
 
 # Other recommended modules (uncomment to use):
 #  use IO::Prompt;
@@ -18,19 +18,26 @@ use version; our $VERSION = qv('0.0.5');
 sub new {
   my $class = shift;
   my $dir = shift || croak "Need a repo directory";
+  my $files_arrayref = shift;
   my ($repo_name)  = ($dir =~ m{/([^/]+)/?$} );
   my $repo = Git->repository (Directory => $dir);
-  my @these_revs = `cd $dir; git rev-list --all`;
+  my @these_revs;
+  if ( $files_arrayref ) {
+    @these_revs = $repo->command('rev-list', '--all', '--', join(" ", @$files_arrayref));
+  } else { 
+    @these_revs = $repo->command('rev-list', '--all');
+  }
   my @commit_info;
   for my $commit ( reverse @these_revs ) {
-    chop $commit;
     my $commit_info = $repo->command('show', '--pretty=fuller', $commit);
     my @files = ($commit_info =~ /\+\+\+\s+b\/(.+)/g);
     my ($author) = ($commit_info =~ /Author:\s+(.+)/);
     my ($commit) = ($commit_info =~ /Commit:\s+(.+)/);
+    my ($commit_date) = ($commit_info =~ /CommitDate:\s+(.+)/);
     push @commit_info, { files => \@files,
 			 author => $author,
-			 commit => $commit};
+			 commit => $commit,
+			 commit_date => $commit_date};
   }
   my $commits = { _repo => $dir,
 		  _name => $repo_name,
@@ -66,7 +73,7 @@ Git::Repo::Commits - Get all commits in a repository
 
 =head1 VERSION
 
-This document describes Git::Repo::Commits version 0.0.3
+This document describes Git::Repo::Commits version 0.0.7
 
 
 =head1 SYNOPSIS
@@ -89,6 +96,7 @@ the shape
 
     { author => $author,
       committer => $committer,
+      commit_date => $date,
       files => \@files }
 
 =head2 hashes
@@ -113,7 +121,9 @@ Depends on L<Git>, which should be available either from your git
 installation or from CPAN.
 
 
+=head2 SEE ALSO
 
+L<Git::Raw> has an object oriented interface to repositories, including a class L<Git::Raw::Commit> to access commits. 
 
 =head1 BUGS AND LIMITATIONS
 

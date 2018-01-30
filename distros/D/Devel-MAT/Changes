@@ -1,5 +1,15 @@
 Revision history for Devel-MAT
 
+0.33    2018-01-23 01:22:25
+        [CHANGES]
+         * Added `inrefs` and `outrefs` commands
+         * Improvements to output of `show` command
+         * Indicate circular vs. non-circular self-references in `identify`
+           command output
+         * Accept names of symbols as valid SV addresses
+         * Renamed $cv->padnames to ->padnames_av`
+         * Added $cv->max_padix
+
 0.32    2017-12-17 00:31:53
         [CHANGES]
          * Only elide single-referrant RVs in `identify` output

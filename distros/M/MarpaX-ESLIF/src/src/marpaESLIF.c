@@ -10181,9 +10181,6 @@ static inline short _marpaESLIFRecognizer_matchPostProcessingb(marpaESLIFRecogni
       if (rci != MARPAESLIF_MATCH_OK) {
         break;
       }
-#ifndef MARPAESLIF_NTRACE
-    MARPAESLIF_VALUECHECK_IF_LEXEME_MODE(marpaESLIFRecognizerp->marpaESLIFp, marpaESLIFValueResult);
-#endif
       linep += matchedLengthl;
       linel -= matchedLengthl;
       /* A new line, reset column count */
@@ -10209,9 +10206,6 @@ static inline short _marpaESLIFRecognizer_matchPostProcessingb(marpaESLIFRecogni
         if (rci != MARPAESLIF_MATCH_OK) {
           break;
         }
-#ifndef MARPAESLIF_NTRACE
-        MARPAESLIF_VALUECHECK_IF_LEXEME_MODE(marpaESLIFRecognizerp->marpaESLIFp, marpaESLIFValueResult);
-#endif
         linep += matchedLengthl;
         linel -= matchedLengthl;
         /* A new character */

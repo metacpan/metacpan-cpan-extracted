@@ -1,5 +1,18 @@
 Revision history for Perl extension Win32::NTFS::Symlink.
 
+0.10 - 2018-01-23
+  - Mile Stone #1
+    - Added new sub routines:
+      - is_ntfs_symlink
+      - is_ntfs_junction
+      - ntfs_reparse_tag
+    - Added constants (mainly for use with ntfs_reparse_tag())
+    - Added prototypes for ntfs_readlink and ntfs_symlink to match built-ins
+    - Added prototypes to new sub routines for consistency with readlink()
+    - General code improvements and polishing
+    - Updated POD to reflect new functions and constants, and polished it
+    - Updated tests to check the new functions
+
 0.04 - 2018-01-15
   - Added additional tests:
     - To test if the overriding of built-ins is working as expected
@@ -14,4 +27,3 @@ Revision history for Perl extension Win32::NTFS::Symlink.
 
 0.01 - 2018-01-09
   - First release
-

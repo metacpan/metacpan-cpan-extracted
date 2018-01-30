@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 55 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 58 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Git/Raw.pm',
+    'Git/Raw/AnnotatedCommit.pm',
     'Git/Raw/Blame.pm',
     'Git/Raw/Blame/Hunk.pm',
     'Git/Raw/Blob.pm',
@@ -49,6 +50,8 @@ my @module_files = (
     'Git/Raw/Patch.pm',
     'Git/Raw/PathSpec.pm',
     'Git/Raw/PathSpec/MatchList.pm',
+    'Git/Raw/Rebase.pm',
+    'Git/Raw/Rebase/Operation.pm',
     'Git/Raw/RefSpec.pm',
     'Git/Raw/Reference.pm',
     'Git/Raw/Reflog.pm',

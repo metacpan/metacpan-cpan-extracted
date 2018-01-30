@@ -9,7 +9,7 @@ package Rex::User::FreeBSD;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands::MD5;
@@ -22,7 +22,7 @@ use Rex::Interface::Fs;
 use Rex::Interface::Exec;
 use Rex::User::Linux;
 use Rex::Helper::Path;
-use JSON::XS;
+use JSON::MaybeXS;
 
 use base qw(Rex::User::Linux);
 
@@ -164,9 +164,11 @@ sub rm_user {
     $cmd .= " -r ";
   }
 
-  i_run $cmd . " -n " . $user, fail_ok => 1;
-  if ( $? != 0 ) {
-    die("Error deleting user $user");
+  my $output = i_run $cmd . " -n " . $user, fail_ok => 1;
+  if ( $? == 67 ) {
+    Rex::Logger::info("Cannot delete user $user (no such user)", "warn");
+  } elsif ( $? != 0 ) {
+    die("Error deleting user $user ($output)");
   }
 
 }

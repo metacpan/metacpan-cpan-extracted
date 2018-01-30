@@ -1,5 +1,16 @@
 Revision history for Perl extension Directory::Scanner
 
+0.03 2018-01-29
+    [!!BREAKING CHANGES!!]
+    - major re-arrangement of the internals for building
+      a stream, there is no longer an endpoint called
+      `stream` which you must call before things are
+      usable, instead things are just always usable.
+    - removed the `stream` method from `Directory::Scanner`
+    - moved all the builder methods from `Directory::Scanner`
+      to `Directory::Scanner::API::Stream` instead, so that
+      you can always wrap/mutate your stream if you like.
+
 0.02 2017-10-10
     - added docs
     - added META.json (thanks Mohammad S Anwar)

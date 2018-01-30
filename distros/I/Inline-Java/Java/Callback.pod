@@ -154,7 +154,7 @@ C<InlineJavaPerlException> (both of these belong to the C<org.perl.inline.java>
 package). The former designates an internal C<Inline::Java> error and the 
 latter indicates that the Perl callback threw an exception (die() or croak()).
 The value of $@ (this can be a scalar or any valid "Inline::Java" object) can
-be retreived using the GetObject() method of the C<InlineJavaPerlException> 
+be retrieved using the GetObject() method of the C<InlineJavaPerlException>
 object (if you are certain that $@ was a Perl scalar, you can use the 
 GetString() method).
    Z<>

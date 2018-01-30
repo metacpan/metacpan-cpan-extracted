@@ -1,3 +1,9 @@
+0.23 2018-01-22T15:21:53+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update copyright years.
+
 0.22 2015-09-16T10:15:40+02:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SEE ALSO section in doc.

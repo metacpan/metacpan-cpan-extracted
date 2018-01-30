@@ -187,37 +187,14 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.001,
-built on November 08, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Transport distribution version 3.002,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

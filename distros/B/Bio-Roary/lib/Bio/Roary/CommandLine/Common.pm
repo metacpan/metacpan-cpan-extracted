@@ -1,6 +1,6 @@
 package Bio::Roary::CommandLine::Common;
 # ABSTRACT: Common command line settings
-$Bio::Roary::CommandLine::Common::VERSION = '3.11.3';
+$Bio::Roary::CommandLine::Common::VERSION = '3.12.0';
 
 use Moose;
 use FindBin;
@@ -61,7 +61,7 @@ Bio::Roary::CommandLine::Common - Common command line settings
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

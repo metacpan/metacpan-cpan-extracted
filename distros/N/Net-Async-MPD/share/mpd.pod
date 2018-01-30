@@ -1,0 +1,797 @@
+=pod
+
+=head1 test
+
+Blah
+
+=head1 Playback options
+
+=head2 consume
+
+    consume {STATE}
+
+Sets consume state to C<STATE>, C<STATE> should be 0 or 1. When consume is activated, each song played is removed from playlist.
+
+=head2 crossfade
+
+    crossfade {SECONDS}
+
+Sets crossfading between songs.
+
+=head2 mixrampdb
+
+    mixrampdb {deciBels}
+
+Sets the threshold at which songs will be overlapped. Like crossfading but doesn't fade the track volume, just overlaps. The songs need to have MixRamp tags added by an external tool. 0dB is the normalized maximum volume so use negative values, I prefer -17dB. In the absence of mixramp tags crossfading will be used. See L<http://sourceforge.net/projects/mixramp>
+
+=head2 mixrampdelay
+
+    mixrampdelay {SECONDS}
+
+Additional time subtracted from the overlap calculated by mixrampdb. A value of "nan" disables MixRamp overlapping and falls back to crossfading.
+
+=head2 random
+
+    random {STATE}
+
+Sets random state to C<STATE>, C<STATE> should be 0 or 1.
+
+=head2 repeat
+
+    repeat {STATE}
+
+Sets repeat state to C<STATE>, C<STATE> should be 0 or 1.
+
+=head2 setvol
+
+    setvol {VOL}
+
+Sets volume to C<VOL>, the range of volume is 0-100.
+
+=head2 single
+
+    single {STATE}
+
+Sets single state to C<STATE>, C<STATE> should be 0 or 1. When single is activated, playback is stopped after current song, or song is repeated if the 'repeat' mode is enabled.
+
+=head2 replay_gain_mode
+
+    replay_gain_mode {MODE}
+
+Sets the replay gain mode. One of C<off>, C<track>, C<album>, C<auto>.
+
+Changing the mode during playback may take several seconds, because the new settings does not affect the buffered data.
+
+This command triggers the C<options> idle event.
+
+=head2 replay_gain_status
+
+    replay_gain_status
+
+Prints replay gain options. Currently, only the variable C<replay_gain_mode> is returned.
+
+=head2 volume
+
+    volume {CHANGE}
+
+Changes volume by amount C<CHANGE>.
+
+B<Note>: C<volume> is deprecated, use C<setvol> instead.
+
+=head1 Controlling playback
+
+=head2 next
+
+    next
+
+Plays next song in the playlist.
+
+=head2 pause
+
+    pause {PAUSE}
+
+Toggles pause/resumes playing, C<PAUSE> is 0 or 1.
+
+B<Note>: The use of C<pause> command w/o the C<PAUSE> argument is deprecated.
+
+=head2 play
+
+    play [SONGPOS]
+
+Begins playing the playlist at song number C<SONGPOS>.
+
+=head2 playid
+
+    playid [SONGID]
+
+Begins playing the playlist at song C<SONGID>.
+
+=head2 previous
+
+    previous
+
+Plays previous song in the playlist.
+
+=head2 seek
+
+    seek {SONGPOS} {TIME}
+
+Seeks to the position C<TIME> (in seconds; fractions allowed) of entry C<SONGPOS> in the playlist.
+
+=head2 seekid
+
+    seekid {C<SONGID>} {TIME}
+
+Seeks to the position C<TIME> (in seconds; fractions allowed) of song C<SONGID>.
+
+=head2 seekcur
+
+    seekcur {TIME}
+
+Seeks to the position C<TIME> (in seconds; fractions allowed) within the current song. If prefixed by '+' or '-', then the time is relative to the current playing position.
+
+=head2 stop
+
+    stop
+
+Stops playing.
+
+=head1 The current playlist
+
+=head2 add
+
+    add {URI}
+
+Adds the file C<URI> to the playlist (directories add recursively). C<URI> can also be a single file.
+
+=head2 addid
+
+    addid {URI} [POSITION]
+
+Adds a song to the playlist (non-recursive) and returns the song id.
+
+C<URI> is always a single file or URL. For example:
+
+    addid "foo.mp3"
+    Id: 999
+    OK
+
+=head2 clear
+
+    clear
+
+Clears the current playlist.
+
+=head2 delete
+
+    delete [{POS} | {START:END}]
+
+Deletes a song from the playlist.
+
+=head2 deleteid
+
+    deleteid {SONGID}
+
+Deletes the song C<SONGID> from the playlist
+
+=head2 move
+
+    move [{FROM} | {START:END}] {TO}
+
+Moves the song at C<FROM> or range of songs at C<START:END> to C<TO> in the playlist.
+
+=head2 moveid
+
+    moveid {FROM} {TO}
+
+Moves the song with C<FROM> (C<songid>) to C<TO> (playlist index) in the playlist. If C<TO> is negative, it is relative to the current song in the playlist (if there is one).
+
+=head2 playlist
+
+    playlist
+
+Displays the current playlist.
+
+B<Note>: Do not use this, instead use C<playlistinfo>.
+
+=head2 playlistfind
+
+    playlistfind {TAG} {NEEDLE}
+
+Finds songs in the current playlist with strict matching.
+
+=head2 playlistid
+
+    playlistid {SONGID}
+
+Displays a list of songs in the playlist. C<SONGID> is optional and specifies a single song to display info for.
+
+=head2 playlistinfo
+
+    playlistinfo [[SONGPOS] | [START:END]]
+
+Displays a list of all songs in the playlist, or if the optional argument is given, displays information only for the song C<SONGPOS> or the range of songs C<START:END>.
+
+=head2 playlistsearch
+
+    playlistsearch {TAG} {NEEDLE}
+
+Searches case-insensitively for partial matches in the current playlist.
+
+=head2 plchanges
+
+    plchanges {VERSION} [START:END]
+
+Displays changed songs currently in the playlist since C<VERSION>. Start and end positions may be given to limit the output to changes in the given range.
+
+To detect songs that were deleted at the end of the playlist, use playlistlength returned by status command.
+
+=head2 plchangesposid
+
+    plchangesposid {VERSION} [START:END]
+
+Displays changed songs currently in the playlist since C<VERSION>. This function only returns the position and the id of the changed song, not the complete metadata. This is more bandwidth efficient.
+
+To detect songs that were deleted at the end of the playlist, use playlistlength returned by status command.
+
+=head2 prio
+
+    prio {PRIORITY} {START:END...}
+
+Set the priority of the specified songs. A higher priority means that it will be played first when "random" mode is enabled.
+
+A priority is an integer between 0 and 255. The default priority of new songs is 0.
+
+=head2 prioid
+
+    prioid {PRIORITY} {ID...}
+
+Same as prio, but address the songs with their id.
+
+=head2 rangeid
+
+    rangeid {ID} {START:END}
+
+Specifies the portion of the song that shall be played. C<START> and C<END> are offsets in seconds (fractional seconds allowed); both are optional. Omitting both (i.e. sending just ":") means "remove the range, play everything". A song that is currently playing cannot be manipulated this way.
+
+=head2 shuffle
+
+    shuffle [START:END]
+
+Shuffles the current playlist. C<START:END> is optional and specifies a range of songs.
+
+=head2 swap
+
+    swap {SONG1} {SONG2}
+
+Swaps the positions of C<SONG1> and C<SONG2>.
+
+=head2 swapid
+
+    swapid {SONG1} {SONG2}
+
+Swaps the positions of C<SONG1> and C<SONG2> (both song ids).
+
+=head2 addtagid
+
+    addtagid {SONGID} {TAG} {VALUE}
+
+Adds a tag to the specified song. Editing song tags is only possible for remote songs. This change is volatile: it may be overwritten by tags received from the server, and the data is gone when the song gets removed from the queue.
+
+=head2 cleartagid
+
+    cleartagid {SONGID} [TAG]
+
+Removes tags from the specified song. If C<TAG> is not specified, then all tag values will be removed. Editing song tags is only possible for remote songs.
+
+=head1 Stored playlists
+
+Playlists are stored inside the configured playlist directory. They are addressed with their file name (without the directory and without the .m3u suffix).
+
+Some of the commands described in this section can be used to run playlist plugins instead of the hard-coded simple m3u parser. They can access playlists in the music directory (relative path including the suffix) or remote playlists (absolute URI with a supported scheme).
+
+=head2 listplaylist
+
+    listplaylist {NAME}
+
+Lists the songs in the playlist. Playlist plugins are supported.
+
+=head2 listplaylistinfo
+
+    listplaylistinfo {NAME}
+
+Lists the songs with metadata in the playlist. Playlist plugins are supported.
+
+=head2 listplaylists
+
+    listplaylists
+
+Prints a list of the playlist directory.
+
+After each playlist name the server sends its last modification time as attribute "Last-Modified" in ISO 8601 format. To avoid problems due to clock differences between clients and the server, clients should not compare this value with their local clock.
+
+=head2 load
+
+    load {NAME} [START:END]
+
+Loads the playlist into the current queue. Playlist plugins are supported. A range may be specified to load only a part of the playlist.
+
+=head2 playlistadd
+
+    playlistadd {NAME} {URI}
+
+Adds C<URI> to the playlist C<NAME.m3u>.
+
+C<NAME.m3u> will be created if it does not exist.
+
+=head2 playlistclear
+
+    playlistclear {NAME}
+
+Clears the playlist C<NAME.m3u>.
+
+=head2 playlistdelete
+
+    playlistdelete {NAME} {SONGPOS}
+
+Deletes C<SONGPOS> from the playlist C<NAME.m3u>.
+
+=head2 playlistmove
+
+    playlistmove {NAME} {FROM} {TO}
+
+Moves the song at position C<FROM> in the playlist C<NAME.m3u> to the position C<TO>.
+
+=head2 rename
+
+    rename {NAME} {NEW_NAME}
+
+Renames the playlist C<NAME.m3u> to C<NEW_NAME.m3u>.
+
+=head2 rm
+
+    rm {NAME}
+
+Removes the playlist C<NAME.m3u> from the playlist directory.
+
+=head2 save
+
+    save {NAME}
+
+Saves the current playlist to C<NAME.m3u> in the playlist directory.
+
+=head1 The music database
+
+=head2 count
+
+    count {TAG} {NEEDLE} [...] [group] [GROUPTYPE]
+
+Counts the number of songs and their total playtime in the db matching C<TAG> exactly.
+
+The group keyword may be used to group the results by a tag. The following prints per-artist counts:
+
+    count group artist
+
+=head2 find
+
+    find {TYPE} {WHAT} [...] [sort TYPE] [window START:END]
+
+Finds songs in the db that are exactly C<WHAT>. C<TYPE> can be any tag supported by MPD, or one of the special parameters:
+
+=over 4
+
+=item * any checks all tag values
+
+=item * file checks the full path (relative to the music directory)
+
+=item * base restricts the search to songs in the given directory (also relative to the music directory)
+
+=item * modified-since compares the file's time stamp with the given value (ISO 8601 or UNIX time stamp)
+
+=back
+
+C<WHAT> is what to find.
+
+sort sorts the result by the specified tag. Without sort, the order is undefined. Only the first tag value will be used, if multiple of the same type exist. To sort by "Artist", "Album" or "AlbumArtist", you should specify "ArtistSort", "AlbumSort" or "AlbumArtistSort" instead. These will automatically fall back to the former if "*Sort" doesn't exist. "AlbumArtist" falls back to just "Artist".
+
+window can be used to query only a portion of the real response. The parameter is two zero-based record numbers; a start number and an end number.
+
+=head2 findadd
+
+    findadd {TYPE} {WHAT} [...]
+
+Finds songs in the db that are exactly C<WHAT> and adds them to current playlist. Parameters have the same meaning as for find.
+
+=head2 list
+
+    list {TYPE} [FILTERTYPE] [FILTERWHAT] [...] [group] [GROUPTYPE] [...]
+
+Lists unique tags values of the specified type. C<TYPE> can be any tag supported by MPD or file.
+
+Additional arguments may specify a filter like the one in the find command.
+
+The group keyword may be used (repeatedly) to group the results by one or more tags. The following example lists all album names, grouped by their respective (album) artist:
+
+    list album group albumartist
+
+=head2 listall
+
+    listall [URI]
+
+Lists all songs and directories in C<URI>.
+
+Do not use this command. Do not manage a client-side copy of MPD's database. That is fragile and adds huge overhead. It will break with large databases. Instead, query MPD whenever you need something.
+
+=head2 listallinfo
+
+    listallinfo [URI]
+
+Same as listall, except it also returns metadata info in the same format as lsinfo.
+
+Do not use this command. Do not manage a client-side copy of MPD's database. That is fragile and adds huge overhead. It will break with large databases. Instead, query MPD whenever you need something.
+
+=head2 listfiles
+
+    listfiles [URI]
+
+Lists the contents of the directory C<URI>, including files are not recognized by MPD. C<URI> can be a path relative to the music directory or an C<URI> understood by one of the storage plugins. The response contains at least one line for each directory entry with the prefix "file: " or "directory: ", and may be followed by file attributes such as "Last-Modified" and "size".
+
+For example, "smb://SERVER" returns a list of all shares on the given SMB/CIFS server; "nfs://servername/path" obtains a directory listing from the NFS server.
+
+=head2 lsinfo
+
+    lsinfo [URI]
+
+Lists the contents of the directory C<URI>.
+
+When listing the root directory, this currently returns the list of stored playlists. This behavior is deprecated; use "listplaylists" instead.
+
+This command may be used to list metadata of remote files (e.g. C<URI> beginning with "http://" or "smb://").
+
+Clients that are connected via UNIX domain socket may use this command to read the tags of an arbitrary local file (C<URI> is an absolute path).
+
+=head2 readcomments
+
+    readcomments [URI]
+
+Read "comments" (i.e. key-value pairs) from the file specified by C<URI>. This C<URI> can be a path relative to the music directory or an absolute path.
+
+This command may be used to list metadata of remote files (e.g. C<URI> beginning with "http://" or "smb://").
+
+The response consists of lines in the form C<KEY: VALUE>. Comments with suspicious characters (e.g. newlines) are ignored silently.
+
+The meaning of these depends on the codec, and not all decoder plugins support it. For example, on Ogg files, this lists the Vorbis comments.
+
+=head2 search
+
+    search {TYPE} {WHAT} [...] [sort TYPE] [window START:END]
+
+Searches for any song that contains C<WHAT>. Parameters have the same meaning as for find, except that search is not case sensitive.
+
+=head2 searchadd
+
+    searchadd {TYPE} {WHAT} [...]
+
+Searches for any song that contains C<WHAT> in tag C<TYPE> and adds them to current playlist.
+
+Parameters have the same meaning as for find, except that search is not case sensitive.
+
+=head2 searchaddpl
+
+    searchaddpl {NAME} {TYPE} {WHAT} [...]
+
+Searches for any song that contains C<WHAT> in tag C<TYPE> and adds them to the playlist named C<NAME>.
+
+If a playlist by that name doesn't exist it is created.
+
+Parameters have the same meaning as for find, except that search is not case sensitive.
+
+=head2 update
+
+    update [URI]
+
+Updates the music database: find new files, remove deleted files, update modified files.
+
+C<URI> is a particular directory or song/file to update. If you do not specify it, everything is updated.
+
+Prints C<updating_db: JOBID> where C<JOBID> is a positive number identifying the update job. You can read the current job id in the status response.
+
+=head2 rescan
+
+    rescan [URI]
+
+Same as update, but also rescans unmodified files.
+
+=head1 Mounts and neighbours
+
+A "storage" provides access to files in a directory tree. The most basic storage plugin is the "local" storage plugin which accesses the local file system, and there are plugins to access NFS and SMB servers.
+
+Multiple storages can be "mounted" together, similar to the mount command on many operating systems, but without cooperation from the kernel. No superuser privileges are necessary, beause this mapping exists only inside the MPD process
+
+=head2 mount
+
+    mount {PATH} {URI}
+
+Mount the specified remote storage C<URI> at the given path. Example:
+
+    mount foo nfs://192.168.1.4/export/mp3
+
+=head2 unmount
+
+    unmount {PATH}
+
+Unmounts the specified path. Example:
+
+    unmount foo
+
+=head2 listmounts
+
+    listmounts
+
+Queries a list of all mounts. By default, this contains just the configured music_directory. Example:
+
+    listmounts
+    mount:
+    storage: /home/foo/music
+    mount: foo
+    storage: nfs://192.168.1.4/export/mp3
+    OK
+
+=head2 listneighbors
+
+    listneighbors
+
+Queries a list of "neighbors" (e.g. accessible file servers on the local net). Items on that list may be used with the mount command. Example:
+
+    listneighbors
+    neighbor: smb://FOO
+    name: FOO (Samba 4.1.11-Debian)
+    OK
+
+=head1 Stickers
+
+ "Stickers" are pieces of information attached to existing MPD objects (e.g. song files, directories, albums). Clients can create arbitrary name/value pairs. MPD itself does not assume any special meaning in them.
+
+The goal is to allow clients to share additional (possibly dynamic) information about songs, which is neither stored on the client (not available to other clients), nor stored in the song files (MPD has no write access).
+
+Client developers should create a standard for common sticker names, to ensure interoperability.
+
+Objects which may have stickers are addressed by their object type ("song" for song objects) and their URI (the path within the database for songs).
+
+=head2 sticker
+
+    sticker get {TYPE} {URI} {NAME}
+
+Reads a sticker value for the specified object.
+
+=head2 sticker
+
+    sticker set {TYPE} {URI} {NAME} {VALUE}
+
+Adds a sticker value to the specified object. If a sticker item with that name already exists, it is replaced.
+
+=head2 sticker
+
+    sticker delete {TYPE} {URI} [NAME]
+
+Deletes a sticker value from the specified object. If you do not specify a sticker name, all sticker values are deleted.
+
+=head2 sticker
+
+    sticker list {TYPE} {URI}
+
+Lists the stickers for the specified object.
+
+=head2 sticker
+
+    sticker find {TYPE} {URI} {NAME}
+
+Searches the sticker database for stickers with the specified name, below the specified directory (C<URI>). For each matching song, it prints the C<URI> and that one sticker's value.
+
+=head2 sticker
+
+    sticker find {TYPE} {URI} {NAME} = {VALUE}
+
+Searches for stickers with the given value.
+
+Other supported operators are: "<", ">"
+
+=head1 Connection settings
+
+=head2 close
+
+    close
+
+Closes the connection to MPD. MPD will try to send the remaining output buffer before it actually closes the connection, but that cannot be guaranteed. This command will not generate a response.
+
+=head2 kill
+
+    kill
+
+Kills MPD.
+
+=head2 password
+
+    password {PASSWORD}
+
+This is used for authentication with the server. C<PASSWORD> is simply the plaintext password.
+
+=head2 ping
+
+    ping
+
+Does nothing but return C<OK>.
+
+=head2 tagtypes
+
+    tagtypes
+
+Shows a list of available tag types. It is an intersection of the metadata_to_use setting and this client's tag mask.
+
+About the tag mask: each client can decide to disable any number of tag types, which will be omitted from responses to this client. That is a good idea, because it makes responses smaller. The following tagtypes sub commands configure this list.
+
+=head2 tagtypes
+
+    tagtypes disable {NAME...}
+
+Remove one or more tags from the list of tag types the client is interested in. These will be omitted from responses to this client.
+
+=head2 tagtypes
+
+    tagtypes enable {NAME...}
+
+Re-enable one or more tags from the list of tag types for this client. These will no longer be hidden from responses to this client.
+
+=head2 tagtypes
+
+    tagtypes clear
+
+Clear the list of tag types this client is interested in. This means that MPD will not send any tags to this client.
+
+=head2 tagtypes
+
+    tagtypes all
+
+Announce that this client is interested in all tag types. This is the default setting for new clients.
+
+=head1 Partition commands
+
+These commands allow a client to inspect and manage "partitions". A partition is one frontend of a multi-player MPD process: it has separate queue, player and outputs. A client is assigned to one partition at a time.
+
+=head2 partition
+
+    partition {NAME}
+
+Switch the client to a different partition.
+
+=head2 listpartitions
+
+    listpartitions
+
+Print a list of partitions. Each partition starts with a partition keyword and the partition's name, followed by information about the partition.
+
+=head2 newpartition
+
+    newpartition {NAME}
+
+Create a new partition.
+
+=head1 Audio Output Devices
+
+=head2 disableoutput
+
+    disableoutput {ID}
+
+Turns an output off.
+
+=head2 enableoutput
+
+    enableoutput {ID}
+
+Turns an output on.
+
+=head2 toggleoutput
+
+    toggleoutput {ID}
+
+Turns an output on or off, depending on the current state.
+
+=head2 outputs
+
+    outputs
+
+Shows information about all outputs.
+
+    outputid: 0
+    outputname: My ALSA Device
+    outputenabled: 0
+    OK
+
+Return information:
+
+=over 4
+
+=item * outputid: ID of the output. May change between executions
+
+=item * outputname: Name of the output. It can be any.
+
+=item * outputenabled: Status of the output. 0 if disabled, 1 if enabled.
+
+=back
+
+=head1 Reflection
+
+=head2 config
+
+    config
+
+Dumps configuration values that may be interesting for the client. This command is only permitted to "local" clients (connected via UNIX domain socket).
+
+The following response attributes are available:
+Name 	Description
+music_directory 	The absolute path of the music directory.
+
+=head2 commands
+
+    commands
+
+Shows which commands the current user has access to.
+
+=head2 notcommands
+
+    notcommands
+
+Shows which commands the current user does not have access to.
+
+=head2 urlhandlers
+
+    urlhandlers
+
+Gets a list of available URL handlers.
+
+=head2 decoders
+
+    decoders
+
+Print a list of decoder plugins, followed by their supported suffixes and MIME types. Example response:
+
+    plugin: mad
+    suffix: mp3
+    suffix: mp2
+    mime_type: audio/mpeg
+    plugin: mpcdec
+    suffix: mpc
+
+=head1 Client to Client
+
+=head2 subscribe
+
+    subscribe {NAME}
+
+Subscribe to a channel. The channel is created if it does not exist already. The name may consist of alphanumeric ASCII characters plus underscore, dash, dot and colon.
+
+=head2 unsubscribe
+
+    unsubscribe {NAME}
+
+Unsubscribe from a channel.
+
+=head2 channels
+
+    channels
+
+Obtain a list of all channels. The response is a list of "channel:" lines.
+
+=head2 readmessages
+
+    readmessages
+
+Reads messages for this client. The response is a list of "channel:" and "message:" lines.
+
+=head2 sendmessage
+
+    sendmessage {CHANNEL} {TEXT}
+
+Send a message to the specified channel.
+
+=cut

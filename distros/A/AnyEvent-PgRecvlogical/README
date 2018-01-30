@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution AnyEvent-PgRecvlogical,
-version 0.002:
+version 0.004:
 
   perl port of pg_recvlogical
 

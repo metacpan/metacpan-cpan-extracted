@@ -1,0 +1,12 @@
+eg/example.pl
+MANIFEST
+t/03rand.t
+t/99podcov.t
+t/98podsyn.t
+t/01basic.t
+lib/Algorithm/ConstructDFA2.pm
+README
+Changes
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

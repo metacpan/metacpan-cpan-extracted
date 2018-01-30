@@ -1,0 +1,195 @@
+NAME
+    App::WHMCSUtils - CLI utilities related to WHMCS
+
+VERSION
+    This document describes version 0.005 of App::WHMCSUtils (from Perl
+    distribution App-WHMCSUtils), released on 2018-01-29.
+
+FUNCTIONS
+  calc_deferred_revenue
+    Usage:
+
+     calc_deferred_revenue(%args) -> [status, msg, result, meta]
+
+    This utility collects invoice items from paid invoices, filters eligible
+    ones, then defers the revenue to separate months for items that should
+    be deferred, and finally sums the amounts to calculate total monthly
+    deferred revenues.
+
+    This utility can also be instructed (via setting the "full" option to
+    true) to output the full CSV report (each items with their
+    categorizations and deferred revenues).
+
+    Recognizes English and Indonesian description text.
+
+    Categorization heuristics:
+
+    *   Fund deposits are not recognized as revenues.
+
+    *   Hosting revenues are deferred, but when the description indicates
+        starting and ending dates and the dates are not too old.
+
+    *   Domain and addon revenues are not deferred, they are recognized
+        immediately.
+
+    *   Other items will be assumed as immediate revenues.
+
+    Extra rules (applied first) can be specified via the "extra_rules"
+    option.
+
+    To use this utility, install the Perl CPAN distribution App::WHMCSUtils.
+    Then, create a configuration file "~/whmcs-calc-deferred-revenue.conf"
+    containing something like:
+
+     db_name=YOURDBNAME
+     db_host=YOURDBHOST
+     db_user=YOURDBUSER
+     db_pass=YOURDBPASS
+
+    "db_host" defaults to "localhost". "db_user" and "db_pass" can be
+    omitted if you have "/etc/my.cnf" or "~/.my.cnf". This utility can
+    search for username/password from those files.
+
+    You can also add other configuration like "extra_rules", e.g.:
+
+     extra_rules=[{"type": "^$", "description": "^(?^i)sewa\\b.*ruang", "category": "rent"}]
+
+    You can then run the utility for the desired, e.g.:
+
+     % whmcs-calc-deferred-revenue --date-start 2013-01-01 --date-end 2017-10-31 \
+         --date-old-limit 2013-01-01 --full --output-file ~/output.csv
+
+    Wait for a while and check the output at "~/output.csv".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date_end => *date*
+
+        End at this date (based on invoice payment date).
+
+    *   date_old_limit => *date*
+
+        Set what date will be considered too old to recognize item as
+        revenue.
+
+        Default is 2008-01-01.
+
+    *   date_start => *date*
+
+        Start from this date (based on invoice payment date).
+
+    *   db_host => *str* (default: "localhost")
+
+    *   db_name* => *str*
+
+    *   db_pass => *str*
+
+    *   db_port => *net::port* (default: 3306)
+
+    *   db_user => *str*
+
+    *   extra_rules => *array[hash]*
+
+        Example (in JSON):
+
+         [
+             {
+                 "type": "^$",
+                 "description": "^SEWA",
+                 "category": "rent"
+             }
+         ]
+
+    *   full => *true*
+
+    *   output_file => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  restore_whmcs_client
+    Usage:
+
+     restore_whmcs_client(%args) -> [status, msg, result, meta]
+
+    Restore a missing client from SQL database backup.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   client_email => *str*
+
+    *   client_id => *posint*
+
+    *   restore_domains => *bool* (default: 1)
+
+    *   restore_hostings => *bool* (default: 1)
+
+    *   restore_invoices => *bool* (default: 1)
+
+    *   sql_backup_dir => *dirname*
+
+        Directory containing per-table SQL files.
+
+    *   sql_backup_file => *filename*
+
+        Can accept either ".sql" or ".sql.gz".
+
+        Will be converted first to a directory where the SQL file will be
+        extracted to separate files on a per-table basis.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-WHMCSUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-WHMCSUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHMCSUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

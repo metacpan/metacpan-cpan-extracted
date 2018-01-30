@@ -19,8 +19,13 @@ my $debug = 0;
 #=============================================================================
 my $lmconf = Lemonldap::NG::Common::Conf->new()
   or die $Lemonldap::NG::Common::Conf::msg;
-my $conf = $lmconf->getLocalConf(HANDLERSECTION)
+my $conf = $lmconf->getConf or die "Unable to get configuration ($!)";
+my $localconf = $lmconf->getLocalConf(HANDLERSECTION)
   or die "Unable to get local configuration ($!)";
+
+if ($localconf) {
+    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
+}
 
 print "Configuration loaded\n" if $debug;
 

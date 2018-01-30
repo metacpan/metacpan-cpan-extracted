@@ -26,9 +26,9 @@ do { my $x = {
                                       'Dist::Zilla::PluginBundle::RJBS' => '5.010',
                                       'Dist::Zilla::Role::PluginBundle::Easy' => '0',
                                       'Moose' => '0',
-                                      'Perl::PrereqScanner::Scanner::Jojo' => '0',
-                                      'Perl::PrereqScanner::Scanner::Mojo' => '0',
-                                      'Perl::PrereqScanner::Scanner::Zim' => '0'
+                                      'Perl::PrereqScanner::Scanner::Jojo' => 'v0.3.0',
+                                      'Perl::PrereqScanner::Scanner::Mojo' => 'v0.3.0',
+                                      'Perl::PrereqScanner::Scanner::Zim' => 'v0.2.0'
                                     }
                     },
        'test' => {

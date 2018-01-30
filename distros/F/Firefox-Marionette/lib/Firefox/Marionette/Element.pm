@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -59,6 +59,11 @@ sub attribute {
     return $self->browser()->attribute( $self, $name );
 }
 
+sub property {
+    my ( $self, $name ) = @_;
+    return $self->browser()->property( $self, $name );
+}
+
 sub css {
     my ( $self, $property_name ) = @_;
     return $self->browser()->css( $self, $property_name );
@@ -103,7 +108,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -168,7 +173,11 @@ switches to this frame within the current window.
 
 =head2 attribute 
 
-accepts a scalar name a parameter.  It returns the value of the attribute with the supplied name.
+accepts a scalar name a parameter.  It returns the initial value of the attribute with the supplied name. Compare with the current value returned by L<property|Firefox::Marionette::Element#property> method.
+
+=head2 property
+
+accepts a scalar name a parameter.  It returns the current value of the property with the supplied name. Compare with the initial value returned by L<attribute|Firefox::Marionette::Element#attribute> method.
 
 =head2 css
 

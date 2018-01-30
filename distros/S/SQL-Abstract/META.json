@@ -33,7 +33,13 @@
          }
       },
       "develop" : {
-         "requires" : {}
+         "requires" : {
+            "Pod::Coverage" : "0.19",
+            "Test::EOL" : "1.0",
+            "Test::NoTabs" : "0.9",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
       },
       "runtime" : {
          "requires" : {
@@ -44,7 +50,8 @@
             "Moo" : "2.000001",
             "Scalar::Util" : "0",
             "Sub::Quote" : "2.000001",
-            "Text::Balanced" : "2.00"
+            "Text::Balanced" : "2.00",
+            "perl" : "5.006"
          }
       },
       "test" : {
@@ -73,6 +80,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbix-class"
    },
-   "version" : "1.84",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "1.85",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

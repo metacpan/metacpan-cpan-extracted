@@ -35,11 +35,17 @@
       "runtime" : {
          "requires" : {
             "Calendar::Plugin::Renderer" : "0.12",
-            "Date::Julian::Simple" : "0.01",
+            "Date::Julian::Simple" : "0.05",
             "Moo" : "2.000000",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Calendar::Julian" : {
+         "file" : "lib/Calendar/Julian.pm",
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -50,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Julian"
       }
    },
-   "version" : "0.02",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

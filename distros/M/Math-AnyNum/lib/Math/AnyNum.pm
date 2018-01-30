@@ -13,7 +13,7 @@ use Math::MPC qw();
 
 use POSIX qw(ULONG_MAX LONG_MIN);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -379,18 +379,22 @@ use overload
     }
 
     sub unimport {
-        overload::remove_constant('binary', '', 'float', '', 'integer');
+        overload::remove_constant(
+                                  binary  => '',
+                                  float   => '',
+                                  integer => '',
+                                 );
     }
 }
 
-# Convert two real-number strings into an MPC object
+# Convert a given pair (real, imag) into an MPC object
 sub _reals2mpc {
     my ($re, $im) = @_;
 
     my $r = Math::MPC::Rmpc_init2($PREC);
 
-    $re = _str2obj($re);
-    $im = _str2obj($im);
+    $re = ref($re) ? _star2obj($re) : _str2obj($re);
+    $im = ref($im) ? _star2obj($im) : _str2obj($im);
 
     my $sig = join(' ', ref($re), ref($im));
 
@@ -420,6 +424,16 @@ sub _reals2mpc {
     }
     elsif ($sig eq q{Math::MPFR Math::GMPq}) {
         Math::MPC::Rmpc_set_fr_q($r, $re, $im, $ROUND);
+    }
+    elsif (ref($re) eq 'Math::MPC') {
+        Math::MPC::Rmpc_set($r, _any2mpc($im), $ROUND);
+        Math::MPC::Rmpc_mul_i($r, $r, 1, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, $re, $ROUND);
+    }
+    elsif (ref($im) eq 'Math::MPC') {
+        Math::MPC::Rmpc_set($r, $im, $ROUND);
+        Math::MPC::Rmpc_mul_i($r, $r, 1, $ROUND);
+        Math::MPC::Rmpc_add($r, $r, _any2mpc($re), $ROUND);
     }
     else {    # this should never happen
         $re = _any2mpfr($re);
@@ -885,6 +899,9 @@ sub _star2obj {
            or ref($x) eq 'Math::MPFR'
            or ref($x) eq 'Math::MPC') {
         $x;
+    }
+    elsif (ref($x) eq 'Math::GComplex') {
+        return _reals2mpc($x->reals);
     }
     else {
         (@_) = "$x";
@@ -1448,8 +1465,13 @@ sub float ($) {
 ## CONVERSION TO COMPLEX
 #
 
-sub complex ($) {
-    my ($x) = @_;
+sub complex ($;$) {
+    my ($x, $y) = @_;
+
+    if (defined $y) {
+        return bless \_reals2mpc($x, $y);
+    }
+
     bless \(
               ref($x) eq __PACKAGE__
             ? ref($$x) eq 'Math::MPC'
@@ -4259,58 +4281,46 @@ sub rat_approx ($) {
 
     Math::MPFR::Rmpfr_number_p($x) || goto &nan;
 
-    my $t = Math::MPFR::Rmpfr_init2($PREC);    # temporary variable
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
+    my $n1 = Math::GMPz::Rmpz_init_set_ui(0);
+    my $n2 = Math::GMPz::Rmpz_init_set_ui(1);
 
-    Math::MPFR::Rmpfr_set($r, $x, $ROUND);
-
-    my $num2cfrac = sub {
-        my ($callback, $n) = @_;
-
-        while (1) {
-            Math::MPFR::Rmpfr_floor($t, $r);
-
-            my $z = Math::GMPz::Rmpz_init();
-            Math::MPFR::Rmpfr_get_z($z, $t, Math::MPFR::MPFR_RNDZ);
-
-            $callback->($z) && return 1;
-
-            Math::MPFR::Rmpfr_sub($r, $r, $t, $ROUND);
-            Math::MPFR::Rmpfr_zero_p($r) && last;
-            Math::MPFR::Rmpfr_ui_div($r, 1, $r, $ROUND);
-        }
-    };
+    my $d1 = Math::GMPz::Rmpz_init_set_ui(1);
+    my $d2 = Math::GMPz::Rmpz_init_set_ui(0);
 
     my $q = Math::GMPq::Rmpq_init();
+    my $z = Math::GMPz::Rmpz_init();
 
-    my $cfrac2num = sub {
-        my (@f) = @_;
-
-        Math::GMPq::Rmpq_set_ui($q, 0, 1);
-
-        for (1 .. $#f) {
-            Math::GMPq::Rmpq_add_z($q, $q, CORE::pop(@f));
-            Math::GMPq::Rmpq_inv($q, $q);
-        }
-
-        Math::GMPq::Rmpq_add_z($q, $q, $f[0]);
-    };
-
-    my @cfrac;
     my $s = __stringify__($x);
-    my $u = Math::MPFR::Rmpfr_init2($PREC);    # temporary variable
 
-#<<<
-    $num2cfrac->(
-        sub {
-            my ($n) = @_;
-            CORE::push(@cfrac, $n);
-            $cfrac2num->(@cfrac);
-            Math::MPFR::Rmpfr_set_q($u, $q, $ROUND);
-            CORE::index(__stringify__($u), $s) == 0;
-        }, $x
-    );
-#>>>
+    my $f1 = Math::MPFR::Rmpfr_init2($PREC);
+    my $f2 = Math::MPFR::Rmpfr_init2($PREC);
+    my $f3 = Math::MPFR::Rmpfr_init2($PREC);
+
+    Math::MPFR::Rmpfr_set($f1, $x, $ROUND);
+
+    while (1) {
+        Math::MPFR::Rmpfr_round($f2, $f1);
+        Math::MPFR::Rmpfr_get_z($z, $f2, $ROUND);
+
+        Math::GMPz::Rmpz_addmul($n1, $n2, $z);    # n1 += n2 * z
+        Math::GMPz::Rmpz_addmul($d1, $d2, $z);    # d1 += d2 * z
+
+        ($n1, $n2) = ($n2, $n1);
+        ($d1, $d2) = ($d2, $d1);
+
+        # q = n2 / d2
+        Math::GMPq::Rmpq_set_num($q, $n2);
+        Math::GMPq::Rmpq_set_den($q, $d2);
+        Math::GMPq::Rmpq_canonicalize($q);
+
+        Math::MPFR::Rmpfr_set_q($f3, $q, $ROUND);
+        CORE::index(__stringify__($f3), $s) == 0 and last;
+
+        # f1 = 1 / (f1 - f2)
+        Math::MPFR::Rmpfr_sub($f1, $f1, $f2, $ROUND);
+        Math::MPFR::Rmpfr_zero_p($f1) && last;
+        Math::MPFR::Rmpfr_ui_div($f1, 1, $f1, $ROUND);
+    }
 
     bless \$q;
 }

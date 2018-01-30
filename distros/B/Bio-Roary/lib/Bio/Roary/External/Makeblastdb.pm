@@ -1,5 +1,5 @@
 package Bio::Roary::External::Makeblastdb;
-$Bio::Roary::External::Makeblastdb::VERSION = '3.11.3';
+$Bio::Roary::External::Makeblastdb::VERSION = '3.12.0';
 # ABSTRACT: Wrapper around NCBIs makeblastdb command
 
 
@@ -64,7 +64,7 @@ Bio::Roary::External::Makeblastdb - Wrapper around NCBIs makeblastdb command
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

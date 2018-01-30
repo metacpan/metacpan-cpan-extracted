@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the TF-IDF measure for ngram phrases
 
-our $VERSION = '0.0205';
+our $VERSION = '0.0206';
 
 use Moo;
 use strictures 2;
@@ -154,18 +154,17 @@ Text::TFIDF::Ngram - Compute the TF-IDF measure for ngram phrases
 
 =head1 VERSION
 
-version 0.0205
+version 0.0206
 
 =head1 SYNOPSIS
 
   use Text::TFIDF::Ngram;
   my $obj = Text::TFIDF::Ngram->new(
-    files     => [qw( foo.txt bar.txt )],
-    size      => 3,
-    stopwords => 1,
+    files => [qw( foo.txt bar.txt )],
+    size  => 3,
   );
   my $w = $obj->tf( 'foo.txt', 'foo bar baz' );
-  my $x = $obj->idf('foo');
+  my $x = $obj->idf('foo bar baz');
   my $y = $obj->tfidf( 'foo.txt', 'foo bar baz' );
   printf "TF: %.3f, IDF: %.3f, TFIDF: %.3f\n", $w, $x, $y;
   my $z = $obj->tfidf_by_file;
@@ -173,11 +172,10 @@ version 0.0205
 
 =head1 DESCRIPTION
 
-The TF-IDF ("term frequency-inverse document frequency") measure is used in
-information retrieval and text mining.  It is a statistical measure used to see
-how important a word is in a document or collection of documents.
+This module computes the TF-IDF ("term frequency-inverse document frequency")
+measure for a corpus of text documents.
 
-For a full example program, please see the F<eg/analyze> file in the
+For a working example program, please see the F<eg/analyze> file in the
 distribution.
 
 =head1 ATTRIBUTES

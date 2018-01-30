@@ -63,12 +63,11 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.302078",
     "Test::Pod" => "1.51",
     "Test::TCP" => "2.17",
-    "Test::Warnings" => "0.026",
     "diagnostics" => 0,
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -109,7 +108,6 @@ my %FallbackPrereqs = (
   "Test::More" => "1.302078",
   "Test::Pod" => "1.51",
   "Test::TCP" => "2.17",
-  "Test::Warnings" => "0.026",
   "Try::Tiny" => "0.28",
   "Type::Library" => 0,
   "Type::Params" => "1.000006",

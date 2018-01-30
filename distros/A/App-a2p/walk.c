@@ -72,8 +72,10 @@ walk(int useval, int level, int node, int *numericptr, int minprec)
 	if (namelist) {
 	    while (isALPHA(*namelist)) {
 		for (d = tokenbuf,s=namelist;
-		  isWORDCHAR(*s);
+		  d - tokenbuf < sizeof(tokenbuf) && isWORDCHAR(*s);
 		  *d++ = *s++) ;
+		if (d - tokenbuf == sizeof(tokenbuf))
+		    fatal("Internal error: argument longer than %d: %s", sizeof(tokenbuf) - 1, namelist);
 		*d = '\0';
 		while (*s && !isALPHA(*s)) s++;
 		namelist = s;

@@ -2,7 +2,7 @@ package CSS::DOM;
 
 use 5.008002;
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use   # to keep CPANTS happy :-)
    strict;
@@ -282,7 +282,7 @@ CSS::DOM - Document Object Model for Cascading Style Sheets
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 This is an alpha version. The API is still subject to change. Many features
 have not been implemented yet (but patches would be welcome :-).
@@ -343,7 +343,7 @@ property, 'kakariki' not being a recognised color value.
 
 It can
 blithely accept all property assignments as being valid. In the case of
-C<color: green; color kakariki>, 'kakariki' will be assigned, since it overrides the previous
+C<color: green; color: kakariki>, 'kakariki' will be assigned, since it overrides the previous
 assignment.
 
 =back
@@ -797,7 +797,7 @@ contributions.
 
 =head1 AUTHOR & COPYRIGHT
 
-Copyright (C) 2007-15 Father Chrysostomos <sprout [at] cpan
+Copyright (C) 2007-18 Father Chrysostomos <sprout [at] cpan
 [dot] org>
 
 This program is free software; you may redistribute it and/or modify

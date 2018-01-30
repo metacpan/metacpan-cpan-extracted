@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-#
 # Verify that all attributes owns a test
 
 use Test::More;

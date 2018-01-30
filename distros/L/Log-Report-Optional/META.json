@@ -4,9 +4,10 @@
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "perl_5",
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,5 +39,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.04"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-Log-Report-Optional.git",
+         "web" : "https://github.com/markov2/perl5-Log-Report-Optional"
+      }
+   },
+   "version" : "1.05",
+   "x_homepage" : "http://perl.overmeer.net/CPAN/",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

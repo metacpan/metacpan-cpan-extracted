@@ -5,7 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'WWW::YouTube::Info',
     VERSION_FROM      => 'lib/WWW/YouTube/Info.pm', # finds $VERSION
-    PREREQ_PM         => {LWP::Simple => 5.835}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+        LWP::Simple => 6.31,
+        LWP::Protocol::https => 6.07,
+    }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/WWW/YouTube/Info.pm', # retrieve abstract from module
        AUTHOR         => 'east') : ()),

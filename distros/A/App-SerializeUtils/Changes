@@ -1,3 +1,9 @@
+0.160   2018-01-29 (PERLANCAR)
+
+	- pp-json, pp-yaml: Observe COLOR environment variable to set
+	  default for color.
+
+
 0.15    2017-06-26 (PERLANCAR)
 
 	- [Bugfix] check-json: Fix typo in constructing JSON::MaybeXS

@@ -1,0 +1,115 @@
+#!perl
+
+our $DATE = '2018-01-29'; # DATE
+our $VERSION = '0.160'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my $color = -t STDOUT;
+my $method = 'eval';
+GetOptions(
+    'eval'   => sub { $method = 'eval' },
+    'undump' => sub { $method = 'undump' },
+    'color!' => \$color,
+    'help' => sub {
+        print "Usage: pp-dd <file>\n";
+        exit 0;
+    },
+);
+
+local $/ = undef;
+my $data;
+if ($method eq 'eval') {
+    $data = eval scalar <>;
+} else {
+    require Data::Undump;
+    $data = Data::Undump::undump(scalar <>);
+    if (!defined($data) && $@) { die }
+}
+
+if ($color) {
+    require Data::Dump::Color;
+    Data::Dump::Color::dd($data);
+} else {
+    require Data::Dump;
+    Data::Dump::dd($data);
+}
+
+1;
+# ABSTRACT: Pretty-print (and colorize) Perl data structure
+# PODNAME: pp-dd
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pp-dd - Pretty-print (and colorize) Perl data structure
+
+=head1 VERSION
+
+This document describes version 0.160 of pp-dd (from Perl distribution App-SerializeUtils), released on 2018-01-29.
+
+=head1 DESCRIPTION
+
+By default, when in interactive mode will load Perl data structure using eval()
+and dump+colorize it using L<Data::Dump::Color>, and when piped will
+dump data using L<Data::Dump>.
+
+=head1 OPTIONS
+
+=head2 --eval (default)
+
+Use eval() to load the Perl data structure.
+
+=head2 --undump
+
+Use L<Data::Undump> instead of eval() to load the Perl data structure. This is
+safer and faster, but more limited.
+
+=head2 --color, --no-color
+
+Force using color (Data::Dump::Color) or no color. The default is to check
+whether STDOUT is not piped (interactive mode) to enable color.
+
+=head1 ENVIRONMENT
+
+=head2 COLOR
+
+Boolean. Set default for color.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SerializeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

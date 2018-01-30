@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
         'XML::Simple'    => '2.22',
     },
     build_requires => {
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     share_dir => {
         dist => [

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::DBIxCustom;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Loader qw/load_class/;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 
 sub register {
@@ -10,7 +10,7 @@ sub register {
   $conf = {%{$conf},%{$app->config->{dbi_config}}} if($app->config->{dbi_config});
   my $dbi_class = delete $conf->{dbi_class} || 'DBIx::Custom';
   my $model_namespace = delete $conf->{model_namespace} if($conf->{model_namespace});
-  
+  my $cb = delete $conf->{cb} if($conf->{cb});
   my $dbi;
   my $e = load_class($dbi_class);
   if($e){
@@ -19,10 +19,13 @@ sub register {
   }elsif($dbi_class->isa("DBIx::Custom")){
     $dbi = $dbi_class->new($conf);
     $dbi->include_model($model_namespace) if($model_namespace);
-    $app->helper(dbi=>sub{$dbi->connect});
+    if($cb){
+      $cb->($dbi);
+    }
+    $app->helper(dbi=>sub{state $dbi_connected = $dbi->connect});
     $app->helper(model=>sub{
         my ($c,$model_name) = @_;
-        return $dbi->connect->model($model_name);
+        $c->dbi->model($model_name);
       }
     );
   }else{
@@ -37,10 +40,6 @@ sub register {
 =head1 NAME
 
 Mojolicious::Plugin::DBIxCustom - 链接DBIx::Custom到Mojolicious的插件
-
-=head1 VERSION
-
-Version 0.1.0
 
 
 =head1 SYNOPSIS

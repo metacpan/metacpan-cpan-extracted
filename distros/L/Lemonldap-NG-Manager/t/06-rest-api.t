@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-#
 # Test RSA key generation
 
 use Test::More;

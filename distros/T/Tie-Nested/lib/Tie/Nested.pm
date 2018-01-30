@@ -1,14 +1,18 @@
-# Copyrights 2010 by Mark Overmeer.
+# Copyrights 2010-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.06.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Tie::Nested.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Tie::Nested;
 use vars '$VERSION';
-$VERSION = '0.10';
+$VERSION = '0.11';
 
+
+use warnings;
+use strict;
 
 use Log::Report 'tie-nested', syntax => 'SHORT';
 use Data::Dumper;

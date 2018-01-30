@@ -1,0 +1,159 @@
+=pod
+
+=head1 NAME
+
+   Win32::GenRandom - XS wrappers of CryptGenRandom and RtlGenRandom.
+
+=head1 FUNCTIONS
+
+   @c = cgr($how_many, $size); # 1st arg is optional
+
+    Returns a list of $how_many strings - each string consisting of
+    $size random bytes.
+    Returns just one string if the $how_many is not specified - in which
+    case the function may be called either as:
+      $c = cgr($size);
+      or
+      @c = cgr($size);
+    This function uses CryptGenRandom to generate the random strings.
+
+   @c = rgr($how_many, $size); # 1st arg is optional
+
+    As for cgr() - but uses RtlGenRandom instead of CryptGenRandom
+    to generate the random strings.
+    (Not available on Windows 2000 and earlier - croaks if used on
+    such a system.)
+
+   @c = gr($how_many, $size); # $how_many is an optional arg.
+
+    As for cgr() and rgr() - but returns rgr(@_) if
+    $Win32::GenRandom::rtl_avail is true (ie if RtlGenRandom is
+    available); otherwise returns cgr(@_).
+
+   @c = cgr_uv($how_many); # $how_many is an optional arg.
+
+    Returns a list of $how_many Perl internal unsigned integer
+    values (UV). Whether the returned values are 32-bit or 64-bit
+    depends upon your perl configuration.
+    Returns just one UV if $how_many is not specified - in which
+    case the function may be called either as:
+      $c = cgr_uv();
+      or
+      @c = cgr_uv();
+    This function uses CryptGenRandom to generate the random UVs.
+
+   @c = rgr_uv($how_many); # $how_many is an optional arg.
+
+    As for cgr_uv() - but uses RtlGenRandom instead of CryptGenRandom
+    to generate the random UVs.
+    (Not available on Windows 2000 and earlier - croaks if used on
+    such a system.)
+
+   @c = gr_uv($how_many); # $how_many is an optional arg.
+
+    As for cgr_uv() and rgr_uv) - but returns rgr_uv() if
+    $Win32::GenRandom::rtl_avail is true (ie if RtlGenRandom is
+    available); otherwise returns cgr_uv(@_).
+
+   @c = cgr_32($how_many); # $how_many is an optional arg.
+
+    Returns a list of $how_many 32-bit unsigned integer values.
+    Returns just one integer if $how_many is not specified - in
+    which case the function may be called either as:
+      $c = cgr_32();
+      or
+      @c = cgr_32();
+    This function uses CryptGenRandom to generate the random UVs.
+
+   @c = rgr_32($how_many); # $how_many is an optional arg.
+
+    As for cgr_32() - but uses RtlGenRandom instead of CryptGenRandom
+    to generate the random 32-bit values.
+    (Not available on Windows 2000 and earlier - croaks if used on
+    such a system.)
+
+   @c = gr_32($how_many); # $how_many is an optional arg.
+
+    As for cgr_32() and rgr_32() - but returns rgr_32(@_) if
+    $Win32::GenRandom::rtl_avail is true (ie if RtlGenRandom is
+    available); otherwise returns cgr_32(@_).
+
+   @c = cgr_custom($how_many, $size, $container, $prov, $type, $flags);
+   @c = cgr_custom_uv($how_many, $container, $prov, $type, $flags);
+   @c = cgr_custom_32($how_many, $container, $prov, $type, $flags);
+
+    Again, $how_many is optional and, if absent, defaults to 1 - in
+    which case the returned value can be assigned to either a scalar
+    or an array.
+    These functions are the same as cgr(), cgr_uv() and cgr_32(), but
+    they allow the user to specify the args that CryptAcquireContextA
+    takes, instead of forcing the user to accept the defaults that
+    cgr(), cgr_uv() and cgr_32() provide.
+    $container is the key container name (string). Provide the empty
+    string if you don't want to specify a particular value.
+    $prov is the name (string) of the Cryptographic Service Provider to
+    be used. Specify the empty string if you don't want to specify a
+    particular CSP.
+    $type specifies the type of provider to acquire.
+    $flags is, as the name suggests, the flag value to be used.
+    For your convenience, the allowed Type and Flag constants provided
+    by wincrypt.h have been wrapped in perl subs of the same name - see
+    the CONSTANTS section below.
+    See the MSDN docs for CryptAcquireContext for more info.
+
+   $which = which_crypto();
+
+    Returns 'RtlGenRandom' if $Win32::GenRandom::rtl_avail is true;
+    otherwise returns 'CryptGenRandom'.
+    IOW it tells us which crypto functionality the "gr" functions will
+    use - and is just another way to access the value of
+    $Win32::GenRandom::rtl_avail (via subroutine call).
+
+   $zero_func = whw(); # Mnemonic for "What Have We ?"
+
+    The MSDN docs recommend zeroing the buffer that has received the
+    random bytes as soon as we no longer need it to hold those bytes.
+    We should use SecureZeroMemory() to do that but, although that
+    function is available on Microsoft and mingw64.sf compilers, it's
+    missing on at least some mingw.org compilers. Therefore, we fall
+    back to using ZeroMemory() if SecureZeroMemory() is unavailable.
+    Should neither be available, then the buffer simply doesn't get
+    zeroed.
+    This function returns the name of the function that is being used
+    to zero the buffer ("SecureZeroMemory" or "ZeroMemory"), or
+    returns "None" if neither function is available.
+    I suspect this zeroing is not relevant for (at least) most apps,
+    but it has minimal impact upon the time taken for rgr() to run.
+
+=head1 CONSTANTS
+
+    The following subroutines return the same value as that defined by
+    their name in wincrypt.h:
+     PROV_FORTEZZA
+     PROV_RSA_SCHANNEL
+     PROV_DSS_DH
+     PROV_SSL
+     PROV_RSA_SIG
+     PROV_DSS
+     PROV_MS_EXCHANGE
+     PROV_RSA_FULL
+     PROV_RSA_AES
+     PROV_DH_SCHANNEL
+     CRYPT_VERIFYCONTEXT
+     CRYPT_DELETEKEYSET
+     CRYPT_NEWKEYSET
+     CRYPT_MACHINE_KEYSET
+     CRYPT_DEFAULT_CONTAINER_OPTIONAL
+     CRYPT_SILENT
+
+=head1 LICENSE
+
+    This program is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+    Copyright 2014, 2018 Sisyphus
+
+=head1 AUTHOR
+
+    Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

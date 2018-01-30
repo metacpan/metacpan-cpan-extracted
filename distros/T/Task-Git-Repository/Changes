@@ -1,5 +1,8 @@
 Revision history for Task-Git-Repository
 
+1.003 2018-01-29 BOOK
+    - add Git::Repository::Plugin::Dirty
+
 1.002 2017-07-18 BOOK
     - add Git::Repository::Plugin::GitHooks
 

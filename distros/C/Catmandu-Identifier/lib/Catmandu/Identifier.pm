@@ -1,7 +1,7 @@
 package Catmandu::Identifier;
 
 use strict;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 1;
 __END__
@@ -10,7 +10,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Identifier - Namespace for handling/fixing identifier, e.g. ISBN, ISSN
+Catmandu::Identifier - Namespace fixing around identifiers (for normalization, validation, etc.), e.g. ISBN, ISSN
 
 =begin markdown
 
@@ -29,6 +29,8 @@ Catmandu::Identifier - Namespace for handling/fixing identifier, e.g. ISBN, ISSN
 =item * L<Catmandu::Fix::isbn10>
 
 =item * L<Catmandu::Fix::isbn13>
+
+=item * L<Catmandu::Fix::isbn_versions>
 
 =item * L<Catmandu::Fix::issn>
 
@@ -75,6 +77,8 @@ Vitali Peil
 Patrick Hochstenbach
 
 brian d foy
+
+Ere Maijala
 
 =head1 LICENSE
 

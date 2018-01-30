@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-#
 # Verify that languages translation cover all `trspan`
 
 use Test::More;

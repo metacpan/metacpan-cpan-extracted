@@ -9,3 +9,4 @@ requires 'Catmandu', '1.0504';
 requires 'JSON', '2.90';
 requires 'Moo', '2.002005';
 requires 'Plack', '1.0042';
+requires 'Plack::App::Catmandu::Bag';

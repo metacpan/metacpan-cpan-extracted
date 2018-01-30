@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Future::AsyncAwait',
    requires => {
       'Future' => 0,
-      'perl' => '5.018', # PL_keyword_plugin, SAVEt_CLEARPADRANGE, PADNAME, ...
+      'perl' => '5.016', # PL_keyword_plugin, pad_new(), CvDYNFILE, many tests fail on 5.14
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

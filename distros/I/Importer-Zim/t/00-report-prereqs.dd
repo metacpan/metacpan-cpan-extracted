@@ -21,7 +21,7 @@ do { my $x = {
                                         'Importer::Zim::EndOfScope' => 'v0.4.0'
                                       },
                       'requires' => {
-                                      'Importer::Zim::Base' => 'v0.12.0',
+                                      'Importer::Zim::Base' => 'v0.12.1',
                                       'Importer::Zim::Utils' => 'v0.8.0',
                                       'Module::Runtime' => '0',
                                       'perl' => '5.010001',

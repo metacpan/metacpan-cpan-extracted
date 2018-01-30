@@ -5,7 +5,7 @@ use parent 'Plack::Middleware';
 use Plack::Util::Accessor qw/callback psgix option action/;
 use Devel::TimeStats;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub prepare_app {
     my $self = shift;
@@ -45,8 +45,6 @@ sub call {
 
     $self->response_cb($res, sub {
         my $res = shift;
-
-        $env->{$self->psgix}->profile('end app');
 
         $env->{$self->psgix}->profile(
             end => $action,

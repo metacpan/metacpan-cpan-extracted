@@ -11,7 +11,8 @@ sub new {
     my $class = shift;
 
     my $self = {
-        _device => shift
+        _device => shift,
+        _udev   => shift
     };
 
     bless $self, $class;
@@ -22,136 +23,81 @@ sub new {
 
 
 sub get_udev {
-    my $self = shift;
-
-    return udev_device_get_udev($self->{_device});
+    return $_[0]->{_udev};
 }
-
 
 
 sub get_devpath {
-    my $self = shift;
-
-    return udev_device_get_devpath($self->{_device});
+    return udev_device_get_devpath($_[0]->{_device});
 }
-
 
 sub get_subsystem {
-    my $self = shift;
-
-    return udev_device_get_subsystem($self->{_device});
+    return udev_device_get_subsystem($_[0]->{_device});
 }
-
 
 sub get_devtype {
-    my $self = shift;
-
-    return udev_device_get_devtype($self->{_device});
+    return udev_device_get_devtype($_[0]->{_device});
 }
-
 
 sub get_syspath {
-    my $self = shift;
-
-    return udev_device_get_syspath($self->{_device});
+    return udev_device_get_syspath($_[0]->{_device});
 }
-
 
 sub get_sysname {
-    my $self = shift;
-
-    return udev_device_get_sysname($self->{_device});
+    return udev_device_get_sysname($_[0]->{_device});
 }
-
 
 sub get_sysnum {
-    my $self = shift;
-
-    return udev_device_get_sysnum($self->{_device});
+    return udev_device_get_sysnum($_[0]->{_device});
 }
-
 
 sub get_devnode {
-    my $self = shift;
-
-    return udev_device_get_devnode($self->{_device});
+    return udev_device_get_devnode($_[0]->{_device});
 }
-
 
 sub get_is_initialized {
-    my $self = shift;
-
-    return udev_device_get_is_initialized($self->{_device});
+    return udev_device_get_is_initialized($_[0]->{_device});
 }
-
 
 sub get_property_value {
-    my $self = shift;
-    my $key = shift;
-
-    return udev_device_get_property_value($self->{_device}, $key);
+    # self, key
+    return udev_device_get_property_value($_[0]->{_device}, $_[1]);
 }
-
 
 sub get_driver {
-    my $self = shift;
-
-    return udev_device_get_driver($self->{_device});
+    return udev_device_get_driver($_[0]->{_device});
 }
-
 
 sub get_devnum {
-    my $self = shift;
-
-    return udev_device_get_devnum($self->{_device});
+    return udev_device_get_devnum($_[0]->{_device});
 }
-
 
 sub get_action {
-    my $self = shift;
-
-    return udev_device_get_action($self->{_device});
+    return udev_device_get_action($_[0]->{_device});
 }
-
 
 sub get_seqnum {
-    my $self = shift;
-
-    return udev_device_get_seqnum($self->{_device});
+    return udev_device_get_seqnum($_[0]->{_device});
 }
-
 
 sub get_usec_since_initialized {
-    my $self = shift;
-
-    return udev_device_get_usec_since_initialized($self->{_device});
+    return udev_device_get_usec_since_initialized($_[0]->{_device});
 }
-
 
 sub get_sysattr_value {
-    my $self = shift;
-    my $sysattr = shift;
-
-    return udev_device_get_sysattr_value($self->{_device}, $sysattr);
+    # self, sysattr
+    return udev_device_get_sysattr_value($_[0]->{_device}, $_[1]);
 }
-
 
 sub set_sysattr_value {
-    my $self = shift;
-    my $sysattr = shift;
-    my $value = shift;
-
-    return udev_device_set_sysattr_value($self->{_device}, $sysattr, $value);
+    # self, sysattr, value
+    return udev_device_set_sysattr_value($_[0]->{_device}, $_[1], $_[2]);
 }
-
 
 sub has_tag {
-    my $self = shift;
-    my $tag = shift;
-
-    return udev_device_has_tag($self->{_device}, $tag);
+    # self, tag
+    return udev_device_has_tag($_[0]->{_device}, $_[1]);
 }
-
 
 
 sub get_parent {
@@ -161,7 +107,7 @@ sub get_parent {
     if(defined($device)) {
         udev_device_ref($device);
 
-        return Udev::FFI::Device->new( $device );
+        return Udev::FFI::Device->new($device, $self->{_udev});
     }
 
     return undef;
@@ -177,49 +123,116 @@ sub get_parent_with_subsystem_devtype {
     if(defined($device)) {
         udev_device_ref($device);
 
-        return Udev::FFI::Device->new( $device );
+        return Udev::FFI::Device->new($device, $self->{_udev});
     }
 
     return undef;
 }
 
 
-
 sub get_devlinks_list_entries {
-    my $self = shift;
-
-    return get_entries( udev_device_get_devlinks_list_entry( $self->{_device} ) );
+    return get_entries( udev_device_get_devlinks_list_entry( $_[0]->{_device} ) );
 }
-
 
 sub get_properties_list_entries {
-    my $self = shift;
-
-    return get_entries( udev_device_get_properties_list_entry( $self->{_device} ) );
+    return get_entries( udev_device_get_properties_list_entry( $_[0]->{_device} ) );
 }
-
 
 sub get_tags_list_entries {
-    my $self = shift;
-
-    return get_entries( udev_device_get_tags_list_entry( $self->{_device} ) );
+    return get_entries( udev_device_get_tags_list_entry( $_[0]->{_device} ) );
 }
 
-
 sub get_sysattr_list_entries {
-    my $self = shift;
-
-    return get_entries( udev_device_get_sysattr_list_entry( $self->{_device} ) );
+    return get_entries( udev_device_get_sysattr_list_entry( $_[0]->{_device} ) );
 }
 
 
 
 sub DESTROY {
-    my $self = shift;
-
-    udev_device_unref( $self->{_device} );
+    udev_device_unref( $_[0]->{_device} );
 }
 
 
 
 1;
+
+
+
+__END__
+
+
+
+=head1 NAME
+
+Udev::FFI::Device
+
+=head1 SYNOPSIS
+
+    use Udev::FFI;
+    
+    my $udev = Udev::FFI->new() or
+        die "Can't create Udev::FFI object: $@";
+    
+    my $device = $udev->new_device_from_subsystem_sysname('block', 'sda1');
+    if(defined($device)) {
+        print "SYSPATH: ".$device->get_syspath()."\n";
+
+        if(my $fs = $device->get_property_value('ID_FS_TYPE')) {
+            print "FS: $fs\n";
+        }
+        if(my $uuid = $device->get_property_value('ID_FS_UUID')) {
+            print "UUID: $uuid\n";
+        }
+    }
+
+=head1 METHODS
+
+=head2 get_devpath ()
+
+=head2 get_subsystem ()
+
+=head2 get_devtype ()
+
+=head2 get_syspath ()
+
+=head2 get_sysname ()
+
+=head2 get_sysnum ()
+
+=head2 get_devnode ()
+
+=head2 get_is_initialized ()
+
+=head2 get_property_value ( KEY )
+
+=head2 get_driver ()
+
+=head2 get_devnum ()
+
+=head2 get_action ()
+
+=head2 get_seqnum ()
+
+=head2 get_usec_since_initialized ()
+
+=head2 get_sysattr_value ( SYSATTR )
+
+=head2 set_sysattr_value ( SYSATTR, VALUE )
+
+=head2 has_tag ( TAG )
+
+=head2 get_parent ()
+
+=head2 get_parent_with_subsystem_devtype ( SUBSYSTEM [, DEVTYPE] )
+
+=head2 get_devlinks_list_entries ()
+
+=head2 get_properties_list_entries ()
+
+=head2 get_tags_list_entries ()
+
+=head2 get_sysattr_list_entries ()
+
+=head2 get_udev ()
+
+=cut

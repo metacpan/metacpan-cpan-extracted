@@ -3,10 +3,10 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README
-README.md
 dist.ini
 lib/Importer/Zim.pm
 lib/Importer/Zim/Cookbook.pod

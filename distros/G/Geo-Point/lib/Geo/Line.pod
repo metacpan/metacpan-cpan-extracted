@@ -46,7 +46,7 @@ Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
  
 =over 4
 
-=item Geo::Line-E<gt>B<bboxFromString>($string, [$projection])
+=item Geo::Line-E<gt>B<bboxFromString>( $string, [$projection] )
 
 Create a square from the $string.  The coordinates can be separated by
 a comma (preferrably), or blanks.  When the coordinates end on NSEW, the
@@ -88,9 +88,9 @@ construct a line, which will probably not have the same begin and end
 point.  The $points are passed as L<new(points)|Geo::Line/"Constructors">, and the other %options
 are passed to L<new()|Geo::Line/"Constructors"> as well.
 
-=item $obj-E<gt>B<new>([%options])
+=item $obj-E<gt>B<new>( [%options] )
 
-=item Geo::Line-E<gt>B<new>([%options])
+=item Geo::Line-E<gt>B<new>( [%options] )
 
 When called as instance method, the projection, ring, and filled attributes
 are taken from the initiator, like a clone with modification.
@@ -105,7 +105,7 @@ are taken from the initiator, like a clone with modification.
 
 =over 2
 
-=item bbox => ARRAY
+=item bbox => [$xmin,$ymin, $xmax,$ymax]
 
 =item clockwise => BOOLEAN
 
@@ -147,7 +147,7 @@ The first and last point will be made the same: if not yet, than a reference
 to the first point is appended to the list.  A "ring" does not cover the
 internal.
 
-=item Geo::Line-E<gt>B<ringFromString>($string, [$projection])
+=item Geo::Line-E<gt>B<ringFromString>( $string, [$projection] )
 
 Calls L<bboxFromString()|Geo::Line/"Constructors"> and then produces a ring object from than.
 Don't forget the C<eval> when you call this method.
@@ -162,7 +162,7 @@ Extends L<"Attributes" in Geo::Shape|Geo::Shape/"Attributes">.
  
 =over 4
 
-=item $obj-E<gt>B<geopoint>($index, [$index, ..])
+=item $obj-E<gt>B<geopoint>( $index, [$index, ..] )
 
 Returns the L<Geo::Point|Geo::Point> for the point with the specified $index or
 indices.
@@ -195,11 +195,11 @@ Inherited, see L<Math::Polygon/"Attributes">
 
 Inherited, see L<Math::Polygon/"Attributes">
 
-=item $obj-E<gt>B<point>($index, [$index,...])
+=item $obj-E<gt>B<point>( $index, [$index,...] )
 
 Inherited, see L<Math::Polygon/"Attributes">
 
-=item $obj-E<gt>B<points>()
+=item $obj-E<gt>B<points>( [FORMAT] )
 
 Inherited, see L<Math::Polygon/"Attributes">
 
@@ -219,7 +219,7 @@ Extends L<"Projections" in Geo::Shape|Geo::Shape/"Projections">.
  
 =over 4
 
-=item $obj-E<gt>B<in>(<$label|'utm'>)
+=item $obj-E<gt>B<in>( <$label|'utm'> )
 
 Inherited, see L<Geo::Shape/"Projections">
 
@@ -251,9 +251,9 @@ open line pieces.
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item $obj-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
-=item Geo::Line-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item Geo::Line-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
@@ -265,7 +265,7 @@ Inherited, see L<Math::Polygon/"Geometry">
 
 Inherited, see L<Math::Polygon/"Geometry">
 
-=item $obj-E<gt>B<clip>(<$xmin,$xmax,$ymin,$ymax>|$object)
+=item $obj-E<gt>B<clip>( <$xmin,$xmax,$ymin,$ymax>|$object )
 
 Clip the shape to the bounding box of $object, or the boxing parameters
 specified.  A list of L<Geo::Line|Geo::Line> objects is returned if anything is
@@ -287,11 +287,15 @@ Inherited, see L<Math::Polygon/"Geometry">
 
 Inherited, see L<Math::Polygon/"Geometry">
 
-=item $obj-E<gt>B<distance>($object, [$unit])
+=item $obj-E<gt>B<distance>($point)
+
+Inherited, see L<Math::Polygon/"Geometry">
+
+=item $obj-E<gt>B<distance>( $object, [$unit] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<equal>(<$other | ARRAY,[$tolerance]> | $points)
+=item $obj-E<gt>B<equal>( <$other | \@points,[$tolerance]> | $points )
 
 Inherited, see L<Math::Polygon/"Geometry">
 
@@ -313,7 +317,7 @@ The length of the line, only useful in a orthogonal coordinate system
 The length of the line on the ring.  A check is performed that the ring
 is closed, but further this returns the result of L<length()|Geo::Line/"Geometry">
 
-=item $obj-E<gt>B<same>(<$other | ARRAY,[$tolerance]> | $points)
+=item $obj-E<gt>B<same>( <$other_polygon | \@points, [$tolerance]> | @points )
 
 Inherited, see L<Math::Polygon/"Geometry">
 
@@ -397,11 +401,11 @@ Inherited, see L<Geo::Shape/"Display">
 
 Inherited, see L<Geo::Shape/"Display">
 
-=item $obj-E<gt>B<string>()
+=item $obj-E<gt>B<string>( [FORMAT] )
 
 Inherited, see L<Math::Polygon/"Display">
 
-=item $obj-E<gt>B<toString>([$projection])
+=item $obj-E<gt>B<toString>( [$projection] )
 
 Returns a string representation of the line, which is also used for
 stringification.  The old method named C<string> is deprecated.
@@ -446,27 +450,14 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.96,
-built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>,
-L</Math::Polygon>,
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Format::Envisat>, and
-L</Geo::Format::Landsat>.
-
-Please post questions or ideas to the mailinglist at
-F<http://geo-perl@list.hut.fi>
+This module is part of Geo-Point distribution version 0.97,
+built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

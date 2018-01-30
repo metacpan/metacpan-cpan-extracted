@@ -3,9 +3,7 @@ use warnings;
 package WebService::Yamli;
 
 # ABSTRACT: Perl wrapper for Yamli's Arabic translation service
-our $VERSION = '0.003'; # VERSION
-
-use v5.14;
+our $VERSION = '0.004'; # VERSION
 
 use Carp;
 use LWP::UserAgent;
@@ -42,7 +40,11 @@ This Module is an interface to L<Yamli.com>'s API.
 
 =head1 IMPLEMENTATION
 
-It seems there's no way to feed the Yamli API more than one word, so currently each word results in a HTTP request. 
+It seems there's no way to feed the Yamli API more than one word, so currently each word results in a HTTP request. Define $WebService::Yamli::HTTPS if HTTPS should be used instead.
+
+=cut
+
+our $HTTPS = 0;
 
 =head1 METHODS AND ARGUMENTS
 
@@ -56,21 +58,23 @@ Transliterates argument. Returns transliterated string, except if input is a sin
 
 sub tr {
     my @words = split ' ', shift;
+    my $s = $HTTPS ? 's' : '';
 
     my ($favorite, @candidates);
     for my $word (@words) {
-        my $url = URI->new('http://api.yamli.com/transliterate.ashx');
+        my $url = URI->new("http$s://api.yamli.com/transliterate.ashx");
         $url->query_form(
             word => $word,
-            account_id => '000000',
-            prot => 'http:',
+            account_id => '000006',
+            tool => 'api',
+            prot => "http$s:",
             hostname => 'metacpan.org',
             path => '/pod/WebService::Yamli',
-            build => '5447'
+            build => '5515'
         );
 
         my $ua = LWP::UserAgent->new;
-        { no strict 'vars'; $ua->agent(__PACKAGE__ . "/$VERSION"); }
+        $ua->agent(__PACKAGE__ . "/" . $WebService::Yamli::VERSION);
 
         my $response = $ua->get($url);
         croak "Error: ", $response->status_line unless $response->is_success;

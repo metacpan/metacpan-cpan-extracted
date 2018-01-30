@@ -30,15 +30,15 @@ Extends L<"Constructors" in Mail::Field|Mail::Field/"Constructors">.
  
 =over 4
 
-=item Mail::Field::Date-E<gt>B<combine>(FIELDS)
+=item Mail::Field::Date-E<gt>B<combine>($fields)
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::Date-E<gt>B<extract>( TAG, HEAD [, INDEX ] )
+=item Mail::Field::Date-E<gt>B<extract>( $tag, $head [, $index ] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::Date-E<gt>B<new>( TAG [, STRING | OPTIONS] )
+=item Mail::Field::Date-E<gt>B<new>( $tag [, STRING | %options] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
@@ -50,7 +50,7 @@ Extends L<""Fake" constructors" in Mail::Field|Mail::Field/""Fake" constructors"
  
 =over 4
 
-=item $obj-E<gt>B<create>(OPTIONS)
+=item $obj-E<gt>B<create>(%options)
 
 Inherited, see L<Mail::Field/""Fake" constructors">
 
@@ -66,7 +66,7 @@ Extends L<"Accessors" in Mail::Field|Mail::Field/"Accessors">.
  
 =over 4
 
-=item $obj-E<gt>B<set>(OPTIONS)
+=item $obj-E<gt>B<set>(%options)
 
  -Option --Default
   Time     undef
@@ -104,9 +104,9 @@ Extends L<"Smart accessors" in Mail::Field|Mail::Field/"Smart accessors">.
 
 Inherited, see L<Mail::Field/"Smart accessors">
 
-=item $obj-E<gt>B<time>( [TIME] )
+=item $obj-E<gt>B<time>( [$time] )
 
-Query (or change) the TIME (as stored in the field) in seconds.
+Query (or change) the $time (as stored in the field) in seconds.
 
 =back
 

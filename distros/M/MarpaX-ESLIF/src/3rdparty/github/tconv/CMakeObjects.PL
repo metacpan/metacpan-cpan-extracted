@@ -18,8 +18,6 @@ use IO::Handle;
 
 autoflush STDOUT 1;
 
-our $DATA = do { local $/; <DATA>; };
-
 # ------------------------------------------------------------
 # Generation of objects using perl setup, for use in perl's XS
 # ------------------------------------------------------------
@@ -36,7 +34,7 @@ make_path(dirname($config_h));
 my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
 $ac->define_var('TCONV_NTRACE', 1);
 $ac->check;
-write_config($version, $config_h_in, $config_h);
+write_tconv_config($version, $config_h_in, $config_h);
 
 # -------------
 # Fake export.h
@@ -50,80 +48,160 @@ close($fh) || warn "Cannot close $export_h, $!";
 
 my @additional_includes = ();
 my @additional_srcdir = ();
+my $extra_compiler_flags = '';
+
+# -----------------------------------------------------
+# We depend on libiconv that is in the form of a tar.gz
+# -----------------------------------------------------
+{
+    my $tar=Archive::Tar->new();
+    my $libiconv_tar = File::Spec->catfile('3rdparty', 'tar', 'libiconv-1.15.tar.gz');
+    $tar->read($libiconv_tar);
+    print "... Extracting $libiconv_tar in 3rdparty/output\n";
+    make_path(File::Spec->catdir('3rdparty', 'output'));
+    {
+        local $CWD = File::Spec->catdir('3rdparty', 'output');
+        $tar->extract();
+    }
+    undef $tar;
+    #
+    # We take care to rename config.h to iconv_config.h everwhere in libiconv
+    #
+    find(
+        {
+            no_chdir => 1,
+            wanted => sub {
+                my $file = File::Spec->canonpath($_);
+                if (-f $file && ($file =~ /\.c$/ || $file =~ /\.h$/)) {
+                    open(my $in, '<', $file) || die "Failed to open $file, $!";
+                    my $content = do { local $/; <$in>; };
+                    close($in) || warn "Failed to close $file, $!";
+                    my $orig = $content;
+                    $content =~ s/"config\.h"/"iconv_config.h"/g;
+                    $content =~ s/<config\.h>/<iconv_config.h>/g;
+                    if ($orig ne $content) {
+                        open(my $out, '>', $file) || die "Failed to open $file, $!";
+                        print $out $content;
+                        close($out) || warn "Failed to close $file, $!";
+                        print STDERR "... Replaced config.h by iconv_config.h in $file\n";
+                    }
+                }
+            },
+        },
+        File::Spec->catdir('3rdparty', 'output', 'libiconv-1.15'));
+
+    my $config_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv_config.h');
+    print "... Generate file $config_h\n";
+    open(my $fd, '>', $config_h) || die "Failed to open $config_h, $!";
+    print $fd "
+/* Generated file */
+/* localcharset.c will play itself with WIN32_LEAN_AND_MEAN... */
+#undef WIN32_LEAN_AND_MEAN
+\n";
+    close($fd) || warn "Failed to close $config_h, $!";
+
+    my $iconv_h_in = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv.h.in');
+    my $iconv_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include', 'iconv.h');
+    print "... Generate file $iconv_h\n";
+    write_iconv_h($iconv_h_in, $iconv_h);
+
+    my $localcharset_h_in = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include', 'localcharset.h.in');
+    my $localcharset_h = File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include', 'localcharset.h');
+    print "... Generate file $localcharset_h\n";
+    write_localcharset_h($localcharset_h_in, $localcharset_h);
+
+    print "... Checking for nl_langinfo(CODESET)\n";
+    $extra_compiler_flags .= " -DHAVE_LANGINFO_CODESET" if get_have_langinfo_codeset();
+
+    my $have_decl_getc_unlocked;
+    $ac->check_func('getc_unlocked', {    # and not check_decl
+        action_on_false => sub { $have_decl_getc_unlocked = 0 },
+        action_on_true  => sub { $have_decl_getc_unlocked = 1 } } );
+    $extra_compiler_flags .= " -DHAVE_DECL_GETC_UNLOCK" if $have_decl_getc_unlocked;
+
+    print "... Checking for endianness\n";
+    $extra_compiler_flags .= " -DWORDS_LITTLEENDIAN" unless get_is_big_endian();
+
+    $extra_compiler_flags .= " -DICONV_CONST=";
+    $extra_compiler_flags .= " -DLIBDIR=\\\"\\\"";
+    $extra_compiler_flags .= " -DHAVE_WORKING_O_NOFOLLOW=0";
+    $extra_compiler_flags .= " -DENABLE_EXTRA";
+    
+
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'lib', 'localcharset.c'));
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'lib', 'relocatable.c'));
+    push(@additional_srcdir, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'lib', 'iconv.c'));
+
+    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'include'));
+    push(@additional_includes, File::Spec->catfile('3rdparty', 'output', 'libiconv-1.15', 'libcharset', 'include'));
+}
 
 # -----------------------------------------------------
 # We depend on cchardet that is in the form of a tar.gz
 # -----------------------------------------------------
-my $tar=Archive::Tar->new();
-my $cchardet_tar = File::Spec->catfile('3rdparty', 'tar', 'cchardet-1.0.0.tar.gz');
-$tar->read($cchardet_tar);
-print "... Extracting $cchardet_tar in 3rdparty/output\n";
-make_path(File::Spec->catdir('3rdparty', 'output'));
 {
-    local $CWD = File::Spec->catdir('3rdparty', 'output');
-    $tar->extract();
+    my $tar=Archive::Tar->new();
+    my $cchardet_tar = File::Spec->catfile('3rdparty', 'tar', 'cchardet-1.0.0.tar.gz');
+    $tar->read($cchardet_tar);
+    print "... Extracting $cchardet_tar in 3rdparty/output\n";
+    make_path(File::Spec->catdir('3rdparty', 'output'));
+    {
+        local $CWD = File::Spec->catdir('3rdparty', 'output');
+        $tar->extract();
+    }
+    undef $tar;
+    #
+    # nspr-emu mess, we fix it by generating ourself what is needed
+    #
+    my $libcharsetdetect = File::Spec->catdir('3rdparty', 'output', 'cchardet-1.0.0', 'src', 'ext', 'libcharsetdetect');
+    my $nspremu = File::Spec->catdir($libcharsetdetect, 'nspr-emu');
+    print "... Suppress directory $nspremu\n";
+    remove_tree($nspremu);
+    print "... Generate directory $nspremu\n";
+    make_path($nspremu);
+    #
+    # nsDebug.h.in have no dependency on cmake discoveries
+    #
+    my $nsDebug = File::Spec->catfile($nspremu, 'nsDebug.h');
+    print "... Generate file $nsDebug\n";
+    copy(File::Spec->catfile('include', 'nsDebug.h.in'), $nsDebug);
+    #
+    # prmem.h.in have no dependency on cmake discoveries
+    #
+    my $prmem = File::Spec->catfile($nspremu, 'prmem.h');
+    print "... Generate file $prmem\n";
+    copy(File::Spec->catfile('include', 'prmem.h.in'), $prmem);
+    #
+    # nscore.h.in depend on some type sizes
+    #
+    my $nscore = File::Spec->catfile($libcharsetdetect, 'nscore.h');
+    print "... Suppress file $nscore\n";
+    unlink($nscore);
+    print "... Generate file $nscore\n";
+    write_nscore(File::Spec->catfile('include', 'nscore.h.in'), $nscore);
+
+    push(@additional_srcdir, File::Spec->catdir('3rdparty', 'output', 'cchardet-1.0.0', 'src', 'ext', 'libcharsetdetect', 'mozilla', 'extensions', 'universalchardet', 'src', 'base'));
+    push(@additional_srcdir, File::Spec->catfile($libcharsetdetect, 'charsetdetect.cpp'));
+    push(@additional_includes, File::Spec->catdir($libcharsetdetect, 'mozilla', 'extensions', 'universalchardet', 'src', 'base'));
+    push(@additional_includes, File::Spec->catdir($libcharsetdetect, 'nspr-emu'));
+    push(@additional_includes, $libcharsetdetect);
 }
-undef $tar;
-#
-# nspr-emu mess, we fix it by generating ourself what is needed
-#
-my $libcharsetdetect = File::Spec->catdir('3rdparty', 'output', 'cchardet-1.0.0', 'src', 'ext', 'libcharsetdetect');
-my $nspremu = File::Spec->catdir($libcharsetdetect, 'nspr-emu');
-print "... Suppress directory $nspremu\n";
-remove_tree($nspremu);
-print "... Generate directory $nspremu\n";
-make_path($nspremu);
-#
-# nsDebug.h.in have no dependency on cmake discoveries
-#
-my $nsDebug = File::Spec->catfile($nspremu, 'nsDebug.h');
-print "... Generate file $nsDebug\n";
-copy(File::Spec->catfile('include', 'nsDebug.h.in'), $nsDebug);
-#
-# prmem.h.in have no dependency on cmake discoveries
-#
-my $prmem = File::Spec->catfile($nspremu, 'prmem.h');
-print "... Generate file $prmem\n";
-copy(File::Spec->catfile('include', 'prmem.h.in'), $prmem);
-#
-# nscore.h.in depend on some type sizes
-#
-my $nscore = File::Spec->catfile($libcharsetdetect, 'nscore.h');
-print "... Suppress file $nscore\n";
-unlink($nscore);
-print "... Generate file $nscore\n";
-write_nscore(File::Spec->catfile('include', 'nscore.h.in'), $nscore);
 
-push(@additional_srcdir, File::Spec->catdir('3rdparty', 'output', 'cchardet-1.0.0', 'src', 'ext', 'libcharsetdetect', 'mozilla', 'extensions', 'universalchardet', 'src', 'base'));
-push(@additional_srcdir, File::Spec->catfile($libcharsetdetect, 'charsetdetect.cpp'));
-push(@additional_includes, File::Spec->catdir($libcharsetdetect, 'mozilla', 'extensions', 'universalchardet', 'src', 'base'));
-push(@additional_includes, File::Spec->catdir($libcharsetdetect, 'nspr-emu'));
-push(@additional_includes, $libcharsetdetect);
-
-my $extra_compiler_flags = '';
-# ------------------------------------------------
-# On Windows, we will use dlfcn-win32 and winiconv
-# ------------------------------------------------
+# -----------------------------------
+# On Windows, we will use dlfcn-win32
+# -----------------------------------
 my @additional = ();
-my $winiconv = 0;
 if (is_os_type('Windows')) {
     push(@additional, 'dlfcn-win32');
-    push(@additional, 'winiconv');
     #
     # This depend on psapi, and perl's cflags always include that by default
     #
     push(@additional_srcdir, File::Spec->catdir('output', '3rdparty', 'dlfcn-win32', 'dlfcn.c'));
-    push(@additional_srcdir, File::Spec->catdir('output', '3rdparty', 'winiconv', 'win_iconv.c'));
     #
     # Well, dlfcn.h is at dlfcn-win32 level
     #
     push(@additional_includes, File::Spec->catdir('output', '3rdparty', 'dlfcn-win32'));
     #
-    # And we want to make sure we will get the iconv.h from winiconv, not the one from the system
-    #
-    push(@additional_includes, File::Spec->catdir('output', '3rdparty', 'winiconv'));
-    $extra_compiler_flags = "-DICONV_SECOND_ARGUMENT_IS_CONST";
-    $winiconv = 1;
 }
 
 # --------------------------------------------------------------------------------
@@ -161,71 +239,6 @@ foreach (qw/genericLogger/, @additional) {
     push(@additional_includes, $inc) if (-d $inc);
 }
 
-# ------------------------------------------------
-# Everything is in place: check iconv capabilities
-# ------------------------------------------------
-my $twobytes_ok = "\"!!\"";
-my $twobytes_ko = "\"\\xa0\\xa1\"";
-
-$ac->define_var('TCONV_HAVE_ICONV', 1);
-
-print "\n";
-print "..........................................................\n";
-print " Checking iconv location\n";
-print "..........................................................\n";
-print "\n";
-
-my $extra_linker_flags = '';
-if (! is_os_type('Windows')) {
-    foreach my $this_lib ('', 'iconv', 'iconv-2') {
-	$ac->msg_checking(sprintf "iconv is in %s library", $this_lib || 'standard');
-	my $conftest = $ac->lang_build_program("#include <stdlib.h>\n#include <iconv.h>", "{iconv_t cd; iconv(cd, NULL, NULL, NULL, NULL);}");
-	$ac->push_libraries($this_lib) if $this_lib;
-	if ($ac->link_if_else($conftest)) {
-	    $ac->msg_result('yes');
-	    $extra_linker_flags = "-l${this_lib}" if $this_lib;
-	    last;
-	} else {
-	    $ac->msg_result('no');
-	}
-    }
-}
-
-print "\n";
-print "..........................................................\n";
-print " Checking iconv capability - please ignore the next lines \n";
-print "..........................................................\n";
-print "\n";
-
-my $iconv_can_translit = get_iconv_capability("ASCII//TRANSLIT", "UTF-8", $twobytes_ok, $winiconv, $extra_compiler_flags, $extra_linker_flags, @additional_includes);
-my $iconv_can_ignore   = get_iconv_capability("ASCII//IGNORE",   "UTF-8", $twobytes_ok, $winiconv, $extra_compiler_flags, $extra_linker_flags, @additional_includes);
-
-print "\n";
-print " The iconv we are using triggered the following settings:\n";
-print "\n";
-
-$ac->msg_checking('ICONV_CAN_TRANSLIT');
-if ($iconv_can_translit) {
-  $ac->define_var('ICONV_CAN_TRANSLIT', 1);
-  $ac->msg_result('yes');
-} else {
-  $ac->msg_result('no');
-}
-
-$ac->msg_checking('ICONV_CAN_IGNORE');
-if ($iconv_can_ignore) {
-  $ac->define_var('ICONV_CAN_IGNORE', 1);
-  $ac->msg_result('yes');
-} else {
-  $ac->msg_result('no');
-}
-
-print "\n";
-print "..........................................................\n";
-print " Checking iconv capability done                           \n";
-print "..........................................................\n";
-print "\n";
-
 $ac->write_config_h(File::Spec->catfile('output', 'include', 'tconv', 'config_autoconf.h'));
 
 # ----------------
@@ -239,10 +252,10 @@ find(
 	    my $file = File::Spec->canonpath($_);
 	    if (-f $file && ($file =~ /\.c$/ || $file =~ /\.cpp$/)) {
                 #
-                # We know that ICU.c and alias.c are exceptions
+                # We know that *ICU.c are exceptions
                 #
                 my $bfile = basename($file);
-                if (! grep { $bfile eq $_ } qw/ICU.c alias.c/) {
+                if (! ($file =~ /ICU\.c$/)) {
                     push(@sources, $file)
                 }
 	    }
@@ -298,7 +311,7 @@ sub get_version {
     return join('.', @rc)
 }
 
-sub write_config {
+sub write_tconv_config {
     my ($version, $input, $output) = @_;
 
     make_path(dirname($output));
@@ -351,71 +364,108 @@ NSCORE
     close($fh) || warn "Cannot close $output, $!";
 }
 
-sub get_iconv_capability {
-  my ($tocharset, $fromcharset, $twobytes, $winiconv, $extra_compiler_flags, $extra_linker_flags, @additional_includes) = @_;
+sub write_iconv_h {
+    my ($input, $output) = @_;
 
-  my $include_winiconv = $winiconv ? '#include <win_iconv.c>' : '';
-  my $source = <<SOURCE_HEADERS;
-  #include <stdlib.h>
-  #include <stdio.h>
-  #include <stddef.h>
-  #include <string.h>
-  $include_winiconv
-  #include <iconv.h>
-SOURCE_HEADERS
-  $source .= q'
-  int main(){
-    iconv_t  conv;
-    char    *src = "123456" ';
-  $source .= ${twobytes};
-  my $data = $DATA;
-  $data =~ s/__TO__/$tocharset/;
-  $data =~ s/__FROM__/$fromcharset/;
-  $source .= $data;
-  # print $source;
-  my $cbuilder = ExtUtils::CBuilder->new();
-  my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
-  print $fh $source;
-  close($fh) || warn "Cannot close $filename, $!";
+    make_path(dirname($output));
+    open(my $fh, '<', $input) || die "Cannot open $input, $!";
+    my $source = do { local $/; <$fh>; };
+    close($fh) || warn "Cannot close $input, $!";
 
-  my $obj = $cbuilder->object_file($filename);
-  $cbuilder->compile(
-                     source        => $filename,
-                     extra_compiler_flags => $extra_compiler_flags,
-                     object_file   => $obj,
-                     include_dirs  => [ 'include', File::Spec->catdir('output', 'include'), @additional_includes ],
-                     'C++'         => 0
-                    );
-  $cbuilder->link_executable(
-                             module_name => 'ICONV::TEST',
-                             extra_linker_flags =>, $extra_linker_flags,
-                             objects => $obj
-                            );
-  system($cbuilder->exe_file($obj), 'unused', 'parameter');
-  my $exitcode =  $? >> 8;
-  unlink $cbuilder->exe_file($obj);
-  unlink $obj;
-  my $rc = $exitcode ? 0 : 1;
-  unlink $filename;
+    $source =~ s/\@DLL_VARIABLE\@//smg;
+    $source =~ s/\@EILSEQ\@/134679/smg;
+    $source =~ s/\@ICONV_CONST\@//smg;
+    $source =~ s/\@USE_MBSTATE_T\@/0/smg;
+    $source =~ s/\@HAVE_WCHAR_T\@/0/smg;
 
-  return $rc;
+    open($fh, '>', $output) || die "Cannot open $output, $!";
+    print $fh $source;
+    close($fh) || warn "Cannot close $output, $!";
 }
 
-__DATA__
-; /* In UTF8: 123, euro sign, 456 */
-    char     dst[1024];
-    char    *inp = src;                             /* Input moving pointer */
-    char    *outp = dst;                            /* Output moving pointer */
-    size_t   inl = 8;                               /* 6 + 2 */
-    size_t   outl = 1024;                           /* 1024 bytes available in output buffer */
+sub write_localcharset_h {
+    my ($input, $output) = @_;
 
-    memset((void *) dst, '\0', 1024);
-    conv = iconv_open("__TO__", "__FROM__");
-    if (conv == (iconv_t)-1) { perror("iconv_open"); return 1; }
-    if (iconv(conv, &inp, &inl, &outp, &outl) == (size_t)-1)  { perror("iconv"); return 1; }
-    /* Flush */
-    if (iconv(conv, NULL, NULL, &outp, &outl) == (size_t)-1)  { perror("iconv"); return 1; }
-    if (iconv_close(conv) == -1)  { perror("iconv_close"); return 1; }
-    fprintf(stdout, "%s\n", dst);
-    return 0;
-  }
+    make_path(dirname($output));
+    open(my $fh, '<', $input) || die "Cannot open $input, $!";
+    my $source = do { local $/; <$fh>; };
+    close($fh) || warn "Cannot close $input, $!";
+
+    open($fh, '>', $output) || die "Cannot open $output, $!";
+    print $fh $source;
+    close($fh) || warn "Cannot close $output, $!";
+}
+
+sub get_have_langinfo_codeset {
+    my $source .= q'
+#include <stdlib.h>
+#include <langinfo.h>
+int main(int ac, char **av)
+{
+  char *cs = nl_langinfo(CODESET);
+  exit(0);
+}';
+
+    my $rc =  eval {
+        my $cbuilder = ExtUtils::CBuilder->new();
+        my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
+        print $fh $source;
+        close($fh) || warn "Cannot close $filename, $!";
+
+        my $obj = $cbuilder->object_file($filename);
+        $cbuilder->compile(
+            source        => $filename,
+            object_file   => $obj,
+            'C++'         => 0
+            );
+        $cbuilder->link_executable(
+            module_name => 'ICONV::TEST',
+            objects => $obj
+            );
+        system($cbuilder->exe_file($obj), 'unused', 'parameter');
+        my $exitcode =  $? >> 8;
+        unlink $cbuilder->exe_file($obj);
+        unlink $obj;
+        unlink $filename;
+        $exitcode ? 0 : 1;
+    } // 0;
+
+    print $@ if $@;
+
+    return $rc;
+}
+
+sub get_is_big_endian {
+    my $source .= q'
+#include <stdlib.h>
+const int i = 1;
+#define is_bigendian() ( (*(char*)&i) == 0 )
+int main(int ac, char **av)
+{
+  exit(is_bigendian() ? 0 : 1);
+}';
+
+    my $cbuilder = ExtUtils::CBuilder->new();
+    my ($fh, $filename) = tempfile(SUFFIX => '.c', UNLINK => 0);
+    print $fh $source;
+    close($fh) || warn "Cannot close $filename, $!";
+
+    my $obj = $cbuilder->object_file($filename);
+    $cbuilder->compile(
+        source        => $filename,
+        object_file   => $obj,
+        'C++'         => 0
+        );
+    $cbuilder->link_executable(
+        module_name => 'ICONV::TEST',
+        objects => $obj
+        );
+    system($cbuilder->exe_file($obj), 'unused', 'parameter');
+    my $exitcode =  $? >> 8;
+    unlink $cbuilder->exe_file($obj);
+    unlink $obj;
+    my $rc = $exitcode ? 0 : 1;
+    unlink $filename;
+
+    return $rc;
+}

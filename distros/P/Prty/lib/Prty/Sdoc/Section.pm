@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::OrderedHash;
 
@@ -266,11 +266,12 @@ sub dump {
             #        || $level > 3,
             #    class=>"$cssPrefix-hr",
             #),
+            $self->anchors($format,$h)."\n".
             $h->tag("h$level",
                 class=>sprintf("$cssPrefix-sec-h%d%s",$level,$smaller?
                     '-small': ''),
                 # $pageBreak? (style=>'page-break-before:always'): (),
-                $visibleTitle.$self->anchors($format,$h)
+                $visibleTitle
             ),
             $childs,
         );
@@ -278,7 +279,7 @@ sub dump {
     elsif ($format eq 'pod') {
         if ($level > 5) {
             $self->throw(
-                q{SDOC-00003: Abschnitt zu tief für POD (max. Ebene 4)},
+                q~SDOC-00003: Abschnitt zu tief für POD (max. Ebene 4)~,
                 Section=>"=head$level",
                 Title=>$visibleTitle,
             );
@@ -306,7 +307,7 @@ sub dump {
     }
 
     $self->throw(
-        q{SDOC-00001: Unbekanntes Format},
+        q~SDOC-00001: Unbekanntes Format~,
         Format=>$format,
     );
 }
@@ -315,7 +316,7 @@ sub dump {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -323,7 +324,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

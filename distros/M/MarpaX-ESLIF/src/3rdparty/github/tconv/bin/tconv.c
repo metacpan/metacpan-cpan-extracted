@@ -63,7 +63,6 @@ typedef struct tconv_helper_context {
   size_t  bufsizel;
   short   guessb;
   short   fromPrintb;
-  short   fuzzyb;
   short   firstconsumercallb;
 #ifndef TCONV_NTRACE
   short   verbose;
@@ -79,8 +78,7 @@ static void fileconvert(int outputFd, char *filenames,
                         tconv_convert_t *convertp, tconv_charset_t *charsetp,
 			short guessb,
 			size_t bufsizel,
-			short fromPrintb,
-			short fuzzyb
+			short fromPrintb
 #ifndef TCONV_NTRACE
 			, short verbose
 #endif
@@ -94,7 +92,6 @@ int main(int argc, char **argv)
   short                fromPrintb     = 0;
   char                *fromcodes      = NULL;
   short                guessb         = 0;
-  short                fuzzyb         = 0;
   char                *charsetEngines = NULL;
   char                *convertEngines = NULL;
   short                helpb          = 0;
@@ -120,7 +117,6 @@ int main(int argc, char **argv)
     {       "verbose", 'v', OPTPARSE_OPTIONAL},
 #endif
     {       "version", 'V', OPTPARSE_OPTIONAL},
-    {         "fuzzy", 'z', OPTPARSE_OPTIONAL},
     {0}
   };
 
@@ -206,9 +202,6 @@ int main(int argc, char **argv)
       GENERICLOGGER_INFOF(NULL, "tconv %s", TCONV_VERSION);
       exit(EXIT_SUCCESS);
       break;
-    case 'z':
-      fuzzyb = 1;
-      break;
     case '?':
       GENERICLOGGER_ERRORF(NULL, "%s: %s", argv[0], options.errmsg);
       _usage(argv[0], 0);
@@ -252,19 +245,19 @@ int main(int argc, char **argv)
 
   setlocale(LC_ALL, "");
 #ifndef TCONV_NTRACE
-#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb) \
-  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb, verbose)
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, verbose)
 #else
-#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb) \
-  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb)
+#define TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb) \
+  fileconvert(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb)
 #endif
 
   while ((args = optparse_arg(&options)) != NULL) {
     haveoptionsb = 1;
-    TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb);
+    TCONV_FILECONVERT(outputFd, args, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb);
   }
   if (! haveoptionsb) {
-    TCONV_FILECONVERT(outputFd, NULL, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb, fuzzyb);
+    TCONV_FILECONVERT(outputFd, NULL, tocodes, fromcodes, convertp, charsetp, guessb, bufsizel, fromPrintb);
   }
 
   if ((outputFd >= 0) && (outputFd != fileno(stdout))) {
@@ -319,7 +312,6 @@ static void _usage(char *argv0, short helpb)
 #ifndef TCONV_NTRACE
     printf("  -v, --verbose               Verbose mode.\n");
 #endif
-    printf("  -z, --fuzzy                 Show fuzzy conversion state.\n");
 
     printf("\n");
     printf("Examples:");
@@ -399,7 +391,6 @@ static short consumer(tconv_helper_t *tconv_helperp, void *voidp, char *bufp, si
 {
   tconv_helper_context_t *contextp  = (tconv_helper_context_t *) voidp;
   size_t                  consumedl;
-  short                   fuzzyb;
 
   if (contextp->outputFd >= 0) {
     consumedl = write(contextp->outputFd, bufp, countl);
@@ -409,16 +400,10 @@ static short consumer(tconv_helper_t *tconv_helperp, void *voidp, char *bufp, si
 
   *countlp = consumedl;
 
-  if (contextp->guessb || contextp->fromPrintb || contextp->fuzzyb) {
+  if (contextp->guessb || contextp->fromPrintb) {
     if (contextp->firstconsumercallb != 0) {
       if (contextp->guessb || contextp->fromPrintb) {
         GENERICLOGGER_INFOF(NULL, "%s: %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", tconv_fromcode(contextp->tconvp));
-      }
-      if (contextp->fuzzyb) {
-        if (! tconv_fuzzy_getb(contextp->tconvp, &fuzzyb)) {
-          return 0;
-        }
-        GENERICLOGGER_INFOF(NULL, "%s: fuzzy mode is %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", fuzzyb ? "on" : "off");
       }
       contextp->firstconsumercallb = 0;
     }
@@ -433,8 +418,7 @@ static void fileconvert(int outputFd, char *filenames,
                         tconv_convert_t *convertp, tconv_charset_t *charsetp,
                         short guessb,
                         size_t bufsizel,
-                        short fromPrintb,
-                        short fuzzyb
+                        short fromPrintb
 #ifndef TCONV_NTRACE
                         , short verbose
 #endif
@@ -503,7 +487,6 @@ static void fileconvert(int outputFd, char *filenames,
   context.bufsizel           = bufsizel;
   context.guessb             = guessb;
   context.fromPrintb         = fromPrintb;
-  context.fuzzyb             = fuzzyb;
   context.firstconsumercallb = 1;
 #ifndef TCONV_NTRACE
   context.verbose   = verbose;

@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.180190';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.180230';
 use Moose;
 use namespace::autoclean;
 
@@ -19,7 +19,7 @@ use Carp;
 use Const::Fast;
 use File::Find::Rule;
 use IPC::System::Simple qw(system);
-use List::AllUtils qw(first firstidx uniq each_array mesh count_by max_by);
+use List::AllUtils 0.12 qw(first firstidx uniq each_array mesh count_by max_by);
 use LWP::Simple qw(get getstore);
 use Path::Class qw(dir file);
 use POSIX;
@@ -1221,7 +1221,7 @@ sub new_from_cache {                        ## no critic (RequireArgUnpacking)
     my %args  = @_;                         # TODO: handle HashRef?
 
     ### Loading NCBI Taxonomy from binary cache file...
-    my $tax_dir = glob $args{tax_dir};
+    my $tax_dir = dir( glob $args{tax_dir} );
     my $cachefile = file($tax_dir, $CACHEDB);
     my $tax = $class->load($cachefile, inject => { tax_dir => $tax_dir } );
 
@@ -1255,7 +1255,7 @@ sub setup_taxdir {
     $tax_dir = dir( glob $tax_dir );
     $tax_dir->mkpath();
 
-    ### Installing NCBI Taxonomy database to: $tax_dir
+    ### Installing NCBI Taxonomy database to: $tax_dir->stringify
     ### Please be patient...
 
     # setup remote archive access
@@ -1273,6 +1273,7 @@ sub setup_taxdir {
 
         ### Downloading: $url
         my $zipfile = file($tax_dir, $target)->stringify;
+        # Note: stringify is required by getstore
         my $ret_code = getstore($url, $zipfile);
         croak "Error: cannot download $url: error $ret_code; aborting!"
             unless $ret_code == 200;
@@ -1370,7 +1371,7 @@ sub _make_gca_files {
         #### $target
 
         my $url = "$base_acc/$target";
-        my $file = join '/', $tax_dir, $target;
+        my $file = file($tax_dir, $target)->stringify;
         #### $file
 
         ### Downloading: $url
@@ -1391,12 +1392,15 @@ sub _make_gca_files {
 
             my ($accession, $taxon_id, $species_taxon_id)
                 = (split /\t/xms, $line)[0,5,6];
-            # TODO: check merged taxon_ids in case of undef warnings
             my @taxonomy = $tax->get_taxonomy($taxon_id);
             my $org = $taxonomy[-1];
+            # TODO: how to deal with desynchronized taxdump/assembly reports
+            # generating a lot of undef warnings in Bio::LITE::Taxonomy?
 
             # use parent taxon_id if no taxon_id for strain
             if ($species_taxon_id == $taxon_id) {
+                $taxon_id = $tax->merged_for($taxon_id)         # fix very
+                    if $tax->is_merged($taxon_id);              # rare undef
                 $species_taxon_id = $parent_taxid_for{$taxon_id};
                 $fix_for{$taxon_id}{name_for} = $org;
                 $fix_for{$taxon_id}{node_for} = $species_taxon_id;
@@ -1409,7 +1413,7 @@ sub _make_gca_files {
     }
 
     # write names.dmp
-    my $names_gca_file = join '/', $tax_dir, 'gca0-names.dmp';
+    my $names_gca_file = file($tax_dir, 'gca0-names.dmp');
     open my $names_out, '>', $names_gca_file;
 
     for my $accession ( keys %name_for ) {
@@ -1422,7 +1426,7 @@ sub _make_gca_files {
     }
 
     # write nodes.dmp
-    my $nodes_gca_file = join '/', $tax_dir, 'gca0-nodes.dmp';
+    my $nodes_gca_file = file($tax_dir, 'gca0-nodes.dmp');
     open my $nodes_out, '>', $nodes_gca_file;
 
     for my $accession ( keys %node_for ) {
@@ -1535,7 +1539,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.180190
+version 0.180230
 
 =head1 SYNOPSIS
 

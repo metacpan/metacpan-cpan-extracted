@@ -28,7 +28,7 @@ BEGIN { our $PACKAGE_SCALAR = "some value" }
    ok( my $gv = $defstash->value( "PACKAGE_SCALAR" ), 'default stash has PACKAGE_SCALAR GV' );
    ok( my $sv = $gv->scalar, 'PACKAGE_SCALAR GV has SCALAR' );
 
-   is( $sv->name, '$main::PACKAGE_SCALAR', 'PACKAGE_SCALAR SV has a name' );
+   is( $sv->symname, '$main::PACKAGE_SCALAR', 'PACKAGE_SCALAR SV has a name' );
 
    identical( $pmat->find_symbol( '$PACKAGE_SCALAR' ), $sv,
       '$pmat->find_symbol $PACKAGE_SCALAR' );
@@ -47,7 +47,7 @@ BEGIN { our @PACKAGE_ARRAY = qw( A B C ) }
    ok( my $gv = $defstash->value( "PACKAGE_ARRAY" ), 'default stash hash PACKAGE_ARRAY GV' );
    ok( my $av = $gv->array, 'PACKAGE_ARRAY GV has ARRAY' );
 
-   is( $av->name, '@main::PACKAGE_ARRAY', 'PACKAGE_ARRAY AV has a name' );
+   is( $av->symname, '@main::PACKAGE_ARRAY', 'PACKAGE_ARRAY AV has a name' );
 
    identical( $pmat->find_symbol( '@PACKAGE_ARRAY' ), $av,
       '$pmat->find_symbol @PACKAGE_ARRAY' );
@@ -60,7 +60,7 @@ BEGIN { our %PACKAGE_HASH = ( one => 1, two => 2 ) }
    ok( my $gv = $defstash->value( "PACKAGE_HASH" ), 'default stash hash PACKAGE_HASH GV' );
    ok( my $hv = $gv->hash, 'PACKAGE_HASH GV has HASH' );
 
-   is( $hv->name, '%main::PACKAGE_HASH', 'PACKAGE_HASH hv has a name' );
+   is( $hv->symname, '%main::PACKAGE_HASH', 'PACKAGE_HASH hv has a name' );
 
    identical( $pmat->find_symbol( '%PACKAGE_HASH' ), $hv,
       '$pmat->find_symbol %PACKAGE_HASH' );
@@ -77,7 +77,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
 {
    ok( my $cv = $defstash->value_code( "PACKAGE_CODE" ), 'default stash has PACKAGE_CODE CV' );
 
-   is( $cv->name, '&main::PACKAGE_CODE', 'PACKAGE_CODE CV has a name' );
+   is( $cv->symname, '&main::PACKAGE_CODE', 'PACKAGE_CODE CV has a name' );
 
    is( $cv->depth, 0, 'PACKAGE_CODE CV currently has depth 0' );
 
@@ -86,6 +86,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
 
    is( $cv->padname( 1 )->name, '$lexvar', 'PACKAGE_CODE CV has padname(1)' );
    is( $cv->padix_from_padname( '$lexvar' ), 1, 'PACKAGE_CODE CV can find padix from padname' );
+   cmp_ok( $cv->max_padix, '>=', 1, 'PACKAGE_CODE CV has at least 1 pad entry' );
 
    my @constants = $cv->constants;
    ok( @constants, 'CV has constants' );
@@ -93,7 +94,7 @@ sub PACKAGE_CODE { my $lexvar = "An unlikely scalar value"; }
 
    # PADNAMES stopped being a real thing after 5.20
    if( $df->{perlver} <= ( ( 5 << 24 ) | ( 20 << 16 ) | 0xffff ) ) {
-      is( $cv->padnames->type, "PADNAMES", 'CV has padnames' );
+      is( $cv->padnames_av->type, "PADNAMES", 'CV has padnames' );
    }
 
    my $pad0 = $cv->pad(0);

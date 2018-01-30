@@ -1,0 +1,71 @@
+#!perl
+
+use strict;
+
+my $c=@ARGV[0];
+
+print "**** Euro Millions Generator ****\n";
+for(my $l=1;$l<=$c;$l++){
+        my (@arr1, @arr2)=undef;
+        for(my $ar1=1;$ar1<=5;$ar1++){
+                my ($rnd1);
+                do {
+                        $rnd1=int(rand(50))+1;
+                        $rnd1='0'.$rnd1 if($rnd1<10);
+                } until (!(grep(/^$rnd1$/,@arr1)));
+                $arr1[$ar1]=$rnd1;
+        }
+        for(my $ar2=1;$ar2<=2;$ar2++){
+                my ($rnd2);
+                do {
+                        $rnd2=int(rand(11))+1;
+                        $rnd2='0'.$rnd2 if($rnd2<10);
+                } until (!(grep(/^$rnd2$/,@arr2)));
+                $arr2[$ar2]=$rnd2;
+        }
+        @arr1=sort{$a<=>$b}@arr1;
+        @arr2=sort{$a<=>$b}@arr2;
+        print "Line $l => @arr1  @arr2\n";
+}
+print "*********************************\n";
+
+=head1 NAME
+
+euro lotto - prints <n> numbers of euro millions lotto lines
+
+=head1 DESCRIPTION
+
+A simple script which usually prints C<bar>. prints <n> numbers of euro millions lotto lines
+here <n> is the number of lines passed in on the cli
+
+=head1 SYNOPSIS
+
+  $ euro_lotto 3
+  
+  **** Euro Millions Generator ****
+  Line 1 =>  01 05 28 43 48  08 09
+  Line 2 =>  08 10 12 22 44  03 08
+  Line 3 =>  07 11 19 27 48  03 06
+  *********************************
+
+=head1 AUTHOR
+
+Mike Kelly
+
+=head1 LICENSE
+
+FreeBSD
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan App::euro_lotto
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+=cut

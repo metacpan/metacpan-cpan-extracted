@@ -8,6 +8,7 @@ use Moose;
 use Try::Tiny;
 use Try::Tiny::Retry;
 use Time::HiRes qw/usleep/;
+use Switch::Plain;
 
 extends 'Moose::Object';
 with 'OpenERP::OOM::DynamicUtils';
@@ -20,40 +21,40 @@ has 'id' => (
 
 sub BUILD {
     my $self = shift;
-    
+
     # Add methods to follow links
     my $links = $self->meta->link;
     while (my ($name, $link) = each %$links) {
-        given ($link->{type}) {
-            when ('single') {
+        sswitch ($link->{type}) {
+            case ('single'): {
                 $self->meta->add_method(
                     $name,
                     sub {
                         my $obj = shift;
                         $obj->{"_$name"} //= $obj->class->schema->link($link->{class})->retrieve($link->{args}, $obj->{$link->{key}});
-                        
+
                         unless ($obj->{"_$name"}) {
                             # FIXME: If $obj->{"_$name"} is undefined, we have a data integrity problem.
                             # Either the linked data is missing, or the key in the OpenERP object is missing.
                             die "Error linking to OpenERP object " . $obj->id . " of class " . ref($obj);
                         }
-                        
+
                         # NOTE: this only links up the object from the linked object
                         # if it has a _source attribute
                         #
                         # has _source => (is => 'rw');
-                        
+
                         if ($obj->{"_$name"}->can('_source')) {
                             # set the _source attribute to point back
                             # to the linked object.
                             $obj->{"_$name"}->_source($obj);
                         }
-                        
+
                         return $obj->{"_$name"};
                     }
                 )
             }
-            when ('multiple') {
+            case ('multiple'): {
                 $self->meta->add_method(
                     $name,
                     sub {
@@ -71,14 +72,14 @@ sub BUILD {
 
 sub update {
     my $self = shift;
-    
+
     if (my $update = shift) {
         while (my ($param, $value) = each %$update) {
             $self->$param($value);
         }
     }
     my $context = $self->class->_get_context(shift);
-    
+
     my $object;
     foreach my $attribute ($self->dirty_attributes) {
         next if ($attribute eq 'id');
@@ -90,11 +91,11 @@ sub update {
     my $relationships = $self->meta->relationship;
     while (my ($name, $rel) = each %$relationships) {
         if ($object->{$rel->{key}}) {
-            given ($rel->{type}) {
-                when ('one2many') {
+            sswitch ($rel->{type}) {
+                case ('one2many'): {
                     delete $object->{$rel->{key}};  # Don't update one2many relationships
                 }
-                when ('many2many') {
+                case ('many2many'): {
                     $object->{$rel->{key}} = [[6,0,$object->{$rel->{key}}]];
                 }
             }
@@ -112,7 +113,7 @@ sub update {
         $self->class->schema->client->update($self->model, $self->id, $object, $context);
     });
     $self->refresh;
-    
+
     return $self;
 }
 
@@ -122,7 +123,7 @@ sub update {
 sub update_single {
     my ($self, $property) = @_;
     my $value = $self->{$property};
-    
+
     # Check to see if the property is the key to a many2many relationship
     my $relationships = $self->meta->relationship;
     my ($key) = grep { $relationships->{$_}->{key} eq $property } keys %$relationships;
@@ -140,7 +141,7 @@ sub update_single {
             $value = $self->prepare_attribute_for_send($attribute->type_constraint, $value);
         }
     }
-    
+
     $self->class->schema->client->update($self->model, $self->id, {$property => $value});
     return $self;
 }
@@ -150,15 +151,15 @@ sub update_single {
 
 sub refresh {
     my $self = shift;
-    
+
     my $new = $self->class->retrieve($self->id);
-    
+
     foreach my $attribute ($self->meta->get_all_attributes) {
         my $name = $attribute->name;
         $self->{$name} = ($new->$name);
     }
     $self->mark_all_clean; # reset the dirty attribute
-    
+
     return $self;
 }
 
@@ -168,7 +169,7 @@ sub refresh {
 
 sub delete {
     my $self = shift;
-    
+
     $self->class->schema->client->delete($self->model, $self->id);
 }
 
@@ -197,7 +198,7 @@ sub copy
 
 sub print {
     my $self = shift;
-    
+
     say "Print called";
 }
 
@@ -226,24 +227,24 @@ sub real_create_related
 
 sub create_related {
     my ($self, $relation_name, $object) = @_;
-    
+
     ### Creating related object 
     ### $relation_name
     ### with initial data:
     ### $object
     my $created_obj;
-    
+
     if (my $relation = $self->meta->relationship->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('one2many') {
+        sswitch ($relation->{type}) {
+            case ('one2many'): {
                 my $class = $self->meta->name;
                 if ($class =~ m/(.*?)::(\w+)$/) {
                     my ($base, $name) = ($1, $2);
                     my $related_class = $base . "::" . $relation->{class};
-                    
+
                     $self->ensure_class_loaded($related_class);
                     my $related_meta = $related_class->meta->relationship;
-                    
+
                     my $far_end_relation;
                     REL: for my $key (keys %$related_meta) {
                         my $value = $related_meta->{$key};
@@ -252,23 +253,23 @@ sub create_related {
                             last REL;
                         }
                     }
-                    
+
                     if ($far_end_relation) {
                         my $foreign_key = $related_meta->{$far_end_relation}->{key};
-                        
+
                         ### Far end relation exists
                         $created_obj = $self->class->schema->class($relation->{class})->create({
                             %$object,
                             $foreign_key => $self->id,
                         });
-                        
+
                         $self->refresh;
                     } else {
                         my $new_object = $self->class->schema->class($relation->{class})->create($object);
-                        
+
                         $created_obj = $new_object;
                         $self->refresh;
-                        
+
                         unless (grep {$new_object->id} @{$self->{$relation->{key}}}) {
                             push @{$self->{$relation->{key}}}, $new_object->id;
                             $self->update;
@@ -276,16 +277,16 @@ sub create_related {
                     }
                 }
             }
-            when ('many2many') {
+            case ('many2many'): {
                 say "create_related many2many";
             }
-            when ('many2one') {
+            case ('many2one'): {
                 say "create_related many2one";
             }
         }
     } elsif ($relation = $self->meta->link->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('single') {
+        sswitch ($relation->{type}) {
+            case ('single'): {
                 ### Creating linked object
                 try {
                     my $id = $self->class->schema->link($relation->{class})->create($relation->{args}, $object);
@@ -298,7 +299,7 @@ sub create_related {
                     die "Error creating linked object: $_[0]";
                 };
             }
-            when ('multiple') {
+            case ('multiple'): {
                 say "create_linked multiple";
             }
         }
@@ -350,14 +351,14 @@ sub search_related {
 
     # find the relation details and add it to the search criteria.
     if (my $relation = $self->meta->relationship->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('one2many') {
+        sswitch ($relation->{type}) {
+            case ('one2many'): {
                 my $class = $self->meta->name;
                 if ($class =~ m/(.*?)::(\w+)$/) {
                     my ($base, $name) = ($1, $2);
                     my $related_class = $self->class->schema->class($relation->{class});
                     my $related_meta = $related_class->object->meta->relationship;
-                    
+
                     my $far_end_relation;
                     REL: for my $key (keys %$related_meta) {
                         my $value = $related_meta->{$key};
@@ -366,24 +367,24 @@ sub search_related {
                             last REL;
                         }
                     }
-                    
+
                     if ($far_end_relation) {
 
                         my $foreign_key = $related_meta->{$far_end_relation}->{key};
-                        
+
                         push @search, [ $foreign_key, '=', $self->id ];
                         return $related_class->search(@search);
-                        
+
                     } else {
                         # well, perhaps we could fix this, but I can't be bothered at the moment.
                         croak 'Unable to search_related without relationship back';
                     }
                 }
             }
-            when ('many2many') {
+            case ('many2many'): {
                 croak 'Unable to search_related many2many relationships';
             }
-            when ('many2one') {
+            case ('many2one'): {
                 croak 'Unable to search_related many2one relationships';
             }
         }
@@ -402,19 +403,19 @@ sub add_related {
     my ($self, $relation_name, $object) = @_;
 
     if (my $relation = $self->meta->relationship->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('one2many') {
+        sswitch ($relation->{type}) {
+            case ('one2many'): {
                 # FIXME - is this the same process as adding a many2many relationship?
             }
-            when ('many2many') {
+            case ('many2many'): {
                 push @{$self->{$relation->{key}}}, _id($object);
                 $self->{$relation->{key}} = [uniq @{$self->{$relation->{key}}}];
                 $self->update_single($relation->{key});
             }
         }
     } elsif ($relation = $self->meta->link->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('multiple') {
+        sswitch ($relation->{type}) {
+            case ('multiple'): {
                 # FIXME - handle linked as well as related objects
             }
         }
@@ -427,14 +428,14 @@ sub add_related {
 
 sub set_related {
     my ($self, $relation_name, $object) = @_;
-    
+
     if (my $relation = $self->meta->relationship->{$relation_name}) {
-        given ($relation->{type}) {
-            when ('many2one') {
+        sswitch ($relation->{type}) {
+            case ('many2one'): {
                 $self->{$relation->{key}} = $object ? _id($object) : undef;
                 $self->update_single($relation->{key});
             }
-            when ('many2many') {
+            case ('many2many'): {
                 my @array;
                 if($object)
                 {
@@ -450,7 +451,7 @@ sub set_related {
                 $self->{$relation->{key}} = \@array;
                 $self->update_single($relation->{key});
             }
-            default {
+            default: {
                 carp "Cannot use set_related() on a $_ relationship";
             }
         }
@@ -543,7 +544,7 @@ OpenERP::OOM::Object::Base
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 DESCRIPTION
 
@@ -556,12 +557,12 @@ OpenERP::OOM::Class::Base
 =head1 SYNOPSYS
 
  my $obj = $schema->class('Name')->create(\%args);
- 
- say $obj->id;
- 
+
+ :say $obj->id;
+
  $obj->name('New name');
  $obj->update;
- 
+
  $obj->delete;
 
 =head1 PROPERTIES
@@ -599,7 +600,7 @@ Updates OpenERP with a single property of an object.
 
  $obj->name('New name');
  $obj->status('Active');
- 
+
  $obj->update_single('name');  # Only the 'name' property is updated
 
 =head2 refresh
@@ -686,7 +687,7 @@ Adds a related or linked object to a one2many, many2many, or multiple relationsh
 
  my $partner  = $schema->class('Partner')->find(...);
  my $category = $schema->class('PartnerCategory')->find(...);
- 
+
  $partner->add_related('category', $category);
 
 =head2 set_related

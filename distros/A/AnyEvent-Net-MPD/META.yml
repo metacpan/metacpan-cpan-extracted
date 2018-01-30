@@ -6,6 +6,7 @@ build_requires:
   Array::Utils: '0'
   Data::Printer: '0'
   List::Util: '0'
+  Log::Any::Adapter: '0'
   PerlX::Maybe: '0'
   Term::ReadLine: '0'
   Test::More: '1.302078'
@@ -16,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +26,7 @@ name: AnyEvent-Net-MPD
 provides:
   AnyEvent::Net::MPD:
     file: lib/AnyEvent/Net/MPD.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   AnyEvent: '7.13'
   AnyEvent::Emitter: '0.02'
@@ -41,5 +42,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jjatria/AnyEvent-Net-MPD/issues
   repository: git://gitlab.com/jjatria/AnyEvent-Net-MPD.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'YAML::Tiny version 1.70'

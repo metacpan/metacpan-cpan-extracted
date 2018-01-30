@@ -43,7 +43,7 @@ rest-ids-ali.pl - Restore ids in ALI files
 
 =head1 VERSION
 
-version 0.180190
+version 0.180230
 
 =head1 USAGE
 

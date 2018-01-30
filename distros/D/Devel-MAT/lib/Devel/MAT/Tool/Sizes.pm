@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use constant FOR_UI => 1;
 

@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/gflohr/Template-Plugin-Gettext/issues
   homepage: http://www.guido-flohr.net/en/projects#template-plugin-xgettext
   repository: git://github.com/gflohr/Template-Plugin-Gettext.git
-version: '0.3'
+version: '0.4'
 x_serialization_backend: 'YAML::Tiny version 1.70'

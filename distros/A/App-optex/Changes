@@ -1,5 +1,14 @@
 Revision history for `optex' command.
 
+v0.0.12 2018-01-24T00:19:54Z
+
+    - Make symbolic link to "perl" for "/usr/bin/env perl" to work.
+
+v0.0.11 2018-01-23T11:31:19Z
+
+    - Put error handling in t/02_config.t
+    - Change STDERR background to WINE RED.
+
 v0.0.10 2018-01-17T14:23:14Z
 
     - Implement "no-module" configuration.

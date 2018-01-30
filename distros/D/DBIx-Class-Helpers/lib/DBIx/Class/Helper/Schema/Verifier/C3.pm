@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Schema::Verifier::C3;
-$DBIx::Class::Helper::Schema::Verifier::C3::VERSION = '2.033003';
+$DBIx::Class::Helper::Schema::Verifier::C3::VERSION = '2.033004';
 # ABSTRACT: Verify that the Results and ResultSets of your Schemata use c3
 
 use strict;
@@ -54,7 +54,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

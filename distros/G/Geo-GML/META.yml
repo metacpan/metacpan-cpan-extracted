@@ -1,27 +1,27 @@
 ---
-abstract: 'Process Geography Markup Language'
+abstract: 'process Geography Markup Language (GML)'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Geo-GML
 no_index:
   directory:
     - t
     - inc
 requires:
-  Geo::Point: 0.90
-  Log::Report: 0.19
-  Test::More: 0.54
-  Test::Pod: 1.00
-  XML::Compile: 1.58
-  XML::Compile::Cache: 1.05
-version: 0.17
+  Geo::Point: '0.90'
+  Log::Report: '1.25'
+  Test::More: '0.54'
+  XML::Compile: '1.59'
+  XML::Compile::Cache: '1.05'
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

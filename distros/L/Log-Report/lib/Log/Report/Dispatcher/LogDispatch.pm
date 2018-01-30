@@ -1,15 +1,19 @@
-# Copyrights 2007-2017 by [Mark Overmeer].
+# Copyrights 2007-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution Log-Report. Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Dispatcher::LogDispatch;
 use vars '$VERSION';
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 use base 'Log::Report::Dispatcher';
+
+use warnings;
+use strict;
 
 use Log::Report 'log-report', syntax => 'SHORT';
 use Log::Report::Util  qw/@reasons expand_reasons/;

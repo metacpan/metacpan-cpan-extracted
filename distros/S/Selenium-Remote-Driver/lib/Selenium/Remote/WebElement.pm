@@ -1,5 +1,5 @@
 package Selenium::Remote::WebElement;
-$Selenium::Remote::WebElement::VERSION = '1.21';
+$Selenium::Remote::WebElement::VERSION = '1.23';
 # ABSTRACT: Representation of an HTML Element used by Selenium Remote Driver
 
 use strict;
@@ -54,7 +54,7 @@ sub click {
 
 sub submit {
     my ($self) = @_;
-    return $self->driver->execute_script("return arguments[0].submit();", {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
+    return $self->driver->execute_script("if (typeof arguments[0].submit === 'function') { return arguments[0].submit(); }; return 0;", {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
     my $res = { 'command' => 'submitElement', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -112,7 +112,10 @@ sub toggle {
 
 sub is_enabled {
     my ($self) = @_;
-    return $self->get_property('enabled') ? 1 : 0 if $self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge});
+    if ($self->driver->{is_wd3} && !(grep { $self->driver->browser_name eq $_ } qw{chrome MicrosoftEdge})) {
+        return 1 if $self->get_tag_name() ne 'input';
+        return $self->get_property('disabled') ? 0 : 1;
+    }
     my $res = { 'command' => 'isElementEnabled', 'id' => $self->id };
     return $self->_execute_command($res);
 }
@@ -154,10 +157,14 @@ sub get_element_rect {
 
 sub get_element_location_in_view {
     my ($self) = @_;
+    #XXX chrome is dopey here
     return $self->driver->execute_script(qq{
-        arguments[0].scrollIntoView();
-        var pos = arguments[0].getBoundingClientRect();
-        return {y:pos.top,x:pos.left};
+        if (typeof(arguments[0]) !== 'undefined' && arguments[0].nodeType === Node.ELEMENT_NODE) {
+            arguments[0].scrollIntoView();
+            var pos = arguments[0].getBoundingClientRect();
+            return {y:pos.top,x:pos.left};
+        }
+        return {};
     }, {'element-6066-11e4-a52e-4f735466cecf'=> $self->{id}} ) if $self->driver->{is_wd3} && grep { $self->driver->browser_name eq $_ } ('firefox','internet explorer');
     my $res = { 'command' => 'getElementLocationInView', 'id' => $self->id };
     return $self->_execute_command($res);
@@ -298,7 +305,7 @@ Selenium::Remote::WebElement - Representation of an HTML Element used by Seleniu
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =head1 DESCRIPTION
 
@@ -379,6 +386,10 @@ exact behavior.
  Description:
     Submit a FORM element. The submit command may also be applied to any element
     that is a descendant of a FORM element.
+
+ Compatibility:
+    On webdriver3 enabled servers, this uses a JS shim, which may not submit correctly depending on the element you are attempting to submit.
+    Try clicking it if possible instead.
 
  Usage:
     $elem->submit();
@@ -502,7 +513,9 @@ Example Output:
     determine an element's location for correctly generating native events.
 
  Compatibility:
-    Not available on WebDriver3 enabled selenium servers.
+    On Webdriver3 servers, we have to implement this with a JS shim.
+    This means in some contexts, you won't get any position returned, as the element isn't considered an element internally.
+    You may have to go up the element stack to find the element that actually has the bounding box.
 
  Output:
     {x:number, y:number} The X and Y coordinates for the element on the page.

@@ -1,8 +1,20 @@
+0.180230  2018-01-23 23:44:19+01:00 Europe/Brussels
+    - Additions
+      - Ali: added option to allow more control on FASTA file format
+      - Ali::Stash: improved documentation
+      - Ali::Temporary: added option to control the lifespan of FASTA file
+    - Changes
+      - GeneticCode::Factory: hard-coded NCBI gc.prt file for robustness
+    - Fixes
+      - IdList:: fixed regression bug preventing FortyTwo to work
+      - Taxonomy: improved robustness of setup-taxdir.pl-related methods
+      - Taxonomy: better described dependencies for more robust deployment
+
 0.180190  2018-01-19 10:00:47+01:00 Europe/Brussels
-    - Changes:
+    - Changes
       - Ali: improved consistency of guessing default value (always on)
       - Seq: ungapped seqs ending in '*' are now trimmed and considered non-aligned
-    - Fixes:
+    - Fixes
       - Ali::Temporary: fixed regression bug preventing IdList application
       - GeneticCode::Factory: tests should now pass on more platforms
       - PostPred::Composition: tests should now pass on more platforms
@@ -16,7 +28,7 @@
     - Additions
       - Ali: new clone method
       - Ali: improved documentation
-    - Changes:
+    - Changes
       - Tree: shorten_ids/restore_ids now ignore missing ids in IdMapper
     - Fixes
       - Rates: tests should now pass on more platforms

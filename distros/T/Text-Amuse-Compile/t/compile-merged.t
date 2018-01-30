@@ -31,8 +31,9 @@ diag "Creating the compiler";
 
 my $c = Text::Amuse::Compile->new(tex => 1,
                                   pdf => $xelatex,
+                                  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=861938 in stretch
                                   extra => {
-                                            mainfont => 'Charis SIL',
+                                            mainfont => 'TeX Gyre Pagella',
                                             papersize => 'a5',
                                            });
 

@@ -58,7 +58,6 @@ t/simplecal/nl.po
 t/simplecal/pt.po
 t/simplecal/pt_BR.po
 t/simplecal/ru.po
-xt/30index.t
 xt/99pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

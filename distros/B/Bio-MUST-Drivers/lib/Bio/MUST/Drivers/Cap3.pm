@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Cap3;
 # ABSTRACT: Bio::MUST driver for running the CAP3 assembly program
-$Bio::MUST::Drivers::Cap3::VERSION = '0.173510';
+$Bio::MUST::Drivers::Cap3::VERSION = '0.180270';
 use Moose;
 use namespace::autoclean;
 
@@ -143,10 +143,12 @@ sub BUILD {
 
     # read and store contig seqs
     my $contigs = Ali->load($outfile_contigs);
+    $contigs->dont_guess;
     $self->_set_contigs($contigs);
 
     # read and store singlet seqs...
     my $singlets = Ali->load($outfile_singlets);
+    $singlets->dont_guess;
     $singlets->restore_ids($self->mapper);      # ... restoring original ids
     $self->_set_singlets($singlets);
 
@@ -173,7 +175,7 @@ Bio::MUST::Drivers::Cap3 - Bio::MUST driver for running the CAP3 assembly progra
 
 =head1 VERSION
 
-version 0.173510
+version 0.180270
 
 =head1 SYNOPSIS
 

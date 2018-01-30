@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -633,12 +633,6 @@ Exit after showing what yath thinks your options mean
 
 Exit after showing this help message
 
-=item -h
-
-=item --help
-
-Exit after showing this help message
-
 =item -V
 
 =item --version
@@ -1083,7 +1077,7 @@ Specify the formatter to use
 
 (Default: "Test2")
 
-Only useful when the renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+Only useful when a renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
 
 =item --qvf
 
@@ -1107,11 +1101,13 @@ This is only used when the renderer is set to "Formatter"
 
 =item --renderer ...
 
-Specify an alternate renderer
+=item -r +Module=arg1,arg2,...
+
+Specify renderers
 
 (Default: "Formatter")
 
-Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument.
+Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument. You may specify custom arguments to the constructor after an "=" sign.
 
 =back
 

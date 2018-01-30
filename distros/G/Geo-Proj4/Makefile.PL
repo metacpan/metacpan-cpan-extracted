@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 require 5.006;
 
 # increased per release
-my $relversion = '1.08';
+my $relversion = '1.09';
 
 my $libversion = '4.4.9';
 
@@ -47,12 +47,25 @@ WriteMakefile
  , INC      => "-I$FWTools/include -I."
  , LIBS     => [ "-L$FWTools/lib -lproj" ]
  , LICENSE  => 'perl'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+         { repository =>
+             { type => 'git'
+             , url  => 'https://github.com/markov2/perl5-Geo-Proj4.git'
+             , web  => 'https://github.com/markov2/perl5-Geo-Proj4'
+             }
+         }
+      , homepage => 'http://perl.overmeer.net/CPAN/'
+      , license  => [ 'http://dev.perl.org/licenses/' ]
+      }
  );
 
 ### used by oodist during production of this distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for DIST, see PODTAIL.txt as well
-RAWDIR          = ../public_html/geoproj4/raw
-DISTDIR         = ../public_html/geoproj4/source
+RAWDIR          = ../public_html/geo-proj4/raw
+DISTDIR         = ../public_html/geo-proj4/source
 __POSTAMBLE

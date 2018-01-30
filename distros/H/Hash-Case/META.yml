@@ -1,23 +1,27 @@
---- #YAML:1.0
-name:               Hash-Case
-version:            1.02
-abstract:           Play trics with hash keys
+---
+abstract: 'Play trics with hash keys'
 author:
-    - Mark Overmeer
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Mark Overmeer'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Log::Report:  0.26
-    Test::More:   0.47
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Hash-Case
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Report: '0.26'
+  Test::More: '0.47'
+resources:
+  repository: https://github.com/markov2/perl5-Hash-Case.git
+version: '1.03'
+x_homepage: http://perl.overmeer.net/CPAN/
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

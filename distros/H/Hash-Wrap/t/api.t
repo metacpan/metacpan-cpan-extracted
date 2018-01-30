@@ -69,7 +69,7 @@ SKIP: {
 
     isa_ok(
         My::Import::Default::LValue::wrap_hash( {} ),
-        ['Hash::Wrap::Class::LValue'],
+        ['Hash::Wrap::Class::lvalue'],
         "default w/ lvalue"
     );
 
@@ -91,15 +91,15 @@ SKIP: {
 
     {
         package My::Import::Good::LValue;
+        our @ISA = qw( Hash::Wrap::Base );
 
-        use if $] ge '5.01600', parent => 'Hash::Wrap::Class::LValue';
+        our $generate_signature = sub { ': lvalue' };
     }
 
     ok(
         lives {
             Hash::Wrap->import( {
                     -class  => 'My::Import::Good::LValue',
-                    -lvalue => 1
                 } )
         },
         'good lvalue class'

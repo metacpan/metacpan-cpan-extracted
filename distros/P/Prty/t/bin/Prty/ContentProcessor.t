@@ -7,6 +7,10 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::Perl;
+use Prty::Section::Object;
+use Prty::Path;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {

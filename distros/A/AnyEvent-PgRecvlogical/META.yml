@@ -26,7 +26,7 @@ requires:
   DBD::Pg: v3.7.0
   DBI: '0'
   Moo: '0'
-  Promises: '0'
+  Promises: '0.99'
   Try::Tiny: '0'
   Types::Standard: '0'
   constant: '0'
@@ -34,5 +34,5 @@ requires:
 resources:
   homepage: https://github.com/mydimension/AnyEvent-PgRecvlogical
   repository: https://github.com/mydimension/AnyEvent-PgRecvlogical.git
-version: '0.002'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.70'

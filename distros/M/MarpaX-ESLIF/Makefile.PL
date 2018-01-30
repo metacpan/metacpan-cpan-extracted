@@ -126,31 +126,10 @@ try {
   }
 };
 
-# ---------------
-# iconv location
-# ---------------
 #
-# On non-Windows platforms we have to check if iconv is in libc or not -;
-# On windows it is using dlfcn-win32 that will imply a dependency on psapi. We verify this library is available
+# On windows we are using dlfcn-win32 that will imply a dependency on psapi. We verify this library is available
 #
-if (! is_os_type('Windows')) {
-  foreach my $this_lib ('', 'iconv', 'iconv-2') {
-    $ac->msg_checking(sprintf "if iconv is in %s library", $this_lib || 'standard');
-    my $conftest = $ac->lang_build_program("#include <stdlib.h>\n#include <iconv.h>", "{iconv_t cd; iconv(cd, NULL, NULL, NULL, NULL);}");
-    $ac->push_libraries($this_lib) if $this_lib;
-    if ($ac->link_if_else($conftest)) {
-      $ac->msg_result('yes');
-      if ($this_lib) {
-        my $found_lib = "-l${this_lib}";
-        $ac->msg_notice("Adding $found_lib to OTHERLDFLAGS");
-        push(@OTHERLDFLAGS, $found_lib);
-      }
-      last;
-    } else {
-      $ac->msg_result('no');
-    }
-  }
-} else {
+if (is_os_type('Windows')) {
   print "# Determining the need for -lpsapi\n";
   $ac->push_libraries('psapi');
   if ($ac->link_if_else("#include <windows.h>\n#include <psapi.h>\nint main() { EnumProcessModules(NULL, NULL, 0, NULL); }")) {
@@ -355,7 +334,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.32",
+  "VERSION" => "2.0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }

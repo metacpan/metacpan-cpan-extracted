@@ -1,16 +1,119 @@
-SYNOPSIS
+NAME
+    App::SerializeUtils - Utilities for serialization tasks
 
+VERSION
+    This document describes version 0.160 of App::SerializeUtils (from Perl
+    distribution App-SerializeUtils), released on 2018-01-29.
+
+SYNOPSIS
      $ script-that-produces-json | json2yaml
 
 DESCRIPTION
+    This distributions provides the following command-line utilities related
+    to serialization:
 
-    This distributions provides the following command-line utilities
-    related to serialization:
+    *   check-json
 
-    # INSERT_EXECS_LIST
+    *   check-phpser
+
+    *   check-yaml
+
+    *   dd2ddc
+
+    *   dd2json
+
+    *   dd2phpser
+
+    *   dd2sereal
+
+    *   dd2storable
+
+    *   dd2yaml
+
+    *   json2dd
+
+    *   json2ddc
+
+    *   json2phpser
+
+    *   json2sereal
+
+    *   json2storable
+
+    *   json2yaml
+
+    *   phpser2dd
+
+    *   phpser2ddc
+
+    *   phpser2json
+
+    *   phpser2sereal
+
+    *   phpser2storable
+
+    *   phpser2yaml
+
+    *   pp-dd
+
+    *   pp-json
+
+    *   pp-yaml
+
+    *   sereal2dd
+
+    *   sereal2ddc
+
+    *   sereal2json
+
+    *   sereal2phpser
+
+    *   sereal2storable
+
+    *   sereal2yaml
+
+    *   serializeutils-convert
+
+    *   storable2dd
+
+    *   storable2ddc
+
+    *   storable2json
+
+    *   storable2phpser
+
+    *   storable2sereal
+
+    *   storable2yaml
+
+    *   yaml2dd
+
+    *   yaml2ddc
+
+    *   yaml2json
+
+    *   yaml2phpser
+
+    *   yaml2sereal
+
+    *   yaml2storabls
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-SerializeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-SerializeUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Data::Dump
 
     JSON
@@ -22,4 +125,14 @@ SEE ALSO
     Storable
 
     YAML
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

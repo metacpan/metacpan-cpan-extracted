@@ -3,26 +3,30 @@ abstract: 'Email message exchange'
 author:
   - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mail-Transport
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 0
-  Errno: 0
-  File::Spec: 0.7
-  IO::Socket: 0
-  List::Util: 0
-  Mail::Reporter: 3
-  Net::SMTP: 0
-version: 3.001
+  Carp: '0'
+  Errno: '0'
+  File::Spec: '0.7'
+  IO::Socket: '0'
+  List::Util: '0'
+  Mail::Reporter: '3'
+  Net::SMTP: '0'
+resources:
+  repository: https://github.com/markov2/perl5-Mail-Transport.git
+version: '3.002'
+x_homepage: http://perl.overmeer.net/CPAN/
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

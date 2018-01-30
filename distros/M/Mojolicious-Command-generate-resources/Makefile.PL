@@ -1,8 +1,10 @@
-use 5.020001;
+use 5.020000;
 use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+my $preop = qq'pod2text lib/Mojolicious/Command/generate/resources.pm > README;'
+  . qq'pod2markdown lib/Mojolicious/Command/generate/resources.pm > README.md';
 WriteMakefile(
   NAME => 'Mojolicious::Command::generate::resources',
   VERSION_FROM =>
@@ -12,6 +14,8 @@ WriteMakefile(
   PREREQ_PM     => {'Mojolicious' => '7.60', perl => '5.020001'},
   TEST_REQUIRES => {'Mojo::SQLite' => '3.000'},
   test          => {TESTS          => 't/*.t'},
+  clean         => {FILES          => 'Mojolicious-Command-*'},
+  dist          => {PREOP          => $preop},
   META_MERGE    => {
     dynamic_config => 0,
     'meta-spec'    => {version => 2},

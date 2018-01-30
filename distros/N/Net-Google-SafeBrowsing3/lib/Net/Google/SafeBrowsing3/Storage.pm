@@ -457,7 +457,7 @@ Required. Time of the update.
 
 =item wait
 
-Required. Number o seconds to wait before doing the next update.
+Required. Number of seconds to wait before doing the next update.
 
 =item list
 
@@ -496,7 +496,7 @@ Required. Time of the update.
 
 =item wait
 
-Required. Number o seconds to wait before doing the next update.
+Required. Number of seconds to wait before doing the next update.
 
 =item list
 
@@ -732,7 +732,7 @@ sub get_full_hash_error {
 
 Remove all local data
 
-	$storage->delete_mac_keys();
+	$storage->reset();
 
 
 Arguments

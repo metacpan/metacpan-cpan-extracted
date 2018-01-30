@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.16
+    Version 0.30
 
 SYNOPSIS
 
@@ -21,6 +21,8 @@ SYNOPSIS
         $firefox->find_element('//button[@name="lucky"]')->click();
     
         say $firefox->page_source();
+    
+        $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
 DESCRIPTION
 
@@ -45,20 +47,27 @@ SUBROUTINES/METHODS
       refuses to allow more than one instance of a profile to run at the
       same time. Profile names can be obtained by using the
       Firefox::Marionette::Profile::names() method. NOTE: firefox ignores
-      any chagnes made to the profile on the disk while it is running.
+      any changes made to the profile on the disk while it is running.
 
       * profile - create a new profile based on the supplied profile. NOTE:
       firefox ignores any changes made to the profile on the disk while it
       is running.
 
-      * debug - allow firefox's debug to be available via STDERR.
+      * debug - should firefox's debug to be available via STDERR. This
+      defaults to "0".
+
+      * addons - should any firefox extensions and themes be available in
+      this session. This defaults to "0".
+
+      * visible - should firefox be visible on the desktop. This defaults
+      to "0".
 
     This method returns a new Firefox::Marionette object, connected to an
-    instance of firefox <https://firefox.com>. If necessary and possible,
+    instance of firefox <https://firefox.com>. In a non MacOS/Win32/Cygwin
+    environment, if necessary (no DISPLAY variable can be found and visible
+    has been set to true) and possible (Xvfb can be executed successfully),
     this method will also automatically start an Xvfb
-    <https://en.wikipedia.org/wiki/Xvfb> instance to allow firefox to run
-    in an environment without an accessible X server, so long as the method
-    is not being run on Windows or MacOS.
+    <https://en.wikipedia.org/wiki/Xvfb> instance.
 
  go
 
@@ -114,8 +123,16 @@ SUBROUTINES/METHODS
  attribute
 
     accepts an element as the first parameter and a scalar attribute name
-    as the second parameter. It returns the value of the attribute with the
-    supplied name.
+    as the second parameter. It returns the initial value of the attribute
+    with the supplied name. This method will return the initial content,
+    the property method will return the current content.
+
+ property
+
+    accepts an element as the first parameter and a scalar attribute name
+    as the second parameter. It returns the current value of the property
+    with the supplied name. This method will return the current content,
+    the attribute method will return the initial content.
 
  script
 
@@ -361,6 +378,10 @@ SUBROUTINES/METHODS
     WebDriver conforming. The WebDriver service offered by Marionette does
     not match or negotiate capabilities beyond type and bounds checks.
 
+ delete_session
+
+    deletes the current WebDriver session.
+
  window_type
 
     returns the current window's type. This should be 'navigator:browser'.
@@ -407,6 +428,21 @@ SUBROUTINES/METHODS
     returns identifiers for each open chrome window for tests interested in
     managing a set of chrome windows and tabs separately.
 
+ install
+
+    accepts the fully qualified path to an .xpi addon file as the first
+    parameter and an optional true/false second parameter to indicate if
+    the xpi addon file should be a temporary addition (just for the
+    existance of this browser instance). Unsigned xpi addon files may be
+    loaded temporarily. It returns the GUID for the addon which may be used
+    as a parameter to the uninstall method.
+
+ uninstall
+
+    accepts the GUID for the addon to uninstall. The GUID is returned when
+    from the install method. This method returns itself to aid in chaining
+    methods.
+
  application_type
 
     returns the application type for the Marionette protocol. Should be
@@ -424,7 +460,24 @@ SUBROUTINES/METHODS
  quit
 
     Marionette will stop accepting new connections before ending the
-    current session, and finally attempting to quit the application
+    current session, and finally attempting to quit the application. This
+    method returns the $? (CHILD_ERROR) value for the Firefox process
+
+ child_error
+
+    This method returns the $? (CHILD_ERROR) for the Firefox process, or
+    undefined if the process has not yet exited.
+
+ error_message
+
+    This method returns a human readable error message describing how the
+    Firefox process exited (assuming it started okay). On Win32 platforms
+    this information is restricted to exit code.
+
+ alive
+
+    This method returns true or false depending on if the Firefox process
+    is still running.
 
 DIAGNOSTICS
 
@@ -449,11 +502,16 @@ DIAGNOSTICS
 CONFIGURATION AND ENVIRONMENT
 
     Firefox::Marionette requires no configuration files or environment
-    variables.
+    variables. It will however use the DISPLAY and XAUTHORITY environment
+    variables to try to connect to an X Server.
 
 DEPENDENCIES
 
-    None.
+    Firefox::Marionette requires the following non-core Perl modules
+
+      * JSON
+
+      * URI
 
 INCOMPATIBILITIES
 

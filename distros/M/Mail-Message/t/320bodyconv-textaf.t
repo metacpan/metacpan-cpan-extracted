@@ -14,7 +14,7 @@ use Test::More;
 BEGIN {
     eval 'require Text::Autoformat';
     if($@)
-    {   plan skip_all => "Text::Autoformat not available.";
+    {   plan skip_all => "requires Text::Autoformat.";
         exit 0;
     }
 

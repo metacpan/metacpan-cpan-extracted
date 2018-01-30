@@ -27,7 +27,7 @@ $q->filter(['AND', [['id', 'IN', \[1, 2]], ['field', 'LIKE', \'a']]]);
 
 $q->order_by(qw(id field));
 
-cmp_deeply($q->get_fields(), [qw(id field)], 'get_fields');
+cmp_deeply($q->get_fields(), {'id' => '', 'field' => ''}, 'get_fields');
 
 ok($q->{'__FILTER__'}, '__FILTER__');
 

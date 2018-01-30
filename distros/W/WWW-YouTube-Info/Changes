@@ -11,4 +11,6 @@ Revision history for Perl extension WWW::YouTube::Info.
 	- fixed synopsis
 0.05  Wed Jul 27 15:32:42 2011
 	- added tests
+0.06  Fri Jan 26 16:36:03 2018
+  - utilize https
 

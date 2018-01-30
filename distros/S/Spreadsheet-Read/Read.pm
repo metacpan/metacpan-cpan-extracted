@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.77";
+our $VERSION = "0.78";
 sub  Version { $VERSION }
 
 use Carp;
@@ -65,15 +65,16 @@ my @parsers = (
     [ dmp  => "Data::Peek",				""		],
     );
 my %can = map {
-    my $preset = $ENV{"SPREADSHEET_READ_\U$_->[0]"};
+    my $p = $_;
+    my $preset = $ENV{"SPREADSHEET_READ_\U$p->[0]"};
     if ($preset and $preset =~ m/^[\w:]+$/) {
 	if (eval "require $preset" and not $@) {
 	    # forcing a parser should still check the version
-	    for (grep { $_->[1] eq $preset and $_->[2] } @parsers) {
+	    for (grep { $p->[1] eq $preset and $p->[2] } @parsers) {
 		my $ok;
 		my $has = $preset->VERSION;
 		$has =~ s/_[0-9]+$//;			# Remove beta-part
-		if ($_->[2] =~ m/^v([0-9.]+)/) {	# clumsy versions
+		if ($p->[2] =~ m/^v([0-9.]+)/) {	# clumsy versions
 		    my @min = split m/\./ => $1;
 		    $has =~ s/^v//;
 		    my @has = split m/\./ => $has;
@@ -81,7 +82,7 @@ my %can = map {
 			  (($min[0] * 1000 + $min[1]) * 1000 + $min[2]);
 		    }
 		else {	# normal versions
-		    $ok = $has >= $_->[2];
+		    $ok = $has >= $p->[2];
 		    }
 		$ok or $preset = "!$preset";
 		}
@@ -90,7 +91,7 @@ my %can = map {
 	    $preset = "!$preset";
 	    }
 	}
-    $_->[0] => $preset || "";
+    $p->[0] => $preset || "";
     } @parsers;
 for (@parsers) {
     my ($flag, $mod, $vsn) = @$_;
@@ -1431,7 +1432,7 @@ and the number of sheets in the book.
 
 With named sheets will first try to use the list of sheet-labels as stored in
 the control structure. If no match is found, it will scan the actual labels
-of the sheets. In that case, it will return the fist matching sheet.
+of the sheets. In that case, it will return the first matching sheet.
 
 If defined, the returned sheet will be of class C<Spreadsheet::Read::Sheet>.
 
@@ -1558,7 +1559,8 @@ I<NOT> be updated.
 
 Returns 1 if the selected sheet is active, otherwise returns 0.
 
-Currently only works on XLS. CSV is always active.
+Currently only works on XLS (as of Spreadsheed::ParseExcel-0.61).
+CSV is always active.
 
 =head2 Using CSV
 

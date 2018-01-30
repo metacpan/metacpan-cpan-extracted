@@ -9,7 +9,7 @@ package Rex::Virtualization::LibVirt::create;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands::Gather;
@@ -421,6 +421,9 @@ __DATA__
   <name><%= $::name %></name>
   <memory><%= $::memory %></memory>
   <currentMemory><%= $::memory %></currentMemory>
+  <% if(exists $::cpu->{mode}) { %>
+   <cpu mode="<%= $::cpu->{mode} %>" />
+  <% } %>
   <vcpu><%= $::cpus %></vcpu>
   <os>
    <type arch="<%= $::arch %>">hvm</type>

@@ -4,9 +4,10 @@
  * This file is part of libgit2, distributed under the GNU GPL v2 with
  * a Linking Exception. For full terms see the included COPYING file.
  */
-#include "common.h"
-#include "diff.h"
+
 #include "diff_generate.h"
+
+#include "diff.h"
 #include "patch_generate.h"
 #include "fileops.h"
 #include "config.h"
@@ -23,7 +24,7 @@
 	(((DIFF)->base.opts.flags & (FLAG)) == 0)
 #define DIFF_FLAG_SET(DIFF,FLAG,VAL) (DIFF)->base.opts.flags = \
 	(VAL) ? ((DIFF)->base.opts.flags | (FLAG)) : \
-	((DIFF)->base.opts.flags & ~(VAL))
+	((DIFF)->base.opts.flags & ~(FLAG))
 
 typedef struct {
 	struct git_diff base;
@@ -388,6 +389,7 @@ static void diff_generated_free(git_diff *d)
 {
 	git_diff_generated *diff = (git_diff_generated *)d;
 
+	git_attr_session__free(&diff->base.attrsession);
 	git_vector_free_deep(&diff->base.deltas);
 
 	git_pathspec__vfree(&diff->pathspec);
@@ -410,13 +412,14 @@ static git_diff_generated *diff_generated_alloc(
 	if ((diff = git__calloc(1, sizeof(git_diff_generated))) == NULL)
 		return NULL;
 
-	GIT_REFCOUNT_INC(diff);
+	GIT_REFCOUNT_INC(&diff->base);
 	diff->base.type = GIT_DIFF_TYPE_GENERATED;
 	diff->base.repo = repo;
 	diff->base.old_src = old_iter->type;
 	diff->base.new_src = new_iter->type;
 	diff->base.patch_fn = git_patch_generated_from_diff;
 	diff->base.free_fn = diff_generated_free;
+	git_attr_session__init(&diff->base.attrsession, repo);
 	memcpy(&diff->base.opts, &dflt, sizeof(git_diff_options));
 
 	git_pool_init(&diff->base.pool, 1);
@@ -624,7 +627,7 @@ int git_diff__oid_for_entry(
 		error = git_odb__hashlink(out, full_path.ptr);
 		diff->base.perf.oid_calculations++;
 	} else if (!git__is_sizet(entry.file_size)) {
-		giterr_set(GITERR_OS, "File size overflow (for 32-bits) on '%s'",
+		giterr_set(GITERR_OS, "file size overflow (for 32-bits) on '%s'",
 			entry.path);
 		error = -1;
 	} else if (!(error = git_filter_list_load(&fl,
@@ -1587,7 +1590,7 @@ int git_diff__commit(
 		char commit_oidstr[GIT_OID_HEXSZ + 1];
 
 		error = -1;
-		giterr_set(GITERR_INVALID, "Commit %s is a merge commit",
+		giterr_set(GITERR_INVALID, "commit %s is a merge commit",
 			git_oid_tostr(commit_oidstr, GIT_OID_HEXSZ + 1, git_commit_id(commit)));
 		goto on_error;
 	}

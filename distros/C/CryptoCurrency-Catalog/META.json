@@ -56,7 +56,7 @@
          "web" : "https://github.com/perlancar/perl-CryptoCurrency-Catalog"
       }
    },
-   "version" : "20180116",
+   "version" : "20180125",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -151,7 +151,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.591"
+            "version" : "0.592"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

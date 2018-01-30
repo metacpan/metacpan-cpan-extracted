@@ -60,6 +60,16 @@ WriteMakefile(
                 },
             },
         },
+        resources   => {
+            bugtracker => {
+                web => 'https://github.com/dallaylaen/perl-mvc-neaf/issues',
+            },
+            repository => {
+                type => 'git',
+                url => 'https://github.com/dallaylaen/perl-mvc-neaf.git',
+                web => 'https://github.com/dallaylaen/perl-mvc-neaf',
+            },
+        },
     },
     dist                 => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean                => { FILES => 'MVC-Neaf-*' },

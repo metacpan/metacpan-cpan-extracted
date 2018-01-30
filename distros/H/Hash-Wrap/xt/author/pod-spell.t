@@ -12,12 +12,10 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Astrophysical
 Base
-Class
 DCONWAY
 Diab
 Hash
 Jerius
-LValue
 Observatory
 Smithsonian
 Wrap

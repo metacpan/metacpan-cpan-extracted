@@ -50,7 +50,6 @@ my $expected =
     srsName => 'EPGS:4326',
     seq_gml_polygonMember => [ {
       gml_polygonMember => {
-        srsName => 'EPGS:4326',
         gml_Polygon => {
           gml_innerBoundaryIs => [],
           gml_outerBoundaryIs => {

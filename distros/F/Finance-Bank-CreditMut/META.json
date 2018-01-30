@@ -1,10 +1,10 @@
 {
-   "abstract" : "Check your Crédit Mutuel accounts from Perl",
+   "abstract" : "Check your CrÃ©dit Mutuel accounts from Perl",
    "author" : [
-      "Cédric Bouvier <cbouvi@cpan.org>"
+      "CÃ©dric Bouvier <cbouvi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,10 +33,12 @@
       "runtime" : {
          "requires" : {
             "HTML::TableExtract" : "1.08",
-            "WWW::Mechanize" : "0.44"
+            "WWW::Mechanize" : "0.44",
+            "XML::Twig" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.13
+   "version" : 0.14,
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,0 +1,395 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/WHMCSUtils/calc_deferred_revenue
+# and generated automatically using Perinci::CmdLine::Gen version 0.484
+
+our $DATE = '2018-01-29'; # DATE
+our $DIST = 'App-WHMCSUtils'; # DIST
+our $VERSION = '0.005'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/WHMCSUtils/calc_deferred_revenue",
+    program_name => "whmcs-calc-deferred-revenue",
+    log => 1,
+    log_level => "info",
+);
+
+$cmdline->run;
+
+# ABSTRACT: whmcs-calc-deferred-revenue
+# PODNAME: whmcs-calc-deferred-revenue
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+whmcs-calc-deferred-revenue - whmcs-calc-deferred-revenue
+
+=head1 VERSION
+
+This document describes version 0.005 of whmcs-calc-deferred-revenue (from Perl distribution App-WHMCSUtils), released on 2018-01-29.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % whmcs-calc-deferred-revenue [options]
+
+=head1 DESCRIPTION
+
+This utility collects invoice items from paid invoices, filters eligible ones,
+then defers the revenue to separate months for items that should be deferred,
+and finally sums the amounts to calculate total monthly deferred revenues.
+
+This utility can also be instructed (via setting the C<full> option to true) to
+output the full CSV report (each items with their categorizations and deferred
+revenues).
+
+Recognizes English and Indonesian description text.
+
+Categorization heuristics:
+
+=over
+
+=item * Fund deposits are not recognized as revenues.
+
+=item * Hosting revenues are deferred, but when the description indicates starting and
+ending dates and the dates are not too old.
+
+=item * Domain and addon revenues are not deferred, they are recognized immediately.
+
+=item * Other items will be assumed as immediate revenues.
+
+=back
+
+Extra rules (applied first) can be specified via the C<extra_rules> option.
+
+To use this utility, install the Perl CPAN distribution L<App::WHMCSUtils>.
+Then, create a configuration file C<~/whmcs-calc-deferred-revenue.conf>
+containing something like:
+
+ db_name=YOURDBNAME
+ db_host=YOURDBHOST
+ db_user=YOURDBUSER
+ db_pass=YOURDBPASS
+
+C<db_host> defaults to C<localhost>. C<db_user> and C<db_pass> can be omitted if you
+have C</etc/my.cnf> or C<~/.my.cnf>. This utility can search for username/password
+from those files.
+
+You can also add other configuration like C<extra_rules>, e.g.:
+
+ extra_rules=[{"type": "^$", "description": "^(?^i)sewa\\b.*ruang", "category": "rent"}]
+
+You can then run the utility for the desired, e.g.:
+
+ % whmcs-calc-deferred-revenue --date-start 2013-01-01 --date-end 2017-10-31 \
+     --date-old-limit 2013-01-01 --full --output-file ~/output.csv
+
+Wait for a while and check the output at C<~/output.csv>.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--date-old-limit>=I<s>
+
+Set what date will be considered too old to recognize item as revenue.
+
+Default is 2008-01-01.
+
+
+=item B<--db-host>=I<s>
+
+Default value:
+
+ "localhost"
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-pass>=I<s>
+
+=item B<--db-port>=I<s>
+
+Default value:
+
+ 3306
+
+=item B<--db-user>=I<s>
+
+=item B<--output-file>=I<s>
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--date-end>=I<s>
+
+End at this date (based on invoice payment date).
+
+=item B<--date-start>=I<s>
+
+Start from this date (based on invoice payment date).
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--full>
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Rule options
+
+=over
+
+=item B<--extra-rules-json>=I<s>
+
+See C<--extra-rules>.
+
+=item B<--extra-rules>=I<s>
+
+Example (in JSON):
+
+    [
+        {
+            "type": "^$",
+            "description": "^SEWA",
+            "category": "rent"
+        }
+    ]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C whmcs-calc-deferred-revenue whmcs-calc-deferred-revenue
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete whmcs-calc-deferred-revenue 'p/*/`whmcs-calc-deferred-revenue`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/whmcs-calc-deferred-revenue.conf>, F<~/whmcs-calc-deferred-revenue.conf>, or F</etc/whmcs-calc-deferred-revenue.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ date_end (see --date-end)
+ date_old_limit (see --date-old-limit)
+ date_start (see --date-start)
+ db_host (see --db-host)
+ db_name (see --db-name)
+ db_pass (see --db-pass)
+ db_port (see --db-port)
+ db_user (see --db-user)
+ extra_rules (see --extra-rules)
+ format (see --format)
+ full (see --full)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ output_file (see --output-file)
+
+=head1 ENVIRONMENT
+
+=head2 WHMCS_CALC_DEFERRED_REVENUE_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/whmcs-calc-deferred-revenue.conf>
+
+F<~/whmcs-calc-deferred-revenue.conf>
+
+F</etc/whmcs-calc-deferred-revenue.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-WHMCSUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-WHMCSUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHMCSUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

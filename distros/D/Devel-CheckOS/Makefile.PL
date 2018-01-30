@@ -1,10 +1,10 @@
-require 5.010;
+require 5.006;
 use ExtUtils::MakeMaker;
 
 use File::Spec;
 
 use strict;
-local $^W = 1;
+use warnings;
 
 use lib 'lib';
 
@@ -53,7 +53,7 @@ if($ENV{AUTOMATED_TESTING}) {
 WriteMakefile(
     NAME         => 'Devel::CheckOS',
     META_MERGE => {
-        license => 'other',
+        license => 'open_source',
         resources => {
             repository => 'https://github.com/DrHyde/perl-modules-Devel-CheckOS',
             bugtracker => 'https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues'

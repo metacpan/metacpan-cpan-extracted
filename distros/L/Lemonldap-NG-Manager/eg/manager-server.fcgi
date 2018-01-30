@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 use Plack::Handler::FCGI;
 use Lemonldap::NG::Manager;

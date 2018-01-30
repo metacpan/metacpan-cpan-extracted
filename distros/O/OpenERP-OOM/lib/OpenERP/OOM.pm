@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 
 
 1; # End of OpenERP::OOM
@@ -21,7 +21,7 @@ OpenERP::OOM
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 

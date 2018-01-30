@@ -13,9 +13,12 @@ BEGIN {
 
 my $cv = MCE::Shared->condvar();
 
+MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
+
 ## signal - --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-{
+if ( $^O ne 'MSWin32' || ($^O eq 'MSWin32' && $] ge '5.020000')) {
+
    ok( 1, "shared condvar, spawning an asynchronous process" );
 
    my $proc = MCE::Hobo->new( sub {
@@ -31,7 +34,8 @@ my $cv = MCE::Shared->condvar();
 
 ## lock, set, get, unlock - --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-{
+if ( $^O ne 'MSWin32' || ($^O eq 'MSWin32' && $] ge '5.020000')) {
+
    my $data = 'beautiful skies, ...';
 
    $cv->lock;
@@ -49,7 +53,8 @@ my $cv = MCE::Shared->condvar();
 
 ## timedwait, wait, broadcast - --- --- --- --- --- --- --- --- --- --- --- ---
 
-{
+if ( $^O ne 'MSWin32' || ($^O eq 'MSWin32' && $] ge '5.020000')) {
+
    my @procs; my $start = time();
 
    push @procs, MCE::Hobo->new( sub { $cv->timedwait(10); 1 } );
@@ -85,6 +90,10 @@ is( $cv->append('ba'), 4, 'shared condvar, check append' );
 is( $cv->get(), '20ba', 'shared condvar, check value after append' );
 is( $cv->getset('foo'), '20ba', 'shared condvar, check getset' );
 is( $cv->get(), 'foo', 'shared condvar, check value after getset' );
+
+$cv->destroy();
+
+MCE::Shared->stop();
 
 done_testing;
 

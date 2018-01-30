@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::clickhouse::st;
-$QBit::Application::Model::DB::clickhouse::st::VERSION = '0.006';
+$QBit::Application::Model::DB::clickhouse::st::VERSION = '0.007';
 use qbit;
 
 use base qw(QBit::Class);
@@ -24,9 +24,7 @@ sub execute {
         my $db = $self->dbi->db;
 
         my $i = 0;
-        while ($sql =~ s/\?/$db->quote($params[$i])/) {
-            $i++;
-        }
+        $sql =~ s/\?/$db->quote($params[$i++])/eg;
 
         if ($i != @params) {
             $self->dbi->err('CH1');

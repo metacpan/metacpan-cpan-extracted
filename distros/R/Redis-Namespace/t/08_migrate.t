@@ -27,6 +27,10 @@ my $ns1 = Redis::Namespace->new(redis => $redis1, namespace => 'ns');
 my $ns2 = Redis::Namespace->new(redis => $redis2, namespace => 'ns');
 
 subtest 'basic MIGRATE test' => sub {
+    my $redis_version = version->parse($redis1->info->{redis_version});
+    plan skip_all => 'your redis does not support MIGRATE command'
+        unless $redis_version >= '2.6.0';
+
     $redis1->flushall;
     $redis2->flushall;
     $ns1->set('hogehoge', 'foobar');

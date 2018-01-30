@@ -13,7 +13,7 @@ our @ISA = qw(
 our @EXPORT = qw(
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 use Data::Dumper;
@@ -41,14 +41,14 @@ WWW::YouTube::Info - gain info on YouTube video by VIDEO_ID
   
   my $info = $yt->get_info();
   
-  # hash reference holds values gained via http://youtube.com/get_video_info?video_id=foobar
+  # hash reference holds values gained via https://youtube.com/get_video_info?video_id=foobar
   # $info->{title}          # e.g.: Foo+bar+-+%27Foobar%27
   # $info->{author}         # e.g.: foobar
   # $info->{keywords}       # e.g.: Foo%2Cbar%2CFoobar
   # $info->{length_seconds} # e.g.: 60
   # $info->{fmt_map}        # e.g.: 22%2F1280x720%2F9%2F0%2F115%2C35%2F854x480%2F9%2F0%2F115%2C34%2F640x360%2F9%2 ..
-  # $info->{fmt_url_map}    # e.g.: 22%7Chttp%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0.0 ..
-  # $info->{fmt_stream_map} # e.g.: 22%7Chttp%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0.0 ..
+  # $info->{fmt_url_map}    # e.g.: 22%7Chttps%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0. ..
+  # $info->{fmt_stream_map} # e.g.: 22%7Chttps%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0. ..
   # ..
   
   # Remark:
@@ -86,17 +86,14 @@ sub get_info {
 
   my $id = $self->{_id};
 
-  my $info_url = "http://youtube.com/get_video_info?video_id=$id";
+  my $info_url = "https://youtube.com/get_video_info?video_id=$id";
 
   my $video_info = get($info_url)
     or croak "no get at $info_url - $!";
 
-  my @info = split /&/, $video_info;
-
-  for ( @info ) {
-    my ($key, $value) = split /=/;
-    $self->{info}->{$key} = $value;
-  }
+  # e.g.: fexp=907911%2C914091%2C911606&url_encoded_fmt_stream_map=url%3Dhttps ..
+  my %video_info = split /[=&]/, $video_info;
+  $self->{info} = \%video_info;
 
   return $self->{info};
 }
@@ -115,7 +112,7 @@ might gain hints/information to improve L<WWW::YouTube::Info>.
 Please report bugs and/or feature requests to
 C<bug-WWW-YouTube-Info at rt.cpan.org>,
 alternatively by means of the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-YouTube-Info>.
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-YouTube-Info>.
 
 =head1 AUTHOR
 
@@ -123,7 +120,7 @@ east E<lt>east@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by east
+Copyright (C) by east
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

@@ -43,6 +43,7 @@
             "File::Path" : "2.07",
             "Test2::API" : "0",
             "Test::More" : "0.96",
+            "Text::Diff" : "0",
             "perl" : "5.008003"
          }
       },
@@ -51,7 +52,8 @@
             "App::Prove" : "0",
             "Capture::Tiny" : "0",
             "Test2::API" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "Text::Diff" : "0"
          }
       }
    },
@@ -69,6 +71,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

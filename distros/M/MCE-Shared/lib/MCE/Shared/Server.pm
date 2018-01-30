@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.834';
+our $VERSION = '1.835';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -25,7 +25,7 @@ no overloading;
 use Carp ();
 use Storable ();
 
-my ($_has_threads, $_spawn_child, $_freeze2, $_freeze, $_thaw);
+my ($_has_threads, $_spawn_child, $_freeze, $_thaw);
 
 BEGIN {
    local $@;
@@ -48,17 +48,15 @@ BEGIN {
          my $_encoder_ver = int( Sereal::Encoder->VERSION() );
          my $_decoder_ver = int( Sereal::Decoder->VERSION() );
          if ( $_encoder_ver - $_decoder_ver == 0 ) {
-            $_freeze2 = sub { encode_sereal( @_, { freeze_callbacks => 1 } ) },
-            $_freeze  = \&encode_sereal,
-            $_thaw    = \&decode_sereal;
+            $_freeze = \&encode_sereal,
+            $_thaw   = \&decode_sereal;
          }
       }
    }
 
    if (!defined $_freeze) {
-      $_freeze2 = \&Storable::freeze,
-      $_freeze  = \&Storable::freeze,
-      $_thaw    = \&Storable::thaw;
+      $_freeze = \&Storable::freeze,
+      $_thaw   = \&Storable::thaw;
    }
 }
 
@@ -1840,7 +1838,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.834
+This document describes MCE::Shared::Server version 1.835
 
 =head1 DESCRIPTION
 

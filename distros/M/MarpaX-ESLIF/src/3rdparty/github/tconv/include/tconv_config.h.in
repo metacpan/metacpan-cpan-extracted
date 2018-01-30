@@ -8,6 +8,7 @@
 #cmakedefine TCONV_HAVE_ICONV             @TCONV_HAVE_ICONV@
 #cmakedefine ICONV_CAN_TRANSLIT           @ICONV_CAN_TRANSLIT@
 #cmakedefine ICONV_CAN_IGNORE             @ICONV_CAN_IGNORE@
+#cmakedefine ICONV_IS_NOT_TRUSTABLE       @ICONV_IS_NOT_TRUSTABLE@
 
 #ifndef __cplusplus
 #  ifndef C_INLINE
@@ -19,7 +20,6 @@
 #    endif
 #  endif
 #endif
-
 
 /* Convenience macro */
 #ifndef TCONV_NTRACE

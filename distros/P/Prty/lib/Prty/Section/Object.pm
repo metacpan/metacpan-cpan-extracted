@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Path;
 
@@ -682,7 +682,7 @@ sub get {
         my $val = $self->[3]->{$key};
         if (ref($val) && $key =~ /^[A-Z]/) {
             $self->throw(
-                q{SECOBJ-00001: Schlüssel besitzt mehrere Werte},
+                q~SECOBJ-00001: Schlüssel besitzt mehrere Werte~,
                 Key=>$key,
                 Values=>'['.join(',',@$val).']',
             );
@@ -785,7 +785,7 @@ sub getBool {
     }
     else {
         $self->throw(
-            q{COTEDO-00001: Illegal attribute value. Only Yes/No allowed.},
+            q~COTEDO-00001: Illegal attribute value. Only Yes/No allowed.~,
             Attribute=>$key,
             Value=>$val,
             File=>$self->file,
@@ -834,7 +834,7 @@ sub getMandatory {
     my $val = $self->get($key);
     if (!defined $val || $val eq '') { 
         $self->throw(
-            q{SECOBJ-00002: Attribute has no value},
+            q~SECOBJ-00002: Attribute has no value~,
             Key=>$key,
             File=>$self->file,
             Line=>$self->line,
@@ -1247,7 +1247,7 @@ sub validate {
 
     if (!$contentAllowed && $self->[4] ne '' && $self->[4] ne '# eof') {
         $self->throw(
-            q{SECTION-00001: Inhalt ist nicht erlaubt},
+            q~SECTION-00001: Inhalt ist nicht erlaubt~,
             Section=>$self->type,
             Content=>$self->[4],
             File=>$self->file,
@@ -1279,7 +1279,7 @@ sub validate {
         }
 
         $self->throw(
-            q{SECTION-00001: Unknown section attributes},
+            q~SECTION-00001: Unknown section attributes~,
             Section=>$self->type,
             Keys=>join(', ',@keys),
             File=>$self->file,
@@ -1393,7 +1393,7 @@ sub AUTOLOAD {
 
     if (!ref $this) {
         $this->throw(
-            q{HASH-00002: Klassen-Methode existiert nicht},
+            q~HASH-00002: Klassen-Methode existiert nicht~,
             Method=>$key,
         );
     }
@@ -1402,7 +1402,7 @@ sub AUTOLOAD {
 
     if (!exists $this->[3]->{$key}) {
         $this->throw(
-            q{HASH-00001: Schlüssel existiert nicht},
+            q~HASH-00001: Schlüssel existiert nicht~,
             Attribute=>$key,
             Class=>ref($this)? ref($this): $this,
         );
@@ -1431,7 +1431,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -1439,7 +1439,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

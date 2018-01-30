@@ -3,13 +3,11 @@ package Firefox::Marionette::Timeouts;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub new {
     my ( $class, %parameters ) = @_;
-    my $element = bless {
-        %parameters
-    }, $class;
+    my $element = bless {%parameters}, $class;
     return $element;
 }
 
@@ -37,7 +35,7 @@ Firefox::Marionette::Timeouts - Represents the timeouts for page loading, search
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 

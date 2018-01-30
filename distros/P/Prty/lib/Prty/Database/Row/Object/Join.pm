@@ -4,7 +4,7 @@ use base qw/Prty::Database::Row::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Array;
 use Prty::Hash;
@@ -98,7 +98,7 @@ sub selectTemplate {
     my $ref = *{"$class\::Select"}{SCALAR};
     if (!$$ref) {
         $class->throw(
-            q{ROW-00001: Join-Klasse definiert kein Select-Statement},
+            q~ROW-00001: Join-Klasse definiert kein Select-Statement~,
             JoinClass=>$class,
         );
     }
@@ -208,7 +208,7 @@ sub cast {
         Prty::Array->compare($titles,$newTitles);
     if (!@$bothA) {
         $self->throw(
-            q{ROW-00006: Datensatz-Klassen haben keine gemeinsamen Kolumnen},
+            q~ROW-00006: Datensatz-Klassen haben keine gemeinsamen Kolumnen~,
             RowClass=>ref($self),
             CastClass=>$newClass,
         );
@@ -261,7 +261,7 @@ sub cast {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -269,7 +269,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

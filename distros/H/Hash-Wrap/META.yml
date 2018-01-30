@@ -30,26 +30,16 @@ no_index:
 provides:
   Hash::Wrap:
     file: lib/Hash/Wrap.pm
-    version: '0.03'
+    version: '0.05'
   Hash::Wrap::Base:
     file: lib/Hash/Wrap/Base.pm
-    version: '0.03'
-  Hash::Wrap::Base::LValue:
-    file: lib/Hash/Wrap/Base/LValue.pm
-    version: '0.03'
-  Hash::Wrap::Class:
-    file: lib/Hash/Wrap/Class.pm
-    version: '0.03'
-  Hash::Wrap::Class::LValue:
-    file: lib/Hash/Wrap/Class/LValue.pm
-    version: '0.03'
+    version: '0.05'
 requires:
-  Hash::Util: '0'
   MRO::Compat: '0'
   Scalar::Util: '0'
   perl: '5.008009'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Hash-Wrap
   repository: git://github.com/djerius/hash-wrap.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

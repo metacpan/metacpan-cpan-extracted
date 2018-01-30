@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.060';
+our $VERSION = '0.062';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -41,7 +41,7 @@ sub __validate_options {
         min_col_width   => '[ 0-9 ]+',
         progress_bar    => '[ 0-9 ]+',
         tab_width       => '[ 0-9 ]+',
-        add_header      => '[ 0 1 ]',
+        add_header      => '[ 0 1 ]', # DEPRECATED
         binary_filter   => '[ 0 1 ]',
         grid            => '[ 0 1 ]',
         keep_header     => '[ 0 1 ]',
@@ -52,7 +52,6 @@ sub __validate_options {
         prompt          => '',
         undef           => '',
         #thsd_sep       => '',
-        col_name        => '', # pod
     };
     for my $key ( keys %$opt ) {
         if ( ! exists $valid->{$key} ) {
@@ -73,7 +72,6 @@ sub __validate_options {
 
 sub __set_defaults {
     my ( $self ) = @_;
-    $self->{add_header}     = 0      if ! defined $self->{add_header};
     $self->{binary_filter}  = 0      if ! defined $self->{binary_filter};
     $self->{binary_string}  = 'BNRY' if ! defined $self->{binary_string};
     $self->{choose_columns} = 0      if ! defined $self->{choose_columns};
@@ -87,7 +85,6 @@ sub __set_defaults {
     $self->{tab_width}      = 2      if ! defined $self->{tab_width};
     $self->{table_expand}   = 1      if ! defined $self->{table_expand};
     $self->{undef}          = ''     if ! defined $self->{undef};
-    $self->{col_name}       = 'col'  if ! defined $self->{col_name};
     $self->{thsd_sep} = ',';
     $self->{tab_w}    = $self->{tab_width};
     $self->{tab_w}++    if $self->{grid} && ! ( $self->{tab_width} % 2 );
@@ -108,21 +105,36 @@ sub print_table {
         $self->__validate_options( $opt );
     }
     if ( ! @$table_ref ) {
-        choose( [ 'Close with ENTER' ], { prompt => "print_table: empty table without header row!" } );
+        choose( [ 'Close with ENTER' ], { prompt => "'print_table': empty table without header row!" } );
         return;
     }
     $self->__set_defaults();
 
-    # ### remove
+    # ### remove and choose_columns data type from [ 0 1 2 ] to [ 0 1 ],
     if ( $self->{choose_columns} == 2 ) {
-        choose( [ 'Close with ENTER' ], { prompt => "print_table option \"choose-columns\": 2 is no longer a valid value!" } );
+        choose( [ 'Close with ENTER' ], { prompt => "'print_table' option \"choose-columns\": 2 is no longer a valid value!" } );
     }
     # ###
 
-    if ( $self->{add_header} ) {
-        unshift @$table_ref, [ map { $_ . $self->{col_name} } 1 .. @{$table_ref->[0]} ];
+    # ### remove and the pod
+    if ( defined $self->{add_header} ) {
+        choose( [ 'Close with ENTER' ], { prompt => "The 'print_table' option \"add_header\" is deprecated and will be removed!" } );
+        if ( $self->{add_header} ) {
+            unshift @$table_ref, [ map { $_ . 'col' } 1 .. @{$table_ref->[0]} ];
+        }
     }
-    my $last_row_idx = $self->{max_rows} && $self->{max_rows} < @$table_ref ? $self->{max_rows} : $#$table_ref;
+    # ###
+    my $table_rows = @$table_ref - 1;
+    if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
+        $self->{info_row} = sprintf( 'Reached the row LIMIT %d', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
+        if ( $table_rows > $self->{max_rows} ) { # because for App::DBBrowser adding "(Total %d)" would be wrong
+            $self->{info_row} .= sprintf( '  (total %d)', insert_sep( $table_rows, $self->{thsd_sep} ) );
+        }
+        $self->{idx_last_row} = $self->{max_rows}; # -1 for index and +1 for header row
+    }
+    else {
+        $self->{idx_last_row} = $#$table_ref;
+    }
     my $col_idxs = [];
     if ( $self->{choose_columns}  ) {
         $col_idxs = $self->__choose_columns( $table_ref->[0] ) if $self->{choose_columns};
@@ -130,13 +142,10 @@ sub print_table {
     }
     my $a_ref = [];
     if ( @$col_idxs ) {
-        $a_ref = [ map { [ @{$table_ref->[$_]}[@$col_idxs] ] } 0 .. $last_row_idx ];
+        $a_ref = [ map { [ @{$table_ref->[$_]}[@$col_idxs] ] } 0 .. $self->{idx_last_row} ];
     }
     else {
         $a_ref = $table_ref;
-        if ( $last_row_idx < $#$table_ref ) {
-            $#$a_ref = $last_row_idx;
-        }
     }
     $self->{binray_regexp} = qr/[\x00-\x08\x0B-\x0C\x0E-\x1F]/;
     if ( $self->{progress_bar} ) {
@@ -163,9 +172,6 @@ sub __win_size_dependet_code {
         return;
     }
     my ( $list, $table_w ) = $self->_col_to_avail_col_width( $a_ref, $w_cols );
-    if ( $self->{max_rows} && @$list - 1 >= $self->{max_rows} ) {
-        push @$list, $self->__reached_limit_message( $table_w );
-    }
     my @header;
     if ( length $self->{prompt} ) {
         @header = ( $self->{prompt} );
@@ -177,6 +183,14 @@ sub __win_size_dependet_code {
     }
     else {
         splice( @$list, 1, 0, $self->__header_sep( $w_cols ) ) if $self->{grid};
+    }
+    if ( $self->{info_row} ) {
+        if ( print_columns( $self->{info_row} ) > $table_w ) {
+            push @$list, cut_to_printwidth( $self->{info_row}, $table_w - 3 ) . '...';
+        }
+        else {
+            push @$list, $self->{info_row};
+        }
     }
     my $prompt = join( "\n", @header );
     my $old_row = 0;
@@ -190,14 +204,12 @@ sub __win_size_dependet_code {
             return;
         }
         if ( ( $self->{keep_header} && ! @$list ) || ( @$list == 1 ) ) {
-            # Choose
             choose(
                 [ undef, @{$a_ref->[0]} ],
                 { prompt => 'EMPTY!', layout => 0, clear_screen => 1, mouse => $self->{mouse}, undef => '<<' }
             );
             return;
         }
-        # Choose
         my $row = choose(
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
@@ -236,6 +248,14 @@ sub __win_size_dependet_code {
                 }
             }
             $old_row = $row;
+            $row_is_expanded = 1;
+            if ( $self->{info_row} && $row == $#$list ) {
+                choose(
+                    [ 'Close' ],
+                    { prompt => $self->{info_row}, clear_screen => 1, mouse => $self->{mouse} }
+                );
+                next;
+            }
             if ( $self->{keep_header} ) {
                 $row++;
             }
@@ -244,16 +264,6 @@ sub __win_size_dependet_code {
                     next   if $row == 1;
                     $row-- if $row > 1;
                 }
-            }
-            $row_is_expanded = 1;
-            if ( $row > $self->{max_rows} ) {
-                $row-- if   $self->{keep_header};
-                $row++ if ! $self->{keep_header} && $self->{grid};
-                choose(
-                    [ $self->__reached_limit_message( $term_w ) ],
-                    { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse} }
-                );
-                next;
             }
             $self->__print_single_row( $a_ref, $row, $self->{longest_col_name} + 1 );
         }
@@ -285,7 +295,6 @@ sub __print_single_row {
             }
         }
     }
-    # Choose
     choose(
         $row_data,
         { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse} }
@@ -314,7 +323,7 @@ sub __calc_col_width {
     my $normal_row = 0;
     my @col_idx = ( 0 .. $#{$a_ref->[0]} );
 
-    for my $row ( @$a_ref ) {
+    for my $row ( @$a_ref[ 0 .. $self->{idx_last_row} ] ) {
         for my $i ( @col_idx ) {
             my $width = print_columns( $self->__sanitize_string( $row->[$i] ) );
             if ( $normal_row ) {
@@ -370,7 +379,7 @@ sub __calc_avail_col_width {
     elsif ( $sum > $avail_w ) {
         my $min_width = $self->{min_col_width} || 1;
         if ( @$w_head > $avail_w ) {
-            $self->__print_term_not_wide_enough_message( $a_ref );
+            $self->__print_term_not_wide_enough_message( $a_ref->[0] );
             return;
         }
         my @w_cols_tmp = @$w_cols;
@@ -440,7 +449,7 @@ sub _col_to_avail_col_width {
         $tab = ' ' x $self->{tab_w};
     }
     my $list = [];
-    for my $row ( @$a_ref ) {
+    for my $row ( @$a_ref[ 0 .. $self->{idx_last_row} ] ) {
         my $str = '';
         for my $i ( 0 .. $#$w_cols ) {
             $str .= unicode_sprintf(
@@ -467,21 +476,21 @@ sub __choose_columns {
     my ( $self, $avail_cols ) = @_;
     my $col_idxs = [];
     my $ok = '-ok-';
-    my @pre = ( $ok );
+    my @pre = ( undef, $ok );
     my $init_prompt = 'Columns: ';
     my $s_tab = print_columns( $init_prompt );
+    my @cols = map { defined $_ ? $_ : '<UNDEF>' } @$avail_cols;
 
     while ( 1 ) {
-        my @chosen_cols = @$col_idxs ?  @{$avail_cols}[@$col_idxs] : '*';
-        my $prompt = $init_prompt . join( ', ', map { defined $_ ? $_ : $self->{undef} } @chosen_cols );
-        my $choices = [ @pre, @$avail_cols ];
-        # Choose
+        my @chosen_cols = @$col_idxs ?  @cols[@$col_idxs] : '*';
+        my $prompt = $init_prompt . join( ', ', @chosen_cols );
+        my $choices = [ @pre, @cols ];
         my @idx = choose(
             $choices,
-            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1,
+            { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<',
               no_spacebar => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse} }
         );
-        if ( ! @idx ) {
+        if ( ! @idx || $idx[0] == 0 ) {
             if ( @$col_idxs ) {
                 $col_idxs = [];
                 next;
@@ -497,17 +506,6 @@ sub __choose_columns {
     }
 }
 
-sub __reached_limit_message {
-    my ( $self, $table_w ) = @_;
-    my $limit = insert_sep( $self->{max_rows}, $self->{thsd_sep} );
-    my $reached_limit = 'REACHED LIMIT "MAX_ROWS": ' . $limit;
-    if ( print_columns( $reached_limit ) > $table_w ) {
-        $reached_limit = '=LIMIT= ' . $limit;
-        $reached_limit = cut_to_printwidth( $reached_limit, $table_w );
-    }
-    return $reached_limit;
-}
-
 sub __header_sep {
     my ( $self, $w_cols ) = @_;
     my $tab = ( '-' x int( $self->{tab_w} / 2 ) ) . '|' . ( '-' x int( $self->{tab_w} / 2 ) );
@@ -520,7 +518,7 @@ sub __header_sep {
 }
 
 sub __sanitize_string {
-    my ( $self, $str ) = @_;
+    my ( $self, $str ) = @_; # copy
     if ( ! defined $str ) {
         $str = $self->{undef};
     }
@@ -536,7 +534,7 @@ sub __sanitize_string {
         $str =~ s/\p{Space}+/ /g;
         $str =~ s/\p{C}//g;
     }
-    return $str;
+    return $str; #
 }
 
 sub __handle_reference {
@@ -565,7 +563,7 @@ sub __handle_reference {
 }
 
 sub __print_term_not_wide_enough_message {
-    my ( $self, $a_ref ) = @_;
+    my ( $self, $col_names ) = @_;
     my $prompt_1 = 'To many columns - terminal window is not wide enough.';
     choose(
         [ 'Press ENTER to show the column names.' ],
@@ -573,7 +571,7 @@ sub __print_term_not_wide_enough_message {
     );
     my $prompt_2 = 'Column names (close with ENTER).';
     choose(
-        $a_ref->[0],
+        $col_names,
         { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse} }
     );
 }
@@ -605,7 +603,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.060
+Version 0.062
 
 =cut
 
@@ -760,7 +758,11 @@ Defaults may change in a future release.
 
 String displayed above the table.
 
-=head3 add_header
+=head3 add_header DEPRECATED
+
+This option is deprecated and will be removed.
+
+Enabling I<add_header> alters the passed list.
 
 If I<add_header> is set to 1, C<print_table> adds a header row - the columns are numbered starting with 1.
 
@@ -804,8 +806,8 @@ Set the maximum number of used table rows. The used table rows are kept in memor
 
 To disable the automatic limit set I<max_rows> to 0.
 
-If the number of table rows is equal to or higher than I<max_rows>, the last row of the output says "REACHED LIMIT" or
-"=LIMIT=" if "REACHED LIMIT" doesn't fit in the row.
+If the number of table rows is equal to or higher than I<max_rows>, the last row of the output tells that the limit has
+been reached.
 
 Default: 50_000
 

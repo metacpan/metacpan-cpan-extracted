@@ -33,11 +33,7 @@ all recognisable GML versions, like NS_GML_32.
 
 The following tags define all what you need per version.
 
-  :gml200    2.0.0
-  :gml211    2.1.1
   :gml212    2.1.2
-  :gml2120   2.1.2.0
-  :gml2121   2.1.2.1
   :gml300    3.0.0
   :gml301    3.0.1
   :gml310    3.1.0
@@ -46,36 +42,14 @@ The following tags define all what you need per version.
 
 =head1 SEE ALSO
 
-This module is part of Geo-GML distribution version 0.17,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>, and
-L</Math::Polygon>.
+This module is part of Geo-GML distribution version 0.18,
+built on January 19, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
-Please post questions or ideas to
-F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
+=head1 LICENSE
 
-=head1 COPYRIGHTS
-
-=head2 License of the CODE
-
-Copyrights of the perl code and the related documentation by
-2008-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2008-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
-
-=head2 License of the SCHEMAS
-
-The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
-They are unmodified copied from the files at F<http://schemas.opengis.net>.
-Read OGCs disclaimer and copyright statements on documentation and software
-at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
-included in this CPAN distribution.
 

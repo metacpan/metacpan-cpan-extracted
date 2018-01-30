@@ -1,3 +1,10 @@
+2.17    2018-01-23
+
+- This release is based on version 2018b of the Olson database. This release
+  reverts the changes for Ireland in the previous versions as these caused
+  breakages in some systems that consumed the IANA time zone data.
+
+
 2.16    2018-01-19
 
 - This release is based on version 2018b of the Olson database. This release

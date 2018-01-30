@@ -36,7 +36,7 @@
             "Calendar::Gregorian" : "0.15",
             "Calendar::Hebrew" : "0.02",
             "Calendar::Hijri" : "0.33",
-            "Calendar::Julian" : "0.02",
+            "Calendar::Julian" : "0.07",
             "Calendar::Persian" : "0.35",
             "Calendar::Saka" : "1.34",
             "perl" : "5.006"
@@ -51,6 +51,6 @@
          "web" : "https://github.com/manwar/Task-Calendar"
       }
    },
-   "version" : "0.32",
+   "version" : "0.34",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

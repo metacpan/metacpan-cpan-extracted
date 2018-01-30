@@ -67,7 +67,7 @@ B<. Example>
 
 =over 4
 
-=item Mail::Address-E<gt>B<new>( PHRASE, ADDRESS, [ COMMENT ] )
+=item Mail::Address-E<gt>B<new>( $phrase, $address, [ $comment ] )
 
 Create a new C<Mail::Address> object which represents an address with the
 elements given. In a message these 3 elements would be seen like:
@@ -79,7 +79,7 @@ example:
 
  Mail::Address->new("Perl5 Porters", "perl5-porters@africa.nicoh.com");
 
-=item $obj-E<gt>B<parse>(LINE)
+=item $obj-E<gt>B<parse>($line)
 
 Parse the given line a return a list of extracted C<Mail::Address> objects.
 The line would normally be one taken from a To,Cc or Bcc line in a message
@@ -102,12 +102,12 @@ Return the address part of the object.
 
 Return the comment part of the object
 
-=item $obj-E<gt>B<format>( [ADDRESSes] )
+=item $obj-E<gt>B<format>(@addresses)
 
 Return a string representing the address in a suitable form to be placed
 on a C<To>, C<Cc>, or C<Bcc> line of a message.  This method is called on
-the first ADDRESS to be used; other specified ADDRESSes will be appended,
-separated with commas.
+the first address to be used; other specified addresses will be appended,
+separated by commas.
 
 =item $obj-E<gt>B<phrase>()
 

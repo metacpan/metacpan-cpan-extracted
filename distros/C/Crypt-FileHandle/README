@@ -1,0 +1,33 @@
+Crypt-FileHandle version 0.02
+=============================
+
+This package creates a tied FileHandle that automatically encrypts or
+decrypts data using the provided cipher. The FileHandle returned from
+new() can be treated like a normal FileHandle. All encrypting,
+decrypting, and buffering is completely transparent to the caller.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+ 
+   FileHandle
+   Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004,2016,2018 by Christopher J. Dunkle
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

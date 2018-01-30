@@ -13,6 +13,7 @@ t/05_scan.t
 t/06_add_namespace.t
 t/07_rem_namespace.t
 t/08_migrate.t
+t/97_subcommands.t
 t/98_guess.t
 xt/02_perlcritic.t
 xt/99_redis_doc.t

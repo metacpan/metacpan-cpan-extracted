@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.036/cXML.dtd">
+<cXML timestamp="2018-01-01T00:00:00-0500" payloadID="123456789.2222.55123123@localhost" xml:lang="en-US">
+	<Header>
+		<From>
+			<Credential domain="TEST">
+				<Identity>remotehost</Identity>
+			</Credential>
+		</From>
+		<To>
+			<Credential domain="TEST">
+				<Identity>localhost</Identity>
+			</Credential>
+		</To>
+		<Sender>
+			<Credential domain="TEST">
+				<Identity>remotehost</Identity>
+			</Credential>
+			<UserAgent>Test Service</UserAgent>
+		</Sender>
+	</Header>
+	<Message deploymentMode="production">
+		<PunchOutOrderMessage>
+			<BuyerCookie>12345678</BuyerCookie>
+			<PunchOutOrderMessageHeader operationAllowed="create">
+				<Total>
+					<Money currency="USD">0.00</Money>
+				</Total>
+			</PunchOutOrderMessageHeader>
+			<ItemIn quantity="0">
+				<ItemID><SupplierPartID></SupplierPartID></ItemID>
+				<ItemDetail>
+					<UnitPrice><Money currency="USD">0.00</Money></UnitPrice>
+					<Description xml:lang="en-US"></Description>
+					<UnitOfMeasure>EA</UnitOfMeasure>
+					<Classification domain="UNSPSC"></Classification>
+				</ItemDetail>
+			</ItemIn>
+		</PunchOutOrderMessage>
+	</Message>
+</cXML>

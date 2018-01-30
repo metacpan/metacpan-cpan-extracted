@@ -1,16 +1,19 @@
-# Copyrights 2005-2014 by [Mark Overmeer].
+# Copyrights 2005-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-
-use strict;
-use warnings;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo-Point.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Geo::Point;
 use vars '$VERSION';
-$VERSION = '0.96';
+$VERSION = '0.97';
 
 use base 'Geo::Shape';
+
+use strict;
+use warnings;
 
 use Geo::Proj;
 use Carp        qw/confess croak/;

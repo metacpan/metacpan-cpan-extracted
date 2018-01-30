@@ -104,6 +104,10 @@ Vue.component('item-form', {
         value: {
             required: true
         },
+        showReadOnly: {
+            required: false,
+            default: true
+        },
         error: {
             default: { }
         }
@@ -147,7 +151,7 @@ Vue.component('item-form', {
             var props = {}, schema = this.schema;
             for ( var key in schema.properties ) {
                 var prop = schema.properties[ key ];
-                if ( prop[ 'x-hidden' ] ) {
+                if ( prop[ 'x-hidden' ] || ( prop['readOnly'] && !this.showReadOnly ) ) {
                     continue;
                 }
                 props[ key ] = prop;
@@ -444,25 +448,35 @@ var app = new Vue({
                             = marked( copy[k], { sanitize: true });
                     }
                 }
+                else if ( copy[k] === null ) {
+                    // `null` doesn't pass type checks, and Perl doesn't
+                    // distinguish between `undef` and `defined but no
+                    // value` in an object, so make this field `undef`
+                    // to Perl
+                    delete copy[k];
+                }
             }
             return JSON.stringify( copy );
         },
 
         showAddItem: function () {
             this.toggleRow();
-            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example || this.createBlankItem();
+            this.newItem = this.createBlankItem();
             this.addingItem = true;
         },
 
         cancelAddItem: function () {
             this.$set( this, 'formError', {} );
             this.addingItem = false;
-            this.newItem = this.collections[ this.currentCollection ].operations['add'].schema.example || this.createBlankItem();
+            this.newItem = this.createBlankItem();
         },
 
         createBlankItem: function () {
             var schema = this.collections[ this.currentCollection ].operations['add'].schema,
                 item = {};
+            if ( schema.example ) {
+                return schema.example;
+            }
             for ( var k in schema.properties ) {
                 item[k] = null;
             }

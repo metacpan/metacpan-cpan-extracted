@@ -1,5 +1,5 @@
 package QBit::QueryData;
-$QBit::QueryData::VERSION = '0.005';
+$QBit::QueryData::VERSION = '0.008';
 use qbit;
 
 use base qw(QBit::Class);
@@ -45,6 +45,8 @@ my $ORDER_OPERATIONS = {
 sub init {
     my ($self) = @_;
 
+    $self->{'fields'} = {map {$_ => ''} @{$self->{'fields'}}} if ref($self->{'fields'}) eq 'ARRAY';
+
     $self->definition({}) unless defined($self->definition);
 
     $self->data($self->{'data'} // []);
@@ -58,12 +60,10 @@ sub data {
     my ($self, $data) = @_;
 
     if (defined($data)) {
-        delete($self->{'__EXISTS_FIELDS__'});
         delete($self->{'__ALL_FIELDS__'});
 
         foreach my $field (sort keys(%{$data->[0] // {}})) {
-            $self->{'__EXISTS_FIELDS__'}{$field} = TRUE;
-            push(@{$self->{'__ALL_FIELDS__'}}, $field);
+            $self->{'__ALL_FIELDS__'}{$field} = '';
         }
 
         $self->{'data'} = $data;
@@ -76,15 +76,19 @@ sub fields {
     my ($self, $fields) = @_;
 
     if (defined($fields)) {
-        $fields = [keys(%$fields)] if ref($fields) eq 'HASH';
+        $fields = {map {$_ => ''} @$fields} if ref($fields) eq 'ARRAY';
 
-        if (@$fields == 0) {
+        unless (%$fields) {
             #default
             delete($self->{'__FIELDS__'});
         } else {
             #set fields
-            if (exists($self->{'__EXISTS_FIELDS__'})) {
-                my @not_exists = grep {!$self->{'__EXISTS_FIELDS__'}{$_}} @$fields;
+            if (exists($self->{'__ALL_FIELDS__'})) {
+                my @not_exists = grep {
+                    (!exists($self->{'__ALL_FIELDS__'}{$_}) && $fields->{$_} eq '')
+                      || (!exists($self->{'__ALL_FIELDS__'}{$fields->{$_}})
+                        && $fields->{$_} ne '')
+                } keys(%$fields);
                 throw gettext('Unknown fields: %s', join(', ', @not_exists)) if @not_exists;
             }
 
@@ -191,7 +195,47 @@ sub found_rows {
 sub get_all {
     my ($self, %opts) = @_;
 
-    my @data = defined($self->{'__FILTER__'}) ? grep {$self->{'__FILTER__'}->($_)} @{$self->data} : @{$self->data};
+    my $fields         = $self->get_fields() // {};
+    my @fields         = keys(%$fields);
+    my @db_fields      = ();
+    my @precess_fields = ();
+
+    foreach (@fields) {
+        if ($fields->{$_}) {
+            push(@precess_fields, $_);
+        } else {
+            push(@db_fields, $_);
+        }
+    }
+
+    my @group_by = @{$self->{'__GROUP_BY__'} // []};
+
+    if (!@group_by && $self->{'__DISTINCT__'}) {
+        @group_by = map {$self->_get_path($_)} @fields;
+    }
+
+    my %uniq = ();
+    my @data = ();
+    foreach my $row (@{$self->{'data'}}) {
+        next if defined($self->{'__FILTER__'}) && !$self->{'__FILTER__'}->($row);
+
+        my $new_row = {map {$_ => $row->{$fields->{$_}}} @precess_fields};
+
+        if (@group_by) {
+            my $key = join($;, map {$self->_get_field_value_by_path($fields, $row, $new_row, undef, @$_) // 'UNDEF'} @group_by);
+
+            unless ($uniq{$key}) {
+                $new_row->{$_} = $row->{$_} foreach @db_fields;
+
+                push(@data, $new_row);
+
+                $uniq{$key} = TRUE;
+            }
+        } else {
+            $new_row->{$_} = $row->{$_} foreach @db_fields;
+            push(@data, $new_row);
+        }
+    }
 
     if (defined($self->{'__ORDER_BY__'})) {
         @data = sort {$self->{'__ORDER_BY__'}->($a, $b)} @data;
@@ -209,35 +253,43 @@ sub get_all {
         @data = @data[$self->{'__OFFSET__'} .. $high];
     }
 
-    my @result = ();
+    return \@data;
+}
 
-    my @fields = @{$self->get_fields() // []};
-    if ($self->{'__DISTINCT__'}) {
-        my %uniq = ();
+sub group_by {
+    my ($self, @group_by) = @_;
 
-        foreach my $row (@data) {
-            my $str = '';
+    unless (@group_by) {
+        delete($self->{'__GROUP_BY__'});
 
-            my $new_row = {};
-            foreach (@fields) {
-                $str .= $row->{$_} // 'UNDEF';
-
-                $new_row->{$_} = $row->{$_};
-            }
-
-            unless ($uniq{$str}) {
-                push(@result, $new_row);
-
-                $uniq{$str} = TRUE;
-            }
-        }
-    } else {
-        foreach my $row (@data) {
-            push(@result, {map {$_ => $row->{$_}} @fields});
-        }
+        return $self;
     }
 
-    return \@result;
+    my @paths = map {$self->_get_path($_)} @group_by;
+
+    my $fields = $self->get_fields() // {};
+    if (exists($self->{'__ALL_FIELDS__'})) {
+        my @unknown_fields = ();
+        foreach my $path (@paths) {
+            if (!exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}}) && !exists($fields->{$path->[0]{'key'}})) {
+                push(@unknown_fields, $path->[0]{'key'});
+            }
+        }
+
+        throw Exception::BadArguments gettext("You can't grouping by following fields: %s", join(', ', @unknown_fields))
+          if @unknown_fields;
+    }
+
+    my %group_by = map {$_->[0]{'key'} => TRUE} @paths;
+    my @not_grouping_fields = grep {!$fields->{$_} && !$group_by{$_}} keys(%$fields);
+
+    throw Exception::BadArguments gettext("You've forgotten grouping function for query fields: %s",
+        join(', ', @not_grouping_fields))
+      if @not_grouping_fields;
+
+    $self->{'__GROUP_BY__'} = \@paths;
+
+    return $self;
 }
 
 sub _get_filter {
@@ -265,21 +317,33 @@ sub _filter {
 
     my @part = ();
     if (ref($filter) eq 'HASH') {
-        foreach my $field (keys(%$filter)) {
-            throw gettext('Unknown field "%s"', $field)
-              if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$field};
+        if ([%$filter]->[0] eq 'NOT' && ref($filter->{'NOT'}) eq 'ARRAY') {
+            my $sub_body .= 'not (';
+            $self->_filter(\$sub_body, $filter->{'NOT'}[0]);
+            $sub_body .= ')';
 
-            my $type_operation = $self->_get_filter_operation($field, '=');
+            push(@part, $sub_body);
+        } else {
+            foreach my $field (keys(%$filter)) {
+                my $path = $self->_get_path($field);
 
-            if (ref($filter->{$field}) eq 'ARRAY') {
-                push(@part,
-                        "(grep {\$_[0]->{$field} $type_operation \$_} ("
-                      . join(', ', map {$self->_get_value($field, $_)} @{$filter->{$field}})
-                      . "))");
-            } else {
-                my $value = $self->_get_value($field, $filter->{$field});
+                throw gettext('Unknown field "%s"', $path->[0]{'key'})
+                  if exists($self->{'__ALL_FIELDS__'}) && !exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}});
 
-                push(@part, "(\$_[0]->{$field} $type_operation $value)");
+                my $type_operation = $self->_get_filter_operation($field, '=');
+
+                my $field_code = $self->_get_field_code_by_path('$_[0]', $path);
+
+                if (ref($filter->{$field}) eq 'ARRAY') {
+                    push(@part,
+                            "(grep {$field_code $type_operation \$_} ("
+                          . join(', ', map {$self->_get_value($field, $_)} @{$filter->{$field}})
+                          . "))");
+                } else {
+                    my $value = $self->_get_value($field, $filter->{$field});
+
+                    push(@part, "($field_code $type_operation $value)");
+                }
             }
         }
     } elsif (ref($filter) eq 'ARRAY' && @$filter == 2) {
@@ -293,13 +357,17 @@ sub _filter {
     } elsif (ref($filter) eq 'ARRAY' && @$filter == 3) {
         my ($field, $op, $value) = @$filter;
 
-        throw gettext('Unknown field "%s"', $field)
-          if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$field};
+        my $path = $self->_get_path($field);
+
+        throw gettext('Unknown field "%s"', $path->[0]{'key'})
+                  if exists($self->{'__ALL_FIELDS__'}) && !exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}});
 
         $op    = uc($op);
         $value = $$value;
 
         my $type_operation = $self->_get_filter_operation($field, $op);
+
+        my $field_code = $self->_get_field_code_by_path('$_[0]', $path);
 
         if (ref($value) eq 'ARRAY') {
             throw gettext('Operation "%s" is not applied to the array', $op)
@@ -308,15 +376,18 @@ sub _filter {
             push(@part,
                     "("
                   . ($op eq '<>' || $op eq '!=' || $op eq 'NOT IN' ? '!' : '')
-                  . "grep {\$_[0]->{$field} $type_operation \$_} ("
+                  . "grep {$field_code $type_operation \$_} ("
                   . join(', ', map {$self->_get_value($field, $_)} @$value)
                   . "))");
         } else {
+            throw gettext('Operation "%s" is only applied to the undef', $op)
+              if (grep {$op eq $_} ('IS', 'IS NOT')) && defined($value);
+
             $value = $self->_get_value($field, $value, $op);
 
             push(@part,
                 ($op eq '<>' || $op eq '!=' || $op =~ /^NOT\s|\sNOT$/i ? '!' : '')
-                  . "(\$_[0]->{$field} $type_operation $value)");
+                  . "($field_code $type_operation $value)");
         }
     }
 
@@ -330,15 +401,14 @@ sub _get_order {
 
     my @part = ();
     foreach my $order (@order_by) {
-        my @path = split(/\./, $order->[0]);
+        my $path = $self->_get_path($order->[0]);
 
-        throw gettext('Unknown field "%s"', $path[0])
-          if exists($self->{'__EXISTS_FIELDS__'}) && !$self->{'__EXISTS_FIELDS__'}{$path[0]};
+        throw gettext('Unknown field "%s"', $path->[0]{'key'})
+          if exists($self->{'__ALL_FIELDS__'}) && !exists($self->{'__ALL_FIELDS__'}{$path->[0]{'key'}});
 
         my $type_operation = $self->_get_order_operation($order->[0]);
 
-        my $value = '$_[%s]';
-        $value .= "->{$_}" foreach @path;
+        my $value = $self->_get_field_code_by_path('$_[%s]', $path);
 
         if ($order->[1]) {
             push(@part, sprintf("($value %s $value)", 1, $type_operation, 0));
@@ -350,6 +420,59 @@ sub _get_order {
     my $body = join(' || ', @part);
 
     return $self->_get_sub($body);
+}
+
+sub _get_path {
+    my ($self, $field) = @_;
+
+    my @path = ();
+    foreach (split(/\./, $field)) {
+        if ($_ =~ /^\[([0-9]+)\]\z/) {
+            push(@path, {type => 'array', key => $1});
+        } else {
+            push(@path, {type => 'hash', key => $_});
+        }
+    }
+
+    return \@path;
+}
+
+sub _get_field_code_by_path {
+    my ($self, $value, $path) = @_;
+
+    foreach (@$path) {
+        if ($_->{'type'} eq 'array') {
+            $value .= "->[$_->{key}]";
+        } else {
+            $value .= "->{$_->{key}}";
+        }
+    }
+
+    return $value;
+}
+
+sub _get_field_value_by_path {
+    my ($self, $fields, $row, $new_row, $last_field, @paths) = @_;
+
+    unless (@paths) {
+        return $last_field eq 'new_row' ? $new_row : $row;
+    }
+
+    my $path = shift(@paths);
+
+    if ($path->{'type'} eq 'array') {
+        if ($fields->{$path->{'key'}}) {
+            return $self->_get_field_value_by_path($fields, $row, $new_row->[$path->{'key'}], 'new_row', @paths);
+        } else {
+            return $self->_get_field_value_by_path($fields, $row->[$path->{'key'}], $new_row, 'row', @paths);
+        }
+    } else {
+        if ($fields->{$path->{'key'}}) {
+            return $self->_get_field_value_by_path($fields, $row, $new_row->{$path->{'key'}}, 'new_row', @paths);
+        } else {
+            return $self->_get_field_value_by_path($fields, $row->{$path->{'key'}}, $new_row, 'row', @paths);
+        }
+    }
 }
 
 sub _get_filter_operation {
@@ -458,6 +581,7 @@ B<Example:>
                     k1 => 1.1,
                     k2 => 'd1_2'
                 },
+                array => [1.1, 'a1_2'],
             },
             {
                 id      => 2,
@@ -466,15 +590,23 @@ B<Example:>
                     k1 => 2.1,
                     k2 => 'd2_2'
                 },
+                array => [2.1, 'a2_2'],
             },
         ],
         fields => [qw(id caption)],
-        filter => ['OR', [{id => 1}, ['caption' => '=' => \'c2']]],
+        filter => ['OR', [
+            {id => 1},
+            ['caption'   => '=' => \'c2'],
+            ['data.k1'   => '>', \2],
+            ['array.[1]' => 'LIKE' => \'a1']
+        ]],
         definition => {
-            'id'      => {type => 'number'},
-            'caption' => {type => 'string'},
-            'data.k1' => {type => 'number'},
-            'data.k2' => {type => 'string'},
+            'id'        => {type => 'number'},
+            'caption'   => {type => 'string'},
+            'data.k1'   => {type => 'number'},
+            'data.k2'   => {type => 'string'},
+            'array.[0]' => {type => 'number'},
+            'array.[1]' => {type => 'string'},
         },
     );
 
@@ -484,11 +616,19 @@ B<fields> - set fields for request
 
 B<Example:>
 
-    $q->fields([qw(caption)]); # or $q->fields({caption => ''});
-    
-    $q->fields([]); # use default fields
-    
-    $q->fields(); # all fields
+    # set fields
+    $q->fields([qw(caption)]);
+    $q->fields({
+        caption => '',
+        key => 'id', # create alias 'key' for field 'id'
+    });
+
+    # use default fields
+    $q->fields([]);
+    $q->fields({});
+
+    # all fields
+    $q->fields();
 
 =item *
 
@@ -496,7 +636,7 @@ B<get_fields> - get fields
 
 B<Example:>
 
-    my $fields = $q->get_fields(); # ['caption', 'id']
+    my $fields = $q->get_fields(); # {'caption' => '', 'key' => 'id'}
 
 =item *
 
@@ -521,9 +661,13 @@ For list: "=" "<>" "!=" "IN" "NOT IN"
 B<Example:>
 
     $q->filter({id => 1, caption => 'c1'}); # or ['AND', [['id' => '=' => \1], ['caption' => '=' => \'c1']]]
-    
+
     $q->filter(['caption' => 'LIKE' => \'c']);
-    
+
+    $q->filter(['data.k1' => '<' => \2]);
+
+    $q->filter(['array.[1]' => '=' => \'a2_2']);
+
     $q->filter(); # all data
 
 =item *
@@ -533,11 +677,21 @@ B<definition> - set fields definition
 B<Example:>
 
     $q->definition({
-        'id'      => {type => 'number'},
-        'caption' => {type => 'string'},
-        'data.k1' => {type => 'number'},
-        'data.k2' => {type => 'string'},
+        'id'        => {type => 'number'},
+        'caption'   => {type => 'string'},
+        'data.k1'   => {type => 'number'},
+        'data.k2'   => {type => 'string'},
+        'array.[0]' => {type => 'number'},
+        'array.[1]' => {type => 'string'},
     });
+
+=item *
+
+B<group_by> - grouping by fields
+
+B<Example:>
+
+    $q->group_by(qw(caption data.k1 array.[1]));
 
 =item *
 
@@ -546,8 +700,8 @@ B<order_by> - set order sorting
 B<Example:>
 
     # Ascending
-    $q->order_by(qw(id caption data.k1)); # or (['id', 0], ['caption', 0], ['data.k1', 0])
-    
+    $q->order_by(qw(id caption data.k1 array.[1])); # or (['id', 0], ['caption', 0], ['data.k1', 0], ['array.[1]', 0])
+
     # Descending
     $q->order_by(['id', 1]);
     
@@ -558,7 +712,7 @@ B<limit> - set offset and limit
 B<Example:>
 
     $q->limit($offset, $limit);
-    
+
     $q->limit(); # all data
 
 =item *
@@ -577,7 +731,7 @@ B<Example:>
 
     #set
     $q->distinct(1); # or $q->distinct();
-    
+
     #reset
     $q->distinct(0);
 
@@ -589,7 +743,7 @@ B<Example:>
 
     #set
     $q->insensitive(1); # or $q->insensitive();
-    
+
     #reset
     $q->insensitive(0);
 
@@ -600,8 +754,8 @@ B<get_all> - get data by settings
 B<Example:>
 
     my $data = $q->get_all();
-    
-    $data = $q->fields([qw(id)])->filter(['caption' => 'LIKE' => \'c'])->order_by(['id', 1])->get_all();
+
+    $data = $q->fields([qw(id)])->filter(['caption' => 'LIKE' => \'c'])->group_by('id')->order_by(['id', 1])->get_all();
 
 =item *
 

@@ -57,11 +57,11 @@ exit;
 sub check_lines_for_level {
     my ($level) = @_;
 
-    my $tmp = File::Temp->new(
+    my $tmp = File::Temp->newdir(
         'DIR'      => '/tmp',
         'TEMPLATE' => 'xslogger-test.XXXXX'
     );
-    local $XS::Logger::PATH_FILE = $tmp->filename();
+    local $XS::Logger::PATH_FILE = $tmp->dirname() . '/my-log.txt';
 
     my $log;
     if ( defined $level ) {

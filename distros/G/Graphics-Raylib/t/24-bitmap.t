@@ -16,9 +16,8 @@ my $glider = Graphics::Raylib::Shape->bitmap(
     transposed => 1
     #x => 150, y => 150, # undocumented
 );
-$g->clear(WHITE);
-
 while (!$g->exiting && $glider->rotation < 360) {
+    $g->clear(WHITE);
     Graphics::Raylib::draw {
         $glider->rotation += 1;
         $glider->draw

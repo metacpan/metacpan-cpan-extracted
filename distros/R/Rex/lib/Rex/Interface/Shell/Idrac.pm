@@ -9,7 +9,7 @@ package Rex::Interface::Shell::Idrac;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Interface::Shell::Default;
 use base qw(Rex::Interface::Shell::Default);
@@ -27,8 +27,12 @@ sub new {
 sub detect {
   my ( $self, $con ) = @_;
 
-  my ($output) = $con->direct_exec('version');
-  if ( defined $output && $output =~ m/SM CLP Version: / ) {
+  my ($output);
+  eval {
+    ($output) = $con->direct_exec('version');
+    1;
+  };
+  if ( $output && $output =~ m/SM CLP Version: / ) {
     return 1;
   }
 

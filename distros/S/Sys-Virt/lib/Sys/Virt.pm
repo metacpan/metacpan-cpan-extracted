@@ -78,7 +78,7 @@ use Sys::Virt::NWFilter;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '3.9.1';
+our $VERSION = '4.0.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -135,7 +135,7 @@ types that will be supported. The credential constants in
 this module can be used as values in this list. The C<callback>
 parameter should be a subroutine reference containing the
 code necessary to gather the credentials. When invoked it
-will be supplied with a single parameter, a array reference
+will be supplied with a single parameter, an array reference
 of requested credentials. The elements of the array are
 hash references, with keys C<type> giving the type of
 credential, C<prompt> giving a user descriptive user
@@ -1164,7 +1164,7 @@ pool sources.
 
 =item my @stats = $vmm->get_all_domain_stats($stats, \@doms=undef, $flags=0);
 
-Get an list of all statistics for domains known to the hypervisor.
+Get a list of all statistics for domains known to the hypervisor.
 The C<$stats> parameter controls which data fields to return and
 should be a combination of the DOMAIN STATS FIELD CONSTANTS.
 
@@ -1469,7 +1469,7 @@ how long the node is suspended for before waking up.
 
 =item $conn->domain_event_register($callback)
 
-Register a callback to received notificaitons of domain state change
+Register a callback to received notifications of domain state change
 events. Only a single callback can be registered with each connection
 instance. The callback will be invoked with four parameters, an
 instance of C<Sys::Virt> for the connection, an instance of C<Sys::Virt::Domain>

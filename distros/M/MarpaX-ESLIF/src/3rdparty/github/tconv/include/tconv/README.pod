@@ -15,8 +15,6 @@ tconv_ext - tconv extended API
   char *tconv_error(tconv_t tconvp);
   char *tconv_fromcode(tconv_t tconvp);
   char *tconv_tocode(tconv_t tconvp);
-  short tconv_fuzzy_set(tconv_t tconvp, short fuzzyb);
-  short tconv_fuzzy(tconv_t tconvp);
   short tconv_helper(tconv_t  tconvp,
                      void    *contextp,
                      short   (*producerp)(void *contextp, char **bufpp, size_t *countlp, short *eofbp),
@@ -301,13 +299,7 @@ A signature may be added or removed on demand. If C<signaturei> is lower than ze
 
 =item TCONV_CONVERT_ICONV
 
-iconv built-in, available when I<tconv> has been compiled with iconv. If I<tconv> has not been compiled with such support, C<TCONV_CONVERT_ICONV> remain available, but using it will fail.
-
-If C<iconvOptionp> is not NULL, it remains a noop, since the definition of corresponding type is:
-
-  typedef void tconv_convert_iconv_option_t;
-
-which mean that I<tconv> is then only a proxy to the iconv() with which it was compiled and linked.
+iconv built-in, always available. No special option.
 
 =back
 
@@ -352,20 +344,6 @@ Get the source codeset.
   char *tconv_tocode(tconv_t tconvp);
 
 Get the destination codeset.
-
-=head2 tconv_fuzzy_set
-
-  short tconv_fuzzy_set(tconv_t tconvp, short fuzzyb);
-
-Sets and return the fuzzy mode. In some rare cases, it is possible that tconv cannot determine the converter I<family> of the two charsets. In this case, and if the two normalised charset strings are equivalent, then a direct mode will happen. This is the meaning of I<fuzzy>. This does never happen with the ICU built-in convert, but can happen with the ICONV built-in.
-
-Fuzzy mode is prefered over doing iconv with the same charsets in input and output, because some iconv implementations simply fail to do that. The only side of the fuzzy mode is that it does I<not> provide any charset validation. This is why the next method exists, in case the end-user application want to do something special when fuzzy mode is on.
-
-=head2 tconv_fuzzy
-
-  short tconv_fuzzy(tconv_t tconvp);
-
-A true value means that fuzzy mode is on.
 
 =head2 tconv_helper
 

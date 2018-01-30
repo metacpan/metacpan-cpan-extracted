@@ -1,6 +1,15 @@
 
 ==== version history for MailTools
 
+version 2.20: Mon 22 Jan 18:14:44 CET 2018
+
+	Improvements:
+	- rewrite doc syntax to my current standard style.
+	- text corrections rt.cpan.org#123823 [Ville Skyttä]
+	- text corrections rt.cpan.org#123824 [Ville Skyttä]
+	- convert to GIT
+	- move to GitHUB
+
 version 2.19: Tue 22 Aug 13:30:41 CEST 2017
 
 	Improvements:
@@ -111,7 +120,7 @@ version 2.08: Wed Jun  1 13:55:34 CEST 2011
 
 	Fixes:
 
-	- respect errors on closing an Mail::Mailer::smtp/::smtps connection.
+	- respect errors on closing a Mail::Mailer::smtp/::smtps connection.
 	  [Tristam Fenton-May]
 
 	- Mail::Internet should accept Net::SMTP::SSL as well.
@@ -247,7 +256,7 @@ version 2.00_01: Wed Jun 20 14:42:35 CEST 2007
 
 	- extracted Mail::Field::Generic from Mail::Field
 
-	- added misteriously missing Mail::Field::AddrList::addr_list()
+	- added mysteriously missing Mail::Field::AddrList::addr_list()
 
 version 1.77: Fri May 11 14:16:01 CEST 2007
 
@@ -283,7 +292,7 @@ version 1.75: Wed Jun 14 15:30:25 CEST 2006
 
 	- [Mike Lerley] reported that environment variables are not
 	  thread-safe in mod_perl.  Therefore, we must pass the
-	  sender of the message explictly on qmail's command-line.
+	  sender of the message explicitly on qmail's command-line.
 	  His addapted patch included.
 
 version 1.74: Tue Feb 28 08:39:14 CET 2006
@@ -520,7 +529,7 @@ version 1.48: Wed Aug  7 22:54:56 CEST 2002
 	  time ago, broke the parser.  As example
 	   "Mark Overmeer <mailtools@overmeer.net> (mailtools maintainer)"
 	  was parsed into two separate objects.... wrong.
-          [Nicholas Oxhøj] reversed the patch.
+	  [Nicholas Oxhøj] reversed the patch.
 
 version 1.47: Fri Jul  5 12:02:55 CEST 2002
 
@@ -529,13 +538,13 @@ version 1.47: Fri Jul  5 12:02:55 CEST 2002
 	  [Meng Weng Wong]
 
 	- Mail::Cap::new has two new options:
-          filename => FILENAME,   which is just long for FILENAME only
-          take => 'ALL', to include all mail-cap files, not only the
+	  filename => FILENAME,   which is just long for FILENAME only
+	  take => 'ALL', to include all mail-cap files, not only the
 	  first one found.  Contributed by [Oleg Muravskiy]
 
 version 1.46: Wed May 29 15:08:44 CEST 2002
 
-	- [Philip Molter] discoverd my typo in Mail/Mailer/rfc822.pm
+	- [Philip Molter] discovered my typo in Mail/Mailer/rfc822.pm
 	  which forced me to release a new version....
 
 version 1.45: Thu May 23 10:15:59 CEST 2002
@@ -547,7 +556,7 @@ version 1.45: Thu May 23 10:15:59 CEST 2002
 	  '-I' in Mail::Mailer.
 
 	- [Leon Avery] updated Mail/Mailer/rfc822.pm to be more
-	  careful with multi-lined, multi-occurence headers.
+	  careful with multi-lined, multi-occurrence headers.
 
 	- [Drieux] small fix in Mail/Mailer/smtp.pm which enables the
 	  passing-on of args to Net::SMTP.
@@ -574,7 +583,7 @@ version 1.43: Fri Feb  8 09:43:25 CET 2002
 	  Mail::Mail::smtp.
 
 	- [Slavan Rezic] + [Jonathan Stowe] Added eval around getpwuid,
-          to avoid croak on Windows.
+	  to avoid croak on Windows.
 
 	- [Slavan Rezic] minor doc update.  The documentation is
 	  still poor.
@@ -583,7 +592,7 @@ version 1.43: Fri Feb  8 09:43:25 CET 2002
 	  module is active) about folder lines within words or strings.
 	  The mistake in the original implementation was that it tried to
 	  fold too hard; folding is a service, but no requirement.
- 	  So: that overly active folding is removed now.
+	  So: that overly active folding is removed now.
 
 version 1.42: Mon Dec 10 19:22:01 CET 2001
 
@@ -606,7 +615,7 @@ version 1.41: Wed Nov 14 10:35:57 CET 2001
 
 	- [Lucas Nussbaum] reported incorrect folding of unstructured
 	  header lines.  The whole idea of folder unstructured fields
-	  is flawed, as far as I know, but anyway noone apparantly had
+	  is flawed, as far as I know, but anyway noone apparently had
 	  sufficient long subject fields to find-out ;)
 	  Fixed in Mail::Mailer.
 
@@ -636,7 +645,7 @@ version 1.16: Wed Aug  8 11:28:26 CEST 2001
 	  Patch by [Heikki Korpela]
 
 	- Fixed "bad file-descriptor" errors in Mail::Mailer::smtp.
-          Patch by [Aaron J Mackey]
+	  Patch by [Aaron J Mackey]
 
 	- Some long header-lines caused the following line in the header
 	  to be indented too.  This should be fixed.
@@ -899,7 +908,7 @@ Change 162 on 1998/06/30 by <gbarr@pobox.com> (Graham Barr)
 Sun Jun 28 1998 <gbarr@pobox.com> (Graham Barr)
 
 	Mail::Address
-	- Split out real handlers into thier own .pm files
+	- Split out real handlers into their own .pm files
 	- Added Mail::Mailer::smtp, this is the default for MacOS
 
 Wed Jun 17 1998 <gbarr@pobox.com> (Graham Barr)
@@ -960,7 +969,7 @@ Fri Jan  2 1998 <gbarr@pobox.com> (Graham Barr)
 
 	Mail::Mailer
 	- removed all for(my $i ...) and foreach my $d as they break
-	  compatability with pre perl5.004
+	  compatibility with pre perl5.004
 
 Tue Nov 25 1997 <gbarr@pobox.com> (Graham Barr)
 

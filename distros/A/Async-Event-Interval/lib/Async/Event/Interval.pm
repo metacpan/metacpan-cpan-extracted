@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 
 use Carp qw(croak);
 use Parallel::ForkManager;
@@ -124,12 +124,16 @@ Async::Event::Interval - Extremely simple timed asynchronous events
 =head1 SYNOPSIS
 
 A simple event. Multiple events can be simultaneously used. For an example using
-an event that can share data with the main application, see L</EXAMPLES>.
+an event that can share data with the main application, examples of how to
+handle event crashes, and how to send parameters to your event callback, see 
+L</EXAMPLES>.
 
     use Async::Event::Interval;
 
-    my $event
-        = Async::Event::Interval->new(1.5, \&callback);
+    my $event = Async::Event::Interval->new(
+        1.5, 
+        \&callback
+    );
 
     $event->start;
 
@@ -205,6 +209,27 @@ Returns the event's process ID (true) if it is running, C<0> (false) if it
 isn't, and C<-1> if the event has crashed.
 
 =head1 EXAMPLES
+
+=head2 Event Parameters
+
+You can send in a list of parameters to the event callback. Changing these
+within the main program will have no effect on the values sent into the
+event itself.
+
+    use Async::Event::Interval
+
+    my @params = qw(1 2 3);
+
+    my $event = Async::Event::Interval->new(
+        1,
+        \&callback,
+        @params
+    );
+
+    sub callback {
+        my ($one, $two, $three) = @_;
+        print "$one, $two, $three\n";
+    }
 
 =head2 Shared Data
 

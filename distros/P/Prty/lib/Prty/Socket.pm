@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Option;
 
@@ -97,7 +97,7 @@ sub new {
     my $self = $class->SUPER::new("$host:$port");
     if (!$self && !$sloppy) {
         $class->throw(
-            q{SOCK-00001: Verbindungsaufbau fehlgeschlagen},
+            q~SOCK-00001: Verbindungsaufbau fehlgeschlagen~,
             Host=>$host,
             Port=>$port,
         );
@@ -147,7 +147,7 @@ sub close {
     my $self = shift;
 
     CORE::close $self or do {
-        $self->throw(q{SOCK-00002: Socket schließen fehlgeschlagen});
+        $self->throw(q~SOCK-00002: Socket schließen fehlgeschlagen~);
     };
 
     return;
@@ -157,7 +157,7 @@ sub close {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -165,7 +165,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

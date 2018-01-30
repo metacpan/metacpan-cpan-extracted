@@ -39,7 +39,7 @@ package Rex::CMDB;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Commands;
 use Rex::Value;

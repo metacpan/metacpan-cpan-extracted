@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/String/Print.pm
 lib/String/Print.pod
 t/00use.t

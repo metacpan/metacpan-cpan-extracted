@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.21';
+$Selenium::Remote::Driver::VERSION = '1.23';
 use strict;
 use warnings;
 
@@ -48,6 +48,7 @@ use constant FINDERS => {
 };
 
 our $FORCE_WD2 = 0;
+our $FORCE_WD3 = 0;
 our %CURRENT_ACTION_CHAIN = ( actions => [] );
 
 
@@ -398,14 +399,16 @@ sub new_session {
     $extra_capabilities ||= {};
     my $args = {
         'desiredCapabilities' => {
-            'browserName'       => $self->browser_name,
-            'platform'          => $self->platform,
-            'javascriptEnabled' => $self->javascript,
-            'version'           => $self->version,
-            'acceptSslCerts'    => $self->accept_ssl_certs,
+            'browserName'        => $self->browser_name,
+            'platform'           => $self->platform,
+            'javascriptEnabled'  => $self->javascript,
+            'version'            => $self->version,
+            'acceptSslCerts'     => $self->accept_ssl_certs,
             %$extra_capabilities,
         },
     };
+    $args->{'extra_capabilities'} = \%$extra_capabilities unless $FORCE_WD2;
+
 
     if ( defined $self->proxy ) {
         $args->{desiredCapabilities}->{proxy} = $self->proxy;
@@ -438,11 +441,13 @@ sub _request_new_session {
     foreach my $cap (keys(%{$args->{capabilities}->{alwaysMatch} })) {
         #Handle browser specific capabilities
         if (exists($args->{desiredCapabilities}->{browserName}) && $cap eq 'extra_capabilities') {
+
             if (exists $args->{capabilities}->{alwaysMatch}->{'moz:firefoxOptions'}->{args}) {
                 $args->{capabilities}->{alwaysMatch}->{$cap}->{args} = $args->{capabilities}->{alwaysMatch}->{'moz:firefoxOptions'}->{args};
             }
             $args->{capabilities}->{alwaysMatch}->{'moz:firefoxOptions'} = $args->{capabilities}->{alwaysMatch}->{$cap} if $args->{desiredCapabilities}->{browserName} eq 'firefox';
-            $args->{capabilities}->{alwaysMatch}->{'chromeOptions'}      = $args->{capabilities}->{alwaysMatch}->{$cap} if $args->{desiredCapabilities}->{browserName} eq 'chrome';
+            #XXX the chrome documentation is lies, you can't do this yet
+            #$args->{capabilities}->{alwaysMatch}->{'chromeOptions'}      = $args->{capabilities}->{alwaysMatch}->{$cap} if $args->{desiredCapabilities}->{browserName} eq 'chrome';
             #Does not appear there are any MSIE based options, so let's just let that be
         }
         if (exists($args->{desiredCapabilities}->{browserName}) && $args->{desiredCapabilities}->{browserName} eq 'firefox' && $cap eq 'firefox_profile') {
@@ -464,6 +469,7 @@ sub _request_new_session {
         }
         delete $args->{capabilities}->{alwaysMatch}->{$cap} if !any { $_ eq $cap } @$caps;
     }
+    delete $args->{desiredCapabilities} if $FORCE_WD3; #XXX fork working-around busted fallback in firefox
     delete $args->{capabilities} if $FORCE_WD2; #XXX 'secret' feature to help the legacy unit tests to work
 
     # geckodriver has not yet implemented the GET /status endpoint
@@ -784,6 +790,7 @@ sub get_window_size {
     my ( $self, $window ) = @_;
     $window = ( defined $window ) ? $window : 'current';
     my $res = { 'command' => 'getWindowSize', 'window_handle' => $window };
+    $res = {'command' => 'getWindowRect', handle => $window } if $self->{is_wd3} && $self->browser_name ne 'chrome';
     return $self->_execute_command($res);
 }
 
@@ -792,6 +799,7 @@ sub get_window_position {
     my ( $self, $window ) = @_;
     $window = ( defined $window ) ? $window : 'current';
     my $res = { 'command' => 'getWindowPosition', 'window_handle' => $window };
+    $res = {'command' => 'getWindowRect', handle => $window } if $self->{is_wd3} && $self->browser_name ne 'chrome';
     return $self->_execute_command($res);
 }
 
@@ -873,6 +881,7 @@ sub execute_async_script {
             {
                 if ($self->{is_wd3}) {
                     $args[$i] = { 'element-6066-11e4-a52e-4f735466cecf' => ( $args[$i] )->{id} };
+                    $args[$i]->{ELEMENT} = $args[$i]->{id} if $self->browser_name eq 'chrome'; #XXX sometimes they prefer the latter/prior
                 } else {
                     $args[$i] = { 'ELEMENT' => ( $args[$i] )->{id} };
                 }
@@ -916,6 +925,7 @@ sub execute_script {
             {
                 if ($self->{is_wd3}) {
                     $args[$i] = { 'element-6066-11e4-a52e-4f735466cecf' => ( $args[$i] )->{id} };
+                    $args[$i]->{ELEMENT} = $args[$i]->{id} if $self->browser_name eq 'chrome'; #XXX sometimes they prefer the latter/prior
                 } else {
                     $args[$i] = { 'ELEMENT' => ( $args[$i] )->{id} };
                 }
@@ -1054,6 +1064,9 @@ sub set_window_position {
     }
     my $res = { 'command' => 'setWindowPosition', 'window_handle' => $window };
     my $params = { 'x' => $x, 'y' => $y };
+    if ( $self->{is_wd3} && $self->browser_name ne 'chrome') {
+        $res = {'command' => 'setWindowRect', handle => $window };
+    }
     my $ret = $self->_execute_command( $res, $params );
     return $ret ? 1 : 0;
 }
@@ -1069,6 +1082,9 @@ sub set_window_size {
     $width += 0;
     my $res = { 'command' => 'setWindowSize', 'window_handle' => $window };
     my $params = { 'height' => $height, 'width' => $width };
+    if ( $self->{is_wd3} && $self->browser_name ne 'chrome') {
+        $res = {'command' => 'setWindowRect', handle => $window };
+    }
     my $ret = $self->_execute_command( $res, $params );
     return $ret ? 1 : 0;
 }
@@ -1713,7 +1729,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =head1 SYNOPSIS
 
@@ -1846,6 +1862,14 @@ you please.
 =head1 WC3 WEBDRIVER COMPATIBILITY
 
 WC3 Webdriver is a constantly evolving standard, so some things may or may not work at any given time.
+
+Furthermore, out of date drivers probably identify as WD3, while only implementing a few methods and retaining JSONWire functionality.
+One way of dealing with this is setting:
+
+    $driver->{is_wd3} = 0
+
+Of course, this will prevent access of any new WC3 methods, but will probably make your tests pass until your browser's driver gets it's act together.
+
 That said, the following 'sanity tests' in the at/ (acceptance test) directory of the module passed on the following versions:
 
 =over 4
@@ -1874,6 +1898,24 @@ any new browser/driver will likely have problems if it's not listed above.
 
 There is also a 'legacy.test' file available to run against old browsers/selenium (2.x servers, pre geckodriver).
 This should only be used to verify backwards-compatibility has not been broken.
+
+=head2 Firefox Notes
+
+If you are intending to pass extra_capabilities to firefox on a WD3 enabled server with geckodriver, you MUST do the following:
+
+   $Selenium::Remote::Driver::FORCE_WD3=1;
+
+This is because the gecko driver prefers legacy capabilities, both of which are normally passed for compatibility reasons.
+
+=head2 Chrome Notes
+
+extra_capabilities may? not work, because chromedriver considers the chromeOptions parameter to be invalid, despite it's documentation here:
+
+    https://sites.google.com/a/chromium.org/chromedriver/capabilities
+
+Other bindings get around this by just using the 'old' way of passing desired capabilities.  You can do this too like so:
+
+    $Selenium::Remote::Driver::FORCE_WD2=1;
 
 =head1 CONSTRUCTOR
 

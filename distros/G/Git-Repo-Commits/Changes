@@ -1,3 +1,15 @@
+2018-01-29  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Git/Repo/Commits.pm: Adds instantiation with a set of files
+
+2018-01-28  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Git/Repo/Commits.pm: Adds commit date to the hash, now that I'm interested in it. 
+
+2017-02-24  Juan J. merelo  <jmerelo@penny>
+
+	* t/00.load.t: Eliminating dependency on File::Slurp::Tiny which was not actually within the expressed dependencies, which accounted for more than a few errors in CPANTs http://www.cpantesters.org/distro/G/Git-Repo-Commits.html#Git-Repo-Commits-0.0.3 
+
 2017-02-23  Juan J. merelo  <jmerelo@penny>
 
 	* lib/Git/Repo/Commits.pm (Git): version 0.0.4, extracts also committer information from the log. 

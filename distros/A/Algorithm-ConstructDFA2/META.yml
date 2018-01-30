@@ -1,0 +1,39 @@
+---
+abstract: 'Deterministic finite automaton construction'
+author:
+  - 'Bjoern Hoehrmann <bjoern@hoehrmann.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Graph::Directed: '0'
+  Graph::Feather: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  List::UtilsBy: '0'
+  Test::More: '0'
+  YAML::XS: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-ConstructDFA2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: '1.5'
+  DBI: '1.635'
+  List::Util: '0'
+  List::UtilsBy: '0'
+  Log::Any: '0'
+  Memoize: '0'
+  Moo: '0'
+  Types::Standard: '0'
+resources:
+  repository: https://github.com/hoehrmann/Algorithm-ConstructDFA2.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

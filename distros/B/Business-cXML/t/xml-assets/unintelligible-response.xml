@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cXML timestamp="2018-01-01T00:00:00-0500" payloadID="123456789.2222.55123123@localhost" xml:lang="en-US">
+	<Response>
+		<Status code="200" xml:lang="en-US" text="OK"></Status
+		<AuthRespoe>
+			<Credent domain="NetworkId"
+		</AuthResponse>
+</cXM>

@@ -15,6 +15,25 @@ INSTALLATION
         make test
         make install
 
+    HINTS FOR WINDOWS USERS
+        Openssl has to be installed first - and openssl/bin must be in
+        PATH for the module tests.
+
+        * The ENV for LIBCRYPTO_CFLAGS should point to the openssl
+          include folder.
+        * The ENV for LIBCRYPTO_LIBS should point to the
+          openssl libraries.
+
+        Example:
+
+            set PATH=C:\openssl\bin;%PATH%
+            set LIBCRYPTO_CFLAGS=-IC:/openssl/include
+            set LIBCRYPTO_LIBS="c:/openssl/lib/libeay32.lib" "c:/openssl/lib/ssleay32.lib"
+
+        Strawberry perl always provides a full *nix compatible
+        libcrypro environment. There are no settings or additionally
+        installations required for this perl distribution.
+
 SUPPORT AND DOCUMENTATION
     After installing, you can find documentation for this module with
     the perldoc command.

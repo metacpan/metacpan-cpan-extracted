@@ -24,7 +24,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,7 +42,7 @@ requires:
   HTML::TokeParser::Simple: 3.15
   LWP::UserAgent: 0
   Log::Trace: 0
-  MIME::Types: 0
+  MIME::Types: 2.17
   Scalar::Util: 0
   Test::Assertions: 0
   Test::Assertions::TestScript: 0
@@ -54,4 +54,4 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Email-MIME-CreateHTML
   repository: https://github.com/vanstyn/Email-MIME-CreateHTML.git
-version: 1.041
+version: 1.042

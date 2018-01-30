@@ -16,14 +16,21 @@ use lib "$FindBin::Bin/lib";
 
 use Test::XSLogger qw{:all};
 
+$| = 1;
+
+my $tmp =
+  File::Temp->newdir( 'DIR' => '/tmp', 'TEMPLATE' => 'xslogger-test.XXXXX' );
+
 {
-    my $tmp = File::Temp->new( 'DIR' => '/tmp', 'TEMPLATE' => 'xslogger-test.XXXXX' );
-    my $logfile = $tmp->filename;
+    my $logfile = $tmp->dirname() . '/a-file.log';
 
     my $logger = XS::Logger->new( { path => $logfile } );
+    ok !-e $logfile;
 
-    $logger->info("1.before fork...");
+    $logger->info("1. before fork...");
+
     is count_lines($logfile), 1;
+
     if ( my $pid = fork() ) {
         waitpid( $pid, 0 );
         is count_lines($logfile), 2;

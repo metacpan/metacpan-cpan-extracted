@@ -31,11 +31,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "blib" => "1.01",
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0205",
+  "VERSION" => "0.0206",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +52,6 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "blib" => "1.01",
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

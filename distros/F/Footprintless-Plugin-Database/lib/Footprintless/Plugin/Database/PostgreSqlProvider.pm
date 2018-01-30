@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::PostgreSqlProvider;
-$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.04';
+$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.05';
 # ABSTRACT: A PostgreSql provider implementation
 # PODNAME: Footprintless::Plugin::Database::AbstractProvider
 
@@ -201,7 +201,8 @@ sub _init {
     my ( $self, %options ) = @_;
     $self->Footprintless::Plugin::Database::AbstractProvider::_init(%options);
 
-    $self->{port} = 5432 unless ( $self->{port} );
+    $self->{port}   = 5432     unless ( $self->{port} );
+    $self->{schema} = 'public' unless ( $self->{schema} );
 
     return $self;
 }
@@ -311,7 +312,7 @@ Footprintless::Plugin::Database::AbstractProvider - A PostgreSql provider implem
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

@@ -1,0 +1,39 @@
+#title Code
+
+<code><br> *hello* <br></code>
+
+=<br> *hello* <br>=
+
+<code><verbatim><br> *hello* <br></verbatim></code>
+
+<verbatim><br> *hello* <br></verbatim>
+
+XXX (<code><br> *hello* <br></code>) XXX
+
+XXX (=<br> *hello* <br>=) XXX
+
+XXX (<code><verbatim><br> *hello* <br></verbatim></code>) XXX
+
+XXX (<verbatim><br> *hello* <br></verbatim>) XXX
+
+this = is = normal
+
+this= is =normal
+
+this =is= code
+
+this=is=normal
+
+this=is nor=mal
+
+=*code* *hello*= is =code *hello*=
+
+=code
+*a*     \|/
+*whole* /|\
+par=
+
+<code>
+*a*     \|/
+*whole* /|\
+</code>

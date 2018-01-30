@@ -53,6 +53,7 @@
             "Test2::Suite" : "0",
             "Test2::Tools::Explain" : "0",
             "Test::Builder" : "0",
+            "Test::CPAN::Meta" : "0",
             "Test::More" : "0"
          }
       }
@@ -60,7 +61,7 @@
    "provides" : {
       "XS::Logger" : {
          "file" : "lib/XS/Logger.pm",
-         "version" : "0.001"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -74,10 +75,10 @@
          "web" : "https://github.com/atoomic/XS-Logger.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -106,7 +107,7 @@
                }
             },
             "name" : "Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
@@ -306,7 +307,7 @@
                }
             },
             "name" : "Git::Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
@@ -339,7 +340,7 @@
                }
             },
             "name" : "@Git/Check",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -370,7 +371,7 @@
                }
             },
             "name" : "@Git/Commit",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -379,7 +380,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.001",
+                  "tag" : "v0.004",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -392,7 +393,7 @@
                }
             },
             "name" : "@Git/Tag",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -410,7 +411,7 @@
                }
             },
             "name" : "@Git/Push",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -426,7 +427,7 @@
                }
             },
             "name" : "Git::NextVersion",
-            "version" : "2.042"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
@@ -601,6 +602,6 @@
          "version" : "6.010"
       }
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

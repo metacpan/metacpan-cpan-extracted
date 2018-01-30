@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::Command::db::restore;
-$Footprintless::Plugin::Database::Command::db::restore::VERSION = '1.04';
+$Footprintless::Plugin::Database::Command::db::restore::VERSION = '1.05';
 # ABSTRACT: restore a database from a backup
 # PODNAME: Footprintless::Plugin::Database::Command::db::restore
 
@@ -65,7 +65,7 @@ Footprintless::Plugin::Database::Command::db::restore - restore a database from 
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

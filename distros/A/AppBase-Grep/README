@@ -1,0 +1,105 @@
+NAME
+    AppBase::Grep - A base for grep-like CLI utilities
+
+VERSION
+    This document describes version 0.004 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2018-01-30.
+
+FUNCTIONS
+  grep
+    Usage:
+
+     grep(%args) -> [status, msg, result, meta]
+
+    A base for grep-like CLI utilities.
+
+    This routine provides a base for grep-like CLI utilities. It accepts
+    coderef as source of lines, which in the actual utilities can be from
+    files or other sources. It provides common options like "-i", "-v",
+    "-c", color highlighting, and so on.
+
+    Examples of CLI utilities that are based on this: abgrep, grep-coin
+    (from App::CryptoCurrencyUtils).
+
+    Why? For grepping lines from files or stdin, abgrep is no match for the
+    standard grep (or its many alternatives): it's orders of magnitude
+    slower and currently has fewer options. But AppBase::Grep is a quick way
+    to create grep-like utilities that greps from a custom sources but have
+    common features with the standard grep.
+
+    Compared to the standard grep, AppBase::Grep also has these unique
+    features:
+
+    *   "--all" option to match all patterns instead of just one;
+
+    *   observe the "COLOR" environment variable to set "--color" default;
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Require all patterns to match, instead of just one.
+
+    *   color => *str*
+
+    *   count => *true*
+
+        Supress normal output, return a count of matching lines.
+
+    *   ignore_case => *bool*
+
+    *   invert_match => *bool*
+
+        Invert the sense of matching.
+
+    *   line_number => *true*
+
+    *   pattern => *re*
+
+    *   quiet => *true*
+
+    *   regexps => *array[re]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  COLOR
+    Boolean. If set to true, will set default "--color" to "always" instead
+    of "auto". If set to false, will set default "--color" to "never"
+    instead of "auto". This behavior is not in GNU grep.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/AppBase-Grep>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-AppBase-Grep>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=AppBase-Grep>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

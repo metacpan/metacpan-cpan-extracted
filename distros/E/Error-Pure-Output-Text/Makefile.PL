@@ -1,4 +1,5 @@
 # Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
@@ -7,7 +8,7 @@ use inc::Module::Install;
 
 # Definition.
 abstract 'Output text subroutines for Error::Pure.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'Cwd' => 0;
 author_requires 'English' => 0;
 author_requires 'File::Spec::Functions' => 0;
@@ -28,7 +29,7 @@ resources 'repository' => 'git://github.com/tupinek/Error-Pure-Output-Text';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.22';
+version '0.23';
 
 # Run.
 WriteAll();

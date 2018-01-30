@@ -281,7 +281,25 @@ EOT
         );
     }
 }
+
+{
+    for my $char ('*', undef) {
+        my $infile = file('test', 'gapify.ali');
+        my $ali = $class->load($infile);
+
+        cmp_store(
+            obj => $ali, method => 'store_fasta',
+            file => 'gapify_' . ($char ? 'gap' : 'X') . '.fasta',
+            test => 'wrote expected gapified fasta through store_fasta',
+            args => { clean => 1, gapify => $char },
+        );
+    }
+}
+
+
 # TODO: test apply_mask and apply_list here?
+
+
 
 {
     for my $stk ( qw(cbs upsk) ) {

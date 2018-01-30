@@ -1,6 +1,10 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.008 2018-01-19T04:36:12
+0.009 2018-01-25T16:24:56
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use MarpaX::ESLIF 2.0.33
+
+0.008 2018-01-19T04:36:12Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - MarpaX::ESLIF Version 2.0.32 changes some of the i_* results, basically
    yells in the input have malformed characters: the standard says nothing

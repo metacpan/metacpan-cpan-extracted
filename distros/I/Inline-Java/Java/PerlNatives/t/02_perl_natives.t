@@ -74,7 +74,6 @@ __DATA__
 __Java__
 
 
-import java.io.* ;
 import org.perl.inline.java.* ;
 
 class t121 extends InlineJavaPerlNatives {

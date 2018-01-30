@@ -3,7 +3,7 @@ package MVC::Neaf::View::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = 0.2202;
+our $VERSION = 0.2203;
 
 =head1 NAME
 

@@ -1,10 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # translate name into MPH
 
 use warnings;
 use strict;
 
-use lib '../lib', 'lib';
 use Geo::Format::Envisat qw/envisat_mph_from_name/;
 
 use Test::More tests => 1;

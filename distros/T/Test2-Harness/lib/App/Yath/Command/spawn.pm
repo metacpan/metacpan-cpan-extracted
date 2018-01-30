@@ -2,7 +2,7 @@ package App::Yath::Command::spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use App::Yath::Util qw/find_yath/;
 use Test2::Util qw/pkg_to_file/;
@@ -106,12 +106,6 @@ App::Yath::Command::spawn - TODO
 =item --show-opts
 
 Exit after showing what yath thinks your options mean
-
-=item -h
-
-=item --help
-
-Exit after showing this help message
 
 =item -h
 

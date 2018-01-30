@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -28,16 +28,16 @@ optional_features: {}
 provides:
   Types::Namespace:
     file: lib/Types/Namespace.pm
-    version: '1.04'
+    version: '1.06'
   URI::Namespace:
     file: lib/URI/Namespace.pm
-    version: '1.04'
+    version: '1.06'
   URI::NamespaceMap:
     file: lib/URI/NamespaceMap.pm
-    version: '1.04'
+    version: '1.06'
   URI::NamespaceMap::ReservedLocalParts:
     file: lib/URI/NamespaceMap/ReservedLocalParts.pm
-    version: '1.04'
+    version: '1.06'
 recommends:
   RDF::NS: '20130802'
   RDF::NS::Curated: '0'
@@ -61,9 +61,10 @@ resources:
   homepage: https://metacpan.org/module/URI::NamespaceMap
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/URI-NamespaceMap/
-version: '1.04'
+version: '1.06'
 x_contributors:
   - 'Dorian Taylor <dorian@cpan.org>'
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
   - 'Paul Williams (KWAKWA) <kwakwa@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -44,7 +44,7 @@ sub _new {
     my $class = ref($proto) || $proto;
     my %params = @_;
 
-    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
     my $self = Sys::Virt::Stream::_new_obj($con, $params{flags});
 
     bless $self, $class;

@@ -1,5 +1,5 @@
 package Bio::Roary::ReformatInputGFFs;
-$Bio::Roary::ReformatInputGFFs::VERSION = '3.11.3';
+$Bio::Roary::ReformatInputGFFs::VERSION = '3.12.0';
 # ABSTRACT: Take in gff files and add suffix where a gene id is seen twice
 
 
@@ -209,7 +209,7 @@ Bio::Roary::ReformatInputGFFs - Take in gff files and add suffix where a gene id
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

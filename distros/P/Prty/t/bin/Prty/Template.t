@@ -6,6 +6,8 @@ use base qw/Prty::Test::Class/;
 use strict;
 use warnings;
 
+use Prty::Path;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {

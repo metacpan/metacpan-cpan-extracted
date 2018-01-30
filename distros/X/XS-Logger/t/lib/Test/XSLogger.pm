@@ -15,7 +15,7 @@ our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(logfile_last_line_like count_lines get_logfile_last_line);
 our %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
-our $TIMESTAMP = qr{[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{1,2}:[0-9]{2}:[0-9]{2}};
+our $TIMESTAMP = qr{[0-9]{4}-[0-9]{2}-[0-9]{2}\s+[0-9]{1,2}:[0-9]{2}:[0-9]{2}};
 our $TIMEZONE  = qr{[+-][0-9]{4}};
 our $PID       = qr{[0-9]+};
 

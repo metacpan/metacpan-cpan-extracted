@@ -8,7 +8,7 @@ Devel::PerlySense::CallTree - A tree of method calls
 =cut
 
 package Devel::PerlySense::CallTree;
-$Devel::PerlySense::CallTree::VERSION = '0.0218';
+$Devel::PerlySense::CallTree::VERSION = '0.0219';
 use strict;
 use warnings;
 use utf8;

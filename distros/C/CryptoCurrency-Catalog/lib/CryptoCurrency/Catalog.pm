@@ -1,7 +1,7 @@
 package CryptoCurrency::Catalog;
 
-our $DATE = '2018-01-16'; # DATE
-our $VERSION = '20180116'; # VERSION
+our $DATE = '2018-01-25'; # DATE
+our $VERSION = '20180125'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ CryptoCurrency::Catalog - Catalog of cryptocurrencies
 
 =head1 VERSION
 
-This document describes version 20180116 of CryptoCurrency::Catalog (from Perl distribution CryptoCurrency-Catalog), released on 2018-01-16.
+This document describes version 20180125 of CryptoCurrency::Catalog (from Perl distribution CryptoCurrency-Catalog), released on 2018-01-25.
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ $$$	Money	money
 808	808Coin	808coin
 888	OctoCoin	octocoin
 8BIT	8Bit	8bit
-9COIN	9COIN	9coin
+AAC	Acute Angle Cloud	acute-angle-cloud
 ABC	Alphabit	alphabitcoinfund
 ABJ	Abjcoin	abjcoin
 ABN	Abncoin	abncoin
@@ -225,11 +225,13 @@ ADZ	Adzcoin	adzcoin
 AE	Aeternity	aeternity
 AEON	Aeon	aeon
 AERM	Aerium	aerium
+AGI	SingularityNET	singularitynet
 AGLC	AgrolifeCoin	agrolifecoin
 AGRS	Agoras Tokens	agoras-tokens
 AHT	Bowhead	bowhead
 AI	POLY AI	poly-ai
 AIB	Advanced Internet Blocks	advanced-internet-blocks
+AID	AidCoin	aidcoin
 AIDOC	AI Doctor	aidoc
 AION	Aion	aion
 AIR	AirToken	airtoken
@@ -261,6 +263,7 @@ ARB	ARbit	arbit
 ARC	ArcticCoin	arcticcoin
 ARCADE	Arcade Token	arcade-token
 ARCO	AquariusCoin	aquariuscoin
+ARCT	ArbitrageCT	arbitragect
 ARDR	Ardor	ardor
 ARG	Argentum	argentum
 ARGUS	Argus	argus
@@ -268,6 +271,7 @@ ARI	Aricoin	aricoin
 ARK	Ark	ark
 ARN	Aeron	aeron
 ART	Maecenas	maecenas
+ARY	Block Array	block-array
 ASAFE2	AllSafe	allsafe
 ASN	Aseancoin	aseancoin
 AST	AirSwap	airswap
@@ -283,19 +287,20 @@ ATS	Authorship	authorship
 ATX	Artex Coin	artex-coin
 AU	AurumCoin	aurumcoin
 AUR	Auroracoin	auroracoin
+AURA	Aurora DAO	aurora-dao
 AV	AvatarCoin	avatarcoin
 AVT	Aventus	aventus
 AWR	AWARE	aware
 AXIOM	Axiom	axiom
+AXP	aXpire	axpire
 B2B	B2B	b2bx
 B2X	SegWit2x	segwit2x
-B3	B3Coin	b3coin
 B@	Bankcoin	bankcoin
 BAC	BitAlphaCoin	bitalphacoin
+BAR	Titanium Blockchain	titanium-blockchain
 BAS	BitAsean	bitasean
 BASH	LuckChain	luckchain
 BAT	Basic Attention Token	basic-attention-token
-BATCOIN	BatCoin	batcoin
 BAY	BitBay	bitbay
 BBP	BiblePay	biblepay
 BBR	Boolberry	boolberry
@@ -357,8 +362,7 @@ BLT	Bloom	bloomtoken
 BLU	BlueCoin	bluecoin
 BLUE	BLUE	ethereum-blue
 BLX	Blockchain Index	blockchain-index
-BLZ	BlazeCoin	blazecoin
-BMC	Blackmoon Crypto	blackmoon-crypto
+BMC	Blackmoon	blackmoon-crypto
 BNB	Binance Coin	binance-coin
 BNT	Bancor	bancor
 BNTY	Bounty0x	bounty0x
@@ -367,10 +371,10 @@ BOAT	BOAT	doubloon
 BOLI	Bolivarcoin	bolivarcoin
 BON	Bonpay	bonpay
 BOS	BOScoin	boscoin
-BOST	BoostCoin	boostcoin
 BOT	Bodhi	bodhi
 BPC	Bitpark Coin	bitpark-coin
 BPL	Blockpool	blockpool
+BPT	Blockport	blockport
 BQ	bitqy	bitqy
 BRAIN	Braincoin	braincoin
 BRAT	BROTHER	brat
@@ -395,6 +399,7 @@ BTC	Bitcoin	bitcoin
 BTC2X	Bitcoin2x	bitcoin2x
 BTCA	Bitair	bitair
 BTCD	BitcoinDark	bitcoindark
+BTCL	Bitcoin Lightning	bitcoin-lightning
 BTCM	BTCMoon	btcmoon
 BTCR	Bitcurrency	bitcurrency
 BTCRED	Bitcoin Red	bitcoin-red
@@ -424,6 +429,7 @@ BXC	Bitcedi	bitcedi
 BXT	BitTokens	bittokens
 BYC	Bytecent	bytecent
 C2	Coin2.1	coin2-1
+C20	CRYPTO20	c20
 CAB	Cabbage	cabbage
 CACH	CacheCoin	cachecoin
 CAG	Change	change
@@ -458,6 +464,7 @@ CFI	Cofound.it	cofound-it
 CFT	CryptoForecast	cryptoforecast
 CFUN	CFun	cfun
 CHAN	ChanCoin	chancoin
+CHAT	ChatCoin	chatcoin
 CHC	ChainCoin	chaincoin
 CHEAP	Cheapcoin	cheapcoin
 CHESS	ChessCoin	chesscoin
@@ -489,6 +496,7 @@ COR	CORION	corion
 CORG	CorgiCoin	corgicoin
 COSS	COSS	coss
 COUPE	Coupecoin	coupecoin
+COV	Covesting	covesting
 COVAL	Circuits of Value	circuits-of-value
 COXST	CoExistCoin	coexistcoin
 CPAY	Cryptopay	cryptopay
@@ -503,11 +511,13 @@ CRED	Verify	verify
 CREDO	Credo	credo
 CREVA	CrevaCoin	crevacoin
 CRM	Cream	cream
+CRPT	Crypterium	crypterium
 CRT	CRTCoin	crtcoin
 CRTM	Corethum	corethum
 CRW	Crown	crown
 CRX	Chronos	chronos
 CRYPT	CryptCoin	cryptcoin
+CSC	CasinoCoin	casinocoin
 CSNO	BitDice	bitdice
 CTIC2	Coimatic 2.0	coimatic-2
 CTIC3	Coimatic 3.0	coimatic-3
@@ -517,6 +527,7 @@ CTX	CarTaxi Token	cartaxi-token
 CUBE	DigiCube	digicube
 CUBIT	Cubits	cubits
 CURE	Curecoin	curecoin
+CV	carVertical	carvertical
 CV2	Colossuscoin V2	colossuscoin-v2
 CVC	Civic	civic
 CVCOIN	CVCoin	cvcoin
@@ -545,6 +556,7 @@ DCR	Decred	decred
 DCRE	DeltaCredits	deltacredits
 DCT	DECENT	decent
 DCY	Dinastycoin	dinastycoin
+DDD	Scry.info	scryinfo
 DDF	DigitalDevelopersFund	digital-developers-fund
 DEM	Deutsche eMark	deutsche-emark
 DENT	Dent	dent
@@ -590,13 +602,14 @@ DRT	DomRaider	domraider
 DRXNE	DROXNE	droxne
 DSH	Dashcoin	dashcoin
 DSR	Desire	desire
+DTA	DATA	data
 DTB	Databits	databits
 DTR	Dynamic Trading Rights	dynamic-trading-rights
 DUB	Dubstep	dubstep
+DUBI	Decentralized Universal Basic Income	decentralized-universal-basic-income
 DUO	ParallelCoin	parallelcoin
 DUTCH	Dutch Coin	dutch-coin
 DYN	Dynamic	dynamic
-E4ROW	E4ROW	ether-for-the-rest-of-the-world
 EAC	EarthCoin	earthcoin
 EAG	EA Coin	ea-coin
 EAGLE	EagleCoin	eaglecoin
@@ -625,6 +638,7 @@ EGG	EggCoin	eggcoin
 EGO	EGO	ego
 EGOLD	eGold	egold
 EKO	EchoLink	echolink
+EKT	EDUCare	educare
 EL	Elcoin	elcoin-el
 ELC	Elacoin	elacoin
 ELE	Elementrem	elementrem
@@ -668,6 +682,7 @@ ETTWAVES	EncryptoTel [WAVES]	encryptotel
 EUC	Eurocoin	eurocoin
 EUSD	eUSD	eusd
 EVC	EventChain	eventchain
+EVE	Devery	devery
 EVIL	Evil Coin	evil-coin
 EVO	Evotion	evotion
 EVR	Everus	everus
@@ -705,7 +720,6 @@ FLY	Flycoin	flycoin
 FNC	FinCoin	fincoin
 FONZ	Fonziecoin	fonziecoin
 FOR	FORCE	force
-FRAZ	Frazcoin	frazcoin
 FRC	Freicoin	freicoin
 FRCT	Farstcoin	farstcoin
 FRD	Farad	farad
@@ -721,7 +735,6 @@ FUDD	DimonCoin	dimoncoin
 FUEL	Etherparty	etherparty
 FUN	FunFair	funfair
 FUNC	FUNCoin	funcoin
-FUNK	The Cypherfunks	the-cypherfunks
 FUTC	FutCoin	futcoin
 FUZZ	FuzzBalls	fuzzballs
 FXE	FuturXe	futurexe
@@ -732,10 +745,11 @@ GAIA	GAIA	gaia
 GAIN	UGAIN	ugain
 GAM	Gambit	gambit
 GAME	GameCredits	gamecredits
-GAME2	Game	game
+GAME2	Game.com	game
 GAP	Gapcoin	gapcoin
 GARY	President Johnson	president-johnson
 GAS	Gas	gas
+GAT	Gatcoin	gatcoin
 GAY	GAY Money	gaycoin
 GB	GoldBlocks	goldblocks
 GBC	GBCGoldCoin	gbcgoldcoin
@@ -745,7 +759,7 @@ GBT	GameBet Coin	gamebet-coin
 GBX	GoByte	gobyte
 GBYTE	Byteball Bytes	byteball
 GCC	TheGCCcoin	thegcccoin
-GCN	GCoin	gcoin
+GCN	GCN Coin	gcoin
 GCR	Global Currency Reserve	global-currency-reserve
 GCS	GameChain System	gamechain
 GEERT	GeertCoin	geertcoin
@@ -784,6 +798,7 @@ GTC	Global Tour Coin	global-tour-coin
 GTO	Gifto	gifto
 GUC	GoldUnionCoin	goldunioncoin
 GUCCIONE	GuccioneCoin	guccionecoin
+GUESS	GUESS	guess
 GUN	Guncoin	guncoin
 GUP	Matchpool	guppy
 GVT	Genesis Vision	genesis-vision
@@ -795,6 +810,7 @@ HAT	Hawala.Today	hawala-today
 HBC	HomeBlockCoin	homeblockcoin
 HBN	HoboNickels	hobonickels
 HBT	Hubii Network	hubii-network
+HC	Harvest Masternode Coin	harvest-masternode-coin
 HCC	Happy Creator Coin	happy-creator-coin
 HDG	Hedge	hedge
 HDLB	HODL Bucks	hodl-bucks
@@ -810,6 +826,8 @@ HNC	Helleniccoin	helleniccoin
 HODL	HOdlcoin	hodlcoin
 HOLD	Interstellar Holdings	interstellar-holdings
 HONEY	Honey	honey
+HORSE	Ethorse	ethorse
+HOT	Hydro Protocol	hydro-protocol
 HPB	High Performance Blockchain	high-performance-blockchain
 HPC	Happycoin	happycoin
 HPY	Hyper Pay	hyper-pay
@@ -840,7 +858,9 @@ ICON	Iconic	iconic
 ICOO	ICO OpenLedger	ico-openledger
 ICOS	ICOS	icos
 ICX	ICON	icon
+IDH	indaHash	indahash
 IDT	InvestDigital	investdigital
+IDXM	IDEX Membership	idex-membership
 IETH	iEthereum	iethereum
 IFC	Infinitecoin	infinitecoin
 IFLT	InflationCoin	inflationcoin
@@ -866,6 +886,8 @@ IOC	I/O Coin	iocoin
 ION	ION	ion
 IOP	Internet of People	internet-of-people
 IOST	IOStoken	iostoken
+IPC	IPChain	ipchain
+IPL	InsurePal	insurepal
 IPY	Infinity Pay	infinity-pay
 IQT	iQuant	iquant
 IRL	IrishCoin	irishcoin
@@ -874,7 +896,6 @@ ITC	IoT Chain	iot-chain
 ITI	iTicoin	iticoin
 ITNS	IntenseCoin	intensecoin
 ITT	Intelligent Trading Tech	intelligent-trading-tech
-ITZ	Interzone	interzone
 IVZ	InvisibleCoin	invisiblecoin
 IXC	Ixcoin	ixcoin
 IXT	iXledger	ixledger
@@ -882,6 +903,7 @@ J	Joincoin	joincoin
 JET	Jetcoin	jetcoin
 JIN	Jin Coin	jin-coin
 JINN	Jinn	jinn
+JIYO	Jiyo	jiyo
 JNS	Janus	janus
 JOBS	JobsCoin	jobscoin
 JS	JavaScript Token	javascript-token
@@ -889,6 +911,7 @@ JWL	Jewels	jewels
 KARMA	Karmacoin	karmacoin
 KASHH	KashhCoin	kashhcoin
 KAYI	Kayicoin	kayicoin
+KB3	B3Coin	b3coin
 KBR	Kubera Coin	kubera-coin
 KCASH	Kcash	kcash
 KCS	KuCoin Shares	kucoin-shares
@@ -925,10 +948,12 @@ LEEK	Leek Coin	leekico
 LEND	ETHLend	ethlend
 LEO	LEOcoin	leocoin
 LEPEN	LePen	lepen
+LET	LinkEye	linkeye
 LEV	Leverj	leverj
 LEX	Lex4All	lex4all
 LGD	Legends Room	legends-room
 LIFE	LIFE	life
+LIGHT	LightChain	lightchain
 LIGHTNINGBTC	Lightning Bitcoin	lightning-bitcoin
 LINDA	Linda	linda
 LINK	ChainLink	chainlink
@@ -941,7 +966,6 @@ LMC	LoMoCoin	lomocoin
 LNK	Link Platform	link-platform
 LOC	LockChain	lockchain
 LOG	Woodcoin	woodcoin
-LOT	LottoCoin	lottocoin
 LRC	Loopring	loopring
 LSK	Lisk	lisk
 LTB	LiteBar	litebar
@@ -958,6 +982,7 @@ MAC	Machinecoin	machinecoin
 MAD	SatoshiMadness	satoshimadness
 MAG	Magnet	magnet
 MAGE	MagicCoin	magiccoin
+MAGGIE	Maggie	maggie
 MAGN	Magnetcoin	magnetcoin
 MAID	MaidSafeCoin	maidsafecoin
 MANA	Decentraland	decentraland
@@ -1003,7 +1028,9 @@ MNE	Minereum	minereum
 MNM	Mineum	mineum
 MNX	MinexCoin	minexcoin
 MOAC	MOAC	moac
+MOBI	Mobius	mobius
 MOD	Modum	modum
+MOF	Molecular Future	molecular-future
 MOIN	Moin	moin
 MOJO	MojoCoin	mojocoin
 MONA	MonaCoin	monacoin
@@ -1013,8 +1040,6 @@ MONK	Monkey Project	monkey-project
 MOON	Mooncoin	mooncoin
 MOT	Olympus Labs	olympus-labs
 MOTO	Motocoin	motocoin
-MRJA	GanjaCoin	ganjacoin
-MRNG	MorningStar	morningstar-payments
 MRT	Miners' Reward Token	miners-reward-token
 MSCN	Master Swiscoin	master-swiscoin
 MSD	MSD	msd
@@ -1023,12 +1048,11 @@ MST	MustangCoin	mustangcoin
 MTH	Monetha	monetha
 MTL	Metal	metal
 MTLMC3	Metal Music Coin	metal-music-coin
-MTM	MTMGaming	mtmgaming
 MTNC	Masternodecoin	masternodecoin
 MTX	Matryx	matryx
 MUE	MonetaryUnit	monetaryunit
 MUSIC	Musicoin	musicoin
-MUT	Mutual Coin	mutual-coin
+MVC	Maverick Chain	maverick-chain
 MXT	MarteXcoin	martexcoin
 MYB	MyBit Token	mybit-token
 MYST	Mysterium	mysterium
@@ -1061,6 +1085,7 @@ NMS	Numus	numus
 NOBL	NobleCoin	noblecoin
 NODC	NodeCoin	nodecoin
 NOTE	DNotes	dnotes
+NOX	Nitro	nitro
 NRO	Neuro	neuro
 NSR	NuShares	nushares
 NTC	Natcoin	natcoin
@@ -1081,9 +1106,11 @@ OAX	OAX	oax
 OBITS	OBITS	obits
 OCEAN	BurstOcean	burstocean
 OCL	Oceanlab	oceanlab
+OCN	Odyssey	odyssey
 OCOW	OCOW	ocow
 OCT	OracleChain	oraclechain
 ODN	Obsidian	obsidian
+OF	OFCOIN	ofcoin
 OFF	Cthulhu Offerings	cthulhu-offerings
 OK	OKCash	okcash
 OMC	Omicron	omicron
@@ -1098,6 +1125,7 @@ OPC	OP Coin	op-coin
 OPES	Opescoin	opescoin
 OPT	Opus	opus
 ORB	Orbitcoin	orbitcoin
+ORE	Galactrum	galactrum
 ORLY	Orlycoin	orlycoin
 ORME	Ormeus Coin	ormeus-coin
 OS76	OsmiumCoin	osmiumcoin
@@ -1127,7 +1155,6 @@ PEPECASH	Pepe Cash	pepe-cash
 PEX	PosEx	posex
 PFR	Payfair	payfair
 PGL	Prospectors Gold	prospectors-gold
-PHO	Photon	photon
 PHR	Phore	phore
 PHS	Philosopher Stones	philosopher-stones
 PIE	PIECoin	piecoin
@@ -1168,17 +1195,19 @@ PPT	Populous	populous
 PPY	Peerplays	peerplays-ppy
 PR	Prototanium	prototanium
 PRC	PRCoin	prcoin
+PRE	Presearch	presearch
 PRES	President Trump	president-trump
 PRG	Paragon	paragon
 PRIMU	Primulon	primulon
 PRIX	Privatix	privatix
-PRL	Oyster	oyster-pearl
+PRL	Oyster	oyster
 PRM	PrismChain	prismchain
 PRN	Protean	protean
 PRO	Propy	propy
 PROCHAIN	ProChain	prochain
 PROCURRENCY	ProCurrency	procurrency
-PRS	Presearch	presearch
+PRPS	Purpose	purpose
+PRS	PressOne	pressone
 PRX	Printerium	printerium
 PST	Primas	primas
 PSY	Psilocybin	psilocybin
@@ -1188,6 +1217,7 @@ PULSE	Pulse	pulse
 PURA	Pura	pura
 PURE	Pure	pure
 PUT	PutinCoin	putincoin
+PUTOKEN	Profile Utility Token	profile-utility-token
 PX	PX	px
 PXC	Phoenixcoin	phoenixcoin
 PXI	Prime-XI	prime-xi
@@ -1197,7 +1227,7 @@ Q2C	QubitCoin	qubitcoin
 QASH	QASH	qash
 QAU	Quantum	quantum
 QBC	Quebecoin	quebecoin
-QBK	Qibuck Asset	qibuck-asset
+QBIC	Qbic	qbic
 QBT	Qbao	qbao
 QCN	QuazarCoin	quazarcoin
 QLC	QLINK	qlink
@@ -1222,13 +1252,16 @@ RBY	Rubycoin	rubycoin
 RC	RussiaCoin	russiacoin
 RCN	Ripio Credit Network	ripio-credit-network
 RCOIN	Rcoin	rcoin
+RCT	RealChain	realchain
 RDD	ReddCoin	reddcoin
 RDN	Raiden Network Token	raiden-network-token
+READ	Read	read
 REAL	REAL	real
 REBL	Rebellious	rebellious
 REC	Regalcoin	regalcoin
 RED	RedCoin	redcoin
 REE	ReeCoin	reecoin
+REF	RefToken	reftoken
 REGA	Regacoin	regacoin
 REMI	Remicoin	remicoin
 REP	Augur	augur
@@ -1282,6 +1315,7 @@ SDP	SydPak	sydpak
 SDRN	Senderon	senderon
 SEND	Social Send	social-send
 SEQ	Sequence	sequence
+SEXC	ShareX	sharex
 SFC	Solarflarecoin	solarflarecoin
 SFE	SafeCoin	safecoin
 SGR	Sugar Exchange	sugar-exchange
@@ -1332,23 +1366,26 @@ SONG	SongCoin	songcoin
 SOON	SoonCoin	sooncoin
 SPACE	SpaceCoin	spacecoin
 SPANK	SpankChain	spankchain
+SPC	SpaceChain	spacechain
 SPEX	SproutsExtreme	sproutsextreme
 SPF	SportyFi	sportyfi
 SPHR	Sphere	sphere
 SPHTX	SophiaTX	sophiatx
+SPK	Sparks	sparks
 SPORT	SportsCoin	sportscoin
 SPR	SpreadCoin	spreadcoin
 SPRTS	Sprouts	sprouts
 SPT	Spots	spots
 SRC	SecureCoin	securecoin
 SRN	SIRIN LABS Token	sirin-labs-token
+SSC	SelfSell	selfsell
 SSS	Sharechain	sharechain
 STA	Starta	starta
 STAK	STRAKS	straks
 STAR	Starbase	starbase
 STARS	StarCash Network	starcash-network
 START	Startcoin	startcoin
-STC	Santa Coin	santa-coin
+STC	StarChain	starchain
 STEEM	Steem	steem
 STEPS	Steps	steps
 STEX	STEX	stex
@@ -1366,7 +1403,6 @@ SUMO	Sumokoin	sumokoin
 SUPER	SuperCoin	supercoin
 SUR	Suretly	suretly
 SWFTC	SwftCoin	swftcoin
-SWIFT	Bitswift	bitswift
 SWING	Swing	swing
 SWP	Swapcoin	swapcoin
 SWT	Swarm City	swarm-city
@@ -1382,6 +1418,7 @@ TAGR	TAGRcoin	tagrcoin
 TAJ	TajCoin	tajcoin
 TALK	BTCtalkcoin	btctalkcoin
 TAU	Lamden	lamden
+TBX	Tokenbox	tokenbox
 TCC	The ChampCoin	the-champcoin
 TCOIN	T-coin	t-coin
 TCR	TheCreed	thecreed
@@ -1398,6 +1435,7 @@ TFL	TrueFlip	trueflip
 TGC	Tigercoin	tigercoin
 TGT	Target Coin	target-coin
 THC	HempCoin	hempcoin
+THETA	Theta Token	theta-token
 THS	TechShares	techshares
 TIE	TIES Network	ties-network
 TIME	Chronobank	chronobank
@@ -1409,17 +1447,19 @@ TKN	TokenCard	tokencard
 TKR	CryptoInsight	trackr
 TKS	Tokes	tokes
 TLE	TattooCoin (Limited)	tattoocoin-limited
+TMC	TimesCoin	timescoin
 TNB	Time New Bank	time-new-bank
+TNC	Trinity Network Credit	trinity-network-credit
 TNT	Tierion	tierion
 TOA	ToaCoin	toacoin
 TODAY	TodayCoin	todaycoin
 TOK	Tokugawa	tokugawa
 TOKC	TOKYO	tokyo
-TOKEN	SwapToken	swaptoken
 TOP	TopCoin	topcoin
 TOPAZ	Topaz Coin	topaz
 TOPC	TopChain	topchain
 TOR	Torcoin	torcoin-tor
+TRAC	OriginTrail	origintrail
 TRC	Terracoin	terracoin
 TRCT	Tracto	tracto
 TRDT	Trident Group	trident
@@ -1430,6 +1470,7 @@ TRIG	Triggers	triggers
 TRK	Truckcoin	truckcoin
 TROLL	Trollcoin	trollcoin
 TRST	WeTrust	trust
+TRUE	True Chain	true-chain
 TRUMP	TrumpCoin	trumpcoin
 TRUST	TrustPlus	trustplus
 TRX	TRON	tron
@@ -1449,6 +1490,7 @@ UFO	UFO Coin	ufo-coin
 UFR	Upfiring	upfiring
 UGC	ugChain	ugchain
 UGT	UG Token	ug-token
+UIP	UnlimitedIP	unlimitedip
 UIS	Unitus	unitus
 UKG	Unikoin Gold	unikoin-gold
 ULA	Ulatech	ulatech
@@ -1592,7 +1634,6 @@ XRC	Rawcoin	rawcoin2
 XRE	RevolverCoin	revolvercoin
 XRL	Rialto	rialto
 XRP	Ripple	ripple
-XRY	Royalties	royalties
 XSH	SHIELD	shield-xsh
 XSPEC	Spectrecoin	spectrecoin
 XST	Stealthcoin	stealthcoin
@@ -1606,10 +1647,10 @@ XVE	The Vegan Initiative	the-vegan-initiative
 XVG	Verge	verge
 XVP	Virtacoinplus	virtacoinplus
 XWC	WhiteCoin	whitecoin
-XYLO	XYLO	xylo
 XZC	ZCoin	zcoin
 YAC	Yacoin	yacoin
 YASH	YashCoin	yashcoin
+YEE	Yee	yee
 YEL	Yellow Token	yellow-token
 YES	Yescoin	yescoin
 YOC	Yocoin	yocoin

@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::Register;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.15';
 
 use Lemonldap::NG::Portal::Simple qw(:all);
 use base qw(Lemonldap::NG::Portal::SharedConf Exporter);
@@ -31,6 +31,8 @@ use POSIX qw(strftime);
 #   - sendConfirmationMail
 #   - registerUser
 #   - sendRegisterMail
+# - portal core module:
+#   - controlUrlOrigin
 # - authentication module:
 #   - authInit
 #   - authFinish
@@ -50,7 +52,7 @@ sub process {
     $self->{error} = PE_OK;
 
     $self->{error} = $self->_subProcess(
-        qw(smtpInit authInit extractRegisterInfo userDBInit getRegisterUser
+        qw(controlUrlOrigin smtpInit authInit extractRegisterInfo userDBInit getRegisterUser
           userDBFinish storeRegisterSession sendConfirmationMail
           registerUser registerDBFinish sendRegisterMail authFinish)
     );
@@ -309,6 +311,7 @@ sub sendConfirmationMail {
     $url .= '&skin=' . $self->getSkin();
     $url .= '&' . $self->{authChoiceParam} . '=' . $self->{_authChoice}
       if ( $self->{_authChoice} );
+    $url .= '&url=' . $self->{_url} if $self->{_url};
 
     # Build mail content
     my $subject = $self->{registerConfirmSubject};
@@ -416,6 +419,13 @@ sub sendRegisterMail {
     my $body;
     my $html = 1;
 
+    # Build portal url
+    my $url = $self->{portal};
+    $url .= '?skin=' . $self->getSkin();
+    $url .= '&' . $self->{authChoiceParam} . '=' . $self->{_authChoice}
+      if ( $self->{_authChoice} );
+    $url .= '&url=' . $self->{_url} if $self->{_url};
+
     # Use HTML template
     my $tplfile = $self->getApacheHtdocsPath
       . "/skins/$self->{portalSkin}/mail_register_done.tpl";
@@ -429,6 +439,7 @@ sub sendRegisterMail {
     $body = $template->output();
 
     # Replace variables in body
+    $body =~ s/\$url/$url/g;
     $body =~ s/\$(\w+)/decode("utf8",$self->{registerInfo}->{$1})/ge;
 
     # Send mail

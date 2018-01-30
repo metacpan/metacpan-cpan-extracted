@@ -734,6 +734,12 @@ token	'n';
 method	perl_version_introduced => '5.021008', note => 'perl5218delta';
 method	perl_version_removed	=> undef;
 
+class	'PPIx::Regexp::Token::GroupType::Script_Run',
+note	=> 'All characters must be in same script';
+token	'+script_run:';
+method	perl_version_introduced	=> '5.027008', note => 'perl5278delta';
+method	perl_version_removed	=> undef;
+
 finis;
 
 my $context;

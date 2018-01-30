@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Hash;
 use Prty::Option;
@@ -559,7 +559,7 @@ sub dsn {
 
     if ($api ne 'dbi') {
         $self->throw(
-            q{UDL-00001: DSN nur für DBI API definiert},
+            q~UDL-00001: DSN nur für DBI API definiert~,
             API=>$api,
         );
     }
@@ -602,7 +602,7 @@ sub dsn {
     }
     else {
         $self->throw(
-            q{UDL-00002: Nicht-unterstütztes DBMS},
+            q~UDL-00002: Nicht-unterstütztes DBMS~,
             Dbms=>$dbms,
         );
     }
@@ -692,7 +692,7 @@ sub udl {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -700,7 +700,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

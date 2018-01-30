@@ -47,7 +47,7 @@ sub _new {
     my $class = ref($proto) || $proto;
     my %params = @_;
 
-    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
     my $self;
     if (exists $params{name}) {
 	$self = Sys::Virt::StoragePool::_lookup_by_name($con,  $params{name});
@@ -115,14 +115,11 @@ C<define_storage_pool> method in L<Sys::Virt>.
 
 Remove the configuration associated with a storage pool previously defined
 with the C<define_storage pool> method in L<Sys::Virt>. If the storage pool is
-running, you probably want to use the C<shutdown> or C<destroy>
-methods instead.
+running, you probably want to use the C<destroy> method instead.
 
 =item $pool->destroy()
 
-Immediately terminate the machine, and remove it from the virtual
-machine monitor. The C<$pool> handle is invalid after this call
-completes and should not be used again.
+Immediately stop the storage pool.
 
 =item $flag = $pool->get_autostart();
 
@@ -499,7 +496,7 @@ Storage pool volume refresh events
 
 The following constants allow storage pool lifecycle change events
 to be interpreted. The events contain both a state change, and a
-reason though the reason is currently unsed.
+reason though the reason is currently unused.
 
 =over 4
 

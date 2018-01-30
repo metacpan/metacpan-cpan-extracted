@@ -17,9 +17,8 @@ subtest '... basic filtered stream test' => sub {
 
 	my $stream = Directory::Scanner->for( $ROOT )
 								   ->recurse
-								   ->match( sub { $_->is_dir } )
-								   ->stream;
-	isa_ok($stream, 'Directory::Scanner::StreamBuilder::Matching');
+								   ->match( sub { $_->is_dir } );
+	isa_ok($stream, 'Directory::Scanner::Stream::Matching');
 
 	ok(!$stream->is_done, '... the stream is not done');
 	ok(!$stream->is_closed, '... the stream is not closed');
@@ -55,9 +54,8 @@ subtest '... basic filtered stream test' => sub {
 
 	my $stream = Directory::Scanner->for( $ROOT )
 								   ->recurse
-								   ->match( sub { $_->is_dir } )
-								   ->stream;
-	isa_ok($stream, 'Directory::Scanner::StreamBuilder::Matching');
+								   ->match( sub { $_->is_dir } );
+	isa_ok($stream, 'Directory::Scanner::Stream::Matching');
 
 	ok(!$stream->is_done, '... the stream is not done');
 	ok(!$stream->is_closed, '... the stream is not closed');

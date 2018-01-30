@@ -2,7 +2,7 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
@@ -282,11 +282,11 @@ Austauschformat fuer Bibliotheken (MAB). In addition to PICA+ in CBS there is
 the cataloging format Pica3 which can losslessly be convert to PICA+ and vice
 versa.
 
-Records in PICA::Data are encoded either as array of arrays, the inner
-arrays representing PICA fields, or as an object with two fields, C<_id> and
-C<record>, the latter holding the record as array of arrays, and the former
-holding the record identifier, stored in field C<003@>, subfield C<0>. For
-instance a minimal record with just one field C<003@>:
+Records in PICA::Data are encoded either as array of arrays, the inner arrays
+representing PICA fields, or as an object with two keys, C<_id> and C<record>,
+the latter holding the record as array of arrays, and the former holding the
+record identifier, stored in field C<003@>, subfield C<0>. For instance a
+minimal record with just one field (having tag C<003@> and no occurrence):
 
     {
       _id    => '12345X',
@@ -300,7 +300,7 @@ or in short form:
     [ [ '003@', undef, '0' => '12345X' ] ]
 
 PICA path expressions (see L<PICA::Path>) can be used to facilitate processing
-PICA+ records.
+PICA+ records and L<PICA::Schema> to validate PICA+ records.
 
 =head1 FUNCTIONS
 
@@ -316,11 +316,15 @@ ignored and additional parameters are passed to the parser's constructor:
 
 =item 
 
-L<PICA::Parser::Plus> for type C<plus> or C<picaplus> (normalized PICA+)
+L<PICA::Parser::Binary> for type C<binary> (binary PICA+)
 
 =item 
 
 L<PICA::Parser::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
+
+=item 
+
+L<PICA::Parser::Plus> for type C<plus> or C<picaplus> (normalized PICA+)
 
 =item 
 
@@ -346,7 +350,15 @@ C<pica_parser> with one of
 
 =item 
 
-L<PICA::Writer::XML> for type C<xml> or C<picaxml> (PICA-XML)
+L<PICA::Writer::Binary> for type C<binary> (binary PICA)
+
+=item 
+
+L<PICA::Writer::Generic> for type C<generic> (PICA with self defined data separators)
+
+=item 
+
+L<PICA::Writer::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
 
 =item 
 
@@ -354,7 +366,11 @@ L<PICA::Writer::Plus> for type C<plus> or C<picaplus> (normalized PICA+)
 
 =item 
 
-L<PICA::Writer::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
+L<PICA::Writer::XML> for type C<xml> or C<picaxml> (PICA-XML)
+
+=item 
+
+L<PICA::Writer::PPXML> for type C<ppxml> (PicaPlus-XML)
 
 =back
 
@@ -411,7 +427,7 @@ Same as C<values> but only returns the first value.
 
 =head2 fields( $path )
 
-Returns a PICA record limited to fields specified in a L<PICA::path>
+Returns a PICA record limited to fields specified in a L<PICA::Path>
 expression.  Always returns an array reference.
 
 =head2 holdings

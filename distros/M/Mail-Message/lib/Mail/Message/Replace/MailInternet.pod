@@ -80,7 +80,7 @@ Remove all data from this object.  Very dangerous!
 
 =over 2
 
-=item Body => ARRAY-OF-LINES
+=item Body => \@lines
 
 Array of C<"\n"> terminated lines.  If not specified, the lines will be
 read from $arg.
@@ -177,7 +177,7 @@ Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Build/"Constructing a message">
 
-=item $obj-E<gt>B<extract>(ARRAY|$fh)
+=item $obj-E<gt>B<extract>(\@lines|$fh)
 
 Read header and body from an ARRAY or $fh
 
@@ -213,9 +213,9 @@ Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
 Inherited, see L<Mail::Message::Construct::Forward/"Constructing a message">
 
-=item $obj-E<gt>B<read>(ARRAY|$fh, %options)
+=item $obj-E<gt>B<read>(\@lines|$fh, %options)
 
-=item Mail::Message::Replace::MailInternet-E<gt>B<read>(ARRAY|$fh, %options)
+=item Mail::Message::Replace::MailInternet-E<gt>B<read>(\@lines|$fh, %options)
 
 Read header and body from the specified ARRAY or $fh.  When used as
 object method, L<Mail::Message::read()|Mail::Message::Construct::Read/"Constructing a message"> is called, to be MailBox compliant.
@@ -234,11 +234,11 @@ only available in the first case.
 
 =back
 
-=item $obj-E<gt>B<read_body>(ARRAY|$fh)
+=item $obj-E<gt>B<read_body>(\@lines|$fh)
 
 Read only the message's body from the ARRAY or $fh.
 
-=item $obj-E<gt>B<read_header>(ARRAY|$fh)
+=item $obj-E<gt>B<read_header>(\@lines|$fh)
 
 Read only the message's header from the ARRAY or $fh
 
@@ -281,9 +281,9 @@ but may be different from L<Mail::Internet>'s version.
 
 =item Cc => ADDRESSES
 
-=item Exclude => ARRAY-OF-NAMES
+=item Exclude => \@names
 
-Remove the fields witht the specified names from the produced reply message.
+Remove the fields with the specified names from the produced reply message.
 
 =item From => ADDRESSES
 
@@ -292,7 +292,7 @@ Remove the fields witht the specified names from the produced reply message.
 Quotation STRING, which is translated into L<reply(quote)|Mail::Message::Construct::Reply/"Constructing a message">.  The normal
 default of C<quote> is "E<gt> ", in stead of "E<gt>".
 
-=item Keep => ARRAY-OF-NAMES
+=item Keep => \@names
 
 Copy all header fields with the specified NAMES from the source to the
 reply message.
@@ -312,7 +312,7 @@ as default the exact oposite of this option, being C<true>.
 
 =item group_reply => BOOLEAN
 
-=item header_template => FILENAME|C<undef>
+=item header_template => $filename|C<undef>
 
 Read the return header from the template file.  When this is explicitly
 set to C<undef>, or the file does not exist, then a header will be created.
@@ -355,11 +355,11 @@ Add a signature (a few extra lines) to the message.
 
 =over 2
 
-=item File => FILENAME
+=item File => $filename
 
 Specifies a filename where the signature is in.
 
-=item Signature => STRING|ARRAY-OF-LINES
+=item Signature => STRING|\@lines
 
 The signature in memory.
 
@@ -403,7 +403,7 @@ Mail::Transport::NNTP or L<Mail::Message::send()|Mail::Message/"The message"> wi
 
 =item Debug => BOOLEAN
 
-=item Host => HOSTNAME
+=item Host => $hostname
 
 =item Port => INTEGER
 
@@ -443,7 +443,7 @@ Extends L<"The header" in Mail::Message|Mail::Message/"The header">.
  
 =over 4
 
-=item $obj-E<gt>B<add>($lines)
+=item $obj-E<gt>B<add>(\@lines)
 
 Add header lines, which simply calls C<Mail::Message::Head::add()> on
 the header for each specified LINE. The last added LINE is returned.
@@ -515,10 +515,10 @@ defined.  The $head argument, which sets the header, is not available
 for L<Mail::Internet>, but is there to be compatible with the C<head>
 method of L<Mail::Message|Mail::Message>.
 
-=item $obj-E<gt>B<header>( [ARRAY] )
+=item $obj-E<gt>B<header>( [\@lines] )
 
-Optionally reads a header from the ARRAY, and then returns those fields
-as array-ref nicely folded.
+Optionally reads a header from the ARRAY of lines, and then returns
+those fields as array-ref nicely folded.
 Implemented by L<Mail::Message::Replace::MailHeader::header()|Mail::Message::Replace::MailHeader/"Simulating Mail::Header">
 
 =item $obj-E<gt>B<nrLines>()
@@ -930,35 +930,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.005,
-built on December 22, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Message distribution version 3.006,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

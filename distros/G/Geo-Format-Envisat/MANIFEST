@@ -2,11 +2,13 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/show_meta.pl
 examples/show_output.txt
 lib/Geo/Format/Envisat.pm
 lib/Geo/Format/Envisat.pod
 t/01use.t
 t/10name.t
-t/99pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

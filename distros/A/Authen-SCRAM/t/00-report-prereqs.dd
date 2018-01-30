@@ -32,8 +32,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                      'String::Compare::ConstantTime' => '0.310'
-                                    },
+                                        'String::Compare::ConstantTime' => '0.310'
+                                      },
                       'requires' => {
                                       'Authen::SASL::SASLprep' => '1.100',
                                       'Carp' => '0',

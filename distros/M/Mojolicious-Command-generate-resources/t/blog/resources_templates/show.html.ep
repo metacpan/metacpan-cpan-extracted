@@ -3,6 +3,8 @@
 %% layout 'blog', 
 %%   title => $title;
 
-<h2><%%= $$title %> </h2>
-<p>TODO: Put the content here</p>
+<h2><%%= $title %> </h2>
+%% for my $k ( qw(<%= join ' ', @{$a->{columns}} %>) ) {
+<p><%%= ucfirst $k %>: <%%= $<%= $a->{t} %>->{$k} %></p>
+%% }
 %%= link_to 'Edit' => edit_<%= $a->{t} %> => {id => $<%= $a->{t} %>->{id}}

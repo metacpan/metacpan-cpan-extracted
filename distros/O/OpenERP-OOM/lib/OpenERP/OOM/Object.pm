@@ -7,6 +7,7 @@ use Moose;
 use Moose::Exporter;
 use Moose::Util::MetaRole;
 use Moose::Util::TypeConstraints;
+use Switch::Plain;
 
 #-------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ subtype 'OpenERP::OOM::Type::Many2One'
 coerce 'OpenERP::OOM::Type::Many2One'
     => from 'ArrayRef'
     => via { $_->[0] };
-    
+
 
 #-------------------------------------------------------------------------------
 
@@ -42,9 +43,9 @@ Moose::Exporter->setup_import_methods(
 sub init_meta {
     shift;
     my %args = @_;
-    
+
     Moose->init_meta( %args, base_class => 'OpenERP::OOM::Object::Base' );
-    
+
     Moose::Util::MetaRole::apply_metaroles(
         for             => $args{for_class},
         class_metaroles => {
@@ -68,7 +69,7 @@ sub init_meta {
 
 sub openerp_model {
     my ($meta, $name, %options) = @_;
-    
+
     $meta->add_method(
         'model',
         sub {return $name},
@@ -80,24 +81,24 @@ sub openerp_model {
 
 sub relationship {
     my ($meta, $name, %options) = @_;
-    
+
     #carp "Adding relationship $name";
-    
+
     $meta->relationship({
         %{$meta->relationship},
         $name => \%options
     });
-    
+
     #say "Adding hooks";
-    
-    given ($options{type}) {
-        when ('many2one') {
+
+    sswitch ($options{type}) {
+        case ('many2one'): {
             goto &_add_rel2one;
         }
-        when ('one2many') {
+        case ('one2many'): {
             goto &_add_rel2many;
         }
-        when ('many2many') {
+        case ('many2many'): {
             goto &_add_rel2many;
         }
     }
@@ -108,13 +109,13 @@ sub relationship {
 
 sub _add_rel2many {
     my ($meta, $name, %options) = @_;
-    
+
     $meta->add_attribute(
         $options{key},
         isa => 'ArrayRef',
         is  => 'rw',
     );
-    
+
     $meta->add_method(
         $name,
         sub {
@@ -167,13 +168,13 @@ sub _add_rel2one {
         is     => 'rw',
         coerce => 1,
     );
-    
+
     my $cache_field = '__cache_' . $field_name;
     $meta->add_attribute(
         $cache_field,
         is     => 'rw',
     );
-    
+
     $meta->add_method(
         $name,
         sub {
@@ -199,17 +200,17 @@ sub _add_rel2one {
 
 sub has_link {
     my ($meta, $name, %options) = @_;
-    
+
     $meta->link({
         %{$meta->link},
         $name => \%options
     });
-    
-    given ($options{type}) {
-        when ('single') {
+
+    sswitch ($options{type}) {
+        case ('single'): {
             goto &_add_link_single;
         }
-        when ('multiple') {
+        case ('multiple'): {
             goto &_add_link_multiple;
         }
     }
@@ -220,13 +221,13 @@ sub has_link {
 
 sub _add_link_single {
     my ($meta, $name, %options) = @_;
-    
+
     $meta->add_attribute(
         $options{key},
         isa => 'Int',
         is  => 'ro',
     );
-    
+
 }
 
 
@@ -234,13 +235,13 @@ sub _add_link_single {
 
 sub _add_link_multiple {
     my ($meta, $name, %options) = @_;
-    
+
     $meta->add_attribute(
         $options{key},
         isa => 'ArrayRef',
         is  => 'ro',
     );
-    
+
 }
 
 
@@ -260,7 +261,7 @@ OpenERP::OOM::Object
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 

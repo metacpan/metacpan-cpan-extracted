@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::Row::ToJSON;
-$DBIx::Class::Helper::Row::ToJSON::VERSION = '2.033003';
+$DBIx::Class::Helper::Row::ToJSON::VERSION = '2.033004';
 # ABSTRACT: Remove the boilerplate from your TO_JSON functions
 
 use strict;
@@ -8,6 +8,7 @@ use warnings;
 use parent 'DBIx::Class::Row';
 
 __PACKAGE__->mk_group_accessors(inherited => '_serializable_columns');
+__PACKAGE__->mk_group_accessors(inherited => '_unserializable_data_types');
 
 my $dont_serialize = {
    text  => 1,
@@ -22,7 +23,7 @@ sub _is_column_serializable {
 
    if (!defined $info->{is_serializable}) {
       if (defined $info->{data_type} &&
-          $dont_serialize->{lc $info->{data_type}}
+          $self->unserializable_data_types->{lc $info->{data_type}}
       ) {
          $info->{is_serializable} = 0;
       } else {
@@ -54,6 +55,14 @@ sub TO_JSON {
       map +($columns_info->{$_}{accessor} || $_),
           keys %$columns_info
    };
+}
+
+sub unserializable_data_types {
+   my $self = shift;
+   if (!$self->_unserializable_data_types) {
+      $self->_unserializable_data_types($dont_serialize);
+   }
+   return $self->_unserializable_data_types;
 }
 
 1;
@@ -149,13 +158,30 @@ to the returned hashref:
     }
  }
 
+=head2 unserializable_data_types
+
+ $self->unserializable_data_types
+
+Simply returns a hashref of data types that TO_JSON should not serialize.
+Defaults to C<blob>, C<text>, or C<ntext>.
+
+If you wanted to allow serialization of text data types, you might override this
+method to look like this:
+
+ sub unserializable_data_types {
+    return {
+       blob  => 1,
+       ntext => 1,
+    };
+ }
+
 =head1 AUTHOR
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

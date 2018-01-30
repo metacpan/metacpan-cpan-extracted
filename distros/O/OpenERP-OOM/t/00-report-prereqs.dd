@@ -10,21 +10,16 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41',
-                                      'blib' => '1.01'
+                                      'Test::Pod' => '1.41'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
-                                      'Class::Inspector' => '0',
-                                      'Data::Dumper' => '0',
                                       'DateTime' => '0',
                                       'DateTime::Format::Strptime' => '0',
                                       'List::MoreUtils' => '0',
                                       'Moose' => '0',
                                       'Moose::Exporter' => '0',
-                                      'Moose::Object' => '0',
                                       'Moose::Role' => '0',
                                       'Moose::Util::MetaRole' => '0',
                                       'Moose::Util::TypeConstraints' => '0',
@@ -32,13 +27,8 @@ do { my $x = {
                                       'MooseX::Role::XMLRPC::Client' => '0',
                                       'OpenERP::XMLRPC::Client' => '0.22',
                                       'RPC::XML' => '0',
-                                      'Time::HiRes' => '0',
-                                      'Try::Tiny' => '0',
-                                      'Try::Tiny::Retry' => '0',
-                                      'namespace::autoclean' => '0',
-                                      'perl' => '5.010',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'Switch::Plain' => '0',
+                                      'Try::Tiny::Retry' => '0'
                                     }
                     },
        'test' => {
@@ -48,10 +38,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'FindBin' => '0',
-                                   'Test::More' => '0.96',
-                                   'Test::Most' => '0',
-                                   'lib' => '0'
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

@@ -47,6 +47,7 @@ _CONST      ~ [^']              # It appears that SQUOTE never appears within %'
 _CONST      ~ _BS _ALLOWED_BS   # or an escaped character
 _DIGITS     ~ [\d]+
 _DIGIT      ~ [\d]
+_OCTALDIGIT ~ [0-7]
 _LCHAR      ~ [a-z]
 _UCHAR      ~ [A-Z]
 _PERCENT    ~ '%'
@@ -129,8 +130,8 @@ ENDIF       ~ _EOF
 _CARET      ~ '^'
 _BS         ~ '\'
 _ALLOWED_BS ~ [abEeflnrst^\,:0]
-_ALLOWED_BS ~ _DIGIT _DIGIT _DIGIT
-_C0_AND_DEL ~ [@A-Z[\]^_ ?]
+_ALLOWED_BS ~ _OCTALDIGIT _OCTALDIGIT _OCTALDIGIT
+_C0_AND_DEL ~ [@A-Z[\]^_?]
 ESCAPED_CHARACTER ~ _CARET _C0_AND_DEL
                   | _BS _ALLOWED_BS
 INISPRINTEXCEPTCOMMA ~ [\p{MarpaX::Database::Terminfo::Grammar::CharacterClasses::InIsPrintExceptComma}]

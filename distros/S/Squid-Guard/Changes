@@ -1,5 +1,29 @@
 Revision history for Perl extension Squid::Guard.
 
+0.25  Fri Jan 26 2018
+	- documentation fixes
+0.24  Wed Sep 21 2016
+	- minor fix in run()
+0.23  Mon Feb 04 2013
+	- more fixes in checkinwbgroups
+0.22  Mon Feb 04 2013
+	- more fixes in checkinwbgroups
+0.21  Thu Dec 11 2012
+	- fixes in checkinwbgroups
+0.20  Thu May 24 2011
+	- moved cache routines to Common.pm
+	- group handling in userdomains (still experimental feature)
+0.19  Wed Apr 20 2011
+	- added checksrcinnet
+	- added a common utility module
+0.18  Tue Apr 12 2011
+	- added some debug log in checkinacl
+	- corrected handling of ".domain" entriens in acl and domain lists
+0.17  Thu Mar 31 2011
+	- added experimental acl support
+0.16  Wed Mar 30 2011
+	- logrotate example file for luxguard script
+	- fix a bug in cache handling
 0.15  Fri Feb 04 2011
 	- implemented a cache for expensive checkin*group calls
 	- decode escape sequences in username in request

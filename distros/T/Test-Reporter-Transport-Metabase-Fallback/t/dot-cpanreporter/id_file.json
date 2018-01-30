@@ -1,0 +1,32 @@
+[
+   {
+      "content" : "[{\"content\":\"Serguei Trouchelle (STRO)\",\"metadata\":{\"core\":{\"resource\":\"metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab\",\"update_time\":\"2010-03-08T12:29:07Z\",\"creator\":\"metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab\",\"type\":\"Metabase-User-FullName\",\"creation_time\":\"2010-03-08T12:29:07Z\",\"guid\":\"34567890-aaaa-bbbb-cccc-1234567890ab\",\"schema_version\":1,\"valid\":1}}},{\"content\":\"stro@cpan.org\",\"metadata\":{\"core\":{\"resource\":\"metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab\",\"update_time\":\"2010-03-08T12:29:07Z\",\"creator\":\"metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab\",\"type\":\"Metabase-User-EmailAddress\",\"creation_time\":\"2010-03-08T12:29:07Z\",\"guid\":\"34567890-aaaa-bbbb-cccc-1234567890ab\",\"schema_version\":1,\"valid\":1}}}]",
+      "metadata" : {
+         "core" : {
+            "resource" : "metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab",
+            "update_time" : "2010-03-08T12:29:07Z",
+            "creator" : "metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab",
+            "type" : "Metabase-User-Profile",
+            "creation_time" : "2010-03-08T12:29:07Z",
+            "guid" : "12345678-aaaa-bbbb-cccc-1234567890ab",
+            "schema_version" : 1,
+            "valid" : 1
+         }
+      }
+   },
+   {
+      "content" : "XXXYYYZZZ",
+      "metadata" : {
+         "core" : {
+            "resource" : "metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab",
+            "update_time" : "2010-03-08T12:29:07Z",
+            "creator" : "metabase:user:12345678-aaaa-bbbb-cccc-1234567890ab",
+            "type" : "Metabase-User-Secret",
+            "creation_time" : "2010-03-08T12:29:07Z",
+            "guid" : "23456789-aaaa-bbbb-cccc-1234567890ab",
+            "schema_version" : 1,
+            "valid" : 1
+         }
+      }
+   }
+]

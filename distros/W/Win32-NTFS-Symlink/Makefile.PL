@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use 5.006;
 use strict;
@@ -6,10 +6,12 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+
 my $github_repo_base = 'github.com/bay-max1/Win32-NTFS-Symlink';
 
 my $meta_merge = {
    'meta-spec' => { version => 2 },
+   dynamic_config => 0,
    
    resources => {
       repository => {
@@ -22,6 +24,7 @@ my $meta_merge = {
       },
    },
 };
+
 
 WriteMakefile(
    NAME              => 'Win32::NTFS::Symlink',

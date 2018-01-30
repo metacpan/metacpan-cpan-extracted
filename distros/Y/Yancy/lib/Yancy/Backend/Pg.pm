@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -101,7 +101,10 @@ our $VERSION = '0.011';
 
 use Mojo::Base 'Mojo';
 use Scalar::Util qw( looks_like_number );
-use Mojo::Pg 3.0;
+BEGIN {
+    eval { require Mojo::Pg; Mojo::Pg->VERSION( 3 ); 1 }
+        or die "Could not load Pg backend: Mojo::Pg version 3 or higher required\n";
+}
 
 has pg =>;
 has collections =>;
@@ -198,10 +201,10 @@ ENDQ
     for my $c ( @columns ) {
         my $table = $c->{table_name};
         my $column = $c->{column_name};
-        # ; use Data::Dumper;
-        # ; say Dumper $c;
+        #; use Data::Dumper;
+        #; say Dumper $c;
         $schema{ $table }{ properties }{ $column } = {
-            _map_type( $c->{data_type} ),
+            $self->_map_type( $c ),
         };
         if ( $c->{is_nullable} eq 'NO' && !$c->{column_default} ) {
             push @{ $schema{ $table }{ required } }, $column;
@@ -217,7 +220,8 @@ ENDQ
 }
 
 sub _map_type {
-    my ( $db_type ) = @_;
+    my ( $self, $column ) = @_;
+    my $db_type = $column->{data_type};
     if ( $db_type =~ /^(?:character|text)/ ) {
         return ( type => 'string' );
     }
@@ -232,6 +236,12 @@ sub _map_type {
     }
     elsif ( $db_type =~ /^(?:timestamp)/ ) {
         return ( type => 'string', format => 'date-time' );
+    }
+    elsif ( $db_type eq 'USER-DEFINED' ) {
+        my $vals = $self->pg->db->query(
+            sprintf 'SELECT unnest(enum_range(NULL::%s))::text', $column->{udt_name},
+        );
+        return ( type => 'string', enum => [ $vals->arrays->flatten->each ] );
     }
     # Default to string
     return ( type => 'string' );
@@ -249,7 +259,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

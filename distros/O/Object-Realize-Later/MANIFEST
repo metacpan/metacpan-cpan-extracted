@@ -1,7 +1,9 @@
+ChangeLog
 Changes
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Object/Realize/Later.pm
 lib/Object/Realize/Later.pod
 t/10isa.t

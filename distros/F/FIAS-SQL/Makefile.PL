@@ -16,10 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "FIAS::SQL",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "DBI" => 0,
+    "LWP::UserAgent" => 0,
     "Readonly" => 0,
     "XBase" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,6 +30,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
+  "DBI" => 0,
+  "LWP::UserAgent" => 0,
   "Readonly" => 0,
   "XBase" => 0
 );

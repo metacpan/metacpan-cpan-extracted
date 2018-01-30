@@ -1,0 +1,67 @@
+{
+   "abstract" : "Deterministic finite automaton construction",
+   "author" : [
+      "Bjoern Hoehrmann <bjoern@hoehrmann.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Algorithm-ConstructDFA2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.5",
+            "DBI" : "1.635",
+            "List::Util" : "0",
+            "List::UtilsBy" : "0",
+            "Log::Any" : "0",
+            "Memoize" : "0",
+            "Moo" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Graph::Directed" : "0",
+            "Graph::Feather" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "List::UtilsBy" : "0",
+            "Test::More" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hoehrmann/Algorithm-ConstructDFA2.git",
+         "web" : "https://github.com/hoehrmann/Algorithm-ConstructDFA2"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

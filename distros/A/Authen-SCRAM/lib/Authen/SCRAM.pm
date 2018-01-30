@@ -5,7 +5,7 @@ use warnings;
 package Authen::SCRAM;
 # ABSTRACT: Salted Challenge Response Authentication Mechanism (RFC 5802)
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 1;
 
@@ -24,7 +24,7 @@ Authen::SCRAM - Salted Challenge Response Authentication Mechanism (RFC 5802)
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -90,7 +90,7 @@ Authen::SCRAM - Salted Challenge Response Authentication Mechanism (RFC 5802)
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =for Pod::Coverage BUILD
 

@@ -896,14 +896,17 @@ EOD
 
 execute 'pwd', cwd() . "\n", 'Print working directory';
 
-execute q{quarters '20090301T000000Z'}, <<'EOD',
+TODO: {
+    local $TODO = 'Change in equinox algorithm in Astro::Coord::ECI::Sun';
+    execute q{quarters '20090301T000000Z'}, <<'EOD',
 2009/03/04 07:45:18 First quarter Moon
 2009/03/11 02:37:41 Full Moon
 2009/03/18 17:47:34 Last quarter Moon
-2009/03/20 11:40:07 Spring equinox
+2009/03/20 11:43:48 Spring equinox
 2009/03/26 16:05:47 New Moon
 EOD
-    'Quarters of Moon and Sun, Mar 1 2009';
+	'Quarters of Moon and Sun, Mar 1 2009';
+}
 
 execute 'sky list', <<'EOD', 'List what is in the sky';
 sky add Moon

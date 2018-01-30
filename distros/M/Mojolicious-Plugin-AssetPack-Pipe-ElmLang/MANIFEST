@@ -1,0 +1,13 @@
+.ship.conf
+Changes
+cpanfile
+examples/elm-http.pl
+examples/elm-package.json
+lib/Mojolicious/Plugin/AssetPack/Pipe/ElmLang.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-basic.t
+t/assets/05-http.elm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

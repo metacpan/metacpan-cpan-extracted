@@ -1,26 +1,16 @@
 package Bio::MUST::Drivers::Blast::Database;
 # ABSTRACT: internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::VERSION = '0.173510';
+$Bio::MUST::Drivers::Blast::Database::VERSION = '0.180270';
 use Moose;
 use namespace::autoclean;
 
 use autodie;
 use feature qw(say);
 
-# use Smart::Comments;
-
 use Carp;
-use File::Temp;
-use IPC::System::Simple qw(system);
 
-use Bio::FastParsers;
 extends 'Bio::FastParsers::Base';
 
-use Bio::MUST::Core;
-use aliased 'Bio::MUST::Core::Ali';
-use Bio::MUST::Drivers::Utils qw(stringify_args);
-
-# TODO: probably move to role...
 # TODO: warn user that we need to build db with -parse_seqids
 
 has 'type' => (
@@ -36,6 +26,7 @@ has 'remote' => (
     default  => 0,
 );
 
+with 'Bio::MUST::Drivers::Roles::Blastable';
 
 # TODO: complete this with list of NCBI databases
 # http://ncbiinsights.ncbi.nlm.nih.gov/2013/03/19/\
@@ -54,10 +45,10 @@ sub BUILD {
     if ($self->remote) {
         $self->_set_type( $type_for{$basename} );
     }
-    elsif (-e "$basename.psq") {
+    elsif (-e "$basename.psq" || -e "$basename.pal") {
         $self->_set_type('prot');
     }
-    elsif (-e "$basename.nsq") {
+    elsif (-e "$basename.nsq" || -e "$basename.nal") {
         $self->_set_type('nucl');
     }
     else {
@@ -65,42 +56,6 @@ sub BUILD {
     }
 
     return;
-}
-
-
-sub blastdbcmd {
-    my $self = shift;
-    my $ids  = shift;
-    my $args = shift // {};
-
-    # setup temporary input/output files (will be automatically unlinked)
-    my $in  = File::Temp->new(UNLINK => 1, EXLOCK => 0);
-    my $out = File::Temp->new(UNLINK => 1, EXLOCK => 0);
-
-    # write id list for -entry_batch
-    say {$in} join "\n", @{$ids};
-    $in->flush;                     # for robustness ; might be not needed
-
-    # format blastdbcmd (optional) arguments
-    $args->{-db}          = $self->filename;
-    $args->{-entry_batch} =   $in->filename;
-    $args->{-out}         =  $out->filename;
-    my $args_str = stringify_args($args);
-
-    # create blastdbcmd command
-    my $pgm = 'blastdbcmd';
-    my $cmd = join q{ }, $pgm, $args_str;
-    ### $cmd
-
-    # try to robustly execute blastdbcmd
-    my $ret_code = system( [ 0, 127 ], $cmd);
-    if ($ret_code == 127) {
-        carp "Warning: cannot execute $pgm command; returning without seqs!";
-        return;
-    }
-
-    # TODO: return Stash instead?
-    return Ali->load($out->filename, guessing => 0);
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -116,7 +71,7 @@ Bio::MUST::Drivers::Blast::Database - internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.173510
+version 0.180270
 
 =head1 SYNOPSIS
 

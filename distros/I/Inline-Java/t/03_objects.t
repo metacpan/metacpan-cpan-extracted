@@ -59,7 +59,6 @@ my $t = new types3() ;
 
 ok($t->__get_private()->{proto}->ObjectCount(), 1) ;
 
-
 __END__
 
 __Java__

@@ -93,9 +93,9 @@ NEWSESS: {
     is($self->{capabilities},'eee',"Caps set correctly in wd3 mode");
     is_deeply($args_modified->{capabilities},$expected,"Desired capabilities correctly translated to Firefox (WD3)");
 
-    $expected->{alwaysMatch}->{'chromeOptions'} = $expected->{alwaysMatch}->{'moz:firefoxOptions'};
+    #$expected->{alwaysMatch}->{'chromeOptions'} = $expected->{alwaysMatch}->{'moz:firefoxOptions'};
     $expected->{alwaysMatch}->{'moz:firefoxOptions'} = {};
-    $expected->{alwaysMatch}->{chromeOptions}->{args} = ['-profile', '~/.mozilla/firefox/vbdgri9o.default'];
+    #$expected->{alwaysMatch}->{chromeOptions}->{args} = ['-profile', '~/.mozilla/firefox/vbdgri9o.default'];
     $expected->{alwaysMatch}->{browserName} = 'chrome';
 
     $args->{desiredCapabilities}->{browserName} = 'chrome';
@@ -109,7 +109,7 @@ EXECOMMAND: {
     #_execute_command with payload 'hitting all the right buttons'
     #also check that fallback works w/ the right special missing word
     #also check capability shortcut
-    my $self = bless({ is_wd3 => 1, capabilities => 'wakka wakka' },"Selenium::Remote::Driver");
+    my $self = bless({ is_wd3 => 1, capabilities => 'wakka wakka', browser_name => 'firefox' },"Selenium::Remote::Driver");
 
     no warnings qw{redefine once};
     local *Selenium::Remote::RemoteConnection::request = sub {return { sessionId => 'zippy', cmd_status => 'OK' }};
@@ -186,7 +186,7 @@ SPEC_PARAMS: {
         property_name => 'plan',
         other         => 'a canal',
         window_handle => 'panama',
-        command       => 'setWindowSize',
+        command       => 'fullscreenWindow',
         ms            => 666,
         type          => 'page load',
         using         => 'id',
@@ -204,6 +204,7 @@ SPEC_PARAMS: {
             'value'    => 'zippy',
         },
     };
+
     is_deeply($obj->get_params($args),$expected,"get_params: var substitution works, payload construction works (mostly)");
 
     $args->{type} = 'implicit';

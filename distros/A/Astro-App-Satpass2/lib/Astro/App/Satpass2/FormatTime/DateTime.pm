@@ -17,7 +17,7 @@ use Astro::App::Satpass2::Locale qw{ __preferred };
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 sub attribute_names {
     my ( $self ) = @_;
@@ -381,7 +381,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2017 by Thomas R. Wyant, III
+Copyright (C) 2010-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

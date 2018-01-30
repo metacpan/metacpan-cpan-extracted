@@ -16,7 +16,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Bookmark::Definition;
-$Devel::PerlySense::Bookmark::Definition::VERSION = '0.0218';
+$Devel::PerlySense::Bookmark::Definition::VERSION = '0.0219';
 
 
 

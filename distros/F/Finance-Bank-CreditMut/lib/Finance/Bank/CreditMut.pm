@@ -1,18 +1,20 @@
 package Finance::Bank::CreditMut;
-use 5.010;
 use strict;
 use Carp qw(carp croak);
 use WWW::Mechanize;
 use HTML::TableExtract;
+use XML::Twig;
 use vars qw($VERSION);
 
-$VERSION = 0.13;
+$VERSION = 0.14;
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
-Finance::Bank::CreditMut -  Check your Crédit Mutuel accounts from Perl
+Finance::Bank::CreditMut -  Check your CrÃ©dit Mutuel accounts from Perl
 
 =head1 SYNOPSIS
 
@@ -41,7 +43,7 @@ system at L<https://www.creditmutuel.fr/>. You will need either
 Crypt::SSLeay or IO::Socket::SSL installed for HTTPS support to work with
 LWP.
 
-The interface of this module is directly taken from Briac Pilpré's
+The interface of this module is directly taken from Briac PilprÃ©'s
 Finance::Bank::BNPParibas.
 
 =head1 WARNING
@@ -79,7 +81,7 @@ sub check_balance {
     my $orig_r;
     my $count = 0;
     {
-        $orig_r = $self->{ua}->get("https://www.creditmutuel.fr/");
+        $orig_r = $self->{ua}->get("https://www.creditmutuel.fr/fr/authentification.html");
         # loop detected, try again
         ++$count;
         redo unless $orig_r->content || $count > 13;
@@ -89,7 +91,7 @@ sub check_balance {
     {
         local $^W;  # both fields_are read-only
         my $click_r = $self->{ua}->submit_form(
-            form_number => 1,
+            form_id => 'bloc_ident',
             fields      => {
                 _cm_user => $self->{username},
                 _cm_pwd  => $self->{password},
@@ -98,51 +100,65 @@ sub check_balance {
         croak $click_r->error_as_HTML if $click_r->is_error;
     }   
 
-    my $r = $self->{ua}->follow_link(url_regex => qr/comptes-et-contrats\.html/);
+    my $r = $self->{ua}->get("https://www.creditmutuel.fr/fr/banque/comptes-et-contrats.html");
     croak $r->error_as_HTML if $r->is_error;
     
     # The current page contains a table displaying the accounts and their
     # balances. 
 
-    my $te = new HTML::TableExtract(headers => [
-        q{Contrat},
-        q{D.bit},
-        q{Cr.dit},
+    my $te = new HTML::TableExtract(keep_html => 1, headers => [
+        qq{Contrat},
+        qq{D\xe9bit},
+        qq{Cr\xe9dit},
+        qq{Actions},
     ]);
     $te->parse($self->{ua}->content());
-    for my $ts ( $te->table_states() ) {
-        foreach ( $ts->rows() ) {
-            # The name actually also contains the account number.
-            # Finance::Bank::CreditMutuel::Account::new will take care of
-            # splitting.
-            my ($name, $dept, $asset) = @$_;
-            (my $short_name = $name) =~ s/   .*//;
-            for ($name, $dept, $asset) {
-                s/^\s+|\s+$//g; # remove leading and trailing whitespace
-                s/\s+/ /g; # collapse all whitespace to one single blank
-            }
-            my $link = $self->{ua}->find_link(text_regex => qr/$short_name/);
 
-            # we only care about accounts that are displayed with
-            # 'mouvements.html' (mortgages use another page that does not
-            # provide CSV downloads. Maybe a future version will handle
-            # this)
-            next unless $link && $link->[0] =~ /mouvements\.html/;
-            for ($dept, $asset) {
-                tr/,/./;
-                tr/-+.A-Z0-9//cd;
+    # The first column contains the name and number of each account, each in a
+    # <span>. Let's use XML::Twig to parse this.
+    my @field;
+    my $twig = XML::Twig->new(twig_handlers => {
+            span => sub { push @field, $_->text },
+        });
+
+    for my $ts ( $te->tables() ) {
+        # The table contains several sections, the first one being the accounts
+        # (then, the insurances, etc). We will detect the sections headers and
+        # consider only the first one.
+        my $header_count = 1;
+
+        foreach ( $ts->rows() ) {
+
+            if ( $_->[0] =~ /ei_decal_anchor/ ) {
+                # section header detected
+                $header_count--;
+                next;
             }
-            # Negative and positive balances are displayed in different
-            # columns: take either one and split the currency code at the
-            # same time.
-            my ($balance,$currency) = $dept || $asset =~ /(.*?)([A-Z]+)$/;
-            $balance += 0; # turn string into a number
+            next if $header_count; # ignore all but the first section
+
+            # Retrieve the account name and number from the <span>s in the
+            # first column. The name is in the first <span>, the number in the
+            # last one.
+            @field = ();
+            $twig->parse(shift @$_);
+            my $name = join ' ' => @field[0, -1];
+
+            my ($amount, $currency);
+            for ( @$_ ) {
+                next unless $_ && /ei_sdsf_montant/; # detect the column that contains the balance
+                s{<span.*?>}{}; # remove HTML
+                s{</span>}{};
+                ($amount, $currency) = split / /;
+                $amount =~ tr/0-9,-//cd; # remove everything but numbers, sign and decimal separator
+                $amount =~ s/,/./;
+                $amount += 0; # turn into a number
+            }
+
             push @accounts, Finance::Bank::CreditMut::Account->new(
                 $name,
                 $currency,
-                $balance,
+                $amount,
                 $self->{ua},
-		$link->[0],
             );
         }
     }
@@ -241,7 +257,7 @@ Returns a brief description of the statement.
 =head2 amount()
 
 Returns the amount of the statement (expressed in Euros or the account's
-currency). Although the Crédit Mutuel website displays number in continental
+currency). Although the CrÃ©dit Mutuel website displays number in continental
 format (i.e. with a coma as decimal separator), amount() returns a real
 number.
 
@@ -282,15 +298,15 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright 2002-2003, Cédric Bouvier. All Rights Reserved. This module can be
+Copyright 2002-2003, CÃ©dric Bouvier. All Rights Reserved. This module can be
 redistributed under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Cédric Bouvier <cbouvi@cpan.org>
+CÃ©dric Bouvier <cbouvi@cpan.org>
 
 Thanks to Simon Cozens for releasing Finance::Bank::LloydsTSB and to Briac
-Pilpré for Finance::Bank::BNPParibas.
+PilprÃ© for Finance::Bank::BNPParibas.
 
 =head1 SEE ALSO
 

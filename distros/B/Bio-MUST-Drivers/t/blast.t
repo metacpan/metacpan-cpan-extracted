@@ -12,7 +12,7 @@ use Path::Class qw(file);
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
 
-my $qr_class = 'Bio::MUST::Drivers::Blast::Query';
+my $qr_class = 'Bio::MUST::Core::Ali::Temporary';
 my $db_class = 'Bio::MUST::Drivers::Blast::Database';
 my $db_tmp_class = 'Bio::MUST::Drivers::Blast::Database::Temporary';
 
@@ -39,19 +39,31 @@ my $report_xml;
         for qw(phr pin psq);
     explain $basename;
 
+    # 1. prebuilt query file (need selecting BLAST program)
+    my $query_file = file('test', 'ready_protquery.fasta');
+    my $parser = $db->blastp($query_file);
+    isa_ok($parser, 'Bio::FastParsers::Blast::Table');
+
+    my $report = $parser->filename;
+    explain $report;
+    compare_filter_ok $report, file('test', 'ready_report.blastp.m6'),
+        \&filter, 'wrote expected BLASTP report for pre-existing query file';
+    $parser->remove;
+
+    # 2. temporary query file (queries have to be degapped first)
     my $query = $qr_class->new( seqs => file('test', 'protquery.fasta') );
     $filename = $query->filename;
     explain $filename;
 
-    # HTML format
-    my $report_html = $query->blast($db, {
+    # 2a. HTML format
+    my $report_html = $db->blast($query, {
         -html   => undef,
         -evalue => 1e-50,
     } );
     ok $report_html =~ m/\.html\z/xms, "wrote HTML report: $report_html";
 
-    # tabular format
-    my $tab_parser = $query->blast($db, {
+    # 2b. tabular format
+    my $tab_parser = $db->blast($query, {
         -evalue => 1e-10,
     } );
     isa_ok($tab_parser, 'Bio::FastParsers::Blast::Table');
@@ -62,8 +74,8 @@ my $report_xml;
         \&filter, 'wrote expected tabular BLASTP report';
     $tab_parser->remove;
 
-    # XML format
-    my $xml_parser = $query->blast($db, {
+    # 2c. XML format
+    my $xml_parser = $db->blast($query, {
         -evalue => 1e-10,
         -outfmt => 5,
     } );
@@ -94,7 +106,7 @@ ok(!-e $report_xml, 'deleted XML report file');
     $filename = $query->filename;
     explain $filename;
 
-    my $parser = $query->blast($db, {
+    my $parser = $db->blast($query, {
         '-entrez_query' => q{'Euglenozoa[ORGN]'},
         '-evalue'       => 1e-250,
         '-outfmt'       => 7,

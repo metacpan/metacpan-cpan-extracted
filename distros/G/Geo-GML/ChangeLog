@@ -3,6 +3,17 @@
 All change mades by Mark Overmeer, unless explicitly assigned to
 someone else.
 
+version 0.18: Fri 19 Jan 15:57:03 CET 2018
+
+	Changes:
+	- updated schemas to the current version of GML.
+	- removed a few versions which OpenGIS does not use anymore.
+
+	Improvements:
+	- remove dependency on Test::POD
+	- call for users: 3.3 will get supported if anyone needs it.
+	- convert to GIT and GitHUB
+
 version 0.17: Thu 29 Jun 16:23:38 CEST 2017
 
 	Improvements:
@@ -13,6 +24,7 @@ version 0.16: Sun Jan  5 18:57:06 CET 2014
 
 	Fixes:
 	- fixed regression-test to match newer versions of XML::Compile
+	  rt.cpan.org#110312 [Slaven Rezic]
 
 	Improvements:
 	- use ::Cache::addPrefixes()

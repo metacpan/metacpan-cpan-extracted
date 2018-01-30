@@ -26,7 +26,8 @@ DESCRIPTION
 IMPLEMENTATION
 
     It seems there's no way to feed the Yamli API more than one word, so
-    currently each word results in a HTTP request.
+    currently each word results in a HTTP request. Define
+    $WebService::Yamli::HTTPS if HTTPS should be used instead.
 
 METHODS AND ARGUMENTS
 

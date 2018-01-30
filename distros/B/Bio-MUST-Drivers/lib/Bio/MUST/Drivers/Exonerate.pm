@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Exonerate;
 # ABSTRACT: Bio::MUST driver for running the exonerate alignment program
-$Bio::MUST::Drivers::Exonerate::VERSION = '0.173510';
+$Bio::MUST::Drivers::Exonerate::VERSION = '0.180270';
 use Moose;
 use namespace::autoclean;
 
@@ -15,9 +15,9 @@ use Path::Class qw(file);
 
 use Bio::MUST::Core;
 use aliased 'Bio::MUST::Core::Ali';
+use aliased 'Bio::MUST::Core::GeneticCode';
 use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Drivers::Exonerate::Sugar';
-use aliased 'Bio::MUST::Core::GeneticCode';
 
 
 has 'dna_seq' => (
@@ -191,7 +191,7 @@ Bio::MUST::Drivers::Exonerate - Bio::MUST driver for running the exonerate align
 
 =head1 VERSION
 
-version 0.173510
+version 0.180270
 
 =head1 SYNOPSIS
 

@@ -27,7 +27,7 @@ BEGIN {
     );
 }
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 Google::ProtocolBuffers->parse("
 	message ChunkData {
@@ -80,6 +80,8 @@ Google::ProtocolBuffers->parse("
 # Todo: optimize lookup_suffix, 1 search for all lists
 
 =head1 NAME
+
+This library is obsolete, please use Net::Google::SafeBrowsing4 instead.
 
 Net::Google::SafeBrowsing3 - Perl extension for the Google Safe Browsing v3 API. (Google Safe Browsing v2 has been deprecated by Google.)
 

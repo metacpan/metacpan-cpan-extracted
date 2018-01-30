@@ -1,0 +1,118 @@
+#!perl
+
+our $DATE = '2018-01-24'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+sub sanity_check {
+    require File::Which;
+    File::Which::which("rsync") or die "rsync: Can't find rsync in PATH\n";
+}
+
+sub parse_cmdline {
+}
+
+sub run {
+    require ShellQuote::Any::Tiny;
+
+    my $cmd = "rsync" . (@ARGV ? " " : "") .
+        join(" ", map { ShellQuote::Any::Tiny::shell_quote($_) } @ARGV);
+    open my $rsync, "$cmd |" or die "rsynccolor: Can't run rsync: $!\n";
+
+    my $use_color = $ENV{COLOR} // (-t STDOUT);
+
+    $|++;
+    while (<$rsync>) {
+        if ($use_color && s/^deleting //) {
+            print "\e[31mdeleting \e[0m$_";
+            next;
+        }
+        print;
+    }
+
+    close $rsync;
+    exit $? >> 8;
+}
+
+# MAIN
+
+sanity_check();
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Add some color to rsync output
+# PODNAME: rsynccolor
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rsynccolor - Add some color to rsync output
+
+=head1 VERSION
+
+This document describes version 0.001 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-01-24.
+
+=head1 SYNOPSIS
+
+Use as you would use B<rsync>:
+
+ % rsynccolor -Pav --del dir1/ dir2/
+
+To alias B<rsync> to B<rsynccolor>, in your shell startup file:
+
+ alias rsync=rsynccolor
+
+=head1 DESCRIPTION
+
+This is a wrapper for the GNU command-line utility B<rsync>. It adds some color
+to rsync output, currently:
+
+  deleting FILENAME
+
+will be highlighted in red to be more visually striking.
+
+=head1 ENVIRONMENT
+
+=head2 COLOR => bool
+
+Force setting color on or off. Default is on when interactive.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-rsynccolor>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-rsynccolor>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rsynccolor>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

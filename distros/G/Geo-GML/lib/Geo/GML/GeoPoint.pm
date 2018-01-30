@@ -1,15 +1,19 @@
-# Copyrights 2008-2017 by [Mark Overmeer].
+# Copyrights 2008-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution Geo::GML.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 # extends the implementation of Geo::GML, autoloaded
 package Geo::GML;
 use vars '$VERSION';
-$VERSION = '0.17';
+$VERSION = '0.18';
 
+
+use warnings;
+use strict;
 
 use Log::Report 'geo-gml', syntax => 'SHORT';
 use Geo::Point  ();
@@ -86,7 +90,6 @@ sub _gml2_surface($$)
     my %poly  = ( gml_outerBoundaryIs => $outer
                 , gml_innerBoundaryIs => \@inner);
    +{ gml_Polygon => \%poly
-    , srsName     => $args->{_srsName}
     };
 }
 

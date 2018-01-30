@@ -5,7 +5,7 @@ use utf8;
 use DBI;
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 
-our $VERSION = '1.9.13';
+our $VERSION = '1.9.15';
 our @ISA     = qw(Lemonldap::NG::Common::Conf::Constants);
 our ( @EXPORT, %EXPORT_TAGS );
 
@@ -63,6 +63,7 @@ sub _dbh {
     }
     elsif ( $self->{dbiChain} =~ /^dbi:mysql/i ) {
         $self->{_dbh}->{mysql_enable_utf8} = 1;
+        $self->{_dbh}->do("set names 'utf8'");
     }
     elsif ( $self->{dbiChain} =~ /^dbi:pg/i ) {
         $self->{_dbh}->{pg_enable_utf8} = 1;

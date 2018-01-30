@@ -4,7 +4,7 @@
       "Julien Sobrier <julien@sobrier.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -19,6 +19,35 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Digest::SHA" : "0",
+            "Google::ProtocolBuffers" : "0",
+            "IO::Socket::SSL" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "MIME::Base64::URLSafe" : "0",
+            "String::HexConvert" : "0",
+            "Test::More" : "0",
+            "Text::Trim" : "0",
+            "URI" : "0",
+            "constant" : "0"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -27,5 +56,6 @@
          "web" : "https://github.com/juliensobrier/Net-Google-SafeBrowsing3"
       }
    },
-   "version" : "0.7"
+   "version" : "0.8",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 examples/dancer/dancer1.pl
 lib/Dancer/Logger/LogReport.pm
 lib/Dancer/Logger/LogReport.pod
@@ -41,6 +42,7 @@ lib/Log/Report/Message.pm
 lib/Log/Report/Message.pod
 lib/Log/Report/Translator.pm
 lib/Log/Report/Translator.pod
+lib/Log/Report/messages/first-domain.utf-8.po
 lib/Log/Report/messages/log-report.utf-8.po
 lib/Log/Report/messages/log-report/nl_NL.po
 lib/MojoX/Log/Report.pm
@@ -49,6 +51,7 @@ t/00use.t
 t/09message.t
 t/10interp.t
 t/11concat.t
+t/12missing.t
 t/31stack.t
 t/41die.t
 t/42exc-dbix-class.t

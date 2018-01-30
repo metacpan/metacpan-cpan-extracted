@@ -36,10 +36,6 @@ When the number of bytes left in the input is C<0>, the return value is equal to
 
 Regardless if you use C<//TRANSLIT> option or not, the ICU convert engine is always doing two conversions internally, one from input encoding to UTF-16, then from UTF-16 to output encoding. This means that it is always eating entirely the input bytes into an internal staging area.
 
-=item with the ICONV convert engine
-
-When input and output encodings are of the same family, then iconv is turned into a validation mode, and is doing internally two conversions, like the ICU plugin. This is also using an internal staging area that always consumes all input bytes before converting them. If the input family is the same as "UTF-8", then the internal staging area is of type "UTF-32", else the internal staging area is of type "UTF-8".
-
 =back
 
 =head1 ENGINES
@@ -60,7 +56,7 @@ The application give the path of a shared library, and tconv will look at it.
 
 Python's L<cchardet> charset detection engine, bundled with tconv, is always available.
 If tconv is compiled with ICU support, then ICU charset and conversion engines will be available.
-If tconv is compiled with ICONV support, then ICONV conversion engine will be available.
+The ICONV conversion engine is always available.
 
 =back
 
@@ -74,7 +70,7 @@ The default charset detection engine is cchardet, bundled statically with tconv.
 
 =item character conversion
 
-The default character conversion engine is ICU, if tconv has been compiled with ICU support, else ICONV if compiled with ICONV support, else I<none>.
+The default character conversion engine is ICU, if tconv has been compiled with ICU support, else iconv.
 
 =back
 
@@ -82,9 +78,9 @@ The default character conversion engine is ICU, if tconv has been compiled with 
 
 =over
 
-=item Windows platform
+=item iconv
 
-On Windows, an ICONV-like conversion engine is always available, via the L<win-iconv> package, bundled with tconv.
+The iconv plugin is always available and is based on libiconv, bundled within tconv.
 
 =item iconv compliance
 
@@ -94,35 +90,9 @@ On Windows, an ICONV-like conversion engine is always available, via the L<win-i
 
 tconv() only guarantees that his plug-ins support the C<//TRANSLIT> and C<//IGNORE> iconv notation.
 
-=item output
+=item pointers in case of error
 
-It is guaranteed that tconv() will behave exactly like iconv() if the character conversion engine is ICONV on an UNIX platform, since in this case tconv() will call iconv() internally. In any other case, the plug-ins have a best-effort policy to behave like C<iconv>.
-
-=item POSIX compliance
-
-By POSIX compliance, we mean that, when the output buffer is too small, iconv should stop updating the input and output pointers prior to when the limit is reached. When the character conversion engine is ICONV on an UNIX platform, it is the behaviour of this UNIX platform that happen. In any other case, the plug-ins guarantee at least that input and output pointers are left in a state that, if being called again, will correctly handle the continuation of the conversion.
-
-=item Iconv plugin
-
-Iconv plugin is a direct interface to C<iconv> library when tconv is compiled. Though, iconv implementations are not uniform. tconv applies the following:
-
-=over
-
-=item C<//TRANSLIT> support
-
-If native iconv does not support C<//TRANSLIT>, this option is silently removed. Only the uppercased C<//TRANSLIT> is checked.
-
-=item C<//IGNORE> support
-
-If native iconv does not support C<//IGNORE>, this option is silently removed. Only the uppercased C<//IGNORE> is checked.
-
-=item Identical charsets
-
-If charsets appears to be identical (case insensitive), tconv is trusting the user and I<no> call to iconv will happen: data will be transfered as-is.
-
-=back
-
-Because of this non-uniform implementation of iconv, it is recommended to have ICU available at least available when you build tconv.
+In some cases, an internal buffer is used. This mean that in case of a failure with errno being C<EINVAL> or C<EILSEQ>, input and output pointers are left in a state that, if being called again, will correctly handle the continuation of the conversion, but may not be exactly at the point of failure as per the original iconv specification.
 
 =back
 
@@ -130,4 +100,4 @@ Because of this non-uniform implementation of iconv, it is recommended to have I
 
 =head1 SEE ALSO
 
-L<tconv_ext(3)>, L<iconv(3)>, L<cchardet|https://pypi.python.org/pypi/cchardet/>, L<win-iconv|https://github.com/win-iconv/win-iconv>, L<ICU|http://icu-project.org/>
+L<tconv_ext(3)>, L<libiconv|https://www.gnu.org/software/libiconv>, L<cchardet|https://pypi.python.org/pypi/cchardet/>

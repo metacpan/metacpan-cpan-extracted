@@ -2,10 +2,11 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '1.09';
+my $version = '1.10';
 
 my %prereq  =
   ( Test::More               => '0.86'
+  , Data::Dumper             => 0
   , Fcntl                    => 0
   , File::Basename           => 0
   , File::Find               => 0
@@ -36,6 +37,20 @@ WriteMakefile
   , AUTHOR    => 'Mark Overmeer'
   , ABSTRACT  => 'Log::Report translation table management'
   , LICENSE   => 'perl'
+
+  , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+         { repository =>
+            { type => 'git'
+            , url  => 'https://github.com/markov2/perl5-Log-Report-Lexicon.git'
+            , web  => 'https://github.com/markov2/perl5-Log-Report-Lexicon'
+            }
+         }
+      , homepage => 'http://perl.overmeer.net/CPAN/'
+      , license  => [ 'http://dev.perl.org/licenses/' ]
+      }
+
   );
 
 sub MY::postamble { <<'__POSTAMBLE' }
@@ -46,9 +61,9 @@ DISTDIR         = ../public_html/log-report-lexicon/source
 
 # for OODoc's oodist, POD
 FIRST_YEAR      = 2007
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/log-report/
-EXTENDS         = ../LogOpt:../Print:../LogReport:../LogTT
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
+EXTENDS         = ../Log-Report-Optional:../String-Print:../../perl/LogReport:../Log-Report-Template
 
 __POSTAMBLE
 

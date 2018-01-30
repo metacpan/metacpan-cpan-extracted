@@ -1,0 +1,8 @@
+Build.PL
+lib/FB3.pm
+lib/FB3/Validator.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t

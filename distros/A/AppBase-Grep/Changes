@@ -1,0 +1,23 @@
+0.004   2018-01-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add more description.
+
+
+0.003   2018-01-29 (PERLANCAR)
+
+	- Allow multiple patterns, add option --all (not in GNU grep).
+
+
+0.002   2018-01-29 (PERLANCAR)
+
+	- [ux] Observe COLOR environment variable (note: this behavior is
+	  not in GNU grep).
+
+	- Display label & line number, add option --line-number (-n).
+
+
+0.001   2018-01-26 (PERLANCAR)
+
+        - First release.

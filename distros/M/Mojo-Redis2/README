@@ -2,7 +2,7 @@ NAME
     Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 VERSION
-    0.30
+    0.31
 
 DESCRIPTION
     Mojo::Redis2 is a pure-Perl non-blocking I/O Redis <http://redis.io>
@@ -140,7 +140,9 @@ ATTRIBUTES
       $str = $self->encoding;
       $self = $self->encoding('UTF-8');
 
-    Holds the encoding using for data from/to Redis. Default is UTF-8.
+    Holds the character encoding to use for data from/to Redis. Default is
+    "UTF-8". Set to "undef" to disable encoding/decoding data. Without an
+    encoding set, Redis expects and returns bytes.
 
   protocol
     DEPRECATED! The protocol object cannot be shared in high load

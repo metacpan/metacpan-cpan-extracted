@@ -1,5 +1,17 @@
 Revision history for Net-Async-Ping
 
+0.004001  2018-01-24 10:24:36+01:00 Europe/Vienna
+  - fix ICMP and ICMPv6 destinaton unreachable parsing
+
+0.004000  2018-01-24 09:09:21+01:00 Europe/Vienna
+  - add ping vs. raw socket advantages to ICMP and ICMPv6 documentation
+  - raw ICMP and ICMPv6 now only uses a single socket and internal reply
+    dispatching for increased performance (O vs. O^2)
+  - don't use Net::Frame::Simple for ICMP and ICMPv6 reply packet parsing for
+    improved performance
+  - send errors are now handled and returned
+    as failed Futures for ping sockets and warnings for the shared raw socket
+
 0.003003  2018-01-17 17:03:08+01:00 Europe/Vienna
   - fix parsing of ICMP responses when using raw socket
     also when falling back from ping socket to raw

@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 12;
 BEGIN { use_ok('Win32::NTFS::Symlink') };
 
 ################################################################################
 
-use Win32::NTFS::Symlink qw(:global junction);
+use Win32::NTFS::Symlink qw(
+   global_readlink junction :is_ ntfs_reparse_tag :const
+);
 
 use File::Spec;
 
@@ -22,11 +24,10 @@ my $test_string = "Test 123";
 mkdir $root or die "mkdir $root failed: $!";
 chdir $root or die "chdir $root failed: $!";
 
-ok(! -e $target_dir, "$target_dir does not already exist");
-ok(! -e $link_dir,   "$link_dir does not already exist");
+ok(! -e $target_dir, '$target_dir does not already exist');
+ok(! -e $link_dir,   '$link_dir does not already exist');
 
 mkdir $target_dir or die "mkdir $target_dir failed: $!";
-ok(-d $target_dir, "target directory $target_dir created");
 
 open my $ofh, '>', $target_test_file or
    die "open $target_test_file for writing failed: $!";
@@ -34,28 +35,41 @@ open my $ofh, '>', $target_test_file or
 print $ofh $test_string;
 close $ofh or die "close $target_test_file failed: $!";
 
-ok(-f $target_test_file, "file $target_test_file created in target directory");
+ok(-f $target_test_file, 'Test file created in $target_dir');
 
 ok(
-   eval { Win32::NTFS::Symlink::junction( $target_dir => $link_dir ) },
-   "create junction $link_dir => $target_dir via junction()"
+   eval { junction( $target_dir => $link_dir ) },
+   'junction($target_dir, $link_dir)'
 );
 
 my $readlink = readlink($link_dir);
 my $readlink_rel = (File::Spec->splitdir($readlink))[-1] || '';
 
-ok($readlink, "readlink(\$link_dir) returns true");
-ok($readlink_rel eq $target_dir, "$link_dir points to $target_dir");
+ok($readlink, 'readlink($link_dir) returns true');
 
-open my $ifh, '<', $link_test_file or 
-   die "open $link_test_file for writing failed: $!";;
+ok(is_ntfs_junction($link_dir), 'is_ntfs_junction($link_dir) is true');
+ok(!is_ntfs_symlink($link_dir), 'is_ntfs_symlink($link_dir) is false');
+
+ok(
+   ntfs_reparse_tag($link_dir) == IO_REPARSE_TAG_MOUNT_POINT,
+   'ntfs_reparse_tag($link_dir) == IO_REPARSE_TAG_MOUNT_POINT'
+);
+ok(
+   ntfs_reparse_tag($link_dir) != IO_REPARSE_TAG_SYMLINK,
+   'ntfs_reparse_tag($link_dir) != IO_REPARSE_TAG_SYMLINK'
+);
+
+ok($readlink_rel eq $target_dir, '$link_dir points to $target_dir');
+
+open my $ifh, '<', $link_test_file or
+   die "open $link_test_file for writing failed: $!";
 
 ok(
    scalar( <$ifh> ) eq $test_string,
-   "Contents of $target_test_file and $link_test_file are the same"
+   'file in $link_dir is the same as file in $target_dir'
 );
 
-close $ifh or die "close $link_test_file failed: $!";;;
+close $ifh or die "close $link_test_file failed: $!";
 
 END {
    unlink $target_test_file;

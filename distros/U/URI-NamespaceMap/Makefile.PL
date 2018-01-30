@@ -4,73 +4,74 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "Namespace manipulation and prefix mapping for XML, RDF, etc.",
-  "author"         => [
-                        "Kjetil Kjernsmo <kjetilk\@cpan.org>",
-                        "Gregory Todd Williams <gwilliams\@cpan.org>",
-                        "Chris Prather (PERIGRIN) <chris\@prather.org>",
-                      ],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "URI-NamespaceMap",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => {
-                          recommends => {
-                                          "RDF::NS"          => 20130802,
-                                          "RDF::NS::Curated" => 0,
-                                          "RDF::Prefixes"    => 0,
-                                          "XML::CommonNS"    => 0,
-                                        },
-                          requires   => {
-                                          "Carp" => 0,
-                                          "IRI" => 0.004,
-                                          "Module::Load::Conditional" => 0,
-                                          "Moo" => "1.006000",
-                                          "namespace::autoclean" => "0.20",
-                                          "perl" => 5.008001,
-                                          "Sub::Quote" => 0,
-                                          "Try::Tiny" => 0,
-                                          "Type::Library" => "1.000000",
-                                          "Types::URI" => 0.004,
-                                          "URI" => 1.52,
-                                        },
+  "abstract"         => "Namespace manipulation and prefix mapping for XML, RDF, etc.",
+  "author"           => [
+                          "Kjetil Kjernsmo <kjetilk\@cpan.org>",
+                          "Gregory Todd Williams <gwilliams\@cpan.org>",
+                          "Chris Prather (PERIGRIN) <chris\@prather.org>",
+                        ],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                        test => { requires => { "Test::Exception" => 0, "Test::More" => 0.88 } },
-                      },
-  "provides"       => {
-                        "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.04 },
-                        "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.04 },
-                        "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.04 },
-                        "URI::NamespaceMap::ReservedLocalParts" => {
-                          file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
-                          version => 1.04,
+  "name"             => "URI-NamespaceMap",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => {
+                            recommends => {
+                                            "RDF::NS"          => 20130802,
+                                            "RDF::NS::Curated" => 0,
+                                            "RDF::Prefixes"    => 0,
+                                            "XML::CommonNS"    => 0,
+                                          },
+                            requires   => {
+                                            "Carp" => 0,
+                                            "IRI" => 0.004,
+                                            "Module::Load::Conditional" => 0,
+                                            "Moo" => "1.006000",
+                                            "namespace::autoclean" => "0.20",
+                                            "perl" => 5.008001,
+                                            "Sub::Quote" => 0,
+                                            "Try::Tiny" => 0,
+                                            "Type::Library" => "1.000000",
+                                            "Types::URI" => 0.004,
+                                            "URI" => 1.52,
+                                          },
+                          },
+                          test => { requires => { "Test::Exception" => 0, "Test::More" => 0.88 } },
                         },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "https://github.com/kjetilk/URI-NamespaceMap/issues" },
-                        homepage     => "https://metacpan.org/module/URI::NamespaceMap",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          web  => "https://github.com/kjetilk/URI-NamespaceMap/",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
-                      },
-  "version"        => 1.04,
-  "x_contributors" => [
-                        "Dorian Taylor <dorian\@cpan.org>",
-                        "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",
-                        "Paul Williams (KWAKWA) <kwakwa\@cpan.org>",
-                      ],
+  "provides"         => {
+                          "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.06 },
+                          "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.06 },
+                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.06 },
+                          "URI::NamespaceMap::ReservedLocalParts" => {
+                            file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
+                            version => 1.06,
+                          },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "https://github.com/kjetilk/URI-NamespaceMap/issues" },
+                          homepage     => "https://metacpan.org/module/URI::NamespaceMap",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            web  => "https://github.com/kjetilk/URI-NamespaceMap/",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
+                        },
+  "version"          => 1.06,
+  "x_contributors"   => [
+                          "Dorian Taylor <dorian\@cpan.org>",
+                          "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",
+                          "Paul Williams (KWAKWA) <kwakwa\@cpan.org>",
+                        ],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

@@ -3,6 +3,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 lib/Geo/Line.pm
 lib/Geo/Line.pod
 lib/Geo/Point.pm
@@ -22,5 +23,5 @@ t/12surface.t
 t/20pstr.t
 t/21lstr.t
 t/22rstr.t
-t/99pod.t
+xt/99pod.t
 META.json                                Module JSON meta-data (added by MakeMaker)

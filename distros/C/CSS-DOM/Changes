@@ -1,5 +1,8 @@
 Revision history for CSS::DOM
 
+0.17    29 January, 2018
+      • Fixed to work with bleadperl (5.27.9) (RT #124156).
+
 0.16    29 November, 2015
       • Work  around  an  incompatible  change  in  Encode  2.77  (RT
         #107221, #107043).

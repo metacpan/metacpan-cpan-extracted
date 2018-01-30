@@ -15,7 +15,7 @@ use Test2::Harness::Util qw/write_file_atomic/;
 use Test2::Harness::Util::File::JSONL();
 use Test2::Harness::Run::Queue();
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Test2::Harness::Util::HashBase qw{
     -pid
@@ -233,7 +233,7 @@ sub lock {
     return 1 unless $self->{+LOCK_FILE};
 
     open(my $lock, '>>', $self->{+LOCK_FILE}) or die "Could not open lock file: $!";
-    flock($lock, LOCK_EX | LOCK_NB) or next;
+    flock($lock, LOCK_EX | LOCK_NB) or return 0;
     $self->{+_LOCK} = $lock;
 
     return 1;

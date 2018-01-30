@@ -5,8 +5,8 @@
  * a Linking Exception. For full terms see the included COPYING file.
  */
 
-#include "common.h"
 #include "vector.h"
+
 #include "integer.h"
 
 /* In elements, not bytes */
@@ -405,6 +405,9 @@ int git_vector_verify_sorted(const git_vector *v)
 void git_vector_reverse(git_vector *v)
 {
 	size_t a, b;
+
+	if (v->length == 0)
+		return;
 
 	a = 0;
 	b = v->length - 1;

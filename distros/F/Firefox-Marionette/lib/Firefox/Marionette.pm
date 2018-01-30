@@ -19,20 +19,16 @@ use URI();
 use File::Temp();
 use FileHandle();
 use MIME::Base64();
-use Digest::MD5();
-use Crypt::URandom();
 use Config;
 
 BEGIN {
     if ( $OSNAME eq 'MSWin32' ) {
         require Win32;
         require Win32::Process;
-        require Win32::Process::Info;
-        Win32::Process::Info->import();
     }
 }
 
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub _ANYPROCESS                    { return -1 }
 sub _COMMAND                       { return 0 }
@@ -40,21 +36,29 @@ sub _DEFAULT_HOST                  { return 'localhost' }
 sub _WIN32_ERROR_SHARING_VIOLATION { return 0x20 }
 sub _NUMBER_OF_MCOOKIE_BYTES       { return 16 }
 sub _MAX_DISPLAY_LENGTH            { return 10 }
+sub _NUMBER_OF_TERM_ATTEMPTS       { return 4 }
 
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
     my @arguments = ('-marionette');
     $self->{last_message_id} = 0;
-    if (!$parameters{addons}) {
-	push @arguments, '-safe-mode';
+    if ( !$parameters{addons} ) {
+        push @arguments, '-safe-mode';
     }
 
     $self->{debug} = $parameters{debug};
     if (   ( defined $parameters{capabilities} )
-        && ( $parameters{capabilities}->moz_headless() ) )
+        && ( !$parameters{capabilities}->moz_headless() ) )
     {
+        $self->{visible} = 1;
+    }
+    elsif ( $parameters{visible} ) {
+        $self->{visible} = 1;
+    }
+    else {
         push @arguments, '-headless';
+        $self->{visible} = 0;
     }
     if ( $parameters{firefox_binary} ) {
         $self->{firefox_binary} = $parameters{firefox_binary};
@@ -66,6 +70,10 @@ sub new {
     else {
         my $profile_directory =
           $self->_setup_new_profile( $parameters{profile} );
+        if ( $OSNAME eq 'cygwin' ) {
+            my $drive = $ENV{SYSTEMDRIVE};
+            $profile_directory = "${drive}/cygwin64$profile_directory";
+        }
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
@@ -73,7 +81,14 @@ sub new {
     my $socket = $self->_setup_local_connection_to_firefox(@arguments);
     my ( $session_id, $capabilities ) =
       $self->_initial_socket_setup( $socket, $parameters{capabilities} );
-    if ( $self->_pid() != $capabilities->moz_process_id() ) {
+    if ( ($session_id) && ($capabilities) && ( ref $capabilities ) ) {
+    }
+    else {
+        Carp::croak('Failed to correctly setup the Firefox process');
+    }
+    if ( $OSNAME eq 'cygwin' ) {
+    }
+    elsif ( $self->_pid() != $capabilities->moz_process_id() ) {
         Carp::croak(
 'Failed to correctly determined the Firefox process id through the initial connection capabilities'
         );
@@ -84,6 +99,11 @@ sub new {
 sub _debug {
     my ($self) = @_;
     return $self->{debug};
+}
+
+sub _visible {
+    my ($self) = @_;
+    return $self->{visible};
 }
 
 sub _pid {
@@ -97,9 +117,11 @@ sub _launch {
         return $self->_launch_win32(@arguments);
     }
     elsif (( $OSNAME ne 'darwin' )
+        && ( $OSNAME ne 'cygwin' )
+        && ( $self->_visible() )
         && ( !$ENV{DISPLAY} )
         && ( $self->_xvfb_exists() ) )
-    {
+    { # if not MacOS or Win32 and no DISPLAY variable, launch Xvfb if at all possible
         $self->_launch_xvfb();
         local $ENV{DISPLAY}    = $self->_xvfb_display();
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
@@ -137,6 +159,12 @@ sub _xvfb_exists {
     my ($self)   = @_;
     my $binary   = $self->_xvfb_binary();
     my $dev_null = File::Spec->devnull();
+    eval {
+        require Digest::MD5;
+        require Crypt::URandom;
+    } or do {
+        return 0;
+    };
     if ( my $pid = fork ) {
         waitpid $pid, 0;
         if ( $CHILD_ERROR == 0 ) {
@@ -198,6 +226,8 @@ sub _launch_xauth {
         else {
             Carp::croak('Failed to run xauth');
         }
+        close $source_handle
+          or Carp::croak("Failed to close temporary file:$EXTENDED_OS_ERROR");
     }
     elsif ( defined $pid ) {
         eval {
@@ -354,40 +384,138 @@ sub _binary {
     if ( $self->{firefox_binary} ) {
         $binary = $self->{firefox_binary};
     }
-    elsif ( $OSNAME eq 'MSWin32' ) {
-        my $program_files_key;
-        foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
-            if ( $ENV{$possible} ) {
-                $program_files_key = $possible;
-                last;
+    else {
+        if ( $OSNAME eq 'MSWin32' ) {
+            my $program_files_key;
+            foreach my $possible ( 'ProgramFiles(x86)', 'ProgramFiles' ) {
+                if ( $ENV{$possible} ) {
+                    $program_files_key = $possible;
+                    last;
+                }
+            }
+            $binary = File::Spec->catfile(
+                $ENV{$program_files_key},
+                'Mozilla Firefox',
+                'firefox.exe'
+            );
+        }
+        elsif ( $OSNAME eq 'darwin' ) {
+            $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
+        }
+        elsif ( $OSNAME eq 'cygwin' ) {
+            if ( -e "$ENV{PROGRAMFILES} (x86)" ) {
+                $binary =
+                  "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
+            }
+            else {
+                $binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
             }
         }
-        $binary = File::Spec->catfile(
-            $ENV{$program_files_key},
-            'Mozilla Firefox',
-            'firefox.exe'
-        );
-    }
-    elsif ( $OSNAME eq 'darwin' ) {
-        $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
     }
     return $binary;
 }
 
-sub _firefox_alive {
+sub child_error {
     my ($self) = @_;
-    if ( $OSNAME eq 'MSWin32' ) {
-        my $alive         = 0;
-        my $quoted_binary = quotemeta $self->_binary();
-        my $info          = Win32::Process::Info->new();
-        foreach my $process ( $info->GetProcInfo( $self->_pid() ) ) {
-            $alive = 1;
-        }
-        return $alive;
+    return $self->{_child_error};
+}
+
+sub _signal_name {
+    my ( $self, $number ) = @_;
+    my @sig_names = split q[ ], $Config{sig_name};
+    return $sig_names[$number];
+}
+
+sub error_message {
+    my ($self) = @_;
+    my $message;
+    my $child_error = $self->child_error();
+    if ( !defined $self->child_error() ) {
+    }
+    elsif ( $OSNAME eq 'MSWin32' ) {
     }
     else {
-        waitpid _ANYPROCESS(), POSIX::WNOHANG();
+
+        if (   ( POSIX::WIFEXITED($child_error) )
+            || ( POSIX::WIFSIGNALED($child_error) ) )
+        {
+            if ( POSIX::WIFEXITED($child_error) ) {
+                $message =
+                  'Firefox exited with a ' . POSIX::WEXITSTATUS($child_error);
+            }
+            elsif ( POSIX::WIFSIGNALED($child_error) ) {
+                my $name = $self->_signal_name( POSIX::WTERMSIG($child_error) );
+                if ( defined $name ) {
+                    $message = "Firefox killed by a $name signal ("
+                      . POSIX::WTERMSIG($child_error) . q[)];
+                }
+                else {
+                    $message = 'Firefox killed by a signal ('
+                      . POSIX::WTERMSIG($child_error) . q[)];
+                }
+            }
+        }
+        else {
+            if ( POSIX::WIFSTOPPED($child_error) ) {
+                my $name = $self->_signal_name( POSIX::WTERMSIG($child_error) );
+                if ( defined $name ) {
+                    $message = "Firefox stopped by a $name signal ("
+                      . POSIX::WSTOPSIG($child_error) . q[)];
+                }
+                else {
+                    $message = 'Firefox stopped by a signal ('
+                      . POSIX::WSTOPSIG($child_error) . q[)];
+                }
+            }
+            elsif ( POSIX::WIFCONTINUED($child_error) ) {
+                $message = 'Firefox continuing';
+            }
+        }
+    }
+    return $message;
+}
+
+sub _reap {
+    my ($self) = @_;
+    if ( $OSNAME eq 'MSWin32' ) {
+        if ( $self->{_win32_process} ) {
+            $self->{_win32_process}->GetExitCode( my $exit_code );
+            if ( $exit_code != Win32::Process::STILL_ACTIVE() ) {
+                $self->{_child_error} = $exit_code;
+            }
+        }
+    }
+    else {
+        while ( ( my $pid = waitpid _ANYPROCESS(), POSIX::WNOHANG() ) > 0 ) {
+            if ( $pid == $self->_pid() ) {
+                $self->{_child_error} = $CHILD_ERROR;
+            }
+            elsif ( ( $self->xvfb() ) && ( $pid == $self->xvfb() ) ) {
+                $self->{_xvfb_child_error} = $CHILD_ERROR;
+            }
+        }
+    }
+    return;
+}
+
+sub alive {
+    my ($self) = @_;
+    if ( $OSNAME eq 'MSWin32' ) {
+        if ( $self->{_win32_process} ) {
+            $self->{_win32_process}->GetExitCode( my $exit_code );
+            $self->_reap();
+            if ( $exit_code == Win32::Process::STILL_ACTIVE() ) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+    elsif ( $self->_pid() ) {
+        $self->_reap();
         return kill 0, $self->_pid();
+    }
+    else {
+        return;
     }
 }
 
@@ -398,7 +526,7 @@ sub _setup_local_connection_to_firefox {
     my $binary = $self->_binary();
     my $socket;
     my $connected;
-    while ( ( !$connected ) && ( $self->_firefox_alive() ) ) {
+    while ( ( !$connected ) && ( $self->alive() ) ) {
         $socket = undef;
         socket $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
           or Carp::croak("Failed to create a socket: $EXTENDED_OS_ERROR");
@@ -421,11 +549,13 @@ sub _setup_local_connection_to_firefox {
                 "Failed to connect to $host on port $port:$EXTENDED_OS_ERROR");
         }
     }
-    if ( ( kill 0, $self->_pid() ) && ($socket) ) {
+    $self->_reap();
+    if ( ( $self->alive() ) && ($socket) ) {
     }
     else {
-        Carp::croak( q[Firefox failed to start as '] . join q[ ],
-            $binary, @arguments );
+        my $error_message =
+          $self->error_message() ? $self->error_message() : q[];
+        Carp::croak($error_message);
     }
     return $socket;
 }
@@ -514,6 +644,10 @@ sub new_session {
 
 sub _create_capabilities {
     my ( $self, $parameters ) = @_;
+    my $pid = $parameters->{'moz:processID'};
+    if ( ($pid) && ( $OSNAME eq 'cygwin' ) ) {
+        $pid = $self->_pid();
+    }
     return Firefox::Marionette::Capabilities->new(
         accept_insecure_certs => $parameters->{acceptInsecureCerts} ? 1 : 0,
         page_load_strategy    => $parameters->{pageLoadStrategy},
@@ -528,7 +662,7 @@ sub _create_capabilities {
         platform_version         => $parameters->{platformVersion},
         moz_profile              => $parameters->{'moz:profile'},
         moz_webdriver_click      => $parameters->{'moz:webdriverClick'} ? 1 : 0,
-        moz_process_id           => $parameters->{'moz:processID'},
+        moz_process_id           => $pid,
         browser_name             => $parameters->{browserName},
         moz_headless             => $parameters->{'moz:headless'} ? 1 : 0,
         moz_accessibility_checks => $parameters->{'moz:accessibilityChecks'}
@@ -684,6 +818,15 @@ sub send_keys {
     return $self;
 }
 
+sub delete_session {
+    my ($self) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, 'WebDriver:DeleteSession' ] );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
 sub minimise {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
@@ -793,7 +936,7 @@ sub window_rect {
         pos_y  => $response->result()->{y},
         width  => $response->result()->{width},
         height => $response->result()->{height},
-        state  => $response->result()->{state},
+        wstate => $response->result()->{state},
     );
     if ( defined $new ) {
         $message_id = $self->_new_message_id();
@@ -1141,6 +1284,20 @@ sub css {
     return $response->result()->{value};
 }
 
+sub property {
+    my ( $self, $element, $name ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            'WebDriver:GetElementProperty',
+            { id => $element->uuid(), name => $name }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $response->result()->{value};
+}
+
 sub attribute {
     my ( $self, $element, $name ) = @_;
     my $message_id = $self->_new_message_id();
@@ -1195,7 +1352,15 @@ sub title {
 
 sub quit {
     my ( $self, $flags ) = @_;
-    if ( $self->_socket() ) {
+    if ( !$self->alive() ) {
+        my $socket = delete $self->{_socket};
+        if ($socket) {
+            close $socket
+              or Carp::croak(
+                "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+        }
+    }
+    elsif ( $self->_socket() ) {
         $flags ||=
           ['eAttemptQuit'];    # ["eConsiderQuit", "eAttemptQuit", "eForceQuit"]
         my $message_id = $self->_new_message_id();
@@ -1203,31 +1368,71 @@ sub quit {
             [ _COMMAND(), $message_id, 'Marionette:Quit', { flags => $flags } ]
         );
         my $response = $self->_get_response($message_id);
-        close $self->_socket()
+        my $socket   = delete $self->{_socket};
+        close $socket
           or
           Carp::croak("Failed to close socket to firefox:$EXTENDED_OS_ERROR");
-        delete $self->{_socket};
         if ( $OSNAME eq 'MSWin32' ) {
             $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
+            $self->_reap();
         }
         else {
             while ( kill 0, $self->_pid() ) {
-                waitpid _ANYPROCESS(), POSIX::WNOHANG();
+                $self->_reap();
             }
         }
     }
+    $self->_terminate_process();
     if ( my $pid = $self->xvfb() ) {
-        my $signal = $self->_interrupt();
+        my $int_signal = $self->_signal_number('INT');
         while ( kill 0, $pid ) {
-            kill $signal, $pid;
+            kill $int_signal, $pid;
             sleep 1;
-            waitpid _ANYPROCESS(), POSIX::WNOHANG();
+            $self->_reap();
         }
         delete $self->{_xvfb_display_number};
         delete $self->{_xvfb_authority_directory};
         delete $self->{_xvfb_pid};
     }
-    return $self;
+    return $self->child_error();
+}
+
+sub _terminate_process {
+    my ($self) = @_;
+    if ( $OSNAME eq 'MSWin32' ) {
+        if ( $self->{_win32_process} ) {
+            $self->{_win32_process}->Kill(1);
+            sleep 1;
+            $self->{_win32_process}->GetExitCode( my $exit_code );
+            while ( $exit_code == Win32::Process::STILL_ACTIVE() ) {
+                $self->{_win32_process}->Kill(1);
+                sleep 1;
+                $exit_code = $self->{_win32_process}->Kill(1);
+            }
+        }
+    }
+    elsif ( kill 0, $self->_pid() ) {
+        my $term_signal = $self->_signal_number('TERM')
+          ;    # https://support.mozilla.org/en-US/questions/752748
+        if ( $term_signal > 0 ) {
+            my $count = 0;
+            while (( $count < _NUMBER_OF_TERM_ATTEMPTS() )
+                && ( kill $term_signal, $self->_pid() ) )
+            {
+                $count += 1;
+                sleep 1;
+                $self->_reap();
+            }
+        }
+        my $kill_signal = $self->_signal_number('KILL');   # no more mr nice guy
+        if ( $kill_signal > 0 ) {
+            while ( kill $kill_signal, $self->_pid() ) {
+                sleep 1;
+                $self->_reap();
+            }
+        }
+    }
+    return;
 }
 
 sub context {
@@ -1266,6 +1471,7 @@ sub accept_connections {
 
 sub async_script {
     my ( $self, $script, %parameters ) = @_;
+    $parameters{args} ||= [];
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -1280,6 +1486,7 @@ sub async_script {
 
 sub script {
     my ( $self, $script, %parameters ) = @_;
+    $parameters{args} ||= [];
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -1399,6 +1606,33 @@ sub go {
     return $self;
 }
 
+sub install {
+    my ( $self, $path, $temporary ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(),
+            $message_id,
+            'Addon:Install',
+            {
+                path      => "$path",
+                temporary => $temporary ? JSON::true() : JSON::false()
+            }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $response->result()->{value};
+}
+
+sub uninstall {
+    my ( $self, $id ) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, 'Addon:Uninstall', { id => $id } ] );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
 my $x = <<'_DOC_';
   // WebDriver service
 #  "WebDriver:AcceptDialog": GeckoDriver.prototype.acceptDialog,
@@ -1408,7 +1642,7 @@ my $x = <<'_DOC_';
 #  "WebDriver:CloseWindow": GeckoDriver.prototype.close,
 #  "WebDriver:DeleteAllCookies": GeckoDriver.prototype.deleteAllCookies,
 #  "WebDriver:DeleteCookie": GeckoDriver.prototype.deleteCookie,
-  "WebDriver:DeleteSession": GeckoDriver.prototype.deleteSession,
+#  "WebDriver:DeleteSession": GeckoDriver.prototype.deleteSession,
 #  "WebDriver:DismissAlert": GeckoDriver.prototype.dismissDialog,
 #  "WebDriver:ElementClear": GeckoDriver.prototype.clearElement,
 #  "WebDriver:ElementClick": GeckoDriver.prototype.clickElement,
@@ -1430,7 +1664,7 @@ my $x = <<'_DOC_';
 #  "WebDriver:GetCurrentURL": GeckoDriver.prototype.getCurrentUrl,
 #  "WebDriver:GetElementAttribute": GeckoDriver.prototype.getElementAttribute,
 #  "WebDriver:GetElementCSSValue": GeckoDriver.prototype.getElementValueOfCssProperty,
-  "WebDriver:GetElementProperty": GeckoDriver.prototype.getElementProperty,
+#  "WebDriver:GetElementProperty": GeckoDriver.prototype.getElementProperty,
 #  "WebDriver:GetElementRect": GeckoDriver.prototype.getElementRect,
 #  "WebDriver:GetElementTagName": GeckoDriver.prototype.getElementTagName,
 #  "WebDriver:GetElementText": GeckoDriver.prototype.getElementText,
@@ -1488,6 +1722,9 @@ sub _send_request {
     my ( $self, $object ) = @_;
     my $json   = JSON::encode_json($object);
     my $length = length $json;
+    if ( $self->_debug() ) {
+        warn ">> $length:$json\n";
+    }
     my $result = syswrite $self->_socket(), "$length:$json";
     if ( !defined $result ) {
         Carp::croak("Failed to send request to firefox:$EXTENDED_OS_ERROR");
@@ -1498,7 +1735,7 @@ sub _read_from_socket {
     my ($self) = @_;
     my $number_of_bytes_in_response;
     my $initial_buffer;
-    while ( !defined $number_of_bytes_in_response ) {
+    while ( ( !defined $number_of_bytes_in_response ) && ( $self->alive() ) ) {
         my $number_of_bytes = sysread $self->_socket(), my $octet, 1;
         if ( defined $number_of_bytes ) {
             $initial_buffer .= $octet;
@@ -1509,7 +1746,10 @@ sub _read_from_socket {
     }
     my $number_of_bytes_already_read = 0;
     my $json                         = q[];
-    while ( $number_of_bytes_already_read < $number_of_bytes_in_response ) {
+    while (( defined $number_of_bytes_in_response )
+        && ( $number_of_bytes_already_read < $number_of_bytes_in_response )
+        && ( $self->alive() ) )
+    {
         my $number_of_bytes_read = sysread $self->_socket(), my $buffer,
           $number_of_bytes_in_response - $number_of_bytes_already_read;
         if ( defined $number_of_bytes_read ) {
@@ -1520,6 +1760,9 @@ sub _read_from_socket {
             Carp::croak(
                 "Failed to read from socket to firefox:$EXTENDED_OS_ERROR");
         }
+    }
+    if ( $self->_debug() ) {
+        warn "<< $initial_buffer$json\n";
     }
     my $parameters = JSON::decode_json($json);
     return $parameters;
@@ -1541,8 +1784,8 @@ sub _get_response {
     return $response;
 }
 
-sub _interrupt {
-    my ($self) = @_;
+sub _signal_number {
+    my ( $self, $name ) = @_;
     my @sig_nums  = split q[ ], $Config{sig_num};
     my @sig_names = split q[ ], $Config{sig_name};
     my %signals_by_name;
@@ -1551,7 +1794,7 @@ sub _interrupt {
         $signals_by_name{$sig_name} = $sig_nums[$idx];
         $idx += 1;
     }
-    return $signals_by_name{INT};
+    return $signals_by_name{$name};
 }
 
 sub DESTROY {
@@ -1569,7 +1812,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -1585,6 +1828,8 @@ Version 0.16
     $firefox->find_element('//button[@name="lucky"]')->click();
 
     say $firefox->page_source();
+
+    $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
 =head1 DESCRIPTION
 
@@ -1610,9 +1855,11 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * addons - should any firefox extensions and themes be available in this session.  This defaults to "0".
 
+=item * visible - should firefox be visible on the desktop.  This defaults to "0".
+
 =back
 
-This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  If necessary and possible, this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance to allow firefox to run in an environment without an accessible X server, so long as the method is not being run on Windows or MacOS.
+This method returns a new C<Firefox::Marionette> object, connected to an instance of L<firefox|https://firefox.com>.  In a non MacOS/Win32/Cygwin environment, if necessary (no DISPLAY variable can be found and visible has been set to true) and possible (Xvfb can be executed successfully), this method will also automatically start an L<Xvfb|https://en.wikipedia.org/wiki/Xvfb> instance.
  
 =head2 go
 
@@ -1660,7 +1907,11 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 =head2 attribute 
 
-accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the value of the attribute with the supplied name.
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the initial value of the attribute with the supplied name.  This method will return the initial content, the L<property|Firefox::Marionette#property> method will return the current content.
+
+=head2 property
+
+accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
 
 =head2 script 
 
@@ -1848,6 +2099,10 @@ returns the current L<timeouts|Firefox::Marionette::Timeouts> for page loading, 
 
 creates a new WebDriver session.  It is expected that the caller performs the necessary checks on the requested capabilities to be WebDriver conforming.  The WebDriver service offered by Marionette does not match or negotiate capabilities beyond type and bounds checks.
 
+=head2 delete_session
+
+deletes the current WebDriver session.
+
 =head2 window_type
 
 returns the current window's type.  This should be 'navigator:browser'.
@@ -1878,6 +2133,14 @@ returns an server-assigned integer identifiers for the current chrome window tha
 
 returns identifiers for each open chrome window for tests interested in managing a set of chrome windows and tabs separately.
 
+=head2 install
+
+accepts the fully qualified path to an .xpi addon file as the first parameter and an optional true/false second parameter to indicate if the xpi addon file should be a temporary addition (just for the existance of this browser instance).  Unsigned xpi addon files may be loaded temporarily.  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
+
+=head2 uninstall
+
+accepts the GUID for the addon to uninstall.  The GUID is returned when from the L<install|Firefox::Marionette#install> method.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
 =head2 application_type
 
 returns the application type for the Marionette protocol.  Should be 'gecko'.
@@ -1892,7 +2155,19 @@ returns the pid of the xvfb process if it exists.
 
 =head2 quit
 
-Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application
+Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application.  This method returns the $? (CHILD_ERROR) value for the Firefox process
+
+=head2 child_error
+
+This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
+
+=head2 error_message
+
+This method returns a human readable error message describing how the Firefox process exited (assuming it started okay).  On Win32 platforms this information is restricted to exit code.
+
+=head2 alive
+
+This method returns true or false depending on if the Firefox process is still running.
 
 =head1 DIAGNOSTICS
 
@@ -1928,9 +2203,6 @@ L<JSON|JSON>
  
 =item *
 L<URI|URI>
- 
-=item *
-L<Crypt::URandom|Crypt::URandom>
  
 =back
 

@@ -1,0 +1,13 @@
+0.003   2018-01-29 (PERLANCAR)
+
+	- Adjust to AppBase::Grep 0.003 (multiple patterns).
+
+
+0.002   2018-01-29 (PERLANCAR)
+
+	- Only show label if user specifies more than 1 file.
+
+
+0.001   2018-01-28 (PERLANCAR)
+
+        - First release.

@@ -8,7 +8,7 @@ use MOP::Role;
 use MOP::Class;
 use MOP::Internal::Util ();
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub get_meta {
@@ -83,7 +83,7 @@ MOP::Util - For MOP External Use Only
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

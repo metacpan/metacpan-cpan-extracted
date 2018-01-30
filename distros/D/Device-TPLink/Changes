@@ -1,5 +1,7 @@
 Revision history for Device-TPLink
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02	23 JAN 2018
+	Fixed Makefile.PL, general cleanup.
 
+0.01    21 JAN 2018
+        First version, released on an unsuspecting world.

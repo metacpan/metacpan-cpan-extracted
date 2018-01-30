@@ -10,7 +10,7 @@ use Carp ();
 use constant DEBUG => $ENV{MOJO_REDIS_DEBUG} || 0;
 use constant DEFAULT_PORT => 6379;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 my $PROTOCOL_CLASS = do {
   my $class = $ENV{MOJO_REDIS_PROTOCOL}
@@ -138,7 +138,7 @@ sub _connect {
       $stream->timeout(0);
       $stream->on(close => sub { $self and $self->_error($c) });
       $stream->on(error => sub { $self and $self->_error($c, $_[1]) });
-      $stream->on(read => sub { $self->_read($c, $_[1]) });
+      $stream->on(read  => sub { $self and $self->_read($c, $_[1]) });
 
       # NOTE: unshift() will cause AUTH to be sent before SELECT
       unshift @{$c->{queue}}, [undef, SELECT => $db]          if $db;
@@ -268,10 +268,9 @@ sub _read {
 MESSAGE:
   while (my $message = $protocol->get_message) {
     my $data = $self->_reencode_message($message);
-    my $op   = shift @{$c->{waiting} || []};
-    my $cb   = $op->[0];
 
     if (ref $data eq 'SCALAR') {
+      my $cb = (shift @{$c->{waiting}} || [])->[0];
       $self->$cb($$data, []) if $cb;
     }
     elsif (ref $data eq 'ARRAY' and $data->[0] and $data->[0] =~ /^(p?message)$/i) {
@@ -279,6 +278,7 @@ MESSAGE:
       $self->emit($event => reverse @$data);
     }
     else {
+      my $cb = (shift @{$c->{waiting}} || [])->[0];
       $self->$cb('', $data) if $cb;
     }
 
@@ -340,7 +340,7 @@ Mojo::Redis2 - Pure-Perl non-blocking I/O Redis driver
 
 =head1 VERSION
 
-0.30
+0.31
 
 =head1 DESCRIPTION
 
@@ -500,7 +500,9 @@ C<$pattern>, after it has been L<subscribed|/psubscribe> to.
   $str = $self->encoding;
   $self = $self->encoding('UTF-8');
 
-Holds the encoding using for data from/to Redis. Default is UTF-8.
+Holds the character encoding to use for data from/to Redis. Default is
+C<UTF-8>. Set to C<undef> to disable encoding/decoding data. Without an
+encoding set, Redis expects and returns bytes.
 
 =head2 protocol
 

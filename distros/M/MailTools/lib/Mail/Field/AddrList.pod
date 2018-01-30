@@ -52,15 +52,15 @@ Extends L<"Constructors" in Mail::Field|Mail::Field/"Constructors">.
  
 =over 4
 
-=item Mail::Field::AddrList-E<gt>B<combine>(FIELDS)
+=item Mail::Field::AddrList-E<gt>B<combine>($fields)
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::AddrList-E<gt>B<extract>( TAG, HEAD [, INDEX ] )
+=item Mail::Field::AddrList-E<gt>B<extract>( $tag, $head [, $index ] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::AddrList-E<gt>B<new>( TAG [, STRING | OPTIONS] )
+=item Mail::Field::AddrList-E<gt>B<new>( $tag [, STRING | %options] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
@@ -72,7 +72,7 @@ Extends L<""Fake" constructors" in Mail::Field|Mail::Field/""Fake" constructors"
  
 =over 4
 
-=item $obj-E<gt>B<create>(OPTIONS)
+=item $obj-E<gt>B<create>(%options)
 
 Inherited, see L<Mail::Field/""Fake" constructors">
 
@@ -88,7 +88,7 @@ Extends L<"Accessors" in Mail::Field|Mail::Field/"Accessors">.
  
 =over 4
 
-=item $obj-E<gt>B<set>(OPTIONS)
+=item $obj-E<gt>B<set>(%options)
 
 Inherited, see L<Mail::Field/"Accessors">
 
@@ -123,9 +123,9 @@ Returns a list if email addresses, found in the field content.
 Returns a list of nicely formatted named, for each of the addresses
 found in the content.
 
-=item $obj-E<gt>B<set_address>(EMAIL, NAME)
+=item $obj-E<gt>B<set_address>($email, $name)
 
-Add/replace an EMAIL address to the field.
+Add/replace an $email address to the field.
 
 =item $obj-E<gt>B<text>( [STRING] )
 

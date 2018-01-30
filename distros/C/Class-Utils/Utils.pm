@@ -1,11 +1,9 @@
 package Class::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use List::MoreUtils qw(any);
 use Readonly;
@@ -15,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(set_params set_params_pub set_split_params
 	split_params);
 
 # Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Set parameters to user values.
 sub set_params {
@@ -146,11 +144,9 @@ Class::Utils - Class utilities.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Utils qw(set_params);
 
  # Hash reference with default parameters.
@@ -169,11 +165,9 @@ Class::Utils - Class utilities.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Utils qw(set_params);
 
  # Hash reference with default parameters.
@@ -186,11 +180,9 @@ Class::Utils - Class utilities.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Utils qw(set_params_pub);
 
  # Hash reference with default parameters.
@@ -212,11 +204,9 @@ Class::Utils - Class utilities.
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Utils qw(set_split_params);
 
  # Hash reference with default parameters.
@@ -241,11 +231,9 @@ Class::Utils - Class utilities.
 
 =head1 EXAMPLE5
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Class::Utils qw(split_params);
 
  # Example parameters.
@@ -281,17 +269,17 @@ L<https://github.com/tupinek/Class-Utils>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2011-2015
+ © Michal Josef Špaček 2011-2018
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

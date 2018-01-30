@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Cwd ();
 use Prty::System;
@@ -66,7 +66,7 @@ sub cwd {
     }
     CORE::chdir $dir or do {
         $this->throw(
-            q{PROC-00001: Cannot change directory},
+            q~PROC-00001: Cannot change directory~,
             Argument=>$dir,
             CurrentWorkingDirectory=>Cwd::cwd,
         );
@@ -118,7 +118,7 @@ sub euid {
     $> = $uid;
     if ($> != $uid) {
         $this->throw(
-            q{PROC-00002: Cannot set EUID},
+            q~PROC-00002: Cannot set EUID~,
             UID=>$<,
             EUID=>$>,
             NewEUID=>$uid,
@@ -175,7 +175,7 @@ sub homeDir {
 
     if (!exists $ENV{'HOME'}) {
         $class->throw(
-            q{PROCESS-00001: Environment-Variable HOME existiert nicht},
+            q~PROCESS-00001: Environment-Variable HOME existiert nicht~,
         );
     }
 
@@ -191,7 +191,7 @@ sub homeDir {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -199,7 +199,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

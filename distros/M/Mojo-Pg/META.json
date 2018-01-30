@@ -36,7 +36,7 @@
          "requires" : {
             "DBD::Pg" : "3.005001",
             "Mojolicious" : "7.53",
-            "SQL::Abstract" : "1.81",
+            "SQL::Abstract" : "1.85",
             "perl" : "5.010001"
          }
       }
@@ -57,6 +57,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "4.04",
-   "x_serialization_backend" : "JSON::PP version 2.97000"
+   "version" : "4.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

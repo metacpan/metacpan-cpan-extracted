@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '4.004'
+version: '4.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

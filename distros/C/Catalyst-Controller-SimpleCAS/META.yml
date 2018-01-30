@@ -24,7 +24,7 @@ requires:
   Data::Dumper: 0
   Digest::SHA1: 0
   Email::MIME: 1.929
-  Email::MIME::CreateHTML: 1.041
+  Email::MIME::CreateHTML: 1.042
   Email::MIME::CreateHTML::Resolver::LWP: 0
   Email::Simple: 2.206
   Encode: 0
@@ -57,7 +57,7 @@ resources:
   IRC: irc://irc.perl.org/#rapidapp
   bugtracker: https://github.com/vanstyn/Catalyst-Controller-SimpleCAS/issues
   repository: https://github.com/vanstyn/Catalyst-Controller-SimpleCAS.git
-version: 1.001
+version: 1.002
 x_contributors:
   - 'Torsten Raudssus <torsten@raudss.us>'
   - 'Michael Conrad <mconrad@intellitree.com>'

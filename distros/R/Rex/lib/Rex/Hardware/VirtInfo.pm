@@ -3,7 +3,7 @@ package Rex::Hardware::VirtInfo;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex;
 use Rex::Helper::Run;
@@ -93,6 +93,11 @@ sub get {
 
     elsif ( $sys_vendor =~ /Parallels Software International Inc/ ) {
       $virtualization_type = "parallels";
+      $virtualization_role = "guest";
+    }
+
+    elsif ( $sys_vendor =~ /QEMU/ ) {
+      $virtualization_type = "kvm";
       $virtualization_role = "guest";
     }
 

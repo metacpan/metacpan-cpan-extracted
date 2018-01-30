@@ -47,7 +47,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.39';
+$VERSION = '3.40';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -83,6 +83,20 @@ sub vendor {
     my $h3c = shift;
     my $mfg = $h3c->entPhysicalMfgName(1) || {};
     return $mfg->{1} || "H3C";
+}
+
+sub model {
+    my $h3c = shift;
+    
+    my $descr = $h3c->description();
+    if ($descr =~ /^.*\n(.*)\n/) {
+        return $1;
+    } elsif ($h3c->entPhysicalClass(2)->{2} =~ /^(3|chassis)$/) {
+        return $h3c->entPhysicalName(2)->{2};
+    } else {
+        my $id = $h3c->id();
+        return &SNMP::translateObj($id) || $id;
+    }
 }
 
 sub os {

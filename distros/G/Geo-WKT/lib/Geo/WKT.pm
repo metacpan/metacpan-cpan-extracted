@@ -1,15 +1,19 @@
-# Copyrights 2008-2015 by [Mark Overmeer].
+# Copyrights 2008-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
-use strict;
-use warnings;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo-WKT.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Geo::WKT;
 use vars '$VERSION';
-$VERSION = '0.95';
+$VERSION = '0.96';
 
 use base 'Exporter';
+
+use strict;
+use warnings;
 
 use Geo::Shape  ();
 use Carp;

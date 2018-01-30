@@ -5,7 +5,7 @@ use warnings;
 package Authen::SCRAM::Client;
 # ABSTRACT: RFC 5802 SCRAM client
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moo 1.001000;
 
@@ -61,6 +61,20 @@ has authorization_id => (
     is      => 'ro',
     isa     => Str,
     default => '',
+);
+
+#pod =attr minimum_iteration_count
+#pod
+#pod If the server requests an iteration count less than this value, the client
+#pod throws an error.  This protects against downgrade attacks.  The default is
+#pod 4096, consistent with recommendations in the RFC.
+#pod
+#pod =cut
+
+has minimum_iteration_count => (
+    is      => 'ro',
+    isa     => Num,
+    default => 4096,
 );
 
 # The derived PBKDF2 password can be reused if the salt and iteration count
@@ -211,22 +225,16 @@ sub final_msg {
     # assemble proof
     my $salt  = decode_base64( $self->_get_session("s") );
     my $iters = $self->_get_session("i");
-    my $cache = $self->_cached_credentials;
-    my $salted_pw;
-    if ( $cache->[0] eq $salt && $cache->[1] == $iters ) {
-        $salted_pw = $cache->[2];
+    if ( $iters < $self->minimum_iteration_count ) {
+        croak sprintf( "SCRAM server requested %d iterations, less than the minimum of %d",
+            $iters, $self->minimum_iteration_count );
     }
-    else {
-        $salted_pw =
-          derive( $self->digest, encode_utf8( $self->_prepped_pass ), $salt, $iters );
-        $self->_cached_credentials( [ $salt, $iters, $salted_pw ] );
-    }
-    my $client_key = $self->_hmac_fcn->( $salted_pw, "Client Key" );
-    my $stored_key = $self->_digest_fcn->($client_key);
+
+    my ( $stored_key, $client_key, $server_key ) = $self->computed_keys( $salt, $iters );
 
     $self->_set_session(
         _stored_key => $stored_key,
-        _server_key => $self->_hmac_fcn->( $salted_pw, "Server Key" ),
+        _server_key => $server_key,
     );
 
     my $client_sig = $self->_client_sig;
@@ -266,6 +274,40 @@ sub validate {
     return 1;
 }
 
+#pod =method computed_keys
+#pod
+#pod This method returns the opaque keys used in the SCRAM protocol.  It returns
+#pod the 'stored key', the 'client key' and the 'server key'.  The server must
+#pod have a copy of the stored key and server key for a given user in order to
+#pod authenticate.
+#pod
+#pod This method caches the computed values -- it generates them fresh only if
+#pod the supplied salt and iteration count don't match the cached salt and
+#pod iteration count.
+#pod
+#pod =cut
+
+sub computed_keys {
+    my ( $self, $salt, $iters ) = @_;
+    my $cache = $self->_cached_credentials;
+
+    if ( $cache->[0] eq $salt && $cache->[1] == $iters ) {
+        # return stored key, client key, server key
+        return @{$cache}[ 2 .. 4 ];
+    }
+
+    my $salted_pw =
+      derive( $self->digest, encode_utf8( $self->_prepped_pass ), $salt, $iters );
+    my $client_key = $self->_hmac_fcn->( $salted_pw, "Client Key" );
+    my $server_key = $self->_hmac_fcn->( $salted_pw, "Server Key" );
+    my $stored_key = $self->_digest_fcn->($client_key);
+
+    $self->_cached_credentials(
+        [ $salt, $iters, $stored_key, $client_key, $server_key ] );
+
+    return ( $stored_key, $client_key, $server_key );
+}
+
 1;
 
 
@@ -283,7 +325,7 @@ Authen::SCRAM::Client - RFC 5802 SCRAM client
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -320,7 +362,7 @@ Authen::SCRAM::Client - RFC 5802 SCRAM client
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 ATTRIBUTES
 
@@ -340,6 +382,12 @@ If the authentication identity (C<username>) will act as a different,
 authorization identity, this attribute provides the authorization identity.  It
 is optional.  If not provided, the authentication identity is considered by the
 server to be the same as the authorization identity.
+
+=head2 minimum_iteration_count
+
+If the server requests an iteration count less than this value, the client
+throws an error.  This protects against downgrade attacks.  The default is
+4096, consistent with recommendations in the RFC.
 
 =head2 digest
 
@@ -385,6 +433,17 @@ should an error occur.
 This takes the C<server-final-message> character string received from the
 server and verifies that the server actually has a copy of the client
 credentials.  It will return true if valid and throw an exception, otherwise.
+
+=head2 computed_keys
+
+This method returns the opaque keys used in the SCRAM protocol.  It returns
+the 'stored key', the 'client key' and the 'server key'.  The server must
+have a copy of the stored key and server key for a given user in order to
+authenticate.
+
+This method caches the computed values -- it generates them fresh only if
+the supplied salt and iteration count don't match the cached salt and
+iteration count.
 
 =for Pod::Coverage BUILD
 

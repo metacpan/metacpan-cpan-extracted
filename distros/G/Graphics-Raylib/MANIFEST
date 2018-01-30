@@ -9,8 +9,8 @@ Makefile.PL
 README
 XS/Changes
 XS/MANIFEST
-XS/Makefile
 XS/Makefile.PL
+XS/README
 XS/XS.xs
 XS/fallback/const-c.inc
 XS/fallback/const-xs.inc

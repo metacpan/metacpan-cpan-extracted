@@ -49,7 +49,7 @@ Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
  
 =over 4
 
-=item Geo::Point-E<gt>B<fromString>($string, [$projection])
+=item Geo::Point-E<gt>B<fromString>( $string, [$projection] )
 
 Create a new point from a $string.  The coordinates can be separated by
 a comma (preferrably), or blanks.  When the coordinates end on NSEW, the
@@ -88,9 +88,9 @@ example: point from string
  my $p = eval { Geo::Point->fromString($x) };
  warn $@ if $@;
 
-=item $obj-E<gt>B<latlong>([ $lat,$long,[$proj] ] | [$proj])
+=item $obj-E<gt>B<latlong>( [ $lat,$long,[$proj] ] | [$proj] )
 
-=item Geo::Point-E<gt>B<latlong>([ $lat,$long,[$proj] ] | [$proj])
+=item Geo::Point-E<gt>B<latlong>( [ $lat,$long,[$proj] ] | [$proj] )
 
 When called as class method, you create a new point.  Provide a LATitude
 and LONGitude. The optional PROJection tells in which coordinate system.
@@ -111,12 +111,14 @@ example: latlong as instance method
 
  my ($lat, $long) = $gp->latlong('wgs84');
 
-=item $obj-E<gt>B<longlat>([ $long,$lat,[$proj] ] | [$proj])
+=item $obj-E<gt>B<longlat>( [ $long,$lat,[$proj] ] | [$proj] )
 
-=item Geo::Point-E<gt>B<longlat>([ $long,$lat,[$proj] ] | [$proj])
+=item Geo::Point-E<gt>B<longlat>( [ $long,$lat,[$proj] ] | [$proj] )
 
 Like L<latlong()|Geo::Point/"Constructors">, but with the coordinates reversed.  Some applications
 prefer this.
+
+=item $obj-E<gt>B<new>(%options)
 
 =item Geo::Point-E<gt>B<new>(%options)
 
@@ -147,16 +149,16 @@ prefer this.
 
 =back
 
-=item $obj-E<gt>B<xy>([$x, $y, [$proj] ] | [$proj])
+=item $obj-E<gt>B<xy>( [$x, $y, [$proj] ] | [$proj] )
 
-=item Geo::Point-E<gt>B<xy>([$x, $y, [$proj] ] | [$proj])
+=item Geo::Point-E<gt>B<xy>( [$x, $y, [$proj] ] | [$proj] )
 
 Like L<longlat()|Geo::Point/"Constructors"> but now for carthesian projections.  Usually, the coordinate
 order is reversed.  See also L<yx()|Geo::Point/"Constructors">.
 
-=item $obj-E<gt>B<yx>([$y, $x, [$proj] ] | [$proj])
+=item $obj-E<gt>B<yx>( [$y, $x, [$proj] ] | [$proj] )
 
-=item Geo::Point-E<gt>B<yx>([$y, $x, [$proj] ] | [$proj])
+=item Geo::Point-E<gt>B<yx>( [$y, $x, [$proj] ] | [$proj] )
 
 Like L<latlong()|Geo::Point/"Constructors"> but now for carthesian projections.  Usually, the
 coordinate order is reversed.  See also L<xy()|Geo::Point/"Constructors">.
@@ -206,7 +208,7 @@ Extends L<"Projections" in Geo::Shape|Geo::Shape/"Projections">.
  
 =over 4
 
-=item $obj-E<gt>B<in>(<$label|'utm'>)
+=item $obj-E<gt>B<in>( <$label|'utm'> )
 
 Inherited, see L<Geo::Shape/"Projections">
 
@@ -239,13 +241,13 @@ The bounding box of a point contains twice itself.
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item $obj-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
-=item Geo::Point-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item Geo::Point-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<distance>($object, [$unit])
+=item $obj-E<gt>B<distance>( $object, [$unit] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
@@ -298,15 +300,15 @@ Inherited, see L<Geo::Shape/"Display">
 
 Inherited, see L<Geo::Shape/"Display">
 
-=item $obj-E<gt>B<dm>([$projection])
+=item $obj-E<gt>B<dm>( [$projection] )
 
 Like L<dms()|Geo::Point/"Display">, but doesn't show seconds.
 
-=item $obj-E<gt>B<dmHTML>([$projection])
+=item $obj-E<gt>B<dmHTML>( [$projection] )
 
 Like L<dmsHTML()|Geo::Point/"Display">, but does not show seconds.
 
-=item $obj-E<gt>B<dms>([$projection])
+=item $obj-E<gt>B<dms>( [$projection] )
 
 Show the point as DMS value-pair.  You must be sure that the coordinate
 is a projection for which is it useful to represent the values in DMS.
@@ -322,7 +324,7 @@ characters, which may confuse HTML (see L<dmsHTML()|Geo::Point/"Display">).
 
 Inherited, see L<Geo::Shape/"Display">
 
-=item $obj-E<gt>B<dmsHTML>([$projection])
+=item $obj-E<gt>B<dmsHTML>( [$projection] )
 
 Like L<dms()|Geo::Point/"Display">, but all character which are troublesome for HTML are
 translated into character codes.
@@ -340,7 +342,7 @@ example: moving West
  $point->moveWest;
  print $point->long;   # -181;
 
-=item $obj-E<gt>B<toString>([$projection])
+=item $obj-E<gt>B<toString>( [$projection] )
 
 Returns a string representation of the point, which is also used for
 stringification.  The default projection is the one of the point.
@@ -420,27 +422,14 @@ L<Geo::Proj::new()|Geo::Proj/"Constructors"> about how to defined them.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.96,
-built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>,
-L</Math::Polygon>,
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Format::Envisat>, and
-L</Geo::Format::Landsat>.
-
-Please post questions or ideas to the mailinglist at
-F<http://geo-perl@list.hut.fi>
+This module is part of Geo-Point distribution version 0.97,
+built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

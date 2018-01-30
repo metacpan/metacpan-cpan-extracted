@@ -19,13 +19,13 @@ sub test_type : Test(2) {
 
     # Section
 
-    my $ln = Prty::Sdoc::Line->new('== Description',47);
+    my $ln = Prty::Sdoc::Line->new('== Description',47,\'[testfile]');
     my $type = $ln->type;
     $self->is($type,'Section','type: type');
 
     # Item
 
-    $ln = Prty::Sdoc::Line->new('* Test',47);
+    $ln = Prty::Sdoc::Line->new('* Test',47,\'[testfile]');
     $type = $ln->type;
     $self->is($type,'Item','type: type');
 }
@@ -35,7 +35,7 @@ sub test_type : Test(2) {
 sub test_item : Test(4) {
     my $self = shift;
 
-    my $ln = Prty::Sdoc::Line->new('* XXX',47);
+    my $ln = Prty::Sdoc::Line->new('* XXX',47,\'[testfile]');
     my ($type,$label,$indent,$text) = $ln->item;
     $self->is($type,'*','item: * type');
     $self->is($label,'*','item: * label');

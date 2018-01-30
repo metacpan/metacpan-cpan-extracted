@@ -1,5 +1,14 @@
 Revision history for App-jenkins-cli
 
+0.012   2018-01-28
+        Updating for release of version 0.012
+        Adding perl 5.26 to travis config (Ivan Wills)
+        Update date (Ivan Wills)
+        Documenting what ls is (Ivan Wills)
+        Better english (Ivan Wills)
+        Added mention of "change" command (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.011   2017-09-10
         Updating for release of version 0.011
         Added documentation for copy (Ivan Wills)

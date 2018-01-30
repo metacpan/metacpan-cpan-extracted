@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Mail/Box/FastScalar.pm
 lib/Mail/Box/FastScalar.pod
 lib/Mail/Box/Parser.pm

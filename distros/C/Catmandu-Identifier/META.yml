@@ -1,5 +1,5 @@
 ---
-abstract: 'Namespace for handling/fixing identifier, e.g. ISBN, ISSN'
+abstract: 'Namespace fixing around identifiers (for normalization, validation, etc.), e.g. ISBN, ISSN'
 author:
   - 'Vitali Peil'
 build_requires:
@@ -10,9 +10,9 @@ build_requires:
   Test::More: '1.001003'
   Test::Pod: '0'
 configure_requires:
-  Module::Build::Tiny: '0.007'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +20,12 @@ meta-spec:
 name: Catmandu-Identifier
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Business::ISBN: '2.010'
   Business::ISSN: '0.91'
@@ -39,8 +39,10 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Identifier/issues
   homepage: https://github.com/LibreCat/Catmandu-Identifier
   repository: https://github.com/LibreCat/Catmandu-Identifier.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'brian d foy <brian.d.foy@gmail.com>'
+  - 'Ere Maijala <ere.maijala@helsinki.fi>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

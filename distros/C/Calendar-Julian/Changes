@@ -1,5 +1,20 @@
 Revision history for Calendar::Julian
 
+0.07  Sun Jan 28 21:35:00 2018
+      - Added test script t/calendar-julian.t.
+
+0.06  Fri Jan 26 09:40:00 2018
+      - Using namespace::autoclean instead.
+
+0.05  Thu Jan 25 13:55:00 2018
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.04  Wed Jan 24 19:55:00 2018
+      - Added key 'provides' to the Makefile.PL script.
+
+0.03  Tue Jan 23 12:45:00 2018
+      - Added dependency on Date::Julian::Simple v0.05.
+
 0.02  Sun Jul 23 11:05:00 2017
       - Updated pod section "DESCRIPTION".
 

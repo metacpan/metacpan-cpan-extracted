@@ -1,6 +1,15 @@
 
 == Revision history for Perl extension Geo::WKT
 
+All modifications where created by Mark Overmeer, unless explicitly
+stated differently.
+
+version 0.96: Tue 23 Jan 17:38:48 CET 2018
+
+	Improvements:
+	- converted to GIT
+	- published on GitHUB
+
 version 0.95: Wed Jan 14 16:42:33 CET 2015
 
 	Fixes:

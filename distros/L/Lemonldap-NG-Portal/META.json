@@ -52,7 +52,7 @@
             "LWP" : "0",
             "LWP::Protocol::https" : "0",
             "Lasso" : "v2.3.0",
-            "Lemonldap::NG::Handler" : "v1.9.14",
+            "Lemonldap::NG::Handler" : "v1.9.15",
             "MIME::Lite" : "0",
             "Net::Facebook::Oauth2" : "0",
             "Net::OAuth" : "0",
@@ -71,7 +71,7 @@
             "CGI" : "3.08",
             "Clone" : "0",
             "HTML::Template" : "0",
-            "Lemonldap::NG::Common" : "v1.9.14",
+            "Lemonldap::NG::Common" : "v1.9.15",
             "Net::LDAP" : "0.38",
             "Regexp::Assemble" : "0",
             "Unicode::String" : "0"
@@ -79,6 +79,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.9.14",
+   "version" : "v1.9.15",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

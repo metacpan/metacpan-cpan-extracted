@@ -102,7 +102,7 @@ L<Mail::Message::Field::Full|Mail::Message::Field::Full> object.  This conversio
 way: the string which is produced by the original object is parsed
 again.  Usually, the string which is parsed is exactly the line (or lines)
 as found in the original input source, which is a good thing because Full
-fields are much more carefull with the actual content.
+fields are much more careful with the actual content.
 
 %options are passed to the constructor (see L<new()|Mail::Message::Field::Full/"METHODS">).  In any case, some
 extensions of this Full field class is returned.  It depends on which
@@ -416,7 +416,7 @@ a '?'.
 
 Encoding on text is slightly more complicated than encoding structured data,
 because it contains blanks.  Visible blanks have to be ignored between two
-encoded words in the text, but not when an encoded word follows or preceeds
+encoded words in the text, but not when an encoded word follows or precedes
 an unencoded word.  Phrases and comments are texts.
 
 =back
@@ -672,35 +672,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.005,
-built on December 22, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Message distribution version 3.006,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

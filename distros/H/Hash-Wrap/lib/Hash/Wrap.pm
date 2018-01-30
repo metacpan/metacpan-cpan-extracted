@@ -10,11 +10,13 @@ use warnings;
 use Scalar::Util qw[ blessed ];
 use MRO::Compat;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-use Hash::Wrap::Class;
+use Hash::Wrap::Base;
 
 our @EXPORT = qw[ wrap_hash ];
+
+my %REGISTRY;
 
 sub _croak {
 
@@ -22,72 +24,122 @@ sub _croak {
     Carp::croak( @_ );
 }
 
-sub _find_generator {
+sub _find_sub {
 
-    my ( $object, $target ) = @_;
+    my ( $object, $sub, $throw ) = @_;
 
+    $throw = 1 unless defined $throw;
     my $package = blessed( $object ) || $object;
-    my $name = "generate_$target";
 
-    ## no critic (ProhibitNoStrict)
-    no strict 'refs';
+    no strict 'refs';  ## no critic (ProhibitNoStrict)
+
 
     my $mro = mro::get_linear_isa( $package );
 
     for my $module ( @$mro ) {
-        my $candidate = *{"$module\::$name"}{SCALAR};
+        my $candidate = *{"$module\::$sub"}{SCALAR};
 
         return $$candidate if defined $candidate && 'CODE' eq ref $$candidate;
     }
 
-    _croak( "Unable to find generator for $target for class $package\n" );
-
+    $throw ? _croak( "Unable to find sub reference \$$sub for class $package\n" ) : return;
 }
 
 # this is called only if the method doesn't exist.
 sub _generate_accessor {
 
-    my ( $object, $method, $key ) = @_;
-
-    my $package = blessed( $object ) || $object;
-
-    my ( $signature, $body ) = map _find_generator( $object, $_ ),
-      qw[ signature body ];
-
-    my $sub
-      = "sub "
-      . $signature->( $object, $method, $key ) . "{\n"
-      . $body->( $object, $method, $key ) . "\n}\n";
-
-    ## no critic (ProhibitNoStrict)
-    no strict 'refs';
+    my ( $object, $package, $key ) = @_;
 
     # $code = eval "sub : lvalue { ... }" will invoke the sub as it is
-    # used as an rvalue inside of the eval.
+    # used as an lvalue inside of the eval, so set it equal to a variable
+    # to ensure it's an rvalue
 
-    ## no critic (ProhibitStringyEval)
-    my $coderef = eval qq[do { package $package; my \$coderef = $sub  }];
-    _croak( qq[error compiling accessor: $@\n $sub \n] )
+    my $code = q[
+        package <<PACKAGE>>;
+        use Scalar::Util ();
+
+       sub <<KEY>> <<SIGNATURE>> {
+         my $self = shift;
+
+         unless ( Scalar::Util::blessed( $self ) ) {
+           require Carp;
+           Carp::croak( qq[Can't locate object method "<<KEY>>" via package $self \n] );
+         }
+
+         unless ( <<VALIDATE>> ) {
+           require Carp;
+           Carp::croak( qq[Can't locate object method "<<KEY>>" via package @{[ Scalar::Util::blessed( $self ) ]} \n] );
+         }
+
+        $self->{q[<<KEY>>]} = $_[0] if @_;
+
+        return $self->{q[<<KEY>>]};
+       }
+       \&<<KEY>>;
+    ];
+
+    my %dict = (
+        package => $package,
+        key     => $key,
+    );
+
+    $dict{$_} = _find_sub( $object, "generate_$_" )->()
+      for  qw[ validate signature ];
+
+    my $coderef = _compile_from_tpl( \$code, \%dict );
+
+    _croak( qq[error compiling accessor: $@\n $code \n] )
       if $@;
 
-    *{$method} = $coderef;
+    return $coderef;
+}
 
-    return *{$method}{CODE};
+sub _generate_validate {
+
+    my ( $object, $package ) = @_;
+    my $code = q[
+        package <<PACKAGE>>;
+        our $validate_key = sub {
+            my ( $self, $key ) = @_;
+            return <<VALIDATE>>;
+        };
+    ];
+
+    _compile_from_tpl(
+        \$code,
+        {
+            package  => $package,
+            key      => '$key',
+            validate => _find_sub( $object, 'generate_validate' )->()
+        },
+      )
+      || _croak(
+        qq(error creating validate_key subroutine for @{[ ref $object ]}: $@\n $code )
+      );
 }
 
 sub _autoload {
 
     my ( $method, $object ) = @_;
 
-    ( my $key = $method ) =~ s/.*:://;
+    my ( $package, $key ) = $method =~ /(.*)::(.*)/;
 
-    _croak( qq[Can't locate class method "$key" via package @{[ ref $object]} \n] )
-      unless  Scalar::Util::blessed( $object );
+    _croak(
+        qq[Can't locate class method "$key" via package @{[ ref $object]} \n] )
+      unless Scalar::Util::blessed( $object );
 
-    _croak( qq[Can't locate object method "$key" via package @{[ ref $object]} \n] )
-      unless exists $object->{$key};
+    # we're here because there's no slot in the hash for $key.
+    #
+    my $validate = _find_sub( $object, 'validate_key', 0 );
 
-    _generate_accessor( $object, $method, $key );
+    $validate = _generate_validate( $object, $package )
+      if ! defined $validate;
+
+    _croak(
+        qq[Can't locate object method "$key" via package @{[ ref $object]} \n] )
+      unless $validate->( $object, $key );
+
+    _generate_accessor( $object, $package, $key );
 }
 
 
@@ -102,44 +154,39 @@ sub import {
 
     for my $args ( @imports ) {
 
-        if ( ! ref $args ) {
+        if ( !ref $args ) {
             _croak( "$args is not exported by ", __PACKAGE__, "\n" )
               unless grep { /$args/ } @EXPORT;
 
             $args = { -as => $args };
-         }
+        }
 
         elsif ( 'HASH' ne ref $args ) {
-            _croak( "argument to ", __PACKAGE__, "::import must be string or hash\n")
-              unless grep { /$args/ } @EXPORT;
+            _croak(
+                "argument to ",
+                __PACKAGE__,
+                "::import must be string or hash\n"
+            ) unless grep { /$args/ } @EXPORT;
+        }
+        else {
+            # make a copy as it gets modified later on
+            $args = { %$args };
         }
 
         my $name = exists $args->{-as} ? delete $args->{-as} : 'wrap_hash';
 
-        my $sub = _generate_wrap_hash( $me, $name, { %$args } );
+        my $sub = _generate_wrap_hash( $me, $name, {%$args} );
 
-        no strict 'refs'; ## no critic
+        no strict 'refs';    ## no critic (ProhibitNoStrict)
         *{"$caller\::$name"} = $sub;
     }
 
-}
-
-# default constructor
-sub _wrap_hash ($) { ## no critic (ProhibitSubroutinePrototypes)
-    my $hash = shift;
-
-    _croak( "argument to wrap_hash must be a hashref\n" )
-      unless 'HASH' eq ref $hash;
-
-    bless $hash, 'Hash::Wrap::Class';
 }
 
 sub _generate_wrap_hash {
 
     my ( $me ) = shift;
     my ( $name, $args ) = @_;
-
-    return \&_wrap_hash unless keys %$args;
 
     # closure for user provided clone sub
     my $clone;
@@ -171,76 +218,159 @@ sub _generate_wrap_hash {
     }
 
     my $class;
-    if ( defined $args->{-class} ) {
 
+    if ( defined $args->{-class} && !$args->{-create} ) {
         $class = $args->{-class};
 
-        if ( $args->{-create} ) {
+        _croak( qq[class ($class) is not a subclass of Hash::Wrap::Base\n] )
+          unless $class->isa( 'Hash::Wrap::Base' );
 
-            my $parent = $args->{-lvalue} ? 'Hash::Wrap::Base::LValue' : 'Hash::Wrap::Base';
-
-            ## no critic (ProhibitStringyEval)
-            eval( qq[ { package $class; use parent '$parent'; } 1; ] )
-              or _croak( "error generating on-the-fly class $class: $@" );
-
-            delete $args->{-create};
+        if ( $args->{-lvalue} ) {
+            my $signature = _find_sub( $class, 'generate_signature' )->();
+            _croak( "signature generator for $class does not add ':lvalue'\n" )
+              unless defined $signature && $signature =~ /:\s*lvalue/;
         }
-        elsif ( !$class->isa( 'Hash::Wrap::Base' ) ) {
-            _croak(
-                qq[class ($class) is not a subclass of Hash::Wrap::Base\n]
-            );
-        }
-        else{
-
-            if ( $args->{-lvalue} ) {
-                my $signature = _find_generator( $class, 'signature' )->();
-                _croak( "signature generator for $class does not add ':lvalue'\n" )
-                  unless $signature =~ /:\s*lvalue/;
-            }
-        }
-
-        delete $args->{-class};
-    }
-    elsif ( $args->{-lvalue} ) {
-        require Hash::Wrap::Class::LValue;
-        $class = 'Hash::Wrap::Class::LValue';
     }
     else {
-        require Hash::Wrap::Class;
-        $class = 'Hash::Wrap::Class';
+        $class = _build_class( $args );
     }
 
-    my $construct = 'my $obj = '
-      . (
-        $class->can( 'new' )
-        ? qq[$class->new(\$hash);]
-        : qq[bless \$hash, '$class';]
-      );
+    my $construct = 'my $obj = ' . do {
+
+        if ( $class->can( 'new' ) ) {
+            qq[$class->new(\$hash);];
+        }
+        else {
+            qq[bless \$hash, '$class';];
+        }
+
+    };
 
     #<<< no tidy
-    my $code =
-      join( "\n",
-            q[sub ($) {],
-            q[my $hash = shift;],
-            qq[if ( ! 'HASH' eq ref \$hash ) { _croak( "argument to $name must be a hashref\n" ) }],
-            @pre_code,
-            $construct,
-            @post_code,
-            q[return $obj;],
-            q[}],
-          );
+    my $code = qq[
+    sub (\$) {
+      my \$hash = shift;
+      if ( ! 'HASH' eq ref \$hash ) { _croak( "argument to $name must be a hashref\n" ) }
+      <<PRECODE>>
+      <<CONSTRUCT>>
+      <<POSTCODE>>
+      return \$obj;
+      };
+    ];
     #>>>
 
-    # easier to remove it here than in the code, as it is referenced
-    # multiple times
-    delete $args->{-lvalue};
+    # clean out the rest of the known attributes
+    delete @{$args}{qw[ -lvalue -create -class -undef ]};
+
     if ( keys %$args ) {
-        _croak( "unknown options passed to ", __PACKAGE__, "::import: ", join( ', ', keys %$args ), "\n" );
+        _croak( "unknown options passed to ",
+            __PACKAGE__, "::import: ", join( ', ', keys %$args ), "\n" );
     }
 
-    ## no critic (ProhibitStringyEval)
-    return eval( $code ) || _croak( "error generating wrap_hash subroutine: $@" );
+    _interpolate(
+        \$code,
+        {
+            precode   => join( "\n", @pre_code ),
+            construct => $construct,
+            postcode  => join( "\n", @post_code ),
+        },
+    );
 
+    return eval( $code )    ## no critic (ProhibitStringyEval)
+      || _croak( "error generating wrap_hash subroutine: $@\n$code" );
+
+}
+
+# our bizarre little role emulator.  except our roles have no methods, just lexical subs.  whee!
+sub _build_class {
+
+    my $attr = shift;
+
+    my $class = $attr->{-class};
+
+    if ( !defined $class ) {
+
+        my @class = map { ( my $attr = $_ ) =~ s/-//; $attr } sort keys %$attr;
+
+        $class = join '::', 'Hash::Wrap::Class', @class;
+    }
+
+    return $class if $REGISTRY{$class};
+
+    my %code = (
+        class         => $class,
+        signature     => '',
+        body          => '',
+        autoload_attr => '',
+        validate      => '',
+    );
+
+    if ( $attr->{-lvalue} ) {
+
+        $code{autoload_attr} = ': lvalue';
+        $code{signature} = 'our $generate_signature = sub { q[: lvalue]; };';
+    }
+
+    if ( $attr->{-undef} ) {
+        $code{validate} = q[ our $generate_validate = sub { '1' }; ];
+    }
+
+    my $class_template = <<'END';
+package <<CLASS>>;
+
+use Scalar::Util ();
+
+our @ISA = ( 'Hash::Wrap::Base' );
+
+<<SIGNATURE>>
+
+<<BODY>>
+
+<<VALIDATE>>
+
+our $AUTOLOAD;
+sub AUTOLOAD <<AUTOLOAD_ATTR>> {
+    goto &{ Hash::Wrap::_autoload( $AUTOLOAD, $_[0] ) };
+}
+
+1;
+END
+
+    _compile_from_tpl( \$class_template, \%code )
+      or _croak( "error generating class $class: $@\n$class_template" );
+
+    $REGISTRY{$class}++;
+
+    return $class;
+}
+
+# can't handle closures; should use Sub::Quote
+sub _compile_from_tpl {
+    my ( $code, $dict ) = @_;
+
+    _interpolate( $code, $dict );
+    eval( $$code );  ## no critic (ProhibitStringyEval)
+}
+
+sub _interpolate {
+
+    my ( $tpl, $dict, $work ) = @_;
+
+    $work = { loop => {} } unless defined $work;
+
+    $$tpl =~ s{ \<\<(\w+)\>\>
+              }{
+                  my $key = lc $1;
+                  my $v = $dict->{$key};
+                  if ( defined $v ) {
+                      _croak( "circular interpolation loop detected for $key\n" )
+                        if $work->{loop}{$key}++;
+                      _interpolate( \$v, $dict, $work );
+                      --$work->{loop}{$key};
+                 }
+                 $v;
+              }gex;
+    return;
 }
 
 
@@ -264,7 +394,7 @@ Hash::Wrap - create lightweight on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -288,8 +418,10 @@ version 0.03
 
 This module provides constructors which create light-weight objects
 from existing hashes, allowing access to hash elements via methods
-(and thus avoiding typos). Attempting to access a non-existent element
-via a method will result in an exception.
+(and thus avoiding typos). By default, attempting to access a
+non-existent element via a method will result in an exception, but
+this may be modified so that the undefined value is returned (see
+L</-undef>).
 
 Hash elements may be added to or deleted from the object after
 instantiation using the standard Perl hash operations, and changes
@@ -314,6 +446,12 @@ The methods act as both accessors and setters, e.g.
 
 Only hash keys which are legal method names will be accessible via
 object methods.
+
+Accessors may optionally be used as lvalues, e.g.,
+
+  $obj->a = 3;
+
+in Perl version 5.16 or later. See L</-lvalue>.
 
 =head2 Object construction and constructor customization
 
@@ -367,6 +505,13 @@ is used. If a coderef, it will be called as
 
 By default, the object uses the hash directly.
 
+=item C<-undef> => I<boolean>
+
+Normally an attempt to use an accessor for an non-existent key will
+result in an exception.  The C<-undef> option causes the accessor
+to return C<undef> instead.  It does I<not> create an element in
+the hash for the key.
+
 =item C<-lvalue> => I<boolean>
 
 If true, the accessors will be lvalue routines, e.g. they can
@@ -377,7 +522,7 @@ change the underlying hash value by assigning to them:
 The hash entry must already exist before using the accessor in
 this manner, or it will throw an exception.
 
-This is only available on Perl 5.16 and higher.
+This is only available on Perl version 5.16 and later.
 
 =back
 
@@ -627,8 +772,10 @@ __END__
 #pod
 #pod This module provides constructors which create light-weight objects
 #pod from existing hashes, allowing access to hash elements via methods
-#pod (and thus avoiding typos). Attempting to access a non-existent element
-#pod via a method will result in an exception.
+#pod (and thus avoiding typos). By default, attempting to access a
+#pod non-existent element via a method will result in an exception, but
+#pod this may be modified so that the undefined value is returned (see
+#pod L</-undef>).
 #pod
 #pod Hash elements may be added to or deleted from the object after
 #pod instantiation using the standard Perl hash operations, and changes
@@ -654,6 +801,13 @@ __END__
 #pod
 #pod Only hash keys which are legal method names will be accessible via
 #pod object methods.
+#pod
+#pod Accessors may optionally be used as lvalues, e.g.,
+#pod
+#pod   $obj->a = 3;
+#pod
+#pod in Perl version 5.16 or later. See L</-lvalue>.
+#pod
 #pod
 #pod =head2 Object construction and constructor customization
 #pod
@@ -707,6 +861,13 @@ __END__
 #pod
 #pod By default, the object uses the hash directly.
 #pod
+#pod =item C<-undef> => I<boolean>
+#pod
+#pod Normally an attempt to use an accessor for an non-existent key will
+#pod result in an exception.  The C<-undef> option causes the accessor
+#pod to return C<undef> instead.  It does I<not> create an element in
+#pod the hash for the key.
+#pod
 #pod =item C<-lvalue> => I<boolean>
 #pod
 #pod If true, the accessors will be lvalue routines, e.g. they can
@@ -717,7 +878,7 @@ __END__
 #pod The hash entry must already exist before using the accessor in
 #pod this manner, or it will throw an exception.
 #pod
-#pod This is only available on Perl 5.16 and higher.
+#pod This is only available on Perl version 5.16 and later.
 #pod
 #pod =back
 #pod
@@ -912,5 +1073,3 @@ __END__
 #pod =back
 #pod
 #pod =back
-#pod
-#pod

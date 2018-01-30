@@ -33,22 +33,19 @@ verify the interactions with your mocks.
 =cut
 
 package Test::Mockify;
-use Test::Mockify::Tools qw ( Error ExistsMethod IsValid LoadPackage Isa );
-use Test::Mockify::TypeTests qw ( IsInteger IsFloat IsString IsArrayReference IsHashReference IsObjectReference );
+use Test::Mockify::Tools qw ( Error ExistsMethod LoadPackage );
+use Test::Mockify::TypeTests qw ( IsString IsArrayReference);
 use Test::Mockify::MethodCallCounter;
 use Test::Mockify::Method;
 use Test::Mockify::MethodSpy;
 use Test::MockObject::Extends;
 use Test::Mockify::CompatibilityTools qw (MigrateOldMatchers);
-use Data::Dumper;
 use Scalar::Util qw( blessed );
-use Data::Compare;
-
-use experimental 'switch';
+use Sub::Override;
 
 use strict;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 sub new {
     my $class = shift;
@@ -68,9 +65,9 @@ sub new {
 #----------------------------------------------------------------------------------------
 sub _mockedModulePath {
     my $self = shift;
-    my ($ModulPath) = @_;
-    return $self->{'MockedModulePath'} unless ($ModulPath);
-    $self->{'MockedModulePath'} = $ModulPath;
+    my ($ModulePath) = @_;
+    return $self->{'MockedModulePath'} unless ($ModulePath);
+    $self->{'MockedModulePath'} = $ModulePath;
 }
 #----------------------------------------------------------------------------------------
 sub _mockedSelf {
@@ -87,6 +84,8 @@ sub _initMockedModule {
     $self->_mockedSelf()->{'__isMockified'} = 1;
     $self->_addGetParameterFromMockifyCall();
 
+    $self->{'override'} = Sub::Override->new();
+    $self->{'IsStaticMockStore'} = undef;
     return;
 }
 
@@ -112,7 +111,7 @@ sub getMockObject {
 
 =head2 mock
 
-This is place where the mocked methods are defined. The method also proves that the method you like to mock actually exists.
+This is the place where the mocked methods are defined. The method also proves that the method you like to mock actually exists.
 
 =head3 synopsis
 
@@ -144,7 +143,7 @@ For possible return types please look in L<Test::Mockify::ReturnValue>
 sub mock {
     my $self = shift;
     my @Parameters = @_;
-    
+
     my $ParameterAmount = scalar @Parameters;
     if($ParameterAmount == 1 && IsString($Parameters[0]) ){
         return $self->_addMockWithMethod($Parameters[0]);
@@ -163,7 +162,64 @@ sub mock {
     }
     return;
 }
+#----------------------------------------------------------------------------------------
 =pod
+
+=head2 mockStatic
+
+Sometimes it is not possible to inject the dependencies from the outside. This is especially the case when the package uses imports of static functions.
+C<mockStatic> provides the possibility to mock static functions inside the mock/sut.
+
+  package SUT;
+  use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
+  sub pullCylinder {
+      shift;
+      if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
+          return 1;
+      }else{
+          return 0;
+      }
+  }
+  1;
+
+
+In the Test it can be mocked
+
+  package Test_SUT;
+  my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
+  $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('white'))->thenReturn(1);
+  $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('black'))->thenReturn(0);
+
+  my $SUT = $MockObjectBuilder->getMockObject();
+  is($SUT->pullCylinder(), 1);
+  1;
+
+
+It can be mixed with normal C<spy> and C<mock>
+
+=head4 Thx
+to @dbucky for this amazing idea
+
+=cut
+sub mockStatic {
+    my $self = shift;
+    my @Parameters = @_;
+
+    my $ParameterAmount = scalar @Parameters;
+    if($ParameterAmount == 1 && IsString($Parameters[0])){
+        if( $Parameters[0] =~ /.*::.*/x ){
+            $self->{'IsStaticMockStore'}{$Parameters[0]} = 1;
+            return $self->_addMockWithMethod($Parameters[0]);
+        }else{
+            Error("The function name needs to be with full path. e.g. 'Path::To::Your::$Parameters[0]' instead of only '$Parameters[0]'");
+        }
+    }else{
+        Error('The Parameter needs to be defined and a String. e.g. Path::To::Your::Function');
+    }
+
+}
+=pod
+
 
 =head2 spy
 
@@ -205,7 +261,54 @@ sub spy {
         return $PointerOriginalMethod->($self->_mockedSelf(), @_);
     });
 }
+#----------------------------------------------------------------------------------------
+=pod
 
+=head2 spyStatic
+
+Provides the possibility to spy static functions inside the mock/sut.
+
+  package SUT;
+  use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
+  sub pullCylinder {
+      shift;
+      if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
+          return 1;
+      }else{
+          return 0;
+      }
+  }
+  1;
+
+In the Test it can be mocked
+
+  package Test_SUT;
+  my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
+  $MockObjectBuilder->spyStatic('Magic::Tools::Rabbit')->whenAny();
+  my $SUT = $MockObjectBuilder->getMockObject();
+
+  $SUT->pullCylinder();
+  is(GetCallCount($SUT, 'pullCylinder), 1);
+
+  1;
+
+It can be mixed with normal C<spy> and C<mock>. For more options see, C<mockStatic>
+
+=cut
+sub spyStatic {
+    my $self = shift;
+    my ($MethodName) = @_;
+    if( $MethodName =~ /.*::.*/x ){
+        $self->{'IsStaticMockStore'}{$MethodName} = 1;
+            my $PointerOriginalMethod = \&{$MethodName};
+            #In order to have the current object available in the parameter list, it has to be injected here.
+            return $self->_addMockWithMethodSpy($MethodName, sub {
+                return $PointerOriginalMethod->($self->_mockedSelf(), @_);
+            });
+    }else{
+        Error("The function name needs to be with full path. e.g. 'Path::To::Your::$MethodName' instead of only '$MethodName'");
+    }
+}
 #----------------------------------------------------------------------------------------
 =pod
 
@@ -276,19 +379,50 @@ sub addMock {
 
     return;
 }
-#-------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
+sub _addStaticMock {
+    my $self = shift;
+    my ( $MethodName, $Method) = @_;
+
+    ExistsMethod( $self->_mockedModulePath(), $MethodName );
+    $self->_mockedSelf()->{'__MethodCallCounter'}->addMethod( $MethodName );
+    if(not $self->{'MethodStore'}{$MethodName}){
+        $self->{'MethodStore'}{$MethodName} //= $Method;
+        my $MockedMethodBody = sub {
+            $self->_mockedSelf()->{'__MethodCallCounter'}->increment( $MethodName );
+            my @MockedParameters = @_;
+            $self->_storeParameters( $MethodName, $self->_mockedSelf(), \@MockedParameters );
+            return $self->{'MethodStore'}{$MethodName}->call(@MockedParameters);
+        };
+        # mock with full path
+        $self->{'override'}->replace($MethodName, $MockedMethodBody);
+        my ($FunctionName) = $MethodName =~ /.*::([^:]+$)/x;
+        # mock for imported method(it will complain if you did't imported it)
+        $self->{'override'}->replace($self->_mockedModulePath().'::'.$FunctionName, $MockedMethodBody);
+    }
+    return $self->{'MethodStore'}{$MethodName};
+}
+#----------------------------------------------------------------------------------------
 sub _addMockWithMethod {
     my $self = shift;
     my ( $MethodName ) = @_;
     $self->_testMockTypeUsage($MethodName);
-    return $self->_addMock($MethodName, Test::Mockify::Method->new());
+    if($self->{'IsStaticMockStore'}{$MethodName}){
+        return $self->_addStaticMock($MethodName, Test::Mockify::Method->new());
+    }else{
+        return $self->_addMock($MethodName, Test::Mockify::Method->new());
+    }
 }
-#-------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------
 sub _addMockWithMethodSpy {
     my $self = shift;
     my ( $MethodName, $PointerOriginalMethod ) = @_;
     $self->_testMockTypeUsage($MethodName);
-    return $self->_addMock($MethodName, Test::Mockify::MethodSpy->new($PointerOriginalMethod));
+    if($self->{'IsStaticMockStore'}{$MethodName}){
+        return $self->_addStaticMock($MethodName, Test::Mockify::MethodSpy->new($PointerOriginalMethod));
+    }else{
+        return $self->_addMock($MethodName, Test::Mockify::MethodSpy->new($PointerOriginalMethod));
+    }
 }
 #-------------------------------------------------------------------------------------
 sub _addMock {

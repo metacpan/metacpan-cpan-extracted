@@ -5,10 +5,24 @@ use strict;
 use warnings;
 
 # Modules.
-use Error::Pure::Die qw(err);
+use English qw(-no_match_vars);
+use Error::Pure qw(err);
+use Error::Pure::Utils qw(err_msg);
 
-# Error.
-err '1', '2', '3';
+# Error in eval.
+eval {
+        err 'Error', 'item1', 'item2', 'item3', 'item4';
+};
+if ($EVAL_ERROR) {
+        my @err_msg = err_msg();
+        foreach my $item (@err_msg) {
+                print "$item\n";
+        }
+}
 
 # Output:
-# 1 at example2.pl line 9.
+# Error
+# item1
+# item2
+# item3
+# item4

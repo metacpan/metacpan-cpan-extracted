@@ -33,6 +33,8 @@ distribution.
 
 =over 4
 
+=item $obj-E<gt>B<new>(%options)
+
 =item Geo::Shape-E<gt>B<new>(%options)
 
 Create a new object.
@@ -67,7 +69,7 @@ Returns the proj4 object which handles the projection.
 
 =over 4
 
-=item $obj-E<gt>B<in>(<$label|'utm'>)
+=item $obj-E<gt>B<in>( <$label|'utm'> )
 
 The coordinates of this point in a certain projection, refered to with
 the $label.  The projection is defined with L<new()|Geo::Shape/"Constructors">.  When simply
@@ -121,15 +123,15 @@ the center of the bounding box.  The values is cached, once computed.
 Be warned that the central point in one projection system may be quite
 different from the central point in some other projectionsystem .
 
-=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item $obj-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
-=item Geo::Shape-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item Geo::Shape-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
 Returns a L<Geo::Line|Geo::Line> which describes the outer bounds of the
 object called upon, counter-clockwise and left-bottom first.  As class
 method, you need to specify the limits and the PROJection.
 
-=item $obj-E<gt>B<distance>($object, [$unit])
+=item $obj-E<gt>B<distance>( $object, [$unit] )
 
 Calculate the distance between this object and some other object.
 For many combinations of objects this is not supported or only
@@ -213,27 +215,14 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.96,
-built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>,
-L</Math::Polygon>,
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Format::Envisat>, and
-L</Geo::Format::Landsat>.
-
-Please post questions or ideas to the mailinglist at
-F<http://geo-perl@list.hut.fi>
+This module is part of Geo-Point distribution version 0.97,
+built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

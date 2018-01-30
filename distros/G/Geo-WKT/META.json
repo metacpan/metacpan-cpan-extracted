@@ -1,16 +1,17 @@
 {
-   "abstract" : "Geometry in wellknown text format",
+   "abstract" : "Geometry in Well-Known Text format",
    "author" : [
       "Mark Overmeer"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-WKT",
    "no_index" : {
@@ -38,5 +39,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.95"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-Geo-WKT.git",
+         "web" : "https://github.com/markov2/perl5-Geo-WKT"
+      }
+   },
+   "version" : "0.96",
+   "x_homepage" : "http://perl.overmeer.net/CPAN/",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

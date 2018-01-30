@@ -10,9 +10,8 @@ use utf8;
 use Net::LDAP;
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use Lemonldap::NG::Common::Conf::Serializer;
-use Encode;
 
-our $VERSION = '1.9.5';
+our $VERSION = '1.9.15';
 
 BEGIN {
     *Lemonldap::NG::Common::Conf::ldap = \&ldap;
@@ -94,6 +93,7 @@ sub ldap {
         \@servers,
         onerror => undef,
         ( $self->{ldapPort} ? ( port => $self->{ldapPort} ) : () ),
+        raw => qr/(?i:^jpegPhoto|;binary)/,
     );
 
     unless ($ldap) {
@@ -161,7 +161,6 @@ sub store {
     # Store values as {key}value
     my @confValues;
     while ( my ( $k, $v ) = each(%$fields) ) {
-        $v = encodeLdapValue($v);
         push @confValues, "{$k}$v";
     }
 
@@ -220,7 +219,6 @@ sub load {
     my @confValues = $entry->get_value( $self->{ldapAttributeContent} );
     foreach (@confValues) {
         my ( $k, $v ) = ( $_ =~ /\{(.*?)\}(.*)/sm );
-        $v = decodeLdapValue($v);
         if ($fields) {
             $f->{$k} = $v if ( grep { $_ eq $k } @$fields );
         }
@@ -256,32 +254,6 @@ sub logError {
         "LDAP error "
       . $ldap_operation->code . ": "
       . $ldap_operation->error . " \n";
-}
-
-# Helpers to have UTF-8 values in LDAP
-# and default encoding in configuration object
-sub encodeLdapValue {
-    my $value = shift;
-
-    eval {
-        my $safevalue = $value;
-        Encode::from_to( $safevalue, "utf8", "iso-8859-1", Encode::FB_CROAK );
-    };
-    if ($@) {
-        Encode::from_to( $value, "iso-8859-1", "utf8", Encode::FB_CROAK );
-    }
-
-    return $value;
-
-}
-
-sub decodeLdapValue {
-    my $value = shift;
-
-    Encode::from_to( $value, "utf8", "iso-8859-1", Encode::FB_CROAK );
-
-    return $value;
-
 }
 
 1;

@@ -9,14 +9,14 @@ Template::Plugin::Gettext - Gettext Support For the Template Toolkit Version 2
 Load the plug-in in templates:
 
     [% USE Gettext('com.textdomain.my', 'fr', 'utf-8', 'DIRECTORIES'...) %]
-    [% Gettext.gettext('Hello, world!) %]
+    [% Gettext.gettext('Hello, world!') %]
 
     [% 'Hello, world!' | gettext %]
 
 Or alias "Gettext":
 
     [% USE gtx = Gettext('com.textdomain.my', 'fr', 'utf-8', 'DIRECTORIES'...) %]
-    [% gtx.gettext('Hello, world!) %]
+    [% gtx.gettext('Hello, world!') %]
 
 Use method invocations:
 

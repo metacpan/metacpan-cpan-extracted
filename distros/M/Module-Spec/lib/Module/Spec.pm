@@ -1,14 +1,14 @@
 
 package Module::Spec;
-$Module::Spec::VERSION = '0.6.0';
+$Module::Spec::VERSION = '0.7.0';
 # ABSTRACT: Load modules based on specifications
 use 5.012;
 
 # use warnings;
 
 BEGIN {
-    require Module::Spec::V1;
-    *croak = \&Module::Spec::V1::croak;
+    require Module::Spec::V0;
+    *croak = \&Module::Spec::V0::croak;
 }
 
 sub new {
@@ -17,7 +17,7 @@ sub new {
     croak qq{What version?} unless exists $args{ver};
 
     my $v = $args{ver};
-    unless ( defined $v && $v =~ /\A[0-9]+\z/ ) {
+    unless ( defined $v && $v =~ /\A[1-9][0-9]*\z/ ) {
         croak qq{Invalid version ($v)} if defined $v;
         croak qq{Undefined version};
     }
@@ -34,7 +34,7 @@ sub new {
 #pod
 #pod     use Module::Spec;
 #pod
-#pod     my $ms = Module::Spec->new(ver => 1);
+#pod     my $ms = Module::Spec->new(ver => 2);
 #pod     $ms->need_module('Mango~2.3');
 #pod
 #pod =head1 DESCRIPTION
@@ -55,13 +55,13 @@ Module::Spec - Load modules based on specifications
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 
     use Module::Spec;
 
-    my $ms = Module::Spec->new(ver => 1);
+    my $ms = Module::Spec->new(ver => 2);
     $ms->need_module('Mango~2.3');
 
 =head1 DESCRIPTION

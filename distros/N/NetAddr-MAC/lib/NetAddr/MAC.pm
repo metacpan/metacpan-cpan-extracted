@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '0.95';
+$NetAddr::MAC::VERSION = '0.96';
 
 use Carp qw( croak );
 use List::Util qw( first );
@@ -956,7 +956,7 @@ NetAddr::MAC - MAC address functions and object
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 
@@ -974,7 +974,7 @@ version 0.95
  print "Multicast\n" if $mac->is_multicast;
  print "Broadcast\n" if $mac->is_broadcast;
 
- print "Locally Administerd\n" if $mac->is_local;
+ print "Locally Administered\n" if $mac->is_local;
  print "Universally Administered\n" if $mac->is_universal;
 
  print 'Basic Format: ',$mac->as_basic,"\n";
@@ -1216,7 +1216,7 @@ B<1,length> leading where I<length> is the number of hex pairs (i.e. 6 for EUI48
 
 Returns the mac address normalized as a hexadecimal string that is 0 padded and with B<.> delimiting every 2nd octet
 (i.e. after every 4th character)
-.
+
  0011.22aa.bbcc
 
 =head2 as_ieee
@@ -1536,7 +1536,7 @@ Dean Hamstead <dean@bytefoundry.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2018 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

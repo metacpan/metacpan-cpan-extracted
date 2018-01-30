@@ -8,7 +8,7 @@ use Moo;
 
 with 'Catmandu::Importer';
 
-use constant BASE_URL => 'http://www.ebi.ac.uk/europepmc/webservices/rest';
+use constant BASE_URL => 'https://www.ebi.ac.uk/europepmc/webservices/rest';
 
 has base   => ( is => 'ro', default => sub { return BASE_URL; } );
 has source => ( is => 'ro', default => sub { return "MED"; } );
@@ -68,7 +68,7 @@ sub _call {
 
     my $url = $self->base;
     if ( $self->module eq 'search' ) {
-        $url .= '/search/query=' . $self->query;
+        $url .= '/search?query=' . $self->query;
     }
     else {
         $url .= '/' . $self->source . '/' . $self->pmid . '/' . $self->module;

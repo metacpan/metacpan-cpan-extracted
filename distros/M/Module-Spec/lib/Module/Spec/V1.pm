@@ -1,12 +1,22 @@
 
 package Module::Spec::V1;
-$Module::Spec::V1::VERSION = '0.6.0';
-# ABSTRACT: Load modules based on specifications V1
+$Module::Spec::V1::VERSION = '0.7.0';
+# ABSTRACT: Load modules based on V1 specifications
 use 5.012;
 
 # use warnings;
 
 our @EXPORT_OK = qw(need_module try_module);
+
+BEGIN {
+    require Module::Spec::V0;
+    *_generate_code  = \&Module::Spec::V0::_generate_code;
+    *_opts           = \&Module::Spec::V0::_opts;
+    *_need_module    = \&Module::Spec::V0::_need_module;
+    *_require_module = \&Module::Spec::V0::_require_module;
+    *_try_module     = \&Module::Spec::V0::_try_module;
+    *croak           = \&Module::Spec::V0::croak;
+}
 
 state $MODULE_RE  = qr/ [^\W\d]\w*+ (?: :: \w++ )*+ /x;
 state $VERSION_RE = qr/ v?+ (?>\d+) (?: [\._] \d+ )*+ /x;
@@ -22,29 +32,27 @@ sub parse_module_spec {
 }
 
 sub _parse_module_spec {
-    if ( $_[0] =~ m/\A ($MODULE_RE) (?: ~ ($VERSION_RE) )? \z/x ) {
-        my ( $m, $v ) = ( $1, $2 );    # Make a copy
-        return ($m) unless $v;
-        return ( $m, _parse_v_spec($v) );
+    if ( $_[0] =~ m/\A $MODULE_RE \z/x ) {
+        return $_[0];
     }
     elsif ( ref $_[0] eq 'ARRAY' ) {
 
         croak(qq{Should contain one or two entries})
           unless @{ $_[0] } && @{ $_[0] } <= 2;
         my $m = $_[0][0];
-        my ( $m1, @v1 ) = _parse_module_spec($m)
+        $m =~ m/\A $MODULE_RE \z/x
           or croak(qq{Can't parse $m});
-        return ( $m1, @v1 ) if @{ $_[0] } == 1;
+        return ($m) if @{ $_[0] } == 1;
         my $v = $_[0][1];
-        return ( $m1, _parse_version_spec($v) );
+        return ( $m, _parse_version_spec($v) );
     }
     elsif ( ref $_[0] eq 'HASH' ) {
 
         croak(qq{Should contain a single pair}) unless keys %{ $_[0] } == 1;
         my ( $m, $v ) = %{ $_[0] };
-        my ($m1) = _parse_module_spec($m)
+        $m =~ m/\A $MODULE_RE \z/x
           or croak(qq{Can't parse $m});
-        return ( $m1, _parse_version_spec($v) );
+        return ( $m, _parse_version_spec($v) );
     }
     return;
 }
@@ -68,54 +76,17 @@ sub need_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    _require_module($m) if $opts->{REQUIRE} // $opts->{require}->( $m, @v );
-    $m->VERSION(@v) if @v;
-    return wantarray ? ( $m, $m->VERSION ) : $m;
+    return _need_module( $opts, $m, @v );
 }
 
 # generate_code($spec, \%opts);
 sub generate_code {
     my $opts = @_ > 1 ? pop : {};
-    $opts->{context} ||= 'void';
-    $opts->{indent}  ||= ' ' x 4;
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq(Can't parse $_[-1]}));
-    my $code = "require $m;\n";
-    $code .= "$m->VERSION('$v[0]');\n" if @v;
-
-    if ( $opts->{context} eq 'void' ) {
-
-        # nothing to do
-    }
-    elsif ( $opts->{context} eq 'scalar' ) {
-        $code .= "'$m';\n";
-    }
-    elsif ( $opts->{context} eq 'list' ) {
-        $code .= "('$m', '$m'->VERSION);\n";
-    }
-
-    if ( $opts->{wrap} ) {
-        $code =~ s/^/$opts->{indent}/mg if $opts->{indent};
-        $code = "do {\n$code};\n";
-    }
-
-    return $code;
+    return _generate_code( $opts, $m, @v );
 }
-
-sub _opts {
-    my %opts = ( require => 1, %{ shift // {} } );
-
-    $opts{REQUIRE} = !!delete $opts{require}
-      unless ref $opts{require} eq 'CODE';
-
-    return \%opts;
-}
-
-# Diagnostics:
-#  Can't locate Foo.pm in @INC (you may need to install the Foo module) (@INC contains:
-#  Carp version 2.3 required--this is only version 1.40 at
-#  Foo2 does not define $Foo2::VERSION--version check failed at
 
 # try_module($spec)
 # try_module($spec, \%opts)
@@ -124,35 +95,37 @@ sub try_module {
 
     my ( $m, @v ) = _parse_module_spec( $_[-1] )
       or croak(qq{Can't parse $_[-1]});
-    if ( $opts->{REQUIRE} // $opts->{require}->( $m, @v ) ) {
-        eval { _require_module($m) };
-        if ($@) {
-            my $err = $@;
-            $err =~ /\ACan't locate\b/ ? return : die $err;
-        }
-    }
-    if (@v) {
-        eval { $m->VERSION(@v) };
-        if ($@) {
-            my $err = $@;
-            $err =~ /\A\S+ version \S+ required\b/ ? return : die $err;
-        }
-    }
-    return wantarray ? ( $m, $m->VERSION ) : $m;
+    return _try_module( $opts, $m, @v );
 }
 
-# TODO need_modules($spec1, $spec1)
-
-sub _require_module {
-    ( my $f = "$_[0].pm" ) =~ s{::}{/}g;
-    require $f;
+sub need_modules {
+    my $op = $_[0] =~ /\A-/ ? shift : '-all';
+    state $SUB_FOR = {
+        '-all'   => \&_need_all_modules,
+        '-any'   => \&_need_any_modules,
+        '-oneof' => \&_need_first
+    };
+    croak(qq{Unknown operator "$op"}) unless my $sub = $SUB_FOR->{$op};
+    if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
+        @_ = map { [ $_ => $_[0]{$_} ] } keys %{ $_[0] };
+    }
+    goto &$sub;
 }
 
-sub croak {
-    require Carp;
-    no warnings 'redefine';
-    *croak = \&Carp::croak;
-    goto &croak;
+sub _need_all_modules {
+    map { scalar need_module($_) } @_;
+}
+
+sub _need_any_modules {
+    my ( @m, $m );
+    ( $m = try_module($_) ) && push @m, $m for @_;
+    return @m;
+}
+
+sub _need_first_module {
+    my $m;
+    ( $m = try_module($_) ) && return ($m) for @_;
+    return;
 }
 
 1;
@@ -162,7 +135,9 @@ sub croak {
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Module::Spec::V1 ();
-#pod     Module::Spec::V1::need_module('Mango~2.3');
+#pod     Module::Spec::V1::need_module('Mango');
+#pod     Module::Spec::V1::need_module( [ 'Mango' => '2.3' ] );
+#pod     Module::Spec::V1::need_module( { 'Mango' => '2.3' } );
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -172,16 +147,7 @@ sub croak {
 #pod
 #pod As string
 #pod
-#pod     M
-#pod     M~V       minimum match, ≥ V
-#pod     M~0       same as M, accepts any version
-#pod
-#pod Example version specs are
-#pod
-#pod     2
-#pod     2.3
-#pod     2.3.4
-#pod     v3.2.3
+#pod     M               any version
 #pod
 #pod As a hash ref
 #pod
@@ -200,12 +166,12 @@ sub croak {
 #pod
 #pod =head2 need_module
 #pod
-#pod     $module = need_module('SomeModule~2.3');
-#pod     $module = need_module( { SomeModule => '2.3' } );
-#pod     $module = need_module( [ SomeModule => '2.3' ] );
+#pod     $module = need_module('SomeModule');
+#pod     $module = need_module( { 'SomeModule' => '2.3' } );
+#pod     $module = need_module( [ 'SomeModule' => '2.3' ] );
 #pod
 #pod     $module = need_module($spec);
-#pod     $module = need_module($spec, \%opts);
+#pod     $module = need_module( $spec, \%opts );
 #pod
 #pod Loads a module and checks for a version requirement (if any).
 #pod Returns the name of the loaded module.
@@ -214,7 +180,7 @@ sub croak {
 #pod and its version (as reported by C<< $m->VERSION >>).
 #pod
 #pod     ( $m, $v ) = need_module($spec);
-#pod     ( $m, $v ) = need_module($spec, \%opts);
+#pod     ( $m, $v ) = need_module( $spec, \%opts );
 #pod
 #pod These options are currently available:
 #pod
@@ -238,14 +204,59 @@ sub croak {
 #pod
 #pod =back
 #pod
+#pod =head2 need_modules
+#pod
+#pod     @modules = need_modules(@spec);
+#pod     @modules = need_modules(-all => @spec);
+#pod     @modules = need_modules(-any => @spec);
+#pod     @modules = need_modules(-oneof => @spec);
+#pod
+#pod     @modules = need_modules(\%spec);
+#pod     @modules = need_modules(-all => \%spec);
+#pod     @modules = need_modules(-any => \%spec);
+#pod     @modules = need_modules(-oneof => \%spec);
+#pod
+#pod Loads some modules according to a specified rule.
+#pod
+#pod The current supported rules are C<-all>, C<-any> and C<-oneof>.
+#pod If none of these are given as the first argument,
+#pod C<-all> is assumed.
+#pod
+#pod The specified modules are given as module specs,
+#pod either as a  list or as a single hashref.
+#pod If given as a list, the corresponding order will be respected.
+#pod If given as a hashref, a random order is to be expected.
+#pod
+#pod The behavior of the rules are as follows:
+#pod
+#pod =over 4
+#pod
+#pod =item -all
+#pod
+#pod All specified modules are loaded by C<need_module>.
+#pod If successful, returns the names of the loaded modules.
+#pod
+#pod =item -any
+#pod
+#pod All specified modules are loaded by C<try_module>.
+#pod Returns the names of the modules successfully loaded.
+#pod
+#pod =item -oneof
+#pod
+#pod Specified modules are loaded by C<try_module>
+#pod until a successful load.
+#pod Returns (in list context) the name of the loaded module.
+#pod
+#pod =back
+#pod
 #pod =head2 try_module
 #pod
-#pod     $module = try_module('SomeModule~2.3');
-#pod     $module = try_module( { SomeModule => '2.3' } );
-#pod     $module = try_module( [ SomeModule => '2.3' ] );
+#pod     $module = try_module('SomeModule');
+#pod     $module = try_module( { 'SomeModule' => '2.3' } );
+#pod     $module = try_module( [ 'SomeModule' => '2.3' ] );
 #pod
 #pod     $module = try_module($spec);
-#pod     $module = try_module($spec, \%opts);
+#pod     $module = try_module( $spec, \%opts );
 #pod
 #pod Tries to load a module (if available) and checks for a version
 #pod requirement (if any). Returns the name of the loaded module
@@ -308,16 +319,18 @@ __END__
 
 =head1 NAME
 
-Module::Spec::V1 - Load modules based on specifications V1
+Module::Spec::V1 - Load modules based on V1 specifications
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 
     use Module::Spec::V1 ();
-    Module::Spec::V1::need_module('Mango~2.3');
+    Module::Spec::V1::need_module('Mango');
+    Module::Spec::V1::need_module( [ 'Mango' => '2.3' ] );
+    Module::Spec::V1::need_module( { 'Mango' => '2.3' } );
 
 =head1 DESCRIPTION
 
@@ -327,16 +340,7 @@ B<This is alpha software. The API is likely to change.>
 
 As string
 
-    M
-    M~V       minimum match, ≥ V
-    M~0       same as M, accepts any version
-
-Example version specs are
-
-    2
-    2.3
-    2.3.4
-    v3.2.3
+    M               any version
 
 As a hash ref
 
@@ -355,12 +359,12 @@ L<Module::Spec::V1> implements the following functions.
 
 =head2 need_module
 
-    $module = need_module('SomeModule~2.3');
-    $module = need_module( { SomeModule => '2.3' } );
-    $module = need_module( [ SomeModule => '2.3' ] );
+    $module = need_module('SomeModule');
+    $module = need_module( { 'SomeModule' => '2.3' } );
+    $module = need_module( [ 'SomeModule' => '2.3' ] );
 
     $module = need_module($spec);
-    $module = need_module($spec, \%opts);
+    $module = need_module( $spec, \%opts );
 
 Loads a module and checks for a version requirement (if any).
 Returns the name of the loaded module.
@@ -369,7 +373,7 @@ On list context, returns the name of the loaded module
 and its version (as reported by C<< $m->VERSION >>).
 
     ( $m, $v ) = need_module($spec);
-    ( $m, $v ) = need_module($spec, \%opts);
+    ( $m, $v ) = need_module( $spec, \%opts );
 
 These options are currently available:
 
@@ -393,14 +397,59 @@ with C<require> or false otherwise.
 
 =back
 
+=head2 need_modules
+
+    @modules = need_modules(@spec);
+    @modules = need_modules(-all => @spec);
+    @modules = need_modules(-any => @spec);
+    @modules = need_modules(-oneof => @spec);
+
+    @modules = need_modules(\%spec);
+    @modules = need_modules(-all => \%spec);
+    @modules = need_modules(-any => \%spec);
+    @modules = need_modules(-oneof => \%spec);
+
+Loads some modules according to a specified rule.
+
+The current supported rules are C<-all>, C<-any> and C<-oneof>.
+If none of these are given as the first argument,
+C<-all> is assumed.
+
+The specified modules are given as module specs,
+either as a  list or as a single hashref.
+If given as a list, the corresponding order will be respected.
+If given as a hashref, a random order is to be expected.
+
+The behavior of the rules are as follows:
+
+=over 4
+
+=item -all
+
+All specified modules are loaded by C<need_module>.
+If successful, returns the names of the loaded modules.
+
+=item -any
+
+All specified modules are loaded by C<try_module>.
+Returns the names of the modules successfully loaded.
+
+=item -oneof
+
+Specified modules are loaded by C<try_module>
+until a successful load.
+Returns (in list context) the name of the loaded module.
+
+=back
+
 =head2 try_module
 
-    $module = try_module('SomeModule~2.3');
-    $module = try_module( { SomeModule => '2.3' } );
-    $module = try_module( [ SomeModule => '2.3' ] );
+    $module = try_module('SomeModule');
+    $module = try_module( { 'SomeModule' => '2.3' } );
+    $module = try_module( [ 'SomeModule' => '2.3' ] );
 
     $module = try_module($spec);
-    $module = try_module($spec, \%opts);
+    $module = try_module( $spec, \%opts );
 
 Tries to load a module (if available) and checks for a version
 requirement (if any). Returns the name of the loaded module

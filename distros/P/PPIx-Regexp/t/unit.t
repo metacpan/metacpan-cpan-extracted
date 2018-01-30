@@ -1946,6 +1946,18 @@ value	( accepts_perl => [ '5.027001' ], 1 );
 value	( requirements_for_perl => [],
     '5.000 <= $] < 5.025001 || 5.027001 <= $]' );
 
+{
+    my $re = '/ [f g] o o b a (?#comment) r /';
+    parse	( $re );
+    value	( scontent => [], '/ [f g] o o b a  r /' );
+
+    parse	( $re, default_modifiers => [ qw{ x } ] );
+    value	( scontent => [], '/[f g]oobar/' );
+
+    parse	( $re, default_modifiers => [ qw{ xx } ] );
+    value	( scontent => [], '/[fg]oobar/' );
+}
+
 SKIP: {
     $is_ascii
 	or skip(

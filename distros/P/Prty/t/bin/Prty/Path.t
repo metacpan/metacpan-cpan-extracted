@@ -195,6 +195,26 @@ sub test_mkdir : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_absolute : Test(4) {
+    my $self = shift;
+
+    my $cwd = Prty::Process->cwd;
+
+    my $path = Prty::Path->absolute;
+    $self->is($path,$cwd);
+
+    $path = Prty::Path->absolute('.');
+    $self->is($path,$cwd);
+
+    $path = Prty::Path->absolute('/tmp');
+    $self->is($path,'/tmp');
+
+    $path = Prty::Path->absolute('tmp');
+    $self->is($path,"$cwd/tmp");
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_basename : Test(3) {
     my $self = shift;
 

@@ -3,14 +3,14 @@ use 5.020;
 use strict;
 use warnings;
 
-our $VERSION = "1.1.0";
+our $VERSION = "1.2.0";
 
 use Moose;
 use HTTP::Tiny;
 use Cpanel::JSON::XS;
 use IO::Async::Timer::Periodic;
 use Log::Any qw($log);
-use Try::Tiny::Retry;
+use Try::Tiny::Retry ':all';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -75,7 +75,8 @@ sub http_request ($self, $method, $url, $headers = {}, $content = '') {
             $log->info("Authentification to teamcity failed, retrying.");
             die 'Authentification to teamcity failed';
         }
-    };
+    }
+    delay_exp { 10, 1e6 };
 
     if (!$response->{success}) {
         die "HTTP $method request to $url failed: " . "$response->{status}: $response->{reason}";
@@ -138,23 +139,17 @@ sub run_teamcity_build ($self, $build_type_id, $properties, $build_name, $wait =
 }
 
 sub get_artifact_list ($self, $build_result) {
-
-    # get build result
-    my $result_url = $self->teamcity_auth_url . $build_result->{href};
-    my $response   = $self->http_request('GET', $result_url, { 'Accept' => 'application/json' },);
-    my $json       = decode_json $response->{content};
-
     # get artifacts summary
-    my $artifacts_href = $json->{artifacts}{href};
+    my $artifacts_href = $build_result->{output}{artifacts}{href};
     my $artifacts_url  = $self->teamcity_auth_url . $artifacts_href;
-    $response = $self->http_request('GET', $artifacts_url, { 'Accept' => 'application/json' },);
+    my $response = $self->http_request('GET', $artifacts_url, { 'Accept' => 'application/json' },);
 
-    $json = decode_json $response->{content};
+    my $json = decode_json $response->{content};
 
     my %artifacts;
 
     # get individual artifacts URLs
-    for my $node ($json->{file}->elements) {
+    for my $node (@{$json->{file}}) {
         my $content_href  = $node->{content}{href};
         my $metadata_href = $node->{content}{href};
         my $name          = $node->{name};
@@ -171,7 +166,10 @@ sub get_artifact_list ($self, $build_result) {
 sub get_artifact_content ($self, $build_result, $artifact_name) {
     my $artifact_list = $self->get_artifact_list($build_result);
 
+    die "The artifact $artifact_name could not be found!" unless %$artifact_list{$artifact_name};
+
     my $content_url = $self->teamcity_auth_url . $artifact_list->{$artifact_name}{content_href};
+
     my $response = $self->http_request('GET', $content_url);
 
     return $response->{content};
@@ -205,6 +203,7 @@ sub poll_teamcity_results($self) {
 
     for my $build (values %{$self->teamcity_builds}) {
         my $url = $self->teamcity_auth_url . $build->{status_href};
+
         my $response = $self->http_request('GET', $url, { 'Accept' => 'application/json' },);
 
         my $json = decode_json $response->{content};
@@ -216,8 +215,6 @@ sub poll_teamcity_results($self) {
 
         next if $state ne 'finished';
 
-        $log->info("RESULT\t$build->{name} [$build->{id}]: $status ($state)");
-
         my $job_result = {
             id     => $build->{id},
             href   => $build->{href},
@@ -226,6 +223,10 @@ sub poll_teamcity_results($self) {
             output => $json
         };
 
+        my $teamcity_job_parameters = join(', ', map { "$_: '$build->{params}->{$_}'" } keys %{$build->{params}});
+        $log->info("$status\t".$build->{name}."($teamcity_job_parameters)");
+        $log->info("\t[".$build->{id}."]\t".$build->{href});
+        
         if ($status eq 'SUCCESS') {
             $build->{future}->done($job_result);
         }

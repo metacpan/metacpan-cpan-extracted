@@ -28,7 +28,7 @@ package Rex::Commands::Gather;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Data::Dumper;
 use Rex::Hardware;
@@ -347,7 +347,7 @@ sub is_mageia {
 sub is_debian {
   my $os = @_ ? shift : get_operating_system();
 
-  my @debian_clones = ( "Debian", "Ubuntu", "LinuxMint", "Raspbian" );
+  my @debian_clones = ( "Debian", "Ubuntu", "LinuxMint", "Raspbian", "Devuan" );
 
   if ( grep { /$os/i } @debian_clones ) {
     return 1;

@@ -32,7 +32,7 @@ package Rex::Commands::Partition;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -96,7 +96,7 @@ sub clearpart {
     }
   }
   else {
-    my @partitions = grep { /$o_disk\d+$/ } split /\n/, cat "/proc/partitions";
+    my @partitions = grep { /\Q$o_disk\Ep?\d+$/ } split /\n/, cat "/proc/partitions";
 
     for my $part_line (@partitions) {
       my ( $num, $part ) = ( $part_line =~ m/\d+\s+(\d+)\s+\d+\s(.*)$/ );

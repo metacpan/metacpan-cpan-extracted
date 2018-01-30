@@ -1,6 +1,5 @@
-use Test::More tests => 6; # -*- mode: cperl -*-
+use Test::More tests => 10; # -*- mode: cperl -*-
 use Git;
-use File::Slurp::Tiny qw(write_file);
 
 use lib qw(../lib lib );
 
@@ -33,4 +32,20 @@ is ( @{$commit_array[1]->{'files'}}, 2, "Commit info correct");
 is ( @{$commits->hashes()}, 2, "Commit hashes correct");
 is ( $commit_array[1]->{'author'}, $commit_author, "Author changed");
 
+write_file("one","one\none two three");
+my @files = qw( one );
+$commits = new Git::Repo::Commits ".", \@files ;
+ok ($commits, "File object created");
+my @commit_array = @{$commits->commits()};
+is( $#commit_array, 1, "Correct number of commits");
+is ( @{$commit_array[1]->{'files'}}, 2, "Commit info correct");
+is ( @{$commits->hashes()}, 2, "Commit hashes correct");
+
 diag( "Testing Git::Repo::Commits $Git::Repo::Commits::VERSION" );
+
+sub write_file {
+  my ($file_name, $file_content) = @_;
+  open my $fh, ">", $file_name;
+  print $fh $file_content;
+  close $fh;
+}

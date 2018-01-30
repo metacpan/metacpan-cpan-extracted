@@ -22,13 +22,19 @@ name: Module-Spec
 provides:
   Module::Spec:
     file: lib/Module/Spec.pm
-    version: v0.6.0
+    version: v0.7.0
   Module::Spec::OO:
     file: lib/Module/Spec/OO.pm
-    version: v0.6.0
+    version: v0.7.0
+  Module::Spec::V0:
+    file: lib/Module/Spec/V0.pm
+    version: v0.7.0
   Module::Spec::V1:
     file: lib/Module/Spec/V1.pm
-    version: v0.6.0
+    version: v0.7.0
+  Module::Spec::V2:
+    file: lib/Module/Spec/V2.pm
+    version: v0.7.0
 requires:
   Carp: '0'
   Class::Method::Modifiers: '1.05'
@@ -38,5 +44,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Module-Spec/issues
   homepage: https://github.com/aferreira/cpan-Module-Spec
   repository: https://github.com/aferreira/cpan-Module-Spec.git
-version: 0.6.0
+version: 0.7.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

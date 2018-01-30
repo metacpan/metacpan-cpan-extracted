@@ -9,7 +9,7 @@ package Rex::Cron::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands;
@@ -196,7 +196,7 @@ sub read_user_cron {
   $command .= " -u $user" if defined $user;
   $command .= ' 2> /dev/null';
 
-  my @lines = i_run $command;
+  my @lines = i_run $command, fail_ok => 1;
   $self->parse_cron(@lines);
 }
 

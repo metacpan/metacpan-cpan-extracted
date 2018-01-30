@@ -1,11 +1,9 @@
 package Error::Pure::HTTP::Print;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Utils qw(err_helper);
 use List::MoreUtils qw(none);
 use Readonly;
@@ -16,7 +14,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $EVAL => 'eval {...}';
 
 # Version.
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Ignore die signal.
 $SIG{__DIE__} = 'IGNORE';
@@ -90,11 +88,9 @@ Error::Pure::HTTP::Print - Error::Pure module for simple error print over HTTP.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::HTTP::Print qw(err);
 
  # Error.
@@ -107,11 +103,9 @@ Error::Pure::HTTP::Print - Error::Pure module for simple error print over HTTP.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::HTTP::Print qw(err);
 
  # Error.
@@ -145,17 +139,17 @@ L<https://github.com/tupinek/Error-Pure-HTTP>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2015 Michal Špaček
+ © 2012-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

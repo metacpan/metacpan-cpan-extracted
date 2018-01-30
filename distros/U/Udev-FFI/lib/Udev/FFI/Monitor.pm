@@ -14,6 +14,7 @@ sub new {
 
     my $self = {
         _monitor => shift,
+        _udev    => shift,
         _is_started => 0
     };
 
@@ -27,7 +28,7 @@ sub new {
 sub get_udev {
     my $self = shift;
 
-    return udev_monitor_get_udev($self->{_monitor});
+    return $self->{_udev};
 }
 
 

@@ -72,20 +72,20 @@ sub integrationTest_Verify {
     my $Mockify = Test::Mockify->new('FakeModuleForMockifyTest', ['one','two']);
     $Mockify->spy('returnParameterListNew')->when(String('Parameter'));
     $Mockify->spy('returnParameterListNew')->when(String('SomeParameter'));
-    $Mockify->spy('DummmyMethodForTestOverriding')->when(String('SomeParameter'));
+    $Mockify->spy('DummyMethodForTestOverriding')->when(String('SomeParameter'));
     my $FakeModule = $Mockify->getMockObject();
 
     is_deeply($FakeModule->returnParameterListNew('Parameter'),['one','two'] , 'proves that the parameters will be passed');
     is_deeply($FakeModule->returnParameterListNew('SomeParameter'),['one','two'] , 'proves that defining multiple return types are supported');
-    is($FakeModule->DummmyMethodForTestOverriding('SomeParameter'),'A dummmy method' , 'proves that defining an other method with the same parameter works fine');
-    throws_ok( sub { $FakeModule->DummmyMethodForTestOverriding('WrongValue') },
+    is($FakeModule->DummyMethodForTestOverriding('SomeParameter'),'A dummy method' , 'proves that defining an other method with the same parameter works fine');
+    throws_ok( sub { $FakeModule->DummyMethodForTestOverriding('WrongValue') },
         qr/No matching found for string/,
         'proves that an unexpected value will throw an Error.'
     );
 
     is(GetCallCount($FakeModule,'returnParameterListNew'),2 , 'proves that the get call count works fine');
-    is(WasCalled($FakeModule,'DummmyMethodForTestOverriding'),1 , 'proves that the verifyer for wasCalled works fine');
-    is(GetParametersFromMockifyCall($FakeModule,'DummmyMethodForTestOverriding')->[0],'SomeParameter' , 'proves that the verifyer for getparams. works fine');
+    is(WasCalled($FakeModule,'DummyMethodForTestOverriding'),1 , 'proves that the verifyer for wasCalled works fine');
+    is(GetParametersFromMockifyCall($FakeModule,'DummyMethodForTestOverriding')->[0],'SomeParameter' , 'proves that the verifyer for getparams. works fine');
 }
 
 #------------------------------------------------------------------------
@@ -99,8 +99,8 @@ sub integrationTest_MixSpyAndMock {
         'proves that it is not possible to use first spy and than mock for the same method'
     );
 
-    $Mockify->mock('DummmyMethodForTestOverriding')->whenAny()->thenReturn('hello');
-    throws_ok( sub { $Mockify->spy('DummmyMethodForTestOverriding') },
+    $Mockify->mock('DummyMethodForTestOverriding')->whenAny()->thenReturn('hello');
+    throws_ok( sub { $Mockify->spy('DummyMethodForTestOverriding') },
         qr/It is not possible to mix spy and mock/,
         'proves that it is not possible to use first mock and than spy for the same method'
     );
@@ -108,7 +108,7 @@ sub integrationTest_MixSpyAndMock {
     my $FakeModule = $Mockify->getMockObject();
 
     is_deeply($FakeModule->returnParameterListNew('Parameter'),['one','two'] , 'proves that the parameters will be passed');
-    is($FakeModule->DummmyMethodForTestOverriding(),'hello' , 'proves that the mock was called');
+    is($FakeModule->DummyMethodForTestOverriding(),'hello' , 'proves that the mock was called');
 }
 __PACKAGE__->RunTest();
 1;

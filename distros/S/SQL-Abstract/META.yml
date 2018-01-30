@@ -33,10 +33,11 @@ requires:
   Scalar::Util: '0'
   Sub::Quote: '2.000001'
   Text::Balanced: '2.00'
+  perl: '5.006'
 resources:
   IRC: irc://irc.perl.org/#dbix-class
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SQL-Abstract
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/sql-abstract.git
-version: '1.84'
+version: '1.85'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

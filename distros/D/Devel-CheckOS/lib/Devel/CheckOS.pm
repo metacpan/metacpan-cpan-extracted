@@ -6,7 +6,7 @@ use Exporter;
 
 use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 
-our $VERSION = '1.80';
+our $VERSION = '1.81';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported list_platforms list_family_members);
@@ -32,13 +32,6 @@ like Linux, Solaris, AIX etc.
 
 It spares perl the embarrassment of wearing its pants on its head by
 covering them with a splendid Fedora.
-
-=head1 INCOMPATIBILITY WARNING
-
-Version 1.80 and higher only work on perl 5.10 and higher. I have no
-idea why it's broken on 5.8.9 (the lowest version I was previously
-testing on). If you care about perls that ancient I welcome a patch
-to restore functionality.
 
 =head1 SYNOPSIS
 

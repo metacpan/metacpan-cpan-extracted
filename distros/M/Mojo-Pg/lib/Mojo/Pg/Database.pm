@@ -279,8 +279,8 @@ L<Mojo::Pg::Transaction/"commit"> has been called before it is destroyed.
   my $results = $db->delete($table, \%where, \%options);
 
 Generate a C<DELETE> statement with L<Mojo::Pg/"abstract"> (usually an
-L<SQL::Abstract> object) and execute it with L</"query">. You can also append a
-callback to perform operations non-blocking.
+L<SQL::Abstract::Pg> object) and execute it with L</"query">. You can also
+append a callback to perform operations non-blocking.
 
   $db->delete(some_table => sub {
     my ($db, $err, $results) = @_;
@@ -340,8 +340,8 @@ to be used as an operator.
   my $results = $db->insert($table, \@values || \%fieldvals, \%options);
 
 Generate an C<INSERT> statement with L<Mojo::Pg/"abstract"> (usually an
-L<SQL::Abstract> object) and execute it with L</"query">. You can also append a
-callback to perform operations non-blocking.
+L<SQL::Abstract::Pg> object) and execute it with L</"query">. You can also
+append a callback to perform operations non-blocking.
 
   $db->insert(some_table => {foo => 'bar'} => sub {
     my ($db, $err, $results) = @_;
@@ -363,6 +363,16 @@ L<SQL::Abstract>.
 
   # "insert into some_table (foo) values ('bar') returning id, foo"
   $db->insert('some_table', {foo => 'bar'}, {returning => ['id', 'foo']});
+
+As well as some PostgreSQL specific extensions added by L<SQL::Abstract::Pg>.
+
+  # "insert into some_table (foo) values ('bar') on conflict do nothing"
+  $db->insert('some_table', {foo => 'bar'}, {on_conflict => undef});
+
+Including operations commonly referred to as C<upsert>.
+
+  # "insert into t (a) values ('b') on conflict (a) do update set a = 'c'"
+  $db->insert('t', {a => 'b'}, {on_conflict => [a => {a => 'c'}]});
 
 =head2 insert_p
 
@@ -463,11 +473,11 @@ L<Mojo::Promise> object instead of accepting a callback.
 
 =head2 select
 
-  my $results = $db->select($source, $fields, $where, $order);
+  my $results = $db->select($source, $fields, $where, \%options);
 
 Generate a C<SELECT> statement with L<Mojo::Pg/"abstract"> (usually an
-L<SQL::Abstract> object) and execute it with L</"query">. You can also append a
-callback to perform operations non-blocking.
+L<SQL::Abstract::Pg> object) and execute it with L</"query">. You can also
+append a callback to perform operations non-blocking.
 
   $db->select(some_table => ['foo'] => {bar => 'yada'} => sub {
     my ($db, $err, $results) = @_;
@@ -487,15 +497,46 @@ L<SQL::Abstract>.
   # "select * from some_table where foo = 'bar'"
   $db->select('some_table', undef, {foo => 'bar'});
 
-  # "select * from some_table where foo = 'bar' order by id desc"
-  $db->select('some_table', undef, {foo => 'bar'}, {-desc => 'id'});
-
   # "select * from some_table where foo like '%test%'"
   $db->select('some_table', undef, {foo => {-like => '%test%'}});
 
+As well as some PostgreSQL specific extensions added by L<SQL::Abstract::Pg>.
+
+  # "select * from foo join bar on (bar.foo_id = foo.id)"
+  $db->select(['foo', ['bar', foo_id => 'id']]);
+
+  # "select * from foo left join bar on (bar.foo_id = foo.id)"
+  $db->select(['foo', [-left => 'bar', foo_id => 'id']]);
+
+  # "select foo as bar from some_table"
+  $db->select('some_table', [[foo => 'bar']]);
+
+  # "select extract(epoch from foo) as foo, bar from some_table"
+  $db->select('some_table', [\'extract(epoch from foo) as foo', 'bar']);
+
+Including a new last argument to pass many new options.
+
+  # "select * from some_table where foo = 'bar' order by id desc"
+  $db->select('some_table', '*', {foo => 'bar'}, {order_by => {-desc => 'id'}});
+
+  # "select * from some_table limit 10 offset 20"
+  $db->select('some_table', '*', undef, {limit => 10, offset => 20});
+
+  # "select * from some_table where foo = 23 group by foo, bar"
+  $db->select('some_table', '*', {foo => 23}, {group_by => ['foo', 'bar']});
+
+  # "select * from t where a = 'b' group by c having d = 'e'"
+  $db->select('t', '*', {a => 'b'}, {group_by => ['c'], having => {d => 'e'}});
+
+  # "select * from some_table where id = 1 for update"
+  $db->select('some_table', '*', {id => 1}, {for => 'update'});
+
+  # "select * from some_table where id = 1 for update skip locked"
+  $db->select('some_table', '*', {id => 1}, {for => \'update skip locked'});
+
 =head2 select_p
 
-  my $promise = $db->select_p($source, $fields, $where, $order);
+  my $promise = $db->select_p($source, $fields, $where, \%options);
 
 Same as L</"select">, but performs all operations non-blocking and returns a
 L<Mojo::Promise> object instead of accepting a callback.
@@ -530,8 +571,8 @@ Unsubscribe from a channel, C<*> can be used to unsubscribe from all channels.
   my $results = $db->update($table, \%fieldvals, \%where, \%options);
 
 Generate an C<UPDATE> statement with L<Mojo::Pg/"abstract"> (usually an
-L<SQL::Abstract> object) and execute it with L</"query">. You can also append a
-callback to perform operations non-blocking.
+L<SQL::Abstract::Pg> object) and execute it with L</"query">. You can also
+append a callback to perform operations non-blocking.
 
   $db->update(some_table => {foo => 'baz'} => {foo => 'bar'} => sub {
     my ($db, $err, $results) = @_;

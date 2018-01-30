@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params_pub);
 use English qw(-no_match_vars);
 use Test::More 'tests' => 4;

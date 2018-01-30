@@ -4,9 +4,10 @@ use strict;
 # 1) create the $redir page where blocked requests will be sent to
 # 2) create the $dbdir (see comments below) and its content
 # 3) launch this script with the -C toption to create the .db files
-# 4) do some testing like (the echoed lines are in the format used by squid to ask the redirector):
+# 4) do some testing (the echoed lines are in the format used by squid to ask the redirector):
 #    echo "http://www.youporn.com/ 172.31.30.132/- user1 GET -" | luxguard -v
-#    echo "0-6.us:443 172.31.40.131/- user2 CONNECT -" | luxguard -v
+#    echo "0-6.us:443 172.31.40.131/- user2 CONNECT -" | luxguard -vd1
+#    You should receive a redirection url when the request is to be redirected
 # 5) put this script (or your own based on this) in your squid's url_rewrite_program
 #    then reload
 
@@ -63,7 +64,7 @@ sub check($$) {
 	#	    ( $i > 1300 && $i < 1400 ); # some prefer Facebook than meal
 
 	return 0 if $lg->checkincateg( $req, 'whitelist');		# Local WL
-	return 'in-addr' if $lg->checkinaddr($req);	# Explicit IPs are not allowed here
+	return 'in-addr' if $req->checkinaddr();	# Explicit IPs are not allowed here
 
 	return $lg->checkincateg( $req, qw/porn socialnet/ );
 

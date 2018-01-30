@@ -4,7 +4,7 @@
       "Stevan Little <stevan@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
          "web" : "https://github.com/stevan/p5-Directory-Scanner"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0223"
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

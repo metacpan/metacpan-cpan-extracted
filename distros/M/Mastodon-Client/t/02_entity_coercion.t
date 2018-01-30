@@ -3,7 +3,6 @@ use warnings;
 
 use Test::Exception;
 use Test::More;
-use Test::Warnings 'warning';
 
 use Mastodon::Types qw( to_Entity to_Instance );
 

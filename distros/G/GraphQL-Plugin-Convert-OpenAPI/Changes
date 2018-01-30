@@ -1,5 +1,17 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.09	Sat Jan 27 09:21:52 GMT 2018
+ - update YAML::XS version to dodge breakage
+
+0.08	Sat Jan 27 05:00:26 GMT 2018
+ - use Test::Snapshot for tests
+ - better promise-handling including of reject
+ - replace non-"valid" GQL characters with _ instead of deleting
+ - rigorous tests of various fields and types etc with "."
+ - nested inputs
+ - treat "definitions" that are an array not as type but as that array
+ - add corpus https://github.com/cliffano/swaggy-jenkins
+
 0.07	Sat Dec 30 12:40:31 GMT 2017
  - update resolver docs
  - deal with type "object" as key/value

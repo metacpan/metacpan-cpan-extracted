@@ -34,10 +34,17 @@ my %META = (
         'Sub::Quote'     => '2.000001',
         'Hash::Merge'    => '0.12',
         'Text::Balanced' => '2.00',
+        'perl'           => '5.006',
       },
     },
     develop   => {
-      requires => {},
+      requires => {
+        'Test::Pod'           => '1.14',
+        'Test::Pod::Coverage' => '1.04',
+        'Pod::Coverage'       => '0.19',
+        'Test::EOL'           => '1.0',
+        'Test::NoTabs'        => '0.9',
+      },
     },
   },
   resources => {
@@ -54,7 +61,7 @@ my %META = (
     license => [ 'http://dev.perl.org/licenses/' ],
   },
   no_index => {
-    package => 'DBIx::Class::Storage::Debug::PrettyPrint',
+    package => [ 'DBIx::Class::Storage::Debug::PrettyPrint' ],
     directory => [ 't', 'xt', 'examples' ],
   },
 );

@@ -1,21 +1,25 @@
 ---
 abstract: 'Collect information about a user'
 author:
-  - 'Mark Overmeer <markov@cpan.org>'
+  - 'Mark Overmeer'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: User-Identity
 no_index:
   directory:
     - t
     - inc
 requires: {}
-version: 0.98
+resources:
+  repository: https://github.com/markov2/perl5-User-Identity.git
+version: '0.99'
+x_homepage: http://perl.overmeer.net/CPAN/
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

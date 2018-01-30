@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 no bytes;
 use Prty::Section::Object;
@@ -358,7 +358,7 @@ sub parse {
                 }
                 else {
                     # Syntaxfehler
-                    die q{SECPAR-00001: Abschnitt erwartet},"\n";
+                    die q~SECPAR-00001: Abschnitt erwartet~,"\n";
                 }
             }
             elsif ($state == 1) {
@@ -450,7 +450,7 @@ sub parse {
             }
             else {
                 # Paranoia
-                die q{SECPAR-00002: Unerwarteter Zustand},"\n";
+                die q~SECPAR-00002: Unerwarteter Zustand~,"\n";
             }
             $source .= $_;
             $line++;
@@ -727,7 +727,7 @@ Als Beispiel siehe prty-confluence:
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -735,7 +735,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

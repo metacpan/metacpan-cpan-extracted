@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 355;
+plan tests => 366;
 
 use Math::AnyNum qw(:misc);
 
@@ -410,6 +410,24 @@ is(float(0) <=> '-1',   1);
 is(rat(0) <=> '-1',     1);
 is(int(0) <=> '-1',     1);
 is(complex(0) <=> '-1', 1);
+
+is(complex(3,       4),         '3+4i');
+is(complex(-3,      -4),        '-3-4i');
+is(complex('3+4i',  '12-3i'),   '6+16i');
+is(complex('(3 4)', '(12 -3)'), '6+16i');
+
+{
+    my $p = Math::AnyNum->new(100);
+
+    is($p + complex('-1/5',  '-1/2'), '99.8-0.5i');
+    is($p + complex('+13',   '0.2'),  '113+0.2i');
+    is($p + complex('3+4i',  '5-6i'), '109+9i');
+    is($p + complex('-3+6i', '-0.5'), '97+5.5i');
+
+    is($p + complex(Math::AnyNum->new('3+4i'), Math::AnyNum->new('5-6i')), '109+9i');
+    is($p + complex(Math::AnyNum->new(13),     Math::AnyNum->new('+0.2')), '113+0.2i');
+    is($p + complex(Math::AnyNum->new(13),     Math::AnyNum->new('1/2')),  '113+0.5i');
+}
 
 ok(is_odd(int('43')));
 ok(is_odd(rat('43')));

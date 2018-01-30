@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Test::Builder ();
 use Prty::Option;
@@ -262,7 +262,7 @@ sub get {
     my @arr;
     for my $key (@_) {
         if (!exists $hash->{$key}) {
-            $self->throw(q{TEST-00002: Unbekanntes Attribut},Key=>$key);
+            $self->throw(q~TEST-00002: Unbekanntes Attribut~,Key=>$key);
         }
         push @arr,$hash->{$key};
     }
@@ -500,7 +500,7 @@ sub runTests {
         if ($@) {
             # FIXME: Erstmal rausbomben, später verbessern
             $class->throw(
-                q{TEST-00005: Foreach-Testmethode fehlgeschlagen},
+                q~TEST-00005: Foreach-Testmethode fehlgeschlagen~,
                 Error=>$@,
             );
         }
@@ -1101,7 +1101,7 @@ sub MODIFY_CODE_ATTRIBUTES {
         }
         else {
             $class->throw(
-                q{TEST-00001: Unbekanntes Code-Attribut},
+                q~TEST-00001: Unbekanntes Code-Attribut~,
                 Attribute=>$_,
             );
         }
@@ -1118,7 +1118,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -1126,7 +1126,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

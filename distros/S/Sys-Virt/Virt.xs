@@ -5611,9 +5611,9 @@ block_stats(dom, path, flags=0)
               field = NULL;
               /* For back compat with previous hash above */
               if (strcmp(params[i].field, "rd_operations") == 0)
-                  field = "rd_reqs";
+                  field = "rd_req";
               else if (strcmp(params[i].field, "wr_operations") == 0)
-                  field = "wr_reqs";
+                  field = "wr_req";
               else if (strcmp(params[i].field, "flush_operations") == 0)
                   field = "flush_reqs";
               if (field) {
@@ -8074,7 +8074,7 @@ recv(st, data, nbytes, flags=0)
       else
           RETVAL = virStreamRecv(st, rawdata, nbytes);
 
-      if (RETVAL != -2 && RETVAL != -3) {
+      if (RETVAL < 0 && RETVAL != -2 && RETVAL != -3) {
           Safefree(rawdata);
           _croak_error();
       }

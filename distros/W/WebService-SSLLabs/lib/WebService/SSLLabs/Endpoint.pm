@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use WebService::SSLLabs::EndpointDetails();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub new {
     my ( $class, $json ) = @_;
@@ -98,7 +98,7 @@ WebService::SSLLabs::Endpoint - Endpoint object
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SUBROUTINES/METHODS
 

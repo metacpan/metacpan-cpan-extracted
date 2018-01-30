@@ -1,0 +1,31 @@
+0.000007  2018-01-29 14:23:53-08:00 America/Los_Angeles
+
+    - Make SQLite work without the sqlite3 binary
+
+0.000006  2018-01-29 12:59:54-08:00 America/Los_Angeles
+
+    - Fix for postgres with alternate hardcoded port numbers
+
+0.000005  2018-01-29 09:00:44-08:00 America/Los_Angeles
+
+    - ENV var safety
+
+0.000004  2018-01-28 20:29:12-08:00 America/Los_Angeles
+
+    - More complete docs
+    - More complete testing
+    - Significant MySQL speed improvements
+    - Better diagnostics from all drivers
+
+0.000003  2018-01-28 12:50:32-08:00 America/Los_Angeles
+
+    - Add sqlite driver
+
+0.000002  2018-01-28 09:08:30-08:00 America/Los_Angeles
+
+    - Minor bug fixes
+    - Add diagnostics for tests
+
+0.000001  2018-01-28 00:09:47-08:00 America/Los_Angeles
+
+    - Initial Release

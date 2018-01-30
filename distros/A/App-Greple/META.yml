@@ -26,7 +26,7 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '8.2301'
+    version: '8.2302'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
@@ -73,7 +73,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: git://github.com/kaz-utashiro/greple.git
-version: '8.2301'
+version: '8.2302'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

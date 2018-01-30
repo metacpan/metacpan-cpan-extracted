@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Color;
 
 # ABSTRACT: Colors for use with Graphics::Raylib
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 require Exporter;
@@ -30,7 +30,7 @@ Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 =head1 VERSION
 
-version 0.009
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ Constructs a new Graphics::Raylib::Color instance.
 sub rgba {
     my $self = \pack("C4", @_);
 
-    bless $self, 'Color';
+    bless $self, 'Graphics::Raylib::XS::Color';
     return $self;
 }
 
@@ -87,7 +87,7 @@ Returns a list with the red, green, blue and alpha components of the color.
 
 =cut
 {
-    package Color;
+    package Graphics::Raylib::XS::Color;
 
     sub r { return unpack("C",    ${$_[0]}) }
     sub g { return unpack("xC",   ${$_[0]}) }
@@ -120,11 +120,11 @@ Constructs a C<Color> out of a 32 bit integer.
 =cut
 
 sub color {
-    return bless \pack("N", shift), 'Color'
+    return bless \pack("N", shift), 'Graphics::Raylib::XS::Color'
 }
 
 {
-    package Color;
+    package Graphics::Raylib::XS::Color;
     sub color { return unpack("N", ${$_[0]}); }
 }
 

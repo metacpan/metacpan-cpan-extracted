@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.834.
+This document describes MCE::Shared version 1.835.
 
 ### Description
 
@@ -139,7 +139,7 @@ and [MCE Cookbook](https://github.com/marioroy/mce-cookbook) for recipes.
 
 ### Copyright and Licensing
 
-Copyright (C) 2016-2017 by Mario E. Roy <marioeroy AT gmail DOT com>
+Copyright (C) 2016-2018 by Mario E. Roy <marioeroy AT gmail DOT com>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself:

@@ -15,11 +15,11 @@ our @EXPORT = qw'symbols_list
                  industry_list
                 ' ;
 
-our $VERSION = '2.01';
+our $VERSION = '3.02';
 
 our $long;
 
-my %inds ;
+our %inds ;
 
 sub _carp(@) { carp "@_\n" ; ()}
 
@@ -48,6 +48,7 @@ sub  _ua() {
 }
 
 sub  _brws(@) {
+    warn "\n@_\n" ; # if $ENV{DEBUG_TICKER_SYMBOL_URL};
     $_ua ||= _ua() ;
     my $res = $_ua->get(@_) ;
     return $res -> content() if $res -> is_success() ;
@@ -79,21 +80,24 @@ sub _gimi($$;@) {
     }
     elsif ($prs eq 'ind' and $long) {
         my @ret ;
-        while ( m{
-                   http\://biz\.yahoo\.com/ic/\d+/\d+\.html\"\>([^\<]+).*?
-                   http\://finance\.yahoo\.com/q\?s\=([\w\.]+)
-             }xgs ) {push @ret, $2 . ':'. _http2name $1 }
+        while ( m{ a \s+
+                   href\=\"/quote/(\w+)\?p\=\w+\" \s+
+                   title\=\"([^\"]+)\"
+             }xgs ) {push @ret, $1 . ':'. _http2name $2 }
         return @ret
     }
     elsif ($prs eq 'ind') {
         return
-          m{http\://finance\.yahoo\.com/q\?s\=([\w\.]+)\s*\"}g
+          m{a \s+
+            href\=\"/quote/(\w+)\?p\=\w+\" \s+
+            title\=\"[^\"]+\"
+            }xgs
     }
     elsif ($prs eq 'inds') {
 
-        while ( m{http\://biz\.yahoo\.com/ic/(\d+)\.html\s*\"\s*\>\s*([^\<]+)}sg ) {
+        while (m{href\=\"/industry/([^\"]+)\" title=\"([^\"]+)\"}g) {
             my ($d, $n) = ($1, $2) ;
-            $inds{ _http2name $n } = $d ;
+            $inds{ _http2name $n } = $d if $d =~ /\w/ and $n =~ /\w/;
         }
         return keys %inds;
     }
@@ -114,17 +118,17 @@ sub symbols_list($) {
     return _carp "bad parameter: should be " . join '|', @all, 'all' ;
 }
 
-sub industries_list { _gimi inds => 'http://biz.yahoo.com/ic/ind_index.html' }
+sub industries_list { _gimi inds => 'http://finance.yahoo.com/industries/' }
 
 sub industry_list($) {
     %inds or industries_list() ;
     my $name = shift ;
     my $n = $inds{$name} or return _carp "'$name' is not recognized" ;
 
-    my $p = 'pub' ; # shift || ''; $p = 'pub' unless $p eq 'prv' or $p eq 'all' ;
-                    # ?? TODO ??
-                    # support Private/Foreign ? what for?
-    _gimi ind => "http://biz.yahoo.com/ic/${n}_cl_${p}.html"
+    # my $p = 'pub' ; # shift || ''; $p = 'pub' unless $p eq 'prv' or $p eq 'all' ;
+    #                 # ?? TODO ??
+    #                 # support Private/Foreign ? what for?
+    _gimi ind => "http://finance.yahoo.com/industry/$n"
 }
 
 1;

@@ -1,5 +1,5 @@
 package Test::RunValgrind;
-$Test::RunValgrind::VERSION = '0.0.3';
+$Test::RunValgrind::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -36,13 +36,52 @@ sub _supress_stderr
     return $self->{_supress_stderr};
 }
 
+sub _ignore_leaks
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{_ignore_leaks} = shift;
+    }
+
+    return $self->{_ignore_leaks};
+}
+
+sub _valgrind_args
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{_valgrind_args} = shift;
+    }
+
+    return $self->{_valgrind_args};
+}
+
 sub _init
 {
     my ( $self, $args ) = @_;
 
     $self->_supress_stderr( $args->{supress_stderr} // 0 );
+    $self->_ignore_leaks( $args->{ignore_leaks} // 0 );
+    $self->_valgrind_args( $args->{valgrind_args} // 0 );
 
     return;
+}
+
+sub _calc_verdict
+{
+    my ( $self, $out_text ) = @_;
+
+    return (
+        (
+            index( $$out_text, q{ERROR SUMMARY: 0 errors from 0 contexts} ) >= 0
+        )
+            && ( $self->_ignore_leaks
+            || ( index( $$out_text, q{in use at exit: 0 bytes} ) >= 0 ) )
+    );
 }
 
 sub run
@@ -66,16 +105,20 @@ sub run
     trap
     {
 
-        system( "valgrind", "--track-origins=yes", "--leak-check=yes",
-            "--log-file=$log_fn", $prog, @$argv, );
+        system(
+            "valgrind",
+            "--track-origins=yes",
+            ( $self->_ignore_leaks ? () : ("--leak-check=yes") ),
+            "--log-file=$log_fn",
+            ( $self->_valgrind_args ? @{ $self->_valgrind_args } : () ),
+            $prog,
+            @$argv,
+        );
     };
 
     STDOUT->print( $trap->stdout );
     my $out_text = path($log_fn)->slurp_utf8;
-    my $VERDICT =
-        (
-        ( index( $out_text, q{ERROR SUMMARY: 0 errors from 0 contexts} ) >= 0 )
-            && ( index( $out_text, q{in use at exit: 0 bytes} ) >= 0 ) );
+    my $VERDICT  = $self->_calc_verdict( \$out_text );
 
     if ( ( !$VERDICT ) and ( !$self->_supress_stderr ) )
     {
@@ -101,7 +144,7 @@ Test::RunValgrind - tests that an external program is valgrind-clean.
 
 =head1 VERSION
 
-version 0.0.3
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -130,7 +173,7 @@ reuse by other projects, including fortune-mod
 
 =head1 VERSION
 
-version 0.0.3
+version 0.2.0
 
 =head1 METHODS
 
@@ -139,6 +182,15 @@ version 0.0.3
 The constructor - currently accepts a single hash reference and if
 its C<'supress_stderr'> key's value is true, supresses outputting STDERR if
 on successful subsequent tests (starting from version 0.0.2).
+Furthermore if C<'ignore_leaks'> is true, then reported memory leaks are
+ignored and their presence will still allow the tests to pass (starting from
+version 0.2.0, and see L<https://rt.cpan.org/Public/Bug/Display.html?id=119988>
+).
+
+C<'valgrind_args'> may point to an array reference of extra command line
+arguments to valgrind.
+See L<https://github.com/shlomif/perl-Test-RunValgrind/issues/4> ; since
+version 0.2.0.
 
 =head2 $obj->run({ ... })
 

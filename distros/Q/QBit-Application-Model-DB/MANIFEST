@@ -28,6 +28,7 @@ t/lib/Test/DB/Table.pm
 t/lib/Test/SecondDB.pm
 t/lib/TestAppDB.pm
 t/lib/TestTimeLog.pm
+t/qbit-application-model-db-_log_sql.t
 t/qbit-application-model-db-multiple.t
 t/qbit-application-model-db-query-comment.t
 t/qbit-application-model-db-query-having.t

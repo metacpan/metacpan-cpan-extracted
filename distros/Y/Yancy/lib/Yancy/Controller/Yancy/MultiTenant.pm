@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 DESCRIPTION
@@ -215,7 +215,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 DESCRIPTION
 

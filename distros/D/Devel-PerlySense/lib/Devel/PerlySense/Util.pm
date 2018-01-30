@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Util;
-$Devel::PerlySense::Util::VERSION = '0.0218';
+$Devel::PerlySense::Util::VERSION = '0.0219';
 use base "Exporter";
 
 our @EXPORT = (
@@ -146,7 +146,7 @@ sub textRenderTemplate {
     my $rex = join("|", map { quotemeta } sort keys %$rhParam);
     my $rhParamEnv = { %ENV, %$rhParam };
 
-    $template =~ s/\${($rex)}/ $rhParamEnv->{$1} || "" /eg;  ###TODO: should be //
+    $template =~ s/\$\{($rex)\}/ $rhParamEnv->{$1} || "" /eg;  ###TODO: should be //
 
     return $template;
 }

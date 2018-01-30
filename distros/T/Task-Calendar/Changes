@@ -1,80 +1,87 @@
 Revision history for Task::Calendar
 
-0.32  Sun Sep 10 12:00:00 2017
+0.34  2018-01-30
+      - Tidied up Changes file as per CPAN::Changes::Spec.
+      - Added test script t/changes.t.
+
+0.33  2018-01-29
+      - Upgraded to use Calendar::Julian v0.07.
+
+0.32  2017-09-10
       - Upgraded to use Calendar::Hebrew v0.02.
 
-0.31  Mon Jul 24 11:40:00 2017
+0.31  2017-07-24
       - Upgraded to use Calendar::Hebrew v0.01.
       - Upgraded to use Calendar::Julian v0.02.
 
-0.30  Thu Feb 02 10:40:00 2017
+0.30  2017-02-02
       - Upgraded to use Calendar::Bahai v0.46.
       - Upgraded to use Calendar::Gregorian v0.15.
       - Upgraded to use Calendar::Hijri v0.33.
       - Upgraded to use Calendar::Persian v0.35.
       - Upgraded to use Calendar::Saka v1.34.
 
-0.29  Thu Jan 12 17:20:00 2017
+0.29  2017-01-12
       - Upgraded to use Calendar::Bahai v0.45.
       - Upgraded to use Calendar::Gregorian v0.14.
       - Upgraded to use Calendar::Hijri v0.32.
       - Upgraded to use Calendar::Persian v0.34.
       - Upgraded to use Calendar::Saka v1.33.
 
-0.28  Thu Jan 05 12:30:00 2017
+0.28  2017-01-05
       - Upgraded to use Calendar::Bahai v0.44.
       - Upgraded to use Calendar::Gregorian v0.13.
       - Upgraded to use Calendar::Hijri v0.31.
       - Upgraded to use Calendar::Persian v0.33.
       - Upgraded to use Calendar::Saka v1.32.
 
-0.27  Sat Dec 24 16:25:00 2016
+0.27  2016-12-24
       - Upgraded to use Calendar::Bahai v0.43.
       - Upgraded to use Calendar::Gregorian v0.12.
       - Upgraded to use Calendar::Hijri v0.30.
       - Upgraded to use Calendar::Persian v0.32.
 
-0.26  Mon Dec 12 04:25:00 2016
+0.26  2016-12-12
       - Upgraded to use Calendar::Bahai v0.42.
       - Upgraded to use Calendar::Gregorian v0.11.
       - Upgraded to use Calendar::Hijri v0.29.
       - Upgraded to use Calendar::Persian v0.31.
       - Upgraded to use Calendar::Saka v1.31.
 
-0.25  Sun Nov 27 10:00:00 2016
+0.25  2016-11-27
       - Upgraded to use Calendar::Bahai v0.41.
 
-0.24  Sun Nov 20 03:55:00 2016
+0.24  2016-11-20
       - Upgraded to use Calendar::Bahai v0.39.
       - Upgraded to use Calendar::Gregorian v0.10.
       - Upgraded to use Calendar::Hijri v0.28.
       - Upgraded to use Calendar::Persian v0.30.
       - Upgraded to use Calendar::Saka v1.30.
 
-0.23  Fri Oct 21 14:35:00 2016
+0.23  2016-10-21
       - Upgraded to use Calendar::Bahai v0.38.
       - Upgraded to use Calendar::Gregorian v0.09.
       - Upgraded to use Calendar::Hijri v0.27.
       - Upgraded to use Calendar::Persian v0.29.
       - Upgraded to use Calendar::Saka v1.29.
 
-0.22  Fri Sep 30 12:20:00 2016
+0.22  2016-09-30
       - Upgraded to use Calendar::Gregorian v0.08
       - Upgraded to use Calendar::Saka v1.28
       - Upgraded to use Calendar::Bahai v0.37
 
-0.21  Fri Sep 16 10:00:00 2016
+0.21  2016-09-16
       - Upgraded to use Calendar::Hijri v0.26
       - Upgraded to use Calendar::Persian v0.28.
 
-0.20  Sun Aug 21 06:15:00 2016
+0.20  2016-08-21
       - Upgraded to use Calendar::Bahai v0.36.
       - Upgraded to use Calendar::Gregorian v0.07.
       - Upgraded to use Calendar::Hijri v0.25.
       - Upgraded to use Calendar::Persian v0.27.
       - Upgraded to use Calendar::Saka v1.27.
 
-0.19  Thu Jul 14 09:40:00 2016
+0.19  2016-07-14
       - Upgraded to use Calendar::Bahai v0.35.
       - Upgraded to use Calendar::Gregorian v0.06.
       - Upgraded to use Calendar::Hijri v0.24.
@@ -82,7 +89,7 @@ Revision history for Task::Calendar
       - Upgraded to use Calendar::Saka v1.26.
       - Updated copyright year information in README.
 
-0.18  Sun May 29 14:25:00 2016
+0.18  2016-05-29
       - Upgraded to use Calendar::Bahai v0.34.
       - Upgraded to use Calendar::Gregorian v0.05.
       - Upgraded to use Calendar::Hijri v0.23.
@@ -90,78 +97,78 @@ Revision history for Task::Calendar
       - Upgraded to use Calendar::Saka v1.25.
       - Tidied up unit test in general.
 
-0.17  Mon May 09 12:30:00 2016
+0.17  2016-05-09
       - Upgraded to use Calendar::Gregorian v0.04.
       - Upgraded to use Calendar::Hijri v0.22.
       - Upgraded to use Calendar::Persian v0.23.
 
-0.16  Sat Apr 09 10:50:00 2016
+0.16  2016-04-09
       - Upgraded to use Calendar::Gregorian v0.02.
 
-0.15  Fri Mar 18 10:10:00 2016
+0.15  2016-03-18
       - Added new calendar to the list i.e. Calendar::Gregorian.
 
-0.14  Fri Jan 15 10:40:00 2016
+0.14  2016-01-15
       - Upgraded to use Calendar::Bahai v0.33.
       - Upgraded to use Calendar::Saka v1.24.
       - Updated Copyright year information in the pod.
 
-0.13  Tue Sep 01 09:20:00 2015
+0.13  2015-09-01
       - Upgraded to use Calendar::Bahai v0.28.
       - Upgraded to use Calendar::Hijri v0.21.
       - Upgraded to use Calendar::Persian v0.22.
       - Upgraded to use Calendar::Saka v1.23.
 
-0.12  Wed Aug 12 10:50:00 2015
+0.12  2015-08-12
       - Upgraded to use Calendar::Bahai v0.27.
       - Upgraded to use Calendar::Hijri v0.20.
       - Upgraded to use Calendar::Persian v0.21.
       - Upgraded to use Calendar::Saka v1.22.
 
-0.11  Sat Jul 11 10:50:00 2015
+0.11  2015-07-11
       - Upgraded to use Calendar::Bahai v0.26.
       - Upgraded to use Calendar::Hijri v0.19.
       - Upgraded to use Calendar::Persian v0.20.
       - Upgraded to use Calendar::Saka v1.21.
 
-0.10  Thu Jul 02 10:40:00 2015
+0.10  2015-07-02
       - Upgraded Calendar::Bahai v0.25 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Hijri v0.18 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Persian v0.19 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Saka v1.20 as pre-requisite in the Makefile.PL script.
 
-0.09  Sun Jun 21 17:45:00 2015
+0.09  2017-06-21
       - Upgraded Calendar::Bahai v0.24 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Hijri v0.16 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Persian v0.18 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Saka v0.19 as pre-requisite in the Makefile.PL script.
 
-0.08  Sat Jun 13 11:40:00 2015
+0.08  2015-06-13
       - Upgraded Calendar::Hijri v0.15 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Persian v0.17 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Saka v0.18 as pre-requisite in the Makefile.PL script.
 
-0.07  Tue Jun 09 10:05:00 2015
+0.07  2015-06-09
       - Upgraded Calendar::Bahai v0.23 as pre-requisite in the Makefile.PL script.
 
-0.06  Thu May 28 10:20:00 2015
+0.06  2015-05-28
       - Upgraded Calendar::Bahai v0.22 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Hijri v0.14 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Persian v0.16 as pre-requisite in the Makefile.PL script.
       - Upgraded Calendar::Saka v0.17 as pre-requisite in the Makefile.PL script.
 
-0.05  Thu May 21 10:15:00 2015
+0.05  2015-05-21
       - Upgraded Calendar::Bahai v0.20 as pre-requisite in the Makefile.PL script.
 
-0.04  Sun May 03 18:10:00 2015
+0.04  2015-05-03
       - Upgraded Calendar::Saka v0.16 as pre-requisite in the Makefile.PL script.
 
-0.03  Fri May 01 17:20:00 2015
+0.03  2015-05-01
       - Upgraded Calendar::Persian v0.15 as pre-requisite in the Makefile.PL script.
 
-0.02  Fri Apr 24 12:35:00 2015
+0.02  2015-04-24
       - Fixed the broken link in the pod document.
       - Upgraded versions of Calendar::* packages.
 
-0.01  Wed Apr 22 12:30:00 2015
+0.01  2015-04-22
       - Module Created.

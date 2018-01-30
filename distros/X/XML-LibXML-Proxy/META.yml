@@ -1,0 +1,24 @@
+---
+abstract: 'Force LibXML to use a proxy for HTTP/HTTPS external entities'
+author:
+  - 'Stephane Lavergne <https://github.com/vphantom/>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-LibXML-Proxy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  LWP::UserAgent: '6.0'
+  XML::LibXML: '2.0'
+  perl: '5.006'
+version: v0.1.1

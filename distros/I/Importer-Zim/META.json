@@ -36,7 +36,7 @@
             "Importer::Zim::EndOfScope" : "v0.4.0"
          },
          "requires" : {
-            "Importer::Zim::Base" : "v0.12.0",
+            "Importer::Zim::Base" : "v0.12.1",
             "Importer::Zim::Utils" : "v0.8.0",
             "Module::Runtime" : "0",
             "perl" : "5.010001",
@@ -62,11 +62,11 @@
    "provides" : {
       "Importer::Zim" : {
          "file" : "lib/Importer/Zim.pm",
-         "version" : "v0.9.0"
+         "version" : "v0.9.1"
       },
       "zim" : {
          "file" : "lib/zim.pm",
-         "version" : "v0.9.0"
+         "version" : "v0.9.1"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim"
       }
    },
-   "version" : "0.9.0",
+   "version" : "0.9.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

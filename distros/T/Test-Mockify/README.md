@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ePages-de/Mockify.svg?branch=master)](https://travis-ci.org/ePages-de/Mockify) [![MetaCPAN Release](https://badge.fury.io/pl/Test-Mockify.svg)](https://metacpan.org/release/Test-Mockify)
+[![Build Status](https://travis-ci.org/ChristianBreitkreutz/Mockify.svg?branch=master)](https://travis-ci.org/ChristianBreitkreutz/Mockify) [![MetaCPAN Release](https://badge.fury.io/pl/Test-Mockify.svg)](https://metacpan.org/release/Test-Mockify)
 # NAME
 
 Test::Mockify - minimal mocking framework for perl
@@ -39,7 +39,7 @@ Provides the actual mock object, which you can use in the test.
 
 ## mock
 
-This is place where the mocked methods are defined. The method also proves that the method you like to mock actually exists.
+This is the place where the mocked methods are defined. The method also proves that the method you like to mock actually exists.
 
 ### synopsis
 
@@ -65,6 +65,39 @@ It is not possible to mix `whenAny` and `when` for the same method.
 #### then ...
 
 For possible return types please look in [Test::Mockify::ReturnValue](https://metacpan.org/pod/Test::Mockify::ReturnValue)
+
+## mockStatic
+
+Sometimes it is not possible to inject the dependencies from the outside. This is especially the case when the package uses imports of static functions.
+`mockStatic` provides the possibility to mock static functions inside the mock/sut.
+
+    package SUT;
+    use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
+    sub pullCylinder {
+        shift;
+        if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    1;
+
+In the Test it can be mocked
+
+    package Test_SUT;
+    my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
+    $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('white'))->thenReturn(1);
+    $MockObjectBuilder->mockStatic('Magic::Tools::Rabbit')->when(String('black'))->thenReturn(0);
+
+    my $SUT = $MockObjectBuilder->getMockObject();
+    is($SUT->pullCylinder(), 1);
+    1;
+
+It can be mixed with normal `spy` and `mock`
+
+#### Thx
+to @dbucky for this amazing idea
 
 ## spy
 
@@ -95,6 +128,36 @@ To define the signature in the needed structure you must use the [Test::Mockify:
 
 If you don't want to specify the method signature at all, you can use whenAny.
 It is not possible to mix `whenAny` and `when` for the same method.
+
+## spyStatic
+
+Provides the possibility to spy static functions inside the mock/sut.
+
+    package SUT;
+    use Magic::Tools qw ( Rabbit ); # Rabbit could use a webservice
+    sub pullCylinder {
+        shift;
+        if(Rabbit('white') && not Magic::Tools::Rabbit('black')){ # imported && full path
+            return 1;
+        }else{
+            return 0;
+        }
+    }
+    1;
+
+In the Test it can be mocked
+
+    package Test_SUT;
+    my $MockObjectBuilder = Test::Mockify->new( 'SUT', [] );
+    $MockObjectBuilder->spyStatic('Magic::Tools::Rabbit')->whenAny();
+    my $SUT = $MockObjectBuilder->getMockObject();
+
+    $SUT->pullCylinder();
+    is(GetCallCount($SUT, 'pullCylinder), 1);
+
+    1;
+
+It can be mixed with normal `spy` and `mock`. For more options see, `mockStatic`
 
 ## addMethodSpy _(deprecated)_
 
@@ -150,4 +213,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Christian Breitkreutz &lt;christianbreitkreutz@gmx.de>
+Christian Breitkreutz <christianbreitkreutz@gmx.de>

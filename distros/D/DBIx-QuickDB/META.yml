@@ -1,0 +1,35 @@
+---
+abstract: 'Quickly start a db server.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-QuickDB
+requires:
+  Carp: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  IPC::Cmd: '0'
+  Importer: '0.024'
+  Module::Pluggable: '2.7'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Test2: '1.302120'
+  Test2::API: '1.302120'
+  Test2::V0: '0.000097'
+  Test::More: '1.302120'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/exodist/DBIx-QuickDB/issues
+  repository: https://github.com/exodist/DBIx-QuickDB/
+version: '0.000007'
+x_serialization_backend: 'YAML::Tiny version 1.70'

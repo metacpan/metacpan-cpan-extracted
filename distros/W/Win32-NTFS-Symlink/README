@@ -1,9 +1,9 @@
-Win32-NTFS-Symlink version 0.04
-===============================
+Win32-NTFS-Symlink
+==================
 
-The purpose of this module is to provide proper support for NTFS junctions
-and symlinks on Windows, either with their own routine to create them, and a
-common readlink routine to read either one.
+The purpose of this module is to provide proper support for NTFS symlinks
+and junctions on Windows, providing routines for creating and testing both,
+and a common readlink routine capable of reading either one.
 
 Further more, multiple methods for either importing or overriding the built-in
 global function are provided, and nothing is imported or overridden by default.
@@ -20,6 +20,8 @@ To install this module type the following:
 DEPENDENCIES
 
 List::Util 1.45
+
+(Test suite uses Test::More)
 
 No non-core dependencies at this time.
 
@@ -39,4 +41,4 @@ Copyright (C) 2018 by Bayan Maxim
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-See L<http://www.perl.com/perl/misc/Artistic.html>
+See http://www.perl.com/perl/misc/Artistic.html

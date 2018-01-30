@@ -2,20 +2,22 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/CryptoCurrencyUtils.pm'
+    'App/CryptoCurrencyUtils.pm',
+    'App/grepcoin.pm'
 );
 
 my @scripts = (
     'script/coin-cmc',
     'script/coin-mno',
-    'script/grepcoin'
+    'script/grep-coin',
+    'script/list-coins'
 );
 
 # no fake home requested
@@ -47,7 +49,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { +require blib; blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {
@@ -77,7 +79,7 @@ foreach my $file (@scripts)
     is($?, 0, "$file compiled ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { +require blib; blib->VERSION('1.01') };
+        and not eval { require blib; blib->VERSION('1.01') };
 
     # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }

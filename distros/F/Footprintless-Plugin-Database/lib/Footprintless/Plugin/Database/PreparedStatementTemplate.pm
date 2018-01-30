@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::PreparedStatementTemplate;
-$Footprintless::Plugin::Database::PreparedStatementTemplate::VERSION = '1.04';
+$Footprintless::Plugin::Database::PreparedStatementTemplate::VERSION = '1.05';
 use Carp;
 use Carp 'verbose';
 use Data::Dumper;
@@ -118,7 +118,7 @@ sub _remove_comments {
             }
         }
     }
-    close $fh;
+    close($fh);
     return $sql_out;
 }
 
@@ -175,7 +175,7 @@ Footprintless::Plugin::Database::PreparedStatementTemplate
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 

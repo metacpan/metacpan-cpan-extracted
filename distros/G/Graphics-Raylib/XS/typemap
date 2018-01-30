@@ -37,7 +37,7 @@ int *						T_PTROBJ
 #############################################################################
 INPUT
 T_OPAQUE_STRUCT
-	if (sv_derived_from($arg, \"${ntype}\")) {
+	if (sv_derived_from($arg, \"Graphics::Raylib::XS::${ntype}\")) {
 	    STRLEN len;
 	    char  *s = SvPV((SV*)SvRV($arg), len);
 
@@ -47,8 +47,8 @@ T_OPAQUE_STRUCT
 	    $var = *($type *)s;
 	}
 	else
-	    croak(\"$var is not of type ${ntype}\")
+	    croak(\"$var is not of type Graphics::Raylib::XS::${ntype}\")
 #############################################################################
 OUTPUT
 T_OPAQUE_STRUCT
-	sv_setref_pvn($arg, \"${ntype}\", (char *)&$var, sizeof($var));
+	sv_setref_pvn($arg, \"Graphics::Raylib::XS::${ntype}\", (char *)&$var, sizeof($var));

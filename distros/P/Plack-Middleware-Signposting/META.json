@@ -1,10 +1,10 @@
 {
-   "abstract" : "a base class for Signposting implementations",
+   "abstract" : "a base class for Plack implementations of the L<<Signposting>>( https://signposting.org) protocol",
    "author" : [
-      "unknown"
+      "Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.16",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -41,6 +41,7 @@
             "JSON" : "2.90",
             "Moo" : "2.002005",
             "Plack" : "1.0042",
+            "Plack::App::Catmandu::Bag" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -63,11 +64,11 @@
          "web" : "https://github.com/LibreCat/Plack-Middleware-Signposting"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

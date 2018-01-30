@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,11 +20,12 @@ name: App-a2p
 provides:
   App::a2p:
     file: lib/App/a2p.pm
-    version: '1.009'
+    version: '1.010'
 requires:
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-a2p
   repository: git://github.com/Leont/app-a2p.git
-version: '1.009'
+version: '1.010'
+x_serialization_backend: 'YAML::Tiny version 1.69'

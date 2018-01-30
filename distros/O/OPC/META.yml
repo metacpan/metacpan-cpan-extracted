@@ -1,0 +1,33 @@
+---
+abstract: 'API for low-level manipulations with packages in OPC format (ECMA-376 Part 2)'
+author:
+  - 'www.litres.ru <gu@litres.ru>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OPC
+provides:
+  OPC:
+    file: lib/OPC.pm
+    version: '0.03'
+  OPC::Node:
+    file: lib/OPC/Node.pm
+  OPC::Part:
+    file: lib/OPC/Part.pm
+  OPC::Root:
+    file: lib/OPC/Root.pm
+requires:
+  Archive::Zip: '0'
+  XML::LibXML: '0'
+  perl: '5.014'
+resources:
+  license: http://opensource.org/licenses/lgpl-license.php
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Hash/Case.pm
 lib/Hash/Case.pod
 lib/Hash/Case/Lower.pm
@@ -14,5 +15,6 @@ t/10lower.t
 t/20upper.t
 t/30pres1.t
 t/31pres2.t
-t/99pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

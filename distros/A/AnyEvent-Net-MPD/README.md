@@ -43,6 +43,12 @@ AnyEvent::Net::MPD - A non-blocking interface to MPD
 
 AnyEvent::Net::MPD provides a non-blocking interface to an MPD server.
 
+# NOTE
+
+Although in what is mostly a usable state, AnyEvent::Net::MPD is currently
+**DEPRECATED**, in favour of [Net::Async::MPD](https://metacpan.org/pod/Net::Async::MPD). If you want an async interface
+to MPD, please consider using that distribution instead.
+
 # ATTRIBUTES
 
 - **host**
@@ -206,6 +212,12 @@ Event descriptions
     A lightweight blocking MPD library. Has fewer dependencies than this one, but
     it does not curently support command lists. I took the idea of allowing for
     underscores in command names from this module.
+
+- [Net::Async::MPD](https://metacpan.org/pod/Net::Async::MPD)
+
+    The author's second (and much more successful) attempt at writing this
+    distribution, using [IO::Async](https://metacpan.org/pod/IO::Async) in the background. Please use that one
+    instead.
 
 - [Audio::MPD](https://metacpan.org/pod/Audio::MPD)
 

@@ -3,7 +3,6 @@ use warnings;
 
 use Test::Exception;
 use Test::More;
-use Test::Warnings 'warning';
 
 # Test data uses only minimum arguments for entity constructors
 # These were set as required only to aid in automatic detection,

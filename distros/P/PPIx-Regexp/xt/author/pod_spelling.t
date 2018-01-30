@@ -27,6 +27,7 @@ hocery
 indices
 infeasible
 instantiation
+jb
 kluginess
 lexed
 lexes
@@ -45,6 +46,7 @@ reblesses
 repl
 schild
 schildren
+scontent
 subclasses
 subscripted
 TODO

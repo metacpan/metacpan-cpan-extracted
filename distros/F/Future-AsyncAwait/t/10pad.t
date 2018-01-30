@@ -96,45 +96,4 @@ use List::Util qw( sum );
    );
 }
 
-# captured variables of nested subs
-{
-   async sub with_inner_subs
-   {
-      my @F = @_;
-
-      my $captured = "A";
-      my $subB = sub {
-         is( $captured, "A", '$captured in subB' );
-         $captured .= "B";
-      };
-
-      await $F[0];
-
-      $subB->();
-
-      $captured .= "C";
-
-      my $subD = sub {
-         is( $captured, "ABC", '$captured in subD' );
-         $captured .= "D";
-      };
-
-      await $F[1];
-
-      $subD->();
-
-      $captured .= "E";
-
-      return $captured;
-   }
-
-   my $f1 = Future->new;
-   my $f2 = Future->new;
-   my $fret = with_inner_subs( $f1, $f2 );
-
-   $f1->done;
-   $f2->done;
-   is( scalar $fret->get, "ABCDE", '$fret now ready after done for inner subs' );
-}
-
 done_testing;

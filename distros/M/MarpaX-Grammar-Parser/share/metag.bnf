@@ -1,4 +1,4 @@
-# Copyright 2014 Jeffrey Kegler
+# Copyright 2015 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -23,8 +23,11 @@ lexeme default =
 statements ::= statement+
 statement ::= <start rule> | <empty rule>
   | <null statement> | <statement group>
-  | <priority rule> | <quantified rule> | <discard rule> | <default rule>
-  | <lexeme default statement> | <lexeme rule>
+  | <priority rule> | <quantified rule>
+  | <discard rule> | <default rule>
+  | <lexeme default statement>
+  | <discard default statement>
+  | <lexeme rule>
   | <completion event declaration>
   | <nulled event declaration>
   | <prediction event declaration>
@@ -37,14 +40,15 @@ statement ::= <start rule> | <empty rule>
 <start rule> ::= ('start' 'symbol' 'is') symbol
 <default rule> ::= ':default' <op declare bnf> <adverb list>
 <lexeme default statement> ::= ('lexeme' 'default' '=') <adverb list>
+<discard default statement> ::= ('discard' 'default' '=') <adverb list>
 <priority rule> ::= lhs <op declare> priorities
 <empty rule> ::= lhs <op declare> <adverb list>
 <quantified rule> ::= lhs <op declare> <single symbol> quantifier <adverb list>
-<discard rule> ::= (':discard' <op declare match>) <single symbol>
+<discard rule> ::= (':discard' <op declare match>) <single symbol> <adverb list>
 <lexeme rule> ::= (':lexeme' <op declare match>) symbol <adverb list>
-<completion event declaration> ::= ('event') <event name> ('=' 'completed') <symbol name>
-<nulled event declaration> ::= ('event') <event name> ('=' 'nulled') <symbol name>
-<prediction event declaration> ::= ('event') <event name> ('=' 'predicted') <symbol name>
+<completion event declaration> ::= ('event') <event initialization> ('=' 'completed') <symbol name>
+<nulled event declaration> ::= ('event') <event initialization> ('=' 'nulled') <symbol name>
+<prediction event declaration> ::= ('event') <event initialization> ('=' 'predicted') <symbol name>
 <current lexer statement> ::= ('current' 'lexer' 'is') <lexer name>
 
 <inaccessible statement> ::= ('inaccessible' 'is') <inaccessible treatment> ('by' 'default')
@@ -80,7 +84,13 @@ action ::= ('action' '=>') <action name>
 <null ranking constant> ::= 'low' | 'high'
 <priority specification> ::= ('priority' '=>') <signed integer>
 <pause specification> ::= ('pause' '=>') <before or after>
-<event specification> ::= ('event' '=>') <event name>
+
+<event specification> ::= ('event' '=>') <event initialization>
+<event initialization> ::= <event name> <event initializer>
+<event initializer> ::= ('=') <on or off>
+<on or off> ::= 'on' | 'off'
+<event initializer> ::= # empty
+
 <latm specification> ::= ('forgiving' '=>') boolean
 <latm specification> ::= ('latm' '=>') boolean
 <blessing> ::= ('bless' '=>') <blessing name>
@@ -88,7 +98,12 @@ action ::= ('action' '=>') <action name>
 
 <alternative name> ::= <standard name> | <single quoted name>
 <lexer name> ::= <standard name> | <single quoted name>
-<event name> ::= <standard name> | <single quoted name>
+
+<event name> ::= <standard name>
+    | <single quoted name>
+    | <reserved event name>
+<reserved event name> ~ ':symbol'
+
 <blessing name> ::= <standard name>
 <blessing name> ::= <reserved blessing name>
 
@@ -152,18 +167,19 @@ boolean ~ [01]
 <bracketed name string> ~ [\s\w]+
 
 <array descriptor> ~ <array descriptor left bracket> <result item descriptor list> <array descriptor right bracket>
-<array descriptor left bracket> ~ '[' 
+<array descriptor left bracket> ~ '['
 <array descriptor left bracket> ~ '[' whitespace
-<array descriptor right bracket> ~ ']' 
-<array descriptor right bracket> ~ whitespace ']' 
+<array descriptor right bracket> ~ ']'
+<array descriptor right bracket> ~ whitespace ']'
 <result item descriptor list> ~ <result item descriptor>* separator => <result item descriptor separator>
 <result item descriptor separator> ~ [,]
 <result item descriptor separator> ~ [,] whitespace
 <result item descriptor> ~ 'start' | 'length'
-  | 'name' | 'lhs' | 'symbol' | 'rule' 
+  | 'g1start' | 'g1length'
+  | 'name' | 'lhs' | 'symbol' | 'rule'
   | 'value' | 'values'
 
-# In single quotes strings and character classes
+# In single quoted strings and character classes
 # no escaping or internal newlines, and disallow empty string
 
 <single quoted string> ~ ['] <string without single quote or vertical space> ['] <character class modifiers>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.036/cXML.dtd">
+<cXML timestamp="2018-01-01T00:00:00-0500" payloadID="123456789.2222.55123123@localhost" xml:lang="en-US">
+	<Header>
+		<From>
+			<Credential domain="TEST">
+				<Identity>remotehost</Identity>
+			</Credential>
+		</From>
+		<To>
+			<Credential domain="TEST">
+				<Identity>localhost</Identity>
+			</Credential>
+		</To>
+		<Sender>
+			<Credential domain="TEST">
+				<Identity>remotehost</Identity>
+			</Credential>
+			<UserAgent>Test Service</UserAgent>
+		</Sender>
+	</Header>
+	<Message deploymentMode="production">
+		<PunchOutOrderMessage>
+			<BuyerCookie>12345678</BuyerCookie>
+			<PunchOutOrderMessageHeader operationAllowed="create" quoteStatus="pending">
+				<Total>
+					<Money currency="CAD">524.93</Money>
+				</Total>
+				<ShipTo>
+					<Address>
+						<Name xml:lang="en-US">John Smith</Name>
+						<PostalAddress>
+							<DeliverTo>John Smith</DeliverTo>
+							<Street>123 Main St.</Street>
+							<City>Metropolis</City>
+							<Municipality>N/A</Municipality>
+							<State>ON</State>
+							<PostalCode>H3C 3P3</PostalCode>
+							<Country isoCountryCode="CA">Canada</Country>
+						</PostalAddress>
+					</Address>
+				</ShipTo>
+				<Shipping>
+					<Money currency="CAD">0.02</Money>
+					<Description xml:lang="fr-CA">Shipping for the whole thing</Description>
+				</Shipping>
+				<Tax>
+					<Money currency="CAD">0.05</Money>
+					<Description xml:lang="fr-CA">Taxes on the whole thing</Description>
+				</Tax>
+				<SupplierOrderInfo orderID="1234"/>
+			</PunchOutOrderMessageHeader>
+			<ItemIn quantity="1" openQuantity="2" promisedQuantity="3" lineNumber="1" parentLineNumber="0" itemType="item" compositeItemType="itemLevel" itemClassification="material">
+				<ItemID><SupplierPartID>SKU-1234</SupplierPartID></ItemID>
+				<ItemDetail>
+					<UnitPrice><Money currency="CAD">500.00</Money></UnitPrice>
+					<Description xml:lang="fr-CA"><ShortName>Desk</ShortName>Sit-stand ergonomic desk with attachments</Description>
+					<UnitOfMeasure>EA</UnitOfMeasure>
+					<Classification domain="SPSC">51000000</Classification>
+					<ManufacturerPartID>2000</ManufacturerPartID>
+					<ManufacturerName xml:lang="fr-CA">Gildan</ManufacturerName>
+					<URL>https://example.com/products/2000</URL>
+					<LeadTime>5</LeadTime>
+					<ItemDetailIndustry isConfigurableMaterial="yes">
+						<ItemDetailRetail>
+							<Characteristic domain="size"  value="70" code="in"/>
+							<Characteristic domain="color" value="Blue"/>
+						</ItemDetailRetail>
+					</ItemDetailIndustry>
+				</ItemDetail>
+				<Shipping>
+					<Money currency="CAD">0.01</Money>
+					<Description xml:lang="fr-CA">Shipping of the desk</Description>
+				</Shipping>
+				<Tax>
+					<Money currency="CAD">0.02</Money>
+					<Description xml:lang="fr-CA">Taxes on the desk</Description>
+				</Tax>
+			</ItemIn>
+			<ItemIn quantity="10">
+				<ItemID><SupplierPartID>SKU-2345</SupplierPartID></ItemID>
+				<ItemDetail>
+					<UnitPrice><Money currency="CAD">2.49</Money></UnitPrice>
+					<Description xml:lang="fr-CA"><ShortName>Cap</ShortName>Baseball cap, unisex, single color</Description>
+					<UnitOfMeasure>EA</UnitOfMeasure>
+					<Classification domain="SPSC">32000001</Classification>
+				</ItemDetail>
+			</ItemIn>
+			<ItemIn quantity="20" itemType="composite" compositeItemType="groupLevel" itemClassification="service">
+				<ItemID><SupplierPartID>SKU-0001</SupplierPartID></ItemID>
+				<ItemDetail>
+					<UnitPrice><Money currency="CAD">100.00</Money></UnitPrice>
+					<Description xml:lang="fr-CA"><ShortName>Installation</ShortName>Our wonderful installation services</Description>
+					<UnitOfMeasure>HUR</UnitOfMeasure>
+					<Classification domain="SPSC">20101010</Classification>
+				</ItemDetail>
+			</ItemIn>
+		</PunchOutOrderMessage>
+	</Message>
+</cXML>

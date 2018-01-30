@@ -84,6 +84,9 @@ t/testfiles/broken3.muse
 t/testfiles/captions.exp.html
 t/testfiles/captions.exp.ltx
 t/testfiles/captions.muse
+t/testfiles/code.exp.html
+t/testfiles/code.exp.ltx
+t/testfiles/code.muse
 t/testfiles/comments.exp.html
 t/testfiles/comments.exp.ltx
 t/testfiles/comments.muse
@@ -257,6 +260,9 @@ t/testfiles/verbatim.muse
 t/testfiles/verse-2.exp.html
 t/testfiles/verse-2.exp.ltx
 t/testfiles/verse-2.muse
+t/testfiles/verse-3.exp.html
+t/testfiles/verse-3.exp.ltx
+t/testfiles/verse-3.muse
 t/testfiles/verse.exp.html
 t/testfiles/verse.exp.ltx
 t/testfiles/verse.muse

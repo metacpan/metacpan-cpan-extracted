@@ -1,0 +1,168 @@
+
+== Revision history for module User::Identity.
+
+All changes are made by Mark Overmeer <markov@cpan.org> unless
+explicitly stated differently.
+
+version 0.99: Wed 24 Jan 09:08:27 CET 2018
+
+	Improvements:
+	- convert to GIT
+	- publish via GitHUB
+	- rename Changes -> ChangeLog
+
+version 0.98: Wed  8 Nov 09:46:42 CET 2017
+
+	Improvements:
+	- altered documentation style
+	- class detection typo
+	  rt.cpan.org#123553 [Randy Diffenderfer]
+	- require perl 5.10
+
+version 0.97: Thu  2 Feb 15:52:27 CET 2017
+
+	Improvements:
+	- spell checks from Debian.
+	  rt.cpan.org#118328 [Angel Abad]
+	- share podtail with MailBox
+
+version 0.96: Mon Sep 19 23:15:07 CEST 2016
+
+	Fixes:
+	- include examples in the manual-pages
+
+version 0.95:
+
+	Improvements:
+	- move t/99pod.t to xt/ and remove dependency on Test::Pod
+	- spell checks from Debian.
+	  rt.cpan.org#92483 [Salvatore Bonaccorso]
+
+version 0.94: Fri Jan 24 10:55:26 CET 2014
+
+	Improvements:
+	- changed documentation style
+
+version 0.93: Thu Dec 24 11:09:49 CET 2009
+
+	Fixes:
+	- Mail::Identity->from(Mail::Address) produced error
+	  rt.cpan.org#52115 [Dmitry Bigunyak]
+
+	Improvements:
+	- do not run t/pod.t in devel environment.
+
+version 0.92: Wed Jul 25 08:50:51 CEST 2007
+
+	Improvements:
+	- add t/pod.t and distribution clean-ups.
+
+version 0.91: Mon Jan  8 10:52:59 CET 2007
+
+	The module hasn't seen changes for some time now, but that
+	is because it works as expected.
+
+	Improvements:
+	- produced with newest OODoc, thereby
+	  could remove version, mkdoc and mkdist
+	- removed useless README
+
+version 0.90: Thu Aug 26 14:30:51 CEST 2004
+
+	Improvements:
+	- Geography::Countries is not required, but optional so
+	  [Nick Ing-Simmons] has installed too much.
+	- Cleaned the docs on many spots.
+	- new methods
+	     User::Identity::Collection::itemType()
+	     User::Identity::Collection::removeRole()
+	- new methods
+	     User::Identity::Item::removeCollection()
+	- METHODS section Initiation renamed to "Constructors"
+
+version 0.07: Mon Sep 29 13:34:47 CEST 2003
+
+	Interface breaking changes:
+	- User::Identity date_of_birth became birth... name was too long.
+	- User::Identity telephone became phone... same reason.
+	- For collections, new(user) was changed into new(parent).
+
+	Improvements:
+	- All items can now have their collections.  It's to the
+	  user not to make a mess of it.  You can create collections
+	  of collections, if you want to.
+	- User::Identity::Collection::Item is useless when everything is
+	  collectable.
+	- Even collections can be collected.
+	- Added base class for long-term storage: User::Identity::Archive
+	- Added User::Identity::Archive::Plain, which is a very simple
+	  text based way to specify items.
+	- Added User::Identity::Collection::Users, a group of people.
+
+version 0.06: Wed Aug  6 10:41:23 CEST 2003
+
+	Released because of version mistake in MailBox
+
+version 0.05: Mon Jul 28 18:34:49 CEST 2003
+
+	Interface breaking:
+
+	- Mail::Identity::email() renamed to Mail::Identity::address(),
+	  otherwise some very confusion options would appear.
+
+	- Mail::Identity::domainname() renamed to Mail::Identity::domain(),
+	  which feels better.
+
+	- Mail::Identity::address() defaults to Mail::Identity::name()
+	  if no username or domainname are present.
+
+	Improvements:
+
+	- Added charset to Mail::Identity
+
+	- Moved all modules to the lib sub-directory, which makes the
+	  */Makefile.PL helpers redundant.
+
+	- Added Mail::Identity->from(Mail::Address or User::Identity)
+
+	- Added enough options to OODoc::processFiles() to be able
+	  to join multiple distributions into one set of documentation
+	  pages.
+
+version 0.04: Tue Mar 25 08:19:13 CET 2003
+
+	Fixes:
+
+	- [Jorg Krieger] found typo's and saw that the ::System module
+	  was not correctly produced via copy-paste: too many things
+	  refered to e-mail i.s.o. systems.
+
+version 0.03: Fri Mar  7 23:26:25 CET 2003
+
+	Improvements:
+
+	- implemented new classes:
+		User::Identity::Item
+		User::Identity::System
+		User::Identity::Collection
+		User::Identity::Collection::Systems
+
+	- Everything is now derived from User::Identity::Item
+
+	- User::Identity requires a name (not nickname).
+
+version 0.02
+
+	Improvements:
+
+	- extended User::Identity with collection handling.
+
+	- implemented new classes:
+		Mail::Identity
+		User::Identity::Collection
+		User::Identity::Collection::Item
+		User::Identity::Collection::Emails
+
+version 0.01  Thu Jan 30 17:22:28 CET 2003
+	- original version
+

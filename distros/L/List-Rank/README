@@ -1,0 +1,72 @@
+NAME
+    List::Rank - Ranking of list elements
+
+VERSION
+    This document describes version 0.002 of List::Rank (from Perl
+    distribution List-Rank), released on 2018-01-26.
+
+SYNOPSIS
+    Return the ranks of the elements if sorted numerically (note that equal
+    values will be given equal ranks):
+
+     my @ranks = rank 10, 30, 20, 20; # => 1, 4, "2=", "2="
+
+    Return the ranks of the elements if sorted ascibetically:
+
+     my @ranks = rankstr "apricot", "cucumber", "banana", "banana"; # => 1,4,"2=","2="
+
+    Return the ranks of the elements if sorted by a custom sorter:
+
+     my @ranks = rankby {length($a) <=> length($b)}
+         "apricot", "cucumber", "banana", "banana"; # => 3, 4, "1=", "1="
+
+    Sort the list numerically and return the elements as well as ranks in
+    pairs:
+
+     my @res = sortrank 10, 30, 20, 20; => 10,1, 20,"2=", 20,"2=", 30,4
+
+    Sort the list ascibetically and return the elements as well as ranks in
+    pairs:
+
+     my @res = sortrankstr "apricot", "cucumber", "banana", "banana";
+         # => "apricot",1, "banana","2=", "banana","2=", "cucumber",4
+
+    Sort the list by a custom sorter and return the elements as well as
+    ranks in pairs:
+
+     my @res = sortrankby "apple", "cucumber", "banana", "banana";
+         # => "banana","1=", "banana","1=", "apricot",3, "cucumber",4
+
+FUNCTIONS
+  rank
+  rankstr
+  rankby
+  sortrank
+  sortrankstr
+  sortrankby
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-Rank>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-List-Rank>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-Rank>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sort::Rank
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

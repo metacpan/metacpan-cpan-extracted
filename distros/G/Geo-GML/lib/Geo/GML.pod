@@ -49,11 +49,7 @@ which versions you understand and produce.
 If you need the <b>most recent</b> version of GML, then you get involved
 with the ISO19139 standard.  See CPAN module Geo::ISO19139.
 
-The first releases of this module will not powerful, but hopefully
-people contribute.  For instance, an example conversion script between
-various versions is very welcome!  It would be nice to help each other.
-I will clean-up the implementation, to make it publishable, but do not
-have the knowledge about what is needed.
+B<When you need GML3.3 features, then please contact me>
 
 Extends L<"DESCRIPTION" in XML::Compile::Cache|XML::Compile::Cache/"DESCRIPTION">.
  
@@ -125,7 +121,7 @@ processed as STRUCTURAL by default (mixed in texts ignored).
 
 =item block_namespace => NAMESPACE|TYPE|HASH|CODE|ARRAY
 
-=item hook => HOOK|ARRAY
+=item hook => $hook|ARRAY
 
 =item hooks => ARRAY
 
@@ -146,7 +142,7 @@ processed as STRUCTURAL by default (mixed in texts ignored).
 Prefix abbreviations, to be used by cache object.  Which prefixes are
 defined depends on the schema version.
 
-=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+=item schema_dirs => $directory|ARRAY-OF-directories
 
 =item typemap => HASH|ARRAY
 
@@ -456,36 +452,14 @@ Extends L<"DESCRIPTIONS" in XML::Compile::Cache|XML::Compile::Cache/"DESCRIPTION
  
 =head1 SEE ALSO
 
-This module is part of Geo-GML distribution version 0.17,
-built on June 29, 2017. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>, and
-L</Math::Polygon>.
+This module is part of Geo-GML distribution version 0.18,
+built on January 19, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
-Please post questions or ideas to
-F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
+=head1 LICENSE
 
-=head1 COPYRIGHTS
-
-=head2 License of the CODE
-
-Copyrights of the perl code and the related documentation by
-2008-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2008-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 See F<http://dev.perl.org/licenses/>
-
-=head2 License of the SCHEMAS
-
-The included schemas are copyrighted by the Open Geospatial Consortium, Inc.
-They are unmodified copied from the files at F<http://schemas.opengis.net>.
-Read OGCs disclaimer and copyright statements on documentation and software
-at F<http://www.opengeospatial.org/ogc/legal>.  The license text is also
-included in this CPAN distribution.
 

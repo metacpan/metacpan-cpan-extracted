@@ -13,4 +13,4 @@ die "There is no folder 'local' in current dir\n"
 
 local::lib->setup_env_hash_for("./local");
 
-system @ARGV;
+exec @ARGV;

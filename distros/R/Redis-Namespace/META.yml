@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.0, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +36,7 @@ no_index:
 provides:
   Redis::Namespace:
     file: lib/Redis/Namespace.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Redis: '0'
   perl: '5.010000'
@@ -44,7 +44,8 @@ resources:
   bugtracker: https://github.com/shogo82148/Redis-Namespace/issues
   homepage: https://github.com/shogo82148/Redis-Namespace
   repository: git://github.com/shogo82148/Redis-Namespace.git
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'karupanerura <karupa@cpan.org>'
   - 'Mihyaeru <mihyaeru21@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

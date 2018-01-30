@@ -18,9 +18,10 @@ create table if not exists groups (
 
 create table if not exists users (
   id    integer primary key autoincrement,
-  group_id integer references groups(id),
+  group_id int(11) NOT NULL references groups(id),
   username varchar(20),
-  name varchar(30)
+  name varchar(30),
+  about TEXT NOT NULL
 );
 
 -- 2 down

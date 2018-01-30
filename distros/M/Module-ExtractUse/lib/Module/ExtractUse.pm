@@ -8,7 +8,7 @@ use Pod::Strip;
 use Parse::RecDescent 1.967009;
 use Module::ExtractUse::Grammar;
 use Carp;
-our $VERSION = '0.341';
+our $VERSION = '0.342';
 
 # ABSTRACT: Find out what modules are used
 
@@ -32,13 +32,13 @@ sub new {
 my $re_block;
 $re_block = qr {
     ( # eval BLOCK, corresponding to the group 10 in the entire regex
-        {
+        \{
             ((?:
                 (?> [^{}]+ )  # Non-braces without backtracking
             |
                 (??{$re_block}) # Recurse to group 10
             )*)
-        }
+        \}
     )
 }xs;
 my $re = qr{
@@ -63,13 +63,13 @@ my $re = qr{
             (?:(['"])(.*?)\8) # eval '' or eval "", group 8, group 9
             |
             ( # eval BLOCK, group 10
-                {
+                \{
                     ((?: # group 11
                         (?> [^{}]+ )  # Non-braces without backtracking
                     |
                         (??{$re_block}) # Recurse to group 10
                     )*)
-                }
+                \}
             )
         ))
     )
@@ -349,7 +349,7 @@ Module::ExtractUse - Find out what modules are used
 
 =head1 VERSION
 
-version 0.341
+version 0.342
 
 =head1 SYNOPSIS
 

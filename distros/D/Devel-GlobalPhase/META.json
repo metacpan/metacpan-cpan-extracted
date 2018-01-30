@@ -4,13 +4,13 @@
       "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-GlobalPhase",
    "no_index" : {
@@ -44,6 +44,6 @@
          "web" : "http://github.com/haarg/Devel-GlobalPhase"
       }
    },
-   "version" : "0.003000",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.003003",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

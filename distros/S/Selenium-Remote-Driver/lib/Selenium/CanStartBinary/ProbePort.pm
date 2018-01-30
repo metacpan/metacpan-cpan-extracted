@@ -1,5 +1,5 @@
 package Selenium::CanStartBinary::ProbePort;
-$Selenium::CanStartBinary::ProbePort::VERSION = '1.21';
+$Selenium::CanStartBinary::ProbePort::VERSION = '1.23';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ Selenium::CanStartBinary::ProbePort - Utility functions for finding open ports t
 
 =head1 VERSION
 
-version 1.21
+version 1.23
 
 =for Pod::Coverage *EVERYTHING*
 

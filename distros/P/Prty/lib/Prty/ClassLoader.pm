@@ -3,7 +3,7 @@ package Prty::ClassLoader;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 # -----------------------------------------------------------------------------
 
@@ -260,12 +260,12 @@ sub AUTOLOAD {
     if ($@) {
         $@ =~ s/ at .*//s;
         $die->($class,$sub,$@,
-            q{CLASSLOADER-00001: Modul kann nicht geladen werden});
+            q~CLASSLOADER-00001: Modul kann nicht geladen werden~);
     }
 
     unless ($this->can($sub)) {
         $die->($class,$sub,undef,
-            q{CLASSLOADER-00002: Methode existiert nicht});
+            q~CLASSLOADER-00002: Methode existiert nicht~);
     }
 
     return $this->$sub(@_);
@@ -309,7 +309,7 @@ werden kann.
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -317,7 +317,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

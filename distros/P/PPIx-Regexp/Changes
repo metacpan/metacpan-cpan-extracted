@@ -1,3 +1,14 @@
+0.054		2018-01-29	T. R. Wyant
+    Add support for (+script_run:...). This is an experimental feature
+    added in Perl 5.27.8. It imposes on any matches it contains the
+    additional restriction that everything matched has to belong to the
+    same Unicode script. This support will be retracted if the
+    functionality does not make it into Perl 5.28.
+
+    Add method scontent().  This returns significant content only. That
+    is, if called on the parse of '/ f u b a r /x', it returns
+    '/fubar/x'.
+
 0.053		2017-10-30	T. R. Wyant
     Recognize \px as Unicode char class. At least, when the x is C, L,
     M, N, P, S or Z.

@@ -1,3 +1,9 @@
+0.03 2018-01-23T09:01:51+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2015-10-15T21:46:14+02:00
  - Add Task::Tags to SEE ALSO section in doc.
  - Add comments to tests.

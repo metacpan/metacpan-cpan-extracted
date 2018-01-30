@@ -48,7 +48,7 @@ void check_exception_from_perl(JNIEnv *env, char *msg){
 	if ((*(env))->ExceptionCheck(env)){
 		(*(env))->ExceptionDescribe(env) ;
 		(*(env))->ExceptionClear(env) ;
-		croak(msg) ;
+		croak("%s", msg) ;
 	}
 }
 
@@ -307,5 +307,5 @@ process_command(this, data)
 	RETVAL
 
 	CLEANUP:
-	(*(env))->DeleteLocalRef(env, resp) ;
 	(*(env))->ReleaseStringUTFChars(env, resp, RETVAL) ;
+	(*(env))->DeleteLocalRef(env, resp) ;

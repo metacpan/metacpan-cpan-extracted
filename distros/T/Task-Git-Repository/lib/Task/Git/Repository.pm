@@ -1,5 +1,5 @@
 package Task::Git::Repository;
-$Task::Git::Repository::VERSION = '1.002';
+$Task::Git::Repository::VERSION = '1.003';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ Task::Git::Repository - Install all Git::Repository plugins at once
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,8 @@ L<Git::Repository> - Perl interface to Git repositories
 L<Git::Repository::Plugin::AUTOLOAD> - Git subcommands as L<Git::Repository> methods
 
 L<Git::Repository::Plugin::Blame> - Add a blame() method to L<Git::Repository>
+
+L<Git::Repository::Plugin::Dirty> - methods to inspect the dirtiness of a git repository
 
 L<Git::Repository::Plugin::FileHistory> - Class representing file on git repository
 
@@ -72,7 +74,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014-2017 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2014-2018 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

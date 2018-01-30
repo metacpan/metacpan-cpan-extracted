@@ -32,11 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.006"
+            "JSON" : "0",
+            "LWP::JSON::Tiny" : "0",
+            "Moose" : "0",
+            "UUID::Generator::PurePerl" : "0",
+            "perl" : "5.008003"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

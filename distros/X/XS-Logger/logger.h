@@ -6,6 +6,16 @@
 #  define XS_LOGGER_H 1
 
 #include <perl.h>
+#include <sys/types.h>
+
+#ifndef false
+#	define false 0
+#endif
+
+#ifndef true
+#	define true 1
+#endif
+
 
 /* typedef enum { xfalse, xtrue } xbool; */
 
@@ -37,7 +47,7 @@ typedef struct {
 char* get_default_file_path();
 void do_log(MyLogger *mylogger, logLevel level, const char *fmt, int num_args, ...);
 
-#define ACQUIRE_LOCK_ONCE(f) if (!hold_lock) { flock( fileno(f), LOCK_EX ); hold_lock = true; }
-#define RELEASE_LOCK(f) if (hold_lock) flock( fileno(f), LOCK_UN );
+#define ACQUIRE_LOCK_ONCE(f) if ( hold_lock == false ) { flock( fileno(f), LOCK_EX ); hold_lock = true; }
+#define RELEASE_LOCK(f) if ( hold_lock == true ) flock( fileno(f), LOCK_UN );
 
 #endif /* XS_LOGGER_H */

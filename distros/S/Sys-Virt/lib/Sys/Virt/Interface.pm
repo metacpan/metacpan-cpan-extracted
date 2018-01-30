@@ -45,7 +45,7 @@ sub _new {
     my $class = ref($proto) || $proto;
     my %params = @_;
 
-    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
     my $self;
     if (exists $params{name}) {
 	$self = Sys::Virt::Interface::_lookup_by_name($con,  $params{name});

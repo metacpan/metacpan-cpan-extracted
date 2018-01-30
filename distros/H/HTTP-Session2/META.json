@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.9",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -68,7 +68,7 @@
    "provides" : {
       "HTTP::Session2" : {
          "file" : "lib/HTTP/Session2.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       },
       "HTTP::Session2::Base" : {
          "file" : "lib/HTTP/Session2/Base.pm"
@@ -87,7 +87,7 @@
       },
       "HTTP::Session2::ServerStore" : {
          "file" : "lib/HTTP/Session2/ServerStore.pm",
-         "version" : "1.09"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
@@ -101,9 +101,10 @@
          "web" : "https://github.com/tokuhirom/HTTP-Session2"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_contributors" : [
       "magai <xxmagai@gmail.com>",
       "Songmu <y.songmu@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

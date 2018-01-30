@@ -9,7 +9,7 @@ package Rex::User::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 require Rex::Commands;
@@ -21,7 +21,7 @@ use Rex::Interface::File;
 use Rex::Interface::Fs;
 use Rex::Interface::Exec;
 use Rex::Helper::Path;
-use JSON::XS;
+use JSON::MaybeXS;
 
 use Rex::User::Base;
 use base qw(Rex::User::Base);
@@ -250,9 +250,11 @@ sub rm_user {
     $cmd .= " --force";
   }
 
-  i_run $cmd . " " . $user, fail_ok => 1;
-  if ( $? != 0 ) {
-    die("Error deleting user $user");
+  my $output = i_run $cmd . " " . $user, fail_ok => 1;
+  if ( $? == 6 ) {
+    Rex::Logger::info("Cannot delete user $user (no such user)", "warn");
+  } elsif ( $? != 0 ) {
+    die("Error deleting user $user ($output)");
   }
 
 }

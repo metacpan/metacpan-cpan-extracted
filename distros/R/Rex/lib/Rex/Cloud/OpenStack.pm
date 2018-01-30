@@ -9,7 +9,7 @@ package Rex::Cloud::OpenStack;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 
@@ -17,7 +17,7 @@ use base 'Rex::Cloud::Base';
 
 BEGIN {
   use Rex::Require;
-  JSON::XS->use;
+  JSON::MaybeXS->use;
   HTTP::Request::Common->use(qw(:DEFAULT DELETE));
   LWP::UserAgent->use;
 }

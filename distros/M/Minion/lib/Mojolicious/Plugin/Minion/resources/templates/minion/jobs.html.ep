@@ -5,34 +5,27 @@
 
   % my ($parents, $children, $id) = @{$job}{qw(parents children worker)};
   % if (@$parents || @$children || $id) {
-    <div class="btn-group">
+    <div class="dropdown">
       <button type="button"
-        class="btn btn-default btn-xs dropdown-toggle"
-        data-toggle="dropdown" aria-haspopup="true"
+        class="btn btn-sm btn-outline-secondary dropdown-toggle"
+        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
         aria-expanded="false">
         Related
-        <span class="caret"></span>
-        <span class="sr-only">Toggle Dropdown</span>
       </button>
-      <ul class="dropdown-menu">
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         % if (@$parents) {
-          <li>
-            <%= link_to
-              Parents => url_for('minion_jobs')->query(id => $parents) %>
-          </li>
+          % my $url = url_for('minion_jobs')->query(id => $parents);
+          <a class="dropdown-item" href="<%= $url %>">Parents</a>
         % }
         % if (@$children) {
-          <li>
-            <%= link_to
-              Children => url_for('minion_jobs')->query(id => $children) %>
-          </li>
+          % my $url = url_for('minion_jobs')->query(id => $children);
+          <a class="dropdown-item" href="<%= $url %>">Children</a>
         % }
         % if ($id) {
-          <li>
-            <%= link_to Worker => url_for('minion_workers')->query(id => $id) %>
-          </li>
+          % my $url = url_for('minion_workers')->query(id => $id);
+          <a class="dropdown-item" href="<%= $url %>">Worker</a>
         % }
-      </ul>
+      </div>
     </div>
   % }
 % end
@@ -40,28 +33,29 @@
 %= include 'minion/_notifications'
 
 %= form_for 'minion_manage_jobs' => begin
-  <div class="row center-md">
-    <div class="col-md-4 btn-group" role="group">
-      <button class="btn btn-default" name="do" value="retry" type="submit">
-        <i class="fas fa-redo" aria-hidden="true"></i> Retry
-      </button>
-      <button class="btn btn-default" name="do" value="stop" type="submit">
-        <i class="fas fa-ban" aria-hidden="true"></i> Stop
-      </button>
-      <button class="btn btn-default" name="do" value="remove" type="submit">
-        <i class="fas fa-times" aria-hidden="true"></i> Remove
-      </button>
+  <div class="d-flex justify-content-between">
+    <div>
+      <div class="btn-group" role="group">
+        <button class="btn btn-outline-secondary" name="do" value="retry"
+          type="submit">
+          <i class="fas fa-redo" aria-hidden="true"></i> Retry
+        </button>
+        <button class="btn btn-outline-secondary" name="do" value="stop"
+          type="submit">
+          <i class="fas fa-ban" aria-hidden="true"></i> Stop
+        </button>
+        <button class="btn btn-outline-secondary" name="do" value="remove"
+          type="submit">
+          <i class="fas fa-times" aria-hidden="true"></i> Remove
+        </button>
+      </div>
     </div>
-    <div class="col-md-4">
-      <p class="text-center">
-        % if (@$jobs) {
-          <%= $offset + 1 %>-<%= $offset + @$jobs %> of <%= $total %>
-        % }
-      </p>
-    </div>
-    <div class="col-md-4">
-      %= include 'minion/_limit'
-    </div>
+    <p class="align-middle">
+      % if (@$jobs) {
+        <%= $offset + 1 %>-<%= $offset + @$jobs %> of <%= $total %>
+      % }
+    </p>
+    %= include 'minion/_limit'
   </div>
 
   <div class="row">
@@ -108,16 +102,16 @@
               <td class="accordion-toggle collapsed" data-toggle="collapse"
                 data-target="#job<%= $i %>">
                 % if ($job->{state} eq 'active') {
-                  <span class="label label-warning">active</span>
+                  <span class="badge badge-warning">active</span>
                 % }
                 % elsif ($job->{state} eq 'failed') {
-                  <span class="label label-danger">failed</span>
+                  <span class="badge badge-danger">failed</span>
                 % }
                 % elsif ($job->{state} eq 'finished') {
-                  <span class="label label-success">finished</span>
+                  <span class="badge badge-success">finished</span>
                 % }
                 % else {
-                  <span class="label label-info">inactive</span>
+                  <span class="badge badge-primary">inactive</span>
                 % }
               </td>
               <td class="accordion-toggle collapsed expand"
@@ -128,7 +122,7 @@
             <tr>
               <td colspan="8" class="hiddenRow">
                 <div class="collapse" id="job<%= $i %>">
-                  <pre><code><%= dumper Minion::_datetime $job %></code></pre>
+                  <pre class="border rounded"><%= dumper Minion::_datetime $job %></pre>
                 </div>
               </td>
             </tr>
@@ -139,8 +133,6 @@
   </div>
 % end
 
-<div class="row">
-  <div class="col-md-12">
-    %= include 'minion/_pagination'
-  </div>
+<div class="d-flex justify-content-center">
+  %= include 'minion/_pagination'
 </div>

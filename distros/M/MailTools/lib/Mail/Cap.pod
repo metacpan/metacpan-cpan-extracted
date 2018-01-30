@@ -36,7 +36,7 @@ and therefore have succeeded the mail-cap specifications on modern
 
 =over 4
 
-=item Mail::Cap-E<gt>B<new>(OPTIONS)
+=item Mail::Cap-E<gt>B<new>(%options)
 
 Create and initialize a new Mail::Cap object.  If you give it an
 argument it will try to parse the specified file.  Without any
@@ -81,13 +81,13 @@ of the command.
 
 =over 4
 
-=item $obj-E<gt>B<compose>(TYPE, FILE)
+=item $obj-E<gt>B<compose>($type, $file)
 
-=item $obj-E<gt>B<edit>(TYPE, FILE)
+=item $obj-E<gt>B<edit>($type, $file)
 
-=item $obj-E<gt>B<print>(TYPE, FILE)
+=item $obj-E<gt>B<print>($type, $file)
 
-=item $obj-E<gt>B<view>(TYPE, FILE)
+=item $obj-E<gt>B<view>($type, $file)
 
 =back
 
@@ -100,13 +100,13 @@ suitable specification exists.
 
 =over 4
 
-=item $obj-E<gt>B<composeCmd>(TYPE, FILE)
+=item $obj-E<gt>B<composeCmd>($type, $file)
 
-=item $obj-E<gt>B<editCmd>(TYPE, FILE)
+=item $obj-E<gt>B<editCmd>($type, $file)
 
-=item $obj-E<gt>B<printCmd>(TYPE, FILE)
+=item $obj-E<gt>B<printCmd>($type, $file)
 
-=item $obj-E<gt>B<viewCmd>(TYPE, FILE)
+=item $obj-E<gt>B<viewCmd>($type, $file)
 
 =back
 
@@ -116,18 +116,18 @@ Methods return the corresponding mailcap field for the type.
 
 =over 4
 
-=item $obj-E<gt>B<description>(TYPE)
+=item $obj-E<gt>B<description>($type)
 
-=item $obj-E<gt>B<field>(TYPE, FIELD)
+=item $obj-E<gt>B<field>($type, $field)
 
 Returns the specified field for the type.  Returns undef if no
 specification exists.
 
-=item $obj-E<gt>B<nametemplate>(TYPE)
+=item $obj-E<gt>B<nametemplate>($type)
 
-=item $obj-E<gt>B<textualnewlines>(TYPE)
+=item $obj-E<gt>B<textualnewlines>($type)
 
-=item $obj-E<gt>B<x11_bitmap>(TYPE)
+=item $obj-E<gt>B<x11_bitmap>($type)
 
 =back
 

@@ -30,41 +30,51 @@ is $db->insert('crud_test', {name => 'bar'}, {returning => 'id'})->hash->{id},
   2, 'right value';
 is_deeply $db->select('crud_test')->hashes->to_array,
   [{id => 1, name => 'foo'}, {id => 2, name => 'bar'}], 'right structure';
+$db->insert('crud_test', {id => 1, name => 'foo'}, {on_conflict => undef});
+$db->insert(
+  'crud_test',
+  {id => 2, name => 'bar'},
+  {on_conflict => [id => {name => 'baz'}]}
+);
 
 # Read
 is_deeply $db->select('crud_test')->hashes->to_array,
-  [{id => 1, name => 'foo'}, {id => 2, name => 'bar'}], 'right structure';
+  [{id => 1, name => 'foo'}, {id => 2, name => 'baz'}], 'right structure';
 is_deeply $db->select('crud_test', ['name'])->hashes->to_array,
-  [{name => 'foo'}, {name => 'bar'}], 'right structure';
+  [{name => 'foo'}, {name => 'baz'}], 'right structure';
 is_deeply $db->select('crud_test', ['name'], {name => 'foo'})->hashes->to_array,
   [{name => 'foo'}], 'right structure';
 is_deeply $db->select('crud_test', ['name'], undef, {-desc => 'id'})
-  ->hashes->to_array, [{name => 'bar'}, {name => 'foo'}], 'right structure';
+  ->hashes->to_array, [{name => 'baz'}, {name => 'foo'}], 'right structure';
+is_deeply $db->select('crud_test', undef, undef, {offset => 1})
+  ->hashes->to_array, [{id => 2, name => 'baz'}], 'right structure';
+is_deeply $db->select('crud_test', undef, undef, {limit => 1})
+  ->hashes->to_array, [{id => 1, name => 'foo'}], 'right structure';
 
 # Non-blocking read
 my $result;
 my $delay = Mojo::IOLoop->delay(sub { $result = pop->hashes->to_array });
 $db->select('crud_test', $delay->begin);
 $delay->wait;
-is_deeply $result, [{id => 1, name => 'foo'}, {id => 2, name => 'bar'}],
+is_deeply $result, [{id => 1, name => 'foo'}, {id => 2, name => 'baz'}],
   'right structure';
 $result = undef;
 $delay = Mojo::IOLoop->delay(sub { $result = pop->hashes->to_array });
 $db->select('crud_test', undef, undef, {-desc => 'id'}, $delay->begin);
 $delay->wait;
-is_deeply $result, [{id => 2, name => 'bar'}, {id => 1, name => 'foo'}],
+is_deeply $result, [{id => 2, name => 'baz'}, {id => 1, name => 'foo'}],
   'right structure';
 
 # Update
-$db->update('crud_test', {name => 'baz'}, {name => 'foo'});
+$db->update('crud_test', {name => 'yada'}, {name => 'foo'});
 is_deeply $db->select('crud_test', undef, undef, {-asc => 'id'})
-  ->hashes->to_array, [{id => 1, name => 'baz'}, {id => 2, name => 'bar'}],
+  ->hashes->to_array, [{id => 1, name => 'yada'}, {id => 2, name => 'baz'}],
   'right structure';
 
 # Delete
-$db->delete('crud_test', {name => 'baz'});
+$db->delete('crud_test', {name => 'yada'});
 is_deeply $db->select('crud_test', undef, undef, {-asc => 'id'})
-  ->hashes->to_array, [{id => 2, name => 'bar'}], 'right structure';
+  ->hashes->to_array, [{id => 2, name => 'baz'}], 'right structure';
 $db->delete('crud_test');
 is_deeply $db->select('crud_test')->hashes->to_array, [], 'right structure';
 
@@ -107,7 +117,7 @@ is $result->{name}, 'promise', 'right result';
 $result = undef;
 my $first  = $pg->db->query_p("select * from crud_test where name = 'promise'");
 my $second = $pg->db->query_p("select * from crud_test where name = 'promise'");
-$first->all($second)->then(
+Mojo::Promise->all($first, $second)->then(
   sub {
     my ($first, $second) = @_;
     $result = [$first->[0]->hash, $second->[0]->hash];
@@ -131,6 +141,27 @@ is $result->{name}, 'promise_two', 'right result';
 my $fail;
 $db->dollar_only->query_p('does_not_exist')->catch(sub { $fail = shift })->wait;
 like $fail, qr/does_not_exist/, 'right error';
+
+# Join
+$db->query(
+  'create table if not exists crud_test4 (
+     id    serial primary key,
+     test1 text
+   )'
+);
+$db->query(
+  'create table if not exists crud_test5 (
+     id    serial primary key,
+     test2 text
+   )'
+);
+$db->insert('crud_test4', {test1 => 'hello'});
+$db->insert('crud_test5', {test2 => 'world'});
+is_deeply $db->select(['crud_test4', ['crud_test5', id => 'id']],
+  ['crud_test4.id', 'test1', 'test2', ['crud_test4.test1' => 'test3']])
+  ->hashes->to_array,
+  [{id => 1, test1 => 'hello', test2 => 'world', test3 => 'hello'}],
+  'right structure';
 
 # Clean up once we are done
 $pg->db->query('drop schema mojo_crud_test cascade');

@@ -1,5 +1,13 @@
 Revision history for Test-RunValgrind
 
+0.2.0       2018-01-26
+    - Implement 'valgrind_args'
+        - https://github.com/shlomif/perl-Test-RunValgrind/issues/4
+        - Thanks to @rrthomas
+    - Implement 'ignore_leaks'
+        - https://rt.cpan.org/Public/Bug/Display.html?id=119988
+        - Thanks to BKB .
+
 0.0.3       2018-01-12
     - Fix a broken link to the GitHub issues and other links.
     - https://github.com/shlomif/perl-Test-RunValgrind/issues/1

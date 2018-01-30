@@ -3,7 +3,7 @@ package Firefox::Marionette::Window::Rect;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -31,9 +31,9 @@ sub height {
     return $self->{height};
 }
 
-sub state {
+sub wstate {
     my ($self) = @_;
-    return $self->{state};
+    return $self->{wstate};
 }
 
 1;    # Magic true value required at end of module
@@ -45,7 +45,7 @@ Firefox::Marionette::Window::Rect - Represents the browser window's shape and si
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * width - the width of the window
 
-=item * state - the state of the window as a scalar string
+=item * wstate - the state of the window as a scalar string
 
 =back
 
@@ -98,7 +98,7 @@ returns the height of the window
 
 returns the width of the window
 
-=head2 state
+=head2 wstate
 
 returns a scalar representing the state of the window. For example 'maximized'.
 

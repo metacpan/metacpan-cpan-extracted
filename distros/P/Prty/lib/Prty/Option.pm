@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Hash;
 use Scalar::Util ();
@@ -209,7 +209,7 @@ sub extract {
                 die "Ungültige Methodenoption: $key\n";
             }
             $class->throw(
-                q{OPT-00002: Ungültige Methodenoption},
+                q~OPT-00002: Ungültige Methodenoption~,
                 Option=>$key,
             );
         }
@@ -302,7 +302,7 @@ sub extract {
                 die "Ungültige Option: $dashPrefix$key\n";
             }
             $class->throw(
-                q{OPT-00001: Ungültige Option},
+                q~OPT-00001: Ungültige Option~,
                 Option=>"$dashPrefix$key",
             );
         };
@@ -441,7 +441,7 @@ sub extractMulti {
         }
         else {
             $this->throw(
-                q{OPT-00004: Ungültige Option},
+                q~OPT-00004: Ungültige Option~,
                 Option=>$key,
             );
         }
@@ -461,7 +461,7 @@ sub extractMulti {
             $refType = Scalar::Util::reftype($ref);
             if (!defined $refType) {
                 $this->throw(
-                    q{OPT-00002: Ungültige Variablen-Referenz},
+                    q~OPT-00002: Ungültige Variablen-Referenz~,
                     Option=>$arg,
                 );
             }
@@ -474,7 +474,7 @@ sub extractMulti {
 
             if (!$sloppy) {
                 $this->throw(
-                    q{OPT-00001: Ungültige Option},
+                    q~OPT-00001: Ungültige Option~,
                     Option=>$arg);
             }
             $ref = undef;
@@ -506,7 +506,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -514,7 +514,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

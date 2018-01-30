@@ -27,6 +27,7 @@ t/connection-refused.t
 t/constructor.t
 t/disconnected.t
 t/lite.t
+t/load.t
 t/protocol.t
 t/pubsub.t
 t/scan-operations.t

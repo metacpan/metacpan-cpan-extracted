@@ -1,0 +1,25 @@
+---
+abstract: 'Metabase transport for Test::Reporter with fallback to File transport'
+author:
+  - 'Serguei Trouchelle <stro@cpan.org>'
+build_requires:
+  Cwd: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Reporter: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Reporter-Transport-Metabase-Fallback
+requires:
+  Carp: '0'
+  Test::Reporter::Transport::File: '0'
+  Test::Reporter::Transport::Metabase: '0'
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

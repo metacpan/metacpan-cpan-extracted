@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Perl;
 use Prty::Path;
@@ -151,7 +151,7 @@ sub new {
         }
     
         if (!-e $cfgFile) {
-            $class->throw(q{CFG-00002: Konfigurationsdatei nicht gefunden},
+            $class->throw(q~CFG-00002: Konfigurationsdatei nicht gefunden~,
                 ConfigFile=>$cfgFile,
             );
         }
@@ -197,7 +197,7 @@ sub get {
     for my $key (@_) {
         if (!exists $self->{$key}) {
             $self->throw(
-                q{CFG-00001: Config-Variable existiert nicht},
+                q~CFG-00001: Config-Variable existiert nicht~,
                 Variable=>$key,
             );
         }
@@ -254,7 +254,7 @@ sub try {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -262,7 +262,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

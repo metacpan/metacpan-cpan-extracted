@@ -4,13 +4,14 @@ lib/Tree/DAG_Node.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
 scripts/cut.and.paste.subtrees.pl
 scripts/read.tree.log
 scripts/read.tree.pl
 scripts/write.tree.pl
+t/00.versions.t
+t/00.versions.tx
 t/about.perl.t
 t/cut.and.paste.subtrees.t
 t/load.t
@@ -20,3 +21,5 @@ t/tree.utf8.attributes.txt
 t/tree.with.attributes.txt
 t/tree.without.attributes.txt
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@ package Devel::MAT::Tool::Reachability;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use constant FOR_UI => 1;
 
@@ -214,9 +214,9 @@ sub mark_reachable
 
                push @more_padlist, $cv->padlist;
 
-               my $padnames = $cv->padnames;
-               if( $padnames ) {
-                  push @more_padlist, $padnames, $padnames->elems;
+               my $padnames_av = $cv->padnames_av;
+               if( $padnames_av ) {
+                  push @more_padlist, $padnames_av, $padnames_av->elems;
                }
 
                foreach my $pad ( $cv->pads ) {
@@ -229,7 +229,7 @@ sub mark_reachable
                   }
 
                   foreach my $padix ( 1 .. $pad->elems-1 ) {
-                     my $padname_sv = $padnames ? $padnames->elem( $padix ) : undef;
+                     my $padname_sv = $padnames_av ? $padnames_av->elem( $padix ) : undef;
                      my $padname = $padname_sv && $padname_sv->type eq "SCALAR" ?
                         $padname_sv->pv : undef;
 

@@ -3,8 +3,9 @@ package Prty::Css;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
+use Prty::Html::Tag;
 use Prty::Path;
 use Prty::String;
 
@@ -62,7 +63,7 @@ sub rule {
     my $str = "$selector {\n";
     while (@_) {
         my $prop = shift; 
-       my $val = shift;
+        my $val = shift;
 
         $prop =~ s/([a-z])([A-Z])/$1-\L$2/g;
 
@@ -220,7 +221,7 @@ sub style {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -228,7 +229,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

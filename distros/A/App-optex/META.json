@@ -4,7 +4,7 @@
       "Kaz Utashiro <kaz@utashiro.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -50,6 +50,8 @@
       },
       "test" : {
          "requires" : {
+            "File::Path" : "0",
+            "File::Spec" : "0",
             "Test::Command" : "0.11",
             "Test::More" : "0.98"
          }
@@ -58,7 +60,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.0.10"
+         "version" : "v0.0.12"
       },
       "App::optex::debug" : {
          "file" : "lib/App/optex/debug.pm"
@@ -90,7 +92,7 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.0.10",
+   "version" : "v0.0.12",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

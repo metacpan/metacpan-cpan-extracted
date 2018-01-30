@@ -51,7 +51,7 @@ package Rex::Commands::Sync;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -65,7 +65,7 @@ use Rex::Commands::File;
 use Rex::Commands::Download;
 use Rex::Helper::Path;
 use Rex::Helper::Encode;
-use JSON::XS;
+use JSON::MaybeXS;
 use Text::Glob 'glob_to_regex', 'match_glob';
 use File::Basename 'basename';
 

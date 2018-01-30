@@ -22,7 +22,7 @@ use warnings;
 use utf8;
 
 package Devel::PerlySense::Config::Project;
-$Devel::PerlySense::Config::Project::VERSION = '0.0218';
+$Devel::PerlySense::Config::Project::VERSION = '0.0219';
 
 
 
@@ -76,7 +76,10 @@ project:
 
   #Extra @INC directories, relative to the project root
   #These come before the default inc directories "." and "lib"
-  inc_dir: []
+  inc_dir:
+  # e.g.
+  # - t/lib
+  # - that/other/lib
 
 
 #Bookmarks are regexes that may match against a single line.

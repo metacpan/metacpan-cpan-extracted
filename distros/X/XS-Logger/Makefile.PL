@@ -30,9 +30,10 @@ my %WriteMakefileArgs = (
     "Test2::Suite" => 0,
     "Test2::Tools::Explain" => 0,
     "Test::Builder" => 0,
+    "Test::CPAN::Meta" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "Test2::Suite" => 0,
   "Test2::Tools::Explain" => 0,
   "Test::Builder" => 0,
+  "Test::CPAN::Meta" => 0,
   "Test::More" => 0
 );
 

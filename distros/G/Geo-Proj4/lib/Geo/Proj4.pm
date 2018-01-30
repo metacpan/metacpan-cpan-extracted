@@ -1,10 +1,14 @@
-# Copyrights 2017 by [Mark Overmeer].
-#  For other contributors see Changes.
+# Copyrights 2018 by [Mark Overmeer].
+#  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Geo-Proj4.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
+
 package Geo::Proj4;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use strict;

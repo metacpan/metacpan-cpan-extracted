@@ -4,13 +4,13 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Task-Git-Repository",
    "prereqs" : {
@@ -32,6 +32,7 @@
             "Git::Repository" : "1.309",
             "Git::Repository::Plugin::AUTOLOAD" : "1.000",
             "Git::Repository::Plugin::Blame" : "0",
+            "Git::Repository::Plugin::Dirty" : "0",
             "Git::Repository::Plugin::FileHistory" : "0",
             "Git::Repository::Plugin::Gerrit" : "0",
             "Git::Repository::Plugin::GitHooks" : "0",
@@ -63,7 +64,7 @@
          "web" : "http://github.com/book/Task-Git-Repository"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.003",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

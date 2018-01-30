@@ -2,17 +2,17 @@ package FakeModuleWithoutNew;
 
 use strict;
 
-sub DummmyMethodForTestOverriding {
+sub DummyMethodForTestOverriding {
     my $self = shift;
-    return 'A dummmy method';
+    return 'A dummy method';
 }
 
-sub secondDummmyMethodForTestOverriding {
+sub secondDummyMethodForTestOverriding {
     my $self = shift;
-    return 'A second dummmy method';
+    return 'A second dummy method';
 }
 
-sub dummmyMethodWithParameterReturn {
+sub dummyMethodWithParameterReturn {
     my $self = shift;
     my ( $Parameter ) = @_;
     return $Parameter;

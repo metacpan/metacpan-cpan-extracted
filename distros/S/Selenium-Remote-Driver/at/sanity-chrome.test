@@ -19,6 +19,9 @@ my $driver = Selenium::Remote::Driver->new(
     port => 4444,
     browser_name => 'chrome',
     accept_ssl_certs => 1,
+    extra_capabilities => {
+        args => ['start-maximized'],
+    },
 );
 isa_ok($driver,'Selenium::Remote::Driver',"Can get new S::R::D with WebDriver3");
 
@@ -134,7 +137,7 @@ ok($driver->switch_to_frame($driver->find_element('frame', 'id')),"can switch to
 ok($driver->switch_to_frame(),"can switch to parent frame (WD3 only)");
 
 ok($driver->set_window_position(1,1),"can set window position (WD3)");
-ok($driver->set_window_size(200,200),"can set window size (WD3)");
+ok($driver->set_window_size(640,480),"can set window size (WD3)");
 
 ok($driver->maximize_window(),"can maximize window (WD3)");
 SKIP: {
@@ -204,7 +207,10 @@ is( $l2->get_tag_name(),'input',"get_tag_name works (WD3)");
 is( exception { $l2->get_element_location_in_view() }, undef, "get_element_location_in_view available in gegl krom");
 
 is($driver->find_element('hidon','id')->is_displayed(),0,"is_displayed returns false for type=hidden elements");
-is($driver->find_element('no-see-em','id')->is_displayed(),0,"is_displayed returns false for display=none");
+my $gone = $driver->find_element('no-see-em','id');
+is($gone->is_displayed(),0,"is_displayed returns false for display=none");
+is($gone->is_enabled(),1,"is_enabled returns true for non-input elements");
+
 is($driver->find_element('h1','tag_name')->get_text(),'Howdy Howdy Howdy', "get_text works (WD3)");
 
 $driver->find_element('clickme','id')->click();

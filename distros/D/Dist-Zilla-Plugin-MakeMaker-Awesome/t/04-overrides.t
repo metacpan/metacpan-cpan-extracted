@@ -19,7 +19,8 @@ use File::pushd 'pushd';
     };
     around _build_WriteMakefile_args => sub {
         my $orig = shift; my $self = shift;
-        return +{ %{ $self->$orig(@_) }, '_IGNORE' => 'in WriteMakefile_args' }
+        # EUMM says: "NAME" must be a valid Perl package name and it must have an associated ".pm" file
+        return +{ %{ $self->$orig(@_) }, 'NAME' => 'ThisIsAHack' }
     };
     around _build_WriteMakefile_dump => sub {
         my $orig = shift; my $self = shift;
@@ -46,6 +47,7 @@ my $tzil = Builder->from_config(
                 # returns nothing
             ),
             path(qw(source lib DZT Sample.pm)) => 'package DZT::Sample; 1',
+            path(qw(source lib ThisIsAHack.pm)) => 'package ThisIsAHack; 1',
             path(qw(source t basic.t)) => 'warn "here is a test";',
             path(qw(source bin hello-world)) => "#!/usr/bin/perl\nprint \"hello!\\n\"",
         },
@@ -69,7 +71,7 @@ like(
 );
 like(
     $content,
-    qr/^\s+"_IGNORE"\s+=>\s+"in WriteMakefile_args",/m,
+    qr/^\s+"NAME"\s+=>\s+"ThisIsAHack",/m,
     '_build_WriteMakefile_args hook called',
 );
 like(

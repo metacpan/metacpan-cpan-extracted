@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use LWP::UserAgent ();
 use Prty::Option;
@@ -584,7 +584,7 @@ sub send {
     my $res = $ua->request($req);
     if (!$res->is_success) {
         $self->throw(
-            q{CLIENT-00001: HTTP request failed},
+            q~CLIENT-00001: HTTP request failed~,
             StatusLine => $res->status_line,
             Response => $res->content,
         );
@@ -659,7 +659,7 @@ sub url {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -667,7 +667,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

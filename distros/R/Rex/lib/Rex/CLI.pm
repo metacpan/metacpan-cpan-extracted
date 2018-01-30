@@ -9,7 +9,7 @@ package Rex::CLI;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use FindBin;
 use File::Basename qw(basename dirname);
@@ -226,7 +226,6 @@ CHECK_OVERWRITE: {
       Rex::Commands::private_key( $opts{'P'} );
 
       for my $task ( Rex::TaskList->create()->get_tasks ) {
-        $task->set_auth( "private_key", $opts{'P'} );
         Rex::TaskList->create()->get_task($task)
           ->set_auth( "private_key", $opts{'P'} );
       }
@@ -807,6 +806,7 @@ sub exit_rex {
 
     my @exit_codes = Rex::TaskList->create()->get_exit_codes();
     for my $exit_code (@exit_codes) {
+      $exit_code = $exit_code >> 8 if $exit_code > 255;
       CORE::exit($exit_code) if $exit_code != 0;
     }
   }

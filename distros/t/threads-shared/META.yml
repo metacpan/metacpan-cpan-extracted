@@ -27,5 +27,5 @@ requires:
   strict: '0'
   threads: '1.73'
   warnings: '0'
-version: '1.57'
+version: '1.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

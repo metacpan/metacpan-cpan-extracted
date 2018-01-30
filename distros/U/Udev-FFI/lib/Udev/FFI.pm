@@ -15,7 +15,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.100000';
+$Udev::FFI::VERSION = '0.101001';
 
 
 
@@ -49,7 +49,7 @@ sub new_device_from_syspath {
 
     my $device = udev_device_new_from_syspath($self->{_context}, $syspath);
 
-    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
+    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
 }
 
 
@@ -61,7 +61,7 @@ sub new_device_from_devnum {
 
     my $device = udev_device_new_from_devnum($self->{_context}, ord($type), $devnum);
 
-    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
+    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
 }
 
 
@@ -73,7 +73,7 @@ sub new_device_from_subsystem_sysname {
 
     my $device = udev_device_new_from_subsystem_sysname($self->{_context}, $subsystem, $sysname);
 
-    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
+    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
 }
 
 
@@ -84,7 +84,7 @@ sub new_device_from_device_id {
 
     my $device = udev_device_new_from_device_id($self->{_context}, $id);
 
-    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
+    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
 }
 
 
@@ -94,7 +94,7 @@ sub new_device_from_environment {
 
     my $device = udev_device_new_from_environment($self->{_context});
 
-    return defined($device) ?Udev::FFI::Device->new( $device ) :undef;
+    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
 }
 
 
@@ -112,7 +112,7 @@ sub new_monitor {
         return undef;
     }
 
-    return Udev::FFI::Monitor->new($monitor);
+    return Udev::FFI::Monitor->new($monitor, $self);
 }
 
 
@@ -126,7 +126,7 @@ sub new_enumerate {
         return undef;
     }
 
-    return Udev::FFI::Enumerate->new($enumerate);
+    return Udev::FFI::Enumerate->new($enumerate, $self);
 }
 
 
@@ -154,97 +154,95 @@ Udev::FFI - Perl bindings for libudev using ffi.
 =head1 SYNOPSIS
 
     use Udev::FFI;
-
+    
     # get udev library version
-    my $udev_version = Udev::FFI->udev_version() or
+    my $udev_version = Udev::FFI::udev_version() or
         die "Can't get udev library version: $@";
-
-
+    
+    
     # create Udev::FFI object
     my $udev = Udev::FFI->new() or
         die "Can't create Udev::FFI object: $@";
-
-
+    
+    
     # create udev monitor
     my $monitor = $udev->new_monitor() or
         die "Can't create udev monitor: $@";
-
+    
     # add filter to monitor
     unless($monitor->filter_by_subsystem_devtype('block')) {
         warn "Ouch!";
     }
-
+    
     # start monitor
     if($monitor->start()) {
         for(;;) {
             # poll devices, now insert or remove your block device
             my $device = $monitor->poll(); #blocking read
             my $action = $device->get_action();
-
+    
             print 'ACTION: '.$action, "\n";
             print 'SYSNAME: '.$device->get_sysname(), "\n";
             print 'DEVNODE: '.$device->get_devnode(), "\n";
-
+    
             last; # for example
         }
-
+    
         for(;;) {
             # poll devices, now insert or remove your block device
             if(defined(my $device = $monitor->poll(0))) { #non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
-
+    
                 print 'ACTION: '.$action, "\n";
                 print 'SYSNAME: '.$device->get_sysname(), "\n";
                 print 'DEVNODE: '.$device->get_devnode(), "\n";
             }
-
+    
             sleep 1;
-
+    
             last; # for example
         }
     }
-
-
+    
+    
     # enumerate devices
     my $enumerate = $udev->new_enumerate() or
         die "Can't create enumerate context: $@";
-
+    
     $enumerate->add_match_subsystem('block');
     $enumerate->scan_devices();
-
+    
     use Data::Dumper; # for dump values in $href and @a
-
+    
     # scalar context
     my $href = $enumerate->get_list_entries();
     print Dumper($href), "\n";
-
+    
     # list context
     my @a = $enumerate->get_list_entries();
     print Dumper(@a), "\n";
-
+    
     if(@a) { # get major and minor
         use Udev::FFI::Devnum qw(:all); # import major, minor and makedev
-
+    
         my $device = $udev->new_device_from_syspath($a[0]);
         if(defined $device) {
             print "Device: ".$device->get_sysname(), "\n";
-
+    
             my $devnum = $device->get_devnum();
             my ($ma, $mi) = (major($devnum), minor($devnum));
-
+    
             print "Major: $ma\n";
             print "Minor: $mi\n";
-
-            $devnum = undef;
-
+    
             $devnum = makedev($ma, $mi);
             print "Devnum: $devnum\n";
-
-
+    
+    
             # scalar context
             $href = $device->get_properties_list_entries();
             print Dumper($href), "\n";
-
+    
             # list context
             @a = $device->get_properties_list_entries();
             print Dumper(@a), "\n";
@@ -374,7 +372,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
         # $device is the device from the udev rule (backlight in this example)
         # work with $device
 
-=head2 Udev::FFI->udev_version ()
+=head2 Udev::FFI::udev_version ()
 
 Return the version of the udev library. Because the udev library does not
 provide a function to get the version number, this function runs the `udevadm`
@@ -384,12 +382,12 @@ Return undef with the error in $@ on failure. Also you can check $! value:
 ENOENT (`udevadm` not found) or EACCES (permission denied).
 
     # simple
-    my $udev_version = Udev::FFI->udev_version() or
+    my $udev_version = Udev::FFI::udev_version() or
         die "Can't get udev library version: $@";
     
     # or catch the error
     use Errno qw( :POSIX );
-    my $udev_version = Udev::FFI->udev_version();
+    my $udev_version = Udev::FFI::udev_version();
     unless(defined $udev_version) {
         if($!{ENOENT}) {
             # udevadm not found
@@ -442,6 +440,5 @@ This library is free software; you can redistribute it and/or modify it under th
 This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more details.
 
 You should have received a copy of the GNU Library General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
 
 =cut

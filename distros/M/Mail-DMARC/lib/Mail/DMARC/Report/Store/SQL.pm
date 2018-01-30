@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20170911'; # VERSION
+our $VERSION = '1.20180125'; # VERSION
 use strict;
 use warnings;
 
@@ -729,7 +729,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20170911
+version 1.20180125
 
 =head1 DESCRIPTION
 

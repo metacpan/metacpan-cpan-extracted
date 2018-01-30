@@ -4,6 +4,7 @@ MailTools.ppd
 Makefile.PL
 README
 README.demos
+README.md
 examples/forwd_demo.PL
 examples/mail-mailer.pl
 examples/rplyto_demo.PL

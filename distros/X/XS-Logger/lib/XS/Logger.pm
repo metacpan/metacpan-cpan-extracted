@@ -1,5 +1,5 @@
 package XS::Logger;
-$XS::Logger::VERSION = '0.001';
+$XS::Logger::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -28,7 +28,7 @@ XS::Logger - a basic logger implemented in XS
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -71,6 +71,8 @@ XS::Logger provides a light and friendly logger for your application.
 
 XS::Logger - basic logger using XS
 
+=for HTML <p><img src="https://travis-ci.org/atoomic/XS-Logger.svg?branch=released" width="81" height="18" alt="Travis CI" /></p>
+
 =head1 Usage
 
 =head1 Log Levels
@@ -102,6 +104,7 @@ Setting the level can be done at construction time or run time
      $log->set_level( XS::Logger::WARN_LOG_LEVEL() ); # only warnings, error and fatal events are logged
 
 =head1 LICENSE
+
    ...
 
 =head1 AUTHOR

@@ -1,5 +1,8 @@
 Revision history for WebService-SSLLabs
 
+0.30   Fri Jan 26 15:31:00 2017
+        Updating the test suite to cope with a change in the return value of attempts
+
 0.29   Sat Sep 16 11:01:00 2017
 	Adding the missing $suite->q() method to fix RT#123027.  Thanks to Jeff Braine for the bug report and proposed patch
 

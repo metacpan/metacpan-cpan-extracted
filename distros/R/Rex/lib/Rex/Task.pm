@@ -38,7 +38,7 @@ use warnings;
 use Data::Dumper;
 use Time::HiRes qw(time);
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::TaskList;
@@ -630,6 +630,8 @@ sub connect {
   }
   $self->{current_server} = $server;
 
+  $self->run_hook( \$server, "before" );
+
   # need to be called, in case of a run_task task call.
   # see #788
   $self->rethink_connection;
@@ -662,8 +664,6 @@ sub connect {
     if ( $auth->{private_key} );
 
   my $profiler = Rex::Profiler->new;
-
-  $self->run_hook( \$server, "before" );
 
   # task specific auth rules over all
   my %connect_hash = %{$auth};
@@ -754,12 +754,12 @@ sub disconnect {
 
   delete $self->{connection};
 
-  $self->run_hook( \$server, "after" );
-
   pop @{ Rex::get_current_connection()->{task} };
 
   # need to get rid of this
   Rex::pop_connection();
+
+  $self->run_hook( \$server, "after" );
 }
 
 =head2 get_data

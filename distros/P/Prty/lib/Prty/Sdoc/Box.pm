@@ -4,9 +4,9 @@ use base qw/Prty::Sdoc::Node/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
-use Prty::TextFile;
+use Prty::LineProcessor;
 
 # -----------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ sub new {
         $line->text($text);
         push @lines,$doc->shiftLine;
     }
-    $doc = Prty::TextFile->new(\@lines);
+    $doc = Prty::LineProcessor->new(\@lines);
 
     # Objekt instantiieren
 
@@ -153,7 +153,7 @@ sub dump {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -161,7 +161,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

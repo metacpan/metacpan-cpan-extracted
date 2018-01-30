@@ -16,7 +16,7 @@ Readonly::Scalar my $TYPE_DEFAULT => 'Die';
 Readonly::Scalar my $LEVEL_DEFAULT => 4;
 
 # Version.
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 # Type of error.
 our $TYPE = $TYPE_DEFAULT;
@@ -235,17 +235,17 @@ L<https://github.com/tupinek/Error-Pure>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2015 Michal Špaček
+ © 2008-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

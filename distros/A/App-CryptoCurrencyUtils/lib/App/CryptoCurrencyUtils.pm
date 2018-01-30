@@ -1,7 +1,7 @@
 package App::CryptoCurrencyUtils;
 
-our $DATE = '2018-01-21'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-01-30'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -105,6 +105,24 @@ sub coin_mno {
     [200];
 }
 
+$SPEC{list_coins} = {
+    v => 1.1,
+    summary => "List cryptocurrency coins",
+    description => <<'_',
+
+This utility lists coins from <pm:CryptoCurrency::Catalog>, which in turn gets
+its list from <https://coinmarketcap.com/>.
+
+_
+    args => {
+    },
+};
+sub list_coins {
+    require CryptoCurrency::Catalog;
+
+    [200, "OK", [CryptoCurrency::Catalog->new->all_data]];
+}
+
 1;
 # ABSTRACT: CLI utilities related to cryptocurrencies
 
@@ -120,7 +138,7 @@ App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 =head1 VERSION
 
-This document describes version 0.004 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-01-21.
+This document describes version 0.006 of App::CryptoCurrencyUtils (from Perl distribution App-CryptoCurrencyUtils), released on 2018-01-30.
 
 =head1 DESCRIPTION
 
@@ -132,7 +150,9 @@ This distribution contains the following CLI utilities:
 
 =item * L<coin-mno>
 
-=item * L<grepcoin>
+=item * L<grep-coin>
+
+=item * L<list-coins>
 
 =back
 
@@ -189,6 +209,33 @@ Arguments ('*' denotes required arguments):
 =item * B<symbols_or_names>* => I<array[cryptocurrency::symbol_or_name]>
 
 =back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_coins
+
+Usage:
+
+ list_coins() -> [status, msg, result, meta]
+
+List cryptocurrency coins.
+
+This utility lists coins from L<CryptoCurrency::Catalog>, which in turn gets
+its list from L<https://coinmarketcap.com/>.
+
+This function is not exported.
+
+No arguments.
 
 Returns an enveloped result (an array).
 

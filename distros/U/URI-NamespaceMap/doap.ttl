@@ -1,349 +1,291 @@
-@prefix dc:    <http://purl.org/dc/terms/> .
-@prefix doap:  <http://usefulinc.com/ns/doap#> .
-@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
-@prefix doap-deps: <http://ontologi.es/doap-deps#> .
-@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-@prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix prov:  <http://www.w3.org/ns/prov#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-
-<file:///mnt/robin/kjetil/dev/URI-NamespaceMap/meta/project.ttl>
-	dc:creator           <http://www.kjetil.kjernsmo.net/foaf#me>;
-	dc:subject           <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project>;
-	dc:title             "DOAP for URI-NamespaceMap"@en.
-
-<http://doriantaylor.com/person/dorian-taylor>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:dorian@cpan.org>;
-	foaf:name            "Dorian Taylor";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Dorian-Taylor>, <http://purl.org/NET/cpan-uri/person/dorian>.
-
-<http://kasei.us/about/foaf.xrdf#greg>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:gwilliams@cpan.org>;
-	foaf:name            "Gregory Todd Williams";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Gregory-Todd-Williams>, <http://purl.org/NET/cpan-uri/person/gwilliams>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project>
-	a                    doap:Project;
-	dc:identifier        "URI::NamespaceMap"^^doap-deps:CpanId;
-	dc:relation          <http://rdf.debian.net/project/liburi-namespacemap-perl>;
-	doap-deps:runtime-recommendation [ doap-deps:on "RDF::NS::Curated"^^doap-deps:CpanId ], [ doap-deps:on "RDF::NS 20130802"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Prefixes"^^doap-deps:CpanId ], [ doap-deps:on "XML::CommonNS"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Moo 1.006000"^^doap-deps:CpanId ], [ doap-deps:on "URI 1.52"^^doap-deps:CpanId ], [ doap-deps:on "IRI 0.004"^^doap-deps:CpanId ], [ doap-deps:on "Types::URI 0.004"^^doap-deps:CpanId ], [
-		doap-deps:on "Type::Library 1.000000"^^doap-deps:CpanId;
-	], [ doap-deps:on "Try::Tiny"^^doap-deps:CpanId ], [
-		doap-deps:on "Module::Load::Conditional"^^doap-deps:CpanId;
-	], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Quote"^^doap-deps:CpanId ], [
-		doap-deps:on "namespace::autoclean 0.20"^^doap-deps:CpanId;
-	];
-	doap-deps:test-requirement [ doap-deps:on "Test::More 0.88"^^doap-deps:CpanId ], [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ];
-	doap:bug-database    <https://github.com/kjetilk/URI-NamespaceMap/issues>;
-	doap:created         "2012-08-27"^^xsd:date;
-	doap:developer       <http://doriantaylor.com/person/dorian-taylor>, <http://purl.org/NET/cpan-uri/person/kwakwa>, <http://purl.org/NET/cpan-uri/person/tobyink>;
-	doap:homepage        <https://metacpan.org/module/URI::NamespaceMap>;
-	doap:license         <http://dev.perl.org/licenses/>;
-	doap:maintainer      <http://kasei.us/about/foaf.xrdf#greg>, <http://purl.org/NET/cpan-uri/person/perigrin>, <http://www.kjetil.kjernsmo.net/foaf#me>;
-	doap:name            "URI-NamespaceMap";
-	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04>;
-	doap:repository      [
-		a doap:GitRepository;
-		doap:browse <https://github.com/kjetilk/URI-NamespaceMap/>;
-		prov:has_provenance <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#>;
-	];
-	doap:shortdesc       "Namespace manipulation and prefix mapping for XML, RDF, etc."@en;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstream>;
-	rdfs:seeAlso         <http://rdf.debian.net/project/liburi-namespacemap-perl.ttl>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01>
-	a                    doap:Version;
-	rdfs:label           "Initial release."@en;
-	dc:issued            "2012-08-28"^^xsd:date;
-	doap:revision        "0.01"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02>
-	a                    doap:Version;
-	rdfs:label           "Minor bugfixes."@en;
-	dc:issued            "2012-08-30"^^xsd:date;
-	doap:revision        "0.02"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04>
-	a                    doap:Version;
-	rdfs:label           "Reverse lookups."@en;
-	dc:issued            "2012-10-23"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Stop using blank node in makefile.ttl to fix version_from."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Adding reverse lookups, i.e. abbreviation and prefix_for."@en;
-			doap-changeset:blame <http://doriantaylor.com/person/dorian-taylor>;
-		];
-	];
-	doap:revision        "0.04"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06>
-	a                    doap:Version;
-	rdfs:label           "Bugfix release."@en;
-	dc:issued            "2012-11-28"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "URI::Namespace must be used from URI::NamespaceMap."@en;
-		];
-	];
-	doap:revision        "0.06"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08>
-	a                    doap:Version;
-	rdfs:label           "Prefix guessing."@en;
-	dc:issued            "2014-05-19"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Prefix guessing using RDF::NS, RDF::Prefixes or XML::CommonNS."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix breakage in terms with hyphens."@en;
-			doap-changeset:blame <http://doriantaylor.com/person/dorian-taylor>;
-		];
-	];
-	doap:revision        "0.08"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10>
-	a                    doap:Version;
-	rdfs:label           "Compatibility with RDF::Trine::NamespaceMap."@en;
-	dc:issued            "2014-05-21"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Make it possible to send local part to the uri method of URI::Namespace."@en;
-			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/perigrin>;
-		];
-	];
-	doap:revision        "0.10"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12>
-	a                    doap:Version;
-	rdfs:label           "Support IRI module."@en;
-	dc:issued            "2014-09-29"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Addition;
-			rdfs:label "Support the new IRI module."@en;
-			doap-changeset:blame <http://kasei.us/about/foaf.xrdf#greg>;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Silence warnings when URI doesn't have local part."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Warn the user in test when they have too old RDF::NS."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Use Types::URI."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Link Debian packages in metadata."@en;
-		];
-	];
-	doap:revision        "0.12"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.12>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20>
-	a                    doap:Version;
-	rdfs:label           "Moo refactoring."@en;
-	dc:issued            "2014-10-05"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Port to Moo."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/tobyink>;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Convert packaging to Dist::Inkt."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/tobyink>;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Warn the user when they have too old RDF::NS but not in automated tests."@en;
-		];
-	];
-	doap:revision        "0.20"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21>
-	a                    doap:Version;
-	rdfs:label           "Fix missing Changes."@en;
-	dc:issued            "2014-10-05"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Fix missing Changes."@en;
-		];
-	];
-	doap:revision        "0.21"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22>
-	a                    doap:Version;
-	rdfs:label           "Clean up source tree."@en;
-	dc:issued            "2014-10-15"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Clean up source tree."@en;
-		];
-	];
-	doap:revision        "0.22"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.22>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24>
-	a                    doap:Version;
-	rdfs:label           "Improve documentation."@en;
-	dc:issued            "2014-12-10"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Reindent using Emacs smart-tabs."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Improve documentation, autoloader."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Some code cleanup."@en;
-		], [
-			a doap-changeset:Bugfix;
-			rdfs:label "Use a string comparison in failing test."@en;
-		];
-	];
-	doap:revision        "0.24"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.24>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26>
-	a                    doap:Version;
-	rdfs:label           "Support for RDF::NS::Curated."@en;
-	dc:issued            "2015-09-01"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Change;
-			rdfs:label "Support for RDF::NS::Curated."@en;
-		];
-	];
-	doap:revision        "0.26"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.26>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28>
-	a                    doap:Version;
-	rdfs:label           "Bugfix release."@en;
-	dc:issued            "2015-09-23"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Had forgotten to update error messages."@en;
-		];
-	];
-	doap:revision        "0.28"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.28>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30>
-	a                    doap:Version;
-	rdfs:label           "Test bugfix."@en;
-	dc:issued            "2016-02-12"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Remove a test because toolchain makes it hard to get the correct version."@en;
-		];
-	];
-	doap:revision        "0.30"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.30>.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32>
-	a                    doap:Version;
-	rdfs:label           "New guessing method and improved diagnostics."@en;
-	dc:issued            "2016-12-29"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Rework some tests that fails in strange ways."@en;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Add method for adding guesses post-construction."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Use carp instead of warns."@en;
-		];
-	];
-	doap:revision        "0.32"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00>
-	a                    doap:Version;
-	rdfs:label           "Check prefixes so they don't conflict with existing methods."@en;
-	dc:issued            "2017-01-18"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Removal;
-			rdfs:label "Remove strict/warnings pragmas where Moo is used."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/kwakwa>;
-		], [
-			a doap-changeset:Addition;
-			rdfs:label "Prefixes that will conflict with existing methods will throw an error."@en;
-			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/kwakwa>;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Minor cleanups."@en;
-		], [
-			a doap-changeset:Change;
-			rdfs:label "Improve the BUILDARGS code."@en;
-			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/perigrin>;
-		];
-	];
-	doap:revision        "1.00"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02>
-	a                    doap:Version;
-	rdfs:label           "Append a hash to URIs needing it."@en;
-	dc:issued            "2017-06-21"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "When adding local names, check if namespace ends in hash or slash, and append hash if not."@en;
-		];
-	];
-	doap:revision        "1.02"^^xsd:string.
-
-<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04>
-	a                    doap:Version;
-	rdfs:label           "Append a hash to only to XSD URIs."@en;
-	dc:issued            "2017-07-08"^^xsd:date;
-	doap-changeset:changeset [
-		doap-changeset:item [
-			a doap-changeset:Bugfix;
-			rdfs:label "Partly revert fix in 1.02, now only append a hash to the XML Schema URI (closes issue #14)."@en;
-		];
-	];
-	doap:revision        "1.04"^^xsd:string;
-	owl:sameAs           <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_1.04>.
-
-<http://purl.org/NET/cpan-uri/person/kwakwa>
-	a                    foaf:Person;
-	foaf:name            "Paul Williams";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Paul-Williams>.
-
-<http://purl.org/NET/cpan-uri/person/perigrin>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:chris@prather.org>;
-	foaf:name            "Chris Prather";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Chris-Prather>.
-
-<http://purl.org/NET/cpan-uri/person/tobyink>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:tobyink@cpan.org>;
-	foaf:name            "Toby Inkster";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Toby-Inkster>, <http://tobyinkster.co.uk/#i>.
-
-<http://www.kjetil.kjernsmo.net/foaf#me>
-	a                    foaf:Person;
-	foaf:mbox            <mailto:kjetilk@cpan.org>;
-	foaf:name            "Kjetil Kjernsmo";
-	owl:sameAs           <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk>.
-
+_:r1517052342r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/URI-NamespaceMap/> ;
+	a <http://usefulinc.com/ns/doap#GitRepository> ;
+	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#> .
+_:r1517052342r1 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add each_map method"@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Check for Iri in scrubber"@en
+	] .
+_:r1517052342r10 <http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/kwakwa> ;
+	a <http://ontologi.es/doap-changeset#Addition> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Prefixes that will conflict with existing methods will throw an error."@en .
+_:r1517052342r11 a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Minor cleanups."@en .
+_:r1517052342r12 <http://ontologi.es/doap-changeset#thanks> <http://purl.org/NET/cpan-uri/person/perigrin> ;
+	a <http://ontologi.es/doap-changeset#Change> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Improve the BUILDARGS code."@en .
+_:r1517052342r13 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Rework some tests that fails in strange ways."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add method for adding guesses post-construction."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use carp instead of warns."@en
+	] .
+_:r1517052342r17 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove a test because toolchain makes it hard to get the correct version."@en
+	] .
+_:r1517052342r19 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Had forgotten to update error messages."@en
+	] .
+_:r1517052342r21 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Support for RDF::NS::Curated."@en
+	] .
+_:r1517052342r23 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Reindent using Emacs smart-tabs."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Improve documentation, autoloader."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Some code cleanup."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use a string comparison in failing test."@en
+	] .
+_:r1517052342r28 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Clean up source tree."@en
+	] .
+_:r1517052342r30 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix missing Changes."@en
+	] .
+_:r1517052342r32 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Port to Moo."@en
+	], [
+		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/tobyink> ;
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Convert packaging to Dist::Inkt."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Warn the user when they have too old RDF::NS but not in automated tests."@en
+	] .
+_:r1517052342r36 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#blame> <http://kasei.us/about/foaf.xrdf#greg> ;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Support the new IRI module."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Silence warnings when URI doesn't have local part."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Warn the user in test when they have too old RDF::NS."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use Types::URI."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Link Debian packages in metadata."@en
+	] .
+_:r1517052342r4 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Partly revert fix in 1.02, now only append a hash to the XML Schema URI (closes issue #14)."@en
+	] .
+_:r1517052342r42 <http://ontologi.es/doap-changeset#item> [
+		<http://ontologi.es/doap-changeset#thanks> <http://purl.org/NET/cpan-uri/person/perigrin> ;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Make it possible to send local part to the uri method of URI::Namespace."@en
+	] .
+_:r1517052342r44 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Prefix guessing using RDF::NS, RDF::Prefixes or XML::CommonNS."@en
+	], [
+		<http://ontologi.es/doap-changeset#blame> <http://doriantaylor.com/person/dorian-taylor> ;
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Fix breakage in terms with hyphens."@en
+	] .
+_:r1517052342r47 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "URI::Namespace must be used from URI::NamespaceMap."@en
+	] .
+_:r1517052342r49 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Stop using blank node in makefile.ttl to fix version_from."@en
+	], [
+		<http://ontologi.es/doap-changeset#blame> <http://doriantaylor.com/person/dorian-taylor> ;
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Adding reverse lookups, i.e. abbreviation and prefix_for."@en
+	] .
+_:r1517052342r6 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Bugfix> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "When adding local names, check if namespace ends in hash or slash, and append hash if not."@en
+	] .
+_:r1517052342r8 <http://ontologi.es/doap-changeset#item> _:r1517052342r10, _:r1517052342r11, _:r1517052342r12, [
+		<http://ontologi.es/doap-changeset#blame> <http://purl.org/NET/cpan-uri/person/kwakwa> ;
+		a <http://ontologi.es/doap-changeset#Removal> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Remove strict/warnings pragmas where Moo is used."@en
+	] .
+_:r1517052343r52 <http://ontologi.es/doap-deps#on> "Test::More 0.88"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r53 <http://ontologi.es/doap-deps#on> "Test::Exception"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r54 <http://ontologi.es/doap-deps#on> "perl 5.008001"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r55 <http://ontologi.es/doap-deps#on> "Moo 1.006000"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r56 <http://ontologi.es/doap-deps#on> "URI 1.52"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r57 <http://ontologi.es/doap-deps#on> "IRI 0.004"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r58 <http://ontologi.es/doap-deps#on> "Types::URI 0.004"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r59 <http://ontologi.es/doap-deps#on> "Type::Library 1.000000"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r60 <http://ontologi.es/doap-deps#on> "Try::Tiny"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r61 <http://ontologi.es/doap-deps#on> "Module::Load::Conditional"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r62 <http://ontologi.es/doap-deps#on> "Carp"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r63 <http://ontologi.es/doap-deps#on> "Sub::Quote"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r64 <http://ontologi.es/doap-deps#on> "namespace::autoclean 0.20"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r65 <http://ontologi.es/doap-deps#on> "RDF::NS::Curated"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r66 <http://ontologi.es/doap-deps#on> "RDF::NS 20130802"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r67 <http://ontologi.es/doap-deps#on> "RDF::Prefixes"^^<http://ontologi.es/doap-deps#CpanId> .
+_:r1517052343r68 <http://ontologi.es/doap-deps#on> "XML::CommonNS"^^<http://ontologi.es/doap-deps#CpanId> .
+<file:///home/kjetil/dev/URI-NamespaceMap/meta/project.ttl> <http://purl.org/dc/terms/creator> <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://purl.org/dc/terms/subject> <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project> ;
+	<http://purl.org/dc/terms/title> "DOAP for URI-NamespaceMap"@en .
+<http://doriantaylor.com/person/dorian-taylor> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Dorian-Taylor>, <http://purl.org/NET/cpan-uri/person/dorian> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:dorian@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Dorian Taylor" .
+<http://kasei.us/about/foaf.xrdf#greg> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Gregory-Todd-Williams>, <http://purl.org/NET/cpan-uri/person/gwilliams> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:gwilliams@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Gregory Todd Williams" .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project> <http://ontologi.es/doap-deps#runtime-recommendation> _:r1517052343r65, _:r1517052343r66, _:r1517052343r67, _:r1517052343r68 ;
+	<http://ontologi.es/doap-deps#runtime-requirement> _:r1517052343r54, _:r1517052343r55, _:r1517052343r56, _:r1517052343r57, _:r1517052343r58, _:r1517052343r59, _:r1517052343r60, _:r1517052343r61, _:r1517052343r62, _:r1517052343r63, _:r1517052343r64 ;
+	<http://ontologi.es/doap-deps#test-requirement> _:r1517052343r52, _:r1517052343r53 ;
+	<http://purl.org/dc/terms/identifier> "URI::NamespaceMap"^^<http://ontologi.es/doap-deps#CpanId> ;
+	<http://purl.org/dc/terms/relation> <http://rdf.debian.net/project/liburi-namespacemap-perl> ;
+	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/URI-NamespaceMap/issues> ;
+	<http://usefulinc.com/ns/doap#created> "2012-08-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#developer> <http://doriantaylor.com/person/dorian-taylor>, <http://purl.org/NET/cpan-uri/person/kwakwa>, <http://purl.org/NET/cpan-uri/person/tobyink> ;
+	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/module/URI::NamespaceMap> ;
+	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
+	<http://usefulinc.com/ns/doap#maintainer> <http://kasei.us/about/foaf.xrdf#greg>, <http://purl.org/NET/cpan-uri/person/perigrin>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://usefulinc.com/ns/doap#name> "URI-NamespaceMap" ;
+	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
+	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04>, <http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_06> ;
+	<http://usefulinc.com/ns/doap#repository> _:r1517052342r0 ;
+	<http://usefulinc.com/ns/doap#shortdesc> "Namespace manipulation and prefix mapping for XML, RDF, etc."@en ;
+	a <http://usefulinc.com/ns/doap#Project> ;
+	<http://www.w3.org/2000/01/rdf-schema#seeAlso> <http://rdf.debian.net/project/liburi-namespacemap-perl.ttl> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstream> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_01> <http://purl.org/dc/terms/issued> "2012-08-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.01"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_02> <http://purl.org/dc/terms/issued> "2012-08-30"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Minor bugfixes."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_04> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r49 ;
+	<http://purl.org/dc/terms/issued> "2012-10-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.04"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Reverse lookups."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_06> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r47 ;
+	<http://purl.org/dc/terms/issued> "2012-11-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.06"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Bugfix release."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_08> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r44 ;
+	<http://purl.org/dc/terms/issued> "2014-05-19"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.08"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Prefix guessing."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_10> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r42 ;
+	<http://purl.org/dc/terms/issued> "2014-05-21"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.10"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Compatibility with RDF::Trine::NamespaceMap."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_12> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r36 ;
+	<http://purl.org/dc/terms/issued> "2014-09-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.12"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Support IRI module."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.12> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_20> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r32 ;
+	<http://purl.org/dc/terms/issued> "2014-10-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.20"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Moo refactoring."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_21> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r30 ;
+	<http://purl.org/dc/terms/issued> "2014-10-05"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.21"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Fix missing Changes."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_22> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r28 ;
+	<http://purl.org/dc/terms/issued> "2014-10-15"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.22"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Clean up source tree."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.22> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_24> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r23 ;
+	<http://purl.org/dc/terms/issued> "2014-12-10"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.24"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Improve documentation."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.24> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_26> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r21 ;
+	<http://purl.org/dc/terms/issued> "2015-09-01"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.26"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Support for RDF::NS::Curated."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.26> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_28> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r19 ;
+	<http://purl.org/dc/terms/issued> "2015-09-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.28"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Bugfix release."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.28> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_30> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r17 ;
+	<http://purl.org/dc/terms/issued> "2016-02-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.30"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Test bugfix."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_0.30> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_0_32> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r13 ;
+	<http://purl.org/dc/terms/issued> "2016-12-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "0.32"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "New guessing method and improved diagnostics."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_00> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r8 ;
+	<http://purl.org/dc/terms/issued> "2017-01-18"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.00"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Check prefixes so they don't conflict with existing methods."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_02> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r6 ;
+	<http://purl.org/dc/terms/issued> "2017-06-21"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Append a hash to URIs needing it."@en .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_04> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r4 ;
+	<http://purl.org/dc/terms/issued> "2017-07-08"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.04"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Append a hash to only to XSD URIs."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_1.04> .
+<http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/v_1_06> <http://ontologi.es/doap-changeset#changeset> _:r1517052342r1 ;
+	<http://purl.org/dc/terms/issued> "2018-01-27"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#revision> "1.06"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Add each_map method."@en ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://packages.qa.debian.org/liburi-namespacemap-perl#upstreamsrc_1.06> .
+<http://purl.org/NET/cpan-uri/person/kwakwa> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Paul-Williams> ;
+	<http://xmlns.com/foaf/0.1/name> "Paul Williams" .
+<http://purl.org/NET/cpan-uri/person/perigrin> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Chris-Prather> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:chris@prather.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Chris Prather" .
+<http://purl.org/NET/cpan-uri/person/tobyink> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Toby-Inkster>, <http://tobyinkster.co.uk/#i> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:tobyink@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Toby Inkster" .
+<http://www.kjetil.kjernsmo.net/foaf#me> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https%3A%2F%2Fgithub.com%2Fkjetilk%2FURI-NamespaceMap&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" .

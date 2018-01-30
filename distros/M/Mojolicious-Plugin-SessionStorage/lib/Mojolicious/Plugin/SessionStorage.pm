@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::SessionStorage;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Mojolicious::Sessions::Storage;
 

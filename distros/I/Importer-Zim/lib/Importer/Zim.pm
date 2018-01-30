@@ -1,6 +1,6 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.9.0';
+$Importer::Zim::VERSION = '0.9.1';
 # ABSTRACT: Import functions à la Invader Zim
 
 use 5.010001;
@@ -17,7 +17,7 @@ BEGIN {
 
 sub import {    # Load +Base if import() is called
     require Importer::Zim::Base;
-    Importer::Zim::Base->VERSION('0.12.0');
+    Importer::Zim::Base->VERSION('0.12.1');
     no warnings 'redefine';
     *import = \&_import;
     goto &_import;
@@ -182,7 +182,7 @@ Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.9.0
+version 0.9.1
 
 =head1 SYNOPSIS
 

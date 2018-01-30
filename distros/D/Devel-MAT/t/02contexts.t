@@ -42,7 +42,7 @@ my ( $cinner, $ctry, $couter, $ceval, $canon ) = @ctxts;
    is( $cinner->type, "SUB", '$cinner type' );
    is( $cinner->file, __FILE__, '$cinner file' );
    is( $cinner->line, $outer_l0 + 2, '$cinner line' );
-   is( $cinner->cv->name, '&main::inner', '$cinner CV name' );
+   is( $cinner->cv->symname, '&main::inner', '$cinner CV name' );
    is( $cinner->depth, 1, '$cinner depth' );
    is( $cinner->olddepth, 0, '$cinner olddepth' );
    is_deeply( [ map { $_->pv } $cinner->args->elems ],
@@ -60,7 +60,7 @@ my ( $cinner, $ctry, $couter, $ceval, $canon ) = @ctxts;
    is( $couter->type, "SUB", '$couter type' );
    like( $couter->file, qr/^\(eval \d+\)/, '$couter file' );
    is( $couter->line, 1, '$couter line' );
-   is( $couter->cv->name, '&main::outer', '$couter CV name' );
+   is( $couter->cv->symname, '&main::outer', '$couter CV name' );
    is_deeply( [ map { $_->pv } $couter->args->elems ],
               [qw( A B )],
               '$couter args' );
@@ -77,7 +77,7 @@ my ( $cinner, $ctry, $couter, $ceval, $canon ) = @ctxts;
    is( $canon->type, "SUB", '$canon type' );
    is( $canon->file, __FILE__, '$canon file' );
    is( $canon->line, $anon_l0 + 3, '$canon line' );
-   is( $canon->cv->name, "&main::__ANON__", '$canon CV name' );
+   is( $canon->cv->symname, "&main::__ANON__", '$canon CV name' );
 }
 
 done_testing;

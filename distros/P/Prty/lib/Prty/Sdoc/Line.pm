@@ -1,10 +1,10 @@
 package Prty::Sdoc::Line;
-use base qw/Prty::TextFile::Line/;
+use base qw/Prty::LineProcessor::Line/;
 
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 # -----------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ Prty::Sdoc::Line - Zeile einer Sdoc-Quelldatei
 
 =head1 BASE CLASS
 
-L<Prty::TextFile::Line>
+L<Prty::LineProcessor::Line>
 
 =head1 METHODS
 
@@ -26,7 +26,7 @@ L<Prty::TextFile::Line>
 
 =head4 Synopsis
 
-    ($type,$depth) = $ln->type;
+    ($type,$depth) = $line->type;
 
 =head4 Description
 
@@ -36,16 +36,6 @@ Ermittele den Zeilentyp und liefefere diesen zurück.
 
 # -----------------------------------------------------------------------------
 
-# FIXME: eigene Methode
-
-sub isRow {
-    return shift->text =~ /^\s*\|.*\|$/? 1: 0;
-}
-
-sub isKeyValRow {
-    return shift->text =~ /^\s*\|[^|]*=>[^|]*\|$/;
-}
-
 sub type {
     my $self = shift;
 
@@ -53,8 +43,9 @@ sub type {
 
     # Generalisierte Spezifikation %OBJECT: ...
     # Der genaue Typ wird vom Aufrufer bestimmt
-    return 'Object' if $text =~ /^%(Document|TableOfContents|Box|Figure):/;
-    return 'Object' if $text =~ /^%(Table|Include):/;
+
+    return 'Object' if $text =~
+        /^%(Document|TableOfContents|Box|Figure|Table|Include|Link):/;
     return 'Object' if $text =~ /^\s*%Code:/;
 
     # Seitenumbruch
@@ -77,9 +68,6 @@ sub type {
     # optional gefolgt von Leerzeichen
     return 'Quote' if $text =~ /^>\s+/;
 
-    # # Abschnitt mit "| Box: ..." ist Kasten
-    # return 'Box' if $text =~ /^\| Box:/;
-
     # Abschnitte mit |...=>...| sind KeyValue-Tabellen
     return 'KeyValRow' if $self->isKeyValRow;
 
@@ -89,11 +77,52 @@ sub type {
     # Abschnitte mit | am Anfang und solche, die eingerückt sind, ohne
     # dass eine andere Regel zutrifft, sind Code-Abschnitte.
     return 'Code' if $text =~ /(^\|\s+|^\s+|^\s*<<Code$)/;
-    # return 'Code' if $text =~ /(^\|?\s+|<<Code$)/;
 
     # Alle nicht-eingerückten Abschnitte, auf die keine andere
     # Regel zutrifft, sind Paragraphen.
     return 'Paragraph';
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isRow() - Test auf Tabellenzeile
+
+=head4 Synopsis
+
+    $bool = $line->isRow;
+
+=head4 Description
+
+Prüfe, ob die Zeile eine Tabellenzeile ist. Wenn ja, liefere wahr,
+ansonsten falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isRow {
+    return shift->text =~ /^\s*\|.*\|$/;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isKeyValRow() - Test auf Schlssel/Wert-Zeile
+
+=head4 Synopsis
+
+    $bool = $line->isKeyValRow;
+
+=head4 Description
+
+Prüfe, ob die Zeile eine Schlssel/Wert-Zeile ist. Wenn ja, liefere
+wahr, ansonsten falsch.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isKeyValRow {
+    return shift->text =~ /^\s*\|[^|]*=>[^|]*\|$/;
 }
 
 # -----------------------------------------------------------------------------
@@ -263,7 +292,7 @@ sub item {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -271,7 +300,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

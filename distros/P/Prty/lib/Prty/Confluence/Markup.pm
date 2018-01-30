@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Unindent;
 
@@ -326,7 +326,7 @@ sub code {
         }
     	else {
              $self->throw(
-                 q{CONFLUENCE-00001: Unknown code macro option},
+                 q~CONFLUENCE-00001: Unknown code macro option~,
                  Option=>$key,
              );
         }
@@ -407,7 +407,7 @@ sub noFormat {
         }
     	else {
              $self->throw(
-                 q{CONFLUENCE-00001: Unknown noformat macro option},
+                 q~CONFLUENCE-00001: Unknown noformat macro option~,
                  Option=>$key,
              );
         }
@@ -507,7 +507,7 @@ sub panel {
         }
 	else {
              $self->throw(
-                 q{CONFLUENCE-00001: Unknown panel option},
+                 q~CONFLUENCE-00001: Unknown panel option~,
                  Option=>$key,
              );
         }
@@ -649,7 +649,7 @@ sub tableOfContents {
         }
 	else {
              $self->throw(
-                 q{CONFLUENCE-00001: Unknown panel option},
+                 q~CONFLUENCE-00001: Unknown panel option~,
                  Option=>$key,
              );
         }
@@ -948,7 +948,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -956,7 +956,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

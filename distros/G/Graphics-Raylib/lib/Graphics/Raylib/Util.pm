@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Util;
 
 # ABSTRACT: Utility functions for use With Graphics::Raylib:XS
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -20,13 +20,13 @@ Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib:XS
 
 =head1 VERSION
 
-version 0.009
+version 0.012
 
 =head1 SYNOPSIS
 
     use Graphics::Raylib::Util;
 
-    # returns Vector2 or Vector3 depending on scalar @coords
+    # returns Graphics::Raylib::XS::{Vector2,Vector3} depending on scalar @coords
     my $vector = Graphics::Raylib::Util::vector(@coords);
 
 =head1 DESCRIPTION
@@ -39,20 +39,20 @@ Raylib deals a lot in value-passed structs. This module builds these structs.
 
 =item vector(@coords)
 
-Constructs a C<Vector2> or C<Vector3> depending on number of arguments. Croaks otherwise.
+Constructs a C<Graphics::Raylib::XS::Vector2> or C<Graphics::Raylib::XS::Vector3> depending on number of arguments. Croaks otherwise.
 
 =cut
 
 sub vector {
-    my $vector = @_ == 2 ? bless \pack("f2", @_), 'Vector2'
-               : @_ == 3 ? bless \pack("f3", @_), 'Vector3'
-               : croak "Only Vector2 and Vector 3 types may be constructed";
+    my $vector = @_ == 2 ? bless \pack("f2", @_), 'Graphics::Raylib::XS::Vector2'
+               : @_ == 3 ? bless \pack("f3", @_), 'Graphics::Raylib::XS::Vector3'
+               : croak "Only Graphics::Raylib::XS::{Vector2,Vector3} types may be constructed";
 
     return $vector;
 }
 
 {
-    package Vector2;
+    package Graphics::Raylib::XS::Vector2;
     sub x { return unpack(     "f", ${$_[0]}) }
     sub y { return unpack("x[f] f", ${$_[0]}) }
     sub components { return unpack("f2", ${$_[0]}) }
@@ -62,7 +62,7 @@ sub vector {
     }
     use overload fallback => 1, '""' => 'stringify';
 
-    package Vector3;
+    package Graphics::Raylib::XS::Vector3;
     sub x { return unpack(     "f", ${$_[0]}) }
     sub y { return unpack("x[f] f", ${$_[0]}) }
     sub z { return unpack("x[ff]f", ${$_[0]}) }
@@ -77,17 +77,17 @@ sub vector {
 
 =item rectangle(x => $x, y => $y, width => $width, height => $height)
 
-Constructs a C<Rectangle>.
+Constructs a C<Graphics::Raylib::XS::Rectangle>.
 
 =cut
 
 sub rectangle {
     my %p = ( x => 0, y => 0, height => 1, width => 1, @_ );
-    return bless \pack("i4", $p{x}, $p{y}, $p{width}, $p{height}), 'Rectangle'
+    return bless \pack("i4", $p{x}, $p{y}, $p{width}, $p{height}), 'Graphics::Raylib::XS::Rectangle'
 }
 
 {
-    package Rectangle;
+    package Graphics::Raylib::XS::Rectangle;
     sub x      { return unpack(      "i", ${$_[0]}) }
     sub y      { return unpack("x[i]  i", ${$_[0]}) }
     sub width  { return unpack("x[ii] i", ${$_[0]}) }

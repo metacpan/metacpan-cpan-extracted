@@ -9,7 +9,7 @@ package Rex::PkgConf::Debian;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Helper::Run;
 
@@ -86,7 +86,6 @@ sub set_options {
       next;
     }
 
-    push @updated, $question;
     Rex::Logger::debug("Will set option $question: $value (type $type)");
     push @updated, "$pkg $question $type $value";
   }

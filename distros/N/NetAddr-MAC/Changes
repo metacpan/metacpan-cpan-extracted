@@ -1,5 +1,9 @@
 NetAddr::MAC - A MAC address object
 
+0.96    2018-01-26
+        - Fixed more POD mistakes
+        - Use Test::Compile
+
 0.95    2017-04-19
         - POD spelling and whitespace
 

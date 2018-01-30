@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Common::Captcha;
 
-our $VERSION = '1.9.1';
+our $VERSION = '1.9.15';
 
 use strict;
 use Lemonldap::NG::Common::Session;
@@ -93,8 +93,8 @@ sub getSession {
     );
 
     if ( $session && $session->data ) {
-        $self->code( $session->data->{code} );
-        $self->image( $session->data->{image} );
+        $self->code( $session->data->{code} )   if $session->data->{code};
+        $self->image( $session->data->{image} ) if $session->data->{image};
     }
 }
 

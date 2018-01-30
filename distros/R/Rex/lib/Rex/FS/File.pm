@@ -34,7 +34,7 @@ use strict;
 use warnings;
 use Rex::Interface::File;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use constant DEFAULT_READ_LEN => 64;
 

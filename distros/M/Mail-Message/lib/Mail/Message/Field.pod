@@ -90,7 +90,7 @@ Always true, to make it possible to say C<if($field)>.
 
 =item overload: B<cmp>
 
-(string comparison) Compare the unfolded body of a field with an other
+(string comparison) Compare the unfolded body of a field with another
 field or a string, using the buildin C<cmp>.
 
 =back
@@ -179,7 +179,7 @@ place (without changing the folding stored inside the field).
 =item $obj-E<gt>B<toDisclose>()
 
 Returns whether this field can be disclosed to other people, for instance
-when sending the message to an other party.  Returns a C<true> or C<false>
+when sending the message to another party.  Returns a C<true> or C<false>
 condition.
 See also L<Mail::Message::Head::Complete::printUndisclosed()|Mail::Message::Head::Complete/"Access to the header">.
 
@@ -249,9 +249,9 @@ example:
 
 =item $obj-E<gt>B<foldedBody>( [$body] )
 
-Returns the body as a set of lines. In scalar context, this will be one line
-containing newlines.  Be warned about the newlines when you do
-pattern-matching on the result of thie method.
+Returns the body as a set of lines. In scalar context, this will be
+one line containing newlines.  Be warned about the newlines when you do
+pattern matching on the result of this method.
 
 The optional $body argument changes the field's body.  The folding of the
 argument must be correct.
@@ -376,7 +376,7 @@ example:
 
  Mail::Message::Field->toDate(localtime);
  Mail::Message::Field->toDate;      # same
- # returns someting like:
+ # returns something like:
  #     Wed, 28 Aug 2002 10:40:25 +0200
 
 =item $obj-E<gt>B<toInt>()
@@ -619,7 +619,7 @@ contains the timezone difference to UTC, however one could decide to add
 this as comment.  Application must ignore this data because the C<Date>
 field is structured.
 
-The last field is unstructured.  The text between parantheses is an
+The last field is unstructured.  The text between parentheses is an
 integral part of the subject line.
 
 =head2 Getting a field
@@ -767,7 +767,7 @@ in case no address is known.
 =head3 Specifying field data
 
 Field data can be anything, strongly dependent on the type
-of field at hand. If you decide to contruct the fields very
+of field at hand. If you decide to construct the fields very
 carefully via some L<Mail::Message::Field::Full|Mail::Message::Field::Full> extension (like via
 L<Mail::Message::Field::Addresses|Mail::Message::Field::Addresses> objects), then you will have protection
 build-in.  However, you can bluntly create any L<Mail::Message::Field|Mail::Message::Field>
@@ -924,35 +924,12 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.005,
-built on December 22, 2017.
-
-Do not forget to read
-L<Mail::Box-Overview>,
-L<Mail::Box-Cookbook>, and
-L<Mail::Box-Index>.
-Examples are included in the Mail-Box distribution, directories 'examples'
-and 'scripts'.
-
-Browseable manuals, papers, and other released material van be found
-at  Website: F<http://perl.overmeer.net/mailbox/>
-
-The central modules (in separate distributions) in the MailBox suite are:
-L<Mail::Message>,
-L<Mail::Box>,
-L<Mail::Box::IMAP4>,
-L<Mail::Box::POP3>,
-L<Mail::Box::Parser::C>,
-L<Mail::Box::Dbx> (unpublished),
-L<Mail::Transport>,
-L<Object::Realize::Later>, and
-L<User::Identity>.
-
-Please post questions or ideas to the author F<markov@cpan.org>.
+This module is part of Mail-Message distribution version 3.006,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

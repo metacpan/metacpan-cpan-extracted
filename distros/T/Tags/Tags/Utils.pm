@@ -1,11 +1,9 @@
 package Tags::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use HTML::Entities;
 use Readonly;
@@ -17,8 +15,7 @@ Readonly::Scalar my $ATTR_CHARS => q{<&"};
 Readonly::Scalar my $CHAR_CHARS => q{<&\240};
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Encode newline in data to '\n' in output.
 sub encode_newline {
@@ -122,11 +119,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Utils qw(encode_newline);
 
  # Input text.
@@ -146,11 +141,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Dumpvalue;
  use Tags::Utils qw(encode_attr_entities);
 
@@ -192,17 +185,17 @@ L<https://github.com/tupinek/Tags>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
+ © 2005-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

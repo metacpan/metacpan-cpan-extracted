@@ -1,6 +1,6 @@
 package CSS::DOM::Array;
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use warnings;
 use strict;
@@ -23,7 +23,7 @@ CSS::DOM::Array - Array class for CSS::DOM
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 SYNOPSIS
 

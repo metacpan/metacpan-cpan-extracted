@@ -1,6 +1,9 @@
 Net-Google-SafeBrowsing3
 ========================
 
+
+This library is obsolete. Google Safe Browsinv v3 has been shult down by Google. Use v4 at http://search.cpan.org/perldoc?Net%3A%3AGoogle%3A%3ASafeBrowsing4
+
 Net::Google::SafeBrowsing2::Lookup implements the Google Safe Browsing v2 Lookup API (up to 10,000 URL checks a day).
 
 The library passes most of the unit tests listed in the API documentation. 

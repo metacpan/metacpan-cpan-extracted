@@ -6,6 +6,22 @@
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.01  2018/01/23  * Fixed parsing of named argument values in sub
+#                     parse_annotation_app:  At case
+#                       @$argref && $argref->[0] eq '('
+#                     while-loop over @$argref case
+#                       $val =~ /^[a-z]/i and $argref->[0] eq '='
+#                     for-loop of $ai case
+#                       $adef[$ai]->[1] eq $parname,
+#                     after assigning $param_index execute `last' instead of
+#                     `return'.
+#                   * Declared globals %annoEnum and @annoDefs as `our' to
+#                     make them accessible from outside.
+#                   * Added 'port' to global %keywords.
+#                   * Fixed calls to sub annotation so that more than one
+#                     annotation may accumulate on a given IDL item.
+#                   * Fixed changelog entry for v. 1.6 modification of REMARK
+#                     NAME/SUBORDINATES.
 # 2.00  2018/01/05  * Fixed parsing of parameterless annotation with empty
 #                     @$argref in sub parse_annotation_app.
 #                   * Changed version numbering to conform to CPAN format.
@@ -17,11 +33,11 @@
 #                   * Added variable $global_idlfile, a copy of the file name
 #                     passed into the most recent call to Parse_File.
 #                   * Simplified the REMARK node as follows:
-#                     - Its SUBORDINATES contains the starting line number
-#                       of the comment lines;
-#                     - its NAME points to a simple array of lines.  I.e. the
-#                       file name and line number elements are no longer part
-#                       of the lines array.
+#                     - Its NAME contains the starting line number of the
+#                       comment lines.
+#                     - Its SUBORDINATES points to a simple array of lines.
+#                       The file name and line number elements are no longer
+#                       part of the lines array.
 #                   * The COMMENT element now points to a tuple of (starting)
 #                     line number and reference to simple array of lines.
 #                     I.e. the file name and line number elements are no
@@ -78,11 +94,11 @@ CORBA::IDLtree - OMG IDL to symbol tree translator
 
 =head1 VERSION
 
-Version 2.00
+Version 2.01
 
 =cut
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 =head1 SYNOPSIS
 
@@ -886,7 +902,7 @@ sub dump_symbols_internal;
 
 # Annotation enumeration types (auxiliary to declaring @annoDefs).
 # User defined annotation enumeration types are added here when they arise.
-my %annoEnum = (
+our %annoEnum = (
     "AutoidKind"        => [ "SEQUENTIAL", "HASH" ],
     "ExtensibilityKind" => [ "FINAL", "APPENDABLE", "MUTABLE" ],
     "PlacementKind"     => [ "BEGIN_FILE",
@@ -911,7 +927,7 @@ my %annoEnum = (
 # is the parameter name.  The third element in the triplet is the default
 # value if a default is given, or is undef if no default is given.
 
-my @annoDefs = (
+our @annoDefs = (
     [ "id",              [ ULONG, "value", undef ] ],
     [ "autoid",          [ "AutoidKind", "value", "HASH" ] ],
     [ "optional",        [ BOOLEAN, "value", "TRUE" ] ],
@@ -1043,7 +1059,7 @@ my %keywords = map { $_ => undef } qw/
   consumes context custom default double emits enum exception
   eventtype factory false finder fixed float getraises home
   import in inout interface local long module multiple native
-  object octet oneway out primarykey private provides public
+  object octet oneway out port primarykey private provides public
   publishes raises readonly setraises sequence short string
   struct supports switch true truncatable typedef typeid
   typeprefix unsigned union uses valuebase valuetype void
@@ -2173,7 +2189,7 @@ sub convert_to_valuetype {
 # Is expected to be called not too long after get_items (the sub may find
 # that too many args were returned by get_items and may therefore call
 # unget_items).
-# Returns 1 on sucess, 0 on error.
+# Returns 1 on success, 0 on error.
 sub parse_annotation_app {
     my ($ann, $argref) = @_;
     my ($index) = grep { $annoDefs[$_]->[0] eq $ann } 0..$#annoDefs;
@@ -2220,7 +2236,7 @@ sub parse_annotation_app {
                 for (my $ai = 0; $ai < scalar(@adef); ++$ai) {
                     if ($adef[$ai]->[1] eq $parname) {
                         $param_index = $ai;
-                        return 0;
+                        last;
                     }
                 }
                 unless (defined $param_index) {
@@ -2367,7 +2383,6 @@ sub Parse_File_i {
             @remark = ();
             $starting_line_number_of_remark = 0;
         }
-        my $anno = annotation;
         my $cmnt = comment;
         KEYWORD:
         my $kw = shift @arg;
@@ -2630,7 +2645,7 @@ sub Parse_File_i {
                 $scope = $module;
             }
             $subord = [ ];
-            $module = [ MODULE, $name, $subord, $anno, $cmnt, $scope ];
+            $module = [ MODULE, $name, $subord, annotation, $cmnt, $scope ];
             $findnode_cache->add($fullname, $module);
             push @$symbols, $module;
             unshift @prev_symroots, $symbols;
@@ -2643,7 +2658,7 @@ sub Parse_File_i {
 
         } elsif ($kw eq 'interface') {
             my $name = check_name(shift @arg);
-            my $symnode = [ INTERFACE, $name, undef, $anno, $cmnt, curr_scope ];
+            my $symnode = [ INTERFACE, $name, undef, annotation, $cmnt, curr_scope ];
             my $lasttok = pop(@arg);
             if ($lasttok eq ';') {
                 $symnode->[TYPE] = INTERFACE_FWD;
@@ -2715,6 +2730,7 @@ sub Parse_File_i {
 
         } elsif ($kw eq 'valuetype') {
             my $name = check_name(shift @arg);
+            my $anno = annotation;
             my $symnode = [ VALUETYPE, $name, 0, $anno, $cmnt, curr_scope ];
             if ($vt2struct) {
                 $in_valuetype = 1;
@@ -2850,6 +2866,7 @@ sub Parse_File_i {
             my $type;
             $type = ($kw eq 'struct' ? STRUCT : EXCEPTION);
             my $name = check_name(shift @arg);
+            my $anno = annotation;
             push @typestack, $type;
             push @namestack, $name;
             push @annostack, $anno;
@@ -2879,6 +2896,7 @@ sub Parse_File_i {
 
         } elsif ($kw eq 'union') {
             my $name = check_name(shift @arg, "type name");
+            my $anno = annotation;
             push @typestack, UNION;
             push @namestack, $name;
             push @annostack, $anno;
@@ -2999,6 +3017,7 @@ sub Parse_File_i {
                 error("expecting '{'");
                 next;
             }
+            my $anno = annotation;
             my @values = ();
             @arg = get_items($in) unless @arg;
             while (@arg) {
@@ -3053,7 +3072,7 @@ sub Parse_File_i {
 
         if ($kw eq 'native') {
             my $name = check_name(shift @arg, "type name");
-            my $node = [ NATIVE, $name, 0, $anno, $cmnt, curr_scope ];
+            my $node = [ NATIVE, $name, 0, annotation, $cmnt, curr_scope ];
             pushsub($symbols, $node, $in_valuetype);
 
         } elsif ($kw eq 'const') {
@@ -3096,7 +3115,7 @@ sub Parse_File_i {
                     next;
                 }
             }
-            my $node = [ CONST, $name, \@tuple, $anno, $cmnt, curr_scope ];
+            my $node = [ CONST, $name, \@tuple, annotation, $cmnt, curr_scope ];
             pushsub($symbols, $node, $in_valuetype);
 
         } elsif ($kw eq 'typedef') {
@@ -3135,7 +3154,7 @@ sub Parse_File_i {
                 push @dimensions, $dim;
             }
             my @subord = ($existing_typenode, [ @dimensions ]);
-            my $node = [ TYPEDEF, $newtype, \@subord, $anno, $cmnt, curr_scope ];
+            my $node = [ TYPEDEF, $newtype, \@subord, annotation, $cmnt, curr_scope ];
             pushsub($symbols, $node, $in_valuetype);
 
         } elsif ($kw eq 'readonly' or $kw eq 'attribute') {
@@ -3155,7 +3174,7 @@ sub Parse_File_i {
             }
             my @subord = ($readonly, $type);
             my $name = check_name(shift @arg);
-            my $node = [ ATTRIBUTE, $name, \@subord, $anno, $cmnt, curr_scope ];
+            my $node = [ ATTRIBUTE, $name, \@subord, annotation, $cmnt, curr_scope ];
             pushsub($symbols, $node, $in_valuetype);
 
         } elsif (grep /\(/, @arg) {   # Method declaration
@@ -3222,7 +3241,7 @@ sub Parse_File_i {
                     shift @arg;
                 }
             }
-            my @node = (METHOD, $name, [ @subord ], $anno, $cmnt, curr_scope);
+            my @node = (METHOD, $name, [ @subord ], annotation, $cmnt, curr_scope);
             if ($expecting_exception_list) {
                 while (@arg) {
                     my $exc_name = shift @arg;
@@ -3780,6 +3799,8 @@ sub root_type {
 sub root_elem_type {
     # Returns the original type of a TYPEDEF, i.e. recurses through
     # all TYPEDEFs until the original type is reached.
+    # Also recurses through array types taking the element type of
+    # an array type.
     my $type = shift;
     if (isnode $type and $$type[TYPE] == TYPEDEF) {
         return root_elem_type($type->[SUBORDINATES][0]);

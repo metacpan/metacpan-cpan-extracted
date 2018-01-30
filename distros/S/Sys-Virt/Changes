@@ -1,5 +1,12 @@
 Revision history for perl module Sys::Virt
 
+4.0.0 2018-01-23
+
+ - Fix check of return value from virStreamRecv*
+ - Fix rd_req / wr_req hash keys for block stats
+ - Fix misc spelling mistakes
+ - Fix docs for storage pool destroy/undefine
+
 3.9.1 2017-12-05
 
  - Fix package location of lifecycle constants
@@ -468,7 +475,7 @@ Revision history for perl module Sys::Virt
 0.2.6 2011-02-16
 
  - Fix build with 0.8.7 libvirt by removing reference to
-   non-existant constant only introduced in libvirt > 0.8.7
+   non-existent constant only introduced in libvirt > 0.8.7
  - Fix test script when hostname is undefined
 
 0.2.5 2011-02-04
@@ -529,7 +536,7 @@ Revision history for perl module Sys::Virt
  - Added networking APIs
  - Added APIs for host capabilities
  - Added APIs for inactive domains
- - Switch licensse to GPLv2+ or Artistic for CPAN compatability
+ - Switch licensse to GPLv2+ or Artistic for CPAN compatibility
  - Fix return values for reboot/shutdown/undefine/create APIs
  - Expanded documentation coverage
 

@@ -8,18 +8,24 @@
 #include "XSUB.h"
 
 
-static int NativeReadReparse(LinkPath, u)
+BOOL get_ntfs_reparse_data(LinkPath, u)
    CONST TCHAR * LinkPath;
    union REPARSE_DATA_BUFFER_UNION * u;
 {
    HANDLE hFile;
    DWORD returnedLength;
    
+   int attr = GetFileAttributes(LinkPath);
+   
+   if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT)) {
+      return FALSE;
+   }
+   
    hFile = CreateFile(LinkPath, 0, 0, NULL, OPEN_EXISTING,
       FILE_FLAG_OPEN_REPARSE_POINT|FILE_FLAG_BACKUP_SEMANTICS, NULL);
    
    if (hFile == INVALID_HANDLE_VALUE) {
-      return -1;
+      return FALSE;
    }
    
    /* Get the link */
@@ -27,7 +33,7 @@ static int NativeReadReparse(LinkPath, u)
       0, &u->iobuf, 1024, &returnedLength, NULL)) {
       
       CloseHandle(hFile);
-      return -1;
+      return FALSE;
    }
    
    CloseHandle(hFile);
@@ -36,31 +42,23 @@ static int NativeReadReparse(LinkPath, u)
       u->iobuf.ReparseTag != IO_REPARSE_TAG_MOUNT_POINT &&
       u->iobuf.ReparseTag != IO_REPARSE_TAG_SYMLINK
    ) {
-      return -1;
+      return FALSE;
    }
    
-   return 0;
+   return TRUE;
 }
-
 
 char * _ntfs_readlink(LinkPath)
    CONST TCHAR * LinkPath;
 {
    union REPARSE_DATA_BUFFER_UNION u;
-   int attr;
    
-   attr = GetFileAttributes(LinkPath);
-   
-   if (!(attr & FILE_ATTRIBUTE_REPARSE_POINT)) {
-      return NULL;
-   }
-   
-   if (NativeReadReparse(LinkPath, &u)) {
+   if (!get_ntfs_reparse_data(LinkPath, &u)) {
       return NULL;
    }
    
    switch (u.iobuf.ReparseTag) {
-      case IO_REPARSE_TAG_MOUNT_POINT: {
+      case IO_REPARSE_TAG_MOUNT_POINT: { // Junction
          char *retval;
          unsigned int len = u.iobuf.MountPointReparseBuffer.SubstituteNameLength;
          
@@ -74,7 +72,7 @@ char * _ntfs_readlink(LinkPath)
          retval += 4;
          return retval;
       }
-      case IO_REPARSE_TAG_SYMLINK: {
+      case IO_REPARSE_TAG_SYMLINK: { // Symlink
          char *retval;
          unsigned int len = u.iobuf.SymbolicLinkReparseBuffer.SubstituteNameLength;
          
@@ -92,3 +90,26 @@ char * _ntfs_readlink(LinkPath)
    return NULL;
 }
 
+DWORD _ntfs_reparse_tag(LinkPath)
+   CONST TCHAR * LinkPath;
+{
+   union REPARSE_DATA_BUFFER_UNION u;
+   
+   if (!get_ntfs_reparse_data(LinkPath, &u)) {
+      return 0;
+   }
+   
+   return u.iobuf.ReparseTag;
+}
+
+BOOL _is_ntfs_symlink(LinkPath)
+   CONST TCHAR * LinkPath;
+{
+   return _ntfs_reparse_tag(LinkPath) == IO_REPARSE_TAG_SYMLINK;
+}
+
+BOOL _is_ntfs_junction(LinkPath)
+   CONST TCHAR * LinkPath;
+{
+   return _ntfs_reparse_tag(LinkPath) == IO_REPARSE_TAG_MOUNT_POINT;
+}

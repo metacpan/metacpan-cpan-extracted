@@ -5,10 +5,19 @@ Limitations to be fixed:
  - when lines are over 997 chars, then the transfer-encoding should
    automatically change from 'none' into 'quoted-printable' or 'base64'
 
+version 3.006: Wed 24 Jan 16:55:26 CET 2018
+
+	Improvements:
+	- spell corrections rt.cpan.org #123993 [Damyan Ivanov, debian]
+	- add some 'use warnings'
+	- convert to GIT
+	- publish on GitHUB
+
 version 3.005: Fri 22 Dec 09:43:45 CET 2017
 
 	Fixes:
 	- repair loose dependency on Mail::Transport [cpantesters]
+	  rt.cpan.org#123929 [Slaven Rezic]
 
 version 3.004: Thu 21 Dec 09:08:52 CET 2017
 

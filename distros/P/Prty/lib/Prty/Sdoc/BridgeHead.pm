@@ -4,7 +4,7 @@ use base qw/Prty::Sdoc::Node/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 # -----------------------------------------------------------------------------
 
@@ -57,8 +57,8 @@ Titel des Abschnitts.
 sub new {
     my ($class,$doc,$parent) = @_;
 
-    # Eine Zwischenüberschrift ist grundsätzlich einzeilig und endet
-    # daher mit der nächsten Zeile.
+    # Eine Zwischenüberschrift ist grundsätzlich einzeilig
+    # und endet daher mit der nächsten Zeile.
 
     my $line = $doc->shiftLine;
     $line->text =~ /^(=+)\? (.*)/;
@@ -77,7 +77,6 @@ sub new {
         title=>$title,
     );
     $self->parent($parent); # schwache Referenz
-    # $self->lockKeys;
 
     return $self;
 }
@@ -118,8 +117,6 @@ sub dump {
         );
     }
     elsif ($format eq 'pod') {
-        # return "=pod\n\nB<$title>\n\n";
-        # return "B<$title>\n\n";
         return "=head$level $title\n\n";
     }
     elsif ($format eq 'man') {
@@ -131,7 +128,7 @@ sub dump {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -139,7 +136,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

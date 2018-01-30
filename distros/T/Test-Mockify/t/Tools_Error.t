@@ -72,7 +72,7 @@ sub test_ErrorWithoutMockedMethodAndDataBlock {
 sub _getErrorRegEx_ErrorWithoutMockedMethod {
     return <<'END_REGEX';
 AnErrorMessage:
-MockedMethod: -not set-
+MockedMethod: -no method set-
 Data:\{\}
 Test::Exception::throws_ok,.*t[/\\]Tools_Error.t\(line \d+\)
 Tools_Error::test_ErrorWithoutMockedMethod,.*t[/\\]Tools_Error.t\(line \d+\)
@@ -98,7 +98,7 @@ END;
 sub _getErrorRegEx_ErrorWithoutMockedMethodAndDataBlock {
     return <<'END_REGEX';
 AnErrorMessage:
-MockedMethod: -not set-
+MockedMethod: -no method set-
 Data:\{key='value'\}
 Test::Exception::throws_ok,.*t[/\\]Tools_Error.t\(line \d+\)
 Tools_Error::test_ErrorWithoutMockedMethodAndDataBlock,.*t[/\\]Tools_Error.t\(line \d+\)

@@ -5,15 +5,25 @@
     <style>
       a, body { color: #2a2a2a }
       body { font: 0.9em 'Helvetica Neue', Helvetica, sans-serif }
-      input[type=text], textarea { width: 600px }
+      input[type=text], input[type=number], textarea { width: 600px }
       input.field-with-error, textarea.field-with-error {
         border: 4px solid #f00;
       }
-      textarea { height: 300px }
+
+      table,td,.menu {font: 1.2em; border: 1px #ddd solid; border-radius: 0.3em; padding: 0.3em;}
+      table, tr, tbody {padding:0;}
+      textarea { height: 10em }
     </style>
   </head>
   <body>
-    <h1><%= link_to 'Blog' => 'posts' %></h1>
+      <div class="menu">
+          <%= link_to '🏠' => '/' %>
+          % my %links = (Blog => 'posts', Users => 'users', Groups => 'groups');
+          % for (sort keys %links) {
+          <%= link_to $_ => "/$links{$_}" %>
+          % }
+      </div>
+      <h1><%= stash->{title} || url_for %></h1>
     %= content
   </body>
 </html>

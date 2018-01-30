@@ -123,6 +123,35 @@ scenario 'In a login session' => sub {
     };
 };
 
+scenario 'Invalid session id' => sub {
+    Cache->new->set('invalid char in session id' => { user_id => 5963 });
+
+    my $session;
+    step 'client -> server: request without cookie' => sub {
+        $session = HTTP::Session2::ServerStore->new(
+            env => {
+                HTTP_COOKIE => 'hss_session=invalid%20char%20in%20session%20id',
+            },
+            get_store => sub { Cache->new() },
+            secret => 's3cret',
+        );
+    };
+    step 'server -> store: set more data' => sub {
+        $session->set('foo' => 'bar');
+    };
+    step 'server -> client: response with new session/xsrf cookie' => sub {
+        my $res = empty_res();
+        $session->finalize_psgi_response($res);
+        is $res->[1]->[0], 'Set-Cookie';
+        my ($sess_id) = ($res->[1]->[1] =~ qr{\Ahss_session=([^;]*); path=/; HttpOnly\z});
+        ok $sess_id;
+        isnt $sess_id, 'invalid char in session id';
+        is_deeply $Cache::STORE{$sess_id}, {
+            foo => 'bar',
+        };
+    };
+};
+
 scenario 'Logout' => sub {
     Cache->new->set(SsEeSsIiOoNn => { foo => 'bar' });
 
@@ -153,4 +182,3 @@ scenario 'Logout' => sub {
 };
 
 done_testing;
-

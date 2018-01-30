@@ -11,6 +11,7 @@ use PICA::Writer::Plus;
 use PICA::Writer::XML;
 use PICA::Writer::PPXML;
 use PICA::Parser::PPXML;
+use PICA::Writer::Generic;
 
 use File::Temp qw(tempfile);
 use IO::File;
@@ -114,8 +115,6 @@ XML
     is $out, $xml, 'XML writer';
 }
 
-note 'PICA::Writer::XML to object';
-
 {
     { 
       package MyStringWriter;
@@ -149,6 +148,42 @@ note 'PICA::Writer::PPXML';
     is_xml($out, $in, 'PPXML writer');
 }
 
+note 'PICA::Writer::Generic';
+
+{
+    my ($fh, $filename) = tempfile();
+    my $writer = PICA::Writer::Generic->new( fh => $fh, us => "#", rs => "%" , gs => "\n\n"  );
+
+    foreach my $record (@pica_records) {
+        $writer->write($record);
+    }
+    close $fh;
+
+    my $out = do { local (@ARGV,$/)=$filename; <> };
+    my $PLUS = <<'PLUS';
+003@ #01041318383%021A #aHello $¥!%
+
+028C/01 #dEmma#aGoldman%
+
+PLUS
+
+    is $out, $PLUS, 'Generic Writer'; 
+}
+
+{
+    my ($fh, $filename) = tempfile();
+    my $writer = PICA::Writer::Generic->new( fh => $fh );
+
+    foreach my $record (@pica_records) {
+        $writer->write($record);
+    }
+    close $fh;
+
+    my $out = do { local (@ARGV,$/)=$filename; <> };
+
+    is $out, '003@ 01041318383021A aHello $¥!028C/01 dEmmaaGoldman', 'Generic Writer (default)';
+}
+
 note 'PICA::Data';
 
 {
@@ -174,8 +209,6 @@ PLAIN
   is $append, $PLAIN, 'record->write';
 }
 
-
-
 note 'Exeptions';
 
 {
@@ -184,6 +217,22 @@ note 'Exeptions';
 
     eval { pica_writer('plain', fh => {} ) };
     ok $@, 'invalid handle';
+}
+
+note 'undefined occurrence';
+
+{
+    my $pica_record = [['003@', undef, '0', '1041318383']];
+    my ($fh, $filename) = tempfile();
+    my $writer = PICA::Writer::Plus->new( fh => $fh );
+    $writer->write($pica_record);
+    close $fh;
+
+    my $out = do { local (@ARGV,$/)=$filename; <> };
+    my $PLUS = <<'PLUS';
+003@ 01041318383
+PLUS
+    is $out, $PLUS, 'undef occ';
 }
 
 done_testing;

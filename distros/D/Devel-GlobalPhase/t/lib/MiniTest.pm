@@ -2,13 +2,8 @@
 # using Test::More and just implement our own simple test routines.
 package MiniTest;
 use strict;
+use warnings;
 $|++;
-{
-  package
-    Test::Scope::Guard;
-  sub new { my ($class, $code) = @_; bless [$code], $class; }
-  sub DESTROY { my $self = shift; $self->[0]->() }
-}
 
 my $had_error;
 my $test_num;
@@ -32,7 +27,7 @@ sub import {
         $plan = $args{tests};
         print "1..$plan\n";
     }
-    my $caller;
+    my $caller = caller;
     no strict 'refs';
     *{"${caller}::TODO"} = *TODO;
     *{"${caller}::$_"} = \&{$_}
@@ -48,9 +43,17 @@ sub ok ($;$) {
   !!$_[0]
 }
 sub is ($$;$) {
-  my $out = ok $_[0] eq $_[1], $_[2]
-    or print "# $_[0] ne $_[1]\n";
-  $out;
+  my $pass = $_[0] eq $_[1];
+  ok $pass, $_[2];
+  if (!$pass) {
+    my (undef, $file, $line) = caller;
+    my $mess
+      = "# Failed test".($_[2] ? " '$_[2]'" : '')."\n"
+      . "#   at $file line $line.\n"
+      . "#   '$_[0]' ne '$_[1]'\n";
+    print { $TODO ? \*STDOUT : \*STDERR } $mess;
+  }
+  $pass;
 }
 sub skip ($;$) {
   print "ok " . ++$test_num;

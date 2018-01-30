@@ -3,10 +3,10 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 README
-README.md
 dist.ini
 lib/Dist/Zilla/PluginBundle/Author/FERREIRA.pm
 t/00-report-prereqs.dd

@@ -1,15 +1,19 @@
-# Copyrights 2017 by [Mark Overmeer].
+# Copyrights 2017-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-use warnings;
-use strict;
+# This code is part of distribution Log-Report-Template. Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Log::Report::Template;
 use vars '$VERSION';
-$VERSION = '0.12';
+$VERSION = '0.13';
 
 use base 'Template';
+
+use warnings;
+use strict;
 
 use Log::Report 'log-report-template';
 use Log::Report::Template::Textdomain ();

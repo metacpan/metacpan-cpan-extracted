@@ -42,11 +42,9 @@ ERRORS
              Unknown parameter '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Utils qw(set_params);
 
      # Hash reference with default parameters.
@@ -64,11 +62,9 @@ EXAMPLE1
      # real_value
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Utils qw(set_params);
 
      # Hash reference with default parameters.
@@ -80,11 +76,9 @@ EXAMPLE2
      # Turn error >>Unknown parameter 'bad'.<<.
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Utils qw(set_params_pub);
 
      # Hash reference with default parameters.
@@ -105,11 +99,9 @@ EXAMPLE3
      # value
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Utils qw(set_split_params);
 
      # Hash reference with default parameters.
@@ -133,11 +125,9 @@ EXAMPLE4
      # bad: value
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Class::Utils qw(split_params);
 
      # Example parameters.
@@ -167,14 +157,14 @@ REPOSITORY
     <https://github.com/tupinek/Class-Utils>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2011-2015
+     © Michal Josef Špaček 2011-2018
      BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

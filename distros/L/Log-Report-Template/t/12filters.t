@@ -3,8 +3,6 @@
 use warnings;
 use strict;
 
-use lib 'lib';
-
 use Test::More;
 
 use_ok 'Log::Report::Template';

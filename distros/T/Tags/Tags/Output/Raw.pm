@@ -1,11 +1,9 @@
 package Tags::Output::Raw;
 
-# Pragmas.
 use base qw(Tags::Output);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use List::MoreUtils qw(none);
 use Readonly;
@@ -17,8 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Finalize Tags output.
 sub finalize {
@@ -578,11 +575,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Output::Raw;
 
  # Object.
@@ -603,11 +598,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Encode;
  use Tags::Output::Raw;
 
@@ -661,17 +654,17 @@ L<https://github.com/tupinek/Tags>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2005-2016 Michal Špaček
+ © 2005-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

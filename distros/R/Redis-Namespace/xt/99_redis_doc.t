@@ -125,8 +125,40 @@ our %before_tests = (
                 isnt $arg->{type}, 'key';
             }
         }
-    }
-);
+    },
+    georadius => sub {
+        my ($key, $longitude, $latitude, $radius, $unit, @extra) = @_;
+        is $key->{type}, 'key', $key->{name};
+        is $longitude->{type}, 'double', $longitude->{name};
+        is $latitude->{type}, 'double', $latitude->{name};
+        is $radius->{type}, 'double', $radius->{name};
+        is $unit->{type}, 'enum', $unit->{name};
+        for my $arg (@extra) {
+            if ($arg->{command} eq 'STORE' || $arg->{command} eq 'STOREDIST') {
+                is $arg->{type}, 'key';
+            } elsif ($arg->{command} eq 'COUNT') {
+                is $arg->{type}, 'integer';
+            } else {
+                is $arg->{type}, 'enum';
+            }
+        }
+    },
+    georadiusbymember => sub {
+        my ($key, $member, $radius, $unit, @extra) = @_;
+        is $key->{type}, 'key', $key->{name};
+        is $member->{type}, 'string', $member->{name};
+        is $radius->{type}, 'double', $radius->{name};
+        is $unit->{type}, 'enum', $unit->{name};
+        for my $arg (@extra) {
+            if ($arg->{command} eq 'STORE' || $arg->{command} eq 'STOREDIST') {
+                is $arg->{type}, 'key';
+            } elsif ($arg->{command} eq 'COUNT') {
+                is $arg->{type}, 'integer';
+            } else {
+                is $arg->{type}, 'enum';
+            }
+        }
+    },);
 
 sub test_command {
     my ($key, $info) = @_;

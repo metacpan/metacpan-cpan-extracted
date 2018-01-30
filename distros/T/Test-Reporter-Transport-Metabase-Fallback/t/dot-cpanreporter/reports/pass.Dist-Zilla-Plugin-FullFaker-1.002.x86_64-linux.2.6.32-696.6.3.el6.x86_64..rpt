@@ -1,0 +1,239 @@
+From: stro@cpan.org
+X-Test-Reporter-Distfile: STRO/Dist-Zilla-Plugin-FullFaker-1.002.tar.gz
+X-Test-Reporter-Perl: v5.26.1
+Subject: PASS Dist-Zilla-Plugin-FullFaker-1.002 x86_64-linux 2.6.32-696.6.3.el6.x86_64
+Report: This distribution has been tested as part of the CPAN Testers
+project, supporting the Perl programming language.  See
+http://wiki.cpantesters.org/ for more information or email
+questions to cpan-testers-discuss@perl.org
+
+
+--
+Dear Serguei Trouchelle,
+
+This is a computer-generated report for Dist-Zilla-Plugin-FullFaker-1.002
+on perl 5.26.1, created by CPAN-Reporter-1.2018.
+
+Thank you for uploading your work to CPAN.  Congratulations!
+All tests were successful.
+
+Sections of this report:
+
+    * Tester comments
+    * Program output
+    * Prerequisites
+    * Environment and other context
+
+------------------------------
+TESTER COMMENTS
+------------------------------
+
+Additional comments from tester:
+
+none provided
+
+------------------------------
+PROGRAM OUTPUT
+------------------------------
+
+Output from '/usr/bin/make test':
+
+PERL_DL_NONLAZY=1 "/home/stro/perl5/perlbrew/perls/perl-5.26.1/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00-use.t ................ ok
+t/author-critic.t ......... skipped: these tests are for testing by the author
+t/release-pod-coverage.t .. skipped: these tests are for release candidate testing
+t/release-pod-syntax.t .... skipped: these tests are for release candidate testing
+All tests successful.
+Files=4, Tests=1,  1 wallclock secs ( 0.01 usr  0.00 sys +  0.32 cusr  0.02 csys =  0.35 CPU)
+Result: PASS
+
+------------------------------
+PREREQUISITES
+------------------------------
+
+Prerequisite modules loaded:
+
+requires:
+
+    Module                         Need Have
+    ------------------------------ ---- ----
+    Dist::Zilla::Plugin::FakeFaker 0    0.04
+
+build_requires:
+
+    Module                         Need Have
+    ------------------------------ ---- ----
+    ExtUtils::MakeMaker            0    7.24
+
+configure_requires:
+
+    Module                         Need Have
+    ------------------------------ ---- ----
+    ExtUtils::MakeMaker            0    7.24
+
+
+------------------------------
+ENVIRONMENT AND OTHER CONTEXT
+------------------------------
+
+Environment variables:
+
+    LANG = en_US.UTF-8
+    LD_LIBRARY_PATH = /usr/lib64/alliance/lib
+    NONINTERACTIVE_TESTING = 1
+    PATH = /home/stro/perl5/perlbrew/perls/perl-5.26.1/bin:/home/stro/perl5/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:/usr/lib64/alliance/bin:/home/stro/bin:/home/stro/bin:/home/stro/bin
+    PERL5LIB = /home/stro/perl5/lib/perl5:/site/lib
+    PERL5OPT = 
+    PERL5_CPANPLUS_IS_RUNNING = 31546
+    PERL5_CPAN_IS_RUNNING = 31546
+    PERL_LOCAL_LIB_ROOT = /home/stro/perl5
+    PERL_MB_OPT = --install_base "/home/stro/perl5"
+    PERL_MM_OPT = INSTALL_BASE=/home/stro/perl5
+    PERL_MM_USE_DEFAULT = 1
+    PERL_USE_UNSAFE_INC = 1
+    SHELL = /bin/bash
+    TERM = xterm
+
+Perl special variables (and OS-specific diagnostics, for MSWin32):
+
+    $^X = /home/stro/perl5/perlbrew/perls/perl-5.26.1/bin/perl
+    $UID/$EUID = 500 / 500
+    $GID = 500 500
+    $EGID = 500 500
+
+Perl module toolchain versions installed:
+
+    Module              Have      
+    ------------------- ----------
+    CPAN                2.18      
+    CPAN::Meta          2.150010  
+    Cwd                 3.67      
+    ExtUtils::CBuilder  0.280225  
+    ExtUtils::Command   7.24      
+    ExtUtils::Install   2.04      
+    ExtUtils::MakeMaker 7.24      
+    ExtUtils::Manifest  1.70      
+    ExtUtils::ParseXS   3.34      
+    File::Spec          3.67      
+    JSON                n/a       
+    JSON::PP            2.27400_02
+    Module::Build       0.4224    
+    Module::Signature   n/a       
+    Parse::CPAN::Meta   2.150010  
+    Test::Harness       3.38      
+    Test::More          1.302120  
+    YAML                n/a       
+    YAML::Syck          n/a       
+    version             0.9917    
+
+
+--
+
+Summary of my perl5 (revision 5 version 26 subversion 1) configuration:
+   
+  Platform:
+    osname=linux
+    osvers=2.6.32-696.6.3.el6.x86_64
+    archname=x86_64-linux
+    uname='linux localhost.localdomain 2.6.32-696.6.3.el6.x86_64 #1 smp wed jul 12 14:17:22 utc 2017 x86_64 x86_64 x86_64 gnulinux '
+    config_args='-de -Dprefix=/home/stro/perl5/perlbrew/perls/perl-5.26.1 -Aeval:scriptdir=/home/stro/perl5/perlbrew/perls/perl-5.26.1/bin'
+    hint=recommended
+    useposix=true
+    d_sigaction=define
+    useithreads=undef
+    usemultiplicity=undef
+    use64bitint=define
+    use64bitall=define
+    uselongdouble=undef
+    usemymalloc=n
+    default_inc_excludes_dot=define
+    bincompat5005=undef
+  Compiler:
+    cc='cc'
+    ccflags ='-fwrapv -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2'
+    optimize='-O2'
+    cppflags='-fwrapv -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include'
+    ccversion=''
+    gccversion='4.4.7 20120313 (Red Hat 4.4.7-11)'
+    gccosandvers=''
+    intsize=4
+    longsize=8
+    ptrsize=8
+    doublesize=8
+    byteorder=12345678
+    doublekind=3
+    d_longlong=define
+    longlongsize=8
+    d_longdbl=define
+    longdblsize=16
+    longdblkind=3
+    ivtype='long'
+    ivsize=8
+    nvtype='double'
+    nvsize=8
+    Off_t='off_t'
+    lseeksize=8
+    alignbytes=8
+    prototype=define
+  Linker and Libraries:
+    ld='cc'
+    ldflags =' -fstack-protector -L/usr/local/lib'
+    libpth=/usr/local/lib /usr/lib /lib/../lib64 /usr/lib/../lib64 /lib /lib64 /usr/lib64 /usr/local/lib64
+    libs=-lpthread -lnsl -lgdbm -ldb -ldl -lm -lcrypt -lutil -lc
+    perllibs=-lpthread -lnsl -ldl -lm -lcrypt -lutil -lc
+    libc=libc-2.12.so
+    so=so
+    useshrplib=false
+    libperl=libperl.a
+    gnulibc_version='2.12'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs
+    dlext=so
+    d_dlsymun=undef
+    ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC'
+    lddlflags='-shared -O2 -L/usr/local/lib -fstack-protector'
+
+
+Characteristics of this binary (from libperl): 
+  Compile-time options:
+    HAS_TIMES
+    PERLIO_LAYERS
+    PERL_COPY_ON_WRITE
+    PERL_DONT_CREATE_GVSV
+    PERL_MALLOC_WRAP
+    PERL_OP_PARENT
+    PERL_PRESERVE_IVUV
+    USE_64_BIT_ALL
+    USE_64_BIT_INT
+    USE_LARGE_FILES
+    USE_LOCALE
+    USE_LOCALE_COLLATE
+    USE_LOCALE_CTYPE
+    USE_LOCALE_NUMERIC
+    USE_LOCALE_TIME
+    USE_PERLIO
+    USE_PERL_ATOF
+  Locally applied patches:
+    Devel::PatchPerl 1.48
+  Built under linux
+  Compiled at Jan 24 2018 12:58:59
+  %ENV:
+    PERL5LIB="/home/stro/perl5/lib/perl5:/site/lib"
+    PERL5OPT=""
+    PERL5_CPANPLUS_IS_RUNNING="31546"
+    PERL5_CPAN_IS_RUNNING="31546"
+    PERL_LOCAL_LIB_ROOT="/home/stro/perl5"
+    PERL_MB_OPT="--install_base "/home/stro/perl5""
+    PERL_MM_OPT="INSTALL_BASE=/home/stro/perl5"
+    PERL_MM_USE_DEFAULT="1"
+    PERL_USE_UNSAFE_INC="1"
+  @INC:
+    /home/stro/perl5/lib/perl5/x86_64-linux
+    /home/stro/perl5/lib/perl5
+    /site/lib
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1/x86_64-linux
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/site_perl/5.26.1
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1/x86_64-linux
+    /home/stro/perl5/perlbrew/perls/perl-5.26.1/lib/5.26.1
+    .

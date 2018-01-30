@@ -2,6 +2,7 @@ package Eixo::Base::Clase;
 
 use Eixo::Base::Util;
 use Clone 'clone';
+use mro;
 
 use Attribute::Handlers;
 use strict;
@@ -9,50 +10,54 @@ use warnings;
 
 
 sub import{
-	my $class = shift;
+    my $class = shift;
 
-	$_->import for qw(strict warnings utf8);
+    $_->import for qw(strict warnings utf8);
+    #mro->import('c3');
 
-	return unless($class eq 'Eixo::Base::Clase');
+    return unless($class eq 'Eixo::Base::Clase');
 
-	if(@_ && $_[0] eq '-norequire'){
-		shift @_;
-	}
-	else{
-		foreach my $f (my @copy = @_){
+    if(@_ && $_[0] eq '-norequire'){
+        shift @_;
+    }
+    else{
+        foreach my $f (my @copy = @_){
 
-			$f =~ s!::|'!/!g;
+            $f =~ s!::|'!/!g;
 
-			no strict 'refs';
+            no strict 'refs';
 
-			require "$f.pm";
+            require "$f.pm";
 
-		}
-	}
+        }
+    }
 
-	my @inheritance = (@_ > 0) ? @_ : $class;
+    my @inheritance = (@_ > 0) ? @_ : $class;
 
-	my $caller = caller;
+    my $caller = caller;
 
-	{
-        	no strict 'refs';
+    {
+        no strict 'refs';
 
-		foreach my $my_class (@inheritance){
+        foreach my $parent (@inheritance){
+
+            foreach my $my_class (@{mro::get_linear_isa($parent)}){
+                #print "$my_class\n";
+                
+                #next if($caller->isa($my_class));
+
+                #print "------>$caller $my_class \n";
+
+                push @{"${caller}\:\:ISA"}, $my_class;
+            }
 
 
-			next if($caller->isa($my_class));
-
-			#print "------>$caller $my_class \n";
-
-        		push @{"${caller}\:\:ISA"}, $my_class;
+        }
 
 
-		}
+        *{$caller . '::has'} = \&has;
 
-
-		*{$caller . '::has'} = \&has;
-
-    	};
+    };
 
 
 }
@@ -60,85 +65,85 @@ sub import{
 
 
 sub has{
-	my (%attributes) = @_;
+    my (%attributes) = @_;
 
-	my $class = (caller(0))[0];
+    my $class = (caller(0))[0];
 
-	no strict 'refs';
-	
-	foreach my $attribute (keys(%attributes)){
+    no strict 'refs';
+    
+    foreach my $attribute (keys(%attributes)){
 
-		$class->__createSetterGetter($attribute, $attributes{$attribute});		
-	}
+        $class->__createSetterGetter($attribute, $attributes{$attribute});        
+    }
 
-	*{$class . '::' . '__initialize'} = sub {
+    *{$class . '::' . '__initialize'} = sub {
 
-		my $c_attributes = clone(\%attributes);
+        my $c_attributes = clone(\%attributes);
 
-		my ($self) = @_;
+        my ($self) = @_;
 
-		foreach(keys %$c_attributes){
+        foreach(keys %$c_attributes){
 
-			$self->{$_} = $c_attributes->{$_};
-		}
-	};  
+            $self->{$_} = $c_attributes->{$_};
+        }
+    };  
 }
 
 sub __createSetterGetter{
-	my ($class, $attribute, $value) = @_;
+    my ($class, $attribute, $value) = @_;
 
-	no strict 'refs';
+    no strict 'refs';
 
-	unless(defined(&{$class . '::' . $attribute})){
+    unless(defined(&{$class . '::' . $attribute})){
 
-		*{$class . '::' . $attribute} = sub {
+        *{$class . '::' . $attribute} = sub {
 
-			my ($self, $value)  = @_;
+            my ($self, $value)  = @_;
 
-			if(defined($value)){
-				
-				$self->{$attribute} = $value;
-				
-				$self;
-			}
-			else{
-				$self->{$attribute};
-			}	
+            if(defined($value)){
+                
+                $self->{$attribute} = $value;
+                
+                $self;
+            }
+            else{
+                $self->{$attribute};
+            }    
 
-		};
-	}
+        };
+    }
 
 }
 
 sub new{
-	my ($clase, @args) = @_;
+    my ($clase, @args) = @_;
 
-	my $self = bless({}, $clase);
+    my $self = bless({}, $clase);
 
-	# initialize attributes with default values from 'has' 
-	$self->__chainInitialize;    
+    # initialize attributes with default values from 'has' 
+    $self->__chainInitialize;    
 
     # finally call initialize method
     $self->initialize(@args);
 
-	$self;
+    $self;
 }
 
 
 sub __chainInitialize{
-	my ($self) = @_;
+    my ($self) = @_;
 
-	no strict 'refs';	
+    no strict 'refs';    
 
-	foreach(@{ref($self) . '::ISA'}){
+    foreach(@{ref($self) . '::ISA'}){
 
-		if(my $code = $_->can('__initialize')){
+        if(my $code = $_->can('__initialize')){
 
-			$code->(@_);
-		}
-	}
+            $code->(@_);
+        }
+    }
 
-	$self->__initialize if($self->can('__initialize'));
+    $self->__initialize if($self->can('__initialize'));
 }
 
 #
@@ -148,65 +153,65 @@ sub initialize{
     
     my ($self, @args) = @_;
 
-    	# default initialize
-	
+        # default initialize
+    
 
-	# if new is called with initialization values (not recommended)
-	if(@args % 2 == 0){
+    # if new is called with initialization values (not recommended)
+    if(@args % 2 == 0){
 
-		my %args = @args;
+        my %args = @args;
 
-		foreach(keys(%args)){
+        foreach(keys(%args)){
 
-			$self->$_($args{$_}) if($self->can($_));
+            $self->$_($args{$_}) if($self->can($_));
 
-		}
-	}
+        }
+    }
 }
 
 #
 # Methods
 #
 sub methods{
-	my ($self, $class, $nested) = @_;
+    my ($self, $class, $nested) = @_;
 
-	$class = $class || ref($self) || $self;
+    $class = $class || ref($self) || $self;
 
-	no strict 'refs';
+    no strict 'refs';
 
-	my @methods = grep { defined(&{$class . '::' . $_} ) } keys(%{$class . '::'});
+    my @methods = grep { defined(&{$class . '::' . $_} ) } keys(%{$class . '::'});
 
-	push @methods, $self->methods($_, 1) foreach(@{ $class .'::ISA' } );
+    push @methods, $self->methods($_, 1) foreach(@{ $class .'::ISA' } );
 
 
-	unless($nested){
+    unless($nested){
 
-		my %s;
+        my %s;
 
-		$s{$_}++ foreach( map { $_ =~ s/.+\:\://; $_ } @methods);
+        $s{$_}++ foreach( map { $_ =~ s/.+\:\://; $_ } @methods);
 
-		return keys(%s);
-	}
+        return keys(%s);
+    }
 
-	@methods;
-	
+    @methods;
+    
 }
 
 #
 # ABSTRACT method
 #
 sub Abstract :ATTR(CODE){
-	my ($pkg, $sym, $code, $attr_name, $data) = @_;
+    my ($pkg, $sym, $code, $attr_name, $data) = @_;
 
-	no warnings 'redefine';
+    no warnings 'redefine';
 
-	my $n = $pkg . '::' . *{$sym}{NAME};
+    my $n = $pkg . '::' . *{$sym}{NAME};
 
-	*{$sym} = sub {
+    *{$sym} = sub {
 
-		die($n . ' is ABSTRACT!!!');
+        die($n . ' is ABSTRACT!!!');
  
-	};	
+    };    
 
 }
 
@@ -215,37 +220,37 @@ sub Abstract :ATTR(CODE){
 #
 sub Log :ATTR(CODE){
 
-	my ($pkg, $sym, $code, $attr_name, $data) = @_;
+    my ($pkg, $sym, $code, $attr_name, $data) = @_;
 
-	no warnings 'redefine';
+    no warnings 'redefine';
 
-	*{$sym} = sub {
+    *{$sym} = sub {
 
-		my ($self, @args) = @_;
+        my ($self, @args) = @_;
 
-		$self->logger([$pkg, *{$sym}{NAME}], \@args);
+        $self->logger([$pkg, *{$sym}{NAME}], \@args);
 
-		$code->($self, @args);
-	};
+        $code->($self, @args);
+    };
 
 }
 
 sub flog{
-	my ($self, $code) = @_;
+    my ($self, $code) = @_;
 
-	unless(ref($code) eq 'CODE'){
-		die(ref($self) . '::flog: code ref expected');
-	}
+    unless(ref($code) eq 'CODE'){
+        die(ref($self) . '::flog: code ref expected');
+    }
 
-	$self->{flog} = $code;
+    $self->{flog} = $code;
 }
 
 sub logger{
-	my ($self, @args) = @_;
+    my ($self, @args) = @_;
 
-	return unless($self->{flog});
+    return unless($self->{flog});
 
-	$self->{flog}->($self, @args);
+    $self->{flog}->($self, @args);
 }
 
 1;

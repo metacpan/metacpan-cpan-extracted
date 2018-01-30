@@ -2,6 +2,7 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 bin/collect-types
 bin/update-iana
 lib/MIME/Type.pm

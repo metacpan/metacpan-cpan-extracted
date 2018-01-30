@@ -16,6 +16,7 @@ do { my $x = {
                       'requires' => {
                                       'Authen::SASL::XS' => '0',
                                       'Data::Dumper' => '0',
+                                      'Devel::CheckLib' => '0',
                                       'Thrift' => 'v0.10.0',
                                       'Thrift::BinaryProtocol' => '0',
                                       'constant' => '0',
@@ -34,7 +35,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.010'
                                  }
                  }

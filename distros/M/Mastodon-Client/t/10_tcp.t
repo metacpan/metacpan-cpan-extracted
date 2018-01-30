@@ -4,7 +4,6 @@ use warnings;
 use Test::Exception;
 use Test::More;
 use Test::TCP;
-use Test::Warnings 'warning';
 use LWP::UserAgent;
 use Mastodon::Client;
 use Try::Tiny;

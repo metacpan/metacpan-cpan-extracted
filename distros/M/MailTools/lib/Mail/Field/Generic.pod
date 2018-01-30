@@ -34,15 +34,15 @@ Extends L<"Constructors" in Mail::Field|Mail::Field/"Constructors">.
  
 =over 4
 
-=item Mail::Field::Generic-E<gt>B<combine>(FIELDS)
+=item Mail::Field::Generic-E<gt>B<combine>($fields)
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::Generic-E<gt>B<extract>( TAG, HEAD [, INDEX ] )
+=item Mail::Field::Generic-E<gt>B<extract>( $tag, $head [, $index ] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
-=item Mail::Field::Generic-E<gt>B<new>( TAG [, STRING | OPTIONS] )
+=item Mail::Field::Generic-E<gt>B<new>( $tag [, STRING | %options] )
 
 Inherited, see L<Mail::Field/"Constructors">
 
@@ -54,7 +54,7 @@ Extends L<""Fake" constructors" in Mail::Field|Mail::Field/""Fake" constructors"
  
 =over 4
 
-=item $obj-E<gt>B<create>(OPTIONS)
+=item $obj-E<gt>B<create>(%options)
 
  -Option--Default
   Text    ''
@@ -77,7 +77,7 @@ Extends L<"Accessors" in Mail::Field|Mail::Field/"Accessors">.
  
 =over 4
 
-=item $obj-E<gt>B<set>(OPTIONS)
+=item $obj-E<gt>B<set>(%options)
 
 Inherited, see L<Mail::Field/"Accessors">
 

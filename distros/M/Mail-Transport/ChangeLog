@@ -1,5 +1,14 @@
 
-===== ChangeLog of Mail::Transport version 3.*
+===== Revision history of Mail::Transport version 3.*
+
+All changes are made by Mark Overmeer <markov@cpan.org> unless
+explicitly stated differently.
+
+version 3.002: Wed 24 Jan 16:02:02 CET 2018
+
+	Improvements:
+	- convert to GIT
+	- publish on GitHUB
 
 version 3.001: Wed  8 Nov 13:06:18 CET 2017
 

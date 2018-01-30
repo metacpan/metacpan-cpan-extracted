@@ -1,5 +1,3 @@
-#!/usr/bin/env perl -I pl/lib
-
 use Test::More;
 use JSON;
 use Data::Dumper;

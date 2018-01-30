@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use Prty::Html::Tag;
+use Prty::Hash;
 
 # -----------------------------------------------------------------------------
 

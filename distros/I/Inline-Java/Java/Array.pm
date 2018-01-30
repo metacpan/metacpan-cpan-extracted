@@ -4,7 +4,7 @@ package Inline::Java::Array ;
 use strict ;
 use Carp ;
 
-$Inline::Java::Array::VERSION = '0.53' ;
+$Inline::Java::Array::VERSION = '0.53_90' ;
 
 # Here we store as keys the knots and as values our blessed objects
 my $OBJECTS = {} ;
@@ -149,7 +149,7 @@ sub DESTROY {
 	if (! $knot){
 		Inline::Java::debug(4, "destroying Inline::Java::Array::Tie") ;
 
-		$OBJECTS->{$this} = undef ;
+		delete $OBJECTS->{$this} ;
 	}
 	else{
 		Inline::Java::debug(4, "destroying Inline::Java::Array") ;

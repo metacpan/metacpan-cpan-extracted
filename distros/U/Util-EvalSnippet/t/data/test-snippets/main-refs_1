@@ -1,0 +1,6 @@
+$sub_ref->($x);
+%$hash_ref = (one => 'two');
+$hash_ref->{three}='four';
+push @$array_ref,4;
+$array_ref->[0] = 0;
+

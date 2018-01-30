@@ -10,7 +10,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '1.9.14';
+our $VERSION = '1.9.15';
 
 use warnings;
 use MIME::Base64;
@@ -675,17 +675,27 @@ sub checkCaptcha {
         }
     );
 
+    my $return = 0;
+
     # Check code
     if ( $captcha && $captcha->code ) {
 
         if ( $code eq $captcha->code ) {
             $self->lmLog( "Code $code match captcha $ccode", 'debug' );
-            return 1;
+            $return = 1;
         }
-        return -2;
+        else {
+            $return = -2;
+        }
+    }
+    else {
+        $return = -1 if $captcha;
     }
 
-    return 0;
+    # Remove captcha
+    $self->removeCaptcha($ccode);
+
+    return $return;
 }
 
 ## @method int removeCaptcha(ccode)
@@ -1479,7 +1489,8 @@ sub convertSec {
 sub getSkin {
     my ($self) = @_;
 
-    my $skin = $self->{portalSkin};
+    my $skin     = $self->{portalSkin};
+    my $skin_dir = $self->getApacheHtdocsPath() . "/skins";
 
     # Fill sessionInfo to eval rule if empty (unauthenticated user)
     $self->{sessionInfo}->{_url}   ||= $self->{urldc};
@@ -1489,17 +1500,28 @@ sub getSkin {
     if ( $self->{portalSkinRules} ) {
         foreach my $skinRule ( sort keys %{ $self->{portalSkinRules} } ) {
             if ( $self->safe->reval($skinRule) ) {
-                $skin = $self->{portalSkinRules}->{$skinRule};
-                $self->lmLog( "Skin $skin selected from skin rule", 'debug' );
+                if (
+                    -d $skin_dir . "/" . $self->{portalSkinRules}->{$skinRule} )
+                {
+                    $skin = $self->{portalSkinRules}->{$skinRule};
+                    $self->lmLog( "Skin $skin selected from skin rule",
+                        'debug' );
+                }
             }
         }
     }
 
     # Check skin GET/POST parameter
     my $skinParam = $self->param('skin');
-    if ( defined $skinParam && !$self->checkXSSAttack( 'skin', $skinParam ) ) {
-        $skin = $skinParam;
-        $self->lmLog( "Skin $skin selected from GET/POST parameter", 'debug' );
+    if (   defined $skinParam
+        && !$self->checkXSSAttack( 'skin', $skinParam )
+        && ( $skinParam !~ m:/|\..: ) )
+    {
+        if ( -d $skin_dir . "/" . $skinParam ) {
+            $skin = $skinParam;
+            $self->lmLog( "Skin $skin selected from GET/POST parameter",
+                'debug' );
+        }
     }
 
     return $skin;
@@ -2539,11 +2561,6 @@ sub store {
 # @return Lemonldap::NG::Portal constant
 sub authFinish {
     my $self = shift;
-
-    # Remove captcha session
-    if ( $self->{captcha_check_code} ) {
-        $self->removeCaptcha( $self->{captcha_check_code} );
-    }
 
     eval { $self->{error} = $self->SUPER::authFinish; };
     if ($@) {

@@ -46,7 +46,7 @@ use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.39';
+$VERSION = '3.40';
 
 # NOTE: Order creates precedence
 #       Example: v_name exists in Bridge.pm and CiscoVTP.pm
@@ -56,7 +56,8 @@ $VERSION = '3.39';
 
 %MIBS = (
 	%SNMP::Info::Layer3::CiscoSwitch::MIBS,
-	'CISCO-ENTITY-VENDORTYPE-OID-MIB' => 'cevMIBObjects',
+	'CISCO-ENTITY-VENDORTYPE-OID-MIB'   => 'cevMIBObjects',
+    'CISCO-CONTEXT-MAPPING-MIB'         => 'cContextMappingMIBObjects',
 );
 
 %GLOBALS = (
@@ -64,7 +65,10 @@ $VERSION = '3.39';
 	'mac' => 'dot1dBaseBridgeAddress',
 );
 
-%FUNCS = ( %SNMP::Info::Layer3::CiscoSwitch::FUNCS, );
+%FUNCS = ( 
+    %SNMP::Info::Layer3::CiscoSwitch::FUNCS, 
+    'vrf_name' => 'cContextMappingVrfName',
+);
 
 %MUNGE = ( %SNMP::Info::Layer3::CiscoSwitch::MUNGE, );
 
@@ -101,9 +105,9 @@ sub _get_snmpid_chassis {
 		}
 	}
 	if ( defined $snmpid_chassis && defined $position ) {
-		printf(" %s - chassis with id %s, position %s selected\n", $funcname, $snmpid_chassis, $position);
+		printf(" %s - chassis with id %s, position %s selected\n", $funcname, $snmpid_chassis, $position) if $self->debug();
 	} else {
-		printf(" %s - no chassis found\n", $funcname);
+		printf(" %s - no chassis found\n", $funcname) if $self->debug();
 	}
 
 	return $snmpid_chassis;

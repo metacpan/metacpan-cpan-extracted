@@ -5,7 +5,7 @@ use strict ;
 use Inline::Java::Protocol ;
 use Carp ;
 
-$Inline::Java::Object::VERSION = '0.53' ;
+$Inline::Java::Object::VERSION = '0.53_90' ;
 
 # Here we store as keys the knots and as values our blessed private objects
 my $PRIVATES = {} ;
@@ -369,7 +369,7 @@ sub DESTROY {
 			my $proto = $priv->{proto} ;
 			$priv->{proto} = undef ;
 			$proto->{obj_priv} = undef ;
-			$PRIVATES->{$this} = undef ;
+			delete $PRIVATES->{$this} ;
 		}
 		else{
 			Inline::Java::debug(4, "script marked as DONE, object destruction not propagated to Java") ;

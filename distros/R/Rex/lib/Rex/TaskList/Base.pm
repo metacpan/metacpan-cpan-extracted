@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;
@@ -369,7 +369,7 @@ sub modify {
   my ( $self, $type, $task, $code, $package, $file, $line ) = @_;
 
   if ( $package ne "main" && $package ne "Rex::CLI" ) {
-    if ( $task !~ m/:/ ) {
+    if ( $task =~ m/:/ ) {
 
       #do we need to detect for base -Rex ?
       $package =~ s/^Rex:://;

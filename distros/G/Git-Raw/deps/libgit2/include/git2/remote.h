@@ -76,6 +76,24 @@ GIT_EXTERN(int) git_remote_create_anonymous(
 		const char *url);
 
 /**
+ * Create a remote without a connected local repo
+ *
+ * Create a remote with the given url in-memory. You can use this when
+ * you have a URL instead of a remote's name.
+ *
+ * Contrasted with git_remote_create_anonymous, a detached remote
+ * will not consider any repo configuration values (such as insteadof url
+ * substitutions).
+ *
+ * @param out pointer to the new remote objects
+ * @param url the remote repository's URL
+ * @return 0 or an error code
+ */
+GIT_EXTERN(int) git_remote_create_detached(
+		git_remote **out,
+		const char *url);
+
+/**
  * Get the information for a particular remote
  *
  * The name will be checked for validity.
@@ -368,6 +386,20 @@ typedef struct {
 typedef int (*git_push_negotiation)(const git_push_update **updates, size_t len, void *payload);
 
 /**
+ * Callback used to inform of the update status from the remote.
+ *
+ * Called for each updated reference on push. If `status` is
+ * not `NULL`, the update was rejected by the remote server
+ * and `status` contains the reason given.
+ *
+ * @param refname refname specifying to the remote ref
+ * @param status status message sent from the remote
+ * @param data data provided by the caller
+ * @return 0 on success, otherwise an error
+ */
+typedef int (*git_push_update_reference_cb)(const char *refname, const char *status, void *data);
+
+/**
  * The callback settings structure
  *
  * Set the callbacks to be called by the remote when informing the user
@@ -434,11 +466,9 @@ struct git_remote_callbacks {
 	git_push_transfer_progress push_transfer_progress;
 
 	/**
-	 * Called for each updated reference on push. If `status` is
-	 * not `NULL`, the update was rejected by the remote server
-	 * and `status` contains the reason given.
+	 * See documentation of git_push_update_reference_cb
 	 */
-	int (*push_update_reference)(const char *refname, const char *status, void *data);
+	git_push_update_reference_cb push_update_reference;
 
 	/**
 	 * Called once between the negotiation step and the upload. It
@@ -715,8 +745,8 @@ GIT_EXTERN(int) git_remote_prune(git_remote *remote, const git_remote_callbacks 
  * Peform all the steps from a push.
  *
  * @param remote the remote to push to
- * @param refspecs the refspecs to use for pushing. If none are
- * passed, the configured refspecs will be used
+ * @param refspecs the refspecs to use for pushing. If NULL or an empty
+ *                 array, the configured refspecs will be used
  * @param opts options to use for this push
  */
 GIT_EXTERN(int) git_remote_push(git_remote *remote,
@@ -796,7 +826,7 @@ GIT_EXTERN(int) git_remote_is_valid_name(const char *remote_name);
 * for the remote will be removed.
 *
 * @param repo the repository in which to act
-* @param name the name of the remove to delete
+* @param name the name of the remote to delete
 * @return 0 on success, or an error code.
 */
 GIT_EXTERN(int) git_remote_delete(git_repository *repo, const char *name);

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -470,6 +470,44 @@ sub memoize {
 
 # -----------------------------------------------------------------------------
 
+=head3 memoizeWeaken() - Cache schwache Referenz auf berechnetem Attribut
+
+=head4 Synopsis
+
+    $ref = $h->memoizeWeaken($key,$sub);
+
+=head4 Description
+
+Wie memozize(), nur dass $sub eine Referenz liefert, die
+von der Methode automatisch zu einer schwachen Referenz gemacht wird.
+
+Bei nicht-existenter Referenz kann die Methode $sub einen Leerstring
+liefern. Dieser wird auf C<undef> abgebildet.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub memoizeWeaken {
+    my ($self,$key,$sub) = @_;
+
+    # MEMO: Variable $ref wird hier benötigt, damit die erzeugte
+    # Referenz bei Aufruf von weaken() nicht gleich wieder
+    # destrukturiert wird!
+
+    my $ref = $self->{$key};
+    if (!defined $ref) {
+        $ref = $self->$sub($key);
+        if ($ref ne '') {
+            $self->weaken($key=>$ref);
+        }
+    }
+
+    return ref $ref? $ref: undef;
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 compute() - Wende Subroutine auf Schlüssel/Wert-Paar an
 
 =head4 Synopsis
@@ -563,7 +601,7 @@ sub AUTOLOAD {
 
     if (!ref $this) {
         $this->throw(
-            q{HASH-00002: Klassen-Methode existiert nicht},
+            q~HASH-00002: Klassen-Methode existiert nicht~,
             Method=>$key,
         );
     }
@@ -572,7 +610,7 @@ sub AUTOLOAD {
 
     if (!exists $this->{$key}) {
         $this->throw(
-            q{HASH-00001: Hash-Schlüssel existiert nicht},
+            q~HASH-00001: Hash-Schlüssel existiert nicht~,
             Attribute=>$key,
             Class=>ref($this)? ref($this): $this,
         );
@@ -685,7 +723,7 @@ sub validate {
     for my $key (CORE::keys %$h) {
         if (!exists $refH->{$key}) {
             $class->throw(
-                q{HASH-00099: Unzulässiger Hash-Schlüssel},
+                q~HASH-00099: Unzulässiger Hash-Schlüssel~,
                 Key=>$key,
             );
         }
@@ -856,6 +894,10 @@ sub clear {
 
 Prüfe, ob der angegebene Schlüssel im Hash existiert. Wenn ja,
 liefere I<wahr>, andernfalls I<falsch>.
+
+Alternative Formulierung:
+
+    $bool = exists $self->{$key};
 
 =cut
 
@@ -1039,7 +1081,7 @@ sub arraySize {
     }
     
     $self->throw(
-        q{HASH-00005: Keine Array-Referenz},
+        q~HASH-00005: Keine Array-Referenz~,
         Key=>$key,
         Class=>ref($self),
     );
@@ -1388,7 +1430,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -1396,7 +1438,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

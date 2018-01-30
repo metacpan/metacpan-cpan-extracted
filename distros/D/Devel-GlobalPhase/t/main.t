@@ -1,6 +1,7 @@
 use strict;
 use lib 't/lib';
 use MiniTest tests => 7;
+use Test::Scope::Guard;
 
 use Devel::GlobalPhase;
 use B ();
@@ -12,7 +13,7 @@ INIT  { is global_phase, 'INIT',    'INIT'    };
 END   { is global_phase, 'END',     'END'     };
 unshift @{ B::end_av()->object_2svref }, sub {
   local $TODO = "can't reliably detect anonymous END blocks"
-    unless defined ${^GLOBAL_PHASE};
+    if !Devel::GlobalPhase::_NATIVE_GLOBAL_PHASE;
       { is global_phase, 'END',     'END via B' };
 };
 our $global = Test::Scope::Guard->new(sub {

@@ -17,9 +17,9 @@ use File::Spec;
 use File::Basename qw(dirname);
 
 BEGIN {
-   eval { require Mail::Box::Mbox };
+   eval 'require Mail::Box::Mbox';
    if($@)
-   {   plan skip_all => 'these tests need Mail::Box::Mbox';
+   {   plan skip_all => 'requires Mail::Box::Mbox.';
        exit 0;
    }
    else

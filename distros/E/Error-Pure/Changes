@@ -1,3 +1,13 @@
+0.25 2018-01-22T14:10:53+01:00
+ [Common]
+ - Add missing author requires.
+ - Fix minimal Perl version.
+ - Fix #121028 - Makefile.PL fails with no '.' in @INC.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update copyright years.
+ - Update examples/ directory.
+
 0.24 2015-09-16T09:50:44+02:00
  [Common]
  - Fix author requires.

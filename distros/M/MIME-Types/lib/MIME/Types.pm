@@ -1,11 +1,14 @@
-# Copyrights 1999,2001-2017 by [Mark Overmeer].
+# Copyrights 1999-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution MIME::Types.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package MIME::Types;
 use vars '$VERSION';
-$VERSION = '2.14';
+$VERSION = '2.17';
 
 
 use strict;
@@ -275,10 +278,3 @@ CROAK
 }
 
 1;
-__END__
-# Exceptions
-vms:text/plain;doc;8bit
-mac:application/x-macbase64;;bin
-
-# IE6 bug
-image/pjpeg;;base64

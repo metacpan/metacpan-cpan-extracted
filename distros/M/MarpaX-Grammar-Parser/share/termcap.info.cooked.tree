@@ -1,505 +1,557 @@
-statements
-    |--- :default
-    |    |--- ::=
-    |    |--- action
-    |    |--- =>
-    |    |--- [values]
-    |--- :start
-    |    |--- ::=
-    |    |--- units
-    |--- units
-    |    |--- ::=
-    |    |--- unit
-    |--- unit
-    |    |--- ::=
-    |    |--- ESCAPED_CHARACTER
-    |    |--- action
-    |    |--- =>
-    |    |--- addEscapedCharacterToRc
-    |    |--- |
-    |    |--- INISPRINTEXCEPTCOMMA
-    |    |--- action
-    |    |--- =>
-    |    |--- addCharacterToRc
-    |    |--- |
-    |    |--- PERCENT
-    |    |--- action
-    |    |--- =>
-    |    |--- addPercentToRc
-    |    |--- |
-    |    |--- C
-    |    |--- action
-    |    |--- =>
-    |    |--- addPrintPopToRc
-    |    |--- |
-    |    |--- PRINT
-    |    |--- action
-    |    |--- =>
-    |    |--- addPrintToRc
-    |    |--- |
-    |    |--- PUSH
-    |    |--- action
-    |    |--- =>
-    |    |--- addPushToRc
-    |    |--- |
-    |    |--- DYNPOP
-    |    |--- action
-    |    |--- =>
-    |    |--- addDynPop
-    |    |--- |
-    |    |--- DYNPUSH
-    |    |--- action
-    |    |--- =>
-    |    |--- addDynPush
-    |    |--- |
-    |    |--- STATICPOP
-    |    |--- action
-    |    |--- =>
-    |    |--- addStaticPop
-    |    |--- |
-    |    |--- STATICPUSH
-    |    |--- action
-    |    |--- =>
-    |    |--- addStaticPush
-    |    |--- |
-    |    |--- L
-    |    |--- action
-    |    |--- =>
-    |    |--- addL
-    |    |--- |
-    |    |--- PUSHCONST
-    |    |--- action
-    |    |--- =>
-    |    |--- addPushConst
-    |    |--- |
-    |    |--- PUSHINT
-    |    |--- action
-    |    |--- =>
-    |    |--- addPushInt
-    |    |--- |
-    |    |--- PLUS
-    |    |--- action
-    |    |--- =>
-    |    |--- addPlus
-    |    |--- |
-    |    |--- MINUS
-    |    |--- action
-    |    |--- =>
-    |    |--- addMinus
-    |    |--- |
-    |    |--- STAR
-    |    |--- action
-    |    |--- =>
-    |    |--- addStar
-    |    |--- |
-    |    |--- DIV
-    |    |--- action
-    |    |--- =>
-    |    |--- addDiv
-    |    |--- |
-    |    |--- MOD
-    |    |--- action
-    |    |--- =>
-    |    |--- addMod
-    |    |--- |
-    |    |--- BITAND
-    |    |--- action
-    |    |--- =>
-    |    |--- addBitAnd
-    |    |--- |
-    |    |--- BITOR
-    |    |--- action
-    |    |--- =>
-    |    |--- addBitOr
-    |    |--- |
-    |    |--- BITXOR
-    |    |--- action
-    |    |--- =>
-    |    |--- addBitXor
-    |    |--- |
-    |    |--- EQUAL
-    |    |--- action
-    |    |--- =>
-    |    |--- addEqual
-    |    |--- |
-    |    |--- GREATER
-    |    |--- action
-    |    |--- =>
-    |    |--- addGreater
-    |    |--- |
-    |    |--- LOWER
-    |    |--- action
-    |    |--- =>
-    |    |--- addLower
-    |    |--- |
-    |    |--- AND
-    |    |--- action
-    |    |--- =>
-    |    |--- addLogicalAnd
-    |    |--- |
-    |    |--- OR
-    |    |--- action
-    |    |--- =>
-    |    |--- addLogicalOr
-    |    |--- |
-    |    |--- NOT
-    |    |--- action
-    |    |--- =>
-    |    |--- addNot
-    |    |--- |
-    |    |--- COMPLEMENT
-    |    |--- action
-    |    |--- =>
-    |    |--- addComplement
-    |    |--- |
-    |    |--- ADDONE
-    |    |--- action
-    |    |--- =>
-    |    |--- addOneToParams
-    |    |--- |
-    |    |--- IF
-    |    |--- units
-    |    |--- THEN
-    |    |--- units
-    |    |--- elifUnits
-    |    |--- ELSE
-    |    |--- units
-    |    |--- ENDIF
-    |    |--- action
-    |    |--- =>
-    |    |--- addIfThenElse
-    |    |--- |
-    |    |--- IF
-    |    |--- units
-    |    |--- THEN
-    |    |--- units
-    |    |--- elifUnits
-    |    |--- ENDIF
-    |    |--- action
-    |    |--- =>
-    |    |--- addIfThen
-    |    |--- |
-    |    |--- IF
-    |    |--- ENDIF
-    |    |--- action
-    |    |--- =>
-    |    |--- ifEndif
-    |    |--- |
-    |    |--- EOF
-    |    |--- action
-    |    |--- =>
-    |    |--- eof
-    |--- elifUnit
-    |    |--- ::=
-    |    |--- ELSE
-    |    |--- units
-    |    |--- THEN
-    |    |--- units
-    |    |--- action
-    |    |--- =>
-    |    |--- elifUnit
-    |--- elifUnits
-    |    |--- ::=
-    |    |--- elifUnit
-    |--- _CONST
-    |    |--- ~
-    |    |--- [^']
-    |--- _CONST
-    |    |--- ~
-    |    |--- _BS
-    |    |--- _ALLOWED_BS
-    |--- _DIGITS
-    |    |--- ~
-    |    |--- [\d]
-    |--- _DIGIT
-    |    |--- ~
-    |    |--- [\d]
-    |--- _LCHAR
-    |    |--- ~
-    |    |--- [a-z]
-    |--- _UCHAR
-    |    |--- ~
-    |    |--- [A-Z]
-    |--- _PERCENT
-    |    |--- ~
-    |    |--- '%'
-    |--- PERCENT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _PERCENT
-    |--- _C
-    |    |--- ~
-    |    |--- 'c'
-    |--- C
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _C
-    |--- _COLON
-    |    |--- ~
-    |    |--- ':'
-    |--- _DOT
-    |    |--- ~
-    |    |--- '.'
-    |--- __FLAGS
-    |    |--- ~
-    |    |--- [-+# ]
-    |--- _FLAGS
-    |    |--- ~
-    |    |--- _COLON
-    |    |--- __FLAGS
-    |    |--- |
-    |    |--- __FLAGS
-    |--- _FORMAT
-    |    |--- ~
-    |    |--- [doxXs]
-    |--- PRINT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _FORMAT
-    |    |--- |
-    |    |--- _PERCENT
-    |    |--- _DIGITS
-    |    |--- _FORMAT
-    |    |--- |
-    |    |--- _PERCENT
-    |    |--- _DIGITS
-    |    |--- _DOT
-    |    |--- _DIGITS
-    |    |--- _FORMAT
-    |--- PRINT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _FLAGS
-    |    |--- _FORMAT
-    |    |--- |
-    |    |--- _PERCENT
-    |    |--- _FLAGS
-    |    |--- _DIGITS
-    |    |--- _FORMAT
-    |    |--- |
-    |    |--- _PERCENT
-    |    |--- _FLAGS
-    |    |--- _DIGITS
-    |    |--- _DOT
-    |    |--- _DIGITS
-    |    |--- _FORMAT
-    |--- PUSH
-    |    |--- ~
-    |    |--- '%p'
-    |    |--- _DIGIT
-    |--- DYNPOP
-    |    |--- ~
-    |    |--- '%P'
-    |    |--- _LCHAR
-    |--- DYNPUSH
-    |    |--- ~
-    |    |--- '%g'
-    |    |--- _LCHAR
-    |--- STATICPOP
-    |    |--- ~
-    |    |--- '%P'
-    |    |--- _UCHAR
-    |--- STATICPUSH
-    |    |--- ~
-    |    |--- '%g'
-    |    |--- _UCHAR
-    |--- L
-    |    |--- ~
-    |    |--- 'ls'
-    |--- _SQUOTE
-    |    |--- ~
-    |    |--- [']
-    |--- PUSHCONST
-    |    |--- ~
-    |    |--- '%'
-    |    |--- _SQUOTE
-    |    |--- _CONST
-    |    |--- _SQUOTE
-    |--- _LCURLY
-    |    |--- ~
-    |    |--- '{'
-    |--- _RCURLY
-    |    |--- ~
-    |    |--- '}'
-    |--- PUSHINT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _LCURLY
-    |    |--- _DIGITS
-    |    |--- _RCURLY
-    |--- _PLUS
-    |    |--- ~
-    |    |--- '+'
-    |--- PLUS
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _PLUS
-    |--- _MINUS
-    |    |--- ~
-    |    |--- '-'
-    |--- MINUS
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _MINUS
-    |--- _STAR
-    |    |--- ~
-    |    |--- '*'
-    |--- STAR
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _STAR
-    |--- _DIV
-    |    |--- ~
-    |    |--- '/'
-    |--- DIV
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _DIV
-    |--- _MOD
-    |    |--- ~
-    |    |--- 'm'
-    |--- MOD
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _MOD
-    |--- _BITAND
-    |    |--- ~
-    |    |--- '&'
-    |--- BITAND
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _BITAND
-    |--- _BITOR
-    |    |--- ~
-    |    |--- '|'
-    |--- BITOR
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _BITOR
-    |--- _BITXOR
-    |    |--- ~
-    |    |--- '^'
-    |--- BITXOR
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _BITXOR
-    |--- _EQUAL
-    |    |--- ~
-    |    |--- '='
-    |--- EQUAL
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _EQUAL
-    |--- _GREATER
-    |    |--- ~
-    |    |--- '>'
-    |--- GREATER
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _GREATER
-    |--- _LOWER
-    |    |--- ~
-    |    |--- '<'
-    |--- LOWER
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _LOWER
-    |--- _AND
-    |    |--- ~
-    |    |--- 'A'
-    |--- AND
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _AND
-    |--- _OR
-    |    |--- ~
-    |    |--- 'O'
-    |--- OR
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _OR
-    |--- _NOT
-    |    |--- ~
-    |    |--- '!'
-    |--- NOT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _NOT
-    |--- _COMPLEMENT
-    |    |--- ~
-    |    |--- '~'
-    |--- COMPLEMENT
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _COMPLEMENT
-    |--- _ADDONE
-    |    |--- ~
-    |    |--- 'i'
-    |--- ADDONE
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _ADDONE
-    |--- _IF
-    |    |--- ~
-    |    |--- '?'
-    |--- IF
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _IF
-    |--- _THEN
-    |    |--- ~
-    |    |--- 't'
-    |--- THEN
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _THEN
-    |--- _ELSE
-    |    |--- ~
-    |    |--- 'e'
-    |--- ELSE
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _ELSE
-    |--- _ENDIF
-    |    |--- ~
-    |    |--- ';'
-    |--- ENDIF
-    |    |--- ~
-    |    |--- _PERCENT
-    |    |--- _ENDIF
-    |--- _EOF
-    |    |--- ~
-    |    |--- ','
-    |--- ENDIF
-    |    |--- ~
-    |    |--- _EOF
-    |--- _CARET
-    |    |--- ~
-    |    |--- '^'
-    |--- _BS
-    |    |--- ~
-    |    |--- '\'
-    |--- _ALLOWED_BS
-    |    |--- ~
-    |    |--- [abEeflnrst^\,:0]
-    |--- _ALLOWED_BS
-    |    |--- ~
-    |    |--- _DIGIT
-    |    |--- _DIGIT
-    |    |--- _DIGIT
-    |--- _C0_AND_DEL
-    |    |--- ~
-    |    |--- [@A-Z[\]^_ ?]
-    |--- ESCAPED_CHARACTER
-    |    |--- ~
-    |    |--- _CARET
-    |    |--- _C0_AND_DEL
-    |    |--- |
-    |    |--- _BS
-    |    |--- _ALLOWED_BS
-    |--- INISPRINTEXCEPTCOMMA
-    |    |--- ~
-    |    |--- [\p{MarpaX::Database::Terminfo::Grammar::CharacterClasses::InIsPrintExceptComma}]
-    |--- EOF
-         |--- ~
-         |--- _EOF
+statements. Attributes: {token => ""}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => ":default"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "action"}
+    |         |--- array_descriptor. Attributes: {token => "[values]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => ":start"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- :start. Attributes: {token => "units"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "units"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "unit"}
+    |         |--- quantifier. Attributes: {token => "*"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "unit"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "ESCAPED_CHARACTER"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addEscapedCharacterToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "INISPRINTEXCEPTCOMMA"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addCharacterToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PERCENT"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPercentToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "C"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPrintPopToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PRINT"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPrintToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PUSH"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPushToRc"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "DYNPOP"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addDynPop"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "DYNPUSH"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addDynPush"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "STATICPOP"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addStaticPop"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "STATICPUSH"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addStaticPush"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "L"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addL"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PUSHCONST"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPushConst"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PUSHINT"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPushInt"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "PLUS"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addPlus"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "MINUS"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addMinus"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "STAR"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addStar"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "DIV"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addDiv"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "MOD"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addMod"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "BITAND"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addBitAnd"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "BITOR"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addBitOr"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "BITXOR"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addBitXor"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "EQUAL"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addEqual"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "GREATER"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addGreater"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "LOWER"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addLower"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "AND"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addLogicalAnd"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "OR"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addLogicalOr"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "NOT"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addNot"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "COMPLEMENT"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addComplement"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "ADDONE"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addOneToParams"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "IF"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "THEN"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "elifUnits"}
+    |    |--- rhs. Attributes: {token => "ELSE"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "ENDIF"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addIfThenElse"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "IF"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "THEN"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "elifUnits"}
+    |    |--- rhs. Attributes: {token => "ENDIF"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "addIfThen"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "IF"}
+    |    |--- rhs. Attributes: {token => "ENDIF"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "ifEndif"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "EOF"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "eof"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "elifUnit"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "ELSE"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- rhs. Attributes: {token => "THEN"}
+    |    |--- rhs. Attributes: {token => "units"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "elifUnit"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "elifUnits"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "elifUnit"}
+    |         |--- quantifier. Attributes: {token => "*"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_CONST"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[^']"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_CONST"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_BS"}
+    |    |--- rhs. Attributes: {token => "_ALLOWED_BS"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_DIGITS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[\d]"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_DIGIT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[\d]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_LCHAR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[a-z]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_UCHAR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[A-Z]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_PERCENT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PERCENT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_C"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'c'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "C"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_C"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_COLON"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "':'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_DOT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'.'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "__FLAGS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[-+# ]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_FLAGS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_COLON"}
+    |    |--- rhs. Attributes: {token => "__FLAGS"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "__FLAGS"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_FORMAT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[doxXs]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PRINT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_DOT"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PRINT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_FLAGS"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_FLAGS"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_FLAGS"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_DOT"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_FORMAT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PUSH"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%p'"}
+    |    |--- rhs. Attributes: {token => "_DIGIT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "DYNPOP"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%P'"}
+    |    |--- rhs. Attributes: {token => "_LCHAR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "DYNPUSH"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%g'"}
+    |    |--- rhs. Attributes: {token => "_LCHAR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "STATICPOP"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%P'"}
+    |    |--- rhs. Attributes: {token => "_UCHAR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "STATICPUSH"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%g'"}
+    |    |--- rhs. Attributes: {token => "_UCHAR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "L"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'ls'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_SQUOTE"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[']"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PUSHCONST"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'%'"}
+    |    |--- rhs. Attributes: {token => "_SQUOTE"}
+    |    |--- rhs. Attributes: {token => "_CONST"}
+    |    |--- rhs. Attributes: {token => "_SQUOTE"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_LCURLY"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'{'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_RCURLY"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'}'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PUSHINT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_LCURLY"}
+    |    |--- rhs. Attributes: {token => "_DIGITS"}
+    |    |--- rhs. Attributes: {token => "_RCURLY"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_PLUS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'+'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "PLUS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_PLUS"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_MINUS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'-'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "MINUS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_MINUS"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_STAR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'*'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "STAR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_STAR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_DIV"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'/'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "DIV"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_DIV"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_MOD"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'m'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "MOD"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_MOD"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_BITAND"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'&'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "BITAND"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_BITAND"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_BITOR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'|'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "BITOR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_BITOR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_BITXOR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'^'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "BITXOR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_BITXOR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_EQUAL"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'='"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "EQUAL"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_EQUAL"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_GREATER"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'>'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "GREATER"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_GREATER"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_LOWER"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'<'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "LOWER"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_LOWER"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_AND"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'A'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "AND"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_AND"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_OR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'O'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "OR"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_OR"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_NOT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'!'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "NOT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_NOT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_COMPLEMENT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'~'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "COMPLEMENT"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_COMPLEMENT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_ADDONE"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'i'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "ADDONE"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_ADDONE"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_IF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'?'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "IF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_IF"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_THEN"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'t'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "THEN"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_THEN"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_ELSE"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'e'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "ELSE"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_ELSE"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_ENDIF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "';'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "ENDIF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_PERCENT"}
+    |    |--- rhs. Attributes: {token => "_ENDIF"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_EOF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "','"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "ENDIF"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_EOF"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_CARET"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'^'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_BS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_ALLOWED_BS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[abEeflnrst^\,:0]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_ALLOWED_BS"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_DIGIT"}
+    |    |--- rhs. Attributes: {token => "_DIGIT"}
+    |    |--- rhs. Attributes: {token => "_DIGIT"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "_C0_AND_DEL"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[@A-Z[\]^_ ?]"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "ESCAPED_CHARACTER"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "_CARET"}
+    |    |--- rhs. Attributes: {token => "_C0_AND_DEL"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "_BS"}
+    |    |--- rhs. Attributes: {token => "_ALLOWED_BS"}
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "INISPRINTEXCEPTCOMMA"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[\p{MarpaX::Database::Terminfo::Grammar::CharacterClasses::InIsPrintExceptComma}]"}
+    |--- statement. Attributes: {token => "statement"}
+         |--- lhs. Attributes: {token => "EOF"}
+         |--- op_declare_match. Attributes: {token => "lexeme"}
+         |--- rhs. Attributes: {token => "_EOF"}

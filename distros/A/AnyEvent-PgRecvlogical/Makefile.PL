@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "DBD::Pg" => "3.7.0",
     "DBI" => 0,
     "Moo" => 0,
-    "Promises" => 0,
+    "Promises" => "0.99",
     "Try::Tiny" => 0,
     "Types::Standard" => 0,
     "constant" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Spec" => 0,
   "Moo" => 0,
-  "Promises" => 0,
+  "Promises" => "0.99",
   "Test::More" => 0,
   "Test::PostgreSQL" => 0,
   "Try::Tiny" => 0,

@@ -1,5 +1,23 @@
 Revision history for CORBA-IDLtree
 
+2.01    2018/01/23
+        * Fixed parsing of named argument values in sub
+          parse_annotation_app:  At case
+            @$argref && $argref->[0] eq '('
+          while-loop over @$argref case
+            $val =~ /^[a-z]/i and $argref->[0] eq '='
+          for-loop of $ai case
+            $adef[$ai]->[1] eq $parname,
+          after assigning $param_index execute `last' instead of
+          `return'.
+        * Declared globals %annoEnum and @annoDefs as `our' to
+          make them accessible from outside.
+        * Added 'port' to global %keywords.
+        * Fixed calls to sub annotation so that more than one
+          annotation may accumulate on a given IDL item.
+        * Fixed changelog entry for v. 1.6 modification of REMARK
+          NAME/SUBORDINATES.
+
 2.00    2018/01/05
         * Fixed parsing of parameterless annotation with empty
           @$argref in sub parse_annotation_app.
@@ -14,11 +32,11 @@ Revision history for CORBA-IDLtree
         * Added variable $global_idlfile, a copy of the file name
           passed into the most recent call to Parse_File.
         * Simplified the REMARK node as follows:
-          - Its SUBORDINATES contains the starting line number
-            of the comment lines;
-          - its NAME points to a simple array of lines.  I.e. the
-            file name and line number elements are no longer part
-            of the lines array.
+          - Its NAME contains the starting line number of the
+            comment lines.
+          - Its SUBORDINATES points to a simple array of lines.
+            The file name and line number elements are no longer
+            part of the lines array.
         * The COMMENT element now points to a tuple of (starting)
           line number and reference to simple array of lines.
           I.e. the file name and line number elements are no

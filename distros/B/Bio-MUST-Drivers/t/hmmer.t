@@ -8,14 +8,13 @@ use feature qw(say);
 
 use Path::Class qw(file);
 
+use Bio::FastParsers;
 use Bio::MUST::Core;
-use aliased 'Bio::MUST::Core::Seq';
-use aliased 'Bio::FastParsers::Hmmer::Standard';
-use aliased 'Bio::FastParsers::Hmmer::Table';
-use aliased 'Bio::FastParsers::Hmmer::DomTable';
 use Bio::MUST::Drivers;
 
-my $class = 'Bio::MUST::Drivers::Hmmer';
+my     $class = 'Bio::MUST::Drivers::Hmmer::Model';
+my $tmp_class = 'Bio::MUST::Drivers::Hmmer::Model::Temporary';
+my  $db_class = 'Bio::MUST::Drivers::Hmmer::Model::Database';
 
 
 # skip all HMMER tests unless hmmsearch is available in the $PATH
@@ -27,207 +26,263 @@ http://hmmer.org/download.html
 EOT
 }
 
+
+{ # Tests 1 and 3: Use of a pre-existing model
+    my $hmmfile = file('test', 'aligned.hmm');
+    my $model = $class->new( file => $hmmfile );
+    cmp_ok $model->cksum, 'eq', '1835300390',
+        'got expected model checksum';
+
+    my $target = file('test', 'ready_unaligned.fasta');
+    my $std_parser = $model->search($target);
+    ok $std_parser, 'got HMM parser on pre-existing model and target';
+
+    my $filename = $std_parser->filename;
+    $std_parser->remove;
+    ok(!-e $filename, '... and it got deleted as expected!');
+}
+
 # amino acid
-{ # Tests 1 to 4, Creation of driver, model and parser + Targets name recovery
+{ # Tests 4 to 7: Creation of driver, model and parser + Target name recovery
 
     # basic model creation
-    my $test_file = file('test', 'aligned.ali');
-    my $ali = Bio::MUST::Core::Ali->load($test_file);
-    ok my $hmmer = $class->new( ali => $ali, consider_X => 1,
-        args => {
-            '--plaplace' => undef,
-        }), "$class constructor";
+    my $infile = file('test', 'aligned.ali');
+    my $ali = Bio::MUST::Core::Ali->load($infile);
+    ok my $model = $tmp_class->new(
+        seqs => $ali,       # alternatively: $infile or [ $ali->all_seqs ]
+        model_args => { '--plaplace' => undef }
+    ), "$tmp_class constructor";
 
-    ok $hmmer->model, 'got model';
-    ### test : $hmmer->model
+    # check delegation to Bio::FastParsers::Hmmer::Model
+    cmp_ok $model->model->cksum, 'eq', '1835300390',
+        'got expected model checksum';
 
-    my @targets = $ali->all_seqs;
+    # build target sequence file
+    my $target = Bio::MUST::Core::Ali::Temporary->new(
+        seqs => $ali, args => { degap => 1 }
+    );
 
     # standard output search
-    my $std_parser = $hmmer->search( \@targets, { '--notextw' => undef } );
-    ok $std_parser, 'got standard HMM parser';
-
-    my $std_exp_file_output = file('test', 'aligned_notextw.out');
-    my $std_exp_output = Standard->new( file => $std_exp_file_output );
+    my $std_parser = $model->search($target);
+    ok $std_parser, 'got standard HMM parser on temporary model';
 
     my @target_reports = $std_parser->get_iteration(0)->all_targets;
-    my $got_targets = [ map { $_->name } @target_reports ];
-    explain $got_targets;
+    my $got_targets = [
+        map { $target->long_id_for( $_->name ) } @target_reports
+    ];
+    $std_parser->remove;
+
+    my $std_exp_file_output = file('test', 'aligned_notextw.out');
+    my $std_exp_output = Bio::FastParsers::Hmmer::Standard->new(
+        file => $std_exp_file_output
+    );
 
     my $exp_targets = [
         map { $_->name } $std_exp_output->get_iteration(0)->all_targets
     ];
-    explain $exp_targets;
 
     cmp_deeply $got_targets, $exp_targets,
         'got expected target list for standard report';
 
-# Tests 5 and 6, Table parser from hmmsearch
+# Tests 8 and 9: Table parser from hmmsearch
 
     # tabular output search
-    my $tbl_parser = $hmmer->search( \@targets, { '--tblout' => undef } );
+    my $tbl_parser = $model->search( $target, { '--tblout' => undef } );
     ok $tbl_parser, 'got tabular HMM parser';
 
+    my @tbl_got_names;
+    while ( my $hit = $tbl_parser->next_hit ) {
+        push @tbl_got_names, $target->long_id_for( $hit->target_name );
+    }
+    $tbl_parser->remove;
+
     my $tbl_exp_file_output = file('test', 'aligned_table.out');
-    my $tbl_exp_output = Table->new( file => $tbl_exp_file_output );
+    my $tbl_exp_output = Bio::FastParsers::Hmmer::Table->new(
+        file => $tbl_exp_file_output
+    );
+
     my @tbl_exp_names;
     while ( my $hit = $tbl_exp_output->next_hit ) {
         push @tbl_exp_names, $hit->target_name;
     }
-    explain \@tbl_exp_names;
-
-    my @tbl_got_names;
-    while ( my $hit = $tbl_parser->next_hit ) {
-        push @tbl_got_names, $hit->target_name;
-    }
-    explain \@tbl_got_names;
 
     cmp_deeply \@tbl_got_names, \@tbl_exp_names,
         'got expected target list for tabular report';
 
-# Tests 7 and 8, DomTable parser from hmmsearch
+# Tests 10 and 11: DomTable parser from hmmsearch
 
     # DomTable output search
-    my $domtbl_parser = $hmmer->search( \@targets, { '--domtblout' => undef } );
+    my $domtbl_parser = $model->search( $target, { '--domtblout' => undef } );
     ok $domtbl_parser, 'got domain table HMM parser';
 
+    my @domtbl_got_names;
+    while ( my $hit = $domtbl_parser->next_hit ) {
+        push @domtbl_got_names, $target->long_id_for( $hit->target_name );
+    }
+    $domtbl_parser->remove;
+
     my $domtbl_exp_file_output = file('test', 'aligned_domtable.out');
-    my $domtbl_exp_output = DomTable->new( file => $domtbl_exp_file_output );
+    my $domtbl_exp_output = Bio::FastParsers::Hmmer::DomTable->new(
+        file => $domtbl_exp_file_output
+    );
+
     my @domtbl_exp_names;
     while ( my $hit = $domtbl_exp_output->next_hit ) {
         push @domtbl_exp_names, $hit->target_name;
     }
-    explain \@domtbl_exp_names;
-
-    my @domtbl_got_names;
-    while ( my $hit = $domtbl_parser->next_hit ) {
-        push @domtbl_got_names, $hit->target_name;
-    }
-    explain \@domtbl_got_names;
 
     cmp_deeply \@domtbl_got_names, \@domtbl_exp_names,
         'got expected target list for domain table report';
+
+    my $filename = $model->filename;
+    $model->remove;
+    ok(!-e $filename, 'Ali::Temporary file got deleted as expected!');
+
+    my $model_filename = $model->model->filename;
+    $model->model->remove;
+    ok(!-e $model_filename, 'Model::Temporary file got deleted as expected!');
 }
 
 # nucleotide
-{ # Tests 9 to 13, Creation of driver, model and parser + Targets name recovery
+{ # Tests 14 to 17: Creation of driver, model and parser + Target name recovery
 
     # basic model creation
-    my $test_file = file('test', 'aligned-nuc.ali');
-    my $ali = Bio::MUST::Core::Ali->load($test_file);
-    ok my $hmmer = $class->new( ali => $ali, consider_X => 1,
-        args => {
-            '--plaplace' => undef,
-        }), "$class constructor";
+    my $infile = file('test', 'aligned-nuc.ali');
+    my $ali = Bio::MUST::Core::Ali->load($infile);
+    ok my $model = $tmp_class->new(
+        seqs => $ali,
+        model_args => { '--plaplace' => undef }
+    ), "$tmp_class constructor";
 
-    ok $hmmer->model, 'got model';
+    cmp_ok $model->model->cksum, 'eq', '3750044850',
+        'got expected model checksum';
 
-    my @targets = $ali->all_seqs;
+    # build target sequence file
+    my $target = Bio::MUST::Core::Ali::Temporary->new(
+        seqs => $ali, args => { degap => 1 }
+    );
 
     # standard output search
-    my $std_parser = $hmmer->search( \@targets, { '--notextw' => undef } );
+    my $std_parser = $model->search($target);
     ok $std_parser, 'got standard HMM parser';
 
-    my $std_exp_file_output = file('test', 'aligned-nuc_notextw.out');
-    my $std_exp_output = Standard->new( file => $std_exp_file_output );
-
     my @target_reports = $std_parser->get_iteration(0)->all_targets;
-    my $got_targets = [ map { $_->name } @target_reports ];
-    explain $got_targets;
+    my $got_targets = [ map {
+        Bio::MUST::Core::SeqId->new(
+            full_id => $target->long_id_for( $_->name ) )->foreign_id
+    } @target_reports ];
+    $std_parser->remove;
+
+    my $std_exp_file_output = file('test', 'aligned-nuc_notextw.out');
+    my $std_exp_output = Bio::FastParsers::Hmmer::Standard->new(
+        file => $std_exp_file_output
+    );
 
     my $exp_targets = [
         map { $_->name } $std_exp_output->get_iteration(0)->all_targets
     ];
-    explain $exp_targets;
 
     cmp_deeply $got_targets, $exp_targets,
         'got expected target list for standard report';
 
-# Tests 14 and 15, Table parser from hmmsearch
+# Tests 18 and 19: Table parser from hmmsearch
 
     # tabular output search
-    my $tbl_parser = $hmmer->search( \@targets, { '--tblout' => undef } );
+    my $tbl_parser = $model->search( $target, { '--tblout' => undef } );
     ok $tbl_parser, 'got tabular HMM parser';
 
+    my @tbl_got_names;
+    while ( my $hit = $tbl_parser->next_hit ) {
+        push @tbl_got_names, Bio::MUST::Core::SeqId->new(
+            full_id => $target->long_id_for( $hit->target_name )
+        )->foreign_id;
+    }
+    $tbl_parser->remove;
+
     my $tbl_exp_file_output = file('test', 'aligned-nuc_table.out');
-    my $tbl_exp_output = Table->new( file => $tbl_exp_file_output );
+    my $tbl_exp_output = Bio::FastParsers::Hmmer::Table->new(
+        file => $tbl_exp_file_output
+    );
+
     my @tbl_exp_names;
     while ( my $hit = $tbl_exp_output->next_hit ) {
         push @tbl_exp_names, $hit->target_name;
     }
-    explain \@tbl_exp_names;
-
-    my @tbl_got_names;
-    while ( my $hit = $tbl_parser->next_hit ) {
-        push @tbl_got_names, $hit->target_name;
-    }
-    explain \@tbl_got_names;
 
     cmp_deeply \@tbl_got_names, \@tbl_exp_names,
         'got expected target list for tabular report';
 
-# Tests 16 and 17, DomTable parser from hmmsearch
+# Tests 20 and 23: DomTable parser from hmmsearch
 
     # DomTable output search
-    my $domtbl_parser = $hmmer->search( \@targets, { '--domtblout' => undef } );
+    my $domtbl_parser = $model->search( $target, { '--domtblout' => undef } );
     ok $domtbl_parser, 'got domain table HMM parser';
 
+    my @domtbl_got_names;
+    while ( my $hit = $domtbl_parser->next_hit ) {
+        push @domtbl_got_names, Bio::MUST::Core::SeqId->new(
+            full_id => $target->long_id_for( $hit->target_name )
+        )->foreign_id;
+    }
+    $domtbl_parser->remove;
+
     my $domtbl_exp_file_output = file('test', 'aligned-nuc_domtable.out');
-    my $domtbl_exp_output = DomTable->new( file => $domtbl_exp_file_output );
+    my $domtbl_exp_output = Bio::FastParsers::Hmmer::DomTable->new(
+        file => $domtbl_exp_file_output
+    );
+
     my @domtbl_exp_names;
     while ( my $hit = $domtbl_exp_output->next_hit ) {
         push @domtbl_exp_names, $hit->target_name;
     }
-    explain \@domtbl_exp_names;
-
-    my @domtbl_got_names;
-    while ( my $hit = $domtbl_parser->next_hit ) {
-        push @domtbl_got_names, $hit->target_name;
-    }
-    explain \@domtbl_got_names;
 
     cmp_deeply \@domtbl_got_names, \@domtbl_exp_names,
         'got expected target list for domain table report';
+
+    my $filename = $model->filename;
+    $model->remove;
+    ok(!-e $filename, 'Ali::Temporary file got deleted as expected!');
+
+    my $model_filename = $model->model->filename;
+    $model->model->remove;
+    ok(!-e $model_filename, 'Model::Temporary file got deleted as expected!');
 }
 
 # empty
-{ # Test 18 to 19, Check if returning undefined object with empty ali
-    my $test_file = file('test', 'empty.ali');
-    my $ali = Bio::MUST::Core::Ali->load($test_file);
-    ok my $hmmer = $class->new( ali => $ali, consider_X => 1,
-        args => {
-            '--plaplace' => undef,
-        }), "$class constructor";
+{ # Tests 24 and 25: Check if returning undefined object with empty ali
+    my $infile = file('test', 'empty.ali');
+    my $ali = Bio::MUST::Core::Ali->load($infile);
+    ok my $model = $tmp_class->new(
+        seqs => $ali,
+        model_args => { '--plaplace' => undef }
+    ), "$tmp_class constructor";
 
-    my $model = $hmmer->model;
-    ok(!defined $model, 'got undefined model from empty file as expected' );
-    my $seq = Seq->new(
-        seq_id => 'Test sequence@seq0001',
-        seq    => 'MGRVIRSQRKGAGSIFRAHTKHRKGAAKLRAHDYAERHGYIKGIVKEIIHDPGRGAPLARVVFRDPYRYKLRKELFLATEGMYTGQFVYCGKRAALSVGNCLPIGAMPEGTVICAVEEKTGDRGKLAKASGNYATVVSHNVDAKKTRVRLPSGSKKVLSSTNRXVIGVVAGGGRIDKPMLKAGRAYHKYKVKRNCWPKVRGVAMNPVEHPHGGGNHQHIGKPSTVKRNTPAGRKVGLIAARRTGRLRGGKK'
-    );
-    my $parser = $hmmer->search( [ $seq ], { '--notextw' => undef } );
-    ok(!defined $parser, 'got undefined parser from empty file as expected');
+    ok(!$model->model, 'got undefined model from empty file as expected' );
 }
 
 # emit
-{ # Test 20-23, Emit method, use of consensus
-	use Smart::Comments;
+{ # Tests 26 to 29: Emit method, use of consensus
+    my $infile = file('test', 'aligned.ali');
+    my $ali = Bio::MUST::Core::Ali->load($infile);
+    ok my $model = $tmp_class->new(
+        seqs => $ali,
+        model_args => { '--plaplace' => undef }
+    ), "$tmp_class constructor";
 
-	# basic model creation
-    my $test_file = file('test', 'aligned.ali');
-    my $ali = Bio::MUST::Core::Ali->load($test_file);
-    ok my $hmmer = $class->new( ali => $ali, consider_X => 1,
-        args => {
-            '--plaplace' => undef,
-        }), "$class constructor";
-
-    ok my $consensus = $hmmer->emit, 'Consensus retrieve';
-    isa_ok($consensus, 'Bio::MUST::Core::Ali');
-    #~ ### $consensus
+    ok my $consensus = $model->emit, 'got consensus from hmmemit';
+    isa_ok $consensus, 'Bio::MUST::Core::Ali::Stash';
 
     my $expected_consensus_seq = 'AARSIKSQKKDVNKIYPAHPSLFGRVPRPADKDKVNLVVKEIGKNAAEGAALARVAGLGEALARLPLATRVLNGGICANKYDTGLLGKLGFAERIRLPALNVKKLVSLCKKKASCYGTTTISRRKKPAGEKATAIELARRMRFKFHKRLKLPASPKKVKASSKKGP';
-    cmp_ok($consensus->get_seq(0)->seq, 'eq', $expected_consensus_seq, 'Retrieve expected consensus');
+    cmp_ok $consensus->get_seq(0)->seq, 'eq', $expected_consensus_seq,
+        'got expected consensus seq from hmmemit';
+}
 
+{ # Tests 30: hmmscan
+    my $db = $db_class->new( file => file('test', 'generic_domains.hmm') );
+    my $target = file('test', 'test.faa');
+    my $domtbl_parser = $db->scan($target);
+    ok $domtbl_parser, 'got domain table HMM parser on model database';
+    $domtbl_parser->remove;
 }
 
 done_testing;

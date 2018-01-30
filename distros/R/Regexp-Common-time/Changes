@@ -1,5 +1,8 @@
 Revision history for Perl module Regexp::Common::time.
 
+0.15  2018-01-26 MANWAR
+      - Merged PR #3: Accept second fractions in ISO date time strings, thanks @jjatria.
+
 0.14  2017-08-07 MANWAR
       - Added MIN_PERL_VERSION to Makefile.PL script.
 

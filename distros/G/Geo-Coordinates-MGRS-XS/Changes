@@ -1,0 +1,6 @@
+Revision history for Perl extension Geo::Coordinates::MGRS::XS.
+
+0.01  Thu Nov 26 11:04:23 2015
+	- original version; created by h2xs 1.23 with options
+		-An Geo::Coordinates::MGRS::XS
+

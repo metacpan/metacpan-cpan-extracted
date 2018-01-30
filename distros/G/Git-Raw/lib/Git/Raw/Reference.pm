@@ -1,5 +1,5 @@
 package Git::Raw::Reference;
-$Git::Raw::Reference::VERSION = '0.74';
+$Git::Raw::Reference::VERSION = '0.75';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Reference - Git reference class
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 DESCRIPTION
 
@@ -21,6 +21,10 @@ B<WARNING>: The API of this module is unstable and may change without warning
 (any change will be appropriately documented in the changelog).
 
 =head1 METHODS
+
+=head2 annotated_commit( )
+
+Create a L<Git::Raw::AnnotatedCommit> from the reference.
 
 =head2 lookup( $name, $repo )
 

@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-MakeMaker-Awesome
 
+0.41      2018-01-28 02:24:20Z
+  - fix test that fails on MSWin32, by using makefile args properly
+
+0.40      2018-01-23 05:12:34Z
+  - fix test that fails on older Dist::Zilla (< 5.014)
+
 0.39      2017-10-01 20:32:33Z
   - avoid uninit warnings with undef prereq versions
 

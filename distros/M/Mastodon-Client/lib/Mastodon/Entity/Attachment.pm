@@ -3,7 +3,7 @@ package Mastodon::Entity::Attachment;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use Moo;
 with 'Mastodon::Role::Entity';

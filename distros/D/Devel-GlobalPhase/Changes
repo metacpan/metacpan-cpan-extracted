@@ -1,5 +1,17 @@
 Revision history for Devel::GlobalPhase
 
+0.003003 - 2018-01-27
+  - fix testing on perl 5.8
+  - fix threading tests
+  - improved error reporting in tests
+
+0.003002 - 2018-01-25
+  - better diagnostics on test failures
+  - fix runtime test on perl 5.8.9 through 5.12.x
+
+0.003001 - 2018-01-24
+  - fix segfault test on Windows
+
 0.003000 - 2017-04-15
   - fix threaded tests when . missing from @INC
   - prevent this module from slowing down Devel::GlobalDestruction

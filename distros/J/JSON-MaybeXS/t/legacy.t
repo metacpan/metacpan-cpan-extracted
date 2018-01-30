@@ -3,8 +3,8 @@ use warnings;
 
 # hide Cpanel::JSON::XS
 use lib map {
-    my ( $m, $c ) = ( $_, qq{die "Can't locate $_ (hidden)\n"} );
-    sub { return unless $_[1] eq $m; open my $fh, "<", \$c; return $fh }
+    my $m = $_;
+    sub { return unless $_[1] eq $m; die "Can't locate $m in \@INC (hidden).\n" };
 } qw{Cpanel/JSON/XS.pm};
 
 use Test::More 0.88;
@@ -42,7 +42,7 @@ __END__
 
     This function call is functionally identical to:
 
-       $json_text = JSON->new->encode($perl_scalar)
+       $json_text = JSON()->new->encode($perl_scalar)
 
   from_json
        $perl_scalar = from_json($json_text)
@@ -52,4 +52,4 @@ __END__
 
     This function call is functionally identical to:
 
-        $perl_scalar = JSON->decode($json_text)
+        $perl_scalar = JSON()->decode($json_text)

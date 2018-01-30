@@ -1,16 +1,12 @@
 package MarpaX::Grammar::Parser;
 
 use strict;
-use utf8;
 use warnings;
-use warnings  qw(FATAL utf8);    # Fatalize encoding glitches.
-use open      qw(:std :utf8);    # Undeclared streams in UTF-8.
-use charnames qw(:full :short);  # Unneeded in v5.16.
+use warnings  qw(FATAL utf8); # Fatalize encoding glitches.
 
-use Data::TreeDumper ();               # For DumpTree().
-use Data::TreeDumper::Renderer::Marpa; # Used by DumpTree().
+use Data::RenderAsTree;
 
-use File::Slurp; # For read_file().
+use File::Slurper 'read_text';
 
 use List::AllUtils qw/any max/;
 
@@ -22,7 +18,7 @@ use Moo;
 
 use Tree::DAG_Node;
 
-use Types::Standard qw/Any Bool HashRef Str/;
+use Types::Standard qw/Any Bool Int Object Str/;
 
 has bind_attributes =>
 (
@@ -34,21 +30,13 @@ has bind_attributes =>
 
 has cooked_tree =>
 (
-	default  => sub{return ''},
+	default  => sub{return Tree::DAG_Node -> new({name => 'Cooked tree', attributes => {rule => '', uid => 1} })},
 	is       => 'rw',
-	isa      => Any,
+	isa      => Object,
 	required => 0,
 );
 
 has cooked_tree_file =>
-(
-	default  => sub{return ''},
-	is       => 'rw',
-	isa      => Str,
-	required => 0,
-);
-
-has first_rule =>
 (
 	default  => sub{return ''},
 	is       => 'rw',
@@ -88,14 +76,6 @@ has minlevel =>
 	required => 0,
 );
 
-has output_hashref =>
-(
-	default  => sub{return 0},
-	is       => 'rw',
-	isa      => Bool,
-	required => 0,
-);
-
 has raw_tree =>
 (
 	default  => sub{return ''},
@@ -112,11 +92,19 @@ has raw_tree_file =>
 	required => 0,
 );
 
-has statements =>
+has rules_file =>
 (
-	default  => sub{return {} },
+	default  => sub{return ''},
 	is       => 'rw',
-	isa      => HashRef,
+	isa      => Str,
+	required => 0,
+);
+
+has uid =>
+(
+	default  => sub{return 1},
+	is       => 'rw',
+	isa      => Int,
 	required => 0,
 );
 
@@ -128,9 +116,15 @@ has user_bnf_file =>
 	required => 0,
 );
 
-# Warning: There's another $VERSION in package MarpaX::Grammar::Parser::Dummy below.
+has verbose =>
+(
+	default  => sub{return 0},
+	is       => 'rw',
+	isa      => Bool,
+	required => 1,
+);
 
-our $VERSION = '1.09';
+our $VERSION = '2.01';
 
 # ------------------------------------------------
 
@@ -155,379 +149,340 @@ sub BUILD
 		);
 	}
 
-	$self -> cooked_tree
-	(
-		Tree::DAG_Node -> new
-		({
-			name => 'statements',
-		})
-	);
-
-	$self -> raw_tree
-	(
-		Tree::DAG_Node -> new
-		({
-			attributes => {type => 'Marpa'},
-			name       => 'statements',
-		})
-	);
-
 } # End of BUILD.
 
 # ------------------------------------------------
 
-sub _build_hashref
+sub add_cooked_daughter
 {
-	my($self) = @_;
-
-	my($name, @name);
-	my(@stack);
-
-	$self -> raw_tree -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			return 1 if ( (length($name) == 0) || ($name =~ /^\d+$/) );
-
-			@name = ();
-
-			while ($node -> is_root == 0)
-			{
-				push @name, $name;
-
-				$node = $node -> mother;
-				$name = $node -> name;
-			}
-
-			push @stack, join('|', reverse @name) if ($#name >= 0);
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	@stack = sort @stack;
-
-	my($ref);
-	my(%statements);
-
-	for my $i (0 .. $#stack)
-	{
-		@name           = split(/\|/, $stack[$i]);
-		$ref            = \%statements;
-		$$ref{$name[0]} = {} if (! $$ref{$name[0]});
-
-		for my $j (1 .. $#name)
-		{
-			if ($j < $#name)
-			{
-				$ref             = $$ref{$name[$j - 1]};
-				$$ref{$name[$j]} = {} if (! ref $$ref{$name[$j]});
-			}
-			else
-			{
-				$$ref{$name[$j - 1]}            = {} if (! ref $$ref{$name[$j - 1]});
-				$$ref{$name[$j - 1]}{$name[$j]} = 1;
-			}
-		}
-	}
-
-	$self -> statements($statements{statement});
-
-} # End of _build_hashref.
-
-# ------------------------------------------------
-
-sub _check_start_rule
-{
-	my($self)  = @_;
-	my($start) = '';
-
-	my($name);
-
-	$self -> raw_tree -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			# Skip any rules which are not the start rule.
-
-			return 1 if ( ($$option{_depth} != 2) || ($node -> mother -> name ne 'statement') );
-
-			$name = $node -> name;
-
-			return 1 if ($name ne 'start_rule');
-
-			# Got it!
-
-			$start = $name;
-
-			return 0; # Stop walking.
-		},
-		_depth => 0,
-	});
-
-	return $start;
-
-} # End of _check_start_rule.
-
-# ------------------------------------------------
-
-sub clean_name
-{
-	my($self, $name) = @_;
-	my($attributes)  = {bracketed_name => 0, quantifier => '', real_name => $name};
-
-	# Expected cases:
-	# o {bare_name => $name}.
-	# o {bracketed_name => $name}.
-	# o $name.
-	#
-	# Quantified names are handled in sub compress_branch.
-
-	if (ref $name eq 'HASH')
-	{
-		if (defined $$name{bare_name})
-		{
-			$$attributes{real_name} = $name = $$name{bare_name};
-		}
-		else
-		{
-			$$attributes{real_name}      = $name = $$name{bracketed_name};
-			$$attributes{bracketed_name} = 1;
-			$name                        =~ s/^<//;
-			$name                        =~ s/>$//;
-		}
-	}
-
-	return ($name, $attributes);
-
-} # End of clean_name.
-
-# ------------------------------------------------
-
-sub compress_branch
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my($token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			if ($name eq 'completion_event_declaration')
-			{
-				$token = $self -> _process_completion_event_rule($index, $node);
-			}
-			elsif ($name eq 'default_rule')
-			{
-				$token = $self -> _process_default_rule($index, $node);
-			}
-			elsif ($name eq 'discard_rule')
-			{
-				$token = $self -> _process_discard_rule($index, $node);
-			}
-			elsif ($name eq 'empty_rule')
-			{
-				$token = $self -> _process_empty_rule($index, $node);
-			}
-			elsif ($name eq 'lexeme_default_statement')
-			{
-				$token = $self -> _process_lexeme_default($index, $node);
-			}
-			elsif ($name eq 'lexeme_rule')
-			{
-				$token = $self -> _process_lexeme_rule($index, $node);
-			}
-			elsif ($name eq 'nulled_event_declaration')
-			{
-				$token = $self -> _process_nulled_event_rule($index, $node);
-			}
-			elsif ($name eq 'prediction_event_declaration')
-			{
-				$token = $self -> _process_predicted_event_rule($index, $node);
-			}
-			elsif ($name eq 'priority_rule')
-			{
-				$token = $self -> _process_priority_rule($index, $node);
-			}
-			elsif ($name eq 'quantified_rule')
-			{
-				$token = $self -> _process_quantified_rule($index, $node);
-			}
-			elsif ($name eq 'start_rule')
-			{
-				$token = $self -> _process_start_rule($index, $node);
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	my($attributes);
-
-	($name, $attributes) = $self -> clean_name(shift @$token);
-	my($node)            = Tree::DAG_Node -> new
-	({
-		attributes => $attributes,
-		name       => $name,
-	});
+	my($self, $name, $rule)	= @_;
+	my($uid)				= $self -> uid($self -> uid + 1);
+	my($attributes)			||= {rule => $rule, uid => $uid};
+	my($node)				= Tree::DAG_Node -> new
+								({
+									attributes	=> $attributes,
+									name		=> $name,
+								});
 
 	$self -> cooked_tree -> add_daughter($node);
 
-	for (my $i = 0; $i <= $#$token; $i++)
+} # End of add_cooked_daughter.
+
+# ------------------------------------------------
+
+sub build_rule
+{
+	my($self, $parts)	= @_;
+	my($last)			= 0;
+	my($rule)			= '';
+	my($statement)		= $$parts[0]{statement};
+
+	$self -> log(debug => "build_rule: $statement. !" . join('!, !', map{$$_{token} } @$parts) . '!');
+
+	my(@adverbs);
+
+	if ($statement eq 'default_rule')
 	{
-		$name                = $$token[$i];
-		($name, $attributes) = $self -> clean_name($name);
+		$last	= 3;
+		$rule	= ":default $$parts[1]{token} action => $$parts[2]{token} bless => $$parts[3]{token}";
+	}
+	elsif ($statement eq 'lexeme_default_statement')
+	{
+		$last	= 3;
+		$rule	= "lexeme default = action => $$parts[1]{token} bless => $$parts[2]{token} latm => $$parts[3]{token}";
+	}
+	elsif ($statement eq 'start_rule')
+	{
+		$last	= 1;
+		$rule	= ":start ::= $$parts[1]{token}";
+	}
+	elsif ($statement eq 'quantified_rule')
+	{
+		$last	= 6;
+		$rule	= "$$parts[2]{token} $$parts[3]{token} $$parts[5]{token}$$parts[6]{token}";
 
-		# Special case handling: Quantitied rules.
+		if ($last < $#$parts)
+		{
+			shift @$parts for (1 .. $#$parts - $last + 1);
 
-		if ( ($i < $#$token) && (ref $$token[$i + 1] eq 'HASH') && ($$token[$i + 1]{quantifier}) )
+			@adverbs	= ();
+			@$parts		= grep{length($$_{token}) > 0} @$parts;
+
+			$self -> log(debug => "Before <$rule>. Parts: !" . join('!, !', map{$$_{token} } @$parts) . '!');
+
+			for (my $j = 0; $j <= $#$parts; $j += 2)
+			{
+				push @adverbs, "$$parts[$j]{token} => $$parts[$j + 1]{token}";
+			}
+
+			$rule .= ' ' . join(' ', @adverbs);
+
+			$self -> log(debug => "After  <$rule>");
+		}
+	}
+	elsif ($statement eq 'priority_rule')
+	{
+		$rule = $self -> collect_alternatives($parts);
+	}
+	else
+	{
+		$rule = '';
+	}
+
+	$self -> log(debug => "build_rule: Returns $rule.");
+
+} # End of build_rule.
+
+# ------------------------------------------------
+
+sub collect_alternatives
+{
+	my($self, $parts)	= @_;
+	my($limit)			= $#$parts;
+	my($rule)			= '';
+
+	my(@alternatives);
+	my($hidden);
+	my($item);
+	my($final_i);
+	my(@tokens);
+
+	# We use a C-style 'for' and not something like 'for $i (0 .. $limit)',
+	# bacause in the latter case Perl ignores our update to $i.
+
+	for (my $i = 2; $i <= $limit; $i++)
+	{
+		$item = $$parts[$i];
+
+		if ($$item{statement} eq 'alternative')
 		{
 			$i++;
 
-			$$attributes{quantifier} = $$token[$i]{quantifier};
-		}
+			$item = $$parts[$i];
 
-		$node -> add_daughter
-		(
-			Tree::DAG_Node -> new
-			({
-				attributes => $attributes,
-				name       => $name,
-			})
-		);
+			if ($$item{statement} eq 'single_symbol')
+			{
+				$i++;
+
+				$item = $$parts[$i];
+			}
+
+			if ($$item{statement} eq 'parenthesized_rhs_primary_list')
+			{
+				$hidden	= $self -> collect_hidden_parts($parts, $i);
+				$i		= $$hidden[0] - 1;
+
+				$self -> log(debug => "1 Push hidden $$hidden[1]");
+
+				push @alternatives, $$hidden[1];
+			}
+			elsif ($$item{statement} =~ /(?:bare_name|bracketed_name|character_class|op_declare_bnf|op_declare_match|single_quoted_string)/)
+			{
+				$self -> log(debug => "2 Push $$item{token}");
+
+				push @alternatives, $$item{token};
+			}
+			else
+			{
+				die "1 No provision for statement '$$item{statement}'\n";
+			}
+		}
+		else
+		{
+			if ($#alternatives >= 0)
+			{
+				$self -> log(debug => '3 Joining alternatives: ' . join(' | ', @alternatives) . '.');
+
+				push @tokens, join(' | ', @alternatives);
+
+				@alternatives = ();
+			}
+
+			if ($$item{statement} eq 'parenthesized_rhs_primary_list')
+			{
+				$hidden	= $self -> collect_hidden_parts($parts, $i);
+				$i		= $$hidden[0];
+
+				$self -> log(debug => "4 Push hidden $$hidden[1]");
+
+				push @alternatives, $$hidden[1];
+			}
+			elsif ($$item{statement} =~ /(?:bare_name|bracketed_name|character_class|op_declare_bnf|op_declare_match|single_quoted_string)/)
+			{
+				$self -> log(debug => "5 Push $$item{token}");
+
+				push @tokens, $$item{token};
+			}
+			elsif ($$item{statement} eq 'single_symbol')
+			{
+				# NOP.
+			}
+			else
+			{
+				$self -> log(debug => 'parts: !' . join('! !', map{$$_{token} } @$parts) . '!');
+
+				die "2 No provision for statement '$$item{statement}'\n";
+			}
+		}
 	}
 
-} # End of compress_branch.
+	$self -> log(debug => "After loop. limit: $limit. alternatives: $#alternatives");
+
+	if ($#alternatives >= 0)
+	{
+		$self -> log(debug => '8 Joining alternatives: ' . join(' | ', @alternatives) . '.');
+
+		push @tokens, join(' | ', @alternatives);
+	}
+
+	$rule = join(' ', @tokens);
+
+	$self -> log(debug => "Rule: $rule");
+
+	return $rule;
+
+} # End of collect_alternatives.
+
+# ------------------------------------------------
+
+sub collect_hidden_parts
+{
+	my($self, $parts, $i) = @_;
+
+	# Step past 'parenthesized_rhs_primary_list'.
+
+	$i += 1;
+
+	my($current_depth)	= $$parts[$i]{depth}; # 23.
+	my($finished)		= 0;
+	my($initial_i)		= $i;
+
+	my(@hidden);
+
+	while (! $finished)
+	{
+		if ($$parts[$i]{depth} < $current_depth)
+		{
+			$finished = 1;
+		}
+		else
+		{
+			push @hidden, $$parts[$i]{token} if ($$parts[$i]{token});
+
+			if ($i == $#$parts)
+			{
+				$finished = 1;
+			}
+			else
+			{
+				$i++;
+			}
+		}
+	}
+
+	return [$i, '(' . join(' ', @hidden) . ')'];
+
+} # End of collect_hidden_parts.
 
 # ------------------------------------------------
 
 sub compress_tree
 {
-	my($self) = @_;
+	my($self, $statements)	= @_;
+	my($limit)				= $#$statements;
 
-	# Phase 1: Process the children of the root:
-	# o First daughter is offset of start within input stream.
-	# o Second daughter is offset of end within input stream.
-	# o Remainder are statements.
+	my($format);
+	my($item);
+	my(@parts);
+	my($rule);
+	my($statement);
 
-	my(@daughters) = $self -> raw_tree -> daughters;
-	my($start)    = (shift @daughters) -> name;
-	my($end)      = (shift @daughters) -> name;
+	# We use a C-style 'for' and not something like 'for $i (0 .. $limit)',
+	# bacause in the latter case Perl ignores our update to $i.
 
-	# Phase 2: Process each statement.
-
-	for my $index (0 .. $#daughters)
+	for (my $i = 0; $i <= $limit; $i++)
 	{
-		$self -> compress_branch($index + 1, $daughters[$index]);
+		$item		= $$statements[$i];
+		$statement	= $$item{statement};
+		$format		= $$item{depth} == 3 ? '* %3i' : '  %3i';
+
+		$self -> log(debug => sprintf($format, $$item{depth}) . ". $statement. $$item{token}.");
+
+		# Wrap up each statement as we encounter it.
+
+		if ($statement =~ /^statement$/)
+		{
+			$rule = $self -> build_rule(\@parts);
+
+			$self -> add_cooked_daughter($parts[0]{statement}, $rule);
+
+			@parts = ();
+		}
+		elsif ($statement =~ /proper_specification/)
+		{
+			push @parts,
+			{
+				depth		=> $$item{depth},
+				statement	=> $$item{statement},
+				token		=> 'proper',
+			};
+
+			push @parts, $item;
+		}
+		elsif ($statement =~ /separator_specification/)
+		{
+			push @parts, $item;
+
+			$i		+= 2;
+			$item	= $$statements[$i];
+
+			push @parts, $item;
+		}
+		else
+		{
+			push @parts, $item;
+		}
 	}
+
+	$self -> log(debug => 'Excess !' . join('! !', map{$$_{token} } @parts) . '!');
 
 } # End of compress_tree.
 
 # ------------------------------------------------
 
-sub _fabricate_start_rule
+sub get_grand_daughter
 {
-	my($self) = @_;
+	my($self, $node)	= @_;
+	my(@daughters)		= $node -> daughters;
+	@daughters			= $daughters[0] -> daughters;
 
-	# Add a start_rule sub-tree to the cooked tree.
+	return $daughters[2];
 
-	my($start_rule) = Tree::DAG_Node -> new({name => ':start'});
-
-	$start_rule -> add_daughter(Tree::DAG_Node -> new({name => '::='}) );
-	$start_rule -> add_daughter(Tree::DAG_Node -> new({name => $self -> first_rule}) );
-	$self -> cooked_tree -> add_daughter_left($start_rule);
-
-} # End of _fabricate_start_rule.
+} # End of get_grand_daughter.
 
 # ------------------------------------------------
 
-sub _find_first_rule
+sub get_grand_daughters_name
 {
-	my($self, $user_bnf) = @_;
+	my($self, $node)	= @_;
+	my($grand_daughter)	= $self -> get_grand_daughter($node);
 
-	for my $line (split(/\n/, $user_bnf) )
-	{
-		# Assume the rule name and the '::=' are on the same line.
+	# Split things like:
+	# o '2 = graph_definition [SCALAR 186]'.
+	# o '2 = ::= [SCALAR 195]'.
+	# o '2 = <string lexeme> [SCALAR 2047]'.
 
-		if ($line =~ /^\s*(<?\w+>?)\s*::=/)
-		{
-			$self -> first_rule($1);
+	my(@name) = split(/\s+/, $grand_daughter -> name);
 
-			last;
-		}
-	}
+	# Discard the '[$x' and '$n]' from the end of @name.
+	# Discard the $n and '=' from the start of @name.
 
-} # End of _find_first_rule.
+	pop @name for 1 .. 2;
+	shift @name for 1 .. 2;
 
-# ------------------------------------------------
+	return join(' ', @name);
 
-sub format_hashref
-{
-	my($self, $depth, $hashref) = @_;
-	my(@keys)           = keys %$hashref;
-	my($max_key_length) = max map{length} @keys;
-
-	# If any key points to a hashref, do not try to line up the '=>' vertically,
-	# because the dump of the hashref will make the padding useless.
-
-	my($ref_present) = any {ref $$hashref{$_} } @keys; # $#refs >= 0 ? 1 : 0;
-
-	my($adjust_indent);
-	my($indent);
-	my($key_pad);
-	my($pretty_key);
-	my($line);
-
-	for my $key (sort keys %$hashref)
-	{
-		$indent  = '    ' x $depth;
-		$key_pad = ' ' x ($max_key_length - length($key) + 1);
-
-		# Quote keys which are not word and do not already have quotes.
-
-		if ( ($key =~ /^\w+$/) || ($key =~ /^\'/) )
-		{
-			$pretty_key = $key;
-		}
-		else
-		{
-			$pretty_key = "'$key'";
-		}
-
-		$key_pad = ' ' if ($ref_present);
-		$line    = "$indent$pretty_key$key_pad=>";
-
-		if (ref $$hashref{$key})
-		{
-			$self -> log(info => $line);
-			$self -> log(info => "$indent\{");
-			$self -> format_hashref($depth + 1, $$hashref{$key});
-			$self -> log(info => "$indent},");
-		}
-		else
-		{
-			$self -> log(info => "$line $$hashref{$key},");
-		}
-	}
-
-} # End of format_hashref.
+} # End of get_grand_daughters_name.
 
 # ------------------------------------------------
 
@@ -541,76 +496,101 @@ sub log
 
 # ------------------------------------------------
 
-sub _process_completion_event_rule
+sub parse_raw_tree
 {
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'event_name')
-			{
-				push @token, 'event', $name, '=', 'completed';
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_completion_event_rule.
-
-# ------------------------------------------------
-
-sub _process_default_rule
-{
-	my($self, $index, $a_node) = @_;
-	my(%map) =
+	my($self)	= @_;
+	my(%type)	=
 	(
-		action   => 'action',
-		blessing => 'bless',
+		action_name						=> 2,	# 2: Use granddaughter[2]{2,2}.
+		adverb_item						=> 0,	# 0: Store.
+		alternative						=> 0,
+		bare_name						=> 1,	# 1: Use granddaughter[2]{1,1}.
+		blessing_name					=> 2,
+		bracketed_name					=> 1,
+		character_class					=> 1,
+		default_rule					=> 1,
+		discard_rule					=> 0,
+		latm_specification				=> 2,
+		lexeme_default_statement		=> 0,
+		lhs								=> 0,
+		op_declare_bnf					=> 1,
+		op_declare_match				=> 1,
+		parenthesized_rhs_primary_list	=> 0,
+		priority_rule					=> 0,
+		proper_specification			=> 2,
+		quantified_rule					=> 0,
+		quantifier						=> 1,
+		separator_specification			=> 4,
+		single_symbol					=> 0,
+		single_quoted_string			=> 1,
+		statement						=> 0,
+		statements						=> 0,
+		start_rule						=> 0,
 	);
 
+	my($grand_daughter);
 	my($name);
-	my(@token);
+	my($statement, @statements);
+	my($type);
 
-	$a_node -> walk_down
+	$self -> raw_tree -> walk_down
 	({
 		callback => sub
 		{
 			my($node, $option) = @_;
-			$name = $node -> name;
 
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
+			return 1 if ($node -> is_root);
 
-			return 1 if ($node -> my_daughter_index < 2);
+			$name		= $node -> name;
+			$statement	= ($name =~ /Class = .+::(.+?)\s/) ? $1 : '';
 
-			if ($node -> mother -> name =~ /op_declare_+/)
+			return 1 if (! $statement);
+
+			$type = $type{$statement};
+
+			return 1 if (! defined $type);
+
+			if ($type == 0)
 			{
-				push @token, ':default', $name;
+				push @statements,
+				{
+					depth		=> $$option{_depth},
+					statement	=> $statement,
+					token		=> '',
+				};
 			}
-			elsif ($node -> mother -> mother -> name =~ /(action|blessing)_name/)
+			elsif ($type == 1)
 			{
-				push @token, $map{$1}, '=>', $name;
+				push @statements,
+				{
+					depth		=> $$option{_depth},
+					statement	=> $statement,
+					token		=> $self -> get_grand_daughters_name($node),
+				};
+			}
+			elsif ($type == 2)
+			{
+				$grand_daughter = $self -> get_grand_daughter($node);
+
+				push @statements,
+				{
+					depth		=> $$option{_depth},
+					statement	=> $statement,
+					token		=> $self -> get_grand_daughters_name($grand_daughter),
+				};
+			}
+			elsif ($type == 4)
+			{
+				push @statements,
+				{
+					depth		=> $$option{_depth},
+					statement	=> $statement,
+					token		=> 'separator',
+				};
+			}
+			else
+			{
+				die "Unexpected type $type\n";
 			}
 
 			return 1; # Keep walking.
@@ -618,488 +598,54 @@ sub _process_default_rule
 		_depth => 0,
 	});
 
-	return [@token];
+	return \@statements;
 
-} # End of _process_default_rule.
-
-# ------------------------------------------------
-
-sub _process_discard_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, ':discard', '~', {$node -> mother -> name => $name};
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_discard_rule.
+} # End of parse_raw_tree.
 
 # ------------------------------------------------
 
-sub _process_empty_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> name =~ /op_declare_+/)
-			{
-				push @token, $name;
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_empty_rule.
-
-# ------------------------------------------------
-
-sub _process_lexeme_default
-{
-	my($self, $index, $a_node) = @_;
-	my(%map) =
-	(
-		action             => 'action',
-		blessing           => 'bless',
-		forgiving          => 'latm',
-		latm_specification => 'latm',
-	);
-	my(@token) = ('lexeme default', '=');
-
-	my($name);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name =~ /(action|blessing)_name/)
-			{
-				push @token, $map{$1}, '=>', $name;
-			}
-			elsif ($node -> mother -> mother -> name eq 'latm_specification')
-			{
-				push @token, $map{latm_specification}, '=>', $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_lexeme_default.
-
-# ------------------------------------------------
-
-sub _process_lexeme_rule
-{
-	my($self, $index, $a_node) = @_;
-	my(%map) =
-	(
-		event_name             => 'event',
-		pause_specification    => 'pause',
-		priority_specification => 'priority',
-	);
-	my(@token) = (':lexeme', '~');
-
-	my($name);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name =~ /(event_name|pause_specification|priority_specification)/)
-			{
-				push @token, $map{$1}, '=>', $name;
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_lexeme_rule.
-
-# ------------------------------------------------
-
-sub _process_nulled_event_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'event_name')
-			{
-				push @token, 'event', $name, '=', 'nulled';
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_nulled_event_rule.
-
-# ------------------------------------------------
-
-sub _process_parenthesized_list
-{
-	my($self, $index, $a_node, $depth_under) = @_;
-
-	my($name);
-	my(@rhs);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($$option{_depth} == $depth_under)
-			{
-				push @rhs, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	$rhs[0]     = "($rhs[0]";
-	$rhs[$#rhs] = "$rhs[$#rhs])";
-
-	return [@rhs];
-
-} # End of _process_parenthesized_list.
-
-# ------------------------------------------------
-
-sub _process_predicted_event_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'event_name')
-			{
-				push @token, 'event', $name, '=', 'predicted';
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, $name;
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_predicted_event_rule.
-
-# ------------------------------------------------
-
-sub _process_priority_rule
-{
-	my($self, $index, $a_node) = @_;
-	my($alternative_count)     = 0;
-	my(%map)                   =
-	(
-		action   => 'action',
-		blessing => 'bless',
-	);
-
-	my($continue);
-	my($depth_under);
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name     = $node -> name;
-			$continue = 1;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name =~ /(action|blessing)_name/)
-			{
-				push @token, $map{$1}, '=>', $name;
-			}
-			elsif ($name eq 'alternative')
-			{
-				$alternative_count++;
-
-				push @token, '|' if ($alternative_count > 1);
-			}
-			elsif ($node -> mother -> name eq 'character_class')
-			{
-				push @token, $name;
-			}
-			elsif ($node -> mother -> name =~ /op_declare_+/)
-			{
-				push @token, $name;
-			}
-			elsif ($name eq 'parenthesized_rhs_primary_list')
-			{
-				$continue    = 0;
-				$depth_under = $node -> depth_under;
-
-				push @token, @{$self -> _process_parenthesized_list($index, $node, $depth_under)};
-			}
-			elsif ($node -> mother -> mother -> name eq 'rank_specification')
-			{
-				push @token, 'rank', '=>', $name;
-			}
-			elsif ($node eq 'separator_specification')
-			{
-				push @token, 'separator', '=>';
-			}
-			elsif ($node -> mother -> name eq 'single_quoted_string')
-			{
-				push @token, $name;
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, {$node -> mother -> name => $name};
-			}
-
-			return $continue;
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_priority_rule.
-
-# ------------------------------------------------
-
-sub _process_quantified_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'action_name')
-			{
-				push @token, 'action', '=>', $name;
-			}
-			elsif ($node -> mother -> name eq 'character_class')
-			{
-				push @token, $name;
-			}
-			elsif ($node -> mother -> name =~ /op_declare_+/)
-			{
-				push @token, $name;
-			}
-			elsif ($node -> mother -> name eq 'quantifier')
-			{
-				push @token, {quantifier => $name};
-			}
-			elsif ($node -> mother -> mother -> name eq 'separator_specification')
-			{
-				push @token, 'separator', '=>';
-			}
-			elsif ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, {$node -> mother -> name => $name};
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_quantified_rule.
-
-# ------------------------------------------------
-
-sub _process_start_rule
-{
-	my($self, $index, $a_node) = @_;
-
-	my($name);
-	my(@token);
-
-	$a_node -> walk_down
-	({
-		callback => sub
-		{
-			my($node, $option) = @_;
-			$name = $node -> name;
-
-			# Skip the first 2 daughters, which hold offsets for the
-			# start and end of the token within the input stream.
-
-			return 1 if ($node -> my_daughter_index < 2);
-
-			if ($node -> mother -> mother -> name eq 'symbol_name')
-			{
-				push @token, ':start', '::=', {$node -> mother -> name => $name};
-			}
-
-			return 1; # Keep walking.
-		},
-		_depth => 0,
-	});
-
-	return [@token];
-
-} # End of _process_start_rule.
-
-# ------------------------------------------------
-
-sub report_hashref
+sub report_rules
 {
 	my($self) = @_;
 
-	$self -> format_hashref(0, $self -> statements);
+	my($attributes);
+	my($name);
+	my(@rules);
 
-	# Return 0 for success and 1 for failure.
+	$self -> cooked_tree -> walk_down
+	({
+		callback => sub
+		{
+			my($node, $option) = @_;
 
-	return 0;
+			return 1 if ($node -> is_root);
 
-} # End of report_hashref.
+			$name		= $node -> name;
+			$attributes	= $node -> attributes;
+
+			push @rules, $$attributes{rule};
+
+			return 1; # Keep walking.
+		},
+		_depth => 0,
+	});
+
+	return \@rules;
+
+} # End of report_rules.
 
 # ------------------------------------------------
 
 sub run
 {
-	my($self)          = @_;
-	my($package)       = 'MarpaX::Grammar::Parser::Dummy'; # This is actually included below.
-	my $marpa_bnf      = read_file($self -> marpa_bnf_file, binmode => ':utf8');
-	my($marpa_grammar) = Marpa::R2::Scanless::G -> new({bless_package => $package, source => \$marpa_bnf});
-	my $user_bnf       = read_file($self -> user_bnf_file, binmode =>':utf8');
-	my($recce)         = Marpa::R2::Scanless::R -> new({grammar => $marpa_grammar});
+	my($self)			= @_;
+	my $marpa_bnf		= read_text($self -> marpa_bnf_file);
+	$marpa_bnf			= $marpa_bnf =~ /([\w\W]+)/ ? $1 : $marpa_bnf; # Untaint.
+	my($marpa_grammar)	= Marpa::R2::Scanless::G -> new({bless_package => 'MarpaX::Grammar::Parser', source => \$marpa_bnf});
+	my $user_bnf		= read_text($self -> user_bnf_file);
+	$user_bnf			= $user_bnf =~ /([\w\W]+)/ ? $1 : $user_bnf; # Untaint.
+	my($recce)			= Marpa::R2::Scanless::R -> new({grammar => $marpa_grammar});
 
-	$self -> _find_first_rule($user_bnf);
 	$recce -> read(\$user_bnf);
 
 	my($value) = $recce -> value;
@@ -1110,19 +656,19 @@ sub run
 
 	die "Parse failed\n" if (! defined $value);
 
-	Data::TreeDumper::DumpTree
-	(
-		$value,
-		'', # No title since Data::TreeDumper::Renderer::Marpa prints nothing.
-		DISPLAY_ROOT_ADDRESS => 1,
-		NO_WRAP              => 1,
-		RENDERER             =>
-		{
-			NAME    => 'Marpa',  # I.e.: Data::TreeDumper::Renderer::Marpa.
-			package => $package, # I.e.: MarpaX::Grammar::Parser::Dummy.
-			root    => $self -> raw_tree,
-		}
-	);
+	# Convert Marpa's return value $value into a tree for ease of processing.
+
+	my($renderer) = Data::RenderAsTree -> new
+		(
+			attributes       => 0,
+			max_key_length   => 100,
+			max_value_length => 100,
+			title            => 'Raw tree',
+			verbose          => 0,
+		);
+	my($output) = $renderer -> render($value);
+
+	$self -> raw_tree($renderer -> root);
 
 	my($raw_tree_file) = $self -> raw_tree_file;
 
@@ -1133,25 +679,31 @@ sub run
 		close $fh;
 	}
 
-	$self -> compress_tree;
+	# Extract only the bits and pieces of interest. Output an arrayref.
 
-	if ($self -> _check_start_rule eq '')
-	{
-		$self -> _fabricate_start_rule;
-	}
+	my($statements) = $self -> parse_raw_tree;
 
-	if ($self -> output_hashref)
-	{
-		$self -> _build_hashref;
-		$self -> report_hashref;
-	}
+	# Convert the arrayref into a user-friendly tree.
+
+	$self -> compress_tree($statements);
 
 	my($cooked_tree_file) = $self -> cooked_tree_file;
 
 	if ($cooked_tree_file)
 	{
 		open(my $fh, '>', $cooked_tree_file) || die "Can't open(> $cooked_tree_file): $!\n";
-		print $fh map{"$_\n"} @{$self -> cooked_tree -> tree2string({no_attributes => 1 - $self -> bind_attributes})};
+		print $fh map{"$_\n"} @{$self -> cooked_tree -> tree2string({no_attributes => 0})};
+		close $fh;
+	}
+
+	# Save our version of the orginal BNF.
+
+	my($rules_file) = $self -> rules_file;
+
+	if ($rules_file)
+	{
+		open(my $fh, '>', $rules_file) || die "Can't open(> $rules_file): $!\n";
+		print $fh map{"$_\n"} @{$self -> report_rules};
 		close $fh;
 	}
 
@@ -1160,14 +712,6 @@ sub run
 	return 0;
 
 } # End of run.
-
-# ------------------------------------------------
-
-package MarpaX::Grammar::Parser::Dummy;
-
-our $VERSION = '1.09';
-
-sub new{return {};}
 
 #-------------------------------------------------
 
@@ -1196,15 +740,12 @@ C<MarpaX::Grammar::Parser> - Converts a Marpa grammar into a tree using Tree::DA
 
 For more help, run:
 
-	 scripts/bnf2tree.pl -h
+	 perl scripts/bnf2tree.pl -h
 
 See share/*.bnf for input files and share/*.tree for output files.
 
 Installation includes copying all files from the share/ directory, into a dir chosen by
 L<File::ShareDir>. Run scripts/find.grammars.pl to display the name of that dir.
-
-The cooked tree can be graphed with L<MarpaX::Grammar::GraphViz2>. That module has its own
-L<demo page|http://savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/index.html>.
 
 =head1 Description
 
@@ -1214,7 +755,9 @@ to create another tree, this time containing just the original grammar (see L</c
 
 The nature of these trees is discussed in the L</FAQ>. The trees are managed by L<Tree::DAG_Node>.
 
-Lastly, the major purpose of the cooked tree is to serve as input to L<MarpaX::Grammar::GraphViz2>.
+Lastly, the major purpose of the cooked tree is to serve as input to L<MarpaX::Grammar::GraphViz2>,
+which graphs such cooked trees. That module has its own
+L<demo page|http://savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/index.html>.
 
 =head1 Installation
 
@@ -1307,14 +850,6 @@ Default: 'error'.
 
 No lower levels are used.
 
-=item o output_hashref Boolean
-
-Log (1) or skip (0) the hashref version of the raw tree.
-
-Note: This needs -maxlevel elevated from its default value of 'notice' to 'info', to do anything.
-
-Default: 0.
-
 =item o raw_tree_file => aTextFileName
 
 The name of the text file to write containing the grammar as a raw tree.
@@ -1348,44 +883,11 @@ C<cooked_tree_file> and C<raw_tree_file>.
 
 Note: C<bind_attributes> is a parameter to new().
 
-=head2 clean_name($name)
-
-Returns a list of 2 elements: ($name, $attributes).
-
-$name is just the name of the token.
-
-$attributes is a hashref with these keys:
-
-=over 4
-
-=item o bracketed_name => $Boolean
-
-Indicates the token's name is (1) or is not (0) of the form '<...>'.
-
-=item o quantifier => $char
-
-Indicates the token is quantified. $char is one of '', '*' or '+'.
-
-If $char is '' (the empty string), the token is not quantified.
-
-=item o real_name => $string
-
-The user-specified version of the name of the token, including leading '<' and trailing '>' if any.
-
-=back
-
-=head2 compress_branch($index, $node)
-
-Called by L</compress_tree()>.
-
-Converts 1 sub-tree of the raw tree into one sub-tree of the cooked tree.
-
 =head2 compress_tree()
 
 Called automatically by L</run()>.
 
-Converts the raw tree into the cooked tree, calling L</compress_branch($index, $node)> once for each
-daughter of the raw tree.
+Converts the raw tree into the cooked tree.
 
 Output is the tree returned by L</cooked_tree()>.
 
@@ -1419,25 +921,6 @@ This latter file is the grammar used in L<MarpaX::Demo::StringParser>.
 Note: C<cooked_tree_file> is a parameter to new().
 
 Note: The bind_attributes option/method affects the output.
-
-=head2 first_rule()
-
-Returns the first G1-level rule in the user's gramamr. This is used to fabricate a start rule if
-'start_rule' is not found in the cooked tree. This new node is not in the raw tree, but only in
-the cooked tree, and hence in the hashref version of the cooked tree.
-
-The presence of a start rule helps L<MarpaX::Grammar::GraphViz2> generate the grammar's image.
-
-=head2 format_hashref($depth, $hashref)
-
-Formats the given hashref, with $depth (starting from 0) used to indent the output.
-
-Outputs using calls to L</log($level, $s)>.
-
-When you call L</report_hashref()>, it calls
-C<< $self -> format_hashref(0, $self -> statements) >>.
-
-End users would normally never call this method, nor override it. Just call L</report_hashref()>.
 
 =head2 log($level, $s)
 
@@ -1487,18 +970,6 @@ Note: C<minlevel> is a parameter to new().
 
 The constructor. See L</Constructor and Initialization>.
 
-=head2 output_hashref([$Boolean])
-
-Here, the [] indicate an optional parameter.
-
-Get or set the option to log (1) or exclude (0) a hashref version of the raw tree.
-
-This hashref can be output by calling L</new()> as C<< new(max => 'info', output_hashref => 1) >>.
-
-See also L</statements()>.
-
-Note: C<output_hashref> is a parameter to new().
-
 =head2 raw_tree()
 
 Returns the root node, of type L<Tree::DAG_Node>, of the raw tree of items in the user's grammar.
@@ -1527,17 +998,6 @@ Note: C<raw_tree_file> is a parameter to new().
 
 Note: The bind_attributes option/method affects the output.
 
-=head2 report_hashref()
-
-Outputs the hashref version of the raw tree to the logger.
-
-It does this by calling C<< $self -> format_hashref(0, $self -> statements) >>, which in turn uses
-the logger provided in the call to L</new()>.
-
-See L</format_hashref($depth, $hashref)>.
-
-C<report_hashref()> returns 0 for success and 1 for failure.
-
 =head2 run()
 
 The method which does all the work.
@@ -1545,14 +1005,6 @@ The method which does all the work.
 See L</Synopsis> and scripts/bnf2tree.pl for sample code.
 
 run() returns 0 for success and 1 for failure.
-
-=head2 statements()
-
-Returns a hashref describing the grammar provided in the user_bnf_file parameter to L</new()>.
-
-The L</FAQ> discusses the format of this hashref.
-
-See also L</output_hashref()>.
 
 =head2 user_bnf_file([$bnf_file_name])
 
@@ -1573,7 +1025,7 @@ Note: C<user_bnf_file> is a parameter to new().
 
 =item o share/c.ast.bnf
 
-This is part of L<MarpaX::Languages::C::AST>, by Jean-Damien Durand. It's 1,565 lines long.
+This is part of L<MarpaX::Languages::C::AST>, by Jean-Damien Durand. It's 1,883 lines long.
 
 The outputs are share/c.ast.cooked.tree and share/c.ast.raw.tree.
 
@@ -1587,7 +1039,7 @@ The command to generate this file is:
 
 =item o share/c.ast.raw.tree
 
-This is the output from processing Marpa's analysis of share/c.ast.bnf. It's 56,723 lines long,
+This is the output from processing Marpa's analysis of share/c.ast.bnf. It's 86,057 lines long,
 which indicates the complexity of Jean-Damien's grammar for C.
 
 The command to generate this file is:
@@ -1640,12 +1092,11 @@ The command to process this file is:
 
 The outputs are share/metag.cooked.tree and share/metag.raw.tree.
 
-=item o share/metag.hashref
+=item o share/numeric.expressions.bnf
 
-Created by:
+This BNF was extracted from L<MarpaX::Demo::SampleScripts>'s examples/ambiguous.grammar.01.pl.
 
-	scripts/bnf2tree.pl -mar share/metag.bnf -u share/metag.bnf -r share/metag.raw.tree \
-		-max info > share/metag.hashref
+It helped me debug the handling of '|' and '||' between right-hand-side alternatives.
 
 =item o share/stringparser.bnf.
 
@@ -1658,22 +1109,6 @@ The command to process this file is:
 	scripts/bnf2tree.sh stringparser
 
 The outputs are share/stringparser.cooked.tree and share/stringparser.raw.tree.
-
-=item o share/stringparser.hashref
-
-Created by:
-
-	scripts/bnf2tree.pl -mar share/stringparser.bnf -u share/stringparser.bnf \
-		-r share/stringparser.raw.tree -max info > share/stringparser.hashref
-
-=item o share/stringparser.treedumper
-
-This is the output of running:
-
-	scripts/metag.pl share/metag.bnf share/stringparser.bnf > \
-		share/stringparser.treedumper
-
-That script, metag.pl, is discussed just below, and in the L</FAQ>.
 
 =item o share/termcap.info.bnf
 
@@ -1697,7 +1132,7 @@ These scripts are all in the scripts/ directory.
 
 This is a neat way of using this module. For help, run:
 
-	scripts/bnf2tree.pl -h
+	perl scripts/bnf2tree.pl -h
 
 Of course you are also encouraged to include the module directly in your own code.
 
@@ -1750,10 +1185,13 @@ Marpa's docs for its SLIF-DSL L<are here|https://metacpan.org/module/Marpa::R2::
 =head2 What is the difference between the cooked tree and the raw tree?
 
 The raw tree is generated by processing the output of Marpa's parse of the user's grammar file.
-It contains Marpa's view of that grammar.
+It contains Marpa's view of that grammar. This raw tree is output by L<Tree::DAG_Node>.
 
 The cooked tree is generated by post-processing the raw tree, to extract just the user's grammar's
-tokens. It contains the user's view of their grammar.
+tokens. It contains the user's view of their grammar. This cooked tree is output by this module.
+
+And yes, the cooked tree can be used to reproduce (apart from formatting details) the user's BNF
+file.
 
 The cooked tree can be graphed with L<MarpaX::Grammar::GraphViz2>. That module has its own
 L<demo page|http://savage.net.au/Perl-modules/html/marpax.grammar.graphviz2/index.html>.
@@ -1762,146 +1200,142 @@ The following items explain this in more detail.
 
 =head2 What are the details of the nodes in the cooked tree?
 
-Under the root, there are a set of nodes:
+Under the root (whose name is 'Cooked tree'), there are a set of nodes:
 
 =over 4
 
-=item o N nodes, 1 per statement in the grammar
+=item o $n1 nodes, 1 per statement (BNF rule) in the grammar
 
-The node's names are the left-hand side of each statement in the grammar.
+Each of these $n1 nodes has the name 'statement', and each also has a sub-tree of $n2 daughter nodes
+ of its own.
 
-Each node is the root of a subtree describing the statement.
+So, each 'statement' node is the root of a sub-tree describing that statement (rule).
 
-Under those nodes are a set of nodes:
+These sub-trees' nodes are:
 
 =over 4
+
+=item o 1 node for the left-hand side of the rule
 
 =item o 1 node for the separator between the left and right sides of the statement
 
-So, the node's name is one of: '=' '::=' or '~'.
+So, this node's name is one of: '=' '::=' or '~'.
 
-=item o 1 node per token from the right-hand side of each statement
+=item o 1 node per token from the right-hand side of the statement
 
-The node's name is the token itself.
-
-=back
+These nodes' names are the tokens themselves.
 
 =back
 
-The attributes of each node are a hashref, with these keys:
-
-=over 4
-
-=item o bracketed_name => $Boolean
-
-Indicates the token's name is or is not of the form '<...>'.
-
-=item o quantifier => $char
-
-Indicates the token is quantified. $char is one of '', '*' or '+'.
-
-If $char is '' (the empty string), the token is not quantified.
-
-=item o real_name => $string
-
-The user-specified version of the name of the token, including leading '<' and trailing '>' if any.
-
 =back
 
-See share/stringparser.cooked.tree.
+So, for a rule like:
+
+	array ::= ('[' ']') | ('[') elements (']') action => ::first
+
+The nodes will be (see share/json.2.cooked.tree):
+
+	:
+    |--- statement. Attributes: {token => "statement"}
+    |    |--- lhs. Attributes: {token => "array"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "'['"}
+    |    |    |--- rhs. Attributes: {token => "']'"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "'['"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- rhs. Attributes: {token => "elements"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "']'"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- reserved_action_name. Attributes: {token => "::first"}
+	:
+
+Firstly, strip off the first 2 daughters. They are the rule name and the separator.
+
+Clearly, to process the remaining daughters (if any) you must start by examining them from the end,
+looking for triplets of the form ($a, '=>', $b). $a will be a reserved word (an adverb). This then
+is the adverb list.
+
+What's left, if anything, is a '|' or '||' separated list of right-hand side alternatives.
+
+See share/json.2.cooked.tree, or any file share/*.cooked.tree.
+
+=head2 Did you know there can be multiple 'statement' nodes with the same rule (1st daughter) name?
+
+E.g.: Parsing share/metag.bnf produces cases like this:
+
+	:
+	|--- statement
+	|    |--- <start rule>
+	|    |--- ::=
+	|    |--- (
+	|    |--- ':start'
+	|    |--- <op declare bnf>
+	|    |--- )
+	|    |--- symbol
+	|--- statement
+	|    |--- <start rule>
+	|    |--- ::=
+	|    |--- (
+	|    |--- 'start'
+	|    |--- 'symbol'
+	|    |--- 'is'
+	|    |--- )
+	|    |--- symbol
+	:
+
+See share/metag.cooked.tree.
+
+=head2 Did you know rules do not have to have right-hand sides?
+
+E.g.: Parsing share/metag.bnf produces cases like this:
+
+	:
+	|--- statement
+	|    |--- <event initializer>
+	|    |--- ::=
+	|--- statement
+	:
+
+See share/metag.cooked.tree.
+
+=head2 What happened to my use of 'forgiving'?
+
+It is an alias for 'latm' (Longest Acceptable Token Match), so this module always outputs 'latm'.
+
+This is deemed to be a feature.
 
 =head2 What are the details of the nodes in the raw tree?
 
-Under the root, there are a set of nodes:
+The first few nodes are:
 
-=over 4
+	Marpa value()
+	    |--- Class = MarpaX::Grammar::Parser::statements [BLESS 1]
+	         |--- 0 = [] [ARRAY 2]
+	              |--- 0 = 0 [SCALAR 3]
+	              |--- 1 = 2460 [SCALAR 4]
 
-=item o One node for the offset of the start of each grammar statement within the input stream.
+This says the input text offsets are from 0 to 2460. I.e. share/stringparser.bnf is 2461 bytes long.
 
-The node's name is the integer start offset.
+After this there are a set of nodes like this, one per statement:
 
-=item o One node for the offset of the end of each grammar statement within the input stream.
+	|--- Class = MarpaX::Grammar::Parser::statement [BLESS 5]
+	|    |--- 2 = [] [ARRAY 6]
+	|         |--- 0 = 0 [SCALAR 7]
+	|         |--- 1 = 34 [SCALAR 8]
+	|         |--- Class = MarpaX::Grammar::Parser::default_rule [BLESS 9]
+	:         :
 
-The node's name is the integer end offset.
+For complex statements, these node can be nested to considerable depth.
 
-=item o N nodes, 1 per statement in the grammar
+This says the first statement in the BNF is at offsets 0 .. 34, and happens to be the default rule
+(':default ::= action => [values]').
 
-The node's names are either an item from the user's grammar (when the attribute 'type' is 'Grammar')
-or a Marpa-assigned token (when the attribute 'type' is 'Marpa').
-
-Each node is the root of a subtree describing the statement.
-
-See share/stringparser.raw.attributes.tree. The tree has attributes displayed using
-(bind_attributes => 1), and share/stringparser.raw.tree for the same tree without attributes
-(bind_attributes => 0).
-
-=back
-
-The attributes of each node are a hashref, with these keys:
-
-=over 4
-
-=item o type
-
-This indicates what type of node it is.  Values:
-
-=over 4
-
-=item o 'Grammar' => The node's name is an item from the user-specified grammar.
-
-=item o 'Marpa' => Marpa has assigned a class to the node (or to one of its parents)
-
-The class name is for the form: $class_name::$node_name.
-
-C<$class_name> is a constant provided by this module, and is 'MarpaX::Grammar::Parser::Dummy'.
-
-The technique used to generate this file is discussed above, under L</Data Files>.
-
-Note: The file share/stringparser.treedumper shows some class names, but they are currently I<not>
-stored in the tree returned by the method L</raw_tree()>.
-
-=back
-
-=back
-
-See share/stringparser.raw.tree.
-
-=head2 Why are attributes used to identify bracketed names?
-
-Because L<dot|http://graphviz.org> assigns a special meaning to labels which begin with '<' and
-'<<'.
-
-=head2 What is the format of the hashref of the cooked tree?
-
-The keys in the hashref are the types of statements found in the grammar, and the values for those
-keys are either '1' to indicate the key exists, or a hashref.
-
-The latter hashref's keys are all the sub-types of statements found in the grammar, for the given
-statement.
-
-The pattern of keys pointing to either '1' or a hashref, is repeated to whatever depth is required
-to represent the tree.
-
-See share/*.hashref for sample output. Instructions for producing this output are detailed under
-L</Data Files>.
-
-=head2 Why did you write your own formatter for the output hashref?
-
-I tried some fine modules (L<Data::Dumper>, L<Data::Dumper::Concise> and L<Data::Dump::Streamer>),
-but even though they may have every option you want, they don't have the options I<I> want.
-
-=head2 How do I sort the daughters of a node?
-
-Here's one way, using the node names as sort keys.
-
-As an example, choose $root as either $self -> cooked_tree or $self -> raw_tree, and then:
-
-	@daughters = sort{$a -> name cmp $b -> name} $root -> daughters;
-
-	$root -> set_daughters(@daughters);
-
-Note: Since the original order of the daughters, in both the cooked and raw trees, is significant,
-sorting is contra-indicated.
+See share/stringparser.raw.tree, or any file share/*.raw.tree.
 
 =head2 Where did the basic code come from?
 
@@ -1910,33 +1344,21 @@ in the thread 'Low-hanging fruit'. I modified it slightly for a module context.
 
 The original code is shipped as scripts/metag.pl.
 
-=head2 Why did you use Data::TreeDump?
+=head2 Why did you use Data::RenderAsTree?
 
 It offered the output which was most easily parsed of the modules I tested.
-The others were L<Data::Dumper>, L<Data::TreeDraw>, L<Data::TreeDumper> and L<Data::Printer>.
+The others were L<Data::TreeDump>, L<Data::Dumper>, L<Data::TreeDraw>, L<Data::TreeDumper>
+and L<Data::Printer>.
 
 =head2 Where is Marpa's Homepage?
 
-L<http://jeffreykegler.github.io/Ocean-of-Awareness-blog/>.
-
-=head2 Are there any articles discussing Marpa?
-
-Yes, many by its author, and several others. See Marpa's homepage, just above, and:
-
-L<The Marpa Guide|http://marpa-guide.github.io/>, (in progress, by Peter Stuifzand and Ron Savage).
-
-L<Parsing a here doc|http://peterstuifzand.nl/2013/04/19/parse-a-heredoc-with-marpa.html>, by Peter
-Stuifzand.
-
-L<An update of parsing here docs|http://peterstuifzand.nl/2013/04/22/changes-to-the-heredoc-parser-example.html>,
-by Peter Stuifzand.
-
-L<Conditional preservation of whitespace|http://savage.net.au/Ron/html/Conditional.preservation.of.whitespace.html>,
-by Ron Savage.
+L<http://savage.net.au/Marpa.html>.
 
 =head1 See Also
 
 L<MarpaX::Demo::JSONParser>.
+
+L<MarpaX::Demo::SampleScripts>.
 
 L<MarpaX::Demo::StringParser>.
 
@@ -1944,7 +1366,11 @@ L<MarpaX::Grammar::GraphViz2>.
 
 L<MarpaX::Languages::C::AST>.
 
-L<Data::TreeDumper>.
+L<MarpaX::Languages::Perl::PackUnpack>.
+
+L<MarpaX::Languages::SVG::Parser>.
+
+L<Data::RenderAsTree>.
 
 L<Log::Handler>.
 

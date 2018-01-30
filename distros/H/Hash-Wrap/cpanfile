@@ -1,4 +1,3 @@
-requires "Hash::Util" => "0";
 requires "MRO::Compat" => "0";
 requires "Scalar::Util" => "0";
 requires "perl" => "5.008009";

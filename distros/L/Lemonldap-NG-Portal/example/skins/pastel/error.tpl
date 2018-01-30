@@ -34,7 +34,7 @@
     </TMPL_IF>
 
     <div class="buttons">
-      <a href="<TMPL_VAR NAME="PORTAL_URL">" class="positive">
+      <a href="<TMPL_VAR NAME="PORTAL_URL"><TMPL_IF NAME="AUTH_URL">/?url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>" class="positive">
         <img src="<TMPL_VAR NAME="SKIN_PATH">/common/accept.png" alt="" />
         <lang en="Go to portal" fr="Aller au portail" />
       </a>

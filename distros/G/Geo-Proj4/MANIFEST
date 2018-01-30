@@ -1,5 +1,4 @@
-Changes
-INSTALL
+ChangeLog
 MANIFEST
 META.yml
 Makefile.PL
@@ -13,6 +12,6 @@ lib/Geo/Proj4.pod
 src/4.8.0/projects.h
 t/10utm.t
 t/20clark80.t
-t/99pod.t
 typemap
+xt/99pod.t
 META.json                                Module JSON meta-data (added by MakeMaker)

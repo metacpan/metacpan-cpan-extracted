@@ -1,5 +1,10 @@
 Revision history for JSON-MaybeXS
 
+1.003010 - 2018-01-28
+ - use bundled ExtUtils::HasCompiler rather than ExtUtils::CBuilder to detect
+   compiler availability.
+ - clarify exported JSON in documentation
+
 1.003009 - 2017-02-27
  - fix tests to no longer rely on . being in @INC (RT#120404)
 

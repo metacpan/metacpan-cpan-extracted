@@ -1,5 +1,15 @@
 Revision history for PICA::Data
 
+0.35  2018-01-29 16:48:55 CET
+
+0.35  2018-01-29 16:29:52 CET
+    - add PICA::Schema
+    - add parsers and writers to documentation
+    - add Generic writer
+    - check if occurrence is defined 
+    - add PICA::Writer::PPXML to documentation
+    - fix version number in cpanfile
+
 0.34  2017-11-18 13:04:04 CET
     - add dependencies to cpanfile
     - use XML::Writer to generate XML files

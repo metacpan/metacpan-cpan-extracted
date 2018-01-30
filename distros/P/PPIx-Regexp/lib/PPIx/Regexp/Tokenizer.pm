@@ -28,6 +28,7 @@ use PPIx::Regexp::Token::GroupType::BranchReset	();
 use PPIx::Regexp::Token::GroupType::Code	();
 use PPIx::Regexp::Token::GroupType::Modifier	();
 use PPIx::Regexp::Token::GroupType::NamedCapture	();
+use PPIx::Regexp::Token::GroupType::Script_Run	();
 use PPIx::Regexp::Token::GroupType::Subexpression	();
 use PPIx::Regexp::Token::GroupType::Switch	();
 use PPIx::Regexp::Token::Interpolation		();
@@ -42,7 +43,7 @@ use PPIx::Regexp::Token::Whitespace		();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -1636,7 +1637,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2017 by Thomas R. Wyant, III
+Copyright (C) 2009-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

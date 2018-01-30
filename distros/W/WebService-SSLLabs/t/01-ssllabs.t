@@ -141,7 +141,7 @@ foreach my $endpoint (@endpoints) {
 				ok(($client->version() =~ /\d/smx) || (q[] eq $client->version()), "\$client->version() is a version number of some sort or an empty string");
 				ok($client->is_reference() =~ /^[01]$/smx, "\$client->is_reference() is a 0 or is a 1");
 				ok($result->error_code() =~ /^[01]$/smx, "\$result->error_code() is a 0 or is a 1");
-				ok($result->attempts() == 1, "\$result->attempts() is a 1");
+				ok($result->attempts() =~ /^\d+$/smx, "\$result->attempts() is a number");
 				if (defined $result->protocol_id()) {
 					ok($result->protocol_id() =~ /^\d+$/smx, "\$result->protocol_id() is a number");
 				}

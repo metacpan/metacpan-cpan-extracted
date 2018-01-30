@@ -1,4 +1,4 @@
-#!/usr/bin/env perl 
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ my $ROOT = $FindBin::Bin.'/data/';
 
 subtest '... basic stream test' => sub {
 
-	my $stream = Directory::Scanner->for( $ROOT )->stream;
+	my $stream = Directory::Scanner->for( $ROOT );
 	isa_ok($stream, 'Directory::Scanner::Stream');
 
 	ok(!$stream->is_done, '... the stream is not done');
@@ -40,7 +40,7 @@ subtest '... basic stream test' => sub {
 
 subtest '... basic stream test using flatten' => sub {
 
-	my $stream = Directory::Scanner->for( $ROOT )->stream;
+	my $stream = Directory::Scanner->for( $ROOT );
 	isa_ok($stream, 'Directory::Scanner::Stream');
 
 	ok(!$stream->is_done, '... the stream is not done');

@@ -1,4 +1,7 @@
-Revision history for Net-Hadoop-YARN
+Revision history for Thrift-SASL-Transport
+
+0.007 2018-01-23 BURAK
+    Adding support for delegation token authentication (ashwin konale)
 
 0.006 2017-03-13 BURAK
     Notify about the cyrus-sasl issue.

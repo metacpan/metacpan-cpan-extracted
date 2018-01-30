@@ -15,7 +15,7 @@ our @ISA = qw(
 our @EXPORT = qw(
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use Carp;
 use Data::Dumper;
@@ -40,7 +40,7 @@ WWW::YouTube::Info::Simple - simple interface to WWW::YouTube::Info
   
   my $yt = WWW::YouTube::Info::Simple->new($id);
   
-  # hash reference holds values gained via http://youtube.com/get_video_info?video_id=foobar
+  # hash reference holds values gained via https://youtube.com/get_video_info?video_id=foobar
   my $info = $yt->get_info();
   # this is basically an inheritance to get_info() at WWW::YouTube::Info
   # $info->{title}          # e.g.: Foo+bar+-+%27Foobar%27
@@ -48,8 +48,8 @@ WWW::YouTube::Info::Simple - simple interface to WWW::YouTube::Info
   # $info->{keywords}       # e.g.: Foo%2Cbar%2CFoobar
   # $info->{length_seconds} # e.g.: 60
   # $info->{fmt_map}        # e.g.: 22%2F1280x720%2F9%2F0%2F115%2C35%2F854x480%2F9%2F0%2F115%2C34%2F640x360%2F9%2 ..
-  # $info->{fmt_url_map}    # e.g.: 22%7Chttp%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0.0 ..
-  # $info->{fmt_stream_map} # e.g.: 22%7Chttp%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0.0 ..
+  # $info->{fmt_url_map}    # e.g.: 22%7Chttps%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0. ..
+  # $info->{fmt_stream_map} # e.g.: 22%7Chttps%3A%2F%2Fv14.lscache1.c.youtube.com%2Fvideoplayback%3Fip%3D131.0.0. ..
   
   # array reference holds values keywords
   my $keys = $yt->get_keywords();
@@ -68,8 +68,8 @@ WWW::YouTube::Info::Simple - simple interface to WWW::YouTube::Info
   
   # hash reference holds values quality -> url
   my $url = $yt->get_url();
-  # $url->{35} e.g.: http://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
-  # $url->{22} e.g.: http://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
+  # $url->{35} e.g.: https://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
+  # $url->{22} e.g.: https://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
   # ..
   
   # URL decoded RTMPE URL
@@ -184,8 +184,8 @@ Croaks if not available.
   
   # hash reference holds values quality -> url
   my $url = $yt->get_url();
-  # $url->{35} e.g.: http://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
-  # $url->{22} e.g.: http://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
+  # $url->{35} e.g.: https://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
+  # $url->{22} e.g.: https://v14.lscache1.c.youtube.com/videoplayback?ip=131.0.0.0 ..
   # ..
 
 YouTube videos can be downloaded in given qualities by means of these URLs and the usual suspects (C<wget>, ..).
@@ -270,12 +270,18 @@ sub _url_encoded_fmt_stream_map {
   my @url_encoded_fmt_stream_map_parts = split /%2C/, $url_encoded_fmt_stream_map;
   foreach my $item ( @url_encoded_fmt_stream_map_parts ) {
     $item = _url_decode($item);
-    (my $url = $item) =~ s/.*url=(.*)&fallback_host=.*/$1/;
+    (my $url = $item) =~ s/.*url=(.*)(?:&.*|$)/$1/;
     $url = _url_decode($url);
     (my $quality = $url) =~ s/.*&itag=(\d+)&.*/$1/;
-    (my $signature = $item) =~ s/.*&sig=([\d\w.]+)&.*/$1/;
-    next unless $quality and $url and $signature;
-    $self->{url}->{$quality} = $url.'&signature='.$signature;
+
+    # fix multiple occurrences of parameters
+    my ($url_base, $params) = split /\?/, $url;
+    my %params_uniq = map { $_ => 1 } split /&/, $params;
+    my $params_uniq = join('&', keys %params_uniq);
+    $url = $url_base . '?' . $params_uniq;
+
+    next unless $quality and $url;
+    $self->{url}->{$quality} = $url;
   }
 
   return $self->{url};
@@ -339,7 +345,7 @@ L<WWW::YouTube::Info> and L<WWW::YouTube::Info::Simple> as well.
 Please report bugs and/or feature requests to
 C<bug-WWW-YouTube-Info-Simple at rt.cpan.org>,
 alternatively by means of the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-YouTube-Info-Simple>.
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-YouTube-Info-Simple>.
 
 =head1 AUTHOR
 
@@ -347,7 +353,7 @@ east E<lt>east@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by east
+Copyright (C) by east
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

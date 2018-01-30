@@ -15,11 +15,14 @@ is $x, 0, "baselline var ok";
 my $e = $mod->new(1, \&perform, $x);
 $e->start;
 
-sleep 1;
-is data(), 10, "event is async and correct";
-sleep 1;
+sleep 2;
+my $data = data();
+ok $data > 0 && $data < 30, "event is async and correct";
+
+sleep 2;
 $e->stop;
-ok data() > 10, "event is async, and is correct again";
+$data = data();
+ok $data >= 30, "event is async, and is correct again";
 
 sub perform {
     $x += 10;

@@ -17,7 +17,6 @@ Theres are a number of dependancies required for Roary, with instructions specif
 * CentOS/RedHat
 * Bioconda - OSX/Linux
 * Galaxy
-* Homebrew/Linuxbrew - OSX/Linux
 * Guix - Linux
 * Virtual Machine - OSX/Linux/Windows
 * Docker - OSX/Linux/Windows/Cloud
@@ -40,10 +39,7 @@ sudo cpanm -f Bio::Roary
 ```
 
 ### Ubuntu 12.04
-Some of the software versions in apt are quite old so follow the instructions for [LinuxBrew](http://brew.sh/linuxbrew/) below.
-
-## CentOS/RedHat
-To install the dependancies, the easiest way is to install [LinuxBrew](http://brew.sh/linuxbrew/) using the steps for Fedora, then follow the steps below for installing Roary on LinuxBrew.
+Some of the software versions in apt are quite old so follow the instructions for Bioconda below.
 
 ## Bioconda - OSX/Linux
 Install conda. Then install bioconda and roary:
@@ -57,16 +53,7 @@ conda install roary
 ```
 
 ## Galaxy
-Roary is available from the Galaxy toolshed ( as is Prokka).
-
-## Homebrew/Linuxbrew - OSX/Linux
-Assuming you have [homebrew](http://brew.sh/) (OSX) or [linuxbrew](http://brew.sh/linuxbrew/) (Linux) setup and installed on your system:
-
-```
-brew tap homebrew/science
-brew install bedtools cd-hit blast mcl parallel prank mafft fasttree cpanm
-sudo cpanm -f Bio::Roary
-```
+Roary is available from the Galaxy toolshed ( as is Prokka ).
 
 ## GNU Guix
 Roary is included in [Guix](https://www.gnu.org/software/guix) and can be installed in the usual way:
@@ -122,14 +109,14 @@ bedtools cd-hit blast mcl GNUparallel prank mafft fasttree
 ```
 
 ## Ancient systems and versions of perl
-The code will not work with perl 5.8 or below (pre-modern perl). We no longer test against 5.10 (released 2007). If you're running a very old verison of Linux, you're also in trouble.
+The code will not work with perl 5.8 or below (pre-modern perl). We no longer test against 5.10 (released 2007) or 5.12 (released 2010). If you're running a very old verison of Linux, you're also in trouble.
 
 # Versions of software we test against
-* Perl 5.14, 5.16, 5.20, 5.24
-* cdhit 4.6.1
-* ncbi blast+ 2.4.0
+* Perl 5.14, 5.26
+* cdhit 4.6.8
+* ncbi blast+ 2.6.0
 * mcl 14-137
 * bedtools 2.27.1
-* prank 130410
-* GNU parallel 20130922, 20160722, 20150122
+* prank 140603
+* GNU parallel 20170822, 20160722
 * FastTree 2.1.9

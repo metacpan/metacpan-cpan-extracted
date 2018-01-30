@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Hash;
 use Prty::Option;
@@ -113,7 +113,7 @@ sub new {
     }
 
     if (!$dbmsName) {
-        $class->throw(q{SQL-00001: Unbekanntes DBMS},Dbms=>$dbms);
+        $class->throw(q~SQL-00001: Unbekanntes DBMS~,Dbms=>$dbms);
     }
 
     # Objekt instantiieren
@@ -383,7 +383,7 @@ sub resolve {
         my $val = shift;
         if ($val =~ /%s/) {
             $self->throw(
-                q{SQL-00099: Wert enthält %s},
+                q~SQL-00099: Wert enthält %s~,
                 Value=>$val,
             );
         }
@@ -710,7 +710,7 @@ sub dataType {
     my $dbms = $self->{'dbms'};
     if (!exists $DataType{$dbms}{$portableType}) {
         $self->throw(
-            q{SQL-00003: Unbekannter Datentyp},
+            q~SQL-00003: Unbekannter Datentyp~,
             Type=>$portableType,
         );
     }
@@ -718,7 +718,7 @@ sub dataType {
     my $dbmsType = $DataType{$dbms}{$portableType};
     unless ($dbmsType) {
         $self->throw(
-            q{SQL-00004: Datentyp von DBMS nicht unterstützt},
+            q~SQL-00004: Datentyp von DBMS nicht unterstützt~,
             Dbms=>$dbms,
             Type=>$portableType,
         );
@@ -907,7 +907,7 @@ sub columnDef {
     }
     if (!$type) {
         $self->throw(
-            q{SQL-00007: Kein Kolumnen-Typ für DBMS angegeben},
+            q~SQL-00007: Kein Kolumnen-Typ für DBMS angegeben~,
             DBMS=>$dbms,
         );
     }
@@ -3867,7 +3867,7 @@ sub select {
     }
     elsif ($selectClause) {
         $self->throw(
-            q{SELECT-00001: Kein Platzhalter für SELECT-Kolumnen},
+            q~SELECT-00001: Kein Platzhalter für SELECT-Kolumnen~,
             Stmt=>$stmt,
             SelectClause=>$selectClause,
         );
@@ -3882,7 +3882,7 @@ sub select {
         }
         else {
             $self->throw(
-                q{SELECT-00002: Kein Platzhalter für FROM-Klausel},
+                q~SELECT-00002: Kein Platzhalter für FROM-Klausel~,
                 Stmt=>$stmt,
                 FromClause=>$fromClause,
             );
@@ -3899,7 +3899,7 @@ sub select {
         }
         else {
             $self->throw(
-                q{SELECT-00003: Kein Platzhalter für WHERE-Klausel},
+                q~SELECT-00003: Kein Platzhalter für WHERE-Klausel~,
                 Stmt=>$stmt,
                 WhereClause=>$whereClause,
             );
@@ -3915,7 +3915,7 @@ sub select {
         }
         else {
             $self->throw(
-                q{SELECT-00003: Kein Platzhalter für GROUP BY-Klausel},
+                q~SELECT-00003: Kein Platzhalter für GROUP BY-Klausel~,
                 Stmt=>$stmt,
                 GroupByClause=>$groupByClause,
             );
@@ -3931,7 +3931,7 @@ sub select {
         }
         else {
             $self->throw(
-                q{SELECT-00003: Kein Platzhalter für HAVING-Klausel},
+                q~SELECT-00003: Kein Platzhalter für HAVING-Klausel~,
                 Stmt=>$stmt,
                 HavingClause=>$havingClause,
             );
@@ -3947,7 +3947,7 @@ sub select {
         }
         else {
             $self->throw(
-                q{SELECT-00003: Kein Platzhalter für ORDER BY-Klausel},
+                q~SELECT-00003: Kein Platzhalter für ORDER BY-Klausel~,
                 Stmt=>$stmt,
                 OrderByClause=>$orderByClause,
             );
@@ -3964,7 +3964,7 @@ sub select {
             }
             else {
                 $self->throw(
-                    q{SELECT-00003: Kein Platzhalter für LIMIT},
+                    q~SELECT-00003: Kein Platzhalter für LIMIT~,
                     Stmt=>$stmt,
                     Limit=>$limit,
                 );
@@ -3979,7 +3979,7 @@ sub select {
             }
             else {
                 $self->throw(
-                    q{SELECT-00003: Kein Platzhalter für OFFSET},
+                    q~SELECT-00003: Kein Platzhalter für OFFSET~,
                     Stmt=>$stmt,
                     Offset=>$offset,
                 );
@@ -4623,7 +4623,7 @@ sub keyExpr {
     my $refType = ref $expr;
     if (!$refType) {
         if (!defined $expr || $expr eq '') {
-            $self->throw(q{SQL-00005: Identifier fehlt});
+            $self->throw(q~SQL-00005: Identifier fehlt~);
         }
         return $expr;
     }
@@ -4820,7 +4820,7 @@ sub expr {
 
     my $meth = $opMethod{$op};
     if (!$meth) {
-        $self->throw(q{SQL-00006: Unbekannte SQL-Operation},Operation=>$op);
+        $self->throw(q~SQL-00006: Unbekannte SQL-Operation~,Operation=>$op);
     }
 
     # Argumente (indirekt rekursiv) auflösen
@@ -5215,7 +5215,7 @@ sub diff {
         }
         else {
             $self->throw(
-                q{SQL-00003: Unbekannter Datentyp},
+                q~SQL-00003: Unbekannter Datentyp~,
                 Type=>$type,
             );
         }
@@ -5259,7 +5259,7 @@ sub diff {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -5267,7 +5267,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

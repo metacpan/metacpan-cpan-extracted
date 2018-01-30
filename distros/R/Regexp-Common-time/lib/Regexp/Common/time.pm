@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 package Regexp::Common::time;
-$Regexp::Common::time::VERSION = '0.14';
+$Regexp::Common::time::VERSION = '0.15';
 use Regexp::Common qw(pattern);
 
 sub _croak { require Carp; goto &Carp::croak}
@@ -746,12 +746,14 @@ pattern name => ['time', 'iso'],
     qq/(?k:/,
     qq/(?=\\d)/,     # Expect a digit
     qq/(?:/,         # Begin optional date portion
-        qq/(?k:$master{yr4})/,   $m2middle,   qq/(?k:$master{dy2})/,
+        qq/(?k:$master{yr4})/, qq/(?:-)(?k:$master{mo2})(?:-)/, qq/(?k:$master{dy2})/,
     qq/)?/,          # End optional date portion
     $dt_sep,
     qq/(?:/,         # Begin optional time portion
-        qq/(?k:$master{hr2})/,  $min2middle,  qq/(?k:$master{sc2})/,
-    qq/)?)/;         # End optional time portion
+        qq/(?k:$master{hr2})/, qq/(?::)(?k:$master{mi2})(?::)/, qq/(?k:$master{sc2}(?:\.\\d+)?)/,
+    qq/)?/,          # End optional time portion
+    qq/(?k:$master{tz})?/, # Optional time zone portion
+    qq/)/;
 
 pattern name => ['time', 'mail'],
     create => join '',

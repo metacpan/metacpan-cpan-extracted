@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Perl;
 use Prty::Http::Cookie;
@@ -822,7 +822,7 @@ sub fromString {
         # X-(.*?):
         elsif (!$received) {
             $self->throw(
-                q{HTTP-00003: Unbekannte HTTP Headerzeile},
+                q~HTTP-00003: Unbekannte HTTP Headerzeile~,
                 Line=>$_,
             );
         }
@@ -859,7 +859,7 @@ sub fromString {
     }
     else {
         $self->throw(
-            q{HTTP-00001: Transfer-Encoding nicht unterstützt},
+            q~HTTP-00001: Transfer-Encoding nicht unterstützt~,
             Value=>$transferEncoding,
         );
     }
@@ -977,7 +977,7 @@ sub asString {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -985,7 +985,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

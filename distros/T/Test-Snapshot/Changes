@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-Snapshot
 
+0.05	Fri Jan 26 22:53:04 GMT 2018
+ - generate diff rather than full dump on test-fail
+
 0.04	Thu Jan 11 01:55:54 GMT 2018
  - instead use App::Prove
 

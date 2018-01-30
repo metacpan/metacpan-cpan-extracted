@@ -6,12 +6,15 @@ SYNOPSIS
 
     A simple event. Multiple events can be simultaneously used. For an
     example using an event that can share data with the main application,
-    see "EXAMPLES".
+    examples of how to handle event crashes, and how to send parameters to
+    your event callback, see "EXAMPLES".
 
         use Async::Event::Interval;
     
-        my $event
-            = Async::Event::Interval->new(1.5, \&callback);
+        my $event = Async::Event::Interval->new(
+            1.5, 
+            \&callback
+        );
     
         $event->start;
     
@@ -21,7 +24,15 @@ SYNOPSIS
             $event->stop if $_ == 3;
             $event->start if $_ == 7;
     
-            print "event is running: " . $event->status . "\n";
+            if ($event->status){
+                print "event is running\n";
+            }
+    
+            if ($event->status == -1){
+                print "event has crashed... restarting it\n";
+                $event->restart;
+            }
+    
             sleep 1;
         }
     
@@ -77,9 +88,33 @@ METHODS
 
  status
 
-    Return 0 (false) if the event is not running, and 1 (true) if it is.
+    Returns the event's process ID (true) if it is running, 0 (false) if it
+    isn't, and -1 if the event has crashed.
 
 EXAMPLES
+
+ Event Parameters
+
+    You can send in a list of parameters to the event callback. Changing
+    these within the main program will have no effect on the values sent
+    into the event itself.
+
+        use Async::Event::Interval
+    
+        my @params = qw(1 2 3);
+    
+        my $event = Async::Event::Interval->new(
+            1,
+            \&callback,
+            @params
+        );
+    
+        sub callback {
+            my ($one, $two, $three) = @_;
+            print "$one, $two, $three\n";
+        }
+
+ Shared Data
 
     A timed event where the event callback shares a hash reference with the
     main program.
@@ -97,13 +132,61 @@ EXAMPLES
             $h->{a}++;
         }
 
+ Event crash: Restart event
+
+        use warnings;
+        use strict;
+        use feature 'say';
+    
+        use Async::Event::Interval;
+    
+        my $event = Async::Event::Interval->new(
+            2,
+            sub {
+                kill 9, $$;
+            },
+        );
+    
+        $event->start;
+    
+        sleep 1; # do stuff
+    
+        if ($event->status == -1){
+            say "event crashed, restarting";
+            $event->restart;
+        }
+
+ Event crash: End program
+
+        use warnings;
+        use strict;
+        use feature 'say';
+    
+        use Async::Event::Interval;
+    
+        my $event = Async::Event::Interval->new(
+            2,
+            sub {
+                kill 9, $$;
+            },
+        );
+    
+        $event->start;
+    
+        sleep 1; # do stuff
+    
+        if ($event->status == -1){
+            say "event crashed, can't continue...";
+            exit;
+        }
+
 AUTHOR
 
     Steve Bertrand, <steveb at cpan.org>
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2016 Steve Bertrand.
+    Copyright 2017 Steve Bertrand.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

@@ -168,14 +168,6 @@ tconv_EXPORT char *tconv_fromcode(tconv_t tconvp);
 tconv_EXPORT char *tconv_tocode(tconv_t tconvp);
 
 /**********************************************************************/
-/* If source and destination charsets are equivalent, implementations */
-/* MAY do fuzzy convertion (i.e. no conversion at all). The following */
-/* methods are setter and getter for this fuzzy state.                */
-/**********************************************************************/
-tconv_EXPORT short tconv_fuzzy_setb(tconv_t tconvp, short fuzzyb);
-tconv_EXPORT short tconv_fuzzy_getb(tconv_t tconvp, short *fuzzybp);
-
-/**********************************************************************/
 /* Helper                                                             */
 /**********************************************************************/
 typedef struct tconv_helper tconv_helper_t;

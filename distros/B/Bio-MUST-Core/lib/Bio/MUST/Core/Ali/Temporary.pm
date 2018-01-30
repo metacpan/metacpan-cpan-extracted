@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Temporary;
 # ABSTRACT: Thin wrapper for a temporary mapped Ali written on disk
-$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180190';
+$Bio::MUST::Core::Ali::Temporary::VERSION = '0.180230';
 use Moose;
 use namespace::autoclean;
 
@@ -29,7 +29,7 @@ has 'seqs' => (
     handles  => [
         qw(count_comments all_comments get_comment
             guessing all_seq_ids has_uniq_ids is_protein is_aligned
-            get_seq get_seq_with_id all_seqs filter_seqs count_seqs
+            get_seq get_seq_with_id first_seq all_seqs filter_seqs count_seqs
             gapmiss_regex
         )
     ],      # comment-related methods needed by IdList
@@ -41,14 +41,6 @@ has 'args' => (
     isa      => 'HashRef',
     builder  => '_build_args',
 );
-
-## no critic (ProhibitUnusedPrivateSubroutines)
-
-sub _build_args {
-    return { clean => 1, degap => 1 };
-}
-
-## use critic
 
 
 has 'file' => (
@@ -72,12 +64,26 @@ has 'mapper' => (
     handles  => [ qw(all_long_ids all_abbr_ids long_id_for abbr_id_for) ],
 );
 
+with 'Bio::MUST::Core::Roles::Aliable';
+
+## no critic (ProhibitUnusedPrivateSubroutines)
+
+sub _build_args {
+    return { clean => 1, degap => 1 };
+}
+
+## use critic
+
 sub BUILD {
     my $self = shift;
 
+    # remove persistent key (if any) from args before temp_fasta call
+    my %args = %{ $self->args };
+    delete $args{persistent};
+
+    # create temporary FASTA file and setup associated IdMapper
     my $ali = $self->seqs;
-    ### args: $self->args
-    my ($filename, $mapper) = $ali->temp_fasta( $self->args );
+    my ($filename, $mapper) = $ali->temp_fasta( \%args );
     $self->_set_file($filename);
     $self->_set_mapper($mapper);
 
@@ -87,12 +93,8 @@ sub BUILD {
 sub DEMOLISH {
     my $self = shift;
 
-    # TODO: allow for more control on this
-    $self->remove;
-
-    # Note: I know I could use UNLINK => 1 in File::Temp constuctor
-    # but this would need to be done in Ali::temp_fasta and would prevent
-    # keeping around a temp file for debugging purposes
+    $self->remove
+        unless $self->args->{persistent};
 
     return;
 }
@@ -121,7 +123,7 @@ Bio::MUST::Core::Ali::Temporary - Thin wrapper for a temporary mapped Ali writte
 
 =head1 VERSION
 
-version 0.180190
+version 0.180230
 
 =head1 SYNOPSIS
 
@@ -137,7 +139,7 @@ version 0.180190
     use aliased 'Bio::MUST::Core::Ali::Temporary';
 
     # build Ali::Temporary object from existing ALI file
-    my $temp_db = Temporary->new( seqs => 'database.ali');
+    my $temp_db = Temporary->new( seqs => 'database.ali' );
 
     # get properties
     my $db = $temp_db->filename;
@@ -172,7 +174,14 @@ version 0.180190
     my $temp_ls = Temporary->new( seqs => \@seqs );
 
     # build Ali::Temporary object preserving gaps in Seq objects
-    my $temp_gp = Temporary->new( seqs => \@seqs, args => { degap => 0 } );
+    # (and persistent associated FASTA file)
+    my $temp_gp = Temporary->new(
+        seqs => \@seqs,
+        args => { degap => 0, persistent => 1 }
+    );
+    my $filename = $temp_gp->filename;
+    # later...
+    unlink $filename;
 
 =head1 DESCRIPTION
 
@@ -202,20 +211,24 @@ objects (see the SYNOPSIS for examples).
 
 For now, it provides the following methods: C<count_comments>,
 C<all_comments>, C<get_comment>, C<guessing>, C<all_seq_ids>, C<has_uniq_ids>,
-C<is_protein>, C<is_aligned>, C<get_seq>, C<get_seq_with_id>, C<all_seqs>,
-C<filter_seqs> and C<count_seqs> (see L<Bio::MUST::Core::Ali>).
+C<is_protein>, C<is_aligned>, C<get_seq>, C<get_seq_with_id>, C<first_seq>,
+C<all_seqs>, C<filter_seqs> and C<count_seqs> (see L<Bio::MUST::Core::Ali>).
 
 =head2 args
 
 HashRef (optional)
 
-When specified this optional attribute is passed as is to the C<temp_fasta>
-method of the internal C<Ali> object. Its purpose is to allow the fine-tuning
-of the format of the associated temporary FASTA file.
+When specified this optional attribute is passed to the C<temp_fasta> method
+of the internal C<Ali> object. Its purpose is to allow the fine-tuning of the
+format of the associated temporary FASTA file.
 
 By default, its contents is C<clean => 1> and C<degap => 1>, so as to generate
-a FASTA file of deggaped sequences where ambiguous and missing states are
+a FASTA file of degapped sequences where ambiguous and missing states are
 replaced by C<X>.
+
+Additionally, if you want to keep your temporary files around for debugging
+purposes, you can pass the option C<persistent => 1>. This will disable the
+autoremoval of the file on object destruction.
 
 =head2 file
 
@@ -257,8 +270,12 @@ This method does not accept any arguments.
 
 =head2 remove
 
-Remove (unlink) the associated temporary FASTA file. Since this method is
-automatically invoked at object destruction, users should not need it.
+Remove (unlink) the associated temporary FASTA file.
+
+Since this method is in principle automatically invoked on object destruction,
+users should not need it. Note that C<persistent> temporary files (see object
+constructor) have to be removed manually, which requires to get and store
+their C<filename> before object destruction.
 
 =head1 AUTHOR
 

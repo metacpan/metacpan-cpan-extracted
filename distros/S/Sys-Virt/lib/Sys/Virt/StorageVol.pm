@@ -48,16 +48,16 @@ sub _new {
 
     my $self;
     if (exists $params{name}) {
-	my $pool = exists $params{pool} ? $params{pool} : die "pool parameter is requried";
+	my $pool = exists $params{pool} ? $params{pool} : die "pool parameter is required";
 	$self = Sys::Virt::StorageVol::_lookup_by_name($pool,  $params{name});
     } elsif (exists $params{key}) {
-	my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+	my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
 	$self = Sys::Virt::StorageVol::_lookup_by_key($con,  $params{key});
     } elsif (exists $params{path}) {
-	my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+	my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
 	$self = Sys::Virt::StorageVol::_lookup_by_path($con,  $params{path});
     } elsif (exists $params{xml}) {
-	my $pool = exists $params{pool} ? $params{pool} : die "pool parameter is requried";
+	my $pool = exists $params{pool} ? $params{pool} : die "pool parameter is required";
 	if ($params{clone}) {
 	    $self = Sys::Virt::StorageVol::_create_xml_from($pool,  $params{xml}, $params{clone}, 0);
 	} else {

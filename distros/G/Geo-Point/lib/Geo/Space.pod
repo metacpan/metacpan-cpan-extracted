@@ -32,9 +32,9 @@ Extends L<"Constructors" in Geo::Shape|Geo::Shape/"Constructors">.
  
 =over 4
 
-=item $obj-E<gt>B<new>([$components], %options)
+=item $obj-E<gt>B<new>( [$components], %options )
 
-=item Geo::Space-E<gt>B<new>([$components], %options)
+=item Geo::Space-E<gt>B<new>( [$components], %options )
 
 When called as instance method, some defaults are copied from the
 object where the call is made upon.  Usually called as class method.
@@ -59,7 +59,7 @@ Extends L<"Attributes" in Geo::Shape|Geo::Shape/"Attributes">.
  
 =over 4
 
-=item $obj-E<gt>B<component>($index, [$index, ...])
+=item $obj-E<gt>B<component>( $index, [$index, ...] )
 
 Returns the component (or components) with the specified $index(es). One
 L<Geo::Shape|Geo::Shape> object in scalar context, and multiple in list context.
@@ -111,7 +111,7 @@ Extends L<"Projections" in Geo::Shape|Geo::Shape/"Projections">.
  
 =over 4
 
-=item $obj-E<gt>B<in>(<$label|'utm'>)
+=item $obj-E<gt>B<in>( <$label|'utm'> )
 
 Inherited, see L<Geo::Shape/"Projections">
 
@@ -140,13 +140,13 @@ Inherited, see L<Geo::Shape/"Geometry">
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item $obj-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
-=item Geo::Space-E<gt>B<bboxRing>([$xmin, $ymin, $xmax, $ymax, [$proj]])
+=item Geo::Space-E<gt>B<bboxRing>( [$xmin, $ymin, $xmax, $ymax, [$proj]] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
-=item $obj-E<gt>B<distance>($object, [$unit])
+=item $obj-E<gt>B<distance>( $object, [$unit] )
 
 Inherited, see L<Geo::Shape/"Geometry">
 
@@ -181,7 +181,7 @@ Inherited, see L<Geo::Shape/"Display">
 
 Inherited, see L<Geo::Shape/"Display">
 
-=item $obj-E<gt>B<toString>([$projection])
+=item $obj-E<gt>B<toString>( [$projection] )
 
 Returns a string representation of the line, which is also used for
 stringification.
@@ -221,27 +221,14 @@ The limitation is purely caused by lack of time to implement this.
 
 =head1 SEE ALSO
 
-This module is part of Geo-Point distribution version 0.96,
-built on January 21, 2014. Website: F<http://perl.overmeer.net/geo/>
-All modules in this suite:
-L</Geo::Point>,
-L</Geo::Proj4>,
-L</Geo::WKT>,
-L</Math::Polygon>,
-L</Geo::GML>,
-L</Geo::ISO19139>,
-L</Geo::EOP>,
-L</Geo::Format::Envisat>, and
-L</Geo::Format::Landsat>.
-
-Please post questions or ideas to the mailinglist at
-F<http://geo-perl@list.hut.fi>
+This module is part of Geo-Point distribution version 0.97,
+built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2005-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2005-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

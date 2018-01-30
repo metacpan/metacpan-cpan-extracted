@@ -8,7 +8,7 @@
 #include <raylib.h>
 
 #include "const-c.inc"
-#
+
 static bool ColorEqual(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
@@ -493,14 +493,6 @@ DrawRectangleRec(rec, color)
     Color    color
 
 void
-DrawRectangleT(posX, posY, width, height, color)
-    int    posX
-    int    posY
-    int    width
-    int    height
-    Color    color
-
-void
 DrawRectangleV(position, size, color)
     Vector2    position
     Vector2    size
@@ -673,9 +665,11 @@ GenImageGradientV(width, height, top, bottom)
     Color    bottom
 
 Image
-GenImagePerlinNoise(width, height, scale)
+GenImagePerlinNoise(width, height, offsetX, offsetY, scale)
     int    width
     int    height
+    int    offsetX
+    int    offsetY
     float    scale
 
 Image
@@ -811,6 +805,10 @@ GetExtension(fileName)
 int
 GetFPS()
 
+const char *
+GetFileName(filePath)
+    const char *    filePath
+
 float
 GetFrameTime()
 
@@ -859,6 +857,9 @@ GetImageData(image)
 int
 GetKeyPressed()
 
+Matrix
+GetMatrixModelview()
+
 Vector2
 GetMousePosition()
 
@@ -885,6 +886,12 @@ GetMusicTimePlayed(music)
     Music    music
 
 int
+GetPixelDataSize(width, height, arg2)
+    int    width
+    int    height
+    int    arg2
+
+int
 GetRandomValue(min, max)
     int    min
     int    max
@@ -909,6 +916,9 @@ GetTextureData(texture)
 
 Texture2D
 GetTextureDefault()
+
+double
+GetTime()
 
 int
 GetTouchPointsCount()
@@ -943,9 +953,24 @@ void
 HideCursor()
 
 void
+ImageAlphaClear(image, color, threshold)
+    Image *    image
+    Color    color
+    float    threshold
+
+void
+ImageAlphaCrop(image, threshold)
+    Image *    image
+    float    threshold
+
+void
 ImageAlphaMask(image, alphaMask)
     Image *    image
     Image    alphaMask
+
+void
+ImageAlphaPremultiply(image)
+    Image *    image
 
 void
 ImageColorBrightness(image, brightness)
@@ -1026,6 +1051,10 @@ ImageFormat(image, newFormat)
     int    newFormat
 
 void
+ImageMipmaps(image)
+    Image *    image
+
+void
 ImageResize(image, newWidth, newHeight)
     Image *    image
     int    newWidth
@@ -1081,6 +1110,10 @@ IsAudioBufferProcessed(stream)
 
 bool
 IsAudioDeviceReady()
+
+bool
+IsAudioStreamPlaying(stream)
+    AudioStream    stream
 
 bool
 IsCursorHidden()
@@ -1258,7 +1291,7 @@ LoadImageFromAV(array_ref, color_cb, width, height)
             call_sv(color_cb, G_SCALAR);
             SPAGAIN;
             SV *ret = POPs;
-            if (sv_isa(ret, "Color"))
+            if (sv_isa(ret, "Graphics::Raylib::XS::Color"))
                 color = *(Color *)SvPV_nolen(SvRV(ret));
 
             where = my_ImageSet(pixels, where, color, 1, 1);
@@ -1271,7 +1304,7 @@ LoadImageFromAV(array_ref, color_cb, width, height)
     {
         SV * RETVALSV;
         RETVALSV = sv_newmortal();
-        sv_setref_pvn(RETVALSV, "Image", (char *)&RETVAL, sizeof(RETVAL));
+        sv_setref_pvn(RETVALSV, "Graphics::Raylib::XS::Image", (char *)&RETVAL, sizeof(RETVAL));
         ST(0) = RETVALSV;
     }
     XSRETURN(1);
@@ -1414,6 +1447,16 @@ SaveImageAs(fileName, image)
     Image    image
 
 void
+SetAudioStreamPitch(stream, pitch)
+    AudioStream    stream
+    float    pitch
+
+void
+SetAudioStreamVolume(stream, volume)
+    AudioStream    stream
+    float    volume
+
+void
 SetCameraAltControl(altKey)
     int    altKey
 
@@ -1441,7 +1484,7 @@ SetCameraSmoothZoomControl(szKey)
 
 void
 SetConfigFlags(flags)
-    char    flags
+    unsigned char    flags
 
 void
 SetExitKey(key)
@@ -1470,7 +1513,7 @@ SetMousePosition(position)
 void
 SetMusicLoopCount(music, count)
     Music    music
-    float    count
+    int    count
 
 void
 SetMusicPitch(music, pitch)
@@ -1525,6 +1568,10 @@ void
 SetTextureWrap(texture, wrapMode)
     Texture2D    texture
     int    wrapMode
+
+void
+SetTraceLog(types)
+    unsigned char    types
 
 void
 SetVrDistortionShader(shader)
@@ -1675,6 +1722,7 @@ UpdateTextureFromImage(texture, image)
     Image image
   CODE:
     UpdateTexture(texture, GetImageData(image));
+
 
 void
 UpdateVrTracking(camera)

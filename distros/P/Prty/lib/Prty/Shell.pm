@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Time::HiRes ();
 use Prty::Option;
@@ -295,7 +295,7 @@ sub exec {
     }
     else {
         $self->throw(
-            q{CMD-00004: Ungültiger Wert für -capture},
+            q~CMD-00004: Ungültiger Wert für -capture~,
             Capture=>$capture,
         );
     }
@@ -502,7 +502,7 @@ sub checkError {
     }
     elsif ($errCode == -1) {
         $this->throw(
-            q{CMD-00001: Kommando konnte nicht aufgerufen werden},
+            q~CMD-00001: Kommando konnte nicht aufgerufen werden~,
             Command=>$cmd,
             ErrorMessage=>$errMsg,
         );
@@ -511,7 +511,7 @@ sub checkError {
         my $sig = $errCode & 127;  # unterste 8 Bit sind Signalnummer
         my $core = $errCode & 128; # 8. Bit zeigt Coredump an
         $this->throw(
-            q{CMD-00003: Kommando wurde abgebrochen},
+            q~CMD-00003: Kommando wurde abgebrochen~,
             Signal=>$sig.($core? ' (Coredump)': ''),
             Command=>$cmd,
             ErrorMessage=>$errMsg,
@@ -519,7 +519,7 @@ sub checkError {
     }
     $errCode >>= 8;
     $this->throw(
-        q{CMD-00002: Kommando endete mit Fehler},
+        q~CMD-00002: Kommando endete mit Fehler~,
         ExitCode=>$errCode,
         Command=>$cmd,
         Cwd=>Cwd::getcwd,
@@ -531,7 +531,7 @@ sub checkError {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -539,7 +539,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

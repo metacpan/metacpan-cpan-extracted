@@ -1,5 +1,11 @@
 Revision history for Math-AnyNum
 
+0.21    2018-01-25
+
+        - Extended the `complex()` function to accept an additional argument, which specifies the imaginary part.
+        - Reimplemented the `rat_approx()` method for much better performance (~3x faster).
+        - More efficient conversion of Math::GComplex objects with Math::AnyNum components.
+
 0.20    2018-01-05
 
         - Added parsing support for complex numbers in Cartesian form, such as "(3 4)" for "3+4i".

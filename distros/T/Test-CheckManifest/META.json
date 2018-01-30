@@ -1,0 +1,53 @@
+{
+   "abstract" : "Check if your Manifest matches your distro",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-CheckManifest",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "Test::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CPAN::Meta::YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Test-CheckManifest/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Test-CheckManifest",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Test-CheckManifest.git",
+         "web" : "http://github.com/reneeb/Test-CheckManifest"
+      }
+   },
+   "version" : "1.33",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

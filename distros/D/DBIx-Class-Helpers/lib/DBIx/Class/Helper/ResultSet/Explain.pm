@@ -1,5 +1,5 @@
 package DBIx::Class::Helper::ResultSet::Explain;
-$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.033003';
+$DBIx::Class::Helper::ResultSet::Explain::VERSION = '2.033004';
 # ABSTRACT: Get query plan for a ResultSet
 
 use strict;
@@ -118,7 +118,7 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      1,
@@ -128,7 +128,7 @@ to your entire schema.
      0,
      4,
      "00",
-     undef
+     undef,
    ],
    [
      2,
@@ -138,7 +138,7 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      3,
@@ -148,7 +148,7 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      4,
@@ -158,7 +158,7 @@ to your entire schema.
      2,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      5,
@@ -168,7 +168,7 @@ to your entire schema.
      3,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      6,
@@ -178,7 +178,7 @@ to your entire schema.
      4,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      7,
@@ -188,7 +188,7 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      8,
@@ -198,7 +198,7 @@ to your entire schema.
      0,
      "",
      "01",
-     undef
+     undef,
    ],
    [
      9,
@@ -208,7 +208,7 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      10,
@@ -218,17 +218,17 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
+     undef,
    ],
    [
      11,
      "Transaction",
      0,
      0,
-     16,
+     17,
      0,
      "01",
-     undef
+     undef,
    ],
    [
      12,
@@ -238,7 +238,7 @@ to your entire schema.
      0,
      "Gnarly",
      "00",
-     undef
+     undef,
    ],
    [
      13,
@@ -248,22 +248,22 @@ to your entire schema.
      0,
      "",
      "00",
-     undef
-   ]
+     undef,
+   ],
  ]
 
 =head2 Pg
 
  [
    [
-     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.000..0.000 rows=0 loops=1)"
+     "Seq Scan on \"Gnarly\" me  (cost=0.00..16.20 rows=620 width=100) (actual time=0.001..0.001 rows=0 loops=1)",
    ],
    [
-     "Planning time: 0.188 ms"
+     "Planning time: 0.216 ms",
    ],
    [
-     "Execution time: 0.013 ms"
-   ]
+     "Execution time: 0.014 ms",
+   ],
  ]
 
 =head2 mysql
@@ -279,9 +279,9 @@ to your entire schema.
      undef,
      undef,
      1,
-     "100.00",
-     ""
-   ]
+     100,
+     "",
+   ],
  ]
 
 =head1 AUTHOR
@@ -290,7 +290,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

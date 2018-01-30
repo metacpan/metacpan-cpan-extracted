@@ -72,6 +72,7 @@ t/fetch-all.t
 t/fetch-hash.t
 t/fetch-source-map.t
 t/font-awesome.t
+t/from-helper.t
 t/google-font.t
 t/Helper.pm
 t/jpeg.t

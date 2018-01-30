@@ -24,8 +24,8 @@ DESCRIPTION
     that performs asynchronous operations using futures look neater and
     more expressive than simply using then chaining and other techniques on
     the futures themselves. It is also a similar syntax used by a number of
-    other languages; notably C# 5, EcmaScript 6, Python 3, and lately even
-    Rust is considering adding it.
+    other languages; notably C# 5, EcmaScript 6, Python 3, Dart. Rust is
+    considering adding it.
 
     The new syntax takes the form of two new keywords, async and await.
 
@@ -83,6 +83,30 @@ DESCRIPTION
     does not require it to make use of the await expression. It is still
     useful to turn the result of that function into a future, entirely
     without awaiting on any itself.
+
+    Any function that doesn't actually await anything, and just returns
+    immediate futures can be neatened by this module too.
+
+    Instead of writing
+
+       sub imm
+       {
+          ...
+          return Future->done( @result );
+       }
+
+    you can now simply write
+
+       async sub imm
+       {
+          ...
+          return @result;
+       }
+
+    with the added side-benefit that any exceptions thrown by the elided
+    code will be turned into an immediate-failed Future rather than making
+    the call itself propagate the exception, which is usually what you
+    wanted when dealing with futures.
 
 EARLY-VERSION WARNING
 
@@ -182,6 +206,19 @@ EARLY-VERSION WARNING
           }
        }
 
+    As map and grep involve implicit local behaviour on the $_ variable,
+    they also don't support await inside them.
+
+       async sub quoo
+       {
+          grep { await ... } LIST;
+       }
+    
+       async sub bah
+       {
+          map { await ... } LIST;
+       }
+
     Additionally, complications with the savestack appear to be affecting
     some uses of package-level our variables captured by async functions:
 
@@ -194,32 +231,6 @@ EARLY-VERSION WARNING
        }
 
     See also the "TODO" list for further things.
-
- Async Without Await
-
-    Any function that doesn't actually await anything, and just returns
-    immediate futures can be neatened by this module too.
-
-    Instead of writing
-
-       sub imm
-       {
-          ...
-          return Future->done( @result );
-       }
-
-    you can now simply write
-
-       async sub imm
-       {
-          ...
-          return @result;
-       }
-
-    with the added side-benefit that any exceptions thrown by the elided
-    code will be turned into an immediate-failed Future rather than making
-    the call itself propagate the exception, which is usually what you
-    wanted when dealing with futures.
 
 WITH OTHER MODULES
 
@@ -265,7 +276,8 @@ TODO
 
       * Clean up the implementation; check for and fix memory leaks.
 
-      * Support older versions of perl than 5.18.
+      * Currently this module requires perl version 5.16 or later. Support
+      perl version 5.14.
 
       https://rt.cpan.org/Ticket/Display.html?id=122252
 

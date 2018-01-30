@@ -70,4 +70,17 @@ ok(!-e $filename, '... and it got deleted as expected!');
 }
 ok(!-e $filename, '... and it got deleted as expected!');
 
+{
+    my $filepath = file('test', 'ali_with_qm.ali');
+    my $temp = $class->new(
+        seqs => $filepath,
+        args => { degap => 0, persistent => 1 }
+    );
+    $filename = $temp->filename;
+    compare_ok($filename, file('test', 'ali_with_qm_temp_gaps.fasta'),
+        "wrote expected Ali::Temporary preserving gaps: $filename");
+}
+ok(-e $filename, '... and it persisted as expected!');
+unlink $filename;
+
 done_testing;

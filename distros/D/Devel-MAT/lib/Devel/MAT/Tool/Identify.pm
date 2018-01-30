@@ -10,7 +10,7 @@ use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use List::Util qw( any pairs );
 use List::UtilsBy qw( nsort_by );
@@ -55,6 +55,7 @@ sub walk_graph
    my ( $node, $indent ) = @_;
    $indent //= "";
 
+   my $addr  = $node->addr;
    my @roots = $node->roots;
    my @edges = $node->edges_in;
 
@@ -71,10 +72,14 @@ sub walk_graph
    # Don't bother showing any non-root edges if we have a strong root
    @edges = () if any { $_->strength eq "strong" } @roots;
 
-   if( @edges > 0 and $seen{$node->addr}++ ) {
+   if( @edges > 0 and $seen{$addr} ) {
       Devel::MAT::Cmd->printf( "$indent└─already found " );
 
-      if( defined( my $id = $id_for{$node->addr} ) ) {
+      Devel::MAT::Cmd->printf( "%s ",
+         Devel::MAT::Cmd->format_note( "circularly" )
+      ) if $seen{$addr} == 1;
+
+      if( defined( my $id = $id_for{$addr} ) ) {
          Devel::MAT::Cmd->printf( "as %s\n",
             Devel::MAT::Cmd->format_note( "*$id" ),
          );
@@ -86,6 +91,8 @@ sub walk_graph
       }
       return;
    }
+
+   $seen{$addr}++;
 
    foreach my $idx ( 0 .. $#roots ) {
       my $isfinal = $idx == $#roots && !@edges;
@@ -125,13 +132,15 @@ sub walk_graph
 
       my $subindent = $indent . ( $is_final ? "  " : "│ " );
 
-      if( $refnode->addr == $node->addr ) {
+      if( $refnode->addr == $addr ) {
          Devel::MAT::Cmd->printf( "${subindent}itself\n" );
       }
       else {
          walk_graph( $refnode, $subindent );
       }
    }
+
+   $seen{$addr}++;
 }
 
 =head1 COMMANDS

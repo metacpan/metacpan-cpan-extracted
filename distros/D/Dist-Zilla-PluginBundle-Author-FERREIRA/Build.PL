@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Dist-Zilla-PluginBundle-Author-FERREIRA",
-  "dist_version" => "0.3.0",
+  "dist_version" => "0.4.0",
   "license" => "perl",
   "module_name" => "Dist::Zilla::PluginBundle::Author::FERREIRA",
   "recursive_test_files" => 1,
@@ -30,9 +30,9 @@ my %module_build_args = (
     "Dist::Zilla::PluginBundle::RJBS" => "5.010",
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Moose" => 0,
-    "Perl::PrereqScanner::Scanner::Jojo" => 0,
-    "Perl::PrereqScanner::Scanner::Mojo" => 0,
-    "Perl::PrereqScanner::Scanner::Zim" => 0
+    "Perl::PrereqScanner::Scanner::Jojo" => "v0.3.0",
+    "Perl::PrereqScanner::Scanner::Mojo" => "v0.3.0",
+    "Perl::PrereqScanner::Scanner::Zim" => "v0.2.0"
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,

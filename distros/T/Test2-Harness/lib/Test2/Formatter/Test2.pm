@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle first/;
@@ -136,12 +136,7 @@ sub init {
 
     $self->{+JOB_LENGTH} ||= 2;
 
-    unless ($self->{+IO}) {
-        my $io = clone_io(\*STDOUT) or die "Can't dup STDOUT: $!";
-        $self->{+IO} = $io;
-    }
-
-    my $io = $self->{+IO};
+    my $io = $self->{+IO} = clone_io($self->{+IO} || \*STDOUT) or die "Cannot get a filehandle: $!";
     $io->autoflush(1);
 
     $self->{+TTY} = -t $io unless defined $self->{+TTY};

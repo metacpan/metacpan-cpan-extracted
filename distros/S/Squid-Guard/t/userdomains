@@ -1,3 +1,5 @@
 foouser|foodom.com
 foouser|foo2dom.com
 baruser|bardom.com
+# hope every system has a bin group with the root user in it
++bin|bindom.com

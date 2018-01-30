@@ -352,10 +352,6 @@ calculating projections, this is more important than on maps.
 
 See the Geo::Point website at L<http://perl.overmeer.net/geo/> for
 an html version of this and related modules;
-L</Geo::GML>,
-L</Geo::Point>,
-L</Geo::WKT> and
-L</Math::Polygon>
 
 Effusive thanks to Frank Warmerdam (maintainer of PROJ.4) and Gerald
 Evenden (main contributor of PROJ.4). Their PROJ.4 library home page:
@@ -366,7 +362,7 @@ proj(1), cs2cs(1), pj_init(3).
 =head1 COPYRIGHTS
 
 Developed and maintained by Mark Overmeer E<lt>markov@cpan.orgE<gt>.
-Copyright (c) 2004-2017 by the authors. All rights reserved.
+Copyright (c) 2004-2018 by the authors. All rights reserved.
 
 Originally Written by Schuyler Erle E<lt>schuyler@nocat.netE<gt> and
 Rich Gibson E<lt>rich@nocat.netE<gt>.  Their site: Mapping Hacks home

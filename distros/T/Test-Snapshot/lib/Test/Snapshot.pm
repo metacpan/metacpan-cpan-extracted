@@ -10,8 +10,9 @@ require File::Spec;
 require File::Path;
 require File::Basename;
 require Data::Dumper;
+use Text::Diff;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 our @EXPORT = qw(is_deeply_snapshot);
 
 sub is_deeply_snapshot {
@@ -20,19 +21,26 @@ sub is_deeply_snapshot {
   my $filename = _get_filename($description);
   if (-f $filename) {
     no strict;
-    $expected = eval _read_file($filename);
+    $expected = _read_file($filename);
     Test::More::diag("Error in snapshot '$filename': $@") if $@;
   } else {
     Test::More::diag("No snapshot filename '$filename' found");
   }
-  my $result = Test::More::is_deeply($got, $expected, $description);
-  if (!$result and $ENV{TEST_SNAPSHOT_UPDATE}) {
-    _make_dir_for($filename);
-    my $dumper = Data::Dumper->new([$got]);
-    $dumper->Indent(1)->Terse(1);
-    $dumper->Sortkeys(1) if $dumper->can("Sortkeys");
-    my $dump = $dumper->Dump;
-    _write_file($filename, $dump);
+  my $dumper = Data::Dumper->new([$got]);
+  $dumper->Indent(1)->Terse(1);
+  $dumper->Sortkeys(1) if $dumper->can("Sortkeys");
+  my $dump = $dumper->Dump;
+  my $result = $dump eq $expected;
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  if ($result) {
+    Test::More::pass($description);
+  } else {
+    Test::More::fail($description);
+    Test::More::diag(diff \$expected, \$dump);
+    if ($ENV{TEST_SNAPSHOT_UPDATE}) {
+      _make_dir_for($filename);
+      _write_file($filename, $dump);
+    }
   }
   $result;
 }

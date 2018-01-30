@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -410,7 +410,7 @@ sub register {
         my $schema = $app->yancy->backend->read_schema;
         for my $c ( keys %$schema ) {
             my $coll = $config->{collections}{ $c } ||= {};
-            my $conf_props = $coll->{properties};
+            my $conf_props = $coll->{properties} ||= {};
             my $schema_props = delete $schema->{ $c }{properties};
             for my $k ( keys %{ $schema->{ $c } } ) {
                 $coll->{ $k } ||= $schema->{ $c }{ $k };
@@ -675,7 +675,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

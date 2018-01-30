@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79752ca470833edca691dba3a6141bd64c7cfe85 AUTHOR_PLEDGE
+SHA1 350cde384cba401f06d886ac09ec9b74ae6ec80d Changes
+SHA1 2d831dbf3273271a42b5256cc5bb3a4e0ca7625c INSTALL
+SHA1 eb157f25f1e662b3d0a5085afbb8d20427d1348e LICENSE
+SHA1 4ac7fd3b04bb56bf000e7d92188fe7c7c2aafb19 MANIFEST
+SHA1 68ecf145fe4f5633831f40c0d89bde1ce57c0ab1 META.json
+SHA1 90217cbbc201283a8f58a922d9901ba5a6101a86 META.yml
+SHA1 58c5a709c59da48a6f602b20457d9357f795ae43 Makefile.PL
+SHA1 980e2e0121da06ce286c667aa64ecd488a100a04 README.mkdn
+SHA1 7c6d12f7155f0e73f58999c7272817ea64561065 cpanfile
+SHA1 351563a846c392d92fdd928cc94f0725a1dd4cbf doap.xml
+SHA1 af87c37b949afa0ab3b70947de5f6c18086b0a57 lib/MooseX/Attribute/Multibuilder.pm
+SHA1 fd7580e7670b61cc0755ccac9c0d28b8063cb67e t/00-compile.t
+SHA1 e465d25038fe5f33cb72678ddb6d36aa08b556f4 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 546eacb2c443906d19da8f6a340a374af090c033 t/basic.t
+SHA1 5b11c680836f8153bc48160ecedb88fdf0b9af91 t/together.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlpryzAACgkQ34Hwf+GwC4xTSwCeMHNNAfTqPggg98danFCJnXOq
+iLUAnRCtUVeMf4BkStVDSFJXYm5v5Oe5
+=Ckec
+-----END PGP SIGNATURE-----

@@ -24,27 +24,28 @@ my(%params) =
 		SUFFIX		=> 'gz'
 	},
 	DISTNAME	=> 'Tree-DAG_Node',
-	LICENSE		=> 'artistic_2',
 	NAME		=> 'Tree::DAG_Node',
 	PL_FILES	=> {},
 	PREREQ_PM	=>
 	{
 		'File::Slurp::Tiny'	=> 0.003,
+		'open'				=> 0,
 		'strict'			=> 0,
+		'utf8'				=> 0,
 		'warnings'			=> 0,
 	},
 	TEST_REQUIRES =>
 	{
 		'File::Spec'	=> 3.40,
 		'File::Temp'	=> 0.19,
-		'Test::More'	=> 1.001014,
+		'Test::More'	=> 1.001002,
 	},
 	VERSION_FROM => 'lib/Tree/DAG_Node.pm',
 );
 
 if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
 {
-	$params{LICENSE} = 'artistic_2';
+	$params{LICENSE} = 'perl';
 }
 
 if ($ExtUtils::MakeMaker::VERSION ge '6.46')

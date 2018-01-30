@@ -5,43 +5,25 @@ use strict;
 use warnings;
 
 # Modules.
-use Dumpvalue;
-use Error::Pure::Die qw(err);
-use Error::Pure::Utils qw(err_get);
+use English qw(-no_match_vars);
+use Error::Pure qw(err);
+use Error::Pure::Utils qw(err_msg_hr);
 
 # Error in eval.
-eval { err '1', '2', '3'; };
+eval {
+        err 'Error',
+                'key1', 'val1',
+                'key2', 'val2';
+};
+if ($EVAL_ERROR) {
+        print $EVAL_ERROR;
+        my $err_msg_hr = err_msg_hr();
+        foreach my $key (sort keys %{$err_msg_hr}) {
+                print "$key: $err_msg_hr->{$key}\n";
+        }
+}
 
-# Error structure.
-my @err = err_get();
-
-# Dump.
-my $dump = Dumpvalue->new;
-$dump->dumpValues(\@err);
-
-# In \@err:
-# [
-#         {
-#                 'msg' => [
-#                         '1',
-#                         '2',
-#                         '3',
-#                 ],
-#                 'stack' => [
-#                         {
-#                                 'args' => '(1)',
-#                                 'class' => 'main',
-#                                 'line' => '9',
-#                                 'prog' => 'script.pl',
-#                                 'sub' => 'err',
-#                         },
-#                         {
-#                                 'args' => '',
-#                                 'class' => 'main',
-#                                 'line' => '9',
-#                                 'prog' => 'script.pl',
-#                                 'sub' => 'eval {...}',
-#                         },
-#                 ],
-#         },
-# ],
+# Output:
+# Error
+# key1: val1
+# key2: val2

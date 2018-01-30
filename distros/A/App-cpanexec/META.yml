@@ -27,7 +27,7 @@ no_index:
 provides:
   App::cpanexec:
     file: lib/App/cpanexec.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   local::lib: '0'
   perl: '5.008001'
@@ -35,6 +35,6 @@ resources:
   bugtracker: https://github.com/oklas/cpanexec/issues
   homepage: https://github.com/oklas/cpanexec
   repository: git://github.com/oklas/cpanexec.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:OKLAS
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

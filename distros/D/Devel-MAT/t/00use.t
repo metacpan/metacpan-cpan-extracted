@@ -21,6 +21,7 @@ use_ok( 'Devel::MAT::Tool::Count' );
 use_ok( 'Devel::MAT::Tool::Identify' );
 use_ok( 'Devel::MAT::Tool::Inrefs' );
 use_ok( 'Devel::MAT::Tool::IO' );
+use_ok( 'Devel::MAT::Tool::Outrefs' );
 use_ok( 'Devel::MAT::Tool::Reachability' );
 use_ok( 'Devel::MAT::Tool::Show' );
 use_ok( 'Devel::MAT::Tool::Sizes' );

@@ -5,7 +5,7 @@ use strict ;
 use Symbol ;
 use Carp ;
 
-$Inline::Java::Handle::VERSION = '0.53' ;
+$Inline::Java::Handle::VERSION = '0.53_90' ;
 
 
 # Here we store as keys the knots and as values our blessed objects
@@ -157,7 +157,7 @@ sub DESTROY {
 		 	$this->__close() ;	
 		}
 
-		$OBJECTS->{$this} = undef ;
+		delete $OBJECTS->{$this} ;
 	}
 	else {
 		Inline::Java::debug(4, "destroying Inline::Java::Handle") ;

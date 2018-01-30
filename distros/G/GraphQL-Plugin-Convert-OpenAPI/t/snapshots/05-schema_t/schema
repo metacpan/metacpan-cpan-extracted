@@ -1,0 +1,839 @@
+'type AllView {
+  _class: String
+  name: String
+  url: String
+}
+
+type BranchImpl {
+  _class: String
+  _links: BranchImpllinks
+  displayName: String
+  estimatedDurationInMillis: Int
+  fullDisplayName: String
+  fullName: String
+  latestRun: PipelineRunImpl
+  name: String
+  organization: String
+  parameters: [StringParameterDefinition]
+  permissions: BranchImplpermissions
+  pullRequest: String
+  weatherScore: Int
+}
+
+type BranchImpllinks {
+  _class: String
+  actions: Link
+  queue: Link
+  runs: Link
+  self: Link
+}
+
+type BranchImplpermissions {
+  _class: String
+  create: Boolean
+  read: Boolean
+  start: Boolean
+  stop: Boolean
+}
+
+type CauseAction {
+  _class: String
+  causes: [CauseUserIdCause]
+}
+
+type CauseUserIdCause {
+  _class: String
+  shortDescription: String
+  userId: String
+  userName: String
+}
+
+type ClassesByClass {
+  _class: String
+  classes: [String]
+}
+
+type ClockDifference {
+  _class: String
+  diff: Int
+}
+
+type ComputerSet {
+  _class: String
+  busyExecutors: Int
+  computer: [HudsonMasterComputer]
+  displayName: String
+  totalExecutors: Int
+}
+
+type DefaultCrumbIssuer {
+  _class: String
+  crumb: String
+  crumbRequestField: String
+}
+
+type DiskSpaceMonitorDescriptorDiskSpace {
+  _class: String
+  path: String
+  size: Int
+  timestamp: Int
+}
+
+type EmptyChangeLogSet {
+  _class: String
+  kind: String
+}
+
+type ExtensionClassContainerImpl1 {
+  _class: String
+  _links: ExtensionClassContainerImpl1links
+  map: ExtensionClassContainerImpl1map
+}
+
+type ExtensionClassContainerImpl1links {
+  _class: String
+  self: Link
+}
+
+type ExtensionClassContainerImpl1map {
+  _class: String
+  io_jenkins_blueocean_service_embedded_rest_MultiBranchPipelineImpl: ExtensionClassImpl
+  io_jenkins_blueocean_service_embedded_rest_PipelineImpl: ExtensionClassImpl
+}
+
+type ExtensionClassImpl {
+  _class: String
+  _links: ExtensionClassImpllinks
+  classes: [String]
+}
+
+type ExtensionClassImpllinks {
+  _class: String
+  self: Link
+}
+
+type FavoriteImpl {
+  _class: String
+  _links: FavoriteImpllinks
+  item: PipelineImpl
+}
+
+type FavoriteImpllinks {
+  _class: String
+  self: Link
+}
+
+type FreeStyleBuild {
+  _class: String
+  actions: [CauseAction]
+  building: Boolean
+  builtOn: String
+  changeSet: EmptyChangeLogSet
+  description: String
+  displayName: String
+  duration: Int
+  estimatedDuration: Int
+  executor: String
+  fullDisplayName: String
+  id: String
+  keepLog: Boolean
+  number: Int
+  queueId: Int
+  result: String
+  timestamp: Int
+  url: String
+}
+
+type FreeStyleProject {
+  _class: String
+  actions: [FreeStyleProjectactions]
+  buildable: Boolean
+  builds: [FreeStyleBuild]
+  color: String
+  concurrentBuild: Boolean
+  description: String
+  displayName: String
+  displayNameOrNull: String
+  firstBuild: FreeStyleBuild
+  fullDisplayName: String
+  fullName: String
+  healthReport: [FreeStyleProjecthealthReport]
+  inQueue: Boolean
+  keepDependencies: Boolean
+  lastBuild: FreeStyleBuild
+  lastCompletedBuild: FreeStyleBuild
+  lastFailedBuild: String
+  lastStableBuild: FreeStyleBuild
+  lastSuccessfulBuild: FreeStyleBuild
+  lastUnstableBuild: String
+  lastUnsuccessfulBuild: String
+  name: String
+  nextBuildNumber: Int
+  queueItem: String
+  scm: NullSCM
+  url: String
+}
+
+type FreeStyleProjectactions {
+  _class: String
+}
+
+type FreeStyleProjecthealthReport {
+  _class: String
+  description: String
+  iconClassName: String
+  iconUrl: String
+  score: Int
+}
+
+type GenericResource {
+  _class: String
+  displayName: String
+  durationInMillis: Int
+  id: String
+  result: String
+  startTime: String
+}
+
+type GithubContent {
+  _class: String
+  base64Data: String
+  name: String
+  owner: String
+  path: String
+  repo: String
+  sha: String
+  size: Int
+}
+
+type GithubFile {
+  _class: String
+  content: GithubContent
+}
+
+type GithubOrganization {
+  _class: String
+  _links: GithubOrganizationlinks
+  jenkinsOrganizationPipeline: Boolean
+  name: String
+}
+
+type GithubOrganizationlinks {
+  _class: String
+  repositories: Link
+  self: Link
+}
+
+type GithubRepositories {
+  _class: String
+  _links: GithubRepositorieslinks
+  items: [GithubRepository]
+  lastPage: Int
+  nextPage: Int
+  pageSize: Int
+}
+
+type GithubRepositorieslinks {
+  _class: String
+  self: Link
+}
+
+type GithubRepository {
+  _class: String
+  _links: GithubRepositorylinks
+  defaultBranch: String
+  description: String
+  fullName: String
+  name: String
+  permissions: GithubRepositorypermissions
+  private: Boolean
+}
+
+type GithubRepositorylinks {
+  _class: String
+  self: Link
+}
+
+type GithubRepositorypermissions {
+  _class: String
+  admin: Boolean
+  pull: Boolean
+  push: Boolean
+}
+
+type GithubRespositoryContainer {
+  _class: String
+  _links: GithubRespositoryContainerlinks
+  repositories: GithubRepositories
+}
+
+type GithubRespositoryContainerlinks {
+  _class: String
+  self: Link
+}
+
+type GithubScm {
+  _class: String
+  _links: GithubScmlinks
+  credentialId: String
+  id: String
+  uri: String
+}
+
+type GithubScmlinks {
+  _class: String
+  self: Link
+}
+
+type Hudson {
+  _class: String
+  assignedLabels: [HudsonassignedLabels]
+  description: String
+  jobs: [FreeStyleProject]
+  mode: String
+  nodeDescription: String
+  nodeName: String
+  numExecutors: Int
+  primaryView: AllView
+  quietingDown: Boolean
+  slaveAgentPort: Int
+  unlabeledLoad: UnlabeledLoadStatistics
+  useCrumbs: Boolean
+  useSecurity: Boolean
+  views: [AllView]
+}
+
+type HudsonMasterComputer {
+  _class: String
+  displayName: String
+  executors: [HudsonMasterComputerexecutors]
+  icon: String
+  iconClassName: String
+  idle: Boolean
+  jnlpAgent: Boolean
+  launchSupported: Boolean
+  loadStatistics: Label1
+  manualLaunchAllowed: Boolean
+  monitorData: HudsonMasterComputermonitorData
+  numExecutors: Int
+  offline: Boolean
+  offlineCause: String
+  offlineCauseReason: String
+  temporarilyOffline: Boolean
+}
+
+type HudsonMasterComputerexecutors {
+  _class: String
+  currentExecutable: FreeStyleBuild
+  idle: Boolean
+  likelyStuck: Boolean
+  number: Int
+  progress: Int
+}
+
+type HudsonMasterComputermonitorData {
+  _class: String
+  hudson_node_monitors_ArchitectureMonitor: String
+  hudson_node_monitors_ClockMonitor: ClockDifference
+  hudson_node_monitors_DiskSpaceMonitor: DiskSpaceMonitorDescriptorDiskSpace
+  hudson_node_monitors_ResponseTimeMonitor: ResponseTimeMonitorData
+  hudson_node_monitors_SwapSpaceMonitor: SwapSpaceMonitorMemoryUsage2
+  hudson_node_monitors_TemporarySpaceMonitor: DiskSpaceMonitorDescriptorDiskSpace
+}
+
+type HudsonassignedLabels {
+  _class: String
+}
+
+type InputStepImpl {
+  _class: String
+  _links: InputStepImpllinks
+  id: String
+  message: String
+  ok: String
+  parameters: [StringParameterDefinition]
+  submitter: String
+}
+
+type InputStepImpllinks {
+  _class: String
+  self: Link
+}
+
+type Label1 {
+  _class: String
+}
+
+type Link {
+  _class: String
+  href: String
+}
+
+type ListView {
+  _class: String
+  description: String
+  jobs: [FreeStyleProject]
+  name: String
+  url: String
+}
+
+type MultibranchPipeline {
+  _class: String
+  branchNames: [String]
+  displayName: String
+  estimatedDurationInMillis: Int
+  latestRun: String
+  name: String
+  numberOfFailingBranches: Int
+  numberOfFailingPullRequests: Int
+  numberOfSuccessfulBranches: Int
+  numberOfSuccessfulPullRequests: Int
+  organization: String
+  totalNumberOfBranches: Int
+  totalNumberOfPullRequests: Int
+  weatherScore: Int
+}
+
+type Mutation {
+  # Delete queue item from an organization pipeline queue
+  deletePipelineQueueItem(organization: String!, pipeline: String!, queue: String!): String
+  # Create a new job using job configuration, or copied from an existing job
+  postCreateItem(Content_Type: String, Jenkins_Crumb: String, body: String, from: String, mode: String, name: String!): String
+  # Create a new view using view configuration
+  postCreateView(Content_Type: String, Jenkins_Crumb: String, body: String, name: String!): String
+  # Build a job
+  postJobBuild(Jenkins_Crumb: String, json: String!, name: String!, token: String): String
+  # Update job configuration
+  postJobConfig(Jenkins_Crumb: String, body: String!, name: String!): String
+  # Delete a job
+  postJobDelete(Jenkins_Crumb: String, name: String!): String
+  # Disable a job
+  postJobDisable(Jenkins_Crumb: String, name: String!): String
+  # Enable a job
+  postJobEnable(Jenkins_Crumb: String, name: String!): String
+  # Stop a job
+  postJobLastBuildStop(Jenkins_Crumb: String, name: String!): String
+  # Replay an organization pipeline run
+  postPipelineRun(organization: String!, pipeline: String!, run: String!): QueueItemImpl
+  # Start a build for an organization pipeline
+  postPipelineRuns(organization: String!, pipeline: String!): QueueItemImpl
+  # Update view configuration
+  postViewConfig(Jenkins_Crumb: String, body: String!, name: String!): String
+  # Favorite/unfavorite a pipeline
+  putPipelineFavorite(body: putPipelineFavorite_bodyInput!, organization: String!, pipeline: String!): FavoriteImpl
+  # Stop a build of an organization pipeline
+  putPipelineRun(blocking: String, organization: String!, pipeline: String!, run: String!, timeOutInSecs: Int): PipelineRun
+}
+
+type NullSCM {
+  _class: String
+}
+
+type Organisation {
+  _class: String
+  name: String
+}
+
+type Pipeline {
+  _class: String
+  displayName: String
+  estimatedDurationInMillis: Int
+  fullName: String
+  latestRun: PipelinelatestRun
+  name: String
+  organization: String
+  weatherScore: Int
+}
+
+type PipelineActivity {
+  _class: String
+  artifacts: [PipelineActivityartifacts]
+  commitId: String
+  durationInMillis: Int
+  enQueueTime: String
+  endTime: String
+  estimatedDurationInMillis: Int
+  id: String
+  organization: String
+  pipeline: String
+  result: String
+  runSummary: String
+  startTime: String
+  state: String
+  type: String
+}
+
+type PipelineActivityartifacts {
+  _class: String
+  name: String
+  size: Int
+  url: String
+}
+
+type PipelineBranchesitem {
+  _class: String
+  displayName: String
+  estimatedDurationInMillis: Int
+  latestRun: PipelineBranchesitemlatestRun
+  name: String
+  organization: String
+  pullRequest: PipelineBranchesitempullRequest
+  totalNumberOfPullRequests: Int
+  weatherScore: Int
+}
+
+type PipelineBranchesitemlatestRun {
+  _class: String
+  commitId: String
+  durationInMillis: Int
+  enQueueTime: String
+  endTime: String
+  estimatedDurationInMillis: Int
+  id: String
+  organization: String
+  pipeline: String
+  result: String
+  runSummary: String
+  startTime: String
+  state: String
+  type: String
+}
+
+type PipelineBranchesitempullRequest {
+  _class: String
+  _links: PipelineBranchesitempullRequestlinks
+  author: String
+  id: String
+  title: String
+  url: String
+}
+
+type PipelineBranchesitempullRequestlinks {
+  _class: String
+  self: String
+}
+
+type PipelineFolderImpl {
+  _class: String
+  displayName: String
+  fullName: String
+  name: String
+  numberOfFolders: Int
+  numberOfPipelines: Int
+  organization: String
+}
+
+type PipelineImpl {
+  _class: String
+  _links: PipelineImpllinks
+  displayName: String
+  estimatedDurationInMillis: Int
+  fullName: String
+  latestRun: String
+  name: String
+  organization: String
+  weatherScore: Int
+}
+
+type PipelineImpllinks {
+  _class: String
+  actions: Link
+  queue: Link
+  runs: Link
+  self: Link
+}
+
+type PipelineRun {
+  _class: String
+  artifacts: [PipelineRunartifacts]
+  commitId: String
+  durationInMillis: Int
+  enQueueTime: String
+  endTime: String
+  estimatedDurationInMillis: Int
+  id: String
+  organization: String
+  pipeline: String
+  result: String
+  runSummary: String
+  startTime: String
+  state: String
+  type: String
+}
+
+type PipelineRunImpl {
+  _class: String
+  _links: PipelineRunImpllinks
+  commitId: String
+  durationInMillis: Int
+  enQueueTime: String
+  endTime: String
+  estimatedDurationInMillis: Int
+  id: String
+  organization: String
+  pipeline: String
+  result: String
+  runSummary: String
+  startTime: String
+  state: String
+  type: String
+}
+
+type PipelineRunImpllinks {
+  _class: String
+  actions: Link
+  log: Link
+  nodes: Link
+  self: Link
+  steps: Link
+}
+
+type PipelineRunNode {
+  _class: String
+  displayName: String
+  durationInMillis: Int
+  edges: [PipelineRunNodeedges]
+  id: String
+  result: String
+  startTime: String
+  state: String
+}
+
+type PipelineRunNodeedges {
+  _class: String
+  id: String
+}
+
+type PipelineRunartifacts {
+  _class: String
+  name: String
+  size: Int
+  url: String
+}
+
+type PipelineStepImpl {
+  _class: String
+  _links: PipelineStepImpllinks
+  displayName: String
+  durationInMillis: Int
+  id: String
+  input: InputStepImpl
+  result: String
+  startTime: String
+  state: String
+}
+
+type PipelineStepImpllinks {
+  _class: String
+  actions: Link
+  self: Link
+}
+
+type PipelinelatestRun {
+  _class: String
+  artifacts: [PipelinelatestRunartifacts]
+  commitId: String
+  durationInMillis: Int
+  enQueueTime: String
+  endTime: String
+  estimatedDurationInMillis: Int
+  id: String
+  organization: String
+  pipeline: String
+  result: String
+  runSummary: String
+  startTime: String
+  state: String
+  type: String
+}
+
+type PipelinelatestRunartifacts {
+  _class: String
+  name: String
+  size: Int
+  url: String
+}
+
+type Query {
+  # Retrieve authenticated user details for an organization
+  getAuthenticatedUser(organization: String!): User
+  # Get a list of class names supported by a given class
+  getClasses(class: String!): String
+  # Retrieve computer details
+  getComputer(depth: Int!): ComputerSet
+  # Retrieve CSRF protection token
+  getCrumb: DefaultCrumbIssuer
+  # Retrieve Jenkins details
+  getJenkins: Hudson
+  # Retrieve job details
+  getJob(name: String!): FreeStyleProject
+  # Retrieve job configuration
+  getJobConfig(name: String!): String
+  # Retrieve job\'s last build details
+  getJobLastBuild(name: String!): FreeStyleBuild
+  # Retrieve job\'s build progressive text output
+  getJobProgressiveText(name: String!, number: String!, start: String!): String
+  # Retrieve JSON Web Key
+  getJsonWebKey(key: Int!): String
+  # Retrieve JSON Web Token
+  getJsonWebToken(expiryTimeInMins: Int, maxExpiryTimeInMins: Int): String
+  # Retrieve organization details
+  getOrganisation(organization: String!): Organisation
+  # Retrieve all organizations details
+  getOrganisations: [Organisation]
+  # Retrieve pipeline details for an organization
+  getPipeline(organization: String!, pipeline: String!): Pipeline
+  # Retrieve all activities details for an organization pipeline
+  getPipelineActivities(organization: String!, pipeline: String!): [PipelineActivity]
+  # Retrieve branch details for an organization pipeline
+  getPipelineBranch(branch: String!, organization: String!, pipeline: String!): BranchImpl
+  # Retrieve branch run details for an organization pipeline
+  getPipelineBranchRun(branch: String!, organization: String!, pipeline: String!, run: String!): PipelineRun
+  # Retrieve all branches details for an organization pipeline
+  getPipelineBranches(organization: String!, pipeline: String!): MultibranchPipeline
+  # Retrieve pipeline folder for an organization
+  getPipelineFolder(folder: String!, organization: String!): PipelineFolderImpl
+  # Retrieve pipeline details for an organization folder
+  getPipelineFolderPipeline(folder: String!, organization: String!, pipeline: String!): PipelineImpl
+  # Retrieve queue details for an organization pipeline
+  getPipelineQueue(organization: String!, pipeline: String!): [QueueItemImpl]
+  # Retrieve run details for an organization pipeline
+  getPipelineRun(organization: String!, pipeline: String!, run: String!): PipelineRun
+  # Get log for a pipeline run
+  getPipelineRunLog(download: Boolean, organization: String!, pipeline: String!, run: String!, start: Int): String
+  # Retrieve run node details for an organization pipeline
+  getPipelineRunNode(node: String!, organization: String!, pipeline: String!, run: String!): PipelineRunNode
+  # Retrieve run node details for an organization pipeline
+  getPipelineRunNodeStep(node: String!, organization: String!, pipeline: String!, run: String!, step: String!): PipelineStepImpl
+  # Get log for a pipeline run node step
+  getPipelineRunNodeStepLog(node: String!, organization: String!, pipeline: String!, run: String!, step: String!): String
+  # Retrieve run node steps details for an organization pipeline
+  getPipelineRunNodeSteps(node: String!, organization: String!, pipeline: String!, run: String!): [PipelineStepImpl]
+  # Retrieve run nodes details for an organization pipeline
+  getPipelineRunNodes(organization: String!, pipeline: String!, run: String!): [PipelineRunNode]
+  # Retrieve all runs details for an organization pipeline
+  getPipelineRuns(organization: String!, pipeline: String!): [PipelineRun]
+  # Retrieve all pipelines details for an organization
+  getPipelines(organization: String!): [Pipeline]
+  # Retrieve queue details
+  getQueue: Queue
+  # Retrieve queued item details
+  getQueueItem(number: String!): Queue
+  # Retrieve SCM details for an organization
+  getSCM(organization: String!, scm: String!): GithubScm
+  # Retrieve SCM organization repositories details for an organization
+  getSCMOrganisationRepositories(credentialId: String, organization: String!, pageNumber: Int, pageSize: Int, scm: String!, scmOrganisation: String!): [GithubOrganization]
+  # Retrieve SCM organization repository details for an organization
+  getSCMOrganisationRepository(credentialId: String, organization: String!, repository: String!, scm: String!, scmOrganisation: String!): [GithubOrganization]
+  # Retrieve SCM organizations details for an organization
+  getSCMOrganisations(credentialId: String, organization: String!, scm: String!): [GithubOrganization]
+  # Retrieve user details for an organization
+  getUser(organization: String!, user: String!): User
+  # Retrieve user favorites details for an organization
+  getUserFavorites(user: String!): [FavoriteImpl]
+  # Retrieve users details for an organization
+  getUsers(organization: String!): User
+  # Retrieve view details
+  getView(name: String!): ListView
+  # Retrieve view configuration
+  getViewConfig(name: String!): String
+  # Retrieve Jenkins headers
+  headJenkins: String
+  # Search for any resource details
+  search(q: String!): String
+  # Get classes details
+  searchClasses(q: String!): String
+}
+
+type Queue {
+  _class: String
+  items: [QueueBlockedItem]
+}
+
+type QueueBlockedItem {
+  _class: String
+  actions: [CauseAction]
+  blocked: Boolean
+  buildable: Boolean
+  buildableStartMilliseconds: Int
+  id: Int
+  inQueueSince: Int
+  params: String
+  stuck: Boolean
+  task: FreeStyleProject
+  url: String
+  why: String
+}
+
+type QueueItemImpl {
+  _class: String
+  expectedBuildNumber: Int
+  id: String
+  pipeline: String
+  queuedTime: Int
+}
+
+type QueueLeftItem {
+  _class: String
+  actions: [CauseAction]
+  blocked: Boolean
+  buildable: Boolean
+  cancelled: Boolean
+  executable: FreeStyleBuild
+  id: Int
+  inQueueSince: Int
+  params: String
+  stuck: Boolean
+  task: FreeStyleProject
+  url: String
+  why: String
+}
+
+type ResponseTimeMonitorData {
+  _class: String
+  average: Int
+  timestamp: Int
+}
+
+type StringParameterDefinition {
+  _class: String
+  defaultParameterValue: StringParameterValue
+  description: String
+  name: String
+  type: String
+}
+
+type StringParameterValue {
+  _class: String
+  name: String
+  value: String
+}
+
+type SwapSpaceMonitorMemoryUsage2 {
+  _class: String
+  availablePhysicalMemory: Int
+  availableSwapSpace: Int
+  totalPhysicalMemory: Int
+  totalSwapSpace: Int
+}
+
+type UnlabeledLoadStatistics {
+  _class: String
+}
+
+type User {
+  _class: String
+  email: String
+  fullName: String
+  id: String
+  name: String
+}
+
+type putPipelineFavorite_body {
+  favorite: Boolean!
+}
+
+input putPipelineFavorite_bodyInput {
+  favorite: Boolean!
+}
+'

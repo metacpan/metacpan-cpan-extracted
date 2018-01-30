@@ -7,5 +7,7 @@ requires 'TOML', '0.95';
 on 'test' => sub {
     requires 'Test::More', '0.98';
     requires 'Test::Command', '0.11';
+    requires 'File::Spec';
+    requires 'File::Path';
 };
 

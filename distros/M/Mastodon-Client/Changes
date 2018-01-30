@@ -1,5 +1,11 @@
 Revision history for Mastodon::Client
 
+0.014     2018-01-23 19:27:43+00:00 Europe/London
+
+  * Changes:
+    * Allowed warnings in tests because of an open issue with
+      Net::Async::HTTP
+
 0.013     2018-01-21 22:29:25+00:00 Europe/London
 
   * Changes:

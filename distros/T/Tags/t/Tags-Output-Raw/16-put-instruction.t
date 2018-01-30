@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Tags::Output::Raw;
 use Test::More 'tests' => 4;
 use Test::NoWarnings;

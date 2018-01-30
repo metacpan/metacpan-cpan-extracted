@@ -16,6 +16,15 @@ bugs:
 wishlist:
 	- let xgettext-perl produce mo files as well.
 
+version 1.10: Tue Jan 23 23:03:57 CET 2018
+
+	Improvements:
+	- typo, rt.cpan.org#123008 [Lukas Mai]
+	- additional filename test in 30index.t
+	- add debugging of fn0 to t/30index.t
+	- convert to GIT
+	- publish on GitHUB
+
 version 1.09: Mon 28 Aug 10:37:30 CEST 2017
 
 	Fixes:

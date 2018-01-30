@@ -1,16 +1,19 @@
-# Copyrights 2001-2017 by [Mark Overmeer].
+# Copyrights 2001-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use strict;
-use warnings;
+# This code is part of distribution Mail-Message.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Mail::Message::Replace::MailInternet;
 use vars '$VERSION';
-$VERSION = '3.005';
+$VERSION = '3.006';
 
 use base 'Mail::Message';
+
+use strict;
+use warnings;
 
 use Mail::Box::FastScalar;
 use Mail::Box::Parser::Perl;
@@ -271,6 +274,8 @@ sub delete(@)
     @_ ?  $self->head->delete(@_) : $self->SUPER::delete;
 }
 
+#------------
+
 
 sub body(@)
 {   my $self = shift;
@@ -335,6 +340,8 @@ sub smtpsend(@)
     $self->send(via => 'smtp', %args);
 }
 
+#------------
+
 
 sub as_mbox_string()
 {   my $self    = shift;
@@ -345,6 +352,8 @@ sub as_mbox_string()
     $mboxmsg->print($file);
     $buffer;
 }
+
+#------------
 
 
 BEGIN {
@@ -361,6 +370,8 @@ sub isa($)
     return 1 if $class eq 'Mail::Internet';
     $thing->SUPER::isa($class);
 }
+
+#------------
 
 
 sub coerce() { confess }

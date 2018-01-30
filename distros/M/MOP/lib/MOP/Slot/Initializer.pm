@@ -10,7 +10,7 @@ use UNIVERSAL::Object::Immutable;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
@@ -64,7 +64,7 @@ MOP::Slot::Initializer - A representation of a class slot initializer
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

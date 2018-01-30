@@ -1,11 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 # Test case-preserving hash, where the first appearance is kept.
 
 use strict;
-use Test::More;
+use warnings;
 
-use lib qw/. t/;
+use Test::More;
 
 BEGIN {plan tests => 37}
 

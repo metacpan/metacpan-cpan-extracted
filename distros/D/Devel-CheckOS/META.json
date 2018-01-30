@@ -4,9 +4,10 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "unknown",
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -49,6 +50,5 @@
          "url" : "https://github.com/DrHyde/perl-modules-Devel-CheckOS"
       }
    },
-   "version" : "1.80",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.81"
 }

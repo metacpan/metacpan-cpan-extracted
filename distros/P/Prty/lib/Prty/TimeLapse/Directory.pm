@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Path;
 use Prty::TimeLapse::File;
@@ -158,7 +158,7 @@ sub new {
         my $n = $img->number;
         if ($hash{$n}) {
             $class->throw(
-                q{TIMELAPSE-00002: Duplicate image number},
+                q~TIMELAPSE-00002: Duplicate image number~,
                 Number=>$n,
                 File=>$img->path,
             );
@@ -433,7 +433,7 @@ sub resolveFunctionExpression {
     }
     else {
         $self->throw(
-            q{TIMELAPSE-00001: Unknown function},
+            q~TIMELAPSE-00001: Unknown function~,
             Function=>$func,
         );
     }
@@ -534,7 +534,7 @@ sub resolveIdentifier {
     }
     else {
         $self->throw(
-            q{TIMELAPSE-00001: Unknown identifier},
+            q~TIMELAPSE-00001: Unknown identifier~,
             Key=>$key,
             Directory=>$self->dir,
         );
@@ -677,7 +677,7 @@ sub image {
     
     if ($n !~ /^\d+$/) {
         $self->throw(
-            q{TIMELAPSE-00001: Not an integer},
+            q~TIMELAPSE-00001: Not an integer~,
             Key=>!defined $n? 'undef': $n eq ''? "''": $n,
         );
     }
@@ -782,7 +782,7 @@ sub importImages {
 
         if ($subDir =~ m|^/|) {
             $class->throw(
-                q{TIMEPAPSE-00001: Path of subdir must be relative},
+                q~TIMEPAPSE-00001: Path of subdir must be relative~,
                 Subdir=>$subDir,
             );
         }
@@ -945,7 +945,7 @@ sub reorganize {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -953,7 +953,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

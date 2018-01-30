@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2017-01-07 00:00:00 +0000 to present.
+Changes from 2017-01-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2018-01-07 10:17:19 +0000
+version 0.007 at 2018-01-23 18:58:11 +0000
 ------------------------------------------
+
+  Change: 236fe7312669b0595487e1d8f791592ce1006bb7
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2018-01-23 21:57:21 +0000
+
+    Merge pull request #3 from QBitFramework/fix_placeholders
+
+    fix execute 
+
+  Change: e7097ee7b4c29e85b0b5310c7ec35da4876b2100
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-23 21:56:13 +0000
+
+    fix execute 
+
+------------------------------------------
+version 0.006 at 2018-01-07 10:20:23 +0000
+------------------------------------------
+
+  Change: 25aa2f5e08139dde061929e559a60709caf8580a
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2018-01-07 13:20:23 +0000
+
+    Version 0.006 
 
   Change: 9b68c4ae9a1eb2ac2902c535fc1cab2f3b795fd1
   Author: Igor <igor-sverdlov@mail.ru>

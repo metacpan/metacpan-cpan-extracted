@@ -1,0 +1,32 @@
+Geo-Coordinates-MGRS-XS version 0.01
+====================================
+
+Geo::Coordinates::MGRS::XS - Perl extension for converting MGRS coordinates to
+UTM or lat/lon.
+
+This module is written in C/XS for an extra speed boost - if you're not
+too worried about execution speed you should probably take a look at the
+more mature Geo::Coordinates::UTM, which also handles MGRS coordinates.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by umeldt
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.22.0 or,
+at your option, any later version of Perl 5 you may have available.

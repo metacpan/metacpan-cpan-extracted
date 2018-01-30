@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Hash::Case - base class for hashes with key-casing requirements
@@ -99,14 +101,14 @@ example:
 
 =head1 SEE ALSO
 
-This module is part of Hash-Case distribution version 1.02,
-built on March 09, 2012. Website: F<http://perl.overmeer.net/hash-case/>
+This module is part of Hash-Case distribution version 1.03,
+built on January 22, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2002-2003,2007-2012 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2002-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

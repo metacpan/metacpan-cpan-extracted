@@ -1,11 +1,12 @@
 package Yancy::Backend::Test;
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 # ABSTRACT: A test backend for testing Yancy
 
 use Mojo::Base 'Mojo';
 use List::Util qw( max );
 use Mojo::JSON qw( from_json );
 use Mojo::File qw( path );
+use Storable qw( dclone );
 
 our %COLLECTIONS = ();
 our %SCHEMA = ();
@@ -80,7 +81,7 @@ sub delete {
 
 sub read_schema {
     my ( $self ) = @_;
-    return { %SCHEMA };
+    return dclone { %SCHEMA };
 }
 
 1;
@@ -95,7 +96,7 @@ Yancy::Backend::Test - A test backend for testing Yancy
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 AUTHOR
 

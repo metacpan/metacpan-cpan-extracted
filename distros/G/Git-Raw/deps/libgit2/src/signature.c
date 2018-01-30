@@ -5,8 +5,8 @@
  * a Linking Exception. For full terms see the included COPYING file.
  */
 
-#include "common.h"
 #include "signature.h"
+
 #include "repository.h"
 #include "git2/common.h"
 #include "posix.h"
@@ -25,7 +25,7 @@ void git_signature_free(git_signature *sig)
 
 static int signature_error(const char *msg)
 {
-	giterr_set(GITERR_INVALID, "Failed to parse signature - %s", msg);
+	giterr_set(GITERR_INVALID, "failed to parse signature - %s", msg);
 	return -1;
 }
 
@@ -90,6 +90,7 @@ int git_signature_new(git_signature **sig_out, const char *name, const char *ema
 
 	p->when.time = time;
 	p->when.offset = offset;
+	p->when.sign = (offset < 0) ? '-' : '+';
 
 	*sig_out = p;
 	return 0;
@@ -113,6 +114,7 @@ int git_signature_dup(git_signature **dest, const git_signature *source)
 
 	signature->when.time = source->when.time;
 	signature->when.offset = source->when.offset;
+	signature->when.sign = source->when.sign;
 
 	*dest = signature;
 
@@ -137,6 +139,7 @@ int git_signature__pdup(git_signature **dest, const git_signature *source, git_p
 
 	signature->when.time = source->when.time;
 	signature->when.offset = source->when.offset;
+	signature->when.sign = source->when.sign;
 
 	*dest = signature;
 
@@ -228,8 +231,12 @@ int git_signature__parse(git_signature *sig, const char **buffer_out,
 		const char *time_start = email_end + 2;
 		const char *time_end;
 
-		if (git__strtol64(&sig->when.time, time_start, &time_end, 10) < 0)
+		if (git__strtol64(&sig->when.time, time_start, &time_end, 10) < 0) {
+			git__free(sig->name);
+			git__free(sig->email);
+			sig->name = sig->email = NULL;
 			return signature_error("invalid Unix timestamp");
+		}
 
 		/* do we have a timezone? */
 		if (time_end + 1 < buffer_end) {
@@ -253,6 +260,7 @@ int git_signature__parse(git_signature *sig, const char **buffer_out,
 			 */
 			if (hours <= 14 && mins <= 59) {
 				sig->when.offset = (hours * 60) + mins;
+				sig->when.sign = tz_start[0];
 				if (tz_start[0] == '-')
 					sig->when.offset = -sig->when.offset;
 			}
@@ -295,7 +303,7 @@ void git_signature__writebuf(git_buf *buf, const char *header, const git_signatu
 	assert(buf && sig);
 
 	offset = sig->when.offset;
-	sign = (sig->when.offset < 0) ? '-' : '+';
+	sign = (sig->when.offset < 0 || sig->when.sign == '-') ? '-' : '+';
 
 	if (offset < 0)
 		offset = -offset;
@@ -316,6 +324,7 @@ bool git_signature__equal(const git_signature *one, const git_signature *two)
 		git__strcmp(one->name, two->name) == 0 &&
 		git__strcmp(one->email, two->email) == 0 &&
 		one->when.time == two->when.time &&
-		one->when.offset == two->when.offset;
+		one->when.offset == two->when.offset &&
+		one->when.sign == two->when.sign;
 }
 

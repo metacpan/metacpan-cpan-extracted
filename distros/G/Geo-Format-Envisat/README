@@ -1,5 +1,5 @@
-=== README for Geo-Format-Envisat version 0.03
-=   Generated on Thu Dec  1 14:21:28 2011 by OODoc 2.00
+=== README for Geo-Format-Envisat version 0.04
+=   Generated on Tue Jan 23 16:06:28 2018 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Geo-Format-Envisat-0.03.tar.gz
-       tar -xf Geo-Format-Envisat-0.03.tar
-       cd Geo-Format-Envisat-0.03
+       gzip -d Geo-Format-Envisat-0.04.tar.gz
+       tar -xf Geo-Format-Envisat-0.04.tar
+       cd Geo-Format-Envisat-0.04
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Geo-Format-Envisat-0.03/
+    http://search.cpan.org/dist/Geo-Format-Envisat-0.04/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Geo-Format-Envisat

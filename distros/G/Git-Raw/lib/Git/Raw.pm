@@ -1,5 +1,5 @@
 package Git::Raw;
-$Git::Raw::VERSION = '0.74';
+$Git::Raw::VERSION = '0.75';
 use strict;
 use warnings;
 
@@ -8,6 +8,7 @@ XSLoader::load('Git::Raw', $Git::Raw::VERSION);
 
 use Git::Raw::Error;
 use Git::Raw::Error::Category;
+use Git::Raw::AnnotatedCommit;
 use Git::Raw::Packbuilder;
 use Git::Raw::Blob;
 use Git::Raw::Commit;
@@ -17,6 +18,7 @@ use Git::Raw::Object;
 use Git::Raw::Odb;
 use Git::Raw::Odb::Object;
 use Git::Raw::Mempack;
+use Git::Raw::Rebase;
 use Git::Raw::Reference;
 use Git::Raw::Repository;
 use Git::Raw::Stash;
@@ -42,7 +44,7 @@ Git::Raw - Perl bindings to the Git linkable library (libgit2)
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 DESCRIPTION
 

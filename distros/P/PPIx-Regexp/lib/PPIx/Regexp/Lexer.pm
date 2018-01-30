@@ -56,13 +56,14 @@ use PPIx::Regexp::Structure::Quantifier			();
 use PPIx::Regexp::Structure::Regexp			();
 use PPIx::Regexp::Structure::RegexSet			();
 use PPIx::Regexp::Structure::Replacement		();
+use PPIx::Regexp::Structure::Script_Run			();
 use PPIx::Regexp::Structure::Switch			();
 use PPIx::Regexp::Structure::Unknown			();
 use PPIx::Regexp::Token::Unmatched			();
 use PPIx::Regexp::Tokenizer				();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 =head2 new
 
@@ -597,7 +598,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2017 by Thomas R. Wyant, III
+Copyright (C) 2009-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -20,6 +20,7 @@ my %options = %{
   NAME => 'Win32::GenRandom',
   VERSION_FROM => 'GenRandom.pm',
   PREREQ_PM => {Test::Warn => '0.23'},
+  LICENSE => 'perl',
   META_MERGE => {
    'meta-spec' => { version => 2 },
     resources => {

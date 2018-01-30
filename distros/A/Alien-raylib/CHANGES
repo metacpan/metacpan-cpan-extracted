@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2016-11-27 00:00:00 +0000 to present.
+Changes from 2017-01-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2017-11-27 02:07:05 +0000
+version 0.008 at 2018-01-27 01:07:02 +0000
+------------------------------------------
+
+  Change: 893dc44c48b5479409f210753cc60be72db1fd66
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-27 02:04:40 +0000
+
+    Point at most recent raylib upstream commit
+
+    This one correctly populates the .pc file on FreeBSD. 
+
+  Change: 57691396fae261696e73a565638198d88be5017e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-26 22:18:04 +0000
+
+    Drop libglew-dev as dependency
+
+    Isn't required. See #2. 
+
+------------------------------------------
+version 0.007 at 2018-01-25 21:00:52 +0000
+------------------------------------------
+
+  Change: b046be3eb0471765d6404215259d1c228a231e0b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-25 22:00:52 +0000
+
+    Note System requirements as requested in #2 
+
+  Change: b5af5e04d84da1b55d43ec2b15c932378d6549f5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-01-25 21:58:23 +0000
+
+    Point at newest raylib develop snapshot 
+
+------------------------------------------
+version 0.006 at 2017-11-27 02:07:00 +0000
 ------------------------------------------
 
   Change: 0e254b60579bdc98ed100fdac54817cc2208e1b2
@@ -45,58 +81,6 @@ version 0.003 at 2017-10-04 13:04:49 +0000
 
     Migrate to Alien::Build 
 
-------------------------------------------
-version 0.002 at 2017-01-16 13:15:17 +0000
-------------------------------------------
-
-  Change: 15d8de300664a9e8f3d417cc318f59893e9ae815
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-01-16 14:15:17 +0000
-
-    updated REAMDE.pod 
-
-  Change: 782600338494ca2cc9d88e9340e25e20f17afa3a
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-01-16 14:13:08 +0000
-
-    Merge pull request #1 from manwar/fix-cpants-issues
-
-    Fix cpants issues 
-
-  Change: 8e4ec47904cea82024c963be1d3acaea2f6ccbfa
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2017-01-16 12:17:57 +0000
-
-    Add mininmum perl version using dzil plugin [MinimumPerlFast]. 
-
-  Change: 5e0743c44e331831d41eed244aa19d411fb20b99
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2017-01-16 12:16:44 +0000
-
-    Auto generate META.json using dzil plugin [MetaJSON]. 
-
-  Change: 12e652000837c8cba3983922a46e95da19957b80
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2017-01-16 12:15:42 +0000
-
-    Fix pod error 
-
-------------------------------------------
-version 0.001 at 2017-01-15 21:37:16 +0000
-------------------------------------------
-
-  Change: ea699305f7da7e9d24675b942b53931c22088c3d
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-01-15 22:37:16 +0000
-
-    Added 2 tests 
-
-  Change: d1a7541a898a94e9c422569e281a8d461aea6cec
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-01-12 03:19:11 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2017-01-27 00:00:00 +0000.
+================================================

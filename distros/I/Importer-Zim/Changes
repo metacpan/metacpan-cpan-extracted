@@ -1,7 +1,11 @@
 
 Release history for Importer-Zim
 
-0.9.0     2017-12-29 15:57:11-08:00 America/Los_Angeles
+0.9.1     2018-01-26 16:57:03-08:00 America/Los_Angeles
+
+    - Require +Base 0.12.1+
+
+v0.9     2017-12-29 15:57:11-08:00 America/Los_Angeles
 
     - Setup default backends with IMPORTER_ZIM_BACKEND
     - prereqs: Make +EndOfScope the fallback backend

@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use App::JenkinsCli;
 
-our $VERSION = "0.011";
+our $VERSION = "0.012";
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -133,7 +133,7 @@ jenkins-cli - Operate Jenkins from the command line
 
 =head1 VERSION
 
-This documentation refers to jenkins-cli version 0.011
+This documentation refers to jenkins-cli version 0.012
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,8 @@ This documentation refers to jenkins-cli version 0.011
   queue         Show the current job build queue
   history job   Show a jobs build history (not yet implemented)
   config job    Show a config for a job
+  change job template.xslt
+                Update job configuration(s) with an XSLT template
   create job config.xml
                 Create a new job from "config.xml"
   watch job(s)  Watch a job or jobs status

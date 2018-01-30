@@ -9,7 +9,7 @@ package Rex::Virtualization::Docker::create;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands::Gather;
@@ -39,7 +39,7 @@ sub execute {
   }
 
   if ( !exists $opts->{"command"} ) {
-    die("You have to define a command.");
+    $opts->{command} = "";
   }
 
   my $options = _format_opts($opts);

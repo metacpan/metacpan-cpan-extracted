@@ -15,6 +15,7 @@ build_requires:
   Test2::Suite: '0'
   Test2::Tools::Explain: '0'
   Test::Builder: '0'
+  Test::CPAN::Meta: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,16 +29,16 @@ name: XS-Logger
 provides:
   XS::Logger:
     file: lib/XS/Logger.pm
-    version: '0.001'
+    version: '0.004'
 requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/atoomic/XS-Logger/issues
   repository: git://github.com/atoomic/XS-Logger.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::PkgVersion
@@ -60,7 +61,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: Test::Compile
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: MetaTests
@@ -213,7 +214,7 @@ x_Dist_Zilla:
           git_version: 2.15.1
           repo_root: .
       name: Git::Push
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
@@ -238,7 +239,7 @@ x_Dist_Zilla:
           git_version: 2.15.1
           repo_root: .
       name: '@Git/Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -261,7 +262,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -269,7 +270,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.004
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -278,7 +279,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -291,7 +292,7 @@ x_Dist_Zilla:
           git_version: 2.15.1
           repo_root: .
       name: '@Git/Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -303,7 +304,7 @@ x_Dist_Zilla:
           git_version: 2.15.1
           repo_root: .
       name: Git::NextVersion
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'

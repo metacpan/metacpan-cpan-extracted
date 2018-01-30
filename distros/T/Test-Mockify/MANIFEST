@@ -23,8 +23,10 @@ scripts/sonar-report.sh
 sonar-project.properties
 t/00_compile.t
 t/CompatibilityTools.t
+t/FakeModulStaticInjection.pm
 t/FakeModuleForMockifyTest.pm
 t/FakeModuleWithoutNew.pm
+t/FakeStaticTools.pm
 t/Matcher.t
 t/Method.t
 t/MethodSpy.t
@@ -32,7 +34,9 @@ t/MockifyTest.t
 t/Mockify_Method.t
 t/Mockify_MethodSpy.t
 t/Mockify_OptionalNew.t
+t/Mockify_StaticInjection.t
 t/Parameter.t
+t/README.md
 t/ReturnValue.t
 t/TestBase.pm
 t/Tools_Error.t

@@ -330,7 +330,7 @@ change.
 
 =head3 Example 3
 
-This module is especially usefull for larger projects, which there is
+This module is especially useful for larger projects, which there is
 a need for speed or memory reduction. In this case, you may have an
 extra overview on which objects have been realized (transformed), and
 which not.  This example is taken from the MailBox modules:
@@ -413,14 +413,14 @@ be prepared to read the body when needed.  A code snippet:
 
 =head1 SEE ALSO
 
-This module is part of Object-Realize-Later distribution version 0.19,
-built on January 24, 2014. Website: F<http://perl.overmeer.net/orl/>
+This module is part of Object-Realize-Later distribution version 0.21,
+built on January 24, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2014 by [Mark Overmeer <perl@overmeer.net>]. For other contributors see Changes.
+Copyrights 2001-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

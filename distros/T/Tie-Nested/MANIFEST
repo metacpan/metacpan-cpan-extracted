@@ -2,8 +2,11 @@ ChangeLog
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Tie/Nested.pm
 lib/Tie/Nested.pod
 t/10recurse.t
 t/20nest.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

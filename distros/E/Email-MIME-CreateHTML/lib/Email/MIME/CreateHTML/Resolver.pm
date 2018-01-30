@@ -10,7 +10,7 @@ use strict;
 use Carp;
 use Scalar::Util ();
 
-our $VERSION = '1.041';
+our $VERSION = '1.042';
 
 use vars qw($HaveCache $HaveLWP $HaveFilesystem);
 

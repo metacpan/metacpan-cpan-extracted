@@ -1,5 +1,5 @@
 package Bio::Roary::InflateClusters;
-$Bio::Roary::InflateClusters::VERSION = '3.11.3';
+$Bio::Roary::InflateClusters::VERSION = '3.12.0';
 # ABSTRACT: Take the clusters file from cd-hit and use it to inflate the output of MCL
 
 
@@ -107,7 +107,7 @@ Bio::Roary::InflateClusters - Take the clusters file from cd-hit and use it to i
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

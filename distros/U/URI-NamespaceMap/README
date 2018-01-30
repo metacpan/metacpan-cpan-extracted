@@ -2,7 +2,7 @@ NAME
     URI::NamespaceMap - Class holding a collection of namespaces
 
 VERSION
-    Version 1.04
+    Version 1.06
 
 SYNOPSIS
       use URI::NamespaceMap;
@@ -13,6 +13,9 @@ SYNOPSIS
       $map->add_mapping(rdf => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#' );
       $map->list_prefixes;  #  ( 'foaf', 'rdf', 'xsd' )
       $map->foaf; # Returns URI::Namespace object
+      while (my ($prefix, $nsURI) = $map->each_map) {
+             $node->setNamespace($nsURI->as_string, $prefix); # For use with XML::LibXML
+      }
 
 DESCRIPTION
     This module provides an object to manage multiple namespaces for creating
@@ -56,6 +59,10 @@ METHODS
 
     `list_prefixes`
         Returns an array of prefixes.
+
+    `each_map`
+        Returns an 2-element list where the first element is a prefix and the
+        second is the corresponding URI::Namespace object.
 
     `guess_and_add ( @string_or_uri )`
         Like in the constructor, an array of strings can be given, and the
@@ -103,7 +110,7 @@ SUPPORT
         perldoc URI::NamespaceMap
 
 COPYRIGHT & LICENSE
-    Copyright 2012,2013,2014,2015,2016,2017 Gregory Todd Williams, Chris
+    Copyright 2012,2013,2014,2015,2016,2017,2018 Gregory Todd Williams, Chris
     Prather and Kjetil Kjernsmo
 
     This program is free software; you can redistribute it and/or modify it

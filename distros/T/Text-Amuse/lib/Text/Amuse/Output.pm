@@ -430,17 +430,24 @@ sub inline_elements {
                             # these are OR, so order matters.
                             # link is the most greedy, as it could have inline markup in the second argument.
                             (?<link>         \[\[[^\[].*?\]\])      |
-                            (?<open_verb>    \<verbatim\>)     |
-                            (?<close_verb>   \<\/verbatim\>)  |
+
+                            # please note: verbatim, code, = =, are
+                            # greedy, the first will slurp up to the
+                            # next matching. one
+
+                            (?<verbatim>      \<verbatim\> .*? \<\/verbatim\>      ) |
+                            (?<verbatim_code> \<code\>     .*? \<\/code\>          ) |
+                            (?<verbatim_code> (?<!\w)\=(?=\S)  .+? (?<=\S)\=(?!\w) ) |
+
                             (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
                                 (?<close>\/?)
-                                (?<tag_name> strong | em |  code | strike | del | sup |  sub )
+                                (?<tag_name> strong | em |  strike | del | sup |  sub )
                                 \>
                             ) |
                             (?<nobreakspace>  \~\~         ) |
-                            (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
+                            (?<inline>(?:\*\*\*|\*\*|\*)   ) |
                             (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
                             (?<br> \x{20}*\< br \x{20}* \/?\>)
                         )}gcxms) {
@@ -461,6 +468,7 @@ sub inline_elements {
                     last_position => $position,
                     fmt => $self->fmt,
                    );
+
         if (delete $captures{tag}) {
             my $close = delete $captures{close};
             $args{type} = $close ? 'close' : 'open';
@@ -521,38 +529,8 @@ sub manage_regular {
     # we do the processing in more steps. It may be more expensive,
     # but at least the code should be clearer.
 
-    my @pieces = $self->inline_elements($string);
-    my @processed;
-  VERBATIMPIECE:
-    while (@pieces) {
-        my $piece = shift @pieces;
-        if (@processed and $processed[-1]->type eq 'verbatim') {
-            if ($piece->type eq 'close_verb') {
-                # push an empty text just to mark the end of verbatim.
-                push @processed, Text::Amuse::InlineElement->new(string => '',
-                                                                 type => 'text',
-                                                                 fmt => $self->fmt,
-                                                                 last_position => $piece->last_position);
-            }
-            else {
-                $processed[-1]->append($piece);
-            }
-            next VERBATIMPIECE;
-        }
-        elsif ($piece->type eq 'open_verb') {
-            push @processed, Text::Amuse::InlineElement->new(string => '',
-                                                             fmt => $self->fmt,
-                                                             type => 'verbatim',
-                                                             last_position => $piece->last_position);
-            next VERBATIMPIECE;
-        }
-        elsif ($piece->type eq 'close_verb') {
-            # this is lonely tag
-            $piece->type('text');
-        }
-        push @processed, $piece;
-    }
-
+    my @pieces;
+    my @processed = $self->inline_elements($string);
     # now we decide what to do with the inline elements: either turn
     # them into open/close tag via unroll, or turn them into regular
     # text
@@ -815,7 +793,7 @@ sub safe {
     my ($self, $string) = @_;
     return Text::Amuse::InlineElement->new(fmt => $self->fmt,
                                     string => $string,
-                                    type => 'verbatim')->stringify;
+                                    type => 'safe')->stringify;
 }
 
 

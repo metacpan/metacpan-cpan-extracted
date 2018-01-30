@@ -3,6 +3,18 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec();
 
+sub last_desperate_search {
+	if (( $^O eq 'MSWin32' )) {
+		print "Checking in Path:" . `"firefox.exe" -version` . "\n";
+	} elsif (( $^O eq 'darwin' ) or ($^O eq 'cygwin')) {
+		print "Checking in PATH:" . `firefox -version` . "\n";
+	}
+	my $glob_path = '/usr/share/applications/firefox*.desktop';
+	foreach my $path (glob $glob_path) {
+		print `perl -nle 'print "\$ARGV:\$_" if (/(Exec|^\\[)/);' $path`;
+	}
+}
+
 my $binary = 'firefox';
 if ( $^O eq 'MSWin32' ) {
     my $program_files_key;
@@ -20,22 +32,31 @@ if ( $^O eq 'MSWin32' ) {
 }
 elsif ( $^O eq 'darwin' ) {
     $binary = '/Applications/Firefox.app/Contents/MacOS/firefox';
+} elsif ($^O eq 'cygwin') {
+	if (-e "$ENV{PROGRAMFILES} (x86)") {
+		$binary = "$ENV{PROGRAMFILES} (x86)/Mozilla Firefox/firefox.exe";
+	} else {
+		$binary = "$ENV{PROGRAMFILES}/Mozilla Firefox/firefox.exe";
+	}
 }
 my $version_string = `"$binary" -version`;
 print $version_string;
 if ($version_string) {
-    if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+[.]\d+\s*/smx ) {
+    if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+([.]\d+)?\s*/smx ) {
         my ($major) = ($1);
         if ( $major < 57 ) {
+            last_desperate_search();
             die
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
         }
     }
     else {
+        last_desperate_search();
         die "Unable to parse $version_string\n";
     }
 }
 else {
+    last_desperate_search();
     die "Mozilla Firefox cannot be discovered in $ENV{PATH}\n";
 }
 
@@ -52,20 +73,14 @@ WriteMakefile(
       : ()),
     PL_FILES       => {},
     BUILD_REQUIRES => {
+        'Cwd'          => 0,
         'Test::More'   => 0,
         'Digest::SHA'  => 0,
-        (
-              $^O eq 'MSWin32' ? ()
-            : $^O eq 'darwin'  ? ()
-            :                    ( 'Test::NeedsDisplay' => 0, )
-        ),
     },
     PREREQ_PM => {
 	'Config::INI::Reader' => 0,
         'JSON'                => 0,
 	'Config'              => 0,
-        'Digest::MD5'         => 0,
-        'Crypt::URandom'      => 0,
         'FileHandle'          => 0,
         'File::Temp'          => 0,
         'File::Spec'          => 0,
@@ -81,7 +96,14 @@ WriteMakefile(
             ? (
                 'Win32'                => 0,
                 'Win32::Process'       => 0,
-                'Win32::Process::Info' => 1.022,
+              )
+            : ()
+        ),
+        (
+            ($^O ne 'MSWin32' and $^O ne 'darwin' and $^O ne 'cygwin')
+            ? (
+		'Digest::MD5'         => 0,
+		'Crypt::URandom'      => 0,
               )
             : ()
         ),

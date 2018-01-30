@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use overload '""' => 'string';
 
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub throw {
     my ( $class, $response ) = @_;
@@ -32,7 +32,7 @@ Firefox::Marionette::Exception::Response - Represents a Marionette protocol resp
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 

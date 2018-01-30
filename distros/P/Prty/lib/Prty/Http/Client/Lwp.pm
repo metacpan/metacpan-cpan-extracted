@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Option;
 use LWP::UserAgent ();
@@ -103,7 +103,7 @@ sub get {
     my $res = $redirect? $ua->request($req): $ua->simple_request($req);
     if ($res->is_error && !$sloppy) {
         $class->throw(
-            q{HTTP-00001: GET Request failed},
+            q~HTTP-00001: GET Request failed~,
             Url=>$url,
             StatusLine=>$res->status_line,
         );
@@ -116,7 +116,7 @@ sub get {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -124,7 +124,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

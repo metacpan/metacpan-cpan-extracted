@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +27,12 @@ requires:
   Moo: '1'
   PDF::Imposition: '0.23'
   Template::Tiny: '1.12'
-  Text::Amuse: '0.95'
+  Text::Amuse: '0.97'
   Type::Tiny: '1'
 resources:
   IRC: irc://chat.freenode.net/#amusewiki
   WebIRC: https://webchat.freenode.net/?channels=#amusewiki
   homepage: http://amusewiki.org
   repository: https://github.com/melmothx/text-amuse-compile
-version: '1.00'
+version: '1.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,10 @@
 Revision history for Perl extension SVG::Grid.
 
+1.12  2018-01-28T11:18:00
+	- Switch from opening my own file handle to writing with File::Slurper. This is to address
+		failure reports from CPAN testers on MS Win machines.
+	- Fix minor typo in t/test.t.
+
 1.11  2017-12-21T11:11:00
 	- Use File::Slurper's read_binary() for testing rather than its read_text(). This should help
 		with the test failures under MS Windows.

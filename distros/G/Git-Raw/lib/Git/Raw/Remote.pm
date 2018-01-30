@@ -1,5 +1,5 @@
 package Git::Raw::Remote;
-$Git::Raw::Remote::VERSION = '0.74';
+$Git::Raw::Remote::VERSION = '0.75';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Remote - Git remote class
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -55,10 +55,10 @@ B<WARNING>: The API of this module is unstable and may change without warning
 
 =head1 METHODS
 
-=head2 create( $repo, $name, $url )
+=head2 create( $repo, $name, $url, [$fetch] )
 
-Create a remote with the default fetch refspec and add it to the repository's
-configuration.
+Create a remote with the default fetch refspec or C<$fetch> if provideed, and add
+it to the repository's configuration.
 
 =head2 create_anonymous( $repo, $url )
 
@@ -68,6 +68,10 @@ Create a remote in memory (anonymous).
 
 Load an existing remote. Returns a L<Git::Raw::Remote> object if the remote
 was found, otherwise C<undef>.
+
+=head2 delete( $repo, $name )
+
+Delete an existing remote.
 
 =head2 owner( )
 

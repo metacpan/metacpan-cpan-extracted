@@ -81,3 +81,8 @@ Revision history for Perl extension B::Keywords.
   - Added 5.27.7 changes, RT #123948
   - Added cperl class keywords
   - Added keywords per version back to 5.004
+1.17 Mon Jan 29 17:57:05 CET 2018 rurban
+  - Added 5.27.8 changes, whereis/whereso is gone for good.
+    There's still a chance for perl6 compat
+1.18 Mon Jan 29 18:09:23 CET 2018 rurban
+  - Oops, forgot break

@@ -6,7 +6,7 @@ use Mojo::JSON;
 use Mojo::Util 'deprecated';
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 my $X_RE = qr{^x-};
 
 has route     => sub {undef};
@@ -72,6 +72,7 @@ sub register {
   $self->_build_route($app, $config);
   $self->_register_plugins($app, $config);
   $self->_add_routes($app, $config);
+  $self;
 }
 
 sub _add_routes {
@@ -163,7 +164,7 @@ sub _build_route {
   push @{$app->defaults->{'openapi.base_paths'}}, [$base_path, $self];
   $route->to({handler => 'openapi', 'openapi.object' => $self});
 
-  my $spec_route = $route->get->to(cb => sub { shift->openapi->render_spec });
+  my $spec_route = $route->get('/')->to(cb => sub { shift->openapi->render_spec });
   if (my $spec_route_name = $config->{spec_route_name} || $self->validator->get('/x-mojo-name')) {
     $spec_route->name($spec_route_name);
     $self->{route_prefix} = "$spec_route_name.";
@@ -515,12 +516,14 @@ Holds a L<JSON::Validator::OpenAPI::Mojolicious> object.
 
 =head2 register
 
-  $self->register($app, \%config);
+  $self = $self->register($app, \%config);
+  $self = $app->plugin(OpenAPI => \%config);
 
 Loads the OpenAPI specification, validates it and add routes to
 L<$app|Mojolicious>. It will also set up L</HELPERS> and adds a
 L<before_render|Mojolicious/before_render> hook for auto-rendering of error
-documents.
+documents. The return value is the object instance, which allow you to access
+the L</ATTRIBUTES> after you load the plugin.
 
 C<%config> can have:
 

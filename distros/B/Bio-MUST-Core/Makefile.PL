@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Graphics::ColorNames::WWW" => 0,
     "IPC::System::Simple" => 0,
     "LWP::Simple" => 0,
-    "List::AllUtils" => "0.08",
+    "List::AllUtils" => "0.12",
     "List::Compare" => 0,
     "Modern::Perl" => 0,
     "Moose" => 0,
@@ -96,7 +96,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Deep" => 0
   },
-  "VERSION" => "0.180190",
+  "VERSION" => "0.180230",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -122,7 +122,7 @@ my %FallbackPrereqs = (
   "Graphics::ColorNames::WWW" => 0,
   "IPC::System::Simple" => 0,
   "LWP::Simple" => 0,
-  "List::AllUtils" => "0.08",
+  "List::AllUtils" => "0.12",
   "List::Compare" => 0,
   "Modern::Perl" => 0,
   "Moose" => 0,

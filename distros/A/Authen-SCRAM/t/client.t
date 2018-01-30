@@ -96,6 +96,66 @@ subtest "RFC 5802 example" => sub {
 
 };
 
+subtest "RFC 7677 example (SHA256)" => sub {
+    # force client nonce to match RFC7677 example
+    my $client = get_client(
+        digest           => 'SHA-256',
+        _nonce_generator => sub { "rOprNGfwEbeRWgbNEkqO" }
+    );
+    my $first = $client->first_msg();
+    is( $first, "n,,n=user,r=rOprNGfwEbeRWgbNEkqO", "client first message" )
+      or diag explain $client;
+
+    # RFC7677 example server-first-message
+    my $server_first =
+      'r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096';
+    my $final = $client->final_msg($server_first);
+    is(
+        $final,
+        'c=biws,r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,p=dHzbZapWIk4jUhN+Ute9ytag9zjfMHgsqmmiz7AndVQ=',
+        "client final message"
+    ) or diag explain $client;
+
+    ok( $client->validate("v=6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4="),
+        "server message validated" );
+
+};
+
+subtest "Minimum iteration count" => sub {
+    {
+        # force client nonce to match RFC5802 example
+        my $client = get_client( _nonce_generator => sub { "fyko+d2lbbFgONRv9qkxdawL" } );
+        my $first = $client->first_msg();
+
+        # RFC5802 example server-first-message, with too low iteration count
+        my $server_first =
+          "r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4095";
+        like(
+            exception { $client->final_msg($server_first) },
+            qr/requested 4095 iterations, less than/,
+            "Default iteration count"
+        );
+    }
+
+    {
+        # force client nonce to match RFC5802 example
+        my $client = get_client(
+            _nonce_generator        => sub { "fyko+d2lbbFgONRv9qkxdawL" },
+            minimum_iteration_count => 8192
+        );
+        my $first = $client->first_msg();
+
+        # RFC5802 example server-first-message, with too low iteration count
+        my $server_first =
+          "r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=8191";
+        like(
+            exception { $client->final_msg($server_first) },
+            qr/requested 8191 iterations, less than/,
+            "Custom iteration count"
+        );
+    }
+};
+
 done_testing;
 #
 # This file is part of Authen-SCRAM

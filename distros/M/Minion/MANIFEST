@@ -31,6 +31,7 @@ lib/Mojolicious/Plugin/Minion/resources/public/minion/fontawesome/fontawesome.cs
 lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black-2x.png
 lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black.png
 lib/Mojolicious/Plugin/Minion/resources/public/minion/moment/moment.js
+lib/Mojolicious/Plugin/Minion/resources/public/minion/popper/popper.js
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.eot
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.ttf
 lib/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.woff

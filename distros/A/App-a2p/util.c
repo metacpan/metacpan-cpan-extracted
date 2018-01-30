@@ -165,15 +165,11 @@ growstr(char **strptr, size_t *curlen, size_t newlen)
 void
 fatal(const char *pat,...)
 {
-#if defined(HAS_VPRINTF)
     va_list args;
 
     va_start(args, pat);
     vfprintf(stderr,pat,args);
     va_end(args);
-#else
-    fprintf(stderr,pat,a1,a2,a3,a4);
-#endif
     exit(1);
 }
 
@@ -183,14 +179,10 @@ __private_extern__	/* warn() conflicts with libc */
 void
 warn(const char *pat,...)
 {
-#if defined(HAS_VPRINTF)
     va_list args;
 
     va_start(args, pat);
     vfprintf(stderr,pat,args);
     va_end(args);
-#else
-    fprintf(stderr,pat,a1,a2,a3,a4);
-#endif
 }
 

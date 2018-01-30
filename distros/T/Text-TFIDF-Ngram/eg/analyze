@@ -2,58 +2,161 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
 use File::Find::Rule;
+use Pod::Usage;
 use Text::TFIDF::Ngram;
 
-my $dir    = shift || die "Usage: perl $0 /some/corpus size top stopwords phrase";
-my $size   = shift || 2;
-my $top    = shift // 0;
-my $stop   = shift // 1;
-my $phrase = shift || '';
+pod2usage(1) unless @ARGV;
 
-my @files = File::Find::Rule->file()->name('*.txt')->in($dir);
+my %opts = (
+    dir    => undef,
+    size   => 2,
+    top    => 0,
+    stop   => 1,
+    phrase => '',
+    type   => 'txt',
+);
+GetOptions( \%opts,
+    'dir=s@',
+    'size=i',
+    'top=i',
+    'stop=i',
+    'phrase=s',
+    'type=s',
+    'help|?',
+    'man',
+) or pod2usage(2);
+
+pod2usage(1) if $opts{help} || !$opts{dir};
+pod2usage( -exitval => 0, -verbose => 2 ) if $opts{man};
+
+my @files;
+
+for my $dir ( @{ $opts{dir} } ) {
+    push @files, File::Find::Rule->file()->name( '*.' . $opts{type} )->in($dir);
+}
 
 my $t = Text::TFIDF::Ngram->new(
     files     => \@files,
-    size      => $size,
-    stopwords => $stop,
+    size      => $opts{size},
+    stopwords => $opts{stop},
 );
 
 # If the top phrases is requested...
-if ( $top ) {
+if ( $opts{top} ) {
     my $x = $t->tfidf_by_file();
 
     my $i = 0;
+
     for my $file ( sort keys %$x ) {
         $i++;
 
-        print "$i. $file\n";
+        printf "%d. %s\n", $i, $file;
 
         my $n = 0;
+
         for my $p ( sort { $x->{$file}{$b} <=> $x->{$file}{$a} } keys %{ $x->{$file} } ) {
-            last if ++$n > $top;
-            print "\t$n. $p = ", $x->{$file}{$p}, "\n";
+            last if ++$n > $opts{top};
+
+            printf "\t%d. %s = %.10f\n", $n, $p, $x->{$file}{$p};
         }
     }
 }
 
 # If an analysis of a single phrase is requested...
-if ( $phrase ) {
-    print "Word: '$phrase' IDF: ", $t->idf($phrase), "\n";
+if ( $opts{phrase} ) {
+    my $idf = $t->idf($opts{phrase});
+    printf "Phrase: '%s', IDF = %.10f\n", $opts{phrase}, $idf
+        if $idf;
 
     my $i = 0;
     for my $file ( @{ $t->files } ) {
-        $i++;
+        my $tf = $t->tf( $file, $opts{phrase} );
+        if ( $tf ) {
+            $i++;
 
-        print "$i. File: $file\n";
+            printf "%d. %s\n", $i, $file;
 
-        print "\tTF: ", $t->tf( $file, $phrase ), "\n";
+            printf "\tTF = %.10f\n", $t->tf( $file, $opts{phrase} );
 
-        my $tfidf = $t->tfidf( $file, $phrase );
-        print "\tTF-IDF: $tfidf\n" if $tfidf;
+            my $tfidf = $t->tfidf( $file, $opts{phrase} );
+            printf "\tTF-IDF = %.10f\n", $tfidf
+                if $tfidf;
+        }
     }
 }
 
 __END__
-!perl % ~/Documents/lit/inaugural/ 2 5
-!perl % ~/Documents/lit/inaugural/ 2 0 1 'public good'
+
+=head1 NAME
+
+analyze - TF-IDF Analyze a corpus
+
+=head1 SYNOPSIS
+
+analyze --dir=/some/corpus [options]
+
+Options:
+
+  --help      help message
+  --man       full documentation
+  --dir       corpus of text documents
+  --size      ngram size
+  --top       top TF-IDF ngrams
+  --stop      use stopwords
+  --phrase    search phrase
+  --type      file extension
+
+Examples:
+
+  perl analyze --dir=/Users/you/Documents/lit/inaugural --top=5
+  perl analyze --dir=/Users/you/Documents/lit/inaugural --phrase='public good'
+  perl analyze --dir=/Users/you/Documents/lit/inaugural --dir=/Users/you/Documents/lit/SOTU --top=5
+  perl analyze --dir=/Users/you/Documents/lit/Shakespeare --size=3 --top=5
+  perl analyze --dir=/Users/you/perl5/perlbrew/perls/perl-5.27.7/lib/site_perl/5.27.7/Music --size=1 --type=pm
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Brief help message
+
+=item --man
+
+Full manual page
+
+=item --dir
+
+Required corpus list of text documents
+
+=item --size
+
+Ngram phrase size - Default = 2
+
+=item --top
+
+Show the top B<N> ngrams seen.  Default = 0
+
+=item --stop
+
+Constrain the ngrams by excluding stopwords.  Default = 1
+
+=item --phrase
+
+Search the corpus for the B<phrase> and its IF-IDF values.  Default = ''
+
+=item --type
+
+Read copus files of this file extension. Default = 'txt'
+
+=back
+
+=head1 DESCRIPTION
+
+This program analyzes the given corpus with the TF-IDF measure for ngrams.
+
+=cut
+

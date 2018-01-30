@@ -1,5 +1,5 @@
 package AnyEvent::PgRecvlogical;
-$AnyEvent::PgRecvlogical::VERSION = '0.002';
+$AnyEvent::PgRecvlogical::VERSION = '0.004';
 # ABSTRACT: perl port of pg_recvlogical
 
 =pod
@@ -11,6 +11,7 @@ AnyEvent::PgRecvlogical - perl port of pg_recvlogical
 =for html
 <a href="https://travis-ci.org/mydimension/AnyEvent-PgRecvlogical"><img src="https://travis-ci.org/mydimension/AnyEvent-PgRecvlogical.svg?branch=master" /></a>
 <a href='https://coveralls.io/github/mydimension/AnyEvent-PgRecvlogical?branch=master'><img src='https://coveralls.io/repos/github/mydimension/AnyEvent-PgRecvlogical/badge.svg?branch=master' alt='Coverage Status' /></a>
+<a href="https://badge.fury.io/pl/AnyEvent-PgRecvlogical"><img src="https://badge.fury.io/pl/AnyEvent-PgRecvlogical.svg" alt="CPAN version" height="18"></a>
 
 =head1 SYNOPSIS
 
@@ -44,7 +45,7 @@ use DBI;
 use DBD::Pg 3.7.0 ':async';
 use AnyEvent;
 use AnyEvent::Util 'guard';
-use Promises backend => ['AnyEvent'], qw(deferred);
+use Promises 0.99 backend => ['AnyEvent'], qw(deferred);
 use Types::Standard ':all';
 use Try::Tiny;
 use Carp 'croak';
@@ -520,6 +521,9 @@ sub _read_copydata {
         $self->on_error->('could not read COPY data: ' . $self->dbh->errstr);
     }
 
+    # do it again until $n == 0
+    my $w; $w = AE::timer 0, 0, sub { undef $w; $self->_read_copydata };
+
     my $type = substr $msg, 0, 1;
 
     if ('k' eq $type) {
@@ -544,7 +548,9 @@ sub _read_copydata {
     # uncoverable branch true
     unless ('w' eq $type) {
         # uncoverable statement
+        undef $w;
         $self->on_error->("unrecognized streaming header: '$type'");
+        return;
     }
 
     my (undef, $startlsn, $endlsn, $ts, $record) = unpack XLOGDATA, $msg;
@@ -557,8 +563,7 @@ sub _read_copydata {
 
     $self->on_message->($record, $guard);
 
-    # do it again until $n == 0
-    my $w; $w = AE::timer 0, 0, sub { undef $w; $self->_read_copydata };
+    return;
 }
 
 =item stop

@@ -1,5 +1,5 @@
 package Git::Raw::Commit;
-$Git::Raw::Commit::VERSION = '0.74';
+$Git::Raw::Commit::VERSION = '0.75';
 use strict;
 use warnings;
 use overload
@@ -14,7 +14,7 @@ Git::Raw::Commit - Git commit class
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,10 @@ sub amend {
 		@_
 	);
 }
+
+=head2 annotated( )
+
+Create a L<Git::Raw::AnnotatedCommit> from the commit.
 
 =head2 amend( $baseline, [@parents], $tree [, $update_ref ] )
 

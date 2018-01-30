@@ -1,0 +1,16 @@
+Changes
+ignore.txt
+lib/Util/EvalSnippet.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/perl-eval-snippet
+t/data/test-snippets/main
+t/data/test-snippets/main-refs_1
+t/data/test-snippets/main-same_name_basics
+t/data/test-snippets/main-substring_name
+t/data/test-snippets/main-symbols
+t/tests/lib/Util/EvalSnippet.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

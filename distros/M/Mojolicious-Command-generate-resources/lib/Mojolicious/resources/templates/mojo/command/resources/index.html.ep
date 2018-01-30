@@ -1,8 +1,8 @@
 % my $a = shift;
 %% layout 'blog', title => 'Blog/<%= ucfirst $a->{t} %>';
 %% my @columns = qw(<%= join(' ', @{$a->{columns}}) %>); #table columns
+%%= link_to 'New record in table "<%= $a->{t} %>"' => 'create_<%= $a->{t} %>'
 <table>
-%% for my $item (@$<%= $a->{t} %>) {
     <thead>
         <tr>
     %% for my $column (@columns) {
@@ -11,11 +11,13 @@
         </tr>
     </thead>
     <tbody>
-        <td><%%= link_to $item->{id} => show_<%= $a->{t} %> => {id => $item->{id}} %></td>
+%% for my $item (@$<%= $a->{t} %>) {
+        <tr>
+            <td><%%= link_to $item->{id} => show_<%= $a->{t} %> => {id => $item->{id}} %></td>
     %% for my $column (@columns[1 .. $#columns]) {
-        <td><%%= $column %></td>
+            <td><%%= $item->{$column} %></td>
     %% }
-    </tbody>
+        </tr>
 %% }
+    </tbody>
 </table>
-%%= link_to 'New record in table "<%= $a->{t} %>"' => 'create_<%= $a->{t} %>'

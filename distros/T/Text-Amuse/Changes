@@ -1,5 +1,18 @@
 Revision history for perl module Text::Amuse
 
+0.97 2018-01-28
+
+ - Prevent the merging of regular lines into prefixed verses (GH#34,
+   thanks to @labdsf for the report)
+
+0.96 2018-01-27
+
+ - The code (or =code=) tag is now a verbatim tag. Any markup inside
+   it will not be interpreted (including footnotes). This is a
+   backward incompatible change, but the original implementation was
+   wrong and not compatible with Emacs Muse.
+   Thanks @labdsf for pointing that out.
+
 0.95 2017-12-28
 
  - Add function to rewrite headers

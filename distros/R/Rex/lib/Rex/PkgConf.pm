@@ -9,7 +9,7 @@ package Rex::PkgConf;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Config;
 use Rex::Commands::Gather;
@@ -36,6 +36,8 @@ sub get {
 
   if ( is_redhat() ) {
     $host->{"operatingsystem"} = "Redhat";
+  } elsif ( is_debian() ) {
+    $host->{"operatingsystem"} = "Debian";
   }
 
   my $class = "Rex::PkgConf::" . $host->{"operatingsystem"};

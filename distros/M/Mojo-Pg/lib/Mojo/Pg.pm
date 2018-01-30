@@ -8,10 +8,14 @@ use Mojo::Pg::Migrations;
 use Mojo::Pg::PubSub;
 use Mojo::URL;
 use Scalar::Util qw(blessed weaken);
-use SQL::Abstract;
+use SQL::Abstract::Pg;
 
 has abstract => sub {
-  SQL::Abstract->new(array_datatypes => 1, name_sep => '.', quote_char => '"');
+  SQL::Abstract::Pg->new(
+    array_datatypes => 1,
+    name_sep        => '.',
+    quote_char      => '"'
+  );
 };
 has [qw(auto_migrate parent search_path)];
 has database_class  => 'Mojo::Pg::Database';
@@ -38,7 +42,7 @@ has pubsub => sub {
   return $pubsub;
 };
 
-our $VERSION = '4.04';
+our $VERSION = '4.08';
 
 sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, pg => $_[0]) }
 
@@ -329,11 +333,11 @@ L<Mojo::Pg> implements the following attributes.
 =head2 abstract
 
   my $abstract = $pg->abstract;
-  $pg          = $pg->abstract(SQL::Abstract->new);
+  $pg          = $pg->abstract(SQL::Abstract::Pg->new);
 
-L<SQL::Abstract> object used to generate CRUD queries for L<Mojo::Pg::Database>,
-defaults to enabling C<array_datatypes> and setting C<name_sep> to C<.> and
-C<quote_char> to C<">.
+L<SQL::Abstract::Pg> object used to generate CRUD queries for
+L<Mojo::Pg::Database>, defaults to enabling C<array_datatypes> and setting
+C<name_sep> to C<.> and C<quote_char> to C<">.
 
   # Generate WHERE clause and bind values
   my($stmt, @bind) = $pg->abstract->where({foo => 'bar', baz => 'yada'});
@@ -533,6 +537,8 @@ This is the class hierarchy of the L<Mojo::Pg> distribution.
 
 =item * L<Mojo::Pg::Transaction>
 
+=item * L<SQL::Abstract::Pg>
+
 =back
 
 =head1 AUTHOR
@@ -553,13 +559,15 @@ Flavio Poletti
 
 Hernan Lopes
 
+Peter Rabbitson
+
 William Lindley
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017, Sebastian Riedel and others.
+Copyright (C) 2014-2018, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

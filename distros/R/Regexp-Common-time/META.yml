@@ -20,11 +20,11 @@ no_index:
 provides:
   Regexp::Common::time:
     file: lib/Regexp/Common/time.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Regexp::Common: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/manwar/Regexp-Common-time.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

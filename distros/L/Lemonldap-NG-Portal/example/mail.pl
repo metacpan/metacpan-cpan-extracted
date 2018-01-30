@@ -31,6 +31,7 @@ my $template = HTML::Template->new(
 
 $template->param(
     PORTAL_URL      => $portal_url,
+    AUTH_URL        => $portal->get_url,
     SKIN_PATH       => $portalPath . "skins",
     SKIN            => $skin,
     SKIN_BG         => $portal->{portalSkinBackground},

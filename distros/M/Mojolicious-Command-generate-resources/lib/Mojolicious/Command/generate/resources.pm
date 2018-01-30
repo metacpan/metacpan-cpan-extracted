@@ -7,11 +7,20 @@ use Getopt::Long qw(GetOptionsFromArray :config auto_abbrev
 File::Spec::Functions->import(qw(catfile catdir));
 
 our $AUTHORITY = 'cpan:BEROV';
-our $VERSION   = '0.08';
+our $VERSION   = '0.10';
 
 has args => sub { {} };
-has description     => 'Generate resources from database for your application';
-has usage           => sub { shift->extract_usage };
+has description => sub {
+  if ($_[1]) {
+    $_[0]->{description} = $_[1];
+    return $_[0];
+  }
+  return $_[0]->{description} if $_[0]->{description};
+  state $bytes   = Mojo::File->new(__FILE__)->slurp();
+  state $package = __PACKAGE__;
+  return $_[0]->{description} = ($bytes =~ /$package\s+-\s+(.+)\n/ && $1);
+};
+has usage => sub { shift->extract_usage };
 has _templates_path => '';
 has '_db_helper';
 
@@ -67,9 +76,9 @@ has routes => sub {
   return $_[0]->{routes};
 };
 
-my $_начевамъ = sub ($азъ, @options) {
-  return $азъ if $азъ->{_initialised};
-  my $args = $азъ->args({tables => []})->args;
+my $_init = sub ($self, @options) {
+  return $self if $self->{_initialised};
+  my $args = $self->args({tables => []})->args;
 
   GetOptionsFromArray(
     \@options,
@@ -84,9 +93,9 @@ my $_начевамъ = sub ($азъ, @options) {
                      );
 
   @{$args->{tables}} = split(/\s*?\,\s*?/, join(',', @{$args->{tables}}));
-  Carp::croak $азъ->usage unless scalar @{$args->{tables}};
+  Carp::croak $self->usage unless scalar @{$args->{tables}};
 
-  my $app = $азъ->app;
+  my $app = $self->app;
   $args->{controller_namespace} //= $app->routes->namespaces->[0];
   $args->{model_namespace}      //= ref($app) . '::Model';
   $args->{home_dir}             //= $app->home;
@@ -99,7 +108,7 @@ my $_начевамъ = sub ($азъ, @options) {
     my $templates_path
       = catdir($path, 'Mojolicious/resources/templates/mojo/command/resources');
     if (-d $templates_path) {
-      $азъ->_templates_path($templates_path);
+      $self->_templates_path($templates_path);
       last;
     }
   }
@@ -108,11 +117,11 @@ my $_начевамъ = sub ($азъ, @options) {
   my @db_helpers = qw(sqlite pg mysql);
   for (@db_helpers) {
     if ($app->renderer->get_helper($_)) {
-      $азъ->_db_helper($_);
+      $self->_db_helper($_);
       last;
     }
   }
-  if (!$азъ->_db_helper) {
+  if (!$self->_db_helper) {
     die <<'MSG';
 Guessing the used database wrapper helper failed. One of (@db_helpers) is
 required. This application does not use any of the supported database helpers.
@@ -121,9 +130,9 @@ Aborting!..
 MSG
   }
 
-  $азъ->{_initialised} = 1;
+  $self->{_initialised} = 1;
 
-  return $азъ;
+  return $self;
 };
 
 # Returns the full path to the first found template.
@@ -132,11 +141,11 @@ sub _template_path ($self, $template) {
   state $paths      = $self->app->renderer->paths;
   state $tmpls_path = $self->_templates_path;
   -r and return $_ for map { catfile($_, $template) } @$paths, $tmpls_path;
-  return undef;
+  return;
 }
 
 sub run ($self, %options) {
-  $self->$_начевамъ(%options);
+  $self->$_init(%options);
   my $args = $self->args;
   my $app  = $self->app;
 
@@ -151,10 +160,11 @@ sub run ($self, %options) {
     my $table_columns = $self->_get_table_columns($t);
     my $template_args = {
                          %$args,
-                         class     => $mclass,
-                         t         => lc $t,
-                         db_helper => $self->_db_helper,
-                         columns   => $table_columns,
+                         class       => $mclass,
+                         t           => lc $t,
+                         db_helper   => $self->_db_helper,
+                         columns     => $table_columns,
+                         column_info => $self->_column_info($t),
                         };
     my $tmpl_file = $self->_template_path('m_class.ep');
     $self->render_template_to_file($tmpl_file, $m_file, $template_args);
@@ -162,8 +172,11 @@ sub run ($self, %options) {
     # Controllers
     my $class = "$args->{controller_namespace}::$class_name";
     my $c_file = catfile($args->{lib}, class_to_path($class));
-    $template_args
-      = {%$args, class => $class, t => lc $t, columns => $table_columns};
+    $template_args = {
+                      %$template_args,
+                      class      => $class,
+                      validation => $self->generate_validation($t)
+                     };
     $tmpl_file = $self->_template_path('c_class.ep');
     $self->render_template_to_file($tmpl_file, $c_file, $template_args);
 
@@ -171,16 +184,20 @@ sub run ($self, %options) {
     my $template_dir  = decamelize($class_name);
     my $template_root = $args->{templates_root};
 
-    my @views = qw(index create show edit _form);
+    my @views = qw(index create show edit);
     for my $v (@views) {
-      my $t_file = catfile($template_root, $template_dir, $v . '.html.ep');
-      my $tmpl_file = $self->_template_path($v . '.html.ep');
-      $self->render_template_to_file($tmpl_file, $t_file, $template_args);
+      my $to_t_file = catfile($template_root, $template_dir, $v . '.html.ep');
+      my $tmpl = $self->_template_path($v . '.html.ep');
+      $self->render_template_to_file($tmpl, $to_t_file, $template_args);
     }
+    $tmpl_file = $self->_template_path('_form.html.ep');
+    my $to_t_file = catfile($template_root, $template_dir, '_form.html.ep');
+    $template_args
+      = {%$template_args, fields => $self->generate_formfields($t)};
+    $self->render_template_to_file($tmpl_file, $to_t_file, $template_args);
 
     # Helpers
-    $template_args
-      = {%$args, t => lc $t, db_helper => $self->_db_helper, class => $mclass};
+    $template_args = {%$template_args, class => $mclass};
     $tmpl_file = $self->_template_path('helper.ep');
     $wrapper_helpers
       .= Mojo::Template->new->render_file($tmpl_file, $template_args);
@@ -197,17 +214,87 @@ sub run ($self, %options) {
 
 # Returns an array reference of columns from the table
 sub _get_table_columns ($self, $table) {
-  state $db_helper = $self->_db_helper;
-  my $col_info
-    = $self->app->$db_helper->db->dbh->column_info(undef, undef, $table, '%')
-    ->fetchall_arrayref({});
-  my @columns = map { $_->{COLUMN_NAME} } @$col_info;
+  my @columns = map ({ $_->{COLUMN_NAME} } @{$self->_column_info($table)});
   return \@columns;
+}
+
+sub _column_info ($self, $table) {
+  state $tci       = {};                  #tables column info
+  state $db_helper = $self->_db_helper;
+  $tci->{$table}
+    //= $self->app->$db_helper->db->dbh->column_info(undef, undef, $table, '%')
+    ->fetchall_arrayref({});
+  return $tci->{$table};
 }
 
 sub render_template_to_file ($self, $filename, $path, $args) {
   my $out = Mojo::Template->new->render_file($filename, $args);
   return $self->write_file($path, $out);
+}
+
+sub generate_formfields ($self, $table) {
+  my $fields = '';
+  for my $col (@{$self->_column_info($table)}) {
+    my $name     = $col->{COLUMN_NAME};
+    my $required = $col->{NULLABLE} ? '' : 'required => 1,';
+    my $size     = $col->{COLUMN_SIZE} ? "size => $col->{COLUMN_SIZE}" : '';
+    if ($name eq 'id') {
+      $fields
+        .= qq|\n%=hidden_field '$name' => \$${table}->{id} if (\$action ne 'create');\n|;
+      next;
+    }
+    if ($col->{TYPE_NAME} =~ /char/i && $col->{COLUMN_SIZE} < 256) {
+      $fields .= <<"QQ";
+  %= label_for $name =>'${\ucfirst($name)}'\n<br />
+  %= text_field $name => \$${table}->{$name}, $required $size\n<br />
+QQ
+      next;
+    }
+    elsif (   $col->{TYPE_NAME} =~ /text/i
+           || $col->{TYPE_NAME} =~ /char/i && $col->{COLUMN_SIZE} > 255)
+    {
+      $fields .= <<"QQ";
+  %= label_for '$name' => '${\ucfirst($name)}'\n<br />
+  %= text_area '$name' => \$${table}->{$name}, $required $size\n<br />
+QQ
+      next;
+    }
+    if ($col->{TYPE_NAME} =~ /INT|FLOAT|DOUBLE|DECIMAL/i) {
+      $fields .= <<"QQ";
+  %= label_for $name => '${\ucfirst($name)}'\n<br />
+  %= number_field $name => \$${table}->{$name}, $required $size\n<br />
+QQ
+      next;
+    }
+  }
+  return $fields;
+}
+
+sub generate_validation ($self, $table) {
+  my $fields = '';
+  for my $col (@{$self->_column_info($table)}) {
+    my $name     = $col->{COLUMN_NAME};
+    my $required = $col->{NULLABLE} ? 0 : 1;
+    my $size     = $col->{COLUMN_SIZE} ? "size => $col->{COLUMN_SIZE}" : '';
+    if ($name eq 'id') {
+      $fields .= qq|\$v->required('id') if \$c->stash->{action} ne 'store';\n|;
+      next;
+    }
+
+    $fields
+      .= $required
+      ? qq|\$v->required('$name', 'trim')|
+      : qq|\$v->optional('$name', 'trim')|;
+    if ($col->{TYPE_NAME} =~ /char/i && $col->{COLUMN_SIZE} < 256) {
+      $fields .= "->size(0, $col->{COLUMN_SIZE})";
+    }
+
+    if ($col->{TYPE_NAME} =~ /INT|FLOAT|DOUBLE|DECIMAL/i) {
+      $fields .= q|->like(qr/\d+(\.\d+)?/)|;
+    }
+    $fields .= ';' . $/;
+  }
+  return $fields;
 }
 
 1;
@@ -216,7 +303,7 @@ sub render_template_to_file ($self, $filename, $path, $args) {
 
 =head1 NAME
 
-Mojolicious::Command::generate::resources - Resources from database for your application
+Mojolicious::Command::generate::resources - Generate M, V & C from database tables
 
 =head1 SYNOPSIS
 
@@ -225,10 +312,12 @@ Mojolicious::Command::generate::resources - Resources from database for your app
     my_app.pl generate help resources # help with all available options
     my_app.pl generate resources --tables users,groups
 
+=head1 PERL REQUIREMENTS
+
+This command uses L<feature/signatures>, therefore Perl 5.20 is required.
 
 =head1 DESCRIPTION
 
-I<This is an early release.>
 L<Mojolicious::Command::generate::resources> generates directory structure for
 a fully functional
 L<MVC|Mojolicious::Guides::Growing/"Model View Controller">
@@ -367,16 +456,35 @@ L<Mojolicious::Command> and implements the following new ones.
 
 Run this command.
 
+=head2 render_template_to_file
+
+Renders a template from a file to a file using L<Mojo::Template>. Parameters:
+C<$tmpl_file> - full path tho the template file; C<$target_file> - full path to
+the file to be written; C<$template_args> - a hash reference containing the
+arguments to the template. See also L<Mojolicious::Command/render_to_file>.
+
+    $self->render_template_to_file($tmpl_file, $target_file, $template_args);
+
+=head2 generate_formfields
+
+Generates form-fields from columns information found in the repective table.
+The result is put into C<_form.html.ep>. The programmer can then modify the
+generated form-fields.
+
+    $form_fields = $self->generate_formfields($table_name);
+
+=head2 generate_validation
+
+Generates code for the C<_validation> method in the respective controler.
+
+    $validation_code = $self->generate_validation($table_name);
+
 =head1 TODO
 
 The work on the features may not go in the same order specified here. Some
 parts may be fully implemented while others may be left for later.
 
-    - Improve documentation. Tests.
-    - Improve temlates to show more posibilities.
-    - Tests for templates (views).
-    - Tests for model classes.
-    - Test the generated routes.
+    - Improve documentation.
     - Implement generation of Open API specification out from
       tables' metadata. More tests.
 
@@ -385,7 +493,6 @@ parts may be fully implemented while others may be left for later.
     Красимир Беров
     CPAN ID: BEROV
     berov@cpan.org
-    http://i-can.eu
 
 =head1 COPYRIGHT
 

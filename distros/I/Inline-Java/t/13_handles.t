@@ -46,7 +46,7 @@ if ($t->__get_private()->{proto}->ObjectCount() != 1){
 	warn "\nWARNING: Your Perl version ($]) seems to leak tied filehandles. Using\n" .
 		"Inline::Java::Handle objects will result in memory leaks both in Perl\n" .
 		"and in Java\n" ;
-}
+} 
 
 
 __END__

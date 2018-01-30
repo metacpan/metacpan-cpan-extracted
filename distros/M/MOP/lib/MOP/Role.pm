@@ -13,7 +13,7 @@ use MOP::Slot;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' };
@@ -299,7 +299,9 @@ sub add_required_method {
         # and if we don't and we have a CODE slot, we
         # need to die because this doesn't make sense
         Carp::confess("[CONFLICT] Cannot add a required method ($name) when there is a regular method already there")
-            if defined *{ $glob }{CODE};
+            if ref \$glob eq 'GLOB'
+                ? defined *{ $glob }{CODE}
+                : defined $glob;
     }
 
     # if we get here, then we
@@ -809,7 +811,7 @@ MOP::Role - A representation of a role
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

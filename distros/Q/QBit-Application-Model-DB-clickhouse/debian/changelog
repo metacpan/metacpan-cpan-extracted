@@ -1,8 +1,16 @@
+libqbit-application-model-db-clickhouse-perl (0.007) raring; urgency=low
+
+  * fix execute
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Tue, 23 Jan 2018 21:58:12 +0300
+
 libqbit-application-model-db-clickhouse-perl (0.006) raring; urgency=low
+
+  * Version 0.006
 
   * fixed: cycle and documentations
 
- -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 07 Jan 2018 13:17:19 +0300
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 07 Jan 2018 13:20:23 +0300
 
 libqbit-application-model-db-clickhouse-perl (0.005) raring; urgency=low
 

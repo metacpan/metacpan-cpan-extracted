@@ -1,5 +1,15 @@
 Revision history for OpenERP-OOM
 
+0.46      2018-01-25 12:47:37+00:00 Europe/London
+
+        - Re-release due to permissions problem
+
+0.45      2018-01-18 15:42:14+00:00 Europe/London
+
+        - Fix spam caused by a date field being null
+        - Fix spam caused by using given/when
+
+
 0.44      2016-09-01 12:45:41+01:00 Europe/London
 
         Pass through context on updates.  This prevents translation issues.

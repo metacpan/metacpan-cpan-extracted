@@ -3,8 +3,6 @@
 use warnings;
 use strict;
 
-use lib 'lib';
-
 use Test::More;
 #use Log::Report mode => 'DEBUG';
 use File::Basename qw(dirname);

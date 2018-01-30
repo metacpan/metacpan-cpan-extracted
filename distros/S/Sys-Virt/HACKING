@@ -15,7 +15,7 @@ Additions to the libvirt C API will require changes to a minimum
 of two parts of the Sys::Virt codebase.
 
  - Virt.xs - this provides the C glue code to access the libvirt C
-   library APIs and constants from the Perl interpretor. As a general
+   library APIs and constants from the Perl interpreter. As a general
    rule, every new function and header file constant/enum requires an
    addition to this file.  The exceptions are functions that are only
    provided for the benefit of language bindings and not intended for
@@ -93,7 +93,7 @@ effective way to update the Perl binding.
  - For each missing item reported in the test suite...
 
      - Edit Virt.xs to add the C binding
-     - Edit lib/*.pm to add the POD documentation (and occassionally Perl glue code)
+     - Edit lib/*.pm to add the POD documentation (and occasionally Perl glue code)
      - Edit Changes to document the addition
      - Run the test suite (without maintainer mode) to verify POD docs
          # ../libvirt/run make test

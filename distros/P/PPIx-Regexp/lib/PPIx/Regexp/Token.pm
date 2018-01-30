@@ -53,7 +53,7 @@ use base qw{PPIx::Regexp::Element};
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL };
 
-our $VERSION = '0.053';
+our $VERSION = '0.054';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 0;
 
@@ -101,6 +101,13 @@ sub unescaped_content {
     return $content;
 }
 
+sub scontent {
+    my ( $self ) = @_;
+    $self->significant()
+	and return $self->{content};
+    return;
+}
+
 # Called by the lexer once it has done its worst to all the tokens.
 # Called as a method with the lexer as argument. The return is the
 # number of parse failures discovered when finalizing.
@@ -123,7 +130,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2017 by Thomas R. Wyant, III
+Copyright (C) 2009-2018 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

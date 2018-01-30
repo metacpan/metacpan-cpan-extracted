@@ -193,7 +193,7 @@ if END-WORD-BOUNDARY is true"
     ;; (lr/debug search-for-rex "search-for-rex")
     (while (search-forward-regexp
             search-for-rex nil t)
-      (replace-match replace-with nil nil))
+      (replace-match replace-with t t))
     )
   )
 

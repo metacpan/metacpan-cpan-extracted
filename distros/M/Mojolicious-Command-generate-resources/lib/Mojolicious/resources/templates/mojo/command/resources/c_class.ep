@@ -34,16 +34,16 @@ sub edit($c) {
 # Update the record in table <%= $a->{t} %>
 sub update($c) {
 
-  # 1. Validate input
+  # Validate input
   my $validation = $c->_validation;
   return $c->render(action => 'edit', <%= $a->{t} %> => {})
     if $validation->has_error;
 
-  # 2. Update the record
+  # Update the record
   my $id = $c->param('id');
-  $c-<%= $a->{t} %>->save($id, $validation->output);
+  $c-><%= $a->{t} %>->save($id, $validation->output);
 
-  # 4. Return the updated record or just send "204 No Content"
+  # Redirect to the updated record or just send "204 No Content"
   # See https://developer.mozilla.org/docs/Web/HTTP/Status/204
   $c->redirect_to('show_<%= $a->{t} %>', id => $id);
 }
@@ -51,7 +51,10 @@ sub update($c) {
 # GET /<%= $a->{t} %>/:id
 # Display a record from table <%= $a->{t} %>.
 sub show($c) {
-  $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->find($c->param('id')));
+    my $row = $c-><%= $a->{t} %>->find($c->param('id'));
+    $c->render(text => $c->res->default_message(404), status => 404) && return 
+        unless $row;
+  $c->render(<%= $a->{t} %> => $row);
 }
 
 # GET /<%= $a->{t} %>
@@ -65,18 +68,16 @@ sub index {
 sub remove {
   my $c = shift;
   $c-><%= $a->{t} %>->remove($c->param('id'));
-  $c->redirect_to('<%= $a->{t} %>');
+  $c->redirect_to('home_<%= $a->{t} %>');
 }
 
 
 # Validation for actions that store or update
 sub _validation($c) {
-  my $validation = $c->validation;
+  my $v = $c->validation;
   # Add validation rules for the record to be stored in the database
-  # $validation->required('title');
-  # $validation->required('body');
-
-  return $validation;
+%= $a->{validation}
+  return $v;
 }
 
 1;

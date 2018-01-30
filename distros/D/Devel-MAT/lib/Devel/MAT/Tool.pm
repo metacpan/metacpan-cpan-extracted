@@ -8,7 +8,7 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( any );
@@ -18,11 +18,15 @@ sub new
    my $class = shift;
    my ( $pmat, %args ) = @_;
 
-   return bless {
+   my $self = bless {
       pmat     => $pmat,
       df       => $pmat->dumpfile,
       progress => $args{progress},
    }, $class;
+
+   $self->init_tool if $self->can( 'init_tool' );
+
+   return $self;
 }
 
 sub pmat
@@ -56,6 +60,10 @@ sub get_sv_from_args
       # Acccept any root name symbolically
       if( any { $addr eq $_ } Devel::MAT::Dumpfile->ROOTS ) {
          $sv = $self->df->$addr;
+      }
+      # Accept named symbols
+      elsif( $addr =~ m/^[\$\@\%\&]/ ) {
+         $sv = $self->pmat->find_symbol( $addr );
       }
       else {
          $addr = do {

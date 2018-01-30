@@ -1,0 +1,97 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+our $VERSION = '0.160'; # VERSION
+
+my $yaml_mod = 'XS';
+GetOptions(
+    'syck' => sub { $yaml_mod = 'Syck' },
+    'xs'   => sub { $yaml_mod = 'XS' },
+    'help' => sub {
+        print "Usage: check-yaml [--syck|--xs] <file>\n";
+        exit 0;
+    },
+);
+
+if ($yaml_mod eq 'Syck') {
+    require YAML::Syck; YAML::Syck->import;
+} elsif ($yaml_mod eq 'XS') {
+    require YAML::XS;   YAML::XS->import;
+}
+
+eval {
+    undef $/;
+    Load(~~<>);
+};
+
+die $@ if $@;
+
+1;
+# ABSTRACT: Check YAML syntax
+# PODNAME: check-yaml
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+check-yaml - Check YAML syntax
+
+=head1 VERSION
+
+This document describes version 0.160 of check-yaml (from Perl distribution App-SerializeUtils), released on 2018-01-29.
+
+=head1 DESCRIPTION
+
+Check YAML syntax. Prints nothing if YAML syntax is okay.
+
+=head1 OPTIONS
+
+=over
+
+=item * --syck
+
+Use L<YAML::Syck>.
+
+=item * --xs
+
+Use L<YAML::XS> (the default).
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-SerializeUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SerializeUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

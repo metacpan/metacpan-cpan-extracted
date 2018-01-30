@@ -2,17 +2,117 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 45)
+MYPACKAGESTART (tconv 1 0 49)
 
 ###########
 # Library #
 ###########
-SET (libtconv_src src/tconv.c src/tconv/charset/cchardet.c)
+SET (libtconv_src src/tconv.c src/tconv/charset/tconv_charset_cchardet.c)
 SET (libtconv_inc)
+
+# ------------------------------------
+# iconv sources: libiconv-1.15 builtin
+# ------------------------------------
+MESSAGE (STATUS "Unpacking libiconv")
+EXECUTE_PROCESS(
+  COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/libiconv-1.15.tar.gz
+  WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
+  )
+#
+# iconv uses config.h, we are using tconv_config.h, so there is no clash luckily
+#
+FILE (WRITE
+  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/config.h
+"
+/* Generated file */
+/* localcharset.c will play itself with WIN32_LEAN_AND_MEAN... */
+#undef WIN32_LEAN_AND_MEAN
+"
+  )
+FUNCTION (CREATE_ICONV_H src dst)
+  SET (DLL_VARIABLE "") # Just to be sure
+  SET (EILSEQ 134679) # Fallback value if any
+  SET (ICONV_CONST "")
+  SET (USE_MBSTATE_T "0")
+  SET (HAVE_WCHAR_T "0")
+  MESSAGE (STATUS "Configuring ${dst}")
+  CONFIGURE_FILE (${src} ${dst})
+ENDFUNCTION ()
+FUNCTION (CREATE_LOCALCHARSET_H src dst)
+  MESSAGE (STATUS "Configuring ${dst}")
+  CONFIGURE_FILE (${src} ${dst})
+ENDFUNCTION ()
+
+CREATE_ICONV_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h @ONLY)
+CREATE_LOCALCHARSET_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h @ONLY)
+INCLUDE (CheckCSourceCompiles)
+CHECK_C_SOURCE_COMPILES("
+  #include <stdlib.h>
+  #include <langinfo.h>
+  int main(int ac, char **av)
+  {
+    char *cs = nl_langinfo(CODESET);
+    exit(0);
+  }"
+  HAVE_LANGINFO_CODESET)
+
+INCLUDE ( CheckSymbolExists )
+CHECK_SYMBOL_EXISTS ( getc_unlocked "stdio.h" HAVE_DECL_GETC_UNLOCKED )
+SET (ENABLE_EXTRA TRUE)
+
+INCLUDE (TestBigEndian)
+TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+IF (NOT IS_BIG_ENDIAN)
+  SET (WORDS_LITTLEENDIAN TRUE)
+ENDIF ()
+
+LIST (APPEND libtconv_iconv_src
+  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/lib/localcharset.c
+  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/relocatable.c
+  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/iconv.c
+  )
+FOREACH (_iconv_src ${libtconv_iconv_src})
+  SET_PROPERTY(
+    SOURCE ${_iconv_src}
+    PROPERTY COMPILE_FLAGS
+    " -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include"
+    )
+  SET_PROPERTY(
+    SOURCE ${_iconv_src}
+    APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    ICONV_CONST=
+    )
+  SET_PROPERTY(
+    SOURCE ${_iconv_src}
+    APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    LIBDIR=""
+    )
+  SET_PROPERTY(
+    SOURCE ${_iconv_src}
+    APPEND
+    PROPERTY COMPILE_DEFINITIONS
+    HAVE_WORKING_O_NOFOLLOW=0
+    )
+  FOREACH (_have HAVE_LANGINFO_CODESET HAVE_DECL_GETC_UNLOCKED ENABLE_EXTRA WORDS_LITTLEENDIAN)
+    IF (${${_have}})
+      SET_PROPERTY(
+	SOURCE ${_iconv_src}
+	APPEND
+	PROPERTY COMPILE_DEFINITIONS
+	${_have}=1
+	)
+    ENDIF ()
+  ENDFOREACH ()
+ENDFOREACH ()
+
+LIST (APPEND libtconv_src ${libtconv_iconv_src})
 
 # ----------------
 # ccharset sources
 # ----------------
+MESSAGE (STATUS "Unpacking cchardet")
 EXECUTE_PROCESS(
   COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/cchardet-1.0.0.tar.gz
   WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
@@ -75,13 +175,17 @@ ELSE ()
   SET (DLFCNWIN32_FOUND FALSE)
 ENDIF ()
 
+###################
+# Default Plugins #
+###################
+
 # ---
 # ICU
 # ---
 FIND_PACKAGE (ICU)
 IF (ICU_FOUND)
   SET (TCONV_HAVE_ICU 1)
-  SET (icu_src src/tconv/charset/ICU.c src/tconv/convert/ICU.c)
+  SET (icu_src src/tconv/charset/tconv_charset_ICU.c src/tconv/convert/tconv_convert_ICU.c)
   LIST (APPEND libtconv_src ${icu_src})
   IF (NOT ("${ICU_INCLUDE_DIRS}" STREQUAL ""))
     LIST (APPEND libtconv_inc ${ICU_INCLUDE_DIRS})
@@ -95,34 +199,13 @@ ENDIF ()
 # -----
 # ICONV
 # -----
-FIND_PACKAGE (Iconv)
-IF (NOT ICONV_FOUND)
-  IF (WIN32 AND NOT CYGWIN)
-    EXECUTE_PROCESS(
-      COMMAND "${CMAKE_COMMAND}" -E copy_directory "${PROJECT_SOURCE_DIR}/3rdparty/github/winiconv" "${3RDPARTY_OUTPUT_PATH}/winiconv"
-      WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
-      )
-    SET (ICONV_FOUND TRUE)
-    SET (TCONV_HAVE_ICONV 1)
-    LIST (APPEND libtconv_src "${3RDPARTY_OUTPUT_PATH}/winiconv/win_iconv.c")
-    LIST (APPEND libtconv_inc "${3RDPARTY_OUTPUT_PATH}/winiconv")
-    SET (ICONV_INCLUDE_DIR "${3RDPARTY_OUTPUT_PATH}/winiconv")
-    SET (ICONV_LINK_FLAGS)
-    SET (ICONV_SECOND_ARGUMENT_IS_CONST TRUE)
-  ENDIF ()
-  SET (WINICONV TRUE)
-ELSE ()
-  SET (TCONV_HAVE_ICONV 1)
-  SET (WINICONV FALSE)
-ENDIF ()
-IF (ICONV_FOUND)
-  FIND_PACKAGE (IconvCapabilities)
-  SET (iconv_src src/tconv/convert/iconv.c)
-  LIST (APPEND libtconv_src ${iconv_src})
-  IF (NOT ("${ICONV_INCLUDE_DIRS}" STREQUAL ""))
-    LIST (APPEND libtconv_inc ${ICONV_INCLUDE_DIRS})
-  ENDIF ()
-ENDIF ()
+SET (ICONV_FOUND TRUE)
+SET (TCONV_HAVE_ICONV 1)
+SET (ICONV_SECOND_ARGUMENT_IS_CONST FALSE)
+SET (ICONV_CAN_TRANSLIT TRUE)
+SET (ICONV_CAN_IGNORE TRUE)
+LIST (APPEND libtconv_src src/tconv/convert/tconv_convert_iconv.c)
+LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include)
 
 MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/tconv_config.h.in
@@ -137,9 +220,6 @@ FOREACH (_target tconv tconv_static)
   IF (ICU_FOUND)
     TARGET_LINK_LIBRARIES(${_target} PUBLIC ${ICU_LINK_FLAGS})
   ENDIF ()
-  IF (ICONV_FOUND AND NOT WINICONV)
-    TARGET_LINK_LIBRARIES(${_target} PUBLIC ${ICONV_LINK_FLAGS})
-  ENDIF ()
   IF (NOT ("${CMAKE_DL_LIBS}" STREQUAL ""))
     TARGET_LINK_LIBRARIES(${_target} PUBLIC ${CMAKE_DL_LIBS})
   ENDIF ()
@@ -147,6 +227,11 @@ FOREACH (_target tconv tconv_static)
     TARGET_LINK_LIBRARIES(${_target} PUBLIC "psapi")
   ENDIF ()
 ENDFOREACH ()
+
+################
+# Dependencies #
+################
+MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS)
 
 ###############
 # Executables #
@@ -169,20 +254,18 @@ FOREACH (_target tconvExe tconvExe_static)
   ELSE ()
     SET_TARGET_PROPERTIES(${_target} PROPERTIES OUTPUT_NAME tconv_static)
   ENDIF ()
+  IF (CMAKE_C_COMPILER_ID STREQUAL SunPro)
+    TARGET_LINK_LIBRARIES(${_target} PUBLIC Crun)
+  ENDIF ()
 ENDFOREACH ()
 
-################
-# Dependencies #
-################
-MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS)
-
-###############
-# Executables #
-###############
 MYPACKAGETESTEXECUTABLE(tconvExample test/example.c)
 FOREACH (_target tconvExample tconvExample_static)
   TARGET_COMPILE_DEFINITIONS(${_target} PRIVATE -DOPTPARSE_IMPLEMENTATION -DOPTPARSE_API=static)
   TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${3RDPARTY_OUTPUT_PATH}/optparse)
+  IF (CMAKE_C_COMPILER_ID STREQUAL SunPro)
+    TARGET_LINK_LIBRARIES(${_target} PUBLIC Crun)
+  ENDIF ()
 ENDFOREACH ()
 
 #########

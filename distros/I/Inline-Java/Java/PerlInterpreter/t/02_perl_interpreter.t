@@ -11,7 +11,7 @@ BEGIN {
         exit ;
 	}
 
-    plan(tests => 12) ;
+    plan(tests => 13) ;
 }
 
 
@@ -67,6 +67,8 @@ __END__
 
 __Java__
 package org.perl.inline.java ;
+
+import java.util.* ;
 
 class InlineJavaPerlInterpreterTests implements Runnable {
 	private static int cnt = 2 ;
@@ -133,6 +135,13 @@ class InlineJavaPerlInterpreterTests implements Runnable {
 			}
 
 			pi.StartCallbackLoop();
+
+			ArrayList a = new ArrayList() ;
+			for (int i = 0 ; i < 100 ; i++){
+				a.add(new Integer(i * 2)) ;
+			}
+			sum = (Integer)pi.CallPerlSub("sum_array_list", new Object [] {a}, Integer.class) ;
+			ok(sum, new Integer(9900)) ;
 
 			pi.destroy() ;
 			ok("1", "1") ;

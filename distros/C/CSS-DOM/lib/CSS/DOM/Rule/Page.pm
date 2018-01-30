@@ -1,6 +1,6 @@
 package CSS::DOM::Rule::Page;
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use warnings; no warnings qw 'utf8 parenthesis';
 use strict;
@@ -73,7 +73,7 @@ CSS::DOM::Rule::Page - CSS @page rule class for CSS::DOM
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 SYNOPSIS
 

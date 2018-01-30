@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Fcntl ();
 use DB_File ();
@@ -70,7 +70,7 @@ sub new {
     }
     else {
         $class->throw(
-            q{BDB-00001: Unbekannter Mode},
+            q~BDB-00001: Unbekannter Mode~,
             Mode=>$mode,
         );
     }
@@ -80,7 +80,7 @@ sub new {
         $DB_File::DB_HASH;
     unless ($ref) {
         $class->throw(
-            q{BDB-00001: Kann Persistenten Hash nicht öffnen},
+            q~BDB-00001: Kann Persistenten Hash nicht öffnen~,
             File=>$file,
             Mode=>$mode,
             Errstr=>$!,
@@ -112,11 +112,11 @@ sub sync {
     my $self = shift;
 
     my $x = tied %$self || $self->throw(
-        q{BDB-00002: Kann Tie-Objekt nicht ermitteln},
+        q~BDB-00002: Kann Tie-Objekt nicht ermitteln~,
     );
     if ($x->sync < 0) {
         $self->throw(
-            q{BDB-00003: Sync ist fehlgeschlagen},
+            q~BDB-00003: Sync ist fehlgeschlagen~,
             Errstr=>$!,
         );
     }
@@ -146,7 +146,7 @@ sub close {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -154,7 +154,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

@@ -16,7 +16,7 @@ my @other_ldflags;
 #@other_ldflags = ('-L/usr/local/Cellar/glfw/3.2.1/lib -lglfw');
 if ($^O eq 'darwin') { # fixed upstream in ExtUtils::MakeMaker v7.31_04
     my @frameworks;
-    for (@LIBS) { push @frameworks, $1 while(s/(-framework \S+)//); }
+    for (@LIBS) { push @frameworks, $1 while(s/(-framework\s*\S+|-F\s*\S+)//); }
     @other_ldflags = (
         dynamic_lib =>  { OTHERLDFLAGS => "@frameworks" },
     );
@@ -158,17 +158,11 @@ if  (eval {require ExtUtils::Constant; 1}) {
               {name=>"MAP_OCCLUSION", macro=>"1"},
               {name=>"MAP_PREFILTER", macro=>"1"},
               {name=>"MAP_ROUGHNESS", macro=>"1"},
-              {name=>"RRES_TYPE_DIRECTORY", macro=>"1"},
-              {name=>"RRES_TYPE_FONT_CHARDATA", macro=>"1"},
-              {name=>"RRES_TYPE_FONT_IMAGE", macro=>"1"},
-              {name=>"RRES_TYPE_IMAGE", macro=>"1"},
-              {name=>"RRES_TYPE_RAW", macro=>"1"},
-              {name=>"RRES_TYPE_TEXT", macro=>"1"},
-              {name=>"RRES_TYPE_VERTEX", macro=>"1"},
-              {name=>"RRES_TYPE_WAVE", macro=>"1"},
               {name=>"UNCOMPRESSED_GRAYSCALE", macro=>"1"},
               {name=>"UNCOMPRESSED_GRAY_ALPHA", macro=>"1"},
+              {name=>"UNCOMPRESSED_R32", macro=>"1"},
               {name=>"UNCOMPRESSED_R32G32B32", macro=>"1"},
+              {name=>"UNCOMPRESSED_R32G32B32A32", macro=>"1"},
               {name=>"UNCOMPRESSED_R4G4B4A4", macro=>"1"},
               {name=>"UNCOMPRESSED_R5G5B5A1", macro=>"1"},
               {name=>"UNCOMPRESSED_R5G6B5", macro=>"1"},

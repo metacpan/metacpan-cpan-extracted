@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:         Sys-Virt
 abstract:     Extension for the libvirt library
-version:      3.9.1
+version:      4.0.0
 author:
   - Daniel P. Berrange <dan@berrange.com>
 license: perl

@@ -33,6 +33,7 @@ t/filter-xgettext.t
 t/interpolate.t
 t/method-xgettext.t
 t/release-cpan-changes.t
+t/templates/bugs-1.tt
 t/templates/interpolate-1.tt
 t/templates/interpolate-2.tt
 t/templates/interpolate-3.tt

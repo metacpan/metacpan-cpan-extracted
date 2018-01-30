@@ -8,8 +8,11 @@ t/domains
 t/urls 
 t/expressions 
 t/userdomains 
+t/squid.conf 
 lib/Squid/Guard.pm
+lib/Squid/Guard/Common.pm
 lib/Squid/Guard/Request.pm
 examples/basic 
 examples/luxguard 
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

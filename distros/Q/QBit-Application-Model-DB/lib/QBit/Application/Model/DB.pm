@@ -28,7 +28,7 @@ apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.025';
+$QBit::Application::Model::DB::VERSION = '0.027';
 use qbit;
 
 use base qw(QBit::Application::Model);
@@ -234,7 +234,7 @@ sub init {
               if $self->can($table_name);
             {
                 no strict 'refs';
-                *{"$class::$table_name"} = sub {
+                *{$class . '::' . $table_name} = sub {
                     my ($self) = @_;
 
                     $self->{'__TABLES__'}{$table_name} = $tables{$table_name}->{'class'}->new(
@@ -688,7 +688,10 @@ sub _get_all {
 sub _log_sql {
     my ($self, $sql, $params) = @_;
 
-    $sql =~ s/\?/$self->quote($_)/e foreach @{$params || []};
+    if (defined($params) && @$params) {
+        my $i = 0;
+        $sql =~ s/\?/$self->quote($params->[$i++])/eg;
+    }
 
     l $sql if $DEBUG;
 

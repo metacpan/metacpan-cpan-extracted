@@ -97,7 +97,7 @@ my @library_tests = (
 
 my %library_opts = (
 	'ssl' => {
-		'defines' => ' -DGIT_OPENSSL',
+		'defines' => ' -DGIT_OPENSSL -DGIT_SHA1_OPENSSL -DGIT_HTTPS',
 		'libs'    => ' -lssl -lcrypto',
 	},
 	'ssh2' => {
@@ -133,6 +133,8 @@ foreach my $test (@library_tests) {
 		}
 
 		my $opts = $library_opts{$library};
+		$opts->{'use'} = 1;
+
 		$def .= $opts->{'defines'};
 
 		print uc($library), " support enabled (user provided)", "\n";
@@ -150,6 +152,8 @@ foreach my $test (@library_tests) {
 		}
 
 		my $opts = $library_opts{$library};
+		$opts->{'use'} = 1;
+
 		$def .= $opts->{'defines'};
 		$lib .= $opts->{'libs'};
 
@@ -161,6 +165,8 @@ foreach my $test (@library_tests) {
 
 # universally supported
 $def .= ' -DNO_VIZ -DSTDC -DNO_GZIP -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE';
+
+$def .= ' -DLIBGIT2_NO_FEATURES_H';
 
 # supported on Solaris
 if ($is_solaris) {
@@ -198,7 +204,7 @@ if ($is_gcc) {
 		}
 
 		# Secure transport (HTTPS)
-		$def .= ' -DGIT_SECURE_TRANSPORT';
+		$def .= ' -DGIT_SECURE_TRANSPORT -DGIT_HTTPS -DGIT_SHA1_COMMON_CRYPTO';
 		$otherldflags .= ' -framework CoreFoundation -framework Security';
 	}
 
@@ -242,8 +248,14 @@ if ($Config{usethreads} && !$is_sunpro) {
 }
 
 my @deps = glob 'deps/libgit2/deps/{http-parser,zlib}/*.c';
-my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c}';
-push @srcs, 'deps/libgit2/src/hash/hash_generic.c';
+my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c}';
+
+if ($is_msvc) {
+	push @srcs, 'deps/libgit2/src/hash/hash_win32.c';
+}
+elsif (!$library_opts{'ssl'}{'use'} && !$is_osx) {
+	push @srcs, 'deps/libgit2/src/hash/hash_generic.c';
+}
 
 # the system regex is broken on Solaris, not available on Windows
 if ($is_windows || $is_solaris) {
@@ -254,12 +266,12 @@ if ($is_windows || $is_solaris) {
 if ($is_windows) {
 	push @srcs, glob 'deps/libgit2/src/{win32,compat}/*.c';
 
-	$def .= ' -DWIN32 -DGIT_WIN32 -DGIT_WINHTTP';
+	$def .= ' -DWIN32 -DGIT_WIN32 -DGIT_WINHTTP -DGIT_HTTPS';
 	$lib .= ' -lwinhttp -lrpcrt4 -lcrypt32';
 
 	if ($is_msvc) {
 		# visual studio compiler
-		$def .= ' -D_CRT_SECURE_NO_WARNINGS';
+		$def .= ' -D_CRT_SECURE_NO_WARNINGS -DGIT_SHA1_WIN32';
 	} else {
 		# mingw/cygwin
 		$def .= ' -D_WIN32_WINNT=0x0501 -D__USE_MINGW_ANSI_STDIO=1';
@@ -335,6 +347,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
+    "Cwd" => 0,
     "File::Basename" => 0,
     "File::Copy" => 0,
     "File::Path" => 0,
@@ -350,7 +363,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.74",
+  "VERSION" => "0.75",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -466,6 +479,15 @@ my @stash_progress_constants = (qw(
 	DONE
 ));
 
+my @rebase_operation_constants = (qw(
+	PICK
+	REWORD
+	EDIT
+	SQUASH
+	FIXUP
+	EXEC
+));
+
 my @object_constants = (qw(
 	ANY
 	BAD
@@ -513,6 +535,16 @@ ExtUtils::Constant::WriteConstants(
 	XS_FILE      => 'const-xs-stash-progress.inc',
 	XS_SUBNAME   => '_constant',
 	C_SUBNAME    => '_stash_progress_constant',
+);
+
+ExtUtils::Constant::WriteConstants(
+	NAME         => 'Git::Raw::Rebase::Operation',
+	NAMES        => [@rebase_operation_constants],
+	DEFAULT_TYPE => 'IV',
+	C_FILE       => 'const-c-rebase-operation.inc',
+	XS_FILE      => 'const-xs-rebase-operation.inc',
+	XS_SUBNAME   => '_constant',
+	C_SUBNAME    => '_rebase_operation_constant',
 );
 
 ExtUtils::Constant::WriteConstants(

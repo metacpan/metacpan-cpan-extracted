@@ -11,11 +11,9 @@ SUBROUTINES
              Returns array of element in Tags format.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Data::Printer;
      use Tags::Element qw(element);
 
@@ -59,11 +57,9 @@ EXAMPLE1
      # ]
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tags::Element qw(element);
      use Tags::Output::Raw;
 
@@ -92,12 +88,12 @@ SEE ALSO
         Install the Tags modules.
 
 AUTHOR
-    Michal Špaček skim@cpan.org
+    Michal Josef Špaček skim@cpan.org
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
+     © 2011-2018 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use constant CMD => "callstack";
 use constant CMD_DESC => "Display the call stack";
@@ -51,7 +51,7 @@ sub run
 
       for( $ctx->type ) {
          if( $_ eq "SUB" ) {
-            $what = $ctx->cv->name;
+            $what = $ctx->cv->symname;
          }
          elsif( $_ eq "TRY" ) {
             $what = "eval {...}";

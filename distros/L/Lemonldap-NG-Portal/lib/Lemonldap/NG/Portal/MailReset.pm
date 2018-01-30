@@ -8,7 +8,7 @@ package Lemonldap::NG::Portal::MailReset;
 use strict;
 use warnings;
 
-our $VERSION = '1.9.10';
+our $VERSION = '1.9.15';
 
 use Lemonldap::NG::Portal::Simple qw(:all);
 use base qw(Lemonldap::NG::Portal::SharedConf Exporter);
@@ -33,6 +33,7 @@ use POSIX qw(strftime);
 #   - changePassword
 #   - sendPasswordMail
 # - portal core module:
+#   - controlUrlOrigin
 #   - setMacros
 #   - setLocalGroups
 #   - setGroups
@@ -54,7 +55,7 @@ sub process {
     $self->{error} = PE_OK;
 
     $self->{error} = $self->_subProcess(
-        qw(smtpInit authInit extractMailInfo userDBInit getMailUser setSessionInfo
+        qw(controlUrlOrigin smtpInit authInit extractMailInfo userDBInit getMailUser setSessionInfo
           setMacros setGroups setPersistentSessionInfo setLocalGroups userDBFinish
           storeMailSession sendConfirmationMail passwordDBInit changePassword passwordDBFinish
           sendPasswordMail authFinish)
@@ -314,6 +315,7 @@ sub sendConfirmationMail {
     $url .= '&skin=' . $self->getSkin();
     $url .= '&' . $self->{authChoiceParam} . '=' . $self->{_authChoice}
       if ( $self->{_authChoice} );
+    $url .= '&url=' . $self->{_url} if $self->{_url};
 
     # Build mail content
     my $subject = $self->{mailConfirmSubject};

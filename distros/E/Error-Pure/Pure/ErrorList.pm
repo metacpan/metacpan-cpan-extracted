@@ -1,11 +1,9 @@
 package Error::Pure::ErrorList;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Utils qw(err_helper);
 use Error::Pure::Output::Text qw(err_line_all);
 use List::MoreUtils qw(none);
@@ -15,8 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-# Version.
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 # Process error.
 sub err {
@@ -143,17 +140,17 @@ L<https://github.com/tupinek/Error-Pure>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2015 Michal Špaček
+ © 2008-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.24
+0.25
 
 =cut

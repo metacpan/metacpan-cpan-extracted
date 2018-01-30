@@ -9,7 +9,7 @@ package Rex::Cloud::Jiffybox;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 
@@ -17,7 +17,7 @@ BEGIN {
   use Rex::Require;
   LWP::UserAgent->use;
   HTTP::Request::Common->use;
-  JSON::XS->use;
+  JSON::MaybeXS->use;
 }
 use Data::Dumper;
 
@@ -77,7 +77,7 @@ sub _do_request {
     die("Error on request.");
   }
 
-  my $json = JSON::XS->new;
+  my $json = JSON::MaybeXS->new;
   my $data = $json->decode( $res->decoded_content );
 
   Rex::Logger::debug( Dumper($data) );

@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -148,12 +148,6 @@ App::Yath::Command::failed
 =item --show-opts
 
 Exit after showing what yath thinks your options mean
-
-=item -h
-
-=item --help
-
-Exit after showing this help message
 
 =item -h
 

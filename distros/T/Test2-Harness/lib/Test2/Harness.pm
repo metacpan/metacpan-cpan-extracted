@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -66,6 +66,8 @@ sub run {
             sleep 0.02;
         }
     }
+
+    $_->finish() for @{$self->{+RENDERERS}};
 
     my $seen = 0;
     my(@fail, @pass);

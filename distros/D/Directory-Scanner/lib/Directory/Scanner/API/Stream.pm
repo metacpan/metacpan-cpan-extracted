@@ -4,7 +4,7 @@ package Directory::Scanner::API::Stream;
 use strict;
 use warnings;
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub head;
@@ -28,6 +28,43 @@ sub flatten {
 	return @results;
 }
 
+# IMPORTANT NOTE:
+# We have a bit of a recursive dependency issue here, which
+# is that these methods are being defined here as calls to
+# other classes, all of which also `do` this role. This means
+# that we need to lazy load things here so as to avoid load
+# ordering issues elsewhere.
+
+sub recurse {
+    my ($self) = @_;
+    require Directory::Scanner::Stream::Recursive;
+    Directory::Scanner::Stream::Recursive->new( stream => $self );
+}
+
+sub ignore {
+    my ($self, $filter) = @_;
+    require Directory::Scanner::Stream::Ignoring;
+    Directory::Scanner::Stream::Ignoring->new( stream => $self, filter => $filter );
+}
+
+sub match {
+    my ($self, $predicate) = @_;
+    require Directory::Scanner::Stream::Matching;
+    Directory::Scanner::Stream::Matching->new( stream => $self, predicate => $predicate );
+}
+
+sub apply {
+    my ($self, $function) = @_;
+    require Directory::Scanner::Stream::Application;
+    Directory::Scanner::Stream::Application->new( stream => $self, function => $function );
+}
+
+sub transform {
+    my ($self, $transformer) = @_;
+    require Directory::Scanner::Stream::Transformer;
+    Directory::Scanner::Stream::Transformer->new( stream => $self, transformer => $transformer );
+}
+
 ## ...
 
 # shhh, I shouldn't do this
@@ -49,14 +86,14 @@ Directory::Scanner::API::Stream - Streaming directory iterator abstract interfac
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
 This is a simple API role that defines what a stream object
 can do.
 
-=head1 METHODS
+=head1 API METHODS
 
 =head2 C<next>
 
@@ -90,10 +127,47 @@ by someone calling the C<close> method.
 This will clone a given stream and can optionally be
 given a different directory to scan.
 
+=head1 UTILITY METHODS
+
 =head2 C<flatten>
 
 This will take a given stream and flatten it into an
 array.
+
+=head2 C<recurse>
+
+By default a scanner will not try to recurse into subdirectories,
+if that is what you want, you must call this builder method.
+
+See L<Directory::Scanner::Stream::Recursive> for more info.
+
+=head2 C<ignore($filter)>
+
+Construct a stream that will ignore anything that is matched by
+the C<$filter> CODE ref.
+
+See L<Directory::Scanner::Stream::Ignoring> for more info.
+
+=head2 C<match($predicate)>
+
+Construct a stream that will keep anything that is matched by
+the C<$predicate> CODE ref.
+
+See L<Directory::Scanner::Stream::Matching> for more info.
+
+=head2 C<apply($function)>
+
+Construct a stream that will apply the C<$function> to each
+element in the stream without modifying it.
+
+See L<Directory::Scanner::Stream::Application> for more info.
+
+=head2 C<transform($transformer)>
+
+Construct a stream that will apply the C<$transformer> to each
+element in the stream and modify it.
+
+See L<Directory::Scanner::Stream::Transformer> for more info.
 
 =head1 AUTHOR
 

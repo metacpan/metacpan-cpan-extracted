@@ -1,5 +1,11 @@
 Revision history for Perl module Tree::DAG_Node.
 
+1.30  2018-01-26T15:32:00
+	- Explicitly escape { and } in a regexp because unescaped { issues a warning now and will become
+		a fatal error in Perl V 5.32.
+	- Adopt new repo structure. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+
 1.29  2016-03-01T13:39:00
 	- After another email exchange with Kent Fredric (via RT) and Karen Etheridge (via the
 		cpan-testers-discuss mailing list), I've edited Makefile.PL, again, to indicate that

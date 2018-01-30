@@ -1,4 +1,4 @@
-WWW-YouTube-Info version 0.05
+WWW-YouTube-Info version 0.06
 =============================
 
 INSTALLATION
@@ -20,7 +20,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2011 by east
+Copyright (C) by east
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

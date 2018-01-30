@@ -1,7 +1,9 @@
+ChangeLog
 Changes
 MANIFEST
 Makefile.PL
 README
+README.md
 lib/Mail/Identity.pm
 lib/Mail/Identity.pod
 lib/User/Identity.pm

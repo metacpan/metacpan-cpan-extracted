@@ -90,6 +90,9 @@ lib/Prty/JQuery/DataTable.pm
 lib/Prty/JQuery/Form/ViewEdit.pm
 lib/Prty/JQuery/Function.pm
 lib/Prty/JQuery/Tabs.pm
+lib/Prty/LaTeX/Generator.pm
+lib/Prty/LineProcessor.pm
+lib/Prty/LineProcessor/Line.pm
 lib/Prty/LockedCounter.pm
 lib/Prty/Math.pm
 lib/Prty/ModelCache.pm
@@ -118,6 +121,7 @@ lib/Prty/Sdoc/Item.pm
 lib/Prty/Sdoc/KeyValRow.pm
 lib/Prty/Sdoc/KeyValTable.pm
 lib/Prty/Sdoc/Line.pm
+lib/Prty/Sdoc/Link.pm
 lib/Prty/Sdoc/List.pm
 lib/Prty/Sdoc/Node.pm
 lib/Prty/Sdoc/PageBreak.pm
@@ -143,8 +147,6 @@ lib/Prty/Template.pm
 lib/Prty/Terminal.pm
 lib/Prty/Test/Class.pm
 lib/Prty/Test/Class/Method.pm
-lib/Prty/TextFile.pm
-lib/Prty/TextFile/Line.pm
 lib/Prty/Time.pm
 lib/Prty/Time/RFC822.pm
 lib/Prty/TimeLapse/Directory.pm
@@ -253,6 +255,9 @@ t/bin/Prty/JQuery/DataTable.t
 t/bin/Prty/JQuery/Form/ViewEdit.t
 t/bin/Prty/JQuery/Function.t
 t/bin/Prty/JQuery/Tabs.t
+t/bin/Prty/LaTeX/Generator.t
+t/bin/Prty/LineProcessor.t
+t/bin/Prty/LineProcessor/Line.t
 t/bin/Prty/LockedCounter.t
 t/bin/Prty/Math.t
 t/bin/Prty/ModelCache.t
@@ -281,6 +286,7 @@ t/bin/Prty/Sdoc/Item.t
 t/bin/Prty/Sdoc/KeyValRow.t
 t/bin/Prty/Sdoc/KeyValTable.t
 t/bin/Prty/Sdoc/Line.t
+t/bin/Prty/Sdoc/Link.t
 t/bin/Prty/Sdoc/List.t
 t/bin/Prty/Sdoc/Node.t
 t/bin/Prty/Sdoc/PageBreak.t
@@ -306,8 +312,6 @@ t/bin/Prty/Template.t
 t/bin/Prty/Terminal.t
 t/bin/Prty/Test/Class.t
 t/bin/Prty/Test/Class/Method.t
-t/bin/Prty/TextFile.t
-t/bin/Prty/TextFile/Line.t
 t/bin/Prty/Time.t
 t/bin/Prty/Time/RFC822.t
 t/bin/Prty/TimeLapse/Directory.t

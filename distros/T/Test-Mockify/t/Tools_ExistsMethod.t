@@ -25,7 +25,7 @@ sub ExistsMethod_WithObject_positiv {
     my $SubTestName = (caller(0))[3];
 
     my $FakeModuleForMockifyTest = FakeModuleForMockifyTest->new();
-    ok( ExistsMethod($FakeModuleForMockifyTest, 'DummmyMethodForTestOverriding'),
+    ok( ExistsMethod($FakeModuleForMockifyTest, 'DummyMethodForTestOverriding'),
         "$SubTestName - tests if ExistsMethod works with an object"
     );
     throws_ok( sub{ExistsMethod($FakeModuleForMockifyTest,'NotExistingMethod')},
@@ -40,7 +40,7 @@ sub ExistsMethod_WithPath_positiv {
     my $self = shift;
     my $SubTestName = (caller(0))[3];
 
-    ok( ExistsMethod('FakeModuleForMockifyTest', 'DummmyMethodForTestOverriding'),
+    ok( ExistsMethod('FakeModuleForMockifyTest', 'DummyMethodForTestOverriding'),
         "$SubTestName - tests if ExistsMethod works with the object path"
     );
     throws_ok( sub{ExistsMethod('FakeModuleForMockifyTest','NotExistingMethod')},

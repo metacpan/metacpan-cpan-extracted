@@ -18,7 +18,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '8.08';
+our $VERSION = '8.09';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -771,7 +771,7 @@ L<http://creativecommons.org/licenses/by-sa/4.0>.
 
 =head2 Bootstrap
 
-  Copyright (C) 2011-2016 Twitter, Inc.
+  Copyright (C) 2011-2018 The Bootstrap Authors.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
@@ -801,6 +801,12 @@ the SIL OFL 1.1, L<http://scripts.sil.org/OFL>.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 
+=head2 popper.js
+
+  Copyright (C) Federico Zivolo 2017.
+
+Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
+
 =head1 AUTHOR
 
 Sebastian Riedel, C<sri@cpan.org>.
@@ -825,7 +831,7 @@ Paul Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2017, Sebastian Riedel and others.
+Copyright (C) 2014-2018, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

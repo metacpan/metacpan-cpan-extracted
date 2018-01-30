@@ -9,7 +9,7 @@ use File::Basename;
 use File::Spec;
 use Promises backend => ['AnyEvent'], qw(deferred);
 
-use ok 'AnyEvent::PgRecvlogical';
+use AnyEvent::PgRecvlogical;
 
 sub ae_sleep {
     my $t = shift || 0;

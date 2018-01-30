@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-use File::Slurper 'read_binary';
+use File::Slurper 'read_text';
 use File::Spec;
 use File::Temp;
 
@@ -47,7 +47,7 @@ ok($y_cell_count == $svg -> y_cell_count, "Comparing y_cell_counts");
 ok($x_offset == $svg -> x_offset, "Comparing x_offset");
 ok($y_offset == $svg -> y_offset, "Comparing y_offset");
 ok($width == $svg -> width, "Comparing widths");
-ok($height == $svg -> height, "Comparing heigths");
+ok($height == $svg -> height, "Comparing heights");
 
 $svg -> frame('stroke-width' => 3);
 $svg -> text
@@ -110,10 +110,10 @@ $svg -> write(output_file_name => $output_file_name);
 # For this test we have to zap the SVG modules' version #s
 # which are embedded in the 2 files.
 
-my($got)				= read_binary($output_file_name);
+my($got)				= read_text($output_file_name);
 $got					= "$1$2" if ($got =~ /(.+)<!--.+-->(.+)/ms);
 my($input_file_name)	= File::Spec -> catfile('data', 'synopsis.svg');
-my($expected)			= read_binary($input_file_name);
+my($expected)			= read_text($input_file_name);
 $expected				= "$1$2" if ($expected =~ /(.+)<!--.+-->(.+)/ms);
 my($result)			 	= $got eq $expected;
 

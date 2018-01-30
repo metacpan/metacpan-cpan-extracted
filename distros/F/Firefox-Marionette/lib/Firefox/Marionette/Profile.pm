@@ -14,7 +14,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.16';
+our $VERSION = '0.30';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -35,6 +35,10 @@ sub _profile_ini_directory {
           File::Spec->catdir( Win32::GetFolderPath( Win32::CSIDL_APPDATA() ),
             'Mozilla', 'Firefox' );
     }
+    elsif ( $OSNAME eq 'cygwin' ) {
+        $profile_ini_directory =
+          File::Spec->catdir( $ENV{APPDATA}, 'Mozilla', 'Firefox' );
+    }
     else {
         my $home_directory =
           ( getpwuid $EFFECTIVE_USER_ID )[ _GETPWUID_DIR_INDEX() ];
@@ -49,15 +53,15 @@ sub _profile_ini_directory {
 
 sub _read_ini_file {
     my ( $class, $profile_ini_directory ) = @_;
-	if (-d $profile_ini_directory) {
-	    my $profile_ini_path =
-	      File::Spec->catfile( $profile_ini_directory, 'profiles.ini' );
-		if (-f $profile_ini_path) {
-		    my $config = Config::INI::Reader->read_file($profile_ini_path);
-		    return $config;
-		}
-	}
-		return {};
+    if ( -d $profile_ini_directory ) {
+        my $profile_ini_path =
+          File::Spec->catfile( $profile_ini_directory, 'profiles.ini' );
+        if ( -f $profile_ini_path ) {
+            my $config = Config::INI::Reader->read_file($profile_ini_path);
+            return $config;
+        }
+    }
+    return {};
 }
 
 sub names {
@@ -114,11 +118,12 @@ sub existing {
               File::Spec->catfile( $config->{$first_key}->{Path}, 'prefs.js' );
         }
     }
-	if (($path) && (-f $path)) {
-	    return $class->parse($path);
-	} else {
-		return;
-	}
+    if ( ($path) && ( -f $path ) ) {
+        return $class->parse($path);
+    }
+    else {
+        return;
+    }
 }
 
 sub new {
@@ -236,7 +241,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.16
+Version 0.30
 
 =head1 SYNOPSIS
 

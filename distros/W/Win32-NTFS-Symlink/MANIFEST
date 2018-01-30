@@ -5,6 +5,7 @@ ntfs_readlink.c
 ntfs_symlink.c
 README
 Symlink.xs
+typemap
 include/ioctlcmd.h
 include/ntfs_readlink.h
 include/ntfs_symlink.h

@@ -1,5 +1,13 @@
 Revision history for Fork-Event-Interval
 
+1.00    2018-01-23
+        - modified t/15-interval.t with some timing changes to prevent CPAN
+          Testers failures
+        - added t/45-params.t to cover cases where we send in parameters to the
+          event
+        - added an EXAMPLE to display how to send in params to the event
+          callback
+
 0.05    2017-10-20
         - POD fix (indenting examples)
         - bump copyright to 2017

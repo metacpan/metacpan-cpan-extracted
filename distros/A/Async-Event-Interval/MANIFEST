@@ -13,6 +13,7 @@ t/25-start.t
 t/30-status.t
 t/35-timeout.t
 t/40-event_crash.t
+t/45-params.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

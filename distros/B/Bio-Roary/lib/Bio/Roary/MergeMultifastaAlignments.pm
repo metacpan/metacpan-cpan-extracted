@@ -1,5 +1,5 @@
 package Bio::Roary::MergeMultifastaAlignments;
-$Bio::Roary::MergeMultifastaAlignments::VERSION = '3.11.3';
+$Bio::Roary::MergeMultifastaAlignments::VERSION = '3.12.0';
 # ABSTRACT: Merge multifasta alignment files with equal numbers of sequences.
 
 
@@ -118,7 +118,7 @@ Bio::Roary::MergeMultifastaAlignments - Merge multifasta alignment files with eq
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

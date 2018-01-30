@@ -30,7 +30,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Apache::Session::Generate::MD5' => 0,
         'CGI'                            => 3.08,
-        'Lemonldap::NG::Common'          => '1.9.14',
+        'Lemonldap::NG::Common'          => '1.9.15',
         'LWP'                            => 0,
         'Mouse'                          => 0,
         'URI'                            => 0,

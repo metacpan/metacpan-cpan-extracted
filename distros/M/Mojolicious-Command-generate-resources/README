@@ -1,6 +1,6 @@
 NAME
-    Mojolicious::Command::generate::resources - Resources from database for
-    your application
+    Mojolicious::Command::generate::resources - Generate M, V & C from
+    database tables
 
 SYNOPSIS
       Usage: APPLICATION generate resources [OPTIONS]
@@ -8,10 +8,14 @@ SYNOPSIS
         my_app.pl generate help resources # help with all available options
         my_app.pl generate resources --tables users,groups
 
+PERL REQUIREMENTS
+    This command uses "signatures" in feature, therefore Perl 5.20 is
+    required.
+
 DESCRIPTION
-    *This is an early release.* Mojolicious::Command::generate::resources
-    generates directory structure for a fully functional MVC set of files,
-    and routes based on existing tables in your application's database.
+    Mojolicious::Command::generate::resources generates directory structure
+    for a fully functional MVC set of files, and routes based on existing
+    tables in your application's database.
 
     This tool's purpose is to promote RAD
     <http://en.wikipedia.org/wiki/Rapid_application_development> by
@@ -28,8 +32,9 @@ DESCRIPTION
     give you a jump start, so you can concentrate on writing your
     business-specific code. It is assumed that you will modify the generated
     code to suit your specific needs. All the generated code is produced
-    from templates which you also can put in your application renderer's
-    path and modify to your taste.
+    from templates. You can copy the folder with the templates, push it to
+    "@{$app->renderer->paths}" and modify to your taste. Please look into
+    the "t/blog" folder of this distribution for examples.
 
     The command expects to find and will use one of the commonly used
     helpers "pg", "mysql" "sqlite". The supported wrappers are respectively
@@ -128,14 +133,32 @@ METHODS
 
     Run this command.
 
+  render_template_to_file
+    Renders a template from a file to a file using Mojo::Template.
+    Parameters: $tmpl_file - full path tho the template file; $target_file -
+    full path to the file to be written; $template_args - a hash reference
+    containing the arguments to the template. See also "render_to_file" in
+    Mojolicious::Command.
+
+        $self->render_template_to_file($tmpl_file, $target_file, $template_args);
+
+  generate_formfields
+    Generates form-fields from columns information found in the repective
+    table. The result is put into "_form.html.ep". The programmer can then
+    modify the generated form-fields.
+
+        $form_fields = $self->generate_formfields($table_name);
+
+  generate_validation
+    Generates code for the "_validation" method in the respective controler.
+
+        $validation_code = $self->generate_validation($table_name);
+
 TODO
     The work on the features may not go in the same order specified here.
     Some parts may be fully implemented while others may be left for later.
 
-        - Improve documentation. Tests.
-        - Tests for templates (views).
-        - Tests for model classes.
-        - Test the generated routes.
+        - Improve documentation.
         - Implement generation of Open API specification out from
           tables' metadata. More tests.
 
@@ -143,7 +166,6 @@ AUTHOR
         Красимир Беров
         CPAN ID: BEROV
         berov@cpan.org
-        http://i-can.eu
 
 COPYRIGHT
     This program is free software licensed under

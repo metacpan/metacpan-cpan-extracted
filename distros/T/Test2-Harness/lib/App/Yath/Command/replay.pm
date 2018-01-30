@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '0.001047';
+our $VERSION = '0.001049';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -91,12 +91,6 @@ App::Yath::Command::replay - Command to replay a test run from an event log.
 =item --show-opts
 
 Exit after showing what yath thinks your options mean
-
-=item -h
-
-=item --help
-
-Exit after showing this help message
 
 =item -h
 
@@ -440,7 +434,7 @@ Specify the formatter to use
 
 (Default: "Test2")
 
-Only useful when the renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+Only useful when a renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
 
 =item --qvf
 
@@ -464,11 +458,13 @@ This is only used when the renderer is set to "Formatter"
 
 =item --renderer ...
 
-Specify an alternate renderer
+=item -r +Module=arg1,arg2,...
+
+Specify renderers
 
 (Default: "Formatter")
 
-Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument.
+Use "+" to give a fully qualified module name. Without "+" "Test2::Harness::Renderer::" will be prepended to your argument. You may specify custom arguments to the constructor after an "=" sign.
 
 =back
 

@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use base qw(Exporter);
 
-our $VERSION = '1.003009';
+our $VERSION = '1.003010';
 $VERSION = eval $VERSION;
 
 sub _choose_json_module {
@@ -111,7 +111,7 @@ JSON::MaybeXS - Use L<Cpanel::JSON::XS> with a fallback to L<JSON::XS> and L<JSO
 
   my $json_output = encode_json($data_structure);
 
-  my $json = JSON->new;
+  my $json = JSON()->new;
 
   my $json_with_args = JSON::MaybeXS->new(utf8 => 1); # or { utf8 => 1 }
 
@@ -181,11 +181,14 @@ B<only>.
 The C<JSON> constant returns the selected implementation module's name for
 use as a class name - so:
 
-  my $json_obj = JSON->new; # returns a Cpanel::JSON::XS or JSON::PP object
+  my $json_obj = JSON()->new; # returns a Cpanel::JSON::XS or JSON::PP object
 
 and that object can then be used normally:
 
   my $data_structure = $json_obj->decode($json_text); # etc.
+
+The use of parentheses here is optional, and only used as a hint to the reader
+that this use of C<JSON> is a I<subroutine> call, I<not> a class name.
 
 =head2 is_bool
 
@@ -223,8 +226,8 @@ least) the methods C<encode> and C<decode>.
 To include JSON-aware booleans (C<true>, C<false>) in your data, just do:
 
     use JSON::MaybeXS;
-    my $true = JSON->true;
-    my $false = JSON->false;
+    my $true = JSON()->true;
+    my $false = JSON()->false;
 
 =head1 CONVERTING FROM JSON::Any
 

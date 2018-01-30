@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.39';
+$VERSION = '3.40';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.39
+SNMP::Info - Version 3.40
 
 =head1 AUTHOR
 
@@ -501,6 +501,12 @@ SNMP::Info::Layer2::3Com - SNMP Interface to L2 3Com Switches
 
 See documentation in L<SNMP::Info::Layer2::3Com> for details.
 
+=item SNMP::Info::Layer2::Adtran
+
+Subclass for Adtran devices.
+
+See documentation in L<SNMP::Info::Layer2::Adtran> for details.
+
 =item SNMP::Info::Layer2::Airespace
 
 Subclass for Cisco (Airespace) wireless controllers.
@@ -724,6 +730,12 @@ This class covers Catalyst 6500s in native mode, hybrid mode.  Catalyst
 
 See documentation in L<SNMP::Info::Layer3::C6500> for details.
 
+=item SNMP::Info::Layer3::CheckPoint
+
+Subclass for CheckPoint devices
+
+See documentation in L<SNMP::Info::Layer3::CheckPoint> for details.
+
 =item SNMP::Info::Layer3::Cisco
 
 This is a simple wrapper around layer 3 for IOS devices and the base layer 3
@@ -753,6 +765,12 @@ L<SNMP::Info::Layer3::CiscoSwitch> for details.
 Subclass for Avaya/Nortel Contivity/VPN Routers.  
 
 See documentation in L<SNMP::Info::Layer3::Contivity> for details.
+
+=item SNMP::Info::Layer3::DLink
+
+Subclass for DLink devices.  
+
+See documentation in L<SNMP::Info::Layer3::DLink> for details.
 
 =item SNMP::Info::Layer3::Dell
 
@@ -931,6 +949,12 @@ Alcatel-Lucent SR Class.
 
 See documentation in L<SNMP::Info::Layer3::Timetra> for details.
 
+=item SNMP::Info::Layer3::VyOS
+
+Subclass for VyOS routers.
+
+See documentation in L<SNMP::Info::Layer3::VyOS> for details.
+
 =item SNMP::Info::Layer3::VMware
 
 Subclass for VMware ESXi hosts.
@@ -956,6 +980,12 @@ See documentation in L<SNMP::Info::Layer7> for details.
 SNMP Interface to APC UPS devices
 
 See documentation in L<SNMP::Info::Layer7::APC> for details.
+
+=item SNMP::Info::Layer7::CiscoIPS
+
+SNMP Interface to Cisco IPS devices
+
+See documentation in L<SNMP::Info::Layer7::Cisco IPS> for details.
 
 =item SNMP::Info::Layer7::Netscaler
 
@@ -1515,6 +1545,7 @@ sub device_type {
         171  => 'SNMP::Info::Layer3::DLink',
         244  => 'SNMP::Info::Layer3::Lantronix',
         311  => 'SNMP::Info::Layer3::Microsoft',
+        664   => 'SNMP::Info::Layer2::Adtran',
         674  => 'SNMP::Info::Layer3::Dell',
         1872 => 'SNMP::Info::Layer3::AlteonAD',
         1916 => 'SNMP::Info::Layer3::Extreme',
@@ -1522,6 +1553,7 @@ sub device_type {
         2011 => 'SNMP::Info::Layer3::Huawei',
         2021 => 'SNMP::Info::Layer3::NetSNMP',
         2272 => 'SNMP::Info::Layer3::Passport',
+        2620 => 'SNMP::Info::Layer3::CheckPoint',
         2636 => 'SNMP::Info::Layer3::Juniper',
         2925 => 'SNMP::Info::Layer1::Cyclades',
         3076 => 'SNMP::Info::Layer3::Altiga',
@@ -1551,6 +1583,7 @@ sub device_type {
         35098 => 'SNMP::Info::Layer3::Pica8',
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
         4413 => 'SNMP::Info::Layer2::Ubiquiti',
+        30803 => 'SNMP::Info::Layer3::VyOS',
     );
 
     my %l2sysoidmap = (
@@ -1560,6 +1593,7 @@ sub device_type {
         45    => 'SNMP::Info::Layer2::Baystack',
         171   => 'SNMP::Info::Layer3::DLink',
         207   => 'SNMP::Info::Layer2::Allied',
+        664   => 'SNMP::Info::Layer2::Adtran',
         674   => 'SNMP::Info::Layer3::Dell',
         1872  => 'SNMP::Info::Layer3::AlteonAD',
         1916  => 'SNMP::Info::Layer3::Extreme',
@@ -1690,6 +1724,11 @@ sub device_type {
         $objtype = 'SNMP::Info::Layer3::CiscoFWSM'
             if ( $desc =~ /Cisco Firewall Services Module/i );
         
+        #   Cisco Small Business (300 500) series override
+        #   This is for enterprises(1).cisco(9).otherEnterprises(6).ciscosb(1)
+        $objtype = 'SNMP::Info::Layer2::CiscoSB'
+            if ( $soid =~ /^\.?1\.3\.6\.1\.4\.1\.9\.6\.1/ );
+
         # Avaya Secure Router
         $objtype = 'SNMP::Info::Layer3::Tasman'
             if ( $desc =~ /^(avaya|nortel)\s+(SR|secure\srouter)\s+\d{4}/i );

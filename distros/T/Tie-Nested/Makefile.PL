@@ -4,7 +4,7 @@ use 5.008;
 
 WriteMakefile
   ( NAME	 => 'Tie::Nested'
-  , VERSION      => '0.10'
+  , VERSION      => '0.11'
   , PREREQ_PM    =>
     { Test::More  => '0.47'
     , Hash::Case  => '1.01'  # only for the tests
@@ -20,12 +20,11 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/tie-nested/raw
 DISTDIR         = ../public_html/tie-nested/source
-LICENSE         = artistic
+LICENSE         = perl
 
 # for POD
 FIRST_YEAR      = 2010
-EMAIL           = perl@overmeer.net
-WEBSITE         = http://perl.overmeer.net/tie-nested
+EMAIL           = markov@cpan.org
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
 __POSTAMBLE
-

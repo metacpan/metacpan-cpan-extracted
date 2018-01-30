@@ -1,6 +1,6 @@
 package Bio::MUST::Drivers::Blast::Database::Temporary;
 # ABSTRACT: internal class for BLAST driver
-$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.173510';
+$Bio::MUST::Drivers::Blast::Database::Temporary::VERSION = '0.180270';
 use Moose;
 use namespace::autoclean;
 
@@ -11,9 +11,15 @@ use Carp;
 use IPC::System::Simple qw(system);
 use Path::Class qw(file);
 
-use Bio::MUST::Core 0.153360;
 extends 'Bio::MUST::Core::Ali::Temporary';
 
+with 'Bio::MUST::Drivers::Roles::Blastable';
+
+
+# overload equivalent attribute in plain Database
+sub remote {
+    return 0;
+}
 
 sub BUILD {
     my $self = shift;
@@ -23,8 +29,7 @@ sub BUILD {
 
     # create makeblastdb command
     my $pgm = 'makeblastdb';
-    my $cmd = "$pgm -in $in -dbtype $dbtype"
-        . ' > /dev/null 2> /dev/null';
+    my $cmd = "$pgm -in $in -dbtype $dbtype > /dev/null 2> /dev/null";
 
     # try to robustly execute makeblastdb
     my $ret_code = system( [ 0, 127 ], $cmd);
@@ -37,7 +42,6 @@ sub BUILD {
     return;
 }
 
-
 sub DEMOLISH {
     my $self = shift;
 
@@ -47,11 +51,6 @@ sub DEMOLISH {
     file($_)->remove for map { "$basename.$_" } @suffices;
 
     return;
-}
-
-
-sub remote {
-    return 0;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -67,7 +66,7 @@ Bio::MUST::Drivers::Blast::Database::Temporary - internal class for BLAST driver
 
 =head1 VERSION
 
-version 0.173510
+version 0.180270
 
 =head1 SYNOPSIS
 

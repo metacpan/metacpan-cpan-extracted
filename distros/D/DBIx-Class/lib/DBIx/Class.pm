@@ -11,7 +11,7 @@ our $VERSION;
 # $VERSION declaration must stay up here, ahead of any other package
 # declarations, as to not confuse various modules attempting to determine
 # this ones version, whether that be s.c.o. or Module::Metadata, etc
-$VERSION = '0.082840';
+$VERSION = '0.082841';
 
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
 
@@ -73,6 +73,20 @@ sub DBIx::Class::_ENV_::HELP_URL () {
 1;
 
 __END__
+
+# This is the only file where an explicit =encoding is needed,
+# as the distbuild-time injected author list is utf8 encoded
+# Without this pod2text output is less than ideal
+#
+# A bit regarding selection/compatiblity:
+# Before 5.8.7 UTF-8 was == utf8, both behaving like the (lax) utf8 we know today
+# Then https://www.nntp.perl.org/group/perl.unicode/2004/12/msg2705.html happened
+# Encode way way before 5.8.0 supported UTF-8: https://metacpan.org/source/DANKOGAI/Encode-1.00/lib/Encode/Supported.pod#L44
+# so it is safe for the oldest toolchains.
+# Additionally we inject all the utf8 programattically and test its well-formedness
+# so all is well
+#
+=encoding UTF-8
 
 =head1 NAME
 
@@ -261,11 +275,9 @@ merged back to trunk for a major release.
 Contributions are always welcome, in all usable forms (we especially
 welcome documentation improvements). The delivery methods include git-
 or unified-diff formatted patches, GitHub pull requests, or plain bug
-reports either via RT or the Mailing list. Contributors are generally
-granted access to the official repository after their first several
-patches pass successful review. Don't hesitate to
-L<contact|/GETTING HELP/SUPPORT> either of the L</CAT HERDERS> with
-any further questions you may have.
+reports either via RT or the Mailing list. Do not hesitate to
+L<get in touch|/GETTING HELP/SUPPORT> with any further questions you may
+have.
 
 =for comment
 FIXME: Getty, frew and jnap need to get off their asses and finish the contrib section so we can link it here ;)
@@ -275,15 +287,9 @@ accessible at the following locations:
 
 =over
 
-=item * Official repo: L<git://git.shadowcat.co.uk/dbsrgits/DBIx-Class.git>
+=item * Current git repository: L<https://github.com/Perl5/DBIx-Class>
 
-=item * Official gitweb: L<http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git>
-
-=item * GitHub mirror: L<https://github.com/dbsrgits/DBIx-Class>
-
-=item * Authorized committers: L<ssh://dbsrgits@git.shadowcat.co.uk/DBIx-Class.git>
-
-=item * Travis-CI log: L<https://travis-ci.org/dbsrgits/dbix-class/builds>
+=item * Travis-CI log: L<https://travis-ci.org/Perl5/DBIx-Class/branches>
 
 =back
 
@@ -303,23 +309,6 @@ The canonical source of authors and their details is the F<AUTHORS> file at
 the root of this distribution (or repository). The canonical source of
 per-line authorship is the L<git repository|/HOW TO CONTRIBUTE> history
 itself.
-
-=head1 CAT HERDERS
-
-The fine folks nudging the project in a particular direction:
-
-=over
-
-B<ribasushi>: Peter Rabbitson <ribasushi@cpan.org>
-(present day maintenance and controlled evolution)
-
-B<castaway>: Jess Robinson <castaway@desert-island.me.uk>
-(lions share of the reference documentation and manuals)
-
-B<mst>: Matt S Trout <mst@shadowcat.co.uk> (project founder -
-original idea, architecture and implementation)
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

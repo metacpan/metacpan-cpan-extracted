@@ -31,6 +31,7 @@
 #include "constants-error-category.h"
 #include "constants-object.h"
 #include "constants-packbuilder.h"
+#include "constants-rebase-operation.h"
 #include "constants-stash-progress.h"
 
 #ifdef _MSC_VER
@@ -45,6 +46,7 @@ typedef struct {
 	SV *cleanup;
 } git_filter_callbacks;
 
+typedef git_annotated_commit * AnnotatedCommit;
 typedef git_blame * Blame;
 typedef git_blame_hunk * Blame_Hunk;
 typedef git_blob * Blob;
@@ -85,6 +87,7 @@ typedef git_raw_packbuilder *Packbuilder;
 typedef git_patch * Patch;
 typedef git_pathspec * PathSpec;
 typedef git_pathspec_match_list * PathSpec_MatchList;
+typedef git_rebase_operation * Rebase_Operation;
 typedef git_reference * Reference;
 typedef git_reflog * Reflog;
 typedef git_reflog_entry * Reflog_Entry;
@@ -2294,6 +2297,7 @@ features(class)
 		} else
 			XSRETURN_EMPTY;
 
+INCLUDE: xs/AnnotatedCommit.xs
 INCLUDE: xs/Blame.xs
 INCLUDE: xs/Blame/Hunk.xs
 INCLUDE: xs/Blob.xs
@@ -2333,6 +2337,7 @@ INCLUDE: xs/Packbuilder.xs
 INCLUDE: xs/Patch.xs
 INCLUDE: xs/PathSpec.xs
 INCLUDE: xs/PathSpec/MatchList.xs
+INCLUDE: xs/Rebase/Operation.xs
 INCLUDE: xs/Reference.xs
 INCLUDE: xs/Reflog.xs
 INCLUDE: xs/Reflog/Entry.xs

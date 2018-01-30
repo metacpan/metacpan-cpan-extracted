@@ -22,18 +22,16 @@
   % }
 % end
 
-<div class="row center-md">
-  <div class="col-md-4"></div>
-  <div class="col-md-4">
+<div class="d-flex justify-content-between">
+  <div></div>
+  <div>
     <p class="text-center">
       % if (@$workers) {
         <%= $offset + 1 %>-<%= $offset + @$workers %> of <%= $total %>
       % }
     </p>
   </div>
-  <div class="col-md-4">
-    %= include 'minion/_limit'
-  </div>
+  %= include 'minion/_limit'
 </div>
 
 <div class="row">
@@ -67,10 +65,10 @@
             <td class="accordion-toggle collapsed"
               data-toggle="collapse" data-target="#worker<%= $i %>">
               % if (@{$worker->{jobs}}) {
-                <span class="label label-warning">busy</span>
+                <span class="badge badge-warning">busy</span>
               % }
               % else {
-                <span class="label label-default">idle</span>
+                <span class="badge badge-secondary">idle</span>
               % }
             </td>
             <td class="accordion-toggle collapsed expand" data-toggle="collapse"
@@ -81,7 +79,7 @@
           <tr>
             <td colspan="7" class="hiddenRow">
               <div class="collapse" id="worker<%= $i %>">
-                <pre><code><%= dumper Minion::_datetime $worker %></code></pre>
+                <pre class="border rounded"><%= dumper Minion::_datetime $worker %></pre>
               </div>
             </td>
           </tr>
@@ -91,8 +89,6 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12">
-    %= include 'minion/_pagination'
-  </div>
+<div class="d-flex justify-content-center">
+  %= include 'minion/_pagination'
 </div>

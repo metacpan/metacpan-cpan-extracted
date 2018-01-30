@@ -1,0 +1,42 @@
+=head1 NAME
+
+euro lotto - prints <n> numbers of euro millions lotto lines
+
+=head1 DESCRIPTION
+
+A simple script which usually prints C<bar>. prints <n> numbers of euro millions lotto lines
+here <n> is the number of lines passed in on the cli
+
+=head1 SYNOPSIS
+
+  $ euro_lotto 3
+  
+  **** Euro Millions Generator ****
+  Line 1 =>  01 05 28 43 48  08 09
+  Line 2 =>  08 10 12 22 44  03 08
+  Line 3 =>  07 11 19 27 48  03 06
+  *********************************
+
+=head1 AUTHOR
+
+Mike Kelly
+
+=head1 LICENSE
+
+FreeBSD
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+    $ cpan App::euro_lotto
+
+Manual install:
+
+    $ perl Makefile.PL
+    $ make
+    $ make install
+
+
+=cut
+

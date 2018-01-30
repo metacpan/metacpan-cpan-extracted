@@ -1,14 +1,18 @@
-# Copyrights 2009-2010 by Mark Overmeer.
+# Copyrights 2009-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.06.
-use warnings;
-use strict;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Net-FTP-Robust.  Meta-POD processed
+# with OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Net::FTP::Robust;
 use vars '$VERSION';
-$VERSION = '0.08';
+$VERSION = '0.09';
 
+
+use warnings;
+use strict;
 
 use Log::Report 'net-ftp-robust', syntax => 'SHORT';
 use Net::FTP;
@@ -78,7 +82,7 @@ sub get($$)
         }
 
         unless( $ftp->login($self->{login_user}, $self->{login_password}))
-        {   notice __x"login failed: {msg}", msg => $ftp->message;
+        {   notice __x"login failed: {msg}", msg => ($ftp->message || $!);
             next ATTEMPT;
         }
 
@@ -87,7 +91,7 @@ sub get($$)
         $dir ||= '/';
         unless($ftp->cwd($dir))
         {   notice __x"directory {dir} does not exist: {msg}"
-              , dir => $dir, msg => $ftp->message;
+              , dir => $dir, msg => ($ftp->message || $!);
             next ATTEMPT;
         }
 
@@ -144,8 +148,8 @@ sub _recurse($$$$)
         my $success = $self->_get_directory($ftp, $full, $to);
         if($success)
         {   $success = $ftp->cdup
-                or notice "cannot go cdup to {dir}: {msg}"
-                     , dir => $dir, msg => $ftp->message;
+                or notice __x"cannot go cdup to {dir}: {msg}"
+                     , dir => $dir, msg => ($ftp->message || $!);
         }
         return $success;
     }
@@ -250,7 +254,9 @@ sub _get_file($$$$)
             $stats->{downloaded} += $downloaded;
         }
         else
-        {   notice __x"failed to get any bytes from {fn}", fn => $local_name;
+        {   notice __x"failed to get any bytes from {fn}: {err}"
+              , fn => $local_name, err => $ftp->message;
+            $success = 0;
         }
     }
 

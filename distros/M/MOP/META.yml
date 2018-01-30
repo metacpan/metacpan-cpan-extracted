@@ -21,14 +21,14 @@ requires:
   Devel::OverloadInfo: '0'
   Scalar::Util: '0'
   Sub::Metadata: '0'
-  Sub::Name: '0'
+  Sub::Util: '0'
   Symbol: '0'
-  UNIVERSAL::Object: '0.13'
+  UNIVERSAL::Object: '0.14'
   attributes: '0'
   mro: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/stevan/p5-MOP/issues
   repository: https://github.com/stevan/p5-MOP.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'YAML::Tiny version 1.70'

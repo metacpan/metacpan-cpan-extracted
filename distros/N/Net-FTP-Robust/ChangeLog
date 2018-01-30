@@ -4,6 +4,14 @@
 Alll changes made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 0.09: Mon Jan 22 20:33:05 CET 2018
+	- $ftp->message may be empty, sometimes.
+	- warning about cdup needs values filled-in
+	- demo use of Passive parameter
+	- remove dependency on Test::POD
+	- convert to GIT
+	- move to GitHUB
+
 version 0.08: Mon Feb  1 11:40:29 CET 2010
 	- fix downloading of empty files.
 	- fix load restart.

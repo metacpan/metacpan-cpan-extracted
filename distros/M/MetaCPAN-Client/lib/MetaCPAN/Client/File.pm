@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::File;
 # ABSTRACT: A File data object
-$MetaCPAN::Client::File::VERSION = '2.022000';
+$MetaCPAN::Client::File::VERSION = '2.023000';
 use Moo;
 use Carp;
 
@@ -15,6 +15,7 @@ my %known_fields = (
         authorized
         binary
         date
+        deprecated
         description
         directory
         distribution
@@ -110,7 +111,7 @@ MetaCPAN::Client::File - A File data object
 
 =head1 VERSION
 
-version 2.022000
+version 2.023000
 
 =head1 DESCRIPTION
 
@@ -186,6 +187,10 @@ the archive.
 
 If the file contains POD with a C<NAME> section, then this attribute will
 include the abstract portion of the name.
+
+=head2 deprecated
+
+The deprecated field value for this file.
 
 =head2 description
 

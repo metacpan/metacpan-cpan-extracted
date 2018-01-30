@@ -11,7 +11,8 @@ sub new {
     my $class = shift;
 
     my $self = {
-        _enumerate => shift
+        _enumerate => shift,
+        _udev      => shift
     };
 
     bless $self, $class;
@@ -22,9 +23,7 @@ sub new {
 
 
 sub get_udev {
-    my $self = shift;
-
-    return udev_enumerate_get_udev($self->{_enumerate});
+    return $_[0]->{_udev};
 }
 
 
@@ -176,17 +175,13 @@ sub scan_subsystems {
 
 
 sub get_list_entries {
-    my $self = shift;
-
-    return get_entries( udev_enumerate_get_list_entry($self->{_enumerate}) );
+    return get_entries( udev_enumerate_get_list_entry($_[0]->{_enumerate}) );
 }
 
 
 
 sub DESTROY {
-    my $self = shift;
-
-    udev_enumerate_unref( $self->{_device} );
+    udev_enumerate_unref( $_[0]->{_enumerate} );
 }
 
 

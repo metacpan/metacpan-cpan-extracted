@@ -127,15 +127,16 @@ sub stringify {
             die "Not reached";
         }
     }
+    if ($type eq 'safe') {
+        return $self->verbatim_string($string);
+    }
     if ($type eq 'verbatim') {
-        if ($self->is_latex) {
-            return $self->escape_tex($string);
-        }
-        elsif ($self->is_html) {
-            return $self->escape_all_html($string);
+        if ($string =~ /\A<verbatim>(.*)<\/verbatim>\z/s) {
+            $string = $1;
+            return $self->verbatim_string($string);
         }
         else {
-            die "Not reached";
+            die "<$string> doesn't match verbatim!";
         }
     }
     elsif ($type eq 'anchor') {
@@ -187,6 +188,30 @@ sub stringify {
                 $leading = $1;
             }
             return "$leading<br />";
+        }
+    }
+    elsif ($type eq 'verbatim_code') {
+        # remove the prefixes
+        warn "<code> is already verbatim! in <$string>" if $string =~ m/<\/?verbatim>/;
+        if ($string =~ /\A=(.+)=\z/s) {
+            $string = $1;
+        }
+        elsif ($string =~ /\A<code><verbatim>(.*)<\/verbatim><\/code>\z/s) {
+            $string = $1;
+        }
+        elsif ($string =~ /\A<code>(.*)<\/code>\z/s) {
+            $string = $1;
+        }
+        else {
+            die "$string doesn't match the <code> pattern!";
+        }
+        if (length $string) {
+            return $self->_markup_table->{code}->{open}->{$self->fmt}
+              . $self->verbatim_string($string)
+              . $self->_markup_table->{code}->{close}->{$self->fmt};
+        }
+        else {
+            return '';
         }
     }
     else {
@@ -369,5 +394,23 @@ sub unroll {
     return map { __PACKAGE__->new(%$_, string => '', fmt => $self->fmt) } @new;
 }
 
+=head2 verbatim_string($string)
+
+Escape the string according to the element format
+
+=cut
+
+sub verbatim_string {
+    my ($self, $string) = @_;
+    if ($self->is_latex) {
+        return $self->escape_tex($string);
+    }
+    elsif ($self->is_html) {
+        return $self->escape_all_html($string);
+    }
+    else {
+        die "Not reached";
+    }
+}
 
 1;

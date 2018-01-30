@@ -184,7 +184,11 @@ sub import_with_imagemagick {
             %current = ();
         }
         elsif (m/^\s*(\w+):\s+(.+)\s*$/) {
-            $current{$1} = $2;
+            my ($name, $value) = ($1, $2);
+            $current{$name} = $value;
+            if ($name eq 'glyphs' and $value !~ m/\.(t|o)tf\z/i) {
+                delete $current{$name};
+            }
         }
     }
     return \%specs;

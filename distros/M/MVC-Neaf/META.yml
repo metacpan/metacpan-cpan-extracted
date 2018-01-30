@@ -31,5 +31,8 @@ requires:
   Template: '0'
   URI::Escape: '0'
   perl: '5.008'
-version: 0.2202
+resources:
+  bugtracker: https://github.com/dallaylaen/perl-mvc-neaf/issues
+  repository: https://github.com/dallaylaen/perl-mvc-neaf.git
+version: 0.2203
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,7 +22,7 @@ use URI;                   # Get metadata URL path
 #inherits Lemonldap::NG::Common::Conf::SAML::Metadata protected service_metadata
 
 our @ISA     = (qw(Lemonldap::NG::Portal::_Browser));
-our $VERSION = '1.9.9';
+our $VERSION = '1.9.15';
 our $samlCache;
 our $initGlibDone;
 
@@ -1615,7 +1615,7 @@ sub processLogoutRequestMsg {
 
     my $expirationTime = $self->samldate2timestamp($notOnOrAfter);
 
-    return ( time > $expirationTime );
+    return ( time < $expirationTime );
 }
 
 ## @method boolean validateLogoutRequest(Lasso::Logout logout)

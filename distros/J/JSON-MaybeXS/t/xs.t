@@ -3,8 +3,8 @@ use warnings;
 
 # hide Cpanel::JSON::XS
 use lib map {
-    my ( $m, $c ) = ( $_, qq{die "Can't locate $_ (hidden)\n"} );
-    sub { return unless $_[1] eq $m; open my $fh, "<", \$c; return $fh }
+    my $m = $_;
+    sub { return unless $_[1] eq $m; die "Can't locate $m in \@INC (hidden).\n" };
 } qw{Cpanel/JSON/XS.pm};
 
 use Test::More 0.88;

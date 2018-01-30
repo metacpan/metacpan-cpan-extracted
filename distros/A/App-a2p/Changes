@@ -1,5 +1,9 @@
 Revision history for App-a2p
 
+1.010     2018-01-27 19:18:18+01:00 Europe/Amsterdam
+          Fix buffer overflow [Vladimir Marek]
+          Eliminate compatibility with pre-ANSI C
+
 1.009     2015-07-08 23:05:11+02:00 Europe/Amsterdam
           Generate path to a2p more portably
 

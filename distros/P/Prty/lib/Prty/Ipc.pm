@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.121;
+our $VERSION = 1.122;
 
 use Prty::Option;
 use Prty::Shell;
@@ -76,7 +76,7 @@ sub filter {
     my $pid = IPC::Open3::open3(\*W,\*R,\*E,$cmd);
     unless ($pid) {
         $class->throw(
-            q{IPC-00001: Kann Filterkommando nicht forken},
+            q~IPC-00001: Kann Filterkommando nicht forken~,
             Cmd=>$cmd,
         );
     }
@@ -106,7 +106,7 @@ sub filter {
 
 =head1 VERSION
 
-1.121
+1.122
 
 =head1 AUTHOR
 
@@ -114,7 +114,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 Frank Seitz
+Copyright (C) 2018 Frank Seitz
 
 =head1 LICENSE
 

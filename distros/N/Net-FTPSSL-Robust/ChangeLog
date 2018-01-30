@@ -1,8 +1,14 @@
 
-===== version history for Net::FTPSLL::Robust
+===== version history for Net::FTPSSL::Robust
 
-Alll changes made by Mark Overmeer, unless explicitly stated
+All changes made by Mark Overmeer, unless explicitly stated
 differently.
+
+version 0.06: Mon Jan 22 21:38:55 CET 2018
+
+	Improvements:
+	- convert to GIT
+	- move to GitHUB
 
 version 0.05: Mon Aug 22 10:27:50 CEST 2011
 	- Net::FTP::SSL >= 0.18 supports restart.

@@ -27,7 +27,7 @@ BEGIN {
 # GLOBALS
 #======================================================================
 
-our $VERSION  = '1.84';
+our $VERSION  = '1.85';
 
 # This would confuse some packagers
 $VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
@@ -219,7 +219,7 @@ sub insert {
   $sql = join " ", $self->_sqlcase('insert into'), $table, $sql;
 
   if ($options->{returning}) {
-    my ($s, @b) = $self->_insert_returning ($options);
+    my ($s, @b) = $self->_insert_returning($options);
     $sql .= $s;
     push @bind, @b;
   }
@@ -368,10 +368,32 @@ sub update {
   my $options = shift;
 
   # first build the 'SET' part of the sql statement
-  my (@set, @all_bind);
   puke "Unsupported data type specified to \$sql->update"
     unless ref $data eq 'HASH';
 
+  my ($sql, @all_bind) = $self->_update_set_values($data);
+  $sql = $self->_sqlcase('update ') . $table . $self->_sqlcase(' set ')
+          . $sql;
+
+  if ($where) {
+    my($where_sql, @where_bind) = $self->where($where);
+    $sql .= $where_sql;
+    push @all_bind, @where_bind;
+  }
+
+  if ($options->{returning}) {
+    my ($returning_sql, @returning_bind) = $self->_update_returning($options);
+    $sql .= $returning_sql;
+    push @all_bind, @returning_bind;
+  }
+
+  return wantarray ? ($sql, @all_bind) : $sql;
+}
+
+sub _update_set_values {
+  my ($self, $data) = @_;
+
+  my (@set, @all_bind);
   for my $k (sort keys %$data) {
     my $v = $data->{$k};
     my $r = ref $v;
@@ -406,7 +428,7 @@ sub update {
           if (@rest or not $op =~ /^\-(.+)/);
 
         local $self->{_nested_func_lhs} = $k;
-        my ($sql, @bind) = $self->_where_unary_op ($1, $arg);
+        my ($sql, @bind) = $self->_where_unary_op($1, $arg);
 
         push @set, "$label = $sql";
         push @all_bind, @bind;
@@ -419,22 +441,9 @@ sub update {
   }
 
   # generate sql
-  my $sql = $self->_sqlcase('update') . " $table " . $self->_sqlcase('set ')
-          . join ', ', @set;
+  my $sql = join ', ', @set;
 
-  if ($where) {
-    my($where_sql, @where_bind) = $self->where($where);
-    $sql .= $where_sql;
-    push @all_bind, @where_bind;
-  }
-
-  if ($options->{returning}) {
-    my ($returning_sql, @returning_bind) = $self->_update_returning ($options);
-    $sql .= $returning_sql;
-    push @all_bind, @returning_bind;
-  }
-
-  return wantarray ? ($sql, @all_bind) : $sql;
+  return ($sql, @all_bind);
 }
 
 # So that subclasses can override UPDATE ... RETURNING separately from
@@ -478,10 +487,10 @@ sub delete {
   my $options = shift;
 
   my($where_sql, @bind) = $self->where($where);
-  my $sql = $self->_sqlcase('delete from') . " $table" . $where_sql;
+  my $sql = $self->_sqlcase('delete from ') . $table . $where_sql;
 
   if ($options->{returning}) {
-    my ($returning_sql, @returning_bind) = $self->_delete_returning ($options);
+    my ($returning_sql, @returning_bind) = $self->_delete_returning($options);
     $sql .= $returning_sql;
     push @bind, @returning_bind;
   }
@@ -629,7 +638,7 @@ sub _where_HASHREF {
         $op =~ s/^not_/NOT /i;
 
         $self->_debug("Unary OP(-$op) within hashref, recursing...");
-        my ($s, @b) = $self->_where_unary_op ($op, $v);
+        my ($s, @b) = $self->_where_unary_op($op, $v);
 
         # top level vs nested
         # we assume that handled unary ops will take care of their ()s
@@ -668,9 +677,9 @@ sub _where_unary_op {
   # top level special ops are illegal in general
   # this includes the -ident/-value ops (dual purpose unary and special)
   puke "Illegal use of top-level '-$op'"
-    if ! defined $self->{_nested_func_lhs} and List::Util::first {$op =~ $_->{regex}} @{$self->{special_ops}};
+    if ! defined $self->{_nested_func_lhs} and List::Util::first { $op =~ $_->{regex} } @{$self->{special_ops}};
 
-  if (my $op_entry = List::Util::first {$op =~ $_->{regex}} @{$self->{unary_ops}}) {
+  if (my $op_entry = List::Util::first { $op =~ $_->{regex} } @{$self->{unary_ops}}) {
     my $handler = $op_entry->{handler};
 
     if (not ref $handler) {
@@ -678,7 +687,7 @@ sub _where_unary_op {
         belch 'Use of [and|or|nest]_N modifiers is deprecated and will be removed in SQLA v2.0. '
             . "You probably wanted ...-and => [ -$op => COND1, -$op => COND2 ... ]";
       }
-      return $self->$handler ($op, $rhs);
+      return $self->$handler($op, $rhs);
     }
     elsif (ref $handler eq 'CODE') {
       return $handler->($self, $op, $rhs);
@@ -692,7 +701,7 @@ sub _where_unary_op {
 
   $self->_assert_pass_injection_guard($op);
 
-  my ($sql, @bind) = $self->_SWITCH_refkind ($rhs, {
+  my ($sql, @bind) = $self->_SWITCH_refkind($rhs, {
     SCALAR =>   sub {
       puke "Illegal use of top-level '-$op'"
         unless defined $self->{_nested_func_lhs};
@@ -703,11 +712,11 @@ sub _where_unary_op {
       );
     },
     FALLBACK => sub {
-      $self->_recurse_where ($rhs)
+      $self->_recurse_where($rhs)
     },
   });
 
-  $sql = sprintf ('%s %s',
+  $sql = sprintf('%s %s',
     $self->_sqlcase($op),
     $sql,
   );
@@ -724,8 +733,8 @@ sub _where_op_ANDOR {
     },
 
     HASHREF => sub {
-      return ( $op =~ /^or/i )
-        ? $self->_where_ARRAYREF( [ map { $_ => $v->{$_} } ( sort keys %$v ) ], $op )
+      return ($op =~ /^or/i)
+        ? $self->_where_ARRAYREF([ map { $_ => $v->{$_} } (sort keys %$v) ], $op)
         : $self->_where_HASHREF($v);
     },
 
@@ -771,7 +780,7 @@ sub _where_op_NEST {
     },
 
     FALLBACK => sub {
-      $self->_recurse_where ($v);
+      $self->_recurse_where($v);
     },
 
    });
@@ -791,7 +800,7 @@ sub _where_op_BOOL {
     },
 
     FALLBACK => sub {
-      $self->_recurse_where ($v);
+      $self->_recurse_where($v);
     },
   });
 
@@ -834,8 +843,8 @@ sub _where_op_VALUE {
   }
 
   my @bind =
-    $self->_bindtype (
-      ( defined $lhs ? $lhs : $self->{_nested_func_lhs} ),
+    $self->_bindtype(
+      (defined $lhs ? $lhs : $self->{_nested_func_lhs}),
       $rhs,
     )
   ;
@@ -855,7 +864,7 @@ sub _where_op_VALUE {
 sub _where_hashpair_ARRAYREF {
   my ($self, $k, $v) = @_;
 
-  if( @$v ) {
+  if (@$v) {
     my @v = @$v; # need copy because of shift below
     $self->_debug("ARRAY($k) means distribute over elements");
 
@@ -920,17 +929,17 @@ sub _where_hashpair_HASHREF {
     my ($sql, @bind);
 
     # CASE: col-value logic modifiers
-    if ( $orig_op =~ /^ \- (and|or) $/xi ) {
+    if ($orig_op =~ /^ \- (and|or) $/xi) {
       ($sql, @bind) = $self->_where_hashpair_HASHREF($k, $val, $1);
     }
     # CASE: special operators like -in or -between
-    elsif ( my $special_op = List::Util::first {$op =~ $_->{regex}} @{$self->{special_ops}} ) {
+    elsif (my $special_op = List::Util::first { $op =~ $_->{regex} } @{$self->{special_ops}}) {
       my $handler = $special_op->{handler};
       if (! $handler) {
         puke "No handler supplied for special operator $orig_op";
       }
       elsif (not ref $handler) {
-        ($sql, @bind) = $self->$handler ($k, $op, $val);
+        ($sql, @bind) = $self->$handler($k, $op, $val);
       }
       elsif (ref $handler eq 'CODE') {
         ($sql, @bind) = $handler->($self, $k, $op, $val);
@@ -968,9 +977,9 @@ sub _where_hashpair_HASHREF {
         },
 
         FALLBACK => sub {       # CASE: col => {op/func => $stuff}
-          ($sql, @bind) = $self->_where_unary_op ($op, $val);
+          ($sql, @bind) = $self->_where_unary_op($op, $val);
 
-          $sql = join (' ',
+          $sql = join(' ',
             $self->_convert($self->_quote($k)),
             $self->{_nested_func_lhs} eq $k ? $sql : "($sql)",  # top level vs nested
           );
@@ -1006,15 +1015,15 @@ sub _where_field_op_ARRAYREF {
 
   my @vals = @$vals;  #always work on a copy
 
-  if(@vals) {
+  if (@vals) {
     $self->_debug(sprintf '%s means multiple elements: [ %s ]',
       $vals,
-      join (', ', map { defined $_ ? "'$_'" : 'NULL' } @vals ),
+      join(', ', map { defined $_ ? "'$_'" : 'NULL' } @vals ),
     );
 
     # see if the first element is an -and/-or op
     my $logic;
-    if (defined $vals[0] && $vals[0] =~ /^ - ( AND|OR ) $/ix) {
+    if (defined $vals[0] && $vals[0] =~ /^ - (AND|OR) $/ix) {
       $logic = uc $1;
       shift @vals;
     }
@@ -1027,7 +1036,7 @@ sub _where_field_op_ARRAYREF {
         and
       (!$logic or $logic eq 'OR')
         and
-      ( $op =~ $self->{inequality_op} or $op =~ $self->{not_like_op} )
+      ($op =~ $self->{inequality_op} or $op =~ $self->{not_like_op})
     ) {
       my $o = uc($op);
       belch "A multi-element arrayref as an argument to the inequality op '$o' "
@@ -1077,7 +1086,7 @@ sub _where_hashpair_SCALAR {
                       $self->_sqlcase($self->{cmp}),
                       $self->_convert('?');
   my @bind =  $self->_bindtype($k, $v);
-  return ( $sql, @bind);
+  return ($sql, @bind);
 }
 
 
@@ -1161,9 +1170,9 @@ sub _where_field_BETWEEN {
            },
            HASHREF => sub {
              my ($func, $arg, @rest) = %$val;
-             puke ("Only simple { -func => arg } functions accepted as sub-arguments to BETWEEN")
+             puke "Only simple { -func => arg } functions accepted as sub-arguments to BETWEEN"
                if (@rest or $func !~ /^ \- (.+)/x);
-             $self->_where_unary_op ($1 => $arg);
+             $self->_where_unary_op($1 => $arg);
            },
            FALLBACK => sub {
              puke $invalid_args,
@@ -1218,9 +1227,9 @@ sub _where_field_IN {
             },
             HASHREF => sub {
               my ($func, $arg, @rest) = %$val;
-              puke ("Only simple { -func => arg } functions accepted as sub-arguments to IN")
+              puke "Only simple { -func => arg } functions accepted as sub-arguments to IN"
                 if (@rest or $func !~ /^ \- (.+)/x);
-              $self->_where_unary_op ($1 => $arg);
+              $self->_where_unary_op($1 => $arg);
             },
             UNDEF => sub {
               puke(
@@ -1236,10 +1245,10 @@ sub _where_field_IN {
         }
 
         return (
-          sprintf ('%s %s ( %s )',
+          sprintf('%s %s ( %s )',
             $label,
             $op,
-            join (', ', @all_sql)
+            join(', ', @all_sql)
           ),
           $self->_bindtype($k, @all_bind),
         );
@@ -1251,13 +1260,13 @@ sub _where_field_IN {
     },
 
     SCALARREF => sub {  # literal SQL
-      my $sql = $self->_open_outer_paren ($$vals);
+      my $sql = $self->_open_outer_paren($$vals);
       return ("$label $op ( $sql )");
     },
     ARRAYREFREF => sub {  # literal SQL with bind
       my ($sql, @bind) = @$$vals;
       $self->_assert_bindval_matches_bindtype(@bind);
-      $sql = $self->_open_outer_paren ($sql);
+      $sql = $self->_open_outer_paren($sql);
       return ("$label $op ( $sql )", @bind);
     },
 
@@ -1279,17 +1288,17 @@ sub _where_field_IN {
 sub _open_outer_paren {
   my ($self, $sql) = @_;
 
-  while ( my ($inner) = $sql =~ /^ \s* \( (.*) \) \s* $/xs ) {
+  while (my ($inner) = $sql =~ /^ \s* \( (.*) \) \s* $/xs) {
 
     # there are closing parens inside, need the heavy duty machinery
     # to reevaluate the extraction starting from $sql (full reevaluation)
-    if ( $inner =~ /\)/ ) {
+    if ($inner =~ /\)/) {
       require Text::Balanced;
 
       my (undef, $remainder) = do {
         # idiotic design - writes to $@ but *DOES NOT* throw exceptions
         local $@;
-        Text::Balanced::extract_bracketed( $sql, '()', qr/\s*/ );
+        Text::Balanced::extract_bracketed($sql, '()', qr/\s*/);
       };
 
       # the entire expression needs to be a balanced bracketed thing
@@ -1312,17 +1321,17 @@ sub _order_by {
   my ($self, $arg) = @_;
 
   my (@sql, @bind);
-  for my $c ($self->_order_by_chunks ($arg) ) {
-    $self->_SWITCH_refkind ($c, {
+  for my $c ($self->_order_by_chunks($arg) ) {
+    $self->_SWITCH_refkind($c, {
       SCALAR => sub { push @sql, $c },
       ARRAYREF => sub { push @sql, shift @$c; push @bind, @$c },
     });
   }
 
   my $sql = @sql
-    ? sprintf ('%s %s',
+    ? sprintf('%s %s',
         $self->_sqlcase(' order by'),
-        join (', ', @sql)
+        join(', ', @sql)
       )
     : ''
   ;
@@ -1336,7 +1345,7 @@ sub _order_by_chunks {
   return $self->_SWITCH_refkind($arg, {
 
     ARRAYREF => sub {
-      map { $self->_order_by_chunks ($_ ) } @$arg;
+      map { $self->_order_by_chunks($_ ) } @$arg;
     },
 
     ARRAYREFREF => sub {
@@ -1357,17 +1366,17 @@ sub _order_by_chunks {
 
       return () unless $key;
 
-      if ( @rest or not $key =~ /^-(desc|asc)/i ) {
+      if (@rest or not $key =~ /^-(desc|asc)/i) {
         puke "hash passed to _order_by must have exactly one key (-desc or -asc)";
       }
 
       my $direction = $1;
 
       my @ret;
-      for my $c ($self->_order_by_chunks ($val)) {
+      for my $c ($self->_order_by_chunks($val)) {
         my ($sql, @bind);
 
-        $self->_SWITCH_refkind ($c, {
+        $self->_SWITCH_refkind($c, {
           SCALAR => sub {
             $sql = $c;
           },
@@ -1425,7 +1434,7 @@ sub _quote {
   my $esc = $_[0]->{escape_char} || $r;
 
   # parts containing * are naturally unquoted
-  return join( $_[0]->{name_sep}||'', map
+  return join($_[0]->{name_sep}||'', map
     +( $_ eq '*' ? $_ : do { (my $n = $_) =~ s/(\Q$esc\E|\Q$r\E)/$esc$1/g; $l . $n . $r } ),
     ( $_[0]->{name_sep} ? split (/\Q$_[0]->{name_sep}\E/, $_[1] ) : $_[1] )
   );
@@ -1568,7 +1577,7 @@ sub values {
         unless ref $data eq 'HASH';
 
     my @all_bind;
-    foreach my $k ( sort keys %$data ) {
+    foreach my $k (sort keys %$data) {
         my $v = $data->{$k};
         $self->_SWITCH_refkind($v, {
           ARRAYREF => sub {
@@ -2017,7 +2026,7 @@ The parameter default in case of a single L</quote_char> character is the quote
 character itself.
 
 When opening-closing-style quoting is used (L</quote_char> is an arrayref)
-this parameter defaults to the B<closing (right)> L</quote_char>. Occurences
+this parameter defaults to the B<closing (right)> L</quote_char>. Occurrences
 of the B<opening (left)> L</quote_char> within the identifier are currently left
 untouched. The default for opening-closing-style quotes may change in future
 versions, thus you are B<strongly encouraged> to specify the escape character
@@ -2250,7 +2259,7 @@ module:
 
 =back
 
-On failure returns C<undef>, on sucess returns a B<scalar> reference
+On failure returns C<undef>, on success returns a B<scalar> reference
 to the original supplied argument.
 
 =over
@@ -2308,7 +2317,7 @@ module:
 
 =back
 
-On failure returns C<undef>, on sucess returns an B<array> reference
+On failure returns C<undef>, on success returns an B<array> reference
 containing the unpacked version of the supplied literal SQL and bind values.
 
 =head1 WHERE CLAUSES
@@ -3013,7 +3022,7 @@ the expected return is C<< ($sql, @bind) >>.
 When supplied with a method name, it is simply called on the
 L<SQL::Abstract> object as:
 
- $self->$method_name ($field, $op, $arg)
+ $self->$method_name($field, $op, $arg)
 
  Where:
 
@@ -3089,7 +3098,7 @@ the expected return is C<< $sql >>.
 When supplied with a method name, it is simply called on the
 L<SQL::Abstract> object as:
 
- $self->$method_name ($op, $arg)
+ $self->$method_name($op, $arg)
 
  Where:
 

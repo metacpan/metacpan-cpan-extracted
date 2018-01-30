@@ -35,7 +35,7 @@ package Rex::Commands::LVM;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -67,7 +67,8 @@ sub pvs {
 
   my @lines =
     i_run 'pvdisplay --units b --columns --separator "|" --noheadings',
-    fail_ok => 1;
+    fail_ok   => 1,
+    no_stderr => 1;
   if ( $? != 0 ) {
     die("Error running pvdisplay");
   }
@@ -125,7 +126,7 @@ sub vgs {
     $cmd .= " $vg";
   }
 
-  my @lines = i_run $cmd, fail_ok => 1;
+  my @lines = i_run $cmd, fail_ok => 1, no_stderr => 1;
   if ( $? != 0 ) {
     die("Error running vgdisplay");
   }
@@ -182,7 +183,7 @@ sub lvs {
     $cmd .= " " . $vg;
   }
 
-  my @lines = i_run $cmd, fail_ok => 1;
+  my @lines = i_run $cmd, fail_ok => 1, no_stderr => 1;
   if ( $? != 0 ) {
     die("Error running lvdisplay");
   }
@@ -210,7 +211,7 @@ sub lvs {
 
 sub pvcreate {
   my ($dev) = @_;
-  my $s = i_run "pvcreate $dev", fail_ok => 1;
+  my $s = i_run "pvcreate $dev", fail_ok => 1, stderr_to_stdout => 1;
   if ( $? != 0 ) {
     die("Error creating pv.\n$s\n");
   }
@@ -221,7 +222,9 @@ sub pvcreate {
 sub vgcreate {
   my ( $vgname, @devices ) = @_;
 
-  my $s = i_run "vgcreate $vgname " . join( " ", @devices ), fail_ok => 1;
+  my $s = i_run "vgcreate $vgname " . join( " ", @devices ),
+    fail_ok          => 1,
+    stderr_to_stdout => 1;
   if ( $? != 0 ) {
     die("Error creating vg.\n$s\n");
   }
@@ -244,7 +247,9 @@ sub lvcreate {
   if ( $size =~ m/^[0-9]+$/ ) { $size .= "M"; }
   my $onvg = $option{onvg};
 
-  my $s = i_run "lvcreate -n $lvname -L $size $onvg", fail_ok => 1;
+  my $s = i_run "lvcreate -n $lvname -L $size $onvg",
+    fail_ok          => 1,
+    stderr_to_stdout => 1;
 
   if ( $? != 0 ) {
     die("Error creating lv.\n$s\n");
@@ -252,7 +257,7 @@ sub lvcreate {
 
   my $lv_path = $option{onvg} . "/" . $lvname;
 
-  mkfs "$lv_path", fstype => $option{fstype};
+  mkfs "$lv_path", fstype => $option{fstype} if ( $option{fstype} );
 
   return $lv_path;
 }
@@ -260,7 +265,9 @@ sub lvcreate {
 sub vgextend {
   my ( $vgname, @devices ) = @_;
 
-  my $s = i_run "vgextend $vgname " . join( " ", @devices ), fail_ok => 1;
+  my $s = i_run "vgextend $vgname " . join( " ", @devices ),
+    fail_ok          => 1,
+    stderr_to_stdout => 1;
 
   if ( $? != 0 ) {
     die("Error extending vg.\n$s\n");

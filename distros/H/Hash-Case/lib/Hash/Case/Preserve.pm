@@ -1,15 +1,19 @@
-# Copyrights 2002-2003,2007-2012 by Mark Overmeer.
+# Copyrights 2002-2018 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.00.
-use strict;
-use warnings;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution Hash::Case.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package Hash::Case::Preserve;
 use vars '$VERSION';
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use base 'Hash::Case';
+
+use strict;
+use warnings;
 
 use Log::Report 'hash-case';
 

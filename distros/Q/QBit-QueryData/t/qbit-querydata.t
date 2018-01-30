@@ -51,7 +51,7 @@ my $q = QBit::QueryData->new(
     definition => {caption => {type => 'string'}}
 );
 
-cmp_deeply($q->get_fields, ['caption'], 'get_fields');
+cmp_deeply($q->get_fields, {'caption' => ''}, 'get_fields');
 
 cmp_deeply($q->definition(), {caption => {type => 'string'}}, 'definition');
 
@@ -61,15 +61,15 @@ cmp_deeply($q->get_all(), [{'caption' => 'caption 1'}], 'filter is not changed')
 
 $q->fields([qw(id caption)]);
 
-cmp_deeply($q->get_fields, ['id', 'caption'], 'changed fields');
+cmp_deeply($q->get_fields, {'id' => '', 'caption' => ''}, 'changed fields');
 
 $q->fields([]);
 
-cmp_deeply($q->get_fields, ['caption'], 'default fields');
+cmp_deeply($q->get_fields, {'caption' => ''}, 'default fields');
 
 $q->fields();
 
-cmp_deeply($q->get_fields, ['caption', 'id'], 'all fields');
+cmp_deeply($q->get_fields, {'caption' => '', 'id' => ''}, 'all fields');
 
 $q->filter(['OR', [['id' => '=' => \2], ['caption' => 'NOT LIKE' => \'caption']]]);
 
@@ -143,6 +143,38 @@ cmp_deeply(
         }
     ],
     'distinct'
+);
+
+{
+    my $err = FALSE;
+
+    try {
+        $q->filter(['id' => 'IS' => \3]);
+    }
+    catch {
+        $err = TRUE;
+        is(shift->message, gettext('Operation "%s" is only applied to the undef', 'IS'), 'corrected message');
+    }
+    finally {
+        ok($err, 'catch error');
+    };
+}
+
+$q->filter({NOT => [['id' => 'IN' => \[(5 .. 13), undef]]]});
+
+cmp_deeply(
+    $q->get_all(),
+    [
+        {
+            id      => 1,
+            caption => 'caption 1',
+        },
+        {
+            id      => 2,
+            caption => 'caption 2',
+        },
+    ],
+    'filter with function "NOT"'
 );
 
 $q->filter(['id' => 'IN' => \[5, 8, undef]]);

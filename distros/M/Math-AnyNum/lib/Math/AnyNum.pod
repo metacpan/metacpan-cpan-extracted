@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -231,7 +231,7 @@ Returns a new AnyNum object with the value specified in the first argument,
 which can be a Perl numerical value, a string representing a number in a
 rational form, such as C<"1/2">, a string holding a floating-point number,
 such as C<"0.5">, a string holding an integer, such as C<"255"> or a string
-holding a complex number, such as C<"3+4i">.
+holding a complex number, such as C<"3+4i"> or C<"(3 4)">.
 
     my $z = Math::AnyNum->new('42');        # integer
     my $r = Math::AnyNum->new('3/4');       # rational
@@ -825,7 +825,9 @@ Cosecant, hyperbolic cosecant, inverse cosecant and inverse hyperbolic cosecant.
 
     atan2(x, y)                                   #=> Any
 
-The arctangent of the quotient of its arguments (i.e.: C<atan(x/y)>).
+The arc tangent of C<x> and C<y>, defined as:
+
+    atan2(x, y) = -i * log((y + x*i) / sqrt(x^2 + y^2))
 
 =head2 deg2rad
 
@@ -1475,7 +1477,7 @@ Converts C<x> to a rational number. Returns NaN when this conversion is not poss
 
 When the given argument is a decimal expansion string, it will be specially parsed as an exact fraction.
 
-If C<x> is a floating-point number, use C<rat_approx()> instead.
+If C<x> is a floating-point number, consider using C<rat_approx()> instead.
 
 Example:
 
@@ -1511,12 +1513,17 @@ Example:
 
     complex(x)                                    #=> Complex
     complex(str)                                  #=> Complex
+    complex(x, y)                                 #=> Complex
 
-Converts C<x> to a complex number.
+Converts C<x> to a complex number. When a second argument is given, it sets C<x> as the real part and C<y> as the imaginary part.
+
+If C<x> or C<y> are complex numbers, the function returns the result of C<x + y*i>.
 
 Example:
 
-    complex("3+4i") = 3+4*i
+    complex("3+4i")        = 3+4*i
+    complex(3, 4)          = 3+4*i
+    complex("5+2i", "-4i") = 9+2*i
 
 =head2 stringify
 

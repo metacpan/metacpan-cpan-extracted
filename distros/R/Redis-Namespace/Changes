@@ -1,5 +1,8 @@
 Revision history for Perl extension Redis::Namespace
 
+0.08 2018-01-28T12:15:16Z
+	- support bitfield, georadius, georadiusbymember, swapdb, touch, and unlink command
+
 0.07 2016-01-19T00:48:31Z
         - support 3.2 pipelined migrate
         - fix some test

@@ -28,4 +28,4 @@ requires:
   perl: '5.012'
 resources:
   repository: git://github.com/frmadem/eixo_queue.git
-version: v0.5.5
+version: v0.5.7

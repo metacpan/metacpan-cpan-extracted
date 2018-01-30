@@ -12,6 +12,7 @@ use Test::More tests => 2;
 my @show_versions =
  qw/Test::More
     Log::Report
+    Log::Report::Optional
     Log::Report::Lexicon
     String::Print
    /;

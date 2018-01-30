@@ -1,5 +1,3 @@
-#!/usr/bin/env perl
-#
 # Verify that all attributes are positionned in tree and that all leaf
 # correspond to an attribute. Verify also that attributes and leafs are uniq
 

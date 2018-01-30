@@ -1,235 +1,356 @@
-statements
-    |--- :start
-    |    |--- ::=
-    |    |--- graph_grammar
-    |--- :default
-    |    |--- ::=
-    |    |--- action
-    |    |--- =>
-    |    |--- [values]
-    |--- lexeme default
-    |    |--- =
-    |    |--- latm
-    |    |--- =>
-    |    |--- 1
-    |--- graph_grammar
-    |    |--- ::=
-    |    |--- graph_definition
-    |--- graph_definition
-    |    |--- ::=
-    |    |--- node_definition
-    |    |--- |
-    |    |--- edge_definition
-    |--- node_definition
-    |    |--- ::=
-    |    |--- node_statement
-    |    |--- |
-    |    |--- node_statement
-    |    |--- graph_definition
-    |--- node_statement
-    |    |--- ::=
-    |    |--- node_name_token
-    |    |--- |
-    |    |--- node_name_token
-    |    |--- attribute_definition
-    |    |--- |
-    |    |--- node_statement
-    |    |--- (',')
-    |    |--- node_statement
-    |--- node_name_token
-    |    |--- ::=
-    |    |--- start_node
-    |    |--- end_node
-    |    |--- |
-    |    |--- start_node
-    |    |--- node_name
-    |    |--- end_node
-    |--- edge_definition
-    |    |--- ::=
-    |    |--- edge_statement
-    |    |--- |
-    |    |--- edge_statement
-    |    |--- graph_definition
-    |--- edge_statement
-    |    |--- ::=
-    |    |--- edge_name
-    |    |--- |
-    |    |--- edge_name
-    |    |--- attribute_definition
-    |    |--- |
-    |    |--- edge_statement
-    |    |--- (',')
-    |    |--- edge_statement
-    |--- edge_name
-    |    |--- ::=
-    |    |--- directed_edge
-    |    |--- |
-    |    |--- undirected_edge
-    |--- attribute_definition
-    |    |--- ::=
-    |    |--- attribute_statement
-    |--- attribute_statement
-    |    |--- ::=
-    |    |--- start_attributes
-    |    |--- string_token_set
-    |    |--- end_attributes
-    |--- string_token_set
-    |    |--- ::=
-    |    |--- string_token_pair
-    |--- string_token_pair
-    |    |--- ::=
-    |    |--- literal_label
-    |    |--- |
-    |    |--- attribute_name
-    |    |--- (':')
-    |    |--- attribute_value
-    |--- :lexeme
-    |    |--- ~
-    |    |--- attribute_name
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- attribute_name
-    |--- attribute_name
-    |    |--- ~
-    |    |--- string_char_set
-    |--- :lexeme
-    |    |--- ~
-    |    |--- attribute_value
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- attribute_value
-    |--- attribute_value
-    |    |--- ~
-    |    |--- string_char_set
-    |--- :lexeme
-    |    |--- ~
-    |    |--- directed_edge
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- directed_edge
-    |    |--- priority
-    |    |--- =>
-    |    |--- 2
-    |--- directed_edge
-    |    |--- ~
-    |    |--- '->'
-    |--- :lexeme
-    |    |--- ~
-    |    |--- end_attributes
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- end_attributes
-    |    |--- priority
-    |    |--- =>
-    |    |--- 1
-    |--- end_attributes
-    |    |--- ~
-    |    |--- '}'
-    |--- :lexeme
-    |    |--- ~
-    |    |--- end_node
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- end_node
-    |    |--- priority
-    |    |--- =>
-    |    |--- 1
-    |--- end_node
-    |    |--- ~
-    |    |--- ']'
-    |--- escaped_char
-    |    |--- ~
-    |    |--- '\'
-    |    |--- [[:print:]]
-    |--- :lexeme
-    |    |--- ~
-    |    |--- literal_label
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- literal_label
-    |    |--- priority
-    |    |--- =>
-    |    |--- 1
-    |--- literal_label
-    |    |--- ~
-    |    |--- 'label'
-    |--- :lexeme
-    |    |--- ~
-    |    |--- node_name
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- node_name
-    |--- node_name
-    |    |--- ~
-    |    |--- string_char_set
-    |--- :lexeme
-    |    |--- ~
-    |    |--- start_attributes
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- start_attributes
-    |--- start_attributes
-    |    |--- ~
-    |    |--- '{'
-    |--- :lexeme
-    |    |--- ~
-    |    |--- start_node
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- start_node
-    |--- start_node
-    |    |--- ~
-    |    |--- '['
-    |--- string_char_set
-    |    |--- ~
-    |    |--- escaped_char
-    |    |--- |
-    |    |--- [^;:}\]]
-    |--- :lexeme
-    |    |--- ~
-    |    |--- undirected_edge
-    |    |--- pause
-    |    |--- =>
-    |    |--- before
-    |    |--- event
-    |    |--- =>
-    |    |--- undirected_edge
-    |    |--- priority
-    |    |--- =>
-    |    |--- 2
-    |--- undirected_edge
-    |    |--- ~
-    |    |--- '--'
-    |--- :discard
-    |    |--- ~
-    |    |--- whitespace
-    |--- whitespace
-         |--- ~
-         |--- [\s]
+statements. Attributes: {token => ""}
+    |--- statement. Attributes: {count => "1", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":default"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "action"}
+    |         |--- array_descriptor. Attributes: {token => "[values]"}
+    |--- statement. Attributes: {count => "2", token => "statement"}
+    |    |--- lhs. Attributes: {token => "discard default"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- event. Attributes: {token => "event"}
+    |    |    |--- reserved_event_name. Attributes: {token => ":symbol"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "3", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":discard"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "whitespace"}
+    |--- statement. Attributes: {count => "4", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "whitespace"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[\s]"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |--- statement. Attributes: {count => "5", token => "statement"}
+    |    |--- lhs. Attributes: {token => "lexeme default"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "latm"}
+    |         |--- boolean. Attributes: {token => "1"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |         |--- priority. Attributes: {token => "2"}
+    |         |--- priority. Attributes: {token => "1"}
+    |         |--- priority. Attributes: {token => "1"}
+    |--- statement. Attributes: {count => "6", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":start"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "graph_grammar"}
+    |--- statement. Attributes: {count => "7", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "graph_grammar"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "graph_definition"}
+    |--- statement. Attributes: {count => "8", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "graph_definition"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_definition"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "edge_definition"}
+    |--- statement. Attributes: {count => "9", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_definition"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_statement"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_statement"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "graph_definition"}
+    |--- statement. Attributes: {count => "10", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_statement"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name_token"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name_token"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_definition"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_statement"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "','"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "node_statement"}
+    |--- statement. Attributes: {count => "11", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name_token"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_node"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "end_node"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_node"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "end_node"}
+    |--- statement. Attributes: {count => "12", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_definition"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_statement"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_statement"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "graph_definition"}
+    |--- statement. Attributes: {count => "13", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_statement"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_name"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_name"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_definition"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_statement"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "','"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "edge_statement"}
+    |--- statement. Attributes: {count => "14", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "edge_name"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "directed_edge"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "undirected_edge"}
+    |--- statement. Attributes: {count => "15", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_definition"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "attribute_statement"}
+    |--- statement. Attributes: {count => "16", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_statement"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_attributes"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string_token_set"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "end_attributes"}
+    |--- statement. Attributes: {count => "17", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string_token_set"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "string_token_pair"}
+    |--- statement. Attributes: {count => "18", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string_token_pair"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "literal_label"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_name"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => "("}
+    |    |    |--- rhs. Attributes: {token => "':'"}
+    |    |--- parenthesized_rhs_primary_list. Attributes: {token => ")"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "attribute_value"}
+    |--- statement. Attributes: {count => "19", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_name"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "attribute_name"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "20", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_name"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "string_char_set"}
+    |--- statement. Attributes: {count => "21", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_value"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "attribute_value"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "22", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "attribute_value"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "string_char_set"}
+    |--- statement. Attributes: {count => "23", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "directed_edge"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "directed_edge"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "24", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "directed_edge"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'->'"}
+    |--- statement. Attributes: {count => "25", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "end_attributes"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "end_attributes"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "26", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "end_attributes"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'}'"}
+    |--- statement. Attributes: {count => "27", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "end_node"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "end_node"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "28", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "end_node"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "']'"}
+    |--- statement. Attributes: {count => "29", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "escaped_char"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "[[:print:]]"}
+    |         |--- priority. Attributes: {token => "1"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |--- statement. Attributes: {count => "30", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "literal_label"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "literal_label"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "31", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "literal_label"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'label'"}
+    |--- statement. Attributes: {count => "32", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "node_name"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "33", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "node_name"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "string_char_set"}
+    |--- statement. Attributes: {count => "34", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_attributes"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "start_attributes"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "35", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_attributes"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'{'"}
+    |--- statement. Attributes: {count => "36", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_node"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "start_node"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "37", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "start_node"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'['"}
+    |--- statement. Attributes: {count => "38", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string_char_set"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "escaped_char"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "[^;:}\]]"}
+    |         |--- priority. Attributes: {token => "2"}
+    |--- statement. Attributes: {count => "39", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":lexeme"}
+    |    |--- op_declare_match. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "undirected_edge"}
+    |    |--- pause_specification. Attributes: {token => "pause_specification"}
+    |    |    |--- before_or_after. Attributes: {token => "before"}
+    |    |--- event_specification. Attributes: {token => "event_specification"}
+    |    |    |--- standard_name. Attributes: {token => "undirected_edge"}
+    |    |--- event_initializer. Attributes: {token => "event_initializer"}
+    |         |--- initial_value. Attributes: {token => "0"}
+    |--- statement. Attributes: {count => "40", token => "statement"}
+         |--- lhs. Attributes: {token => "bare_name"}
+         |    |--- bare_name. Attributes: {token => "undirected_edge"}
+         |--- op_declare_match. Attributes: {token => "lexeme"}
+         |--- rhs. Attributes: {token => "'--'"}

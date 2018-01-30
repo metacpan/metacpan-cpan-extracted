@@ -27,7 +27,7 @@ package Rex::Commands::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 #require Exporter;
 require Rex::Exporter;

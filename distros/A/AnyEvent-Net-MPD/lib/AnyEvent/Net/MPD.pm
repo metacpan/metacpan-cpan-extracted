@@ -3,7 +3,7 @@ package AnyEvent::Net::MPD;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moo;
 use MooX::HandlesVia;
@@ -488,6 +488,12 @@ AnyEvent::Net::MPD - A non-blocking interface to MPD
 
 AnyEvent::Net::MPD provides a non-blocking interface to an MPD server.
 
+=head1 NOTE
+
+Although in what is mostly a usable state, AnyEvent::Net::MPD is currently
+B<DEPRECATED>, in favour of L<Net::Async::MPD>. If you want an async interface
+to MPD, please consider using that distribution instead.
+
 =head1 ATTRIBUTES
 
 =over 4
@@ -671,6 +677,12 @@ A message was received on a channel this client is subscribed to.
 A lightweight blocking MPD library. Has fewer dependencies than this one, but
 it does not curently support command lists. I took the idea of allowing for
 underscores in command names from this module.
+
+=item * L<Net::Async::MPD>
+
+The author's second (and much more successful) attempt at writing this
+distribution, using L<IO::Async> in the background. Please use that one
+instead.
 
 =item * L<Audio::MPD>
 

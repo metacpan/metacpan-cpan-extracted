@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Cronjob;
 # ABSTRACT: wrap up programs to be run as cron jobs
-$App::Cronjob::VERSION = '1.200006';
+$App::Cronjob::VERSION = '1.200007';
 use Digest::MD5 qw(md5_hex);
 use Errno;
 use Fcntl qw( :DEFAULT :flock );
@@ -47,6 +47,7 @@ sub run {
      [ 'errors-only|E', 'do not send mail if exit code 0, even with output', ],
      [ 'sender|f=s',    'sender for message',                                ],
      [ 'jobname|j=s',   'job name; used for locking, if given'               ],
+     [ 'timeout=i',     "fail if the child isn't completed within n seconds" ],
      [ 'ignore-errors=s@', 'error types to ignore (like: lock)'              ],
      [ 'temp-ignore-lock-errors=i',
                      'failure to lock only signals an error after this long' ],
@@ -69,7 +70,8 @@ sub run {
   $host    = hostname_long;
   $sender  = $opt->{sender} || sprintf '%s@%s', ($ENV{USER}||'cron'), $host;
 
-  my $lockfile = sprintf '/tmp/cronjob.%s',
+  my $lockfile = sprintf '%s/cronjob.%s',
+                 $ENV{APP_CRONJOB_LOCKDIR} || '/tmp',
                  $opt->{jobname} || md5_hex($subject);
 
   my $got_lock;
@@ -115,9 +117,18 @@ sub run {
     my $start = Time::HiRes::time;
     my $output;
 
-    # XXX: does not throw proper exception
-    $logger->log_fatal([ 'run3 failed to run command: %s', $@ ])
-      unless eval { run3($opt->{command}, \undef, \$output, \$output); 1; };
+    my $ok = eval {
+      local $SIG{ALRM} = sub { die "command took too long to run" };
+      alarm($opt->timeout) if $opt->timeout;
+      run3($opt->{command}, \undef, \$output, \$output);
+      alarm(0) if $opt->timeout;
+      1;
+    };
+
+    unless ($ok) {
+      # XXX: does not throw proper exception
+      $logger->log_fatal([ 'run3 failed to run command: %s', $@ ]);
+    }
 
     my $status = Process::Status->new;
 
@@ -234,7 +245,7 @@ END_TEMPLATE
 
 {
   package App::Cronjob::Exception;
-$App::Cronjob::Exception::VERSION = '1.200006';
+$App::Cronjob::Exception::VERSION = '1.200007';
 sub new {
     my ($class, $type, $text, $extra) = @_;
     bless { type => $type, text => $text, extra => $extra } => $class;
@@ -255,7 +266,7 @@ App::Cronjob - wrap up programs to be run as cron jobs
 
 =head1 VERSION
 
-version 1.200006
+version 1.200007
 
 =head1 SEE INSTEAD
 
@@ -273,7 +284,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords chromatic Mark Jason Dominus
+=for stopwords chromatic Mark Jason Dominus Rob N ★
 
 =over 4
 
@@ -284,6 +295,10 @@ chromatic <chromatic@wgz.org>
 =item *
 
 Mark Jason Dominus <mjd@plover.com>
+
+=item *
+
+Rob N ★ <robn@robn.io>
 
 =back
 

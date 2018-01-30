@@ -1,5 +1,12 @@
 Revision history for Group-Git-Taggers-Node
 
+0.0.3   2018-01-22
+        Updating for release of version 0.0.3
+        Added travisCI config (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        License update (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+
 0.0.2   2015-08-30
         Updating for release of version 0.0.2
         Removed creation of makefile (Ivan Wills)

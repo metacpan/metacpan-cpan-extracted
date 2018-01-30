@@ -1,0 +1,56 @@
+{
+   "abstract" : "Geography metadata standard",
+   "author" : [
+      "Mark Overmeer"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5",
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-ISO19139",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Geo::GML" : "0.18",
+            "Log::Report" : "0.19",
+            "Test::More" : "0.54",
+            "XML::Compile" : "0.84",
+            "XML::Compile::Cache" : "0.1",
+            "XML::Compile::Tester" : "0.02"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/markov2/perl5-Geo-ISO19139.git",
+         "web" : "https://github.com/markov2/perl5-Geo-ISO19139"
+      }
+   },
+   "version" : "0.11",
+   "x_homepage" : "http://perl.overmeer.net/CPAN/",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

@@ -1,5 +1,5 @@
 package Mail::DMARC::Policy;
-our $VERSION = '1.20170911'; # VERSION
+our $VERSION = '1.20180125'; # VERSION
 use strict;
 use warnings;
 
@@ -100,7 +100,7 @@ sub aspf {
 
 sub fo {
     return $_[0]->{fo} if 1 == scalar @_;
-    croak "invalid fo: $_[1]" if 0 == grep {/^$_[1]$/ix} qw/ 0 1 d s /;
+    croak "invalid fo: $_[1]" if $_[1] !~ /^[01ds](:[01ds])*$/ix;
     return $_[0]->{fo} = $_[1];
 }
 
@@ -194,7 +194,7 @@ Mail::DMARC::Policy - a DMARC policy in object format
 
 =head1 VERSION
 
-version 1.20170911
+version 1.20180125
 
 =head1 SYNOPSIS
 

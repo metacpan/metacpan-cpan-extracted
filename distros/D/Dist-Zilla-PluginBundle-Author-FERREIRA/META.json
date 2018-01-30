@@ -41,9 +41,9 @@
             "Dist::Zilla::PluginBundle::RJBS" : "5.010",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Moose" : "0",
-            "Perl::PrereqScanner::Scanner::Jojo" : "0",
-            "Perl::PrereqScanner::Scanner::Mojo" : "0",
-            "Perl::PrereqScanner::Scanner::Zim" : "0"
+            "Perl::PrereqScanner::Scanner::Jojo" : "v0.3.0",
+            "Perl::PrereqScanner::Scanner::Mojo" : "v0.3.0",
+            "Perl::PrereqScanner::Scanner::Zim" : "v0.2.0"
          }
       },
       "test" : {
@@ -63,7 +63,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::FERREIRA" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/FERREIRA.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/aferreira/cpan-Dist-Zilla-PluginBundle-Author-FERREIRA"
       }
    },
-   "version" : "0.3.0",
+   "version" : "0.4.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

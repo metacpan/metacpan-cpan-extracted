@@ -48,12 +48,12 @@ rplyto_demo:
 send_demo:
 
    This takes an Internet message as input and uses sendmail to send
-   the message.  It also allows the user to defined aliases in thier
+   the message.  It also allows the user to defined aliases in their
    ~/.mailrc file in the same format as would be expected by binmail
 
        alias name expansion
 
    If you have News::NNTPClient installed then this script can also be
    used to post to a newsgroup by adding a Newsgroups: line into the
-   header an passing a -post option on the cmdline.
+   header and passing a -post option on the cmdline.
 

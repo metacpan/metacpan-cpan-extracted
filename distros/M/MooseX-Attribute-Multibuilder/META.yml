@@ -1,0 +1,39 @@
+---
+abstract: 'Have several attributes share the same builder'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moose: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Attribute-Multibuilder
+provides:
+  MooseX::Attribute::Multibuilder:
+    file: lib/MooseX/Attribute/Multibuilder.pm
+    version: v0.0.1
+requires:
+  List::Util: '1.29'
+  Moose::Role: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/MooseX-Attribute-Multibuilder/issues
+  homepage: https://github.com/yanick/MooseX-Attribute-Multibuilder
+  repository: https://github.com/yanick/MooseX-Attribute-Multibuilder.git
+version: 0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_serialization_backend: 'YAML::Tiny version 1.67'

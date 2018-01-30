@@ -1,0 +1,161 @@
+'type ApiResponse {
+  code: Int
+  message: String
+  type: String
+}
+
+type Category {
+  id: Int
+  name: String
+}
+
+input CategoryInput {
+  id: Int
+  name: String
+}
+
+type Mutation {
+  # Add a new pet to the store
+  addPet(body: PetInput!): String
+  # Create user
+  createUser(body: UserInput!): String
+  # Creates list of users with given input array
+  createUsersWithArrayInput(body: [UserInput]!): String
+  # Creates list of users with given input array
+  createUsersWithListInput(body: [UserInput]!): String
+  # Delete purchase order by ID
+  deleteOrder(orderId: Int!): String
+  # Deletes a pet
+  deletePet(api_key: String, petId: Int!): String
+  # Delete user
+  deleteUser(username: String!): String
+  # Place an order for a pet
+  placeOrder(body: OrderInput!): Order
+  # Update an existing pet
+  updatePet(body: PetInput!): String
+  # Updates a pet in the store with form data
+  updatePetWithForm(name: String, petId: Int!, status: String): String
+  # Updated user
+  updateUser(body: UserInput!, username: String!): String
+  # uploads an image
+  uploadFile(additionalMetadata: String, file: String, petId: Int!): ApiResponse
+}
+
+type Order {
+  complete: Boolean
+  id: Int
+  petId: Int
+  quantity: Int
+  shipDate: DateTime
+  # Order Status
+  status: OrderStatus
+}
+
+input OrderInput {
+  complete: Boolean
+  id: Int
+  petId: Int
+  quantity: Int
+  shipDate: DateTime
+  # Order Status
+  status: OrderStatus
+}
+
+# Order Status
+enum OrderStatus {
+  approved
+  delivered
+  placed
+}
+
+type Pet {
+  category: Category
+  id: Int
+  name: String!
+  photoUrls: [String]!
+  # pet status in the store
+  status: PetStatus
+  tags: [Tag]
+}
+
+input PetInput {
+  category: CategoryInput
+  id: Int
+  name: String!
+  photoUrls: [String]!
+  # pet status in the store
+  status: PetStatus
+  tags: [TagInput]
+}
+
+# pet status in the store
+enum PetStatus {
+  available
+  pending
+  sold
+}
+
+type Query {
+  # Finds Pets by status
+  findPetsByStatus(status: [findPetsByStatus_status]!): [Pet]
+  # Finds Pets by tags
+  findPetsByTags(tags: [String]!): [Pet]
+  # Returns pet inventories by status
+  getInventory: [getInventoryReturn]
+  # Find purchase order by ID
+  getOrderById(orderId: Int!): Order
+  # Find pet by ID
+  getPetById(petId: Int!): Pet
+  # Get user by user name
+  getUserByName(username: String!): User
+  # Logs user into the system
+  loginUser(password: String!, username: String!): String
+  # Logs out current logged in user session
+  logoutUser: String
+}
+
+type Tag {
+  id: Int
+  name: String
+}
+
+input TagInput {
+  id: Int
+  name: String
+}
+
+type User {
+  email: String
+  firstName: String
+  id: Int
+  lastName: String
+  password: String
+  phone: String
+  # User Status
+  userStatus: Int
+  username: String
+}
+
+input UserInput {
+  email: String
+  firstName: String
+  id: Int
+  lastName: String
+  password: String
+  phone: String
+  # User Status
+  userStatus: Int
+  username: String
+}
+
+enum findPetsByStatus_status {
+  available
+  pending
+  sold
+}
+
+type getInventoryReturn {
+  key: String
+  value: Int
+}
+'

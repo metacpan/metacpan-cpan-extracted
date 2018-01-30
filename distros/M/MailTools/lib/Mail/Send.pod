@@ -57,24 +57,24 @@ used to initialize the object.
 
 =over 4
 
-=item $obj-E<gt>B<add>(FIELDNAME, VALUES)
+=item $obj-E<gt>B<add>($fieldname, @values)
 
-Add values to the list of defined values for the FIELDNAME.
+Add values to the list of defined values for the $fieldname.
 
-=item $obj-E<gt>B<bcc>(VALUES)
+=item $obj-E<gt>B<bcc>(@values)
 
-=item $obj-E<gt>B<cc>(VALUES)
+=item $obj-E<gt>B<cc>(@values)
 
-=item $obj-E<gt>B<delete>(FIELDNAME)
+=item $obj-E<gt>B<delete>($fieldname)
 
-=item $obj-E<gt>B<set>(FIELDNAME, VALUES)
+=item $obj-E<gt>B<set>($fieldname, @values)
 
-VALUES will replace the old values for the FIELDNAME.  Returned is
+The @values will replace the old values for the $fieldname.  Returned is
 the LIST of values after modification.
 
-=item $obj-E<gt>B<subject>(VALUES)
+=item $obj-E<gt>B<subject>(@values)
 
-=item $obj-E<gt>B<to>(VALUES)
+=item $obj-E<gt>B<to>(@values)
 
 =back
 
@@ -82,9 +82,9 @@ the LIST of values after modification.
 
 =over 4
 
-=item $obj-E<gt>B<open>(OPTIONS)
+=item $obj-E<gt>B<open>(%options)
 
-The OPTIONS are used to initiate a mailer object via
+The %options are used to initiate a mailer object via
 L<Mail::Mailer::new()|Mail::Mailer/"Constructors">.  Then L<Mail::Mailer::open()|Mail::Mailer/"Constructors"> is called
 with the knowledge collected in this Mail::Send object.
 

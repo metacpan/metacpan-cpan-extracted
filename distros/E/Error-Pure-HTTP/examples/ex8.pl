@@ -1,16 +1,14 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Error::Pure::HTTP::Error qw(err);
+use Error::Pure::HTTP::Print qw(err);
 
 # Error.
 err '1';
 
-# Output like this:
+# Output:
 # Content-type: text/plain
 #
-# #Error [script.pl:12] 1
+# 1

@@ -35,5 +35,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=SVG-Grid
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/SVG-Grid.git
-version: '1.11'
+version: '1.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

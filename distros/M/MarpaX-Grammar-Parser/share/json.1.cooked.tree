@@ -1,200 +1,273 @@
-statements
-    |--- lexeme default
-    |    |--- =
-    |    |--- latm
-    |    |--- =>
-    |    |--- 1
-    |--- :start
-    |    |--- ::=
-    |    |--- json
-    |--- json
-    |    |--- ::=
-    |    |--- object
-    |    |--- |
-    |    |--- array
-    |--- object
-    |    |--- ::=
-    |    |--- '{'
-    |    |--- '}'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_empty_object
-    |    |--- |
-    |    |--- '{'
-    |    |--- members
-    |    |--- '}'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_object
-    |--- members
-    |    |--- ::=
-    |    |--- pair
-    |    |--- separator
-    |    |--- =>
-    |    |--- comma
-    |    |--- action
-    |    |--- =>
-    |    |--- do_list
-    |--- pair
-    |    |--- ::=
-    |    |--- string
-    |    |--- ':'
-    |    |--- value
-    |    |--- action
-    |    |--- =>
-    |    |--- do_pair
-    |--- value
-    |    |--- ::=
-    |    |--- string
-    |    |--- |
-    |    |--- object
-    |    |--- |
-    |    |--- number
-    |    |--- |
-    |    |--- array
-    |    |--- |
-    |    |--- 'true'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_true
-    |    |--- |
-    |    |--- 'false'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_true
-    |    |--- |
-    |    |--- 'null'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_null
-    |--- array
-    |    |--- ::=
-    |    |--- '['
-    |    |--- ']'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_empty_array
-    |    |--- |
-    |    |--- '['
-    |    |--- elements
-    |    |--- ']'
-    |    |--- action
-    |    |--- =>
-    |    |--- do_array
-    |--- elements
-    |    |--- ::=
-    |    |--- value
-    |    |--- separator
-    |    |--- =>
-    |    |--- comma
-    |    |--- action
-    |    |--- =>
-    |    |--- do_list
-    |--- number
-    |    |--- ~
-    |    |--- int
-    |    |--- |
-    |    |--- int
-    |    |--- frac
-    |    |--- |
-    |    |--- int
-    |    |--- exp
-    |    |--- |
-    |    |--- int
-    |    |--- frac
-    |    |--- exp
-    |--- int
-    |    |--- ~
-    |    |--- digits
-    |    |--- |
-    |    |--- '-'
-    |    |--- digits
-    |--- digits
-    |    |--- ~
-    |    |--- [\d]
-    |--- frac
-    |    |--- ~
-    |    |--- '.'
-    |    |--- digits
-    |--- exp
-    |    |--- ~
-    |    |--- e
-    |    |--- digits
-    |--- e
-    |    |--- ~
-    |    |--- 'e'
-    |    |--- |
-    |    |--- 'e+'
-    |    |--- |
-    |    |--- 'e-'
-    |    |--- |
-    |    |--- 'E'
-    |    |--- |
-    |    |--- 'E+'
-    |    |--- |
-    |    |--- 'E-'
-    |--- string
-    |    |--- ::=
-    |    |--- lstring
-    |    |--- action
-    |    |--- =>
-    |    |--- do_string
-    |--- lstring
-    |    |--- ~
-    |    |--- quote
-    |    |--- in_string
-    |    |--- quote
-    |--- quote
-    |    |--- ~
-    |    |--- ["]
-    |--- in_string
-    |    |--- ~
-    |    |--- in_string_char
-    |--- in_string_char
-    |    |--- ~
-    |    |--- [^"\\]
-    |    |--- |
-    |    |--- '\'
-    |    |--- '"'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 'b'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 'f'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 't'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 'n'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 'r'
-    |    |--- |
-    |    |--- '\'
-    |    |--- 'u'
-    |    |--- four_hex_digits
-    |    |--- |
-    |    |--- '\'
-    |    |--- '/'
-    |    |--- |
-    |    |--- '\\'
-    |--- four_hex_digits
-    |    |--- ~
-    |    |--- hex_digit
-    |    |--- hex_digit
-    |    |--- hex_digit
-    |    |--- hex_digit
-    |--- hex_digit
-    |    |--- ~
-    |    |--- [0-9a-fA-F]
-    |--- comma
-    |    |--- ~
-    |    |--- ','
-    |--- :discard
-    |    |--- ~
-    |    |--- whitespace
-    |--- whitespace
-         |--- ~
-         |--- [\s]
+statements. Attributes: {token => ""}
+    |--- statement. Attributes: {count => "1", token => "statement"}
+    |    |--- lhs. Attributes: {token => "lexeme default"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "latm"}
+    |         |--- boolean. Attributes: {token => "1"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |--- statement. Attributes: {count => "2", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":start"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "json"}
+    |--- statement. Attributes: {count => "3", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "json"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "object"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "array"}
+    |--- statement. Attributes: {count => "4", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "object"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "'{'"}
+    |    |--- rhs. Attributes: {token => "'}'"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "do_empty_object"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'{'"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "members"}
+    |    |--- rhs. Attributes: {token => "'}'"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_object"}
+    |--- statement. Attributes: {count => "5", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "members"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "pair"}
+    |    |--- separator. Attributes: {token => "<comma>"}
+    |    |    |--- quantifier. Attributes: {token => "+"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_list"}
+    |--- statement. Attributes: {count => "6", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "pair"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string"}
+    |    |--- rhs. Attributes: {token => "':'"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "value"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_pair"}
+    |--- statement. Attributes: {count => "7", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "value"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "object"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "number"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "array"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'true'"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "do_true"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'false'"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "do_true"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'null'"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_null"}
+    |--- statement. Attributes: {count => "8", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "array"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "'['"}
+    |    |--- rhs. Attributes: {token => "']'"}
+    |    |--- action. Attributes: {token => "action"}
+    |    |    |--- Perl_name. Attributes: {token => "do_empty_array"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'['"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "elements"}
+    |    |--- rhs. Attributes: {token => "']'"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_array"}
+    |--- statement. Attributes: {count => "9", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "elements"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "value"}
+    |    |--- separator. Attributes: {token => "<comma>"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_list"}
+    |--- statement. Attributes: {count => "10", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "number"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "int"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "int"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "frac"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "int"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "exp"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "int"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "frac"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "exp"}
+    |--- statement. Attributes: {count => "11", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "int"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "digits"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'-'"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "digits"}
+    |--- statement. Attributes: {count => "12", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "digits"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[\d]"}
+    |         |--- quantifier. Attributes: {token => "+"}
+    |--- statement. Attributes: {count => "13", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "frac"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'.'"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "digits"}
+    |--- statement. Attributes: {count => "14", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "exp"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "e"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "digits"}
+    |--- statement. Attributes: {count => "15", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "e"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "'e'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'e+'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'e-'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'E'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'E+'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'E-'"}
+    |--- statement. Attributes: {count => "16", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "string"}
+    |    |--- op_declare_bnf. Attributes: {token => "bnf"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "lstring"}
+    |    |--- action. Attributes: {token => "action"}
+    |         |--- Perl_name. Attributes: {token => "do_string"}
+    |--- statement. Attributes: {count => "17", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "lstring"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "quote"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "in_string"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "quote"}
+    |--- statement. Attributes: {count => "18", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "quote"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "["]"}
+    |         |--- quantifier. Attributes: {token => "*"}
+    |--- statement. Attributes: {count => "19", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "in_string"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "in_string_char"}
+    |--- statement. Attributes: {count => "20", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "in_string_char"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[^"\\]"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'"'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'b'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'f'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'t'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'n'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'r'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'u'"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "four_hex_digits"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\'"}
+    |    |--- rhs. Attributes: {token => "'/'"}
+    |    |--- alternative. Attributes: {token => "|"}
+    |    |--- rhs. Attributes: {token => "'\\'"}
+    |--- statement. Attributes: {count => "21", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "four_hex_digits"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "hex_digit"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "hex_digit"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "hex_digit"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "hex_digit"}
+    |--- statement. Attributes: {count => "22", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "hex_digit"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "[0-9a-fA-F]"}
+    |--- statement. Attributes: {count => "23", token => "statement"}
+    |    |--- lhs. Attributes: {token => "bare_name"}
+    |    |    |--- bare_name. Attributes: {token => "comma"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "','"}
+    |--- statement. Attributes: {count => "24", token => "statement"}
+    |    |--- lhs. Attributes: {token => ":discard"}
+    |    |--- op_declare_match. Attributes: {token => "lexeme"}
+    |    |--- rhs. Attributes: {token => "bare_name"}
+    |         |--- bare_name. Attributes: {token => "whitespace"}
+    |--- statement. Attributes: {count => "25", token => "statement"}
+         |--- lhs. Attributes: {token => "bare_name"}
+         |    |--- bare_name. Attributes: {token => "whitespace"}
+         |--- op_declare_match. Attributes: {token => "lexeme"}
+         |--- rhs. Attributes: {token => "[\s]"}
+              |--- quantifier. Attributes: {token => "+"}

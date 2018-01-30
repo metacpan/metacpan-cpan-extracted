@@ -6,7 +6,7 @@ use Type::Library -base, -declare => qw( Uri Iri Namespace NamespaceMap );
 use Types::Standard qw( HashRef InstanceOf );
 use Types::URI qw();
 
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 =head1 NAME
 
@@ -29,8 +29,9 @@ Types::Namespace - type constraints for dealing with namespaces
 
 =head1 DESCRIPTION
 
-L<Types::URI> is a type constraint library suitable for use with
-L<Moo>/L<Moose> attributes, L<Kavorka> sub signatures, and so forth.
+Types::Namespace is a type constraint library suitable for use with
+L<Moo>/L<Moose> attributes, L<Kavorka> sub signatures, and so
+forth. It builds on L<Types::URI>.
 
 =head1 TYPES
 

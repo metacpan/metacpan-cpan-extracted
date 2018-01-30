@@ -1,5 +1,5 @@
 package Bio::Roary::Output::CoreGeneAlignmentCoordinatesEMBL;
-$Bio::Roary::Output::CoreGeneAlignmentCoordinatesEMBL::VERSION = '3.11.3';
+$Bio::Roary::Output::CoreGeneAlignmentCoordinatesEMBL::VERSION = '3.12.0';
 # ABSTRACT: Create an embl file for the header with locations of where genes are in the multifasta alignment of core genes
 
 
@@ -71,7 +71,7 @@ Bio::Roary::Output::CoreGeneAlignmentCoordinatesEMBL - Create an embl file for t
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 

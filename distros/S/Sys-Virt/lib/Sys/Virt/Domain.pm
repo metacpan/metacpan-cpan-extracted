@@ -45,7 +45,7 @@ sub _new {
     my $class = ref($proto) || $proto;
     my %params = @_;
 
-    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is requried";
+    my $con = exists $params{connection} ? $params{connection} : die "connection parameter is required";
     my $self;
     if (exists $params{name}) {
 	$self = Sys::Virt::Domain::_lookup_by_name($con,  $params{name});
@@ -490,7 +490,7 @@ One of the CONTROL INFO constants listed later
 
 =item C<details>
 
-Currently unsed, always 0.
+Currently unused, always 0.
 
 =item C<stateTime>
 
@@ -658,7 +658,7 @@ later.
 
 =item $dom->detach_device($xml[, $flags])
 
-Hotunplug a existing device whose configuration is given by C<$xml>,
+Hotunplug an existing device whose configuration is given by C<$xml>,
 from the running guest. The optional <$flags> parameter defaults
 to 0, but can accept one of the device hotplug flags described
 later.
@@ -1719,7 +1719,7 @@ instead of MB/s.
 Abort the current job that is executing for the block device
 associated with C<$path>
 
-=item $dom->block_pull($path, $bandwith, $flags=0)
+=item $dom->block_pull($path, $bandwidth, $flags=0)
 
 Merge the backing files associated with C<$path> into the
 top level file. The C<$bandwidth> parameter specifies the
@@ -1735,7 +1735,7 @@ instead of MB/s.
 
 =back
 
-=item $dom->block_rebase($path, $base, $bandwith, $flags=0)
+=item $dom->block_rebase($path, $base, $bandwidth, $flags=0)
 
 Switch the backing path associated with C<$path> to instead
 use C<$base>. The C<$bandwidth> parameter specifies the
@@ -1774,7 +1774,7 @@ The maximum amount of data in flight in bytes.
 
 =back
 
-=item $dom->block_commit($path, $base, $top, $bandwith, $flags=0)
+=item $dom->block_commit($path, $base, $top, $bandwidth, $flags=0)
 
 Commit changes there were made to the temporary top level file C<$top>.
 Takes all the differences between C<$top> and C<$base> and merge them
@@ -3827,7 +3827,7 @@ The host storage has run out of free space
 
 =item Sys::Virt::Domain::DISK_ERROR_UNSPEC
 
-An unspecified error has ocurred.
+An unspecified error has occurred.
 
 =back
 

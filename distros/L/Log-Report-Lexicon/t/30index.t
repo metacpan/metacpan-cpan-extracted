@@ -6,9 +6,13 @@ use strict;
 use lib 'lib', '../lib';
 use utf8;
 
-use Test::More tests => 59;
+use Test::More tests => 71;
 use File::Basename        qw/dirname/;
 use File::Spec::Functions qw/catfile/;
+
+use Data::Dumper          qw/Dumper/;
+$Data::Dumper::Indent    = 1;
+$Data::Dumper::Quotekeys = 0;
 
 use_ok 'Log::Report::Translator::POT';
 use_ok 'Log::Report::Lexicon::Index';
@@ -26,7 +30,6 @@ is $lexicon->directory, $lexdir;
 
 my $i = $lexicon->index;
 
-#use Data::Dumper;
 #warn Dumper $i;
 
 ### test the list() method
@@ -42,6 +45,7 @@ cmp_ok scalar @list2, '==', 12, 'list simplecal po';
 
 my $fn0 = $lexicon->find('simplecal', 'nl');
 ok defined $fn0, "found NL in $fn0";
+defined $fn0 or warn Dumper $lexicon;
 
 my $fn1 = $lexicon->find('simplecal', 'nl_BE');
 ok defined $fn1, "found nl_BE in $fn1";
@@ -65,16 +69,17 @@ my @pots =
   );
 
 foreach (@pots)
-{    my ($lang, $charset, $trans) = @$_;
-     my $po = $pot->load('simplecal', $lang);
-     ok defined $po, "got translation for $lang";
+{   my ($lang, $charset, $trans) = @$_;
+    my $po = $pot->load('simplecal', $lang);
+    ok defined $po, "got translation for $lang";
+    like $po->filename, qr/$lang\.[mp]o$/i, 'filename '.$po->filename;
 
-     isa_ok $po, $lang eq 'ar_sa'
-       ? 'Log::Report::Lexicon::MOTcompact'
-       : 'Log::Report::Lexicon::POTcompact'; 
+    isa_ok $po, $lang eq 'ar_sa'
+      ? 'Log::Report::Lexicon::MOTcompact'
+      : 'Log::Report::Lexicon::POTcompact'; 
 
-     is $po->originalCharset, $charset, 'charset';
-     is $po->msgid('November'), $trans, 'translated';
+    is $po->originalCharset, $charset, "charset $lang";
+    is $po->msgid('November'), $trans, "translated $lang";
 }
 
 my $msg = {_domain => 'simplecal', _msgid => 'November'};

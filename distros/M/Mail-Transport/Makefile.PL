@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.001';
+my $VERSION = '3.002';
 
 my %prereq =
  ( Carp           => 0
@@ -52,6 +52,19 @@ WriteMakefile
  , ABSTRACT   => 'Email message exchange'
  , PREREQ_PM  => \%prereq
  , LICENSE    => 'perl'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-Mail-Transport.git'
+              , web  => 'https://github.com/markov2/perl5-Mail-Transport'
+              }
+          }
+      , homepage => 'http://perl.overmeer.net/CPAN/'
+      , license  => [ 'http://dev.perl.org/licenses/' ]
+      }
  );
 
 ### used by oodist during production of distribution
@@ -61,14 +74,12 @@ sub MY::postamble { <<'__POSTAMBLE' }
 RAWDIR          = ../public_html/mail-transport/raw
 DISTDIR         = ../public_html/mail-transport/source
 
-LICENSE         = artistic
-EXTENDS			= ../MailMessage:../MailPOP:../MailIMAP
+LICENSE         = perl
+EXTENDS			= ../../perl/MailMessage:../../perl/MailPOP:../../perl/MailIMAP
 
 # for POD
 FIRST_YEAR      = 2001
 EMAIL           = markov@cpan.org
-WEBSITE         = http://perl.overmeer.net/mailbox/
-PODTAIL         = ../MailBox-shared-podtail
-
+WEBSITE         = http://perl.overmeer.net/CPAN/
 
 __POSTAMBLE

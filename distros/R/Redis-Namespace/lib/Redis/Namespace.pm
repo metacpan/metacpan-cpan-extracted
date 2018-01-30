@@ -2,7 +2,7 @@ package Redis::Namespace;
 
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Redis;
 
@@ -169,6 +169,64 @@ our %BEFORE_FILTERS = (
         }
         return @res;
     },
+
+    # GEORADIUS key longitude latitude radius m|km|ft|mi STORE key STOREDIST key => GEORADIUS namespace:key longitude latitude radius m|km|ft|mi STORE namespace:key STOREDIST namespace:key
+    georadius => sub {
+        my ($self, @args) = @_;
+        my @res;
+
+        # key
+        if(@args) {
+            my $first = shift @args;
+            push @res, $self->add_namespace($first);
+        }
+
+        # longitude latitude radius m|km|ft|mi
+        push @res, splice @args, 0, 4;
+
+        while(@args) {
+            my $option = lc shift @args;
+            if($option eq 'store' || $option eq 'storedist') {
+                my $key = shift @args;
+                push @res, $option, $self->add_namespace($key);
+            } elsif($option eq 'count') {
+                my $count = shift @args;
+                push @res, $option, $count;
+            } else {
+                push @res, $option;
+            }
+        }
+        return @res;
+    },
+
+    # GEORADIUSBYMEMBER key member radius m|km|ft|mi STORE key STOREDIST key => GEORADIUSBYMEMBER namespace:key member radius m|km|ft|mi STORE namespace:key STOREDIST namespace:key
+    georadiusbymember => sub {
+        my ($self, @args) = @_;
+        my @res;
+
+        # key
+        if(@args) {
+            my $first = shift @args;
+            push @res, $self->add_namespace($first);
+        }
+
+        # member radius m|km|ft|mi
+        push @res, splice @args, 0, 3;
+
+        while(@args) {
+            my $option = lc shift @args;
+            if($option eq 'store' || $option eq 'storedist') {
+                my $key = shift @args;
+                push @res, $option, $self->add_namespace($key);
+            } elsif($option eq 'count') {
+                my $count = shift @args;
+                push @res, $option, $count;
+            } else {
+                push @res, $option;
+            }
+        }
+        return @res;
+    },
 );
 
 our %AFTER_FILTERS = (
@@ -262,6 +320,7 @@ our %COMMANDS = (
     bgrewriteaof     => [],
     bgsave           => [],
     bitcount         => [ 'first' ],
+    bitfield         => [ 'first' ],
     bitpos           => [ 'first' ],
     bitop            => [ 'exclude_first' ],
     blpop            => [ 'exclude_last', 'first' ],
@@ -291,8 +350,8 @@ our %COMMANDS = (
     geodist          => [ 'first' ],
     geohash          => [ 'first' ],
     geopos           => [ 'first' ],
-    georadius        => [ 'first' ],
-    georadiusbymember=> [ 'first' ],
+    georadius        => [ 'georadius' ],
+    georadiusbymember=> [ 'georadiusbymember' ],
     get              => [ 'first' ],
     getbit           => [ 'first' ],
     getrange         => [ 'first' ],
@@ -395,11 +454,14 @@ our %COMMANDS = (
     subscribe        => [ 'all' ],
     sunion           => [ 'all' ],
     sunionstore      => [ 'all' ],
+    swapdb           => [],
     sync             => [],
     time             => [],
+    touch            => [ 'all' ],
     ttl              => [ 'first' ],
     type             => [ 'first' ],
     unsubscribe      => [ 'all' ],
+    unlink           => [ 'all' ],
     unwatch          => [],
     wait             => [],
     watch            => [ 'all' ],
@@ -425,8 +487,6 @@ our %COMMANDS = (
     zscore           => [ 'first' ],
     zunionstore      => [ 'exclude_options' ],
 
-    wait_all_responses => [],
-    wait_one_response  => [],
     multi              => [],
 );
 
@@ -453,7 +513,8 @@ sub new {
 
 sub _wrap_method {
     my ($class, $command) = @_;
-    my $filters = $COMMANDS{$command};
+    my ($cmd, @extra) = split /_/, lc($command);
+    my $filters = $COMMANDS{$cmd};
     my $warn_message;
     my ($before, $after);
 
@@ -481,22 +542,22 @@ sub _wrap_method {
 
         if(@args && ref $args[-1] eq 'CODE') {
             my $cb = pop @args;
-            @args = $before->($self, @args);
+            @args = $before->($self, @extra, @args);
             push @args, sub {
                 my ($result, $error) = @_;
                 $cb->($after->($self, $result), $error);
             };
         } else {
-            @args = $before->($self, @args);
+            @args = $before->($self, @extra, @args);
         }
 
         if(!$wantarray) {
-            $redis->$command(@args);
+            $redis->$cmd(@args);
         } elsif($wantarray) {
-            my @result = $redis->$command(@args);
+            my @result = $redis->$cmd(@args);
             return $after->($self, @result);
         } else {
-            my $result = $redis->$command(@args);
+            my $result = $redis->$cmd(@args);
             return $after->($self, $result);
         }
     };
@@ -544,6 +605,15 @@ sub AUTOLOAD {
   goto $method;
 }
 
+# special commands. they are not redis commands.
+sub wait_one_response {
+    my $self = shift;
+    return $self->{redis}->wait_one_response(@_);
+}
+sub wait_all_responses {
+    my $self = shift;
+    return $self->{redis}->wait_all_responses(@_);
+}
 
 sub __wrap_subcb {
     my ($self, $cb) = @_;
@@ -566,6 +636,17 @@ sub __subscribe {
     my $callback = $self->__wrap_subcb($cb);
     @args = $BEFORE_FILTERS{all}->($self, @args);
     return $redis->$command(@args, $callback);
+}
+
+# PubSub commands
+sub wait_for_messages {
+    my $self = shift;
+    return $self->{redis}->wait_for_messages(@_);
+}
+
+sub is_subscriber {
+    my $self = shift;
+    return $self->{redis}->is_subscriber(@_);
 }
 
 sub subscribe {
@@ -633,7 +714,7 @@ prefix of keys.
 =item guess
 
 If Redis::Namespace doesn't known the command,
-call L<command info|http://redis.io/commands/command-info> and guess postions of keys.
+call L<command info|http://redis.io/commands/command-info> and guess positions of keys.
 It is boolean value.
 
 =back

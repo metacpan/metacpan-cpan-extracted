@@ -23,11 +23,11 @@ the calling package.
 
 =over 4
 
-=item B<mailaddress>( [ADDRESS] )
+=item B<mailaddress>( [$address] )
 
 Return a guess at the current users mail address. The user can force
 the return value by setting the MAILADDRESS environment variable.
-[2.10] You may set the ADDRESS via the parameter.
+[2.10] You may set the $address via the parameter.
 
 WARNING:
 When not supplied via the environment variable, <mailaddress> looks at
@@ -81,9 +81,9 @@ example:
  use Mail::Util 'maildomain';
  print maildomain;
 
-=item B<read_mbox>(FILE)
+=item B<read_mbox>($file)
 
-Read FILE, a binmail mailbox file, and return a list of  references.
+Read $file, a binmail mailbox file, and return a list of  references.
 Each reference is a reference to an array containing one message.
 
 WARNING:

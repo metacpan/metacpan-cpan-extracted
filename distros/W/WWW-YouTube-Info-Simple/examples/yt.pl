@@ -1,11 +1,11 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # CLI example usage of WWW::YouTube::Info::Simple
 # to directly download YouTube videos
 # with means of lwp-download
 # by a given URL or VIDEO_ID.
-# e.g.: ./yt.pl http://youtube.com/watch?v=foobar
-# e.g.: ./yt.pl http://www.youtube.com/v/foobar
+# e.g.: ./yt.pl https://youtube.com/watch?v=foobar
+# e.g.: ./yt.pl https://www.youtube.com/v/foobar
 # e.g.: ./yt.pl foobar
 
 # change /usr/bin/lwp-download to the appropriate path/bin
@@ -120,12 +120,12 @@ sub get_id {
   my $query = $uri->query();
 
   my $id;
-  # http://youtube.com/watch?v=foobar
+  # https://youtube.com/watch?v=foobar
   if ( $path =~ /\/watch/ ) {
     $id = $query;
     $id =~ s/^v=//;
   }
-  # http://www.youtube.com/v/foobar
+  # https://www.youtube.com/v/foobar
   elsif ( $path =~ /\/v\// ) {
     $id = $path;
     $id =~ s/\/v\///;

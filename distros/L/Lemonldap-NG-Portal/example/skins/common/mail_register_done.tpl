@@ -14,5 +14,6 @@
 <span><img src="cid:key:skins/common/key.png" /></span>
 <b>$password</b>
 </p>
+<p><a href="$url"><lang en="Click here to access to portal" fr="Cliquer ici pour accéder au portail" /></a></p>
 
 <TMPL_INCLUDE NAME="mail_footer.tpl">

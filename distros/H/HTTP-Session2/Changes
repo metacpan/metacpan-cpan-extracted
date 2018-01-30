@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP-Session2
 
+1.10 2018-01-26T05:01:07Z
+
+    - Validate session ID
+
 1.09 2014-09-01T02:22:09Z
 
     - Catch the exception thrown from deserializer.

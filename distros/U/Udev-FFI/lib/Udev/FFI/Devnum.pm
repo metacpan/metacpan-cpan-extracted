@@ -42,3 +42,56 @@ sub mkdev { #2017-12-19
 
 
 1;
+
+
+
+__END__
+
+
+
+=head1 NAME
+
+Udev::FFI::Devnum.
+
+=head1 SYNOPSIS
+
+    use Udev::FFI::Devnum qw(:all); #or use Udev::FFI::Devnum qw(major minor makedev)
+    
+    my $devnum = makedev(8, 1);
+    my $major = major($devnum);
+    my $minor = minor($devnum);
+
+=head1 DESCRIPTION
+
+This module provides major, minor and  makedev functions.
+
+=head1 FUNCTIONS
+
+=head2  major ( DEVNUM )
+
+Return major ID.
+
+=head2  minor ( DEVNUM )
+
+Return minor ID.
+
+=head2  makedev ( MAJOR, MINOR )
+
+Return device number.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Udev::FFI> - main Udev::FFI documentation
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017-2018 by Ilya Pavlov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

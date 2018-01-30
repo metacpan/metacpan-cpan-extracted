@@ -20,7 +20,7 @@
 
 use strict;
 
-use Test::More tests => 1;
+use Test::More tests => 4;
 
 use Locale::XGettext::TT2;
 
@@ -33,7 +33,21 @@ BEGIN {
 
 use TestLib qw(find_entries);
 
-my @po = Locale::XGettext::TT2->new({}, 
+my @po = Locale::XGettext::TT2->new({},
                                     'templates/nested.tt')
                               ->run->po;
 is((scalar find_entries \@po, msgid => qq{"%Y/%m/%d"}), 1);
+
+@po = Locale::XGettext::TT2->new({},
+                                 'templates/bugs-1.tt')
+                           ->run->po;
+
+# https://github.com/gflohr/Template-Plugin-Gettext/issues/3
+is((scalar find_entries \@po, msgid => qq{"no parentheses around filter"}), 1,
+   'filter without parens');
+is((scalar find_entries \@po,
+           msgid => qq{"no parentheses around filter and filter following"}), 1,
+   'filter without parens and filter following');
+is((scalar find_entries \@po,
+           msgid => qq{"no parentheses around filter and dot following"}), 1,
+   'filter without parens and dot following');

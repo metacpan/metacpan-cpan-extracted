@@ -1,0 +1,17 @@
+port                 "{{ port }}"
+music_directory      "{{ root }}/music"
+playlist_directory   "{{ root }}/playlists"
+log_file             "/dev/null"
+#error_file           "/dev/null"
+db_file              "{{ root }}/music.db"
+state_file           "{{ root }}/state"
+pid_file             "{{ root }}/pid"
+bind_to_address      "{{ host }}"
+{{ profiles }}
+connection_timeout   "10"
+bind_to_address      "::1"
+mixer_type           "software"
+audio_output {
+    name "null"
+    type "null"
+}

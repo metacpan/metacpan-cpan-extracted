@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::MySqlProvider;
-$Footprintless::Plugin::Database::MySqlProvider::VERSION = '1.04';
+$Footprintless::Plugin::Database::MySqlProvider::VERSION = '1.05';
 # ABSTRACT: A MySql provider implementation
 # PODNAME: Footprintless::Plugin::Database::MySqlProvider
 
@@ -380,7 +380,7 @@ Footprintless::Plugin::Database::MySqlProvider - A MySql provider implementation
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 AUTHOR
 

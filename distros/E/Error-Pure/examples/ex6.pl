@@ -5,10 +5,43 @@ use strict;
 use warnings;
 
 # Modules.
+use Dumpvalue;
 use Error::Pure::Die qw(err);
+use Error::Pure::Utils qw(err_get);
 
-# Error.
-err '1';
+# Error in eval.
+eval { err '1', '2', '3'; };
 
-# Output:
-# 1 at example1.pl line 9.
+# Error structure.
+my @err = err_get();
+
+# Dump.
+my $dump = Dumpvalue->new;
+$dump->dumpValues(\@err);
+
+# In \@err:
+# [
+#         {
+#                 'msg' => [
+#                         '1',
+#                         '2',
+#                         '3',
+#                 ],
+#                 'stack' => [
+#                         {
+#                                 'args' => '(1)',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'err',
+#                         },
+#                         {
+#                                 'args' => '',
+#                                 'class' => 'main',
+#                                 'line' => '9',
+#                                 'prog' => 'script.pl',
+#                                 'sub' => 'eval {...}',
+#                         },
+#                 ],
+#         },
+# ],

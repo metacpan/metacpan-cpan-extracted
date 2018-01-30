@@ -5,11 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   GraphQL: '0.26'
-  JSON::Validator: '1.07'
-  Mojolicious::Plugin::GraphQL: '0.09'
+  JSON::Validator: '2.01'
+  Mojolicious::Plugin::GraphQL: '0.10'
   OpenAPI::Client: '0.14'
   Test::More: '0.98'
-  YAML::XS: '0'
+  Test::Snapshot: '0.02'
+  YAML::XS: '0.68'
 configure_requires:
   ExtUtils::MakeMaker: '7.10'
 dynamic_config: 0
@@ -25,7 +26,7 @@ no_index:
     - inc
 requires:
   GraphQL: '0.26'
-  JSON::Validator: '1.07'
+  JSON::Validator: '2.01'
   OpenAPI::Client: '0.14'
   perl: '5.014'
 resources:
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

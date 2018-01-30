@@ -1,0 +1,13 @@
+Algorithm-ConstructDFA2
+=======================
+
+Please see `perldoc lib/Algorithm/ConstructDFA2.pm` for details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

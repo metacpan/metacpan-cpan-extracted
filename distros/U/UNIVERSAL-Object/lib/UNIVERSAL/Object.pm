@@ -8,13 +8,10 @@ use 5.006;
 
 use Carp ();
 
-our $VERSION   = '0.13';
+our $VERSION   = '0.14';
 our $AUTHORITY = 'cpan:STEVAN';
 
-BEGIN {
-    eval('use ' . ($] >= 5.010 ? 'mro' : 'MRO::Compat'));
-    Carp::confess($@) if $@;
-}
+BEGIN { $] >= 5.010 ? require mro : require MRO::Compat }
 
 sub new {
     my $class = shift;
@@ -61,7 +58,7 @@ sub CREATE {
     $self->{ $_ } = exists $proto->{ $_ }
         ? $proto->{ $_ }
         : $slots{ $_ }->( $self, $proto )
-            foreach keys %slots;
+            foreach sort keys %slots;
 
     return $self;
 }
@@ -115,7 +112,7 @@ UNIVERSAL::Object - A useful base class
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

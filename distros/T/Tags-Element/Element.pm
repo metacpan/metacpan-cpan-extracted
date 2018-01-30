@@ -1,18 +1,16 @@
 package Tags::Element;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(element);
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Common element.
 sub element {
@@ -68,11 +66,9 @@ Tags::Element - Element utilities for 'Tags'.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Data::Printer;
  use Tags::Element qw(element);
 
@@ -117,11 +113,9 @@ Tags::Element - Element utilities for 'Tags'.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tags::Element qw(element);
  use Tags::Output::Raw;
 
@@ -160,15 +154,15 @@ Install the Tags modules.
 
 =head1 AUTHOR
 
-Michal Špaček L<skim@cpan.org>
+Michal Josef Špaček L<skim@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

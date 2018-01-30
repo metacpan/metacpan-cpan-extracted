@@ -6,12 +6,13 @@ use warnings;
 
 our @ISA = qw();
 
-our $VERSION = '0.15';
+our $VERSION = '0.25';
 
 use Carp;
 use DB_File;
 use Fcntl;
 use Squid::Guard::Request;
+use Squid::Guard::Common;
 
 =head1 NAME
 
@@ -20,6 +21,12 @@ Squid::Guard - Redirector for the Squid web proxy
 =head1 SYNOPSYS
 
     use Squid::Guard;
+
+    sub check($$) {
+        my ( $self, $req ) = @_;
+        return 'deny' if $req->host =~ /somethingnasty.com/;
+        0;
+    }
 
     my $sg = Squid::Guard->new();
 
@@ -61,7 +68,7 @@ sub new {
 	$self->{concurrency}    = 0;
 	$self->{categ}          = {};
 	$self->{redir}          = ();
-	$self->{strictauth}     = 0;
+	$self->{squidcfg}       = undef;
 	$self->{verbose}        = 0;
 	$self->{debug}          = 0;
 	$self->{oneshot}        = 0;
@@ -98,7 +105,7 @@ The following macros are supported:
 
 =back
 
-If set to the special value C<CHECKF>, then the return value of the checkf function, if true, is used directly as the redirection url
+If set to the special value C<'CHECKF'>, then the return value of the checkf function, if true, is used literally as the redirection url.
 
 =cut
 
@@ -113,7 +120,9 @@ sub redir {
 
 Sets the check callback function, which is called upn each request received.
 The check function receives as arguments the current C<Squid::Guard> object, and a L<Squid::Guard::Request> object on which the user can perform tests.
-A false return value means no redirection is to be proformed. A true return value means that the request is to be redirected to what was declared with C<redir()>.
+A false return value means no redirection is to be proformed. A true return value means that the request is to be redirected to what was declared with C<redir()> (or, in the case C<redir()> is exactly C<'CHECKF'>, to the exact return value, which in this case should be a complete url).
+
+See the examples included in the distribution.
 
 =cut
 
@@ -138,11 +147,6 @@ sub concurrency {
 }
 
 
-my $cachettl = 0;
-my $cachepurgelastrun = 0;
-my %cacheh;	# this contains the real cache items
-my @cachea;	# this contains the cache keys with the time they where written in the cache.
-
 =head2 $sg->cache()
 
 Enables caching in expensive subs which involve spawning external processes. At the moment, caching is implemented in C<checkinwbgroup()> (which calls wbinfo 3 times) and in C<checkingroup()> (which can be expensive in some nss configurations).
@@ -154,53 +158,7 @@ The time to live, as the whole cached objects, are shared among all the objects 
 sub cache {
 	my $self = shift;
 	my $ttl = shift;
-	$cachettl = $ttl;
-}
-
-
-sub _cachepurge() {
-	my $time = time();
-	return if $cachepurgelastrun == $time;	# do not purge too often
-	$cachepurgelastrun = $time;
-
-        my $t = $time - $cachettl;
-
-	return unless @cachea;			# try to avoid looping through if unnecessary
-	return if $cachea[0]->[0] > $t;
-
-	my $ndel = 0;
-        LOOP: foreach my $p ( @cachea ) {
-                last LOOP if $p->[0] > $t;
-
-                my $k = $p->[1];
-                delete( $cacheh{$k} ) if defined( $cacheh{$k} ) && $cacheh{$k}->[0] <= $t;
-
-		$ndel++;
-        }
-	
-	$ndel and splice(@cachea, 0, $ndel);
-}
-
-
-sub _cachewr($$) {
-        my ($k, $v) = @_;
-	defined($v) or $v = "";	# be sure not to cache undef values since _cacherd returns undef when the value is not in the cache
-
-        my $t = time;
-
-        my @arr = ( $t, $v );
-        $cacheh{$k} = \@arr;
-
-        my @arra = ($t, $k);
-        push @cachea, \@arra;
-}
-
-
-sub _cacherd($) {
-        my ($k) = @_;
-	# Purge the cache when reading from it. This also ensures that the remaining cache record are in their ttl. This could be done in other occasions too
-	_cachepurge();
-        return defined($cacheh{$k}) ? $cacheh{$k}->[1] : undef;
+	$Squid::Guard::Common::cachettl = $ttl;
 }
 
 
@@ -348,8 +306,8 @@ sub run {
 		my $redir = $self->handle($_);
 
 		if( $redir ) {
-			$self->{verbose} and print STDERR "Returning $redir\n";
 			$ret .= $redir;
+			$self->{verbose} and print STDERR "Returning $ret\n";
 		}
 
 		print "$ret\n";
@@ -359,12 +317,15 @@ sub run {
 }
 
 
-=head2 Black/white-list support
+=head1 Black/white-list support
 
-Squid::Guard provides support for using precompiled black or white lists, in a way similar to what squidGuard does. These lists are organized in categories. Each category has its own path (a directory) where three files can reside. These files are named domains, urls and expressions. There's no need for all three to be there, and in most situations only the domains and urls files are used. These files list domains, urls and/or (regular) expressions which describe if a request belong to the category. You can decide, in the checkf function, to allow or to redirect a request belonging to a certain category.
-Similarly to what squidGuard does, the domains and urls files have to be compiled in .db form prior to be used. This makes it possible to run huge domains and urls lists, with acceptable performance.
+Squid::Guard provides support for using precompiled black or white lists, in a way similar to what squidGuard does. These lists are organized in categories. Each category has its own path (a directory) where three files can reside. These files are named domains, urls and expressions. There's no need for all three to be there, and in most situations only the domains and urls files are used. These files list domains, urls and/or (regular) expressions which describe if a request belong to the category. Using the checkf sub you decide wether to allow a request unchanged, or to redirect it when it belongs to a certain category you want to look for.
+
+Similarly to what squidGuard does, the domains and urls files have to be compiled in .db form prior to be used. This makes it possible to run huge domains and urls lists with acceptable performance.
 You can find precompiled lists on the net, or create your own.
+
 Beginning with version 0.13, there is EXPERIMENTAL support for the userdomains file. This file lists domains associated with users. The request will be checked against the domains only if the request has the associated identity corresponding to the user. The file is made of lines in the format C<user|domain>. At the moment, the file is entirely read in memory and no corresponding .db is generated/needed. The userdomain feature is EXPERIMENTAL and subject to change.
+Beginning with version 0.20, if the user name begins with '+', then this is taken as a UNIX group, and the domain check will be performed if the request' identity belongs to this group. If the user name begins with '!', then the name is supposed to be a Winbind group.
 
 =head2 $sg->dbdir()
 
@@ -431,16 +392,26 @@ sub addcateg {
 
 		my $ud = "$l/userdomains";
 		if( -f $ud ) {
-			my $hr = {};
+			my $hr  = {};	# x users
+			my $ghr = {};	# x unix groups
+			my $whr = {};	# x wb groups
 			open( UD, "< $ud" ) or croak "Cannot open $ud: $!";
 			while( <UD> ) {
 				chomp;
 				s/#.*//o;
-				next unless /^\s*([^\|]+)\|(.*\S)/o;
-				$hr->{$1}->{$2} = 1;
+				next unless /^\s*([+!])?([^\|]+)\|(.*\S)/o;
+				if( ! $1 ) {
+					$hr->{$2}->{$3} = 1;
+				} elsif( $1 eq '+' ) {
+					$ghr->{$2}->{$3} = 1;
+				} elsif ( $1 eq '!' ) {
+					$whr->{$2}->{$3} = 1;
+				}
 			}
 			close UD;
 			$self->{categ}->{$cat}->{ud} = $hr;
+			$self->{categ}->{$cat}->{gd} = $ghr;
+			$self->{categ}->{$cat}->{wd} = $whr;
 		}
 	}
 	return 1;
@@ -563,6 +534,7 @@ sub _domains($) {
 	for( 0 .. $num ) {
 		my $j = $num - $_;
 		push @b, join(".", @a[$j .. $num]);
+		push @b, '.' . join(".", @a[$j .. $num]) if $j < $num; # check .domain too since some lists and acls mention domains with the heading dot
 	}
 	return @b;
 }
@@ -610,9 +582,9 @@ sub checkincateg($$@) {
 			$self->{debug} and print STDERR " Check " . $req->host . " in $categ domains\n";
 			my $ref = $catref->{$categ}->{d};
 			foreach( _domains($req->host) ) {
-				$self->{debug} and print STDERR "  Check $_\n";
+				#$self->{debug} and print STDERR "  Check $_\n";
 				if(exists($ref->{$_})) {
-					$self->{debug} and print STDERR "   FOUND\n";
+					$self->{debug} and print STDERR "   FOUND in $_\n";
 					return $categ;
 				}
 			}
@@ -623,9 +595,9 @@ sub checkincateg($$@) {
 			$self->{debug} and print STDERR " Check $what in $categ urls\n";
 			my $ref = $catref->{$categ}->{u};
 			foreach( _uris($what) ) {
-				$self->{debug} and print STDERR "  Check $_\n";
+				#$self->{debug} and print STDERR "  Check $_\n";
 				if(exists($ref->{$_})) {
-					$self->{debug} and print STDERR "   FOUND\n";
+					$self->{debug} and print STDERR "   FOUND in $_\n";
 					return $categ;
 				}
 			}
@@ -635,24 +607,63 @@ sub checkincateg($$@) {
 			$self->{debug} and print STDERR " Check $what in $categ expressions\n";
 			my $ref = $catref->{$categ}->{e};
 			foreach( @$ref ) {
-				$self->{debug} and print STDERR "  Check $_\n";
+				#$self->{debug} and print STDERR "  Check $_\n";
 				if( $what =~ /$_/i ) {	# Can't use 'o' regexp option, since I would compare always the same regexp.
-					$self->{debug} and print STDERR "   FOUND\n";
+					$self->{debug} and print STDERR "   FOUND in $_\n";
 					return $categ;
 				}
 			}
 		}
-		if( $req->ident and defined( $catref->{$categ}->{ud}->{$req->ident} ) ) {
-			$self->{debug} and print STDERR " Check " . $req->host . " in $categ userdomains for user " . $req->ident . "\n";
-			my $hr = $catref->{$categ}->{ud}->{$req->ident};
-			# TODO: optimization: precompile _domains($req->host) only once for domains and userdomains
-			foreach( _domains($req->host) ) {
-				$self->{debug} and print STDERR "  Check $_\n";
-				if($hr->{$_}) {
-					$self->{debug} and print STDERR "   FOUND\n";
-					return $categ;
+		if( $req->ident ) {
+			my $ident = $req->ident;
+			my $host = $req->host;
+			if( defined( $catref->{$categ}->{ud}->{$ident} ) ) {
+				$self->{debug} and print STDERR " Check " . $host . " in $categ userdomains for user " . $ident . "\n";
+				my $hr = $catref->{$categ}->{ud}->{$ident};
+				# TODO: optimization: precompile _domains($host) only once for domains and userdomains
+				foreach( _domains($host) ) {
+					#$self->{debug} and print STDERR "  Check $_\n";
+					if($hr->{$_}) {
+						$self->{debug} and print STDERR "   FOUND in $_\n";
+						return $categ;
+					}
 				}
 			}
+
+			if( defined( $catref->{$categ}->{gd} ) ) {
+				foreach( keys %{$catref->{$categ}->{gd}} ) {
+					my $group = $_;
+					next unless $self->checkingroup( $ident, $group );
+					$self->{debug} and print STDERR " Check " . $host . " in $categ userdomains for group " . $group . "\n";
+					my $ghr = $catref->{$categ}->{gd}->{$group};
+					# TODO: optimization: precompile _domains($host) only once for domains and userdomains
+					foreach( _domains($host) ) {
+						#$self->{debug} and print STDERR "  Check $_\n";
+						if($ghr->{$_}) {
+							$self->{debug} and print STDERR "   FOUND in $_\n";
+							return $categ;
+						}
+					}
+				}
+			}
+
+			if( defined( $catref->{$categ}->{wd} ) ) {
+				foreach( keys %{$catref->{$categ}->{wd}} ) {
+					my $wbgroup = $_;
+					next unless $self->checkinwbgroup( $ident, $wbgroup );
+					$self->{debug} and print STDERR " Check " . $host . " in $categ userdomains for winbind group " . $wbgroup . "\n";
+					my $whr = $catref->{$categ}->{wd}->{$wbgroup};
+					# TODO: optimization: precompile _domains($host) only once for domains and userdomains
+					foreach( _domains($host) ) {
+						#$self->{debug} and print STDERR "  Check $_\n";
+						if($whr->{$_}) {
+							$self->{debug} and print STDERR "   FOUND in $_\n";
+							return $categ;
+						}
+					}
+				}
+			}
+
 		}
 	}
 
@@ -660,69 +671,158 @@ sub checkincateg($$@) {
 }
 
 
-# Gets a passwd row, making use of the cache if enabled.
+=head1 Squid ACL support
 
-sub _getpwnamcache($) {
-	my $nam = shift;
-	my $k = "PWNAM: $nam";
+Limited support for reading in and using Squid ACLs is provided. I included this because I found that often I needed to have the same ACLs both in squid and in the redirector (for example, if you whitelist something in Squid, then likely you want it to be whitelisted in the redirector).
+This feature is still quite limited and EXPERIMENTAL. 
 
-	if( $cachettl ) {
-		my $v = _cacherd( $k );
-		defined($v) and return split( /:/, $v );
+=head2 $sg->readsquidcfg($file)
+
+Reads the given squid config file (default is /etc/squid/squid.conf) looking only for acl statements, and only of some basic type.
+
+=cut
+
+sub readsquidcfg(;$) {
+	my $self = shift;
+	my $cfgfile = shift || '/etc/squid/squid.conf';
+	open(CFGF, "< $cfgfile") or do { print STDERR "Can not open configuration file: $!\n"; return undef; };
+	while( <CFGF> ) {
+		chomp;
+		s/\s*#.*//;
+		s/^\s*//;
+		next if /^$/;
+		if( s/^acl\s+// ) {
+			my @arr = split /\s+/;
+			my $name = shift @arr;
+			my $type = shift @arr;
+
+			# Treat the case where the acl argument is a file name to be slurped too.
+			# Here we should also care about the -i switch for regexps and other particular cases
+			my @arr2;
+			foreach( @arr ) {
+				if( /"(.*)"/ ) {
+					my $fh;
+					open( $fh, "< $1" ) or next;
+					while( <$fh> ) {
+						chomp;
+						next if /^\s*#/;
+						push @arr2, $_;
+					}
+					close $fh;
+				} else {
+					push @arr2, $_;
+				}
+			}
+			push @{$self->{squidcfg}->{acl}->{$name}}, [ $type, \@arr2 ];
+		} else {
+			# this type of config directive is not interesting
+		}
 	}
-
-	my @a = getpwnam($nam);
-
-	if( $cachettl ) {
-		_cachewr( $k, join( ':', @a ) );
-	}
-
-	return @a;
+	close CFGF;
+	#use Data::Dumper;
+	#print STDERR Dumper($self->{squidcfg});
 }
 
 
-sub _getgrnamcache($) {
-	my $nam = shift;
-	my $k = "GRNAM: $nam";
+=head2 $sg->checkinacl($req, $acl, ... )
 
-	if( $cachettl ) {
-		my $v = _cacherd( $k );
-		defined($v) and return split( /:/, $v );
+Checks if a request is in a squid.conf acl (or more).
+
+Currently only the following acl types are supported:
+
+=over
+
+=item src
+
+=item dstdomain
+
+=item port
+
+=item proto
+
+=item method
+
+=back
+
+Other types will be added when needed. Patches are welcome.
+
+=cut
+
+sub checkinacl($$@) {
+	my ( $self, $req, @acls ) = @_;
+
+	if( ! defined( $self->{squidcfg} ) ) {
+		print STDERR "Squid config undefined. Maybe you forgot to call readsquidcfg?\n";
+		return "nosquidcfg";
 	}
 
-	my @a = getgrnam($nam);
+	foreach my $acl (@acls) {
+		if( ! defined( $self->{squidcfg}->{acl}->{$acl} ) ) {
+			print STDERR "acl $acl not found in squid config file.\n";
+			next;
+		}
 
-	if( $cachettl ) {
-		_cachewr( $k, join( ':', @a ) );
+		foreach ( @{$self->{squidcfg}->{acl}->{$acl}} ) {
+			my $type = $_->[0];
+			my @arr = @{$_->[1]};
+
+			if( $type eq 'dstdomain' ) {
+				foreach( @arr ) {
+					my $h = $req->host;
+					my $substr = substr( $h, - length($_) );
+					#print STDERR "$_ " . $h . " $substr\n";
+					if( ( $_ eq $substr and substr( $substr, 0, 1 ) eq '.' ) or ( $_ eq $h ) ) {
+						$self->{debug} and print STDERR "FOUND in acl $acl (type dstdomain)\n";
+						return $acl;
+					}
+				}
+			} elsif( $type eq 'port' ) {
+				my $rp = $req->port;
+				#print STDERR $req->port . " VS " . join( " ", @arr) . "\n";
+				#return $acl if grep( {$req->port == $_} @arr);	# Hey, too simple
+				foreach( @arr ) {
+					if( $_ =~ /^\d+$/ ) {
+						if( $_ == $rp ) {
+							$self->{debug} and print STDERR "FOUND in acl $acl (type port)\n";
+							return $acl;
+						}
+					} elsif( $_ =~ /^(\d+)-(\d+)$/ ) {
+						if( $rp >= $1 && $rp <= $2 ) {
+							$self->{debug} and print STDERR "FOUND in acl $acl (type port)\n";
+							return $acl;
+						}
+					} else {
+						print STDERR "Can't understand port range $_\n";
+					}
+				}
+			} elsif( $type eq 'proto' ) {
+				my $s = lc($req->scheme);
+				if( grep( {$s eq lc($_)} @arr) ) {
+					$self->{debug} and print STDERR "FOUND in acl $acl (type proto)\n";
+					return $acl;
+				}
+			} elsif( $type eq 'method' ) {
+				my $m = $req->method;
+				if( grep( {$m eq $_} @arr) ) {
+					$self->{debug} and print STDERR "FOUND in acl $acl (type method)\n";
+					return $acl;
+				}
+			} elsif( $type eq 'src' ) {
+				if( $req->checksrcinnet(@arr) ) {
+					$self->{debug} and print STDERR "FOUND in acl $acl (type src)\n";
+					return $acl;
+				}
+			} else {
+				print STDERR "acl type $type is not yet implemented, sorry\n";
+			}
+		}
 	}
-
-	return @a;
+	
+	return '';
 }
 
 
-# Runs a command, making use of the cache if enabled.
-
-sub _runcache($) {
-	my $cmd = shift;
-	my $k = "RUN: $cmd";
-
-	my $v;
-	if( $cachettl ) {
-		$v = _cacherd( $k );
-		defined($v) and return $v;
-	}
-
-	$v = `$cmd`;
-
-	if( $cachettl ) {
-		_cachewr( $k, $v );
-	}
-
-	return $v;
-}
-
-
-=head2 Other help subs that can be used in the checkf function
+=head1 Other help subs that can be used in the checkf function
 
 
 =head2 $sg->checkingroup($user, $group, ... )
@@ -736,29 +836,29 @@ sub checkingroup($$@) {
 
 	return 0 unless $user;
 
-	my @pwent = _getpwnamcache($user);
+	my @pwent = Squid::Guard::Common::_getpwnamcache($user);
 	if( ! @pwent ) {
-		print STDERR "Can not find user $user\n";
+		print STDERR "Could not find user $user\n";
 		return '';
 	}
 
 	my $uid      = $pwent[2];
 	my $uprimgid = $pwent[3];
 	if( ! defined $uid || ! defined $uprimgid ) {
-		print STDERR "Can not find uid and gid corresponding to $user\n";
+		print STDERR "Could not find uid and gid corresponding to $user\n";
 		return '';
 	}
 
 	foreach my $group (@groups) {
-		my @grent = _getgrnamcache($group);
+		my @grent = Squid::Guard::Common::_getgrnamcache($group);
 		if( ! @grent ) {
-			print STDERR "Can not find group $group\n";
+			print STDERR "Could not find group $group\n";
 			next;
 		}
 
 		my $gid = $grent[2];
 		if( ! defined $gid ) {
-			print STDERR "Can not find gid corresponding to $group\n";
+			print STDERR "Could not find gid corresponding to $group\n";
 			next;
 		}
 
@@ -770,10 +870,10 @@ sub checkingroup($$@) {
 		my @membri = split(/\s+/, $grent[3]);
 		$self->{debug} and print STDERR "Group $group contains:\n" . join("\n", @membri) . "\n";
 		for(@membri) {
-			my @pwent2 = _getpwnamcache($_);
+			my @pwent2 = Squid::Guard::Common::_getpwnamcache($_);
 			my $uid2 = $pwent2[2];
 			if( ! defined $uid2 ) {
-				print STDERR "Can not find uid corresponding to $_\n";
+				print STDERR "Could not find uid corresponding to $_\n";
 				next;
 			}
 			if( $uid2 == $uid ) {
@@ -798,9 +898,76 @@ sub checkinwbgroup($$@) {
 
 	return '' unless $user;
 
-	my $userSID = _runcache("wbinfo -n '$user'");
+
+	# Method #1 : find the users belonging to a group, and search if $user is in it
+
+	my $owndomain = Squid::Guard::Common::_runcache("wbinfo --own-domain");
 	if( $? ) {
-		print STDERR "Can not find user $user in winbind\n";
+		print STDERR "Could not retrieve my own domain\n";
+		return '';
+	}
+	chomp $owndomain;
+	$self->{debug} and print STDERR "My own domain is $owndomain\n";
+
+	#my $usercomplete = $user =~ /\\/ ? $user : "${owndomain}\\${user}";
+	my $usercomplete;
+
+	# Make sure the domain is in uppercase, and the user in lowercase: it seems to be always reported this way when querying domain and group memberships
+	if( $user =~ /^([^\\]+)\\(.+)/ ) {
+		#$user =~ s/^.*\\/\U$&/			# Make sure the domain is in uppercase
+		$usercomplete = uc($1) . "\\" . lc($2);		# domain in uppercase, user in lowercase
+	} else {
+		$usercomplete = "${owndomain}\\" . lc(${user});
+	}
+
+	#$self->{debug} and print STDERR "The complete user name is $usercomplete\n";
+
+	my $method1error = 0;
+	foreach my $group (@groups) {
+		$self->{debug} and print STDERR " Examining members of $group\n";
+
+# Returns something like a /etc/group line. Local users usually lack the domain, foreign users have it:
+# internet:*:10077:frbros,spfber,splendi, ... , GF2000\ctolli,GF2000\aborelli
+		my $l = Squid::Guard::Common::_runcache("wbinfo '--group-info=$group'");
+		if( $? ) {
+			print STDERR "Could not retrieve users in group $group\n";
+			$method1error++;
+			next;
+		}
+		chomp $l;
+		$self->{debug} and print STDERR "Searching group info for $group yelds $l\n";
+
+		my @a = split( /:/, $l );
+	
+		if( ! $a[3] ) {		# 
+			$method1error++;
+			next;
+		}
+
+		chomp $a[3];
+
+		foreach my $member ( split( /,/, $a[3] ) ) {
+			$member !~ /\\/  and $member = "${owndomain}\\${member}";
+			if ( $usercomplete eq $member ) {
+			$self->{debug} and print STDERR "   FOUND\n";
+				return $group;
+			}
+		}
+	}
+
+	
+	# DO NOT STOP HERE because wbinfo --group-info reports only users for whom this group is not primary. If the group is the primary group, we should continue to check with method #2.
+	#return "" if not $method1error;		# if method #1 incurred in no errors, then we're done. But this is not 
+
+
+	# Method #2, our original method: find the user SID, the groups SIDs, then for each group search the list of SIDs beloging to it.
+	# This used to be the only check we did, but it fails when the user is in some trusted domain: wbinfo --user-domgroups '$userSID' yelds
+	# Can not find the SIDs of the groups of GF2000\ctolli - S-1-5-21-916134602-88897214-270368766-14178
+	# when the user is not in our own domain
+
+	my $userSID = Squid::Guard::Common::_runcache("wbinfo -n '$user'");
+	if( $? ) {
+		print STDERR "Could not find user $user in winbind\n";
 		return '';
 	}
 	$userSID =~ s/\s.*//o;
@@ -809,9 +976,9 @@ sub checkinwbgroup($$@) {
 
 	my %groupsSIDs;
 	foreach my $group (@groups) {
-		my $groupSID = _runcache("wbinfo -n '$group'");
+		my $groupSID = Squid::Guard::Common::_runcache("wbinfo -n '$group'");
 		if( $? ) {
-			print STDERR "Can not find group $group in winbind\n";
+			print STDERR "Could not find group $group in winbind\n";
 			return '';
 		}
 		$groupSID =~ s/\s.*//o;
@@ -820,15 +987,14 @@ sub checkinwbgroup($$@) {
 		$groupsSIDs{$groupSID} = $group;
 	}
 
-	my @userInSIDs = _runcache("wbinfo --user-domgroups '$userSID'");
+	my @userInSIDs = split( /\n/, Squid::Guard::Common::_runcache("wbinfo --user-domgroups '$userSID'") );
 	if( $? ) {
-		print STDERR "Can not find the SIDs of the groups of $user - $userSID\n";
+		print STDERR "Could not find the SIDs of the groups of $user - $userSID\n";
 		return '';
 	}
-	$self->{debug} and print STDERR "$user is in the following groups:\n @userInSIDs";
+	$self->{debug} and print STDERR "$user is in the following groups:\n" . join( "\n", @userInSIDs) . "\n";
 
 	foreach ( @userInSIDs ) {
-		chomp;
 		if ( $groupsSIDs{$_} ) {
 			$self->{debug} and print STDERR "   FOUND\n";
 			return $groupsSIDs{$_};
@@ -842,14 +1008,13 @@ sub checkinwbgroup($$@) {
 =head2 $sg->checkinaddr($req)
 
 Checks if a request is for an explicit IP address
+This is only a wrapper for C<$req->checkinaddr()>, maybe you want to use that instead.
 
 =cut
 
 sub checkinaddr($$) {
         my ( $self, $req ) = @_;
-	# TODO: Maybe the test should be more accurate and more general
-	return 1 if $req->host =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/o;
-	return 0;
+	return $req->checkinaddr();
 }
 
 

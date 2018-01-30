@@ -9,7 +9,7 @@ package Rex::Hardware::Network::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '1.5.0'; # VERSION
+our $VERSION = '1.6.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Helper::Run;
@@ -18,6 +18,11 @@ use Rex::Helper::Array;
 use Data::Dumper;
 
 sub get_bridge_devices {
+  unless ( can_run("brctl") ) {
+    Rex::Logger::debug("No brctl available");
+    return {};
+  }
+
   local $/ = "\n";
   my @lines = i_run 'brctl show', fail_ok => 1;
   chomp @lines;

@@ -1,5 +1,5 @@
 package Bio::Roary::OrderGenes;
-$Bio::Roary::OrderGenes::VERSION = '3.11.3';
+$Bio::Roary::OrderGenes::VERSION = '3.12.0';
 # ABSTRACT: Take in GFF files and create a matrix of what genes are beside what other genes
 
 
@@ -390,7 +390,7 @@ Bio::Roary::OrderGenes - Take in GFF files and create a matrix of what genes are
 
 =head1 VERSION
 
-version 3.11.3
+version 3.12.0
 
 =head1 SYNOPSIS
 
