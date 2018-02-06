@@ -30,7 +30,7 @@ use Carp qw/croak/;
 our $NEWLINE_MARPA_REGEXP = qr/[\x{0D}|\x{0A}|\x{85}|\x{0B}|\x{0C}|\x{2028}|\x{2029}]/;
 our $NEWLINE_CORRECT_REGEXP = qr/\R/;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 # CONTRIBUTORS
 
 our @EXPORT_OK = qw/whoami whowasi traceAndUnpack logCroak showLineAndCol lineAndCol lastCompleted startAndLength rulesByDepth/;
@@ -255,7 +255,7 @@ MarpaX::Languages::C::AST::Util - C Translation to AST - Class method utilities
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.063   2018-02-04
+        - Bugfix: no output if one table row and "keep_header" enabled.
+
 0.062   2018-01-24
-        - Option "choose_columns": allow the user to reset the made choice
+        - Option "choose_columns": allow the user to reset the made choice.
 
 0.061   2018-01-22
         - Option "add_header" is deprecated and will be removed.

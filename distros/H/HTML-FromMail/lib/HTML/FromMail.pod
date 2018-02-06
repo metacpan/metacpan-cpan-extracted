@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 HTML::FromMail - base-class for the HTML producers
@@ -58,7 +60,8 @@ Email addresses in the header are not yet formatted as links.
 
 =head2 Plans
 
-There are many extensions planned.
+There are many extensions planned; but I have no time to implement
+them.
 
 =over 4
 
@@ -93,19 +96,19 @@ hard.
 
 =head2 Constructors
 
-HTML::FromMail-E<gt>B<new>(OPTIONS)
-
 =over 4
 
- Option   --Default
- formatter  HTML::FromMail::Format::OODoc
- producers  <some basic items>
- settings   {}
- templates  '.'
+=item HTML::FromMail-E<gt>B<new>(OPTIONS)
 
-. formatter => CLASS|OBJECT|HASH
+ -Option   --Default
+  formatter  HTML::FromMail::Format::OODoc
+  producers  <some basic items>
+  settings   {}
+  templates  '.'
 
-=over 4
+=over 2
+
+=item formatter => CLASS|OBJECT|HASH
 
 The formatter which is used to process the template files which produce
 the output.
@@ -113,11 +116,7 @@ the output.
 You can specify a CLASS, a formatter OBJECT, or a HASH with options for
 a L<HTML::FromMail::Format::OODoc|HTML::FromMail::Format::OODoc> object which will be created for you.
 
-=back
-
-. producers => HASH
-
-=over 4
+=item producers => HASH
 
 The producer list describes which set of formatting commands are
 applicable to certain objects when producing HTML.  The HASH
@@ -125,11 +124,7 @@ maps external classes (usually implemented in L<Mail::Box>) to
 sub-classes of this object.  You may modify the default list
 using L<producer()|HTML::FromMail/"Attributes">.  Read more in L</Producers>.
 
-=back
-
-. settings => HASH
-
-=over 4
+=item settings => HASH
 
 Each producer has defaults for formatting flexability.  For instance,
 sometimes alternatives are available for creating certain pieces
@@ -137,11 +132,7 @@ of HTML.  This option adds/modifies the settings for a certain group
 of producers, but influence the formatters behavior as well.
 Read more in L</Settings>.
 
-=back
-
-. templates => DIRECTORY
-
-=over 4
+=item templates => DIRECTORY
 
 The location where the template files can be found.  It is used as
 base for relative names.
@@ -152,17 +143,13 @@ base for relative names.
 
 =head2 Attributes
 
-$obj-E<gt>B<formatter>
-
 =over 4
+
+=item $obj-E<gt>B<formatter>()
 
 Returns the selected formatter object.
 
-=back
-
-$obj-E<gt>B<producer>((CLASS|OBJECT) [, HTML_PRODUCER])
-
-=over 4
+=item $obj-E<gt>B<producer>( (CLASS|OBJECT) [, HTML_PRODUCER] )
 
 The CLASS object, for instance a Mail::Message, is handled by the
 HTML_PRODUCER class.  When an OBJECT is specified, the class of that
@@ -174,7 +161,7 @@ Without producer as parameter, the actual producer for the CLASS is
 returned.  In this case, the producer class will be compiled for you,
 if that hasn't be done before.
 
-I<Example:> 
+example: 
 
  use HTML::FromMail;
  my $converter = HTML::FromMail->new;
@@ -182,11 +169,7 @@ I<Example:>
 
  print $converter->producer($msg);
 
-=back
-
-$obj-E<gt>B<settings>((PRODUCER|TOPIC) [,HASH|LIST])
-
-=over 4
+=item $obj-E<gt>B<settings>( (PRODUCER|TOPIC) [,HASH|LIST] )
 
 Returns a hash which contains the differences from the default for
 producers of a certain TOPIC, or the topic of the specified PRODUCER.
@@ -195,11 +178,7 @@ With HASH, all settings will be replaced by that value as new set.
 It may be easier to use L<new(settings)|HTML::FromMail/"Constructors"> or add the information to
 the content of your templates.
 
-=back
-
-$obj-E<gt>B<templates>([PRODUCER|TOPIC])
-
-=over 4
+=item $obj-E<gt>B<templates>( [PRODUCER|TOPIC] )
 
 Returns the location of the templates.  When a TOPIC is specified,
 that is added to the templates path.  With a PRODUCER, that is object is used
@@ -209,29 +188,25 @@ to get the topic.
 
 =head2 Export
 
-$obj-E<gt>B<export>(OBJECT, OPTIONS)
-
 =over 4
+
+=item $obj-E<gt>B<export>(OBJECT, OPTIONS)
 
 Produce the HTML output of the OBJECT, using the specified OPTIONS.
 
- Option--Default
- output  <required>
- use     undef
+ -Option--Default
+  output  <required>
+  use     undef
 
-. output => DIRECTORY|FILENAME
+=over 2
 
-=over 4
+=item output => DIRECTORY|FILENAME
 
 The DIRECTORY where the processed templates for the object are written to.
 It is only permitted to supply a single filename when the template
 specifies a single filename as well.
 
-=back
-
-. use => ARRAY-OF-FILENAMES
-
-=over 4
+=item use => ARRAY-OF-FILENAMES
 
 Directoy C<new(templates)> defines the location of all template files.  In
 that directort, you have sub-directories for each kind of object which
@@ -252,9 +227,9 @@ is absolute (starts with a slash), that name is used.
 
 =head2 Other methods
 
-$obj-E<gt>B<expandFiles>(DIRECTORY|FILENAME|ARRAY-OF-FILENAMES)
-
 =over 4
+
+=item $obj-E<gt>B<expandFiles>(DIRECTORY|FILENAME|ARRAY-OF-FILENAMES)
 
 Returns a list with all filenames which are included in the DIRECTORY
 specified or the ARRAY.  If only one FILENAME is specified, then that
@@ -309,44 +284,48 @@ For settings available for messages, see L<HTML::FromMail::Message/Settings>.
 
 =head1 DIAGNOSTICS
 
-I<Warning:> Cannot find $dir/file
+=over 4
 
-I<Error:> Cannot find template file or directory $topic in $directory.
+=item Warning: Cannot find $dir/file
+
+=item Error: Cannot find template file or directory $topic in $directory.
 
 The templates directory (see L<new(templates)|HTML::FromMail/"Constructors">) does not contain a template
 for the specified topic (see L<HTML::FromMail::Object::new(topic)|HTML::FromMail::Object/"METHODS">).
 
-I<Error:> Cannot read from directory $thing: $!
+=item Error: Cannot read from directory $thing: $!
 
-I<Error:> Cannot use $producer for $class: $@
+=item Error: Cannot use $producer for $class: $@
 
 The specified producer (see L<new(producers)|HTML::FromMail/"Constructors">) does not exist or produces
 compilation errors.  The problem is displayed.
 
-I<Error:> Formatter $class can not be used: $@
+=item Error: Formatter $class can not be used: $@
 
-I<Error:> Formatter $class could not be instantiated
+=item Error: Formatter $class could not be instantiated
 
-I<Error:> No output directory or file specified.
+=item Error: No output directory or file specified.
 
-I<Error:> No producer for $class objects.
+=item Error: No producer for $class objects.
 
-I<Warning:> No templates for $topic objects.
+=item Warning: No templates for $topic objects.
 
-I<Warning:> No templates found in $templates directory
+=item Warning: No templates found in $templates directory
 
-I<Warning:> Skipping $full, which is neither file or directory.
+=item Warning: Skipping $full, which is neither file or directory.
+
+=back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.11,
-built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+This module is part of HTML-FromMail distribution version 0.12,
+built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

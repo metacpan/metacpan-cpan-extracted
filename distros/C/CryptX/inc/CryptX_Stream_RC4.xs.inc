@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::RC4
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::RC4
 new(Class, SV * key)
     CODE:
@@ -11,10 +13,10 @@ new(Class, SV * key)
         if (!SvPOK(key))   croak("FATAL: key must be string/buffer scalar");
         k  = (unsigned char *) SvPVbyte(key, k_len);
 
-        Newz(0, RETVAL, 1, struct rc4_struct);
+        Newz(0, RETVAL, 1, rc4_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = rc4_stream_setup(&RETVAL->state, k, (unsigned long)k_len);
+        rv = rc4_stream_setup(RETVAL, k, (unsigned long)k_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: rc4_stream_setup failed: %s", error_to_string(rv));
@@ -26,15 +28,15 @@ new(Class, SV * key)
 void
 DESTROY(Crypt::Stream::RC4 self)
     CODE:
-        rc4_stream_done(&self->state);
+        rc4_stream_done(self);
         Safefree(self);
 
 Crypt::Stream::RC4
 clone(Crypt::Stream::RC4 self)
     CODE:
-        Newz(0, RETVAL, 1, struct rc4_struct);
+        Newz(0, RETVAL, 1, rc4_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct rc4_struct);
+        Copy(self, RETVAL, 1, rc4_state);
     OUTPUT:
         RETVAL
 
@@ -45,14 +47,19 @@ keystream(Crypt::Stream::RC4 self, STRLEN out_len)
         int rv;
         unsigned char *out_data;
 
-        RETVAL = NEWSV(0, out_len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, out_len);
-        out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = rc4_stream_keystream(&self->state, out_data, (unsigned long)out_len);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: rc4_stream_keystream failed: %s", error_to_string(rv));
+        if (out_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, out_len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          rv = rc4_stream_keystream(self, out_data, (unsigned long)out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: rc4_stream_keystream failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -71,11 +78,11 @@ crypt(Crypt::Stream::RC4 self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = rc4_stream_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          rv = rc4_stream_crypt(self, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: rc4_stream_crypt failed: %s", error_to_string(rv));

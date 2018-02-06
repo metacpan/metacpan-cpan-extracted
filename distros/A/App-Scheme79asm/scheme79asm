@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use 5.014000;
+
+use App::Scheme79asm;
+use Getopt::Long;
+
+my $type_bits;
+my $addr_bits;
+
+GetOptions ('addr-bits=i' => \$addr_bits, 'type-bits=i' => \$type_bits);
+
+my $asm = App::Scheme79asm->new(addr_bits => $addr_bits, type_bits => $type_bits);
+my $str = join '', <>;
+$asm->parse_and_print($str);
+
+__END__

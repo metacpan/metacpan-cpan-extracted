@@ -1,7 +1,7 @@
 package HTML::DOM::Interface;
 
 use Exporter 5.57 'import';
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # for constants
 require HTML'DOM'Event'Mutation;
@@ -13,7 +13,7 @@ HTML::DOM::Interface - A list of HTML::DOM's interface members in machine-readab
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

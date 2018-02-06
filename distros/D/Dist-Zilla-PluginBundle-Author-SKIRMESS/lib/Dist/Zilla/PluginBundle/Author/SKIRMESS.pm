@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use Moose 0.99;
 
@@ -131,7 +131,19 @@ sub configure {
         ],
 
         # automatically extract Perl::Critic policy prereqs
-        'AutoPrereqs::Perl::Critic',
+        [
+            'AutoPrereqs::Perl::Critic', 'AutoPrereqs::Perl::Critic / code',
+            {
+                critic_config => 'xt/author/perlcriticrc-code',
+            },
+        ],
+
+        [
+            'AutoPrereqs::Perl::Critic', 'AutoPrereqs::Perl::Critic / tests',
+            {
+                critic_config => 'xt/author/perlcriticrc-tests',
+            },
+        ],
 
         # Set script shebang to #!perl
         ( $self->set_script_shebang ? 'SetScriptShebang' : () ),
@@ -349,7 +361,7 @@ Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way 
 
 =head1 VERSION
 
-Version 0.031
+Version 0.032
 
 =head1 SYNOPSIS
 
@@ -396,7 +408,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sven Kirmess.
+This software is Copyright (c) 2017-2018 by Sven Kirmess.
 
 This is free software, licensed under:
 

@@ -4,40 +4,49 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "A curated set of RDF prefixes",
-  "author"         => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "RDF-NS-Curated",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => { requires => { perl => "5.006000" } },
-                        test      => { requires => { "Test::More" => 0.96 } },
-                      },
-  "provides"       => {
-                        "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => 0.005 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "https://github.com/kjetilk/p5-rdf-ns-curated/issues" },
-                        homepage     => "https://metacpan.org/release/RDF-NS-Curated",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/kjetilk/p5-rdf-ns-curated.git",
-                                          web  => "https://github.com/kjetilk/p5-rdf-ns-curated",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project",
-                      },
-  "version"        => 0.005,
+  "abstract"         => "A curated set of RDF prefixes",
+  "author"           => ["Kjetil Kjernsmo (KJETILK) <kjetilk\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "RDF-NS-Curated",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => {
+                                         recommends => {
+                                           "Dist::Inkt"      => 0.001,
+                                           "List::Util"      => 1.43,
+                                           "RDF::Trine"      => 0,
+                                           "Test::Exception" => 0,
+                                         },
+                                       },
+                          runtime   => { requires => { perl => "5.006000" } },
+                          test      => { requires => { "Test::More" => 0.96 } },
+                        },
+  "provides"         => {
+                          "RDF::NS::Curated" => { file => "lib/RDF/NS/Curated.pm", version => "0.100" },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "https://github.com/kjetilk/p5-rdf-ns-curated/issues" },
+                          homepage     => "https://metacpan.org/release/RDF-NS-Curated",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/kjetilk/p5-rdf-ns-curated.git",
+                                            web  => "https://github.com/kjetilk/p5-rdf-ns-curated",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project",
+                          x_IRC        => "irc://irc.perl.org/#perlrdf",
+                        },
+  "version"          => "0.100",
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

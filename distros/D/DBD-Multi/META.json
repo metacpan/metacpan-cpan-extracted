@@ -21,7 +21,7 @@
             "Test::Exception" : "0.21",
             "Test::More" : "0",
             "Test::Pod" : "1.14",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::TCP" : "2.19"
          }
       },
       "configure" : {
@@ -42,23 +42,23 @@
    "provides" : {
       "DBD::Multi" : {
          "file" : "lib/DBD/Multi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "DBD::Multi::Handler" : {
          "file" : "lib/DBD/Multi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "DBD::Multi::db" : {
          "file" : "lib/DBD/Multi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "DBD::Multi::dr" : {
          "file" : "lib/DBD/Multi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       },
       "DBD::Multi::st" : {
          "file" : "lib/DBD/Multi.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "web" : "https://github.com/dwright/DBD-Multi"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

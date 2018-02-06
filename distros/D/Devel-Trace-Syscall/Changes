@@ -1,5 +1,9 @@
 Revision history for Devel-Trace-Syscall
 
+0.05 January 31 2018
+        - Fixed printing of 4th system call argument
+        - Fixed tests with regards to open vs openat
+
 0.04 May 31 2017
         - Removed debugging code
         - Fix build problems on some perls

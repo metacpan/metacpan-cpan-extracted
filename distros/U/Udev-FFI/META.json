@@ -29,7 +29,7 @@
       "configure" : {
          "requires" : {
             "FFI::CheckLib" : "0",
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build" : "0.4005"
          }
       },
       "develop" : {
@@ -58,7 +58,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.101001"
+         "version" : "0.102000"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -87,7 +87,8 @@
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.101001",
+   "version" : "0.102000",
+   "x_authority" : "cpan:ILUX",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],

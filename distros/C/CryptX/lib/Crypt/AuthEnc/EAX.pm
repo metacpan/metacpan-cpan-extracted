@@ -2,9 +2,9 @@ package Crypt::AuthEnc::EAX;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
-use base qw(Crypt::AuthEnc Exporter);
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( eax_encrypt_authenticate eax_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -12,57 +12,12 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Cipher;
-
-### the following methods/functions are implemented in XS:
-# - _new
-# - DESTROY
-# - clone
-# - encrypt_add
-# - encrypt_done
-# - decrypt_add
-# - decrypt_done
-# - adata_add
-
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
-}
-
-sub eax_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub eax_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::EAX->new($cipher_name, $key, $iv);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
 
 # obsolete, only for backwards compatibility
 sub header_add { goto &adata_add }
 sub aad_add    { goto &adata_add }
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

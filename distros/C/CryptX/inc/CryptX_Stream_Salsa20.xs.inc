@@ -1,5 +1,7 @@
 MODULE = CryptX         PACKAGE = Crypt::Stream::Salsa20
 
+PROTOTYPES: DISABLE
+
 Crypt::Stream::Salsa20
 new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
     CODE:
@@ -13,16 +15,16 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
         k  = (unsigned char *)SvPVbyte(key, k_len);
         iv = (unsigned char *)SvPVbyte(nonce, iv_len);
 
-        Newz(0, RETVAL, 1, struct salsa20_struct);
+        Newz(0, RETVAL, 1, salsa20_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = salsa20_setup(&RETVAL->state, k, (unsigned long)k_len, rounds);
+        rv = salsa20_setup(RETVAL, k, (unsigned long)k_len, rounds);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: salsa20_setup failed: %s", error_to_string(rv));
         }
 
-        rv = salsa20_ivctr64(&RETVAL->state, iv, (unsigned long)iv_len, (ulong64)counter);
+        rv = salsa20_ivctr64(RETVAL, iv, (unsigned long)iv_len, (ulong64)counter);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: salsa20_ivctr64 failed: %s", error_to_string(rv));
@@ -34,15 +36,15 @@ new(Class, SV * key, SV * nonce, UV counter = 0, int rounds = 20)
 void
 DESTROY(Crypt::Stream::Salsa20 self)
     CODE:
-        salsa20_done(&self->state);
+        salsa20_done(self);
         Safefree(self);
 
 Crypt::Stream::Salsa20
 clone(Crypt::Stream::Salsa20 self)
     CODE:
-        Newz(0, RETVAL, 1, struct salsa20_struct);
+        Newz(0, RETVAL, 1, salsa20_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct salsa20_struct);
+        Copy(self, RETVAL, 1, salsa20_state);
     OUTPUT:
         RETVAL
 
@@ -53,14 +55,19 @@ keystream(Crypt::Stream::Salsa20 self, STRLEN out_len)
         int rv;
         unsigned char *out_data;
 
-        RETVAL = NEWSV(0, out_len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, out_len);
-        out_data = (unsigned char *)SvPVX(RETVAL);
-        rv = salsa20_keystream(&self->state, out_data, (unsigned long)out_len);
-        if (rv != CRYPT_OK) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: salsa20_keystream failed: %s", error_to_string(rv));
+        if (out_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, out_len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          rv = salsa20_keystream(self, out_data, (unsigned long)out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: salsa20_keystream failed: %s", error_to_string(rv));
+          }
         }
     }
     OUTPUT:
@@ -79,11 +86,11 @@ crypt(Crypt::Stream::Salsa20 self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = salsa20_crypt(&self->state, in_data, (unsigned long)in_data_len, out_data);
+          rv = salsa20_crypt(self, in_data, (unsigned long)in_data_len, out_data);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: salsa20_crypt failed: %s", error_to_string(rv));

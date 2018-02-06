@@ -1,0 +1,82 @@
+{
+   "abstract" : "It's yet another DMM sdk.",
+   "author" : [
+      "([$floor_id],\\%params)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.14",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WebService-YDMM",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "URI" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::YDMM" : {
+         "file" : "lib/WebService/YDMM.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/AnaTofuZ/p5-webservice-YDMM/issues"
+      },
+      "homepage" : "https://github.com/AnaTofuZ/p5-webservice-YDMM",
+      "repository" : {
+         "url" : "git://github.com/AnaTofuZ/p5-webservice-YDMM.git",
+         "web" : "https://github.com/AnaTofuZ/p5-webservice-YDMM"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:ANATOFUZ",
+   "x_contributors" : [
+      "AnaTofuZ <anatofuz@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

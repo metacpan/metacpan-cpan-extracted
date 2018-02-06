@@ -35,7 +35,7 @@ use base qw/ Astro::Catalog::IO::Binary /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =begin __PUBLIC_METHODS__
@@ -844,10 +844,6 @@ sub _write_catalog {
 }
 
 =back
-
-=head1 REVISION
-
-  $Id: LCOGTFITSTable.pm 5687 2012-05-16 16:43:56Z tlister $
 
 =head1 SEE ALSO
 

@@ -6,4 +6,9 @@ Home page:    <https://metacpan.org/release/AtteanX-Compatibility-Trine>
 Bug tracker:  <https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+0.002	2018-02-05
+
+ [ Bug Fixes ]
+ - Fix the langString error coded to Attean.
+
 0.001	2017-08-14	Initial release

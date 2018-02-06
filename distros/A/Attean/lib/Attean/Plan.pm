@@ -8,7 +8,7 @@ Attean::Plan - Representation of SPARQL query plan operators
 
 =head1 VERSION
 
-This document describes Attean::Plan version 0.018
+This document describes Attean::Plan version 0.019
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Evaluates a quad pattern against the model.
 
 =cut
 
-package Attean::Plan::Quad 0.018 {
+package Attean::Plan::Quad 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed reftype);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -137,7 +137,7 @@ Evaluates a join (natural-, anti-, or left-) using a nested loop.
 
 =cut
 
-package Attean::Plan::NestedLoopJoin 0.018 {
+package Attean::Plan::NestedLoopJoin 0.019 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -226,7 +226,7 @@ Evaluates a join (natural-, anti-, or left-) using a hash join.
 
 =cut
 
-package Attean::Plan::HashJoin 0.018 {
+package Attean::Plan::HashJoin 0.019 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use namespace::clean;
@@ -367,7 +367,7 @@ package Attean::Plan::HashJoin 0.018 {
 
 =cut
 
-package Attean::Plan::Construct 0.018 {
+package Attean::Plan::Construct 0.019 {
 	use Moo;
 	use List::MoreUtils qw(all);
 	use Types::Standard qw(Str ArrayRef ConsumerOf InstanceOf);
@@ -458,7 +458,7 @@ package Attean::Plan::Construct 0.018 {
 
 =cut
 
-package Attean::Plan::Describe 0.018 {
+package Attean::Plan::Describe 0.019 {
 	use Moo;
 	use Attean::RDF;
 	use List::MoreUtils qw(all);
@@ -544,7 +544,7 @@ named variable binding.
 
 =cut
 
-package Attean::Plan::EBVFilter 0.018 {
+package Attean::Plan::EBVFilter 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ConsumerOf);
@@ -603,7 +603,7 @@ ordering.
 
 =cut
 
-package Attean::Plan::Merge 0.018 {
+package Attean::Plan::Merge 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(Str ArrayRef ConsumerOf);
@@ -632,7 +632,7 @@ Evaluates a set of sub-plans, returning the union of results.
 
 =cut
 
-package Attean::Plan::Union 0.018 {
+package Attean::Plan::Union 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use namespace::clean;
@@ -703,7 +703,7 @@ expressions, binding the produced values to new variables.
 
 =cut
 
-package Attean::Plan::Extend 0.018 {
+package Attean::Plan::Extend 0.019 {
 	use Moo;
 	use Encode;
 	use Data::UUID;
@@ -987,7 +987,7 @@ package Attean::Plan::Extend 0.018 {
 				}
 				foreach my $s (@strings) {
 					die unless ($s->does('Attean::API::Literal'));
-					die if ($s->datatype and not($s->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#(langString|string)>));
+					die if ($s->datatype and not($s->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>));
 					if (my $l2 = $s->language) {
 						if (my $l1 = $args{language}) {
 							if ($l1 ne $l2) {
@@ -1030,20 +1030,20 @@ package Attean::Plan::Extend 0.018 {
 			} elsif ($func eq 'STRLANG') {
 				my ($term, $lang)	= @terms;
 				die unless ($term->does('Attean::API::Literal'));
-				die unless ($term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#(langString|string)>);
+				die unless ($term->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>);
 				die if ($term->language);
 				return Attean::Literal->new(value => $term->value, language => $lang->value);
 			} elsif ($func eq 'STRDT') {
 				my ($term, $dt)	= @terms;
 				die unless ($term->does('Attean::API::Literal'));
-				die unless ($term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#(langString|string)>);
+				die unless ($term->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>);
 				die if ($term->language);
 # 				my ($term, $dt)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 				return Attean::Literal->new(value => $term->value, datatype => $dt->value);
 			} elsif ($func eq 'REPLACE') {
 				my ($term, $pat, $rep)	= @terms;
 				die unless ($term->does('Attean::API::Literal'));
-				die unless ($term->language or $term->datatype->value =~ m<http://www.w3.org/2001/XMLSchema#(langString|string)>);
+				die unless ($term->language or $term->datatype->value =~ m<http://www.w3.org/(1999/02/22-rdf-syntax-ns#langString|2001/XMLSchema#string)>);
 # 				my ($term, $pat, $rep)	= map { $self->evaluate_expression($model, $_, $r) } @{ $expr->children };
 				my $value	= $term->value;
 				my $pattern	= $pat->value;
@@ -1297,7 +1297,7 @@ hash of already-seen results.
 
 =cut
 
-package Attean::Plan::HashDistinct 0.018 {
+package Attean::Plan::HashDistinct 0.019 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1325,7 +1325,7 @@ filtering out sequential duplicates.
 
 =cut
 
-package Attean::Plan::Unique 0.018 {
+package Attean::Plan::Unique 0.019 {
 	use Moo;
 	use namespace::clean;
 	
@@ -1360,7 +1360,7 @@ number of results ("offset") and limiting the total number of returned results
 
 =cut
 
-package Attean::Plan::Slice 0.018 {
+package Attean::Plan::Slice 0.019 {
 	use Moo;
 	use Types::Standard qw(Int);
 	use namespace::clean;
@@ -1401,7 +1401,7 @@ of variable bindings in each result.
 
 =cut
 
-package Attean::Plan::Project 0.018 {
+package Attean::Plan::Project 0.019 {
 	use Moo;
 	with 'Attean::API::BindingSubstitutionPlan', 'Attean::API::UnaryQueryTree';
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1478,7 +1478,7 @@ sorting is applied.
 
 =cut
 
-package Attean::Plan::OrderBy 0.018 {
+package Attean::Plan::OrderBy 0.019 {
 	use Moo;
 	use Types::Standard qw(HashRef ArrayRef InstanceOf Bool Str);
 	use namespace::clean;
@@ -1548,7 +1548,7 @@ Evaluates a SPARQL query against a remove endpoint.
 
 =cut
 
-package Attean::Plan::Service 0.018 {
+package Attean::Plan::Service 0.019 {
 	use Moo;
 	use Types::Standard qw(ConsumerOf Bool Str);
 	use namespace::clean;
@@ -1580,7 +1580,7 @@ Returns a constant set of results.
 
 =cut
 
-package Attean::Plan::Table 0.018 {
+package Attean::Plan::Table 0.019 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1645,7 +1645,7 @@ L<Attean::ListIterator>, the size of that iterator will be used.
 
 =cut
 
-package Attean::Plan::Iterator 0.018 {
+package Attean::Plan::Iterator 0.019 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf Int);
 	use namespace::clean;
@@ -1709,7 +1709,7 @@ package Attean::Plan::Iterator 0.018 {
 
 =cut
 
-package Attean::Plan::ALPPath 0.018 {
+package Attean::Plan::ALPPath 0.019 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1861,7 +1861,7 @@ package Attean::Plan::ALPPath 0.018 {
 	}
 }
 
-package Attean::Plan::ZeroOrOnePath 0.018 {
+package Attean::Plan::ZeroOrOnePath 0.019 {
 	use Moo;
 	use Attean::TreeRewriter;
 	use Types::Standard qw(ArrayRef ConsumerOf);
@@ -1960,7 +1960,7 @@ results were produced by evaluating the sub-plan.
 
 =cut
 
-package Attean::Plan::Exists 0.018 {
+package Attean::Plan::Exists 0.019 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -1990,7 +1990,7 @@ package Attean::Plan::Exists 0.018 {
 
 =cut
 
-package Attean::Plan::Aggregate 0.018 {
+package Attean::Plan::Aggregate 0.019 {
 	use Moo;
 	use Encode;
 	use Data::UUID;
@@ -2219,7 +2219,7 @@ package Attean::Plan::Aggregate 0.018 {
 	}
 }
 
-package Attean::Plan::Sequence 0.018 {
+package Attean::Plan::Sequence 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2244,7 +2244,7 @@ package Attean::Plan::Sequence 0.018 {
 	}
 }
 
-package Attean::Plan::Clear 0.018 {
+package Attean::Plan::Clear 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2281,7 +2281,7 @@ package Attean::Plan::Clear 0.018 {
 	}
 }
 
-package Attean::Plan::Drop 0.018 {
+package Attean::Plan::Drop 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf ArrayRef);
@@ -2316,7 +2316,7 @@ package Attean::Plan::Drop 0.018 {
 	}
 }
 
-package Attean::Plan::TripleTemplateToModelQuadMethod 0.018 {
+package Attean::Plan::TripleTemplateToModelQuadMethod 0.019 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(ConsumerOf Str ArrayRef HashRef);
@@ -2392,7 +2392,7 @@ package Attean::Plan::TripleTemplateToModelQuadMethod 0.018 {
 	}
 }
 
-package Attean::Plan::Load 0.018 {
+package Attean::Plan::Load 0.019 {
 	use Moo;
 	use Encode;
 	use LWP::UserAgent;
@@ -2455,7 +2455,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

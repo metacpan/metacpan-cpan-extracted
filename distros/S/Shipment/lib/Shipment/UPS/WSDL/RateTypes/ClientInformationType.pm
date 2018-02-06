@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::ClientInformationType;
-$Shipment::UPS::WSDL::RateTypes::ClientInformationType::VERSION = '2.03';
+$Shipment::UPS::WSDL::RateTypes::ClientInformationType::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -46,7 +46,7 @@ Class::Std::initialize();
 
 package Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property;
 $Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::VERSION =
-  '2.03';
+  '3.01';
 use strict;
 use warnings;
 {
@@ -64,7 +64,7 @@ use warnings;
 
     package Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr;
     $Shipment::UPS::WSDL::RateTypes::ClientInformationType::_Property::XmlAttr::VERSION
-      = '2.03';
+      = '3.01';
     use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
     {    # BLOCK to scope variables
@@ -103,7 +103,7 @@ Shipment::UPS::WSDL::RateTypes::ClientInformationType
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 DESCRIPTION
 
@@ -145,7 +145,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

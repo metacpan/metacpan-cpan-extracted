@@ -6,18 +6,25 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CryptoCurrencyUtils.pm',
-    'App/grepcoin.pm'
+    'App/grepcoin.pm',
+    'App/grepexchange.pm'
 );
 
 my @scripts = (
-    'script/coin-cmc',
-    'script/coin-mno',
+    'script/coin-cmc-summary',
+    'script/global-cmc-summary',
     'script/grep-coin',
-    'script/list-coins'
+    'script/grep-exchange',
+    'script/list-cmc-coins',
+    'script/list-coins',
+    'script/list-exchanges',
+    'script/open-coin-cmc',
+    'script/open-coin-mno',
+    'script/open-exchange-cmc'
 );
 
 # no fake home requested

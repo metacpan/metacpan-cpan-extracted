@@ -1,8 +1,8 @@
 ChangeLog
 MANIFEST
-META.yml                                 Module meta-data (added by MakeMaker)
 Makefile.PL
 README
+README.md
 examples/README
 examples/demo.pl
 examples/show_all.pl
@@ -33,5 +33,6 @@ lib/HTML/FromMail/Object.pod
 lib/HTML/FromMail/Page.pm
 lib/HTML/FromMail/Page.pod
 t/00run.t
-t/pod.t
-version
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

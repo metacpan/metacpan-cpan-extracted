@@ -1,6 +1,6 @@
 package Catmandu::Fix::pica_map;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Catmandu::Sane;
 use Moo;
@@ -136,7 +136,7 @@ Catmandu::Fix::pica_map - copy pica values of one field to a new field
     # Copy from field 003@ subfield 0 to dc.identifier hash
     pica_map('003A0','dc.identifier');
 
-    # Copy from field 003@ subfield 0 to dc.identifier hash
+    # Copy from field 010@ subfield a to dc.language hash
     pica_map('010@a','dc.language');
 
     # Copy from field 009Q subfield a to foaf.primaryTopicOf array

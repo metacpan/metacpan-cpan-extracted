@@ -27,7 +27,7 @@ sub foo {
 foo();
 
 __DATA__
-open("/dev/null", 0x241, 0666) = * at subexpr.pl line 12.
+open("/dev/null", *, 0666) = * at subexpr.pl line 12.
     main::baz() called at subexpr.pl line 20
     main::bar() called at subexpr.pl line 24
     main::foo() called at subexpr.pl line 27

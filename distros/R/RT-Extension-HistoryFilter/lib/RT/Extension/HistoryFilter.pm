@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 my @types;
 {
@@ -20,6 +20,7 @@ $RT::Config::META{'HistoryFilterTypes'} = {
     Widget          => '/Widgets/Form/Select',
     WidgetArguments => {
         Description => 'Transaction types that will be shown on the ticket display page', #loc
+        Hints       => '(' . __PACKAGE__ . ')',
         Values      => [ @types ],
         Multiple    => 1,
         },
@@ -80,7 +81,7 @@ Christian Loos <cloos@netsandbox.de>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (C) 2010-2016, Christian Loos.
+Copyright (C) 2010-2017, Christian Loos.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

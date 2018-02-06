@@ -1,6 +1,6 @@
 package Map::Tube::Kolkatta;
 
-$Map::Tube::Kolkatta::VERSION   = '0.12';
+$Map::Tube::Kolkatta::VERSION   = '0.13';
 $Map::Tube::Kolkatta::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Kolkatta - Interface to the Kolkatta Metro Map.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

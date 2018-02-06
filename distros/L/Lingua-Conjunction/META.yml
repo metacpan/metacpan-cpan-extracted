@@ -19,7 +19,7 @@ name: Lingua-Conjunction
 provides:
   Lingua::Conjunction:
     file: lib/Lingua/Conjunction.pm
-    version: v2.1.0
+    version: v2.1.2
 requires:
   Carp: '0'
   Exporter: '0'
@@ -29,6 +29,8 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Lingua-Conjunction/issues
   repository: git://github.com/robrwo/Lingua-Conjunction.git
-version: v2.1.0
+version: v2.1.2
 x_authority: cpan:RRWO
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

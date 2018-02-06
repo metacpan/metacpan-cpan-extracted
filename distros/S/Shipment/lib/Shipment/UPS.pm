@@ -1,5 +1,5 @@
 package Shipment::UPS;
-$Shipment::UPS::VERSION = '2.03';
+$Shipment::UPS::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -1545,7 +1545,7 @@ Shipment::UPS
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -1586,9 +1586,13 @@ https://www.ups.com/upsdeveloperkit
 See related modules for documentation on options and how to access rates and labels:
 
 L<Shipment::Base> - common attributes and methods for all interfaces
+
 L<Shipment::Address> - define an from or to address
+
 L<Shipment::Package> - define package details, weight, dimensions, etc
+
 L<Shipment::Service> - access information about a service, rate, etd, etc
+
 L<Shipment::Label> - access the label file
 
 It makes extensive use of SOAP::WSDL in order to create/decode xml requests and responses. The Shipment::UPS::WSDL interface was created primarily using the wsdl2perl.pl script from SOAP::WSDL.
@@ -1786,7 +1790,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

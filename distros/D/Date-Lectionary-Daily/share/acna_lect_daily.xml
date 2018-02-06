@@ -484,7 +484,7 @@
       <lesson service="evening" order="2">Romans 6</lesson>
     </day>
   </week>
-  <week name="The Eighth Sunday of Epiphany">
+  <week name="The Second to Last Sunday after Epiphany">
     <day name="Sunday">
       <lesson service="morning" order="1">Genesis 3</lesson>
       <lesson service="morning" order="2">1 Corinthians 10:1-13, (14-24)</lesson>
@@ -528,7 +528,7 @@
       <lesson service="evening" order="2">Romans 11</lesson>
     </day>
   </week>
-  <week name="The Last Sunday of Epiphany">
+  <week name="The Last Sunday after Epiphany">
     <day name="Sunday">
       <lesson service="morning" order="1">Genesis 12:1-9</lesson>
       <lesson service="morning" order="2">1 Corinthians 12:4-end</lesson>

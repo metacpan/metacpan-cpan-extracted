@@ -54,6 +54,17 @@ subtest 'test success' => sub {
         $res->{callback_called_count}, 0,
         'callback called an expected number of times'
     );
+
+    for my $mode ( 'LIVE', 'TEST' ) {
+        $res = _make_token_and_request( $ua, 1, undef, $mode );
+
+        is(
+            $res->{uri},
+            'http://example.com?SECURETOKEN=token&SECURETOKENID=token_id&MODE='
+                . $mode,
+            'hosted_form_mode set MODE=' . $mode,
+        );
+    }
 };
 
 subtest 'test error with no retries' => sub {
@@ -156,6 +167,7 @@ sub _make_token_and_request {
     my $ua             = shift;
     my $retry_attempts = shift;
     my $callback       = shift;
+    my $mode           = shift;
 
     my $callback_called_count = 0;
 
@@ -178,6 +190,7 @@ sub _make_token_and_request {
             $callback_called_count++;
             $callback->($res2) if defined $callback;
         },
+        ( $mode ? ( hosted_form_mode => $mode ) : () ),
         );
 
     my $uri;

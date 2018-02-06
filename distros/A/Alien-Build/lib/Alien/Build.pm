@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -654,8 +654,19 @@ sub build
       local $CWD;
       delete $ENV{DESTDIR} unless $self->meta_prop->{destdir};
 
-      %ENV = (%ENV, %{ $self->meta_prop->{env} || {} });
-      %ENV = (%ENV, %{ $self->install_prop->{env} || {} });
+      my %env_meta = %{ $self->meta_prop   ->{env} || {} };
+      my %env_inst = %{ $self->install_prop->{env} || {} };
+
+      if($self->meta_prop->{env_interpolate})
+      {
+        foreach my $key (keys %env_meta)
+        {
+          $env_meta{$key} = $self->meta->interpolator->interpolate($env_meta{$key});
+        }
+      }
+
+      %ENV = (%ENV, %env_meta);
+      %ENV = (%ENV, %env_inst);
 
       my $destdir;
 
@@ -1124,7 +1135,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -1279,6 +1290,13 @@ Same as C<destdir_filter> except applies to C<build_ffi> instead of C<build>.
 =item env
 
 Environment variables to override during the build stage.
+
+=item env_interpolate
+
+Environment variable values will be interpolated with helpers.  Example:
+
+ meta->prop->{env_interpolate} = 1;
+ meta->prop->{env}->{PERL} = '%{perl}';
 
 =item local_source
 
@@ -2002,6 +2020,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

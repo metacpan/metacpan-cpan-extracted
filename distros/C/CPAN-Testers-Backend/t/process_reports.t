@@ -34,6 +34,14 @@ my $schema = CPAN::Testers::Schema->connect(
     { ignore_version => 1 },
 );
 $schema->deploy;
+$schema->storage->dbh->do(q{
+CREATE TABLE `page_requests` (
+  `type` varchar(8) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `weight` int(2) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id` int(10) unsigned DEFAULT '0'
+)});
 
 use DBI;
 my $metabase_dbh = DBI->connect( 'dbi:SQLite::memory:', undef, undef, { RaiseError => 1 } );
@@ -256,6 +264,15 @@ subtest run => sub {
         is $tester_row->{fullname}, 'Andreas J. Koenig', 'tester name is correct';
         is $tester_row->{email}, 'andreas.koenig.gmwojprw@franz.ak.mind.de', 'tester email is correct';
 
+        my @page_requests = $schema->storage->dbh->selectall_array(
+            'SELECT type, name, weight, id FROM page_requests', { Slice => {} },
+        );
+        is_deeply \@page_requests,
+            [
+                { type => 'author', name => 'YUKI', weight => 1, id => $cache_row->{id} },
+                { type => 'distro', name => 'Sorauta-SVN-AutoCommit', weight => 1, id => $cache_row->{id} },
+            ],
+            'page_requests are correct';
     };
 
     subtest 'process a single report' => sub {

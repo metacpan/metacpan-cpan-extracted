@@ -1,6 +1,6 @@
 package Ref::Util::XS;
 # ABSTRACT: XS implementation for Ref::Util
-$Ref::Util::XS::VERSION = '0.116';
+$Ref::Util::XS::VERSION = '0.117';
 use strict;
 use warnings;
 use XSLoader;
@@ -42,6 +42,27 @@ our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );
 
 XSLoader::load('Ref::Util::XS', $Ref::Util::XS::{VERSION} ? ${ $Ref::Util::XS::{VERSION} } : ());
 
+if (_using_custom_ops()) {
+  for my $op (@{$EXPORT_TAGS{all}}) {
+    no strict 'refs';
+    *{"B::Deparse::pp_$op"} = sub {
+      my ($deparse, $bop, $cx) = @_;
+      my @kids = $deparse->deparse($bop->first, 6);
+      my $sib = $bop->first->sibling;
+      if (ref $sib ne 'B::NULL') {
+        push @kids, $deparse->deparse($sib, 6);
+      }
+      my $prefix
+        = (
+          exists &{"$deparse->{curstash}::$op"}
+          && \&{"$deparse->{curstash}::$op"} == \&{__PACKAGE__.'::'.$op}
+        )
+        ? '' : (__PACKAGE__.'::');
+      return "$prefix$op(" . join(", ", @kids) . ")";
+    };
+  }
+}
+
 1;
 
 __END__
@@ -56,7 +77,7 @@ Ref::Util::XS - XS implementation for Ref::Util
 
 =head1 VERSION
 
-version 0.116
+version 0.117
 
 =head1 SYNOPSIS
 
@@ -76,10 +97,10 @@ Ref::Util::XS is the XS implementation of Ref::Util, which provides several
 functions to help identify references in a more convenient way than the
 usual approach of examining the return value of C<ref>.
 
-You should use Ref::Util::XS by installing Ref::Util itself: if the system
-you install it on has a C compiler available, Ref::Util::XS will be
+You should use L<Ref::Util::XS> by installing L<Ref::Util> itself: if the system
+you install it on has a C compiler available, C<Ref::Util::XS> will be
 installed and used automatically, providing a significant speed boost to
-everything that uses Ref::Util.
+everything that uses C<Ref::Util>.
 
 See L<Ref::Util> for full documentation of the available functions.
 
@@ -105,7 +126,7 @@ The following people have been invaluable in their feedback and support.
 
 =back
 
-=head1 AUTHORS
+=head1 AUTHORS AND MAINTAINERS
 
 =over 4
 
@@ -116,6 +137,10 @@ The following people have been invaluable in their feedback and support.
 =item * Sawyer X
 
 =item * Gonzalo Diethelm
+
+=item * Karen Etheridge
+
+=item * Graham Knop
 
 =item * p5pclub
 
@@ -150,11 +175,15 @@ Gonzalo Diethelm <gonzus@cpan.org>
 
 Karen Etheridge <ether@cpan.org>
 
+=item *
+
+Graham Knop <haarg@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sawyer X.
+This software is Copyright (c) 2018 by Sawyer X.
 
 This is free software, licensed under:
 

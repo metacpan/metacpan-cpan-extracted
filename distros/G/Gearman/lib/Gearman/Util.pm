@@ -1,6 +1,6 @@
 package Gearman::Util;
 use version ();
-$Gearman::Util::VERSION = version->declare("2.004.012");
+$Gearman::Util::VERSION = version->declare("2.004.0013");
 
 use strict;
 use warnings;
@@ -116,13 +116,18 @@ sub read_res_packet {
     my $err_ref    = shift;
     my $timeout    = shift;
     my $time_start = Time::HiRes::time();
-
-    Scalar::Util::blessed($sock)
-        || die "provided value is not a blessed object";
+    unless (Scalar::Util::blessed($sock)) {
+        # for the sake of Gearman::Client::Async
+        # see https://github.com/p-alik/perl-Gearman/issues/37
+        (ref($sock) eq "GLOB") || die "provided value is not a blessed object";
+        ($$sock && $$sock eq '*Gearman::Worker::$sock')
+            || die
+            "provided value is not a GLOB of type Gearman::Worker::\$sock";
+    } ## end unless (Scalar::Util::blessed...)
 
     my $err = sub {
         my $code = shift;
-        $sock->close() if $sock->connected;
+        Scalar::Util::blessed($sock) && $sock->close() if $sock->connected;
         $$err_ref = $code if ref $err_ref;
         return undef;
     };

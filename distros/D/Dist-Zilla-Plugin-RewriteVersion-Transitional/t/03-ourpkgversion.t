@@ -10,9 +10,7 @@ use Path::Tiny;
 
 use Test::Needs 'Dist::Zilla::Plugin::OurPkgVersion';
 
-delete $ENV{RELEASE_STATUS};
-delete $ENV{TRIAL};
-delete $ENV{V};
+delete @ENV{qw(RELEASE_STATUS TRIAL V)};
 
 my $captured_args;
 {

@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: CMake plugin for Alien::Build
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 sub cmake_generator
@@ -127,7 +127,7 @@ Alien::Build::Plugin::Build::CMake - CMake plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -255,6 +255,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

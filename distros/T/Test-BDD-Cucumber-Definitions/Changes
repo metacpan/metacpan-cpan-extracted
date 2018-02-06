@@ -1,5 +1,15 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.08    2019-02-05
+        - Functions in Util modules check parameters using types from the TypeConstraints module
+
+0.07    2018-02-03
+        [ HTTP ]
+        - Added functions for checking decoded content
+
+        [ Data ]
+        - The function for decoding structured data uses decoded content
+
 0.06    2018-01-13
         - The definition "http response content must be" and the function "content_eq" was added
 

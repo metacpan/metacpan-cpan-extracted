@@ -14,7 +14,8 @@ SKIP: {
         skip "sort of required Cwd", $ntests;
     }
 
-    require "t/remote.pl";    
+    use lib '.';   # needed for perl 5.26.0
+    require "t/remote.pl";
     my $sshd = get_test_sshd();
     if (!$sshd) {
         diag "Tests t/49* require access to a remote or mock-remote ssh server.";
@@ -35,7 +36,7 @@ SKIP: {
     my $rhost = $sshd->host;
     my $ruser = $sshd->user;
     my $rport = $sshd->port;
-    my $rhostx = $ruser . '@' . $rhost;
+    my $rhostx = $ruser ? $ruser . '@' . $rhost : $rhost;
     $rhostx .= ":" . $rport if $rport;
     my $rpwd = $sshd->password;
     my $ids = $sshd->key_path;

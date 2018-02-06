@@ -1,0 +1,39 @@
+{
+   "abstract" : "Support for beautifying/compressing JSON directly in Padre.",
+   "author" : [
+      "Adam Harrison <adamdharrison@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-JSONUtilities",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "JSON" : "0",
+            "Padre" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Padre::Plugin::JSONUtilities" : {
+         "file" : "lib/Padre/Plugin/JSONUtilities.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

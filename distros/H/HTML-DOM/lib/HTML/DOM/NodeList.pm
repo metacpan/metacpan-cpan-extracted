@@ -6,7 +6,7 @@ use overload fallback => 1, '@{}' => sub { ${$_[0]} };
 
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 # new NodeList \@array;
@@ -31,7 +31,7 @@ HTML::DOM::NodeList - Simple node list class for HTML::DOM
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

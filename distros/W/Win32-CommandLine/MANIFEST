@@ -1,3 +1,10 @@
+.appveyor.install-perl.BAT
+.appveyor.yml
+.codecov.yml
+.editorconfig
+.mailmap
+.perlcriticrc
+.travis.yml
 bin/xx.bat
 Build.PL
 Build.PL.config
@@ -13,25 +20,25 @@ lib/Win32/CommandLine.pm
 lib/Win32/CommandLine.xs
 lib/Win32/typemap
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
 README
+README.mkd
 SIGNATURE
 t/00.signature.t
 t/01.load.t
-t/10.namespace.t
 t/11.commandline.t
 t/12.argv-ENVnullglob-f.t
 t/12.argv-ENVnullglob-t.t
 t/12.argv-tilde.t
 t/12.argv.t
-t/12.argv.t.o
 t/13.xx.t
-t/90.pod-coverage.t
-t/90.pod.t
+t/14.subshells.t
+t/90.exports.t
+t/91.pod-coverage.t
+t/91.pod.t
 t/97.license.t
 t/97.meta.t
 t/97.perl-minv.t
@@ -61,3 +68,4 @@ t/glob-file.tests/TESTFILE.{a}.txt
 t/glob-file.tests/TESTFILE.{b}.txt
 t/ltrim.t
 t/test.t
+VERSION

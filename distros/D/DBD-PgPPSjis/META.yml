@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: DBD-PgPPSjis
 abstract: Pure Perl PostgreSQL driver for (not raw) ShiftJIS
-version: 0.0801001
+version: 0.0801003
 author:
   - INABA Hitoshi <ina@cpan.org>
 license: perl

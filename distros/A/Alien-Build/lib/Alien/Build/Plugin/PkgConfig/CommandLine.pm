@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using the pkg-config command line interface
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -63,6 +63,11 @@ sub init
   my($self, $meta) = @_;
   
   my $pkgconf = $self->bin_name;
+
+  unless(defined $meta->prop->{env}->{PKG_CONFIG})
+  {
+    $meta->prop->{env}->{PKG_CONFIG} = $pkgconf;
+  }
 
   my($pkg_name, @alt_names) = (ref $self->pkg_name) ? (@{ $self->pkg_name }) : ($self->pkg_name);
   
@@ -152,7 +157,7 @@ Alien::Build::Plugin::PkgConfig::CommandLine - Probe system and determine librar
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -244,6 +249,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

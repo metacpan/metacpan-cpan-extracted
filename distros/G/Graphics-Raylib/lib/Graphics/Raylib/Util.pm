@@ -2,12 +2,22 @@ use strict;
 use warnings;
 package Graphics::Raylib::Util;
 
-# ABSTRACT: Utility functions for use With Graphics::Raylib:XS
-our $VERSION = '0.012'; # VERSION
+# ABSTRACT: Utility functions for use With Graphics::Raylib::XS
+our $VERSION = '0.014'; # VERSION
 
-use List::Util qw(min max);
+use List::Util qw(reduce);
 use Graphics::Raylib::XS qw(:all);
+use Scalar::Util 'blessed';
 use Carp;
+
+require Exporter;
+our @ISA = qw(Exporter);
+our %EXPORT_TAGS = (objects => [qw(vector rectangle camera)]);
+Exporter::export_ok_tags(qw(objects));
+{
+    my %seen;
+    push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
+}
 
 =pod
 
@@ -15,12 +25,12 @@ use Carp;
 
 =head1 NAME
 
-Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib:XS
+Graphics::Raylib::Util - Utility functions for use With Graphics::Raylib::XS
 
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -41,15 +51,41 @@ Raylib deals a lot in value-passed structs. This module builds these structs.
 
 Constructs a C<Graphics::Raylib::XS::Vector2> or C<Graphics::Raylib::XS::Vector3> depending on number of arguments. Croaks otherwise.
 
+    typedef struct Vector2 {
+        float x;
+        float y;
+    } Vector2;
+
+    typedef struct Vector3 {
+        float x;
+        float y;
+        float z;
+    } Vector3;
+
 =cut
 
 sub vector {
-    my $vector = @_ == 2 ? bless \pack("f2", @_), 'Graphics::Raylib::XS::Vector2'
-               : @_ == 3 ? bless \pack("f3", @_), 'Graphics::Raylib::XS::Vector3'
+    my @coords = @_;
+    if (@coords == 1) {
+        my $obj = $coords[0];
+        if (ref($obj) eq 'ARRAY') {
+            @coords = @$obj;
+        } elsif (blessed($obj)) {
+            return $obj if $obj->isa("Graphics::Raylib::XS::Vector2");
+            return $obj if $obj->isa("Graphics::Raylib::XS::Vector3");
+        }
+    }
+
+    my $vector = @coords == 2 ? __vector2(pack("f2", @coords))
+               : @coords == 3 ? __vector3(pack("f3", @coords))
                : croak "Only Graphics::Raylib::XS::{Vector2,Vector3} types may be constructed";
 
     return $vector;
 }
+sub __vector2 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector2' }
+sub __vector3 { my $binstr = shift; bless \$binstr, 'Graphics::Raylib::XS::Vector3' }
+
+sub vabs { sqrt reduce { $a + $b } map({ $_ ** 2 } $_[0]->components) }
 
 {
     package Graphics::Raylib::XS::Vector2;
@@ -60,7 +96,16 @@ sub vector {
         my ($self) = @_;
         return sprintf '(%d, %d)', $self->components;
     }
-    use overload fallback => 1, '""' => 'stringify';
+    sub add {
+        my ($self, $other, $swap) = @_;
+        return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y);
+    }
+    sub equal {
+        my ($self, $other) = @_;
+        $$self eq $$other
+    }
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use constant Zero => Graphics::Raylib::Util::vector(0,0);
 
     package Graphics::Raylib::XS::Vector3;
     sub x { return unpack(     "f", ${$_[0]}) }
@@ -71,18 +116,30 @@ sub vector {
         my ($self) = @_;
         return sprintf '(%d, %d, %d)', $self->components;
     }
-    use overload fallback => 1, '""' => 'stringify';
-
+    sub add {
+        my ($self, $other, $swap) = @_;
+        return Graphics::Raylib::Util::vector($self->x + $other->x, $self->y + $other->y, $self->z + $other->z);
+    }
+    sub equal {
+        my ($self, $other) = @_;
+        $$self eq $$other
+    }
+    use overload fallback => 1, '""' => 'stringify', '+' => 'add', '==' => 'equal', 'abs' => 'Graphics::Raylib::Util::vabs';
+    use constant Zero => Graphics::Raylib::Util::vector(0,0,0);
 }
 
-=item rectangle(x => $x, y => $y, width => $width, height => $height)
+
+=item rectangle(x => $x, y => $y, width => $width, height => $height) or rectangle(position => $posVector2, size => $sizeVector2)
 
 Constructs a C<Graphics::Raylib::XS::Rectangle>.
 
 =cut
 
 sub rectangle {
-    my %p = ( x => 0, y => 0, height => 1, width => 1, @_ );
+    my %p = ( @_ );
+    ($p{x}, $p{y}) = ($p{position}->x, $p{position}->y) if defined $p{position};
+    ($p{width}, $p{height}) = ($p{size}->x, $p{size}->y) if defined $p{size};
+
     return bless \pack("i4", $p{x}, $p{y}, $p{width}, $p{height}), 'Graphics::Raylib::XS::Rectangle'
 }
 
@@ -98,6 +155,50 @@ sub rectangle {
     sub stringify {
         my ($p) = $_[0]->components;
         return sprintf '(x: %d, y: %d, width: %d, height: %d)', $p->{x}, $p->{y}, $p->{width}, $p->{height};
+    }
+    sub collides {
+        Graphics::Raylib::XS::CheckCollisionRecs(shift, shift)
+    }
+    use overload fallback => 1, '""' => 'stringify', 'x' => 'collides';
+}
+
+=item camera(position => $pos3d, target => $target3d, up => $up3d, fovy => $fovy)
+
+Constructs a C<Graphics::Raylib::XS::Camera>.
+
+    typedef struct Camera {
+        Vector3 position;
+        Vector3 target;
+        Vector3 up;
+        float fovy;
+    } Camera;
+
+=cut
+
+sub camera {
+    use constant ZERO => Graphics::Raylib::XS::Vector3::Zero;
+    my %p = (position => ZERO, target => ZERO, up => ZERO, fovy => 0, @_);
+    ($p{position}, $p{target}, $p{up})
+        = map { Graphics::Raylib::Util::vector($_) } $p{position}, $p{target}, $p{up};
+
+    my $camera = ${$p{position}}.${$p{target}}.${$p{up}}.pack('f', $p{fovy});
+    return bless \$camera, 'Graphics::Raylib::XS::Camera';
+}
+
+{
+    package Graphics::Raylib::XS::Camera;
+    sub position { return Graphics::Raylib::Util::vector(unpack(      "f3", ${$_[0]})) }
+    sub target   { return Graphics::Raylib::Util::vector(unpack("x[f3] f3", ${$_[0]})) }
+    sub up       { return Graphics::Raylib::Util::vector(unpack("x[f6] f3", ${$_[0]})) }
+    sub fovy     { return                                unpack("x[f9] f",  ${$_[0]})  }
+    sub components {
+        my $self = shift;
+        return {position=>$self->position, target=>$self->target, up=>$self->up, fovy=>$self->fovy}
+    }
+    sub stringify {
+        my ($c) = $_[0]->components;
+        return sprintf '(position: %s, target: %s, up: %s, fovy: %s)',
+                        $c->{position}, $c->{target}, $c->{up}, $c->{fovy};
     }
     use overload fallback => 1, '""' => 'stringify';
 }

@@ -57,16 +57,12 @@ WriteMakefile(
       'ABSTRACT' => 'Print a stack trace whenever a system call is made',
   'AUTHOR' => 'Rob Hoelz <rob@hoelz.ro>',
   'LICENSE' => 'perl',
-  'VERSION' => '0.04',
+  'VERSION' => '0.05',
       'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '0'
   },
   'TEST_REQUIRES' => {
-    'File::Spec' => '0',
-    'IO::Handle' => '0',
-    'IPC::Open3' => '0',
-    'Test::Differences' => '0.61',
-    'Test::More' => '0'
+    'Test::Differences' => '0.61'
   },
     LIBS           => [''],
     DEFINE         => '',

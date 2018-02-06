@@ -29,5 +29,6 @@ add_stopwords(qw/
     NSW
     Hornsby
     dist
+    PL
 /);
 all_pod_files_spelling_ok();

@@ -1,7 +1,9 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::DH
 
+PROTOTYPES: DISABLE
+
 Crypt::PK::DH
-_new()
+_new(Class)
     CODE:
     {
         int rv;
@@ -208,7 +210,7 @@ key2hash(Crypt::PK::DH self)
         not_used = hv_store(rv_hash, "size", 4, newSViv(dh_get_groupsize(&self->key)), 0);
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
-        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
+        LTC_UNUSED_PARAM(not_used);
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL

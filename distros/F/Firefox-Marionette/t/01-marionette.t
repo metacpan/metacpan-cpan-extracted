@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 169;
+use Test::More tests => 174;
 use Cwd();
 use Firefox::Marionette();
 use Config;
@@ -36,7 +36,7 @@ sub start_firefox {
 			diag("ulimit -a | grep -i mem");
 			diag(`ulimit -a | grep -i mem`);
 		}
-		sleep 5; # magic number.  No science behind it. Trying to give time to allow OS/firefox to recover
+		sleep 5 + int rand 5; # magic number.  No science behind it. Trying to give time to allow OS/firefox to recover (5-9 seconds)
 		$firefox = undef;
 		eval {
 			$firefox = Firefox::Marionette->new(%parameters);
@@ -50,11 +50,25 @@ sub start_firefox {
 		if (($^O eq 'MSWin32') || ($^O eq 'cygwin') || ($^O eq 'darwin')) {
 			diag("Failed to start in $^O:$exception");
 		} else {
-			`Xvfb -help 2>/dev/null >/dev/null`;
-			if ($? == 0) {
-				diag("Failed to start with a working Xvfb:$exception");
+			`Xvfb -help 2>/dev/null | grep displayfd`;
+			if ($? == 1) {
+				`dbus-launch 2>/dev/null >/dev/null`;
+				if ($? == 0) {
+					if ($^O eq 'freebsd') {
+						my $mount = `mount`;
+						if ($mount =~ /fdescfs/) {
+							diag("Failed to start with fdescfs mounted and a working Xvfb and D-Bus:$exception");
+						} else {
+							$skip_message = "Unable to launch a visible firefox in $^O without fdescfs mounted:$exception";
+						}
+					} else {
+						diag("Failed to start with a working Xvfb and D-Bus:$exception");
+					}
+				} else {
+					$skip_message = "Unable to launch a visible firefox in $^O with an incorrectly setup D-Bus:$exception";
+				}
 			} elsif ($require_visible) {
-				$skip_message = "Unable to launch firefox in $^O with at least Xvfb:$exception";
+				$skip_message = "Unable to launch a visible firefox in $^O without Xvfb:$exception";
 			}
 		}
 	}
@@ -97,18 +111,32 @@ if ($^O eq 'MSWin32') {
 	if (exists $ENV{DISPLAY}) {
 		diag("DISPLAY is $ENV{DISPLAY}");
 	}
-	if ($^O =~ /bsd/i) {
+	`dbus-launch >/dev/null`;
+	if ($? == 0) {
+		diag("D-Bus is working");
+	} else {
+		diag("D-Bus appears to be broken.  'dbus-launch' was unable to successfully complete:$?");
+	}
+	if ($^O eq 'freebsd') {
 		`pkg -v >/dev/null 2>/dev/null`;
 		if ($? == 0) {
 			diag("pkg -v is " . `pkg -v`);
-			diag("pkg info xorg-vfbserver is " . `pkg info xorg-vfbserver`);
-			diag("pkg info xkeyboard-config is " . `pkg info xkeyboard-config`);
-			diag("pkg info xkbcomp is " . `pkg info xkbcomp`);
-			diag("pkg info xorg-fonts is " . `pkg info xorg-fonts`);
+			diag("xorg-vfbserver version is " . `pkg info xorg-vfbserver | perl -nle 'print "\$1" if (/Version\\s+:\\s+(\\S+)\\s*/);'`);
+			diag("xkeyboard-config version is " . `pkg info xkeyboard-config | perl -nle 'print "\$1" if (/Version\\s+:\\s+(\\S+)\\s*/);'`);
+			diag("xkbcomp version is " . `pkg info xkbcomp | perl -nle 'print "\$1" if (/Version\\s+:\\s+(\\S+)\\s*/);'`);
+			diag("xauth version is " . `pkg info xauth | perl -nle 'print "\$1" if (/Version\\s+:\\s+(\\S+)\\s*/);'`);
+			diag("xorg-fonts version is " . `pkg info xorg-fonts | perl -nle 'print "\$1" if (/Version\\s+:\\s+(\\S+)\\s*/);'`);
 		} else {
 			diag("pkg does not seem to be supported in $^O");
 		}
-	} else {
+		print "mount | grep fdescfs\n";
+		my $result = `mount | grep fdescfs`;
+		if ($result =~ /fdescfs/) {
+			diag("fdescfs has been mounted.  /dev/fd/ should work correctly for xvfb/xauth");
+		} else {
+			diag("It looks like 'sudo mount -t fdescfs fdesc /dev/fd' needs to be executed")
+		}
+	} elsif ($^O eq 'linux') {
 		`dpkg --help >/dev/null 2>/dev/null`;
 		if ($? == 0) {	
 			diag("DPKG version is " . `dpkg -s Xvfb | perl -nle 'print if s/^Version:[ ]//smx'`);
@@ -119,6 +147,17 @@ if ($^O eq 'MSWin32') {
 			}
 		}
 	}
+}
+if ($^O eq 'linux') {
+	diag("grep -r Mem /proc/meminfo");
+	diag(`grep -r Mem /proc/meminfo`);
+	diag("ulimit -a | grep -i mem");
+	diag(`ulimit -a | grep -i mem`);
+} elsif ($^O =~ /bsd/i) {
+	diag("sysctl hw | egrep 'hw.(phys|user|real)'");
+	diag(`sysctl hw | egrep 'hw.(phys|user|real)'`);
+	diag("ulimit -a | grep -i mem");
+	diag(`ulimit -a | grep -i mem`);
 }
 my $count = 0;
 foreach my $name (Firefox::Marionette::Profile->names()) {
@@ -145,6 +184,7 @@ chomp $@;
 ok((($@) and (not($firefox))), "Firefox::Marionette->new() threw an exception when launched with a path to a non firefox binary:$@");
 my $skip_message;
 my $at_least_one_success;
+my ($major_version, $minor_version, $patch_version); 
 SKIP: {
 	($skip_message, $firefox) = start_firefox(0, debug => 1);
 	if (!$skip_message) {
@@ -156,6 +196,7 @@ SKIP: {
 	ok($firefox, "Firefox has started in Marionette mode");
 	my $capabilities = $firefox->capabilities();
 	diag("Browser version is " . $capabilities->browser_version());
+	($major_version, $minor_version, $patch_version) = split /[.]/smx, $capabilities->browser_version(); 
 	diag("Operating System is " . $capabilities->platform_name() . q[ ] . $capabilities->platform_version());
 	diag("Profile Directory is " . $capabilities->moz_profile());
 	diag("Mozilla PID is " . $capabilities->moz_process_id());
@@ -175,7 +216,10 @@ SKIP: {
 	ok($old->pos_y() =~ /^\-?\d+([.]\d+)?$/, "Window has a Y position of " . $old->pos_y());
 	ok($old->width() =~ /^\d+([.]\d+)?$/, "Window has a width of " . $old->width());
 	ok($old->height() =~ /^\d+([.]\d+)?$/, "Window has a height of " . $old->height());
-	ok($old->wstate() =~ /^\w+$/, "Window has a state of " . $old->wstate());
+	TODO: {
+		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_rect()->wstate()" : q[];
+		ok(defined $old->wstate() && $old->wstate() =~ /^\w+$/, "Window has a state of " . ($old->wstate() || q[]));
+	}
 	my $rect = $firefox->window_rect();
 	ok($rect->pos_x() =~ /^[-]?\d+([.]\d+)?$/, "Window has a X position of " . $rect->pos_x());
 	ok($rect->pos_y() =~ /^[-]?\d+([.]\d+)?$/, "Window has a Y position of " . $rect->pos_y());
@@ -199,13 +243,17 @@ SKIP: {
 	ok($firefox->alive(), "Firefox is still alive");
 	ok($firefox->close_current_window_handle(), "Closed new tab/window");
 	ok($firefox->delete_session()->new_session(), "\$firefox->delete_session()->new_session() has cleared the old session and created a new session");
-	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
-	ok($firefox->child_error() == 0, "Firefox returns 0 for the child error:" . $firefox->child_error());
+	my $child_error = $firefox->quit();
+	if ($child_error != 0) {
+		diag("Firefox exited with a \$? of $child_error");
+	}
+	ok($child_error =~ /^\d+$/, "Firefox has closed with an integer exit status of " . $child_error);
+	ok($firefox->child_error() == $child_error, "Firefox returns $child_error for the child error, matching the return value of quit():$child_error:" . $firefox->child_error());
 	ok(!$firefox->alive(), "Firefox is not still alive");
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
+	($skip_message, $firefox) = start_firefox(0, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -217,7 +265,10 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->page_load_strategy() eq 'eager', "\$capabilities->page_load_strategy() is 'eager'");
 	ok($capabilities->accept_insecure_certs() == 1, "\$capabilities->accept_insecure_certs() is set to true");
-	ok($capabilities->moz_webdriver_click() == 1, "\$capabilities->moz_webdriver_click() is set to true");
+	TODO: {
+		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+		ok($capabilities->moz_webdriver_click() == 1, "\$capabilities->moz_webdriver_click() is set to true");
+	}
 	ok($capabilities->moz_accessibility_checks() == 1, "\$capabilities->moz_accessibility_checks() is set to true");
 	ok($capabilities->moz_headless() == 1, "\$capabilities->moz_headless() is set to true");
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());
@@ -232,7 +283,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 106);
+		skip($skip_message, 107);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -286,12 +337,12 @@ SKIP: {
 	TODO: {
 		my $element;
 		eval {
-			$element = $firefox->find_element('//frame[@name="target1"]')->switch_to_shadow_root();
+			$element = $firefox->find('//frame[@name="target1"]')->switch_to_shadow_root();
 		};
 		local $TODO = "Switch to shadow root can be broken";
 		ok($element, "Switched to target1 shadow root");
 	}
-	ok($firefox->find_element('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
+	ok($firefox->find('//frame[@name="target1"]')->switch_to_frame(), "Switched to target1 frame");
 	ok($firefox->active_frame()->isa('Firefox::Marionette::Element'), "\$firefox->active_frame() returns a Firefox::Marionette::Element object");
 	ok($firefox->switch_to_parent_frame(), "Switched to parent frame");
 	foreach my $handle ($firefox->close_current_chrome_window_handle()) {
@@ -305,30 +356,35 @@ SKIP: {
 	ok($firefox->context('chrome') eq 'content', "Initial context of the browser is 'content'");
 	ok($firefox->context('content') eq 'chrome', "Changed context of the browser is 'chrome'");
 	ok($firefox->page_source() =~ /lucky/smx, "metacpan.org contains the phrase 'lucky' in page source");
+	ok($firefox->html() =~ /lucky/smx, "metacpan.org contains the phrase 'lucky' in html");
 	ok($firefox->refresh(), "\$firefox->refresh()");
 	my $element = $firefox->active_element();
 	ok($element, "\$firefox->active_element() returns an element");
 	ok(not(defined $firefox->active_frame()), "\$firefox->active_frame() is undefined for " . $firefox->uri());
-	ok($firefox->find_element('//input[@id="search-input"]')->send_keys('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
+	ok($firefox->find('//input[@id="search-input"]')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
 	my $autofocus;
 	ok($autofocus = $firefox->find_element('//input[@id="search-input"]')->attribute('autofocus'), "The value of the autofocus attribute is '$autofocus'");
-	ok($autofocus = $firefox->find_element('//input[@id="search-input"]')->property('autofocus'), "The value of the autofocus property is '$autofocus'");
+	ok($autofocus = $firefox->find('//input[@id="search-input"]')->property('autofocus'), "The value of the autofocus property is '$autofocus'");
 	my $css_rule;
-	ok($css_rule = $firefox->find_element('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
+	ok($css_rule = $firefox->find('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
 	my $result;
-	ok($result = $firefox->find_element('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
-	ok($result = $firefox->find_element('//input[@id="search-input"]')->is_displayed() =~ /^[01]$/, "is_displayed returns 0 or 1:$result");
-	ok($result = $firefox->find_element('//input[@id="search-input"]')->is_selected() =~ /^[01]$/, "is_selected returns 0 or 1:$result");
-	ok($firefox->find_element('//input[@id="search-input"]')->clear(), "Clearing the element directly");
+	ok($result = $firefox->find('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
+	ok($result = $firefox->find('//input[@id="search-input"]')->is_displayed() =~ /^[01]$/, "is_displayed returns 0 or 1:$result");
+	ok($result = $firefox->find('//input[@id="search-input"]')->is_selected() =~ /^[01]$/, "is_selected returns 0 or 1:$result");
+	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
+	ok($firefox->find('//input[@id="search-input"]')->send_keys('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
+	ok($firefox->find('//input[@id="search-input"]')->clear(), "Clearing the element directly");
 	foreach my $element ($firefox->find_elements('//input[@id="search-input"]')) {
 		ok($firefox->send_keys($element, 'Test::More'), "Sent 'Test::More' to the 'search-input' field via the browser");
+		ok($firefox->clear($element), "Clearing the element via the browser");
+		ok($firefox->type($element, 'Test::More'), "Sent 'Test::More' to the 'search-input' field via the browser");
 		last;
 	}
-	my $text = $firefox->find_element('//button[@name="lucky"]')->text();
+	my $text = $firefox->find('//button[@name="lucky"]')->text();
 	ok($text, "Read '$text' directly from 'Lucky' button");
-	my $tag_name = $firefox->find_element('//button[@name="lucky"]')->tag_name();
+	my $tag_name = $firefox->find('//button[@name="lucky"]')->tag_name();
 	ok($tag_name, "'Lucky' button has a tag name of '$tag_name'");
-	my $rect = $firefox->find_element('//button[@name="lucky"]')->rect();
+	my $rect = $firefox->find('//button[@name="lucky"]')->rect();
 	ok($rect->pos_x() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a X position of " . $rect->pos_x());
 	ok($rect->pos_y() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a Y position of " . $rect->pos_y());
 	ok($rect->width() =~ /^\d+([.]\d+)?$/, "'Lucky' button has a width of " . $rect->width());
@@ -341,25 +397,25 @@ SKIP: {
 	$handle->read($buffer, 20);
 	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->selfie() returns a PNG file");
 	$buffer = undef;
-	$handle = $firefox->find_element('//button[@name="lucky"]')->selfie();
+	$handle = $firefox->find('//button[@name="lucky"]')->selfie();
 	$handle->read($buffer, 20);
-	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->find_element('//button[\@name=\"lucky\"]')->selfie() returns a PNG file");
-	my $actual_digest = $firefox->selfie(hash => 1, highlights => [ $firefox->find_element('//button[@name="lucky"]') ]);
-	ok($actual_digest =~ /^[a-f0-9]+$/smx, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find_element('//button[\@name=\"lucky\"]') ]) returns a hex encoded SHA256 digest");
-	$handle = $firefox->selfie(highlights => [ $firefox->find_element('//button[@name="lucky"]') ]);
+	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->find('//button[\@name=\"lucky\"]')->selfie() returns a PNG file");
+	my $actual_digest = $firefox->selfie(hash => 1, highlights => [ $firefox->find('//button[@name="lucky"]') ]);
+	ok($actual_digest =~ /^[a-f0-9]+$/smx, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns a hex encoded SHA256 digest");
+	$handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ]);
 	$buffer = undef;
 	$handle->read($buffer, 20);
-	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->selfie(highlights => [ \$firefox->find_element('//button[\@name=\"lucky\"]') ]) returns a PNG file");
+	ok($buffer =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/smx, "\$firefox->selfie(highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns a PNG file");
 	$handle->seek(0,0) or die "Failed to seek:$!";
 	$handle->read($buffer, 1_000_000) or die "Failed to read:$!";
 	my $correct_digest = Digest::SHA::sha256_hex(MIME::Base64::encode_base64($buffer, q[]));
 	TODO: {
 		local $TODO = "Digests can sometimes change for all platforms";
-		ok($actual_digest eq $correct_digest, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find_element('//button[\@name=\"lucky\"]') ]) returns the correct hex encoded SHA256 hash of the base64 encoded image");
+		ok($actual_digest eq $correct_digest, "\$firefox->selfie(hash => 1, highlights => [ \$firefox->find('//button[\@name=\"lucky\"]') ]) returns the correct hex encoded SHA256 hash of the base64 encoded image");
 	}
 	my $clicked;
 	while ($firefox->uri() eq 'https://metacpan.org/') {
-		ELEMENT: foreach my $element ($firefox->find_elements('//a[@href="https://fastapi.metacpan.org"]')) {
+		ELEMENT: foreach my $element ($firefox->list('//a[@href="https://fastapi.metacpan.org"]')) {
 			$clicked = 1;
 			$firefox->click($element);
 			last ELEMENT;
@@ -370,7 +426,10 @@ SKIP: {
 	my @cookies = $firefox->cookies();
 	ok($cookies[0]->name() =~ /\w/, "The first cookie name is '" . $cookies[0]->name() . "'");
 	ok($cookies[0]->value() =~ /\w/, "The first cookie value is '" . $cookies[0]->value() . "'");
-	ok($cookies[0]->expiry() =~ /^\d+$/, "The first cookie name has an integer expiry date of '" . $cookies[0]->expiry() . "'");
+	TODO: {
+		local $TODO = ($major_version < 56) ? "\$cookies[0]->expiry() does not function for Firefox versions less than 56" : q[];
+		ok(defined $cookies[0]->expiry() && $cookies[0]->expiry() =~ /^\d+$/, "The first cookie name has an integer expiry date of '" . ($cookies[0]->expiry() || q[]) . "'");
+	}
 	ok($cookies[0]->http_only() =~ /^[01]$/, "The first cookie httpOnly flag is a boolean set to '" . $cookies[0]->http_only() . "'");
 	ok($cookies[0]->secure() =~ /^[01]$/, "The first cookie secure flag is a boolean set to '" . $cookies[0]->secure() . "'");
 	ok($cookies[0]->path() =~ /\S/, "The first cookie path is a string set to '" . $cookies[0]->path() . "'");
@@ -388,7 +447,7 @@ SKIP: {
 	ok($firefox->script('return window.find("lucky");'), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
-	foreach my $element ($firefox->find_elements('//button[@name="lucky"]')) {
+	foreach my $element ($firefox->list('//button[@name="lucky"]')) {
 		ok($firefox->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	}
 	my $alert_text = 'testing alert';
@@ -429,7 +488,10 @@ SKIP: {
 	ok($capabilities->browser_version() =~ /^\d+[.]\d+([.]\d+)?$/, "\$capabilities->browser_version() is a major.minor.patch version number:" . $capabilities->browser_version());
 	ok($capabilities->platform_version() =~ /\d+/, "\$capabilities->platform_version() contains a number:" . $capabilities->platform_version());
 	ok($capabilities->moz_profile() =~ /firefox_marionette/, "\$capabilities->moz_profile() contains 'firefox_marionette':" . $capabilities->moz_profile());
-	ok($capabilities->moz_webdriver_click() =~ /^(1|0)$/, "\$capabilities->moz_webdriver_click() is a boolean:" . $capabilities->moz_webdriver_click());
+	TODO: {
+		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+		ok($capabilities->moz_webdriver_click() =~ /^(1|0)$/, "\$capabilities->moz_webdriver_click() is a boolean:" . $capabilities->moz_webdriver_click());
+	}
 	ok($capabilities->platform_name() =~ /\w+/, "\$capabilities->platform_version() contains alpha characters:" . $capabilities->platform_name());
 	TODO: {
 		local $TODO = "\$firefox->dismiss_alert() not perfect yet";
@@ -470,7 +532,7 @@ SKIP: {
 }
 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0));
+	($skip_message, $firefox) = start_firefox(1, debug => 1, capabilities => Firefox::Marionette::Capabilities->new(moz_headless => 0, accept_insecure_certs => 0, page_load_strategy => 'none', moz_webdriver_click => 0, moz_accessibility_checks => 0));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
@@ -482,7 +544,10 @@ SKIP: {
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->page_load_strategy() eq 'none', "\$capabilities->page_load_strategy() is 'none'");
 	ok($capabilities->accept_insecure_certs() == 0, "\$capabilities->accept_insecure_certs() is set to false");
-	ok($capabilities->moz_webdriver_click() == 0, "\$capabilities->moz_webdriver_click() is set to false");
+	TODO: {
+		local $TODO = $major_version < 57 ? $capabilities->browser_version() . " probably does not have support for \$capabilities->moz_webdriver_click()" : q[];
+		ok($capabilities->moz_webdriver_click() == 0, "\$capabilities->moz_webdriver_click() is set to false");
+	}
 	ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
 	ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
 	ok($firefox->quit() == 0, "Firefox has closed with an exit status of 0:" . $firefox->child_error());

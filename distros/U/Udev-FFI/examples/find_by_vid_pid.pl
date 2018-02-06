@@ -34,9 +34,11 @@ $enumerate->scan_devices();
 my @a = $enumerate->get_list_entries();
 for(@a) {
     my $device = $udev->new_device_from_syspath($_);
-    printf "Syspath: %s\n", $_;
+    if(defined $device) {
+        printf "Syspath: %s\n", $_;
 
-    printf "Manufacturer: %s\n", $device->get_sysattr_value("manufacturer") // '';
-    printf "Product: %s\n", $device->get_sysattr_value("product") // '';
-    printf "Serial: %s\n\n", $device->get_sysattr_value("serial") // '';
+        printf "Manufacturer: %s\n", $device->get_sysattr_value("manufacturer") // '';
+        printf "Product: %s\n", $device->get_sysattr_value("product") // '';
+        printf "Serial: %s\n\n", $device->get_sysattr_value("serial") // '';
+    }
 }

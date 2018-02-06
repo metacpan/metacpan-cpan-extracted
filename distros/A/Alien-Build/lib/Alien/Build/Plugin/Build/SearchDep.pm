@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Text::ParseWords qw( shellwords );
 
 # ABSTRACT: Add dependencies to library and header search path
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 has aliens => {};
@@ -133,7 +133,7 @@ Alien::Build::Plugin::Build::SearchDep - Add dependencies to library and header 
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

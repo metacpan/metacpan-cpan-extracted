@@ -18,7 +18,7 @@ use SNMP::Info::Layer3;  # only used in sub mac()
 
 use vars qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE/;
 
-$VERSION = '3.40';
+$VERSION = '3.43';
 
 %MIBS = (
     %SNMP::Info::Layer2::MIBS,
@@ -276,6 +276,14 @@ Returns 'Ubiquiti Networks, Inc.'
 =item $ubnt->model()
 
 Returns the model extracted from C<dot11manufacturerProductName>, with failback to some complex logic for EdgeMax devices
+
+=item $ubnt->serial()
+
+Serial Number.
+
+=item $ubnt->mac()
+
+Bridge MAC address.
 
 =item $ubnt->os()
 

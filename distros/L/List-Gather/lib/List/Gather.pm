@@ -1,10 +1,10 @@
-package List::Gather; # git description: 0.12-22-gfb66ce5
+package List::Gather; # git description: 0.13-9-g4c4e5d3
 # ABSTRACT: Construct lists procedurally without temporary variables
 
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Devel::CallParser;
 use Devel::CallChecker;
@@ -86,7 +86,7 @@ use Sub::Exporter -setup => {
 #pod       $graph->visit_all_nodes_recursively(sub {
 #pod           my ($node) = @_;
 #pod           take $node if $node->is_leaf;
-#pod       }
+#pod       });
 #pod   };
 #pod
 #pod =func gather
@@ -171,7 +171,7 @@ List::Gather - Construct lists procedurally without temporary variables
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -273,7 +273,7 @@ C<gather> block is legal.
       $graph->visit_all_nodes_recursively(sub {
           my ($node) = @_;
           take $node if $node->is_leaf;
-      }
+      });
   };
 
 =head1 SEE ALSO
@@ -340,7 +340,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Father Chrysostomos David Mitchell Tony Cook
+=for stopwords Karen Etheridge Father Chrysostomos David Mitchell Tony Cook bay-max1
 
 =over 4
 
@@ -359,6 +359,10 @@ David Mitchell <davem@iabyn.com>
 =item *
 
 Tony Cook <tonyc@cpan.org>
+
+=item *
+
+bay-max1 <34803732+bay-max1@users.noreply.github.com>
 
 =back
 

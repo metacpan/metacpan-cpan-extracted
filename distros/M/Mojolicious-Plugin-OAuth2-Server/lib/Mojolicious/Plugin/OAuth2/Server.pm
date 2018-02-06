@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.39
+0.40
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -132,6 +132,29 @@ token and if the access token has the requisite scopes. The scopes are optional:
 
 This calls the L<Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant>
 module (C<verify_token_and_scope> method) to validate the access/refresh token.
+
+=head2 oauth2_auth_request
+
+This is a helper to allow you get get the redirect URI instead of directing
+a user to the authorize_route - it requires the details of the client:
+
+  my $redirect_uri = $c->oauth2_auth_request({
+    client_id     => $client_id,
+    redirect_uri  => 'https://foo',
+    response_type => 'token',
+    scope         => 'list,of,scopes',
+    state         => 'foo=bar&baz=boz',
+  });
+
+  if ( $redirect_uri ) {
+   # do something with $redirect_uri
+  } else {
+    # something didn't work, e.g. bad client, scopes, etc
+  }
+
+You can use this helper instead of directing a user to the authorize_route if
+you need to do something more involved with the redirect_uri rather than
+having the plugin direct to the user to the resulting redirect uri
 
 =cut
 
@@ -191,6 +214,11 @@ sub register {
     $auth_route => sub { _authorization_request( @_ ) },
   );
 
+  $app->helper( oauth2_auth_request => sub {
+    my ( $c,$args ) = @_;
+    _authorization_request( $c,$args,1 );
+  } );
+
   $app->routes->post(
     $atoken_route => sub { _access_token_request( @_ ) },
   );
@@ -211,11 +239,15 @@ sub register {
 }
 
 sub _authorization_request {
-  my ( $self ) = @_;
+  my ( $self,$args,$is_helper ) = @_;
 
-  my ( $client_id,$uri,$type,$scope,$state )
-    = map { $self->param( $_ ) // undef }
-    qw/ client_id redirect_uri response_type scope state /;
+  $args //= {};
+
+  my $client_id = $args->{client_id}     // $self->param( 'client_id' );
+  my $uri       = $args->{redirect_uri}  // $self->param( 'redirect_uri' );
+  my $type      = $args->{response_type} // $self->param( 'response_type' );
+  my $scope     = $args->{scope}         // $self->param( 'scope' );
+  my $state     = $args->{state}         // $self->param( 'state' );
 
   my @scopes = $scope ? split( / /,$scope ) : ();
 
@@ -250,7 +282,10 @@ sub _authorization_request {
 
   if ( $res ) {
 
-    if ( ! $Grant->login_resource_owner( mojo_controller => $self ) ) {
+    if ( ! $Grant->login_resource_owner(
+      mojo_controller => $self,
+      client_id => $client_id,
+    ) ) {
       $self->app->log->debug( "OAuth2::Server: Resource owner not logged in" );
       # call to $resource_owner_logged_in method should have called redirect_to
       return;
@@ -275,8 +310,9 @@ sub _authorization_request {
 
   if ( $res ) {
 
-    return _maybe_generate_access_token( $self,$mojo_url,$client_id,[ @scopes ],$state )
-      if $type eq 'token'; # implicit grant
+    return _maybe_generate_access_token(
+      $self,$mojo_url,$client_id,[ @scopes ],$state,$is_helper
+    ) if $type eq 'token'; # implicit grant
 
     $self->app->log->debug( "OAuth2::Server: Generating auth code for $client_id" );
     my $auth_code = $Grant->token(
@@ -310,11 +346,11 @@ sub _authorization_request {
 
   $mojo_url->query->append( state => $state ) if defined( $state );
 
-  $self->redirect_to( $mojo_url );
+  return $is_helper ? $mojo_url : $self->redirect_to( $mojo_url );
 }
 
 sub _maybe_generate_access_token {
-  my ( $self,$mojo_url,$client,$scope,$state ) = @_;
+  my ( $self,$mojo_url,$client,$scope,$state,$is_helper ) = @_;
 
   my $access_token  = $Grant->token(
     client_id  => $client,
@@ -344,7 +380,7 @@ sub _maybe_generate_access_token {
   );
 
   $mojo_url->fragment( $params->to_string );
-  $self->redirect_to( $mojo_url );
+  return $is_helper ? $mojo_url : $self->redirect_to( $mojo_url );
 }
 
 sub _access_token_request {

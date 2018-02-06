@@ -43,5 +43,5 @@ resources:
   bugtracker: https://github.com/bluefeet/GitLab-API-v4/issues
   homepage: https://github.com/bluefeet/GitLab-API-v4
   repository: https://github.com/bluefeet/GitLab-API-v4.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.69'

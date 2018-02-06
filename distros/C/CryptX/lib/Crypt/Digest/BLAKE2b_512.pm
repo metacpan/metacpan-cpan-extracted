@@ -4,7 +4,7 @@ package Crypt::Digest::BLAKE2b_512;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2b_512 blake2b_512_hex blake2b_512_b64 blake2b_512_b64u blake2b_512_file blake2b_512_file_hex blake2b_512_file_b64 blake2b_512_file_b64u )] );
@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub blake2b_512             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub blake2b_512_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub blake2b_512_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub blake2b_512_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub blake2b_512_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub blake2b_512_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub blake2b_512_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub blake2b_512_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('BLAKE2b_512')             }
+sub blake2b_512             { Crypt::Digest::digest_data('BLAKE2b_512', @_)      }
+sub blake2b_512_hex         { Crypt::Digest::digest_data_hex('BLAKE2b_512', @_)  }
+sub blake2b_512_b64         { Crypt::Digest::digest_data_b64('BLAKE2b_512', @_)  }
+sub blake2b_512_b64u        { Crypt::Digest::digest_data_b64u('BLAKE2b_512', @_) }
+sub blake2b_512_file        { Crypt::Digest::digest_file('BLAKE2b_512', @_)      }
+sub blake2b_512_file_hex    { Crypt::Digest::digest_file_hex('BLAKE2b_512', @_)  }
+sub blake2b_512_file_b64    { Crypt::Digest::digest_file_b64('BLAKE2b_512', @_)  }
+sub blake2b_512_file_b64u   { Crypt::Digest::digest_file_b64u('BLAKE2b_512', @_) }
 
 1;
 

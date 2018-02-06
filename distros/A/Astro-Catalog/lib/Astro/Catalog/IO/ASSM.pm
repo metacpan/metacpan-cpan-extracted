@@ -35,7 +35,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 
@@ -182,10 +182,6 @@ sub _read_catalog {
 }
 
 =back
-
-=head1 REVISION
-
- $Id: ASSM.pm 5702 2012-05-19 00:45:23Z tlister $
 
 =head1 SEE ALSO
 

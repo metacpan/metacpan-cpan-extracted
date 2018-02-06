@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+builder/testLibudev.pm
 cpanfile
 examples/block_devices_monitor.pl
 examples/device_get_parent.pl
@@ -22,5 +23,6 @@ minil.toml
 t/00_diag.t
 t/01_use.t
 t/basic.t
+t/udev_ffi_new.t
 META.yml
 MANIFEST

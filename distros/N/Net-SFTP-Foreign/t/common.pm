@@ -62,6 +62,7 @@ sub sftp_server {
 	      File::Spec->catfile($up, 'lib', $ssname),
               File::Spec->catfile($up, 'lib64', $ssname),
 	      File::Spec->catfile($up, 'libexec', $ssname),
+	      File::Spec->catfile($up, 'libexec', 'openssh', $ssname),
 	      File::Spec->catfile($up, 'sbin', $ssname),
 	      File::Spec->catfile($up, 'lib', 'openssh', $ssname),
               File::Spec->catfile($up, 'lib64', 'openssh', $ssname),

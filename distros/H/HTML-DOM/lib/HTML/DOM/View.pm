@@ -8,7 +8,7 @@ use HTML::DOM::_FieldHash;
 
 fieldhashes \my %doc;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # -------- DOM ATTRIBUTES -------- #
 
@@ -50,7 +50,7 @@ HTML::DOM::View - A Perl class for representing an HTML Document's 'defaultView'
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

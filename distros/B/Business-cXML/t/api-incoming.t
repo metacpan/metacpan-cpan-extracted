@@ -17,7 +17,7 @@ use Business::cXML::Transmission;
 use lib 't/';
 use Test::cXML qw(comparable);
 
-plan tests => 17;
+plan tests => 19;
 
 my $cxml = Business::cXML->new(local => 'https://example.com/api/cxml');
 
@@ -48,6 +48,7 @@ our $nth = 0;
 sub _pos {
 	my ($cxml, $req, $res) = @_;
 	cmp_deeply($req->id, $res->inreplyto, 'Response inreplyto matches request ID');
+	cmp_deeply($req->is_test, $res->is_test, 'Response deployment mode matches request');
 	$res->status(200);
 	$res->payload->url('https://example.com/punchout_login') unless $nth;
 	$nth++;

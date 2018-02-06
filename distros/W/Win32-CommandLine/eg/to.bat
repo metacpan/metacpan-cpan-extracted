@@ -29,14 +29,14 @@ if [%args%]==[] ( set args=~ )
 :::
 ::::: ^%prefix_char% is used to escape the character in cases where it might be a quote character
 :::if [^%prefix_char%] == [^%tilde%] (
-:::::	: avoid interpretation of set unless the leading character is ~ [arguments surrounded by quotes would otherwise cause a syntax error for %suffix% with only a trailing quote
-:::	set args=%suffix%
-:::	)
+:::::   : avoid interpretation of set unless the leading character is ~ [arguments surrounded by quotes would otherwise cause a syntax error for %suffix% with only a trailing quote
+::: set args=%suffix%
+::: )
 :::if 01 == 1.0 (
-:::::	: 4NT/TCC/TCMD quirk: "if [^%prefix_char%] == [^%tilde%]" DOESN'T work in 4NT/TCC/TCMD
-:::::	: used 4NT/TCC/TCMD %@ltrim[] instead
-:::	set args=%@ltrim[~,%args%]
-:::	)
+:::::   : 4NT/TCC/TCMD quirk: "if [^%prefix_char%] == [^%tilde%]" DOESN'T work in 4NT/TCC/TCMD
+:::::   : used 4NT/TCC/TCMD %@ltrim[] instead
+::: set args=%@ltrim[~,%args%]
+::: )
 :::
 :::::echo prefix_char = %prefix_char%
 :::::echo suffix = %suffix%
@@ -44,9 +44,9 @@ if [%args%]==[] ( set args=~ )
 
 set ERROR=0
 if EXIST "%args%" (
-	cd "%args%" > nul 2> nul
-	goto :CD_DONE
-	)
+    cd "%args%" > nul 2> nul
+    goto :CD_DONE
+    )
 call xx -s cd %args% > nul 2> nul
 set ERROR=%ERRORLEVEL%
 if "%ERROR%" == "0" ( goto :CD_DONE )
@@ -61,14 +61,14 @@ if "%ERROR%" == "0" ( goto :DONE )
 :: check for missing Perl and/or XX
 call perl -e 1 2> nul
 if NOT "%ERRORLEVEL%" == "0" (
-	echo ERROR: Missing Perl [which is required]; install perl and the Win32::CommandLine module [install from http://strawberryperl.com, then "cpan Win32::CommandLine"]
-	goto :handle_errors_DONE
-	)
+    echo ERROR: Missing Perl [which is required]; install perl and the Win32::CommandLine module [install from http://strawberryperl.com, then "cpan Win32::CommandLine"]
+    goto :handle_errors_DONE
+    )
 call xx --version > nul 2> nul
 if NOT "%ERRORLEVEL%" == "0" (
-	echo ERROR: Missing XX [which is required]; install the Win32::CommandLine module for perl [use "cpan Win32::CommandLine"]
-	goto :handle_errors_DONE
-	)
+    echo ERROR: Missing XX [which is required]; install the Win32::CommandLine module for perl [use "cpan Win32::CommandLine"]
+    goto :handle_errors_DONE
+    )
 call xx echo ERROR: Cannot find the specified path [%args% (or ~%args%)]
 :handle_errors_DONE
 

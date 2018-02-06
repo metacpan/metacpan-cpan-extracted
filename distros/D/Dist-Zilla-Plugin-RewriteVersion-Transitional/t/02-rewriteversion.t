@@ -8,9 +8,7 @@ use Test::Deep;
 use Test::Fatal;
 use Path::Tiny;
 
-delete $ENV{RELEASE_STATUS};
-delete $ENV{TRIAL};
-delete $ENV{V};
+delete @ENV{qw(RELEASE_STATUS TRIAL V)};
 
 # version 0.010 adds "from Foo-Bar-0.001.tar.gz" comments unconditionally;
 # version 0.011 disables that behaviour by default
@@ -33,10 +31,7 @@ my $tzil = Builder->from_config(
                 },
                 [ GatherDir => ],
                 [ MetaConfig => ],
-                [ 'RewriteVersion::Transitional' => {
-                        fallback_version_provider => 'not used',
-                    },
-                ],
+                [ 'RewriteVersion::Transitional' ],
                 [ FakeRelease => ],
                 [ 'BumpVersionAfterRelease::Transitional' ],
             ),

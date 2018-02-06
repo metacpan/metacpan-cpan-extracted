@@ -11,7 +11,6 @@ use Encode;
 use XML::Parser;
 use Data::Dumper;
 #use File::Copy;
-
 #use Getopt::Long;
 
 #use File::BOM qw( :all );
@@ -79,8 +78,7 @@ sub catch {
 # http://blogs.msdn.com/brettsh/archive/2006/06/07/620986.aspx
 #open (my $TF, ">:raw:encoding(UTF16-LE):crlf:utf8", $tmp_path)  or die "Unable to make new temporary file: $!";
     
-    open( $TF, "> :encoding($args{encoding})", $args{tmp_file} )
-        or die "Unable to make new temporary file: $!";
+     open( $TF, ">:encoding($args{encoding})", $args{tmp_file} ) or die "Unable to make new temporary file: $!";
 
 print $TF "\N{BOM}";
 
@@ -89,9 +87,10 @@ print $TF "\N{BOM}";
 
     $erasesignal = 2;
     $comchain = 0;
-    #  ProtocolEncoding => $args{encoding},
+    #  ProtocolEncoding => $args{encoding}, #with this accetended char in shortkey's name are preserved
     my $p = XML::Parser->new(
         ErrorContext     => 2, 
+        ProtocolEncoding => $args{encoding}
     );
 
     $p->setHandlers(

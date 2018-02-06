@@ -1,13 +1,13 @@
 package DBD::Multi;
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 package DBD::Multi::dr;
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 package DBD::Multi::db;
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 package DBD::Multi::st;
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 package DBD::Multi::Handler;
-our $VERSION   = '1.01';
+our $VERSION   = '1.02';
 
 package DBD::Multi;
 use strict;

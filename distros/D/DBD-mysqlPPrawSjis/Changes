@@ -1,5 +1,18 @@
 Revision history for Perl extension DBD::mysqlPPrawSjis
 
+0.12 2018-02-04 00:00:00
+  - retry Kwalitee Indicator: distname_matches_name_in_meta
+  - created by INABA Hitoshi
+
+0.11 2018-02-04 00:00:00
+  - try Kwalitee Indicator: distname_matches_name_in_meta
+  - created by INABA Hitoshi
+
+0.10 2018-02-04 00:00:00
+  - try Removal of the current directory (".") from @INC
+  - try Kwalitee Indicator: buildtool_not_executable
+  - created by INABA Hitoshi
+
 0.09  Tue Nov 4 00:00:00 JST 2014
   - fix 'exists' to 'defined'
 

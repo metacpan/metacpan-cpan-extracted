@@ -11,7 +11,7 @@ use XSLoader;
 my $parent_pid = $$;
 
 BEGIN { # must happen at BEGIN time so that flush_events is available to DB::sub
-    our $VERSION = '0.04'; # VERSION
+    our $VERSION = '0.05'; # VERSION
     XSLoader::load(__PACKAGE__, $Devel::Trace::Syscall::VERSION);
 }
 
@@ -76,7 +76,7 @@ Devel::Trace::Syscall - Print a stack trace whenever a system call is made
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -152,6 +152,13 @@ C<print>/C<say>) use tricks like buffering to avoid repeated system calls,
 which may make it look like the writing is happening on a different line.  If
 you're interested in system calls like these, you may want to enable things
 like autoflush.
+
+=item *
+
+Some system calls have different variants that may be used by different versions of
+the C library or perl itself (eg. C<open> and C<openat>) - keep this in mind when
+trying to trace different system calls, as one your targets' variants may end up
+getting used by the script instead!
 
 =back
 

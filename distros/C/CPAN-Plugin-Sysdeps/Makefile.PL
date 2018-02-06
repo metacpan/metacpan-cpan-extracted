@@ -17,6 +17,10 @@ EOF
 WriteMakefile(
     NAME              => 'CPAN::Plugin::Sysdeps',
     VERSION_FROM      => 'lib/CPAN/Plugin/Sysdeps.pm',
+    PREREQ_PM         => {
+	'List::Util' => 0,
+	'Test::More' => 0,
+    },
     EXE_FILES         => ['script/cpan-sysdeps'],
     LICENSE	      => 'perl',
     ABSTRACT          => 'CPAN.pm plugin for installing external dependencies',

@@ -26,5 +26,5 @@ requires:
   Win32::Clipboard: '0.58'
   Win32::Shortkeys::Kbh: '0.01'
   XML::Parser: '2.44'
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

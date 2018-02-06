@@ -1,0 +1,107 @@
+{
+   "abstract" : "A tiny StatsD client",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Statsd-Tiny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Type::Tiny::XS" : "0"
+         },
+         "requires" : {
+            "IO::Socket" : "1.18",
+            "IO::String" : "0",
+            "Moo" : "1.000000",
+            "MooX::TypeTiny" : "0",
+            "Sub::Quote" : "0",
+            "Sub::Util" : "1.40",
+            "Type::Library" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Devel::StrictMode" : "0",
+            "File::Spec" : "0",
+            "IO::Select" : "0",
+            "Module::Metadata" : "0",
+            "Net::EmptyPort" : "0",
+            "Test::More" : "0",
+            "Test::Roo" : "0",
+            "Test::Roo::DataDriven" : "0",
+            "Test::Roo::Role" : "0",
+            "Test::TCP" : "2.19",
+            "curry" : "0",
+            "if" : "0",
+            "lib" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Statsd::Tiny" : {
+         "file" : "lib/Net/Statsd/Tiny.pm",
+         "version" : "v0.2.1"
+      },
+      "Net::Statsd::Tiny::Types" : {
+         "file" : "lib/Net/Statsd/Tiny/Types.pm",
+         "version" : "v0.2.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Net-Statsd-Tiny/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Net-Statsd-Tiny.git",
+         "web" : "https://github.com/robrwo/Net-Statsd-Tiny"
+      }
+   },
+   "version" : "v0.2.1",
+   "x_authority" : "cpan:RRWO",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

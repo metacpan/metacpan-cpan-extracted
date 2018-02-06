@@ -32,6 +32,8 @@ sub setup {
 	$config->define('secret', 'A random secret key, used to encrypt the cookies.', '_INSECURE_DEFAULT_REPLACE_ME_');
 	$config->define("vid_prefix", "The URL prefix to be used for video data files", "");
 	$config->define("anonreviews", "Set to truthy if anonymous reviews should be allowed, or to falsy if not", 0);
+	$config->define("preview_exten", "The extension used by previews (webm or mp4). Should be autodetected in the future, but...", "webm");
+	$config->define("eventurl_format", "A Mojo::Template that generates an event URL. Used by the /released metadata URL", undef);
 
 	# Values for encoder scripts
 	$config->define('pubdir', 'The directory on the file system where files served by the webinterface should be stored', '/srv/sreview/web/public');
@@ -62,8 +64,9 @@ sub setup {
 
 	# Values for notification script
 	$config->define('notify_actions', 'An array of things to do when notifying. Can contain one or more of: email, command.', []);
-	$config->define('email_template', 'A filename of a Mojo::Template template to process, returning the email body. Required if notify_actions includes email.', '');
-	$config->define('email_from', 'The data for the From: header in the email. Required if notify_actions includes email.', '');
+	$config->define('email_template', 'A filename of a Mojo::Template template to process, returning the email body. Required if notify_actions includes email.', undef);
+	$config->define('email_from', 'The data for the From: header in the email. Required if notify_actions includes email.', undef);
+	$config->define('email_subject', 'The data for the Subject: header in the email. Required if notify_actions includes email.', undef);
 	$config->define('urlbase', 'The URL on which SReview runs. Note that this is used by sreview-notify to generate URLs, not by sreview-web.', '');
 	$config->define('notify_commands', 'An array of commands to run. Each component is passed through Mojo::Template before processing. To avoid quoting issues, it is a two-dimensional array, so that no shell will be called to run this.', [['echo', '<%== $title %>', 'is', 'available', 'at', '<%== $url %>']]);
 

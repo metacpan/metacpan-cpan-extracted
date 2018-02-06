@@ -24,7 +24,7 @@ use base qw/ Astro::FITS::HdrTrans::Base /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.59";
+$VERSION = "1.60";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -185,7 +185,7 @@ YYYYMMDD integer.
 sub to_UTDATE {
   my $self = shift;
   my $FITS_headers = shift;
-  my $date = _sybase_convert_date( _date_header( $FITS_headers ), 1);
+  my $date = _mysql_convert_date( _date_header( $FITS_headers ), 1);
   return $date->strftime('%Y%m%d');
 }
 
@@ -198,7 +198,7 @@ Translates the DB date header into a C<Time::Piece> object.
 sub to_UTSTART {
   my $self = shift;
   my $FITS_headers = shift;
-  return _sybase_convert_date( _date_header( $FITS_headers ));
+  return _mysql_convert_date( _date_header( $FITS_headers ));
 }
 
 =item B<to_UTEND>
@@ -212,7 +212,7 @@ sub to_UTEND {
   my $self = shift;
   my $FITS_headers = shift;
 
-  my $return = _sybase_convert_date( _date_header( $FITS_headers ) );
+  my $return = _mysql_convert_date( _date_header( $FITS_headers ) );
   return undef unless defined $return;
   my $expt = $self->to_EXPOSURE_TIME( $FITS_headers );
 
@@ -403,7 +403,7 @@ sub to_SYSTEM_VELOCITY {
 
 =item B<_date_header>
 
-Works out which header corresponds to the date field in sybase format and returns the value.
+Works out which header corresponds to the date field in MySQL format and returns the value.
 
   $value = _date_header( $FITS_headers );
 
@@ -413,7 +413,8 @@ Returns undef if none found.
 
 sub _date_header {
   my $FITS_headers = shift;
-  for my $key (qw/ LONGDATEOBS DATE_OBS LONGDATE/ ) {
+  # For compatability with Sybase database, also accept LONGDATEOBS LONGDATE
+  for my $key (qw/ DATE_OBS LONGDATEOBS LONGDATE / ) {
     if (exists $FITS_headers->{$key} && defined $FITS_headers->{$key}) {
       return $FITS_headers->{$key};
     }
@@ -421,42 +422,58 @@ sub _date_header {
   return;
 }
 
-=item B<_sybase_convert_date>
+=item B<_mysql_convert_date>
 
-Converts a sybase long date to Time::Piece object.
+Converts a MySQL date to Time::Piece object.
 
-  $date = _sybase_convert_date( $string );
+  $date = _mysql_convert_date( $string );
 
 Optional flag can be set to true to drop Hours, minutes and seconds from parse.
 
-  $utday = _sybase_convert_date( $string, 1);
+  $utday = _mysql_convert_date( $string, 1);
 
 Returns undef if no string is supplied.
 
 =cut
 
-sub _sybase_convert_date {
-  my $longdate = shift;
+sub _mysql_convert_date {
+  my $date = shift;
   my $drophms = shift;
-  return undef unless $longdate;
+  return undef unless $date;
 
-  # The UT header is in Sybase format, which is something like
+  # The UT header is in MySQL format, which is something like
+  # "2002-03-15 07:04:35".
+  #
+  # Also support the Sybase format, which is something like
   # "Mar 15 2002  7:04:35:234AM   ". We first need to remove the number
   # of milliseconds, then the whitespace at the end, then use the
   # "%b%t%d%t%Y%t%I:%M:%S%p" format.
 
   # General cleanup
-  $longdate =~ s/:\d\d\d//;
-  $longdate =~ s/\s*$//;
+  $date =~ s/\s*$//;
 
   my $return;
-  if ($drophms) {
-    $longdate =~ s/\s*\d\d?:\d\d:\d\d[A|P]M$//;
-    $return = Time::Piece->strptime( $longdate,
-                                     "%b %e %Y" );
+
+  if ($date =~ /^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/) {
+    if ($drophms) {
+      $date =~ s/\s*\d\d?:\d\d:\d\d$//;
+      $return = Time::Piece->strptime( $date,
+                                       "%Y-%m-%d" );
+    } else {
+      $return = Time::Piece->strptime( $date,
+                                       "%Y-%m-%d %T" );
+    }
   } else {
-    $return = Time::Piece->strptime( $longdate,
-                                     "%b %e %Y %l:%M:%S%p" );
+    $date =~ s/:\d\d\d//;
+
+    if ($drophms) {
+      $date =~ s/\s*\d\d?:\d\d:\d\d[A|P]M$//;
+      $return = Time::Piece->strptime( $date,
+                                       "%b %e %Y" );
+    } else {
+      $return = Time::Piece->strptime( $date,
+                                       "%b %e %Y %l:%M:%S%p" );
+    }
   }
   return $return;
 }

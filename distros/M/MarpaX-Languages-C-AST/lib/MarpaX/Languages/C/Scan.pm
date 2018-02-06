@@ -9,7 +9,7 @@ use MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan;
 use Carp qw/croak/;
 use Log::Any qw/$log/;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 sub new {
@@ -53,7 +53,7 @@ MarpaX::Languages::C::Scan - C::Scan-like interface
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 

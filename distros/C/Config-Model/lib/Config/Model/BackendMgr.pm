@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2017 by Dominique Dumont.
+# This software is Copyright (c) 2005-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.116';
+$Config::Model::BackendMgr::VERSION = '2.117';
 use Mouse;
 use strict;
 use warnings;
@@ -67,11 +67,6 @@ sub _build_backend_obj {
     return $c->new( node => $self->node, name => $backend );
 }
 
-# Configuration directory where to read and write files. This value
-# does not override the configuration directory specified in the model
-# data passed to read and write functions.
-has config_dir => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
-
 has support_annotation => (
     is => 'ro',
     isa => 'Bool',
@@ -89,15 +84,14 @@ sub get_cfg_dir_path {
     my $w = $args{write} || 0;
     my $dir = $self->get_tuned_config_dir(%args);
 
-    $dir = $args{root} . $dir;
-
-    if ( not -d $dir and $w and $args{auto_create} ) {
+    if ( not $dir->is_dir and $w and $args{auto_create} ) {
         $logger->info("creating directory $dir");
-        mkpath( $dir, 0, 0755 );
+        $dir->mkpath;
     }
 
-    unless ( -d $dir ) {
-        $logger->info( "auto_" . ( $w ? 'write' : 'read' ) . " $args{backend} no directory $dir" );
+    unless ( $dir->is_dir ) {
+        my $mode = $w ? 'write' : 'read';
+        $logger->info( "$args{backend}: missing directory $dir ($mode mode)" );
         return ( 0, $dir );
     }
 
@@ -123,11 +117,10 @@ sub get_cfg_file_path {
     }
 
     if ( defined $cfo ) {
-        my $override = $args{root} . $args{config_file};
-        $logger->trace( "auto_"
-                . ( $w ? 'write' : 'read' )
-                . " $args{backend} override target file is $override" );
-        return ( 1, $args{root} . $args{config_file} );
+        my $override =  $args{root} ? path($args{root})->child($cfo) : path($cfo);
+        my $mode = $w ? 'write' : 'read';
+        $logger->trace("$args{backend} override target file is $override ($mode mode)");
+        return ( 1, $override );
     }
 
     Config::Model::Exception::Model->throw(
@@ -139,7 +132,7 @@ sub get_cfg_file_path {
 
     if ( defined $args{file} ) {
         my $file = $args{skip_compute} ? $args{file} : $self->node->compute_string($args{file});
-        my $res = $dir . $file;
+        my $res = $dir->child($file);
         $logger->trace("get_cfg_file_path: returns $res");
         return ( $dir_ok, $res );
     }
@@ -355,12 +348,7 @@ sub try_read_backend {
     };
     $error = $@;
 
-    # only backend based on C::M::Backend::Any can support annotations
-    if ($backend_obj->can('annotation')) {
-        $self->{support_annotation} ||= $backend_obj->annotation ;
-    }
-
-    # catch eval errors done in the if-then-else block before
+    # catch eval error
     if ( ref($error) and $error->isa('Config::Model::Exception::Syntax') ) {
 
         $error->parsed_file( $file_path) unless $error->parsed_file;
@@ -374,6 +362,11 @@ sub try_read_backend {
     }
     elsif ( $error ) {
         die "Backend error: $error";
+    }
+
+    # only backend based on C::M::Backend::Any can support annotations
+    if ($backend_obj->can('annotation')) {
+        $self->{support_annotation} = $backend_obj->annotation ;
     }
 
     return ( $res, $file_path );
@@ -560,7 +553,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.116
+version 2.117
 
 =head1 SYNOPSIS
 
@@ -818,7 +811,7 @@ C<rw_config> specification.
 
 =head2 support_annotation
 
-Returns 1 if at least one of the backends support to read and write annotations
+Returns 1 if at least the backend supports read and write annotations
 (aka comments) in the configuration file.
 
 =head1 AUTHOR
@@ -836,7 +829,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2017 by Dominique Dumont.
+This software is Copyright (c) 2005-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

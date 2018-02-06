@@ -1,5 +1,9 @@
 Revision history for Alien-patch
 
+0.14      2018-01-31 11:59:05 -0500
+  - implicit modification of PATH is now removed
+    (was deprecated in 0.09)
+
 0.12      2017-07-10 15:05:27 -0400
   - Fixed broken repository link in meta data
 

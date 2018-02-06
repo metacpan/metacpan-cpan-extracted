@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use_ok('Lingua::Conjunction', '2.00');
+use_ok('Lingua::Conjunction');
 
 ok( "A" eq conjunction( qw( A ) ) );
 ok( "A and C" eq conjunction( qw( A C ) ) );

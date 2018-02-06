@@ -80,27 +80,27 @@ sub new {
 		string      => undef,
 		xml_doc     => undef,
 		xml_root    => undef,
-		xml_payload => undef,
-		payload     => undef,
-		timestamp   => cxml_timestamp($now),
+		_xml_payload => undef,
+		_payload     => undef,
+		_timestamp   => cxml_timestamp($now),
 		epoch       => $now->strftime('%s'),
 		hostname    => hostname,
 		randint     => int(rand(99999999)),
 		pid         => $$,
 		test        => 0,
-		lang        => 'en-US',
-		id          => undef,
-		inreplyto   => undef,
+		_lang        => 'en-US',
+		_id          => undef,
+		_inreplyto   => undef,
 		status      => {
 			code        => 200,
 			text        => 'OK',
 			description => '',
 		},
 		class  => '',
-		type   => '',
-		from   => undef,
-		to     => undef,
-		sender => undef,
+		_type   => '',
+		_from   => undef,
+		_to     => undef,
+		_sender => undef,
 	};
 	bless $self, $class;
 
@@ -122,11 +122,11 @@ sub new {
 			payloadID        => 'id',
 			# timestamp is implicit
 			signatureVersion => '__UNIMPLEMENTED',
-			'xml:lang'       => 'lang',
+			'xml:lang'       => '_lang',
 			Header           => {
-				From             => [ 'from',   'Business::cXML::Credential' ],
-				To               => [ 'to',     'Business::cXML::Credential' ],
-				Sender           => [ 'sender', 'Business::cXML::Credential' ],
+				From             => [ '_from',   'Business::cXML::Credential' ],
+				To               => [ '_to',     'Business::cXML::Credential' ],
+				Sender           => [ '_sender', 'Business::cXML::Credential' ],
 				Path             => '__UNIMPLEMENTED',
 				OriginalDocument => '__UNIMPLEMENTED',
 			},
@@ -141,23 +141,23 @@ sub new {
 		my $doc = $self->{xml_doc} = XML::LibXML::Document->new('1.0', 'UTF-8');
 		$doc->createInternalSubset('cXML', undef, "http://xml.cxml.org/schemas/cXML/" . $Business::cXML::CXML_VERSION . "/cXML.dtd");
 		my $root = $self->{xml_root} = $doc->createElement('cXML');
-		$self->{id} = $self->{epoch} . '.' . $self->{pid} . '.' . $self->{randint} . '@' . $self->{hostname};  # payloadID/inReplyTo
+		$self->{_id} = $self->{epoch} . '.' . $self->{pid} . '.' . $self->{randint} . '@' . $self->{hostname};  # payloadID/inReplyTo
 		$root->attr(
-			payloadID  => $self->{id},
-			timestamp  => $self->{timestamp},
-			'xml:lang' => $self->{lang},
+			payloadID  => $self->{_id},
+			timestamp  => $self->{_timestamp},
+			'xml:lang' => $self->{_lang},
 		);
 		# UNIMPLEMENTED cXML: version? signatureVersion?
 		$doc->setDocumentElement($root);
 
 		# Something initially valid which will be replaced by the user
-		$self->{xml_payload} = $doc->createElement('ProfileRequest');
+		$self->{_xml_payload} = $doc->createElement('ProfileRequest');
 		$self->{class} = CXML_CLASS_REQUEST;
-		$self->{type} = 'Profile';
+		$self->{_type} = 'Profile';
 	};
-	$self->{from}   = Business::cXML::Credential->new('From')   unless defined $self->{from};
-	$self->{to}     = Business::cXML::Credential->new('To')     unless defined $self->{to};
-	$self->{sender} = Business::cXML::Credential->new('Sender') unless defined $self->{sender};
+	$self->{_from}   = Business::cXML::Credential->new('From')   unless defined $self->{_from};
+	$self->{_to}     = Business::cXML::Credential->new('To')     unless defined $self->{_to};
+	$self->{_sender} = Business::cXML::Credential->new('Sender') unless defined $self->{_sender};
 
 	return $self;
 }
@@ -166,19 +166,19 @@ sub _new_payload {
 	my ($self, $msg) = @_;
 	my $status;
 
-	$self->is_test(1) if ($msg->{deploymentMode} eq 'test');
-	$self->{inreplyto} = $msg->{inReplyTo} if exists $msg->{inReplyTo};
+	$self->is_test(1) if (exists $msg->{deploymentMode} && $msg->{deploymentMode} eq 'test');
+	$self->{_inreplyto} = $msg->{inReplyTo} if exists $msg->{inReplyTo};
 	# UNIMPLEMENTED Message/Request/Response: Id?
 
 	foreach ($msg->childNodes) {
 		if ($_->nodeName eq 'Status') {
 			$status = $_;
 		} elsif ($_->nodeType == XML_ELEMENT_NODE) {
-			$self->{xml_payload} = $msg = $_;
+			$self->{_xml_payload} = $msg = $_;
 		};
 	};
 	my $className;
-	($self->{type}, $className) = $msg->nodeName =~ /^(.*)(Request|Response|Message)$/;
+	($self->{_type}, $className) = $msg->nodeName =~ /^(.*)(Request|Response|Message)$/;
 	$self->{class} = CXML_CLASS_MESSAGE  if $className eq 'Message';
 	$self->{class} = CXML_CLASS_REQUEST  if $className eq 'Request';
 	$self->{class} = CXML_CLASS_RESPONSE if $className eq 'Response';
@@ -195,7 +195,7 @@ sub _new_payload {
 sub _rebuild_payload {
 	my ($self) = @_;
 
-	return if defined $self->{payload};
+	return if defined $self->{_payload};
 
 	my $class = 'Message';
 	$class = 'Request' if $self->is_request;
@@ -207,7 +207,7 @@ sub _rebuild_payload {
 		my $file = $class;
 		$file =~ s|::|/|g;
 		require "$file.pm";
-		$self->{payload} = $class->new($self->{xml_payload});
+		$self->{_payload} = $class->new($self->{_xml_payload});
 	};
 	# Payload remains safely undef for unknown classes-types.
 }
@@ -243,7 +243,7 @@ Optional, override submit button HTML with your own
 
 sub toForm {
 	my ($self, %args) = @_;
-	my $url = encode_entities($args{url});
+	my $url = encode_entities($args{url} || '');
 	my $submit = '<input type="submit">';
 	$submit = $args{submit_button} if exists $args{submit_button};
 	my $target = '';
@@ -276,7 +276,7 @@ sub _valid_string {
 		$self->{xml_doc}->validate();
 	};
 	if ($@) {
-		return ($@, qq(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/) . $Business::cXML::CXML_VERSION . qq(/cXML.dtd">\n<cXML timestamp=") . $self->{timestamp} . qq(" payloadID=") . $self->{id} .  qq(" xml:lang="en-US"><Response><Status code="500" text="Internal Server Error">) . encode_entities($@) . qq(</Status></Response></cXML>));
+		return ($@, qq(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/) . $Business::cXML::CXML_VERSION . qq(/cXML.dtd">\n<cXML timestamp=") . $self->{_timestamp} . qq(" payloadID=") . $self->{_id} .  qq(" xml:lang="en-US"><Response><Status code="500" text="Internal Server Error">) . encode_entities($@) . qq(</Status></Response></cXML>));
 	};
 	return (undef, $self->{xml_doc}->toString);
 }
@@ -291,10 +291,10 @@ sub toString {
 
 	unless ($self->is_response) {
 		my $header = $self->{xml_root}->add('Header');
-		$header->add($self->{from}->to_node($header));
-		$header->add($self->{to}->to_node($header));
-		$self->{sender}->secret(undef) if $self->is_message;  # No SharedSecret in Message
-		$header->add($self->{sender}->to_node($header));
+		$header->add($self->{_from}->to_node($header));
+		$header->add($self->{_to}->to_node($header));
+		$self->{_sender}->secret(undef) if $self->is_message;  # No SharedSecret in Message
+		$header->add($self->{_sender}->to_node($header));
 		# UNIMPLEMENTED: (Path OriginalDocument)?
 	};
 
@@ -305,7 +305,7 @@ sub toString {
 	$className = 'Response' if $self->is_response;
 	$wrapper = $self->{xml_root}->add($className);
 	$wrapper->attr(deploymentMode => ($self->{test} ? 'test' : 'production')) unless $self->is_response;
-	$wrapper->attr(inReplyTo => $self->{inreplyto}) if $self->is_message && $self->{inreplyto};
+	$wrapper->attr(inReplyTo => $self->{_inreplyto}) if $self->is_message && $self->{_inreplyto};
 	# UNIMPLEMENTED Message/Request/Response: Id?
 
 	if ($self->is_response || ($self->is_message && $self->{status}{code} != 200)) {
@@ -319,12 +319,12 @@ sub toString {
 	# No payload on error or ping response
 	return $self->_valid_string if $self->{status}{code} >= 300 || $self->{status}{description} eq 'Pong!';
 
-	if (ref $self->{payload}) {
+	if (ref $self->{_payload}) {
 		# Optional native payload has precedence over XML payload.
-		$self->{xml_payload} = $self->{payload}->to_node($self->{xml_root});
+		$self->{_xml_payload} = $self->{_payload}->to_node($self->{xml_root});
 	};
-	$self->{xml_payload}->setNodeName($self->{type} . $className);
-	$wrapper->addChild($self->{xml_payload});
+	$self->{_xml_payload}->setNodeName($self->{_type} . $className);
+	$wrapper->addChild($self->{_xml_payload});
 
 	return $self->_valid_string;
 }
@@ -375,9 +375,10 @@ reciprocity with request data.
 sub reply_to {
 	my ($self, $req) = @_;
 
-	$self->{type} = $req->{type};
+	$self->{_type} = $req->{_type};
 
-	$self->inreplyto($req->{id});
+	$self->inreplyto($req->{_id});
+	$self->is_test($req->is_test);
 
 	$self->sender->copy($req->to);
 	$self->sender->contact(undef);
@@ -413,32 +414,32 @@ and a clone will be copied into C<from()>.
 sub from {
 	my ($self, %props) = @_;
 	if (ref($_[1])) {
-		$self->{from} = clone($self->{sender} = $_[1]);
+		$self->{_from} = clone($self->{_sender} = $_[1]);
 	} elsif (%props) {
-		$self->{sender}->set(%props);
-		$self->{from}->set(%props);
+		$self->{_sender}->set(%props);
+		$self->{_from}->set(%props);
 	};
-	return $self->{from};
+	return $self->{_from};
 }
 
 sub to {
 	my ($self, %props) = @_;
 	if (ref($_[1])) {
-		$self->{to} = $_[1];
+		$self->{_to} = $_[1];
 	} elsif (%props) {
-		$self->{to}->set(%props);
+		$self->{_to}->set(%props);
 	};
-	return $self->{to};
+	return $self->{_to};
 }
 
 sub sender {
 	my ($self, %props) = @_;
 	if (ref($_[1])) {
-		$self->{sender} = $_[1];
+		$self->{_sender} = $_[1];
 	} elsif (%props) {
-		$self->{sender}->set(%props);
+		$self->{_sender}->set(%props);
 	};
-	return $self->{sender};
+	return $self->{_sender};
 }
 
 =item C<B<is_test>( [I<$bool>] )>
@@ -459,7 +460,7 @@ Read-only, the transmission's creation date/time.
 
 =cut
 
-sub timestamp { shift->{timestamp} };
+sub timestamp { shift->{_timestamp} };
 
 =item C<B<id>>
 
@@ -467,7 +468,7 @@ Read-only, the transmission's payload ID.
 
 =cut
 
-sub id { shift->{id} };
+sub id { shift->{_id} };
 
 =item C<B<inreplyto>( [I<$id>] )>
 
@@ -477,8 +478,8 @@ Get/set the payload ID of the transmission we're responding to.
 
 sub inreplyto {
 	my ($self, $id) = @_;
-	$self->{inreplyto} = $id if @_ > 1;
-	return $self->{inreplyto};
+	$self->{_inreplyto} = $id if @_ > 1;
+	return $self->{_inreplyto};
 }
 
 =item C<B<is_message>( [I<$bool>] )>
@@ -499,7 +500,7 @@ sub is_message {
 	my ($self, $bool) = @_;
 	if ($bool) {
 		$self->{class} = CXML_CLASS_MESSAGE;
-		$self->{payload} = undef;
+		$self->{_payload} = undef;
 	};
 	return $self->{class} == CXML_CLASS_MESSAGE;
 }
@@ -508,7 +509,7 @@ sub is_request {
 	my ($self, $bool) = @_;
 	if ($bool) {
 		$self->{class} = CXML_CLASS_REQUEST;
-		$self->{payload} = undef;
+		$self->{_payload} = undef;
 	};
 	return $self->{class} == CXML_CLASS_REQUEST;
 }
@@ -517,7 +518,7 @@ sub is_response {
 	my ($self, $bool) = @_;
 	if ($bool) {
 		$self->{class} = CXML_CLASS_RESPONSE;
-		$self->{payload} = undef;
+		$self->{_payload} = undef;
 	};
 	return $self->{class} == CXML_CLASS_RESPONSE;
 }
@@ -533,10 +534,10 @@ transmission, this should be a hint to the user's preferred display language.
 sub lang {
 	my ($self, $lang) = @_;
 	if (defined $lang) {
-		$self->{lang} = $lang;
+		$self->{_lang} = $lang;
 		$self->{xml_root}->attr('xml:lang' => $lang);
 	};
-	return $self->{lang};
+	return $self->{_lang};
 }
 
 =item C<B<type>( [I<$name>] )>
@@ -552,10 +553,10 @@ to do it early!
 sub type {
 	my ($self, $type) = @_;
 	if (defined $type) {
-		$self->{type} = $type;
-		$self->{payload} = undef;
+		$self->{_type} = $type;
+		$self->{_payload} = undef;
 	};
-	return $self->{type};
+	return $self->{_type};
 }
 
 =item C<B<payload>>
@@ -574,7 +575,7 @@ preserving any (valid) changes done on the XML side into the native version.
 sub payload {
 	my ($self) = @_;
 	$self->_rebuild_payload();
-	return $self->{payload};
+	return $self->{_payload};
 }
 
 =item C<B<xml_payload>>
@@ -596,8 +597,8 @@ version, B<switching back again to native would lose all data>.
 
 sub xml_payload {
 	my ($self) = @_;
-	$self->{payload} = undef;
-	return $self->{xml_payload};
+	$self->{_payload} = undef;
+	return $self->{_xml_payload};
 }
 
 =item C<B<status>( [ I<$code>, [$description] ] )>

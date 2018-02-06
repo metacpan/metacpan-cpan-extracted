@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 HTML::FromMail::Field - output a header field as HTML
@@ -13,145 +15,91 @@ HTML::FromMail::Field - output a header field as HTML
 
 =head1 DESCRIPTION
 
+Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTION">.
+ 
 =head1 METHODS
 
-$obj-E<gt>B<addressField>(FIELD, HOW, ARGS)
-
+Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
+ 
 =over 4
+
+=item $obj-E<gt>B<addressField>(FIELD, HOW, ARGS)
 
 Produce text for a header field containing addresses.  HOW this is done
 is defining the result.  Possible values are C<'ADDRESS'>, C<'PHRASE'>,
 C<'PLAIN'>, C<'MAILTO'>, or C<'LINK'>.  See L</address HOW> for details.
 
-=back
-
-$obj-E<gt>B<fromHead>(HEAD, NAME, ARGS)
-
-=over 4
+=item $obj-E<gt>B<fromHead>(HEAD, NAME, ARGS)
 
 Returns the fields from the header with NAME.  Some fields appear more
 than once, some may not be present.
 
-=back
-
-$obj-E<gt>B<htmlAddresses>(FIELD, ARGS)
-
-=over 4
+=item $obj-E<gt>B<htmlAddresses>(FIELD, ARGS)
 
 Returns an array with address info.
 
-=back
-
-$obj-E<gt>B<htmlBody>(ARGS)
-
-=over 4
+=item $obj-E<gt>B<htmlBody>(ARGS)
 
 Produce the body of the field: everything after the first colon on the
 header line.
 
- Option --Default
- address  'MAILTO'
- content  <depends>
- wrap     78
+ -Option --Default
+  address  'MAILTO'
+  content  <depends>
+  wrap     78
 
-. address => ADDRESS|PHRASE|PLAIN|MAILTO|LINK
+=over 2
 
-=over 4
+=item address => ADDRESS|PHRASE|PLAIN|MAILTO|LINK
 
 See L</address HOW>
 
-=back
-
-. content => FOLDED|REFOLD|UNFOLDED|DECODED
-
-=over 4
+=item content => FOLDED|REFOLD|UNFOLDED|DECODED
 
 How to included the body of the field.  If a C<wrap> is defined, then
 REFOLD is taken as default, otherwise DECODED is the default. See
 L</content HOW>
 
-=back
-
-. wrap => INTEGER
-
-=over 4
+=item wrap => INTEGER
 
 In combination with C<content REFOLD>, it specifies the maximum number
 of characters requested per line.  See L</wrap INTEGER>.
 
 =back
 
-=back
-
-$obj-E<gt>B<htmlName>(ARGS)
-
-=over 4
+=item $obj-E<gt>B<htmlName>(ARGS)
 
 Returns the name of the header field.
 
- Option  --Default
- capitals  'UNCHANGED'
+ -Option  --Default
+  capitals  'UNCHANGED'
 
-. capitals => 'UNCHANGED'|'WELLFORMED'
+=over 2
 
-=over 4
+=item capitals => 'UNCHANGED'|'WELLFORMED'
 
 Overrules the default from L<new(settings)|HTML::FromMail::Object/"METHODS"> C<names>.
 See L</names HOW>.
 
 =back
 
-=back
+=item $obj-E<gt>B<lookup>(LABEL, ARGS)
 
-$obj-E<gt>B<lookup>(LABEL, ARGS)
+Inherited, see L<HTML::FromMail::Page/"METHODS">
 
-=over 4
+=item HTML::FromMail::Field-E<gt>B<new>(OPTIONS)
 
-See L<HTML::FromMail::Page/"METHODS">
+ -Option  --Defined in            --Default
+  settings  HTML::FromMail::Object  {}
+  topic     HTML::FromMail::Object  'field'
 
-=back
+=over 2
 
-HTML::FromMail::Field-E<gt>B<new>(OPTIONS)
+=item settings => HASH-OF-HASHES
 
-=over 4
-
- Option  --Defined in     --Default
- settings  HTML::FromMail::Object  {}
- topic     HTML::FromMail::Object  'field'
-
-. settings => HASH-OF-HASHES
-
-. topic => STRING
+=item topic => STRING
 
 =back
-
-=head2 Attributes
-
-$obj-E<gt>B<settings>([TOPIC])
-
-=over 4
-
-See L<HTML::FromMail::Object/"Attributes">
-
-=back
-
-$obj-E<gt>B<topic>
-
-=over 4
-
-See L<HTML::FromMail::Object/"Attributes">
-
-=back
-
-=head2 Export
-
-=head2 Other methods
-
-$obj-E<gt>B<plain2html>(STRING)
-
-=over 4
-
-See L<HTML::FromMail::Object/"Other methods">
 
 =back
 
@@ -251,7 +199,7 @@ of capitals.  The correct use of capitals is implemented by
 Mail::Message::Field subroutine wellformedName and will be used when WELLFORMED
 is selected.  By default, the names are displayed UNCHANGED.
 
-I<Example:> using L<HTML::FromMail::Format::Magic|HTML::FromMail::Format::Magic>
+B<. Example: using HTML::FromMail::Format::Magic>
 
   <!--{name capitals => WELLFORMED}-->
 
@@ -262,14 +210,14 @@ are requested per line.
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.11,
-built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+This module is part of HTML-FromMail distribution version 0.12,
+built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

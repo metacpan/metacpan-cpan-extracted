@@ -1,3 +1,16 @@
+0.006   2018-02-06 (PERLANCAR)
+
+        - Allow PnW [RT#124294].
+
+        - Allow decimal fractions (note that ISO standard only allows decimal
+          fractions for the smallest unit, but we haven't enforced this).
+
+        - [doc] Document parse_duration_as_deltas().
+
+        - [Bugfix] Forgot to load DateTime::Duration when creating object
+          [RT#124293].
+
+
 0.005   2017-08-02 (PERLANCAR)
 
 	- Fix parsing PT0S (RT#122682, thanks Pip Cet).

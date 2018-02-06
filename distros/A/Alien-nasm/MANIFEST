@@ -13,7 +13,6 @@ dist.ini
 lib/Alien/nasm.pm
 t/00_diag.t
 t/alien_nasm.t
-t/alien_nasm__warning.t
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

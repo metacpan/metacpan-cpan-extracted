@@ -4,7 +4,7 @@
       "Johann Rolschewski <rolschewski@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
             "Catmandu" : "1.0601",
             "Catmandu::SRU" : "0.41",
             "Moo" : "1.0",
-            "PICA::Data" : "0.33",
+            "PICA::Data" : "0.35",
             "PICA::Parser" : "0.585",
             "perl" : "v5.12.0"
          }
@@ -67,7 +67,7 @@
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -76,6 +76,6 @@
       "Johann Rolschewski <jorol@cpan.org>",
       "Julian Ladisch <julianladisch@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

@@ -1,5 +1,5 @@
 package Devel::SubBreaker;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 sub import {
     our @patterns = @_[1..$#_];
     require "perl5db.pl";
@@ -10,7 +10,12 @@ CHECK { # expect compile-time mods have been loaded before CHECK phase
         # exclude some pragmas, core modules, and modules integral to the
         # debugger, as breaking inside these modules can cause problems
         # This list is constructed by trial-and-error so that it does
-        # not cause any problems for perl v5.08 through v5.26
+        # not cause any problems for perl v5.08 through v5.26.
+        #
+        # If you encounter any additional modules and pragmas that must
+        # be excluded for this module to function, submit a bug report to
+        # http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-ModuleBreaker
+
 
         next if $sub =~ /^warnings::/;
         next if $sub =~ /^Carp::/;
@@ -32,10 +37,8 @@ CHECK { # expect compile-time mods have been loaded before CHECK phase
         next if $sub eq 'main::BEGIN';
         next if $sub =~ /t.bptracker.pl/;
 
-#        print STDERR $::LL++,$",$sub,$/;
         for (our @patterns) {
             if ($sub =~ qr/$_/) {
-#                print STDERR "Breaking in $sub ... matches $_\n";
                 DB::cmd_b_sub($sub);
                 last;
             }
@@ -50,7 +53,7 @@ Devel::SubBreaker - set breakpoints in many arbitrary subroutines simultaneously
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 

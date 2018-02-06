@@ -1,0 +1,473 @@
+{
+    "request": {
+        "parameters": {
+            "api_id": "example",
+            "affiliate_id": "affiliate-990",
+            "output": "json",
+            "callback": "example"
+        }
+    },
+    "result": {
+        "site": [{
+                "name": "DMM.com（一般）",
+                "code": "DMM.com",
+                "service": [{
+                        "name": "AKB48グループ",
+                        "code": "monthly",
+                        "floor": [{
+                                "id": "1",
+                                "name": "AKB48",
+                                "code": "akb48"
+                            },
+                            {
+                                "id": "2",
+                                "name": "SKE48",
+                                "code": "ske48"
+                            },
+                            {
+                                "id": "3",
+                                "name": "NMB48",
+                                "code": "nmb48"
+                            },
+                            {
+                                "id": "4",
+                                "name": "HKT48",
+                                "code": "hkt48"
+                            },
+                            {
+                                "id": "5",
+                                "name": "NGT48",
+                                "code": "ngt48"
+                            },
+                            {
+                                "id": "6",
+                                "name": "REVIVAL!! ON DEMAND",
+                                "code": "rod"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "動画",
+                        "code": "digital",
+                        "floor": [{
+                                "id": "7",
+                                "name": "バンダイch",
+                                "code": "bandai"
+                            },
+                            {
+                                "id": "8",
+                                "name": "アニメ",
+                                "code": "anime"
+                            },
+                            {
+                                "id": "9",
+                                "name": "アイドル",
+                                "code": "idol"
+                            },
+                            {
+                                "id": "10",
+                                "name": "映画・ドラマ",
+                                "code": "cinema"
+                            },
+                            {
+                                "id": "11",
+                                "name": "格闘技",
+                                "code": "fight"
+                            },
+                            {
+                                "id": "12",
+                                "name": "バラエティ",
+                                "code": "video"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "月額動画",
+                        "code": "monthly",
+                        "floor": [{
+                                "id": "13",
+                                "name": "東映・東映アニメアーカイブス",
+                                "code": "toei"
+                            },
+                            {
+                                "id": "14",
+                                "name": "アニメチャンネル",
+                                "code": "animate"
+                            },
+                            {
+                                "id": "15",
+                                "name": "アイドルチャンネル",
+                                "code": "idol"
+                            },
+                            {
+                                "id": "16",
+                                "name": "ギャルコレクション",
+                                "code": "dgc"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "電子書籍",
+                        "code": "ebook",
+                        "floor": [{
+                                "id": "19",
+                                "name": "コミック",
+                                "code": "comic"
+                            },
+                            {
+                                "id": "20",
+                                "name": "写真集",
+                                "code": "photo"
+                            },
+                            {
+                                "id": "21",
+                                "name": "文芸・ラノベ",
+                                "code": "novel"
+                            },
+                            {
+                                "id": "22",
+                                "name": "ビジネス・実用",
+                                "code": "otherbooks"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "PCゲーム/ソフトウェア",
+                        "code": "pcsoft",
+                        "floor": [{
+                                "id": "23",
+                                "name": "PCゲーム",
+                                "code": "digital_pcgame"
+                            },
+                            {
+                                "id": "24",
+                                "name": "ソフトウェア",
+                                "code": "digital_pcsoft"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "通販",
+                        "code": "mono",
+                        "floor": [{
+                                "id": "25",
+                                "name": "DVD・Blu-ray",
+                                "code": "dvd"
+                            },
+                            {
+                                "id": "26",
+                                "name": "CD",
+                                "code": "cd"
+                            },
+                            {
+                                "id": "27",
+                                "name": "本・コミック",
+                                "code": "book"
+                            },
+                            {
+                                "id": "28",
+                                "name": "ゲーム",
+                                "code": "game"
+                            },
+                            {
+                                "id": "29",
+                                "name": "ホビー",
+                                "code": "hobby"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "DVD/CDレンタル",
+                        "code": "rental",
+                        "floor": [{
+                                "id": "33",
+                                "name": "月額DVDレンタル",
+                                "code": "rental_dvd"
+                            },
+                            {
+                                "id": "34",
+                                "name": "月額CDレンタル",
+                                "code": "rental_cd"
+                            },
+                            {
+                                "id": "35",
+                                "name": "単品DVDレンタル",
+                                "code": "ppr_dvd"
+                            },
+                            {
+                                "id": "36",
+                                "name": "単品CDレンタル",
+                                "code": "ppr_cd"
+                            },
+                            {
+                                "id": "39",
+                                "name": "コミック",
+                                "code": "rental_comic"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "いろいろレンタル",
+                        "code": "nandemo",
+                        "floor": [{
+                                "id": "40",
+                                "name": "レディースファッションレンタル",
+                                "code": "fashion_ladies"
+                            },
+                            {
+                                "id": "41",
+                                "name": "メンズファッションレンタル",
+                                "code": "fashion_mens"
+                            },
+                            {
+                                "id": "42",
+                                "name": "いろいろ",
+                                "code": "rental_iroiro"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "DMM.R18（アダルト）",
+                "code": "DMM.co.jp",
+                "service": {
+                    "8": {
+                        "name": "動画",
+                        "code": "digital",
+                        "floor": [{
+                                "id": "43",
+                                "name": "ビデオ",
+                                "code": "videoa"
+                            },
+                            {
+                                "id": "44",
+                                "name": "素人",
+                                "code": "videoc"
+                            },
+                            {
+                                "id": "45",
+                                "name": "成人映画",
+                                "code": "nikkatsu"
+                            },
+                            {
+                                "id": "46",
+                                "name": "アニメ動画",
+                                "code": "anime"
+                            }
+                        ]
+                    },
+                    "9": {
+                        "name": "月額動画",
+                        "code": "monthly",
+                        "floor": [{
+                                "id": "47",
+                                "name": "プレイガール ch.",
+                                "code": "playgirl"
+                            },
+                            {
+                                "id": "48",
+                                "name": "AVステーション",
+                                "code": "avstation"
+                            },
+                            {
+                                "id": "49",
+                                "name": "ドリームチャンネル",
+                                "code": "dream"
+                            },
+                            {
+                                "id": "50",
+                                "name": "エスワン ナンバーワンスタイル ch",
+                                "code": "s1"
+                            },
+                            {
+                                "id": "51",
+                                "name": "MOODYZチャンネル",
+                                "code": "moodyz"
+                            },
+                            {
+                                "id": "52",
+                                "name": "ソフト・オン・デマンド ch",
+                                "code": "sod"
+                            },
+                            {
+                                "id": "53",
+                                "name": "プレステージ ch",
+                                "code": "prestige"
+                            },
+                            {
+                                "id": "54",
+                                "name": "KMP チャンネル",
+                                "code": "kmp"
+                            },
+                            {
+                                "id": "55",
+                                "name": "桃太郎BB",
+                                "code": "momotaroubb"
+                            },
+                            {
+                                "id": "56",
+                                "name": "アリスJAPAN ch",
+                                "code": "alice"
+                            },
+                            {
+                                "id": "60",
+                                "name": "熟女チャンネル",
+                                "code": "jukujo"
+                            },
+                            {
+                                "id": "61",
+                                "name": "マニア ch",
+                                "code": "mania"
+                            },
+                            {
+                                "id": "62",
+                                "name": "パラダイステレビ ch",
+                                "code": "paradisetv"
+                            },
+                            {
+                                "id": "63",
+                                "name": "素人ガールズコレクション",
+                                "code": "shirouto"
+                            },
+                            {
+                                "id": "64",
+                                "name": "ピンク映画 ch",
+                                "code": "nikkatsu"
+                            },
+                            {
+                                "id": "65",
+                                "name": "アダルトアニメチャンネル",
+                                "code": "animech"
+                            },
+                            {
+                                "id": "66",
+                                "name": "妄想族ch",
+                                "code": "mousouzoku"
+                            },
+                            {
+                                "id": "67",
+                                "name": "見放題ch ライト",
+                                "code": "prime"
+                            },
+                            {
+                                "id": "68",
+                                "name": "見放題ch プレミアム",
+                                "code": "premium"
+                            }
+                        ]
+                    },
+                    "10": {
+                        "name": "10円動画",
+                        "code": "ppm",
+                        "floor": [{
+                                "id": "69",
+                                "name": "ビデオ",
+                                "code": "video"
+                            },
+                            {
+                                "id": "70",
+                                "name": "素人",
+                                "code": "videoc"
+                            }
+                        ]
+                    },
+                    "11": {
+                        "name": "DVDレンタル",
+                        "code": "rental",
+                        "floor": [{
+                                "id": "71",
+                                "name": "月額レンタル",
+                                "code": "rental_dvd"
+                            },
+                            {
+                                "id": "72",
+                                "name": "単品レンタル",
+                                "code": "ppr_dvd"
+                            }
+                        ]
+                    },
+                    "12": {
+                        "name": "通販",
+                        "code": "mono",
+                        "floor": [{
+                                "id": "74",
+                                "name": "DVD",
+                                "code": "dvd"
+                            },
+                            {
+                                "id": "75",
+                                "name": "大人のおもちゃ",
+                                "code": "goods"
+                            },
+                            {
+                                "id": "76",
+                                "name": "アニメ",
+                                "code": "anime"
+                            },
+                            {
+                                "id": "77",
+                                "name": "PCゲーム",
+                                "code": "pcgame"
+                            },
+                            {
+                                "id": "78",
+                                "name": "ブック",
+                                "code": "book"
+                            },
+                            {
+                                "id": "79",
+                                "name": "同人",
+                                "code": "doujin"
+                            }
+                        ]
+                    },
+                    "13": {
+                        "name": "アダルトPCゲーム",
+                        "code": "pcgame",
+                        "floor": [{
+                                "id": "80",
+                                "name": "アダルトPCゲーム",
+                                "code": "digital_pcgame"
+                            },
+                            {
+                                "id": "89",
+                                "name": "音楽",
+                                "code": "pcgame_music"
+                            }
+                        ]
+                    },
+                    "14": {
+                        "name": "同人",
+                        "code": "doujin",
+                        "floor": [{
+                            "id": "81",
+                            "name": "同人",
+                            "code": "digital_doujin"
+                        }]
+                    },
+                    "15": {
+                        "name": "電子書籍",
+                        "code": "ebook",
+                        "floor": [{
+                                "id": "82",
+                                "name": "コミック",
+                                "code": "comic"
+                            },
+                            {
+                                "id": "83",
+                                "name": "美少女ノベル・官能小説",
+                                "code": "novel"
+                            },
+                            {
+                                "id": "84",
+                                "name": "アダルト写真集・雑誌",
+                                "code": "photo"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}

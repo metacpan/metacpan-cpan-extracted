@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Run object
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 sub out    { shift->{out} }
@@ -172,7 +172,7 @@ Test::Alien::Run - Run object
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -341,6 +341,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

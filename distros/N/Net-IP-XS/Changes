@@ -1,5 +1,9 @@
 Revision history for Net-IP-XS
 
+0.21    5 February 2018
+        - Avoid unnecessary calls to NI_ip_get_version when
+          constructing objects (Github #2).
+
 0.20    26 October 2017
         - Fix subroutine redefinition problem (RT #122438).
 

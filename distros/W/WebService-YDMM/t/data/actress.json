@@ -1,0 +1,147 @@
+{
+    "request": {
+        "parameters": {
+            "api_id": "example",
+            "affiliate_id": "affiliate-990",
+            "keyword": "あさみ",
+            "bust": "90",
+            "waist": "-60",
+            "sort": "-bust",
+            "hits": "10",
+            "output": "json"
+        }
+    },
+    "result": {
+        "status": "200",
+        "result_count": 5,
+        "total_count": "5",
+        "first_position": 0,
+        "actress": [
+            {
+                "id": "15365",
+                "name": "麻美ゆま",
+                "ruby": "あさみゆま",
+                "bust": "96",
+                "cup": "H",
+                "waist": "58",
+                "hip": "88",
+                "height": "158",
+                "birthday": "1987-03-24",
+                "blood_type": "AB",
+                "hobby": "香水集め、英会話、ピアノ",
+                "prefectures": "東京都",
+                "imageURL": {
+                    "small": "http://pics.dmm.co.jp/mono/actjpgs/thumbnail/asami_yuma.jpg",
+                    "large": "http://pics.dmm.co.jp/mono/actjpgs/asami_yuma.jpg"
+                },
+                "listURL": {
+                    "digital": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=15365/affiliate-990",
+                    "monthly": "http://www.dmm.co.jp/monthly/premium/-/list/=/article=actress/id=15365/affiliate-990",
+                    "ppm": "http://www.dmm.co.jp/ppm/video/-/list/=/article=actress/id=15365/affiliate-990",
+                    "mono": "http://www.dmm.co.jp/mono/dvd/-/list/=/article=actress/id=15365/affiliate-990",
+                    "rental": "http://www.dmm.co.jp/rental/ppr/-/list/=/article=actress/id=15365/affiliate-990"
+                }
+            },
+            {
+                "id": "26511",
+                "name": "星川麻美",
+                "ruby": "ほしかわあさみ",
+                "bust": "93",
+                "cup": "H",
+                "waist": "59",
+                "hip": "86",
+                "height": "165",
+                "birthday": "1986-07-07",
+                "blood_type": null,
+                "hobby": "卓球",
+                "prefectures": "",
+                "imageURL": {
+                    "small": "http://pics.dmm.co.jp/mono/actjpgs/thumbnail/hosikawa_asami.jpg",
+                    "large": "http://pics.dmm.co.jp/mono/actjpgs/hosikawa_asami.jpg"
+                },
+                "listURL": {
+                    "digital": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=26511/affiliate-990",
+                    "monthly": "http://www.dmm.co.jp/monthly/premium/-/list/=/article=actress/id=26511/affiliate-990",
+                    "ppm": "http://www.dmm.co.jp/ppm/video/-/list/=/article=actress/id=26511/affiliate-990",
+                    "mono": "http://www.dmm.co.jp/mono/dvd/-/list/=/article=actress/id=26511/affiliate-990",
+                    "rental": "http://www.dmm.co.jp/rental/ppr/-/list/=/article=actress/id=26511/affiliate-990"
+                }
+            },
+            {
+                "id": "3152",
+                "name": "眞城麗美（浅見伽揶）",
+                "ruby": "しんじょうれいみ（あさみかや）",
+                "bust": "93",
+                "cup": "F",
+                "waist": "60",
+                "hip": "94",
+                "height": null,
+                "birthday": "1974-01-15",
+                "blood_type": "O",
+                "hobby": "ネイルアート",
+                "prefectures": null,
+                "imageURL": {
+                    "small": "http://pics.dmm.co.jp/mono/actjpgs/thumbnail/sinzyou_remi.jpg",
+                    "large": "http://pics.dmm.co.jp/mono/actjpgs/sinzyou_remi.jpg"
+                },
+                "listURL": {
+                    "digital": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=3152/affiliate-990",
+                    "monthly": "http://www.dmm.co.jp/monthly/premium/-/list/=/article=actress/id=3152/affiliate-990",
+                    "ppm": "http://www.dmm.co.jp/ppm/video/-/list/=/article=actress/id=3152/affiliate-990",
+                    "mono": "http://www.dmm.co.jp/mono/dvd/-/list/=/article=actress/id=3152/affiliate-990",
+                    "rental": "http://www.dmm.co.jp/rental/ppr/-/list/=/article=actress/id=3152/affiliate-990"
+                }
+            },
+            {
+                "id": "12222",
+                "name": "麻宮千聖",
+                "ruby": "あさみやちさと",
+                "bust": "90",
+                "cup": "",
+                "waist": "58",
+                "hip": "88",
+                "height": "157",
+                "birthday": "1969-12-28",
+                "blood_type": "A",
+                "hobby": null,
+                "prefectures": null,
+                "imageURL": {
+                    "small": "http://pics.dmm.co.jp/mono/actjpgs/thumbnail/asamiya_tisato.jpg",
+                    "large": "http://pics.dmm.co.jp/mono/actjpgs/asamiya_tisato.jpg"
+                },
+                "listURL": {
+                    "digital": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=12222/affiliate-990",
+                    "monthly": "http://www.dmm.co.jp/monthly/premium/-/list/=/article=actress/id=12222/affiliate-990",
+                    "ppm": "http://www.dmm.co.jp/ppm/video/-/list/=/article=actress/id=12222/affiliate-990",
+                    "mono": "http://www.dmm.co.jp/mono/dvd/-/list/=/article=actress/id=12222/affiliate-990",
+                    "rental": "http://www.dmm.co.jp/rental/ppr/-/list/=/article=actress/id=12222/affiliate-990"
+                }
+            },
+            {
+                "id": "550",
+                "name": "叶麻美",
+                "ruby": "かのうあさみ",
+                "bust": "90",
+                "cup": "",
+                "waist": "59",
+                "hip": "90",
+                "height": null,
+                "birthday": "1978-01-10",
+                "blood_type": null,
+                "hobby": null,
+                "prefectures": null,
+                "imageURL": {
+                    "small": "http://pics.dmm.co.jp/mono/actjpgs/thumbnail/kanou_asami.jpg",
+                    "large": "http://pics.dmm.co.jp/mono/actjpgs/kanou_asami.jpg"
+                },
+                "listURL": {
+                    "digital": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=actress/id=550/affiliate-990",
+                    "monthly": "http://www.dmm.co.jp/monthly/premium/-/list/=/article=actress/id=550/affiliate-990",
+                    "ppm": "http://www.dmm.co.jp/ppm/video/-/list/=/article=actress/id=550/affiliate-990",
+                    "mono": "http://www.dmm.co.jp/mono/dvd/-/list/=/article=actress/id=550/affiliate-990",
+                    "rental": "http://www.dmm.co.jp/rental/ppr/-/list/=/article=actress/id=550/affiliate-990"
+                }
+            }
+        ]
+    }
+}

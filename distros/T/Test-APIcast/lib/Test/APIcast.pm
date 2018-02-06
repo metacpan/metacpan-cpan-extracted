@@ -3,7 +3,7 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 
 BEGIN {
     $ENV{TEST_NGINX_BINARY} ||= 'openresty';
@@ -24,6 +24,7 @@ $ENV{TEST_NGINX_MANAGEMENT_CONFIG} = "$path/conf.d/management.conf";
 $ENV{TEST_NGINX_UPSTREAM_CONFIG} = "$path/http.d/upstream.conf";
 $ENV{TEST_NGINX_BACKEND_CONFIG} = "$path/conf.d/backend.conf";
 $ENV{TEST_NGINX_APICAST_CONFIG} = "$path/conf.d/apicast.conf";
+$ENV{APICAST_DIR} = $path;
 
 if ($ENV{DEBUG}) {
     $ENV{TEST_NGINX_ERROR_LOG} ||= '/dev/stderr';
@@ -64,6 +65,7 @@ sub get_random_port {
     return $ServerPort;
 }
 
+env_to_nginx('APICAST_DIR');
 env_to_nginx("TEST_NGINX_SERVER_PORT=$Test::Nginx::Util::ServerPortForClient");
 
 log_level('debug');

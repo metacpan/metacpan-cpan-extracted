@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "RPC-Switch client using Mojo(licious).",
+  "ABSTRACT" => "Connect to the RPC-Switch using Mojo.",
   "AUTHOR" => "Wieger Opmeer <wiegerop\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -20,9 +20,9 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "JSON::RPC2::TwoWay" => "0.03",
     "MojoX::NetstringStream" => "0.06",
-    "Mojolicious" => "7.49"
+    "Mojolicious" => "7.55"
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "JSON::RPC2::TwoWay" => "0.03",
   "MojoX::NetstringStream" => "0.06",
-  "Mojolicious" => "7.49"
+  "Mojolicious" => "7.55"
 );
 
 

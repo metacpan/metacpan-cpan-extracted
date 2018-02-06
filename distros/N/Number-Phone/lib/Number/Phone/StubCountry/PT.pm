@@ -22,43 +22,35 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
-                  'pattern' => '(2\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '2[12]'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '2[12]',
+                  'pattern' => '(2\\d)(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '([2-46-9]\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             2[3-9]|
             [346-9]
-          '
+          ',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '884[0-4689]\\d{5}',
-                'geographic' => '
-          2(?:
-            [12]\\d|
-            [35][1-689]|
-            4[1-59]|
-            6[1-35689]|
-            7[1-9]|
-            8[1-69]|
-            9[1256]
-          )\\d{6}
-        ',
                 'pager' => '',
-                'toll_free' => '80[02]\\d{6}',
+                'voip' => '30\\d{7}',
                 'mobile' => '
           9(?:
             [1236]\\d{2}|
             480
           )\\d{5}
         ',
+                'personal_number' => '884[0-4689]\\d{5}',
+                'toll_free' => '80[02]\\d{6}',
                 'fixed_line' => '
           2(?:
             [12]\\d|
@@ -93,7 +85,17 @@ my $validators = {
             )
           )\\d{5}
         )',
-                'voip' => '30\\d{7}'
+                'geographic' => '
+          2(?:
+            [12]\\d|
+            [35][1-689]|
+            4[1-59]|
+            6[1-35689]|
+            7[1-9]|
+            8[1-69]|
+            9[1256]
+          )\\d{6}
+        '
               };
 my %areanames = (
   35121 => "Lisbon",

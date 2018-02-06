@@ -1,5 +1,5 @@
 package CPAN::Testers::Backend::ProcessReports;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Process an incoming test report into useful statistics
 
 #pod =head1 SYNOPSIS
@@ -114,6 +114,7 @@ sub run( $self, @args ) {
             next;
         }
         $self->write_metabase_cache( $report, $stat );
+        $self->write_builder_update( $stat );
     }
 
     $LOG->info("Skipped $skipped unprocessed report(s)") if $skipped;
@@ -273,6 +274,30 @@ sub write_metabase_cache( $self, $report_row, $stat_row ) {
     return;
 }
 
+#pod =method write_builder_update
+#pod
+#pod     $self->write_builder_update( $stat_row );
+#pod
+#pod Write entries to the C<page_requests> table to tell the legacy webapp
+#pod report builders that they need to update the static data caches for this
+#pod distribution and this distribution's author.
+#pod
+#pod =cut
+
+sub write_builder_update( $self, $stat ) {
+    my $upload_row = $self->schema->resultset( 'Upload' )->search({
+        dist => $stat->dist,
+        version => $stat->version,
+    })->first;
+    my $sql = 'INSERT INTO page_requests ( type, name, weight, id ) VALUES ( ?, ?, ?, ? )';
+    my $sub = sub( $storage, $dbh, @values ) {
+        $dbh->do( $sql, {}, @values );
+    };
+    my $storage = $self->schema->storage;
+    $storage->dbh_do( $sub, 'author', $upload_row->author, 1, $stat->id );
+    $storage->dbh_do( $sub, 'distro', $stat->dist, 1, $stat->id );
+}
+
 1;
 
 __END__
@@ -285,7 +310,7 @@ CPAN::Testers::Backend::ProcessReports - Process an incoming test report into us
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -341,6 +366,14 @@ processes are changed to use the new test report format, we need to
 maintain the old metabase cache.
 
 Once the legacy metabase cache is removed, this method can be removed
+
+=head2 write_builder_update
+
+    $self->write_builder_update( $stat_row );
+
+Write entries to the C<page_requests> table to tell the legacy webapp
+report builders that they need to update the static data caches for this
+distribution and this distribution's author.
 
 =head1 ARGUMENTS
 

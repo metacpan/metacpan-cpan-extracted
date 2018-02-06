@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::PostgreSqlProvider;
-$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.05';
+$Footprintless::Plugin::Database::PostgreSqlProvider::VERSION = '1.06';
 # ABSTRACT: A PostgreSql provider implementation
 # PODNAME: Footprintless::Plugin::Database::AbstractProvider
 
@@ -165,7 +165,7 @@ sub _connection_string {
 
     return join( '',
         'DBI:Pg:', 'dbname=', $self->{database}, ';', 'host=', $hostname, ';', 'port=', $port,
-        ( @pg_options ? ( "options=", join( ' ', @pg_options ) ) : () ) );
+        ( @pg_options ? ( ";options=\'", join( ' ', @pg_options ), "\'" ) : () ) );
 }
 
 sub _dump_command {
@@ -312,7 +312,7 @@ Footprintless::Plugin::Database::AbstractProvider - A PostgreSql provider implem
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 AUTHOR
 

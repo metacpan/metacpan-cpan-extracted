@@ -9,7 +9,7 @@ use Astro::Coord::ECI::TLE;
 use Carp;
 
 our @ISA = qw{ Astro::Coord::ECI::TLE };
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 my $pkg = __PACKAGE__;
 

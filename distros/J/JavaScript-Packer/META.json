@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JavaScript-Packer",
    "no_index" : {
@@ -49,6 +49,6 @@
          "url" : "https://github.com/leejo/javascript-packer-perl"
       }
    },
-   "version" : "2.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.04",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

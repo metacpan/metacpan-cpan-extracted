@@ -1,6 +1,6 @@
 package HTML::DOM::EventTarget;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 use strict;
@@ -25,7 +25,7 @@ HTML::DOM::EventTarget - Perl implementation of the DOM EventTarget interface
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use Carp;
 use Forks::Super::Debug ':all';
 use Forks::Super::Util ':all';
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 my $emulate_id = 0;
 
@@ -73,7 +73,13 @@ sub _postlaunch_child_to_cmd {
     if (&IS_WIN32) {
 
         $job->set_signal_pid($$);
-	$c1 = system( @{$job->{cmd}} );
+        if ($job->{_indirect}) {
+            my $prog = shift @{$job->{cmd}};
+            my $name = $job->{name} || $prog;
+            $c1 = system { $prog } ($name,@{$job->{cmd}});
+        } else {            
+            $c1 = system( @{$job->{cmd}} );
+        }
 	Forks::Super::Job::Ipc::_close_child_fh($job);
 	Forks::Super::Sigchld::_preliminary_reap($job,$c1);
 	debug("WIN32 returned, exit code of $$ was $c1 ", $c1>>8)
@@ -97,8 +103,13 @@ sub _postlaunch_child_to_cmd {
         }
         $EMULATE_PID{$exec_pid} = $job;
         if ($$ != $this_pid) {
-            exec( @{$job->{cmd}} ) or
-                Carp::confess 'exec for cmd-style fork failed ';
+            if ($job->{_indirect} && @{$job->{cmd}}==1) {
+                exec { $job->{cmd}[0] } @{$job->{cmd}} or
+                    Carp::confess 'exec for cmd-style fork failed ';
+            } else {
+                exec( @{$job->{cmd}} ) or
+                    Carp::confess 'exec for cmd-style fork failed ';
+            }
         }
         $job->{debug} && debug("  exec pid is $exec_pid for job $job");
         $job->set_signal_pid($exec_pid);
@@ -120,7 +131,13 @@ sub _postlaunch_child_to_cmd {
             debug("$$ was reaped in SIGCHLD handler status=$job->{status}");
         }
     } else {
-        $c1 = system( @{$job->{cmd}} );
+        if ($job->{_indirect}) {
+            my $prog = shift @{$job->{cmd}};
+            my $name = $job->{name} || $prog;
+            $c1 = system { $prog } ($name,@{$job->{cmd}});
+        } else {            
+            $c1 = system( @{$job->{cmd}} );
+        }
         Forks::Super::Job::Ipc::_close_child_fh($job);
         Forks::Super::Sigchld::_preliminary_reap($job,$c1);
     }
@@ -140,7 +157,7 @@ Forks::Super::Job::Emulate - support emulation mode for Job object
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 DESCRIPTION
 
@@ -149,7 +166,7 @@ to L<fork|Forks::Super/"fork">), no background process is created.
 Rather, the C<fork> call performs the background task in the main
 process and returns a L<Forks::Super::Job|Forks::Super::Job> object
 that resembles a completed background job. See 
-L<< the "emulate" option to C<fork>|Forks::Super/"emulate"> for
+L<< the "emulate" option to C<fork>|Forks::Super/"emulate" >> for
 more information.
 
 This package is part of the L<Forks::Super|Forks::Super>

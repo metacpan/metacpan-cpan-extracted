@@ -1,5 +1,5 @@
 package CPAN::Testers::Backend::Migrate::MetabaseCache;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 # ABSTRACT: Migrate old metabase cache to new test report format
 
 #pod =head1 SYNOPSIS
@@ -202,7 +202,7 @@ CPAN::Testers::Backend::Migrate::MetabaseCache - Migrate old metabase cache to n
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

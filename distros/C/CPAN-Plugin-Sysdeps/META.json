@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "0",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
@@ -42,5 +44,5 @@
          "url" : "git://github.com/eserte/cpan-plugin-sysdeps.git"
       }
    },
-   "version" : "0.43"
+   "version" : "0.44"
 }

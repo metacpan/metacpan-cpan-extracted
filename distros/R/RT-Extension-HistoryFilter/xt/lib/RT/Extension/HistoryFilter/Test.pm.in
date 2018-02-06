@@ -1,0 +1,27 @@
+use strict;
+use warnings;
+
+### after: use lib qw(@RT_LIB_PATH@);
+
+
+package RT::Extension::HistoryFilter::Test;
+use base 'RT::Test';
+
+sub import {
+    my $class = shift;
+    my %args  = @_;
+
+    $args{'requires'} ||= [];
+    if ( $args{'testing'} ) {
+        unshift @{ $args{'requires'} }, 'RT::Extension::HistoryFilter';
+    } else {
+        $args{'testing'} = 'RT::Extension::HistoryFilter';
+    }
+
+    $class->SUPER::import( %args );
+    $class->export_to_level(1);
+
+    require RT::Extension::HistoryFilter;
+}
+
+1;

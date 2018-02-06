@@ -2,9 +2,9 @@ package Crypt::AuthEnc::OCB;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
-use base qw(Crypt::AuthEnc Exporter);
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ocb_encrypt_authenticate ocb_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -12,48 +12,12 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Cipher;
-
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(Crypt::Cipher::_trans_cipher_name(shift), @_);
-}
-
-sub ocb_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $nonce = shift;
-  my $adata = shift;
-  my $tag_len = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, $tag_len);
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->encrypt_last($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub ocb_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $nonce = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::OCB->new($cipher_name, $key, $nonce, length($tag));
-  $m->adata_add($adata) if defined $adata;
-  my $ct = $m->decrypt_last($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
 
 # obsolete, only for backwards compatibility
 sub aad_add { goto &adata_add }
 sub blocksize { return 16 }
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

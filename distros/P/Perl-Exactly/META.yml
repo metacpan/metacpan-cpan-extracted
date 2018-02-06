@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Perl-Exactly
 abstract: ensures exactly version of perl
-version: 0.03
+version: 0.04
 author:
   - INABA Hitoshi <ina@cpan.org>
 license: perl

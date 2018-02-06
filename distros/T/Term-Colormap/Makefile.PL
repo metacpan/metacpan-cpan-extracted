@@ -3,26 +3,27 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Term::Colormap',
   'EXE_FILES' => [
-                   'bin/#create_brewer_mapping#',
                    'bin/color_numbers',
                    'bin/felix',
                    'bin/git_blame_summary',
                    'bin/hbar',
                    'bin/highlight',
                    'bin/show_brewer_colormap',
-                   'bin/show_colormap'
+                   'bin/show_brewer_colormap~',
+                   'bin/show_colormap',
+                   'bin/show_colormap~'
                  ],
-  'NAME' => 'Term::Colormap',
-  'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/Term/Colormap.pm',
   'PREREQ_PM' => {
+                   'Test::More' => 0,
+                   'Scalar::Util' => 0,
                    'Test::Exception' => 0,
                    'Capture::Tiny' => 0,
-                   'Term::ReadKey' => 0,
-                   'Scalar::Util' => 0,
-                   'Test::More' => 0
-                 },
-  'VERSION_FROM' => 'lib/Term/Colormap.pm'
+                   'Term::ReadKey' => 0
+                 }
 )
 ;

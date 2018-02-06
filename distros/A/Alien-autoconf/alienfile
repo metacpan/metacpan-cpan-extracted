@@ -63,7 +63,7 @@ share {
   }
 
   plugin Download => (
-    url => 'ftp://ftp.gnu.org/gnu/autoconf',
+    url => 'http://ftp.gnu.org/gnu/autoconf',
     filter => qr/^autoconf-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );

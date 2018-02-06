@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::SqlShellAdapter;
-$Footprintless::Plugin::Database::SqlShellAdapter::VERSION = '1.05';
+$Footprintless::Plugin::Database::SqlShellAdapter::VERSION = '1.06';
 # ABSTRACT: An adaptor to SQL::Shell
 # PODNAME: Footprintless::Plugin::Database::SqlShellAdapter
 
@@ -158,7 +158,7 @@ Footprintless::Plugin::Database::SqlShellAdapter - An adaptor to SQL::Shell
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 

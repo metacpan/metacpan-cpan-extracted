@@ -12,11 +12,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.75
+Version 0.76
 
 =cut
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 =head1 SYNOPSIS
 
@@ -221,7 +221,7 @@ sub new {
         $self->type( $1 );
         $self->scan_on( { 'index_name' => $2, } );
     }
-    elsif ( $self->type =~ m{ \A (Index (?: \s Only )? \s Scan (?: \s Backward )? ) \s using \s (\S+) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
+    elsif ( $self->type =~ m{ \A ( (?: Parallel \s+ )? Index (?: \s Only )? \s Scan (?: \s Backward )? ) \s using \s (\S+) \s on \s (\S+) (?: \s+ (\S+) ) ? \z }xms ) {
         $self->type( $1 );
         $self->scan_on(
             {

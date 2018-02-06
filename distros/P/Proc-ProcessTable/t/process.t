@@ -13,7 +13,7 @@ use Proc::ProcessTable;
 $SIG{CHLD} = sub{wait;};
 my ( $got, $field );
 
-my $t = new Proc::ProcessTable;
+my $t = Proc::ProcessTable->new;
 
 # Is there a process called cron
 foreach $got ( @{$t->table} )

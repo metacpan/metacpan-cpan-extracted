@@ -7,9 +7,9 @@ Astro::Catalog::Query::CMC - A query request to the Carlsberg Meridian Catalog
 =head1 SYNOPSIS
 
   $gsc = new Astro::Catalog::Query::CMC( RA        => $ra,
-					 Dec       => $dec,
-					 Radius    => $radius,
-					 Nout      => $number_out );
+                                         Dec       => $dec,
+                                         Radius    => $radius,
+                                         Nout      => $number_out );
 
   my $catalog = $gsc->querydb();
 
@@ -48,11 +48,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: CMC.pm,v 1.3 2003/09/25 15:56:59 aa Exp $
+$VERSION = "4.32";
 
 =begin __PRIVATE_METHODS__
 
@@ -89,12 +85,12 @@ by the remote system (and to be included in the query).
 sub _get_allowed_options {
   my $self = shift;
   return (
-	  ra => '-c.ra',
-	  dec => '-c.dec',
-	  radmax => '-c.rm',
-	  nout => '-out.max',
+          ra => '-c.ra',
+          dec => '-c.dec',
+          radmax => '-c.rm',
+          nout => '-out.max',
           catalog => '-source',
-	 );
+         );
 }
 
 
@@ -106,17 +102,17 @@ Get the default query state.
 
 sub _get_default_options {
   return (
-	  # Internal
-	  catalog => 'I/282/cmc12',
+          # Internal
+          catalog => 'I/282/cmc12',
 
-	  # Target information
-	  ra => undef,
-	  dec => undef,
+          # Target information
+          ra => undef,
+          dec => undef,
 
-	  # Limits
-	  radmax => 5,
-	  nout => 20000,
-	 );
+          # Limits
+          radmax => 5,
+          nout => 20000,
+         );
 }
 
 =item B<_parse_query>
@@ -132,9 +128,9 @@ sub _parse_query {
 
   print $self->{BUFFER};
   return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
-			     Origin => 'Carlsberg Meridian Catalogue (CMC/11)',
-			     ReadOpt => { ra_col => 2, dec_col => 4, }
-			   );
+                             Origin => 'Carlsberg Meridian Catalogue (CMC/11)',
+                             ReadOpt => { ra_col => 2, dec_col => 4, }
+                           );
 }
 
 
@@ -173,10 +169,10 @@ sub _translate_one_to_one {
   my $self = shift;
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
-	  map { $_, undef }(qw/
-			    catalog
-			    /)
-	 );
+          map { $_, undef }(qw/
+                            catalog
+                            /)
+         );
 }
 
 =back

@@ -22,21 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{1})(\\d{6})',
-                  'leading_digits' => '[1-689]'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '[1-689]',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '7'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '7',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
                 'voip' => '',
+                'pager' => '',
                 'fixed_line' => '
           1(?:
             1[2-57]\\d{6}|
@@ -53,9 +58,6 @@ my $validators = {
         ',
                 'specialrate' => '',
                 'toll_free' => '',
-                'mobile' => '7[0125-8]\\d{7}',
-                'pager' => '',
-                'personal_number' => '',
                 'geographic' => '
           1(?:
             1[2-57]\\d{6}|
@@ -69,7 +71,9 @@ my $validators = {
             6[35-7]|
             [89]1
           )[2-57]\\d{6}
-        '
+        ',
+                'mobile' => '7[0125-8]\\d{7}',
+                'personal_number' => ''
               };
 my %areanames = (
   9411 => "Colombo",
@@ -109,7 +113,10 @@ my %areanames = (
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
   
       return $self if ($self->is_valid());
-      $number =~ s/(^0)//g;
+      {
+        no warnings 'uninitialized';
+        $number =~ s/^(?:0)//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
     return $self->is_valid() ? $self : undef;
 }

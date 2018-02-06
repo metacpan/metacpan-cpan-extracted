@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::cryptocurrency_symbol;
 
-our $DATE = '2018-01-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-01-30'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ Perinci::Sub::XCompletion::cryptocurrency_symbol - Generate completion for crypt
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Sub::XCompletion::cryptocurrency_symbol (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-01-12.
+This document describes version 0.002 of Perinci::Sub::XCompletion::cryptocurrency_symbol (from Perl distribution Perinci-Sub-XCompletionBundle-CryptoCurrency), released on 2018-01-30.
 
 =head1 FUNCTIONS
 

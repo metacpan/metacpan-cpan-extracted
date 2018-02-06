@@ -8,12 +8,24 @@ use File::Spec;
 use Carp qw(croak);
 use File::Temp 'tempdir';
 
+use Log::Log4perl ':easy';
+
 delete $ENV{HTTP_PROXY};
 delete $ENV{HTTPS_PROXY};
 
 sub browser_instances {
     my ($filter) = @_;
     $filter ||= qr/^/;
+
+    # (re)set the log level
+    if (my $lv = $ENV{TEST_LOG_LEVEL}) {
+        if( $lv eq 'trace' ) {
+            Log::Log4perl->easy_init($TRACE)
+        } elsif( $lv eq 'debug' ) {
+            Log::Log4perl->easy_init($DEBUG)
+        }
+    }
+
     my @instances;
     # default Chrome instance
 
@@ -54,15 +66,13 @@ sub default_unavailable {
     !scalar browser_instances
 };
 
-my @cleanup_directories;
 sub runtests {
     my ($browser_instance,$port, $new_mech, $code, $test_count) = @_;
     if ($browser_instance) {
         diag sprintf "Testing with %s",
             $browser_instance;
     };
-    my $tempdir = tempdir();
-    push @cleanup_directories, $tempdir;
+    my $tempdir = tempdir( CLEANUP => 1 );
     my @launch = $browser_instance
                ? ( launch_exe => $browser_instance,
                    port => $port,
@@ -97,9 +107,6 @@ sub runtests {
     };
 
     goto &$code;
-}
-END {
-    File::Path::rmtree($_, 0) for @cleanup_directories;
 }
 
 sub run_across_instances {

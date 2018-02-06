@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Strict-Perl
 abstract: Perl module to restrict old/unsafe constructs
-version: 2017.05
+version: 2018.02
 author:
   - INABA Hitoshi <ina@cpan.org> in a CPAN
 license: perl

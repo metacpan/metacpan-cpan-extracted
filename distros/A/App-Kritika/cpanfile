@@ -9,4 +9,5 @@ on 'test' => sub {
     requires 'Test::Fatal';
     requires 'Test::MonkeyMock';
     requires 'Test::TempDir::Tiny';
+    requires 'Test::Deep';
 };

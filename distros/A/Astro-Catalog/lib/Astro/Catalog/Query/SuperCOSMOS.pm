@@ -14,9 +14,9 @@ Astro::Catalog::Query::CMC - A query request to the SuperCOSMOS catalogue
 =head1 SYNOPSIS
 
   $supercos = new Astro::Catalog::Query::SuperCOSMOS( RA     => $ra,
-					              Dec    => $dec,
-					              Radius => $radius,
-					              Nout   => $number_out,
+                                                      Dec    => $dec,
+                                                      Radius => $radius,
+                                                      Nout   => $number_out,
                                                       Colour => $band );
 
   my $catalog = $supercos->querydb();
@@ -67,7 +67,7 @@ use Astro::FluxColor;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 # Controls whether we follow 'directory' config entries and recursively
@@ -83,10 +83,6 @@ my $CFG_FILE;
 # organized as a hash indexed by remote server shortname
 # this has the advantage of removing duplicates
 my %CONFIG;
-
-=head1 REVISION
-
-$Id: SuperCOSMOS.pm,v 1.11 2005/06/16 03:11:11 aa Exp $
 
 =head1 METHODS
 
@@ -291,8 +287,8 @@ sub _parse_query {
   # Make sure we set origin and field centre if we know it
   my $query = new Astro::Catalog( Format => 'TST',
                                   Data => $self->{BUFFER},
-			          ReadOpt => \%params,
-			          Origin => $CONFIG{$cat}->{long_name} );
+                                  ReadOpt => \%params,
+                                  Origin => $CONFIG{$cat}->{long_name} );
 
   # Grab each star in the catalog and add some value to it
   my $catalog = new Astro::Catalog( );
@@ -482,23 +478,23 @@ sub _get_default_options {
 
   # Global skycat defaults
   my %defaults = (
-		  # Target information
-		  ra => undef,
-		  dec => undef,
-		  id => undef,
+                  # Target information
+                  ra => undef,
+                  dec => undef,
+                  id => undef,
 
-		  # Limits
-		  radmin => 0,
-		  radmax => 5,
-		  width => 10,
-		  height => 10,
+                  # Limits
+                  radmin => 0,
+                  radmax => 5,
+                  width => 10,
+                  height => 10,
 
-		  magfaint => 100,
-		  magbright => 0,
+                  magfaint => 100,
+                  magbright => 0,
 
-		  nout => 20000,
-		  cond => '',
-		 );
+                  nout => 20000,
+                  cond => '',
+                 );
 
   # Get allowed options
   my %allow = $self->_get_allowed_options();
@@ -665,8 +661,8 @@ sub _load_config {
     # reconstruct the url. Of course, this does allow us to provide
     # mandatory keywords. $url =~ s/\%ra/$ra/;
     if ( $entry->{url} =~ m|^http://www-wfau.roe.ac.uk/~sss/cgi-bin/gaia_obj.cgi?
-	       (.*)               # CGI options without trailing space
-	      |x) {
+               (.*)               # CGI options without trailing space
+              |x) {
       $entry->{remote_host} = "www-wfau.roe.ac.uk";
       $entry->{url_path} = "~sss/cgi-bin/gaia_obj.cgi?";
       my $options = $1;
@@ -693,27 +689,27 @@ sub _load_config {
 
       # there should always be tokens. No obvious way to reomve the anomaly
       warnings::warnif( "No tokens found in $options!!!" )
-	  unless @tokens;
+          unless @tokens;
 
       # Just need to make sure that these are acceptable tokens
       # Get the lookup table and store that as the allowed options
       my %allow;
       for my $tok (@tokens) {
-	# only one token. See if we recognize it
-	my $strip = $tok;
-	$strip =~ s/%//;
+        # only one token. See if we recognize it
+        my $strip = $tok;
+        $strip =~ s/%//;
 
-	if (exists $map{$strip}) {
-	  if (!defined $map{$strip}) {
-	    warnings::warnif("Do not know how to process token $tok" );
-	  } else {
-	    $allow{ $map{$strip} } = $strip;
-	  }
-	} else {
+        if (exists $map{$strip}) {
+          if (!defined $map{$strip}) {
+            warnings::warnif("Do not know how to process token $tok" );
+          } else {
+            $allow{ $map{$strip} } = $strip;
+          }
+        } else {
 
-	  warnings::warnif("Token $tok not currently recognized")
-	      unless exists $map{$strip};
-	}
+          warnings::warnif("Token $tok not currently recognized")
+              unless exists $map{$strip};
+        }
 
       }
 
@@ -772,18 +768,18 @@ sub _extract_raw_info {
       my $value = $2;
       # Assume that serv_type is always first
       if ($key eq 'serv_type') {
-	# Store previous config if it contains something
-	# If it actually contains information on a serv_type of
-	# directory we can follow the URL and recursively expand
-	# the content
-	push(@configs, $self->_dir_check( $current ));
+        # Store previous config if it contains something
+        # If it actually contains information on a serv_type of
+        # directory we can follow the URL and recursively expand
+        # the content
+        push(@configs, $self->_dir_check( $current ));
 
-	# Clear the config and store the serv_type
-	$current = { $key => $value  };
+        # Clear the config and store the serv_type
+        $current = { $key => $value  };
 
       } else {
-	# Just store the key value pair
-	$current->{$key} = $value;
+        # Just store the key value pair
+        $current->{$key} = $value;
       }
 
     } else {
@@ -831,19 +827,19 @@ sub _dir_check {
       # Get the content of the URL unless we are not
       # reading directories
       if ($FOLLOW_DIRS && defined $current->{url} &&
-	  !exists $followed_dirs{$current->{short_name}}) {
-	print "Following directory link to ". $current->{short_name}.
-	  "[".$current->{url}."]\n"
-	  if $DEBUG;
+          !exists $followed_dirs{$current->{short_name}}) {
+        print "Following directory link to ". $current->{short_name}.
+          "[".$current->{url}."]\n"
+          if $DEBUG;
 
-	# Indicate that we have followed this link
-	$followed_dirs{$current->{short_name}} = $current->{url};
+        # Indicate that we have followed this link
+        $followed_dirs{$current->{short_name}} = $current->{url};
 
-	# Retrieve the url, pass that array to the raw parser and then
-	# return any new configs to our caller
-	# Must force scalar context to get array ref
-	# back rather than a simple list.
-	return $self->_extract_raw_info(scalar $self->_get_directory_url( $current->{url} ));
+        # Retrieve the url, pass that array to the raw parser and then
+        # return any new configs to our caller
+        # Must force scalar context to get array ref
+        # back rather than a simple list.
+        return $self->_extract_raw_info(scalar $self->_get_directory_url( $current->{url} ));
       }
     } else {
       # Not a 'directory' so this is a simple config entry. Simply return it.
@@ -904,31 +900,31 @@ Keys are skycat tokens.
 
 sub _token_mapping {
   return (
-	  id => 'id',
+          id => 'id',
 
-	  ra => 'ra',
-	  dec => 'dec',
+          ra => 'ra',
+          dec => 'dec',
 
-	  # Arcminutes
-	  r1 => 'radmin',
-	  r2 => 'radmax',
-	  w  => 'width',
-	  h  => 'height',
+          # Arcminutes
+          r1 => 'radmin',
+          r2 => 'radmax',
+          w  => 'width',
+          h  => 'height',
 
-	  n => 'nout',
+          n => 'nout',
 
-	  # which filter???
-	  m2 => 'magfaint',
-	  m1 => 'magbright',
+          # which filter???
+          m2 => 'magfaint',
+          m1 => 'magbright',
 
-	  # Is this a conditional?
-	  cond => 'cond',
+          # Is this a conditional?
+          cond => 'cond',
 
-	  # Not Yet Supported
-	  cols => undef,
-	  'mime-type' => undef,
-	  ws => undef,
-	 );
+          # Not Yet Supported
+          cols => undef,
+          'mime-type' => undef,
+          ws => undef,
+         );
 }
 
 =back
@@ -991,10 +987,10 @@ sub _translate_one_to_one {
   my $self = shift;
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
-	  map { $_, undef }(qw/
-			    cond
-			    /)
-	 );
+          map { $_, undef }(qw/
+                            cond
+                            /)
+         );
 }
 
 =back

@@ -5,7 +5,7 @@ package MarpaX::ESLIF::ECMA404::RecognizerInterface;
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Recognizer Interface
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -67,7 +67,7 @@ MarpaX::ESLIF::ECMA404::RecognizerInterface - MarpaX::ESLIF::ECMA404 Recognizer 
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -8,9 +8,7 @@ use Test::Deep;
 use Test::Fatal;
 use Path::Tiny;
 
-delete $ENV{RELEASE_STATUS};
-delete $ENV{TRIAL};
-delete $ENV{V};
+delete @ENV{qw(RELEASE_STATUS TRIAL V)};
 
 {
     package inc::SimpleVersionProvider;
@@ -82,19 +80,20 @@ FOO
         '$VERSION assignment was not added to the private module in the source dir',
     );
 
+    my $version_munger = 'Dist::Zilla::Plugin::PkgVersion ' . Dist::Zilla::Plugin::PkgVersion->VERSION;
+
     cmp_deeply(
         $tzil->log_messages,
         superbagof(
-            '[RewriteVersion::Transitional] inserted $VERSION statement into lib/Foo.pm',
-            '[BumpVersionAfterRelease::Transitional] inserted $VERSION statement into ' . path($tzil->tempdir, qw(source lib Foo.pm)),
-
+            '[RewriteVersion::Transitional] inserted $VERSION statement into lib/Foo.pm with ' . $version_munger,
+            '[BumpVersionAfterRelease::Transitional] inserted $VERSION statement into ' . path($tzil->tempdir, qw(source lib Foo.pm)) . ' with ' . $version_munger,
         ),
         'got appropriate log messages about inserting new $VERSION statement into Foo',
     );
 
     ok(
         (! grep {
-            m{^\[(RewriteVersion|BumpVersionAfterRelease)::Transitional\] inserted \$VERSION statement into .*Bar.pm$}
+            m{^\[(RewriteVersion|BumpVersionAfterRelease)::Transitional\] inserted \$VERSION statement into .*Bar.pm}
         } @{ $tzil->log_messages }),
         'did not log a message about inserting a $VERSION statement into private Foo::Bar',
     );

@@ -184,7 +184,7 @@ FUNCTIONAL INTERFACE
     The following convenience methods are provided by this module. They are
     exported by default:
 
-    $json_text = encode_json $perl_scalar
+    $json_text = encode_json $perl_scalar, [json_type]
         Converts the given Perl data structure to a UTF-8 encoded, binary
         string (that is, the string contains octets only). Croaks on error.
 
@@ -193,6 +193,8 @@ FUNCTIONAL INTERFACE
            $json_text = Cpanel::JSON::XS->new->utf8->encode ($perl_scalar)
 
         Except being faster.
+
+        For the type argument see Cpanel::JSON::XS::Type.
 
     $perl_scalar = decode_json $json_text [, $allow_nonref ]
         The opposite of "encode_json": expects an UTF-8 (binary) string of
@@ -1191,6 +1193,12 @@ BOM
     Beware that Cpanel::JSON::XS is currently the only JSON module which
     does accept and decode a BOM.
 
+    The latest JSON spec
+    <https://www.greenbytes.de/tech/webdav/rfc8259.html#character.encoding>
+    forbid the usage of UTF-16 or UTF-32, the character encoding is UTF-8.
+    Thus in subsequent updates BOM's of UTF-16 or UTF-32 will throw an
+    error.
+
 MAPPING
     This section describes how Cpanel::JSON::XS maps Perl values to JSON
     values and vice versa. These mappings are designed to "do the right
@@ -1251,6 +1259,13 @@ MAPPING
         The other round, from perl to JSON, "!0" which is represented as
         "yes" becomes "true", and "!1" which is represented as "no" becomes
         "false".
+
+        Via Cpanel::JSON::XS::Type you can now even force negation in
+        "encode", without overloading of "!":
+
+            my $false = Cpanel::JSON::XS::false;
+            print($json->encode([!$false], [JSON_TYPE_BOOL]));
+            => [true]
 
     null
         A JSON null atom becomes "undef" in Perl.
@@ -1992,9 +2007,9 @@ SEE ALSO
     <https://tools.ietf.org/html/rfc4627>
 
 AUTHOR
-    Marc Lehmann <schmorp@schmorp.de>, http://home.schmorp.de/
-
     Reini Urban <rurban@cpan.org>
+
+    Marc Lehmann <schmorp@schmorp.de>, http://home.schmorp.de/
 
 MAINTAINER
     Reini Urban <rurban@cpan.org>

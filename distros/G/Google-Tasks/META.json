@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       },
       "develop" : {
@@ -29,6 +29,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0"
          }
       },
@@ -45,7 +46,7 @@
             "Moo" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.006",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -57,9 +58,8 @@
             "IPC::Open3" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
-            "blib" : "1.01",
             "constant" : "0",
-            "perl" : "5.006"
+            "perl" : "5.014"
          }
       }
    },
@@ -75,6 +75,7 @@
          "web" : "https://github.com/gryphonshafer/Google-Tasks"
       }
    },
-   "version" : "1.05"
+   "version" : "1.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

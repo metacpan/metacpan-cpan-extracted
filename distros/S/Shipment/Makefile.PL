@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Data::Currency" => 0,
     "Date::Parse" => 0,
     "DateTime" => 0,
+    "DateTime::Format::ISO8601" => 0,
     "File::Util" => 0,
     "LWP::UserAgent" => 0,
     "Locale::SubCountry" => 0,
@@ -43,7 +44,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "2.03",
+  "VERSION" => "3.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Data::Currency" => 0,
   "Date::Parse" => 0,
   "DateTime" => 0,
+  "DateTime::Format::ISO8601" => 0,
   "File::Util" => 0,
   "LWP::UserAgent" => 0,
   "Locale::SubCountry" => 0,

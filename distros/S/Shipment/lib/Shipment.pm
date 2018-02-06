@@ -1,6 +1,6 @@
 # ABSTRACT: Interface to Popular Shipping Services
 package Shipment;
-$Shipment::VERSION = '2.03';
+$Shipment::VERSION = '3.01';
 use Shipment::Address;
 use Shipment::Package;
 
@@ -47,6 +47,12 @@ sub address {
 }
 
 
+sub package {
+    shift;
+    return Shipment::Package->new(@_);
+}
+
+
 1;
 
 __END__
@@ -61,7 +67,7 @@ Shipment - Interface to Popular Shipping Services
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -87,11 +93,11 @@ version 2.03
 
 =head1 DESCRIPTION
 
-  This library provides an interface to popular shipping/courier services.
+This library provides an interface to popular shipping/courier services.
 
-  See the relevant module for details on usage.
+See the relevant module for details on usage.
 
-  For code examples, see https://github.com/pullingshots/Shipment/tree/master/eg
+For code examples, see https://github.com/pullingshots/Shipment/tree/master/eg
 
 =over
 
@@ -102,39 +108,29 @@ version 2.03
 
 =item fedex
 
-  The fedex method returns a L<Shipment::FedEx> object. See L<Shipment::FedEx> for
-  more details.
+The fedex method returns a L<Shipment::FedEx> object. See L<Shipment::FedEx> for more details.
 
 =item purolator
 
-  The purolator method returns a L<Shipment::Purolator> object. See
-  L<Shipment::Purolator> for more details.
+The purolator method returns a L<Shipment::Purolator> object. See L<Shipment::Purolator> for more details.
 
 =item ups
 
-  The ups method returns a L<Shipment::UPS> object. See L<Shipment::UPS> for
-  more details.
+The ups method returns a L<Shipment::UPS> object. See L<Shipment::UPS> for more details.
 
 =item temando
 
-  The temando method returns a L<Shipment::Temando> object. See L<Shipment::Temando> for
-  more details.
+The temando method returns a L<Shipment::Temando> object. See L<Shipment::Temando> for more details.
 
 =item address
 
-  The address method returns a L<Shipment::Address> object.
-  See L<Shipment::Address> for more details.
+The address method returns a L<Shipment::Address> object. See L<Shipment::Address> for more details.
 
 =item package
 
-  The package method returns a L<Shipment::Package> object.
-  See L<Shipment::Package> for more details.
+The package method returns a L<Shipment::Package> object. See L<Shipment::Package> for more details.
 
 =back
-
-sub package {
-    shift; return Shipment::Package->new(@_)
-}
 
 =head1 AUTHOR
 
@@ -168,7 +164,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

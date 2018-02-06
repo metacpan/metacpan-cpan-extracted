@@ -18,6 +18,7 @@ lib/Catmandu/Importer/PICA.pm
 lib/Catmandu/Importer/SRU/Parser/picaxml.pm
 lib/Catmandu/Importer/SRU/Parser/ppxml.pm
 lib/Catmandu/PICA.pm
+lib/Catmandu/Validator/PICA.pm
 t/00-load.t
 t/02-importer.t
 t/03-fix.t
@@ -25,6 +26,7 @@ t/04-exporter.t
 t/06-sru.t
 t/07-pica-each.t
 t/08-pica-add.t
+t/10-validator.t
 t/author-pod-syntax.t
 t/bugfix_pica_map.t
 t/files/dump.dat
@@ -32,6 +34,7 @@ t/files/picaplus.dat
 t/files/picaxml.xml
 t/files/plain.pica
 t/files/ppxml.xml
+t/files/schema.json
 t/files/slim_ppxml.xml
 t/files/sru_picaxml.xml
 t/files/sru_ppxml.xml

@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.062';
+our $VERSION = '0.063';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -203,7 +203,7 @@ sub __win_size_dependet_code {
             $self->__win_size_dependet_code( $a_ref );
             return;
         }
-        if ( ( $self->{keep_header} && ! @$list ) || ( @$list == 1 ) ) {
+        if ( ( $self->{keep_header} && ! @$list ) || ( ! $self->{keep_header} && @$list == 1 ) ) {
             choose(
                 [ undef, @{$a_ref->[0]} ],
                 { prompt => 'EMPTY!', layout => 0, clear_screen => 1, mouse => $self->{mouse}, undef => '<<' }
@@ -603,7 +603,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.062
+Version 0.063
 
 =cut
 

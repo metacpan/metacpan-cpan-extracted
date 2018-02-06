@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 use feature qw( say );
 
@@ -122,8 +122,14 @@ sub configure {
     );
 
     $self->add_plugins($_) for @plugins;
-    $self->add_bundle( '@Git::VersionManager' =>
-            { commit_files_after_release => \@allow_dirty } );
+    $self->add_bundle(
+        '@Git::VersionManager' => {
+            commit_files_after_release => \@allow_dirty,
+            'RewriteVersion::Transitional.fallback_version_provider' =>
+                'Git::NextVersion',
+        }
+    );
+
     $self->add_plugins('Git::Push');
 }
 
@@ -164,7 +170,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000017
+version 0.000018
 
 =head2 configure
 

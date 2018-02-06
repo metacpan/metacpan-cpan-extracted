@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.44  2018-02-02
+	- mapping update
+	- usage of Hash::Util is now optional
+
 0.43  2017-12-26
 	- mapping update
 

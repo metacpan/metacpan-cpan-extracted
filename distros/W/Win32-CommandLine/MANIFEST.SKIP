@@ -28,8 +28,8 @@
 ^${dist_name}-${dist_version}-[^/]*\.par$
 ^${dist_name}-${dist_version}/
 
-# :: Avoid VERSION
-^VERSION$
+# # :: Avoid VERSION
+# ^VERSION$
 
 # :: compiler detrus in the lib directory
 ^lib/.*\.(bs|c|def|obj|o|pdb|base|exp|lds|lib|ccs)$
@@ -60,19 +60,19 @@
 # :: 6.18 through 6.25 generated 'blibdirs\.ts'
 ^blibdirs\.ts$
 
-# Avoid META-build files (ANT/NANT)
-# :: regexp matches .build/.build.xml/.build.xml* ONLY the main directory
+# Avoid developer bin and META-build files (ANT/NANT, ...)
+(?:^|/)#dbin/
+# :: regexp matches .build/.build.xml/.build.xml* ONLY in the main directory
 ^\.build$
 ^\.build\.xml[^/]*$
 
 # Avoid version control files
-# :: TODO: check on correcting the trailing '\b' to a '/' for the SCS directories
-(?:^|/)RCS\b
-(?:^|/)CVS\b
-(?:^|/)SCCS\b
+(?:^|/)RCS/
+(?:^|/)CVS/
+(?:^|/)SCCS/
 ,v$
-(?:^|/)\.svn\b
-(?:^|/)_darcs\b
+(?:^|/)\.svn/
+(?:^|/)_darcs/
 # :: mercurial
 (?:^|/)\.hg/
 (?:^|/)\.hgtags$

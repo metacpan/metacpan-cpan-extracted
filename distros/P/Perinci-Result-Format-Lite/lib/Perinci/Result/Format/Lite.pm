@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2017-12-09'; # DATE
-our $VERSION = '0.270'; # VERSION
+our $DATE = '2018-01-31'; # DATE
+our $VERSION = '0.271'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -91,20 +91,22 @@ sub __gen_table {
             }
         }
 
+        if ($resmeta->{'table.field_orders'}) {
+            $column_orders = $resmeta->{'table.field_orders'};
+            last SET_COLUMN_ORDERS;
+        }
+
         # find column orders from table spec
         $column_orders = $resmeta->{'table.fields'};
     }
 
     # reorder each row according to requested column order
     if ($column_orders) {
+        require Sort::BySpec;
+        my $cmp = Sort::BySpec::cmp_by_spec(spec => $column_orders);
         # 0->2, 1->0, ... (map column position from unordered to ordered)
-        my @map0 = sort {
-            my $idx_a = firstidx(sub {$_ eq $a->[1]},
-                                 @$column_orders) // 9999;
-            my $idx_b = firstidx(sub {$_ eq $b->[1]},
-                                 @$column_orders) // 9999;
-            $idx_a <=> $idx_b || $a->[1] cmp $b->[1];
-        } map {[$_, $columns[$_]]} 0..$#columns;
+        my @map0 = sort { $cmp->($a->[1], $b->[1]) }
+            map {[$_, $columns[$_]]} 0..$#columns;
         #use DD; dd \@map0;
         my @map;
         for (0..$#map0) {
@@ -517,7 +519,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.270 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2017-12-09.
+This document describes version 0.271 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2018-01-31.
 
 =head1 SYNOPSIS
 
@@ -577,7 +579,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

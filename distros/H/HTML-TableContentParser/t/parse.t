@@ -51,6 +51,8 @@ $HTML::TableContentParser::DEBUG = 0;
 
 my $tables = $obj->parse($html);
 is( $tables->[0]->{caption}->{data}, $table_caption, 'Table caption' );
+is( $tables->[0]->{rows}->[0]->{headers}->[0]->{data}, $header_text,
+    'First row' );
 is( $tables->[0]->{rows}->[1]->{cells}->[0]->{data}, $table_content1,
     'First row' );
 is( $tables->[0]->{rows}->[2]->{cells}->[0]->{data}, $table_content2,
@@ -59,6 +61,117 @@ is( $tables->[0]->{rows}->[3]->{cells}->[0]->{data}, $table_content3,
     'Third row' );
 is( $tables->[0]->{rows}->[4]->{cells}->[0]->{data}, $table_content4,
     'Fourth row' );
+
+is_deeply( $tables, [
+	{
+	    border	=> 0,
+	    caption	=> {
+		data	=> $table_caption,
+		id	=> 'test',
+	    },
+	    headers	=> [
+		{
+		    data	=> $header_text,
+		},
+	    ],
+	    id		=> 'foo',
+	    rows	=> [
+		{
+		    headers	=> [
+			{
+			    data	=> $header_text,
+			},
+		    ],
+		},
+		{
+		    cells	=> [
+			{
+			    data	=> $table_content1,
+			},
+		    ],
+		},
+		{
+		    cells	=> [
+			{
+			    data	=> $table_content2,
+			},
+		    ],
+		},
+		{
+		    cells	=> [
+			{
+			    data	=> $table_content3,
+			},
+		    ],
+		},
+		{
+		    cells	=> [
+			{
+			    data	=> $table_content4,
+			},
+		    ],
+		},
+	    ],
+	},
+    ], 'Complete returned structure' );
+
+{
+    note( 'Test basic functionality, classic parse' );
+
+    local $HTML::TableContentParser::CLASSIC = 1;
+    my $o = HTML::TableContentParser->new();
+    
+    cmp_ok( $o->classic(), '==', 1, q<'classic' attr set by default> );
+
+    my $t = $o->parse($html);
+
+    is_deeply( $t, [
+	    {
+		border	=> 0,
+		caption	=> {
+		    data	=> $table_caption,
+		    id	=> 'test',
+		},
+		headers	=> [
+		    {
+			data	=> $header_text,
+		    },
+		],
+		id		=> 'foo',
+		rows	=> [
+		    {},
+		    {
+			cells	=> [
+			    {
+				data	=> $table_content1,
+			    },
+			],
+		    },
+		    {
+			cells	=> [
+			    {
+				data	=> $table_content2,
+			    },
+			],
+		    },
+		    {
+			cells	=> [
+			    {
+				data	=> $table_content3,
+			    },
+			],
+		    },
+		    {
+			cells	=> [
+			    {
+				data	=> $table_content4,
+			    },
+			],
+		    },
+		],
+	    },
+	], 'Complete returned structure, classic parse' );
+}
 
 
 note( 'More complex HTML' );

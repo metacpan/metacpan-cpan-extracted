@@ -10,7 +10,7 @@ use Win32::Process;
 our $VERSION = $Mojo::Server::Threaded::VERSION;
 
 has threaded => sub { Mojo::Server::Threaded->new(listen => ['http://*:8080']) };
-has upgrade_timeout => 60;
+has upgrade_timeout => 180;
 
 sub configure {
   my ($self, $name, $fallback_name) = @_;

@@ -3,8 +3,16 @@ use warnings;
 use strict;
 
 use lib "../lib";
-use Term::Colormap qw( color_table );
+use Term::Colormap qw( color_table colormap_names );
 use Term::Colormap::Brewer;
+
+if ( not defined $ARGV[0] ) {
+    for my $name ( colormap_names() ) {
+        next unless $name =~ m|^\w+\-\d+|; # brewer colors are named like accent-5
+        color_table($name);
+    }
+    exit 0;
+}
 
 my $name = $ARGV[0] || 'unknown';
 

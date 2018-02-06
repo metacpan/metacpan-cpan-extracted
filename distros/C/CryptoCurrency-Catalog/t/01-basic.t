@@ -21,7 +21,8 @@ subtest "by_ticker" => sub {
 
 subtest "by_name" => sub {
     is_deeply($cat->by_name("Ethereum"), {symbol=>"ETH", name=>"Ethereum", safename=>"ethereum"});
-    dies_ok { $cat->by_name("ethereum") };
+    is_deeply($cat->by_name("ethereum"), {symbol=>"ETH", name=>"Ethereum", safename=>"ethereum"});
+    dies_ok { $cat->by_name("foo bar") };
 };
 
 subtest "by_safename" => sub {

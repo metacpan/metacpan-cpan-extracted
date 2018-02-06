@@ -39,14 +39,10 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 
 # C O N S T R U C T O R ----------------------------------------------------
-
-=head1 REVISION
-
-$Id: VOTable.pm,v 1.10 2005/06/15 19:03:42 aa Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -183,18 +179,18 @@ sub _read_catalog {
             my $color = new Astro::FluxColor(
                    upper => new Astro::WaveBand( Filter => $1 ),
                    lower => new Astro::WaveBand( Filter => $2 ),
-		   quantity => $row[$contents{$key}] );
-            unshift @colours, $color;	# I don't understand why I have
-	                                # to unshift here rather than
-					# push, this is oddly disturbing
+                   quantity => $row[$contents{$key}] );
+            unshift @colours, $color;   # I don't understand why I have
+                                        # to unshift here rather than
+                                        # push, this is oddly disturbing
          } else {
 
             # we might have a magnitude, who knows?
             #print "MAGNITUDE IN COLUMN $contents{$key}\n";
             #$mags{$identifier} = $row[$contents{$key}];
-	    my $flux = new Astro::Flux( $row[$contents{$key}],
-	                                'mag', $identifier );
-	    push @fluxes, $flux;
+            my $flux = new Astro::Flux( $row[$contents{$key}],
+                                        'mag', $identifier );
+            push @fluxes, $flux;
          }
 
       }
@@ -227,7 +223,7 @@ sub _read_catalog {
                            coords => $coords,
                            #magnitudes => \%mags,
                            #colours => \%colours,
-			   fluxes => $fluxes,
+                           fluxes => $fluxes,
                            quality => $row[$contents{"quality"}] );
 
       # push the star onto the catalog
@@ -507,9 +503,9 @@ sub _write_catalog {
   for ($i = 0; $i < @data; $i++) {
     $tr = new Astro::VO::VOTable::TR();
     for ($j = 0; $j < @field_names; $j++) {
-	$td = new Astro::VO::VOTable::TD();
-	$td->set($data[$i][$j]);
-	$tr->append_TD($td);
+        $td = new Astro::VO::VOTable::TD();
+        $td->set($data[$i][$j]);
+        $tr->append_TD($td);
     }
     $tabledata->append_TR($tr);
   }

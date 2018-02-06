@@ -49,12 +49,12 @@ Returns the classes which loaded the optional module.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.05,
-built on January 23, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report-Optional distribution version 1.06,
+built on February 02, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2013-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2018 by [Mark Overmeer <mark@overmeer.net>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

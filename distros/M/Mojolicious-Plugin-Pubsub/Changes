@@ -1,0 +1,22 @@
+0.004     2018-02-06 01:57:52+01:00 Europe/Stockholm
+ - Make tests use a tempdir for their home. Should hopefully allow tests to
+   pass on *BSD.
+ - Before replacing a socket, check if there's already a viable daemon.
+ - Refactor chat example so it uses websockets (Thanks Grinnz!).
+ - Add documentation about how a new daemon is spun up.
+ - Add documentation about not supporting MSWin32.
+
+0.003     2018-02-03 15:21:16+01:00 Europe/Stockholm
+ - Specify that we don't support MSWin32.
+ - Change default location of socket from CWD to $app->home.
+ - Add subscribe/unsubscribe tests and fix up the other tests slightly.
+
+0.002     2018-02-02 03:15:30+01:00 Europe/Stockholm
+ - Add subscribe() and unsubscribe() helpers.
+ - Add clearer documentation about callbacks/subscribers.
+ - Fix a race condition in setting up the socket.
+ - Set stream timeout to 0 so it doesn't time out.
+ - Add example application.
+
+0.001     2018-01-31 06:18:58+01:00 Europe/Stockholm
+ - Initial release.

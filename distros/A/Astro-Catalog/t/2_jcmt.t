@@ -37,8 +37,8 @@ for (@results) {
 
 # search by radius
 my $refcoords = new Astro::Coords( ra => "23:14:00",
-				   dec => "61:27:00",
-				   type => "J2000");
+                                   dec => "61:27:00",
+                                   type => "J2000");
 
 # 10 arcmin
 $cat->reset_list;
@@ -92,8 +92,11 @@ for my $id (keys %hash1) {
   my $s2 = $hash2{$id};
 
   if (defined $s1 && defined $s2) {
+  SKIP: {
+    skip "HOLO source moves on the sky", 1 if ($id eq 'HOLO');
     my $d = $s1->coords->distance( $s2->coords);
     ok( $d->arcsec < 0.1, "Check coordinates $id");
+  }
   SKIP: {
       skip "Only Equatorial coordinates have velocity", 3
         unless $s1->coords->type eq 'RADEC';
@@ -150,9 +153,9 @@ sub form_hash {
       my $c1 = $s->coords;
       my $c2 = $hash{$id}->coords;
       if ($c1->distance( $c2 ) == 0) {
-	# fine. The same coordinate
+        # fine. The same coordinate
       } else {
-	warn "ID matches $id but coords differ\n";
+        warn "ID matches $id but coords differ\n";
       }
     } else {
       $hash{$id} = $s;

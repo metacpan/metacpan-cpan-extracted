@@ -3,9 +3,9 @@ NAME
     as ISO8601 duration string
 
 VERSION
-    This document describes version 0.005 of
+    This document describes version 0.006 of
     DateTime::Format::Duration::ISO8601 (from Perl distribution
-    DateTime-Format-Duration-ISO8601), released on 2017-08-02.
+    DateTime-Format-Duration-ISO8601), released on 2018-02-06.
 
 SYNOPSIS
      use DateTime::Format::Duration::ISO8601;
@@ -38,6 +38,10 @@ METHODS
 
   format_duration ("DateTime::Duration") => "string"
   parse_duration ("string") => "DateTime::Duration"
+  parse_duration_as_deltas("string") => \%deltas
+    This is for parsing a duration string into hash, without creating
+    DateTime::Duration object.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/DateTime-Format-Duration-ISO8601>.
@@ -66,7 +70,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -2,9 +2,9 @@ package Crypt::AuthEnc::GCM;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
-use base qw(Crypt::AuthEnc Exporter);
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( gcm_encrypt_authenticate gcm_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -12,48 +12,8 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Cipher;
 
-sub new {
-  my ($class, $cipher, $key, $iv) = @_;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $self = _new(Crypt::Cipher::_trans_cipher_name($cipher), $key);
-  # for backwards compatibility the $iv is optional
-  $self->iv_add($iv) if defined $iv;
-  return $self;
-}
-
-sub gcm_encrypt_authenticate {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::GCM->new($cipher_name, $key);
-  $m->iv_add($iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub gcm_decrypt_verify {
-  my $cipher_name = shift;
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::GCM->new($cipher_name, $key);
-  $m->iv_add($iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

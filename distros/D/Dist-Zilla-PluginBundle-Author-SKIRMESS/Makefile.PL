@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Dist::Zilla::PluginBundle::Author::SKIRMESS",
   "PREREQ_PM" => {
+    "CPAN::Meta::YAML" => 0,
     "Carp" => 0,
     "Config::Std" => 0,
     "Dist::Zilla" => 0,
@@ -80,6 +81,8 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Dist::Zilla::Role::TextTemplate" => 0,
     "File::Spec" => 0,
+    "HTTP::Cache::Transparent" => 0,
+    "LWP::Simple" => 0,
     "List::SomeUtils" => 0,
     "Moose" => "0.99",
     "Path::Tiny" => 0,
@@ -91,7 +94,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.031",
+  "VERSION" => "0.032",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -99,6 +102,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CPAN::Meta::YAML" => 0,
   "Carp" => 0,
   "Config::Std" => 0,
   "Dist::Zilla" => 0,
@@ -162,6 +166,8 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Role::PluginBundle::Easy" => 0,
   "Dist::Zilla::Role::TextTemplate" => 0,
   "File::Spec" => 0,
+  "HTTP::Cache::Transparent" => 0,
+  "LWP::Simple" => 0,
   "List::SomeUtils" => 0,
   "Moose" => "0.99",
   "Path::Tiny" => 0,

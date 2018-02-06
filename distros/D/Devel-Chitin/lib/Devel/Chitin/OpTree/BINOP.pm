@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::BINOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use warnings;
@@ -186,24 +186,25 @@ sub pp_leaveloop {
     if ($enterloop->op->name eq 'enteriter') {
         return $self->_deparse_foreach;
 
-    } elsif ($enterloop->op->name eq 'entergiven') {
-        return $self->_deparse_given;
+    #} elsif ($enterloop->op->name eq 'entergiven') {
+    #    return $self->_deparse_given;
 
     } else {
         return $self->_deparse_while_until;
     }
 }
 
-sub _deparse_given {
-    my $self = shift;
-
-    my $enter_op = $self->first;
-    my $topic_op = $enter_op->first;
-    my $topic = $topic_op->deparse;
-    my $block_content = $topic_op->sibling->deparse(omit_braces => 1);
-
-    "given ($topic) {$block_content}";
-}
+# Part of the reverted given/whereso/whereis from 5.27.7
+#sub _deparse_given {
+#    my $self = shift;
+#
+#    my $enter_op = $self->first;
+#    my $topic_op = $enter_op->first;
+#    my $topic = $topic_op->deparse;
+#    my $block_content = $topic_op->sibling->deparse(omit_braces => 1);
+#
+#    "given ($topic) {$block_content}";
+#}
 
 sub _deparse_while_until {
     my $self = shift;

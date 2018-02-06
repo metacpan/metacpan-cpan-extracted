@@ -197,6 +197,7 @@ lib/App/Netdisco/Worker/Plugin/Discover.pm
 lib/App/Netdisco/Worker/Plugin/Discover/CanonicalIP.pm
 lib/App/Netdisco/Worker/Plugin/Discover/Entities.pm
 lib/App/Netdisco/Worker/Plugin/Discover/Neighbors.pm
+lib/App/Netdisco/Worker/Plugin/Discover/Neighbors/Routed.pm
 lib/App/Netdisco/Worker/Plugin/Discover/PortPower.pm
 lib/App/Netdisco/Worker/Plugin/Discover/Properties.pm
 lib/App/Netdisco/Worker/Plugin/Discover/VLANs.pm
@@ -212,6 +213,7 @@ lib/App/Netdisco/Worker/Plugin/Macsuck.pm
 lib/App/Netdisco/Worker/Plugin/Macsuck/Nodes.pm
 lib/App/Netdisco/Worker/Plugin/Macsuck/WirelessNodes.pm
 lib/App/Netdisco/Worker/Plugin/Macwalk.pm
+lib/App/Netdisco/Worker/Plugin/MakeRancidConf.pm
 lib/App/Netdisco/Worker/Plugin/Monitor.pm
 lib/App/Netdisco/Worker/Plugin/Nbtstat.pm
 lib/App/Netdisco/Worker/Plugin/Nbtstat/Core.pm

@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/pali/Email-Address-XS/issues
   repository: git://github.com/pali/Email-Address-XS.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

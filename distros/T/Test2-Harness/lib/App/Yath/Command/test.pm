@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001049';
+our $VERSION = '0.001050';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -357,6 +357,7 @@ sub run_command {
     }
 
     # Let the loggers clean up.
+    $_->finish for @$loggers;
     @$loggers = ();
 
     if (-t STDOUT) {

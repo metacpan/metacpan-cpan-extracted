@@ -39,9 +39,20 @@ apt-get update
 apt-get install analizo
 ```
 
+## From CPAN
+
+Install [cpanminus](https://metacpan.org/pod/App::cpanminus) and building
+dependencies (see "Installing dependencies on non-Debian systems" on
+HACKING.md) then run `cpanm`:
+
+```console
+cpanm Analizo
+```
+
 ## From sources
 
-Download the analizo tarball linked from <span class='repository'><a href="http://analizo.org/download.html">the download page</a></span>,
+Download the analizo tarball linked from
+<span class='repository'><a href="http://analizo.org/download.html">the download page</a></span>,
 extract it and run the following commands inside the analizo-x.y.z directory:
 
 ```console

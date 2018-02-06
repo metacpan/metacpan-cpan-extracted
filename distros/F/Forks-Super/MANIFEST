@@ -54,6 +54,7 @@ t/10-to-natural.t
 t/11-to-command.t
 t/12-to-sub.t
 t/13-to-exec.t
+t/14-echo-surprise.t
 t/15-debug.t
 t/16-overload.t
 t/17-retries.t

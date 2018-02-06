@@ -1,3 +1,11 @@
+2.15.02 Tue Jan 30 12:18:00 CST 2018
+
+use explicit LICENSE key in Extutils metadata.
+
+2.15.01 Fri Jan 26 10:10:37 CST 2018
+
+Add 'same terms as perl 5.24 or any later version' license.
+
 2.15    Tue Sep  1 14:33:49 CDT 2015
 
 Explictly export empty string w/ scalar export if no lib's found

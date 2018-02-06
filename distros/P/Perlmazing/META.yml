@@ -41,7 +41,7 @@ configure_requires:
   version: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001
+generated_by: ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -71,4 +71,5 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: '1.2810'
+version: '1.2812'
+x_serialization_backend: YAML::XS version 0.67

@@ -1,3 +1,59 @@
+20180131  2018-01-31 (PERLANCAR)
+
+          - [ux] Make by_name() case-insensitive.
+
+          - Update to CMC 2018-01-31.
+
+          - New coins:
+            + All Sports (SOC)
+            + Bitcoin White (BTW)
+            + Blackmoon (BMC)
+            + Candy (CANDY)
+            + CoinFi (COFI)
+            + CoinMeet (MEE)
+            + CPChain (CPCHAIN)
+            + Electronic PK Chain (EPC)
+            + Equal (EQL)
+            + Fortuna (FOTA)
+            + Garlicoin (GRLC)
+            + GCN Coin (GCN)
+            + HalalChain (HLC)
+            + Health Mutual Society (HMSC)
+            + Matrix AI Network (MAN)
+            + Nework (NKC)
+            + OceanChain (OC)
+            + Photon (PHO)
+            + Pundi X (PXS)
+            + Royalties (XRY)
+            + Ruff (RUFF)
+            + Smartlands (SLT)
+            + Speed Mining Service (SMS)
+            + ValueChain (VLC)
+            + Zeepin (ZPT)
+            + Zilliqa (ZIL)
+
+          - Removed coins:
+            + Arcade Token (ARCADE)
+            + Blackmoon (BMC)
+            + CorgiCoin (CORG)
+            + DimonCoin (FUDD)
+            + GCN Coin (GCN)
+            + GeoCoin (GEO)
+            + Global Business Revolution (GBRC)
+            + KemCredit (KMC)
+            + Mavro (MAVRO)
+            + Purpose (PRPS)
+            + USDe (USDE)
+
+          - Changed coins:
+            + Elite (1337) changed name from 1337
+            + SONO (ALTCOM) changed name from AltCommunity Coin
+            + Bitcoin Atom (BCA) changed name from Bitcoin Atom [Futures]
+            + Peerguess (GUESS) changed name from GUESS
+
+          - Total coins now 1506 (from 1491)
+
+
 20180125  2018-01-25 (PERLANCAR)
 
           - Update to CMC 2018-01-25.

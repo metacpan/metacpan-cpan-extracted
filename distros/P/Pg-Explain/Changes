@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+0.76    2018/02/05
+        - Recognize properly parallel index scans and their table/index info
+          Problem reported by Matthijs van der Vleuten
+
 0.75    2017/11/29
         - Change inclusive time calculation for parallel nodes to calculate
           wall clock time, and not total time used.

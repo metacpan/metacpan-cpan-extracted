@@ -2,9 +2,6 @@
 use strict;
 use warnings;
 
-use Test::Requires 'IPC::Signal';
-
-use IPC::Signal qw( sig_num );
 use Log::Dispatch;
 use Log::Dispatch::Null;
 use Parallel::ForkManager;

@@ -2,9 +2,9 @@ NAME
     Perinci::Result::Format::Lite - Format enveloped result
 
 VERSION
-    This document describes version 0.270 of Perinci::Result::Format::Lite
+    This document describes version 0.271 of Perinci::Result::Format::Lite
     (from Perl distribution Perinci-Result-Format-Lite), released on
-    2017-12-09.
+    2018-01-31.
 
 SYNOPSIS
 DESCRIPTION
@@ -51,7 +51,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

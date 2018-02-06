@@ -163,7 +163,7 @@ Possible TODOs:
             regular make test worked?
             t/24e-kill.t does not terminate
 
-    ___ have a "remote_host" option to go with "cmd" option
+    _X_ have a "remote_host" option to go with "cmd" option
         _X_ remote_host => host
         _X_ remote_host => [host, user, pwd]
             to run on a remote server that requires some credentials
@@ -185,3 +185,5 @@ Possible TODOs:
         _X_ rename Forks::Super::Queue so this package name is available later
 
     ___ determine in system-limits.PL if alternate alarm is needed
+
+    _X_ exec should use  exec { $args[0] } @args  idiom

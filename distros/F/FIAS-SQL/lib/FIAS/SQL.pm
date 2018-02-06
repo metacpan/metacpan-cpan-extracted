@@ -1,5 +1,5 @@
 package FIAS::SQL;
-$FIAS::SQL::VERSION = '0.06';
+$FIAS::SQL::VERSION = '0.08';
 # ABSTRACT: Модуль для минимальной работы с данными из базы ФИАC https://fias.nalog.ru/FiasInfo.aspx
 
 use strict;
@@ -173,23 +173,20 @@ sub get_address_objects {
 
     my $parentguid = $params{parentguid};
 
-    # Должно быть что-то из двух уровень объекта или id родительского объекта
-    confess 'aolevel and parentguid is empty!'
-        unless $params{aolevel} || $parentguid;
-
     # Разрешаются только вышеперечисленные уровни
     confess 'level is incorrect'
         if $params{aolevel} && !$LEVELS->{ $params{aolevel} };
 
     # Забираем числовое значения уровня для выборкиж
-    my $aolevel = $LEVELS->{ $params{aolevel} };
+    my $aolevel;
+    $aolevel = $LEVELS->{ $params{aolevel} }
+        if $params{aolevel};
 
-    # Нет необходимости выбирать все объекты ниже региона, только с id родителя.
-    confess 'parentguid is mandatory for levels above 1'
-        if $aolevel && $aolevel >1 && !$parentguid;
-
-    my $sqlquery = 'SELECT aoguid, aolevel, offname, shortname FROM addrob WHERE ';
+    my $sqlquery = 'SELECT * FROM addrob';
     my ( @where, @binds );
+
+    $sqlquery .= ' WHERE '
+        if ( $aolevel || $parentguid);
 
     # Добавляем WHERE в зависимости от пришедших параметров
     if ( $aolevel ) {
@@ -198,14 +195,30 @@ sub get_address_objects {
     }
 
     if ( $parentguid ) {
-        push @where, 'parentguid = ?';
-        push @binds, $parentguid;
+        # если приходит мультизначение
+        if ( ref $parentguid eq 'ARRAY' ) {
+            push @where, 'parentguid in (' . join (',', ('?') x  @$parentguid) . ')';
+            push @binds, @$parentguid;
+        }
+        else {
+            push @where, 'parentguid = ?';
+            push @binds, $parentguid;
+        }
     }
 
     $sqlquery .= join( ' AND ', @where );
 
-    return $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, @binds );
+    return ref $parentguid eq 'ARRAY'
+           ? $self->{dbh}->selectall_arrayref( $sqlquery, undef, @binds )
+           : $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, @binds )
 }
+
+sub get_address_objects_guids_only {
+    my ( $self, %params ) = @_;
+
+    return [map{ $_->{aoguid} } @{ $self->get_address_objects( %params ) } ];
+}
+
 
 sub get_sublevels_for_objects {
     my ( $self, $parentguid ) = @_;
@@ -233,16 +246,54 @@ sub get_data_for_object_by_aoguid {
         'SELECT aoguid, aolevel, offname, shortname, parentguid, postalcode FROM addrob WHERE aoguid = ?',
         undef,  $aoguid );
 }
+sub get_data_for_object_by_aoguid_array{
+    my ( $self, $aoguid ) = @_;
+
+    # Должен быть id  объекта
+    confess 'aoguid is empty!'
+        unless $aoguid;
+
+    return $self->{dbh}->selectrow_array("SELECT * FROM addrob where aoguid = '$aoguid'");
+}
+sub add_object_to_base {
+    my ( $self, $table, @values ) = @_;
+
+    # эскейпим данные
+    $_ = "\'$_\'" for @values;
+
+   # собираем данные региона в строку
+   my $values_string = join(',', @values );
+
+   $self->{dbh}->do( "INSERT INTO $table VALUES($values_string)")
+       or confess $DBI::errstr; ;
+
+}
 
 sub get_houses_of_address_objects {
     my ( $self, $aoguid ) =  @_;
 
-    # id адресного объекта не может быть пустым
-    confess 'aoguid is empty!'
-       unless $aoguid;
-    my $sqlquery = 'SELECT housenum, buildnum, strucnum, aoguid, houseguid, postalcode FROM house WHERE aoguid = ?';
+    my $sqlquery = 'SELECT * FROM house ';
 
-    return $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, $aoguid );
+    $sqlquery .= ' WHERE aoguid '
+        if $aoguid;
+
+    my @binds;
+    if ( $aoguid ) {
+        if ( ref $aoguid eq 'ARRAY' ){
+            $sqlquery .= ' in (' . join (',', ('?') x @$aoguid) . ')';
+            push @binds, @$aoguid;
+        }
+        else {
+
+            $sqlquery .= ' = ?';
+            push @binds, $aoguid;
+        }
+    }
+
+    return ref $aoguid eq 'ARRAY'
+           ? $self->{dbh}->selectall_arrayref( $sqlquery, undef, @binds )
+           : $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, @binds )
+
 }
 
 sub get_data_for_house_by_houseguid {
@@ -257,18 +308,35 @@ sub get_data_for_house_by_houseguid {
         undef,  $houseguid );
 }
 
+sub get_houses_guids_only {
+    my ( $self, %params ) = @_;
+
+    return [map{ $_->{houseguid} } @{ $self->get_houses_of_address_objects() } ];
+}
+
 sub get_rooms_of_address_objects {
     my ( $self, $houseguid ) =  @_;
 
     # ID дома не может быть пустым
     confess 'houseguid is empty!' unless $houseguid;
 
-    my $sqlquery = 'SELECT flatnumber, flattype.shortname AS flattype, houseguid, roomguid, postalcode, roomnumber, roomtype.shortname AS roomtype FROM room
-                    JOIN flattype ON flattype.fltypeid = room.flattype
-                    JOIN roomtype ON roomtype.rmtypeid = room.roomtype
-                    WHERE houseguid = ?';
+    my $sqlquery = 'SELECT * FROM room WHERE houseguid ';
 
-    return $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, $houseguid );
+    my @binds;
+
+    if ( ref $houseguid eq 'ARRAY' ){
+        $sqlquery .= ' in (' . join (',', ('?') x @$houseguid) . ')';
+        push @binds, @$houseguid;
+    }
+    else {
+
+        $sqlquery .= ' = ?';
+        push @binds, $houseguid;
+    }
+
+    return ref $houseguid eq 'ARRAY'
+           ? $self->{dbh}->selectall_arrayref( $sqlquery, undef, @binds )
+           : $self->{dbh}->selectall_arrayref( $sqlquery, { Slice => {} }, @binds );
 }
 
 sub get_data_for_room_by_roomguid {
@@ -284,6 +352,12 @@ sub get_data_for_room_by_roomguid {
                     JOIN roomtype ON roomtype.rmtypeid = room.roomtype
                     WHERE roomguid = ?',
         undef,  $roomguid );
+}
+
+sub get_data_for_table {
+    my ( $self, $table_name ) =  @_;
+
+    return $self->{dbh}->selectall_arrayref( "select * from $table_name" );
 }
 
 sub get_parent_record_chain_by_aoguid {
@@ -358,6 +432,7 @@ sub set_database_version {
 
 sub get_database_version {
     my ( $self ) = @_;
+
     # хендлер базы
     my $dbh = $self->{dbh};
 
@@ -368,13 +443,34 @@ sub get_link_for_full_database_dbf{
 }
 sub get_actual_base_version {
     my $ua = LWP::UserAgent->new;
+
     my $get = $ua->get( 'http://fias.nalog.ru/Public/Downloads/Actual/VerDate.txt', ':content_file'=>'version.txt' );
+
     open my $file, '<', "version.txt";
     my $firstline = <$file>;
     $firstline =~ s/\.//g;
     close $file;
     unlink 'version.txt';
+
     return $firstline;
+}
+
+sub clone_base_structure {
+    my ( $self, $destination_object ) = @_;
+
+    # Забираем список таблиц из ФИАС
+    my @fias_tables = grep { $_ !~ /\_$/} @{ $self->show_tables() };
+    # Создаём таблицы в тестовой базе
+    for my $table_name ( @fias_tables ) {
+        my $cr_statement = $self->{dbh}->selectcol_arrayref( "SHOW CREATE TABLE $table_name", { Columns => [2] } )->[0];
+        $destination_object->{dbh}->do( $cr_statement );
+    }
+}
+
+sub show_tables {
+    my ( $self ) = @_;
+
+    return $self->{dbh}->selectcol_arrayref("show tables");
 }
 
 sub _check_record_actuality {
@@ -408,6 +504,9 @@ sub _get_table_fields {
             #where => 'WHERE LIVESTATUS = 1',
         },
     };
+
+    # При апдейте приходят подчёркивания, это лишннее
+    $sql_table_name =~ s/\_$//a;
 
     # Возвращаем только необходимые поля
     return @{ $table_config->{ $sql_table_name }{fields} }
@@ -457,13 +556,13 @@ sub _create_table {
 
     my $create_string = "CREATE TABLE IF NOT EXISTS $sql_table_name (" . join( ', ', @sqlcommand );
 
-    if ( $sql_table_name eq 'house' ) {
+    if ( $sql_table_name =~ /^house\_?$/ ) {
 	    $create_string .= ", PRIMARY KEY \`houseguid\` (\`houseguid\`), KEY \`aoguid\`(\`aoguid\`)";
     }
-    elsif (  $sql_table_name eq 'room' ) {
+    elsif (  $sql_table_name =~ /^room\_?$/ ) {
 	    $create_string .= ", PRIMARY KEY \`roomguid\` (\`roomguid\`), KEY \`houseguid\`(\`houseguid\`)";
     }
-    elsif (  $sql_table_name eq 'addrob' ) {
+    elsif (  $sql_table_name =~ /^addrob\_?$/ ) {
 	    $create_string .= ", PRIMARY KEY \`aoguid\` (\`aoguid\`), KEY \`aolevel\`(\`aolevel\`), KEY \`aoguid\`(\`aoguid\`)";
     }
     $create_string .=  ') MAX_ROWS=1000000000';
@@ -543,7 +642,7 @@ FIAS::SQL - Модуль для минимальной работы с данн�
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
     # Создание объекта, подключение к базе
     my  $fias = FIAS::SQL->new(
@@ -632,6 +731,27 @@ version 0.06
     offname  --  Официальное наименование
     shortname -- Краткое наименование типа объекта
 
+=item B<get_address_objects_guids_only>
+    Получение адресных объектов по уровню и родителю, возвращаются только уникальные id объекта
+
+    %params
+        parentguid -- id родительского объекта
+        aolevel    -- уровень получаемых объектов
+            Уровень объекта может принимать только нижеперечисленные значения
+            соответствия между строками и числами указаны в хеше $LEVELS
+                region(1) – уровень региона
+                district(3) – уровень района
+                settlement(35) – уровень городских и сельских поселений
+                town(4) – уровень города
+                inhabitet_locality(6) – уровень населенного пункта
+                planning_structure(65) – планировочная структура
+                street(7) – уровень улицы
+                stead(75) – земельный участок
+                structure(8) – здания, сооружения, объекта незавершенного строительства
+                premises(9) – уровень помещения в пределах здания, сооружения
+
+    Функция возвращает arrayref из aoguids
+
 =item B<get_sublevels_for_objects>
     Получение списка уровней дочерних адресных объектов по id родителя
 
@@ -645,6 +765,19 @@ version 0.06
     aoguid -- id  объекта
 
     Функция возвращает hashref c данными адресного объекта
+
+=item B<get_data_for_object_by_aoguid_array>
+    Получение данных адресного объекта по id
+
+    aoguid -- id  объекта
+
+    Функция возвращает array c данными адресного объекта
+
+=item B<add_object_to_base>
+    Добавление объекта в таблицу
+
+    table -- имя таблицы
+    @values, список значений
 
 =item B<get_houses_of_address_objects>
     Функция возвращает список домов для адресного объекта
@@ -664,7 +797,6 @@ version 0.06
     buildnum -- номер корпуса
     strucnum -- номер строения
     postalcode -- Почтовый индекс
-    TODO добавить join для hststat?
 
 =item B<get_data_for_house_by_houseguid>
     Получение данных дома по id
@@ -793,6 +925,13 @@ version 0.06
 
 =item B<get_database_version>
     Получение версии актуальной базы
+
+=item B<clone_base_structure>
+    создаём таблицы в базе
+    $destination_object -- база назначения
+
+=item B<show_tables>
+    Список таблиц базы
 
 =item B<_check_record_actuality>
     Проверка записи из DBF на актуальность

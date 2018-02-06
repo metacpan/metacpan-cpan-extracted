@@ -1,0 +1,5 @@
+[-Documentation::RequirePodAtEnd]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::RequireConstantVersion]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-Variables::ProhibitLocalVars]

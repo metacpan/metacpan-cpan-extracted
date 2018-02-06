@@ -1,0 +1,19 @@
+language: bash
+services: docker
+
+env:
+  - RT_VERSION=4.0
+  - RT_VERSION=4.2
+  - RT_VERSION=4.4
+
+before_install:
+  - env | sort
+  - image="netsandbox/request-tracker:$RT_VERSION"
+
+install:
+    - docker pull $image
+    - docker run -d -v $TRAVIS_BUILD_DIR:/rtx --name rt $image
+    - docker ps -a
+
+script:
+    - docker exec -it rt bash -c "cd /rtx && RELEASE_TESTING=1 perl Makefile.PL && make && make test"

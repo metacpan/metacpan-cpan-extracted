@@ -4,12 +4,23 @@ package Crypt::Mode::ECB;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use Crypt::Cipher;
-use base 'Crypt::Mode';
 
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
+sub encrypt {
+  my ($self, $pt) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  $self->start_encrypt(@_)->add($pt) . $self->finish;
+}
+
+sub decrypt {
+  my ($self, $ct) = (shift, shift);
+  local $SIG{__DIE__} = \&CryptX::_croak;
+  $self->start_decrypt(@_)->add($ct) . $self->finish;
+}
+
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

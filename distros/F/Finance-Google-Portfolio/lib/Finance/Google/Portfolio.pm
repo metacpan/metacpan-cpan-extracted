@@ -1,6 +1,7 @@
 package Finance::Google::Portfolio;
 # ABSTRACT: Manipulate Google Finance portfolios a little
 
+use 5.008;
 use strict;
 use warnings;
 
@@ -12,7 +13,7 @@ use JSON::PP;
 use Carp 'croak';
 use URI;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 
 has user      => ( is => 'rwp' );
 has passwd    => ( is => 'rwp' );
@@ -22,7 +23,9 @@ has json      => ( is => 'ro', default => sub { JSON::PP->new->utf8->allow_barek
 has ua        => (
     is      => 'ro',
     default => sub {
-        my $ua = LWP::UserAgent->new;
+        my $ua = LWP::UserAgent->new(
+            max_redirect => 24,
+        );
         push( @{ $ua->requests_redirectable }, 'POST' );
         $ua->cookie_jar({});
         return $ua;
@@ -146,7 +149,7 @@ Finance::Google::Portfolio - Manipulate Google Finance portfolios a little
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Finance-Google-Portfolio.svg)](https://travis-ci.org/gryphonshafer/Finance-Google-Portfolio)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Finance-Google-Portfolio/badge.png)](https://coveralls.io/r/gryphonshafer/Finance-Google-Portfolio)
@@ -310,7 +313,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

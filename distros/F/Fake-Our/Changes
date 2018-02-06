@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.11 2018-02-03 00:00:00
+  - try Removal of the current directory (".") from @INC
+  - try Kwalitee Indicator: buildtool_not_executable
+  - created by INABA Hitoshi
+
 0.10 2017-03-07 00:00:00
   - define NORECURS, PM, and PL_FILES in Makefile.PL
   - created by INABA Hitoshi

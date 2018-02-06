@@ -163,6 +163,10 @@ SIM_RTS =                    F / True if RTS data is simulated
 SIM_POL =                    F / True if polarization data is simulated
 SIMULATE=                    F / True if any data are simulated
 STATUS  = 'NORMAL  '           / Status of end of obervation
+DOORSTST= 'Open    '           / Status of dome doors at start of observation
+DOORSTEN= 'Open    '           / Status of dome doors at end of observation
+ROOFSTST= 'Open    '           / Status of dome roof at start of observation
+ROOFSTEN= 'Open    '           / Status of dome roof at end of observation
 
         ---- Polarimeter Specific ----
 POL_MODE= 'UNKNOWN '           / Step-and-integrate (STOP_START) or Spin (CONSTA

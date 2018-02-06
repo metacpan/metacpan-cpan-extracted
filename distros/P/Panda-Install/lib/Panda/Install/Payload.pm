@@ -1,6 +1,7 @@
 package Panda::Install::Payload;
 use strict;
 use warnings;
+use Cwd();
 
 my %module_info;
 
@@ -12,12 +13,12 @@ sub data_dir {
     if (my $path = $INC{"$module.pm"}) {
         $path =~ s/\.pm$//;
         my $pldir = "$path.x";
-        return $pldir if -d $pldir;
+        return Cwd::realpath($pldir) if -d $pldir;
     }
     
     foreach my $inc (@INC) {
         my $pldir = "$inc/$module.x";
-        return $pldir if -d $pldir;
+        return Cwd::realpath($pldir) if -d $pldir;
     }
     
     return undef;

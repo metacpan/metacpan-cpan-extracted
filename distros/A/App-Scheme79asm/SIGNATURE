@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 d5f0703b4bf283e6afd2241ce852f71680a8adf9 Changes
+SHA1 f89d1c09d613b3f4cb7d3bff7297c4802c87282a MANIFEST
+SHA1 fe67416feed9fccabb4913e233c2d2d501e24113 META.json
+SHA1 1d61e59edaf2f1146a03b758a876330800179610 META.yml
+SHA1 7b2c82d22a8afdf846c732f2a9c6c288bb16ff30 Makefile.PL
+SHA1 8150c6136b56db069e7fa5d8e568b6e1d196858e README
+SHA1 ce467ad1a2bbba02a42574a30812e8b987a70723 lib/App/Scheme79asm.pm
+SHA1 5f624653a11ba753dccd5adf446be2e91b9b3b29 scheme79asm
+SHA1 f0aa50e52ad703ab5aba4116f3d5961bb1264f9f t/App-Scheme79asm.t
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAlpx74kQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYhNRD/41De9Vci+Rsn8lRd7o1KrF7oKr/y2nllbf
+GNEZAtqFiA+UKiIwOiHwGu4kXj/w/F8e0XLYtDEiVE/H2QE4sg/wh0g3QxmJAxim
+wG0tqhHNQSIjHEj+QjS8GsK8HMDf1qg5R3rreyqe7aCqkLX2ZDmvL/3ydRSmNOWJ
+BCHVGFelSfpqozJrolb+1dwc167Wx42umdCceBKkMaTGI+4U9Bbyh6JEdXGpHniz
+6wa7oKHbaZ1Hn4kA/F1UkzfivCJAYjhm57gsq/YT9XDytpp01WkH49cCuTw6oIvw
+aTtcLr7tNWdV8FUeyiXxbcWkkksGonGN2wsgASDr/GgOgnYOh1zI7QzGjbW6C7or
+yat8SjNTJJl0OMJaMY2GTd2wrDvPTCRawFTYrIbwf31vHuxX2t8pAGx58VHsOhDF
+uvlUZAl7M5IzgLF1MYhVo/bUFo40CLgoylp60EyC/+5/368ABbDHCFznoT6pC2Jy
+eRWqVTyZVL2/JNcY2vTrWl264oRZnAWLWTkEIeilTbYjw3fxCsS7IALZQYzmyQZu
+c2PP1owwhZl4Cg+uvBr3gBbf53IOJHui9BfFoFCRd+DgoAtMwxFGpcyLWJyJAoNC
+ifllEwVMTHLZ/o3X2k/Zk3TyV0lvJ37U4awnanYGl8//ollw1Lj6e3Tat1pzm0Gs
+ZaXYqhQKSw==
+=cNy2
+-----END PGP SIGNATURE-----

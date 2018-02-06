@@ -1,6 +1,4 @@
 call japerl.bat xt\0304_FileBasename_fileparse_5C.t
-goto END
-
 call japerl.bat xt\0305_FileBasename_basename_5C.t
 call japerl.bat xt\0306_FileBasename_dirname_5C.t
 call japerl.bat xt\0403_FilePath_mkpath_5C.t

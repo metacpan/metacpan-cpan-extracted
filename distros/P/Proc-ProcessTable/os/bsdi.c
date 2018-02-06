@@ -153,9 +153,11 @@ void OS_get_table() {
 	argv = kvm_getargv(kd, (const struct kinfo_proc *) &(procs[i]) , 0);
 	if (argv) {
 	  int j = 0;
-	  while (argv[j] && strlen(cmndline) <= MAXARGLN) {
+	  while (argv[j] && strlen(cmndline)+strlen(argv[j])+1 <= MAXARGLN) {
 		strcat(cmndline, argv[j]);
-		strcat(cmndline, " ");
+		if (argv[j+1]) {
+		  strcat(cmndline, " ");
+		}
 		j++;
 	  }
 	}

@@ -13,6 +13,12 @@ do { my $x = {
                                       'Test::Pod' => '1.41'
                                     }
                     },
+       'runtime' => {
+                      'requires' => {
+                                      'BSD::Resource' => '0',
+                                      'Starman::Server' => '0'
+                                    }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'

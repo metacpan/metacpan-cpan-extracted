@@ -1,11 +1,12 @@
 package Thrift::API::HiveClient2;
-$Thrift::API::HiveClient2::VERSION = '0.021';
+$Thrift::API::HiveClient2::VERSION = '0.023';
 {
   $Thrift::API::HiveClient2::DIST = 'Thrift-API-HiveClient2';
 }
 
 # ABSTRACT: Perl to HiveServer2 Thrift API wrapper
 
+use 5.010;
 use strict;
 use warnings;
 use Moo;
@@ -16,40 +17,6 @@ use List::MoreUtils 'zip';
 use Thrift;
 use Thrift::Socket;
 use Thrift::BufferedTransport;
-
-# An unclean workaround to have the multiple "die new TException" statements
-# display something useful instead of a useless stringified hash reference.
-# Currently tied to version 0.7 to 0.9; Thrift people don't seem to read cpan
-# bug reports, will need to poke them directly.
-# see https://rt.cpan.org/Public/Bug/Display.html?id=86679
-
-# update: not indexable by cpan as it injects code in another class which is
-# not ours. plus the version check doesn't work either because of a missing
-# package declaration in the Thrift class file, see:
-# https://issues.apache.org/jira/browse/THRIFT-3551
-# https://issues.apache.org/jira/browse/THRIFT-3549 
-
-#package Thrift::TException;
-#use version;
-#
-#my $thrift_version = version->parse($Thrift::VERSION);
-#if ( $thrift_version >= version->parse('0.7.0') && $thrift_version <= version->parse('0.9.3') )
-#{
-#    eval <<'OVERLOAD';    #<<<
-#    use overload '""' => sub {
-#        return
-#            ref( $_[0] )
-#            . " error: "
-#            . ( $_[0]->{message} || 'empty message' )
-#            . " (code "
-#            . ( defined $_[0]->{code} ? $_[0]->{code} : 'undefined' ) . ")";
-#    };
-#OVERLOAD
-#}
-
-#>>>
-
-package Thrift::API::HiveClient2;
 
 # Protocol loading is done dynamically later.
 
@@ -104,6 +71,12 @@ has port => (
 has sasl => (
     is      => 'ro',
     default => 0,
+);
+
+# Kerberos principal
+# Usually in the format 'hive/{hostname}@REALM.COM';
+has principal => (
+    is => 'rw',
 );
 
 # 1 hour default recv socket timeout. Increase for longer-running queries
@@ -166,7 +139,8 @@ sub BUILD {
     if ( !$self->_transport ) {
         my $transport = Thrift::BufferedTransport->new( $self->_socket );
         if ( $self->_sasl ) {
-            $self->_set_transport( Thrift::SASL::Transport->new( $transport, $self->_sasl ) );
+            my $debug = 0;
+            $self->_set_transport( Thrift::SASL::Transport->new( $transport, $self->_sasl, $debug, $self->principal ) );
         }
         else {
             $self->_set_transport($transport);
@@ -204,8 +178,14 @@ sub connect {
 has _session => (
     is  => 'rwp',
     isa => sub {
-        die "Session isn't a Thrift::API::HiveClient2::TOpenSessionResp"
-            if !blessed( $_[0] ) || !$_[0]->isa('Thrift::API::HiveClient2::TOpenSessionResp');
+        my($val) = @_;
+        if (   !blessed( $val )
+            || !$val->isa('Thrift::API::HiveClient2::TOpenSessionResp')
+        ) {
+            die sprintf "Session `%s` isn't a Thrift::API::HiveClient2::TOpenSessionResp",
+                $val // '[undefined]'
+            ;
+        }
     },
     lazy    => 1,
     builder => '_build_session',
@@ -238,8 +218,14 @@ sub _build_session {
 has _session_handle => (
     is  => 'rwp',
     isa => sub {
-        die "Session handle isn't a Thrift::API::HiveClient2::TSessionHandle"
-            if !blessed( $_[0] ) || !$_[0]->isa('Thrift::API::HiveClient2::TSessionHandle');
+        my($val) = @_;
+        if (   !blessed( $val )
+            || !$val->isa('Thrift::API::HiveClient2::TSessionHandle')
+        ) {
+            die sprintf "Session handle `%s` isn't a Thrift::API::HiveClient2::TSessionHandle",
+                            $val // '[undefined]'
+            ;
+        }
     },
     lazy    => 1,
     builder => '_build_session_handle',
@@ -253,14 +239,20 @@ sub _build_session_handle {
 has _operation => (
     is  => "rwp",
     isa => sub {
-        die "Operation isn't a Thrift::API::HiveClient2::T*Resp"
-            if defined $_[0]
+        my($val) = @_;
+        if ( defined $val
             && (
-            !blessed( $_[0] )
-            || (   !$_[0]->isa('Thrift::API::HiveClient2::TExecuteStatementResp')
-                && !$_[0]->isa('Thrift::API::HiveClient2::TGetColumnsResp')
-                && !$_[0]->isa('Thrift::API::HiveClient2::TGetTablesResp') )
-            );
+                !blessed( $val )
+                || (   !$val->isa('Thrift::API::HiveClient2::TExecuteStatementResp')
+                    && !$val->isa('Thrift::API::HiveClient2::TGetColumnsResp')
+                    && !$val->isa('Thrift::API::HiveClient2::TGetTablesResp')
+                    )
+            )
+        ) {
+            die "Operation `%s` isn't a Thrift::API::HiveClient2::T*Resp",
+                    $val // '[undefined]'
+            ;
+        }
     },
     lazy => 1,
 );
@@ -268,10 +260,17 @@ has _operation => (
 has _operation_handle => (
     is  => 'rwp',
     isa => sub {
-        die "Operation handle isn't a Thrift::API::HiveClient2::TOperationHandle"
-            if defined $_[0]
-            && ( !blessed( $_[0] )
-            || !$_[0]->isa('Thrift::API::HiveClient2::TOperationHandle') );
+        my($val) = @_;
+        if (
+            defined $val
+            && (   !blessed( $val )
+                || !$val->isa('Thrift::API::HiveClient2::TOperationHandle')
+                )
+        ) {
+            die sprintf "Operation handle isn't a Thrift::API::HiveClient2::TOperationHandle",
+                            $val // '[undefined]'
+            ;
+        }
     },
     lazy => 1,
 );
@@ -496,7 +495,10 @@ sub DEMOLISH {
             )
         );
     }
-    $self->_transport->close;
+    
+    if ( $self->_transport ) {
+        $self->_transport->close;
+    }
 }
 
 # when the user calls a method on an object of this class, see if that method
@@ -529,7 +531,9 @@ Thrift::API::HiveClient2 - Perl to HiveServer2 Thrift API wrapper
 
 =head1 VERSION
 
-version 0.021
+version 0.023
+
+=for Pod::Coverage BUILD DEMOLISH
 
 =head1 METHODS
 
@@ -538,10 +542,30 @@ version 0.021
 Initialize the client object with the Hive server parameters
 
     my $client = Thrift::API::HiveClient2->new(
-        host    => <host name or IP, defaults to localhost>,
-        port    => <port, defaults to 10000>,
-        timeout => <seconds timeout, defaults to 1 hour>,
+        host    => $hive_host,
+        port    => $hive_port,
+        timeout => $seconds,
     );
+
+=head3 host
+
+Host name or IP, defaults to localhost.
+
+=head3 port
+
+Hive port, defaults to 10000.
+
+=head3 principal
+
+Kerberos principal. Default is not set. See the L</WARNING> section.
+
+=head3 sasl
+
+Enables authentication. Default is not set. See the L</WARNING> section.
+
+=head3 timeout
+
+Seconds timeout, defaults to 1 hour.
 
 =head2 connect
 
@@ -634,6 +658,9 @@ Starting with 0.014, support for secure clusters has been added thanks to
 L<Thrift::SASL::Transport>. This behaviour is set by passing sasl => 1 to the
 constructor. It has been tested with hive.server2.authentication = KERBEROS.
 It of course requires a valid credentials cache (kinit) or keytab.
+With this, kerberos principal also should be provided as part of constructor,
+principal => hive/_HOST@REALM.COM
+this value will be under hive.server2.authentication.kerberos.principal in hive-site.xml
 
 Starting with 0.015, other authentication methods are supported, and driven by
 the content of the sasl property. When built using sasl => 0 or sasl => 1, the
@@ -650,6 +677,20 @@ Authen::SASL, for instance:
     }
 
 Note that a server configured with NONE will happily accept the PLAIN method.
+
+=head1 DELEGATIONTOKEN
+Sasl object need to be created specifically if hiveClient2 is used with delegation token.
+    {
+      mechanism  => 'DIGEST-MD5',
+      callback   => {
+        canonuser => <bas65 encoded identifier extracted from delegation token>,
+        password  => <bas65 encoded password extracted from delegation token>,
+        realm     => 'default'
+      }
+    }
+This is used when hiveclient is called from oozie, where keytabs cannot be used.
+Oozie requests delegationtoken on behalf of hive if specified. This token is used for
+further authentication purposes.
 
 =head1 CAVEATS
 
@@ -676,7 +717,7 @@ David Morel <david.morel@amakuru.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by David Morel & Booking.com. Portions are (c) R.Scaffidi, Thrift files are (c) Apache Software Foundation..
+This software is Copyright (c) 2015 by David Morel & Booking.com. Portions are (c) R.Scaffidi, Thrift files are (c) Apache Software Foundation.
 
 This is free software, licensed under:
 

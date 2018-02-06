@@ -13,7 +13,7 @@ use Scalar::Util 'reftype';
 use Carp;
 use strict;
 use warnings;
-use overload # XXX - what is overloading for? is it necessary?
+use overload
     '""' => sub { "" . $_[0]->_fetch },
     '+' => sub { $_[0]->_fetch + $_[1] },
     '*' => sub { $_[0]->_fetch * $_[1] },
@@ -41,11 +41,8 @@ use overload # XXX - what is overloading for? is it necessary?
     '&{}' => sub { $_[0]->_fetch },
     '*{}' => sub { $_[0]->_fetch },
 
-    # when we define %{} and internally require an element of an object,
-    # we must unbless the object before the operation and rebless it
-    # afterward. See search.cpan.org/perldoc?overload#Two-face_references
-
-
+# A BackgroundScalar object is a HASH-type reference. Inside
+# _fetch we must disable overloading of '%{}'
     '%{}' => sub { $_[0]->_fetch },
 
     'cos' => sub { cos $_[0]->_fetch },
@@ -59,7 +56,7 @@ use overload # XXX - what is overloading for? is it necessary?
 		         : atan2($_[0]->_fetch, $_[1]) }
 ;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 # "protocols" for serializing data and the methods used
 # to carry out the serialization
@@ -156,30 +153,6 @@ sub _decode {
     }
 }
 
-# unbless the object (so we can access hash elements without going
-# through the overloaded hash dereference operator). Return the
-# original object type so we can re-bless it.
-sub _unbless {
-    my $self = shift;
-    my $class = ref $self;
-    bless $self, "!@#$%";
-    return $class;
-}
-
-sub is_ready {
-    my $self = shift;
-    my $is_ready = 0;
-
-    my $class = $self->_unbless;
-
-    if ($self->{value_set}) { $is_ready = 1 }
-    if ($self->{job}->is_complete) { $is_ready = 1 }
-
-    bless $self, $class;
-
-    # XXX - pause here or waitpid WNOHANG? That might be helpful on Windows.
-    return 0;
-}
 
 # retrieves the result of the background task. If necessary, wait for the
 # background task to finish.
@@ -189,10 +162,11 @@ sub _fetch {
     # temporarily turn off overloaded hash dereferencing.
     # it will be turned back on later
     #
-    # would like to just say 'no overloading "%{}"', but that is
-    # not supported for perl <v5.10.1
-    my $class = $self->_unbless;
-
+    # I would love to just say 'no overloading %{}' here, but that
+    # is not supported for perl <5.10.1
+    my $class = ref $self;
+    bless $self, '!@#$%';
+    
     if (!$self->{value_set}) {
 	if (!$self->{job}->is_complete) {
             return if &Forks::Super::Job::_INSIDE_END_QUEUE;
@@ -202,7 +176,7 @@ sub _fetch {
 		carp 'Forks::Super::bg_eval: ',
 			"failed to retrieve result from process!\n";
 		$self->{value_set} = 1;
-		$self->{error} = 
+		$self->{error} =
 		    'waitpid failed, result not retrieved from process';
 		bless $self, $class;
 		return '';  # v0.53 on failure return empty string
@@ -259,7 +233,7 @@ Forks::Super::LazyEval::BackgroundScalar
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 DESCRIPTION
 
@@ -275,7 +249,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2017, Marty O'Brien.
+Copyright (c) 2010-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

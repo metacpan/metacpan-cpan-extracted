@@ -36,99 +36,106 @@ my $catalog_data = new Astro::Catalog( origin => 'Reference');
 
 # create a temporary object to hold stars
 my $star;
-  
+
 # Parse data block
 # ----------------
 foreach my $line ( 0 .. $#buffer ) {
-                      
+
    # split each line
    my @separated = split( /\s+/, $buffer[$line] );
-    
- 
+
+
    # check that there is something on the line
    if ( defined $separated[0] ) {
-              
+
        # create a temporary place holder object
-       $star = new Astro::Catalog::Star(); 
+       $star = new Astro::Catalog::Star();
 
        # ID
        my $id = $separated[2];
        $star->id( $id );
-                      
+
        # debugging
-       #print "# ID $id star $line\n";      
-              
+       #print "# ID $id star $line\n";
+
        # RA
        my $objra = "$separated[3] $separated[4] $separated[5]";
-              
+
        # Dec
        my $objdec = "$separated[6] $separated[7] $separated[8]";
 
        $star->coords( new Astro::Coords( name => $id,
-					 ra => $objra,
-					 dec => $objdec,
-					 units => 'sex',
-					 type => 'J2000',
-				       ));
+                                         ra => $objra,
+                                         dec => $objdec,
+                                         units => 'sex',
+                                         type => 'J2000',
+                                       ));
 
        # B Magnitude
        #my %b_mag = ( R => $separated[10] );
        #$star->magnitudes( \%b_mag );
-              
+
        # B mag error
        #my %mag_errors = ( R => undef );
        #$star->magerr( \%mag_errors );
 
        $star->fluxes( new Astro::Fluxes( new Astro::Flux(
-	               new Number::Uncertainty( Value => $separated[10] ),
-			'mag', "R" )));              
+                       new Number::Uncertainty( Value => $separated[10] ),
+                        'mag', "R" )));
        # Quality
        my $quality = $separated[13];
        $star->quality( undef );
-              
+
        # Field
        my $field = $separated[12];
        $star->field( undef );
-              
+
        # GSC, obvious!
        $star->gsc( "TRUE" );
-              
+
        # Distance
        my $distance = $separated[16];
        $star->distance( $distance );
-              
+
        # Position Angle
        my $pos_angle = $separated[17];
        $star->posangle( $pos_angle );
 
     }
-             
+
     # Push the star into the catalog
     # ------------------------------
     $catalog_data->pushstar( $star );
 }
 
 # field centre
-$catalog_data->fieldcentre( RA => '01 10 12.9', 
-                            Dec => '+60 04 35.9', 
+$catalog_data->fieldcentre( RA => '01 10 12.9',
+                            Dec => '+60 04 35.9',
                             Radius => '5' );
 
 
 # Grab comparison from ESO/ST-ECF Archive Site
 # --------------------------------------------
 
-print "# Reseting \$cfg_file to local copy in ./etc \n";
-my $file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
-Astro::Catalog::Query::SkyCat->cfg_file( $file );
-
-my $gsc_byname = new Astro::Catalog::Query::SkyCat( # Target => 'HT Cas',
-						    RA => '01 10 12.9',
-						   Dec => '+60 04 35.9',
-						    Radius => '5',
-						    Catalog => 'gsc@eso',
-						  );
-
 SKIP: {
+    print "# Reseting \$cfg_file to local copy in ./etc \n";
+    my $file = File::Spec->catfile( '.', 'etc', 'skycat.cfg' );
+    Astro::Catalog::Query::SkyCat->cfg_file( $file );
+
+    my $gsc_byname = eval {
+        new Astro::Catalog::Query::SkyCat( # Target => 'HT Cas',
+                                           RA => '01 10 12.9',
+                                           Dec => '+60 04 35.9',
+                                           Radius => '5',
+                                           Catalog => 'gsc@eso',
+                                         );
+    };
+
+    unless (defined $gsc_byname) {
+        diag('Can not construct Skycat client: '. $@);
+        skip 'Cannot construct client', 147;
+    }
+
     print "# Connecting to ESO/ST-ECF GSC Catalogue\n";
     my $catalog_byname = eval {
         $gsc_byname->querydb();

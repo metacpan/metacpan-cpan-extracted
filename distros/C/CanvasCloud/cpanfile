@@ -1,4 +1,5 @@
 requires "Hash::Merge" => "0";
+requires "IO::String" => "0";
 requires "JSON" => "0";
 requires "LWP::UserAgent" => "0";
 requires "Module::Load" => "0";
@@ -11,6 +12,7 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
+  requires "FindBin" => "0";
   requires "Test::More" => "0";
 };
 

@@ -1,6 +1,6 @@
 package Bot::BasicBot;
 our $AUTHORITY = 'cpan:BIGPRESH';
-$Bot::BasicBot::VERSION = '0.91';
+$Bot::BasicBot::VERSION = '0.93';
 use strict;
 use warnings;
 
@@ -68,6 +68,7 @@ sub run {
                 irc_kick         => "irc_kicked_state",
                 irc_nick         => "irc_nick_state",
                 irc_quit         => "irc_quit_state",
+                irc_mode         => "irc_mode_state",
 
                 fork_close       => "fork_close_state",
                 fork_error       => "fork_error_state",
@@ -116,6 +117,8 @@ sub got_names { return }
 sub topic { return }
 
 sub nick_change { return }
+
+sub mode_change { return }
 
 sub kicked { return }
 
@@ -490,6 +493,12 @@ sub no_run {
     return $self->{no_run};
 }
 
+sub webirc {
+    my $self = shift;
+    $self->{webirc} = shift if @_;
+    return $self->{webirc};
+}
+
 sub start_state {
     my ($self, $kernel, $session) = @_[OBJECT, KERNEL, SESSION];
     $kernel->sig('DIE', 'die');
@@ -520,6 +529,7 @@ sub start_state {
 	    Flood     => $self->flood,
 	    LocalAddr => $self->localaddr,
             useipv6   => $self->useipv6,
+            webirc    => $self->webirc,
 	    $self->charset_encode(
 		Nick     => $self->nick,
 		Username => $self->username,
@@ -549,9 +559,11 @@ sub irc_001_state {
         $self->charset_encode($self->nick),
     );
 
+    $self->log("Connected to " . $self->server);
+
     # connect to the channel
     for my $channel ($self->channels) {
-        $self->log("Trying to connect to '$channel'\n");
+        $self->log("Trying to join '$channel'\n");
         $kernel->post(
             $self->{IRCNAME},
             'join',
@@ -601,6 +613,20 @@ sub irc_nick_state {
     my ($self, $nick, $newnick) = @_[OBJECT, ARG0, ARG1];
     $nick = $self->nick_strip($nick);
     $self->nick_change($nick, $newnick);
+    return;
+}
+
+sub irc_mode_state {
+    my ($self, $nick, $channel, $mode_changes) = @_[OBJECT, ARG0, ARG1, ARG2];
+    my @mode_operands = @_[ARG3..$#_];
+    $self->mode_change(
+        {
+            channel       => $channel,
+            who           => $self->nick_strip($nick),
+            mode_changes  => $mode_changes,
+            mode_operands => \@mode_operands,
+        }
+    );
     return;
 }
 
@@ -1125,6 +1151,19 @@ topic of the channel.
 When a user changes nicks, this will be called. It receives two arguments:
 the old nickname and the new nickname.
 
+=head2 C<mode_change>
+
+When a user sets channel modes, or the bot (or someone sharing its bouncer
+connection?) sets user modes, this will be called.  It receives a hashref
+which will look like the following:
+
+  {
+      channel => "#channel",
+      who => "nick!user@host",
+      mode_changes => "+o+v",
+      mode_operands => ["bigpresh", "somedude"],
+  }
+
 =head2 C<kicked>
 
 Called when a user is kicked from the channel. It receives a hashref which
@@ -1174,6 +1213,15 @@ Receives a hashref which will look like:
       who => "nick that quit",
       body => "quit message",
     }
+
+=head2 C<irc_raw>
+
+Receives a line of raw IRC input.  Intended for cases where you're trying to do
+something clever which the normal methods and parsing supplied can't handle.
+
+=head2 C<irc_raw_out>
+
+Receives a line of raw IRC output being sent to the IRC server.
 
 =head1 BOT METHODS
 
@@ -1229,7 +1277,7 @@ handler for each call.
 =item body
 
 Optional. Use this to pass on the body of the incoming message that
-triggered you to fork this process. Useful for interactive proceses
+triggered you to fork this process. Useful for interactive processes
 such as searches, so that you can act on specific terms in the user's
 instructions.
 
@@ -1340,7 +1388,7 @@ commands to the component. For example:
 Takes a channel names as a parameter, and returns a hash of hashes. The
 keys are the nicknames in the channel, the values are hashes containing
 the keys "voice" and "op", indicating whether these users are voiced or
-opped in the channel. This method is only here for backwards compatability.
+opped in the channel. This method is only here for backwards compatibility.
 You'll probably get more use out of
 L<POE::Component::IRC::State|POE::Component::IRC::State>'s methods (which
 this method is merely a wrapper for). You can access the
@@ -1440,6 +1488,12 @@ Set to '1' to disable the built-in flood protection of POE::Compoent::IRC
 Tells Bot::BasicBot to B<not> run the L<POE kernel|POE::Kernel> at the end
 of L<C<run>|/run>, in case you want to do that yourself.
 
+=head2 C<webirc>
+
+A hashref of WEBIRC params - keys C<user>, C<pass>, C<host> and C<ip>.  Unless
+the network you are connecting to trusts you enough to give you a WEBIRC config
+block & password, this won't be of any use to you.
+
 =head1 OTHER METHODS
 
 =head2 C<AUTOLOAD>
@@ -1491,7 +1545,10 @@ If you have any questions or issues, you can drop by in #poe or
 
 =head1 AUTHOR
 
-Tom Insam E<lt>tom@jerakeen.orgE<gt>
+David Precious (BIGPRESH) C<< <davidp@preshweb.co.uk> >> is the 
+current maintainer.
+
+Tom Insam E<lt>tom@jerakeen.orgE<gt> was the original author.
 
 This program is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
@@ -1509,7 +1566,7 @@ AUTOLOAD stuff, better interactive help, and a few API tidies.
 Maintainership for a while was in the hands of Simon Kent
 E<lt>simon@hitherto.netE<gt>. Don't know what he did. :-)
 
-I (Tom Insam) recieved patches for tracking joins and parts from Silver,
+I (Tom Insam) received patches for tracking joins and parts from Silver,
 sat on them for two months, and have finally applied them. Thanks, dude.
 He also sent me changes for the tick event API, which made sense.
 
@@ -1521,7 +1578,11 @@ In April 2017, maintainership moved to David Precious
 
 =head1 SEE ALSO
 
-L<POE>, L<POE::Component::IRC>
+If you want to write/run a more flexible bot which supports module loading,
+authentication, data storage etc, consider the subclass
+L<Bot::BasicBot::Pluggable>.
+
+Also see L<POE>, L<POE::Component::IRC>
 
 Possibly Infobot, at http://www.infobot.org
 

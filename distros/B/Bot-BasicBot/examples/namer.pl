@@ -1,10 +1,11 @@
+#!/usr/bin/perl
+
 =head1 NAME
 
 namer - read out url titles in the channel
 
 =cut
 
-#!/usr/bin/perl
 package Bot;
 use base qw(Bot::BasicBot);
 use warnings;

@@ -1,4 +1,8 @@
 Revision history for Net::Etcd
+0.019
+[ BUG FIX ]
+* Resolved issue where chunked data was not properly handled in non streaming calls and would truncate data when buffer was full. Fixed By GH #40 - Thanks Ananth Kavuri (foobargeez)
+
 0.018
 [ ENHANCEMENTS ]
 * Added Member class and tests.

@@ -17,7 +17,7 @@
 # housekeeping
 ########################################################################
 
-package FindBin::libs;
+package FindBin::libs   v2.12.01;
 
 use v5.14;
 use strict;
@@ -74,9 +74,6 @@ BEGIN
 ########################################################################
 # package variables 
 ########################################################################
-
-our $VERSION    = '2.12';
-$VERSION = eval $VERSION;
 
 my %defaultz = 
 (
@@ -1094,5 +1091,10 @@ Steven Lembark, Workhorse Computing <lembark@wrkhors.com>
 =head1 COPYRIGHT
 
 Copyright (C) 2003-2014, Steven Lembark, Workhorse Computing.
-This code is released under the same terms as Perl-5.20
+This code is released under the same terms as Perl-5.24
+or any later version of Perl.
+
+=head1 LICENSE
+
+This code is released under the same terms as Perl-5.24
 or any later version of Perl.

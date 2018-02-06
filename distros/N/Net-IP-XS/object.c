@@ -1,7 +1,7 @@
 /*
 object.c - Functions for Net::IP::XS's object-oriented interface.
 
-Copyright (C) 2010-2016 Tom Harrison <tomhrr@cpan.org>
+Copyright (C) 2010-2018 Tom Harrison <tomhrr@cpan.org>
 Original inet_pton4, inet_pton6 are Copyright (C) 2006 Free Software
 Foundation.
 Original interface, and the auth and ip_auth functions, are Copyright
@@ -208,10 +208,7 @@ NI_set(SV* ipo, char *data, int ipversion)
     HV_MY_DELETE(ipo, "is_prefix",  9);
 
     if (!ipversion) {
-        ipversion = NI_ip_get_version(buf1);
-        if (!ipversion) {
-            return 0;
-        }
+        ipversion = strchr(buf1, '.') ? 4 : 6;
     }
 
     iplen = NI_iplengths(ipversion);
@@ -236,7 +233,7 @@ NI_set(SV* ipo, char *data, int ipversion)
         HV_MY_STORE_PV(ipo, "last_bin", 8, binbuf1, iplen);
         binbuf2p = binbuf1;
     } else {
-        endipversion = NI_ip_get_version(buf2);
+        endipversion = strchr(buf2, '.') ? 4 : 6;
         if (!endipversion) {
             return 0;
         }

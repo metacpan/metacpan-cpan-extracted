@@ -7,7 +7,9 @@ use warnings;
 # This test is included mostly so that I can get more detail about
 # the CPAN testers' configuration.
 
-binmode *STDERR, ':encoding(UTF-8)';
+if ($] >= 5.007) {
+    binmode *STDERR, ':encoding(UTF-8)';
+}
 
 print STDERR "\n";
 Forks::Super::Config::CONFIG_module("Time::HiRes");

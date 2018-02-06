@@ -1,5 +1,5 @@
 ---
-abstract: "meta::cpan (Ã¯Â¾‰Ã¢—•Ã£ƒÂ®Ã¢—•)Ã¯Â¾‰*:Ã£ƒÂ»Ã¯Â¾ŸÃ¢œÂ§ index me"
+abstract: Emoji
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
@@ -20,7 +20,7 @@ no_index:
 provides:
   Acme::AsciiEmoji:
     file: lib/Acme/AsciiEmoji.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Exporter::Tiny: '0'
   perl: '5.006'
@@ -28,5 +28,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Acme-AsciiEmoji.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

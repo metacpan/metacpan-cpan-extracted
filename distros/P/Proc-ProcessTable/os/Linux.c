@@ -30,10 +30,10 @@
 /* some static values that won't change, */
 static pthread_once_t   globals_init = PTHREAD_ONCE_INIT;
 
-static long long   			boot_time;
-static unsigned				page_size;
-static unsigned long long	system_memory;
-static unsigned 			system_hertz;
+static long long            boot_time;
+static unsigned             page_size;
+static unsigned long long   system_memory;
+static unsigned             system_hertz;
 
 static bool     init_failed = false;
 
@@ -66,7 +66,7 @@ static void init_static_vars()
     boot_time = -1;
     system_memory = -1;
 
-	page_size = getpagesize();
+    page_size = getpagesize();
 
     /* initilize our mem stack, tempoary memory */
     obstack_init(&mem_pool);
@@ -433,12 +433,40 @@ static void get_proc_cmndline(char *pid, char *format_str, struct procstat* prs,
     field_enable(format_str, F_CMNDLINE);
 }
 
+static void get_proc_cmdline(char *pid, char *format_str, struct procstat* prs,
+    struct obstack *mem_pool)
+{
+    char    *cmdline_text, *cur;
+    off_t   cmdline_off;
+
+    if ((cmdline_text = read_file(pid, "cmdline", &cmdline_off, mem_pool)) == NULL)
+        return;
+
+    prs->cmdline = cmdline_text;
+    prs->cmdline_len = cmdline_off;
+    field_enable(format_str, F_CMDLINE);
+}
+
+static void get_proc_environ(char *pid, char *format_str, struct procstat* prs,
+    struct obstack *mem_pool)
+{
+    char    *environ_text, *cur;
+    off_t   environ_off;
+
+    if ((environ_text = read_file(pid, "environ", &environ_off, mem_pool)) == NULL)
+        return;
+
+    prs->environ = environ_text;
+    prs->environ_len = environ_off;
+    field_enable(format_str, F_ENVIRON);
+}
+
 static void get_proc_status(char *pid, char *format_str, struct procstat* prs,
     struct obstack *mem_pool)
 {
     char    *status_text, *loc;
     off_t   status_len;
-	int		dummy_i;
+    int     dummy_i;
 
     if ((status_text = read_file(pid, "status", &status_len, mem_pool)) == NULL)
         return;
@@ -464,10 +492,13 @@ static void get_proc_status(char *pid, char *format_str, struct procstat* prs,
         } else if (strncmp(loc, "Gid:", 4) == 0) {
             sscanf(loc + 4, " %d %d %d %d", &dummy_i, &prs->egid, &prs->sgid, &prs->fgid);
             field_enable_range(format_str, F_EGID, F_FGID);
+        } else if (strncmp(loc, "TracerPid:", 10) == 0) {
+            sscanf(loc + 10, " %d", &prs->tracer);
+            field_enable(format_str, F_TRACER);
         }
 
         /* short circuit condition */
-        if (islower(format_str[F_EUID]) && islower(format_str[F_EGID]))
+        if (islower(format_str[F_EUID]) && islower(format_str[F_EGID]) && islower(format_str[F_TRACER]))
             goto done;
     }
 
@@ -520,6 +551,9 @@ static void fixup_stat_values(char *format_str, struct procstat* prs)
         case 't':
             prs->state = get_string(TRACINGSTOP);
             break;
+        case 'P':
+            prs->state = get_string(PARKED);
+            break;
         /* unknown state, state is already set to NULL */
         default:
             ppt_warn("Ran into unknown state (hex char: %x)", (int) prs->state_c);
@@ -539,14 +573,14 @@ skip_state_format:
     prs->cstime     = JIFFIES_TO_MICROSECONDS(prs->cstime);
     prs->cutime     = JIFFIES_TO_MICROSECONDS(prs->cutime);
 
-	/* derived time values */
-    prs->time	= prs->utime	+ prs->stime;
-    prs->ctime	= prs->cutime	+ prs->cstime;
+    /* derived time values */
+    prs->time   = prs->utime    + prs->stime;
+    prs->ctime  = prs->cutime   + prs->cstime;
 
-	field_enable_range(format_str, F_TIME, F_CTIME);
+    field_enable_range(format_str, F_TIME, F_CTIME);
 
-	/* fix rss to be in bytes (returned from kernel in pages) */
-	prs->rss	*= page_size;
+    /* fix rss to be in bytes (returned from kernel in pages) */
+    prs->rss    *= page_size;
 }
 
 /* calc_prec()
@@ -661,8 +695,14 @@ void OS_get_table()
         /* correct values (times) found in /proc/${pid}/stat */
         fixup_stat_values(format_str, prs);
 
-		/* get process' cmndline */
-		get_proc_cmndline(dir_result->d_name, format_str, prs, &mem_pool);
+    /* get process' cmndline */
+    get_proc_cmndline(dir_result->d_name, format_str, prs, &mem_pool);
+
+    /* get process' cmdline */
+    get_proc_cmdline(dir_result->d_name, format_str, prs, &mem_pool);
+
+    /* get process' environ */
+    get_proc_environ(dir_result->d_name, format_str, prs, &mem_pool);
 
         /* get process' cwd & exec values from the symblink */
         eval_link(dir_result->d_name, "cwd", F_CWD, &prs->cwd, format_str,
@@ -673,8 +713,8 @@ void OS_get_table()
         /* scapre from /proc/{$pid}/status */
         get_proc_status(dir_result->d_name, format_str, prs, &mem_pool);
 
-		/* calculate precent cpu & mem values */
-		calc_prec(format_str, prs, &mem_pool);
+        /* calculate precent cpu & mem values */
+        calc_prec(format_str, prs, &mem_pool);
 
         /* Go ahead and bless into a perl object */
         /* Linux.h defines const char* const* Fiels, but we cast it away, as bless_into_proc only understands char** */
@@ -701,8 +741,8 @@ void OS_get_table()
             prs->vsize,
             prs->rss,
             prs->wchan,
-	    prs->time,
-	    prs->ctime,
+        prs->time,
+        prs->ctime,
             prs->state,
             prs->euid,
             prs->suid,
@@ -714,7 +754,12 @@ void OS_get_table()
             prs->pctmem,
             prs->cmndline,
             prs->exec,
-            prs->cwd
+            prs->cwd,
+            prs->cmdline,
+            prs->cmdline_len,
+            prs->environ,
+            prs->environ_len,
+            prs->tracer
         );
 
         /* we want a new prs, for the next itteration */

@@ -1,0 +1,43 @@
+NAME
+
+    Task::BeLike::KWAKWA - Be more like KWAKWA!
+
+TASK CONTENTS
+
+ Apps
+
+  App::Ack
+
+  App::ForkProve
+
+ Testing
+
+  Test::MockTime
+
+  Test::Mojo can be used to test Dancer2 apps too.
+
+ Web
+
+  Catalyst
+
+  Dancer2
+
+  Mojolicious
+
+AUTHOR
+
+    Paul Williams <kwakwa@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2018- Paul Williams
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Task::BeLike::DAGOLDEN, Task::BeLike::RJBS.
+

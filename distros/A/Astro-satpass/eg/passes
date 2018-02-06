@@ -15,7 +15,7 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (

@@ -4,7 +4,7 @@
       "Miroslav Tynovsky <tynovsky@avast.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.0.4",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,7 @@
          "requires" : {
             "Log::Dispatch" : "0",
             "Log::GELF::Util" : "0.90",
+            "Params::Validate" : "0",
             "perl" : "5.010"
          }
       },
@@ -62,7 +63,7 @@
    "provides" : {
       "Log::Dispatch::Gelf" : {
          "file" : "lib/Log/Dispatch/Gelf.pm",
-         "version" : "v1.3.0"
+         "version" : "v1.3.1"
       }
    },
    "release_status" : "stable",
@@ -76,11 +77,12 @@
          "web" : "https://github.com/avast/log-dispatch-gelf"
       }
    },
-   "version" : "1.3.0",
+   "version" : "1.3.1",
    "x_contributors" : [
       "Jan Seidl <seidl@avast.com>",
       "Adam Clarke <adam.clarke@strategicdata.com.au>",
-      "tynovsky <tynovsky@seznam.cz>"
+      "tynovsky <tynovsky@seznam.cz>",
+      "Mohelníková Lucie <mohelnikova@avast.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

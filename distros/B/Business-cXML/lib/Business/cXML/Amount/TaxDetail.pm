@@ -43,8 +43,8 @@ use constant PROPERTIES => (
 	purpose     => undef,
 );
 use constant OBJ_PROPERTIES => (
-	basis       => 'Business::cXML::Amount',
-	tax         => 'Business::cXML::Amount',
+	basis       => [ 'Business::cXML::Amount', 'TaxableAmount' ],
+	tax         => [ 'Business::cXML::Amount', 'TaxAmount' ],
 	description => 'Business::cXML::Description',
 );
 

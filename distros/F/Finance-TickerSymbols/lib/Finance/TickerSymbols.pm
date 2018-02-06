@@ -15,7 +15,7 @@ our @EXPORT = qw'symbols_list
                  industry_list
                 ' ;
 
-our $VERSION = '3.02';
+our $VERSION = '3.03';
 
 our $long;
 
@@ -95,7 +95,7 @@ sub _gimi($$;@) {
     }
     elsif ($prs eq 'inds') {
 
-        while (m{href\=\"/industry/([^\"]+)\" title=\"([^\"]+)\"}g) {
+        while (m{href\=\"/industry/([^\"]+)\"\s+title=\"([^\"]+)\"}g) {
             my ($d, $n) = ($1, $2) ;
             $inds{ _http2name $n } = $d if $d =~ /\w/ and $n =~ /\w/;
         }
@@ -118,17 +118,18 @@ sub symbols_list($) {
     return _carp "bad parameter: should be " . join '|', @all, 'all' ;
 }
 
-sub industries_list { _gimi inds => 'http://finance.yahoo.com/industries/' }
+sub industries_list { _gimi inds => 'https://finance.yahoo.com/industries/' }
 
 sub industry_list($) {
     %inds or industries_list() ;
     my $name = shift ;
+    $name or return _carp "Illegal arg" ; # undef, 0, ''
     my $n = $inds{$name} or return _carp "'$name' is not recognized" ;
 
     # my $p = 'pub' ; # shift || ''; $p = 'pub' unless $p eq 'prv' or $p eq 'all' ;
     #                 # ?? TODO ??
     #                 # support Private/Foreign ? what for?
-    _gimi ind => "http://finance.yahoo.com/industry/$n"
+    _gimi ind => "https://finance.yahoo.com/industry/$n"
 }
 
 1;

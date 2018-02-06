@@ -1,7 +1,7 @@
 package Bio::FastParsers::CdHit;
 # ABSTRACT: front-end class for CD-HIT parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::CdHit::VERSION = '0.173640';
+$Bio::FastParsers::CdHit::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
 
@@ -15,21 +15,7 @@ extends 'Bio::FastParsers::Base';
 # public attributes (inherited)
 
 
-
-# private attributes
-
-has '_members_for' => (
-    traits   => ['Hash'],
-    is       => 'ro',
-    isa      => 'HashRef[ArrayRef[Str]]',
-    init_arg => undef,
-    writer   => '_set_members_for',
-    handles  => {
-        all_representatives => 'keys',
-            members_for     => 'get',
-    },
-);
-
+with 'Bio::FastParsers::Roles::Clusterable';
 
 sub BUILD {
     my $self = shift;
@@ -80,7 +66,7 @@ sub BUILD {
     #### %members_for
 
     # store representative and member sequence ids
-    $self->_set_members_for(\%members_for);
+    $self->_set_members_for( \%members_for );
 
     return;
 }
@@ -98,7 +84,7 @@ Bio::FastParsers::CdHit - front-end class for CD-HIT parser
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.03";
+our $VERSION = "2.04";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -731,7 +731,7 @@ JavaScript::Packer - Perl version of Dean Edwards' Packer.js
 
 =head1 VERSION
 
-Version 2.02
+Version 2.04
 
 =head1 DESCRIPTION
 
@@ -853,7 +853,10 @@ A scalar is requested by the context. The input will remain unchanged.
 Merten Falk, C<< <nevesenin at cpan.org> >>. Now maintained by Lee
 Johnson (LEEJO)
 
-=head1 BUGS
+=head1 BUGS AND CAVEATS
+
+This module will break code that relies on ASI, see L<https://github.com/leejo/javascript-packer-perl/issues/5>
+for more information.
 
 Please report any bugs or feature requests through the web interface at
 L<http://github.com/leejo/javascript-packer-perl/issues>.

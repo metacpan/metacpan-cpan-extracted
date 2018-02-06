@@ -1,5 +1,5 @@
 ---
-abstract: 'Chain several sources through a single file read handle'
+abstract: unknown
 author:
   - 'Louis Strous <lstrous@cpan.org>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,5 +19,5 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: v1.1.0
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

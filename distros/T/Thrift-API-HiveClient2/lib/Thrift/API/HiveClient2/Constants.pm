@@ -4,7 +4,7 @@
 # DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 #
 package Thrift::API::HiveClient2::Constants;
-$Thrift::API::HiveClient2::Constants::VERSION = '0.021';
+$Thrift::API::HiveClient2::Constants::VERSION = '0.023';
 {
   $Thrift::API::HiveClient2::Constants::DIST = 'Thrift-API-HiveClient2';
 }
@@ -71,7 +71,7 @@ Thrift::API::HiveClient2::Constants
 
 =head1 VERSION
 
-version 0.021
+version 0.023
 
 =head1 AUTHOR
 
@@ -79,7 +79,7 @@ David Morel <david.morel@amakuru.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by David Morel & Booking.com. Portions are (c) R.Scaffidi, Thrift files are (c) Apache Software Foundation..
+This software is Copyright (c) 2015 by David Morel & Booking.com. Portions are (c) R.Scaffidi, Thrift files are (c) Apache Software Foundation.
 
 This is free software, licensed under:
 

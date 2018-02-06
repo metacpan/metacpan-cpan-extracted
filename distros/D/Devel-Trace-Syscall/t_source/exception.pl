@@ -10,4 +10,4 @@ say 'here';
 __DATA__
 # exit: 2
 
-open("/foo/bar/baz", 0x0, 0666) = * at exception.pl line 7.
+open("/foo/bar/baz", *, *) = * at exception.pl line 7.

@@ -11,7 +11,7 @@ use Sys::Hostname 'hostname';
 
 has 'mysql';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -188,6 +188,37 @@ sub list_workers {
   };
 }
 
+sub list_locks {
+  my ($self, $offset, $limit, $options) = @_;
+
+  my ( @where, @params );
+  if ( $options->{name} ) {
+    push @where, 'name = ?';
+    push @params, $options->{name};
+  }
+
+  push @where, 'expires > now()';
+
+  my $where = @where ? 'WHERE ' . join ' AND ', @where : '';
+  my $sql = "SELECT
+          id, name, UNIX_TIMESTAMP(expires) AS expires
+      FROM minion_locks
+      $where
+      ORDER BY id
+      DESC LIMIT ? OFFSET ?";
+
+  my $locks = $self->mysql->db->query($sql, @params, $limit || 0, $offset || 0)->hashes;
+
+  my $total = $self->mysql->db->query(
+    "SELECT COUNT(name) AS total FROM minion_locks $where", @params
+  )->hash->{total};
+
+  return {
+    locks => $locks,
+    total => $total,
+  };
+}
+
 sub new {
   my ( $class, @args ) = @_;
   if ( ref $args[0] eq 'HASH' ) {
@@ -325,6 +356,7 @@ sub stats {
       FROM minion_jobs
     };
   %$states = ( %$states, %{ $db->query($sql)->hash } );
+  $states->{active_locks} = $db->query("SELECT COUNT(*) FROM minion_locks WHERE expires > now()")->array->[0];
 
   return {
     active_workers   => $active,
@@ -335,6 +367,7 @@ sub stats {
     finished_jobs    => $states->{finished} || 0,
     enqueued_jobs    => $states->{enqueued_jobs} || 0,
     delayed_jobs     => $states->{delayed_jobs} || 0,
+    active_locks     => $states->{active_locks} || 0,
     uptime           => $uptime || 0,
   };
 }
@@ -855,7 +888,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -1271,13 +1304,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Olaf Alders Paul Cochrane Zoffix Znet
+=for stopwords Alexander Nalobin Dmitry Krylov Olaf Alders Paul Cochrane Zoffix Znet
 
 =over 4
 
 =item *
 
 Alexander Nalobin <nalobin@reg.ru>
+
+=item *
+
+Dmitry Krylov <pentabion@gmail.com>
 
 =item *
 

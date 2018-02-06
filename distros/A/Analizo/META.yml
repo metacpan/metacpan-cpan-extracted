@@ -4,6 +4,7 @@ author:
   - 'Joenio Costa <joenio@joenio.me>'
 build_requires:
   Archive::Extract: '0'
+  Env::Path: '0'
   File::LibMagic: '0'
   File::Share: '0'
   File::ShareDir: '0'
@@ -11,24 +12,25 @@ build_requires:
   List::MoreUtils: '0'
   Method::Signatures: '0'
   Term::UI: '0'
-  Test::BDD::Cucumber: '0'
+  Test::BDD::Cucumber: '0.44'
   Test::Class: '0'
   Test::Exception: '0'
   Test::MockModule: '0'
   Test::MockObject: '0'
 configure_requires:
-  Alien::Doxyparse: '0.04'
+  Alien::Doxyparse: '0.06'
   Alien::SLOCCount: '0.05'
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Analizo
 requires:
+  App::Cmd: '0'
   CHI: '0'
   Class::Accessor: '0'
   DBD::SQLite: '0'
@@ -44,11 +46,11 @@ requires:
   Mojolicious: '0'
   Statistics::Descriptive: '0'
   Term::ProgressBar: '0'
-  YAML: '0'
+  YAML: '1.20'
   YAML::Tiny: '0'
   ZMQ::FFI: '0'
 resources:
   bugtracker: http://github.com/analizo/Analizo/issues
   repository: git://github.com/analizo/analizo.git
-version: 1.20.3
+version: 1.20.6
 x_serialization_backend: 'YAML::Tiny version 1.70'

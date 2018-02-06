@@ -1,5 +1,5 @@
 Name:           perl-SMS-Send-Driver-WebService
-Version:        0.04
+Version:        0.06
 Release:        1%{?dist}
 Summary:        SMS::Send driver base class for web services
 License:        CHECK(Distributable)
@@ -12,16 +12,18 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Simple) >= 0.44
 BuildRequires:  perl(Config::IniFiles)
 BuildRequires:  perl(LWP::UserAgent)
+BuildRequires:  perl(HTTP::Tiny)
 BuildRequires:  perl(Path::Class)
 BuildRequires:  perl(SMS::Send)
 Requires:       perl(Config::IniFiles)
 Requires:       perl(LWP::UserAgent)
+Requires:       perl(HTTP::Tiny)
 Requires:       perl(Path::Class)
 Requires:       perl(SMS::Send)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
-The SMS::Send::Driver::WebService package provides an SMS::Send driver base class to support two common needs.  The first need is a base class that provides LWP::UserAgent as a simple method. The second need is a way to configure various setting for multiple SMS providers without having to rebuild the SMS::Send driver concept.
+The SMS::Send::Driver::WebService package provides an SMS::Send driver base class to support two common needs.  The first need is a base class that provides HTTP:Tiny as a simple method. The second need is a way to configure various setting for multiple SMS providers without having to rebuild the SMS::Send driver concept.
 
 %prep
 %setup -q -n SMS-Send-Driver-WebService-%{version}

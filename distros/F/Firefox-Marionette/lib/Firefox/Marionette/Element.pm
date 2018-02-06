@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -51,7 +51,14 @@ sub rect {
 
 sub send_keys {
     my ( $self, $text ) = @_;
-    return $self->browser()->send_keys( $self, $text );
+    Carp::carp(
+        '**** DEPRECATED METHOD - send_keys HAS BEEN REPLACED BY type ****');
+    return $self->browser()->type( $self, $text );
+}
+
+sub type {
+    my ( $self, $text ) = @_;
+    return $self->browser()->type( $self, $text );
 }
 
 sub attribute {
@@ -108,7 +115,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.30
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -117,9 +124,9 @@ Version 0.30
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $element = $firefox->find_element('//input[@id="search-input"]');
+    my $element = $firefox->find('//input[@id="search-input"]');
 
-    $element->send('Test::More');
+    $element->type('Test::More');
 
 =head1 DESCRIPTION
 
@@ -160,6 +167,10 @@ returns the relevant tag name.  For example 'a' or 'input'.
 returns the current L<position and size|Firefox::Marionette::Element::Rect> of the L<element|Firefox::Marionette::Element>
 
 =head2 send_keys
+
+*** DEPRECATED - see L<type|Firefox::Marionette::Element#type>. ***
+
+=head2 type
 
 accepts a scalar string as a parameter.  It sends the string to this L<element|Firefox::Marionette::Element>, such as filling out a text box. This method returns L<the browser|Firefox::Marionette> to aid in chaining methods.
 

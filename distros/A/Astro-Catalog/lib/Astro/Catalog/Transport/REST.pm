@@ -34,11 +34,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: REST.pm,v 1.7 2004/03/03 00:50:15 cavanagh Exp $
+$VERSION = "4.32";
 
 =head1 METHODS
 
@@ -51,11 +47,11 @@ $Id: REST.pm,v 1.7 2004/03/03 00:50:15 cavanagh Exp $
 Create a new instance from a hash of options
 
   $q = new Astro::Catalog::Transport::REST( Coords    => new Astro::Coords(),
-				            Radius    => $radius,
-				            Bright    => $magbright,
-				            Faint     => $magfaint,
-				            Sort      => $sort_type,
-				            Number    => $number_out );
+                                            Radius    => $radius,
+                                            Bright    => $magbright,
+                                            Faint     => $magfaint,
+                                            Sort      => $sort_type,
+                                            Number    => $number_out );
 
 returns a reference to an query object. Must only called from
 sub-classed constructors.
@@ -72,7 +68,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { OPTIONS   => {},
-		      COORDS    => undef,
+                      COORDS    => undef,
                       URL       => undef,
                       QUERY     => undef,
                       USERAGENT => undef,
@@ -261,7 +257,7 @@ sub url {
     $self->{URL} = $base_url;
     if( defined $base_url ) {
        $self->query_url("http://$base_url/" .
-			$self->_default_url_path );
+                        $self->_default_url_path );
     }
   }
 

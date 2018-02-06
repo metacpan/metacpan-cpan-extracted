@@ -13,6 +13,7 @@ eg/README
 eg/sh_script
 eg/solstice
 eg/tle_period.t
+eg/usno-seasons
 eg/visual
 eg/xml
 inc/Astro/Coord/ECI/TLE/Period.pm

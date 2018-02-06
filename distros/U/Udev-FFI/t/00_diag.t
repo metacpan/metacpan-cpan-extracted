@@ -8,4 +8,5 @@ use_ok 'FFI::CheckLib';
 
 use_ok 'IPC::Cmd';
 
-isnt( find_lib( lib => 'udev' ), undef, 'Looking for libudev' );
+my ($libudev) = find_lib( lib => 'udev' );
+isnt( $libudev, undef, 'Looking for libudev' );

@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base -base;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -11,7 +11,7 @@ our $VERSION = '0.01'; # VERSION
 BEGIN {
 	$ENV{'MOJO_REACTOR'} = 'Mojo::Reactor::Poll' unless $ENV{'MOJO_REACTOR'};
 }
-# more Mojo
+# more Mojolicious
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
 use Mojo::Log;
@@ -40,6 +40,7 @@ has [qw(
 	log method ns ping_timeout port rpc timeout tls token who
 )];
 
+# keep in sync with the rpc-switch
 use constant {
 	RES_OK => 'RES_OK',
 	RES_WAIT => 'RES_WAIT',
@@ -289,6 +290,7 @@ sub call_nb {
 		my ($err) = @_;
 		$self->log->error("Something went wrong in call_nb: $err");
 		$rescb->(RES_ERROR, $err);
+		return @_;
 	});
 }
 
@@ -309,7 +311,7 @@ sub get_status {
 	# fixme: reuse call?
 	my ($done, $status, $outargs);
 	my %args = (
-		method => "$ns.get_status",
+		method => "$ns._get_status",
 		inargs => $inargs,
 		waitcb => sub {
 			($status, $outargs) = @_;
@@ -422,7 +424,6 @@ sub announce {
 	my $mode = $args{mode} // (($args{async}) ? 'async' : 'sync');
 	croak "unknown callback mode $mode" unless $mode =~ /^(subproc|async|async2|sync)$/;
 	my $undocb = $args{undocb};
-	my $slots = $args{slots} // 1;
 	my $host = hostname;
 	my $workername = $args{workername} // "$self->{who} $host $0 $$";
 	
@@ -436,8 +437,8 @@ sub announce {
 		$self->conn->call('rpcswitch.announce', {
 				 workername => $workername,
 				 method => $method,
-				 slots => $slots,
 				 (($args{filter}) ? (filter => $args{filter}) : ()),
+				 (($args{doc}) ? (doc => $args{doc}) : ()),
 			}, $d->begin(0));
 	},
 	sub {
@@ -459,8 +460,6 @@ sub announce {
 			cb => $cb,
 			mode => $mode,
 			undocb => $undocb,
-			addenv => $args{addenv} // 0,
-			slots => $slots,
 			worker_id => $worker_id,
 		};
 		$self->actions->{$method} = $action;
@@ -663,7 +662,7 @@ sub _daemonize {
 
 =head1 NAME
 
-RPC::Switch::Client - RPC-Switch client using Mojo(licious).
+RPC::Switch::Client - Connect to the RPC-Switch using Mojo.
 
 =head1 SYNOPSIS
 
@@ -676,7 +675,7 @@ RPC::Switch::Client - RPC-Switch client using Mojo(licious).
      token => ...
    );
 
-   my ($job_id, $outargs) = $client->call(
+   my ($status, $outargs) = $client->call(
      method => 'test',
      inargs => { test => 'test' },
    );
@@ -684,8 +683,8 @@ RPC::Switch::Client - RPC-Switch client using Mojo(licious).
 =head1 DESCRIPTION
 
 L<RPC::Switch::Client> is a class to build a client to connect to the
-L<RPC-Switch>. The client can be used to call methods on the RPC-Switch as 
-well as to announce and handle methods as a worker.
+L<RPC-Switch>.  The client can be used to iniate and inspect rpcs as well as
+for providing 'worker' services to the RPC-Switch.
 
 =head1 METHODS
 
@@ -748,7 +747,11 @@ expected and json encoded.  (default true)
 
 (per default a new L<Mojo::Log> object is created)
 
-=item - ping_timeout: after this long without a ping from the RPC-Switch the
+=item - timeout: how long to wait for Api calls to complete
+
+(default 60 seconds)
+
+=item - ping_timeout: after this long without a ping from the Api the
 connection will be closed and the work() method will return
 
 (default 5 minutes)
@@ -759,93 +762,70 @@ connection will be closed and the work() method will return
 
 ($status, $outargs) = $client->call(%args);
 
-Calls a method on the RPC-Switch and waits for the results.
+Calls the RPC-Switch and waits for the results.
 
 Valid arguments are:
 
 =over 4
 
-=item - method: name of the method to call (required)
+=item - method: name of the methodw to call (required)
 
 =item - inargs: input arguments for the workflow (if any)
 
-=back
-
-The returned status can be on of:
-
-=over 4
-
-=item - RES_OK
-
-=item - RES_ERROR
+=item - timeout: wait this many seconds for the method to finish
+(optional, defaults to 5 times the Api-call timeout, so default 5 minutes)
 
 =back
 
 =head2 call_nb
 
-$job_id = $client->call_nb(%args);
+$client->call_nb(%args);
 
-Calls a method on the RPC-Switch and calls the provided result callback on
-completion.
+Calls a method on the RPC-Switch and calls the provided callbacks on completion
+of the method call.
 
 =over 4
 
-=item - resultcb: coderef to the callback to call on method completion
-(required)
-
-( resultcb => sub { ($status, $outargs) = @_; ... } )
-
-=item - waitcb: coderef to the callback to call on method delay (optional)
+=item - waitcb: (optional) coderef that will be called when the worker
+signals that processing may take a while.  The $wait_id can be used with the
+get_status call, $status wil be the string 'RES_WAIT'.
 
 ( waitcb => sub { ($status, $wait_id) = @_; ... } )
 
-The status will be RES_WAIT, the $wait_id could be used with get_status to
-poll for method completion.  
+=item - resultcb: coderef that will be called on method completion.  $status
+will be a string value, one of 'RES_OK' or 'RES_ERROR'.  $outargs will be
+the method return values or a error message, respectively.
 
-The intended use case is for methods that start some kind of extended
-processing to return a "cloakroom number".  If the connection to the
-RPC-Switch gets lost or if it infeasable to keep a connection open for a
-long time this number can then be used to retrieve the method call results.
+( resultcb => sub { ($status, $outargs) = @_; ... } )
 
 =back
 
 =head2 get_status
 
-($status, $outargs) = $client->get_status($wait_id, $wait);
+($status, $outargs) = $client->get_status($wait_id,);
 
-Retrieves the status for the given $wait_id.  If $wait is true then
-get_status will block untill either a RES_OK of RES_ERROR is returned.
-
-The returned status can be on of:
-
-=over 4
-
-=item - RES_OK
-
-=item - RES_ERROR
-
-=item - RES_WAIT : still working, only if $wait is false.
-
-=back
+Retrieves the status for the given $wait_id.  See call_nb for a description
+of the return values.
 
 =head2 ping
 
 $status = $client->ping($timeout);
 
-Tries to ping the JobCenter API. On success return true. On failure returns
+Tries to ping the RPC-Switch. On success return true. On failure returns
 the undefined value, after that the client object should be undefined.
 
 =head2 announce
 
-Announces the capability to perform a method to the RPC-Switch.  The provided callback
-will be called when there is a task to be performed.  Returns an error when
-there was a problem announcing the action.
+Announces the capability to perform a method to the RPC-Switch.  The
+provided callback will be called when there is a method to be performed. 
+Returns an error when there was a problem announcing the action.
 
   my $err = $client->announce(
-    method => 'do_something',
+    workername => 'me',
+    method => 'do.something',
     cb => sub { ... },
   );
-  die "could not announce $method: $err" if $err;
+  die "could not announce $method?: $err" if $err;
 
 See L<rpc-switch-worker> for an example.
 
@@ -853,11 +833,15 @@ Valid arguments are:
 
 =over 4
 
-=item - method: the method name
+=item - workername: name of the worker
+
+(optional, defaults to client->who, processname and processid)
+
+=item - method: name of the method
 
 (required)
 
-=item - cb: callback to be called for the action
+=item - cb: callback to be called for the method
 
 (required)
 
@@ -870,7 +854,7 @@ Possible values:
 =over 8
 
 =item - 'sync': simple blocking mode, just return the results from the
-callback.
+callback.  Use only for callbacks taking less than (about) a second.
 
 =item - 'subproc': the simple blocking callback is started in a seperate
 process.  Useful for callbacks that take a long time.
@@ -878,23 +862,100 @@ process.  Useful for callbacks that take a long time.
 =item - 'async': the callback gets passed another callback as the last
 argument that is to be called on completion of the task.  For advanced use
 cases where the worker is actually more like a proxy.  The (initial)
-callback is expected to return soonish to the event loop.
+callback is expected to return soonish to the event loop, after setting up
+some Mojo-callbacks.
 
 =back
 
-=item - filter: only process a subset of the action
+=item - async: backwards compatible way for specifying mode 'async'
+
+(optional, default false)
+
+=item - undocb: a callback that gets called when the original callback
+returns an error object or throws an error.  Called with the same arguments
+as the original callback.
+
+(optional, only valid for mode 'subproc')
+
+=item - filter: only process a subset of the method
 
 The filter expression allows a worker to specify that it can only do the
 method for a certain subset of arguments.  For example, for a "mkdir"
-method the filter expression {'host' => 'example.com'} would mean that this
-worker can only do mkdir on host example.com. The filter expression is limited
-to a simple equality tests on one key only, and only for the key configured
-at the RPC-Switch. If a key is configured at the RPC-Switch filtering is
-mandatory.
+action the filter expression {'host' => 'example.com'} would mean that this
+worker can only do mkdir on host example.com. Filter expressions are limited
+to simple equality tests on one or more keys, and only those keys that are
+allowed in the action definition. Filtering can be allowed, be mandatory or
+be forbidden per action.
+
+=item - doc: documentation for the method
+
+The documentation provided to the RPC-Switch can be retrieved by calling the
+rpcswitch.get_method_details method.  Documentation is 'free-form' but the
+suggested format is something like:
+
+ 'doc' => {
+   'description' => 'adds step to counter and returns counter; step defaults to 1',
+   'outputs' => 'counter',
+   'inputs' => 'counter, step'
+ }
+
+=back
 
 =head2 work
 
 Starts the L<Mojo::IOLoop>.
+
+=head1 REMOTE METHOD INFORMATION
+
+Once a connection has been established to the RPC-Switch there are two
+methods that can provide information about the remote methods that are
+callable via the RPC-Switch.
+
+
+=over 4
+
+=item - rpcswitch.get_methods
+
+Produces a list of all methods that are callable by the current role with a
+short description text if available
+
+Example:
+  ./rpc-switch-client rpcswitch.get_methods '{}'
+
+  ...
+        [
+          {
+            'foo.add' => 'adds 2 numbers'
+          },
+          {
+            'foo.div' => 'undocumented method'
+          },
+	  ...
+        ];
+
+=item - rpcswitch.get_method_details
+
+Gives detailed information about a specific method.  Details can include the
+'backend' (b) method that a worker needs to provide, a short descrption (d)
+and contact information (c).  If a worker is available then the documentation
+for that method from that worker is shown.
+
+Example:
+  ./rpc-switch-client rpcswitch.get_method_details '{"method":"foo.add"}'
+
+  ...
+        {
+          'doc' => {
+                     'description' => 'adds step to counter and returns counter; step defaults to 1',
+                     'outputs' => 'counter',
+                     'inputs' => 'counter, step'
+                   },
+          'b' => 'bar.add',
+          'd' => 'adds 2 numbers',
+          'c' => 'wieger'
+        }
+
+=back
 
 =head1 SEE ALSO
 
@@ -912,7 +973,7 @@ L<examples/rpc-switch-client>, L<examples/rpc-switch-worker>
 
 =back
 
-L<https://github.com/a6502/rpc-switch: RPC-Switch
+L<https://github.com/a6502/rpc-switch>: RPC-Switch
 
 =head1 ACKNOWLEDGEMENT
 
@@ -931,7 +992,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Wieger Opmeer.
+This software is copyright (c) 2018 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

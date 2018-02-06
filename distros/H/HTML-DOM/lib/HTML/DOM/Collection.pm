@@ -5,7 +5,7 @@ use warnings;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Internals: \[$nodelist, $tie]
 
@@ -121,7 +121,7 @@ HTML::DOM::Collection - A Perl implementation of the HTMLCollection interface
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

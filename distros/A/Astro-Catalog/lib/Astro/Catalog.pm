@@ -18,9 +18,6 @@ package Astro::Catalog;
 #  Authors:
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
-#  Revision:
-#     $Id: Catalog.pm,v 1.59 2007/10/31 22:10:48 cavanagh Exp $
-
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
 
@@ -72,7 +69,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 $DEBUG = 0;
 
 
@@ -214,7 +211,7 @@ sub write_catalog {
       autoflush $file 1; # We need to make sure we write the lines
     } else {
       croak "Can not write catalogue to reference of type ".
-	ref($file)."\n";
+        ref($file)."\n";
     }
 
   } else {
@@ -569,9 +566,9 @@ sub fieldcentre {
     $self->set_coords($args{coords});
   } elsif ( defined $args{ra} && defined $args{dec}) {
     my $c = new Astro::Coords( type => 'J2000',
-			       ra => $args{ra},
-			       dec => $args{dec},
-			     );
+                               ra => $args{ra},
+                               dec => $args{dec},
+                             );
     $self->set_coords($c);
   }
 
@@ -1155,13 +1152,13 @@ sub filter_by_distance {
 
   # Calculate distance and throw away outliers
   return $self->filter_by_cb( sub {
-				my $star = shift;
-				my $c = $star->coords;
-				return if not defined $c;
-				my $dist = $refpos->distance( $c );
-				return if not defined $dist;
-				return $dist < $radius;
-			      } );
+                                my $star = shift;
+                                my $c = $star->coords;
+                                return if not defined $c;
+                                my $dist = $refpos->distance( $c );
+                                return if not defined $dist;
+                                return $dist < $radius;
+                              } );
 }
 
 =item B<filter_by_cb>
@@ -1284,11 +1281,11 @@ sub sort_catalog {
       my %calc = (
                   object => $_,
                  );
-		  $calc{ra} = $c->ra_app if $sort eq 'ra';
-		  $calc{dec} = $c->dec_app if $sort eq 'dec';
-		  $calc{az} = $c->az if $sort eq 'az';
-		  $calc{el} = $c->el if $sort eq 'el';
-		  $calc{id} = $_->id if ( $sort eq 'id' || $sort eq 'name' );
+                  $calc{ra} = $c->ra_app if $sort eq 'ra';
+                  $calc{dec} = $c->dec_app if $sort eq 'dec';
+                  $calc{az} = $c->az if $sort eq 'az';
+                  $calc{el} = $c->el if $sort eq 'el';
+                  $calc{id} = $_->id if ( $sort eq 'id' || $sort eq 'name' );
 
       if ($ref && $sort eq 'distance') {
         $calc{distance} = $ref->distance( $c );

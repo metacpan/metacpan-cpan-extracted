@@ -8,7 +8,7 @@ configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ requires:
   Alien::Build: '0.25'
 resources:
   repository: http://github.com/joenio/alien-doxyparse
-version: '0.05'
+version: '0.06'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.32'
   requires:
@@ -33,3 +33,4 @@ x_alienfile:
       Alien::m4: '0'
       Config: '0'
     system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

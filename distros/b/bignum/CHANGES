@@ -1,3 +1,16 @@
+2018-02-03 v0.49 pjacklam
+
+ * Improve specification of required modules in Makefile.PL.
+
+ * Fix typo in CHANGES file.
+
+2018-01-31 v0.48 pjacklam
+
+ * According to the CPAN testers reports, Perl v5.10 or later is required, so
+   make Perl v5.10 the minimum required version.
+
+ * Verify that CPAN RT #102006 is fixed.
+
 2016-12-13 v0.47 pjacklam
 
  * Add more logic to Makefile.PL regarding INSTALLDIRS (CPAN RT #119199

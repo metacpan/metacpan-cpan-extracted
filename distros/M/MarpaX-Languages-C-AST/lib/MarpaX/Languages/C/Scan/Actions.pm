@@ -7,7 +7,7 @@ use Carp qw/croak/;
 
 # ABSTRACT: ISO ANSI C grammar actions in Scan mode
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 sub new {
@@ -91,7 +91,7 @@ MarpaX::Languages::C::Scan::Actions - ISO ANSI C grammar actions in Scan mode
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 DESCRIPTION
 

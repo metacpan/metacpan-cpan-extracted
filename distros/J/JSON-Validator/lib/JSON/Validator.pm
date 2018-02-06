@@ -24,7 +24,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -219,7 +219,7 @@ sub _load_schema {
     return $self->_load_schema_from_url(Mojo::URL->new($url)->fragment(undef)), "$url";
   }
 
-  confess "Unable to load schema '$url'";
+  confess "Unable to load schema '$url' ($file)";
 }
 
 sub _load_schema_from_text {
@@ -970,7 +970,10 @@ sub _uniq {
 
 # Please report if you need to manually monkey patch this function
 # https://github.com/jhthorsen/json-validator/issues
-sub _yaml_module { state $yaml_module = eval q[use YAML::XS 0.67; "YAML::XS"] }
+sub _yaml_module {
+  state $yaml_module = eval qq[use YAML::XS 0.67; "YAML::XS"]
+    || die "[JSON::Validator] The optional YAML::XS module is missing or could not be loaded: $@";
+}
 
 1;
 
@@ -982,7 +985,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.01
+2.02
 
 =head1 SYNOPSIS
 

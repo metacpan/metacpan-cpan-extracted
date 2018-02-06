@@ -18,10 +18,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "IRC::Utils" => 0,
     "POE" => 0,
-    "POE::Component::IRC" => "6.62",
+    "POE::Component::IRC" => "6.90",
     "Text::Wrap" => 0
   },
-  "VERSION" => "0.91",
+  "VERSION" => "0.93",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "IRC::Utils" => 0,
   "POE" => 0,
-  "POE::Component::IRC" => "6.62",
+  "POE::Component::IRC" => "6.90",
   "Text::Wrap" => 0
 );
 

@@ -40,6 +40,7 @@ SAMPLE of Perl/Exactly.pm.conf
           5.020 => 'C:/Perl520/bin/perl.exe',
           5.022 => 'C:/Perl522/bin/perl.exe',
           5.024 => 'C:/Perl524/bin/perl.exe',
+          5.026 => 'C:/Perl526/bin/perl.exe',
       ) :
 
       # UNIX-like system
@@ -55,6 +56,7 @@ SAMPLE of Perl/Exactly.pm.conf
           5.020 => '/path/to/perl/5.020/bin/perl',
           5.022 => '/path/to/perl/5.022/bin/perl',
           5.024 => '/path/to/perl/5.024/bin/perl',
+          5.026 => '/path/to/perl/5.026/bin/perl',
       )
   }
   __END__

@@ -22,21 +22,35 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[13-7]',
-                  'pattern' => '(\\d{3})(\\d{4})'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'leading_digits' => '[13-7]'
                 },
                 {
+                  'leading_digits' => '9',
                   'pattern' => '(9)(\\d{3})(\\d{4})',
-                  'leading_digits' => '9'
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(60[0-2]\\d{4})',
+                'personal_number' => '',
+                'mobile' => '
+          9(?:
+            5(?:
+              [12467]\\d|
+              3[01]
+            )|
+            6(?:
+              [15-9]\\d|
+              3[01]
+            )
+          )\\d{4}
+        ',
                 'fixed_line' => '
           9(?:
             [48]\\d{2}|
@@ -50,20 +64,8 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'specialrate' => '(60[0-2]\\d{4})',
                 'toll_free' => '',
-                'mobile' => '
-          9(?:
-            5(?:
-              [12467]\\d|
-              3[01]
-            )|
-            6(?:
-              [15-9]\\d|
-              3[01]
-            )
-          )\\d{4}
-        ',
-                'voip' => '',
                 'geographic' => '
           9(?:
             [48]\\d{2}|
@@ -77,8 +79,8 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'personal_number' => '',
-                'pager' => '955\\d{5}'
+                'pager' => '955\\d{5}',
+                'voip' => ''
               };
 my %areanames = (
   599318 => "St\.\ Eustatius",

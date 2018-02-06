@@ -13,7 +13,7 @@ Config::Model::Cookbook::CreateModelFromDoc - Create a configuration model from 
 
 =head1 VERSION
 
-version 2.116
+version 2.117
 
 =head1 Introduction
 
@@ -306,7 +306,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2017 by Dominique Dumont.
+This software is Copyright (c) 2005-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

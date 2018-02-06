@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 use Prty::Unindent;
 
@@ -230,7 +230,7 @@ sub formatDate {
 
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

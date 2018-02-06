@@ -25,6 +25,7 @@ use IO::Handle;
 use File::Path;
 use Cwd;
 use Carp;
+use Data::Dumper;
 use Exporter;
 use strict;
 use warnings;
@@ -33,7 +34,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -2404,6 +2405,7 @@ sub _config_cmd_fh_child {
     my @cmd = @{$job->{$cmd_or_exec}};
     if (@cmd > 1) {
 	@cmd = _collapse_command(@cmd);
+        $job->{_indirect} = 0;
     }
 
     # XXX - not idiot proof. FH dir could have a metacharacter.
@@ -2411,10 +2413,12 @@ sub _config_cmd_fh_child {
 	$cmd[0] .= " >\"$fh_config->{f_out}\"";
 	if ($fh_config->{join}) {
 	    $cmd[0] .= ' 2>&1';
+            $job->{_indirect} = 0;
 	}
     }
     if ($fh_config->{err} && $fh_config->{f_err} && !$fh_config->{join}) {
 	$cmd[0] .= " 2>\"$fh_config->{f_err}\"";
+        $job->{_indirect} = 0;
     }
 
     if ($fh_config->{f_in}) {
@@ -2435,6 +2439,7 @@ sub _config_cmd_fh_child {
 
 	$cmd[0] = _insert_input_redir_to_cmdline_crudely(
 			    $cmd[0], $fh_config->{f_in});
+        $job->{_indirect} = 0;
 
 	# external command must not launch until the input file has been created
 	my $try;
@@ -2916,7 +2921,11 @@ sub _emulate_readline_scalar {
 }
 
 sub Forks::Super::Job::read_stdout {
-    my ($job, %options) = @_;
+    my $job = shift;
+    if (@_ % 2) {
+        Carp::cluck "Odd number of elements in hash assignment: @_";
+    }
+    my %options = @_;
     Forks::Super::Job::_resolve($job);
     return _readline($job->{child_stdout}, $job, wantarray, %options);
 }
@@ -3386,7 +3395,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 DESCRIPTION
 
@@ -3404,7 +3413,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

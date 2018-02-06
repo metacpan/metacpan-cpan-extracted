@@ -11,8 +11,8 @@ my $builder = Module::Build->new( module_name        => 'DBD::Multi',
                                   release_status     => 'stable',
                                   configure_requires => { 'Module::Build' => '0', },
                                   build_requires     => {
+                                                      'Test::TCP'           => '2.19',  # Would not work for me with 2.13
                                                       'Test::More'          => '0',
-                                                      'Test::Pod::Coverage' => '1.04',
                                                       'Test::Pod'           => '1.14',
                                                       'Test::Exception'     => '0.21',
                                                       'DBD::SQLite'         => '1.09',

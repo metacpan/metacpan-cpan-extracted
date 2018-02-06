@@ -19,7 +19,7 @@ sub foo {
 foo();
 
 __DATA__
-open("/dev/null", 0x0, 0666) = * at last-call.pl line 8.
+open("/dev/null", *, *) = * at last-call.pl line 8.
     main::baz() called at last-call.pl line 12
     main::bar() called at last-call.pl line 16
     main::foo() called at last-call.pl line 19

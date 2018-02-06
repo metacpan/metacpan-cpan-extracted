@@ -20,5 +20,5 @@ no_index:
 requires:
   LWP: '6'
   LWP::Protocol::https: '6'
-version: '3.02'
+version: '3.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

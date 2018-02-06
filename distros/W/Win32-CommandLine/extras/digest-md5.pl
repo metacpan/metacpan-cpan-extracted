@@ -19,8 +19,8 @@ digest-md5 [B<<option(s)>>] B<<filename(s)>>
 
 Options:
 
-		--version       version message
-	-?, --help          brief help message
+        --version       version message
+    -?, --help          brief help message
 
 =end HIDDEN-OPTIONS
 
@@ -58,8 +58,8 @@ B<digest-md5> will calculate and print the hexadecimal MD5 digest for each FILEN
 
 # VERSION: major.minor.release[.build]]  { minor is ODD => alpha/beta/experimental; minor is EVEN => stable/release }
 # generate VERSION from $Version$ SCS tag
-# $defaultVERSION 	:: used to make the VERSION code resilient vs missing keyword expansion
-# $generate_alphas	:: 0 => generate normal versions; true/non-0 => generate alpha version strings for ODD numbered minor versions
+# $defaultVERSION   :: used to make the VERSION code resilient vs missing keyword expansion
+# $generate_alphas  :: 0 => generate normal versions; true/non-0 => generate alpha version strings for ODD numbered minor versions
 use version qw(); our $VERSION; { my $defaultVERSION = '0.1.0'; my $generate_alphas = 0; $VERSION = ( $defaultVERSION, qw( $Version$ ))[-2]; if ($generate_alphas) { $VERSION =~ /(\d+)\.(\d+)\.(\d+)(?:\.)?(.*)/; $VERSION = $1.'.'.$2.((!$4&&($2%2))?'_':'.').$3.($4?((($2%2)?'_':'.').$4):q{}); $VERSION = version::qv( $VERSION ); }; } ## no critic ( ProhibitCallsToUnexportedSubs ProhibitCaptureWithoutTest ProhibitNoisyQuotes ProhibitMixedCaseVars ProhibitMagicNumbers)
 
 use Pod::Usage;
@@ -88,14 +88,14 @@ pod2usage(-verbose => 2) if $ARGV{'man'};
 pod2usage(1) if @ARGV < 1;
 
 foreach (@ARGV)
-	{
-	#print '#args = '.scalar(@ARGV)."\n";
-	if (@ARGV > 1) { print "$_: "; }
+    {
+    #print '#args = '.scalar(@ARGV)."\n";
+    if (@ARGV > 1) { print "$_: "; }
 
-	open(FILE, $_) or die "Can't open '$_': $!";
+    open(FILE, $_) or die "Can't open '$_': $!";
     binmode(FILE);
 
     print Digest::MD5->new->addfile(*FILE)->hexdigest, "\n";
 
     close(FILE);
-	}
+    }

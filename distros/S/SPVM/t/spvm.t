@@ -45,6 +45,7 @@ my $DOUBLE_PRECICE = 65536.5;
 # last
 # while
 # eval repeat
+# print
 
 # Positive infinity(unix like system : inf, Windows : 1.#INF)
 my $POSITIVE_INFINITY = SPVM::POSITIVE_INFINITY();
@@ -1745,4 +1746,5 @@ is($end_objects_count, $start_objects_count);
   }
 }
 
-
+eval { SPVM::TestCase::eval_block_stack_check() };
+ok($@);

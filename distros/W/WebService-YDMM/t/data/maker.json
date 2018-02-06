@@ -1,0 +1,87 @@
+{
+    "request": {
+        "parameters": {
+            "api_id": "example",
+            "affiliate_id": "affiliate-990",
+            "floor_id": "43",
+            "hits": "10",
+            "offset": "100",
+            "output": "json"
+        }
+    },
+    "result": {
+        "status": "200",
+        "result_count": 10,
+        "total_count": "4074",
+        "first_position": 99,
+        "site_name": "DMM.R18（アダルト）",
+        "site_code": "DMM.R18",
+        "service_name": "動画",
+        "service_code": "digital",
+        "floor_id": "43",
+        "floor_name": "ビデオ",
+        "floor_code": "videoa",
+        "maker": [
+            {
+                "maker_id": "1157",
+                "name": "TRH",
+                "ruby": "てぃーあーるえっち",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1157/affiliate-990"
+            },
+            {
+                "maker_id": "1158",
+                "name": "TRIVIAL RISK",
+                "ruby": "とりう゛ぃあるりすく",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1158/affiliate-990"
+            },
+            {
+                "maker_id": "1159",
+                "name": "TV quest",
+                "ruby": "てれびくえすと",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1159/affiliate-990"
+            },
+            {
+                "maker_id": "1160",
+                "name": "Two Sexual Idol",
+                "ruby": "とぅせくしゃるあいどる",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1160/affiliate-990"
+            },
+            {
+                "maker_id": "1161",
+                "name": "TY-Extra",
+                "ruby": "てぃーわいえくすとら",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1161/affiliate-990"
+            },
+            {
+                "maker_id": "1162",
+                "name": "TZG",
+                "ruby": "てぃーぜっとじー",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1162/affiliate-990"
+            },
+            {
+                "maker_id": "1163",
+                "name": "UCZ",
+                "ruby": "ゆーしーぜっと",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1163/affiliate-990"
+            },
+            {
+                "maker_id": "1164",
+                "name": "United Black",
+                "ruby": "ゆないてっどぶらっく",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1164/affiliate-990"
+            },
+            {
+                "maker_id": "1165",
+                "name": "unlock",
+                "ruby": "あんろっく",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1165/affiliate-990"
+            },
+            {
+                "maker_id": "1166",
+                "name": "USA",
+                "ruby": "ゆーえすえー",
+                "list_url": "http://www.dmm.co.jp/digital/videoa/-/list/=/article=maker/id=1166/affiliate-990"
+            }
+        ]
+    }
+}

@@ -1,5 +1,12 @@
 Revision history for Astro::FITS::HdrTrans
 
+1.60 2019-02-05
+
+    - Add support for dates in the format used by MySQL.
+    - Add translation of WND_BLND for JCMT.
+    - Add generic header DOME_OPEN, based on DOORSTST, DOORSTEN,
+      ROOFSTST and ROOFSTEN at JCMT.
+
 1.59 2016-10-21
 
     - Add translation of REFERENCE_LOCATION for ACSIS.

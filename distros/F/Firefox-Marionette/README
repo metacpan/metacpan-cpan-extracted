@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.30
+    Version 0.33
 
 SYNOPSIS
 
@@ -14,13 +14,13 @@ SYNOPSIS
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find_element('//input[@id="search-input"]')->send_keys('Test::More');
+        $firefox->find('//input[@id="search-input"]')->type('Test::More');
     
-        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_element('//button[@name="lucky"]') ])
+        my $file_handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ])
     
-        $firefox->find_element('//button[@name="lucky"]')->click();
+        $firefox->find('//button[@name="lucky"]')->click();
     
-        say $firefox->page_source();
+        say $firefox->html();
     
         $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
@@ -86,6 +86,10 @@ SUBROUTINES/METHODS
 
  find_element
 
+    *** DEPRECATED - see find. ***
+
+ find
+
     returns the first element in the current browsing context that matches
     the search parameters supplied;
 
@@ -101,7 +105,11 @@ SUBROUTINES/METHODS
 
  find_elements
 
-    returns the elements in the current browsing context that match the
+    *** DEPRECATED - see list. ***
+
+ list
+
+    returns all the elements in the current browsing context that match the
     search parameters supplied;
 
       * the first parameter is a scalar search value. This can be an xpath
@@ -150,6 +158,10 @@ SUBROUTINES/METHODS
 
  page_source
 
+    *** DEPRECATED - see html. ***
+
+ html
+
     returns the page source of the content document.
 
  context
@@ -179,6 +191,10 @@ SUBROUTINES/METHODS
     returns the contents of the cookie jar in scalar or list context.
 
  send_keys
+
+    *** DEPRECATED - see type. ***
+
+ type
 
     accepts an element as the first parameter and a string as the second
     parameter. It sends the string to the specified element in the current
@@ -304,7 +320,8 @@ SUBROUTINES/METHODS
 
     returns the current browser orientation. This will be one of the valid
     primary orientation values 'portrait-primary', 'landscape-primary',
-    'portrait-secondary', or 'landscape-secondary'.
+    'portrait-secondary', or 'landscape-secondary'. This method is only
+    currently available on Android (Fennec).
 
  selfie
 
@@ -518,6 +535,14 @@ INCOMPATIBILITIES
     None reported.
 
 BUGS AND LIMITATIONS
+
+    Currently the following Marionette methods have not been implemented;
+
+      * WebDriver:ReleaseAction
+
+      * WebDriver:PerformActions
+
+      * WebDriver:SetScreenOrientation
 
     No bugs have been reported.
 

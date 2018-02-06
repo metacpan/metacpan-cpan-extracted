@@ -16,6 +16,3 @@ my($parser)	= Regexp::Parsertron -> new(verbose => 1);
 my($result) = $parser -> parse(re => $re);
 
 say "Original:  $re. Result: $result. (0 is success)";
-
-$parser -> append(text => '|C++', uid => 6);
-$parser -> print_raw_tree;

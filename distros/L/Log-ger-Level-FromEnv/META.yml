@@ -17,12 +17,12 @@ meta-spec:
   version: '1.4'
 name: Log-ger-Level-FromEnv
 requires:
-  Log::ger: '0.022'
+  Log::ger: '0.023'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Level-FromEnv
   homepage: https://metacpan.org/release/Log-ger-Level-FromEnv
   repository: git://github.com/perlancar/perl-Log-ger-Level-FromEnv.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -98,7 +98,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.590'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -292,9 +292,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
       version: '0.03'
     -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
-      name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
+      name: '@Author::PERLANCAR/Acme::CPANModules::Blacklist'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
@@ -302,7 +302,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

@@ -1,4 +1,8 @@
 Revision history for Devel-ModuleBreaker
 
-0.01    2018-01-16
+0.02	2018-01-30
+	Fix issue with perl 5.28 where stash entries are not necessarily
+            typeglobs [RT#124240] (Patch from Father Chrysostomos)
+
+0.01	2018-01-16
 	Initial version.

@@ -1,6 +1,6 @@
 package HTML::DOM::Node;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 use strict;
@@ -63,7 +63,7 @@ HTML::DOM::Node - A Perl class for representing the nodes of an HTML DOM tree
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

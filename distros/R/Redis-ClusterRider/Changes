@@ -1,5 +1,11 @@
 Revision history for Perl extension Redis::ClusterRider.
 
+0.14 Mon Feb 5 15:08:33 MSK 2018
+  - The client now raise error if "CLUSTER SLOTS" command returns empty list.
+  - The client now raise appropriate error, when not all slots are served for
+    some reason.
+  - All connections in the client are lazy again.
+
 0.12 Thu Jun 1 16:15:53 MSK 2017
   - Bugfix. Did not returning command replay after MOVED and ACK reply.
 

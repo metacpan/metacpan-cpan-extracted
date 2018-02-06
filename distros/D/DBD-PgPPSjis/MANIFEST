@@ -1,4 +1,4 @@
-DBD/PgPPSjis.pm
+lib/DBD/PgPPSjis.pm
 Changes
 Makefile.PL
 pMakefile.PL

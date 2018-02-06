@@ -24,6 +24,7 @@ Process/Makefile.PL
 Process/Process.pm
 hints/linux.pl
 hints/solaris.pl
+hints/dragonfly.pl
 hints/aix.pl
 hints/aix_4_2.pl
 hints/aix_4_3.pl

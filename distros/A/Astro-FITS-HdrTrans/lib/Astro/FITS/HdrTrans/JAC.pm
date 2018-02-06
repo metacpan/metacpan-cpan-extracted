@@ -34,7 +34,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.59";
+$VERSION = "1.60";
 
 # in each class we have three sets of data.
 #   - constant mappings
@@ -149,11 +149,13 @@ FITS compliant.
 sub _fix_dates {
   my ( $class, $FITS_headers ) = @_;
 
-  # DATE-OBS can be from LONGDATEOBS LONGDATE or DATE_OBS
-  __PACKAGE__->_try_dates( $FITS_headers, 'DATE-OBS', qw/ LONGDATEOBS LONGDATE DATE_OBS / );
+  # DATE-OBS can be from DATE_OBS
+  # For compatability with Sybase database, also accept LONGDATEOBS LONGDATE
+  __PACKAGE__->_try_dates( $FITS_headers, 'DATE-OBS', qw/ DATE_OBS LONGDATEOBS LONGDATE / );
 
-  # DATE-END can be from DATE_END or LONGDATEEND
-  __PACKAGE__->_try_dates( $FITS_headers, 'DATE-END', qw/ LONGDATEEND DATE_END / );
+  # DATE-END can be from DATE_END
+  # For compatability with Sybase database, also accept LONGDATEEND
+  __PACKAGE__->_try_dates( $FITS_headers, 'DATE-END', qw/ DATE_END LONGDATEEND / );
 
   return;
 }
@@ -165,7 +167,7 @@ sub _try_dates {
   if (!exists $FITS_headers->{$outkey}) {
     for my $key (@tests) {
       if ( exists( $FITS_headers->{$key} ) ) {
-        my $date = _convert_sybase_date( $FITS_headers->{$key} );
+        my $date = _convert_mysql_date( $FITS_headers->{$key} );
         if( defined( $date ) ) {
           $FITS_headers->{$outkey} = $date->datetime;
           last;
@@ -176,13 +178,26 @@ sub _try_dates {
   return;
 }
 
-sub _convert_sybase_date {
-  my $sybase_date = shift;
+# Convert MySQL date string to DateTime object.
+# For compatability, also accepts Sybase date strings.
+sub _convert_mysql_date {
+  my $date = shift;
 
-  $sybase_date =~ s/:\d\d\d//;
-  $sybase_date =~ s/\s*$//;
+  $date =~ s/\s*$//;
 
-  if( $sybase_date =~ /\s*(\w+)\s+(\d{1,2})\s+(\d{4})\s+(\d{1,2}):(\d\d):(\d\d)(AM|PM)/ ) {
+  if ($date =~ /\s*(\d\d\d\d)-(\d\d)-(\d\d)\s+(\d{1,2}):(\d\d):(\d\d)/) {
+
+    my $return = DateTime->new( year => $1,
+                                month => $2,
+                                day => $3,
+                                hour => $4,
+                                minute => $5,
+                                second => $6,
+                                time_zone => $UTC,
+                              );
+    return $return;
+
+  } elsif ($date =~ /\s*(\w+)\s+(\d{1,2})\s+(\d{4})\s+(\d{1,2}):(\d\d):(\d\d)(?::\d\d\d)?(AM|PM)/) {
 
     my $hour = $4;
     if (uc($7) eq 'AM' && $hour == 12) {

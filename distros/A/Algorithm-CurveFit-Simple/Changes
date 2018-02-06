@@ -1,0 +1,10 @@
+Revision history for Algorithm::CurveFit::Simple
+
+1.00      2018-01-31
+        - Initial release
+
+1.01      2018-01-31
+        - Fixed docs
+
+1.02      2018-02-05
+	- Switched unit test t/03-init-parameters.t from using JSON::PP to is_deeply() to avoid Win32 formatting bug.

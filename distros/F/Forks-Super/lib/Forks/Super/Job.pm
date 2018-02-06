@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -986,6 +986,14 @@ sub _postlaunch_child_to_exec {
     debug("Exec'ing [ @{$job->{exec}} ]") if $job->{debug};
 
     if (!&IS_WIN32) {
+        if ($job->{_indirect} && @{$job->{exec}} == 1) {
+            my $prog = shift @{$job->{exec}};
+            my $name = $job->{name} || $prog;
+            print STDERR "exec { $prog } ($name,@{$job->{exec}})\n";
+            exec { $prog } ($name,@{$job->{exec}})
+	        or croak 'exec failed for ', $job->toString(), 
+                         ' command ',@{$job->{exec}};
+        }
 	exec( @{$job->{exec}} )
 	    or croak 'exec failed for ', $job->toString(), 
 	        ' command ',@{$job->{exec}};
@@ -1059,8 +1067,15 @@ sub _postlaunch_child_to_cmd {
                 "Child process unable to create new fork to run cmd";
         }
         if ($exec_pid == 0) {
-	    exec( @{$job->{cmd}} ) or
-                Carp::confess 'exec for cmd-style fork failed ';
+            if ($job->{_indirect} && @{$job->{cmd}} == 1) {
+                my $prog = shift @{$job->{cmd}};
+                my $name = $job->{name} || $prog;
+                exec { $prog } ($name, @{$job->{cmd}})
+                    or Carp::confess 'exec for cmd-style fork failed ';
+            } else {
+                exec( @{$job->{cmd}} )
+                    or Carp::confess 'exec for cmd-style fork failed ';
+            }
 	}
         $job->{debug} && debug("  exec pid is $exec_pid");
 	$job->set_signal_pid($exec_pid);
@@ -1331,7 +1346,11 @@ sub _postlaunch_to_natural_child {
     # an END block. This function adds an END block at run time that
     # won't be seen by any other processes.
     use B;
-    unshift @{B::end_av->object_2svref}, \&deinit_child;
+    if ($] >= 5.007) {
+        unshift @{B::end_av->object_2svref}, \&deinit_child;
+    } else {
+        eval "END { &deinit_child }";
+    }
 }
 
 sub _launch_from_child {
@@ -1361,6 +1380,23 @@ sub _launch_from_child {
 }
 
 sub set_signal_pid {
+
+    # sometimes a background task in Forks::Super will launch another
+    # process
+    #    * when a daemon is desired
+    #    * in a system call from a child process
+    #    * to emulate exec on Windows
+    #    * a process launched on a remote server
+    # so that when the user wants to send a signal to the task, he/she
+    # really intends to send the signal to the second background process.
+    # When a second background process is created, we will record its
+    # process id and retain it as the "signal pid" for the job, and using
+    # the signals API to signal the job will actually send the signal
+    # to this second process from the parent process.
+    # When a second background process does not need to be created, the
+    # "signal pid" will be the same as the process id of the original
+    # background process.
+    
     # called from child. signal_pid will be called from the parent
     my ($job, $signal_pid) = @_;
     $job->{signal_pid} = $signal_pid;
@@ -1507,7 +1543,7 @@ sub _read_signal_pid {
 	    }
 	}
     } elsif ($job->{debug}) {
-	debug('no ', $job->{signal_ipc}, ' signal ipc file ...');
+	debug('no ', ($job->{signal_ipc} || '<not specified>'), ' signal ipc file ...');
     }
     return;
 }
@@ -1697,7 +1733,8 @@ sub _preconfig2 {
         # communicating the daemon pid ... do we want to
         # try using pipes for this on Windows?
         if (!&IS_WIN32) {
-            pipe my $p1, my $p2;
+            my ($p1,$p2);
+            pipe $p1, $p2;
             $p2->autoflush(1);
             $job->{daemon_ipc_pipe} = [ $p1, $p2 ];
             if ($job->{debug}) {
@@ -1735,7 +1772,8 @@ sub _preconfig2 {
                       ' to get signal pid.');
             }
         } else {
-            pipe my $p1, my $p2;
+            my ($p1,$p2);
+            pipe $p1, $p2;
             $p2->autoflush(1);
             $job->{signal_ipc_pipe} = [ $p1, $p2 ];
             if ($job->{debug}) {
@@ -1794,12 +1832,16 @@ sub _preconfig_style {
     if (defined $job->{cmd}) {
 	if (ref $job->{cmd} ne 'ARRAY') {
 	    $job->{cmd} = [ $job->{cmd} ];
-	}
+	} else {
+            $job->{_indirect} = 1;
+        }
 	$job->{style} = 'cmd';
     } elsif (defined $job->{exec}) {
 	if (ref $job->{exec} ne 'ARRAY') {
 	    $job->{exec} = [ $job->{exec} ];
-	}
+	} else {
+            $job->{_indirect} = 1;
+        }
 	$job->{style} = 'exec';
     } elsif (defined $job->{sub}) {
 	$job->{style} = 'sub';
@@ -2284,6 +2326,7 @@ sub disable_overload {
 sub get {
     my $id = shift;
     if (!defined $id) {
+        return if _INSIDE_END_QUEUE();
 	Carp::cluck 'undef value passed to Forks::Super::Job::get()';
     }
     if (ref($id) && $id->isa('Forks::Super::Job')) {
@@ -2579,7 +2622,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 SYNOPSIS
 
@@ -3369,7 +3412,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, either Perl version 5.8.8 or,

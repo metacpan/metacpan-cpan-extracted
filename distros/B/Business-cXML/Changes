@@ -1,5 +1,12 @@
 Revision history for Business-cXML
 
+v0.6.5  2018-02-05
+        Bugfix: Transmission.pm: avoid possible conflicts between methods and keys
+
+v0.6.4  2018-02-01
+        Improve DTD validity by default
+        Carry deploymentMode from requests to responses
+
 v0.6.3  2018-01-27
         Add PunchOutOrderMessageHeader/SupplierOrderInfo orderID
 

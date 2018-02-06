@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 use feature qw( state );
 
@@ -12,12 +12,18 @@ extends 'WebService::PayPal::PaymentsAdvanced::Response';
 
 use HTTP::Status qw( is_server_error );
 use Type::Params qw( compile );
-use Types::Standard qw( Bool CodeRef InstanceOf Int );
+use Types::Standard qw( Bool CodeRef Enum InstanceOf Int );
 use Types::URI qw( Uri );
 use URI::QueryParam;
 use Web::Scraper;
 use WebService::PayPal::PaymentsAdvanced::Error::HTTP;
 use WebService::PayPal::PaymentsAdvanced::Error::HostedForm;
+
+has hosted_form_mode => (
+    is        => 'ro',
+    isa       => Enum [qw( LIVE TEST )],
+    predicate => '_has_hosted_form_mode',
+);
 
 has hosted_form_uri => (
     is       => 'lazy',
@@ -70,6 +76,9 @@ sub _build_hosted_form_uri {
     my $uri = $self->payflow_link_uri->clone;
     $uri->query_param( SECURETOKEN   => $self->secure_token, );
     $uri->query_param( SECURETOKENID => $self->secure_token_id, );
+
+    $uri->query_param( MODE => $self->hosted_form_mode, )
+        if $self->_has_hosted_form_mode;
 
     return $uri unless $self->validate_hosted_form_uri;
 
@@ -157,7 +166,7 @@ WebService::PayPal::PaymentsAdvanced::Response::SecureToken - Response class for
 
 =head1 VERSION
 
-version 0.000024
+version 0.000025
 
 =head1 SYNOPSIS
 
@@ -170,6 +179,11 @@ You should not create this response object directly.  It will be provided to
 you via L<WebService::PayPal::PaymentsAdvanced/<create_secure_token>.
 
 =head1 OPTIONS
+
+=head2 hosted_form_mode
+
+Sets the C<MODE> query parameter on C<hosted_form_uri>. This can be C<LIVE>
+or C<TEST>.
 
 =head2 payflow_link_uri
 
@@ -240,7 +254,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc.
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

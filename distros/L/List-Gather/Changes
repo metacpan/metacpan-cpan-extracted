@@ -1,5 +1,8 @@
 Revision history for List-Gather
 
+0.14  2018-02-04 02:31:07Z
+  * fix syntax error in documentation example (thanks, bay-max!)
+
 0.13  2017-04-01 00:30:19Z
   * fixes for perl 5.25.1 for manipulation of op_sibling (RT#116694; thanks,
     Dave Mitchell!)

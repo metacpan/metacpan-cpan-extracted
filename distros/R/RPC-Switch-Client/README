@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution RPC-Switch-Client,
-version 0.01:
+version 0.02:
 
-  RPC-Switch client using Mojo(licious).
+  Connect to the RPC-Switch using Mojo.
 
-This software is copyright (c) 2017 by Wieger Opmeer.
+This software is copyright (c) 2018 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

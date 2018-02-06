@@ -114,3 +114,4 @@ t/tree-builder.t
 t/uievents.t
 t/views.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

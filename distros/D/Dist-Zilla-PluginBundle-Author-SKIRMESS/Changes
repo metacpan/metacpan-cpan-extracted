@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.032  2018-02-04 20:06:17 UTC
+
+  - .perlcriticrc file replaced with xt/author/perlcriticrc-code and xt/author/perlcriticrc-tests
+  - Added 2018 to copyright year
+  - perlcriticrc.local replaced with perlcriticrc-code.local and perlcriticrc-tests.local
+  - xt/author/critic.t test replaced with xt/author/perlcritic-code.t and xt/author/perlcritic-tests.t
+
 0.031  2017-10-31 22:10:13 UTC
 
   - Do not run xt/author/pod-spell.t if AUTOMATED_TESTING env variable is set

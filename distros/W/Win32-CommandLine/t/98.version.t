@@ -10,25 +10,26 @@ use warnings;
 my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $fh;  # DISABLE buffering on STDIN, STDOUT, and STDERR
 }
 
-use Test::More;
+use Test::More;     # included with perl v5.6.2+
 
 plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{TEST_AUTHOR} or $ENV{TEST_ALL};
-plan skip_all => 'TAINT mode not supported (Module::Build is eval tainted)' if in_taint_mode();
 
-use Module::Build;
+use version qw//;
+my @modules = ( 'CPAN::Meta', 'ExtUtils::MakeMaker' );  # @modules = ( '<MODULE> [<MIN_VERSION> [<MAX_VERSION>]]', ... )
+my $haveRequired = 1;
+foreach (@modules) {my ($module, $min_v, $max_v) = /\S+/gmsx; my $v = eval "require $module; $module->VERSION();"; if ( !$v || ($min_v && ($v < version->new($min_v))) || ($max_v && ($v > version->new($max_v))) ) { $haveRequired = 0; my $out = $module . ($min_v?' [v'.$min_v.($max_v?" - $max_v":'+').']':q//); diag("$out is not available"); }}  ## no critic (ProhibitStringyEval)
 
-my $mb = Module::Build->current();
+plan skip_all => '[ '.join(', ',@modules).' ] required for testing' if not $haveRequired;
 
-my @files = @{$mb->notes('versioned_filenames_aref')};
+my $metaFile = q//;
+    $metaFile = 'META.json' if (($metaFile eq q//) && (-f 'META.json'));
+    $metaFile = 'META.yaml' if (($metaFile eq q//) && (-f 'META.yaml'));
+my $haveMetaFile = ($metaFile ne q//);
+my $haveNonEmptyMetaFile = $haveMetaFile && (-s $metaFile);
+my $meta_ref = CPAN::Meta->load_file( $metaFile );
+my $packages_href = (defined $meta_ref) ? $meta_ref->{provides} : undef;
 
-#_or_
-### untaint
-##my $versioned_file_globs = untaint( $ENV{_BUILD_versioned_file_globs} );
-##my @files = ( map { glob $_ } split(/;/, $versioned_file_globs) );
-
-untaint( @files );
-
-my $haveExtUtilsMakeMaker = eval { require ExtUtils::MakeMaker; 1; };
+my @files = map { $packages_href->{$_}{file} } keys %{$packages_href};
 
 #my @all_files = all_perl_files( '.' );
 #my @files = @all_files;
@@ -43,8 +44,6 @@ my $haveExtUtilsMakeMaker = eval { require ExtUtils::MakeMaker; 1; };
 
 #print cwd();
 
-plan skip_all => 'ExtUtils::MakeMaker required to check code versioning' if !$haveExtUtilsMakeMaker;
-
 plan tests => scalar( @files * 3 + 1 );
 
 ok( (scalar(@files) > 0), "Found ".scalar(@files)." files to check");
@@ -53,9 +52,10 @@ ok( (scalar(@files) > 0), "Found ".scalar(@files)." files to check");
 ##ok( (MM_parse_version($_) =~ /^([0-9]+\.)?[0-9]+\.[0-9_]+[_.][0-9_]+$/), "'$_' has version with correct canonical form [M.m.r[.b] and correct '_' position for alphas]") for @files;
 for (@files) {
     my $v = MM_parse_version($_);
+    # diag(qq{$_, v$v});
     isnt( $v, 'undef', "'$_' (v$v) has ExtUtils::MakeMaker parsable version");
-    ok( (version_non_alpha_form($v) =~ /^[0-9]+\.[0-9]+$/), qq{'$_' has version ("}.version_non_alpha_form($v).qq{") in correct canonical form (M.m[_alpha])});
-    ok( ($v =~ /^[0-9]+\.[0-9]+(_[0-9]+)?$/), "'$_' has version with correct '_' position for alphas (if alpha)");
+    ok( ($v =~ /^\d+\.\d+(_\d+)?$/), "'$_' has version with correct '_' position for alphas (if alpha)");
+    ok( (version_non_alpha_form($v) =~ /^\d+[.]\d+$/), qq{'$_' has version ("}.version_non_alpha_form($v).qq{") in correct canonical form (M.m[_alpha])});
     }
 
 #-----------------------------------------------------------------------------

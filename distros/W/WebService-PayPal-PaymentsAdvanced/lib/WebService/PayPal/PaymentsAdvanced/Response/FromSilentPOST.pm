@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 use Const::Fast qw( const );
 use List::AllUtils qw( any );
@@ -90,7 +90,7 @@ WebService::PayPal::PaymentsAdvanced::Response::FromSilentPOST - Response object
 
 =head1 VERSION
 
-version 0.000024
+version 0.000025
 
 =head1 DESCRIPTION
 
@@ -138,7 +138,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc.
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

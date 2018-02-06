@@ -1,6 +1,6 @@
 IO-ReadHandle-Chain
 
-The current version is 1.1.0.
+The current version is 1.2.1.
 
 This module chains any number of data sources (scalar, file, IO
 handle) together for reading through a single file read handle.
@@ -9,51 +9,8 @@ This is convenient if you have multiple data sources of which some are
 very large and you need to pretend that they are all inside a single
 data source.
 
-Use the IO::ReadHandle::Chain object for reading as you would any
-other file handle.
-
-    use IO::ReadHandle::Chain;
-
-    open $ifh, '<', 'somefile.txt';
-    $text = 'This is some text.';
-    $cfh = IO::ReadHandle::Chain->new('file.txt', \$text, $ifh);
-    print while <$cfh>;
-    # prints lines from file 'file.txt', then lines from scalar $text,
-    # then lines from file handle $ifh
-
-    @lines = <$cfh>;              # or get all lines at once
-
-    # or read bytes instead
-    $buffer = '';
-    $bytecount = read($cfh, $buffer, 100);
-    $bytecount = sysread($cfh, $buffer, 100);
-
-    # or single characters
-    $c = getc($cfh);
-
-    close($cfh);
-
-    # OO, too
-    $line = $cfh->getline;
-    @lines = $cfh->getlines;
-    $bytecount = $cfh->read($buffer, $size, $offset);
-    $bytecount = $cfh->sysread($buffer, $size, $offset);
-    $c = $cfh->getc;
-    $cfh->close;
-    print "end!\n" if $cfh->eof;
-
-You cannot write or seek through an IO::ReadHandle::Chain.
-
-When reading by lines, then for each data source the associated input
-record separator is used to separate the data into lines.
-
-For any of the data sources that are file handles, when the end of the
-associated data stream is reached, or if the chain filehandle object
-is closed, then the object tries to reset the file handle's position
-to what it was when the module started reading from the file handle.
-
-The chain filehandle object does not close any of the file handles
-that are passed to it as data sources.
+This module requires Perl v5.12.0 or later, and uses only core
+modules.
 
 INSTALLATION
 

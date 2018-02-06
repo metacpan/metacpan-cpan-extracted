@@ -89,3 +89,5 @@ static inline char * strcpy(char * dest,const char *src)
 			 : "memory");
   return dest;
 }
+
+unsigned char _bittest(const long *Base, long Offset) { unsigned char old; __asm__ ("bt{" "l" " %[Offset],%[Base] | %[Base],%[Offset]}" : [old] "=@ccc" (old) : [Offset] "I" "r" (Offset), [Base] "rm" (*Base) : ); return old; }

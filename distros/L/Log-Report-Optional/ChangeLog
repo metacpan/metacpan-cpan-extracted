@@ -3,6 +3,12 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.06: Fri  2 Feb 08:53:01 CET 2018
+
+	Fixes:
+	- fix metadata [Mohammad S Anwar]
+	- Accidentally removed from CPAN
+
 version 1.05: Tue Jan 23 22:44:26 CET 2018
 
 	Improvements:

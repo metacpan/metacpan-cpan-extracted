@@ -35,7 +35,7 @@ my $COLOR_INDEX = 0;
 
 use vars qw/$VERSION $FORMAT/;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 
 # Kluge - this is the format of the catalog to be read
 # Needs to be given as an option on the FileSelect widget.
@@ -54,18 +54,18 @@ created.  Callbacks must be specified for -addCmd and -upDate; a
 warning is issued for -onDestroy when it is missing.
 
   $cat = new Tk::AstroCatalog($MW,
-			    -addCmd => $addCmd,
-			    -upDate => $upDate,
-			    -onDestroy => $onDestroy);
+                            -addCmd => $addCmd,
+                            -upDate => $upDate,
+                            -onDestroy => $onDestroy);
 
 Additionally a pre-existing Astro::Catalog object can be supplied
 using the "-catalog" option.
 
   $cat = new Tk::AstroCatalog($MW,
-			    -addCmd => $addCmd,
-			    -upDate => $upDate
-			    -catalog => $cat,
-			   );
+                            -addCmd => $addCmd,
+                            -upDate => $upDate
+                            -catalog => $cat,
+                           );
 
 The "-transient" option can be used if only a single value is required
 from the widget. Default behaviour is for the widget to be
@@ -112,9 +112,9 @@ sub new {
   croak "CatWin usage: Missing args \n" unless (@_);
   my $MW = shift;
   my %defaults = (
-		  -default => 'defaults',
-		  -transient => 0,
-		  @_);
+                  -default => 'defaults',
+                  -transient => 0,
+                  @_);
 
 #  use Data::Dumper;
 #  print Dumper(\%defaults);
@@ -188,20 +188,20 @@ Returns and sets the Astro::Catalog object.
 =cut
 
 sub Catalog {
-	my $self = shift;
-	if(@_)
-	{
-		my $cat = shift;
-		if (UNIVERSAL::isa($cat,'Astro::Catalog'))
-		{
-		  $self->{Catalog} = $cat;
-		}
-		else
-		{
-		  croak "Tk::AstroCatalog: Catalog must be of type Astro::Catalog \n";
-	        }
-	}
-	return $self->{Catalog};
+        my $self = shift;
+        if(@_)
+        {
+                my $cat = shift;
+                if (UNIVERSAL::isa($cat,'Astro::Catalog'))
+                {
+                  $self->{Catalog} = $cat;
+                }
+                else
+                {
+                  croak "Tk::AstroCatalog: Catalog must be of type Astro::Catalog \n";
+                }
+        }
+        return $self->{Catalog};
 }
 
 =item AddCommand
@@ -215,20 +215,20 @@ returns and sets the AddCommand callback code for the catalog
 
 sub AddCommand
 {
-	my $self = shift;
-	if(@_)
-	{
-		my $cmd = shift;
-		if (ref($cmd) eq 'CODE')
-		{
-			$self->{AddCommand} = $cmd;
-		}
-		else
-		{
-			croak "CatWin: AddCommand must be of type Code Ref \n";
-	        }
-	}
-	return $self->{AddCommand};
+        my $self = shift;
+        if(@_)
+        {
+                my $cmd = shift;
+                if (ref($cmd) eq 'CODE')
+                {
+                        $self->{AddCommand} = $cmd;
+                }
+                else
+                {
+                        croak "CatWin: AddCommand must be of type Code Ref \n";
+                }
+        }
+        return $self->{AddCommand};
 }
 
 =item UpDate
@@ -245,20 +245,20 @@ The first argument will be the current object.
 
 sub UpDate
 {
-	my $self = shift;
-	if(@_)
-	{
-		my $cmd = shift;
-		if (ref($cmd) eq 'CODE')
-		{
-			$self->{upDate} = $cmd;
-		}
-		else
-		{
-			croak "CatWin: upDate must be of type Code Ref \n";
-	        }
-	}
-	return $self->{upDate};
+        my $self = shift;
+        if(@_)
+        {
+                my $cmd = shift;
+                if (ref($cmd) eq 'CODE')
+                {
+                        $self->{upDate} = $cmd;
+                }
+                else
+                {
+                        croak "CatWin: upDate must be of type Code Ref \n";
+                }
+        }
+        return $self->{upDate};
 }
 
 =item Reset
@@ -272,20 +272,20 @@ returns and sets the onDestroy callback code for the catalog
 
 sub Reset
 {
-	my $self = shift;
-	if(@_)
-	{
-		my $cmd = shift;
-		if (ref($cmd) eq 'CODE')
-		{
-			$self->{Reset} = $cmd;
-		}
-		else
-		{
-			croak "CatWin: Reset must be of type Code Ref \n";
-	        }
-	}
-	return $self->{Reset};
+        my $self = shift;
+        if(@_)
+        {
+                my $cmd = shift;
+                if (ref($cmd) eq 'CODE')
+                {
+                        $self->{Reset} = $cmd;
+                }
+                else
+                {
+                        croak "CatWin: Reset must be of type Code Ref \n";
+                }
+        }
+        return $self->{Reset};
 }
 
 =item Toplevel
@@ -299,12 +299,12 @@ returns and sets the name of the Toplevel
 
 sub Toplevel
 {
-	my $self = shift;
-	if(@_)
-	{
-		$self->{Toplevel} = shift;
-	}
-	return $self->{Toplevel};
+        my $self = shift;
+        if(@_)
+        {
+                $self->{Toplevel} = shift;
+        }
+        return $self->{Toplevel};
 }
 
 =item Transient
@@ -319,12 +319,12 @@ next Add.
 
 sub Transient
 {
-	my $self = shift;
-	if(@_)
-	{
-		$self->{Transient} = shift;
-	}
-	return $self->{Transient};
+        my $self = shift;
+        if(@_)
+        {
+                $self->{Transient} = shift;
+        }
+        return $self->{Transient};
 }
 
 =item Text
@@ -337,20 +337,20 @@ returns and sets the name of the Text
 =cut
 
 sub Text {
-	my $self = shift;
-	if(@_)
-	{
-		my $cat = shift;
-		if (UNIVERSAL::isa($cat,'Tk::Frame'))
-		{
-			$self->{Text} = $cat;
-		}
-		else
-		{
-			croak "CatWin: Text widget must be of type Tk::Frame \n";
-	        }
-	}
-	return $self->{Text};
+        my $self = shift;
+        if(@_)
+        {
+                my $cat = shift;
+                if (UNIVERSAL::isa($cat,'Tk::Frame'))
+                {
+                        $self->{Text} = $cat;
+                }
+                else
+                {
+                        croak "CatWin: Text widget must be of type Tk::Frame \n";
+                }
+        }
+        return $self->{Text};
 }
 
 =item RefLabel
@@ -383,12 +383,12 @@ returns and sets the name of the CatClass
 =cut
 
 sub CatClass {
-	my $self = shift;
-	if(@_)
-	{
-		$self->{CatClass} = shift;
-	}
-	return $self->{CatClass};
+        my $self = shift;
+        if(@_)
+        {
+                $self->{CatClass} = shift;
+        }
+        return $self->{CatClass};
 }
 
 =item Selected
@@ -402,17 +402,17 @@ returns the Selected array or the indexed value of this array
 
 sub Selected
 {
-	my $self = shift;
-	if(@_)
-	{
-		my $index = shift;
-		if(@_)
-		{
-			$self->{Selected}->[$index] = shift;
-		}
-		return $self->{Selected}->[$index];
-	}
-	return $self->{Selected};
+        my $self = shift;
+        if(@_)
+        {
+                my $index = shift;
+                if(@_)
+                {
+                        $self->{Selected}->[$index] = shift;
+                }
+                return $self->{Selected}->[$index];
+        }
+        return $self->{Selected};
 }
 
 =item file
@@ -426,12 +426,12 @@ returns and sets the File name
 
 sub file
 {
-	my $self = shift;
-	if (@_)
-	{
-		$self->{File} = shift;
-	}
-	return $self->{File};
+        my $self = shift;
+        if (@_)
+        {
+                $self->{File} = shift;
+        }
+        return $self->{File};
 }
 
 =item makeCatalog
@@ -480,21 +480,21 @@ sub makeCatalog
 
   # create the text scrollable window
   my $T = $topFrame->Scrolled('Text',
-			      -scrollbars => 'e',
-			      -wrap       => 'none',
-			      -width      => 100 + $self->{'CustomWidth'},
-			      -height     => 15,
-			      -font       => '-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-*',
-			      -setgrid    => 1,
-			     )->grid(qw/-sticky nsew/);
-  $T->bindtags(qw/widget_demo/);	# remove all bindings but dummy "widget_demo"
+                              -scrollbars => 'e',
+                              -wrap       => 'none',
+                              -width      => 100 + $self->{'CustomWidth'},
+                              -height     => 15,
+                              -font       => '-*-Courier-Medium-R-Normal--*-120-*-*-*-*-*-*',
+                              -setgrid    => 1,
+                             )->grid(qw/-sticky nsew/);
+  $T->bindtags(qw/widget_demo/);  # remove all bindings but dummy "widget_demo"
   $self->Text($T);
   print "just before creating the done button\n" if $locateBug;
 
   # KLUGE with a global reference label for now
   my $RefLabel = $topFrame->Label( -textvariable => $self->RefLabel,
-				     -width => 64,
-				   )->grid(-sticky=>'nsew',-row=>2);
+                                     -width => 64,
+                                   )->grid(-sticky=>'nsew',-row=>2);
 
   # Create button frame
   my $buttonF2 = $Top->Frame->pack(-padx=>10, -fill =>'x');
@@ -503,92 +503,92 @@ sub makeCatalog
   # create the Done button if we are not transient
   if (!$self->Transient) {
     my $dBut = $buttonF->Button(
-				-text         => 'Done',
-				-command      => sub{ $self->destroy }
-			       )->pack(-side=>'right');
+                                -text         => 'Done',
+                                -command      => sub{ $self->destroy }
+                               )->pack(-side=>'right');
   }
 
   # create the Add button
   my $addBut = $buttonF->Button( -text=>'Add',
-		    -relief => 'raised',
-		    -width        => 7,
-		    -command => sub {
-			my $callback = $self->AddCommand;
-			my $selected = $self->Selected;
-			# turn off tags
-		  	foreach my $one (@$selected) {
-			  # KLUGE source does not have index attribute
-		          $T->tag('configure', 'd'.$one->{index}, -foreground => 'blue');
-		  	}
-			#$callback->(@$selected);
-			$callback->($selected);
+                    -relief => 'raised',
+                    -width        => 7,
+                    -command => sub {
+                        my $callback = $self->AddCommand;
+                        my $selected = $self->Selected;
+                        # turn off tags
+                        foreach my $one (@$selected) {
+                          # KLUGE source does not have index attribute
+                          $T->tag('configure', 'd'.$one->{index}, -foreground => 'blue');
+                        }
+                        #$callback->(@$selected);
+                        $callback->($selected);
 
-			if ($self->Transient) {
-			  # game over (should be a sub)
-			  $self->destroy;
-			}
-		})->pack(-side=>'right', -padx=>20);
+                        if ($self->Transient) {
+                          # game over (should be a sub)
+                          $self->destroy;
+                        }
+                })->pack(-side=>'right', -padx=>20);
 
   # create the Search button
   my $searchBut;
   $searchBut = $buttonF->Button( -text=>'Search',
-		    -relief => 'raised',
-		    -width        => 7,
-		    -command => sub {
-		      $searchBut->configure(-state=>'disabled');
-	              $self->getSource($self->Toplevel->Toplevel,$searchBut);
-		    })->pack(-side=>'right');
+                    -relief => 'raised',
+                    -width        => 7,
+                    -command => sub {
+                      $searchBut->configure(-state=>'disabled');
+                      $self->getSource($self->Toplevel->Toplevel,$searchBut);
+                    })->pack(-side=>'right');
 
   # declared for the catalog file
   my $catEnt;
 
   # create the Rescan button
   my $rescanBut = $buttonF->Button( -text=>'Rescan',
-		    -relief => 'raised',
-		    -width        => 7,
-		    -command => sub {
-		      $self->file($catEnt->get);
+                    -relief => 'raised',
+                    -width        => 7,
+                    -command => sub {
+                      $self->file($catEnt->get);
                       # reset current array to original list
-		      $self->Catalog->reset_list;
-		      $self->fillWithSourceList ('full');
-		    })->pack(-side=>'right', -padx =>'20');
+                      $self->Catalog->reset_list;
+                      $self->fillWithSourceList ('full');
+                    })->pack(-side=>'right', -padx =>'20');
 
   # create the Sort menu
   my $sortmenu = $buttonF->Menubutton(-text=>'Sort by', -relief=>'raised', -width=>7);
   $sortmenu->command(-label=>'Unsorted', -command=> sub {
- 			$self->Catalog->sort_catalog('unsorted');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('unsorted');
+                        $self->fillWithSourceList ('full');
+                        });
   $sortmenu->command(-label=>'Id', -command=> sub {
- 			$self->Catalog->sort_catalog('id');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('id');
+                        $self->fillWithSourceList ('full');
+                        });
   $sortmenu->command(-label=>'Ra', -command=> sub {
- 			$self->Catalog->sort_catalog('ra');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('ra');
+                        $self->fillWithSourceList ('full');
+                        });
   $sortmenu->command(-label=>'Dec', -command=> sub {
-			$self->Catalog->sort_catalog('dec');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('dec');
+                        $self->fillWithSourceList ('full');
+                        });
   $sortmenu->command(-label=>'Az', -command=> sub {
-			$self->Catalog->sort_catalog('az');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('az');
+                        $self->fillWithSourceList ('full');
+                        });
   $sortmenu->command(-label=>'El', -command=> sub {
-			$self->Catalog->sort_catalog('el');
-			$self->fillWithSourceList ('full');
-			});
+                        $self->Catalog->sort_catalog('el');
+                        $self->fillWithSourceList ('full');
+                        });
   # add sort by distance if we have a reference position
   if ($self->Catalog->reference) {
     $sortmenu->command(-label=>'Distance', -command=> sub {
-			 $self->Catalog->sort_catalog('distance');
-			 $self->fillWithSourceList ('full');
-		       });
+                         $self->Catalog->sort_catalog('distance');
+                         $self->fillWithSourceList ('full');
+                       });
     $sortmenu->command(-label=>'Distance in Az', -command=> sub {
-			 $self->Catalog->sort_catalog('distance_az');
-			 $self->fillWithSourceList ('full');
-		       });
+                         $self->Catalog->sort_catalog('distance_az');
+                         $self->fillWithSourceList ('full');
+                       });
   }
 
 
@@ -597,80 +597,80 @@ sub makeCatalog
   # create the catalog menu button
   my $catB = $buttonF2->Menubutton( -text=>'Catalogs', -relief => 'raised', -width => 8);
   $catB->command(-label =>'Default Catalog', -command=> sub{
-  		   $self->file ('default');
-		   $catEnt->delete ('0','end');
-		   $catEnt->insert(0,$self->file);
-		 #  $MW->update;
-		   # No filename for default
-		   $self->Catalog($self->CatClass->new(
-						       Format => $FORMAT,
-						      ));
-		   $self->fillWithSourceList ('full');
-  		  });
+                   $self->file ('default');
+                   $catEnt->delete ('0','end');
+                   $catEnt->insert(0,$self->file);
+                   # $MW->update;
+                   # No filename for default
+                   $self->Catalog($self->CatClass->new(
+                                                       Format => $FORMAT,
+                                                      ));
+                   $self->fillWithSourceList ('full');
+                  });
   $catB->command(-label =>'File Catalog', -command=> sub{
-		   my $dir;
-		   chomp($dir = `pwd`);
-		   my $win = $Top->FileSelect(-directory => $dir);;
-		   my $file = $win->Show;
-		   if (defined $file && $file ne '') {
-		     $catEnt->delete ('0','end');
-		     $catEnt->insert('0', $file);
+                   my $dir;
+                   chomp($dir = `pwd`);
+                   my $win = $Top->FileSelect(-directory => $dir);;
+                   my $file = $win->Show;
+                   if (defined $file && $file ne '') {
+                     $catEnt->delete ('0','end');
+                     $catEnt->insert('0', $file);
 
-		     # Get the current catalogue properties [should be a sub]
-		     my $oldcat = $self->Catalog;
-		     my ($refc, $canobs);
-		     if (defined $oldcat) {
-		       $refc = $oldcat->reference;
-		       $canobs = $oldcat->auto_filter_observability;
-		     }
+                     # Get the current catalogue properties [should be a sub]
+                     my $oldcat = $self->Catalog;
+                     my ($refc, $canobs);
+                     if (defined $oldcat) {
+                       $refc = $oldcat->reference;
+                       $canobs = $oldcat->auto_filter_observability;
+                     }
 
-		     $self->file($file);
-		     $self->Catalog($self->CatClass->new(File =>$self->file,
-							 Format => $FORMAT
-							));
+                     $self->file($file);
+                     $self->Catalog($self->CatClass->new(File =>$self->file,
+                                                         Format => $FORMAT
+                                                        ));
 
-		     # Propogate previous info
-		     $self->Catalog->reference( $refc ) if defined $refc;
-		     $self->Catalog->auto_filter_observability( $canobs );
-		     $self->Catalog->reset_list;
+                     # Propogate previous info
+                     $self->Catalog->reference( $refc ) if defined $refc;
+                     $self->Catalog->auto_filter_observability( $canobs );
+                     $self->Catalog->reset_list;
 
-		     $self->fillWithSourceList ('full');
-		   }
-  		  });
+                     $self->fillWithSourceList ('full');
+                   }
+                  });
   $catB->pack (-side=>'left',-padx =>10);
 
   # Create the catalog file label
   $buttonF2->Label (
-  		     -text => "Catalog file:",
-  		    )->pack(-side=>'left');
+                     -text => "Catalog file:",
+                    )->pack(-side=>'left');
   $catEnt = $buttonF2->Entry(-relief=>'sunken',
-  				-width=>37)->pack(-side=>'left', -padx =>10);
+                                -width=>37)->pack(-side=>'left', -padx =>10);
   $catEnt->bind('<KeyPress-Return>' =>sub {
-		  # Get the current catalogue properties [should be a sub]
-		  my $oldcat = $self->Catalog;
-		  my ($refc, $canobs);
-		  if (defined $oldcat) {
-		    $refc = $oldcat->reference;
-		    $canobs = $oldcat->auto_filter_observability;
-		  }
+                  # Get the current catalogue properties [should be a sub]
+                  my $oldcat = $self->Catalog;
+                  my ($refc, $canobs);
+                  if (defined $oldcat) {
+                    $refc = $oldcat->reference;
+                    $canobs = $oldcat->auto_filter_observability;
+                  }
 
-		  $self->file($catEnt->get);
-		  if ($catEnt->get eq 'default') {
-		    $self->Catalog($self->CatClass->new(
-							Format => $FORMAT
-						       ));
-		  } else {
-		    $self->Catalog($self->CatClass->new(File => $self->file,
-							Format => $FORMAT
-						       ));
-		  }
-		  # Propogate previous info
-		  $self->Catalog->reference( $refc ) if defined $refc;
-		  $self->Catalog->auto_filter_observability( $canobs );
-		  $self->Catalog->reset_list;
+                  $self->file($catEnt->get);
+                  if ($catEnt->get eq 'default') {
+                    $self->Catalog($self->CatClass->new(
+                                                        Format => $FORMAT
+                                                       ));
+                  } else {
+                    $self->Catalog($self->CatClass->new(File => $self->file,
+                                                        Format => $FORMAT
+                                                       ));
+                  }
+                  # Propogate previous info
+                  $self->Catalog->reference( $refc ) if defined $refc;
+                  $self->Catalog->auto_filter_observability( $canobs );
+                  $self->Catalog->reset_list;
 
-		  $self->fillWithSourceList ('full');
-		});
+                  $self->fillWithSourceList ('full');
+                });
   $catEnt->insert(0,$self->file);
 
   print "made it past all the buttons and just about to fill...\n" if $locateBug;
@@ -678,8 +678,8 @@ sub makeCatalog
   unless ($self->Catalog) {
     $self->file($catEnt->get);
     $self->Catalog($self->CatClass->new( File => $self->file,
-					 Format => $FORMAT
-				       ));
+                                         Format => $FORMAT
+                                       ));
   }
   $self->fillWithSourceList ('full');
 
@@ -758,7 +758,7 @@ sub fillWithSourceList {
     foreach my $source (@sources) {
       # KLUGE source does not have index attribute
       if (exists $source->{index} && defined $source->{index}) {
-	$T->tagDelete('d'.$source->{index});
+        $T->tagDelete('d'.$source->{index});
       }
     }
 
@@ -789,7 +789,7 @@ sub fillWithSourceList {
   if ($ref) {
     my ($az, $el) = $ref->azel();
     my $summary = sprintf("%-15s Az: %3.0f  El: %3.0f", $ref->name,
-			  $az->degrees, $el->degrees );
+                          $az->degrees, $el->degrees );
     $self->RefLabel("Reference position: $summary");
   } else {
     # blank it
@@ -807,12 +807,12 @@ sub fillWithSourceList {
       # add distance
       my $distance = " --- ";
       if ($ref) {
-	my $d = $ref->distance($source);
-	if (defined $d) {
-	  $distance = sprintf("%5.0f", $d->degrees);
-	} else {
-	  $distance = "  Inf";
-	}
+        my $d = $ref->distance($source);
+        if (defined $d) {
+          $distance = sprintf("%5.0f", $d->degrees);
+        } else {
+          $distance = "  Inf";
+        }
       }
       my $custom = '';
       if ($self->{'CustomColumns'}) {
@@ -820,26 +820,26 @@ sub fillWithSourceList {
                                 @{$self->{'CustomColumns'}}) . ' ';
       }
       $line = sprintf("%-4d  %s %3.0f %3.0f %s %s%s",$index, $source->summary(),
-		      $source->az(format=>'d'),
-		      $source->el(format=>'d'),
-		      $distance,
+                      $source->az(format=>'d'),
+                      $source->el(format=>'d'),
+                      $distance,
                       $custom,
-		      $source->comment
-		     );
+                      $source->comment
+                     );
       if ($self->isWithin ($source, @$selected)) {
-	$self->inswt("$line\n","d$index",'selected');
+        $self->inswt("$line\n","d$index",'selected');
       } else {
-	# KLUGE - source does not really have active or color attributes
-	# KLUGE2 - "active" is never set!
-	if ($source->{active}) {
-	  if ($source->{color} ne '') {
-	    $self->inswt("$line\n","d$index",$source->{color});
-	  } else {
-	    $self->inswt("$line\n","d$index",'normal');
-	  }
-	} else {
-	  $self->inswt("$line\n","d$index",'inactive');
-	}
+        # KLUGE - source does not really have active or color attributes
+        # KLUGE2 - "active" is never set!
+        if ($source->{active}) {
+          if ($source->{color} ne '') {
+            $self->inswt("$line\n","d$index",$source->{color});
+          } else {
+            $self->inswt("$line\n","d$index",'normal');
+          }
+        } else {
+          $self->inswt("$line\n","d$index",'inactive');
+        }
       }
     }
 
@@ -847,56 +847,56 @@ sub fillWithSourceList {
     for ($itag=0; $itag < $len; $itag++) {
       my $dtag = "d$itag";
       $T->tag('bind', $dtag, '<Any-Enter>' =>
-	      sub {
-		shift->tag('configure', $dtag, @bold);
-	      }
-	     );
+              sub {
+                shift->tag('configure', $dtag, @bold);
+              }
+             );
       $T->tag('bind', $dtag, '<Any-Leave>' =>
-	      sub {
-		shift->tag('configure', $dtag, @normal);
-	      }
-	     );
+              sub {
+                shift->tag('configure', $dtag, @normal);
+              }
+             );
       $T->tag('bind', $dtag, '<ButtonRelease-1>' =>
-	      sub {
-		if (!$BUSY){
-		  if (! $self->isWithin ($sources[substr($dtag,1,99)], @$selected) ) {
-		    shift->tag('configure', $dtag, -foreground => 'red');
-		    push (@$selected, $sources[substr($dtag,1,99)]);
-		  } else {
-		    # KLUGE - no color support in class
-		    if ($sources[substr($dtag,1,99)]->{color} ne '') {
-		      shift->tag('configure', $dtag, -foreground => $sources[substr($dtag,1,99)]->color());
-		    } else {
-		      shift->tag('configure', $dtag, -foreground => 'blue');
-		    }
-		    $self->remove ($sources[substr($dtag,1,99)], $selected);
-		  }
-		}
-	      }
-	     );
-	$T->tag('bind', $dtag, '<Double-1>' => sub {
-		  $BUSY = 1;
-		  my $source = $sources[substr($dtag,1,99)];
-		  push (@$selected, $source);
-		  my $T = shift;
-		 # my $callback = $self->UpDate;
-	         # $callback->();
-		  my $callback = $self->AddCommand;
-		  # turn off tags
-		  foreach $source (@$selected) {
-		    # KLUGE source does not have index attribute
-		    	$T->tag('configure', 'd'.$source->{index}, -foreground => 'blue');
-		  }
-		print " ref(@$selected) is selected \n" if $locateBug;
-		my @array = [1..2];
-		 # $callback->(@array);
-		  $callback->($selected);
-		  $BUSY = 0;
-		  @$selected = ();
+              sub {
+                if (!$BUSY){
+                  if (! $self->isWithin ($sources[substr($dtag,1,99)], @$selected) ) {
+                    shift->tag('configure', $dtag, -foreground => 'red');
+                    push (@$selected, $sources[substr($dtag,1,99)]);
+                  } else {
+                    # KLUGE - no color support in class
+                    if ($sources[substr($dtag,1,99)]->{color} ne '') {
+                      shift->tag('configure', $dtag, -foreground => $sources[substr($dtag,1,99)]->color());
+                    } else {
+                      shift->tag('configure', $dtag, -foreground => 'blue');
+                    }
+                    $self->remove ($sources[substr($dtag,1,99)], $selected);
+                  }
+                }
+              }
+             );
+        $T->tag('bind', $dtag, '<Double-1>' => sub {
+                  $BUSY = 1;
+                  my $source = $sources[substr($dtag,1,99)];
+                  push (@$selected, $source);
+                  my $T = shift;
+                 # my $callback = $self->UpDate;
+                 # $callback->();
+                  my $callback = $self->AddCommand;
+                  # turn off tags
+                  foreach $source (@$selected) {
+                    # KLUGE source does not have index attribute
+                        $T->tag('configure', 'd'.$source->{index}, -foreground => 'blue');
+                  }
+                print " ref(@$selected) is selected \n" if $locateBug;
+                my @array = [1..2];
+                 # $callback->(@array);
+                  $callback->($selected);
+                  $BUSY = 0;
+                  @$selected = ();
 
-		  $self->destroy if $self->Transient;
+                  $self->destroy if $self->Transient;
 
-		});
+                });
     }
   }
 
@@ -996,10 +996,10 @@ sub inswt {
 
     $w->insert('insert', $text);
     foreach my $tag ($w->tag('names', $start)) {
-	$w->tag('remove', $tag, $start, 'insert');
+        $w->tag('remove', $tag, $start, 'insert');
     }
     foreach my $i (@args) {
-	$w->tag('add', $i, $start, 'insert');
+        $w->tag('add', $i, $start, 'insert');
     }
 
 } # end inswt
@@ -1042,22 +1042,22 @@ sub getSource {
   my $topFrame = $Top->Frame(-relief=>'groove', -borderwidth =>2, -width =>50)->pack(-padx=>10, -fill => 'x', -ipady=>10, -pady => 10);
 
   $topFrame->Label (
-		    -text => "Name:"
-		   )->grid(-column=>0, -row=>0);
+                    -text => "Name:"
+                   )->grid(-column=>0, -row=>0);
   my $nameEnt = $topFrame->Entry(-relief=>'sunken',
-				-width=>15)->grid(-column=>1, -row=>0, -padx =>10, -pady=>3);
+                                -width=>15)->grid(-column=>1, -row=>0, -padx =>10, -pady=>3);
 
   $topFrame->Label (
-		    -text => "Ra:"
-		   )->grid(-column=>0, -row=>1);
+                    -text => "Ra:"
+                   )->grid(-column=>0, -row=>1);
   my $raEnt = $topFrame->Entry(-relief=>'sunken',
-				-width=>15)->grid(-column=>1, -row=>1, -padx =>10, -pady=>3);
+                                -width=>15)->grid(-column=>1, -row=>1, -padx =>10, -pady=>3);
 
   $topFrame->Label (
-		    -text => "Dec:"
-		   )->grid(-column=>0, -row=>2);
+                    -text => "Dec:"
+                   )->grid(-column=>0, -row=>2);
   my $decEnt = $topFrame->Entry(-relief=>'sunken',
-				-width=>15)->grid(-column=>1, -row=>2, -padx =>10, -pady=>3);
+                                -width=>15)->grid(-column=>1, -row=>2, -padx =>10, -pady=>3);
 
   $topFrame->Label(-text => 'Distance:')->grid(-column => 0, -row => 3);
   my $distEnt = '1\'';
@@ -1072,23 +1072,23 @@ sub getSource {
   $distB->grid(-column => 1, -row => 3, -padx => 10, -pady => 5, -sticky => 'w');
 
   $topFrame->Label (
-		    -text => "Epoc:"
-		   )->grid(-column=>0, -row=>4, -padx =>5, -pady=>5);
+                    -text => "Epoc:"
+                   )->grid(-column=>0, -row=>4, -padx =>5, -pady=>5);
   my $epocEnt = 'RJ';
   my $epocB = $topFrame->Menubutton(-text => $epocEnt, -relief => 'raised',
                                     -width => 15);
   foreach $name (@Epocs) {
     $epocB->command(-label =>$name, -command=> sub{
-		   $epocB->configure( -text => $name );
-		   $epocEnt = $name;
-		 });
+                   $epocB->configure( -text => $name );
+                   $epocEnt = $name;
+                 });
   }
   $epocB->grid(-column=>1, -row=>4, -padx =>10, -pady=>5, -sticky=>'w');
 
   my $buttonF = $Top->Frame->pack(-padx=>10, -pady=>10);
   $buttonF->Button(
-		   -text         => 'Ok',
-		   -command      => sub{
+                   -text         => 'Ok',
+                   -command      => sub{
                      my $name = $nameEnt->get(); undef $name if $name eq '';
                      my $ra   = $raEnt->get();   undef $ra   if $ra   eq '';
                      my $dec  = $decEnt->get();  undef $dec  if $dec  eq '';
@@ -1135,16 +1135,16 @@ sub getSource {
                          });
                      }
 
-		     $self->fillWithSourceList ('full');
-		     $Top->destroy();
-		   }
-		  )->pack(-side=>'right');
+                     $self->fillWithSourceList ('full');
+                     $Top->destroy();
+                   }
+                  )->pack(-side=>'right');
   $buttonF->Button(
-		   -text         => 'Cancel',
-		   -command      => sub{
-		     $Top->destroy();
-		   }
-		  )->pack(-side=>'right');
+                   -text         => 'Cancel',
+                   -command      => sub{
+                     $Top->destroy();
+                   }
+                  )->pack(-side=>'right');
 
   $Top->bind('<Destroy>', sub {
       my $widget = shift;

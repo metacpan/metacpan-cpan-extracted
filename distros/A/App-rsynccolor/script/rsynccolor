@@ -1,11 +1,13 @@
 #!perl
 
-our $DATE = '2018-01-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-02-01'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use PerlIO::fgets;
 
 sub sanity_check {
     require File::Which;
@@ -25,12 +27,18 @@ sub run {
     my $use_color = $ENV{COLOR} // (-t STDOUT);
 
     $|++;
-    while (<$rsync>) {
-        if ($use_color && s/^deleting //) {
-            print "\e[31mdeleting \e[0m$_";
-            next;
+
+    my $start_of_line = 1;
+    while (!eof($rsync)) {
+        no warnings 'uninitialized'; # "Use of uninitialized value in subroutine entry" at line below
+        defined(my $line = fgets($rsync, 32))
+            or die "rsynccolor: fgets failed: $!\n";
+
+        if ($use_color && $start_of_line) {
+            $line =~ s/^deleting /\e[31mdeleting \e[0m/;
         }
-        print;
+        print $line;
+        $start_of_line = $line =~ /\R\z/;
     }
 
     close $rsync;
@@ -59,7 +67,7 @@ rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.001 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-01-24.
+This document describes version 0.003 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-02-01.
 
 =head1 SYNOPSIS
 

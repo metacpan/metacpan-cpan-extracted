@@ -9,6 +9,7 @@ README
 dist.ini
 lib/Perinci/Sub/XCompletion/cryptocurrency_symbol.pm
 lib/Perinci/Sub/XCompletion/cryptocurrency_symbol_or_name.pm
+lib/Perinci/Sub/XCompletion/cryptoexchange_name.pm
 lib/Perinci/Sub/XCompletionBundle/CryptoCurrency.pm
 t/00-compile.t
 t/author-critic.t

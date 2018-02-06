@@ -6,12 +6,16 @@ build_requires:
   Encode: '0'
   Log::Log4perl::MDC: '0'
   Test::Compile: '0'
+  Test::More: '0'
   Test::Most: '0'
+  Test::Warnings: '0'
+  perl: '5.008'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,5 +37,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Log4perl-Layout-JSON
   homepage: http://search.cpan.org/dist/Log-Log4perl-Layout-JSON/
   repository: git://github.com/mschout/Log-Log4perl-Layout-JSON
-version: '0.52'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.53'
+x_serialization_backend: 'YAML::Tiny version 1.70'

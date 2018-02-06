@@ -14,7 +14,7 @@ use warnings;
 our ($_SIGCHLD, $_SIGCHLD_CNT, $REAP) = (0,0,0);
 our (@CHLD_HANDLE_HISTORY, @SIGCHLD_CAUGHT) = (0);
 our $SIG_DEBUG = $ENV{SIG_DEBUG};
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 my %bastards;
 
 #
@@ -69,7 +69,7 @@ sub handle_CHLD {
         if ($Forks::Super::Job::Emulate::EMULATE_PID{$pid}) {
             my $job = $Forks::Super::Job::Emulate::EMULATE_PID{$pid};
             _preliminary_reap($job,$status);
-            Forks::Super::Job::IPC::_close_child($job);
+            Forks::Super::Job::Ipc::_close_child($job);
         } elsif (defined $Forks::Super::ALL_JOBS{$pid}) {
 	    _preliminary_reap($pid, $status);
 	} else {

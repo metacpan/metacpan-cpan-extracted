@@ -1,7 +1,7 @@
 ---
-abstract: 'Video timecode class'
+abstract: 'Video timecode class and command line program'
 author:
-  - 'Skye Shaw <sshaw AT lucas.cis.temple.edu>'
+  - 'Skye Shaw <skye.shaw AT gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -21,5 +21,5 @@ requires: {}
 resources:
   bugtracker: http://github.com/sshaw/Time-Timecode/issues
   homepage: http://github.com/sshaw
-version: '0.30'
+version: '0.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

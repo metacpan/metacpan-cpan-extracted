@@ -18,6 +18,7 @@ use Plack::Middleware::TimeStats;
             sub {
                 my $env = shift;
                 $env->{'psgix.timestats'}->profile('foo');
+                sleep 1;
                 [ 200, [], ['OK'] ];
             };
         };
@@ -45,6 +46,7 @@ use Plack::Middleware::TimeStats;
             sub {
                 my $env = shift;
                 $env->{'psgix.timestats'}->profile('bar');
+                sleep 1;
                 [ 200, [], ['OK'] ];
             };
         };

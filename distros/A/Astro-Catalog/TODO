@@ -2,26 +2,26 @@
 To Do (16th June 2004)
 ---------------------
 
- * Introduce support for quality flags with Astro::Catalog::Item::Quality  
+ * Introduce support for quality flags with Astro::Catalog::Item::Quality
    object.
-   
+
  * Fix things so all "values" are represented by the new Number::Uncertainty
    object and can have associated errors. Currently only flux values use the
    new Number::Uncertainty class.
-  
- * Add output support for FITS binary tables. 
-   
+
+ * Add output support for FITS binary tables.
+
  * Support the VOTable V1.1 standard.
- 
+
  * Fix Astro::Catalog::Query::CMC module to correctly parse the CMC TST files,
    currently support is somewhat broken. The module itself may no longer work
    at all under the new V4 API.
- 
+
  * Add writing support for TST files to Astro::Catalog::IO::TST
 
  * Fix Astro::Catalog::Query::SkyCat and Astro::Catalog::Query::Vizier to
    be truely generic (or at least work in more cases out of the box).
-   
+
  * Change Astro::Catalog::Query::Vizier to use VOTables for easier parsing?
-    
+
  * Add further catalogue query classes?

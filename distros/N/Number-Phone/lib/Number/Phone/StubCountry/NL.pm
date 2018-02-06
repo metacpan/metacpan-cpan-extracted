@@ -22,11 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
-                  'pattern' => '([1-578]\\d)(\\d{3})(\\d{4})',
                   'leading_digits' => '
             1[035]|
             2[0346]|
@@ -35,52 +34,138 @@ my $formatters = [
             5[0358]|
             7|
             8[4578]
-          '
+          ',
+                  'pattern' => '([1-578]\\d)(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '([1-5]\\d{2})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             1[16-8]|
             2[259]|
             3[124]|
             4[17-9]|
             5[124679]
-          '
+          ',
+                  'pattern' => '([1-5]\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(6)(\\d{8})',
-                  'leading_digits' => '6[0-57-9]'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'leading_digits' => '6[0-57-9]',
+                  'pattern' => '(6)(\\d{8})'
                 },
                 {
-                  'leading_digits' => '66',
-                  'pattern' => '(66)(\\d{7})'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'pattern' => '(66)(\\d{7})',
+                  'leading_digits' => '66'
                 },
                 {
+                  'pattern' => '(14)(\\d{3,4})',
                   'leading_digits' => '14',
-                  'pattern' => '(14)(\\d{3,4})'
+                  'format' => '$1 $2',
+                  'national_rule' => '$1'
                 },
                 {
-                  'pattern' => '([89]0\\d)(\\d{4,7})',
-                  'leading_digits' => '
-            80|
-            9
-          '
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'leading_digits' => '[89]0',
+                  'pattern' => '([89]0\\d)(\\d{4,7})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'geographic' => '
+                'voip' => '
           (?:
-            1[0135-8]|
-            2[02-69]|
-            3[0-68]|
-            4[0135-9]|
-            [57]\\d|
-            8[478]
-          )\\d{7}
+            6760|
+            85\\d{2}
+          )\\d{5}
         ',
                 'pager' => '66\\d{7}',
+                'geographic' => '
+          (?:
+            1(?:
+              [035]\\d|
+              1[13-578]|
+              6[124-8]|
+              7[24]|
+              8[0-467]
+            )|
+            2(?:
+              [0346]\\d|
+              2[2-46-9]|
+              5[125]|
+              9[479]
+            )|
+            3(?:
+              [03568]\\d|
+              1[3-8]|
+              2[01]|
+              4[1-8]
+            )|
+            4(?:
+              [0356]\\d|
+              1[1-368]|
+              7[58]|
+              8[15-8]|
+              9[23579]
+            )|
+            5(?:
+              [0358]\\d|
+              [19][1-9]|
+              2[1-57-9]|
+              4[13-8]|
+              6[126]|
+              7[0-3578]
+            )|
+            7\\d{2}|
+            8[478]\\d
+          )\\d{6}
+        ',
+                'fixed_line' => '
+          (?:
+            1(?:
+              [035]\\d|
+              1[13-578]|
+              6[124-8]|
+              7[24]|
+              8[0-467]
+            )|
+            2(?:
+              [0346]\\d|
+              2[2-46-9]|
+              5[125]|
+              9[479]
+            )|
+            3(?:
+              [03568]\\d|
+              1[3-8]|
+              2[01]|
+              4[1-8]
+            )|
+            4(?:
+              [0356]\\d|
+              1[1-368]|
+              7[58]|
+              8[15-8]|
+              9[23579]
+            )|
+            5(?:
+              [0358]\\d|
+              [19][1-9]|
+              2[1-57-9]|
+              4[13-8]|
+              6[126]|
+              7[0-3578]
+            )|
+            7\\d{2}|
+            8[478]\\d
+          )\\d{6}
+        ',
+                'toll_free' => '800\\d{4,7}',
                 'specialrate' => '(90[069]\\d{4,7})|(
           140(?:
             1(?:
@@ -107,24 +192,8 @@ my $validators = {
             8[458]
           )
         )',
-                'fixed_line' => '
-          (?:
-            1[0135-8]|
-            2[02-69]|
-            3[0-68]|
-            4[0135-9]|
-            [57]\\d|
-            8[478]
-          )\\d{7}
-        ',
-                'mobile' => '6[1-58]\\d{7}',
-                'toll_free' => '800\\d{4,7}',
-                'voip' => '
-          (?:
-            6760|
-            85\\d{2}
-          )\\d{5}
-        '
+                'personal_number' => '',
+                'mobile' => '6[1-58]\\d{7}'
               };
 my %areanames = (
   3110 => "Rotterdam",
@@ -132,27 +201,34 @@ my %areanames = (
   31113 => "Goes",
   31114 => "Hulst",
   31115 => "Terneuzen",
+  31117 => "Oostburg",
   31118 => "Middelburg",
   3113 => "Tilburg",
   3115 => "Delft",
   31161 => "Rijen",
+  31162 => "Oosterhout",
   31164 => "Bergen\ op\ Zoom",
   31165 => "Roosendaal",
   31166 => "Tholen",
+  31167 => "Steenbergen",
   31168 => "Zevenbergen",
   31172 => "Alphen\ aan\ den\ Rijn",
+  31174 => "Naaldwijk",
   31180 => "Barendrecht",
   31181 => "Spijkenisse",
   31182 => "Gouda",
   31183 => "Gorinchem",
   31184 => "Sliedrecht",
   31186 => "Oud\-Beijerland",
+  31187 => "Middelharnis",
   3120 => "Amsterdam",
   31222 => "Den\ Burg",
   31223 => "Den\ Helder",
   31224 => "Schagen",
+  31226 => "Noord\ Scharwoude",
   31227 => "Medemblik",
   31228 => "Enkhuizen",
+  31229 => "Horn",
   3123 => "Haarlem",
   3124 => "Nijmegen",
   31251 => "Beverwijk",
@@ -165,6 +241,7 @@ my %areanames = (
   3130 => "Utrecht",
   31313 => "Dieren",
   31314 => "Doetinchem",
+  31315 => "Terborg",
   31316 => "Zevenaar",
   31317 => "Wageningen",
   31318 => "Veenendaal",
@@ -177,6 +254,7 @@ my %areanames = (
   31344 => "Tiel",
   31345 => "Culemborg",
   31346 => "Maarssen",
+  31347 => "Vianen",
   31348 => "Woerden",
   3135 => "Hilversum",
   3136 => "Almere",
@@ -192,17 +270,25 @@ my %areanames = (
   3146 => "Sittard",
   31475 => "Roermond",
   31478 => "Venray",
+  31481 => "Bemmel",
+  31485 => "Cuyk",
+  31486 => "Grave",
   31487 => "Druten",
+  31488 => "Zetten",
   31492 => "Helmond",
   31493 => "Deurne",
   31495 => "Weert",
+  31497 => "Eersel",
   31499 => "Best",
   3150 => "Groningen",
+  31511 => "Veenwouden",
   31512 => "Drachten",
   31513 => "Heerenveen",
   31514 => "Lemmer",
   31515 => "Sneek",
+  31516 => "Oosterwolde",
   31517 => "Harlingen",
+  31518 => "St\.\ Annaparochie",
   31519 => "Dokkum",
   31521 => "Steenwijk",
   31522 => "Meppel",
@@ -235,6 +321,8 @@ my %areanames = (
   31591 => "Emmen",
   31592 => "Assen",
   31593 => "Beilen",
+  31594 => "Zuidhorn",
+  31595 => "Warffum",
   31596 => "Delfzijl",
   31597 => "Winschoten",
   31598 => "Veendam",
@@ -243,6 +331,7 @@ my %areanames = (
   3171 => "Leiden",
   3172 => "Alkmaar",
   3173 => "\'s\-Hertogenbosch",
+  3174 => "Hengelo",
   3175 => "Zaandam",
   3176 => "Breda",
   3177 => "Venlo",
@@ -256,7 +345,10 @@ my %areanames = (
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
   
       return $self if ($self->is_valid());
-      $number =~ s/(^0)//g;
+      {
+        no warnings 'uninitialized';
+        $number =~ s/^(?:0)//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
     return $self->is_valid() ? $self : undef;
 }

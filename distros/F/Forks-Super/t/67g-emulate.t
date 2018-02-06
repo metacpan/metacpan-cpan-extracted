@@ -41,9 +41,9 @@ okl($t <= 1, "fast return [3] ${t}s expected <= 1s");
 sleep 4;
 
 $t = Time::HiRes::time();
-while (<$pid>) {
-    last;
-}
+
+$_ = $] >= 5.008008 ? <$pid> : $pid->read_stdout; # skip one line
+
 $t = Time::HiRes::time() - $t;
 ok($_ eq "123\n",
    "while (<\$obj>) auto-assign to \$_")
@@ -51,7 +51,7 @@ ok($_ eq "123\n",
 okl($t <= 1.3, "fast return [4] ${t}s expected <= 1s");    ### 9 ### obs 1.28
 
 $t = Time::HiRes::time();
-$z = <$pid>;
+$z = $] >= 5.008008 ? <$pid> : $pid->read_stdout;
 $t = Time::HiRes::time() - $t;
 ok(!defined($z) || $z eq '',
    "$pid output stream is empty so <\$pid> is empty");
@@ -59,7 +59,7 @@ okl($t <= 1, "fast return [5] ${t}s expected <= 1s");
 waitall;
 
 for (1 .. 4) {
-    $z = <$pid>;
+    $z = $] >= 5.008008 ? <$pid> : $pid->read_stdout;
     last if !defined $z;
     sleep 2;
 }

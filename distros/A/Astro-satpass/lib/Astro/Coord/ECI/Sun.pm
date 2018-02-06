@@ -50,21 +50,26 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw{Astro::Coord::ECI};
 
 use Astro::Coord::ECI::Utils qw{:all};
 use Carp;
-use POSIX qw{floor strftime};
+use POSIX qw{ ceil floor strftime };
 
 use constant MEAN_MAGNITUDE => -26.8;
+
+my %attrib = (
+    iterate_for_quarters	=> 1,
+);
 
 my %static = (
     id => 'Sun',
     name => 'Sun',
     diameter => 1392000,
-    );
+    iterate_for_quarters	=> undef,
+);
 
 my $weaken = eval {
     require Scalar::Util;
@@ -239,6 +244,17 @@ eod
     return $self->{_sun_geometric_longitude};
 }
 
+sub get {
+    my ( $self, @args ) = @_;
+    my @rslt;
+    foreach my $name ( @args ) {
+	push @rslt, $attrib{$name} ?
+	    ref $self ? $self->{$name} : $static{$name} :
+	    $self->SUPER::get( $name );
+    }
+    return wantarray ? @rslt : $rslt[0];
+}
+
 
 =item ($point, $intens, $central) = $sun->magnitude ($theta, $omega);
 
@@ -342,12 +358,24 @@ a number from 0 through 3.
 As a side effect, the time of the $sun object ends up set to the
 returned time.
 
-The method of calculation is successive approximation, and actually
-returns the second B<after> the calculated equinox or solstice.
+As of version 0.088_01, the algorithm given in Jean Meeus' "Astronomical
+Algorithms", 2nd Edition, Chapter 27 ("Equinoxes and Solstices"), pages
+278ff is used. This should be good for the range -1000 to 3000
+Gregorian, and good to within a minute or so within the range 1951 to
+2050 Gregorian, but the longitude of the Sun at the calculated time may
+be as much as 0.01 degree off the exact time for the event.
 
-Since we only calculate the Sun's position to the nearest 0.01 degree,
-the calculated solstice or equinox may be in error by as much as 15
+If you take the United States Naval Observatory's times (given to the
+nearest minute) as the standard, the maximum deviation from that
+standard in the range 1700 to 2100 is 226 seconds. I have no information
+on this algorithm's accuracy outside that range. I<Caveat user.>.
+
+In version 0.088 and before, this calculation was done by successive
+approximation based on the position of the Sun, and was good to about 15
 minutes.
+
+If you want the old iterative version back, set attribute
+C<iterate_for_quarters> to a true value.
 
 =cut
 
@@ -356,7 +384,50 @@ use constant NEXT_QUARTER_INCREMENT => 86400 * 85;	# 85 days.
 *__next_quarter_coordinate = __PACKAGE__->can( 
     'ecliptic_longitude' );
 
-use Astro::Coord::ECI::Mixin qw{ next_quarter };
+# use Astro::Coord::ECI::Mixin qw{ next_quarter };
+
+sub next_quarter {
+    my ( $self, $quarter ) = @_;
+    $self->{iterate_for_quarters}
+	and goto &Astro::Coord::ECI::Mixin::next_quarter;
+    my $time = $self->universal();
+    my $year = ( gmtime( $time ) )[5] + 1900;
+    my $season;
+    if ( defined $quarter ) {
+	# I can't think of an edge case that makes the first calculation
+	# give a quarter that is too late. Wish that made me feel better
+	# than it in fact does.
+	$season = $self->season( $year, $quarter );
+	$season < $time
+	    and $season = $self->season( $year + 1, $quarter );
+	$self->universal( $season );
+    } else {
+	my ( undef, $lon ) = $self->ecliptic();
+	# The fudged-in 359 is because I am worried about the limited
+	# accuracy of the longitude calculation causing me to pick the
+	# wrong quarter. So I essentially back the Sun up by about a
+	# day. That may indeed put me a quarter too early, but I have to
+	# check for that anyway because of the accuracy (or lack
+	# thereof) of the calculated longitude.
+	$quarter = ceil( ( rad2deg( $lon ) + 359 ) / 90 ) % 4;
+	$season = $self->season( $year, $quarter );
+	# If we're a quarter too early, add one and repeat the
+	# calculation. We shouldn't have to do this more than once,
+	# since our maximum error even with the fudge factor is a day.
+	if ( $season < $time ) {
+	    $quarter++;
+	    if ( $quarter > 3 ) {
+		$quarter -= 4;
+		$year++;
+	    }
+	    $season = $self->season( $year, $quarter );
+	}
+    }
+    $season = ceil( $season );	# Make sure we're AFTER.
+    $self->universal( $season );
+    return wantarray ? ( $season, $quarter, $self->__quarter_name(
+	    $quarter ) ) : $season;
+}
 
 =item $hash_reference = $sun->next_quarter_hash($want);
 
@@ -406,6 +477,121 @@ sub period {return 31558149.7632}	# 365.256363 * 86400
     }
 }
 
+=begin comment
+
+=item $time = $self->season( $year, $season );
+
+This method calculates the time of the given season of the given
+Gregorian year. The $season is an integer from 0 to 3, with 0 being the
+astronomical Spring equinox (first point of Aries), and so on.
+
+The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
+Edition, Chapter 27 ("Equinoxes and Solstices), pages 278ff.
+
+THIS METHOD IS UNSUPPORTED. I understand the temptation to call it if
+all you want are the seasons, but if possible I would like to be able to
+remove it if its use in next_quarter() turns out to e a bad idea. I am
+not unwilling to support it; if you want me to, please contact me.
+
+Because it is unsupported, its name may change without warning if
+L<Test::Pod::Coverage|Test::Pod::Coverage> becomes smart enough to
+realize that the =begin/end comment markers mean that this method is not
+documented after all.
+
+=end comment
+
+=cut
+
+sub season {
+    my ( $self, $year, $season ) = @_;
+    my ( $Y, $d ) = $year < 1000 ? (
+	$year / 1000,
+	[	# Meeus table 27 A
+	    [ -0.00071,  0.00111,  0.06134, 365242.13740, 1721139.29189 ],
+	    [  0.00025,  0.00907, -0.05323, 365241.72562, 1721233.25401 ],
+	    [  0.00074, -0.00297, -0.11677, 365242.49558, 1721325.70455 ],
+	    [ -0.00006, -0.00933, -0.00769, 365242.88257, 1721414.39987 ],
+	]->[ $season ],
+    ) : (
+	( $year - 2000 ) / 1000,
+	[	# Meeus table 27 B
+	    [ -0.00057, -0.00411,  0.05169, 365242.37404, 2451623.80984 ],
+	    [ -0.00030,  0.00888,  0.00325, 365241.62603, 2451716.56767 ],
+	    [  0.00078,  0.00337, -0.11575, 365242.01767, 2451810.21715 ],
+	    [  0.00032, -0.00823, -0.06223, 365242.74049, 2451900.05952 ],
+	]->[ $season ],
+    );
+    my $JDE0 = ( ( ( $d->[0] * $Y + $d->[1] ) * $Y + $d->[2] ) * $Y +
+	$d->[3] ) * $Y + $d->[4];
+    my $T = ( $JDE0 - 2451545.0 ) / 36525;
+    $self->{debug}
+	and print "Debug - T = $T\n";
+    my $W = mod2pi( deg2rad( 35999.373 * $T - 2.47 ) );
+    my $delta_lambda = 1 + 0.0334 * cos( $W ) + 0.0007 * cos( 2 * $W );
+    $self->{debug}
+	and print "Debug - delta lambda = $delta_lambda\n";
+    my $S = 0;
+    foreach my $term (	# Meeus table 27 C
+	[ 485, 324.96,   1934.136 ],
+	[ 203, 337.23,  32964.467 ],
+	[ 199, 342.08,     20.186 ],
+	[ 182,  27.85, 445267.112 ],
+	[ 156,  73.14,  45036.886 ],
+	[ 136, 171.52,  22518.443 ],
+	[  77, 222.54,  65928.934 ],
+	[  74, 296.72,   3034.906 ],
+	[  70, 243.58,   9037.513 ],
+	[  58, 119.81,  33718.147 ],
+	[  52, 297.17,    150.678 ],
+	[  50,  21.02,   2281.226 ],
+	[  45, 247.54,  29929.562 ],
+	[  44, 325.15,  31555.956 ],
+	[  29,  60.93,   4443.417 ],
+	[  18, 155.12,  67555.328 ],
+	[  17, 288.79,   4562.452 ],
+	[  16, 198.04,  62894.029 ],
+	[  14, 199.76,  31436.921 ],
+	[  12,  95.39,  14577.848 ],
+	[  12, 287.11,  31931.756 ],
+	[  12, 320.81,  34777.259 ],
+	[   9, 227.73,   1222.114 ],
+	[   8,  15.45,  16859.074 ],
+    ) {
+	$S += $term->[0] * cos( mod2pi( deg2rad( $term->[1] + $term->[2]
+		    * $T ) ) );
+    }
+    $self->{debug}
+	and print "Debug - S = $S\n";
+    my $JDE = 0.00001 * $S / $delta_lambda + $JDE0;
+    $self->{debug}
+	and print "Debug - JDE = $JDE\n";
+    my $time = ( $JDE - JD_OF_EPOCH ) * SECSPERDAY;
+    # Note that gmtime() in the following needs the parens because it
+    # might have come from Time::y2038, which appears to take more than
+    # one argument -- even though, as I read it, its prototype is (;$).
+    $self->{debug}
+	and print "Debug - dynamical date is ", scalar gmtime( $time ), "\n";
+    return $time - dynamical_delta( $time );	# Not quite right.
+}
+
+sub set {
+    my ( $self, @args ) = @_;
+    while ( @args ) {
+	my ( $name, $val ) = splice @args, 0, 2;
+	if ( $attrib{$name} ) {
+	    if ( ref $self ) {
+		$self->{$name} = $val;
+	    } else {
+		$static{$name} = $val;
+	    }
+	} else {
+	    $self->SUPER::set( $name, $val );
+	}
+    }
+    return $self;
+}
+
+
 =item $sun->time_set ()
 
 This method sets coordinates of the object to the coordinates of the
@@ -453,13 +639,13 @@ sub time_set {
 	    + (SUN_C2_1 * $T + SUN_C2_0) * sin (2 * $M)
 	    + SUN_C3_0 * sin (3 * $M);
     my $O = $self->{_sun_geometric_longitude} = $L0 + $C;
-    my $omega = mod2pi (deg2rad (125.04 - 1934.156 * $T));
+    my $omega = mod2pi (deg2rad (125.04 - 1934.136 * $T));
     my $lambda = mod2pi ($O - deg2rad (0.00569 + 0.00478 * sin ($omega)));
     my $nu = $M + $C;
     my $R = (1.000_001_018 * (1 - $e * $e)) / (1 + $e * cos ($nu))
 	    * AU;
     $self->{debug} and print <<eod;
-Debug sun - @{[strftime '%d-%b-%Y %H:%M:%S', gmtime $time]}
+Debug sun - @{[strftime '%d-%b-%Y %H:%M:%S', gmtime( $time )]}
     T  = $T
     L0 = @{[_rad2deg ($L0)]} degrees
     M  = @{[_rad2deg ($M)]} degrees
@@ -482,6 +668,27 @@ eod
 sub __initial_inertial { return 1 }
 
 1;
+
+=back
+
+=head2 Attributes
+
+This class has the following public attributes. The description gives
+the data type.
+
+=over
+
+=item iterate_for_quarters (Boolean)
+
+If this attribute is true, the C<next_quarter()> method uses the old
+(pre-0.088_01) algorithm.
+
+If this attribute is false, the new algorithm is used.
+
+The default is C<undef>, i.e. false, because I believe the new algorithm
+to be more accurate for reasonably-current times.
+
+This attribute is new with version 0.088_01.
 
 =back
 

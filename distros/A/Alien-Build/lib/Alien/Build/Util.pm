@@ -7,7 +7,7 @@ use Path::Tiny qw( path );
 use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config );
@@ -128,7 +128,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 DESCRIPTION
 
@@ -195,6 +195,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

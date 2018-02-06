@@ -1,5 +1,5 @@
 package CanvasCloud::API;
-$CanvasCloud::API::VERSION = '0.002';
+$CanvasCloud::API::VERSION = '0.003';
 # ABSTRACT: Base Class for talking Canvas LMS API
 
 use Moose;
@@ -36,7 +36,7 @@ sub request {
 
 sub send {
     my ( $self, $request ) = @_;
-    $request->header( 'Content-Type' => 'application/x-www-form-urlencoded' ) if ( $request->method eq 'POST' );
+    $request->header( 'Content-Type' => 'application/x-www-form-urlencoded' ) if ( $request->method eq 'POST' && $request->content_type eq '' );
     warn join("\n", 'REQUEST:--->',$request->as_string, 'REQUEST:<----'), "\n" if ( $self->debug );
     my $resp = $self->ua->request( $request );
     warn join("\n", 'RESPONSE:--->',$resp->as_string, 'RESPONSE:<----'), "\n" if ( $self->debug );
@@ -106,7 +106,7 @@ CanvasCloud::API - Base Class for talking Canvas LMS API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -165,7 +165,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ted Katseres.
+This software is copyright (c) 2018 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

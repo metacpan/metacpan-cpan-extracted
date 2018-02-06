@@ -38,21 +38,21 @@ my @star;
 
 # magnitude and colour hashes
 my $flux1 = new Astro::Flux( new Number::Uncertainty ( Value => 16.1,
-                                                       Error => 0.1 ),  
-			     'mag', 'R' );
+                                                       Error => 0.1 ),
+                             'mag', 'R' );
 my $flux2 = new Astro::Flux( new Number::Uncertainty ( Value => 16.4,
-                                                       Error => 0.4 ),  
-			     'mag', 'B' );
+                                                       Error => 0.4 ),
+                             'mag', 'B' );
 my $flux3 = new Astro::Flux( new Number::Uncertainty ( Value => 16.3,
-                                                       Error => 0.3 ),  
-			     'mag', 'V' );
+                                                       Error => 0.3 ),
+                             'mag', 'V' );
 my $col1 = new Astro::FluxColor( upper => 'B', lower => 'V',
                      quantity => new Number::Uncertainty ( Value => 0.1,
-                                                           Error => 0.02 ) );  			     
+                                                           Error => 0.02 ) );
 my $col2 = new Astro::FluxColor( upper => 'B', lower => 'R',
                      quantity => new Number::Uncertainty ( Value => 0.3,
                                                            Error => 0.05 ) );
-my $fluxes1 = new Astro::Fluxes( $flux1, $flux2, $flux3, $col1, $col2 );	
+my $fluxes1 = new Astro::Fluxes( $flux1, $flux2, $flux3, $col1, $col2 );
 
 
 # create a star
@@ -73,17 +73,17 @@ isa_ok( $star[0], "Astro::Catalog::Star");
 
 # magnitude and colour hashes
 my $flux4 = new Astro::Flux( new Number::Uncertainty ( Value => 9.5,
-                                                       Error => 0.6 ),  
-			     'mag', 'R' );
+                                                       Error => 0.6 ),
+                             'mag', 'R' );
 my $flux5 = new Astro::Flux( new Number::Uncertainty ( Value => 9.3,
-                                                       Error => 0.2 ),  
-			     'mag', 'B' );
+                                                       Error => 0.2 ),
+                             'mag', 'B' );
 my $flux6 = new Astro::Flux( new Number::Uncertainty ( Value => 9.1,
-                                                       Error => 0.1 ),  
-			     'mag', 'V' );
+                                                       Error => 0.1 ),
+                             'mag', 'V' );
 my $col3 = new Astro::FluxColor( upper => 'B', lower => 'V',
                      quantity => new Number::Uncertainty ( Value => -0.2,
-                                                           Error => 0.05 ) );  			     
+                                                           Error => 0.05 ) );
 my $col4 = new Astro::FluxColor( upper => 'B', lower => 'R',
                      quantity => new Number::Uncertainty ( Value => 0.2,
                                                            Error => 0.07 ) );
@@ -164,14 +164,14 @@ my @star2;
 # ------
 
 # magnitude and colour hashes
-my $flux7 = new Astro::Flux( new Number::Uncertainty ( Value => 16.1 ),  
-			     'mag', 'R' );
-my $flux8 = new Astro::Flux( new Number::Uncertainty ( Value => 16.4  ),  
-			     'mag', 'B' );
-my $flux9 = new Astro::Flux( new Number::Uncertainty ( Value => 16.3 ),  
-			     'mag', 'V' );
+my $flux7 = new Astro::Flux( new Number::Uncertainty ( Value => 16.1 ),
+                             'mag', 'R' );
+my $flux8 = new Astro::Flux( new Number::Uncertainty ( Value => 16.4  ),
+                             'mag', 'B' );
+my $flux9 = new Astro::Flux( new Number::Uncertainty ( Value => 16.3 ),
+                             'mag', 'V' );
 my $col5 = new Astro::FluxColor( upper => 'B', lower => 'V',
-                     quantity => new Number::Uncertainty ( Value => 0.1) );  			     
+                     quantity => new Number::Uncertainty ( Value => 0.1) );
 my $col6 = new Astro::FluxColor( upper => 'B', lower => 'R',
                      quantity => new Number::Uncertainty ( Value => 0.3 ) );
 my $fluxes3 = new Astro::Fluxes( $flux7, $flux8, $flux9, $col5, $col6 );
@@ -188,14 +188,14 @@ isa_ok( $star2[0], "Astro::Catalog::Star");
 # ------
 
 # magnitude and colour hashes
-my $flux10 = new Astro::Flux( new Number::Uncertainty ( Value => 9.5 ),  
-			     'mag', 'R' );
-my $flux11 = new Astro::Flux( new Number::Uncertainty ( Value => 9.3 ),  
-			     'mag', 'B' );
-my $flux12 = new Astro::Flux( new Number::Uncertainty ( Value => 9.1 ),  
-			     'mag', 'V' );
+my $flux10 = new Astro::Flux( new Number::Uncertainty ( Value => 9.5 ),
+                             'mag', 'R' );
+my $flux11 = new Astro::Flux( new Number::Uncertainty ( Value => 9.3 ),
+                             'mag', 'B' );
+my $flux12 = new Astro::Flux( new Number::Uncertainty ( Value => 9.1 ),
+                             'mag', 'V' );
 my $col7 = new Astro::FluxColor( upper => 'B', lower => 'V',
-                     quantity => new Number::Uncertainty ( Value => -0.2 ) );  			     
+                     quantity => new Number::Uncertainty ( Value => -0.2 ) );
 my $col8 = new Astro::FluxColor( upper => 'B', lower => 'R',
                      quantity => new Number::Uncertainty ( Value => 0.2 ) );
 my $fluxes4 = new Astro::Fluxes( $flux10, $flux11, $flux12, $col7, $col8 );

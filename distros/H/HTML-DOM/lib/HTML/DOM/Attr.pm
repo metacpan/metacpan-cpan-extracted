@@ -39,7 +39,7 @@ require HTML::DOM::NodeList;
 
 our @ISA = 'HTML::DOM::EventTarget';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # -------- NON-DOM AND PRIVATE METHODS -------- #
 
@@ -322,7 +322,7 @@ HTML::DOM::Attr - A Perl class for representing attribute nodes in an HTML DOM t
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,9 @@ to pass this test and use the features exercised by this test.
 }
 
 for my $stdfh (*STDOUT, *STDERR) {
-    binmode $stdfh, $^O eq 'MSWin32' ? ':utf8' : ':encoding(UTF-8)';
+    if ($] >= 5.007) {
+        binmode $stdfh, $^O eq 'MSWin32' ? ':utf8' : ':encoding(UTF-8)';
+    }
 }
 
 my @cmd = ($^X, "t/external-command.pl",

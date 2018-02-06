@@ -4,7 +4,7 @@ Attean::API::TripleOrQuad - Role representing triples and quads
 
 =head1 VERSION
 
-This document describes Attean::API::TripleOrQuad version 0.018
+This document describes Attean::API::TripleOrQuad version 0.019
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

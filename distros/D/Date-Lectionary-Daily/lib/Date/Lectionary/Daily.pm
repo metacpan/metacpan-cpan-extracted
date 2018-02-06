@@ -22,7 +22,7 @@ Date::Lectionary::Daily - Daily Readings for the Christian Lectionary
 
 =head1 VERSION
 
-Version 1.20180114
+Version 1.20180205
 
 =cut
 
@@ -40,7 +40,7 @@ Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for m
 
 =cut
 
-our $VERSION = '1.20180114';
+our $VERSION = '1.20180205';
 
 enum 'LectionaryType', [qw(acna)];
 no Moose::Util::TypeConstraints;

@@ -4,11 +4,13 @@ LICENSE
 META.json
 README.md
 cpanfile
+kritika.fatpack
 lib/App/Kritika.pm
 lib/App/Kritika/Settings.pm
 minil.toml
 script/kritika
 t/kritika.t
 t/kritika/settings.t
+util/fatpack.sh
 META.yml
 MANIFEST

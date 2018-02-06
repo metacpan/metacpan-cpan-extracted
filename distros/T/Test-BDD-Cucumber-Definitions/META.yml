@@ -18,8 +18,11 @@ no_index:
     - t
     - inc
 requires:
+  Const::Fast: '0'
   DDP: '0'
+  HTTP::Response: '0'
   HTTP::Tiny: '0'
+  Hash::MultiValue: '0'
   JSON::Path: '0'
   JSON::XS: '0'
   Moose::Util::TypeConstraints: '0'
@@ -31,5 +34,5 @@ resources:
   bugtracker: https://github.com/ivanych/Test-BDD-Cucumber-Definitions/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ivanych/Test-BDD-Cucumber-Definitions.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

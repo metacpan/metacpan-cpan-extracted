@@ -1,3 +1,8 @@
+0.003   2018-01-30 (PERLANCAR)
+
+	- Add schema: cryptoexchange::name.
+
+
 0.002   2018-01-14 (PERLANCAR)
 
         - [build] Rebuild with updated DZP:Sah::Schemas to add prereqs to

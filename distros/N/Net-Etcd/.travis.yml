@@ -5,7 +5,7 @@ addons:
     - travis1
 env:
   global:
-    - ETCD_VER=v3.2.10_plus_git
+    - ETCD_VER=v3.3.0-rc.4
     - ETCDCTL_API=3
     - ETCD_TEST_HOST=127.0.0.1
     - ETCD_TEST_PORT=2379
@@ -28,7 +28,7 @@ matrix:
       env: COVERAGE=1   # enables coverage+coveralls reporting
 before_install:
   - curl https://coreos.com/dist/pubkeys/app-signing-pubkey.gpg | sudo apt-key add -
-  - wget https://github.com/hexfusion/etcd/releases/download/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -O /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
+  - wget https://github.com/coreos/etcd/releases/download/${ETCD_VER}/etcd-${ETCD_VER}-linux-amd64.tar.gz -O /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz
   - mkdir -p /tmp/test-etcd
   - tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/test-etcd --strip-components=1
   - /tmp/test-etcd/etcd -version

@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,10 @@
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::MSYS" : "0.84",
+            "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52",
+            "File::Which" : "0",
+            "Sort::Versions" : "0",
             "perl" : "5.008001"
          }
       },
@@ -60,7 +63,6 @@
             "File::chdir" : "0",
             "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
-            "Test::More" : "0.94",
             "perl" : "5.008001"
          }
       }
@@ -78,11 +80,30 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.09",
+   "version" : "0.11",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Alien::m4" : "0.11",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Path::Tiny" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Zaki Mughal (zmughal, sivoais)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

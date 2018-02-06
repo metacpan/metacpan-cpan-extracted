@@ -1,5 +1,5 @@
-Perl/Exactly.pm
-Perl/Exactly.pm.conf
+lib/Perl/Exactly.pm
+lib/Perl/Exactly.pm.conf
 Changes
 Makefile.PL
 pMakefile.PL

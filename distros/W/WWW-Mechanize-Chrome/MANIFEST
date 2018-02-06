@@ -8,11 +8,11 @@ examples/javascript.pl
 examples/README
 examples/resource-timing.pl
 examples/url-to-image.pl
-inc/IO/Catch.pm
 lib/Chrome/DevToolsProtocol.pm
 lib/Chrome/DevToolsProtocol/Transport.pm
 lib/Chrome/DevToolsProtocol/Transport/AnyEvent.pm
 lib/Chrome/DevToolsProtocol/Transport/Mojo.pm
+lib/Chrome/DevToolsProtocol/Transport/NetAsync.pm
 lib/WWW/Mechanize/Chrome.pm
 lib/WWW/Mechanize/Chrome/Cookbook.pm
 lib/WWW/Mechanize/Chrome/DSL.pm
@@ -34,7 +34,6 @@ t/49-mech-get-file-lc-ct.html
 t/49-mech-get-file.html
 t/49-mech-get-file.t
 t/49-mech-nav.t
-t/49-port-mojo.t
 t/49-port.t
 t/50-click.html
 t/50-follow-link.t

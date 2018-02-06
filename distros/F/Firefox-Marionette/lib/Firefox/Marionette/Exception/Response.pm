@@ -4,12 +4,17 @@ use strict;
 use warnings;
 use overload '""' => 'string';
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub throw {
     my ( $class, $response ) = @_;
     my $self = bless { response => $response }, $class;
     Carp::croak($self);
+}
+
+sub error {
+    my ($self) = @_;
+    return $self->{response}->error()->{error};
 }
 
 sub string {
@@ -32,7 +37,7 @@ Firefox::Marionette::Exception::Response - Represents a Marionette protocol resp
 
 =head1 VERSION
 
-Version 0.30
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -52,6 +57,10 @@ accepts a Marionette L<response|Firefox::Marionette::Response> as it's only para
 =head2 string
 
 returns a stringified version of the error and message fields on the error.
+
+=head2 error
+
+returns the firefox error message
 
 =head2 trace
 

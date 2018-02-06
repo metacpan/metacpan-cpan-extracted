@@ -5,21 +5,18 @@ author:
 build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
   File::chdir: '0'
   Test2::V0: '0.000060'
   Test::Alien: '0'
-  Test::More: '0.94'
   perl: '5.006'
 configure_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
-  IPC::Cmd: '0'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,8 +30,26 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-patch/issues
   homepage: https://metacpan.org/pod/Alien::patch
   repository: git://github.com/Perl5-Alien/Alien-patch.git
-version: '0.12'
+version: '0.14'
+x_alienfile:
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  requires:
+    share:
+      Archive::Tar: '0'
+      Config: '0'
+      File::Basename: '0'
+      File::chdir: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Zlib: '0'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system:
+      Capture::Tiny: '0'
+      File::chdir: '0'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Zakariyya Mughal'
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

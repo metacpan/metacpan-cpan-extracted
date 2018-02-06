@@ -16,12 +16,13 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
-    	'Cwd' => '0',
+        'Cwd' => '0',
+        'File::Path' => '0',
     },
     PREREQ_PM => {
-    	'strict' => '0',
-	'warnings' => '0',
-	'Cwd' => '0',
+        'strict' => '0',
+        'warnings' => '0',
+        'Cwd' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Hazy-*' },

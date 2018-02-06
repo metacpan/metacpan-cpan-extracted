@@ -88,7 +88,16 @@ tle_period.t
     and it expects to find the orbital elements file sgp4-ver.tle in the
     t directory.
 
-t/xml
+usno-seasons
+    This script takes an optional Gregorian year on the command line
+    (defaulting to the current year), and displays equinox and solstice
+    times as calculated by Astro::Coord::ECI::Sun. For comparison, it
+    downloads displays the times provided by the United States Naval
+    Observatory, and the ecliptic longitude calculated by
+    Astro::Coord::ECI::Sun for both its own and the Naval Observatory's
+    times.
+
+xml
     This demonstration script downloads International Space Station TLE
     data from Celestrak, predicts passes over The Hague, Netherlands,
     and displays the results as XML, using XML::Writer. The pass_variant

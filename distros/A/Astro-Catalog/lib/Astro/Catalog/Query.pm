@@ -29,13 +29,9 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 # C O N S T R U C T O R ----------------------------------------------------
-
-=head1 REVISION
-
-$Id: Query.pm,v 1.8 2003/09/25 21:27:50 aa Exp $
 
 =head1 METHODS
 
@@ -48,11 +44,11 @@ $Id: Query.pm,v 1.8 2003/09/25 21:27:50 aa Exp $
 Create a new instance from a hash of options
 
   $q = new Astro::Catalog::Query( Coords    => new Astro::Coords(),
-				  Radius    => $radius,
-				  Bright    => $magbright,
-				  Faint     => $magfaint,
-				  Sort      => $sort_type,
-				  Number    => $number_out );
+                                  Radius    => $radius,
+                                  Bright    => $magbright,
+                                  Faint     => $magfaint,
+                                  Sort      => $sort_type,
+                                  Number    => $number_out );
 
 returns a reference to an query object. Must only called from
 sub-classed constructors.
@@ -205,9 +201,9 @@ sub target {
 
     # Store it in the options table
     $self->_set_query_options(
-			      object => $ident,
-			      %clear
-			     );
+                              object => $ident,
+                              %clear
+                             );
   }
   return $self->query_options("object");
 }
@@ -412,7 +408,7 @@ sub _set_query_options {
 
     if (!exists $allow{$newkey}) {
       warnings::warnif("Option $newkey not supported by catalog ".
-		       ref($self)."\n");
+                       ref($self)."\n");
       next;
     }
     # set the option
@@ -437,18 +433,18 @@ the internal options, with 1-1 mapping.
 
 sub _get_allowed_options {
   return (
-	  ra => 'ra',
-	  dec => 'dec',
-	  object => 'object',
-	  radmax => 'radmax',
-	  radmin => 'radmin',
-	  width => 'width',
-	  height => 'height',
-	  magbright => 'magbright',
-	  magfaint => 'magfaint',
-	  sort => 'sort',
-	  nout => 'nout',
-	 );
+          ra => 'ra',
+          dec => 'dec',
+          object => 'object',
+          radmax => 'radmax',
+          radmin => 'radmin',
+          width => 'width',
+          height => 'height',
+          magbright => 'magbright',
+          magfaint => 'magfaint',
+          sort => 'sort',
+          nout => 'nout',
+         );
 }
 
 =item B<_get_supported_accessor_options>
@@ -469,15 +465,15 @@ then we will just set the option directly.
 
 sub _get_supported_accessor_options {
   return (
-	  ra => 'ra',
-	  dec => 'dec',
-	  faint => 'magfaint',
-	  bright => 'magbright',
-	  radius => 'radmax',
-	  target => 'object',
-	  sort => 'sort',
-	  number => 'nout',
-	  format => 'format',
+          ra => 'ra',
+          dec => 'dec',
+          faint => 'magfaint',
+          bright => 'magbright',
+          radius => 'radmax',
+          target => 'object',
+          sort => 'sort',
+          number => 'nout',
+          format => 'format',
   );
 }
 
@@ -620,7 +616,7 @@ sub _translate_options {
       # issue a warning if the method has not been declared
       # as supporting that simply mapping
       warnings::warnif("Unable to find translation for key $key. Assuming 1 to 1 mapping.\n")
-	  unless exists $one_one{$key};
+          unless exists $one_one{$key};
 
       # Translate the key and copy the value
       $outkey = $allow{$key};
@@ -641,9 +637,9 @@ a one-to-one mapping when forming a URL (etc).
 sub _translate_one_to_one {
   # convert to a hash-list
   return map { $_, undef }(qw/
-			   object radmax radmin magfaint magbright
-			   nout format
-			   /);
+                           object radmax radmin magfaint magbright
+                           nout format
+                           /);
 }
 
 

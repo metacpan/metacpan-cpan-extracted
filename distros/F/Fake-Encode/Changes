@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.08 2018-02-03 00:00:00
+  - try Removal of the current directory (".") from @INC
+  - try Kwalitee Indicator: buildtool_not_executable
+  - created by INABA Hitoshi
+
 0.07 2017-09-10 00:00:00
   - cancel removing '.' from @INC (CVE-2016-1238: Important unsafe module load path flaw)
   - created by INABA Hitoshi

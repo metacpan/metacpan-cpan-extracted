@@ -1,6 +1,7 @@
 requires 'perl', '5.010';
 requires 'Log::Dispatch';
 requires 'Log::GELF::Util', '>= 0.90';
+requires 'Params::Validate';
 
 recommends 'JSON::XS', '2.0';
 

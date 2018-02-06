@@ -10,7 +10,7 @@ use Test::More tests
  => 116 # form.t
   +  24 # form_param.t
   +  2  # misc
-  +  2  # <button>
+  +  3  # <button>
   +  4; # bugs
 
 BEGIN{	use_ok 'HTML::DOM' };
@@ -655,6 +655,7 @@ is +($doc->forms)[0]->make_request->uri,
 
 $doc->close;
 $doc->write("<form><button name=b value=v><button name=b value=w>
+                   <button name=btnAccept></button>(no value)
                    <button type=reset name=c value=d>
                    <button type=button name=e value=f>
             </form>");
@@ -663,6 +664,8 @@ is $doc->getElementsByTagName('button')->[1]->main'click->as_string,
 is +($doc->forms)[0]->main::click->as_string,
    "GET http://example.com?b=v\n\n",
    'form->click supports <button>s';
+is $doc->getElementsByTagName('button')->[2]->main'click->as_string,
+   "GET http://example.com?btnAccept=\n\n", '<button> element with no val';
 
 # -------- Bugs related to HTML::DOM’s HTML::Form imitation ---------- #
 {

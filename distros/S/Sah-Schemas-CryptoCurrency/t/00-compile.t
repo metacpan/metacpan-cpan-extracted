@@ -2,17 +2,19 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sah/Schema/cryptocurrency/symbol.pm',
     'Sah/Schema/cryptocurrency/symbol_or_name.pm',
+    'Sah/Schema/cryptoexchange/name.pm',
     'Sah/SchemaR/cryptocurrency/symbol.pm',
     'Sah/SchemaR/cryptocurrency/symbol_or_name.pm',
+    'Sah/SchemaR/cryptoexchange/name.pm',
     'Sah/Schemas/CryptoCurrency.pm'
 );
 

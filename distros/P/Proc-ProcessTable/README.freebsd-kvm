@@ -8,6 +8,7 @@ SUPPORTED ATTRIBUTES
   groups       array of group ids
   pgrp         process GID
   sess         process session ID
+  jid          Jail ID
 
   flags        P_* flags
   sflags       PS_* flags
@@ -18,6 +19,7 @@ SUPPORTED ATTRIBUTES
   ctime        running child time (in seconds)
   cutime       child user time (in seconds)
   cstime       child system time (in seconds)
+  pctcpu       percent CPU usage
   wchan        current system call
   state        state of process
 

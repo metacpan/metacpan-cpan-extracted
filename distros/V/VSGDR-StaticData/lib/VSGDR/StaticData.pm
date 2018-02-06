@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 
 sub databaseName {
@@ -164,9 +164,18 @@ sub generateScript {
 
     my $widest_column_name_len = max ( map { length ($_->[0]); } @{$ra_columns} ) ;
     my $widest_column_name_padding = int($widest_column_name_len/4) + 4;
-    
-    my $reportingPKCols = "" ;
-    
+
+    my $flatcolumnlist          = "" ;
+    my $flatvariablelist        = "" ;
+    foreach my $l (@{$ra_columns}) {
+        do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
+        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
+    }    
+    $flatcolumnlist             =~ s{ ,\s? \z }{}msx;
+    $flatvariablelist           =~ s{ ,\s? \z }{}msx;
+
+    my $reportingPKCols                 = "" ;
+    my $recordExistenceCheckSQL         = "" ;
     if ( ! scalar @{$ra_pkcolumns} ) {
         my @pk_ColumnsCheck = () ;
         foreach my $l (@{$ra_columns}) {
@@ -176,8 +185,20 @@ sub generateScript {
             push @pk_ColumnsCheck , "([$l->[0]]" . "\t"x$varpadding . " = \@$l->[0]" . "\t"x$varpadding . "or ([$l->[0]]". "\t"x$varpadding . " is null and \@$l->[0] ". "\t"x$varpadding . " is null ) ) " ;
         }
         #my @pk_ColumnsCheck     = map { "( $_->[0]\t\t\t = \@$_->[0] or ( $_->[0]\t\t\t is null and \@$_->[0] is null ) ) " } @{$ra_columns} ;
-        $primaryKeyCheckClause  = "where\t" . do { local $" = "\n\t\t\t\tand\t\t"; "@pk_ColumnsCheck" }  
+        $primaryKeyCheckClause  = "where\t" . do { local $" = "\n\t\t\t\tand\t\t"; "@pk_ColumnsCheck" };
+        
+        $recordExistenceCheckSQL = <<"EOF";
+if exists
+                (
+                select $flatvariablelist
+                except        
+                select  ${flatcolumnlist} 
+                from    ${quotedCombinedName}
+                )
+EOF
+
     }
+    # does this even get called ???
     elsif ( scalar @{$ra_pkcolumns} != 1 ) {
         my @pk_ColumnsCheck = () ;
 
@@ -199,12 +220,29 @@ sub generateScript {
 #warn Dumper $col;
             push @nonKeyColumns, $col unless grep {$_->[0] eq $col->[0] } @{$ra_pkcolumns} ;
         }
+        $recordExistenceCheckSQL = <<"EOF";
+if not exists
+                (
+                select  ${flatcolumnlist} 
+                from    ${quotedCombinedName}
+                ${primaryKeyCheckClause}
+                )               
+EOF
     }
     else {
         $reportingPKCols        = $ra_pkcolumns->[0][0];     
         $pk_column              = $ra_pkcolumns->[0][0];        
         $primaryKeyCheckClause  = "where   ${pk_column}        = \@${pk_column}";
-        @nonKeyColumns = grep { $_->[0] ne $pk_column } @{$ra_columns};        
+        @nonKeyColumns = grep { $_->[0] ne $pk_column } @{$ra_columns};
+        
+        $recordExistenceCheckSQL = <<"EOF";
+if not exists
+                (
+                select  ${flatcolumnlist} 
+                from    ${quotedCombinedName}
+                ${primaryKeyCheckClause}
+                )               
+EOF
     } 
     
 
@@ -213,9 +251,9 @@ sub generateScript {
     my $selectstatement         = "select\t" ;
     my $insertclause            = "insert into ${combinedName}\n\t\t\t\t\t\t(";
     my $valuesclause            = "values(";
-    my $flatcolumnlist          = "" ;
+#   my $flatcolumnlist             = "" ;
     my $flatExtractColumnList   = "" ;
-    my $flatvariablelist        = "" ;
+#    my $flatvariablelist        = "" ;
     my $updateColumns           = "set\t";
     my $printStatement          = "" ;
 
@@ -239,9 +277,9 @@ sub generateScript {
         do { local $" = "";   $selectstatement          .= "@"."$l->[0]" . "\t"x$varpadding ."= [$l->[0]]" ; $selectstatement .= "\n\t\t,\t\t"} ;
         do { local $" = "";   $insertclause             .= "[$l->[0]]" ; $insertclause .= ", "} ;    
         do { local $" = "";   $valuesclause             .= "[$l->[0]]" ; $valuesclause .= ", "} ;    
-        do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
+#        do { local $" = "";   $flatcolumnlist           .= "[$l->[0]]" ; $flatcolumnlist .= ", "} ;
         do { local $" = "";   $flatExtractColumnList    .= $l->[1] =~ m{\A(?:date|datetime|smalldatetime)\z}i  ? "convert(varchar(30),[$l->[0]],120)" :  "[$l->[0]]" ; $flatExtractColumnList .= ", "} ;
-        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
+#        do { local $" = "";   $flatvariablelist         .= "@"."$l->[0]" ; $flatvariablelist .= ","} ;
 
         do { local $" = "";   $printStatement           .= "'  $$l[0]: ' " ; } ;
         my $printFragment                               = $$l[1] !~ m{ (?: char ) }ixms 
@@ -270,9 +308,9 @@ sub generateScript {
     $updateColumns            =~ s{ \n\t\t\t,\t \z }{}msx;
     $insertclause             =~ s{ ,\s? \z }{}msx;
     $valuesclause             =~ s{ ,\s? \z }{}msx;
-    $flatcolumnlist           =~ s{ ,\s? \z }{}msx;
+#    $flatcolumnlist           =~ s{ ,\s? \z }{}msx;
     $flatExtractColumnList    =~ s{ ,\s? \z }{}msx;
-    $flatvariablelist         =~ s{ ,\s? \z }{}msx;
+#    $flatvariablelist         =~ s{ ,\s? \z }{}msx;
     $updateColumns            =~ s{ \n\t\t\t\t\t,\t \z }{}msx;
     $printStatement           =~ s{ \+\s \z }{}msx;
 
@@ -424,7 +462,7 @@ EOF
 
     if ( scalar @{$ra_data} > ${LargeDataSetThreshhold}  ){
         $printChangedTotalsSection        = "print 'Total count of inserted records : ' + cast( \@InsertedCount as varchar(10))" ;
-        $printChangedTotalsSection        .= "\nprint 'Total count of altered records  : ' + cast( \@ChangedCount as varchar(10))" ;
+        $printChangedTotalsSection        .= "\n\tprint 'Total count of altered records  : ' + cast( \@ChangedCount as varchar(10))" ;
     }
 
 
@@ -513,12 +551,16 @@ begin try
         from    \@${tableVarName}
         where   StaticDataPopulationId\t\t= \@i
 
+        ${recordExistenceCheckSQL}
+/*
         if not exists
                 (
-                select  * 
-                from    $quotedCombinedName
+                select  ${flatcolumnlist} 
+                from    ${quotedCombinedName}
                 ${primaryKeyCheckClause}
-                )  begin
+                )
+*/              
+            begin
             $insertingPrintStatement
             if \@DeploySwitch = 1 begin
                 ${set_IDENTITY_INSERT_ON}

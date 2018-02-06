@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 =encoding utf8
 
@@ -33,6 +33,10 @@ L<Prty::ApplicationPaths> - Ermittele Pfade einer Unix-Applikation
 =item *
 
 L<Prty::Array> - Operationen auf Arrays
+
+=item *
+
+L<Prty::AsciiTable> - ASCII-Tabelle
 
 =item *
 
@@ -388,6 +392,10 @@ L<Prty::LaTeX::Generator> - LaTeX-Generator
 
 =item *
 
+L<Prty::LaTeX::LongTable> - Erzeuge LaTeX longtable
+
+=item *
+
 L<Prty::LineProcessor> - Verarbeite Datei als Array von Zeilen
 
 =item *
@@ -674,7 +682,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

@@ -27,12 +27,12 @@ foo();
 say 'end';
 
 __DATA__
-open("/dev/null", 0x241, 0666) = * at basic.pl line 8.
+open("/dev/null", *, 0666) = * at basic.pl line 8.
     main::baz() called at basic.pl line 16
     main::bar() called at basic.pl line 20
     main::foo() called at basic.pl line 24
 
-open("/dev/null", 0x241, 0666) = * at basic.pl line 8.
+open("/dev/null", *, 0666) = * at basic.pl line 8.
     main::baz() called at basic.pl line 16
     main::bar() called at basic.pl line 20
     main::foo() called at basic.pl line 26

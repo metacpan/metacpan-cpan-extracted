@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.509';
+our $VERSION = '1.510';
 
 use Exporter qw( import );
 
@@ -21,55 +21,57 @@ sub print_columns {
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_width, $rest ) = @_;
-    my $gc_str = Unicode::GCString->new( $str );
-    if ( $gc_str->columns() <= $avail_width ) {
-        return $str, '' if $rest;
-        return $str;
+    # $_[0] == string,
+    # $_[1] == available width
+    # $_[2] == return the rest (yes/no)
+    my $gc_str = Unicode::GCString->new( $_[0] );
+    if ( $gc_str->columns() <= $_[1] ) {
+        return $_[0], '' if $_[2];
+        return $_[0];
     }
-    my $left = $gc_str->substr( 0, $avail_width );
+    my $left = $gc_str->substr( 0, $_[1] );
     my $left_w = $left->columns();
-    if ( $left_w == $avail_width ) {
-        return $left->as_string, $gc_str->substr( $avail_width )->as_string if $rest;
+    if ( $left_w == $_[1] ) {
+        return $left->as_string, $gc_str->substr( $_[1] )->as_string if $_[2];
         return $left->as_string;
     }
-    if ( $avail_width < 2 ) {
+    if ( $_[1] < 2 ) {
         die "The terminal width is too small.";
     }
     my ( $nr_chars, $adjust );
-    if ( $left_w > $avail_width ) {
-        $nr_chars = int( $avail_width / 2 );
+    if ( $left_w > $_[1] ) {
+        $nr_chars = int( $_[1] / 2 );
         $adjust = int( ( $nr_chars + 1 ) / 2 );
-        #$nr_chars = int( $avail_width / 4 * 3 );
-        #$adjust = int( ( $avail_width + 7 ) / 8 );
+        #$nr_chars = int( $_[1] / 4 * 3 );
+        #$adjust = int( ( $_[1] + 7 ) / 8 );
     }
-    elsif ( $left_w < $avail_width ) {
-        $nr_chars = int( $avail_width + ( $gc_str->length() - $avail_width ) / 2 );
+    elsif ( $left_w < $_[1] ) {
+        $nr_chars = int( $_[1] + ( $gc_str->length() - $_[1] ) / 2 );
         $adjust = int( ( $gc_str->length() - $nr_chars + 1 ) / 2 );
     }
 
     while ( 1 ) {
         $left = $gc_str->substr( 0, $nr_chars );
         $left_w = $left->columns();
-        if ( $left_w + 1 == $avail_width ) {
+        if ( $left_w + 1 == $_[1] ) {
             my $len_next_char = $gc_str->substr( $nr_chars, 1 )->columns();
             if ( $len_next_char == 1 ) {
-                return $gc_str->substr( 0, $nr_chars + 1 )->as_string, $gc_str->substr( $nr_chars + 1 )->as_string if $rest;
+                return $gc_str->substr( 0, $nr_chars + 1 )->as_string, $gc_str->substr( $nr_chars + 1 )->as_string if $_[2];
                 return $gc_str->substr( 0, $nr_chars + 1 )->as_string;
             }
             elsif ( $len_next_char == 2 ) {
-                return $left->as_string . ' ' , $gc_str->substr( $nr_chars )->as_string if $rest;
+                return $left->as_string . ' ' , $gc_str->substr( $nr_chars )->as_string if $_[2];
                 return $left->as_string . ' ';
             }
         }
-        if ( $left_w > $avail_width ) {
+        if ( $left_w > $_[1] ) {
             $nr_chars = int( $nr_chars - $adjust );
         }
-        elsif ( $left_w < $avail_width ) {
+        elsif ( $left_w < $_[1] ) {
             $nr_chars = int( $nr_chars + $adjust );
         }
         else {
-            return $left->as_string, $gc_str->substr( $nr_chars )->as_string if $rest;
+            return $left->as_string, $gc_str->substr( $nr_chars )->as_string if $_[2];
             return $left->as_string;
         }
         $adjust = int( ( $adjust + 1 ) / 2 );
@@ -78,7 +80,7 @@ sub cut_to_printwidth {
 
 
 sub line_fold {
-    my ( $string, $avail_width, $init_tab, $subseq_tab ) = @_;
+    my ( $string, $avail_width, $init_tab, $subseq_tab ) = @_; #copy
     for ( $init_tab, $subseq_tab ) {
         if ( $_ ) {
             s/\s/ /g;

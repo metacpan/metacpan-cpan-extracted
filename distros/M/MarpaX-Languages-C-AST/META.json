@@ -4,7 +4,7 @@
       "Jean-Damien Durand <jeandamiendurand@free.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,6 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -43,6 +42,7 @@
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
@@ -110,7 +110,6 @@
             "Test::Differences" : "0",
             "Test::More" : "0",
             "Test::Trap" : "0",
-            "blib" : "1.01",
             "perl" : "5.010"
          }
       }
@@ -118,71 +117,71 @@
    "provides" : {
       "MarpaX::Languages::C::AST" : {
          "file" : "lib/MarpaX/Languages/C/AST.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Callback" : {
          "file" : "lib/MarpaX/Languages/C/AST/Callback.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Callback::Events" : {
          "file" : "lib/MarpaX/Languages/C/AST/Callback/Events.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Callback::Method" : {
          "file" : "lib/MarpaX/Languages/C/AST/Callback/Method.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Callback::Option" : {
          "file" : "lib/MarpaX/Languages/C/AST/Callback/Option.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Grammar" : {
          "file" : "lib/MarpaX/Languages/C/AST/Grammar.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011" : {
          "file" : "lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Actions" : {
          "file" : "lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Actions.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan" : {
          "file" : "lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan::Actions" : {
          "file" : "lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan/Actions.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Impl" : {
          "file" : "lib/MarpaX/Languages/C/AST/Impl.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Impl::Logger" : {
          "file" : "lib/MarpaX/Languages/C/AST/Impl/Logger.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Scope" : {
          "file" : "lib/MarpaX/Languages/C/AST/Scope.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Util" : {
          "file" : "lib/MarpaX/Languages/C/AST/Util.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::AST::Util::Data::Find" : {
          "file" : "lib/MarpaX/Languages/C/AST/Util/Data/Find.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::Scan" : {
          "file" : "lib/MarpaX/Languages/C/Scan.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       },
       "MarpaX::Languages::C::Scan::Actions" : {
          "file" : "lib/MarpaX/Languages/C/Scan/Actions.pm",
-         "version" : "0.47"
+         "version" : "0.48"
       }
    },
    "release_status" : "stable",
@@ -198,14 +197,12 @@
          "web" : "https://github.com/jddurand/marpax-languages-c-ast"
       }
    },
-   "version" : "0.47",
+   "version" : "0.48",
    "x_contributors" : [
       "Ben Bullock <benkasminbullock@gmail.com>",
       "Ivan Baidakou <basiliscos@openmailbox.com>",
-      "Jeffrey Kegler <JKEGL@cpan.org>",
-      "Jeffrey Kegler <jkegl@cpan.org>",
-      "jddurand <jeandamiendurand@free.fr>"
+      "Jeffrey Kegler <JKEGL@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

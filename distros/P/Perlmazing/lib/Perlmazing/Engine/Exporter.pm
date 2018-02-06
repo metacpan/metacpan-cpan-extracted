@@ -36,7 +36,7 @@ sub export {
 	no warnings 'once';
 	if ($sigil eq '&') {
 		if (not defined *{"${from}::$symbol"}{CODE}) {
-			eval "sub ${from}::$symbol";
+			eval "sub ${from}::$symbol"; ## no critic
 			croak "Cannot create symbol for sub ${from}::$symbol: $@" if $@;
 		}
 		if (defined *{"${to}::$symbol"}{CODE}) {

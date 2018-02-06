@@ -10,7 +10,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 # "protocols" for serializing data and the methods used
 # to carry out the serialization
@@ -99,34 +99,8 @@ sub _decode {
     }
 }
 
-# unbless the object (so we can access hash elements without going
-# through the overloaded hash dereference operator). Return the
-# original object type so we can re-bless it.
-sub _unbless {
-    my $self = shift;
-    my $class = ref $self;
-    bless $self, "!@#$%";
-    return $class;
-}
-
-sub is_ready {
-    my $self = shift;
-    my $is_ready = 0;
-
-    my $class = $self->_unbless;
-
-    if ($self->{value_set}) { $is_ready = 1 }
-    if ($self->{job}->is_complete) { $is_ready = 1 }
-
-    bless $self, $class;
-
-    # XXX - pause here or waitpid WNOHANG? That might be helpful on Windows.
-    return 0;
-}
-
 sub _fetch {
     my $self = shift;
-    my $class = $self->_unbless;
 
     if (!$self->{value_set}) {
 	if (!$self->{job}->is_complete) {
@@ -138,7 +112,6 @@ sub _fetch {
 		$self->{value_set} = 1;
 		$self->{error} = 
 		    'waitpid failed, result not retrieved from process';
-		bless $self, $class;
 		return ();  # v0.53 on failure return empty string
 	    }
 	    if ($self->{job}{status} != 0) {
@@ -172,7 +145,6 @@ sub _fetch {
 	}
     }
     my $value = $self->{value};
-    bless $self, $class;
     return @$value;
 }
 
@@ -184,7 +156,7 @@ Forks::Super::LazyEval::BackgroundArray
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 DESCRIPTION
 
@@ -200,7 +172,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2017, Marty O'Brien.
+Copyright (c) 2010-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

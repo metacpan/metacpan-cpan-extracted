@@ -23,7 +23,7 @@ link $from => $dest;
 
 print STDOUT "Installing: '$from' ($dest)\n";
 
-our $VERSION = '2.15';
+our $VERSION = '2.15_02';
 $VERSION = eval $VERSION;
 
 WriteMakefile
@@ -31,6 +31,7 @@ WriteMakefile
     NAME            => 'FindBin::libs',
     VERSION         => $VERSION,
     ABSTRACT_FROM   => $dest,
+    LICENSE         => 'perl',
     PREREQ_PM       =>
     {
         # standard distro, particular versions 

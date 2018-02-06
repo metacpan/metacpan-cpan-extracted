@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2014-11-20 00:00:00 +0000 to present.
+Changes from 2016-02-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2016-11-19 20:53:41 +0000
+version 0.002 at 2018-02-03 03:44:44 +0000
+------------------------------------------
+
+  Change: 0bc1293e78e433c554178c0f07b254332995f424
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-02 19:44:14 +0000
+
+    Release 0.002 with fixed SIG_CHLD handler 
+
+  Change: a70fa6e0b1223760764790a851d6df5447e1d8b3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-02-02 19:37:55 +0000
+
+    Allow the 'Filter' argument to pass to the Wheel 
+
+  Change: 6fdfa5bbfbb8d986cddb78d0d88475fde1906774
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-13 11:15:00 +0000
+
+    Proper handling of the POE '_child' event. 
+
+------------------------------------------
+version 0.001 at 2016-11-19 20:52:51 +0000
 ------------------------------------------
 
   Change: 2b50d4603ed1ae7553660dbe46e2d74f5be6d0e3

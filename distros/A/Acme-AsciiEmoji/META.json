@@ -1,5 +1,5 @@
 {
-   "abstract" : "meta::cpan (ï¾âã®â)ï¾*:ã»ï¾â§ index me",
+   "abstract" : "Emoji",
    "author" : [
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Acme::AsciiEmoji" : {
          "file" : "lib/Acme/AsciiEmoji.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Acme-AsciiEmoji"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

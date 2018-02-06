@@ -17,7 +17,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
-        'Moonshine::Test' => 0.14,
+        'Moonshine::Test' => 0.16,
     },
     PREREQ_PM => {
         'strict' => 0,
@@ -25,7 +25,7 @@ WriteMakefile(
         'String::Trim::More' => 0.03,
         'String::Elide::Parts' => 0.07, 
         'Exporter::Tiny' => 0.044,
-        'HTML::Valid' => 0.05,
+        'HTML::Valid' => 0.07,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Moonshine-Util-*' },

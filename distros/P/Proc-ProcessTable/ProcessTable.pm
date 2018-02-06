@@ -5,7 +5,6 @@ use 5.006;
 use strict;
 use warnings;
 use Carp;
-use Fcntl;
 use Config;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
@@ -19,7 +18,7 @@ require DynaLoader;
 @EXPORT = qw(
     
 );
-$VERSION = '0.53';
+$VERSION = '0.55';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -111,15 +110,25 @@ sub initialize
       else
       {
         $self->_get_tty_list;
-        my $old_umask = umask;
-        umask 022;
 
-        sysopen( my $ttydevs_fh, $TTYDEVSFILE, O_WRONLY | O_EXCL | O_CREAT )
-          or die "$TTYDEVSFILE was created by other process";
+        require File::Temp;
+        require File::Basename;
+
+        my($ttydevs_fh, $ttydevs_tmpfile) = File::Temp::tempfile('ProcessTable_XXXXXXXX', DIR => File::Basename::dirname($TTYDEVSFILE));
+        chmod 0644, $ttydevs_tmpfile;
         Storable::store_fd( \%Proc::ProcessTable::TTYDEVS, $ttydevs_fh );
         close $ttydevs_fh;
 
-        umask $old_umask;
+        if( !rename $ttydevs_tmpfile, $TTYDEVSFILE )
+        {
+          my $err = $!;
+          unlink $ttydevs_tmpfile;
+          if( !-r $TTYDEVSFILE)
+          {
+            die "Renaming $ttydevs_tmpfile to $TTYDEVSFILE failed: $err";
+          }
+          # else somebody else obviously created the file in the meantime
+        }
       }
     }
     else
@@ -169,9 +178,9 @@ Proc::ProcessTable - Perl extension to access the unix process table
 
   use Proc::ProcessTable;
 
-  $p = new Proc::ProcessTable( 'cache_ttys' => 1 ); 
-  @fields = $p->fields;
-  $ref = $p->table;
+  my $p = Proc::ProcessTable->new( 'cache_ttys' => 1 ); 
+  my @fields = $p->fields;
+  my $ref = $p->table;
 
 =head1 DESCRIPTION
 
@@ -225,10 +234,10 @@ are supported directly by internal perl functions.
  # A cheap and sleazy version of ps
  use Proc::ProcessTable;
 
- $FORMAT = "%-6s %-10s %-8s %-24s %s\n";
- $t = new Proc::ProcessTable;
+ my $FORMAT = "%-6s %-10s %-8s %-24s %s\n";
+ my $t = Proc::ProcessTable->new;
  printf($FORMAT, "PID", "TTY", "STAT", "START", "COMMAND"); 
- foreach $p ( @{$t->table} ){
+ foreach my $p ( @{$t->table} ){
    printf($FORMAT, 
           $p->pid, 
           $p->ttydev, 
@@ -241,11 +250,11 @@ are supported directly by internal perl functions.
  # Dump all the information in the current process table
  use Proc::ProcessTable;
 
- $t = new Proc::ProcessTable;
+ my $t = Proc::ProcessTable->new;
 
- foreach $p (@{$t->table}) {
+ foreach my $p (@{$t->table}) {
   print "--------------------------------\n";
-  foreach $f ($t->fields){
+  foreach my $f ($t->fields){
     print $f, ":  ", $p->{$f}, "\n";
   }
  }              
@@ -262,7 +271,7 @@ D. Urist, durist@frii.com
 
 =head1 SEE ALSO
 
-Proc::ProcessTable::Process.pm, perl(1).
+L<Proc::ProcessTable::Process>, L<perl(1)>.
 
 =cut
 

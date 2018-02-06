@@ -1,5 +1,8 @@
 Revision history for Perl extension Log-Dispatch-Gelf
 
+1.3.1 2018-02-01T12:31:14Z
+    - add Params::Validate to cpanfile
+
 1.3.0 2016-03-01T13:59:38Z
     - use Log::GELF::Util (ADAMC)
 

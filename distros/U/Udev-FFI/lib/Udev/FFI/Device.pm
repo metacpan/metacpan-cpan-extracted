@@ -235,4 +235,8 @@ Udev::FFI::Device
 
 =head2 get_udev ()
 
+=head1 SEE ALSO
+
+L<Udev::FFI> main Udev::FFI documentation
+
 =cut

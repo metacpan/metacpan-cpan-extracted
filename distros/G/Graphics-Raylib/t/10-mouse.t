@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More tests => 7;
 
 use_ok 'Graphics::Raylib::Mouse';
 
@@ -14,5 +14,3 @@ diag "Co-ords: $pos[0], $pos[1]";
 ok $pos[0] >= 0;
 ok $pos[1] >= 0;
 is scalar @pos, 2;
-
-done_testing;

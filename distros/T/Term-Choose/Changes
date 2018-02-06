@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.510   2018-02-04
+        - Bugfix: don't overwrite option "layout"
+        - 'cut_to_printwidth': don't copy parameter.
+
 1.509   2018-01-04
         - Removed the option "pad_one_row".
 

@@ -2,10 +2,7 @@ package CryptX;
 
 use strict;
 use warnings ;
-our $VERSION = '0.056';
-
-use base qw(Exporter);
-our @EXPORT_OK = qw();
+our $VERSION = '0.057';
 
 require XSLoader;
 XSLoader::load('CryptX', $VERSION);
@@ -67,7 +64,7 @@ CryptX - Cryptographic toolkit (self-contained, no external libraries needed)
 
 Cryptography in CryptX is based on L<https://github.com/libtom/libtomcrypt>
 
-Currently available modules:
+Available modules:
 
 =over
 
@@ -103,7 +100,7 @@ L<Crypt::Digest::SHA3_224>, L<Crypt::Digest::SHA3_256>, L<Crypt::Digest::SHA3_38
 
 =item * Checksums
 
-L<Crypt::Checksum>, L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
+L<Crypt::Checksum::Adler32>, L<Crypt::Checksum::CRC32>
 
 =item * Message Authentication Codes
 
@@ -114,9 +111,9 @@ L<Crypt::Mac::Pelican>, L<Crypt::Mac::PMAC>, L<Crypt::Mac::XCBC>, L<Crypt::Mac::
 
 L<Crypt::PK::RSA>, L<Crypt::PK::DSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DH>
 
-=item * Cryptographically secure random number generators
+=item * Cryptographically secure random number generators - see L<Crypt::PRNG> and related modules
 
-L<Crypt::PRNG>, L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
+L<Crypt::PRNG::Fortuna>, L<Crypt::PRNG::Yarrow>, L<Crypt::PRNG::RC4>, L<Crypt::PRNG::Sober128>, L<Crypt::PRNG::ChaCha20>
 
 =item * Key derivation functions - PBKDF1, PBKDF2 and HKDF
 
@@ -134,6 +131,6 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013+ DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
+Copyright (c) 2013+ DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
 
 =cut

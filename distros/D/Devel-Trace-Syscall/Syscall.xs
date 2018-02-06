@@ -251,6 +251,7 @@ send_args(pid_t child, int fd, struct syscall_info *info)
                     }
                 }
                 break;
+            case 'f': // file descriptor
             case 'i': // signed int
             case 'u': // unsigned int
             case 'p': // pointer
@@ -472,13 +473,18 @@ read_and_print_args(FILE *fp, uint16_t syscall_no)
             }
 
             switch(*arg) {
+                case 'f': format_string = "%d";   break;
                 case 'i': format_string = "%d";   break;
                 case 'u': format_string = "%u";   break;
                 case 'p': format_string = "%p";   break;
                 case 'o': format_string = "0%o";  break;
                 case 'x': format_string = "0x%x"; break;
             }
-            fprintf(stderr, format_string, arg_value);
+            if(*arg == 'f' && ((int)arg_value) == AT_FDCWD) {
+                fprintf(stderr, "AT_FDCWD");
+            } else {
+                fprintf(stderr, format_string, arg_value);
+            }
         }
 
         arg++;

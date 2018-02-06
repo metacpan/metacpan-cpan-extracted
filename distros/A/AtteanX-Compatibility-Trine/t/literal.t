@@ -17,6 +17,6 @@ my $lit = Attean::Literal->new(value => 'Dahut', language => 'fr');
 ok($lit->has_datatype, 'All have datatype in RDF 1.1');
 is($lit->literal_value, 'Dahut', 'Value roundtripped');
 is($lit->literal_value_language, 'fr', 'Language roundtripped');
-is($lit->literal_datatype, 'http://www.w3.org/2001/XMLSchema#langString', 'Got langString data type');
+is($lit->literal_datatype, 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString', 'Got langString data type');
 
 done_testing;

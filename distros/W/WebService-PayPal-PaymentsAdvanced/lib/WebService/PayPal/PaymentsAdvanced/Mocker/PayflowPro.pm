@@ -4,7 +4,7 @@ use Mojolicious::Lite;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 use feature qw( state );
 
@@ -256,7 +256,7 @@ WebService::PayPal::PaymentsAdvanced::Mocker::PayflowPro - A simple app to enabl
 
 =head1 VERSION
 
-version 0.000024
+version 0.000025
 
 =head1 DESCRIPTION
 
@@ -285,7 +285,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc.
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

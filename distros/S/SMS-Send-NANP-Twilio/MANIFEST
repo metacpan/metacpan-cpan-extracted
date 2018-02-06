@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_send.t
+t/003_send_MediaUrl.t
+t/004_send_api.t
+lib/SMS/Send/NANP/Twilio.pm
+perl-SMS-Send-NANP-Twilio.spec
+META.yml                                 Module meta-data (added by MakeMaker)

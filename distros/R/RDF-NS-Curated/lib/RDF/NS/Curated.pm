@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.100';
 
 sub new {
   my $class = shift;
@@ -14,11 +14,12 @@ sub new {
 						 as => 'https://www.w3.org/ns/activitystreams#',
 						 bibo => 'http://purl.org/ontology/bibo/',
 						 cc => 'http://creativecommons.org/ns#',
+						 csvw => 'http://www.w3.org/ns/csvw#',
 						 ctag => 'http://commontag.org/ns#',
 						 dbo => 'http://dbpedia.org/ontology/',
 						 dbp => 'http://dbpedia.org/property/',
 						 dc => 'http://purl.org/dc/terms/',
-						 dc11 => 'http://purl.org/dc/elements/1.1/ => ',
+						 dc11 => 'http://purl.org/dc/elements/1.1/',
 						 dcat => 'http://www.w3.org/ns/dcat#',
 						 dctype => 'http://purl.org/dc/dcmitype/',
 						 doap => 'http://usefulinc.com/ns/doap#',
@@ -55,6 +56,7 @@ sub new {
 						 sioc => 'http://rdfs.org/sioc/ns#',
 						 skos => 'http://www.w3.org/2004/02/skos/core#',
 						 skosxl => 'http://www.w3.org/2008/05/skos-xl#',
+						 sosa => 'http://www.w3.org/ns/sosa/',
 						 ssn => 'http://www.w3.org/ns/ssn/',
 						 time => 'http://www.w3.org/2006/time#',
 						 v => 'http://rdf.data-vocabulary.org/#',
@@ -93,6 +95,11 @@ sub prefix {
   return $ns_prefix->{$namespace};
 }
 
+sub all {
+  my $self = shift;
+  return $self->{prefix_namespace};
+}
+
 1;
 
 __END__
@@ -113,7 +120,7 @@ RDF::NS::Curated - A curated set of RDF prefixes
 
 =head1 DESCRIPTION
 
-This contains a list of 58 prefix and URI pairs that are commonly used
+This contains a list of 60 prefix and URI pairs that are commonly used
 in RDF. The intention is that prefixes in this list can be safely used
 in code that has a long lifetime. The list has been derived mostly
 from W3C standards documents, but also some popularity lists. See the
@@ -137,6 +144,10 @@ This will return the URI (as a plain string) of the supplied prefix or C<undef> 
 
 This will return the prefix corresponding to the supplied URI string or C<undef> if it is not registered.
 
+=item C<< all >>
+
+This will return a hashref with all prefix and URI pairs.
+
 =back
 
 =head1 BUGS
@@ -154,7 +165,7 @@ Kjetil Kjernsmo E<lt>kjetilk@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2015, 2017 by Kjetil Kjernsmo.
+This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

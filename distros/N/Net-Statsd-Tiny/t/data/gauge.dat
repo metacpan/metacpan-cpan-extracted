@@ -1,0 +1,23 @@
+#!perl
+
+use strict;
+use warnings;
+
+[
+
+    {
+        description => "gauge",
+        autoflush   => 1,
+        input       => [ [qw/ gauge level 100 /], ],
+        output      => "test.level:100|g\n",
+    },
+
+    {
+        description => "gauge (increment)",
+        autoflush   => 1,
+        input       => [ [qw/ gauge level +12 /], ],
+        output      => "test.level:+12|g\n",
+    },
+
+
+]

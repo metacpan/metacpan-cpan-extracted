@@ -35,6 +35,7 @@ my @files = (
     't/cdecl.t',
     't/complex_declarations.t',
     't/delayed_directDeclaratorIdentifier.t',
+    't/directAbstractDeclarator.t',
     't/discard_GCC_attribute.t',
     't/discard_MSVS_declspec.t',
     't/discard_MSVS_pragma.t',

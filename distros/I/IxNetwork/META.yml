@@ -1,0 +1,19 @@
+---
+abstract: 'IxNetwork API Perl Bindings'
+author:
+  - diana.galan@keysight.com
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: IxNetwork
+requires:
+  perl: v5.18.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 8.40

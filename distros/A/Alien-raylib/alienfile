@@ -4,14 +4,14 @@ plugin 'PkgConfig' => 'raylib';
 
 share {
     plugin Download => (
-        url => 'https://github.com/raysan5/raylib/archive/2090ad8119fd622f80ff8a8707f416abec1db375.tar.gz'
+        url => 'https://github.com/a3f/raylib/archive/Alien-raylib-v0.010.tar.gz'
     );
 
     plugin Extract => 'tar.gz';
     plugin 'Build::CMake';
 
     build [
-        [ '%{cmake}', -G => '%{cmake_generator}', '-DWITH_PIC=ON',
+        [ '%{cmake}', -G => '%{cmake_generator}', '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
           '-DSHARED_RAYLIB=ON', '-DSTATIC_RAYLIB=ON',
           '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
           '-DBUILD_EXAMPLES=OFF', '-DBUILD_GAMES=OFF', '.'],

@@ -1,3 +1,4 @@
+#define PERL_NO_GET_CONTEXT     /* we want efficiency */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -11,18 +12,39 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
-typedef adler32_state *Crypt__Checksum__Adler32;
-typedef crc32_state   *Crypt__Checksum__CRC32;
+typedef adler32_state           *Crypt__Checksum__Adler32;
+typedef crc32_state             *Crypt__Checksum__CRC32;
+
+typedef ccm_state               *Crypt__AuthEnc__CCM;
+typedef eax_state               *Crypt__AuthEnc__EAX;
+typedef gcm_state               *Crypt__AuthEnc__GCM;
+typedef chacha20poly1305_state  *Crypt__AuthEnc__ChaCha20Poly1305;
+typedef ocb3_state              *Crypt__AuthEnc__OCB;
+
+typedef chacha_state            *Crypt__Stream__ChaCha;
+typedef salsa20_state           *Crypt__Stream__Salsa20;
+typedef sosemanuk_state         *Crypt__Stream__Sosemanuk;
+typedef rabbit_state            *Crypt__Stream__Rabbit;
+typedef rc4_state               *Crypt__Stream__RC4;
+typedef sober128_state          *Crypt__Stream__Sober128;
+
+typedef f9_state                *Crypt__Mac__F9;
+typedef hmac_state              *Crypt__Mac__HMAC;
+typedef omac_state              *Crypt__Mac__OMAC;
+typedef pelican_state           *Crypt__Mac__Pelican;
+typedef pmac_state              *Crypt__Mac__PMAC;
+typedef xcbc_state              *Crypt__Mac__XCBC;
+typedef poly1305_state          *Crypt__Mac__Poly1305;
+typedef blake2smac_state        *Crypt__Mac__BLAKE2s;
+typedef blake2bmac_state        *Crypt__Mac__BLAKE2b;
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
-  int id;
   struct ltc_cipher_descriptor *desc;
 } *Crypt__Cipher;
 
 typedef struct digest_struct {          /* used by Crypt::Digest */
   hash_state state;
-  int id;
   struct ltc_hash_descriptor *desc;
 } *Crypt__Digest;
 
@@ -31,109 +53,6 @@ typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
   int num;
 } *Crypt__Digest__SHAKE;
 
-typedef struct ccm_struct {             /* used by Crypt::AuthEnc::CCM */
-  ccm_state state;
-  int direction;
-  int tag_len;
-  unsigned long pt_len;
-  int id;
-} *Crypt__AuthEnc__CCM;
-
-typedef struct eax_struct {             /* used by Crypt::AuthEnc::EAX */
-  eax_state state;
-  int id;
-} *Crypt__AuthEnc__EAX;
-
-typedef struct gcm_struct {             /* used by Crypt::AuthEnc::GCM */
-  gcm_state state;
-  int id;
-} *Crypt__AuthEnc__GCM;
-
-typedef struct chacha20poly1305_struct {/* used by Crypt::AuthEnc::ChaCha20Poly1305 */
-  chacha20poly1305_state state;
-  int id;
-} *Crypt__AuthEnc__ChaCha20Poly1305;
-
-typedef struct ocb_struct {             /* used by Crypt::AuthEnc::OCB */
-  ocb3_state state;
-  int id;
-} *Crypt__AuthEnc__OCB;
-
-typedef struct chacha_struct {          /* used by Crypt::Stream::ChaCha */
-  chacha_state state;
-  int id;
-} *Crypt__Stream__ChaCha;
-
-typedef struct salsa20_struct {         /* used by Crypt::Stream::Salsa20 */
-  salsa20_state state;
-  int id;
-} *Crypt__Stream__Salsa20;
-
-typedef struct sosemanuk_struct {       /* used by Crypt::Stream::Sosemanuk */
-  sosemanuk_state state;
-  int id;
-} *Crypt__Stream__Sosemanuk;
-
-typedef struct rabbit_struct {          /* used by Crypt::Stream::Rabbit */
-  rabbit_state state;
-  int id;
-} *Crypt__Stream__Rabbit;
-
-typedef struct rc4_struct {             /* used by Crypt::Stream::RC4 */
-  rc4_state state;
-  int id;
-} *Crypt__Stream__RC4;
-
-typedef struct sober128_struct {        /* used by Crypt::Stream::Sober128 */
-  sober128_state state;
-  int id;
-} *Crypt__Stream__Sober128;
-
-typedef struct f9_struct {              /* used by Crypt::Mac::F9 */
-  f9_state state;
-  int id;
-} *Crypt__Mac__F9;
-
-typedef struct hmac_struct {            /* used by Crypt::Mac::HMAC */
-  hmac_state state;
-  int id;
-} *Crypt__Mac__HMAC;
-
-typedef struct omac_struct {            /* used by Crypt::Mac::OMAC */
-  omac_state state;
-  int id;
-} *Crypt__Mac__OMAC;
-
-typedef struct pelican_struct {         /* used by Crypt::Mac::Pelican */
-  pelican_state state;
-  int id;
-} *Crypt__Mac__Pelican;
-
-typedef struct pmac_struct {            /* used by Crypt::Mac::PMAC */
-  pmac_state state;
-  int id;
-} *Crypt__Mac__PMAC;
-
-typedef struct xcbc_struct {            /* used by Crypt::Mac::XCBC */
-  xcbc_state state;
-  int id;
-} *Crypt__Mac__XCBC;
-
-typedef struct poly1305_struct {        /* used by Crypt::Mac::Poly1305 */
-  poly1305_state state;
-  int id;
-} *Crypt__Mac__Poly1305;
-
-typedef struct blake2s_struct {         /* used by Crypt::Mac::BLAKE2s */
-  blake2smac_state state;
-  int id;
-} *Crypt__Mac__BLAKE2s;
-
-typedef struct blake2b_struct {         /* used by Crypt::Mac::BLAKE2b */
-  blake2bmac_state state;
-  int id;
-} *Crypt__Mac__BLAKE2b;
-
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
   symmetric_CBC state;
@@ -141,7 +60,6 @@ typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int padlen;
   int padding_mode;
   int direction;
-  int id;
 } *Crypt__Mode__CBC;
 
 typedef struct ecb_struct {             /* used by Crypt::Mode::ECB */
@@ -151,14 +69,12 @@ typedef struct ecb_struct {             /* used by Crypt::Mode::ECB */
   int padlen;
   int padding_mode;
   int direction;
-  int id;
 } *Crypt__Mode__ECB;
 
 typedef struct cfb_struct {             /* used by Crypt::Mode::CFB */
   int cipher_id, cipher_rounds;
   symmetric_CFB state;
   int direction;
-  int id;
 } *Crypt__Mode__CFB;
 
 typedef struct ctr_struct {             /* used by Crypt::Mode::CTR */
@@ -166,63 +82,54 @@ typedef struct ctr_struct {             /* used by Crypt::Mode::CTR */
   int ctr_mode_param;
   symmetric_CTR state;
   int direction;
-  int id;
 } *Crypt__Mode__CTR;
 
 typedef struct f8_struct {              /* used by Crypt::Mode::F8 */
   int cipher_id, cipher_rounds;
   symmetric_F8 state;
   int direction;
-  int id;
 } *Crypt__Mode__F8;
 
 typedef struct lrw_struct {             /* used by Crypt::Mode::LRW */
   int cipher_id, cipher_rounds;
   symmetric_LRW state;
   int direction;
-  int id;
 } *Crypt__Mode__LRW;
 
 typedef struct ofb_struct {             /* used by Crypt::Mode::OFB */
   int cipher_id, cipher_rounds;
   symmetric_OFB state;
   int direction;
-  int id;
 } *Crypt__Mode__OFB;
 
 typedef struct xts_struct {             /* used by Crypt::Mode::XTS */
   int cipher_id, cipher_rounds;
   symmetric_xts state;
   int direction;
-  int id;
 } *Crypt__Mode__XTS;
 
 typedef struct prng_struct {            /* used by Crypt::PRNG */
   prng_state state;
   struct ltc_prng_descriptor *desc;
   IV last_pid;
-  int id;
 } *Crypt__PRNG;
 
 typedef struct rsa_struct {             /* used by Crypt::PK::RSA */
   prng_state pstate;
   int pindex;
   rsa_key key;
-  int id;
 } *Crypt__PK__RSA;
 
 typedef struct dsa_struct {             /* used by Crypt::PK::DSA */
   prng_state pstate;
   int pindex;
   dsa_key key;
-  int id;
 } *Crypt__PK__DSA;
 
 typedef struct dh_struct {              /* used by Crypt::PK::DH */
   prng_state pstate;
   int pindex;
   dh_key key;
-  int id;
 } *Crypt__PK__DH;
 
 typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
@@ -230,7 +137,6 @@ typedef struct ecc_struct {             /* used by Crypt::PK::ECC */
   int pindex;
   ecc_key key;
   ltc_ecc_set_type dp;
-  int id;
 } *Crypt__PK__ECC;
 
 int str_add_leading_zero(char *str, int maxlen, int minlen) {
@@ -262,9 +168,81 @@ int mp_tohex_with_leading_zero(mp_int * a, char *str, int maxlen, int minlen) {
   return str_add_leading_zero(str, maxlen, minlen);
 }
 
+int _base16_encode(const unsigned char *in, unsigned long inlen, unsigned char *out, unsigned long *outlen)
+{
+   unsigned long i;
+   const char alphabet[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+
+   if (*outlen < inlen * 2) {
+      *outlen = inlen * 2;
+      return CRYPT_BUFFER_OVERFLOW;
+   }
+
+   for (i = 0; i < inlen; i++) {
+     out[i*2]   = (unsigned char)alphabet[in[i] >> 4];
+     out[i*2+1] = (unsigned char)alphabet[in[i] & 0xF];
+   }
+
+   *outlen = inlen * 2;
+   return CRYPT_OK;
+}
+
+size_t _find_start(const char *name, char *ltcname, size_t ltclen)
+{
+   size_t i, start = 0;
+   if (name == NULL || strlen(name) + 1 > ltclen) croak("FATAL: invalid name") ;
+   /* normalize */
+   for (i = 0; i < ltclen && name[i] > 0; i++) {
+     if (name[i] >= 'A' && name[i] <= 'Z') {
+       ltcname[i] = name[i] + 32; /* lowecase */
+     }
+     else if (name[i] == '_') {
+       ltcname[i] = '-';
+     }
+     else {
+       ltcname[i] = name[i];
+     }
+     if (name[i] == ':') start = i + 1;
+   }
+   return start;
+}
+
+int _find_hash(const char *name)
+{
+   char ltcname[100] = { 0 };
+   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+   /* special cases */
+   if (strcmp(ltcname + start, "ripemd128") == 0) return find_hash("rmd128");
+   if (strcmp(ltcname + start, "ripemd160") == 0) return find_hash("rmd160");
+   if (strcmp(ltcname + start, "ripemd256") == 0) return find_hash("rmd256");
+   if (strcmp(ltcname + start, "ripemd320") == 0) return find_hash("rmd320");
+   if (strcmp(ltcname + start, "tiger192")  == 0) return find_hash("tiger");
+   if (strcmp(ltcname + start, "chaes")     == 0) return find_hash("chc_hash");
+   if (strcmp(ltcname + start, "chc-hash")  == 0) return find_hash("chc_hash");
+   return find_hash(ltcname + start);
+}
+
+int _find_cipher(const char *name)
+{
+   char ltcname[100] = { 0 };
+   size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+   /* special cases */
+   if (strcmp(ltcname + start, "des-ede") == 0) return find_cipher("3des");
+   if (strcmp(ltcname + start, "saferp")  == 0) return find_cipher("safer+");
+   return find_cipher(ltcname + start);
+}
+
+int _find_prng(const char *name)
+{
+  char ltcname[100] = { 0 };
+  size_t start = _find_start(name, ltcname, sizeof(ltcname) - 1);
+  return find_prng(ltcname + start);
+}
+
 /* Math::BigInt::LTM related */
 typedef mp_int * Math__BigInt__LTM;
 STATIC SV * sv_from_mpi(mp_int *mpi) {
+  dTHX; /* fetch context */
   SV *obj = newSV(0);
   sv_setref_pv(obj, "Math::BigInt::LTM", (void*)mpi);
   return obj;
@@ -272,6 +250,7 @@ STATIC SV * sv_from_mpi(mp_int *mpi) {
 
 ltc_ecc_set_type* _ecc_set_dp_from_SV(ltc_ecc_set_type *dp, SV *curve)
 {
+  dTHX; /* fetch context */
   HV *h;
   SV *param, **pref;
   SV **sv_cofactor, **sv_prime, **sv_A, **sv_B, **sv_order, **sv_Gx, **sv_Gy;
@@ -348,316 +327,6 @@ BOOT:
     if(crypt_mp_init("ltm")   != CRYPT_OK)     { croak("FATAL: crypt_mp_init failed"); }
 
 SV *
-CryptX__encode_base64url(SV * in)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__decode_base64url(SV * in)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__encode_base64(SV * in)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64_encode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__decode_base64(SV * in)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base64_decode(in_data, (unsigned long)in_len, out_data, &out_len) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__encode_b32(SV *in, unsigned idx)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-        int id = -1;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        if (idx == 0) id = BASE32_RFC4648;
-        if (idx == 1) id = BASE32_BASE32HEX;
-        if (idx == 2) id = BASE32_ZBASE32;
-        if (idx == 3) id = BASE32_CROCKFORD;
-        if (id == -1) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)((8 * in_len + 4) / 5);
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__decode_b32(SV *in, unsigned idx)
-    CODE:
-    {
-        STRLEN in_len;
-        unsigned long out_len;
-        unsigned char *out_data, *in_data;
-        int id = -1;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        if (idx == 0) id = BASE32_RFC4648;
-        if (idx == 1) id = BASE32_BASE32HEX;
-        if (idx == 2) id = BASE32_ZBASE32;
-        if (idx == 3) id = BASE32_CROCKFORD;
-        if (id == -1) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, in_len);
-        if (in_len == 0) {
-          RETVAL = newSVpvn("", 0);
-        }
-        else {
-          out_len = (unsigned long)in_len;
-          RETVAL = NEWSV(0, out_len);
-          SvPOK_only(RETVAL);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
-            SvREFCNT_dec(RETVAL);
-            XSRETURN_UNDEF;
-          }
-          SvCUR_set(RETVAL, out_len);
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__increment_octets_le(SV * in)
-    CODE:
-    {
-        STRLEN len, i = 0;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, len);
-        if (len == 0) XSRETURN_UNDEF;
-
-        RETVAL = NEWSV(0, len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, len);
-        out_data = (unsigned char *)SvPVX(RETVAL);
-        Copy(in_data, out_data, len, unsigned char);
-        while (i < len) {
-          out_data[i]++;
-          if (0 != out_data[i]) break;
-          i++;
-        }
-        if (i == len) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: increment_octets_le overflow");
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__increment_octets_be(SV * in)
-    CODE:
-    {
-        STRLEN len, i = 0;
-        unsigned char *out_data, *in_data;
-
-        if (!SvPOK(in)) XSRETURN_UNDEF;
-        in_data = (unsigned char *)SvPVbyte(in, len);
-        if (len == 0) XSRETURN_UNDEF;
-
-        RETVAL = NEWSV(0, len);
-        SvPOK_only(RETVAL);
-        SvCUR_set(RETVAL, len);
-        out_data = (unsigned char *)SvPVX(RETVAL);
-        Copy(in_data, out_data, len, unsigned char);
-        while (i < len) {
-          out_data[len - 1 - i]++;
-          if (0 != out_data[len - 1 - i]) break;
-          i++;
-        }
-        if (i == len) {
-          SvREFCNT_dec(RETVAL);
-          croak("FATAL: increment_octets_be overflow");
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__radix_to_bin(char *in, int radix)
-    CODE:
-    {
-        STRLEN len;
-        unsigned char *out_data;
-        mp_int mpi;
-
-        if (in == NULL || strlen(in) == 0)      XSRETURN_UNDEF;
-        if (mp_init(&mpi) != CRYPT_OK)          XSRETURN_UNDEF;
-
-        if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
-          len = mp_unsigned_bin_size(&mpi);
-          RETVAL = NEWSV(0, len);
-          SvPOK_only(RETVAL);
-          SvCUR_set(RETVAL, len);
-          out_data = (unsigned char *)SvPVX(RETVAL);
-          mp_to_unsigned_bin(&mpi, out_data);
-          mp_clear(&mpi);
-        }
-        else {
-          XSRETURN_UNDEF;
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
-CryptX__bin_to_radix(SV *in, int radix)
-    CODE:
-    {
-        STRLEN len;
-        unsigned char *in_data;
-        char *out_data;
-        mp_int mpi, tmp;
-        mp_digit d;
-        int digits = 0;
-
-        if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
-        in_data = (unsigned char *) SvPVbyte(in, len);
-        if (len == 0) XSRETURN_UNDEF;
-
-        mp_init(&mpi);
-        if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
-          mp_init_copy(&tmp, &mpi);
-          while (mp_iszero(&tmp) == MP_NO) {
-            mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
-            digits++;
-          }
-          mp_clear(&tmp);
-
-          if (digits == 0) {
-            RETVAL = newSVpvn("", 0);
-            mp_clear(&mpi);
-          }
-          else {
-            RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
-            SvPOK_only(RETVAL);
-            out_data = SvPVX(RETVAL);
-            mp_toradix(&mpi, out_data, radix);
-            SvCUR_set(RETVAL, strlen(out_data));
-            mp_clear(&mpi);
-          }
-        }
-        else {
-          mp_clear(&mpi);
-          XSRETURN_UNDEF;
-        }
-    }
-    OUTPUT:
-        RETVAL
-
-SV *
 CryptX__ltc_build_settings()
     CODE:
         RETVAL = newSVpv(crypt_build_settings, 0);
@@ -675,6 +344,298 @@ int
 CryptX__ltc_mp_bits_per_digit()
     CODE:
         RETVAL = ltc_mp.bits_per_digit;
+    OUTPUT:
+        RETVAL
+
+MODULE = CryptX       PACKAGE = Crypt::Misc
+
+PROTOTYPES: DISABLE
+
+SV *
+_radix_to_bin(char *in, int radix)
+    CODE:
+    {
+        STRLEN len;
+        unsigned char *out_data;
+        mp_int mpi;
+
+        if (in == NULL) XSRETURN_UNDEF;
+        if (mp_init(&mpi) != CRYPT_OK) XSRETURN_UNDEF;
+        if (strlen(in) == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else if (mp_read_radix(&mpi, in, radix) == CRYPT_OK) {
+          len = mp_unsigned_bin_size(&mpi);
+          if (len == 0) {
+            RETVAL = newSVpvn("", 0);
+          }
+          else {
+            RETVAL = NEWSV(0, len); /* avoid zero! */
+            SvPOK_only(RETVAL);
+            SvCUR_set(RETVAL, len);
+            out_data = (unsigned char *)SvPVX(RETVAL);
+            mp_to_unsigned_bin(&mpi, out_data);
+          }
+        }
+        else {
+          RETVAL = newSVpvn(NULL, 0); /* undef */
+        }
+        mp_clear(&mpi);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+_bin_to_radix(SV *in, int radix)
+    CODE:
+    {
+        STRLEN len;
+        unsigned char *in_data;
+        char *out_data;
+        mp_int mpi, tmp;
+        mp_digit d;
+        int digits = 0;
+
+        if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, len);
+        mp_init_multi(&mpi, &tmp, NULL);
+        if (len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          if (mp_read_unsigned_bin(&mpi, in_data, (unsigned long)len) == CRYPT_OK) {
+            mp_copy(&mpi, &tmp);
+            while (mp_iszero(&tmp) == MP_NO) {
+              mp_div_d(&tmp, (mp_digit)radix, &tmp, &d);
+              digits++;
+            }
+            if (digits == 0) {
+              RETVAL = newSVpvn("", 0);
+            }
+            else {
+              RETVAL = NEWSV(0, digits + 2); /* +2 for sign and NUL byte */
+              SvPOK_only(RETVAL);
+              out_data = SvPVX(RETVAL);
+              mp_toradix(&mpi, out_data, radix);
+              SvCUR_set(RETVAL, strlen(out_data));
+            }
+          }
+          else {
+            RETVAL = newSVpvn(NULL, 0); /* undef */
+          }
+        }
+        mp_clear_multi(&tmp, &mpi, NULL);
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+encode_b64(SV * in)
+    ALIAS:
+        encode_b64u = 1
+    CODE:
+    {
+        int rv;
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)(4 * ((in_len + 2) / 3) + 1);
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (ix == 1)
+            rv = base64url_encode(in_data, (unsigned long)in_len, out_data, &out_len);
+          else
+            rv = base64_encode(in_data, (unsigned long)in_len, out_data, &out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+decode_b64(SV * in)
+    ALIAS:
+        decode_b64u = 1
+    CODE:
+    {
+        int rv;
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (ix == 1)
+            rv = base64url_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+          else
+            rv = base64_decode(in_data, (unsigned long)in_len, out_data, &out_len);
+          if (rv != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+encode_b32r(SV *in)
+    ALIAS:
+        encode_b32b = 1
+        encode_b32z = 2
+        encode_b32c = 3
+    CODE:
+    {
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (ix == 0) id = BASE32_RFC4648;
+        if (ix == 1) id = BASE32_BASE32HEX;
+        if (ix == 2) id = BASE32_ZBASE32;
+        if (ix == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
+        in_data = (unsigned char *) SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)((8 * in_len + 4) / 5);
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_encode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+decode_b32r(SV *in)
+    ALIAS:
+        decode_b32b = 1
+        decode_b32z = 2
+        decode_b32c = 3
+    CODE:
+    {
+        STRLEN in_len;
+        unsigned long out_len;
+        unsigned char *out_data, *in_data;
+        int id = -1;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (ix == 0) id = BASE32_RFC4648;
+        if (ix == 1) id = BASE32_BASE32HEX;
+        if (ix == 2) id = BASE32_ZBASE32;
+        if (ix == 3) id = BASE32_CROCKFORD;
+        if (id == -1) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, in_len);
+        if (in_len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          out_len = (unsigned long)in_len;
+          RETVAL = NEWSV(0, out_len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          if (base32_decode(in_data, (unsigned long)in_len, out_data, &out_len, id) != CRYPT_OK) {
+            SvREFCNT_dec(RETVAL);
+            XSRETURN_UNDEF;
+          }
+          SvCUR_set(RETVAL, out_len);
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+increment_octets_le(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, len);
+        if (len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          Copy(in_data, out_data, len, unsigned char);
+          while (i < len) {
+            out_data[i]++;
+            if (0 != out_data[i]) break;
+            i++;
+          }
+          if (i == len) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: increment_octets_le overflow");
+          }
+        }
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+increment_octets_be(SV * in)
+    CODE:
+    {
+        STRLEN len, i = 0;
+        unsigned char *out_data, *in_data;
+
+        if (!SvPOK(in)) XSRETURN_UNDEF;
+        in_data = (unsigned char *)SvPVbyte(in, len);
+        if (len == 0) {
+          RETVAL = newSVpvn("", 0);
+        }
+        else {
+          RETVAL = NEWSV(0, len); /* avoid zero! */
+          SvPOK_only(RETVAL);
+          SvCUR_set(RETVAL, len);
+          out_data = (unsigned char *)SvPVX(RETVAL);
+          Copy(in_data, out_data, len, unsigned char);
+          while (i < len) {
+            out_data[len - 1 - i]++;
+            if (0 != out_data[len - 1 - i]) break;
+            i++;
+          }
+          if (i == len) {
+            SvREFCNT_dec(RETVAL);
+            croak("FATAL: increment_octets_be overflow");
+          }
+        }
+    }
     OUTPUT:
         RETVAL
 

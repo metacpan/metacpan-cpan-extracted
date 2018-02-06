@@ -5,6 +5,9 @@ do { my $x = {
                                       }
                       },
        'develop' => {
+                      'recommends' => {
+                                        'Readonly' => '0'
+                                      },
                       'requires' => {
                                       'Devel::PPPort' => '3.23',
                                       'File::Spec' => '0',

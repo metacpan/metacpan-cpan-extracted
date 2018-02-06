@@ -2,13 +2,11 @@ package Crypt::Digest::SHAKE;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-
-sub new { my $class = shift; _new(@_) }
 
 sub addfile {
   my ($self, $file) = @_;

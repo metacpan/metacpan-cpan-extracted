@@ -1,0 +1,121 @@
+NAME
+
+    MARC::Schema - Specification of the MARC21 format
+
+SYNOPSIS
+
+        # in Perl
+        use MARC::Schema;
+    
+        my $record = {
+            _id    => 'fol05865967',
+            record => [
+                [ 'LDR', undef, undef, '_', '00661nam  22002538a 4500' ],
+                [ '001', undef, undef, '_', 'fol05865967' ],
+                [ '001', undef, undef, '_', 'field is not repeatable' ],
+                [   '245', '1', '0', 'a', 'Programming Perl /',
+                    'c', 'Larry Wall, Tom Christiansen & Jon Orwant.',
+                    'a', 'subfield is not repeatable',
+                    'x', 'unknown subfield',
+                ],
+                [ '999', undef, undef, '_', 'not a standard field']
+            ]
+        };
+        
+        # load default schema
+        my $schema = MARC::Schema->new();
+        
+        # load custom schema from file
+        my $schema = MARC::Schema->new({ file => share/marc-schema.json });
+    
+    
+        # load custom schema
+        my $schema = MARC::Schema->new(
+            {   fields => {
+                    '001' => { label => 'Control Number', repetable => 0 }
+                }
+            }
+        );
+        my @check = $schema->check($record);
+    
+        # via the command line
+        $ marcvalidate --file t/camel.mrc --type RAW
+
+DESCRIPTION
+
+    MARC::Schema defines a set of MARC21 fields and subfields to validate
+    Catmandu::MARC records. A schema is given as hash reference such as:
+
+        {   fields => {
+                LDR => {
+                    positions =>
+                        [ { position => '00-04', label => 'Record length' } ],
+                    repeatable => 0,
+                },
+                '001' => { label => 'Control Number', repeatable => 0 }
+            }
+        }
+
+    For a more detailed description of the (default) schema see MARC21
+    structure in JSON
+    <https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
+
+METHODS
+
+ check( $record [, %options ] )
+
+    Check whether a given "Catmandu::Importer::MARC" or "MARC::Parser::*"
+    <https://metacpan.org/search?q=%22MARC%3A%3AParser%22> record confirms
+    to the schema and return a list of detected violations. Possible
+    options include:
+
+    ignore_unknown_fields
+
+      Don't report fields not included in the schema.
+
+    ignore_unknown_subfields
+
+      Don't report subfields not included in the schema.
+
+    Errors are given as list of hash reference with keys label, message,
+    repeatable, subfields and tag of the violated field. If key subfields
+    is set, the field contained invalid subfields. The error field message
+    contains a human-readable error message which for each violated field
+    and/or subfield;
+
+ check_field( $field [, %options ] )
+
+    Check whether a MARC21 field confirms to the schema. Use same options
+    as method check.
+
+AUTHOR
+
+    Johann Rolschewski <jorol@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2018- Johann Rolschewski
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Catmandu::Validator
+
+    JSON::Schema
+
+    PICA::Schema
+
+    MARC::Lint
+
+ACKNOWLEDGEMENT
+
+    MARC::Schema uses the MARC21 schema developed by Péter Király
+    <https://github.com/pkiraly> as default. For more information see
+    "Metadata assessment for MARC records"
+    <https://github.com/pkiraly/metadata-qa-marc> and "MARC21 structure in
+    JSON" <https://pkiraly.github.io/2018/01/28/marc21-in-json/>.
+

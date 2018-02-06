@@ -41,6 +41,7 @@ void OS_get_table(){
   char cstime[20];
   char flag[20];
   char sflag[20];
+  char pctcpu[20];
 
   static char format[128];
   char cmndline[ARG_MAX];
@@ -80,9 +81,11 @@ void OS_get_table(){
      argv = kvm_getargv(kd, (const struct kinfo_proc *) &(procs[i]) , 0);
      if (argv) {
        int j = 0;
-       while (argv[j] && strlen(cmndline) <= ARG_MAX) {
+       while (argv[j] && strlen(cmndline)+strlen(argv[j])+1 <= ARG_MAX) {
          strcat(cmndline, argv[j]);
-         strcat(cmndline, " ");
+	 if (argv[j+1]) {
+	   strcat(cmndline, " ");
+	 }
          j++;
        }
      }
@@ -134,6 +137,24 @@ void OS_get_table(){
 
      oncpu = procs[i].ki_oncpu == 0xff ? &PL_sv_undef : newSViv(procs[i].ki_oncpu);
 
+     /* get the current CPU percent usage for this process      */
+     /* copied from FreeBSD sources bin/ps/ps.c and friends     */
+     #define fxtofl(fixpt) ((double)(fixpt) / fscale)
+     int fscale;
+     size_t oldlen;
+     fixpt_t ccpu;
+     oldlen = sizeof(ccpu);
+     if (sysctlbyname("kern.ccpu", &ccpu, &oldlen, NULL, 0) == -1)
+             ppt_croak("cannot get kern.ccpu");
+     if (sysctlbyname("kern.fscale", &fscale, &oldlen, NULL, 0) == -1)
+             ppt_croak("cannot get kern.fscale");
+     double pcpu;
+     if (procs[i].ki_swtime == 0 || (procs[i].ki_flag & P_INMEM) == 0)
+             pcpu = 0.0;
+     else
+             pcpu = (100.0 * fxtofl(procs[i].ki_pctcpu) / (1.0 - exp(procs[i].ki_swtime * log(fxtofl(ccpu)))));
+     sprintf(pctcpu,"%.1f",pcpu);
+
      bless_into_proc( format,
                       Fields,
 
@@ -157,6 +178,7 @@ void OS_get_table(){
                       ctime,
 		      cutime,
 		      cstime,
+                      pctcpu,
 
                       procs[i].ki_wmesg,
                       state,

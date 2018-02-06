@@ -68,31 +68,31 @@
    "provides" : {
       "CPAN::Testers::Backend" : {
          "file" : "lib/CPAN/Testers/Backend.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::Base" : {
          "file" : "lib/CPAN/Testers/Backend/Base.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::Fix::TesterNoname" : {
          "file" : "lib/CPAN/Testers/Backend/Fix/TesterNoname.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::Migrate::MetabaseCache" : {
          "file" : "lib/CPAN/Testers/Backend/Migrate/MetabaseCache.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::Migrate::MetabaseUsers" : {
          "file" : "lib/CPAN/Testers/Backend/Migrate/MetabaseUsers.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::ProcessReports" : {
          "file" : "lib/CPAN/Testers/Backend/ProcessReports.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "CPAN::Testers::Backend::ViewMetabaseCache" : {
          "file" : "lib/CPAN/Testers/Backend/ViewMetabaseCache.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -107,7 +107,7 @@
          "web" : "https://github.com/cpan-testers/cpantesters-backend"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "James E Keenan <jkeenan@cpan.org>",

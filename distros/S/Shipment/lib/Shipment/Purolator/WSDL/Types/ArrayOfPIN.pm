@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ArrayOfPIN;
-$Shipment::Purolator::WSDL::Types::ArrayOfPIN::VERSION = '2.03';
+$Shipment::Purolator::WSDL::Types::ArrayOfPIN::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Shipment::Purolator::WSDL::Types::ArrayOfPIN
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 DESCRIPTION
 
@@ -98,7 +98,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

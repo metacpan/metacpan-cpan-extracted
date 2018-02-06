@@ -1,5 +1,15 @@
 Revision history for Perl extension roles
 
+0.03 2018-01-31
+    - when composing roles, we will attempt
+      to load them in an optimistic manner
+    - inspecting roles can now be done with
+      the roles::DOES function.
+
+    [DEPENDENCIES]
+    - added Module::Runtime, to handle the
+      loading of roles
+
 0.02 2017-10-20
     [ NOTE ]
     - last release should be completely

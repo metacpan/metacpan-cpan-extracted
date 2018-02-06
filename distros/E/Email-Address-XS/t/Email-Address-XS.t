@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (c) 2015-2017 by Pali <pali@cpan.org>
+# Copyright (c) 2015-2018 by Pali <pali@cpan.org>
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Email-Address-XS.t'
@@ -19,7 +19,7 @@ use Carp;
 $Carp::Internal{'Test::Builder'} = 1;
 $Carp::Internal{'Test::More'} = 1;
 
-use Test::More tests => 453;
+use Test::More tests => 474;
 use Test::Builder;
 
 local $SIG{__WARN__} = sub {
@@ -283,6 +283,45 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
 		is($address->address(), 'julia@ficdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method new() with UNICODE characters';
+		my $address = Email::Address::XS->new(phrase => "\x{2606} \x{2602}", user => "\x{263b} \x{265e}", host => "\x{262f}.\x{262d}", comment => "\x{2622} \x{20ac}");
+		ok($address->is_valid(), $subtest);
+		is($address->phrase(), "\x{2606} \x{2602}", $subtest);
+		is($address->user(), "\x{263b} \x{265e}", $subtest);
+		is($address->host(), "\x{262f}.\x{262d}", $subtest);
+		is($address->address(), "\"\x{263b} \x{265e}\"\@\x{262f}.\x{262d}", $subtest);
+		is($address->comment(), "\x{2622} \x{20ac}", $subtest);
+		is($address->name(), "\x{2606} \x{2602}", $subtest);
+		is($address->format(), "\"\x{2606} \x{2602}\" <\"\x{263b} \x{265e}\"\@\x{262f}.\x{262d}> (\x{2622} \x{20ac})", $subtest);
+	}
+
+	{
+		my $subtest = 'test method new() with Latin1 characters';
+		my $address = Email::Address::XS->new(user => "L\x{e1}tin1", host => "L\x{e1}tin1");
+		ok($address->is_valid(), $subtest);
+		is($address->phrase(), undef, $subtest);
+		is($address->user(), "L\x{e1}tin1", $subtest);
+		is($address->host(), "L\x{e1}tin1", $subtest);
+		is($address->address(), "L\x{e1}tin1\@L\x{e1}tin1", $subtest);
+		is($address->comment(), undef, $subtest);
+		is($address->name(), "L\x{e1}tin1", $subtest);
+		is($address->format(), "L\x{e1}tin1\@L\x{e1}tin1", $subtest);
+	}
+
+	{
+		my $subtest = 'test method new() with mix of Latin1 and UNICODE characters';
+		my $address = Email::Address::XS->new(user => "L\x{e1}tin1", host => "\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404}");
+		ok($address->is_valid(), $subtest);
+		is($address->phrase(), undef, $subtest);
+		is($address->user(), "L\x{e1}tin1", $subtest);
+		is($address->host(), "\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404}", $subtest);
+		is($address->address(), "L\x{e1}tin1\@\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404}", $subtest);
+		is($address->comment(), undef, $subtest);
+		is($address->name(), "L\x{e1}tin1", $subtest);
+		is($address->format(), "L\x{e1}tin1\@\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404}", $subtest);
 	}
 
 }
@@ -1079,7 +1118,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 
 	is(
 		format_email_groups("\x{2764} \x{2600}" => [ Email::Address::XS->new(phrase => "\x{2606} \x{2602}", user => "\x{263b} \x{265e}", host => "\x{262f}.\x{262d}", comment => "\x{2622} \x{20ac}") ]),
-		"\"\x{2764} \x{2600}\": \"\x{2606} \x{2602}\" <\"\x{263b} \x{265e}\"@\x{262f}.\x{262d}> (\x{2622} \x{20ac});",
+		"\"\x{2764} \x{2600}\": \"\x{2606} \x{2602}\" <\"\x{263b} \x{265e}\"\@\x{262f}.\x{262d}> (\x{2622} \x{20ac});",
 		'test function format_email_groups() that preserves unicode characters and UTF-8 status flag',
 	);
 
@@ -1090,8 +1129,14 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	);
 
 	is(
+		format_email_groups("ASCII" => [ Email::Address::XS->new(user => "L\x{e1}tin1", host => "L\x{e1}tin1") ]),
+		"ASCII: L\x{e1}tin1\@L\x{e1}tin1;",
+		'test function format_email_groups() that correctly compose Latin1 string from Latin1 parts',
+	);
+
+	is(
 		format_email_groups("ASCII" => [ Email::Address::XS->new(user => "L\x{e1}tin1", host => "\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404}") ]),
-		"ASCII: L\x{e1}tin1@\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404};",
+		"ASCII: L\x{e1}tin1\@\x{1d414}\x{1d40d}\x{1d408}\x{1d402}\x{1d40e}\x{1d403}\x{1d404};",
 		'test function format_email_groups() that correctly compose UNICODE string from ASCII, Latin1 and UNICODE parts',
 	);
 
@@ -1245,7 +1290,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	);
 
 	is_deeply(
-		[ parse_email_groups("\"\x{2764} \x{2600}\": \"\x{2606} \x{2602}\" <\"\x{263b} \x{265e}\"@\x{262f}.\x{262d}> (\x{2622} \x{20ac});") ],
+		[ parse_email_groups("\"\x{2764} \x{2600}\": \"\x{2606} \x{2602}\" <\"\x{263b} \x{265e}\"\@\x{262f}.\x{262d}> (\x{2622} \x{20ac});") ],
 		[ "\x{2764} \x{2600}" => [ Email::Address::XS->new(phrase => "\x{2606} \x{2602}", user => "\x{263b} \x{265e}", host => "\x{262f}.\x{262d}", comment => "\x{2622} \x{20ac}") ] ],
 		'test function parse_email_groups() that preserve unicode characters and UTF-8 status flag',
 	);
@@ -1287,28 +1332,28 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 {
 	my $undef = undef;
 	is_deeply(
-		[ parse_email_groups("string1\x00string2") ],
-		[ undef, [ Email::Address::XS->new(user => 'string1') ] ],
+		[ parse_email_groups("\"string1\x00string2\"") ],
+		[ undef, [ Email::Address::XS->new(phrase => "string1\x00string2") ] ],
 		'test function parse_email_groups() on string with nul character',
 	);
 	is(
-		with_warning { format_email_groups($undef => [ Email::Address::XS->new(phrase => "string1\x00string2", user => 'user', host => 'host') ]) },
-		'string1 <user@host>',
+		format_email_groups($undef => [ Email::Address::XS->new(phrase => "string1\x00string2", user => 'user', host => 'host') ]),
+		"\"string1\x00string2\" <user\@host>",
 		'test function format_email_groups() with nul character in phrase',
 	);
 	is(
-		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => "string1\x00string2", host => 'host') ]) },
-		'string1@host',
+		format_email_groups($undef => [ Email::Address::XS->new(user => "string1\x00string2", host => 'host') ]),
+		"\"string1\x00string2\"\@host",
 		'test function format_email_groups() with nul character in user part of address',
 	);
 	is(
-		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => "string1\x00string2") ]) },
-		'user@string1',
+		format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => "string1\x00string2") ]),
+		"user\@string1\x00string2",
 		'test function format_email_groups() with nul character in host part of address',
 	);
 	is(
-		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => 'host', comment => "string1\x00string2") ]) },
-		'user@host (string1)',
+		format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => 'host', comment => "string1\x00string2") ]),
+		"user\@host (string1\x00string2)",
 		'test function format_email_groups() with nul character in comment',
 	);
 }

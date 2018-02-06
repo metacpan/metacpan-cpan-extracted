@@ -7,11 +7,11 @@ Win32::Shortkeys - A shortkeys perl script for windows
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut
 
@@ -80,7 +80,7 @@ sub run {
 sub parse_file {
     my $self     = shift;
     my $encoding = $self->{config}->get_file_encoding;
-    $encoding = ( $encoding ? $encoding : "UTF8" );
+    $encoding = ( $encoding ? $encoding : "UTF-8" );
     my $path = $self->{config}->get_file_path
         or confess("path to shortkeys xml file undefined");
    
@@ -89,7 +89,7 @@ sub parse_file {
 
     #binmode(STDOUT, ":encoding(utf8)");
     my $p =
-        XML::Parser->new( ErrorContext => 2, ProtocolEncoding => 'UTF-8' );
+        XML::Parser->new( ErrorContext => 2, ProtocolEncoding => $encoding );
 
     #	'Default' => \&MySubs::def,
     #    'Final' => \&MySubs::final
@@ -439,7 +439,7 @@ Since the synopsis above is short, the main things to describe are in the file p
 It must follow the Config::YAML::Tiny syntax. Mine looks like
 
     file_path: shortkeys_utf8.xml
-    file_encoding: UTF8
+    file_encoding: UTF-8
     use_ctrl_v: 1
     load_key: VK_HOME
     quit_key: VK_F12

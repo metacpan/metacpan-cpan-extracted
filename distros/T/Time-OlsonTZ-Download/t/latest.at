@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 use Params::Classify qw(is_blessed is_ref is_string);
-use Test::More tests => 57;
+use Test::More tests => 61;
 
 BEGIN { use_ok "Time::OlsonTZ::Download"; }
 
@@ -99,11 +99,16 @@ foreach(keys %$cs) {
 }
 is $failures, 0, "country_selection well formed";
 
-my $df = $ld->data_files;
-ok is_ref($df, "ARRAY"), "data_files well formed";
+my $df = $ld->source_data_files;
+ok is_ref($df, "ARRAY"), "source_data_files well formed";
 ok @$df >= 1, "at least one data file";
-ok !(grep { !(is_string($_) && m#\A/#) } @$df), "data_files well formed";
-ok !(grep { !m#\A\Q$dir\E/[A-Za-z0-9\-\+_]{1,14}\z# } @$df), "data files in right place";
+ok !(grep { !(is_string($_) && m#\A/#) } @$df), "source_data_files well formed";
+ok !(grep { !m#\A\Q$dir\E/[A-Za-z0-9\-\+_.]{1,14}\z# } @$df), "source data files in right place";
+$df = $ld->zic_input_files;
+ok is_ref($df, "ARRAY"), "zic_input_files well formed";
+ok @$df >= 1, "at least one data file";
+ok !(grep { !(is_string($_) && m#\A/#) } @$df), "zic_input_files well formed";
+ok !(grep { !m#\A\Q$dir\E/[A-Za-z0-9\-\+_.]{1,14}\z# } @$df), "zic input files in right place";
 my $zx = $ld->zic_exe;
 ok is_string($zx), "zic_exe well formed";
 like $zx, qr#\A/#, "zic_exe well formed";

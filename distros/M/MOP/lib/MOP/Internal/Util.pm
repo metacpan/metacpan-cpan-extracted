@@ -13,7 +13,7 @@ use Scalar::Util        (); # I think I use blessed somewhere in here ...
 use Devel::OverloadInfo (); # Sometimes I need to know about overloading
 use Devel::Hook         (); # for scheduling UNITCHECK blocks ...
 
-our $VERSION   = '0.13';
+our $VERSION   = '0.14';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## ------------------------------------------------------------------
@@ -437,7 +437,7 @@ MOP::Internal::Util - For MOP Internal Use Only
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -449,7 +449,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stevan Little.
+This software is copyright (c) 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

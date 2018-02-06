@@ -29,9 +29,10 @@ no_index:
 provides:
   Test::Time::HiRes:
     file: lib/Test/Time/HiRes.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Test::More: '0.96'
+  Test::Time: '0'
   Time::HiRes: '0'
   perl: '5.008'
   strict: '0'
@@ -40,5 +41,5 @@ resources:
   bugtracker: https://github.com/mjemmeson/Test-Time-HiRes/issues
   homepage: https://github.com/mjemmeson/Test-Time-HiRes
   repository: https://github.com/mjemmeson/Test-Time-HiRes.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

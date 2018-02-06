@@ -18,7 +18,7 @@ use Log::Log4perl qw/:easy/;
 
 # ABSTRACT: C source scan (C::Scan alternative)
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 # PODNAME: cscan
 
@@ -288,7 +288,7 @@ cscan - C source scan (C::Scan alternative)
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 AUTHOR
 

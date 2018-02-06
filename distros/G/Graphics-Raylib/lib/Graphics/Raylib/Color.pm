@@ -3,20 +3,27 @@ use warnings;
 package Graphics::Raylib::Color;
 
 # ABSTRACT: Colors for use with Graphics::Raylib
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
+use Convert::Color;
+use Scalar::Util 'blessed';
 require Exporter;
 our @ISA = qw(Exporter);
 our %EXPORT_TAGS = (colors => [qw( LIGHTGRAY GRAY DARKGRAY LIGHTGREY GREY DARKGREY YELLOW GOLD
                                    ORANGE PINK RED MAROON GREEN LIME DARKGREEN SKYBLUE BLUE
                                    DARKBLUE PURPLE VIOLET DARKPURPL BEIGE BROWN DARKBROWN WHITE
-                                   BLACK BLANK MAGENTA RAYWHITE)]
+                                   BLACK BLANK MAGENTA RAYWHITE)],
+                    gradients  => [qw( REDISH GREENISH BLUISH CYANISH MAGENTAISH YELLOWISH WHITISH  GRAYISH GREYISH) ]
                    );
-Exporter::export_ok_tags('colors');
+Exporter::export_ok_tags(qw(colors gradients));
 {
     my %seen;
-    push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
+    push @{$EXPORT_TAGS{all}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach qw(colors);
+}
+{
+    my %seen;
+    push @{$EXPORT_TAGS{debug}}, grep {!$seen{$_}++} @{$EXPORT_TAGS{$_}} foreach keys %EXPORT_TAGS;
 }
 
 =pod
@@ -30,7 +37,7 @@ Graphics::Raylib::Color - Use predefined Raylib colors or define your own
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -59,12 +66,14 @@ As a color is basically a 32-bit integer (RGBA) in raylib, the constructors rgba
 
 =item rgba($red, $green, $blue, $alpha)
 
-Constructs a new Graphics::Raylib::Color instance.
+Constructs a new C<Graphics::Raylib::Color> out of 8-bit (0-255) components.
 
 =cut
 
+sub clamp { my $n = shift; return $n > 0xFF ? 0xFF : $n < 0x00 ? 0x00 : $n }
+
 sub rgba {
-    my $self = \pack("C4", @_);
+    my $self = \pack "C4", map { clamp $_ } @_;
 
     bless $self, 'Graphics::Raylib::XS::Color';
     return $self;
@@ -72,7 +81,7 @@ sub rgba {
 
 =item rgb($red, $green, $blue)
 
-Constructs a new Graphics::Raylib::Color instance out of an opaque color.
+Constructs a new C<Graphics::Raylib::Color> instance out of an opaque color.
 Calls C<rgba> with C<$alpha = 255>.
 
 =cut
@@ -127,6 +136,45 @@ sub color {
     package Graphics::Raylib::XS::Color;
     sub color { return unpack("N", ${$_[0]}); }
 }
+
+=item new($string, [$alpha = 255])
+
+Returns a new C<Color> that represent the color specified by the C<string>. This string should be prefixed by the name of the color space to which it applies. For example
+
+    rgb:RED,GREEN,BLUE
+    rgb8:RRGGBB
+    rgb16:RRRRGGGGBBBB
+    hsv:HUE,SAT,VAL
+    hsl:HUE,SAT,LUM
+    cmy:CYAN,MAGENTA,YELLOW
+    cmyk:CYAN,MAGENTA,YELLOW,KEY
+
+    vga:NAME
+    vga:INDEX
+
+    x11:NAME
+
+This leverages L<Convert::Color> under the hood. Refer to its documentation for more information.
+
+=cut
+
+sub new {
+    my ($color, $alpha) = @_;
+    $color = Convert::Color->new($color) unless blessed($color) and $color->isa("Convert::Color");
+    rgba(map({ 255 * $_ } $color->rgb), $alpha // 255);
+}
+
+=item hsv($hue, $sat, $val, [$alpha = 255])
+
+Returns a new C<Color> out of HSV components.
+
+=cut
+
+sub hsv {
+    my ($hue, $sat, $val, $alpha) = @_;
+    new("hsv:$hue,$sat,$val", $alpha);
+}
+
 
 =back
 
@@ -224,6 +272,20 @@ sub rainbow {
         return Graphics::Raylib::Color::rgb($r, $g, $b);
     }
 }
+
+# for easy gradient creation when debugging
+# 1D gradients
+sub REDISH     { rgb(shift() * 255, 0, 0) }
+sub GREENISH   { rgb(0, shift() * 255, 0) }
+sub BLUISH     { rgb(0, 0, shift() * 255) }
+sub GRAYISH    { my $c = shift; rgb($c, $c, $c) }
+sub GREYISH    { goto &GRAYISH; }
+# 2D gradients
+sub CYANISH    { rgb(0, shift() * 255, shift() * 255) }
+sub MAGENTAISH { rgb(shift() * 255, 0, shift() * 255) }
+sub YELLOWISH  { rgb(shift() * 255, shift() * 255, 0) }
+# 3D gradients
+sub WHITISH    { rgb(shift() * 255, shift() * 255, shift() * 255) }
 
 1;
 

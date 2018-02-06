@@ -33,7 +33,7 @@ use Astro::Coords;
 use base qw/ Astro::Catalog::IO::ASCII /;
 
 $DEBUG = 0;
-$VERSION = '4.31';
+$VERSION = '4.32';
 
 =begin __PRIVATE_METHODS__
 
@@ -291,11 +291,11 @@ sub _read_catalog {
   # USNO-A2, 2MASS, Bright Star Catalogues and SuperCOSMOS. Maps the
   # Astro::Catalog::Star methods to different columns names
   my %datadict = (
-		  field => [ qw/ field /, qw/ fldno / ],
-		  quality => [ qw/ qual /, qw/ qflg /, qw/ quality / ],
-		  distance => [ "d'" ],
-		  posangle => [ qw/ pa /, qw/ _r / ],
-		 );
+                  field => [ qw/ field /, qw/ fldno / ],
+                  quality => [ qw/ qual /, qw/ qflg /, qw/ quality / ],
+                  distance => [ "d'" ],
+                  posangle => [ qw/ pa /, qw/ _r / ],
+                 );
 
 
   # precalculate EQUINOX (type for Astro::Coords at the moment
@@ -565,10 +565,6 @@ sub _parse_line {
 =back
 
 =end __PRIVATE_METHODS__
-
-=head1 REVISION
-
- $Id: TST.pm,v 1.14 2006/03/16 00:15:13 cavanagh Exp $
 
 =head1 FORMAT
 

@@ -14,14 +14,25 @@ use DBD::SQLite;
 use DBD::Multi;
 use Data::Dumper;
 use Sys::SigAction qw( timeout_call );
+use Test::TCP ();
 
 eval { require DBD::Pg; };
 if ( $@ ) {  plan skip_all => 'DBD::Pg unavailable'; exit; }
 
+# Start a TCP server that will provide timing-out Pg server
+my $host = '127.0.0.1';
+my $server = Test::TCP->new(
+    listen => 1,
+    host => $host,
+    code => sub { while (1) { sleep 10; } }
+);
+if (!$server) { plan skip_all => 'Could not start a TCP server'; exit; }
+
 plan tests => 7;
 pass 'DBD::Pg is installed';
 
-my @PG_CONNECT = ('dbi:Pg:dbname=fake;host=192.0.2.1', 'fakeuser','fakepass') ;
+my @PG_CONNECT = ('dbi:Pg:dbname=fake;host=' . $host . ';port=' . $server->port,
+    'fakeuser','fakepass') ;
 my $SQ_TABLE = "$Bin/one.db";
 cleanup();
 
@@ -71,6 +82,7 @@ ok(
 is($val, 1, "Query failed over to the second DB");
 
 cleanup();
+$server->stop();
 
 sub cleanup {
     -e $SQ_TABLE and unlink( $SQ_TABLE );

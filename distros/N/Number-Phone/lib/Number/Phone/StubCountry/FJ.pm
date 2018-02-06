@@ -22,45 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[35-9]',
-                  'pattern' => '(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'leading_digits' => '[2-9]',
+                  'format' => '$1 $2'
                 },
                 {
-                  'leading_digits' => '0',
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
                 'fixed_line' => '
           (?:
-            3[0-5]|
-            6[25-7]|
-            8[58]
-          )\\d{5}
+            3[0-5]\\d|
+            6(?:
+              03|
+              [25-7]\\d
+            )|
+            8[58]\\d
+          )\\d{4}
         ',
-                'specialrate' => '',
                 'toll_free' => '0800\\d{7}',
+                'specialrate' => '',
+                'geographic' => '
+          (?:
+            3[0-5]\\d|
+            6(?:
+              03|
+              [25-7]\\d
+            )|
+            8[58]\\d
+          )\\d{4}
+        ',
                 'mobile' => '
           (?:
-            5[018]|
-            [79]\\d|
+            [279]\\d|
+            45|
+            5[01568]|
             8[034679]
           )\\d{5}
         ',
-                'voip' => '',
                 'personal_number' => '',
-                'geographic' => '
-          (?:
-            3[0-5]|
-            6[25-7]|
-            8[58]
-          )\\d{5}
-        ',
+                'voip' => '',
                 'pager' => ''
               };
 

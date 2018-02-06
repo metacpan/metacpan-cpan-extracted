@@ -10,5 +10,6 @@ t/01_core.t
 t/02_hires.t
 t/03_anyevent.t
 t/04_sleep.t
+t/05_hires.t
 META.yml
 MANIFEST

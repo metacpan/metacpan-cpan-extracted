@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw( looks_like_number );
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our @EXPORT_OK = qw(
     colorbar
@@ -17,6 +17,7 @@ our @EXPORT_OK = qw(
     print_colored_text
     color_table
     add_mapping
+    colormap_names
 );
 
 my $color_mapping = {};
@@ -183,6 +184,12 @@ sub colormap {
 
 }
 
+sub colormap_names {
+
+    return sort keys %$color_mapping;
+
+}
+
 sub color2rgb {
     my ($color) = @_;
 
@@ -261,7 +268,7 @@ Term::Colormap - Colormaps for ANSI 256 Color Terminals!
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -284,6 +291,7 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
     print_colored_text
     color_table
     add_mapping
+    colormap_names
 
 =head1 SUBROUTINES/METHODS
 
@@ -353,6 +361,12 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
 
     color_table('my_colors');
 
+=head2 colormap_names
+
+    Returns the list of available colormaps.
+
+    my @available_colormaps = colormap_names();
+
 =head1 AVAILABLE COLORMAPS
 
     rainbow - 32 colors : Red -> Orange -> Yellow -> Green -> Cyan -> Blue -> Magenta
@@ -374,6 +388,10 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
     red-pink-yellow        - 16 colors : Red -> Pink -> Yellow
 
     green-orange-pink-blue - 16 colors : Green -> Orange -> Pink -> Blue
+
+=head1 What do they look like?
+
+    Run the show_colormap script to display them in your terminal.
 
 =head1 AUTHOR
 

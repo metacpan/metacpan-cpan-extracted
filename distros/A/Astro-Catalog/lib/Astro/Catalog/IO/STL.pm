@@ -33,7 +33,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/$VERSION $DEBUG/;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -260,10 +260,6 @@ sub _write_catalog {
 }
 
 =back
-
-=head1 REVISION
-
- $Id: STL.pm,v 1.3 2005/09/13 02:12:50 cavanagh Exp $
 
 =head1 FORMAT
 

@@ -1,7 +1,9 @@
 MODULE = CryptX         PACKAGE = Crypt::PK::ECC
 
+PROTOTYPES: DISABLE
+
 Crypt::PK::ECC
-_new()
+_new(Class)
     CODE:
     {
         int rv;
@@ -205,7 +207,7 @@ key2hash(Crypt::PK::ECC self)
         not_used = hv_store(rv_hash, "size", 4, newSViv(esize), 0);
         /* type */
         not_used = hv_store(rv_hash, "type", 4, newSViv(self->key.type), 0);
-        if (not_used) not_used = NULL; /* just silence the warning: variable 'not_used' set but not used */
+        LTC_UNUSED_PARAM(not_used);
         RETVAL = newRV_noinc((SV*)rv_hash);
     OUTPUT:
         RETVAL
@@ -278,7 +280,7 @@ export_key_raw(Crypt::PK::ECC self, char * type)
         RETVAL
 
 SV *
-_encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
+encrypt(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
     CODE:
     {
         int rv, hash_id;
@@ -289,7 +291,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
-        hash_id = find_hash(hash_name);
+        hash_id = _find_hash(hash_name);
         if (hash_id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
         rv = ecc_encrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
@@ -301,7 +303,7 @@ _encrypt(Crypt::PK::ECC self, SV * data, char * hash_name)
         RETVAL
 
 SV *
-_decrypt(Crypt::PK::ECC self, SV * data)
+decrypt(Crypt::PK::ECC self, SV * data)
     CODE:
     {
         int rv;
@@ -320,20 +322,27 @@ _decrypt(Crypt::PK::ECC self, SV * data)
         RETVAL
 
 SV *
-_sign(Crypt::PK::ECC self, SV * data)
+sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
     ALIAS:
-        _sign_rfc7518 = 1
+        sign_message         = 1
+        sign_message_rfc7518 = 2
     CODE:
     {
-        int rv;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned char buffer[1024];
-        unsigned long buffer_len = 1024;
+        int rv, id;
+        unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
+        unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
+        STRLEN data_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
-
-        if (ix == 1) {
+        if (ix == 1 || ix == 2) {
+          id = _find_hash(hash_name);
+          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
+          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          data_ptr = tmp;
+          data_len = tmp_len;
+        }
+        if (ix == 2) {
           rv = ecc_sign_hash_rfc7518(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
                              &self->pstate, self->pindex,
                              &self->key);
@@ -350,23 +359,30 @@ _sign(Crypt::PK::ECC self, SV * data)
         RETVAL
 
 int
-_verify(Crypt::PK::ECC self, SV * sig, SV * data)
+verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "SHA1")
     ALIAS:
-        _verify_rfc7518 = 1
+        verify_message         = 1
+        verify_message_rfc7518 = 2
     CODE:
     {
-        int rv, stat;
-        unsigned char *data_ptr=NULL;
-        STRLEN data_len=0;
-        unsigned char *sig_ptr=NULL;
-        STRLEN sig_len=0;
+        int rv, stat, id;
+        unsigned char tmp[MAXBLOCKSIZE], *data_ptr = NULL, *sig_ptr = NULL;
+        unsigned long tmp_len = MAXBLOCKSIZE;
+        STRLEN data_len = 0, sig_len = 0;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
-
+        if (ix == 1 || ix == 2) {
+          id = _find_hash(hash_name);
+          if (id == -1) croak("FATAL: find_hash failed for '%s'", hash_name);
+          rv = hash_memory(id, data_ptr, (unsigned long)data_len, tmp, &tmp_len);
+          if (rv != CRYPT_OK) croak("FATAL: hash_memory failed: %s", error_to_string(rv));
+          data_ptr = tmp;
+          data_len = tmp_len;
+        }
         RETVAL = 1;
         stat = 0;
-        if (ix == 1) {
+        if (ix == 2) {
           rv = ecc_verify_hash_rfc7518(sig_ptr, (unsigned long)sig_len, data_ptr, (unsigned long)data_len, &stat, &self->key);
         }
         else {

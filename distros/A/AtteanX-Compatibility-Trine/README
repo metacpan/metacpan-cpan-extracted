@@ -29,6 +29,9 @@ BUGS
     <https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues>.
 
 SEE ALSO
+    For a compatibility layer the other direction (i.e. backwards
+    compatibility), see RDF::TrineX::Compatibility::Attean.
+
 AUTHOR
     Kjetil Kjernsmo <kjetilk@cpan.org>.
 

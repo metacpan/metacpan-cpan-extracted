@@ -3,6 +3,7 @@ abstract: 'kritika.io integration'
 author:
   - 'Viacheslav Tykhanovskyi, C<viacheslav.t@gmail.com>'
 build_requires:
+  Test::Deep: '0'
   Test::Fatal: '0'
   Test::MonkeyMock: '0'
   Test::More: '0.98'
@@ -10,8 +11,8 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
-license: artistic_2
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -29,7 +30,7 @@ no_index:
 provides:
   App::Kritika:
     file: lib/App/Kritika.pm
-    version: '0.04'
+    version: '0.05'
   App::Kritika::Settings:
     file: lib/App/Kritika/Settings.pm
 requires:
@@ -41,6 +42,6 @@ resources:
   bugtracker: https://github.com/kritikaio/app-kritika/issues
   homepage: https://github.com/kritikaio/app-kritika
   repository: git://github.com/kritikaio/app-kritika.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:VTI
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

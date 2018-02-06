@@ -6,7 +6,7 @@ use overload fallback => 1, '@{}' => \&_get_tie;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # Innards: {
 #	get => sub { ... }, # sub that gets the list
@@ -97,7 +97,7 @@ HTML::DOM::NodeList::Magic - Magical node list class for HTML::DOM
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

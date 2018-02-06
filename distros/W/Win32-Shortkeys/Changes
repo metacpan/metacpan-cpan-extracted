@@ -6,5 +6,8 @@ Revision history for Perl module Win32::Shortkeys
 0.03 2017.11.29
      z as a command abreviation is used to call usleep and 
      to induce a waiting time
+0.04 2018.02.02
+      ProtocolEncoding arg when parser is created in Ripper->catch
+      ProtocolEncoding set to the arg received in Shortkeys->parse_file
 
 

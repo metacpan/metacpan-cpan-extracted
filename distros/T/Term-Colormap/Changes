@@ -1,5 +1,10 @@
 Revision history for Term-Colormap
 
+0.16   Sun Feb 4 04:13:12 UTC 2017
+    * Updated pod wih references to show_colormap scripts.
+    * Show all available colormaps.
+    * Added colormap_names().
+
 0.15   Wed Oct 26 03:15:47 UTC 2017
     * Fixed pod Term::Colormap::Brewer
     * Added link to Available Brewer Colormaps on README.md

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::RewriteVersion::Transitional; # git description: v0.007-12-ge819041
+package Dist::Zilla::Plugin::RewriteVersion::Transitional; # git description: v0.008-7-g50b6f0b
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ease the transition to [RewriteVersion] in your distribution
 # KEYWORDS: plugin version rewrite munge module
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::RewriteVersion';
@@ -19,6 +19,11 @@ use namespace::autoclean;
 
 has fallback_version_provider => (
     is => 'ro', isa => 'Str',
+    lazy => 1,
+    default => sub {
+        shift->log('tried to provide a version, but fallback_version_provider configuration is missing');
+        return '';
+    },
 );
 
 has _fallback_version_provider_args => (
@@ -81,8 +86,17 @@ around provide_version => sub
     my $version = $self->$orig(@_);
     return $version if defined $version;
 
-    $self->log([ 'no version found in environment or file; falling back to %s', $self->fallback_version_provider ]);
-    return $self->_fallback_version_provider_obj->provide_version;
+    # if we have no fallback_version_provider, ether they forgot to set it (probably in a bundle that uses us), or
+    # the version is already being provided some other way (hardcoded in dist.ini?) and we shouldn't even be here.
+    # Bail out gracefully and give something else the chance to provide the version and then we can use our
+    # transitional logic to add a $VERSION after release!
+    if (my $fallback_version_provider = $self->fallback_version_provider)
+    {
+        $self->log([ 'no version found in environment or file; falling back to %s', $fallback_version_provider ]);
+        return $self->_fallback_version_provider_obj->provide_version;
+    }
+
+    return;
 };
 
 my $warned_underscore;
@@ -117,7 +131,7 @@ Dist::Zilla::Plugin::RewriteVersion::Transitional - Ease the transition to [Rewr
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

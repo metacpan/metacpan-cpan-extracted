@@ -23,7 +23,7 @@ use Module::Build;
 
 my $mb = Module::Build->current();
 
-my @files = @{$mb->notes('versioned_filenames_aref')};
+my @files = @{$mb->notes('config/versioned_filenames_aref')};
 
 #_or_
 ### untaint

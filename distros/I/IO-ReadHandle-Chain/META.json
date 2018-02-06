@@ -1,10 +1,10 @@
 {
-   "abstract" : "Chain several sources through a single file read handle",
+   "abstract" : "unknown",
    "author" : [
       "Louis Strous <lstrous@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.0",
+   "version" : "v1.2.1",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

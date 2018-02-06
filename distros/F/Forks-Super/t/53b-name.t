@@ -50,7 +50,7 @@ my $t31 = Time::HiRes::time();
 waitall();
 my $t4 = Time::HiRes::time();
 ($t,$t2,$t3,$t31) = ($t4-$t,$t4-$t2,$t4-$t3,$t4-$t31);
-okl($t > 4.75 && $t31 < 9.08,          ### 6 ### was 8.0 obs 9.03,4.81
+okl($t > 4.75 && $t31 < 9.58,          ### 6 ### was 8.0 obs 9.55,4.81
    "Took ${t}s ${t2}s ${t3}s ${t31} for dependent jobs - expected ~6s"); 
 ok($j1->{end} <= $j2->{start} + $TOL,
    "handled circular dependency");

@@ -4,8 +4,13 @@ kritika - integrate with kritika.io
 
 # SYNOPSIS
 
+    # Full file analysis
     kritika lib/MyFile.pm
-    kritika --head master lib/OtherFile.pm
+
+    # Report only *new* violations
+    kritika --diff master lib/OtherFile.pm
+    kritika --diff #31 lib/OtherFile.pm
+    kritika --diff 451e77f3 lib/OtherFile.pm
 
 # DESCRIPTION
 
@@ -39,7 +44,8 @@ This is based on the shipped with `git` pre-push hook example.
 
             branch="$(git rev-parse --abbrev-ref HEAD)"
 
-            git diff --name-only $range | kritika --head "$branch" || exit 1
+            git diff --name-only $range | kritika --diff-branch master \
+                --branch "$branch" --revision "$local_sha" || exit 1
         fi
     done
 

@@ -22,14 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [];
 
 my $validators = {
-                'geographic' => '528[89]\\d{5}',
-                'personal_number' => '',
                 'pager' => '',
+                'voip' => '5924[01]\\d{4}',
                 'mobile' => '
           (?:
             6(?:
@@ -37,15 +36,17 @@ my $validators = {
               8[0-247-9]
             )|
             7(?:
-              [07][07]|
-              6[12]
+              0[067]|
+              6[1267]|
+              7[07]
             )
           )\\d{6}
         ',
+                'personal_number' => '',
                 'toll_free' => '80\\d{7}',
                 'fixed_line' => '528[89]\\d{5}',
                 'specialrate' => '(89\\d{7})',
-                'voip' => '5924[01]\\d{4}'
+                'geographic' => '528[89]\\d{5}'
               };
 my %areanames = (
   212520 => "Casablanca",
@@ -124,7 +125,10 @@ my %areanames = (
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
   
       return $self if ($self->is_valid());
-      $number =~ s/(^0)//g;
+      {
+        no warnings 'uninitialized';
+        $number =~ s/^(?:0)//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
     return $self->is_valid() ? $self : undef;
 }

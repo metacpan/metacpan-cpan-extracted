@@ -3,10 +3,11 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
+use Scalar::Util 'blessed';
 use Graphics::Raylib::Color;
 
 use Import::Into;
@@ -21,7 +22,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -47,20 +48,20 @@ version 0.012
     }
 
 
-
-
 =head1 raylib
 
 raylib is highly inspired by Borland BGI graphics lib and by XNA framework. Allegro and SDL have also been analyzed for reference.
 
-NOTE for ADVENTURERS: raylib is a programming library to learn videogames programming; no fancy interface, no visual helpers, no auto-debugging... just coding in the most pure spartan-programmers way. Are you ready to learn? Jump to code examples!.
+NOTE for ADVENTURERS: raylib is a programming library to learn videogames programming; no fancy interface, no visual helpers, no auto-debugging... just coding in the most pure spartan-programmers way. Are you ready to learn? Jump to L<code examples|http://www.raylib.com/examples.html> or L<games|http://www.raylib.com/games.html>!.
 
 
 =head1 IMPLEMENTATION
 
-This is a Perlish wrapper around L<Graphics::Raylib::XS>, but not yet feature complete.
+This is a Perlish wrapper around L<Graphics::Raylib::XS>, but not yet feature complete. You can import L<Graphics::Raylib::XS> for any functions not yet exposed perlishly. Check out the C<examples/> directory for examples on how to do so.
 
-You can import L<Graphics::Raylib::XS> for any functions not yet exposed perlishly. Scroll down for an example.
+=head1 TESTING
+
+If you want to skip graphical tests when installing, define C<NO_GRAPHICAL_TEST> in the environment. These tests are also skipped automatically if no graphic device is available.
 
 =head1 AUTOMATIC IMPORT
 
@@ -94,13 +95,15 @@ sub import {
 
 Constructs the Graphics::Raylib window. C<$title> is optional and defaults to C<$0>. Resources allocated for the window are freed when the handle returned by C<window> goes out of scope.
 
+If no graphic device is available it returns an C<undef> value.
+
 =cut
 
 sub window {
     my $class = shift;
 
     my $self = { width => shift, height => shift, title => shift // $0, @_ };
-    InitWindow($self->{width}, $self->{height}, $self->{title});
+    InitWindow($self->{width}, $self->{height}, $self->{title}) or return;
     SetTargetFPS($self->{fps}) if defined $self->{fps};
     ClearBackground($self->{background}) if defined $self->{background};
 
@@ -115,7 +118,7 @@ If C<$fps> is supplied, sets the frame rate to that value. Returns the frame rat
 =cut
 
 sub fps {
-    shift if $_[0]->isa(__PACKAGE__);
+    shift if blessed($_[0]) && $_[0]->isa(__PACKAGE__);
 
     my $fps = shift;
     if (defined $fps) {
@@ -133,7 +136,7 @@ Clears the background to C<$color>. C<$color> defaults to C<Graphics::Raylib::Co
 =cut
 
 sub clear {
-    shift if $_[0]->isa(__PACKAGE__);
+    shift if blessed($_[0]) && $_[0]->isa(__PACKAGE__);
 
     ClearBackground(shift // Graphics::Raylib::Color::RAYWHITE);
 }
@@ -150,9 +153,10 @@ sub exiting {
 
     WindowShouldClose();
 }
+
 =item draw($coderef)
 
-Begins drawing, calls C<$coderef->()> and ends drawing. See examples.
+Begins drawing, calls C<< $coderef->() >> and ends drawing. See examples.
 
 =cut
 
@@ -168,6 +172,32 @@ sub draws(@) {
     BeginDrawing();
     for (@_) { $_->draw }
     EndDrawing();
+}
+
+=item draw3D($coderef)
+
+Begins 3D drawing, calls C<$coderef->()> and ends drawing. See examples.
+
+=cut
+
+sub draw3D(&) {
+    my $block = shift;
+
+    BeginDrawing();
+    $block->();
+    EndDrawing();
+}
+
+
+sub timestamp {
+    return strftime('%Y-%m-%dT%H.%M.%S', gmtime(time))
+}
+
+sub screenshot {
+    shift if blessed($_[0]) && $_[0]->isa(__PACKAGE__);
+    my $file = shift // ('ScreenShot-' . timestamp . '.png');
+
+    TakeScreenshot($file);
 }
 
 sub DESTROY {
@@ -254,11 +284,17 @@ sub DESTROY {
 
 =for html <iframe src="https://giphy.com/embed/3ov9jGoKzwnt4l4UQo" width="458" height="480" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/graphicsraylib-3ov9jGoKzwnt4l4UQo">via GIPHY</a></p>
 
+=head2 More?
+
+Check out the L<examples/|https://github.com/athreef/Graphics-Raylib/tree/master/examples> directory in the distribution or L<at raylib|https://github.com/raysan5/raylib/tree/master/examples>. Also check out the L<games in the repository|https://github.com/raysan5/raylib>!
+
 =head1 GIT REPOSITORY
 
 L<http://github.com/athreef/Graphics-Raylib>
 
 =head1 SEE ALSO
+
+L<http://www.raylib.com>
 
 L<Graphics::Raylib::Shape>
 
@@ -271,9 +307,15 @@ Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 Ahmad Fatoum
+Copyright (C) 2017-2018 Ahmad Fatoum
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 RAYLIB LICENSE
+
+This is an unofficial wrapper of L<http://www.raylib.com>.
+
+raylib is Copyright (c) 2013-2016 Ramon Santamaria and available under the terms of the zlib/libpng license. Refer to C<XS/LICENSE.md> for full terms.
 
 =cut

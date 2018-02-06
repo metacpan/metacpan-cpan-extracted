@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-AssetPack-Pipe-ElmLang
 
+0.4 2018-02-03T15:00:55-0500
+  - run elm-make when any elm source file is changed
+  
 0.3 2018-01-29T22:21:26-0500
  - Fixed debug mode flag
 

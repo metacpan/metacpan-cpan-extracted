@@ -2,10 +2,10 @@ use Test::More;
 
 use Hazy;
 use lib '.';
-
+use File::Path qw/make_path remove_tree/;
 subtest 'process' => sub {
     my $new_dir = sprintf "meh/%s", int( rand(10000000) );
-    mkdir $new_dir;
+    make_path($new_dir);
 
     Hazy->new(
         read_dir  => 'hazy',
@@ -20,12 +20,9 @@ subtest 'process' => sub {
     close $after;
 
     my $expected_css = '.foo{color:#eee;font-size:10px}.thing{color:#fff;font-size:10px}';
-    is( $content, $expected_css, "expected output - $expected_html" );
+    is( $content, $expected_css, "expected output - $expected_css" );
 
-    unlink (sprintf "t/%s/testing.css", $new_dir);
-    unlink $file;
-    rmdir "t/$new_dir";
-    rmdir "t/meh";
+    remove_tree("t/meh");
 };
 
 done_testing();

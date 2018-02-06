@@ -1,0 +1,45 @@
+---
+abstract: "It's yet another DMM sdk."
+author:
+  - ([$floor_id],\%params)
+build_requires:
+  Test2::V0: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-YDMM
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WebService::YDMM:
+    file: lib/WebService/YDMM.pm
+    version: '0.02'
+requires:
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  URI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/AnaTofuZ/p5-webservice-YDMM/issues
+  homepage: https://github.com/AnaTofuZ/p5-webservice-YDMM
+  repository: git://github.com/AnaTofuZ/p5-webservice-YDMM.git
+version: '0.02'
+x_authority: cpan:ANATOFUZ
+x_contributors:
+  - 'AnaTofuZ <anatofuz@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

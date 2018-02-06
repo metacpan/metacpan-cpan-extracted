@@ -9,6 +9,7 @@ use File::Copy::Recursive qw( rcopy );
 use YAML;
 use File::LibMagic;
 use Archive::Extract;
+use DBI;
 
 our $exit_status;
 our $stdout;
@@ -22,6 +23,13 @@ When qr/^I run "([^\"]*)"$/, func($c) {
   $exit_status = system "($command) >tmp.out 2>tmp.err";
   $stdout = read_file('tmp.out');
   $stderr = read_file('tmp.err');
+};
+
+When qr/^I run "([^\"]*)" on database "([^\"]*)"$/, func($c) {
+  my $statement = $1;
+  my $db = $2;
+  my @a = DBI->connect("dbi:SQLite:$db")->selectall_array($statement);
+  $stdout = join("\n", map { join("|", @$_) } @a), "\n";
 };
 
 Then qr/^the output must match "([^\"]*)"$/, func($c) {
@@ -78,6 +86,10 @@ Given qr/^I am in (.+)$/, func($c) {
 
 Then qr/^analizo must emit a warning matching "([^\"]*)"$/, func($c) {
   like($stderr, qr/$1|\Q$1\E/);
+};
+
+Then qr/^analizo must not emit a warning matching "([^\"]*)"$/, func($c) {
+  unlike($stderr, qr/$1|\Q$1\E/);
 };
 
 Then qr/^analizo must report that "([^\"]*)" is part of "([^\"]*)"$/, func($c) {

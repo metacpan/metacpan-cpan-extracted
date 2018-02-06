@@ -1,5 +1,10 @@
 Revision history for HTML::DOM
 
+0.058   2 February, 2018
+        Bug fix: When a <button> element is clicked, its value is now
+        included in the form data even if it has no value. Previously,
+        valueless buttons would be omitted.
+
 0.057   10 July, 2016
         Bug fix:  $doc->base now returns the URL of the page if it is
         a data URL, instead of just ‘data:’.

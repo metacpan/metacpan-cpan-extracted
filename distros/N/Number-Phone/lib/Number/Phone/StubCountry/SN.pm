@@ -22,20 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200236;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[379]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[379]'
                 },
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '8',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
+                'personal_number' => '',
                 'mobile' => '
           7(?:
             [06-8]\\d|
@@ -43,28 +46,6 @@ my $validators = {
             90
           )\\d{6}
         ',
-                'toll_free' => '800\\d{6}',
-                'fixed_line' => '
-          3(?:
-            0(?:
-              1[0-2]|
-              80
-            )|
-            282|
-            3(?:
-              8[1-9]|
-              9[3-9]
-            )|
-            611
-          )\\d{5}
-        ',
-                'specialrate' => '(81[02468]\\d{6})|(88[4689]\\d{6})',
-                'voip' => '
-          39[01]\\d{6}|
-          3392\\d{5}|
-          93330\\d{4}
-        ',
-                'personal_number' => '',
                 'geographic' => '
           3(?:
             0(?:
@@ -79,7 +60,28 @@ my $validators = {
             611
           )\\d{5}
         ',
-                'pager' => ''
+                'specialrate' => '(81[02468]\\d{6})|(88[4689]\\d{6})',
+                'fixed_line' => '
+          3(?:
+            0(?:
+              1[0-2]|
+              80
+            )|
+            282|
+            3(?:
+              8[1-9]|
+              9[3-9]
+            )|
+            611
+          )\\d{5}
+        ',
+                'toll_free' => '800\\d{6}',
+                'pager' => '',
+                'voip' => '
+          39[01]\\d{6}|
+          3392\\d{5}|
+          93330\\d{4}
+        '
               };
 my %areanames = (
   221338 => "Dakar",

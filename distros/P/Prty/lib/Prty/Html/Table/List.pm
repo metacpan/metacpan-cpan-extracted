@@ -4,7 +4,7 @@ use base qw/Prty::Html::Table::Base/;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 # -----------------------------------------------------------------------------
 
@@ -280,7 +280,7 @@ sub html {
 
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

@@ -7,9 +7,9 @@ Astro::Catalog::Query::SIMBAD - A query request to the SIMBAD database
 =head1 SYNOPSIS
 
   $sim = new Astro::Catalog::Query::SIMBAD( RA        => $ra,
-					    Dec       => $dec,
-					    Radius    => $radius,
-					    Target    => $target,
+                                            Dec       => $dec,
+                                            Radius    => $radius,
+                                            Target    => $target,
                                            );
 
   my $catalog = $sim->querydb();
@@ -42,7 +42,7 @@ use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 
 
 =begin __PRIVATE_METHODS__
@@ -84,35 +84,35 @@ sub _get_allowed_options {
           dec => 'dec',
           object => 'Ident',
           radmax => 'Radius',
-	  nout => "output.max",
-	  bibyear1 => "Bibyear1",
-	  bibyear2 => "Bibyear2",
-	  _protocol => "protocol",
-	  _nbident => "NbIdent",
-	  _catall => "o.catall",
-	  _mesdisp => "output.mesdisp",
+          nout => "output.max",
+          bibyear1 => "Bibyear1",
+          bibyear2 => "Bibyear2",
+          _protocol => "protocol",
+          _nbident => "NbIdent",
+          _catall => "o.catall",
+          _mesdisp => "output.mesdisp",
 
-	  radunits => "Radius.unit", # arcsec, arcmin or deg
+          radunits => "Radius.unit", # arcsec, arcmin or deg
 
-	  # These should not be published
-	  # Since we need to switch to Astro::Coords
-	  _coordframe => "CooFrame",  # FK5 or FK4
-	  _coordepoch => "CooEpoch",  # 2000
-	  _coordequi  => "CooEqui",   # 2000
+          # These should not be published
+          # Since we need to switch to Astro::Coords
+          _coordframe => "CooFrame",  # FK5 or FK4
+          _coordepoch => "CooEpoch",  # 2000
+          _coordequi  => "CooEqui",   # 2000
 
-	  _frame1 => "Frame1",
-	  _equi1 => "Equi1",
-	  _epoch1 => "Epoch1",
+          _frame1 => "Frame1",
+          _equi1 => "Equi1",
+          _epoch1 => "Epoch1",
 
-	  _frame2 => "Frame2",
-	  _equi2 => "Equi2",
-	  _epoch2 => "Epoch2",
+          _frame2 => "Frame2",
+          _equi2 => "Equi2",
+          _epoch2 => "Epoch2",
 
-	  _frame3 => "Frame3",
-	  _equi3 => "Equi3",
-	  _epoch3 => "Epoch3",
+          _frame3 => "Frame3",
+          _equi3 => "Equi3",
+          _epoch3 => "Epoch3",
 
-	  );
+          );
 }
 
 =item B<_get_default_options>
@@ -127,39 +127,39 @@ sub _get_default_options {
            ra => undef,
            dec => undef,
            object => undef,
-	   radmax => 0.1,
-	   radunits => "arcmin", # For consistency
-	   nout => "all",
+           radmax => 0.1,
+           radunits => "arcmin", # For consistency
+           nout => "all",
 
-	   _protocol => "html",
-	   _coordepoch => "2000",
-	   _coordequi  => "2000",
-	   _coordframe => "FK5",
-	   _nbident    => "around",
-	   _nbident    => "around",
-	   _catall     => "on",
-	   _mesdisp    => "A",
+           _protocol => "html",
+           _coordepoch => "2000",
+           _coordequi  => "2000",
+           _coordframe => "FK5",
+           _nbident    => "around",
+           _nbident    => "around",
+           _catall     => "on",
+           _mesdisp    => "A",
 
-	   bibyear1    => 1983,
-	   bibyear2    => 2003,
+           bibyear1    => 1983,
+           bibyear2    => 2003,
 
-	   # Frame 1, 2 and 3
-	   # Frame 1 FK5 2000/2000
-	   _frame1      => "FK5",
-	   _equi1       => "2000.0",
-	   _epoch1      => "2000.0",
+           # Frame 1, 2 and 3
+           # Frame 1 FK5 2000/2000
+           _frame1      => "FK5",
+           _equi1       => "2000.0",
+           _epoch1      => "2000.0",
 
-	   # Frame 2 FK4 1950/1950
-	   _frame2      => "FK4",
-	   _equi2       => "1950.0",
-	   _epoch2      => "1950.0",
+           # Frame 2 FK4 1950/1950
+           _frame2      => "FK4",
+           _equi2       => "1950.0",
+           _epoch2      => "1950.0",
 
-	   # Frame 3 Galactic
-	   _frame3      => "G",
-	   _equi3       => "2000.0",
-	   _epoch3      => "2000.0",
+           # Frame 3 Galactic
+           _frame3      => "G",
+           _equi3       => "2000.0",
+           _epoch3      => "2000.0",
 
-	  );
+          );
 }
 
 =item B<_parse_query>
@@ -230,7 +230,7 @@ sub _parse_query {
     my $start_index = index( $separated[0], q/"/ );
     my $last_index = rindex( $separated[0], q/"/ );
     my $url = substr( $separated[0], $start_index+1,
-		      $last_index-$start_index-1);
+                      $last_index-$start_index-1);
 
     # push it into the object
     $star->moreinfo( $url );
@@ -286,11 +286,11 @@ sub _parse_query {
 
     # Store the coordinates
     $star->coords( new Astro::Coords( name => $name,
-				      ra => $ra,
-				      dec => $dec,
-				      type => "J2000",
-				      units => "s",
-				    ));
+                                      ra => $ra,
+                                      dec => $dec,
+                                      type => "J2000",
+                                      units => "s",
+                                    ));
 
     # SPECTRAL TYPE
     # -------------
@@ -334,23 +334,19 @@ sub _translate_one_to_one {
   my $self = shift;
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
-	  map { $_, undef }(qw/
-			    bibyear1 bibyear2 radunits
-			    _protocol _catall _mesdisp _nbident
-			    _coordepoch _coordequi _coordframe
-			    _epoch1 _frame1 _equi1
-			    _epoch2 _frame2 _equi2
-			    _epoch3 _frame3 _equi3
-			    /)
-	 );
+          map { $_, undef }(qw/
+                            bibyear1 bibyear2 radunits
+                            _protocol _catall _mesdisp _nbident
+                            _coordepoch _coordequi _coordframe
+                            _epoch1 _frame1 _equi1
+                            _epoch2 _frame2 _equi2
+                            _epoch3 _frame3 _equi3
+                            /)
+         );
 }
 
 
 =end __PRIVATE_METHODS__
-
-=head1 REVISION
-
- $Id: SIMBAD.pm,v 1.2 2003/09/25 11:38:50 aa Exp $
 
 =head1 SEE ALSO
 

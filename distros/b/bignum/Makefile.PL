@@ -9,13 +9,20 @@ my %WriteMakefileArgs =
    'NAME'               => 'bignum',
    'VERSION_FROM'       => 'lib/bignum.pm',
    'AUTHOR'             => 'Peter John Acklam <pjacklam@gmail.com>',
-   'MIN_PERL_VERSION'   => 5.006,
+   'MIN_PERL_VERSION'   => 5.010,
+   'CONFIGURE_REQUIRES' => {
+                            'ExtUtils::MakeMaker' => 6.64,
+                           },
+   'BUILD_REQUIRES'     => {
+                            'ExtUtils::MakeMaker' => 6.64,
+                           },
    'PREREQ_PM'          => {
-                            #'ExtUtils::MakeMaker' => 6.58,
-                            'Test::More'          => 0.47,
                             'Math::BigInt'        => 1.999718,
                             'Math::BigRat'        => 0.12,
                             #'Math::BigInt::Lite'  => 0.09,      # optional
+                           },
+   'TEST_REQUIRES'      => {
+                            'Test::More'          => 0.47,
                            },
    'LICENSE'            => 'perl_5',
    'LIBS'               => [''],        # e.g., '-lm'

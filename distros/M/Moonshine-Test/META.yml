@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,9 @@ no_index:
 provides:
   Moonshine::Test:
     file: lib/Moonshine/Test.pm
-    version: '0.14'
+    version: '0.16'
 requires:
-  Acme::AsciiEmoji: '0.02'
+  Acme::AsciiEmoji: '0.11'
   B: '0'
   Exporter: '0'
   Params::Validate: '0'
@@ -37,5 +37,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Moonshine-Test.git
-version: '0.14'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

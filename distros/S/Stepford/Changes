@@ -1,3 +1,15 @@
+0.005000 2018-01-31
+
+- Stepford is not alpha. It is used for serious things. We removed the
+  alpha warning.
+- Stepford::Role::Step::FileGenerator now accepts MooseX::Types::Path::Tiny
+  types in addition to MooseX::Types::Path::Class types for files.
+- The unused and undocumented Stepford::Types::Internal::ArrayOfFiles type
+  was removed.
+- Graph::Easy is now used to generate the string representation of a
+  Stepford::Graph. PR by José Joaquín Atria. GitHub #35.
+
+
 0.004001 2017-02-14
 
 - Fixed an issue where Stepford would fail if $_ was modified by a

@@ -24,7 +24,7 @@ use constant {
 
 use Exporter 5.57 'import';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 our @EXPORT_OK = qw'
 	INDEX_SIZE_ERR             
 	DOMSTRING_SIZE_ERR         
@@ -68,7 +68,7 @@ HTML::DOM::Exception - The Exception interface for HTML::DOM
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

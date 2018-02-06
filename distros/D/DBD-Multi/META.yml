@@ -8,7 +8,7 @@ build_requires:
   Test::Exception: '0.21'
   Test::More: '0'
   Test::Pod: '1.14'
-  Test::Pod::Coverage: '1.04'
+  Test::TCP: '2.19'
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
@@ -21,19 +21,19 @@ name: DBD-Multi
 provides:
   DBD::Multi:
     file: lib/DBD/Multi.pm
-    version: '1.01'
+    version: '1.02'
   DBD::Multi::Handler:
     file: lib/DBD/Multi.pm
-    version: '1.01'
+    version: '1.02'
   DBD::Multi::db:
     file: lib/DBD/Multi.pm
-    version: '1.01'
+    version: '1.02'
   DBD::Multi::dr:
     file: lib/DBD/Multi.pm
-    version: '1.01'
+    version: '1.02'
   DBD::Multi::st:
     file: lib/DBD/Multi.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   Class::Accessor::Fast: '0.19'
   DBI: '0'
@@ -43,5 +43,5 @@ requires:
 resources:
   bugtracker: https://github.com/dwright/DBD-Multi/issues
   repository: https://github.com/dwright/DBD-Multi.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

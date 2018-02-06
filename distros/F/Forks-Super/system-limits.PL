@@ -17,7 +17,7 @@ use warnings;
 use Config;
 use POSIX;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 my $limits_file = $ARGV[0] || "t/out/limits.$^O.$]";
 my $limits2 = $ARGV[1] || "t/out/limits.$^O";
@@ -191,7 +191,8 @@ sub get_Time_HiRes_tolerance {
 	$max=$diff if $max<$diff;
     }
     if ($max > 0) {
-	print STDOUT "Observed time on this system skipping backwards by ${max}s.\n";
+	print STDOUT
+            "Observed time on this system skipping backwards by ${max}s.\n";
     } else {
         print STDOUT "No timing anomalies observed on this system.\n";
     }
@@ -375,7 +376,8 @@ sub explore_sync_options {
 
     if (eval {
 	# exercise IPC::Semaphore
-	no warnings 'prototype','redefine';
+	no warnings 'prototype';
+        no warnings 'redefine';
 	require IPC::SysV;
 	require IPC::Semaphore;
 	IPC::SysV->import(qw(IPC_PRIVATE S_IRUSR S_IWUSR IPC_CREAT IPC_NOWAIT));
@@ -444,7 +446,7 @@ sub signame_to_signum {
 # alarm is needed for systems where SIGALRM cannot interrupt
 # a system call in a grandchild process
 #
-# RT#118730 - maybe MacOS/darwin should use the alt alarm
+# RT#118474 - maybe MacOS/darwin should use the alt alarm
 sub explore_alternate_alarm {
     if (defined $ENV{PREFER_ALT_ALARM}) {
         write_limits( prefer_alt_alarm => $ENV{PREFER_ALT_ALARM}+0 );
@@ -561,7 +563,8 @@ sub probe_ssh_test_env {
     my $ENV_HOST = $ENV{HOSTNAME} || 'xhxhxhxh';
     chomp(my $hostname = qx(hostname));
     $hostname ||= 'knknknknknk';
-    my $ip = eval "use Sys::HostAddr;1" ? Sys::HostAddr->new->main_ip : "299.1.1.1";
+    my $ip = eval "use Sys::HostAddr;1" 
+             ? Sys::HostAddr->new->main_ip : "299.1.1.1";
 
     foreach my $host ('$ENV_HOST', '$ip', 'localhost', '$hostname') {
         foreach my $user ('$ENV_USER','') {
@@ -724,9 +727,3 @@ t/out/limits.$^O file:
    ncpu
    maxfork
    system
-
-
-RT#118474 - report that all tests about timeouts fail on darwin.
-    Would darwin benefit from the "alternate alarm" that we
-    started using on bsd?
-

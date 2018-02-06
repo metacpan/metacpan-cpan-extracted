@@ -34,6 +34,7 @@ foreach (0..$SIZE) {
 my $gen = mpdl \@data;
 
 my $g = Graphics::Raylib->window($CELL_SIZE*$SIZE, $CELL_SIZE*$SIZE);
+plan skip_all => 'No graphic device' if !$g or defined $ENV{NO_GRAPHICAL_TEST} or defined $ENV{NO_GRAPHICAL_TESTS};
 
 $g->fps($HZ);
 
@@ -77,4 +78,4 @@ while (!$g->exiting && $i < $GENERATIONS)
 
 is $i, $GENERATIONS;
 
-done_testing;
+done_testing

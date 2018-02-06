@@ -1,4 +1,4 @@
-use Forks::Super 'bg_eval', ':test';
+use Forks::Super qw(:test bg_eval);
 use Test::More tests => 10;
 use Time::HiRes 'time';
 use strict;
@@ -36,7 +36,8 @@ my ($foo, $bar, $baz);
     my $t3 = time;
     ok(!$@, 'method call from bg_eval return val ok')
         or diag '$@(',__LINE__,') was ', $@;
-    ok($t3-$t1 > 8, '... and is not slow');
+    ok($t3-$t1 > 8, '... and is not slow')
+        or diag "eval time: ",$t3-$t1,"s, expected ~10s";
     ok($foo == 42, '... and returns the expected result');
     eval { $bar = $ooo->bar(0) };
     my $t4 = time;

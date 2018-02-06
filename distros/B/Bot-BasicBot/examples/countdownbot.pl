@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 =head1 NAME
 
 countdownbot - a bot that will announce the time till an event
@@ -9,7 +11,6 @@ announce how long until that date. I wrote this to annoy Arthur.
 
 =cut
 
-#!/usr/bin/perl
 use warnings;
 use strict;
 

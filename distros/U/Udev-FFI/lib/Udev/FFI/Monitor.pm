@@ -165,3 +165,61 @@ sub DESTROY {
 
 
 1;
+
+
+
+__END__
+
+
+
+=head1 NAME
+
+Udev::FFI::Monitor
+
+=head1 SYNOPSIS
+
+    use Udev::FFI;
+    
+    my $udev = Udev::FFI->new() or
+        die "Can't create Udev::FFI object: $@";
+    
+    my $monitor = $udev->new_monitor() or
+        die "Can't create udev monitor: $@.\n";
+    
+    $monitor->filter_by_subsystem_devtype('usb');
+    
+    $monitor->start();
+    
+    for(;;) {
+        my $device = $monitor->poll(); # blocking read
+    
+        print 'ACTION: '.$device->get_action()."\n";
+        print 'SYSNAME: '.$device->get_sysname()."\n";
+        print 'DEVPATH: '.$device->get_devpath()."\n";
+    }
+
+=head1 METHODS
+
+=head2 set_receive_buffer_size ( BYTES )
+
+=head2 filter_by_subsystem_devtype ( SUBSYSTEM [, DEVTYPE] )
+
+=head2 filter_by_tag ( TAG )
+
+=head2 filter_update ()
+
+=head2 filter_remove ()
+
+=head2 start ()
+
+=head2 poll ( [TIMEOUT] )
+
+=head2 is_started ()
+
+=head2 get_udev ()
+
+=head1 SEE ALSO
+
+L<Udev::FFI> main Udev::FFI documentation
+
+=cut

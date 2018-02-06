@@ -1,5 +1,5 @@
 package Devel::FileBreaker;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 sub import {
     our @patterns = @_[1..$#_];
     require "perl5db.pl";
@@ -17,7 +17,7 @@ Devel::FileBreaker - set breakpoints in all subroutines in one or more files
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 

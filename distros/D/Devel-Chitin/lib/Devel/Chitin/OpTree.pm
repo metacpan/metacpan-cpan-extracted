@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -690,10 +690,10 @@ my %scopelike_ops = (
     pp_entergiven => 1,
     enterwhile => 1,
     pp_enterwhile => 1,
-    entergiven => 1,
-    pp_entergiven => 1,
-    enterwhereso => 1,
-    pp_enterwhereso => 1,
+    #entergiven => 1,        # Part of the reverted given/whereso/whereis from 5.27.7
+    #pp_entergiven => 1,
+    #enterwhereso => 1,
+    #pp_enterwhereso => 1,
 );
 sub is_scopelike {
     my $self = shift;

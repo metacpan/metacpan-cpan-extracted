@@ -4,7 +4,7 @@ Attean::API::PushParser - Role for parsers that natively call a callback functio
 
 =head1 VERSION
 
-This document describes Attean::API::PushParser version 0.018
+This document describes Attean::API::PushParser version 0.019
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

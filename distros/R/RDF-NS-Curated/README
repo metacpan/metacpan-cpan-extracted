@@ -7,7 +7,7 @@ SYNOPSIS
       print $ns->prefix('http://schema.org/'); # prints schema
 
 DESCRIPTION
-    This contains a list of 58 prefix and URI pairs that are commonly used in
+    This contains a list of 60 prefix and URI pairs that are commonly used in
     RDF. The intention is that prefixes in this list can be safely used in
     code that has a long lifetime. The list has been derived mostly from W3C
     standards documents, but also some popularity lists. See the source code
@@ -27,6 +27,9 @@ DESCRIPTION
         This will return the prefix corresponding to the supplied URI string
         or `undef` if it is not registered.
 
+    `all`
+        This will return a hashref with all prefix and URI pairs.
+
 BUGS
     Please report any bugs to
     <https://github.com/kjetilk/p5-rdf-ns-curated/issues>.
@@ -38,7 +41,7 @@ AUTHOR
     Kjetil Kjernsmo <kjetilk@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2015, 2017 by Kjetil Kjernsmo.
+    This software is copyright (c) 2015, 2017, 2018 by Kjetil Kjernsmo.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

@@ -31,7 +31,7 @@ no_index:
 provides:
   Date::Lectionary::Daily:
     file: lib/Date/Lectionary/Daily.pm
-    version: '1.20180114'
+    version: '1.20180205'
 requires:
   Carp: '1.38'
   Date::Advent: '1.20160727'
@@ -52,6 +52,6 @@ requires:
   perl: '5.022'
 resources:
   repository: git://github.com/marmanold/Date-Lectionary-Daily.git
-version: '1.20180114'
+version: '1.20180205'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_twitter: https://www.twitter.com/marmanold/

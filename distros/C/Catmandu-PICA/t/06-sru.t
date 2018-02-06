@@ -16,7 +16,9 @@ BEGIN {
 use Catmandu::Importer::SRU::Parser::picaxml;
 use Catmandu::Importer::SRU::Parser::ppxml;
 
-require 't/lib/MockFurl.pm';
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MockFurl;
 
 note "Catmandu::Importer::SRU::Parser::picaxml";
 {

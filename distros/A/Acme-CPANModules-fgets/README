@@ -1,0 +1,69 @@
+NAME
+    Acme::CPANModules::fgets - fgets() implementations in Perl
+
+VERSION
+    This document describes version 0.002 of Acme::CPANModules::fgets (from
+    Perl distribution Acme-CPANModules-fgets), released on 2018-02-05.
+
+DESCRIPTION
+    fgets() implementations in Perl.
+
+    Reading a line of data from a filehandle in Perl is easy, but Perl will
+    happily slurp line of any length without limit, even gigabytes which can
+    cause your script or system to run out of memory.
+
+    "fgets()" is a standard I/O C function to get a line of data with a
+    length limit. In many cases you don't need in this Perl but in some
+    cases you do. The lack of built-in "fgets()" function in Perl (unlike
+    in, say, PHP) is a bit annoying, but no worries because there are
+    several CPAN modules that provide you with just that.
+
+INCLUDED MODULES
+    *   PerlIO::fgets
+
+        Can handle piped command fine, but doesn't work well in non-blocking
+        mode.
+
+    *   File::fgets
+
+        XS module. Seems to have trouble dealing with piped command. But
+        works well in low-throughput situation as well as in non-blocking
+        mode.
+
+    *   File::GetLineMaxLength
+
+        Pure-Perl module. Different interface (use an OO wrapper) so a bit
+        more cumbersome to use. Uses a fixed 4096-byte block size so doesn't
+        work well in low-throughput situation. Doesn't work well in
+        non-blocking mode.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-fgets>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-fgets>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-fget
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

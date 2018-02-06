@@ -12,14 +12,13 @@ build_requires:
   Test::Differences: '0'
   Test::More: '0'
   Test::Trap: '0'
-  blib: '1.01'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,55 +33,55 @@ no_index:
 provides:
   MarpaX::Languages::C::AST:
     file: lib/MarpaX/Languages/C/AST.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Callback:
     file: lib/MarpaX/Languages/C/AST/Callback.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Callback::Events:
     file: lib/MarpaX/Languages/C/AST/Callback/Events.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Callback::Method:
     file: lib/MarpaX/Languages/C/AST/Callback/Method.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Callback::Option:
     file: lib/MarpaX/Languages/C/AST/Callback/Option.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Grammar:
     file: lib/MarpaX/Languages/C/AST/Grammar.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011:
     file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Actions:
     file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Actions.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan:
     file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan::Actions:
     file: lib/MarpaX/Languages/C/AST/Grammar/ISO_ANSI_C_2011/Scan/Actions.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Impl:
     file: lib/MarpaX/Languages/C/AST/Impl.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Impl::Logger:
     file: lib/MarpaX/Languages/C/AST/Impl/Logger.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Scope:
     file: lib/MarpaX/Languages/C/AST/Scope.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Util:
     file: lib/MarpaX/Languages/C/AST/Util.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::AST::Util::Data::Find:
     file: lib/MarpaX/Languages/C/AST/Util/Data/Find.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::Scan:
     file: lib/MarpaX/Languages/C/Scan.pm
-    version: '0.47'
+    version: '0.48'
   MarpaX::Languages::C::Scan::Actions:
     file: lib/MarpaX/Languages/C/Scan/Actions.pm
-    version: '0.47'
+    version: '0.48'
 requires:
   Carp: '0'
   Class::Struct: '0'
@@ -128,11 +127,9 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-Languages-C-AST
   homepage: https://metacpan.org/release/MarpaX-Languages-C-AST
   repository: git://github.com/jddurand/marpax-languages-c-ast.git
-version: '0.47'
+version: '0.48'
 x_contributors:
   - 'Ben Bullock <benkasminbullock@gmail.com>'
   - 'Ivan Baidakou <basiliscos@openmailbox.com>'
   - 'Jeffrey Kegler <JKEGL@cpan.org>'
-  - 'Jeffrey Kegler <jkegl@cpan.org>'
-  - 'jddurand <jeandamiendurand@free.fr>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

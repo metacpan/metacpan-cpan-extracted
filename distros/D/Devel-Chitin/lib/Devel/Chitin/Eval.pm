@@ -3,7 +3,7 @@ package Devel::Chitin::Eval;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Count how many stack frames we should discard when we're
 # interested in the debugged program's stack frames

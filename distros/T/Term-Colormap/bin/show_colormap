@@ -2,7 +2,13 @@
 use warnings;
 use strict;
 
-use Term::Colormap qw( color_table );
+use Term::Colormap qw( color_table colormap_names );
 
-my $name = $ARGV[0] || 'unknown';
-color_table($name);
+if (defined $ARGV[0]) {
+    color_table( $ARGV[0] )
+} else {
+    for my $name ( colormap_names() ) {
+        color_table($name);
+    }
+}
+

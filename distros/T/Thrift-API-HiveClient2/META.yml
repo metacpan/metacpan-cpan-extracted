@@ -2,24 +2,52 @@
 abstract: 'Perl to HiveServer2 Thrift API wrapper'
 author:
   - 'David Morel <david.morel@amakuru.net>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Thrift::XS::BinaryProtocol: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - apache
+  - thrift
+  - hive
+  - hadoop
+  - bigdata
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Thrift-API-HiveClient2
 requires:
+  Authen::SASL: '0'
+  Carp: '0'
   Class::Accessor: '0'
   List::MoreUtils: '0'
   Moo: '0'
   Scalar::Util: '0'
-  Thrift: '0'
+  Thrift: v0.10.0
+  Thrift::BinaryProtocol: '0'
+  Thrift::BufferedTransport: '0'
+  Thrift::SASL::Transport: '0'
+  Thrift::Socket: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
   version: '0'
+  warnings: '0'
 resources:
-  homepage: https://github.com/dmorel/Thrift-API-HiveClient2
-  repository: https://github.com/dmorel/Thrift-API-HiveClient2.git
-version: '0.021'
+  bugtracker: https://github.com/Perl-Hadoop/Thrift-API-HiveClient2/issues
+  repository: git://github.com/Perl-Hadoop/Thrift-API-HiveClient2.git
+version: '0.023'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+  - 'David Morel <dmor@cpan.org>'
+  - 'Neil Bowers <neil@bowers.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

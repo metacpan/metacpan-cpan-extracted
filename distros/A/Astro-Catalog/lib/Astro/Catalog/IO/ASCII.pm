@@ -24,7 +24,7 @@ use strict;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =head1 METHODS
@@ -123,10 +123,6 @@ sub read_catalog {
 }
 
 =back
-
-=head1 REVISION
-
-  $Id: ASCII.pm,v 1.2 2005/08/05 03:36:17 timj Exp $
 
 =head1 SEE ALSO
 

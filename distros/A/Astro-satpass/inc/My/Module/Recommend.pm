@@ -98,7 +98,8 @@ sub make_optional_modules_tests {
 	or die "Can not create $dir: $!\n";
     opendir my $dh, 't'
 	or die "Can not access t/: $!\n";
-    while ( readdir $dh ) {
+    local $_ = undef;
+    while ( defined( $_ = readdir $dh ) ) {
 	m/ \A [.] /smx
 	    and next;
 	m/ [.] t \z /smx

@@ -3,11 +3,11 @@ use strict;
 use warnings;
 use base qw{SMS::Send::Driver};
 use URI qw{};
-use LWP::UserAgent qw{};
 use Path::Class qw{};
 use Config::IniFiles qw{};
+use HTTP::Tiny qw{};
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -20,8 +20,9 @@ SMS::Send::Driver::WebService - SMS::Send driver base class for web services
   use base qw{SMS::Send::Driver::WebService};
   sub send_sms {
     my $self = shift;
-    my $ua   = $self->ua; #isa LWP::UserAgent
-    my $cfg  = self->cfg; #isa Config::IniFiles
+    my $ua   = $self->ua;  #isa LWP::UserAgent
+    my $uat  = $self->uat; #isa HTTP::Tiny
+    my $cfg  = self->cfg;  #isa Config::IniFiles
     #call web service die on critical error
     #parse return with a package like XML::Simple or JSON::XS
     #return 1 for successful or 0 for unsuccessful
@@ -318,6 +319,23 @@ sub _url_default {undef};
 
 =head1 OBJECT ACCESSORS
 
+=head2 uat
+
+Returns a lazy loaded L<HTTP::Tiny> object
+
+=cut
+
+sub uat {
+  my $self       = shift;
+  unless ($self->{'uat'}) {
+    $self->{'uat'} = HTTP::Tiny->new(
+                                     keep_alive => 0, #override bad default
+                                     agent      => $self->_http_agent,
+                                    );
+  }
+  return $self->{'uat'};
+}
+
 =head2 ua
 
 Returns a lazy loaded L<LWP::UserAgent> object
@@ -325,10 +343,26 @@ Returns a lazy loaded L<LWP::UserAgent> object
 =cut
 
 sub ua {
-  my $self=shift;
-  $self->{'ua'} = LWP::UserAgent->new(agent=>"Mozilla/5.0 (compatible; $PACKAGE/$VERSION; See rt.cpan.org 35173)")
-    unless $self->{'ua'};
+  my $self = shift;
+  unless ($self->{'ua'}) {
+    local $@;
+    eval 'use LWP::UserAgent'; #Lazy Load Package
+    my $error     = $@;
+    die($error) if $error;
+    $self->{'ua'} = LWP::UserAgent->new(
+                                        env_proxy => 1, #override bad default
+                                        agent     => $self->_http_agent,
+                                       );
+  }
   return $self->{'ua'};
+}
+
+sub _http_agent {
+  my $self               = shift;
+  $self->{'_http_agent'} = shift if @_;
+  $self->{'_http_agent'} = "Mozilla/5.0 (compatible; $PACKAGE/$VERSION; See rt.cpan.org 35173)"
+    unless defined $self->{'_http_agent'};
+  return $self->{'_http_agent'};
 }
 
 =head2 cfg

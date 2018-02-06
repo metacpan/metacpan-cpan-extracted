@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::UNOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use warnings;
@@ -525,56 +525,56 @@ foreach my $a ( [ pp_preinc     => '++',    1,  0 ],
     *$pp_name = $sub;
 }
 
-sub pp_leavewhereso {
-    my $self = shift;
-
-    my $enter_op = $self->first;
-    my $condition_op = $enter_op->first;
-    my $condition_deparsed = $condition_op->deparse;
-    my $block_op = $condition_op->sibling;
-
-    my $keyword = $condition_op->op->name eq 'smartmatch'
-                    ? 'whereis'
-                    : 'whereso';
-
-    if ($self->_is_postfix_whereso) {
-        my $block_deparsed = $block_op->deparse(omit_braces => 1, skip => 0, noindent => 1);
-        "$block_deparsed $keyword ($condition_deparsed);" # ; because there's no COPs inside given to generate them
-    } else {
-        my $block_deparsed = $block_op->deparse(force_multiline => 1);
-        "$keyword ($condition_deparsed) $block_deparsed";
-    }
-}
-
-# "regular" whereso has a format like:
-# 1-line with braces:
-#   leavewhereso
-#       enterwhereso
-#           condition-op(s)
-#           scope
-#               (ex-)nextstate
-#               block-op(s)
-# or multiline with braces:
-#   leavewhereso
-#       enterwhereso
-#           condition-op(s)
-#           leave
-#               enter
-#               block-op(s)
-# postfix whereso looks like the first one, but missing the nextstate that's
-# the first part of the scope
-sub _is_postfix_whereso {
-    my $self = shift;
-    my $scope_op = $self->first->first->sibling;
-    my $scope_name = $scope_op->op->name;
-
-    my $first_in_scope_op = $scope_name eq 'scope' ? $scope_op->first : undef;
-    return( $scope_name eq 'scope'
-            and $first_in_scope_op
-            and ! $first_in_scope_op->is_null
-            and ! ($first_in_scope_op->_ex_name eq 'pp_nextstate')
-        );
-}
+#sub pp_leavewhereso {
+#    my $self = shift;
+#
+#    my $enter_op = $self->first;
+#    my $condition_op = $enter_op->first;
+#    my $condition_deparsed = $condition_op->deparse;
+#    my $block_op = $condition_op->sibling;
+#
+#    my $keyword = $condition_op->op->name eq 'smartmatch'
+#                    ? 'whereis'
+#                    : 'whereso';
+#
+#    if ($self->_is_postfix_whereso) {
+#        my $block_deparsed = $block_op->deparse(omit_braces => 1, skip => 0, noindent => 1);
+#        "$block_deparsed $keyword ($condition_deparsed);" # ; because there's no COPs inside given to generate them
+#    } else {
+#        my $block_deparsed = $block_op->deparse(force_multiline => 1);
+#        "$keyword ($condition_deparsed) $block_deparsed";
+#    }
+#}
+#
+## "regular" whereso has a format like:
+## 1-line with braces:
+##   leavewhereso
+##       enterwhereso
+##           condition-op(s)
+##           scope
+##               (ex-)nextstate
+##               block-op(s)
+## or multiline with braces:
+##   leavewhereso
+##       enterwhereso
+##           condition-op(s)
+##           leave
+##               enter
+##               block-op(s)
+## postfix whereso looks like the first one, but missing the nextstate that's
+## the first part of the scope
+#sub _is_postfix_whereso {
+#    my $self = shift;
+#    my $scope_op = $self->first->first->sibling;
+#    my $scope_name = $scope_op->op->name;
+#
+#    my $first_in_scope_op = $scope_name eq 'scope' ? $scope_op->first : undef;
+#    return( $scope_name eq 'scope'
+#            and $first_in_scope_op
+#            and ! $first_in_scope_op->is_null
+#            and ! ($first_in_scope_op->_ex_name eq 'pp_nextstate')
+#        );
+#}
 
 1;
 

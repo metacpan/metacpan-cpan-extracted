@@ -2,7 +2,7 @@
 #
 # pMakefile.PL - Makefile.PL of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2014, 2015 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2008, 2009, 2010, 2011, 2014, 2015, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -58,7 +58,7 @@ __END__
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2008, 2009, 2010, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -165,18 +165,10 @@ for my $target (@ARGV) {
         }
         close FH_CHANGES;
         my $dirname  = dirname($file[0]);
+        $dirname =~ tr#/#-#;
         my $basename = basename($file[0], '.pm','.pl','.bat');
-        my $tardir;
-        if ($dirname eq 'lib') {
-            $tardir = "$basename-$version";
-        }
-        elsif ($dirname ne '.') {
-            $dirname =~ tr#/#-#;
-            $tardir = "$dirname-$basename-$version";
-        }
-        else {
-            $tardir = "$basename-$version";
-        }
+        my $tardir = "$dirname-$basename-$version";
+        $tardir =~ s#^lib-##;
         rmtree($tardir,0,0);
 
         # rewrite META.yml file
@@ -225,7 +217,20 @@ for my $target (@ARGV) {
                     local $/ = undef; # slurp mode
                     my $data = <FH>;
                     close FH;
-                    if ($file =~ m/\. (com|exe|bat|pl) \z/oxmsi) {
+
+#-----------------------------------------------------------------------------
+# Kwalitee Indicator: buildtool_not_executable core
+# The build tool (Build.PL/Makefile.PL) is executable. This is bad because
+# you should specify which perl you want to use while installing.
+#
+# How to fix
+# Change the permissions of Build.PL/Makefile.PL to not-executable.
+#-----------------------------------------------------------------------------
+
+                    if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
+                        $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
+                    }
+                    elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
                         $tar->add_data("$tardir/$file", $data, {'mode' => 0775});
                     }
                     else {
@@ -275,7 +280,7 @@ for my $target (@ARGV) {
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2008, 2009, 2010, 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -373,7 +378,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -509,7 +514,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

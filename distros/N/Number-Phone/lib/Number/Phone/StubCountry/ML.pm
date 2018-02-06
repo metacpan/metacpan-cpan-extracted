@@ -22,24 +22,39 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '[246-9]',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(\\d{4})',
+                  'intl_format' => 'NA',
+                  'format' => '$1',
                   'leading_digits' => '
             67|
             74
-          '
+          ',
+                  'pattern' => '(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
+                'personal_number' => '',
+                'mobile' => '
+          (?:
+            2(?:
+              079|
+              17\\d
+            )|
+            [679]\\d{3}|
+            8[239]\\d{2}
+          )\\d{4}
+        ',
+                'specialrate' => '',
+                'toll_free' => '80\\d{6}',
                 'fixed_line' => '
           (?:
             2(?:
@@ -55,20 +70,6 @@ my $validators = {
             44[1239]\\d
           )\\d{4}
         ',
-                'specialrate' => '',
-                'mobile' => '
-          (?:
-            2(?:
-              079|
-              17\\d
-            )|
-            [679]\\d{3}|
-            8[239]\\d{2}
-          )\\d{4}
-        ',
-                'toll_free' => '80\\d{6}',
-                'pager' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -83,7 +84,9 @@ my $validators = {
             )|
             44[1239]\\d
           )\\d{4}
-        '
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   223202 => "Bamako",

@@ -52,11 +52,7 @@ use Astro::Flux;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: MPC.pm,v 1.2 2005/06/16 01:57:35 aa Exp $
+$VERSION = "4.32";
 
 =begin __PRIVATE_METHODS__
 
@@ -222,9 +218,9 @@ sub _parse_query {
           #my %vmag = ( V => $vmag );
           #$star->magnitudes( \%vmag );
 
-	  $star->fluxes( new Astro::Fluxes( new Astro::Flux(
-	                 new Number::Uncertainty( Value => $vmag ),
-			 'mag', "V" )));
+          $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+                         new Number::Uncertainty( Value => $vmag ),
+                         'mag', "V" )));
 
           $comment =~ s/^\s+//;
           $star->comment( $comment );

@@ -1,0 +1,229 @@
+#!perl
+
+our $DATE = '2018-02-05'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+# IFUNBUILT
+# use strict;
+# use warnings;
+# END IFUNBUILT
+
+use Getopt::Long;
+use Time::HiRes qw(time nanosleep);
+
+our $DEBUG = $ENV{DEBUG};
+
+my %Opts = (
+    block_size => 0,
+    speed => undef,
+);
+
+sub main {
+    my $speed = $Opts{speed};
+    my $block_size = $Opts{block_size};
+    my $delay; # in nanosecs
+  CALC_BLOCK_SIZE_AND_DELAY: {
+        unless ($block_size >= 1) {
+            # we try to use 4096 or its multiples to keep sleeping period close
+            # to 1 second, unless speed is small in which case we reduce block
+            # size accordingly.
+            if ($speed >= 4096) {
+                $block_size = int($speed/4096)*4096;
+            } else {
+                $block_size = int($speed);
+            }
+            $block_size = 1 if $block_size < 1;
+        }
+        warn "throttle: Setting block size to $block_size\n" if $DEBUG;
+        $delay = int($block_size / $speed * 1e9);
+    }
+
+    my ($time1, $time2, $buf, $bytes_read);
+    $|++;
+  MAIN_LOOP: while (1) {
+        $time1 = time();
+        $bytes_read = read(STDIN, $buf, $block_size);
+        last unless $bytes_read;
+        print $buf;
+        $time2 = time();
+        nanosleep($delay - ($time2-$time1));
+    }
+}
+
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_',
+throttle - Bandwidth limiting pipe
+Usage:
+  % other-command ... | throttle [options]
+
+Options:
+  --speed, -s SPEED (e.g. -s 128kbps, --speed 1bps)
+  --block-size, -b SIZE
+  --help, -h, -?
+  --version, -v
+
+For more details, see the manpage.
+_
+            exit 0;
+    },
+    'version|v' => sub {
+        no warnings 'once';
+        print "throttle version ", ($main::VERSION || "dev"), "\n";
+        exit 0;
+    },
+    'block-size|b=i' => sub {
+        $Opts{block_size} = $_[1];
+    },
+    'speed|s=s' => sub {
+        # convert to bytes per second
+        my ($num, $unit) = $_[1] =~ m!\A(\d+(?:\.\d+)?)\s*(bps|B/s|kbps|kbit|KB/s|Mbps|Mbit|MB/s)\z! or do {
+            die "throttle: Invalid speed '$_[1]', please specify number + valid unit, e.g. '0.5Mbit'\n";
+        };
+        if ($unit eq 'bps') {
+            $Opts{speed} = $num / 8;
+        } elsif ($unit eq 'B/s') {
+            $Opts{speed} = $num;
+        } elsif ($unit eq 'kbps' || $unit eq 'kbit') {
+            $Opts{speed} = $num * 1024/8;
+        } elsif ($unit eq 'KB/s') {
+            $Opts{speed} = $num * 1024;
+        } elsif ($unit eq 'Mbps' || $unit eq 'Mbit') {
+            $Opts{speed} = $num * 1024*1024/8;
+        } elsif ($unit eq 'MB/s') {
+            $Opts{speed} = $num * 1024*1024;
+        } else {
+            die "throttle: BUG: unprocessed unit '$unit'\n";
+        }
+    },
+);
+die "throttle: Please specify --speed (-s)\n" unless $Opts{speed};
+
+main();
+
+# ABSTRACT: Bandwidth limiting pipe
+# PODNAME: throttle
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+throttle - Bandwidth limiting pipe
+
+=head1 VERSION
+
+This document describes version 0.002 of throttle (from Perl distribution App-throttle), released on 2018-02-05.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This utility copies standard input to standard output while limiting bandwidth
+to the specified maximum. Bandwidth limiting is done by calling C<nanosleep()>
+in between copying.
+
+Keywords: throttle, throughput, bandwidth, speed limit, stdin, stdout, standard
+input, standard output, pipe.
+
+For higher throughput speeds, the overhead of this Perl-based utility will
+become more significant. you might want to try C-based implementations mentioned
+in L</"SEE ALSO">.
+
+=head1 OPTIONS
+
+=head2 --help, -h, -?
+
+=head2 --version, -v
+
+=head2 --block-size, -b
+
+The default is to use at least 4096 (4KB) or its multiples to keep the sleeping
+period close to 1 second (unless speed limit is too low, in which case block
+will also be reduced accordingly).
+
+=head2 --speed, -s
+
+Default: undefined (unlimited).
+
+Accepted units:
+
+=over
+
+=item * bps (bits per second)
+
+=item * Bps, B/s (bytes per second)
+
+=item * kbps, kbit (kilobits per second)
+
+=item * KB/s (kilobytes per second)
+
+=item * Mbps, Mbit (megabits per second)
+
+=item * MB/s (megabytes per second)
+
+=back
+
+Examples: 19200 bps, 1.5Mbit, 0.5MB/s.
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG
+
+Bool. If set will output more debug messages to stderr.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-throttle>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com///u1@198.58.100.202:/home/u1/repos/perl-App-throttle>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-throttle>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<throttle>, L<http://www.pro-toolz.net/data/man/1/throttle.html>, bandwidth
+limiting pipe. The closest in purpose/form with our Perl-based L<throttle>. At
+the time of this writing, no Debian/Ubuntu package is available. Differences:
+our Perl-based B<throttle> allows specifying bandwidth limit in a more
+human-friendly way (C<-s 1Mbps> instead of C<-m 1>).
+
+B<cpipe>, L<http://cpipe.berlios.de>, a CLI to copy stdin to stdout while
+counting bytes and reporting progress to stderr. Can also be instructed to limit
+throughput, although the minimum speed is 1KB/s and minimum buffer size is 1KB.
+At the time of this writing, Debian/Ubuntu package is available.
+
+B<pv> (pipe viewer), L<http://www.ivarch.com/programs/pv.shtml>, monitor the
+progress of data through a pipe. Like C<cpipe>, except it doesn't have an option
+to limit speed. At the time of this writing, Debian/Ubuntu package is available.
+
+B<socat>, L<http://www.dest-unreach.org/socat>, a versatile relay program. Its
+C<ispeed> and C<ospeed> options cannot be applied to stdin/stdout though, it
+seems.
+
+B<throttle-cli>, L<https://github.com/edi9999/throttle-cli>, an NPM package.
+Line-based.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

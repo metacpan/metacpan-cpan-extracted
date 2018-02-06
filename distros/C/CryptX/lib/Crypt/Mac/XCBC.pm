@@ -4,21 +4,12 @@ package Crypt::Mac::XCBC;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( xcbc xcbc_hex xcbc_b64 xcbc_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
-
-use CryptX;
-use Crypt::Cipher;
-
-sub new { my $class = shift; _new(Crypt::Cipher::_trans_cipher_name(shift), @_) }
-sub xcbc { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->mac }
-sub xcbc_hex  { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->hexmac }
-sub xcbc_b64  { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->b64mac }
-sub xcbc_b64u { Crypt::Mac::XCBC->new(shift, shift)->add(@_)->b64umac }
 
 1;
 

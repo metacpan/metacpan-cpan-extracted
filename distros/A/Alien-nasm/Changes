@@ -1,5 +1,9 @@
 Revision history for Alien-nasm
 
+0.20      2018-01-31 10:31:01 -0500
+  - implicit modification of PATH is now removed
+    (was deprecated in 0.11)
+
 0.19      2017-10-03 06:32:05 -0400
   - For MSWin32 download binaries of nasm to avoid MSYS
   - Ensure both nasm and ndisasm are available

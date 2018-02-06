@@ -42,6 +42,12 @@ sub main {
             test_suffix => '12345',
             filename    => '000124105.xls',
         },
+        M2m    => +{
+            function    => 'fixed_pref',
+            prefix      => '020',
+            test_suffix => '12345',
+            filename    => '000477281.xls',
+        },
         Q2       => +{
             function    => 'fixed_pref',
             prefix      => '0990',

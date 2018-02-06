@@ -1290,7 +1290,7 @@ None by default.
   AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize,
                                   unsigned int channels)
   void InitVrSimulator(VrDeviceInfo info)
-  void InitWindow(int width, int height, const char *data)
+  bool InitWindow(int width, int height, const char *data)
   bool IsAudioBufferProcessed(AudioStream stream)
   bool IsAudioDeviceReady(void)
   bool IsAudioStreamPlaying(AudioStream stream)
@@ -1442,11 +1442,9 @@ Ahmad Fatoum, E<lt>ahmad@a3f.atE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Ahmad Fatoum
+Copyright (C) 2018 by Ahmad Fatoum
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.26.1 or,
-at your option, any later version of Perl 5 you may have available.
-
+L<Graphics::Raylib::XS> is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, or, at your option, the zlib/libpng license.
 
 =cut

@@ -1,5 +1,14 @@
 Revision history for Perl extension DBD::PgPPSjis.
 
+0.0801003  2018-02-04 00:00:00
+  - try Kwalitee Indicator: main_module_version_matches_dist_version
+  - created by INABA Hitoshi
+
+0.0801002  2018-02-04 00:00:00
+  - try Removal of the current directory (".") from @INC
+  - try Kwalitee Indicator: buildtool_not_executable
+  - created by INABA Hitoshi
+
 0.0801001  2015-01-25 00:00:00 JST
     - DBI->connect() executes "SET NAMES 'SJIS'" at last
     - $dbh->quote() supports ShiftJIS strings

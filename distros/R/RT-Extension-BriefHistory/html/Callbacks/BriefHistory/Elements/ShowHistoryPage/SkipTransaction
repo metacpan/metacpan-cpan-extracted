@@ -2,11 +2,7 @@
 my $request_path = $HTML::Mason::Commands::r->path_info;
 $request_path =~ s!/{2,}!/!g;
 
-# the following request paths are used
-# /Ticket/Display.html:       RT 4.0 and RT 4.2+ with $ShowHistory config = always
-# /Helpers/TicketHistory:     RT 4.2+ with $ShowHistory config != always and scroll
-# /Helpers/TicketHistoryPage: RT 4.4+ with $ShowHistory config = scroll
-return unless $request_path =~ m{^/(Ticket/Display\.html|Helpers/TicketHistory)};
+return if $request_path =~ m{^/Ticket/History\.html};
 
 my @types = RT->Config->Get('BriefHistoryTypes');
 $$skip = 1 unless grep { $_ eq $Transaction->Type } @types;

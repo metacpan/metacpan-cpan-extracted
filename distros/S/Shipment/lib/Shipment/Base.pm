@@ -1,5 +1,5 @@
 package Shipment::Base;
-$Shipment::Base::VERSION = '2.03';
+$Shipment::Base::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -149,6 +149,31 @@ has 'tracking_id' => (
 );
 
 
+has 'activities' => (
+    handles_via => 'Array',
+    is          => 'rw',
+    isa         => ArrayRef [InstanceOf ['Shipment::Activity']],
+    default => sub { [] },
+    handles => {
+        all_activities   => 'elements',
+        get_activity     => 'get',
+        add_activity     => 'push',
+        count_activities => 'count',
+    },
+);
+
+
+sub status {
+    shift->get_activity(0);
+}
+
+has 'ship_date' => (
+    is     => 'rw',
+    isa    => DateAndTime,
+    coerce => \&coerce_datetime,
+);
+
+
 has 'documents' => (
     is  => 'rw',
     isa => InstanceOf ['Shipment::Label'],
@@ -213,7 +238,10 @@ has 'carbon_offset' => (
 
 
 sub _build_services {
+    my $self = shift;
+
     warn "routine '_build_services' has not been implemented";
+    $self->error("routine '_build_services' has not been implemented");
     {   ground => Shipment::Service->new(
             id   => 'ground',
             name => 'Example Ground Service',
@@ -239,42 +267,60 @@ sub _build_services {
 sub rate {
     my ($self, $service_id) = @_;
 
-    warn "routine 'rate' is not implemented for $self";
+    warn "routine 'rate' is not implemented for $self" if $self->debug;
+    $self->error("routine 'rate' is not implemented for $self");
+
+    return;
 }
 
 
 sub ship {
     my ($self, $service_id) = @_;
 
-    warn "routine 'ship' is not implemented for $self";
+    warn "routine 'ship' is not implemented for $self" if $self->debug;
+    $self->error("routine 'ship' is not implemented for $self");
+
+    return;
 }
 
 
 sub return {
     my ($self, $service_id) = @_;
 
-    warn "routine 'return' is not implemented for $self";
+    warn "routine 'return' is not implemented for $self" if $self->debug;
+    $self->error("routine 'return' is not implemented for $self");
+
+    return;
 }
 
 
 sub cancel {
     my ($self, $service_id) = @_;
 
-    warn "routine 'cancel' is not implemented for $self";
+    warn "routine 'cancel' is not implemented for $self" if $self->debug;
+    $self->error("routine 'cancel' is not implemented for $self");
+
+    return;
 }
 
 
 sub end_of_day {
     my ($self, $service_id) = @_;
 
-    warn "routine 'end_of_day' is not implemented for $self";
+    warn "routine 'end_of_day' is not implemented for $self" if $self->debug;
+    $self->error("routine 'end_of_day' is not implemented for $self");
+
+    return;
 }
 
 
 sub track {
     my $self = shift;
 
-    warn "routine 'track' is not implemented for $self";
+    warn "routine 'track' is not implemented for $self" if $self->debug;
+    $self->error("routine 'track' is not implemented for $self");
+
+    return;
 }
 
 
@@ -311,7 +357,7 @@ Shipment::Base
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -468,9 +514,19 @@ type: L<Shipment::Service>
 =head2 tracking_id
 
 The tracking_id returned from a call to ship
-OR the tracking_id to be used in a call to track
+OR the tracking_id to be used in a call to cancel or track
 
 type: String
+
+=head2 activities
+
+The tracking activities returned from a call to track
+
+=head2 status, ship_date
+
+most recent tracking status
+
+ship_date is when the shipment was passed off to the carrier, set by a call to track
 
 =head2 documents
 
@@ -622,7 +678,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

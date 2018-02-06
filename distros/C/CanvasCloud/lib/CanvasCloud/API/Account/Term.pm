@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account::Term;
-$CanvasCloud::API::Account::Term::VERSION = '0.002';
+$CanvasCloud::API::Account::Term::VERSION = '0.003';
 # ABSTRACT: extends L<CanvasCloud::API::Account>
 
 use Moose;
@@ -32,13 +32,13 @@ CanvasCloud::API::Account::Term - extends L<CanvasCloud::API::Account>
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 ATTRIBUTES
 
 =head2 uri
 
-augments base uri to append '/reports'
+augments base uri to append '/terms'
 
 =head1 METHODS
 
@@ -52,7 +52,7 @@ Ted Katseres
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ted Katseres.
+This software is copyright (c) 2018 by Ted Katseres.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

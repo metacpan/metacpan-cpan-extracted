@@ -7,7 +7,7 @@ use Net::Curl::Easy qw(CURLE_COULDNT_CONNECT);
 use Net::Curl::Multi qw(CURLMSG_DONE CURL_SOCKET_TIMEOUT /^CURL_POLL_/ /^CURL_CSELECT_/ CURLMOPT_SOCKETFUNCTION CURLMOPT_TIMERFUNCTION);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.01.6';
+our $VERSION = '0.07';
 
 BEGIN {
 	Net::Curl::Multi->can('CURLMOPT_TIMERFUNCTION') or
@@ -71,7 +71,7 @@ sub curl_ev {
 			$timer{$easy} = EV::timer $timeout, 0, sub {
 				delete $timer{$easy};
 				$multi->remove_handle($easy);
-				$finish{$easy}->($easy, CURLE_COULDNT_CONNECT);
+				$finish{$easy}->($easy, bless( do{\(my $o = CURLE_COULDNT_CONNECT)}, 'Net::Curl::Easy::Code' ));
 				delete $finish{$easy};
 			};
 		}

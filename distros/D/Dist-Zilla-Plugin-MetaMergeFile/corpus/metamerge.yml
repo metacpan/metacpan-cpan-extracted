@@ -1,0 +1,6 @@
+prereqs:
+	runtime:
+		requires:
+			Foo::Bar: 1
+resources:
+	homepage: http://example.com/

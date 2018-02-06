@@ -24,7 +24,7 @@ use Number::Uncertainty;
 
 use warnings::register;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 =head1 METHODS
 
@@ -284,10 +284,6 @@ sub _configure {
 }
 
 =back
-
-=head1 REVISION
-
- $Id: Morphology.pm,v 1.4 2006/06/05 21:03:23 cavanagh Exp $
 
 =head1 COPYRIGHT
 

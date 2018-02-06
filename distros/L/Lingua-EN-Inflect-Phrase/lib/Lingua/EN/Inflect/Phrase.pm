@@ -1,11 +1,6 @@
 package Lingua::EN::Inflect::Phrase;
-BEGIN {
-  $Lingua::EN::Inflect::Phrase::AUTHORITY = 'cpan:AVAR';
-}
-{
-  $Lingua::EN::Inflect::Phrase::VERSION = '0.18';
-}
-
+our $AUTHORITY = 'cpan:AVAR';
+$Lingua::EN::Inflect::Phrase::VERSION = '0.19';
 use strict;
 use warnings;
 use Exporter 'import';
@@ -83,10 +78,10 @@ our @EXPORT_OK = qw/to_PL to_S/;
 
 our $prefer_nouns = 1;
 
-my $MAYBE_NOUN       = qr{(\S+)/(?:NNS?|CD|JJ)\b};
-my $MAYBE_NOUN_TAG   = qr{/(?:NNS?|CD|JJ)\b};
-my $NOUN_OR_VERB     = qr{(\S+)/(?:NNS?|CD|JJ|VB[A-Z]?)\b};
-my $NOUN_OR_VERB_TAG = qr{/(?:NNS?|CD|JJ|VB[A-Z]?)\b};
+my $MAYBE_NOUN       = qr{(\S+)/(?:NN[PS]?|CD|JJ)\b};
+my $MAYBE_NOUN_TAG   = qr{/(?:NN[PS]?|CD|JJ)\b};
+my $NOUN_OR_VERB     = qr{(\S+)/(?:NN[PS]?|CD|JJ|VB[A-Z]?)\b};
+my $NOUN_OR_VERB_TAG = qr{/(?:NN[PS]?|CD|JJ|VB[A-Z]?)\b};
 my $VERB_TAG         = qr{/VB[A-z]?\b};
 
 my $PREPOSITION_OR_CONJUNCTION_TAG = qr{/(?:CC|IN)\b};
@@ -119,6 +114,12 @@ sub _inflect_noun {
   }
   elsif ($want_plural && lc($noun) eq 'two') {
     return 'twos';
+  }
+  elsif ($noun =~ /^[A-Z].+ity\z/) {
+    return $want_plural ? ucfirst(Lingua::EN::Inflect::Number::to_PL(lc($noun))) : $noun;
+  }
+  elsif ($noun =~ /^[A-Z].+ities\z/) {
+    return $want_plural ? $noun : ucfirst(Lingua::EN::Inflect::Number::to_S(lc($noun)));
   }
 
   if ($want_plural && (not $is_plural)) {
@@ -338,30 +339,6 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lingua-EN-Inflect-Phrase>.  I
 will be notified, and then you'll automatically be notified of progress on your
 bug as I make changes.
 
-=head1 SUPPORT
-
-More information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-EN-Inflect-Phrase>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Lingua-EN-Inflect-Phrase>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Lingua-EN-Inflect-Phrase>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Lingua-EN-Inflect-Phrase/>
-
-=back
-
 =head1 REPOSITORY
 
   git clone git://github.com/rkitover/lingua-en-inflect-phrase.git lingua-en-inflect-phrase
@@ -372,11 +349,15 @@ L<Lingua::EN::Inflect>, L<Lingua::EN::Inflect::Number>, L<Lingua::EN::Tagger>
 
 =head1 AUTHOR
 
-Rafael Kitover <rkitover@cpan.org>
+rkitover: Rafael Kitover <rkitover@cpan.org>
+
+=head1 CONTRIBUTORS
+
+zakame: Zak B. Elep <zakame@zakame.net>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010 Rafael Kitover (rkitover@cpan.org).
+Copyright (c) 2018 Rafael Kitover (rkitover@cpan.org).
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

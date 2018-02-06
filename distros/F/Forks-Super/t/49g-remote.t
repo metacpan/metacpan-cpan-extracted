@@ -18,6 +18,7 @@ SKIP: {
         skip "sort of required Cwd", $ntests;
     }
 
+    use lib '.';  # needed for perl 5.26
     require "t/remote.pl";
     my $sshd = get_test_sshd();
     if (!$sshd) {

@@ -26,6 +26,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/Runner-child-death.t',
     't/Runner-diamond-graph.t',
+    't/Runner-dry-run.t',
     't/Runner-inner-steps.t',
     't/Runner-integration.t',
     't/Runner-no-unnecessary-rebuild.t',

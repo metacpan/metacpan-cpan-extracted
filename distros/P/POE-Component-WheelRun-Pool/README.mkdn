@@ -4,7 +4,7 @@ POE::Component::WheelRun::Pool - POE::Wheel::Run worker pool
 
 # VERSION
 
-version 0.001
+version 0.002
 
 # SYNOPSIS
 
@@ -44,58 +44,58 @@ to the child process.  See:
 
 For more information on options not covered here.
 
-- __Alias__
+- **Alias**
 
     Default is 'pool', use a unique name to make dispatching events to worker pools easier to understand.
 
-- __Program__
+- **Program**
 
     Required! Can be either a CODE reference or a path to an executable to launch.  The script needs to be able to accept data on STDIN and communicate
     back to the parent session using STDOUT or STDERR.  This means the program can be in any language.
 
-- __PoolSize__
+- **PoolSize**
 
     Default is 4.  This is the number of children to spawn and maintain.
 
-- __MaxTasksPerChild__
+- **MaxTasksPerChild**
 
     Default 0, anything <= 0 means unlimited.  This is the maximum number of tasks that can be handed to any one worker before it needs to respawn.
 
-- __MaxTimePerChild__
+- **MaxTimePerChild**
 
     Default 0, anything <= 0 means unlimited.  This is the maximum number of seconds any worker can live before being killed and respawned.  This check occurs only inside of the
-    dispatch event trigger and only for that "next" worker.   This means it is possible for processes to live longer that __MaxTimePerChild__, but their next invocation will
+    dispatch event trigger and only for that "next" worker.   This means it is possible for processes to live longer that **MaxTimePerChild**, but their next invocation will
     be their last.
 
-- __Splay__
+- **Splay**
 
-    Default is 0.1 and is unimportant without __MaxTimePerChild__ or __MaxTasksPerChild__.  This applies a random splay to the time or tasks checker.  Best thought of as a percentage
+    Default is 0.1 and is unimportant without **MaxTimePerChild** or **MaxTasksPerChild**.  This applies a random splay to the time or tasks checker.  Best thought of as a percentage
     range for max tasks or time.  e. g.
 
         ChildMaxUpperBound = MaxTasksPerChild + (Splay * MaxTasksPerChild)
         ChildMaxLowerBound = MaxTasksPerChild - (Splay * MaxTasksPerChild)
 
-    When a child is spawned the max tasks/time is calculated inside that range using two calls to rand(), one for the __Splay__ and the second for positive/negative.
+    When a child is spawned the max tasks/time is calculated inside that range using two calls to rand(), one for the **Splay** and the second for positive/negative.
 
-    The idea behind this is to offset process creation in the parent process as that can be expensive.  If you would like to disable this feature, set the __Splay__ to __0__.
+    The idea behind this is to offset process creation in the parent process as that can be expensive.  If you would like to disable this feature, set the **Splay** to **0**.
 
-- __StatsInterval__
+- **StatsInterval**
 
     Default is 60.  Seconds to run the stats handler.
 
-- __StatsHandler__
+- **StatsHandler**
 
-    Default 'undef'.  If passed a CODE reference, that refernce is run every __StatInterval__ seconds. The handler is passed a hash reference with the events tracked and the values
+    Default 'undef'.  If passed a CODE reference, that refernce is run every **StatInterval** seconds. The handler is passed a hash reference with the events tracked and the values
     representing the number of times each event ocurred.
 
-- __StdoutHandler__
+- **StdoutHandler**
 
-    Default 'undef'.  CODE reference with what to do when there's content on STDOUT of the worker process.  Based on __StdioFilter__ or __StdoutFilter__ this reference may be passed
+    Default 'undef'.  CODE reference with what to do when there's content on STDOUT of the worker process.  Based on **StdioFilter** or **StdoutFilter** this reference may be passed
     the content as a stream, line of text, or even a Perl object.
 
-- __StderrHandler__
+- **StderrHandler**
 
-    Default 'undef'.  CODE reference with what to do when there's content on STDERR of the worker process.  Based on __StderrFilter__ this reference may be passed
+    Default 'undef'.  CODE reference with what to do when there's content on STDERR of the worker process.  Based on **StderrFilter** this reference may be passed
     the content as a stream, line of text, or even a Perl object.
 
 # AUTHOR
@@ -109,11 +109,6 @@ This software is Copyright (c) 2016 by Brad Lhotsky.
 This is free software, licensed under:
 
     The (three-clause) BSD License
-
-# CONTRIBUTORS
-
-- Brad Lhotsky <blhotsky@craigslist.org>
-- Brad Lhotsky <brad.lhotsky@booking.com>
 
 # SUPPORT
 

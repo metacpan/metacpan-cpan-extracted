@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 our @aliens;
@@ -406,7 +406,7 @@ sub xs_ok
         if(my $error = $@)
         {
           $ok = 0;
-          push @diag, '  DynaLoader failed';
+          push @diag, '  XSLoader failed';
           push @diag, "    $error";
         }
       }
@@ -635,7 +635,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -1008,6 +1008,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

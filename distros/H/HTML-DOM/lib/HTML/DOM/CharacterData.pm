@@ -12,7 +12,7 @@ use Scalar::Util qw'blessed weaken';
 require HTML::DOM::Node;
 
 our @ISA = 'HTML::DOM::Node';
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 sub   surrogify($);
@@ -254,7 +254,7 @@ HTML::DOM::CharacterData - A base class shared by HTML::DOM::Text and ::Comment
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 DESCRIPTION
 

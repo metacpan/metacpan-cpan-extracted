@@ -6,7 +6,7 @@ use strict;
 use Carp;
 use Regexp::RegGrp;
 
-our $VERSION            = '2.03';
+our $VERSION            = '2.05';
 
 our @COMPRESS           = ( 'minify', 'pretty' );
 our $DEFAULT_COMPRESS   = 'pretty';
@@ -36,7 +36,7 @@ our $URL            = 'url\(\s*(' . $DICTIONARY->{STRING1} . '|' . $DICTIONARY->
 
 our $IMPORT         = '\@import\s+(' . $DICTIONARY->{STRING1} . '|' . $DICTIONARY->{STRING2} . '|' . $URL . ')([^;]*);';
 
-our $MEDIA          = '\@media([^{}]+)\{((?:' . $IMPORT . '|' . $RULE . '|' . $WHITESPACES . ')+)\}';
+our $AT_RULE        = '\@\S+([^{}]+)\{((?:' . $IMPORT . '|' . $RULE . '|' . $WHITESPACES . ')+)\}';
 
 our $DECLARATION    = '((?>[^;:]+)):(?<=:)((?>[^;]*))(?:;|\s*$)';
 
@@ -261,8 +261,11 @@ sub init {
             }
         },
         {
-            regexp      => $MEDIA,
+            regexp      => $AT_RULE,
             replacement => sub {
+                my $original    = $_[0]->{match};
+                my ($selector)  = ( $original =~ /\@(\S+)/ );
+
                 my $submatches  = $_[0]->{submatches};
                 my $mediatype   = $submatches->[0];
                 my $mediarules  = $submatches->[1];
@@ -274,7 +277,7 @@ sub init {
 
                 $reggrp_mediarules->exec( \$mediarules );
 
-                return '@media ' . $mediatype . '{' . ( $compress eq 'pretty' ? "\n" : '' ) .
+                return "\@$selector " . $mediatype . '{' . ( $compress eq 'pretty' ? "\n" : '' ) .
                     $mediarules . '}' . ( $compress eq 'pretty' ? "\n" : '' );
             }
         },
@@ -387,7 +390,7 @@ CSS::Packer - Another CSS minifier
 
 =head1 VERSION
 
-Version 2.02
+Version 2.05
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@
       "Marty O'Brien <mob@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.91",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.92",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

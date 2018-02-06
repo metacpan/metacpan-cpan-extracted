@@ -55,7 +55,7 @@ subtest "meta:table.fields" => sub {
              'table.fields'=>[qw/a b c e/],
          },],
         "text-pretty"),
-         qr/^\| \s* d \s* \| \s* a \s* \| \s* b \s* \| \s* c \s* \|$/mx);
+         qr/^\| \s* a \s* \| \s* b \s* \| \s* c \s* \| \s* d \s* \|$/mx);
 };
 
 subtest "meta:table.hide_unknown_fields" => sub {
@@ -81,7 +81,7 @@ subtest "meta:table.field_units" => sub {
              'table.field_units'=>[qw/u1 u2 u3 u4/],
          },],
         "text-pretty"),
-         qr/^\| \s* d \s* \| \s* a \s\(u1\) \s* \| \s* b \s\(u2\) \s* \| \s* c \s\(u3\) \s* \|$/mx);
+         qr/^\| \s* a \s\(u1\) \s* \| \s* b \s\(u2\) \s* \| \s* c \s\(u3\) \s* \| \s* d \s* \|$/mx);
 };
 
 subtest "meta:table.field_formats" => sub {
@@ -98,7 +98,7 @@ subtest "meta:table.field_formats" => sub {
              'table.field_formats'=>[undef, qw/iso8601_datetime iso8601_date/, 'foo'],
          },],
         "text-pretty"),
-         qr/^\| \s* 0 \s* \| \s* 1 \s* \| \s* 2016-06-12T15:15:27Z \s* \| \s* 2016-06-12 \s* \|$/mx);
+         qr/^\| \s* 1 \s* \| \s* 2016-06-12T15:15:27Z \s* \| \s* 2016-06-12 \s* \| \s* 0 \s* \|$/mx);
 };
 
 subtest "meta:table.field_aligns" => sub {
@@ -118,16 +118,32 @@ subtest "meta:table.field_aligns" => sub {
         "text-pretty"),
        join(
            "",
-           "+------+------+-------+--------+---------+-----------+----------+\n",
-           "| a    | left | right | middle | number1 | number2__ | number3  |\n",
-           "+------+------+-------+--------+---------+-----------+----------+\n",
-           "| x    | x    |     x |   x    |       1 |      1    |     1e2  |\n",
-           "| xx   | xx   |    xx |   xx   |     -10 |    -10    |   1.2e-1 |\n",
-           "| xxx  | xxx  |   xxx |  xxx   |     100 |      1.2  |  1.23e3  |\n",
-           "| xxxx | xxxx |  xxxx |  xxxx  |    1000 |      1.23 | 12.34e3  |\n",
-           "+------+------+-------+--------+---------+-----------+----------+\n",
+           "+------+-------+--------+---------+-----------+----------+------+\n",
+           "| left | right | middle | number1 | number2__ | number3  | a    |\n",
+           "+------+-------+--------+---------+-----------+----------+------+\n",
+           "| x    |     x |   x    |       1 |      1    |     1e2  | x    |\n",
+           "| xx   |    xx |   xx   |     -10 |    -10    |   1.2e-1 | xx   |\n",
+           "| xxx  |   xxx |  xxx   |     100 |      1.2  |  1.23e3  | xxx  |\n",
+           "| xxxx |  xxxx |  xxxx  |    1000 |      1.23 | 12.34e3  | xxxx |\n",
+           "+------+-------+--------+---------+-----------+----------+------+\n",
        ),
    );
+};
+
+subtest "meta:table.field_orders" => sub {
+    like($fmt->(
+        [200,
+         "OK",
+         [
+             {a=>0, b=>1, c=>2, d=>3, e1=>4, e2=>5, e3=>6},
+             # XXX time=DateTime instance
+             # XXX time=Time::Moment instance
+         ],
+         {
+             'table.field_orders'=>['a', 'b', 'c', qr/^e/ => sub { $_[0] cmp $_[1] }],
+         },],
+        "text-pretty"),
+         qr/^\| \s* a \s* \| \s* b \s* \| \s* c \s* \| \s* e1 \s* \| \s* e2 \s* \| \s* e3 \s* \| \s* d \s* \|$/mx);
 };
 
 done_testing();

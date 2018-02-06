@@ -6,5 +6,6 @@ export MOJO_HOME=$(pwd)
 export MOJO_LOG_SHORT=1 # Remove timestamps from Mojo, added by log svc
 export BEAM_PATH=$HOME/etc/container
 export BEAM_MINION='mysql+dsn+dbi:mysql:mysql_read_default_file=~/.cpanstats.cnf;mysql_read_default_group=application'
+export MOJO_PUBSUB_EXPERIMENTAL=1 # Shut up
 
 exec beam minion worker 2>&1

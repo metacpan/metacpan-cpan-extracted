@@ -2,8 +2,8 @@ NAME
     App::rsynccolor - Add some color to rsync output
 
 VERSION
-    This document describes version 0.001 of App::rsynccolor (from Perl
-    distribution App-rsynccolor), released on 2018-01-24.
+    This document describes version 0.003 of App::rsynccolor (from Perl
+    distribution App-rsynccolor), released on 2018-02-01.
 
 SYNOPSIS
     See the command-line script rsynccolor.

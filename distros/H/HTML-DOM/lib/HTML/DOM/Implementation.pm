@@ -3,7 +3,7 @@ package HTML::DOM::Implementation;
 use strict;
 use warnings;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 our $it = bless do{\my$x};
 
@@ -43,7 +43,7 @@ HTML::DOM::Implementation - HTML::DOM's 'DOMImplementation' object
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

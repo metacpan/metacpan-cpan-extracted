@@ -8,13 +8,16 @@ README
 README.mkdn
 eg/fedex.pl
 eg/fedex_express.pl
+eg/fedex_tracking.pl
 eg/generic.pl
 eg/purolator.pl
 eg/temando.pl
 eg/ups.pl
 eg/ups_canada.pl
 eg/ups_surepost.pl
+fedex.test
 lib/Shipment.pm
+lib/Shipment/Activity.pm
 lib/Shipment/Address.pm
 lib/Shipment/Base.pm
 lib/Shipment/FedEx.pm
@@ -1376,6 +1379,7 @@ perltidy.pl
 perltidyrc
 t/fedex.t
 t/fedex_express.t
+t/fedex_tracking.t
 t/generic.t
 t/purolator.t
 t/temando.t

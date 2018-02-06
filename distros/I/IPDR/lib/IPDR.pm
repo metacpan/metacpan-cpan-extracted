@@ -6,11 +6,11 @@ IPDR - IPDR Data Suite
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 
@@ -76,9 +76,12 @@ L<http://search.cpan.org/dist/IPDR>
 
 =head1 ACKNOWLEDGEMENTS
 
+Thanks to Eric Davis Eric.Davis at calix.com for some updates and integration efforts
+with Calix hardware.
+
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011 Andrew S. Kennedy, all rights reserved.
+Copyright 2018 Andrew S. Kennedy, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

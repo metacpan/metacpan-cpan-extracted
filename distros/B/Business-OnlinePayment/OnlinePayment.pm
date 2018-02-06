@@ -6,7 +6,7 @@ use Carp;
 
 require 5.005;
 
-$VERSION = '3.04';
+$VERSION = '3.05';
 $VERSION = eval $VERSION; # modperlstyle: convert the string into a number
 
 # Remember subclasses we have "wrapped" submit() with _pre_submit()
@@ -36,6 +36,7 @@ my @methods = qw(
     response_page
     avs_code
     cvv2_response
+    txn_date
 );
 
 __PACKAGE__->build_subs(@methods);
@@ -363,6 +364,8 @@ What action being taken by this transaction. Currently available are:
 
 =item Credit
 
+=item Tokenize
+
 =item Recurring Authorization
 
 =item Modify Recurring Authorization
@@ -574,6 +577,14 @@ Bank's routing code
 Account type.  Can be (case-insensitive): B<Personal Checking>,
 B<Personal Savings>, B<Business Checking> or B<Business Savings>.
 
+=item nacha_sec_code
+
+NACHA SEC Code for US ACH transactions.  'PPD' indicates customer signed a form
+giving authorization for the charge, 'CCD' same for a business checking/savings
+account, 'WEB' for online transactions where a box was checked authorizing the
+charge, and 'TEL' for authorization via recorded phone call (NACHA script
+required).
+
 =item account_name
 
 Account holder's name.
@@ -609,6 +620,21 @@ Customer's driver's license number.
 =item license_dob
 
 Customer's date of birth.
+
+=back
+
+=head3 FOLLOW-UP TRANSACTION FIELDS
+
+These fields are used in follow-up transactions related to an original
+transaction (Post Authorization, Reverse Authorization, Void, Credit).
+
+=over 4
+
+=item authorization
+
+=item order_number
+
+=item txn_date
 
 =back
 
@@ -708,6 +734,12 @@ this if you would like to run inquiries or refunds on the transaction later.
 If supported by your gateway, a card_token can be used in a subsequent
 transaction to refer to a card number.
 
+=head2 txn_date()
+
+Transaction date, as returned by the gateway.  Required by some gateways
+for follow-up transactions.  Store this if you would like to run inquiries or
+refunds on the transaction later.
+
 =head2 fraud_score()
 
 Retrieve or change the fraud score from any Business::FraudDetect plugin
@@ -788,8 +820,8 @@ Croaks if any of the required fields are not present.
 
 =head2 silly_bool( $value )
 
-Returns 0 if the value starts with y, Y, t or T.
-Returns 1 if the value starts with n, N, f or F.
+Returns 1 if the value starts with y, Y, t or T.
+Returns 0 if the value starts with n, N, f or F.
 Otherwise returns the value itself.
 
 Use this for handling boolean content like tax_exempt.
@@ -810,7 +842,7 @@ Phil Lobbes E<lt>phil at perkpartners dot comE<gt>
 
 Copyright (c) 1999-2004 Jason Kohles
 Copyright (c) 2004 Ivan Kohler
-Copyright (c) 2007-2015 Freeside Internet Services, Inc.
+Copyright (c) 2007-2018 Freeside Internet Services, Inc.
 
 All rights reserved.
 
@@ -826,7 +858,7 @@ Development:  http://perl.business/onlinepayment/ng.html
 =head1 MAILING LIST
 
 Please direct current development questions, patches, etc. to the mailing list:
-http://420.am/cgi-bin/mailman/listinfo/bop-devel/
+http://mail.freeside.biz/cgi-bin/mailman/listinfo/bop-devel/
 
 =head1 REPOSITORY
 
@@ -836,16 +868,16 @@ The code is available from our public git repository:
 
 Or on the web:
 
-  http://freeside.biz/gitweb/?p=Business-OnlinePayment.git
+  http://git.freeside.biz/gitweb/?p=Business-OnlinePayment.git
   Or:
-  http://freeside.biz/gitlist/Business-OnlinePayment.git
+  http://git.freeside.biz/cgit/Business-OnlinePayment.git
 
 Many (but by no means all!) processor plugins are also available in the same
 repository, see:
 
-  http://freeside.biz/gitweb/
+  http://git.freeside.biz/gitweb/
   Or:
-  http://freeside.biz/gitlist/
+  http://git.freeside.biz/cgit/
 
 =head1 DISCLAIMER
 

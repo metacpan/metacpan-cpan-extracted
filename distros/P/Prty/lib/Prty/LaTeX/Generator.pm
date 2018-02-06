@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 use Scalar::Util ();
 use Prty::Option;
@@ -241,6 +241,210 @@ sub cmd {
 
 # -----------------------------------------------------------------------------
 
+=head3 comment() - Erzeuge LaTeX-Kommentar
+
+=head4 Synopsis
+
+    $code = $ltx->comment($text,@opt);
+
+=head4 Options
+
+=over 4
+
+=item -nl => $n (Default: 1)
+
+Füge $n Zeilenumbrüche am Ende hinzu.
+
+=item -preNl => $n (Default: 0)
+
+Setze $n Zeilenumbrüche an den Anfang.
+
+=back
+
+=head4 Description
+
+Erzeuge einen LaTex-Kommentar und liefere den resultierenden
+Code zurück.
+
+=head4 Examples
+
+B<Kommentar erzeugen>
+
+    $ltx->comment("Dies ist\nein Kommentar");
+
+produziert
+
+    % Dies ist
+    % ein Kommentar
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub comment {
+    my $self = shift;
+    # @_: $text,@opt
+
+    # Optionen
+
+    my $nl = 1;
+    my $preNl = 0;
+
+    Prty::Option->extract(\@_,
+        -nl => \$nl,
+        -preNl => \$preNl,
+    );
+
+    # Argumente
+    my $text = shift;
+
+    # Kommentar erzeugen
+
+    $text = Prty::Unindent->trim($text);
+    $text =~ s/^/% /mg;
+    $text = ("\n" x $preNl).$text;
+    $text .= ("\n" x $nl);
+    
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 protect() - Schütze LaTeX Metazeichen
+
+=head4 Synopsis
+
+    $code = $ltx->protect($text);
+
+=head4 Description
+
+Schütze LaTeX-Metazeichen in $text und liefere den resultierenden
+Code zurück.
+
+Liste/Erläuterung der LaTeX-Metazeichen:
+L<https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
+
+=head4 Examples
+
+B<Dollarzeichen>
+
+    $ltx->protect('Der Text $text wird geschützt.');
+
+produziert
+
+    Der Text \$text wird geschützt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub protect {
+    my ($self,$text) = @_;
+
+    # Vorhandene Backslashes kennzeichnen und zum Schluss ersetzen.
+    # Dies ist wg. der eventuellen Ersetzung in \textbackslash{}
+    # nötig, wobei dann geschweifte Klammern entstehen würden.
+    $text =~ s/\\/\\\x1d/g;
+
+    # Reservierte und Sonderzeichen wandeln
+    $text =~ s/([\$_%{}#&])/\\$1/g;         # $ _ % { } # &
+    $text =~ s/>/\\textgreater{}/g;         # >
+    $text =~ s/</\\textless{}/g;            # <
+    $text =~ s/~/\\textasciitilde{}/g;      # ~
+    $text =~ s/\^/\\textasciicircum{}/g;    # <
+    $text =~ s/\|/\\textbar{}/g;            # |
+    $text =~ s/LaTeX/\\LaTeX{}/g;           # LaTeX
+    $text =~ s/(?<!La)TeX/\\TeX{}/g;        # TeX
+
+    # Gekennzeichnete Backslashes zum Schluss wandeln
+    $text =~ s/\\\x1d/\\textbackslash{}/g; # \
+
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 LaTeX-Kommandos
+
+=head3 renewcommand() - Redefiniere LaTeX-Kommando
+
+=head4 Synopsis
+
+    $code = $ltx->renewcommand($name,@args);
+
+=head4 Options
+
+Siehe Methode $ltx->cmd().
+
+=head4 Description
+
+Redefiniere LaTeX-Kommando $name und liefere den resultierenden
+LaTeX-Code zurück.
+
+=head4 Examples
+
+    $ltx->renewcommand('cellalign',-p=>'lt');
+
+produziert
+
+    \renewcommand{\cellalign}{lt}
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub renewcommand {
+    my $self = shift;
+    my $name = shift;
+    # @_: @args
+
+    return $self->cmd('renewcommand',-p=>"\\$name",@_);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 setlength() - Erzeuge TeX-Längenangabe
+
+=head4 Synopsis
+
+    $code = $ltx->setlength($name,$length,@args);
+
+=head4 Options
+
+Siehe Methode $ltx->cmd().
+
+=head4 Description
+
+Erzeuge eine TeX-Längenangabe und liefere den resultierenden
+Code zurück.
+
+=head4 Examples
+
+B<Paragraph-Einrückung entfernen>
+
+    $ltx->setlength('parindent','0em');
+
+produziert
+
+    \setlength{\parindent}{0em}
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub setlength {
+    my $self = shift;
+    my $name = shift;
+    my $length = shift;
+    # @_: @args
+
+    return $self->cmd('setlength',-p=>"\\$name",-p=>$length,@_);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Höhere Konstruktionen
+
 =head3 env() - Erzeuge LaTeX-Umgebung
 
 =head4 Synopsis
@@ -322,171 +526,6 @@ sub env {
 }
 
 # -----------------------------------------------------------------------------
-
-=head3 len() - Erzeuge TeX-Längenangabe
-
-=head4 Synopsis
-
-    $code = $ltx->len($name,$length,@args);
-
-=head4 Options
-
-Siehe Methode $ltx->cmd().
-
-=head4 Description
-
-Erzeuge eine TeX-Längenangabe und liefere den resultierenden
-Code zurück.
-
-=head4 Examples
-
-B<Paragraph-Einrückung entfernen>
-
-    $ltx->len('parindent','0em');
-
-produziert
-
-    \parindent0em
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub len {
-    my $self = shift;
-    my $name = shift;
-    my $length = shift;
-    # @_: @args
-
-    return $self->cmd("$name$length",@_);
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 comment() - Erzeuge LaTeX-Kommentar
-
-=head4 Synopsis
-
-    $code = $ltx->comment($text,@opt);
-
-=head4 Options
-
-=over 4
-
-=item -nl => $n (Default: 1)
-
-Füge $n Zeilenumbrüche am Ende hinzu.
-
-=item -preNl => $n (Default: 0)
-
-Setze $n Zeilenumbrüche an den Anfang.
-
-=back
-
-=head4 Description
-
-Erzeuge einen LaTex-Kommentar und liefere den resultierenden
-Code zurück.
-
-=head4 Examples
-
-B<Kommentar erzeugen>
-
-    $ltx->comment("Dies ist\nein Kommentar");
-
-produziert
-
-    % Dies ist
-    % ein Kommentar
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub comment {
-    my $self = shift;
-    # @_: $text,@opt
-
-    # Optionen
-
-    my $nl = 1;
-    my $preNl = 0;
-
-    Prty::Option->extract(\@_,
-        -nl => \$nl,
-        -preNl => \$preNl,
-    );
-
-    # Argumente
-    my $text = shift;
-
-    # Kommentar erzeugen
-
-    $text = Prty::Unindent->trim($text);
-    $text =~ s/^/% /mg;
-    $text = ("\n" x $preNl).$text;
-    $text .= ("\n" x $nl);
-    
-    return $text;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 protect() - Schütze Sonderzeichen
-
-=head4 Synopsis
-
-    $code = $ltx->protect($text);
-
-=head4 Description
-
-Schütze Sonderzeichen in $text und liefere den resultierenden Code
-zurück.
-
-Liste/Erläuterung der LaTeX-Sonderzeichen:
-L<https://www.namsu.de/Extra/strukturen/Sonderzeichen.html>
-
-=head4 Examples
-
-B<Dollarzeichen>
-
-    $ltx->protect('Der Text $text wird geschützt.');
-
-produziert
-
-    Der Text \$text wird geschützt.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub protect {
-    my ($self,$text) = @_;
-
-    # Vorhandene Backslashes kennzeichnen und zum Schluss ersetzen.
-    # Dies ist wg. der eventuellen Ersetzung in \textbackslash{}
-    # nötig, wobei dann geschweifte Klammern entstehen würden.
-    $text =~ s/\\/\\\x1d/g;
-
-    # Reservierte und Sonderzeichen wandeln
-    $text =~ s/([\$_%{}#&])/\\$1/g;         # $ _ % { } # &
-    $text =~ s/>/\\textgreater{}/g;         # >
-    $text =~ s/</\\textless{}/g;            # <
-    $text =~ s/~/\\textasciitilde{}/g;      # ~
-    $text =~ s/\^/\\textasciicircum{}/g;    # <
-    $text =~ s/\|/\\textbar{}/g;            # |
-    $text =~ s/LaTeX/\\LaTeX{}/g;           # LaTeX
-    $text =~ s/(?<!La)TeX/\\TeX{}/g;        # TeX
-
-    # Gekennzeichnete Backslashes zum Schluss wandeln
-    $text =~ s/\\\x1d/\\textbackslash{}/g; # \
-
-    return $text;
-}
-
-# -----------------------------------------------------------------------------
-
-=head2 Höhere Konstruktion
 
 =head3 section() - Erzeuge LaTeX Section
 
@@ -570,7 +609,7 @@ sub section {
 
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

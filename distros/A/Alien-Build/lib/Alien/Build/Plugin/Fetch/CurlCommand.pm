@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 has curl_command => sub { defined $ENV{CURL} ? which($ENV{CURL}) : which('curl') };
@@ -114,7 +114,6 @@ sub init
 #
 #          my($filename) = $url =~ m{/([^/]+)$};
 #          $filename = 'unknown' if (! defined $filename) || ($filename eq '');
-#          $DB::single = 1;
 #          my($stdout, $stderr) = eval { $self->_execute($build, $self->curl_command, -o => $filename, $url) };
 #          $first_error = $@;
 #          if($first_error eq '')
@@ -187,7 +186,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -280,6 +279,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

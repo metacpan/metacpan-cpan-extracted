@@ -1,10 +1,52 @@
 ==================================================
-Changes from 2015-06-11 00:00:00 +0000 to present.
+Changes from 2017-02-01 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2016-06-10 20:40:22 +0000
+version 0.003 at 2018-02-01 21:19:56 +0000
 ------------------------------------------
+
+  Change: b05b4134c6846fcf7ada1f001bd23e34d38e983c
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-01 15:19:40 +0000
+
+    fix tests 
+
+  Change: 4840b6eb157185ce271270043ac4185e1049608a
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-01 15:15:34 +0000
+
+    update release 
+
+  Change: 1f7a560b9669b66b7d583f56ea884941e4eb7faf
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-01 15:05:31 +0000
+
+    Updates for SISImport usage + extra helper for base factory class 
+
+  Change: 53ef29f75b2ed1db31745313d29c32b85c1f0a39
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2016-08-10 10:49:17 +0000
+
+    fixed sisimport 
+
+  Change: 7ae5587ee08fbb4efaa2b1c4921801aabc15d3e1
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2016-07-19 11:13:27 +0000
+
+    added sis_imports 
+
+  Change: 7b0996637f36f0214643a30ba934e4a31f949cbf
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2016-07-19 11:12:52 +0000
+
+    only set content_type if not already set 
+
+  Change: 2efa2b25e5e33d6759516e7908f9796c46b7f38f
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2016-07-19 11:12:18 +0000
+
+    fix doc for term 
 
   Change: 4ff664673b99cf80d88a2bdc399ac83ef7326638
   Author: Theodore Katseres LNX <katsert@live.siouxcityschools.com>

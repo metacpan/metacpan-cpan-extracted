@@ -4,7 +4,7 @@ Lingua::Conjunction - Convert lists into simple linguistic conjunctions
 
 # VERSION
 
-version v2.1.0
+version v2.1.2
 
 # SYNOPSIS
 
@@ -86,7 +86,7 @@ languages, such as Norwegian. Hence the defaults set in the `%languages`.
 `Locale::Language`
 
 The _Perl Cookbook_ in Section 4.2 has a simular subroutine called
-`commify_series`. The different is that 1. this routine handles
+`commify_series`. The difference is that 1. this routine handles
 multiple languages and 2. being a module, you do not have to add
 the subroutine to a script every time you need it.
 
@@ -108,6 +108,10 @@ feature.
 
 - Robert Rothenberg <rrwo@cpan.org>
 - Damian Conway <damian@conway.org>
+
+# CONTRIBUTOR
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 

@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "Path::Class" => 0,
     "Smart::Comments" => 0,
+    "Sort::Naturally" => 0,
     "Test::Most" => 0,
     "Tie::IxHash" => 0,
     "XML::Bare" => "0.53",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.173640",
+  "VERSION" => "0.180330",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "Path::Class" => 0,
   "Smart::Comments" => 0,
+  "Sort::Naturally" => 0,
   "Test::Most" => 0,
   "Tie::IxHash" => 0,
   "XML::Bare" => "0.53",

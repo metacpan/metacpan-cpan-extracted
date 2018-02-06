@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/grepcoin/grep_coin
 # and generated automatically using Perinci::CmdLine::Gen version 0.484
 
-our $DATE = '2018-01-30'; # DATE
+our $DATE = '2018-02-05'; # DATE
 our $DIST = 'App-CryptoCurrencyUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ grep-coin - Grep cryptocurrency coins
 
 =head1 VERSION
 
-This document describes version 0.006 of grep-coin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-01-30.
+This document describes version 0.010 of grep-coin (from Perl distribution App-CryptoCurrencyUtils), released on 2018-02-05.
 
 =head1 SYNOPSIS
 

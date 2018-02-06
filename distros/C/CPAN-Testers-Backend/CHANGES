@@ -1,5 +1,12 @@
 Changelog for CPAN-Testers-Backend
 
+0.005     2018-02-03 13:30:00-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed problem with website not updating due to webapp processes
+      not knowing that data was updated
+
 0.004     2018-01-16 16:03:56-06:00 America/Chicago
 
     [Added]

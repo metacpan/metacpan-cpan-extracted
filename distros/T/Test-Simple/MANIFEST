@@ -60,6 +60,7 @@ lib/Test2/EventFacet/Info.pm
 lib/Test2/EventFacet/Meta.pm
 lib/Test2/EventFacet/Parent.pm
 lib/Test2/EventFacet/Plan.pm
+lib/Test2/EventFacet/Render.pm
 lib/Test2/EventFacet/Trace.pm
 lib/Test2/Formatter.pm
 lib/Test2/Formatter/TAP.pm

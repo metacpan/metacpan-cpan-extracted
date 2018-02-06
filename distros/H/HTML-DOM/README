@@ -1,4 +1,4 @@
-HTML::DOM, version 0.057
+HTML::DOM, version 0.058
 
 HTML::DOM is a Perl implementation of the HTML Document Object Model
 
@@ -10,6 +10,12 @@ sheet interfaces.
 RECENT CHANGES
 
 See the Changes file for the long version.
+
+0.058
+-----
+Bug fix:  When a  <button>  element is  clicked,  its  value  is  now
+included in the form data even if it has no value.  Previously, value-
+less buttons would be omitted.
 
 0.057
 -----
@@ -26,15 +32,6 @@ due to changed output in Encode 2.80,  the tests started failing.  So
 now the MIME encoding is skipped on a  string  consisting  solely  of
 spaces and printable ASCII.  (This was easier than  having  two  sets
 of tests.)
-
-0.055
------
-Bug fixes:
-• getElementsByClassName now works correctly when class names contain
-  hyphens,  instead of treating hyphens within  class  attributes  as
-  boundaries.  This was based on a patch by Sean Dodger  (thank you!).
-• $doc->body  used to return a text node in some cases,  causing meth-
-  ods like aLink to die.
 
 
 TO DO

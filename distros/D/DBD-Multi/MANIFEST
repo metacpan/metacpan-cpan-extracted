@@ -2,6 +2,8 @@ Build.PL
 Changes
 lib/DBD/Multi.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README.md
 t/00-load.t
 t/dbd-multi-db.t
@@ -12,11 +14,8 @@ t/dbd-multi.t
 t/get_info.t
 t/handle-as-coderef.t
 t/lazy-load.t
-t/pod-coverage.t
 t/pod.t
 t/purge_failures.t
 t/random.t
 t/unavailable-server.t
 TODO
-META.yml
-META.json

@@ -30,12 +30,8 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/$VERSION $DEBUG/;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
-
-=head1 REVISION
-
-$Id: XY.pm,v 1.1 2006/05/02 21:41:39 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 

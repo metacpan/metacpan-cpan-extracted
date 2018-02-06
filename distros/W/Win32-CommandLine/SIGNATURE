@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,52 +12,60 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 717f209733a2f5e5ec129225867ee56df8c66318 Build.PL
-SHA1 59d2e46ef0d318fc864bf471c557613b6238169b Build.PL.config
+SHA1 11fc254978e55d45ef977988a61ff0dd8c5b3a54 .appveyor.install-perl.BAT
+SHA1 d6b2dd9eefd5d01498bf9268f153d2b8bc26563e .appveyor.yml
+SHA1 0d3e2a316eaa1b3adb9e62a00564515904c84832 .codecov.yml
+SHA1 3bd40344418eeab7afd8e3442d0b0614ef7d53a3 .editorconfig
+SHA1 41cb69753d99dcba9f8746e1e6e660d181ac9951 .mailmap
+SHA1 42dbebe3b3c3176bc59c490df3ea943239608ead .perlcriticrc
+SHA1 0e2aafc68339cf24c61641c8b59838a7ab1ccd62 .travis.yml
+SHA1 f0615c691a8a1d6e0d65ca89b2c3edb4c1b12d9d Build.PL
+SHA1 e03b3ca5241c645e9ef803a8eb2b562f1d0913b4 Build.PL.config
 SHA1 ac348a5d0b77499314096be5c6d2f11dafbed351 CHANGES
-SHA1 67d59fa35d31f7d2223d23a66018ac4181242719 LICENSE
-SHA1 a0ee2bb37edf0c45aedb22306c68d0324e850e8e MANIFEST
-SHA1 13d7487629b20142cf4a6f2ef2b000b5004a0798 MANIFEST.SKIP
-SHA1 36da3271cb2b79044c1c7d1ad61452e61d3d96dc META.json
-SHA1 33a0ee59c524c5a52c179573442420f9cb3c7a87 META.yml
-SHA1 9d141fbb07304e9a69fb336dad4a7ff2b42b5439 Makefile.PL
-SHA1 d2e7b5480c14e1f9e525dfa4790073b49b0216ce README
-SHA1 fc798692542e887ccad93b51dc254b8fe9bdef58 bin/xx.bat
-SHA1 f9eed341ed3c980c3100d9721fc33068abd28a88 eg/to.bat
-SHA1 eba0238ddd21a7b73aafbdc3c9e08d6fa1bfc8da extras/digest-md5.pl
-SHA1 3e3230ed49ce28129c826ddd4df411c32b68ff5d extras/dosify.bat
+SHA1 1fb93964aad13dccbc2aa48c804412308071e72a LICENSE
+SHA1 838739f6791ff514733396a1aa9c6d6dca1e66e2 MANIFEST
+SHA1 d52c39adf1416b982d72377c1c8dfc7cf7cf3b47 MANIFEST.SKIP
+SHA1 594ebf2371111011174ba0f7685aa86838f3ef36 META.json
+SHA1 e7263d32cb42d1d443d83aaf517d138337833190 META.yml
+SHA1 1c630fff6413c064a50fcd46556d8d08490a8854 README
+SHA1 c17e836ea781bd8dc95a98c38728685d6c2a4a70 README.mkd
+SHA1 9de245ec490f552e8d0c7d85fa1a879bba01dee2 VERSION
+SHA1 b931ddd2a89d41d9c2f819e6be20023d6a4dbdec bin/xx.bat
+SHA1 58df7572043a866371fdc8c774f71603fe01f81e eg/to.bat
+SHA1 5fd05f983a6dc6e7d633e187479e74c7d58161b6 extras/digest-md5.pl
+SHA1 744fb6a1e5031b82b2d223294939c7dc41f80cc9 extras/dosify.bat
 SHA1 56aaf3c3194f632624c62452ee436d9af82c02ac extras/new-guid.zip
-SHA1 acf2107b09d0085a5a69e1d6200247d433cef3e6 extras/quote.bat
-SHA1 d0ab2bc38eacb89864baa8b5318c05f0b7189cd0 extras/so.bat
-SHA1 4fd155d1d5ea64b8bc59136e79c8f72317a6fb2c extras/which.pl
-SHA1 76c186916629bb4d1ea8a41e655efbb778b26707 lib/Win32/CommandLine.pm
-SHA1 1a38e72871e37ab6f3e4e2b46feaa85067be9ca6 lib/Win32/CommandLine.xs
+SHA1 a0aafc04cb449248fcb07464b4846595f1678f4e extras/quote.bat
+SHA1 a567fae1a102d2b84eda4bb1694f8f0f46104f04 extras/so.bat
+SHA1 1a197b9457d0791ac9c02a547cd696acd9926db3 extras/which.pl
+SHA1 d2238807e18b231cddc48bf9543eb4f2810aae59 lib/Win32/CommandLine.pm
+SHA1 85e97b9378fe58e1a708d63c54d0acadb9151fd8 lib/Win32/CommandLine.xs
 SHA1 c0402cb5c1d827329dc16d5484e232bcb9d9798b lib/Win32/typemap
-SHA1 472765c9338e271cfaf3a204c792669f13a772b7 t/00.signature.t
-SHA1 b39f70f27a402f378777b9805ce0994e2aa5740b t/01.load.t
-SHA1 7ba138d02a5af2c2b247d5aa3701cbb0521a029f t/10.namespace.t
-SHA1 637108bdc7dad4a6bb69e38ac9ebe78a70e238ba t/11.commandline.t
-SHA1 ae0b44c05a90e886567ee2f2bc0939ac50eb5939 t/12.argv-ENVnullglob-f.t
-SHA1 71405772a34fc38fb01202f58b1a28fda049dfa9 t/12.argv-ENVnullglob-t.t
-SHA1 eee3dc9affb787f2df50616dcdb35a0502c8148f t/12.argv-tilde.t
-SHA1 6aadfa8c0659d33ddc8e1342c033a6fdabfe50c5 t/12.argv.t
-SHA1 042167249715457b18e34f98543323e14bfaac5b t/12.argv.t.o
-SHA1 5f0c2b2b4c528cb974c44dab8795f1971f95e3a9 t/13.xx.t
-SHA1 04745dfc6661f3be672f086498708b6715dc45f4 t/90.pod-coverage.t
-SHA1 99a6037be5f4402f27a0418d3bdfd06589d4fa70 t/90.pod.t
+SHA1 930d2c0c7adfa00ea36756c32b9bbf95c5a72dd2 t/00.signature.t
+SHA1 067fbee45d39ad61d2a989b37e62524ced54110f t/01.load.t
+SHA1 55099a732c136406992269d4eeadd6e95c91431c t/11.commandline.t
+SHA1 02d1482a1f178f4064d343d67656ad5d7471376b t/12.argv-ENVnullglob-f.t
+SHA1 915f2242332a22db9db57d92e68ec48bad670e7d t/12.argv-ENVnullglob-t.t
+SHA1 378a374afd4a2feed4fd5ca67ee448bc0d6e4cfc t/12.argv-tilde.t
+SHA1 5a9b69d769d20442e9d8d7156c79e7b5627e9a64 t/12.argv.t
+SHA1 71f420de424e1eb52be9891e70092948c239da0c t/13.xx.t
+SHA1 f65ff3694271e401091fb2f3f1f705cc4a00dfef t/14.subshells.t
+SHA1 cd7f4060bda38af89ddc066f273fb3a80d58c052 t/90.exports.t
+SHA1 04745dfc6661f3be672f086498708b6715dc45f4 t/91.pod-coverage.t
+SHA1 99a6037be5f4402f27a0418d3bdfd06589d4fa70 t/91.pod.t
 SHA1 1a1ba5eebfc2cf0bb59a9e84a5fa4994d7a0dd3a t/97.license.t
-SHA1 c7493d9ecbb0c80d89886ee57721304ccbadb1f9 t/97.meta.t
-SHA1 5e3cd1cd0e6ebbaa00f875303be0d3698a69d77a t/97.perl-minv.t
-SHA1 4e45deb4c83535d05eea8186e415b426a85afbf2 t/98.version-defaults.t-
-SHA1 8b25c662aa9badb442b2cba3e4c71817d1b8d4c6 t/98.version.t
-SHA1 de2dcb73e51b0765dc2dcbdf38a5562af8af7b30 t/99.cover.t-
+SHA1 91796fd8cd198fde61a5c28040b3e8728d2fb432 t/97.meta.t
+SHA1 221d36dddf1f519f637aad9072e3b482d67b222b t/97.perl-minv.t
+SHA1 c4f6ffd265799a06bfac2bfc31f37e6d0b6b931c t/98.version-defaults.t-
+SHA1 a91f1a7808211bd01071ea9301705c19898b3ec4 t/98.version.t
+SHA1 5f50e1b096a1097ea2fc8c96c402c0a5deb40aaa t/99.cover.t-
 SHA1 a60f918f09cb9d63ae92b09a604b01c57478357a t/99.critic-tests.t
-SHA1 2d46addae4d0d29350eea21e7603fe9445330823 t/99.critic.t
+SHA1 44783a204cc980b98e2789f0123b6b64b175ac9a t/99.critic.t
 SHA1 55da0b3398486772a309aa6d927463f4fac9de9b t/99.distribution.t
 SHA1 6b6fa2fe2c7467124710e3ba6c6d89c7de9b425b t/99.kwalitee.t
-SHA1 815b6bf0c0a481826ecd3c15690445d794a0768d t/99.signature.t
+SHA1 0342d9b2fadfa6c9efaf278f75aeb42528a16b8b t/99.signature.t
 SHA1 c90ebd3ff868563cd1daf61b6030ff1098c5db52 t/99.strict.t-
 SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/dir-further/.hidden/.sub-hidden/a/test.txt
 SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/dir-further/.hidden/.sub-hidden/test.txt
@@ -79,7 +87,7 @@ SHA1 fe1b8801464a021aef8e6b8e04a14affeb86717e t/test.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2
 
-iEYEARECAAYFAlfDqQsACgkQddUWrzF9mccxdACfUox42lfhQIXBBcMgtWbnSCy2
-duEAn1hkE5J9BKH4OErWNmEWSChKYW6q
-=HDgx
+iF4EAREIAAYFAlp474sACgkQMRddaLm5suPesQD/SZWUW5zrqfPpjJsVA5lJrICp
+rBkzZWDHUUcBQFlZbNsBAK31gUUn6NiwSSmLhgV50LPXgwOtRMPsao4vR4xn/lFR
+=2isE
 -----END PGP SIGNATURE-----

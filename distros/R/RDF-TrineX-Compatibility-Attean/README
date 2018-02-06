@@ -1,0 +1,62 @@
+NAME
+    RDF::TrineX::Compatibility::Attean - Compatibility layer between Attean
+    and RDF::Trine
+
+SYNOPSIS
+    In modules that have new Attean methods, but otherwise uses RDF::Trine,
+    just go:
+
+      use RDF::TrineX::Compatibility::Attean;
+
+DESCRIPTION
+    For now, only certain methods of Attean classes are supported. They are
+    added to the respective RDF::Trine classes by this module. They are:
+
+    *   `RDF::Trine::Node::equals`
+
+    *   `RDF::Trine::Node::ntriples_string`
+
+    *   `RDF::Trine::Node::Resource::abs`
+
+    *   `RDF::Trine::Node::Literal::value`
+
+    *   `RDF::Trine::Node::Literal::language`
+
+    *   `RDF::Trine::Node::Literal::datatype`
+
+    *   `RDF::Trine::Model::get_quads`
+
+    *   `RDF::Trine::Model::count_quads`
+
+TODO
+    I'm unsure on how `RDF::Trine::Node::Literal::has_datatype` should be
+    treated. Attean implements RDF 1.1, where all literals have a datatype, so
+    to Attean, `has_datatype` would always be true, but that would be
+    surprising to Trine users. For now, I have chosen to solve this only at
+    the output level, i.e. the `RDF::Trine::Node::Literal::datatype` will
+    return the RDF 1.1 datatypes, but `has_datatype` is still false for what
+    was in RDF 1.0 plain literals and language literals.
+
+BUGS
+    One should be that this module is a hack to make legacy code run while
+    being in transition to Attean. It was initially motivated by making
+    RDF::RDFa::Generator run on both frameworks. It may do surprising things.
+
+    Nevertheless, please report any bugs or things you miss from Attean here:
+    <https://github.com/kjetilk/p5-rdf-trinex-compatibility-attean/issues>.
+
+SEE ALSO
+AUTHOR
+    Kjetil Kjernsmo <kjetilk@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Kjetil Kjernsmo.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

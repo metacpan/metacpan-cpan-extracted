@@ -2,7 +2,7 @@ package Test2::Harness::Feeder::JSONL;
 use strict;
 use warnings;
 
-our $VERSION = '0.001049';
+our $VERSION = '0.001050';
 
 use Carp qw/croak/;
 
@@ -58,6 +58,7 @@ sub poll {
         bless($line->{facet_data}->{harness_job}, 'Test2::Harness::Job')
             if $line->{facet_data}->{harness_job};
 
+        next if $line->{processed};
         push @out => Test2::Harness::Event->new(%$line);
         last if $max && @out >= $max
     }

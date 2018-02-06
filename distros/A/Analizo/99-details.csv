@@ -1,6 +1,0 @@
-filename,module,acc,accm,amloc,anpm,cbo,dit,lcom4,loc,mmloc,noa,noc,nom,npa,npm,rfc,sc
-animal.h,Animal,4,1,1,0,0,0,1,1,1,0,1,1,0,1,1,0
-cat.h/cat.cc,Cat,0,1,3,0.5,0,2,1,6,3,1,0,2,0,2,5,0
-dog.h/dog.cc,Dog,0,1,3,0.5,0,2,1,6,3,1,0,2,0,2,5,0
-main.cc,main,0,1,9,0,1,0,1,9,9,0,0,1,0,1,2,1
-mammal.h,Mammal,2,1,1,0,0,1,1,1,1,0,2,1,0,0,1,0

@@ -7,23 +7,7 @@ use Env qw( @PATH );
 use File::Spec;
 
 # ABSTRACT: Find or build nasm, the netwide assembler
-our $VERSION = '0.19'; # VERSION
-
-
-my $in_path;
-
-sub import
-{
-  require Carp;
-  Carp::carp "Alien::nasm with implicit path modification is deprecated ( see https://metacpan.org/pod/Alien::nasm#CAVEATS )";
-  return if Alien::nasm->install_type('system');
-  return if $in_path;
-  my $dir = File::Spec->catdir(Alien::nasm->dist_dir, 'bin');
-  Carp::carp "adding $dir to PATH";
-  unshift @PATH, $dir;
-  # only do it once.
-  $in_path = 1;
-}
+our $VERSION = '0.20'; # VERSION
 
 
 sub alien_helper
@@ -49,7 +33,7 @@ Alien::nasm - Find or build nasm, the netwide assembler
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -87,29 +71,6 @@ should work with this class.
 
 Returns the name of the nasm executable.  As of this writing it is always
 C<nasm>, but in the future it may have a different value.
-
-=head1 CAVEATS
-
-On Windows for share builds, we install binaries.  This avoids needing
-to depend on L<Alien::MSYS>.
-
-This version of L<Alien::nasm> adds nasm to your path, if it isn't
-already there when you use it, like this:
-
- use Alien::nasm;  # deprecated, issues a warning
-
-This was a design mistake, and now B<deprecated>.  When L<Alien::nasm> was
-originally written, it was one of the first Alien tool style modules on
-CPAN.  As such, the author and the L<Alien::Base> team hadn't yet come up
-with the best practices for this sort of module.  The author, and the
-L<Alien::Base> team feel that for consistency and for readability it is
-better use L<Alien::nasm> without the automatic import:
-
- use Alien::nasm ();
-
-and explicitly modify the C<PATH> yourself (examples are above in the
-synopsis).  The old style will issue a warning.  The old behavior will be
-removed, but not before 31 January 2018.
 
 =head1 AUTHOR
 

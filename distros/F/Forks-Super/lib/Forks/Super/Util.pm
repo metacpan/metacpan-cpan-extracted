@@ -16,7 +16,7 @@ use constant IS_CYGWIN => $^O =~ /cygwin/i;
 use constant IS_WIN32ish => &IS_WIN32 || &IS_CYGWIN;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 our @EXPORT_OK = qw(Ctime is_number isValidPid pause qualify_sub_name shquote
 		    is_socket is_pipe IS_WIN32 IS_CYGWIN okl DEVNULL DEVTTY);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -58,6 +58,7 @@ sub Ctime {
 
 sub is_number {
     my $s = shift;
+    return 0 if !defined($s);
     $s =~ s/^\s+//;
     $s =~ s/\s+$//;
 
@@ -394,7 +395,7 @@ Forks::Super::Util - utility routines for Forks::Super module
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 SYNOPSIS
 
@@ -560,7 +561,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

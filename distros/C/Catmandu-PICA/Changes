@@ -1,5 +1,13 @@
 Changelog for Catmandu-PICA
 
+0.25  2018-02-01 15:00:11 CET
+ - add modules to documentation
+ - set minimum version for PICA::Data
+ - Fix example documentation
+ - Add Catmandu::Validator::PICA
+ - fix POD
+ - fix load local lib in t
+
 0.24  2017-11-18 15:55:56 CET
  - fix test for new XML writer
 

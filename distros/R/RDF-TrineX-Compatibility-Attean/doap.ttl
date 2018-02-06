@@ -1,0 +1,39 @@
+_:rb8ee5bafb350b451aac783ec87ba2b540r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-rdf-trinex-compatibility-attean> ;
+	a <http://usefulinc.com/ns/doap#GitRepository> ;
+	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-trinex-compatibility-attean&serialization=PROV-O#> .
+_:rbd35929487a484576b68de2da17b1a767r0 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbd35929487a484576b68de2da17b1a767r1 <http://ontologi.es/doap-deps#on> "perl 5.014"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbd35929487a484576b68de2da17b1a767r2 <http://ontologi.es/doap-deps#on> "RDF::Trine"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbd35929487a484576b68de2da17b1a767r3 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
+<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Compatibility-Attean/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rbd35929487a484576b68de2da17b1a767r3 ;
+	<http://ontologi.es/doap-deps#runtime-requirement> _:rbd35929487a484576b68de2da17b1a767r1, _:rbd35929487a484576b68de2da17b1a767r2 ;
+	<http://ontologi.es/doap-deps#test-requirement> _:rbd35929487a484576b68de2da17b1a767r0 ;
+	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://usefulinc.com/ns/doap#bug-database> <http://rt.cpan.org/Dist/Display.html?Queue=RDF-TrineX-Compatibility-Attean> ;
+	<http://usefulinc.com/ns/doap#created> "2017-12-22"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#developer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://usefulinc.com/ns/doap#download-page> <https://metacpan.org/release/RDF-TrineX-Compatibility-Attean> ;
+	<http://usefulinc.com/ns/doap#homepage> <https://metacpan.org/release/RDF-TrineX-Compatibility-Attean> ;
+	<http://usefulinc.com/ns/doap#license> <http://dev.perl.org/licenses/> ;
+	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://usefulinc.com/ns/doap#name> "RDF-TrineX-Compatibility-Attean" ;
+	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
+	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Compatibility-Attean/v_0-100> ;
+	<http://usefulinc.com/ns/doap#repository> _:rb8ee5bafb350b451aac783ec87ba2b540r0 ;
+	<http://usefulinc.com/ns/doap#shortdesc> "Compatibility layer between Attean and RDF::Trine" ;
+	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
+	a <http://usefulinc.com/ns/doap#Project> .
+<http://purl.org/NET/cpan-uri/dist/RDF-TrineX-Compatibility-Attean/v_0-100> <http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://purl.org/dc/terms/identifier> "RDF-TrineX-Compatibility-Attean-0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2018-01-31"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-TrineX-Compatibility-Attean-0.100.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Initial release" .
+<http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
+	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-trinex-compatibility-attean&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
+	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;
+	<http://xmlns.com/foaf/0.1/name> "Kjetil Kjernsmo" ;
+	<http://xmlns.com/foaf/0.1/nick> "KJETILK" ;
+	<http://xmlns.com/foaf/0.1/page> <https://metacpan.org/author/KJETILK> .

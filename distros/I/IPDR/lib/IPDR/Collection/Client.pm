@@ -17,11 +17,11 @@ IPDR::Collection::Client - IPDR Collection Client
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 =head1 SYNOPSIS
 
@@ -141,6 +141,18 @@ can be passed the following varaibles
     Capabilities - This defaults to 0x01 and should not be set to much else.
     TimeOut - This defaults to 5 and is passed to IO::Socket (usefulness ?!)
     DataHandler - This MUST be set and a pointer to a function (see example)
+
+    OutputVersion - 
+	This defaults to a basic and potentially old naming scheme and is used
+        for the XML output.
+
+        There are currently two values
+
+	basic - This is the default 
+	calix - This is here as they contacted me for an update.
+
+	If you want your vendor specific version let me know.
+       
     DEBUG - Set at your peril, 5 being the highest value.
 
 An example of using new is
@@ -293,6 +305,8 @@ sub new {
         if ( !$self->{_GLOBAL}{'InitiatorID'} )
                         { $self->{_GLOBAL}{'InitiatorID'}=""; }
 
+	if ( !$self->{_GLOBAL}{'OutputVersion'} )
+			{ $self->{_GLOBAL}{'OutputVersion'}="Basic"; }
 
 	$self->{_GLOBAL}{'data_ack'}=0;
 	$self->{_GLOBAL}{'ERROR'}="" ;
@@ -683,7 +697,7 @@ if ($child=fork)
 			}
 		if ( length($self->{_GLOBAL}{'XMLDirectory'})>5 )
 			{
-			if ( open (__FILE,">".$self->{_GLOBAL}{'XMLDirectory'}."/".$$self->{_GLOBAL}{'ServerIP'} ) )
+			if ( open (__FILE,">".$self->{_GLOBAL}{'XMLDirectory'}."/".$self->{_GLOBAL}{'ServerIP'} ) )
 				{
 				print __FILE $xml_transform;
 				close __FILE;
@@ -746,7 +760,7 @@ if ( $self->get_internal_value('data_ack') )
 
 		if ( length($self->{_GLOBAL}{'XMLDirectory'})>5 )
 			{
-			if ( open (__FILE,">".$self->{_GLOBAL}{'XMLDirectory'}."/".$$self->{_GLOBAL}{'ServerIP'} ) )
+			if ( open (__FILE,">".$self->{_GLOBAL}{'XMLDirectory'}."/".$self->{_GLOBAL}{'ServerIP'} ) )
 				{
 				print __FILE $xml_transform;
 				close __FILE;
@@ -2206,6 +2220,39 @@ foreach my $sequence ( sort { $a<=>$b } keys %{$data_pointer} )
 		{ ${$data_pointer}{$sequence}{'CMcpeIpv4List'}=""; }
 	$xml.="<IPDR xsi:type=\"DOCSIS-Type\">";
 	$xml.="<IPDRcreationTime>".${$data_pointer}{$sequence}{'RecCreationTime'}."</IPDRcreationTime>";
+
+	if (  $self->{_GLOBAL}{'OutputVersion'}=~/^calix$/i )
+	{
+ 	$xml.="<CmMacAddr>".${$data_pointer}{$sequence}{'CmMacAddr'}."</CmMacAddr>";
+ 	$xml.="<CmIpv4Addr>".${$data_pointer}{$sequence}{'CmIpv4Addr'}."</CmIpv4Addr>";
+ 	$xml.="<CmIpv6LinkLocalAddr>".${$data_pointer}{$sequence}{'CmIpv6LinkLocalAddr'}."</CmIpv6LinkLocalAddr>";
+ 	$xml.="<CmIpv6Addr>".${$data_pointer}{$sequence}{'CmIpv6Addr'}."</CmIpv6Addr>";
+ 	$xml.="<CmLastRegTime>".${$data_pointer}{$sequence}{'CmLastRegTime'}."</CmLastRegTime>";
+ 	$xml.="<CmQosVersion>".${$data_pointer}{$sequence}{'CmQosVersion'}."</CmQosVersion>";
+ 	$xml.="<CmRegStatusValue>".${$data_pointer}{$sequence}{'CmRegStatusValue'}."</CmRegStatusValue>";
+ 	$xml.="<CmtsHostName>".${$data_pointer}{$sequence}{'CmtsHostName'}."</CmtsHostName>";
+ 	$xml.="<CmtsIpv4Addr>".${$data_pointer}{$sequence}{'CmtsIpv4Addr'}."</CmtsIpv4Addr>";
+ 	$xml.="<CmtsIpv6Addr>".${$data_pointer}{$sequence}{'CmtsIpv6Addr'}."</CmtsIpv6Addr>";
+ 	$xml.="<CmtsSysUpTime>".${$data_pointer}{$sequence}{'CmtsSysUpTime'}."</CmtsSysUpTime>";
+ 	$xml.="<CmtsMdIfName>".${$data_pointer}{$sequence}{'CmtsMdIfName'}."</CmtsMdIfName>";
+ 	$xml.="<CmtsMdIfIndex>".${$data_pointer}{$sequence}{'CmtsMdIfIndex'}."</CmtsMdIfIndex>";
+ 	$xml.="<ServiceAppId>".${$data_pointer}{$sequence}{'ServiceAppId'}."</ServiceAppId>";
+ 	$xml.="<ServiceClassName>".${$data_pointer}{$sequence}{'ServiceClassName'}."</ServiceClassName>";
+ 	$xml.="<ServiceDirection>".${$data_pointer}{$sequence}{'ServiceDirection'}."</ServiceDirection>";
+ 	$xml.="<ServiceDsMulticast>".${$data_pointer}{$sequence}{'ServiceDsMulticast'}."</ServiceDsMulticast>";
+ 	$xml.="<ServiceFlowChSet>".${$data_pointer}{$sequence}{'ServiceFlowChSet'}."</ServiceFlowChSet>";
+ 	$xml.="<ServiceGateId>".${$data_pointer}{$sequence}{'ServiceGateId'}."</ServiceGateId>";
+ 	$xml.="<ServiceIdentifier>".${$data_pointer}{$sequence}{'ServiceIdentifier'}."</ServiceIdentifier>";
+ 	$xml.="<ServiceOctetsPassed>".${$data_pointer}{$sequence}{'ServiceOctetsPassed'}."</ServiceOctetsPassed>";
+ 	$xml.="<ServicePktsPassed>".${$data_pointer}{$sequence}{'ServicePktsPassed'}."</ServicePktsPassed>";
+ 	$xml.="<ServiceSlaDelayPkts>".${$data_pointer}{$sequence}{'ServiceSlaDelayPkts'}."</ServiceSlaDelayPkts>";
+ 	$xml.="<ServiceSlaDropPkts>".${$data_pointer}{$sequence}{'ServiceSlaDropPkts'}."</ServiceSlaDropPkts>";
+ 	$xml.="<ServiceTimeActive>".${$data_pointer}{$sequence}{'ServiceTimeActive'}."</ServiceTimeActive>";
+ 	$xml.="<ServiceTimeCreated>".${$data_pointer}{$sequence}{'ServiceTimeCreated'}."</ServiceTimeCreated>";
+	$ipdrrecorder = ${$data_pointer}{$sequence}{'CmtsIpv4Addr'};
+	}
+	else
+	{
 	$xml.="<CMTShostName>".${$data_pointer}{$sequence}{'CMTShostName'}."</CMTShostName>";
 	$xml.="<CMTSipAddress>".${$data_pointer}{$sequence}{'CMTSipAddress'}."</CMTSipAddress>";
 	$xml.="<CMTSsysUpTime>".${$data_pointer}{$sequence}{'CMTSsysUpTime'}."</CMTSsysUpTime>";
@@ -2230,6 +2277,7 @@ foreach my $sequence ( sort { $a<=>$b } keys %{$data_pointer} )
 	$xml.="<serviceTimeActive>".${$data_pointer}{$sequence}{'serviceTimeActive'}."</serviceTimeActive>";
 	$xml.="</IPDR>";
 	$ipdrrecorder = ${$data_pointer}{$sequence}{'CMTShostName'};
+	}
         }
 $ipdrcreationtime = ctime();
 $header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
@@ -2482,7 +2530,7 @@ Thanks to http://www.streamsolutions.co.uk/ for my Flash Streaming Server
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011 Andrew S. Kennedy, all rights reserved.
+Copyright 2018 Andrew S. Kennedy, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

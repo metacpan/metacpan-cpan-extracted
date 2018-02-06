@@ -7,12 +7,12 @@ Astro::Catalog::Query::GSC - A query request to the GSC Catalog
 =head1 SYNOPSIS
 
   $gsc = new Astro::Catalog::Query::GSC( RA        => $ra,
-					 Dec       => $dec,
-					 Radius    => $radius,
-					 Bright    => $magbright,
-					 Faint     => $magfaint,
-					 Sort      => $sort_type,
-					 Nout      => $number_out );
+                                         Dec       => $dec,
+                                         Radius    => $radius,
+                                         Bright    => $magbright,
+                                         Faint     => $magfaint,
+                                         Sort      => $sort_type,
+                                         Nout      => $number_out );
 
   my $catalog = $gsc->querydb();
 
@@ -50,11 +50,7 @@ use Astro::Flux;
 use Astro::Fluxes;
 use Number::Uncertainty;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: GSC.pm,v 1.5 2005/06/16 01:57:35 aa Exp $
+$VERSION = "4.32";
 
 =begin __PRIVATE_METHODS__
 
@@ -91,20 +87,20 @@ by the remote system (and to be included in the query).
 sub _get_allowed_options {
   my $self = shift;
   return (
-	  ra => 'ra',
-	  dec => 'dec',
-	  object => 'object',
-	  radmax => 'radmax',
-	  magbright => 'magbright',
-	  magfaint => 'magfaint',
-	  sort => 'sort',
-	  nout => 'nout',
-	  format => 'format',
-	  catalogue => 'catalogue',
-	  epoch => 'epoch',
-	  chart => 'chart',
-	  multi => 'multi',
-	 );
+          ra => 'ra',
+          dec => 'dec',
+          object => 'object',
+          radmax => 'radmax',
+          magbright => 'magbright',
+          magfaint => 'magfaint',
+          sort => 'sort',
+          nout => 'nout',
+          format => 'format',
+          catalogue => 'catalogue',
+          epoch => 'epoch',
+          chart => 'chart',
+          multi => 'multi',
+         );
 }
 
 =item B<_get_default_options>
@@ -115,25 +111,25 @@ Get the default query state.
 
 sub _get_default_options {
   return  (
-	   # Hidden
-	   catalogue => 'gsc',
-	   epoch => '2000.0',
-	   chart => 1,
+           # Hidden
+           catalogue => 'gsc',
+           epoch => '2000.0',
+           chart => 1,
 
-	   # Target information
-	   ra => undef,
-	   dec => undef,
-	   object => undef,
+           # Target information
+           ra => undef,
+           dec => undef,
+           object => undef,
 
-	   # Limits
-	   radmax => 5,
-	   magbright => 0,
-	   magfaint => 100,
-	   format => 1,
-	   sort => 'RA',
-	   nout => 20000,
-	   multi => 1,
-	  );
+           # Limits
+           radmax => 5,
+           magbright => 0,
+           magfaint => 100,
+           format => 1,
+           sort => 'RA',
+           nout => 20000,
+           multi => 1,
+          );
 }
 
 =item B<_parse_query>
@@ -177,14 +173,14 @@ sub _parse_query {
      if( lc($buffer[$line]) =~ "<td>dec:" ) {
         $_ = lc($buffer[$line]);
         my ( $dec ) = /^\s+<td>dec:\s+(.*)<\/td>/;
-	$field{Dec} = $dec;
+        $field{Dec} = $dec;
      }
 
      # Radius
      if( lc($buffer[$line]) =~ "search radius:" ) {
         $_ = lc($buffer[$line+1]);
         my ( $radius ) = />\s+(.*)\s\w/;
-	$field{Radius} = $radius;
+        $field{Radius} = $radius;
      }
      $catalog->fieldcentre( %field );
 
@@ -225,22 +221,22 @@ sub _parse_query {
               # Dec
               my $objdec = "$separated[6] $separated[7] $separated[8]";
 
-	      $star->coords( new Astro::Coords(ra => $objra,
-					       dec => $objdec,
-					       units => 'sex',
-					       type => 'J2000',
-					       name => $id,
-					       ),
-			     );
+              $star->coords( new Astro::Coords(ra => $objra,
+                                               dec => $objdec,
+                                               units => 'sex',
+                                               type => 'J2000',
+                                               name => $id,
+                                               ),
+                             );
 
               # B Magnitude
               #my %b_mag = ( B => $separated[10] );
               #$star->magnitudes( \%b_mag );
 
-	      $star->fluxes( new Astro::Fluxes( new Astro::Flux(
-	               new Number::Uncertainty( Value => $separated[10],
-		                                Error => $separated[11] ),
-			'mag', "B" )));
+              $star->fluxes( new Astro::Fluxes( new Astro::Flux(
+                       new Number::Uncertainty( Value => $separated[10],
+                                                Error => $separated[11] ),
+                        'mag', "B" )));
 
               # B mag error
               #my %mag_errors = ( B => $separated[11] );
@@ -322,10 +318,10 @@ sub _translate_one_to_one {
   my $self = shift;
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
-	  map { $_, undef }(qw/
-			    chart epoch catalogue
-			    /)
-	 );
+          map { $_, undef }(qw/
+                            chart epoch catalogue
+                            /)
+         );
 }
 
 

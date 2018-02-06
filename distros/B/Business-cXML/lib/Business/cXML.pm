@@ -108,7 +108,7 @@ use Scalar::Util 'blessed';
 use Business::cXML::Transmission;
 
 BEGIN {
-	our $VERSION = 'v0.6.3';
+	our $VERSION = 'v0.6.5';
 	our $CXML_VERSION = '1.2.036';
 	our $USERAGENT = "Business::cXML.pm $VERSION";
 }
@@ -535,6 +535,10 @@ sub stringify {
 }
 
 =back
+
+=head1 VERSION
+
+0.6.5 based on cXML DTD 1.2.036
 
 =head1 AUTHOR
 

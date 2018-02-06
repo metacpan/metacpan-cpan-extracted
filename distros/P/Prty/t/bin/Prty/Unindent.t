@@ -106,6 +106,39 @@ sub test_trim : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+my $Result4 =
+"  Dies ist
+ein Test-
+Text.
+
+  Nächster
+Absatz\n";
+
+sub test_trimNl : Test(2) {
+    my $self = shift;
+
+    # undef
+    
+    my $str = Prty::Unindent->trimNl(undef);
+    $self->is($str,'');
+
+    # String mit Leerzeilen und Einrückung
+    
+    $str = Prty::Unindent->trimNl('
+
+      Dies ist
+    ein Test-
+    Text.
+
+      Nächster
+    Absatz
+
+    ');
+    $self->is($str,$Result4);
+}
+
+# -----------------------------------------------------------------------------
+
 package main;
 Prty::Unindent::Test->runTests;
 

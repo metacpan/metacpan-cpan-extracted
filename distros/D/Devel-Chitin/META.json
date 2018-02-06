@@ -4,7 +4,7 @@
       "Anthony Brummett <brummett@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
          "web" : "https://github.com/amb43790/Devel-Chitin"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0218"
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

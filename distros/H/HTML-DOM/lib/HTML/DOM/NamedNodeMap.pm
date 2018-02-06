@@ -7,7 +7,7 @@ use HTML::DOM::Exception qw'NOT_FOUND_ERR';
 use HTML::DOM::_FieldHash;
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 fieldhashes \my(%a, %h);
 

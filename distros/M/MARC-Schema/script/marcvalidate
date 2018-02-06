@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+
+use Getopt::Long 'HelpMessage';
+use MARC::Parser::RAW;
+use MARC::Parser::XML;
+use MARC::Schema;
+use DDP;
+
+GetOptions(
+    'file|f=s' => \my $file,
+    'type|t=s' => \( my $type = 'RAW' ),
+    'help|h'   => sub { HelpMessage(0) },
+) or HelpMessage(1);
+
+die "file not found" unless defined $file and -e $file;
+
+my $schema = MARC::Schema->new();
+
+my $parser;
+if ( $type eq 'RAW' ) {
+    $parser = MARC::Parser::RAW->new($file);
+}
+elsif ( $type eq 'XML' ) {
+    $parser = MARC::Parser::XML->new($file);
+}
+else {
+    print qq{type '$type' not supported. Use 'RAW' or 'XML'};
+}
+
+my $record_count = 0;
+while ( my $record = $parser->next() ) {
+    $record_count++;
+    my @result = $schema->check($record);
+    if (@result > 0) {
+        print "Record $record_count:\n";
+        p @result;
+    }
+}
+
+=head1 NAME
+
+marcvalidate - Validate a file with MARC21 records
+
+=head1 SYNOPSIS
+
+  --file,-f   Path to MARC21 file
+  --type,-t   Type of MARC21 serialization (RAW|XML, default: RAW)
+  --help,-h   Print this help
+
+=head1 AUTHOR
+
+Johann Rolschewski E<lt>jorol@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2018- Johann Rolschewski
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

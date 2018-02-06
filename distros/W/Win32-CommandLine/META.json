@@ -1,28 +1,35 @@
 {
    "abstract" : "Retrieve and reparse the Win32 command line",
    "author" : [
-      "Roy Ivy III <rivy[at]cpan[dot]org>"
+      "Roy Ivy III <rivy@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Win32-CommandLine",
    "no_index" : {
       "directory" : [
          "eg",
          "extras",
-         "notes"
+         "notes",
+         "inc",
+         "t",
+         "xt"
+      ],
+      "file" : [
+         "README.mkd"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Config" : "0",
             "Cwd" : "0",
             "ExtUtils::CBuilder" : "0",
             "ExtUtils::Manifest" : "1.54",
@@ -34,24 +41,39 @@
             "File::Spec::Functions" : "0",
             "File::Which" : "0",
             "FindBin" : "0",
-            "IPC::Run3" : "0",
+            "IO::File" : "0",
             "Module::Build" : "0",
-            "Probe::Perl" : "0",
-            "Test::Differences" : "0",
-            "Test::More" : "0",
+            "TAP::Formatter::Color" : "0",
+            "TAP::Formatter::Console" : "0",
+            "TAP::Harness" : "0",
+            "Text::Template" : "1.44",
+            "URI" : "0",
             "perl" : "v5.6.1",
             "version" : "0.77"
          }
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
+            "Cwd" : "0",
+            "ExtUtils::Manifest" : "1.54",
             "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Glob" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
             "File::Spec::Functions" : "0",
+            "File::Which" : "0",
             "FindBin" : "0",
+            "IO::File" : "0",
             "Module::Build" : "0",
+            "TAP::Formatter::Color" : "0",
+            "TAP::Formatter::Console" : "0",
             "TAP::Harness" : "0",
-            "Test::Harness" : "3.0",
-            "Text::Template" : "1.44"
+            "Text::Template" : "1.44",
+            "URI" : "0",
+            "perl" : "v5.6.1",
+            "version" : "0.77"
          }
       },
       "runtime" : {
@@ -67,19 +89,62 @@
             "perl" : "v5.8.8",
             "version" : "0.74"
          }
+      },
+      "test" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Cwd" : "0",
+            "ExtUtils::Manifest" : "1.54",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Glob" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Which" : "0",
+            "FindBin" : "0",
+            "IO::File" : "0",
+            "IPC::Run3" : "0",
+            "Module::Build" : "0",
+            "Probe::Perl" : "0",
+            "TAP::Formatter::Color" : "0",
+            "TAP::Formatter::Console" : "0",
+            "TAP::Harness" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Text::Template" : "1.44",
+            "URI" : "0",
+            "perl" : "v5.6.1",
+            "version" : "0.77"
+         }
       }
    },
    "provides" : {
       "Win32::CommandLine" : {
          "file" : "lib/Win32/CommandLine.pm",
-         "version" : "0.938"
+         "version" : "0.954"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rivy/perl.Win32-CommandLine/issues"
+      },
+      "homepage" : "https://github.com/rivy/perl.Win32-CommandLine",
       "license" : [
          "http://www.perlfoundation.org/artistic_license_2_0"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rivy/perl.Win32-CommandLine.git",
+         "web" : "https://github.com/rivy/perl.Win32-CommandLine"
+      }
    },
-   "version" : "0.938"
+   "version" : "0.954",
+   "x_authority" : "cpan:RIVY",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

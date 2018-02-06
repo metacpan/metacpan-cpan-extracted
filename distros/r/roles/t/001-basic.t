@@ -82,10 +82,15 @@ my $Comparable = MOP::Role->new( name => 'Comparable');
 my $USCurrency = MOP::Class->new( name => 'US::Currency');
 
 ok($Comparable->does_role( 'Eq' ), '... Comparable does the Eq role');
+ok(Comparable->roles::DOES( 'Eq' ), '... Comparable does the Eq role');
 
 ok($USCurrency->does_role( 'Eq' ), '... US::Currency does Eq');
 ok($USCurrency->does_role( 'Comparable' ), '... US::Currency does Comparable');
 ok($USCurrency->does_role( 'Printable' ), '... US::Currency does Printable');
+
+ok(US::Currency->roles::DOES( 'Eq' ), '... US::Currency does Eq');
+ok(US::Currency->roles::DOES( 'Comparable' ), '... US::Currency does Comparable');
+ok(US::Currency->roles::DOES( 'Printable' ), '... US::Currency does Printable');
 
 ok($Eq->requires_method('equal_to'), '... EQ::equal_to is a stub method');
 ok(!$Eq->requires_method('not_equal_to'), '... EQ::not_equal_to is NOT a stub method');
@@ -94,15 +99,18 @@ ok(!$Eq->requires_method('not_equal_to'), '... EQ::not_equal_to is NOT a stub me
     my $dollar = US::Currency->new( amount => 10 );
     ok($dollar->isa( 'US::Currency' ), '... the dollar is a US::Currency instance');
 
+    ok($dollar->roles::DOES('Eq'), '... check that it does the Eq role');
     can_ok($dollar, 'equal_to');
     can_ok($dollar, 'not_equal_to');
 
+    ok($dollar->roles::DOES('Comparable'), '... check that it does the Eq role');
     can_ok($dollar, 'greater_than');
     can_ok($dollar, 'greater_than_or_equal_to');
     can_ok($dollar, 'less_than');
     can_ok($dollar, 'less_than_or_equal_to');
-
     can_ok($dollar, 'compare');
+
+    ok($dollar->roles::DOES('Printable'), '... check that it does the Eq role');
     can_ok($dollar, 'to_string');
 
     is($dollar->to_string, '$10.00 USD', '... got the right to_string value');

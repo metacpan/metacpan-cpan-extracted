@@ -3,6 +3,7 @@ lib/Prty.pm
 lib/Prty/AnsiColor.pm
 lib/Prty/ApplicationPaths.pm
 lib/Prty/Array.pm
+lib/Prty/AsciiTable.pm
 lib/Prty/ClassConfig.pm
 lib/Prty/ClassLoader.pm
 lib/Prty/Color.pm
@@ -91,6 +92,7 @@ lib/Prty/JQuery/Form/ViewEdit.pm
 lib/Prty/JQuery/Function.pm
 lib/Prty/JQuery/Tabs.pm
 lib/Prty/LaTeX/Generator.pm
+lib/Prty/LaTeX/LongTable.pm
 lib/Prty/LineProcessor.pm
 lib/Prty/LineProcessor/Line.pm
 lib/Prty/LockedCounter.pm
@@ -168,6 +170,7 @@ README
 t/bin/Prty/AnsiColor.t
 t/bin/Prty/ApplicationPaths.t
 t/bin/Prty/Array.t
+t/bin/Prty/AsciiTable.t
 t/bin/Prty/ClassConfig.t
 t/bin/Prty/ClassLoader.t
 t/bin/Prty/Color.t
@@ -256,6 +259,7 @@ t/bin/Prty/JQuery/Form/ViewEdit.t
 t/bin/Prty/JQuery/Function.t
 t/bin/Prty/JQuery/Tabs.t
 t/bin/Prty/LaTeX/Generator.t
+t/bin/Prty/LaTeX/LongTable.t
 t/bin/Prty/LineProcessor.t
 t/bin/Prty/LineProcessor/Line.t
 t/bin/Prty/LockedCounter.t

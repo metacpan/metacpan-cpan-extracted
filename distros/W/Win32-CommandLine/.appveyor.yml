@@ -1,0 +1,178 @@
+# .appveyor.yml
+
+# ref: https://www.appveyor.com/docs/appveyor-yml @@ https://archive.is/OUJHS
+# * validation tool @ https://ci.appveyor.com/tools/validate-yaml
+
+# * note: AppVeyor setup
+# 1. add an AppVeyor project observing the repository
+# 2. enable "General / Skip branches without appveyor.yml" within the project SETTINGS
+
+# note: alternate perl AppVeyor implementation @ https://github.com/rivy/Sub-Quote/blob/6fc8fa26ebdb5bf31107e1153764bd436455b575/.appveyor.yml
+#   ... (with associated https://github.com/rivy/Sub-Quote/blob/6fc8fa26ebdb5bf31107e1153764bd436455b575/.appveyor.cmd )
+
+version: "{build} ~ {branch}"
+
+skip_tags: true     # do not build on tags
+
+branches:
+  except:
+    - gh-pages
+
+environment:
+    matrix:
+        - Perl_VERSION: "latest"
+          COVERAGE: "Codecov Coveralls" ## note: case sensitive!
+        - Perl_VERSION: "5.24.3.1"
+        - Perl_VERSION: "5.22.3.1"
+        - Perl_VERSION: "5.20.3.3"
+        - Perl_VERSION: "5.16"
+        - Perl_VERSION: "5.14"
+        - Perl_VERSION: "5.12"
+        - Perl_VERSION: "5.10"
+        - Perl_VERSION: "5.8"
+        - Perl_VERSION: "5.8.8"
+
+# note: cache is too small to be helpful
+# cache:
+#     - C:\strawberry -> .appveyor.yml
+
+install:
+    # move "C:\mingw" to avoid cross library linking (a problem with older perl versions, breaking dll compilation with "/mingw/lib/dllcrt2.o:(.text+0xd1): undefined reference to `__dyn_tls_init_callback'")
+    - move c:\mingw c:\mingw.o >NUL
+    # ensure CWD is project main directory
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    # force branch checkout (if knowable), then reset to the specific commit ## (needed for accurate code coverage info)
+    # * this allows later apps to see the branch name using standard `git branch` operations, yet always builds the correct specific commit
+    # * ref: <https://github.com/appveyor/ci/issues/1606>[`@`](https://archive.is/RVpnF)
+    - if DEFINED APPVEYOR_REPO_BRANCH ( git checkout "%APPVEYOR_REPO_BRANCH%" & git reset --hard "%APPVEYOR_REPO_COMMIT%" )
+    # install perl
+    # * install strawberry perl
+    - call .appveyor.install-perl.BAT
+    # * install `cpanm` (needed for older perl versions)
+    - cpan -T -i App::cpanminus 2>&1 | rem
+    # * pre-install problematic modules for perl versions < 5.14
+    #   'ExtUtils::MakeMaker'
+    #   - for perl versions < 5.14, installing ExtUtils::MakeMaker >= 7.0 causes ... "The system cannot find the path specified.\ndmake.exe:  Error code 129, while making 'blib\lib\ExtUtils\.exists'"
+    - perl -e "use version; use ExtUtils::MakeMaker; exit -1 if version->parse($ExtUtils::MakeMaker::VERSION) < version->parse(q{7.0});" || cpanm --no-interactive --no-man-pages --notest ExtUtils::MakeMaker~"< 7.0" 2>&1
+    #   'version'
+    #   - updated version needed for many installs; local VERSION file conflicts and confuses `cpanm` => using "//version" to disambiguate
+    #   - 'version' requires 'parent' (missing requirement on some 0.9915+ versions, specifically 0.9918 [most recent on 2018-01-20])
+    - cpanm --no-interactive --no-man-pages --notest --quiet parent //version 2>&1
+    #   'ExtUtils::ParseXS'
+    #   - updated ParseXS needed to install File::Spec (o/w PathTools installation fails with "Cwd.o:Cwd.c:(.text+0x593): undefined reference to `croak_xs_usage'")
+    - cpanm --no-interactive --no-man-pages --notest --quiet ExtUtils::ParseXS 2>&1
+    # * show perl version verification
+    - perl -V
+    # install baseline dependencies
+    - cpanm --no-interactive --no-man-pages --notest --quiet --skip-satisfied --installdeps .
+    # check OS_unsupported
+    - perl Build.PL 2>&1 | findstr /b /i /r "OS unsupported\b" >NUL 2>&1 && set "OS_unsupported=OS unsupported" || set "OS_unsupported="
+    # check code coverage
+    - ps: |
+        if ($env:COVERAGE) {
+            # determine coverage support (signalled by <COVERAGE_TYPE>_TOKEN environment vars)
+            $s = $env:COVERAGE
+            $coverage = @()
+            $s.split() | foreach {
+                $name = "env:\"+$_.ToUpper()+"_TOKEN"
+                $val = (get-item $("env:\"+$_.ToUpper()+"_TOKEN") -ea ignore).value
+                # write-host "$name = '$val'"
+                # write-host "`$val.length = $($val.length)"
+                if ($val.length -gt 0) { $coverage += $_ } else { write-host -f yellow "info: skipping '$_' coverage (missing '$($_.ToUpper() + '_TOKEN')')" }
+                }
+            $env:COVERAGE = $coverage -join " "
+            # write-host "env:COVERAGE = $env:COVERAGE"
+            }
+    # install any extra dependencies (including recommended dependencies)
+    - if NOT DEFINED OS_unsupported ( cpanm --no-interactive --no-man-pages --notest --quiet --skip-satisfied --with-recommends --installdeps . )
+    # install any needed code coverage dependencies
+    - ps: |
+        if (-not $env:OS_unsupported -and $env:COVERAGE) {
+            # install coverage support
+            cpanm --no-interactive --no-man-pages --notest --skip-satisfied Devel::Cover
+            ($env:COVERAGE).split() | foreach {
+                # echo "cpanm --no-interactive --no-man-pages --notest --skip-satisfied Devel::Cover::Report::$_"
+                if ( $_ -ieq "Coveralls" ) {
+                    ## override for bugged default "Coveralls"; use patched version from personal github repo
+                    cpanm --no-interactive --no-man-pages --notest --quiet --skip-satisfied https://github.com/rivy/perl.Devel-Cover-Report-Coveralls.git
+                    }
+                else {
+                    cpanm --no-interactive --no-man-pages --notest --quiet --skip-satisfied Devel::Cover::Report::$_
+                    }
+                }
+            }
+
+before_build:
+    # ensure CWD is project main directory
+    - cd "%APPVEYOR_BUILD_FOLDER%"
+    # setup environment options
+    - set AUTOMATED_TESTING=1
+    - set DEVEL_COVER_OPTIONS=-ignore,^_build/
+    # * for non-COVERAGE builds, enable parallel processing (COVERAGE builds need sequential, correctly interleaved, output to avoid warnings)
+    - if NOT DEFINED COVERAGE (set "HARNESS_OPTIONS=j")
+    - set HARNESS_TIMER=1
+    # * for COVERAGE builds, preload JSON:PP to avoid JSON::PP::Boolean redefine warning (see <https://github.com/rurban/Cpanel-JSON-XS/issues/65#issuecomment-219352754>)
+    - if DEFINED COVERAGE (set HARNESS_PERL_SWITCHES=-MJSON::PP %HARNESS_PERL_SWITCHES%)
+    # display environment
+    - echo AUTOMATED_TESTING=%AUTOMATED_TESTING%
+    - echo COVERAGE=%COVERAGE%
+    - echo DEVEL_COVER_OPTIONS=%DEVEL_COVER_OPTIONS%
+    - echo HARNESS_OPTIONS=%HARNESS_OPTIONS%
+    - echo HARNESS_TIMER=%HARNESS_TIMER%
+    - echo HARNESS_PERL_SWITCHES=%HARNESS_PERL_SWITCHES%
+    - echo make=%make%
+    - echo OS_unsupported=%OS_unsupported%
+    # - echo PATH=%PATH%
+    - echo PERL5OPT=%PERL5OPT%
+
+build_script:
+    - if NOT DEFINED OS_unsupported ( perl Build.PL && perl Build )
+
+test_script:
+    - if NOT DEFINED OS_unsupported if DEFINED COVERAGE ( perl Build testcover ) else ( perl Build test )
+
+after_test:
+    # reporting
+    # * report any code coverage information
+    - ps: if (-not $env:OS_unsupported -and $env:COVERAGE) { $env:COVERAGE.split() | foreach { cover -report $_ 2>&1 } }
+    # # * report test results, if requested and configured (WIP: might be better done elsewhere upon deployment to CPAN)
+    # - ps: |
+    #     if ($env:REPORT) {
+    #         # install reporting modules
+    #         # * ensure "C:\tmp" exists; allows Data::UUID to build; "--force" alone won't work (? perl version dependent) ## Data::UUID is bugged (see <https://github.com/rjbs/Data-UUID/issues/24>[`@`](http://archive.is/pFyzW))
+    #         mkdir "C:\tmp"
+    #         cpanm --no-interactive --no-man-pages --notest --skip-satisfied Data::UUID
+    #         cpanm --force --no-interactive --no-man-pages --notest --skip-satisfied CPAN::Testers::Common::Client
+    #         cpanm --no-interactive --no-man-pages --notest --skip-satisfied Task::CPAN::Reporter Test::Reporter Test::Reporter::Transport::Metabase App::cpanminus::reporter
+    #         cpanm --no-interactive --no-man-pages --notest --skip-satisfied App::cpanminus::reporter
+    #         # setup reporter configuration
+    #         $dname = "$env:USERPROFILE/.cpanreporter"
+    #         $fname = "$dname/config.ini"
+    #         $content = ( 'edit_report=default:no pass/na:no', 'email_from="Roy Ivy III" <rivy@cpan.org>', 'send_report=default:no pass/na:yes', 'transport=Metabase uri http://metabase.cpantesters.org/api/v1 id_file metabase_id.json' )
+    #         mkdir $dname
+    #         [System.IO.File]::WriteAllText( $fname, $($content -join "`n") + "`n" ); # write ASCII text without BOM
+    #         type $fname
+    #         metabase-profile --email none@no.com --name "John Doe" --secret nono9999! --output "$dname/metabase_id.json"
+    #         type "$dname/metabase_id.json"
+    #         # determine test commit info
+    #         $prefix = if ($env:APPVEYOR_REPO_PROVIDER -eq "github") {"https://github.com/"} elseif ($env:APPVEYOR_REPO_PROVIDER -eq "bitbucket") {"https://bitbucket.org/"} else {""}
+    #         $env:REPO_URL = $prefix + $env:APPVEYOR_REPO_NAME
+    #         perl -MCPAN -e "CPAN::HandleConfig->load; CPAN::Shell->o('conf','test_report','1'); CPAN::Shell->o('conf','commit');" >NUL
+    #         # repeat test for reporter
+    #         cpan -T %REPO_URL%.git@%APPVEYOR_REPO_COMMIT%
+    #         # report
+    #         cpanm-reporter --dry-run
+    #         }
+    # "unsupported" notice, if needed
+    - ps: |
+        if ($env:OS_unsupported) { write-host -f magenta "WARN: OS unsupported" }
+
+
+# notifications:
+# To get Github PR notifications from AppVeyor, get an auth token from Github,
+# encrypt it at https://ci.appveyor.com/tools/encrypt and put it into the
+# secure field
+#  - provider: GitHubPullRequest
+#    auth_token:
+#      secure: ...
+notifications:

@@ -7,7 +7,7 @@ Attean::Literal - RDF Literals
 
 =head1 VERSION
 
-This document describes Attean::Literal version 0.018
+This document describes Attean::Literal version 0.019
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ Returns true if the literal has a language tag, false otherwise.
 
 =cut
 
-package Attean::Literal 0.018 {
+package Attean::Literal 0.019 {
 	use Moo;
 	use Types::Standard qw(Str Maybe InstanceOf);
 	use Attean::API::Term;
@@ -94,7 +94,7 @@ package Attean::Literal 0.018 {
 		my $orig	= shift;
 		my $self	= shift;
 		if ($self->has_language) {
-			return Attean::IRI->new(value => 'http://www.w3.org/2001/XMLSchema#langString');
+			return Attean::IRI->new(value => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString');
 		} else {
 			return $self->$orig(@_);
 		}
@@ -169,7 +169,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

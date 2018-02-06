@@ -1,0 +1,7 @@
+# .codecov.yml ([Codecov](https://codecov.io))
+
+# overrides default / team config (see https://docs.codecov.io/docs/codecov-yaml @@ https://archive.is/BGhys)
+
+# turn off pull request commentary
+# ref: https://docs.codecov.io/docs/pull-request-comments @@ https://archive.is/rfFrw
+comment: false

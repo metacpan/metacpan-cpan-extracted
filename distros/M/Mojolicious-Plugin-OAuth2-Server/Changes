@@ -1,5 +1,9 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.40     2018-02-02
+        - Add oauth2_auth_request helper to get at redirect URI that results
+          from the authorization process
+
 0.39     2018-09-01
         - Add failing test case for return values when refresh token is
           a JWT (GH #17, thanks to pierre-vigier)

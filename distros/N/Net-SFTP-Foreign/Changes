@@ -1,5 +1,19 @@
 Revision history for Net::SFTP::Foreign
 
+1.89  Feb 2, 2018
+	- Method "ls" has an internal shortcut intended to improve
+          performance that was never taken (bug report and patch by
+          Dean West).
+
+1.88_02  Aug 21, 2017
+        - Handle ECHILD errors correctly during connection setup (bug
+          report by Gianni Ceccarelli).
+
+1.88_01  Jul 6, 2017
+        - _read_fill_cache was setting error at EOF and even dying
+          when in autodie mode. That affected most methods on the
+          FileHandle interface.
+
 1.87  Feb 10, 2017
         - rget handle correctly the case where the given remote source
           is a file (bug report by Mirror).

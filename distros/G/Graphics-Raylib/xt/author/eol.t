@@ -23,12 +23,13 @@ my @files = (
     't/10-mouse.t',
     't/11-key.t',
     't/12-keyboard.t',
-    't/20-init.t',
-    't/21-fps.t',
-    't/22-background.t',
+    't/20-use-ok.t',
     't/23-progress-bar.t',
     't/24-bitmap.t',
-    't/30-game-of-life.t'
+    't/30-game-of-life.t',
+    't/31-sierpinski.t',
+    't/32-fractals.t',
+    't/40-3d.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

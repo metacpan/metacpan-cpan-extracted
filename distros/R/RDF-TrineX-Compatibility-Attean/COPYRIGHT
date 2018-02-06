@@ -1,0 +1,56 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: RDF-TrineX-Compatibility-Attean
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+Source: https://metacpan.org/release/RDF-TrineX-Compatibility-Attean
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ t/literal.t
+ t/model.t
+ t/node.t
+Copyright: Copyright 2018 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ README.pod
+ lib/RDF/TrineX/Compatibility/Attean.pm
+ t/01basic.t
+Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: dist.ini
+ t/blank.t
+ t/iri.t
+Copyright: Copyright 2017 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

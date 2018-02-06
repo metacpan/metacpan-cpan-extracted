@@ -33,6 +33,10 @@ test_phrase 'swedish fish', 'swedish fish';
 # fallback
 test_phrase 'green', 'greens';
 
+# RT#118767
+test_phrase 'functionality', 'functionalities';
+test_phrase 'Functionality', 'Functionalities';
+
 Test::NoWarnings::had_no_warnings;
 
 done_testing;

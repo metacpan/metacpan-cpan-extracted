@@ -23,13 +23,13 @@ no_index:
 requires:
   IRC::Utils: '0'
   POE: '0'
-  POE::Component::IRC: '6.62'
+  POE::Component::IRC: '6.90'
   Text::Wrap: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bot-BasicBot
   homepage: http://metacpan.org/release/Bot-BasicBot
   license: http://dev.perl.org/licenses/
   repository: git://github.com/bigpresh/bot-basicbot.git
-version: '0.91'
+version: '0.93'
 x_authority: cpan:BIGPRESH
 x_serialization_backend: 'YAML::Tiny version 1.69'

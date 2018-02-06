@@ -3,7 +3,7 @@ package Firefox::Marionette::Element::Rect;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -40,7 +40,7 @@ Firefox::Marionette::Element::Rect - Represents the box around an Element
 
 =head1 VERSION
 
-Version 0.30
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ Version 0.30
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
-    my $rect = $firefox->find_element('//button[@name="lucky"]')->rect();
+    my $rect = $firefox->find('//button[@name="lucky"]')->rect();
     say "Current height of the Lucky button " . $rect->height();
 
 =head1 DESCRIPTION

@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 
-use Log::Dispatch;
 use Path::Class qw( tempdir );
 use Stepford::Runner;
 use Time::HiRes qw( sleep );

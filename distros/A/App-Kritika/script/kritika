@@ -7,11 +7,13 @@ use Getopt::Long;
 use App::Kritika;
 use App::Kritika::Settings;
 
-my $opt_head;
-my $opt_changes;
+my $opt_diff_branch;
+my $opt_diff_ref;
+my $opt_diff_snapshot;
 GetOptions(
-    'head=s'  => \$opt_head,
-    'changes' => \$opt_changes
+    'diff-branch=s'   => \$opt_diff_branch,
+    'diff-ref=s'      => \$opt_diff_ref,
+    'diff-snapshot=i' => \$opt_diff_snapshot,
 ) or die("Error in command line arguments\n");
 
 my @files;
@@ -25,35 +27,49 @@ else {
 
 @files = grep { -f $_ } @files;
 
-die "Usage: [--head=<head>] [--changes] <file>...\n" unless @files;
+die <<"EOF" unless @files;
+Usage: [--diff-ref=<reference>]
+       [--diff-snapshot=<snapshot-seq>]
+       [--diff-branch=<branch>]
+       <file>...
+EOF
 
 my $settings = App::Kritika::Settings->new( file => $files[0] )->settings;
 
-my $kritika =
-  App::Kritika->new( %$settings, head => $opt_head, changes => $opt_changes );
+my $kritika = App::Kritika->new(
+    %$settings,
+    diff_branch   => $opt_diff_branch,
+    diff_ref      => $opt_diff_ref,
+    diff_snapshot => $opt_diff_snapshot
+);
 
 my $issues_found = 0;
-foreach my $file (@files) {
-    my $report = eval { $kritika->validate($file) } or do {
-        print "Error: $file:$@";
-        $issues_found++;
-        next;
-    };
 
-    foreach my $issue (@$report) {
-        $issue->{col_no} //= 1;
-        print "$file:$issue->{line_no}:$issue->{col_no}: "
-          . "[$issue->{profile}/$issue->{rule}] $issue->{message}\n";
+my $report = $kritika->validate(@files);
 
-        $issues_found++;
-    }
+if ( $report->{success} ) {
+    print "No violations found\n";
 
-    if ( !@$report ) {
-        print "$file:OK\n";
-    }
+    exit 0;
 }
+else {
+    foreach my $file ( @{ $report->{files} } ) {
+        if ( $file->{success} ) {
+            print "$file->{path}:OK\n";
+            next;
+        }
 
-exit($issues_found);
+        foreach my $violation ( sort { $a->{line_no} <=> $b->{line_no} }
+            @{ $file->{violations} } )
+        {
+            $violation->{col_no} //= 1;
+            print "$file->{path}:$violation->{line_no}:$violation->{col_no}: "
+              . "[$violation->{profile}/$violation->{rule}] $violation->{message}\n";
+        }
+    }
+
+    exit $report->{violations_found};
+}
 
 __END__
 
@@ -63,8 +79,13 @@ kritika - integrate with kritika.io
 
 =head1 SYNOPSIS
 
+    # Full file analysis
     kritika lib/MyFile.pm
-    kritika --head master lib/OtherFile.pm
+
+    # Report only *new* violations
+    kritika --diff master lib/OtherFile.pm
+    kritika --diff #31 lib/OtherFile.pm
+    kritika --diff 451e77f3 lib/OtherFile.pm
 
 =head1 DESCRIPTION
 
@@ -98,7 +119,8 @@ This is based on the shipped with C<git> pre-push hook example.
 
             branch="$(git rev-parse --abbrev-ref HEAD)"
 
-            git diff --name-only $range | kritika --head "$branch" || exit 1
+            git diff --name-only $range | kritika --diff-branch master \
+                --branch "$branch" --revision "$local_sha" || exit 1
         fi
     done
 

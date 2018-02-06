@@ -17,7 +17,7 @@ use XML::LibXML;
 
 # ABSTRACT: C Header file transformation
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 # PODNAME: csl
 
@@ -411,7 +411,7 @@ csl - C Header file transformation
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 AUTHOR
 

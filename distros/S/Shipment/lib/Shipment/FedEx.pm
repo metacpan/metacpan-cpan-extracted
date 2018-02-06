@@ -1,5 +1,5 @@
 package Shipment::FedEx;
-$Shipment::FedEx::VERSION = '2.03';
+$Shipment::FedEx::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -10,6 +10,8 @@ use Shipment::SOAP::WSDL;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);
 use namespace::clean;
+
+use DateTime::Format::ISO8601;
 
 extends 'Shipment::Base';
 
@@ -259,7 +261,8 @@ sub _build_services {
                             Residential => $self->residential_address,
                         },
                     },
-                    PackageCount => $self->count_packages || 1,
+                    RateRequestTypes          => 'LIST',
+                    PackageCount              => $self->count_packages || 1,
                     PackageDetail             => 'INDIVIDUAL_PACKAGES',
                     RequestedPackageLineItems => \@pieces,
                 },
@@ -289,6 +292,10 @@ sub _build_services {
                     $service->get_RatedShipmentDetails->[0]
                       ->get_ShipmentRateDetail->get_TotalNetCharge
                       ->get_Currency
+                ),
+                discount => Data::Currency->new(
+                    $service->get_RatedShipmentDetails->[0]
+                      ->get_EffectiveNetDiscount->get_Amount,
                 ),
               );
         }
@@ -450,6 +457,7 @@ sub rate {
                             Residential => $self->residential_address,
                         },
                     },
+                    RateRequestTypes          => 'LIST',
                     PackageCount              => $self->count_packages,
                     PackageDetail             => 'INDIVIDUAL_PACKAGES',
                     RequestedPackageLineItems => \@pieces,
@@ -479,6 +487,11 @@ sub rate {
                       ->get_RatedShipmentDetails->[0]
                       ->get_ShipmentRateDetail->get_TotalNetCharge
                       ->get_Currency,
+                ),
+                discount => Data::Currency->new(
+                    $response->get_RateReplyDetails()
+                      ->get_RatedShipmentDetails->[0]
+                      ->get_EffectiveNetDiscount->get_Amount,
                 ),
             )
         );
@@ -894,6 +907,122 @@ sub cancel {
 }
 
 
+sub track {
+    my $self = shift;
+
+    use Shipment::Activity;
+
+    if (!$self->tracking_id) {
+        $self->error('no tracking id provided');
+        return;
+    }
+
+    use Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort;
+
+    my $interface =
+      Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort
+      ->new({proxy_domain => $self->proxy_domain,});
+    my $response;
+
+    try {
+        $Shipment::SOAP::WSDL::Debug = 1 if $self->debug > 1;
+        $response = $interface->track(
+            {   WebAuthenticationDetail => {
+                    UserCredential => {
+                        Key      => $self->key,
+                        Password => $self->password,
+                    },
+                },
+                ClientDetail => {
+                    AccountNumber => $self->account,
+                    MeterNumber   => $self->meter,
+                },
+                Version => {
+                    ServiceId    => 'trck',
+                    Major        => 9,
+                    Intermediate => 0,
+                    Minor        => 0,
+                },
+                SelectionDetails => {
+                    PackageIdentifier => {
+                        Type  => 'TRACKING_NUMBER_OR_DOORTAG',
+                        Value => $self->tracking_id,
+                    }
+                }
+            },
+        );
+        $Shipment::SOAP::WSDL::Debug = 0;
+        warn "Response\n" . $response if $self->debug > 1;
+
+        $self->notice('');
+        foreach my $notification (@{$response->get_Notifications()}) {
+            warn $notification->get_Message->get_value if $self->debug;
+            $self->add_notice($notification->get_Message->get_value . "\n");
+        }
+
+
+        if ($response->get_CompletedTrackDetails()->get_TrackDetails()
+            ->get_Notification()->get_Severity()->get_value() eq 'ERROR')
+        {
+            $self->error(
+                $response->get_CompletedTrackDetails()->get_TrackDetails()
+                  ->get_Notification()->get_Message()->get_value());
+        }
+        else {
+
+            $self->activities(
+                [   Shipment::Activity->new(
+                        description => $response->get_CompletedTrackDetails()
+                          ->get_TrackDetails()->get_StatusDetail()
+                          ->get_Description()->get_value(),
+                        date => DateTime::Format::ISO8601->parse_datetime(
+                            $response->get_CompletedTrackDetails()
+                              ->get_TrackDetails()->get_StatusDetail()
+                              ->get_CreationTime()->get_value()
+                        ),
+                        location => Shipment::Address->new(
+                            city => $response->get_CompletedTrackDetails()
+                              ->get_TrackDetails()->get_StatusDetail()
+                              ->get_Location()->get_City()->get_value(),
+                            state => $response->get_CompletedTrackDetails()
+                              ->get_TrackDetails()->get_StatusDetail()
+                              ->get_Location()->get_StateOrProvinceCode()
+                              ->get_value(),
+                            country => $response->get_CompletedTrackDetails()
+                              ->get_TrackDetails()->get_StatusDetail()
+                              ->get_Location()->get_CountryCode()->get_value(),
+                        ),
+                    )
+                ]
+            );
+            $self->ship_date(
+                DateTime::Format::ISO8601->parse_datetime(
+                    $response->get_CompletedTrackDetails()->get_TrackDetails()
+                      ->get_ShipTimestamp->get_value()
+                )
+            );
+
+        }
+
+    }
+    catch {
+        warn $_ if $self->debug;
+        try {
+            $self->error(
+                $response->get_Notifications()->[0]->get_Message->get_value);
+            warn $response->get_Notifications()->[0]->get_Message->get_value
+              if $self->debug;
+        }
+        catch {
+            $self->error($response->get_faultstring->get_value);
+            warn $response->get_faultstring->get_value if $self->debug;
+        };
+    };
+
+    return;
+}
+
+
 sub end_of_day {
     my $self = shift;
 
@@ -973,7 +1102,7 @@ Shipment::FedEx
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -1014,9 +1143,13 @@ https://www.fedex.com/wpor/web/jsp/drclinks.jsp?links=techresources/index.html
 See related modules for documentation on options and how to access rates and labels:
 
 L<Shipment::Base> - common attributes and methods for all interfaces
+
 L<Shipment::Address> - define an from or to address
+
 L<Shipment::Package> - define package details, weight, dimensions, etc
+
 L<Shipment::Service> - access information about a service, rate, etd, etc
+
 L<Shipment::Label> - access the label file
 
 It makes extensive use of SOAP::WSDL in order to create/decode xml requests and responses. The Shipment::FedEx::WSDL interface was created primarily using the wsdl2perl.pl script from SOAP::WSDL.
@@ -1098,6 +1231,16 @@ Currently only supports deleting one package (tracking id) at a time - DeletionC
 
 returns "SUCCESS" if successful
 
+=head2 track
+
+This method calls track from the Tracking Services API
+
+Currently only supports tracking using a valid tracking number: Type => 'TRACKING_NUMBER_OR_DOORTAG'
+
+Result is added to $self->activities, accessible using $self->status
+
+Also sets $self->ship_date
+
 =head2 end_of_day
 
 This method calls groundClose from the Close Services API
@@ -1136,7 +1279,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

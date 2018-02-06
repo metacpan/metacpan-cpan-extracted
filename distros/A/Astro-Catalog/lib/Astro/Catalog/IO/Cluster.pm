@@ -42,14 +42,10 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 
 # C O N S T R U C T O R ----------------------------------------------------
-
-=head1 REVISION
-
-$Id: Cluster.pm,v 1.19 2006/01/18 01:29:33 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -111,10 +107,10 @@ sub _read_catalog {
 
       # Assume J2000 and create an Astro::Coords object
       my $coords = new Astro::Coords( type  => 'J2000',
-				      units => 'sex',
-				      ra    => $objra,
-				      dec   => $objdec,
-				      name  => $star->id() );
+                                      units => 'sex',
+                                      ra    => $objra,
+                                      dec   => $objdec,
+                                      name  => $star->id() );
 
       # and push it into the Astro::Catalog::Star object
       $star->coords( $coords );
@@ -139,14 +135,14 @@ sub _read_catalog {
          if( lc($colours[$j]) =~ "-" ) {
 
             # build a colour object and push it into the @colors array
-	    my @filters = split "-", $colours[$j];
+            my @filters = split "-", $colours[$j];
             my $color = new Astro::FluxColor(
               upper => new Astro::WaveBand( Filter => $filters[0] ),
               lower => new Astro::WaveBand( Filter => $filters[1] ),
-	      quantity => new Number::Uncertainty(
-	                   Value => $separated[3*$j+10],
-			   Error => $separated[3*$j+11] ) );
-	    push @colors, $color;
+              quantity => new Number::Uncertainty(
+                           Value => $separated[3*$j+10],
+                           Error => $separated[3*$j+11] ) );
+            push @colors, $color;
 
             # quality flags
             $quality[$j] = $separated[3*$j+12];
@@ -156,12 +152,12 @@ sub _read_catalog {
 
 
 
-	    my $mag = new Astro::Flux(
-	                   new Number::Uncertainty(
-	                   Value => $separated[3*$j+10],
-			   Error => $separated[3*$j+11] ),
-			   'mag', $colours[$j] );
-	    push @fluxes, $mag;
+            my $mag = new Astro::Flux(
+                           new Number::Uncertainty(
+                           Value => $separated[3*$j+10],
+                           Error => $separated[3*$j+11] ),
+                           'mag', $colours[$j] );
+            push @fluxes, $mag;
 
 
             # quality flags

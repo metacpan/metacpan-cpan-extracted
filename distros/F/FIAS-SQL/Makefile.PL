@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "Readonly" => 0,
     "XBase" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }

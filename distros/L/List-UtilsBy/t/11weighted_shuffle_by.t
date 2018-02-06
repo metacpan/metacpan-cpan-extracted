@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Test::More;
+
+use lib ".";
 use t::Unrandom;
 
 use List::UtilsBy qw( weighted_shuffle_by );

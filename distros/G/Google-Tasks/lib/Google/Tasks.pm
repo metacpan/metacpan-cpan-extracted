@@ -1,6 +1,7 @@
 package Google::Tasks;
 # ABSTRACT: Manipulate Google/GMail Tasks
 
+use 5.014;
 use strict;
 use warnings;
 
@@ -13,13 +14,15 @@ use HTTP::Request::Common;
 use Try::Tiny qw( try catch finally );
 use Carp 'croak';
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 has json => ( is => 'ro', default => sub { JSON->new } );
 has ua   => (
     is      => 'ro',
     default => sub {
-        my $ua = LWP::UserAgent->new;
+        my $ua = LWP::UserAgent->new(
+            max_redirect => 24,
+        );
         push( @{ $ua->requests_redirectable }, 'POST' );
         $ua->cookie_jar({});
         return $ua;
@@ -423,7 +426,7 @@ Google::Tasks - Manipulate Google/GMail Tasks
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Google-Tasks.svg)](https://travis-ci.org/gryphonshafer/Google-Tasks)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Google-Tasks/badge.png)](https://coveralls.io/r/gryphonshafer/Google-Tasks)
@@ -812,7 +815,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gryphon Shafer.
+This software is copyright (c) 2018 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

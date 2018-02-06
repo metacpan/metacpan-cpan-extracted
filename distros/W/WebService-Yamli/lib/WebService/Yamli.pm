@@ -3,7 +3,7 @@ use warnings;
 package WebService::Yamli;
 
 # ABSTRACT: Perl wrapper for Yamli's Arabic translation service
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Carp;
 use LWP::UserAgent;

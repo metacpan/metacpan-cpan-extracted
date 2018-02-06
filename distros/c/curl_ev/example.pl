@@ -7,6 +7,8 @@ use Net::Curl::Multi;
 use Net::Curl::Easy qw(/^CURLOPT_/);
 use Net::Curl::Multi::EV;
 
+print "VERSION=$Net::Curl::Multi::EV::VERSION\n";
+
 my $multi = Net::Curl::Multi->new();
 my $curl_ev = Net::Curl::Multi::EV::curl_ev($multi);
 

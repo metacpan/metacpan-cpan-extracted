@@ -6,22 +6,30 @@ use 5.010;
 
 use ExtUtils::MakeMaker;
 
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
+
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perlish wrapper for Raylib videogame library",
   "AUTHOR" => "Ahmad Fatoum <athreef\@cpan.org>",
   "BUILD_REQUIRES" => {
-    "Alien::raylib" => "0.008"
+    "Alien::raylib" => "0.010"
   },
   "CONFIGURE_REQUIRES" => {
     "Alien::raylib" => 0,
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => 0,
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Graphics-Raylib",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Graphics::Raylib",
   "PREREQ_PM" => {
-    "Alien::raylib" => "0.008",
+    "Alien::raylib" => "0.010",
+    "Convert::Color" => 0,
     "Import::Into" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Needs" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +48,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::raylib" => "0.008",
+  "Alien::raylib" => "0.010",
+  "Convert::Color" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -61,3 +70,9 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

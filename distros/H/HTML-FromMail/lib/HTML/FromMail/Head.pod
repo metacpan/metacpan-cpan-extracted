@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 HTML::FromMail::Head - output a message header as HTML
@@ -13,62 +15,50 @@ HTML::FromMail::Head - output a message header as HTML
 
 =head1 DESCRIPTION
 
+Extends L<"DESCRIPTION" in HTML::FromMail::Page|HTML::FromMail::Page/"DESCRIPTION">.
+ 
 =head1 METHODS
 
-$obj-E<gt>B<fields>(MESSAGE, OPTIONS)
-
-HTML::FromMail::Head-E<gt>B<fields>(MESSAGE, OPTIONS)
-
+Extends L<"METHODS" in HTML::FromMail::Page|HTML::FromMail::Page/"METHODS">.
+ 
 =over 4
+
+=item $obj-E<gt>B<fields>(MESSAGE, OPTIONS)
+
+=item HTML::FromMail::Head-E<gt>B<fields>(MESSAGE, OPTIONS)
 
 Collect information about the header fields.
 
- Option              --Default
- ignore                undef
- remove_list_group     1
- remove_resent_groups  1
- remove_spam_groups    1
- select                ''
+ -Option              --Default
+  ignore                undef
+  remove_list_group     1
+  remove_resent_groups  1
+  remove_spam_groups    1
+  select                ''
 
-. ignore => STRING
+=over 2
 
-=over 4
+=item ignore => STRING
 
 The reverse of C<select>: which fields not to take.
 
-=back
-
-. remove_list_group => BOOLEAN
-
-=over 4
+=item remove_list_group => BOOLEAN
 
 Do not select the headers which are added by mailing list software.
 See Mail::Message::Head::ListGroup.
 
-=back
-
-. remove_resent_groups => BOOLEAN
-
-=over 4
+=item remove_resent_groups => BOOLEAN
 
 Remove all the lines which are related to transport of the message, for
 instance the C<Received> and C<Return-Path>, and all lines which start
 with C<Resent->.  See Mail::Message::Head::ResentGroup.
 
-=back
-
-. remove_spam_groups => BOOLEAN
-
-=over 4
+=item remove_spam_groups => BOOLEAN
 
 Do not select headers which were added by spam fighting software.  See
 Mail::Message::Head::SpamGroup.
 
-=back
-
-. select => STRING
-
-=over 4
+=item select => STRING
 
 Select only the fields which match the patterns found in STRING.  Multiple
 patterns can be specified separated by vertical bars (I<pipes>).  The fields
@@ -77,70 +67,36 @@ See Mail::Message::Head::Complete subroutine grepNames.
 
 =back
 
-=back
+=item $obj-E<gt>B<lookup>(LABEL, ARGS)
 
-$obj-E<gt>B<lookup>(LABEL, ARGS)
+Inherited, see L<HTML::FromMail::Page/"METHODS">
 
-=over 4
+=item HTML::FromMail::Head-E<gt>B<new>(OPTIONS)
 
-See L<HTML::FromMail::Page/"METHODS">
+ -Option  --Defined in            --Default
+  settings  HTML::FromMail::Object  {}
+  topic     HTML::FromMail::Object  'head'
 
-=back
+=over 2
 
-HTML::FromMail::Head-E<gt>B<new>(OPTIONS)
+=item settings => HASH-OF-HASHES
 
-=over 4
-
- Option  --Defined in     --Default
- settings  HTML::FromMail::Object  {}
- topic     HTML::FromMail::Object  'head'
-
-. settings => HASH-OF-HASHES
-
-. topic => STRING
+=item topic => STRING
 
 =back
-
-=head2 Attributes
-
-$obj-E<gt>B<settings>([TOPIC])
-
-=over 4
-
-See L<HTML::FromMail::Object/"Attributes">
-
-=back
-
-$obj-E<gt>B<topic>
-
-=over 4
-
-See L<HTML::FromMail::Object/"Attributes">
-
-=back
-
-=head2 Export
-
-=head2 Other methods
-
-$obj-E<gt>B<plain2html>(STRING)
-
-=over 4
-
-See L<HTML::FromMail::Object/"Other methods">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.11,
-built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+This module is part of HTML-FromMail distribution version 0.12,
+built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

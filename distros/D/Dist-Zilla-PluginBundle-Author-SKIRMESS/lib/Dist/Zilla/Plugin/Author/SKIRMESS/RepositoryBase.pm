@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use Moose;
 
@@ -65,8 +65,11 @@ has _travis_available_perl => (
 
 use Carp;
 use Config::Std { def_sep => q{=} };
+use CPAN::Meta::YAML;
 use File::Spec;
+use HTTP::Cache::Transparent ( BasePath => '.cache', NoUpdate => 15 * 60 );
 use List::SomeUtils qw(uniq);
+use LWP::Simple ();
 use Path::Tiny;
 
 use namespace::autoclean;
@@ -185,7 +188,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.031
+Version 0.032
 
 =head1 SYNOPSIS
 
@@ -201,6 +204,426 @@ CPAN distributions which makes it easy to keep them all up to date.
 The following files are created in the repository and in the distribution:
 
 =cut
+
+# Returns an iterator that can be used to iterate over all the perlcritic
+# policies in a policy distribution.
+sub _perl_critic_policy_from_distribution {
+    my ( $self, $distribution ) = @_;
+
+    my $url = "http://cpanmetadb.plackperl.org/v1.0/package/$distribution";
+    $self->log("Downloading '$url'...");
+    my $content = LWP::Simple::get($url);
+
+    if ( !defined $content ) {
+        $self->log_fatal("Cannot download '$url'");
+    }
+
+    my $yaml = CPAN::Meta::YAML->read_string($content) or $self->log_fatal( CPAN::Meta::YAML->errstr );
+    my $meta = $yaml->[0];
+
+    if ( !exists $meta->{provides} ) {
+        $self->log_fatal('Unable to parse returned data');
+    }
+
+    my @policies;
+  MODULE:
+    for my $module ( keys %{ $meta->{provides} } ) {
+        if ( $module =~ m{ ^ Perl::Critic::Policy:: ( .+ ) }xsm ) {
+            push @policies, $1;
+        }
+    }
+
+    my @stack = sort { lc $a cmp lc $b } @policies;
+
+    return sub {
+        return if !@stack;
+        return shift @stack;
+    };
+}
+
+# Returns an iterator that iterates over the perlcritic policy distributions
+# we use.
+sub _perl_critic_policy_distributions {
+    my ($self) = @_;
+
+    my @stack = (
+        'Perl::Critic',
+        'Perl::Critic::Bangs',
+        'Perl::Critic::Moose',
+        'Perl::Critic::Freenode',
+        'Perl::Critic::Policy::HTTPCookies',
+        'Perl::Critic::Itch',
+        'Perl::Critic::Lax',
+        'Perl::Critic::More',
+        'Perl::Critic::PetPeeves::JTRAMMELL',
+        'Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays',
+        'Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr',
+        'Perl::Critic::Policy::Moo::ProhibitMakeImmutable',
+        'Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice',
+        'Perl::Critic::Policy::Perlsecret',
+        'Perl::Critic::Policy::TryTiny::RequireBlockTermination',
+        'Perl::Critic::Policy::TryTiny::RequireUse',
+        'Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection',
+        'Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter',
+        'Perl::Critic::Pulp',
+        'Perl::Critic::StricterSubs',
+        'Perl::Critic::Tics',
+    );
+
+    return sub {
+        return if !@stack;
+        return shift @stack;
+    };
+}
+
+# Returns an iterator that iterates over all policies of all the perlcritic
+# policy distributions we use. Return value is an array ref of the
+# distribution name and the policy name.
+sub _perl_critic_policy {
+    my ($self) = @_;
+
+    my $dist_it = $self->_perl_critic_policy_distributions();
+    my $dist;
+    my $pol_it;
+
+    return sub {
+        if ( defined $pol_it ) {
+            my $pol = $pol_it->();
+            return [ $dist, $pol ] if defined $pol;
+        }
+
+        $dist = $dist_it->();
+        return if !defined $dist;
+
+        $pol_it = $self->_perl_critic_policy_from_distribution($dist);
+        my $pol = $pol_it->();
+        return [ $dist, $pol ] if defined $pol;
+        return;
+    };
+}
+
+# Returns an iterator that iterates over all policies of all the perlcritic
+# policy distributions we use. Return value is an array ref of the
+# distribution name, the policy name and if the policy should be enabled.
+#
+# This method has a blacklist of policies we don't like. They get disabled.
+#
+# This method has another blacklist of policies that are no policies,
+# basically badly named packages. They get completely dropped.
+sub _perl_critic_policy_default_enabled {
+    my ($self) = @_;
+
+    my %disabled_policies = map { $_ => 0 } (
+
+        # core policies
+        'Documentation::PodSpelling',
+        'Documentation::RequirePodSections',
+        'InputOutput::RequireBriefOpen',
+        'Modules::ProhibitExcessMainComplexity',
+        'Modules::RequireVersionVar',
+
+        # Perl::Critic::Bangs
+        'Bangs::ProhibitCommentedOutCode',
+        'Bangs::ProhibitNoPlan',
+        'Bangs::ProhibitVagueNames',
+
+        # Perl::Critic::Freenode
+        'Freenode::EmptyReturn',
+
+        # Perl::Critic::Itch
+        'CodeLayout::ProhibitHashBarewords',
+
+        # Perl::Critic::Lax
+        'Lax::ProhibitEmptyQuotes::ExceptAsFallback',
+        'Lax::ProhibitLeadingZeros::ExceptChmod',
+        'Lax::ProhibitStringyEval::ExceptForRequire',
+        'Lax::RequireConstantOnLeftSideOfEquality::ExceptEq',
+        'Lax::RequireEndWithTrueConst',
+        'Lax::RequireExplicitPackage::ExceptForPragmata',
+
+        # Perl::Critic::More
+        'CodeLayout::RequireASCII',
+        'Editor::RequireEmacsFileVariables',
+        'ErrorHandling::RequireUseOfExceptions',
+        'ValuesAndExpressions::RequireConstantOnLeftSideOfEquality',
+        'ValuesAndExpressions::RestrictLongStrings',
+
+        # Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
+        # (requires Perl 5.12)
+        'ValuesAndExpressions::ProhibitSingleArgArraySlice',
+
+        # Perl::Critic::Pulp
+        'CodeLayout::ProhibitIfIfSameLine',
+        'Compatibility::Gtk2Constants',
+        'Compatibility::PodMinimumVersion',
+        'Documentation::ProhibitDuplicateSeeAlso',
+        'Documentation::RequireFinalCut',
+        'Miscellanea::TextDomainPlaceholders',
+        'Miscellanea::TextDomainUnused',
+        'ValuesAndExpressions::ProhibitFiletest_f',
+
+        # Perl::Critic::StricterSubs
+        'Subroutines::ProhibitCallsToUndeclaredSubs',
+        'Subroutines::ProhibitCallsToUnexportedSubs',
+
+        # Perl::Critic::Tics
+        'Tics::ProhibitLongLines',
+    );
+
+    my %policies_to_remove = map { $_ => 1 } (
+
+        # This is no policy, just a badly named package!
+        'Documentation::ProhibitAdjacentLinks::Parser',
+    );
+
+    my $it = $self->_perl_critic_policy();
+
+    return sub {
+        my $pol_ref;
+
+      POL_REF:
+        while (1) {
+            $pol_ref = $it->();
+            last POL_REF if !defined $pol_ref;
+            last POL_REF if !exists $policies_to_remove{ $pol_ref->[1] };
+        }
+
+        if ( !defined $pol_ref ) {
+          POLICY:
+            for my $policy ( keys %disabled_policies ) {
+                next POLICY if $disabled_policies{$policy} == 1;
+
+                $self->log_fatal("Policy '$policy' is disabled but does not exist.");
+            }
+
+            return;
+        }
+
+        push @{$pol_ref}, exists $disabled_policies{ $pol_ref->[1] } ? 0 : 1;
+        $disabled_policies{ $pol_ref->[1] } = 1;
+
+        return $pol_ref;
+    };
+}
+
+# Returns an iterator that iterates over all policies of all the perlcritic
+# policy distributions we use. Return value is an array ref of the
+# distribution name, the policy name, if the policy should be enabled and
+# either undef or a hash ref of default configuration for that policy.
+#
+# This method contains a list a default configurations we like.
+sub _perl_critic_policy_default_config {
+    my ($self) = @_;
+
+    my $it = $self->_perl_critic_policy_default_enabled();
+
+    return sub {
+        my $pol_ref = $it->();
+        return if !defined $pol_ref;
+
+        my $policy = $pol_ref->[1];
+
+        push @{$pol_ref},
+
+          # Core Policies
+            $policy eq 'ErrorHandling::RequireCarping' ? { allow_in_main_unless_in_subroutine => '1' }
+          : $policy eq 'InputOutput::RequireCheckedSyscalls' ? { functions => ':builtins', exclude_functions => 'print say sleep' }
+          : $policy eq 'Modules::ProhibitEvilModules' ? { modules => 'Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::XS {Found use of JSON::XS. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}' }
+          : $policy eq 'Subroutines::ProhibitUnusedPrivateSubroutines' ? { private_name_regex => '_(?!build_)\w+' }
+          : $policy eq 'ValuesAndExpressions::ProhibitComplexVersion'  ? { forbid_use_version => '1' }
+          : $policy eq 'Variables::ProhibitPunctuationVars'            ? { allow              => '$@ $! $/ $0' }
+          :
+
+          # Perl::Critic::Moose
+            $policy eq 'Moose::ProhibitDESTROYMethod' ? { equivalent_modules => 'Moo Moo::Role' }
+          : $policy eq 'Moose::ProhibitLazyBuild'     ? { equivalent_modules => 'Moo Moo::Role' }
+          : $policy eq 'Moose::ProhibitMultipleWiths' ? { equivalent_modules => 'Moo Moo::Role' }
+          : $policy eq 'Moose::ProhibitNewMethod'     ? { equivalent_modules => 'Moo Moo::Role' }
+          :
+
+          # Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
+          $policy eq 'Variables::ProhibitUnusedVarsStricter'
+          ? { allow_unused_subroutine_arguments => '1' }
+          : undef;
+
+        return $pol_ref;
+    };
+}
+
+# Parses the perlcriticrc.local configuration file. Then, returns an
+# iterator that iterates over all policies of all the perlcritic policy
+# distributions we use. Return value is an array ref of the distribution
+# name, the policy name, if the policy should be enabled and either undef
+# or a hash ref of configuration for that policy.
+sub _perl_critic_policy_with_config {
+    my ( $self, $perlcriticrc_local ) = @_;
+
+    my $it = $self->_perl_critic_policy_default_config();
+
+    my %local_config;
+
+    if ( -f $perlcriticrc_local ) {
+        $self->log("Adjusting Perl::Critic config from '$perlcriticrc_local'");
+
+        read_config $perlcriticrc_local, my %perlcriticrc_local;
+
+        my %local_seen;
+
+      POLICY:
+        for my $policy ( keys %perlcriticrc_local ) {
+
+            if ( $policy eq q{-} ) {
+                $self->log_fatal('We cannot disable the global settings');
+            }
+
+            my $policy_name = $policy =~ m{ ^ - (.+) }xsm ? $1 : $policy;
+
+            if ( exists $local_seen{$policy_name} ) {
+                $self->log_fatal("There are multiple entries for policy '$policy_name' in '$perlcriticrc_local'.");
+            }
+
+            $local_seen{$policy_name} = 1;
+
+            if ( $policy =~ m{ ^ - }xsm ) {
+                $self->log("Disabling policy '$policy_name'");
+                $local_config{$policy_name} = [0];
+                next POLICY;
+            }
+            #
+            if ( $policy eq q{} ) {
+                $self->log_fatal('Custom global settings are not supported');
+            }
+            else {
+                $self->log("Custom configuration for policy '$policy_name'");
+                $local_config{$policy} = [ 1, $perlcriticrc_local{$policy_name} ];
+            }
+        }
+    }
+
+    my %local_config_unused = map { $_ => 1 } keys %local_config;
+    return sub {
+        my $pol_ref = $it->();
+
+        if ( !defined $pol_ref ) {
+            my ($first_not_used_policy_from_local_config) = keys %local_config_unused;
+            if ( defined $first_not_used_policy_from_local_config ) {
+                $self->log_fatal("Policy '$first_not_used_policy_from_local_config' is mentioned the local configuration file '$perlcriticrc_local' but does not exist.");
+            }
+
+            return;
+        }
+
+        my ( $dist, $policy, $enabled_default, $config_default_ref ) = @{$pol_ref};
+        return $pol_ref if !exists $local_config{$policy};
+
+        delete $local_config_unused{$policy};
+
+        if ( ${ $local_config{$policy} }[0] == 0 ) {
+
+            # policy is disabled from local config
+            return [ $dist, $policy, 0, undef ];
+        }
+
+        # policy is enabled in local config
+        if ( ( @{ $local_config{$policy} } == 1 ) || ( scalar keys %{ ${ $local_config{$policy} }[1] } == 0 ) ) {
+
+            # policy is enabled from local config, with no local configuration
+            return [ $dist, $policy, 1, undef ];
+        }
+
+        # policy is enabled from local config, with local configuration
+        return [ $dist, $policy, 1, ${ $local_config{$policy} }[1] ];
+    };
+}
+
+# Returns an iterator that iterates over all policies of all the perlcritic
+# policy distributions we use. Return value is a string containing the
+# configuration of one policy, or a comment block.
+#
+# The returned string are expected to be concatenated together to create
+# the .perlcriticrc config file.
+sub _perl_critic_config_block {
+    my ( $self, $perlcriticrc_local ) = @_;
+
+    my $it = $self->_perl_critic_policy_with_config($perlcriticrc_local);
+
+    my $last_dist = q{};
+    my $pol_ref;
+    my $empty_line = 0;
+    return sub {
+        if ( !defined $pol_ref ) {
+            $pol_ref = $it->();
+        }
+
+        return if !defined $pol_ref;
+
+        my ( $dist, $policy, $enabled, $config_ref ) = @{$pol_ref};
+
+        if ( $dist ne $last_dist ) {
+
+            # we have to return the dist "header"
+            $last_dist = $dist;
+
+            my $result = $empty_line ? q{} : "\n";
+            $result .= '# ' . ( q{-} x 58 ) . "\n";
+            $result .= ( $dist eq 'Perl::Critic' ? "# Core policies\n" : "# $dist\n" );
+            $result .= '# ' . ( q{-} x 58 ) . "\n\n";
+
+            $empty_line = 1;
+
+            return $result;
+        }
+
+        $pol_ref = undef;
+
+        my $result = "[$policy]\n";
+
+        if ( !$enabled ) {
+            $empty_line = 0;
+            return "#$result";
+        }
+
+        if ( !defined $config_ref ) {
+            $empty_line = 0;
+            return $result;
+        }
+
+        if ( !$empty_line ) {
+            $result = "\n$result";
+        }
+
+        for my $key ( sort keys %{$config_ref} ) {
+            $result .= "$key = ${$config_ref}{$key}\n";
+        }
+
+        $empty_line = 1;
+        return "$result\n";
+
+    };
+}
+
+# Returns a string containing the content of a .perlcriticrc config file
+# based on the local configuration file and defaults saved in this module.
+sub _perlcriticrc {
+    my ( $self, $perlcriticrc_local ) = @_;
+
+    my $content = <<'PERLCRITICRC_TEMPLATE';
+# Automatically generated file
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+only = 1
+severity = 1
+verbose = [%p] %m at %f line %l, near '%r'\n
+PERLCRITICRC_TEMPLATE
+
+    my $it = $self->_perl_critic_config_block($perlcriticrc_local);
+
+    while ( defined( my $x = $it->() ) ) {
+        $content .= $x;
+    }
+
+    return $content;
+}
 
 {
     # Files to generate
@@ -267,478 +690,10 @@ test_script:
   - prove -lr xt/author
 APPVEYOR_YML
 
-=head2 .perlcriticrc
+=head2 .cache
 
-The configuration for L<Perl::Critic|Perl::Critic>. This file is created from
-a default contained in this plugin and from distribution specific settings in
-F<perlcriticrc.local>.
-
-=cut
-
-    $file{q{.perlcriticrc}} = sub {
-        my ($self) = @_;
-
-        my $perlcriticrc_template = <<'PERLCRITICRC_TEMPLATE';
-# Automatically generated file
-# {{ ref $plugin }} {{ $plugin->VERSION() }}
-
-only = 1
-severity = 1
-verbose = [%p] %m at %f line %l, near '%r'\n
-
-# ----------------------------------------------------------
-# Core policies
-# ----------------------------------------------------------
-
-[BuiltinFunctions::ProhibitBooleanGrep]
-[BuiltinFunctions::ProhibitComplexMappings]
-[BuiltinFunctions::ProhibitLvalueSubstr]
-[BuiltinFunctions::ProhibitReverseSortBlock]
-[BuiltinFunctions::ProhibitSleepViaSelect]
-[BuiltinFunctions::ProhibitStringyEval]
-[BuiltinFunctions::ProhibitStringySplit]
-[BuiltinFunctions::ProhibitUniversalCan]
-[BuiltinFunctions::ProhibitUniversalIsa]
-[BuiltinFunctions::ProhibitUselessTopic]
-[BuiltinFunctions::ProhibitVoidGrep]
-[BuiltinFunctions::ProhibitVoidMap]
-[BuiltinFunctions::RequireBlockGrep]
-[BuiltinFunctions::RequireBlockMap]
-[BuiltinFunctions::RequireGlobFunction]
-[BuiltinFunctions::RequireSimpleSortBlock]
-[ClassHierarchies::ProhibitAutoloading]
-[ClassHierarchies::ProhibitExplicitISA]
-[ClassHierarchies::ProhibitOneArgBless]
-[CodeLayout::ProhibitHardTabs]
-[CodeLayout::ProhibitParensWithBuiltins]
-[CodeLayout::ProhibitQuotedWordLists]
-[CodeLayout::ProhibitTrailingWhitespace]
-[CodeLayout::RequireConsistentNewlines]
-[CodeLayout::RequireTidyCode]
-[CodeLayout::RequireTrailingCommas]
-[ControlStructures::ProhibitCStyleForLoops]
-[ControlStructures::ProhibitCascadingIfElse]
-[ControlStructures::ProhibitDeepNests]
-[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
-[ControlStructures::ProhibitMutatingListFunctions]
-[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
-[ControlStructures::ProhibitPostfixControls]
-[ControlStructures::ProhibitUnlessBlocks]
-[ControlStructures::ProhibitUnreachableCode]
-[ControlStructures::ProhibitUntilBlocks]
-[ControlStructures::ProhibitYadaOperator]
-#[Documentation::PodSpelling]
-[Documentation::RequirePackageMatchesPodName]
-[Documentation::RequirePodAtEnd]
-[Documentation::RequirePodLinksIncludeText]
-#[Documentation::RequirePodSections]
-
-[ErrorHandling::RequireCarping]
-allow_in_main_unless_in_subroutine = 1
-
-[ErrorHandling::RequireCheckingReturnValueOfEval]
-[InputOutput::ProhibitBacktickOperators]
-[InputOutput::ProhibitBarewordFileHandles]
-[InputOutput::ProhibitExplicitStdin]
-[InputOutput::ProhibitInteractiveTest]
-[InputOutput::ProhibitJoinedReadline]
-[InputOutput::ProhibitOneArgSelect]
-[InputOutput::ProhibitReadlineInForLoop]
-[InputOutput::ProhibitTwoArgOpen]
-[InputOutput::RequireBracedFileHandleWithPrint]
-#[InputOutput::RequireBriefOpen]
-[InputOutput::RequireCheckedClose]
-[InputOutput::RequireCheckedOpen]
-
-[InputOutput::RequireCheckedSyscalls]
-functions = :builtins
-exclude_functions = print say sleep
-
-[InputOutput::RequireEncodingWithUTF8Layer]
-[Miscellanea::ProhibitFormats]
-[Miscellanea::ProhibitTies]
-[Miscellanea::ProhibitUnrestrictedNoCritic]
-[Miscellanea::ProhibitUselessNoCritic]
-[Modules::ProhibitAutomaticExportation]
-[Modules::ProhibitConditionalUseStatements]
-
-[Modules::ProhibitEvilModules]
-modules = Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::XS {Found use of JSON::XS. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}
-
-#[Modules::ProhibitExcessMainComplexity]
-[Modules::ProhibitMultiplePackages]
-[Modules::RequireBarewordIncludes]
-[Modules::RequireEndWithOne]
-[Modules::RequireExplicitPackage]
-[Modules::RequireFilenameMatchesPackage]
-[Modules::RequireNoMatchVarsWithUseEnglish]
-#[Modules::RequireVersionVar]
-[NamingConventions::Capitalization]
-[NamingConventions::ProhibitAmbiguousNames]
-[Objects::ProhibitIndirectSyntax]
-[References::ProhibitDoubleSigils]
-[RegularExpressions::ProhibitCaptureWithoutTest]
-[RegularExpressions::ProhibitComplexRegexes]
-[RegularExpressions::ProhibitEnumeratedClasses]
-[RegularExpressions::ProhibitEscapedMetacharacters]
-[RegularExpressions::ProhibitFixedStringMatches]
-[RegularExpressions::ProhibitSingleCharAlternation]
-[RegularExpressions::ProhibitUnusedCapture]
-[RegularExpressions::ProhibitUnusualDelimiters]
-[RegularExpressions::ProhibitUselessTopic]
-[RegularExpressions::RequireBracesForMultiline]
-[RegularExpressions::RequireDotMatchAnything]
-[RegularExpressions::RequireExtendedFormatting]
-[RegularExpressions::RequireLineBoundaryMatching]
-[Subroutines::ProhibitAmpersandSigils]
-[Subroutines::ProhibitBuiltinHomonyms]
-[Subroutines::ProhibitExcessComplexity]
-[Subroutines::ProhibitExplicitReturnUndef]
-[Subroutines::ProhibitManyArgs]
-[Subroutines::ProhibitNestedSubs]
-[Subroutines::ProhibitReturnSort]
-[Subroutines::ProhibitSubroutinePrototypes]
-
-[Subroutines::ProhibitUnusedPrivateSubroutines]
-private_name_regex = _(?!build_)\w+
-
-[Subroutines::ProtectPrivateSubs]
-[Subroutines::RequireArgUnpacking]
-[Subroutines::RequireFinalReturn]
-[TestingAndDebugging::ProhibitNoStrict]
-[TestingAndDebugging::ProhibitNoWarnings]
-[TestingAndDebugging::ProhibitProlongedStrictureOverride]
-[TestingAndDebugging::RequireTestLabels]
-[TestingAndDebugging::RequireUseStrict]
-[TestingAndDebugging::RequireUseWarnings]
-[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
-
-[ValuesAndExpressions::ProhibitComplexVersion]
-forbid_use_version = 1
-
-[ValuesAndExpressions::ProhibitConstantPragma]
-[ValuesAndExpressions::ProhibitEmptyQuotes]
-[ValuesAndExpressions::ProhibitEscapedCharacters]
-[ValuesAndExpressions::ProhibitImplicitNewlines]
-[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
-[ValuesAndExpressions::ProhibitLeadingZeros]
-[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
-[ValuesAndExpressions::ProhibitMagicNumbers]
-[ValuesAndExpressions::ProhibitMismatchedOperators]
-[ValuesAndExpressions::ProhibitMixedBooleanOperators]
-[ValuesAndExpressions::ProhibitNoisyQuotes]
-[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
-[ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
-[ValuesAndExpressions::ProhibitVersionStrings]
-[ValuesAndExpressions::RequireConstantVersion]
-[ValuesAndExpressions::RequireInterpolationOfMetachars]
-[ValuesAndExpressions::RequireNumberSeparators]
-[ValuesAndExpressions::RequireQuotedHeredocTerminator]
-[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
-[Variables::ProhibitAugmentedAssignmentInDeclaration]
-[Variables::ProhibitConditionalDeclarations]
-[Variables::ProhibitEvilVariables]
-[Variables::ProhibitLocalVars]
-[Variables::ProhibitMatchVars]
-[Variables::ProhibitPackageVars]
-[Variables::ProhibitPerl4PackageNames]
-
-[Variables::ProhibitPunctuationVars]
-allow = $@ $! $/ $0
-
-[Variables::ProhibitReusedNames]
-[Variables::ProhibitUnusedVariables]
-[Variables::ProtectPrivateVars]
-[Variables::RequireInitializationForLocalVars]
-[Variables::RequireLexicalLoopIterators]
-[Variables::RequireLocalizedPunctuationVars]
-[Variables::RequireNegativeIndices]
-
-# ----------------------------------------------------------
-# Perl::Critic::Bangs
-# ----------------------------------------------------------
-
-[Bangs::ProhibitBitwiseOperators]
-#[Bangs::ProhibitCommentedOutCode]
-[Bangs::ProhibitDebuggingModules]
-[Bangs::ProhibitFlagComments]
-#[Bangs::ProhibitNoPlan]
-[Bangs::ProhibitNumberedNames]
-[Bangs::ProhibitRefProtoOrProto]
-[Bangs::ProhibitUselessRegexModifiers]
-#[Bangs::ProhibitVagueNames]
-
-# ----------------------------------------------------------
-# Perl::Critic::Moose
-# ----------------------------------------------------------
-
-[Moose::ProhibitDESTROYMethod]
-equivalent_modules = Moo Moo::Role
-
-[Moose::ProhibitLazyBuild]
-equivalent_modules = Moo Moo::Role
-
-[Moose::ProhibitMultipleWiths]
-equivalent_modules = Moo Moo::Role
-
-[Moose::ProhibitNewMethod]
-equivalent_modules = Moo Moo::Role
-
-[Moose::RequireCleanNamespace]
-[Moose::RequireMakeImmutable]
-
-# ----------------------------------------------------------
-# Perl::Critic::Freenode
-# ----------------------------------------------------------
-
-[Freenode::AmpersandSubCalls]
-[Freenode::ArrayAssignAref]
-[Freenode::BarewordFilehandles]
-[Freenode::ConditionalDeclarations]
-[Freenode::ConditionalImplicitReturn]
-[Freenode::DeprecatedFeatures]
-[Freenode::DiscouragedModules]
-[Freenode::DollarAB]
-[Freenode::Each]
-#[Freenode::EmptyReturn]
-[Freenode::IndirectObjectNotation]
-[Freenode::ModPerl]
-[Freenode::OpenArgs]
-[Freenode::OverloadOptions]
-[Freenode::PackageMatchesFilename]
-[Freenode::POSIXImports]
-[Freenode::Prototypes]
-[Freenode::StrictWarnings]
-[Freenode::Threads]
-[Freenode::Wantarray]
-[Freenode::WarningsSwitch]
-[Freenode::WhileDiamondDefaultAssignment]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::HTTPCookies
-# ----------------------------------------------------------
-
-[HTTPCookies]
-
-# ----------------------------------------------------------
-# Perl::Critic::Itch
-# ----------------------------------------------------------
-
-#[CodeLayout::ProhibitHashBarewords]
-
-# ----------------------------------------------------------
-# Perl::Critic::Lax
-# ----------------------------------------------------------
-
-[Lax::ProhibitComplexMappings::LinesNotStatements]
-#[Lax::ProhibitEmptyQuotes::ExceptAsFallback]
-#[Lax::ProhibitLeadingZeros::ExceptChmod]
-#[Lax::ProhibitStringyEval::ExceptForRequire]
-#[Lax::RequireConstantOnLeftSideOfEquality::ExceptEq]
-#[Lax::RequireEndWithTrueConst]
-#[Lax::RequireExplicitPackage::ExceptForPragmata]
-
-# ----------------------------------------------------------
-# Perl::Critic::More
-# ----------------------------------------------------------
-
-#[CodeLayout::RequireASCII]
-#[Editor::RequireEmacsFileVariables]
-#[ErrorHandling::RequireUseOfExceptions]
-[Modules::PerlMinimumVersion]
-[Modules::RequirePerlVersion]
-#[ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
-#[ValuesAndExpressions::RestrictLongStrings]
-
-# ----------------------------------------------------------
-# Perl::Critic::PetPeeves::JTRAMMELL
-# ----------------------------------------------------------
-
-[Variables::ProhibitUselessInitialization]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays
-# ----------------------------------------------------------
-
-[BuiltinFunctions::ProhibitDeleteOnArrays]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
-# ----------------------------------------------------------
-
-[BuiltinFunctions::ProhibitReturnOr]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::Moo::ProhibitMakeImmutable
-# ----------------------------------------------------------
-
-[Moo::ProhibitMakeImmutable]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
-# requires Perl 5.12
-# ----------------------------------------------------------
-
-#[ValuesAndExpressions::ProhibitSingleArgArraySlice]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::Perlsecret
-# ----------------------------------------------------------
-
-[Perlsecret]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::TryTiny::RequireBlockTermination
-# ----------------------------------------------------------
-
-[TryTiny::RequireBlockTermination]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::TryTiny::RequireUse
-# ----------------------------------------------------------
-
-[TryTiny::RequireUse]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection
-# ----------------------------------------------------------
-
-[ValuesAndExpressions::PreventSQLInjection]
-
-# ----------------------------------------------------------
-# Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
-# ----------------------------------------------------------
-
-[Variables::ProhibitUnusedVarsStricter]
-allow_unused_subroutine_arguments = 1
-
-# ----------------------------------------------------------
-# Perl::Critic::Pulp
-# ----------------------------------------------------------
-
-[CodeLayout::ProhibitFatCommaNewline]
-#[CodeLayout::ProhibitIfIfSameLine]
-[CodeLayout::RequireFinalSemicolon]
-[CodeLayout::RequireTrailingCommaAtNewline]
-[Compatibility::ConstantLeadingUnderscore]
-[Compatibility::ConstantPragmaHash]
-#[Compatibility::Gtk2Constants]
-[Compatibility::PerlMinimumVersionAndWhy]
-#[Compatibility::PodMinimumVersion]
-[Compatibility::ProhibitUnixDevNull]
-[Documentation::ProhibitAdjacentLinks]
-[Documentation::ProhibitBadAproposMarkup]
-[Documentation::ProhibitDuplicateHeadings]
-#[Documentation::ProhibitDuplicateSeeAlso]
-[Documentation::ProhibitLinkToSelf]
-[Documentation::ProhibitParagraphEndComma]
-[Documentation::ProhibitParagraphTwoDots]
-[Documentation::ProhibitUnbalancedParens]
-[Documentation::ProhibitVerbatimMarkup]
-[Documentation::RequireEndBeforeLastPod]
-[Documentation::RequireFilenameMarkup]
-#[Documentation::RequireFinalCut]
-[Documentation::RequireLinkedURLs]
-#[Miscellanea::TextDomainPlaceholders]
-#[Miscellanea::TextDomainUnused]
-[Modules::ProhibitModuleShebang]
-[Modules::ProhibitPOSIXimport]
-[Modules::ProhibitUseQuotedVersion]
-[ValuesAndExpressions::ConstantBeforeLt]
-[ValuesAndExpressions::NotWithCompare]
-[ValuesAndExpressions::ProhibitArrayAssignAref]
-[ValuesAndExpressions::ProhibitBarewordDoubleColon]
-[ValuesAndExpressions::ProhibitDuplicateHashKeys]
-[ValuesAndExpressions::ProhibitEmptyCommas]
-#[ValuesAndExpressions::ProhibitFiletest_f]
-[ValuesAndExpressions::ProhibitNullStatements]
-[ValuesAndExpressions::ProhibitUnknownBackslash]
-[ValuesAndExpressions::RequireNumericVersion]
-[ValuesAndExpressions::UnexpandedSpecialLiteral]
-
-# ----------------------------------------------------------
-# Perl::Critic::StricterSubs
-# ----------------------------------------------------------
-
-[Modules::RequireExplicitInclusion]
-#[Subroutines::ProhibitCallsToUndeclaredSubs]
-#[Subroutines::ProhibitCallsToUnexportedSubs]
-[Subroutines::ProhibitExportingUndeclaredSubs]
-[Subroutines::ProhibitQualifiedSubDeclarations]
-
-# ----------------------------------------------------------
-# Perl::Critic::Tics
-# ----------------------------------------------------------
-
-#[Tics::ProhibitLongLines]
-[Tics::ProhibitManyArrows]
-[Tics::ProhibitUseBase]
-PERLCRITICRC_TEMPLATE
-
-        # Conig::Std will not preserve a comment on the last line, therefore
-        # we append at least one empty line at the end
-        $perlcriticrc_template .= "\n\n";
-
-        read_config \$perlcriticrc_template, my %perlcriticrc;
-
-        my $perlcriticrc_local = 'perlcriticrc.local';
-
-        if ( -f $perlcriticrc_local ) {
-            $self->log("Adjusting Perl::Critic config from '$perlcriticrc_local'");
-
-            read_config $perlcriticrc_local, my %perlcriticrc_local;
-
-            my %local_seen;
-
-          POLICY:
-            for my $policy ( keys %perlcriticrc_local ) {
-
-                if ( $policy eq q{-} ) {
-                    $self->log_fatal('We cannot disable the global settings');
-
-                    # log_fatal should die
-                    croak 'internal error';
-                }
-
-                my $policy_name = $policy =~ m{ ^ - (.+) }xsm ? $1 : $policy;
-
-                if ( exists $local_seen{$policy_name} ) {
-                    $self->log_fatal("There are multiple entries for policy '$policy_name' in '$perlcriticrc_local'.");
-
-                    # log_fatal should die
-                    croak 'internal error';
-                }
-
-                $local_seen{$policy_name} = 1;
-
-                delete $perlcriticrc{$policy_name};
-
-                if ( $policy =~ m{ ^ - }xsm ) {
-                    $self->log("Disabling policy '$policy_name'");
-                    next POLICY;
-                }
-
-                if ( $policy eq q{} ) {
-                    $self->log('Custom global settings');
-                }
-                else {
-                    $self->log("Custom configuration for policy '$policy_name'");
-                }
-
-                $perlcriticrc{$policy_name} = $perlcriticrc_local{$policy_name};
-            }
-        }
-
-        if ( ( !exists $perlcriticrc{q{}}{only} ) or ( $perlcriticrc{q{}}{only} ne '1' ) ) {
-            $self->log(q{Setting global option 'only' back to '1'});
-            $perlcriticrc{q{}}{only} = '1';
-        }
-
-        my $content;
-        write_config %perlcriticrc, \$content;
-
-        return $content;
-    };
+The directory .cache is generated by L<HTTP::Cache::Transparent|HTTP::Cache::Transparent> to cache HTTP
+requests. Please add this directory to your F<.gitignore> file.
 
 =head2 .perltidyrc
 
@@ -976,34 +931,6 @@ if ( !Test::CleanNamespaces->find_modules() ) {
 all_namespaces_clean();
 XT_AUTHOR_CLEAN_NAMESPACES_T
 
-=head2 xt/author/critic.t
-
-L<Test::Perl::Critic|Test::Perl::Critic> author test.
-
-=cut
-
-    $file{q{xt/author/critic.t}} = $test_header . <<'XT_AUTHOR_CRITIC_T';
-use File::Spec;
-
-use Perl::Critic::Utils qw(all_perl_files);
-use Test::More;
-use Test::Perl::Critic;
-
-my @dirs = qw(bin lib t xt);
-
-my @ignores;
-my %file;
-@file{ all_perl_files(@dirs) } = ();
-delete @file{@ignores};
-my @files = keys %file;
-
-if ( @files == 0 ) {
-    BAIL_OUT('no files to criticize found');
-}
-
-all_critic_ok(@files);
-XT_AUTHOR_CRITIC_T
-
 =head2 xt/author/minimum_version.t
 
 L<Test::MinimumVersion|Test::MinimumVersion> author test.
@@ -1039,6 +966,58 @@ use Test::NoTabs;
 
 all_perl_files_ok( grep { -d } qw( bin lib t xt ) );
 XT_AUTHOR_NO_TABS_T
+
+=head2 xt/author/perlcriticrc-code
+
+The configuration for L<Perl::Critic|Perl::Critic> for F<bin> and F<lib>.
+This file is created from a default contained in this plugin and, if it
+exists from distribution specific settings in F<perlcriticrc-code.local>.
+
+=cut
+
+    $file{q{xt/author/perlcriticrc-code}} = sub {
+        my ($self) = @_;
+
+        return $self->_perlcriticrc('perlcriticrc-code.local');
+    };
+
+=head2 xt/author/perlcriticrc-tests
+
+The configuration for L<Perl::Critic|Perl::Critic> for F<t> and F<xt>.
+This file is created from a default contained in this plugin and, if it
+exists from distribution specific settings in F<perlcriticrc-tests.local>.
+
+=cut
+
+    $file{q{xt/author/perlcriticrc-tests}} = sub {
+        my ($self) = @_;
+
+        return $self->_perlcriticrc('perlcriticrc-tests.local');
+    };
+
+=head2 xt/author/perlcritic-code.t
+
+L<Test::Perl::Critic|Test::Perl::Critic> author test for F<bin> and F<lib>.
+
+=cut
+
+    $file{q{xt/author/perlcritic-code.t}} = $test_header . <<'XT_AUTHOR_PERLCRITIC_CODE_T';
+use Test::Perl::Critic ( -profile => 'xt/author/perlcriticrc-code' );
+
+all_critic_ok(qw(bin lib));
+XT_AUTHOR_PERLCRITIC_CODE_T
+
+=head2 xt/author/perlcritic-tests.t
+
+L<Test::Perl::Critic|Test::Perl::Critic> author test for F<t> and F<xt>.
+
+=cut
+
+    $file{q{xt/author/perlcritic-tests.t}} = $test_header . <<'XT_AUTHOR_PERLCRITIC_TESTS_T';
+use Test::Perl::Critic ( -profile => 'xt/author/perlcriticrc-tests' );
+
+all_critic_ok(qw(t xt));
+XT_AUTHOR_PERLCRITIC_TESTS_T
 
 =head2 xt/author/pod-no404s.t
 
@@ -1280,7 +1259,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sven Kirmess.
+This software is Copyright (c) 2017-2018 by Sven Kirmess.
 
 This is free software, licensed under:
 

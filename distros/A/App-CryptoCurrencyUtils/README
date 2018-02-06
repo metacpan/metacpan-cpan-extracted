@@ -2,33 +2,52 @@ NAME
     App::CryptoCurrencyUtils - CLI utilities related to cryptocurrencies
 
 VERSION
-    This document describes version 0.006 of App::CryptoCurrencyUtils (from
-    Perl distribution App-CryptoCurrencyUtils), released on 2018-01-30.
+    This document describes version 0.010 of App::CryptoCurrencyUtils (from
+    Perl distribution App-CryptoCurrencyUtils), released on 2018-02-05.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
 
-    *   coin-cmc
+    *   coin-cmc-summary
 
-    *   coin-mno
+    *   global-cmc-summary
 
     *   grep-coin
 
+    *   grep-exchange
+
+    *   list-cmc-coins
+
     *   list-coins
 
+    *   list-exchanges
+
+    *   open-coin-cmc
+
+    *   open-coin-mno
+
+    *   open-exchange-cmc
+
 FUNCTIONS
-  coin_cmc
+  coin_cmc_summary
     Usage:
 
-     coin_cmc(%args) -> [status, msg, result, meta]
+     coin_cmc_summary(%args) -> [status, msg, result, meta]
 
-    Go to coin's CMC (coinmarketcap.com) currency page.
+    Get coin's CMC (coinmarketcap.com) summary.
+
+    Currently retrieves https://api.coinmarketcap.com/v1/ticker/<coin-id>/
+    and return the data in a table.
+
+    If no coins are specified, will return global data.
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   symbols_or_names* => *array[cryptocurrency::symbol_or_name]*
+    *   coins => *array[cryptocurrency::symbol_or_name]*
+
+    *   convert => *str*
 
     Returns an enveloped result (an array).
 
@@ -41,21 +60,47 @@ FUNCTIONS
 
     Return value: (any)
 
-  coin_mno
+  global_cmc_summary
     Usage:
 
-     coin_mno(%args) -> [status, msg, result, meta]
+     global_cmc_summary(%args) -> [status, msg, result, meta]
 
-    Go to coin's MNO (masternodes.online) currency page.
+    Get global CMC (coinmarketcap.com) summary.
 
-    Currently does not perform any translation between CMC -> MNO currency
-    code if there is a difference.
+    Currently retrieves https://api.coinmarketcap.com/v1/ticker/<coin-id>/
+    and
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   symbols_or_names* => *array[cryptocurrency::symbol_or_name]*
+    *   convert => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_cmc_coins
+    Usage:
+
+     list_cmc_coins() -> [status, msg, result, meta]
+
+    List of all coins listed on coinmarketcap.com (CMC) along with their
+    marketcaps, ranks, etc.
+
+    This utility basically parses <https://coinmarketcap.com/all/views/all/>
+    into table data.
+
+    This function is not exported.
+
+    No arguments.
 
     Returns an enveloped result (an array).
 
@@ -81,6 +126,107 @@ FUNCTIONS
     This function is not exported.
 
     No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_exchanges
+    Usage:
+
+     list_exchanges() -> [status, msg, result, meta]
+
+    List cryptocurrency exchanges.
+
+    This utility lists cryptocurrency exchanges from
+    CryptoExchange::Catalog, which in turn gets its list from
+    <https://coinmarketcap.com/>.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_coin_cmc
+    Usage:
+
+     open_coin_cmc(%args) -> [status, msg, result, meta]
+
+    Open coin's CMC (coinmarketcap.com) currency page in the browser.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   coins* => *array[cryptocurrency::symbol_or_name]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_coin_mno
+    Usage:
+
+     open_coin_mno(%args) -> [status, msg, result, meta]
+
+    Open coin's MNO (masternodes.online) currency page in the browser.
+
+    Currently does not perform any translation between CMC -> MNO currency
+    code if there is a difference.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   coins* => *array[cryptocurrency::symbol_or_name]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_exchange_cmc
+    Usage:
+
+     open_exchange_cmc(%args) -> [status, msg, result, meta]
+
+    Open exchange's CMC (coinmarketcap.com) exchange page in the browser.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exchanges* => *array[cryptoexchange::name]*
 
     Returns an enveloped result (an array).
 

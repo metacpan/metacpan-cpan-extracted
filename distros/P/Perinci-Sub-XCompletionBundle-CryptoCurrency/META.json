@@ -35,6 +35,7 @@
          "requires" : {
             "Complete::Util" : "0.57",
             "CryptoCurrency::Catalog" : "0",
+            "CryptoExchange::Catalog" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -61,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-CryptoCurrency"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -156,7 +157,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.591"
+            "version" : "0.592"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -424,7 +425,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
@@ -465,7 +466,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::CheckCircular",
             "name" : "@Author::PERLANCAR/Prereqs::CheckCircular",
-            "version" : "0.005"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple",

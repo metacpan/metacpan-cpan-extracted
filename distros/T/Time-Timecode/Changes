@@ -1,4 +1,9 @@
 -------------------------
+2018-02-03	v0.31
+-------------------------
+* Added support for arithmetic to timecode executable
+
+-------------------------
 2016-07-16	v0.30
 -------------------------
 * Fixed dropframe calculations and changed algorithm [RT Bug #91181]

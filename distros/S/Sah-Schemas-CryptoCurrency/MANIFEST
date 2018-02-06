@@ -9,8 +9,10 @@ README
 dist.ini
 lib/Sah/Schema/cryptocurrency/symbol.pm
 lib/Sah/Schema/cryptocurrency/symbol_or_name.pm
+lib/Sah/Schema/cryptoexchange/name.pm
 lib/Sah/SchemaR/cryptocurrency/symbol.pm
 lib/Sah/SchemaR/cryptocurrency/symbol_or_name.pm
+lib/Sah/SchemaR/cryptoexchange/name.pm
 lib/Sah/Schemas/CryptoCurrency.pm
 t/00-compile.t
 t/author-critic.t

@@ -3,7 +3,7 @@ use warnings;
 
 use Devel::Chitin::OpTree;
 use Devel::Chitin::Location;
-use Test::More tests => 34;
+use Test::More tests => 33;
 
 use Fcntl qw(:flock :DEFAULT SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);
@@ -1085,7 +1085,6 @@ subtest 'perl-5.10.1' => sub {
 subtest 'given-when-5.10.1' => sub {
     _run_tests(
         requires_version(v5.10.1),
-        excludes_version(v5.27.7),
         given_when_5_10 => use_experimental('switch'),
                       join("\n",q(my $a;),
                                 q(given ($a) {),
@@ -1105,28 +1104,29 @@ subtest 'given-when-5.10.1' => sub {
     );
 };
 
-subtest 'given-when-5.27.7' => sub {
-    _run_tests(
-        requires_version(v5.27.7),
-        given_when_5_27 => use_experimental('switch'),
-                    join("\n",q(my $a;),
-                              q(given ($a) {),
-                             qq(\twhereso (m/abc/) {),
-                             qq(\t\tprint 'abc';),
-                             qq(\t\tprint 'ABC'),
-                             qq(\t}),
-                             qq(\twhereso (m/def/) {),
-                             qq(\t\tprint 'def'),
-                             qq(\t}),
-                             qq(\tprint 'ghi' whereso (m/ghi/);),
-                             qq(\twhereis ('123') {),
-                             qq(\t\tprint '123'),
-                             qq(\t}),
-                             qq(\tprint '456' whereis (456);),
-                             qq(\tprint 'default case'),
-                             qq(})),
-    );
-};
+# from the reverted given/whereso/whereis from 5.27.7
+#subtest 'given-when-5.27.7' => sub {
+#    _run_tests(
+#        requires_version(v5.27.7),
+#        given_when_5_27 => use_experimental('switch'),
+#                    join("\n",q(my $a;),
+#                              q(given ($a) {),
+#                             qq(\twhereso (m/abc/) {),
+#                             qq(\t\tprint 'abc';),
+#                             qq(\t\tprint 'ABC'),
+#                             qq(\t}),
+#                             qq(\twhereso (m/def/) {),
+#                             qq(\t\tprint 'def'),
+#                             qq(\t}),
+#                             qq(\tprint 'ghi' whereso (m/ghi/);),
+#                             qq(\twhereis ('123') {),
+#                             qq(\t\tprint '123'),
+#                             qq(\t}),
+#                             qq(\tprint '456' whereis (456);),
+#                             qq(\tprint 'default case'),
+#                             qq(})),
+#    );
+#};
 
 subtest 'perl-5.12' => sub {
     _run_tests(

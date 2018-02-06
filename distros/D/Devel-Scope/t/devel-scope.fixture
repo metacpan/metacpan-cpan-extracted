@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Devel::Scope qw( debug );
+
+debug("0:Main-Block");
+{
+    debug("1:Main-Block");
+    { 
+        debug("2:Main-Block");
+        {
+            debug("3:Main-Block");
+        }
+    }
+}
+
+if ( int rand ) {
+    debug("1:Main-If-True");
+    if ( int rand ) {
+        debug("2:Main-If-True-True");  
+    } else {
+        debug("2:Main-If-True-False");  
+    }
+} else {
+    debug("1:Main-If-False");
+    if ( int rand ) {
+        debug("2:Main-If-False-True");  
+    } else {
+        debug("2:Main-If-False-False");  
+    }
+}
+
+foo();
+
+exit 0;
+
+sub foo {
+    debug("1:Foo-Begin");
+
+    debug("1:Foo-Block");
+    {
+        debug("2:Foo-Block");
+        { 
+            debug("3:Foo-Block");
+            {
+                debug("4:Foo-Block");
+            }
+        }
+    }
+
+    if ( int rand ) {
+        debug("2:Foo-If-True");
+        if ( int rand ) {
+            debug("3:Foo-If-True-True");  
+        } else {
+            debug("3:Foo-If-True-False");  
+        }
+    } else {
+        debug("2:Foo-If-False");
+        if ( int rand ) {
+            debug("3:Foo-If-False-True");  
+        } else {
+            debug("3:Foo-If-False-False");  
+        }
+    }
+    debug("1:Foo-End");
+}

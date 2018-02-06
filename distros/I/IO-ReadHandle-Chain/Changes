@@ -1,5 +1,21 @@
 Revision history for IO-ReadHandle-Chain
 
+1.2.1   2018-02-03
+        - Improve documentation.
+
+1.2.0   2018-02-02
+        - BREAKING CHANGE: no longer attempt to reset a source
+          filehandle to its initial position when switching to the
+          next source.
+        - BUGFIX: 'read' at EOF now takes into account the specified
+          offset.
+        - Reimplement with tie to self, so that additional methods can
+          be defined for the filehandle.
+        - Implement current_source method.
+        - Implement input_line_number method, and update
+          $. appropriately.
+        - Implement set_field, get_field, remove_field methods.
+
 1.1.0   2017-12-21
         BUGFIX: 'read' beyond EOF now yields an empty buffer.
 

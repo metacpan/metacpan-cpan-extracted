@@ -1,7 +1,7 @@
 package DateTime::Format::Duration::ISO8601;
 
-our $DATE = '2017-08-02'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-02-06'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,6 +76,11 @@ sub parse_duration {
         ));
     }
 
+    # Convert weeks to days
+    if (exists $duration_args->{ weeks }) {
+        $duration_args->{days} += delete($duration_args->{weeks}) * 7;
+    }
+
     # Convert ss.sss floating seconds to seconds and nanoseconds
     if (exists $duration_args->{ seconds }) {
         my ($seconds, $floating) = $duration_args->{ seconds } =~ qr{(?x)
@@ -91,11 +96,7 @@ sub parse_duration {
         }
     }
 
-    # DateTime::Duration only accepts integer values
-    for my $field (keys %{ $duration_args }) {
-        $duration_args->{ $field } = int($duration_args->{ $field });
-    }
-
+    require DateTime::Duration;
     return DateTime::Duration->new(%{ $duration_args });
 }
 
@@ -108,17 +109,26 @@ sub parse_duration_as_deltas {
 
     my $regex = qr{(?x)
         ^
-        (?:(?<repeats>R(?<repetitions>[0-9]+)?))?
+        (?:(?<repeats>R(?<repetitions>[0-9]+(?:\.[0-9]*)?)?))?
         P
-        (?:(?<years>[0-9]+)Y)?
-        (?:(?<months>[0-9]+)M)?
-        (?:(?<days>[0-9]+)D)?
-        (?:T
-            (?:(?<hours>[0-9]+)H)?
-            (?:(?<minutes>[0-9]+)M)?
-            (?:(?<seconds>[0-9]+(?:\.([0-9]+))?)S)?
-        )?
-        $
+        (?:
+            # PnW
+            (?:
+                (?:(?<weeks>[0-9]+(?:\.[0-9]*)?)W)
+            )
+            |
+            # PnYnMnDTnHnMnS & P<date>T<time>
+            (?:
+                (?:(?<years>[0-9]+(?:\.[0-9]*)?)Y)?
+                (?:(?<months>[0-9]+(?:\.[0-9]*)?)M)?
+                (?:(?<days>[0-9]+(?:\.[0-9]*)?)D)?
+                (?:T
+                    (?:(?<hours>[0-9]+(?:\.[0-9]*)?)H)?
+                    (?:(?<minutes>[0-9]+(?:\.[0-9]*)?)M)?
+                    (?:(?<seconds>[0-9]+(?:\.[0-9]*)?)S)?
+                )?
+            )
+        )$
     };
 
     unless ($duration_string =~ $regex) {
@@ -131,6 +141,8 @@ sub parse_duration_as_deltas {
     my %fields = map  { $_ => $+{ $_ } }
                  grep { defined $+{ $_ } }
                       keys %+;
+
+    # XXX ISO standard only allows decimal fraction for the smallest unit
 
     return \%fields;
 }
@@ -158,7 +170,7 @@ DateTime::Format::Duration::ISO8601 - Format DateTime::Duration object as ISO860
 
 =head1 VERSION
 
-This document describes version 0.005 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2017-08-02.
+This document describes version 0.006 of DateTime::Format::Duration::ISO8601 (from Perl distribution DateTime-Format-Duration-ISO8601), released on 2018-02-06.
 
 =head1 SYNOPSIS
 
@@ -178,8 +190,6 @@ This module formats and parses ISO 8601 durations to and from
 L<DateTime::Duration> instances.
 
 ISO 8601 intervals are B<not> supported.
-
-=for Pod::Coverage ^(parse_duration_as_deltas)$
 
 =head1 METHODS
 
@@ -202,6 +212,11 @@ Set to C<undef> to disable error dispatching.
 =head2 format_duration (C<DateTime::Duration>) => C<string>
 
 =head2 parse_duration (C<string>) => C<DateTime::Duration>
+
+=head2 parse_duration_as_deltas(C<string>) => \%deltas
+
+This is for parsing a duration string into hash, without creating
+L<DateTime::Duration> object.
 
 =head1 HOMEPAGE
 
@@ -234,7 +249,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

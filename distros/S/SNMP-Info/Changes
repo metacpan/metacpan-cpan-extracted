@@ -1,3 +1,25 @@
+version 3.43 (2018-02-02)
+
+  [BUG FIXES]
+
+  * Fix identification of Brocade CES
+
+version 3.42 (2018-02-02)
+
+  [ENHANCEMENTS]
+
+  * IPv6 Prefix Length support via IPv6::ipv6_addr_prefixlength
+
+  [BUG FIXES]
+
+  * Fix test for updated snmplabs.com data
+
+version 3.41 (2018-02-01)
+
+  [BUG FIXES]
+
+  * Fixes to distriution metadata
+
 version 3.40 (2018-01-28)
 
   [ENHANCEMENTS]

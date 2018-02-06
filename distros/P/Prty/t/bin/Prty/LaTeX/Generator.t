@@ -52,32 +52,6 @@ sub test_cmd : Test(6) {
 
 # -----------------------------------------------------------------------------
 
-sub test_env : Test(1) {
-    my $self = shift;
-
-    my $ltx = Prty::LaTeX::Generator->new;
-    
-    my $code = $ltx->env('document','Dies ist ein Text.');
-    $self->is($code,Prty::Unindent->string(q~
-        \begin{document}
-        Dies ist ein Text.
-        \end{document}
-    ~));
-}
-
-# -----------------------------------------------------------------------------
-
-sub test_len : Test(1) {
-    my $self = shift;
-
-    my $ltx = Prty::LaTeX::Generator->new;
-    
-    my $code = $ltx->len('parindent','0em');
-    $self->is($code,"\\parindent0em\n");
-}
-
-# -----------------------------------------------------------------------------
-
 sub test_comment : Test(1) {
     my $self = shift;
 
@@ -96,6 +70,43 @@ sub test_protect : Test(1) {
     
     my $code = $ltx->protect('Der Text $text wird geschützt.');
     $self->is($code,'Der Text \$text wird geschützt.');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_renewcommand : Test(1) {
+    my $self = shift;
+
+    my $ltx = Prty::LaTeX::Generator->new;
+    
+    my $code = $ltx->renewcommand('cellalign',-p=>'lt');
+    $self->is($code,"\\renewcommand{\\cellalign}{lt}\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_setlength : Test(1) {
+    my $self = shift;
+
+    my $ltx = Prty::LaTeX::Generator->new;
+    
+    my $code = $ltx->setlength('parindent','0em');
+    $self->is($code,"\\setlength{\\parindent}{0em}\n");
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_env : Test(1) {
+    my $self = shift;
+
+    my $ltx = Prty::LaTeX::Generator->new;
+    
+    my $code = $ltx->env('document','Dies ist ein Text.');
+    $self->is($code,Prty::Unindent->string(q~
+        \begin{document}
+        Dies ist ein Text.
+        \end{document}
+    ~));
 }
 
 # -----------------------------------------------------------------------------

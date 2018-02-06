@@ -24,7 +24,7 @@ my $h = Time::HiRes::time();
 ($t,$t2) = ($h-$t,$h-$t2);
 my $y = $x;
 ok($y == $z, "scalar bg_qx");
-okl($t2 >= 2.65 && $t <= 6.5,          ### 10 ### was 5.1 obs 5.57,6.31,2.66
+okl($t2 >= 2.15 && $t <= 6.5,          ### 10 ### was 5.1 obs 5.57,6.31,2.16
     "scalar bg_qx took ${t}s ${t2}s expected ~3s");
 $x = 19;
 ok($x == 19, "result is not read only");

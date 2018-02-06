@@ -5,7 +5,7 @@ use Carp;
 use Scalar::Util qw(set_prototype);
 use Taint::Util 'untaint';
 use Data::Dump 'dump';
-our $VERSION = '1.2810';
+our $VERSION = '1.2812';
 my $found_symbols;
 my $loaded_symbols;
 my $precompile_symbols;
@@ -15,14 +15,14 @@ sub found_symbols {
 	my $self = shift;
 	my $package = (shift or caller);
 	return unless exists $found_symbols->{$package};
-	return sort keys %{$found_symbols->{$package}};
+	sort keys %{$found_symbols->{$package}};
 }
 
 sub loaded_symbols {
 	my $self = shift;
 	my $package = (shift or caller);
 	return unless exists $loaded_symbols->{$package};
-	return keys %{$loaded_symbols->{$package}};
+	keys %{$loaded_symbols->{$package}};
 }
 
 sub preload {
@@ -79,6 +79,7 @@ sub _find_symbols {
 			$precompile_symbols->{$package}->{$i->Name} = $i;
 		}
 		no strict 'refs';
+		no warnings; # prevents during-cleanup warnings when Submodules was destroyed and $i is undefined
 		*{"${package}::$i->{Name}"} = sub {
 			unshift @_, $package, $i->Name;
 			goto &_autoload;

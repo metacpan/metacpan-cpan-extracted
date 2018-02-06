@@ -1,3 +1,27 @@
+0.089		2018-02-02	T. R. Wyant
+    Kelso marks Iridiums 3, 37, 49 as "P" ("partly operational"). This
+    is "spare" in my classification. Sladen calls 3 failed, but I'm
+    using the Kelso data in the canned status table in
+    Astro::Coord::ECI::TLE.
+
+    Fix problem with Astro::Coord::ECI::Sun when Time::y2038 used.
+
+    New algorithm for equinoxes and solstices. The new algorithm is from
+    Jean Meeus' "Astronomical Algorithms." 2nd edition, chapter 27
+    ("Equinoxes and Solstices"), and should be more accurate, at least
+    for reasonably current times.
+
+    If you want the old iterative algorithm back, you can set new
+    attribute 'iterate_for_quarters' to a true value.
+
+    Correct typo in calculation of Sun's postion. The correction
+    produced no change in the equinoxes and solstices calculated by
+    iteration.
+
+    Add eg/usno-seasons. This displays equinoxes and solstices for a
+    given year, both as computed by Astro::Coord::ECI::Sun and as
+    downloaded from the United States Naval Observatory.
+
 0.088		2018-01-16	T. R. Wyant
     Iridium 34 decayed January 8 2017. So marked in canned status.
 

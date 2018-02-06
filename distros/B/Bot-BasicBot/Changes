@@ -1,5 +1,15 @@
 Revision history Bot::BasicBot
 
+0.93  Fri Feb 2 00:12:02 GMT 2018
+  - Support WEBIRC
+  - Typo fixes
+  - Pass just the nick, not full n!u@h, to newly-introduced
+    mode_change() method, for consistency with other methods.
+
+0.92  Thu Feb 1 20:09:43 GMT 2018
+  - new mode_change() method fired when modes change
+  - More accurate log messages upon connection
+
 0.91  Thu Apr 6 23:39:21 BST 2017
 
 0.90  Wed Apr 5 23:34:09 CEST 2017

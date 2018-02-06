@@ -6,14 +6,14 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
 use Method::Signatures;
 use MooseX::Types::Path::Tiny qw(Path);
 use MooseX::Types::URI qw(Uri);
-use LWP::UserAgent;
+use LWP::UserAgent::Determined;
 use MIME::Base64;
 use Mozilla::CA;
 use Path::Tiny;
@@ -95,11 +95,12 @@ has _ua_module_version => (
 );
 
 method _build_ua () {
-    return LWP::UserAgent->new(
+    return LWP::UserAgent::Determined->new(
         agent      => $self->_ua_module_version . ' ',
         cookie_jar => {},
         ssl_opts   => { verify_hostname => $self->ssl_verify, SSL_ca_file => $self->ssl_ca_file },
-        timeout    => $self->timeout
+        timeout    => $self->timeout,
+        env_proxy  => 1,
     );
 }
 
@@ -450,7 +451,7 @@ VMware::vCloudDirector::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head2 Attributes
 

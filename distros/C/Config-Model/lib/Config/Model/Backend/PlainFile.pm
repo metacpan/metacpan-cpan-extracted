@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2017 by Dominique Dumont.
+# This software is Copyright (c) 2005-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.116';
+$Config::Model::Backend::PlainFile::VERSION = '2.117';
 use 5.10.1;
 use Carp;
 use Mouse;
@@ -19,6 +19,7 @@ use Log::Log4perl qw(get_logger :levels);
 extends 'Config::Model::Backend::Any';
 
 with "Config::Model::Role::ComputeFunction";
+with "Config::Model::Role::FileHandler";
 
 my $logger = get_logger("Backend::PlainFile");
 
@@ -46,7 +47,6 @@ sub read {
     # check      => yes|no|skip
 
     my $check = $args{check} || 'yes';
-    my $dir   = $args{config_dir};
     my $node  = $args{object};
     $logger->trace( "called on node ", $node->name );
 
@@ -55,8 +55,8 @@ sub read {
     foreach my $elt ( $node->get_element_names(all => 1) ) {
         my $obj = $args{object}->fetch_element( name => $elt );
 
-        my $dir = path($args{root} . $dir);
         my $file_name = $args{file} ? $obj->compute_string($args{file}) : $elt;
+        my $dir = $self->get_tuned_config_dir(%args);
         my $file = $dir->child($file_name);
 
         $logger->trace("looking for plainfile $file ");
@@ -125,8 +125,10 @@ sub write {
     # check      => yes|no|skip
 
     my $check = $args{check} || 'yes';
-    my $dir = path($args{root} . $args{config_dir});
-    $dir->mkpath({ mode => 0755 } ) unless -d $dir;
+    my $cfg_dir = $args{config_dir};
+    my $dir = $self->get_tuned_config_dir(%args);
+    $dir->mkpath({ mode => 0755 } ) unless $dir->is_dir;
+
     my $node = $args{object};
     $logger->debug( "PlainFile write called on node ", $node->name );
 
@@ -180,18 +182,17 @@ sub delete {
     # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    my $dir = $args{root} . $args{config_dir};
+    my $dir = $self->get_tuned_config_dir(%args);
     my $node = $args{object};
     $logger->debug( "PlainFile delete called on deleted node");
 
     # write data from leaf element from the node
     foreach my $elt ( $node->get_element_name() ) {
-        my $obj = $args{object}->fetch_element( name => $elt );
+        my $obj = $node->fetch_element( name => $elt );
 
-        my $file = $dir;
-        $file .= $args{file} ? $obj->compute_string($args{file}) : $elt;
+        my $file = $dir->child($args{file} ? $obj->compute_string($args{file}) : $elt);
         $logger->info( "Removing $file (deleted node)" );
-        unlink($file);
+        $file->remove;
     }
 }
 
@@ -214,7 +215,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.116
+version 2.117
 
 =head1 SYNOPSIS
 
@@ -338,7 +339,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2017 by Dominique Dumont.
+This software is Copyright (c) 2005-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

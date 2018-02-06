@@ -18,6 +18,7 @@ meta-spec:
 name: App-rsynccolor
 requires:
   File::Which: '0'
+  PerlIO::fgets: '0'
   ShellQuote::Any::Tiny: '0'
   strict: '0'
   warnings: '0'
@@ -25,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-rsynccolor
   homepage: https://metacpan.org/release/App-rsynccolor
   repository: git://github.com/perlancar/perl-App-rsynccolor.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -345,7 +346,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

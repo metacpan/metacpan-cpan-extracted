@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.39  Mon Feb 05 11:45:00 2018
+      - Updated dependency on Map::Tube v3.44.
+
 0.38  Mon Jan 08 17:25:00 2018
       - Now using namespace::autoclean.
 

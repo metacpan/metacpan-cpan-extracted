@@ -2,7 +2,7 @@
 
 # Author: Skye Shaw (skye.shaw@gmail.com)
 # Source: https://github.com/sshaw/Time-Timecode
-# Copyright: Copyright (c) 2009-2016 Skye Shaw. All rights reserved.
+# Copyright: Copyright (c) 2009-2018 Skye Shaw. All rights reserved.
 # License: This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 # Description: Timecode conversion program. A front end for the Time::Timecode module.
 
@@ -14,7 +14,8 @@ use Time::Timecode;
 
 Getopt::Long::Configure('bundling');
 
-my $VERSION = '0.01';
+my $VERSION = '0.02';
+my $MAY_BE_ARITHMETIC = qr|^(\S+)\s*([-+*/])\s*(\S+)$|;
 
 my ($convert, $format, $input, $output, $quiet);
 
@@ -29,25 +30,24 @@ my $ok = GetOptions('c|convert:s' => \&convert_options,
 usage() unless $ok;
 
 if (@ARGV) {
-  my $tc = parse_timecode(shift, $input);
+  my $tc = process_input(shift);
   exit 1 unless $tc;
-
   print convert_timecode($tc), "\n";
 }
 else {
-
-  my @conversions;
   while (<>) {
     next unless /\w/;
     chomp;
 
-    my $tc = parse_timecode($_, $input);
+    my $tc = process_input($_);
     next unless $tc;
 
-    push @conversions, [$tc->to_string, convert_timecode($tc)]
+    output_timecode($_, convert_timecode($tc))
   }
+}
 
-  output_timecode(@$_) for @conversions;
+sub process_input {
+  return $_[0] =~ $MAY_BE_ARITHMETIC ? timecode_arithmetic($1, $2, $3) : parse_timecode(shift);
 }
 
 sub output_timecode {
@@ -57,12 +57,37 @@ sub output_timecode {
 
 sub parse_timecode {
   my $value = shift;
-  my $options = shift || {};
+  my $options = $input || {};
   my $tc = eval { Time::Timecode->new($value, $options) };
 
   die $@ if $@ && !$quiet;
 
   return $tc;
+}
+
+sub timecode_arithmetic {
+  my $lhs = parse_timecode(shift, $input);
+  my $op =  shift;
+  my $rhs = parse_timecode(shift, $input);
+  return unless $rhs && $lhs;
+
+  my $result;
+
+  if ($op eq '-') {
+    return $lhs - $rhs
+  }
+  elsif ($op eq '+') {
+    return $lhs + $rhs
+  }
+  elsif ($op eq '*') {
+    return $lhs * $rhs
+  }
+  elsif ($op eq '/') {
+    return $lhs / $rhs
+  }
+  elsif (!$quiet) {
+    die "Unknown operator: $op";
+  }
 }
 
 sub input_options {
@@ -83,9 +108,9 @@ sub parse_timecode_options {
   my $value = pop;
   my $options = {};
 
-  if ($value =~ /^(\d+(?:.\d+)?)(N?D)?$/i) {
+  if ($value =~ /^(\d+(?:.\d+)?)(N?D|DF)?$/i) {
     $options->{fps} = $1;
-    $options->{dropframe} = defined $2 && lc $2 eq 'd' ? 1 : 0;
+    $options->{dropframe} = defined $2 && lc substr($2,0,1) eq 'd' ? 1 : 0;
   }
   else {
     map {
@@ -98,19 +123,23 @@ sub parse_timecode_options {
 }
 
 sub help {
-  print STDERR "usage: timecode [-h] [-c spec] [-f format] [-i spec] [timecode]\n";
+  print STDERR "usage: timecode [-h] [-c spec] [-f format] [-i spec] [expression]\n";
   print STDERR<<HELP;
     -h --help		   option help
-    -c --convert spec      convert timecode according to `spec'
- 			   `spec' can be a number of FPS proceeded by an optional `N' or `ND' or, a comma
-		 	   separated list of key=value. key can be fps, dropframe, delimiter, frame_delimiter
+    -c --convert spec      convert expression according to `spec'
+ 			   or `spec' can be a number of FPS proceeded by an optional `D', `ND', `DF'
+		 	   a comma separated list of key=value.
+			   key can be fps, dropframe, delimiter, frame_delimiter
     -f --format  format    output timecode according to `format' e.g., '%H:%M:%S at %r FPS'.
-			   %H=hours, %M=mins, %S=secs, %f=frames, %i=total frames, %r=frame rate, %s=frames in secs
-    -i --input   spec      process incoming timecodes according to `spec'; see -c for more info
-    -q --quiet             ignore invalid timecodes
+			   %H=hours, %M=mins, %S=secs, %f=frames, %i=total frames, %r=frame rate,
+			   %s=frames in secs
+    -i --input   spec      process incoming expressions according to `spec'; see -c for more info
+    -q --quiet             ignore invalid expressions
     -v --version           print version information
 
-If no timecode is given timecodes will be read from stdin.
+Expression can be a timecode, a number of frames, or an arithmetic expression composed one or both.
+If no expression is given timecode will read from stdin.
+
 For more info and examples visit: https://github.com/sshaw/Time-Timecode
 HELP
 }

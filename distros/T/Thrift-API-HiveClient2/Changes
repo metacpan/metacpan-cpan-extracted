@@ -1,67 +1,17 @@
 Revision history for Thrift-API-HiveClient2
 
-0.001   2013-02-08
-        First version, released on an unsuspecting world.
+0.023 2018-02-06 BURAK
+	Distro fix for prereqs.
 
-0.002   2013-06-25
-        Fixed forgotten Thrift dependency
+0.022 2018-01-30 BURAK
+        Verbose type checks.
+        Adding support for delegation token authentication (ashwin konale)
+        Don’t try to close undefined transport during global destruction (Dave Cardwel)
+        Cleanup dead code.
+        Compatibility layer for the API changes.
 
-0.003   2013-06-27
-        Added some docs, fixed licence
-        Removed tempfiles from the package
-        Set defaults for host and port
-
-0.004   2013-06-27
-        Fixed fetch() output
-        Made sure code and pod tell the same story
-
-0.005   2013-06-28
-        Fixed missing Class::Accessor dep
-
-0.006   2013-07-01
-        Removed Test::Pod::Coverage failure
-
-0.007   2013-07-01
-        Removed more useless tests
-
-0.008   2013-07-10
-        Added default timeout of 1h
-        Die in case the server returns an error in execute()
-
-0.009   2013-07-10
-        Fixed bad error message
-
-0.010   2013-07-11
-        Fixed fetch() behaviour due to hasMoreRows bug
-
-0.011
-0.012   2013-08-21
-        Fixed CDH 4.3.0 bug (thanks to Stephen Sprague and Oleksiy Kovyrin)
-        Added UTF-8 configuration comments
-
-0.013   2014-02-10
-        Fixed If hive returns errors, the values can be undef (Burak Gürsoy)
-
-0.014   2014-10-29
-        Added Kerberos support
-
-0.015   2014-12-10 
-        Other SASL mechanisms can be used, passed directly to the
-        Authen::SASL object
-
-0.016   2014-12-10
-        PruneCruft didn't remove the files in the build dir, fixing that
-
-0.017   2015-05-14
-        Merged burak's 45a06bba - Guard isa() checks with blessed().
-        Tiny doc fix re/ SASL+PLAIN: canonuser, not user
-
-0.018   2015-09-30
-        Added get_columns method, giving complete info on a table's columns
-
-0.019   2015-10-01
-        Added get_tables method, outputs a list of tables with some details
-        Added fetch_hashref, which returns a resultset keyed on column names
+0.021   2016-01-17
+        Version up to solve cpan conflict after rejection
 
 0.020   2016-01-13
         Removed .iml file
@@ -73,5 +23,66 @@ Revision history for Thrift-API-HiveClient2
         Workaround for Thrift error messages (commented out, sigh)
         Added POD as README.md
 
-0.021   2016-01-17
-        Version up to solve cpan conflict after rejection
+0.019   2015-10-01
+        Added get_tables method, outputs a list of tables with some details
+        Added fetch_hashref, which returns a resultset keyed on column names
+
+0.018   2015-09-30
+        Added get_columns method, giving complete info on a table's columns
+
+0.017   2015-05-14
+        Merged burak's 45a06bba - Guard isa() checks with blessed().
+        Tiny doc fix re/ SASL+PLAIN: canonuser, not user
+
+0.016   2014-12-10
+        PruneCruft didn't remove the files in the build dir, fixing that
+
+0.015   2014-12-10 
+        Other SASL mechanisms can be used, passed directly to the
+        Authen::SASL object
+
+0.014   2014-10-29
+        Added Kerberos support
+
+0.013   2014-02-10
+        Fixed If hive returns errors, the values can be undef (Burak Gürsoy)
+
+0.012   2013-08-21
+0.011   2013-08-21
+        Fixed CDH 4.3.0 bug (thanks to Stephen Sprague and Oleksiy Kovyrin)
+        Added UTF-8 configuration comments
+
+0.010   2013-07-11
+        Fixed fetch() behaviour due to hasMoreRows bug
+
+0.009   2013-07-10
+        Fixed bad error message
+
+0.008   2013-07-10
+        Added default timeout of 1h
+        Die in case the server returns an error in execute()
+
+0.007   2013-07-01
+        Removed more useless tests
+
+0.006   2013-07-01
+        Removed Test::Pod::Coverage failure
+
+0.005   2013-06-28
+        Fixed missing Class::Accessor dep
+
+0.004   2013-06-27
+        Fixed fetch() output
+        Made sure code and pod tell the same story
+
+0.003   2013-06-27
+        Added some docs, fixed licence
+        Removed tempfiles from the package
+        Set defaults for host and port
+
+0.002   2013-06-25
+        Fixed forgotten Thrift dependency
+
+
+0.001   2013-02-08
+        First version, released on an unsuspecting world.

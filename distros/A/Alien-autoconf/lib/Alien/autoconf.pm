@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find autoconf
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::autoconf - Build or find autoconf
 
 =head1 VERSION
 
-version 0.11
+version 0.14
 
 =head1 SYNOPSIS
 

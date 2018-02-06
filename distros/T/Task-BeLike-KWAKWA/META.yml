@@ -1,0 +1,33 @@
+---
+abstract: 'Be more like KWAKWA - use the modules he likes!'
+author:
+  - 'Paul Williams <kwakwa@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-BeLike-KWAKWA
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kwakwaversal/task-belike-kwakwa/issues
+  homepage: https://github.com/kwakwaversal/task-belike-kwakwa
+  repository: https://github.com/kwakwaversal/task-belike-kwakwa.git
+version: '0.01'
+x_contributors:
+  - 'Paul Williams <kwakwaversal@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME            => 'Time::Timecode',
-    AUTHOR	    => 'Skye Shaw <sshaw AT lucas.cis.temple.edu>',
+    AUTHOR	    => 'Skye Shaw <skye.shaw AT gmail.com>',
     LICENSE         => 'perl',
     VERSION_FROM    => 'lib/Time/Timecode.pm',
     ABSTRACT_FROM   => 'lib/Time/Timecode.pm',

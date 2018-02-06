@@ -22,31 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
+                  'pattern' => '(2\\d)(\\d{6})',
                   'leading_digits' => '2',
-                  'pattern' => '(2\\d)(\\d{6})'
+                  'format' => '$1 $2'
                 },
                 {
                   'leading_digits' => '[79]',
-                  'pattern' => '([79]\\d{3})(\\d{4})'
+                  'pattern' => '([79]\\d{3})(\\d{4})',
+                  'format' => '$1 $2'
                 },
                 {
-                  'leading_digits' => '[58]',
-                  'pattern' => '([58]00)(\\d{4,6})'
+                  'format' => '$1 $2',
+                  'pattern' => '([58]00)(\\d{4,6})',
+                  'leading_digits' => '[58]00'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
                 'voip' => '',
-                'fixed_line' => '2[2-6]\\d{6}',
-                'specialrate' => '(900\\d{5})',
-                'toll_free' => '
-          8007\\d{4,5}|
-          500\\d{4}
-        ',
+                'personal_number' => '',
                 'mobile' => '
           7[19]\\d{6}|
           9(?:
@@ -54,9 +53,13 @@ my $validators = {
             [1-9]\\d
           )\\d{5}
         ',
-                'pager' => '',
-                'personal_number' => '',
-                'geographic' => '2[2-6]\\d{6}'
+                'geographic' => '2[2-6]\\d{6}',
+                'specialrate' => '(900\\d{5})',
+                'toll_free' => '
+          8007\\d{4,5}|
+          500\\d{4}
+        ',
+                'fixed_line' => '2[2-6]\\d{6}'
               };
 my %areanames = (
   96823 => "Dhofar\ \&\ Al\ Wusta",

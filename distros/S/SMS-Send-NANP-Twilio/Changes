@@ -1,0 +1,15 @@
+Revision history for Perl extension SMS::Send::NANP::Twilio
+
+0.03 2018-02-03
+  - API BREAK
+    - Changed sid property to API documented name MessagingServiceSid
+    - Changed from property to API documented case From
+  - Updated sms_send method
+    - Added support for MediaUrl property
+  - Added support for all optional properties in API documentation
+
+0.02 2018-02-03
+  - Status return is different when using copilot
+
+0.01 2018-02-03
+  - original version

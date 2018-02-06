@@ -5,7 +5,6 @@ use warnings;
 use namespace::autoclean;
 
 use Stepford::Types qw( Dir File );
-use Time::HiRes qw( stat );
 
 use Moose;
 

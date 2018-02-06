@@ -1098,7 +1098,7 @@ void
 InitVrSimulator(info)
     VrDeviceInfo    info
 
-void
+bool
 InitWindow(width, height, data)
     int    width
     int    height

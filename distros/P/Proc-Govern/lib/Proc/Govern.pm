@@ -1,7 +1,7 @@
 package Proc::Govern;
 
-our $DATE = '2017-03-31'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2018-01-31'; # DATE
+our $VERSION = '0.200'; # VERSION
 
 use 5.010001;
 use strict;
@@ -86,7 +86,7 @@ If not given, will be taken from command.
 _
         },
         command => {
-            schema => ['any*' => of => ['str*', ['array*' => of => 'str*']]],
+            schema => ['array*' => of => 'str*'],
             req => 1,
             summary => 'Command to run',
             description => <<'_',
@@ -289,10 +289,11 @@ sub govern_process {
 
     my $cmd = $args{command};
     defined($cmd) or die "Please specify command\n";
+    ref($cmd) eq 'ARRAY' or die "Command must be arrayref of strings";
 
     my $name = $args{name};
     if (!defined($name)) {
-        $name = ref($cmd) eq 'ARRAY' ? $cmd->[0] : ref($cmd) ? 'prog' : $cmd;
+        $name = $cmd->[0];
         $name =~ s!.*/!!; $name =~ s/\W+/_/g;
         length($name) or $name = "prog";
     }
@@ -334,14 +335,14 @@ sub govern_process {
         $fwrargs{prefix}   = $name;
         my $fwr = File::Write::Rotate->new(%fwrargs);
         $out = sub {
-            print STDOUT $_[0] if $showout;
+            print STDOUT $_[0]//'' if $showout;
             # XXX prefix with timestamp, how long script starts,
             $_[0] =~ s/^/STDOUT: /mg;
             $fwr->write($_[0]);
         };
     } else {
         $out = sub {
-            print STDOUT $_[0] if $showout;
+            print STDOUT $_[0]//'' if $showout;
         };
     }
 
@@ -353,14 +354,14 @@ sub govern_process {
         $fwrargs{prefix}   = $name;
         my $fwr = File::Write::Rotate->new(%fwrargs);
         $err = sub {
-            print STDERR $_[0] if $showerr;
+            print STDERR $_[0]//'' if $showerr;
             # XXX prefix with timestamp, how long script starts,
             $_[0] =~ s/^/STDERR: /mg;
             $fwr->write($_[0]);
         };
     } else {
         $err = sub {
-            print STDERR $_[0] if $showerr;
+            print STDERR $_[0]//'' if $showerr;
         };
     }
 
@@ -525,7 +526,7 @@ Proc::Govern - Run child process and govern its various aspects
 
 =head1 VERSION
 
-This document describes version 0.19 of Proc::Govern (from Perl distribution Proc-Govern), released on 2017-03-31.
+This document describes version 0.200 of Proc::Govern (from Perl distribution Proc-Govern), released on 2018-01-31.
 
 =head1 SYNOPSIS
 
@@ -543,7 +544,7 @@ To use directly as Perl module:
  use Proc::Govern qw(govern_process);
  govern_process(
      name       => 'myapp',
-     command    => '/path/to/myapp',
+     command    => ['/path/to/myapp', 'some', 'args'],
      timeout    => 3600,
      log_stderr => {
          dir       => '/var/log/myapp',
@@ -659,7 +660,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<command>* => I<str|array[str]>
+=item * B<command>* => I<array[str]>
 
 Command to run.
 
@@ -869,7 +870,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

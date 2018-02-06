@@ -8,9 +8,10 @@ use lib 't/lib';
 use List::AllUtils qw( first );
 use Log::Dispatch;
 use Log::Dispatch::Array;
-use Path::Class qw( dir tempdir );
+use Path::Class qw( tempdir );
 use Stepford::Runner;
 use Time::HiRes 1.9726 qw( stat time );
+use Graph::Easy 0.76;
 
 use Test::Differences;
 use Test::Fatal;
@@ -38,18 +39,16 @@ my $tempdir = tempdir( CLEANUP => 1 );
         logger          => $logger,
     );
 
+    my $plan_graph
+        = Graph::Easy->new(
+              '[Test1::Step::CombineFiles] -> [Test1::Step::UpdateFiles]'
+            . '[Test1::Step::UpdateFiles]  -> [Test1::Step::CreateA1]'
+            . '[Test1::Step::UpdateFiles]  -> [Test1::Step::CreateA2]' );
     _test_plan(
         $runner,
         'Test1::Step',
         ['CombineFiles'],
-        {
-            'CombineFiles' => {
-                'UpdateFiles' => {
-                    'CreateA1' => undef,
-                    'CreateA2' => undef,
-                },
-            },
-        },
+        $plan_graph,
         'runner comes up with the right plan for simple steps'
     );
 
@@ -75,14 +74,7 @@ my $tempdir = tempdir( CLEANUP => 1 );
 
     is(
         $graph_message->{message},
-        <<'EOF',
-Graph for Test1::Step::CombineFiles:
-Stepford::FinalStep
-    Test1::Step::CombineFiles
-        Test1::Step::UpdateFiles
-            Test1::Step::CreateA1
-            Test1::Step::CreateA2
-EOF
+        "Graph for Test1::Step::CombineFiles:\n" . $plan_graph->as_txt,
         'logged plan when ->run was called'
     );
 
@@ -250,12 +242,12 @@ EOF
         $runner,
         'Test2::Step',
         'D',
-        {
-            D => {
-                B => { A => undef },
-                C => { B => { A => undef } },
-            }
-        },
+        Graph::Easy->new(
+                  '[Test2::Step::D] -> [Test2::Step::B]'
+                . '[Test2::Step::D] -> [Test2::Step::C]'
+                . '[Test2::Step::B] -> [Test2::Step::A]'
+                . '[Test2::Step::C] -> [Test2::Step::B]'
+        ),
         'repeated steps correctly show up in plan'
     );
 }
@@ -305,9 +297,9 @@ EOF
     my $e = exception {
         Stepford::Runner->new(
             step_namespaces => 'Test3::Step',
-            )->run(
+        )->run(
             final_steps => 'Test3::Step::B',
-            );
+        );
     };
 
     like(
@@ -341,9 +333,9 @@ EOF
     my $e = exception {
         Stepford::Runner->new(
             step_namespaces => 'Test4::Step',
-            )->run(
+        )->run(
             final_steps => 'Test4::Step::A',
-            );
+        );
     };
 
     like(
@@ -375,9 +367,9 @@ EOF
     my $e = exception {
         Stepford::Runner->new(
             step_namespaces => 'Test5::Step',
-            )->run(
+        )->run(
             final_steps => 'Test5::Step::A',
-            );
+        );
     };
 
     like(
@@ -631,26 +623,15 @@ EOF
         $runner,
         'Test8::Step',
         [ 'Final1', 'Final2' ],
-        {
-            Final1 => {
-                'ForFinal1::A' => => {
-                    Shared => {
-                        'ForShared::A' => undef,
-                        'ForShared::B' => undef,
-                    },
-                },
-            },
-            Final2 => {
-                'ForFinal2::B' => {
-                    'ForFinal2::A' => {
-                        Shared => {
-                            'ForShared::A' => undef,
-                            'ForShared::B' => undef,
-                        },
-                    },
-                },
-            },
-        },
+        Graph::Easy->new(
+                  '[Test8::Step::Final1]       -> [Test8::Step::ForFinal1::A]'
+                . '[Test8::Step::Final2]       -> [Test8::Step::ForFinal2::B]'
+                . '[Test8::Step::ForFinal1::A] -> [Test8::Step::Shared]'
+                . '[Test8::Step::ForFinal2::B] -> [Test8::Step::ForFinal2::A]'
+                . '[Test8::Step::ForFinal2::A] -> [Test8::Step::Shared]'
+                . '[Test8::Step::Shared]       -> [Test8::Step::ForShared::A]'
+                . '[Test8::Step::Shared]       -> [Test8::Step::ForShared::B]'
+        ),
         'runner comes up with an optimized plan for multiple final steps'
     );
 }
@@ -673,9 +654,9 @@ EOF
     my $e = exception {
         Stepford::Runner->new(
             step_namespaces => 'Test9::Step',
-            )->run(
+        )->run(
             final_steps => 'Test9::Step::A',
-            );
+        );
     };
 
     like(
@@ -702,32 +683,11 @@ sub _test_plan {
         {},
     )->graph->as_string;
 
-    my $expect_str = 'Stepford::FinalStep' . "\n" . _plan_as_str(
-        _prefix( $prefix, q{} ),
-        $expect,
-        1,
-    );
-
     eq_or_diff(
         $got_str,
-        $expect_str,
+        $expect->as_txt,
         $desc
     );
 }
 
 sub _prefix { return join '::', @_[ 0, 1 ] }
-
-sub _plan_as_str {
-    my $prefix = shift;
-    my $plan   = shift;
-    my $depth  = shift;
-
-    my $str = q{};
-
-    for my $step ( sort keys %{$plan} ) {
-        $str .= q{ } x ( $depth * 4 ) . $prefix . $step . "\n";
-        $str .= _plan_as_str( $prefix, $plan->{$step}, $depth + 1 )
-            if $plan->{$step};
-    }
-    return $str;
-}

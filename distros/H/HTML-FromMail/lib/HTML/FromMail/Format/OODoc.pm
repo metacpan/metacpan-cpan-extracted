@@ -1,15 +1,19 @@
-# Copyrights 2003,2004,2007 by Mark Overmeer.
+# Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 1.00.
-
-use strict;
-use warnings;
+# Pod stripped from pm file by OODoc 2.02.
+# This code is part of distribution HTML-FromMail.  Meta-POD processed with
+# OODoc into POD and HTML manual-pages.  See README.md
+# Copyright Mark Overmeer.  Licensed under the same terms as Perl itself.
 
 package HTML::FromMail::Format::OODoc;
 use vars '$VERSION';
-$VERSION = '0.11';
+$VERSION = '0.12';
+
 use base 'HTML::FromMail::Format';
+
+use strict;
+use warnings;
 
 use Carp;
 use OODoc::Template;

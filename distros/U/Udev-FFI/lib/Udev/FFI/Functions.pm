@@ -86,7 +86,7 @@ my $FUNCTIONS = {
 
     # struct udev_device *udev_device_new_from_devnum(struct udev *udev, char type, dev_t devnum);
     'udev_device_new_from_devnum' => {
-        ffi_data => [ ['opaque', 'signed char', 'uint64_t'], 'opaque' ]
+        ffi_data => [ ['opaque', 'signed char', 'dev_t'], 'opaque' ]
     },
 
     # struct udev_device *udev_device_new_from_subsystem_sysname(struct udev *udev, const char *subsystem, const char *sysname);
@@ -190,7 +190,7 @@ my $FUNCTIONS = {
 
     # dev_t udev_device_get_devnum(struct udev_device *udev_device);
     'udev_device_get_devnum' => {
-        ffi_data => [ ['opaque'], 'uint64_t' ]
+        ffi_data => [ ['opaque'], 'dev_t' ]
     },
 
     #const char *udev_device_get_action(struct udev_device *udev_device);
@@ -498,8 +498,8 @@ sub init {
     my $ffi = FFI::Platypus->new;
     $ffi->lib($libudev);
 
-    if(8 != (my $sizeof_dev_t = $ffi->sizeof('dev_t'))) {
-        $@ = "sizeof(dev_t) != 8 on your OS (sizeof(dev_t) == $sizeof_dev_t). Please report this to the author";
+    if(!$ffi->type('dev_t')) {
+        $@ = "Can't find \"dev_t\" type";
         return 0;
     }
 

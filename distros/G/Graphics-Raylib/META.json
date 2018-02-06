@@ -26,13 +26,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::raylib" : "0.008"
+            "Alien::raylib" : "0.010"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::raylib" : "0",
             "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06",
             "perl" : "5.010"
          }
       },
@@ -51,7 +52,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::raylib" : "0.008",
+            "Alien::raylib" : "0.010",
+            "Convert::Color" : "0",
             "Import::Into" : "0",
             "perl" : "5.010"
          }
@@ -76,79 +78,83 @@
    "provides" : {
       "Graphics::Raylib" : {
          "file" : "lib/Graphics/Raylib.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Key" : {
          "file" : "lib/Graphics/Raylib/Key.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Keyboard" : {
          "file" : "lib/Graphics/Raylib/Keyboard.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Mouse" : {
          "file" : "lib/Graphics/Raylib/Mouse.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Bitmap" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Circle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Line" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Pixel" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Polygon" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Rectangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Shape::Triangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Text" : {
          "file" : "lib/Graphics/Raylib/Text.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::Util" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.012"
+         "version" : "0.014"
+      },
+      "Graphics::Raylib::XS::Camera" : {
+         "file" : "lib/Graphics/Raylib/Util.pm",
+         "version" : "0.014"
       },
       "Graphics::Raylib::XS::Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::XS::Rectangle" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::XS::Vector2" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       },
       "Graphics::Raylib::XS::Vector3" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.012"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -163,7 +169,7 @@
          "web" : "https://github.com/athreef/Graphics-Raylib"
       }
    },
-   "version" : "0.012",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -482,7 +488,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.012",
+                  "tag" : "v0.014",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

@@ -1,3 +1,15 @@
+0.271   2018-01-31 (PERLANCAR)
+
+	- Introduce table.field_orders (which will be fed to Sort::BySpec
+	  which can sort by regexes and custom coderefs).
+
+	- [Bugfix] In table view, make columns that are mentioned in
+	  table.fields result metadata shown before (instead of after)
+	  those that are not mentioned. This bug is caused by a
+	  misunderstanding of what firstidx() will return in case there is
+	  no match. It is -1, not undef.
+
+
 0.270   2017-12-09 (PERLANCAR)
 
 	- Replace Number::Format with Number::Format::BigFloat to be able

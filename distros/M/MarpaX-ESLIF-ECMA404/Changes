@@ -1,6 +1,12 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.009 2018-01-25T16:24:56
+0.010 2018-01-30T18:28:39
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - use MarpaX::ESLIF 2.0.34
+ - .appveyor.yml [ci skip]
+ - .appveyor.yml
+
+0.009 2018-01-25T16:24:56Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - use MarpaX::ESLIF 2.0.33
 

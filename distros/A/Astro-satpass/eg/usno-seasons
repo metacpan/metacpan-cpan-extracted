@@ -1,0 +1,152 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Astro::Coord::ECI::Sun;
+use Astro::Coord::ECI::Utils qw{ rad2deg };
+use Getopt::Long 2.33 qw{ :config auto_version };
+use JSON;
+use LWP::UserAgent;
+use Pod::Usage;
+use POSIX qw{ strftime };
+use Time::Local;
+
+our $VERSION = '0.089';
+
+local $Astro::Coord::ECI::Sun::Singleton = 0;
+
+sub sayx (@) {
+    return print @_, "\n";
+}
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ iterate_for_quarters|iterate-for-quarters! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my $year;
+if ( defined $ARGV[0] ) {
+    $year = $ARGV[0];
+} else {
+    ( undef, undef, undef, undef, undef, $year ) = gmtime;
+    $year += 1900;
+}
+
+1700 <= $year
+    and $year <= 2100
+    or die "Year must be in range 1700 to 2100, inclusive\n";
+
+my $ua = LWP::UserAgent->new();
+my $resp = $ua->get( "http://api.usno.navy.mil/seasons?year=$year" );
+$resp->is_success()
+    or die "Failed to get Naval Observatory data: ", $resp->status_line();
+
+my $json = JSON->new()->utf8();
+my $data = $json->decode( $resp->content() );
+
+my $my_sun = Astro::Coord::ECI::Sun->new(
+    iterate_for_quarters	=> $opt{iterate_for_quarters},
+);
+my $usno_sun = Astro::Coord::ECI::Sun->new();
+my $jan1 = timegm( 0, 0, 0, 1, 0, $year );
+$my_sun->universal( $jan1 );
+
+foreach my $usno ( @{ $data->{data} } ) {
+    { Equinox => 1, Solstice => 1 }->{$usno->{phenom}}
+	or next;
+    my ( $time, $quarter, $desc ) = $my_sun->next_quarter();
+    sayx "$year $desc";
+    my ( undef, $lon ) = $my_sun->ecliptic();
+    sayx '     Astro::Coord::ECI::Sun time ', format_time( $time ),
+	'; longitude ', format_lon( $lon );
+    my ( $hr, $min ) = split qr<:>smx, $usno->{time};
+    $time = timegm( 0, $min, $hr, $usno->{day}, $usno->{month}-1,
+	$usno->{year} );
+    ( undef, $lon ) = $usno_sun->ecliptic( $time );
+    sayx '    U. S. Naval Observatory time ', format_time( $time ),
+	'; longitude ', format_lon( $lon );
+}
+
+sub format_lon {
+    my ( $lon ) = @_;
+    return sprintf '%8.4f', rad2deg( $lon );
+}
+
+sub format_time {
+    my ( $time ) = @_;
+    return strftime( '%Y-%m-%dT%H:%M:%SZ', gmtime $time );
+}
+
+__END__
+
+=head1 TITLE
+
+usno-seasons - Compare equinox and solstice calculations to those of the U. S. Naval Observatory
+
+=head1 SYNOPSIS
+
+ usno-seasons
+ usno-seasons 2001
+ usno-seasons -help
+ usno-seasons -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script calculates the equinoxes and solstices for the year
+given on the command line (defaulting to the current year) and compares
+them to the calculations of the United States Naval Observatory. The
+USNO data are obtained via its API. Because the USNO restricts its API
+to the years 1700 through 2100, this script has the same restriction.
+
+For each season three lines of output are produced. The first is the
+year and the name of the season, the latter as provided by
+L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>. The second is the
+date/time and ecliptic longitude of the season, as calculated by
+L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>. The third is the
+date/time returned from the U. S. Naval Observatory, and the ecliptic
+longitude calculated by L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>
+for that time.
+
+B<Note> that the U. S. Naval Observatory only gives the times to the
+nearest minute. We arbitrarily set the seconds to C<0> when interpreting
+USNO times.
+
+This script assumes the U. S. Naval Observatory's API returns the
+seasons in order by the time they occur. If this assumption is wrong,
+the USNO data will show up at the wrong place in the output.
+
+=head1 AUTHOR
+
+Tom Wyant (wyant at cpan dot org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

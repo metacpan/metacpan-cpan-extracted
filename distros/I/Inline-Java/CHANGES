@@ -1,6 +1,10 @@
 Revision history for Perl extension Inline::Java
 ------------------------------------------------
 
+0.60 Tue Jan 30 18:53:01 GMT 2018
+ - apply Debian reproducible-build patch
+ - Added license meta name. (thanks @manwar)
+
 0.59 Mon Jan 29 07:02:52 GMT 2018
  - zap no_index line
  - put . in Makefile.PL @INC for perl 5.26+

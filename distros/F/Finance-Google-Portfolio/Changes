@@ -1,5 +1,9 @@
 Revision history for Finance::Google::Portfolio
 
+1.04      2018-02-05 10:56:44-08:00 America/Los_Angeles
+        - Allowing for up to 24 HTTP redirects from Google because holy cow Google
+        - Adding Perl versions to test; annual general update for 2018
+
 1.03      2016-02-23 16:19:34-08:00 America/Los_Angeles
         - Patch to support Google's new two-page web sign-in process
 

@@ -29,7 +29,7 @@ use strict;
 use warnings;
 
 our @ISA = qw(Exporter IO::Handle);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 sub TIEHANDLE {
     my ($class, %props) = @_;

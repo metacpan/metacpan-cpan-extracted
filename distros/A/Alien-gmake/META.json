@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,20 +16,19 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.40",
-            "Alien::Build::MM" : "0.40",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.40",
-            "Alien::Build::MM" : "0.40",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::chdir" : "0",
-            "IPC::Cmd" : "0",
             "perl" : "5.006"
          }
       },
@@ -57,10 +56,8 @@
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
-            "Test2::Suite" : "0.000060",
-            "Test::Alien" : "0",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
+            "Test::Alien" : "0.56",
             "perl" : "5.006"
          }
       }
@@ -78,7 +75,27 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.21",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "Capture::Tiny" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Zlib" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {
+            "Capture::Tiny" : "0"
+         }
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_use_unsafe_inc" : 0
 }
 

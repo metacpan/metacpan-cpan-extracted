@@ -1,3 +1,8 @@
+0.180330  2018-02-02 23:49:20+01:00 Europe/Brussels
+    - Additions
+      - new parser for UCLUST output
+      - new all_representatives_by_cluster_size method for CD-HIT parser
+
 0.173640  2017-12-30 22:53:09+01:00 Europe/Brussels
     - Fixes
       - Hmmer::Standard tests should pass on more platforms

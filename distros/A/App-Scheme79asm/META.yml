@@ -1,0 +1,26 @@
+---
+abstract: 'assemble sexp to Verilog ROM for SIMPLE processor'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Scheme79asm
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::SExpression: '0.41'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=app-scheme79asm.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::Dimensions;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::VERSION = '2.03';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -64,7 +64,7 @@ Class::Std::initialize();
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height::VERSION = '2.03';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Height::VERSION = '3.01';
 use strict;
 use warnings;
 {
@@ -77,7 +77,7 @@ use warnings;
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length::VERSION = '2.03';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Length::VERSION = '3.01';
 use strict;
 use warnings;
 {
@@ -90,7 +90,7 @@ use warnings;
 
 
 package Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width;
-$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width::VERSION = '2.03';
+$Shipment::FedEx::WSDL::RateTypes::Dimensions::_Width::VERSION = '3.01';
 use strict;
 use warnings;
 {
@@ -116,7 +116,7 @@ Shipment::FedEx::WSDL::RateTypes::Dimensions
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 DESCRIPTION
 
@@ -169,7 +169,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

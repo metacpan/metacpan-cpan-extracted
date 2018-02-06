@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Kritika
 
+0.05 2018-02-01T21:40:14Z
+
+    - new protocol support
+
 0.04 2017-06-01T18:58:23Z
 
     - better error handling

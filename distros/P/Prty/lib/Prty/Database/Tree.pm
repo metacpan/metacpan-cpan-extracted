@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 use Time::HiRes ();
 
@@ -508,7 +508,7 @@ sub siblings {
 
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

@@ -6,23 +6,8 @@ use base qw( Alien::Base );
 use Env qw( @PATH );
 
 # ABSTRACT: Find or build patch
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
-
-my $in_path;
-
-sub import
-{
-  require Carp;
-  Carp::carp "Alien::patch with implicit path modification is deprecated ( see https://metacpan.org/pod/Alien::patch#CAVEATS )";
-  return if __PACKAGE__->install_type('system');
-  return if $in_path;
-  my $dir = File::Spec->catdir(__PACKAGE__->dist_dir, 'bin');
-  Carp::carp "adding $dir to PATH";
-  unshift @PATH, $dir;
-  # only do it once.
-  $in_path = 1;
-}
 
 sub exe
 {
@@ -58,7 +43,7 @@ Alien::patch - Find or build patch
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -113,26 +98,6 @@ which is usually what you want.
 
 When used with L<Alien::Base::ModuleBuild> in a C<alien_build_commands> or C<alien_install_commands>,
 this helper will be replaced by either C<patch> (Unix and cygwin) or C<patch --binary> (MSWin32).
-
-=head1 CAVEATS
-
-This version of L<Alien::patch> adds patch to your path, if it isn't
-already there when you use it, like this:
-
- use Alien::patch;  # deprecated, issues a warning
-
-This was a design mistake, and now B<deprecated>.  When L<Alien::patch> was
-originally written, it was one of the first Alien tool style modules on
-CPAN.  As such, the author and the L<Alien::Base> team hadn't yet come up
-with the best practices for this sort of module.  The author, and the
-L<Alien::Base> team feel that for consistency and for readability it is
-better use L<Alien::patch> without the automatic import:
-
- use Alien::patch ();
-
-and explicitly modify the C<PATH> yourself (examples are above in the
-synopsis).  The old style will issue a warning.  The old behavior will be
-removed, but not before 31 January 2018.
 
 =head1 AUTHOR
 

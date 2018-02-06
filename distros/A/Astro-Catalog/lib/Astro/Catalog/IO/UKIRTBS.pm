@@ -32,7 +32,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 
 =over 4
 
@@ -72,25 +72,25 @@ sub _read_catalog {
 
     # Create coordinate object
     my $c = new Astro::Coords( ra => $ra,
-			       dec => $dec,
-			       type => 'B1950',
-			       name => $bs,
-			       units => 'r',
-			     );
+                               dec => $dec,
+                               type => 'B1950',
+                               name => $bs,
+                               units => 'r',
+                             );
 
     my $s = new Astro::Catalog::Star( coords => $c,
-				      id =>  $bs,
-				      spectype => $type,
-				      fluxes => new Astro::Fluxes(
-				        new Astro::Flux( $mag, 'mag', 'V') ),
-				    );
+                                      id =>  $bs,
+                                      spectype => $type,
+                                      fluxes => new Astro::Fluxes(
+                                        new Astro::Flux( $mag, 'mag', 'V') ),
+                                    );
     push(@stars, $s);
   }
 
   # Create the catalog object
   return new Astro::Catalog( Stars => \@stars,
-			     Origin => 'UKIRT BS Catalog',
-			   );
+                             Origin => 'UKIRT BS Catalog',
+                           );
 
 }
 

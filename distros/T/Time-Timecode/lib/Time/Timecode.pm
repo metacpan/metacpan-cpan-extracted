@@ -14,7 +14,7 @@ use overload
 use POSIX ();
 use Carp ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 our $DEFAULT_FPS = 29.97;
 our $DEFAULT_DROPFRAME = 0;
@@ -395,7 +395,7 @@ __END__
 
 =head1 NAME
 
-Time::Timecode - Video timecode class
+Time::Timecode - Video timecode class and command line program
 
 =head1 SYNOPSIS
 
@@ -690,32 +690,40 @@ literal the options will be taken from the right hand side.
 =head1 TIMECODE CONVERSION UTILITY PROGRAM
 
 C<Time::Timecode> includes an executable called C<timecode> that allows one to perform timecode conversions
-from the command line:
+and arithmetic from the command line:
 
-  usage: timecode [-h] [-c spec] [-f format] [-i spec] [timecode]
+  usage: timecode [-h] [-c spec] [-f format] [-i spec] [expression]
       -h --help		   option help
-      -c --convert spec      convert timecode according to `spec'
-			     `spec' can be a number of FPS proceeded by an optional `N' or `ND' or, a comma
-			     separated list of key=value. key can be fps, dropframe, delimiter, frame_delimiter
+      -c --convert spec      convert expression according to `spec'
+                             `spec' can be a number of FPS proceeded by an optional `D', `ND', `DF' or
+                             a comma separated list of key=value.
+                             key can be fps, dropframe, delimiter, frame_delimiter
       -f --format  format    output timecode according to `format' e.g., '%H:%M:%S at %r FPS'.
-			     %H=hours, %M=mins, %S=secs, %f=frames %i=total frames, %r=frame rate, %s=frames in secs
-      -i --input   spec      process incoming timecodes according to `spec'; see -c for more info
-      -q --quiet             ignore invalid timecodes
+                             %H=hours, %M=mins, %S=secs, %f=frames, %i=total frames, %r=frame rate,
+                             %s=frames in secs
+      -i --input   spec      process incoming expressions according to `spec'; see -c for more info
+      -q --quiet             ignore invalid expressions
       -v --version           print version information
 
-  If no timecode is given timecodes will be read from stdin.
+  Expression can be a timecode, a number of frames, or an arithmetic expression composed one or both.
+  If no expression is given timecode will read from stdin.
 
 =head2 Examples
 
-=head3 Convert a 29.97 non drop frame count to a timecode
+=head3 Convert frames to a 29.97 dropframe timecode
 
-  timecode -i 29.97nd -f %T 1800
-  00:01:00:00
+  timecode -c 29.97df 1800
+  00:01:00:02
 
-=head3 Convert 24 to 29.97 drop and output the result as frames
+=head3 Convert 24 to 29.97 dropframe and output the result as frames
 
-  timecode -i 24 -c 29.97d -f %i 00:12:33:19
+  timecode -i 24 -c 29.97df -f %i 00:12:33:19
   18091
+
+=head3 Subtract two dropframe timecodes
+
+  timecode -c 29.97 23:00:04.29-00:00:05.00
+  22:58:37.05
 
 =head3 Convert a list of timecodes from a file to a custom format, ignoring invalid timecodes
 
@@ -745,9 +753,21 @@ C<$DEFAULT_FRAME_DELIMITER = ':'>
 
 C<$DEFAULT_TO_STRING_FORMAT = 'HHxMMxSSxFF'>  where C<x> represents the instance's frame and time separators.
 
+=head1 SEE ALSO
+
+=over 2
+
+=item L<xslt-timecode|https://github.com/sshaw/xslt-timecode> - A pure, dependency free, XSLT 1.0 library for video timecode manipulation
+
+=item L<iTunes Store Transporter: GUI|http://transportergui.com> - GUI and workflow automation for the iTunes Store’s Transporter (iTMSTransporter)
+
+=back
+
 =head1 AUTHOR
 
 Skye Shaw (skye.shaw [AT] gmail)
+
+Made by L<ScreenStaring|http://screenstaring.com>.
 
 =head1 CREDITS
 
@@ -763,7 +783,7 @@ L<http://andrewduncan.net/timecodes/>, L<http://dropframetimecode.org/>, L<http:
 
 =head1 COPYRIGHT
 
-Copyright (c) 2009-2016 Skye Shaw. All rights reserved.
+Copyright (c) 2009-2018 Skye Shaw. All rights reserved.
 
 =head1 LICENSE
 

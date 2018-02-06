@@ -1,8 +1,8 @@
 name = "Udev-FFI"
 # badges = ["travis"]
-# ModuleBuildTiny_Extend is module from https://github.com/Ilya33/minilla-modulemaker-modulebuildtiny_extend.git
-# I'm not use ModuleBuildTiny cuz I need to change ModuleBuildTiny template.
-# Also I add "use Minilla::ModuleMaker::ModuleBuildTiny_Extend;" to Minilla::Project.pm
-# If you know a gooder way, please do a pull request or send me email.
-module_maker="ModuleBuildTiny_Extend"
+authority="cpan:ILUX"
 
+module_maker="ModuleBuild"
+
+[build]
+build_class = "builder::testLibudev"

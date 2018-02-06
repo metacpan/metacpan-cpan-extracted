@@ -3,14 +3,13 @@ use warnings;
 
 use lib 't/lib';
 
-use File::Temp qw( tempdir );
-use Path::Class qw( dir );
+use Path::Class qw( tempdir );
 use Stepford::Runner;
 use Test1::Step::CombineFiles;
 
 use Test::More;
 
-my $tempdir = dir( tempdir( CLEANUP => 1 ) );
+my $tempdir = tempdir( CLEANUP => 1 );
 
 {
     my $runner = Stepford::Runner->new(

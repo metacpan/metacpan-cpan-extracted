@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.000024",
+  "VERSION" => "0.000025",
   "test" => {
     "TESTS" => "t/*.t t/PaymentsAdvanced/*.t t/PaymentsAdvanced/Mocker/*.t t/PaymentsAdvanced/Response/*.t t/PaymentsAdvanced/Response/FromSilentPOST/*.t"
   }

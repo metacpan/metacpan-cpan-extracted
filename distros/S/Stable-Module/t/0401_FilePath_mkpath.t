@@ -1,6 +1,7 @@
-$::VERSION = $::VERSION = 0.01;
 use 5.00503;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Test::Simply tests => 14;
 use Stable::Module;
 
@@ -37,5 +38,8 @@ ok(($mkpath >= 1),     qq{mkpath('a a/b b/c c') $^X @{[__FILE__]}});
 ok((-d 'a a'        ), qq{-d 'a a' $^X @{[__FILE__]}});
 ok((-d 'a a/b b'    ), qq{-d 'a a/b b' $^X @{[__FILE__]}});
 ok((-d 'a a/b b/c c'), qq{-d 'a a/b b/c c' $^X @{[__FILE__]}});
+
+rmtree('a');
+rmtree('a a');
 
 __END__

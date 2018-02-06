@@ -1,39 +1,10 @@
 package CORE {
-  sub say ($value : String) : native void;
-  sub say_byte ($value : byte) : native void;
-  sub say_short ($value : short) : native void;
-  sub say_int ($value : int) : native void;
-  sub say_long ($value : long) : native void;
-  sub say_float ($value : float) : native void;
-  sub say_double ($value : double) : native void;
-
-  sub print ($value : String) : native void;
-  sub print_byte ($value : byte) : native void;
-  sub print_short ($value : short) : native void;
-  sub print_int ($value : int) : native void;
-  sub print_long ($value : long) : native void;
-  sub print_float ($value : float) : native void;
-  sub print_double ($value : double) : native void;
-
-  sub say_err ($value : String) : native void;
-  sub say_err_byte ($value : byte) : native void;
-  sub say_err_short ($value : short) : native void;
-  sub say_err_int ($value : int) : native void;
-  sub say_err_long ($value : long) : native void;
-  sub say_err_float ($value : float) : native void;
-  sub say_err_double ($value : double) : native void;
-
-  sub print_err ($value : String) : native void;
-  sub print_err_byte ($value : byte) : native void;
-  sub print_err_short ($value : short) : native void;
-  sub print_err_int ($value : int) : native void;
-  sub print_err_long ($value : long) : native void;
-  sub print_err_float ($value : float) : native void;
-  sub print_err_double ($value : double) : native void;
-
-  sub time () : native long;
+  sub print : native void ($value : String);
+  sub warn : native void ($value : String);
   
-  sub sum_int($values : int[]) : native int;
-  sub test1($num1 : int, $num2 : int) : native int;
-  sub test2($num1 : int, $num2 : int) : native int;
+  sub time : native long ();
+  
+  sub sum_int : native int ($values : int[]);
+  sub test1 : native int ($num1 : int, $num2 : int);
+  sub test2 : native int ($num1 : int, $num2 : int);
 }

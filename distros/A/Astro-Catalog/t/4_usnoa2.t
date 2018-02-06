@@ -62,11 +62,11 @@ foreach my $line ( 0 .. $#buffer ) {
        my $objdec = "$separated[6] $separated[7] $separated[8]";
 
        $star->coords( new Astro::Coords( name => $id,
-					 ra => $objra,
-					 dec => $objdec,
-					 units => 'sex',
-					 type => 'J2000',
-				       ));
+                                         ra => $objra,
+                                         dec => $objdec,
+                                         units => 'sex',
+                                         type => 'J2000',
+                                       ));
 
        # R Magnitude
        #my %r_mag = ( R => $separated[9] );
@@ -75,7 +75,7 @@ foreach my $line ( 0 .. $#buffer ) {
        # B Magnitude
        #my %b_mag = ( B => $separated[10] );
        #$star->magnitudes( \%b_mag );
-    
+
        # Quality
        my $quality = $separated[11];
        $star->quality( $quality );
@@ -138,23 +138,23 @@ foreach my $line ( 0 .. $#buffer ) {
 
     # Build the fluxes object
     # ------------------------------
-        
-    $star->fluxes( new Astro::Fluxes( 
-            new Astro::Flux( 
-	       new Number::Uncertainty( Value => $separated[9],
-	                                Error => $delta_r ),'mag', "R" ),
-            new Astro::Flux( 
-	       new Number::Uncertainty( Value => $separated[10],
-	                                Error => $delta_b),'mag', "B" ),
+
+    $star->fluxes( new Astro::Fluxes(
+            new Astro::Flux(
+               new Number::Uncertainty( Value => $separated[9],
+                                        Error => $delta_r ),'mag', "R" ),
+            new Astro::Flux(
+               new Number::Uncertainty( Value => $separated[10],
+                                        Error => $delta_b),'mag', "B" ),
             new Astro::FluxColor( lower => "R", upper => "B" ,
-	                          quantity => new Number::Uncertainty( 
-	                                Value => $b_minus_r,
-	                                Error => $delta_bmr) ),								
-			));
-			
+                                  quantity => new Number::Uncertainty(
+                                        Value => $b_minus_r,
+                                        Error => $delta_bmr) ),
+                        ));
+
     # Push the star into the catalog
     # ------------------------------
-    $catalog_data->pushstar( $star );			
+    $catalog_data->pushstar( $star );
 
 }
 

@@ -18,9 +18,6 @@ package Astro::Catalog::Item;
 #  Authors:
 #    Alasdair Allan (aa@astro.ex.ac.uk)
 
-#  Revision:
-#     $Id: Item.pm,v 1.13 2007/09/25 23:23:43 cavanagh Exp $
-
 #  Copyright:
 #     Copyright (C) 2002 University of Exeter. All Rights Reserved.
 
@@ -35,26 +32,26 @@ Astro::Catalog::Item - A generic star object in a stellar catalogue.
 =head1 SYNOPSIS
 
   $star = new Astro::Catalog::Item(
-               ID	    => $id,
-               Coords	    => new Astro::Coords(),
+               ID           => $id,
+               Coords       => new Astro::Coords(),
                Morphology   => new Astro::Catalog::Item::Morphology(),
-               Fluxes	    => new Astro::Fluxes(),
-	       Quality      => $quality_flag,
-               Field	    => $field,
-               GSC	    => $in_gsc,
+               Fluxes       => new Astro::Fluxes(),
+               Quality      => $quality_flag,
+               Field        => $field,
+               GSC          => $in_gsc,
                Distance     => $distance_to_centre,
                PosAngle     => $position_angle,
-               X	    => $x_pixel_coord,
-               Y	    => $y_pixel_coord,
-               WCS	    => new Starlink::AST(),
+               X            => $x_pixel_coord,
+               Y            => $y_pixel_coord,
+               WCS          => new Starlink::AST(),
                Comment      => $comment_string
-	       SpecType     => $spectral_type,
-	       StarType     => $star_type,
-	       LongStarType => $long_star_type,
-	       MoreInfo     => $url,
+               SpecType     => $spectral_type,
+               StarType     => $star_type,
+               LongStarType => $long_star_type,
+               MoreInfo     => $url,
                InsertDate   => new Time::Piece(),
-               Misc  => $hash_ref,
-				  );
+               Misc         => $hash_ref,
+                                  );
 
 =head1 DESCRIPTION
 
@@ -84,7 +81,7 @@ use Astro::FluxColor;
 # Register an Astro::Catalog::Item warning category
 use warnings::register;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 # Internal lookup table for Simbad star types
 my %STAR_TYPE_LOOKUP = (
@@ -230,10 +227,6 @@ my %STAR_TYPE_LOOKUP = (
 
 # C O N S T R U C T O R ----------------------------------------------------
 
-=head1 REVISION
-
-$Id: Item.pm,v 1.13 2007/09/25 23:23:43 cavanagh Exp $
-
 =head1 METHODS
 
 =head2 Constructor
@@ -247,24 +240,24 @@ Create a new instance from a hash of options
 
   $star = new Astro::Catalog::Item(
                ID           => $id,
-               Coords	    => new Astro::Coords(),
+               Coords       => new Astro::Coords(),
                Morphology   => new Astro::Catalog::Item::Morphology(),
-               Fluxes	    => new Astro::Fluxes(),
+               Fluxes       => new Astro::Fluxes(),
                Quality      => $quality_flag,
-               Field	    => $field,
-               GSC	    => $in_gsc,
+               Field        => $field,
+               GSC          => $in_gsc,
                Distance     => $distance_to_centre,
                PosAngle     => $position_angle,
-               X	    => $x_pixel_coord,
-               Y	    => $y_pixel_coord,
+               X            => $x_pixel_coord,
+               Y            => $y_pixel_coord,
                Comment      => $comment_string
-	       SpecType     => $spectral_type,
-	       StarType     => $star_type,
-	       LongStarType => $long_star_type,
-	       MoreInfo     => $url,
+               SpecType     => $spectral_type,
+               StarType     => $star_type,
+               LongStarType => $long_star_type,
+               MoreInfo     => $url,
                InsertDate   => new Time::Piece(),
-               Misc   => $misc,
-				  );
+               Misc         => $misc,
+                                  );
 
 returns a reference to an Astro::Catalog::Item object.
 
@@ -286,19 +279,19 @@ sub new {
                       GSC        => undef,
                       DISTANCE   => undef,
                       POSANGLE   => undef,
-		      COORDS     => undef,
+                      COORDS     => undef,
                       X          => undef,
                       Y          => undef,
                       WCS        => undef,
                       COMMENT    => undef,
-		      SPECTYPE   => undef,
-		      STARTYPE   => undef,
-		      LONGTYPE   => undef,
-		      MOREINFO   => undef,
+                      SPECTYPE   => undef,
+                      STARTYPE   => undef,
+                      LONGTYPE   => undef,
+                      MOREINFO   => undef,
                       INSERTDATE => undef,
                       PREFERRED_MAG_TYPE => undef,
                       MISC => undef,
-		    }, $class;
+                    }, $class;
 
   # If we have arguments configure the object
   $block->configure( @_ ) if @_;
@@ -425,20 +418,20 @@ sub ra {
     if (defined $c) {
       # Need to tweak RA?
       croak "Can only adjust RA with Astro::Coords::Equatorial coordinates"
-	unless $c->isa("Astro::Coords::Equatorial");
+        unless $c->isa("Astro::Coords::Equatorial");
 
       # For now need to kluge since Astro::Coords does not allow
       # you to change the position (it is an immutable object)
       $c = $c->new( type => 'J2000',
-		    dec => $c->dec(format => 's'),
-		    ra => $ra,
-		  );
+                    dec => $c->dec(format => 's'),
+                    ra => $ra,
+                  );
 
     } else {
       $c = new Astro::Coords( type => 'J2000',
-			      ra => $ra,
-			      dec => '0',
-			    );
+                              ra => $ra,
+                              dec => '0',
+                            );
     }
 
     # Update the object
@@ -509,20 +502,20 @@ sub dec {
     if (defined $c) {
       # Need to tweak RA?
       croak "Can only adjust Dec with Astro::Coords::Equatorial coordinates"
-	unless $c->isa("Astro::Coords::Equatorial");
+        unless $c->isa("Astro::Coords::Equatorial");
 
       # For now need to kluge since Astro::Coords does not allow
       # you to change the position (it is an immutable object)
       $c = $c->new( type => 'J2000',
-		    ra => $c->ra(format => 's'),
-		    dec => $dec,
-		  );
+                    ra => $c->ra(format => 's'),
+                    dec => $dec,
+                  );
 
     } else {
       $c = new Astro::Coords( type => 'J2000',
-			      dec => $dec,
-			      ra => 0,
-			    );
+                              dec => $dec,
+                              ra => 0,
+                            );
     }
 
     # Update the object
@@ -662,7 +655,7 @@ Returns the magnitude for the supplied filter if available
 sub get_magnitude {
   my $self = shift;
   #warnings::warn("Astro::Item::get_magnitude is deprecated")
-  #					  if warnings::enabled();
+  #                                      if warnings::enabled();
 
   my $magnitude;
   if (@_) {
@@ -736,7 +729,7 @@ Returns the error in the magnitude value for the supplied filter if available
 sub get_errors {
   my $self = shift;
   #warnings::warn("Astro::Item::get_errors is deprecated")
-  #					  if warnings::enabled();
+  #                                      if warnings::enabled();
 
   my $mag_error;
   if (@_) {
@@ -809,7 +802,7 @@ Returns the value of the supplied colour if available
 sub get_colour {
   my $self = shift;
   #warnings::warn("Astro::Item::get_colour is deprecated")
-  #					  if warnings::enabled();
+  #                                      if warnings::enabled();
 
   my $value;
   if (@_) {
@@ -837,7 +830,7 @@ Returns the error in the colour value for the supplied colour if available
 sub get_colourerr {
   my $self = shift;
   #warnings::warn("Astro::Item::get_colourerr is deprecated")
-  #					  if warnings::enabled();
+  #                                      if warnings::enabled();
 
   my $col_error;
   if (@_) {
@@ -1470,7 +1463,7 @@ sub configure {
     my $lckey = lc($key);
     if (exists $check{$lckey} && $check{$lckey} ne $args{$key}) {
       warnings::warnif("Duplicated key in constructor [$lckey] with differing values ".
-	" '$check{$lckey}' and '$args{$key}'\n");
+        " '$check{$lckey}' and '$args{$key}'\n");
     }
     $check{$lckey} = $args{$key};
   }
@@ -1483,16 +1476,16 @@ sub configure {
     if (exists $check{ra} && exists $check{dec}) {
       # Create a new coords object - assume J2000
       my $c = new Astro::Coords( type => 'J2000',
-				 ra => $check{ra},
-				 dec => $check{dec},
-#				 units => 'sex',
-			       );
+                                 ra => $check{ra},
+                                 dec => $check{dec},
+#                                units => 'sex',
+                               );
 
       # Make sure we have the same reference place and time
       $c->datetime( $check{coords}->datetime )
-	if $check{coords}->has_datetime;
+        if $check{coords}->has_datetime;
       $c->telescope( $check{coords}->telescope )
-	if defined $check{coords}->telescope;
+        if defined $check{coords}->telescope;
 
 
       # Check the distance
@@ -1519,8 +1512,8 @@ sub configure {
     my $ra = $check{ra} || 0.0;
     my $dec = $check{dec} || 0.0;
     $check{coords} = new Astro::Coords( type => 'J2000',
-					ra => $ra,
-					dec => $dec );
+                                        ra => $ra,
+                                        dec => $dec );
     delete $check{ra};
     delete $check{dec};
   }

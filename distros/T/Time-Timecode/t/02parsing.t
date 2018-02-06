@@ -18,7 +18,7 @@ $tc = Time::Timecode->new('10:00:00;22');
 hmsf_ok($tc, 10, 0, 0, 22);
 ok($tc->is_dropframe);
 
-# Normally a dropframe frame delimiter would make the timecode dropframe 
+# Normally a dropframe frame delimiter would make the timecode dropframe
 $tc = Time::Timecode->new('00:01:00.02', { dropframe => 0 });
 ok(!$tc->is_dropframe);
 ok($tc->total_frames, 1802);
@@ -34,6 +34,3 @@ hmsf_ok($tc, 0, 0, 0, 11);
 # Invalid dropframe timecode ';' means dropframe
 eval{ $tc = Time::Timecode->new('00:01:00;00') };
 ok($@ =~ /invalid dropframe/i);
-
-
-

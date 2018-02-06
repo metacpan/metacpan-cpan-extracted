@@ -7,7 +7,7 @@ use Encode ();
 use JSON::MaybeXS ();
 use constant DEBUG => $ENV{TELEGRAM_BOTAPI_DEBUG} || 0;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 my $json; # for debugging purposes, only defined when DEBUG = 1
 
 BEGIN {
@@ -152,7 +152,7 @@ sub api_request
             }
             else
             {
-                $postdata->{$k} = JSON::MaybeXS::encode_json $postdata->{$k}, next
+                $postdata->{$k} = JSON::MaybeXS::encode_json ($postdata->{$k}), next
                     if $has_file_upload;
                 push @fixable_keys, $k;
             }
@@ -160,7 +160,7 @@ sub api_request
         if ($has_file_upload)
         {
             # Fix keys found before the file upload.
-            $postdata->{$_} = JSON::MaybeXS::encode_json $postdata->{$_} for @fixable_keys;
+            $postdata->{$_} = JSON::MaybeXS::encode_json ($postdata->{$_}) for @fixable_keys;
             $postdata->{$_} = Encode::encode ("utf-8", $postdata->{$_})  for @utf8_keys;
             $is_lwp
                 and push @request, Content      => $postdata,
@@ -171,7 +171,7 @@ sub api_request
         {
             $is_lwp
                 and push @request, DEBUG ? (DBG => $postdata) : (), # handled in _fix_request_args
-                                   Content      => JSON::MaybeXS::encode_json $postdata,
+                                   Content      => JSON::MaybeXS::encode_json ($postdata),
                                    Content_Type => "application/json"
                 or  push @request, json         => $postdata;
         }

@@ -22,38 +22,44 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
-                  'leading_digits' => '1'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '2'
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '2',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '8',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          2\\d{7}|
-          85\\d{6}
-        ',
                 'personal_number' => '',
-                'voip' => '',
+                'mobile' => '19[123]\\d{7}',
                 'fixed_line' => '
           2\\d{7}|
           85\\d{6}
         ',
                 'specialrate' => '',
                 'toll_free' => '',
-                'mobile' => '19[123]\\d{7}'
+                'geographic' => '
+          2\\d{7}|
+          85\\d{6}
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 
     sub new {
@@ -63,7 +69,10 @@ my $validators = {
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
   
       return $self if ($self->is_valid());
-      $number =~ s/(^0)//g;
+      {
+        no warnings 'uninitialized';
+        $number =~ s/^(?:0)//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
     return $self->is_valid() ? $self : undef;
 }

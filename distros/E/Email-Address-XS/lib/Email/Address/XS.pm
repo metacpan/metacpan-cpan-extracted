@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2017 by Pali <pali@cpan.org>
+# Copyright (c) 2015-2018 by Pali <pali@cpan.org>
 
 package Email::Address::XS;
 
@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
 
@@ -546,6 +546,30 @@ sub name {
 	return '';
 }
 
+=item as_string
+
+  my $address = Email::Address::XS->new(phrase => 'Winston Smith', address => 'winston.smith@recdep.minitrue');
+  my $stringified = $address->as_string();
+
+This method is used for object L<stringification|/stringify>. It
+returns string representation of object. By default object is
+stringified to L<C<format>|/format>.
+
+Available since version 1.01.
+
+=cut
+
+our $STRINGIFY; # deprecated
+
+sub as_string {
+	my ($self) = @_;
+	return $self->format() unless defined $STRINGIFY;
+	carp 'Variable $Email::Address::XS::STRINGIFY is deprecated; subclass instead';
+	my $method = $self->can($STRINGIFY);
+	croak 'Stringify method ' . $STRINGIFY . ' does not exist' unless defined $method;
+	return $method->($self);
+}
+
 =item original
 
   my $address = Email::Address::XS->parse('(Winston) "Smith"   <winston.smith@recdep.minitrue> (Minitrue)');
@@ -582,21 +606,9 @@ sub original {
   print "Winston's address is $address.";
   # Winston's address is "Winston Smith" <winston.smith@recdep.minitrue>.
 
-Objects stringify to L<C<format>|/format>. For stringification purpose
-is defined method C<as_string>.
+Stringification is done by method L<C<as_string>|/as_string>.
 
 =cut
-
-our $STRINGIFY; # deprecated
-
-sub as_string {
-	my ($self) = @_;
-	return $self->format() unless defined $STRINGIFY;
-	carp 'Variable $Email::Address::XS::STRINGIFY is deprecated; subclass instead';
-	my $method = $self->can($STRINGIFY);
-	croak 'Stringify method ' . $STRINGIFY . ' does not exist' unless defined $method;
-	return $method->($self);
-}
 
 use overload '""' => \&as_string;
 
@@ -643,7 +655,7 @@ Pali E<lt>pali@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2017 by Pali E<lt>pali@cpan.orgE<gt>
+Copyright (C) 2015-2018 by Pali E<lt>pali@cpan.orgE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

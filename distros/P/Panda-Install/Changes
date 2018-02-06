@@ -1,3 +1,7 @@
+1.2.11   02.01.2018
+           - bugfix: related path require
+1.2.10   31.01.2018
+           - bugfix: if XS was in the same folder as c files SRC, it was included twice in object list
 1.2.9    03.10.2017
            - bugfix: removed exponential growth of duplicates in BIN_DEPS  
 1.2.8    06.06.2017

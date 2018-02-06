@@ -1,11 +1,19 @@
 Revision history for RT::Extension::BriefHistory
 
+2.01 2018-02-04
+ - update installation instructions
+ - update Module::Install and friends
+ - support SelfService again
+ - add .travis.yml
+ - add some basic tests
+ - update Module::Install and friends
+
 2.00 2016-02-29
-- use the same callback for all supported RT version
-- RT 4.4 compatibility
+ - use the same callback for all supported RT version
+ - RT 4.4 compatibility
 
 1.00 2014-08-26
-  - RT 4.2 compatibility
+ - RT 4.2 compatibility
 
 0.01 2010-05-16
-  - initial release
+ - initial release

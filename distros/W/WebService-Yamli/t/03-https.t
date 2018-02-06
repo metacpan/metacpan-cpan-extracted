@@ -1,7 +1,10 @@
 use utf8;
-use Test::More;
-use WebService::Yamli;
+use Test::Needs 'LWP::Protocol::https';
 use Test::RequiresInternet ('yamli.com' => 443);
+use Test::More;
+
+use WebService::Yamli;
+
 plan tests => 1;
 diag "Online check possible";
 

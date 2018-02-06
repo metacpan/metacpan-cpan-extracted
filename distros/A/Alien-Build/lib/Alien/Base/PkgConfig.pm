@@ -8,7 +8,7 @@ use Path::Tiny qw( path );
 use Capture::Tiny qw( capture_stderr );
 
 # ABSTRACT: Private legacy pkg-config class for Alien::Base
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 sub new {
@@ -162,7 +162,7 @@ Alien::Base::PkgConfig - Private legacy pkg-config class for Alien::Base
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 DESCRIPTION
 
@@ -234,6 +234,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

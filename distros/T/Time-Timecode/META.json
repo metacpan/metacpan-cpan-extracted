@@ -1,7 +1,7 @@
 {
-   "abstract" : "Video timecode class",
+   "abstract" : "Video timecode class and command line program",
    "author" : [
-      "Skye Shaw <sshaw AT lucas.cis.temple.edu>"
+      "Skye Shaw <skye.shaw AT gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
@@ -41,6 +41,6 @@
       },
       "homepage" : "http://github.com/sshaw"
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

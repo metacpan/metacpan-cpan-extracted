@@ -1,3 +1,6 @@
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
 if (!defined $ENV{DBI_DSN}) {
     print "1..0 # Skipped: Cannot run test unless DBI_DSN is defined.  See the README file.\n";
     exit 0;

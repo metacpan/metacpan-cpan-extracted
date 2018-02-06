@@ -1,6 +1,6 @@
 package HTML::DOM::Event;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 use strict;
@@ -283,7 +283,7 @@ HTML::DOM::Event - A Perl class for HTML DOM Event objects
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

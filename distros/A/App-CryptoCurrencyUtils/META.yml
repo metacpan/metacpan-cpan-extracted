@@ -20,14 +20,19 @@ requires:
   AppBase::Grep: '0.003'
   Browser::Open: '0'
   CryptoCurrency::Catalog: '0'
+  CryptoExchange::Catalog: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::re: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
+  HTTP::Tiny: '0'
+  JSON::MaybeXS: '0'
+  Log::ger: '0.023'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Base: '1.80'
   Perinci::Sub::Util: '0.46'
   Sah::Schema::cryptocurrency::symbol_or_name: '0'
+  Sah::Schema::cryptoexchange::name: '0'
   Sah::Schema::true: '0'
   URI::Escape: '0'
   strict: '0'
@@ -36,18 +41,18 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CryptoCurrencyUtils
   homepage: https://metacpan.org/release/App-CryptoCurrencyUtils
   repository: git://github.com/perlancar/perl-App-CryptoCurrencyUtils.git
-version: '0.006'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript coin-cmc'
+      name: 'GenPericmdScript coin-cmc-summary'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
-      name: 'GenPericmdScript coin-mno'
+      name: 'GenPericmdScript global-cmc-summary'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -55,7 +60,31 @@ x_Dist_Zilla:
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript grep-exchange'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript list-cmc-coins'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-coins'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript list-exchanges'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript open-coin-cmc'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript open-coin-mno'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript open-exchange-cmc'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

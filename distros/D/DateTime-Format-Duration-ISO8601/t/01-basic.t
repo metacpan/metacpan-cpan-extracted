@@ -80,6 +80,17 @@ subtest "parse" => sub {
         },
     );
     test_parse(
+        str => 'P1W',
+
+        result => {
+            days => 7,
+            minutes => 0,
+            months => 0,
+            nanoseconds => 0,
+            seconds => 0,
+        },
+    );
+    test_parse(
         str => 'PT0S',
 
         result => {

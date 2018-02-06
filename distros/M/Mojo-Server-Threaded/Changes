@@ -1,11 +1,14 @@
 Revision history for Mojo-Server-Threaded
 
-0.10    2017-08-02
-        First version.
+0.13    2018-02-05
+        - Fix missing threaded command
+        - align upgrade timeout in Mojo::Server::Elzar with
+          Mojo::Server::Hypnotoad version 7.62
+0.12    2017-12-08
+        - Fix fallback to hypnotoad config
 0.11    2017-08-17
         - Try to fix tests on cygwin
         - fix docs and dependencies in Makefile.PL
         - add LICENSE
-0.12    2017-12-08
-        - Fix fallback to hypnotoad config
-
+0.10    2017-08-02
+        First version.

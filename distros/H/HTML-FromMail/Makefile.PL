@@ -148,22 +148,37 @@ DONE
 
 WriteMakefile
  ( NAME	      => 'HTML::FromMail'
- , VERSION    => '0.11'
- , AUTHOR     => 'Mark Overmeer'
+ , VERSION    => '0.12'
+ , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
  , ABSTRACT   => 'Convert E-mail into HTML'
  , PREREQ_PM  => \%prereq
+ , LICENSE    => 'perl_5'
+
+ , META_MERGE =>
+      { 'meta-spec' => { version => 2 }
+      , resources  =>
+          { repository =>
+              { type => 'git'
+              , url  => 'https://github.com/markov2/perl5-HTML-FromMail.git'
+              , web  => 'https://github.com/markov2/perl5-HTML-FromMail'
+              }
+          , homepage => 'http://perl.overmeer.net/CPAN/'
+          , license  => [ 'http://dev.perl.org/licenses/' ]
+          }
+      }
+
  );
 
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for OODoc's oodist, DIST
-RAWDIR		= ../public_html/html-from-mail/raw
-DISTDIR		= ../public_html/html-from-mail/source
-LICENSE		= artistic
+RAWDIR		= ../public_html/html-frommail/raw
+DISTDIR		= ../public_html/html-frommail/source
+LICENSE		= perl
 
 # for OODoc's oodist, POD
-FIRST_YEAR	= 2003,2004,2007
-EMAIL		= perl@overmeer.net
-WEBSITE		= http://perl.overmeer.net/html-from-mail/
+FIRST_YEAR	= 2003
+EMAIL		= markov@cpan.org
+WEBSITE		= http://perl.overmeer.net/CPAN/
 
 __POSTAMBLE

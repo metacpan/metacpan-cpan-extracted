@@ -1,7 +1,7 @@
 --- #YAML:1.0
-name: DBD::mysqlPPrawSjis
+name: DBD-mysqlPPrawSjis
 abstract: Pure Perl MySQL driver for raw ShiftJIS
-version: 0.09
+version: 0.12
 author:
   - INABA Hitoshi <ina@cpan.org>
 license: perl

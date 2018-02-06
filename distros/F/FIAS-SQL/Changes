@@ -1,6 +1,12 @@
 Revision history for Perl module FIAS::SQL.
 
-0.06  Jan 01 2017 Daniil Popov
+0.08  Jan 31 2017 Daniil Popov
+    - rm show_create_table_for_table, create_tables
+
+0.07  Jan 29 2017 Daniil Popov
+    - bugfix, additional functions
+
+0.06  Jan 29 2017 Daniil Popov
     - add functions for update existing base from fias.nalog.ru
 
 0.05  Jan 01 2017 Daniil Popov

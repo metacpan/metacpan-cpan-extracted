@@ -39,7 +39,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =begin __PRIVATE_METHODS__
@@ -811,10 +811,6 @@ sub _write_catalog {
 }
 
 =back
-
-=head1 REVISION
-
-  $Id: SExtractor.pm,v 1.19 2006/06/05 21:02:49 cavanagh Exp $
 
 =head1 FORMAT
 

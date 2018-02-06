@@ -1,5 +1,19 @@
 Revision history for Firefox-Marionette
 
+0.33  Sat Feb  3 16:53:00 2018
+       Adding support for NetBSD.
+       Reduced the minimum acceptable firefox version to 55
+       Added support for older Marionette protocol commands
+
+0.32  Fri Feb  2 19:38:00 2018
+       Adding support for OpenBSD, reduced the minimum acceptable firefox version to 56.
+       Requirement/test suite cleanups.
+
+0.31  Tue Jan 30 05:55:00 2018
+       Deprecating page_source (for html), find_element (find), find_elements (list) and send_keys (type).
+       Removed driver.js from the MANIFEST.
+       Adding virtual memory detection in Makefile.PL.
+
 0.30  Tue Jan 30 05:55:00 2018
        Coping with Ubuntu implementating rpm.
 

@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Table::Hsp;
 # ABSTRACT: internal class for tabular BLAST parser
-$Bio::FastParsers::Blast::Table::Hsp::VERSION = '0.173640';
+$Bio::FastParsers::Blast::Table::Hsp::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
 
@@ -55,7 +55,7 @@ Bio::FastParsers::Blast::Table::Hsp - internal class for tabular BLAST parser
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

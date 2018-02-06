@@ -3,7 +3,7 @@ package Stepford::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 
 use MooseX::Types::Common::Numeric;
 use MooseX::Types::Moose;
@@ -36,7 +36,7 @@ Stepford::Types - Type library used in Stepford classes/roles
 
 =head1 VERSION
 
-version 0.004001
+version 0.005000
 
 =head1 SUPPORT
 
@@ -48,7 +48,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

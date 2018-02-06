@@ -22,18 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200236;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})'
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1-$2'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'format' => '($1) $2-$3',
+                  'intl_format' => '$1-$2-$3'
                 }
               ];
 
 my $validators = {
+                'geographic' => '
+          649(?:
+            712|
+            9(?:
+              4\\d|
+              50
+            )
+          )\\d{4}
+        ',
+                'fixed_line' => '
+          649(?:
+            712|
+            9(?:
+              4\\d|
+              50
+            )
+          )\\d{4}
+        ',
                 'toll_free' => '
           8(?:
             00|
@@ -45,6 +67,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'mobile' => '
           649(?:
             2(?:
@@ -58,37 +81,21 @@ my $validators = {
             4[34][1-3]
           )\\d{4}
         ',
-                'fixed_line' => '
-          649(?:
-            712|
-            9(?:
-              4\\d|
-              50
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'voip' => '64971[01]\\d{4}',
                 'personal_number' => '
           5(?:
-            00|
-            22|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
+            (?:
+              00|
+              22|
+              33|
+              44|
+              66|
+              77|
+              88
+            )[2-9]|
+            21[23]
+          )\\d{6}
         ',
-                'geographic' => '
-          649(?:
-            712|
-            9(?:
-              4\\d|
-              50
-            )
-          )\\d{4}
-        ',
+                'voip' => '64971[01]\\d{4}',
                 'pager' => ''
               };
 use Number::Phone::NANP::Data;

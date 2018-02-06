@@ -1,3 +1,19 @@
+version 0.009; 2018-01-31
+
+  * split the ->data_files method into separate ->source_data_files and
+    ->zic_input_files to cover the two data file roles of human editing
+    and machine parsing, with the ->data_files method itself deprecated
+    and only yielding a result when it serves both roles simultaneously
+
+  * when extracting source data file names from the Olson makefile,
+    handle changes in the makefile rules expected to be seen from version
+    2018d onwards
+
+  * munge internal uuencoded data to avoid older versions of Pod modules
+    interpreting it as Pod markup
+
+  * slightly refactor a regexp used for extracting source data file names
+
 version 0.008; 2018-01-19
 
   * bugfix: in the ->new_from_local_source constructor, don't get confused

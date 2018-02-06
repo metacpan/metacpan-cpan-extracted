@@ -1,3 +1,28 @@
+0.010   2018-02-05 (PERLANCAR)
+
+	- Add utility: list-cmc-coins.
+
+
+0.009   2018-01-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- coin-cmc-summary: Tweak Rinci metadata: sort all price_* fields.
+
+
+0.008   2018-01-31 (PERLANCAR)
+
+	- [Incompatible changes] Rename utilities: coin-cmc -> open-coin-cmc,
+	  coin-mno -> open-coin-mno, exchange-cmc -> open-exchange-cmc.
+
+	- Add utilities: coin-cmc-summary, global-cmc-summary.
+
+
+0.007   2018-01-30 (PERLANCAR)
+
+	- Add utilities: list-exchanges, grep-exchange, exchange-cmc.
+
+
 0.006   2018-01-30 (PERLANCAR)
 
 	- grep-coin: accept multiple patterns, defaults to ignore-case.

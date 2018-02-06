@@ -36,7 +36,7 @@ sub test_unitTest: Test(3) {
         $data .= $_;
     }
     $self->like($data,qr/^Content-Type/im,'Header Content-Type empfangen');
-    $self->like($data,qr/<HTML>/i,'HTML-Content empfangen');
+    $self->like($data,qr/<HTML/i,'HTML-Content empfangen');
 }
 
 # -----------------------------------------------------------------------------

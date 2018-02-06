@@ -31,7 +31,7 @@ use base qw/ Astro::FITS::HdrTrans::JAC /;
 use vars qw/ $VERSION /;
 
 # Note that we use %02 not %03 because of historical reasons
-$VERSION = "1.59";
+$VERSION = "1.60";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -346,7 +346,9 @@ sub to_UTDATE {
   my $return;
 
   if ( exists( $FITS_headers->{'UT_DATE'} ) ) {
-    $return = Time::Piece->strptime( $FITS_headers->{'UT_DATE'}, "%b %d %Y %I:%M%p" );
+    my $datestr = $FITS_headers->{'UT_DATE'};
+    $return = _parse_date($datestr);
+    die "Error parsing date \"$datestr\"" unless defined $return;
     $return = $return->strftime('%Y%m%d');
   }
 
@@ -562,7 +564,7 @@ Parses a string as a date. Returns a C<Time::Piece> object.
 Returns C<undef> if the time could not be parsed.
 Returns the object unchanged if the argument is already a C<Time::Piece>.
 
-It will also recognize a Sybase style date: 'Mar 15 2002  7:04AM'
+It will also recognize a MySQL style date: '2002-03-15 07:04:00'
 and a simple YYYYMMDD.
 
 The date is assumed to be in UT.
@@ -584,8 +586,12 @@ sub _parse_date {
 
   my $format;
 
-  # Need to disambiguate ISO date from Sybase date
-  if ($date =~ /\d\d\d\d-\d\d-\d\d/) {
+  # Need to disambiguate ISO date from MySQL date
+  if ($date =~ /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/) {
+    # MySQL
+    $format = '%Y-%m-%d %T';
+
+  } elsif ($date =~ /\d\d\d\d-\d\d-\d\d/) {
     # ISO
 
     # All arguments should have a day, month and year
@@ -602,7 +608,7 @@ sub _parse_date {
     # YYYYMMDD format
     $format = "%Y%m%d";
   } else {
-    # Assume Sybase date
+    # Allow Sybase date for compatability.
     # Mar 15 2002  7:04AM
     $format = "%b %d %Y %I:%M%p";
 
@@ -629,6 +635,7 @@ sub _parse_date {
 
   }
 
+  return $time;
 }
 
 =back

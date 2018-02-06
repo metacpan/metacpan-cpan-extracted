@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200236;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'pattern' => '([3689]\\d{3})(\\d{4})',
                   'leading_digits' => '
             [369]|
@@ -34,32 +35,35 @@ my $formatters = [
                 },
                 {
                   'pattern' => '(1[89]00)(\\d{3})(\\d{4})',
-                  'leading_digits' => '1[89]'
+                  'leading_digits' => '1[89]00',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(7000)(\\d{4})(\\d{3})',
-                  'leading_digits' => '70'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '7000',
+                  'pattern' => '(7000)(\\d{4})(\\d{3})'
                 },
                 {
-                  'leading_digits' => '80',
-                  'pattern' => '(800)(\\d{3})(\\d{4})'
+                  'leading_digits' => '800',
+                  'pattern' => '(800)(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
+                'voip' => '3[12]\\d{6}',
+                'pager' => '',
+                'specialrate' => '(1900\\d{7})|(7000\\d{7})',
+                'fixed_line' => '6[1-9]\\d{6}',
+                'toll_free' => '1?800\\d{7}',
+                'geographic' => '6[1-9]\\d{6}',
+                'personal_number' => '',
                 'mobile' => '
           (?:
             8[1-8]|
             9[0-8]
           )\\d{6}
-        ',
-                'toll_free' => '1?800\\d{7}',
-                'fixed_line' => '6[1-9]\\d{6}',
-                'specialrate' => '(1900\\d{7})|(7000\\d{7})',
-                'voip' => '3[12]\\d{6}',
-                'geographic' => '6[1-9]\\d{6}',
-                'personal_number' => '',
-                'pager' => ''
+        '
               };
 
     sub new {

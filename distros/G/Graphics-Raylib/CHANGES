@@ -1,9 +1,119 @@
 ==================================================
-Changes from 2017-01-27 00:00:00 +0000 to present.
+Changes from 2017-02-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.012 at 2018-01-27 08:45:18 +0000
+version 0.014 at 2018-02-05 15:07:18 +0000
+------------------------------------------
+
+  Change: 93837d1ed10bc463664c04bf54c8d363bcb3ddb8
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-05 16:06:57 +0000
+
+    Link to raylib repo's examples/ and games/ 
+
+  Change: bd2387aabcd8549d12ea73c79c22d88f3b5ba361
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-05 10:58:40 +0000
+
+    Snake: Add sound effect when eating fruit 
+
+  Change: 2e937188eec652652b516f0fc509f25fb9058b20
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-05 02:31:07 +0000
+
+    Include raylib's LICENSE in distribution 
+
+  Change: d97c9480d75fb2cb00b432f39fe65fd52cbf8802
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-05 02:12:56 +0000
+
+    Add snake game example 
+
+  Change: 4474b77a8889aeda75cb384fbaecf01ca60a454c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 23:05:13 +0000
+
+    Add example test using Graphics::Raylib::XS for 3D
+
+    as well as Graphics::Raylib::Util::camera helper. 
+
+  Change: bde68f5d689352ed766b58e2e66c1512a9b59c3b
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 20:20:40 +0000
+
+    Add ->screenshot to Graphics::Raylib 
+
+  Change: 15c45769a976ea076ee82fe7cf78c1433cd49bbb
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 20:20:28 +0000
+
+    Combine FPS and progress bar examples 
+
+  Change: c726b96816ddcb3b89666c41c90b76c8f7a64066
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 10:55:08 +0000
+
+    Add disabled-by-default XS fractal test 
+
+  Change: 523803f49bf45a98e8f51980b79863093eef0790
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 09:56:32 +0000
+
+    Add NO_GRAPHICAL_TEST environment variable 
+
+  Change: 0c6c79c87ddcf8d08f79abceabeee6597010c33e
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 09:56:32 +0000
+
+    Add tests/examples of fractals
+
+    They "test" that one can create multiple bitmaps and look nice. 
+
+  Change: 376519cddef1684ddaab031f206717a89fe5ac68
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-04 09:56:24 +0000
+
+    Add Convert::Color based ->new constructor for different color spaces 
+
+  Change: 9c77682a393596218e024e7090009f80ab8c300c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-03 22:42:04 +0000
+
+    Add Color ':gradients' to aid with debugging 
+
+------------------------------------------
+version 0.013 at 2018-02-03 14:17:51 +0000
+------------------------------------------
+
+  Change: 6413abd82e793381c8bac835282f986045f07e7d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-03 15:17:51 +0000
+
+    Note that ->window returns undef if there's no graphic device 
+
+  Change: b91ac1a2cf978d276bd05e25ce514807f3517573
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-03 15:13:52 +0000
+
+    Require Alien::raylib v0.010
+
+    This one doesn't call exit(3) when InitWindow fails 
+
+  Change: aa3a6e41a51cc8d1a526f082aa9ba4003ff34075
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-03 14:19:17 +0000
+
+    Skip, don't fail, test if no graphic device 
+
+  Change: 35e61520ec417ac2ef301ab7afafe8da06a4208d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-03 13:05:13 +0000
+
+    Skip graphical testing if graphic device unavailable 
+
+------------------------------------------
+version 0.012 at 2018-01-27 08:44:17 +0000
 ------------------------------------------
 
   Change: 967c5c3f90ded43833f726638768f4cb8734ba95
@@ -195,5 +305,5 @@ version 0.002 at 2017-02-21 23:25:10 +0000
     from both git and perl distribution. This resolves issue #1. 
 
 ===============================================
-Plus 1 release after 2017-01-27 00:00:00 +0000.
+Plus 1 release after 2017-02-05 00:00:00 +0000.
 ===============================================

@@ -16,6 +16,7 @@ WriteMakefile(
   },
   BUILD_REQUIRES => {
     'Test::More'               => 0,
+    'Test::File::Contents'     => 0.21,
   },
   META_MERGE => {
     resources => {

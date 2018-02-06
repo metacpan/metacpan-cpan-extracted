@@ -142,7 +142,7 @@ if (!$gzip_layer_avail) {
     ok($err =~ /^foo/, "read stderr")                      ### 10 ###
 	or diag("expected 'foo', got $err");
 
-    my $out = <$pid>;
+    my $out = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
     ok($out eq "$phrase_to_compress\n", "read stdout")
 	or diag("output was: $out\nexpected  : $phrase_to_compress\n");
 
@@ -214,7 +214,7 @@ if (!$utf8_layer_avail) {
     ok($err =~ /^foo/, "read stderr")                       ### 19 ###
 	or diag("expected 'foo', got $err");
 
-    my $out = <$pid>;
+    my $out = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
     ok($out eq "$unicode_phrase_to_compress\n", "read stdout")
 	or diag("output was: $out\nexpected  : $unicode_phrase_to_compress\n");
 

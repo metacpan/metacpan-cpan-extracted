@@ -17,7 +17,8 @@ my %WriteMakefileArgs = (
   "NAME" => "Sah::Schemas::CryptoCurrency",
   "PREREQ_PM" => {
     "Perinci::Sub::XCompletion::cryptocurrency_symbol" => 0,
-    "Perinci::Sub::XCompletion::cryptocurrency_symbol_or_name" => 0
+    "Perinci::Sub::XCompletion::cryptocurrency_symbol_or_name" => 0,
+    "Perinci::Sub::XCompletion::cryptoexchange_name" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::cryptocurrency_symbol" => 0,
   "Perinci::Sub::XCompletion::cryptocurrency_symbol_or_name" => 0,
+  "Perinci::Sub::XCompletion::cryptoexchange_name" => 0,
   "Test::More" => 0
 );
 

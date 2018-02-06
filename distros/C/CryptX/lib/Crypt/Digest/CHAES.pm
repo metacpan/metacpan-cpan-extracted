@@ -4,7 +4,7 @@ package Crypt::Digest::CHAES;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u )] );
@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub chaes             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub chaes_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub chaes_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub chaes_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub chaes_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub chaes_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub chaes_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub chaes_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('CHAES')             }
+sub chaes             { Crypt::Digest::digest_data('CHAES', @_)      }
+sub chaes_hex         { Crypt::Digest::digest_data_hex('CHAES', @_)  }
+sub chaes_b64         { Crypt::Digest::digest_data_b64('CHAES', @_)  }
+sub chaes_b64u        { Crypt::Digest::digest_data_b64u('CHAES', @_) }
+sub chaes_file        { Crypt::Digest::digest_file('CHAES', @_)      }
+sub chaes_file_hex    { Crypt::Digest::digest_file_hex('CHAES', @_)  }
+sub chaes_file_b64    { Crypt::Digest::digest_file_b64('CHAES', @_)  }
+sub chaes_file_b64u   { Crypt::Digest::digest_file_b64u('CHAES', @_) }
 
 1;
 

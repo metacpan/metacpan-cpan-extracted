@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -255,7 +255,7 @@ a list of some of the plugin categories.
 For now, I will just show you how to write the L<alienfile> for libfoo 
 above using L<Alien::Build::Plugin::Build::Autoconf>, 
 L<Alien::Build::Plugin::PkgConfig::Negotiate>, 
-L<Alien::Buld::Plugin::Download::Negotiate>, and
+L<Alien::Build::Plugin::Download::Negotiate>, and
 L<Alien::Build::Plugin::Extract::Negotiate>
 
  use alienfile;
@@ -616,6 +616,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

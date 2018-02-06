@@ -45,8 +45,8 @@ my $tempfile = "results.dat";
 
 for my $module (@modules) {
 
-  # Try forking. Perl test suite runs 
-  # we have to fork because each "use" will contaminate the 
+  # Try forking. Perl test suite runs
+  # we have to fork because each "use" will contaminate the
   # symbol table and we want to start with a clean slate.
   my $pid;
   if ($pid = fork) {

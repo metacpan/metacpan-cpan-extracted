@@ -84,6 +84,8 @@ my $write_nginx_config = sub {
     my $management_port = Test::APIcast::get_random_port();
     my $echo_port = Test::APIcast::get_random_port();
 
+    my $environment = $block->environment;
+
     my $sites_d = $block->sites_d;
     my $apicast_cli = $block->apicast || $ApicastBinary;
 
@@ -105,7 +107,19 @@ my $write_nginx_config = sub {
     }
 
     my ($env, $env_file) = tempfile();
-    print $env <<_EOC_;
+
+    my $apicast_cmd = "APICAST_CONFIGURATION_LOADER='' $apicast_cli start --test --environment $env_file";
+
+    if (defined $configuration_file) {
+        $apicast_cmd .= " --configuration $configuration_file"
+    } else {
+        $configuration_file = "";
+    }
+
+    if (defined $environment) {
+        print $env $environment;
+    } else {
+        print $env <<_EOC_;
 return {
     worker_processes = '$Workers',
     master_process = '$MasterProcessEnabled',
@@ -128,9 +142,14 @@ return {
     sites_d = [============================[$sites_d]============================],
 }
 _EOC_
+    }
     close $env;
 
-    my $apicast = `APICAST_CONFIGURATION_LOADER="" $apicast_cli start --test --environment $env_file --configuration $configuration_file 2>&1`;
+    if ($ENV{DEBUG}) {
+        warn $apicast_cmd;
+    }
+
+    my $apicast = `${apicast_cmd} 2>&1`;
     if ($apicast =~ /configuration file (?<file>.+?) test is successful/)
     {
         move($+{file}, $ConfFile);

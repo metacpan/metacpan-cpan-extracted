@@ -58,7 +58,7 @@
    "provides" : {
       "Lingua::Conjunction" : {
          "file" : "lib/Lingua/Conjunction.pm",
-         "version" : "v2.1.0"
+         "version" : "v2.1.2"
       }
    },
    "release_status" : "stable",
@@ -72,8 +72,11 @@
          "web" : "https://github.com/robrwo/Lingua-Conjunction"
       }
    },
-   "version" : "v2.1.0",
+   "version" : "v2.1.2",
    "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

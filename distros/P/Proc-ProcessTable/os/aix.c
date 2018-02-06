@@ -107,7 +107,7 @@ void OS_get_table() {
       format[F_STAT] = 'S';
     }
 
-    
+   // http://www.thp.uni-due.de/pstree/pstree.c 
     if ( state == ZOMBIE 
 	 || getuser(&pr_buff[i], sizeof(struct procinfo),
 		    &uinfo,      sizeof(struct userinfo) ) < 0 ) {

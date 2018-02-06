@@ -2,13 +2,16 @@ package Test2::Harness::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '0.001049';
+our $VERSION = '0.001050';
 
 use Carp qw/confess/;
 
 use Test2::Harness::Util::HashBase;
 
-sub log_event { confess "not implemented" };
+sub log_raw_event { }
+sub log_processed_event { }
+
+sub finish {}
 
 1;
 

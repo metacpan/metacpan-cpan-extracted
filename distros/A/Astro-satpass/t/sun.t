@@ -195,30 +195,34 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 # Equinoxes and Solstices for 2005
 # Tests: next_quarter_hash() (and implicitly next_quarter())
 
-# This test is based on Meeus' table 27.E on page 182. The accuracy is a
+# This test is based on Meeus' table 27.E on page 182.
+# With calculations based on the position of the Sun, the accuracy is a
 # fairly poor 16 minutes 40 seconds, because our  position of the Sun is
 # only good to 0.01 degrees.
+# With calculations based on Meeus' Chapter 27, they ought to be a
+# minute or so.
 
 {
     my $time = time_gm( 0, 0, 0, 1, 0, 2005 );
     my $sun = Astro::Coord::ECI::Sun->universal( $time );
-    my $tolerance = 16 * 60 + 40;
+#   my $tolerance = 16 * 60 + 40;
+    my $tolerance = 1 * 60;
 
-    my $hash = $sun->next_quarter_hash();
+    $sun->next_quarter();
     tolerance $sun->dynamical(), time_gm( 29, 34, 12, 20, 2, 2005 ),
-	$tolerance, "$hash->{almanac}{description} 2005", \&format_dyn;
+	$tolerance, 'March equinox 2005', \&format_dyn;
 
-    $hash = $sun->next_quarter_hash();
+    $sun->next_quarter();
     tolerance $sun->dynamical(), time_gm( 12, 47, 6, 21, 5, 2005 ),
-	$tolerance, "$hash->{almanac}{description} 2005", \&format_dyn;
+	$tolerance, 'June solstice 2005', \&format_dyn;
 
-    $hash = $sun->next_quarter_hash();
+    $sun->next_quarter();
     tolerance $sun->dynamical(), time_gm( 14, 24, 22, 22, 8, 2005 ),
-	$tolerance, "$hash->{almanac}{description} 2005", \&format_dyn;
+	$tolerance, 'September equinox 2005', \&format_dyn;
 
-    $hash = $sun->next_quarter_hash();
+    $sun->next_quarter();
     tolerance $sun->dynamical(), time_gm( 1, 36, 18, 21, 11, 2005 ),
-	$tolerance, "$hash->{almanac}{description} 2005", \&format_dyn;
+	$tolerance, 'December solstice 2005', \&format_dyn;
 }
 
 

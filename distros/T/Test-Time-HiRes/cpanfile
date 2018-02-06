@@ -1,4 +1,5 @@
 requires "Test::More"  => 0;
+requires "Test::Time"  => 0;
 requires "Time::HiRes" => 0;
 requires "perl"        => "5.008";
 requires "strict"      => "0";

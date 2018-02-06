@@ -1,8 +1,8 @@
 
-# $Id: ebay.t,v 1.21 2015-06-06 19:51:07 Martin Exp $
-
 use strict;
 use warnings;
+
+my $VERSON = 1.22;
 
 use constant DEBUG_CONTENTS => 0;
 
@@ -118,7 +118,7 @@ my $qrBid = qr{\b$sBidPattern};
 my @ara = (
            ['description', 'like', $qrBid, 'description contains bid amount'],
            ['description', 'like', qr{Item #\d+;}, 'description contains item #'],
-           ['url', 'like', qr(\Ahttp://(cgi|www)\d*\.ebay\.com), # ), # Emacs bug
+           ['url', 'like', qr(\Ahttps?://(cgi|www)\d*\.ebay\.com), # ), # Emacs bug
             q'URL is from ebay.com'], # '], # Emacs bug
            ['title', 'ne', 'q{}', 'result Title is not empty'],
            ['change_date', 'date', 'change_date is really a date'],

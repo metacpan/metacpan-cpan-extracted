@@ -1,3 +1,10 @@
+0.117     2018-01-31 12:47:11+01:00 Europe/Amsterdam
+
+        * Allow the custom OPs to be deparsed with B::Deparse.
+          (Graham @haarg Knop)
+        * Optimize the shared object size by moving common call checker
+          logic into a function. (James Raspass)
+
 0.116     2017-05-13 15:13:41+02:00 Europe/Amsterdam
 
         * Changes rephrasing. (Ilmari)

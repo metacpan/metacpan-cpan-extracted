@@ -60,6 +60,9 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
   // Constant pool sub
   SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&constant_pool[sub_id];
   
+  // Subroutine mys length
+  int32_t sub_mys_length = constant_pool_sub->mys_length;
+  
   // Subroutine object my length
   int32_t sub_object_mys_length = constant_pool_sub->object_mys_length;
   
@@ -99,17 +102,17 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
   // Call stack
   SPVM_API_VALUE vars[65535];
   
-  // Eval stack
-  int32_t eval_stack[255];
-  
-  // Eval stack top
-  int32_t eval_stack_top = -1;
-  
   // Call subroutine argument stack
   SPVM_API_VALUE call_sub_arg_stack[255];
   
   // Call subroutine argument stack top
   int32_t call_sub_arg_stack_top = -1;
+  
+  // Auto decrement reference count variable index stack
+  SPVM_API_OBJECT* auto_dec_ref_count_stack[65535];
+  
+  // Auto decrement reference count variable index stack top
+  int32_t auto_dec_ref_count_stack_top = -1;
   
   // Condition flag
   register int32_t condition_flag = 0;
@@ -442,20 +445,44 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
           = *(double*)&vars[opcode->operand1] / *(double*)&vars[opcode->operand2];
         break;
       case SPVM_OPCODE_C_CODE_REMAINDER_BYTE:
-        *(SPVM_API_byte*)&vars[opcode->operand0]
-          = *(SPVM_API_byte*)&vars[opcode->operand1] % *(SPVM_API_byte*)&vars[opcode->operand2];
+        if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
+          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          api->set_exception(api, exception);
+          croak_flag = 1;
+        }
+        else {
+          *(SPVM_API_byte*)&vars[opcode->operand0] = *(SPVM_API_byte*)&vars[opcode->operand1] % *(SPVM_API_byte*)&vars[opcode->operand2];
+        }
         break;
       case SPVM_OPCODE_C_CODE_REMAINDER_SHORT:
-        *(SPVM_API_short*)&vars[opcode->operand0]
-          = *(SPVM_API_short*)&vars[opcode->operand1] % *(SPVM_API_short*)&vars[opcode->operand2];
+        if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
+          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          api->set_exception(api, exception);
+          croak_flag = 1;
+        }
+        else {
+          *(SPVM_API_short*)&vars[opcode->operand0] = *(SPVM_API_short*)&vars[opcode->operand1] % *(SPVM_API_short*)&vars[opcode->operand2];
+        }
         break;
       case SPVM_OPCODE_C_CODE_REMAINDER_INT:
-        *(SPVM_API_int*)&vars[opcode->operand0]
-          = *(SPVM_API_int*)&vars[opcode->operand1] % *(SPVM_API_int*)&vars[opcode->operand2];
+        if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
+          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          api->set_exception(api, exception);
+          croak_flag = 1;
+        }
+        else {
+          *(SPVM_API_int*)&vars[opcode->operand0] = *(SPVM_API_int*)&vars[opcode->operand1] % *(SPVM_API_int*)&vars[opcode->operand2];
+        }
         break;
       case SPVM_OPCODE_C_CODE_REMAINDER_LONG:
-        *(SPVM_API_long*)&vars[opcode->operand0]
-          = *(SPVM_API_long*)&vars[opcode->operand1] % *(SPVM_API_long*)&vars[opcode->operand2];
+        if (__builtin_expect(*(SPVM_API_short*)&vars[opcode->operand2] == 0, 0)) {
+          SPVM_API_OBJECT* exception = api->new_string(api, "0 division", 0);
+          api->set_exception(api, exception);
+          croak_flag = 1;
+        }
+        else {
+          *(SPVM_API_long*)&vars[opcode->operand0] = *(SPVM_API_long*)&vars[opcode->operand1] % *(SPVM_API_long*)&vars[opcode->operand2];
+        }
         break;
       case SPVM_OPCODE_C_CODE_REMAINDER_FLOAT:
         *(float*)&vars[opcode->operand0]
@@ -1050,7 +1077,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         }
         break;
       }
-      case SPVM_OPCODE_C_CODE_MOVE:
+      case SPVM_OPCODE_C_CODE_MOVE_BYTE:
+      case SPVM_OPCODE_C_CODE_MOVE_SHORT:
+      case SPVM_OPCODE_C_CODE_MOVE_INT:
+      case SPVM_OPCODE_C_CODE_MOVE_LONG:
+      case SPVM_OPCODE_C_CODE_MOVE_FLOAT:
+      case SPVM_OPCODE_C_CODE_MOVE_DOUBLE:
+      case SPVM_OPCODE_C_CODE_MOVE_OBJECT:
         vars[opcode->operand0] = vars[opcode->operand1];
         break;
       case SPVM_OPCODE_C_CODE_INC_REF_COUNT: {
@@ -1070,6 +1103,26 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
             api->dec_ref_count(api, *(SPVM_API_OBJECT**)&vars[opcode->operand0]);
           }
         }
+        break;
+      }
+      case SPVM_OPCODE_C_CODE_PUSH_AUTO_DEC_REF_COUNT: {
+        auto_dec_ref_count_stack_top++;
+        auto_dec_ref_count_stack[auto_dec_ref_count_stack_top] = opcode->operand0;
+        break;
+      }
+      case SPVM_OPCODE_C_CODE_LEAVE_SCOPE: {
+        int32_t auto_dec_ref_count_stack_base = opcode->operand0;
+        int32_t index;
+        for (index = auto_dec_ref_count_stack_base; index <= auto_dec_ref_count_stack_top; index++) {
+          int32_t var_index = auto_dec_ref_count_stack[index];
+          
+          if (*(SPVM_API_OBJECT**)&vars[var_index] != NULL) {
+            api->dec_ref_count(api, *(SPVM_API_OBJECT**)&vars[var_index]);
+          }
+        }
+        
+        auto_dec_ref_count_stack_top = auto_dec_ref_count_stack_base - 1;
+        
         break;
       }
       case SPVM_OPCODE_C_CODE_NEW_OBJECT: {
@@ -1534,20 +1587,6 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         
         break;
       }
-      case SPVM_OPCODE_C_CODE_PUSH_EVAL: {
-        // Set exception to NULL at start of eval block
-        SPVM_INLINE_SET_EXCEPTION_NULL();
-        
-        eval_stack_top++;
-        eval_stack[eval_stack_top] = opcode->operand0;
-        
-        break;
-      }
-      case SPVM_OPCODE_C_CODE_POP_EVAL: {
-        eval_stack_top--;
-        
-        break;
-      }
       case SPVM_OPCODE_C_CODE_LOAD_EXCEPTION_VAR: {
         *(SPVM_API_OBJECT**)&vars[opcode->operand0] = SPVM_INLINE_GET_EXCEPTION();
         
@@ -1835,6 +1874,13 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         // Set return value
         if (!constant_pool_sub->is_void) {
           return_value = vars[opcode->operand0];
+          
+          // Increment ref count of return value not to release by decrement
+          if (sub_return_type_code > SPVM_TYPE_C_CODE_DOUBLE) {
+            if (return_value.object_value != NULL) {
+              SPVM_INLINE_INC_REF_COUNT(return_value.object_value);
+            }
+          }
         }
         
         goto label_SPVM_OPCODE_C_CODE_RETURN;
@@ -1899,14 +1945,8 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
 
   label_SPVM_OPCODE_C_CODE_RETURN: {
     
-    // Increment ref count of return value not to release by decrement
-    if (sub_return_type_code > SPVM_TYPE_C_CODE_DOUBLE) {
-      if (return_value.object_value != NULL) {
-        SPVM_INLINE_INC_REF_COUNT(return_value.object_value);
-      }
-    }
-    
     // Decrement my vars
+    /*
     {
       int32_t i;
       for (i = 0; i < sub_object_mys_length; i++) {
@@ -1923,16 +1963,28 @@ SPVM_API_VALUE SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_id, SPVM_API_VAL
         }
       }
     }
+    */
     
-    // Decrement ref count of return value
-    if (sub_return_type_code > SPVM_TYPE_C_CODE_DOUBLE) {
-      if (return_value.object_value != NULL) {
-        SPVM_INLINE_DEC_REF_COUNT_ONLY(return_value.object_value);
+    {
+      int32_t index;
+      for (index = 0; index <= auto_dec_ref_count_stack_top; index++) {
+        int32_t var_index = auto_dec_ref_count_stack[index];
+        
+        if (*(SPVM_API_OBJECT**)&vars[var_index] != NULL) {
+          api->dec_ref_count(api, *(SPVM_API_OBJECT**)&vars[var_index]);
+        }
       }
     }
     
     // Croak
     if (!croak_flag) {
+      // Decrement ref count of return value
+      if (sub_return_type_code > SPVM_TYPE_C_CODE_DOUBLE) {
+        if (return_value.object_value != NULL) {
+          SPVM_INLINE_DEC_REF_COUNT_ONLY(return_value.object_value);
+        }
+      }
+      
       SPVM_INLINE_SET_EXCEPTION_NULL();
     }
     

@@ -17,7 +17,7 @@ use Regexp::Common qw/comment delimited/;
 our $WS_RE = qr/[ \t\v\n\f]/;          # C.f. doAsmOpaque()
 our $ASM_COMMENT_RE = qr/(?:;[^\n]*|$RE{comment}{'C++'})/;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 # ----------------------------------------------------------------------------------------
@@ -718,7 +718,7 @@ MarpaX::Languages::C::AST - Translate a C source to an AST
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -759,6 +759,8 @@ This module translates C source into an AST tree. To assist further process of t
 This module implements the full syntax, as well as those specification constraints which are syntactic in nature: Associativity of nested if-then-else statements is according to the C standards, as is the treatment of names as typedefs, enums, or variable identifiers.
 
 The C standards contain many constraints that are non-syntactic. MarpaX::Languages::C::AST does not implement these, leaving them for AST post-process. One example of a non-syntactic constraint is the requirement that labeled statements within a function be unique. Another is the requirement that declarations include at most one storage class specifier.
+
+It is recommended to start with L<MarpaX::Languages::C::Scan> when starting with this package.
 
 =head1 SUBROUTINES/METHODS
 
@@ -889,7 +891,7 @@ Jean-Damien Durand <jeandamiendurand@free.fr>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bullock Ivan Baidakou Jeffrey Kegler jddurand
+=for stopwords Ben Bullock Ivan Baidakou Jeffrey Kegler
 
 =over 4
 
@@ -904,14 +906,6 @@ Ivan Baidakou <basiliscos@openmailbox.com>
 =item *
 
 Jeffrey Kegler <JKEGL@cpan.org>
-
-=item *
-
-Jeffrey Kegler <jkegl@cpan.org>
-
-=item *
-
-jddurand <jeandamiendurand@free.fr>
 
 =back
 

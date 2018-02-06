@@ -13,4 +13,6 @@ examples/pubhostkey.pem
 examples/generic_collect_tcp_reconnect.pl
 examples/new_cisco_collect_tcp.pl
 examples/new_cisco_collect_tcp_ssl.pl
+examples/new_calix_example.pl
 t/64bitTest.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1582,6 +1582,34 @@ subtest 'do not allow network install' => sub {
   
 };
 
+alien_subtest 'interpolate env overrides' => sub {
+  
+  local $ENV{FOO1} = 'oxo';
+  
+  my $build = alienfile_ok q{
+    use alienfile;
+
+    meta->prop->{env_interpolate} = 1;
+    meta->prop->{env}->{FOO1} = '%{foo1}';
+    meta->interpolator->add_helper( foo1 => sub { 'xox' } );
+    
+    probe sub { 'share' };
+    
+    share {
+
+      plugin 'Download::Foo';
+
+      build sub {
+        die 'wrong value' if $ENV{FOO1} ne 'xox';
+      };
+    };
+    
+  };
+  
+  alien_build_ok;
+  
+};
+
 done_testing;
 
 {

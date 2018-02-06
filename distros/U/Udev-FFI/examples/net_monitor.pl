@@ -22,10 +22,10 @@ unless($monitor->filter_by_subsystem_devtype('net')) {
 }
 
 if($monitor->start()) {
-    #now insert your usb ethernet adapter
+    # now insert your usb ethernet adapter
 
     for(;;) {
-        my $device = $monitor->poll(); #blocking read
+        my $device = $monitor->poll(); # blocking read
         my $action = $device->get_action();
 
         print 'ACTION: '.$action, "\n";

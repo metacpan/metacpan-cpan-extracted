@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use Exporter 'import';
 use Panda::Install::Payload;
 
-our $VERSION = '1.2.9';
+our $VERSION = '1.2.11';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
 our @EXPORT;
@@ -183,7 +183,7 @@ sub process_C {
     my $params = shift;
     my $c_files = $params->{C} ? _string_split_array(delete $params->{C}) : [_scan_files($c_mask)];
     push @$c_files, grep { !_includes($c_files, $_) } values %{$params->{XS}};
-    push @$c_files, _scan_files($c_mask, $_) for @{$params->{SRC}};
+    push @$c_files, grep { !_includes($c_files, $_) } _scan_files($c_mask, $_) for @{$params->{SRC}};
     $params->{C} = $c_files;
 }
 

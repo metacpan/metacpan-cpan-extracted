@@ -2,15 +2,15 @@
 
 use Proc::ProcessTable;
 
-$ref = new Proc::ProcessTable;
+my $ref = Proc::ProcessTable->new;
 
-foreach $proc (@{$ref->table}) {
+foreach my $proc (@{$ref->table}) {
   if(@ARGV) {
     next unless grep {$_ == $proc->{pid}} @ARGV;
   }
 
   print "--------------------------------\n";
-  foreach $field ($ref->fields){
+  foreach my $field ($ref->fields){
     print $field, ":  ", $proc->{$field}, "\n";
   }
 }

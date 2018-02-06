@@ -168,11 +168,14 @@ sub actually_process {
   }
   close $temp_handle;
 
+  eval 'use Alien::Doxyparse';
+  $ENV{PATH} = join(':', $ENV{PATH}, Alien::Doxyparse->bin_dir) unless $@;
+
   eval {
-    open DOXYPARSE, "doxyparse - < $temp_filename |" or die $!;
+    open DOXYPARSE, "doxyparse - < $temp_filename |" or die "can't run doxyparse: $!";
     local $/ = undef;
     my $doxyparse_output = <DOXYPARSE>;
-    close DOXYPARSE;
+    close DOXYPARSE or die "doxyparse error";
     $self->feed($doxyparse_output);
     unlink $temp_filename;
   };
@@ -183,4 +186,3 @@ sub actually_process {
 }
 
 1;
-

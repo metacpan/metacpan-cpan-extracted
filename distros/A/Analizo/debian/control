@@ -3,19 +3,20 @@ Section: devel
 Priority: optional
 Maintainer: Joenio Costa <joenio@joenio.me>
 Build-Depends: debhelper (>= 10)
-Build-Depends-Indep: libfile-sharedir-perl,
- libfile-share-perl,
- libgit-wrapper-perl,
- liblist-moreutils-perl,
+Build-Depends-Indep: liblist-moreutils-perl,
+ libfile-sharedir-perl,
  libterm-ui-perl,
- libtest-mockobject-perl,
+ libgit-wrapper-perl,
+ libfile-share-perl,
  libfile-libmagic-perl,
+ libtest-mockmodule-perl,
  libtest-exception-perl,
  libtest-class-perl,
- libmethod-signatures-perl,
- libtest-mockmodule-perl,
+ libenv-path-perl,
+ libtest-bdd-cucumber-perl,
  libarchive-extract-perl,
- libtest-bdd-cucumber-perl
+ libtest-mockobject-perl,
+ libmethod-signatures-perl
 Standards-Version: 4.1.2
 Homepage: http://analizo.org
 
@@ -23,27 +24,26 @@ Package: analizo
 Architecture: all
 Depends: ${misc:Depends}, ${perl:Depends}, libapp-cmd-perl,
  libgraph-writer-dsm-perl,
- libmojolicious-perl,
- libfile-copy-recursive-perl,
- libdbi-perl,
- libgraph-perl,
- libzmq-ffi-perl,
- libdbd-sqlite3-perl,
- libchi-perl,
- libfile-homedir-perl,
- libfindbin-libs-perl,
- libjson-perl,
- libclass-accessor-perl,
- libyaml-perl,
- libstatistics-descriptive-perl,
- liblist-compare-perl,
- libterm-progressbar-perl,
  libyaml-tiny-perl,
+ libclass-accessor-perl,
+ libterm-progressbar-perl,
+ libstatistics-descriptive-perl,
+ libapp-cmd-perl,
+ libfile-homedir-perl,
+ libdbd-sqlite3-perl,
+ libfindbin-libs-perl,
+ libyaml-perl,
+ libmojolicious-perl,
+ libdbi-perl,
+ libjson-perl,
+ libgraph-perl,
+ libfile-copy-recursive-perl,
+ liblist-compare-perl,
+ libzmq-ffi-perl,
+ libchi-perl,
  doxyparse,
- sloccount,
- sqlite3,
- man
-Recommends: graphviz
+ sloccount
+Recommends: graphviz, man
 Description: multi-language source code analysis toolkit
  Analizo parses source code in multiple languages and report useful information
  about it, such as module dependency, source code metrics and more.

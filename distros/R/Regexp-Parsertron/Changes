@@ -1,7 +1,15 @@
 Revision history for Perl extension Regexp::Parserton.
 
+1.00  2018-02-07T12:00:00
+	- More work on the sample code and the docs. Update the version # to 1.00.
+
+0.90  2018-02-04T14:13:12
+	- Many, many changes to the BNF. Various updates to the docs. Known failures to parser empty
+		regexps have been moved to t/empty.re.t.
+
 0.81  2018-01-15T10:08:00
 	- Add, document and test the new find($string) function.
+	- Expand BNF.
 
 0.80  2018-01-14T15:08:00
 	- Expand the BNF to cover all the major items in http://perldoc.perl.org/perlre.html.

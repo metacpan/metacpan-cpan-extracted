@@ -3,7 +3,7 @@ package Stepford;
 use strict;
 use warnings;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 
 1;
 
@@ -21,7 +21,7 @@ Stepford - A vaguely Rake/Make/Cake-like thing for Perl - create steps and let a
 
 =head1 VERSION
 
-version 0.004001
+version 0.005000
 
 =head1 SYNOPSIS
 
@@ -73,8 +73,6 @@ version 0.004001
     );
 
 =head1 DESCRIPTION
-
-B<NOTE: This is alpha code. You have been warned!>
 
 Stepford provides a framework for running a set of steps that are dependent on
 other steps. At a high level, this is a lot like Make, Rake, etc. However, the
@@ -175,16 +173,6 @@ in place.
 It is not currently possible for a class to have optional dependencies. This
 may be added in the future if it turns out to be useful.
 
-=head1 FUTURE FEATURES
-
-There are several very obvious things that should be added to this framework:
-
-=over 4
-
-=item * Dry runs
-
-=back
-
 =head1 VERSIONING POLICY
 
 This module uses semantic versioning as described by
@@ -204,13 +192,21 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Greg Oschwald Mark Fowler Olaf Alders Ran Eilam
+=for stopwords Greg Oschwald José Joaquín Atria Kevin Phair Mark Fowler Olaf Alders Ran Eilam vti
 
 =over 4
 
 =item *
 
 Greg Oschwald <goschwald@maxmind.com>
+
+=item *
+
+José Joaquín Atria <jjatria@gmail.com>
+
+=item *
+
+Kevin Phair <phair.kevin@gmail.com>
 
 =item *
 
@@ -224,11 +220,15 @@ Olaf Alders <oalders@maxmind.com>
 
 Ran Eilam <reilam@maxmind.com>
 
+=item *
+
+vti <viacheslav.t@gmail.com>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

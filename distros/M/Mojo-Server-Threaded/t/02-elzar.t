@@ -33,7 +33,7 @@ use Win32::Process qw(:DEFAULT STILL_ACTIVE);
     upgrade_timeout    => 45,
     workers            => 7
   };
-  is $elzar->upgrade_timeout, 60, 'right default';
+  is $elzar->upgrade_timeout, 180, 'right default';
   $elzar->configure('test');
   is_deeply $elzar->threaded->listen, ['http://*:8080'], 'right value';
   $elzar->configure('myserver');

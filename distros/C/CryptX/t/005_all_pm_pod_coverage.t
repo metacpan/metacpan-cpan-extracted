@@ -28,8 +28,14 @@ for my $m (sort @files) {
   elsif ($m eq 'Crypt::Mode') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(add|decrypt|encrypt|finish|new|start_decrypt|start_encrypt)$/] );
   }
+  elsif ($m eq 'Crypt::Checksum') {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(addfile|(adler32_|crc32_)(file_hex|file_int|file|data_hex|data_int|data))$/] );
+  }
   elsif ($m eq 'Crypt::Mac') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(add|addfile)$/] );
+  }
+  elsif ($m =~ /^Crypt::Mode::(CTR|CFB|OFB)$/) {
+    $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(finish)$/] );
   }
   elsif ($m eq 'Crypt::AuthEnc::OCB') {
     $pc = Pod::Coverage->new(package => $m, pod_from => $f, trustme => [qr/^(blocksize|aad_add)$/] );

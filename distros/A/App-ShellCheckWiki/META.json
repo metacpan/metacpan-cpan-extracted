@@ -1,0 +1,50 @@
+{
+   "abstract" : "Check the wiki for details about shellcheck errors.",
+   "author" : [
+      "Felix Tubiana <felixtubiana@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-ShellCheckWiki",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ANSIColor" : "4.06",
+            "WWW::Mechanize" : "1.86",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/xxfelixxx/shellcheckwiki.git",
+         "web" : "https://github.com/xxfelixxx/shellcheckwiki"
+      }
+   },
+   "version" : "0.03"
+}

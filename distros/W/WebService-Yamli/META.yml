@@ -8,6 +8,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
+  Test::Needs: '0'
   Test::RequiresInternet: '0'
   blib: '1.01'
   perl: '5.013002'
@@ -33,7 +34,7 @@ no_index:
 provides:
   WebService::Yamli:
     file: lib/WebService/Yamli.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   JSON: '0'
@@ -46,7 +47,7 @@ resources:
   bugtracker: https://github.com/athreef/WebService-Yamli/issues
   homepage: https://github.com/athreef/WebService-Yamli
   repository: https://github.com/athreef/WebService-Yamli.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -203,7 +204,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -220,7 +221,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -233,11 +234,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.004
+          tag: v0.005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -251,7 +252,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -267,7 +268,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.15.1
+          git_version: 2.16.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'

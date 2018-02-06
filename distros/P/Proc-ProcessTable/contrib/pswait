@@ -4,7 +4,7 @@ use Proc::ProcessTable;
 
 exit if ( $#ARGV == -1 );
 $|++;
-my $ptable = new Proc::ProcessTable;
+my $ptable = Proc::ProcessTable->new;
 my %waited = ();
 my %proc;
 $proc{ $_->pid }=$_->fname foreach (@{$ptable->table});

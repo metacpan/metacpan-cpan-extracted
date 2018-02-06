@@ -1,8 +1,8 @@
 
-# $Id: enddate.t,v 1.14 2015-06-06 19:51:07 Martin Exp $
-
 use strict;
 use warnings;
+
+my $VERSION = 1.15;
 
 use blib;
 use Data::Dumper;
@@ -45,7 +45,7 @@ cmp_ok(0, '<', scalar(@ao), 'got some results');
 my $sDatePrev = 'yesterday';
 foreach my $oResult (@ao)
   {
-  like($oResult->url, qr{\Ahttp://(cgi|www)\d*\.ebay\.com},
+  like($oResult->url, qr{\Ahttps?://(cgi|www)\d*\.ebay\.com},
        'result URL really is from ebay.com');
   cmp_ok($oResult->title, 'ne', '',
          'result Title is not empty');
@@ -53,7 +53,11 @@ foreach my $oResult (@ao)
        'result bidcount is ok');
   my $sDate = $oResult->change_date || '';
   DEBUG_DATE && diag(qq{raw result date is '$sDate'});
-  diag(Dumper($oResult)) unless isnt($sDate, '');
+  if ($sDate eq q//)
+    {
+    diag(Dumper($oResult));
+    diag " ^^^ result has no end date";
+    } # if
   my $iCmp = Date_Cmp($sDatePrev, $sDate);
   cmp_ok($iCmp, '<=', 0, 'result is in order by end date');
   $sDatePrev = $sDate;

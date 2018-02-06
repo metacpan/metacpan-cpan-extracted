@@ -5,7 +5,7 @@ package Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional;
 # ABSTRACT: Ease the transition to [BumpVersionAfterRelease] in your distribution
 # KEYWORDS: plugin version rewrite munge module
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::BumpVersionAfterRelease';
@@ -66,7 +66,7 @@ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional - Ease the transition
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

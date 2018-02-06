@@ -34,7 +34,7 @@ use Astro::Coords;
 use base qw/ Astro::Catalog::IO::ASCII /;
 
 $DEBUG = 0;
-$VERSION = '4.31';
+$VERSION = '4.32';
 
 # Named Constants for column positions
 use constant NAME => 0;
@@ -113,35 +113,31 @@ sub _read_catalog {
 
     # Coordinate object
     my $c = new Astro::Coords( name => $currid,
-			       ra => $chunks[RA],
-			       dec => $chunks[DEC],
-			       type => $chunks[EQUINOX],
-			       units => 'sex',
-			     );
+                               ra => $chunks[RA],
+                               dec => $chunks[DEC],
+                               type => $chunks[EQUINOX],
+                               units => 'sex',
+                             );
 
     my $star = new Astro::Catalog::Star( ID => $currid,
-					 Field => $chunks[0],
-					 Coords => $c,
-					 X => $chunks[XPIX],
-					 Y => $chunks[YPIX],
-				       );
+                                         Field => $chunks[0],
+                                         Coords => $c,
+                                         X => $chunks[XPIX],
+                                         Y => $chunks[YPIX],
+                                       );
 
     push(@stars, $star);
   }
 
   my $cat = new Astro::Catalog( Stars => \@stars,
-				Origin => 'GaiaPick',
-			      );
+                                Origin => 'GaiaPick',
+                              );
 
 }
 
 =back
 
 =end __PRIVATE_METHODS__
-
-=head1 REVISION
-
- $Id: GaiaPick.pm,v 1.2 2005/03/31 01:24:53 cavanagh Exp $
 
 =head1 FORMAT
 

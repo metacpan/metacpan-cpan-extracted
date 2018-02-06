@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More tests => 2;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Keyboard';
@@ -6,5 +6,3 @@ BEGIN {
 
 Graphics::Raylib::Keyboard::exit_key("<space>");
 is Graphics::Raylib::Keyboard::exit_key(), "<SPACE>";
-
-done_testing;

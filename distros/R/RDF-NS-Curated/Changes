@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/RDF-NS-Curated>
 Bug tracker:  <https://github.com/kjetilk/p5-rdf-ns-curated/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.100	2018-02-05
+
+ [ Bug Fixes ]
+ - Fix a typo bug in dc11 URI.
+
+ [ Other ]
+ - Added: Add an all method.
+ - Added: Add author test to check the RDFa Initial Context.
+ - Added: Added csvw prefix.
+ - Added: Added sosa prefix.
+
 0.005	2017-01-23	Correct duv prefix.
 
 0.004	2017-01-23	Remove duv prefix, spec unreliable.

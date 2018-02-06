@@ -34,7 +34,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/$VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG   = 0;
 
 # Name must be limited to 15 characters on write
@@ -321,9 +321,9 @@ sub _write_catalog {
       # Create stringified form of previous coordinate with same name
       # and current coordinate
       my $prevcoords = join(" ",@{$previous->{long}},@{$previous->{lat}},
-			    $previous->{rv}, $previous->{vdefn}, $previous->{vframe});
+                            $previous->{rv}, $previous->{vdefn}, $previous->{vframe});
       my $curcoords = join(" ",@{$srcdata{long}},@{$srcdata{lat}},
-			    $srcdata{rv}, $srcdata{vdefn}, $srcdata{vframe});
+                            $srcdata{rv}, $srcdata{vdefn}, $srcdata{vframe});
 
       if ($prevcoords eq $curcoords) {
         # This is the same target so we can ignore it
@@ -431,7 +431,7 @@ sub _write_catalog {
     # Velocity can not easily be done with a sprintf since it can be either
     # a string or a 2 column number
     if (lc($rv) eq 'n/a') {
-      $rv = '  n/a  ';
+      $rv = '  n/a   ';
     } else {
       my $sign = ( $rv >= 0 ? '+' : '-' );
       my $val  = $rv;
@@ -447,7 +447,7 @@ sub _write_catalog {
 
     push @lines,
       sprintf("%-". MAX_SRC_LENGTH.
-      "s    %02d %02d %06.3f %1s %02d %02d %04.1f  %2s  %s %5s  %5s  %-4s %s %s\n",
+      "s %02d %02d %06.3f %1s %02d %02d %05.2f %2s  %s %5s  %5s  %-4s %s %s\n",
       $name, @$long, @$lat, $system, $rv, $flux850, $vrange, $vframe, $vdefn, $comment);
 
   }

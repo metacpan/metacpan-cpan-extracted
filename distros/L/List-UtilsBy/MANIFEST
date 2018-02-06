@@ -10,8 +10,7 @@ README
 t/00use.t
 t/01sort_by.t
 t/02nsort_by.t
-t/03max_by.t
-t/04min_by.t
+t/03max_min_by.t
 t/05uniq_by.t
 t/06partition_by.t
 t/07count_by.t

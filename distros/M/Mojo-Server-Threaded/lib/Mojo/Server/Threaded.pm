@@ -1,7 +1,7 @@
 package Mojo::Server::Threaded;
 use Mojo::Base 'Mojo::Server::Daemon';
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 use threads('stack_size' => 64*4096);
 use Thread::Queue;

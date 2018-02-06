@@ -7,12 +7,12 @@ Astro::Catalog::Query::Vizier - A query request to the Vizier catalogs
 =head1 SYNOPSIS
 
   $gsc = new Astro::Catalog::Query::2MASS( Catalog => '2MASS',
-					   RA        => $ra,
-					   Dec       => $dec,
-					   Radius    => $radius,
-					   Nout      => $number_out,
-					   Target    => $object,
-					 );
+                                           RA        => $ra,
+                                           Dec       => $dec,
+                                           Radius    => $radius,
+                                           Nout      => $number_out,
+                                           Target    => $object,
+                                         );
 
   my $catalog = $gsc->querydb();
 
@@ -48,11 +48,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: Vizier.pm,v 1.1 2003/08/04 10:52:28 timj Exp $
+$VERSION = "4.32";
 
 =begin __PRIVATE_METHODS__
 
@@ -95,17 +91,17 @@ sub _get_allowed_options {
   my $self = shift;
   # Need to add magfaint and magbright
   return (
-	  ra => '-c.ra',
-	  dec => '-c.dec',
-	  radmax => '-c.rm.max',
-	  radmin => '-c.rm.min',
-	  nout => '-out.max',
-#	  sort => '-sort',
-	  object => '-c.obj',
+          ra => '-c.ra',
+          dec => '-c.dec',
+          radmax => '-c.rm.max',
+          radmin => '-c.rm.min',
+          nout => '-out.max',
+#         sort => '-sort',
+          object => '-c.obj',
 
           catalog => '-source',
-#	  outcols => '-out.all',
-	 );
+#         outcols => '-out.all',
+         );
 }
 
 
@@ -117,22 +113,22 @@ Get the default query state.
 
 sub _get_default_options {
   return (
-	  # Internal
-	  catalog => '2MASS',
+          # Internal
+          catalog => '2MASS',
 
-	  # Target information
-	  ra => undef,
-	  dec => undef,
-	  object => undef,
+          # Target information
+          ra => undef,
+          dec => undef,
+          object => undef,
 
-	  # Limits
-	  radmin => 0,
-	  radmax => 5,
-	  nout => 20000,
-#	  sort => 'RA', # do not know the allowed options
+          # Limits
+          radmin => 0,
+          radmax => 5,
+          nout => 20000,
+#         sort => 'RA', # do not know the allowed options
 
-#	  outcols => '', # need to check
-	 );
+#         outcols => '', # need to check
+         );
 }
 
 =item B<_parse_query>
@@ -148,13 +144,13 @@ sub _parse_query {
 
   print $self->{BUFFER};
   return new Astro::Catalog( Format => 'TST', Data => $self->{BUFFER},
-			     Origin => 'Vizier',
-			     ReadOpt => {
-					 id_col => 0,
-					 ra_col => 1,
-					 dec_col => 2,
-					}
-			   );
+                             Origin => 'Vizier',
+                             ReadOpt => {
+                                         id_col => 0,
+                                         ra_col => 1,
+                                         dec_col => 2,
+                                        }
+                           );
 }
 
 
@@ -193,11 +189,11 @@ sub _translate_one_to_one {
   my $self = shift;
   # convert to a hash-list
   return ($self->SUPER::_translate_one_to_one,
-	  map { $_, undef }(qw/
-			    catalog
-			    outcols
-			    /)
-	 );
+          map { $_, undef }(qw/
+                            catalog
+                            outcols
+                            /)
+         );
 }
 
 =back

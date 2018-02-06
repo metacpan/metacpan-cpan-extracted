@@ -1,0 +1,11 @@
+Revision history for App-ShellCheckWiki
+
+0.03    Tue Feb  6 01:15:01 UTC 2018
+        Updated pod in App::ShellCheckWiki
+
+0.02    Mon Feb  5 08:43:12 UTC 2018
+        Get Makefile.PL working.
+
+0.01    Mon Feb  5 06:42:29 UTC 2018
+        First version, released on an unsuspecting world.
+

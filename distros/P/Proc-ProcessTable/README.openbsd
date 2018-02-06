@@ -12,6 +12,8 @@ time             cpu time of process
 utime            user time
 stime            system time
 start            time process started
+size             virtual memory size (bytes)
+rss              resident set size (bytes)
 fname            command name    
 state            state of process
 ttydev           path of process' tty

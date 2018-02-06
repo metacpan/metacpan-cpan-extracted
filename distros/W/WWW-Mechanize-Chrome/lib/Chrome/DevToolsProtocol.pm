@@ -13,7 +13,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our @CARP_NOT;
 
 sub _build_log( $self ) {
@@ -192,7 +192,8 @@ sub connect( $self, %args ) {
         $self->{ endpoint } = $endpoint;
         return Future->done( $endpoint );
     })->catch(sub(@args) {
-        croak @args;
+        #croak @args;
+        Future->fail( @args );
     });
 
     my $transport = delete $args{ transport }
@@ -206,10 +207,7 @@ sub connect( $self, %args ) {
         $transport = $self->{transport};
     };
 
-    $transport->connect( $self, $got_endpoint, sub { $self->log( @_ ) } )
-    ->then(sub( $tr ) {
-        return Future->done( $tr )
-    });
+    return $transport->connect( $self, $got_endpoint, sub { $self->log( @_ ) } );
 };
 
 sub close( $self ) {

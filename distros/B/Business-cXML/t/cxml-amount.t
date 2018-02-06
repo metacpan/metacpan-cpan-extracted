@@ -14,7 +14,7 @@ use XML::LibXML::Ferry;
 use Business::cXML::Amount;
 #use Business::cXML::Amount::TaxDetail;
 
-plan tests => 14;
+plan tests => 15;
 
 my $a;
 my $d;
@@ -46,10 +46,9 @@ cmp_deeply(
 ## Hash
 #
 $a = Business::cXML::Amount->new({
-	amount => 29.99,
-	description => {
-		full => 'The price for this item',
-	},
+	amount      => 29.99,
+	description => { full => 'The price for this item' },
+	tax_details => { category => 'gst', tax => { amount => 4.99 } },
 });
 cmp_deeply(
 	$a,
@@ -67,12 +66,33 @@ cmp_deeply(
 		fees            => [],
 		tracking_domain => undef,
 		tracking_id     => undef,
-		tax_details     => [],
+		tax_details     => [{
+			_nodeName   => 'TaxDetail',
+			basis       => undef,
+			category    => 'gst',
+			percent     => undef,
+			purpose     => undef,
+			description => undef,
+			tax       => {
+				_nodeName       => 'TaxAmount',
+				currency        => 'USD',
+				amount          => 4.99,
+				description     => undef,
+				type            => undef,
+				fees            => [],
+				tracking_domain => undef,
+				tracking_id     => undef,
+				tax_details     => [],
+				taxadj_details  => [],
+				category        => '',
+				region          => undef,
+			},
+		}],
 		taxadj_details  => [],
 		category        => '',
 		region          => undef,
 	}),
-	'Object from has expected information'
+	'Object from hash has expected information'
 );
 
 ## XML round-trip
@@ -132,6 +152,24 @@ cmp_deeply(
 	'Type and description ignored for a generic Amount'
 );
 
+## Conditional defaults
+#
 
-
-
+cmp_deeply(
+	Business::cXML::Amount->new('Tax', { amount => 4.95 })->to_node($d)->toHash,
+	noclass({
+		__attributes => {},
+		__text       => '',
+		Money => [{
+			__attributes => { currency => 'USD' },
+			__text       => '4.95',
+		}],
+		Description => [{
+			__attributes => {
+				'{http://www.w3.org/XML/1998/namespace}lang' => 'en-US',
+			},
+			__text => '',
+		}],
+	}),
+	'A Tax always includes a description'
+);

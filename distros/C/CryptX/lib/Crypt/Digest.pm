@@ -2,7 +2,7 @@ package Crypt::Digest;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( digest_data digest_data_hex digest_data_b64 digest_data_b64u digest_file digest_file_hex digest_file_b64 digest_file_b64u )] );
@@ -14,69 +14,21 @@ $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
 ### the following methods/functions are implemented in XS:
-# - _new
-# - _hashsize
-# - _hashsize_by_name (function, not method)
+# - new
+# - hashsize
 # - clone
 # - reset
 # - digest
 # - hexdigest
 # - b64digest
 # - add
+# - digest_data
+# - digest_data_hex
+# - digest_data_b64
+# - digest_data_b64u
 # - DESTROY
 
-sub _trans_digest_name {
-  my $name = shift || "";
-  my %trans = (
-    CHAES       => 'chc_hash',
-    RIPEMD128   => 'rmd128',
-    RIPEMD160   => 'rmd160',
-    RIPEMD256   => 'rmd256',
-    RIPEMD320   => 'rmd320',
-    TIGER192    => 'tiger',
-    SHA512_224  => 'sha512-224',
-    SHA512_256  => 'sha512-256',
-    SHA3_224    => 'sha3-224',
-    SHA3_256    => 'sha3-256',
-    SHA3_384    => 'sha3-384',
-    SHA3_512    => 'sha3-512',
-    BLAKE2B_160 => 'blake2b-160',
-    BLAKE2B_256 => 'blake2b-256',
-    BLAKE2B_384 => 'blake2b-384',
-    BLAKE2B_512 => 'blake2b-512',
-    BLAKE2S_128 => 'blake2s-128',
-    BLAKE2S_160 => 'blake2s-160',
-    BLAKE2S_224 => 'blake2s-224',
-    BLAKE2S_256 => 'blake2s-256',
-  );
-  $name =~ s/^Crypt::Digest:://i;
-  return $trans{uc($name)} if defined $trans{uc($name)};
-  return lc($name);
-}
-
 ### METHODS
-
-sub new {
-  my $pkg = shift;
-  unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(@_);
-}
-
-sub hashsize {
-  return unless defined $_[0];
-
-  if (ref $_[0]) {
-    local $SIG{__DIE__} = \&CryptX::_croak;
-    return _hashsize(@_);
-  }
-  else {
-    my $pkg = shift;
-    unshift @_, ($pkg eq 'Crypt::Digest' ? _trans_digest_name(shift) : _trans_digest_name($pkg));
-    local $SIG{__DIE__} = \&CryptX::_croak;
-    return _hashsize_by_name(@_);
-  }
-}
 
 sub addfile {
   my ($self, $file) = @_;
@@ -104,11 +56,6 @@ sub addfile {
 sub CLONE_SKIP { 1 } # prevent cloning
 
 ### FUNCTIONS
-
-sub digest_data        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->digest     }
-sub digest_data_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->hexdigest  }
-sub digest_data_b64    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->b64digest  }
-sub digest_data_b64u   { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->add(@_)->b64udigest }
 
 sub digest_file        { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->digest     }
 sub digest_file_hex    { local $SIG{__DIE__} = \&CryptX::_croak; Crypt::Digest->new(shift)->addfile(@_)->hexdigest  }

@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 =head1 NAME
 
@@ -45,6 +45,12 @@ For RT 4.0, add this line:
 
 or add C<RT::Extension::BriefHistory> to your existing C<@Plugins> line.
 
+=item Clear your mason cache
+
+    rm -rf /opt/rt4/var/mason_data/obj/*
+
+=item Restart your webserver
+
 =back
 
 =head1 AUTHOR
@@ -52,9 +58,9 @@ or add C<RT::Extension::BriefHistory> to your existing C<@Plugins> line.
 Christian Loos <cloos@netsandbox.de>
 
 =head1 LICENCE AND COPYRIGHT
- 
+
 Copyright (C) 2010-2014, Christian Loos.
- 
+
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

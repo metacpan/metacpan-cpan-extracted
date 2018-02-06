@@ -15,13 +15,16 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Martian",
   "LICENSE" => "perl",
   "NAME" => "Martian",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "BSD::Resource" => 0,
+    "Starman::Server" => 0
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,8 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "BSD::Resource" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Starman::Server" => 0,
   "Test::More" => "0.96"
 );
 

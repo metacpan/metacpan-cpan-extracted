@@ -22,24 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200236;
 
 my $formatters = [
                 {
+                  'national_rule' => '0$1',
+                  'pattern' => '([1-7])(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             [1-6]|
             7[24-68]
           ',
-                  'pattern' => '([1-7])(\\d{3})(\\d{3,4})'
+                  'format' => '$1 $2 $3'
                 },
                 {
+                  'national_rule' => '0$1',
+                  'pattern' => '(7\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '7[0137]',
-                  'pattern' => '(7\\d{2})(\\d{3})(\\d{3})'
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
                 'pager' => '',
+                'voip' => '',
+                'mobile' => '7[0137]\\d{7}',
                 'personal_number' => '',
                 'geographic' => '
           (?:
@@ -55,7 +61,8 @@ my $validators = {
             7[24-68]
           )\\d{5}
         ',
-                'voip' => '',
+                'toll_free' => '',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             1(?:
@@ -69,10 +76,7 @@ my $validators = {
             6[3-58]|
             7[24-68]
           )\\d{5}
-        ',
-                'specialrate' => '',
-                'toll_free' => '',
-                'mobile' => '7[0137]\\d{7}'
+        '
               };
 
     sub new {
@@ -82,7 +86,10 @@ my $validators = {
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
   
       return $self if ($self->is_valid());
-      $number =~ s/(^0)//g;
+      {
+        no warnings 'uninitialized';
+        $number =~ s/^(?:0)//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
     return $self->is_valid() ? $self : undef;
 }

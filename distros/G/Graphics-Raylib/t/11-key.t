@@ -1,4 +1,4 @@
-use Test::More;
+use Test::More tests => 23;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Key';
@@ -41,5 +41,3 @@ $key = Graphics::Raylib::Key->new(map => '0');
 ok $key eq '0';
 is "$key", '0';
 isnt "$key", '<30>';
-
-done_testing;

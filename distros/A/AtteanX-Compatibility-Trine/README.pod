@@ -5,7 +5,7 @@ use warnings;
 package AtteanX::Compatibility::Trine;
 
 our $AUTHORITY = 'cpan:KJETILK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Attean;
 
@@ -72,6 +72,9 @@ Please report any bugs or things you miss from L<RDF::Trine> here:
 L<https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues>.
 
 =head1 SEE ALSO
+
+For a compatibility layer the other direction (i.e. backwards
+compatibility), see L<RDF::TrineX::Compatibility::Attean>.
 
 =head1 AUTHOR
 

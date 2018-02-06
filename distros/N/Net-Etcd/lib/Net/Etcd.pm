@@ -30,7 +30,7 @@ Net::Etcd - etcd v3 REST API.
 
 =cut
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 =head1 SYNOPSIS
 

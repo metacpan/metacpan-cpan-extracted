@@ -4,7 +4,7 @@ Attean::API::Variable - Role representing term variables
 
 =head1 VERSION
 
-This document describes Attean::API::Variable version 0.018
+This document describes Attean::API::Variable version 0.019
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

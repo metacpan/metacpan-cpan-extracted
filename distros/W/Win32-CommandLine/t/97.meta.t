@@ -8,18 +8,21 @@ use warnings;
 my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $fh;	# DISABLE buffering on STDIN, STDOUT, and STDERR
 }
 
-use Test::More;
+use Test::More;     # included with perl v5.6.2+
 
 plan skip_all => 'Author tests [to run: set TEST_AUTHOR]' unless $ENV{AUTOMATED_TESTING} or $ENV{TEST_AUTHOR} or $ENV{TEST_RELEASE} or $ENV{TEST_ALL};
 
 use version qw();
-my @modules = ( 'Test::CPAN::Meta 0.12' );	# @modules = ( '<MODULE> [[<MIN_VERSION>] <MAX_VERSION>]', ... )
+my @modules = ( 'Test::CPAN::Meta 0.12', 'Test::CPAN::Meta::JSON' );	# @modules = ( '<MODULE> [<MIN_VERSION> [<MAX_VERSION>]]', ... )
 my $haveRequired = 1;
-foreach (@modules) {my ($module, $min_v, $max_v) = split(' '); my $v = eval "require $module; $module->VERSION();"; if ( !$v || ($min_v && ($v < version->new($min_v))) || ($max_v && ($v > version->new($max_v))) ) { $haveRequired = 0; my $out = $module . ($min_v?' [v'.$min_v.($max_v?" - $max_v":'+').']':''); diag("$out is not available"); }}	## no critic (ProhibitStringyEval)
+foreach (@modules) {my ($module, $min_v, $max_v) = /\S+/gmsx; my $v = eval "require $module; $module->VERSION();"; if ( !$v || ($min_v && ($v < version->new($min_v))) || ($max_v && ($v > version->new($max_v))) ) { $haveRequired = 0; my $out = $module . ($min_v?' [v'.$min_v.($max_v?" - $max_v":'+').']':q//); diag("$out is not available"); }}	## no critic (ProhibitStringyEval)
 
-plan skip_all => '[ '.join(', ',@modules).' ] required for testing' if !$haveRequired;
+plan skip_all => '[ '.join(', ',@modules).' ] required for testing' if not $haveRequired;
 
-Test::CPAN::Meta::meta_yaml_ok();
+plan tests => 4;
+
+Test::CPAN::Meta::JSON::meta_spec_ok();     # 2 tests
+Test::CPAN::Meta::meta_spec_ok();           # 2 tests
 
 #FROM Test-SubCalls-1.08
 #!/usr/bin/perl

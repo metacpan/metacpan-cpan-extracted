@@ -67,7 +67,7 @@
    "provides" : {
       "Date::Lectionary::Daily" : {
          "file" : "lib/Date/Lectionary/Daily.pm",
-         "version" : "1.20180114"
+         "version" : "1.20180205"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/marmanold/Date-Lectionary-Daily"
       }
    },
-   "version" : "1.20180114",
+   "version" : "1.20180205",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_twitter" : "https://www.twitter.com/marmanold/"
 }

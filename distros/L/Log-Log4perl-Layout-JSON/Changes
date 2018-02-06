@@ -1,5 +1,9 @@
 Changes file for Log::Log4perl::Layout::JSON
 
+0.53  2018-01-31
+  - Fix "Odd number of hash elements" in split if the last configured field is empty
+    (GitHub #2)
+
 0.52  2017-05-19
   - Make signature test a RELEASE or AUTHOR test only.  The test is skipped otherwise.
   - Remove Test::Signature from test prereqs.  The test will be skipped if

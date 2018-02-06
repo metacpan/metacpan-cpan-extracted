@@ -7,6 +7,7 @@ Module::Build->new(
   license     => 'bsd',
   dist_author => 'Eric A. Miller <emiller@cpan.org>',
   # dynamic_config => 1,
+  create_readme => 1,
   configure_requires => {
     'Module::Build' => '0.42',
   },
@@ -16,10 +17,16 @@ Module::Build->new(
     'SNMP' => '0',
     'Math::BigInt' => '0',
   },
-  # recommends => {
-  # },
+  recommends => {
+    'PPI' => '0',
+    'Class::ISA' => '0',
+    'Module::Info' => '0',
+    'Module::Load' => '0',
+    'File::Slurp' => '0',
+  },
   test_requires => {
     'Test::More' => '0.88',
+    'Test::Distribution' => '0',
   },
   # script_files => [
   # ],

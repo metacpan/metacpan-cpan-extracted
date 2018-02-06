@@ -20592,6 +20592,7 @@ ok($tel->set_number('088 6551234')->is_valid_number, 'checking for 088 6551234')
 ok($tel->set_number('088 6561234')->is_valid_number, 'checking for 088 6561234');
 ok($tel->set_number('088 6571234')->is_valid_number, 'checking for 088 6571234');
 ok($tel->set_number('088 6601234')->is_valid_number, 'checking for 088 6601234');
+ok($tel->set_number('088 6611234')->is_valid_number, 'checking for 088 6611234');
 ok($tel->set_number('088 6621234')->is_valid_number, 'checking for 088 6621234');
 ok($tel->set_number('088 6631234')->is_valid_number, 'checking for 088 6631234');
 ok($tel->set_number('088 6641234')->is_valid_number, 'checking for 088 6641234');
@@ -39694,7 +39695,6 @@ ok(!$tel->set_number('088 6501234')->is_valid_number, 'checking for 088 6501234'
 ok(!$tel->set_number('088 6511234')->is_valid_number, 'checking for 088 6511234');
 ok(!$tel->set_number('088 6581234')->is_valid_number, 'checking for 088 6581234');
 ok(!$tel->set_number('088 6591234')->is_valid_number, 'checking for 088 6591234');
-ok(!$tel->set_number('088 6611234')->is_valid_number, 'checking for 088 6611234');
 ok(!$tel->set_number('088 6701234')->is_valid_number, 'checking for 088 6701234');
 ok(!$tel->set_number('088 6731234')->is_valid_number, 'checking for 088 6731234');
 ok(!$tel->set_number('088 6801234')->is_valid_number, 'checking for 088 6801234');

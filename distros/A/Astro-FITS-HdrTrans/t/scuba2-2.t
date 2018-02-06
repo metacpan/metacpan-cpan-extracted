@@ -15,7 +15,7 @@ eval {
 if( $@ ) {
   plan skip_all => 'Test requires Astro::FITS::Header module';
 } else {
-  plan tests => 8;
+  plan tests => 9;
 }
 
 # Test compilation.
@@ -44,6 +44,8 @@ delta_ok( $generic_header{'DEC_BASE'}, -1.66150199455579, "Check DEC_BASE" );
 
 ok( !exists $generic_header{AZIMUTH_START}, "Missing azimuth start" );
 delta_ok( $generic_header{AZIMUTH_END}, 127.225669719891, "End azimuth is present" );
+
+is($generic_header{'DOME_OPEN'}, 1, 'DOME OPEN');
 
 sub readfits {
   my $file = shift;

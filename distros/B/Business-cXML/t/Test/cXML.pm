@@ -18,13 +18,13 @@ sub comparable {
 		# CAUTION: This XML reset makes the object UNUSABLE for further processing!
 		$hash->{xml_doc}     = undef;
 		$hash->{xml_root}    = undef;
-		$hash->{xml_payload} = undef;
-		$hash->{timestamp}   = 'timestamp';
+		$hash->{_xml_payload} = undef;
+		$hash->{_timestamp}   = 'timestamp';
 		$hash->{epoch}       = 'epoch';
 		$hash->{hostname}    = 'hostname';
 		$hash->{randint}     = 'randint';
 		$hash->{pid}         = 'pid';
-		$hash->{id}          = 'id';
+		$hash->{_id}          = 'id';
 	} elsif (ref($hash) eq 'HASH') {
 
 		# cXML attributes to remove

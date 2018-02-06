@@ -1,6 +1,7 @@
-$::VERSION = $::VERSION = 0.01;
 use 5.00503;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Test::Simply tests => 4;
 use Stable::Module;
 

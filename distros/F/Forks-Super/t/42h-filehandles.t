@@ -34,7 +34,7 @@ my $t1 = Time::HiRes::time() - $t0;
 ok($err =~ /^foo/, "read stderr");
 okl($t1 < 1.40, "read blocked stderr fast ${t1}s, expected <1s");  ### 4 ### obs 1.38
 
-my $out = $] >= 5.008008 ? <$pid> : $pid->read_stdout($pid);
+my $out = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
 my $t2 = Time::HiRes::time() - $t0;
 ok($out =~ /^bar/, "read stdout");
 okl($t2 > 2.05, "read blocked stdout ${t2}s, expected ~4s");

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.20
+    version 0.21
 
 SYNOPSIS
 
@@ -92,26 +92,6 @@ HELPERS
 
     Returns either make or gmake depending on how GNU make is called on
     your system.
-
-CAVEATS
-
-    This version of Alien::gmake adds GNU make to your path, if it isn't
-    already there when you use it, like this:
-
-     use Alien::gmake;  # deprecated, issues a warning
-
-    This was a design mistake, and now deprecated. When Alien::gmake was
-    originally written, it was one of the first Alien tool style modules on
-    CPAN. As such, the author and the Alien::Base team hadn't yet come up
-    with the best practices for this sort of module. The author, and the
-    Alien::Base team feel that for consistency and for readability it is
-    better use Alien::gmake without the automatic import:
-
-     use Alien::gmake ();
-
-    and explicitly modify the PATH yourself (examples are above in the
-    synopsis). The old style will issue a warning. The old behavior will be
-    removed, but not before 31 January 2018.
 
 AUTHOR
 

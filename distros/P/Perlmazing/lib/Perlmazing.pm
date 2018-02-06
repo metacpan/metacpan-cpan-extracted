@@ -1,8 +1,10 @@
 package Perlmazing;
 use Perlmazing::Engine;
 use Perlmazing::Engine::Exporter;
-our $VERSION = '1.2810';
-our @EXPORT = Perlmazing::Engine->found_symbols;
+use Perlmazing::Feature;
+our $VERSION = '1.2812';
+our @EXPORT;
+our @found_symbols = Perlmazing::Engine->found_symbols;
 
 Perlmazing::Engine->precompile;
 
@@ -17,7 +19,32 @@ sub import {
 	my $self = shift;
 	my @call = caller;
 	Perlmazing::Feature->import;
-	warnings->import(FATAL => 'all');
+	warnings->import(FATAL => qw(closed unopened numeric recursion redefine syntax uninitialized));
+	if (@_) {
+		@EXPORT = ();
+		my (@YES, @NO);
+		for my $i (@_) {
+			if ($i =~ /^!(.*?)$/) {
+				push @NO, $1;
+			} else {
+				push @YES, $i;
+			}
+		}
+		for my $i (@YES, @NO) {
+			croak "Symbol '$i' is not exported by the Perlmazing module" unless grep {$i eq $_} @found_symbols;
+		}
+		if (@YES and @NO) {
+			@EXPORT = @YES;
+		} elsif (@YES) {
+			@EXPORT = @YES;
+		} else {
+			for my $i (@found_symbols) {
+				push (@EXPORT, $i) unless grep {$_ eq $i} @NO;
+			}
+		}
+	} else {
+		@EXPORT = @found_symbols;
+	}
 	$self->SUPER::import;
 }
 

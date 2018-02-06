@@ -1,6 +1,6 @@
-# Business-cXML v0.6.3
+# Business-cXML v0.6.5
 
-[![Build Status](https://travis-ci.org/vphantom/Business-cXML.svg?branch=v0.6.3)](https://travis-ci.org/vphantom/Business-cXML) [![Coverage Status](https://coveralls.io/repos/github/vphantom/Business-cXML/badge.svg?branch=v0.6.3)](https://coveralls.io/github/vphantom/Business-cXML?branch=v0.6.3)
+[![Build Status](https://travis-ci.org/vphantom/Business-cXML.svg?branch=v0.6.5)](https://travis-ci.org/vphantom/Business-cXML) [![Coverage Status](https://coveralls.io/repos/github/vphantom/Business-cXML/badge.svg?branch=v0.6.5)](https://coveralls.io/github/vphantom/Business-cXML?branch=v0.6.5)
 
 Perl implementation of cXML messaging.
 
@@ -25,6 +25,12 @@ perldoc command.
 
 If you find any bugs, please report them at:
 	https://github.com/vphantom/Business-cXML/issues
+
+## KNOWN BUGS
+
+Microsoft Windows is not currently supported and I don't have access to such
+an environment for testing.  See details in
+https://github.com/vphantom/Business-cXML/issues/1
 
 ## ACKNOWLEDGEMENTS
 

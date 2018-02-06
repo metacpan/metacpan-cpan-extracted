@@ -1,3 +1,16 @@
+0.019   2018-02-01 (PERLANCAR)
+
+	- ticker: Remove --pair argument because the API only provides
+	  btc_idr.
+
+
+0.018   2018-02-01 (PERLANCAR)
+
+	- Make currencies/markets data available to outside package.
+
+	- Move code to module, add subcommand 'pairs'.
+
+
 0.017   2018-01-05 (PERLANCAR)
 
 	- Add market: ignis_idr.

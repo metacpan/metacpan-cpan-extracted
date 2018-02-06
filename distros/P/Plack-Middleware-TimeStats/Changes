@@ -1,5 +1,8 @@
 Revision history for Perl extension Plack::Middleware::TimeStats
 
+0.05    Sat Feb  3 20:15:42 JST 2018
+        -  fix tests for elapsed in Devel::TimeStats
+
 0.04    Fri Jan 26 22:50:25 JST 2018
         - remove unneccessary stats
 

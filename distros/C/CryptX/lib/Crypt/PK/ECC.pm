@@ -2,7 +2,7 @@ package Crypt::PK::ECC;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( ecc_encrypt ecc_decrypt ecc_sign_message ecc_verify_message ecc_sign_hash ecc_verify_hash ecc_shared_secret )] );
@@ -425,10 +425,8 @@ sub _curve_name_lookup {
 }
 
 sub new {
-  my ($class, $f, $p) = @_;
-  my $self = _new();
-  $self->import_key($f, $p) if $f;
-  return  $self;
+  my $self = shift->_new();
+  return @_ > 0 ? $self->import_key(@_) : $self;
 }
 
 sub export_key_pem {
@@ -568,55 +566,6 @@ sub import_key {
   croak "FATAL: invalid or unsupported EC key format";
 }
 
-sub encrypt {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name = Crypt::Digest::_trans_digest_name($hash_name||'SHA1');
-  return $self->_encrypt($data, $hash_name);
-}
-
-sub decrypt {
-  my ($self, $data) = @_;
-  return $self->_decrypt($data);
-}
-
-sub sign_message {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_sign($data_hash);
-}
-
-sub sign_message_rfc7518 {
-  my ($self, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_sign_rfc7518($data_hash);
-}
-
-sub verify_message {
-  my ($self, $sig, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_verify($sig, $data_hash);
-}
-
-sub verify_message_rfc7518 {
-  my ($self, $sig, $data, $hash_name) = @_;
-  $hash_name ||= 'SHA1';
-  my $data_hash = digest_data($hash_name, $data);
-  return $self->_verify_rfc7518($sig, $data_hash);
-}
-
-sub sign_hash {
-  my ($self, $data_hash) = @_;
-  return $self->_sign($data_hash);
-}
-
-sub verify_hash {
-  my ($self, $sig, $data_hash) = @_;
-  return $self->_verify($sig, $data_hash);
-}
-
 sub curve2hash {
   my $self = shift;
   my $kh = $self->key2hash;
@@ -627,7 +576,8 @@ sub curve2hash {
      Gx       => $kh->{curve_Gx},
      Gy       => $kh->{curve_Gy},
      cofactor => $kh->{curve_cofactor},
-     order    => $kh->{curve_order}
+     order    => $kh->{curve_order},
+     oid      => $kh->{curve_oid},
   };
 }
 
@@ -635,6 +585,7 @@ sub curve2hash {
 
 sub ecc_encrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
@@ -642,6 +593,7 @@ sub ecc_encrypt {
 
 sub ecc_decrypt {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
@@ -649,6 +601,7 @@ sub ecc_decrypt {
 
 sub ecc_sign_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
@@ -656,6 +609,7 @@ sub ecc_sign_message {
 
 sub ecc_verify_message {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
@@ -663,6 +617,7 @@ sub ecc_verify_message {
 
 sub ecc_sign_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
@@ -670,6 +625,7 @@ sub ecc_sign_hash {
 
 sub ecc_verify_hash {
   my $key = shift;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
   carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
@@ -677,6 +633,7 @@ sub ecc_verify_hash {
 
 sub ecc_shared_secret {
   my ($privkey, $pubkey) = @_;
+  local $SIG{__DIE__} = \&CryptX::_croak;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
   $pubkey  = __PACKAGE__->new($pubkey)  unless ref $pubkey;
   carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;

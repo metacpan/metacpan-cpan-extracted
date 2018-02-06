@@ -22,16 +22,42 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
                 'mobile' => '[23679]\\d{6}',
+                'personal_number' => '',
+                'geographic' => '
+          (?:
+            4(?:
+              [23]\\d{2}|
+              4(?:
+                1[024679]|
+                [6-9]\\d
+              )
+            )|
+            5(?:
+              54[0-7]|
+              6(?:
+                [67]\\d
+              )|
+              7(?:
+                1[04]|
+                2[035]|
+                3[58]|
+                48
+              )
+            )|
+            8\\d{3}
+          )\\d{3}
+        ',
                 'toll_free' => '',
                 'specialrate' => '',
                 'fixed_line' => '
@@ -58,33 +84,8 @@ my $validators = {
             8\\d{3}
           )\\d{3}
         ',
-                'voip' => '',
-                'geographic' => '
-          (?:
-            4(?:
-              [23]\\d{2}|
-              4(?:
-                1[024679]|
-                [6-9]\\d
-              )
-            )|
-            5(?:
-              54[0-7]|
-              6(?:
-                [67]\\d
-              )|
-              7(?:
-                1[04]|
-                2[035]|
-                3[58]|
-                48
-              )
-            )|
-            8\\d{3}
-          )\\d{3}
-        ',
-                'personal_number' => '',
-                'pager' => ''
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   22042 => "Banjul",

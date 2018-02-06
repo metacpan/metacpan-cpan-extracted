@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Moonshine-Test",
    "no_index" : {
@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::AsciiEmoji" : "0.02",
+            "Acme::AsciiEmoji" : "0.11",
             "B" : "0",
             "Exporter" : "0",
             "Params::Validate" : "0",
@@ -51,7 +51,7 @@
    "provides" : {
       "Moonshine::Test" : {
          "file" : "lib/Moonshine/Test.pm",
-         "version" : "0.14"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Moonshine-Test"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

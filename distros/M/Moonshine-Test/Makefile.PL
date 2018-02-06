@@ -22,18 +22,18 @@ WriteMakefile(
         'warnings' => 0,
     },
     PREREQ_PM => {
-		'Acme::AsciiEmoji' => 0.02,
+        'Acme::AsciiEmoji' => 0.11,
         'Test::More' => 0,
         'Scalar::Util' => 0,
         'Params::Validate' => 0,
         'B' => 0,
         'Exporter' => 0,
         'strict' => 0,
-		'warnings' => 0,
+        'warnings' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Moonshine-Test-*' },
-	META_MERGE => {
+    META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {
             repository => {
@@ -45,5 +45,5 @@ WriteMakefile(
     },
     META_ADD => {
         provides => Module::Metadata->provides(version => '2', dir => 'lib'),
-	}, 
+    }, 
 );

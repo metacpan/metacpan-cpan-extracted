@@ -29,11 +29,11 @@ use Test::Differences;      # included with perl [see Standard Modules in perlmo
 
 my $haveExtUtilsMakeMaker = eval { require ExtUtils::MakeMaker; 1; };
 
-if ( !$ENV{HARNESS_ACTIVE} ) {
-    # not executing under Test::Harness
-    use lib qw{ blib/arch };    # only needed for dynamic module loads (eg, compiled XS) [ remove if no XS ]
-    use lib qw{ lib };          # use the 'lib' version (for ease of testing from command line and testing immediacy; so 'blib/arch' version doesn't have to be built/updated 1st)
-    }
+# if ( !$ENV{HARNESS_ACTIVE} ) {
+#     # not executing under Test::Harness
+#     use lib qw{ blib/arch };    # only needed for dynamic module loads (eg, compiled XS) [ remove if no XS ]
+#     use lib qw{ lib };          # use the 'lib' version (for ease of testing from command line and testing immediacy; so 'blib/arch' version doesn't have to be built/updated 1st)
+#     }
 
 my @modules = ( 'File::Spec', 'IPC::Run3', 'Probe::Perl' );
 my $haveRequired = 1;

@@ -1,5 +1,16 @@
 Revision history for Perl extension Lingua::Conjunction.
 
+v2.1.2    2018-02-05 17:41:31+00:00 Europe/London
+  [Documentation]
+  - Fixed typo in POD, #1 (Mohammad S Anwar)
+
+v2.1.1    2018-02-05 13:59:21+00:00 Europe/London
+  [Tests]
+  - Fixed failing test on Perl 5.8.
+
+  [Documentation]
+  - Removed Windows newlines from the Changes file.
+
 v2.1.0    2018-01-28 21:38:27+00:00 Europe/London
   [Documentation]
   - Updated the format of the Changes file.

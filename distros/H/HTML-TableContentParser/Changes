@@ -1,3 +1,14 @@
+0.300		2018-02-01	T. R. Wyant
+    Handle <th> like <td>. That is, create a {headers} key in the <tr>
+    hash. This contains the <th> hashes for the row, or undef if the
+    position contains a <td>. Similarly, the {cells} key contains an
+    undef for a <th>. Trailing undefs in both are removed, as is the
+    whole tag if it is empty.
+    
+    A true value for the {classic} argument to new() restores the old
+    behavior. The {headers} key in the <table> hash gets populated either
+    way.
+
 0.201		2018-01-09	T. R. Wyant
     RT 1237 - Table-in-table bug. Tables containing other tables should
     no longer be truncated.

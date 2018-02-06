@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort;
-$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '2.03';
+$Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort::VERSION = '3.01';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -11,8 +11,11 @@ require Shipment::FedEx::WSDL::TrackTypemaps::TrackService
   if not Shipment::FedEx::WSDL::TrackTypemaps::TrackService->can('get_class');
 
 sub START {
-    $_[0]->set_proxy('https://wsbeta.fedex.com:443/web-services/track')
+    my $proxy_domain = $_[2]->{proxy_domain} || 'wsbeta.fedex.com:443';
+
+    $_[0]->set_proxy('https://' . $proxy_domain . '/web-services/track')
       if not $_[2]->{proxy};
+
     $_[0]->set_class_resolver(
         'Shipment::FedEx::WSDL::TrackTypemaps::TrackService')
       if not $_[2]->{class_resolver};
@@ -161,7 +164,7 @@ Shipment::FedEx::WSDL::TrackInterfaces::TrackService::TrackServicePort
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -524,7 +527,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,13 +3,14 @@ abstract: 'Perl access for Canvas LMS API'
 author:
   - 'Ted Katseres'
 build_requires:
+  FindBin: '0'
   Module::Build: '0.28'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,6 +18,7 @@ meta-spec:
 name: CanvasCloud
 requires:
   Hash::Merge: '0'
+  IO::String: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   Module::Load: '0'
@@ -26,4 +28,5 @@ requires:
 resources:
   homepage: https://github.com/tedkat/CanvasCloud
   repository: https://github.com/tedkat/CanvasCloud.git
-version: '0.002'
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

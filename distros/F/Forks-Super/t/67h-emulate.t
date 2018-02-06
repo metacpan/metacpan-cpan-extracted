@@ -33,25 +33,24 @@ ok($y eq "wORLD\n", "\$obj->read_stdout(), no block empty in emulation");
 okl($t <= 1, "fast return [12] ${t}s expected <=1s");
 
 $t = Time::HiRes::time();
-while (<$pid>) {
-    last;
-}
+
+$_ = $] >= 5.008008 ? <$pid> : $pid->read_stdout; # skip one line
 
 $t = Time::HiRes::time() - $t;
 ok($_ eq "abc\n", "while (<\$obj>) auto-assign to \$_");
 okl($t < 2.0, "no blocking read[2] in emulation mode");
 
 $t = Time::HiRes::time();
-$z = <$pid>;
+$z = $] >= 5.008008 ? <$pid> : $pid->read_stdout();
 $t = Time::HiRes::time() - $t;
 ok($z eq "123\n", "<\$pid> ok");
 okl($t <= 1, "fast return [5] ${t}s expected <= 1s");
 waitall;
 
-$z = <$pid>;
+$z = $] >= 5.008008 ? <$pid> : $pid->read_stdout;
 if (defined $z) {
     sleep 5;
-    $z = <$pid>;
+    $z = $] >= 5.008008 ? <$pid> : $pid->read_stdout;
 }
 ok(!defined($z), "<\$pid> undef on empty stream")
     or diag("\$z was \"$z\"");

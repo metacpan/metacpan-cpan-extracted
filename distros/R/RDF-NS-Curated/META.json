@@ -4,7 +4,7 @@
       "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -32,7 +32,10 @@
       },
       "develop" : {
          "recommends" : {
-            "Dist::Inkt" : "0.001"
+            "Dist::Inkt" : "0.001",
+            "List::Util" : "1.43",
+            "RDF::Trine" : "0",
+            "Test::Exception" : "0"
          }
       },
       "runtime" : {
@@ -49,7 +52,7 @@
    "provides" : {
       "RDF::NS::Curated" : {
          "file" : "lib/RDF/NS/Curated.pm",
-         "version" : "0.005"
+         "version" : "0.100"
       }
    },
    "release_status" : "stable",
@@ -66,8 +69,10 @@
          "url" : "git://github.com/kjetilk/p5-rdf-ns-curated.git",
          "web" : "https://github.com/kjetilk/p5-rdf-ns-curated"
       },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/RDF-NS-Curated/project"
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.27202"
+   "version" : "0.100",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
 }

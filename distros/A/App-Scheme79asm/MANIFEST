@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+scheme79asm
+t/App-Scheme79asm.t
+lib/App/Scheme79asm.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -18,6 +18,7 @@ use Plack::Middleware::TimeStats;
             sub {
                 my $env = shift;
                 $env->{'psgix.ama'}->profile('aki');
+                sleep 1;
                 [ 200, [], ['OK'] ];
             };
         };

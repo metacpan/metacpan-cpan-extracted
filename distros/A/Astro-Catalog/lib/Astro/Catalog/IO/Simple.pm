@@ -35,14 +35,10 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use Data::Dumper;
 
-$VERSION = "4.31";
+$VERSION = "4.32";
 
 
 # C O N S T R U C T O R ----------------------------------------------------
-
-=head1 REVISION
-
-$Id: Simple.pm,v 1.6 2005/03/31 01:24:53 cavanagh Exp $
 
 =begin __PRIVATE_METHODS__
 
@@ -84,27 +80,27 @@ sub _read_catalog {
 
       # Use a pattern match parser
       my @match = ( $lines[$i] =~ m/^(.*?)  # Target name (non greedy)
-		          \s*   # optional trailing space
+                          \s*   # optional trailing space
                           (\d{1,2}) # 1 or 2 digits [RA:h] [greedy]
-		          [:\s]+       # separator
-		          (\d{1,2}) # 1 or 2 digits [RA:m]
-		          [:\s]+       # separator
-		          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
-		                    # no capture on fraction
-		          [:\s]+
-		          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
-		          [:\s]+
-		          (\d{1,2}) # 1|2 digit [dec:m]
-		          [:\s]+
-		          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
+                          [:\s]+       # separator
+                          (\d{1,2}) # 1 or 2 digits [RA:m]
+                          [:\s]+       # separator
+                          (\d{1,2}(?:\.\d*)?) # 1|2 digits opt .fraction [RA:s]
+                                    # no capture on fraction
+                          [:\s]+
+                          ([+-]?\s*\d{1,2}) # 1|2 digit [dec:d] inc sign
+                          [:\s]+
+                          (\d{1,2}) # 1|2 digit [dec:m]
+                          [:\s]+
+                          (\d{1,2}(?:\.\d*)?) # arcsecond (optional fraction)
                                               # no capture on fraction
                           \s*
-		          (RB|RJ|AZ|GA|AZEL|J2000|B1950|Galactic)? # coordinate type
+                          (RB|RJ|AZ|GA|AZEL|J2000|B1950|Galactic)? # coordinate type
 
-		         # most everything else is optional
-		         \s*
+                         # most everything else is optional
+                         \s*
                          (?:\#\s*(.*))?$                    # comment [8]
-		/xi);
+                /xi);
 
       # Abort if we do not have matches for the first 8 fields
       # type is optional
@@ -136,42 +132,42 @@ sub _read_catalog {
       # The form of the hash depends on the type
       my %c;
       if ($type =~ /(RB|RJ|J2000|B1950)/ ) {
-	# Standard RADEC
-	$c{ra} = $ra;
-	$c{dec} = $dec;
+        # Standard RADEC
+        $c{ra} = $ra;
+        $c{dec} = $dec;
 
-	if ($type =~ /B/) {
-	  $c{type} = "B1950";
-	} else {
-	  $c{type} = "J2000";
-	}
+        if ($type =~ /B/) {
+          $c{type} = "B1950";
+        } else {
+          $c{type} = "J2000";
+        }
 
       } elsif ($type =~ /^(GA|SUPERGAL)/) {
 
-	$c{long} = $ra;
-	$c{lat} = $dec;
-	if ($type =~ /S/) {
-	  $c{type} = "SUPERGALACTIC";
-	} else {
-	  $c{type} = "GALACTIC";
-	}
+        $c{long} = $ra;
+        $c{lat} = $dec;
+        if ($type =~ /S/) {
+          $c{type} = "SUPERGALACTIC";
+        } else {
+          $c{type} = "GALACTIC";
+        }
 
       } elsif ($type =~ /^AZ/) {
 
-	$c{az} = $ra;
-	$c{el} = $dec;
+        $c{az} = $ra;
+        $c{el} = $dec;
 
       } else {
-	croak "Unexpected coordinate type: $type\n";
+        croak "Unexpected coordinate type: $type\n";
       }
 
       # Assume J2000 and create an Astro::Coords object
       my $coords = new Astro::Coords( units => 'sex',
-				      name  => $star->id(),
-				      %c );
+                                      name  => $star->id(),
+                                      %c );
 
       croak "Error creating coordinate object from $ra / $dec "
-	unless defined $coords;
+        unless defined $coords;
 
       # and push it into the Astro::Catalog::Star object
       $star->coords( $coords );
@@ -234,12 +230,12 @@ sub _write_catalog {
       my $type = $c->type;
 
       if ($type eq 'RADEC') {
-	# Standard J2000
-	push(@chunks, $c->ra(format=>'s'),$c->dec(format=>'s'), "J2000");
+        # Standard J2000
+        push(@chunks, $c->ra(format=>'s'),$c->dec(format=>'s'), "J2000");
       } elsif ($type eq 'FIXED') {
-	push(@chunks, $c->az(format=>'s'),$c->el(format=>'s'),"AZEL");
+        push(@chunks, $c->az(format=>'s'),$c->el(format=>'s'),"AZEL");
       } else {
-	$comment = "Can not represent star $chunks[0] in catalogue since it is of type $type";
+        $comment = "Can not represent star $chunks[0] in catalogue since it is of type $type";
       }
 
     } else {
@@ -252,7 +248,7 @@ sub _write_catalog {
     } else {
       my $cmt = '';
       $cmt = " # " .$star->comment()
-	if $star->comment();
+        if $star->comment();
 
       push(@output, sprintf("%-15s %s %s %s", @chunks) . $cmt);
 

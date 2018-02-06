@@ -34,28 +34,28 @@ isa_ok($t, 'Business::cXML::Transmission', 'Bare creation yields a valid transmi
 cmp_deeply(
 	comparable($t),
 	noclass({
-		string      => undef,
-		xml_doc     => undef,
-		xml_root    => undef,
-		xml_payload => undef,
-		payload     => undef,
-		timestamp   => 'timestamp',
-		epoch       => 'epoch',
-		hostname    => 'hostname',
-		randint     => 'randint',
-		pid         => 'pid',
-		test        => 0,
-		lang        => 'en-US',
-		id          => 'id',
-		inreplyto   => undef,
-		status      => {
+		string       => undef,
+		xml_doc      => undef,
+		xml_root     => undef,
+		_xml_payload => undef,
+		_payload     => undef,
+		_timestamp   => 'timestamp',
+		epoch        => 'epoch',
+		hostname     => 'hostname',
+		randint      => 'randint',
+		pid          => 'pid',
+		test         => 0,
+		_lang        => 'en-US',
+		_id          => 'id',
+		_inreplyto   => undef,
+		status       => {
 			code        => 200,
 			text        => 'OK',
 			description => '',
 		},
-		class  => 2,
-		type   => 'Profile',
-		from   => {
+		class => 2,
+		_type => 'Profile',
+		_from => {
 			_nodeName => 'From',
 			_note     => undef,
 			domain    => 'NetworkId',
@@ -66,7 +66,7 @@ cmp_deeply(
 			lang      => undef,
 			contact   => undef,
 		},
-		to => {
+		_to => {
 			_nodeName => 'To',
 			_note     => undef,
 			domain    => 'NetworkId',
@@ -77,7 +77,7 @@ cmp_deeply(
 			lang      => undef,
 			contact   => undef,
 		},
-		sender => {
+		_sender => {
 			_nodeName => 'Sender',
 			_note     => undef,
 			domain    => 'NetworkId',

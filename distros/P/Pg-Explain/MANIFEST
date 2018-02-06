@@ -172,3 +172,6 @@ t/plans/24-expect
 t/plans/24-plan
 t/plans/25-expect
 t/plans/25-plan
+t/34-parallel-index-only-scan.t
+t/33-parallel-index-scan.t
+t/32-parallel-index-scan-backward.t

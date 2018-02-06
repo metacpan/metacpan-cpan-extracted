@@ -1,5 +1,12 @@
 Revision history for Perl module SMS::Send::Driver::Webservice
 
+0.06 2017-10-18
+  - Updated HTTP::Tiny constructor to disable keep_alive
+
+0.05 2017-10-17
+  - Added HTTP::Tiny constructor
+  - Moved LWP::UserAgent as Lazy loaded package
+
 0.04 2016-01-09
   - Dropped author tests from distribution
 

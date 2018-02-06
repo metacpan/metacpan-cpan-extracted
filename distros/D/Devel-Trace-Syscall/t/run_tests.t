@@ -79,6 +79,11 @@ sub parse_events {
         if($line =~ /^(?<name>$SYSCALL_NAME) $SYSCALL_ARGS \s+=\s+ (?<result>$SYSCALL_RESULT) \s+ (?<location>$LOCATION)$/x) {
             my ( $name, $args, $result, $location ) = @+{qw/name args result location/};
 
+            if($name eq 'openat') {
+                $name = 'open';
+                $args =~ s/^.*?,\s*//;
+            }
+
             push @events, [{
                 name       => $name,
                 args       => parse_args($args),
@@ -199,7 +204,7 @@ $ENV{'PERL5LIB'} = '../blib/arch:../blib/lib';
 
 foreach my $filename (@test_files) {
     my ( $metadata, $expected_events ) = read_events_from_data($filename);
-    my @args                           = split(/\s*,\s*/, $metadata->{'args'} || 'open');
+    my @args                           = split(/\s*,\s*/, $metadata->{'args'} || 'open,openat');
     my ( $exit_code, $output_lines )   = capture_trace_output($^X, '-d:Trace::Syscall=' . join(',', @args), $filename);
     my $got_events                     = parse_events($output_lines);
     $got_events                        = strip_unimportant_events($got_events);

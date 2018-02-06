@@ -1,7 +1,9 @@
 MODULE = CryptX       PACKAGE = Crypt::AuthEnc::CCM
 
+PROTOTYPES: DISABLE
+
 Crypt::AuthEnc::CCM
-_new(char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
+new(Class, char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_len)
     CODE:
     {
         unsigned char *k=NULL;
@@ -21,30 +23,27 @@ _new(char * cipher_name, SV * key, SV * nonce, SV * adata, int tag_len, int pt_l
         if (!SvPOK(adata)) croak("FATAL: adata must be string/buffer scalar");
         h = (unsigned char *) SvPVbyte(adata, h_len);
 
-        id = find_cipher(cipher_name);
+        id = _find_cipher(cipher_name);
         if (id == -1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
 
-        Newz(0, RETVAL, 1, struct ccm_struct);
+        Newz(0, RETVAL, 1, ccm_state);
         if (!RETVAL) croak("FATAL: Newz failed");
 
-        rv = ccm_init(&RETVAL->state, id, k, (int)k_len, (int)pt_len, (int)tag_len, (int)h_len); /* XXX-TODO why int? */
+        rv = ccm_init(RETVAL, id, k, (int)k_len, (int)pt_len, (int)tag_len, (int)h_len); /* XXX-TODO why int? */
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: ccm_init failed: %s", error_to_string(rv));
         }
-        rv = ccm_add_nonce(&RETVAL->state, n, (unsigned long)n_len);
+        rv = ccm_add_nonce(RETVAL, n, (unsigned long)n_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: ccm_add_nonce failed: %s", error_to_string(rv));
         }
-        rv = ccm_add_aad(&RETVAL->state, h, (unsigned long)h_len);
+        rv = ccm_add_aad(RETVAL, h, (unsigned long)h_len);
         if (rv != CRYPT_OK) {
           Safefree(RETVAL);
           croak("FATAL: ccm_add_aad failed: %s", error_to_string(rv));
         }
-        RETVAL->direction = -1;
-        RETVAL->tag_len = tag_len;
-        RETVAL->pt_len = pt_len;
     }
     OUTPUT:
         RETVAL
@@ -57,9 +56,9 @@ DESTROY(Crypt::AuthEnc::CCM self)
 Crypt::AuthEnc::CCM
 clone(Crypt::AuthEnc::CCM self)
     CODE:
-        Newz(0, RETVAL, 1, struct ccm_struct);
+        Newz(0, RETVAL, 1, ccm_state);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct ccm_struct);
+        Copy(self, RETVAL, 1, ccm_state);
     OUTPUT:
         RETVAL
 
@@ -76,21 +75,15 @@ encrypt_add(Crypt::AuthEnc::CCM self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (self->direction == -1) self->direction = CCM_ENCRYPT;
-          if (self->direction != CCM_ENCRYPT) {
-            croak("FATAL: encrypt_add failed: wrong direction");
-          }
-          if (self->pt_len < in_data_len) croak("FATAL: encrypt_add failed: pt_len mismatch");
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ccm_process(&self->state, in_data, (unsigned long)in_data_len, out_data, self->direction);
+          rv = ccm_process(self, in_data, (unsigned long)in_data_len, out_data, CCM_ENCRYPT);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ccm_process failed: %s", error_to_string(rv));
           }
-          self->pt_len -= (unsigned long)in_data_len;
         }
     }
     OUTPUT:
@@ -109,21 +102,15 @@ decrypt_add(Crypt::AuthEnc::CCM self, SV * data)
           RETVAL = newSVpvn("", 0);
         }
         else {
-          if (self->direction == -1) self->direction = CCM_DECRYPT;
-          if (self->direction != CCM_DECRYPT) {
-            croak("FATAL: decrypt_add failed: wrong direction");
-          }
-          if (self->pt_len < in_data_len) croak("FATAL: decrypt_add failed: pt_len mismatch");
-          RETVAL = NEWSV(0, in_data_len);
+          RETVAL = NEWSV(0, in_data_len); /* avoid zero! */
           SvPOK_only(RETVAL);
           SvCUR_set(RETVAL, in_data_len);
           out_data = (unsigned char *)SvPVX(RETVAL);
-          rv = ccm_process(&self->state, out_data, (unsigned long)in_data_len, in_data, CCM_DECRYPT);
+          rv = ccm_process(self, out_data, (unsigned long)in_data_len, in_data, CCM_DECRYPT);
           if (rv != CRYPT_OK) {
             SvREFCNT_dec(RETVAL);
             croak("FATAL: ccm_process failed: %s", error_to_string(rv));
           }
-          self->pt_len -= (unsigned long)in_data_len;
         }
     }
     OUTPUT:
@@ -135,13 +122,9 @@ encrypt_done(Crypt::AuthEnc::CCM self)
     {
         int rv;
         unsigned char tag[MAXBLOCKSIZE];
-        unsigned long tag_len = self->tag_len;
+        unsigned long tag_len = MAXBLOCKSIZE;
 
-        if (self->direction != CCM_ENCRYPT) {
-          croak("FATAL: encrypt_done failed: wrong direction");
-        }
-        if (self->pt_len != 0) croak("FATAL: encrypt_done failed: pt_len mismatch");
-        rv = ccm_done(&self->state, tag, &tag_len);
+        rv = ccm_done(self, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: ccm_done failed: %s", error_to_string(rv));
         XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
     }
@@ -152,15 +135,11 @@ decrypt_done(Crypt::AuthEnc::CCM self, ...)
     {
         int rv;
         unsigned char tag[MAXBLOCKSIZE];
-        unsigned long tag_len = self->tag_len;
+        unsigned long tag_len = MAXBLOCKSIZE;
         STRLEN expected_tag_len;
         unsigned char *expected_tag;
 
-        if (self->direction != CCM_DECRYPT) {
-          croak("FATAL: decrypt_done failed: wrong direction");
-        }
-        if (self->pt_len != 0) croak("FATAL: decrypt_done failed: pt_len mismatch");
-        rv = ccm_done(&self->state, tag, &tag_len);
+        rv = ccm_done(self, tag, &tag_len);
         if (rv != CRYPT_OK) croak("FATAL: ccm_done failed: %s", error_to_string(rv));
         if (items == 1) {
           XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
@@ -177,5 +156,75 @@ decrypt_done(Crypt::AuthEnc::CCM self, ...)
           else {
             XPUSHs(sv_2mortal(newSViv(1))); /* true */
           }
+        }
+    }
+
+void
+ccm_encrypt_authenticate(char *cipher_name, SV *key, SV *nonce, SV *header, unsigned long tag_len, SV *plaintext)
+    PPCODE:
+    {
+        STRLEN k_len = 0, n_len = 0, h_len = 0, pt_len = 0;
+        unsigned char *k = NULL, *n = NULL, *h = NULL, *pt = NULL;
+        int rv, id;
+        unsigned char tag[MAXBLOCKSIZE];
+        SV *output;
+
+        if (SvPOK(key))       k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (SvPOK(nonce))     n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (SvPOK(plaintext)) pt = (unsigned char *) SvPVbyte(plaintext, pt_len);
+        if (SvPOK(header))    h  = (unsigned char *) SvPVbyte(header, h_len);
+
+        id = _find_cipher(cipher_name);
+        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        output = NEWSV(0, pt_len > 0 ? pt_len : 1); /* avoid zero! */
+        SvPOK_only(output);
+        SvCUR_set(output, pt_len);
+        if(tag_len < 4 || tag_len > 16) tag_len = 16;
+
+        rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                        pt, (unsigned long)pt_len, (unsigned char *)SvPVX(output), tag, &tag_len, CCM_ENCRYPT);
+
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(output);
+          croak("FATAL: ccm_memory failed: %s", error_to_string(rv));
+        }
+        XPUSHs(sv_2mortal(output));
+        XPUSHs(sv_2mortal(newSVpvn((char*)tag, tag_len)));
+    }
+
+void
+ccm_decrypt_verify(char *cipher_name, SV *key, SV *nonce, SV *header, SV *ciphertext, SV *tagsv)
+    PPCODE:
+    {
+        STRLEN k_len = 0, n_len = 0, h_len = 0, ct_len = 0, t_len = 0;
+        unsigned char *k = NULL, *n = NULL, *h = NULL, *ct = NULL, *t = NULL;
+        int rv, id;
+        unsigned char tag[MAXBLOCKSIZE];
+        unsigned long tag_len;
+        SV *output;
+
+        if (SvPOK(key))        k  = (unsigned char *) SvPVbyte(key, k_len);
+        if (SvPOK(nonce))      n  = (unsigned char *) SvPVbyte(nonce, n_len);
+        if (SvPOK(ciphertext)) ct = (unsigned char *) SvPVbyte(ciphertext, ct_len);
+        if (SvPOK(tagsv))      t  = (unsigned char *) SvPVbyte(tagsv, t_len);
+        if (SvPOK(header))     h  = (unsigned char *) SvPVbyte(header, h_len);
+
+        id = _find_cipher(cipher_name);
+        if(id==-1) croak("FATAL: find_cipfer failed for '%s'", cipher_name);
+        output = NEWSV(0, ct_len > 0 ? ct_len : 1); /* avoid zero! */
+        SvPOK_only(output);
+        SvCUR_set(output, ct_len);
+        tag_len = (unsigned long)t_len;
+        Copy(t, tag, t_len, unsigned char);
+
+        rv = ccm_memory(id, k, (unsigned long)k_len, NULL, n, (unsigned long)n_len, h, (unsigned long)h_len,
+                        (unsigned char *)SvPVX(output), (unsigned long)ct_len, ct, tag, &tag_len, CCM_DECRYPT);
+
+        if (rv != CRYPT_OK) {
+          SvREFCNT_dec(output);
+          XPUSHs(sv_2mortal(newSVpvn(NULL,0))); /* undef */
+        }
+        else {
+          XPUSHs(sv_2mortal(output));
         }
     }

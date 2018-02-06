@@ -44,7 +44,7 @@ print $version_string;
 if ($version_string) {
     if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+([.]\d+)?\s*/smx ) {
         my ($major) = ($1);
-        if ( $major < 57 ) {
+        if ( $major < 55 ) {
             last_desperate_search();
             die
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
@@ -58,6 +58,29 @@ if ($version_string) {
 else {
     last_desperate_search();
     die "Mozilla Firefox cannot be discovered in $ENV{PATH}\n";
+}
+if ($^O eq 'linux') {
+	print "grep -r Mem /proc/meminfo\n";
+	print `grep -r Mem /proc/meminfo`;
+	print "ulimit -a | grep -i mem\n";
+	print `ulimit -a | grep -i mem`;
+} elsif ($^O =~ /bsd/i) {
+	print "sysctl hw | egrep 'hw.(phys|user|real)'\n";
+	print `sysctl hw | egrep 'hw.(phys|user|real)'`;
+	print "ulimit -a | grep -i mem\n";
+	print `ulimit -a | grep -i mem`;
+}
+if (($^O eq 'linux') || ($^O eq 'freebsd')) {
+	my $virtual_memory = `ulimit -v 2>/dev/null`;
+	if ($? == 0) {
+		chomp $virtual_memory;
+		if ($virtual_memory eq 'unlimited') {
+		} elsif (($^O eq 'freebsd') && ($virtual_memory < 1_800_000)) {
+			die "$virtual_memory bytes of virtual memory is less than the required 1.8Gb to run test suite in $^O";
+		} elsif ($virtual_memory < 2_400_000) {
+			die "$virtual_memory bytes of virtual memory is less than the required 2.4Gb to run test suite in $^O";
+		}
+	}
 }
 
 WriteMakefile(
@@ -102,7 +125,6 @@ WriteMakefile(
         (
             ($^O ne 'MSWin32' and $^O ne 'darwin' and $^O ne 'cygwin')
             ? (
-		'Digest::MD5'         => 0,
 		'Crypt::URandom'      => 0,
               )
             : ()

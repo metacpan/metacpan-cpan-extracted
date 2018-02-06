@@ -7,7 +7,7 @@ use Test::More;
 use Test::Time;
 use Time::HiRes ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $time    = 0;    # epoch in microseconds
 our $seconds = 0;    # i.e. standard epoch

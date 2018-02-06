@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 
-use List::AllUtils qw( all any first_index max none sort_by );
-use Scalar::Util qw( refaddr );
+use Graph::Easy;
+use List::AllUtils qw( all none );
 use Stepford::Error;
 use Stepford::Types qw(
     ArrayRef
@@ -114,7 +114,7 @@ sub _constructor_args_for_class {
     for my $init_arg (
         grep { defined }
         map  { $_->init_arg } $class->meta->get_all_attributes
-        ) {
+    ) {
 
         $args{$init_arg} = $config->{$init_arg}
             if exists $config->{$init_arg};
@@ -297,14 +297,29 @@ sub is_serializable {
     ( $self, @{ $self->_children_graphs } );
 }
 
+# Return a stringified dump of the graph with all its children steps. This is
+# primarily used by Stepford::Runner to print when a dry run has been requested.
+#
 sub as_string {
-    my $self = shift;
-    my $depth = shift || 0;
+    my $self   = shift;
+    my $method = shift // 'txt';
+    $method = 'as_' . $method;
 
-    return ( q{ } x ( 4 * $depth ) ) . $self->step_class . "\n" . join(
-        q{},
-        map { $_->as_string( $depth + 1 ) } @{ $self->_children_graphs }
+    my $graph = Graph::Easy->new;
+
+    $self->traverse(
+        sub {
+            my $node = shift;
+            if ( $node->step_class ne 'Stepford::FinalStep' ) {
+                foreach my $child ( @{ $node->_children_graphs } ) {
+                    $graph->add_edge_once(
+                        $node->step_class => $child->step_class );
+                }
+            }
+        }
     );
+
+    return $graph->$method;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -325,7 +340,7 @@ Stepford::Graph - Contains the step dependency graph
 
 =head1 VERSION
 
-version 0.004001
+version 0.005000
 
 =head1 DESCRIPTION
 
@@ -350,7 +365,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

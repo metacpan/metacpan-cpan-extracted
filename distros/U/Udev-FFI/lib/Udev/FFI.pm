@@ -15,7 +15,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.101001';
+$Udev::FFI::VERSION = '0.102000';
 
 
 
@@ -25,13 +25,12 @@ $Udev::FFI::VERSION = '0.101001';
 
 sub new {
     my $class = shift;
-    my $self = {};
 
     if(0 == Udev::FFI::Functions->init()) {
         return undef; # error already in $@
     }
 
-    $self->{_context} = udev_new();
+    my $self = {_context => udev_new()};
     if(!defined($self->{_context})) {
         $@ = "Can't create udev context";
         return undef;

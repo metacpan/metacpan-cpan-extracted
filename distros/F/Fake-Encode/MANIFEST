@@ -1,10 +1,10 @@
-Fake/Encode.pm
+lib/Fake/Encode.pm
+lib/Test/Simply.pm
 Changes
 Makefile.PL
 pMakefile.PL
 MANIFEST
 README
 META.yml
-Test/Simply.pm
 t/001_encode.t
 t/002_decode.t

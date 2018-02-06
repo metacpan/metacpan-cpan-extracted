@@ -32,11 +32,7 @@ use Carp;
 use Astro::Catalog;
 use Astro::Catalog::Star;
 
-$VERSION = "4.31";
-
-=head1 REVISION
-
-$Id: WebService.pm,v 1.4 2003/08/03 06:18:35 timj Exp $
+$VERSION = "4.32";
 
 =head1 METHODS
 
@@ -50,11 +46,11 @@ Create a new instance from a hash of options
 
   $q = new Astro::Catalog::Transport::WebService(
                                             Coords    => new Astro::Coords(),
-				            Radius    => $radius,
-				            Bright    => $magbright,
-				            Faint     => $magfaint,
-				            Sort      => $sort_type,
-				            Number    => $number_out );
+                                            Radius    => $radius,
+                                            Bright    => $magbright,
+                                            Faint     => $magfaint,
+                                            Sort      => $sort_type,
+                                            Number    => $number_out );
 
 returns a reference to an query object. Must only called from
 sub-classed constructors.
@@ -71,7 +67,7 @@ sub new {
 
   # bless the query hash into the class
   my $block = bless { OPTIONS   => {},
-		      COORDS    => undef,
+                      COORDS    => undef,
                       URN       => undef,
                       ENDPOINT  => undef,
                       SERVICE   => undef,

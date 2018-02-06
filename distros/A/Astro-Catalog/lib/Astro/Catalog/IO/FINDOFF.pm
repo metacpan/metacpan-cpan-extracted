@@ -32,7 +32,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =head1 METHODS
@@ -150,10 +150,6 @@ sub _write_catalog {
 }
 
 =back
-
-=head1 REVISION
-
- $Id: FINDOFF.pm,v 1.5 2007/05/31 01:42:34 cavanagh Exp $
 
 =head1 SEE ALSO
 

@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 # shortcuts
 #  os and distros
@@ -120,8 +120,12 @@ sub mapping {
        [package => 'libprotobuf-dev']]],
 
      [cpanmod => 'Alien::raylib',
+      [os_freebsd,
+       [package => [qw(alsa-lib)]]], # XXX maybe more?
+      [like_debian,
+       [package => [qw(libasound2-dev libxcursor-dev libxinerama-dev mesa-common-dev libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev)]]],
       [like_fedora,
-       [package => 'libXrandr-devel']],
+       [package => 'libXrandr-devel']], # XXX maybe more?
      ],
 
      [cpanmod => 'Alien::RRDtool',
@@ -317,7 +321,7 @@ sub mapping {
 
      [cpanmod => ['Authen::Krb5Password', 'GSSAPI'],
       [os_freebsd,
-       [package => 'heimdal | krb5']],
+       [package => 'krb5 | heimdal']], # heimdal shadows tools like "su", so put it behind krb5
       [like_debian,
        [linuxdistrocodename => [qw(squeeze wheezy jessie)],
 	[package => 'heimdal-dev | libkrb5-dev']],
@@ -507,6 +511,18 @@ sub mapping {
        [package => 'recode']],
       [like_fedora,
        [package => 'recode']],
+     ],
+
+     [cpanmod => 'CORBA::ORBit',
+      #[os_freebsd,
+      # [package => 'ORBit']], # does not exist anymore, just ORBit2
+      [like_fedora,
+       [package => [qw(ORBit-devel libIDL-devel)]]
+       # XXX still does not work, at least on CentOS6
+       # either -I/usr/include/libIDL-1.0 or libIDL-2.0 has
+       # to be specified, but not possible in the standard
+       # Makefile.PL
+      ],
      ],
 
      [cpanmod => 'Couchbase',
@@ -772,9 +788,15 @@ sub mapping {
      ],
 
      [cpanmod => 'Device::Cdio',
+      [os_freebsd,
+       # but it's too old, even on freebsd11 (1.1 needed, 0.94 installed)
+       [package => 'libcdio']],
       [like_debian,
        # but still does not work
-       [package => ['libcdio-dev', 'libiso9660-dev']]]],
+       [package => ['libcdio-dev', 'libiso9660-dev']]],
+      [os_darwin,
+       [package => 'libcdio']],
+     ],
 
      [cpanmod => 'Device::Serdisp',
       [os_freebsd,
@@ -1506,10 +1528,14 @@ sub mapping {
 
      [cpanmod => 'Inline::Lua',
       [os_freebsd,
-       # does not work, see https://rt.cpan.org/Ticket/Display.html?id=93690
-       [package => 'lua']],
+       [package => 'lua53 | lua']],
       [like_debian,
-       [package => 'liblua5.1-0-dev']]],
+       [package => 'liblua5.1-0-dev']],
+      [like_fedora,
+       [package => 'lua-devel']],
+      [os_darwin,
+       [package => 'lua']],
+     ],
 
      [cpanmod => 'Inline::Perl6',
       [like_debian,
@@ -2599,7 +2625,12 @@ sub mapping {
       [like_debian,
        [package => ['mesa-common-dev', 'libglu1-mesa-dev']]]],
 
-     [cpanmod => ['UAV::Pilot::SDL', 'UAV::Pilot::Video::Ffmpeg'],
+     [cpanmod => 'UAV::Pilot::SDL',
+      [like_debian,
+       [package => ['libavcodec-dev', 'libswscale-dev']]],
+     ],
+
+     [cpanmod => 'UAV::Pilot::Video::Ffmpeg',
       [like_debian,
        [package => 'libavcodec-dev']],
      ],

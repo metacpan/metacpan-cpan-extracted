@@ -14,7 +14,7 @@ use Astro::Telescope;
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '1.59';
+our $VERSION = '1.60';
 
 use base qw/ Astro::FITS::HdrTrans::JAC /;
 
@@ -35,6 +35,7 @@ my %UNIT_MAP =
     PROJECT              => 'PROJECT',
     SCAN_PATTERN         => 'SCAN_PAT',
     STANDARD             => 'STANDARD',
+    WIND_BLIND           => 'WND_BLND',
     X_APERTURE           => 'INSTAP_X',
     Y_APERTURE           => 'INSTAP_Y',
   );
@@ -261,6 +262,69 @@ sub to_SUBSYSTEM_IDKEY {
     return $try if @results;
   }
   return;
+}
+
+=item B<to_DOME_OPEN>
+
+Uses the roof and door status at start and end of observation headers
+to generate a combined value which, if true, confirms that the dome
+was fully open throughout.  (Unless it closed and reopened during
+the observation.)
+
+=cut
+
+sub to_DOME_OPEN {
+  my $self = shift;
+  my $FITS_headers = shift;
+
+  my ($n_open, $n_closed, $n_other) = (0, 0, 0);
+
+  foreach my $header (qw/DOORSTST DOORSTEN ROOFSTST ROOFSTEN/) {
+    foreach my $value ($self->via_subheader($FITS_headers, $header)) {
+      if ($value =~ /^open$/i) {
+        $n_open ++;
+      }
+      elsif ($value =~ /^closed$/i) {
+        $n_closed ++;
+      }
+      else {
+        $n_other ++;
+      }
+    }
+  }
+
+  if ($n_open and not ($n_closed or $n_other)) {
+    return 1;
+  }
+
+  if ($n_closed and not ($n_open or $n_other)) {
+    return 0;
+  }
+
+  return undef;
+}
+
+=item B<from_DOME_OPEN>
+
+Converts the DOME_OPEN value back to individual roof and door
+status headers.
+
+=cut
+
+sub from_DOME_OPEN {
+  my $self = shift;
+  my $generic_headers = shift;
+
+  my $value = undef;
+
+  if (exists $generic_headers->{'DOME_OPEN'}) {
+    my $dome = $generic_headers->{'DOME_OPEN'};
+    if (defined $dome) {
+      $value = $dome ? 'Open' : 'Closed';
+    }
+  }
+
+  return map {$_ => $value} qw/DOORSTST DOORSTEN ROOFSTST ROOFSTEN/;
 }
 
 =back

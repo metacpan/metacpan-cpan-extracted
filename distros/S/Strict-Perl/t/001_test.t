@@ -1,5 +1,7 @@
 use 5.00503;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Test::Simply 'tests' => 24;
 
 use vars qw(@test);
@@ -27,6 +29,8 @@ use strict;
 END
 
     '006_strictperl_exit.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -34,6 +38,8 @@ exit;
 END
 
     '007_strictperl_die.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -41,6 +47,8 @@ die;
 END
 
     '008_must_moduleversion.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -48,6 +56,8 @@ exit;
 END
 
     '009_must_moduleversion_match.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl 9999.99;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -55,6 +65,8 @@ exit;
 END
 
     '010_strict.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 $VERSION = 1;
 $VAR = 1;
@@ -62,6 +74,8 @@ exit;
 END
 
     '011_warnings.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 print "VERSION=$VERSION";
@@ -69,6 +83,8 @@ exit;
 END
 
     '012_autodie.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -78,6 +94,8 @@ exit;
 END
 
     '013_goodvariable.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -86,6 +104,8 @@ exit;
 END
 
     '014_bareword.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -95,6 +115,8 @@ exit;
 END
 
     '015_fileno_0.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -103,6 +125,8 @@ exit;
 END
 
     '016_fileno_undef.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -111,6 +135,8 @@ exit;
 END
 
     '017_unlink.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -119,6 +145,8 @@ exit;
 END
 
     '018_use_Thread.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -127,6 +155,8 @@ exit;
 END
 
     '019_use_threads.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -135,6 +165,8 @@ exit;
 END
 
     '020_use_encoding.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -143,6 +175,8 @@ exit;
 END
 
     '021_use_Switch.pl' => [<<'END', 'mustdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -151,6 +185,8 @@ exit;
 END
 
     '022_sigiled_keyword.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
@@ -163,12 +199,16 @@ goto HERE
 :HERE
 @rem ';
 #line 6
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;
 END
 
     '024___END__.pl' => [<<'END', 'notdie'],
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Strict::Perl <%MODULEVERSION%>;
 use vars qw($VERSION);
 $VERSION = 1;

@@ -4,7 +4,7 @@ use Moo;
 
 use namespace::autoclean;
 
-our $VERSION = '0.000024';
+our $VERSION = '0.000025';
 
 use feature qw( say state );
 
@@ -447,7 +447,7 @@ WebService::PayPal::PaymentsAdvanced - A simple wrapper around the PayPal Paymen
 
 =head1 VERSION
 
-version 0.000024
+version 0.000025
 
 =head1 SYNOPSIS
 
@@ -799,7 +799,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Dave Rolsky Greg Oschwald Mark Fowler Mateu X Hunter Olaf Alders William Storey
+=for stopwords Andy Jack Dave Rolsky Greg Oschwald Mark Fowler Mateu X Hunter Narsimham Chelluri Olaf Alders William Storey
 
 =over 4
 
@@ -825,6 +825,10 @@ Mateu X Hunter <mhunter@maxmind.com>
 
 =item *
 
+Narsimham Chelluri <nchelluri@users.noreply.github.com>
+
+=item *
+
 Olaf Alders <oalders@maxmind.com>
 
 =item *
@@ -835,7 +839,7 @@ William Storey <wstorey@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by MaxMind, Inc.
+This software is copyright (c) 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

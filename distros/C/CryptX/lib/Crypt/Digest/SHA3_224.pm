@@ -4,7 +4,7 @@ package Crypt::Digest::SHA3_224;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha3_224 sha3_224_hex sha3_224_b64 sha3_224_b64u sha3_224_file sha3_224_file_hex sha3_224_file_b64 sha3_224_file_b64u )] );
@@ -13,19 +13,17 @@ our @EXPORT = qw();
 
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
-use CryptX;
+use Crypt::Digest;
 
-sub hashsize { Crypt::Digest::hashsize(__PACKAGE__) }
-
-sub sha3_224             { Crypt::Digest::digest_data(__PACKAGE__, @_) }
-sub sha3_224_hex         { Crypt::Digest::digest_data_hex(__PACKAGE__, @_) }
-sub sha3_224_b64         { Crypt::Digest::digest_data_b64(__PACKAGE__, @_) }
-sub sha3_224_b64u        { Crypt::Digest::digest_data_b64u(__PACKAGE__, @_) }
-
-sub sha3_224_file        { Crypt::Digest::digest_file(__PACKAGE__, @_) }
-sub sha3_224_file_hex    { Crypt::Digest::digest_file_hex(__PACKAGE__, @_) }
-sub sha3_224_file_b64    { Crypt::Digest::digest_file_b64(__PACKAGE__, @_) }
-sub sha3_224_file_b64u   { Crypt::Digest::digest_file_b64u(__PACKAGE__, @_) }
+sub hashsize                { Crypt::Digest::hashsize('SHA3_224')             }
+sub sha3_224             { Crypt::Digest::digest_data('SHA3_224', @_)      }
+sub sha3_224_hex         { Crypt::Digest::digest_data_hex('SHA3_224', @_)  }
+sub sha3_224_b64         { Crypt::Digest::digest_data_b64('SHA3_224', @_)  }
+sub sha3_224_b64u        { Crypt::Digest::digest_data_b64u('SHA3_224', @_) }
+sub sha3_224_file        { Crypt::Digest::digest_file('SHA3_224', @_)      }
+sub sha3_224_file_hex    { Crypt::Digest::digest_file_hex('SHA3_224', @_)  }
+sub sha3_224_file_b64    { Crypt::Digest::digest_file_b64('SHA3_224', @_)  }
+sub sha3_224_file_b64u   { Crypt::Digest::digest_file_b64u('SHA3_224', @_) }
 
 1;
 

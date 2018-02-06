@@ -7,4 +7,4 @@ use feature qw(say);
 print -T '/dev/null';
 
 __DATA__
-open("/dev/null", 0x0, 0666) = * at last-statement.pl line 7.
+open("/dev/null", *, *) = * at last-statement.pl line 7.

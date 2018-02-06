@@ -1,0 +1,17 @@
+Revision history for Devel-Scope
+
+0.05    Tue Feb  6 09:25:03 UTC 2018
+        * Fixed Pod.
+
+0.04    Mon Feb  5 03:36:52 UTC 2018
+        * Added devel-scope.t
+
+0.03    Mon Feb  5 01:23:25 UTC 2018
+        * Added prereqs to Makefile.PL
+
+0.02    Sun Feb  4 11:44:39 UTC 2018
+        * Fixed Documentation
+
+0.01    Sun Feb  4 10:59:02 UTC 2018
+        First version, released on an unsuspecting world.
+

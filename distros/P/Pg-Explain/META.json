@@ -4,7 +4,7 @@
       "hubert depesz lubaczewski <depesz@depesz.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -42,35 +42,35 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::From" : {
          "file" : "lib/Pg/Explain/From.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::FromJSON" : {
          "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::FromText" : {
          "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::FromXML" : {
          "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::FromYAML" : {
          "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::Node" : {
          "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       },
       "Pg::Explain::StringAnonymizer" : {
          "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "0.75"
+         "version" : "0.76"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.75",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.76",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

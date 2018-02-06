@@ -18,11 +18,11 @@ this infomations for ban whith iptables.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(tail initCount iptabBan nginxBan);
@@ -254,7 +254,6 @@ sub nginxBan {
     }
     close $nFD;
 
-    open my $nFD, ">>", $conf or die("Can not open 1 the file!$!\n");
 
     unless ($bid) {
         print "$btime,banip $ip\n";
@@ -264,7 +263,6 @@ sub nginxBan {
         `/usr/bin/kill -HUP $pid`;
     }
 
-    close $nFD;
 
 }
 

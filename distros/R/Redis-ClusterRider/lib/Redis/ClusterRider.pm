@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Redis;
 use List::MoreUtils qw( bsearch );
@@ -222,6 +222,11 @@ sub _discover_cluster {
 
   $self->_execute( 'cluster_state', [], $nodes );
   my $slots = $self->_execute( 'cluster_slots', [], $nodes );
+
+  unless ( @{$slots} ) {
+    croak 'ERR Returned empty list of slots';
+  }
+
   $self->_prepare_nodes($slots);
 
   unless ( defined $self->{_commands} ) {
@@ -346,6 +351,7 @@ sub _new_node {
     server    => $hostport,
     reconnect => 0.001,       # reconnect only once
     every     => 1000,
+    no_auto_connect_on_new => 1,
 
     on_connect => $self->_create_on_node_connect($hostport),
   );
@@ -401,6 +407,10 @@ sub _route {
   }
 
   my $nodes = $self->_nodes( $slot, $allow_slaves );
+
+  unless ( defined $nodes ) {
+    croak 'ERR Target node not found. Maybe not all slots are served';
+  }
 
   return $self->_execute( $cmd_name, $args, $nodes );
 }
@@ -458,6 +468,10 @@ sub _execute {
         my ($fwd_hostport) = ( split( m/\s+/, $err ) )[3];
         $fwd_hostport =~ s/,$//;
 
+        unless ( defined $nodes_pool->{$fwd_hostport} ) {
+          $nodes_pool->{$fwd_hostport} = $self->_new_node( $fwd_hostport );
+        }
+
         return $self->_execute( $cmd_name, $args, [ $fwd_hostport ] );
       }
 
@@ -490,6 +504,8 @@ sub _nodes {
       $slot > $_->[1] ? -1 : $slot < $_->[0] ? 1 : 0;
     }
     @{ $self->{_slots} };
+
+    return unless defined $range;
 
     return $allow_slaves
         ? $range->[2]
@@ -707,9 +723,12 @@ The full list of the Redis commands can be found here: L<http://redis.io/command
 =head1 TRANSACTIONS
 
 To perform the transaction you must get the master node by the key using
-C<nodes> method and then execute all commands on this node.
+C<nodes> method. Then you need to execute C<ECHO> command or any other command
+before C<MULTI> command to avoid the error "reconnect disabled inside
+transaction or watch" because all connection in the cluster client are lazy.
 
   my $node = $cluster->nodes('foo');
+  $node->echo('ping');
 
   $node->multi;
   $node->set( '{foo}bar', "some\r\nstring" );
@@ -773,7 +792,7 @@ Sponsored by SMS Online, E<lt>dev.opensource@sms-online.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2017, Eugene Ponizovsky, SMS Online. All rights reserved.
+Copyright (c) 2017-2018, Eugene Ponizovsky, SMS Online. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

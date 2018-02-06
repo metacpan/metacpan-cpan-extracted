@@ -112,52 +112,91 @@ my $logger
 }
 
 {
-    my $file            = $tempdir->file('no_interruption');
-    my $step_that_lives = AtomicFileGeneratorTest::TwoLineFileGenerator->new(
-        logger     => $logger,
-        should_die => 0,
-        a_file     => $file,
+    package AtomicFileGeneratorTest::TwoLineFileGenerator::PathTiny;
+
+    use Moose;
+
+    use MooseX::Types::Path::Tiny qw( Path );
+    use Stepford::Types qw( Bool );
+
+    with 'Stepford::Role::Step::FileGenerator::Atomic';
+
+    has a_file => (
+        traits => ['StepProduction'],
+        is     => 'ro',
+        isa    => Path,
+        coerce => 1,
     );
 
-    my $pre_commit_file = $step_that_lives->pre_commit_file;
-    is(
-        $pre_commit_file->parent->stringify,
-        $file->parent->stringify,
-        'pre_commit_file and final file are in the same directory'
+    has should_die => (
+        is       => 'ro',
+        isa      => Bool,
+        required => 1,
     );
 
-    $step_that_lives->run;
-    is(
-        $file->slurp,
-        "line 1\nline 2",
-        'file written correctly to final destination when run not'
-            . ' interrupted',
-    );
-
-    undef $step_that_lives;
-    ok(
-        !-f $pre_commit_file,
-        'pre commit file cleaned after step runs'
-    );
+    sub run {
+        my $self = shift;
+        my $file = $self->pre_commit_file;
+        $file->spew('line 1');
+        die 'expected death' if $self->should_die;
+        $file->spew("line 1\nline 2");
+    }
 }
 
-{
-    my $file           = $tempdir->file('interruption');
-    my $step_that_dies = AtomicFileGeneratorTest::TwoLineFileGenerator->new(
-        logger     => $logger,
-        should_die => 1,
-        a_file     => $file,
-    );
+for my $class (
+    qw( AtomicFileGeneratorTest::TwoLineFileGenerator
+    AtomicFileGeneratorTest::TwoLineFileGenerator::PathTiny )
+) {
+    subtest $class => sub {
+        {
+            my $file            = $tempdir->file('no_interruption');
+            my $step_that_lives = $class->new(
+                logger     => $logger,
+                should_die => 0,
+                a_file     => $file,
+            );
 
-    my $pre_commit_file = $step_that_dies->pre_commit_file;
+            my $pre_commit_file = $step_that_lives->pre_commit_file;
+            is(
+                $pre_commit_file->parent->stringify,
+                $file->parent->stringify,
+                'pre_commit_file and final file are in the same directory'
+            );
 
-    exception { $step_that_dies->run };
-    ok( !-e $file, 'file not written at all when run interrupted' );
+            $step_that_lives->run;
+            is(
+                $file->slurp,
+                "line 1\nline 2",
+                'file written correctly to final destination when run not'
+                    . ' interrupted',
+            );
 
-    ok(
-        !-f $pre_commit_file,
-        'pre commit file cleaned even if step dies mid-run'
-    );
+            undef $step_that_lives;
+            ok(
+                !-f $pre_commit_file,
+                'pre commit file cleaned after step runs'
+            );
+        }
+
+        {
+            my $file           = $tempdir->file('interruption');
+            my $step_that_dies = $class->new(
+                logger     => $logger,
+                should_die => 1,
+                a_file     => $file,
+            );
+
+            my $pre_commit_file = $step_that_dies->pre_commit_file;
+
+            exception { $step_that_dies->run };
+            ok( !-e $file, 'file not written at all when run interrupted' );
+
+            ok(
+                !-f $pre_commit_file,
+                'pre commit file cleaned even if step dies mid-run'
+            );
+        }
+    };
 }
 
 {

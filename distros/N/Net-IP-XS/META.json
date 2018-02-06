@@ -4,7 +4,7 @@
       "Tom Harrison <tomhrr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -45,6 +45,6 @@
          "url" : "https://github.com/tomhrr/p5-Net-IP-XS"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

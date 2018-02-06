@@ -1,6 +1,6 @@
 package HTML::DOM::Event::Mouse;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 use warnings; no warnings qw 'utf8 parenthesis';
 use strict;
@@ -53,7 +53,7 @@ HTML::DOM::Event::Mouse - A Perl class for HTML DOM mouse event objects
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

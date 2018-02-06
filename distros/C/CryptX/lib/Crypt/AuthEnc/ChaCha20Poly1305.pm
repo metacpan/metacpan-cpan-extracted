@@ -2,9 +2,9 @@ package Crypt::AuthEnc::ChaCha20Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
-use base qw(Crypt::AuthEnc Exporter);
+require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
@@ -13,39 +13,7 @@ use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
 
-sub new {
-  my $class = shift;
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  return _new(@_);
-}
-
-sub chacha20poly1305_encrypt_authenticate {
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $plaintext = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->encrypt_add($plaintext);
-  my $tag = $m->encrypt_done;
-  return ($ct, $tag);
-}
-
-sub chacha20poly1305_decrypt_verify {
-  my $key = shift;
-  my $iv = shift;
-  my $adata = shift;
-  my $ciphertext = shift;
-  my $tag = shift;
-
-  local $SIG{__DIE__} = \&CryptX::_croak;
-  my $m = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
-  $m->adata_add(defined $adata ? $adata : ''); #XXX-TODO if no aad we have to pass empty string
-  my $ct = $m->decrypt_add($ciphertext);
-  return $m->decrypt_done($tag) ? $ct : undef;
-}
+sub CLONE_SKIP { 1 } # prevent cloning
 
 1;
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.012
+    version 0.014
 
 SYNOPSIS
 
@@ -37,15 +37,22 @@ raylib
     NOTE for ADVENTURERS: raylib is a programming library to learn
     videogames programming; no fancy interface, no visual helpers, no
     auto-debugging... just coding in the most pure spartan-programmers way.
-    Are you ready to learn? Jump to code examples!.
+    Are you ready to learn? Jump to code examples
+    <http://www.raylib.com/examples.html> or games
+    <http://www.raylib.com/games.html>!.
 
 IMPLEMENTATION
 
     This is a Perlish wrapper around Graphics::Raylib::XS, but not yet
-    feature complete.
+    feature complete. You can import Graphics::Raylib::XS for any functions
+    not yet exposed perlishly. Check out the examples/ directory for
+    examples on how to do so.
 
-    You can import Graphics::Raylib::XS for any functions not yet exposed
-    perlishly. Scroll down for an example.
+TESTING
+
+    If you want to skip graphical tests when installing, define
+    NO_GRAPHICAL_TEST in the environment. These tests are also skipped
+    automatically if no graphic device is available.
 
 AUTOMATIC IMPORT
 
@@ -65,6 +72,8 @@ METHODS/SUBS AND ARGUMENTS
       defaults to $0. Resources allocated for the window are freed when the
       handle returned by window goes out of scope.
 
+      If no graphic device is available it returns an undef value.
+
     fps($fps)
 
       If $fps is supplied, sets the frame rate to that value. Returns the
@@ -81,7 +90,11 @@ METHODS/SUBS AND ARGUMENTS
 
     draw($coderef)
 
-      Begins drawing, calls $coderef-()> and ends drawing. See examples.
+      Begins drawing, calls $coderef->() and ends drawing. See examples.
+
+    draw3D($coderef)
+
+      Begins 3D drawing, calls $coderef-()> and ends drawing. See examples.
 
 EXAMPLES
 
@@ -153,11 +166,21 @@ EXAMPLES
 
  Result
 
+ More?
+
+    Check out the examples/
+    <https://github.com/athreef/Graphics-Raylib/tree/master/examples>
+    directory in the distribution or at raylib
+    <https://github.com/raysan5/raylib/tree/master/examples>. Also check
+    out the games in the repository!
+
 GIT REPOSITORY
 
     http://github.com/athreef/Graphics-Raylib
 
 SEE ALSO
+
+    http://www.raylib.com
 
     Graphics::Raylib::Shape
 
@@ -169,8 +192,16 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2017 Ahmad Fatoum
+    Copyright (C) 2017-2018 Ahmad Fatoum
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+RAYLIB LICENSE
+
+    This is an unofficial wrapper of http://www.raylib.com.
+
+    raylib is Copyright (c) 2013-2016 Ramon Santamaria and available under
+    the terms of the zlib/libpng license. Refer to XS/LICENSE.md for full
+    terms.
 

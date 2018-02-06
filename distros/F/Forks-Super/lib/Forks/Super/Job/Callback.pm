@@ -18,7 +18,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(run_callback);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 sub run_callback {
     my ($job, $callback) = @_;

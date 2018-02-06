@@ -8,7 +8,7 @@ use HTML::DOM::Node qw 'TEXT_NODE ATTRIBUTE_NODE';
 require HTML::DOM::CharacterData;
 
 our @ISA = 'HTML::DOM::CharacterData';
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 
 =head1 NAME
@@ -17,7 +17,7 @@ HTML::DOM::Text - A Perl class for representing text nodes in an HTML DOM tree
 
 =head1 VERSION
 
-Version 0.057
+Version 0.058
 
 =head1 SYNOPSIS
 

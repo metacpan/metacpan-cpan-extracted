@@ -4,48 +4,49 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "Compatibility layer between RDF::Trine and Attean",
-  "author"         => [
-                        "Kjetil Kjernsmo <kjetilk\@cpan.org>",
-                        "KJETILK <kjetilk\@cpan.org>",
-                      ],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
-  "keywords"       => [],
-  "license"        => ["perl_5"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "AtteanX-Compatibility-Trine",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => { requires => { Attean => 0 } },
-                        test      => { requires => { "Test::More" => 0.96 } },
-                      },
-  "provides"       => {
-                        "Attean::Blank" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
-                        "Attean::IRI" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
-                        "Attean::Literal" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
-                        "AtteanX::Compatibility::Trine" => { file => "lib/AtteanX/Compatibility/Trine.pm", version => 0.001 },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => {
-                                          web => "https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues",
-                                        },
-                        homepage     => "https://metacpan.org/release/AtteanX-Compatibility-Trine",
-                        license      => ["http://dev.perl.org/licenses/"],
-                        repository   => {
-                                          type => "git",
-                                          url  => "git://github.com/kjetilk/p5-atteanx-compatibility-trine.git",
-                                          web  => "https://github.com/kjetilk/p5-atteanx-compatibility-trine",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Compatibility-Trine/project",
-                      },
-  "version"        => 0.001,
+  "abstract"         => "Compatibility layer between RDF::Trine and Attean",
+  "author"           => [
+                          "Kjetil Kjernsmo <kjetilk\@cpan.org>",
+                          "KJETILK <kjetilk\@cpan.org>",
+                        ],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => [],
+  "license"          => ["perl_5"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
+                        },
+  "name"             => "AtteanX-Compatibility-Trine",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          runtime   => { requires => { Attean => 0.019 } },
+                          test      => { requires => { "Test::More" => 0.96 } },
+                        },
+  "provides"         => {
+                          "Attean::Blank" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
+                          "Attean::IRI" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
+                          "Attean::Literal" => { file => "lib/AtteanX/Compatibility/Trine.pm" },
+                          "AtteanX::Compatibility::Trine" => { file => "lib/AtteanX/Compatibility/Trine.pm", version => 0.002 },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => {
+                                            web => "https://github.com/kjetilk/p5-atteanx-compatibility-trine/issues",
+                                          },
+                          homepage     => "https://metacpan.org/release/AtteanX-Compatibility-Trine",
+                          license      => ["http://dev.perl.org/licenses/"],
+                          repository   => {
+                                            type => "git",
+                                            url  => "git://github.com/kjetilk/p5-atteanx-compatibility-trine.git",
+                                            web  => "https://github.com/kjetilk/p5-atteanx-compatibility-trine",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/AtteanX-Compatibility-Trine/project",
+                        },
+  "version"          => 0.002,
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

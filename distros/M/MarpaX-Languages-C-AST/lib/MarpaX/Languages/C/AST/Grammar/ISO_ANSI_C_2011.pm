@@ -8,7 +8,7 @@ use IO::String;
 
 # ABSTRACT: ISO ANSI C 2011 grammar written in Marpa BNF
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 our %DEFAULT_PAUSE = (
@@ -133,7 +133,7 @@ MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011 - ISO ANSI C 2011 grammar wr
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -677,10 +677,10 @@ directAbstractDeclarator
         | directAbstractDeclarator LBRACKET typeQualifierList STATIC assignmentExpression RBRACKET
         | directAbstractDeclarator LBRACKET typeQualifierList RBRACKET
         | directAbstractDeclarator LBRACKET assignmentExpression RBRACKET
-        | LPAREN_SCOPE RPAREN_SCOPE
-        | LPAREN_SCOPE parameterTypeList RPAREN_SCOPE
-        | directAbstractDeclarator LPAREN_SCOPE RPAREN_SCOPE
-        | directAbstractDeclarator LPAREN_SCOPE parameterTypeList RPAREN_SCOPE
+        | LPAREN RPAREN
+        | LPAREN parameterTypeList RPAREN
+        | directAbstractDeclarator LPAREN RPAREN
+        | directAbstractDeclarator LPAREN parameterTypeList RPAREN
 
 initializer
         ::= LCURLY initializerList RCURLY
@@ -1306,7 +1306,8 @@ gccAsmClobberList ::= gccAsmClobber | gccAsmClobberList COMMA gccAsmClobber
 
 gccAsmOperandList ::= gccAsmOperand | gccAsmOperandList COMMA gccAsmOperand
 
-gccAsmInnerClobberList ::= COLON gccAsmClobberList
+gccAsmInnerClobberList ::= COLON
+                         | COLON gccAsmClobberList
 
 gccAsmInnerOperandList2 ::= COLON
                           | COLON gccAsmInnerClobberList

@@ -7,30 +7,30 @@ This directory contains the SkyCat configuration files. Current files are:
            the returned SuperCOSMOS catalogue is in TST format with the columns
            returned being as follows,
 
-                 Column  Content        Unit                   Type     
+                 Column  Content        Unit                   Type
                  ------  -------        ----                   ----
-                 0       id             none                   INTEGER         
-                 1       ra             DEGREES{IHMS.3}        DOUBLE        
-                 2       dec            DEGREES{+IDMS.2}       DOUBLE        
-                 3       objepoch       year                   REAL         
-                 4       MU_ACOSD       mas/yr                 REAL         
-                 5       MU_D           mas/yr                 REAL         
-                 6       SIGMU_A        mas/yr                 REAL         
-                 7       SIGMU_D        mas/yr                 REAL         
-                 8       B_J            magnitude              REAL         
-                 9       R_1            magnitude              REAL         
-                10       R_2            magnitude              REAL         
-                11       I              magnitude              REAL         
-                12       AREA           pixels                 INTEGER        
-                13       A_I            0.01 um                INTEGER        
-                14       B_I            0.01 um                INTEGER        
-                15       PA             degrees                INTEGER        
-                16       CLASS                                 INTEGER        
-                17       N_0_1          sigma                  REAL       
-                18       BLEND                                 INTEGER        
-                19       QUALITY                               INTEGER        
-                20       FLDNO                                 INTEGER        
-          
+                 0       id             none                   INTEGER
+                 1       ra             DEGREES{IHMS.3}        DOUBLE
+                 2       dec            DEGREES{+IDMS.2}       DOUBLE
+                 3       objepoch       year                   REAL
+                 4       MU_ACOSD       mas/yr                 REAL
+                 5       MU_D           mas/yr                 REAL
+                 6       SIGMU_A        mas/yr                 REAL
+                 7       SIGMU_D        mas/yr                 REAL
+                 8       B_J            magnitude              REAL
+                 9       R_1            magnitude              REAL
+                10       R_2            magnitude              REAL
+                11       I              magnitude              REAL
+                12       AREA           pixels                 INTEGER
+                13       A_I            0.01 um                INTEGER
+                14       B_I            0.01 um                INTEGER
+                15       PA             degrees                INTEGER
+                16       CLASS                                 INTEGER
+                17       N_0_1          sigma                  REAL
+                18       BLEND                                 INTEGER
+                19       QUALITY                               INTEGER
+                20       FLDNO                                 INTEGER
+
            the Astro::Catalog::Query::SuperCOSMOS module is used to query the
            catalogue servers at ROE for this catalogue. The generic SkyCat
            module is unable to do so due to the rather odd URL's for the

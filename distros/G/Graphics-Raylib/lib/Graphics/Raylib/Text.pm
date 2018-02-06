@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Text;
 
 # ABSTRACT: Output text to window
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 use Graphics::Raylib::Color;
@@ -19,7 +19,7 @@ Graphics::Raylib::Text - Output text to window
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ version 0.012
 
 =over 4
 
-=item new( text => $text, color => $color, pos => [$x, $y], size => [$width, $height] )
+=item new( text => $text, color => $color, position => [$x, $y], size => [$width, $height] )
 
 Constructs a new Graphics::Raylib::Text instance. Position defaults to C<[0,0]> and size to C<10>.
 
@@ -61,7 +61,7 @@ sub new {
     my $class = shift;
 
     my $self = {
-        pos => [0,0],
+        position => [0,0],
         size => 10,
         color => Graphics::Raylib::Color::RED,
         @_
@@ -79,17 +79,17 @@ Constructs a new Graphics::Raylib::Text instance. Position defaults to C<[0,0]> 
 
 sub draw {
     my $self = shift;
-    return $self->{func}() if defined $self->{func};
+    return $self->{func}->() if defined $self->{func};
 
     return unless defined $self->{text};
     if (defined $self->{font}) {
         DrawTextEx (
             $self->{font}, $self->{text},
-            $self->{pos}, $self->{size},
+            $self->{position}, $self->{size},
             $self->{spacing}, $self->{color}
         );
     } else {
-        DrawText($self->{text}, @{$self->{pos}}, $self->{size}, $self->{color});
+        DrawText($self->{text}, @{$self->{position}}, $self->{size}, $self->{color});
     }
 }
 
@@ -117,7 +117,7 @@ An already constructed C<Graphics::Raylib::Text>, that draws FPS to the top left
 
 =cut
 
-use constant FPS => Graphics::Raylib::Text->new(func => sub { DrawFPS(0, 0) });
+use constant FPS => Graphics::Raylib::Text->new(func => sub { DrawFPS(1, 1) });
 
 
 1;

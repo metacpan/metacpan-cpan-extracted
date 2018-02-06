@@ -1,12 +1,14 @@
 @rem = q{--* Perl *--
 @::# (emacs/sublime) -*- mode: perl; tab-width: 4; coding: dos; -*-
-@::# bin\xx.bat, 0.938 ( [git:blead] r351:36a8ab1c4600; Roy Ivy III <rivy.dev@gmail.com> )
+@::# "bin/xx.bat" 0.954 (from "PL.#no-dist/bin/xx.bat.PL")
+@setlocal &:: localize ENV changes until sourcing is pending
 @echo off
 :: eXpand and eXecute command line
 :: similar to linux xargs
 
 :: ToDO: perl must be referenced here as 'perl.exe' to avoid infinite recursion if this is called via a 'perl.BAT' batch script as "xx perl.exe $*"; using shell aliasing will avoid this complication, but is there another way to keep the script here clean of expectation of perl as PERL.EXE?
 :: ToDO: clean up documentation/comments
+:: ToDO: remove TCC/4NT compatiblity code
 
 :: parent environment is kept untouched except as modified by "sourcing" of target command line text or executable output
 :: contains batch file techniques to allow "sourcing" of target command line text or executable output
@@ -14,8 +16,7 @@
 
 :: NOTE: TCC/4NT quirk => use %% for %, whereas CMD.exe % => as long as it does not introduce a known variable (eg, for CMD, %not_a_var => %not_a_var although %windir => C:\WINDOWS)
 
-:: localize ENV changes until sourcing is pending
-setlocal
+set "ERRORLEVEL=" &:: defensively reset ERRORLEVEL (avoiding any prior pinned value)
 
 set _xx_bat=nul
 
@@ -43,14 +44,14 @@ if NOT [%_xx_bat%]==[nul] ( goto :source_expansion )
 ::echo "perl output - no -s/-so"
 ::perl.exe -x -S %0 %*      &:: if needed to avoid infinite recursion while using a PERL.BAT script
 perl -x -S %0 %*
-set _ERROR=%errorlevel%
+set "_ERROR=%ERRORLEVEL%" &:: save ERRORLEVEL into _ERROR for later processing
 if "%_ERROR%" == "0" ( goto :NO_EXIT_ERROR )
 perl -e "exit 0"
-if NOT "%errorlevel%" == "0" (
+if NOT "%ERRORLEVEL%" == "0" (
     echo "ERROR: perl is required, but it is not executable; please install Perl and/or add perl to the PATH [see http://strawberryperl.com]"
     )
-::  propagate %errorlevel%
-exit /B %_ERROR%
+:: propagate ERRORLEVEL (via %_ERROR%)
+goto #_undefined_label_# 2>nul || "%COMSPEC%" /d /c exit %_ERROR%
 :NO_EXIT_ERROR
 endlocal
 goto :_DONE
@@ -65,41 +66,40 @@ echo @echo OFF >> %_xx_bat%
 ::echo perl output [source expansion { perl -x -S %0 %* }]
 ::perl.exe -x -S %0 %* >> %_xx_bat%     &:: if needed to avoid infinite recursion while using a PERL.BAT script
 perl -x -S %0 %* >> %_xx_bat%
-set _ERROR=%errorlevel%
+set _ERROR=%ERRORLEVEL%
 ::echo "sourcing - BAT created"
 if NOT "%_ERROR%" == "0" (
 ::  echo _ERROR=%ERROR%
     erase %_xx_bat% 1>nul 2>nul
     perl -e 0
-    if "%errorlevel%" == "0" (
+    if "%ERRORLEVEL%" == "0" (
         echo "ERROR: perl is required, but it is not executable; please install and/or add perl to the PATH"
         )
-    exit /B %_ERROR%
+    goto #_undefined_label_# 2>nul || "%COMSPEC%" /d /c exit %_ERROR%
     )
 ::echo "sourcing & cleanup..."
 :: propagate exit code from _xx_bat after it is sourced
-:: NOTES: :: erase RESETS %errorlevel% depending on outcome (overriding any %_xx_bat% errors
-::        :: if ERRORLEVEL N doesn't check for negative ERRORLEVELs
-:: use subroutines to preserve ENVIRONMENT variables and %ERRORLEVEL% (can use %N instead of polluting ENVIRONMENT to save %ERRORLEVEL%)
-endlocal & call :source_expansion_FINAL %_xx_bat%
+endlocal & call :source_and_erase %_xx_bat%
+if NOT "%ERRORLEVEL" == "0" ( set "ERRORLEVEL=" & goto #_undefined_label_# 2>nul || "%COMSPEC%" /d /c exit %_ERROR% )
+set "ERRORLEVEL=" &:: un-pin ERRORLEVEL
 goto :_DONE
+
 ::
-:source_expansion_FINAL
-::echo in FINAL [exec "%1%"]
+:source_and_erase &:: ( SOURCE_FILE ) ## SOURCE_FILE is already quoted, if needed
+:: NOTE: returns with ERRORLEVEL *pinned* to the value obtained while sourcing SOURCE_FILE
+::echo [exec "%1%"]
 call %1
-call :source_expansion_CLEANUP %1 %errorlevel%
-goto :EOF
-:source_expansion_CLEANUP
-::echo FINAL [erase TEMP (file=%1), ERRORLEVEL=%2]
+set "ERRORLEVEL=%ERRORLEVEL%" &:: pin ERRORLEVEL prior to erase (which resets it based on outcome)
+::echo FINAL [erase TEMP (file=%1)]
 erase %1 1>nul 2>nul
-exit /B %2
 goto :EOF
+::
 
 :_DONE
 goto :endofperl
 @rem };
 #!perl -w --
-#NOTE: use '#line NN' (where NN = actual_line_number + 1) to set perl line # for errors/warnings
+#NOTE: use '#line NN' (where NN = actual_line_number + 1) to set perl line # for errors/warnings; NOTE: 'actual_line_number' is from the *output* file not the template
 #line 104
 
 ## TODO: add normal .pl utility documentation/POD, etc [IN PROCESS]
@@ -130,13 +130,15 @@ goto :endofperl
 
 # Script Summary
 
+=for stopwords CMD eXpand eXecute pl2bat
+
 =head1 NAME
 
 xx - eXpand (reparse) and eXecute the command line
 
 =head1 VERSION
 
-This document describes C<xx>, v 0.938.
+This document describes C<xx>, v 0.954.
 
 =head1 SYNOPSIS
 
@@ -197,12 +199,12 @@ COMMAND...
 
 B<xx> will read expand the command line and execute the COMMAND.
 
-NOTE: B<xx> is designed for use with legacy commands to graft on better command line interpretation behaviors. It shouldn't generally be necessary to use B<xx> on commands which already use Win32::CommandLine::argv() internally as the command line will be re-interpreted. If that's the behavior desired, that's fine; but think about it.
-??? what about pl2bat'ed perl scripts? Since the command line is used within the wrapping batch file, is it clean for the .pl file or does it need xx wrapping as well?
+NOTE: B<xx> is designed for use with legacy commands to graft on better command line interpretation behaviors. Generally, it's not necessary to use B<xx> on commands which already use Win32::CommandLine::argv(), as the command line will be re-interpreted. If that's the behavior desired, that's fine; but think about it.
+??? what about pl2bat-wrapped perl scripts? Since the command line is used within the wrapping batch file, is it clean for the .pl file or does it need xx wrapping as well?
 
 =head1 EXAMPLES
 
-Here are some examples of what's possible in the standard cmd and tcc shells:
+Here are some examples of what's possible in the standard CMD shell:
 
     xx $( perl -MConfig -e "print $Config{cc}" ) $(perl -MExtUtils::Embed -e ccopts) foo.c -o foo
 
@@ -212,22 +214,23 @@ Here are some examples of what's possible in the standard cmd and tcc shells:
     xx $( perl -MConfig -e "print $Config{ld}" ) $("perl -MExtUtils::Embed -e ldopts 2>nul") bar.o
 
 =cut
-
 use strict;
 use warnings;
 
 # VERSION: Major.minor[_alpha]  { minor is ODD => alpha/beta/experimental; minor is EVEN => stable/release }
-# * NOTE: "boring" versions are preferred (see: http://www.dagolden.com/index.php/369/version-numbers-should-be-boring @@ https://archive.is/7PZQL)
-{;## no critic ( RequireConstantVersion )
-our $VERSION = '0.938';    # VERSION definition
-$VERSION =~ s/_//g;     # numify VERSION (needed for alpha versions)
+# * NOTE: simple decimal ("boring") versions are preferred (see: <http://www.dagolden.com/index.php/369/version-numbers-should-be-boring>[`@`](https://archive.is/7PZQL))
+# * NOTE: *two-line* version definition is intentional so that Module::Build / CPAN get a correct alpha version, but users receive a simple decimal version
+{
+    ; ## no critic ( RequireConstantVersion )
+    our $VERSION = '0.954';    # VERSION definition
+    $VERSION =~ s/_//g;                   # numify VERSION (needed for alpha versions)
 }
 
 use Pod::Usage;
 
 use Carp::Assert;
 
-use FindBin; # NOTE: BEGIN is used in FindBin; this can incompatible with any other modules using FindBin; so, DON'T use with any *module* submitted to CPAN; ## URLref: [perldoc::FindBin - Known Issues] http://perldoc.perl.org/FindBin.html#KNOWN-ISSUES
+use FindBin;                              # NOTE: BEGIN is used in FindBin; this can incompatible with any other modules using FindBin; so, DON'T use with any *module* submitted to CPAN; ## URLref: [perldoc::FindBin - Known Issues] http://perldoc.perl.org/FindBin.html#KNOWN-ISSUES
 
 use ExtUtils::MakeMaker;
 
@@ -238,33 +241,32 @@ use ExtUtils::MakeMaker;
 use Getopt::Long qw(:config bundling bundling_override gnu_compat no_getopt_compat no_permute pass_through); ## # no_permute/pass_through to parse all args up to 1st unrecognized or non-arg or '--'
 # PRE-parse for nullglob option before initial expansion of command line (to avoid double expansion of the command line and possible subshell side-effects)
 my %ARGV = ();
-GetOptions (\%ARGV, 'echo|e|s', 'so', 'args|a', 'nullglob=s', 'help|h|?|usage', 'man', 'version|ver|v');
+GetOptions( \%ARGV, 'echo|e|s', 'so', 'args|a', 'nullglob=s', 'help|h|?|usage', 'man', 'version|ver|v' );
 if ( exists $ARGV{'nullglob'} ) { $ENV{'nullglob'} = $ARGV{'nullglob'}; }
 
-my $showUsage = ( @ARGV < 1 );  # show usage only if no arguments (check _before_ a possible nullglob replacement of any/all globs by NULL)
+my $showUsage = ( @ARGV < 1 );    # show usage only if no arguments (check _before_ a possible nullglob replacement of any/all globs by NULL)
 
 use Win32::CommandLine;
 
-@ARGV = Win32::CommandLine::argv( { dosify => 'true', dosquote => 'true' } );   # if eval { require Win32::CommandLine; }; ## depends on Win32::CommandLine (and installed with it) so we want the error if its missing or unable to load
+@ARGV = Win32::CommandLine::argv( { dosify => 'true', dosquote => 'true' } );    # if eval { require Win32::CommandLine; }; ## depends on Win32::CommandLine (and installed with it) so we want the error if its missing or unable to load
 
 #-- do main getopt
 ##use Getopt::Long qw(:config bundling bundling_override gnu_compat no_getopt_compat no_permute pass_through); ##   # no_permute/pass_through to parse all args up to 1st unrecognized or non-arg or '--'
 %ARGV = ();
 # NOTE: the 'source' option '-s' is bundled into the 'echo' option since 'source' is exactly the same as 'echo' to the internal perl script. Sourcing is done by wrapping the BAT script by executing the output of the perl script.
-GetOptions (\%ARGV, 'echo|e|s', 'so', 'args|a', 'nullglob=s', 'help|h|?|usage', 'man', 'version|ver|v');
+GetOptions( \%ARGV, 'echo|e|s', 'so', 'args|a', 'nullglob=s', 'help|h|?|usage', 'man', 'version|ver|v' );
 #Getopt::Long::VersionMessage() if $ARGV{'version'};
-do {print q{}.(File::Spec->splitpath($0))[2].qq{ v$::VERSION}.qq{\n}; exit(0);} if $ARGV{'version'};
+do { print q{} . ( File::Spec->splitpath($0) )[2] . qq{ v$::VERSION} . qq{\n}; exit(0); } if $ARGV{'version'};
 pod2usage(1) if $ARGV{'help'};
-pod2usage({-verbose => 2}) if $ARGV{'man'};
+pod2usage( { -verbose => 2 } ) if $ARGV{'man'};
 
 pod2usage(1) if $showUsage;
 
-if ( $ARGV{args} )
-    {
+if ( $ARGV{args} ) {
     my $cl = Win32::CommandLine::command_line();
-    print ' $ENV{CMDLINE}'." = `".($ENV{CMDLINE}?$ENV{CMDLINE}:'<null>')."`\n";
-    print 'command_line()'." = `$cl`\n";
-    }
+    print ' $ENV{CMDLINE}' . " = `" . ( $ENV{CMDLINE} ? $ENV{CMDLINE} : '<null>' ) . "`\n";
+    print 'command_line()' . " = `$cl`\n";
+}
 
 ## unfortunately the args (which are correct at this point) are reparsed while going to the target command through CreateProcess() (PERL BUG: despite explicit documentation in PERL that system bypasses the shell and goes directly to execvp() for scalar(@ARGV) > 1 although there is no obvious work around since execvp() doesn't really exist in Win32 and must be emulated through CreateProcess())
 ## so, we must protect the ARGs from CreateProcess() reparsing destruction
@@ -282,20 +284,22 @@ if ( $ARGV{args} )
 # TODO: check echo %% "%%" => echo % % => % % [doesn't work for TCC or CMD]
 
 # untaint
-$ENV{PATH} =~ /\A(.*)\z/mxs; $ENV{PATH} = ( defined $1 ? $1 : undef );
+$ENV{PATH} =~ /\A(.*)\z/mxs;
+$ENV{PATH} = ( defined $1 ? $1 : undef );
 
-
-if ( $ARGV{args} )
-    {
-    for (my $i = 0; $i < @ARGV; $i++) { print '$ARGV'."[$i] = `$ARGV[$i]`\n"; }
-    }
+if ( $ARGV{args} ) {
+    for ( my $i = 0 ; $i < @ARGV ; $i++ ) { print '$ARGV' . "[$i] = `$ARGV[$i]`\n"; }
+}
 
 #system { $ARGV[0] } @ARGV;     # doesn't see "echo" as a command (?? might be a problem for all CMD built-ins)
-if ( not $ARGV{args} )
-    {
+if ( not $ARGV{args} ) {
     ## TODO: REDO this comment -- unfortunately the args (which are correct at this point) are reparsed while going to the target command through CreateProcess() (PERL BUG: despite explicit documentation in PERL that system bypasses the shell and goes directly to execvp() for scalar(@ARGV) > 1 although there is no obvious work around since execvp() doesn't really exist in Win32 and must be emulated through CreateProcess())
-    if ($ARGV{echo} ) { print join(" ",@ARGV); } else { if ($ARGV{so}) { my $x = join(" ",@ARGV); print `$x`; exit($? >> 8);} else { exit((system @ARGV) >> 8); }}
+    if ( $ARGV{echo} ) { print join( " ", @ARGV ); }
+    else {
+        if ( $ARGV{so} ) { my $x = join( " ", @ARGV ); print `$x`; exit( $? >> 8 ); }
+        else             { exit( ( system @ARGV ) >> 8 ); }
     }
+}
 
 __END__
 :endofperl

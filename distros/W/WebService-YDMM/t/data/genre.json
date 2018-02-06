@@ -1,0 +1,71 @@
+{
+    "request": {
+        "parameters": {
+            "Genre": "",
+            "api_id": "example",
+            "affiliate_id": "affiliate-990",
+            "initial": "き",
+            "floor_id": "25",
+            "hits": "10",
+            "offset": "10",
+            "output": "json"
+        }
+    },
+    "result": {
+        "status": "200",
+        "result_count": 7,
+        "total_count": "16",
+        "first_position": 9,
+        "site_name": "DMM.com（一般）",
+        "site_code": "DMM.com",
+        "service_name": "通販",
+        "service_code": "mono",
+        "floor_id": "25",
+        "floor_name": "DVD・Blu-ray",
+        "floor_code": "dvd",
+        "genre": [
+            {
+                "genre_id": "73115",
+                "name": "キャラクター",
+                "ruby": "きゃらくたー",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=73115/affiliate-990"
+            },
+            {
+                "genre_id": "73117",
+                "name": "キッズ",
+                "ruby": "きっず",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=73117/affiliate-990"
+            },
+            {
+                "genre_id": "73130",
+                "name": "近未来",
+                "ruby": "きんみらい",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=73130/affiliate-990"
+            },
+            {
+                "genre_id": "73145",
+                "name": "教育",
+                "ruby": "きょういく",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=73145/affiliate-990"
+            },
+            {
+                "genre_id": "74119",
+                "name": "キッズ",
+                "ruby": "きっず",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=74119/affiliate-990"
+            },
+            {
+                "genre_id": "77042",
+                "name": "近未来",
+                "ruby": "きんみらい",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=77042/affiliate-990"
+            },
+            {
+                "genre_id": "78038",
+                "name": "近未来",
+                "ruby": "きんみらい",
+                "list_url": "http://www.dmm.com/mono/dvd/-/list/=/article=keyword/id=78038/affiliate-990"
+            }
+        ]
+    }
+}

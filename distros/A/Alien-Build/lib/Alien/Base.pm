@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_merged/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 sub import {
@@ -274,8 +274,19 @@ sub config {
   }
 
   my $config = $class . '::ConfigData';
-  eval "require $config";
-  warn $@ if $@;
+  my $pm = "$class/ConfigData.pm";
+  $pm =~ s{::}{/}g;
+  eval { require $pm };
+  
+  if($@)
+  {
+    warn "Cannot find either a share directory or a ConfigData module for $class.\n";
+    my $pm = "$class.pm";
+    $pm =~ s{::}{/}g;
+    warn "($class loaded from $INC{$pm})\n" if $INC{$pm};
+    warn "Please see https://metacpan.org/pod/distribution/Alien-Build/lib/Alien/Build/Manual/FAQ.pod#Cannot-find-either-a-share-directory-or-a-ConfigData-module\n";
+    die $@;
+  }
 
   return $config->config(@_);
 }
@@ -438,7 +449,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -901,6 +912,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

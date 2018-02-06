@@ -1,19 +1,18 @@
 package Bio::FastParsers::Hmmer::Standard::Target;
 # ABSTRACT: internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.173640';
+$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
 
 use List::AllUtils qw(indexes);
 
 use aliased 'Bio::FastParsers::Hmmer::Standard::Domain';
-with 'Bio::FastParsers::Hmmer::Roles::Targetable';
 
 
 # public attributes
 
-# TODO: check if this an empty ArrayRef would not make more sense that Maybe
+# TODO: check if this an empty ArrayRef would not make more sense than Maybe
 # We dont want smth else than a Domain in this ArrayRef
 # so it is more a matter of precision than sense
 has 'domains' => (
@@ -29,6 +28,7 @@ has 'domains' => (
     },
 );
 
+with 'Bio::FastParsers::Roles::Targetable';
 
 # parse Target block (raw)...
 # ... and retrieve attrs from the corresponding line of hit table (Hit)
@@ -83,7 +83,7 @@ Bio::FastParsers::Hmmer::Standard::Target - internal class for standard HMMER pa
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

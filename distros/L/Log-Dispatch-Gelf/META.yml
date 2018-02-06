@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,20 +29,22 @@ no_index:
 provides:
   Log::Dispatch::Gelf:
     file: lib/Log/Dispatch/Gelf.pm
-    version: v1.3.0
+    version: v1.3.1
 recommends:
   JSON::XS: '2.0'
 requires:
   Log::Dispatch: '0'
   Log::GELF::Util: '0.90'
+  Params::Validate: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/avast/log-dispatch-gelf/issues
   homepage: https://github.com/avast/log-dispatch-gelf
   repository: git://github.com/avast/log-dispatch-gelf.git
-version: 1.3.0
+version: 1.3.1
 x_contributors:
   - 'Jan Seidl <seidl@avast.com>'
   - 'Adam Clarke <adam.clarke@strategicdata.com.au>'
   - 'tynovsky <tynovsky@seznam.cz>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Mohelníková Lucie <mohelnikova@avast.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

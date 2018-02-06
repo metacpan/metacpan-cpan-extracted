@@ -7,7 +7,7 @@ Attean::BindingEqualityTest - Test for equality of binding sets with bnode isomo
 
 =head1 VERSION
 
-This document describes Attean::BindingEqualityTest version 0.018
+This document describes Attean::BindingEqualityTest version 0.019
 
 =head1 SYNOPSIS
 
@@ -28,7 +28,7 @@ This document describes Attean::BindingEqualityTest version 0.018
 
 =cut
 
-package Attean::BindingEqualityTest 0.018 {
+package Attean::BindingEqualityTest 0.019 {
 	use v5.14;
 	use warnings;
 	use Moo;
@@ -249,7 +249,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

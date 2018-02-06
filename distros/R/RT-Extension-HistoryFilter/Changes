@@ -1,5 +1,14 @@
 Revision history for RT::Extension::HistoryFilter
 
+2.02 2018-02-05
+ - update Module::Install and friends
+ - add a hint to this extension on the configuration widget
+ - sync html/Widgets/Form/Select with RT 4.4.2
+ - filter transactions on all pages except ticket history
+ - add .travis.yml
+ - add some basic tests
+ - update Module::Install::RTx
+
 2.01 2016-05-30
  - update Module::Install::ReadmeFromPod
  - support SelfService again

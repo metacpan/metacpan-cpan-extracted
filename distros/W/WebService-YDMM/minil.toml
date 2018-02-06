@@ -1,0 +1,6 @@
+name = "WebService-YDMM"
+badges = ["travis" , "metacpan"]
+authority="cpan:ANATOFUZ"
+
+module_maker="ModuleBuildTiny"
+

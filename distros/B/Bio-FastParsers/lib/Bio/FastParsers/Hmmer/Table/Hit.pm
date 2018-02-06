@@ -1,10 +1,9 @@
 package Bio::FastParsers::Hmmer::Table::Hit;
 # ABSTRACT: internal class for tabular HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Table::Hit::VERSION = '0.173640';
+$Bio::FastParsers::Hmmer::Table::Hit::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
-with 'Bio::FastParsers::Hmmer::Roles::Targetable';
 
 
 # public attributes
@@ -21,6 +20,7 @@ has $_ => (
     required => 1,
 ) for qw(reg clu ov env rep inc);
 
+with 'Bio::FastParsers::Roles::Targetable';
 
 
 sub expect {
@@ -41,7 +41,7 @@ Bio::FastParsers::Hmmer::Table::Hit - internal class for tabular HMMER parser
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

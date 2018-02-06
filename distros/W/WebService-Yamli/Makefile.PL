@@ -30,11 +30,12 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
+    "Test::Needs" => 0,
     "Test::RequiresInternet" => 0,
     "blib" => "1.01",
     "utf8" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "LWP::UserAgent" => 0,
   "Test::More" => 0,
+  "Test::Needs" => 0,
   "Test::RequiresInternet" => 0,
   "URI" => 0,
   "blib" => "1.01",

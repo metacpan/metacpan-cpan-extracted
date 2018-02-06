@@ -17,6 +17,8 @@ my @files = (
     't/03-ourpkgversion.t',
     't/04-private-package.t',
     't/05-two-packages.t',
+    't/06-missing-fallback-no-version.t',
+    't/07-missing-fallback-have-version.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',

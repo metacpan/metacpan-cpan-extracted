@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Request;
-$Shipment::Temando::WSDL::Types::Request::VERSION = '2.03';
+$Shipment::Temando::WSDL::Types::Request::VERSION = '3.01';
 use strict;
 use warnings;
 
@@ -100,7 +100,7 @@ Class::Std::initialize();
 
 
 package Shipment::Temando::WSDL::Types::Request::_anythings;
-$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '2.03';
+$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.01';
 use strict;
 use warnings;
 {
@@ -140,7 +140,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::Request::_quotes;
-$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '2.03';
+$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.01';
 use strict;
 use warnings;
 {
@@ -180,7 +180,7 @@ use warnings;
 
 
 package Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr;
-$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '2.03';
+$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.01';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
 {        # BLOCK to scope variables
@@ -216,7 +216,7 @@ Shipment::Temando::WSDL::Types::Request
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 DESCRIPTION
 
@@ -531,7 +531,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

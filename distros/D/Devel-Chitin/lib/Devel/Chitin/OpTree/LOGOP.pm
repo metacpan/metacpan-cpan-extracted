@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LOGOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use strict;
 use warnings;
@@ -85,10 +85,9 @@ sub _deparse_map_grep {
 sub pp_and {
     my $self = shift;
     my $left = $self->first->deparse;
-    my $right = $self->other->deparse;
+    my $right = $self->other->deparse(force_multiline => 1);
     if ($self->is_if_statement) {
         $left = _format_if_conditional($left);
-        $right = _format_if_block($right);
         "if ($left) $right";
 
     } elsif ($self->is_postfix_if) {
@@ -113,7 +112,7 @@ sub pp_or {
             $condition = $self->first->deparse;
         }
         $condition = _format_if_conditional($condition);
-        my $code = _format_if_block($self->other->deparse);
+        my $code = $self->other->deparse(force_multiline => 1);
         "unless ($condition) $code";
 
     } elsif ($self->is_postfix_if) {
@@ -138,19 +137,6 @@ sub _format_if_conditional {
     }
 }
 
-sub _format_if_block {
-    my $code = shift;
-    if (index($code,"\n") >=0 ) {
-        $code =~ s/^{ \n/{\n/;
-        $code =~ s/ }$/\n}/;
-    } else {
-        # make even one-liner blocks indented
-        $code =~ s/^{ /{\n\t/;
-        $code =~ s/ }$/\n}/;
-    }
-    $code;
-}
-
 sub pp_andassign { _and_or_assign(shift, '&&=') }
 sub pp_orassign { _and_or_assign(shift, '||=') }
 sub pp_dorassign { _and_or_assign(shift, '//=') }
@@ -166,11 +152,11 @@ sub pp_cond_expr {
     my $children = $self->children;
 
     my($cond, $true, $false) = @$children;
-    my($cond_code, $true_code, $false_code) = map { $_->deparse } ($cond, $true, $false);
+    my $cond_code = $cond->deparse();
+    my $true_code = $true->deparse(force_multiline => 1);
+    my $false_code = $false->deparse(force_multiline => 1);
 
     if ($true->is_scopelike and $false->is_scopelike) {
-        $true_code = _format_if_block($true_code);
-        $false_code = _format_if_block($false_code);
         $cond_code = _format_if_conditional($cond_code);
         "if ($cond_code) $true_code else $false_code";
 
@@ -178,8 +164,6 @@ sub pp_cond_expr {
             and $false->is_null
             and ( $false->first->op->name eq 'cond_expr' or $false->first->op->name eq 'and' )
     ) {
-        $true_code = _format_if_block($true_code);
-        $false_code = _format_if_block($false_code);
         $cond_code = _format_if_conditional($cond_code);
         "if ($cond_code) $true_code els$false_code";
 

@@ -1,33 +1,48 @@
-#!perl -w   -- -*- tab-width: 4; mode: perl -*-
+#!perl -w   -- -*- tab-width: 4; mode: perl -*-     ## no critic ( RequireTidyCode RequireVersionVar )
+## no critic ( Capitalization )
 
 use strict;
 use warnings;
+use English qw/ -no_match_vars /;   # enable long form built-in variable names; '-no_match_vars' avoids regex performance penalty for perl versions <= 5.16
 
-use Test::More;
+{
+## no critic ( ProhibitOneArgSelect RequireLocalizedPunctuationVars ProhibitPunctuationVars )
+my $fh = select STDIN; $|++; select STDOUT; $|++; select STDERR; $|++; select $fh;  # DISABLE buffering on STDIN, STDOUT, and STDERR
+}
 
 my $haveTestNoWarnings = eval { require Test::NoWarnings; import Test::NoWarnings; 1; };
 
-if ( !$ENV{HARNESS_ACTIVE} ) {
-	# not executing under Test::Harness
-	use lib qw{ blib/arch };	# only needed for dynamic module loads (eg, compiled XS) [ remove if no XS ]
-	use lib qw{ lib };			# use the 'lib' version (for ease of testing from command line and testing immediacy; so 'blib/arch' version doesn't have to be built/updated 1st)
-	}
+use Test::More;
+
+# # configure 'lib' for command line testing, when needed
+# if ( !$ENV{HARNESS_ACTIVE} ) {
+#     # not executing under Test::Harness (eg, executing directly from command line)
+#     use lib qw{ blib/arch };   # only needed for dynamic module loads (eg, compiled XS) [ removable if no XS ]
+#     use lib qw{ lib };         # use 'lib' content (so 'blib/arch' version doesn't always have to be built/updated 1st)
+#     }
 
 #
 
 plan tests => 3 + ($haveTestNoWarnings ? 1 : 0);
+
+#
+{; ## no critic ( ProhibitBuiltinHomonyms ProhibitSubroutinePrototypes RequireArgUnpacking )
+sub say  (@) { return print @_, "\n" }          # ( @:MSGS ) => $:success
+sub sayf (@) { return say sprintf shift, @_ }   # ( @:MSGS ) => $:success
+}
+#
 
 # Tests
 
 require_ok('Win32::CommandLine');
 Win32::CommandLine->import( qw( command_line ) );
 
-my $zero = quotemeta $0;
+my $zero = quotemeta $PROGRAM_NAME;
 my $string = command_line();
-print "command_line = $string\n";
-ok($string =~ /.*perl.*$zero.*/, "command_line() [$string] for $0 returned {matches /.*perl.*\$0.*/}");
+() = say "command_line = $string";
+ok($string =~ /.*perl.*$zero.*/msx, "command_line() [$string] for $PROGRAM_NAME returned {matches /.*perl.*\$PROGRAM_NAME.*/}");
 
 my @argv2 = Win32::CommandLine::argv();
-print "ARGV[$#ARGV] = {".join(':',@ARGV)."}\n";
-print "argv2[$#argv2] = {".join(':',@argv2)."}\n";
-ok($#argv2 < 0, "successful command_line() reparse; ARGV has no args");
+() = say "ARGV[$#ARGV] = {".join(q/:/,@ARGV).q/}/;
+() = say "argv2[$#argv2] = {".join(q/:/,@argv2).q/}/;
+ok($#argv2 < 0, 'successful command_line() reparse; ARGV has no args');

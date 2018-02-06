@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 
 use List::AllUtils qw( any );
 use Stepford::LoggerWithMoniker;
 use Stepford::Trait::StepDependency;
 use Stepford::Trait::StepProduction;
-use Stepford::Types qw( ArrayOfDependencies Logger Maybe PositiveNum Str );
+use Stepford::Types qw( Logger );
 
 use Moose::Role;
 
@@ -98,7 +98,7 @@ Stepford::Role::Step - The basic role all step classes must implement
 
 =head1 VERSION
 
-version 0.004001
+version 0.005000
 
 =head1 DESCRIPTION
 
@@ -189,7 +189,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

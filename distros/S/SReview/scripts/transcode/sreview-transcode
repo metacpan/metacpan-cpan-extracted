@@ -98,11 +98,13 @@ The DBI string used to connect to the database
 
 =cut
 
+my $talkid = $ARGV[0];
+
 my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
 
-$dbh->begin_work;
+$dbh->prepare("UPDATE talks SET progress='running' WHERE id = ?")->execute($talkid);
 
-my $talkid = $ARGV[0];
+$dbh->begin_work;
 
 my $talk = $dbh->prepare("SELECT * FROM talks WHERE id = ?");
 
@@ -111,7 +113,7 @@ $talk->execute($talkid);
 my $row = $talk->fetchrow_hashref();
 my $slug = $row->{slug};
 
-my $data = $dbh->prepare("SELECT eventid, event, room, starttime::date AS date, speakers, name AS title, subtitle, apologynote FROM talk_list WHERE id = ?");
+my $data = $dbh->prepare("SELECT eventid, event, room, starttime::date AS date, to_char(starttime, 'yyyy') AS year, speakers, name AS title, subtitle, apologynote FROM talk_list WHERE id = ?");
 $data->execute($talkid);
 my $drow = $data->fetchrow_hashref();
 my $eid = $drow->{eventid};
@@ -154,6 +156,10 @@ The name of the room in which this talk was recorded
 =item date
 
 The date on which this talk occurred
+
+=item year
+
+The year in which this talk occurred
 
 =back
 
@@ -297,6 +303,8 @@ foreach my $profile_str(@{$config->get('output_profiles')}) {
 		}
 	}
 	SReview::Videopipe->new(inputs => [$input], output => $output, vcopy => 0, acopy => 0, multipass => 1)->run();
+	# XXX: this should really be done by SReview::Video::Concat, not by us
+	unlink($input->url);
 }
 my $update = $dbh->prepare("UPDATE talks SET state = state_next(state) WHERE id = ? AND state = 'transcoding'");
 $update->execute($talkid);
@@ -351,3 +359,7 @@ be replaced by the empty string instead.
 
 L<sreview-cut>, L<sreview-previews>, L<sreview-skip>, L<sreview-config>,
 L<SReview::Video::ProfileFactory>
+
+=cut
+
+$dbh->prepare("UPDATE talks SET progress = 'done' WHERE id = ?")->execute($talkid);

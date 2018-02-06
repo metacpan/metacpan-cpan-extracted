@@ -2,7 +2,7 @@ package Perlmazing::Feature;
 use strict;
 use warnings;
 use version;
-our $VERSION = '1.2810';
+our $VERSION = '1.2812';
 our @ISA = qw(feature);
 
 sub import {

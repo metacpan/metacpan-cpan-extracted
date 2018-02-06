@@ -122,9 +122,9 @@ use constant PROPERTIES => (
 	region          => undef,
 );
 use constant OBJ_PROPERTIES => (
-	fees           => 'Business::cXML::Amount',
+	fees           => [ 'Business::cXML::Amount', 'Fee' ],
 	tax_details    => 'Business::cXML::Amount::TaxDetail',
-	taxadj_details => 'Business::cXML::Amount',
+	taxadj_details => [ 'Business::cXML::Amount', 'TaxAdjustmentDetail' ],
 	description    => 'Business::cXML::Description',
 );
 
@@ -169,6 +169,7 @@ sub to_node {
 		$node->add($_->to_node($node)) foreach (@{ $self->{fees} });
 	};
 
+	$self->description({}) if !defined($self->{description}) && $self->{_nodeName} =~ /^(Penalty|Shipping|Tax)$/;
 	$node->add($self->{description}->to_node($node))
 		if defined $self->{description}
 			&& $self->{_nodeName} =~ /^(AvailablePrice|Penalty|Shipping|SpecialHandlingAmount|Tax)$/

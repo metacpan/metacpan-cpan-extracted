@@ -122,7 +122,7 @@ is($image->width_latex, "0.50\\textwidth", "LaTeX width ok");
 
 $ltx =<<'EOF';
 
-\begin{figure}[htbp!]
+\begin{figure}[p]
 \centering
 \includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.50\textwidth]{test.png}
 \end{figure}

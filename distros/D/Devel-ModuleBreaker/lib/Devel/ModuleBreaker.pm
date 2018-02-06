@@ -1,5 +1,5 @@
 package Devel::ModuleBreaker;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 sub import {
     our @modules = @_[1..$#_];
     require "perl5db.pl";
@@ -7,8 +7,8 @@ sub import {
 CHECK {
     for my $module (our @modules) {
         no strict 'refs';
-        defined &$_ and DB::cmd_b_sub(substr($_,1))
-            for eval "values %" . $module . "::";
+        defined &{"$module\::$_"} and DB::cmd_b_sub("$module\::$_")
+            for keys %{"$module\::"};
     }
 }
 1;
@@ -20,7 +20,7 @@ simultaneously
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 

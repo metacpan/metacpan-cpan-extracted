@@ -2,15 +2,16 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Sub/XCompletion/cryptocurrency_symbol.pm',
     'Perinci/Sub/XCompletion/cryptocurrency_symbol_or_name.pm',
+    'Perinci/Sub/XCompletion/cryptoexchange_name.pm',
     'Perinci/Sub/XCompletionBundle/CryptoCurrency.pm'
 );
 

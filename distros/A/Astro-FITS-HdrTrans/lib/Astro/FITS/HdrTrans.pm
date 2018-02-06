@@ -36,7 +36,7 @@ use vars qw/ $VERSION $DEBUG @ISA /;
 use Exporter 'import';
 our @EXPORT_OK = qw( translate_from_FITS translate_to_FITS );
 
-$VERSION = '1.59';
+$VERSION = '1.60';
 $DEBUG   = 0;
 
 # The reference list of classes we can try This list should be
@@ -102,6 +102,7 @@ my @generic_headers = qw(
                           DETECTOR_BIAS
                           DETECTOR_INDEX
                           DETECTOR_READ_TYPE
+                          DOME_OPEN
                           DR_GROUP
                           DR_RECIPE
                           ELEVATION_START
@@ -184,6 +185,7 @@ my @generic_headers = qw(
                           VELOCITY_REFERENCE_FRAME
                           VELOCITY_TYPE
                           WAVEPLATE_ANGLE
+                          WIND_BLIND
                           XBINNING
                           YBINNING
                           X_APERTURE

@@ -46,7 +46,7 @@ SKIP: {
     # reference star
     my $star = new Astro::Catalog::Star(id => 'EX Hya',
                                         coords => new Astro::Coords(
-                                            ra =>'12 52 24.40', dec =>'-29 14 56',
+                                            ra =>'12 52 24.22', dec =>'-29 14 56',
                                             type=> 'j2000'));
 
     compare_star( $catalog->starbyindex(0), $star);

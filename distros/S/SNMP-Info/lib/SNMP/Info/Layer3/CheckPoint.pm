@@ -40,7 +40,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.40';
+$VERSION = '3.43';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -245,7 +245,7 @@ These are methods that return scalar value from SNMP
 
 Returns 'checkpoint'.
 
-=item $ckp>model()
+=item $ckp->model()
 
 Return the model type of the CheckPoint device (Based on the sysObjectOID translation).
 

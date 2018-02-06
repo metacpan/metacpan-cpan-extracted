@@ -15,6 +15,6 @@ use feature qw(say);
 my $g = bless {}, 'Guard';
 
 __DATA__
-open("/dev/null", 0x0, 0666) = * at destructor.pl line 11.
+open("/dev/null", *, *) = * at destructor.pl line 11.
         Guard::DESTROY(*) called at destructor.pl line 0
         eval {...} called at destructor.pl line 0

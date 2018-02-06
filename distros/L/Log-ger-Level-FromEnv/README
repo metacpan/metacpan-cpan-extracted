@@ -3,7 +3,7 @@ NAME
     variables
 
 VERSION
-    version 0.002
+    version 0.003
 
 SYNOPSIS
      use Log::ger;
@@ -14,10 +14,10 @@ SYNOPSIS
 DESCRIPTION
     This module sets $Log::ger::Current_Level based on hints from several
     environment variables: "LOG_LEVEL" (for example, if set to "warn" or
-    "warning" will set the log level to warning (3)), "TRACE" (if true, will
-    set log level to trace (6)), "DEBUG" (if true, will set log level to
-    debug (5)), "VERBOSE" (if true, will set log level to info (4)), "QUIET"
-    (if true, will set log level to error (2)).
+    "warning" will set the log level to warning (30)), "TRACE" (if true,
+    will set log level to trace (60)), "DEBUG" (if true, will set log level
+    to debug (50)), "VERBOSE" (if true, will set log level to info (40)),
+    "QUIET" (if true, will set log level to error (20)).
 
     This is convenient for CLI programs.
 
@@ -26,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

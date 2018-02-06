@@ -23,7 +23,7 @@ Net::Etcd::Role::Actions
 
 =cut
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 has etcd => (
     is  => 'ro',
@@ -169,21 +169,46 @@ sub _build_request {
             my($headers) = @_;
             $self->{response}{headers} = $headers;
         },
-        on_body   => sub {
-            my ($data, $hdr) = @_;
-            $self->{response}{content} = $data;
-            $cb->($data, $hdr) if $cb;
-            my $status = $hdr->{Status};
-            $self->check_hdr($status);
-            $cv->end;
-            1
-        },
+        want_body_handle => 1,
         sub {
-            my (undef, $hdr) = @_;
-            #print STDERR Dumper($hdr);
-            my $status = $hdr->{Status};
-            $self->check_hdr($status);
-            $cv->end;
+            my ($handle, $hdr) = @_;
+            my $json_reader = sub {
+                my ($handle, $json) = @_;
+                return unless $json;
+                $self->{response}{content} = JSON::encode_json($json);
+                $cb->($json, $hdr) if $cb;
+                my $status = $hdr->{Status};
+                $self->check_hdr($status);
+                $cv->send;
+            };
+            my $chunk_reader = sub {
+                my($handle, $line) = @_;
+                return unless $line;
+                #read chunk size
+                $line =~ /^([0-9a-fA-F]+)/ or die 'bad chunk (incorrect length) -['.$line.']-';
+                my $len = hex $1;
+                #read chunk
+                $handle->push_read(chunk => $len, sub {
+                    my($handle, $chunk) = @_;
+                    $handle->push_read(line => sub {
+                        length $_[1] and die 'bad chunk (missing last empty line)';
+                    });
+                    $self->{response}{content} = $chunk;
+                    $cb->($chunk, $hdr) if $cb;
+                    my $status = $hdr->{Status};
+                    $self->check_hdr($status);
+                    $cv->send;
+                });
+            };
+
+            if (($hdr->{'transfer-encoding'} || '') =~ /\bchunked\b/i) {
+                $handle->on_read(sub {$handle->push_read(line => $chunk_reader)});
+            } else {
+                $handle->on_read(sub {$handle->push_read(json => $json_reader)});
+            }
+
+            $handle->on_eof(sub {$handle->destroy; $cv->end});
+            $handle->on_error(sub {$handle->destroy; $cv->end});
         }
     );
     $cv->recv;

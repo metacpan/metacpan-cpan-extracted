@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter::Shiny;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 our %EMOJI;
 
@@ -283,11 +283,11 @@ our @EXPORT_OK = keys %EMOJI;
 
 =head1 NAME
 
-Acme::AsciiEmoji - meta::cpan (ﾉ◕ヮ◕)ﾉ*:・ﾟ✧ index me
+Acme::AsciiEmoji - Emoji
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 

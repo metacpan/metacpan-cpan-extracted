@@ -1,5 +1,7 @@
 use 5.00503;
 use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
 use Test::Simply tests => 1;
 BEGIN {
     if ($] > 5.00503) {

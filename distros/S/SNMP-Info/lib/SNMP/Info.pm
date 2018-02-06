@@ -24,7 +24,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.40';
+$VERSION = '3.43';
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.40
+SNMP::Info - Version 3.43
 
 =head1 AUTHOR
 
@@ -1706,7 +1706,9 @@ sub device_type {
             =~ /^(BayStack|Ethernet\s+Routing\s+Switch)\s[2345](\d){2,3}/i );
 
         # Nortel Contivity
-        $objtype = 'SNMP::Info::Layer3::Contivity' if $desc =~ /(\bCES\b|\bNVR\sV\d)/;
+        $objtype = 'SNMP::Info::Layer3::Contivity'
+          if $desc =~ /(\bCES\b|\bNVR\sV\d)/
+              and (!defined $id or !defined $l3sysoidmap{$id});
 
         # SonicWALL
         $objtype = 'SNMP::Info::Layer3::SonicWALL' if $desc =~ /SonicWALL/i;

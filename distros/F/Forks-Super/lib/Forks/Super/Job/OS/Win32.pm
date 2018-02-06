@@ -27,7 +27,7 @@ if (!&Forks::Super::Util::IS_WIN32ish) {
 #   http://msdn.microsoft.com/en-us/library/ms684847(VS.85).aspx
 
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 our ($_THREAD_API, $_THREAD_API_INITIALIZED, %SYSTEM_INFO);
 
 ##################################################################
@@ -995,7 +995,11 @@ sub set_os_priority {
 sub get_process_priority_class { # for the current process
     my $pid = shift;
     my $phandle = get_process_handle($pid, 0);
-    return if !$phandle;
+    if (!$phandle) {
+        carp "FSJ::OS::Win32::get_process_priority_class: ",
+             "no handle for pid $pid";
+        return;
+    }
     local $! = 0;
     my $result = win32api('GetPriorityClass', $phandle);
     if ($!) {
@@ -1007,7 +1011,7 @@ sub get_process_priority_class { # for the current process
 
 sub get_process_base_priority {
     my $pid = shift;
-    my $class = get_process_priority_class($pid);
+    my $class = get_process_priority_class($pid) || -1;
     if ($class == 0x0100) { #      0x0100: realtime
 	return 24;
     } elsif ($class == 0x20) { #   0x0020: normal

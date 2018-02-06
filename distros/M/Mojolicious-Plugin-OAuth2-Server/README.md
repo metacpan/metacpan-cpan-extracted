@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 # VERSION
 
-0.39
+0.40
 
 # SYNOPSIS
 
@@ -116,6 +116,29 @@ token and if the access token has the requisite scopes. The scopes are optional:
 
 This calls the [Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant](https://metacpan.org/pod/Net::OAuth2::AuthorizationServer::AuthorizationCodeGrant)
 module (`verify_token_and_scope` method) to validate the access/refresh token.
+
+## oauth2\_auth\_request
+
+This is a helper to allow you get get the redirect URI instead of directing
+a user to the authorize\_route - it requires the details of the client:
+
+    my $redirect_uri = $c->oauth2_auth_request({
+      client_id     => $client_id,
+      redirect_uri  => 'https://foo',
+      response_type => 'token',
+      scope         => 'list,of,scopes',
+      state         => 'foo=bar&baz=boz',
+    });
+
+    if ( $redirect_uri ) {
+     # do something with $redirect_uri
+    } else {
+      # something didn't work, e.g. bad client, scopes, etc
+    }
+
+You can use this helper instead of directing a user to the authorize\_route if
+you need to do something more involved with the redirect\_uri rather than
+having the plugin direct to the user to the resulting redirect uri
 
 # SEE ALSO
 

@@ -17,7 +17,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
 use constant FIRST_DEFERRED_ID => -500000;
@@ -538,7 +538,7 @@ Forks::Super::Deferred
 
 =head1 VERSION
 
-0.91
+0.92
 
 =head1 DESCRIPTION
 

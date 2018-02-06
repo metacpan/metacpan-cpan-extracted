@@ -3,7 +3,7 @@ package Firefox::Marionette::Timeouts;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -35,7 +35,7 @@ Firefox::Marionette::Timeouts - Represents the timeouts for page loading, search
 
 =head1 VERSION
 
-Version 0.30
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * scripts - the timeout used for L<script|Firefox::Marionette#script> and L<async_script|Firefox::Marionette#async_script> methods in milliseconds
 
-=item * implicit - the timeout used for L<find_element|Firefox::Marionette#find_element> and L<find_elements|Firefox::Marionette#find_elements> methods in milliseconds
+=item * implicit - the timeout used for L<find|Firefox::Marionette#find> and L<list|Firefox::Marionette#list> methods in milliseconds
 
 =back
 
@@ -78,7 +78,7 @@ returns the the timeout used for L<script|Firefox::Marionette#script> and L<asyn
 
 =head2 implicit
 
-returns the timeout used for L<find_element|Firefox::Marionette#find_element> and L<find_elements|Firefox::Marionette#find_elements> methods in milliseconds
+returns the timeout used for L<find|Firefox::Marionette#find> and L<list|Firefox::Marionette#list> methods in milliseconds
 
 =head1 DIAGNOSTICS
 

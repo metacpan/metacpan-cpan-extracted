@@ -50,9 +50,7 @@ csl
 earley
 enums
 grammarName
-jddurand
 jeandamiendurand
-jkegl
 lexeme
 lexemeCallback
 lhs

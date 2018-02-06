@@ -5,7 +5,13 @@ use warnings;
 use Number::Phone::Country qw(noexport);
 
 use base qw(Number::Phone);
-our $VERSION = '1.3';
+our $VERSION = '1.4000';
+
+=head1 NAME
+
+Number::Phone::StubCountry - Base class for auto-generated country files
+
+=cut
 
 sub country_code {
     my $self = shift;
@@ -52,6 +58,7 @@ sub _validator {
 sub areaname {
     my $self   = shift;
     my $number = $self->{number};
+    return unless $self->{areanames};
     my %map = %{$self->{areanames}};
     foreach my $prefix (map { substr($number, 0, $_) } reverse(1..length($number))) {
         return $map{$self->country_code().$prefix} if exists($map{$self->country_code().$prefix});

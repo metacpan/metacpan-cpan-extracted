@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort;
-$Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort::VERSION = '2.03';
+$Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort::VERSION = '3.01';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -116,7 +116,7 @@ Shipment::UPS::WSDL::RateInterfaces::RateService::RatePort
 
 =head1 VERSION
 
-version 2.03
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -306,7 +306,7 @@ Andrew Baerg <baergaj@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Baerg.
+This software is copyright (c) 2018 by Andrew Baerg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

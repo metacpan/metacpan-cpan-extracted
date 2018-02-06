@@ -172,11 +172,11 @@ sub compare_star {
   foreach my $col ( 0 ... $#ref_cols ) {
     is( $cmp_cols[$col], $ref_cols[$col],"compare color $ref_cols[$col]" );
     is( $cmpstar->get_colour($cmp_cols[$col]),
-	$refstar->get_colour($ref_cols[$col]),
-	"compare value of color $ref_cols[$col]");
+        $refstar->get_colour($ref_cols[$col]),
+        "compare value of color $ref_cols[$col]");
     is( $cmpstar->get_colourerr($cmp_cols[$col]),
-	$refstar->get_colourerr($ref_cols[$col]),
-	"compare color error $ref_cols[$col]" );
+        $refstar->get_colourerr($ref_cols[$col]),
+        "compare color error $ref_cols[$col]" );
   }
 
   is( $cmpstar->quality(), $refstar->quality(), "check quality" );
@@ -240,13 +240,13 @@ sub compare_mpc_star {
   # we got (just in case that is zero)
   foreach my $filter ( 0 ... $#ref_filters ) {
     is( $cmp_filters[$filter], $ref_filters[$filter],
-	"compare filter $ref_filters[$filter]" );
+        "compare filter $ref_filters[$filter]" );
     is( $cmpstar->get_magnitude($cmp_filters[$filter]),
-	$refstar->get_magnitude($ref_filters[$filter]),
-	"compare magnitude $ref_filters[$filter]");
+        $refstar->get_magnitude($ref_filters[$filter]),
+        "compare magnitude $ref_filters[$filter]");
     is( $cmpstar->get_errors($cmp_filters[$filter]),
-	$refstar->get_errors($ref_filters[$filter]),
-	"compare magerr $ref_filters[$filter]");
+        $refstar->get_errors($ref_filters[$filter]),
+        "compare magerr $ref_filters[$filter]");
   }
 
   my @cmp_cols = $cmpstar->what_colours();
@@ -256,11 +256,11 @@ sub compare_mpc_star {
   foreach my $col ( 0 ... $#ref_cols ) {
     is( $cmp_cols[$col], $ref_cols[$col],"compare color $ref_cols[$col]" );
     is( $cmpstar->get_colour($cmp_cols[$col]),
-	$refstar->get_colour($ref_cols[$col]),
-	"compare value of color $ref_cols[$col]");
+        $refstar->get_colour($ref_cols[$col]),
+        "compare value of color $ref_cols[$col]");
     is( $cmpstar->get_colourerr($cmp_cols[$col]),
-	$refstar->get_colourerr($ref_cols[$col]),
-	"compare color error $ref_cols[$col]" );
+        $refstar->get_colourerr($ref_cols[$col]),
+        "compare color error $ref_cols[$col]" );
   }
 
   is( $cmpstar->quality(), $refstar->quality(), "check quality" );

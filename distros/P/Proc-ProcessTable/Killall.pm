@@ -49,7 +49,7 @@ sub killall {
 	$self = 0 unless defined $self;
 	my $nkilled = 0;
 	croak("killall: Unsupported signal: $signal") unless is_sig($signal);
-	my $t = new Proc::ProcessTable;
+	my $t = Proc::ProcessTable->new;
 	my $BANG = undef;
 	foreach my $p (@{$t->table}) {
 	  my $cmndline = $p->{cmndline} || $p->{fname};

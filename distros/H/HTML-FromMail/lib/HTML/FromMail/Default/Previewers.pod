@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 Html::FromMail::Default::Previewers - produce smaller versions of data items
@@ -40,20 +42,24 @@ rough description)
 
 =head1 FUNCTIONS
 
-B<previewHtml>(PAGE, MESSAGE, PART, ATTACH, ARGS)
-
 =over 4
+
+=item B<previewHtml>(PAGE, MESSAGE, PART, ATTACH, ARGS)
 
 Produce a small preview of the html, where first the title is taken
 and put in bold. The rest of the header is removed.  Then the first
 characters of the rest of the content are displayed.
 
- Option        --Default
- text_max_chars  250
+ -Option        --Default
+  text_max_chars  250
 
-. text_max_chars => INTEGER
+=over 2
 
-I<Example:> of a plain text preview with the Text::MagicTemplate formatter
+=item text_max_chars => INTEGER
+
+=back
+
+example: of a plain text preview with the Text::MagicTemplate formatter
 
  <!--{preview text_max_chars => 120}-->
     <!--{html}-->
@@ -63,45 +69,45 @@ I<Example:> of a plain text preview with the Text::MagicTemplate formatter
     <!--{/html}-->
  <!--{/preview}-->
 
-=back
-
-B<previewImage>(PAGE, MESSAGE, PART, ATTACH, ARGS)
-
-=over 4
+=item B<previewImage>(PAGE, MESSAGE, PART, ATTACH, ARGS)
 
 Produce a small preview of the html, where first the title is taken
 and put in bold. The rest of the header is removed.  Then the first
 characters of the rest of the content are displayed.
 
- Option        --Default
- img_max_height  250
- img_max_width   250
+ -Option        --Default
+  img_max_height  250
+  img_max_width   250
 
-. img_max_height => INTEGER
+=over 2
 
-. img_max_width => INTEGER
+=item img_max_height => INTEGER
 
-I<Example:> of a plain text preview with the Text::MagicTemplate formatter
+=item img_max_width => INTEGER
+
+=back
+
+example: of a plain text preview with the Text::MagicTemplate formatter
 
  <!--{preview img_max_width => 200, img_max_height => 200}-->
     <!--{image}-->
     <!--{/image}-->
  <!--{/preview}-->
 
-=back
-
-B<previewText>(PAGE, MESSAGE, PART, ATTACH, ARGS)
-
-=over 4
+=item B<previewText>(PAGE, MESSAGE, PART, ATTACH, ARGS)
 
 Produce a small preview of the text, where all wrappig is removed.
 
- Option        --Default
- text_max_chars  250
+ -Option        --Default
+  text_max_chars  250
 
-. text_max_chars => INTEGER
+=over 2
 
-I<Example:> of a plain text preview with the Text::MagicTemplate formatter
+=item text_max_chars => INTEGER
+
+=back
+
+example: of a plain text preview with the Text::MagicTemplate formatter
 
  <!--{preview text_max_chars => 120}-->
     <!--{html}-->
@@ -115,14 +121,14 @@ I<Example:> of a plain text preview with the Text::MagicTemplate formatter
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.11,
-built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+This module is part of HTML-FromMail distribution version 0.12,
+built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

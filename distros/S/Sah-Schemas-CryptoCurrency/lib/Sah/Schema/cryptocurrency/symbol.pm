@@ -1,7 +1,7 @@
 package Sah::Schema::cryptocurrency::symbol;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-01-30'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $schema = [str => {
     summary => 'Cryptocurrency symbol',
@@ -23,7 +23,7 @@ Sah::Schema::cryptocurrency::symbol - Cryptocurrency symbol
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::cryptocurrency::symbol (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-01-14.
+This document describes version 0.003 of Sah::Schema::cryptocurrency::symbol (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2018-01-30.
 
 =head1 HOMEPAGE
 

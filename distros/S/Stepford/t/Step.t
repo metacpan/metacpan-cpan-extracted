@@ -67,7 +67,7 @@ is_deeply(
 {
     package FileStep;
 
-    use Path::Class qw( dir tempdir );
+    use Path::Class qw( tempdir );
     use Stepford::Types qw( File );
 
     use Moose;
@@ -102,30 +102,69 @@ is_deeply(
 }
 
 {
-    my $step = FileStep->new(
-        prior_steps_last_run_time => 1,
-        logger                    => $logger,
+    package PathTinyFileStep;
+
+    use Path::Tiny qw( tempdir );
+    use MooseX::Types::Path::Tiny qw( Path );
+
+    use Moose;
+    with 'Stepford::Role::Step::FileGenerator';
+
+    my $tempdir = tempdir( CLEANUP => 1 );
+
+    has output_file1 => (
+        traits  => ['StepProduction'],
+        is      => 'ro',
+        isa     => Path,
+        default => sub { $tempdir->child('file1') },
     );
 
-    is(
-        $step->last_run_time, undef,
-        q{no last run time when output files don't exist}
+    has output_file2 => (
+        traits  => ['StepProduction'],
+        is      => 'ro',
+        isa     => Path,
+        default => sub { $tempdir->child('file2') },
     );
 
-    $step->run;
-    is(
-        $step->last_run_time,
-        ( stat $step->output_file2 )[9],
-        'last_run_time matches mtime of $step->output_file2'
-    );
+    sub run {
+        my $self = shift;
 
-    my $message = shift @{ $logger_output->array };
-    is(
-        $message->{message},
-        '[FileStep] Touching file',
-        'expected log message'
-    );
-    is( $message->{level}, 'debug', 'expected log level' );
+        $self->logger->debug('Touching file');
+
+        $self->output_file1->touch;
+        utime 100, 100, $self->output_file1 or die $!;
+
+        $self->output_file2->touch;
+    }
+}
+
+for my $class (qw( FileStep PathTinyFileStep)) {
+    subtest $class => sub {
+        my $step = $class->new(
+            prior_steps_last_run_time => 1,
+            logger                    => $logger,
+        );
+
+        is(
+            $step->last_run_time, undef,
+            q{no last run time when output files don't exist}
+        );
+
+        $step->run;
+        is(
+            $step->last_run_time,
+            ( stat $step->output_file2 )[9],
+            'last_run_time matches mtime of $step->output_file2'
+        );
+
+        my $message = shift @{ $logger_output->array };
+        is(
+            $message->{message},
+            "[$class] Touching file",
+            'expected log message'
+        );
+        is( $message->{level}, 'debug', 'expected log level' );
+    };
 }
 
 {
@@ -162,7 +201,7 @@ is_deeply(
         qr/
             \QThe FileStep::Bad class consumed the \E
             \QStepford::Role::Step::FileGenerator role but contains \E
-            \Qthe following productions which are not files: output1 output2\E
+            \Qthe following productions which are not a supported file type: output1 output2\E
            /x,
         'FileStep::Bad->new dies because it has productions which are not files'
     );

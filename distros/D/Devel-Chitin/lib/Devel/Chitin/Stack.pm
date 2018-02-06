@@ -3,7 +3,7 @@ package Devel::Chitin::Stack;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 our @saved_ARGV;
 BEGIN {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.012;
 use Cwd qw/abs_path/;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my ( $pkg, @new ) = @_;
@@ -116,7 +116,7 @@ Hazy - A simple, minimalistic CSS framework.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

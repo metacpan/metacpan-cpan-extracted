@@ -37,7 +37,7 @@ our $RESAMELINE = qr/(?:[ \t\v\f])*/;                        # i.e. WS* without 
 our $REDEFINE = qr/^${RESAMELINE}#${RESAMELINE}define${RESAMELINE}((\w+)(?>[^\n\\]*)(?>\\.[^\n\\]*)*)/ms; # dot-matches-all mode, keeping ^ meaningful
 our $BALANCEDPARENS = qr/$RE{balanced}{-parens=>'()'}{-keep}/;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 # ----------------------------------------------------------------------------------------
@@ -1211,7 +1211,7 @@ sub _parseDeclarator {
     while ($last->{node}->localname() eq 'LBRACKET') {
       $last = $self->_readArraySize($callLevel, $nodesp, $cdeclp);
     }
-  } elsif ($last->{node}->localname() eq 'LPAREN_SCOPE') {
+  } elsif (($last->{node}->localname() eq 'LPAREN_SCOPE') || ($last->{node}->localname() eq 'LPAREN')) {
     $last = $self->_readFunctionArgs($callLevel, $nodesp, $cdeclp);
   } elsif ($last->{node}->localname() eq 'LCURLY') {
     if ($last->{node}->parentNode()->localname() eq 'structOrUnionSpecifier') {
@@ -2238,7 +2238,7 @@ MarpaX::Languages::C::AST::Grammar::ISO_ANSI_C_2011::Scan - Scan C source
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 

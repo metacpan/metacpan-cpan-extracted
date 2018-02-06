@@ -1,5 +1,5 @@
 package Graph::Writer::DSM::HTML;
-$Graph::Writer::DSM::HTML::VERSION = '0.007';
+$Graph::Writer::DSM::HTML::VERSION = '0.008';
 use Modern::Perl;
 use base qw( Graph::Writer );
 use Mojo::Template;
@@ -13,7 +13,7 @@ Graph::Writer::DSM::HTML - draw graph as a DSM matrix in HTML format
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

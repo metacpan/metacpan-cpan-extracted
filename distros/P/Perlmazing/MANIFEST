@@ -89,11 +89,15 @@ lib/Perlmazing/Perlmazing/trim.pm
 lib/Perlmazing/Perlmazing/unescape_html.pm
 lib/Perlmazing/Perlmazing/unescape_uri.pm
 lib/Perlmazing/Perlmazing/untaint.pm
+lib/Perlmazing/Perlmazing/weaken.pm
+lib/Perlmazing/Perlmazing/unweaken.pm
 lib/Perlmazing.pm
 Makefile.PL
 MANIFEST
 README
 t/00-perlmazing_functions.t
+t/00-perlmazing_specific_import.t
+t/00-perlmazing_specific_skip.t
 t/01-md5.t
 t/02-dumped.t
 t/03-time.t

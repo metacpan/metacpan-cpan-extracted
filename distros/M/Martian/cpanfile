@@ -1,0 +1,2 @@
+requires 'BSD::Resource';
+requires 'Starman::Server';

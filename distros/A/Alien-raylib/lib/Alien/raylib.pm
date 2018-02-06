@@ -3,7 +3,7 @@ use warnings;
 package Alien::raylib;
 
 # ABSTRACT: Alien distribution for Raylib
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -18,11 +18,11 @@ Alien::raylib - Alien distribution for raylib video game engine
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 USAGE
 
-Use L<Graphics::Raylib::XS>, which wraps this in XS, instead. Otherwise, just use it like any other Alien distro. Currently wraps raylib 1.9.1-dev (and a few extra commits L<2090ad8119fd622f80ff8a8707f416abec1db375|https://github.com/raysan5/raylib/commit/2090ad8119fd622f80ff8a8707f416abec1db375>, specifically)
+Use L<Graphics::Raylib::XS>, which wraps this in XS, instead. Otherwise, just use it like any other Alien distro. Currently wraps raylib 1.9.1-dev (and a few extra commits, see the C<alienfile> in this distribution)
 
 =head1 System requirements
 

@@ -1,0 +1,41 @@
+---
+abstract: 'Add arbitrary metadata using a mergefile'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Slurper: '0'
+  JSON::PP: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MetaMergeFile
+provides:
+  Dist::Zilla::Plugin::MetaMergeFile:
+    file: lib/Dist/Zilla/Plugin/MetaMergeFile.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Role::MetaProvider: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Moose: '0'
+  MooseX::Types::Stringlike: '0'
+  Parse::CPAN::Meta: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaMergeFile
+  repository: git://github.com/Leont/dist-zilla-plugin-metamergefile.git
+version: '0.001'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -17,7 +17,7 @@ our @EXPORT = qw(
     mock_time
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 my $datetime_was_loaded;
 
@@ -32,11 +32,6 @@ BEGIN {
         $time = "$time.$usec" if $usec;
         return $time;
     };
-    my $time_original = \&Test::MockTime::time;
-    *Test::MockTime::time = sub () {
-        return int($time_original->());
-    };
-    *CORE::GLOBAL::time = \&Test::MockTime::time;
 
     *CORE::GLOBAL::sleep = sub ($) {
         return int(Test::MockTime::HiRes::_sleep($_[0], sub {CORE::sleep $_[0]}));
@@ -47,6 +42,12 @@ BEGIN {
     my $hires_sleep = \&Time::HiRes::sleep;
     my $hires_usleep = \&Time::HiRes::usleep;
     my $hires_nanosleep = \&Time::HiRes::nanosleep;
+
+    *Test::MockTime::time = sub () {
+        return int(Test::MockTime::HiRes::time($hires_time));
+    };
+    *CORE::GLOBAL::time = \&Test::MockTime::time;
+
     *Time::HiRes::clock_gettime = sub (;$) {
         return Test::MockTime::HiRes::time($hires_clock_gettime, @_);
     };
@@ -69,7 +70,7 @@ BEGIN {
     $datetime_was_loaded = 1 if $INC{'DateTime.pm'};
 }
 
-sub time (&;@) {
+sub time ($;@) {
     my $original = shift;
     defined $Test::MockTime::fixed ? $Test::MockTime::fixed : $original->(@_) + $Test::MockTime::offset;
 }

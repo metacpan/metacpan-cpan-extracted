@@ -1,6 +1,6 @@
 package HTML::DOM::_FieldHash;
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 BEGIN {
  if(eval { require Hash::Util::FieldHash }) {

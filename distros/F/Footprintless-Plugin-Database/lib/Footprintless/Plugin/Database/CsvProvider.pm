@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Plugin::Database::CsvProvider;
-$Footprintless::Plugin::Database::CsvProvider::VERSION = '1.05';
+$Footprintless::Plugin::Database::CsvProvider::VERSION = '1.06';
 # ABSTRACT: A CSV file provider implementation
 # PODNAME: Footprintless::Plugin::Database::CsvProvider
 
@@ -59,7 +59,7 @@ Footprintless::Plugin::Database::CsvProvider - A CSV file provider implementatio
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 AUTHOR
 

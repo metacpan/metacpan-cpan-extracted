@@ -1,7 +1,7 @@
 # ABSTRACT: POE::Wheel::Run worker pool
 package POE::Component::WheelRun::Pool;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use POE qw(
 
 const my @PASS_ARGS => qw(
     Program ProgramArgs
-    StdioFilter StdinFilter StdoutFilter StderrFilter
+    Filter StdioFilter StdinFilter StdoutFilter StderrFilter
     Priority User Group NoSetSid NoSetPgrp
 );
 
@@ -60,7 +60,7 @@ sub spawn {
             # Internal
             _start              => \&pool_start,
             _stop               => \&pool_stop,
-            _child              => \&worker_chld,
+            _child              => \&pool_child,
             # Interface
             dispatch            => \&pool_dispatch,
             stats               => \&pool_stats,
@@ -106,6 +106,15 @@ sub pool_start {
 
     # Stats engine enabled
     $kernel->delay_add( stats => $args{StatsInterval} ) if exists $args{StatsInterval};
+}
+
+sub pool_child {
+    my ($kernel,$heap,$reason,$child) = @_[KERNEL,HEAP,ARG0,ARG1];
+
+    # Record the Child Session Status
+    my $stat = join('_', child => $reason );
+    $heap->{stats}{$stat} ||= 0;
+    $heap->{stats}{$stat}++;
 }
 
 sub pool_stop {
@@ -344,7 +353,7 @@ POE::Component::WheelRun::Pool - POE::Wheel::Run worker pool
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -453,22 +462,6 @@ This software is Copyright (c) 2016 by Brad Lhotsky.
 This is free software, licensed under:
 
   The (three-clause) BSD License
-
-=head1 CONTRIBUTORS
-
-=for stopwords Brad Lhotsky
-
-=over 4
-
-=item *
-
-Brad Lhotsky <blhotsky@craigslist.org>
-
-=item *
-
-Brad Lhotsky <brad.lhotsky@booking.com>
-
-=back
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

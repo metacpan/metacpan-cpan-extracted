@@ -1,0 +1,109 @@
+NAME
+
+    Mojolicious::Plugin::Pubsub - Pubsub plugin for Mojolicious
+
+VERSION
+
+    version 0.004
+
+SYNOPSIS
+
+      # Mojolicious
+      my $pubsub = $app->plugin('Pubsub', { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', });
+      $app->publish("message");
+      
+      # Mojolicious::Lite
+      my $pubsub = plugin Pubsub => { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', };
+      app->publish("message");
+
+DESCRIPTION
+
+    Easy way to add pubsub to your Mojolicious apps; it hooks into the
+    Mojo::IOLoop to send and receive messages asynchronously.
+
+    Each time you run your Mojolicious app and the plugin gets loaded,
+    it'll spawn a new daemon that'll try to connect to the socket if it
+    already exists, and if it fails it will replace the socket assuming
+    that the underlying daemon is dead. If it succeeds, it will cancel the
+    new daemon and leave the old one to continue doing its work.
+
+    Note: MSWin32 is not supported because it has no proper UNIX socket
+    support.
+
+NAME
+
+    Mojolicious::Plugin::Pubsub - Pubsub plugin for Mojolicious
+
+OPTIONS
+
+ cb
+
+    Takes a callback CODE reference.
+
+ socket
+
+    A path to a UNIX socket used to communicate between the publishers. By
+    default this will be $app->home->child($app->moniker . '.pubsub').
+
+HELPERS
+
+ publish
+
+      $c->publish("message");
+      $c->publish(@args);
+
+    Publishes a message that the subscribing callbacks will receive.
+
+ subscribe
+
+      $c->subscribe($cb);
+
+    Add the $cb code reference to the callbacks that get published
+    messages.
+
+ unsubscribe
+
+      $c->unsubscribe($cb);
+
+    Remove the $cb code reference from the callbacks that get published
+    messages.
+
+SUBSCRIBERS
+
+      my $subscriber = sub {
+        my @args = @_;
+        ...
+      };
+
+    Subscribers sent to the cb option, or the subscribe helper should
+    simply be CODE references that handle the arguments passed in. The
+    @args will be the same as what was passed in to the publish helper,
+    except they will have gotten JSON encoded via Mojo::JSON on the way, so
+    only data structures that consist of regular scalars, arrays, hashes,
+    and objects that implement TO_JSON or that stringify will work
+    correctly. See Mojo::JSON for more details.
+
+METHODS
+
+ register
+
+      my $pubsub = $plugin->register(Mojolicious->new, { cb => sub { ... }, socket => $path });
+
+    Register plugin in Mojolicious application.
+
+SEE ALSO
+
+    Mojolicious, Mojo::Redis2.
+
+AUTHOR
+
+    Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Andreas Guldstrand.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

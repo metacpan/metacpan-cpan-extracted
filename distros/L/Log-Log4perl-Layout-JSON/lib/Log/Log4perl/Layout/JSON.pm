@@ -1,5 +1,5 @@
 package Log::Log4perl::Layout::JSON;
-$Log::Log4perl::Layout::JSON::VERSION = '0.52';
+$Log::Log4perl::Layout::JSON::VERSION = '0.53';
 # ABSTRACT: Layout a log message as a JSON hash, including MDC data
 
 use 5.008;
@@ -155,7 +155,7 @@ sub render {
     my $layed_out_msg = $self->_pattern_layout->render($m, $category, $priority, $caller_level);
 
     my @fields = (
-        split($self->_separator, $layed_out_msg),
+        split($self->_separator, $layed_out_msg, -1),
         @data, # append extra fields but before mdc
         $self->mdc_handler->($self) # MDC fields override non-MDC fields (not sure if this is a feature)
     );
@@ -268,7 +268,7 @@ Log::Log4perl::Layout::JSON - Layout a log message as a JSON hash, including MDC
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

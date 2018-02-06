@@ -1,0 +1,58 @@
+Revision history for Plack-Middleware-Statsd
+
+v0.3.0    2018-02-06 11:10:44+00:00 Europe/London
+  [Enhancements]
+  - Catch log errors when calling the statsd client, #1.
+
+  [Tests]
+  - Show diagnostics on failure.
+
+  [Other Changes]
+  - Added Net::Statsd::Tiny as a recommended prerequisite.
+
+v0.2.1    2018-02-05 14:16:07+00:00 Europe/London
+  [Enhancements]
+  - Allow the statsd client to support the timing method as an
+    alternative to the timing_ms method.
+
+  - Call client's flush method (if there is one) when done, to support
+    Net::Statsd::Tiny.
+
+  [Incompatible Changes]
+  - Removed the sample_rate attribute.
+
+  [Documentation]
+  - Added an example of accessing this statsd client from Catalyst.
+
+  - Only list the client methods that are actually used.
+
+  [Tests]
+  - Explicitly specify a dependency of Test::Most for cpantesters.
+
+v0.2.0    2018-02-01 17:21:29+00:00 Europe/London
+  [Enhancements]
+  - Allow the X-Sendfile header variation to be configured.
+
+  [Documentation]
+  - Updated information on logging content types.
+
+  - Added missing psgi.request.content-type metric.
+
+  - Fixed POD markup.
+
+v0.1.1    2018-02-01 14:21:29+00:00 Europe/London
+  [Bug Fixes]
+  - Removed charset from content-type metrics.
+
+  - Explicitly added Plack middleware prerequisites for tests.
+
+  [Documentation]
+  - Fixed POD markup.
+
+  - Documented additional metrics.
+
+  [Other Changes]
+  - Removed unnecessary testing prerequisites.
+
+v0.1.0    2018-01-31 18:13:40+00:00 Europe/London
+  - Initial release.

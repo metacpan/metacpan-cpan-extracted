@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Devel-Trace-Syscall,
-version 0.04:
+version 0.05:
 
   Print a stack trace whenever a system call is made
 

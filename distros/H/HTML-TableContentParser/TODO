@@ -1,9 +1,5 @@
-o  Support for nested tables.
 o  Use separate package for stored elements - TableContentParser::Table, e.g.
 o  Add support for thead, tfoot, tbody, col, & colgroup elements.
 o  More validation of element layout (tbody must come after tfoot, which must
    come after thead, for example) [Not sure validation is wanted in this
    package -- TRW]
-o  [ Current (0.13/0.200) <th> functionality is broken, because <th>
-   defines a column just like <td> does, and is part of a <tr>. -- TRW]
-o  [ Simplify code before doing nested tables. -- TRW]

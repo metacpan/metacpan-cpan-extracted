@@ -10,8 +10,8 @@ if 01 == 1.0 ( setdos /x-14567 )
 
 perl -x -S %0 %*
 if NOT %errorlevel% == 0 (
-	endlocal & exit /B %errorlevel%
-	)
+    endlocal & exit /B %errorlevel%
+    )
 :: TODO: test error output(s)
 ::endlocal
 
@@ -41,8 +41,8 @@ dosify [B<<option(s)>>] [B<<filename(s)>>]
 
 Options:
 
-		--version       version message
-	-?, --help          brief help message
+        --version       version message
+    -?, --help          brief help message
 
 =end HIDDEN-OPTIONS
 
@@ -90,8 +90,8 @@ B<dosify> will read INPUT (either STDIN or B<<filename(s)>> and "dosify" each in
 
 # VERSION: major.minor.release[.build]]  { minor is ODD => alpha/beta/experimental; minor is EVEN => stable/release }
 # generate VERSION from $Version: 0.3.3.179015 $ SCS tag
-# $defaultVERSION 	:: used to make the VERSION code resilient vs missing keyword expansion
-# $generate_alphas	:: 0 => generate normal versions; true/non-0 => generate alpha version strings for ODD numbered minor versions
+# $defaultVERSION   :: used to make the VERSION code resilient vs missing keyword expansion
+# $generate_alphas  :: 0 => generate normal versions; true/non-0 => generate alpha version strings for ODD numbered minor versions
 use version qw(); our $VERSION; { my $defaultVERSION = '0.1.0'; my $generate_alphas = 0; $VERSION = ( $defaultVERSION, qw( $Version: 0.3.3.179015 $ ))[-2]; if ($generate_alphas) { $VERSION =~ /(\d+)\.(\d+)\.(\d+)(?:\.)?(.*)/; $VERSION = $1.'.'.$2.((!$4&&($2%2))?'_':'.').$3.($4?((($2%2)?'_':'.').$4):q{}); $VERSION = version::qv( $VERSION ); }; } ## no critic ( ProhibitCallsToUnexportedSubs ProhibitCaptureWithoutTest ProhibitNoisyQuotes ProhibitMixedCaseVars ProhibitMagicNumbers)
 
 use Pod::Usage;
@@ -121,46 +121,46 @@ pod2usage(-verbose => 2) if $ARGV{'man'};
 
 while(<>)
 {
-	chomp($_);
-	print _dosify($_, {quote_all => $ARGV{quote}})."\n";
+    chomp($_);
+    print _dosify($_, {quote_all => $ARGV{quote}})."\n";
 }
 
-sub	_dosify {
-	# _dosify( <null>|$|@ ): returns <null>|$|@ ['shortcut' function]
-	# dosify string, returning a string dosify will be interpreted/parsed by DOS/CMD as the input string when input to the command line
-	# CMD/DOS quirks: dosify double-quotes:: {\\} => {\\} UNLESS followed by a double-quote mark when {\\} => {\} and {\"} => {"} (and doesn't end the quote)
-	#	:: EXAMPLES: {a"b"c d} => {[abc][d]}, {a"\b"c d} => {[a\bc][d]}, {a"\b\"c d} => {[a\b"c d]}, {a"\b\"c" d} => {[a\b"c"][d]}
-	#				 {a"\b\\"c d} => {[a\b\c][d]}, {a"\b\\"c" d} => {[a\b\c d]}, {a"\b\\"c d} => {[a\b\c][d]}, {a"\b\\c d} => {[a\b\\c d]}
-	my %opt	= (
-		quote_all => 0, 	# = true/false [default = false]	# if true, surround all output arguments with double-quotes
-		);
+sub _dosify {
+    # _dosify( <null>|$|@ ): returns <null>|$|@ ['shortcut' function]
+    # dosify string, returning a string dosify will be interpreted/parsed by DOS/CMD as the input string when input to the command line
+    # CMD/DOS quirks: dosify double-quotes:: {\\} => {\\} UNLESS followed by a double-quote mark when {\\} => {\} and {\"} => {"} (and doesn't end the quote)
+    #   :: EXAMPLES: {a"b"c d} => {[abc][d]}, {a"\b"c d} => {[a\bc][d]}, {a"\b\"c d} => {[a\b"c d]}, {a"\b\"c" d} => {[a\b"c"][d]}
+    #                {a"\b\\"c d} => {[a\b\c][d]}, {a"\b\\"c" d} => {[a\b\c d]}, {a"\b\\"c d} => {[a\b\c][d]}, {a"\b\\c d} => {[a\b\\c d]}
+    my %opt = (
+        quote_all => 0,     # = true/false [default = false]    # if true, surround all output arguments with double-quotes
+        );
 
-	my $me = (caller(0))[3];	## no critic ( ProhibitMagicNumbers )	## caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
-	my $opt_ref;
-	$opt_ref = pop @_ if ( @_ && (ref($_[-1]) eq 'HASH'));	## no critic (ProhibitPostfixControls)	## pop last argument only if it's a HASH reference (assumed to be options for our function)
-	if ($opt_ref) { for (keys %{$opt_ref}) { if (exists $opt{$_}) { $opt{$_} = $opt_ref->{$_}; } else { Carp::carp "Unknown option '$_' for function ".$me; return; } } }
-	if ( !@_ && !defined(wantarray) ) { Carp::carp 'Useless use of '.$me.' with no arguments in void return context (did you want '.$me.'($_) instead?)'; return; } ## no critic ( RequireInterpolationOfMetachars ) #
-	if ( !@_ ) { Carp::carp 'Useless use of '.$me.' with no arguments'; return; }
+    my $me = (caller(0))[3];    ## no critic ( ProhibitMagicNumbers )   ## caller(EXPR) => ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller($i);
+    my $opt_ref;
+    $opt_ref = pop @_ if ( @_ && (ref($_[-1]) eq 'HASH'));  ## no critic (ProhibitPostfixControls)  ## pop last argument only if it's a HASH reference (assumed to be options for our function)
+    if ($opt_ref) { for (keys %{$opt_ref}) { if (exists $opt{$_}) { $opt{$_} = $opt_ref->{$_}; } else { Carp::carp "Unknown option '$_' for function ".$me; return; } } }
+    if ( !@_ && !defined(wantarray) ) { Carp::carp 'Useless use of '.$me.' with no arguments in void return context (did you want '.$me.'($_) instead?)'; return; } ## no critic ( RequireInterpolationOfMetachars ) #
+    if ( !@_ ) { Carp::carp 'Useless use of '.$me.' with no arguments'; return; }
 
-	@_ = @_ ? @_ : $_ if defined wantarray;		## no critic (ProhibitPostfixControls)	## break aliasing if non-void return context
+    @_ = @_ ? @_ : $_ if defined wantarray;     ## no critic (ProhibitPostfixControls)  ## break aliasing if non-void return context
 
-	# TODO: check these characters for necessity => PIPE characters [<>|] and internal double quotes for sure, [:]?, [*?] glob chars needed?, what about glob character set chars [{}]?
-	my $dos_special_chars = '"<>|';
-	my $dc = quotemeta( $dos_special_chars );
-	for (@_ ? @_ : $_)
-		{
-		#print "_ = $_\n";
-		s:\/:\\:g;								# forward to back slashes
-		if ( $opt{quote_all} or ($_ =~ qr{(\s|[$dc])}))
-			{
-			#print "in qr\n";
-			s:":\\":g;							# CMD: preserve double-quotes with backslash	# TODO: change to $dos_escape	## no critic (ProhibitUnusualDelimiters)
-			s:([\\]+)\\":($1 x 2).q{\\"}:eg;	# double backslashes in front of any \" to preserve them when interpreted by DOS/CMD
-			$_ = q{"}.$_.q{"};					# quote the final token
-			};
-		}
+    # TODO: check these characters for necessity => PIPE characters [<>|] and internal double quotes for sure, [:]?, [*?] glob chars needed?, what about glob character set chars [{}]?
+    my $dos_special_chars = '"<>|';
+    my $dc = quotemeta( $dos_special_chars );
+    for (@_ ? @_ : $_)
+        {
+        #print "_ = $_\n";
+        s:\/:\\:g;                              # forward to back slashes
+        if ( $opt{quote_all} or ($_ =~ qr{(\s|[$dc])}))
+            {
+            #print "in qr\n";
+            s:":\\":g;                          # CMD: preserve double-quotes with backslash    # TODO: change to $dos_escape   ## no critic (ProhibitUnusualDelimiters)
+            s:([\\]+)\\":($1 x 2).q{\\"}:eg;    # double backslashes in front of any \" to preserve them when interpreted by DOS/CMD
+            $_ = q{"}.$_.q{"};                  # quote the final token
+            };
+        }
 
-	return wantarray ? @_ : "@_";
+    return wantarray ? @_ : "@_";
 }
 
 __END__

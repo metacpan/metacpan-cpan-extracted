@@ -47,7 +47,7 @@ use SNMP::Info::IEEE802dot3ad 'agg_ports_lag';
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.40';
+$VERSION = '3.43';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -206,6 +206,10 @@ See L<SNMP::Info::LLDP> for its own MIB requirements.
 These are methods that return scalar value from SNMP
 
 =over
+
+=item $h3c->model()
+
+Returns the model from C<sysObjectID> or C<entPhysicalClass>.
 
 =item $h3c->vendor()
 

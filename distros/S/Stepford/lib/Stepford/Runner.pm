@@ -4,18 +4,17 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.004001';
+our $VERSION = '0.005000';
 
-use List::AllUtils qw( first max );
+use List::AllUtils qw( first );
 use Module::Pluggable::Object;
 use MooseX::Params::Validate qw( validated_list );
 use Parallel::ForkManager;
-use Scalar::Util qw( blessed );
 use Stepford::Error;
 use Stepford::GraphBuilder;
 use Stepford::Types qw(
     ArrayOfClassPrefixes ArrayOfSteps Bool ClassName
-    HashRef Logger Maybe PositiveInt Step
+    HashRef Logger Maybe PositiveInt Step OutputMode
 );
 use Try::Tiny;
 
@@ -59,7 +58,7 @@ has _memory_stats => (
         }
         catch {
             undef;
-        }
+        };
     },
 );
 
@@ -83,7 +82,8 @@ sub BUILD {
 
 sub run {
     my $self = shift;
-    my ( $final_steps, $config, $force_step_execution ) = validated_list(
+    my ( $final_steps, $config, $force_step_execution, $dry_run )
+        = validated_list(
         \@_,
         final_steps => {
             isa    => ArrayOfSteps,
@@ -96,13 +96,21 @@ sub run {
         force_step_execution => {
             isa     => Bool,
             default => 0,
-        }
-    );
+        },
+        dry_run => {
+            isa     => Bool | OutputMode,
+            default => 'none',
+        },
+        );
 
     my $root_graph
         = $self->_make_root_graph_builder( $final_steps, $config )->graph;
 
-    if ( $self->jobs > 1 ) {
+    if ( $dry_run ne 'none' ) {
+        ## no critic (InputOutput::RequireCheckedSyscalls)
+        print $root_graph->as_string($dry_run);
+    }
+    elsif ( $self->jobs > 1 ) {
         $self->_run_parallel( $root_graph, $force_step_execution );
     }
     else {
@@ -299,7 +307,7 @@ sub _build_step_classes {
             search_path => [ $self->step_namespaces ],
             require     => 1,
         )->plugins
-        ) {
+    ) {
 
         # We need to skip roles
         next unless $class->isa('Moose::Object');
@@ -387,7 +395,7 @@ Stepford::Runner - Takes a set of steps and figures out what order to run them i
 
 =head1 VERSION
 
-version 0.004001
+version 0.005000
 
 =head1 SYNOPSIS
 
@@ -532,6 +540,37 @@ which steps are up to date and do not need re-executing. Even with this set
 each step will only be executed once per run regardless of how many other
 steps depend on it during execution.
 
+=item * dry_run
+
+This argument defaults to C<none>.
+
+When set to L<a valid output mode|https://metacpan.org/pod/Graph::Easy#Output>,
+this option makes Stepford calculate the steps that need to be executed, but
+stop before actually executing them. Instead, the step graph will be dumped to
+STDOUT using one of the following output methods available in L<Graph::Easy>:
+
+=over 4
+
+=item * txt
+
+=item * ascii
+
+=item * boxart
+
+=item * svg
+
+=item * graphviz
+
+=item * graphml
+
+=item * vcg
+
+=item * gdl
+
+=back
+
+These will be mapped directly to the corresponding methods in that module.
+
 =back
 
 =head2 $runner->step_namespaces
@@ -571,7 +610,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2017 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

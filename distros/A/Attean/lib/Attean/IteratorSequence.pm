@@ -7,7 +7,7 @@ Attean::IteratorSequence - Iterator implementation backed by zero or more sub-it
 
 =head1 VERSION
 
-This document describes Attean::IteratorSequence version 0.018
+This document describes Attean::IteratorSequence version 0.019
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ iterator.
 
 =cut
 
-package Attean::IteratorSequence 0.018 {
+package Attean::IteratorSequence 0.019 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf);
 	use namespace::clean;
@@ -105,7 +105,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

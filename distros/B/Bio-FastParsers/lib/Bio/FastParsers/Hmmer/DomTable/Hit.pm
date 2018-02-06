@@ -1,10 +1,9 @@
 package Bio::FastParsers::Hmmer::DomTable::Hit;
 # ABSTRACT: internal class for tabular HMMER domain parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::DomTable::Hit::VERSION = '0.173640';
+$Bio::FastParsers::Hmmer::DomTable::Hit::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
-with 'Bio::FastParsers::Hmmer::Roles::Domainable';
 
 # public attributes
 
@@ -26,6 +25,7 @@ has $_ => (
     required => 1,
 ) for qw(tlen qlen evalue score bias of);
 
+with 'Bio::FastParsers::Roles::Domainable';
 
 
 sub expect {
@@ -46,7 +46,7 @@ Bio::FastParsers::Hmmer::DomTable::Hit - internal class for tabular HMMER domain
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

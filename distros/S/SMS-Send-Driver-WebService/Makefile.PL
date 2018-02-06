@@ -7,6 +7,7 @@ WriteMakefile(
     PREREQ_PM    => {
                      'Test::Simple'     => 0.44,
                      'LWP::UserAgent'   => 0,
+                     'HTTP::Tiny'       => 0,
                      'SMS::Send'        => 0,
                      'Config::IniFiles' => 0,
                      'Path::Class'      => 0,

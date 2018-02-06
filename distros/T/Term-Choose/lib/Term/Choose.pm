@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.509';
+our $VERSION = '1.510';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -571,7 +571,7 @@ sub __choose {
 
 sub __marked_idx2rc {
     my ( $self, $list_of_indexes, $boolean ) = @_;
-    if ( $self->{layout} == 3 ) {
+    if ( $self->{current_layout} == 3 ) {
         for my $idx ( @$list_of_indexes ) {
             $self->{marked}[$idx][0] = $boolean;
         }
@@ -756,16 +756,18 @@ sub __prepare_promptline {
 
 sub __size_and_layout {
     my ( $self ) = @_;
+    my $layout = $self->{layout};
     $self->{rc2idx} = [];
     if ( $self->{length_longest} > $self->{avail_width} ) {
         $self->{avail_col_width} = $self->{avail_width};
-        $self->{layout} = 3;    # ###
+        $layout = 3;
     }
     else {
         $self->{avail_col_width} = $self->{length_longest};
     }
+    $self->{current_layout} = $layout;
     my $all_in_first_row = '';
-    if ( $self->{layout} == 0 || $self->{layout} == 1 ) {
+    if ( $layout == 0 || $layout == 1 ) {
         for my $idx ( 0 .. $#{$self->{list}} ) {
             $all_in_first_row .= $self->{list}[$idx];
             $all_in_first_row .= ' ' x $self->{pad} if $idx < $#{$self->{list}};
@@ -778,7 +780,7 @@ sub __size_and_layout {
     if ( $all_in_first_row ) {
         $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
     }
-    elsif ( $self->{layout} == 3 ) {
+    elsif ( $layout == 3 ) {
         for my $idx ( 0 .. $#{$self->{list}} ) {
             $self->{rc2idx}[$idx][0] = $idx;
         }
@@ -786,13 +788,13 @@ sub __size_and_layout {
     else {
         my $tmp_avail_width = $self->{avail_width} + $self->{pad};
         # auto_format
-        if ( $self->{layout} == 1 || $self->{layout} == 2 ) {
+        if ( $layout == 1 || $layout == 2 ) {
             my $tmc = int( @{$self->{list}} / $self->{avail_height} );
             $tmc++ if @{$self->{list}} % $self->{avail_height};
             $tmc *= $self->{col_width};
             if ( $tmc < $tmp_avail_width ) {
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) ) if $self->{layout} == 1;
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 4 ) )   if $self->{layout} == 2;
+                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) ) if $layout == 1;
+                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 4 ) )   if $layout == 2;
                 $tmp_avail_width = $tmc;
             }
         }
@@ -1071,7 +1073,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.509
+Version 1.510
 
 =cut
 

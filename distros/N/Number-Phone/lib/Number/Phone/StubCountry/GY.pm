@@ -22,39 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
+                'toll_free' => '
           (?:
-            2(?:
-              1[6-9]|
-              2[0-35-9]|
-              3[1-4]|
-              5[3-9]|
-              6\\d|
-              7[0-24-79]
-            )|
-            3(?:
-              2[25-9]|
-              3\\d
-            )|
-            4(?:
-              4[0-24]|
-              5[56]
-            )|
-            77[1-57]
+            289|
+            862
           )\\d{4}
         ',
-                'personal_number' => '',
-                'voip' => '',
+                'specialrate' => '(9008\\d{3})',
                 'fixed_line' => '
           (?:
             2(?:
@@ -76,14 +60,31 @@ my $validators = {
             77[1-57]
           )\\d{4}
         ',
-                'specialrate' => '(9008\\d{3})',
-                'toll_free' => '
+                'geographic' => '
           (?:
-            289|
-            862
+            2(?:
+              1[6-9]|
+              2[0-35-9]|
+              3[1-4]|
+              5[3-9]|
+              6\\d|
+              7[0-24-79]
+            )|
+            3(?:
+              2[25-9]|
+              3\\d
+            )|
+            4(?:
+              4[0-24]|
+              5[56]
+            )|
+            77[1-57]
           )\\d{4}
         ',
-                'mobile' => '6\\d{6}'
+                'mobile' => '6\\d{6}',
+                'personal_number' => '',
+                'voip' => '',
+                'pager' => ''
               };
 my %areanames = (
   592216 => "Diamond\/Grove",

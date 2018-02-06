@@ -1,0 +1,39 @@
+App-Scheme79asm version 0.001
+=============================
+
+SIMPLE is a LISP processor defined in the 1979
+B<Design of LISP-Based Processors> paper by Steele and Sussman.
+
+The SIMPLE processor expects input in a particular tagged-pointer
+format. This module takes a string containing a sequence of
+S-expressions of the form C<(tag . value)> representing a tagged
+pointer. Here the tag is either a number or one of several predefined
+values (see the source for a full list), and the value is either a
+number or another tagged pointer. These values are laid out in memory
+and a block of verilog code assigning the memory contents to an array
+named C<mem> is printed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Data::SExpression
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2018 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

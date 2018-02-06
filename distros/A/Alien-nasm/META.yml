@@ -5,7 +5,6 @@ author:
 build_requires:
   Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '6.52'
   Test2::V0: '0.000060'
   Test::Alien: '0.11'
@@ -32,7 +31,7 @@ resources:
   bugtracker: https://github.com/plicease/Alien-nasm/issues
   homepage: https://metacpan.org/pod/Alien::nasm
   repository: git://github.com/plicease/Alien-nasm.git
-version: '0.19'
+version: '0.20'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
   requires:
@@ -48,3 +47,4 @@ x_alienfile:
       URI::Escape: '0'
     system: {}
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

@@ -14,27 +14,27 @@ require_ok( 'Astro::Catalog' );
 
 # test sources
 my @input = (
-	     {
-	      ra => '03:25:27.1',
-	      dec => '30:45:11',
-	      type => 'j2000',
-	      name => 'a space',
-	      comment => 'with comment'
-	     },
-	     {
-	      ra => '13:25:27.1',
-	      dec => '-30:45:11',
-	      type => 'b1950',
-	      name => 'test',
-	     },
-	     {
-	      long => '03:26:30.0',
-	      lat => '-1:45:0',
-	      type => 'galactic',
-	      name => 'gal 2',
-	     }
+             {
+              ra => '03:25:27.1',
+              dec => '30:45:11',
+              type => 'j2000',
+              name => 'a space',
+              comment => 'with comment'
+             },
+             {
+              ra => '13:25:27.1',
+              dec => '-30:45:11',
+              type => 'b1950',
+              name => 'test',
+             },
+             {
+              long => '03:26:30.0',
+              lat => '-1:45:0',
+              type => 'galactic',
+              name => 'gal 2',
+             }
 
-	    );
+            );
 
 # Start by having some test coordinates
 # convert test sources to Astro::Coords and randomly

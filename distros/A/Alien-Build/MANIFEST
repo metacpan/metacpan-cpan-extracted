@@ -60,6 +60,7 @@ corpus/lib/Alien/Foo1.pm
 corpus/lib/Alien/Foo1/ConfigData.pm
 corpus/lib/Alien/Foo2.pm
 corpus/lib/Alien/Foo2/ConfigData.pm
+corpus/lib/Alien/SansShare.pm
 corpus/lib/Alien/foomake.pm
 corpus/lib/Alien/libfoo1.pm
 corpus/lib/Alien/libfoo2.pm

@@ -50,3 +50,6 @@ Revision history for Perl extension Finance::TickerSymbols.
 
 3.02  Mon Jan 29 - 2018
          - add a pre-requirement of LWP::Protocol::https version 6
+
+3.03  Tue Jan 30 - 2018
+         - use https://...yahoo.. to avoid redirection

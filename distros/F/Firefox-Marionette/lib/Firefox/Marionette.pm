@@ -28,7 +28,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 sub _ANYPROCESS                    { return -1 }
 sub _COMMAND                       { return 0 }
@@ -37,6 +37,7 @@ sub _WIN32_ERROR_SHARING_VIOLATION { return 0x20 }
 sub _NUMBER_OF_MCOOKIE_BYTES       { return 16 }
 sub _MAX_DISPLAY_LENGTH            { return 10 }
 sub _NUMBER_OF_TERM_ATTEMPTS       { return 4 }
+sub _OLD_BROWSER_MAJOR_VERSION     { return 56 }
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -120,9 +121,9 @@ sub _launch {
         && ( $OSNAME ne 'cygwin' )
         && ( $self->_visible() )
         && ( !$ENV{DISPLAY} )
-        && ( $self->_xvfb_exists() ) )
+        && ( $self->_xvfb_exists() )
+        && ( $self->_launch_xvfb() ) )
     { # if not MacOS or Win32 and no DISPLAY variable, launch Xvfb if at all possible
-        $self->_launch_xvfb();
         local $ENV{DISPLAY}    = $self->_xvfb_display();
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
         return $self->_launch_unix(@arguments);
@@ -155,14 +156,82 @@ sub _xvfb_binary {
     return 'Xvfb';
 }
 
+sub _dev_fd_works {
+    my ($self) = @_;
+    my $test_handle =
+      File::Temp::tempfile( File::Spec->tmpdir(),
+        'firefox_marionette_dev_fd_test_XXXXXXXXXXX' )
+      or Carp::Croak("Failed to open temporary file:$EXTENDED_OS_ERROR");
+    my @stats = stat '/dev/fd/' . fileno $test_handle;
+    if ( scalar @stats ) {
+        return 1;
+    }
+    elsif ( $OSNAME eq 'freebsd' ) {
+        Carp::carp(
+q[/dev/fd is not working.  Perhaps you need to mount fdescfs like so 'sudo mount -t fdescfs fdesc /dev/fd']
+        );
+    }
+    else {
+        Carp::carp("/dev/fd is not working for $OSNAME");
+    }
+    return 0;
+}
+
+sub _dbus_works {
+    my ($self)   = @_;
+    my $binary   = 'dbus-launch';
+    my $dev_null = File::Spec->devnull();
+    if ( my $pid = fork ) {
+        waitpid $pid, 0;
+        if ( $CHILD_ERROR == 0 ) {
+            return 1;
+        }
+        elsif ( $OSNAME eq 'freebsd' ) {
+            my @stats = stat '/etc/machine-id';
+            if ( scalar @stats ) {
+            }
+            else {
+                Carp::carp(
+q[D-Bus is not working.  Perhaps you need to create '/etc/machine-id' like so 'sudo dbus-uuidgen --ensure=/etc/machine-id']
+                );
+            }
+        }
+    }
+    elsif ( defined $pid ) {
+        eval {
+            if ( !$self->_debug() ) {
+                open STDOUT, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+                open STDERR, q[>], $dev_null
+                  or Carp::croak(
+                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
+                  );
+            }
+            exec {$binary} $binary
+              or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
+        } or do {
+            chomp $EVAL_ERROR;
+            warn "$EVAL_ERROR\n";
+        };
+        exit 1;
+    }
+    return 0;
+}
+
 sub _xvfb_exists {
     my ($self)   = @_;
     my $binary   = $self->_xvfb_binary();
     my $dev_null = File::Spec->devnull();
-    eval {
-        require Digest::MD5;
-        require Crypt::URandom;
-    } or do {
+    if ( !$self->_dev_fd_works() ) {
+        return 0;
+    }
+    if ( !$self->_dbus_works() ) {
+        return 0;
+    }
+    eval { require Crypt::URandom; } or do {
+        Carp::croak('Unable to load Crypt::URandom');
         return 0;
     };
     if ( my $pid = fork ) {
@@ -199,9 +268,8 @@ sub xvfb {
 
 sub _launch_xauth {
     my ( $self, $display_number ) = @_;
-    my $mcookie =
-      Digest::MD5::md5_hex(
-        Crypt::URandom::urandom( _NUMBER_OF_MCOOKIE_BYTES() ) );
+    my $mcookie = unpack 'H*',
+      Crypt::URandom::urandom( _NUMBER_OF_MCOOKIE_BYTES() );
     my $source_handle =
       File::Temp::tempfile( File::Spec->tmpdir(),
         'firefox_marionette_xauth_source_XXXXXXXXXXX' )
@@ -301,6 +369,11 @@ sub _launch_xvfb {
             chomp $display_number;
             if ( $display_number !~ /^\d+$/smx ) {
                 sleep 1;
+            }
+            waitpid $pid, POSIX::WNOHANG();
+            if ( !kill 0, $pid ) {
+                Carp::carp('Unable to start Xvfb');
+                return 0;
             }
         }
         $self->{_xvfb_display_number} = $display_number;
@@ -487,7 +560,7 @@ sub _reap {
     }
     else {
         while ( ( my $pid = waitpid _ANYPROCESS(), POSIX::WNOHANG() ) > 0 ) {
-            if ( $pid == $self->_pid() ) {
+            if ( ( $self->_pid() ) && ( $pid == $self->_pid() ) ) {
                 $self->{_child_error} = $CHILD_ERROR;
             }
             elsif ( ( $self->xvfb() ) && ( $pid == $self->xvfb() ) ) {
@@ -620,7 +693,7 @@ sub new_session {
     if (   ( defined $capabilities )
         && ( $capabilities->isa('Firefox::Marionette::Capabilities') ) )
     {
-        $parameters = {
+        my $actual = {
             acceptInsecureCerts => $capabilities->accept_insecure_certs()
             ? JSON::true()
             : JSON::false(),
@@ -632,14 +705,49 @@ sub new_session {
               $capabilities->moz_accessibility_checks() ? JSON::true()
             : JSON::false(),
         };
+        $parameters = $actual;    # for Mozilla 57 and after
+        foreach my $key ( sort { $a cmp $b } keys %{$actual} ) {
+            $parameters->{capabilities}->{requiredCapabilities}->{$key} =
+              $actual->{$key};    # for Mozilla 56 (and below???)
+        }
     }
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:NewSession', $parameters ] );
-    my $response = $self->_get_response($message_id);
+        [
+            _COMMAND(),                              $message_id,
+            $self->_command('WebDriver:NewSession'), $parameters
+        ]
+    );
+    my $response;
+    eval { $response = $self->_get_response($message_id); } or do {
+        if (
+            ( ref $EVAL_ERROR )
+            && ( ( ref $EVAL_ERROR ) eq
+                'Firefox::Marionette::Exception::Response' )
+            && (   ( $EVAL_ERROR->error() eq 'invalid session id' )
+                || ( $EVAL_ERROR->error() eq 'unknown command' ) )
+          )
+        {
+            my $fallback_message_id = $self->_new_message_id();
+            $self->_send_request(
+                [ _COMMAND(), $fallback_message_id, 'newSession', $parameters ]
+            );
+            $response = $self->_get_response($fallback_message_id);
+        }
+        else {
+            Carp::croak($EVAL_ERROR);
+        }
+    };
     $self->{session_id} = $response->result()->{sessionId};
-    return ( $self->{session_id},
-        $self->_create_capabilities( $response->result()->{capabilities} ) );
+    my $new =
+      $self->_create_capabilities( $response->result()->{capabilities} );
+    $self->{_browser_version} = $new->browser_version();
+    return ( $self->{session_id}, $new );
+}
+
+sub browser_version {
+    my ($self) = @_;
+    return $self->{_browser_version};
 }
 
 sub _create_capabilities {
@@ -647,6 +755,12 @@ sub _create_capabilities {
     my $pid = $parameters->{'moz:processID'};
     if ( ($pid) && ( $OSNAME eq 'cygwin' ) ) {
         $pid = $self->_pid();
+    }
+    my $headless = $self->_visible() ? 0 : 1;
+    if ( defined $parameters->{'moz:headless'} ) {
+        if ( $parameters->{'moz:headless'} != $headless ) {
+            Carp::croak('moz:headless has not been determined correctly');
+        }
     }
     return Firefox::Marionette::Capabilities->new(
         accept_insecure_certs => $parameters->{acceptInsecureCerts} ? 1 : 0,
@@ -656,15 +770,15 @@ sub _create_capabilities {
             script    => $parameters->{timeouts}->{script},
             implicit  => $parameters->{timeouts}->{implicit},
         ),
-        browser_version          => $parameters->{browserVersion},
-        platform_name            => $parameters->{platformName},
-        rotatable                => $parameters->{rotatable} ? 1 : 0,
+        browser_version => $parameters->{browserVersion},
+        platform_name   => $parameters->{platformName},
+        rotatable => $parameters->{rotatable} ? 1 : 0,
         platform_version         => $parameters->{platformVersion},
         moz_profile              => $parameters->{'moz:profile'},
         moz_webdriver_click      => $parameters->{'moz:webdriverClick'} ? 1 : 0,
         moz_process_id           => $pid,
         browser_name             => $parameters->{browserName},
-        moz_headless             => $parameters->{'moz:headless'} ? 1 : 0,
+        moz_headless             => $headless,
         moz_accessibility_checks => $parameters->{'moz:accessibilityChecks'}
         ? 1
         : 0,
@@ -673,12 +787,22 @@ sub _create_capabilities {
 
 sub find_elements {
     my ( $self, $value, $using ) = @_;
+    Carp::carp(
+        '**** DEPRECATED METHOD - find_elements HAS BEEN REPLACED BY list ****'
+    );
+    return $self->find( $value, $using );
+}
+
+sub list {
+    my ( $self, $value, $using ) = @_;
     $using ||= 'xpath';
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:FindElements', { using => $using, value => $value }
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:FindElements'),
+            { using => $using, value => $value }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -702,7 +826,7 @@ sub add_cookie {
         [
             _COMMAND(),
             $message_id,
-            'WebDriver:AddCookie',
+            $self->_command('WebDriver:AddCookie'),
             {
                 cookie => {
                     httpOnly => $cookie->http_only()
@@ -739,7 +863,8 @@ sub is_selected {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:IsElementSelected', { id => $element->uuid() }
+            $self->_command('WebDriver:IsElementSelected'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -763,7 +888,8 @@ sub is_enabled {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:IsElementEnabled', { id => $element->uuid() }
+            $self->_command('WebDriver:IsElementEnabled'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -787,7 +913,8 @@ sub is_displayed {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:IsElementDisplayed', { id => $element->uuid() }
+            $self->_command('WebDriver:IsElementDisplayed'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -795,6 +922,13 @@ sub is_displayed {
 }
 
 sub send_keys {
+    my ( $self, $element, $text ) = @_;
+    Carp::carp(
+        '**** DEPRECATED METHOD - send_keys HAS BEEN REPLACED BY type ****');
+    return $self->type( $element, $text );
+}
+
+sub type {
     my ( $self, $element, $text ) = @_;
     if (
         !(
@@ -804,13 +938,14 @@ sub send_keys {
       )
     {
         Carp::croak(
-            'send_keys method requires a Firefox::Marionette::Element parameter'
-        );
+            'type method requires a Firefox::Marionette::Element parameter');
     }
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id, 'WebDriver:ElementSendKeys',
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:ElementSendKeys'),
             { id => $element->uuid(), text => $text }
         ]
     );
@@ -822,7 +957,8 @@ sub delete_session {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:DeleteSession' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:DeleteSession') ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -831,7 +967,10 @@ sub minimise {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:MinimizeWindow' ] );
+        [
+            _COMMAND(), $message_id, $self->_command('WebDriver:MinimizeWindow')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -840,7 +979,10 @@ sub maximise {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:MaximizeWindow' ] );
+        [
+            _COMMAND(), $message_id, $self->_command('WebDriver:MaximizeWindow')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -848,16 +990,106 @@ sub maximise {
 sub refresh {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
-    $self->_send_request( [ _COMMAND(), $message_id, 'WebDriver:Refresh' ] );
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:Refresh') ] );
     my $response = $self->_get_response($message_id);
     return $self;
+}
+
+my %_deprecated_commands = (
+    'WebDriver:GetCapabilities'              => 'getSessionCapabilities',
+    'Marionette:Quit'                        => 'quit',
+    'Marionette:SetContext'                  => 'setContext',
+    'Marionette:GetContext'                  => 'getContext',
+    'Marionette:AcceptConnections'           => 'acceptConnections',
+    'Addon:Install'                          => 'addon:install',
+    'Addon:Uninstall'                        => 'addon:uninstall',
+    'WebDriver:AcceptDialog'                 => 'acceptDialog',
+    'WebDriver:AddCookie'                    => 'addCookie',
+    'WebDriver:Back'                         => 'goBack',
+    'WebDriver:CloseChromeWindow'            => 'closeChromeWindow',
+    'WebDriver:CloseWindow'                  => 'close',
+    'WebDriver:DeleteAllCookies'             => 'deleteAllCookies',
+    'WebDriver:DeleteCookie'                 => 'deleteCookie',
+    'WebDriver:DeleteSession'                => 'deleteSession',
+    'WebDriver:DismissAlert'                 => 'dismissDialog',
+    'WebDriver:GetWindowType'                => 'getWindowType',
+    'WebDriver:DismissAlert'                 => 'dismissDialog',
+    'WebDriver:ElementClear'                 => 'clearElement',
+    'WebDriver:ElementClick'                 => 'clickElement',
+    'WebDriver:ElementSendKeys'              => 'sendKeysToElement',
+    'WebDriver:ExecuteAsyncScript'           => 'executeAsyncScript',
+    'WebDriver:ExecuteScript'                => 'executeScript',
+    'WebDriver:FindElement'                  => 'findElement',
+    'WebDriver:FindElements'                 => 'findElements',
+    'WebDriver:Forward'                      => 'goForward',
+    'WebDriver:FullscreenWindow'             => 'fullscreenWindow',
+    'WebDriver:GetActiveElement'             => 'getActiveElement',
+    'WebDriver:GetActiveFrame'               => 'getActiveFrame',
+    'WebDriver:GetAlertText'                 => 'getTextFromDialog',
+    'WebDriver:GetCapabilities'              => 'getSessionCapabilities',
+    'WebDriver:GetChromeWindowHandle'        => 'getChromeWindowHandle',
+    'WebDriver:GetChromeWindowHandles'       => 'getChromeWindowHandles',
+    'WebDriver:GetCookies'                   => 'getCookies',
+    'WebDriver:GetCurrentChromeWindowHandle' => 'getChromeWindowHandle',
+    'WebDriver:GetCurrentURL'                => 'getCurrentUrl',
+    'WebDriver:GetElementAttribute'          => 'getElementAttribute',
+    'WebDriver:GetElementCSSValue'           => 'getElementValueOfCssProperty',
+    'WebDriver:GetElementProperty'           => 'getElementProperty',
+    'WebDriver:GetElementRect'               => 'getElementRect',
+    'WebDriver:GetElementTagName'            => 'getElementTagName',
+    'WebDriver:GetElementText'               => 'getElementText',
+    'WebDriver:GetPageSource'                => 'getPageSource',
+    'WebDriver:GetScreenOrientation'         => 'getScreenOrientation',
+    'WebDriver:GetTimeouts'                  => 'getTimeouts',
+    'WebDriver:GetTitle'                     => 'getTitle',
+    'WebDriver:GetWindowHandle'              => 'getWindowHandle',
+    'WebDriver:GetWindowHandles'             => 'getWindowHandles',
+    'WebDriver:GetWindowRect'                => 'getWindowRect',
+    'WebDriver:IsElementDisplayed'           => 'isElementDisplayed',
+    'WebDriver:IsElementEnabled'             => 'isElementEnabled',
+    'WebDriver:IsElementSelected'            => 'isElementSelected',
+    'WebDriver:MinimizeWindow'               => 'minimizeWindow',
+    'WebDriver:MaximizeWindow'               => 'maximizeWindow',
+    'WebDriver:Navigate'                     => 'get',
+    'WebDriver:NewSession'                   => 'newSession',
+    'WebDriver:PerformActions'               => 'performActions',
+    'WebDriver:Refresh'                      => 'refresh',
+    'WebDriver:ReleaseActions'               => 'releaseActions',
+    'WebDriver:SendAlertText'                => 'sendKeysToDialog',
+    'WebDriver:SetScreenOrientation'         => 'setScreenOrientation',
+    'WebDriver:SetTimeouts'                  => 'setTimeouts',
+    'WebDriver:SetWindowRect'                => 'setWindowRect',
+    'WebDriver:SwitchToFrame'                => 'switchToFrame',
+    'WebDriver:SwitchToParentFrame'          => 'switchToParentFrame',
+    'WebDriver:SwitchToShadowRoot'           => 'switchToShadowRoot',
+    'WebDriver:SwitchToWindow'               => 'switchToWindow',
+    'WebDriver:TakeScreenshot'               => 'takeScreenshot',
+);
+
+sub _command {
+    my ( $self, $command ) = @_;
+    if ( defined $self->browser_version() ) {
+        my ( $major, $minor, $patch ) = split /[.]/smx,
+          $self->browser_version();
+        if ( $major < _OLD_BROWSER_MAJOR_VERSION() ) {
+            if ( $_deprecated_commands{$command} ) {
+                return $_deprecated_commands{$command};
+            }
+        }
+    }
+    return $command;
 }
 
 sub capabilities {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetCapabilities' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetCapabilities')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self->_create_capabilities( $response->result()->{capabilities} );
 }
@@ -866,7 +1098,11 @@ sub delete_cookies {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:DeleteAllCookies' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:DeleteAllCookies')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -876,7 +1112,8 @@ sub delete_cookie {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id, 'WebDriver:DeleteCookie', { name => $name }
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:DeleteCookie'), { name => $name }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -886,7 +1123,8 @@ sub delete_cookie {
 sub cookies {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
-    $self->_send_request( [ _COMMAND(), $message_id, 'WebDriver:GetCookies' ] );
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetCookies') ] );
     my $response = $self->_get_response($message_id);
     return map {
         Firefox::Marionette::Cookie->new(
@@ -918,7 +1156,8 @@ sub tag_name {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:GetElementTagName', { id => $element->uuid() }
+            $self->_command('WebDriver:GetElementTagName'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -929,7 +1168,8 @@ sub window_rect {
     my ( $self, $new ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetWindowRect' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetWindowRect') ]
+    );
     my $response = $self->_get_response($message_id);
     my $old      = Firefox::Marionette::Window::Rect->new(
         pos_x  => $response->result()->{x},
@@ -944,7 +1184,7 @@ sub window_rect {
             [
                 _COMMAND(),
                 $message_id,
-                'WebDriver:SetWindowRect',
+                $self->_command('WebDriver:SetWindowRect'),
                 {
                     x      => $new->pos_x(),
                     y      => $new->pos_y(),
@@ -974,7 +1214,8 @@ sub rect {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:GetElementRect', { id => $element->uuid() }
+            $self->_command('WebDriver:GetElementRect'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1002,7 +1243,8 @@ sub text {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:GetElementText', { id => $element->uuid() }
+            $self->_command('WebDriver:GetElementText'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1025,7 +1267,8 @@ sub clear {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:ElementClear', { id => $element->uuid() }
+            $self->_command('WebDriver:ElementClear'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1048,7 +1291,8 @@ sub click {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:ElementClick', { id => $element->uuid() }
+            $self->_command('WebDriver:ElementClick'),
+            { id => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1059,7 +1303,7 @@ sub timeouts {
     my ( $self, $new ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetTimeouts' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetTimeouts') ] );
     my $response = $self->_get_response($message_id);
     my $old      = Firefox::Marionette::Timeouts->new(
         page_load => $response->result()->{pageLoad},
@@ -1072,7 +1316,7 @@ sub timeouts {
             [
                 _COMMAND(),
                 $message_id,
-                'WebDriver:SetTimeouts',
+                $self->_command('WebDriver:SetTimeouts'),
                 {
                     pageLoad => $new->page_load(),
                     script   => $new->script(),
@@ -1089,7 +1333,11 @@ sub active_element {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetActiveElement' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetActiveElement')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return Firefox::Marionette::Element->new( $self,
         %{ $response->result()->{value} } );
@@ -1099,7 +1347,8 @@ sub uri {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetCurrentURL' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetCurrentURL') ]
+    );
     my $response = $self->_get_response($message_id);
     return URI->new( $response->result()->{value} );
 }
@@ -1108,7 +1357,11 @@ sub full_screen {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:FullscreenWindow' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:FullscreenWindow')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1117,7 +1370,8 @@ sub dismiss_alert {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:DismissAlert' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:DismissAlert') ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1139,7 +1393,8 @@ sub accept_dialog {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:AcceptDialog' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:AcceptDialog') ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1148,7 +1403,8 @@ sub alert_text {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetAlertText' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetAlertText') ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1182,7 +1438,11 @@ sub selfie {
         }
     }
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:TakeScreenshot', $parameters ] );
+        [
+            _COMMAND(),                                  $message_id,
+            $self->_command('WebDriver:TakeScreenshot'), $parameters
+        ]
+    );
     my $response = $self->_get_response($message_id);
     if ( $extra{hash} ) {
         return $response->result()->{value};
@@ -1211,7 +1471,11 @@ sub current_chrome_window_handle {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetCurrentChromeWindowHandle' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetCurrentChromeWindowHandle')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1220,7 +1484,11 @@ sub chrome_window_handle {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetChromeWindowHandle' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetChromeWindowHandle')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1229,7 +1497,11 @@ sub chrome_window_handles {
     my ( $self, $element ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetChromeWindowHandles' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetChromeWindowHandles')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return @{ $response->result() };
 }
@@ -1238,7 +1510,11 @@ sub window_handle {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetWindowHandle' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetWindowHandle')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1247,7 +1523,11 @@ sub window_handles {
     my ( $self, $element ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetWindowHandles' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetWindowHandles')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return @{ $response->result() };
 }
@@ -1256,7 +1536,11 @@ sub close_current_chrome_window_handle {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:CloseChromeWindow' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:CloseChromeWindow')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return @{ $response->result() };
 }
@@ -1265,7 +1549,7 @@ sub close_current_window_handle {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:CloseWindow' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:CloseWindow') ] );
     my $response = $self->_get_response($message_id);
     return @{ $response->result() };
 }
@@ -1275,8 +1559,9 @@ sub css {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:GetElementCSSValue',
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:GetElementCSSValue'),
             { id => $element->uuid(), propertyName => $property_name }
         ]
     );
@@ -1289,8 +1574,9 @@ sub property {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:GetElementProperty',
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:GetElementProperty'),
             { id => $element->uuid(), name => $name }
         ]
     );
@@ -1304,7 +1590,7 @@ sub attribute {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:GetElementAttribute',
+            $self->_command('WebDriver:GetElementAttribute'),
             { id => $element->uuid(), name => $name }
         ]
     );
@@ -1314,12 +1600,21 @@ sub attribute {
 
 sub find_element {
     my ( $self, $value, $using ) = @_;
+    Carp::carp(
+        '**** DEPRECATED METHOD - find_element HAS BEEN REPLACED BY find ****');
+    return $self->find( $value, $using );
+}
+
+sub find {
+    my ( $self, $value, $using ) = @_;
     $using ||= 'xpath';
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:FindElement', { using => $using, value => $value }
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:FindElement'),
+            { using => $using, value => $value }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1331,7 +1626,10 @@ sub active_frame {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetActiveFrame' ] );
+        [
+            _COMMAND(), $message_id, $self->_command('WebDriver:GetActiveFrame')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     if ( defined $response->result()->{value} ) {
         return Firefox::Marionette::Element->new( $self,
@@ -1345,7 +1643,8 @@ sub active_frame {
 sub title {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
-    $self->_send_request( [ _COMMAND(), $message_id, 'WebDriver:GetTitle' ] );
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetTitle') ] );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1361,14 +1660,20 @@ sub quit {
         }
     }
     elsif ( $self->_socket() ) {
-        $flags ||=
-          ['eAttemptQuit'];    # ["eConsiderQuit", "eAttemptQuit", "eForceQuit"]
-        my $message_id = $self->_new_message_id();
-        $self->_send_request(
-            [ _COMMAND(), $message_id, 'Marionette:Quit', { flags => $flags } ]
-        );
-        my $response = $self->_get_response($message_id);
-        my $socket   = delete $self->{_socket};
+        if ( $self->_session_id() ) {
+            $flags ||=
+              ['eAttemptQuit']
+              ;    # ["eConsiderQuit", "eAttemptQuit", "eForceQuit"]
+            my $message_id = $self->_new_message_id();
+            $self->_send_request(
+                [
+                    _COMMAND(), $message_id,
+                    $self->_command('Marionette:Quit'), { flags => $flags }
+                ]
+            );
+            my $response = $self->_get_response($message_id);
+        }
+        my $socket = delete $self->{_socket};
         close $socket
           or
           Carp::croak("Failed to close socket to firefox:$EXTENDED_OS_ERROR");
@@ -1378,6 +1683,7 @@ sub quit {
         }
         else {
             while ( kill 0, $self->_pid() ) {
+                sleep 1;
                 $self->_reap();
             }
         }
@@ -1392,7 +1698,6 @@ sub quit {
         }
         delete $self->{_xvfb_display_number};
         delete $self->{_xvfb_authority_directory};
-        delete $self->{_xvfb_pid};
     }
     return $self->child_error();
 }
@@ -1411,7 +1716,7 @@ sub _terminate_process {
             }
         }
     }
-    elsif ( kill 0, $self->_pid() ) {
+    elsif ( ( $self->_pid() ) && ( kill 0, $self->_pid() ) ) {
         my $term_signal = $self->_signal_number('TERM')
           ;    # https://support.mozilla.org/en-US/questions/752748
         if ( $term_signal > 0 ) {
@@ -1439,7 +1744,7 @@ sub context {
     my ( $self, $new ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'Marionette:GetContext' ] );
+        [ _COMMAND(), $message_id, $self->_command('Marionette:GetContext') ] );
     my $response = $self->_get_response($message_id);
     my $context  = $response->result()->{value};        # 'content' or 'chrome'
     if ( defined $new ) {
@@ -1447,7 +1752,7 @@ sub context {
         $self->_send_request(
             [
                 _COMMAND(), $message_id,
-                'Marionette:SetContext', { value => $new }
+                $self->_command('Marionette:SetContext'), { value => $new }
             ]
         );
         $response = $self->_get_response($message_id);
@@ -1460,8 +1765,9 @@ sub accept_connections {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'Marionette:AcceptConnections',
+            _COMMAND(),
+            $message_id,
+            $self->_command('Marionette:AcceptConnections'),
             { value => $new ? JSON::true() : JSON::false() }
         ]
     );
@@ -1475,9 +1781,8 @@ sub async_script {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(),
-            $message_id,
-            'WebDriver:ExecuteAsyncScript',
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:ExecuteAsyncScript'),
             { script => $script, %parameters }
         ]
     );
@@ -1490,8 +1795,25 @@ sub script {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id,
-            'WebDriver:ExecuteScript', { script => $script, %parameters }
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:ExecuteScript'),
+            { script => $script, %parameters }
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $response->result()->{value};
+}
+
+sub html {
+    my ($self) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(),
+            $message_id,
+            $self->_command('WebDriver:GetPageSource'),
+            { sessionId => $self->_session_id() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1500,21 +1822,16 @@ sub script {
 
 sub page_source {
     my ($self) = @_;
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [
-            _COMMAND(), $message_id,
-            'WebDriver:GetPageSource', { sessionId => $self->_session_id() }
-        ]
-    );
-    my $response = $self->_get_response($message_id);
-    return $response->result()->{value};
+    Carp::carp(
+        '**** DEPRECATED METHOD - page_source HAS BEEN REPLACED BY html ****');
+    return $self->html();
 }
 
 sub back {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
-    $self->_send_request( [ _COMMAND(), $message_id, 'WebDriver:Back' ] );
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:Back') ] );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1522,7 +1839,8 @@ sub back {
 sub forward {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
-    $self->_send_request( [ _COMMAND(), $message_id, 'WebDriver:Forward' ] );
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:Forward') ] );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1531,7 +1849,11 @@ sub screen_orientation {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetScreenOrientation' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:GetScreenOrientation')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1540,7 +1862,11 @@ sub switch_to_parent_frame {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:SwitchToParentFrame' ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:SwitchToParentFrame')
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
@@ -1549,7 +1875,8 @@ sub window_type {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'WebDriver:GetWindowType' ] );
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetWindowType') ]
+    );
     my $response = $self->_get_response($message_id);
     return $response->result()->{value};
 }
@@ -1573,7 +1900,8 @@ sub switch_to_window {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:SwitchToWindow', { name => $window_handle }
+            $self->_command('WebDriver:SwitchToWindow'),
+            { name => $window_handle }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1586,7 +1914,8 @@ sub switch_to_frame {
     $self->_send_request(
         [
             _COMMAND(), $message_id,
-            'WebDriver:SwitchToFrame', { element => $element->uuid() }
+            $self->_command('WebDriver:SwitchToFrame'),
+            { element => $element->uuid() }
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1598,7 +1927,8 @@ sub go {
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
-            _COMMAND(), $message_id, 'WebDriver:Navigate',
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:Navigate'),
             { url => "$uri", sessionId => $self->_session_id() }
         ]
     );
@@ -1613,7 +1943,7 @@ sub install {
         [
             _COMMAND(),
             $message_id,
-            'Addon:Install',
+            $self->_command('Addon:Install'),
             {
                 path      => "$path",
                 temporary => $temporary ? JSON::true() : JSON::false()
@@ -1628,74 +1958,14 @@ sub uninstall {
     my ( $self, $id ) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, 'Addon:Uninstall', { id => $id } ] );
+        [
+            _COMMAND(), $message_id,
+            $self->_command('Addon:Uninstall'), { id => $id }
+        ]
+    );
     my $response = $self->_get_response($message_id);
     return $self;
 }
-
-my $x = <<'_DOC_';
-  // WebDriver service
-#  "WebDriver:AcceptDialog": GeckoDriver.prototype.acceptDialog,
-#  "WebDriver:AddCookie": GeckoDriver.prototype.addCookie,
-#  "WebDriver:Back": GeckoDriver.prototype.goBack,
-#  "WebDriver:CloseChromeWindow": GeckoDriver.prototype.closeChromeWindow,
-#  "WebDriver:CloseWindow": GeckoDriver.prototype.close,
-#  "WebDriver:DeleteAllCookies": GeckoDriver.prototype.deleteAllCookies,
-#  "WebDriver:DeleteCookie": GeckoDriver.prototype.deleteCookie,
-#  "WebDriver:DeleteSession": GeckoDriver.prototype.deleteSession,
-#  "WebDriver:DismissAlert": GeckoDriver.prototype.dismissDialog,
-#  "WebDriver:ElementClear": GeckoDriver.prototype.clearElement,
-#  "WebDriver:ElementClick": GeckoDriver.prototype.clickElement,
-#  "WebDriver:ElementSendKeys": GeckoDriver.prototype.sendKeysToElement,
-#  "WebDriver:ExecuteAsyncScript": GeckoDriver.prototype.executeAsyncScript,
-#  "WebDriver:ExecuteScript": GeckoDriver.prototype.executeScript,
-#  "WebDriver:FindElement": GeckoDriver.prototype.findElement,
-#  "WebDriver:FindElements": GeckoDriver.prototype.findElements,
-#  "WebDriver:Forward": GeckoDriver.prototype.goForward,
-#  "WebDriver:FullscreenWindow": GeckoDriver.prototype.fullscreenWindow,
-#  "WebDriver:GetActiveElement": GeckoDriver.prototype.getActiveElement,
-#  "WebDriver:GetActiveFrame": GeckoDriver.prototype.getActiveFrame,
-#  "WebDriver:GetAlertText": GeckoDriver.prototype.getTextFromDialog,
-#  "WebDriver:GetCapabilities": GeckoDriver.prototype.getSessionCapabilities,
-#  "WebDriver:GetChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-#  "WebDriver:GetChromeWindowHandles": GeckoDriver.prototype.getChromeWindowHandles,
-#  "WebDriver:GetCookies": GeckoDriver.prototype.getCookies,
-#  "WebDriver:GetCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-#  "WebDriver:GetCurrentURL": GeckoDriver.prototype.getCurrentUrl,
-#  "WebDriver:GetElementAttribute": GeckoDriver.prototype.getElementAttribute,
-#  "WebDriver:GetElementCSSValue": GeckoDriver.prototype.getElementValueOfCssProperty,
-#  "WebDriver:GetElementProperty": GeckoDriver.prototype.getElementProperty,
-#  "WebDriver:GetElementRect": GeckoDriver.prototype.getElementRect,
-#  "WebDriver:GetElementTagName": GeckoDriver.prototype.getElementTagName,
-#  "WebDriver:GetElementText": GeckoDriver.prototype.getElementText,
-#  "WebDriver:GetPageSource": GeckoDriver.prototype.getPageSource,
-#  "WebDriver:GetScreenOrientation": GeckoDriver.prototype.getScreenOrientation,
-#  "WebDriver:GetTimeouts": GeckoDriver.prototype.getTimeouts,
-#  "WebDriver:GetTitle": GeckoDriver.prototype.getTitle,
-#  "WebDriver:GetWindowHandle": GeckoDriver.prototype.getWindowHandle,
-#  "WebDriver:GetWindowHandles": GeckoDriver.prototype.getWindowHandles,
-#  "WebDriver:GetWindowRect": GeckoDriver.prototype.getWindowRect,
-#  "WebDriver:GetWindowType": GeckoDriver.prototype.getWindowType,
-#  "WebDriver:IsElementDisplayed": GeckoDriver.prototype.isElementDisplayed,
-#  "WebDriver:IsElementEnabled": GeckoDriver.prototype.isElementEnabled,
-#  "WebDriver:IsElementSelected": GeckoDriver.prototype.isElementSelected,
-#  "WebDriver:MinimizeWindow": GeckoDriver.prototype.minimizeWindow,
-#  "WebDriver:MaximizeWindow": GeckoDriver.prototype.maximizeWindow,
-#  "WebDriver:Navigate": GeckoDriver.prototype.get,
-#  "WebDriver:NewSession": GeckoDriver.prototype.newSession,
-  "WebDriver:PerformActions": GeckoDriver.prototype.performActions,
-#  "WebDriver:Refresh":  GeckoDriver.prototype.refresh,
-  "WebDriver:ReleaseActions": GeckoDriver.prototype.releaseActions,
-#  "WebDriver:SendAlertText": GeckoDriver.prototype.sendKeysToDialog,
-  "WebDriver:SetScreenOrientation": GeckoDriver.prototype.setScreenOrientation
-#  "WebDriver:SetTimeouts": GeckoDriver.prototype.setTimeouts,
-#  "WebDriver:SetWindowRect": GeckoDriver.prototype.setWindowRect,
-#  "WebDriver:SwitchToFrame": GeckoDriver.prototype.switchToFrame,
-#  "WebDriver:SwitchToParentFrame": GeckoDriver.prototype.switchToParentFrame,
-#  "WebDriver:SwitchToShadowRoot": GeckoDriver.prototype.switchToShadowRoot,
-#  "WebDriver:SwitchToWindow": GeckoDriver.prototype.switchToWindow,
-#  "WebDriver:TakeScreenshot": GeckoDriver.prototype.takeScreenshot,
-_DOC_
 
 sub marionette_protocol {
     my ($self) = @_;
@@ -1727,7 +1997,15 @@ sub _send_request {
     }
     my $result = syswrite $self->_socket(), "$length:$json";
     if ( !defined $result ) {
-        Carp::croak("Failed to send request to firefox:$EXTENDED_OS_ERROR");
+        my $socket_error = $EXTENDED_OS_ERROR;
+        if ( $self->alive() ) {
+            Carp::croak("Failed to send request to firefox:$socket_error");
+        }
+        else {
+            my $error_message =
+              $self->error_message() ? $self->error_message() : q[];
+            Carp::croak($error_message);
+        }
     }
 }
 
@@ -1739,6 +2017,19 @@ sub _read_from_socket {
         my $number_of_bytes = sysread $self->_socket(), my $octet, 1;
         if ( defined $number_of_bytes ) {
             $initial_buffer .= $octet;
+        }
+        else {
+            my $socket_error = $EXTENDED_OS_ERROR;
+            if ( $self->alive() ) {
+                Carp::croak(
+"Failed to read size of response from socket to firefox:$socket_error"
+                );
+            }
+            else {
+                my $error_message =
+                  $self->error_message() ? $self->error_message() : q[];
+                Carp::croak($error_message);
+            }
         }
         if ( $initial_buffer =~ s/^(\d+)://smx ) {
             ($number_of_bytes_in_response) = ($1);
@@ -1757,8 +2048,17 @@ sub _read_from_socket {
             $number_of_bytes_already_read += $number_of_bytes_read;
         }
         else {
-            Carp::croak(
-                "Failed to read from socket to firefox:$EXTENDED_OS_ERROR");
+            my $socket_error = $EXTENDED_OS_ERROR;
+            if ( $self->alive() ) {
+                Carp::croak(
+"Failed to read response from socket to firefox:$socket_error"
+                );
+            }
+            else {
+                my $error_message =
+                  $self->error_message() ? $self->error_message() : q[];
+                Carp::croak($error_message);
+            }
         }
     }
     if ( $self->_debug() ) {
@@ -1812,7 +2112,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.30
+Version 0.33
 
 =head1 SYNOPSIS
 
@@ -1821,13 +2121,13 @@ Version 0.30
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_element('//input[@id="search-input"]')->send_keys('Test::More');
+    $firefox->find('//input[@id="search-input"]')->type('Test::More');
 
-    my $file_handle = $firefox->selfie(highlights => [ $firefox->find_element('//button[@name="lucky"]') ])
+    my $file_handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ])
 
-    $firefox->find_element('//button[@name="lucky"]')->click();
+    $firefox->find('//button[@name="lucky"]')->click();
 
-    say $firefox->page_source();
+    say $firefox->html();
 
     $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
 
@@ -1875,6 +2175,10 @@ returns the current title of the window.
 
 =head2 find_element
 
+*** DEPRECATED - see L<find|Firefox::Marionette#find>. ***
+
+=head2 find
+
 returns the first element in the current browsing context that matches the search parameters supplied;
 
 =over 4
@@ -1889,7 +2193,11 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
 =head2 find_elements
 
-returns the elements in the current browsing context that match the search parameters supplied;
+*** DEPRECATED - see L<list|Firefox::Marionette#list>. ***
+
+=head2 list
+
+returns all the elements in the current browsing context that match the search parameters supplied;
 
 =over 4
 
@@ -1927,6 +2235,10 @@ The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeou
 
 =head2 page_source
 
+*** DEPRECATED - see L<html|Firefox::Marionette#html>. ***
+
+=head2 html
+
 returns the page source of the content document.
 
 =head2 context
@@ -1950,6 +2262,10 @@ here be cookie monsters! This method returns L<itself|Firefox::Marionette> to ai
 returns the contents of the cookie jar in scalar or list context.
 
 =head2 send_keys
+
+*** DEPRECATED - see L<type|Firefox::Marionette#type>. ***
+
+=head2 type
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a string as the second parameter.  It sends the string to the specified L<element|Firefox::Marionette::Element> in the current page, such as filling out a text box. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
@@ -2043,7 +2359,7 @@ returns the L<capabilities|Firefox::Marionette::Capabilities> of the current fir
 
 =head2 screen_orientation
 
-returns the current browser orientation.  This will be one of the valid primary orientation values 'portrait-primary', 'landscape-primary', 'portrait-secondary', or 'landscape-secondary'.
+returns the current browser orientation.  This will be one of the valid primary orientation values 'portrait-primary', 'landscape-primary', 'portrait-secondary', or 'landscape-secondary'.  This method is only currently available on Android (Fennec).
 
 =head2 selfie
 
@@ -2157,6 +2473,10 @@ returns the pid of the xvfb process if it exists.
 
 Marionette will stop accepting new connections before ending the current session, and finally attempting to quit the application.  This method returns the $? (CHILD_ERROR) value for the Firefox process
 
+=head2 browser_version
+
+This method returns version of firefox.
+
 =head2 child_error
 
 This method returns the $? (CHILD_ERROR) for the Firefox process, or undefined if the process has not yet exited.
@@ -2212,6 +2532,18 @@ None reported.
 
 
 =head1 BUGS AND LIMITATIONS
+
+Currently the following Marionette methods have not been implemented;
+
+=over
+ 
+=item * WebDriver:ReleaseAction
+
+=item * WebDriver:PerformActions
+
+=item * WebDriver:SetScreenOrientation
+
+=back
 
 No bugs have been reported.
 

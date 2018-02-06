@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200234;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2 $3',
                   'pattern' => '([2-9]\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             [2-8]|
@@ -33,17 +34,21 @@ my $formatters = [
           '
                 },
                 {
-                  'pattern' => '(96\\d)(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '96'
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '96',
+                  'pattern' => '(96\\d)(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(9\\d)(\\d{3})(\\d{3})(\\d{3})',
-                  'leading_digits' => '9[36]'
+                  'leading_digits' => '9[36]',
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
                 'voip' => '9[17]0\\d{6}',
+                'personal_number' => '70[01]\\d{6}',
                 'mobile' => '
           (?:
             60[1-8]|
@@ -53,7 +58,14 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'toll_free' => '800\\d{6}',
+                'geographic' => '
+          2\\d{8}|
+          (?:
+            3[1257-9]|
+            4[16-9]|
+            5[13-9]
+          )\\d{7}
+        ',
                 'specialrate' => '(8[134]\\d{7})|(
           9(?:
             0[05689]|
@@ -73,16 +85,7 @@ my $validators = {
             5[13-9]
           )\\d{7}
         ',
-                'pager' => '',
-                'geographic' => '
-          2\\d{8}|
-          (?:
-            3[1257-9]|
-            4[16-9]|
-            5[13-9]
-          )\\d{7}
-        ',
-                'personal_number' => '70[01]\\d{6}'
+                'toll_free' => '800\\d{6}'
               };
 my %areanames = (
   4202 => "Prague",

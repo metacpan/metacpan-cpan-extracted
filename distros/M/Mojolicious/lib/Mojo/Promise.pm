@@ -15,8 +15,7 @@ sub all {
     and deprecated 'Use of Mojo::Promise::all as instance method is DEPRECATED'
     if ref $class;
 
-  my $all = $class->new;
-
+  my $all       = $class->new;
   my $results   = [];
   my $remaining = scalar @promises;
   for my $i (0 .. $#promises) {
@@ -109,7 +108,13 @@ sub _finally {
 
 sub _settle {
   my ($self, $status) = (shift, shift);
+
+  $_[0]->then(sub { $self->resolve(@_); () }, sub { $self->reject(@_); () })
+    and return $self
+    if blessed $_[0] && $_[0]->can('then');
+
   return $self if $self->{result};
+
   @{$self}{qw(result status)} = ([@_], $status);
   $self->_defer;
   return $self;
@@ -122,11 +127,7 @@ sub _then {
 
   my @res;
   return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
-
-  return $new->resolve(@res)
-    unless @res == 1 && blessed $res[0] && $res[0]->can('then');
-
-  $res[0]->then(sub { $new->resolve(@_); () }, sub { $new->reject(@_); () });
+  return $new->resolve(@res);
 }
 
 1;

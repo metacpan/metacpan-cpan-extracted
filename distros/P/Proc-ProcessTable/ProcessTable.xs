@@ -101,6 +101,8 @@ void store_ttydev( HV* myhash, unsigned long ttynum ){
 /* This gets called by OS-specific get_table                          */
 /* format specifies what types are being passed in, in a string       */
 /* containing these specifiers:                                       */
+/*   A    ignore this array of strings                                */
+/*   a    array of strings, delimated with NULL, next argument is len */
 /*   S    ignore this string                                          */
 /*   s    string                                                      */
 /*   I    ignore this int                                             */
@@ -146,6 +148,27 @@ void bless_into_proc(char* format, char** fields, ...){
     key = *fields; 
     switch(*format)
       {
+      case 'A': /* ignore; creates an undef value for this key in the hash */
+	va_arg(args, char *);
+	va_arg(args, int);
+	hv_store(myhash, key, strlen(key), &PL_sv_undef, 0);
+	break;
+      case 'a':  /* string */
+	s_val = va_arg(args, char *);
+	i_val = va_arg(args, int);
+	{
+	    int len;
+	    char *s;
+	    AV *av = newAV();
+
+	    for (s = s_val; s < (s_val + i_val); s += len + 1) {
+		len = strlen(s);
+		av_push (av, newSVpvn (s, len));
+	    }
+	    hv_store (myhash, key, strlen(key), newRV_noinc((SV *) av), 0);
+	}
+	break;
+
       case 'S': /* ignore; creates an undef value for this key in the hash */
 	va_arg(args, char *);
 	hv_store(myhash, key, strlen(key), newSV(0), 0);
@@ -317,7 +340,7 @@ table(obj)
 
      /* Check that we have an actual object. 
        calling Proc::Processtable->table SIGSEVs
-       calling on an actual object is valid my $proc_obj = new Proc::ProcessTable; $proc_obj->table; 
+       calling on an actual object is valid my $proc_obj = Proc::ProcessTable->new; $proc_obj->table; 
      */
      if (!obj || !SvOK (obj) || !SvROK (obj) || !sv_isobject (obj)) {
          croak("Must call table from an initalized object created with new");

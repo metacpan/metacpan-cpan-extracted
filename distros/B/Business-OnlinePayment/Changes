@@ -1,5 +1,12 @@
 Revision history for Perl extension Business::OnlinePayment.
 
+3.05    Fri Feb  2 09:25:50 PST 2018
+        - Add txn_date to return fields (and build_subs)
+        - doc: Add Tokenize action (stand-alone tokenize without a transaction)
+        - doc: follow-up transaction fields
+        - doc: nacha_sec_code for ACH transactions
+        - doc: adjust URLs and year for current reality
+
 3.04    Thu Dec  3 12:49:59 PST 2015
         - Partial authorizations
         - Doc: Moo is a-okay for module authors

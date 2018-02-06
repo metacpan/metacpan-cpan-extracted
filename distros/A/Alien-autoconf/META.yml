@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/plicease/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/plicease/Alien-autoconf.git
-version: '0.11'
+version: '0.14'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
   requires:
@@ -42,10 +42,13 @@ x_alienfile:
       Alien::m4: '0.11'
       Archive::Tar: '0'
       Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
       IO::Zlib: '0'
-      Net::FTP: '0'
       Path::Tiny: '0'
       Sort::Versions: '0'
       URI: '0'
+      URI::Escape: '0'
     system: {}
 x_serialization_backend: 'YAML::Tiny version 1.70'
+x_use_unsafe_inc: 0

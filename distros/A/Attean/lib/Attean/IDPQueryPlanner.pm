@@ -7,7 +7,7 @@ Attean::IDPQueryPlanner - Iterative dynamic programming query planner
 
 =head1 VERSION
 
-This document describes Attean::IDPQueryPlanner version 0.018
+This document describes Attean::IDPQueryPlanner version 0.019
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ iterative dynamic programming approach.
 
 =cut
 
-package Attean::IDPQueryPlanner 0.018 {
+package Attean::IDPQueryPlanner 0.019 {
 	use Moo;
 	use namespace::clean;
 	
@@ -57,7 +57,7 @@ at L<https://github.com/kasei/attean/issues>.
 
 =head1 SEE ALSO
 
-L<http://www.perlrdf.org/>
+
 
 =head1 AUTHOR
 

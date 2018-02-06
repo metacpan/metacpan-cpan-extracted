@@ -17,20 +17,20 @@ my($parser)	= Regexp::Parsertron -> new(re => $re);
 # Return 0 for success and 1 for failure.
 
 my($result)		= $parser -> parse(re => $re);
-my($node_uid)	= 6;
+my($node_uid)	= 5; # Obtained from displaying and inspecting the tree.
 
 $parser -> append(text => '|C++', uid => $node_uid);
 
 my($count) = 0;
 
-ok($parser -> uid == 7, 'Check uid counts'); $count++;
+ok($parser -> uid == 6, 'Check uid counts'); $count++;
 
 my(%text) =
 (
 	1 => '(',
-	3 => '^',
-	5 => ':',
-	6 => 'Perl|JavaScript|C++',
+	2 => '?^',
+	4 => ':',
+	5 => 'Perl|JavaScript|C++',
 );
 
 my($text);

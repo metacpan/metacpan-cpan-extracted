@@ -46,7 +46,7 @@ use SNMP::Info::Entity;
 
 use vars qw/$VERSION %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.40';
+$VERSION = '3.43';
 
 %MIBS = ( %SNMP::Info::Layer7::MIBS, %SNMP::Info::Entity::MIBS, );
 
@@ -128,7 +128,7 @@ sub e_index {
     my $self = shift();
     my %index;
     foreach my $id ( keys %{$self->e_id} ){
-        %index->{$id} = $id;
+        $index{$id} = $id;
     }
     return \%index;
 }

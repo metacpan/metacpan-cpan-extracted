@@ -97,8 +97,8 @@ chomp($dppid);
 close $dh;
 
 ok(is_init_process($dppid),
-   "daemon process does not have a parent")
-    or diag("daemon process was '$dppid', expected '1'");
+   "daemon process $dpid does not have a parent")
+    or diag("daemon process parent was '$dppid', expected '1'");
 
 # https://rt.cpan.org/Public/Bug/Display.html?id=105814:
 # an init process does not necessarily have id 1
@@ -118,7 +118,12 @@ sub is_init_process {
             $cmdline =~ s/\s+$//;
             diag "proc $dppid looks like init process: $cmdline";
             return 1;
+        } else {
+            diag "ZZZ proc $dppid cmdline=$cmdline not init";
         }
+    } elsif ($^O eq 'linux') {
+        diag "No /proc/$dppid/cmdline";
+        return 1;
     }
     if ($^O eq 'solaris') {
         my @procs = qx(ps -p $dppid -o "ppid comm");

@@ -1,11 +1,12 @@
 requires "Carp" => "0";
-requires "File::Temp" => "0";
+requires "Graph::Easy" => "0.76";
 requires "List::AllUtils" => "0";
 requires "Log::Dispatch" => "0";
 requires "Log::Dispatch::Null" => "0";
 requires "Module::Pluggable::Object" => "0";
 requires "Moose" => "0";
 requires "Moose::Role" => "0";
+requires "Moose::Util::TypeConstraints" => "0";
 requires "MooseX::Params::Validate" => "0";
 requires "MooseX::StrictConstructor" => "0";
 requires "MooseX::Types" => "0";
@@ -16,7 +17,6 @@ requires "MooseX::Types::Moose" => "0";
 requires "MooseX::Types::Path::Class" => "0";
 requires "Parallel::ForkManager" => "0";
 requires "Path::Class" => "0";
-requires "Scalar::Util" => "0";
 requires "Scope::Guard" => "0";
 requires "Throwable::Error" => "0";
 requires "Time::HiRes" => "1.9726";
@@ -29,15 +29,16 @@ requires "warnings" => "0";
 recommends "Memory::Stats" => "0";
 
 on 'test' => sub {
+  requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "0";
-  requires "File::Copy" => "0";
   requires "File::Spec" => "0";
-  requires "IPC::Signal" => "0";
+  requires "Graph::Easy" => "0.76";
   requires "Log::Dispatch::Array" => "0";
+  requires "MooseX::Types::Path::Tiny" => "0";
+  requires "Path::Tiny" => "0";
   requires "Test::Differences" => "0";
   requires "Test::Fatal" => "0";
   requires "Test::More" => "0.96";
-  requires "Test::Requires" => "0";
   requires "autodie" => "0";
   requires "lib" => "0";
 };
@@ -48,6 +49,10 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'configure' => sub {
+  suggests "JSON::PP" => "2.27300";
 };
 
 on 'develop' => sub {
@@ -76,6 +81,5 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };

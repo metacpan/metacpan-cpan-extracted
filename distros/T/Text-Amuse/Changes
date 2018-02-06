@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.98 2018-02-03
+
+ - Fix the latex output of full page images
+
 0.97 2018-01-28
 
  - Prevent the merging of regular lines into prefixed verses (GH#34,

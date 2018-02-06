@@ -1,5 +1,11 @@
 Revision history for CSS-Packer
 
+2.05       2018-02-02
+    - Add missing files to MANIFEST (GH #5, thanks to nfg)
+
+2.04       2018-02-01
+    - Fix compression with @keyframes by being more generic with at-rules (GH #3, GH #4)
+
 2.03       2017-04-18
     - Makefile.PL moved to ExtUtils::MakeMaker to fix no . in @INC (perl 5.25.11+)
 

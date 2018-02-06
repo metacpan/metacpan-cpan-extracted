@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless::Plugin::Database
 
+1.06 2018-01-30
+
+    - Added fix for PostgreSQL connection string (https://github.com/lucastheisen/footprintless-plugin-database/pull/5)
+
 1.05 2018-01-25
 
     - Added default "public" schema on PostgreSqlProvider (https://github.com/lucastheisen/footprintless-plugin-database/pull/4)

@@ -22,5 +22,7 @@ t/stylesheets/s6-expected.css
 t/stylesheets/s6.css
 t/stylesheets/s7-expected.css
 t/stylesheets/s7.css
+t/stylesheets/s8-expected.css
+t/stylesheets/s8.css
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

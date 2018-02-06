@@ -1,0 +1,87 @@
+{
+    "request": {
+        "parameters": {
+            "api_id": "example",
+            "affiliate_id": "affiliate-990",
+            "initial": "お",
+            "floor_id": "27",
+            "hits": "10",
+            "output": "json"
+        }
+    },
+    "result": {
+        "status": "200",
+        "result_count": 10,
+        "total_count": "959",
+        "first_position": 0,
+        "site_name": "DMM.com（一般）",
+        "site_code": "DMM.com",
+        "service_name": "通販",
+        "service_code": "mono",
+        "floor_id": "27",
+        "floor_name": "本・コミック",
+        "floor_code": "book",
+        "series": [
+            {
+                "series_id": "11773",
+                "name": "おふらいんげーむ",
+                "ruby": "おふらいんげーむ",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=11773/affiliate-990"
+            },
+            {
+                "series_id": "25103",
+                "name": "オナペ",
+                "ruby": "おなぺ",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=25103/affiliate-990"
+            },
+            {
+                "series_id": "50112",
+                "name": "おねがい☆ツインズ",
+                "ruby": "おねがいついんず",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50112/affiliate-990"
+            },
+            {
+                "series_id": "50113",
+                "name": "おねがい☆ティーチャー",
+                "ruby": "おねがいてぃーちゃー",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50113/affiliate-990"
+            },
+            {
+                "series_id": "50219",
+                "name": "王妃マルゴ",
+                "ruby": "おうひまるご",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50219/affiliate-990"
+            },
+            {
+                "series_id": "50222",
+                "name": "沖縄の島へ全部行ってみたサー",
+                "ruby": "おきなわのしまえぜんぶいってみたさー",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50222/affiliate-990"
+            },
+            {
+                "series_id": "50225",
+                "name": "俺に血まなこ",
+                "ruby": "おれにちまなこ",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50225/affiliate-990"
+            },
+            {
+                "series_id": "50226",
+                "name": "女には向かない職業",
+                "ruby": "おんなにはむかないしょくぎょう",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50226/affiliate-990"
+            },
+            {
+                "series_id": "50474",
+                "name": "大人の舌先養成講座",
+                "ruby": "おとなのしたさきようせいこうざ",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50474/affiliate-990"
+            },
+            {
+                "series_id": "50716",
+                "name": "オーバーマン キングゲイナー",
+                "ruby": "おーばーまんきんぐげいなー",
+                "list_url": "http://www.dmm.com/mono/book/-/list/=/article=series/id=50716/affiliate-990"
+            }
+        ]
+    }
+}

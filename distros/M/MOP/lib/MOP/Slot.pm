@@ -6,14 +6,12 @@ use warnings;
 
 use Carp ();
 
-use UNIVERSAL::Object::Immutable;
-
 use MOP::Internal::Util;
 
-our $VERSION   = '0.13';
+our $VERSION   = '0.14';
 our $AUTHORITY = 'cpan:STEVAN';
 
-our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' }
+use parent 'UNIVERSAL::Object::Immutable';
 
 sub BUILDARGS {
     my $class = shift;
@@ -98,7 +96,7 @@ MOP::Slot - A representation of a class slot
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -136,7 +134,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stevan Little.
+This software is copyright (c) 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

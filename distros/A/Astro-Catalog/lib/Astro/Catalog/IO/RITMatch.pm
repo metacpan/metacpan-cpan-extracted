@@ -38,7 +38,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =head1 METHODS
@@ -143,6 +143,10 @@ Optional arguments are:
 =item mag_type - the magnitude type to write out to the file. Defaults
 to 'mag'.
 
+=item filter - reference filter to select from catalogue. See flux()
+      method in Astro::Flux. This allows a specific filter to be selected
+      for output. Argument can be a string or Astro::Waveband object.
+
 The output format has the ID in column 1, X coordinate in column 2, Y
 coordinate in column 3, magnitude value in column 4, and any comments
 in column 5.
@@ -164,11 +168,20 @@ sub _write_catalog {
     $mag_type = $options{'mag_type'};
   }
 
+  my $refwb;
+  $refwb = $options{filter}
+    if exists $options{filter};
+
   # Set up variables for output.
   my @output;
   my $output_line;
 
   my $newid = 1;
+
+  # Astro::Fluxes can not guarantee that the Astro::Flux
+  # order will be in a particular order so we can not simply
+  # grab the first one. We might get a "J" this time but previously
+  # got "R".
 
   # Loop through the items in the catalogue.
   foreach my $item ( $catalog->stars ) {
@@ -183,17 +196,32 @@ sub _write_catalog {
               ! defined( $y ) ||
               ! defined( $fluxes ) );
 
-    # Grab the Astro::Flux objects. We'll use the first one.
-    my @flux = $fluxes->allfluxes;
-    my $flux = $flux[0];
+    my $flux;
+    if (!$refwb) {
+      # If no external selection of waveband and this is first time
+      # through loop we select the first waveband as a reference
+      my @allflux = $fluxes->allfluxes;
+      $flux = $allflux[0];
+      $refwb = $flux->waveband->natural;
+    } else {
+      $flux = $fluxes->flux( type => $mag_type, waveband => $refwb );
+    }
 
+    next unless defined $flux;
     next if ( uc( $flux->type ) ne uc( $mag_type ) );
+
+    my $magval = $flux->quantity($mag_type);
+
+    # Sometimes we get a missing value
+    next if !defined $magval;
+    next unless length($magval);
 
     # Create the output string.
     $output_line = join ' ', $newid,
                              $x,
                              $y,
-                             $flux->quantity($mag_type);
+                             $magval,
+                             $item->id;
 
     # And push this string to the output array.
     push @output, $output_line;
@@ -208,10 +236,6 @@ sub _write_catalog {
 
 =back
 
-=head1 REVISION
-
- $Id: RITMatch.pm,v 1.2 2007/05/31 01:45:07 cavanagh Exp $
-
 =head1 SEE ALSO
 
 L<Astro::Catalog>, L<Astro::Catalog::IO::Simple>
@@ -220,6 +244,7 @@ http://spiff.rit.edu/match/
 
 =head1 COPYRIGHT
 
+Copyright (C) 2014 Tim Jenness
 Copyright (C) 2006 Particle Physics and Astronomy Research
 Council. All Rights Reserved.
 
@@ -229,6 +254,7 @@ under the terms of the GNU Public License.
 =head1 AUTHORS
 
 Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
+Tim Jenness E<lt>tjenness@cpan.orgE<gt>
 
 =cut
 

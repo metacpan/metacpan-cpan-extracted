@@ -3,7 +3,7 @@ package Prty::Unindent;
 use strict;
 use warnings;
 
-our $VERSION = 1.122;
+our $VERSION = 1.123;
 
 # -----------------------------------------------------------------------------
 
@@ -363,7 +363,7 @@ sub trim {
     my $class = shift;
     my $str = shift // return '';
 
-    $str =~ s/^\n+//;
+    $str =~ s/^\s*\n//;
     $str =~ s/\s+$//;
 
     return $class->hereDoc($str);
@@ -371,9 +371,38 @@ sub trim {
 
 # -----------------------------------------------------------------------------
 
+=head3 trimNl() - Trim plus Newline
+
+=head4 Synopsis
+
+    $strOut = $class->trimNl($strIn);
+
+=head4 Description
+
+Wie die Methode L</trim>(), jedoch wird am Ende genau ein Newline
+angehängt, sofern der Sting nicht leer ist.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub trimNl {
+    my $class = shift;
+    my $str = shift // return '';
+
+    $str = $class->trim($str);
+    if ($str ne '') {
+        $str .= "\n";
+    }
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.122
+1.123
 
 =head1 AUTHOR
 

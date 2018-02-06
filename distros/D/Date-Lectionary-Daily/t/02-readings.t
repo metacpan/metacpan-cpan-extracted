@@ -3,7 +3,7 @@ use v5.22;
 
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More tests => 54;
 use Test::Exception;
 
 use Time::Piece;
@@ -473,4 +473,22 @@ is(
     $testReading->readings->{evening}->{1},
     'Wisdom 2',
     'The first reading for evening prayer on 2017-11-27 should be Wisdom 2'
+);
+
+#Lectionary Week: The Second to Last Sunday after Epiphany: Monday
+$testReading = Date::Lectionary::Daily->new(
+    'date' => Time::Piece->strptime( "2018-02-05", "%Y-%m-%d" ) );
+is(
+    $testReading->readings->{evening}->{2},
+    'Romans 7',
+    'The second reading for evening prayer on 2018-02-05 should be Romans 7'
+);
+
+#Lectionary Week: The Last Sunday after Epiphany: Tuesday
+$testReading = Date::Lectionary::Daily->new(
+    'date' => Time::Piece->strptime( "2018-02-13", "%Y-%m-%d" ) );
+is(
+    $testReading->readings->{morning}->{1},
+    'Genesis 32:3-30, (31-32)',
+    'The first reading for morning prayer on 2018-02-13 should be Genesis 32:3-30, (31-32)'
 );

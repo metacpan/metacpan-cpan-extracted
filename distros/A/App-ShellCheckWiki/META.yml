@@ -1,0 +1,26 @@
+---
+abstract: 'Check the wiki for details about shellcheck errors.'
+author:
+  - 'Felix Tubiana <felixtubiana@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-ShellCheckWiki
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Term::ANSIColor: '4.06'
+  WWW::Mechanize: '1.86'
+  perl: '5.006'
+resources:
+  repository: https://github.com/xxfelixxx/shellcheckwiki.git
+version: '0.03'

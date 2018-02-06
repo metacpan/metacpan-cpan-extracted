@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.12
+    version 0.14
 
 SYNOPSIS
 
@@ -60,26 +60,6 @@ HELPERS
     When used with Alien::Base::ModuleBuild in a alien_build_commands or
     alien_install_commands, this helper will be replaced by either patch
     (Unix and cygwin) or patch --binary (MSWin32).
-
-CAVEATS
-
-    This version of Alien::patch adds patch to your path, if it isn't
-    already there when you use it, like this:
-
-     use Alien::patch;  # deprecated, issues a warning
-
-    This was a design mistake, and now deprecated. When Alien::patch was
-    originally written, it was one of the first Alien tool style modules on
-    CPAN. As such, the author and the Alien::Base team hadn't yet come up
-    with the best practices for this sort of module. The author, and the
-    Alien::Base team feel that for consistency and for readability it is
-    better use Alien::patch without the automatic import:
-
-     use Alien::patch ();
-
-    and explicitly modify the PATH yourself (examples are above in the
-    synopsis). The old style will issue a warning. The old behavior will be
-    removed, but not before 31 January 2018.
 
 AUTHOR
 

@@ -213,33 +213,27 @@ sub as_latex {
         $desc = "\n\\caption[]{\\noindent $realdesc}";
     }
     my $src = $self->filename;
-    my $out;
+    my $open;
+    my $close;
     if ($wrap eq 'r' or $wrap eq 'l') {
-        $out =<<"EOF";
-
-\\begin{wrapfigure}{$wrap}{$width}
-\\centering
-\\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
-\\end{wrapfigure}
-EOF
+        $open = "\\begin{wrapfigure}{$wrap}{$width}";
+        $close = "\\end{wrapfigure}";
+    }
+    elsif ($wrap eq 'f') {
+        $open = "\\begin{figure}[p]";
+        $close = "\\end{figure}\n\\clearpage";
     }
     else {
-        $out =<<"EOF";
+        $open = "\\begin{figure}[htbp!]";
+        $close = "\\end{figure}";
+    }
+    my $out = <<"EOF";
 
-\\begin{figure}[htbp!]
+$open
 \\centering
 \\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
-\\end{figure}
+$close
 EOF
-
-
-    }
-
-    # if full, add a clearpage after the image
-    if ($wrap eq 'f') {
-        $out .= "\\clearpage\n";
-    }
-
     return $out;
 }
 

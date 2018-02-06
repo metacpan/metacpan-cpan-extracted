@@ -22,27 +22,34 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113149;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
+                'voip' => '',
+                'personal_number' => '',
                 'mobile' => '
           (?:
             6[234689]0|
-            77[45789]
+            77\\d|
+            88[0-4]
           )\\d{4}
         ',
                 'toll_free' => '',
                 'specialrate' => '',
                 'fixed_line' => '
-          2552255|
           (?:
-            277|
+            2(?:
+              55|
+              77
+            )|
             345|
             488|
             5(?:
@@ -63,14 +70,16 @@ my $validators = {
               24|
               55|
               76
-            )
+            )|
+            900
           )\\d{4}
         ',
-                'voip' => '',
                 'geographic' => '
-          2552255|
           (?:
-            277|
+            2(?:
+              55|
+              77
+            )|
             345|
             488|
             5(?:
@@ -91,18 +100,33 @@ my $validators = {
               24|
               55|
               76
-            )
+            )|
+            900
           )\\d{4}
-        ',
-                'personal_number' => '',
-                'pager' => ''
+        '
               };
-
+my %areanames = (
+  680255 => "Sonsorol\ State\ and\ Hatohobei\ State",
+  680277 => "Angaur\ State",
+  680345 => "Peleliu\ State",
+  680488 => "Koror\ State",
+  680535 => "Ngatpang\ State",
+  680544 => "Aimeliik\ State",
+  680587 => "Airai\ State",
+  680622 => "Ngchesar\ State",
+  680654 => "Melekeok\ State",
+  680679 => "Ngiwal\ State",
+  680733 => "Ngaremlengui\ State",
+  680747 => "Ngardmau\ State",
+  680824 => "Ngaraard\ State",
+  680855 => "Ngarchelong\ State",
+  680876 => "Kayangel\ State",
+);
     sub new {
       my $class = shift;
       my $number = shift;
       $number =~ s/(^\+680|\D)//g;
-      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, }, $class);
+      my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
   return $self->is_valid() ? $self : undef;
 }
 1;

@@ -5,6 +5,11 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.019  2018-02-04
+
+ - (Update) Documentation updates (#120, #121 from @kjetilk).
+ - (Update) Fix incorrect URI for langString (#119 from @kjetilk).
+
 0.018  2018-01-06
 
  - (Update) Added tests for turtle parser escape handling (#55).

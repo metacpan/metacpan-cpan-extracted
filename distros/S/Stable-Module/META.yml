@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Stable-Module
 abstract: frequently used modules on Perl5 application
-version: 0.06
+version: 0.07
 author:
   - INABA Hitoshi <ina@cpan.org>
 license: perl

@@ -22,21 +22,41 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170908113148;
+our $VERSION = 1.20180203200235;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[2-46-9]',
-                  'pattern' => '([2-46-9]\\d{2})(\\d{4})'
+                  'format' => '$1 $2',
+                  'pattern' => '([2-46-9]\\d{2})(\\d{4})',
+                  'leading_digits' => '[2-46-9]'
                 },
                 {
+                  'leading_digits' => '5',
                   'pattern' => '(5\\d{3})(\\d{4})',
-                  'leading_digits' => '5'
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
                 'personal_number' => '',
+                'mobile' => '
+          5(?:
+            2[59]\\d|
+            4(?:
+              2[1-389]|
+              4\\d|
+              7[1-9]|
+              9\\d
+            )|
+            7\\d{2}|
+            8(?:
+              [0-25689]\\d|
+              4[3479]|
+              7[15-8]
+            )|
+            9[0-8]\\d
+          )\\d{4}
+        ',
                 'geographic' => '
           (?:
             2(?:
@@ -59,27 +79,7 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'pager' => '',
                 'toll_free' => '80[012]\\d{4}',
-                'mobile' => '
-          5(?:
-            2[59]\\d|
-            4(?:
-              2[1-389]|
-              4\\d|
-              7[1-9]|
-              9\\d
-            )|
-            7\\d{2}|
-            8(?:
-              [0-25689]\\d|
-              4[3479]|
-              7[15-8]
-            )|
-            9[0-8]\\d
-          )\\d{4}
-        ',
-                'specialrate' => '(30\\d{5})',
                 'fixed_line' => '
           (?:
             2(?:
@@ -102,6 +102,8 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'specialrate' => '(30\\d{5})',
+                'pager' => '',
                 'voip' => '
           3(?:
             20|

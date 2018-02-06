@@ -40,6 +40,7 @@ WriteMakefile(
 				type => 'git',
 			},
 		},
+		'dynamic_config' => 0,
 	},
 	) : (),
 );

@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+# Copyright (C) 2018 TTK Ciar
+# Available for unlimited distribution and use.
+# The copyright is just so someone else cannot claim ownership and sue me for use of my own code.
+
+our $VERSION = '1.02'; # VERSION 1.02
+
+use strict;
+use warnings;
+use JSON::PP;
+use lib "./lib";
+use Algorithm::CurveFit::Simple qw(fit);
+
+my @DOCS;
+my %OPT = (v => 1);
+foreach my $arg (@ARGV) {
+    if    ($arg =~ /^\-+(.+?)\=(.*)/) { $OPT{$1} = $2; }
+    elsif ($arg =~ /^\-+(v+)$/      ) { $OPT{v}  = length($1) + 1; }
+    elsif ($arg =~ /^\-+q$/         ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+quiet$/     ) { $OPT{v}  = 0;  }
+    elsif ($arg =~ /^\-+(.+)/       ) { $OPT{$1} = -1; }
+    else { push (@DOCS, $arg); }
+}
+foreach my $k (keys %OPT) {
+    next unless ($k =~ /\-/);
+    my $k1 = join('_', split(/\-/, $k));
+    $OPT{$k1} = $OPT{$k};
+    delete $OPT{$k};
+}
+
+my $PROJECT_NAME = 'curvefit';
+
+exit(main(\@DOCS, \%OPT));
+
+sub main {
+    my ($docs_ar, $opt_hr) = @_;
+    usage() if (opt('h') || opt('help'));
+
+    my (@xdata, @ydata);
+    while(defined(my $datum = <STDIN>)) {
+        next unless($datum =~ /^\s*([\-+]?[\d\.]+)[\t,]([\-+]?[\d\.]+)/);
+        push @xdata, $1;
+        push @ydata, $2;
+    }
+
+    my ($max_dev, $avg_dev, $src) = fit(xdata => \@xdata, ydata => \@ydata, %OPT);
+    print STDERR "$max_dev\n$avg_dev\n" if (opt('v'));
+    print STDERR JSON::PP::encode_json(\%Algorithm::CurveFit::Simple::STATS_H)."\n" if (opt('d') || opt('debug') || opt('profile'));
+    print "$src\n";
+    return 0;
+}
+
+sub opt {
+    my ($name, $default_value, $alt_hr) = @_;
+    return def($OPT{$name}, $alt_hr->{$name}, $default_value);
+}
+
+sub def {
+    foreach my $v (@_) { return $v if (defined($v)); }
+    return undef;
+}
+
+sub logger {
+    return if (opt('no-log') || opt('log',1) == 0);
+    my $log_ar = [localtime(), Time::HiRes::time(), $$, @_];
+    my $log_rec = JSON::to_json($log_ar, {ascii => 1, space_after => 1, canonical => 1})."\n";
+    print STDERR $log_rec if (opt('show-log'));
+    print STDOUT $log_rec if (opt('show-log-to-stdout'));
+    File::Valet::ap_f(opt('logfile',"/home/ttk/$PROJECT_NAME.log"), $log_rec) unless(opt('no-logfile'));
+    return;
+}
+
+sub usage {
+    print <<USAGE;
+Usage: $0 [options] < data
+Input must be x,y data pairs, one pair per line, separated by a comma or tab.
+Options and their defaults, if any:
+    --time-limit=3    Maximum number of seconds to spend calculating best fit
+    --iterations=#    Maximum number of iterations to spend calculating best fit (default is to use a time limit)
+    --terms=3         Number of terms in polynomial, max 10
+    --inv             Invert the sense of the fit to f(y) = x
+    --impl-lang=perl  Language used for output implementation: perl, C
+    --impl-name=x2y   Name of function in output implementation
+    --bounds-check    Implementation will check for out-of-bounds input
+    --round-result    Implementation will round output to nearest integer
+    --suppress-includes (C only) Do not put #include directives in output implementation
+    --quiet           Do not write supplementary information to stderr
+    --profile         Dump %STATS_H to stderr as json
+See also: Algorithm::CurveFit::Simple
+USAGE
+    exit(0);
+}
+
+=head1 NAME
+
+curvefit - Fit a polynomial to data points
+
+=head1 SYNOPSIS
+
+  Usage: curvefit [options] < data
+
+  Expects x,y data pairs on STDIN, one pair per line, separated by a comma or tab.
+
+      --time-limit=3    Maximum number of seconds to spend calculating best fit
+      --iterations=#    Maximum number of iterations to spend calculating best fit (default is to use a time limit)
+      --terms=3         Number of terms in polynomial, max 10
+      --inv             Invert the sense of the fit to f(y) = x
+      --impl-lang=perl  Language used for output implementation: perl, C
+      --impl-name=x2y   Name of function in output implementation
+      --bounds-check    Implementation will check for out-of-bounds input
+      --round-result    Implementation will round output to nearest integer
+      --suppress-includes (C only) Do not put #include directives in output implementation
+      --quiet           Do not write supplementary information to stderr
+      --profile         Dump %STATS_H to STDERR as json
+
+=head1 DESCRIPTION
+
+This is a thin wrapper around L<Algorithm::CurveFit::Simple>, which is in turn a convenience wrapper around L<Algorithm::CurveFit>.
+
+Given a set of x,y data pairs on STDIN, it will generate a polynomial formula f(x) = y which fits that data, and write a source code implementation of that formula to STDOUT.
+
+Additionally it will write a maximum deviation and average deviation to STDERR.  Closer to 1.0 is better.  Play with --terms=# until these deviations are as close to 1.0 as possible, and beware overfitting.  Use --quiet to suppress this information.
+
+=head1 SEE ALSO
+
+L<Algorithm::CurveFit::Simple>
+
+=cut

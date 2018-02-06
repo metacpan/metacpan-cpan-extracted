@@ -2,11 +2,574 @@ NAME
     App::btcindo - CLI for bitcoin.co.id (VIP)
 
 VERSION
-    This document describes version 0.017 of App::btcindo (from Perl
-    distribution App-btcindo), released on 2018-01-05.
+    This document describes version 0.019 of App::btcindo (from Perl
+    distribution App-btcindo), released on 2018-02-01.
 
 SYNOPSIS
     Please see included script btcindo.
+
+FUNCTIONS
+  balance
+    Usage:
+
+     balance(%args) -> [status, msg, result, meta]
+
+    Show current balances.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   secret* => *str*
+
+    *   with_idr_estimates => *bool*
+
+        Also show the value of all assets in IDR, using current prices
+        information.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  cancel_all_orders
+    Usage:
+
+     cancel_all_orders(%args) -> [status, msg, result, meta]
+
+    Cancel all existing open orders.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   secret* => *str*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  cancel_order
+    Usage:
+
+     cancel_order(%args) -> [status, msg, result, meta]
+
+    Cancel an existing open order.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   order_id* => *posint*
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
+
+    *   secret* => *str*
+
+    *   type* => *str*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  cancel_orders
+    Usage:
+
+     cancel_orders(%args) -> [status, msg, result, meta]
+
+    Cancel one or more open orders matching criteria.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   currency => *str*
+
+        Filter by currency.
+
+    *   key* => *str*
+
+    *   pair => *str*
+
+        Filter by pair.
+
+    *   secret* => *str*
+
+    *   type => *str*
+
+        Filter by type (buy/sell).
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  create_order
+    Usage:
+
+     create_order(%args) -> [status, msg, result, meta]
+
+    Create a new order.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   btc => *float*
+
+    *   idr => *posint*
+
+    *   key* => *str*
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
+
+    *   price* => *posint*
+
+    *   secret* => *str*
+
+    *   type* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  depth
+    Usage:
+
+     depth(%args) -> [status, msg, result, meta]
+
+    Show depth.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   type => *str*
+
+        Filter by type (buy/sell).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  hold_details
+    Usage:
+
+     hold_details(%args) -> [status, msg, result, meta]
+
+    Show in which open orders your currency is being held.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   currency => *str* (default: "idr")
+
+        Currency name.
+
+    *   key* => *str*
+
+    *   secret* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  info
+    Usage:
+
+     info(%args) -> [status, msg, result, meta]
+
+    Show balance, server timestamp, and some other information.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   secret* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  open_orders
+    Usage:
+
+     open_orders(%args) -> [status, msg, result, meta]
+
+    Show open orders.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   pair => *str*
+
+        Filter by pair.
+
+    *   secret* => *str*
+
+    *   type => *str*
+
+        Filter by type (buy/sell).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pairs
+    Usage:
+
+     pairs() -> [status, msg, result, meta]
+
+    List available pairs.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  price_history
+    Usage:
+
+     price_history(%args) -> [status, msg, result, meta]
+
+    Show price history, which can be used to draw candlestick chart.
+
+    The function will return an array of records. Each record is an array
+    with the following data:
+
+     [timestamp-in-unix-epoch, open, high, low, close]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   period => *str* (default: "day")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  profit
+    Usage:
+
+     profit(%args) -> [status, msg, result, meta]
+
+    Calculate your profit.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
+
+    *   secret* => *str*
+
+    *   time_from => *date*
+
+        Filter by beginning time.
+
+    *   time_to => *date*
+
+        Filter by ending time.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  ticker
+    Usage:
+
+     ticker() -> [status, msg, result, meta]
+
+    Show ticker.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  trade_history
+    Usage:
+
+     trade_history(%args) -> [status, msg, result, meta]
+
+    Show history of trades.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   pair => *str* (default: "btc_idr")
+
+        Pair.
+
+    *   secret* => *str*
+
+    *   time_from => *date*
+
+        Filter by beginning time.
+
+    *   time_to => *date*
+
+        Filter by ending time.
+
+    *   trade_id_from => *int*
+
+        Filter by beginning trade ID.
+
+    *   trade_id_to => *int*
+
+        Filter by ending trade ID.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  trade_history_total
+    Usage:
+
+     trade_history_total(%args) -> [status, msg, result, meta]
+
+    Show total amount of trades.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   key* => *str*
+
+    *   market => *str* (default: "idr")
+
+        Market.
+
+    *   secret* => *str*
+
+    *   time_from => *date*
+
+        Filter by beginning time.
+
+    *   time_to => *date*
+
+        Filter by ending time.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  trades
+    Usage:
+
+     trades(%args) -> [status, msg, result, meta]
+
+    Show latest trades.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   type => *str*
+
+        Filter by type (buy/sell).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  tx_history
+    Usage:
+
+     tx_history(%args) -> [status, msg, result, meta]
+
+    Show history of deposits and withdrawals.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   currency => *str*
+
+        Filter by currency.
+
+    *   key* => *str*
+
+    *   secret* => *str*
+
+    *   txtype => *str*
+
+        Filter by transaction type (deposit/withdraw).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 HOMEPAGE
     Please visit the project's homepage at

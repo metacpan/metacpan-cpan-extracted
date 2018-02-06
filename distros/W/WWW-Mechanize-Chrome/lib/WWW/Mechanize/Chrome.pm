@@ -16,7 +16,7 @@ use JSON::PP;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our @CARP_NOT;
 
 =head1 NAME
@@ -431,7 +431,9 @@ Calling this method in void context croaks.
 To see the browser console live from your Perl script, use the following:
 
   my $console = $mech->add_listener('Runtime.consoleAPICalled', sub {
-      print $_[0]->{params}->{args}->[0]->{value} || Dumper \@_;
+    warn join ", ",
+        map { $_->{value} // $_->{description} }
+        @{ $_[0]->{params}->{args} };
   });
 
 =cut
@@ -828,6 +830,12 @@ sub DESTROY {
     if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
         $_[0]->driver->close_tab({ id => $tab_id })->get();
     };
+
+    #if( $pid and $_[0]->{cached_version} > 65) {
+    #    # Try a graceful shutdown
+    #    $_[0]->driver->send_message('Browser.close' )->get
+    #};
+
     eval {
         # Shut down our websocket connection
         $_[0]->{ driver }->close
@@ -3739,7 +3747,7 @@ use feature 'signatures';
 
 use Scalar::Util 'weaken';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has 'attributes' => (
     is => 'lazy',

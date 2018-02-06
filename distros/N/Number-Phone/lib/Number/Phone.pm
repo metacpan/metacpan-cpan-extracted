@@ -8,7 +8,7 @@ use Number::Phone::Country qw(noexport);
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.4002';
+our $VERSION = '3.4003';
 
 my $NOSTUBS = 0;
 sub import {
@@ -92,8 +92,17 @@ sub format_using {
 
     eval "use Number::Phone::Formatter::$format";
     die("Couldn't load format '$format': $@\n") if($@);
-    return "Number::Phone::Formatter::$format"->format($self->format());
+    return "Number::Phone::Formatter::$format"->format($self->format(), $self);
+}
 
+sub format_for_country {
+  my $self = shift;
+  my $country_code = shift || '';
+  $country_code = Number::Phone::Country::country_code($country_code)
+    if $country_code && $country_code =~ /[a-z]/i;
+  $country_code =~ s/^\+//;
+  return $self->format_using('National') if $country_code eq $self->country_code();
+  return $self->format_using('NationallyPreferredIntl');
 }
 
 1;
@@ -450,6 +459,14 @@ which will return:
   2087712924
 
 It is a fatal error to specify a non-existent formatter.
+
+=item format_for_country
+
+Given a country code (either two-letter ISO or numeric prefix), return the
+number formatted either nationally-formatted, if the number is in the same
+country, or as a nationally-preferred international number if not. Internally
+this uses the National and NationallyPreferredIntl formatters. Beware of the
+potential performance hit!
 
 =item country
 

@@ -38,7 +38,6 @@ package Test1::Step::BackupAFile;
 
 use namespace::autoclean;
 
-use File::Copy qw( copy );
 use Stepford::Types qw( Dir File );
 
 use Moose;
@@ -69,10 +68,8 @@ has inner_steps_test_backup_file => (
 sub run {
     my $self = shift;
 
-    copy(
-        $self->inner_steps_test_original_file,
-        $self->inner_steps_test_backup_file
-    );
+    $self->inner_steps_test_original_file->copy_to(
+        $self->inner_steps_test_backup_file );
 }
 
 __PACKAGE__->meta->make_immutable;

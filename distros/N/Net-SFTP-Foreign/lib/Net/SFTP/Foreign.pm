@@ -1,6 +1,6 @@
 package Net::SFTP::Foreign;
 
-our $VERSION = '1.87';
+our $VERSION = '1.89';
 
 use strict;
 use warnings;
@@ -863,49 +863,56 @@ sub _fill_read_cache {
     my $qsize = $sftp->{_queue_size};
     my $bsize = $sftp->{_block_size};
 
-    my @msgid;
-    my $askoff = length $$bin;
-    my $eof;
+    do {
+        local $sftp->{_autodie};
 
-    while (!defined $len or length $$bin < $len) {
-	while ((!defined $len or $askoff < $len) and @msgid < $qsize) {
-	    my $id = $sftp->_queue_new_msg(SSH2_FXP_READ, str=> $rfid,
-					  int64 => $pos + $askoff, int32 => $bsize);
-	    push @msgid, $id;
-	    $askoff += $bsize;
-	}
+        my @msgid;
+        my $askoff = length $$bin;
+        my $ensure_eof;
 
-	my $eid = shift @msgid;
-	my $msg = $sftp->_get_msg_and_check(SSH2_FXP_DATA, $eid,
-					    SFTP_ERR_REMOTE_READ_FAILED,
-					    "Couldn't read from remote file")
-	    or last;
+        while (!defined $len or length $$bin < $len) {
+            while ((!defined $len or $askoff < $len) and @msgid < $qsize) {
+                my $id = $sftp->_queue_new_msg(SSH2_FXP_READ, str=> $rfid,
+                                               int64 => $pos + $askoff, int32 => $bsize);
+                push @msgid, $id;
+                $askoff += $bsize;
+            }
 
-	my $data = $msg->get_str;
-	$$bin .= $data;
-	if (length $data < $bsize) {
-	    unless (defined $len) {
-		$eof = $sftp->_queue_new_msg(SSH2_FXP_READ, str=> $rfid,
-					     int64 => $pos + length $$bin, int32 => 1);
-	    }
-	    last;
-	}
+            my $eid = shift @msgid;
+            my $msg = $sftp->_get_msg_and_check(SSH2_FXP_DATA, $eid,
+                                                SFTP_ERR_REMOTE_READ_FAILED,
+                                                "Couldn't read from remote file")
+                or last;
 
-    }
+            my $data = $msg->get_str;
+            $$bin .= $data;
+            if (length $data < $bsize) {
+                unless (defined $len) {
+                    $ensure_eof = $sftp->_queue_new_msg(SSH2_FXP_READ, str=> $rfid,
+                                                        int64 => $pos + length $$bin, int32 => 1);
+                }
+                last;
+            }
+        }
 
-    $sftp->_get_msg for @msgid;
+        $sftp->_get_msg for @msgid;
 
-    if ($eof) {
-	$sftp->_get_msg_and_check(SSH2_FXP_DATA, $eof,
-				  SFTP_ERR_REMOTE_BLOCK_TOO_SMALL,
-				  "received block was too small")
-    }
+        if ($ensure_eof and
+            $sftp->_get_msg_and_check(SSH2_FXP_DATA, $ensure_eof,
+                                      SFTP_ERR_REMOTE_READ_FAILED,
+                                      "Couldn't read from remote file")) {
 
-    if ($sftp->{_status} == SSH2_FX_EOF and length $$bin) {
-	$sftp->_clear_error_and_status;
-    }
+            $sftp->_set_error(SFTP_ERR_REMOTE_BLOCK_TOO_SMALL,
+                              "Received block was too small");
+        }
 
-    return $sftp->{_error} ? undef : length $$bin;
+        if ($sftp->{_status} == SSH2_FX_EOF) {
+            $sftp->_set_error;
+            $sftp->_set_status if length $$bin
+        }
+    };
+
+    $sftp->_ok_or_autodie and length $$bin;
 }
 
 sub read {
@@ -949,7 +956,7 @@ sub _readline {
 	    my $line = $$bin;
 	    $rfh->_inc_pos(length $line);
 	    $$bin = '';
-	    return $line;
+	    return (length $line ? $line : undef);
 	}
     }
 }
@@ -1977,7 +1984,7 @@ sub get_content {
     ${^TAINT} and &_catch_tainted_args;
 
     my ($sftp, $name) = @_;
-    $name = $sftp->_rel2abs($name);
+    #$name = $sftp->_rel2abs($name);
     my @data;
 
     my $rfh = $sftp->open($name)
@@ -2000,7 +2007,7 @@ sub put {
         $local_is_fh and croak "unable to infer remote file name when a file handler is passed as local";
         $remote = (File::Spec->splitpath($local))[2];
     }
-    $remote = $sftp->_rel2abs($remote);
+    # $remote = $sftp->_rel2abs($remote);
 
     my $cb = delete $opts{callback};
     my $umask = delete $opts{umask};
@@ -2466,7 +2473,7 @@ sub ls {
     my $cheap = ($names_only and !$realpath); 
     my ($cheap_wanted, $wanted);
     if ($cheap and
-	ref $opts{wanted} eq 'RegExp' and 
+	ref $opts{wanted} eq 'Regexp' and 
 	not defined $opts{no_wanted}) {
 	$cheap_wanted = delete $opts{wanted}
     }
@@ -5629,7 +5636,7 @@ L<autodie>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2017 Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+Copyright (c) 2005-2018 Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 Copyright (c) 2001 Benjamin Trott, Copyright (c) 2003 David Rolsky.
 

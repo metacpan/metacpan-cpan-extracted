@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2017 by Dominique Dumont.
+# This software is Copyright (c) 2005-2018 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::HashId;
-$Config::Model::HashId::VERSION = '2.116';
+$Config::Model::HashId::VERSION = '2.117';
 use Mouse;
 use 5.10.1;
 
@@ -158,6 +158,7 @@ sub _store {
     my ( $self, $key, $value ) = @_;
     push @{ $self->{list} }, $key
         unless exists $self->{data}{$key};
+    $self->notify_change(note => "added entry $key") if $self->write_empty_value;
     return $self->{data}{$key} = $value;
 }
 
@@ -538,7 +539,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.116
+version 2.117
 
 =head1 SYNOPSIS
 
@@ -656,7 +657,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2017 by Dominique Dumont.
+This software is Copyright (c) 2005-2018 by Dominique Dumont.
 
 This is free software, licensed under:
 

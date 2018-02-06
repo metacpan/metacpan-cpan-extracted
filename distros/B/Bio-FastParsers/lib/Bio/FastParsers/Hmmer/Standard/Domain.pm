@@ -1,13 +1,11 @@
 package Bio::FastParsers::Hmmer::Standard::Domain;
 # ABSTRACT: internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.173640';
+$Bio::FastParsers::Hmmer::Standard::Domain::VERSION = '0.180330';
 use Moose;
 use namespace::autoclean;
 
 use List::AllUtils qw(mesh);
-
-with 'Bio::FastParsers::Hmmer::Roles::Domainable';
 
 
 # public attributes
@@ -18,6 +16,7 @@ has $_ => (
     required => 1,
 ) for qw(seq scoreseq profile probabilities);
 
+with 'Bio::FastParsers::Roles::Domainable';
 
 around BUILDARGS => sub {
     my ($orig, $class, $inargs) = @_;
@@ -132,7 +131,7 @@ Bio::FastParsers::Hmmer::Standard::Domain - internal class for standard HMMER pa
 
 =head1 VERSION
 
-version 0.173640
+version 0.180330
 
 =head1 SYNOPSIS
 

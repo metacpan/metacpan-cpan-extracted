@@ -7,7 +7,7 @@ use Test::More tests => 14;
 require_ok( 'Astro::FITS::HdrTrans' );
 
 my %header = ();
-$header{'LONGDATE'} = "Feb  3 2006  6:29:00:234AM ";
+$header{'DATE_OBS'} = "2006-02-03 06:29:00";
 $header{SCAN} = 22;
 $header{'NORSECT'} = 4;
 $header{'NOFCHAN'} = 2;

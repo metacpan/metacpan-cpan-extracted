@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(diag $CWD DEBUG);
 use File::Temp;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 sub process {
     my ($self, $assets) = @_;
@@ -26,11 +26,12 @@ sub process {
             
             return unless $asset->format eq 'elm';
 
-            return $asset->content($file)->FROM_JSON($attrs) if $file = $store->load($attrs);
+            # massage the checksum so we can compile elm packages that are spread across multiple files
+            $attrs->{checksum} = $attrs->{checksum} . "_" . sprintf("%x", time());
             
             $self->_install_elm unless $self->{installed}++;
             
-            diag 'Process "%s" with checksum %s.', $asset->url, $attrs->{checksum} if DEBUG;
+            diag 'Process "%s" with checksum %s.', $asset->url, $attrs->{checksum} if $mode eq "development";
             
             my $elm_make = $self->app->home->rel_file('node_modules/.bin/elm-make');
 
@@ -74,7 +75,7 @@ Mojolicious::Plugin::AssetPack::Pipe::ElmLang - process .elm files
 
 =head1 VERSION
 
-0.3.2
+0.4.2
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Const::Fast" => 0,
     "Data::Dump" => 0,
-    "LWP::UserAgent" => 0,
+    "LWP::UserAgent::Determined" => 0,
     "Lingua::EN::Inflexion" => 0,
     "MIME::Base64" => 0,
     "Method::Signatures" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::LWP::UserAgent" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +57,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
-  "LWP::UserAgent" => 0,
+  "LWP::UserAgent::Determined" => 0,
   "Lingua::EN::Inflexion" => 0,
   "MIME::Base64" => 0,
   "Method::Signatures" => 0,

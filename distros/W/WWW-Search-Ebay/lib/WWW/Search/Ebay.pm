@@ -4,7 +4,7 @@ package WWW::Search::Ebay;
 use strict;
 use warnings;
 
-our $VERSION = 2.273;
+our $VERSION = 2.274;
 
 =head1 NAME
 
@@ -524,6 +524,8 @@ sub _parse_shipping
   # I don't know why there are sometimes weird characters in there:
   $iPrice =~ s!&Acirc;!!g;
   $iPrice =~ s!Â!!g;
+  $iPrice =~ s!\+!!g;
+  $iPrice =~ s/SHIPPING//gi;
   print STDERR " DDD   raw shipping ===$iPrice===\n" if (DEBUG_COLUMNS || (1 < $self->{_debug}));
   if ($iPrice =~ m/UNKNOWN/i)
     {
@@ -725,6 +727,10 @@ sub _get_result_count_elements
                             '_tag' => 'div',
                             id => 'rsc'
                            );
+  push @ao, $tree->look_down( # for Category, as of 2018-02:
+                            _tag => 'h2',
+                            class => 'srp-controls__count-heading'
+                           );
   return @ao;
   } # _get_result_count_elements
 
@@ -765,6 +771,16 @@ sub _get_itemtitle_tds
                               );
     push @ao, $oDiv->look_down(_tag => 'h3',
                                class => 'lvtitle',
+                              );
+    } # if
+  # This is for Category search as of 2018-02:
+  $oDiv = $tree->look_down(_tag => 'ul',
+                           class => 'b-list__items_nofooter',
+                          );
+  if (ref $oDiv)
+    {
+    push @ao, $oDiv->look_down(_tag => 'div',
+                               class => 's-item__info clearfix',
                               );
     } # if
   return @ao;
@@ -860,10 +876,10 @@ sub _parse_tree
  FONT:
   foreach my $oFONT (@aoResultCountTagset)
     {
+    my $s = $oFONT->as_text;
     my $qr = $self->_result_count_pattern;
-    print STDERR (" DDD   result_count try ==",
-                  $oFONT->as_text, "== against qr=$qr=\n") if (1 < $self->{_debug});
-    if ($oFONT->as_text =~ m!$qr!)
+    print STDERR (" DDD   result_count try qr=$qr= against ==$s==\n") if (1 < $self->{_debug});
+    if ($s =~ m/$qr/)
       {
       my $sCount = $1;
       print STDERR " DDD     matched ($sCount)\n" if (1 < $self->{_debug});
@@ -872,7 +888,7 @@ sub _parse_tree
       $self->approximate_result_count(0 + $sCount);
       last FONT;
       } # if
-    } # foreach
+    } # foreach FONT
 
   if ($self->approximate_result_count() < 1)
     {
@@ -975,7 +991,7 @@ sub _parse_tree
         {
         next TD if ! $self->_parse_enddate($oTDsib, $hit);
         }
-      if ($sColumn =~ 'time')
+      if ($sColumn =~ m'time')
         {
         next TD if ! $self->_parse_enddate($oTDsib, $hit);
         }
@@ -1207,7 +1223,7 @@ Include parentheses so that $1 becomes the number (with commas is OK).
 
 sub _result_count_pattern
   {
-  return qr'([0-9,]+)\s+(active\s+)?(listing|item|matche?|result)s?(\s+found)?';
+  return qr'([0-9,]+)\s+(active\s+)?(listing|item|matche?|result)s?(\s+found)?'i;
   } # _result_count_pattern
 
 

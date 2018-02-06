@@ -12,7 +12,7 @@ my $prog1 = "$^X -e \"print qq/Hello|world|/.<>\"";
 my $prog2 = "$^X -ne \"print uc\"";
 
 my $pid = fork 
-    [ "$prog1 | $prog2" ],
+    exec =>  "$prog1 | $prog2",
     stdin => "foo\n",
     timeout => 5,
     child_fh => "all" ;

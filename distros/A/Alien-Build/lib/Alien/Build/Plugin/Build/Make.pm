@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Alien::Build::Plugin;
 
 # ABSTRACT: Make plugin for Alien::Build
-our $VERSION = '1.32'; # VERSION
+our $VERSION = '1.36'; # VERSION
 
 
 has '+make_type' => undef;
@@ -79,7 +79,7 @@ Alien::Build::Plugin::Build::Make - Make plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.32
+version 1.36
 
 =head1 SYNOPSIS
 
@@ -190,6 +190,8 @@ Ahmad Fatoum (a3f, ATHREEF)
 José Joaquín Atria (JJATRIA)
 
 Duke Leto (LETO)
+
+Shoichi Kaji (SKAJI)
 
 =head1 COPYRIGHT AND LICENSE
 

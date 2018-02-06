@@ -1,0 +1,14 @@
+#!perl
+
+use strict;
+use warnings;
+
+[
+    {
+        description => "meter",
+        autoflush   => 1,
+        prefix      => 'bar.',
+        input       => [ [qw/ meter processed 7 /], ],
+        output      => "bar.processed:7|m\n",
+    },
+];

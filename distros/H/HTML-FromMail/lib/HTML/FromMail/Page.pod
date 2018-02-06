@@ -1,3 +1,5 @@
+=encoding utf8
+
 =head1 NAME
 
 HTML::FromMail::Page - base class for outputting pages
@@ -17,11 +19,15 @@ HTML::FromMail::Page - base class for outputting pages
 
 =head1 DESCRIPTION
 
+Extends L<"DESCRIPTION" in HTML::FromMail::Object|HTML::FromMail::Object/"DESCRIPTION">.
+ 
 =head1 METHODS
 
-$obj-E<gt>B<lookup>(LABEL, ARGS)
-
+Extends L<"METHODS" in HTML::FromMail::Object|HTML::FromMail::Object/"METHODS">.
+ 
 =over 4
+
+=item $obj-E<gt>B<lookup>(LABEL, ARGS)
 
 Look-up, in a formatter dependent way, what the value related to a certain
 LABEL is.  The location which is being produced on the moment that this
@@ -29,67 +35,41 @@ method is called is stored somewhere in the OPTIONS.  The formatter
 (which is also in the OPTIONS) is called to get the value based on that
 location information.
 
- Option   --Default
- formatter  <required>
+ -Option   --Default
+  formatter  <required>
 
-. formatter => OBJECT
+=over 2
 
-=back
-
-HTML::FromMail::Page-E<gt>B<new>(OPTIONS)
-
-=over 4
-
- Option  --Defined in     --Default
- settings  HTML::FromMail::Object  {}
- topic     HTML::FromMail::Object  <required>
-
-. settings => HASH-OF-HASHES
-
-. topic => STRING
+=item formatter => OBJECT
 
 =back
 
-=head2 Attributes
+=item HTML::FromMail::Page-E<gt>B<new>(OPTIONS)
 
-$obj-E<gt>B<settings>([TOPIC])
+ -Option  --Defined in            --Default
+  settings  HTML::FromMail::Object  {}
+  topic     HTML::FromMail::Object  <required>
 
-=over 4
+=over 2
 
-See L<HTML::FromMail::Object/"Attributes">
+=item settings => HASH-OF-HASHES
 
-=back
-
-$obj-E<gt>B<topic>
-
-=over 4
-
-See L<HTML::FromMail::Object/"Attributes">
+=item topic => STRING
 
 =back
-
-=head2 Export
-
-=head2 Other methods
-
-$obj-E<gt>B<plain2html>(STRING)
-
-=over 4
-
-See L<HTML::FromMail::Object/"Other methods">
 
 =back
 
 =head1 SEE ALSO
 
-This module is part of HTML-FromMail distribution version 0.11,
-built on June 08, 2007. Website: F<http://perl.overmeer.net/html-from-mail/>
+This module is part of HTML-FromMail distribution version 0.12,
+built on January 29, 2018. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2003,2004,2007 by Mark Overmeer. For other contributors see ChangeLog.
+Copyrights 2003-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

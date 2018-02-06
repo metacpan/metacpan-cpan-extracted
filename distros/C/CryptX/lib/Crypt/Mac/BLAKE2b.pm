@@ -4,19 +4,12 @@ package Crypt::Mac::BLAKE2b;
 
 use strict;
 use warnings;
-our $VERSION = '0.056';
+our $VERSION = '0.057';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( blake2b blake2b_hex blake2b_b64 blake2b_b64u )] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
-
-use CryptX;
-sub new { my $class = shift; _new(@_) }
-sub blake2b { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->mac }
-sub blake2b_hex  { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->hexmac }
-sub blake2b_b64  { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->b64mac }
-sub blake2b_b64u { Crypt::Mac::BLAKE2b->new(shift, shift)->add(@_)->b64umac }
 
 1;
 

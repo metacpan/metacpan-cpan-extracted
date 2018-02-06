@@ -1,4 +1,4 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 BEGIN {
     use_ok 'Graphics::Raylib::Color';
@@ -21,3 +21,4 @@ is $color->r, 0xDE;
 is $color->g, 0xAD;
 is $color->b, 0xBE;
 is $color->a, 0xEF;
+is Graphics::Raylib::Color::new("rgb8:DEADBE", 0xEF), $color;

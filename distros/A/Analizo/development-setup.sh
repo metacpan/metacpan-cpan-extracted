@@ -23,17 +23,35 @@ setup_debian() {
   sudo apt-file update
 
   sudo apt-get -q -y install dh-make-perl libdist-zilla-perl
-  packages=$(dh-make-perl locate $(dzil authordeps) | grep 'package$' | grep ' is in ' | sed 's/.\+is in \(.\+\) package/\1/')
-  sudo apt-get -q -y -f install $packages
 
-  packages=$(dh-make-perl locate $(dzil listdeps) | grep 'package$' | grep ' is in ' | sed 's/.\+is in \(.\+\) package/\1/')
+  if ! which cpanm; then
+    echo "*** cpanm NOT FOUND ***"
+    echo "installing cpanm..." 1>&2
+    sudo apt-get -q -y install cpanminus
+  fi
+
+  packages=$(locate_package $(dzil authordeps))
   sudo apt-get -q -y -f install $packages
+  dzil authordeps --missing | cpanm --sudo --notest
+
+  packages=$(locate_package $(dzil listdeps))
+  sudo apt-get -q -y -f install $packages
+  dzil listdeps --missing | cpanm --sudo --notest
 
   packages=$(dzil externaldeps)
   sudo apt-get -q -y -f install $packages
 }
 
-prepare_precise() {
+locate_package() {
+  packages=
+  for module in $@; do
+    package=$(dh-make-perl locate $module | grep 'package$' | grep ' is in ' | sed 's/.\+is in \(.\+\) package/\1/')
+    packages="$packages $package"
+  done
+  echo $packages
+}
+
+prepare_ubuntu() {
   if ! grep -q ZeroMQ Makefile.PL; then
     # only needed while we depend on ZeroMQ
     return
@@ -41,12 +59,16 @@ prepare_precise() {
   apt-get install -q -y libzeromq-perl
 }
 
+prepare_precise() {
+  prepare_ubuntu
+}
+
 prepare_quantal() {
-  if ! grep -q ZeroMQ Makefile.PL; then
-    # only needed while we depend on ZeroMQ
-    return
-  fi
-  apt-get install -q -y libzeromq-perl
+  prepare_ubuntu
+}
+
+prepare_trusty() {
+  prepare_ubuntu
 }
 
 # FIXME share data with Makefile.PL/dist.ini

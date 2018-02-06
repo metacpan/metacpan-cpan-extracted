@@ -34,7 +34,7 @@ use base qw/ Astro::Catalog::IO::Binary /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.31';
+$VERSION = '4.32';
 $DEBUG = 0;
 
 =begin __PUBLIC_METHODS__
@@ -668,10 +668,6 @@ sub _write_catalog {
 }
 
 =back
-
-=head1 REVISION
-
-  $Id: FITSTable.pm,v 1.9 2006/05/02 21:39:10 cavanagh Exp $
 
 =head1 SEE ALSO
 
