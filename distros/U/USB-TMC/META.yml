@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/USB-TMC/issues
   homepage: http://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/USB-TMC.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,4 @@
+TYPEMAP
+
+xs::lib::XSCallbackDispatcher*     T_OEXT
+xs::lib::NativeCallbackDispatcher* T_OEXT

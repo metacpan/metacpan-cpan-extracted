@@ -1,0 +1,89 @@
+NAME
+    App::GoogleAuthUtils - Utilities related to Google Authenticator
+
+VERSION
+    This document describes version 0.001 of App::GoogleAuthUtils (from Perl
+    distribution App-GoogleAuthUtils), released on 2018-02-08.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   gen-google-auth-qrcode
+
+FUNCTIONS
+  gen_google_auth_qrcode
+    Usage:
+
+     gen_google_auth_qrcode(%args) -> [status, msg, result, meta]
+
+    Generate Google authenticator QR code (barcode) from a secret key.
+
+    Examples:
+
+    *   Example #1:
+
+         gen_google_auth_qrcode(
+         secret_key => "6XDT6TSOGR5SCWKHXZ4DFBRXJVZGAKAW",
+           issuer => "example.com"
+         );
+
+        Result:
+
+         undef
+
+    When generating a new 2FA token, you are usually presented with a secret
+    key as well as a 2D barcode (QR code) representation of this secret key.
+    You are advised to store the secret key and it's usually more convenient
+    to store the key code instead of the QR code. But when entering the
+    secret key to the Google authenticator app, it's often more convenient
+    to scan the barcode instead of typing or copy-pasting the code.
+
+    This utility will convert the secret key code into bar code (opened in a
+    browser) so you can conveniently scan the bar code into your app.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   account => *str*
+
+    *   issuer* => *str*
+
+    *   secret_key* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GoogleAuthUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GoogleAuthUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleAuthUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

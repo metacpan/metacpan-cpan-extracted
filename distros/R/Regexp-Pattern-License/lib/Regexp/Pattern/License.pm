@@ -12,11 +12,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.0.31
+Version v3.1.0
 
 =cut
 
-our $VERSION = version->declare("v3.0.31");
+our $VERSION = version->declare("v3.1.0");
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,11 @@ L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 
 Patterns each covering a single license.
 
+Each of these patterns has exactly one of these tags:
+B< type:singleversion:* >
+B< type:unversioned >
+B< type:versioned:decimal >.
+
 =over
 
 =item * adobe_2006
@@ -41,6 +46,8 @@ Patterns each covering a single license.
 
 =item * agpl
 
+=item * aladdin
+
 =item * apache
 
 =item * apafml
@@ -48,6 +55,10 @@ Patterns each covering a single license.
 =item * artistic
 
 =item * artistic_2
+
+=item * bdwgc
+
+=item * bdwgc_matlab
 
 =item * beerware
 
@@ -115,13 +126,23 @@ Patterns each covering a single license.
 
 =item * isc
 
+=item * isc_minidiscl
+
+=item * icu
+
 =item * lgpl
+
+=item * lgpl_bdwgc
 
 =item * llgpl
 
 =item * libpng
 
 =item * mit_advertising
+
+=item * mit_cmu
+
+=item * mit_cmu_warranty
 
 =item * mit_enna
 
@@ -149,6 +170,8 @@ Patterns each covering a single license.
 
 =item * ntp_disclaimer
 
+=item * ofl
+
 =item * openssl
 
 =item * postgresql
@@ -158,6 +181,8 @@ Patterns each covering a single license.
 =item * python
 
 =item * qpl
+
+=item * rpsl
 
 =item * sgi_b
 
@@ -200,54 +225,82 @@ our %RE = (
 	adobe_2006 => {
 		name    => 'Adobe-2006',
 		caption => 'Adobe',
+		tags    => ['type:unversioned'],
 		pat     => qr/You agree to indemnify, hold harmless and defend/,
 	},
 	adobe_glyph => {
 		name    => 'Adobe-Glyph',
 		caption => 'Adobe Glyph List',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/and to permit others to do the same, provided that the derived work is not represented as being a copy/,
 	},
 	afl => {
 		name    => 'AFL',
 		summary => 'Academic Free License',
+		tags    => ['type:versioned:decimal'],
 		pat => qr/(?:$the?Academic Free License(?: \(AFL\))?|${the}AFL\b)/,
 	},
 	agpl => {
 		name    => 'AGPL',
 		summary => 'GNU Affero General Public License',
+		tags    => [ 'family:gpl', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$the?$gnu?Affero $gpl(?: \(AGPL\))?$by_fsf?|(?:$the$gnu?|$gnu)AGPL)/,
 	},
 	aladdin => {
 		name    => 'Aladdin',
 		summary => 'Aladdin Free Public License',
+		tags    => ['type:unversioned'],
 		pat     => qr/$the?Aladdin Free Public License/,
 	},
 	apache => {
 		name    => 'Apache',
 		summary => 'Apache License',
+		tags    => ['type:versioned:decimal'],
 		pat     => qr/$the?Apache(?: Software)? License/,
 	},
 	apafml => {
 		name    => 'APAFML',
 		caption => 'Adobe Postscript AFM',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/(?:AFM files it accompanies may be used|that the AFM files are not distributed)/,
 	},
 	artistic => {
 		name    => 'Artistic',
 		summary => 'Artistic License',
+		tags    => ['type:versioned:decimal'],
 		pat     => qr/$the?Artistic License/,
 	},
 	artistic_2 => {
 		name    => 'Artistic-2.0',
 		summary => 'Artistic License (v2.0)',
+		tags    => ['type:singleversion:artistic'],
 		pat     => qr/is governed by this Artistic License\./,
+	},
+	bdwgc => {
+		description => <<'END',
+Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
+END
+		tags => ['type:unversioned'],
+		pat =>
+			qr/$P{perm_granted} $P{to_copy} $P{this_prg} $P{any_purpose}, $P{retain_notices_all}\. $P{perm} $P{to_dist_mod} $P{granted}, $P{retain_notices}, and $P{note_mod} with $P{copr}\./,
+	},
+	bdwgc_matlab => {
+		name        => 'bdwgc-matlab',
+		description => <<'END',
+Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
+END
+		tags => ['type:versioned:decimal'],
+		pat =>
+			qr/$P{perm_granted} $P{to_copy} $P{this_prg} $P{any_purpose}, $P{retain_notices_all}\. $P{repro_code_cite_authors_copr}, and .?$P{used_perm}\.?.? $P{repro_matlab_cite_authors}\. $P{perm} $P{to_dist_mod} $P{granted}, $P{retain_notices}, and $P{note_mod} with $P{copr}\. $P{retain_you_avail_orig}\./,
+		'pat.alt.flavor.artifact' => qr/must cite the Authors/,
 	},
 	beerware => {
 		name    => 'Beerware',
 		summary => 'Beer-Ware License',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/(?:you can buy me a beer in return|$the?beer-?ware(?: License)?)/,
 	},
@@ -255,39 +308,36 @@ our %RE = (
 		name                  => 'BSD-2-Clause',
 		'name.alt.org.debian' => 'BSD-2-clause',
 		caption               => 'BSD (2 clause)',
-		tags                  => ['bsd'],
-		pat =>
-			qr/$P{repro_copr_cond_discl}\W+$P{asis_sw_by_name}/,
+		tags                  => [ 'bsd', 'family:bsd', 'type:unversioned' ],
+		pat => qr/$P{repro_copr_cond_discl}\W+$P{asis_sw_by_name}/,
 	},
 	bsd_3_clause => {
 		name                  => 'BSD-3-Clause',
 		'name.alt.org.debian' => 'BSD-3-clause',
 		caption               => 'BSD (3 clause)',
-		tags                  => ['bsd'],
-		pat =>
-			qr/$P{repro_copr_cond_discl}\W+$P{nopromo_neither}/,
+		tags                  => [ 'bsd', 'family:bsd', 'type:unversioned' ],
+		pat => qr/$P{repro_copr_cond_discl}\W+$P{nopromo_neither}/,
 	},
 	bsd_4_clause => {
 		name                  => 'BSD-4-Clause',
 		'name.alt.org.debian' => 'BSD-4-clause',
 		caption               => 'BSD (4 clause)',
-		tags                  => ['bsd'],
+		tags                  => [ 'bsd', 'family:bsd', 'type:unversioned' ],
 		pat                   => qr/$P{ad_mat_ack_this}/,
 	},
 	cc_by => {
 		name    => 'CC-BY',
 		caption => 'CC by',
 		summary => 'Creative Commons Attribution Public License',
-		tags    => ['cc'],
-		pat =>
-			qr/(?:$P{cc}$SD(?:$P{cc_by}|BY|$P{cc_url}by))/,
+		tags    => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
+		pat     => qr/(?:$P{cc}$SD(?:$P{cc_by}|BY|$P{cc_url}by))/,
 	},
 	cc_by_nc => {
 		name    => 'CC-BY-NC',
 		caption => 'CC by-nc',
 		summary =>
 			'Creative Commons Attribution-NonCommercial Public License',
-		tags => ['cc'],
+		tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nc}|BY${SD}NC|$P{cc_url}by-nc))/,
 	},
@@ -296,7 +346,7 @@ our %RE = (
 		caption => 'CC by-nc-nd',
 		summary =>
 			'Creative Commons Attribution-NonCommercial-NoDerivatives Public License',
-		tags => ['cc'],
+		tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_by}$SD(?:$P{cc_nc}$SD$P{cc_nd}|$P{cc_nd}$SD$P{cc_nc})|BY${SD}NC${SD}ND|$P{cc_url}by-nc-nd))/,
 	},
@@ -305,7 +355,7 @@ our %RE = (
 		caption => 'CC by-nc-sa',
 		summary =>
 			'Creative Commons Attribution-NonCommercial-ShareAlike Public License',
-		tags => ['cc'],
+		tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nc}$SD$P{cc_sa}|BY${SD}NC${SD}SA|$P{cc_url}by-nc-sa))/,
 	},
@@ -314,7 +364,7 @@ our %RE = (
 		caption => 'CC by-nd',
 		summary =>
 			'Creative Commons Attribution-NoDerivatives Public License',
-		tags => ['cc'],
+		tags => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_nd}|BY${SD}ND|$P{cc_url}by-nd))/,
 	},
@@ -322,124 +372,131 @@ our %RE = (
 		name    => 'CC-BY-SA',
 		caption => 'CC by-sa',
 		summary => 'Creative Commons Attribution-ShareAlike Public License',
-		tags    => ['cc'],
+		tags    => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_by}$SD$P{cc_sa}|BY${SD}SA|$P{cc_url}by-sa))/,
 	},
 	cc_cc0 => {
 		name    => 'CC0',
 		summary => 'Creative Commons CC0 Public License',
-		tags    => ['cc'],
+		tags    => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
 		pat =>
 			qr/(?:$P{cc}$SD(?:$P{cc_cc0}(?: \(?"CC0"?\)?)?|CC0|$P{cc_url_pd}zero))/,
 	},
 	cc_sp => {
 		caption => 'CC Sampling Plus',
 		summary => 'Creative Commons Sampling Plus Public License',
-		tags    => ['cc'],
-		pat =>
-			qr/(?:$P{cc}$SD(?:$P{cc_sp}|$P{cc_url}sampling\+))/,
+		tags    => [ 'cc', 'family:cc', 'type:versioned:decimal' ],
+		pat     => qr/(?:$P{cc}$SD(?:$P{cc_sp}|$P{cc_url}sampling\+))/,
 	},
 	cddl => {
 		name    => 'CDDL',
 		summary => 'Common Development and Distribution License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?(?:Common Development and Distribution License|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE)(?: \(CDDL\))?|${the}CDDL\b)/,
 	},
 	cecill => {
 		name    => 'CECILL',
 		caption => 'CeCILL',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:CONTRAT DE LICENCE DE LOGICIEL LIBRE |(?:la )?licence |$the?FREE SOFTWARE LICENSING AGREEMENT )?CeCILL/,
 	},
 	cecill_1 => {
 		name    => 'CECILL-1.0',
 		caption => 'CeCILL-1.0',
-		pat =>
-			qr/Version 1 du 21\/06\/2004/,
+		tags    => ['type:singleversion:cecill'],
+		pat     => qr/Version 1 du 21\/06\/2004/,
 	},
 	cecill_1_1 => {
 		name    => 'CECILL-1.1',
 		caption => 'CeCILL-1.1',
-		pat =>
-			qr/Version 1\.1 of 10\/26\/2004/,
+		tags    => ['type:singleversion:cecill'],
+		pat     => qr/Version 1\.1 of 10\/26\/2004/,
 	},
 	cecill_2 => {
 		name    => 'CECILL-2.0',
+		tags    => ['type:singleversion:cecill'],
 		caption => 'CeCILL-2.0',
-		pat =>
-			qr/Version 2\.0 (?:du|dated) 2006-09-05/,
+		pat     => qr/Version 2\.0 (?:du|dated) 2006-09-05/,
 	},
 	cecill_2_1 => {
 		name    => 'CECILL-2.1',
 		caption => 'CeCILL-2.1',
-		pat =>
-			qr/Version 2\.1 (?:du|dated) 2013-06-21/,
+		tags    => ['type:singleversion:cecill'],
+		pat     => qr/Version 2\.1 (?:du|dated) 2013-06-21/,
 	},
 	cecill_b => {
 		name    => 'CECILL-B',
 		caption => 'CeCILL-B',
-		pat =>
-			qr/the two main principles guiding its drafting|CeCILL-B/,
+		tags    => ['type:unversioned'],
+		pat     => qr/the two main principles guiding its drafting|CeCILL-B/,
 	},
 	cecill_c => {
 		name    => 'CECILL-C',
 		caption => 'CeCILL-C',
-		pat =>
-			qr/CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-C/,
+		tags    => ['type:unversioned'],
+		pat     => qr/CONTRAT DE LICENCE DE LOGICIEL LIBRE CeCILL-C/,
 	},
 	cube => {
 		name => 'Cube',
-		tags => ['zlib'],
+		tags => [ 'zlib', 'family:zlib', 'type:unversioned' ],
 		pat =>
 			qr/$P{origin_sw_no_misrepresent}; $P{you_not_claim_wrote}\. $P{use_ack_nonreq}\. $P{altered_srcver_mark}\. $P{notice_no_alter_any}\. additional clause specific to Cube:? $P{src_no_relicense}/,
 	},
 	curl => {
-		tags => ['mit'],
-		pat  => qr/$P{note_copr_perm}\.\s+$P{asis_sw_warranty}/,
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
+		pat => qr/$P{note_copr_perm}\.\s+$P{asis_sw_warranty}/,
 	},
 	dsdp => {
 		name                     => 'DSDP',
 		'caption.alt.org.fedora' => 'DSDP a.k.a. MIT (PetSC variant)',
-		tags                     => ['mit'],
-		pat => qr/This program discloses material protectable/,
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
+		pat  => qr/This program discloses material protectable/,
 	},
 	epl => {
 		name    => 'EPL',
 		summary => 'Eclipse Public License',
+		tags    => ['type:versioned:decimal'],
 		pat => qr/(?:$the?Eclipse Public License(?: \(EPL\))?|${the}EPL\b)/,
 	},
 	eurosym => {
 		name => 'Eurosym',
-		tags => ['zlib'],
+		tags => [ 'zlib', 'family:zlib', 'type:unversioned' ],
 		pat =>
 			qr/$P{origin_sw_no_misrepresent}.*?$P{altered_srcver_mark}.*?$P{change_redist_share}.*?$P{notice_no_alter}/,
 	},
 	fsfap => {
 		name    => 'FSFAP',
 		caption => 'FSF All Permissive',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/Copying and distribution of this file, with or without modification, are permitted in any medium without royalty provided the copyright notice and this notice are preserved/,
 	},
 	fsful => {
 		name    => 'FSFUL',
 		caption => 'FSF Unlimited',
+		tags    => ['type:unversioned'],
 		pat     => qr/This configure script is free software; $fsf_ul/,
 	},
 	fsfullr => {
 		name    => 'FSFULLR',
 		caption => 'FSF Unlimited (with Retention)',
+		tags    => ['type:unversioned'],
 		pat     => qr/This file is free software; $fsf_ullr/,
 	},
 	ftl => {
 		name    => 'FTL',
 		caption => 'Freetype',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/$the?(?:FreeType(?: [Pp]roject)? (?:LICENSE|[Ll]icense)(?: \(FTL\))?)/,
 	},
 	gfdl => {
 		name    => 'GFDL',
 		summary => 'GNU Free Documentation License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?$gnu?Free Documentation License(?: \(GFDL\))?$by_fsf?|(?:$the$gnu?|$gnu)GFDL)/,
 	},
@@ -448,46 +505,70 @@ our %RE = (
 		caption => 'GFDL (no invariant sections)',
 		summary =>
 			'GNU Free Documentation License, with no Front-Cover or Back-Cover Texts or Invariant Sections',
+		tags => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?$gnu?Free Documentation License(?: \(GFDL\))?$by_fsf?[,;]? $niv|(?:$the$gnu?|$gnu)GFDL-NIV)/,
 	},
 	gpl => {
 		name    => 'GPL',
 		summary => 'The GNU General Public License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?$gnu?$gpl(?: \(GPL\))?$by_fsf?|(?:$the$gnu?|$gnu)GPL)/,
 	},
 	isc => {
 		name => 'ISC',
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat  => qr/$P{note_copr_perm}\.\s+$P{asis_sw_name_discl}/,
+	},
+	isc_minidiscl => {
+		name                  => 'ISC-minimal-disclaimer',
+		'name.alt.org.debian' => 'ISC~minimal-disclaimer',
+		tags                  => [ 'family:mit', 'type:unversioned' ],
+		pat => qr/$P{note_copr_perm}\.\s+$P{asis_sw_expr_warranty}/,
 	},
 	icu => {
 		name => 'ICU',
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/$P{note_copr_perm} of the Software and that $P{repro_copr_perm_appear_doc}\.\s+$P{asis_sw_warranty}(?:[^.]+\.\s+){2}$P{nopromo_except}/,
 	},
 	lgpl => {
 		name    => 'LGPL',
 		summary => 'The GNU Lesser General Public License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?$gnu?(?:Library|Lesser(?: \(Library\))?) $gpl(?: \(LGPL\))?$by_fsf?|(?:$the$gnu?|$gnu)LGPL)/,
+	},
+	lgpl_bdwgc => {
+		name    => 'LGPL-bdwgc',
+		caption => 'LGPL (modified-code-notice clause)',
+		summary =>
+			'The GNU Lesser General Public License, with modified-code-notice clause',
+		description => <<'END',
+Origin: Possibly Boehm-Demers-Weiser conservative C/C++ Garbage Collector (libgc, bdwgc, boehm-gc).
+END
+		tags => ['type:versioned:decimal'],
+		pat =>
+			qr/$P{perm_granted} $P{to_copy} $P{this_prg} under the terms of $the${gnu}LGPL, $P{retain_copr_avail_orig}\. $P{repro_code_modcode_cite_copr_avail_note}, and .?$P{used_perm}\.?.? $P{perm} $P{to_dist_mod} $P{granted}, $P{retain_copr_avail_note}, and $P{note_mod}\./,
+		'pat.alt.flavor.artifact' => qr/code must cite the Copyright/,
 	},
 	llgpl => {
 		name    => 'LLGPL',
 		summary => 'Lisp Lesser General Public License',
+		tags    => ['type:unversioned'],
 		pat     => qr/(?:$the?Lisp Lesser $gpl(?: \(LLGPL\))?|${the}LLGPL\b)/,
 	},
 	libpng => {
 		name => 'Libpng',
+		tags => ['type:unversioned'],
 		pat =>
 			qr/$P{origin_src_no_misrepresent}\. $P{altered_ver_mark}\. $P{copr_no_alter}/,
 	},
 	mit_advertising => {
 		name    => 'MIT-advertising',
 		caption => 'MIT (advertising)',
-		tags    => ['mit'],
+		tags    => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat => qr/$P{note_marketing}\b[^.,]+, and $P{ack_doc_mat_pkg_use}/,
 	},
 	mit_cmu => {
@@ -500,13 +581,12 @@ Identical to NTP, except...
  * include elaborate warranty disclaimer
  * include liability disclaimer
 
-fingerprint: "without specific written permission"
-
 SPDX and fedora sample seem not generic but the unique file COPYING from project net-snmp.
 END
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/Permission $P{to_dist} $P{sw_doc} $P{any_purpose} and $P{nofee} $P{granted}, $P{retain_copr_appear} and that $P{repro_copr_perm_appear_doc}, and that $P{nopromo_name_written}\./,
+		'pat.alt.flavor.artifact' => qr/without specific written permission/,
 	},
 	mit_cmu_warranty => {
 		'name.alt.org.debian'    => 'MIT-CMU~warranty',
@@ -515,25 +595,24 @@ END
 		description              => <<'END',
 Identical to MIT-CMU, except...
  * add requirement of "warranty disclaimer" appearing in documentation
-
-fingerprint: "warranty disclaimer appear"
 END
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/Permission $P{to_dist} $P{sw_doc} $P{any_purpose} and $P{nofee} $P{granted}, $P{retain_copr_appear} and that $P{repro_copr_perm_warr_appear_doc}, and that $P{nopromo_name_written_prior}\./,
+		'pat.alt.flavor.artifact' => qr/warranty disclaimer appear/,
 	},
 	mit_enna => {
 		name    => 'MIT-enna',
 		caption => 'MIT (enna)',
-		tags    => ['mit'],
-		pat     => qr/$P{ack_pub_use_nosrc}/,
+		tags    => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/$P{perm_granted}, $P{free_charge}, $P{to_pers} $P{the_sw}, $P{to_deal_the_sw_rights} $P{to_mod_sublic} $P{sw}, and $P{to_perm_pers}, $P{subj_cond}:? $P{retain_copr_perm_sw_copr}\. $P{ack_pub_use_nosrc}\. This includes acknowledgments in either Copyright notices, Manuals, Publicity and Marketing documents or any documentation provided with any product containing this software\. $P{license_not_lib}\./,
+		'pat.alt.flavor.artifact' => qr/$P{ack_pub_use_nosrc}/,
 	},
 	mit_feh => {
 		name    => 'MIT-feh',
 		caption => 'MIT (feh)',
-		tags    => ['mit'],
+		tags    => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/$P{perm_granted}, $P{free_charge}, $P{to_pers} $P{the_sw}, $P{to_deal_the_sw_rights} $P{to_mod_sublic} $P{sw}, and $P{to_perm_pers}, $P{subj_cond}:? $P{retain_copr_perm_sw_doc} and $P{ack_doc_pkg_use}\./,
 	},
@@ -543,14 +622,14 @@ END
 		caption                  => 'MIT (Expat)',
 		'caption.alt.org.debian' => 'MIT/X11 (BSD like)',
 		'caption.alt.org.fedora' => 'MIT (Modern Style with sublicense)',
-		tags                     => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/$P{to_mod_sublic} $P{sw}\b[^.]+\s+$P{retain_copr_perm_subst}/,
 	},
 	mit_new_materials => {
 		'name.alt.org.debian' => 'MIT~Khronos',
 		caption               => 'MIT (Khronos)',
-		tags                  => ['mit'],
+		tags                  => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat =>
 			qr/$P{perm_granted}, $P{free_charge}, $P{to_pers} $P{the_material}, $P{to_deal_mat}/,
 	},
@@ -558,7 +637,7 @@ END
 		'name.alt.org.debian' => 'MIT~old',
 		'name.alt.org.gentoo' => 'Old-MIT',
 		caption               => 'MIT (old)',
-		tags                  => ['mit'],
+		tags                  => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat                   => qr/$P{perm_granted}, $P{free_agree_fee}/,
 	},
 	mit_oldstyle => {
@@ -567,122 +646,134 @@ END
 		description           => <<'END',
 Origin: Possibly by Jamie Zawinski in 1993 for xscreensaver.
 END
-		tags => ['mit'],
-		pat  => qr/documentation\. +No representations are made/,
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
+		pat => qr/documentation\. +No representations are made/,
 	},
 	mit_oldstyle_disclaimer => {
 		'name.alt.org.debian' => 'MIT~oldstyle~disclaimer',
 		caption               => 'MIT (Old Style, legal disclaimer)',
-		tags                  => ['mit'],
+		tags                  => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat => qr/supporting documentation\.\s+$P{asis_name_sw}/,
 	},
 	mit_oldstyle_permission => {
 		'name.alt.org.debian' => 'MIT~oldstyle~permission',
-		tags                  => ['mit'],
+		tags                  => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat => qr/$P{without_written_prior}\.\s+$P{asis_name_sw}/,
 	},
 	mpl => {
 		name    => 'MPL',
 		summary => 'Mozilla Public License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?Mozilla Public License(?: \(\"?(?:https?:?\/\/mozilla.org\/)?MPL\"?\))?(?: (?:as )?published by $the{0,2}Mozilla Foundation)?|${the}MPL\b)/,
 	},
 	ms_pl => {
 		name    => 'MS-PL',
 		caption => 'Ms-PL',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/(?:$the?Microsoft Public License(?: \(Ms-PL\))?|${the}Ms-PL\b)/,
 	},
 	ms_rl => {
 		name    => 'MS-RL',
 		caption => 'Ms-RL',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/(?:$the?Microsoft Reciprocal License(?: \(Ms-RL\))?|${the}Ms-RL\b)/,
 	},
 	ntp => {
 		name => 'NTP',
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
+		tags => ['type:unversioned'],
 		pat  => $P{asis_expr_warranty},
 	},
 	ntp_disclaimer => {
 		'name.alt.org.debian' => 'NTP~disclaimer',
 		caption               => 'NTP (legal disclaimer)',
-		tags                  => ['mit'],
+		tags                  => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat => qr/$P{asis_expr_warranty}\.\s+$P{discl_name_warranties}/,
+	},
+	ofl => {
+		name                     => 'OFL',
+		'caption.alt.org.debian' => 'SIL',
+		tags                     => ['type:versioned:decimal'],
+		pat =>
+			qr/$the?(?:SIL )?(?:OPEN FONT LICENSE|[Oo]pen [Ff]ont [Ll]icense)(?: \(OFL\))?/,
 	},
 	openssl => {
 		name    => 'OpenSSL',
 		summary => 'OpenSSL License',
+		tags    => ['type:unversioned'],
 		pat     => qr/$P{redist_ack_this}/,
 	},
 	postgresql => {
 		name => 'PostgreSQL',
-		tags => ['mit'],
+		tags => [ 'mit', 'family:mit', 'type:unversioned' ],
 		pat  => qr/$P{permission_use_fee_agree}/i,
 	},
 	public_domain => {
 		name    => 'public-domain',
 		caption => 'Public domain',
+		tags    => ['type:unversioned'],
 		pat     => qr/$the?public domain/,
-	},
-	ofl => {
-		name                     => 'OFL',
-		'caption.alt.org.debian' => 'SIL',
-		pat =>
-			qr/$the?(?:SIL )?(?:OPEN FONT LICENSE|[Oo]pen [Ff]ont [Ll]icense)(?: \(OFL\))?/,
 	},
 	python => {
 		name    => 'Python',
 		caption => 'PSF',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/$the?Python Software Foundation License|PYTHON SOFTWARE FOUNDATION LICENSE/,
 	},
 	qpl => {
 		name    => 'QPL',
 		summary => '$the?Q Public License',
-		pat =>
-			qr/(?:$the?Q Public License(?: \(QPL\))?$by_fsf?|${the}QPL\b)/,
+		tags    => ['type:versioned:decimal'],
+		pat => qr/(?:$the?Q Public License(?: \(QPL\))?$by_fsf?|${the}QPL\b)/,
 	},
 	rpsl => {
 		name    => 'RPSL',
 		caption => 'RealNetworks Public Source License',
-		pat =>
-			qr/$the?RealNetworks Public Source License/,
+		tags    => ['type:versioned:decimal'],
+		pat     => qr/$the?RealNetworks Public Source License/,
 	},
 	sgi_b => {
 		name    => 'SGI-B',
 		caption => 'SGI Free Software License B',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?SGI (?:Free Software License|FREE SOFTWARE LICENSE) B(?: \(SGI-B\))?$by_fsf?|(?:SGI )?FreeB\b|${the}SGI-B\b)/,
 	},
 	unicode_strict => {
 		name    => 'Unicode-strict',
 		caption => 'Unicode strict',
+		tags    => ['type:unversioned'],
 		pat     => qr/hereby grants the right to freely use/,
 	},
 	unicode_tou => {
 		name    => 'Unicode-TOU',
 		caption => 'Unicode Terms Of Use',
+		tags    => ['type:unversioned'],
 		pat =>
 			qr/distribute all documents and files solely for informational/,
 	},
 	wtfpl => {
 		name    => 'WTFPL',
 		caption => 'do What The Fuck you want to Public License',
+		tags    => ['type:versioned:decimal'],
 		pat =>
 			qr/(?:$the?[Dd]o What The Fuck [Yy]ou [Ww]ant [Tt]o Public License|DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE(?: \(WTFPL\))?|${the}WTFPL\b)/,
 	},
 	zlib => {
 		name    => 'Zlib',
 		caption => 'zlib/libpng',
-		tags    => ['zlib'],
+		tags    => [ 'zlib', 'family:zlib', 'type:unversioned' ],
 		pat =>
 			qr/$P{origin_sw_no_misrepresent}; $P{you_not_claim_wrote}\. $P{use_ack_nonreq}\. $P{altered_srcver_mark}\. $P{notice_no_alter}/,
 	},
 	zlib_acknowledgement => {
 		name                => 'NUnit',
 		'name.alt.org.SPDF' => 'zlib-acknowledgement',
-		tags                => ['zlib'],
+		tags                => [ 'zlib', 'family:zlib', 'type:unversioned' ],
 		pat =>
 			qr/$P{origin_sw_no_misrepresent}; $P{you_not_claim_wrote}\. $P{use_ack_req}\. Portions Copyright \S+ [\d-]+ Charlie Poole or Copyright \S+ [\d-]+ James W\. Newkirk, Michael C\. Two, Alexei A\. Vorontsov or Copyright \S+ [\d-]+ Philip A\. Craig $P{altered_srcver_mark}\. $P{notice_no_alter}/,
 	},
@@ -691,6 +782,8 @@ END
 =head2 Licensing traits
 
 Patterns each covering a single trait occuring in licenses.
+
+Each of these patterns has the tag B< type:trait >.
 
 =over
 
@@ -724,77 +817,79 @@ Patterns each covering a single trait occuring in licenses.
 
 $RE{'clause_retention'} = {
 	caption => 'retention clause',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{retain_notice_cond_discl}/,
 };
 
 $RE{'clause_reproduction'} = {
 	caption => 'reproduction clause',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{repro_copr_cond_discl}/,
 };
 
 $RE{'clause_advertising'} = {
 	caption => 'advertising clause',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{ad_mat_ack_this}/,
 };
 
 $RE{'clause_advertising_always'} = {
 	caption => 'advertising clause (always)',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{redist_ack_this}/,
 };
 
 $RE{'clause_non_endorsement'} = {
 	caption => 'non-endorsement clause',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{nopromo_neither}/,
 };
 
 $RE{'fsf_unlimited'} = {
-	tags => ['trait'],
+	tags => [ 'trait', 'type:trait' ],
 	pat  => qr/$fsf_ul/,
 };
 
 $RE{'fsf_unlimited_retention'} = {
-	tags => ['trait'],
+	tags => [ 'trait', 'type:trait' ],
 	pat  => qr/$fsf_ullr/,
 };
 
 $RE{'version_later'} = {
 	caption => 'version "or later"',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/,? $P{ver_later_postfix}|\. $P{ver_later_para}/,
 };
 
 $RE{'version_later_paragraph'} = {
 	caption => 'version "or later" postfix (paragraphs)',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{ver_later_para}/,
 };
 
 $RE{'version_later_postfix'} = {
 	caption => 'version "or later" (postfix)',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{ver_later_postfix}/,
 };
 
 $RE{'version_number'} = {
 	caption => 'version number',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{ver_number}/,
 };
 
 $RE{'version_prefix'} = {
 	caption => 'version prefix',
-	tags    => ['trait'],
+	tags    => [ 'trait', 'type:trait' ],
 	pat     => qr/$P{ver_prefix}/,
 };
 
 =head2 License combinations
 
-Patterns each covering a single combination of multiple licenses.
+Patterns each covering a combination of multiple licenses.
+
+Each of these patterns has the tag B< type:combo >.
 
 =over
 
@@ -807,14 +902,16 @@ Patterns each covering a single combination of multiple licenses.
 $RE{'perl'} = {
 	name    => 'Artistic or GPL-1+',
 	caption => 'Perl',
-	tags    => ['combo'],
+	tags    => [ 'combo', 'type:combo' ],
 	pat =>
 		qr/the same terms as $the?Perl(?: ?5)?( programming| language| system){0,3} itself/,
 };
 
-=head2 Multiple licenses
+=head2 License groups
 
-Patterns each covering multiple licenses.
+Patterns each covering either of multiple licenses.
+
+Each of these patterns has the tag B< type:group >.
 
 =over
 
@@ -831,7 +928,7 @@ Patterns each covering multiple licenses.
 $RE{'bsd'} = {
 	name    => 'BSD~unspecified',
 	caption => 'BSD (unspecified)',
-	tags    => ['group'],
+	tags    => [ 'group', 'type:group' ],
 	pat =>
 		qr/$P{repro_copr_cond_discl}(?:(?:[\d\W]+$P{ad_mat_ack_this}.*)?[\d\W]+$P{nopromo_neither})?/,
 };
@@ -839,16 +936,80 @@ $RE{'bsd'} = {
 $RE{'gnu'} = {
 	name    => 'AGPL/GPL/LGPL',
 	summary => 'a GNU license (AGPL or GPL or LGPL)',
-	tags    => ['group'],
+	tags    => [ 'group', 'type:group' ],
 	pat     => qr/(?:$RE{agpl}{pat}|$RE{gpl}{pat}|$RE{lgpl}{pat})/,
 };
 
 $RE{'mit'} = {
 	name    => 'MIT~unspecified',
 	caption => 'MIT (unspecified)',
-	tags    => ['group'],
+	tags    => [ 'group', 'type:group' ],
 	pat     => qr/${the}MIT\b/,
 };
+
+=head1 STRUCTURE
+
+The regexp patterns follows the L<DefHash> specification,
+and more specifically the structure of L<Regexp::Pattern>.
+
+=head2 TAGS
+
+Pattern defhashes optionally includes tags,
+which may help in selecting multiple related patterns.
+
+Tags are hierarchical,
+with C<:> as separator,
+and may be extended without notice.
+Therefore take care to permit sub-parts when tag-matching,
+e.g. using a regex like C< /\Asome:tag(?:\z|:)/ >.
+
+=over
+
+=item * family:bsd
+
+=item * family:cc
+
+=item * family:gpl
+
+=item * family:mit
+
+=item * family:zlib
+
+Pattern covers a license part of a family of licenses.
+
+=item * type:combo
+
+Pattern covers a combination of multiple licenses.
+
+=item * type:group
+
+Pattern covers either of multiple licenses.
+
+=item * type:singleversion:*
+
+Pattern covers a specific version of a license.
+
+Last part of tag is the key of the corresponding non-version-specific pattern.
+
+=item * type:trait
+
+Pattern covers a single trait occuring in licenses.
+
+=item * type:unversioned
+
+Pattern covers a license without versioning scheme.
+
+=item * type:versioned:decimal
+
+Pattern covers a license using decimal number versioning scheme.
+
+=back
+
+=head3 DEPRECATED TAGS
+
+Tags not documented in this POD,
+specifically non-hierarchical tags,
+are deprecated and will be dropped in a future release.
 
 =encoding UTF-8
 

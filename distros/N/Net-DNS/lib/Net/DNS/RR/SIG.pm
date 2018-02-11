@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: SIG.pm 1611 2018-01-02 09:41:24Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1611 $)[1];
 
 
 use strict;
@@ -78,11 +78,9 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $signame = $self->{signame};
 
 	if ( DNSSEC && !$self->{sigbin} ) {
-		my $private = $self->{private} || die 'missing key reference';
-		delete $self->{private};			# one shot is all you get
-
+		my $private = delete $self->{private};		# one shot is all you get
 		my $sigdata = $self->_CreateSigData($packet);
-		$self->_CreateSig( $sigdata, $private );
+		$self->_CreateSig( $sigdata, $private || die 'missing key reference' );
 	}
 
 	pack 'n C2 N3 n a* a*', @{$self}{@field}, $signame->encode, $self->sigbin;
@@ -502,8 +500,7 @@ sub _CreateSigData {
 			local $message->{additional} = \@unsigned;    # remake header image
 			my @part = qw(question answer authority additional);
 			my @size = map scalar( @{$message->{$_}} ), @part;
-			my $rref = $self->{rawref};
-			delete $self->{rawref};
+			my $rref = delete $self->{rawref};
 			my $data = $rref ? $$rref : $message->data;
 			my ( $id, $status ) = unpack 'n2', $data;
 			my $hbin = pack 'n6 a*', $id, $status, @size;

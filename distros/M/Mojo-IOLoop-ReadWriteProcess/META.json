@@ -28,6 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
+            "Module::Build" : "0.4005",
             "Module::Build::Tiny" : "0.035",
             "perl" : "5.008_001"
          }
@@ -55,7 +56,7 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Mojo::IOLoop::ReadWriteProcess::Exception" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm"
@@ -78,9 +79,9 @@
          "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "Ettore Di Giacinto <mudler@gentoo.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

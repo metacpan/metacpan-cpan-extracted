@@ -1,4 +1,4 @@
-# $Id: 02-domain.t 1555 2017-03-22 09:47:16Z willem $	-*-perl-*-
+# $Id: 02-domain.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 53;
@@ -164,13 +164,10 @@ use constant ESC => '\\';
 
 
 {
-	my @warnings;
-	local $SIG{__WARN__} = sub { push( @warnings, "@_" ); };
 	my $name      = 'LO-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-O-NG!';
-	my $domain    = new Net::DNS::Domain("$name");
-	my ($warning) = @warnings;
-	chomp $warning;
-	ok( $warning, "long domain label\t[$warning]" );
+	my $domain    = eval { new Net::DNS::Domain("$name") };
+	my $exception = $1 if $@ =~ /^(.+)\n/;
+	ok( $exception ||= '', "long domain label\t[$exception]" );
 }
 
 

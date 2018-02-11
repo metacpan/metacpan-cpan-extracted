@@ -14,51 +14,51 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA512
 
-SHA1 6261e6b65a03fa16808fc6558169ed394597c239 Block.pm
-SHA1 8261649a08f4dd7bdebad35a1e67af81aab3b0c8 Block/Item.pm
-SHA1 9bdf970c6843d9419a9dfcfec1824f5c0dc0074b Changes
+SHA1 ab475a6bc2f66978fa462c5a8cefeeb2258953eb Block.pm
+SHA1 2bc790c45f2d55f9513df5d1761d5f4dcf77dd5a Block/Item.pm
+SHA1 b81a3cd039ca816690a1baa1e1c9a28488c3ae32 Changes
 SHA1 bb306a003553f898c2a9c013f40281b27bd3c936 LICENSE
 SHA1 1f61f28926118d6ed16553da6643a36a78372450 MANIFEST
-SHA1 fcad5f181267cc875132516bfeaae563103dd475 META.yml
-SHA1 4aa5bfe22f97ab80b66d54dc1f5d8675a03a8f11 Makefile.PL
-SHA1 cd46ca8b6d555f2c0190fc7b600ca9f2048ffe4f README
-SHA1 1e3b017f339dfb3d568f3c4fea05675cff7073fa examples/ex1.pl
-SHA1 0eca3938f2578478eefc7b71761cff7a22daf4cd examples/ex2.pl
-SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 417afb3a21510efe9729922ca5c4673e94157010 META.yml
+SHA1 2752d920079cf46aa292efdd80b498cf8fb4d4ec Makefile.PL
+SHA1 8574e24b8c2394c33650598b5eb002693ee34bc5 README
+SHA1 f83b15107fc6aeaab515f076083c88a8b2887ac5 examples/ex1.pl
+SHA1 a910145b8fd5fe2aa5c9e9f06295de655af41bb3 examples/ex2.pl
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
 SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
-SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
-SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
-SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
-SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
 SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
-SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
-SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
 SHA1 0d363f8feb1c12583ea2acf080b02a7d4adf7890 t/Unicode-Block-Item/01-use.t
-SHA1 1a592ea8013c866d387969c0a7b2df5461bdb5dd t/Unicode-Block-Item/02-version.t
-SHA1 9d9d773de75f132a5e3e33f9706257a45afae972 t/Unicode-Block-Item/03-new.t
-SHA1 8192c37c647b9cc55e2610e65ed3ad65d905f3b3 t/Unicode-Block-Item/04-base.t
-SHA1 a75160b994595e29e89ac1cc8765de2a4f2e7981 t/Unicode-Block-Item/05-char.t
-SHA1 2e1700a6ea86d5e3953b75c97d39e2ec5fa9fd10 t/Unicode-Block-Item/06-hex.t
-SHA1 50d2d491032d11ece70952db1ef39fc3b7076683 t/Unicode-Block-Item/07-last_hex.t
-SHA1 28ea5e160cc4c161b45da177f89b58000dad501c t/Unicode-Block-Item/08-width.t
+SHA1 6f89796231dc2e984c2ce3a239e429c1d14f6013 t/Unicode-Block-Item/02-version.t
+SHA1 c1923d8227595df805902b212bc67694aa6588a5 t/Unicode-Block-Item/03-new.t
+SHA1 a48441a371fb0caca66d57418477c328ae8298ec t/Unicode-Block-Item/04-base.t
+SHA1 40d96c05e5b015e1d28c151732b09a4b1736f11b t/Unicode-Block-Item/05-char.t
+SHA1 955c0e55013fb53a95fb13e9a198cbe6820a36c0 t/Unicode-Block-Item/06-hex.t
+SHA1 9bd61b6dc62614b0058f7e8f942c6a301478944b t/Unicode-Block-Item/07-last_hex.t
+SHA1 d88ed22e3e9286f9f9fc8407e1c7eb45ad7af7ed t/Unicode-Block-Item/08-width.t
 SHA1 dc6dde0b17995747467bac798b44b3cdbc20dc34 t/Unicode-Block/01-use.t
-SHA1 442b49c7ad40eb79d071c0307571309714464a8f t/Unicode-Block/02-version.t
-SHA1 cac7960f6e445180c74d4d4042a3c15bbc95c8a1 t/Unicode-Block/03-new.t
-SHA1 c8ca118dce50fc40d7ea70b49ccdc64d91ccdc2e t/Unicode-Block/04-next.t
+SHA1 b1beedf408392144d00f6a6cbd7d3680799ea109 t/Unicode-Block/02-version.t
+SHA1 b7c033c947030e30d5937fe0507a7b62c9fdc8ce t/Unicode-Block/03-new.t
+SHA1 cd1561e574f71bac380c50a49bc1af13c2961cd3 t/Unicode-Block/04-next.t
 SHA1 16f3d4ed2d5f4631fd0a6f3e4a6b438c9e3e19ab xt/Unicode-Block-Item/01-pod_coverage.t
 SHA1 046cca4617b008e8934cc74daeec526ad275d7d6 xt/Unicode-Block-Item/02-pod.t
 SHA1 0b4f6fd52a00e19fc12fb5a12c780c515f1886e7 xt/Unicode-Block/01-pod_coverage.t
 SHA1 8d13f660a04090f3203f9009807c78331aa8c838 xt/Unicode-Block/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlpBmdYACgkQKyiOZjWe
-rHa6rAf/duPeYJk/fVggbtqCBPusNq6N+3OgenaeYQEZu2CcTBAmjq5RsxcGI5Vy
-FUWTsuES5f7FBuUbY4e9cDJ/CVk+MzCgns8/rqlGvAeP0wLC7CHwH8CouMsC8iwb
-tSPPJ66WYGpJixR4xcwaLwaLAy691jz1vnO6AznCzPd0ZZ4L7KHAsEwFXx5Mmo/r
-x05OPDiBMzn1/SI9ETk5df1/ameWiadq4LxvJOOTRfLRrylWz4qP3E1kfxa/7dgm
-K4zRx0yh9suBjLrs5DzuibrADSu/Ee6gySPgUy6GPG7neh6fo7zO58dHLZB2Xkv5
-iOz9yKsmnf9S/TbUSIjy4DJgrdjoog==
-=FSUv
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAlp6opcACgkQKyiOZjWe
+rHbjUQf/cm463+AtS8OE2be03CSvUceqTRtaOb8viWNAPsaB8h5fi29RnqMPVQx4
+NDlqxQKjXAOVPc8pDF70CnyHeSXvTCor7ZwAP1T7bc8DqqbcWDLMdq2KVAMHnwQx
+BZ9mVyN0McXZ01LwwCvN0NjVWPDiUIRj59/p7PIVvctx9pd0N870v5yw4yhlOUx4
+xAXNoc3r5HjSamnl5rMZvOfGGVRy/M8kDGwqhVxMEnCXTPE4dbwKB2Z9IKIOvmf4
+MpYNpgByG0RL+MryiroD/FR6A+zoPv0RCUePJOQOqTFTaGye4Jbpiagx9L1arWn8
+/4w/wCfQhOoe/dOXSH7FIDzUhuhFLg==
+=/1tG
 -----END PGP SIGNATURE-----

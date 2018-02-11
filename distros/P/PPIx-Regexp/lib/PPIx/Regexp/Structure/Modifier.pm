@@ -35,7 +35,7 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 # This is a kluge for both determining whether the object asserts
 # modifiers (hence the 'ductype') and determining whether the given

@@ -64,7 +64,7 @@
          "web" : "https://github.com/LibreCat/Plack-Middleware-Signposting"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"

@@ -5,7 +5,7 @@
       "Aleksandr Babenko <babenko@reg.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -73,22 +73,22 @@
    "provides" : {
       "WebService::CEPH" : {
          "file" : "lib/WebService/CEPH.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "WebService::CEPH::FileShadow" : {
          "file" : "lib/WebService/CEPH/FileShadow.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "WebService::CEPH::NetAmazonS3" : {
          "file" : "lib/WebService/CEPH/NetAmazonS3.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://metacpan.org/release/WebService-CEPH"
    },
-   "version" : "0.015",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.016",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

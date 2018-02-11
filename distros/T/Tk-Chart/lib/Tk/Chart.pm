@@ -2,8 +2,8 @@ package Tk::Chart;
 
 #==================================================================
 # $Author    : Djibril Ousmanou                                   $
-# $Copyright : 2017                                               $
-# $Update    : 23/04/2017                                         $
+# $Copyright : 2018                                               $
+# $Update    : 09/02/2018                                         $
 # $AIM       : Private functions for Tk::Chart modules            $
 #==================================================================
 
@@ -13,7 +13,7 @@ use Carp;
 use Tk::Chart::Utils qw / :DUMMIES /;
 
 use vars qw($VERSION);
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 use Exporter;
 
@@ -108,6 +108,8 @@ sub _get_configspecs {
 
     -linewidth => [ 'PASSIVE', 'Linewidth', 'LineWidth', 1 ],
     -colordata => [ 'PASSIVE', 'Colordata', 'ColorData', $ref_config->{Legend}{Colors} ],
+
+    -legendfont => [ 'PASSIVE', 'Legendfont',  'LegendFont',  $ref_config->{Legend}{legendfont} ],
 
     # verbose mode
     -verbose => [ 'PASSIVE', 'verbose', 'Verbose', 1 ],
@@ -217,6 +219,7 @@ sub _initconfig {
       ],
       NbrLegend => 0,
       box       => 0,
+	  legendfont => '{Times} 8 {normal}',
     },
     'TAGS' => {
       AllTagsChart => '_AllTagsChart',

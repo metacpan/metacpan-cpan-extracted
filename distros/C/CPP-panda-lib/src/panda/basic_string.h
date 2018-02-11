@@ -776,7 +776,12 @@ public:
     template <class Alloc2>
     basic_string& append (const basic_string<CharT, Traits, Alloc2>& str) {
         if (!_length && _state != State::INTERNAL) return assign(str); // do not optimize if string had reserved memory
-        return append(str._str, str._length);
+        if (str._length) { // can't call append(const CharT*, size_type) because otherwise if &str == this a fuckup would occur
+            _reserve_save(_length + str._length);
+            traits_type::copy(_str + _length, str._str, str._length);
+            _length += str._length;
+        }
+        return *this;
     }
 
     template <class Alloc2>
@@ -833,13 +838,31 @@ public:
     basic_string& operator+= (std::initializer_list<CharT> ilist)             { return append(ilist); }
     basic_string& operator+= (std::basic_string_view<CharT, Traits> sv)       { return append(sv); }
 
+    basic_string& insert (size_type pos, const basic_string& str) {
+        if (this == &str) {
+            const basic_string tmp(str);
+            return insert(pos, tmp._str, tmp._length);
+        }
+        else return insert(pos, str._str, str._length);
+    }
+
     template <class Alloc2>
     basic_string& insert (size_type pos, const basic_string<CharT, Traits, Alloc2>& str) {
         return insert(pos, str._str, str._length);
     }
 
+    basic_string& insert (size_type pos, const basic_string& str, size_type subpos, size_type sublen = npos) {
+        if (subpos > str._length) throw std::out_of_range("basic_string::insert");
+        if (sublen > str._length - subpos) sublen = str._length - subpos;
+        if (this == &str) {
+            const basic_string tmp(str);
+            return insert(pos, tmp._str + subpos, sublen);
+        }
+        else return insert(pos, str._str + subpos, sublen);
+    }
+
     template <class Alloc2>
-    basic_string& insert (size_type pos, const basic_string<CharT, Traits, Alloc2>& str, size_type subpos, size_type sublen) {
+    basic_string& insert (size_type pos, const basic_string<CharT, Traits, Alloc2>& str, size_type subpos, size_type sublen = npos) {
         if (subpos > str._length) throw std::out_of_range("basic_string::insert");
         if (sublen > str._length - subpos) sublen = str._length - subpos;
         return insert(pos, str._str + subpos, sublen);
@@ -878,15 +901,15 @@ public:
     }
 
     iterator insert (const_iterator it, size_type count, CharT ch) {
-        auto pos = it - cbegin();
+        size_type pos = it - cbegin();
         insert(pos, count, ch);
-        return cbegin() + pos;
+        return _str + pos;
     }
 
     iterator insert (const_iterator it, CharT ch) {
-        auto pos = it - cbegin();
+        size_type pos = it - cbegin();
         insert(pos, 1, ch);
-        return cbegin() + pos;
+        return _str + pos;
     }
 
     basic_string& insert (const_iterator it, std::initializer_list<CharT> ilist) {
@@ -900,6 +923,14 @@ public:
     // fix ambiguity between iterator(char*) and size_t
     basic_string& insert (int pos, size_type count, CharT ch) { return insert((size_type)pos, count, ch); }
 
+    basic_string& replace (size_type pos, size_type remove_count, const basic_string& str) {
+        if (this == &str) {
+            const basic_string tmp(str);
+            return replace(pos, remove_count, tmp._str, tmp._length);
+        }
+        return replace(pos, remove_count, str._str, str._length);
+    }
+
     template <class Alloc2>
     basic_string& replace (size_type pos, size_type remove_count, const basic_string<CharT, Traits, Alloc2>& str) {
         return replace(pos, remove_count, str._str, str._length);
@@ -910,11 +941,21 @@ public:
         return replace(first - cbegin(), last - first, str);
     }
 
+    basic_string& replace (size_type pos, size_type remove_count, const basic_string& str, size_type pos2, size_type insert_count = npos) {
+        if (pos2 > str._length) throw std::out_of_range("basic_string::replace");
+        if (insert_count > str._length - pos2) insert_count = str._length - pos2;
+        if (this == &str) {
+            const basic_string tmp(str);
+            return replace(pos, remove_count, tmp._str + pos2, insert_count);
+        }
+        return replace(pos, remove_count, str._str + pos2, insert_count);
+    }
+
     template <class Alloc2>
     basic_string& replace (size_type pos, size_type remove_count, const basic_string<CharT, Traits, Alloc2>& str, size_type pos2, size_type insert_count = npos) {
         if (pos2 > str._length) throw std::out_of_range("basic_string::replace");
         if (insert_count > str._length - pos2) insert_count = str._length - pos2;
-        return insert(pos, remove_count, str._str + pos2, insert_count);
+        return replace(pos, remove_count, str._str + pos2, insert_count);
     }
 
     basic_string& replace (size_type pos, size_type remove_count, const CharT* s, size_type insert_count) {
@@ -936,27 +977,27 @@ public:
     }
 
     basic_string& replace (const_iterator first, const_iterator last, const CharT* s, size_type insert_count) {
-        return insert(first - cbegin(), last - first, s, insert_count);
+        return replace(first - cbegin(), last - first, s, insert_count);
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
     basic_string& replace (size_type pos, size_type remove_count, const _CharT* const& s) {
-        return insert(pos, remove_count, s, traits_type::length(s));
+        return replace(pos, remove_count, s, traits_type::length(s));
     }
 
     template <size_type SIZE>
     basic_string& replace (size_type pos, size_type remove_count, const CharT (&s)[SIZE]) {
-        return insert(pos, remove_count, s, SIZE-1);
+        return replace(pos, remove_count, s, SIZE-1);
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
     basic_string& replace (const_iterator first, const_iterator last, const _CharT* const& s) {
-        return insert(first, last, s, traits_type::length(s));
+        return replace(first, last, s, traits_type::length(s));
     }
 
     template <size_type SIZE>
     basic_string& replace (const_iterator first, const_iterator last, const CharT (&s)[SIZE]) {
-        return insert(first, last, s, SIZE-1);
+        return replace(first, last, s, SIZE-1);
     }
 
     basic_string& replace (size_type pos, size_type remove_count, size_type insert_count, CharT ch) {
@@ -978,11 +1019,11 @@ public:
     }
 
     basic_string& replace (const_iterator first, const_iterator last, size_type insert_count, CharT ch) {
-        return insert(first - cbegin(), last - first, insert_count, ch);
+        return replace(first - cbegin(), last - first, insert_count, ch);
     }
 
     basic_string& replace (const_iterator first, const_iterator last, std::initializer_list<CharT> ilist) {
-        return insert(first, last, ilist.begin(), ilist.size());
+        return replace(first, last, ilist.begin(), ilist.size());
     }
 
     basic_string& replace (size_type pos, size_type remove_count, std::basic_string_view<CharT, Traits> sv) {
@@ -1051,7 +1092,7 @@ private:
     void _new_internal_from_sso (size_type capacity, size_type pos, size_type remove_count, size_type insert_count) {
         auto ibuf = (Buffer*)Alloc::allocate(capacity + BUF_CHARS);
         if (pos) traits_type::copy(ibuf->start, _str, pos);
-        traits_type::copy(ibuf->start + pos + insert_count, _str + pos + remove_count, _length - pos - remove_count);
+        traits_type::copy((CharT*)ibuf->start + pos + insert_count, _str + pos + remove_count, _length - pos - remove_count);
         ibuf->capacity = capacity;
         ibuf->refcnt   = 1;
         _state = State::INTERNAL;

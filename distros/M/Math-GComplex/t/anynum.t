@@ -13,7 +13,7 @@ BEGIN {
       if ($Math::AnyNum::VERSION < 0.20);
 }
 
-plan tests => 250;
+plan tests => 336;
 
 use Math::GComplex;
 use Math::AnyNum qw(:overload);
@@ -28,6 +28,36 @@ is(join(' ', ($x / $y)->reals), '41/74 13/74');
 
 is(join(' ', $x->conj->reals), '3 -4');
 is(join(' ', (-$y)->reals), '-7 -5');
+
+is($x->norm,       25);
+is($x->conj->norm, 25);
+is($x->neg->norm,  25);
+
+is(join(' ', Math::GComplex->new(0, 0)->pow(3)->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->pow(Math::GComplex->new(3, 4))->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->pow(0)->reals), '1 0');
+is(join(' ', Math::GComplex->new(0, 0)->pow(Math::GComplex->new(0, 0))->reals), '1 0');
+is(join(' ', Math::GComplex->new(0, 0)->pow(-2)->reals), 'Inf NaN');
+is(join(' ', Math::GComplex->new(0, 0)->pow(Math::GComplex->new(-2, -5))->reals), 'Inf NaN');
+is(join(' ', Math::GComplex->new(0, 0)->pow(Math::GComplex->new(0,  0))->reals),  '1 0');
+
+is(join(' ', Math::GComplex->new(0, 0)->root(0)->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->root(1)->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->root(Math::GComplex->new(1, -5))->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->root(2)->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->root(Math::GComplex->new(2, 3))->reals), '0 0');
+is(join(' ', Math::GComplex->new(0, 0)->root(-2)->reals), 'Inf NaN');
+is(join(' ', Math::GComplex->new(0, 0)->root(Math::GComplex->new(-3, 4))->reals), 'Inf NaN');
+
+is(join(' ', Math::GComplex->new(0,  4)->pow(0)->reals),  '1 0');
+is(join(' ', Math::GComplex->new(0,  -4)->pow(0)->reals), '1 0');
+is(join(' ', Math::GComplex->new(-3, -4)->pow(0)->reals), '1 0');
+
+like(join(' ', Math::GComplex->new(0, 1)->pow(Math::GComplex->new(0, 1))->reals),
+     qr/^0\.207879576350761908546955619834\d* 0\z/);
+
+like(join(' ', Math::GComplex->new(0, 4)->pow(Math::GComplex->new(0, 5))->reals),
+     qr/^0\.00030944438931709426034562369\d* 0\.000234405412606400922838812072\d*\z/);
 
 is(join(' ', log($x)->reals), join(' ', log(3 + 4 * i)->reals));
 is(join(' ', log($y)->reals), join(' ', log(7 + 5 * i)->reals));
@@ -275,11 +305,11 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', sin($z3)->asin->reals), '-0.5 0.3');
     is(join(' ', sin($z4)->asin->reals), '-0.5 -0.3');
 
-    # acos(cos(x)) = x  for |x| < 1
-    is(join(' ', cos($z1)->acos->reals), '0.5 0.3');
-    is(join(' ', cos($z2)->acos->reals), '0.5 -0.3');
-    is(join(' ', cos($z3)->acos->reals), '0.5 -0.3');    # this is correct
-    is(join(' ', cos($z4)->acos->reals), '0.5 0.3');     # =//=
+    # asin(sin(x)) = x
+    is(join(' ', $z1->sinh->asinh->reals), '0.5 0.3');
+    is(join(' ', $z2->sinh->asinh->reals), '0.5 -0.3');
+    is(join(' ', $z3->sinh->asinh->reals), '-0.5 0.3');
+    is(join(' ', $z4->sinh->asinh->reals), '-0.5 -0.3');
 
     # sin(asin(x)) = x  for |x| < pi/2
     is(join(' ', sin($z1->asin)->reals), '0.5 0.3');
@@ -287,35 +317,83 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', sin($z3->asin)->reals), '-0.5 0.3');
     is(join(' ', sin($z4->asin)->reals), '-0.5 -0.3');
 
+    # sinh(asinh(x)) = x
+    is(join(' ', $z1->asinh->sinh->reals), '0.5 0.3');
+    is(join(' ', $z2->asinh->sinh->reals), '0.5 -0.3');
+    is(join(' ', $z3->asinh->sinh->reals), '-0.5 0.3');
+    is(join(' ', $z4->asinh->sinh->reals), '-0.5 -0.3');
+
+    # acos(cos(x)) = x  for |x| < 1
+    is(join(' ', cos($z1)->acos->reals), '0.5 0.3');
+    is(join(' ', cos($z2)->acos->reals), '0.5 -0.3');
+    is(join(' ', cos($z3)->acos->reals), '0.5 -0.3');    # this is correct
+    is(join(' ', cos($z4)->acos->reals), '0.5 0.3');     # =//=
+
+    # acosh(cosh(x)) = x
+    is(join(' ', $z1->cosh->acosh->reals), '0.5 0.3');
+    is(join(' ', $z2->cosh->acosh->reals), '0.5 -0.3');
+    is(join(' ', $z3->cosh->acosh->reals), '0.5 -0.3');    # this is correct
+    is(join(' ', $z4->cosh->acosh->reals), '0.5 0.3');     # =//=
+
     # cos(acos(x)) = x  for |x| < pi/2
     is(join(' ', cos($z1->acos)->reals), '0.5 0.3');
     is(join(' ', cos($z2->acos)->reals), '0.5 -0.3');
     is(join(' ', cos($z3->acos)->reals), '-0.5 0.3');
     is(join(' ', cos($z4->acos)->reals), '-0.5 -0.3');
 
-    # atan(tan(x)) = x
+    # cosh(acosh(x)) = x
+    is(join(' ', $z1->acosh->cosh->reals), '0.5 0.3');
+    is(join(' ', $z2->acosh->cosh->reals), '0.5 -0.3');
+    is(join(' ', $z3->acosh->cosh->reals), '-0.5 0.3');
+    is(join(' ', $z4->acosh->cosh->reals), '-0.5 -0.3');
+
+    # tan(atan(x)) = x
     is(join(' ', $z1->atan->tan->reals), '0.5 0.3');
     is(join(' ', $z2->atan->tan->reals), '0.5 -0.3');
     is(join(' ', $z3->atan->tan->reals), '-0.5 0.3');
     is(join(' ', $z4->atan->tan->reals), '-0.5 -0.3');
 
-    # tan(atan(x)) = x
+    # tanh(atanh(x)) = x
+    is(join(' ', $z1->atanh->tanh->reals), '0.5 0.3');
+    is(join(' ', $z2->atanh->tanh->reals), '0.5 -0.3');
+    is(join(' ', $z3->atanh->tanh->reals), '-0.5 0.3');
+    is(join(' ', $z4->atanh->tanh->reals), '-0.5 -0.3');
+
+    # atan(tan(x)) = x
     is(join(' ', $z1->tan->atan->reals), '0.5 0.3');
     is(join(' ', $z2->tan->atan->reals), '0.5 -0.3');
     is(join(' ', $z3->tan->atan->reals), '-0.5 0.3');
     is(join(' ', $z4->tan->atan->reals), '-0.5 -0.3');
 
-    # acot(cot(x)) = x
+    # atan(tan(x)) = x
+    is(join(' ', $z1->tanh->atanh->reals), '0.5 0.3');
+    is(join(' ', $z2->tanh->atanh->reals), '0.5 -0.3');
+    is(join(' ', $z3->tanh->atanh->reals), '-0.5 0.3');
+    is(join(' ', $z4->tanh->atanh->reals), '-0.5 -0.3');
+
+    # cot(acot(x)) = x
     is(join(' ', $z1->acot->cot->reals), '0.5 0.3');
     is(join(' ', $z2->acot->cot->reals), '0.5 -0.3');
     is(join(' ', $z3->acot->cot->reals), '-0.5 0.3');
     is(join(' ', $z4->acot->cot->reals), '-0.5 -0.3');
 
-    # cot(acot(x)) = x
+    # coth(acoth(x)) = x
+    is(join(' ', $z1->acoth->coth->reals), '0.5 0.3');
+    is(join(' ', $z2->acoth->coth->reals), '0.5 -0.3');
+    is(join(' ', $z3->acoth->coth->reals), '-0.5 0.3');
+    is(join(' ', $z4->acoth->coth->reals), '-0.5 -0.3');
+
+    # acot(cot(x)) = x
     is(join(' ', $z1->cot->acot->reals), '0.5 0.3');
     is(join(' ', $z2->cot->acot->reals), '0.5 -0.3');
     is(join(' ', $z3->cot->acot->reals), '-0.5 0.3');
     is(join(' ', $z4->cot->acot->reals), '-0.5 -0.3');
+
+    # acoth(coth(x)) = x
+    is(join(' ', $z1->coth->acoth->reals), '0.5 0.3');
+    is(join(' ', $z2->coth->acoth->reals), '0.5 -0.3');
+    is(join(' ', $z3->coth->acoth->reals), '-0.5 0.3');
+    is(join(' ', $z4->coth->acoth->reals), '-0.5 -0.3');
 
     # asec(sec(x)) = x
     is(join(' ', $z1->sec->asec->reals), '0.5 0.3');
@@ -323,11 +401,23 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', $z3->sec->asec->reals), '0.5 -0.3');    # this is correct
     is(join(' ', $z4->sec->asec->reals), '0.5 0.3');     # =//=
 
+    # asech(sech(x)) = x
+    is(join(' ', $z1->sech->asech->reals), '0.5 0.3');
+    is(join(' ', $z2->sech->asech->reals), '0.5 -0.3');
+    is(join(' ', $z3->sech->asech->reals), '0.5 -0.3');    # this is correct
+    is(join(' ', $z4->sech->asech->reals), '0.5 0.3');     # =//=
+
     # sec(asec(x)) = x
     is(join(' ', $z1->asec->sec->reals), '0.5 0.3');
     is(join(' ', $z2->asec->sec->reals), '0.5 -0.3');
     is(join(' ', $z3->asec->sec->reals), '-0.5 0.3');
     is(join(' ', $z4->asec->sec->reals), '-0.5 -0.3');
+
+    # sech(asech(x)) = x
+    is(join(' ', $z1->asech->sech->reals), '0.5 0.3');
+    is(join(' ', $z2->asech->sech->reals), '0.5 -0.3');
+    is(join(' ', $z3->asech->sech->reals), '-0.5 0.3');
+    is(join(' ', $z4->asech->sech->reals), '-0.5 -0.3');
 
     # csc(acsc(x)) = x
     is(join(' ', $z1->acsc->csc->reals), '0.5 0.3');
@@ -335,11 +425,23 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', $z3->acsc->csc->reals), '-0.5 0.3');
     is(join(' ', $z4->acsc->csc->reals), '-0.5 -0.3');
 
+    # csch(acsch(x)) = x
+    is(join(' ', $z1->acsch->csch->reals), '0.5 0.3');
+    is(join(' ', $z2->acsch->csch->reals), '0.5 -0.3');
+    is(join(' ', $z3->acsch->csch->reals), '-0.5 0.3');
+    is(join(' ', $z4->acsch->csch->reals), '-0.5 -0.3');
+
     # acsc(csc(x)) = x
     is(join(' ', $z1->csc->acsc->reals), '0.5 0.3');
     is(join(' ', $z2->csc->acsc->reals), '0.5 -0.3');
     is(join(' ', $z3->csc->acsc->reals), '-0.5 0.3');
     is(join(' ', $z4->csc->acsc->reals), '-0.5 -0.3');
+
+    # acsch(csch(x)) = x
+    is(join(' ', $z1->csch->acsch->reals), '0.5 0.3');
+    is(join(' ', $z2->csch->acsch->reals), '0.5 -0.3');
+    is(join(' ', $z3->csch->acsch->reals), '-0.5 0.3');
+    is(join(' ', $z4->csch->acsch->reals), '-0.5 -0.3');
 
     # tan(x) = sin(x)/cos(x)
     is(join(' ', (sin($z1) / cos($z1))->reals), join(' ', $z1->tan->reals));
@@ -347,11 +449,23 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', (sin($z3) / cos($z3))->reals), join(' ', $z3->tan->reals));
     is(join(' ', (sin($z4) / cos($z4))->reals), join(' ', $z4->tan->reals));
 
+    # tanh(x) = sinh(x)/cosh(x)
+    is(join(' ', ($z1->sinh / $z1->cosh)->reals), join(' ', $z1->tanh->reals));
+    is(join(' ', ($z2->sinh / $z2->cosh)->reals), join(' ', $z2->tanh->reals));
+    is(join(' ', ($z3->sinh / $z3->cosh)->reals), join(' ', $z3->tanh->reals));
+    is(join(' ', ($z4->sinh / $z4->cosh)->reals), join(' ', $z4->tanh->reals));
+
     # sec(x) = 1/cos(x)
     is(join(' ', $z1->sec->reals), join(' ', cos($z1)->inv->reals));
     is(join(' ', $z2->sec->reals), join(' ', cos($z2)->inv->reals));
     is(join(' ', $z3->sec->reals), join(' ', cos($z3)->inv->reals));
     is(join(' ', $z4->sec->reals), join(' ', cos($z4)->inv->reals));
+
+    # sech(x) = 1/cosh(x)
+    is(join(' ', $z1->sech->reals), join(' ', $z1->cosh->inv->reals));
+    is(join(' ', $z2->sech->reals), join(' ', $z2->cosh->inv->reals));
+    is(join(' ', $z3->sech->reals), join(' ', $z3->cosh->inv->reals));
+    is(join(' ', $z4->sech->reals), join(' ', $z4->cosh->inv->reals));
 
     # csc(x) = 1/sin(x)
     is(join(' ', $z1->csc->reals), join(' ', sin($z1)->inv->reals));
@@ -359,11 +473,23 @@ is(join(' ', Math::GComplex->new(-13.3, -15.9)->ceil->reals), '-13 -15');
     is(join(' ', $z3->csc->reals), join(' ', sin($z3)->inv->reals));
     is(join(' ', $z4->csc->reals), join(' ', sin($z4)->inv->reals));
 
+    # csch(x) = 1/sinh(x)
+    is(join(' ', $z1->csch->reals), join(' ', $z1->sinh->inv->reals));
+    is(join(' ', $z2->csch->reals), join(' ', $z2->sinh->inv->reals));
+    is(join(' ', $z3->csch->reals), join(' ', $z3->sinh->inv->reals));
+    is(join(' ', $z4->csch->reals), join(' ', $z4->sinh->inv->reals));
+
     # cot(x) = 1/tan(x)
     is(join(' ', $z1->cot->reals), join(' ', $z1->tan->inv->reals));
     is(join(' ', $z2->cot->reals), join(' ', $z2->tan->inv->reals));
     is(join(' ', $z3->cot->reals), join(' ', $z3->tan->inv->reals));
     is(join(' ', $z4->cot->reals), join(' ', $z4->tan->inv->reals));
+
+    # coth(x) = 1/tanh(x)
+    is(join(' ', $z1->coth->reals), join(' ', $z1->tanh->inv->reals));
+    is(join(' ', $z2->coth->reals), join(' ', $z2->tanh->inv->reals));
+    is(join(' ', $z3->coth->reals), join(' ', $z3->tanh->inv->reals));
+    is(join(' ', $z4->coth->reals), join(' ', $z4->tanh->inv->reals));
 }
 
 is(join(' ', Math::GComplex::deg2rad(45)->reals),              join(' ', (Math::AnyNum->pi / 4)->reals));

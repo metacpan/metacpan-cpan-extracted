@@ -37,6 +37,8 @@
 #include "spvm_jitcode_builder.h"
 #include "spvm_dynamic_array.h"
 #include "spvm_constant_pool_builder.h"
+#include "spvm_jitcode_builder.h"
+#include "spvm_string_buffer.h"
 
 static SPVM_API_VALUE call_sub_args[255];
 
@@ -71,6 +73,47 @@ SPVM_OBJECT* SPVM_XS_UTIL_get_object(SV* sv_object) {
   else {
     return NULL;
   }
+}
+
+int SPVM_XS_UTIL_compile_jit_sub(SPVM_API* api, int32_t sub_id) {
+  dSP;
+
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  
+  // Subroutine information
+  SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+  
+  // String buffer for jitcode
+  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
+  
+  // Build sub jitcode
+  SPVM_JITCODE_BUILDER_build_sub_jitcode(string_buffer, sub_id);
+  
+  SV* sv_jitcode_source = sv_2mortal(newSVpv(string_buffer->buffer, string_buffer->length));
+  
+  SV* sv_sub_id = sv_2mortal(newSViv(sub_id));
+  
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  XPUSHs(sv_sub_id);
+  XPUSHs(sv_jitcode_source);
+  PUTBACK;
+
+  call_pv("SPVM::compile_jit_sub", G_SCALAR);
+
+  SPAGAIN;
+
+  int32_t success = POPi;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+  
+  SPVM_STRING_BUFFER_free(string_buffer);
+  
+  return success;
 }
 
 MODULE = SPVM::Core::Object		PACKAGE = SPVM::Core::Object
@@ -3182,25 +3225,48 @@ build_opcode(...)
 }
 
 SV*
-build_jitcode(...)
+get_module_path(...)
   PPCODE:
 {
   (void)RETVAL;
+  
+  SV* sv_module_name = ST(0);
+  const char* module_name = SvPV_nolen(sv_module_name);
 
+  // Get compiler
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  
+  const char* module_path = SPVM_HASH_search(compiler->module_load_symtable, module_name, strlen(module_name));
+  
+  SV* sv_module_path = sv_2mortal(newSVpvn(module_path, 0));
+  
+  XPUSHs(sv_module_path);
+  XSRETURN(1);
+}
+
+SV*
+get_sub_name(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_sub_id = ST(0);
+  int32_t sub_id = (int32_t)SvIV(sv_sub_id);
+  
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
   
-  SV* sv_jit_source_file = ST(0);
-  char* jit_source_file = SvPV_nolen(sv_jit_source_file);
-  
-  // Set jit source file
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  runtime->jit_source_file = jit_source_file;
   
-  // Build JIT code
-  SPVM_JITCODE_BUILDER_build_jitcode();
+  SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+  int32_t sub_name_id = constant_pool_sub->abs_name_id;
+  int32_t sub_name_length = runtime->constant_pool[sub_name_id];
+  const char* sub_name = (char*)&runtime->constant_pool[sub_name_id + 1];
   
-  XSRETURN(0);
+  SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, sub_name_length));
+  
+  XPUSHs(sv_sub_name);
+  XSRETURN(1);
 }
 
 SV*
@@ -3260,6 +3326,44 @@ get_native_sub_names(...)
       if (sub->is_native) {
         const char* sub_name = sub->abs_name;
         SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, strlen(sub_name)));
+        av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
+      }
+    }
+  }
+  
+  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
+  
+  XPUSHs(sv_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_no_native_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  
+  int32_t subs_base = runtime->subs_base;
+  int32_t subs_length = runtime->subs_length;
+  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  
+  {
+    int32_t sub_index;
+    for (sub_index = 0; sub_index < subs_length; sub_index++) {
+      int32_t sub_id = runtime->constant_pool[subs_base + sub_index];
+      
+      SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+      if (!constant_pool_sub->is_native) {
+        int32_t sub_name_id = constant_pool_sub->abs_name_id;
+        int32_t sub_name_length = runtime->constant_pool[sub_name_id];
+        const char* sub_name = (char*)&runtime->constant_pool[sub_name_id + 1];
+        
+        SV* sv_sub_name = sv_2mortal(newSVpvn(sub_name, sub_name_length));
         av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
       }
     }
@@ -3359,17 +3463,29 @@ bind_native_sub(...)
 }
 
 SV*
-bind_jitcode_call_sub(...)
+bind_jitcode_sub(...)
   PPCODE:
 {
   (void)RETVAL;
   
-  SV* sv_call_sub_native_address = ST(0);
-  void* call_sub_native_address = (void*)SvIV(sv_call_sub_native_address);
+  SV* sv_sub_abs_name = ST(0);
+  SV* sv_sub_native_address = ST(1);
+  
+  const char* sub_abs_name = SvPV_nolen(sv_sub_abs_name);
+  void* sub_jit_address = (void*)SvIV(sv_sub_native_address);
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
-  api->call_sub = call_sub_native_address;
+  
+  int32_t sub_id = api->get_sub_id(api, sub_abs_name);
+
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+  
+  // Subroutine information
+  SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+  
+  constant_pool_sub->jit_address = sub_jit_address;
+  constant_pool_sub->is_jit = 1;
   
   XSRETURN(0);
 }
@@ -3442,12 +3558,28 @@ build_runtime(...)
   // Create run-time
   SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
   
-  // SPVM API
+  // Set API
   SPVM_API* api = runtime->api;
   size_t iv_api = PTR2IV(api);
   SV* sviv_api = sv_2mortal(newSViv(iv_api));
   SV* sv_api = sv_2mortal(newRV_inc(sviv_api));
   sv_setsv(get_sv("SPVM::API", 0), sv_api);
+  
+  api->compile_jit_sub = &SPVM_XS_UTIL_compile_jit_sub;
+  
+  // JIT count
+  HV* hv_env = get_hv("ENV", 0);
+  SV** sv_jit_count_ptr = hv_fetch(hv_env, "SPVM_JIT_COUNT", strlen("SPVM_JIT_COUNT"), 0);
+  int32_t jit_count = 0;
+  if (sv_jit_count_ptr) {
+    jit_count = SvIV(*sv_jit_count_ptr);
+  }
+  if (jit_count <= 0) {
+    runtime->jit_count = 10000;
+  }
+  else {
+    runtime->jit_count = jit_count;
+  }
   
   XSRETURN(0);
 }
@@ -3478,12 +3610,9 @@ call_sub(...)
   
   SV* sv_sub_abs_name = ST(0);
   
-  // Get API
-  SV* sv_api = get_sv("SPVM::API", 0);
-  SV* sviv_api = SvRV(sv_api);
-  size_t iv_api = SvIV(sviv_api);
-  SPVM_API* api = INT2PTR(SPVM_API*, iv_api);
-  
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+
   const char* sub_abs_name = SvPV_nolen(sv_sub_abs_name);
   int32_t sub_id = api->get_sub_id(api, sub_abs_name);
   

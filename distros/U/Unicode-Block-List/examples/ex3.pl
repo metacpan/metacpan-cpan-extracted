@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Curses::UI;
 use Encode qw(encode_utf8);
 use Unicode::Block::Ascii;

@@ -6,7 +6,7 @@ use Carp;
 use Forks::Super::Debug ':all';
 use Forks::Super::Util ':all';
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 my $emulate_id = 0;
 
@@ -73,13 +73,7 @@ sub _postlaunch_child_to_cmd {
     if (&IS_WIN32) {
 
         $job->set_signal_pid($$);
-        if ($job->{_indirect}) {
-            my $prog = shift @{$job->{cmd}};
-            my $name = $job->{name} || $prog;
-            $c1 = system { $prog } ($name,@{$job->{cmd}});
-        } else {            
-            $c1 = system( @{$job->{cmd}} );
-        }
+        $c1 = system( @{$job->{cmd}} );
 	Forks::Super::Job::Ipc::_close_child_fh($job);
 	Forks::Super::Sigchld::_preliminary_reap($job,$c1);
 	debug("WIN32 returned, exit code of $$ was $c1 ", $c1>>8)
@@ -157,7 +151,7 @@ Forks::Super::Job::Emulate - support emulation mode for Job object
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

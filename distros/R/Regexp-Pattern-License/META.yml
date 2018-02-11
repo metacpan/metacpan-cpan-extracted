@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Licensing
   - Sourcecode
@@ -29,10 +29,10 @@ optional_features: {}
 provides:
   Regexp::Pattern::License:
     file: lib/Regexp/Pattern/License.pm
-    version: v3.0.31
+    version: v3.1.0
   Regexp::Pattern::License::Parts:
     file: lib/Regexp/Pattern/License/Parts.pm
-    version: v3.0.31
+    version: v3.1.0
 requires:
   perl: '5'
   strictures: '2'
@@ -42,8 +42,9 @@ resources:
   homepage: https://metacpan.org/release/Regexp-Pattern-License
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/git/build-common/regexp-pattern-license.git
-version: v3.0.31
+version: v3.1.0
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

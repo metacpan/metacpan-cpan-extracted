@@ -36,7 +36,7 @@ my (%fruit, @snake, @snakePosition, $allowMove, %offset, $counterTail);
 my $g = Graphics::Raylib->window(screenWidth, screenHeight);
 
 InitAudioDevice();
-$fruit{sound}  = LoadSound("share/coin.wav");
+$fruit{sound} = LoadSound("share/coin.wav");
 InitGame();
 
 $g->fps(60);
@@ -57,7 +57,7 @@ sub InitGame {
     $framesCounter = 0;
     $gameOver = 0;
     $pause = 0;
-    
+
     $counterTail = 1;
     $allowMove = 0;
 
@@ -86,7 +86,7 @@ sub InitGame {
 sub UpdateGame {
     if (!$gameOver) {
          $pause = !$pause if IsKeyPressed(ord('P'));
-        
+
          if (!$pause) {
              # control
              if (IsKeyPressed(KEY_RIGHT) && ($snake[0]{speed}->x == 0) && $allowMove) {
@@ -123,7 +123,7 @@ sub UpdateGame {
              }
 
              # wall behaviour
-             if ((($snake[0]{position}->x) > (screenWidth  - $offset{x})) || 
+             if ((($snake[0]{position}->x) > (screenWidth  - $offset{x})) ||
                  (($snake[0]{position}->y) > (screenHeight - $offset{y})) ||
                  ($snake[0]{position}->x < 0) || ($snake[0]{position}->y < 0)) {
                  $gameOver = 1;

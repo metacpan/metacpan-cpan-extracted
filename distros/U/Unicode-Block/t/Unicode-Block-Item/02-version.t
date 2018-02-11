@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Unicode::Block::Item::VERSION, 0.06, 'Version.');
+is($Unicode::Block::Item::VERSION, 0.07, 'Version.');

@@ -1,5 +1,9 @@
 Revision history for Tk-Chart
 
+1.22 09/02/2018
+      All Tk::Chart::*
+         -legendfont bug fixed.
+
 1.21 23/04/2017
       Tk::Chart::Pie
          bug reporting : after refreshing the chart with new data, the balloons are reporting always the first data when the chart was created. [https://rt.cpan.org/Public/Bug/Display.html?id=121319] bug fixed.

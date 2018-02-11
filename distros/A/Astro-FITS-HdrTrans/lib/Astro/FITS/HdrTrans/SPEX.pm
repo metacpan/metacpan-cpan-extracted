@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -130,7 +130,7 @@ sub to_DEC_BASE {
 # Assume that the initial offset is 0.0, i.e. the base is the
 # source position.  This also assumes that the reference pixel
 # is unchanged in the group, as is created in the conversion
-# script.  The other headers are measured in sexagesimal, but 
+# script.  The other headers are measured in sexagesimal, but
 # the offsets are in arcseconds.
 sub to_DEC_TELESCOPE_OFFSET {
   my $self = shift;
@@ -171,7 +171,7 @@ sub to_NUMBER_OF_EXPOSURES {
   if ( defined $FITS_headers->{CO_ADDS} ) {
     $coadds = $FITS_headers->{CO_ADDS};
   }
-   
+
 }
 
 sub to_NUMBER_OF_OFFSETS {
@@ -285,7 +285,7 @@ sub to_UTDATE {
 }
 
 # Derive from the start time, plus the exposure time and some
-# allowance for the read time taken from 
+# allowance for the read time taken from
 # http://irtfweb.ifa.hawaii.edu/~spex
 # http://irtfweb.ifa.hawaii.edu/Facility/spex/work/array_params/array_params.html
 sub to_UTEND {
@@ -426,7 +426,7 @@ sub get_bounds {
   }
   return @bounds;
 }
-   
+
 # Returns the UT date in yyyyMMdd format.
 sub get_UT_date {
   my $self = shift;

@@ -370,7 +370,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "Regexp-Pattern-License";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-0-31>, <http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://anonscm.debian.org/git/build-common/regexp-pattern-license.git>;
@@ -393,6 +393,32 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.0.31.tar.gz>;
 	doap:revision        "v3.0.31"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/v_v3-1-0>
+	a                    doap:Version;
+	dc:identifier        "Regexp-Pattern-License-v3.1.0"^^xsd:string;
+	dc:issued            "2018-02-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add hierarchical tags family:* type:*. Deprecate undocumented non-hierarchical tags.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add license patterns bdwgc bdwgc_matlab isc_minidiscl lgpl_bdwgc.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Introduce alternate license patterns: pat.alt.flavor.artifact.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve POD: Rephrase sections about license combinations and license groups, to better disambiguate.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Improve POD: Fix list covered licenses aladdin icu mit_cmu mit_cmu_warranty ofl rpsl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/Regexp-Pattern-License-v3.1.0.tar.gz>;
+	doap:revision        "v3.1.0"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;

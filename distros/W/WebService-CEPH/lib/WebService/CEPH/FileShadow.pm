@@ -4,34 +4,33 @@
 
 =head1 WebService::CEPH::FileShadow
 
-Потомок WebService::CEPH.
+Child class of WebService::CEPH.
 
-Опции конструктора те же самые, что и у WebService::CEPH, плюс ещё есть:
+Constructor parameters are the same as for WebService::CEPH, plus there are mode and fs_shadow_path parameters:
+mode - 's3' or 's3-fs' or 'fs'
 
-mode - 's3' или 's3-fs' или 'fs'
+fs_shadow_path - path to the file system, points to the directory, the final slash is optional.
 
-fs_shadow_path - путь к файловой системе, указывает на директорию, финальный слэш не обязателен.
+In s3 mode, everything works like WebService :: CEPH, the files are downloaded and uploaded to the CEPH using the s3 protocol.
 
-В режиме s3 всё работает, как WebService::CEPH, файлы скачиваются и закачиваются в CEPH по протоколу s3.
-В режиме 's3-fs' при закачке файла, создаётся его копия в файловой системе. Сначала файл закачивается в s3, потом
-в файловую систему, если в это время случится исключение, предыдущий шаг не отменяется.
-Скачивание файлов происходит с 's3', при ошибке скачивания, никакого фейловера на файловую систему не производится.
-В режиме 'fs' закачивание и скачивание файлов происходит только в файловую систему.
+In the 's3-fs' mode when uploading a file, a copy of file is created in the file system.
+First, the file is uploaded to s3, then to the file system and if an exception was thrown at that time, the previous step would not be canceled.
+If a download fails in 's3-fs' mode, no failover on the file system is made.
+In the 'fs' mode, file upload and download is made using only file system, not S3.
 
-Метаинформация (x-amz-meta-md5, content-type в файловой системе не сохраняется).
+Metainformation (x-amz-meta-md5, content-type in the file system is not saved).
+In the download_to_file, upload_from_file methods in the fs mode, working with local files is done as much as possible
+compatible with the 's3' mode (umask permissions when creating files, truncate and seek modes when working with filehandles).
 
-В методах download_to_file, upload_from_file в режиме файловой системы, работа с локальными файлами
-делается максимально совместимо с режимом 's3' (права (umask) при создании файла, режимы truncate и seek при работе
-с filehandles)
-
-Имя ключа объекта не должно содержать символов, опасных для файловой системы (например '../', '/..') иначе
-будет исключение. Однако по-настоящему заботится о безопасности должен вызывающий.
+The object key name can not contain characters that are insecure for the file system (for example '../', '/ ..')
+otherwise there will be an exception thrown.
+However, it is the caller that is really responsible for security.
 
 =cut
 
 package WebService::CEPH::FileShadow;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use strict;
 use warnings;

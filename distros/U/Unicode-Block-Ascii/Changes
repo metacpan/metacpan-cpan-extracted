@@ -1,3 +1,9 @@
+0.03 2018-02-07T07:49:53+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix output of second example in doc.
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+
 0.02 2017-12-25T15:01:12+01:00
  - Add EXAMPLE2 section to doc.
  - Add tests for get() method.

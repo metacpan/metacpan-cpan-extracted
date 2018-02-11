@@ -29,7 +29,7 @@ use base qw/ Astro::FITS::HdrTrans::LCO /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -162,7 +162,7 @@ sub to_RA_SCALE {
       my $ccdsum = $self->via_subheader( $FITS_headers, "CCDSUM" );
       if ( defined $ccdsum ) {
         my @binning = split( / /, $ccdsum );
-      	$rascale = $rascale * $binning[0];
+        $rascale = $rascale * $binning[0];
       }
    }
    return $rascale;
@@ -198,7 +198,7 @@ sub to_RA_TELESCOPE_OFFSET {
 # place son the sky, not the motion of the telescope.
    return -1.0 * $raoffset;
 }
- 
+
 =item B<to_X_LOWER_BOUND>
 
 Returns the lower bound along the X-axis of the area of the detector
@@ -272,7 +272,7 @@ sub getbounds{
    if ( exists $FITS_headers->{CCDSUM} ) {
       my $binning = $FITS_headers->{CCDSUM};
       if ( $binning eq '1 1' ) {
-      	 @bounds = ( 22, 3072, 12, 2044 );
+         @bounds = ( 22, 3072, 12, 2044 );
       }
    }
    if ( exists $FITS_headers->{TRIMSEC} ) {
@@ -286,7 +286,7 @@ sub getbounds{
           print "ERR: TRIMSEC all 0\n";
         } else {
           if ( $FITS_headers->{INSTRUME} !~ /^kbXX/i ) {
-# Unless this is kb78 data (which has a bad TRIMSEC), update bounds array 
+# Unless this is kb78 data (which has a bad TRIMSEC), update bounds array
             @bounds = @newbounds;
           }
         }

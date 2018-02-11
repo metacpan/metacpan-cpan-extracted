@@ -272,6 +272,7 @@ ok(add_rule_based_user_lists($client),
     "Test of add_rule_based_user_lists example");
 # Skipping upload_offline_call_conversions because extra setup is required.
 # Skipping upload_offline_conversions because extra setup is required.
+# Skipping upload_offline_data because extra setup is required.
 
 # reporting
 my ($fh, $filename) = tempfile();

@@ -16,7 +16,7 @@ package Google::Ads::AdWords::Client;
 
 use strict;
 use version;
-our $VERSION = qv("5.0.0");
+our $VERSION = qv("5.1.0");
 
 use Google::Ads::AdWords::Constants;
 use Google::Ads::AdWords::Deserializer;
@@ -408,7 +408,7 @@ Google::Ads::AdWords::Client
   my $adGroupId = "12345678";
 
   my $adgroupad_selector =
-      Google::Ads::AdWords::v201702::Types::AdGroupAdSelector->new({
+      Google::Ads::AdWords::v201710::Types::AdGroupAdSelector->new({
         adGroupIds => [$adGroupId]
       });
 
@@ -464,7 +464,7 @@ https://developers.google.com/adwords/api/docs/signingup
 
 =head2 version
 
-The version of the AdWords API to use. Currently C<v201702> is the default
+The version of the AdWords API to use. Currently C<v201710> is the default
 version.
 
 =head2 alternate_url
@@ -665,8 +665,8 @@ instance is set to die() on SOAP faults.
 The client object contains a method for every service provided by the API.
 So for example it can invoked as $client->AdGroupService() and it will return
 an object of type
-L<Google::Ads::AdWords::v201702::AdGroupService::AdGroupServiceInterfacePort>
-when using version v201702 of the API.
+L<Google::Ads::AdWords::v201710::AdGroupService::AdGroupServiceInterfacePort>
+when using version v201710 of the API.
 For a list of all available services please refer to
 http://developers.google.com/adwords/api/docs and for examples on
 how to invoke the services please refer to scripts in the examples folder.

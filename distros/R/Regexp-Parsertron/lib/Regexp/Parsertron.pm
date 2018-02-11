@@ -1,6 +1,6 @@
 package Regexp::Parsertron;
 
-use v5.10;
+use v5.10.1;
 use strict;
 use warnings;
 #use warnings qw(FATAL utf8); # Fatalize encoding glitches.
@@ -99,7 +99,7 @@ has warning_str =>
 	required => 0,
 );
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 # ------------------------------------------------
 
@@ -1425,6 +1425,10 @@ The file Changes was converted into Changelog.ini by L<Module::Metadata::Changes
 =head1 Version Numbers
 
 Version numbers < 1.00 represent development versions. From 1.00 up, they are production versions.
+
+=head1 CPAN Tester Results
+
+L<http://fast-matrix.cpantesters.org/?dist=Regexp-Parsertron>
 
 =head1 Repository
 

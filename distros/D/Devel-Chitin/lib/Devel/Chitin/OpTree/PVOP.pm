@@ -1,10 +1,12 @@
 package Devel::Chitin::OpTree::PVOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use strict;
 use warnings;
+
+use Config;
 
 sub pp_dump {
     'dump ' . shift->op->pv;
@@ -80,24 +82,35 @@ sub collapse {
     my(@chars) = @_;
     my($str, $c, $tr) = ("");
     for ($c = 0; $c < @chars; $c++) {
-    $tr = $chars[$c];
-    $str .= pchr($tr);
-    if ($c <= $#chars - 2 and $chars[$c + 1] == $tr + 1 and
-        $chars[$c + 2] == $tr + 2)
-    {
-        for (; $c <= $#chars-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
-          {}
-        $str .= "-";
-        $str .= pchr($chars[$c]);
-    }
+        $tr = $chars[$c];
+        $str .= pchr($tr);
+        if ($c <= $#chars - 2
+            and $chars[$c + 1] == $tr + 1
+            and $chars[$c + 2] == $tr + 2
+        ) {
+            for (; $c <= $#chars-1 and $chars[$c + 1] == $chars[$c] + 1; $c++)
+              {}
+            $str .= "-";
+            $str .= pchr($chars[$c]);
+        }
     }
     return $str;
 }
 
 sub tr_decode_byte {
     my($table, $flags) = @_;
-    my(@table) = unpack("s*", $table);
-    splice @table, 0x100, 1;   # Number of subsequent elements
+
+    my @table;
+    if ($^V lt v5.27.8) {
+        @table = unpack("s*", $table);
+        splice @table, 0x100, 1;   # Number of subsequent elements
+
+    } else {
+        my $ssize_t = $Config{ptrsize} == 8 ? 'q' : 'l';
+        (undef, @table) = unpack("${ssize_t}s*", $table);
+        pop @table; # remove the wildcard final entry
+    }
+
     my($c, $tr, @from, @to, @delfrom, $delhyphen);
     if ($table[ord "-"] != -1
         and

@@ -64,6 +64,13 @@
 
 <main id="app" class="container-fluid" style="margin-top: 10px">
 
+    <div v-if="hasCollections !== null && !hasCollections" class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">No Collections Configured</h4>
+        <p class="mb-0">Please configure your data collections, or have
+        Yancy scan your database by setting <code>read_schema =&gt;
+        1</code>.</p>
+    </div>
+
     <div v-show="error && error.fetchSpec" class="alert alert-danger" role="alert">
         <h4 class="alert-heading">Error Fetching API Spec</h4>
         <p>Error from server: {{ error.fetchSpec }}</p>
@@ -86,7 +93,9 @@
         </div>
         <div v-show="currentCollection" class="col-md-10">
             <!-- current collection -->
-            <h2>{{ currentCollection }}</h2>
+            <h2>{{ schema.title ? schema.title : currentCollection }}</h2>
+            <div v-if="schema.description"
+                v-html="marked( schema.description )"></div>
 
             <div v-show="error && error.fetchPage" class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Error Fetching Data</h4>
@@ -223,15 +232,18 @@
             <button class="btn btn-primary">Save</button>
             <button type="button" @click="cancel()" class="btn btn-danger">Cancel</button>
             <div v-if="!showRaw">
-                <div v-for="( conf, field ) in properties" class="form-group" style="clear: both">
-                    <label :for="'field-' + field + '-' + _uid">
-                        {{ conf.title || field }} {{ isRequired( field ) ? '*' : '' }}
+                <div v-for="( conf, i ) in properties" class="form-group" style="clear: both">
+                    <label :for="'field-' + conf.name + '-' + _uid">
+                        {{ conf.title }} {{ isRequired( conf.name ) ? '*' : '' }}
                     </label>
-                    <edit-field v-model="$data._value[field]"
-                        :example="example[field]" :schema="conf"
-                        :required="isRequired( field )" :valid="!error[field]"
+                    <edit-field v-model="$data._value[conf.name]"
+                        :example="example[conf.name]" :schema="conf"
+                        :required="isRequired( conf.name )" :valid="!error[conf.name]"
+                        :aria-labelledby="'field-' + conf.name + '-desc-' + _uid"
                     /></edit-field>
-                    <div v-show="error[field]" class="invalid-feedback">Error: {{ error[ field ] }}</div>
+                    <div v-show="error[conf.name]" class="invalid-feedback">Error: {{ error[ conf.name ] }}</div>
+                    <small v-if="conf.description" :id="'field-' + conf.name + '-desc-' + _uid"
+                        v-html="marked( conf.description )"></small>
                 </div>
             </div>
             <div v-if="showRaw && rawError" class="alert alert-danger" role="alert" style="clear: both">
@@ -245,7 +257,7 @@
 
 <template id="edit-field">
     <div :class="!valid ? 'is-invalid' : ''">
-        <input v-if="fieldType != 'select' && fieldType != 'checkbox' && fieldType != 'markdown'"
+        <input v-if="fieldType != 'select' && fieldType != 'checkbox' && fieldType != 'markdown' && fieldType != 'textarea'"
             :type="fieldType" :pattern="pattern" :required="required"
             :minlength="minlength" :maxlength="maxlength"
             :min="min" :max="max"
@@ -254,6 +266,9 @@
             v-model="$data._value" @change="input" class="form-control"
             :class="!valid ? 'is-invalid' : ''"
         />
+        <textarea v-if="fieldType == 'textarea'" :required="required"
+            :disabled="readonly" v-model="$data._value" @change="input"
+            :class="!valid ? 'is-invalid' : ''" rows="5"></textarea>
         <select v-if="fieldType == 'select'"
             :required="required" :disabled="readonly"
             v-model="$data._value" @change="input"

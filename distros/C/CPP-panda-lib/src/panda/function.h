@@ -36,7 +36,7 @@ public:
 
 public:
     function(){}
-    function(nullptr_t){}
+    function(std::nullptr_t){}
 
     template <typename Derr>
     function(const shared_ptr<Derr>& f) : func(f) {}
@@ -62,6 +62,11 @@ public:
         return (func && func->equals(oth.func.get())) || (!func && !oth.func);
     }
     bool operator !=(const function& oth) const {return !operator ==(oth);}
+
+    bool operator ==(const Ifunction<Ret, Args...>& oth) const {
+        return func && func->equals(&oth);
+    }
+    bool operator !=(const Ifunction<Ret, Args...>& oth) const {return !operator ==(oth);}
 
     explicit operator bool() const {
         return func;

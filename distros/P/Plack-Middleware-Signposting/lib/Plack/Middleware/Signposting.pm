@@ -1,9 +1,9 @@
 package Plack::Middleware::Signposting;
 
+our $VERSION = '0.04';
+
 use Catmandu::Sane;
 use parent 'Plack::Middleware';
-
-our $VERSION = '0.03';
 
 sub to_link_format {
     my ($self, @signs) = @_;

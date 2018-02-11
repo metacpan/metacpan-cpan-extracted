@@ -1,9 +1,7 @@
-# Pragmas.
-use lib 'inc';
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
@@ -34,7 +32,7 @@ test_requires 'Error::Pure::Utils' => 0.13;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

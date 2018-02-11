@@ -35,13 +35,13 @@ use warnings;
         description => "counter with rate",
         autoflush   => 1,
         input       => [ [qw/ counter beans 5 0.5 /], ],
-        output      => "test.beans:5|c|\@0.500000\n",
+        output      => "test.beans:5|c|\@0.5\n",
     },
     {
         description => "counter (negative) with rate",
         autoflush   => 1,
         input       => [ [qw/ counter beans -25 0.1 /], ],
-        output      => "test.beans:-25|c|\@0.100000\n",
+        output      => "test.beans:-25|c|\@0.1\n",
     },
     {
         description => "increment with rate",

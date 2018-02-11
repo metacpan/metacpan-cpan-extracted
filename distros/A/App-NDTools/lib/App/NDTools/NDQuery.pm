@@ -12,7 +12,7 @@ use Struct::Path 0.80 qw(list_paths path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(colored);
 
-sub VERSION { '0.29' };
+sub VERSION() { '0.31' };
 
 sub arg_opts {
     my $self = shift;
@@ -22,6 +22,7 @@ sub arg_opts {
         'colors!' => \$self->{OPTS}->{colors},
         'delete|ignore=s@' => \$self->{OPTS}->{delete},
         'depth|d=i' => \$self->{OPTS}->{depth},
+        'exists=s' => \$self->{OPTS}->{exists},
         'grep=s@' => \$self->{OPTS}->{grep},
         'items' => \$self->{OPTS}->{items},
         'list|l' => \$self->{OPTS}->{list},
@@ -88,10 +89,23 @@ sub dump {
 sub exec {
     my $self = shift;
 
-    $self->check_args(@ARGV) or die_fatal undef, 1;
+    $self->check_args(@{$self->{ARGV}}) or die_fatal undef, 1;
 
-    for my $uri (@ARGV ? @ARGV : \*STDIN) {
+    for my $uri (@{$self->{ARGV}} ? @{$self->{ARGV}} : \*STDIN) {
         my @data = $self->load_struct($uri, $self->{OPTS}->{ifmt});
+
+        if (defined $self->{OPTS}->{exists}) {
+            log_debug { "Check existence for '$self->{OPTS}->{exists}'" };
+
+            my $spath = eval { str2path($self->{OPTS}->{exists}) };
+            die_fatal "Failed to parse '$self->{OPTS}->{path}'", 4 if ($@);
+            if (path($data[0], $spath)) {
+                print "$uri\n";
+                next;
+            } else {
+                die_info "Doesnt't exist '$self->{OPTS}->{exists}')", 4;
+            }
+        }
 
         if (defined $self->{OPTS}->{path}) {
             my $spath = eval { str2path($self->{OPTS}->{path}) };

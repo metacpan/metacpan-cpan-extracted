@@ -1,8 +1,11 @@
 Revision history for RPi-Serial
 
+2.3603  2018-02-09
+        - added WARNING section in POD about the requirement of disabling
+          the Pi's Bluetooth before the GPIO serial will work (closes #1)
+
 2.3602  2017-07-01
         - added DESTROY method to close() the serial port
 
 0.01    2017-07-01
         First version, released on an unsuspecting world.
-

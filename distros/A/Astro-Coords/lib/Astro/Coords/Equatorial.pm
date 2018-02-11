@@ -52,7 +52,7 @@ use warnings;
 use warnings::register;
 use Carp;
 
-our $VERSION = '0.07';
+our $VERSION = '0.19';
 
 use Astro::PAL ();
 use base qw/ Astro::Coords /;
@@ -98,6 +98,9 @@ for J2000).  If proper motions are supplied they must both be supplied
 in a reference to an array:
 
   pm => [ 0.13, 0.45 ],
+
+Additionally if non-zero proper motions are supplied then a non-zero
+parallax must also be supplied.
 
 If parallax and proper motions are given, the ra/dec coordinates are
 assumed to be correct for the specified EQUINOX (Epoch = 2000.0 for
@@ -201,6 +204,9 @@ sub new {
       # Assume we are HEL without checking
       my $rv = ( exists $args{rv} && $args{rv} ? $args{rv} : 0);
 
+      warnings::warnif('Proper motion specified without parallax')
+        if ( $pm1 != 0 || $pm2 != 0 ) && ! $parallax;
+
       ( $ra, $dec ) = Astro::PAL::palPm( $ra, $dec,
                                          Astro::PAL::DAS2R * $pm1,
                                          Astro::PAL::DAS2R * $pm2,
@@ -234,6 +240,9 @@ sub new {
     if( $pm1 != 0 || $pm2 != 0 || $parallax != 0 ) {
       # Assume we are HEL without checking
       my $rv = ( exists $args{rv} && $args{rv} ? $args{rv} : 0);
+
+      warnings::warnif('Proper motion specified without parallax')
+        if ( $pm1 != 0 || $pm2 != 0 ) && ! $parallax;
 
       # We are converting to J2000 but we need to convert that to Besselian epoch
       ($ra, $dec) = Astro::PAL::palPm( $ra, $dec,
@@ -544,6 +553,9 @@ declination).
 
 If the proper motions are not defined, an empty list will be returned.
 
+If non-zero proper motions are supplied then a non-zero
+parallax must also be supplied.
+
 =cut
 
 sub pm {
@@ -560,6 +572,10 @@ sub pm {
       $pm2 = 0.0;
     }
     $self->{pm} = [ $pm1, $pm2 ];
+
+    my $parallax = $self->parallax;
+    warnings::warnif('Proper motion specified without parallax')
+      if ( $pm1 != 0 || $pm2 != 0 ) && ! $parallax;
   }
   if( !defined( $self->{pm} ) ) { $self->{pm} = []; }
   return @{ $self->{pm} };

@@ -39,7 +39,7 @@ our %EXPORT_TAGS =
       'filehandles'  => [ @export_ok_vars, @EXPORT ],
       'vars'         => [ @export_ok_vars, @EXPORT ],
       'all'          => [ @EXPORT_OK, @EXPORT ] );
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 our $SOCKET_READ_TIMEOUT = 0.05;  # seconds
 our $MAIN_PID;
@@ -64,7 +64,7 @@ our $ON_TOO_MANY_OPEN_FILEHANDLES;
 sub import {
     my ($class,@args) = @_;
     my @tags;
-    _init();
+    init_pkg();
     my $ipc_dir = '';
     for (my $i=0; $i<@args; $i++) {
 	if (_import_common_vars($args[$i], $args[$i+1])) {
@@ -204,7 +204,7 @@ sub _import_init_ipc_dir {
     return;
 }
 
-sub _init {
+sub init_pkg {
     return if $PKG_INITIALIZED;
     $PKG_INITIALIZED++;
 
@@ -246,7 +246,7 @@ sub _init {
     *handle_CHLD = *Forks::Super::Sigchld::handle_CHLD;
 
     Forks::Super::Util::set_productive_pause_code {
-	Forks::Super::Deferred::check_queue();# if !$Forks::Super::Deferred::_LOCK;
+	Forks::Super::Deferred::check_queue();
 	handle_CHLD(-1);
     };
 
@@ -261,6 +261,7 @@ sub _init {
 
     tie $ON_TOO_MANY_OPEN_FILEHANDLES,
         'Forks::Super::Tie::Enum', qw(fail rescue);
+
     #$ON_TOO_MANY_OPEN_FILEHANDLES = 'fail';
     $ON_TOO_MANY_OPEN_FILEHANDLES = 'rescue'; # enabled v0.85
 
@@ -268,10 +269,44 @@ sub _init {
 
     Forks::Super::Deferred::init();
     $XSIG{CHLD}[-1] = \&Forks::Super::handle_CHLD;
+
+    no warnings 'redefine','prototype';
+    *Forks::Super::Impl::fork = \&Forks::Super::Impl::_fork;
+    *Forks::Super::Impl::wait = \&Forks::Super::Wait::wait;
+    *Forks::Super::Impl::waitpid = \&Forks::Super::Wait::waitpid;
+    *Forks::Super::Impl::kill = \&Forks::Super::Impl::_kill;
     return;
 }
 
-sub Forks::Super::fork {
+# RT#124316: SIGCHLD handler has unexpected side-effects. When your program
+# no longer needs to fork, you can call  Forks::Super->deinit_pkg
+# to remove those side-effects.
+sub deinit_pkg {
+    untie $ON_BUSY;
+    untie $ON_TOO_MANY_OPEN_FILEHANDLES;
+    untie $IPC_DIR;
+    Forks::Super::Deferred::deinit();
+    &Forks::Super::Util::set_productive_pause_code(undef);
+    &Forks::Super::Wait::set_productive_waitpid_code(undef);
+    undef $XSIG{CHLD}[-1];
+    if ($] < 5.016000) {
+        no warnings 'redefine','prototype';
+        *Forks::Super::Impl::fork = sub { CORE::fork };
+        *Forks::Super::Impl::wait = sub { CORE::wait };
+        *Forks::Super::Impl::waitpid = sub { CORE::waitpid($_[0],$_[1]) };
+        *Forks::Super::Impl::kill = sub { CORE::kill(@_) };
+    } else {
+        no warnings 'redefine','prototype';
+        *Forks::Super::Impl::fork = \&CORE::fork;
+        *Forks::Super::Impl::wait = \&CORE::wait;
+        *Forks::Super::Impl::waitpid = \&CORE::waitpid;
+        *Forks::Super::Impl::kill = \&CORE::kill;
+    }
+    $PKG_INITIALIZED = 0;
+    return;
+}
+
+sub Forks::Super::Impl::_fork {
     my @fork_args = @_;
 
     my %fork_argsx;
@@ -481,7 +516,7 @@ sub kill_all {
     return Forks::Super::kill ($signal, @all_jobs);
 }
 
-sub Forks::Super::kill {
+sub Forks::Super::Impl::_kill {
     my ($signal, @jobs) = @_;
     my $kill_proc_group = $signal =~ s/^-//;
 
@@ -552,6 +587,14 @@ sub Forks::Super::kill {
     return wantarray ? @signalled : scalar @signalled;
 }
 
+# v0.93: put another level of indirection between the entry points to
+# the main functions and their implementations so that they may be
+# reverted back to CORE:: if desired (see &deinit_pkg).
+sub Forks::Super::fork { goto &Forks::Super::Impl::fork }
+sub Forks::Super::kill { goto &Forks::Super::Impl::kill }
+sub Forks::Super::wait { goto &Forks::Super::Impl::wait };
+sub Forks::Super::waitpid { goto &Forks::Super::Impl::waitpid };
+
 sub _get_killable_jobs {
     my (@jobs) = @_;
     # may be process ids or Forks::Super::Job objects
@@ -616,7 +659,7 @@ sub _unreap {
     my (@pids) = @_;
     my $old_status = $?;
     foreach my $pid (@pids) {
-	if ($pid == waitpid $pid, 0, 1.0) {
+	if ($pid == Forks::Super::Wait::waitpid $pid, 0, 1.0) {
 	    my $j = Forks::Super::Job::get($pid);
 	    $j->{state} = 'COMPLETE';
 	    if (delete $j->{reaped}) {
@@ -689,7 +732,7 @@ Forks::Super - extensions and convenience methods to manage background processes
 
 =head1 VERSION
 
-Version 0.92
+Version 0.93
 
 =head1 SYNOPSIS
 
@@ -2911,27 +2954,6 @@ expressions as
 
 
 
-=head2 Miscellaneous functions
-
-=head3 pause
-
-=over 4
-
-=item C<Forks::Super::pause($delay)>
-
-A B<productive> drop-in replacement for the Perl L<sleep|perlfunc/"sleep">
-system call (or L<Time::HiRes::sleep|Time::HiRes/"sleep">, if available). On
-systems like Windows that lack a proper method for
-handling C<SIGCHLD> events, the C<Forks::Super::pause> method
-will occasionally reap child processes that have completed
-and attempt to dispatch jobs on the queue.
-
-On other systems, using C<Forks::Super::pause> is less vulnerable
-than C<sleep> to interruptions from this module (See
-L</"BUGS AND LIMITATIONS"> below).
-
-=back
-
 =head2 Obtaining job information
 
 =head3 Forks::Super::Job::get
@@ -2988,6 +3010,72 @@ status than checking C<$?> after a L<"wait"> or L<"waitpid"> call,
 because it is possible for this module's C<SIGCHLD> handler
 to temporarily corrupt the C<$?> value while it is checking
 for deceased processes.
+
+=back
+
+=head2 Miscellaneous functions
+
+=head3 pause
+
+=over 4
+
+=item C<Forks::Super::pause($delay)>
+
+A B<productive> drop-in replacement for the Perl L<sleep|perlfunc/"sleep">
+system call (or L<Time::HiRes::sleep|Time::HiRes/"sleep">, if available). On
+systems like Windows that lack a proper method for
+handling C<SIGCHLD> events, the C<Forks::Super::pause> method
+will occasionally reap child processes that have completed
+and attempt to dispatch jobs on the queue.
+
+On other systems, using C<Forks::Super::pause> is less vulnerable
+than C<sleep> to interruptions from this module (See
+L</"BUGS AND LIMITATIONS"> below).
+
+=head3 init_pkg
+
+=head3 deinit_pkg
+
+=over 4
+
+=item C<< Forks::Super->deinit_pkg >>
+
+=item C<< Forks::Super->init_pkg >>
+
+L<RT#124316|https://rt.cpan.org/Public/Bug/Display.html?id=124316>
+identified an issue where the C<SIGCHLD> handler used by
+C<Forks::Super> would interfere with a piped open. That is, the
+C<close> call in code like
+
+    my $pid = open my $fh, "|-", "some command you expect to work ...";
+    ...
+    close $fh or die "...";
+
+will fail because C<Forks::Super>'s C<SIGCHLD> handler reaps the
+process before the implicit C<waitpid> call in the C<close> function
+gets to it.
+
+In some situations -- say, near the end of your program, when you
+are not going to use C<Forks::Super::fork> anymore, but you 
+still have a reason to call a piped open -- it is desirable and
+appropriate to uninstall C<Forks::Super>'s C<SIGCHLD> handler.
+The C<Forks::Super::deinit_pkg> is provided for this purpose.
+
+    Forks::Super::deinit_pkg;
+    Forks::Super->deinit_pkg;
+
+Either one of these calls will uninstall the C<SIGCHLD> handler
+and revert the C<fork>, C<waitpid>, C<wait>, and C<kill> functions
+to Perl's builtin behaviors. It is a kludgy attempt to "uninstall" the
+module, or at least several features of the module, to workaround
+the issue with piped opens.
+
+The C<init_pkg> function, invoked as either C<Forks::Super::init_pkg>
+or C<< Forks::Super->init_pkg >>, installs features of the module
+into your program. It is automatically called when the C<Forks::Super>
+module is imported. So it is not necessary for users to call it
+explicitly, I<unless> they have previously called C<deinit_pkg>
+and wish to I<re-enable> features of the module.
 
 =back
 
@@ -3756,6 +3844,28 @@ compile without those modules. Attempts to use these features
 without the necessary modules will be silently ignored.
 
 =head1 BUGS AND LIMITATIONS
+
+=head2 Interference with piped C<open>
+
+As documented in
+L<RT#124316|https://rt.cpan.org/Public/Bug/Display.html?id=124316>,
+C<Forks::Super> sets a relatively heavy C<SIGCHLD> handler, which
+can apparently cause a race condition when you call C<close> on a
+piped filehandle
+
+    open my $fh, '|-', "command you expect to work ...";
+    ...
+    close $fh or die;
+
+Sometimes, a C<waitpid> call inside the signal handler will reap
+the process before the C<close> call. If that happens, the
+C<close> call will fail (and set C<$!> to "C<No child processes>"
+and C<$?> to -1).
+
+If this behavior is undesired, and there are no calls to L<"fork">
+between the piped C<open> and C<close> statements, the workaround is
+to call the L<< "deinit_pkg"|C<Forks::Super::deinit_pkg> >>
+function and disable the problematic features of the module.
 
 =head2 Leftover temporary files and directories
 

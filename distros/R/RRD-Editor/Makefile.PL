@@ -1,7 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 
 WriteMakefile(
     NAME                => 'RRD::Editor',
@@ -13,7 +13,10 @@ WriteMakefile(
       : ()),
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
+    },
+    TEST_REQUIRES => {
+        'Test::Deep'    => 0,
+        'Test::More'    => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'RRD-Editor-*' },

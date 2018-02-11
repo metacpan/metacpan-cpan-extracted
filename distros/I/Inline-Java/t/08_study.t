@@ -3,10 +3,6 @@ package study ;
 use strict ;
 use Test ;
 
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
-
 use Inline(
 	Java => 'DATA',
 ) ;

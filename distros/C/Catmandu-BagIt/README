@@ -110,6 +110,12 @@ CATMANDU MODULES
 
       * Catmandu::Store::File::BagIt
 
+LARGE FILE SUPPORT
+
+    Streaming large files into a BagIt requires a large /tmp directory. The
+    location of the temp directory can be set with the TMPDIR environmental
+    variable.
+
 METHODS
 
  new()

@@ -18,7 +18,7 @@ $test = "noargs";
 run_ok(
     name => $test,
     cmd => [ @cmd ],
-    stderr => qr/ERROR] Two arguments expected for diff/,,
+    stderr => qr/ERROR] At least two arguments expected for diff/,
     exit => 1,
 );
 

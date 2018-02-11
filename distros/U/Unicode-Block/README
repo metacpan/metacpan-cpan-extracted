@@ -36,11 +36,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Unicode::Block;
 
@@ -95,5 +93,5 @@ LICENSE AND COPYRIGHT
      BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

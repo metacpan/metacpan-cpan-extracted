@@ -6,7 +6,7 @@
       "Wes Malone <wesm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "artistic_2"
    ],
@@ -62,16 +62,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/cees/cgi-application-plugin-authentication/issues"
+         "web" : "https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication/issues"
       },
-      "homepage" : "https://github.com/cees/cgi-application-plugin-authentication",
+      "homepage" : "https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/cees/cgi-application-plugin-authentication.git",
-         "web" : "https://github.com/cees/cgi-application-plugin-authentication"
+         "url" : "https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication.git",
+         "web" : "https://github.com/MicroTechnology-Services/cgi-application-plugin-authentication"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.22",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

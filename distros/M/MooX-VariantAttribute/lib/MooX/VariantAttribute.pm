@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     my ( $package, @import ) = @_;
@@ -91,7 +91,7 @@ MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 

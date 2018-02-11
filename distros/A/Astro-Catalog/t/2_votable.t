@@ -16,6 +16,13 @@ BEGIN {
 #load test
 use File::Temp;
 use Data::Dumper;
+use Astro::Coords::Angle;
+use Astro::Coords::Angle::Hour;
+
+# Fix the precision used by Astro::Coords::Angle since we will be
+# comparing values formatted as strings to this precision.
+Astro::Coords::Angle->NDP(2);
+Astro::Coords::Angle::Hour->NDP(3);
 
 # load modules
 require_ok("Astro::Catalog");
@@ -256,7 +263,7 @@ __DATA__
         <TABLEDATA>
           <TR>
             <TD>U1500_01194794</TD>
-            <TD>09:55:39.0</TD>
+            <TD>09:55:39.000</TD>
             <TD> 60:07:23.60</TD>
             <TD>16.1</TD>
             <TD>0.1</TD>
@@ -272,7 +279,7 @@ __DATA__
           </TR>
           <TR>
             <TD>U1500_01194795</TD>
-            <TD>10:44:57.0</TD>
+            <TD>10:44:57.000</TD>
             <TD> 12:34:53.50</TD>
             <TD>9.5</TD>
             <TD>0.6</TD>

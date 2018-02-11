@@ -28,7 +28,7 @@ use base qw/ Astro::FITS::HdrTrans::UKIRTNew /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -45,7 +45,7 @@ my @NULL_MAP = qw/ DETECTOR_INDEX /;
 
 my %UNIT_MAP = (
                 RA_SCALE             => "CDELT2",
-                 
+
                 # UIST specific
                 GRATING_NAME         => "GRISM",
 

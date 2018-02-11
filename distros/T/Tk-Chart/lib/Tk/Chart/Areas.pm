@@ -6,13 +6,13 @@ use Carp;
 
 #==================================================================
 # $Author    : Djibril Ousmanou                                   $
-# $Copyright : 2011                                               $
-# $Update    : 21/10/2011 22:26:01                                $
+# $Copyright : 2018                                               $
+# $Update    : 09/02/2018                                         $
 # $AIM       : Create area graph                                  $
 #==================================================================
 
 use vars qw($VERSION);
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use base qw/ Tk::Derived Tk::Canvas::GradientColor /;
 use Tk::Balloon;
@@ -280,7 +280,7 @@ sub _viewlegend {
   # legend option
   my $legend_title       = $cw->{RefChart}->{Legend}{title};
   my $legendmarkercolors = $cw->cget( -colordata );
-  my $legendfont         = $cw->{RefChart}->{Legend}{legendfont};
+  my $legendfont         = $cw->cget( -legendfont );
   my $titlecolor         = $cw->{RefChart}->{Legend}{titlecolors};
   my $titlefont          = $cw->{RefChart}->{Legend}{titlefont};
   my $axiscolor          = $cw->cget( -axiscolor );

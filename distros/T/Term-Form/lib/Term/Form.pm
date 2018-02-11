@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.310';
+our $VERSION = '0.311';
 
 use Carp       qw( croak carp );
 use Encode     qw( encode );
@@ -59,18 +59,18 @@ sub DESTROY {
 
 sub __set_defaults {
     my ( $self ) = @_;
-    # compat         : undef ok
-    # reinit_encoding: undef ok
-    # no_echo        : false ok
-    $self->{default} = '';
-
-    # prompt   : undef ok
-    # mark_curr: false ok
-    # back     : undef ok
-    $self->{auto_up} = 0;
-    $self->{back}    = '';
-    $self->{confirm} = '<<';
-    $self->{ro}      = [];
+    #$self->{compat}          = undef;
+    #$self->{reinit_encoding} = undef;
+    #$self->{no_echo}         = undef;
+    $self->{default}          = '';
+    $self->{clear_screen}     = 0;
+    $self->{info_on_top}      = '';                # experimental # name
+    #$self->{prompt}          = undef;
+    #$self->{mark_curr}       = undef;             # experimental
+    $self->{auto_up}          = 0;
+    $self->{back}             = '   BACK';
+    $self->{confirm}          = 'CONFIRM';
+    $self->{read_only}        = [];
 }
 
 
@@ -116,8 +116,7 @@ sub __init_term {
 
 sub __reset_term {
     my ( $self ) = @_;
-    delete $self->{enter_row} if exists $self->{enter_row};
-    delete $self->{enter_col} if exists $self->{enter_col};
+    #delete $self->{i} if exists $self->{i};
     if ( defined $self->{plugin} ) {
         $self->{plugin}->__reset_mode();
     }
@@ -131,16 +130,19 @@ sub config {
             croak "config: the (optional) argument must be a HASH reference";
         }
         my $valid = {
-            no_echo         => '[ 0 1 2 ]',
-            compat          => '[ 0 1 ]',
-            reinit_encoding => '',
-            default         => '',
-            prompt          => '',
-            back            => '',
-            confirm         => '',
             auto_up         => '[ 0 1 2 ]',
-            mark_curr       => '[ 0 1 ]',
-            ro              => 'ARRAY',
+            back            => '',
+            clear_screen    => '[ 0 1 ]',
+            compat          => '[ 0 1 ]',
+            confirm         => '',
+            default         => '',
+            info_on_top     => '',          # experimental
+            no_echo         => '[ 0 1 2 ]',
+            mark_curr       => '[ 0 1 ]',   # experimental
+            prompt          => '',
+            reinit_encoding => '',
+            read_only       => 'ARRAY',
+            ro              => 'ARRAY', ##
         };
         $self->__validate_options( $opt, $valid );
         for my $option ( keys %$opt ) {
@@ -167,31 +169,43 @@ sub readline {
         }
     }
     my $valid = {
-        no_echo => '[ 0 1 2 ]',
-        default => '',
+        clear_screen => '[ 0 1 ]',
+        default      => '',
+        info_on_top  => '',        # experimental # name
+        no_echo      => '[ 0 1 2 ]',
     };
     $self->__validate_options( $opt, $valid );
-    $opt->{default} = $self->{default} if ! defined $opt->{default};
-    $opt->{no_echo} = $self->{no_echo} if ! defined $opt->{no_echo};
-    $self->{sep} = '';
+    $opt->{default}      = $self->{default}      if ! defined $opt->{default};
+    $opt->{no_echo}      = $self->{no_echo}      if ! defined $opt->{no_echo};
+    $opt->{clear_screen} = $self->{clear_screen} if ! defined $opt->{clear_screen};
+    $self->{i}{info_text}       = $opt->{info_on_top};
+    $self->{i}{sep}             = '';
+    $self->{i}{curr_row}        = 0;
+    $self->{i}{length_key}[0]   = Unicode::GCString->new( $prompt )->columns;
+    $self->{i}{len_longest_key} = $self->{i}{length_key}[0];
+    $self->{i}{length_prompt}   = $self->{i}{len_longest_key} + length $self->{i}{sep};
     my $list = [ [ $prompt, $self->{default} ] ];
-    $self->{curr_row} = 0;
-    $self->{length_key}[0]   = Unicode::GCString->new( $prompt )->columns;
-    $self->{len_longest_key} = $self->{length_key}[0];
-    $self->{length_prompt}   = $self->{len_longest_key} + length $self->{sep};
     my $str = Unicode::GCString->new( $opt->{default} );
     my $pos = $str->length();
     local $| = 1;
     $self->__init_term();
+    $self->{plugin}->__clear_screen() if $opt->{clear_screen};
+    $self->{i}{info_row_count} = 0;
 
     while ( 1 ) {
-        if ( $self->{beep} ) {
+        if ( $self->{i}{beep} ) {
             $self->{plugin}->__beep();
-            $self->{beep} = 0;
+            $self->{i}{beep} = 0;
         }
         my ( $term_width ) = $self->{plugin}->__term_buff_size();
-        $self->{avail_width} = $term_width - 1;
-        $self->{avail_width_value} = $self->{avail_width} - $self->{length_prompt};
+        $self->{i}{avail_width} = $term_width - 1;
+        $self->{i}{avail_width_value} = $self->{i}{avail_width} - $self->{i}{length_prompt};
+        if ( $self->{i}{info_text} ) { # experimental
+            $self->{plugin}->__up( $self->{i}{info_row_count} );
+            $self->{plugin}->__clear_lines_to_end_of_screen();
+            $self->__info_text_row_count();
+            print "\r", $self->{i}{info_text} . "\n";
+        }
         $self->__print_readline( $opt, $list, $str, $pos );
         my $key = $self->{plugin}->__get_key();
         if ( ! defined $key ) {
@@ -207,7 +221,7 @@ sub readline {
                 $str->substr( $pos, 1, '' );
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == CONTROL_U ) {
@@ -216,7 +230,7 @@ sub readline {
                 $pos = 0;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == CONTROL_K ) {
@@ -224,7 +238,7 @@ sub readline {
                 $str->substr( $pos, $str->length() - $pos, '' );
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_DELETE || $key == CONTROL_D ) {
@@ -233,7 +247,7 @@ sub readline {
                     $str->substr( $pos, 1, '' );
                 }
                 else {
-                    $self->{beep} = 1;
+                    $self->{i}{beep} = 1;
                 }
             }
             else {
@@ -247,7 +261,7 @@ sub readline {
                 $pos++;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_LEFT  || $key == CONTROL_B ) {
@@ -255,7 +269,7 @@ sub readline {
                 $pos--;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_END   || $key == CONTROL_E ) {
@@ -263,7 +277,7 @@ sub readline {
                 $pos = $str->length();
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_HOME  || $key == CONTROL_A ) {
@@ -271,11 +285,11 @@ sub readline {
                 $pos = 0;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_UP || $key == VK_DOWN ) {
-            $self->{beep} = 1;
+            $self->{i}{beep} = 1;
         }
         else {
             $key = chr $key;
@@ -303,8 +317,8 @@ sub __print_readline {
     my $print_pos = $pos;
     my $n = 1;
     my ( $b, $e );
-    while ( $print_str->columns > $self->{avail_width_value} ) {
-        if ( $print_str->substr( 0, $print_pos )->columns > $self->{avail_width_value} / 4 ) {
+    while ( $print_str->columns > $self->{i}{avail_width_value} ) {
+        if ( $print_str->substr( 0, $print_pos )->columns > $self->{i}{avail_width_value} / 4 ) {
             $print_str->substr( 0, $n, '' );
             $print_pos -= $n;
             $b = 1;
@@ -320,7 +334,7 @@ sub __print_readline {
     if ( $e ) {
         $print_str->substr( $print_str->length(), 1, '>' );
     }
-    my $key = $self->__padded_or_trimed_key( $list, $self->{curr_row} );
+    my $key = $self->__padded_or_trimed_key( $list, $self->{i}{curr_row} );
     $self->{plugin}->__clear_line();
     if ( $opt->{mark_curr} ) {
         $self->{plugin}->__mark_current();
@@ -330,9 +344,9 @@ sub __print_readline {
     else {
         print "\r", $key;
     }
-    my $sep = $self->{sep};
-    if ( any { $_ == $self->{curr_row} - @{$self->{pre_list}} } @{$opt->{ro}} ) {
-        $sep = $self->{sep_ro};
+    my $sep = $self->{i}{sep};
+    if ( defined $self->{i}{pre_list} && any { $_ == $self->{i}{curr_row} - @{$self->{i}{pre_list}} } @{$opt->{read_only}} ) { #
+        $sep = $self->{i}{sep_ro};
     }
     if ( $opt->{no_echo} ) {
         if ( $opt->{no_echo} == 2 ) {
@@ -344,7 +358,7 @@ sub __print_readline {
     else {
         print $sep, $print_str->as_string, "\r";
     }
-    $self->{plugin}->__right( $self->{length_prompt} + $print_str->substr( 0, $print_pos )->columns );
+    $self->{plugin}->__right( $self->{i}{length_prompt} + $print_str->substr( 0, $print_pos )->columns );
 
 }
 
@@ -356,83 +370,84 @@ sub __length_longest_key {
     for my $i ( 0 .. $#$list ) {
         my $gcs = Unicode::GCString->new( $list->[$i][0] );
         $len->[$i] = $gcs->columns;
-        if ( $i < @{$self->{pre_list}} ) {
+        if ( $i < @{$self->{i}{pre_list}} ) {
             next;
         }
         $longest = $len->[$i] if $len->[$i] > $longest;
     }
-    $self->{len_longest_key} = $longest;
-    $self->{length_key} = $len;
+    $self->{i}{len_longest_key} = $longest;
+    $self->{i}{length_key} = $len;
 }
 
 
 sub __prepare_size {
     my ( $self, $opt, $list, $maxcols, $maxrows ) = @_;
-    $self->{avail_width} = $maxcols - 1;
-    $self->{avail_height} = $maxrows;
-    if ( defined $opt->{main_prompt} ) {
-        $self->__nr_prompt_lines( $opt );
-        my $backup_height = $self->{avail_height};
-        $self->{avail_height} -= $self->{nr_prompt_lines};
+    $self->{i}{avail_width} = $maxcols - 1;
+    $self->{i}{avail_height} = $maxrows;
+    if ( defined $self->{i}{info_text} ) {
+        $self->__info_text_row_count();
+        my $backup_height = $self->{i}{avail_height};
+        $self->{i}{avail_height} -= $self->{i}{info_row_count};
         my $min_avail_height = 5;
-        if ( $self->{avail_height} < $min_avail_height ) {
+        if ( $self->{i}{avail_height} < $min_avail_height ) {
             if ( $backup_height > $min_avail_height ) {
-                $self->{avail_height} = $min_avail_height;
+                $self->{i}{avail_height} = $min_avail_height;
             }
             else {
-                $self->{avail_height} = $backup_height;
+                $self->{i}{avail_height} = $backup_height;
             }
         }
     }
-    if ( @$list > $self->{avail_height} ) {
-        $self->{pages} = int @$list / ( $self->{avail_height} - 1 );
-        if ( @$list % ( $self->{avail_height} - 1 ) ) {
-            $self->{pages}++;
+    else {
+        $self->{i}{info_row_count} = 0;
+    }
+    if ( @$list > $self->{i}{avail_height} ) {
+        $self->{i}{pages} = int @$list / ( $self->{i}{avail_height} - 1 );
+        if ( @$list % ( $self->{i}{avail_height} - 1 ) ) {
+            $self->{i}{pages}++;
         }
-        $self->{avail_height}--;
+        $self->{i}{avail_height}--;
     }
     else {
-        $self->{pages} = 1;
+        $self->{i}{pages} = 1;
     }
     return;
 }
 
 
-sub __nr_prompt_lines {
-    my ( $self, $opt ) = @_;
-    my $prompt = $opt->{main_prompt};
-    if ( $prompt eq '' ) {
-        $self->{nr_prompt_lines} = 0;
-        return;
-    }
-    #$self->{main_prompt} =~ s/[^\n\P{Space}]/ /g;
-    #$self->{main_prompt} =~ s/[^\n\P{C}]//g;
-    if ( $prompt !~ /\n/ &&  Unicode::GCString->new( $prompt )->columns <= $self->{avail_width} ) {
-        $self->{nr_prompt_lines} = 1;
+sub __info_text_row_count {
+    my ( $self ) = @_;
+    $self->{i}{info_row_count} = 0;
+    my $info_text = $self->{i}{info_text};
+    return if ! length $info_text;
+    #$info_text =~ s/[^\n\P{Space}]/ /g;
+    $info_text =~ s/[^\n\P{C}]//g;
+    if ( $info_text !~ /\n/ &&  Unicode::GCString->new( "$info_text" )->columns <= $self->{i}{avail_width} ) {
+        $self->{i}{info_row_count} = 1;
     }
     else {
         my $line_fold = Text::LineFold->new(
             Charset=> 'utf-8',
-            ColMax => $self->{avail_width},
+            ColMax => $self->{i}{avail_width},
             OutputCharset => '_UNICODE_',
             Urgent => 'FORCE'
         );
-        #if ( defined $self->{lf} ) {
-        #    $self->{prompt_copy} = $line_fold->fold( ' ' x $self->{lf}[0], ' ' x $self->{lf}[1], $self->{main_prompt} );
+        #if ( defined $self->{i}{lf} ) {
+        #    $self->{i}{prompt_copy} = $line_fold->fold( ' ' x $self->{i}{lf}[0], ' ' x $self->{i}{lf}[1], $self->{i}{info_text} );
         #}
         #else {
-            $opt->{main_prompt} = $line_fold->fold( $prompt, 'PLAIN' );
+            $self->{i}{info_text} = $line_fold->fold( $info_text, 'PLAIN' );
         #}
-        $opt->{main_prompt} =~ s/\n\z//;
-        $self->{nr_prompt_lines} = $opt->{main_prompt} =~ s/\n/\n\r/g; # #
-        $self->{nr_prompt_lines} += 1;
+        $self->{i}{info_text} =~ s/\n\z//;
+        $self->{i}{info_row_count} = $self->{i}{info_text} =~ s/\n/\n/g; # #
+        $self->{i}{info_row_count} += 1;
     }
 }
 
 
 sub __gcstring_and_pos {
     my ( $self, $list ) = @_;
-    my $default = $list->[$self->{curr_row}][1];
+    my $default = $list->[$self->{i}{curr_row}][1];
     if ( ! defined $default ) {
         $default = '';
     }
@@ -444,81 +459,82 @@ sub __gcstring_and_pos {
 sub __print_current_row {
     my ( $self, $opt, $list, $str, $pos ) = @_;
     $self->{plugin}->__clear_line();
-    if ( $self->{curr_row} < @{$self->{pre_list}} ) {
+    if ( $self->{i}{curr_row} < @{$self->{i}{pre_list}} ) {
         $self->{plugin}->__reverse();
-        print $list->[$self->{curr_row}][0];
+        print $list->[$self->{i}{curr_row}][0];
         $self->{plugin}->__reset();
     }
     else {
         $self->__print_readline( $opt, $list, $str, $pos );
-        $list->[$self->{curr_row}][1] = $str->as_string;
+        $list->[$self->{i}{curr_row}][1] = $str->as_string;
     }
 }
 
 
 sub __print_row {
     my ( $self, $opt, $list, $idx ) = @_;
-    if ( $idx < @{$self->{pre_list}} ) {
+    if ( $idx < @{$self->{i}{pre_list}} ) {
         return $list->[$idx][0];
     }
     else {
         my $val = defined $list->[$idx][1] ? $list->[$idx][1] : '';
         $val =~ s/\p{Space}/ /g;
         $val =~ s/\p{C}//g;
-        my $sep = $self->{sep};
-        if ( any { $_ == $idx - @{$self->{pre_list}} } @{$opt->{ro}} ) {
-            $sep = $self->{sep_ro};
+        my $sep = $self->{i}{sep};
+        if ( any { $_ == $idx - @{$self->{i}{pre_list}} } @{$opt->{read_only}} ) {
+            $sep = $self->{i}{sep_ro};
         }
         return
             $self->__padded_or_trimed_key( $list, $idx ) . $sep .
-            $self->__unicode_trim( Unicode::GCString->new( $val ), $self->{avail_width_value} );
+            $self->__unicode_trim( Unicode::GCString->new( $val ), $self->{i}{avail_width_value} );
     }
 }
 
 
 sub __write_screen {
     my ( $self, $opt, $list ) = @_;
-    print join "\n", map { $self->__print_row( $opt, $list, $_ ) } $self->{begin_row} .. $self->{end_row};
-    if ( $self->{pages} > 1 ) {
-        if ( $self->{avail_height} - ( $self->{end_row} + 1 - $self->{begin_row} ) ) {
-            print "\n" x ( $self->{avail_height} - ( $self->{end_row} - $self->{begin_row} ) - 1 );
+    print join "\n", map { $self->__print_row( $opt, $list, $_ ) } $self->{i}{begin_row} .. $self->{i}{end_row};
+    if ( $self->{i}{pages} > 1 ) {
+        if ( $self->{i}{avail_height} - ( $self->{i}{end_row} + 1 - $self->{i}{begin_row} ) ) {
+            print "\n" x ( $self->{i}{avail_height} - ( $self->{i}{end_row} - $self->{i}{begin_row} ) - 1 );
         }
-        $self->{page} = int( $self->{end_row} / $self->{avail_height} ) + 1;
-        my $page_number = sprintf '- Page %d/%d -', $self->{page}, $self->{pages};
-        if ( length $page_number > $self->{avail_width} ) {
-            $page_number = substr sprintf( '%d/%d', $self->{page}, $self->{pages} ), 0, $self->{avail_width};
+        $self->{i}{page} = int( $self->{i}{end_row} / $self->{i}{avail_height} ) + 1;
+        my $page_number = sprintf '- Page %d/%d -', $self->{i}{page}, $self->{i}{pages};
+        if ( length $page_number > $self->{i}{avail_width} ) {
+            $page_number = substr sprintf( '%d/%d', $self->{i}{page}, $self->{i}{pages} ), 0, $self->{i}{avail_width};
         }
         print "\n", $page_number;
-        $self->{plugin}->__up( $self->{avail_height} - ( $self->{curr_row} - $self->{begin_row} ) );
+        $self->{plugin}->__up( $self->{i}{avail_height} - ( $self->{i}{curr_row} - $self->{i}{begin_row} ) );
     }
     else {
-        $self->{page} = 1;
-        my $up_curr = $self->{end_row} - $self->{curr_row};
+        $self->{i}{page} = 1;
+        my $up_curr = $self->{i}{end_row} - $self->{i}{curr_row};
         $self->{plugin}->__up( $up_curr );
     }
 }
 
 
 sub __write_first_screen {
-    my ( $self, $opt, $list, $curr_row ) = @_;
-    if ( $self->{len_longest_key} > $self->{avail_width} / 3 ) {
-        $self->{len_longest_key} = int( $self->{avail_width} / 3 );
+    my ( $self, $opt, $list, $curr_row, $auto_up ) = @_;
+    if ( $self->{i}{len_longest_key} > $self->{i}{avail_width} / 3 ) {
+        $self->{i}{len_longest_key} = int( $self->{i}{avail_width} / 3 );
     }
-    my $len_separator = Unicode::GCString->new( $self->{sep} )->columns;
-    if ( @{$opt->{ro}} ) {
-        my $tmp = Unicode::GCString->new( $self->{sep_ro} )->columns;
+    my $len_separator = Unicode::GCString->new( $self->{i}{sep} )->columns;
+    if ( @{$opt->{read_only}} ) {
+        my $tmp = Unicode::GCString->new( $self->{i}{sep_ro} )->columns;
         $len_separator = $tmp if $tmp > $len_separator;
     }
-    $self->{length_prompt} = $self->{len_longest_key} + $len_separator;
-    $self->{avail_width_value} = $self->{avail_width} - $self->{length_prompt};
-    $self->{curr_row} = $opt->{auto_up} == 2 ? $curr_row : @{$self->{pre_list}};
-    $self->{begin_row} = 0;
-    $self->{end_row}  = ( $self->{avail_height} - 1 );
-    if ( $self->{end_row} > $#$list ) {
-        $self->{end_row} = $#$list;
+    $self->{i}{length_prompt} = $self->{i}{len_longest_key} + $len_separator;
+    $self->{i}{avail_width_value} = $self->{i}{avail_width} - $self->{i}{length_prompt};
+    $self->{i}{curr_row} = $auto_up == 2 ? $curr_row : @{$self->{i}{pre_list}};
+    $self->{i}{begin_row} = 0;
+    $self->{i}{end_row}  = ( $self->{i}{avail_height} - 1 );
+    if ( $self->{i}{end_row} > $#$list ) {
+        $self->{i}{end_row} = $#$list;
     }
-    if ( defined $opt->{main_prompt} ) {
-        print $opt->{main_prompt}, "\n";
+    $self->{plugin}->__clear_screen() if $opt->{clear_screen};
+    if ( length $self->{i}{info_text} ) {
+        print $self->{i}{info_text}, "\n";
     }
     $self->__write_screen( $opt, $list );
 }
@@ -536,47 +552,55 @@ sub fill_form {
         croak "'fill_form': the (optional) second argument must be a HASH reference";
     }
     my $valid = {
-        prompt    => '',
-        back      => '',
-        confirm   => '',
-        auto_up   => '[ 0 1 2 ]',
-        mark_curr => '[ 0 1 ]',
-        ro        => 'ARRAY',
-####
-        sep             => '', # remove
-####
+        auto_up      => '[ 0 1 2 ]',
+        back         => '',
+        clear_screen => '[ 0 1 ]',
+        confirm      => '',
+        info_on_top  => '',             # experimental # name
+        mark_curr    => '[ 0 1 ]',
+        prompt       => '',
+        ro           => 'ARRAY', ##
+        read_only    => 'ARRAY',
     };
-    my $list = [ map { [ @$_ ] } @$orig_list ];
     $self->__validate_options( $opt, $valid );
-    $opt->{prompt}  = $self->{prompt}  if ! defined $opt->{prompt};
-    $opt->{back}    = $self->{back}    if ! defined $opt->{back};
-    $opt->{confirm} = $self->{confirm} if ! defined $opt->{confirm};
-    $opt->{auto_up} = $self->{auto_up} if ! defined $opt->{auto_up};
-    $opt->{ro}      = $self->{ro}      if ! defined $opt->{ro};
-    $opt->{main_prompt} = $opt->{prompt};
-    $self->{sep}    = ': ';
-    $self->{sep_ro} = '| ';
-    $self->{pre_list} = [ [ $opt->{confirm} ] ];
-    if ( length $opt->{back} ) {
-        unshift @{$self->{pre_list}}, [ $opt->{back} ];
+    $opt->{prompt}       = $self->{prompt}       if ! defined $opt->{prompt};
+    $opt->{info_on_top}  = $self->{info_on_top}  if ! defined $opt->{info_on_top};  # experimental
+    $opt->{back}         = $self->{back}         if ! defined $opt->{back};
+    $opt->{confirm}      = $self->{confirm}      if ! defined $opt->{confirm};
+    $opt->{auto_up}      = $self->{auto_up}      if ! defined $opt->{auto_up};
+    $opt->{read_only}    = $opt->{ro}            if ! defined $opt->{read_only};  ##
+    $opt->{read_only}    = $self->{read_only}    if ! defined $opt->{read_only};
+    $opt->{clear_screen} = $self->{clear_screen} if ! defined $opt->{clear_screen};
+    $self->{i}{info_text}  = $opt->{info_on_top};
+    if ( defined $opt->{prompt} ) {
+        $self->{i}{info_text} .= "\n" if length $self->{i}{info_text} && length $opt->{prompt};
+        $self->{i}{info_text} .= $opt->{prompt};
     }
-    unshift @$list, @{$self->{pre_list}};
+    $self->{i}{sep}         = ': ';
+    $self->{i}{sep_ro}      = '| ';
+    $self->{i}{pre_list}    = [ [$opt->{confirm}, ] ];
+    if ( length $opt->{back} ) {
+        unshift @{$self->{i}{pre_list}}, [ $opt->{back}, ];
+    }
+    my $list = [ @{$self->{i}{pre_list}}, map { [ @$_ ] } @$orig_list ];
     $self->__length_longest_key( $list );
+    my $auto_up = $opt->{auto_up};
     $self->__init_term();
     local $| = 1;
     my ( $maxcols, $maxrows ) = $self->{plugin}->__term_buff_size();
     $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
-    $self->__write_first_screen( $opt, $list, 0 );
+    $self->__write_first_screen( $opt, $list, 0, $auto_up );
     my ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+    my $k = 0;
 
-    LINE: while ( 1 ) {
+    KEY: while ( 1 ) {
         my $locked = 0;
-        if ( any { $_ == $self->{curr_row} - @{$self->{pre_list}} } @{$opt->{ro}} ) {
+        if ( any { $_ == $self->{i}{curr_row} - @{$self->{i}{pre_list}} } @{$opt->{read_only}} ) {
             $locked = 1;
         }
-        if ( $self->{beep} ) {
+        if ( $self->{i}{beep} ) {
             $self->{plugin}->__beep();
-            $self->{beep} = 0;
+            $self->{i}{beep} = 0;
         }
         else {
             $self->__print_current_row( $opt, $list, $str, $pos );
@@ -587,61 +611,65 @@ sub fill_form {
             carp "EOT: $!";
             return;
         }
-        next if $key == NEXT_get_key;
-        next if $key == KEY_TAB;
+        next KEY if $key == NEXT_get_key;
+        next KEY if $key == KEY_TAB;
         my ( $tmp_maxcols, $tmp_maxrows ) = $self->{plugin}->__term_buff_size();
         if ( $tmp_maxcols != $maxcols || $tmp_maxrows != $maxrows && $tmp_maxrows < ( @$list + 1 ) ) {
             ( $maxcols, $maxrows ) = ( $tmp_maxcols, $tmp_maxrows );
             $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
             $self->{plugin}->__clear_screen();
-            $self->__write_first_screen( $opt, $list, 1 );
+            $self->__write_first_screen( $opt, $list, 1, $auto_up ); # 1
             ( $str, $pos ) = $self->__gcstring_and_pos( $list );
         }
         if ( $key == KEY_BSPACE || $key == CONTROL_H ) {
-            if ( $locked ) {
-                $self->{beep} = 1;
+            $k = 1;
+            if ( $locked ) {    # read_only
+                $self->{i}{beep} = 1;
             }
             elsif ( $pos ) {
                 $pos--;
                 $str->substr( $pos, 1, '' );
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == CONTROL_U ) {
+            $k = 1;
             if ( $locked ) {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
             elsif ( $pos ) {
                 $str->substr( 0, $pos, '' );
                 $pos = 0;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == CONTROL_K ) {
+            $k = 1;
             if ( $locked ) {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
             elsif ( $pos < $str->length() ) {
                 $str->substr( $pos, $str->length() - $pos, '' );
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_DELETE || $key == CONTROL_D ) {
+            $k = 1;
             if ( $str->length() ) {
                 if ( $locked ) {
-                    $self->{beep} = 1;
+                    $self->{i}{beep} = 1;
                 }
                 elsif ( $pos < $str->length() ) {
                     $str->substr( $pos, 1, '' );
                 }
                 else {
-                    $self->{beep} = 1;
+                    $self->{i}{beep} = 1;
                 }
             }
             else {
@@ -651,46 +679,51 @@ sub fill_form {
             }
         }
         elsif ( $key == VK_RIGHT ) {
+            $k = 1;
             if ( $pos < $str->length() ) {
                 $pos++;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_LEFT ) {
+            $k = 1;
             if ( $pos ) {
                 $pos--;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_END   || $key == CONTROL_E ) {
+            $k = 1;
             if ( $pos < $str->length() ) {
                 $pos = $str->length();
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_HOME  || $key == CONTROL_A ) {
+            $k = 1;
             if ( $pos > 0 ) {
                 $pos = 0;
             }
             else {
-                $self->{beep} = 1;
+                $self->{i}{beep} = 1;
             }
         }
         elsif ( $key == VK_UP ) {
-            if ( $self->{curr_row} == 0 ) {
-                $self->{beep} = 1;
+            $k = 1;
+            if ( $self->{i}{curr_row} == 0 ) {
+                $self->{i}{beep} = 1;
             }
             else {
-                $self->{curr_row}--;
+                $self->{i}{curr_row}--;
                 ( $str, $pos ) = $self->__gcstring_and_pos( $list );
-                if ( $self->{curr_row} >= $self->{begin_row} ) {
-                    $self->__reset_previous_row( $opt, $list, $self->{curr_row} + 1 );
+                if ( $self->{i}{curr_row} >= $self->{i}{begin_row} ) {
+                    $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} + 1 );
                     $self->{plugin}->__up( 1 );
                 }
                 else {
@@ -699,56 +732,59 @@ sub fill_form {
             }
         }
         elsif ( $key == VK_DOWN ) {
-            if ( $self->{curr_row} == $#$list ) {
-                $self->{beep} = 1;
+            $k = 1;
+            if ( $self->{i}{curr_row} == $#$list ) {
+                $self->{i}{beep} = 1;
             }
             else {
-                $self->{curr_row}++;
+                $self->{i}{curr_row}++;
                 ( $str, $pos ) = $self->__gcstring_and_pos( $list );
-                if ( $self->{curr_row} <= $self->{end_row} ) {
-                    $self->__reset_previous_row( $opt, $list, $self->{curr_row} - 1 );
+                if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
+                    $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
                     $self->{plugin}->__down( 1 );
                 }
                 else {
-                    $self->{plugin}->__up( $self->{end_row} - $self->{begin_row} );
+                    $self->{plugin}->__up( $self->{i}{end_row} - $self->{i}{begin_row} );
                     $self->__print_next_page( $opt, $list );
                 }
             }
         }
         elsif (  $key == VK_PAGE_UP || $key == CONTROL_B ) {
-            if ( $self->{page} == 1 ) {
-                if ( $self->{curr_row} == 0 ) {
-                    $self->{beep} = 1;
+            $k = 1;
+            if ( $self->{i}{page} == 1 ) {
+                if ( $self->{i}{curr_row} == 0 ) {
+                    $self->{i}{beep} = 1;
                 }
                 else {
-                    $self->__reset_previous_row( $opt, $list, $self->{curr_row} );
-                    $self->{plugin}->__up( $self->{curr_row} );
-                    $self->{curr_row} = 0;
+                    $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
+                    $self->{plugin}->__up( $self->{i}{curr_row} );
+                    $self->{i}{curr_row} = 0;
                     ( $str, $pos ) = $self->__gcstring_and_pos( $list );
                 }
             }
             else {
-                $self->{plugin}->__up( $self->{curr_row} - $self->{begin_row} );
-                $self->{curr_row} = $self->{begin_row} - $self->{avail_height};
+                $self->{plugin}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                $self->{i}{curr_row} = $self->{i}{begin_row} - $self->{i}{avail_height};
                 ( $str, $pos ) = $self->__gcstring_and_pos( $list );
                 $self->__print_previous_page( $opt, $list );
             }
         }
         elsif (  $key == VK_PAGE_DOWN || $key == CONTROL_F ) {
-            if ( $self->{page} == $self->{pages} ) {
-                if ( $self->{curr_row} == $#$list ) {
-                    $self->{beep} = 1;
+            $k = 1;
+            if ( $self->{i}{page} == $self->{i}{pages} ) {
+                if ( $self->{i}{curr_row} == $#$list ) {
+                    $self->{i}{beep} = 1;
                 }
                 else {
-                    $self->__reset_previous_row( $opt, $list, $self->{curr_row} );
-                    $self->{plugin}->__down( $self->{end_row} - $self->{curr_row} );
-                    $self->{curr_row} = $self->{end_row};
+                    $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} );
+                    $self->{plugin}->__down( $self->{i}{end_row} - $self->{i}{curr_row} );
+                    $self->{i}{curr_row} = $self->{i}{end_row};
                     ( $str, $pos ) = $self->__gcstring_and_pos( $list );
                 }
             }
             else {
-                $self->{plugin}->__up( $self->{curr_row} - $self->{begin_row} );
-                $self->{curr_row} = $self->{end_row} + 1;
+                $self->{plugin}->__up( $self->{i}{curr_row} - $self->{i}{begin_row} );
+                $self->{i}{curr_row} = $self->{i}{end_row} + 1;
                 ( $str, $pos ) = $self->__gcstring_and_pos( $list );
                 $self->__print_next_page( $opt, $list );
             }
@@ -756,72 +792,68 @@ sub fill_form {
         else {
             $key = chr $key;
             utf8::upgrade $key;
-            if ( $key eq "\n" || $key eq "\r" ) { #
-                my $up = $self->{curr_row} - $self->{begin_row};
-                $up += $self->{nr_prompt_lines} if $self->{nr_prompt_lines};
-                if ( $list->[$self->{curr_row}][0] eq $opt->{back} ) {
+            if ( $key eq "\n" || $key eq "\r" ) {                                                                       # ENTER
+                $self->{i}{lock_ENTER} = 0 if $k;                                                                       # any previously pressed key other than ENTER removes lock_ENTER
+                if ( $auto_up == 2 && $opt->{auto_up} == 1 && ! $self->{i}{lock_ENTER} ) {                              # a removed lock_ENTER resets "auto_up" from 2 to 1 if the 2 was originally a 1
+                    $auto_up = 1;
+                }
+                $k = 0;                                                                                                 # if ENTER set $k to 0
+                my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
+                $up += $self->{i}{info_row_count} if $self->{i}{info_row_count}; # total of printed lines
+                if ( $list->[$self->{i}{curr_row}][0] eq $opt->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
                     $self->{plugin}->__up( $up );
                     $self->{plugin}->__clear_lines_to_end_of_screen();
                     $self->__reset_term();
                     return;
                 }
-                elsif ( $list->[$self->{curr_row}][0] eq $opt->{confirm} ) {
+                elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
                     $self->{plugin}->__up( $up );
                     $self->{plugin}->__clear_lines_to_end_of_screen();
+                    splice @$list, 0, @{$self->{i}{pre_list}};
                     $self->__reset_term();
-                    splice @$list, 0, @{$self->{pre_list}};
                     if ( $self->{compat} || ! defined $self->{compat} && $ENV{READLINE_SIMPLE_COMPAT} ) {
                         return [ map { [ $_->[0], encode( 'console_in', $_->[1] ) ] } @$list ];
                     }
                     return $list;
                 }
-                if ( $opt->{auto_up} == 2 ) {
-                    if ( $self->{curr_row} == 0 ) {
-                        $self->{beep} = 1;
-                    }
-                    else {
-                        $self->{plugin}->__up( $up );
-                        $self->{plugin}->__clear_lines_to_end_of_screen();
-                        ( $str, $pos ) = $self->__write_first_screen( $opt, $list, 0 );
-                        ( $str, $pos ) = $self->__gcstring_and_pos( $list );
-                    }
-                }
-                elsif ( $self->{curr_row} == $#$list ) {
+                if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                     $self->{plugin}->__up( $up );
                     $self->{plugin}->__clear_lines_to_end_of_screen();
-                    ( $str, $pos ) = $self->__write_first_screen( $opt, $list, scalar @{$self->{pre_list}} );
+                    my $cursor = 0; # cursor on {back}
+                    $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
                     ( $str, $pos ) = $self->__gcstring_and_pos( $list );
-                    $self->{enter_col} = $pos;
-                    $self->{enter_row} = $self->{curr_row};
+                }
+                elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
+                    $self->{plugin}->__up( $up );
+                    $self->{plugin}->__clear_lines_to_end_of_screen();
+                    my $cursor = scalar @{$self->{i}{pre_list}}; # cursor on the first data row
+                    $self->__write_first_screen( $opt, $list, $cursor, $auto_up );
+                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
+
+                    $self->{i}{lock_ENTER} = 1;                                                                         # set lock_ENTER when jumped automatically from the {last row} to the {first data row/2}
                 }
                 else {
-                    if ( $opt->{auto_up} == 1 ) {
-                        if (    defined $self->{enter_row} && $self->{enter_row} == $self->{curr_row}
-                             && defined $self->{enter_col} && $self->{enter_col} == $pos
-                        ) {
-                            $self->{beep} = 1;
-                            next;
-                        }
-                        else {
-                            delete $self->{enter_row};
-                            delete $self->{enter_col};
-                        }
+                    if ( $auto_up == 1 && $self->{i}{curr_row} == @{$self->{i}{pre_list}} && $self->{i}{lock_ENTER} ) { # if ENTER && "auto_up" == 1 $$ "curr_row" == {first data row/2} && lock_ENTER is true:
+                        $self->{i}{beep} = 1;                                                                           # set "auto_up" temporary to 2 so a second ENTER moves the cursor to {back/0}
+                        $auto_up = 2;
+                        next KEY;
                     }
-                    $self->{curr_row}++;
-                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );
-                    if ( $self->{curr_row} <= $self->{end_row} ) {
-                        $self->__reset_previous_row( $opt, $list, $self->{curr_row} - 1 );
+                     $self->{i}{curr_row}++;
+                    ( $str, $pos ) = $self->__gcstring_and_pos( $list );                                                # or go to the next row if not on the last row
+                    if ( $self->{i}{curr_row} <= $self->{i}{end_row} ) {
+                        $self->__reset_previous_row( $opt, $list, $self->{i}{curr_row} - 1 );
                         $self->{plugin}->__down( 1 );
                     }
                     else {
-                        $self->{plugin}->__up( $up );
+                        $self->{plugin}->__up( $up );                                                                   # or else to the next page
                         $self->__print_next_page( $opt, $list );
                     }
                 }
             }
             else {
+                $k = 1;
                 if ( $locked ) {
-                    $self->{beep} = 1;
+                    $self->{i}{beep} = 1;
                 }
                 else {
                     $str->substr( $pos, 0, $key );
@@ -842,9 +874,9 @@ sub __reset_previous_row {
 
 sub __print_next_page {
     my ( $self, $opt, $list ) = @_;
-    $self->{begin_row} = $self->{end_row} + 1;
-    $self->{end_row}   = $self->{end_row} + $self->{avail_height};
-    $self->{end_row}   = $#$list if $self->{end_row} > $#$list;
+    $self->{i}{begin_row} = $self->{i}{end_row} + 1;
+    $self->{i}{end_row}   = $self->{i}{end_row} + $self->{i}{avail_height};
+    $self->{i}{end_row}   = $#$list if $self->{i}{end_row} > $#$list;
     $self->{plugin}->__clear_lines_to_end_of_screen();
     $self->__write_screen( $opt, $list );
 }
@@ -852,9 +884,9 @@ sub __print_next_page {
 
 sub __print_previous_page {
     my ( $self, $opt, $list ) = @_;
-    $self->{end_row}   = $self->{begin_row} - 1;
-    $self->{begin_row} = $self->{begin_row} - $self->{avail_height};
-    $self->{begin_row} = 0 if $self->{begin_row} < 0;
+    $self->{i}{end_row}   = $self->{i}{begin_row} - 1;
+    $self->{i}{begin_row} = $self->{i}{begin_row} - $self->{i}{avail_height};
+    $self->{i}{begin_row} = 0 if $self->{i}{begin_row} < 0;
     $self->{plugin}->__clear_lines_to_end_of_screen();
     $self->__write_screen( $opt, $list );
 }
@@ -863,16 +895,16 @@ sub __print_previous_page {
 sub __padded_or_trimed_key {
     my ( $self, $list, $idx ) = @_;
     my $unicode;
-    my $key_length = $self->{length_key}[$idx];
+    my $key_length = $self->{i}{length_key}[$idx];
     my $key = $list->[$idx][0];
     $key =~ s/\p{Space}/ /g;
     $key =~ s/\p{C}//g;
-    if ( $key_length > $self->{len_longest_key} ) {
+    if ( $key_length > $self->{i}{len_longest_key} ) {
         my $gcs = Unicode::GCString->new( $key );
-        $unicode = $self->__unicode_trim( $gcs, $self->{len_longest_key} );
+        $unicode = $self->__unicode_trim( $gcs, $self->{i}{len_longest_key} );
     }
-    elsif ( $key_length < $self->{len_longest_key} ) {
-        $unicode = " " x ( $self->{len_longest_key} - $key_length ) . $key;
+    elsif ( $key_length < $self->{i}{len_longest_key} ) {
+        $unicode = " " x ( $self->{i}{len_longest_key} - $key_length ) . $key;
     }
     else {
         $unicode = $key;
@@ -900,72 +932,6 @@ sub __unicode_trim {
 }
 
 
-# use utf8;
-# use open qw( :std :utf8 );
-
-# use Term::Form;
-# use Term::ReadLine; # 1.14
-# use Devel::Peek;
-
-# my $default = 'ü';                    # "\x{fc}"
-# character read with readline: 'ä'     # "\x{e4}"
-
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Stub' );   # default not supported
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Perl' );
-# my $line = $tr->readline( ': ' );
-
-###  Ã¤    "\303\244"\0
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Perl' );
-# my $line = $tr->readline( ': ', $default );
-
-###  üÃ¤   "\303\274\303\203\302\244"\0 [UTF8 "\x{fc}\x{c3}\x{a4}"]
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Perl', *STDIN, *STDOUT );
-# my $line = $tr->readline( ': ', $default );
-
-###  üä    "\303\274\303\244"\0 [UTF8 "\x{fc}\x{e4}"]
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Gnu 1.26' );
-# my $line = $tr->readline( ': ', $default );
-
-###  Ã¼Ã¤  "\303\274\303\244"\0
-
-#-----------------------------------------------------------
-
-# my $tr = Term::ReadLine->new( 'Gnu 1.26', *STDIN, *STDOUT );
-# my $line = $tr->readline( ': ', $default );
-
-###  Ã¼Ã¤  "\303\274\303\244"\0
-
-#-----------------------------------------------------------
-
-# my $tr = Term::Form->new();
-# $tr->config( { compat => 0 } );
-# my $line = $tr->readline( ': ', $default );
-
-###  üä    "\303\274\303\244"\0 [UTF8 "\x{fc}\x{e4}"]
-
-#-----------------------------------------------------------
-
-# my $tr = Term::Form->new();
-# $tr->config( { compat => 1 } );
-# my $line = $tr->readline( ': ', $default );
-
-###  Ã¼Ã¤  "\303\274\303\244"\0
-
 
 1;
 
@@ -981,7 +947,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.310
+Version 0.311
 
 =cut
 
@@ -1099,6 +1065,14 @@ argument is a hash-reference, the hash is used to set the different options. The
 
 =item
 
+clear_screen
+
+If enabled, the screen is cleared before the output.
+
+default: disabled
+
+=item
+
 default
 
 Set a initial value of input.
@@ -1143,24 +1117,35 @@ default: undefined
 
 auto_up
 
-With I<auto_up> set to C<0> or C<1> pressing C<ENTER> moves the cursor to the next line if the cursor is on a
-"readline". If the last "readline" row is reached, the cursor jumps to the first "readline" row if C<ENTER> was pressed.
-If after an C<ENTER> the cursor has jumped to the first "readline" row and I<auto_up> is set to C<1>, C<ENTER> doesn't
-move the cursor to the next row until the cursor is moved with another key. If I<auto_up> is set to C<0> or C<1> the
-initially cursor position is on the first "readline" menu entry.
+With I<auto_up> set to C<0> or C<1> pressing C<ENTER> moves the cursor to the next line (if the cursor is not on the
+"back" or "confirm" row). If the last row is reached, the cursor jumps to the first data row if C<ENTER> is pressed.
+While with  I<auto_up> set to C<0> the cursor loops through the rows until a key other than C<ENTER> is pressed with
+I<auto_up> set to C<1> after one loop an C<ENTER> moves the cursor to the top menu entry ("back") if no other
+key than C<ENTER> was pressed.
 
-With I<auto_up> set to C<2> C<ENTER> goes to the top menu entry if the cursor is on a "readline". The initially
-cursor position is on the first menu entry.
+With I<auto_up> set to C<2> an C<ENTER> moves the cursor to the top menu entry (except the cursor is on the "confirm"
+row).
 
-default: C<0>
+If I<auto_up> is set to C<0> or C<1> the initially cursor position is on the first data row while when set to C<2> the
+initially cursor position is on the first menu entry ("back").
+
+default: C<1>
 
 =item
 
-ro
+clear_screen
 
-Set a form-row to readonly.
+If enabled, the screen is cleared before the output.
 
-Expected value: a reference to an array with the indexes of the rows which should be readonly.
+default: disabled
+
+=item
+
+read_only
+
+Set a form-row to read only.
+
+Expected value: a reference to an array with the indexes of the rows which should be read only.
 
 default: empty array
 
@@ -1170,7 +1155,7 @@ confirm
 
 Set the name of the "confirm" menu entry.
 
-default: C<<<>
+default: C<Confirm>
 
 =item
 
@@ -1178,9 +1163,9 @@ back
 
 Set the name of the "back" menu entry.
 
-The "back" menu entry is not available if I<back> is not defined or set to an empty string.
+The "back" menu entry can be disabled by setting I<back> to an empty string.
 
-default: undefined
+default: C<Back>
 
 =back
 
@@ -1221,7 +1206,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2016 Matthäus Kiem.
+Copyright 2014-2018 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

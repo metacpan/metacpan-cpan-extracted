@@ -19,6 +19,7 @@ requires 'perl', 'v5.14.0';
 requires 'Version::Compare';
 requires 'JSON';
 requires 'Date::Parse';
+requires 'Number::Bytes::Human';
 
 on configure => sub {
 	requires 'Devel::CheckBin';

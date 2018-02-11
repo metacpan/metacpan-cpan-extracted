@@ -1,30 +1,42 @@
 
 package Text::Template::Preprocess;
-$Text::Template::Preprocess::VERSION = '1.47';
+$Text::Template::Preprocess::VERSION = '1.49';
 # ABSTRACT: Expand template text with embedded Perl
 
+use strict;
+use warnings;
+
 use Text::Template;
-@ISA = qw(Text::Template);
+our @ISA = qw(Text::Template);
 
 sub fill_in {
-  my $self = shift;
-  my (%args) = @_;
-  my $pp = $args{PREPROCESSOR} || $self->{PREPROCESSOR} ;
-  if ($pp) {
-    local $_ = $self->source();
-#    print "# fill_in: before <$_>\n";
-    &$pp;
-#    print "# fill_in: after <$_>\n";
-    $self->set_source_data($_);
-  }
-  $self->SUPER::fill_in(@_);
+    my $self   = shift;
+    my (%args) = @_;
+
+    my $pp     = $args{PREPROCESSOR} || $self->{PREPROCESSOR};
+
+    if ($pp) {
+        local $_ = $self->source();
+        my $type = $self->{TYPE};
+
+        #    print "# fill_in: before <$_>\n";
+        &$pp;
+
+        #    print "# fill_in: after <$_>\n";
+        $self->set_source_data($_, $type);
+    }
+
+    $self->SUPER::fill_in(@_);
 }
 
 sub preprocessor {
-  my ($self, $pp) = @_;
-  my $old_pp = $self->{PREPROCESSOR};
-  $self->{PREPROCESSOR} = $pp if @_ > 1;  # OK to pass $pp=undef
-  $old_pp;
+    my ($self, $pp) = @_;
+
+    my $old_pp = $self->{PREPROCESSOR};
+
+    $self->{PREPROCESSOR} = $pp if @_ > 1;    # OK to pass $pp=undef
+
+    $old_pp;
 }
 
 1;
@@ -39,7 +51,7 @@ Text::Template::Preprocess - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.47
+version 1.49
 
 =head1 SYNOPSIS
 
@@ -108,13 +120,17 @@ L<Text::Template>
 
 =head1 SOURCE
 
-The development version is on github at L<http://github.com/mschout/perl-text-template>
-and may be cloned from L<git://github.com/mschout/perl-text-template.git>
+The development version is on github at L<http://https://github.com/mschout/perl-text-template>
+and may be cloned from L<git://https://github.com/mschout/perl-text-template.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-text-template@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Template
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/perl-text-template/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

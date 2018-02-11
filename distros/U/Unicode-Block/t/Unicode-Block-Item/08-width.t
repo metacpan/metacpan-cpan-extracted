@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use POSIX qw(LC_ALL setlocale);
 use Test::More 'tests' => 8;

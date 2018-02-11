@@ -1,5 +1,5 @@
 ---
-abstract: 'Bitcoin Core API RPCs'
+abstract: 'Bitcoin Core JSON RPC Client'
 author:
   - 'Wesley Hinds <wesley.hinds@gmail.com>'
 build_requires:
@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  JSON::RPC::Client: '0.93'
+  JSON::RPC::Legacy::Client: '1.06'
   Moo: '1.001'
   perl: '5.006'
 resources:
   repository: https://github.com/whindsx/Bitcoin-RPC-Client 
-version: '0.07'
+version: '0.08'

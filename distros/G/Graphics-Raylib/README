@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.014
+    version 0.015
 
 SYNOPSIS
 
@@ -39,7 +39,7 @@ raylib
     auto-debugging... just coding in the most pure spartan-programmers way.
     Are you ready to learn? Jump to code examples
     <http://www.raylib.com/examples.html> or games
-    <http://www.raylib.com/games.html>!.
+    <http://www.raylib.com/games.html>!
 
 IMPLEMENTATION
 

@@ -26,7 +26,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(@ALL_JOBS %ALL_JOBS PREFORK POSTFORK 
                  POSTFORK_PARENT POSTFORK_CHILD);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 our (@ALL_JOBS, %ALL_JOBS, @ARCHIVED_JOBS, $WIN32_PROC, $WIN32_PROC_PID);
 our $OVERLOAD_ENABLED = 0;
@@ -448,7 +448,10 @@ sub max_proc {
             }
         }
     }
-    return ref($val) eq 'CODE' ? $val->() : $val;
+    if (ref($val) eq 'CODE') {
+        $val = $val->();
+    }
+    return $val || 0;  # RT124316b
 }
 
 sub _max_proc { # used in test suite but not in this distro itself
@@ -2622,7 +2625,7 @@ Forks::Super::Job - object representing a background task
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 SYNOPSIS
 

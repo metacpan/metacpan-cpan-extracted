@@ -1,7 +1,6 @@
 use strict ;
 use Test ;
 
-
 BEGIN {
 	if ($ENV{PERL_INLINE_JAVA_JNI}){
 		plan(tests => 0) ;
@@ -11,10 +10,6 @@ BEGIN {
 		plan(tests => 4) ;
 	}
 }
-
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test' ;
 
 use Inline (
 	Java => 't/shared.java',

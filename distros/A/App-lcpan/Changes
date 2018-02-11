@@ -1,3 +1,15 @@
+1.022   2018-02-08 (PERLANCAR)
+
+	- [Bugfix] Make log level overridable from environment variable,
+	  e.g. TRACE=1.
+
+
+1.021   2018-02-08 (PERLANCAR)
+
+	- Add to builtin skip list: Shipment-3.01.tar.gz (segfaults
+	  Compiler::Lexer 0.22).
+
+
 1.020   2018-01-15 (PERLANCAR)
 
 	- lcpanm, lcpanm-script: Observe LCPANM_PERL5OPT.

@@ -38,11 +38,7 @@ GetOptions(
 ) or pod2usage(2);
 
 
-my $uri = shift or die "Must specify a URL or file to check.  See --help for details.\n";
-if ( -e $uri ) {
-    require URI::file;
-    $uri = URI::file->new_abs( $uri )->as_string;
-}
+my @uris = @ARGV or die "Must specify a URL or file to check.  See --help for details.\n";
 
 @actions = (\&dump_forms) unless @actions;
 
@@ -65,20 +61,27 @@ else {
 }
 
 $mech->env_proxy();
-my $response = $mech->get( $uri );
-if (!$response->is_success and defined ($response->www_authenticate)) {
-    if (!defined $user or !defined $pass) {
-        die("Page requires username and password, but none specified.\n");
-    }
-    $mech->credentials($user,$pass);
-    $response = $mech->get( $uri );
-    $response->is_success or die "Can't fetch $uri with username and password\n", $response->status_line, "\n";
-}
-$mech->is_html or die qq{$uri returns type "}, $mech->ct, qq{", not "text/html"\n};
+foreach my $uri (@uris) {
+  if ( -e $uri ) {
+      require URI::file;
+      $uri = URI::file->new_abs( $uri )->as_string;
+  }
 
-while ( my $action = shift @actions ) {
-    $action->( $mech );
-    print "\n" if @actions;
+  my $response = $mech->get( $uri );
+  if (!$response->is_success and defined ($response->www_authenticate)) {
+      if (!defined $user or !defined $pass) {
+          die("Page requires username and password, but none specified.\n");
+      }
+      $mech->credentials($user,$pass);
+      $response = $mech->get( $uri );
+      $response->is_success or die "Can't fetch $uri with username and password\n", $response->status_line, "\n";
+  }
+  $mech->is_html or die qq{$uri returns type "}, $mech->ct, qq{", not "text/html"\n};
+
+  foreach my $action (@actions ) {
+      $action->( $mech );
+      print "\n" if @actions;
+  }
 }
 
 
@@ -128,7 +131,7 @@ mech-dump - Dumps information about a web page
 
 =head1 VERSION
 
-version 1.86
+version 1.87
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 Usage:
-        nddiff [OPTIONS] <file1> <file2>
+        nddiff [OPTIONS] <file1> <file2> [<file3> ... ]
 
 Options:
     --brief
@@ -42,7 +42,7 @@ Options:
         Don't show diff, only exit code shows exists diff or not.
 
     --rules
-        Dump diff in nsproc-rules format.
+        Dump diff as rules for ndproc.
 
     --show
         Visualize diff (JSON formatted diff file must be provided as

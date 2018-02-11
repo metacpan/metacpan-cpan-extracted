@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 
 sub databaseName {
@@ -198,11 +198,11 @@ if exists
 EOF
 
     }
-    # does this even get called ???
     elsif ( scalar @{$ra_pkcolumns} != 1 ) {
+        
         my @pk_ColumnsCheck = () ;
 
-        foreach my $l (@{$ra_columns}) {
+        foreach my $l (@{$ra_pkcolumns}) {
             my $varlen  = length($l->[0]) ;
             my $colpadding = $widest_column_name_padding - (int(($varlen)/4));
             my $varpadding = $widest_column_name_padding - (int(($varlen+1)/4));
@@ -223,10 +223,10 @@ EOF
         $recordExistenceCheckSQL = <<"EOF";
 if not exists
                 (
-                select  ${flatcolumnlist} 
+                select  *
                 from    ${quotedCombinedName}
                 ${primaryKeyCheckClause}
-                )               
+                )
 EOF
     }
     else {
@@ -552,14 +552,6 @@ begin try
         where   StaticDataPopulationId\t\t= \@i
 
         ${recordExistenceCheckSQL}
-/*
-        if not exists
-                (
-                select  ${flatcolumnlist} 
-                from    ${quotedCombinedName}
-                ${primaryKeyCheckClause}
-                )
-*/              
             begin
             $insertingPrintStatement
             if \@DeploySwitch = 1 begin

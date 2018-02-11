@@ -1,3 +1,10 @@
+1.1.1    08.02.2018
+    - std::integer_sequence for old C++ lower than 14
+    - panda::function optimizations
+1.1.0    06.02.2018
+    - bugfixes and warn fixes in panda::string
+    - move all tests from perl to c++
+    - iptr<> added
 1.0.7    17.01.2018
     - C++14 requirements lowered to C++11
     - new overloads for endian conversions

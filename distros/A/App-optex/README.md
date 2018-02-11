@@ -24,7 +24,7 @@ module [Getopt::EX](https://metacpan.org/pod/Getopt::EX).  It enables user to de
 aliases for any commands on the system, and provide module style
 extendible capability.
 
-Target command is given as argument:
+Target command is given as an argument:
 
     % optex command
 

@@ -14,7 +14,7 @@ use warnings;
 our ($_SIGCHLD, $_SIGCHLD_CNT, $REAP) = (0,0,0);
 our (@CHLD_HANDLE_HISTORY, @SIGCHLD_CAUGHT) = (0);
 our $SIG_DEBUG = $ENV{SIG_DEBUG};
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 my %bastards;
 
 #
@@ -30,7 +30,6 @@ sub handle_CHLD {
     $SIGCHLD_CAUGHT[0]++;
     my $sig = shift;
     $_SIGCHLD_CNT++;
-
     # poor man's synchronization
     $_SIGCHLD++;
     if ($_SIGCHLD > 1) {
@@ -42,6 +41,7 @@ sub handle_CHLD {
 	$_SIGCHLD--;
 	return;
     }
+
 
     if ($SIG_DEBUG) {
 	my $z = Time::HiRes::time() - $^T;
@@ -83,6 +83,19 @@ sub handle_CHLD {
 	    # 2. This is a child process with $CHILD_FORK_OK>0, reaping process
 	    #    started with a system fork (system or exec or maybe even qx?),
 	    #    not a F::S::fork call from within the child process.
+            #
+            # With RT#124316, a third mechanism has been identified:
+            # 3. In a piped open
+            #
+            #         $pid = open $fh, "|-", "some command ...";
+            #         ...
+            #         close $fh;
+            #
+            #    A SIGCHLD will be generated when "some command ..." finishes.
+            #    There may even be a race condition between the waitpid call
+            #    above and the implicit waitpid in the close call, and the
+            #    close call may fail. See the "BUGS AND LIMITATIONS" section
+            #    in Forks::Super pod.
 
 	    debug('handle_CHLD(): got CHLD signal ',
 		  "but can't find child to reap; pid=$pid") if $DEBUG;

@@ -4,17 +4,17 @@ NAME
 
 VERSION
 
-    version 0.004
+    version 0.006
 
 SYNOPSIS
 
       # Mojolicious
       my $pubsub = $app->plugin('Pubsub', { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', });
-      $app->publish("message");
+      $app->pubsub->publish("message");
       
       # Mojolicious::Lite
       my $pubsub = plugin Pubsub => { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', };
-      app->publish("message");
+      app->pubsub->publish("message");
 
 DESCRIPTION
 
@@ -47,23 +47,23 @@ OPTIONS
 
 HELPERS
 
- publish
+ pubsub->publish
 
-      $c->publish("message");
-      $c->publish(@args);
+      $c->pubsub->publish("message");
+      $c->pubsub->publish(@args);
 
     Publishes a message that the subscribing callbacks will receive.
 
- subscribe
+ pubsub->subscribe
 
-      $c->subscribe($cb);
+      $c->pubsub->subscribe($cb);
 
     Add the $cb code reference to the callbacks that get published
     messages.
 
- unsubscribe
+ pubsub->unsubscribe
 
-      $c->unsubscribe($cb);
+      $c->pubsub->unsubscribe($cb);
 
     Remove the $cb code reference from the callbacks that get published
     messages.
@@ -75,12 +75,12 @@ SUBSCRIBERS
         ...
       };
 
-    Subscribers sent to the cb option, or the subscribe helper should
-    simply be CODE references that handle the arguments passed in. The
-    @args will be the same as what was passed in to the publish helper,
-    except they will have gotten JSON encoded via Mojo::JSON on the way, so
-    only data structures that consist of regular scalars, arrays, hashes,
-    and objects that implement TO_JSON or that stringify will work
+    Subscribers sent to the cb option, or the pubsub->subscribe helper
+    should simply be CODE references that handle the arguments passed in.
+    The @args will be the same as what was passed in to the pubsub->publish
+    helper, except they will have gotten JSON encoded via Mojo::JSON on the
+    way, so only data structures that consist of regular scalars, arrays,
+    hashes, and objects that implement TO_JSON or that stringify will work
     correctly. See Mojo::JSON for more details.
 
 METHODS

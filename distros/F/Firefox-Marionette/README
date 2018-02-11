@@ -5,16 +5,16 @@ NAME
 
 VERSION
 
-    Version 0.33
+    Version 0.37
 
 SYNOPSIS
 
-        use Firefox::Marionette();
+        use Firefox::Marionette qw(:all);
         use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find('//input[@id="search-input"]')->type('Test::More');
+        $firefox->find('search-input', BY_ID())->type('Test::More');
     
         my $file_handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ])
     
@@ -99,9 +99,62 @@ SUBROUTINES/METHODS
       of 'foo'.
 
       * the second optional parameter is a scalar search strategy. This
-      defaults to 'xpath'
+      defaults to BY_XPATH()
 
-      This method is subject to the implicit timeout.
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette qw(:all);
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find('//input[@id="search-input"]')->type('Test::More');
+        $firefox->find('//input[@id="search-input"]', BY_XPATH())->type('Test::More');
+        $firefox->find('search-input', BY_ID())->type('Test::More');
+        $firefox->find('q', BY_NAME())->type('Test::More');
+        $firefox->find('form-control home-search-input', BY_CLASS())->type('Test::More');
+        $firefox->find('input.home-search-input', BY_SELECTOR())->type('Test::More');
+    
+        $firefox->find('input', BY_TAG());
+        $firefox->find('API', BY_LINK());
+        $firefox->find('AP', BY_PARTIAL());
+
+ BY_XPATH
+
+    This find strategy returns the element(s) that match with supplied
+    xpath <https://en.wikipedia.org/wiki/XPath> expression.
+
+ BY_ID
+
+    This find strategy returns the element(s) with a matching 'id'
+    property.
+
+ BY_NAME
+
+    This find strategy returns the element(s) with a matching 'name'
+    property.
+
+ BY_CLASS
+
+    This find strategy returns the element(s) with a matching 'class'
+    property.
+
+ BY_SELECTOR
+
+    This find strategy returns the element(s) with a matching CSS Selector
+    <https://en.wikipedia.org/wiki/Cascading_Style_Sheets#Selector>
+
+ BY_TAG
+
+    This find strategy returns the element(s) with a matching tag name.
+
+ BY_LINK
+
+    This find strategy returns the link(s) with matching text
+
+ BY_PARTIAL
+
+    This find strategy returns the link(s) with matching partial text
 
  find_elements
 
@@ -118,7 +171,7 @@ SUBROUTINES/METHODS
       of 'foo'.
 
       * the second optional parameter is a scalar search strategy. This
-      defaults to 'xpath'
+      defaults to BY_XPATH().
 
     This method is subject to the implicit timeout.
 
@@ -356,12 +409,11 @@ SUBROUTINES/METHODS
 
  window_rect
 
-    accepts an optional <position and
-    size|Firefox::Marionette::Window::Rect> as a parameter, sets the
-    current browser window to that position and size and returns the
-    previous position, size and state of the browser window. If no
-    parameter is supplied, it returns the current position, size and state
-    of the browser window.
+    accepts an optional position and size as a parameter, sets the current
+    browser window to that position and size and returns the previous
+    position, size and state of the browser window. If no parameter is
+    supplied, it returns the current position, size and state of the
+    browser window.
 
  rect
 
@@ -480,6 +532,10 @@ SUBROUTINES/METHODS
     current session, and finally attempting to quit the application. This
     method returns the $? (CHILD_ERROR) value for the Firefox process
 
+ browser_version
+
+    This method returns version of firefox.
+
  child_error
 
     This method returns the $? (CHILD_ERROR) for the Firefox process, or
@@ -557,8 +613,7 @@ AUTHOR
 ACKNOWLEDGEMENTS
 
     Thanks to the entire Mozilla organisation for a great browser and to
-    the team behind Marionette for providing a great interface for
-    automation.
+    the team behind Marionette for providing an interface for automation.
 
     Thanks also to the authors of the documentation in the following
     sources;

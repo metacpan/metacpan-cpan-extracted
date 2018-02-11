@@ -1,0 +1,6 @@
+name = "Class-DbC"
+# badges = ["travis"]
+authority="cpan:ARUNBEAR"
+
+module_maker="ModuleBuildTiny"
+

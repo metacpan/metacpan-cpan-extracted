@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1608 2017-12-07 10:10:38Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1623 2018-01-26 14:23:54Z willem $	-*-perl-*-
 #
 
 
@@ -15,19 +15,22 @@ RIP
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
 use Getopt::Long;
 use IO::Socket;
+use ExtUtils::MakeMaker;
+use constant MM => eval $ExtUtils::MakeMaker::VERSION;
 
 
 # See perldoc ExtUtils::MakeMaker for details of how to influence
 # the contents of the Makefile that is written.
 
+my @author = ( 'Dick Franks', 'Olaf Kolkman', 'Michael Fuhr' );
+
 my %metadata = (
 	NAME		 => 'Net::DNS',
 	VERSION_FROM	 => 'lib/Net/DNS.pm',
 	ABSTRACT_FROM	 => 'lib/Net/DNS.pm',
-	AUTHOR		 => 'Olaf Kolkman et al',
+	AUTHOR		 => MM < 6.58 ? "$author[0] et al" : [@author],
 	LICENSE		 => 'mit',
 	MIN_PERL_VERSION => 5.006,
 	);
@@ -48,6 +51,7 @@ my %prerequisite = (
 	'Digest::MD5'  => 2.13,
 	'Digest::SHA'  => 5.23,
 	'File::Spec'   => 0.86,
+	'IO::File'     => 1.08,
 	'IO::Socket'   => 1.16,
 	'MIME::Base64' => 2.11,
 	'Time::Local'  => 1.19,

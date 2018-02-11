@@ -1,7 +1,7 @@
 package App::shcompgen;
 
-our $DATE = '2017-08-10'; # DATE
-our $VERSION = '0.320'; # VERSION
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '0.321'; # VERSION
 
 use 5.010001;
 use strict;
@@ -915,7 +915,7 @@ _shcompgen_loader()
     # otherwise, do as default (XXX still need to fix this, we don't want to
     # install a fixed completion for unknown commands; but using 'compopt -o
     # default' also creates a 'complete' entry)
-    complete -o default "$1" && return 124
+    complete -o bashdefault -o default "$1" && return 124
 }
 complete -D -F _shcompgen_loader
 _
@@ -1153,7 +1153,7 @@ App::shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.320 of App::shcompgen (from Perl distribution App-shcompgen), released on 2017-08-10.
+This document describes version 0.321 of App::shcompgen (from Perl distribution App-shcompgen), released on 2018-02-08.
 
 =head1 FUNCTIONS
 
@@ -1654,7 +1654,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

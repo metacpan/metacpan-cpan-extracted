@@ -4,9 +4,8 @@ use File::Find ;
 use strict ;
 use File::Spec ;
 
-require "Portable.pm" ;
 # The file we just produced in the parent Makefile.PL
-require "default_j2sdk.pl" ;
+require "Inline/Java/default_j2sdk.pl" ;
 
 my $build_jni = $main::build_jni ;
 my $build_perl_natives = $main::build_perl_natives ;
@@ -49,22 +48,9 @@ foreach my $f (@files){
 	$files->{$f}->{default_choice} = 1 ;
 }
 
-
 my $build_jni_by_dflt = Inline::Java::Portable::portable("BUILD_JNI_BY_DFLT") ;
 if (! defined($build_jni)){
-	print
-		"\nInline::Java can use a JNI extension that allows the Java Virtual Machine\n" .
-		"(JVM) to be dynamically linked with Perl instead of running as a separate\n" .
-		"process. The use of this extension is optional, and building it still\n" .
-		"allows Inline::Java to run the JVM in the default (separate process)\n" .
-		"fashion.\n" .
-		"Note: You need a C compiler to build the extension.\n" ;
-#		"Note: You must build the extension if you wish to use PerlNatives or\n" .
-#		"      PerlInterpreter.\n" ;
-	if (AskYN("Do you wish to build the JNI extension?", 
-		($build_jni_by_dflt ? 'y' : 'n'))){
-		$build_jni = 1 ;
-	}
+  $build_jni = $build_jni_by_dflt;
 }
 if ($build_jni){
 	print "\nBuilding JNI extension.\n\n" ;

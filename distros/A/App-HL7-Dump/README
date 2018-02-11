@@ -28,14 +28,14 @@ REPOSITORY
     <https://github.com/tupinek/App-HL7-Dump>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2016 Michal Špaček
+     © 2016-2018 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

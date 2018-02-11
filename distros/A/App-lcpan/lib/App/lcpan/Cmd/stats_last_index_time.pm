@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::stats_last_index_time;
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '1.020'; # VERSION
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '1.022'; # VERSION
 
 use 5.010;
 use strict;
@@ -60,7 +60,7 @@ App::lcpan::Cmd::stats_last_index_time - Return last index time of mirror
 
 =head1 VERSION
 
-This document describes version 1.020 of App::lcpan::Cmd::stats_last_index_time (from Perl distribution App-lcpan), released on 2018-01-15.
+This document describes version 1.022 of App::lcpan::Cmd::stats_last_index_time (from Perl distribution App-lcpan), released on 2018-02-08.
 
 =head1 FUNCTIONS
 

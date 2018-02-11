@@ -1,7 +1,7 @@
 package Business::ID::NIK;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2018-02-07'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -13,7 +13,7 @@ use Locale::ID::Province qw(list_id_provinces);
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(parse_nik);
+our @EXPORT_OK = qw(parse_nik);
 
 our %SPEC;
 
@@ -85,7 +85,7 @@ sub parse_nik {
     my $today = DateTime->today;
     $y += int($today->year / 100) * 100;
     $y -= 100 if $y > $today->year;
-    eval { $res->{dob} = DateTime->new(day=>$d, month=>$m, year=>$y) };
+    eval { $res->{dob} = DateTime->new(day=>$d, month=>$m, year=>$y)->ymd };
     if ($@) {
         return [400, "Invalid date of birth: $d-$m-$y"];
     }
@@ -111,7 +111,7 @@ Business::ID::NIK - Parse Indonesian citizenship registration number (NIK)
 
 =head1 VERSION
 
-This document describes version 0.08 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2015-09-03.
+This document describes version 0.090 of Business::ID::NIK (from Perl distribution Business-ID-NIK), released on 2018-02-07.
 
 =head1 SYNOPSIS
 
@@ -139,9 +139,15 @@ female), ssss is 4-digit serial starting from 1.
 =head1 FUNCTIONS
 
 
-=head2 parse_nik(%args) -> [status, msg, result, meta]
+=head2 parse_nik
+
+Usage:
+
+ parse_nik(%args) -> [status, msg, result, meta]
 
 Parse Indonesian citizenship registration number (NIK).
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -194,7 +200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

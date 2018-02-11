@@ -4,7 +4,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 # VERSION
 
-version 2.2.4
+version v2.3.0
 
 # SYNOPSIS
 
@@ -155,6 +155,28 @@ HTML::Restrict recognizes:
         my $processed = $hr->process( $html );
 
         # $processed now equals: <img alt="Alt Text">
+
+    As of 2.3.0, the value to be tested against can also be a code reference.  The
+    code reference will be passed the value of the attribute, and should return
+    either a string to use for the attribute value, or undef to remove the attribute.
+
+        my $hr = HTML::Restrict->new(
+            rules => {
+                span => [
+                    { style     => sub {
+                        my $value = shift;
+                        # all colors are orange
+                        $value =~ s/\bcolor\s*:\s*[^;]+/color: orange/g;
+                        return $value;
+                    } }
+                ],
+            },
+        );
+
+        my $html = '<span style="color: #0000ff;">This is blue</span>';
+        my $processed = $hr->process( $html );
+
+        # $processed now equals: <span style="color: orange;">
 
 - `trim => [0|1]`
 

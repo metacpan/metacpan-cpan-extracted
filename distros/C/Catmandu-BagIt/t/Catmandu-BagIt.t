@@ -13,18 +13,14 @@ use Path::Tiny;
 use Test::LWP::UserAgent;
 use utf8;
 
-#use Data::Dumper;
-#use Log::Log4perl;
-#use Log::Any::Adapter;
-#Log::Log4perl::init('log4perl.conf');
-#Log::Any::Adapter->set('Log4perl');
-
 my $pkg;
 BEGIN {
     $pkg = 'Catmandu::BagIt';
     use_ok $pkg;
 }
 require_ok $pkg;
+
+my $bag_dir = "t/my-bag-$$";
 
 note("in-memory");
 
@@ -329,40 +325,40 @@ note("write to disk");
 
     dies_ok { $bagit->write() } "write() without parameters dies";
 
-    ok $bagit->write("t/my-bag") , 'write(t/my-bag)';
+    ok $bagit->write($bag_dir) , "write($bag_dir)";
     ok $bagit->complete, 'bag is now complete';
     ok $bagit->valid , 'bag is now valid';
     ok !$bagit->is_dirty , 'bag is not dirty anymore';
 
-    ok -d "t/my-bag" , "got a t/my-bag directory";
-    ok -d "t/my-bag/data" , "got a t/my-bag/data directory";
-    ok -f "t/my-bag/bagit.txt" , "got a t/my-bag/bagit.txt";
-    ok -f "t/my-bag/bag-info.txt" , "got a t/my-bag/bag-info.txt";
-    ok -f "t/my-bag/manifest-md5.txt" , "got a t/my-bag/manifest-md5.txt";
-    ok -f "t/my-bag/tagmanifest-md5.txt" , "got a t/my-bag/tagmanifest-md5.txt";
+    ok -d "$bag_dir" , "got a $bag_dir directory";
+    ok -d "$bag_dir/data" , "got $bag_dir/data directory";
+    ok -f "$bag_dir/bagit.txt" , "got a $bag_dir/bagit.txt";
+    ok -f "$bag_dir/bag-info.txt" , "got a $bag_dir/bag-info.txt";
+    ok -f "$bag_dir/manifest-md5.txt" , "got a $bag_dir/manifest-md5.txt";
+    ok -f "$bag_dir/tagmanifest-md5.txt" , "got a v/tagmanifest-md5.txt";
 
     my $bagit2 = Catmandu::BagIt->new;
     $bagit2->add_info('Test',123);
 
-    ok ! $bagit2->write("t/my-bag") , 'failed to overwrite existing bag';
+    ok ! $bagit2->write($bag_dir) , 'failed to overwrite existing bag';
 
     ok $bagit2->is_dirty, 'bag is dirty';
 
-    ok $bagit2->write("t/my-bag", overwrite => 1) , 'write with overwrite';
+    ok $bagit2->write($bag_dir, overwrite => 1) , 'write with overwrite';
 
     ok ! $bagit->is_dirty, 'bag is not dirty anymore';
 
-    my $bagit3 = Catmandu::BagIt->read("t/my-bag");
+    my $bagit3 = Catmandu::BagIt->read($bag_dir);
 
     ok $bagit3 , 'read';
 
-    ok $bagit3->write("t/my-bag2") , 'create a copy';
+    ok $bagit3->write($bag_dir . "-2") , 'create a copy';
     ok $bagit3->complete , 'copy is complete';
     ok $bagit3->valid , 'copy is valid';
     ok !$bagit3->is_dirty , 'bag is not dirty';
 
-    remove_path("t/my-bag");
-    remove_path("t/my-bag2");
+    remove_path($bag_dir);
+    remove_path($bag_dir . "-2");
 }
 
 note("update bag");
@@ -374,35 +370,35 @@ note("update bag");
     $bagit->add_fetch("http://my.org/data.txt",1024,"data.txt");
 
     ok $bagit->is_dirty , 'bag is dirty';
-    ok $bagit->write("t/my-bag") , 'write bag';
+    ok $bagit->write($bag_dir) , 'write bag';
 
-    ok -f "t/my-bag/data/test.txt" , 'got a t/my-bag/data/test.txt';
-    ok -f "t/my-bag/fetch.txt" , 'got a t/my-bag/fetch.txt';
+    ok -f "$bag_dir/data/test.txt" , "got a $bag_dir/data/test.txt";
+    ok -f "$bag_dir/fetch.txt" , "got a $bag_dir/fetch.txt";
 
     ok $bagit->valid , 'bag is now valid';
     ok !$bagit->is_dirty , 'bag is not dirty anymore';
     ok !$bagit->complete , 'bag is not complete';
 
     ok $bagit->remove_fetch("data.txt"), 'remove_fetch';
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    ok -f "t/my-bag/data/test.txt" , 'got a t/my-bag/data/test.txt';
-    ok ! -f "t/my-bag/fetch.txt" , 'removed the t/my-bag/fetch.txt';
+    ok -f "$bag_dir/data/test.txt" , "got a $bag_dir/data/test.txt";
+    ok ! -f "$bag_dir/fetch.txt" , "removed the $bag_dir/fetch.txt";
 
     ok $bagit->complete , 'bag is now complete';
 
     ok $bagit->add_file("test.txt","test456", overwrite => 1) , 'overwrite file';
     ok $bagit->is_dirty , 'bag is dirty';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    is path("t/my-bag/data/test.txt")->slurp_utf8 , "test456" , "file content is correctly updated";
+    is path("$bag_dir/data/test.txt")->slurp_utf8 , "test456" , "file content is correctly updated";
 
     ok $bagit->remove_file("test.txt") , 'remove_file';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    ok ! -f "t/my-bag/data/test.txt" , 'removed t/my-bag/data/test.txt';
+    ok ! -f "$bag_dir/data/test.txt" , "removed $bag_dir/data/test.txt";
 
     ok ! $bagit->is_dirty , 'bag is not dirty';
 
@@ -410,9 +406,9 @@ note("update bag");
 
     ok $bagit->add_file("test.txt","test789") , 'adding a new file';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    ok -f "t/my-bag/data/test.txt" , 'got a t/my-bag/data/test.txt';
+    ok -f "$bag_dir/data/test.txt" , "got a $bag_dir/data/test.txt";
 
     my $fh = IO::File->new("t/poem.txt");
 
@@ -425,21 +421,21 @@ note("update bag");
         }
     });
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    ok -f "t/my-bag/data/test.txt" , 'got a t/my-bag/data/test.txt';
-    ok -f "t/my-bag/data/poem.txt" , 'got a t/my-bag/data/poem.txt';
-    ok -f "t/my-bag/data/results.txt" , 'got a t/my-bag/data/results.txt';
+    ok -f "$bag_dir/data/test.txt" , "got a $bag_dir/data/test.txt";
+    ok -f "$bag_dir/data/poem.txt" , "got a $bag_dir/data/poem.txt";
+    ok -f "$bag_dir/data/results.txt" , "got a $bag_dir/data/results.txt";
 
-    like path("t/my-bag/data/test.txt")->slurp_utf8 , qr/test789/, 'file content is correct';
-    like path("t/my-bag/data/poem.txt")->slurp_utf8 , qr/Violets are blue/ , 'file content is correct';
-    like path("t/my-bag/data/results.txt")->slurp_utf8 , qr/0123456789/ , 'file content is correct';
+    like path("$bag_dir/data/test.txt")->slurp_utf8 , qr/test789/, 'file content is correct';
+    like path("$bag_dir/data/poem.txt")->slurp_utf8 , qr/Violets are blue/ , 'file content is correct';
+    like path("$bag_dir/data/results.txt")->slurp_utf8 , qr/0123456789/ , 'file content is correct';
 
     ok $bagit->add_file("poem.txt",IO::File->new("t/poem2.txt"), overwrite => 1) , 'setting new file content';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    like path("t/my-bag/data/poem.txt")->slurp_utf8 , qr/The rose is red, the violet's blue/ , 'file content is correct';
+    like path("$bag_dir/data/poem.txt")->slurp_utf8 , qr/The rose is red, the violet's blue/ , 'file content is correct';
 
     my $payload_oxum = $bagit->payload_oxum;
 
@@ -451,7 +447,7 @@ note("update bag");
 
     is $payload_oxum , '290218.4' , 'new payload oxum reflects the fetch file';
 
-    remove_path("t/my-bag");
+    remove_path($bag_dir);
 }
 
 note("mirror fetch");
@@ -468,19 +464,19 @@ note("mirror fetch");
 
     ok $fetch , 'get_fetch()';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
     ok $bagit->mirror_fetch($fetch) , 'mirror_fetch';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->write($bag_dir, overwrite => 1) , 'write bag overwrite';
 
-    ok -r "t/my-bag/data/poem.txt";
+    ok -r "$bag_dir/data/poem.txt";
 
-    my $size = [stat("t/my-bag/data/poem.txt")]->[7];
+    my $size = [stat("$bag_dir/data/poem.txt")]->[7];
 
     is $size , 65 , 'got the correct size';
 
-    remove_path("t/my-bag");
+    remove_path($bag_dir);
 }
 
 note("lock");
@@ -491,43 +487,47 @@ note("lock");
 
     $bagit = Catmandu::BagIt->new;
 
-    ok $bagit->write("t/my-bag");
+    ok $bagit->write($bag_dir);
 
-    $bagit->touch("t/my-bag/.lock");
+    $bagit->touch("$bag_dir/.lock");
 
     ok $bagit->locked , 'locked';
 
-    remove_path("t/my-bag");
+    remove_path($bag_dir);
 }
 
 note("pipe");
 {
-    my $pipe = new IO::Pipe;
+  SKIP: {
+      skip "ENV{PIPETEST} not set", 4 unless $ENV{PIPETEST};
+      
+      my $pipe = new IO::Pipe;
 
-    if(my $pid = fork()) { # Parent
-        $pipe->reader();
+      if(my $pid = fork()) { # Parent
+          $pipe->reader();
 
-        my $bagit = Catmandu::BagIt->new;
+          my $bagit = Catmandu::BagIt->new;
 
-        ok $bagit->add_file("test.txt",$pipe) , 'add_file() pipe';
+          ok $bagit->add_file("test.txt",$pipe) , 'add_file() pipe';
 
-        ok $bagit->write("t/my-bag") , 'write()';
+          ok $bagit->write($bag_dir) , 'write()';
 
-        my $file = $bagit->get_file("test.txt");
+          my $file = $bagit->get_file("test.txt");
 
-        ok $file;
+          ok $file;
 
-        is path($file->path)->slurp_utf8 , "Hello, parent!\n" , 'file->data';
+          is path($file->path)->slurp_utf8 , "Hello, parent!\n" , 'file->data';
 
-        remove_path("t/my-bag");
-    }
-    elsif(defined $pid) { # Child
-        $pipe->writer();
+          remove_path($bag_dir);
+      }
+      elsif(defined $pid) { # Child
+          $pipe->writer();
 
-        print $pipe "Hello, parent!\n";
+          print $pipe "Hello, parent!\n";
 
-        exit(0);
-    }
+          exit(0);
+      }
+  }
 }
 
 done_testing;
@@ -564,3 +564,8 @@ EOF
 
     $ua;
 }
+
+END {
+	my $error = [];
+	path("$bag_dir")->remove_tree;
+};

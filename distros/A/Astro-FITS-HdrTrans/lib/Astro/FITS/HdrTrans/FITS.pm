@@ -30,7 +30,7 @@ use base qw/ Astro::FITS::HdrTrans::Base /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -74,7 +74,7 @@ This determines the angle, in decimal degrees, of the declination or
 latitude axis with respect to the second axis of the data array, measured
 in the anticlockwise direction.
 
-It first looks for the linear-transformation CD matrix, widely used 
+It first looks for the linear-transformation CD matrix, widely used
 including by IRAF and the precursor to the PC matrix.  If this is
 absent, the routine attempts to find the standard transformation
 matrix PC defined in the FITS WCS Standard.  Either matrix is
@@ -103,7 +103,7 @@ sub to_ROTATION {
     my $cd21 = defined( $FITS_headers->{CD2_1} ) ? $FITS_headers->{CD2_1} : 0.0;
     my $cd12 = defined( $FITS_headers->{CD1_2} ) ? $FITS_headers->{CD1_2} : 0.0;
     my $cd22 = defined( $FITS_headers->{CD2_2} ) ? $FITS_headers->{CD2_2} : 0.0;
-   
+
     # Determine the sense of the scales.
     my $sgn1;
     if ( $cd12 < 0 ) {
@@ -118,7 +118,7 @@ sub to_ROTATION {
     } else {
       $sgn2 = 1;
     }
-   
+
     # Average the estimates of the rotation converting from radians to
     # degrees (rtod).
     $rotation = $rtod * 0.5 * ( atan2( $sgn1 * $cd21 / $rtod,  $sgn1 * $cd11 / $rtod ) +

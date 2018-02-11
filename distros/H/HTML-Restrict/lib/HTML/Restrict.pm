@@ -2,16 +2,19 @@ use strict;
 use 5.006;
 
 package HTML::Restrict;
-$HTML::Restrict::VERSION = '2.2.4';
+
+use version;
+our $VERSION = 'v2.3.0';
+
 use Carp qw( croak );
 use Data::Dump qw( dump );
-use HTML::Parser;
+use HTML::Parser ();
 use HTML::Entities qw( encode_entities );
 use Types::Standard 1.000001 qw[ Bool HashRef ArrayRef CodeRef ];
 use List::Util 1.33 qw( any none );
 use Scalar::Util qw( reftype weaken );
 use Sub::Quote 'quote_sub';
-use URI;
+use URI ();
 
 use Moo 1.002000;
 use namespace::clean;
@@ -154,15 +157,28 @@ sub _build_parser {
                         my $attr_item ( @{ $self->get_rules->{$tagname} } ) {
                         if ( ref $attr_item eq 'HASH' ) {
 
-                            # validate against regex contraints
-                            for my $attr_name ( sort keys %$attr_item ) {
-                                if ( exists $attr->{$attr_name} ) {
-                                    my $value = encode_entities(
-                                        $attr->{$attr_name} );
-                                    $more .= qq[ $attr_name="$value" ]
-                                        if $attr->{$attr_name}
-                                        =~ $attr_item->{$attr_name};
+                            # validate or munge with regex or coderef contraints
+                            #
+                            for my $attr_name (
+                                sort grep exists $attr->{$_},
+                                keys %$attr_item
+                            ) {
+                                my $rule  = $attr_item->{$attr_name};
+                                my $value = $attr->{$attr_name};
+                                if ( ref $rule eq 'CODE' ) {
+                                    $value = $rule->($value);
+                                    next
+                                        if !defined $value;
                                 }
+                                elsif ( $value =~ $rule ) {
+
+                                    # ok
+                                }
+                                else {
+                                    next;
+                                }
+                                $more .= qq[ $attr_name="]
+                                    . encode_entities($value) . q["];
                             }
                         }
                         else {
@@ -202,7 +218,7 @@ sub _build_parser {
                 elsif (
                     any { $_ eq $tagname }
                     @{ $self->strip_enclosed_content }
-                    ) {
+                ) {
                     print "adding $tagname to strippers" if $self->debug;
                     push @{ $self->_stripper_stack }, $tagname;
                 }
@@ -335,7 +351,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 =head1 VERSION
 
-version 2.2.4
+version v2.3.0
 
 =head1 SYNOPSIS
 
@@ -488,6 +504,28 @@ value. This feature should be considered experimental for the time being:
     my $processed = $hr->process( $html );
 
     # $processed now equals: <img alt="Alt Text">
+
+As of 2.3.0, the value to be tested against can also be a code reference.  The
+code reference will be passed the value of the attribute, and should return
+either a string to use for the attribute value, or undef to remove the attribute.
+
+    my $hr = HTML::Restrict->new(
+        rules => {
+            span => [
+                { style     => sub {
+                    my $value = shift;
+                    # all colors are orange
+                    $value =~ s/\bcolor\s*:\s*[^;]+/color: orange/g;
+                    return $value;
+                } }
+            ],
+        },
+    );
+
+    my $html = '<span style="color: #0000ff;">This is blue</span>';
+    my $processed = $hr->process( $html );
+
+    # $processed now equals: <span style="color: orange;">
 
 =item * C<< trim => [0|1] >>
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Needs 'Log::Any';
+use Test::Needs {'Log::Any' => '1.00'};
 
 use Log::Any::Test;
 use Mojo::Log;

@@ -9,7 +9,6 @@ our %RECOMMENDED
        'Sys::CpuLoadX' => '0.02',
        'DateTime::Format::Natural' => '0.89',
        'Net::OpenSSH' => '0.64',
-#      'Test::SSH' => 0,
        'PerlIO::gzip' => 0 );
 
 if ($^O eq 'MSWin32') {

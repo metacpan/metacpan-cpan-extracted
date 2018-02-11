@@ -69,7 +69,7 @@ use Astro::Catalog::Item;
 use Time::Piece qw/ :override /;
 use Carp;
 
-$VERSION = "4.32";
+$VERSION = "4.33";
 $DEBUG = 0;
 
 

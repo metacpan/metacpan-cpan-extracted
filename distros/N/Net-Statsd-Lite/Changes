@@ -1,0 +1,44 @@
+Revision history for Net-Statsd-Lite
+
+v0.4.0    2018-02-07 21:41:25+00:00 Europe/London
+  [Enhancements]
+  - Removed the use of IO::String, which increases the performance
+    significantly.
+
+  - Type checking of values is only done when run in strict mode.
+
+  - Improve performance when autoflush is enabled.
+
+  - Improve performance for sending UDP packets.
+
+  [Bug Fixes]
+  - Sample rates are honoured properly.
+
+  [Other Changes]
+  - Removed useless "no strict".
+
+  [Incompatible Changes]
+  - Removed add_set method.
+
+v0.3.1    2018-02-06 16:37:55+00:00 Europe/London
+  [Documentation]
+  - Fixed SYNOPSIS references to Net::Statsd::Tiny
+
+v0.3.0    2018-02-06 16:31:16+00:00 Europe/London
+ - Forked from Net::Statsd::Tiny.
+
+v0.2.1    2018-02-06 09:25:32+00:00 Europe/London
+  [Tests]
+  - Specified a minimum Test::TCP version.
+
+v0.2.0    2018-02-05 17:38:42+00:00 Europe/London
+  [Enhancements]
+  - Added rate option for logging timings.
+
+v0.1.1    2018-02-05 15:28:33+00:00 Europe/London
+  [Bug Fixes]
+  - Renamed add_set to set_add, but kept alias for backwards
+    compatability.
+
+v0.1.0    2018-02-05 13:30:21+00:00 Europe/London
+  - Initial version released.

@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.37';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -85,7 +85,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.33
+Version 0.37
 
 =head1 SYNOPSIS
 
@@ -115,11 +115,11 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certian session operations.
 
-=item * moz_webdriver_click - use a WebDriver conforming L<click|Firefox::Marionette#click>.  Allowed values are 1 or 0.  Default is 0.
+=item * moz_webdriver_click - use a WebDriver conforming L<click|Firefox::Marionette#click>.  Allowed values are 1 or 0.  Default is 0.  This function will return undef for Firefox versions less than 57.
 
 =item * moz_accessibility_checks - run a11 checks when clicking elements. Allowed values are 1 or 0.  Default is 0.
 
-=item * moz_headless - the browser should be started with the -headless option
+=item * moz_headless - the browser should be started with the -headless option.  moz_headless is only supported in Firefox 56+
 
 =back
 

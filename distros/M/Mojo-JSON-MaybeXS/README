@@ -101,18 +101,20 @@ CAVEATS
 
  Upgraded Numbers
 
-    JSON::MaybeXS, if using JSON::XS or JSON::PP, will attempt to guess if
-    a value to be encoded is numeric or string based on its last usage.
-    Therefore, using a variable containing 13 in a string will cause it to
-    be encoded as "13" even if the variable itself was not changed.
-    Mojo::JSON or Cpanel::JSON::XS version 3.0109 or greater will encode 13
-    as 13 regardless of whether it has been used as a string.
+    JSON::MaybeXS, if using JSON::XS, will attempt to guess if a value to
+    be encoded is numeric or string based on whether Perl has ever
+    populated a string value for it internally. Therefore, using a variable
+    containing 13 in a string context will cause it to be encoded as "13"
+    even if the variable itself was not changed. Mojo::JSON, JSON::PP
+    version 2.92 or greater, or Cpanel::JSON::XS version 3.0109 or greater
+    will encode 13 as 13 regardless of whether it has been used as a
+    string.
 
      my ($num1, $num2) = (13, 14);
      my $str = "$num1";
      print encode_json([$num1, $num2, $str]);
-     # Mojo::JSON or Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
-     # JSON::XS or JSON::PP: ["13",14,"13"]
+     # Mojo::JSON, JSON::PP >= 2.92, Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
+     # JSON::XS: ["13",14,"13"]
 
  Duplicate Keys
 

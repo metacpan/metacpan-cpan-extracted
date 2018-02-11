@@ -1,11 +1,44 @@
-SYNOPSIS
+NAME
+    App::CompleteUtils - Collection of CLI utilities related to completion
+    and Complete::*
 
+VERSION
+    This document describes version 0.16 of App::CompleteUtils (from Perl
+    distribution App-CompleteUtils), released on 2018-02-08.
+
+SYNOPSIS
     This distribution provides several command-line utilities related to
     (shell) completion and the Complete modules family:
 
-    # INSERT_EXECS_LIST
+    *   compwithargs
+
+    *   testcomp
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CompleteUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CompleteUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Complete
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

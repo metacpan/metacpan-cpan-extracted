@@ -1,0 +1,214 @@
+NAME
+    Devel::IPerl::Plugin::Perlbrew - interact with perlbrew in Jupyter
+    <https://jupyter.org> IPerl kernel
+
+DESCRIPTION
+    In a shared server environment the Perl module needs of multiple users
+    can be met most easily with access to perlbrew and the ability to
+    install perl modules under their own libraries. A user can generate a
+    cpanfile to facilitate the creation of these libraries in a reproducible
+    manner. At the command line a typical workflow in such an environment
+    might appear thus:
+
+      perlbrew lib create perl-5.26.0@reproducible
+      perlbrew use perl-5.26.0@reproducible
+      ## assuming a cpanfile
+      cpanm --installdeps .
+
+    During the analysis that utilises such codebases using a JupyterHub on
+    the same environment a user will wish to access these installed modules
+    in a way that is as simple as the command line and within the framework
+    of a Jupyter notebook.
+
+    This plugin is designed to easily transition between command line and
+    Jupyter with similar syntax and little overhead.
+
+SYNOPSIS
+      IPerl->load_plugin('Perlbrew') unless IPerl->can('perlbrew');
+      IPerl->perlbrew_list();
+      IPerl->perlbrew_list_modules();
+
+      IPerl->perlbrew('perl-5.26.0@reproducible');
+
+INSTALLATION AND REQUISITES
+      ## install dependencies
+      cpanm --installdeps --quiet .
+      ## install
+      cpanm .
+
+    If there are some issues with Devel::IPerl installing refer to their
+    README.md <https://github.com/EntropyOrg/p5-Devel-IPerl>. The
+    ".travis.yml" in this repository might provide sources of help.
+
+    App::perlbrew is a requirement and it is suggested that Devel::IPerl is
+    deployed into a perlbrew installed perl and call the "perlbrew" function
+    to use each library.
+
+    installing perlbrew
+        For a single user use case the recommended install proceedure at
+        <https://perlbrew.pl> should be used. If installing for a shared
+        environment and JupyterHub, the following may act as a template.
+
+          version=0.82
+          mkdir -p /sw/perlbrew-$version
+          export PERLBREW_ROOT=!$
+          curl -L https://install.perlbrew.pl | bash
+
+    installing iperl
+        The kernel specification needs to be installed so that Jupyter can
+        find it. This is achieved thus:
+
+          iperl --version
+
+    perlbrew-ise the kernel
+        The kernel specification should be updated to make the environment
+        variables, that App::perlbrew relies on, available. Included in this
+        dist is the command "perlbrewise-spec".
+
+          perlbrewise-spec
+
+IPerl Interface Method
+  register
+    Called by "IPerl->load_plugin('Perlbrew')".
+
+REGISTERED METHODS
+  perlbrew
+      # 1 - success
+      IPerl->perlbrew('perl-5.26.0@reproducible');
+      # 0 - it is already loaded
+      IPerl->perlbrew('perl-5.26.0@reproducible');
+      # -1 - no library specified
+      IPerl->perlbrew();
+      # 1 - success switching off reproducible and reverting to perl-5.26.0
+      IPerl->perlbrew($ENV{'PERLBREW_PERL'});
+
+    This is identical to "perlbrew use perl-5.26.0@reproducible" and will
+    switch any from any previous call. Returns 1, 0 or -1 for *success*, *no
+    change* and *error* respectively. A name for the library is required. To
+    revert to the *"system"* or non-library version pass the value of
+    $ENV{PERLBREW_PERL}.
+
+      IPerl->perlbrew('perl-5.26.0@tutorial', 1);
+
+    The function takes a Boolean as an optional second argument. A *true*
+    value will result in all the modules that were loaded during the
+    activity of the previous library to be unloaded using delete_package.
+    The default value is *false* as setting is to true might expose the
+    unexpected behaviour.
+
+    When using multiple perlbrew libraries it may be possible to use modules
+    from both, although this is not a recommended use.
+
+      IPerl->perlbrew('perl-5.26.0@tutorial');
+      use Jupyter::Tutorial::Simple;
+      ## run some code
+
+      ## load @reproducible, but do not unload Jupyter::Tutorial::Simple
+      IPerl->perlbrew('perl-5.26.0@reproducible', 0);
+      use Bio::Taxonomy;
+      ## ... more code, possibly using Jupyter::Tutorial::Simple
+
+  perlbrew_domain
+    This is experimental.
+
+      # /home/username/.perlbrew
+      IPerl->perlbrew_domain;
+      # /work/username/perlbrew-libs
+      IPerl->perlbrew_domain('/work/username/perlbrew-libs');
+
+    Users often generate a large number of libraries which can quickly
+    result in a long list generated in the output of "perlbrew_list". This
+    experimental feature allows for switching between *domains* to reduce
+    the size of these lists. Thus, a collection of libraries are organised
+    under domains. These are only directories, must exist before use and are
+    synonymous with $ENV{PERLBREW_HOME}. Indeed, this is a convenient
+    alternative to $App::perlbrew::PERLBREW_HOME.
+
+  perlbrew_lib_create
+      # 1 - success
+      IPerl->perlbrew_lib_create('reproducible');
+      # 0 - already exists
+      IPerl->perlbrew_lib_create('reproducible');
+      # -1 - no library name given
+      IPerl->perlbrew_lib_create();
+
+    This is identical to "perlbrew lib create". Returns 1, 0 or -1 for
+    *success*, *already exists* and *error* respectively.
+
+  perlbrew_list
+      IPerl->perlbrew_list;
+
+    This is identical to "perlbrew list" and will output the same
+    information.
+
+  perlbrew_list_modules
+      IPerl->perlbrew_list_modules;
+
+    This is identical to "perlbrew list_modules" and will output the same
+    information.
+
+ENVIRONMENT VARIABLES
+    The following environment variables alter the behaviour of the plugin.
+
+    IPERL_PLUGIN_PERLBREW_DEBUG
+        A logical to control how verbose the plugin is during its
+        activities.
+
+    IPERL_PLUGIN_PERLBREW_CLASS
+        This defaults to App::prelbrew
+
+INTERNAL INTERFACES
+    These are part of the internal interface and not designed for end user
+    consumption.
+
+  brew
+      $plugin->brew;
+
+    Use the perlbrew library specified in "name".
+
+  env
+      $plugin->env({PERLBREW_ROOT => '/sw/perlbrew', ...});
+      # {PERLBREW_ROOT => '/sw/perlbrew', ...}
+      $plugin->env;
+
+    An accessor that stores the environment from App::perlbrew for a
+    subsequent call to "brew".
+
+  new
+      my $plugin = Devel::IPerl::Plugin::Perlbrew->new();
+
+    Instantiate an object.
+
+  name
+      $plugin->name('perl-5.26.0@reproducible');
+      # perl-5.26.0@reproducible
+      $plugin->name;
+
+    An accessor for the name of the perlbrew library.
+
+  saved
+      $plugin->saved;
+
+    An accessor for the previous environment variables so they may be
+    restored as the "brew" "spoil"s.
+
+  spoil
+      $plugin->spoil;
+
+    When a "brew" is finished with. This is called automatically during
+    object destruction.
+
+  success
+      # boolean where 1 == success, 0 == not success
+      $plugin->success;
+
+    Was everything a success?
+
+  unload
+      $plugin->unload(1);
+      # 1
+      $plugin->unload;
+
+    A flag to determine whether to unload all the modules that were used as
+    part of this library during cleanup.
+

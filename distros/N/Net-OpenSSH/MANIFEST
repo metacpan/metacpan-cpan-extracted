@@ -25,17 +25,17 @@ t/test_user_key.pub
 t/known_hosts
 t/quoting.t
 t/uri.t
-sample/expect.pl
-sample/change_passwd.pl
-sample/autosudo.pl
-sample/net-telnet.pl
-sample/login_handler.pl
-sample/mod_perl_openssh.pm
-sample/keep_in_sync.pl
-sample/password_from_data.pl
-sample/git_ssh_through_mux.pl
-sample/git_with_password.pl
-sample/sshfs_mount.pl
+examples/expect.pl
+examples/change_passwd.pl
+examples/autosudo.pl
+examples/net-telnet.pl
+examples/login_handler.pl
+examples/mod_perl_openssh.pm
+examples/keep_in_sync.pl
+examples/password_from_data.pl
+examples/git_ssh_through_mux.pl
+examples/git_with_password.pl
+examples/sshfs_mount.pl
 patches/openssh-fwd-stdio-to-streamlocal-1.patch
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

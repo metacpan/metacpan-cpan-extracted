@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib;
 
 # ABSTRACT: Perlish wrapper for Raylib videogame library
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Carp;
 use Graphics::Raylib::XS qw(:all);
@@ -22,7 +22,7 @@ Graphics::Raylib - Perlish wrapper for Raylib videogame library
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ version 0.014
 
 raylib is highly inspired by Borland BGI graphics lib and by XNA framework. Allegro and SDL have also been analyzed for reference.
 
-NOTE for ADVENTURERS: raylib is a programming library to learn videogames programming; no fancy interface, no visual helpers, no auto-debugging... just coding in the most pure spartan-programmers way. Are you ready to learn? Jump to L<code examples|http://www.raylib.com/examples.html> or L<games|http://www.raylib.com/games.html>!.
+NOTE for ADVENTURERS: raylib is a programming library to learn videogames programming; no fancy interface, no visual helpers, no auto-debugging... just coding in the most pure spartan-programmers way. Are you ready to learn? Jump to L<code examples|http://www.raylib.com/examples.html> or L<games|http://www.raylib.com/games.html>!
 
 
 =head1 IMPLEMENTATION
@@ -103,7 +103,8 @@ sub window {
     my $class = shift;
 
     my $self = { width => shift, height => shift, title => shift // $0, @_ };
-    InitWindow($self->{width}, $self->{height}, $self->{title}) or return;
+    InitWindow($self->{width}, $self->{height}, $self->{title});
+    IsWindowReady() or return;
     SetTargetFPS($self->{fps}) if defined $self->{fps};
     ClearBackground($self->{background}) if defined $self->{background};
 

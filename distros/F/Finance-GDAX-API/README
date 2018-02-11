@@ -92,7 +92,7 @@ There is another convenience method inherited into all API modules for
 the variously paranoid called "external_secret" which is documented in
 Finance::GDAX::API
 
-This method will take a file name and read it in to assigns the 3 API
+This method will take a file name and read it in to assign the 3 API
 keys necessary for requests that was assigned to you by GDAX.
 
 It will also optionally fork a process that will read from an external
@@ -117,4 +117,8 @@ TODO
 Some of the long informational requests to GDAX have a paging aspect
 if they returned records exceed 100. This implementation of the API
 does not yet support paged records. Best to limit by time for now.
+
+THANKS FOR BUG/HELP
+===================
+Sean Newton
 

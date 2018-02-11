@@ -1,4 +1,9 @@
 -------------------------
+2018-02-06	v0.32
+-------------------------
+* Fix test failure on some systems
+
+-------------------------
 2018-02-03	v0.31
 -------------------------
 * Added support for arithmetic to timecode executable

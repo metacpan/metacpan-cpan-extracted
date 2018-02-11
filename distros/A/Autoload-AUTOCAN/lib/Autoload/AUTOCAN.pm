@@ -5,20 +5,21 @@ use warnings;
 use Carp ();
 use Scalar::Util ();
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my $autoload_methods = <<'EOF';
 sub AUTOLOAD {
   my ($inv) = @_;
-  my ($package, $method) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
-  Carp::croak qq[Undefined subroutine &${package}::$method called]
+  my ($package, $function) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
+  Carp::croak qq[Undefined subroutine &${package}::$function called]
     unless defined $inv && (!ref $inv or Scalar::Util::blessed $inv) && $inv->isa(__PACKAGE__);
-  return if $method eq 'DESTROY';
+  return if $function eq 'DESTROY';
   my $autocan = $inv->can('AUTOCAN');
-  my $sub = defined $autocan ? $inv->$autocan($method) : undef;
-  Carp::croak qq[Can't locate object method "$method" via package "$package"]
-    unless defined $sub and do { local $@; eval { $sub = \&$sub } };
+  my $sub = defined $autocan ? $inv->$autocan($function) : undef;
+  Carp::croak qq[Can't locate object method "$function" via package "$package"]
+    unless defined $sub and do { local $@; eval { $sub = \&$sub; 1 } };
   # allow overloads and blessed subrefs; assign ref so overload is only invoked once
+__INSTALL_SUB_CODE__
   goto &$sub;
 }
 EOF
@@ -29,8 +30,9 @@ sub AUTOLOAD {
   my $autocan = __PACKAGE__->can('AUTOCAN');
   my $sub = defined $autocan ? __PACKAGE__->$autocan($function) : undef;
   Carp::croak qq[Undefined subroutine &${package}::$function called]
-    unless defined $sub and do { local $@; eval { $sub = \&$sub } };
+    unless defined $sub and do { local $@; eval { $sub = \&$sub; 1 } };
   # allow overloads and blessed subrefs; assign ref so overload is only invoked once
+__INSTALL_SUB_CODE__
   goto &$sub;
 }
 EOF
@@ -42,28 +44,50 @@ sub can {
   return $sub if defined $sub;
   return undef if $function eq 'AUTOCAN'; # don't recurse on AUTOCAN
   my $autocan = $package->can('AUTOCAN');
-  return defined $autocan ? scalar $package->$autocan($function) : undef;
+  $sub = defined $autocan ? $package->$autocan($function) : undef;
+  return undef unless defined $sub and do { local $@; eval { $sub = \&$sub; 1 } };
+  # allow overloads and blessed subrefs; assign ref so overload is only invoked once
+__INSTALL_SUB_CODE__
+  return $sub;
 }
 EOF
 
+my $install_subs = <<'EOF';
+  {
+    require Sub::Util;
+    no strict 'refs';
+    *{"${package}::$function"} = Sub::Util::set_subname("${package}::$function", $sub);
+  }
+EOF
+
 sub import {
-  my ($class, $style) = @_;
-  $style = 'methods' unless defined $style;
+  my ($class, @args) = @_;
+  
+  my $autoload_code = $autoload_methods;
+  my $can_code = $install_can;
+  my $install_sub_code = '';
+  
+  foreach my $arg (@args) {
+    if ($arg eq 'methods') {
+      $autoload_code = $autoload_methods;
+    } elsif ($arg eq 'functions') {
+      $autoload_code = $autoload_functions;
+    } elsif ($arg eq 'install_subs') {
+      $install_sub_code = $install_subs;
+    } else {
+      Carp::croak "Unrecognized import argument '$arg'";
+    }
+  }
+  
+  $autoload_code =~ s/__INSTALL_SUB_CODE__/$install_sub_code/;
+  $can_code =~ s/__INSTALL_SUB_CODE__/$install_sub_code/;
   
   my $target = caller;
-  my $autoload_code;
-  if ($style eq 'methods') {
-    $autoload_code = $autoload_methods;
-  } elsif ($style eq 'functions') {
-    $autoload_code = $autoload_functions;
-  } else {
-    Carp::croak "Invalid autoload style '$style' (expected 'functions' or 'methods')";
-  }
   
   my ($errored, $error);
   {
     local $@;
-    unless (eval "package $target;\n$install_can\n$autoload_code\n1") {
+    unless (eval "package $target;\n$can_code\n$autoload_code\n1") {
       $errored = 1;
       $error = $@;
     }
@@ -127,6 +151,12 @@ Along with C<AUTOLOAD>, the module installs a C<can> method which returns code
 references as normal for defined methods (see L<UNIVERSAL>), and delegates to
 C<AUTOCAN> for unknown methods.
 
+=head1 CONFIGURING
+
+L<Autoload::AUTOCAN> accepts import arguments to configure its behavior.
+
+=head2 functions
+
 C<AUTOLOAD> affects standard function calls in addition to method calls. By
 default, the C<AUTOLOAD> provided by this module will die (as Perl normally
 does without a defined C<AUTOLOAD>) if a nonexistent function is called without
@@ -147,6 +177,41 @@ rather than using the first argument as an invocant.
   # elsewhere
   say My::Functions::duplicate('foo'); # foofoofoofoofoo
   say My::Functions::foo('bar'); # undefined subroutine error
+
+=head2 install_subs
+
+By passing C<install_subs> as an import argument, any autoloaded function or
+method returned by C<AUTOCAN> will be installed into the package, so that
+future invocations do not need to go through C<AUTOLOAD>. This should not be
+used if the autoloaded code is expected to change in subsequent calls to
+C<AUTOCAN>, as the installed version will be called or returned by C<can>
+directly.
+
+  package My::Class;
+  use Moo;
+  use Autoload::AUTOCAN 'install_subs';
+  
+  sub AUTOCAN {
+    my ($self, $method) = @_;
+    my $hash = expensive_calculation($method);
+    return sub { $hash };
+  }
+  
+  # elsewhere
+  my $obj = My::Class->new;
+  $obj->foo; # sub foo installed in My::Class
+  $obj->foo; # not autoloaded anymore
+
+=head1 CAVEATS
+
+If you use L<namespace::clean>, it will clean up the installed C<AUTOLOAD>
+function. To avoid this, either use this module B<after> L<namespace::clean>,
+or add an exception for C<AUTOLOAD> as below.
+
+  use Autoload::AUTOCAN;
+  use namespace::clean -except => 'AUTOLOAD';
+
+This issue does not seem to occur with L<namespace::autoclean>.
 
 =head1 BUGS
 

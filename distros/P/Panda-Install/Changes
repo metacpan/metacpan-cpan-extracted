@@ -1,3 +1,5 @@
+1.2.12   06.02.2018
+           - make possible for XS files to compile to .cc extensions
 1.2.11   02.01.2018
            - bugfix: related path require
 1.2.10   31.01.2018

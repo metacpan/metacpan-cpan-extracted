@@ -1,37 +1,11 @@
 package Net::Statsd::Tiny::Types;
 
-# ABSTRACT: A type library for Net::Statsd::Tiny
+# ABSTRACT: This is no longer used
 
 use strict;
 use warnings;
 
-use Type::Library -base;
-use Type::Utils -all;
-
-BEGIN { extends "Types::Standard" }
-
-our $VERSION = 'v0.2.1';
-
-
-declare "PosInt", as Int,
-  where { $_ >= 0 },
-  inline_as { my $n = $_[1]; "$n >= 0" };
-
-declare "PosNum", as StrictNum,
-  where { $_ >= 0 },
-  inline_as { my $n = $_[1]; "$n >= 0" };
-
-declare "Port", as "PosInt",
-  where { $_ >= 0 && $_ <= 65535 },
-  inline_as { my $port = $_[1]; "$port >= 0 && $port <= 65535" };
-
-declare "Rate", as StrictNum,
-  where { $_ >= 0 && $_ <= 1 },
-  inline_as { my $n = $_[1]; "$n >= 0 && $n <= 1" };
-
-declare "Gauge", as Str,
-  where { $_ =~ /\A[\-\+]?\d+\z/ },
-  inline_as { my $n = $_[1]; "$n =~ /\\A[\\-\\+]?\\d+\\z/" };
+our $VERSION = 'v0.3.0';
 
 
 1;
@@ -44,18 +18,15 @@ __END__
 
 =head1 NAME
 
-Net::Statsd::Tiny::Types - A type library for Net::Statsd::Tiny
+Net::Statsd::Tiny::Types - This is no longer used
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.0
 
 =head1 DESCRIPTION
 
-This module provides types for L<Net::Statsd::Tiny>.
-
-The types declared here are intended for internal use, and subject to
-change.
+This module has been renamed to L<Net::Statsd::Lite::Types>.
 
 =head1 SOURCE
 

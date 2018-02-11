@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Needs 'Log::Contextual';
+use Test::Needs {'Log::Contextual' => '0.008001'};
 
 use Mojo::Log;
 use Mojo::Util 'dumper';

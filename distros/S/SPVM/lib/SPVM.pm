@@ -26,18 +26,79 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0308';
+our $VERSION = '0.0309';
 
 our $COMPILER;
 our $API;
 our @PACKAGE_INFOS;
 our %PACKAGE_INFO_SYMTABLE;
+our $HOME_DIR;
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
 
+sub create_jit_sub_name {
+  my $sub_name = shift;
+  
+  my $jit_sub_name = $sub_name;
+  
+  $jit_sub_name =~ s/:/_/g;
+  
+  $jit_sub_name = "SPVM_JITCODE_$jit_sub_name";
+  
+  return $jit_sub_name;
+}
+
+my $count = 0;
+
+sub compile_jit_sub {
+  my ($sub_id, $sub_jitcode_source) = @_;
+  
+  my $sub_abs_name = SPVM::get_sub_name($sub_id);
+  my $jit_sub_name = SPVM::create_jit_sub_name($sub_abs_name);
+  
+  # Build JIT code
+  my $jit_source_dir = $SPVM::HOME_DIR;
+  my $jit_source_file = "$jit_source_dir/$jit_sub_name.c";
+  my $jit_shared_lib_file = "$jit_source_dir/$jit_sub_name.$Config{dlext}";
+  
+  # Get old jit source
+  my $old_sub_jitcode_source;
+  if (-f $jit_source_file) {
+    open my $fh, '<', $jit_source_file
+      or die "Can't open $jit_source_file";
+    $old_sub_jitcode_source = do { local $/; <$fh> };
+  }
+  else {
+    $old_sub_jitcode_source = '';
+  }
+  
+  # Only compile when source is different
+  if (!-f $jit_shared_lib_file || ($sub_jitcode_source ne $old_sub_jitcode_source)) {
+    open my $fh, '>', $jit_source_file
+      or die "Can't create $jit_source_file";
+    print $fh $sub_jitcode_source;
+    close $fh;
+    
+    SPVM::Build::compile_jitcode($jit_source_file);
+  }
+  
+  my $sub_jit_address = search_shared_lib_func_address($jit_shared_lib_file, $jit_sub_name);
+  unless ($sub_jit_address) {
+    confess "Can't get $sub_abs_name jitcode address";
+  }
+  
+  bind_jitcode_sub($sub_abs_name, $sub_jit_address);
+  
+  my $success = 1;
+  
+  return $success;
+}
+
 sub import {
   my ($class, $package_name) = @_;
+  
+  $SPVM::HOME_DIR ||= $ENV{SPVM_HOME_DIR} || tempdir(CLEANUP => 1);
   
   # Add package informations
   if (defined $package_name) {
@@ -84,18 +145,15 @@ sub _get_dll_file {
   return $shared_lib_file;
 }
 
-sub search_native_address {
-  my ($shared_lib_file, $sub_abs_name) = @_;
+sub search_shared_lib_func_address {
+  my ($shared_lib_file, $shared_lib_func_name) = @_;
   
   my $native_address;
   
   if ($shared_lib_file) {
     my $dll_libref = DynaLoader::dl_load_file($shared_lib_file);
     if ($dll_libref) {
-      my $sub_abs_name_c = $sub_abs_name;
-      $sub_abs_name_c =~ s/:/_/g;
-      
-      $native_address = DynaLoader::dl_find_symbol($dll_libref, $sub_abs_name_c);
+      $native_address = DynaLoader::dl_find_symbol($dll_libref, $shared_lib_func_name);
     }
     else {
       return;
@@ -120,8 +178,10 @@ sub get_sub_native_address {
   
   my $dll_package_name = $package_name;
   my $shared_lib_file = _get_dll_file($dll_package_name);
-
-  my $native_address = search_native_address($shared_lib_file, $sub_abs_name);
+  
+  my $shared_lib_func_name = $sub_abs_name;
+  $shared_lib_func_name =~ s/:/_/g;
+  my $native_address = search_shared_lib_func_address($shared_lib_file, $shared_lib_func_name);
   
   # Try runtime compile
   unless ($native_address) {
@@ -150,7 +210,7 @@ sub get_sub_native_address {
       return;
     }
     else {
-      $native_address = search_native_address($shared_lib_file, $sub_abs_name);
+      $native_address = search_shared_lib_func_address($shared_lib_file, $shared_lib_func_name);
     }
   }
   
@@ -169,19 +229,6 @@ sub bind_native_subs {
     }
     bind_native_sub($native_func_name, $native_address);
   }
-}
-
-sub bind_jitcode {
-  my $shared_lib_file = shift;
-  
-  my $call_sub_name = 'SPVM_JITCODE_call_sub';
-  my $call_sub_native_address = search_native_address($shared_lib_file, $call_sub_name);
-  
-  unless ($call_sub_native_address) {
-    confess "Can't get jitcode call_sub native_address";
-  }
-  
-  bind_jitcode_call_sub($call_sub_native_address);
 }
 
 # Compile SPVM source code just after compile-time of Perl
@@ -235,31 +282,8 @@ sub compile_spvm {
     # Build run-time
     build_runtime();
     
-    # Free compiler
-    free_compiler();
-    
-    if (defined $ENV{PERL_SPVM_DIR}) {
-      # Build JIT code
-      my $jit_source_dir = tempdir(CLEANUP => 1);
-      my $jit_source_file = "$jit_source_dir/spvm_jitcode.c";
-      build_jitcode($jit_source_file);
-      
-      open my $fh, '<', $jit_source_file
-        or die "aaa";
-      my $jit_source_content = do { local $/; <$fh> };
-      #print $jit_source_content;
-      
-      # Compile JIT code
-      my $jitcode_lib_file = SPVM::Build::compile_jitcode($jit_source_file);
-      bind_jitcode($jitcode_lib_file);
-    }
-    
     # Build SPVM subroutines
     build_spvm_subs();
-  }
-  else {
-    # Free compiler
-    free_compiler();
   }
   
   return $compile_success;
@@ -865,14 +889,6 @@ L<SPVM::Document::Cookbook> - SPVM Cookbook, advanced technique and many example
 =head2 SPVM FAQ
 
 L<SPVM::Document::FAQ> - Oftten asked question.
-
-=head1 Environment Variable
-
-=head2 PERL_SPVM_DIR
-
-  PERL_SPVM_DIR=/var/data/spvm
-
-C<PERL_SPVM_DIR> is for SPVM cache and config directory.
 
 =head2 SUPPORT
 

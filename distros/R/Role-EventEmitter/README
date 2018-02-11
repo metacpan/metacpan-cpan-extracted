@@ -4,25 +4,25 @@ NAME
 
 SYNOPSIS
 
-      package Cat;
+      package Channel;
       use Moo;
       with 'Role::EventEmitter';
     
       # Emit events
-      sub poke {
+      sub send_message {
         my $self = shift;
-        $self->emit(roar => 3);
+        $self->emit(message => @_);
       }
     
       package main;
     
       # Subscribe to events
-      my $tiger = Cat->new;
-      $tiger->on(roar => sub {
-        my ($tiger, $times) = @_;
-        say 'RAWR!' for 1 .. $times;
+      my $channel_a = Channel->new;
+      $channel_a->on(message => sub {
+        my ($channel, $text) = @_;
+        say "Received message: $text";
       });
-      $tiger->poke;
+      $channel_a->send_message('All is well');
 
 DESCRIPTION
 
@@ -99,6 +99,23 @@ METHODS
         ...
       });
 
+ once_f
+
+      my $f = $e->once_f('foo');
+
+    Subscribe to event as in "once", returning a Future that will be marked
+    complete after it has been emitted once. Requires Future to be
+    installed.
+
+      my $f = $e->once_f('foo')->on_done(sub {
+        my ($e, @args) = @_;
+        ...
+      });
+
+    To unsubscribe the returned Future early, cancel it.
+
+      $f->cancel;
+
  subscribers
 
       my $subscribers = $e->subscribers('foo');
@@ -116,7 +133,7 @@ METHODS
       $e = $e->unsubscribe('foo');
       $e = $e->unsubscribe(foo => $cb);
 
-    Unsubscribe from event.
+    Unsubscribe from event. Related Futures will also be cancelled.
 
 DEBUGGING
 
@@ -133,9 +150,15 @@ AUTHOR
 
     Dan Book <dbook@cpan.org>
 
+    Code and tests adapted from Mojo::EventEmitter, an event emitter base
+    class by the Mojolicious team.
+
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2015 by Dan Book.
+    Copyright (c) 2008-2015 Sebastian Riedel.
+
+    Copyright (c) 2015 Dan Book for adaptation to a role and further
+    changes.
 
     This is free software, licensed under:
 
@@ -143,5 +166,6 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Mojo::EventEmitter, Mixin::Event::Dispatch, Beam::Emitter
+    Mojo::EventEmitter, Mixin::Event::Dispatch, Beam::Emitter,
+    Event::Distributor
 

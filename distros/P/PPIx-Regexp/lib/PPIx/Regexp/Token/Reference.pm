@@ -42,7 +42,7 @@ use base qw{ PPIx::Regexp::Token };
 use Carp qw{ confess };
 use List::Util qw{ first };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;

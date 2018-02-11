@@ -1,14 +1,14 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-MSCHOUT
 #
-# This software is copyright (c) 2017 by Michael Schout.
+# This software is copyright (c) 2018 by Michael Schout.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 
 package Dist::Zilla::PluginBundle::MSCHOUT;
-$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.36';
+$Dist::Zilla::PluginBundle::MSCHOUT::VERSION = '0.37';
 # ABSTRACT: Use L<Dist::Zilla> like MSCHOUT does
 
 use Moose;
@@ -24,11 +24,10 @@ use Dist::Zilla::PluginBundle::Git 1.101230;
 use Dist::Zilla::Plugin::AuthorSignatureTest;
 use Dist::Zilla::Plugin::AutoPrereqs;
 use Dist::Zilla::Plugin::AutoVersion;
-use Dist::Zilla::Plugin::Bugtracker;
 use Dist::Zilla::Plugin::CheckPrereqsIndexed;
 use Dist::Zilla::Plugin::FakeRelease;
 use Dist::Zilla::Plugin::Git::NextVersion;
-use Dist::Zilla::Plugin::Homepage;
+use Dist::Zilla::Plugin::GithubMeta;
 use Dist::Zilla::Plugin::InsertCopyright;
 use Dist::Zilla::Plugin::MetaJSON;
 use Dist::Zilla::Plugin::MetaProvides::Package;
@@ -37,7 +36,6 @@ use Dist::Zilla::Plugin::NextRelease;
 use Dist::Zilla::Plugin::PodWeaver;
 use Dist::Zilla::Plugin::Prereqs::AuthorDeps;
 use Dist::Zilla::Plugin::RemovePrereqs;
-use Dist::Zilla::Plugin::Repository;
 use Dist::Zilla::Plugin::Signature;
 use Dist::Zilla::Plugin::TaskWeaver 0.093330;
 use Dist::Zilla::Plugin::TravisYML;
@@ -90,16 +88,14 @@ sub configure {
             AuthorSignatureTest
             MinimumPerl
             InsertCopyright
-            Repository
-            Bugtracker
-            Homepage
             Signature
             Prereqs::AuthorDeps
             MetaProvides::Package
             MetaJSON
         ),
         # update release in Changes file
-        [ NextRelease => { format => '%-2v  %{yyyy-MM-dd}d' } ]
+        [ NextRelease => { format => '%-2v  %{yyyy-MM-dd}d' } ],
+        [ GithubMeta => { issues => 1 } ]
     );
 
     if ($self->is_task) {
@@ -210,7 +206,7 @@ Dist::Zilla::PluginBundle::MSCHOUT - Use L<Dist::Zilla> like MSCHOUT does
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -229,13 +225,14 @@ It's equivalent to:
  [MinimumPerl]
  [InsertCopyright]
  [PodWeaver]
- [Repository]
- [Bugtracker]
- [Homepage]
  [Signature]
  [MetaJSON]
  [NextRelease]
     format = "%-2v  %{yyyy-MM-dd}d"
+
+ [GithubMeta]
+    issues = 1
+
  [Git::Check]
  allow_dirty = .travis.yml
  [Git::Commit]
@@ -308,13 +305,17 @@ This PluginBundle also supports C<PluginRemover>, so removing a plugin is as sim
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/dist-zilla-pluginbundle-mschout>
-and may be cloned from L<git://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
+The development version is on github at L<http://https://github.com/mschout/dist-zilla-pluginbundle-mschout>
+and may be cloned from L<git://https://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-dist-zilla-pluginbundle-mschout@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MSCHOUT
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/dist-zilla-pluginbundle-mschout/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -322,7 +323,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Schout.
+This software is copyright (c) 2018 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

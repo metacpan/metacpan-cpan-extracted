@@ -1,3 +1,15 @@
+5.1.0
+- Removed examples and support for v201702. For future sunset dates, see
+https://developers.google.com/adwords/api/docs/sunset-dates
+- Added the ReportQueryBuilder utility for building AWQL queries for reporting.
+An example of using this utility can be found in
+download_criteria_report_with_awql.pl.
+- Added the ServiceQueryBuilder utility for building AWQL queries for services.
+An example of using this utility can be found in
+get_campaigns_with_awql.pl.
+- Updated the upload_offline_data.pl example to show both third party and first
+party uploads.
+
 5.0.0
 - Replaced XML::XPath with XML::LibXML, which resulted in a significant
   improvement in memory usage and performance.

@@ -12,5 +12,7 @@ t/03to_string.t
 t/04conversions.t
 t/05defaults.t
 t/TestHelper.pm
+Time-Timecode-0.32/META.json
+Time-Timecode-0.32/META.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

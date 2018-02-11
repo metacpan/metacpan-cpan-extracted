@@ -1,0 +1,19 @@
+<h1>User: [% session.spid_session.nameid %]</h1>
+<h2>SPID Level: [% session.spid_session.spid_level %]</h2>
+ 
+<p><a href="/logout">Logout</a></p>
+ 
+<h2>Attributes</h2>
+ 
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Value</th>
+  </tr>
+  [% FOREACH key IN session.spid_session.attributes.keys %]
+      <tr>
+        <td>[% key %]</td>
+        <td>[% session.spid_session.attributes.$key.join(', ') %]</td>
+      </tr>
+  [% END %]
+</table>

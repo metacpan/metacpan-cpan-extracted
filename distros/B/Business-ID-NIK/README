@@ -1,15 +1,21 @@
-SYNOPSIS
+NAME
+    Business::ID::NIK - Parse Indonesian citizenship registration number
+    (NIK)
 
+VERSION
+    This document describes version 0.090 of Business::ID::NIK (from Perl
+    distribution Business-ID-NIK), released on 2018-02-07.
+
+SYNOPSIS
         use Business::ID::NIK qw(parse_nik);
-    
+
         my $res = parse_nik(nik => "3273010119800002");
 
 DESCRIPTION
-
     This module can be used to validate Indonesian citizenship registration
-    number, Nomor Induk Kependudukan (NIK), or more popularly known as
-    Nomor Kartu Tanda Penduduk (Nomor KTP), because NIK is displayed on the
-    KTP (citizen identity card).
+    number, Nomor Induk Kependudukan (NIK), or more popularly known as Nomor
+    Kartu Tanda Penduduk (Nomor KTP), because NIK is displayed on the KTP
+    (citizen identity card).
 
     NIK is composed of 16 digits as follow:
 
@@ -21,4 +27,64 @@ DESCRIPTION
     2-digit subdistrict [kecamatan] code), ddmmyy is date of birth of the
     citizen (dd will be added by 40 for female), ssss is 4-digit serial
     starting from 1.
+
+FUNCTIONS
+  parse_nik
+    Usage:
+
+     parse_nik(%args) -> [status, msg, result, meta]
+
+    Parse Indonesian citizenship registration number (NIK).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   check_locality => *bool* (default: 1)
+
+        Whether to check for known locality (city) codes.
+
+    *   check_province => *bool* (default: 1)
+
+        Whether to check for known province codes.
+
+    *   nik* => *str*
+
+        Input NIK to be validated.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Business-ID-NIK>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Business-ID-NIK>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Business-ID-NIK>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

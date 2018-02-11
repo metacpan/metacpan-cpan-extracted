@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Display::Basic;
-$CGI::Application::Plugin::Authentication::Display::Basic::VERSION = '0.21';
+$CGI::Application::Plugin::Authentication::Display::Basic::VERSION = '0.22';
 use base qw(CGI::Application::Plugin::Authentication::Display);
 
 use 5.006;

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.06 9 Feb 2018
+- Remove unused “Pending” modules (holdovers from Net::ACME)
+
 0.05 18 Jan 2018
 - Minimum X::Tiny version of 0.12.
 

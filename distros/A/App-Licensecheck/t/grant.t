@@ -67,7 +67,7 @@ run_me(
 
 # CC-BY-SA
 run_me(
-	{   license => 'CC-BY-SA-3.0',
+	{   license => 'CC-BY-SA-3.0 and/or GFDL-1.2',
 		corpus  => 'CC-BY-SA_and_more/WMLA'
 	}
 );
@@ -105,6 +105,7 @@ TODO: {
 	local $TODO = 'not yet handled';
 	run_me( { license => 'LGPL', corpus => 'LGPL/PKG-INFO' } );
 }
+
 run_me( { license => 'LGPL-2.1',  corpus => 'LGPL/criu.h' } );
 run_me( { license => 'LGPL',      corpus => 'LGPL/dqblk_xfs.h' } );
 run_me( { license => 'LGPL',      corpus => 'LGPL/exr.h' } );
@@ -116,6 +117,11 @@ run_me( { license => 'LGPL-2.1+', corpus => 'LGPL/strv.c' } );
 run_me( { license => 'LGPL-2+',   corpus => 'LGPL/table.py' } );
 run_me(
 	{ license => 'LGPL-2.1 or LGPL-3', corpus => 'LGPL/videoplayer.cpp' } );
+run_me(
+	{   license => 'LGPL-2.1+ and/or LGPL-bdwgc',
+		corpus  => 'LGPL_and_more/colamd.c'
+	}
+);
 run_me(
 	{   license => 'LGPL-2.1 or GPL-2.0 and/or MPL-1.1',
 		corpus  => 'LGPL_and_more/da.aff'
@@ -162,6 +168,13 @@ TODO: {
 }
 
 # MIT
+run_me(
+	{   license => 'bdwgc',
+		corpus  => 'MIT/gc.h'
+	}
+);
+
+run_me( { license => 'bdwgc-matlab', corpus => 'MIT/old_colamd.c' } );
 run_me(
 	{   license => 'MIT~old',
 		corpus  => 'MIT/harfbuzz-impl.c'

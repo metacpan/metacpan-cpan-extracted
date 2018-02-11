@@ -24,10 +24,13 @@ use Business::Fixflo::Property;
 
     Address
     AdditionalDetails
+    AppointmentDate
+    AttendenceDate
     AssignedAgent
     Block
     BlockName
     CallbackId
+    CloseReason
     ContactNumber
     ContactNumberAlt
     Created
@@ -47,6 +50,8 @@ use Business::Fixflo::Property;
     Property
     PropertyId
     PropertyAddressId
+    Quotes
+    QuoteEndTime
     Salutation
     SearchStatus
     Status
@@ -66,6 +71,8 @@ use Business::Fixflo::Property;
 has [ qw/
     Address
     AdditionalDetails
+    AppointmentDate
+    AttendenceDate
     AssignedAgent
     Block
     BlockName
@@ -73,6 +80,7 @@ has [ qw/
     ContactNumber
     ContactNumberAlt
     Created
+    CloseReason
     DirectEmailAddress
     DirectMobileNumber
     EmailAddress
@@ -89,6 +97,8 @@ has [ qw/
     Media
     Property
     PropertyAddressId
+    Quotes
+    QuoteEndTime
     Salutation
     SearchStatus
     Status

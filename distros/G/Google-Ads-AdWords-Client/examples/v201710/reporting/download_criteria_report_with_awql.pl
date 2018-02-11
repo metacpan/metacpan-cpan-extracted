@@ -23,6 +23,7 @@ use utf8;
 
 use Google::Ads::AdWords::Client;
 use Google::Ads::AdWords::Logging;
+use Google::Ads::AdWords::Utilities::ReportQueryBuilder;
 use Google::Ads::Common::ReportUtils;
 
 use Cwd qw(abs_path);
@@ -39,12 +40,20 @@ sub download_criteria_report_with_awql {
   my $yesterday = sprintf("%d%02d%02d", ($year + 1900), ($mon + 1), $mday);
   (undef, undef, undef, $mday, $mon, $year) =
     localtime(time - 60 * 60 * 24 * 4);
-  my $last_4_days = sprintf("%d%02d%02d", ($year + 1900), ($mon + 1), $mday);
+  my $four_days_ago = sprintf("%d%02d%02d", ($year + 1900), ($mon + 1), $mday);
 
   my $report_query =
-    "SELECT CampaignId, AdGroupId, Id, Criteria, CriteriaType, " .
-    "Impressions, Clicks, Cost FROM CRITERIA_PERFORMANCE_REPORT " .
-    "WHERE Status IN [ENABLED, PAUSED] " . "DURING $last_4_days, $yesterday";
+    Google::Ads::AdWords::Utilities::ReportQueryBuilder->new(
+    {client => $client})
+    ->select([
+      "CampaignId",   "AdGroupId",   "Id",     "Criteria",
+      "CriteriaType", "Impressions", "Clicks", "Cost"
+    ]
+    )->from("CRITERIA_PERFORMANCE_REPORT")
+    ->where("Status")
+    ->in(["ENABLED", "PAUSED"])
+    ->during($four_days_ago, $yesterday)
+    ->build();
 
   # Optional: Modify the reporting configuration of the client to suppress
   # header, column, or summary rows in the report output and include data with
@@ -59,9 +68,11 @@ sub download_criteria_report_with_awql {
 
   # Get the report handler.
   my $report_handler = Google::Ads::Common::ReportUtils::get_report_handler({
-    query => $report_query,
-    format => "CSV"
-  }, $client);
+      query  => $report_query,
+      format => "CSV"
+    },
+    $client
+  );
 
   # Download the report using the appropriate method on ReportDownloadHandler.
   my $result;
@@ -73,7 +84,7 @@ sub download_criteria_report_with_awql {
 
   if (!$result) {
     printf("An error has occurred of type '%s', triggered by '%s'.\n",
-           $result->get_type(), $result->get_trigger());
+      $result->get_type(), $result->get_trigger());
   } elsif ($output_file) {
     printf("Report was downloaded to \"%s\".\n", $output_file);
   } else {

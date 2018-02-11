@@ -3,12 +3,15 @@ ignore.txt
 lib/RRD/Editor.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
 META.yml
 README
 scripts/dumplfile.pl
 scripts/rrdtool.pl
 scripts/t.pl
 t/00-load.t
+t/33-delete-rra.t
+t/34-resize-rra.t
 t/createfile.t
 t/editing.t
 t/pod-coverage.t
@@ -22,4 +25,3 @@ t/test.rrd.info
 t/test.rrd.rra_editing.dump
 t/test.rrd.rrdtool
 t/test.rrd.single
-META.json                                Module JSON meta-data (added by MakeMaker)

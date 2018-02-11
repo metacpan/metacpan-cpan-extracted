@@ -29,7 +29,7 @@ use Carp;
 use Astro::Coords;
 use Astro::Catalog;
 use Astro::Catalog::Star;
-$VERSION = "4.32";
+$VERSION = "4.33";
 
 # C O N S T R U C T O R ----------------------------------------------------
 

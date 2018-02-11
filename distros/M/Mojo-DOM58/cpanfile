@@ -7,3 +7,4 @@ suggests 'Role::Tiny' => '2.000001';
 test_requires 'Encode';
 test_requires 'JSON::PP';
 test_requires 'Test::More' => '0.88';
+author_requires 'Role::Tiny' => '2.000001';

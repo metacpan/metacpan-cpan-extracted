@@ -3,32 +3,50 @@ package Test::BDD::Cucumber::Definitions::TypeConstraints;
 use strict;
 use warnings;
 
-use Moose::Util::TypeConstraints;
+use MooseX::Types (
+    -declare => [
+        qw(
+            ValueString
+            ValueInteger
+            ValueRegexp
+            ValueJsonpath
+            )
+    ]
+);
+
+use MooseX::Types::Moose qw(Str Int RegexpRef);
+
 use Try::Tiny;
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 subtype(
-    'ValueString',
-    as 'Str',
-    message {qq{"$_" is not a valid string}}
+    ValueString,
+    as Str,
+    message {
+        "$_ is not a valid string"
+    }
 );
 
 subtype(
-    'ValueInteger',
-    as 'Int',
-    message {qq{"$_" is not a valid integer}}
+    ValueInteger,
+    as Int,
+    message {
+        "$_ is not a valid integer"
+    }
 );
 
 subtype(
-    'ValueRegexp',
-    as 'RegexpRef',
-    message {qq{"$_" is not a valid regexp}}
+    ValueRegexp,
+    as RegexpRef,
+    message {
+        "$_ is not a valid regexp"
+    }
 );
 
 coerce(
-    'ValueRegexp',
-    from 'Str',
+    ValueRegexp,
+    from Str,
     via {
         my $value = $_;
 
@@ -42,9 +60,11 @@ coerce(
 );
 
 subtype(
-    'ValueJsonpath',
-    as 'Str',
-    message {qq{"$_" is not a valid jsonpath}}
+    ValueJsonpath,
+    as Str,
+    message {
+        "$_ is not a valid jsonpath"
+    }
 );
 
 1;

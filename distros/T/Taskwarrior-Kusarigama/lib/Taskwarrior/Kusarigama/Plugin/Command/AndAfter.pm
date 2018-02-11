@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Command::AndAfter;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a subsequent task
-$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.5.0';
+$Taskwarrior::Kusarigama::Plugin::Command::AndAfter::VERSION = '0.6.0';
 
 use 5.10.0;
 
@@ -38,7 +38,7 @@ Taskwarrior::Kusarigama::Plugin::Command::AndAfter - create a subsequent task
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

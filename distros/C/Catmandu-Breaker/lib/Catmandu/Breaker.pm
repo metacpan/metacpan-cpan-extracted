@@ -1,6 +1,6 @@
 package Catmandu::Breaker;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Moo;
 use Carp;
@@ -240,7 +240,7 @@ For instance, without a special handler:
     fol05731351   record[][]  0
     fol05731351   record[][]  a
 
-With a special handler:
+With the special L<marc handler|Catmandu::Exporter::Breaker::Parser::marc>:
 
     $ catmandu convert MARC to Breaker --handler marc < t/camel.usmarc
 
@@ -255,7 +255,9 @@ With a special handler:
     fol05731351   040c  DLC
     fol05731351   040d  DLC
 
-For the L<Catmandu::XML> tools an C<xml> handler is available:
+For the L<Catmandu::PICA> tools a L<pica handler|Catmandu::Exporter::Breaker::Parser::pica> is available.
+
+For the L<Catmandu::XML> tools an L<xml handler|Catmandu::Exporter::Breaker::Parser::xml> is available:
 
     $ catmandu convert XML --path book to Breaker --handler xml < t/book.xml
 
@@ -304,5 +306,9 @@ L<Catmandu>, L<Catmandu::MARC>, L<Catmandu::XML>, L<Catmandu::Stat>
 =head1 AUTHOR
 
 Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>
+
+=head1 CONTRIBUTORS
+
+Jakob Voss, C<< nichtich at cpan.org >>
 
 =cut

@@ -16,14 +16,15 @@ my %params = (
     BIN_DEPS => ['CPP::catch::test'],
     CCFLAGS  => '-Wall -Wextra',
     OPTIMIZE  => '-g0 -O2',
+    #OPTIMIZE  => '-g0',
     XS => {},
     #CC => 'clang++',
 );
 
 if ($ENV{TEST_FULL}) {
     ($params{DEFINE}||='') .= ' -DTEST_FULL';
-    push @{$params{SRC}||=[]}, 't/src';
-    $params{XS}{'lib.xs'} = 'lib.c';
+    push @{$params{SRC}||=[]}, 't';
+    $params{XS}{'t/xs.xs'} = 't/xs.cc';
     ($params{CCFLAGS}||='') .= ' -fsanitize=undefined';
     push @{$params{LIBS}||=[]}, '-lubsan'; #sanitizer
     ($params{BIN_SHARE}{CCFLAGS}||='') .= ' -fsanitize=undefined -fno-sanitize=alignment';

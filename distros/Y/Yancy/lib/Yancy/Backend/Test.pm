@@ -1,5 +1,5 @@
 package Yancy::Backend::Test;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: A test backend for testing Yancy
 
 use Mojo::Base 'Mojo';
@@ -96,7 +96,7 @@ Yancy::Backend::Test - A test backend for testing Yancy
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 AUTHOR
 

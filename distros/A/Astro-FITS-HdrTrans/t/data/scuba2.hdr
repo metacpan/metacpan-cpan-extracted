@@ -54,6 +54,7 @@ WAVELEN =              0.00085 / [m] Wavelength
 COMMENT   '        '           / -- Mapping parameters --
 SAM_MODE= 'STARE   '           / Sample mode: STARE, DREAM or SCAN
 SW_MODE = 'NONE    '           / Switch mode: CHOP, PSSW, FREQ, or NONE
+INBEAM  = 'fts2 pol'           / Hardware in the beam
 OBS_TYPE= 'FOCUS   '           / Observation type -  Science, Pointing or Focus
 JIGL_CNT=                    0 / Number of points in DREAM pattern
 JIGL_NAM= '        '           / Name containing DREAM jiggle offsets

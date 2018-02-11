@@ -1,5 +1,5 @@
 package Net::Stripe;
-$Net::Stripe::VERSION = '0.33';
+$Net::Stripe::VERSION = '0.34';
 use Moose;
 use Class::Load;
 use Kavorka;
@@ -598,6 +598,9 @@ sub _get_collections {
     if (my $c = $args{object}) {
         push @path_args, "object=$c";
     }
+    if (my $c = $args{starting_after}) {
+        push @path_args, "starting_after=$c";
+    }
 
     # example: $Stripe->get_charges( 'count' => 100, 'created' => { 'gte' => 1397663381 } );
     if (defined($args{created})) {
@@ -718,7 +721,7 @@ method _build_api_base { 'https://api.stripe.com/v1' }
 
 method _build_ua {
     my $ua = LWP::UserAgent->new(keep_alive => 4);
-    $ua->agent("Net::Stripe/" . $Net::Stripe::VERSION);
+    $ua->agent("Net::Stripe/" . ($Net::Stripe::VERSION || 'dev'));
     return $ua;
 }
 
@@ -736,7 +739,7 @@ Net::Stripe - API client for Stripe.com
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -1677,7 +1680,7 @@ Rusty Conover
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Rusty Conover Sachin Sebastian Tom Eliaz
+=for stopwords Andrew Solomon Brian Collins Devin M. Certas Dimitar Petrov Dylan Reinhold E. Choroba Florian Heyer Hermann Calabria Jonathan "Duke" Leto Luke Closs Mohammad S Anwar Olaf Alders Paul Cochrane Rusty Conover Sachin Sebastian Sherrard Burton Slobodan Mišković Tom Eliaz
 
 =over 4
 
@@ -1744,6 +1747,14 @@ Rusty Conover <rusty@luckydinosaur.com>
 =item *
 
 Sachin Sebastian <sachinjsk@users.noreply.github.com>
+
+=item *
+
+Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+
+=item *
+
+Slobodan Mišković <slobodan@miskovic.ca>
 
 =item *
 

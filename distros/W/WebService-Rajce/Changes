@@ -1,3 +1,9 @@
+1.180380  2018-02-07 13:25:51+01:00 Europe/Prague
+	Restore http support - thanks Petr Písař
+
+1.180370  2018-02-06 14:46:28+01:00 Europe/Prague
+	https support
+
 1.152450  2015-09-02 18:17:28+02:00 Europe/Prague
 	Add long command line switches
 

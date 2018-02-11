@@ -1,7 +1,9 @@
 package WWW::Mechanize::Link;
-$WWW::Mechanize::Link::VERSION = '1.86';
+
 use strict;
 use warnings;
+
+our $VERSION = '1.87';
 
 #ABSTRACT: Link object for WWW::Mechanize
 
@@ -49,8 +51,6 @@ sub url_abs {
 }
 
 
-# vi:et:sw=4 ts=4
-
 1;
 
 __END__
@@ -65,7 +65,7 @@ WWW::Mechanize::Link - Link object for WWW::Mechanize
 
 =head1 VERSION
 
-version 1.86
+version 1.87
 
 =head1 SYNOPSIS
 

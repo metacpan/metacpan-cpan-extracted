@@ -1,0 +1,22 @@
+#!perl
+
+use strict;
+use warnings;
+
+[
+    {
+        description => "histogram",
+        autoflush   => 1,
+        prefix      => 'bar.',
+        input       => [ [qw/ histogram size 12000 /], ],
+        output      => "bar.size:12000|h\n",
+    },
+
+    {
+        description => "histogram with non-integer",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ histogram load 10.316 /], ],
+        output      => "foo.load:10.316|h\n",
+    },
+];

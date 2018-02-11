@@ -1,3 +1,27 @@
+2018-02-06 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.045)
+* Use API function for reconnect; fixes compilation on MariaDB 10.2.6+.
+  Fix provided by Pali.
+* Fixed broken link to MySQL download page, provided by Mohammad S Anwar.
+* Spelling fixes, provided by Ville Skyttä.
+
+
+2018-01-22 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.044)
+* Reapply https://github.com/perl5-dbi/DBD-mysql/pull/114 
+  "Improve SSL settings, reflect changes for BACKRONYM and 
+  Riddle vulnerabilities, enforce SSL encryption when mysql_ssl=1 is set"
+  Thank you to Pali Rohar, Daniël van Eeden, Booking.com, et al:w
+* Fix parsing configure libs from mysql_config --libs output in Makefile.PL
+  Libraries in mysql_config --libs output can be specified by library name
+  with the -l prefix or by absolute path to library name without any prefix.
+  Parameters must start with a hyphen, so treat all options without leading
+  hyphen in mysql_config --libs output as libraries with full path.
+  Partially fixes bug https://rt.cpan.org/Public/Bug/Display.html?id=100898
+  Fix by Pali Rohár.
+* Return INTs with ZEROFILL as strings. Reported by Knarf, fix by Pali Rohár.
+   https://rt.cpan.org/Public/Bug/Display.html?id=118977
+* Correct require on relative path for perl 5.26. Fix by Grinnz.
+   https://github.com/perl5-dbi/DBD-mysql/pull/136
+
 2017-06-29 Patrick Galbraith, Michiel Beijen, DBI/DBD community (4.043)
 
 YOUR ATTENTION PLEASE, THIS IS A REVERT TO 4.041
@@ -409,7 +433,7 @@ docs to POD - Thanks!
 
 2010-07-10 Patrick Galbraith <patg at patg dot net> (4.016)
 * Disabled mysql_bind_type_guessing due to one performance issue
-  querying on a indexed character column unquoted will mean the index
+  querying on an indexed character column unquoted will mean the index
   is not used
 * Fixed int types that should be bools
 
@@ -1424,7 +1448,7 @@ Tokuhiro Matsuno!
 	* Makefile.lib (InitializeMysql): Modified order of -I statements
 	  (Inside MySQL distribution it can happen that headers of recently
 	  installed DBI versions are used instead of the correct headers.)
-	* nodbd/nodbd.xs.in, nodbd/typemap: Supressed warning for
+	* nodbd/nodbd.xs.in, nodbd/typemap: Suppressed warning for
 	  undef'd argument in connect method. (Chris Holt,
 	  <xris@migraine.stanford.edu>)
 	* nodbd/nodbd.xs.in: Fixed definition of 'HOST' attribute
@@ -1679,7 +1703,7 @@ DBD::mysql for DBI - Written by Alligator Descartes <descarte@mcqueen.com>
 	  Added the memory bug patch to this.
 
 96.06.18  Added pod documentation to mysql.pm and the possibility
-	  to retreive insert_id. This was done by Nathan Torkington.
+	  to retrieve insert_id. This was done by Nathan Torkington.
 
 	  Fixed memory bug that sql results never was freed.
 	  Now a result is freed when one calls the 'finish' action.

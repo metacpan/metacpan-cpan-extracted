@@ -14,6 +14,12 @@ unless ($API_KEY) {
     exit;
 }
 
+unless ($API_KEY =~ m/^sk_test_/) {
+    plan skip_all => "STRIPE_API_KEY env var MUST BE A TEST KEY to prevent modification of live data.";
+    exit;
+}
+
+
 my $future = DateTime->now + DateTime::Duration->new(years => 1);
 my $future_ymdhms = $future->ymd('-') . '-' . $future->hms('-');
 my $stripe = Net::Stripe->new(api_key => $API_KEY, debug => 1);
@@ -191,6 +197,28 @@ Charges: {
         my $charges = $stripe->get_charges( limit => 1 );
         is scalar(@{$charges->data}), 1, 'one charge returned';
         is $charges->get(0)->id, $charge->id, 'charge ids match';
+
+        # simulate address_line1_check failure
+        lives_ok {
+            $charge = $stripe->post_charge(
+                amount => 3300,
+                currency => 'usd',
+                card => {
+                    number => '4000-0000-0000-0028',
+                    exp_month => $future->month,
+                    exp_year  => $future->year,
+                    cvc => 123,
+                    address_line1 => '123 Main Street',
+                },
+                description => 'Wikileaks donation',
+            );
+        } 'Created a charge object';
+        isa_ok $charge, 'Net::Stripe::Charge';
+
+        # Check out the returned card object
+        $card = $charge->card;
+        isa_ok $card, 'Net::Stripe::Card';
+        is $card->address_line1_check, 'fail', 'card address_line1_check';
     }
 
     Charge_with_metadata: {
@@ -336,8 +364,10 @@ Customers: {
                 description => 'Test for Net::Stripe',
                 metadata => {'somemetadata' => 'hello world'},
             );
-            my $path = 'customers/'.$customer->id.'/cards/'.$customer->default_card;
-            my $card = $stripe->_get( $path );
+            my $card = $stripe->get_card(
+                customer=> $customer,
+                card_id=> $customer->default_card,
+            );
             isa_ok $card, 'Net::Stripe::Card';
             is $card->country, 'US', 'card country';
             is $card->exp_month, $future->month, 'card exp_month';
@@ -354,8 +384,10 @@ Customers: {
             );
             isa_ok $customer, 'Net::Stripe::Customer', 'got back a customer';
             ok $customer->id, 'customer has an id';
-            my $path = 'customers/'.$customer->id.'/cards/'.$customer->default_card;
-            my $card = $stripe->_get( $path );
+            my $card = $stripe->get_card(
+                customer=> $customer,
+                card_id=> $customer->default_card,
+            );
             is $card->last4, '4242', 'card token ok';
         }
 
@@ -382,7 +414,7 @@ Customers: {
             );
             isa_ok $subs, 'Net::Stripe::Subscription',
                 'got a subscription back';
-            is $subs->plan->id, $freeplan->id;
+            is $subs->plan->id, $freeplan->id, 'plan id matches';
 
             my $subs_again = $stripe->get_subscription(
                 customer => $other->id
@@ -454,7 +486,7 @@ Customers: {
             );
             isa_ok $priceysubs, 'Net::Stripe::Subscription',
                 'got a subscription back';
-            is $priceysubs->plan->id, $priceyplan->id;
+            is $priceysubs->plan->id, $priceyplan->id, 'plan id matches';
             $customer = $stripe->get_customer(customer_id => $customer->id);
             is $customer->subscriptions->get(0)->plan->id,
               $priceyplan->id, 'subscribed without a creditcard';
@@ -492,8 +524,10 @@ Invoices_and_items: {
         );
         ok $customer->id, 'customer has an id';
         is $customer->subscription->plan->id, $plan->id, 'customer has a plan';
-        my $path = 'customers/'.$customer->id.'/cards/'.$customer->default_card;
-        my $card = $stripe->_get( $path );
+            my $card = $stripe->get_card(
+                customer=> $customer,
+                card_id=> $customer->default_card,
+            );
         is $card->last4, $token->card->last4, 'customer has a card';
         
         my $ChargesList = $stripe->get_charges(limit => 1);

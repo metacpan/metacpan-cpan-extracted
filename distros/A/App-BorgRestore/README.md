@@ -10,6 +10,8 @@ borg-restore.pl \[options\] &lt;path>
      --help, -h                 short help message
      --debug                    show debug messages
      --update-cache, -u         update cache files
+     --list [pattern]           List paths contained in the backups, optionally
+                                matching an SQLite LIKE pattern
      --destination, -d <path>   Restore backup to directory <path>
      --time, -t <timespec>      Automatically find newest backup that is at least
                                 <time spec> old
@@ -65,6 +67,12 @@ It can be used to build your own restoration script.
 
     Update the lookup database. You should run this after creating or removing a backup.
 
+- **--list** **\[pattern\]**
+
+    List paths contained in the backups, optionally matching an SQLite LIKE
+    pattern. If no % occurs in the pattern, the patterns is automatically wrapped
+    between two % so it may match anywhere in the path.
+
 - **--destination=**_path_, **-d **_path_
 
     Restore the backup to 'path' instead of its original location. The destination
@@ -96,7 +104,7 @@ For configuration options please see [App::BorgRestore::Settings](https://metacp
 
 # LICENSE
 
-Copyright (C) 2016-2017  Florian Pritz <bluewind@xinu.at>
+Copyright (C) 2016-2018  Florian Pritz <bluewind@xinu.at>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

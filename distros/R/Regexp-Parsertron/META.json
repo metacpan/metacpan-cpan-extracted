@@ -41,7 +41,7 @@
             "Tree" : "1.1",
             "Try::Tiny" : "0.3",
             "Types::Standard" : "1.002001",
-            "perl" : "5.020002",
+            "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -64,6 +64,6 @@
          "web" : "https://github.com/ronsavage/Regexp-Parsertron"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

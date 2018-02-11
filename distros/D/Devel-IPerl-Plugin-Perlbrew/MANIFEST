@@ -1,0 +1,29 @@
+.proverc
+.ship.conf
+.travis.yml
+bin/.gitkeep
+bin/perlbrewise-spec
+Changes
+cpanfile
+examples/cpanminus.ipynb
+examples/README.md
+examples/Tutorial.ipynb
+lib/Devel/IPerl/Plugin/CpanMinus.pm
+lib/Devel/IPerl/Plugin/Perlbrew.pm
+LICENSE
+maint/fatpack.sh
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/perlbrewise-spec
+t/00-basic.t
+t/eval.t
+t/iperl-cpanm.t
+t/iperl-perlbrew.t
+t/iperl.t
+t/jupyter
+t/lib/perl5/ACME/NotThere.pm
+t/lib/Test/App/perlbrew.pm
+t/perlbrewise.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

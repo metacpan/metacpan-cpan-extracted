@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+# -*- mode: perl; -*-
+
+## __FATPACK__
+
+package Devel::IPerl::Plugin::Perlbrew::Install;
+
+use strict;
+use warnings;
+use Applify;
+use JSON::MaybeXS qw(decode_json encode_json);
+use Path::Class qw{dir};
+
+version our $VERSION = '0.02';
+
+documentation $0;
+
+my @VARIABLES =
+  (qw{PERLBREW_HOME PERLBREW_PATH PERLBREW_PERL PERLBREW_ROOT PERLBREW_VERSION});
+
+option str  => iperl     => 'path to iperl command        [default=iperl]',
+  default => 'iperl';
+option str  => jupyter   => 'path to jupyter command      [default=jupyter]',
+  default => 'jupyter';
+option flag => omit_home => 'Do not include PERLBREW_HOME [default=0]',
+  default => 0;
+
+sub _all_variables_set {
+  my $spec = shift;
+  return '' unless exists $spec->{env};
+  return !!(@VARIABLES == (grep {
+    exists $spec->{env}{$_} && $spec->{env}{$_} eq $ENV{$_}
+  } @VARIABLES));
+}
+
+sub augment_kernel_spec {
+  my $class       = shift;
+  my $kernel_file = shift;
+	my $kernel_spec = decode_json( $kernel_file->slurp );
+  my $augmented   = (_all_variables_set($kernel_spec) ? 0 : 1);
+  $kernel_spec->{env} = {
+    %{$kernel_spec->{env} || {}}
+  };
+  for my $var (@VARIABLES) {
+    $kernel_spec->{env}{$var} = $ENV{$var};
+  }
+  if ($augmented) {
+    $kernel_file->spew( encode_json($kernel_spec) );
+  }
+  return $augmented;
+}
+
+sub get_ipython_target_dir {
+  my $self = shift;
+  my $ipython_dir;
+  open my $fh, '-|', "@$self{jupyter} --data-dir" or return;
+  while (my $line = <$fh>) {
+    chomp($line);
+    $ipython_dir ||= $line;
+  }
+	return unless length $ipython_dir;
+	$ipython_dir;
+}
+
+sub get_kernels_target_dir {
+  my $self = shift;
+	my $ipython_dir = $self->get_ipython_target_dir();
+	return unless length $ipython_dir;
+	dir($ipython_dir)->subdir(qw[ kernels iperl ]);
+}
+
+sub report_iperl_version {
+  my $class = shift;
+  open my $fh, '-|', "@$class{iperl} --version 2>&1" or return;
+  while (<$fh>) {
+    chomp;
+    say STDERR $_;
+  }
+}
+
+app {
+  my ($class) = (shift);
+
+  $class->report_iperl_version;
+
+  @VARIABLES = grep { $_ ne 'PERLBREW_HOME' } @VARIABLES if $class->omit_home;
+
+  my $target = $class->get_kernels_target_dir;
+  my $kernel_file = dir($target)->file('kernel.json');
+
+  if (-e $kernel_file) {
+    $class->augment_kernel_spec($kernel_file) if $ENV{PERLBREW_ROOT};
+  } else {
+    say STDERR "$kernel_file does not exist";
+    say STDERR 'augment_kernel_spec() requires an existing kernel.json';
+    return 1;
+  }
+
+  return 0;
+};
+
+=pod
+
+=head1 NAME
+
+perlbrewise-spec
+
+=head1 DESCRIPTION
+
+=head1 SYNOPSIS
+
+  perlbrewise-spec [options]
+
+=cut

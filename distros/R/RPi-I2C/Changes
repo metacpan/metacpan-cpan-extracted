@@ -1,5 +1,10 @@
 Revision history for RPi-I2C
 
+2.3605  2018-02-09
+        - fix typo in POD (closes #3)
+        - made more clear the warning if having issues communicating with an
+          Arduino (closes #5)
+
 2.3604  2017-06-28
         - removed WiringPi::API from being a prereq
         - POD fixes

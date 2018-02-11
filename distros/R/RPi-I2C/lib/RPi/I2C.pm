@@ -3,7 +3,7 @@ package RPi::I2C;
 use strict;
 use warnings;
 
-our $VERSION = '2.3604';
+our $VERSION = '2.3605';
 our @ISA = qw(IO::Handle);
  
 use Carp;
@@ -60,7 +60,9 @@ sub read_bytes {
     $reg = _set_reg($reg);
     my $retval = 0;
     for (1..$num_bytes){
-        $retval = (0 << 8) | _readByteData($self->fileno, $reg + $num_bytes - $_)
+        $retval = (0 << 8) | _readByteData(
+            $self->fileno, $reg + $num_bytes - $_
+        )
     }
     return $retval;
 }
@@ -152,7 +154,7 @@ See the examples direcory for more information on usage with an Arduino unit.
 
 Interface to read and write to I2C bus devices.
 
-=head1 YOU SHOULD KNOW
+=head1 READ THIS FIRST
 
 There are particular things to know depending on connecting to certain devices.
 
@@ -183,7 +185,7 @@ C</boot/config.txt> file:
 =head2 Arduino
 
 Often, the default speed of the I2C bus master is too fast for an Arduino. If
-you do not get any results, try changing the spped. On a Raspberry Pi, you do
+you do not get any results, try changing the speed. On a Raspberry Pi, you do
 that by setting the C<dtparam=i2c_arm_baudrate> directive in the
 C</boot/config.txt> file:
 
@@ -358,6 +360,19 @@ an Arduino board. The files in the C<examples> directory are the foundation of
 the tests that are now run, and both the examples and the real tests use the
 C<arduino.ino> sketch in the examples directory as the Arduino code.
 
+=head1 TROUBLESHOOTING
+
+=head2 Arduino
+
+If you are having issues communicating with an Arduino, the most likely cause
+is that the Raspberry Pi's I2C communicates much too fast for it.
+
+The fix is to lower the speed of the I2C bus on the Pi. This can be done by
+setting the C<dtparam=i2c_arm_baudrate> directive in the C</boot/config.txt>
+file to a lower value:
+
+    dtparam=i2c_arm_baudrate=10000
+
 =head1 ACKNOWLEDGEMENTS
 
 All of the XS code was copied directly from L<Device::I2C>, written by Slava
@@ -370,7 +385,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017,2018 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

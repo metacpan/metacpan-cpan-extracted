@@ -1,5 +1,8 @@
 package App::NDTools::INC;
 
+use strict;
+use warnings;
+
 my $added = 0;
 
 sub import {

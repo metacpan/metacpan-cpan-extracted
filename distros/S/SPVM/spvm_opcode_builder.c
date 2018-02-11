@@ -1661,8 +1661,51 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                 // tableswitch
                 if (switch_info->code == SPVM_SWITCH_INFO_C_CODE_TABLE_SWITCH) {
-                  // TABLE_SWITCH is no longer used
-                  assert(0);
+                  SPVM_OPCODE opcode_switch_info;
+                  memset(&opcode_switch_info, 0, sizeof(SPVM_OPCODE));
+
+                  opcode_switch_info.code = SPVM_OPCODE_C_CODE_TABLE_SWITCH;
+
+                  int32_t index_in = SPVM_OP_get_my_index(compiler, op_cur->first);
+                  
+                  opcode_switch_info.operand0 = index_in;
+                  
+                  // Default
+                  opcode_switch_info.operand1 = 0;
+
+                  SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode_switch_info);
+
+                  SPVM_OPCODE opcode_table_switch_range;
+                  memset(&opcode_table_switch_range, 0, sizeof(SPVM_OPCODE));
+
+                  opcode_table_switch_range.code = SPVM_OPCODE_C_CODE_TABLE_SWITCH_RANGE;
+                  
+                  // Minimal
+                  opcode_table_switch_range.operand0 = switch_info->min;
+                  
+                  // Max
+                  opcode_table_switch_range.operand1 = switch_info->max;
+
+                  SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode_table_switch_range);
+
+                  // Switch bytecode index
+                  int32_t switch_opcode_index = opcode_array->length - 2;
+                  switch_info->opcode_index = switch_opcode_index;
+                  SPVM_DYNAMIC_ARRAY_push(switch_info_stack, switch_info);
+                  
+                  // Jump offset length
+                  int32_t jump_offset_length = switch_info->max - switch_info->min + 1;
+                  
+                  // Branches
+                  {
+                    int32_t i;
+                    for (i = 0; i < jump_offset_length; i++) {
+                      SPVM_OPCODE opcode_case;
+                      memset(&opcode_case, 0, sizeof(SPVM_OPCODE));
+                      opcode_case.code = SPVM_OPCODE_C_CODE_CASE;
+                      SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode_case);
+                    }
+                  }
                 }
                 // lookupswitch
                 else if (switch_info->code == SPVM_SWITCH_INFO_C_CODE_LOOKUP_SWITCH) {
@@ -1711,8 +1754,48 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                 
                 // tableswitch
                 if (switch_info->code == SPVM_SWITCH_INFO_C_CODE_TABLE_SWITCH) {
-                  // TABLE_SWITCH is no longer used
-                  assert(0);
+                  // Default branch
+                  int32_t default_branch;
+                  if (!default_opcode_index) {
+                    default_branch = opcode_array->length;
+                  }
+                  else {
+                    default_branch = default_opcode_index;
+                  }
+                  ((SPVM_OPCODE*)opcode_array->values + switch_opcode_index)->operand1 = default_branch;
+                  
+                  // min
+                  int32_t min = ((SPVM_OPCODE*)opcode_array->values + switch_opcode_index + 1)->operand0;
+                  
+                  // max
+                  int32_t max = ((SPVM_OPCODE*)opcode_array->values + switch_opcode_index + 1)->operand1;
+                  
+                  int32_t length = (int32_t)(max - min + 1);
+                  
+                  int32_t case_pos = 0;
+                  {
+                    int32_t i;
+                    for (i = 0; i < length; i++) {
+                      SPVM_OP* op_case = SPVM_DYNAMIC_ARRAY_fetch(switch_info->op_cases, case_pos);
+                      SPVM_OP* op_constant = op_case->first;
+                      SPVM_OPCODE* opcode_case = (opcode_array->values + switch_opcode_index + 2 + i);
+
+                      if (op_constant->uv.constant->value.int_value - min == i) {
+                        // Branch
+                        int32_t* case_opcode_index_ptr = SPVM_DYNAMIC_ARRAY_fetch(case_opcode_indexes, case_pos);
+                        int32_t case_opcode_index = *case_opcode_index_ptr;
+                        int32_t case_branch = case_opcode_index;
+                        
+                        opcode_case->operand1 = case_branch;
+                        
+                        case_pos++;
+                      }
+                      else {
+                        // Default branch
+                        opcode_case->operand1 = default_branch;
+                      }
+                    }
+                  }
                 }
                 // lookupswitch
                 else if (switch_info->code == SPVM_SWITCH_INFO_C_CODE_LOOKUP_SWITCH) {
@@ -2482,6 +2565,11 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
       }
       else if (opcodes[opcode_index].code == SPVM_OPCODE_C_CODE_IF_EQ_ZERO || opcodes[opcode_index].code == SPVM_OPCODE_C_CODE_IF_NE_ZERO) {
         int32_t branch_opcode_index = opcodes[opcode_index].operand0;
+        opcodes[branch_opcode_index].has_label = 1;
+      }
+      else if (opcodes[opcode_index].code == SPVM_OPCODE_C_CODE_TABLE_SWITCH) {
+        // Default branch
+        int32_t branch_opcode_index = opcodes[opcode_index].operand1;
         opcodes[branch_opcode_index].has_label = 1;
       }
       else if (opcodes[opcode_index].code == SPVM_OPCODE_C_CODE_LOOKUP_SWITCH) {

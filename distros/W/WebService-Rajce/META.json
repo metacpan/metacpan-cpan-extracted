@@ -4,13 +4,13 @@
       "Petr Kletecka <pek@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Rajce",
    "prereqs" : {
@@ -58,6 +58,7 @@
          "web" : "https://github.com/petrkle/webservice-rajce"
       }
    },
-   "version" : "1.152450"
+   "version" : "1.180380",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

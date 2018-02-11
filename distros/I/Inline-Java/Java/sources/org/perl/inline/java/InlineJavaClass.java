@@ -505,7 +505,7 @@ class InlineJavaClass {
 	static boolean ClassIsArray (Class p){
 		String name = p.getName() ;
 
-		if ((ClassIsReference(p))&&(name.startsWith("["))){
+		if ((name.startsWith("["))&&(ClassIsReference(p))){
 			InlineJavaUtils.debug(4, "class " + name + " is array") ;
 			return true ;
 		}

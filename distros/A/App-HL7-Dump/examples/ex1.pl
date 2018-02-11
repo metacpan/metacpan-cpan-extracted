@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use App::HL7::Dump;
 use File::Temp qw(tempfile);
 use IO::Barf qw(barf);

@@ -6,6 +6,9 @@ do { my $x = {
                                       }
                       },
        'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                      },
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',

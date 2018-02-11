@@ -26,7 +26,7 @@ public:
             return real(args...);
         }
 
-        bool operator ==(const Wrapper& oth) {
+        bool equal(const Wrapper& oth) {
             if (simple) {
                 return simple == oth.simple;
             } else {
@@ -34,12 +34,18 @@ public:
             }
         }
 
-        bool operator ==(const SimpleCallback& oth) {
+        template <typename T, typename = decltype(simple == std::declval<const T&>())>
+        bool equal(const T& oth) {
             if (simple) {
                 return simple == oth;
             } else {
                return false;
             }
+        }
+
+        template <typename T, typename Check = decltype(real == std::declval<T>())>
+        bool equal(const T& oth, Check* = nullptr) {
+            return real == oth;
         }
     };
 
@@ -89,11 +95,27 @@ public:
     template <typename SmthComparable>
     void remove(const SmthComparable& callback) {
         for (auto iter = listeners.rbegin(); iter != listeners.rend(); ++iter) {
-            if (*iter == callback) {
+            if (iter->equal(callback)) {
                 listeners.erase(iter);
                 break;
             }
         }
+    }
+
+    template <typename T>
+    void remove_object(T&& makable,
+                       decltype(tmp_abstract_function<Ret, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
+    {
+        auto tmp = tmp_abstract_function<Ret, Args...>(std::forward<T>(makable));
+        remove(tmp);
+    }
+
+    template <typename T>
+    void remove_object(T&& makable,
+                       decltype(tmp_abstract_function<RetType, Event&, Args...>(std::forward<T>(std::declval<T>())))* = nullptr)
+    {
+        auto tmp = tmp_abstract_function<RetType, Event&, Args...>(std::forward<T>(makable));
+        remove(tmp);
     }
 
     void remove_all() {

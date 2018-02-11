@@ -1,3 +1,6 @@
+0.07 2018-02-07T07:54:14+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+
 0.06 2017-12-26T01:37:41+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
  - Improve LICENSE AND COPYRIGHT section in doc.

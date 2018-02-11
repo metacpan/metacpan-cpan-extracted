@@ -15,6 +15,5 @@ script/optex
 t/00_compile.t
 t/01_run.t
 t/02_config.t
-t/home/_optex.d/config.toml
 META.yml
 MANIFEST

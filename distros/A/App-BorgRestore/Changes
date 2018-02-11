@@ -1,5 +1,10 @@
 Revision history for Perl extension App-BorgRestore
 
+2.3.0 2018-02-06T15:58:36Z
+	- Add --list option to search for paths occuring in backups
+	- Warn if sqlite's memory cache is is filled during cache updates
+	- Improve documentation of @backup_prefixes setting
+
 2.2.0 2017-11-25T23:16:04Z
 	- Add borg 1.1 support
 	- Mention required positive return code of config in documentation

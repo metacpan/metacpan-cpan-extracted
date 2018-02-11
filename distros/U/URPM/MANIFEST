@@ -19,6 +19,6 @@ t/sort_graph.t
 t/synthesis.t
 t/test-rpm.spec
 ChangeLog
+META.json                                Module meta-data (added by MakeMaker)
 META.yml                                 Module meta-data (added by MakeMaker)
 NEWS
-META.json                                Module JSON meta-data (added by MakeMaker)

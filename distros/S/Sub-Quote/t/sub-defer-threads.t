@@ -1,14 +1,5 @@
-use Config;
-BEGIN {
-  unless ($Config{useithreads}) {
-    print "1..0 # SKIP your perl does not support ithreads\n";
-    exit 0;
-  }
-  if ("$]" <= 5.008_004) {
-    print "1..0 # SKIP threads not reliable enough on perl <= 5.8.4\n";
-    exit 0;
-  }
-}
+use lib 't/lib';
+use ThreadsCheck;
 use threads;
 use strict;
 use warnings;

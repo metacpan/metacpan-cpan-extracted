@@ -50,7 +50,7 @@ $log->format(
 like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
   'right format';
 
-# Short log messages
+# Short log messages (systemd)
 {
   $log = Mojo::Log->new;
   ok !$log->short, 'long messages';
@@ -61,8 +61,18 @@ like $log->format->(time, 'debug', qw(Test 1 2 3)), qr/^debug:\d+:Test:1:2:3$/,
   ok $log->short, 'short messages';
   $log = Mojo::Log->new(short => 1);
   ok $log->short, 'short messages';
-  like $log->format->(time, 'debug', 'Test 123'), qr/^\[debug\] Test 123\n$/,
+  like $log->format->(time, 'debug', 'Test 123'), qr/^<7>\[d\] Test 123\n$/,
     'right format';
+  like $log->format->(time, 'info', 'Test 123'), qr/^<6>\[i\] Test 123\n$/,
+    'right format';
+  like $log->format->(time, 'warn', 'Test 123'), qr/^<4>\[w\] Test 123\n$/,
+    'right format';
+  like $log->format->(time, 'error', 'Test 123'), qr/^<3>\[e\] Test 123\n$/,
+    'right format';
+  like $log->format->(time, 'fatal', 'Test 123'), qr/^<2>\[f\] Test 123\n$/,
+    'right format';
+  like $log->format->(time, 'debug', 'Test', '1', '2', '3'),
+    qr/^<7>\[d\] Test\n<7>1\n<7>2\n<7>3\n$/, 'right format';
 }
 
 # Events

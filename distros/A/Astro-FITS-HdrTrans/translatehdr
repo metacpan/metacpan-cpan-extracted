@@ -30,6 +30,13 @@ The manual page.
 
 Version number for this command.
 
+=item B<--test-to-fits>
+
+Also output the results of converting the translated header information
+back to instrument-specific FITS headers.  This option is primarily
+intended for use in testing the operation of the FITS header translation
+software.
+
 =back
 
 =cut
@@ -45,10 +52,11 @@ use Astro::FITS::HdrTrans;
 
 
 # Options
-my ($help, $man, $version);
+my ($help, $man, $version, $test_bidi);
 my $status = GetOptions("help" => \$help,
                         "man" => \$man,
                         "version" => \$version,
+                        "test-to-fits" => \$test_bidi,
                        );
 
 pod2usage(1) if $help;
@@ -88,6 +96,18 @@ for my $k (sort keys %translation) {
     my $v = $translation{$k};
     $v = "undef" if !defined $v; # should be trapped by HdrTrans
     print "$k => $v\n";
+}
+
+if ($test_bidi) {
+    print "\n";
+
+    my %retranslation = Astro::FITS::HdrTrans::translate_to_FITS(\%translation);
+
+    for my $k (sort keys %retranslation) {
+        my $v = $retranslation{$k};
+        $v = 'undef' unless defined $v;
+        print "$k => $v\n";
+    }
 }
 
 =head1 NOTES

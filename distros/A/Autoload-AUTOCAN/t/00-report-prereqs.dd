@@ -13,6 +13,7 @@ do { my $x = {
                       'requires' => {
                                       'Carp' => '0',
                                       'Scalar::Util' => '0',
+                                      'Sub::Util' => '1.40',
                                       'perl' => '5.006'
                                     }
                     },

@@ -1,12 +1,12 @@
 #!perl
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '1.020'; # VERSION
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '1.022'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::ger; BEGIN { $Log::ger::Current_Level = 4 }
+use Log::ger; BEGIN { $ENV{LOG_LEVEL} //= 'info' }
 
 use PERLANCAR::Module::List;
 use Perinci::CmdLine::Any;
@@ -63,7 +63,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.020 of lcpan (from Perl distribution App-lcpan), released on 2018-01-15.
+This document describes version 1.022 of lcpan (from Perl distribution App-lcpan), released on 2018-02-08.
 
 =head1 SYNOPSIS
 
@@ -966,7 +966,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1050,7 +1050,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1427,7 +1427,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1501,7 +1501,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -2309,7 +2309,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2465,7 +2465,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--query-json>=I<s>, B<-q>
 

@@ -7,8 +7,8 @@ use Digest::MD5 qw/md5_hex/;
 use File::Slurp qw/read_file/;
 
 #
-# Юнит тест с моками, тестирующий WebService::CEPH, проверяет всю логику что есть в коде.
-# Все вызовы "драйвера" мокируются
+# Unit tests with mocks for WebService::CEPH, it checks all of the module's logic.
+# All driver calls are mocked
 #
 
 my $tmp_dir = tempdir(CLEANUP => 1);

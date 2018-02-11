@@ -38,4 +38,11 @@ sub prepare_boolean {
         include 't/fixtures/boolean.def';
     };
 }
+
+sub prepare_example_null {
+    APISchema::DSL::process {
+        include 't/fixtures/example-null.def';
+    };
+}
+
 1;

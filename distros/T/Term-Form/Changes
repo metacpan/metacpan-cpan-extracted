@@ -1,5 +1,11 @@
 Revision history for Term::Form
 
 
+0.311   2018-02-08
+        - Added option 'clear_screen'.
+        - Modified option 'auto_up'.
+        - "fill_form" has "back" on by default.
+        - Update documentation.
+
 0.310   2016-08-30
         - Renamed "Term::ReadLine::Simple" to "Term::Form".

@@ -1,6 +1,6 @@
 package WebService::Rajce;
 # ABSTRACT: Perl module for rajce.net web API.
-$WebService::Rajce::VERSION = '1.152450';
+$WebService::Rajce::VERSION = '1.180380';
 use 5.006;
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ sub new {
 	my $class = shift;
   my %passed_parms = @_;
 	my $self  = {};
-	$self->{API} = 'http://www.rajce.idnes.cz/liveAPI/index.php';
+	$self->{API} = 'https://www.rajce.idnes.cz/liveAPI/index.php';
 	$self->{XML} = '<?xml version="1.0" encoding="utf-8"?>';
 	$self->{DEBUG} = $passed_parms{'debug'};
 	$self->{KEEP_EXIF} = $passed_parms{'keep_exif'};
@@ -460,7 +460,7 @@ WebService::Rajce - Perl module for rajce.net web API.
 
 =head1 VERSION
 
-version 1.152450
+version 1.180380
 
 =head1 SYNOPSIS
 
@@ -476,7 +476,11 @@ version 1.152450
 
 Create new object instance.
 
-=head2 $rajce->_debug($mesage);
+The C<debug> param turns on debug mode.
+
+The C<keep_exif> param keep EXIF information in uploaded image.
+
+=head2 $rajce->_debug($message);
 
 Show debugging message.
 
@@ -538,7 +542,7 @@ Get URL of album.
 
 =head1 SEE ALSO
 
-http://rajce.net/static/doc/LiveApi.html
+https://rajce.net/static/doc/LiveApi.html
 
 =head1 AUTHOR
 

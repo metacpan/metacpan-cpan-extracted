@@ -6,9 +6,13 @@
 #include <xs/lib/merge.h>
 #include <panda/string.h>
 #include <panda/log.h>
+#include <xs/lib/XSCallbackDispatcher.h>
+#include <xs/lib/NativeCallbackDispatcher.h>
 
 using namespace panda::lib;
+using namespace panda;
 using namespace xs::lib;
+using xs::SvIntrPtr;
 
 MODULE = Panda::Lib                PACKAGE = Panda::Lib
 PROTOTYPES: DISABLE
@@ -88,10 +92,14 @@ void set_native_logger(CV* cb) {
             dTHX;
             auto cp_str = cp.to_string();
             SV* args[] = {newSViv(l), newSVpv(cp_str.c_str(), cp_str.size()), newSVpv(s.c_str(), s.size())};
-            xs::call_sub_void(aTHX_ cb.get<CV>(), args, 2);
+            xs::call_sub_void(aTHX_ cb.get<CV>(), args, 3);
         }
     };
     auto log = new CatchLogger;
     log->cb = cb_ptr;
     panda::Log::logger().reset(log);
 }
+
+INCLUDE: CallbackDispatcher.xsi
+
+INCLUDE: NativeCallbackDispatcher.xsi

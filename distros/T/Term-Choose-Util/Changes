@@ -1,8 +1,14 @@
 Revision history for Term::Choose::Util
 
 
+0.055   2018-02-08
+        - Added experimental options.
+        - Fixed 'reset' in "choose_a_number".
+        - Code refactoring.
+        - Removed some functions from documentation.
+
 0.054   2018-01-17
-        - 'settings_menu': the option "in-place" is deprecated and will be removed.
+        - 'settings_menu': the option "in_place" is deprecated and will be removed.
         - Removed deprecated function 'choose_multi'.
 
 0.053   2018-01-11

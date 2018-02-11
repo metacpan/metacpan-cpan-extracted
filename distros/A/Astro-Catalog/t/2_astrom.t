@@ -5,6 +5,13 @@ use Test::More tests => 16;
 
 use strict;
 use File::Temp;
+use Astro::Coords::Angle;
+use Astro::Coords::Angle::Hour;
+
+# Fix the precision used by Astro::Coords::Angle since we will be
+# comparing values formatted as strings to this precision.
+Astro::Coords::Angle->NDP(2);
+Astro::Coords::Angle::Hour->NDP(3);
 
 require_ok( "Astro::Catalog" );
 require_ok( "Astro::Catalog::Star" );
@@ -74,13 +81,13 @@ for( my $i = 0; $i < @written_cat; $i++ ) {
 
 __DATA__
 ~ GENE 0.0
-~ 19 04 00.0 -65 00 00.00 J2000 2000.0
-18 56 39.4 -63 25 13.23 J2000 2000.0
+~ 19 04 00.000 -65 00 00.00 J2000 2000.0
+18 56 39.426 -63 25 13.23 J2000 2000.0
 44.791 85.643
-19 11 53.9 -63 17 57.57 J2000 2000.0
+19 11 53.909 -63 17 57.57 J2000 2000.0
 -46.266 92.337
-19 01 13.6 -63 49 14.84 J2000 2000.0
+19 01 13.606 -63 49 14.84 J2000 2000.0
 17.246 64.945
-19 08 29.1 -63 57 42.79 J2000 2000.0
+19 08 29.088 -63 57 42.79 J2000 2000.0
 -25.314 57.456
 END

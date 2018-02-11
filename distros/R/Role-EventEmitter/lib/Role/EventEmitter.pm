@@ -1,30 +1,29 @@
 package Role::EventEmitter;
 
-use Scalar::Util qw(blessed weaken);
+use Carp 'croak';
+use Scalar::Util qw(blessed refaddr weaken);
 use constant DEBUG => $ENV{ROLE_EVENTEMITTER_DEBUG} || 0;
 
 use Role::Tiny;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 sub catch { $_[0]->on(error => $_[1]) and return $_[0] }
 
 sub emit {
-  my ($self, $name) = (shift, shift);
-
+  my $self = shift;
+  my $name = shift;
   if (my $s = $self->{_role_ee_events}{$name}) {
     warn "-- Emit $name in @{[blessed $self]} (@{[scalar @$s]})\n" if DEBUG;
     for my $cb (@$s) { $self->$cb(@_) }
-  }
-  else {
+  } else {
     warn "-- Emit $name in @{[blessed $self]} (0)\n" if DEBUG;
     die "@{[blessed $self]}: $_[0]" if $name eq 'error';
   }
-
   return $self;
 }
 
-sub has_subscribers { !!shift->{_role_ee_events}{shift()} }
+sub has_subscribers { !!$_[0]->{_role_ee_events}{$_[1]} }
 
 sub on { push @{$_[0]{_role_ee_events}{$_[1]}}, $_[2] and return $_[2] }
 
@@ -43,20 +42,42 @@ sub once {
   return $wrapper;
 }
 
-sub subscribers { shift->{_role_ee_events}{shift()} ||= [] }
+my $has_future;
+sub once_f {
+  my ($self, $name) = @_;
+
+  unless (defined $has_future) {
+    local $@;
+    eval { require Future; $has_future = 1 } or $has_future = 0;
+  }
+  croak "Future is required for once_f method" unless $has_future;
+
+  my $f = Future->new;
+  my $wrapper = sub { $f->done(@_) };
+  $self->on($name => $wrapper);
+  $self->{_role_ee_futures}{$name}{refaddr $wrapper} = $f;
+  
+  weaken $self;
+  weaken $wrapper;
+  return $f->on_ready(sub { $self->unsubscribe($name => $wrapper) });
+}
+
+sub subscribers { $_[0]->{_role_ee_events}{$_[1]} ||= [] }
 
 sub unsubscribe {
   my ($self, $name, $cb) = @_;
-
-  # One
-  if ($cb) {
-    $self->{_role_ee_events}{$name} = [grep { $cb ne $_ } @{$self->{_role_ee_events}{$name}}];
+  if ($cb) { # One
+    my $addr = refaddr $cb;
+    $self->{_role_ee_events}{$name} = [grep { $addr != refaddr $_ } @{$self->{_role_ee_events}{$name}}];
     delete $self->{_role_ee_events}{$name} unless @{$self->{_role_ee_events}{$name}};
+    if ($self->{_role_ee_futures}{$name} and my $f = delete $self->{_role_ee_futures}{$name}{$addr}) {
+      $f->cancel;
+      delete $self->{_role_ee_futures}{$name} unless keys %{$self->{_role_ee_futures}{$name}};
+    }
+  } else { # All
+    delete $self->{_role_ee_events}{$name};
+    $_->cancel for values %{delete $self->{_role_ee_futures}{$name} || {}};
   }
-
-  # All
-  else { delete $self->{_role_ee_events}{$name} }
-
   return $self;
 }
 
@@ -68,25 +89,25 @@ Role::EventEmitter - Event emitter role
 
 =head1 SYNOPSIS
 
-  package Cat;
+  package Channel;
   use Moo;
   with 'Role::EventEmitter';
 
   # Emit events
-  sub poke {
+  sub send_message {
     my $self = shift;
-    $self->emit(roar => 3);
+    $self->emit(message => @_);
   }
 
   package main;
 
   # Subscribe to events
-  my $tiger = Cat->new;
-  $tiger->on(roar => sub {
-    my ($tiger, $times) = @_;
-    say 'RAWR!' for 1 .. $times;
+  my $channel_a = Channel->new;
+  $channel_a->on(message => sub {
+    my ($channel, $text) = @_;
+    say "Received message: $text";
   });
-  $tiger->poke;
+  $channel_a->send_message('All is well');
 
 =head1 DESCRIPTION
 
@@ -161,6 +182,22 @@ Subscribe to event and unsubscribe again after it has been emitted once.
     ...
   });
 
+=head2 once_f
+
+  my $f = $e->once_f('foo');
+
+Subscribe to event as in L</"once">, returning a L<Future> that will be marked
+complete after it has been emitted once. Requires L<Future> to be installed.
+
+  my $f = $e->once_f('foo')->on_done(sub {
+    my ($e, @args) = @_;
+    ...
+  });
+
+To unsubscribe the returned L<Future> early, cancel it.
+
+  $f->cancel;
+
 =head2 subscribers
 
   my $subscribers = $e->subscribers('foo');
@@ -178,7 +215,7 @@ All subscribers for event.
   $e = $e->unsubscribe('foo');
   $e = $e->unsubscribe(foo => $cb);
 
-Unsubscribe from event.
+Unsubscribe from event. Related Futures will also be cancelled.
 
 =head1 DEBUGGING
 
@@ -195,9 +232,14 @@ Report any issues on the public bugtracker.
 
 Dan Book <dbook@cpan.org>
 
+Code and tests adapted from L<Mojo::EventEmitter>, an event emitter base class
+by the L<Mojolicious> team.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Dan Book.
+Copyright (c) 2008-2015 Sebastian Riedel.
+
+Copyright (c) 2015 Dan Book for adaptation to a role and further changes.
 
 This is free software, licensed under:
 
@@ -205,4 +247,5 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Mojo::EventEmitter>, L<Mixin::Event::Dispatch>, L<Beam::Emitter>
+L<Mojo::EventEmitter>, L<Mixin::Event::Dispatch>, L<Beam::Emitter>,
+L<Event::Distributor>

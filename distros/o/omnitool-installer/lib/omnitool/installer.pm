@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.7";
+our $VERSION = "1.0.9";
 
 # for reading in configs
 use File::Slurp;

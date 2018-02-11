@@ -31,7 +31,7 @@ use base qw/ Astro::FITS::HdrTrans::Base /;
 use vars qw/ $VERSION /;
 
 # Note that we use %02 not %03 because of historical reasons
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 
 # for a constant mapping, there is no FITS header, just a generic
@@ -519,7 +519,7 @@ ascension axis.  Results are in arcseconds per pixel.
 
 =cut
 
-# X_SCALE conversion courtesy Micah Johnson, from the cdelrot.pl script 
+# X_SCALE conversion courtesy Micah Johnson, from the cdelrot.pl script
 # supplied for use with XIMAGE.
 
 sub to_X_SCALE {
@@ -542,7 +542,7 @@ axis. Results are in arcseconds per pixel.
 
 =cut
 
-# Y_SCALE conversion courtesy Micah Johnson, from the cdelrot.pl script 
+# Y_SCALE conversion courtesy Micah Johnson, from the cdelrot.pl script
 # supplied for use with XIMAGE.
 
 sub to_Y_SCALE {

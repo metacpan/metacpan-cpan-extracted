@@ -13,14 +13,13 @@ has variant_last_value => (
 
 sub _given_when {
     my ($self) = shift;
-    my ( $set, $given, $when, $attr ) = @_;
+    my ( $set, $given, $when, $attr, $run ) = @_;
 
     return if $self->_variant_last_value($attr, 'set', $set);
 
     my $find = $self->_find_from_given(@_);
-   
+
     $self->variant_last_value->{$attr}->{find} = $find;
-    
     my @when = @{ $when };
     while (scalar @when >= 2) {
         my $check = shift @when;
@@ -41,8 +40,8 @@ sub _given_when {
                 }
             }
 
-            if ( my $run = $found->{run} ) { 
-                my @new = ref $run eq 'CODE' 
+            if ( $run = $found->{run} ) { 
+				my @new = ref $run eq 'CODE' 
                     ? $found->{run}->( $self, $find, $set, ) 
                     : $self->$run($find, $set);
                 $set = scalar @new > 1 ? \@new : shift @new;

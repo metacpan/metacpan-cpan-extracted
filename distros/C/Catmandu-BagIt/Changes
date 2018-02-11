@@ -1,11 +1,33 @@
 Revision history for Catmandu-BagIt
 
+0.211  2018-02-09 17:25:37 CET
+    - Making IO::Pipe tests optional to support multiple platforms
+    
+0.21  2018-02-07 09:44:56 CET
+    - Maintenance release: fixing parallel executed tests
+
+0.20  2018-02-02 14:49:11 CET
+    - Adding more pod on /tmp sizes
+    - Fixing MD5 missing in File::Bag export bug
+
+0.19  2017-12-04 16:47:42 CET
+    - Fixing missing overwrite bug
+
+0.18  2017-11-11 16:11:30 CET
+    - Fixing dependencies
+
+0.17  2017-11-06 14:18:13 CET
+    - Making add() methods for File::Store more like add() for Store
+
+0.16  2017-09-11 11:34:51 CEST
+    - Supporting exporting local files to BagIts
+
 0.151  2017-08-24 15:30:12 CEST
     - Fixing minimum required Catmandu dependency
 
 0.15  2017-07-10 12:20:32 CEST
     - Adding BagIt as Catmandu::Store::File
-    
+
 0.14  2017-07-04 10:17:17 CEST
     - Returning errors on read() in wantarray context
     - Fixing mswin tests

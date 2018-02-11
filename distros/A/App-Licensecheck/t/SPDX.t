@@ -9,6 +9,7 @@ $app->lines(0);
 $app->deb_fmt(1);
 
 # TODO: make naming scheme configurable
+# TODO: Detect MPL-1.0 version on separate line
 my %Debian2SPDX = (
 	'AGPL-1'       => 'AGPL-1.0',
 	'AGPL-3'       => 'AGPL-3.0',
@@ -22,6 +23,7 @@ my %Debian2SPDX = (
 	'GPL-2+'       => 'GPL-2.0',
 	'LGPL-2+'      => 'LGPL-2.0',
 	'LGPL-2.1+'    => 'LGPL-2.1',
+	'MPL'          => 'MPL-1.0',
 	'Python-2'     => 'Python-2.0',
 	'WTFPL-2'      => 'WTFPL',
 	'NUnit'        => 'zlib-acknowledgement',

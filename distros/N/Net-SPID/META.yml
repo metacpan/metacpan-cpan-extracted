@@ -1,0 +1,57 @@
+---
+abstract: 'SPID implementation for Perl'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SPID
+no_index:
+  namespace:
+    - Net::SAML2
+  package:
+    - Net::SAML2
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  Crypt::OpenSSL::Bignum: '0'
+  Crypt::OpenSSL::DSA: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Crypt::OpenSSL::Random: '0'
+  Crypt::OpenSSL::VerifyX509: '0'
+  Crypt::OpenSSL::X509: '0'
+  DateTime: '0'
+  DateTime::Format::XSD: '0'
+  Digest::SHA1: '0'
+  File::Slurp: '0'
+  IO::Compress::RawDeflate: '0'
+  IO::Uncompress::RawInflate: '0'
+  LWP::UserAgent: '0'
+  MIME::Base64: '0'
+  Moo: '0'
+  Moose: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Common: '0'
+  MooseX::Types::DateTime: '0'
+  MooseX::Types::URI: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::CanonicalizeXML: '0'
+  XML::Generator: '0'
+  XML::Writer: '0'
+  XML::XPath: '0'
+resources:
+  bugtracker: https://github.com/italia/spid-perl/issues
+  repository: https://github.com/italia/spid-perl.git
+version: '0.12'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -10,7 +10,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # "protocols" for serializing data and the methods used
 # to carry out the serialization
@@ -156,7 +156,7 @@ Forks::Super::LazyEval::BackgroundArray
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

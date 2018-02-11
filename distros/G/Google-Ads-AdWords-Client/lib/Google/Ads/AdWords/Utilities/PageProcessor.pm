@@ -184,9 +184,9 @@ Constructor. The following data structure may be passed to new():
 
  { # Google::Ads::AdWords::Utilities::PageProcessor
    service =>  $service, # A service e.g.
-   Google::Ads::AdWords::v201702::TypeMaps::CampaignService object
+   Google::Ads::AdWords::v201710::TypeMaps::CampaignService object
    selector => $selector, # A reference to a selector e.g.
-   Google::Ads::AdWords::v201702::Selector. When 'selector' is defined,
+   Google::Ads::AdWords::v201710::Selector. When 'selector' is defined,
    'query' cannot be defined.
    query => $query, # A string representing a query e.g.
    SELECT Id, Name, Status ORDER BY Name. When 'query' is defined, 'selector'

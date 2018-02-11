@@ -1,5 +1,5 @@
 package CGI::Application::Plugin::Authentication::Display;
-$CGI::Application::Plugin::Authentication::Display::VERSION = '0.21';
+$CGI::Application::Plugin::Authentication::Display::VERSION = '0.22';
 use 5.006;
 use strict;
 use warnings;

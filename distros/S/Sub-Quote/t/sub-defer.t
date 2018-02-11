@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Fatal;
-use Sub::Defer qw(defer_sub undefer_sub undefer_all undefer_package);
+use Sub::Defer qw(defer_sub undefer_sub undefer_all undefer_package defer_info);
+use Scalar::Util qw(refaddr weaken);
 
 my %made;
 
@@ -101,7 +102,7 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $foo_string = "$foo";
   undef $foo;
 
-  is Sub::Defer::defer_info($foo_string), undef,
+  is defer_info($foo_string), undef,
     "deferred subs don't leak";
 
   Sub::Defer->CLONE;
@@ -115,20 +116,18 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   Sub::Defer->CLONE;
   undef $foo;
 
-  is Sub::Defer::defer_info($foo_string), undef,
+  is defer_info($foo_string), undef,
     "CLONE doesn't strengthen refs";
 }
 
 {
   my $foo = defer_sub undef, sub { sub { 'foo' } };
   my $foo_string = "$foo";
-  my $foo_info = Sub::Defer::defer_info($foo_string);
+  my $foo_info = defer_info($foo_string);
   undef $foo;
 
   is exception { Sub::Defer->CLONE }, undef,
     'CLONE works when quoted info saved externally';
-  ok exists $Sub::Defer::DEFERRED{$foo_string},
-    'CLONE keeps entries that had info saved externally';
 }
 
 {
@@ -157,6 +156,135 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $sub = defer_sub undef, sub { +sub :lvalue { $foo } }, { attributes => [ 'lvalue' ]};
   $sub->() = 'foo';
   is $foo, 'foo', 'attributes are applied to deferred subs';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub "Foo::flub", sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  my $undeferred_addr = refaddr($undeferred);
+  my $deferred_str = "$deferred";
+  weaken($deferred);
+
+  is $deferred, undef,
+    'no strong external refs kept for deferred named subs';
+
+  is defer_info($deferred_str), undef,
+    'defer_info on expired deferred named sub gives undef';
+
+  isnt refaddr(undefer_sub($deferred_str)), $undeferred_addr,
+    'undefer_sub on expired deferred named sub does not give undeferred sub';
+
+  is refaddr(undefer_sub($undeferred)), $undeferred_addr,
+    'undefer_sub on undeferred named sub after deferred expiry gives undeferred';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub undef, sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  my $undeferred_addr = refaddr($undeferred);
+  my $deferred_str = "$deferred";
+  my $undeferred_str = "$undeferred";
+  weaken($deferred);
+
+  is $deferred, undef,
+    'no strong external refs kept for deferred unnamed subs';
+
+  is defer_info($deferred_str), undef,
+    'defer_info on expired deferred unnamed sub gives undef';
+
+  isnt refaddr(undefer_sub($deferred_str)), $undeferred_addr,
+    'undefer_sub on expired deferred unnamed sub does not give undeferred sub';
+
+  is refaddr(undefer_sub($undeferred)), $undeferred_addr,
+    'undefer_sub on undeferred unnamed sub after deferred expiry gives undeferred';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub "Foo::gwarf", sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  my $undeferred_addr = refaddr($undeferred);
+  my $deferred_str = "$deferred";
+  my $undeferred_str = "$undeferred";
+  delete $Foo::{gwarf};
+
+  weaken($deferred);
+  weaken($undeferred);
+
+  is $undeferred, undef,
+    'no strong external refs kept for undeferred named subs';
+
+  is defer_info($undeferred_str), undef,
+    'defer_info on expired undeferred named sub gives undef';
+
+  isnt refaddr(undefer_sub($undeferred_str)), $undeferred_addr,
+    'undefer_sub on expired undeferred named sub does not give undeferred sub';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub undef, sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  my $undeferred_addr = refaddr($undeferred);
+  my $deferred_str = "$deferred";
+  my $undeferred_str = "$undeferred";
+
+  weaken($deferred);
+  weaken($undeferred);
+
+  is $undeferred, undef,
+    'no strong external refs kept for undeferred unnamed subs';
+
+  is defer_info($undeferred_str), undef,
+    'defer_info on expired undeferred unnamed sub gives undef';
+
+  isnt refaddr(undefer_sub($undeferred_str)), $undeferred_addr,
+    'undefer_sub on expired undeferred unnamed sub does not give undeferred sub';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub undef, sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  weaken($deferred);
+
+  ok defer_info($undeferred),
+    'defer_info still returns info for undeferred unnamed subs after deferred sub expires';
+}
+
+{
+  my $guff;
+  my $deferred = defer_sub undef, sub { sub { $guff } };
+  my $undeferred = undefer_sub($deferred);
+  weaken($deferred);
+
+  Sub::Defer->CLONE;
+
+  ok defer_info($undeferred),
+    'defer_info still returns info for undeferred unnamed subs after deferred sub expires and CLONE';
+}
+
+{
+  my $guff;
+  my $gen = sub { +sub :lvalue { $guff } };
+  my $deferred = defer_sub 'Foo::blorp', $gen,
+    { attributes => [ 'lvalue' ] };
+
+  is_deeply defer_info($deferred),
+    [ 'Foo::blorp', $gen, { attributes => [ 'lvalue' ] } ],
+    'defer_info gives name, generator, options before undefer';
+
+  my $undeferred = undefer_sub $deferred;
+
+  is_deeply defer_info($deferred),
+    [ 'Foo::blorp', $gen, { attributes => [ 'lvalue' ] }, $undeferred ],
+    'defer_info on deferred gives name, generator, options after undefer';
+
+  is_deeply defer_info($undeferred),
+    [ 'Foo::blorp', $gen, { attributes => [ 'lvalue' ] }, $undeferred ],
+    'defer_info on undeferred gives name, generator, options after undefer';
 }
 
 done_testing;

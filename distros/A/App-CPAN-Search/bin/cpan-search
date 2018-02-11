@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use App::CPAN::Search;
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Run.
 App::CPAN::Search->new->run;
@@ -62,17 +59,17 @@ L<https://github.com/tupinek/App-CPAN-Search>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
+ © 2015-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

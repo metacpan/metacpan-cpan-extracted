@@ -1,7 +1,9 @@
 ---
 abstract: 'Perl Interface to the Domain Name System'
 author:
-  - 'Olaf Kolkman et al'
+  - 'Dick Franks'
+  - 'Olaf Kolkman'
+  - 'Michael Fuhr'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -28,10 +30,11 @@ requires:
   Digest::MD5: '2.13'
   Digest::SHA: '5.23'
   File::Spec: '0.86'
+  IO::File: '1.08'
   IO::Socket: '1.16'
   MIME::Base64: '2.11'
   Test::More: '0.52'
   Time::Local: '1.19'
   perl: '5.006'
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

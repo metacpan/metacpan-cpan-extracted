@@ -43,7 +43,7 @@
             "Pod::Usage" : "1.33",
             "String::Glob::Permute" : "0",
             "Term::ReadKey" : "0",
-            "perl" : "5.008005"
+            "perl" : "5.008004"
          }
       }
    },
@@ -59,11 +59,11 @@
          "web" : "https://github.com/skaji/App-RemoteCommand"
       }
    },
-   "version" : "0.96",
+   "version" : "0.97",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
    "x_static_install" : 1
 }
 

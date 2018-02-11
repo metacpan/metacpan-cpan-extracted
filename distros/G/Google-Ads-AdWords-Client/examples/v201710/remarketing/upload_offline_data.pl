@@ -24,6 +24,7 @@ use utf8;
 use Google::Ads::AdWords::Client;
 use Google::Ads::AdWords::Logging;
 use Google::Ads::AdWords::v201710::ConversionTrackerOperation;
+use Google::Ads::AdWords::v201710::FirstPartyUploadMetadata;
 use Google::Ads::AdWords::v201710::Money;
 use Google::Ads::AdWords::v201710::MoneyWithCurrency;
 use Google::Ads::AdWords::v201710::OfflineCallConversionFeed;
@@ -46,8 +47,13 @@ use Digest::SHA qw(sha256_hex);
 my $external_upload_id = 'INSERT_EXTERNAL_UPLOAD_ID';
 # Insert the conversion type name that you'd like to attribute this upload to.
 my $conversion_name = 'INSERT_CONVERSION_NAME';
+# Change the below constant to ThirdPartyUploadMetadata if uploading third
+# party data.
+my $store_sales_upload_common_metadata_type = "FirstPartyUploadMetadata";
 # Insert email addresses below for creating user identifiers.
 my @email_addresses = ['EMAIL_ADDRESS_1', 'EMAIL_ADDRESS_2'];
+# The three constants below are needed when uploading third party data.
+# You can safely ignore them if you are uploading first party data.
 # For times, use the format yyyyMMdd HHmmss tz. For more details on formats,
 # see:
 # https://developers.google.com/adwords/api/docs/appendix/codes-formats#date-and-time-formats
@@ -59,7 +65,8 @@ my $partner_id             = "INSERT_PARTNER_ID";
 
 # Example main subroutine.
 sub upload_offline_data {
-  my ($client, $external_upload_id, $conversion_name, $email_addresses,
+  my ($client, $external_upload_id, $conversion_name,
+    $store_sales_upload_common_metadata_type, $email_addresses,
     $advertiser_upload_time, $bridge_map_version_id, $partner_id)
     = @_;
 
@@ -108,26 +115,44 @@ sub upload_offline_data {
   );
 
   # Create offline data upload object.
-  my $offline_data_upload =
-    Google::Ads::AdWords::v201710::OfflineDataUpload->new({
-      externalUploadId => $external_upload_id,
-      offlineDataList  => [$offline_data_1, $offline_data_2],
-      # Set the type and metadata of this upload.
-      uploadType     => 'STORE_SALES_UPLOAD_THIRD_PARTY',
-      uploadMetadata => Google::Ads::AdWords::v201710::UploadMetadata->new({
-          storeSalesUploadCommonMetadata =>
-            Google::Ads::AdWords::v201710::ThirdPartyUploadMetadata->new({
-              loyaltyRate           => "1.0",
-              transactionUploadRate => "1.0",
-              advertiserUploadTime  => $advertiser_upload_time,
-              validTransactionRate  => "1.0",
-              partnerMatchRate      => "1.0",
-              partnerUploadRate     => "1.0",
-              bridgeMapVersionId    => $bridge_map_version_id,
-              partnerId             => $partner_id
-            })
-      })
-    });
+  my $offline_data_upload = undef;
+  if ($store_sales_upload_common_metadata_type eq 'FirstPartyUploadMetadata') {
+    $offline_data_upload =
+      Google::Ads::AdWords::v201710::OfflineDataUpload->new({
+        externalUploadId => $external_upload_id,
+        offlineDataList  => [$offline_data_1, $offline_data_2],
+        uploadType     => 'STORE_SALES_UPLOAD_FIRST_PARTY',
+        uploadMetadata => Google::Ads::AdWords::v201710::UploadMetadata->new({
+            storeSalesUploadCommonMetadata =>
+              Google::Ads::AdWords::v201710::ThirdPartyUploadMetadata->new({
+                loyaltyRate           => "1.0",
+                transactionUploadRate => "1.0",
+              })
+        })
+      });
+  } elsif (
+      $store_sales_upload_common_metadata_type eq 'ThirdPartyUploadMetadata') {
+    $offline_data_upload =
+      Google::Ads::AdWords::v201710::OfflineDataUpload->new({
+        externalUploadId => $external_upload_id,
+        offlineDataList  => [$offline_data_1, $offline_data_2],
+        # Set the type and metadata of this upload.
+        uploadType     => 'STORE_SALES_UPLOAD_THIRD_PARTY',
+        uploadMetadata => Google::Ads::AdWords::v201710::UploadMetadata->new({
+            storeSalesUploadCommonMetadata =>
+              Google::Ads::AdWords::v201710::ThirdPartyUploadMetadata->new({
+                loyaltyRate           => "1.0",
+                transactionUploadRate => "1.0",
+                advertiserUploadTime  => $advertiser_upload_time,
+                validTransactionRate  => "1.0",
+                partnerMatchRate      => "1.0",
+                partnerUploadRate     => "1.0",
+                bridgeMapVersionId    => $bridge_map_version_id,
+                partnerId             => $partner_id
+              })
+        })
+      });
+  }
 
   # Create an offline data upload operation.
   my $offline_data_upload_operation =
@@ -229,5 +254,5 @@ $client->set_die_on_faults(1);
 
 # Call the example
 upload_offline_data($client, $external_upload_id, $conversion_name,
-  \@email_addresses, $advertiser_upload_time, $bridge_map_version_id,
-  $partner_id);
+  $store_sales_upload_common_metadata_type, \@email_addresses,
+  $advertiser_upload_time, $bridge_map_version_id, $partner_id);

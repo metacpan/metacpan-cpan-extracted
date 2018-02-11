@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 README.md
+address-formatting/LICENSE.txt
 address-formatting/README.md
 address-formatting/bin/coverage.pl
 address-formatting/bin/run_tests.t
@@ -22,6 +23,7 @@ address-formatting/conf/components.yaml
 address-formatting/conf/countries/worldwide.yaml
 address-formatting/conf/country2lang.yaml
 address-formatting/conf/country_codes.yaml
+address-formatting/conf/county_codes.yaml
 address-formatting/conf/state_codes.yaml
 address-formatting/testcases/countries/ad.yaml
 address-formatting/testcases/countries/ae.yaml

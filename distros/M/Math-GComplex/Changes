@@ -1,5 +1,11 @@
 Revision history for Math-GComplex
 
+0.08    2018-02-09
+
+        - Added the `norm()` method.
+        - Fixed `0**0` and `0**z` special cases in the `pow()` method.
+        - Handle division by zero in the tan(), cot(), sec() and csc() functions, when the components of a complex number are native Perl numbers.
+
 0.07    2018-01-20
 
         - Fixed the trigonometry tests under Perl built with -Duselongdouble (thanks to Slaven Rezić)

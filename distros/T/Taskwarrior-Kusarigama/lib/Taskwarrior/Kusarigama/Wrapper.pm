@@ -1,7 +1,7 @@
 package  Taskwarrior::Kusarigama::Wrapper;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: interface to the taskwarrior's 'task' command
-$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.5.0';
+$Taskwarrior::Kusarigama::Wrapper::VERSION = '0.6.0';
 
 # TODO use Test::Pod::Snippet for that example ^^^
 
@@ -142,7 +142,7 @@ Taskwarrior::Kusarigama::Wrapper - interface to the taskwarrior's 'task' command
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -182,7 +182,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

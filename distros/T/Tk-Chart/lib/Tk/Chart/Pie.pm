@@ -6,13 +6,13 @@ use Carp;
 
 #==================================================================
 # $Author    : Djibril Ousmanou                                   $
-# $Copyright : 2017                                               $
-# $Update    : 23/01/2017                                         $
+# $Copyright : 2018                                               $
+# $Update    : 09/02/2018                                         $
 # $AIM       : Create pie graph                                   $
 #==================================================================
 
 use vars qw($VERSION);
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use base qw/ Tk::Derived Tk::Canvas::GradientColor /;
 use Tk::Balloon;
@@ -54,10 +54,11 @@ sub Populate {
     -colordata  => [ 'PASSIVE', 'Colordata',  'ColorData',  $cw->{RefChart}->{Legend}{Colors} ],
 
     -legendcolor => [ 'PASSIVE', 'Legendcolor', 'LegendColor', 'black' ],
-    -legendfont  => [ 'PASSIVE', 'Legendfont',  'LegendFont',  '{Times} 8 {normal}' ],
     -setlegend   => [ 'PASSIVE', 'Setlegend',   'SetLegend',   1 ],
     -piesize     => [ 'PASSIVE', 'Piesize',   'PieSize',   360 ],
 
+	-legendfont => [ 'PASSIVE', 'Legendfont',  'LegendFont',  $cw->{RefChart}->{Legend}{legendfont} ],
+	
     # verbeose mode
     -verbose => [ 'PASSIVE', 'verbose', 'Verbose', 1 ],
   );

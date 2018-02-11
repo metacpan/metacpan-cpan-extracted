@@ -1,13 +1,14 @@
 #!perl
 
 use strict;
-use Test::More tests => 36;
+use Test::More tests => 43;
 use Test::Number::Delta;
 use Scalar::Util qw/ looks_like_number /;
 
 require_ok("Astro::Coords");
 require_ok("Astro::Telescope");
 require_ok("Astro::Coords::Offset");
+require_ok('Astro::Coords::Angle');
 
 my $off = Astro::Coords::Offset->new( 55, 22, system => "GALACTIC" );
 isa_ok($off, "Astro::Coords::Offset");
@@ -18,6 +19,18 @@ $off = Astro::Coords::Offset->new( 55, 22, system => "J2008.5" );
 isa_ok($off, "Astro::Coords::Offset");
 
 is( $off->system, "J2008.5", "Check system conversion");
+
+# Check offset invert.
+$off = new Astro::Coords::Offset(
+    30, 40, system => 'B1950', projection => 'SIN',
+    posang => new Astro::Coords::Angle(80, units => 'deg'));
+isa_ok($off, 'Astro::Coords::Offset');
+$off = $off->invert();
+is($off->projection(), 'SIN');
+is($off->system(), 'B1950');
+delta_ok($off->xoffset->arcsec(), -30);
+delta_ok($off->yoffset->arcsec(), -40);
+delta_ok($off->posang()->degrees(), 80);
 
 # Check offset rotations against those displayed by the OT.
 $off = Astro::Coords::Offset->new(100, 0, posang => 45);

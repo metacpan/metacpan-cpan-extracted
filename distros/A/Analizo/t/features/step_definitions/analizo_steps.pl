@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More 'no_plan';
+use Test::More;
 use Test::BDD::Cucumber::StepFile;
 use Method::Signatures;
 use File::Slurp;
@@ -16,7 +16,7 @@ our $stdout;
 our $stderr;
 
 use Env qw(@PATH $PWD);
-push @PATH, "$PWD/bin";
+push @PATH, "$PWD/blib/script", "$PWD/bin";
 
 When qr/^I run "([^\"]*)"$/, func($c) {
   my $command = $1;

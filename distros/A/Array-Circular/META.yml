@@ -1,0 +1,19 @@
+---
+abstract: 'Provide an array data structure that can go around in circles'
+author:
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Array-Circular
+resources:
+  bugtracker: https://github.com/singingfish/p5-array-circular/issues
+  repository: git://github.com/singingfish/p5-array-circular.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

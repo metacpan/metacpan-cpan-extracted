@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.10 2018-02-06T17:52:11Z
+
+    - Prevent build on unsupported platforms
+
 0.09 2017-10-09T09:19:17Z
     - Add option to serialize data from forked code
 0.08 2017-10-02T13:43:30Z

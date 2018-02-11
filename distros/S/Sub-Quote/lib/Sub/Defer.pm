@@ -5,7 +5,7 @@ use Exporter qw(import);
 use Scalar::Util qw(weaken);
 use Carp qw(croak);
 
-our $VERSION = '2.004000';
+our $VERSION = '2.005000';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(defer_sub undefer_sub undefer_all);
@@ -47,9 +47,16 @@ sub _install_coderef {
 
 sub undefer_sub {
   my ($deferred) = @_;
-  my ($target, $maker, $undeferred_ref) = @{
-    $DEFERRED{$deferred}||return $deferred
-  };
+  my $info = $DEFERRED{$deferred} or return $deferred;
+  my ($target, $maker, $options, $undeferred_ref, $deferred_sub) = @$info;
+
+  if (!(
+    $deferred_sub && $deferred eq $deferred_sub
+    || ${$undeferred_ref} && $deferred eq ${$undeferred_ref}
+  )) {
+    return $deferred;
+  }
+
   return ${$undeferred_ref}
     if ${$undeferred_ref};
   ${$undeferred_ref} = my $made = $maker->();
@@ -62,9 +69,9 @@ sub undefer_sub {
     # _install_coderef calls are not necessary --ribasushi
     *{_getglob($target)} = $made;
   }
-  $DEFERRED{$made} = $DEFERRED{$deferred};
-  weaken $DEFERRED{$made}
-    unless $target;
+  my $undefer_info = [ $target, $maker, $options, \$$undeferred_ref ];
+  $info->[5] = $DEFERRED{$made} = $undefer_info;
+  weaken ${$undefer_info->[3]};
 
   return $made;
 }
@@ -87,7 +94,19 @@ sub undefer_package {
 sub defer_info {
   my ($deferred) = @_;
   my $info = $DEFERRED{$deferred||''} or return undef;
-  [ @$info ];
+
+  my ($target, $maker, $options, $undeferred_ref, $deferred_sub) = @$info;
+  if (!(
+    $deferred_sub && $deferred eq $deferred_sub
+    || ${$undeferred_ref} && $deferred eq ${$undeferred_ref}
+  )) {
+    delete $DEFERRED{$deferred};
+    return undef;
+  }
+  [
+    $target, $maker, $options,
+    ( $undeferred_ref && $$undeferred_ref ? $$undeferred_ref : ()),
+  ];
 }
 
 sub defer_sub {
@@ -105,7 +124,7 @@ sub defer_sub {
   }
   my $deferred;
   my $undeferred;
-  my $deferred_info = [ $target, $maker, \$undeferred ];
+  my $deferred_info = [ $target, $maker, $options, \$undeferred ];
   if (@attributes || $target && !_CAN_SUBNAME) {
     my $code
       =  q[#line ].(__LINE__+2).q[ "].__FILE__.qq["\n]
@@ -115,7 +134,7 @@ sub defer_sub {
         package Sub::Defer;
         # uncoverable subroutine
         # uncoverable statement
-        $undeferred ||= undefer_sub($deferred_info->[3]);
+        $undeferred ||= undefer_sub($deferred_info->[4]);
         goto &$undeferred; # uncoverable statement
         $undeferred; # fake lvalue return
       }]."\n"
@@ -131,23 +150,25 @@ sub defer_sub {
   else {
     # duplicated from above
     $deferred = sub {
-      $undeferred ||= undefer_sub($deferred_info->[3]);
+      $undeferred ||= undefer_sub($deferred_info->[4]);
       goto &$undeferred;
     };
     _install_coderef($target, $deferred)
       if $target;
   }
-  weaken($deferred_info->[3] = $deferred);
+  weaken($deferred_info->[4] = $deferred);
   weaken($DEFERRED{$deferred} = $deferred_info);
   return $deferred;
 }
 
 sub CLONE {
-  %DEFERRED = map { defined $_ && $_->[3] ? ($_->[3] => $_) : () } values %DEFERRED;
-  foreach my $info (values %DEFERRED) {
-    weaken($info)
-      unless $info->[0] && ${$info->[2]};
-  }
+  %DEFERRED = map {
+    defined $_ ? (
+        $_->[4] ? ($_->[4] => $_)
+      : ($_->[3] && ${$_->[3]}) ? (${$_->[3]} => $_)
+      : ()
+    ) : ()
+  } values %DEFERRED;
 }
 
 1;
@@ -178,7 +199,7 @@ subroutines and methods until they are first called.
 
 =head2 defer_sub
 
- my $coderef = defer_sub $name => sub { ... };
+ my $coderef = defer_sub $name => sub { ... }, \%options;
 
 This subroutine returns a coderef that encapsulates the provided sub - when
 it is first called, the provided sub is called and is -itself- expected to
@@ -188,6 +209,24 @@ If a name is provided, this also installs the sub as that name - and when
 the subroutine is undeferred will re-install the final version for speed.
 
 Exported by default.
+
+=head3 Options
+
+A hashref of options can optionally be specified.
+
+=over 4
+
+=item package
+
+The package to generate the sub in.  Will be overridden by a fully qualified
+C<$name> option.  If not specified, will default to the caller's package.
+
+=item attributes
+
+The L<perlsub/Subroutine Attributes> to apply to the sub generated.  Should be
+specified as an array reference.
+
+=back
 
 =head2 undefer_sub
 
@@ -199,6 +238,19 @@ If the passed coderef has not been deferred, this will just return it.
 If this is confusing, take a look at the example in the L</SYNOPSIS>.
 
 Exported by default.
+
+=head2 defer_info
+
+ my $data = defer_info $sub;
+ my ($name, $generator, $options, $undeferred_sub) = @$data;
+
+Returns original arguments to defer_sub, plus the undeferred version if this
+sub has already been undeferred.
+
+Note that $sub can be either the original deferred version or the undeferred
+version for convenience.
+
+Not exported by default.
 
 =head2 undefer_all
 

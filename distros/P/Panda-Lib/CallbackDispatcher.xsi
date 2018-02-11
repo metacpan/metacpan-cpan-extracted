@@ -1,0 +1,48 @@
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::CallbackDispatcher
+PROTOTYPES: DISABLE
+
+BOOT {
+    xs::register_package("Panda::Lib::CallbackDispatcher", "Panda::Lib");
+    xs::register_package("Panda::Lib::CallbackDispatcherEvent", "Panda::Lib");
+}
+
+TYPEMAP: << END
+XSCallbackDispatcher::Event* T_OPTR
+END
+
+xs::lib::XSCallbackDispatcher* xs::lib::XSCallbackDispatcher::new () {
+    RETVAL = new XSCallbackDispatcher();
+}
+
+void xs::lib::XSCallbackDispatcher::DESTROY () {}
+
+void xs::lib::XSCallbackDispatcher::add(CV* cb) {
+    THIS->add(CallbackCVWrapperSimple(cb));
+}
+
+void xs::lib::XSCallbackDispatcher::add_ext(CV* cb) {
+    static HV* event_class = gv_stashpvn("Panda::Lib::CallbackDispatcherEvent", 0, 0);
+    SvIntrPtr cb_ptr = cb;
+    THIS->add(CallbackCVWrapperExt([=](XSCallbackDispatcher::Event& event, SV** args, size_t items) {
+        SV* full_args[items+1];
+        full_args[0] = typemap_outcast<XSCallbackDispatcher::Event*, HV* CLASS>(&event, event_class);
+        memcpy(&full_args[1], args, items*sizeof(SV*));
+        return xs::call_sub_scalar(cb_ptr.get<CV>(), full_args, items+1);
+    }, cb));
+}
+
+void xs::lib::XSCallbackDispatcher::remove(CV* cb) {
+    THIS->remove_object(CallbackCVWrapperSimple(cb));
+    THIS->remove_object(CallbackCVWrapperExt(nullptr, cb));
+}
+
+void xs::lib::XSCallbackDispatcher::call(...) {
+    THIS->operator()(&ST(1), items - 1);
+}
+
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::CallbackDispatcherEvent
+PROTOTYPES: DISABLE
+
+SV* XSCallbackDispatcher::Event::next (...) {
+    RETVAL = THIS->next(&ST(1), items - 1).value_or(&PL_sv_undef);
+}

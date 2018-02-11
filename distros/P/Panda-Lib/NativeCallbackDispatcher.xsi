@@ -1,0 +1,13 @@
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::NativeCallbackDispatcher
+PROTOTYPES: DISABLE
+
+void xs::lib::NativeCallbackDispatcher::DESTROY () {}
+
+void xs::lib::NativeCallbackDispatcher::add(CV* cv)
+
+void xs::lib::NativeCallbackDispatcher::remove(CV* cv)
+
+void xs::lib::NativeCallbackDispatcher::call(...) {
+    THIS->call(&ST(1), items - 1);
+}
+

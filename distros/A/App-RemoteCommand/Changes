@@ -1,5 +1,9 @@
 Revision history for Perl extension App-RemoteCommand
 
+0.97  2018-02-09 08:45:02 JST
+  - Refactor (#4)
+  - Minimum perl version 5.8.5 -> 5.8.4
+
 0.96  2017-09-19 19:28:45 JST
   - Fix how to handle failures in connecting
 

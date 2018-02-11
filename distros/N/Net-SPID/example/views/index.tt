@@ -1,0 +1,1 @@
+[% spid.get_button('/spid-login?idp=%s') %]

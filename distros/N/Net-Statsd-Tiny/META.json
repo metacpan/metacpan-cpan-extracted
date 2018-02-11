@@ -1,5 +1,5 @@
 {
-   "abstract" : "A tiny StatsD client",
+   "abstract" : "A tiny StatsD client that supports multimetric packets",
    "author" : [
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
@@ -31,27 +31,16 @@
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
             "Test::TrailingSpace" : "0.0203"
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Type::Tiny::XS" : "0"
-         },
          "requires" : {
+            "Class::Accessor::Fast" : "0",
             "IO::Socket" : "1.18",
-            "IO::String" : "0",
-            "Moo" : "1.000000",
-            "MooX::TypeTiny" : "0",
-            "Sub::Quote" : "0",
-            "Sub::Util" : "1.40",
-            "Type::Library" : "0",
-            "Type::Utils" : "0",
-            "Types::Standard" : "0",
-            "namespace::autoclean" : "0",
-            "perl" : "v5.10.0",
+            "base" : "0",
+            "perl" : "v5.10.1",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -61,7 +50,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Carp" : "0",
             "Devel::StrictMode" : "0",
             "File::Spec" : "0",
             "IO::Select" : "0",
@@ -72,7 +60,6 @@
             "Test::Roo::DataDriven" : "0",
             "Test::Roo::Role" : "0",
             "Test::TCP" : "2.19",
-            "curry" : "0",
             "if" : "0",
             "lib" : "0",
             "utf8" : "0"
@@ -82,11 +69,11 @@
    "provides" : {
       "Net::Statsd::Tiny" : {
          "file" : "lib/Net/Statsd/Tiny.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.3.0"
       },
       "Net::Statsd::Tiny::Types" : {
          "file" : "lib/Net/Statsd/Tiny/Types.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -100,7 +87,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Tiny"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.3.0",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

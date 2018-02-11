@@ -1,5 +1,26 @@
 Revision history for Perl extension Net::OpenSSH.
 
+0.76  Feb 8, 2018
+        - Allow passing "file_from" and "from0" options into "rsync"
+          (bug report and patch by Slaven Rezic, fixes #rt124357)
+        - Document how to manipulate port forwardings.
+        - Rename sample directory to examples (fixes #rt122042
+          reported by Karen Etheridge).
+
+0.75_02  Jul 18, 2017
+        - Add support for "master_pty_force" and "get_master_pty_log"
+          features.
+        - Add support for "subsystem" feature.
+
+0.75_01  Mar 3, 2017
+        - Use an opaque digest as the last part of the multiplexing
+          socket path in order to reduce its size (bug report by
+          Sombrerero_Loco at PerlMonks).
+        - Improve ctl_path/ctl_dir handling catching more errors
+          earlier.
+        - Add support for stdin_keep_open feature (bug report by
+          fwalters at PerlMonks).
+
 0.74  Feb 10, 2017
         - Update list of options accepted by method "sftp" (bug report
           by Mirror).

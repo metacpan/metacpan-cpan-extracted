@@ -1,9 +1,8 @@
 #!/usr/bin/env perl
 
-use App::NDTools::NDQuery;
+require App::NDTools::NDQuery;
 
-my $ndquery = App::NDTools::NDQuery->new();
-$ndquery->exec();
+App::NDTools::NDQuery->new(@ARGV)->exec();
 
 __END__
 
@@ -126,13 +125,13 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<jq(1)>
+L<App::NDTools::nddiff>, L<App::NDTools::ndpatch>, L<App::NDTools::ndproc>
 
-L<nddiff(1)>, L<ndpatch(1)>, L<ndproc(1)>
+L<App::NDTools::NDQuery>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016,2017 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+Copyright 2016-2018 Michael Samoglyadov C<< <mixas at cpan.org> >>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of GNU General Public License 3 or later versions.

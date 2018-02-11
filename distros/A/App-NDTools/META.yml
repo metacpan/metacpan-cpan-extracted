@@ -2,7 +2,12 @@
 abstract: 'diff/patch/process/query tools for nested structures'
 author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
-build_requires: {}
+build_requires:
+  Storable: 0
+  Test::File::Contents: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: open_source
@@ -14,6 +19,19 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Encode::Locale: 0
+  Hash::Merge: 0
+  Hash::Merge::Extra: 0.06
+  IPC::Run3: 0
+  JSON: 0
+  Log::Log4Cli: 0.20
+  Module::Find: 0
+  Struct::Diff: 0.94
+  Struct::Path: 0.81
+  Struct::Path::PerlStyle: 0.8
+  YAML::XS: 0
+  perl: 5.01
 resources:
-  repository: https://github.com/mr-mixas/NDTools.git
-version: v0.5.0
+  repository: https://github.com/mr-mixas/NDTools
+version: v0.5.1

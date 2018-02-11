@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -17,6 +17,7 @@ use List::Util            qw( sum );
 
 use Encode::Locale         qw();
 use File::HomeDir          qw();
+use List::MoreUtils        qw( first_index ); #
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 use Term::ReadKey          qw( GetTerminalSize ReadKey ReadMode );
@@ -54,28 +55,31 @@ sub choose_dirs {
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
-
-        my $prompt;
-        $prompt .= $o->{prompt} . "\n" if $o->{prompt};
-        my $len_key;
+        my $lines;
+        my $key_w;
         if ( defined $o->{current} ) {
-            $len_key = 9;
-            $prompt .= sprintf "Current: %s\n", _stringify_array( @{$o->{current}} );
-            $prompt .= sprintf "    New: %s\n", _stringify_array( @$new );
+            $key_w = 9;
+            $lines .= sprintf "current: %s\n", _stringify_array( @{$o->{current}} );
+            $lines .= sprintf "    new: %s",   _stringify_array( @$new );
         }
         else {
-            $len_key = 5;
-            $prompt .= sprintf "New: %s\n", _stringify_array( @$new );
+            $key_w = 5;
+            $lines .= sprintf "new: %s", _stringify_array( @$new );
         }
-        my $key_cwd = '=> ';
-        $prompt  = line_fold( $prompt,                                     term_width(), '' , ' ' x $len_key );
-        $prompt .= "\n";
-        $prompt .= line_fold( $key_cwd . decode( 'locale_fs', $previous ), term_width(), '' , ' ' x length $key_cwd );
-        $prompt .= "\n";
-        $prompt .= $o->{prompt} if $o->{prompt}; ####
+        my $key_cwd = '==>  ';
+        $lines  = line_fold( $lines,                                          term_width(), '' , ' ' x $key_w );
+        $lines .= "\n";
+        $lines .= line_fold( $key_cwd . decode( 'locale_fs', "[$previous]" ), term_width(), '' , ' ' x length $key_cwd );
+        if ( length $o->{info_on_top} ) {
+            $lines = $o->{info_on_top} . "\n" . $lines;
+        }
+        if ( defined $o->{prompt} ) {
+            $lines .= "\n" if length $o->{prompt};
+            $lines .= $o->{prompt};
+        }
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $prompt, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
+            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
               justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! defined $choice ) {
@@ -122,6 +126,7 @@ sub _prepare_opt_choose_path {
         mouse        => 0,
         layout       => 1,
         order        => 1,
+        info_on_top  => '', # experimental
         justify      => 0,
         enchanted    => 1,
         confirm      => ' = ',
@@ -183,29 +188,33 @@ sub _choose_a_path {
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
-        my $prompt = '';
+        my $lines = $o->{info_on_top};
+        $lines .= "\n" if length $lines;
         if ( $a_file ) {
             if ( $curr ) {
-                $prompt .= sprintf "Current file: %s\n", _prepare_string( $curr );
-                $prompt .= sprintf "    New file: %s\n", _prepare_string( catfile $dir, $wildcard );
+                $lines .= sprintf "Current file: %s\n", _prepare_string( $curr );
+                $lines .= sprintf "    New file: %s", _prepare_string( catfile $dir, $wildcard );
             }
             else {
-                $prompt .= sprintf "New file: %s\n", _prepare_string( catfile $dir, $wildcard );
+                $lines .= sprintf "New file: %s", _prepare_string( catfile $dir, $wildcard );
             }
         }
         else {
             if ( $curr ) {
-                $prompt .= sprintf "Current dir: %s\n", _prepare_string( $curr );
-                $prompt .= sprintf "    New dir: %s\n", _prepare_string( $dir );
+                $lines .= sprintf "Current dir: %s\n", _prepare_string( $curr );
+                $lines .= sprintf "    New dir: %s", _prepare_string( $dir );
             }
             else {
-                $prompt .= sprintf "New dir: %s\n", _prepare_string( $dir );
+                $lines .= sprintf "New dir: %s", _prepare_string( $dir );
             }
         }
-        $prompt .= $o->{prompt} if $o->{prompt};
+        if ( defined $o->{prompt} ) {
+            $lines .= "\n" if length $lines && length $o->{prompt};
+            $lines .= $o->{prompt};
+        }
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
-            { prompt => $prompt, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
+            { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
               justify => $o->{justify}, layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! defined $choice ) {
@@ -263,19 +272,23 @@ sub _a_file {
             choose( [ ' < ' ], { prompt => $prompt } );
             return;
         }
-        my $prompt = '';
+        my $lines = $o->{info_on_top};
+        $lines .= "\n" if length $lines;
         if ( $curr ) {
-            $prompt .= sprintf "Current file: %s\n", _prepare_string( $curr );
-            $prompt .= sprintf "    New file: %s\n", _prepare_string( catfile $dir, $previous // $wildcard );
+            $lines .= sprintf "Current file: %s\n", _prepare_string( $curr );
+            $lines .= sprintf "    New file: %s", _prepare_string( catfile $dir, $previous // $wildcard );
         }
         else {
-            $prompt .= sprintf "New file: %s\n", _prepare_string( catfile $dir, $previous // $wildcard );
+            $lines .= sprintf "New file: %s", _prepare_string( catfile $dir, $previous // $wildcard );
         }
-        $prompt .= "\n" . $o->{prompt} if $o->{prompt};
+        if ( defined $o->{prompt} ) {
+            $lines .= "\n" if length $lines && length $o->{prompt};
+            $lines .= $o->{prompt};
+        }
         my @pre = ( undef, $o->{confirm} );
         my $choice = choose(
             [ @pre, sort( @files ) ],
-            { prompt => $prompt, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
+            { prompt => $lines, undef => $o->{back}, mouse => $o->{mouse}, justify => $o->{justify},
             layout => $o->{layout}, order => $o->{order}, clear_screen => $o->{clear_screen} }
         );
         if ( ! length $choice ) {
@@ -294,12 +307,22 @@ sub _a_file {
 
 sub choose_a_number {
     my ( $digits, $opt ) = @_;
+    if ( ref $digits ) {
+        $opt = $digits;
+        $digits = 7;
+    }
     $opt = {} if ! defined $opt;
-    #                $opt->{current}
-    my $thsd_sep   = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
-    my $name       = defined $opt->{name}         ? $opt->{name}         : '';
-    my $clear      = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
-    my $mouse      = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $prompt = $opt->{prompt};
+    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}   : '';    # experimental
+    my $current;
+    if ( exists $opt->{current} ) {
+       $current      = defined $opt->{current}      ? $opt->{current}      : '';
+    }
+    my $thsd_sep     = defined $opt->{thsd_sep}     ? $opt->{thsd_sep}     : ',';
+    my $name         = defined $opt->{name}         ? $opt->{name}         : '';
+    my $clear        = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
+    my $mouse        = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $small_on_top = defined $opt->{small_on_top} ? $opt->{small_on_top} : 0;     # experimental
     #-------------------------------------------#
     my $back       = defined $opt->{back}         ? $opt->{back}         : 'BACK';
     my $back_short = defined $opt->{back_short}   ? $opt->{back_short}   : '<<';
@@ -332,29 +355,45 @@ sub choose_a_number {
     }
     my %numbers;
     my $result;
-    my $undef = '--';
+    my $empty = '--';
 
     NUMBER: while ( 1 ) {
-        my $new_result = defined $result ? $result : $undef;
-        my $prompt = '';
-        if ( exists $opt->{current} ) {
-            $opt->{current} = defined $opt->{current} ? insert_sep( $opt->{current}, $thsd_sep ) : $undef;
-            $prompt .= sprintf "%s%*s\n",   'Current ' . $name . ': ', $longest, $opt->{current};
-            $prompt .= sprintf "%s%*s\n\n", '    New ' . $name . ': ', $longest, $new_result;
+        my $lines = $info_on_top;
+        $lines .= "\n" if length $lines;
+        my $new_result = length $result ? $result : $empty;
+        my $str_w = print_columns( "$choices_range[0]" );
+        my $term_w = term_width();
+        if ( defined $current ) {
+            $current = insert_sep( $current, $thsd_sep );
+            my $tmp1 = sprintf " current %*s", $longest, $current;     # []
+            my $tmp2 = sprintf "     new %*s", $longest, $new_result;
+            if ( $str_w > $term_w ) {
+                $lines .= sprintf "%*s", $term_w, $new_result;
+            }
+            else {
+                $lines .= sprintf "%*s\n", $str_w, $tmp1;
+                $lines .= sprintf "%*s",   $str_w, $tmp2;
+            }
         }
         else {
-            $prompt = sprintf "%s%*s\n\n", $name . ': ', $longest, $new_result;
+            my $tmp = sprintf "%*s", $longest, $new_result; # []
+            $lines .= sprintf "%*s", ( $str_w > $term_w ? $term_w : $str_w ), $tmp;
+        }
+        if ( defined $prompt ) {
+            $lines .= "\n" if length $lines && length $prompt;
+            $lines .= $prompt;
         }
         my @pre = ( undef, $confirm_tmp );
         # Choose
         my $range = choose(
-            [ @pre, @choices_range ],
-            { prompt => $prompt, layout => 3, justify => 1, mouse => $mouse,
+            $small_on_top ? [ @pre, reverse @choices_range ] : [ @pre, @choices_range ],
+            { prompt => $lines, layout => 3, justify => 1, mouse => $mouse,
               clear_screen => $clear, undef => $back_tmp }
         );
         if ( ! defined $range ) {
             if ( defined $result ) {
                 $result = undef;
+                %numbers = ();
                 next NUMBER;
             }
             else {
@@ -380,7 +419,7 @@ sub choose_a_number {
         # Choose
         my $number = choose(
             [ undef, @choices, $reset ],
-            { prompt => $prompt, layout => 1, justify => 2, order => 0,
+            { prompt => $lines, layout => 1, justify => 2, order => 0,
               mouse => $mouse, clear_screen => $clear, undef => $back_short }
         );
         next if ! defined $number;
@@ -399,80 +438,113 @@ sub choose_a_number {
 
 sub choose_a_subset {
     my ( $available, $opt ) = @_;
-    $opt = {} if ! defined $opt;
-    #             $opt->{current}
-    my $index   = defined $opt->{index}        ? $opt->{index}        : 0;
-    my $clear   = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
-    my $mouse   = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
-    my $layout  = defined $opt->{layout}       ? $opt->{layout}       : 3;
-    my $order   = defined $opt->{order}        ? $opt->{order}        : 1;
-    my $prefix  = defined $opt->{prefix}       ? $opt->{prefix}       : ( $layout == 3 ? '- ' : '' );
-    my $justify = defined $opt->{justify}      ? $opt->{justify}      : 0;
-    my $prompt  = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
+    $opt = {} if ! defined $opt; # check ?
+    my $current = $opt->{current};
+    my $show_fmt    = defined $opt->{show_fmt}     ? $opt->{show_fmt}     : 1;      # experimental
+    my $keep_chosen = defined $opt->{keep_chosen}  ? $opt->{keep_chosen}  : 1;      # experimental
+    my $mark        = $opt->{mark};                                                 # experimental
+    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}  : '';     # experimental
+    my $index       = defined $opt->{index}        ? $opt->{index}        : 0;
+    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
+    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $layout      = defined $opt->{layout}       ? $opt->{layout}       : 3;
+    my $order       = defined $opt->{order}        ? $opt->{order}        : 1;
+    my $prefix      = defined $opt->{prefix}       ? $opt->{prefix}       : ( $layout == 3 ? '- ' : '' );
+    my $justify     = defined $opt->{justify}      ? $opt->{justify}      : 0;
+    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : ''; #
     #--------------------------------------#
-    my $confirm = defined $opt->{confirm}      ? $opt->{confirm}      : 'CONFIRM';
-    my $back    = defined $opt->{back}         ? $opt->{back}         : 'BACK';
-    my $key_cur = defined $opt->{p_curr}       ? $opt->{p_curr}       : 'Current > ';
-    my $key_new = defined $opt->{p_new}        ? $opt->{p_new}        : '    New > ';
+    my $confirm     = defined $opt->{confirm}     ? $opt->{confirm}     : 'CONFIRM';    # layout 0|1|2  [OK] [<<]
+    my $back        = defined $opt->{back}        ? $opt->{back}        : 'BACK';
+    my $key_cur     = defined $opt->{p_curr}      ? $opt->{p_curr}      : 'Current: '; #
+    my $key_new     = defined $opt->{p_new}       ? $opt->{p_new}       : ( defined $current ? '    New: ' : 'Chosen: ' ); #
     if ( $layout == 3 && $prefix ) {
         my $len_prefix = print_columns( "$prefix" );
         $confirm = ( ' ' x $len_prefix ) . $confirm;
         $back    = ( ' ' x $len_prefix ) . $back;
     }
-    my $len_cur = print_columns( "$key_cur" );
-    my $len_new = print_columns( "$key_new" );
-    my $len_key = $len_cur > $len_new ? $len_cur : $len_new;
-    my $new_idx = [];
-    my $new     = [];
+    my $key_cur_w = print_columns( "$key_cur" );
+    my $key_new_w = print_columns( "$key_new" );
+    my $key_w = $key_cur_w > $key_new_w ? $key_cur_w : $key_new_w;
+    my @new_idx;
+
+    my @cur_avail = @$available;
 
     while ( 1 ) {
-        my $lines = '';
-        $lines .= $key_cur . join( ', ', map { "\"$_\"" } @{$opt->{current}} ) . "\n"   if defined $opt->{current};
-        $lines .= $key_new . join( ', ', map { "\"$_\"" } @$new )              . "\n\n";
-        $lines .= $prompt;
+        my $lines = $info_on_top;
+        $lines .= "\n" if length $lines;
+        if ( $show_fmt == 0 ) {
+            $lines .= join( ', ', @{$opt->{current}} ) . "\n" if defined $current;
+            my $tmp = join( ', ', @{$available}[@new_idx] );
+            $lines .= ! length $tmp  ? '--' : $tmp;
+        }
+        elsif ( $show_fmt == 1 ) {
+            $lines .= $key_cur . join( ', ', map { "\"$_\"" } @{$opt->{current}} ) . "\n" if defined $current;
+            $lines .= $key_new . join( ', ', map { "\"$_\"" } @{$available}[@new_idx] );
+        }
+        else {
+            $lines .= join( "\n", @{$available}[@new_idx] );
+        }
+        if ( defined $prompt ) {
+            $lines .= "\n" if length $lines && length $prompt;
+            $lines .= $prompt;
+        }
         my @pre = ( undef, $confirm );
-        my @avail_with_prefix = map { $prefix . $_ } @$available;
+        if ( defined $mark && @$mark ) {
+            $mark = [ map { $_ + @pre } @$mark ];
+        }
+        my @avail_with_prefix = map { $prefix . $_ } @cur_avail;
         # Choose
         my @idx = choose(
             [ @pre, @avail_with_prefix  ],
             { prompt => $lines, layout => $layout, mouse => $mouse, clear_screen => $clear, justify => $justify,
-              index => 1, lf => [ 0, $len_key ], order => $order, no_spacebar => [ 0 .. $#pre ], undef => $back }
+              index => 1, lf => [ 0, $key_w ], order => $order, no_spacebar => [ 0 .. $#pre ], undef => $back,
+              mark => $mark }
         );
+        $mark = undef;
         if ( ! defined $idx[0] || $idx[0] == 0 ) {
-            if ( @$new_idx ) {
-                $new_idx = [];
-                $new     = [];
+            if ( @new_idx ) {
+                @new_idx = ();
+                @cur_avail = @$available;
                 next;
             }
-            else {
-                return;
-            }
+            return;
         }
         if ( $idx[0] == 1 ) {
             shift @idx;
-            push @$new,     map { $available->[$_ - @pre] } @idx;
-            push @$new_idx, map { $_ - @pre }               @idx;
-            return $index ? $new_idx : $new;
+            my @tmp_idx;
+            for my $i ( reverse @idx ) {
+                $i -= @pre;
+                my $str = $keep_chosen ? $cur_avail[$i] : splice( @cur_avail, $i, 1 );
+                push @tmp_idx, first_index { $str eq $_ } @$available;
+            }
+            push @new_idx, reverse( @tmp_idx );
+            return $index ? \@new_idx : [ @{$available}[@new_idx] ];
         }
-        push @$new,     map { $available->[$_ - @pre] } @idx;
-        push @$new_idx, map { $_ - @pre }               @idx;
+        my @tmp_idx;
+        for my $i ( reverse @idx ) {
+            $i -= @pre;
+            my $str = $keep_chosen ? $cur_avail[$i] : splice( @cur_avail, $i, 1 );
+            push @tmp_idx, first_index { $str eq $_ } @$available;
+        }
+        push @new_idx, reverse( @tmp_idx );
     }
 }
 
 
 sub settings_menu {
-    my ( $menu, $val, $opt ) = @_;
+    my ( $menu, $curr, $opt ) = @_;
     $opt = {} if ! defined $opt;
-    my $prompt   = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $in_place = $opt->{in_place}; # DEPRECATED
-    my $clear    = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
-    my $mouse    = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
+    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}  : '';         # experimental
+    my $in_place    = $opt->{in_place}; # DEPRECATED
+    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
+    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
     #---------------------------------------#
-    my $confirm = defined $opt->{confirm}       ? $opt->{confirm}      : 'CONFIRM';
-    my $back    = defined $opt->{back}          ? $opt->{back}         : 'BACK';
+    my $confirm = defined $opt->{confirm} ? $opt->{confirm} : 'CONFIRM';
+    my $back    = defined $opt->{back}    ? $opt->{back}    : 'BACK';
     $back    = '  ' . $back;
     $confirm = '  ' . $confirm;
-    # ###
+    # ### # DEPRECATED
     if ( defined $in_place ) {
         my $m = 'Please remove the option "in_place". In the next release the option "in-place" will be removed and "settings_menu" will always do an in-place edit of the configuration %hash.';
         choose(
@@ -485,31 +557,36 @@ sub settings_menu {
     }
     # ###
     my $longest = 0;
-    my $tmp     = {};
+    my $new     = {};
     for my $sub ( @$menu ) {
-        my ( $key, $prompt ) = @$sub;
-        my $length = print_columns( "$prompt" );
-        $longest = $length if $length > $longest;
-        if ( ! defined $val->{$key} ) {
-            $val->{$key} = 0;
-        }
-        $tmp->{$key} = $val->{$key};
+        my ( $key, $name ) = @$sub;
+        my $name_w = print_columns( "$name" );
+        $longest      = $name_w if $name_w > $longest;
+        $curr->{$key} = 0       if ! defined $curr->{$key};
+        $new->{$key}  = $curr->{$key};
     }
-    my $count = 0;
+    my $lines = $info_on_top;
+    if ( defined $prompt ) {
+        $lines .= "\n" if length $lines;
+        $lines .= $prompt;
+    }
+    ###########################
+    my $count = 0; # DEPRECATED
+    ###########################
 
     while ( 1 ) {
         my @print_keys;
         for my $sub ( @$menu ) {
-            my ( $key, $prompt, $avail ) = @$sub;
-            my $current = $avail->[$tmp->{$key}];
-            push @print_keys, sprintf "%-*s [%s]", $longest, $prompt, $current;
+            my ( $key, $name, $values ) = @$sub;
+            my $current = $values->[$new->{$key}];
+            push @print_keys, sprintf "%-*s [%s]", $longest, $name, $current;
         }
         my @pre = ( undef, $confirm );
         my $choices = [ @pre, @print_keys ];
         # Choose
         my $idx = choose(
             $choices,
-            { prompt => $prompt, index => 1, layout => 3, justify => 0,
+            { prompt => $lines, index => 1, layout => 3, justify => 0,
               mouse => $mouse, clear_screen => $clear, undef => $back }
         );
         return if ! defined $idx;
@@ -517,34 +594,51 @@ sub settings_menu {
         return if ! defined $choice;
         if ( $choice eq $confirm ) {
             my $change = 0;
-            if ( $count ) {
+
+            #for my $sub ( @$menu ) {                    # NEW
+            #    my $key = $sub->[0];
+            #    next if $curr->{$key} == $new->{$key};
+            #    $curr->{$key} = $new->{$key};
+            #    $change++;
+            #}
+            #return $change; #
+
+            ###################################################
+            if ( $count ) {                        # DEPRECATED
                 for my $sub ( @$menu ) {
                     my $key = $sub->[0];
-                    next if $val->{$key} == $tmp->{$key};
+                    next if $curr->{$key} == $new->{$key};
                     if ( $in_place ) {
-                        $val->{$key} = $tmp->{$key};
+                        $curr->{$key} = $new->{$key};
                     }
                     $change++;
                 }
             }
-            return if ! $change;        # pod return value
+            return if ! $change;
             return 1 if $in_place;
-            return $tmp;
+            return $new;
+            ###################################################
         }
-        my $key   = $menu->[$idx-@pre][0];
-        my $avail = $menu->[$idx-@pre][2];
-        $tmp->{$key}++;
-        $tmp->{$key} = 0 if $tmp->{$key} == @$avail;
-        $count++;
+        my $key    = $menu->[$idx-@pre][0];
+        my $values = $menu->[$idx-@pre][2];
+        $new->{$key}++;
+        $new->{$key} = 0 if $new->{$key} == @$values;
+        ######################
+        $count++; # DEPRECATED
+        ######################
     }
 }
 
 
+
+# Removed documentation 08.02.2018:
+
 sub insert_sep {
     my ( $number, $separator ) = @_;
-    return if ! defined $number;
+    return           if ! defined $number;
+    return $number   if ! length $number;
     $separator = ',' if ! defined $separator;
-    return $number if $number =~ /\Q$separator\E/;
+    return $number   if $number =~ /\Q$separator\E/;
     $number =~ s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1$separator/g;
     # http://perldoc.perl.org/perlfaq5.html#How-can-I-output-my-numbers-with-commas-added?
     return $number;
@@ -569,7 +663,7 @@ sub print_hash {
     my $left_margin  = defined $opt->{left_margin}  ? $opt->{left_margin}  : 1;
     my $right_margin = defined $opt->{right_margin} ? $opt->{right_margin} : 2;
     my $keys         = defined $opt->{keys}         ? $opt->{keys}         : [ sort keys %$hash ];
-    my $len_key      = defined $opt->{len_key}      ? $opt->{len_key}      : length_longest( $keys );
+    my $key_w        = defined $opt->{len_key}      ? $opt->{len_key}      : length_longest( $keys );
     my $maxcols      = $opt->{maxcols};
     my $clear        = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
     my $mouse        = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
@@ -581,11 +675,11 @@ sub print_hash {
     if ( ! $maxcols || $maxcols > $term_width  ) {
         $maxcols = $term_width - $right_margin;
     }
-    $len_key += $left_margin;
+    $key_w += $left_margin;
     my $sep = ' : ';
     my $len_sep = print_columns( "$sep" );
-    if ( $len_key + $len_sep > int( $maxcols / 3 * 2 ) ) {
-        $len_key = int( $maxcols / 3 * 2 ) - $len_sep;
+    if ( $key_w + $len_sep > int( $maxcols / 3 * 2 ) ) {
+        $key_w = int( $maxcols / 3 * 2 ) - $len_sep;
     }
     my @vals = ();
     if ( defined $preface ) {
@@ -605,8 +699,8 @@ sub print_hash {
         else {
             $val = $hash->{$key};
         }
-        my $pr_key = sprintf "%*.*s%*s", $len_key, $len_key, $key, $len_sep, $sep;
-        my $text = line_fold( $pr_key . $val, $maxcols, '' , ' ' x ( $len_key + $len_sep ) );
+        my $pr_key = sprintf "%*.*s%*s", $key_w, $key_w, $key, $len_sep, $sep;
+        my $text = line_fold( $pr_key . $val, $maxcols, '' , ' ' x ( $key_w + $len_sep ) );
         $text =~ s/\n+\z//;
         for my $val ( split /\n+/, $text ) {
             push @vals, $val;
@@ -677,7 +771,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.054
+Version 0.055
 
 =cut
 
@@ -993,7 +1087,7 @@ Defaults to "Choose:".
         'attempts'       => 2
     };
 
-    settings_menu( $menu, $config )
+    settings_menu( $menu, $config );
 
 The first argument is a reference to an array of arrays. These arrays have three elements:
 
@@ -1001,7 +1095,7 @@ The first argument is a reference to an array of arrays. These arrays have three
 
 =item
 
-the key/option name
+the name of the option
 
 =item
 
@@ -1009,7 +1103,7 @@ the prompt string
 
 =item
 
-an array reference with the available values of the key/option.
+an array reference with the available values of the option.
 
 =back
 
@@ -1023,7 +1117,7 @@ the keys are the option names
 
 =item
 
-the values (C<0> if not defined) are the indexes of the current value of the respective key.
+the values (C<0> if not defined) are the indexes of the current value of the respective key/option.
 
 =back
 
@@ -1036,16 +1130,6 @@ The optional third argument is a reference to a hash. The keys are
 clear_screen
 
 If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
-
-=item
-
-in_place DEPRECATED
-
-This option will be removed and C<settings_menu> will always do an in-place edit of the configuration hash (the second argument).
-
-If enabled, the configuration hash (second argument) is edited in place else a reference to the modified hash is returned.
 
 Values: 0,[1].
 
@@ -1069,175 +1153,7 @@ When C<settings_menu> is called, it displays for each array entry a row with the
 It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. If the
 end of the list of the values is reached, it begins from the beginning of the list.
 
-C<settings_menu> returns nothing if no changes are made. If the user has changed values and C<in_place> is set to 1,
-C<settings_menu> modifies the hash passed as the second argument in place and returns 1. With the option C<in_place>
-set to 0 C<settings_menu> does no in place modifications but modifies a copy of the configuration hash. A reference to
-that modified copy is then returned.
-
-=head2 insert_sep
-
-    $integer = insert_sep( $number, $separator );
-
-C<insert_sep> inserts thousands separators into the number and returns the number.
-
-If the first argument is not defined, it is returned nothing.
-
-If the first argument contains one or more characters equal to the thousands separator, C<insert_sep> returns the string
-unchanged.
-
-As a second argument it can be passed a character which will be used as the thousands separator.
-
-The thousands separator defaults to the comma (C<,>).
-
-=head2 length_longest
-
-C<length_longest> expects as its argument a list of decoded strings passed a an array reference.
-
-    $longest = length_longest( \@elements );
-
-    ( $longest, $length ) = length_longest( \@elements );
-
-
-In scalar context C<length_longest> returns the length of the longest string - in list context it returns a list where
-the first item is the length of the longest string and the second is a reference to an array where the elements are the
-length of the corresponding elements from the array (reference) passed as the argument.
-
-I<Length> means here number of print columns as returned by the C<columns> method from  L<Unicode::GCString>.
-
-=head2 print_hash
-
-Prints a simple hash to STDOUT if called in void context. If not called in
-void context, I<print_hash> returns the formatted hash as a string.
-
-Nested hashes are not supported. If the hash has more keys than the terminal rows, the output is divided up on several
-pages. The user can scroll through the single lines of the hash. In void context the output of the hash is closed when
-the user presses C<Return>.
-
-Empty strings are used instead of undefined hash values.
-
-The first argument is the hash to be printed passed as a reference.
-
-The optional second argument is also a hash reference which allows to set the following options:
-
-=over
-
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
-
-=item
-
-keys
-
-The keys which should be printed in the given order. The keys are passed with an array reference. Keys which don't exist
-are ignored. If not set, I<keys> defaults to
-
-    [ sort keys %$hash ]
-
-=item
-
-left_margin
-
-I<left_margin> is added to I<len_key>. It defaults to 1.
-
-=item
-
-len_key
-
-I<len_key> sets the available print width for the keys. The default value is the length (of print columns) of the
-longest key.
-
-If the remaining width for the values is less than one third of the total available width the keys are trimmed until the
-available width for the values is at least one third of the total available width.
-
-=item
-
-maxcols
-
-The maximum width of the output. If not set or set to 0 or set to a value higher than the terminal width, the maximum
-terminal width is used instead.
-
-Default: undefined.
-
-=item
-
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
-
-=item
-
-preface
-
-With I<preface> it can be passed a string which is printed above the hash.
-
-Default: undefined.
-
-=item
-
-prompt
-
-Sets the prompt string
-
-If I<preface> is defined, I<prompt> defaults to the empty string else the default is 'Close with ENTER'.
-
-=item
-
-right_margin
-
-The I<right_margin> is subtracted from I<maxcols> if I<maxcols> is the maximum terminal width. The default value is
-2.
-
-=back
-
-=head2 term_size
-
-C<term_size> returns the current terminal width and the current terminal height.
-
-    ( $width, $height ) = term_size()
-
-If the OS is MSWin32, C<Size> from L<Win32::Console> is used to get the terminal width and the terminal height else
-C<GetTerminalSize> form L<Term::ReadKey> is used.
-
-On MSWin32 OS, if it is written to the last column on the screen the cursor goes to the first column of the next line.
-To prevent this newline when writing to a Windows terminal C<term_size> subtracts 1 from the terminal width before
-returning the width if the OS is MSWin32.
-
-=head2 term_width
-
-C<term_size> returns the current terminal width. See L</term_size> above.
-
-=head2 unicode_sprintf
-
-    $unicode = unicode_sprintf( $unicode, $available_width, $rightpad );
-
-C<unicode_sprintf> expects 2 or 3 arguments: the first argument is a decoded string, the second argument is the
-available width and the third and optional argument tells how to pad the string.
-
-If the length of the string is greater than the available width, it is truncated to the available width. If the string
-is equal to the available width, nothing is done with the string. If the string length is less than the available width,
-C<unicode_sprintf> adds spaces to the string until the string length is equal to the available width. If the third
-argument is set to a true value, the spaces are added at the beginning of the string else they are added at the end of
-the string.
-
-I<Length> or I<width> means here number of print columns as returned by the C<columns> method from L<Unicode::GCString>.
-
-=head2 unicode_trim
-
-    $unicode = unicode_trim( $unicode, $length )
-
-The first argument is a decoded string, the second argument is the length.
-
-If the string is longer than the passed length, it is trimmed to that length at the right site and returned else the
-string is returned as it is.
-
-I<Length> means here number of print columns as returned by the C<columns> method from  L<Unicode::GCString>.
+C<settings_menu> returns true if changes were made else false.
 
 =head1 REQUIREMENTS
 

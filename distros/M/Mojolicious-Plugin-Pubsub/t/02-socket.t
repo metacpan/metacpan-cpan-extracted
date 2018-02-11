@@ -11,7 +11,7 @@ my $socket = tempdir( CLEANUP => 1 ) . "/pubsub.sock";
 plugin Pubsub => { cb => sub { $msg = -e $socket; Mojo::IOLoop->stop; }, socket => $socket };
 
 app->log->level('warn');
-app->publish('message');
+app->pubsub->publish('message');
 app->start('daemon', '-l', "http://127.0.0.1:$port");
 
 

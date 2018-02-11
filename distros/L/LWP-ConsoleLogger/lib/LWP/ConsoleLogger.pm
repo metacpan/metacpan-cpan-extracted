@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-$LWP::ConsoleLogger::VERSION = '0.000036';
+our $VERSION = '0.000037';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -347,7 +347,7 @@ sub _get_content {
             ( 'javascript', 'html', 'json', 'xml', 'x-www-form-urlencoded', )
         )
         && $subtype !~ m{$json_regex}
-        ) {
+    ) {
         $content = $self->_redaction_message($content_type);
     }
     elsif ( $self->content_pre_filter ) {
@@ -534,9 +534,31 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000036
+version 0.000037
 
 =head1 SYNOPSIS
+
+The simplest way to get started is by adding L<LWP::ConsoleLogger::Everywhere>
+to your code and then just watching your output.
+
+    use LWP::ConsoleLogger::Everywhere ();
+
+If you need more control, look at L<LWP::ConsoleLogger::Easy>.
+
+    use LWP::ConsoleLogger::Easy qw( debug_ua );
+    use WWW::Mechanize;
+
+    my $mech           = WWW::Mechanize->new;   # or LWP::UserAgent->new() etc
+    my $console_logger = debug_ua( $mech );
+    $mech->get( 'https://metacpan.org' );
+
+    # now watch the console for debugging output
+    # turn off header dumps
+    $console_logger->dump_headers( 0 );
+
+    $mech->get( $some_other_url );
+
+To get down to the lowest level, use LWP::ConsoleLogger directly.
 
     my $ua = LWP::UserAgent->new( cookie_jar => {} );
     my $console_logger = LWP::ConsoleLogger->new(
@@ -563,21 +585,6 @@ version 0.000036
 
     # now watch debugging output to your screen
     $ua->get( 'http://nytimes.com/' );
-
-Or start the easy way.
-
-    use LWP::ConsoleLogger::Easy qw( debug_ua );
-    use WWW::Mechanize;
-
-    my $mech           = WWW::Mechanize->new;   # or LWP::UserAgent->new() etc
-    my $console_logger = debug_ua( $mech );
-    $mech->get( 'https://metacpan.org' );
-
-    # now watch the console for debugging output
-    # turn off header dumps
-    $console_logger->dump_headers( 0 );
-
-    $mech->get( $some_other_url );
 
 Sample output might look like this.
 
@@ -737,7 +744,7 @@ content_pre_filter and text_pre_filters have been applied.  Defaults to true.
 =head2 dump_title( 0|1 )
 
 Boolean value. If true, dumps the titles of HTML pages if your UserAgent has
-a c<title> method and if it returns something useful. Defaults to true.
+a C<title> method and if it returns something useful. Defaults to true.
 
 =head2 dump_uri( 0|1 )
 
@@ -769,7 +776,7 @@ HTML content to make it easier to detect changes in the body of the page.
     );
 
 Try to make sure that your content mangling doesn't return broken HTML as that
-may not play with with L<HTML::Restrict>.
+may not play well with L<HTML::Restrict>.
 
 =head2 request_callback
 
@@ -835,7 +842,7 @@ order to present you with more readable text.
 If the content_type indicates HTML then HTML::Restrict will be used to strip
 tags from your content in the text rendering process.  You may pass your own
 HTML::Restrict object, if you like.  This would be helpful in situations where
-you still do want to some some tags in your text.
+you still do want to have some tags in your text.
 
 =head2 logger( Log::Dispatch->new( ... ) )
 

@@ -47,7 +47,6 @@
             "Sub::Name" : "0",
             "Test::Builder" : "0",
             "Test::More" : "0",
-            "experimental" : "0",
             "lib" : "0"
          }
       }
@@ -56,11 +55,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/amb43790/Devel-Chitin.git",
-         "web" : "https://github.com/amb43790/Devel-Chitin"
+         "url" : "https://github.com/brummett/Devel-Chitin.git",
+         "web" : "https://github.com/brummett/Devel-Chitin"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

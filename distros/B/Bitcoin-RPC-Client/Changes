@@ -1,5 +1,10 @@
 Revision history for Bitcoin::RPC::Client 
 
+0.08    2018-1-30/14
+        - Changed dependency for JSON::RPC::Client to JSON::RPC::Legacy::Client
+        - Fatal on bitcoind errors
+        - Support for cookie based auth
+
 0.07    2017-10-16/14
         - Multi-wallet support
         - SSL support over web proxy

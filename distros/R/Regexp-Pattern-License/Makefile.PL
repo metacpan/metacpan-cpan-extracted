@@ -4,42 +4,43 @@ use ExtUtils::MakeMaker 6.17;
 my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 
 my $meta = {
-  "abstract"       => "regular expressions for legal licenses",
-  "author"         => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010",
-  "keywords"       => ["Licensing", "Sourcecode"],
-  "license"        => ["gpl_3"],
-  "meta-spec"      => {
-                        url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-                        version => 2,
-                      },
-  "name"           => "Regexp-Pattern-License",
-  "no_index"       => { directory => ["eg", "examples", "inc", "t", "xt"] },
-  "prereqs"        => {
-                        configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                        runtime => { requires => { perl => 5, strictures => 2 } },
-                        test => {
-                          requires => { "Regexp::Pattern" => 0, "Test::Exception" => 0, "Test::More" => 0.98 },
+  "abstract"         => "regular expressions for legal licenses",
+  "author"           => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
+  "dynamic_config"   => 0,
+  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "keywords"         => ["Licensing", "Sourcecode"],
+  "license"          => ["gpl_3"],
+  "meta-spec"        => {
+                          url => "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+                          version => 2,
                         },
-                      },
-  "provides"       => {
-                        "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.0.31" },
-                        "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.0.31" },
-                      },
-  "release_status" => "stable",
-  "resources"      => {
-                        bugtracker   => { web => "https://bugs.debian.org/regexp-pattern-license" },
-                        homepage     => "https://metacpan.org/release/Regexp-Pattern-License",
-                        license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
-                        repository   => {
-                                          type => "git",
-                                          web  => "https://anonscm.debian.org/git/build-common/regexp-pattern-license.git",
-                                        },
-                        x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
-                      },
-  "version"        => "v3.0.31",
-  "x_help_wanted"  => ["tester", "documenter"],
+  "name"             => "Regexp-Pattern-License",
+  "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
+  "prereqs"          => {
+                          configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
+                          runtime => { requires => { perl => 5, strictures => 2 } },
+                          test => {
+                            requires => { "Regexp::Pattern" => 0, "Test::Exception" => 0, "Test::More" => 0.98 },
+                          },
+                        },
+  "provides"         => {
+                          "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.1.0" },
+                          "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.1.0" },
+                        },
+  "release_status"   => "stable",
+  "resources"        => {
+                          bugtracker   => { web => "https://bugs.debian.org/regexp-pattern-license" },
+                          homepage     => "https://metacpan.org/release/Regexp-Pattern-License",
+                          license      => ["http://www.gnu.org/licenses/gpl-3.0.txt"],
+                          repository   => {
+                                            type => "git",
+                                            web  => "https://anonscm.debian.org/git/build-common/regexp-pattern-license.git",
+                                          },
+                          x_identifier => "http://purl.org/NET/cpan-uri/dist/Regexp-Pattern-License/project",
+                        },
+  "version"          => "v3.1.0",
+  "x_help_wanted"    => ["documenter", "tester"],
+  "x_static_install" => 1,
 };
 
 my %dynamic_config;

@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/plack/Plack/issues
   homepage: https://github.com/plack/Plack
   repository: https://github.com/plack/Plack.git
-version: '1.0045'
+version: '1.0047'
 x_authority: cpan:MIYAGAWA
 x_contributors:
   - 'Aaron Trevena <aaron.trevena@gmail.com>'
@@ -56,6 +56,7 @@ x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alex J. G. Burzyński <ajgb@cpan.org>'
   - 'Allan Whiteford <github.allan@256kelvin.com>'
+  - 'Andrew Fresh <andrew.fresh@grantstreet.com>'
   - 'Andrew Rodland <andrew@cleverdomain.org>'
   - 'Andy Wardley <abw@wardley.org>'
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'

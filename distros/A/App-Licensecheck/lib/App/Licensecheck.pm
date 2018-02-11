@@ -9,7 +9,8 @@ use Path::Iterator::Rule;
 use Path::Tiny;
 use Fcntl qw/:seek/;
 use Encode;
-use Regexp::Pattern::License;
+use Regexp::Pattern;
+use Regexp::Pattern::License 3.1.0;
 use String::Copyright 0.003 {
 	format => sub { join ' ', $_->[0] || (), $_->[1] || () }
 };
@@ -30,11 +31,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.31
+Version v3.0.32
 
 =cut
 
-our $VERSION = version->declare("v3.0.31");
+our $VERSION = version->declare("v3.0.32");
 
 =head1 SYNOPSIS
 
@@ -370,7 +371,13 @@ sub licensepatterns
 		}
 		$list{name}{$key} ||= $val->{name} || $key;
 		$list{caption}{$key} ||= $val->{caption} || $val->{name} || $key;
-		$list{re}{$key} = $val->{pat};
+		$list{re}{$key} = re( 'License::' . $key );
+		for ( map {/^type:([^:]+(?::[^:]+)?)$/} @{ $val->{tags} } ) {
+			push @{ $list{type}{$_} }, $key;
+		}
+		for ( map {/^family:([^:]+)/} @{ $val->{tags} } ) {
+			push @{ $list{family}{$_} }, $key;
+		}
 	}
 
 	# TODO: use Regexp::Common
@@ -393,6 +400,8 @@ sub parse_license
 
 	# TODO: make naming scheme configurable
 	my %L = licensepatterns('debian');
+
+	my @custom_done = ();
 
   # @spdx_license contains identifiers from https://spdx.org/licenses/
   # it would be more efficient to store license info only in this
@@ -533,6 +542,7 @@ sub parse_license
 			$gen_license->( 'lgpl', $1, $2 );
 		}
 	}
+	push @custom_done, qw(lgpl);
 
 	# AGPL
 	given ($licensetext) {
@@ -556,6 +566,7 @@ sub parse_license
 			$gen_license->( 'agpl', $1, $2 );
 		}
 	}
+	push @custom_done, qw(agpl);
 
 	# GPL
 	given ($licensetext) {
@@ -597,10 +608,11 @@ sub parse_license
 			$gen_license->( 'gpl', $1, $2 );
 		}
 	}
+	push @custom_done, qw(gpl);
 
 	# CC
 	given ($licensetext) {
-		foreach my $id (qw<cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0>) {
+		foreach my $id ( @{ $L{family}{cc} } ) {
 			when ( /$L{re}{$id}(?i: version)? ($L{re}{version_number}) or ($L{re}{version_number})/i ) {
 				$license = "$L{caption}{$id} (v$1 or v$2) $license";
 				push @spdx_license, "$L{name}{$id}-$1 or $L{name}{$id}-$1";
@@ -610,19 +622,7 @@ sub parse_license
 			}
 		}
 	}
-
-	# NTP
-	given ($licensetext) {
-		when ( /$L{re}{dsdp}/) {
-			$gen_license->('dsdp');
-		}
-		when ( /$L{re}{ntp_disclaimer}/) {
-			$gen_license->('ntp_disclaimer');
-		}
-		when ( /$L{re}{ntp}/) {
-			$gen_license->('ntp');
-		}
-	}
+	push @custom_done, qw(cc_by cc_by_nc cc_by_nc_nd cc_by_nc_sa cc_by_nd cc_by_sa cc_cc0 cc_sp);
 
 	# BSD
 	if ( $licensetext =~ /THIS SOFTWARE IS PROVIDED .*AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY/ ) {
@@ -647,6 +647,7 @@ sub parse_license
 	elsif ( $licensetext =~ /licen[sc]e:? ?bsd\b/i ) {
 		$gen_license->('bsd');
 	}
+	push @custom_done, qw(bsd_2_clause bsd_3_clause bsd_4_clause);
 
 	# Artistic
 	given ($licensetext) {
@@ -660,6 +661,7 @@ sub parse_license
 			$gen_license->('artistic', $1, $2);
 		}
 	}
+	push @custom_done, qw(artistic artistic_2 perl);
 
 	# Apache
 	given ($licensetext) {
@@ -688,6 +690,7 @@ sub parse_license
 			$gen_license->( 'apache', $1 );
 		}
 	}
+	push @custom_done, qw(apache);
 
 	# FSFUL
 	given ($licensetext) {
@@ -699,6 +702,7 @@ sub parse_license
 			push @spdx_license, "FSFUL~$1";
 		}
 	}
+	push @custom_done, qw(fsful);
 
 	# FSFULLR
 	given ($licensetext) {
@@ -710,6 +714,7 @@ sub parse_license
 			push @spdx_license, "FSFULLR~$1";
 		}
 	}
+	push @custom_done, qw(fsfullr);
 
 	# JSON
 	given ($licensetext) {
@@ -749,13 +754,7 @@ sub parse_license
 			$gen_license->( 'cecill', $1 );
 		}
 	}
-
-	# CDDL
-	given ($licensetext) {
-		when ( /$L{re}{cddl}(?:,?\s+$L{re}{version}{-keep})?/ ) {
-			$gen_license->( 'cddl', $1 );
-		}
-	}
+	push @custom_done, qw(cecill cecill_1 cecill_1_1 cecill_2 cecill_2_1 cecill_b cecill_c);
 
 	# public-domain
 	given ($licensetext) {
@@ -763,6 +762,7 @@ sub parse_license
 			$gen_license->('public_domain');
 		}
 	}
+	push @custom_done, qw(public_domain);
 
 	given ($licensetext) {
 		# AFL or LGPL
@@ -774,13 +774,7 @@ sub parse_license
 			$gen_license->( 'afl', $1 );
 		}
 	}
-
-	# EPL
-	given ($licensetext) {
-		when ( /$L{re}{epl}(?:[ ,-]+$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/ ) {
-			$gen_license->( 'epl', $1, $2 );
-		}
-	}
+	push @custom_done, qw(afl);
 
 	# BSL
 	given ($licensetext) {
@@ -795,38 +789,41 @@ sub parse_license
 
 	given ($licensetext) {
 
-		# simple-versioned
-		foreach my $id (qw<mpl ofl python qpl rpsl sgi_b wtfpl>) {
-			when (/$L{re}{$id}\W*\(?$L{re}{version}{-keep}\)?/) {
+		# versioned
+		foreach my $id ( @{ $L{type}{'versioned:decimal'} } ) {
+			next if ( grep {/^$id$/} @custom_done );
 
-				# skip referenced license
-				if ( 'mpl' eq $id and $licensetext =~ /$L{re}{rpsl}/ ) {
-					continue;
-				}
+			# skip embedded or referenced licenses
+			if ( grep {/^$id$/} qw(mpl python) ) {
+				next if $licensetext =~ /$L{re}{rpsl}/;
+			}
 
-				$gen_license->( $id, $1 );
+			when (
+				/$L{re}{$id}(?:\W*\(?$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?\)?)?/
+				)
+			{
+				$gen_license->( $id, $1, $2 );
 				continue;
 			}
 		}
 
 		# unversioned
-		foreach my $id (
-			qw(
-			adobe_2006 adobe_glyph aladdin apafml
-			beerware cube curl eurosym fsfap ftl icu isc libpng llgpl
-			mit_advertising mit_cmu mit_cmu_warranty
-			mit_enna mit_feh mit_new mit_old
-			mit_oldstyle mit_oldstyle_disclaimer mit_oldstyle_permission
-			ms_pl ms_rl postgresql unicode_strict unicode_tou
-			zlib zlib_acknowledgement)
-			)
-		{
-			when (/$L{re}{$id}/) {
+		foreach my $id ( @{ $L{type}{unversioned} } ) {
+			next if ( grep {/^$id$/} @custom_done );
 
-				# skip embedded license
-				if ( 'zlib' eq $id and $licensetext =~ /$L{re}{cube}/ ) {
-					continue;
-				}
+			# skip embedded or referenced licenses
+			if ( grep {/^$id$/} qw(zlib) ) {
+				next if $licensetext =~ /$L{re}{cube}/;
+			}
+			if ( grep {/^$id$/} qw(ntp) ) {
+				next if $licensetext =~ /$L{re}{ntp_disclaimer}/;
+				next if $licensetext =~ /$L{re}{dsdp}/;
+			}
+			if ( grep {/^$id$/} qw(ntp_disclaimer) ) {
+				next if $licensetext =~ /$L{re}{mit_cmu}/;
+			}
+
+			when (/$L{re}{$id}/) {
 				$gen_license->($id);
 				continue;
 			}

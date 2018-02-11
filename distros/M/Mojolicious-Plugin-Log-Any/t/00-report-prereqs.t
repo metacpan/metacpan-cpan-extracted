@@ -60,7 +60,11 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  Log::Any
+  Log::Contextual
+  Log::Dispatch
+  Log::Dispatchouli
+  Log::Log4perl
 );
 
 my @exclude = qw(

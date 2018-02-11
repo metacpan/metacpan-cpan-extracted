@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Devel-Chitin,
-version 0.14:
+version 0.15:
 
   Programmatic interface to the Perl debugging API
 
-This software is copyright (c) 2017 by Anthony Brummett <brummett@cpan.org>.
+This software is copyright (c) 2018 by Anthony Brummett <brummett@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

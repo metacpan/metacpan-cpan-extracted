@@ -1,5 +1,5 @@
 package Net::Stripe::Card;
-$Net::Stripe::Card::VERSION = '0.33';
+$Net::Stripe::Card::VERSION = '0.34';
 use Moose;
 use Moose::Util::TypeConstraints qw(union);
 use Kavorka;
@@ -23,7 +23,7 @@ has 'exp_year'        => (is => 'ro', isa => 'Maybe[Int]', required => 1);
 
 # Output fields
 has 'id'                   => (is => 'ro', isa => 'Maybe[Str]');
-has 'address_line_1_check' => (is => 'ro', isa => 'Maybe[Str]');
+has 'address_line1_check'  => (is => 'ro', isa => 'Maybe[Str]');
 has 'address_zip_check'    => (is => 'ro', isa => 'Maybe[Str]');
 has 'country'              => (is => 'ro', isa => 'Maybe[Str]');
 has 'cvc_check'            => (is => 'ro', isa => 'Maybe[Str]');
@@ -53,7 +53,7 @@ Net::Stripe::Card - represent a Card object from Stripe
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 ATTRIBUTES
 

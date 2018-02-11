@@ -1,5 +1,7 @@
 package Plack::Middleware::Signposting::Catmandu;
 
+our $VERSION = '0.04';
+
 use Catmandu::Sane;
 use Catmandu;
 use Catmandu::Fix;
@@ -41,11 +43,15 @@ sub call {
 
     my $id;
     my $match_paths = $self->match_paths;
-    my $pattern = join('|', @$match_paths);
-    $id = $request->path =~ /$pattern/;
-    
+    foreach my $p (@$match_paths) {
+        if ($request->path =~ /$p/) {
+            $id = $1;
+            last;
+        }
+    }
+
     return $res unless $id;
-    
+
     # see http://search.cpan.org/~miyagawa/Plack-1.0044/lib/Plack/Middleware.pm#RESPONSE_CALLBACK
     return $self->response_cb($res, sub {
         my $res = shift;
@@ -53,8 +59,7 @@ sub call {
         # ignore streaming response for now
         return unless ref $res->[2] eq 'ARRAY';
 
-        my $data = $bag->get($id);
-        return unless $data->{_id};
+        my $data = $bag->get($id) || return;
 
         $fixer->fix($data);
 
@@ -85,7 +90,7 @@ Plack::Middleware::Signposting::Catmandu - A Signposting implementation from a C
             store => 'library',
             bag => 'books',
             fix => 'signs.fix', #optional
-            math_paths => ["publication/(\w+?)/?", "record/(\w+?)/?"],
+            match_paths => ['publication/(\w+)/*', 'record/(\w+)/*'],
             ;
 
         # ...

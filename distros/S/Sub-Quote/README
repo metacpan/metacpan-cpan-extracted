@@ -59,7 +59,34 @@ SUBROUTINES
 
     "package"
       The package that the quoted sub will be evaluated in. If not
-      specified, the sub calling "quote_sub" will be used.
+      specified, the package from sub calling "quote_sub" will be used.
+
+    "hints"
+      The value of $^H to use for the code being evaluated. This captures
+      the settings of the strict pragma. If not specified, the value from
+      the calling code will be used.
+
+    "warning_bits"
+      The value of "${^WARNING_BITS}" to use for the code being evaluated.
+      This captures the warnings set. If not specified, the warnings from
+      the calling code will be used.
+
+    "%^H"
+      The value of "%^H" to use for the code being evaluated. This captures
+      additional pragma settings. If not specified, the value from the
+      calling code will be used if possible (on perl 5.10+).
+
+    "attributes"
+      The "Subroutine Attributes" in perlsub to apply to the sub generated.
+      Should be specified as an array reference. The attributes will be
+      applied to both the generated sub and the deferred wrapper, if one is
+      used.
+
+    "file"
+      The apparent filename to use for the code being evaluated.
+
+    "line"
+      The apparent line number to use for the code being evaluated.
 
   unquote_sub
      my $coderef = unquote_sub $sub;

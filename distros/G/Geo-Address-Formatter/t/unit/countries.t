@@ -1,4 +1,5 @@
 use strict;
+use warnings;
 use lib 'lib';
 use feature qw(say);
 use Data::Dumper;
@@ -13,9 +14,9 @@ use utf8;
 # nicer output for diag and failures, see
 # http://perldoc.perl.org/Test/More.html#CAVEATS-and-NOTES
 my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
+binmode $builder->output,         ":encoding(UTF-8)";
+binmode $builder->failure_output, ":encoding(UTF-8)";
+binmode $builder->todo_output,    ":encoding(UTF-8)";
 
 
 my $path = dirname(__FILE__) . '/testcases1';
@@ -53,6 +54,5 @@ foreach my $filename (@files){
         _one_testcase($country, $rh_testcase);
     }
 }
-
 
 done_testing();

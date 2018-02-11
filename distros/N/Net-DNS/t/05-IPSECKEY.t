@@ -1,4 +1,4 @@
-# $Id: 05-IPSECKEY.t 1381 2015-08-25 07:36:09Z willem $	-*-perl-*-
+# $Id: 05-IPSECKEY.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -119,7 +119,7 @@ my $wire =
 {
 	my $rr = new Net::DNS::RR(". $type @data");
 	$rr->{gatetype} = 255;
-	$rr->encode;
+	eval { $rr->encode };
 	my $exception = $1 if $@ =~ /^(.+)\n/;
 	ok( $exception ||= '', "exception raised in encode\t[$exception]" );
 }

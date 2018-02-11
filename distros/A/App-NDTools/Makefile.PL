@@ -26,18 +26,11 @@ WriteMakefile(
         'ndproc',
         'ndquery',
     ],
-    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (
-        META_MERGE => {
-            'meta-spec' => { version => 2 },
-            resources => {
-                repository => {
-                    type => 'git',
-                    url  => 'https://github.com/mr-mixas/NDTools.git',
-                    web  => 'https://github.com/mr-mixas/NDTools',
-                },
-            }
-        }
-    ) : ()),
+    META_MERGE => {
+        resources => {
+            repository  => 'https://github.com/mr-mixas/NDTools',
+        },
+    },
     PREREQ_PM => {
         'Encode::Locale'            => 0,
         'Hash::Merge'               => 0,

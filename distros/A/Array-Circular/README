@@ -1,0 +1,95 @@
+NAME
+
+    Array::Circular
+
+ DESCRIPTION
+
+    Circular array, tracks how many times it's been round.
+
+ SYNOPSIS
+
+        my $a = Array->Circular->new(qw/once upon a time there was/);
+        my $current = $l->next;
+        say "They are the same" if $current == $l->current;
+        my $first = $l->previous;
+        say "Also the same" if $first == $l->current;
+        say "We went around the loop " . $l->loops . " times";
+
+ METHODS
+
+  new
+
+        my $a = Array::Circular->new(qw/this is a test/);
+
+  next
+
+        my $element     = $l->next;
+        my $two_forward = $l->next(2);
+
+  previous / prev
+
+        my $element = $l->previous;
+        my $two_back = $l->previous(2);
+
+  current / curr
+
+        my $element = $l->current;
+
+  index
+
+        my $idx = $l->index;
+        $idx    = $l->index(3);
+
+    Gets or sets the current index. Always returns the value of the current
+    index. Does not reset the loop counter. No validation is performed.
+
+  loops
+
+        my $number_of_times_been_around = $l->loops
+        $l->loops(-3);
+
+    The loops method keeps track of how many times the array has been
+    around. Looping forwards increases the loop count. Looping back
+    decreases it. Sending in a number will set the counter but beware, no
+    validation is performed on set operations.
+
+  reset
+
+        $l->reset
+
+    Resets the current index and loop count to 0.
+
+   me
+
+        my $internal_store = $l->me
+
+    This is the internal store that tracks the current state of the list.
+    It's intended for internal use only.
+
+ GOTCHAS
+
+    Some array modification operations are supported. For example splice,
+    push and pop operations are untested. If you mutate the array you may
+    consider using reset, loops and index to fix up the effects of your
+    mutation.
+
+ IMPLEMENTATION NOTES
+
+    This module is implemented as an inside out object.
+
+ SEE ALSO
+
+    Array::Iterator::Circular provides similar functionality but it does
+    not support previous. Array::Iterator contains a survey of various
+    similar modules.
+
+ TODO
+
+    Not thread safe. See implementation of Hash::MultiValue for
+    implementation of thread safety.
+
+ AUTHOR COPYRIGHT AND LICENSE
+
+    Copyright 2018 Kieren Diment zarquon@cpan.org. This software can be
+    redistributed under the same terms as perl itself.
+

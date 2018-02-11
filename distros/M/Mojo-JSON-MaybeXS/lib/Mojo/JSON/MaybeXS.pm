@@ -6,7 +6,7 @@ use Mojo::Util 'monkey_patch';
 use JSON::MaybeXS 'JSON';
 use Mojo::JSON ();
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $BINARY = JSON::MaybeXS->new(utf8 => 1, canonical => 1, allow_nonref => 1,
 	allow_unknown => 1, allow_blessed => 1, convert_blessed => 1);
@@ -140,18 +140,19 @@ or L<JSON::PP> will encode them as numbers (barewords) producing invalid JSON.
 
 =head2 Upgraded Numbers
 
-L<JSON::MaybeXS>, if using L<JSON::XS> or L<JSON::PP>, will attempt to guess if
-a value to be encoded is numeric or string based on its last usage. Therefore,
-using a variable containing C<13> in a string will cause it to be encoded as
-C<"13"> even if the variable itself was not changed. L<Mojo::JSON> or
+L<JSON::MaybeXS>, if using L<JSON::XS>, will attempt to guess if a value to be
+encoded is numeric or string based on whether Perl has ever populated a string
+value for it internally. Therefore, using a variable containing C<13> in a
+string context will cause it to be encoded as C<"13"> even if the variable
+itself was not changed. L<Mojo::JSON>, L<JSON::PP> version 2.92 or greater, or
 L<Cpanel::JSON::XS> version 3.0109 or greater will encode C<13> as C<13>
 regardless of whether it has been used as a string.
 
  my ($num1, $num2) = (13, 14);
  my $str = "$num1";
  print encode_json([$num1, $num2, $str]);
- # Mojo::JSON or Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
- # JSON::XS or JSON::PP: ["13",14,"13"]
+ # Mojo::JSON, JSON::PP >= 2.92, Cpanel::JSON::XS >= 3.0109: [13,14,"13"]
+ # JSON::XS: ["13",14,"13"]
 
 =head2 Duplicate Keys
 

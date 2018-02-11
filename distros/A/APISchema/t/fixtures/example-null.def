@@ -1,0 +1,14 @@
+title 'Example with null';
+
+resource value => {
+    type => 'object',
+    description => 'the result',
+    properties => {
+        value  => {
+            type => 'null',
+            description => 'The Value',
+            example => undef,
+        },
+    },
+    required => ['value'],
+};

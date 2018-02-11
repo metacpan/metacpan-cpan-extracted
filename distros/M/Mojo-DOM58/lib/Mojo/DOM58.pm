@@ -16,7 +16,7 @@ use Mojo::DOM58::_CSS;
 use Mojo::DOM58::_HTML;
 use Scalar::Util qw(blessed weaken);
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 sub new {
   my $class = shift;
@@ -406,7 +406,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<7.55> of
+This release of L<Mojo::DOM58> is up to date with version C<7.62> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS

@@ -52,5 +52,5 @@ requires:
 resources:
   bugtracker: http://github.com/analizo/Analizo/issues
   repository: git://github.com/analizo/analizo.git
-version: 1.20.6
+version: 1.20.7
 x_serialization_backend: 'YAML::Tiny version 1.70'

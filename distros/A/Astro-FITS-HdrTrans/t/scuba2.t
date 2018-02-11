@@ -14,7 +14,7 @@ eval {
 if( $@ ) {
   plan skip_all => 'Test requires Astro::FITS::Header module';
 } else {
-  plan tests => 6;
+  plan tests => 8;
 }
 
 # Test compilation.
@@ -39,6 +39,9 @@ is( $generic_header{'INSTRUMENT'}, "SCUBA-2", "SCUBA-2");
 is( $generic_header{'SEEING'}, 0.5, "SEEING is 0.5");
 
 is($generic_header{'DOME_OPEN'}, 0, 'DOME OPEN');
+
+is($generic_header{'FOURIER_TRANSFORM_SPECTROMETER'}, 1, 'FOURIER TRANSFORM SPECTROMETER');
+is($generic_header{'POLARIMETER'}, 1, 'POLARIMETER');
 
 sub readfits {
   my $file = shift;

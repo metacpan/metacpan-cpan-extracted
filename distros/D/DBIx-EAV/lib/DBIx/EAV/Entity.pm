@@ -51,10 +51,14 @@ sub get {
 
 sub _get_related {
     my ($self, $relname, $query, $options) = @_;
-    $query //= {};
+
     my $rel = $self->type->relationship($relname);
+    my ($our_side, $their_side) = $rel->{is_right_entity} ? qw/ right left / : qw/ left right /;
+    my $related_type = $self->eav->type_by_id($rel->{"${their_side}_entity_type_id"});
+
+    $query //= {};
     $query->{$rel->{incoming_name}} = $self;
-    $self->eav->resultset($rel->{entity})->search($query, $options);
+    $self->eav->resultset($related_type)->search($query, $options);
 }
 
 
@@ -274,8 +278,8 @@ sub _save_related {
     $options //= {};
 
     my $rel = $self->type->relationship($relname);
-    my $related_type = $self->eav->type($rel->{entity});
     my ($our_side, $their_side) = $rel->{is_right_entity} ? qw/ right left / : qw/ left right /;
+    my $related_type = $self->eav->type_by_id($rel->{"${their_side}_entity_type_id"});
 
     # delete any old links
     my $relationship_table = $self->eav->table('entity_relationships');
@@ -344,13 +348,14 @@ sub remove_related {
 
     my $relationships_table = $self->eav->table('entity_relationships');
     my ($our_side, $their_side) = $rel->{is_right_entity} ? qw/ right left / : qw/ left right /;
+    my $related_type = $self->eav->type_by_id($rel->{"${their_side}_entity_type_id"});
 
     $data = [$data] unless ref $data eq 'ARRAY';
 
     foreach my $entity (@$data) {
 
-        die "remove_related() error: give me an instance of '$rel->{entity}' or an arrayref of it."
-            unless blessed $entity && $entity->isa('DBIx::EAV::Entity') && $entity->type->name eq $rel->{entity};
+        die "remove_related() error: give me an instance of '".$related_type->name."' or an arrayref of it."
+            unless blessed $entity && $entity->isa('DBIx::EAV::Entity') && $entity->is_type($related_type->name);
 
         $relationships_table->delete({
             relationship_id          => $rel->{id},

@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.3, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   DBIx::EAV:
     file: lib/DBIx/EAV.pm
-    version: '0.09'
+    version: '0.11'
   DBIx::EAV::Cursor:
     file: lib/DBIx/EAV/Cursor.pm
   DBIx::EAV::Entity:
@@ -44,6 +44,8 @@ provides:
 requires:
   Class::Load: '0'
   DBI: '0'
+  Data::Dumper: '0'
+  Digest::MD5: '0'
   Lingua::EN::Inflect: '1.899'
   Moo: '0'
   SQL::Abstract: '0'
@@ -56,4 +58,5 @@ resources:
   bugtracker: https://github.com/cafe01/dbix-eav/issues
   homepage: https://github.com/cafe01/dbix-eav
   repository: git://github.com/cafe01/dbix-eav.git
-version: '0.09'
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

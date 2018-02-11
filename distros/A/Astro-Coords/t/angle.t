@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Test::Number::Delta within => 1e-9;
 
 require_ok('Astro::Coords::Angle');
@@ -29,6 +29,9 @@ is( "$ang", "45d00m00.00000s", "dms stringification");
 
 delta_ok( $ang->arcsec, (45 * 60 * 60 ), 'arcsec');
 
+$ang = new Astro::Coords::Angle(45, units => 'deg');
+delta_ok($ang->negate()->degrees(), -45);
+
 # use string form to recreate to test parser
 my $ang2 = new Astro::Coords::Angle( $ang->string, units=>'sex',range=>'PI');
 is($ang2->degrees, $ang->degrees, "compare deg to string to deg");
@@ -46,6 +49,7 @@ delta_ok($ang->hours, 12, "compare hour to hour");
 my $ra = new Astro::Coords::Angle::Hour( '12h13m45.6s', units => 'sex',
 				    range => 'PI'
  );
+$ra->str_ndp(1);
 
 is("$ra", '-11:46:14.4', "hour angle -12 to +12");
 isa_ok( $ra, "Astro::Coords::Angle::Hour");

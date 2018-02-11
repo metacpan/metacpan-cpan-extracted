@@ -1,7 +1,7 @@
 package App::CompleteUtils;
 
-our $DATE = '2017-07-05'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '0.16'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ App::CompleteUtils - Collection of CLI utilities related to completion and Compl
 
 =head1 VERSION
 
-This document describes version 0.15 of App::CompleteUtils (from Perl distribution App-CompleteUtils), released on 2017-07-05.
+This document describes version 0.16 of App::CompleteUtils (from Perl distribution App-CompleteUtils), released on 2018-02-08.
 
 =head1 SYNOPSIS
 
@@ -63,7 +63,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

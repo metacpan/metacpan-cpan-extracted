@@ -1,5 +1,8 @@
 Revision history for Perl extension USB::TMC
 
+0.006 2018-02-10
+    - Installation docs: Add section on udev rules
+
 0.004 2017-09-11
     - Do proper split transactions
     - Abort bulk transfers on error (e.g. if a timeout happens)

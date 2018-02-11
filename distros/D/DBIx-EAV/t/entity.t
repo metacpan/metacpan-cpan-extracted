@@ -13,7 +13,7 @@ my $eav = DBIx::EAV->new(
 
 
 $eav->schema->deploy( add_drop_table => $eav->schema->db_driver_name eq 'mysql');
-$eav->register_types(read_yaml_file("$FindBin::Bin/entities.yml"));
+$eav->declare_entities(read_yaml_file("$FindBin::Bin/entities.yml"));
 
 
 test_common();

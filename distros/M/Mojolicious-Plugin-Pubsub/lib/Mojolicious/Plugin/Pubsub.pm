@@ -2,12 +2,12 @@ use strict;
 use warnings;
 package Mojolicious::Plugin::Pubsub;
 #ABSTRACT: Pubsub plugin for Mojolicious
-$Mojolicious::Plugin::Pubsub::VERSION = '0.004';
+$Mojolicious::Plugin::Pubsub::VERSION = '0.006';
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::IOLoop;
 use Mojo::JSON qw( decode_json encode_json );
-use Mojo::Util qw( b64_decode b64_encode );
+use Mojo::Util qw( b64_decode b64_encode deprecated );
 use IO::Socket::UNIX;
 
 my $client;
@@ -92,7 +92,7 @@ sub register {
   $loop->next_tick(sub { _connect() });
 
   $app->helper(
-    publish => sub {
+    'pubsub.publish' => sub {
       my $self = shift;
       my $msg = b64_encode(encode_json([@_]), "");
 
@@ -103,7 +103,7 @@ sub register {
   );
 
   $app->helper(
-    subscribe => sub {
+    'pubsub.subscribe' => sub {
       my $self = shift;
       my $cb = shift;
 
@@ -114,7 +114,7 @@ sub register {
   );
 
   $app->helper(
-    unsubscribe => sub {
+    'pubsub.unsubscribe' => sub {
       my $self = shift;
       my $cb = shift;
 
@@ -123,6 +123,22 @@ sub register {
       return $self;
     }
   );
+
+  $app->helper(
+    publish => sub {
+      deprecated '->publish is deprecated in favour of ->pubsub->publish';
+      shift->pubsub->publish(@_);
+    });
+  $app->helper(
+    subscribe => sub {
+      deprecated '->subscribe is deprecated in favour of ->pubsub->subscribe';
+      shift->pubsub->subscribe(@_);
+    });
+  $app->helper(
+    unsubscribe => sub {
+      deprecated '->unsubscribe is deprecated in favour of ->pubsub->unsubscribe';
+      shift->pubsub->unsubscribe(@_);
+    });
 
 }
 
@@ -197,17 +213,17 @@ Mojolicious::Plugin::Pubsub - Pubsub plugin for Mojolicious
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
   # Mojolicious
   my $pubsub = $app->plugin('Pubsub', { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', });
-  $app->publish("message");
+  $app->pubsub->publish("message");
   
   # Mojolicious::Lite
   my $pubsub = plugin Pubsub => { cb => sub { print "Message: $_[0]\n"; }, socket => 'myapp.pubsub', };
-  app->publish("message");
+  app->pubsub->publish("message");
 
 =head1 DESCRIPTION
 
@@ -233,22 +249,22 @@ A path to a C<UNIX> socket used to communicate between the publishers. By defaul
 
 =head1 HELPERS
 
-=head2 publish
+=head2 pubsub->publish
 
-  $c->publish("message");
-  $c->publish(@args);
+  $c->pubsub->publish("message");
+  $c->pubsub->publish(@args);
 
 Publishes a message that the subscribing callbacks will receive.
 
-=head2 subscribe
+=head2 pubsub->subscribe
 
-  $c->subscribe($cb);
+  $c->pubsub->subscribe($cb);
 
 Add the C<$cb> code reference to the callbacks that get published messages.
 
-=head2 unsubscribe
+=head2 pubsub->unsubscribe
 
-  $c->unsubscribe($cb);
+  $c->pubsub->unsubscribe($cb);
 
 Remove the C<$cb> code reference from the callbacks that get published messages.
 
@@ -259,7 +275,7 @@ Remove the C<$cb> code reference from the callbacks that get published messages.
     ...
   };
 
-Subscribers sent to the C<cb> option, or the C<subscribe> helper should simply be C<CODE> references that handle the arguments passed in. The C<@args> will be the same as what was passed in to the C<publish> helper, except they will have gotten C<JSON> encoded via L<Mojo::JSON> on the way, so only data structures that consist of regular scalars, arrays, hashes, and objects that implement C<TO_JSON> or that stringify will work correctly. See L<Mojo::JSON> for more details.
+Subscribers sent to the C<cb> option, or the C<< pubsub->subscribe >> helper should simply be C<CODE> references that handle the arguments passed in. The C<@args> will be the same as what was passed in to the C<< pubsub->publish >> helper, except they will have gotten C<JSON> encoded via L<Mojo::JSON> on the way, so only data structures that consist of regular scalars, arrays, hashes, and objects that implement C<TO_JSON> or that stringify will work correctly. See L<Mojo::JSON> for more details.
 
 =head1 METHODS
 

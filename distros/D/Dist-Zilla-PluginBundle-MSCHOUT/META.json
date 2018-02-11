@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,11 +38,10 @@
             "Dist::Zilla::Plugin::AuthorSignatureTest" : "0",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
             "Dist::Zilla::Plugin::AutoVersion" : "0",
-            "Dist::Zilla::Plugin::Bugtracker" : "0",
             "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
             "Dist::Zilla::Plugin::FakeRelease" : "0",
             "Dist::Zilla::Plugin::Git::NextVersion" : "0",
-            "Dist::Zilla::Plugin::Homepage" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
@@ -51,7 +50,6 @@
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
             "Dist::Zilla::Plugin::RemovePrereqs" : "0",
-            "Dist::Zilla::Plugin::Repository" : "0",
             "Dist::Zilla::Plugin::Signature" : "0",
             "Dist::Zilla::Plugin::TaskWeaver" : "0.093330",
             "Dist::Zilla::Plugin::TravisYML" : "0",
@@ -67,7 +65,7 @@
             "Pod::Elemental::Transformer::List" : "0",
             "Pod::Weaver::Config::Assembler" : "0",
             "Pod::Weaver::Section::AllowOverride" : "0",
-            "Pod::Weaver::Section::BugsRT" : "0",
+            "Pod::Weaver::Section::Bugs" : "0",
             "Pod::Weaver::Section::SourceGitHub" : "0",
             "namespace::autoclean" : "0.09",
             "perl" : "5.006"
@@ -85,27 +83,26 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::MSCHOUT" : {
          "file" : "lib/Dist/Zilla/PluginBundle/MSCHOUT.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       },
       "Pod::Weaver::PluginBundle::MSCHOUT" : {
          "file" : "lib/Pod/Weaver/PluginBundle/MSCHOUT.pm",
-         "version" : "0.36"
+         "version" : "0.37"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dist-zilla-pluginbundle-mschout at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MSCHOUT"
+         "web" : "https://github.com/mschout/dist-zilla-pluginbundle-mschout/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-PluginBundle-MSCHOUT/",
+      "homepage" : "https://github.com/mschout/dist-zilla-pluginbundle-mschout",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/dist-zilla-pluginbundle-mschout.git",
+         "url" : "https://github.com/mschout/dist-zilla-pluginbundle-mschout.git",
          "web" : "https://github.com/mschout/dist-zilla-pluginbundle-mschout"
       }
    },
-   "version" : "0.36",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+   "version" : "0.37",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # For a constant mapping, there is no FITS header, just a generic
 # header that is constant.
@@ -190,7 +190,7 @@ Returns the data-reduction recipe name.  The selection depends on the
 value of the C<OBJECT> keyword.  The default is "QUICK_LOOK".  A dark
 returns "REDUCE_DARK", a sky flat "SKY_FLAT_MASKED", a dome flat
 "SKY_FLAT", and an object's recipe is "JITTER_SELF_FLAT".
-   
+
 =cut
 
 sub to_DR_RECIPE {
@@ -336,7 +336,7 @@ sub to_UTDATE {
 
 =item B<to_UTEND>
 
-Returns the UT time of the end of the observation as a C<Time::Piece> object.  
+Returns the UT time of the end of the observation as a C<Time::Piece> object.
 
 =cut
 
@@ -374,7 +374,7 @@ sub from_UTEND {
 
 =item B<to_UTSTART>
 
-Returns an estimated UT time of the start of the observation as a 
+Returns an estimated UT time of the start of the observation as a
 C<Time::Piece> object.  The start time is derived from the end time,
 less the C<EXPTIME> exposure time and some allowance for the read time.
 
@@ -535,7 +535,7 @@ sub get_speed_sec {
 
 =item B<get_UT_date>
 
-Returns the UT date in YYYYMMDD format.  It parses the non-standard 
+Returns the UT date in YYYYMMDD format.  It parses the non-standard
 ddMmmyy C<DATE-OBS> keyword.
 
 =cut
@@ -603,9 +603,9 @@ sub hms_to_degrees {
 
 Returns the detector bounds in pixels of the region of the detector
 used.  The region will be one of the four quadrants or the full
-detector.  We guess for the moment that keword C<QUAD> values of 
+detector.  We guess for the moment that keword C<QUAD> values of
 1, 2, 3, 4 correspond to lower-left, lower-right, upper-left,
-upper-right quadrants respectively, and 5 is the whole 
+upper-right quadrants respectively, and 5 is the whole
 256x256-pixel array.
 
 =cut

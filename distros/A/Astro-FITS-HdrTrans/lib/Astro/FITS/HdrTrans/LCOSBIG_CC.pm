@@ -29,7 +29,7 @@ use base qw/ Astro::FITS::HdrTrans::LCO /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -284,7 +284,7 @@ sub getbounds{
             print "ERR: TRIMSEC all 0\n";
          } else {
             if ( $FITS_headers->{INSTRUME} !~ /^kb10/i ) {
-# Unless this is kb10 data (which has a bad TRIMSEC), update bounds array 
+# Unless this is kb10 data (which has a bad TRIMSEC), update bounds array
                @bounds = @newbounds;
             }
          }

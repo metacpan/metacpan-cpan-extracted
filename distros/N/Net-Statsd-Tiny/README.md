@@ -1,10 +1,10 @@
 # NAME
 
-Net::Statsd::Tiny - A tiny StatsD client
+Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.2.1
+version v0.3.0
 
 # SYNOPSIS
 
@@ -41,8 +41,8 @@ It supports the following features:
 Note that the specification requires the measured values to be
 integers no larger than 64-bits, but ideally 53-bits.
 
-The current implementation expects values to be integers, except where
-specified. But it otherwise does not enforce maximum/minimum values.
+The current implementation does not validate the values. If you want
+validation, see [Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite).
 
 # ATTRIBUTES
 
@@ -203,6 +203,9 @@ This sends the buffer to the ["host"](#host) and empties the buffer, if there
 is any data in the buffer.
 
 # SEE ALSO
+
+[Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
+[Type::Tiny](https://metacpan.org/pod/Type::Tiny) for data validation.
 
 [https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)
 

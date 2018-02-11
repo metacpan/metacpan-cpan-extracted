@@ -1,2 +1,14 @@
+0.03 2018-02-07T08:08:26+01:00
+ - Update Module::Install to 1.19 version.
+ - Update copyright years.
+
+0.02 2018-02-07T07:59:54+01:00
+ - Add LICENSE file.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Remove trivial comments.
+ - Update Module::Install to 1.18 version.
+ - Update author name.
+ - Update copyright years.
+
 0.01 2015-12-30T23:26:24+01:00
  - First version.

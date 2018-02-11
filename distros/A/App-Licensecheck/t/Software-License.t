@@ -21,7 +21,7 @@ my %LICENSES = (
 	QPL_1_0      => 'QPL (v1.0)',
 	Zlib         => 'zlib/libpng',
 	CC0_1_0      => 'UNKNOWN',
-	GFDL_1_3     => 'UNKNOWN',
+	GFDL_1_3     => 'GFDL (v1.3 or later)',
 	Artistic_1_0 => 'Artistic (v1.0)',
 	Artistic_2_0 => 'Artistic (v2.0)',
 	Mozilla_1_0  => 'MPL (v1.0)',
@@ -31,10 +31,10 @@ my %LICENSES = (
 	SSLeay       => 'BSD (2 clause)',
 	Apache_1_1   => 'Apache (v1.1)',
 	Mozilla_1_1  => 'MPL (v1.1)',
-	GFDL_1_2     => 'UNKNOWN',
+	GFDL_1_2     => 'GFDL (v1.2 or later)',
 	Sun          => 'UNKNOWN',
 	BSD          => 'BSD (3 clause)',
-	OpenSSL      => 'UNKNOWN',
+	OpenSSL      => 'OpenSSL',
 	Perl_5       => 'Perl',
 );
 

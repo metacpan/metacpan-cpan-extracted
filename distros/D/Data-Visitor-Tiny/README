@@ -1,0 +1,88 @@
+NAME
+    Data::Visitor::Tiny - Recursively walk data structures
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use Data::Visitor::Tiny;
+
+        my $hoh = {
+            a => { b => 1, c => 2 },
+            d => { e => 3, f => 4 },
+        };
+
+        # print leaf (non-ref) values on separate lines (1 2 3 4)
+        visit( $hoh, sub { return if ref; say } );
+
+        # transform leaf value for a given key
+        visit(
+            $hoh,
+            sub {
+                my ( $key, $valueref ) = @_;
+                $$valueref = "replaced" if $key eq 'e';
+            }
+        );
+        say $hoh->{d}{e}; # "replaced"
+
+DESCRIPTION
+    This module provides a simple framework for recursively iterating over a
+    data structure of hashrefs and/or arrayrefs.
+
+FUNCTIONS
+  visit
+        visit( $ref, sub { ... } );
+
+    The "visit" function takes a hashref or arrayref and recursively visits
+    all values via pre-order traversal, calling the provided callback for
+    each value. Only hashrefs and arrayrefs are traversed; objects, even if
+    they override hash or array dereference, are only ever treated as
+    values. Hash keys are sorted lexicographically before iteration,
+    ensuring consistent visitation order in the face of Perl's hash order
+    randomization.
+
+    Within the callback, the $_ variable is set to the value of the node.
+    The callback also receives three arguments: $key, $valueref, and
+    $context. The $key is the hash key or array index of the value. The
+    $valueref is a scalar reference to the value; use it to modify the value
+    in place. The $context is a hashref for tracking state throughout the
+    visiting process. Context keys beginning with '_' are reserved for
+    "Data::Visitor::Tiny"; you may store whatever other keys/values you
+    need. The only key provided currently is "_depth", which starts at 0 and
+    reflects how deep the visitor has recursed.
+
+    The "visit" function returns the context object.
+
+SEE ALSO
+    *   Data::Visitor
+
+    *   Data::Visitor::Lite
+
+    *   Data::Rmap
+
+    *   Data::Traverse
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Data-Visitor-Tiny/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Data-Visitor-Tiny>
+
+      git clone https://github.com/dagolden/Data-Visitor-Tiny.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2018 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

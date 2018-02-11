@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::ESO /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -133,7 +133,7 @@ sub to_DEC_TELESCOPE_OFFSET {
     # Apply the rotation matrix to obtain the equatorial pixel offset.
     $decoffset = -$x_as * $sinrot + $y_as * $cosrot;
   }
-              
+
   # The sense is reversed compared with UKIRT, as these measure the
   # place on the sky, not the motion of the telescope.
   return -1.0 * $decoffset;
@@ -344,7 +344,7 @@ sub to_RA_TELESCOPE_OFFSET {
     # Apply the rotation matrix to obtain the equatorial pixel offset.
     $raoffset = -$x_as * $cosrot + $y_as * $sinrot;
   }
-              
+
   # The sense is reversed compared with UKIRT, as these measure the
   # place on the sky, not the motion of the telescope.
   return -1.0 * $raoffset;

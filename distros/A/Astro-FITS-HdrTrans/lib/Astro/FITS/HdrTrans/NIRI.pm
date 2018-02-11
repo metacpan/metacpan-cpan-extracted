@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::GEMINI /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -148,7 +148,7 @@ sub to_ROTATION {
     # deviation from the cardinal orientations.
     if ( abs( abs( $rotation ) - 90 ) < 2 ) {
       my $delta_rho = 0.0;
-         
+
       $delta_rho = $rotation - ( 90 * int( $rotation / 90 ) );
       $delta_rho -= 90 if ( $delta_rho > 45 );
       $delta_rho += 90 if ( $delta_rho < -45 );
@@ -158,7 +158,7 @@ sub to_ROTATION {
       # the support astronomer.
       $rotation = 180.0 + $delta_rho;
     }
-         
+
   }
   return $rotation;
 }

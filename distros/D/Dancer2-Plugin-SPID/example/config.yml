@@ -1,0 +1,18 @@
+layout: "main"
+logger: "console"
+appname: "SPID Test"
+template: "template_toolkit"
+session: "Simple"
+
+# Configuration for the Dancer::Plugin::SPID module:
+plugins:
+  SPID:
+    sp_entityid: "https://www.prova.it/"
+    sp_key_file: "sp.key"
+    sp_cert_file: "sp.pem"
+    #cacert_file: "cacert.pem"
+    idp_metadata_dir: "idp_metadata/"
+    login_endpoint: "/spid-login"
+    logout_endpoint: "/spid-logout"
+    sso_endpoint: "/spid-sso"
+    slo_endpoint: "/spid-slo"

@@ -1,5 +1,5 @@
 package CPAN::Testers::API;
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 # ABSTRACT: REST API for CPAN Testers data
 
 #pod =head1 SYNOPSIS
@@ -23,14 +23,42 @@ our $VERSION = '0.023';
 #pod     # api.conf
 #pod     {
 #pod         broker => 'ws://127.0.0.1:5000',
+#pod         schema => 'dbi:SQLite:api.db',
 #pod     }
 #pod
 #pod The possible configuration keys are below:
 #pod
-#pod =head2 broker
+#pod =over
+#pod
+#pod =item broker
 #pod
 #pod The URL to a L<Mercury> message broker, starting with C<ws://>. This
 #pod broker is used to forward messages to every connected user.
+#pod
+#pod =item schema
+#pod
+#pod The DBI connect string to give to L<CPAN::Testers::Schema>. If not specified,
+#pod will use L<CPAN::Testers::Schema/connect_from_config>.
+#pod
+#pod =back
+#pod
+#pod =head1 LOCAL TESTING
+#pod
+#pod To run an instance of this for local testing, create an C<api.conf> file
+#pod to configure a SQLite schema:
+#pod
+#pod     # api.conf
+#pod     {
+#pod         schema => 'dbi:SQLite:api.sqlite3'
+#pod     }
+#pod
+#pod For the L<CPAN::Testers::Schema> to work with SQLite, you will need to
+#pod install an additional CPAN module, L<DateTime::Format::SQLite>.
+#pod
+#pod Once this is configured, you can deploy a new, blank database using
+#pod C<< cpantesters-api eval 'app->schema->deploy' >>.
+#pod
+#pod Now you can run the API using C<< cpantesters-api daemon >>.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -61,7 +89,11 @@ use JSON::MaybeXS qw( encode_json );
 #pod =cut
 
 has schema => sub {
+    my ( $app ) = @_;
     require CPAN::Testers::Schema;
+    if ( $app->config->{schema} ) {
+        return CPAN::Testers::Schema->connect( $app->config->{schema} );
+    }
     return CPAN::Testers::Schema->connect_from_config;
 };
 
@@ -206,7 +238,7 @@ CPAN::Testers::API - REST API for CPAN Testers data
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -279,14 +311,42 @@ like:
     # api.conf
     {
         broker => 'ws://127.0.0.1:5000',
+        schema => 'dbi:SQLite:api.db',
     }
 
 The possible configuration keys are below:
 
-=head2 broker
+=over
+
+=item broker
 
 The URL to a L<Mercury> message broker, starting with C<ws://>. This
 broker is used to forward messages to every connected user.
+
+=item schema
+
+The DBI connect string to give to L<CPAN::Testers::Schema>. If not specified,
+will use L<CPAN::Testers::Schema/connect_from_config>.
+
+=back
+
+=head1 LOCAL TESTING
+
+To run an instance of this for local testing, create an C<api.conf> file
+to configure a SQLite schema:
+
+    # api.conf
+    {
+        schema => 'dbi:SQLite:api.sqlite3'
+    }
+
+For the L<CPAN::Testers::Schema> to work with SQLite, you will need to
+install an additional CPAN module, L<DateTime::Format::SQLite>.
+
+Once this is configured, you can deploy a new, blank database using
+C<< cpantesters-api eval 'app->schema->deploy' >>.
+
+Now you can run the API using C<< cpantesters-api daemon >>.
 
 =head1 SEE ALSO
 

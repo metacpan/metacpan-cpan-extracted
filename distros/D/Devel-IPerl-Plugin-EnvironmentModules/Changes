@@ -1,0 +1,9 @@
+Revision history for perl distribution Devel-IPerl-Plugin-EnvironmentModules
+
+0.02 2018-02-09T16:16:19+1300
+ - Plugin created
+ - add supported helpers module_avail, module_list, module_load, module_show and
+   module_unload.
+
+0.01 2018-02-08T16:55:00+1300
+ - Started project

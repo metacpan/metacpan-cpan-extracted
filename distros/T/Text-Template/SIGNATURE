@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,48 +14,49 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA256
 
-SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
-SHA1 ab8577d3eb0eedf3f98004e381a9cee30e7224e1 COPYING
-SHA1 43beb657271f1e1e9cb584840e8ee943c681c947 Changes
+SHA1 44aae5f570beb9c5d51032c70ddee6c195d00ff7 Changes
 SHA1 b457bd56a70b838ccc55d183ab09de64b6996958 INSTALL
 SHA1 f12894289cb0f379f24b8d63e2e761dbcba1b216 LICENSE
-SHA1 15c979eac5716cebc281bb61333349fd6602a2c3 MANIFEST
-SHA1 2266ea77c62b205d35051ff0f26dfe2da457c3e6 META.json
-SHA1 211c9680545a4a71b1623142a0976a2b7a43fb19 META.yml
-SHA1 718f9f9b865df45db83b0288f790f8c53e39c042 Makefile.PL
-SHA1 5d77dacc6fbc44c87a96bbf67cb5c988be4ce5ee README
-SHA1 da4182e4294f849bd4439a5fd0921f2342123171 lib/Text/Template.pm
-SHA1 836447bd5d442416a2565f7e62374d9bbca56894 lib/Text/Template/Preprocess.pm
-SHA1 5faf3ecf92314b033bcccb40a84a1a4ad0c83dc6 t/00-version.t
-SHA1 24b3086d4e2614dad9a8a620c88fbccaa039d915 t/01-basic.t
-SHA1 fb6312cbdf23d2b7432ac583a3385b8fcfd3ac57 t/02-hash.t
-SHA1 7217bace07f864bfda030f4042437a8c05776ba7 t/03-out.t
-SHA1 ad0c362cf467b7e1892b22a1f18a79c514b4a439 t/04-safe.t
-SHA1 a78aee9ccdb179755f2e4ea3b3918334cef7788a t/05-safe2.t
-SHA1 ef3aeaa58bc4f04bd75b16de27e92aa988fe5e8a t/06-ofh.t
-SHA1 667da67f35783ffea9ef749578332dcee34bb636 t/07-safe3.t
-SHA1 23fff8b4a4416be3a0642206f7848d7f85fb8019 t/08-exported.t
-SHA1 8c044296f34321532fb81b3f735b2ae7eb469041 t/09-error.t
-SHA1 8ccec0d79c50eb68ede1d69b655e95692a84f141 t/10-delimiters.t
-SHA1 158d92f56a690da05f894fee111d4d788f87007b t/11-prepend.t
-SHA1 b169342c187879870e12349e52c8b7dfa1849924 t/12-preprocess.t
-SHA1 dcc157ff4cfc1a3e68ba82e50d2b24ebaa30f517 t/13-taint.t
-SHA1 d45e4ea21f436366c33b9921b7c0fe3ca90cad98 t/14-broken.t
-SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 3f9f74e202ca7d9a3d211d6389d4e302279a6725 MANIFEST
+SHA1 8968bcdf888b8263e55d5bcb63748fe73db086fb META.json
+SHA1 c5ad9bbd8f9768ce483d74f3346a98972b0fe295 META.yml
+SHA1 1e908e59c6b778abc585cb4771ad70bc85c66e20 Makefile.PL
+SHA1 b94aaad0a0bf2c323061bfefb9cf1fd532f14e7b README
+SHA1 9ca8dd606832cc602df3621d13705e38b360fabe lib/Text/Template.pm
+SHA1 917c440001e3c5bdc06430da8d64f07b855ec4ab lib/Text/Template/Preprocess.pm
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 19cc343f8a85c6805bbeb02580487483a6283887 t/author-signature.t
+SHA1 ae085010c9f08576ef8584f224e38e6a98c1c178 t/basic.t
+SHA1 006feb1a0b1e5780db52aa79bd38933664a8339a t/broken.t
+SHA1 e419b37cc02b404f05863fa3746afa27dc7754c8 t/delimiters.t
+SHA1 304955c4280159ec3a4c0f2717dcff9c887bb487 t/error.t
+SHA1 c862dfc08e00e76b3f2aee953583d3cc8e5524a2 t/exported.t
+SHA1 50ef92bda3b6b5cbd5a9307e6f17ce49ee8f245c t/hash.t
+SHA1 d5dc210684aec8bb2c4817af96597c86047169c1 t/inline-comment.t
+SHA1 62ae0720aa86146bccfa23d2c903fa142cb86d50 t/ofh.t
+SHA1 68093417d49a2afdfcd4642bacea04466039b734 t/out.t
+SHA1 a8b21fdca0f1d243775a00758105e0fcc58022aa t/prepend.t
+SHA1 4e7e00eccede7c3231e93ef0f3cb011423be4eb5 t/preprocess.t
+SHA1 a52d61ef92e6a88d694db0be4893b88417a72f9c t/rt29928.t
+SHA1 5186ff459c6042af11bca92decd271887c7b2eae t/safe.t
+SHA1 ff68263e220e1520b6bce0be44cfa3a495b734e2 t/safe2.t
+SHA1 b50a51577c0f2c13c9a48113dc7f061385a02219 t/safe3.t
+SHA1 16d3abf7588da4c0056c6c6b7818470c8601577c t/strict.t
+SHA1 e07dff6b477a7cb3d91b5f1c34cb2a99919017f2 t/taint.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQIVAwUBWLRc6KQl27WkM10aAQijiRAA8/cXNX7udrWbrhNtRstB7ao3ewmTK3Sd
-9SkQ9gTUdaEaF6eBs3BjZjqu4k/OPVJTUUsjsb/pjAC5Zd8x6Jg83+MLRZC1lMqV
-TLx9AhwmSYmRpILBg+W8wrwZvG/XU7Lf5gLHvgLpW84qimvWRHm+YB1vOXafhAhS
-0G+voOMOD+619+eEwZBb18Jf4u7mreHk32WCgj6iCAlTEE7Pu7iORQvnbIwGE+6+
-kifk9+NhTDg9/4jD9i8kA23Q3/SBwin6Gj9fILsL39xriVQhPCARJKSs2DHZohPf
-hidICtM35cweQvIkwL3MMBGoJ6fuQQLWaCwsWnjaZSLhw92TunUgxWx0p1WFIwfT
-8iYmQd2lEKReoDIN0Nhy5DRidZQxmS6QNK43KImsfEmYz8xC6cSpfJbNeWLhqvGj
-qai57xcBQvF+33IjdxprI0ebhXqlgvj1gmgtGJdgsqO50FqTR5L125A4OUEL4ryG
-2maiJe2tmW8d4n76VMIzYVNgTRmTVJouf7i2yMhae2ADqHNU9pw5p6yRdLtUsYyp
-EJDAbQUbr8CDUr0XxivQmOMJo0jRUKC9KzU5H6AjsSlaGdTtnPuwlwGRdacp2WKa
-HEGjPR37rJP+Lkt4PSTHxUCAIrha8IW7gdn4MDgRaplmtihZ9/pAqb/MpvOnv1rD
-1MT2LvIcEmk=
-=ExEp
+iQJFBAEBCAAvFiEE2EtuRfhGgngE8PsARAzvLrlUzY4FAlp72gsRHG1zY2hvdXRA
+Y3Bhbi5vcmcACgkQRAzvLrlUzY7XpA//ficXNQIQ8sASnHAdoJo+OCz3n4GBkpVS
+XrvWm153DwAT9CBWauDIX7Y3gbj+uGnn07b+fgzJkiPuXhL5OQEpc0i23kYbnV5s
+ruTlJqsOXHseK3Sev1ThJafVmO4sl86YW3HY+Hq3OQMkoPAjQPxHO+fCajI+zEZ4
+PTCvmCbv5TzZUCZ3ntoGD6EXcrrl3xPmnnmWHMNTnfMeTMWcaKaupkpnZ950zeWq
+wgkSkeKUz6G07usnu2pCbzB8+Tp6jcOamrq/gL2MiTxoNSSlE69Q1pnfrkl4uJSw
+TX/ey4E3cE3gsOS6cfjMTGAVfR2hn9osYzybHEceXiriDnYwcuA8Zjqb6WLFTO+p
+orqcK99sC8otFIyZgSHADMUmga7Zx4zwOvj2729riVTRbv6aDbrMjvZBgp6U2JeW
+TsOFoRfUdIaPahxD1ENpaKv0Rvm/skT/MEzJsPpam2ZCiODEW0DAY50VHQx8JKpp
+oQuaekhP2OTO/FFIUNa2+d4vGkzK0EJQeDP5uu57oT0gmIRb8ca5pI6J9gfPt9t4
+Tk+bcdgQXZtPRtbFKJco18xAfIK+deIhavgmwkmB35inkmbJuGfC593IAY0Bu59/
+Ey/MDOwJQVCOU+0km0EHxQpLkyAJ84mbf693nAJj7luCluAMy0d3Dzndk6jTPeTy
+XOH1oJzy/m4=
+=R7NX
 -----END PGP SIGNATURE-----

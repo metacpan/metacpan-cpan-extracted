@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Key;
 
 # ABSTRACT: Keyboard Key class
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Graphics::Raylib::XS qw(:all);
 use Carp;

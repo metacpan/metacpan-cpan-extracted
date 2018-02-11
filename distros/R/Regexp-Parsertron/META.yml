@@ -29,11 +29,11 @@ requires:
   Tree: '1.1'
   Try::Tiny: '0.3'
   Types::Standard: '1.002001'
-  perl: '5.020002'
+  perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
   license: http://opensource.org/licenses/Artistic-2.0
   repository: https://github.com/ronsavage/Regexp-Parsertron.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

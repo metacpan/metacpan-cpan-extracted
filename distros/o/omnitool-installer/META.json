@@ -70,6 +70,7 @@
             "MIME::Parser" : "5.507",
             "MIME::Types" : "2.13",
             "Net::Domain" : "3.05",
+            "Net::Server::SS::PreFork" : "0.05",
             "Number::Range" : "0.12",
             "Plack" : "1.0044",
             "Plack::Middleware::DBIx::DisconnectAll" : "0.02",
@@ -80,6 +81,7 @@
             "Spreadsheet::ParseExcel" : "0.65",
             "Spreadsheet::XLSX" : "0.15",
             "Starlet" : "0.31",
+            "Starman" : "0.4014",
             "Template" : "2.26",
             "Term::ReadKey" : "2.37",
             "Try::Tiny" : "0.24",
@@ -99,7 +101,7 @@
    "provides" : {
       "omnitool::installer" : {
          "file" : "lib/omnitool/installer.pm",
-         "version" : "v1.0.7"
+         "version" : "v1.0.9"
       }
    },
    "release_status" : "stable",
@@ -113,7 +115,7 @@
          "web" : "https://github.com/ericschernoff/omnitool-installer"
       }
    },
-   "version" : "1.0.7",
+   "version" : "1.0.9",
    "x_contributors" : [
       "Eric Chernoff <echernof@cisco.com>",
       "Eric Chernoff <ericschernoff@gmail.com>",

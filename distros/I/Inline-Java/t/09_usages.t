@@ -1,16 +1,9 @@
 use strict ;
 use Test ;
 
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
-
-
 BEGIN {
 	plan(tests => 6) ;
 }
-
-
 
 package t09::p1 ;
 use Inline(

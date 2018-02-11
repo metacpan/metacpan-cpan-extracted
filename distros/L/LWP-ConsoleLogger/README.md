@@ -4,9 +4,31 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 # VERSION
 
-version 0.000036
+version 0.000037
 
 # SYNOPSIS
+
+The simplest way to get started is by adding [LWP::ConsoleLogger::Everywhere](https://metacpan.org/pod/LWP::ConsoleLogger::Everywhere)
+to your code and then just watching your output.
+
+    use LWP::ConsoleLogger::Everywhere ();
+
+If you need more control, look at [LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy).
+
+    use LWP::ConsoleLogger::Easy qw( debug_ua );
+    use WWW::Mechanize;
+
+    my $mech           = WWW::Mechanize->new;   # or LWP::UserAgent->new() etc
+    my $console_logger = debug_ua( $mech );
+    $mech->get( 'https://metacpan.org' );
+
+    # now watch the console for debugging output
+    # turn off header dumps
+    $console_logger->dump_headers( 0 );
+
+    $mech->get( $some_other_url );
+
+To get down to the lowest level, use LWP::ConsoleLogger directly.
 
     my $ua = LWP::UserAgent->new( cookie_jar => {} );
     my $console_logger = LWP::ConsoleLogger->new(
@@ -33,21 +55,6 @@ version 0.000036
 
     # now watch debugging output to your screen
     $ua->get( 'http://nytimes.com/' );
-
-Or start the easy way.
-
-    use LWP::ConsoleLogger::Easy qw( debug_ua );
-    use WWW::Mechanize;
-
-    my $mech           = WWW::Mechanize->new;   # or LWP::UserAgent->new() etc
-    my $console_logger = debug_ua( $mech );
-    $mech->get( 'https://metacpan.org' );
-
-    # now watch the console for debugging output
-    # turn off header dumps
-    $console_logger->dump_headers( 0 );
-
-    $mech->get( $some_other_url );
 
 Sample output might look like this.
 
@@ -187,7 +194,7 @@ content\_pre\_filter and text\_pre\_filters have been applied.  Defaults to true
 ## dump\_title( 0|1 )
 
 Boolean value. If true, dumps the titles of HTML pages if your UserAgent has
-a c&lt;title> method and if it returns something useful. Defaults to true.
+a `title` method and if it returns something useful. Defaults to true.
 
 ## dump\_uri( 0|1 )
 
@@ -219,7 +226,7 @@ HTML content to make it easier to detect changes in the body of the page.
     );
 
 Try to make sure that your content mangling doesn't return broken HTML as that
-may not play with with [HTML::Restrict](https://metacpan.org/pod/HTML::Restrict).
+may not play well with [HTML::Restrict](https://metacpan.org/pod/HTML::Restrict).
 
 ## request\_callback
 
@@ -285,7 +292,7 @@ order to present you with more readable text.
 If the content\_type indicates HTML then HTML::Restrict will be used to strip
 tags from your content in the text rendering process.  You may pass your own
 HTML::Restrict object, if you like.  This would be helpful in situations where
-you still do want to some some tags in your text.
+you still do want to have some tags in your text.
 
 ## logger( Log::Dispatch->new( ... ) )
 

@@ -9,7 +9,7 @@ my $eav = DBIx::EAV->new( dbh => $dbh, tenant_id => 42 );
 
 
 test_create_tables();
-test_register_types();
+test_declare_entities();
 test_entity_type();
 test_load_types();
 
@@ -65,13 +65,29 @@ sub test_create_tables {
 }
 
 
-sub test_register_types {
+sub test_declare_entities {
 
     my $schema = read_yaml_file("$FindBin::Bin/entities.yml");
 
     is $eav->schema->has_data_type('int'), 1, 'has_data_type';
 
-    $eav->register_types($schema);
+    $eav->declare_entities($schema);
+
+    my $artist_signature = $eav->_type_declarations->{Artist}{signature};
+    like $artist_signature, qr/^\w{32}$/, 'declaration signature';
+
+
+    # no types registered yet
+    is $dbh->selectrow_hashref('SELECT COUNT(*) as count from eav_entity_types')->{count}, 0, 'no types registered';
+    is $eav->_types, {}, 'no types installed';
+
+    # load types
+    my $artist_type = $eav->type('Artist');
+    is $dbh->selectrow_hashref('SELECT COUNT(*) as count from eav_entity_types')->{count}, 4, 'all types registered';
+
+    my $track_type = $eav->type('Track');
+    my $cd_type = $eav->type('CD');
+    my $lyric_type = $eav->type('Lyric');
 
     # entity types
     my $artist = $dbh->selectrow_hashref('SELECT * from eav_entity_types WHERE name = "Artist"');
@@ -117,6 +133,23 @@ sub test_register_types {
             right_entity_type_id => $cd->{id},
         },
         'Artist many_to_many CDs';
+
+
+    # decalre again, signature must stay the same
+    $eav->declare_entities($schema);
+    is $artist_signature, $eav->_type_declarations->{Artist}{signature}, 'signature';
+
+    # modify type declaration
+    push @{$schema->{Artist}{attributes}}, 'is_active:bool::1';
+    is $dbh->selectrow_hashref("SELECT COUNT(*) AS count from eav_attributes WHERE entity_type_id = $artist->{id}")->{count}, 4;
+    $eav->declare_entities($schema);
+    my $updated_artist_type = $eav->type('Artist');
+    is $updated_artist_type->id, $artist_type->id, 'type id didnt change';
+    is $dbh->selectrow_hashref("SELECT COUNT(*) AS count from eav_attributes WHERE entity_type_id = $artist->{id}")->{count}, 5;
+    like $dbh->selectrow_hashref('SELECT * from eav_attributes WHERE name = "is_active" AND entity_type_id = '.$artist_type->id), {
+        data_type => 'bool',
+        entity_type_id => $artist_type->id
+    }, 'is_active definition';
 }
 
 
@@ -141,6 +174,8 @@ sub test_entity_type {
 
 sub test_load_types {
 
-    $eav = DBIx::EAV->new( dbh => $dbh, tenant_id => 42 );
+    %{$eav->_types} = ();
+    %{$eav->_types_by_id} = ();
+
     test_entity_type();
 }

@@ -1,5 +1,10 @@
 Revision history for Struct-Path-JsonPointer
 
+0.5.1   2018-02-09
+        - nddiff: diff multiple arguments supported
+        - all: get rid of global @ARGV usage
+        - dist fixed (prereqs, docs, cpants errors, etc)
+
 0.5.0   2018-01-22
         - Struct::* depends updated, related code fixed
         - ndquery: --nopretty fixed

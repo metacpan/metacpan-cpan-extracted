@@ -1,10 +1,6 @@
 use strict ;
 use Test ;
 
-use Inline Config => 
-           DIRECTORY => './_Inline_test' ;
-
-
 package t02_14 ;
 use Inline(
     Java => qq |

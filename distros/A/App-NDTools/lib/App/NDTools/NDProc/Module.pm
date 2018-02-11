@@ -7,7 +7,7 @@ use warnings FATAL => 'all';
 
 use App::NDTools::INC;
 use App::NDTools::NDTool;
-use Getopt::Long qw(:config bundling pass_through);
+use Getopt::Long qw(GetOptionsFromArray :config bundling pass_through);
 use Log::Log4Cli;
 use Storable qw(dclone);
 use Struct::Path 0.80 qw(path);
@@ -59,9 +59,9 @@ sub new {
 }
 
 sub parse_args {
-    my $self = shift;
+    my ($self, $args) = @_;
 
-    unless (GetOptions ($self->arg_opts)) {
+    unless (GetOptionsFromArray ($args, $self->arg_opts)) {
         $self->usage;
         die_fatal "Unsupported opt passed", 1;
     }

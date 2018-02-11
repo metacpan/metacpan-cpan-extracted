@@ -11,7 +11,7 @@ use warnings;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bg_eval bg_qx BG_EVAL BG_QX);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 use constant BG_EVAL => 'Forks::Super::bg_eval';
 use constant BG_QX   => 'Forks::Super::bg_qx';
@@ -333,11 +333,11 @@ sub bg_qx {
 
 =head1 NAME
 
-Forks::Super::LazyEval
+Forks::Super::LazyEval - deferred processing of output from a background proc
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

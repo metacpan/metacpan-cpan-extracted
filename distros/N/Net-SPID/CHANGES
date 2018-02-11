@@ -1,0 +1,91 @@
+==================================================
+Changes from 2017-02-07 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.12 at 2018-02-07 10:58:20 +0000
+-----------------------------------------
+
+  Change: ec4b61152e3fd905ac7f894c314ec58b83bfc1d2
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 11:40:00 +0000
+
+    Minor fixes to README 
+
+  Change: 282152aa1d93e421a7780b6894cd94f9bf998920
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 11:27:02 +0000
+
+    Added XML::Writer dependency 
+
+  Change: 8a301393cfcbcdfeb674fafcf2ab3bea4079fb2e
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 11:10:37 +0000
+
+    Add links to CPAN and TravisCI support. Minor fixes to POD included 
+
+-----------------------------------------
+version 0.11 at 2018-02-07 08:39:38 +0000
+-----------------------------------------
+
+  Change: 4f308300b38cb81c96e15194cbf036e3f59009a7
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-07 09:39:38 +0000
+
+    Prevent PAUSE from indexing our Net::SAML2 
+
+-----------------------------------------
+version 0.10 at 2018-02-06 18:56:01 +0000
+-----------------------------------------
+
+  Change: 9238242a3eb1dc1dca2c8ba9ac858c7be2b993cc
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-06 19:56:01 +0000
+
+    Various fixes for Dist::Zilla releases 
+
+  Change: 6e657a7bd88493409548b1a1d932a86a01fcd909
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-06 19:18:22 +0000
+
+    Add Dist::Zilla support 
+
+  Change: aa38d3066a6dec91c637aa7f2e99725202bbe6aa
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-06 19:10:30 +0000
+
+    POD documentation 
+
+  Change: ec395f203208b86ca5db3b9c872f93d3580a2f40
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-06 19:10:21 +0000
+
+    Add the first test 
+
+  Change: 0244a186940853f9e429b5c8bc90223474bea8ec
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-02-06 15:26:58 +0000
+
+    Improvements to the checklist 
+
+  Change: 31efe3d3c0adf7a547f264feb6e9bf88684eed93
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-01-25 18:48:48 +0000
+
+    Typo 
+
+  Change: 72df79000ac2aa77ba53c783e3be371db8936104
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-01-25 18:30:21 +0000
+
+    Initial import 
+
+  Change: 0f0f36df2ea9e8d8dadbf77d1d1ee374466e1dc3
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2018-01-25 18:28:04 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

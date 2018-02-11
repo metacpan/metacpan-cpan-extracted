@@ -1,4 +1,4 @@
-requires 'perl', '5.008005';
+requires 'perl', '5.008004';
 
 requires 'IO::Pty';
 requires 'List::Util', '1.45';

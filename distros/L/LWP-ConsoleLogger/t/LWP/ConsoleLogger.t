@@ -31,7 +31,7 @@ $logger->content_pre_filter(
 
         if ( $content
             =~ m{<!-- \s header \s ends \s -->(.*)<!-- \s footer \s begins \s -->}gmxs
-            ) {
+        ) {
             return $1;
         }
         return $content;

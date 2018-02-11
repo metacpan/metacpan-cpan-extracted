@@ -1,4 +1,11 @@
-Revision history for Business-ID-NIK
+0.090   2018-02-07 (PERLANCAR)
+
+	- [Incompatible change] parse_nik() no longer exported by default.
+
+	- [Incompatible change] parse_nik() now returns 'dob' key as
+	  'YYYY-MM-DD' string instead of DateTime object, to make the date more
+	  interoperable.
+
 
 0.08    2015-09-03 (PERLANCAR)
 

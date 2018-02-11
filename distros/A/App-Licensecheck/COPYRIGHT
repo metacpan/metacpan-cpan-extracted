@@ -6,6 +6,7 @@ Source: https://metacpan.org/release/App-Licensecheck
 Files: INSTALL
  LICENSE
  README
+ TODO
  scripts/licensecheck.bash_completion
  t/OSI/AFL-3.0
  t/OSI/AGPL-3.0
@@ -188,8 +189,11 @@ Files: INSTALL
  t/grant/LGPL/strv.c
  t/grant/LGPL/table.py
  t/grant/LGPL/videoplayer.cpp
+ t/grant/LGPL_and_more/colamd.c
  t/grant/LGPL_and_more/da.aff
+ t/grant/MIT/gc.h
  t/grant/MIT/harfbuzz-impl.c
+ t/grant/MIT/old_colamd.c
  t/grant/MIT/spaces.c
  t/grant/MPL_and_more/symbolstore.py
  t/grant/NTP/directory.h
@@ -209,16 +213,15 @@ Files: Changes
  bin/licensecheck
  doap.ttl
  lib/App/Licensecheck.pm
- t/OSI.t
+ t/SPDX.t
+ t/Software-License.t
+ t/fedora.t
  t/grant.t
-Copyright: Copyright 2017 Jonas Smedegaard.
+Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: dist.ini
- t/SPDX.t
- t/Software-License.t
  t/devscripts.t
- t/fedora.t
  t/grant/LGPL/Model.pm
  t/license.t
 Copyright: Copyright 2016 Jonas Smedegaard.
@@ -230,6 +233,10 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: t/OSI.t
+Copyright: Copyright 2017 Jonas Smedegaard.
+License: GPL-3.0
+
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
@@ -239,28 +246,28 @@ Copyright: Copyright (C) 2009 by Moritz Lenz and the SVG::Plot contributors (see
 License: Artistic-2.0
 
 License: GPL-3.0
- This software is Copyright (c) 2017 by Jonas Smedegaard.
+ This software is Copyright (c) 2018 by Jonas Smedegaard.
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 3, June 2007
 
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The GNU General Public License, Version 1, February 1989
 
 License: Artistic-2.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2018 by the copyright holder(s).
  
  This is free software, licensed under:
  

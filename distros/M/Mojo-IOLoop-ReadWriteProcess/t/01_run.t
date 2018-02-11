@@ -123,12 +123,19 @@ subtest 'process is_running()' => sub {
 };
 
 subtest 'process execute()' => sub {
+  my $test_script         = "$FindBin::Bin/data/process_check.sh";
+  my $test_script_sigtrap = "$FindBin::Bin/data/term_trap.sh";
   plan skip_all =>
     "You do not seem to have bash, which is required (as for now) for this test"
     unless -e '/bin/bash';
+  plan skip_all =>
+"You do not seem to have $test_script. The script is required to run the test"
+    unless -e $test_script;
+  plan skip_all =>
+"You do not seem to have $test_script_sigtrap. The script is required to run the test"
+    unless -e $test_script_sigtrap;
   use Mojo::IOLoop::ReadWriteProcess;
-  my $p = Mojo::IOLoop::ReadWriteProcess->new(
-    execute => "$FindBin::Bin/data/process_check.sh")->start();
+  my $p = Mojo::IOLoop::ReadWriteProcess->new(execute => $test_script)->start();
   is $p->getline, "TEST normal print\n", 'Get right output from stdout';
   is $p->err_getline, "TEST error print\n", 'Get right output from stderr';
   is $p->is_running, 1, 'process is still waiting for our input';
@@ -139,7 +146,7 @@ subtest 'process execute()' => sub {
   is $p->is_running, 0, 'process is not running anymore';
 
   $p = Mojo::IOLoop::ReadWriteProcess->new(
-    execute => "$FindBin::Bin/data/process_check.sh",
+    execute => $test_script,
     args    => [
       qw(FOO
         BAZ)
@@ -155,10 +162,8 @@ subtest 'process execute()' => sub {
   is $p->getline,     "FOO BAZ\n", 'process received extra arguments';
   is $p->exit_status, 100,         'able to retrieve function return';
 
-  $p
-    = Mojo::IOLoop::ReadWriteProcess->new(
-    execute => "$FindBin::Bin/data/process_check.sh")->args([qw(FOO BAZ)])
-    ->start();
+  $p = Mojo::IOLoop::ReadWriteProcess->new(execute => $test_script)
+    ->args([qw(FOO BAZ)])->start();
   is $p->stdout, "TEST normal print\n", 'Get right output from stdout';
   is $p->err_getline, "TEST error print\n", 'Get right output from stderr';
   is $p->is_running, 1, 'process is still waiting for our input';
@@ -172,7 +177,7 @@ subtest 'process execute()' => sub {
 
   $p = Mojo::IOLoop::ReadWriteProcess->new(
     separate_err => 0,
-    execute      => "$FindBin::Bin/data/process_check.sh"
+    execute      => $test_script
   );
   $p->start();
   is $p->is_running, 1, 'process is still running';
@@ -184,7 +189,7 @@ subtest 'process execute()' => sub {
 
   my $p2 = Mojo::IOLoop::ReadWriteProcess->new(
     separate_err => 0,
-    execute      => "$FindBin::Bin/data/process_check.sh",
+    execute      => $test_script,
     set_pipes    => 0
   );
   $p2->start();
@@ -197,7 +202,7 @@ subtest 'process execute()' => sub {
   $p = Mojo::IOLoop::ReadWriteProcess->new(
     verbose           => 1,
     separate_err      => 0,
-    execute           => "$FindBin::Bin/data/term_trap.sh",
+    execute           => $test_script_sigtrap,
     max_kill_attempts => -4
   );    # ;)
   $p->start();
@@ -224,8 +229,8 @@ killed'
     verbose           => 1,
     separate_err      => 0,
     blocking_stop     => 1,
-    execute           => "$FindBin::Bin/data/process_check.sh",
-    max_kill_attempts => -1                                       # ;)
+    execute           => $test_script,
+    max_kill_attempts => -1              # ;)
   )->start()->stop();
   sleep 4;
 
@@ -237,8 +242,8 @@ killed'
     verbose           => 1,
     separate_err      => 0,
     blocking_stop     => 1,
-    execute           => "$FindBin::Bin/data/process_check.sh",
-    max_kill_attempts => -1,                                      # ;)
+    execute           => $test_script,
+    max_kill_attempts => -1,             # ;)
     pidfile           => $pidfile
   )->start();
   my $pid = path($pidfile)->slurp();
@@ -252,8 +257,8 @@ killed'
     verbose           => 1,
     separate_err      => 0,
     blocking_stop     => 1,
-    execute           => "$FindBin::Bin/data/process_check.sh",
-    max_kill_attempts => -1,                                      # ;)
+    execute           => $test_script,
+    max_kill_attempts => -1,             # ;)
   )->start();
   $p->write_pidfile($pidfile);
   $pid = path($pidfile)->slurp();
@@ -266,8 +271,8 @@ killed'
     verbose           => 1,
     separate_err      => 0,
     blocking_stop     => 1,
-    execute           => "$FindBin::Bin/data/process_check.sh",
-    max_kill_attempts => -1,                                      # ;)
+    execute           => $test_script,
+    max_kill_attempts => -1,             # ;)
   )->start();
   is $p->write_pidfile(), undef, "No filename given to write_pidfile";
   $p->stop();

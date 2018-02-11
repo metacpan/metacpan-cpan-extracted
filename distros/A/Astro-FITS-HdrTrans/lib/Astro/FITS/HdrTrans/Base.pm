@@ -31,7 +31,7 @@ use Math::Trig qw/ deg2rad /;
 use vars qw/ $VERSION /;
 use Astro::FITS::HdrTrans ();   # for the generic header list
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 =head1 PUBLIC METHODS
 
@@ -179,7 +179,7 @@ sub can_translate {
 
   # For consistency in subsequent algorithm convert
   # a string to a pattern match object
-  if (not ref($ref)) { 
+  if (not ref($ref)) {
     $ref = quotemeta($ref);
     $ref = qr/^$ref$/i;
   }
@@ -345,7 +345,7 @@ sub _generate_lookup_methods {
       # First generate the code to generate Generic headers
       my $subname = "to_$key";
       my $sub = qq/ $p sub $subname {
-	  my \@allresults = \$_[0]->via_subheader_undef_check(\$_[1],\"$fhdr\");
+          my \@allresults = \$_[0]->via_subheader_undef_check(\$_[1],\"$fhdr\");
           return \$allresults[-1];
         } $ep /;
       eval "$sub";

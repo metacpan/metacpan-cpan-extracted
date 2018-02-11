@@ -26,7 +26,7 @@ use base qw/ Astro::FITS::HdrTrans::JAC /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # In each class we have three sets of data.
 #   - constant mappings

@@ -10,7 +10,7 @@ use Readonly;
 use FindBin qw/$Bin/;
 use lib $Bin;
 
-$ENV{MOJO_LOG_LEVEL} = 'debug';
+$ENV{MOJO_LOG_LEVEL} = 'fatal';
 
 Readonly my $BASE_URN => '/api/v2';
 
@@ -316,6 +316,11 @@ sub _issue {
 		"FaultPriority" => 3,
 		"TenantId" => "$id",
 		"Job" => undef,
+		"BlockName" => undef,
+		"AttendenceDate" => undef,
+		"CloseReason" => undef,
+		"Quotes" => undef,
+		"QuoteEndTime" => undef,
 	}
 }
 
@@ -348,6 +353,8 @@ sub _property {
 		"Address" => _address(),
 		"Created" => "",
 		"UpdateDate" => "",
+		"AssignedAgent" => undef,
+		"BlockId" => undef,
 		%{ $post_data // {} },
 	};
 }

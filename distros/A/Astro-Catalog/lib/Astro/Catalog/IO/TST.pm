@@ -33,7 +33,7 @@ use Astro::Coords;
 use base qw/ Astro::Catalog::IO::ASCII /;
 
 $DEBUG = 0;
-$VERSION = '4.32';
+$VERSION = '4.33';
 
 =begin __PRIVATE_METHODS__
 

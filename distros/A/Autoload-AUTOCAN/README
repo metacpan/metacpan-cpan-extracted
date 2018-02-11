@@ -50,6 +50,12 @@ DESCRIPTION
     code references as normal for defined methods (see UNIVERSAL), and
     delegates to AUTOCAN for unknown methods.
 
+CONFIGURING
+
+    Autoload::AUTOCAN accepts import arguments to configure its behavior.
+
+ functions
+
     AUTOLOAD affects standard function calls in addition to method calls.
     By default, the AUTOLOAD provided by this module will die (as Perl
     normally does without a defined AUTOLOAD) if a nonexistent function is
@@ -71,6 +77,41 @@ DESCRIPTION
       # elsewhere
       say My::Functions::duplicate('foo'); # foofoofoofoofoo
       say My::Functions::foo('bar'); # undefined subroutine error
+
+ install_subs
+
+    By passing install_subs as an import argument, any autoloaded function
+    or method returned by AUTOCAN will be installed into the package, so
+    that future invocations do not need to go through AUTOLOAD. This should
+    not be used if the autoloaded code is expected to change in subsequent
+    calls to AUTOCAN, as the installed version will be called or returned
+    by can directly.
+
+      package My::Class;
+      use Moo;
+      use Autoload::AUTOCAN 'install_subs';
+      
+      sub AUTOCAN {
+        my ($self, $method) = @_;
+        my $hash = expensive_calculation($method);
+        return sub { $hash };
+      }
+      
+      # elsewhere
+      my $obj = My::Class->new;
+      $obj->foo; # sub foo installed in My::Class
+      $obj->foo; # not autoloaded anymore
+
+CAVEATS
+
+    If you use namespace::clean, it will clean up the installed AUTOLOAD
+    function. To avoid this, either use this module after namespace::clean,
+    or add an exception for AUTOLOAD as below.
+
+      use Autoload::AUTOCAN;
+      use namespace::clean -except => 'AUTOLOAD';
+
+    This issue does not seem to occur with namespace::autoclean.
 
 BUGS
 

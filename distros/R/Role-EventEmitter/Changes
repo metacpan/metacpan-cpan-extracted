@@ -1,3 +1,6 @@
+0.003     2018-02-06 14:13:52 EST
+  - Add once_f method to subscribe and return a Future
+
 0.002     2015-10-27 21:22:12 EDT
   - Switch to Role::Tiny based role as attribute is not needed
 

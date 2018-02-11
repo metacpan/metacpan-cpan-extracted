@@ -3,10 +3,15 @@
 
 use strict;
 use warnings;
-use Test::More tests => 41;
+use Test::More;
 use MDV::Packdrakeng;
 use URPM;
 use URPM::Build;
+if (`uname -a` =~ /BSD/i) {
+    plan skip_all => "*BSD fails those";
+} else {
+    plan tests => 41;
+}
 
 
 chdir 't' if -d 't';

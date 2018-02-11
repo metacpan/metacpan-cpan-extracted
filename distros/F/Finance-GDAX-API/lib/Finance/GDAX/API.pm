@@ -1,5 +1,5 @@
 package Finance::GDAX::API;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use 5.20.0;
 use warnings;
 use JSON;
@@ -74,7 +74,7 @@ sub send {
     $client->addHeader('Content-Type',         'application/json');
 
     my $method = $self->method;
-    $client->setTimetout($self->timeout) if $self->timeout;
+    $client->setTimeout($self->timeout) if $self->timeout;
     $self->_set_error('');
     if ($method =~ /^(GET|DELETE)$/) {
 	$client->$method($url->get);

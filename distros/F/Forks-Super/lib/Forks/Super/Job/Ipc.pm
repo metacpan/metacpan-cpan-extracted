@@ -34,7 +34,7 @@ $| = 1;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(close_fh);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 our $NO_README = 0;
 
 our (%FILENO, %SIG_OLD, $IPC_COUNT, $IPC_DIR_DEDICATED,
@@ -2232,7 +2232,7 @@ sub _config_fh_child_stderr {
 	return;
     }
     return if ! $fh_config->{err};
-
+    
     if ($fh_config->{sockets}) {
 	__config_fh_child_stderr_sockets($job);
     } elsif ($fh_config->{pipes}) {
@@ -2244,6 +2244,10 @@ sub _config_fh_child_stderr {
 	    'fh_config = ', join(' ', %{$job->{fh_config}});
     }
     ${*STDERR}->{is_write} = 1;
+
+    # RT124316c: workaround for die in child not writing to STDERR
+    $SIG{__DIE__} ||= sub { print STDERR @_ };
+
     return;
 }
 
@@ -3395,7 +3399,7 @@ Forks::Super::Job::Ipc - interprocess communication routines for Forks::Super
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

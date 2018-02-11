@@ -6,8 +6,8 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'Log::Any' => '0',
-                                      'Log::Contextual' => '0',
+                                      'Log::Any' => '1.00',
+                                      'Log::Contextual' => '0.008001',
                                       'Log::Dispatch' => '0',
                                       'Log::Dispatchouli' => '0',
                                       'Log::Log4perl' => '0',

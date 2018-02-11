@@ -286,6 +286,7 @@ sub _parse_clause_identifier {
 
             my $rel = $current_type->relationship($id_part);
             my ($our_side, $their_side) = $rel->{is_right_entity} ? qw/ right left / : qw/ left right /;
+            my $related_type = $self->eav->type_by_id($rel->{"${their_side}_entity_type_id"});
             push @rels, $rel->{name};
             my $current_rel_alias = join '_', @rels, 'link';
 
@@ -309,12 +310,12 @@ sub _parse_clause_identifier {
 
                 if (defined $bind_value) {
 
-                    die "Cursor: query error: the entity given to '$identifier' is not an entity of type '$rel->{entity}'."
+                    die sprintf('Cursor: query error: the entity given to "%s" is not an entity of type %s.', $identifier, $related_type->name)
                         unless blessed $bind_value
                                 && $bind_value->isa('DBIx::EAV::Entity')
-                                && $bind_value->is_type($rel->{entity});
+                                && $bind_value->is_type($related_type->name);
 
-                    die "Cursor: query error: the '$rel->{entity}' instance given to '$identifier' is not in storage."
+                    die "Cursor: query error: the '".$related_type->name."' instance given to '$identifier' is not in storage."
                         unless $bind_value->in_storage;
                 }
 
@@ -329,7 +330,7 @@ sub _parse_clause_identifier {
             # step into the related type
             else {
 
-                $current_type = $eav->type($rel->{entity});
+                $current_type = $related_type;
                 $current_entity_alias = $current_entity_alias eq 'me' ? $rel->{name}
                                                                       : $current_entity_alias.'_'.$rel->{name};
 

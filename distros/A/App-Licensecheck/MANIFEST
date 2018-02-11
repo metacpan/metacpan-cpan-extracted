@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
+TODO
 bin/licensecheck
 dist.ini
 doap.ttl
@@ -203,8 +204,11 @@ t/grant/LGPL/pic.c
 t/grant/LGPL/strv.c
 t/grant/LGPL/table.py
 t/grant/LGPL/videoplayer.cpp
+t/grant/LGPL_and_more/colamd.c
 t/grant/LGPL_and_more/da.aff
+t/grant/MIT/gc.h
 t/grant/MIT/harfbuzz-impl.c
+t/grant/MIT/old_colamd.c
 t/grant/MIT/spaces.c
 t/grant/MPL_and_more/symbolstore.py
 t/grant/NTP/directory.h

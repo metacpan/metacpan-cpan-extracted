@@ -6,13 +6,14 @@ use strict;
 use warnings;
 
 use Moo;
-use JSON::RPC::Client;
+use JSON::RPC::Legacy::Client;
 
-our $VERSION  = '0.07';
+our $VERSION  = '0.08';
 
-has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Client"->new });
+has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Legacy::Client"->new });
 has user     => (is => 'ro');
 has password => (is => 'ro');
+has cookie   => (is => 'ro', isa => \&isa_cookie);
 has host     => (is => 'ro');
 has wallet   => (is => 'ro');
 has port     => (is => "lazy", default => 8332);
@@ -25,7 +26,7 @@ has debug    => (is => "lazy", default => 0);
 has ssl      => (is => 'ro', default => 0);
 has verify_hostname => (is => 'ro', default => 1);
 
-our $DEBUG_DUMPED = 0;
+my $DEBUG_DUMPED = 0;
 
 sub AUTOLOAD {
    my $self   = shift;
@@ -34,14 +35,26 @@ sub AUTOLOAD {
    $method =~ s/.*:://;
 
    return if ($method eq 'DESTROY');
-   # Thanks JSON::RPC::Client
+
+   # Build request URL
+   my $url = "";
 
    # Are we using SSL?
    my $uri = "http://";
    if ($self->ssl eq 1) {
       $uri = "https://";
    }
-   my $url = $uri . $self->user . ":" . $self->password . "\@" . $self->host . ":" . $self->port;
+
+   # Cookie will take precedence over user/password
+   if ($self->cookie) {
+      # If cookie is defined its contents become user:password
+      $url = $uri . $self->cookie . "\@" . $self->host . ":" . $self->port;
+   } elsif ($self->user) {
+      $url = $uri . $self->user . ":" . $self->password . "\@" . $self->host . ":" . $self->port;
+   } else {
+      die "An RPC user or RPC cookie file must be defined";
+   }
+
    # Tack on a specific wallet name if given
    if ($self->wallet) {
       $url .= "/wallet/" . $self->wallet;
@@ -50,10 +63,10 @@ sub AUTOLOAD {
    my $client = $self->jsonrpc;
 
    # Set timeout because bitcoin is slow
-   $client->ua->timeout($self->timeout); 
+   $client->ua->timeout($self->timeout);
 
-   # Set Agent, let them know who we be 
-   $client->ua->agent("Bitcoin::RPC::Client/" . $VERSION); 
+   # Set Agent, let them know who we be
+   $client->ua->agent("Bitcoin::RPC::Client/" . $VERSION);
 
    # Turn on debugging for LWP::UserAgent
    if ($self->debug) {
@@ -64,17 +77,17 @@ sub AUTOLOAD {
       }
    } else {# Don't print error message when debug is on.
       # We want to handle broken responses ourself
-      $client->ua->add_handler("response_data", 
-         sub { 
+      $client->ua->add_handler("response_data",
+         sub {
             my ($response, $ua, $h, $data) = @_;
 
             if ($response->is_error) {
                my $content = JSON->new->utf8->decode($data);
-
                print STDERR "error code: ";
-               print STDERR $content->{error}->{code}; 
+               print STDERR $content->{error}->{code};
                print STDERR ", error message: ";
-               print STDERR $content->{error}->{message} . " ($method)\n"; 
+               print STDERR $content->{error}->{message} . " ($method)\n";
+               exit(1);
             } else {
                # If no error then ditch the handler
                # otherwise things that did not error will get handled too
@@ -109,18 +122,43 @@ sub AUTOLOAD {
    return;
 }
 
+# function to setup cookie attrib
+sub isa_cookie {
+
+   my $failed = 0;
+
+   # We only want to read this once (limit io).
+   open COOKIE, $_[0] or $failed = 1;
+
+   if ($failed) {
+      print STDERR "Could not open RPC cookie file: " . $_[0];
+      print STDERR "\n";
+      exit(1);
+   }
+
+   my $cookie = <COOKIE>;
+   close COOKIE;
+   if (!defined($cookie) or $cookie !~ /:/) {
+      print STDERR "Invalid RPC cookie file format\n";
+      exit(1);
+   }
+   $cookie =~ s/\s+//g;
+   $_[0] = $cookie;
+
+}
+
 1;
 
 =pod
 
 =head1 NAME
 
-Bitcoin::RPC::Client - Bitcoin Core API RPCs
+Bitcoin::RPC::Client - Bitcoin Core JSON RPC Client
 
 =head1 SYNOPSIS
 
    use Bitcoin::RPC::Client;
-   
+
    # Create Bitcoin::RPC::Client object
    $btc = Bitcoin::RPC::Client->new(
       user     => "username",
@@ -142,7 +180,7 @@ Bitcoin::RPC::Client - Bitcoin Core API RPCs
    #     https://bitcoin.org/en/developer-reference#settxfee
    $settx = $btc->settxfee($feerate);
 
-   # Check your balance 
+   # Check your balance
    # (JSON::Boolean objects must be passed as boolean parameters)
    #     https://bitcoin.org/en/developer-reference#getbalance
    $balance = $btc->getbalance("yourAccountName", 1, JSON::true);
@@ -156,7 +194,7 @@ Bitcoin::RPC::Client - Bitcoin Core API RPCs
 
 =head1 DESCRIPTION
 
-This module implements in PERL the functions that are currently part of the
+This module implements in Perl the functions that are currently part of the
 Bitcoin Core RPC client calls (bitcoin-cli).The function names and parameters
 are identical between the Bitcoin Core API and this module. This is done for
 consistency so that a developer only has to reference one manual:
@@ -170,9 +208,10 @@ This method creates a new C<Bitcoin::RPC::Client> and returns it.
 
    Key                 Default
    -----------         -----------
+   host                undef (Required)
    user                undef (Required)
    password            undef (Required)
-   host                undef (Required)
+   cookie              undef
    port                8332
    wallet              undef
    timeout             20
@@ -181,18 +220,22 @@ This method creates a new C<Bitcoin::RPC::Client> and returns it.
    debug               0
    syntax              0
 
-wallet - Work against specific wallet.dat file when Multi-wallet support is 
+cookie - Absolute path to your RPC cookie file (.cookie). When cookie is
+defined user and password will be ignored and the contents of cookie will
+be used instead.
+
+wallet - Work against specific wallet.dat file when Multi-wallet support is
 enabled (Bitcoin Core v0.15+ only)
 
 timeout - Set the timeout in seconds for individual RPC requests. Increase
 this for slow bitcoind instances.
 
-ssl - OpenSSL support has been removed from the Bitcoin Core 
-project as of v0.12.0. However Bitcoin::RPC::Client will work
-over SSL with a reverse web proxy such as nginx.
+ssl - OpenSSL support has been removed from the Bitcoin Core project as of
+v0.12.0. However Bitcoin::RPC::Client will work over SSL with earlier versions
+or with a reverse web proxy such as nginx.
 
 verify_hostname - Disable SSL certificate verification. Needed when
-bitcoind is fronted by a proxy or when using a self-signed certificate. 
+bitcoind is fronted by a proxy or when using a self-signed certificate.
 
 debug - Turns on raw HTTP request/response output from LWP::UserAgent.
 
@@ -211,7 +254,7 @@ https://github.com/whindsx/Bitcoin-RPC-Client.git
 
 =head1 DONATE
 
-1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe 
+1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe
 
 =head1 LICENSE AND COPYRIGHT
 

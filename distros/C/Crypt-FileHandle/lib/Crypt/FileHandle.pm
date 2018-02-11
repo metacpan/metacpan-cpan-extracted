@@ -8,7 +8,7 @@ use FileHandle;
 use Carp qw(croak carp);
 
 use vars qw($VERSION);
-$VERSION = "0.02";
+$VERSION = "0.03";
 
 # ensure errors are properly reported to caller
 $Carp::Internal{"Crypt::FileHandle"}++;

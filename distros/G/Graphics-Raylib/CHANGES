@@ -1,9 +1,45 @@
 ==================================================
-Changes from 2017-02-05 00:00:00 +0000 to present.
+Changes from 2017-02-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.014 at 2018-02-05 15:07:18 +0000
+version 0.015 at 2018-02-09 22:07:36 +0000
+------------------------------------------
+
+  Change: 2d8089c467797063c935f1f57a3cd77cf7cc729c
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-09 23:07:17 +0000
+
+    Require newest Alien::raylib 
+
+  Change: de29f2cfdee9ad2f692c539f65d5205ceb04c907
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-09 22:36:44 +0000
+
+    Upgrade to use IsWindowReady() 
+
+  Change: 745b2fe11e97bc32a689f1d727b03e5921f826f9
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-08 12:21:17 +0000
+
+    Require newest Alien::raylib
+
+    Back to upstream again. Fixes glfwGetVideoMode triggering assert 
+
+  Change: ec4f19d43a5561c6d10f5229a73cbcdcba2589c7
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-08 12:20:33 +0000
+
+    Formatting, no functional changes 
+
+  Change: bdc34b7c43ab253bd2d3fecb57a4295b2ffd3462
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2018-02-08 12:19:56 +0000
+
+    Include stdbool for true & false definitions 
+
+------------------------------------------
+version 0.014 at 2018-02-05 15:06:57 +0000
 ------------------------------------------
 
   Change: 93837d1ed10bc463664c04bf54c8d363bcb3ddb8
@@ -305,5 +341,5 @@ version 0.002 at 2017-02-21 23:25:10 +0000
     from both git and perl distribution. This resolves issue #1. 
 
 ===============================================
-Plus 1 release after 2017-02-05 00:00:00 +0000.
+Plus 1 release after 2017-02-09 00:00:00 +0000.
 ===============================================

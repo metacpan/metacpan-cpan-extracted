@@ -1,5 +1,10 @@
 Revision history for Perl extension Regexp::Parserton.
 
+1.01  2018-02-08T12:00:00
+	- Adjust minimum Perl version in Makefile.PL from 5.20.2 to 5.10.1, to match Marpa::R2.
+	- Ensure same version of Perl is 'use'd in all *.pl and *.t files.
+	- Add link in docs to CPAN Testers fast-matrix of test results.
+
 1.00  2018-02-07T12:00:00
 	- More work on the sample code and the docs. Update the version # to 1.00.
 

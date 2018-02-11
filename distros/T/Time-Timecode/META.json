@@ -4,7 +4,7 @@
       "Skye Shaw <skye.shaw AT gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,5 @@
       },
       "homepage" : "http://github.com/sshaw"
    },
-   "version" : "0.31",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.32"
 }

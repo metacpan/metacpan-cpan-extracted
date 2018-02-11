@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use overload
   '""' => \&stringify,
@@ -110,6 +110,7 @@ use overload
         inv  => \&inv,
         sgn  => \&sgn,
         conj => \&conj,
+        norm => \&norm,
 
         real => \&real,
         imag => \&imag,
@@ -262,7 +263,7 @@ sub div {
 
     my $d = $y->{a} * $y->{a} + $y->{b} * $y->{b};
 
-    if (!ref($d) and $d == 0) {
+    if ($d == 0) {
         return $x->log->sub($y->log)->exp;
     }
 
@@ -349,6 +350,18 @@ sub conj ($) {
 }
 
 #
+## norm(a + b*i) = a**2 + b**2
+#
+
+sub norm ($) {
+    my ($x) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+
+    $x->{a} * $x->{a} + $x->{b} * $x->{b};
+}
+
+#
 ## log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a)*i    -- where a,b are real
 #
 
@@ -403,6 +416,19 @@ sub pow {
     $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
     $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
 
+    if ($x->{a} == 0 and $x->{b} == 0) {
+
+        if ($y->{a} < 0) {
+            return $x->inv;
+        }
+
+        if ($y->{a} == 0 and $y->{b} == 0) {
+            return __PACKAGE__->new($x->{a} + 1, $x->{b});
+        }
+
+        return __PACKAGE__->new($x->{a}, $x->{b});
+    }
+
     $x->log->mul($y)->exp;
 }
 
@@ -416,7 +442,7 @@ sub root ($$) {
     $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
     $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
 
-    $x->log->div($y)->exp;
+    $x->pow($y->inv);
 }
 
 #
@@ -706,8 +732,13 @@ sub tan ($) {
     $r->{a} *= 2;
     $r->{b} *= 2;
 
-    $r->{a} /= $den;
-    $r->{b} /= $den;
+    if (!ref($den) and $den == 0) {
+        $r = $r->div($den);
+    }
+    else {
+        $r->{a} /= $den;
+        $r->{b} /= $den;
+    }
 
     $r->{a} -= 1;
 
@@ -818,8 +849,13 @@ sub cot ($) {
     $r->{a} *= 2;
     $r->{b} *= 2;
 
-    $r->{a} /= $den;
-    $r->{b} /= $den;
+    if (!ref($den) and $den == 0) {
+        $r = $r->div($den);
+    }
+    else {
+        $r->{a} /= $den;
+        $r->{b} /= $den;
+    }
 
     $r->{a} += 1;
 
@@ -893,8 +929,13 @@ sub sec ($) {
     $t1->{a} *= +2;
     $t1->{b} *= -2;
 
-    $t1->{a} /= $den;
-    $t1->{b} /= $den;
+    if (!ref($den) and $den == 0) {
+        $t1 = $t1->div($den);
+    }
+    else {
+        $t1->{a} /= $den;
+        $t1->{b} /= $den;
+    }
 
     $t1;
 }
@@ -967,8 +1008,13 @@ sub csc ($) {
     $t1->{a} *= -2;
     $t1->{b} *= -2;
 
-    $t1->{a} /= $den;
-    $t1->{b} /= $den;
+    if (!ref($den) and $den == 0) {
+        $t1 = $t1->div($den);
+    }
+    else {
+        $t1->{a} /= $den;
+        $t1->{b} /= $den;
+    }
 
     @{$t1}{'a', 'b'} = ($t1->{b}, $t1->{a});
 

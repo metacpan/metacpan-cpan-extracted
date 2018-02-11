@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{ FALSE MINIMUM_PERL NODE_UNKNOWN TRUE };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use constant ELEMENT_UNKNOWN	=> NODE_UNKNOWN;
 

@@ -16,7 +16,7 @@ use constant IS_CYGWIN => $^O =~ /cygwin/i;
 use constant IS_WIN32ish => &IS_WIN32 || &IS_CYGWIN;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 our @EXPORT_OK = qw(Ctime is_number isValidPid pause qualify_sub_name shquote
 		    is_socket is_pipe IS_WIN32 IS_CYGWIN okl DEVNULL DEVTTY);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -395,7 +395,7 @@ Forks::Super::Util - utility routines for Forks::Super module
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -44,7 +44,7 @@ our $VERSION = '0.012';
 #pod Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
 #pod Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
 #pod Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
-#pod ORM|Yancy::Backend::DBIC>
+#pod ORM|Yancy::Backend::Dbic>
 #pod
 #pod =head2 Standalone App
 #pod
@@ -256,6 +256,8 @@ our $VERSION = '0.012';
 #pod
 #pod =item * C<< type => "string", format => "tel" >> - A telephone number (C<< <input type="tel"> >>)
 #pod
+#pod =item * C<< type => "string", format => "textarea" >> - A multiline text field (C<< <textarea> >>)
+#pod
 #pod =back
 #pod
 #pod Fields with an C<enum> property will be translated to C<< <select> >>
@@ -373,6 +375,13 @@ our $VERSION = '0.012';
 #pod
 #pod If true, thie field will be hidden from the rich editing form.
 #pod
+#pod =item x-order
+#pod
+#pod Set the order of the fields in the edit form by assigning a number to
+#pod the C<x-order> property. Fields in the form are be sorted by their
+#pod C<x-order>, and then by their name (alphabetically). Fields that do not
+#pod have C<x-order> set will be sorted after fields that do.
+#pod
 #pod =item x-filter
 #pod
 #pod This key is an array of filter names to run on the field when setting or
@@ -469,7 +478,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -509,7 +518,7 @@ Yancy can manage data in multiple databases using different backends
 Mojo::Pg|Yancy::Backend::Pg>, L<MySQL via
 Mojo::mysql|Yancy::Backend::Mysql>, L<SQLite via
 Mojo::SQLite|Yancy::Backend::Sqlite>, and L<DBIx::Class, a Perl
-ORM|Yancy::Backend::DBIC>
+ORM|Yancy::Backend::Dbic>
 
 =head2 Standalone App
 
@@ -721,6 +730,8 @@ the object's properties.
 
 =item * C<< type => "string", format => "tel" >> - A telephone number (C<< <input type="tel"> >>)
 
+=item * C<< type => "string", format => "textarea" >> - A multiline text field (C<< <textarea> >>)
+
 =back
 
 Fields with an C<enum> property will be translated to C<< <select> >>
@@ -838,6 +849,13 @@ to control how it is treated by Yancy.
 
 If true, thie field will be hidden from the rich editing form.
 
+=item x-order
+
+Set the order of the fields in the edit form by assigning a number to
+the C<x-order> property. Fields in the form are be sorted by their
+C<x-order>, and then by their name (alphabetically). Fields that do not
+have C<x-order> set will be sorted after fields that do.
+
 =item x-filter
 
 This key is an array of filter names to run on the field when setting or
@@ -901,13 +919,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar William Lindley
+=for stopwords Mohammad S Anwar mohawk2 William Lindley
 
 =over 4
 
 =item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+mohawk2 <mohawk2@users.noreply.github.com>
 
 =item *
 

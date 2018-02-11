@@ -1,0 +1,33 @@
+do{ my $x = {
+       'recommends' => {
+                         'CGI::Application::Plugin::Session' => 0,
+                         'Digest::MD5' => 0,
+                         'Apache::Htpasswd' => '1.8',
+                         'Color::Calc' => '0.12'
+                       },
+       'conflicts' => {},
+       'test_requires' => {},
+       'requires' => {
+                       'Class::ISA' => 0,
+                       'Attribute::Handlers' => 0,
+                       'CGI' => '3.16',
+                       'Scalar::Util' => 0,
+                       'perl' => '5.006',
+                       'CGI::Application' => 4,
+                       'Digest::SHA' => 0,
+                       'UNIVERSAL::require' => 0,
+                       'MIME::Base64' => 0
+                     },
+       'build_requires' => {
+                             'Test::Taint' => 0,
+                             'Test::MockObject' => 0,
+                             'Readonly' => 0,
+                             'Test::Regression' => 0,
+                             'Test::More' => '0.93',
+                             'Test::NoWarnings' => 0,
+                             'Test::Without::Module' => 0,
+                             'Test::Warn' => '0.11',
+                             'Test::Exception' => 0
+                           }
+     };
+$x; }

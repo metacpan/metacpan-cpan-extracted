@@ -17,14 +17,14 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
-        'Moonshine::Test' => 0.13,
+        'Moonshine::Test' => 0.16,
     },
     PREREQ_PM => {
         'Carp' => 0,
         'Scalar::Util' => 0,
-        'Combine::Keys' => 0.04,
+        'Combine::Keys' => 0.09,
         'Moo' => 0,
-        'MooX::ReturnModifiers' => 0.03,
+        'MooX::ReturnModifiers' => 0.09,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-VariantAttribute-*' },

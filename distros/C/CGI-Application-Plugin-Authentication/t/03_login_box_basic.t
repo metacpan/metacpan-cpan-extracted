@@ -2,7 +2,6 @@
 use Test::More;
 use Test::Taint;
 use Test::Regression;
-use Test::NoWarnings;
 use Test::Exception;
 use English qw(-no_match_vars);
 use lib qw(t);
@@ -160,4 +159,7 @@ subtest 'null' => sub {
     throws_ok(sub {$display->enforce_protection}, qr/Attempt to bypass authentication on protected template/, 'not authenticated');
 };
 
+# Test::NoWarn doesn't play nice with the windows skip_all
+require Test::NoWarnings;
+Test::NoWarnings::had_no_warnings();
 

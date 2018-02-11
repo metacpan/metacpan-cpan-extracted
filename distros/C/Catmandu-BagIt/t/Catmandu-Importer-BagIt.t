@@ -14,8 +14,8 @@ BEGIN {
 require_ok $pkg;
 
 my $importer = $pkg->new(
-    bags => ['bags/demo01','bags/demo02'] , 
-    verify => 1 , 
+    bags => ['bags/demo01','bags/demo02'] ,
+    verify => 1 ,
     include_payloads => 1 ,
     include_manifests => 1
 );
@@ -36,4 +36,4 @@ ok(grep ( {$_ eq 'data/Catmandu-0.9204.tar.gz'} @{$bags->[0]->{payload_files}}),
 
 is($bags->[0]->{manifest}->{'data/Catmandu-0.9204.tar.gz'},'c8accb44741272d63f6e0d72f34b0fde','reading manifest');
 
-done_testing 10;
+done_testing;

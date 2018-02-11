@@ -1,9 +1,9 @@
 package Net::DNS::RR::RRSIG;
 
 #
-# $Id: RRSIG.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: RRSIG.pm 1623 2018-01-26 14:23:54Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
 
 
 use strict;
@@ -36,7 +36,7 @@ use constant RSA => defined eval 'require Net::DNS::SEC::RSA';
 
 use constant ECDSA => defined eval 'require Net::DNS::SEC::ECDSA';
 use constant EdDSA => defined eval 'require Net::DNS::SEC::EdDSA';
-use constant GOST  => defined eval 'require Net::DNS::SEC::ECCGOST';
+use constant GOST  => defined eval 'require Digest::GOST; require Net::DNS::SEC::ECCGOST';
 
 use constant DNSSEC => PRIVATE && ( RSA || DSA || ECDSA || EdDSA );
 

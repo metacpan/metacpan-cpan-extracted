@@ -22,6 +22,7 @@ has 'dbh', is => 'ro', required => 1;
 has 'database_cascade_delete', is => 'ro', default => 1;
 has 'table_prefix', is => 'ro', default => 'eav_';
 has 'tenant_id', is => 'ro';
+has 'enable_multi_tenancy', is => 'ro', default => 0;
 has 'data_types', is => 'ro', default => sub { [qw/ int decimal varchar text datetime bool /] };
 has 'static_attributes', is => 'ro', default => sub { [] };
 has 'id_type', is => 'ro', default => 'int';
@@ -50,14 +51,14 @@ sub _build_translator {
 
 sub _build_sqlt_schema {
     my ($self, $schema) = @_;
-
+    my $enable_multi_tenancy = $self->enable_multi_tenancy || $self->tenant_id;
     my @schema = (
 
         entity_types => {
-            columns => ['id', $self->tenant_id ? 'tenant_id' : (), 'name:varchar:255'],
-            index   => [$self->tenant_id ? 'tenant_id' : ()],
+            columns => ['id', $enable_multi_tenancy ? 'tenant_id' : (), 'name:varchar:255', 'signature:char:32'],
+            index   => [$enable_multi_tenancy ? 'tenant_id' : ()],
             unique  => {
-                name => [$self->tenant_id ? 'tenant_id' : (),'name']
+                name => [$enable_multi_tenancy ? 'tenant_id' : (),'name']
             }
         },
 
@@ -284,10 +285,11 @@ sub deploy {
 
     # check we already installed this version
     my $version_table = $self->version_table;
-    return if $version_table->select_one({ version => $self->version });
+    return if $version_table->select_one({ version => $self->version }) && !$options{add_drop_table};
 
     # deploy ddl
     my $ddl = $self->get_ddl;
+    print STDERR $ddl if SQL_DEBUG;
     $self->dbh_do($_)
         for grep { /\w/ } split ';', $ddl;
 

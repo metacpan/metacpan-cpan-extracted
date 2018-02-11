@@ -1,10 +1,10 @@
 {
    "abstract" : "Efficient generation of subroutines via string eval",
    "author" : [
-      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+      "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.004000",
+   "version" : "2.005000",
    "x_authority" : "cpan:MSTROUT",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

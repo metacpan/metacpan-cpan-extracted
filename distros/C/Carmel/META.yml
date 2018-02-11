@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,10 +44,11 @@ resources:
   bugtracker: https://github.com/miyagawa/Carmel/issues
   homepage: https://github.com/miyagawa/Carmel
   repository: https://github.com/miyagawa/Carmel.git
-version: v0.1.34
+version: v0.1.35
 x_contributors:
   - 'Jan Seidl <seidl@avast.com>'
   - 'Jarrod Funnell <jfunnell@multiservice.com>'
   - 'Scott Wiersdorf <scott@perlcode.org>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,9 +1,8 @@
 #!/usr/bin/env perl
 
-use App::NDTools::NDDiff;
+require App::NDTools::NDDiff;
 
-my $nddiff = App::NDTools::NDDiff->new();
-$nddiff->exec();
+App::NDTools::NDDiff->new(@ARGV)->exec();
 
 __END__
 
@@ -13,7 +12,7 @@ nddiff - diff tool for nested data structures
 
 =head1 SYNOPSIS
 
-    nddiff [OPTIONS] <file1> <file2>
+    nddiff [OPTIONS] <file1> <file2> [<file3> ... ]
 
 =head1 DESCRIPTION
 
@@ -76,7 +75,7 @@ Don't show diff, only exit code shows exists diff or not.
 
 =item B<--rules>
 
-Dump diff in nsproc-rules format.
+Dump diff as rules for L<ndproc|App::NDTools::ndproc>.
 
 =item B<--show>
 
@@ -116,13 +115,13 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<diff(1)>, L<sdiff(1)>
+L<App::NDTools::ndpatch>, L<App::NDTools::ndproc>, L<App::NDTools::ndquery>
 
-L<ndpatch(1)>, L<ndproc(1)>, L<ndquery(1)>
+L<App::NDTools::NDDiff>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016,2017 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+Copyright 2016-2018 Michael Samoglyadov C<< <mixas at cpan.org> >>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of GNU General Public License 3 or later versions.

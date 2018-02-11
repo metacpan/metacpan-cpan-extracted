@@ -15,6 +15,9 @@ my %params = (
     BIN_SHARE     => {
         CPLUS    => 11,
         INCLUDE  => {'src' => '/'},
+        TYPEMAPS => {
+            'typemap'        => '',
+        }
     },
     CCFLAGS  => '-Wall -Wextra',
     OPTIMIZE  => '-g0 -O2',

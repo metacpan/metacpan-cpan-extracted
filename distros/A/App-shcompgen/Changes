@@ -1,3 +1,10 @@
+0.321   2018-02-08 (PERLANCAR)
+
+	- [Bugfix] Install default completion rule with -o bashdefault
+	  option as well to enable e.g. shell variable and ~username
+	  completion.
+
+
 0.320   2017-08-10 (PERLANCAR)
 
 	- Support Getopt::Long::EvenLess-based scripts.

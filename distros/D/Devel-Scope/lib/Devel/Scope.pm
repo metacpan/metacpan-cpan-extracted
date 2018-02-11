@@ -11,14 +11,11 @@ use Time::HiRes qw( tv_interval gettimeofday );
 
 require Exporter;
 our @ISA       = qw( Exporter );
-our @EXPORT_OK = qw( debug );
+our @EXPORT_OK = qw( debug debug_enable debug_disable );
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
-my $env_prefix = 'DEVEL_SCOPE_';
-my @env_vars_maybe = grep { m|^$env_prefix| } keys %ENV;
-
-my %config = (
+my %default_config = (
     'DEVEL_SCOPE_DEPTH'                => 0,
     'DEVEL_SCOPE_MIN_DECIMAL_PLACES'   => 10,
     'DEVEL_SCOPE_TIME_FORMAT'          => '%06f',
@@ -26,18 +23,7 @@ my %config = (
     'DEVEL_SCOPE_TIME_LOG_OFFSET'      => 4,
 );
 
-for my $env_var (@env_vars_maybe) {
-    if ( not defined $config{$env_var} ) {
-        print "Invalid " . __PACKAGE__ . " env variable '$env_var'\n";
-        print "Possible variable names: [name=default]\n";
-        for my $key ( sort keys %config ) {
-            print "    " . $key . '=' . $config{$key} . "\n";
-        }
-        die "\n";
-    } else {
-        $config{ $env_var } = $ENV{ $env_var };
-    }
-}
+my %config = validate_env_vars();
 
 my $time_format = $config{'DEVEL_SCOPE_TIME_FORMAT'};
 my $format_total_and_elapsed = "[ $time_format : $time_format ]";
@@ -59,7 +45,7 @@ debug("-"x40);
 
 sub debug {
     return if not defined $ENV{'DEVEL_SCOPE_DEPTH'};
-
+    $config{'DEVEL_SCOPE_DEPTH'} = $ENV{'DEVEL_SCOPE_DEPTH'};
     my $toc = [ gettimeofday ];
 
     my ($message) = join(' ', @_);
@@ -113,6 +99,44 @@ sub output {
     }
 }
 
+sub debug_disable {
+    my $previous_value = $ENV{'DEVEL_SCOPE_DEPTH'};
+    delete $ENV{'DEVEL_SCOPE_DEPTH'};
+    delete $config{'DEVEL_SCOPE_DEPTH'};
+    return $previous_value;
+}
+
+sub debug_enable {
+    my ($depth) = @_;
+    $depth ||= $default_config{'DEVEL_SCOPE_DEPTH'};
+
+    $ENV{'DEVEL_SCOPE_DEPTH'} = $depth;
+    $config{'DEVEL_SCOPE_DEPTH'} = $depth;
+
+    return $depth;
+}
+
+sub validate_env_vars {
+    my $env_prefix = 'DEVEL_SCOPE_';
+    my @env_vars_maybe = grep { m|^$env_prefix| } keys %ENV;
+
+    my %config = %default_config;
+    for my $env_var (@env_vars_maybe) {
+        if ( not defined $config{$env_var} ) {
+            print "Invalid " . __PACKAGE__ . " env variable '$env_var'\n";
+            print "Possible variable names: [name=default]\n";
+            for my $key ( sort keys %config ) {
+                print "    " . $key . '=' . $config{$key} . "\n";
+            }
+            die "\n";
+        } else {
+            $config{ $env_var } = $ENV{ $env_var };
+        }
+    }
+
+    return %config;
+}
+
 1; # End of Devel::Scope
 
 __END__
@@ -123,7 +147,7 @@ Devel::Scope - Scope based debug
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -158,6 +182,8 @@ Provide a debug method that outputs conditionally based on the scoping level.
 =head1 EXPORT
 
     debug
+    debug_enable
+    debug_disable
 
 =head1 SUBROUTINES/METHODS
 
@@ -165,6 +191,24 @@ Provide a debug method that outputs conditionally based on the scoping level.
 
     Prints only when the scope is greater (deeper) than some number.
     Turns into a NO-OP unless DEVEL_SCOPE_DEPTH environmental variable is set.
+
+        debug("The value of foo = 2")
+
+head2 debug_enable
+
+    Turn on debugging
+
+        debug_enable(2); # Set the depth to 2
+
+        my $current_debug_depth = debug_enable();
+
+head3 debug disable
+
+    Turn off debugging
+
+        debug_disable();
+
+        my $previous_debug_depth = debug_disable();
 
 =cut
 

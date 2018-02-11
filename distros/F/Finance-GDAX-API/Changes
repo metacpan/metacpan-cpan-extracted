@@ -1,3 +1,33 @@
+commit 8045f4505257a197eb3946279a046f6ce0d478db
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Feb 10 03:57:01 2018 -0800
+
+    Fixed typo for REST client timeout and clarified documentation that new order objects must be created for each separate order
+
+commit b72a5010a792c89e71e2d132e3a2eefd82084144
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jan 11 18:39:13 2018 -0800
+
+    Update version to 0.08
+
+commit 66922afc39326031a3779fb260715d56396e5ac9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jan 11 18:37:20 2018 -0800
+
+    NetBSD fails timestamp on REST request during test 010 - looking for expired request now as well as invalid request
+
+commit 06d5445ff3fb8de76a0b14462ced7e8621ff9944
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jan 8 19:03:47 2018 -0800
+
+    Updated $VERSION to match CPAN dist version in main module (thanks J. Rabinowitz)
+
+commit 0fe2bf5d5e2f386b242b6ba0b69de875ad5553d3
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jul 14 16:33:51 2017 -0700
+
+    MYMETA.* files added to MANIFEST.SKIP to resolve CPAN ticket # 122482
+
 commit 632944e83a40b9ad9f65e1026198723d2a225be9
 Author: Mark Rushing <mark@orbislumen.net>
 Date:   Thu Jul 13 01:08:00 2017 -0700

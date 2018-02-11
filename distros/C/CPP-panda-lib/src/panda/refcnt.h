@@ -1,9 +1,7 @@
 #pragma once
 #include <memory>
-#include <atomic>
 #include <stdint.h>
 #include <stddef.h>
-#include <type_traits>
 #include <panda/cast.h>
 
 namespace panda {
@@ -47,25 +45,114 @@ namespace {
     };
 }
 
-template <typename Storage>
-class RefCountedImpl {
+class Refcnt {
+public:
+    void    retain  () const { ++_refcnt; }
+    void    release () const { if (--_refcnt <= 0) delete this; }
+    int32_t refcnt  () const { return _refcnt; }
+protected:
+    Refcnt () : _refcnt(0) {}
+    virtual ~Refcnt () {}
+private:
+    mutable int32_t _refcnt;
+};
+
+template <typename T>
+class iptr {
+public:
+    template <class U> friend class iptr;
+    typedef T element_type;
+
+    iptr ()                   : ptr(NULL)    {}
+    iptr (T* pointer)         : ptr(pointer) { if (ptr) ptr->retain(); }
+    iptr (const iptr<T>& oth) : ptr(oth.ptr) { if (ptr) ptr->retain(); }
+    template<class U>
+    iptr (const iptr<U>& oth) : ptr(oth.ptr) { if (ptr) ptr->retain(); }
+
+    iptr (iptr<T>&& oth) {
+        ptr = oth.ptr;
+        oth.ptr = NULL;
+    }
+
+    template<class U>
+    iptr (iptr<U>&& oth) {
+        ptr = oth.ptr;
+        oth.ptr = NULL;
+    }
+
+    ~iptr () { if (ptr) ptr->release(); }
+
+    iptr<T>& operator= (T* pointer) {
+        if (ptr) ptr->release();
+        ptr = pointer;
+        if (pointer) pointer->retain();
+        return *this;
+    }
+
+    iptr<T>& operator= (const iptr<T>& oth) { return iptr<T>::operator=(oth.ptr); }
+    template<class U>
+    iptr<T>& operator= (const iptr<U>& oth) { return iptr<T>::operator=(oth.ptr); }
+
+    iptr<T>& operator= (iptr<T>&& oth) {
+        std::swap(ptr, oth.ptr);
+        return *this;
+    }
+
+    template<class U>
+    iptr<T>& operator= (iptr<U>&& oth) {
+        if (ptr) ptr->release();
+        ptr = oth.ptr;
+        oth.ptr = NULL;
+        return *this;
+    }
+
+    void reset () {
+        if (ptr) ptr->release();
+        ptr = NULL;
+    }
+
+    void reset (T* p) { operator=(p); }
+
+    T* operator-> () const { return ptr; }
+    T& operator*  () const { return *ptr; }
+    operator T*   () const { return ptr; }
+    explicit
+    operator bool () const { return ptr; }
+
+    T* get () const { return ptr; }
+
+private:
+    T* ptr;
+};
+
+template <typename T1, typename T2>
+inline iptr<T1> static_pointer_cast (const iptr<T2>& ptr) {
+    return iptr<T1>(static_cast<T1*>(ptr.get()));
+}
+
+template <typename T1, typename T2>
+inline iptr<T1> const_pointer_cast (const iptr<T2>& ptr) {
+    return iptr<T1>(const_cast<T1*>(ptr.get()));
+}
+
+template <typename T1, typename T2>
+inline iptr<T1> dynamic_pointer_cast (const iptr<T2>& ptr) {
+    return iptr<T1>(dyn_cast<T1*>(ptr.get()));
+}
+
+class RefCounted {
 public:
     void    retain  () const { ++_refcnt; on_retain(); }
     void    release () const { bool delete_me = --_refcnt <= 0; on_release(); if (delete_me && _refcnt <= 0) delete this; }
     int32_t refcnt  () const { return _refcnt; }
 protected:
-    RefCountedImpl () : _refcnt(0) {}
+    RefCounted () : _refcnt(0) {}
     virtual void on_retain  () const {}
     virtual void on_release () const {}
-    virtual ~RefCountedImpl () {}
+    virtual ~RefCounted () {}
 private:
-    mutable Storage _refcnt;
+    mutable int32_t _refcnt;
 };
-
-using RefCounted = RefCountedImpl<int32_t>;
-
-template<bool SAFE = true>
-using RefCountedThreadSafe = RefCountedImpl< typename std::conditional<SAFE, std::atomic<int32_t>, int32_t>::type >;
 
 template <typename T, bool A = IsRefCounted<T>::value>
 class shared_ptr {};

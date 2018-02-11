@@ -1,12 +1,11 @@
 use strict ;
 use Test ;
 
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
-
 use Inline(
 	Java => 'DATA'
 ) ;
+
+use Inline::Java qw(cast);
 
 BEGIN {
 	plan(tests => 55) ;
@@ -43,10 +42,11 @@ my $t = new types5() ;
 	$a = $t->_Object([1, "two", $t]) ;
 	ok($a->[0], "1") ;
 	ok($a->[1], "two") ;
-	ok(UNIVERSAL::isa($a->[2], "main::types5")) ;
-	ok($a->[2]->{data}->[1], "a") ;
-	$a->[2]->{data} = ["1", "2"] ;
-	ok($a->[2]->{data}->[1], 2) ;
+	my $a2 = cast('types5', $a->[2]);
+	ok(UNIVERSAL::isa($a2, "main::types5")) ;
+	ok($a2->{data}->[1], "a") ;
+	$a2->{data} = ["1", "2"] ;
+	ok($a2->{data}->[1], 2) ;
 
 	$a->[0]++ ;
 	ok($a->[0], "2") ;
@@ -58,7 +58,7 @@ my $t = new types5() ;
 	ok($a->[2], "string") ;
 
 	$a->[0] = $t ;
-	ok(UNIVERSAL::isa($a->[0], "main::types5")) ;
+	ok(UNIVERSAL::isa(cast('types5', $a->[0]), "main::types5")) ;
 	
 	# Try some multidimensional arrays.
 	$a = $t->_StringString([

@@ -2,7 +2,7 @@ NAME
     Regexp::Pattern::License - Regular expressions for legal licenses
 
 VERSION
-    Version v3.0.31
+    Version v3.1.0
 
 DESCRIPTION
     Regexp::Pattern::License provides a hash of regular expression patterns
@@ -14,6 +14,9 @@ PATTERNS
   Single licenses
     Patterns each covering a single license.
 
+    Each of these patterns has exactly one of these tags: type:singleversion:*
+    type:unversioned type:versioned:decimal .
+
     *   adobe_2006
 
     *   adobe_glyph
@@ -22,6 +25,8 @@ PATTERNS
 
     *   agpl
 
+    *   aladdin
+
     *   apache
 
     *   apafml
@@ -29,6 +34,10 @@ PATTERNS
     *   artistic
 
     *   artistic_2
+
+    *   bdwgc
+
+    *   bdwgc_matlab
 
     *   beerware
 
@@ -96,13 +105,23 @@ PATTERNS
 
     *   isc
 
+    *   isc_minidiscl
+
+    *   icu
+
     *   lgpl
+
+    *   lgpl_bdwgc
 
     *   llgpl
 
     *   libpng
 
     *   mit_advertising
+
+    *   mit_cmu
+
+    *   mit_cmu_warranty
 
     *   mit_enna
 
@@ -130,6 +149,8 @@ PATTERNS
 
     *   ntp_disclaimer
 
+    *   ofl
+
     *   openssl
 
     *   postgresql
@@ -139,6 +160,8 @@ PATTERNS
     *   python
 
     *   qpl
+
+    *   rpsl
 
     *   sgi_b
 
@@ -154,6 +177,8 @@ PATTERNS
 
   Licensing traits
     Patterns each covering a single trait occuring in licenses.
+
+    Each of these patterns has the tag type:trait .
 
     *   clause_retention
 
@@ -180,18 +205,77 @@ PATTERNS
     *   version_prefix
 
   License combinations
-    Patterns each covering a single combination of multiple licenses.
+    Patterns each covering a combination of multiple licenses.
+
+    Each of these patterns has the tag type:combo .
 
     *   perl
 
-  Multiple licenses
-    Patterns each covering multiple licenses.
+  License groups
+    Patterns each covering either of multiple licenses.
+
+    Each of these patterns has the tag type:group .
 
     *   bsd
 
     *   gnu
 
     *   mit
+
+STRUCTURE
+    The regexp patterns follows the DefHash specification, and more
+    specifically the structure of Regexp::Pattern.
+
+  TAGS
+    Pattern defhashes optionally includes tags, which may help in selecting
+    multiple related patterns.
+
+    Tags are hierarchical, with `:` as separator, and may be extended without
+    notice. Therefore take care to permit sub-parts when tag-matching, e.g.
+    using a regex like ` /\Asome:tag(?:\z|:)/ `.
+
+    *   family:bsd
+
+    *   family:cc
+
+    *   family:gpl
+
+    *   family:mit
+
+    *   family:zlib
+
+        Pattern covers a license part of a family of licenses.
+
+    *   type:combo
+
+        Pattern covers a combination of multiple licenses.
+
+    *   type:group
+
+        Pattern covers either of multiple licenses.
+
+    *   type:singleversion:*
+
+        Pattern covers a specific version of a license.
+
+        Last part of tag is the key of the corresponding non-version-specific
+        pattern.
+
+    *   type:trait
+
+        Pattern covers a single trait occuring in licenses.
+
+    *   type:unversioned
+
+        Pattern covers a license without versioning scheme.
+
+    *   type:versioned:decimal
+
+        Pattern covers a license using decimal number versioning scheme.
+
+   DEPRECATED TAGS
+    Tags not documented in this POD, specifically non-hierarchical tags, are
+    deprecated and will be dropped in a future release.
 
 AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`

@@ -1,6 +1,4 @@
 Changes
-lib.c
-lib.xs
 lib/CPP/panda/lib.pm
 lib/CPP/panda/lib.pod
 Makefile.PL
@@ -19,6 +17,7 @@ src/panda/lib/from_chars.cc
 src/panda/lib/from_chars.h
 src/panda/lib/hash.cc
 src/panda/lib/hash.h
+src/panda/lib/integer_sequence.h
 src/panda/lib/memory.cc
 src/panda/lib/memory.h
 src/panda/lib/owning_list.h
@@ -33,23 +32,21 @@ src/panda/string_view.h
 src/panda/unordered_string_map.h
 src/panda/unordered_string_set.h
 t/cpp_tests.t
-t/from_chars.t
-t/lib/PLTest.pm
-t/src/from_chars.xsi
-t/src/string.xsi
-t/src/string_containers.xsi
-t/src/test.h
-t/src/test.xsi
-t/src/test_dispatcher.cc
+t/dispatcher.cc
+t/from_chars.cc
+t/function.cc
+t/iptr.cc
+t/owning_list.cc
+t/src/test.h.orig
 t/src/test_dispatcher.o
-t/src/test_function.cc
 t/src/test_function.o
-t/src/test_owning_list.cc
 t/src/test_owning_list.o
-t/src/test_utils.h
-t/src/testmap
-t/string.t
-t/string_containers.t
-t/to_chars.t
+t/string.cc
+t/string.xsi
+t/string_containers.cc
+t/test.cc
+t/test.h
+t/to_chars.cc
+t/xs.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

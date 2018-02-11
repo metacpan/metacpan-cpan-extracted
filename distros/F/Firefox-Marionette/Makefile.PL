@@ -41,10 +41,11 @@ elsif ( $^O eq 'darwin' ) {
 }
 my $version_string = `"$binary" -version`;
 print $version_string;
+my $major;
 if ($version_string) {
     if ( $version_string =~ /^Mozilla[ ]Firefox[ ](\d+)[.]\d+([.]\d+)?\s*/smx ) {
-        my ($major) = ($1);
-        if ( $major < 55 ) {
+        ($major) = ($1);
+        if ( $major < 52 ) {
             last_desperate_search();
             die
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
@@ -82,6 +83,15 @@ if (($^O eq 'linux') || ($^O eq 'freebsd')) {
 		}
 	}
 }
+if (( $^O eq 'MSWin32' ) || ( $^O eq 'darwin' ) || ($^O eq 'cygwin')) {
+} elsif ($ENV{DISPLAY}) {
+} elsif ($major > 55) { # -headless is supported
+} else {
+	`Xvfb -help 2>/dev/null >/dev/null`;
+	if ($? != 0) {
+		die "Unable to run tests when not in an X11 environment and Xvfb is not available.  Please install Xvfb";
+	}
+}
 
 WriteMakefile(
     NAME           => 'Firefox::Marionette',
@@ -112,8 +122,11 @@ WriteMakefile(
         'POSIX'               => 0,
         'URI'                 => 0,
 	'Fcntl'               => 0,
+	'IPC::Run'            => 0,
         'MIME::Base64'        => 0,
+        'Exporter'            => 0,
         'overload'            => 0,
+        'base'                => 0,
         (
             $^O eq 'MSWin32'
             ? (

@@ -36,7 +36,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.19';
 
 use Astro::PAL ();
 use Astro::Coords::Angle;
@@ -232,7 +232,8 @@ types of coordinates.
 
 sub array {
   my $self = shift;
-  return ( $self->type, $self->az, $self->el,
+  my ($az, $el) = $self->azel();
+  return ( $self->type, $az->radians, $el->radians,
 	   undef, undef, undef, undef, undef, undef, undef, undef);
 }
 

@@ -11,6 +11,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "rpmversion.h"
 
 #include <sys/utsname.h>
 #include <sys/select.h>
@@ -1268,10 +1269,12 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
       callback = td->callback_error;
       callback_type = "error";
       break;
+#ifdef RPM4_13_0
     case RPMCALLBACK_ELEM_PROGRESS:
       callback = td->callback_elem;
       callback_type = "elem";
       break;
+#endif
     default:
       break;
   }
@@ -1303,9 +1306,11 @@ static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
       case RPMCALLBACK_CPIO_ERROR:
 	callback_subtype = "cpio";
 	break;
+#ifdef RPM4_13_0
       case RPMCALLBACK_ELEM_PROGRESS:
 	callback_subtype = "progress";
 	break;
+#endif
       case RPMCALLBACK_SCRIPT_ERROR:
 	callback_subtype = "script";
 	break;
@@ -2990,6 +2995,11 @@ Urpm_parse_hdlist__XS(urpm, filename, ...)
     } else croak("first argument should contain a depslist ARRAY reference");
   } else croak("first argument should be a reference to a HASH");
 
+
+#ifndef RPM4_14_0
+#define RPMVSF_NOPAYLOAD RPMVSF_NOSHA1
+#define RPMVSF_NOSHA256HEADER RPMVSF_NOMD5HEADER
+#endif
 void
 Urpm_parse_rpm(urpm, filename, ...)
   SV *urpm
@@ -3063,34 +3073,35 @@ Urpm_verify_rpm(filename, ...)
   PREINIT:
   FD_t fd;
   int i, oldlogmask;
-  rpmts ts = NULL;
-  struct rpmQVKArguments_s qva;
+  rpmVSFlags vsflags;
   CODE:
   /* Don't display error messages */
   oldlogmask = rpmlogSetMask(RPMLOG_UPTO(RPMLOG_PRI(4)));
-  memset(&qva, 0, sizeof(struct rpmQVKArguments_s));
-  qva.qva_source = RPMQV_RPM;
-  qva.qva_flags = VERIFY_ALL;
+  vsflags = RPMVSF_DEFAULT;
   for (i = 1 ; i < items - 1 ; i += 2) {
     STRLEN len;
     char *s = SvPV(ST(i), len);
     if (SvIV(ST(i+1))) {
       if (len == 9 && !strncmp(s, "nodigests", 9))
-        qva.qva_flags &= ~VERIFY_DIGEST;
+        vsflags |= _RPMVSF_NODIGESTS;
       else if (len == 12 && !strncmp(s, "nosignatures", 12))
-        qva.qva_flags &= ~VERIFY_SIGNATURE;
+        vsflags |= _RPMVSF_NOSIGNATURES;
     }
   }
   fd = Fopen(filename, "r");
   if (fd == NULL)
     RETVAL = 0;
   else {
+    Header h;
     read_config_files(0);
-    ts = rpmtsCreate();
+    rpmts ts = rpmtsCreate();
     rpmtsSetRootDir(ts, "/");
     rpmtsOpenDB(ts, O_RDONLY);
-    RETVAL = rpmVerifySignatures(&qva, ts, fd, filename) ? 0 : 1;
+    rpmtsSetVSFlags(ts, vsflags);
+    RETVAL = (rpmReadPackageFile(ts, fd, filename, &h) == RPMRC_OK);
     Fclose(fd);
+    if (h)
+      h = headerFree(h);
     (void)rpmtsFree(ts);
   }
   rpmlogSetMask(oldlogmask);
@@ -3117,7 +3128,11 @@ Urpm_get_gpg_fingerprint(filename)
 	pktlen = 0;
     else {
 	unsigned int i;
+#ifdef RPM4_14_0
         pgpPubkeyKeyID (pkt, pktlen, fingerprint);
+#else
+	pgpPubkeyFingerprint (pkt, pktlen, fingerprint);
+#endif
    	for (i = 0; i < sizeof (pgpKeyID_t); i++)
 	    sprintf(&fingerprint_str[i*2], "%02x", fingerprint[i]);
     }
@@ -3136,7 +3151,7 @@ Urpm_verify_signature(filename, prefix=NULL)
   char result[1024];
   rpmRC rc;
   FD_t fd;
-  Header h = headerNew();
+  Header h;
   CODE:
   fd = Fopen(filename, "r");
   if (fd == NULL)

@@ -1,7 +1,0 @@
-no-module = [
-	"echo",
-]
-
-[alias]
-	echo-n = [ "echo", "-n" ]
-	hello = "echo -n 'hello  world'"

@@ -3,7 +3,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "2.2.0";
+our $VERSION = "2.3.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
@@ -402,6 +402,21 @@ method _add_path_to_hash($hash, $path, $time) {
 	}
 }
 
+=head3 search_path
+
+ my $paths = $app->search_path($pattern)
+
+Returns a arrayref of paths that match the pattern. The pattern is matched as
+an sqlite LIKE pattern. If no % occurs in the pattern, the patterns is
+automatically wrapped between two % so it may match anywhere in the path.
+
+=cut
+
+method search_path($pattern) {
+	$pattern = '%'.$pattern.'%' if $pattern !~ m/%/;
+	return $self->{db}->search_path($pattern);
+}
+
 =head3 get_missing_items
 
  my $items = $app->get_missing_items($have, $want);
@@ -438,6 +453,7 @@ method _handle_removed_archives($borg_archives) {
 			$self->{db}->remove_archive($archive);
 			$self->{db}->commit;
 			$self->{db}->vacuum;
+			$self->{db}->verify_cache_fill_rate_ok();
 		}
 
 		my $end = Time::HiRes::gettimeofday();
@@ -476,6 +492,7 @@ method _handle_added_archives($borg_archives) {
 		$self->_save_node($archive_id,  undef, $lookuptable);
 		$self->{db}->commit;
 		$self->{db}->vacuum;
+		$self->{db}->verify_cache_fill_rate_ok();
 
 		my $end = Time::HiRes::gettimeofday();
 		$log->debugf("Adding archive finished after: %.5fs (parsing borg output took %.5fs)", $end - $start, $borg_time - $start);
@@ -515,10 +532,13 @@ method update_cache() {
 
 	my $borg_archives = $self->{borg}->borg_list();
 
+	# write operations benefit from the large cache so set the cache size here
+	$self->{db}->set_cache_size();
 	$self->_handle_removed_archives($borg_archives);
 	$self->_handle_added_archives($borg_archives);
 
 	$log->debugf("DB contains information for %d archives in %d rows", scalar(@{$self->{db}->get_archive_names()}), $self->{db}->get_archive_row_count());
+	$self->{db}->verify_cache_fill_rate_ok();
 }
 
 

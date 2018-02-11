@@ -24,7 +24,7 @@ use base qw/ Astro::FITS::HdrTrans::Base /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -203,7 +203,7 @@ sub to_UTSTART {
 
 =item B<to_UTEND>
 
-Translates the database date header into a C<Time::Piece> object and adds 
+Translates the database date header into a C<Time::Piece> object and adds
 on the exposure time.
 
 =cut

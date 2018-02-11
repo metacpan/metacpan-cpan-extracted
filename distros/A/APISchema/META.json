@@ -4,7 +4,7 @@
       "hitode909 <hitode909@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -79,7 +79,7 @@
    "provides" : {
       "APISchema" : {
          "file" : "lib/APISchema.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "APISchema::DSL" : {
          "file" : "lib/APISchema/DSL.pm"
@@ -144,12 +144,13 @@
          "web" : "https://github.com/hitode909/APISchema"
       }
    },
-   "version" : "1.36",
+   "version" : "1.37",
    "x_authority" : "cpan:HITODE",
    "x_contributors" : [
-      "Tomohiro Nishimura <tomohiro68@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "aereal <aereal@aereal.org>",
-      "Takumi Akiyama <t.akiym@gmail.com>"
-   ]
+      "Takumi Akiyama <t.akiym@gmail.com>",
+      "Tomohiro Nishimura <tomohiro68@gmail.com>",
+      "aereal <aereal@aereal.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

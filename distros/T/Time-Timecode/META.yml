@@ -3,15 +3,15 @@ abstract: 'Video timecode class and command line program'
 author:
   - 'Skye Shaw <skye.shaw AT gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Time-Timecode
 no_index:
   directory:
@@ -21,5 +21,4 @@ requires: {}
 resources:
   bugtracker: http://github.com/sshaw/Time-Timecode/issues
   homepage: http://github.com/sshaw
-version: '0.31'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 0.32

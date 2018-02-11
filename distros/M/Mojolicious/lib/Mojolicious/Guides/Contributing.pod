@@ -80,11 +80,11 @@ without them, and update relevant documentation.
 
 While the L<Mojolicious> distribution covers a wide range of features, we are
 rather conservative when it comes to adding new ones. So if your contribution
-is not a bug fix, you can drastically increase its chances of getting accepted
-by discussing it in advance on the
-L<mailing list|http://groups.google.com/group/mojolicious> or the official IRC
-channel C<#mojo> on C<irc.perl.org>
-(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>).
+is not a simple bug fix, it is B<strongly recommended> that you discuss it in
+advance on the L<mailing list|http://groups.google.com/group/mojolicious> or the
+official IRC channel C<#mojo> on C<irc.perl.org>
+(L<chat now!|https://chat.mibbit.com/?channel=%23mojo&server=irc.perl.org>), to
+avoid unnecessary work and to increase its chances of getting accepted.
 
 The following mission statement and rules are the foundation of all L<Mojo> and
 L<Mojolicious> development. Please make sure that your contribution aligns well
@@ -180,8 +180,7 @@ No names outside of C<Mojolicious.pm>.
 L<Mojolicious> is open source and free to use. However, the amount of effort
 needed to maintain the project and develop new features for it is not
 sustainable without proper financial backing. You can support the ongoing
-development of L<Mojolicious> through L<PayPal|https://www.paypal.me/kraih> and
-Bitcoin (C<1Cid78CmK4hvf78Ry8K2XeDx8pQHNh4hbz>).
+development of L<Mojolicious> through L<PayPal|https://www.paypal.me/kraih>.
 
 If you run a business and use L<Mojolicious> in a revenue generating product, it
 makes business sense to support L<Mojolicious> development. Because it ensures

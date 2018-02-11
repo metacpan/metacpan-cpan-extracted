@@ -1,4 +1,4 @@
-use lib 'inc';
+use lib '.';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

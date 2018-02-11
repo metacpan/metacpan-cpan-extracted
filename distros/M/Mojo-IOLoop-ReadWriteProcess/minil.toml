@@ -1,4 +1,6 @@
 name = "Mojo-IOLoop-ReadWriteProcess"
 badges = ["travis", "codecov"]
-module_maker="ModuleBuildTiny"
+module_maker="ModuleBuild"
 
+[build]
+build_class = "builder::custom"

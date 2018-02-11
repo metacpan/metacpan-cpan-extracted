@@ -1,3 +1,6 @@
+1.005     2018-02-06 14:28:11 EST
+  - Improved HTML Living Standard compliance (from Mojolicious 7.60)
+
 1.004     2017-11-11 16:46:13 EST
   - Added with_roles method to Mojo::DOM58 and collection objects to support
     applying roles with Role::Tiny. (from Mojolicious 7.43)

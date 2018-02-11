@@ -1506,6 +1506,29 @@ void do_warn(SV* h, int rc, char* what)
     } \
   }
 
+static void set_ssl_error(MYSQL *sock, const char *error)
+{
+  const char *prefix = "SSL connection error: ";
+  STRLEN prefix_len;
+  STRLEN error_len;
+
+  sock->net.last_errno = CR_SSL_CONNECTION_ERROR;
+  strcpy(sock->net.sqlstate, "HY000");
+
+  prefix_len = strlen(prefix);
+  if (prefix_len > sizeof(sock->net.last_error) - 1)
+    prefix_len = sizeof(sock->net.last_error) - 1;
+  memcpy(sock->net.last_error, prefix, prefix_len);
+
+  error_len = strlen(error);
+  if (prefix_len + error_len > sizeof(sock->net.last_error) - 1)
+    error_len = sizeof(sock->net.last_error) - prefix_len - 1;
+  if (prefix_len + error_len > 100)
+    error_len = 100 - prefix_len;
+  memcpy(sock->net.last_error + prefix_len, error, error_len);
+
+  sock->net.last_error[prefix_len + error_len] = 0;
+}
 
 /***************************************************************************
  *
@@ -1746,12 +1769,17 @@ MYSQL *mysql_dr_connect(
         if ((svp = hv_fetch(hv, "mysql_skip_secure_auth", 22, FALSE)) &&
             *svp  &&  SvTRUE(*svp))
         {
+#if LIBMYSQL_VERSION_ID > SECURE_AUTH_LAST_VERSION
+          croak("mysql_skip_secure_auth not supported");
+#endif
+#if MYSQL_VERSION_ID <= SECURE_AUTH_LAST_VERSION
           my_bool secauth = 0;
           if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
             PerlIO_printf(DBIc_LOGPIO(imp_xxh),
                           "imp_dbh->mysql_dr_connect: Skipping" \
                           " secure auth\n");
           mysql_options(sock, MYSQL_SECURE_AUTH, &secauth);
+#endif
         }
         if ((svp = hv_fetch(hv, "mysql_read_default_file", 23, FALSE)) &&
             *svp  &&  SvTRUE(*svp))
@@ -1898,28 +1926,34 @@ MYSQL *mysql_dr_connect(
         }
 #endif
 
+	if ((svp = hv_fetch(hv, "mysql_ssl", 9, FALSE)) && *svp && SvTRUE(*svp))
+          {
+	    my_bool ssl_enforce = 1;
 #if defined(DBD_MYSQL_WITH_SSL) && !defined(DBD_MYSQL_EMBEDDED) && \
     (defined(CLIENT_SSL) || (MYSQL_VERSION_ID >= 40000))
-	if ((svp = hv_fetch(hv, "mysql_ssl", 9, FALSE))  &&  *svp)
-        {
-	  if (SvTRUE(*svp))
-          {
 	    char *client_key = NULL;
 	    char *client_cert = NULL;
 	    char *ca_file = NULL;
 	    char *ca_path = NULL;
 	    char *cipher = NULL;
 	    STRLEN lna;
-#if MYSQL_VERSION_ID >= SSL_VERIFY_VERSION && MYSQL_VERSION_ID <= SSL_LAST_VERIFY_VERSION
-            /*
-              New code to utilise MySQLs new feature that verifies that the
-              server's hostname that the client connects to matches that of
-              the certificate
-            */
-	    my_bool ssl_verify_true = 0;
-	    if ((svp = hv_fetch(hv, "mysql_ssl_verify_server_cert", 28, FALSE))  &&  *svp)
-	      ssl_verify_true = SvTRUE(*svp);
-#endif
+	    unsigned int ssl_mode;
+	    my_bool ssl_verify = 0;
+	    my_bool ssl_verify_set = 0;
+
+            /* Verify if the hostname we connect to matches the hostname in the certificate */
+	    if ((svp = hv_fetch(hv, "mysql_ssl_verify_server_cert", 28, FALSE)) && *svp) {
+  #if defined(HAVE_SSL_VERIFY) || defined(HAVE_SSL_MODE)
+	      ssl_verify = SvTRUE(*svp);
+	      ssl_verify_set = 1;
+  #else
+	      set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported");
+	      return NULL;
+  #endif
+	    }
+        if ((svp = hv_fetch(hv, "mysql_ssl_optional", 18, FALSE)) && *svp)
+            ssl_enforce = !SvTRUE(*svp);
+
 	    if ((svp = hv_fetch(hv, "mysql_ssl_client_key", 20, FALSE)) && *svp)
 	      client_key = SvPV(*svp, lna);
 
@@ -1941,13 +1975,104 @@ MYSQL *mysql_dr_connect(
 
 	    mysql_ssl_set(sock, client_key, client_cert, ca_file,
 			  ca_path, cipher);
-#if MYSQL_VERSION_ID >= SSL_VERIFY_VERSION && MYSQL_VERSION_ID <= SSL_LAST_VERIFY_VERSION
-	    mysql_options(sock, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &ssl_verify_true);
-#endif
+
+	    if (ssl_verify && !(ca_file || ca_path)) {
+	      set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported without mysql_ssl_ca_file or mysql_ssl_ca_path");
+	      return NULL;
+	    }
+
+  #ifdef HAVE_SSL_MODE
+
+        if (!ssl_enforce)
+          ssl_mode = SSL_MODE_PREFERRED;
+        else if (ssl_verify)
+	      ssl_mode = SSL_MODE_VERIFY_IDENTITY;
+	    else if (ca_file || ca_path)
+	      ssl_mode = SSL_MODE_VERIFY_CA;
+	    else
+	      ssl_mode = SSL_MODE_REQUIRED;
+	    if (mysql_options(sock, MYSQL_OPT_SSL_MODE, &ssl_mode) != 0) {
+	      set_ssl_error(sock, "Enforcing SSL encryption is not supported");
+	      return NULL;
+	    }
+
+  #else
+
+        if (ssl_enforce) {
+    #if defined(HAVE_SSL_MODE_ONLY_REQUIRED)
+	      ssl_mode = SSL_MODE_REQUIRED;
+	      if (mysql_options(sock, MYSQL_OPT_SSL_MODE, &ssl_mode) != 0) {
+	        set_ssl_error(sock, "Enforcing SSL encryption is not supported");
+	        return NULL;
+	      }
+    #elif defined(HAVE_SSL_ENFORCE)
+	      if (mysql_options(sock, MYSQL_OPT_SSL_ENFORCE, &ssl_enforce) != 0) {
+	        set_ssl_error(sock, "Enforcing SSL encryption is not supported");
+	        return NULL;
+	      }
+    #elif defined(HAVE_SSL_VERIFY)
+	      if (!ssl_verify_also_enforce_ssl()) {
+	        set_ssl_error(sock, "Enforcing SSL encryption is not supported");
+	        return NULL;
+	      }
+	      if (ssl_verify_set && !ssl_verify) {
+	        set_ssl_error(sock, "Enforcing SSL encryption is not supported without mysql_ssl_verify_server_cert=1");
+	        return NULL;
+	      }
+	      ssl_verify = 1;
+    #else
+	      set_ssl_error(sock, "Enforcing SSL encryption is not supported");
+	      return NULL;
+    #endif
+        }
+
+    #ifdef HAVE_SSL_VERIFY
+        if (!ssl_enforce && ssl_verify && ssl_verify_also_enforce_ssl()) {
+            set_ssl_error(sock, "mysql_ssl_optional=1 with mysql_ssl_verify_server_cert=1 is not supported");
+            return NULL;
+        }
+    #endif
+
+	    if (ssl_verify) {
+          if (!ssl_verify_usable() && ssl_enforce && ssl_verify_set) {
+	        set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is broken by current version of MySQL client");
+	        return NULL;
+	      }
+    #ifdef HAVE_SSL_VERIFY
+	      if (mysql_options(sock, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &ssl_verify) != 0) {
+	        set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported");
+	        return NULL;
+	      }
+    #else
+	      set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported");
+	      return NULL;
+    #endif
+	    }
+
+  #endif
+
 	    client_flag |= CLIENT_SSL;
-	  }
-	}
+#else
+	    if ((svp = hv_fetch(hv, "mysql_ssl_optional", 18, FALSE)) && *svp)
+	      ssl_enforce = !SvTRUE(*svp);
+            if (ssl_enforce)
+            {
+	      set_ssl_error(sock, "mysql_ssl=1 is not supported and mysql_ssl_optional is not enabled.");
+	      return NULL;
+            }
+            else
+            {
+              do_warn(dbh, SL_ERR_NOTAVAILBLE, "mysql_ssl is set but SSL support is not available.");
+            }
 #endif
+	  }
+	else
+	  {
+#ifdef HAVE_SSL_MODE
+	    unsigned int ssl_mode = SSL_MODE_DISABLED;
+	    mysql_options(sock, MYSQL_OPT_SSL_MODE, &ssl_mode);
+#endif
+	  }
 #if (MYSQL_VERSION_ID >= 32349)
 	/*
 	 * MySQL 3.23.49 disables LOAD DATA LOCAL by default. Use
@@ -1979,6 +2104,16 @@ MYSQL *mysql_dr_connect(
 
     if (result)
     {
+      /*
+        we turn off Mysql's auto reconnect and handle re-connecting ourselves
+        so that we can keep track of when this happens.
+      */
+#if MYSQL_VERSION_ID >= 50013
+      my_bool reconnect = FALSE;
+      mysql_options(result, MYSQL_OPT_RECONNECT, &reconnect);
+#else
+      result->reconnect = 0;
+#endif
 #if MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
       /* connection succeeded. */
       /* imp_dbh == NULL when mysql_dr_connect() is called from mysql.xs
@@ -1992,12 +2127,6 @@ MYSQL *mysql_dr_connect(
           imp_dbh->async_query_in_flight = NULL;
       }
 #endif
-
-      /*
-        we turn off Mysql's auto reconnect and handle re-connecting ourselves
-        so that we can keep track of when this happens.
-      */
-      result->reconnect=0;
     }
     else {
       /* 
@@ -3842,6 +3971,9 @@ int dbd_describe(SV* sth, imp_sth_t* imp_sth)
       buffer->is_null= (my_bool*) &(fbh->is_null);
       buffer->error= (my_bool*) &(fbh->error);
 
+      if (fields[i].flags & ZEROFILL_FLAG)
+        buffer->buffer_type = MYSQL_TYPE_STRING;
+
       switch (buffer->buffer_type) {
       case MYSQL_TYPE_DOUBLE:
         buffer->buffer_length= sizeof(fbh->ddata);
@@ -4249,23 +4381,29 @@ process:
 
         switch (mysql_to_perl_type(fields[i].type)) {
         case MYSQL_TYPE_DOUBLE:
-          /* Coerce to dobule and set scalar as NV */
-          (void) SvNV(sv);
-          SvNOK_only(sv);
+          if (!(fields[i].flags & ZEROFILL_FLAG))
+          {
+            /* Coerce to dobule and set scalar as NV */
+            (void) SvNV(sv);
+            SvNOK_only(sv);
+          }
           break;
 
         case MYSQL_TYPE_LONG:
         case MYSQL_TYPE_LONGLONG:
-          /* Coerce to integer and set scalar as UV resp. IV */
-          if (fields[i].flags & UNSIGNED_FLAG)
+          if (!(fields[i].flags & ZEROFILL_FLAG))
           {
-            (void) SvUV(sv);
-            SvIOK_only_UV(sv);
-          }
-          else
-          {
-            (void) SvIV(sv);
-            SvIOK_only(sv);
+            /* Coerce to integer and set scalar as UV resp. IV */
+            if (fields[i].flags & UNSIGNED_FLAG)
+            {
+              (void) SvUV(sv);
+              SvIOK_only_UV(sv);
+            }
+            else
+            {
+              (void) SvIV(sv);
+              SvIOK_only(sv);
+            }
           }
           break;
 
@@ -4446,12 +4584,8 @@ void dbd_st_destroy(SV *sth, imp_sth_t *imp_sth) {
 
   if (imp_sth->stmt)
   {
-    if (mysql_stmt_close(imp_sth->stmt))
-    {
-      do_error(DBIc_PARENT_H(imp_sth), mysql_stmt_errno(imp_sth->stmt),
-          mysql_stmt_error(imp_sth->stmt),
-          mysql_stmt_sqlstate(imp_sth->stmt));
-    }
+    mysql_stmt_close(imp_sth->stmt);
+    imp_sth->stmt= NULL;
   }
 #endif
 
@@ -5021,7 +5155,7 @@ int dbd_bind_ph(SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
             buffer_is_unsigned= 1;
           if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
             PerlIO_printf(DBIc_LOGPIO(imp_xxh),
-                          "   SCALAR type %"IVdf" ->%"IVdf"<- IS A INT NUMBER\n",
+                          "   SCALAR type %"IVdf" ->%"IVdf"<- IS AN INT NUMBER\n",
                           sql_type, *(IV *)buffer);
           break;
 
@@ -5274,7 +5408,7 @@ AV *dbd_db_type_info_all(SV *dbh, imp_dbh_t *imp_dbh)
 
     IV_PUSH(t->sql_datatype); /* SQL_DATATYPE*/
     IV_PUSH(t->sql_datetime_sub); /* SQL_DATETIME_SUB*/
-    IV_PUSH(t->interval_precision); /* INTERVAL_PERCISION */
+    IV_PUSH(t->interval_precision); /* INTERVAL_PRECISION */
     IV_PUSH(t->native_type);
     IV_PUSH(t->is_num);
   }

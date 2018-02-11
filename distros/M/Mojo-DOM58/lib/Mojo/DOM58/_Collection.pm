@@ -16,7 +16,7 @@ use constant REDUCE => ($] >= 5.008009 ? \&List::Util::reduce : \&_reduce);
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 sub new {
   my $class = shift;

@@ -2,29 +2,27 @@
 
 =head1 WebService::CEPH::NetAmazonS3
 
-Драйвер для CEPH на базе Net::Amazon::S3.
+Driver for CEPH is based on Net::Amazon::S3.
 
-Сделан скорее не на базе Net::Amazon::S3, а на базе Net::Amazon::S3::Client
-см. POD https://metacpan.org/pod/Net::Amazon::S3::Client, там отдельная документация
-и сказано что это более новый интерфейс, при этом в докции Net::Amazon::S3 ссылки на это нет.
+Made rather not on the basis Net::Amazon::S3, but on the basis Net::Amazon::S3::Client
+see POD https://metacpan.org/pod/Net::Amazon::S3::Client
+There is a separate documentation and it is said that this is a newer interface, while in the Net::Amazon::S3, there is no link to this.
 
-Лезет в приватные методы и не документированные возможности Net::Amazon::S3,
-в связи с тем что Net::Amazon::S3 сложно назвать документированным в принципе, а публичного
-функционала не хватает.
+Goes into private methods and not documented features of Net :: Amazon :: S3, due to the fact that
+Net :: Amazon :: S3 is not well-documented in principle, and there is not enough public functionality in it.
 
-Стабильность такого решения обеспечивается интеграционным тестом netamazons3_integration,
-который по идее потестирует всё-всё. Проблемы могут быть только если вы поставили этот
-модуль, затем обновили Net::Amazon::S3 на новую, ещё не существующую версию, которая
-сломала обратную совместимость приватных методов.
+The stability of this solution is provided by the integration test netamazons3_integration, which in theory tests everything.
+The problems can only be if you installed this module, then updated Net :: Amazon :: S3 to a new version that did not exist yet,
+which broke back compatibility of private methods.
 
-Интерфейс данного модуля документирован. Придерживайтесь того что документировано, WebService::CEPH
-на всё это рассчитывает. Можете написать свой драйвер с таким же интерфейсом, но с другой реализацией.
+The interface of this module is documented. Stick to what is documented, WebService :: CEPH counts on all this.
+You can write your driver with the same interface, but with a different implementation.
 
 =cut
 
 package WebService::CEPH::NetAmazonS3;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use strict;
 use warnings;
@@ -41,17 +39,17 @@ sub _time { # for mocking in tests
 
 =head2 new
 
-Конструктор
+Constructor
 
-protocol - 'http' или 'https'
+protocol - 'http' or 'https'
 
-host - хост Amazon S3 или CEPH
+host - Amazon S3 host or CEPH
 
-bucket - (обязателен для всех операций кроме запроса списка бакетов) имя бакета, этот бакет будет использоваться для всех операций объекта
+bucket - (mandatory for all operations except the request for the bucket list) the name of the bucket, this bucket will be used for all object operations
 
-key - ключ доступа
+key - access key
 
-secret - секретный секрет
+secret - access secret
 
 =cut
 
@@ -80,8 +78,7 @@ sub new {
 
 =head2 _request_object
 
-Приватный метод. Возвращает объект Net::Amazon::S3::Client::Bucket, который затем может использоваться.
-Используется в коде несколько раз
+Private method. Returns the Net :: Amazon :: S3 :: Client :: Bucket object, which can then be used. Used in code several times
 
 =cut
 
@@ -107,20 +104,19 @@ sub get_buckets_list {
 
 =head2 upload_single_request
 
-Закачивает данные.
+Uploads data.
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $key - имя объекта
+2) $key - object name
 
-3) сами данные (блоб)
+3) data itself (blob)
 
-4) Content-Type, не обязателен
+4) Content-Type, optional
 
-Закачивает объект за один запрос (не-multipart upload), ставит приватный ACL,
-добавляет кастомный заголовок x-amz-meta-md5, который равен md5 hex от файла
+Upload an object for one request (non-multipart upload), put a private ACL, add a custom x-amz-meta-md5 header, which equals md5 hex from the file
 
 =cut
 
@@ -139,21 +135,20 @@ sub upload_single_request {
 
 =head2 list_multipart_uploads
 
-Возвращает список multipart_upload
+Returns a list multipart_upload
 
-Параметры:
+Parameters:
 
-нет
+none
 
-Возвращает:
-
-    [
+Returns:
+   [
         {
             key       => 'Upload key',
             upload_id => 'Upload ID',
             initiated => 'Init date',
-            initiated_epoch => то же, что initiated но в формате epoch time
-            initiated_age_seconds => это просто time() - initiated_epoch т.е. возраст upload
+            initiated_epoch => same as initiated but in epoch time format
+            initiated_age_seconds => simply time() - initiated_epoch ie upload age
         },
         ...
     ]
@@ -198,11 +193,11 @@ sub list_multipart_uploads {
 
 =head2 delete_multipart_upload
 
-Удаляет аплоад
+Deletes upload
 
-Параметры:
+Parameters:
+   $key, $upload_id
 
-    $key, $upload_id
 
 =cut
 
@@ -223,20 +218,18 @@ sub delete_multipart_upload {
 
 =head2 initiate_multipart_upload
 
-Инициирует multipart upload
+Initiates multipart upload
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $key - имя объекта
+2) $key - object name
 
-3) md5 от данных
+3) md5 from data
 
-Инициирует multipart upload, устанавливает x-amz-meta-md5 в значение md5 файла (нужно посчитать
-заранее и передать как параметр).
-Возвращает ссылку на структуру, недокументированной природы, которая в дальнейшем должна
-использоваться для работы с этим multipart upload
+Initiates multipart upload, sets x-amz-meta-md5 to md5 value of the file (needs to be calculated in advance and pass it as a parameter).
+Returns a reference to a structure of an undocumented nature, which should be used later to work with this multipart upload
 
 =cut
 
@@ -267,21 +260,20 @@ sub initiate_multipart_upload {
 
 =head2 upload_part
 
-Закачивает часть данных при multipart upload'е
+Uploads part of the data when multipart uploading
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $multipart_upload - ссылка, полученная из initiate_multipart_upload
+2) $multipart_upload - reference, obtained from initiate_multipart_upload
 
-3) $part_number - номер части, от 1 и выше.
+3) $part_number - part number, from 1 and higher.
 
-Работает только если части закачивались по очереди, с возрастающими номерами
-(что естественно, если это последовательная закачка, и делает невозможным паралллельную
-закачку из разных процессов)
+Works only if parts were uploaded in turn with increasing numbers (which is natural, if it is sequential uploading,
+and makes it impossible for parallel upload from different processes)
 
-Ничего не возвращает
+Returns nothing
 
 =cut
 
@@ -301,15 +293,15 @@ sub upload_part {
 
 =head2 complete_multipart_upload
 
-Финализирует multipart upload
+Finalize multipart upload
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $multipart_upload - ссылка, полученная из initiate_multipart_upload
+2) $multipart_upload - reference, obtained from initiate_multipart_upload
 
-ничего не возвращает. падает с исчлючением, если что-то не так.
+returns nothing. throws an exception, if something is wrong.
 
 =cut
 
@@ -325,31 +317,33 @@ sub complete_multipart_upload {
 
 =head2 download_with_range
 
-Скачивает объект с заголовком HTTP Range (т.е. часть данных).
+Downloads an object with the HTTP Range header (ie, part of the data).
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $key - имя объекта
+2) $key - object name
 
-3) $first - первый байт для Range
+3) $first - first byte for Range
 
-4) $last - последний байт для Range
+4) $last - last byte for Range
 
-Если $first, $last отсутствуют или undef, скачивается весь файл, без заголовка Range
-Если $last отсутствует, скачивает данные с определённой позиции и до конца (так же как в спецификации Range)
-Если объект отсутствует, возвращает пустой список. Если другая ошибка - исключение.
+If $first, $last are missing or undef, the entire file is downloaded, without the Range header
 
-Возвращает:
+If $last is missing, downloads data from a specific position to the end (as well as in the Range specification).
 
-1) Scalar Ref на скачанные данные
+If the object is missing, returns an empty list. If other error - an exception.
 
-2) Количество оставшихся байтов, которые ещё можно скачать (или undef, если параметра $first не было)
+Returns:
 
-3) ETag заголовок с удалёнными кавычками (или undef если его нет)
+1) Scalar Ref on downloaded data
 
-4) X-Amz-Meta-Md5 заголовок (или undef, если его нет)
+2) The number of remaining bytes that can still be downloaded (or undef, if $first parameter was not present)
+
+3) ETag header with deleted quotes (or undef if it is missing)
+
+4) X-Amz-Meta-Md5 header (or undef if it is missing)
 
 =cut
 
@@ -402,16 +396,15 @@ sub download_with_range {
 
 =head2 size
 
-Получает размер объекта с помощью HTTP HEAD запроса.
+Gets the size of the object using the HTTP HEAD request.
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $key - имя объекта
+2) $key - object name
 
-Если объект отсутствует, возвращает undef. Если другая ошибка - исключение.
-Возвращает размер, в байтах.
+If the object does not exist, it returns undef. If other error - an exception. Returns size in bytes.
 
 =cut
 
@@ -444,15 +437,15 @@ sub size {
 
 =head2 delete
 
-Удаляет объект
+Deletes an object
 
-Параметры:
+Parameters:
 
 1) $self
 
-2) $key - имя объекта
+2) $key - object name
 
-Ничего не возвращает. Если объект не сузществовал, никак об этом не сигнализирует.
+Returns nothing. If the object did not exist, does not signal about it.
 
 =cut
 
@@ -464,7 +457,7 @@ sub delete {
 
 =head2 query_string_authentication_uri
 
-Возвращает Query String Authentication URL для ключа $key, с экспайром $expires
+Returns Query String Authentication URL for key $key, with expire time $expires
 
 =cut
 

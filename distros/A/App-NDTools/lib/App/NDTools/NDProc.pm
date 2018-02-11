@@ -13,7 +13,7 @@ use Struct::Diff 0.94 qw(diff split_diff);
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(str2path);
 
-sub VERSION { '0.22' }
+sub VERSION() { '0.23' }
 
 sub arg_opts {
     my $self = shift;
@@ -118,8 +118,9 @@ sub exec {
         die_fatal "Unknown module specified '$self->{OPTS}->{module}'", 1
             unless (exists $self->{MODS}->{$self->{OPTS}->{module}});
         $self->init_module($self->{OPTS}->{module});
+
         my $mod = $self->{MODS}->{$self->{OPTS}->{module}}->new();
-        for my $rule ($mod->parse_args()->get_opts()) {
+        for my $rule ($mod->parse_args($self->{ARGV})->get_opts()) {
             $rule->{modname} = $self->{OPTS}->{module},
             push @{$self->{rules}}, $rule;
         }
@@ -134,16 +135,17 @@ sub exec {
 
     my $p = Getopt::Long::Parser->new();
     $p->configure('nopass_through'); # just to be sure
-    unless ($p->getoptions(@rest_opts)) {
+    unless ($p->getoptionsfromarray($self->{ARGV}, @rest_opts)) {
+
         $self->usage;
         die_fatal "Unsupported opts passed", 1;
     }
 
-    if ($self->{OPTS}->{'dump-rules'} and not @ARGV) {
+    if ($self->{OPTS}->{'dump-rules'} and not @{$self->{ARGV}}) {
         $self->dump_rules();
     } else {
-        $self->check_args(@ARGV) or die_fatal undef, 1;
-        $self->process_args(@ARGV);
+        $self->check_args(@{$self->{ARGV}}) or die_fatal undef, 1;
+        $self->process_args(@{$self->{ARGV}});
     }
 
     die_info "All done", 0;

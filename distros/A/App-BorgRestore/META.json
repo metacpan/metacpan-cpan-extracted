@@ -59,6 +59,7 @@
             "Log::Log4perl::Appender::ScreenColoredLevels" : "0",
             "Log::Log4perl::Layout::PatternLayout" : "0",
             "Log::Log4perl::Level" : "0",
+            "Number::Bytes::Human" : "0",
             "Path::Tiny" : "0",
             "Pod::Usage" : "0",
             "Version::Compare" : "0",
@@ -80,7 +81,7 @@
    "provides" : {
       "App::BorgRestore" : {
          "file" : "lib/App/BorgRestore.pm",
-         "version" : "v2.2.0"
+         "version" : "v2.3.0"
       },
       "App::BorgRestore::Borg" : {
          "file" : "lib/App/BorgRestore/Borg.pm"
@@ -106,6 +107,6 @@
          "web" : "https://github.com/Bluewind/App-BorgRestore"
       }
    },
-   "version" : "2.2.0",
+   "version" : "2.3.0",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

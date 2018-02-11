@@ -50,7 +50,7 @@
    "provides" : {
       "Test::Strict" : {
          "file" : "lib/Test/Strict.pm",
-         "version" : "0.39"
+         "version" : "0.41"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "x_license" : "http://dev.perl.org/licenses/"
       }
    },
-   "version" : "0.40",
+   "version" : "0.41",
    "x_contributors" : [
       "Gabor Szabo <szabgab@cpan.org>",
       "Peter Vereshagin <veresc@cpan.org>",

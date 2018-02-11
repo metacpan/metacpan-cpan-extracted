@@ -3,9 +3,9 @@ abstract: 'Write Perl classes in Java.'
 author:
   - 'Patrick LeBoutillier <patl@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.30'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.30'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
@@ -19,11 +19,10 @@ no_index:
     - inc
 requires:
   Inline: '0.68'
-  Inline::C: '0.62'
   MIME::Base64: '0'
   Test: '1.13'
   perl: '5.008'
 resources:
   repository: https://github.com/ingydotnet/Inline-Java
-version: '0.60'
+version: '0.61'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

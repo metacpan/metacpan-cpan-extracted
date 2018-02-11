@@ -13,7 +13,7 @@ use WebService::Rajce;
 use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure qw(gnu_getopt);
 
-my $url_pattern="^http:\/\/(.*)\.rajce\.idnes\.cz\/(.*)";
+my $url_pattern="^(https?):\/\/(.*)\.rajce\.idnes\.cz\/(.*)";
 
 $|++;
 
@@ -44,9 +44,9 @@ if(!$opt{u} or $opt{u} !~ /$url_pattern/ or $opt{h}){
 	exit;
 }
 
-my ($username,$album) = $opt{u} =~ $url_pattern;
+my ($schema,$username,$album) = $opt{u} =~ $url_pattern;
 
-my $url = "http://$username.rajce.idnes.cz/$album";
+my $url = "$schema://$username.rajce.idnes.cz/$album";
 
 my $bot = WWW::Mechanize->new(autocheck => 1, agent => 'rajce-get/'.$version);
 $bot->env_proxy();
@@ -103,7 +103,7 @@ rajce-get - Download images from rajce.net.
 
 =head1 VERSION
 
-version 1.152450
+version 1.180380
 
 =head1 SYNOPSIS
 
@@ -117,10 +117,11 @@ directory username/album
 Behind proxy server try:
 
 export http_proxy=http://login:password@proxyserver:port
+export https_proxy=http://login:password@proxyserver:port
 
 =head1 OPTIONS AND ARGUMENTS
 
-	 -u, --url http://username.rajce.idnes.cz/album
+	 -u, --url https://username.rajce.idnes.cz/album
 			Address of requested album
 
 	 -v, --verbose
@@ -138,7 +139,7 @@ export http_proxy=http://login:password@proxyserver:port
 
 =head1 EXAMPLES
 
-rajce-get --sorted --verbose --url http://username.rajce.idnes.cz/album
+rajce-get --sorted --verbose --url https://username.rajce.idnes.cz/album
 
 =head1 SEE ALSO
 

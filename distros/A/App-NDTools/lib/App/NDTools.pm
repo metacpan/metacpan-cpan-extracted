@@ -1,6 +1,9 @@
 package App::NDTools;
 
-our $VERSION = "0.5.0";
+use strict;
+use warnings;
+
+our $VERSION = "0.5.1";
 
 =head1 NAME
 
@@ -9,6 +12,7 @@ App::NDTools - diff/patch/process/query tools for nested structures
 =begin html
 
 <a href="https://travis-ci.org/mr-mixas/NDTools"><img src="https://travis-ci.org/mr-mixas/NDTools.svg?branch=master" alt="CI"></a>
+<a href="https://badge.fury.io/pl/App-NDTools"><img src="https://badge.fury.io/pl/App-NDTools.svg" alt="CPAN version"></a>
 
 =end html
 
@@ -49,7 +53,7 @@ Examine structure and dump it's parts.
 
 =head1 INSTALL
 
- spanm App::NDTools
+ cpan App::NDTools
 
 =head1 AUTHOR
 
@@ -61,10 +65,7 @@ Report bugs to L<https://github.com/mr-mixas/NDTools/issues>
 
 =head1 SEE ALSO
 
-L<nddiff|App::NDTools::nddiff>, L<ndpatch|App::NDTools::ndpatch>,
-L<ndproc|App::NDTools::ndproc>, L<ndquery|App::NDTools::ndquery>
-
-L<jq(1)>
+L<jq|https://stedolan.github.io/jq/>
 
 L<Struct::Diff>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 
@@ -72,17 +73,17 @@ L<Struct::Diff>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 
 Copyright 2016-2018 Michael Samoglyadov
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the-
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+along with this program. If not, see L<http://www.gnu.org/licenses/>.
 
 =cut

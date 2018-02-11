@@ -6,7 +6,7 @@ use Filesys::DiskUsage qw(du);
 
 plan skip_all => 'no chmod on Windows' if $^O =~ /win32/i;
 
-plan tests => 2;
+plan tests => 3;
 
 
 my $dir = tempdir( CLEANUP => 1 );
@@ -45,3 +45,4 @@ diag "We run this again to see what are the various error messages in different 
 diag '$ENV{LANG}: ' . $ENV{LANG};
 du($dir);
 
+cmp_ok((chmod 0755, "$dir/sub"), '>=', 0, "Ensure removal by tempdir CLEANUP");

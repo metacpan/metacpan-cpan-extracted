@@ -1,19 +1,19 @@
 #
 # This file is part of Dist-Zilla-PluginBundle-MSCHOUT
 #
-# This software is copyright (c) 2017 by Michael Schout.
+# This software is copyright (c) 2018 by Michael Schout.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
 #
 
 package Pod::Weaver::PluginBundle::MSCHOUT;
-$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.36';
+$Pod::Weaver::PluginBundle::MSCHOUT::VERSION = '0.37';
 # ABSTRACT: Pod::Weaver configuration the way MSCHOUT does it
 
 # Dependencies
 use Pod::Weaver::Section::SourceGitHub;
-use Pod::Weaver::Section::BugsRT;
+use Pod::Weaver::Section::Bugs;
 
 use Pod::Weaver::Config::Assembler;
 
@@ -47,7 +47,7 @@ sub mvp_bundle_config {
                 match_anywhere => 0
             }
         ],
-        [ '@MSCHOUT/BugsRT',       _exp('BugsRT'),       {} ],
+        [ '@MSCHOUT/Bugs',       _exp('Bugs'),       {} ],
 
         [ '@MSCHOUT/postlude', _exp('Region'), { region_name => 'postlude' } ],
 
@@ -76,7 +76,7 @@ Pod::Weaver::PluginBundle::MSCHOUT - Pod::Weaver configuration the way MSCHOUT d
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -87,13 +87,17 @@ it with L<Dist::Zilla::PluginBundle::MSCHOUT>
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/mschout/dist-zilla-pluginbundle-mschout>
-and may be cloned from L<git://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
+The development version is on github at L<http://https://github.com/mschout/dist-zilla-pluginbundle-mschout>
+and may be cloned from L<git://https://github.com/mschout/dist-zilla-pluginbundle-mschout.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-dist-zilla-pluginbundle-mschout@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MSCHOUT
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/dist-zilla-pluginbundle-mschout/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -101,7 +105,7 @@ Michael Schout <mschout@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Michael Schout.
+This software is copyright (c) 2018 by Michael Schout.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

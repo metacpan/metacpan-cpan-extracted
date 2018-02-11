@@ -8,8 +8,11 @@ Revision history for Perl extension Crypt::FileHandle.
 
 0.02 - 2018-01-28
 	- Updates to documentation
-	- Clarified input recod separator check for slurp mode
+	- Clarified input record separator check for slurp mode
 	- Changed false return values from 0 to !1
 	- Explicitly use return at end of methods
 	- Removed dependency for Fcntl, instead parses mode from open()
 	- Released to CPAN
+
+0.03 - 2018-02-10
+	- Added META.yml and META.json

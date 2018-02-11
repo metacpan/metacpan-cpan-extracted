@@ -6,45 +6,43 @@ WebService::CEPH
 
 =head1 DESCRIPTION
 
-CEPH client for simple workflow, supporting multipart uploads. Most docs are in Russian.
+CEPH client for simple workflow, supporting multipart uploads.
 
-Клинт для CEPH, без низкоуровневого кода для общения с библиотекой Amazon S3
-(она вынесена в отдельный класс).
+Clint for CEPH, without a low-level code to communicate with the Amazon S3 library (it is placed in a separate class).
 
-Обработка ошибок (исключения их тип итп; повторы неудачных запросов) - на совести более низкоуровневой библиотеки,
-если иное не гарантируется в этой документации.
+Lower-level library is responsible for error handling (exceptions and failed requests retries), unless otherwise guaranteed in this documentation.
 
-Параметры конструктора:
+Constructor parameters:
 
-Обязательные параметры:
+Required parameters:
 
 protocol - http/https
 
-host - хост бэкэнда
+host - backend host
 
-key - ключ для входа
+key - access key
 
-secret - secret для входа
+secret - access secret
 
-Необязательные параметры:
+Optional parameters:
 
-bucket - имя бакета (не нужен только для получения списка бакетов)
+bucket - name of the bucket (not needed just to get the list of buckets)
 
-driver_name - в данный момент только 'NetAmazonS3'
+driver_name - at the moment only 'NetAmazonS3' is supported
 
-multipart_threshold - после какого размера файла (в байтах) начинать multipart upload
+multipart_threshold - the size threshold in bytes used for multipart uploads
 
-multisegment_threshold - после какого размера файла (в байтах) будет multisegment download
+multisegment_threshold - the size threshold in bytes used for multisegment downloads
 
-query_string_authentication_host_replace - протокол-хост на который заменять URL в query_string_authentication_uri
-должен начинаться с протокола (http/https), затем хост, на конце может быть, а может не быть слэша.
-нужен если вы хотите сменить хост для отдачи клиентам (у вас кластер) или протокол (https внешним клиентам)
+query_string_authentication_host_replace - host/protocol on which to replace the URL in query_string_authentication_uri
+should start with the protocol (http / https), then the host, at the end optional slash.
+This parameter is needed if you want to change the host for return to clients (you have a cluster) or protocol (https for external clients)
 
 =cut
 
 package WebService::CEPH;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use strict;
 use warnings;
@@ -59,7 +57,7 @@ sub _check_ascii_key { confess "Key should be ASCII-only" unless $_[0] !~ /[^\x0
 
 =head2 new
 
-Конструктор. Параметры см. выше.
+Constructor. See the parameters above.
 
 =cut
 
@@ -98,42 +96,40 @@ sub new {
 
 =head2 upload
 
-Загружает файл в CEPH. Если файл уже существует - он заменяется.
-Если данные больше определённого размера, происходим multipart upload
-Ничего не возвращает
+Uploads the file into CEPH. If the file already exists, it is replaced. If the data is larger than a certain size, multipart upload is started. Returns nothing
 
-Параметры:
+Parameters:
 
-0-й - $self
+0th - $self
 
-1-й - имя ключа
+1-st - key name
 
-2-й - скаляр, данные ключа
+2-nd - scalar, key data
 
-3-й - Content-type. Если undef, используется дефолтный binary/octet-stream
+3-rd - Content-type. If undef, the default binary / octet-stream is used
 
 =cut
 
 sub upload {
-    my ($self, $key) = (shift, shift); # после этого $_[0] - данные, $_[1] - Content-type
+    my ($self, $key) = (shift, shift); #  after these params: $_[0] - data, $_[1] - Content-type
     $self->_upload($key, sub { substr($_[0], $_[1], $_[2]) }, length($_[0]), md5_hex($_[0]), $_[1], $_[0]);
 }
 
 =head2 upload_from_file
 
-То же, что upload, но происходит чтение из файла.
+Same as upload method, but reads from file.
 
-Параметры:
+Parameters:
 
-0-й - $self
+0th - $self
 
-1-й - имя ключа
+1-st - key name
 
-2-й - имя файла (если скаляр), иначе открытый filehandle
+2-nd - file name (if scalar), otherwise opens filehandle
 
-3-й - Content-type. Если undef, используется дефолтный binary/octet-stream
+3-rd - Content-type. If undef, the default binary / octet-stream is used
 
-Дваждый проходит по файлу, высчитывая md5. Файл не должен быть пайпом, его размер не должен меняться.
+Double walks through the file, calculating md5. The file should not be a pipe, its size should not vary.
 
 =cut
 
@@ -163,24 +159,23 @@ sub upload_from_file {
 
 =head2 _upload
 
-Приватный метод для upload/upload_from_file
+Private method for upload/upload_from_file
 
-Параметры
+Parameters
 
 1) self
 
-2) ключ
+2) key
 
-3) итератор с интерфейсом (данные, оффсет, длина). "данные" должны соответствовать последнему
-параметру этой функции (т.е. (6))
+3) iterator with interface (data, offset, length). "data" must correspond to the last parameter of this function (ie (6))
 
-4) длина данных
+4) data length
 
-5) заранее высчитанный md5 от данных
+5) previously calculated md5 from the data
 
-6) Content-type. Если undef, используется дефолтный binary/octet-stream
+6) Content-type. If undef, the default binary / octet-stream is used
 
-7) данные. или скаляр. или filehandle
+7) data. or a scalar. or filehandle
 
 =cut
 
@@ -217,14 +212,13 @@ sub _upload {
 
 =head2 download
 
-Скачивает данные объекта с именем $key и возвращает их.
-Если объект не существует, возвращает undef.
+Downloads data from an object named $key and returns it. If the object does not exist, it returns undef.
 
-Если размер объекта по факту окажется больше multisegment_threshold,
-объект будет скачан несколькими запросами с заголовком Range (т.е. multi segment download).
+If the size of the object is actually greater than multisegment_threshold, the object will be downloaded by several requests with heading Range
+(ie, multi segment download).
 
-В данный момент есть workaround для бага http://lists.ceph.com/pipermail/ceph-users-ceph.com/2016-June/010704.html,
-в связи с ним всегда делается лишний HTTP запрос - запрос длины файла. Плюс не исключён Race condition.
+At the moment there is a workaround for the bug http://lists.ceph.com/pipermail/ceph-users-ceph.com/2016-June/010704.html,
+in connection with this, an extra HTTP request is always made - the request for the length of the file. Plus Race condition is not excluded.
 
 =cut
 
@@ -244,20 +238,17 @@ sub download {
 
 =head2 download_to_file
 
-Скачивает данные объекта с именем $key в файл $fh_or_filename.
-Если объект не существует, возвращает undef (при этом выходной файл всё равно будет испорчен и, возможно,
-частично записан в случае race condition - удаляйте эти данные сами; если удалять тяжело - пользуйтесь
-методом download)
-Иначе возвращает размер записанных данных.
+Downloads the data of the object with the name $key to the file $fh_or_filename.
+If the object does not exist, it returns undef
+(in this case the output file will be corrupted and, possibly, partially written due to the case of race condition - delete this data yourself,
+or delete it using the download method). Otherwise, returns the size of the written data.
+The output file is opened in overwrite mode, if this is the file name, if it is a filehandle, it is trimmed to zero length and written from the beginning.
 
-Выходной файл открывается в режиме перезаписи, если это имя файла, если это filehandle,
-то образается на нулевую длину и пишется с начала.
+If the size of the object is actually greater than multisegment_threshold, the object will be downloaded by several requests with heading Range
+(ie, multi segment download).
 
-Если размер объекта по факту окажется больше multisegment_threshold,
-объект будет скачан несколькими запросами с заголовком Range (т.е. multi segment download).
-
-В данный момент есть workaround для бага http://lists.ceph.com/pipermail/ceph-users-ceph.com/2016-June/010704.html,
-в связи с ним всегда делается лишний HTTP запрос - запрос длины файла. Плюс не исключён Race condition.
+At the moment there is a workaround for the bug http://lists.ceph.com/pipermail/ceph-users-ceph.com/2016-June/010704.html,
+in connection with this, an extra HTTP request is always made - the request for the length of the file. Plus Race condition is not excluded.
 
 =cut
 
@@ -295,16 +286,15 @@ sub download_to_file {
 
 =head2 _download
 
-Приватный метод для download/download_to_file
+Private method for download/download_to_file
 
-Параметры:
+Parameters:
 
 1) self
 
-2) имя ключа
+2) key name
 
-3) appender - замыкание в которое будут передаваться данные для записи. оно должно аккумулировать их куда-то
-себе или писать в файл, который оно само знает.
+3) appender - the closure in which the data for recording will be transmitted. it should accumulate them somewhere to itself or write to a file that it knows.
 
 =cut
 
@@ -322,16 +312,16 @@ sub _download {
     while() {
         my ($dataref, $bytesleft, $etag, $custom_md5) = $self->{driver}->download_with_range($key, $offset, $offset + $self->{multisegment_threshold});
 
-        # Если объект не найден - возвращаем undef
-        # даже если при мультисегментном скачивании объект неожиданно исчез на каком-то сегменте, значит
-        # его кто-то удалил, нужно всё же вернуть undef
-        # При этом, при скачивании в файл, часть данных может быть уже записана. Удаляйте их сами.
+        # Return undef if object not found
+        # If object suddently disappeared during multisegment download, it means someone deleted it. So we have to return undef it this case.
+        # However, when downloading to file, some data could have been already written to file. Remove this file by yourself.
         return unless ($dataref);
 
         if (defined $got_etag) {
-            # Во время скачивания, кто-то подменил файл (ETag изменился), В соотв. с HTTP, ETag гарантированно
-            # будет разным для разных файлов (но не факт что одинаковым для одинаковых)
-            # В этом случае падаем.. Наверное можно в будущем делать retry запросов..
+            # Someone replaced file during download process. According to HTTP, ETag must be different for different files
+            #(though it does not have to be the same for same files).
+            # Throw an exception in this case...
+            # TODO: retry requests if file changed during download
             confess "File changed during download. Race condition. Please retry request"
                 unless $got_etag eq $etag;
         }
@@ -339,7 +329,7 @@ sub _download {
             $got_etag = $etag;
         }
 
-        # Проверяем md5 только если ETag "нормальный" с md5 (был не multipart upload)
+        # Check md5 if ETag was normal with md5 (it was not a multipart upload)
         if (!defined $check_md5) {
             my ($etag_md5) = $etag =~ /^([0-9a-f]+)$/;
 
@@ -370,8 +360,7 @@ sub _download {
 
 =head2 size
 
-Возвращает размер объекта с именем $key в байтах,
-если ключ не существует, возвращает undef
+Returns the size of the object named $key in bytes, if the key does not exist, returns undef
 
 =cut
 
@@ -387,8 +376,7 @@ sub size {
 
 =head2 delete
 
-Удаляет объект с именем $key, ничего не возвращает. Если объект
-не существует, не выдаёт ошибку
+Removes an object named $key, returns nothing. If the object does not exist, it does not produce an error
 
 =cut
 
@@ -404,12 +392,11 @@ sub delete {
 
 =head2 query_string_authentication_uri
 
-Возвращает Query String Authentication URL для ключа $key, с экспайром $expires
+Returns Query String Authentication URL for key $key, with expire $expires
 
-$expires - epoch время. но низкоуровневая библиотека может принимать другие форматы. убедитесь
-что входные данные валидированы и вы передаёте именно epoch
+$expires - epoch time. But a low-level library can accept other formats. make sure that the input data is validated and you transfer exactly epoch
 
-Заменяет хост, если есть опция query_string_authentication_host_replace (см. конструктор)
+Replaces the host if there is a query_string_authentication_host_replace option (see the constructor)
 
 =cut
 
@@ -434,10 +421,12 @@ Returns buckets list
 
 WARNING
 
-Метод падает c ошибкой
-Attribute (owner_id) does not pass the type constraint because: Validation failed for 'OwnerId'
-Уведомления направлены разрабтчикам:
-http://tracker.ceph.com/issues/16806 и https://github.com/rustyconover/net-amazon-s3/issues/18
+The method throws error "Attribute (owner_id) does not pass the type constraint because:
+Validation failed for 'OwnerId'"
+
+Notifications sent to the developers:
+http://tracker.ceph.com/issues/16806
+https://github.com/rustyconover/net-amazon-s3/issues/18
 
 =cut
 
@@ -449,7 +438,7 @@ sub get_buckets_list {
 
 =head2 list_multipart_uploads
 
-Возвращает список multipart загрузок в бакете
+Returns the list of multipart downloads in a bucket
 
 =cut
 
@@ -463,11 +452,11 @@ sub list_multipart_uploads {
 
 =head2 delete_multipart_upload
 
-Удаляет multipart загрузку в бакете
+Deletes multipart download in bucket
 
-Параметры позиционные: $key, $upload_id
+Positional parameters: $key, $upload_id
 
-Ничего не возвращает
+Returns nothing
 
 =cut
 

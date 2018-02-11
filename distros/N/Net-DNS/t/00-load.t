@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1606 2017-11-30 10:13:43Z willem $	-*-perl-*-
+# $Id: 00-load.t 1611 2018-01-02 09:41:24Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -33,12 +33,13 @@ my @module = qw(
 	Win32::TieRegistry
 	);
 
-diag("\n\nThese tests were run using:\n");
+my @diag;
 foreach my $module (@module) {
 	eval "require $module";
 	my $version = eval { $module->VERSION } || next;
-	diag sprintf "\t%-25s  %s", $module, $version;
+	push @diag, sprintf "%-25s  %s", $module, $version;
 }
+diag join "\n\t", "\nThese tests were run using:", @diag;
 
 
 plan tests => 20 + scalar(@Net::DNS::EXPORT);

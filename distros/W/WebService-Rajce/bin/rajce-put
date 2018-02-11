@@ -88,7 +88,7 @@ rajce-put - Upload images to rajce.net.
 
 =head1 VERSION
 
-version 1.152450
+version 1.180380
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ add entry to $HOME/.netrc
 
 Something like this:
 
-machine http://www.rajce.idnes.cz/liveAPI/index.php login mail@example.com password nbu123
+machine https://www.rajce.idnes.cz/liveAPI/index.php login mail@example.com password nbu123
 
 Set the correct access rights:
 

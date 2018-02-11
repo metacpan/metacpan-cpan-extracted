@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,42 +16,63 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::MSCHOUT" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Signature" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
-            "perl" : "5.004",
+            "base" : "0",
+            "perl" : "5.008",
             "strict" : "0",
-            "vars" : "0"
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "lib" : "0"
+            "File::Temp" : "0",
+            "Safe" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.008",
+            "vars" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Text::Template" : {
+         "file" : "lib/Text/Template.pm",
+         "version" : "1.49"
+      },
+      "Text::Template::Preprocess" : {
+         "file" : "lib/Text/Template/Preprocess.pm",
+         "version" : "1.49"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-text-template at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Text-Template"
+         "web" : "https://github.com/mschout/perl-text-template/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Text-Template/",
+      "homepage" : "https://github.com/mschout/perl-text-template",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/perl-text-template.git",
+         "url" : "https://github.com/mschout/perl-text-template.git",
          "web" : "https://github.com/mschout/perl-text-template"
       }
    },
-   "version" : "1.47"
+   "version" : "1.49",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -1,7 +1,7 @@
 package App::cpm::Tutorial;
 use strict;
 use warnings;
-our $VERSION = '0.957';
+our $VERSION = '0.958';
 1;
 __END__
 
@@ -92,6 +92,8 @@ This is an experimental and fun part! cpm supports git/dist syntax in cpanfile.
 
   $ cat cpanfile
   requires 'Carl', git => 'git://github.com/skaji/Carl.git';
+  requires 'Plack', git => 'ssh://git@github.com/plack/Plack.git';
+  requires 'App::cpm', git => 'https://login:password@github.com/skaji/cpm.git';
   requires 'Perl::PrereqDistributionGatherer',
     git => 'https://github.com/skaji/Perl-PrereqDistributionGatherer',
     ref => '3850305'; # ref can be revision/branch/tag

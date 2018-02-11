@@ -31,7 +31,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.0.31
+    version: v3.0.32
 requires:
   Encode: '0'
   Fcntl: '0'
@@ -41,7 +41,8 @@ requires:
   Path::Iterator::Rule: '0'
   Path::Tiny: '0.062'
   Pod::Constants: '0'
-  Regexp::Pattern::License: v3.0.30
+  Regexp::Pattern: '0'
+  Regexp::Pattern::License: v3.1.0
   Sort::Key::Multi: '1.25'
   String::Copyright: '0.003'
   String::Escape: '0'
@@ -57,12 +58,12 @@ resources:
   homepage: https://metacpan.org/release/App-Licensecheck
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/licensecheck.git
-version: v3.0.31
+version: v3.0.32
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - tester
   - documenter
+  - tester
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

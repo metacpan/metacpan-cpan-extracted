@@ -25,8 +25,6 @@ use Google::Ads::Common::Constants; our $VERSION = ${Google::Ads::Common::Consta
 # Gets the index of the operation that was the source of an ApiError object.
 sub get_source_operation_index ($) {
   my ($self, $error) = @_;
-  # Starting in v201702, an error now includes a FieldPathElement that can
-  # return the index of the error.
   if ($error->can('get_fieldPathElements')) {
     my $field_path_elements = $error->get_fieldPathElements();
     my $first_field_path_element =

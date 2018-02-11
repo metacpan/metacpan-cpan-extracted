@@ -43,6 +43,8 @@ our %ADS_UTILITIES = (
   ReportDownloaderFile   => "ReportDownloader/file",
   ReportDownloaderStream => "ReportDownloader/stream",
   ReportDownloaderString => "ReportDownloader/string",
+  ReportQueryBuilder     => "ReportQueryBuilder",
+  ServiceQueryBuilder    => "ServiceQueryBuilder"
 );
 
 {

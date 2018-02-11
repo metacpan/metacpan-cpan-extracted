@@ -1,9 +1,9 @@
 package Net::DNS::Domain;
 
 #
-# $Id: Domain.pm 1605 2017-11-27 11:37:40Z willem $
+# $Id: Domain.pm 1611 2018-01-02 09:41:24Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1611 $)[1];
 
 
 =head1 NAME
@@ -113,6 +113,7 @@ sub new {
 	my $label = $self->{label} = ( $s eq '@' ) ? [] : [split /\056/, _encode_utf8($s)];
 
 	foreach (@$label) {
+		croak 'empty domain label' unless length;
 
 		if ( LIBIDN2 && UTF8 && /[^\000-\177]/ ) {
 			my $rc = 0;
@@ -129,10 +130,7 @@ sub new {
 
 		s/\134([\060-\071]{3})/$unescape{$1}/eg;	# numeric escape
 		s/\134(.)/$1/g;					# character escape
-		croak 'empty domain label' unless length;
-		next unless length > 63;
-		substr( $_, 63 ) = '';
-		carp 'domain label truncated';
+		croak 'long domain label' if length > 63;
 	}
 
 	$$cache1{$k} = $self;					# cache object reference

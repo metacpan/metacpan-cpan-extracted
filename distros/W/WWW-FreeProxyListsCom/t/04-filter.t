@@ -19,6 +19,8 @@ eval {
 
     my $ip = $ca->[0]->{ip};
     my $ip_check = @{ $p->filter(ip => $ip) };
+    print $p->filter(ip => $ip) . "\n";
+
     is ($ip_check, 1, "IP filter count is ok");
 
     my $port_count;

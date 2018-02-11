@@ -1,6 +1,6 @@
 package Net::OpenSSH;
 
-our $VERSION = '0.74';
+our $VERSION = '0.76';
 
 use strict;
 use warnings;
@@ -20,6 +20,7 @@ use Errno ();
 use Net::OpenSSH::Constants qw(:error :_state);
 use Net::OpenSSH::ModuleLoader;
 use Net::OpenSSH::ShellQuoter;
+use Digest::MD5;
 
 my $thread_generation = 0;
 
@@ -214,6 +215,10 @@ sub parse_connection_opts {
     return \%r;
 }
 
+my $sizeof_sun_path = ($^O eq 'linux' ? 108 :
+                       $^O =~ /bsd/i  ? 104 :
+                       $^O eq 'hpux'  ? 92  : undef);
+
 sub new {
     ${^TAINT} and &_catch_tainted_args;
 
@@ -276,6 +281,7 @@ sub new {
         croak "agent forwarding can not be used when a passphrase has also been given";
     my $forward_X11 = delete $opts{forward_X11};
     my $passwd_prompt = delete $opts{password_prompt};
+    my $master_pty_force = delete $opts{master_pty_force};
     $passwd_prompt = delete $opts{passwd_prompt} unless defined $passwd_prompt;
 
     my ($master_opts, @master_opts,
@@ -390,6 +396,7 @@ sub new {
 		 _master_stdout_discard => $master_stdout_discard,
 		 _master_stderr_discard => $master_stderr_discard,
                  _master_setpgrp => $master_setpgrp,
+                 _master_pty_force => $master_pty_force,
 		 _remote_shell => $remote_shell,
                  _default_stream_encoding => $default_stream_encoding,
                  _default_argument_encoding => $default_argument_encoding,
@@ -421,7 +428,21 @@ sub new {
     $ctl_path = $self->_expand_vars($ctl_path);
     $ctl_dir = $self->_expand_vars($ctl_dir);
 
-    unless (defined $ctl_path) {
+    if  (defined $ctl_path) {
+        if ($external_master) {
+            unless (-S $ctl_path) {
+                $self->_master_fail($async, "ctl_path $ctl_path does not point to a socket");
+                return $self;
+            }
+        }
+        else {
+            if (-e $ctl_path) {
+                $self->_master_fail($async, "unable to use ctl_path $ctl_path, a file object already exists there");
+                return $self;
+            }
+        }
+    }
+    else {
         $external_master and croak "external_master is set but ctl_path is not defined";
 
         unless (defined $ctl_dir) {
@@ -442,7 +463,8 @@ sub new {
         my $target = join('-', grep defined, $user, $host, $port);
 
         for (1..10) {
-            $ctl_path = File::Spec->join($ctl_dir, sprintf("%s-%d-%d", substr($target, 0, 20), $$, rand(1e6)));
+            my $ctl_file = Digest::MD5::md5_hex(sprintf "%s-%d-%d-%d", $target, $$, time, rand 1e6);
+            $ctl_path = File::Spec->join($ctl_dir, $ctl_file);
             last unless -e $ctl_path
         }
         if (-e $ctl_path) {
@@ -450,6 +472,12 @@ sub new {
             return $self;
         }
     }
+
+    if (defined $sizeof_sun_path and length $ctl_path > $sizeof_sun_path) {
+        $self->_master_fail($async, "ctl_path $ctl_path is too long (max permissible size for $^O is $sizeof_sun_path)");
+        return $self;
+    }
+
     $ctl_dir = File::Spec->catpath((File::Spec->splitpath($ctl_path))[0,1], "");
     $debug and $debug & 2 and _debug "ctl_path: $ctl_path, ctl_dir: $ctl_dir";
 
@@ -471,6 +499,8 @@ sub get_port { shift->{_port} }
 sub get_master_pid { shift->{_pid} }
 sub get_ctl_path { shift->{_ctl_path} }
 sub get_expand_vars { shift->{_expand_vars} }
+
+sub get_master_pty_log { shift->{_master_pty_log} }
 
 sub set_expand_vars {
     my $self = shift;
@@ -870,7 +900,8 @@ sub _master_start {
                       $ssh_flags);
 
     my ($mpty, $use_pty, $pref_auths);
-    $use_pty = 1 if defined $self->{_login_handler};
+    $use_pty = 1 if ( $self->{_master_pty_force} or
+                      defined $self->{_login_handler} );
     if (defined $self->{_passwd}) {
         $use_pty = 1;
         $pref_auths = ($self->{_passphrase}
@@ -955,7 +986,10 @@ sub _master_check {
     my ($self, $async) = @_;
     my $error;
     if ($async) {
-        return 1 if -S $self->{_ctl_path};
+        if (-S $self->{_ctl_path}) {
+            delete $self->{_master_pty_log};
+            return 1
+        }
         $error = "master SSH connection broken";
     }
     else {
@@ -964,7 +998,10 @@ sub _master_check {
         unless ($error) {
             my $pid = $self->{_pid};
             if ($out =~ /pid=(\d+)/) {
-                return 1 if !$pid or $1 == $pid;
+                if (!$pid or $1 == $pid) {
+                    delete $self->{_master_pty_log};
+                    return 1;
+                }
                 $error = "bad ssh master at $self->{_ctl_path} socket owned by pid $1 (pid $pid expected)";
             }
             else {
@@ -1027,9 +1064,12 @@ sub _master_wait {
         }
 
         $self->_master_start($async) or return;
-        if (defined $self->{_passwd} or $self->{_login_handler}) {
+        if ($self->{_mpty}) {
             $self->{_wfm_bout} = '';
-            return $self->_master_jump_state(_STATE_LOGIN, $async);
+            $self->{_master_pty_log} = '';
+            if (defined $self->{passwd} or $self->{_login_handler}) {
+                return $self->_master_jump_state(_STATE_LOGIN, $async);
+            }
         }
         return $self->_master_jump_state(_STATE_AWAITING_MUX, $async);
     }
@@ -1063,7 +1103,9 @@ sub _master_wait {
     my $mpty = $self->{_mpty};
     my $fnopty;
     my $rv = '';
-    if ($self->{_master_state} == _STATE_LOGIN) {
+    if ($mpty and 
+        ( $self->{_master_state} == _STATE_LOGIN or
+          $self->{_master_state} == _STATE_AWAITING_MUX )) {
         $fnopty = fileno $mpty;
         vec($rv, $fnopty, 1) = 1
     }
@@ -1118,22 +1160,27 @@ sub _master_wait {
                 vec($rv1, $fnopty, 1) or die "internal error";
                 my $read = sysread($mpty, $self->{_wfm_bout}, 4096, length $self->{_wfm_bout});
                 if ($read) {
+                    $self->{_master_pty_log} .= substr($self->{_wfm_bout}, -$read);
+                    if ((my $remove = length($self->{_master_pty_log}) - 4096) > 0) {
+                        substr($self->{_master_pty_log}, 0, $remove) = ''
+                    }
+
+                    if ($self->{_wfm_bout} =~ /The authenticity of host.*can't be established/si) {
+                        $error = "the authenticity of the target host can't be established; the remote host " .
+                            "public key is probably not present in the '~/.ssh/known_hosts' file";
+                        last;
+                    }
+
+                    if ($self->{_wfm_bout} =~ /WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED/si) {
+                        $error = "the authenticity of the target host can't be established; the remote host " .
+                            "public key doesn't match the one stored locally";
+                        last;
+                    }
+
                     my $passwd_prompt = _first_defined $self->{_passwd_prompt}, qr/[:?]/;
                     $passwd_prompt = quotemeta $passwd_prompt unless ref $passwd_prompt;
 
                     if ($self->{_master_state} == _STATE_LOGIN) {
-                        if ($self->{_wfm_bout} =~ /The authenticity of host.*can't be established/si) {
-                            $error = "the authenticity of the target host can't be established; the remote host " .
-                                "public key is probably not present on the '~/.ssh/known_hosts' file";
-                            last;
-                        }
-
-                        if ($self->{_wfm_bout} =~ /WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED/si) {
-                            $error = "the authenticity of the target host can't be established; the remote host " .
-                                "public key doesn't match the one stored locally";
-                            last;
-                        }
-
                         if ($self->{_wfm_bout} =~ /^(.*$passwd_prompt)/s) {
                             $debug and $debug & 4 and _debug "passwd/passphrase requested ($1)";
                             print $mpty $deobfuscate->($self->{_passwd}) . "\n";
@@ -1310,6 +1357,11 @@ sub make_remote_command {
         push @ssh_opts, $self->_make_W_option(@_);
     }
     else {
+        my $subsystem = delete $opts{subsystem};
+        if ($subsystem) {
+            push @ssh_opts, '-s';
+            @_ == 1 or croak "wrong number of arguments for subsystem command";
+        }
         @args = $self->_quote_args(\%opts, @_);
     }
     _croak_bad_options %opts;
@@ -1463,6 +1515,9 @@ sub open_ex {
     if ($self->{_forward_X11}) {
         my $forward_X11 = delete $opts{forward_X11};
         $ssh_flags .= ($forward_X11 ? 'X' : 'x');
+    }
+    if (delete $opts{subsystem}) {
+        $ssh_flags .= 's';
     }
 
     my $setpgrp = delete $opts{setpgrp};
@@ -1702,7 +1757,7 @@ my @retriable = (Errno::EINTR(), Errno::EAGAIN());
 push @retriable, Errno::EWOULDBLOCK() if Errno::EWOULDBLOCK() != Errno::EAGAIN();
 
 sub _io3 {
-    my ($self, $out, $err, $in, $stdin_data, $timeout, $encoding) = @_;
+    my ($self, $out, $err, $in, $stdin_data, $timeout, $encoding, $keep_in_open) = @_;
     # $self->wait_for_master or return;
     my @data = _array_or_scalar_to_list $stdin_data;
     my ($cout, $cerr, $cin) = (defined($out), defined($err), defined($in));
@@ -1710,7 +1765,7 @@ sub _io3 {
 
     my $has_input = grep { defined and length } @data;
     if ($cin and !$has_input) {
-        close $in;
+        close $in unless $keep_in_open;
         undef $cin;
     }
     elsif (!$cin and $has_input) {
@@ -1800,7 +1855,7 @@ sub _io3 {
                     elsif (grep $! == $_, @retriable) {
                         next FAST;
                     }
-                    close $in;
+                    close $in unless $keep_in_open;
                     undef $cin;
                     $recalc_vecs = 1;
                 }
@@ -1814,7 +1869,7 @@ sub _io3 {
     }
     close $out if $cout;
     close $err if $cerr;
-    close $in if $cin;
+    close $in if $cin and not $keep_in_open;
 
     if ($enc) {
         local $self->{_error_prefix} = [@{$self->{_error_prefix}}, 'output decoding failed'];
@@ -1829,10 +1884,11 @@ sub _io3 {
 
 
 
-_sub_options spawn => qw(stderr_to_stdout stdin_discard stdin_fh stdin_file stdout_discard
-                         stdout_fh stdout_file stderr_discard stderr_fh stderr_file
-                         stdinout_dpipe stdinout_dpipe_make_parent quote_args quote_args_extended remote_shell glob_quoting
-                         tty ssh_opts tunnel encoding argument_encoding forward_agent forward_X11 setpgrp);
+_sub_options spawn => qw(stderr_to_stdout stdin_discard stdin_fh stdin_file stdout_discard stdout_fh
+                         stdout_file stderr_discard stderr_fh stderr_file stdinout_dpipe
+                         stdinout_dpipe_make_parent quote_args quote_args_extended remote_shell
+                         glob_quoting tty ssh_opts tunnel encoding argument_encoding forward_agent
+                         forward_X11 setpgrp subsystem);
 sub spawn {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1844,7 +1900,7 @@ sub spawn {
 
 _sub_options open2 => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file quote_args quote_args_extended
                          remote_shell glob_quoting tty ssh_opts tunnel encoding argument_encoding forward_agent
-                         forward_X11 setpgrp);
+                         forward_X11 setpgrp subsystem);
 sub open2 {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1862,7 +1918,7 @@ sub open2 {
 _sub_options open2pty => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file
                             quote_args quote_args_extended remote_shell glob_quoting tty
                             close_slave_pty ssh_opts encoding argument_encoding forward_agent
-                            forward_X11 setpgrp);
+                            forward_X11 setpgrp subsystem);
 sub open2pty {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1880,7 +1936,7 @@ sub open2pty {
 _sub_options open2socket => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file
                                quote_args quote_args_extended remote_shell glob_quoting tty
                                ssh_opts tunnel encoding argument_encoding forward_agent
-                               forward_X11 setpgrp);
+                               forward_X11 setpgrp subsystem);
 sub open2socket {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1894,7 +1950,7 @@ sub open2socket {
 }
 
 _sub_options open3 => qw(quote_args quote_args_extended remote_shell glob_quoting tty ssh_opts
-                         encoding argument_encoding forward_agent forward_X11 setpgrp);
+                         encoding argument_encoding forward_agent forward_X11 setpgrp subsystem);
 sub open3 {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1912,7 +1968,7 @@ sub open3 {
 }
 
 _sub_options open3pty => qw(quote_args quote_args_extended remote_shell glob_quoting tty close_slave_pty ssh_opts
-                            encoding argument_encoding forward_agent forward_X11 setpgrp);
+                            encoding argument_encoding forward_agent forward_X11 setpgrp subsystem);
 sub open3pty {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1931,8 +1987,7 @@ sub open3pty {
 }
 
 _sub_options open3socket => qw(quote_args quote_args_extended remote_shell glob_quoting tty ssh_opts encoding
-                               argument_encoding forward_agent
-                               forward_X11 setpgrp);
+                               argument_encoding forward_agent forward_X11 setpgrp subsystem);
 sub open3socket {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1951,7 +2006,7 @@ _sub_options system => qw(stdout_discard stdout_fh stdin_discard stdout_file std
                           quote_args quote_args_extended remote_shell glob_quoting
                           stderr_to_stdout stderr_discard stderr_fh stderr_file
                           stdinout_dpipe stdinout_dpipe_make_parent tty ssh_opts tunnel encoding
-                          argument_encoding forward_agent forward_X11 setpgrp);
+                          argument_encoding forward_agent forward_X11 setpgrp subsystem);
 sub system {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -1959,29 +2014,37 @@ sub system {
     my $stdin_data = delete $opts{stdin_data};
     my $timeout = delete $opts{timeout};
     my $async = delete $opts{async};
+    my $stdin_keep_open = ($async ? undef : delete $opts{stdin_keep_open});
+
     _croak_bad_options %opts;
 
-    local $SIG{INT} = 'IGNORE';
-    local $SIG{QUIT} = 'IGNORE';
-    local $SIG{CHLD};
+    $stdin_data = '' if $stdin_keep_open and not defined $stdin_data;
 
     my $stream_encoding;
     if (defined $stdin_data) {
         $opts{stdin_pipe} = 1;
         $stream_encoding = $self->_delete_stream_encoding(\%opts);
     }
+
+    local $SIG{INT} = 'IGNORE';
+    local $SIG{QUIT} = 'IGNORE';
+    local $SIG{CHLD};
+
     my ($in, undef, undef, $pid) = $self->open_ex(\%opts, @_) or return undef;
 
-    $self->_io3(undef, undef, $in, $stdin_data, $timeout, $stream_encoding) if defined $stdin_data;
+    $self->_io3(undef, undef, $in, $stdin_data,
+                $timeout, $stream_encoding, $stdin_keep_open) if defined $stdin_data;
     return $pid if $async;
     $self->_waitpid($pid, $timeout);
 }
 
 _sub_options test => qw(stdout_discard stdout_fh stdin_discard stdout_file stdin_fh stdin_file
-                        quote_args quote_args_extended remote_shell glob_quoting
-                        stderr_to_stdout stderr_discard stderr_fh stderr_file
-                        stdinout_dpipe stdinout_dpipe_make_parent tty ssh_opts timeout stdin_data
-                        encoding stream_encoding argument_encoding forward_agent forward_X11 setpgrp);
+                        quote_args quote_args_extended remote_shell glob_quoting stderr_to_stdout
+                        stderr_discard stderr_fh stderr_file stdinout_dpipe
+                        stdinout_dpipe_make_parent tty ssh_opts timeout stdin_data stdin_keep_open
+                        encoding stream_encoding argument_encoding forward_agent forward_X11
+                        setpgrp subsystem);
+
 sub test {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
@@ -2004,17 +2067,20 @@ sub test {
     return undef;
 }
 
-_sub_options capture => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file
-                           stdin_discard stdin_fh stdin_file quote_args quote_args_extended
-                           remote_shell glob_quoting tty ssh_opts tunnel
-                           encoding argument_encoding forward_agent forward_X11 setpgrp);
+_sub_options capture => qw(stderr_to_stdout stderr_discard stderr_fh stderr_file stdin_discard
+                           stdin_fh stdin_file quote_args quote_args_extended remote_shell
+                           glob_quoting tty ssh_opts tunnel encoding argument_encoding forward_agent
+                           forward_X11 setpgrp subsystem);
 sub capture {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
     my %opts = (ref $_[0] eq 'HASH' ? %{shift()} : ());
     my $stdin_data = delete $opts{stdin_data};
+    my $stdin_keep_open = delete $opts{stdin_keep_open};
     my $timeout = delete $opts{timeout};
     _croak_bad_options %opts;
+
+    $stdin_data = '' if $stdin_keep_open and not defined $stdin_data;
 
     my $stream_encoding = $self->_delete_stream_encoding(\%opts);
     $opts{stdout_pipe} = 1;
@@ -2025,7 +2091,8 @@ sub capture {
     local $SIG{CHLD};
 
     my ($in, $out, undef, $pid) = $self->open_ex(\%opts, @_) or return ();
-    my ($output) = $self->_io3($out, undef, $in, $stdin_data, $timeout, $stream_encoding);
+    my ($output) = $self->_io3($out, undef, $in, $stdin_data,
+                               $timeout, $stream_encoding, $stdin_keep_open);
     $self->_waitpid($pid, $timeout);
     if (wantarray) {
         my $pattern = quotemeta $/;
@@ -2034,17 +2101,19 @@ sub capture {
     $output
 }
 
-_sub_options capture2 => qw(stdin_discard stdin_fh stdin_file
-                            quote_args quote_args_extended remote_shell glob_quoting
-                            tty ssh_opts encoding stream_encoding
-                            argument_encoding forward_agent forward_X11 setpgrp);
+_sub_options capture2 => qw(stdin_discard stdin_fh stdin_file quote_args quote_args_extended
+                            remote_shell glob_quoting tty ssh_opts encoding stream_encoding
+                            argument_encoding forward_agent forward_X11 setpgrp subsystem);
 sub capture2 {
     ${^TAINT} and &_catch_tainted_args;
     my $self = shift;
     my %opts = (ref $_[0] eq 'HASH' ? %{shift()} : ());
     my $stdin_data = delete $opts{stdin_data};
+    my $stdin_keep_open = delete $opts{stdin_keep_open};
     my $timeout = delete $opts{timeout};
     _croak_bad_options %opts;
+
+    $stdin_data = '' if $stdin_keep_open and not defined $stdin_data;
 
     my $stream_encoding = $self->_delete_stream_encoding(\%opts);
     $opts{stdout_pipe} = 1;
@@ -2056,7 +2125,8 @@ sub capture2 {
     local $SIG{CHLD};
 
     my ($in, $out, $err, $pid) = $self->open_ex( \%opts, @_) or return ();
-    my @capture = $self->_io3($out, $err, $in, $stdin_data, $timeout, $stream_encoding);
+    my @capture = $self->_io3($out, $err, $in, $stdin_data,
+                              $timeout, $stream_encoding, $stdin_keep_open);
     $self->_waitpid($pid, $timeout);
     wantarray ? @capture : $capture[0];
 }
@@ -2215,11 +2285,11 @@ sub _scp {
 my %rsync_opt_with_arg = map { $_ => 1 } qw(chmod suffix backup-dir rsync-path max-delete max-size min-size partial-dir
                                             timeout modify-window temp-dir compare-dest copy-dest link-dest compress-level
                                             skip-compress filter exclude exclude-from include include-from
-                                            out-format log-file log-file-format bwlimit protocol iconv checksum-seed);
+                                            out-format log-file log-file-format bwlimit protocol iconv checksum-seed files-from);
 
 my %rsync_opt_forbidden = map { $_ => 1 } qw(rsh address port sockopts blocking-io password-file write-batch
                                             only-write-batch read-batch ipv4 ipv6 version help daemon config detach
-                                            files-from from0 blocking-io protect-args list-only);
+                                            blocking-io protect-args list-only);
 
 $rsync_opt_forbidden{"no-$_"} = 1 for (keys %rsync_opt_with_arg, keys %rsync_opt_forbidden);
 
@@ -2326,7 +2396,7 @@ sub sftp {
     _croak_bad_options %opts;
     $opts{timeout} = $self->{_timeout} unless defined $opts{timeout};
     $self->wait_for_master or return undef;
-    my ($in, $out, $pid) = $self->open2( { ssh_opts => '-s',
+    my ($in, $out, $pid) = $self->open2( { subsystem => 1,
 					   stderr_fh => $stderr_fh,
 					   stderr_discard => $stderr_discard },
 					 'sftp' )
@@ -2655,6 +2725,17 @@ avoid insecure operation.
 
 By default C<~/.libnet-openssh-perl> is used.
 
+=item ctl_path => $path
+
+Path to the SSH master control socket.
+
+Usually this option should be avoided as the module is able to pick an unused
+socket path by itself. An exception to that rule is when the C<external_master>
+feature is enabled.
+
+Note that the length of the path is usually limited to between 92 and 108 bytes,
+depending of the underlying operating system.
+
 =item ssh_cmd => $cmd
 
 Name or full path to OpenSSH C<ssh> binary. For instance:
@@ -2863,7 +2944,7 @@ Note, that blocking operations should not be performed inside the
 login handler (at least if you want the C<async> and C<timeout>
 features to work).
 
-See also the sample script C<login_handler.pl> in the C<samples>
+See also the sample script C<login_handler.pl> in the C<examples>
 directory.
 
 Usage of this option is incompatible with the C<password> and
@@ -2885,6 +2966,16 @@ reset.
 This feature is highly experimental. Report any problems you may find,
 please.
 
+=item master_pty_force => 1
+
+By default, Net::OpenSSH attaches the master SSH process to a pty only
+when some kind of interactive authentication is requested. If this
+flag is set a pty will be attached always.
+
+That allows to get better diagnostics for some kind of errors (as for
+instance, bad host keys) and also allows to retrieve the pty log using
+L<get_master_pty_log>.
+
 =back
 
 =item $ssh->error
@@ -2895,6 +2986,20 @@ The returned value is a dualvar as $! (see L<perlvar/"$!">) that
 renders an informative message when used in string context or an error
 number in numeric context (error codes appear in
 L<Net::OpenSSH::Constants|Net::OpenSSH::Constants>).
+
+=item $ssh->get_master_pty_log
+
+In order to handle password authentication or entering the passphrase
+for a private key, Net::OpenSSH may run the master SSH process attached
+to a pty.
+
+In that case and after a constructor call returns a connection failure
+error, this method can be called to retrieve the output captured at
+the pty (the log is discarded when the connection is established
+successfully).
+
+Any data consumed from the pty by custom login handlers will be
+missing from the the returned log.
 
 =item $ssh->get_user
 
@@ -3108,6 +3213,13 @@ Example:
 
 See also L</Tunnels>.
 
+=item subsystem => $bool
+
+Request a connection to a SSH subsystem. The name of the subsystem
+must be passed as an argument, as in the following example:
+
+  my $s = $ssh->open2socket({subsystem => 1}, 'netconf');
+
 =item encoding => $encoding
 
 =item argument_encoding => $encoding
@@ -3215,6 +3327,15 @@ See also the L</spawn> method documentation below.
 See the L</open_ex> method documentation for an explanation of these
 options.
 
+=item stdin_keep_open => $bool
+
+When C<stdin_data> is given, the module closes the stdin stream once
+all the data has been sent. Unfortunately, some SSH buggy servers fail
+to handle this event correctly and close the channel prematurely.
+
+As a workaround, when this flag is set the stdin is left open until
+the remote process terminates.
+
 =back
 
 =item $ok = $ssh->test(\%opts, @cmd);
@@ -3279,6 +3400,11 @@ Accepted options:
 
 =item stdin_data => \@input
 
+=item stdin_keep_open => $bool
+
+See the L</system> method documentation for an explanation of these
+options.
+
 =item timeout => $timeout
 
 See L</Timeouts>.
@@ -3315,6 +3441,8 @@ The accepted options are:
 =item stdin_data => $input
 
 =item stdin_data => \@input
+
+=item stdin_keep_open => $bool
 
 See the L</system> method documentation for an explanation of these
 options.
@@ -3602,6 +3730,11 @@ address and port. For instance:
 
   $cmd = $ssh->make_remote_command({tunnel => 1}, $host, $port);
 
+=item subsystem => 1
+
+Return a command for invoking a SSH subsystem (i.e. SFTP or
+netconf). In that case the only argument is the subsystem name.
+
 =back
 
 =item $ssh->wait_for_master($async)
@@ -3706,7 +3839,7 @@ the Net::OpenSSH object go out of scope.
 If C<async> is true, it doesn't wait for the SSH connection to
 terminate. In that case, L</wait_for_master> must be called repeatedly
 until the shutdown sequence terminates (See the L</AnyEvent>
-integration section bellow).
+integration section below).
 
 =item $pid = $ssh->sshfs_import(\%opts, $remote_fs, $local_mnt_point)
 
@@ -3785,7 +3918,7 @@ operation of the module in any other regard.
 
 For instance:
 
-  # See sample/sshfs_mount.pl for a working program
+  # See examples/sshfs_mount.pl for a working program
   my $ssh = Net::OpenSSH->new($host);
   my $sshfs_pid = $ssh->sshfs_import("/home/foo", "my-remote-home");
   $ssh->disown_master;
@@ -4020,6 +4153,8 @@ work. Also, note that tunnel forwarding may be administratively
 forbidden at the server side (see L<sshd(8)> and L<sshd_config(5)> or
 the documentation provided by your SSH server vendor).
 
+=head3 Tunnels targeting UNIX sockets
+
 When connecting to hosts running a recent version of OpenSSH sshd, it
 is also possible to open connections targeting Unix sockets.
 
@@ -4031,6 +4166,28 @@ For instance:
 Currently, this feature requires a patched OpenSSH ssh client. The
 patch is available as
 C<patches/openssh-fwd-stdio-to-streamlocal-1.patch>.
+
+=head3 Port forwarding
+
+L<Net::OpenSSH> does not offer direct support for handling port
+forwardings between server and client. But that can be done easily
+anyway passing custom SSH options to its methods.
+
+For instance, tunnel creation options can be passed to the constructor:
+
+  my $ssh = Net::OpenSSH->new(...
+                    master_opts => -Llocalhost:1234:localhost:3306');
+
+The port forwardings can also be changed for a running SSH connection
+using a Control command:
+
+    # setting up a tunnel:
+    $ssh->system({ssh_opts => ['-O','forward',
+                               '-L127.0.0.1:12345:127.0.0.1:3306']});
+
+    # canceling it:
+    $ssh->system({ssh_opts => ['-O', 'cancel',
+                               '-L127.0.0.1:12345:127.0.0.1:3306']});
 
 =head2 Data encoding
 
@@ -4307,7 +4464,21 @@ check:
 
 The error message will tell what has gone wrong.
 
-=item 2 - OpenSSH version
+=item 2 - Check the connection parameters
+
+Believe it or not, passing bad parameters to Net::OpenSSH turns to be
+one of the top causes of failures so check that you are using the
+right parameters.
+
+Specifically, if you are obtaining them from the outside, ensure that
+they don't have extra spaces or new lines attached (do you need to
+C<chomp>?).
+
+Passwords and URIs may contain C<$> or C<@> characters. If you have
+then hardcoded in your script, check that those are quoted properly
+(and BTW, use C<strict>).
+
+=item 3 - OpenSSH version
 
 Ensure that you have a version of C<ssh> recent enough:
 
@@ -4316,8 +4487,7 @@ Ensure that you have a version of C<ssh> recent enough:
 
 OpenSSH version 4.1 was the first to support the multiplexing feature
 and is the minimal required by the module to work. I advise you to use
-the latest OpenSSH (currently 5.8) or at least a more recent
-version.
+the latest OpenSSH (currently 7.5).
 
 The C<ssh_cmd> constructor option lets you select the C<ssh> binary to
 use. For instance:
@@ -4331,7 +4501,7 @@ Net::OpenSSH should work with these SSH clients as long as they are
 derived from some version of OpenSSH recent enough. Anyway, my advise
 is to use the real OpenSSH software if you can!
 
-=item 3 - run ssh from the command line
+=item 4 - run ssh from the command line
 
 Check you can connect to the remote host using the same parameters you
 are passing to Net::OpenSSH. In particular, ensure that you are
@@ -4392,7 +4562,7 @@ key is correctly installed on the server.
 
 =back
 
-=item 4 - security checks on the multiplexing socket
+=item 5 - security checks on the multiplexing socket
 
 Net::OpenSSH performs some security checks on the directory where the
 multiplexing socket is going to be placed to ensure that it can not be
@@ -4420,7 +4590,7 @@ else has permissions to perform write operations on them.
 The constructor option C<strict_mode> disables these security checks,
 but you should not use it unless you understand its implications.
 
-=item 5 - file system must support sockets
+=item 6 - file system must support sockets
 
 Some file systems (as for instance FAT or AFS) do not support placing
 sockets inside them.
@@ -4662,8 +4832,9 @@ There are some devices that support command mode but that only accept
 one command per connection. In that cases, using L<Expect> is also
 probably the best option.
 
-Nowadays, there is a new player, L<Net::CLI::Interaction> that may be
-more suitable than Expect.
+Nowadays, there is a new player, L<Net::CLI::Interact> that may be
+more suitable than Expect, and L<Net::Appliance::Session> for working
+specifically with network devices.
 
 =item Connection fails
 
@@ -4833,7 +5004,7 @@ pipes).
 
 If for whatever reason the methods described above fail, you can
 always revert to using Expect to talk to the remote C<sudo>. See the
-C<sample/expect.pl> script from this module distribution.
+C<examples/expect.pl> script from this module distribution.
 
 =back
 
@@ -4860,7 +5031,7 @@ implementation.
 
 L<Expect|Expect> can be used to interact with commands run through
 this module on the remote machine (see also the C<expect.pl> and
-<autosudo.pl> scripts in the sample directory).
+<autosudo.pl> scripts in the examples directory).
 
 L<SSH::OpenSSH::Parallel> is an advanced scheduler that allows one to run
 commands in remote hosts in parallel. It is obviously based on
@@ -4885,7 +5056,7 @@ Net::OpenSSH to handle the connections.
 
 L<Net::CLI::Interact> allows one to interact with remote shells
 and other services. It is specially suited for interaction with
-network equipment. The passphrase approach it uses is very clever. You
+network equipment. The phrasebook approach it uses is very clever. You
 may also like to check the L<other
 modules|https://metacpan.org/author/OLIVER> from its author, Oliver
 Gorwits.
@@ -5049,7 +5220,7 @@ I always welcome documentation corrections and improvements.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2017 by Salvador FandiE<ntilde>o
+Copyright (C) 2008-2018 by Salvador FandiE<ntilde>o
 (sfandino@yahoo.com)
 
 This library is free software; you can redistribute it and/or modify

@@ -3,7 +3,7 @@ package Firefox::Marionette::Cookie;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.37';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -65,7 +65,7 @@ Firefox::Marionette::Cookie - Represents a Firefox cookie retrieved using the Ma
 
 =head1 VERSION
 
-Version 0.33
+Version 0.37
 
 =head1 SYNOPSIS
 
@@ -97,7 +97,7 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * path - the path belonging to the cookie. 
 
-=item * expiry - the expiry time of the cookie in seconds since the UNIX epoch. 
+=item * expiry - the expiry time of the cookie in seconds since the UNIX epoch.  expiry will return undef for Firefox versions less than 56
 
 =item * value - the value of the cookie. 
 

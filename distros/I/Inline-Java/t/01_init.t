@@ -4,11 +4,7 @@ use Test ;
 BEGIN {
 	$main::cp = $ENV{CLASSPATH} || "<empty>" ;
 	plan(tests => 1) ;
-	mkdir('./_Inline_test', 0777) unless -e './_Inline_test' ;
 }
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test' ;
 
 use Inline (
 	Java => 'DATA'

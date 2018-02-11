@@ -1,0 +1,44 @@
+---
+abstract: 'Recursively walk data structures'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Visitor-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Data::Visitor::Tiny:
+    file: lib/Data/Visitor/Tiny.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Data-Visitor-Tiny/issues
+  homepage: https://github.com/dagolden/Data-Visitor-Tiny
+  repository: https://github.com/dagolden/Data-Visitor-Tiny.git
+version: '0.001'
+x_authority: cpan:DAGOLDEN
+x_serialization_backend: 'YAML::Tiny version 1.70'

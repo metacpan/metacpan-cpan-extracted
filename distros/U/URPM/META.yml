@@ -1,14 +1,17 @@
 ---
-abstract: unknown
+abstract: 'Manipulate RPM files and headers'
 author:
-  - unknown
+  - 'Thierry Vignaud'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Pod: '1.00'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::Depends: '0.300'
+  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::PkgConfig: '1.00'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,5 +22,8 @@ no_index:
     - inc
 requires:
   MDV::Packdrakeng: '1.00'
-version: '5.15'
+  perl: '5.008001'
+resources:
+  repository: git://git.mageia.org/software/rpm/perl-URPM/
+version: '5.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

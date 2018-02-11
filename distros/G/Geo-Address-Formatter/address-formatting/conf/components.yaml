@@ -16,6 +16,8 @@ aliases:
     - residential
     - path
     - pedestrian
+    - road_reference
+    - road_reference_intl    
 ---
 name: village
 aliases:
@@ -32,6 +34,8 @@ aliases:
     - town
 ---
 name: county
+aliases:
+    - county_code
 ---
 name: postcode
 ---

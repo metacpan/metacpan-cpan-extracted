@@ -1,5 +1,17 @@
 Revision history for Perl extension DBIx-EAV
 
+0.11 2018-02-09T14:30:06Z
+
+    * new _normalize_entity_schema() method
+    * fixed declare_entities() bug
+
+0.10 2018-02-08T17:52:21Z
+
+    * new schema option 'enable_multi_tenancy'
+    * improved entity type registration/loading
+      - implemented declare_entities()
+      - removed register_types()
+
 0.09 2016-08-23T01:46:22Z
 
     [ FIX ]

@@ -1,4 +1,12 @@
-$Id: Changes 1610 2017-12-15 12:25:33Z willem $                       -*-text-*-
+$Id: Changes 1639 2018-02-09 11:08:24Z willem $                       -*-text-*-
+
+
+**** 1.15 Feb 9, 2018
+
+	GOST R 34.11-94 hash algorithm: end of life 1st Jan 2018
+	per sunset clause in successor standard GOST R 34.11-2012.
+	Digest::GOST removed from the recommended module metadata,
+	but will still be used if available.
 
 
 **** 1.14 Dec 15, 2017

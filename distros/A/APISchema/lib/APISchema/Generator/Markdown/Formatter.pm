@@ -91,9 +91,9 @@ sub _code ($) {
     return sprintf '`%s`', $text;
 }
 
-sub code ($) {
-    my $text = shift;
-    return '' unless defined $text;
+sub code ($;$) {
+    my ($text, $exists) = @_;
+    return $exists ? '`null`' : '' unless defined $text;
     return _code json $text;
 }
 

@@ -17,8 +17,10 @@ BEGIN {
 
 require_ok $pkg;
 
+my $bag_dir = "t/my-bag-$$";
+
 my $store
-    = Catmandu::Store::File::BagIt->new(root => 't/data', keysize => 9);
+    = Catmandu::Store::File::BagIt->new(root => $bag_dir, keysize => 9);
 my $index = $store->bag;
 
 ok $store , 'got a store';
@@ -35,17 +37,17 @@ note("add");
     ok $bag->upload(IO::File->new('t/data2/000/000/001/data/test.txt'),
         'test1.txt');
 
-    ok -f 't/data/000/001/234/data/test1.txt', 'test1.txt exists';
+    ok -f "$bag_dir/000/001/234/data/test1.txt", 'test1.txt exists';
 
     ok $bag->upload(IO::File->new('t/data2/000/000/002/data/test.txt'),
         'test2.txt');
 
-    ok -f 't/data/000/001/234/data/test2.txt', 'test2.txt exists';
+    ok -f "$bag_dir/000/001/234/data/test2.txt", 'test2.txt exists';
 
     ok $bag->upload(IO::File->new('t/data2/000/000/003/data/test.txt'),
         'test3.txt');
 
-    ok -f 't/data/000/001/234/data/test3.txt', 'test3.txt exists';
+    ok -f "$bag_dir/000/001/234/data/test3.txt", 'test3.txt exists';
 }
 
 note("list");
@@ -104,7 +106,5 @@ done_testing();
 
 END {
 	my $error = [];
-	# Stupid chdir trick to make remove_tree work
-	chdir("lib");
-	path('../t/data')->remove_tree;
+	path("$bag_dir")->remove_tree;
 };

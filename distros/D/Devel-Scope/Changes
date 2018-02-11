@@ -1,5 +1,11 @@
 Revision history for Devel-Scope
 
+0.0y    Fri Feb  9 03:10:50 UTC 2018
+        * Added debug_enable() and debug_disable()
+
+0.06    Wed Feb  7 01:33:41 UTC 2018
+        * Refactored tests to be more portable.
+
 0.05    Tue Feb  6 09:25:03 UTC 2018
         * Fixed Pod.
 

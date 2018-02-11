@@ -19,13 +19,41 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Storable" : "0",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::Locale" : "0",
+            "Hash::Merge" : "0",
+            "Hash::Merge::Extra" : "0.06",
+            "IPC::Run3" : "0",
+            "JSON" : "0",
+            "Log::Log4Cli" : "0.20",
+            "Module::Find" : "0",
+            "Struct::Diff" : "0.94",
+            "Struct::Path" : "0.81",
+            "Struct::Path::PerlStyle" : "0.8",
+            "YAML::XS" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/mr-mixas/NDTools.git",
-         "web" : "https://github.com/mr-mixas/NDTools"
+         "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.5.0"
+   "version" : "v0.5.1"
 }

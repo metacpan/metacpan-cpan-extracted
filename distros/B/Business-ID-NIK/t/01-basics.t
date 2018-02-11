@@ -12,7 +12,7 @@ test_parse(
     nik    => "32 7300 010101 0001",
     status => 200,
     result => {
-        'dob' => 978307200,
+        'dob' => '2001-01-01',
         'gender' => 'M',
         'loc_code' => '3273',
         'loc_ind_name' => 'BANDUNG',
@@ -27,7 +27,7 @@ test_parse(
     nik    => "32 7300 710101 0001",
     status => 200,
     result => {
-        'dob' => 980899200,
+        'dob' => '2001-01-31',
         'gender' => 'F',
         'loc_code' => '3273',
         'loc_ind_name' => 'BANDUNG',

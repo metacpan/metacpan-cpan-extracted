@@ -40,7 +40,7 @@ use base qw/ Astro::Coords::Angle /;
 # Package Global variables
 use vars qw/ $VERSION /;
 
-$VERSION = '0.03';
+$VERSION = '0.19';
 
 =head1 METHODS
 
@@ -97,14 +97,14 @@ The following methods control the default behaviour of the class.
 =item B<NDP>
 
 As for the base class except that the default number of decimal places
-is 1.
+is 3.
 
 This method has no effect on the base class.
 
 =cut
 
 {
-  my $DEFAULT_NDP = 1;
+  my $DEFAULT_NDP = 3;
   my $NDP = $DEFAULT_NDP;
   sub NDP {
     my $class = shift;

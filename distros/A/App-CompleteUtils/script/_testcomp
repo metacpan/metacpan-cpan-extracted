@@ -1,0 +1,88 @@
+#!perl
+
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '0.16'; # VERSION
+# FRAGMENT id=shcompgen-hint completer=1 for=testcomp
+
+use 5.010;
+use strict;
+use warnings;
+
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+die "This script is for shell completion only\n"
+        unless $ENV{COMP_LINE};
+
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+
+        my $word = $args{word} // '';
+        my $type = $args{type};
+        my $argpos = $args{argpos};
+
+        # XXX complete -I with module name
+
+        if ($type eq 'arg' && $argpos == 0) {
+            require Complete::File;
+            require Complete::Program;
+            require Complete::Util;
+            Complete::Util::combine_answers(
+                Complete::File::complete_file(word=>$word),
+                Complete::Program::complete_program(word=>$word),
+            );
+        }
+
+        # XXX complete arguments argpos>0 by trying to pass COMP_LINE and
+        # COMP_POINT to program in argpos 0. that would be cool, e.g. 'testcomp
+        # depak --tra<tab>' can complete depak command.
+
+    },
+    'include|I=s' => sub {},
+);
+
+# ABSTRACT: Completion script for testcomp
+# PODNAME: _testcomp
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_testcomp - Completion script for testcomp
+
+=head1 VERSION
+
+This document describes version 0.16 of _testcomp (from Perl distribution App-CompleteUtils), released on 2018-02-08.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CompleteUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CompleteUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

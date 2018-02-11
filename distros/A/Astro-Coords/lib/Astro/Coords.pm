@@ -108,7 +108,7 @@ use Carp;
 use vars qw/ $DEBUG /;
 $DEBUG = 0;
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 use Math::Trig qw/ acos /;
 use Astro::PAL ();
@@ -338,12 +338,15 @@ time to be used on subsequent calls.
 
   $c->datetime( undef );
 
-If no argument is specified, or C<usenow> is set to true, an object
+If no argument is specified and no Date/Time object had already been
+supplied, or C<usenow> is set to true, an object
 referring to the current time (GMT/UT) is returned. This object may be
 either a C<Time::Piece> object or a C<DateTime> object depending on
 current implementation (but in modern versions it will be a
-C<DateTime> object). If a new argument is supplied C<usenow> is always
-set to false.
+C<DateTime> object). If a Date/Time object had already been specified
+then the object returned will be of the same type as the supplied
+object (C<DateTime> or C<Time::Piece>).
+If a new argument is supplied C<usenow> is always set to false.
 
 A copy of the input argument is created, guaranteeing a UTC representation.
 
@@ -2833,10 +2836,11 @@ sub _iterative_el {
 	  }
 
           my $deltat = $epoch - $prevepoch;
-          if (abs($deltat) > 0) {
+          my $deltael = $el - $prevel;
+          if (abs($deltat) > 0 and abs($deltael) > 0) {
             # in the linear approximation
             # we know the gradient
-            my $gradient = ($el - $prevel) / $deltat;
+            my $gradient = $deltael / $deltat;
             my $newinc = - ($diff_to_curr) / $gradient;
             my $newsign = $newinc <=> 0;
             $newinc = abs($newinc);

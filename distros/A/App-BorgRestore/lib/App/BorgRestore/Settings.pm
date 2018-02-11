@@ -53,9 +53,9 @@ This defaults to "C<$XDG_CACHE_HOME>/borg-restore.pl". It contains the lookup da
 
 =item C<@backup_prefixes>
 
-This is an array of prefixes that need to be added when looking up a file in the
-backup archives. If you use filesystem snapshots and the snapshot for /home is
-located at /mnt/snapshots/home, you have to add the following:
+This is an array of prefixes that need to be added or removed when looking up a
+file in the backup archives. If you use filesystem snapshots and the snapshot
+for /home is located at /mnt/snapshots/home, you have to add the following:
 
 # In the backup archives, /home has the path /mnt/snapshots/home
 {regex => "^/home/", replacement => "mnt/snapshots/home/"},
@@ -65,6 +65,11 @@ a tailing slash as well to prevent clashes with directories that start with the
 same string. The first regex that matches for a given file is used. This
 setting only affects lookups, it does not affect the creation of the database
 with --update-database.
+
+If you create a backup of /home/user only, you will need to use the following:
+
+# In the backup archives, /home/user/foo has the path foo
+{regex => "^/home/user", replacement => ""},
 
 =item C<$sqlite_cache_size>
 
@@ -83,12 +88,12 @@ the disk too much.
  @backup_prefixes = (
  	{regex => "^/home/", replacement => "mnt/snapshots/home/"},
  	# /boot is not snapshotted
- 	{regex => "^/boot", replacement => ""},
+ 	{regex => "^/boot/", replacement => "boot"},
  	{regex => "^/", replacement => "mnt/snapshots/root/"},
  );
  $sqlite_cache_size = 2097152;
 
-1; #ensure positive return value
+ 1; #ensure positive return value
 
 =head1 LICENSE
 

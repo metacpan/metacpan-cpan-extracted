@@ -1,3 +1,13 @@
+0.006     2018-02-06 22:36:33+01:00 Europe/Stockholm
+ - Update docs to reflect new helper names. Oops.
+
+0.005     2018-02-06 22:25:26+01:00 Europe/Stockholm
+ - Deprecate ->publish, ->subscribe, and ->unsubscribe helpers in favour of
+   ->pubsub->publish, ->pubsub->subscribe, and ->pubsub->unsubscribe helpers
+   respectively. The deprecated helpers will be removed by version 0.010 or
+   1.000, whichever happens first.
+ - Make the chat example use nicer html and xml escape the chat messages.
+
 0.004     2018-02-06 01:57:52+01:00 Europe/Stockholm
  - Make tests use a tempdir for their home. Should hopefully allow tests to
    pass on *BSD.

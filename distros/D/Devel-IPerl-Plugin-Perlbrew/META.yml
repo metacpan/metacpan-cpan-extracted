@@ -1,0 +1,30 @@
+---
+abstract: 'interact with L<perlbrew> in L<Jupyter|https://jupyter.org> IPerl kernel'
+author:
+  - 'Roy Storey <kiwiroy@users.noreply.github.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-IPerl-Plugin-Perlbrew
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::cpanminus: '0'
+  App::perlbrew: '0'
+  Devel::IPerl: '0.009'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/kiwiroy/Devel-IPerl-Plugin-Perlbrew/issues
+  homepage: https://github.com/kiwiroy/Devel-IPerl-Plugin-Perlbrew
+  repository: https://github.com/kiwiroy/Devel-IPerl-Plugin-Perlbrew.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

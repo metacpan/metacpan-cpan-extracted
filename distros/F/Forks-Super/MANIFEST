@@ -186,6 +186,7 @@ t/67g-emulate.t
 t/67h-emulate.t
 t/70-cleanse.t
 t/71-config.t
+t/72-deinit.t
 t/external-command.pl
 t/external-daemon.pl
 t/forked_harness.pl

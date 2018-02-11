@@ -1,10 +1,8 @@
 package App::HL7::Dump;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
@@ -12,8 +10,7 @@ use Getopt::Std;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -143,11 +140,9 @@ App::HL7::Dump - Base class for hl7dump script.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::HL7::Dump;
  use File::Temp qw(tempfile);
  use IO::Barf qw(barf);
@@ -220,17 +215,17 @@ L<https://github.com/tu pinek/App-HL7-Dump>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2016 Michal Špaček
+ © 2016-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

@@ -6,7 +6,7 @@ use Astro::Catalog::Item;
 
 use base qw/ Astro::Catalog::Item /;
 use vars qw/ $VERSION /;
-$VERSION = "4.32";
+$VERSION = "4.33";
 
 =head1 NAME
 

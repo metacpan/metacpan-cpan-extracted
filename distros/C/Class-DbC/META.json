@@ -1,0 +1,86 @@
+{
+   "abstract" : "Add Design By Contract easily and flexibly to existing code.",
+   "author" : [
+      "- Arun Prasaad"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-DbC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "2.12",
+            "Module::Runtime" : "0.014",
+            "Params::Validate" : "1.10",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Lib" : "0.002",
+            "Test::More" : "0.98",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "provides" : {
+      "Class::DbC" : {
+         "file" : "lib/Class/DbC.pm",
+         "version" : "0.000001"
+      },
+      "DbC" : {
+         "file" : "lib/DbC.pm",
+         "version" : "0.000001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arunbear/Class-DbC/issues"
+      },
+      "homepage" : "https://github.com/arunbear/Class-DbC",
+      "repository" : {
+         "url" : "git://github.com/arunbear/Class-DbC.git",
+         "web" : "https://github.com/arunbear/Class-DbC"
+      }
+   },
+   "version" : "0.000001",
+   "x_authority" : "cpan:ARUNBEAR",
+   "x_contributors" : [
+      "Arun Prasaad <arunbear@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

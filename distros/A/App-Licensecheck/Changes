@@ -7,6 +7,24 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.32	2018-02-09
+
+ [ REGRESSIONS ]
+ - Adapt testsuite to tolerate misdetecting MPL-1.0 as MPL: Regression
+   caused by more generalized matching.
+
+ [ Documentation ]
+ - Add TODO file, with a bunch of ideas.
+ - Improve POD: Add SEE ALSO section to commandline tool.
+
+ [ Other ]
+ - Adapt and extend testsuite to cover new license patterns supported by
+   Regex::Patterns::License 3.1.0: bdwgc bdwgc-matlab gfdl lgpl-bdwgc.
+ - Optimize slightly: Skip embedded or referenced licenses earlier.
+ - Tighten regexes: Generalize and improve matching.
+ - Use Regexp::Pattern.
+ - Use Regexp::Pattern::License 3.1.0 tags.
+
 v3.0.31	2017-08-16
 
  [ Documentation ]

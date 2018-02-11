@@ -24,6 +24,7 @@ extends 'Business::Fixflo::Resource';
 =head1 ATTRIBUTES
 
     Id
+    AssignedAgent
     BlockId
     BlockName
     Created
@@ -41,6 +42,7 @@ use Carp qw/ confess /;
 
 has [ qw/
     Id
+    AssignedAgent
     BlockId
     BlockName
     Created

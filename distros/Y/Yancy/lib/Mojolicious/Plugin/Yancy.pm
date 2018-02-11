@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -59,6 +59,10 @@ our $VERSION = '0.012';
 #pod and add authentication or authorization. Defaults to allowing access
 #pod to the Yancy web application under C</yancy>, and the REST API under
 #pod C</yancy/api>.
+#pod
+#pod =item return_to
+#pod
+#pod The URL to use for the "Back to Application" link. Defaults to C</>.
 #pod
 #pod =item filters
 #pod
@@ -309,6 +313,7 @@ use Sys::Hostname qw( hostname );
 sub register {
     my ( $self, $app, $config ) = @_;
     my $route = $config->{route} // $app->routes->any( '/yancy' );
+    $route->to( return_to => $config->{return_to} // '/' );
     $config->{controller_class} //= 'Yancy';
 
     # Resources and templates
@@ -675,7 +680,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.012
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -740,6 +745,10 @@ A base route to add Yancy to. This allows you to customize the URL
 and add authentication or authorization. Defaults to allowing access
 to the Yancy web application under C</yancy>, and the REST API under
 C</yancy/api>.
+
+=item return_to
+
+The URL to use for the "Back to Application" link. Defaults to C</>.
 
 =item filters
 

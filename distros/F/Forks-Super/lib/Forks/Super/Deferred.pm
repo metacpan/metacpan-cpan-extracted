@@ -17,7 +17,7 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(queue_job);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # must sync FIRST_DEFERRED_ID with Win32 code in Forks::Super::Util::isValidPid
 use constant FIRST_DEFERRED_ID => -500000;
@@ -62,6 +62,12 @@ sub init {
 	$Forks::Super::QUEUE_INTERRUPT = 'USR1';
     }
     return;
+}
+
+sub deinit {
+    untie $QUEUE_MONITOR_FREQ;
+    untie $INHIBIT_QUEUE_MONITOR;
+    untie $Forks::Super::QUEUE_INTERRUPT;
 }
 
 sub init_child {
@@ -534,11 +540,11 @@ sub Forks::Super::Deferred::QueueInterrupt::STORE {
 
 =head1 NAME
 
-Forks::Super::Deferred
+Forks::Super::Deferred - manage queue of background tasks to perform
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

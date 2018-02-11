@@ -1,3 +1,11 @@
+0.055		2018-02-08	T. R. Wyant
+    Tokenizer method prior() is now fatal. This was documented as
+    package-private, but as it WAS documented, I am putting it through a
+    deprecation cycle anyway. Six months from now it will be removed.
+
+    Add Script_Run classes as subclasses to their superclass docs. This
+    was missed in the last update.
+
 0.054		2018-01-29	T. R. Wyant
     Add support for (+script_run:...). This is an experimental feature
     added in Perl 5.27.8. It imposes on any matches it contains the

@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Recurse;
 
 #
-# $Id: Recurse.pm 1555 2017-03-22 09:47:16Z willem $
+# $Id: Recurse.pm 1623 2018-01-26 14:23:54Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1555 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
 
 
 =head1 NAME
@@ -91,7 +91,7 @@ sub send {
 	$original = $question unless ref($original);		# to preserve original request
 
 	my ( $head, @tail ) = $question->{qname}->label;
-	my $domain = lc join( '.', @tail ) || '.';
+	my $domain = lc( join( '.', @tail ) || '.' );
 	my $nslist = $res->{persistent}->{$domain} ||= [];
 	unless ( defined $head ) {
 		my $defres = new Net::DNS::Resolver();

@@ -1,8 +1,5 @@
 use strict ;
-use Test ;
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
+use Test::More tests => 37;
 
 use Inline (
 	Java => 'DATA',
@@ -10,13 +7,8 @@ use Inline (
 	STARTUP_DELAY => 20,	
 ) ;
 
-use Inline::Java qw(caught) ;
-
-
-BEGIN {
-	my $cnt = 37 ;
-	plan(tests => $cnt) ;
-}
+use Inline::Java qw(cast caught) ;
+use Data::Dumper;
 
 my $mtc_cnt = 0 ;
 my $mtc_mode = 0 ;
@@ -24,32 +16,32 @@ my $t = new t15() ;
 
 {
 	eval {
-		ok($t->add(5, 6), 11) ;
-		ok($t->add_via_perl(5, 6), 11) ;
+		is($t->add(5, 6), 11) ;
+		is($t->add_via_perl(5, 6), 11) ;
 		my $a = $t->incr_via_perl([7, 6, 5]) ;
-		ok($a->[1], 7) ;
+		is($a->[1], 7) ;
 		$a = $t->incr_via_perl_ctx($a) ;
-		ok($a->[1], 8) ;
-		ok($t->mul(5, 6), 30) ;
-		ok($t->mul_via_perl(5, 6), 30) ;
-		ok($t->silly_mul(3, 2), 6) ;
-		ok($t->silly_mul_via_perl(3, 2), 6) ;
+		is($a->[1], 8) ;
+		is($t->mul(5, 6), 30) ;
+		is($t->mul_via_perl(5, 6), 30) ;
+		is($t->silly_mul(3, 2), 6) ;
+		is($t->silly_mul_via_perl(3, 2), 6) ;
 
-		ok(add_via_java(3, 4), 7) ;
+		is(add_via_java(3, 4), 7) ;
 
-		ok($t->add_via_perl_via_java(3, 4), 7) ;
-		ok($t->silly_mul_via_perl_via_java(10, 9), 90) ;
+		is($t->add_via_perl_via_java(3, 4), 7) ;
+		is($t->silly_mul_via_perl_via_java(10, 9), 90) ;
 
-		ok(t15->add_via_perl_via_java_t($t, 6, 9), 15) ;
+		is(t15->add_via_perl_via_java_t($t, 6, 9), 15) ;
 
-		ok($t->cat_via_perl("Inline", "Java"), "InlineJava") ;
+		is($t->cat_via_perl("Inline", "Java"), "InlineJava") ;
 
-		ok($t->perl_static(), 'main->static') ;
+		is($t->perl_static(), 'main->static') ;
 
-		ok(twister(20, 0, 0), "return perl twister") ;
-		ok($t->twister(20, 0, 0), "return java twister") ;
+		is(twister(20, 0, 0), "return perl twister") ;
+		is($t->twister(20, 0, 0), "return java twister") ;
 
-		eval {twister(20, 0, 1)} ; ok($@, qr/^throw perl twister/) ;
+		eval {twister(20, 0, 1)} ; like($@, qr/^throw perl twister/) ;
 				
 		my $msg = '' ;
 		eval {$t->twister(20, 0, 1)} ;
@@ -58,31 +50,31 @@ my $t = new t15() ;
 				$msg = $@->getMessage() ;
 			}
 			else{
-				die $@ ;
+				$msg = $@ ;
 			}
 		}
-		ok($msg, "throw java twister") ;
+		is($msg, "throw java twister") or diag Dumper $msg;
 
-		eval {$t->bug()} ; ok($@, qr/^bug/) ;
+		eval {$t->bug()} ; like($@, qr/^bug/) ;
 
-		ok($t->perlt()->add(5, 6), 11) ;
+		is(cast('t15', $t->perlt())->add(5, 6), 11) ;
 
-		eval {$t->perldummy()} ; ok($@, qr/Can't propagate non-/) ; #'
+		eval {$t->perldummy()} ; like($@, qr/Can't propagate non-/) ; #'
 
 		$t->mtc_callbacks(20) ;
 		$t->StartCallbackLoop() ;
-		ok($mtc_cnt, 20) ;
+		is($mtc_cnt, 20) ;
 
 		$mtc_cnt = -30 ;
 		$t->mtc_callbacks2(50) ;
 		$t->StartCallbackLoop() ;
-		ok($mtc_cnt, 20) ;
+		is($mtc_cnt, 20) ;
 
 		$mtc_cnt = 0 ;
 		$mtc_mode = 1 ;
 		$t->mtc_callbacks2(20) ;
 		$t->StartCallbackLoop() ;
-		ok($mtc_cnt, 20) ;
+		is($mtc_cnt, 20) ;
 
 		$mtc_cnt = 0 ;
 		$mtc_mode = 2 ;
@@ -91,16 +83,16 @@ my $t = new t15() ;
 		while (($mtc_cnt < 20)&&($t->WaitForCallback(-1) > 0)){
 			$t->ProcessNextCallback() ;
 		}
-		ok($mtc_cnt, 20) ;
+		is($mtc_cnt, 20) ;
 
 		$mtc_cnt = 0 ;
 		$mtc_mode = 2 ;
 		$t->mtc_callbacks2(10) ;
 		while ($t->WaitForCallback(3.1416) > 0){
-			ok($t->WaitForCallback(0) >= 1) ;
+			cmp_ok($t->WaitForCallback(0), '>=', 1) ;
 			$t->ProcessNextCallback() ;
 		}
-		ok($mtc_cnt, 10) ;
+		is($mtc_cnt, 10) ;
 
 		# Unfortunately we can't test this because the Thread.run method doesn't allow us
 		# to throw any exceptions...
@@ -117,7 +109,7 @@ my $t = new t15() ;
 	}
 }
 
-ok($t->__get_private()->{proto}->ObjectCount(), 1) ;
+is($t->__get_private()->{proto}->ObjectCount(), 1) ;
 
 
 sub add {

@@ -2,19 +2,19 @@ package Mojolicious::Plugin::DBIxCustom;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Loader qw/load_class/;
 
-our $VERSION = '0.1.2';
+our $VERSION = '1.1.0';
 
 
-sub register {
+sub register{
   my ($self, $app, $conf) = @_;
-  $conf = {%{$conf},%{$app->config->{dbi_config}}} if($app->config->{dbi_config});
-  my $dbi_class = delete $conf->{dbi_class} || 'DBIx::Custom';
+  $conf = {%{$conf}, %{$app->config->{dbi_config}}} if($app->config->{dbi_config});
+  my $dbi_class = delete $conf->{dbi_class} || 'Mojolicious::DBIxCustom';
   my $model_namespace = delete $conf->{model_namespace} if($conf->{model_namespace});
   my $cb = delete $conf->{cb} if($conf->{cb});
   my $dbi;
   my $e = load_class($dbi_class);
   if($e){
-    ref $e ? die $e:die "can't fond the module named '$dbi_class' ,inspect your installed please";
+    ref $e ? die $e : die "can't fond the module named '$dbi_class' ,inspect your installed please";
     return undef;
   }elsif($dbi_class->isa("DBIx::Custom")){
     $dbi = $dbi_class->new($conf);
@@ -22,9 +22,9 @@ sub register {
     if($cb){
       $cb->($dbi);
     }
-    $app->helper(dbi=>sub{state $dbi_connected = $dbi->connect});
-    $app->helper(model=>sub{
-        my ($c,$model_name) = @_;
+    $app->helper(dbi => sub{state $dbi_connected = $dbi->connect});
+    $app->helper(model => sub{
+        my ($c, $model_name) = @_;
         $c->dbi->model($model_name);
       }
     );

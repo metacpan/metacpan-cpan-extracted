@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Log::Any;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 sub register {
   my ($self, $app, $conf) = @_;

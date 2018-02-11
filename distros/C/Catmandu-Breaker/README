@@ -112,7 +112,7 @@ BREAKER FORMAT
         fol05731351   record[][]  0
         fol05731351   record[][]  a
 
-    With a special handler:
+    With the special marc handler:
 
         $ catmandu convert MARC to Breaker --handler marc < t/camel.usmarc
     
@@ -126,6 +126,8 @@ BREAKER FORMAT
         fol05731351   040a  DLC
         fol05731351   040c  DLC
         fol05731351   040d  DLC
+
+    For the Catmandu::PICA tools a pica handler is available.
 
     For the Catmandu::XML tools an xml handler is available:
 
@@ -174,4 +176,8 @@ SEE ALSO
 AUTHOR
 
     Patrick Hochstenbach, <patrick.hochstenbach at ugent.be>
+
+CONTRIBUTORS
+
+    Jakob Voss, nichtich at cpan.org
 

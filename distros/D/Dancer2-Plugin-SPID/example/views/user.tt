@@ -1,0 +1,21 @@
+<h1>User: [% spid_session.nameid %]</h1>
+<h2>SPID Level: [% spid_session.spid_level %]</h2>
+ 
+<p><a href="[% spid_login(level => 2, redirect => '/') %]">Upgrade to L2</a></p>
+ 
+<p><a href="[% spid_logout(redirect => '/') %]">Logout</a></p>
+ 
+<h2>Attributes</h2>
+ 
+<table>
+  <tr>
+    <th>Key</th>
+    <th>Value</th>
+  </tr>
+  [% FOREACH key IN spid_session.attributes.keys %]
+      <tr>
+        <td>[% key %]</td>
+        <td>[% spid_session.attributes.$key.join(', ') %]</td>
+      </tr>
+  [% END %]
+</table>

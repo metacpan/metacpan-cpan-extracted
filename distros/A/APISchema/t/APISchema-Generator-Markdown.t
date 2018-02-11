@@ -113,3 +113,13 @@ sub boolean : Tests {
 
     like $markdown, qr!\btrue\b!;
 }
+
+sub example_null : Tests {
+    my $schema = t::test::fixtures::prepare_example_null;
+
+    my $generator = APISchema::Generator::Markdown->new;
+    my $markdown = $generator->format_schema($schema);
+
+    like $markdown, qr!"value" : null!;
+    like $markdown, qr!\Q|`.value` |`null` | |`null` | |The Value |\E!;
+}

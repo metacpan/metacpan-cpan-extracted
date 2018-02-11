@@ -20,7 +20,7 @@ DBIx::EAV - Entity-Attribute-Value data modeling (aka 'open schema') for Perl
     $eav->schema->deploy;
 
     # register entities
-    $eav->register_types({
+    $eav->declare_entities({
         Artist => {
             many_to_many => 'CD',
             has_many     => 'Review',
@@ -168,24 +168,20 @@ then returns a new instance via [new(\\%constructor\_params)](#new).
 
 # METHODS
 
-## register\_types
+## declare\_entities
 
 - Arguments: \\%schema
 - Return value: none
 
-Registers entity types specified in \\%schema, where each key is the name of the
+Declares entity types specified in \\%schema, where each key is the name of the
 [type](https://metacpan.org/pod/DBIx::EAV::EntityType) and the value is a hashref describing its
 attributes and relationships. Fully described in
 ["ENTITY DEFINITION" in DBIx::EAV::EntityType](https://metacpan.org/pod/DBIx::EAV::EntityType#ENTITY-DEFINITION).
 
-This method ignores types already installed, allowing code that registers types
-to live close to the code that actually uses the types.
-
-When registering types already registered, additional attributes and
-relationships are registered accordingly. To delete attributes and values see
-["PRUNING" in DBIx::EAV::EntityType](https://metacpan.org/pod/DBIx::EAV::EntityType#PRUNING).
-
-See ["INSTALLED VS REGISTERED TYPES"](#installed-vs-registered-types).
+You must declare your entities every time a new instance of DBIx::EAV is created.
+This method stores the entities schema, and calculates a signature for each.
+Next time type() is called the relevant entity type will get registerd or
+updated (if the signature changed)
 
 ## resultset
 
@@ -245,4 +241,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-Carlos Fernando Avila Gratz &lt;cafe@kreato.com.br>
+Carlos Fernando Avila Gratz <cafe@kreato.com.br>

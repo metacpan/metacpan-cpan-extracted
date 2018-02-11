@@ -130,3 +130,13 @@ v0.17   + Require DateTime version 0.76 to avoid problems with rise/set test scr
 
 v0.18   + Fix inconsistency in parsing of hours vs degrees (Eric Jensen)
 
+v0.19   + Astro::Coords::Fixed::array now returns the azimuth and elevation
+          in radians.
+        + Changed the default number of decimal places for
+          Astro::Coords::Angle::Hour to 3.
+        + Updated the format specification used to parse epoch strings in
+          Astro::Coords::Elements (for recent versions of Time::Piece).
+        + Fixed the Astro::Coords::Angle::negate method.
+        + Added warnings about the use of proper motion without parallax.
+          (With Astro::PAL, significant proper motions are not applied
+          unless the parallax is also given.)

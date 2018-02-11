@@ -10,6 +10,7 @@ t/inline.t
 t/leaks.t
 t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
+t/lib/ThreadsCheck.pm
 t/quotify.t
 t/sub-defer-no-subname.t
 t/sub-defer-threads.t

@@ -6,13 +6,13 @@ use Carp;
 
 #==================================================================
 # $Author    : Djibril Ousmanou                                   $
-# $Copyright : 2011                                               $
-# $Update    : 21/10/2011 22:26:14                                $
+# $Copyright : 2018                                               $
+# $Update    : 09/02/2018                                         $
 # $AIM       : Create bars graph                                  $
 #==================================================================
 
 use vars qw($VERSION);
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 use base qw/ Tk::Derived Tk::Canvas::GradientColor /;
 use Tk::Balloon;
@@ -274,7 +274,7 @@ sub _legend {
 
 =for NumberLines:
   We calculate the number of lines set for the legend graph.
-  If wa can set 11 legends per line, then for 3 legend, we will need one line
+  If we can set 11 legends per line, then for 3 legend, we will need one line
   and for 12 legends, we will need 2 lines
   If NbrLeg / NbrPerLine = integer => get number of lines
   If NbrLeg / NbrPerLine = float => int(float) + 1 = get number of lines
@@ -288,7 +288,7 @@ sub _legend {
   }
 
   # Total Height of Legend
-  $cw->{RefChart}->{Legend}{Height} = $cw->{RefChart}->{Legend}{HeightTitle}    # Hauteur Titre lÃ©gende
+  $cw->{RefChart}->{Legend}{Height} = $cw->{RefChart}->{Legend}{HeightTitle}    # Hauteur Titre legende
     + $cw->{RefChart}->{Legend}{NbrLine} * $cw->{RefChart}->{Legend}{HLine};
 
   # Get number legend text max per line to reajust our graph
@@ -305,7 +305,7 @@ sub _viewlegend {
   # legend option
   my $legend_title       = $cw->{RefChart}->{Legend}{title};
   my $legendmarkercolors = $cw->cget( -colordata );
-  my $legendfont         = $cw->{RefChart}->{Legend}{legendfont};
+  my $legendfont         = $cw->cget( -legendfont );
   my $titlecolor         = $cw->{RefChart}->{Legend}{titlecolors};
   my $titlefont          = $cw->{RefChart}->{Legend}{titlefont};
   my $axiscolor          = $cw->cget( -axiscolor );

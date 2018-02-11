@@ -6,7 +6,7 @@ use Catmandu::Expander;
 use Catmandu::Breaker;
 use namespace::clean;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 has tags    => (is => 'ro' , default => sub { +{} });
 has breaker => (is => 'lazy');
@@ -44,3 +44,13 @@ sub add {
 1;
 
 __END__
+
+=head1 NAME
+
+Catmandu::Exporter::Breaker::Parser::json - default handler
+
+=head1 DESCRIPTION
+
+This is the default L<Catmandu::Breaker> handler.
+
+=cut

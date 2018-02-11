@@ -6,17 +6,11 @@ our @EXPORT_OK = qw(prompt DEBUG logger);
 
 use constant DEBUG => $ENV{PERL_RCOMMAND_DEBUG} ? 1 : 0;
 
-use POSIX ();
 use Term::ReadKey 'ReadMode';
 
 sub logger {
-    my $msg;
-    if (@_ == 1) {
-        $msg = $_[0];
-    } else {
-        $msg = sprintf shift, @_;
-    }
-    warn "-> $msg\n";
+    my $msg = @_ == 1 ? $_[0] : sprintf shift, @_;
+    warn " | $msg\n";
 }
 
 sub prompt {

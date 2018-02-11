@@ -32,7 +32,7 @@ use base qw/ Astro::Catalog::IO::ASCII /;
 
 use vars qw/ $VERSION $DEBUG /;
 
-$VERSION = '4.32';
+$VERSION = '4.33';
 $DEBUG = 0;
 
 =head1 METHODS

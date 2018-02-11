@@ -1,0 +1,29 @@
+---
+abstract: 'A boilerplate to enforce the coding style of Sympa mailing list manager'
+author:
+  - 'YOUR NAME <youremail@example.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Kwalitee: '1.27'
+  Test::Simple: '1.302120'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sympatic
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Function::Parameters: '2.001003'
+  Moo: '2.002005'
+  Types::Standard: '1.002001'
+  autodie: '2.29'
+  utf8::all: '0.024'
+version: '0.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

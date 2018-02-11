@@ -13,9 +13,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/_testcomp',
-    'bin/compwithargs',
-    'bin/testcomp'
+    'script/_testcomp',
+    'script/compwithargs',
+    'script/testcomp'
 );
 
 # no fake home requested

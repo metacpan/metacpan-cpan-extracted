@@ -43,7 +43,7 @@ use overload
 # Package Global variables
 use vars qw/ $VERSION /;
 
-$VERSION = '0.03';
+$VERSION = '0.19';
 
 =head1 METHODS
 
@@ -490,7 +490,7 @@ sub negate {
   croak "Angle can not be negated since its range is 0 to 2PI"
     if $self->range eq '2PI';
   my $rad = $self->radians;
-  return $self->new( $rad, units => 'radians', range => $self->range );
+  return $self->new( $rad * -1.0, units => 'radians', range => $self->range );
 }
 
 =back

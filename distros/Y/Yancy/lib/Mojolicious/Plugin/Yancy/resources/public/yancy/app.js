@@ -30,7 +30,10 @@ Vue.component('edit-field', {
             fieldType = 'checkbox';
         }
         else if ( this.schema.type == 'string' ) {
-            if ( this.schema.format == 'email' ) {
+            if ( this.schema.format == 'textarea' ) {
+                fieldType = 'textarea';
+            }
+            else if ( this.schema.format == 'email' ) {
                 fieldType = 'email';
             }
             else if ( this.schema.format == 'url' ) {
@@ -148,15 +151,28 @@ Vue.component('item-form', {
     },
     computed: {
         properties: function () {
-            var props = {}, schema = this.schema;
+            var props = [], schema = this.schema;
             for ( var key in schema.properties ) {
                 var prop = schema.properties[ key ];
+                var defaults = { name: key };
                 if ( prop[ 'x-hidden' ] || ( prop['readOnly'] && !this.showReadOnly ) ) {
                     continue;
                 }
-                props[ key ] = prop;
+                if ( typeof prop['x-order'] == 'undefined' ) {
+                    defaults['x-order'] = 999999;
+                }
+                if ( !prop.title ) {
+                    defaults.title = key;
+                }
+                props.push( Object.assign( defaults, prop ) );
             }
-            return props;
+            return props.sort( function (a, b) {
+                return a['x-order'] < b['x-order'] ? -1
+                    : a['x-order'] > b['x-order'] ?  1
+                    : a.name < b.name ? -1
+                    : a.name > b.name ? 1
+                    : 0;
+            } );
         },
         example: function () {
             return this.schema.example || {};
@@ -178,6 +194,7 @@ var app = new Vue({
     data: function () {
         var current = this.parseHash();
         return {
+            hasCollections: null,
             currentCollection: current.collection || null,
             collections: {},
             openedRow: null,
@@ -221,6 +238,7 @@ var app = new Vue({
         parseSpec: function ( spec ) {
             var pathParts = [], collectionName, collection, pathObj, firstCollection;
             this.collections = {};
+            this.hasCollections = false;
 
             // Preprocess definitions
             for ( var defKey in spec.definitions ) {
@@ -268,6 +286,7 @@ var app = new Vue({
                 if ( !firstCollection ) {
                     firstCollection = collectionName;
                 }
+                this.hasCollections = true;
 
                 // Array operations
                 if ( pathParts.length == 2 ) {
@@ -530,7 +549,10 @@ var app = new Vue({
             return Math.floor( this.total / this.perPage ) + 1;
         },
         operations: function () {
-            return this.collections[ this.currentCollection ].operations;
+            return this.collections[ this.currentCollection ] ? this.collections[ this.currentCollection ].operations : {};
+        },
+        schema: function () {
+            return this.operations.get ? this.operations.get.schema : {};
         }
     },
     watch: {

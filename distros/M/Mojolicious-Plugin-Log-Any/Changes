@@ -1,3 +1,10 @@
+0.004     2018-02-06 23:16:16 EST
+  - Require Log::Any 1.00 for Log::Any testing
+
+0.003     2018-02-06 14:05:06 EST
+  - Require Log::Contextual 0.008001 when attaching it as a logger
+  - Import slog_ functions individually from Log::Contextual
+
 0.002     2017-12-05 02:28:09 EST
   - Quick breaking change: Unsubscribe the default message handler in the
     plugin, not the role

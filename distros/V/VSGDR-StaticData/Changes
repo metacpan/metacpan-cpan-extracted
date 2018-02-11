@@ -58,21 +58,23 @@ Revision history for VSGDR::StaticData
         Made StaticDataPopulationId an identity column.
 0.27    02/09/2015
         Fixed new perl 5.22 error message.
-		Can't use an array as a reference at C:/strawberry-perl/perl/site/lib/VSGDR/StaticData.pm line 122.
+        Can't use an array as a reference at C:/strawberry-perl/perl/site/lib/VSGDR/StaticData.pm line 122.
 0.28    02/09/2015
         Begin/End around rollback to savepoint and commit section.
 0.29    05/09/2015
-		Just found out about interaction between xact_state() and @@trancount.  Trying to fix the generated code.
+        Just found out about interaction between xact_state() and @@trancount.  Trying to fix the generated code.
 0.30    29/09/2015
-		Typo fix.
+        Typo fix.
 0.31    20/10/2016
-		Quoted output column names.
+        Quoted output column names.
 0.32    19/04/2017
-		Justified data columns.  May make this optional at a later date.
+        Justified data columns.  May make this optional at a later date.
 0.33    14/12/2017
-		Fixed null value in precision for float types.
+        Fixed null value in precision for float types.
 0.34	06/02/2018
-		Updated non-pk version of insert to use select .. except checks.  Took out the verbose older method.  Now matches the update logic better.
+        Updated non-pk version of insert to use select .. except checks.  Took out the verbose older method.  Now matches the update logic better.
+0.35	06/02/2018
+        Re-fixed broken multi-column pk/uk logic.
 
         
 	

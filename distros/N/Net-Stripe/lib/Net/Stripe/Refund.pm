@@ -1,5 +1,5 @@
 package Net::Stripe::Refund;
-$Net::Stripe::Refund::VERSION = '0.33';
+$Net::Stripe::Refund::VERSION = '0.34';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -52,7 +52,7 @@ Net::Stripe::Refund - represent a Refund object from Stripe
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 ATTRIBUTES
 

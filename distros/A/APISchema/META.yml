@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,7 @@ no_index:
 provides:
   APISchema:
     file: lib/APISchema.pm
-    version: '1.36'
+    version: '1.37'
   APISchema::DSL:
     file: lib/APISchema/DSL.pm
   APISchema::Generator::Markdown:
@@ -92,10 +92,11 @@ resources:
   bugtracker: https://github.com/hitode909/APISchema/issues
   homepage: https://github.com/hitode909/APISchema
   repository: git://github.com/hitode909/APISchema.git
-version: '1.36'
+version: '1.37'
 x_authority: cpan:HITODE
 x_contributors:
-  - 'Tomohiro Nishimura <tomohiro68@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-  - 'aereal <aereal@aereal.org>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'
+  - 'Tomohiro Nishimura <tomohiro68@gmail.com>'
+  - 'aereal <aereal@aereal.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

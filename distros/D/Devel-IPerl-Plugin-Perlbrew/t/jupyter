@@ -1,0 +1,15 @@
+## -*- mode: perl; -*-
+use strict;
+use warnings;
+use feature 'say';
+use Path::Class qw{dir};
+
+sub main {
+  my ($class, $tmp) = (shift, shift || '.');
+  my $dir = dir($tmp)->subdir(qw{data});
+  $dir->mkpath;
+  say $dir;
+  return 0;
+}
+
+exit(__PACKAGE__->main(@ARGV)) unless caller();

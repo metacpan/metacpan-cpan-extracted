@@ -46,6 +46,7 @@ WriteMakefile(
         'File::Basename'         => 0,
         'File::HomeDir'          => 0,
         'File::Spec::Functions'  => 0,
+        'List::MoreUtils'        => 0,
         'List::Util'             => 0,
         'Term::Choose'           => '1.509',
         'Term::Choose::LineFold' => '1.509',

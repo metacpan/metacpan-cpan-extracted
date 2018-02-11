@@ -6,7 +6,7 @@ use Astro::Catalog::Item::Morphology;
 
 use base qw/ Astro::Catalog::Item::Morphology /;
 use vars qw/ $VERSION /;
-$VERSION = "4.32";
+$VERSION = "4.33";
 
 =head1 NAME
 

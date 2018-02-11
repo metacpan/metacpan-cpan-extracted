@@ -40,10 +40,9 @@ my %WriteMakefileArgs = (
     "Sub::Name" => 0,
     "Test::Builder" => 0,
     "Test::More" => 0,
-    "experimental" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +68,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "base" => 0,
   "constant" => 0,
-  "experimental" => 0,
   "lib" => 0,
   "strict" => 0,
   "vars" => 0,

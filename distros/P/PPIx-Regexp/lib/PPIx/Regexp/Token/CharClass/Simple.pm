@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{
     MINIMUM_PERL TOKEN_LITERAL TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 {
 

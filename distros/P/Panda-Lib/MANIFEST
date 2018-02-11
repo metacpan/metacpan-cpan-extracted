@@ -1,16 +1,23 @@
+CallbackDispatcher.xsi
 Changes
 Lib.xs
+Lib.xs.orig
 lib/Panda/Lib.pm
 lib/Panda/Lib.pod
 Makefile.PL
+Makefile.PL.orig
 MANIFEST			This list of files
 misc/mytest.plx
+misc/mytest.plx.orig
+NativeCallbackDispatcher.xsi
 src/xs/lib/clone.cc
 src/xs/lib/clone.h
 src/xs/lib/cmp.cc
 src/xs/lib/cmp.h
 src/xs/lib/merge.cc
 src/xs/lib/merge.h
+src/xs/lib/NativeCallbackDispatcher.h
+src/xs/lib/XSCallbackDispatcher.h
 t/00-Panda-Util.t
 t/01-string_hash.t
 t/02-crypt_xor.t
@@ -20,6 +27,8 @@ t/05-endecode_utf8_struct.t
 t/06-clone.t
 t/07-hash_cmp.t
 t/08-merge.t
+t/09-CallbackDispatcher.t
 t/99-leaks.t
+typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

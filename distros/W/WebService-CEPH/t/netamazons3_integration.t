@@ -25,8 +25,8 @@ sub test_case {
 ## Test cases
 ##
 
-# Метод падает Attribute (owner_id) does not pass the type constraint because: Validation failed for 'OwnerId'
-# Отложиено до фикса бага.
+# get_buckets_list method returns an error  "Attribute (owner_id) does not pass the type constraint because: Validation failed for 'OwnerId'"
+# TODO: uncomment when method bug fixed
 #test_case "get_buckets_list" => sub {
 #    my ($msg, $ceph) = @_;
 #    $ceph->get_buckets_list();

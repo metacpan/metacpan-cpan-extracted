@@ -1,3 +1,21 @@
+Version 5.16 - 10 February 2018
+
+- make clear URPM needs rpm >= 4.14
+- restore compatibility with rpm-4.12.x & 4.13.x
+- revert fix for segfault with rpm-4.14 when checking invalid signatures as rpm
+  got fixed
+- restore rpm-4.12.x compatibility
+- restore rpm-4.13.x compatibility
+- use ExtUtils::PkgConfig in order to get rpm installed
+- cpan testers:
+  o add cflags reported by pkgconfig
+    (needed for eg: FreeBSD where rpm is installed under /usr/local)
+  o advertize the proper pkg for most distros
+  o skip all rpmdb tests on Debian/Ubutun
+  o skip failing tests on *BSD
+- switch Urpm_verify_rpm() to use rpmReadPackageFile() to support back ignoring
+  signatures with rpm 4.14 (mga#21886)
+
 Version 5.15 - 3 October 2017
 
 - testsuite:

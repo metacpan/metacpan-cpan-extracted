@@ -9,6 +9,8 @@ requires 'SQL::Translator', '0.11021';
 requires 'Lingua::EN::Inflect', '1.899';
 requires 'namespace::clean';
 requires 'Class::Load';
+requires 'Data::Dumper';
+requires 'Digest::MD5';
 
 on 'test' => sub {
 

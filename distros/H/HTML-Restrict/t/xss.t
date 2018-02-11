@@ -21,7 +21,7 @@ is $hr->process('<a href="javascript&#58;evil_script()">evil</a>'),
 foreach my $uri (
     'http://vilerichard.com', 'https://vilerichard.com',
     '//vilerichard.com',      '/music'
-    ) {
+) {
     my $img = qq[<a href="$uri">click</a>];
     is $hr->process($img), $img, "good uri scheme preserved";
 }

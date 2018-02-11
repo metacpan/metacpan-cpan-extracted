@@ -22,14 +22,10 @@ BEGIN {
 	}
 }
 
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test' ;
-
 use Inline (
 	Java => 't/shared.java',
 	SHARED_JVM => 1,
-	PORT => 17891,
+	PORT => 17892,
 	NAME => 't10',
 ) ;
 

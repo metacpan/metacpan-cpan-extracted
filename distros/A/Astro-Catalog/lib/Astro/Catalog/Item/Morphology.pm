@@ -24,7 +24,7 @@ use Number::Uncertainty;
 
 use warnings::register;
 
-$VERSION = "4.32";
+$VERSION = "4.33";
 
 =head1 METHODS
 

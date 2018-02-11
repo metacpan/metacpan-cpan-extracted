@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::JSON::MaybeXS:
     file: lib/Mojo/JSON/MaybeXS.pm
-    version: '1.000'
+    version: '1.001'
 recommends:
   Cpanel::JSON::XS: '3.0207'
 requires:
@@ -38,10 +38,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-JSON-MaybeXS/issues
   homepage: https://github.com/Grinnz/Mojo-JSON-MaybeXS
   repository: https://github.com/Grinnz/Mojo-JSON-MaybeXS.git
-version: '1.000'
+version: '1.001'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -90,13 +90,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.9.4
+          git_version: 2.14.3
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.030'
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
@@ -104,7 +104,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::DBOOK/CheckChangesHasContent'
-      version: '0.010'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -118,10 +118,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.4
+          git_version: 2.14.3
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -133,7 +133,7 @@ x_Dist_Zilla:
           global: 0
           skip_version_provider: 0
       name: '@Author::DBOOK/RewriteVersion'
-      version: '0.015'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::DBOOK/NextRelease'
@@ -171,12 +171,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.4
+          git_version: 2.14.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -184,16 +184,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.000
+          tag: v1.001
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.4
+          git_version: 2.14.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -204,7 +204,7 @@ x_Dist_Zilla:
           global: 0
           munge_makefile_pl: 0
       name: '@Author::DBOOK/BumpVersionAfterRelease'
-      version: '0.015'
+      version: '0.017'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -219,12 +219,12 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.4
+          git_version: 2.14.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -233,10 +233,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.4
+          git_version: 2.14.3
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
@@ -266,7 +266,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.042'
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:

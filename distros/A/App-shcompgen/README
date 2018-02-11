@@ -2,8 +2,8 @@ NAME
     App::shcompgen - Generate shell completion scripts
 
 VERSION
-    This document describes version 0.320 of App::shcompgen (from Perl
-    distribution App-shcompgen), released on 2017-08-10.
+    This document describes version 0.321 of App::shcompgen (from Perl
+    distribution App-shcompgen), released on 2018-02-08.
 
 FUNCTIONS
   detect_prog
@@ -483,7 +483,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

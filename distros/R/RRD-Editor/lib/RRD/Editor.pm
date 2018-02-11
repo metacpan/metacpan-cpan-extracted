@@ -20,7 +20,7 @@ use Config;
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 
-$VERSION = '0.18';
+$VERSION = '0.19';
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
@@ -889,29 +889,40 @@ sub add_RRA {
 sub delete_RRA {
     # delete an RRA
     my ($self, $idx) = @_;  my $rrd=$self->{rrd};
-    if ($idx > $rrd->{rra_cnt} || $idx<0) {croak("RRA index out of range\n");}
+    if ($idx >= $rrd->{rra_cnt} || $idx < 0) { croak("RRA index out of range\n"); }
     # load RRA data, if not already loaded
     if (!defined($rrd->{dataloaded})) {$self->_loadRRAdata;}
-    # update RRA 
+    # update RRA
     $rrd->{rra_cnt}--;
-    for (my $i=$idx; $i<$rrd->{rra_cnt}; $i++) {
-        $rrd->{rra}[$i]=$rrd->{rra}[$i+1];
-    }
+    splice(@{$rrd->{rra}}, $idx, 1);
     return 1;
 }
 
 sub resize_RRA {
     my ($self, $idx, $size) = @_;  my $rrd=$self->{rrd};
-    
-    if ($idx > $rrd->{rra_cnt} || $idx<0) {croak("RRA index out of range\n");}
+
+    if ($idx >= $rrd->{rra_cnt} || $idx < 0) { croak("RRA index out of range\n"); }
     if ($size < 0) {$size=0;}
     # load RRA data, if not already loaded
     if (!defined($rrd->{dataloaded})) {$self->_loadRRAdata;}
     # update data
-    my @empty=((NAN)x$rrd->{ds_cnt});
-    for (my $i=$rrd->{rra}[$idx]->{row_cnt}; $i<$size; $i++) {
-        $rrd->{rra}[$idx]->{data}[$i] = $self->_packd(\@empty);
+    my $row_cnt = $rrd->{rra}[$idx]->{row_cnt};
+    my $ptr = $rrd->{rra}[$idx]->{ptr};
+    my $empty = $self->_packd([(NAN)x$rrd->{ds_cnt}]);
+
+    if ($size > $row_cnt) {
+        # Expand
+        splice( @{$rrd->{rra}[$idx]->{data}}, $ptr+1, 0, ( ($empty)x($size-$row_cnt) ) );
+    } elsif ($size < $row_cnt) {
+        # Shrink; removing tail
+        my $cnt_strip = $row_cnt-$size;
+        my $tail = ($ptr+1 + $cnt_strip > $row_cnt ? $row_cnt - $ptr-1 : $cnt_strip);
+        splice(@{$rrd->{rra}[$idx]->{data}}, $ptr+1, $tail) if $tail > 0;
+
+        # then removing head if remainder
+        splice(@{$rrd->{rra}[$idx]->{data}}, 0, $cnt_strip-$tail) if $tail < $cnt_strip;
     }
+
     $rrd->{rra}[$idx]->{row_cnt} = $size;
     return 1;
 }
@@ -919,7 +930,7 @@ sub resize_RRA {
 sub set_RRA_xff {
     # schange xff value for an RRA
     my ($self, $idx, $xff) = @_;  my $rrd=$self->{rrd};
-    if ($idx > $rrd->{rra_cnt} || $idx<0) {croak("RRA index out of range\n");}
+    if ($idx >= $rrd->{rra_cnt} || $idx < 0) { croak("RRA index out of range\n"); }
     $rrd->{rra}[$idx]->{xff}=$xff;
     return 1;
 }
@@ -1599,6 +1610,7 @@ sub save {
         }
     }    
     # done
+    truncate($fd, tell($fd));
 
     # and exit
     return 1;
@@ -2260,7 +2272,7 @@ L<rrdtool.pl|http://cpansearch.perl.org/src/DOUGLEITH/RRD-Editor-0.12/scripts/rr
  
 =head1 VERSION
  
-Ver 0.18
+Ver 0.19
  
 =head1 AUTHOR
  

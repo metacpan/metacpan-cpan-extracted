@@ -1,5 +1,0 @@
-TYPEMAP
-
-test::String   T_STRING
-test::String*  T_OPTR
-test::String2* T_OPTR

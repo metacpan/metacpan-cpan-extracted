@@ -1,6 +1,6 @@
 package Catmandu::Store::File::BagIt;
 
-our $VERSION = '1.0602';
+our $VERSION = '0.211';
 
 use Catmandu::Sane;
 use Moo;
@@ -12,7 +12,8 @@ use Catmandu::Store::File::BagIt::Bag;
 use Data::UUID;
 use namespace::clean;
 
-with 'Catmandu::FileStore', 'Catmandu::Droppable';
+with 'Catmandu::FileStore';
+with 'Catmandu::Droppable';
 
 has root    => (is => 'ro', required => '1');
 has uuid    => (is => 'ro', trigger  => 1);
@@ -91,6 +92,9 @@ Catmandu::Store::File::BagIt - A Catmandu::FileStore to store files on disk in t
     # Download the file 'myfile.txt' from the container '1234'
     $ catmandu stream File::BagIt --root t/data --bag 1234 --id myfile.txt to /tmp/output.txt
 
+    # Delete the file 'myfile.txt' from the container '1234'
+    $ catmandu delete File::BagIt --root t/data --bag 1234 --id myfile.txt
+
     # From Perl
     use Catmandu;
 
@@ -141,7 +145,12 @@ is stored as
 In this directory all the L<Catmandu::FileBag> items are stored as
 flat files.
 
-=head1 CONFIGURATION
+=head1 METHODS
+
+=head2 new(root => $path , [ keysize => NUM , uuid => 1])
+
+Create a new Catmandu::Store::File::BagIt with the following configuration
+parameters:
 
 =over
 
@@ -161,10 +170,52 @@ If the to a true value, then the Simple store will require UUID-s as keys
 
 =back
 
+=head1 LARGE FILE SUPPORT
+
+Streaming large files into a BagIt requires a large /tmp directory. The location
+of the temp directory can be set with the TMPDIR environmental variable.
+
+=head1 INHERITED METHODS
+
+This Catmandu::FileStore implements:
+
+=over 3
+
+=item L<Catmandu::FileStore>
+
+=item L<Catmandu::Droppable>
+
+=back
+
+The index Catmandu::Bag in this Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Bag>
+
+=item L<Catmandu::FileBag::Index>
+
+=item L<Catmandu::Droppable>
+
+=back
+
+The file Catmandu::Bag in this Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Bag>
+
+=item L<Catmandu::FileBag>
+
+=item L<Catmandu::Droppable>
+
+=back
+
 =head1 SEE ALSO
 
 L<Catmandu::Store::File::BagIt::Index>,
 L<Catmandu::Store::File::BagIt::Bag>,
+L<Catmandu::Plugin::SideCar>,
 L<Catmandu::FileStore>
 
 =cut

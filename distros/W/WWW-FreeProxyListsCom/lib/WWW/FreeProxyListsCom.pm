@@ -3,9 +3,10 @@ package WWW::FreeProxyListsCom;
 use warnings;
 use strict;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use Carp;
+use Data::Dumper;
 use URI;
 use WWW::Mechanize;
 use HTML::TokeParser::Simple;
@@ -19,6 +20,7 @@ __PACKAGE__->mk_group_accessors( simple => qw/
     debug
     list
     filtered_list
+    url_list
 /);
 
 sub new {
@@ -158,6 +160,29 @@ sub filter {
     }
     return $self->filtered_list( \@filtered );
 }
+sub urls {
+    my ($self) = @_;
+
+    my $proxies = $self->filtered_list ? $self->filtered_list : $self->list;
+
+    if (! @$proxies){
+        $self->_set_error(
+           'Proxy list seems to be undefined, did you call get_list() first?'
+        );
+    }
+
+    my @urls;
+
+    for (@$proxies){
+        my $protocol = $_->{is_https} eq 'true'
+            ? 'https'
+            : 'http';
+
+            push @urls, join '', "$protocol://", join ':', @$_{qw(ip port)};
+    }
+
+    return $self->url_list(\@urls);
+}
 sub _parse_list {
     my ( $self, $content ) = @_;
 
@@ -224,7 +249,7 @@ __END__
 
 =head1 NAME
 
-WWW::FreeProxyListsCom - get proxy lists from http://www.freeproxylists.com
+WWW::FreeProxyListsCom - Fetch proxy lists from http://www.freeproxylists.com
 
 =for html
 <a href="http://travis-ci.org/stevieb9/p5-www-freeproxylistscom"><img src="https://secure.travis-ci.org/stevieb9/p5-www-freeproxylistscom.png"/>
@@ -238,17 +263,13 @@ WWW::FreeProxyListsCom - get proxy lists from http://www.freeproxylists.com
 
     use WWW::FreeProxyListsCom;
 
-    my $prox = WWW::FreeProxyListsCom->new;
+    my $fpl = WWW::FreeProxyListsCom->new;
 
-    my $ref = $prox->get_list( type => 'non_anonymous' )
-        or die $prox->error;
+    my $proxy_list = $fpl->get_list or die $prox->error;
 
-    print "Got a list of " . @$ref . " proxies\nFiltering...\n";
+    $proxy_list = $fpl->filter(type => 'is_https');
 
-    $ref = $prox->filter( port => qr/(80){1,2}/ );
-
-    print "Filtered list contains: " . @$ref . " proxies\n"
-            . join "\n", map( "$_->{ip}:$_->{port}", @$ref), '';
+    my $formatted_into_urls = $fpl->urls;
 
 =head1 DESCRIPTION
 
@@ -259,12 +280,12 @@ L<http://www.freeproxylists.com/>
 
 =head2 C<new>
 
-    my $prox = WWW::FreeProxyListCom->new;
+    my $fpl = WWW::FreeProxyListCom->new;
 
-    my $prox2 = WWW::FreeProxyListCom->new(
-        timeout     => 20, # or 'mech'
-        mech        => WWW::Mechanize->new( agent => 'foos', timeout => 20 ),
-        debug       => 1,
+    my $fpl2 = WWW::FreeProxyListCom->new(
+        timeout => 20, # or 'mech'
+        mech    => WWW::Mechanize->new(agent => 'foos', timeout => 20),
+        debug   => 1
     );
 
 Bakes up and returns a fresh WWW::FreeProxyListCom object. Takes a few
@@ -272,16 +293,16 @@ arguments, all of which are I<optional>. Possible arguments are as follows:
 
 =head3 C<timeout>
 
-    my $prox = WWW::FreeProxyListCom->new( timeout => 10 );
+    my $fpl = WWW::FreeProxyListCom->new(timeout => 10);
 
 Takes a scalar as a value which is the value that will be passed to
 the L<WWW::Mechanize> object to indicate connection timeout in seconds.
-B<Defaults to:> C<30> seconds
+B<Defaults to:> C<30> seconds.
 
 =head3 C<mech>
 
-    my $prox = WWW::FreeProxyListCom->new(
-        mech => WWW::Mechanize->new( agent => '007', timeout => 10 ),
+    my $fpl = WWW::FreeProxyListCom->new(
+        mech => WWW::Mechanize->new(agent => '007', timeout => 10),
     );
 
 If a simple timeout is not enough for your needs feel free to specify
@@ -292,7 +313,7 @@ is set to as well as C<agent> argument is set to mimic FireFox.
 
 =head3 C<debug>
 
-    my $prox = WWW::FreeProxyListCom->new( debug => 1 );
+    my $fpl = WWW::FreeProxyListCom->new(debug => 1);
 
 When set to a true value will make the object print out some debugging
 info. B<Defaults to:> C<0>
@@ -301,13 +322,12 @@ info. B<Defaults to:> C<0>
 
 =head2 C<get_list>
 
-    my $list_ref = $prox->get_list
-        or die $prox->error;
+    my $proxy_list = $fpl->get_list or die $fpl->error;
 
-    my $list_ref2 = $prox->get_list(
-        type        => 'standard',
-        max_pages   => 5,
-    ) or die $prox->error;
+    my $fpl2 = $fpl->get_list(
+        type      => 'standard',
+        max_pages => 5,
+    ) or die $fpl->error;
 
 Instructs the object ot fetch a list of proxies from
 L<http://www.freeproxylists.com/> website. On failure returns either
@@ -324,7 +344,7 @@ as follows:
 
 =head3 C<type>
 
-    ->get_list( type => 'standard' );
+    type => $string
 
 B<Optional>. Specifies the list of proxies to fetch. B<Defaults to:> C<elite>.
 Possible arguments are as follows. Note all are plain HTTP except C<socks> and
@@ -343,7 +363,7 @@ C<https>.
 
 =head3 C<max_pages>
 
-    ->get_list( max_pages => 4 );
+    max_pages => $int
 
 B<Optional>. Specifies how many "lists" to fetch. In other words, if
 you go to list section titled "http elite proxies" you'll see several lists
@@ -402,7 +422,7 @@ Corresponds to "HTTPS" column on the site.
 
 =head2 C<filter>
 
-    my $filtered_list_ref = $prox->filter(
+    my $filtered_list = $fpl->filter(
         port        => 80,
         ip          => qr/^120/,
         country     => 'Russia',
@@ -428,8 +448,8 @@ arguments and call it after successfull C<get_list()>.
 
 =head2 C<error>
 
-    my $list_ref = $prox->get_list
-        or die $prox->error;
+    my $proxy_list = $fpl->get_list
+        or die $fpl->error;
 
 When either C<get_list()> or C<filter()> methods fail they will return
 either C<undef> or an empty list depending on the context and the reason
@@ -437,39 +457,55 @@ for the failure will be available via C<error()> method. Takes no arguments,
 returns a human parsable message explaining why C<get_list()> or C<filter()>
 failed.
 
-=head2 C<list>
+=head2 C<urls>
 
-    my $last_list_ref = $prox->list;
+    my $proxy_urls = $fpl->urls;
 
-Must be called after a successfull call to C<get_list()>. Takes no arugments,
-returns the same arrayref of hashrefs last call to C<get_list()> returned.
-
-=head2 C<filtered_list>
-
-    my $last_filtered_list_ref = $prox->filtered_list;
-
-Must be called after a successfull call to C<filter()>. Takes no arugments,
-returns the same arrayref of hashrefs last call to C<filter()> returned.
+Must be called after a successful call to C<get_list()>. Takes no arguments,
+returns an array reference of proxies. Each element is a string, in the
+following format: C<https://ip_address:port>.
 
 =head2 C<mech>
 
-    my $old_mech = $prox->mech;
+    my $old_mech = $fpl->mech;
 
-    $prox->mech( WWW::Mechanize->new( agent => 'blah' ) );
+    $fpl->mech(WWW::Mechanize->new(agent => 'blah'));
 
 Returns a L<WWW::Mechanize> object used for fetching proxy lists.
 When called with an
 optional argument (which must be a L<WWW::Mechanize> object) will use it
 in any subsequent C<get_list()> calls.
 
+=head2 C<list>
+
+    my $cached_proxy_list = $fpl->list;
+
+Must be called after a successfull call to C<get_list()>. Takes no arugments,
+returns the same arrayref of hashrefs last call to C<get_list()> returned.
+
+=head2 C<filtered_list>
+
+    my $cached_filtered_proxy_list = $fpl->filtered_list;
+
+Must be called after a successfull call to C<filter()>. Takes no arugments,
+returns the same arrayref of hashrefs last call to C<filter()> returned.
+
 =head2 C<debug>
 
-    my $old_debug = $prox->debug;
+    my $old_debug = $fpl->debug;
 
-    $prox->debug( 1 );
+    $fpl->debug(1);
 
 Returns a currently set debug flag (see C<debug> argument to constructor).
 When called with an argument will set the debug flag to the value specified.
+
+=head2 C<debug_list>
+
+    my $cached_urls = $fpl->url_list;
+
+Returns the same list after the last successful call to C<urls()> without the
+module re-processing the proxies that were acquired in the previous call to
+C<get_list()>.
 
 =head1 AUTHOR
 
@@ -486,7 +522,7 @@ Please report any bugs or feature requests to L<https://github.com/stevieb9/p5-w
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2016 Steve Bertrand
+Copyright 2016, 2018 Steve Bertrand
 
 Copyright 2008 Zoffix Znet, all rights reserved.
 

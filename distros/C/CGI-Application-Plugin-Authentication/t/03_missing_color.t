@@ -2,7 +2,6 @@
 use Test::More;
 use Test::Taint;
 use Test::Regression;
-use Test::NoWarnings;
 use Test::Warn;
 use Test::Without::Module qw(Color::Calc);
 use English qw(-no_match_vars);
@@ -103,4 +102,7 @@ sub make_output_timeless {
         return $output;
 }
 
+# Test::NoWarn doesn't play nice with the windows skip_all
+require Test::NoWarnings;
+Test::NoWarnings::had_no_warnings();
 

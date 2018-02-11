@@ -1,16 +1,13 @@
 package App::CPAN::Search;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use CPAN;
 use Class::Utils qw(set_params);
 use Getopt::Std;
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -95,11 +92,9 @@ App::CPAN::Search - Base class for cpan-search script.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::CPAN::Search;
 
  # Arguments.
@@ -133,17 +128,17 @@ L<https://github.com/tupinek/App-CPAN-Search>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
+ © 2015-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

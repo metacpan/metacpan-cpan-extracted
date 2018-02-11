@@ -1,6 +1,6 @@
 #!perl
 use strict;
-use Test::More tests => 102;
+use Test::More tests => 105;
 use Test::Number::Delta within => 1e-9;
 use Scalar::Util qw/ looks_like_number /;
 
@@ -313,6 +313,24 @@ if ($newbopp) {
 } else {
   ok(0, "Failed to create clone of elements object");
 }
+
+# Test parsing of date strings in for elements EPOCH.
+$c = new Astro::Coords(
+    elements => {EPOCH => '2013 Dec 04.0',
+                 ORBINC => 62.40397752235779 * &Astro::PAL::DD2R,
+                 ANODE => 295.65203155196 * &Astro::PAL::DD2R,
+                 PERIH => 345.5312406205832 * &Astro::PAL::DD2R,
+                 AORQ => 0.01245259242960607,
+                 E => 1.000201003833968,
+                 EPOCHPERIH => '2013 Nov 28.7786582736',
+                },
+    name => 'ISON');
+ok($c, 'Instantiate element object for ISON');
+my %c_elements = $c->elements();
+delta_ok($c_elements{'EPOCH'}, 56630.0,
+         'Compare parsed elements EPOCH');
+delta_ok($c_elements{'EPOCHPERIH'}, 56624.7786582736,
+         'Compare parsed elements EPOCHPERIH');
 
 # Make sure we can get a list of planet names
 my @planets = Astro::Coords::Planet->planets();

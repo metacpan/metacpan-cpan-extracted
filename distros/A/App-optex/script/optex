@@ -36,7 +36,7 @@ use Pod::Usage;
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use Cwd qw(abs_path);
-use List::Util qw(uniq);
+use List::Util qw(uniq max);
 use Text::ParseWords qw(shellwords);
 use IO::File;
 use TOML;
@@ -307,11 +307,15 @@ sub _ls {
     };
     $dir->close;
 
+    my $max = max map length, @dirent;
     for my $ent (@dirent) {
 	my $path = "$bin_dir/$ent";
 	if (-l $path) {
 	    print $op->{path} ? $path : $ent;
-	    printf " -> %s", readlink $path if $op->{long};
+	    if ($op->{long}) {
+		print ' ' x ($max - length $ent);
+		print " -> ", readlink $path;
+	    }
 	    print "\n";
 	}
 	warn "$ent: not exist\n" unless -f $path;
@@ -395,7 +399,7 @@ module L<Getopt::EX>.  It enables user to define their own option
 aliases for any commands on the system, and provide module style
 extendible capability.
 
-Target command is given as argument:
+Target command is given as an argument:
 
     % optex command
 

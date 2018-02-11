@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Signposting
 
+0.04  2018-02-09 12:53:04 CET
+    - correct path matching
+    - better pod
+
 0.03  2018-01-26 12:52:49 CET
 	- introdcue sub class 'Catmandu'
 	- add pod

@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1606 2017-11-30 10:13:43Z willem $
+# $Id: RR.pm 1611 2018-01-02 09:41:24Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1606 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1611 $)[1];
 
 
 =head1 NAME
@@ -135,7 +135,7 @@ sub _new_string {
 		my $rdlen = shift(@token) || 0;
 		my $rdata = pack 'H*', join( '', @token );
 		croak 'length and hexadecimal data inconsistent' unless $rdlen == length $rdata;
-		$self->rdata($rdata) if $rdlen;			# unpack RDATA
+		$self->rdata($rdata);				# unpack RDATA
 		return $self;
 	}
 
@@ -182,13 +182,12 @@ sub _new_hash {
 		$attribute{lc $key} = shift;
 	}
 
-	my ( $owner, $name, $type, $class, $ttl ) = @attribute{@core};
-	delete @attribute{@core};				# leaving RDATA only
+	my ( $owner, $name, $type, $class, $ttl ) = delete @attribute{@core};
 
-	my $self = $base->_subclass( $type, scalar %attribute );
+	my $self = $base->_subclass( $type, scalar(%attribute) );
 	$self->owner( $name ? $name : $owner );
-	$self->class($class) if defined $class;			# specify CLASS
-	$self->ttl($ttl)     if defined $ttl;			# specify TTL
+	$self->class($class) if defined $class;			# optional CLASS
+	$self->ttl($ttl)     if defined $ttl;			# optional TTL
 
 	eval {
 		while ( my ( $attribute, $value ) = each %attribute ) {
@@ -272,7 +271,7 @@ sub encode {
 	my $type  = $self->{type};
 	my $class = $self->{class} || 1;
 	my $index = $offset + length($owner) + RRFIXEDSZ;
-	my $rdata = eval { $self->_empty ? '' : $self->_encode_rdata( $index, @opaque ); } || '';
+	my $rdata = $self->_empty ? '' : $self->_encode_rdata( $index, @opaque );
 	return pack 'a* n2 N n a*', $owner, $type, $class, $self->ttl, length $rdata, $rdata;
 }
 
@@ -297,7 +296,7 @@ sub canonical {
 	my $type  = $self->{type};
 	my $class = $self->{class} || 1;
 	my $index = RRFIXEDSZ + length $owner;
-	my $rdata = eval { $self->_empty ? '' : $self->_encode_rdata($index); } || '';
+	my $rdata = $self->_empty ? '' : $self->_encode_rdata($index);
 	pack 'a* n2 N n a*', $owner, $type, $class, $self->ttl, length $rdata, $rdata;
 }
 
@@ -335,7 +334,7 @@ sub string {
 	my @core = ( $name, @ttl, $self->class, $self->type );
 
 	my $empty = $self->_empty;
-	my @rdata = eval { $empty ? () : $self->_format_rdata; };
+	my @rdata = $empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
 
 	my $tab = length($name) < 72 ? "\t" : ' ';
@@ -379,7 +378,7 @@ sub token {
 	my @ttl = grep defined, $self->{ttl};
 	my @core = ( $self->{owner}->string, @ttl, $self->class, $self->type );
 
-	my @rdata = eval { $self->_empty ? () : $self->_format_rdata; };
+	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
 
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
 	my @parse = map { s/\\\\/\\092/g; s/\\"/\\034/g; split /$PARSE_REGEX/o; } @rdata;
@@ -544,7 +543,7 @@ Resource record data section when viewed as opaque octets.
 sub rdata {
 	my $self = shift;
 
-	return eval { $self->_empty ? '' : $self->_encode_rdata( 0x4000, {} ); } || '' unless @_;
+	return $self->_empty ? '' : eval { $self->_encode_rdata( 0x4000, {} ) } unless @_;
 
 	my $data = shift || '';
 	my $hash = {};
@@ -564,7 +563,7 @@ Returns a string representation of the RR-specific data.
 sub rdstring {
 	my $self = shift;
 
-	my @rdata = eval { $self->_empty ? () : $self->_format_rdata; };
+	my @rdata = $self->_empty ? () : eval { $self->_format_rdata };
 	carp $@ if $@;
 
 	join "\n\t", _wrap(@rdata);
@@ -664,7 +663,7 @@ sub get_rrsort_func {
 # The optional second argument indicates that default values are
 # to be copied into the newly created object.
 
-our %_MINIMAL = ( 'ANY' => bless ['type' => 255], __PACKAGE__ );
+our %_MINIMAL = ( 255 => bless ['type' => 255], __PACKAGE__ );
 our %_LOADED = %_MINIMAL;
 
 sub _subclass {
@@ -720,7 +719,7 @@ sub _annotation {
 my %ignore = map( ( $_ => 1 ), @core, 'annotation', '#' );
 
 sub _empty {
-	( $_[0]->{'#'} ||= scalar grep !$ignore{$_}, keys %{$_[0]} ) == 0;
+	not( $_[0]->{'#'} ||= scalar grep !$ignore{$_}, keys %{$_[0]} );
 }
 
 

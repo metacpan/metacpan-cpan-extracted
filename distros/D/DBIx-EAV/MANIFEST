@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+TODO.md
 cpanfile
 lib/DBIx/EAV.pm
 lib/DBIx/EAV/Cursor.pm

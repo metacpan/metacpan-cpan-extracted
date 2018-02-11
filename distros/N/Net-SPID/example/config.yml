@@ -1,0 +1,5 @@
+layout: "main"
+logger: "console"
+appname: "SPID Test"
+template: "template_toolkit"
+session: "Simple"

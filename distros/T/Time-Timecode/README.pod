@@ -6,7 +6,13 @@
 
 Time::Timecode - Video timecode class and command line program
 
+=for html <a href="https://travis-ci.org/sshaw/Time-Timecode"><img src="https://travis-ci.org/sshaw/Time-Timecode.svg?branch=master"></a>
+
 =head1 SYNOPSIS
+
+To install the C<timecode> executable see L</TIMECODE UTILITY PROGRAM>.
+
+To use with your Perl program:
 
  use Time::Timecode;
 
@@ -45,12 +51,13 @@ Time::Timecode - Video timecode class and command line program
 
 =head1 DESCRIPTION
 
-C<Time::Timecode> supports any frame rate, drop/non-drop frame counts, basic arithmetic,
-and conversion between frame rates and drop/non-drop frame counts. The only
-requirements are that the timecode be between 00:00:00:00 and 99:99:99:99,
-inclusive, and frames per second (fps) are greater than zero. This means that
-you can create nonstandard timecodes (feature or bug? :^). Dropframe rules will still
-apply.
+C<Time::Timecode> supports SMTPE timecodes, any frame rate,
+drop/non-drop frame counts, basic arithmetic, and conversion between
+frame rates and drop/non-drop frame counts. The only requirements are
+that the timecode be between 00:00:00:00 and 99:99:99:99, inclusive,
+and frames per second (fps) are greater than zero. This means that you
+can create nonstandard timecodes (feature or bug?). Dropframe rules
+will still apply.
 
 C<Time::Timecode> instances can be created from a a variety of representations,
 see L</CONSTRUCTOR>.
@@ -296,10 +303,30 @@ literal the options will be taken from the right hand side.
   print 'greater than' if $tc1 >= '02:00:12;22';
   # ....
 
-=head1 TIMECODE CONVERSION UTILITY PROGRAM
+=head1 DEFAULTS
+
+All defaults except C<$DEFAULT_TO_STRING_FORMAT> can be overridden when L<creating a new instance|/CONSTRUCTOR>.
+C<$DEFAULT_TO_STRING_FORMAT> can be overridden by passing a format to C<< L<to_string|/to_string([FORMAT])> >>.
+
+C<$DEFAULT_FPS = 29.97>
+
+C<$DEFAULT_DROPFRAME = 0>
+
+C<$DEFAULT_DELIMITER = ':'>
+
+C<$DEFAULT_FRAME_DELIMITER = ':'>
+
+C<$DEFAULT_TO_STRING_FORMAT = 'HHxMMxSSxFF'>  where C<x> represents the instance's frame and time separators.
+
+=head1 TIMECODE UTILITY PROGRAM
 
 C<Time::Timecode> includes an executable called C<timecode> that allows one to perform timecode conversions
-and arithmetic from the command line:
+and arithmetic.
+
+Using it requires L<Perl|https://www.perl.org/get.html>. Once Perl is installed run the following command to
+install it: C<cpan Time::Timecode>
+
+=head2 Usage
 
   usage: timecode [-h] [-c spec] [-f format] [-i spec] [expression]
       -h --help		   option help
@@ -347,24 +374,11 @@ and arithmetic from the command line:
   02:02:21:00 2h 2m 21s and 0 frames
   02:01:00:02 2h 1m 0s and 2 frames
 
-=head1 DEFAULTS
-
-All defaults except C<$DEFAULT_TO_STRING_FORMAT> can be overridden when L<creating a new instance|/CONSTRUCTOR>.
-C<$DEFAULT_TO_STRING_FORMAT> can be overridden by passing a format to C<< L<to_string|/to_string([FORMAT])> >>.
-
-C<$DEFAULT_FPS = 29.97>
-
-C<$DEFAULT_DROPFRAME = 0>
-
-C<$DEFAULT_DELIMITER = ':'>
-
-C<$DEFAULT_FRAME_DELIMITER = ':'>
-
-C<$DEFAULT_TO_STRING_FORMAT = 'HHxMMxSSxFF'>  where C<x> represents the instance's frame and time separators.
-
 =head1 SEE ALSO
 
 =over 2
+
+=item L<< C<Time::Timecode source code>|https://github.com/sshaw/Time-Timecode >>
 
 =item L<xslt-timecode|https://github.com/sshaw/xslt-timecode> - A pure, dependency free, XSLT 1.0 library for video timecode manipulation
 
@@ -373,8 +387,6 @@ C<$DEFAULT_TO_STRING_FORMAT = 'HHxMMxSSxFF'>  where C<x> represents the instance
 =back
 
 =head1 AUTHOR
-
-Skye Shaw (skye.shaw [AT] gmail)
 
 Made by L<ScreenStaring|http://screenstaring.com>.
 

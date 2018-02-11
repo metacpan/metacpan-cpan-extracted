@@ -10,11 +10,11 @@ Regexp::Pattern::License::Parts - Regular expressions for licensing sub-parts
 
 =head1 VERSION
 
-Version v3.0.31
+Version v3.1.0
 
 =cut
 
-our $VERSION = version->declare("v3.0.31");
+our $VERSION = version->declare("v3.1.0");
 
 =head STATUS
 
@@ -56,18 +56,22 @@ our %RE = (
 		pat =>
 			qr/this software and associated documentation files \(the "?Software"?\)/
 	},
+	this_prg => { pat => qr/this program/ },
 
 	# rights
 	perm        => { pat => qr/Permission/ },
 	any_purpose => { pat => qr/for any purpose/ },
 	to_deal_mat =>
 		{ pat => qr/to deal in the Materials without restriction/ },
-	granted               => { pat => qr/is hereby granted/ },
+	granted               => { pat => qr/is(?: hereby)? granted/ },
 	to_deal_the_sw_rights => {
 		pat =>
 			qr/to deal in the Software without restriction, including without limitation the rights/
 	},
-	to_dist       => { pat => qr/to use, copy, modify,? and distribute/ },
+	to_copy => { pat => qr/to use or copy/ },
+	to_dist => { pat => qr/to use, copy, modify,? and distribute/ },
+	to_dist_mod =>
+		{ pat => qr/to modify the code and to distribute modified code/ },
 	to_mod_sublic => {
 		pat =>
 			qr/to use, copy, modify, merge, publish, distribute, sublicense, and\/or sell copies of/
@@ -180,6 +184,10 @@ our %RE = (
 	asis_expr_warranty => { pat => qr/without express or implied warranty/ },
 	asis_name_sw    => { pat => qr/(?:\S+ ){1,15}PROVIDES? THIS SOFTWARE/ },
 	asis_sw_by_name => { pat => qr/THIS SOFTWARE IS PROVIDED BY/ },
+	asis_sw_expr_warranty => {
+		pat =>
+			qr/This software is supplied \*as is\W* without express or implied warranty/
+	},
 	asis_sw_name_discl => {
 		pat =>
 			qr/THE SOFTWARE IS PROVIDED \W*AS\W+IS\W*(?:,?|AND) (?:\S+ ){1,15}DISCLAIMS/
@@ -216,7 +224,15 @@ our %RE = (
 		pat =>
 			qr/the following acknowledge?ment\W+This product includes software developed by/
 	},
-	copr      => { pat => qr/[Tt]he above copyright notice/ },
+	authors_copr    => { pat => qr/the Authors, the Copyright/ },
+	copr            => { pat => qr/[Tt]he above copyright notice/ },
+	copr_avail_orig => {
+		pat =>
+			qr/the Copyright, this License, and the Availability of the original version/
+	},
+	copr_avail_note => {
+		pat => qr/the Copyright, this License, (?:and )?the Availability note/
+	},
 	copr_perm => {
 		pat =>
 			qr/(?:both t|t|T)(?:hat|he|he above) copyright notice(?:s|\(s\))? and this permission notice/
@@ -229,6 +245,8 @@ our %RE = (
 		pat =>
 			qr/the above copyright notice, this list of conditions and the following disclaimer/
 	},
+	notices   => { pat => qr/[Tt]he above notices/ },
+	used_perm => { pat => qr/[Uu]sed by permission/ },
 
 	# combinations
 	discl_name_warranties =>
@@ -242,12 +260,23 @@ $RE{ad_mat_ack_this}{pat}
 	= qr/All advertising materials mentioning features or use of this software must display $RE{ack_name}{pat}/;
 $RE{note_copr_perm}{pat}
 	= qr/provided that$I? $RE{copr_perm}{pat} appear in all copies/;
+$RE{repro_code_cite_authors_copr}{pat}
+	= qr/User documentation of any code that uses this code must cite $RE{authors_copr}{pat}/;
+$RE{repro_code_modcode_cite_copr_avail_note}{pat}
+	= qr/User documentation of any code that uses this code or any modified version of this code must cite $RE{copr_avail_note}{pat}/;
 $RE{repro_copr_perm_warr_appear_doc}{pat}
 	= qr/$RE{copr_perm_warr}{pat} appear in supporting documentation/;
+$RE{repro_matlab_cite_authors}{pat}
+	= qr/If this code is accessible from within Matlab, then typing(?: \S+){2,5} \(with no arguments\) must cite the Authors/;
 $RE{note_marketing}{pat}
 	= qr/$RE{incl}{pat} in $RE{cp_sw}{pat}, its documentation and marketing/;
+$RE{note_mod}{pat} = qr/a notice that the code was modified is included/;
 $RE{retain_copr_appear}{pat}
 	= qr/provided that $RE{copr}{pat} appears? in all copies/;
+$RE{retain_copr_avail_note}{pat}
+	= qr/provided $RE{copr_avail_note}{pat} are retained/;
+$RE{retain_copr_avail_orig}{pat}
+	= qr/provided that $RE{copr_avail_orig}{pat} is retained on all copies/;
 $RE{retain_copr_perm_subst}{pat}
 	= qr/$RE{copr_perm}{pat} $RE{incl}{pat} in all copies or substantial portions of the Software/;
 $RE{retain_copr_perm_sw_copr}{pat}
@@ -256,6 +285,10 @@ $RE{retain_copr_perm_sw_doc}{pat}
 	= qr/$RE{copr_perm}{pat} $RE{incl}{pat} in $RE{cp_sw_doc}{pat}/;
 $RE{retain_notice_cond_discl}{pat}
 	= qr/Redistributions of source code must retain $RE{copr_cond_discl}{pat}/;
+$RE{retain_notices}{pat}     = qr/provided $RE{notices}{pat} are retained/;
+$RE{retain_notices_all}{pat} = qr/$RE{retain_notices}{pat} on all copies/;
+$RE{retain_you_avail_orig}{pat}
+	= qr/You must also retain the Availability information below, of the original version/;
 $RE{nopromo_except}{pat}
 	= qr/Except as contained in this notice, $RE{namenot}{pat} $RE{used_ad}{pat}/;
 $RE{nopromo_name_written}{pat}

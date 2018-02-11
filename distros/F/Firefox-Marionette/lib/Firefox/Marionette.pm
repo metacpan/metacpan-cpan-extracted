@@ -11,6 +11,7 @@ use Firefox::Marionette::Timeouts();
 use Firefox::Marionette::Capabilities();
 use Firefox::Marionette::Profile();
 use JSON();
+use IPC::Run();
 use Socket();
 use English qw( -no_match_vars );
 use POSIX();
@@ -20,6 +21,7 @@ use File::Temp();
 use FileHandle();
 use MIME::Base64();
 use Config;
+use base qw(Exporter);
 
 BEGIN {
     if ( $OSNAME eq 'MSWin32' ) {
@@ -28,7 +30,11 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.33';
+our @EXPORT_OK =
+  qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
+our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+
+our $VERSION = '0.37';
 
 sub _ANYPROCESS                    { return -1 }
 sub _COMMAND                       { return 0 }
@@ -37,15 +43,59 @@ sub _WIN32_ERROR_SHARING_VIOLATION { return 0x20 }
 sub _NUMBER_OF_MCOOKIE_BYTES       { return 16 }
 sub _MAX_DISPLAY_LENGTH            { return 10 }
 sub _NUMBER_OF_TERM_ATTEMPTS       { return 4 }
-sub _OLD_BROWSER_MAJOR_VERSION     { return 56 }
+sub _MIN_VERSION_FOR_NEW_CMDS      { return 56 }
+sub _MIN_VERSION_FOR_NEW_SENDKEYS  { return 55 }
+sub _MIN_VERSION_FOR_HEADLESS      { return 55 }
+sub _MIN_VERSION_FOR_WD_HEADLESS   { return 56 }
+sub _MIN_VERSION_FOR_SAFE_MODE     { return 55 }
+sub _MIN_VERSION_FOR_AUTO_LISTEN   { return 55 }
+
+sub BY_XPATH    { return 'xpath' }
+sub BY_ID       { return 'id' }
+sub BY_NAME     { return 'name' }
+sub BY_TAG      { return 'tag name' }
+sub BY_CLASS    { return 'class name' }
+sub BY_SELECTOR { return 'css selector' }
+sub BY_LINK     { return 'link text' }
+sub BY_PARTIAL  { return 'partial link text' }
 
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
-    my @arguments = ('-marionette');
     $self->{last_message_id} = 0;
+    $self->{creation_pid}    = $PROCESS_ID;
+    my @arguments = $self->_setup_arguments(%parameters);
+    $self->{_pid} = $self->_launch(@arguments);
+    my $socket = $self->_setup_local_connection_to_firefox(@arguments);
+    my ( $session_id, $capabilities ) =
+      $self->_initial_socket_setup( $socket, $parameters{capabilities} );
+
+    if ( ($session_id) && ($capabilities) && ( ref $capabilities ) ) {
+    }
+    else {
+        Carp::croak('Failed to correctly setup the Firefox process');
+    }
+    if ( $OSNAME eq 'cygwin' ) {
+    }
+    elsif ( $self->_pid() != $capabilities->moz_process_id() ) {
+        Carp::croak(
+'Failed to correctly determined the Firefox process id through the initial connection capabilities'
+        );
+    }
+    return $self;
+}
+
+sub _setup_arguments {
+    my ( $self, %parameters ) = @_;
+    my @arguments = ('-marionette');
+
+    if ( $parameters{firefox_binary} ) {
+        $self->{firefox_binary} = $parameters{firefox_binary};
+    }
     if ( !$parameters{addons} ) {
-        push @arguments, '-safe-mode';
+        if ( $self->_is_safe_mode_okay() ) {
+            push @arguments, '-safe-mode';
+        }
     }
 
     $self->{debug} = $parameters{debug};
@@ -58,11 +108,25 @@ sub new {
         $self->{visible} = 1;
     }
     else {
-        push @arguments, '-headless';
-        $self->{visible} = 0;
-    }
-    if ( $parameters{firefox_binary} ) {
-        $self->{firefox_binary} = $parameters{firefox_binary};
+        if ( $self->_is_headless_okay() ) {
+            push @arguments, '-headless';
+            $self->{visible} = 0;
+        }
+        elsif (( $OSNAME eq 'MSWin32' )
+            || ( $OSNAME eq 'darwin' )
+            || ( $OSNAME eq 'cygwin' ) )
+        {
+        }
+        else {
+            if ( $self->_xvfb_exists() && ( $self->_launch_xvfb() ) ) {
+                $self->{_xvfb_support_for_headless} = 1;
+                $self->{visible}                    = 0;
+            }
+            else {
+                Carp::carp('Unable to launch firefox with -headless option');
+                $self->{visible} = 1;
+            }
+        }
     }
     if ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
@@ -78,23 +142,94 @@ sub new {
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
-    $self->{_pid} = $self->_launch(@arguments);
-    my $socket = $self->_setup_local_connection_to_firefox(@arguments);
-    my ( $session_id, $capabilities ) =
-      $self->_initial_socket_setup( $socket, $parameters{capabilities} );
-    if ( ($session_id) && ($capabilities) && ( ref $capabilities ) ) {
+    return @arguments;
+}
+
+sub _is_new_sendkeys_okay {
+    my ($self) = @_;
+    $self->_initialise_version();
+    if (
+        ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} <
+            _MIN_VERSION_FOR_NEW_SENDKEYS() )
+      )
+    {
+        return 0;
     }
     else {
-        Carp::croak('Failed to correctly setup the Firefox process');
+        return 1;
     }
-    if ( $OSNAME eq 'cygwin' ) {
+}
+
+sub _is_safe_mode_okay {
+    my ($self) = @_;
+    $self->_initialise_version();
+    if (   ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} < _MIN_VERSION_FOR_SAFE_MODE() )
+      )
+    {
+        return 0;
     }
-    elsif ( $self->_pid() != $capabilities->moz_process_id() ) {
-        Carp::croak(
-'Failed to correctly determined the Firefox process id through the initial connection capabilities'
-        );
+    else {
+        return 1;
     }
-    return $self;
+}
+
+sub _is_headless_okay {
+    my ($self) = @_;
+    $self->_initialise_version();
+    my $min_version = _MIN_VERSION_FOR_HEADLESS();
+    if ( ( $OSNAME eq 'MSWin32' ) || ( $OSNAME eq 'darwin' ) ) {
+        $min_version = _MIN_VERSION_FOR_WD_HEADLESS();
+    }
+    if (   ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} < $min_version ) )
+    {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+sub _is_auto_listen_okay {
+    my ($self) = @_;
+    $self->_initialise_version();
+    if ( ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} <
+            _MIN_VERSION_FOR_AUTO_LISTEN() ) )
+    {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+sub _initialise_version {
+    my ($self) = @_;
+    if ( defined $self->{_initial_version} ) {
+    }
+    else {
+        my $binary = $self->_binary();
+        my $version_string;
+        my ( $in, $err );
+        IPC::Run::run( [ $binary, '--version' ], \$in, \$version_string,
+            \$err );
+        if ( $version_string =~
+            /^Mozilla[ ]Firefox[ ](\d+)[.](\d+)(?:[.](\d+))?\s*$/smx )
+        {
+            $self->{_initial_version}->{major} = $1;
+            $self->{_initial_version}->{minor} = $2;
+            $self->{_initial_version}->{patch} = $2;
+        }
+        else {
+            Carp::croak(
+"'$binary --version' did not produce output that looks like 'Mozilla Firefox \\d+[.]\\d+([.]\\d+)?'"
+            );
+        }
+    }
+    return;
 }
 
 sub _debug {
@@ -124,6 +259,11 @@ sub _launch {
         && ( $self->_xvfb_exists() )
         && ( $self->_launch_xvfb() ) )
     { # if not MacOS or Win32 and no DISPLAY variable, launch Xvfb if at all possible
+        local $ENV{DISPLAY}    = $self->_xvfb_display();
+        local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
+        return $self->_launch_unix(@arguments);
+    }
+    elsif ( $self->{_xvfb_support_for_headless} ) {
         local $ENV{DISPLAY}    = $self->_xvfb_display();
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
         return $self->_launch_unix(@arguments);
@@ -177,57 +317,11 @@ q[/dev/fd is not working.  Perhaps you need to mount fdescfs like so 'sudo mount
     return 0;
 }
 
-sub _dbus_works {
-    my ($self)   = @_;
-    my $binary   = 'dbus-launch';
-    my $dev_null = File::Spec->devnull();
-    if ( my $pid = fork ) {
-        waitpid $pid, 0;
-        if ( $CHILD_ERROR == 0 ) {
-            return 1;
-        }
-        elsif ( $OSNAME eq 'freebsd' ) {
-            my @stats = stat '/etc/machine-id';
-            if ( scalar @stats ) {
-            }
-            else {
-                Carp::carp(
-q[D-Bus is not working.  Perhaps you need to create '/etc/machine-id' like so 'sudo dbus-uuidgen --ensure=/etc/machine-id']
-                );
-            }
-        }
-    }
-    elsif ( defined $pid ) {
-        eval {
-            if ( !$self->_debug() ) {
-                open STDOUT, q[>], $dev_null
-                  or Carp::croak(
-                    "Failed to redirect STDOUT to $dev_null:$EXTENDED_OS_ERROR"
-                  );
-                open STDERR, q[>], $dev_null
-                  or Carp::croak(
-                    "Failed to redirect STDERR to $dev_null:$EXTENDED_OS_ERROR"
-                  );
-            }
-            exec {$binary} $binary
-              or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
-        } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
-        };
-        exit 1;
-    }
-    return 0;
-}
-
 sub _xvfb_exists {
     my ($self)   = @_;
     my $binary   = $self->_xvfb_binary();
     my $dev_null = File::Spec->devnull();
     if ( !$self->_dev_fd_works() ) {
-        return 0;
-    }
-    if ( !$self->_dbus_works() ) {
         return 0;
     }
     eval { require Crypt::URandom; } or do {
@@ -254,10 +348,15 @@ sub _xvfb_exists {
             exec {$binary} $binary, '-help'
               or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
         } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
         };
         exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
     }
 }
 
@@ -268,6 +367,14 @@ sub xvfb {
 
 sub _launch_xauth {
     my ( $self, $display_number ) = @_;
+    my $auth_handle =
+      FileHandle->new( $ENV{XAUTHORITY},
+        Fcntl::O_CREAT() | Fcntl::O_WRONLY() | Fcntl::O_EXCL(),
+        Fcntl::S_IRWXU() )
+      or Carp::croak(
+        "Failed to open $ENV{XAUTHORITY} for writing:$EXTENDED_OS_ERROR");
+    $auth_handle->close()
+      or Carp::croak("Failed to close $ENV{XAUTHORITY}:$EXTENDED_OS_ERROR");
     my $mcookie = unpack 'H*',
       Crypt::URandom::urandom( _NUMBER_OF_MCOOKIE_BYTES() );
     my $source_handle =
@@ -290,12 +397,11 @@ sub _launch_xauth {
     if ( my $pid = fork ) {
         waitpid $pid, 0;
         if ( $CHILD_ERROR == 0 ) {
+            close $source_handle
+              or
+              Carp::croak("Failed to close temporary file:$EXTENDED_OS_ERROR");
+            return 1;
         }
-        else {
-            Carp::croak('Failed to run xauth');
-        }
-        close $source_handle
-          or Carp::croak("Failed to close temporary file:$EXTENDED_OS_ERROR");
     }
     elsif ( defined $pid ) {
         eval {
@@ -312,10 +418,15 @@ sub _launch_xauth {
             exec {$binary} $binary, @arguments
               or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
         } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
         };
         exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
     }
     return;
 }
@@ -335,7 +446,7 @@ sub _launch_xvfb {
     my ($self) = @_;
     $self->{_xvfb_fbdir_directory} = File::Temp->newdir(
         File::Spec->catdir(
-            File::Spec->tmpdir(), 'firefox_marionette_xvfb_fbdir_XXXXXXXXXX'
+            File::Spec->tmpdir(), 'firefox_marionette_xvfb_fbdir_XXXXXXXXXXX'
         )
       )
       or Carp::croak("Failed to create temporary directory:$EXTENDED_OS_ERROR");
@@ -357,46 +468,23 @@ sub _launch_xvfb {
 
     if ( my $pid = fork ) {
         $self->{_xvfb_pid} = $pid;
-        my $display_number = q[];
-        while ( $display_number !~ /^\d+$/smx ) {
-            seek $display_no_handle, 0, Fcntl::SEEK_SET()
-              or Carp::croak(
-                "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
-            defined sysread $display_no_handle, $display_number,
-              _MAX_DISPLAY_LENGTH()
-              or Carp::croak(
-                "Failed to read from temporary file:$EXTENDED_OS_ERROR");
-            chomp $display_number;
-            if ( $display_number !~ /^\d+$/smx ) {
-                sleep 1;
-            }
-            waitpid $pid, POSIX::WNOHANG();
-            if ( !kill 0, $pid ) {
-                Carp::carp('Unable to start Xvfb');
-                return 0;
-            }
-        }
+        my $display_number =
+          $self->_wait_for_display_number( $pid, $display_no_handle );
         $self->{_xvfb_display_number} = $display_number;
         close $display_no_handle
           or Carp::croak("Failed to close temporary file:$EXTENDED_OS_ERROR");
         $self->{_xvfb_authority_directory} = File::Temp->newdir(
             File::Spec->catdir(
-                File::Spec->tmpdir(), 'firefox_marionette_xvfb_auth_XXXXXXXXXX'
+                File::Spec->tmpdir(),
+                'firefox_marionette_xvfb_auth_XXXXXXXXXXX'
             )
           )
           or Carp::croak(
             "Failed to create temporary directory:$EXTENDED_OS_ERROR");
         local $ENV{DISPLAY}    = $self->_xvfb_display();
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
-        my $auth_handle =
-          FileHandle->new( $ENV{XAUTHORITY},
-            Fcntl::O_CREAT() | Fcntl::O_WRONLY() | Fcntl::O_EXCL(),
-            Fcntl::S_IRWXU() )
-          or Carp::croak(
-            "Failed to open $ENV{XAUTHORITY} for writing:$EXTENDED_OS_ERROR");
-        $auth_handle->close()
-          or Carp::croak("Failed to close $ENV{XAUTHORITY}:$EXTENDED_OS_ERROR");
         $self->_launch_xauth($display_number);
+        return 1;
     }
     elsif ( defined $pid ) {
         eval {
@@ -413,12 +501,41 @@ sub _launch_xvfb {
             exec {$binary} $binary, @arguments
               or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
         } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
         };
         exit 1;
     }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
+    }
     return;
+}
+
+sub _wait_for_display_number {
+    my ( $self, $pid, $display_no_handle ) = @_;
+    my $display_number = [];
+    while ( $display_number !~ /^\d+$/smx ) {
+        seek $display_no_handle, 0, Fcntl::SEEK_SET()
+          or Carp::croak(
+            "Failed to seek to start of temporary file:$EXTENDED_OS_ERROR");
+        defined sysread $display_no_handle, $display_number,
+          _MAX_DISPLAY_LENGTH()
+          or
+          Carp::croak("Failed to read from temporary file:$EXTENDED_OS_ERROR");
+        chomp $display_number;
+        if ( $display_number !~ /^\d+$/smx ) {
+            sleep 1;
+        }
+        waitpid $pid, POSIX::WNOHANG();
+        if ( !kill 0, $pid ) {
+            Carp::carp('Unable to start Xvfb');
+            return 0;
+        }
+    }
+    return $display_number;
 }
 
 sub _launch_unix {
@@ -443,10 +560,15 @@ sub _launch_unix {
             exec {$binary} $binary, @arguments
               or Carp::croak("Failed to exec '$binary':$EXTENDED_OS_ERROR");
         } or do {
-            chomp $EVAL_ERROR;
-            warn "$EVAL_ERROR\n";
+            if ( $self->_debug() ) {
+                chomp $EVAL_ERROR;
+                warn "$EVAL_ERROR\n";
+            }
         };
         exit 1;
+    }
+    else {
+        Carp::croak("Failed to fork:$EXTENDED_OS_ERROR");
     }
     return $pid;
 }
@@ -637,7 +759,7 @@ sub _setup_new_profile {
     my ( $self, $profile ) = @_;
     my $profile_directory = File::Temp->newdir(
         File::Spec->catdir(
-            File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXX'
+            File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
         )
     );
     $self->{profile_directory} = $profile_directory;
@@ -647,6 +769,17 @@ sub _setup_new_profile {
     }
     else {
         $profile = Firefox::Marionette::Profile->new();
+    }
+    if ( !$self->_is_auto_listen_okay() ) {
+        socket my $socket, Socket::PF_INET(), Socket::SOCK_STREAM(), 0
+          or Carp::croak("Failed to create a socket: $EXTENDED_OS_ERROR");
+        bind $socket, Socket::sockaddr_in( 0, Socket::INADDR_LOOPBACK() )
+          or Carp::croak("Failed to bind socket:$EXTENDED_OS_ERROR");
+        my $port = ( Socket::sockaddr_in( getsockname $socket ) )[0];
+        close $socket
+          or Carp::croak("Failed to close socket:$EXTENDED_OS_ERROR");
+        $profile->set_value( 'marionette.defaultPrefs.port', $port );
+        $profile->set_value( 'marionette.port',              $port );
     }
     $profile->save( $self->{profile_path} );
     return $profile_directory;
@@ -689,7 +822,7 @@ sub _initial_socket_setup {
 
 sub new_session {
     my ( $self, $capabilities ) = @_;
-    my $parameters;
+    my $parameters = {};
     if (   ( defined $capabilities )
         && ( $capabilities->isa('Firefox::Marionette::Capabilities') ) )
     {
@@ -762,13 +895,26 @@ sub _create_capabilities {
             Carp::croak('moz:headless has not been determined correctly');
         }
     }
+    else {
+        $parameters->{'moz:headless'} = $headless;
+    }
+    if ( !defined $self->{_page_load_timeouts_key} ) {
+        if ( defined $parameters->{timeouts}->{'page load'} ) {
+            $self->{_page_load_timeouts_key} = 'page load';
+        }
+        else {
+            $self->{_page_load_timeouts_key} = 'pageLoad';
+        }
+    }
+
     return Firefox::Marionette::Capabilities->new(
         accept_insecure_certs => $parameters->{acceptInsecureCerts} ? 1 : 0,
         page_load_strategy    => $parameters->{pageLoadStrategy},
         timeouts              => Firefox::Marionette::Timeouts->new(
-            page_load => $parameters->{timeouts}->{pageLoad},
-            script    => $parameters->{timeouts}->{script},
-            implicit  => $parameters->{timeouts}->{implicit},
+            page_load =>
+              $parameters->{timeouts}->{ $self->{_page_load_timeouts_key} },
+            script   => $parameters->{timeouts}->{script},
+            implicit => $parameters->{timeouts}->{implicit},
         ),
         browser_version => $parameters->{browserVersion},
         platform_name   => $parameters->{platformName},
@@ -795,7 +941,7 @@ sub find_elements {
 
 sub list {
     my ( $self, $value, $using ) = @_;
-    $using ||= 'xpath';
+    $using ||= BY_XPATH();
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -941,12 +1087,14 @@ sub type {
             'type method requires a Firefox::Marionette::Element parameter');
     }
     my $message_id = $self->_new_message_id();
+    my $parameters = { id => $element->uuid(), text => $text };
+    if ( !$self->_is_new_sendkeys_okay() ) {
+        $parameters->{value} = [ split //smx, $text ];
+    }
     $self->_send_request(
         [
-            _COMMAND(),
-            $message_id,
-            $self->_command('WebDriver:ElementSendKeys'),
-            { id => $element->uuid(), text => $text }
+            _COMMAND(),                                   $message_id,
+            $self->_command('WebDriver:ElementSendKeys'), $parameters
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -998,7 +1146,7 @@ sub refresh {
 
 my %_deprecated_commands = (
     'WebDriver:GetCapabilities'              => 'getSessionCapabilities',
-    'Marionette:Quit'                        => 'quit',
+    'Marionette:Quit'                        => 'quitApplication',
     'Marionette:SetContext'                  => 'setContext',
     'Marionette:GetContext'                  => 'getContext',
     'Marionette:AcceptConnections'           => 'acceptConnections',
@@ -1045,7 +1193,7 @@ my %_deprecated_commands = (
     'WebDriver:GetTitle'                     => 'getTitle',
     'WebDriver:GetWindowHandle'              => 'getWindowHandle',
     'WebDriver:GetWindowHandles'             => 'getWindowHandles',
-    'WebDriver:GetWindowRect'                => 'getWindowRect',
+    'WebDriver:GetWindowRect'                => 'getWindowSize',
     'WebDriver:IsElementDisplayed'           => 'isElementDisplayed',
     'WebDriver:IsElementEnabled'             => 'isElementEnabled',
     'WebDriver:IsElementSelected'            => 'isElementSelected',
@@ -1059,7 +1207,7 @@ my %_deprecated_commands = (
     'WebDriver:SendAlertText'                => 'sendKeysToDialog',
     'WebDriver:SetScreenOrientation'         => 'setScreenOrientation',
     'WebDriver:SetTimeouts'                  => 'setTimeouts',
-    'WebDriver:SetWindowRect'                => 'setWindowRect',
+    'WebDriver:SetWindowRect'                => 'setWindowSize',
     'WebDriver:SwitchToFrame'                => 'switchToFrame',
     'WebDriver:SwitchToParentFrame'          => 'switchToParentFrame',
     'WebDriver:SwitchToShadowRoot'           => 'switchToShadowRoot',
@@ -1072,7 +1220,7 @@ sub _command {
     if ( defined $self->browser_version() ) {
         my ( $major, $minor, $patch ) = split /[.]/smx,
           $self->browser_version();
-        if ( $major < _OLD_BROWSER_MAJOR_VERSION() ) {
+        if ( $major < _MIN_VERSION_FOR_NEW_CMDS() ) {
             if ( $_deprecated_commands{$command} ) {
                 return $_deprecated_commands{$command};
             }
@@ -1306,7 +1454,7 @@ sub timeouts {
         [ _COMMAND(), $message_id, $self->_command('WebDriver:GetTimeouts') ] );
     my $response = $self->_get_response($message_id);
     my $old      = Firefox::Marionette::Timeouts->new(
-        page_load => $response->result()->{pageLoad},
+        page_load => $response->result()->{ $self->{_page_load_timeouts_key} },
         script    => $response->result()->{script},
         implicit  => $response->result()->{implicit}
     );
@@ -1318,9 +1466,9 @@ sub timeouts {
                 $message_id,
                 $self->_command('WebDriver:SetTimeouts'),
                 {
-                    pageLoad => $new->page_load(),
-                    script   => $new->script(),
-                    implicit => $new->implicit()
+                    $self->{_page_load_timeouts_key} => $new->page_load(),
+                    script                           => $new->script(),
+                    implicit                         => $new->implicit()
                 }
             ]
         );
@@ -1412,7 +1560,7 @@ sub alert_text {
 sub selfie {
     my ( $self, $element, @remaining ) = @_;
     my $message_id = $self->_new_message_id();
-    my $parameters;
+    my $parameters = {};
     my %extra;
     if (   ( defined $element )
         && ( $element->isa('Firefox::Marionette::Element') ) )
@@ -1607,7 +1755,7 @@ sub find_element {
 
 sub find {
     my ( $self, $value, $using ) = @_;
-    $using ||= 'xpath';
+    $using ||= BY_XPATH();
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [
@@ -2064,7 +2212,25 @@ sub _read_from_socket {
     if ( $self->_debug() ) {
         warn "<< $initial_buffer$json\n";
     }
-    my $parameters = JSON::decode_json($json);
+    return $self->_decode_json($json);
+}
+
+sub _decode_json {
+    my ( $self, $json ) = @_;
+    my $parameters;
+    eval { $parameters = JSON::decode_json($json); } or do {
+        if ( $self->alive() ) {
+            if ($EVAL_ERROR) {
+                chomp $EVAL_ERROR;
+                die "$EVAL_ERROR\n";
+            }
+        }
+        else {
+            my $error_message =
+              $self->error_message() ? $self->error_message() : q[];
+            Carp::croak($error_message);
+        }
+    };
     return $parameters;
 }
 
@@ -2099,7 +2265,9 @@ sub _signal_number {
 
 sub DESTROY {
     my ($self) = @_;
-    $self->quit();
+    if ( $self->{creation_pid} == $PROCESS_ID ) {
+        $self->quit();
+    }
     return;
 }
 
@@ -2112,18 +2280,18 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.33
+Version 0.37
 
 =head1 SYNOPSIS
 
-    use Firefox::Marionette();
+    use Firefox::Marionette qw(:all);
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find('//input[@id="search-input"]')->type('Test::More');
+    $firefox->find('search-input', BY_ID())->type('Test::More');
 
-    my $file_handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ])
+    my $file_handle = $firefox->selfie(highlights => [ $firefox->find('lucky', BY_NAME()) ])
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -2185,11 +2353,31 @@ returns the first element in the current browsing context that matches the searc
 
 =item * the first parameter is a scalar search value.  This can be an L<xpath|https://en.wikipedia.org/wiki/XPath> expression such as C<//button[@name="foo"]> to find all button elements that have a 'name' of 'foo'.
 
-=item * the second optional parameter is a scalar search strategy.  This defaults to 'xpath'
+=item * the second optional parameter is a scalar search strategy.  This defaults to L<BY_XPATH()|Firefox::Marionette#BY_XPATH>
+
+=back
 
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
-=back
+    use Firefox::Marionette qw(:all);
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    # All these methods accomplish the same goal
+
+    $firefox->find('//input[@id="search-input"]')->type('Test::More');
+    $firefox->find('//input[@id="search-input"]', BY_XPATH())->type('Test::More');
+    $firefox->find('search-input', BY_ID())->type('Test::More');
+    $firefox->find('q', BY_NAME())->type('Test::More');
+    $firefox->find('form-control home-search-input', BY_CLASS())->type('Test::More');
+    $firefox->find('input.home-search-input', BY_SELECTOR())->type('Test::More');
+
+    # Some additional strategies
+
+    $firefox->find('input', BY_TAG());
+    $firefox->find('API', BY_LINK());
+    $firefox->find('AP', BY_PARTIAL());
 
 =head2 find_elements
 
@@ -2203,7 +2391,7 @@ returns all the elements in the current browsing context that match the search p
 
 =item * the first parameter is a scalar search value.  This can be an L<xpath|https://en.wikipedia.org/wiki/XPath> expression such as C<//button[@name="foo"]> to find all button elements that have a 'name' of 'foo'.
 
-=item * the second optional parameter is a scalar search strategy.  This defaults to 'xpath'
+=item * the second optional parameter is a scalar search strategy.  This defaults to L<BY_XPATH()|Firefox::Marionette#BY_XPATH>.
 
 =back
 
@@ -2389,7 +2577,7 @@ accepts a L<Firefox::Marionette::Element|Firefox::Marionette::Element> object as
 
 =head2 window_rect
 
-accepts an optional <position and size|Firefox::Marionette::Window::Rect> as a parameter, sets the current browser window to that position and size and returns the previous L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.  If no parameter is supplied, it returns the current  L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.
+accepts an optional L<position and size|Firefox::Marionette::Window::Rect> as a parameter, sets the current browser window to that position and size and returns the previous L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.  If no parameter is supplied, it returns the current  L<position, size and state|Firefox::Marionette::Window::Rect> of the browser window.
 
 =head2 rect
 
@@ -2489,6 +2677,38 @@ This method returns a human readable error message describing how the Firefox pr
 
 This method returns true or false depending on if the Firefox process is still running.
 
+=head2 BY_XPATH
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) that match with supplied L<xpath|https://en.wikipedia.org/wiki/XPath> expression.
+
+=head2 BY_ID
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'id' property.
+
+=head2 BY_NAME
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'name' property.
+
+=head2 BY_CLASS
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'class' property.
+
+=head2 BY_SELECTOR
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching L<CSS Selector|https://en.wikipedia.org/wiki/Cascading_Style_Sheets#Selector>
+
+=head2 BY_TAG
+
+This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching tag name.
+
+=head2 BY_LINK
+
+This L<find|Firefox::Marionette#find> strategy returns the link(s) with matching text
+
+=head2 BY_PARTIAL
+
+This L<find|Firefox::Marionette#find> strategy returns the link(s) with matching partial text
+
 =head1 DIAGNOSTICS
 
 =over
@@ -2558,7 +2778,7 @@ David Dick  C<< <ddick@cpan.org> >>
 
 =head1 ACKNOWLEDGEMENTS
  
-Thanks to the entire Mozilla organisation for a great browser and to the team behind Marionette for providing a great interface for automation.
+Thanks to the entire Mozilla organisation for a great browser and to the team behind Marionette for providing an interface for automation.
  
 Thanks also to the authors of the documentation in the following sources;
 

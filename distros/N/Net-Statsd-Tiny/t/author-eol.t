@@ -25,7 +25,6 @@ my @files = (
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
-    't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/data/counter.dat',

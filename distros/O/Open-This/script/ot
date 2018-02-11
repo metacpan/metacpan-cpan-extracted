@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Open::This ();
+
+my @editor_args = Open::This::to_editor_args(@ARGV);
+
+if ( !@editor_args ) {
+    print "Could not locate file\n";
+    exit;
+}
+
+exec $ENV{EDITOR}, @editor_args;
+
+# ABSTRACT: parse text and (hopefully) open an editor with the correct arguments
+# PODNAME: ot
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ot - parse text and (hopefully) open an editor with the correct arguments
+
+=head1 VERSION
+
+version 0.000004
+
+=head1 SYNOPSIS
+
+    ot "lib/Foo/Bar.pm line 222"
+    # Executes $ENV{EDITOR} +222 lib/Foo/Bar.pm
+
+    # open Foo::Bar which is in your lib, t/lib or @INC
+    ot Foo::Bar
+
+    # open Foo::Bar at the do_something() subroutine
+    ot "Foo::Bar::do_something()"
+
+    # open output from git-grep
+    ot lib/Open/This.pm:17
+
+    # Find a core module
+    ot Test::More
+
+    # Open a core module at a function
+    ot "Test::More::diag()"
+
+=head1 DESCRIPTION
+
+It can be a pain to have to copy Perl module names from a stack trace or some
+other output and have to translate that into something which an editor like vim
+understands.  This module aims to take some of the pain out of this.  So far I
+have tested this only with vim, but I *think* this should also work with emacs
+and nano.
+
+The C<ot> script can parse line numbers from text so that you can open your
+files at the correct starting point.  It will also try to translate subroutine
+names into the appropriate line numbers.  It will look in a lib or t/lib
+directory relative to your current path.  If it thinks it has a Perl module
+name it will also try to require it and use %INC in order to find the module on
+disks.  All security caveats apply when requiring 3rd party modules.
+
+=head1 AUTHOR
+
+Olaf Alders <olaf@wundercounter.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Olaf Alders.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

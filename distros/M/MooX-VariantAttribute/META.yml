@@ -3,12 +3,12 @@ abstract: 'a щ（ﾟДﾟщ）Attribute...'
 author:
   - 'Robert Acock <thisusedtobeanemail@gmail.com>'
 build_requires:
-  Moonshine::Test: '0.13'
+  Moonshine::Test: '0.16'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,17 +21,17 @@ no_index:
 provides:
   MooX::VariantAttribute:
     file: lib/MooX/VariantAttribute.pm
-    version: '0.07'
+    version: '0.08'
   MooX::VariantAttribute::Role:
     file: lib/MooX/VariantAttribute/Role.pm
 requires:
   Carp: '0'
-  Combine::Keys: '0.04'
+  Combine::Keys: '0.09'
   Moo: '0'
-  MooX::ReturnModifiers: '0.03'
+  MooX::ReturnModifiers: '0.09'
   Scalar::Util: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

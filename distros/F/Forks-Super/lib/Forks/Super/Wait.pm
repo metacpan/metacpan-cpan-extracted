@@ -19,9 +19,9 @@ use strict;
 use warnings;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(wait waitpid waitall TIMEOUT WREAP_BG_OK);
+our @EXPORT_OK = qw(waitall TIMEOUT WREAP_BG_OK);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 my ($productive_waitpid_code);
 my $respect_SIGCHLD_ignore = 1;
@@ -528,11 +528,11 @@ sub __run_productive_waitpid_code {
 
 =head1 NAME
 
-Forks::Super::Wait
+Forks::Super::Wait - manage background processes at the end of their life cycle
 
 =head1 VERSION
 
-0.92
+0.93
 
 =head1 DESCRIPTION
 

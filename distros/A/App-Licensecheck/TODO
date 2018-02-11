@@ -1,0 +1,45 @@
+  * Implement decoding options:
+    * --decode-html
+      regular expression for paths to parse as html.
+    * --decode-exif
+      regular expression for paths to extract EXIF and other metadata from
+      (see exiftool and Image::ExifTool).
+    * --decode-auto
+      enable all --decode-* options for common file extensions.
+  * Move detection code to separate module(s).
+    * Maybe extend Software::License.
+  * Fail when passed unknown options
+  * Implement search options:
+    * --traversal-type
+      Algorithm used to walk directories passed as arguments.
+      * Values: one any
+      * Default: one
+    * --match-type
+      Algorithm used for --include and --exclude options.
+      * Values: regex glob_deb
+      * Default: regex
+  * Implement strictness option:
+    * --strict implies...
+      * --machine (or --machine-deb if enabled)
+      * --include .* (or --include * with --match-type glob_deb)
+      * --exclude ''
+      * --traversal-type any
+    * --fast implies...
+      * --exclude-common
+      * --decode-none
+  * Detect non-commercial license.
+    (?i:(?:\w{4}|\W(?:[^oO]\w|\w[^rR]|[^aA]\w\w|\w[^nN]\w|\w\w[^dD])) non[-_ ]commercial)
+  * Compare against competitors
+    + ripper
+  * Warn about licensing conflicts
+    + See adequate
+  * Sort Files sections to list common over exotic:
+    + prefix of leftmost truncate wildcard (*)
+    + suffix of leftmost truncate wildcard (*)
+    + filecount when containing character wildcard (?)
+    + filecount
+    + License-shortnames
+    + License-Grant
+    + License inlined
+    + Copyright
+    + Filenames

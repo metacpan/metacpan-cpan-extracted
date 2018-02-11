@@ -14,6 +14,7 @@
 ^SOURCEME$
 ^TODO$
 ^NOTES$
+^MYMETA
 
 ^App-NDTools-.*\.tar\.gz$
 ^Makefile(\.old)?$

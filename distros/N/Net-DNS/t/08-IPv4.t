@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1608 2017-12-07 10:10:38Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1628 2018-02-01 13:29:13Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -27,6 +27,14 @@ my @hints = qw(
 		193.0.14.129
 		199.7.83.42
 		202.12.27.33
+		);
+
+my $NOIP = qw(0.0.0.0);
+
+my @nsdname = qw(
+		ns.net-dns.org
+		mcvax.nlnet.nl
+		ns.nlnetlabs.nl
 		);
 
 
@@ -64,23 +72,19 @@ eval {
 
 
 my $IP = eval {
-	my @nsdname  = qw(ns.net-dns.org mcvax.nlnet.nl ns.nlnetlabs.nl);
 	my $resolver = new Net::DNS::Resolver();
 	$resolver->nameservers(@nsdname);
 	$resolver->force_v4(1);
-
-	my @ip = $resolver->nameservers();
-	scalar(@ip) ? [@ip] : undef;
-} || exit( plan skip_all => 'Unable to resolve nameserver name' );
-
-my $NOIP = '0.0.0.0';
+	[$resolver->nameservers()];
+};
+exit( plan skip_all => 'Unable to resolve nameserver name' ) unless scalar @$IP;
 
 diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 92;
+plan tests => 94;
 
 NonFatalBegin();
 
@@ -222,43 +226,58 @@ NonFatalBegin();
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->srcaddr($NOIP);
-	$resolver->srcport(2345);
 
 	my $udp = $resolver->bgsend(qw(net-dns.org SOA IN));
-	ok( $udp, '$resolver->bgsend(...)	specify UDP local address & port' );
+	ok( $udp, '$resolver->bgsend(...)	specify UDP local address' );
 
 	$resolver->usevc(1);
 
 	my $tcp = $resolver->bgsend(qw(net-dns.org SOA IN));
-	ok( $tcp, '$resolver->bgsend(...)	specify TCP local address & port' );
+	ok( $tcp, '$resolver->bgsend(...)	specify TCP local address' );
 }
 
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->srcport(-1);
+	$resolver->srcport(2345);
+
+	my $udp = $resolver->bgsend(qw(net-dns.org SOA IN));
+	ok( $udp, '$resolver->bgsend(...)	specify UDP source port' );
+
+	$resolver->usevc(1);
+
+	my $tcp = $resolver->bgsend(qw(net-dns.org SOA IN));
+	ok( $tcp, '$resolver->bgsend(...)	specify TCP source port' );
+}
+
+
+{
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
+	my $badport = -1;
+	$resolver->srcport($badport);
 
 	my $udp = $resolver->send(qw(net-dns.org SOA IN));
-	ok( !$udp, '$resolver->send(...)	specify bad UDP source port' );
+	ok( !$udp, "\$resolver->send(...)	reject UDP source port $badport" );
 
 	$resolver->usevc(1);
 
 	my $tcp = $resolver->send(qw(net-dns.org SOA IN));
-	ok( !$tcp, '$resolver->send(...)	specify bad TCP source port' );
+	ok( !$tcp, "\$resolver->send(...)	reject TCP source port $badport" );
 }
 
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->srcport(-1);
+	my $badport = -1;
+	$resolver->srcport($badport);
 
 	my $udp = $resolver->bgsend(qw(net-dns.org SOA IN));
-	ok( !$udp, '$resolver->bgsend(...)	specify bad UDP source port' );
+	ok( !$udp, "\$resolver->bgsend(...)	reject UDP source port $badport" );
 
 	$resolver->usevc(1);
 
 	my $tcp = $resolver->bgsend(qw(net-dns.org SOA IN));
-	ok( !$tcp, '$resolver->bgsend(...)	specify bad TCP source port' );
+	ok( !$tcp, "\$resolver->bgsend(...)	reject TCP source port $badport" );
 }
 
 

@@ -21,6 +21,7 @@ L<PPIx::Regexp::Structure::Code|PPIx::Regexp::Structure::Code>,
 L<PPIx::Regexp::Structure::Main|PPIx::Regexp::Structure::Main>,
 L<PPIx::Regexp::Structure::Modifier|PPIx::Regexp::Structure::Modifier>,
 L<PPIx::Regexp::Structure::Quantifier|PPIx::Regexp::Structure::Quantifier>,
+L<PPIx::Regexp::Structure::Script_Run|PPIx::Regexp::Structure::Script_Run>,
 L<PPIx::Regexp::Structure::Subexpression|PPIx::Regexp::Structure::Subexpression>,
 L<PPIx::Regexp::Structure::Switch|PPIx::Regexp::Structure::Switch> and
 L<PPIx::Regexp::Structure::Unknown|PPIx::Regexp::Structure::Unknown>.
@@ -52,7 +53,7 @@ use PPIx::Regexp::Constant qw{ STRUCTURE_UNKNOWN };
 use PPIx::Regexp::Util qw{ __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 use constant ELEMENT_UNKNOWN => STRUCTURE_UNKNOWN;
 

@@ -21,4 +21,4 @@ requires:
   Scope::Upper: '0.30'
   Term::Colormap: '0.16'
   perl: '5.006'
-version: '0.05'
+version: '0.07'

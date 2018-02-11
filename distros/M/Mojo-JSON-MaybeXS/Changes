@@ -1,3 +1,6 @@
+1.001     2018-02-06 14:06:23 EST
+  - Doc updates for upgraded numbers logic
+
 1.000     2017-08-02 00:12:05 EDT
   - Fix tests and document that Cpanel::JSON::XS now disallows duplicate keys in non-relaxed mode
 

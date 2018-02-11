@@ -10,7 +10,7 @@ use App::BorgRestore;
 
 # Only log calls to $db->add_path
 my $db = Test::MockObject->new();
-$db->set_true(qw(add_path -begin_work -commit -vacuum -add_archive_name));
+$db->set_true(qw(add_path -begin_work -commit -vacuum -add_archive_name -verify_cache_fill_rate_ok));
 $db->mock('-get_archive_id', sub {return 'prefix-archive-1' if $_[1] eq 'archive-1';});
 $db->mock('-get_archive_names', sub {return []});
 

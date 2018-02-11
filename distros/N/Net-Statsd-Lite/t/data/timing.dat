@@ -1,0 +1,35 @@
+#!perl
+
+use strict;
+use warnings;
+
+[
+    {
+        description => "timing",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ timing load 123 /], ],
+        output      => "foo.load:123|ms\n",
+    },
+    {
+        description => "timing with non-integer",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ timing load 10.316 /], ],
+        output      => "foo.load:10.316|ms\n",
+    },
+    {
+        description => "timing with rate",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ timing load 123 0.5 /], ],
+        output      => "foo.load:123|ms|\@0.500000\n",
+    },
+    {
+        description => "timing_ms (alias for timing)",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ timing_ms load 123 /], ],
+        output      => "foo.load:123|ms\n",
+    },
+];

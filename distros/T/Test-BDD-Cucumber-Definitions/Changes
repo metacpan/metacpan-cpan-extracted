@@ -1,6 +1,19 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
-0.08    2019-02-05
+0.11    2018-02-07
+        [Data]
+        Module Data::Ru with the definitions of steps in the Russian language is added
+
+0.10    2018-02-07
+        - The architecture of the module is changed. The utilities are migrated from HTTP::Utils to HTTP,
+            and the step definitions are migrated from HTTP to HTTP::In.
+            Similarly done for Data.
+        - Params::ValidationCompiler module version 0.22 is required
+
+0.09    2018-02-07
+        - Types are organized into the library using MooseX::Types
+
+0.08    2018-02-05
         - Functions in Util modules check parameters using types from the TypeConstraints module
 
 0.07    2018-02-03

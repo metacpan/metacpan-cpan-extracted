@@ -3,7 +3,7 @@ package Firefox::Marionette::Window::Rect;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.37';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -45,7 +45,7 @@ Firefox::Marionette::Window::Rect - Represents the browser window's shape and si
 
 =head1 VERSION
 
-Version 0.33
+Version 0.37
 
 =head1 SYNOPSIS
 
@@ -68,15 +68,15 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =over 4
 
-=item * pos_x - the X position of the window
+=item * pos_x - the X position of the window.  This function will return undef for older Firefoxen.
 
-=item * pos_y - the Y position of the window
+=item * pos_y - the Y position of the window.  This function will return undef for older Firefoxen.
 
 =item * height - the height of the window
 
 =item * width - the width of the window
 
-=item * wstate - the state of the window as a scalar string
+=item * wstate - the state of the window as a scalar string.  This function will return undef for Firefox versions less than 57
 
 =back
 

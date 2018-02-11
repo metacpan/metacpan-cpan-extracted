@@ -1,10 +1,8 @@
 package App::HL7::Send;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Getopt::Std;
@@ -12,8 +10,7 @@ use Net::HL7::Connection;
 use Net::HL7::Message;
 use Perl6::Slurp qw(slurp);
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -32,7 +29,7 @@ sub new {
 	if (! getopts('h', $self->{'_opts'}) || @ARGV < 3
 		|| $self->{'_opts'}->{'h'}) {
 
-		print STDERR "Usage: $0 [-h] [--version] host port hl7_file\n";
+		print STDERR "Usage: $0 [-h] [--version] host port hl7_file|-\n";
 		print STDERR "\t-h\t\tHelp.\n";
 		print STDERR "\t--version\tPrint version.\n";
 		exit 1;
@@ -50,7 +47,14 @@ sub run {
 	my $self = shift;
 
 	# Get hl7_file.
-	my $hl7 = slurp($self->{'_hl7_file'});
+	my $hl7;
+	if ($self->{'_hl7_file'} eq '-') {
+		while (my $line = <STDIN>) {
+			$hl7 .= $line;
+		}
+	} else {
+		$hl7 = slurp($self->{'_hl7_file'});
+	}
 
 	# Create message.
 	my $msg = Net::HL7::Message->new($hl7);
@@ -119,11 +123,9 @@ App::HL7::Send - Base class for hl7send script.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use App::HL7::Send;
  use File::Temp qw(tempfile);
  use IO::Barf qw(barf);
@@ -174,21 +176,21 @@ L<Perl6::Slurp>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tu pinek/App-HL7-Send>
+L<https://github.com/tupinek/App-HL7-Send>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2016 Michal Špaček
+ © 2016-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

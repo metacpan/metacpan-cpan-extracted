@@ -1,12 +1,12 @@
 package Net::ACME2::Constants;
 
 #----------------------------------------------------------------------
-# Please do NOT reference these from outside the Net::ACME namespace!
+# Please do NOT reference these from outside the Net::ACME2 namespace!
 #----------------------------------------------------------------------
 
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;

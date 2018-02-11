@@ -4,7 +4,7 @@
       "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.3",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -44,6 +44,8 @@
          "requires" : {
             "Class::Load" : "0",
             "DBI" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
             "Lingua::EN::Inflect" : "1.899",
             "Moo" : "0",
             "SQL::Abstract" : "0",
@@ -65,7 +67,7 @@
    "provides" : {
       "DBIx::EAV" : {
          "file" : "lib/DBIx/EAV.pm",
-         "version" : "0.09"
+         "version" : "0.11"
       },
       "DBIx::EAV::Cursor" : {
          "file" : "lib/DBIx/EAV/Cursor.pm"
@@ -97,5 +99,6 @@
          "web" : "https://github.com/cafe01/dbix-eav"
       }
    },
-   "version" : "0.09"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

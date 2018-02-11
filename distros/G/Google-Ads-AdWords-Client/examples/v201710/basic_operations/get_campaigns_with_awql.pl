@@ -28,6 +28,7 @@ use Google::Ads::AdWords::v201710::Paging;
 use Google::Ads::AdWords::v201710::Predicate;
 use Google::Ads::AdWords::v201710::Selector;
 use Google::Ads::AdWords::Utilities::PageProcessor;
+use Google::Ads::AdWords::Utilities::ServiceQueryBuilder;
 
 use constant PAGE_SIZE => 500;
 
@@ -38,7 +39,12 @@ sub get_campaigns_with_awql {
   my $client = shift;
 
   # Get all the campaigns for this account.
-  my $query = "SELECT Id, Name, Status ORDER BY Name";
+  my $query =
+    Google::Ads::AdWords::Utilities::ServiceQueryBuilder->new(
+    {client => $client})
+    ->select(["Id", "Name", "Status"])
+    ->order_by("Name")
+    ->build();
 
   # Paginate through results.
   # The contents of the subroutine will be executed for each campaign.

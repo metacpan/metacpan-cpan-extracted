@@ -438,6 +438,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	InitAudioStream
 	InitVrSimulator
 	InitWindow
+	IsWindowReady
 	IsAudioBufferProcessed
 	IsAudioDeviceReady
 	IsAudioStreamPlaying
@@ -1290,7 +1291,8 @@ None by default.
   AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize,
                                   unsigned int channels)
   void InitVrSimulator(VrDeviceInfo info)
-  bool InitWindow(int width, int height, const char *data)
+  void InitWindow(int width, int height, const char *data)
+  bool IsWindowReady(void)
   bool IsAudioBufferProcessed(AudioStream stream)
   bool IsAudioDeviceReady(void)
   bool IsAudioStreamPlaying(AudioStream stream)

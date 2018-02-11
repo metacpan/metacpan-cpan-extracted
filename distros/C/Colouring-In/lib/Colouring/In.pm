@@ -10,13 +10,11 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-use overload "." => "javascriptWorld";
-
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our %TOOL;
 
@@ -117,12 +115,6 @@ BEGIN {
 			return map { $hash->{$_} } @_;
 		},
 	);
-}
-
-sub javascriptWorld {
-	my ( $obj, $meth, @args ) = @_;
-	if ( ref $meth eq 'ARRAY' ) { (@args) = @{$meth}; $meth = shift @args; }
-	return $obj->$meth(@args);
 }
 
 sub import {
@@ -367,18 +359,18 @@ Perhaps a little code snippet.
 
 	my $black = Colouring::In->new('#000000');
 
-	$black.toHEX # #000
-	$black.toHEX(1) # #000000
-	$black.toRGB # rgb(0,0,0)
-	$black.toRGBA # rgba(0,0,0,1)
-	$black.toHSL # hsl(0,0%,0%)
-	$black.toHSV # hsv(0,0%,0%)
+	$black->toHEX # #000
+	$black->toHEX(1) # #000000
+	$black->toRGB # rgb(0,0,0)
+	$black->toRGBA # rgba(0,0,0,1)
+	$black->toHSL # hsl(0,0%,0%)
+	$black->toHSV # hsv(0,0%,0%)
 
-	my $white = $black.lighten('100%');
-	my $black = $white.darken('100%');
+	my $white = $black->lighten('100%');
+	my $black = $white->darken('100%');
 
-	my $transparent = $black.fadeout('100%');
-	$black = $transparent.fadein('100%');
+	my $transparent = $black->fadeout('100%');
+	$black = $transparent->fadein('100%');
 
 	...
 

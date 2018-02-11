@@ -4,30 +4,32 @@ use strict;
 use warnings;
 use DynaLoader;
 use Socket ();
+use Symbol ();
+use POSIX ();
 use Config;
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 use constant {
-	INET_ATON     => 0,
-	INET_PTON     => 1,
-	GETHOSTBYNAME => 2,
-	GETADDRINFO   => 3,
-	NEED_RTLD_GLOBAL => $Config{osname} =~ /linux/i && 
-	   !($Config{usethreads} || $Config{libs} =~ /-l?pthread\b/ || $Config{ldflags} =~ /-l?pthread\b/)
+    INET_ATON     => 0,
+    INET_PTON     => 1,
+    GETHOSTBYNAME => 2,
+    GETADDRINFO   => 3,
+    NEED_RTLD_GLOBAL => $Config{osname} =~ /linux/i && 
+       !($Config{usethreads} || $Config{libs} =~ /-l?pthread\b/ || $Config{ldflags} =~ /-l?pthread\b/)
 };
 
 our @ISA = 'DynaLoader';
 sub dl_load_flags {
-	if (NEED_RTLD_GLOBAL) {
-		return 0x01;
-	}
-	
-	return 0;
+    if (NEED_RTLD_GLOBAL) {
+        return 0x01;
+    }
+    
+    return 0;
 }
 DynaLoader::bootstrap('Net::DNS::Native');
 if (NEED_RTLD_GLOBAL && &_is_non_safe_symbols_loaded) {
-	die sprintf(
+    die sprintf(
 "***********************************************************************
 Some package defined non thread safe symbols which %s uses internally
 Please make sure you are not placed loading of modules like IO::Socket::IP
@@ -36,59 +38,106 @@ inet_aton() before loading of %s
 ************************************************************************", __PACKAGE__, __PACKAGE__);
 }
 
-sub _fd2socket($) {
-	open my $sock, '+<&=' . $_[0]
-		or die "Can't transform file descriptor to handle: ", $!;
-	$sock;
+sub _fd2socket($$) {
+    my $sock = Symbol::gensym();
+    tie *$sock, 'Net::DNS::Native::Handle', $_[1], $_[0];
+    $sock;
 }
 
 sub getaddrinfo {
-	my $self = shift;
-	_fd2socket $self->_getaddrinfo($_[0], $_[1], $_[2], GETADDRINFO);
+    my $self = shift;
+    _fd2socket $self, $self->_getaddrinfo($_[0], $_[1], $_[2], GETADDRINFO);
 }
 
 sub inet_aton {
-	my $self = shift;
-	_fd2socket $self->_getaddrinfo($_[0], undef, {family => Socket::AF_INET, socktype => Socket::SOCK_STREAM}, INET_ATON);
+    my $self = shift;
+    _fd2socket $self, $self->_getaddrinfo($_[0], undef, {family => Socket::AF_INET, socktype => Socket::SOCK_STREAM}, INET_ATON);
 }
 
 sub inet_pton {
-	my $self = shift;
-	_fd2socket $self->_getaddrinfo($_[1], undef, {family => $_[0], socktype => Socket::SOCK_STREAM}, INET_PTON);
+    my $self = shift;
+    _fd2socket $self, $self->_getaddrinfo($_[1], undef, {family => $_[0], socktype => Socket::SOCK_STREAM}, INET_PTON);
 }
 
 sub gethostbyname {
-	my $self = shift;
-	_fd2socket $self->_getaddrinfo($_[0], undef, {family => Socket::AF_INET, flags => Socket::AI_CANONNAME, socktype => Socket::SOCK_STREAM}, GETHOSTBYNAME);
+    my $self = shift;
+    _fd2socket $self, $self->_getaddrinfo($_[0], undef, {family => Socket::AF_INET, flags => Socket::AI_CANONNAME, socktype => Socket::SOCK_STREAM}, GETHOSTBYNAME);
 }
 
 sub get_result {
-	my ($self, $sock) = @_;
-	
-	my ($type, $err, @res) =  $self->_get_result(fileno($sock));
-	
-	if ($type == GETADDRINFO) {
-		return ($err, @res);
-	}
-	
-	if ($type == INET_ATON || $type == INET_PTON || (!wantarray() && $type == GETHOSTBYNAME)) {
-		return
-		  $err ? undef :
-		  ( $res[0]{family} == Socket::AF_INET ?
-		     Socket::unpack_sockaddr_in($res[0]{addr}) :
-		     Net::DNS::Native::unpack_sockaddr_in6($res[0]{addr}) )[1];
-	}
-	
-	if ($type == GETHOSTBYNAME) {
-		return
-		  $err ? () : 
-		  ($res[0]{canonname}, undef, Socket::AF_INET, length($res[0]{addr}), map { (Socket::unpack_sockaddr_in($_->{addr}))[1] } @res);
-	}
+    my ($self, $sock) = @_;
+    
+    my ($type, $err, @res) =  $self->_get_result(fileno($sock));
+    
+    tied(*$sock)->need_result(0);
+    
+    if ($type == GETADDRINFO) {
+        return ($err, @res);
+    }
+    
+    if ($type == INET_ATON || $type == INET_PTON || (!wantarray() && $type == GETHOSTBYNAME)) {
+        return
+          $err ? undef :
+          ( $res[0]{family} == Socket::AF_INET ?
+             Socket::unpack_sockaddr_in($res[0]{addr}) :
+             Net::DNS::Native::unpack_sockaddr_in6($res[0]{addr}) )[1];
+    }
+    
+    if ($type == GETHOSTBYNAME) {
+        return
+          $err ? () : 
+          ($res[0]{canonname}, undef, Socket::AF_INET, length($res[0]{addr}), map { (Socket::unpack_sockaddr_in($_->{addr}))[1] } @res);
+    }
 }
 
 sub timedout {
-	my ($self, $sock) = @_;
-	$self->_timedout($sock, fileno($sock));
+    my ($self, $sock) = @_;
+    
+    if (ref $sock) {
+        tied(*$sock)->need_result(0);
+        $sock = fileno $sock;
+    }
+    
+    $self->_timedout($sock);
+}
+
+package Net::DNS::Native::Handle;
+
+use strict;
+use warnings;
+
+sub TIEHANDLE {
+    my ($class, $fd, $resolver) = @_;
+    bless { fd => $fd, rs => $resolver, need_result => 1 }, $class;
+}
+
+sub FILENO {
+    return $_[0]->{fd};
+}
+
+sub READ {
+    my $self = shift;
+    POSIX::read( $self->{fd}, $_[0], $_[1] );
+}
+
+sub CLOSE {}
+
+sub DESTROY {
+    my $self = shift;
+    
+    if ($self->need_result && $self->{rs}) {
+        $self->{rs}->timedout($self->{fd});
+    }
+}
+
+sub need_result {
+    my $self = shift;
+    
+    unless (@_) {
+        return $self->{need_result};
+    }
+    
+    $self->{need_result} = $_[0];
 }
 
 1;
@@ -105,56 +154,56 @@ Net::DNS::Native - non-blocking system DNS resolver
 
 =over
 
-	use Net::DNS::Native;
-	use IO::Select;
-	use Socket;
-	
-	my $dns = Net::DNS::Native->new();
-	my $sock = $dns->getaddrinfo("google.com");
-	
-	my $sel = IO::Select->new($sock);
-	$sel->can_read(); # wait until resolving done
-	my ($err, @res) = $dns->get_result($sock);
-	die "Resolving failed: ", $err if ($err);
-	
-	for my $r (@res) {
-		warn "google.com has ip ",
-			$r->{family} == AF_INET ?
-				inet_ntoa((unpack_sockaddr_in($r->{addr}))[1]) :                   # IPv4
-				Socket::inet_ntop(AF_INET6, (unpack_sockaddr_in6($r->{addr}))[1]); # IPv6
-	}
+    use Net::DNS::Native;
+    use IO::Select;
+    use Socket;
+    
+    my $dns = Net::DNS::Native->new();
+    my $sock = $dns->getaddrinfo("google.com");
+    
+    my $sel = IO::Select->new($sock);
+    $sel->can_read(); # wait until resolving done
+    my ($err, @res) = $dns->get_result($sock);
+    die "Resolving failed: ", $err if ($err);
+    
+    for my $r (@res) {
+        warn "google.com has ip ",
+            $r->{family} == AF_INET ?
+                inet_ntoa((unpack_sockaddr_in($r->{addr}))[1]) :                   # IPv4
+                Socket::inet_ntop(AF_INET6, (unpack_sockaddr_in6($r->{addr}))[1]); # IPv6
+    }
 
 =back
 
 =over
 
-	use Net::DNS::Native;
-	use AnyEvent;
-	use Socket;
-	
-	my $dns = Net::DNS::Native->new;
-	
-	my $cv = AnyEvent->condvar;
-	$cv->begin;
-	
-	for my $host ('google.com', 'google.ru', 'google.cy') {
-		my $fh = $dns->inet_aton($host);
-		$cv->begin;
-		
-		my $w; $w = AnyEvent->io(
-			fh   => $fh,
-			poll => 'r',
-			cb   => sub {
-				my $ip = $dns->get_result($fh);
-				warn $host, $ip ? " has ip " . inet_ntoa($ip) : " has no ip";
-				$cv->end;
-				undef $w;
-			}
-		)
-	}
-	
-	$cv->end;
-	$cv->recv;
+    use Net::DNS::Native;
+    use AnyEvent;
+    use Socket;
+    
+    my $dns = Net::DNS::Native->new;
+    
+    my $cv = AnyEvent->condvar;
+    $cv->begin;
+    
+    for my $host ('google.com', 'google.ru', 'google.cy') {
+        my $fh = $dns->inet_aton($host);
+        $cv->begin;
+        
+        my $w; $w = AnyEvent->io(
+            fh   => $fh,
+            poll => 'r',
+            cb   => sub {
+                my $ip = $dns->get_result($fh);
+                warn $host, $ip ? " has ip " . inet_ntoa($ip) : " has no ip";
+                $cv->end;
+                undef $w;
+            }
+        )
+    }
+    
+    $cv->end;
+    $cv->recv;
 
 =back
 
@@ -212,16 +261,16 @@ when resolving will be really started. To notify it will simply make C<$handle> 
 data from this handle to make it non readable again, so you can receive next notification, when host resolving will be done. There will be 1 byte
 of data which you should read. C<"1"> for notification about start of the resolving and C<"2"> for notification about finish of the resolving.
 
-	my $dns = Net::DNS::Native->new(pool => 1, notify_on_begin => 1);
-	my $handle = $dns->inet_aton("google.com");
-	my $sel = IO::Select->new($handle);
-	$sel->can_read(); # wait "begin" notification
-	sysread($handle, my $buf, 1); # $buf eq "1", $handle is not readable again
-	$sel->can_read(); # wait "finish" notification
-	# resolving done
-	# we can sysread($handle, $buf, 1); again and $buf will be eq "2"
-	# but this is not necessarily
-	my $ip = $dns->get_result($handle);
+    my $dns = Net::DNS::Native->new(pool => 1, notify_on_begin => 1);
+    my $handle = $dns->inet_aton("google.com");
+    my $sel = IO::Select->new($handle);
+    $sel->can_read(); # wait "begin" notification
+    sysread($handle, my $buf, 1); # $buf eq "1", $handle is not readable again
+    $sel->can_read(); # wait "finish" notification
+    # resolving done
+    # we can sysread($handle, $buf, 1); again and $buf will be eq "2"
+    # but this is not necessarily
+    my $ip = $dns->get_result($handle);
 
 =back
 
@@ -263,7 +312,8 @@ but will automatically discard any results returned when resolving will be done.
 associated resolving operation. And don't need to call C<get_result($handle)> to destroy resources associated with this handle. Furthermore, if you are using thread pool
 and all threads in pool are busy and C<extra_thread> option not specified, but 1 resolving operation from this pool marked as timed out and you'll add one more resolving operation,
 this operation will not be queued. Instead of this 1 temporary extra thread will be created to process this operation. So you can think about C<timedout> like about real interrupter of
-long running resolving operation. But you are warned how it really works.
+long running resolving operation. But you are warned how it really works. B<Note:> since 0.16 handles will be automatically marked as timedout during destruction, so you no need more to
+call C<timedout($handle)> yourself, just lose last reference to this handle.
 
 =head1 AUTHOR
 

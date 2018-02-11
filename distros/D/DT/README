@@ -1,0 +1,54 @@
+DT
+==
+
+    DT is a very simple and thin wrapper over DateTime::Moonpig, which in
+    turn is a wrapper over DateTime. DateTime::Moonpig brings immutability
+    and saner operator overloading at the cost of cartoonish name but also
+    lacks date/time parsing capabilities that are badly needed all the
+    time.
+
+    There is a myriad of helpful modules on CPAN but oh all that typing!
+
+    Consider:
+
+        use DateTime;
+        my $dt = DateTime->from_epoch(epoch => time);
+    
+        use DateTime::Format::Pg;
+        my $dt = DateTime::Format::Pg->parse_datetime($timestamp_from_postgres);
+    
+        use DateTime::Format::ISO8601;
+        my $dt = DateTime::Format::ISO8601->parse_datetime($iso_datetime);
+
+    Versus:
+
+        use DT ':pg';
+        my $dt_unix = DT->new(time);
+        my $dt_pg = DT->new($timestamp_from_postgres);
+        my $dt_iso = DT->new($iso_datetime);
+
+    DT constructor will try to Do What You Mean, and if it cannot it will
+    fall back to default DateTime constructor. Simple.
+
+INSTALLATION
+
+    To install this module type the following:
+
+        perl Makefile.PL
+        make && make test && make install
+
+DEPENDENCIES
+
+    DateTime::Moonpig is the parent class for DT. DateTime::Format::ISO8601
+    is required for parsing ISO8601 date/time formats.
+
+    PostgreSQL related methods are optional and depend on
+    DateTime::Format::Pg being installed.
+
+LICENSE AND COPYRIGHT
+
+    Copyright (c) 2018 by Alex Tokarev <nohuhu@cpan.org>.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See "perlartistic".
+

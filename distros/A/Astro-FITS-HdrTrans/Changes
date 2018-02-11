@@ -1,6 +1,11 @@
 Revision history for Astro::FITS::HdrTrans
 
-1.60 2019-02-05
+1.61 2018-02-09
+
+    - Add support for the INBEAM header for SCUBA-2 (replacing
+      the use of POL_CONN for POL-2).
+
+1.60 2018-02-05
 
     - Add support for dates in the format used by MySQL.
     - Add translation of WND_BLND for JCMT.

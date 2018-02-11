@@ -1,5 +1,5 @@
 package Finance::GDAX::API::Order;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use 5.20.0;
 use warnings;
 use Moose;
@@ -172,7 +172,8 @@ Finance::GDAX::API::Order - Perl interface to the GDAX Order API
 
 =head1 DESCRIPTION
 
-Basic interface to the GDAX API for orders.
+Basic interface to the GDAX API for orders. PLEASE USE A NEW ORDER
+OBJECT FOR EACH ORDER, otherwise unexpected things can happen.
 
 The API shows the response should look something like this for orders
 intiated:
@@ -425,7 +426,9 @@ the current API docs, like
     "settled": false
   }
 
-If $order->error exists, then it will contain the error message.
+If $order->error exists, then it will contain the error
+message. PLEASE USE A NEW ORDER OBJECT FOR EACH ORDER, otherwise
+unexpected things can happen.
 
 =head2 C<cancel> $order_id
 

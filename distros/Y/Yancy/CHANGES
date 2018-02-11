@@ -1,5 +1,31 @@
 Changelog for Yancy
 
+0.014     2018-02-09 14:50:26-06:00 America/Chicago
+
+    [Added]
+
+    - Added "textarea" field format for multiline text fields
+    - Added friendly error message when no collections configured
+    - Added `x-order` field configuration to control the order of fields
+      in the edit form
+
+    [Fixed]
+
+    - Fixed "Yancy" and "Back to Application" links in Yancy UI to point
+      to useful locations. Thanks @lindleyw!
+
+0.013     2018-02-07 23:21:49-06:00 America/Chicago
+
+    [Added]
+
+    - Added display of `title` and `description` for collections
+      and fields
+
+    [Fixed]
+
+    - Fixed problem with tests not running on Perls < 5.24. Thanks
+      @lindleyw! [Github #9]
+
 0.012     2018-01-29 12:37:52-06:00 America/Chicago
 
     [Fixed]

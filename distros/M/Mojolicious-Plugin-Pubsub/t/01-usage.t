@@ -11,7 +11,7 @@ my $msg;
 plugin Pubsub => { cb => sub { $msg = shift; Mojo::IOLoop->stop; } };
 
 app->log->level('warn');
-app->publish('message');
+app->pubsub->publish('message');
 app->start('daemon', '-l', "http://127.0.0.1:$port");
 
 

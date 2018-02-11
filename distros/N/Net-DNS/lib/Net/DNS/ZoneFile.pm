@@ -1,9 +1,9 @@
 package Net::DNS::ZoneFile;
 
 #
-# $Id: ZoneFile.pm 1605 2017-11-27 11:37:40Z willem $
+# $Id: ZoneFile.pm 1623 2018-01-26 14:23:54Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1605 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1623 $)[1];
 
 
 =head1 NAME
@@ -401,8 +401,8 @@ sub parse {
 		return substr sprintf( "%01.$digit$format", $value ), -$length if $format =~ /[doxX]/;
 
 		my $nibble = join( '.', split //, sprintf ".%32.32lx", $value );
-		return lc reverse substr $nibble, -$length if $format =~ /[n]/;
-		return uc reverse substr $nibble, -$length if $format =~ /[N]/;
+		return reverse lc( substr $nibble, -$length ) if $format =~ /[n]/;
+		return reverse uc( substr $nibble, -$length ) if $format =~ /[N]/;
 		die "unknown $format format";
 	}
 

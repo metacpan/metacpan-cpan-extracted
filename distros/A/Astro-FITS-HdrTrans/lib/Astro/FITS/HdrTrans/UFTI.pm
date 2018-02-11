@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::UKIRTNew /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -96,7 +96,7 @@ L<http://www.jach.hawaii.edu/UKIRT/instruments/ufti/PARAMETERS.html#1>
 The default scale assumes north is to the top.
 
 The actual C<CDELT2> value is scaled if its unit is degree/pixel,
-as suggested by its size, and the presence of header C<CTYPE2> set 
+as suggested by its size, and the presence of header C<CTYPE2> set
 to 'DEC--TAN' indicating that the WCS follows the AIPS convention.
 
 =cut
@@ -199,7 +199,7 @@ sub to_RA_BASE {
   if ( exists($FITS_headers->{RABASE} ) ) {
     my $date = $self->to_UTDATE( $FITS_headers );
     my $format = $self->to_FILE_FORMAT( $FITS_headers );
-      
+
     if ( defined( $format ) && $format eq "HDS" &&
          defined( $date ) && $date > 20000507 && $date < 20000720 ) {
       $return = $FITS_headers->{RABASE};
@@ -233,7 +233,7 @@ sub from_RA_BASE {
   if ( defined( $generic_headers->{RA_BASE} ) ) {
     my $date = $self->to_UTDATE( $generic_headers );
 
-    if ( defined( $generic_headers->{FILE_FORMAT} ) && 
+    if ( defined( $generic_headers->{FILE_FORMAT} ) &&
          $generic_headers->{FILE_FORMAT} eq "HDS" &&
          defined( $date ) && $date > 20000507 && $date < 20000720 ) {
       $return_hash{'RABASE'} = $generic_headers->{RA_BASE};
@@ -255,7 +255,7 @@ The default scale assumes east is to the left.
 It corrects for an erroneous sign in early data.
 
 The actual C<CDELT1> value is scaled if its unit is degree/pixel,
-as suggested by its size, and the presence of header C<CTYPE1> set 
+as suggested by its size, and the presence of header C<CTYPE1> set
 to 'RA---TAN' indicating that the WCS follows the AIPS convention.
 
 =cut
@@ -310,7 +310,7 @@ sub to_RA_SCALE {
 
 =item B<from_RA_SCALE>
 
-Converts the generic header C<RA_SCALE> to the FITS header C<CDELT1> 
+Converts the generic header C<RA_SCALE> to the FITS header C<CDELT1>
 by ensuring it has a positive sign as in the input data.  This
 sign is wrong because the right ascension increases with decreasing
 pixel index, however this conversion permits a cycle from FITS to

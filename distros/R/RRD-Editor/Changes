@@ -9,3 +9,8 @@ Revision history for RRD-Editor
 0.10	Better file opening (readonly handling), minor code tweaks.  Thanks to John LoVerso.
 0.12	Further portability testing - Irix
 0.15	Minor bug fixes (template handling, open files)	
+0.19    2018.02.07
+    * CPAN#89662 CPAN#124356 save() does not truncate file which leads to corrupt RRD file
+    * CPAN#124303 resize_RRA() does not rely to ptr leading to shift of RRA data
+    * CPAN#124355 delete_RRA() parameter validation allows out of range index
+    - CPAN#124355 delete_RRA() last element of RRA array doesn't deleteted after shift

@@ -27,7 +27,7 @@ use base qw/ Astro::FITS::HdrTrans::FITS /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # For a constant mapping, there is no FITS header, just a generic
 # header that is constant.
@@ -445,7 +445,7 @@ sub to_UTDATE {
 
 =item B<to_UTEND>
 
-Returns the UT time of the end of the observation as a C<Time::Piece> object.  
+Returns the UT time of the end of the observation as a C<Time::Piece> object.
 
 =cut
 
@@ -460,9 +460,9 @@ sub to_UTEND {
 
 =item B<to_UTSTART>
 
-Returns an estimated UT time of the start of the observation as a 
+Returns an estimated UT time of the start of the observation as a
 C<Time::Piece> object.  The start time is derived from the C<DATE-OBS>
-keyword and if C<DATE-OBS> only supplies a date, the time from the 
+keyword and if C<DATE-OBS> only supplies a date, the time from the
 C<UTSTART> keyword is appended before conversaion to a C<Time::Piece>
 object.
 
@@ -633,7 +633,7 @@ sub getbounds{
 
 =item B<get_UT_date>
 
-Returns the UT date in YYYYMMDD format.  It parses the non-standard 
+Returns the UT date in YYYYMMDD format.  It parses the non-standard
 ddMmmyy C<DATE-OBS> keyword.
 
 =cut

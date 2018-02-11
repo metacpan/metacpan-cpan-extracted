@@ -27,12 +27,12 @@ requires:
   Pod::Usage: '1.33'
   String::Glob::Permute: '0'
   Term::ReadKey: '0'
-  perl: '5.008005'
+  perl: '5.008004'
 resources:
   bugtracker: https://github.com/skaji/App-RemoteCommand/issues
   homepage: https://github.com/skaji/App-RemoteCommand
   repository: https://github.com/skaji/App-RemoteCommand.git
-version: '0.96'
+version: '0.97'
 x_contributors:
   - 'Shoichi Kaji <skaji@outlook.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

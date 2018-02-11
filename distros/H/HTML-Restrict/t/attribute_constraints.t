@@ -63,4 +63,50 @@ cmp_ok(
     'possible to maintain order',
 );
 
+cmp_ok(
+    $hr->process(
+        q[<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert('hi')"></iframe>]
+    ),
+    'eq',
+    q[<iframe src="http://www.youtube.com/&quot; onclick=&quot;alert(&#39;hi&#39;)"></iframe>],
+    'entities are re-encoded when regex match passes',
+);
+
+$hr = HTML::Restrict->new(
+    rules => {
+        span => [
+            {
+                style => sub {
+                    my $value = shift;
+                    my @values;
+                    while ( $value
+                        =~ /(?:\A|;)\s*([a-z-]+)\s*:\s*([^;\n]+?)\s*(?=;|$)/gc
+                    ) {
+                        my ( $prop, $prop_value ) = ( $1, $2 );
+                        if (   $prop =~ /\A(?:margin|padding)\z/
+                            && $prop_value =~ /\A\d+(?:em|px|)\z/ ) {
+                            push @values, "$prop: $prop_value";
+                        }
+                    }
+                    return
+                        unless @values;
+                    return join '; ', @values;
+                }
+            },
+            {
+                class => sub { return undef }
+            },
+        ],
+    },
+);
+
+cmp_ok(
+    $hr->process(
+        '<span class="fish" style="margin: 2px; padding: 7px;border: 2px;">content</span>',
+    ),
+    'eq',
+    '<span style="margin: 2px; padding: 7px">content</span>',
+    'filter attributes by coderef',
+);
+
 done_testing;

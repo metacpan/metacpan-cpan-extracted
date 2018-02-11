@@ -39,8 +39,8 @@
             "Hash::MultiValue" : "0",
             "JSON::Path" : "0",
             "JSON::XS" : "0",
-            "Moose::Util::TypeConstraints" : "0",
-            "Params::ValidationCompiler" : "0",
+            "MooseX::Types" : "0",
+            "Params::ValidationCompiler" : "0.22",
             "Test::BDD::Cucumber" : "0",
             "Try::Tiny" : "0",
             "perl" : "5.006"
@@ -61,6 +61,6 @@
          "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions"
       }
    },
-   "version" : "0.08",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

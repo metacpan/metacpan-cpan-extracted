@@ -1,4 +1,4 @@
-Forks::Super version 0.92
+Forks::Super version 0.93
 =========================
 
 Forks::Super provides drop-in replacements for the Perl
@@ -179,7 +179,7 @@ for important information.
 
 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2017, Marty O'Brien.
+Copyright (c) 2009-2018, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

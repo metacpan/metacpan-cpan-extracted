@@ -1,0 +1,155 @@
+do{ my $x = [
+       {
+         'ARGV' => []
+       },
+       {},
+       {
+         'config_dir' => '_build',
+         'orig_dir' => '/home/wes/code/cgi-app-p-authen',
+         'use_rcfile' => 1,
+         'include_dirs' => [],
+         'get_options' => {},
+         'build_bat' => 0,
+         'auto_configure_requires' => 1,
+         'install_base_relpaths' => {},
+         'dist_name' => 'CGI-Application-Plugin-Authentication',
+         'perl' => '/home/wes/.plenv/versions/5.20.1/bin/perl5.20.1',
+         'allow_pureperl' => 0,
+         'libdoc_dirs' => [
+                            'blib/lib',
+                            'blib/arch'
+                          ],
+         'config' => undef,
+         'program_name' => undef,
+         'prereq_action_types' => [
+                                    'requires',
+                                    'build_requires',
+                                    'test_requires',
+                                    'conflicts',
+                                    'recommends'
+                                  ],
+         'test_requires' => {},
+         'license' => 'perl',
+         'xs_files' => undef,
+         'build_script' => 'Build',
+         'sign' => undef,
+         'create_readme' => 1,
+         'create_license' => undef,
+         'dist_author' => [
+                            'Cees Hek <ceeshek@gmail.com>'
+                          ],
+         'requires' => {
+                         'Class::ISA' => 0,
+                         'Attribute::Handlers' => 0,
+                         'CGI' => '3.16',
+                         'Scalar::Util' => 0,
+                         'perl' => '5.006',
+                         'CGI::Application' => 4,
+                         'Digest::SHA' => 0,
+                         'UNIVERSAL::require' => 0,
+                         'MIME::Base64' => 0
+                       },
+         'create_makefile_pl' => 'traditional',
+         'destdir' => undef,
+         'prefix' => undef,
+         'install_sets' => {},
+         '_added_to_INC' => [],
+         'prefix_relpaths' => {},
+         'configure_requires' => {},
+         'meta_merge' => {
+                           'resources' => {
+                                            'repository' => 'http://github.com/cees/cgi-application-plugin-authentication/tree'
+                                          },
+                           'keywords' => [
+                                           'cgiapp',
+                                           'Titanium',
+                                           'authentication'
+                                         ]
+                         },
+         'use_tap_harness' => 0,
+         'verbose' => undef,
+         'test_file_exts' => [
+                               '.t'
+                             ],
+         'conflicts' => {},
+         'tap_harness_args' => {},
+         'build_elements' => [
+                               'PL',
+                               'support',
+                               'pm',
+                               'xs',
+                               'share_dir',
+                               'pod',
+                               'script'
+                             ],
+         'pureperl_only' => 0,
+         'PL_files' => undef,
+         'magic_number' => undef,
+         'extra_linker_flags' => [],
+         'release_status' => 'stable',
+         'module_name' => 'CGI::Application::Plugin::Authentication',
+         'recommends' => {
+                           'CGI::Application::Plugin::Session' => 0,
+                           'Digest::MD5' => 0,
+                           'Apache::Htpasswd' => '1.8',
+                           'Color::Calc' => '0.12'
+                         },
+         'meta_add' => {},
+         'cpan_client' => 'cpan',
+         'extra_compiler_flags' => [],
+         'recurse_into' => [],
+         'has_config_data' => undef,
+         'pm_files' => undef,
+         'html_css' => '',
+         'mb_version' => '0.421',
+         'blib' => 'blib',
+         'scripts' => undef,
+         'original_prefix' => {},
+         'create_packlist' => 1,
+         'bundle_inc' => [],
+         'dynamic_config' => 1,
+         'base_dir' => '/home/wes/code/cgi-app-p-authen',
+         'metafile' => 'META.yml',
+         'debug' => undef,
+         'share_dir' => undef,
+         'script_files' => undef,
+         'test_files' => undef,
+         'recursive_test_files' => undef,
+         'install_base' => undef,
+         'dist_version' => '0.20',
+         'metafile2' => 'META.json',
+         'debugger' => undef,
+         'build_requires' => {
+                               'Test::Taint' => 0,
+                               'Test::MockObject' => 0,
+                               'Readonly' => 0,
+                               'Test::Regression' => 0,
+                               'Test::More' => '0.93',
+                               'Test::NoWarnings' => 0,
+                               'Test::Without::Module' => 0,
+                               'Test::Warn' => '0.11',
+                               'Test::Exception' => 0
+                             },
+         'installdirs' => 'site',
+         'extra_manify_args' => undef,
+         'install_path' => {},
+         'pod_files' => undef,
+         'build_class' => 'Module::Build',
+         'mymetafile2' => 'MYMETA.json',
+         'dist_abstract' => undef,
+         'dist_version_from' => 'lib/CGI/Application/Plugin/Authentication.pm',
+         'autosplit' => undef,
+         'pollute' => undef,
+         'quiet' => undef,
+         'bundle_inc_preload' => [],
+         'c_source' => undef,
+         'dist_suffix' => undef,
+         'mymetafile' => 'MYMETA.yml',
+         'bindoc_dirs' => [
+                            'blib/script'
+                          ],
+         'needs_compiler' => '',
+         'allow_mb_mismatch' => 0
+       }
+     ];
+$x; }

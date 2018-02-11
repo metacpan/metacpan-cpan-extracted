@@ -22,7 +22,7 @@ use base qw/ Astro::FITS::HdrTrans::JAC /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -401,7 +401,7 @@ sub to_UTSTART {
     my $ut = $utdate . "T" . $FITS_headers->{'UTSTART'};
     $return = $self->_parse_iso_date( $ut );
 
-  } elsif (exists $FITS_headers->{"DATE-OBS"}) { 
+  } elsif (exists $FITS_headers->{"DATE-OBS"}) {
     # reduced data
     $return = $self->_parse_iso_date( $FITS_headers->{"DATE-OBS"} );
 

@@ -5,6 +5,7 @@ use strictures 2;
 use DBI;
 use Lingua::EN::Inflect ();
 use Data::Dumper;
+use Digest::MD5 qw/ md5_hex /;
 use DBIx::EAV::EntityType;
 use DBIx::EAV::Entity;
 use DBIx::EAV::ResultSet;
@@ -14,7 +15,7 @@ use Scalar::Util 'blessed';
 use Class::Load qw' try_load_class ';
 use namespace::clean;
 
-our $VERSION = "0.09";
+our $VERSION = "0.11";
 
 # required
 has 'dbh', is => 'ro', required => 1;
@@ -27,6 +28,7 @@ has 'resultset_namespaces', is => 'ro', default => sub { [] };
 
 # internal
 has 'schema', is => 'ro', lazy => 1, builder => 1, init_arg => undef, handles => [qw/ table dbh_do /];
+has '_type_declarations', is => 'ro', default => sub { {} };
 has '_types', is => 'ro', default => sub { {} };
 has '_types_by_id', is => 'ro', default => sub { {} };
 
@@ -38,7 +40,7 @@ around BUILDARGS => sub {
 
     my @schema_params = grep { exists $params->{$_} } qw/
         tenant_id         data_types   database_cascade_delete static_attributes
-        table_prefix      id_type      default_attribute_type
+        table_prefix      id_type      default_attribute_type  enable_multi_tenancy
     /;
 
     @{$schema_config}{@schema_params} = delete @{$params}{@schema_params};
@@ -69,20 +71,15 @@ sub connect {
 }
 
 sub type {
-    my ($self, $value) = @_;
+    my ($self, $name) = @_;
+    confess 'usage: eav->type($name)' unless $name;
 
-    return $self->_types->{$value}
-        if exists $self->_types->{$value};
+    return $self->_types->{$name}
+        if exists $self->_types->{$name};
 
-    my $type = $self->_load_type('name', $value);
+    my $type = $self->_load_or_register_type('name', $name);
 
-    # not registered, try to find  a custom entity class and register it
-    if (!$type && (my $entity_class = $self->_resolve_entity_class($value))) {
-
-        ($type) = $self->register_types({$value => $entity_class->type_definition});
-    }
-
-    confess "EntityType '$value' does not exist."
+    confess "EntityType '$name' does not exist."
         unless $type;
 
     $type;
@@ -94,20 +91,100 @@ sub type_by_id {
     return $self->_types_by_id->{$value}
         if exists $self->_types_by_id->{$value};
 
-    $self->_load_type('id', $value)
+    $self->_load_or_register_type('id', $value)
         or confess "EntityType 'id=$value' does not exist.";
 }
 
-sub _load_type {
+sub declare_entities {
+    my ($self, $schema) = @_;
+    my $declarations = $self->_type_declarations;
+
+    local $Data::Dumper::Indent = 0;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Maxdepth = 10;
+
+    for my $name (sort keys %$schema) {
+
+        # generate signature
+        my $entity_schema = $self->_normalize_entity_schema($name, $schema->{$name});
+        my $signature = md5_hex Dumper($entity_schema);
+
+        # not declared yet
+        if (!$declarations->{$name}) {
+            $declarations->{$name} = {
+                signature => $signature,
+                schema => $entity_schema
+            };
+            next;
+        }
+        else {
+
+            # same schema, do nothing
+            next if $declarations->{$name}{signature} eq $signature;
+
+            # its different, replace declaration and invalidate insalled type
+            printf STDERR "# %s declaration changed from %s to %s\n", $name, $declarations->{$name}{signature}, $signature;
+            $declarations->{$name} = {
+                signature => $signature,
+                schema => $entity_schema
+            };
+
+            my $type_id = $self->_types->{$name}->id;
+            delete $self->_types->{$name};
+            delete $self->_types_by_id->{$type_id};
+        }
+    }
+}
+
+sub _load_or_register_type {
     my ($self, $field, $value) = @_;
+    my $declarations = $self->_type_declarations;
 
-    my $type_row = $self->table('entity_types')->select_one({ $field => $value });
-    return unless $type_row;
+    # find registered type
+    if (my $type_row = $self->table('entity_types')->select_one({ $field => $value })) {
 
-    my $type = DBIx::EAV::EntityType->load({ %$type_row, core => $self});
-    $self->_types->{$type->name} = $type;
-    $self->_types_by_id->{$type->id} = $type;
-    $type;
+        # find custom class to update type declaration
+        if (my $custom_entity_class = $self->_resolve_entity_class($type_row->{name})) {
+            $self->declare_entities({ $value => $custom_entity_class->type_definition });
+        }
+
+        # update type registration if changed
+        my $declaration = $declarations->{$type_row->{name}}
+            or die "Found registered but not declared entity type '$type_row->{name}'";
+
+        my $type;
+        # declaration didnt change, load from db
+        if ($declaration->{signature} eq $type_row->{signature}) {
+
+            # printf STDERR "# loaded $type_row->{name} signature %s.\n", $type_row->{signature};
+            $type = DBIx::EAV::EntityType->load({ %$type_row, core => $self});
+        }
+        # update definition
+        else {
+            # printf STDERR "# loaded $type_row->{name} signature changed from %s to %s.\n", $type_row->{signature}, $declaration->{signature};
+            $self->_update_type_definition($type_row, $declaration->{schema});
+            $type = DBIx::EAV::EntityType->new({ %$type_row, core => $self});
+        }
+
+        # install type and return
+        $self->_types->{$type->name} = $type;
+        $self->_types_by_id->{$type->id} = $type;
+        return $type;
+    }
+
+    # not found, give up unless we have a name
+    return unless $field eq 'name';
+
+    # find custom class to update type declaration
+    if (my $custom_entity_class = $self->_resolve_entity_class($value)) {
+        $self->declare_entities({ $value => $custom_entity_class->type_definition });
+    }
+
+    # declaration not found
+    return unless $declarations->{$value};
+
+    # register new type
+    $self->_register_entity_type($value);
 }
 
 sub _resolve_entity_class {
@@ -146,124 +223,128 @@ sub _resolve_resultset_class {
 
 sub resultset {
     my ($self, $name) = @_;
+    my $type;
 
-    my $rs_class = $self->_resolve_resultset_class($name)
+    if (blessed $name) {
+        confess "invalid argument" unless $name->isa('DBIx::EAV::EntityType');
+        $type = $name;
+    }
+    else {
+        $type = $self->type($name);
+    }
+
+    my $rs_class = $self->_resolve_resultset_class($type->name)
         || 'DBIx::EAV::ResultSet';
 
     $rs_class->new({
         eav  => $self,
-        type => $self->type($name),
+        type => $type,
     });
 }
 
+sub _register_entity_type {
+    my ($self, $name) = @_;
 
-sub register_types {
-    my ($self, $schema) = @_;
-    my %skip;
+    # error: undeclared type
+    my $declaration = $self->_type_declarations->{$name}
+        or die "_register_entity_type() error: No type declaration for '$name'";
 
-    # register only not-installed entities to
-    # allow multiple calls to this method
-    my @new_types = grep { not exists $self->_types->{$_} } keys %$schema;
-
-    # create or update each entity type on database
-    my @registered_types;
-    foreach my $name (@new_types) {
-        next if exists $self->_types->{$name};
-        push @registered_types,
-             $self->_register_entity_type($name, $schema->{$name}, $schema);
+    # error: already registered
+    my $types_table = $self->table('entity_types');
+    if  (my $type = $types_table->select_one({ name => $name })) {
+        die "Type '$type->{name}' is already registered!'";
     }
 
-    # register relationships
-    foreach my $name (@new_types) {
+    # isnert new entity type
+    my $id = $types_table->insert({ name => $name, signature => $declaration->{signature} });
+    my $type = $types_table->select_one({ id => $id });
+    die "Error inserting entity type '$name'!" unless $type;
 
-        my $spec = $schema->{$name};
-        my $entity_type = $self->type($name);
+    # insert type definition (parent, attributes, relationships)
+    $self->_update_type_definition($type, $declaration->{schema});
 
-        foreach my $reltype (qw/ has_one has_many many_to_many /) {
-
-            next unless defined $spec->{$reltype};
-
-            $spec->{$reltype} ||= [];
-            $spec->{$reltype} = [$spec->{$reltype}]
-                unless ref $spec->{$reltype} eq 'ARRAY';
-
-            foreach my $rel (@{$spec->{$reltype}}) {
-                $entity_type->register_relationship($reltype, $rel);
-            }
-        }
-    }
-
-    @registered_types;
+    # install and return
+    $self->_types->{$name} =
+        $self->_types_by_id->{$type->{id}} = DBIx::EAV::EntityType->new(%$type, core => $self);
 }
 
 
-sub _register_entity_type {
-    my ($self, $name, $spec, $schema) = @_;
+sub _update_type_definition {
+    my ($self, $type, $spec) = @_;
 
     # parent type first
-    my $parent_type;
-    if ($spec->{extends}) {
-
-        unless ($parent_type = $self->_types->{$spec->{extends}}) {
-
-            die "Unknown type '$spec->{extends}' specified in 'extents' option for type '$name'."
-                unless exists $schema->{$spec->{extends}};
-
-            $parent_type = $self->_register_entity_type($spec->{extends}, $schema->{$spec->{extends}}, $schema);
-        }
-    }
-
-    # find or create entity type
-    my $types_table = $self->table('entity_types');
-    my $hierarchy_table = $self->table('type_hierarchy');
-    my $type = $types_table->select_one({ name => $name });
-
-    if (defined $type) {
-
-        # change parent
-    }
-    else {
-
-        # TODO implement rename
-        # if ($spec->{rename_from}) { ... }
-
-        my $id = $types_table->insert({ name => $name });
-        $type = $types_table->select_one({ id => $id });
-        die "Error inserting entity type '$name'!" unless $type;
-
-        if ($parent_type) {
-            $hierarchy_table->insert({
-                parent_type_id => $parent_type->{id},
-                child_type_id  => $type->{id}
-            });
-
-            $type->{parent} = $parent_type;
-        }
-    }
+    my $parent_type = $self->_update_type_inheritance($type, $spec);
+    $type->{parent} = $parent_type if $parent_type;
 
     # update or create attributes
+    $self->_update_type_attributes($type, $spec);
+
+    # update or create relationships
+    foreach my $reltype (qw/ has_one has_many many_to_many /) {
+
+        next unless defined $spec->{$reltype};
+
+        $spec->{$reltype} = [$spec->{$reltype}]
+            unless ref $spec->{$reltype} eq 'ARRAY';
+
+        foreach my $rel (@{$spec->{$reltype}}) {
+            # $entity_type->register_relationship($reltype, $rel);
+            $self->_register_type_relationship($type, $reltype, $rel);
+        }
+    }
+
+}
+
+sub _update_type_inheritance {
+    my ($self, $type, $spec) = @_;
+
+    my $hierarchy_table = $self->table('type_hierarchy');
+    my $inheritance_row = $hierarchy_table->select_one({ child_type_id  => $type->{id} });
+    my $parent_type;
+
+    if ($spec->{extends}) {
+
+        die "Unknown type '$spec->{extends}' specified in 'extents' option for type '$type->{name}'."
+            unless $parent_type = $self->type($spec->{extends});
+
+        # update parent link
+        if ($inheritance_row && $inheritance_row->{parent_type_id} ne $parent_type->id) {
+
+            $hierarchy_table->update({ parent_type_id => $parent_type->id }, $inheritance_row)
+                or die "Error updating to inheritance table. ( for '$type->{name}' extends '$spec->{extends}')";
+        }
+        # insert parent link
+        elsif(!$inheritance_row) {
+
+            $hierarchy_table->insert({ child_type_id => $type->{id}, parent_type_id => $parent_type->id })
+                or die "Error inserting to inheritance table. ( for '$type->{name}' extends '$spec->{extends}')";
+        }
+
+        $type->{parent} = $parent_type;
+    }
+    else {
+        # remove parent link
+        if ($inheritance_row) {
+            $hierarchy_table->delete($inheritance_row)
+                or die "Error deleting from inheritance table. (to remove '$type->{name}' parent link)";
+        }
+    }
+
+    $parent_type;
+}
+
+sub _update_type_attributes {
+    my ($self, $type, $spec) = @_;
+
     my $attributes = $self->table('attributes');
     my %static_attributes = map { $_ => {name => $_, is_static => 1} } @{$self->table('entities')->columns};
     $type->{attributes} = {};
 
-    my %inherited_attributes = $parent_type ? map { $_->{name} => $_ } $parent_type->attributes( no_static => 1 )
-                                            : ();
+    my %inherited_attributes = $type->{parent}  ? map { $_->{name} => $_ } $type->{parent} ->attributes( no_static => 1 ) : ();
 
     foreach my $attr_spec (@{$spec->{attributes}}) {
 
-        # expand string to name/type
-        unless (ref $attr_spec) {
-            my ($name, $type) = split ':', $attr_spec;
-            $attr_spec = {
-                name => $name,
-                type => $type || $self->default_attribute_type
-            };
-        }
-
-        die sprintf("Error registering attribute '%s' for  entity '%s'. Can't use names of static attributes (real table columns).", $attr_spec->{name}, $type->{name})
-            if exists $static_attributes{$attr_spec->{name}};
-
-        printf STDERR "[warn] entity '%s' is overriding inherited attribute '%s'", $name, $attr_spec->{name}
+        printf STDERR "[warn] entity '%s' is overriding inherited attribute '%s'", $type->{name}, $attr_spec->{name}
             if $inherited_attributes{$attr_spec->{name}};
 
         my $attr = $attributes->select_one({
@@ -272,7 +353,7 @@ sub _register_entity_type {
         });
 
         if (defined $attr) {
-            # update
+            # TODO update attribute definition
         }
         else {
             delete $attr_spec->{id}; # safety
@@ -292,12 +373,146 @@ sub _register_entity_type {
 
         $type->{attributes}{$attr->{name}} = $attr;
     }
-
-    $self->_types->{$name} =
-        $self->_types_by_id->{$type->{id}} = DBIx::EAV::EntityType->new(%$type, core => $self);
 }
 
+sub _register_type_relationship {
+    my ($self, $type, $reltype, $params) = @_;
 
+    die sprintf("Error: invalid %s relationship for entity '%s': missing 'entity' parameter.", $reltype, $type->{name})
+        unless $params->{entity};
+
+    my $other_entity = $self->type($params->{entity});
+
+    $params->{name} ||= $reltype =~ /_many$/ ? lc Lingua::EN::Inflect::PL($other_entity->name)
+                                             : lc $other_entity->name;
+
+    $params->{incoming_name} ||= $reltype eq 'many_to_many' ? lc Lingua::EN::Inflect::PL($type->{name})
+                                                            : lc $type->{name};
+
+    my %rel = (
+        left_entity_type_id  => $type->{id},
+        right_entity_type_id => $other_entity->id,
+        name => $params->{name},
+        incoming_name => $params->{incoming_name},
+        "is_$reltype" => 1
+    );
+
+    # update or insert
+    my $relationships_table = $self->table('relationships');
+    my $existing_rel = $relationships_table->select_one({
+        left_entity_type_id => $type->{id},
+        name => $rel{name},
+    });
+
+    if ($existing_rel) {
+
+        $rel{id} = $existing_rel->{id};
+
+        # update
+        my %changed_cols = map { $_ => $rel{$_} }
+                           grep { $rel{$_} ne $existing_rel->{$_} }
+                           keys %rel;
+
+        $relationships_table->update(\%changed_cols, { id => $rel{id} })
+            if keys %changed_cols > 0;
+    }
+    else {
+        my $id = $relationships_table->insert(\%rel);
+        die sprintf("Database error while registering  '%s -> %s' relationship.", $type->{name}, $rel{name})
+            unless $id;
+
+        $rel{id} = $id;
+    }
+
+    # this type side
+    $type->{relationships}->{$rel{name}} = \%rel;
+
+    # install their side
+    $other_entity->_relationships->{$rel{incoming_name}} = {
+        %rel,
+        is_right_entity => 1,
+        name => $rel{incoming_name},
+        incoming_name => $rel{name},
+    };
+}
+
+sub _normalize_entity_schema {
+    my ($self, $entity_name, $schema) = @_;
+
+    # validate, normalize and copy data structures
+    my %normalized;
+
+    # scalar keys
+    for (qw/ extends /) {
+        $normalized{$_} = $schema->{$_}
+            if exists $schema->{$_};
+    }
+
+    # attributes
+    my %static_attributes = map { $_ => {name => $_, is_static => 1} } @{$self->table('entities')->columns};
+    foreach my $attr_spec (@{$schema->{attributes}}) {
+
+        # expand string to name/type
+        unless (ref $attr_spec) {
+            my ($name, $type) = split ':', $attr_spec;
+            $attr_spec = {
+                name => $name,
+                type => $type || $self->default_attribute_type
+            };
+        }
+
+        die sprintf("Error normalizing attribute '%s' for  entity '%s': can't use names of static attributes (real table columns).", $attr_spec->{name}, $entity_name)
+            if exists $static_attributes{$attr_spec->{name}};
+
+        push @{$normalized{attributes}}, { %$attr_spec };
+    }
+
+    # relationships
+    for my $reltype (qw/ has_one has_many many_to_many /) {
+
+        next unless $schema->{$reltype};
+
+        my $rels = $schema->{$reltype};
+        if (my $reftype = ref $rels) {
+            die "Error: invalid '$reltype' config for '$entity_name'" if $reftype ne 'ARRAY';
+        } else {
+            $rels = [$rels]
+        }
+
+        foreach my $params (@$rels)  {
+
+            my %rel;
+            my $reftype = ref $params;
+            # scalar: entity
+            if (!$reftype) {
+                %rel = ( entity => $params )
+            }
+            elsif ($reftype eq 'ARRAY') {
+
+                %rel = (
+                    name => $params->[0],
+                    entity  => $params->[1],
+                    incoming_name => $params->[2],
+                );
+            }
+            elsif ($reftype eq 'HAS') {
+                %rel = %$params;
+            }
+            else {
+                die "Error: invalid '$reltype' config for '$entity_name'.";
+            }
+
+            die sprintf("Error: invalid %s relationship for entity '%s': missing 'entity' parameter.", $reltype, $entity_name)
+                unless $rel{entity};
+
+            # push
+            push @{$normalized{$reltype}}, \%rel;
+        }
+
+    }
+
+    \%normalized;
+}
 
 1;
 
@@ -326,7 +541,7 @@ DBIx::EAV - Entity-Attribute-Value data modeling (aka 'open schema') for Perl
     $eav->schema->deploy;
 
     # register entities
-    $eav->register_types({
+    $eav->declare_entities({
         Artist => {
             many_to_many => 'CD',
             has_many     => 'Review',
@@ -488,7 +703,7 @@ then returns a new instance via L<new(\%constructor_params)|/new>.
 
 =head1 METHODS
 
-=head2 register_types
+=head2 declare_entities
 
 =over
 
@@ -498,19 +713,15 @@ then returns a new instance via L<new(\%constructor_params)|/new>.
 
 =back
 
-Registers entity types specified in \%schema, where each key is the name of the
+Declares entity types specified in \%schema, where each key is the name of the
 L<type|DBIx::EAV::EntityType> and the value is a hashref describing its
 attributes and relationships. Fully described in
 L<DBIx::EAV::EntityType/"ENTITY DEFINITION">.
 
-This method ignores types already installed, allowing code that registers types
-to live close to the code that actually uses the types.
-
-When registering types already registered, additional attributes and
-relationships are registered accordingly. To delete attributes and values see
-L<DBIx::EAV::EntityType/PRUNING>.
-
-See L<"INSTALLED VS REGISTERED TYPES">.
+You must declare your entities every time a new instance of DBIx::EAV is created.
+This method stores the entities schema, and calculates a signature for each.
+Next time type() is called the relevant entity type will get registerd or
+updated (if the signature changed)
 
 =head2 resultset
 

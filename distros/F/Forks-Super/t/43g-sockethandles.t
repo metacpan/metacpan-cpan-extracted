@@ -56,7 +56,8 @@ my $t5 = Time::HiRes::time() - $t0;
 my $t54 = $t5 - $t4;
 okl($t54 <= 1.30, 
    "blocking read on empty stderr fast ${t54}s, expected <1.0s");
-ok(!defined($err), "blocking read on empty stderr returns empty");
+ok(!defined($err) || $err =~ /OK to die from child .../,
+   "blocking read on empty stderr returns empty");
 
 # print "\$err = $err, time = $t5, $t54\n";
 

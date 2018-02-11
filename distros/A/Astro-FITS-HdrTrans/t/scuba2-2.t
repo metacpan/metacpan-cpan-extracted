@@ -15,7 +15,7 @@ eval {
 if( $@ ) {
   plan skip_all => 'Test requires Astro::FITS::Header module';
 } else {
-  plan tests => 9;
+  plan tests => 11;
 }
 
 # Test compilation.
@@ -46,6 +46,9 @@ ok( !exists $generic_header{AZIMUTH_START}, "Missing azimuth start" );
 delta_ok( $generic_header{AZIMUTH_END}, 127.225669719891, "End azimuth is present" );
 
 is($generic_header{'DOME_OPEN'}, 1, 'DOME OPEN');
+
+is($generic_header{'FOURIER_TRANSFORM_SPECTROMETER'}, 0, 'FOURIER TRANSFORM SPECTROMETER');
+is($generic_header{'POLARIMETER'}, 0, 'POLARIMETER');
 
 sub readfits {
   my $file = shift;

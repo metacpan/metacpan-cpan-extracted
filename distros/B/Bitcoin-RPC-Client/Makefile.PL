@@ -19,7 +19,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Moo'               => 1.001,
-        'JSON::RPC::Client' => 0.93,
+        'JSON::RPC::Legacy::Client' => 1.06,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Bitcoin-*' },

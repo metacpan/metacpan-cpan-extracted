@@ -97,10 +97,13 @@ cmp_deeply(
         ( map { $_ => ignore() } qw/
             AdditionalDetails
             AssignedAgent
+            AttendenceDate
             Block
+            BlockName
             CallbackId
             ContactNumber
             ContactNumberAlt
+            CloseReason
             Created
             DirectEmailAddress
             DirectMobileNumber
@@ -117,6 +120,8 @@ cmp_deeply(
             Media
             Property
             PropertyAddressId
+            Quotes
+            QuoteEndTime
             Salutation
             Status
             StatusChanged
@@ -154,7 +159,7 @@ isa_ok(
         AddressLine2 => 'some district',
         Town         => 'some town',
         County       => 'some country',
-        PostCode     => 'AB1 2CD',
+        PostCode     => 'AB12CD',
         Country      => 'UK',
     ),
     'Business::Fixflo::Address'
@@ -253,7 +258,7 @@ cmp_deeply(
         'AddressLine2' => 'some district',
         'Country' => ignore(),
         'County' => ignore(),
-        'PostCode' => 'AB1 2CD',
+        'PostCode' => 'AB12CD',
         'Town' => 'some town',
         'client' => 0
       }, 'Business::Fixflo::Address' ),
@@ -262,6 +267,8 @@ cmp_deeply(
       'KeyReference' => ignore(),
       'UpdateDate' => ignore(),
       'Created' => ignore(),
+      'AssignedAgent' => ignore(),
+      'BlockId' => ignore(),
       'PropertyAddressId' => ignore(),
       'PropertyId' => 0,
       'client' => bless( {
@@ -281,7 +288,7 @@ cmp_deeply(
 
 isa_ok(
     my $properties = $ff->properties(
-        Keywords => 'AB1 2CD',
+        Keywords => 'AB12CD',
     ),
     'Business::Fixflo::Paginator',
     '->properties'

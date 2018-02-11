@@ -2,36 +2,28 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A tiny StatsD client",
+  "ABSTRACT" => "A tiny StatsD client that supports multimetric packets",
   "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Net-Statsd-Tiny",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Net::Statsd::Tiny",
   "PREREQ_PM" => {
+    "Class::Accessor::Fast" => 0,
     "IO::Socket" => "1.18",
-    "IO::String" => 0,
-    "Moo" => "1.000000",
-    "MooX::TypeTiny" => 0,
-    "Sub::Quote" => 0,
-    "Sub::Util" => "1.40",
-    "Type::Library" => 0,
-    "Type::Utils" => 0,
-    "Types::Standard" => 0,
-    "namespace::autoclean" => 0,
+    "base" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Carp" => 0,
     "Devel::StrictMode" => 0,
     "File::Spec" => 0,
     "IO::Select" => 0,
@@ -42,12 +34,11 @@ my %WriteMakefileArgs = (
     "Test::Roo::DataDriven" => 0,
     "Test::Roo::Role" => 0,
     "Test::TCP" => "2.19",
-    "curry" => 0,
     "if" => 0,
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.2.1",
+  "VERSION" => "v0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,30 +46,21 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
+  "Class::Accessor::Fast" => 0,
   "Devel::StrictMode" => 0,
   "File::Spec" => 0,
   "IO::Select" => 0,
   "IO::Socket" => "1.18",
-  "IO::String" => 0,
   "Module::Metadata" => 0,
-  "Moo" => "1.000000",
-  "MooX::TypeTiny" => 0,
   "Net::EmptyPort" => 0,
-  "Sub::Quote" => 0,
-  "Sub::Util" => "1.40",
   "Test::More" => 0,
   "Test::Roo" => 0,
   "Test::Roo::DataDriven" => 0,
   "Test::Roo::Role" => 0,
   "Test::TCP" => "2.19",
-  "Type::Library" => 0,
-  "Type::Utils" => 0,
-  "Types::Standard" => 0,
-  "curry" => 0,
+  "base" => 0,
   "if" => 0,
   "lib" => 0,
-  "namespace::autoclean" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

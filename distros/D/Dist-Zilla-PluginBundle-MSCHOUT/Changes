@@ -1,5 +1,8 @@
 Revision history for Dist::Zilla::PluginBundle::MSCHOUT
 
+0.37  2018-02-07
+    - switch bugtracker from rt.cpan.org to github issues
+
 0.36  2017-12-24
     - add Dist::Zilla::Plugin::MetaProvides::Package plugin
 

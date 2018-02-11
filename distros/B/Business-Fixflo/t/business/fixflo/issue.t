@@ -32,8 +32,13 @@ can_ok(
 		report
 
         AdditionalDetails
+        AppointmentDate
         BlockName
 		CallbackId
+        AttendenceDate
+        CloseReason
+        Quotes
+        QuoteEndTime
 		FaultTitle
 		TermsAccepted
 		TenantNotes

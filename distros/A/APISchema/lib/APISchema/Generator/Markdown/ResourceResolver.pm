@@ -67,40 +67,46 @@ sub _collect_properties {
 
 sub _collect_example {
     my ($self, $path, $definition) = @_;
-    return $definition->{example} if defined $definition->{example};
+    return ($definition->{example}, 1) if exists $definition->{example};
 
     if (my $union = $definition->{oneOf} || $definition->{anyOf} || $definition->{allOf}) {
-        return $self->_collect_example($path, $union->[0]);
+        return ($self->_collect_example($path, $union->[0]), 1);
     }
 
     my $ref = $definition->{'$ref'};
     if ($ref) {
         $ref = $ref =~ s/^#//r;
         my $def = JSON::Pointer->get($self->schema, $ref);
-        return $self->_collect_example($path, $def) if $def;
+        return ($self->_collect_example($path, $def), 1) if $def;
     }
 
     my %result;
     my $type = $definition->{type} || '';
     _foreach_properties($path, $definition, sub {
-        my $example = $self->_collect_example(@_) // $_[1]->{default};
-        $result{$_[0]->[-1]} = $example if defined $example;
+        my ($example, $exists) = $self->_collect_example(@_);
+        unless ($exists) {
+            if (exists $_[1]->{default}) {
+                $example = $_[1]->{default};
+                $exists = 1;
+            }
+        }
+        $result{$_[0]->[-1]} = $example if $exists;
     });
 
-    return \%result if $type eq 'object';
+    return (\%result, 1) if $type eq 'object';
 
     if ($type eq 'array') {
-        return [ $result{'[]'} ] if $result{'[]'};
+        return ([ $result{'[]'} ], 1) if $result{'[]'};
 
         my @result;
         for (keys %result) {
             next unless $_ =~ /\A\[([0-9]+)\]\z/;
             $result[$1] = $result{$_};
         }
-        return \@result;
+        return (\@result, 1);
     }
 
-    return undef;
+    return (undef, 0);
 }
 
 sub properties {
@@ -110,7 +116,8 @@ sub properties {
 
 sub example {
     my ($self, $resource) = @_;
-    return $self->_collect_example([], $resource);
+    my ($example) = $self->_collect_example([], $resource);
+    return $example;
 }
 
 1;

@@ -1,5 +1,8 @@
 Revision history for Filesys::DiskUsage
 
+0.11  2018-02-10 MANWAR
+      - Merged PR #3, thanks @JKEENAN.
+
 0.10  2016-12-08 MANWAR
       - Updated Makefile.PL with regard to github repo details.
       - Added MANIFEST file.

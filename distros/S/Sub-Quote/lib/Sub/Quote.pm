@@ -12,10 +12,11 @@ use Carp qw(croak);
 BEGIN { our @CARP_NOT = qw(Sub::Defer) }
 use B ();
 BEGIN {
+  *_HAVE_IS_UTF8 = defined &utf8::is_utf8 ? sub(){1} : sub(){0};
   *_HAVE_PERLSTRING = defined &B::perlstring ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.004000';
+our $VERSION = '2.005000';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(quote_sub unquote_sub quoted_from_sub qsub);
@@ -28,7 +29,8 @@ sub quotify {
   no warnings 'numeric';
   ! defined $value     ? 'undef()'
   # numeric detection
-  : (length( (my $dummy = '') & $value )
+  : (!(_HAVE_IS_UTF8 && utf8::is_utf8($value))
+    && length( (my $dummy = '') & $value )
     && 0 + $value eq $value
     && $value * 0 == 0
   ) ? $value
@@ -105,7 +107,7 @@ sub quote_sub {
       unless $subname =~ /^[^\d\W]\w*$/;
   }
   my @caller = caller(0);
-  my $attributes = $options->{attributes};
+  my ($attributes, $file, $line) = @{$options}{qw(attributes file line)};
   if ($attributes) {
     /\A\w+(?:\(.*\))?\z/s || croak "invalid attribute $_"
       for @$attributes;
@@ -119,6 +121,8 @@ sub quote_sub {
     warning_bits => (exists $options->{warning_bits} ? $options->{warning_bits} : $caller[9]),
     hintshash    => (exists $options->{hintshash}    ? $options->{hintshash}    : $caller[10]),
     ($attributes ? (attributes => $attributes) : ()),
+    ($file       ? (file => $file) : ()),
+    ($line       ? (line => $line) : ()),
   };
   my $unquoted;
   weaken($quoted_info->{unquoted} = \$unquoted);
@@ -150,8 +154,20 @@ sub quote_sub {
 sub _context {
   my $info = shift;
   $info->{context} ||= do {
-    my ($package, $hints, $warning_bits, $hintshash)
-      = @{$info}{qw(package hints warning_bits hintshash)};
+    my ($package, $hints, $warning_bits, $hintshash, $file, $line)
+      = @{$info}{qw(package hints warning_bits hintshash file line)};
+
+    $line ||= 1
+      if $file;
+
+    my $line_mark = '';
+    if ($line) {
+      $line_mark = "#line ".($line-1);
+      if ($file) {
+        $line_mark .= qq{ "$file"};
+      }
+      $line_mark .= "\n";
+    }
 
     $info->{context}
       ="# BEGIN quote_sub PRELUDE\n"
@@ -165,6 +181,7 @@ sub _context {
         keys %$hintshash)
       ."  );\n"
       ."}\n"
+      .$line_mark
       ."# END quote_sub PRELUDE\n";
   };
 }
@@ -244,10 +261,11 @@ sub qsub ($) {
 }
 
 sub CLONE {
-  %QUOTED = map { defined $_ ? (
+  my @quoted = map { defined $_ ? (
     $_->{unquoted} && ${$_->{unquoted}} ? (${ $_->{unquoted} } => $_) : (),
     $_->{deferred} ? ($_->{deferred} => $_) : (),
   ) : () } values %QUOTED;
+  %QUOTED = @quoted;
   weaken($_) for values %QUOTED;
 }
 
@@ -326,7 +344,40 @@ good idea.  For a sub that will most likely be inlined, it is not recommended.
 =item C<package>
 
 The package that the quoted sub will be evaluated in.  If not specified, the
-sub calling C<quote_sub> will be used.
+package from sub calling C<quote_sub> will be used.
+
+=item C<hints>
+
+The value of L<< C<$^H> | perlvar/$^H >> to use for the code being evaluated.
+This captures the settings of the L<strict> pragma.  If not specified, the value
+from the calling code will be used.
+
+=item C<warning_bits>
+
+The value of L<< C<${^WARNING_BITS}> | perlvar/${^WARNING_BITS} >> to use for
+the code being evaluated.  This captures the L<warnings> set.  If not specified,
+the warnings from the calling code will be used.
+
+=item C<%^H>
+
+The value of L<< C<%^H> | perlvar/%^H >> to use for the code being evaluated.
+This captures additional pragma settings.  If not specified, the value from the
+calling code will be used if possible (on perl 5.10+).
+
+=item C<attributes>
+
+The L<perlsub/Subroutine Attributes> to apply to the sub generated.  Should be
+specified as an array reference.  The attributes will be applied to both the
+generated sub and the deferred wrapper, if one is used.
+
+=item C<file>
+
+The apparent filename to use for the code being evaluated.
+
+=item C<line>
+
+The apparent line number
+to use for the code being evaluated.
 
 =back
 

@@ -1,10 +1,112 @@
 ==================================================
-Changes from 2016-05-11 00:00:00 +0000 to present.
+Changes from 2017-02-10 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.33 at 2017-05-11 21:27:56 +0000
+version 0.34 at 2018-02-10 11:44:14 +0000
 -----------------------------------------
+
+  Change: 56541b71e642bd871cf592fbfbd17cfc68b1a1f2
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-02-10 11:43:39 +0000
+
+    Version 0.34 docs 
+
+  Change: f56016c41df7a2f773608aa836038acb1ef6742b
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2018-02-10 11:23:03 +0000
+
+    Merge pull request #93 from slobo/patch-1
+
+    Fix `starting_after` not passed properly 
+
+  Change: 4c845ea45a1e48d3e8933ea2f70ef1987b2509c7
+  Author: Slobodan MiÅ¡koviÄ <slobodan@miskovic.ca>
+  Date : 2018-02-09 15:18:27 +0000
+
+    Fix `starting_after` not passed properly 
+
+  Change: 623a897b06c391d0f836abe36d2796e2f97c5638
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-11-04 21:57:16 +0000
+
+    Merge pull request #86 from sherrardb/address_check_typo
+
+    Fix typo for output field address_line1_check 
+
+  Change: 49c5a6e0514b97b5de59cb63cb7ebeb0f67e244c
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2017-11-04 20:55:44 +0000
+
+    remove extraneous "my" 
+
+  Change: 7fa533ceca535fe25876a86c4d640011577e956a
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-11-04 20:27:54 +0000
+
+    Merge pull request #91 from sherrardb/use_get_card_w
+
+    replace _get() with get_card in unit tests 
+
+  Change: 4ca67fb14fc335432c6ab5273e94225a4aac9d8f
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-11-04 18:59:21 +0000
+
+    issue #90 - prevent testing against live data 
+
+  Change: db64f01c9bac8ecf0deba00282cec33bb0c15a7b
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2017-10-30 22:11:08 +0000
+
+    replace _get() with get_card in unit tests
+
+    instead of manually constructing paths and calling _get() directly,
+    use the more-robust get_card() 
+
+  Change: 0c6764b61e2027316f4227c378b12b4329e47c08
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2017-10-27 17:52:08 +0000
+
+    Fix typo for output field address_line1_check
+
+    Fix typo for output field address_line1_check 
+
+  Change: 137d64a27a6f6c8ffd1076aaba26f200e90165fd
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-10-27 00:32:29 +0000
+
+    Merge pull request #87 from sherrardb/missing_test_names
+
+    Fix missing test names 
+
+  Change: 05d1965a0fe30857cec1254e5d14d27e059d91c1
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-10-27 00:30:34 +0000
+
+    Merge pull request #88 from sherrardb/set_dev_ua_string
+
+    Set user agent string for dev environment 
+
+  Change: c70a2d52cd4e45df2f527b5219a20d4f382f9fdc
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2017-10-26 09:26:54 +0000
+
+    Set user agent string for dev environment
+
+    set user agent string to Net::Stripe/dev when $Net::Stripe::VERSION
+    is unset 
+
+  Change: 5c6d9370981d9fe61852ffa366a18c0d85bfdfff
+  Author: Sherrard Burton <32931314+sherrardb@users.noreply.github.com>
+  Date : 2017-10-26 00:48:20 +0000
+
+    Fix missing test names 
+
+  Change: 6091e5f3a372b2ab04b27043a8c2c24430c8d63f
+  Author: Andrew Solomon <andrew@geekuni.com>
+  Date : 2017-05-11 22:34:35 +0000
+
+    Version 0.33 docs 
 
   Change: 523cf60d3d4f53a9b49180a86c18f7e4fc674354
   Author: Andrew Solomon <andrew@geekuni.com>

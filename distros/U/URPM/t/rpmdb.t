@@ -2,8 +2,13 @@
 
 use strict ;
 use warnings ;
-use Test::More tests => 7;
+use Test::More;
 use URPM;
+if (-e '/etc/debian_version' || `uname -a` =~ /BSD/i) {
+    plan skip_all => "*BSD/Debian/Ubuntu do not have a system wide rpmdb";
+} else {
+    plan tests => 7;
+}
 
 my ($count, @all_pkgs_extern, @all_pkgs);
 my ($pkg_perl, $count_perl, $pkg_perl_extern);

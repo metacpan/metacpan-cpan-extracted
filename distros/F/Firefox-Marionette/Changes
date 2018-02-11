@@ -1,5 +1,19 @@
 Revision history for Firefox-Marionette
 
+0.37  Sat Feb 10 08:57:00 2018
+       Test fixes for Firefox 52.6 on darwin.
+
+0.36  Fri Feb  9 07:02:00 2018
+       Correcting Win32/cygwin/darwin dependencies
+
+0.35  Thu Feb  8 19:07:00 2018
+       Adding support for Dragonfly BSD.
+       More 11 exit detection. 
+
+0.34  Web Feb  7 07:03:00 2018
+       Adding support for RHEL7/RHEL6/jessie.
+       Reduced the minimum acceptable firefox version to 52
+
 0.33  Sat Feb  3 16:53:00 2018
        Adding support for NetBSD.
        Reduced the minimum acceptable firefox version to 55

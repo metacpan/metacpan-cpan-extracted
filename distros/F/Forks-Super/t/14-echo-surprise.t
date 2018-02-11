@@ -19,8 +19,14 @@ for my $ec ("cmd","exec") {
 
     ok($pid1->status == 0, "$ec no ARRAY ok");
     ok($pid1->read_stdout =~ /surprise/, "$ec no ARRAY ok");
-    ok($pid2->status > 0, '"echo surprise" fail');
-    ok(!$pid2->read_stdout, '"echo surprise" no output');
+  SKIP:
+    {
+        if ($^O eq 'MSWin32') {
+            skip "MSWin32 $ec doesn't distinguish list args", 2;
+        }
+        ok($pid2->status > 0, '"echo surprise" fail');
+        ok(!$pid2->read_stdout, '"echo surprise" no output');
+    }
     ok($pid3->status == 0, "$ec 'echo','surprise' ok");
     ok($pid3->read_stdout =~ /surprise/,  "$ec 'echo','surprise' ok");
 }

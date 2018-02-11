@@ -113,5 +113,5 @@ $tc2 = Time::Timecode->new(0,0,5,0, {dropframe => 1});
 hmsf_ok($tc1 - $tc2, 22, 59, 59, 29);
 
 # Etc...
-eval { $tc =  Time::Timecode->new(1) * 2000000000000000000 };
+eval { $tc =  Time::Timecode->new(1) * 200_000_000 };
 ok($@ =~ /invalid hours/i);

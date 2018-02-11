@@ -224,6 +224,6 @@ HTTP/1.1 <?= http_status($code) ?>
 |--------|----|-------|-------|------------|-----------|
 ?   for my $prop (@$properties) {
 ?     my $def = $prop->{definition};
-|`<?= $prop->{path} ?>` |<?= type($def) ?> |<?= code($def->{default}) ?> |<?= code($def->{example}) ?> |<?= restriction($def) ?> |<?= desc($def->{description}) ?> |
+|`<?= $prop->{path} ?>` |<?= type($def) ?> |<?= code($def->{default}) ?> |<?= code($def->{example}, exists $def->{example}) ?> |<?= restriction($def) ?> |<?= desc($def->{description}) ?> |
 ?   } # $prop
 ? } # scalar @$properties

@@ -17,6 +17,8 @@ USB::TMC - Perl interface to USB Test & Measurement (USBTMC) backend.
  $usbtmc->write(data => "*CLS\n");
  $usbtmc->write(data => "VOLT:NPLC 10\n");
 
+ $usbtmc->write(data => ":read?\n");
+ print $usbtmc->read(length => 100);
  print $usbtmc->query(data => ":read?\n", length => 100);
  
  my $capabilities = $usbtmc->get_capabilities();
@@ -31,6 +33,21 @@ Internally this module is based on L<USB::LibUSB>.
 Does not yet support the additional features of USBTMC-USB488. But those could
 easily be added if needed.
 
+=head1 INSTALLATION
+
+The documentation of L<USB::LibUSB> contains detailed installation
+instructions.
+
+To access USB devices as a non-root user we need udev rules. E.g. on
+Debian we add a file F</etc/udev/rules.d/97-usbtmc.rules> with contents:
+
+ ATTR{idVendor}=="0957", GROUP="usbtmc"
+
+where "0957" (actually 0x0957) is the USB vendor ID of Agilent Technologies.
+
+With this udev rule, all users in the "usbtmc" group can access the device.
+
+
 =head1 METHODS
 
 Errors with USB transfers will result in a croak.
@@ -43,7 +60,7 @@ use strict;
 use warnings;
 
 package USB::TMC;
-$USB::TMC::VERSION = '0.005';
+$USB::TMC::VERSION = '0.006';
 use USB::LibUSB;
 use Moose;
 use MooseX::Params::Validate 'validated_list';

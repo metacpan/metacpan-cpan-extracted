@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '1.020'; # VERSION
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '1.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,6 +39,7 @@ my %builtin_file_skip_list_sub = (
     'Shipment-2.01.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2016-06-23
     'Shipment-2.02.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2016-06-29
     'Shipment-2.03.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2016-09-06
+    'Shipment-3.01.tar.gz'                => 'segfaults Compiler::Lexer 0.22', # 2018-02-08
     'App-IndonesianBankingUtils-0.07.tar.gz' => 'segfaults at phase 3/3',      # 2016-08-18
 );
 
@@ -3972,7 +3973,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.020 of App::lcpan (from Perl distribution App-lcpan), released on 2018-01-15.
+This document describes version 1.022 of App::lcpan (from Perl distribution App-lcpan), released on 2018-02-08.
 
 =head1 SYNOPSIS
 
@@ -3999,7 +4000,7 @@ Examples:
 
 =item * Find CPAN IDs which start with something:
 
- authors( query => ["MICHAEL%"]); # -> ["MICHAEL", "MICHAELW", undef, {}]
+ authors( query => ["MICHAEL%"]); # -> undef
 
 =back
 
@@ -4133,7 +4134,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 
@@ -4305,7 +4306,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 
@@ -4447,7 +4448,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 

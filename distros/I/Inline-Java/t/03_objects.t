@@ -1,13 +1,9 @@
 use strict ;
 use Test ;
 
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
-
 use Inline(
 	Java => 'DATA',
 ) ;
-
 
 BEGIN {
 	plan(tests => 16) ;

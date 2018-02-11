@@ -26,4 +26,12 @@ Revision history for Perl extension omnitool-installer
 
 1.0.7 2017-12-13T02:09:37Z
 
-   - Fix: Incorrect URL for sample apps view..
+   - Fix: Incorrect URL for sample apps view.
+
+1.0.8 2018-02-10T05:22:37Z
+
+   - Add dependency to Net::Server::SS::PreFork for Starman
+
+1.0.9 2018-02-10T05:29:32Z
+
+   - Add dependency for Starman.

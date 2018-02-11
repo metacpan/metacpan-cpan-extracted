@@ -31,6 +31,7 @@ can_ok(
 		to_json
         create
 
+        AssignedAgent
         Id
         BlockId
         BlockName

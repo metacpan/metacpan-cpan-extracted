@@ -13,15 +13,15 @@ my $msg2;
 # I know this will leak, but this is just a single test
 my $subscriber; $subscriber = sub {
   $msg = shift;
-  app->unsubscribe($subscriber);
-  app->subscribe(sub { $msg2 = shift; Mojo::IOLoop->stop(); });
-  app->publish('message');
+  app->pubsub->unsubscribe($subscriber);
+  app->pubsub->subscribe(sub { $msg2 = shift; Mojo::IOLoop->stop(); });
+  app->pubsub->publish('message');
 };
 
 plugin Pubsub => { cb => $subscriber };
 
 app->log->level('warn');
-app->publish('not message');
+app->pubsub->publish('not message');
 app->start('daemon', '-l', "http://127.0.0.1:$port");
 
 

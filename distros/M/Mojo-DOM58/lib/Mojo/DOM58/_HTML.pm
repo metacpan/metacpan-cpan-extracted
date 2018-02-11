@@ -9,7 +9,7 @@ use warnings;
 use Mojo::DOM58::Entities qw(html_attr_unescape html_escape html_unescape);
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 
 my $ATTR_RE = qr/
   ([^<>=\s\/]+|\/)                         # Key
@@ -56,8 +56,9 @@ my %END = (body => 'head', optgroup => 'optgroup', option => 'option');
 
 # HTML elements that break paragraphs
 $END{$_} = 'p' for
-  qw(address article aside blockquote dir div dl fieldset footer form h1 h2),
-  qw(h3 h4 h5 h6 header hr main menu nav ol p pre section table ul);
+  qw(address article aside blockquote details div dl fieldset figcaption),
+  qw(figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main menu nav ol p),
+  qw(pre section table ul);
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);

@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Core;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Set of core functions interacting with Taskwarrior
-$Taskwarrior::Kusarigama::Core::VERSION = '0.5.0';
+$Taskwarrior::Kusarigama::Core::VERSION = '0.6.0';
 
 use strict;
 use warnings;
@@ -100,6 +100,14 @@ sub export_tasks {
 }
 
 
+sub  new_task {
+    my ( $self, $task ) = @_;
+    $task ||= {};
+
+    return Taskwarrior::Kusarigama::Task->new( $self->run_task, $task );
+}
+
+
 sub import_task {
     my( $self, $task ) = @_;
 
@@ -132,7 +140,7 @@ Taskwarrior::Kusarigama::Core - Set of core functions interacting with Taskwarri
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 DESCRIPTION
 
@@ -200,6 +208,13 @@ Equivalent to
 
 Returns the list of the tasks.
 
+=head2 new_task
+
+    my $task = $tw->new_task( \%task );
+    $task->save;
+
+Creates a new task, but doesn't commit it yet (use C<save> for that).
+
 =head2 import_task
 
     $tw->import_task( \%task  )
@@ -222,7 +237,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

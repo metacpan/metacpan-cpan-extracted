@@ -1,5 +1,12 @@
 Revision history for WWW-FreeProxyListsCom
 
+1.006   2018-02-07
+        - added urls(), returns a list of stringified proxy URLs. Perfect for
+          using with WWW::ProxyChecker
+        - added t/07 to test the new urls() method
+        - modified naming conventions in POD of certain variables (didn't
+          modify structure or content)
+
 1.005   2016-02-19
         - removed t/kwalitee.t
 

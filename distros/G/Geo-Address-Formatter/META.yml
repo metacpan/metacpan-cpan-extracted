@@ -15,7 +15,7 @@ name: Geo-Address-Formatter
 provides:
   Geo::Address::Formatter:
     file: lib/Geo/Address/Formatter.pm
-    version: '1.63'
+    version: '1.64'
 requires:
   Clone: '0'
   Data::Dumper: '0'
@@ -37,5 +37,5 @@ requires:
 resources:
   homepage: https://github.com/OpenCageData/perl-Geo-Address-Formatter
   repository: https://github.com/OpenCageData/perl-Geo-Address-Formatter.git
-version: '1.63'
+version: '1.64'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -21,7 +21,7 @@ use base qw/ Astro::FITS::HdrTrans::JCMT /;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # For a constant mapping, there is no FITS header, just a generic
 # header that is constant.
@@ -41,7 +41,6 @@ my %UNIT_MAP = (
                 INSTRUMENT           => "INSTRUME",
                 DR_GROUP             => "DRGROUP",
                 OBSERVATION_TYPE     => "OBS_TYPE",
-                POLARIMETER          => 'POL_CONN',
                 UTDATE               => "UTDATE",
                 TELESCOPE            => "TELESCOP",
                 AMBIENT_TEMPERATURE  => 'ATSTART',
@@ -159,6 +158,103 @@ sub to_DR_RECIPE {
     }
   }
   return $dr;
+}
+
+=item B<to_POLARIMETER>
+
+Determine if POL-2 is in the beam, based on the INBEAM header.
+
+=cut
+
+sub to_POLARIMETER {
+  my $class = shift;
+  my $FITS_headers = shift;
+
+  my $inbeam = $FITS_headers->{'INBEAM'};
+
+  return 0 unless defined $inbeam;
+
+  return ($inbeam =~ /\bpol/i) ? 1 : 0;
+}
+
+=item B<from_POLARIMETER>
+
+Attempt to recreate the INBEAM header.  Since this also
+depends on FTS-2, use the _reconstruct_INBEAM method.
+
+=cut
+
+sub from_POLARIMETER {
+  my $class = shift;
+  my $generic_headers = shift;
+
+  return $class->_reconstruct_INBEAM($generic_headers);
+}
+
+=item B<to_FOURIER_TRANSFORM_SPECTROMETER>
+
+Determine if FTS-2 is in the beam, based on the INBEAM header.
+
+=cut
+
+sub to_FOURIER_TRANSFORM_SPECTROMETER {
+  my $class = shift;
+  my $FITS_headers = shift;
+
+  my $inbeam = $FITS_headers->{'INBEAM'};
+
+  return 0 unless defined $inbeam;
+
+  return ($inbeam =~ /\bfts/i) ? 1 : 0;
+}
+
+=item B<from_FOURIER_TRANSFORM_SPECTROMETER>
+
+Attempt to recreate the INBEAM header.  Since this also
+depends on POL-2, use the _reconstruct_INBEAM method.
+
+=cut
+
+sub from_FOURIER_TRANSFORM_SPECTROMETER {
+  my $class = shift;
+  my $generic_headers = shift;
+
+  return $class->_reconstruct_INBEAM($generic_headers);
+}
+
+
+=item B<_reconstruct_INBEAM>
+
+Since the INBEAM header becomes multiple generic headers, we need to look at
+them all to reconstruct it.  In order to work within the confines of the
+Astro::FITS::HdrTrans::Base::translate_to_FITS method, we need to work
+on a per-generic header basis.  This internal method can then be used for
+the "from_" method for each of these.  It will end up returning the same
+INBEAM header each time -- the versions generated from different generic
+headers will overwrite eachother in the Base translate_to_FITS method
+but that shouldn't be a problem.
+
+Note that the INBEAM header may not be reconstructed exactly.  For example
+it will just include the short form "pol" even if it would originally have
+included specific POL-2 components instead.
+
+=cut
+
+sub _reconstruct_INBEAM {
+  my $class = shift;
+  my $generic_headers = shift;
+
+  my @components;
+
+  push @components, 'fts2' if $generic_headers->{'FOURIER_TRANSFORM_SPECTROMETER'};
+
+  push @components, 'pol' if $generic_headers->{'POLARIMETER'};
+
+  my $inbeam = undef;
+
+  $inbeam = join(' ', @components) if scalar @components;
+
+  return (INBEAM => $inbeam);
 }
 
 =back

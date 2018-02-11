@@ -31,7 +31,7 @@ use base qw/ Astro::FITS::HdrTrans::JAC /;
 use vars qw/ $VERSION /;
 
 # Note that we use %02 not %03 because of historical reasons
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # for a constant mapping, there is no FITS header, just a generic
 # header that is constant
@@ -100,7 +100,7 @@ __PACKAGE__->_generate_lookup_methods( \%CONST_MAP, \%UNIT_MAP, \@NULL_MAP );
 =item B<can_translate>
 
 Determine if this class can handle the translation. Returns true
-if the TELESCOP is "UKIRT" and there is a "FILENAME" key and 
+if the TELESCOP is "UKIRT" and there is a "FILENAME" key and
 a "RAJ2000" key. These keywords allow the DB results to be disambiguated
 from the actual file headers.
 

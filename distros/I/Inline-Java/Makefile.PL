@@ -5,8 +5,8 @@ use File::Spec ;
 use Cwd ;
 use Config ;
 
-use lib '.'; # perl 5.26+
-require "Java/Portable.pm" ;
+use lib 'lib'; # perl 5.26+
+require "Inline/Java/Portable.pm" ;
 
 print "\nWelcome to the Inline::Java installation procedure.\n\n" ;
 
@@ -51,13 +51,7 @@ if (! $jdk_dir){
 }
 
 if (! $jdk_dir){
-	my $def_pl = File::Spec->catfile('Java', 'default_j2sdk.pl') ;
-	if (-e $def_pl){
-		require File::Spec->catfile('Java', 'default_j2sdk.pl') ;
-		$jdk_dir = Inline::Java::get_default_j2sdk() ;
-	}
-	else {
-		print <<NO_J2SDK;
+  print <<NO_J2SDK;
 A Java 2 SDK is required to install and use Inline::Java. Please 
 specify your Java 2 SDK installation directory using the J2SDK 
 option to Makefile.PL as such:
@@ -70,14 +64,13 @@ the CPAN installer you can do:
 
     JAVA_HOME=/path/to/your/j2sdk/installation cpan Inline::Java
 NO_J2SDK
-		exit(1) ;
-	}
+  exit(1) ;
 }
 elsif (! -d $jdk_dir){
-	print <<BAD_J2SDK;
+  print <<BAD_J2SDK;
 Java 2 SDK installation directory '$jdk_dir' does not exist.
 BAD_J2SDK
-	exit(1) ;
+  exit(1) ;
 }
 my $perl_jdk_dir = $jdk_dir ;
 $perl_jdk_dir =~ s/'/\'/g ;
@@ -96,7 +89,7 @@ foreach my $f ('javac', 'jar', 'java'){
 # Now we have the J2SDK directory and it exists.
 # We will create the default_j2sdk.pl file that
 # will contain that value for future use.
-my $def_jdk = File::Spec->catfile('Java', 'default_j2sdk.pl') ;
+my $def_jdk = File::Spec->catfile(qw(lib Inline Java default_j2sdk.pl)) ;
 open(J2SDK, ">$def_jdk") or
 	die("Can't open '$def_jdk' for writing: $!") ;
 print J2SDK <<J2SDK_PL;
@@ -129,8 +122,8 @@ my $jar = File::Spec->catfile($jdk_dir, $jdk_bin, 'jar' . $ext) ;
 my $src_dir = File::Spec->catdir('Java', 'sources', 'org', 'perl', 'inline', 'java') ;
 my $src = File::Spec->catfile($src_dir, '*.java') ;
 my $obj_dir = File::Spec->catdir('Java', 'classes') ;
-my $server_arch = File::Spec->catfile('Java', 'InlineJavaServer.jar') ;
-my $user_arch = File::Spec->catfile('Java', 'InlineJavaUser.jar') ;
+my $server_arch = File::Spec->catfile(qw(lib Inline Java InlineJavaServer.jar)) ;
+my $user_arch = File::Spec->catfile(qw(lib Inline Java InlineJavaUser.jar)) ;
 
 # Create the object diretory because later we need to put the properties
 # file inside it.
@@ -138,18 +131,6 @@ if (! -e $obj_dir){
 	mkdir($obj_dir) or
 		die("Can't create object directory '$obj_dir': $!") ;
 }
-
-sub MY::top_targets {
-	my $this = shift ;
-
-	my $make = <<MAKE ;
-# Added by Inline::Java installation
-pure_all :: java
-MAKE
-
-	return $make . $this->MM::top_targets() ;
-}
-
 
 my $INSTALLSITEARCH = '' ;
 my $INST_ARCHLIB = '' ;
@@ -160,16 +141,19 @@ sub MY::postamble {
 
 	my $make = <<MAKE ;
 # Added by Inline::Java installation
-JAVA_SRC=$java_src 
+JAVA_SRC=$java_src
 
 java.ts: \$(JAVA_SRC)
 	\@\$(MKPATH) $obj_dir
 	"$javac" -deprecation -g -d $obj_dir $src
-	"$jar" cf $server_arch -C $obj_dir org -C $obj_dir InlineJava.properties
-	"$jar" cf $user_arch -C $obj_dir InlineJavaUserClassLink.class
 	\@\$(TOUCH) java.ts
 
-java :: java.ts
+$server_arch : java.ts
+	"$jar" cf $server_arch -C $obj_dir org -C $obj_dir InlineJava.properties
+
+$user_arch : java.ts
+	"$jar" cf $user_arch -C $obj_dir InlineJavaUserClassLink.class
+
 MAKE
 
 	# Used for PerlNatives
@@ -191,43 +175,54 @@ sub expand_macros {
 	return $val ;
 }
 
+my @subfiles = glob File::Spec->catfile(qw(lib Inline Java *.*));
+my $subprefix = File::Spec->catdir(qw(lib Inline));
 
 # Write the Makefile
-my $natives_test = File::Spec->catdir('Java', 'Natives', '_Inline_test') ;
-my $perlinterp_test = File::Spec->catdir('Java', 'PerlInterpreter', '_Inline_test') ;
 WriteMakefile(
-	NAME => 'Inline::Java',
-	VERSION_FROM => 'Java.pm',
-	MIN_PERL_VERSION => '5.008',
-	LICENSE => 'artistic_2',
-	DIR => ['Java'],
-	PREREQ_PM => {
-		Inline => 0.68,
-		'Inline::C' => 0.62,
-		Test => 1.13,
-		'MIME::Base64' => 0,
-	},
-	PM => {
-		'Java.pm' => File::Spec->catfile('$(INST_LIBDIR)', 'Java.pm'),
-		'Java.pod'=> File::Spec->catfile('$(INST_LIBDIR)', 'Java.pod'),
-		$server_arch => File::Spec->catfile('$(INST_LIBDIR)', $server_arch),
-		$user_arch => File::Spec->catfile('$(INST_LIBDIR)', $user_arch),
-	},
-	clean => {FILES => "$def_jdk _Inline_test $natives_test $perlinterp_test $obj_dir $server_arch $user_arch java.ts"},
-	ABSTRACT_FROM  => 'Java.pod', # retrieve abstract from module
-	AUTHOR         => 'Patrick LeBoutillier <patl@cpan.org>',
-	META_MERGE => {
-	  "meta-spec" => { version => 2 },
-	  resources => {
-	    repository => {
-	      type => 'git',
-	      url => 'https://github.com/ingydotnet/Inline-Java',
-	      web => 'https://github.com/ingydotnet/Inline-Java',
-	    },
-	  },
-	},
-) ;
-
+  NAME => 'Inline::Java',
+  VERSION_FROM => 'lib/Inline/Java.pm',
+  MIN_PERL_VERSION => '5.008',
+  LICENSE => 'artistic_2',
+  DIR => ['Java'],
+  BUILD_REQUIRES => {
+    'ExtUtils::MakeMaker' => '7.30',
+  },
+  XSMULTI => 1,
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker' => '7.30',
+  },
+  PREREQ_PM => {
+    Inline => 0.68,
+    Test => 1.13,
+    'MIME::Base64' => 0,
+  },
+  PM => {
+    'lib/Inline/Java.pm' => File::Spec->catfile('$(INST_LIBDIR)', 'Java.pm'),
+    'lib/Inline/Java.pod'=> File::Spec->catfile('$(INST_LIBDIR)', 'Java.pod'),
+    map { my $f = $_; $f =~ s#$subprefix#\$(INST_LIBDIR)#; ($_ => $f) } @subfiles, $server_arch, $user_arch,
+  },
+  clean => {FILES => "$def_jdk _Inline $obj_dir $server_arch $user_arch java.ts"},
+  ABSTRACT_FROM  => 'lib/Inline/Java.pod', # retrieve abstract from module
+  AUTHOR         => 'Patrick LeBoutillier <patl@cpan.org>',
+  META_MERGE => {
+    "meta-spec" => { version => 2 },
+    resources => {
+      repository => {
+        type => 'git',
+        url => 'https://github.com/ingydotnet/Inline-Java',
+        web => 'https://github.com/ingydotnet/Inline-Java',
+      },
+    },
+    prereqs => {
+      develop => {
+        requires => {
+          'Test::CheckManifest' => '0.9',
+        },
+      },
+    },
+  },
+);
 
 # Add the so_dirs to the default_j2sdk.pl file.
 open(J2SDK, ">>$def_jdk") or
@@ -304,9 +299,3 @@ if (Inline::Java::Portable::portable('COMMAND_COM')){
 	}
 	close(MAKEFILE) ;
 }
-
-my $make = Inline::Java::Portable::portable('MAKE') ;
-print "\nYou can continue the installation with the following commands:\n" ;
-print "  % $make\n" ;
-print "  % $make test\n" ;
-print "  % $make install\n" ; 

@@ -1,0 +1,24 @@
+#!perl
+
+use utf8;
+
+use strict;
+use warnings;
+
+[
+    {
+        description => "set",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ set_add addresses 192.168.0.1 /], ],
+        output      => "foo.addresses:192.168.0.1|s\n",
+    },
+    {
+        description => "set (utf8 value)",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [ qw/ set_add places Äland/, ], ],
+        output      => "foo.places:Äland|s\n",
+    },
+
+]

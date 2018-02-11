@@ -1,5 +1,5 @@
 package Net::Stripe::Charge;
-$Net::Stripe::Charge::VERSION = '0.33';
+$Net::Stripe::Charge::VERSION = '0.34';
 use Moose;
 use Kavorka;
 extends 'Net::Stripe::Resource';
@@ -48,7 +48,7 @@ Net::Stripe::Charge - represent an Charge object from Stripe
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 ATTRIBUTES
 

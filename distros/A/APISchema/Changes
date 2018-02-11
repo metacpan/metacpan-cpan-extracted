@@ -1,5 +1,8 @@
 Revision history for Perl extension APISchema
 
+1.37 2018-02-08T10:31:50Z
+  - Allow `example: undef` and serve document
+
 1.36 2017-12-25T12:45:24Z
   - show enum values in type column
 

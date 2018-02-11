@@ -3,11 +3,6 @@ package t10 ;
 use strict ;
 use Test ;
 
-
-use Inline Config => 
-           DIRECTORY => './_Inline_test';
-
-
 BEGIN {
 	# Leave previous server enough time to die...
 	sleep(1) ;
@@ -20,14 +15,12 @@ BEGIN {
 	}
 }
 
-
-
-Inline->bind(
+use Inline (
 	Java => 't/shared.java',
 	SHARED_JVM => 1,
-	PORT => 17891,
-	NAME => 't10',
-) ;
+	PORT => 17893,
+	NAME => 't10_6',
+);
 {
 	my $t = new t10::t10() ;
 	ok($t->{i}++, 5) ;
@@ -41,8 +34,8 @@ Inline::Java::__clear_JVM() ;
 Inline->bind(
 	Java => 't/shared.java',
 	SHARED_JVM => 1,
-	PORT => 17891,
-	NAME => 't10',
+	PORT => 17893,
+	NAME => 't10_6',
 ) ;
 {
 	my $t = new t10::t10() ;
@@ -57,8 +50,8 @@ Inline::Java::__clear_JVM() ;
 Inline->bind(
 	Java => 't/shared.java',
 	SHARED_JVM => 1,
-	PORT => 17891,
-	NAME => 't10',
+	PORT => 17893,
+	NAME => 't10_6',
 ) ;
 {
 	my $t = new t10::t10() ;

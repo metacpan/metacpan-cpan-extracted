@@ -56,7 +56,7 @@ sub at_exit {
 sub cancel {
     my ($self, $signal) = @_;
 
-    DEBUG and logger "CANCEL %s, state %s", $self->host, $self->{state};
+    DEBUG and logger " CANCEL %s, state %s", $self->host, $self->{state};
 
     if ($self->{state} == STATE_TODO) {
         $self->{state} == STATE_DONE;
@@ -70,7 +70,7 @@ sub cancel {
             and $self->{current}{type} eq "cmd"
             and my $pid = $self->{current}{pid}
         ) {
-            DEBUG and logger "SEND SIG$signal %s, pid %s", $self->host, $pid;
+            DEBUG and logger " SEND SIG$signal %s, pid %s", $self->host, $pid;
             kill $signal => $pid;
         }
     } elsif ($self->{state} == STATE_DISCONNECTING) {
@@ -107,7 +107,7 @@ sub one_tick {
     my $ssh = $self->{ssh};
 
     if ($ssh and $exit_pid and $ssh->get_master_pid and $exit_pid == $ssh->get_master_pid) {
-        DEBUG and logger "FAIL %s, master process exited unexpectedly", $self->host;
+        DEBUG and logger " FAIL %s, master process exited unexpectedly", $self->host;
         $ssh->master_exited;
         $self->{exit} = $exit_code;
         $self->{_error} = $self->{ssh}->error || "master process exited unexpectedly";
@@ -116,7 +116,7 @@ sub one_tick {
     }
 
     if ($self->{state} == STATE_TODO) {
-        DEBUG and logger "CONNECT %s", $self->host;
+        DEBUG and logger " CONNECT %s", $self->host;
         $ssh = $self->{ssh} = $self->_ssh($self->{host});
         $self->{state} = STATE_CONNECTING;
     }
@@ -124,13 +124,13 @@ sub one_tick {
     if ($self->{state} == STATE_CONNECTING) {
         my $master_state = $ssh->wait_for_master(1);
         if ($master_state) {
-            DEBUG and logger "CONNECTED %s", $self->host;
+            DEBUG and logger " CONNECTED %s", $self->host;
             $self->{state} = STATE_CONNECTED;
         } elsif (!defined $master_state) {
             # still connecting...
             return 1;
         } else {
-            DEBUG and logger "FAIL TO CONNECT %s", $self->host;
+            DEBUG and logger " FAIL TO CONNECT %s", $self->host;
             $self->{exit} = -1;
             $self->{_error} = $self->{ssh}->error || "master process exited unexpectedly";
             $self->{state} = STATE_DONE;
@@ -142,7 +142,7 @@ sub one_tick {
         if (!$self->{current} or $exit_pid && $self->{current} && $self->{current}{pid} == $exit_pid) {
 
             if ($self->{current}) {
-                DEBUG and logger "FINISH %s, pid %d, type %s, exit %d",
+                DEBUG and logger " FINISH %s, pid %d, type %s, exit %d",
                     $self->host, $exit_pid, $self->{current}{type}, $exit_code;
                 if ($self->{current}{type} eq "cmd") {
                     $self->{exit} = $exit_code;
@@ -162,7 +162,7 @@ sub one_tick {
                 my $ssh = $self->{ssh};
                 my ($pid, $fh) = $cmd->($ssh);
                 if ($pid) {
-                    DEBUG and logger "START %s, pid %d, type %s", $self->host, $pid, $type;
+                    DEBUG and logger " START %s, pid %d, type %s", $self->host, $pid, $type;
                     $self->{current} = {pid => $pid, type => $type};
                     $select->add(pid => $pid, fh => $fh, host => $self->host) if $fh;
                     return 1;
@@ -172,7 +172,7 @@ sub one_tick {
             }
 
             undef $self->{current};
-            DEBUG and logger "DISCONNECTING %s", $self->host;
+            DEBUG and logger " DISCONNECTING %s", $self->host;
             $ssh->disconnect(0); # XXX block disconnect
             $self->{state} = STATE_DISCONNECTING;
         } else {
@@ -183,7 +183,7 @@ sub one_tick {
     if ($self->{state} == STATE_DISCONNECTING) {
         my $master_state = $ssh->wait_for_master(1);
         if (defined $master_state && !$master_state) {
-            DEBUG and logger "DISCONNECTED %s", $self->host;
+            DEBUG and logger " DISCONNECTED %s", $self->host;
             $self->{state} = STATE_DONE;
             undef $self->{ssh};
         } else {
@@ -192,7 +192,7 @@ sub one_tick {
     }
 
     if ($self->{state} == STATE_DONE) {
-        DEBUG and logger "DONE %s", $self->host;
+        DEBUG and logger " DONE %s", $self->host;
         return;
     }
 

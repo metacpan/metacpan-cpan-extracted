@@ -1,0 +1,154 @@
+#!perl
+
+our $DATE = '2018-02-08'; # DATE
+our $VERSION = '0.16'; # VERSION
+
+# FRAGMENT id=shcompgen-hint command=compwithargs
+
+use 5.010001;
+use strict;
+use warnings;
+
+if ($ENV{COMP_LINE} || $ENV{COMMAND_LINE}) {
+
+    my $shell;
+    if ($ENV{COMP_SHELL}) {
+        ($shell = $ENV{COMP_SHELL}) =~ s!.+/!!;
+    } elsif ($ENV{COMMAND_LINE}) {
+        $shell = 'tcsh';
+    } else {
+        $shell = 'bash';
+    }
+
+    my ($words, $cword);
+    if ($ENV{COMP_LINE}) {
+        require Complete::Bash;
+        ($words,$cword) = @{ Complete::Bash::parse_cmdline(undef, undef, {truncate_current_word=>1}) };
+        ($words,$cword) = @{ Complete::Bash::join_wordbreak_words($words, $cword) };
+    } elsif ($ENV{COMMAND_LINE}) {
+        require Complete::Tcsh;
+        $shell //= 'tcsh';
+        ($words, $cword) = @{ Complete::Tcsh::parse_cmdline() };
+    }
+
+    shift @$words; $cword--; # strip program name
+    require Complete::Util;
+    my $word = splice @$words, $cword, 1;
+    my $compres = Complete::Util::complete_array_elem(
+        word  => $word,
+        array => $words,
+    );
+
+    if ($shell eq 'bash') {
+        require Complete::Bash;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'fish') {
+        require Complete::Fish;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'tcsh') {
+        require Complete::Tcsh;
+        print Complete::Tcsh::format_completion($compres);
+    } elsif ($shell eq 'zsh') {
+        require Complete::Zsh;
+        print Complete::Zsh::format_completion($compres);
+    } else {
+        die "Unknown shell '$shell'";
+    }
+
+    exit 0;
+
+} else {
+
+    require Getopt::Long;
+    Getopt::Long::Configure('no_ignore_case', 'bundling', 'permute');
+    Getopt::Long::GetOptions(
+        'help|h|?' => sub {
+            print <<'_';
+compwithargs - Show completion from words specified in command-line arguments
+Usage:
+  compwith word1 word2 word3 <tab>
+Options:
+_
+            exit 0;
+        },
+        'version|v' => sub {
+            print "compwithargs version ", ($main::VERSION // 'dev'), "\n";
+            exit 0;
+        },
+    );
+}
+
+# ABSTRACT: Show completion from words specified in command-line arguments
+# PODNAME: compwithargs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+compwithargs - Show completion from words specified in command-line arguments
+
+=head1 VERSION
+
+This document describes version 0.16 of compwithargs (from Perl distribution App-CompleteUtils), released on 2018-02-08.
+
+=head1 SYNOPSIS
+
+ % compwithargs apple banana apricot <tab>
+ apple
+ apricot
+ banana
+
+ % compwithargs apple banana apricot a<tab>
+ apple
+ apricot
+
+=head1 DESCRIPTION
+
+This utility simply uses words from command-line arguments (except the last one)
+for completion.
+
+=head1 OPTIONS
+
+=head2 --help, -h, -?
+
+=head2 --version, -v
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CompleteUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CompleteUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<complete-array-elem> from L<App::CompleteCLIs> (which in turn is a CLI for
+C<complete_array_elem()> function in L<Complete::Util>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

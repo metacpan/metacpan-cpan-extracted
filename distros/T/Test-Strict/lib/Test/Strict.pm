@@ -6,7 +6,7 @@ Test::Strict - Check syntax, presence of use strict; and test coverage
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use File::Find;
 use Config;
 
 our $COVER;
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 our $PERL    = $^X || 'perl';
 our $COVERAGE_THRESHOLD = 50; # 50%
 our $UNTAINT_PATTERN    = qr|^(.*)$|;
@@ -225,19 +225,22 @@ sub strict_ok {
     return $ok;
 }
 
+sub _module_rx {
+    my (@module_names) = @_;
+    my $names = join '|', map quotemeta, reverse sort @module_names;
+    # TODO: improve this matching (e.g. see TODO test)
+    return qr/\buse\s+(?:$names)(?:[;\s]|$)/;
+}
+
 sub _strict_ok {
     my ($in) = @_;
+    my $strict_module_rx = _module_rx( modules_enabling_strict() );
     local $_;
     while (<$in>) {
         next if (/^\s*#/); # Skip comments
         next if (/^\s*=.+/ .. /^\s*=(cut|back|end)/); # Skip pod
         last if (/^\s*(__END__|__DATA__)/); # End of code
-        foreach my $name (modules_enabling_strict()) {
-            # TODO: improve this matching (e.g. see TODO test)
-            if (/\buse\s+$name(?:[;\s]|$)/) {
-                return 1;
-            }
-        }
+        return 1 if $_ =~ $strict_module_rx;
         if (/\buse\s+(5\.\d+)/ and $1 >= 5.012) {
             return 1;
         }
@@ -288,6 +291,7 @@ our @MODULES_ENABLING_STRICT = qw(
     Role::Tiny
     Spiffy
     strictures
+    Test::Roo
 );
 
 sub modules_enabling_strict { return @MODULES_ENABLING_STRICT }
@@ -332,6 +336,7 @@ our @MODULES_ENABLING_WARNINGS = qw(
     Role::Tiny
     Spiffy
     strictures
+    Test::Roo
 );
 
 sub modules_enabling_warnings { return @MODULES_ENABLING_WARNINGS }
@@ -375,6 +380,7 @@ sub warnings_ok {
 # TODO unite with _strict_ok
 sub _warnings_ok {
     my ($is_script, $in) = @_;
+    my $warnings_module_rx = _module_rx( modules_enabling_warnings() );
     local $_;
     while (<$in>) {
         if ($. == 1 and $is_script and $_ =~ $PERL_PATTERN) {
@@ -386,11 +392,7 @@ sub _warnings_ok {
         next if (/^\s*#/); # Skip comments
         next if (/^\s*=.+/ .. /^\s*=(cut|back|end)/); # Skip pod
         last if (/^\s*(__END__|__DATA__)/); # End of code
-        foreach my $name (modules_enabling_warnings()) {
-            if (/\buse\s+$name(?:[;\s]|$)/) {
-                return 1;
-            }
-        }
+        return 1 if $_ =~ $warnings_module_rx;
     }
     return;
 }

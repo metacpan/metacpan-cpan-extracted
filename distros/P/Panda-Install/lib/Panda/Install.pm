@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use Exporter 'import';
 use Panda::Install::Payload;
 
-our $VERSION = '1.2.11';
+our $VERSION = '1.2.12';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
 our @EXPORT;
@@ -173,6 +173,7 @@ sub process_XS {
     push @xs_list, _scan_files($xs_mask, $_) for @{$params->{SRC}};
     $params->{XS} = $xs_files ||= {};
     foreach my $xsfile (@xs_list) {
+        next if $xs_files->{$xsfile};
         my $cfile = $xsfile;
         $cfile =~ s/\.xs$/.c/ or next;
         $xs_files->{$xsfile} = $cfile;
@@ -530,6 +531,13 @@ sub _string_merge {
     sub postamble {
         my $self = shift;
         my %args = @_;
+
+        $args{'.xs.cc'} = '
+.xs.cc:
+	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) $(XSUBPP_EXTRA_ARGS) $*.xs > $*.xsc
+	$(MV) $*.xsc $*.cc
+';
+
         return join("\n", values %args);
     }
 }

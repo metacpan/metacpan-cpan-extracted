@@ -1,14 +1,9 @@
 use strict ;
 use Test ;
 
-
 BEGIN {
 	plan(tests => 5) ;
 }
-
-
-use Inline Config =>
-           DIRECTORY => './_Inline_test' ;
 
 use Inline::Java qw(caught) ;
 

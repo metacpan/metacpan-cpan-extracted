@@ -21,7 +21,7 @@ our $opt = { "help" => \&Usage, };
 
 {
 local ($::test_host, $::test_port, $::test_user, $::test_socket, $::test_password, $::test_db, $::test_force_embedded);
-eval { require "t/mysql.mtest"; 1; } || eval { require "../t/mysql.mtest"; 1; } and do {
+eval { require "./t/mysql.mtest"; 1; } || eval { require "../t/mysql.mtest"; 1; } and do {
 $opt->{'testhost'} = $::test_host;
 $opt->{'testport'} = $::test_port;
 $opt->{'testuser'} = $::test_user;
@@ -376,12 +376,19 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
     LICENSE => 'perl',
     MIN_PERL_VERSION => '5.008001',
     META_MERGE => {
+      'meta-spec' => { version => 2 },
+      dynamic_config => 0,
       resources => {
-        repository => 'https://github.com/perl5-dbi/DBD-mysql',
-        MailingList => 'mailto:dbi-dev@perl.org',
-        license     => 'http://dev.perl.org/licenses/',
-        homepage    => 'http://dbi.perl.org/',
-        IRC         => 'irc://irc.perl.org/#dbi',
+        repository => {
+          type => 'git',
+          url  => 'https://github.com/perl5-dbi/DBD-mysql.git',
+          web  => 'https://github.com/perl5-dbi/DBD-mysql',
+        },
+        bugtracker    => { web => 'https://github.com/perl5-dbi/DBD-mysql/issues' },
+        x_MailingList => 'mailto:dbi-dev@perl.org',
+        license       => ['http://dev.perl.org/licenses/'],
+        homepage      => 'http://dbi.perl.org/',
+        x_IRC         => 'irc://irc.perl.org/#dbi',
       },
       x_contributors => [
         # a list of our awesome contributors generated from git
@@ -391,6 +398,7 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
         'Alexandr Ciornii <alexchorny@gmail.com>',
         'Alexey Molchanov <alexey.molchanov@portaone.com>',
         'Amiri Barksdale at Home <amiri@roosterpirates.com>',
+        'Andrew Miller <ikari7789@yahoo.com>',
         'Aran Deltac <bluefeet@gmail.com>',
         'Bernt M. Johnsen <bernt.johnsen@oracle.com>',
         'Chase Whitener <chase.whitener@infotechfl.com>',
@@ -401,12 +409,14 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
         'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>',
         'Daisuke Murase <typester@cpan.org>',
         'Damyan Ivanov <dmn@debian.org>',
+        'Dan Book <grinnz@gmail.com>',
         'Daniël van Eeden <daniel.vaneeden@booking.com>',
+        'Dave Lambley <davel@isosceles.(none)>',
         'David Farrell <davidnmfarrell@gmail.com>',
         'David Steinbrunner <dsteinbrunner@pobox.com>',
         'Giovanni Bechis <giovanni@bigio.snb.it>',
         'Graham Ollis <plicease@cpan.org>',
-        'H.Merijn Brand <h.m.brand@xs4all.nl>',
+        'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>',
         'Hanno <hanno@gentoo.org>',
         'James McCoy <jamessan@jamessan.com>',
         'Jim Winstead <jimw@trainedmonkey.com>',
@@ -417,6 +427,7 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
         'Matthew Horsfall (alh) <WolfSage@gmail.com>',
         'Michiel Beijen <michiel.beijen@gmail.com>',
         'Mike Pomraning <mjp@pilcrow.madison.wi.us>',
+        'Mohammad S Anwar <mohammad.anwar@yahoo.com>',
         'Pali <pali@cpan.org>',
         'Patrick Galbraith <patg@patg.net>',
         'Perlover <perlover@perlover.com>',
@@ -434,6 +445,7 @@ if (eval $ExtUtils::MakeMaker::VERSION >= 5.43) {
         'Taro Kobayashi <9re.3000@gmail.com>',
         'Tatsuhiko Miyagawa <miyagawa@bulknews.net>',
         'Tim Mullin <tim@cpanel.net>',
+        'Ville Skyttä <ville.skytta@iki.fi>',
         'Vladimir Marek <vlmarek@volny.cz>',
         'katyavoid <katyavoid@gmail.com>',
         'kmx <kmx@cpan.org>',
@@ -578,7 +590,7 @@ sub Configure {
                 if ($param eq 'libs') {
                     my (@libs, @ldflags);
                     for (split ' ', $str) {
-                        if (/^-[Ll]/) { push @libs, $_ }
+                        if (/^-[Ll]/ || /^[^\-]/) { push @libs, $_ }
                         else          { push @ldflags, $_ }
                     }
                     $str = "@libs";

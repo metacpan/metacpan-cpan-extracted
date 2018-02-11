@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App::Install;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: install scripts and tweak config for Taskwarrior::Kusarigama
-$Taskwarrior::Kusarigama::App::Install::VERSION = '0.5.0';
+$Taskwarrior::Kusarigama::App::Install::VERSION = '0.6.0';
 
 use 5.10.0;
 
@@ -83,7 +83,7 @@ Taskwarrior::Kusarigama::App::Install - install scripts and tweak config for Tas
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Yanick Champoux.
+This software is copyright (c) 2018, 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

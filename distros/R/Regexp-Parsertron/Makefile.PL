@@ -1,3 +1,9 @@
+#!/usr/bin/env perl
+
+use v5.10.1;
+use strict;
+use warnings;
+
 use strict;
 use warnings;
 
@@ -25,7 +31,7 @@ my(%params) =
 		SUFFIX   => 'gz'
 	},
 	DISTNAME			=> 'Regexp-Parsertron',
-	MIN_PERL_VERSION	=> 5.20.2,
+	MIN_PERL_VERSION	=> 5.10.1,
 	NAME				=> 'Regexp::Parsertron',
 	PL_FILES 			=> {},
 	PREREQ_PM			=>

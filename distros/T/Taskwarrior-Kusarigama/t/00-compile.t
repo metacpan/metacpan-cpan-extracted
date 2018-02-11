@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Taskwarrior/Kusarigama.pm',
@@ -25,6 +25,7 @@ my @module_files = (
     'Taskwarrior/Kusarigama/Plugin.pm',
     'Taskwarrior/Kusarigama/Plugin/Command/AndAfter.pm',
     'Taskwarrior/Kusarigama/Plugin/Command/ButBefore.pm',
+    'Taskwarrior/Kusarigama/Plugin/Command/Github.pm',
     'Taskwarrior/Kusarigama/Plugin/Command/Morning.pm',
     'Taskwarrior/Kusarigama/Plugin/Command/Open.pm',
     'Taskwarrior/Kusarigama/Plugin/Command/Progress.pm',

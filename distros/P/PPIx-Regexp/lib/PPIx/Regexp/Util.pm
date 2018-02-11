@@ -12,7 +12,7 @@ use base qw{ Exporter };
 
 our @EXPORT_OK = qw{ __choose_tokenizer_class __instance __to_ordinal_en };
 
-our $VERSION = '0.054';
+our $VERSION = '0.055';
 
 {
 

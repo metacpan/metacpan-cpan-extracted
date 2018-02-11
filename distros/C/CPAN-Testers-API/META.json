@@ -4,7 +4,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -79,27 +79,27 @@
    "provides" : {
       "CPAN::Testers::API" : {
          "file" : "lib/CPAN/Testers/API.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "CPAN::Testers::API::Base" : {
          "file" : "lib/CPAN/Testers/API/Base.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "CPAN::Testers::API::Controller::Release" : {
          "file" : "lib/CPAN/Testers/API/Controller/Release.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "CPAN::Testers::API::Controller::Report" : {
          "file" : "lib/CPAN/Testers/API/Controller/Report.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "CPAN::Testers::API::Controller::Summary" : {
          "file" : "lib/CPAN/Testers/API/Controller/Summary.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       },
       "CPAN::Testers::API::Controller::Upload" : {
          "file" : "lib/CPAN/Testers/API/Controller/Upload.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -115,13 +115,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>",
       "mohawk2 <mohawk2@users.noreply.github.com>",
       "Nick Tonkin <1nickt@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

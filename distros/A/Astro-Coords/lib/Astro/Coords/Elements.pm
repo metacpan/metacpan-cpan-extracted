@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.19';
 
 # Need working palPlante
 use Astro::PAL 0.95 ();
@@ -159,7 +159,7 @@ sub new {
       # Split on decimal point
       my ($date, $frac) = split(/\./,$epoch,2);
       $frac = "0.". $frac; # preserve as decimal fraction
-      my $format = '%Y %B %d';
+      my $format = '%Y %b %d';
       #print "EPOCH : $epoch and $date and $frac\n";
       my $obj = Time::Piece->strptime($date, $format);
       my $tzoffset = $obj->tzoffset;
@@ -267,7 +267,7 @@ sub array {
 =item B<type>
 
 Returns the generic type associated with the coordinate system.
-For this class the answer is always "RADEC".
+For this class the answer is always "ELEMENTS".
 
 This is used to aid construction of summary tables when using
 mixed coordinates.

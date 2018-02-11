@@ -31,7 +31,7 @@ use Astro::FITS::HdrTrans::FITS;
 
 use vars qw/ $VERSION /;
 
-$VERSION = "1.60";
+$VERSION = "1.61";
 
 # in each class we have three sets of data.
 #   - constant mappings
@@ -175,7 +175,7 @@ sub to_RA_SCALE {
   my $cd22 = $FITS_headers->{"CD2_2"};
   sqrt( $cd12**2 + $cd22**2 );
 }
- 
+
 sub to_RA_TELESCOPE_OFFSET {
   my $self = shift;
   my $FITS_headers = shift;

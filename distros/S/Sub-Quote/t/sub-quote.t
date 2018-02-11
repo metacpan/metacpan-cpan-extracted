@@ -247,4 +247,9 @@ is $@, '', 'sanitize_identifier gives valid identifier';
     'attributes applied to quoted sub with no_defer';
 }
 
+{
+  my $sub = quote_sub q{ sub { join " line ", (caller(0))[1,2] }->() }, {}, { file => "welp.pl", line => 42 };
+  is $sub->(), "welp.pl line 42", "file and line provided";
+}
+
 done_testing;

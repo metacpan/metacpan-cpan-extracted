@@ -1,5 +1,7 @@
 package Catmandu::Exporter::BagIt;
 
+our $VERSION = '0.211';
+
 =head1 NAME
 
 Catmandu::Exporter::BagIt - Package that exports data as BagIts
@@ -40,6 +42,16 @@ and one or more fields:
 
 All URL's in the fetch array will be mirrored and added to the bag. All payload files should
 be put in the 'data' subdirectory as shown in the example above.
+
+You can also add files from disk, using the "files" array:
+
+    {
+          '_id' => 'bags/demo01',
+           'files' => [
+               { '/tmp/download1.pdf'  => 'data/my_download1.pdf' } ,
+               { '/tmp/download2.pdf' => 'data/my_download2.pdf' } ,
+           ],
+    };
 
 =head1 METHODS
 
@@ -95,14 +107,18 @@ use IO::File;
 use LWP::Simple;
 use Moo;
 
-our $VERSION = '0.151';
-
 with 'Catmandu::Exporter';
 
 has user_agent      => (is => 'ro');
 has ignore_existing => (is => 'ro' , default => sub { 0 });
 has overwrite       => (is => 'ro' , default => sub { 0 });
 has skip_manifest   => (is => 'ro' , default => sub { 0 });
+
+sub _mtime {
+    my $file = $_[0];
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks) = stat($file);
+    return $mtime;
+}
 
 sub add {
     my ($self, $data) = @_;
@@ -146,12 +162,45 @@ sub add {
 
             $file =~ s{^data/}{};
             $bagit->add_file($file,IO::File->new($fname));
+            # close the bag to keep the number of open file handles to a minimum
+            # only the files that are flagged 'dirty' will be written
             $bagit->write($directory, overwrite => 1);
 
             undef($tmp);
         }
     }
+    if ( exists $data->{files} ) {
 
+        for my $file ( @{ $data->{files} } ) {
+
+            my($source)     = keys %$file;
+            my $destination = $file->{$source};
+
+            -f $source or Catmandu::Error->throw("source file $source does not exist");
+
+            my $data_dir    = File::Spec->catfile( $directory, "data" );
+
+            path($data_dir)->mkpath unless -d $data_dir;
+
+            my $destination_path    = File::Spec->catfile( $directory, $destination );
+            my $destination_entry   = $destination;
+            $destination_entry      =~ s{^data/}{};
+
+            #only add when destination is either older, or does not exist yet
+            if (
+                    (-f $destination_path && _mtime($source) > _mtime($destination_path)) ||
+                    !(-f $destination_path)
+
+            ) {
+
+                $bagit->add_file($destination_entry, IO::File->new($source));
+                $bagit->write($directory, overwrite => 1);
+
+            }
+
+        }
+
+    }
     1;
 }
 

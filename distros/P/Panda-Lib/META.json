@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Panda-Lib",
    "no_index" : {
@@ -29,19 +29,19 @@
       "configure" : {
          "requires" : {
             "CPP::catch::test" : "v1.0.0",
-            "CPP::panda::lib" : "v1.0.6",
+            "CPP::panda::lib" : "v1.1.0",
             "ExtUtils::MakeMaker" : "6.76",
-            "Panda::Install" : "v1.2.9",
-            "Panda::XS" : "v2.1.8"
+            "Panda::Install" : "v1.2.12",
+            "Panda::XS" : "v2.1.9"
          }
       },
       "runtime" : {
          "requires" : {
             "CPP::catch::test" : "v1.0.0",
-            "CPP::panda::lib" : "v1.0.6",
+            "CPP::panda::lib" : "v1.1.0",
             "Panda::Export" : "0",
-            "Panda::Install" : "v1.2.9",
-            "Panda::XS" : "v2.1.8",
+            "Panda::Install" : "v1.2.12",
+            "Panda::XS" : "v2.1.9",
             "Time::HiRes" : "0",
             "perl" : "5.010000"
          }
@@ -57,6 +57,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.3.5",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.3.6",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -68,3 +68,7 @@ on 'develop' => sub {
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Spelling" => "0.12";
 };
+
+on 'develop' => sub {
+  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.005";
+};

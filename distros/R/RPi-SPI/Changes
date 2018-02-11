@@ -1,6 +1,11 @@
 Revision history for RPi-SPI
 
-2.3607 2017-06-28
+2.3608  2018-02-07
+        - fix issue where we were calling _channel() twice in new(), instead
+          of one call to _channel() and one to _speed() (fixes #5). Thanks
+          gnotoix (Github) for the report and patch!
+
+2.3607  2017-06-28
         - bump prereq ver of WiringPi::API to 2.3612
 
 2.3606  2017-03-13

@@ -11,6 +11,4 @@ WriteMakefile(
 	LIBS => [join(' ', @main::L) . " -ljvm"],
 	dynamic_lib => Inline::Java::Portable::portable("dynamic_lib"),
 	# CCFLAGS => '-D_REENTRANT',
-    clean => {FILES => "_Inline_test"},
 ) ;
-

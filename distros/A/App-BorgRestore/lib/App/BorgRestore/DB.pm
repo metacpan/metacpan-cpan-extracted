@@ -9,6 +9,7 @@ use autodie;
 use DBI;
 use Function::Parameters;
 use Log::Any qw($log);
+use Number::Bytes::Human qw(format_bytes);
 use Path::Tiny;
 
 =encoding utf-8
@@ -31,20 +32,24 @@ method new($class: $db_path, $cache_size) {
 		# ensure the cache directory exists
 		path($db_path)->parent->mkpath({mode => oct(700)});
 
-		my $db = $self->_open_db($db_path, $cache_size);
+		my $db = $self->_open_db($db_path);
 		$self->initialize_db();
 	} else {
-		$self->_open_db($db_path, $cache_size);
+		$self->_open_db($db_path);
 	}
+	$self->{cache_size} = $cache_size;
 
 	return $self;
 }
 
-method _open_db($dbfile, $cache_size) {
+method _open_db($dbfile) {
 	$log->debugf("Opening database at %s", $dbfile);
 	$self->{dbh} = DBI->connect("dbi:SQLite:dbname=$dbfile","","", {RaiseError => 1, Taint => 1});
-	$self->{dbh}->do("PRAGMA cache_size=-".$cache_size);
 	$self->{dbh}->do("PRAGMA strict=ON");
+}
+
+method set_cache_size() {
+	$self->{dbh}->do("PRAGMA cache_size=-".$self->{cache_size});
 }
 
 method initialize_db() {
@@ -164,6 +169,31 @@ method begin_work() {
 
 method commit() {
 	$self->{dbh}->commit();
+}
+
+method verify_cache_fill_rate_ok() {
+	my $used = $self->{dbh}->sqlite_db_status()->{cache_used}->{current};
+	$log->debugf("sqlite page cache usage: %s", format_bytes($used, si=>1));
+	if ($used > $self->{cache_size} * 1024 * 0.95) {
+		$log->warnf("sqlite cache usage is %s of %s", format_bytes($used, si=>1), format_bytes($self->{cache_size} * 1024, si => 1));
+		$log->warn("Consider increasing the sqlite cache (see documentation of App::BorgRestore::Settings)");
+	}
+}
+
+method search_path($pattern) {
+	$log->debugf("Preparing path search for pattern '%s'", $pattern);
+	my $st = $self->{dbh}->prepare('select path from files where path like ?');
+	$log->debug("Executing search");
+	$st->execute($pattern);
+	$log->debug("Fetching search result");
+
+	my @ret;
+	while (my $row = $st->fetchrow_hashref()) {
+		push @ret, $row->{path};
+	}
+
+	$log->debugf("Found %d matching paths", 0+@ret);
+	return \@ret;
 }
 
 method vacuum() {

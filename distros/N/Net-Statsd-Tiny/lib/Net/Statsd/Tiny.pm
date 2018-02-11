@@ -1,149 +1,102 @@
 package Net::Statsd::Tiny;
 
-# ABSTRACT: A tiny StatsD client
+# ABSTRACT: A tiny StatsD client that supports multimetric packets
 
-# RECOMMEND PREREQ: Type::Tiny::XS
+use v5.10.1;
 
-use v5.10;
+use strict;
+use warnings;
 
-use Moo 1.000000;
+use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
-use IO::String;
-use MooX::TypeTiny;
-use Sub::Quote qw/ quote_sub /;
-use Sub::Util 1.40 qw/ set_subname /;
-use Net::Statsd::Tiny::Types -types;
 
-use namespace::autoclean;
-
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 
 
-has host => (
-    is      => 'ro',
-    isa     => Str,
-    default => '127.0.0.1',
+__PACKAGE__->mk_ro_accessors(
+    qw/ host port proto prefix
+      autoflush max_buffer_size _socket /
 );
 
+sub new {
+    my ( $class, @args ) = @_;
 
-has port => (
-    is      => 'ro',
-    isa     => Port,
-    default => 8125,
-);
+    my %args;
+    if ( ( @args == 1 ) && ( ref( $args[0] ) eq 'HASH' ) ) {
+        %args = %{ $args[0] };
+    }
+    else {
+        %args = @args;
+    }
 
+    my %DEFAULTS = (
+        host            => '127.0.0.1',
+        port            => 8125,
+        proto           => 'udp',
+        prefix          => '',
+        autoflush       => 1,
+        max_buffer_size => 512,
+    );
 
-has proto => (
-    is      => 'ro',
-    isa     => Enum [qw/ tcp udp /],
-    default => 'udp',
-);
+    foreach my $attr ( keys %DEFAULTS ) {
+        next if exists $args{$attr};
+        $args{$attr} = $DEFAULTS{$attr};
+    }
 
+    $args{_socket} = IO::Socket::INET->new(
+        PeerAddr => $args{host},
+        PeerPort => $args{port},
+        Proto    => $args{proto},
+    ) or die "Failed to initialize socket: $!";
 
-has prefix => (
-    is      => 'ro',
-    isa     => Str,
-    default => '',
-);
+    my $self = $class->SUPER::new( \%args );
 
+    $self->{_buffer} = '';
 
-has autoflush => (
-    is      => 'ro',
-    isa     => Bool,
-    default => 1,
-);
-
-has _buffer => (
-    is      => 'lazy',
-    isa     => InstanceOf ['IO::String'],
-    builder => sub {
-        IO::String->new;
-    },
-);
-
-
-has max_buffer_size => (
-    is      => 'ro',
-    isa     => PosInt,
-    default => 512,
-);
-
-has _socket => (
-    is      => 'lazy',
-    isa     => InstanceOf ['IO::Socket::INET'],
-    builder => sub {
-        my ($self) = shift;
-        my $sock = IO::Socket::INET->new(
-            PeerAddr => $self->host,
-            PeerPort => $self->port,
-            Proto    => $self->proto,
-        ) or die "Failed to initialize socket: $!";
-        return $sock;
-    },
-    handles => { _send => 'send' },
-);
+    return $self;
+}
 
 
 BEGIN {
     my $class = __PACKAGE__;
 
     my %PROTOCOL = (
-        set_add   => [ 's',  Str, ],
-        counter   => [ 'c',  Int, 1 ],
-        gauge     => [ 'g',  Gauge | PosInt ],
-        histogram => [ 'h',  PosNum ],
-        meter     => [ 'm',  PosInt ],
-        timing    => [ 'ms', PosNum, 1 ],
+        set_add   => 's',
+        counter   => 'c',
+        gauge     => 'g',
+        histogram => 'h',
+        meter     => 'm',
+        timing    => 'ms',
     );
 
     foreach my $name ( keys %PROTOCOL ) {
 
-        no strict 'refs'; ## no critic (ProhibitNoStrict)
+        no strict 'refs';    ## no critic (ProhibitNoStrict)
 
-        my $type = $PROTOCOL{$name}[1];
-        my $rate = $PROTOCOL{$name}[2];
+        my $suffix = '|' . $PROTOCOL{$name};
 
-        my $code =
-          defined $rate
-          ? q{ my ($self, $metric, $value, $rate) = @_; }
-          : q{ my ($self, $metric, $value) = @_; };
-
-        $code .= $type->inline_assert('$value');
-
-        $code .= q/ if (defined $rate) { / . Rate->inline_assert('$rate') . ' }'
-          if defined $rate;
-
-        my $tmpl = '%s:%s|' . $PROTOCOL{$name}[0];
-
-        if ( defined $rate ) {
-
-            $code .= q/ if ((defined $rate) && ($rate<1)) {
-                     $self->_record( $tmpl . '|@%f', $metric, $value, $rate );
-                   } else {
-                     $self->_record( $tmpl, $metric, $value ); } /;
-        }
-        else {
-
-            $code .= q{$self->_record( $tmpl, $metric, $value );};
-
-        }
-
-        quote_sub "${class}::${name}", $code,
-          { '$tmpl' => \$tmpl },
-          { no_defer => 1 };
-
+        *{"${class}::${name}"} = sub {
+            my ( $self, $metric, $value, $rate ) = @_;
+            if ( ( defined $rate ) && ( $rate < 1 ) ) {
+                $self->_record( $suffix . '|@' . $rate, $metric, $value )
+                    if rand() < $rate;
+            }
+            else {
+                $self->_record( $suffix, $metric, $value );
+            }
+        };
 
     }
 
     # Alises for other Net::Statsd::Client or Etsy::StatsD
 
     {
-        no strict 'refs'; ## no critic (ProhibitNoStrict)
+        no strict 'refs';    ## no critic (ProhibitNoStrict)
 
-        *{"${class}::update"}    = set_subname "update"    => \&counter;
-        *{"${class}::timing_ms"} = set_subname "timing_ms" => \&timing;
-        *{"${class}::add_set"}   = set_subname "timing_ms" => \&set_add;
+        *{"${class}::update"}    = \&counter;
+        *{"${class}::timing_ms"} = \&timing;
+        *{"${class}::add_set"}   = \&set_add;
 
     }
 
@@ -160,39 +113,29 @@ sub decrement {
 }
 
 sub _record {
-    my ( $self, $template, @args ) = @_;
+    my ( $self, $suffix, $metric, $value ) = @_;
 
-    my $data = $self->prefix . sprintf( $template, @args );
+    my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
-    my $fh  = $self->_buffer;
-    my $len = length($data);
-
-    if ( $len >= $self->max_buffer_size ) {
-        warn "Data is too large";
-        return $self;
+    if ( $self->autoflush ) {
+        send( $self->_socket, $data, 0 );
+        return;
     }
 
-    $len += length( ${ $fh->string_ref } );
-    if ( $len >= $self->max_buffer_size ) {
-        $self->flush;
-    }
+    my $avail = $self->max_buffer_size - length( $self->{_buffer} );
+    $self->flush if length($data) > $avail;
 
-    say {$fh} $data;
-
-    $self->flush if $self->autoflush;
+    $self->{_buffer} .= $data;
 }
+
 
 
 sub flush {
     my ($self) = @_;
 
-    my $fh = $self->_buffer;
-
-    my $data = ${ $fh->string_ref };
-
-    if ( length($data) ) {
-        $self->_send( $data, 0 );
-        $fh->truncate;
+    if ( length($self->{_buffer}) ) {
+        send( $self->_socket, $self->{_buffer}, 0 );
+        $self->{_buffer} = '';
     }
 }
 
@@ -215,11 +158,11 @@ __END__
 
 =head1 NAME
 
-Net::Statsd::Tiny - A tiny StatsD client
+Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -259,8 +202,8 @@ It supports the following features:
 Note that the specification requires the measured values to be
 integers no larger than 64-bits, but ideally 53-bits.
 
-The current implementation expects values to be integers, except where
-specified. But it otherwise does not enforce maximum/minimum values.
+The current implementation does not validate the values. If you want
+validation, see L<Net::Statsd::Lite>.
 
 =head1 ATTRIBUTES
 
@@ -401,6 +344,9 @@ This sends the buffer to the L</host> and empties the buffer, if there
 is any data in the buffer.
 
 =head1 SEE ALSO
+
+L<Net::Statsd::Lite> which has a similar API but uses L<Moo> and
+L<Type::Tiny> for data validation.
 
 L<https://github.com/b/statsd_spec>
 
