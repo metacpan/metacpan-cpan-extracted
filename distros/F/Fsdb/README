@@ -144,24 +144,10 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.64, 2017-11-20 several small bugfixes and enhancements[0m
-       BUG FIX
-           In dbroweval, the "next row" option previously did not correctly
-           set up "_last_fieldname".  It now does.
-
+   [1m2.65, date-tba desc-tba[0m
        ENHANCEMENT
-           The csv_to_db converter now has an optional "-F x" option to set
+           dbmultistats and dbmapreduce now both take a "-F x" option to set
            the field separator.
-
-       ENHANCEMENT
-           Finally dbcolsplittocols has a "--header" option, and a new "-N"
-           option to give the list of resulting output columns.
-
-       INCOMPATIBLE CHANGE
-           Now dbcolstats and dbmultistats produce no output (but a schema)
-           when given no input but a schema.  Previously they gave a null row
-           of output.  The "--output-on-no-input" and
-           "--no-output-on-no-input" options can control this behavior.
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -2289,6 +2275,25 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        BUG FIX
            Version 2.62 was supposed to have this improvement, but did not
            (and now does): dbroweval logs are now quoted.
+
+   [1m2.64, 2017-11-20 several small bugfixes and enhancements[0m
+       BUG FIX
+           In dbroweval, the "next row" option previously did not correctly
+           set up "_last_fieldname".  It now does.
+
+       ENHANCEMENT
+           The csv_to_db converter now has an optional "-F x" option to set
+           the field separator.
+
+       ENHANCEMENT
+           Finally dbcolsplittocols has a "--header" option, and a new "-N"
+           option to give the list of resulting output columns.
+
+       INCOMPATIBLE CHANGE
+           Now dbcolstats and dbmultistats produce no output (but a schema)
+           when given no input but a schema.  Previously they gave a null row
+           of output.  The "--output-on-no-input" and
+           "--no-output-on-no-input" options can control this behavior.
 
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"

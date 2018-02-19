@@ -6,7 +6,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 #pod =begin pod_coverage
 #pod
@@ -37,7 +37,7 @@ Data::Record::Serialize::Sink::null - send output to nowhere.
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

@@ -19,7 +19,7 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3621';
+our $VERSION = '2.3622';
 
 my $fatal_exit = 1;
 
@@ -306,7 +306,7 @@ various items
     # Serial
     #
 
-    my $dev  = "/dev/ttyAMA0";
+    my $dev  = "/dev/ttyS0";
     my $baud = 115200;
 
     my $ser = $pi->serial($dev, $baud);
@@ -615,6 +615,11 @@ the devices on an I2C bus.
 See the linked documentation for full documentation on usage, or the
 L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
 
+Aruino note: If using I2C with an Arduino, the Pi may speak faster than the
+Arduino can. If this is the case, try lowering the I2C bus speed on the Pi:
+
+    dtparam=i2c_arm_baudrate=10000
+
 =head2 lcd(...)
 
 Returns a L<RPi::LCD> object, which allows you to fully manipulate
@@ -642,6 +647,11 @@ serial bus.
 
 See the linked documentation for full documentation on usage, or the
 L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+NOTE: Bluetooth on the Pi overlays the serial pins (14, 15) on the Pi. To use
+serial, you must disable bluetooth in the C</boot/config.txt> file:
+
+    dtoverlay=pi3-disable-bt-overlay
 
 =head2 servo($pin_num)
 
@@ -719,7 +729,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017,2018 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

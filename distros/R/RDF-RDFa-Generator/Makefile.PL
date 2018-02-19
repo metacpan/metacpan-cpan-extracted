@@ -21,27 +21,37 @@ my $meta = {
   "no_index"         => { directory => ["eg", "examples", "inc", "t", "xt"] },
   "prereqs"          => {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
-                          runtime => {
-                            requires => {
-                              "AtteanX::Compatibility::Trine" => 0,
-                              "Data::Dumper" => 0,
-                              "Icon::FamFamFam::Silk" => 0,
-                              "perl" => 5.008,
-                              "RDF::Prefixes" => 0,
-                              "RDF::Trine" => 0.112,
-                              "XML::LibXML" => "1.60",
-                            },
-                          },
-                          test => { requires => { "Test::More" => 0.96, "Test::Output" => 0 } },
+                          develop   => { recommends => { "Dist::Inkt" => 0.001 } },
+                          runtime   => {
+                                         recommends => { "Attean" => 0.019, "RDF::NS" => 0, "RDF::Prefixes" => 0 },
+                                         requires   => {
+                                                         "Data::Dumper" => 0,
+                                                         "Icon::FamFamFam::Silk" => 0,
+                                                         "perl" => 5.008,
+                                                         "RDF::NS::Curated" => "0.100",
+                                                         "URI::NamespaceMap" => 1.06,
+                                                         "XML::LibXML" => "1.60",
+                                                       },
+                                         suggests   => { "RDF::Trine" => 0.112 },
+                                       },
+                          test      => {
+                                         requires => {
+                                           "Attean"        => 0.019,
+                                           "RDF::Prefixes" => 0,
+                                           "Test::Modern"  => 0,
+                                           "Test::More"    => 0.96,
+                                           "Test::Output"  => 0,
+                                         },
+                                       },
                         },
   "provides"         => {
-                          "RDF::RDFa::Generator"                     => { file => "lib/RDF/RDFa/Generator.pm", version => 0.192 },
-                          "RDF::RDFa::Generator::HTML::Head"         => { file => "lib/RDF/RDFa/Generator/HTML/Head.pm", version => 0.192 },
-                          "RDF::RDFa::Generator::HTML::Hidden"       => { file => "lib/RDF/RDFa/Generator/HTML/Hidden.pm", version => 0.192 },
-                          "RDF::RDFa::Generator::HTML::Pretty"       => { file => "lib/RDF/RDFa/Generator/HTML/Pretty.pm", version => 0.192 },
+                          "RDF::RDFa::Generator"                     => { file => "lib/RDF/RDFa/Generator.pm", version => "0.200" },
+                          "RDF::RDFa::Generator::HTML::Head"         => { file => "lib/RDF/RDFa/Generator/HTML/Head.pm", version => "0.200" },
+                          "RDF::RDFa::Generator::HTML::Hidden"       => { file => "lib/RDF/RDFa/Generator/HTML/Hidden.pm", version => "0.200" },
+                          "RDF::RDFa::Generator::HTML::Pretty"       => { file => "lib/RDF/RDFa/Generator/HTML/Pretty.pm", version => "0.200" },
                           "RDF::RDFa::Generator::HTML::Pretty::Note" => {
                                                                           file => "lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm",
-                                                                          version => 0.192,
+                                                                          version => "0.200",
                                                                         },
                         },
   "release_status"   => "stable",
@@ -59,7 +69,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-RDFa-Generator/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.192,
+  "version"          => "0.200",
   "x_contributors"   => ["ZORAN <zoran\@cpan.org>"],
   "x_static_install" => 1,
 };

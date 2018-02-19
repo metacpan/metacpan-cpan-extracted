@@ -5,7 +5,8 @@ use Mojo::URL;
 use Mojo::Home;
 use Mojo::IOLoop;
 use Mojo::Parameters;
-use Mojo::Util qw(url_unescape);
+use Mojo::Promise;
+use Mojo::Util qw(url_unescape dumper);
 use List::Util qw(none);
 use Scalar::Util qw(blessed);
 use File::Basename 'dirname';
@@ -15,11 +16,11 @@ use Net::AMQP;
 use Net::AMQP::Common qw(:all);
 
 use Mojo::RabbitMQ::Client::Channel;
-use Mojo::RabbitMQ::Client::Consumer;
 use Mojo::RabbitMQ::Client::LocalQueue;
-use Mojo::RabbitMQ::Client::Publisher;
+require Mojo::RabbitMQ::Client::Consumer;
+require Mojo::RabbitMQ::Client::Publisher;
 
-our $VERSION = "0.0.9";
+our $VERSION = "0.1.0";
 
 use constant DEBUG => $ENV{MOJO_RABBITMQ_DEBUG} // 0;
 
@@ -48,10 +49,32 @@ sub connect {
   $self->{buffer} = '';
 
   my $id;
-  $id = $self->_connect(sub { $self->_connected($id, @_) });
+  $id = $self->_connect(sub { $self->_connected($id) });
   $self->stream_id($id);
 
   return $id;
+}
+
+sub connect_p {
+  my $self = shift;
+  my $promise = Mojo::Promise->new;
+
+  my $id;
+
+  weaken $self;
+  my $handler = sub {
+    my ($err) = @_;
+    if (defined $err) {
+      return $promise->reject($err);
+    }
+
+    return $promise->resolve($self);
+  };
+
+  $id = $self->_connect(sub { $self->_connected($id, $handler) });
+  $self->stream_id($id);
+
+  return $promise;
 }
 
 sub consumer {
@@ -106,6 +129,21 @@ sub add_channel {
   return $channel;
 }
 
+sub acquire_channel_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+
+  my $channel = Mojo::RabbitMQ::Client::Channel->new();
+  $channel->catch(sub { $promise->reject(@_) });
+  $channel->on(close => sub { warn "Channel closed" });
+  $channel->on(open => sub { $promise->resolve(@_) });
+
+  $self->open_channel($channel);
+
+  return $promise;
+}
+
 sub open_channel {
   my $self    = shift;
   my $channel = shift;
@@ -130,6 +168,7 @@ sub close {
   $self->_write_expect(
     'Connection::Close'   => {},
     'Connection::CloseOk' => sub {
+      warn "-- Connection::CloseOk\n" if DEBUG;
       $self->emit('close');
       $self->_close;
     },
@@ -235,8 +274,11 @@ sub _handle {
 sub _read {
   my ($self, $id, $chunk) = @_;
   my $chunk_len = length($chunk);
+  my $buffer_len = defined $self->{buffer} ? length($self->{buffer}) : 0;
 
-  if ($chunk_len + length($self->{buffer}) > $self->max_buffer_size) {
+  warn "<- @{[dumper $chunk]}" if DEBUG;
+
+  if ($chunk_len + $buffer_len > $self->max_buffer_size) {
     $self->{buffer} = '';
     return;
   }
@@ -348,7 +390,7 @@ sub _connect {
 }
 
 sub _connected {
-  my ($self, $id, $query) = @_;
+  my ($self, $id, $cb) = @_;
 
   # Inactivity timeout
   my $stream = $self->_loop->stream($id)->timeout(0);
@@ -383,6 +425,7 @@ sub _connected {
 
       $self->{_server_properties} = $frame->method_frame->server_properties;
 
+      warn "-- Connection::Start {product: " . $self->{_server_properties}->{product} . ", version: " . $self->{_server_properties}->{version} . "}\n" if DEBUG;
       $self->_write_frame(
         Net::AMQP::Protocol::Connection::StartOk->new(
           client_properties => {
@@ -397,7 +440,7 @@ sub _connected {
         ),
       );
 
-      $self->_tune($id);
+      $self->_tune($id, $cb);
     },
     sub {
       $self->emit(error => 'Unable to start connection: ' . shift);
@@ -406,7 +449,7 @@ sub _connected {
 }
 
 sub _tune {
-  my $self = shift;
+  my ($self, $id, $cb) = @_;
 
   weaken $self;
   $self->_expect(
@@ -418,6 +461,7 @@ sub _tune {
 
       my $heartbeat = $self->heartbeat_timeout || $method_frame->heartbeat;
 
+      warn "-- Connection::Tune {frame_max: " . $method_frame->frame_max . ", heartbeat: " . $method_frame->heartbeat . "}\n" if DEBUG;
       # Confirm
       $self->_write_frame(
         Net::AMQP::Protocol::Connection::TuneOk->new(
@@ -427,12 +471,12 @@ sub _tune {
         ),
       );
 
- # According to https://www.rabbitmq.com/amqp-0-9-1-errata.html
- # The client should start sending heartbeats after receiving a Connection.Tune
- # method, and start monitoring heartbeats after sending Connection.Open.
- # -and-
- # Heartbeat frames are sent about every timeout / 2 seconds. After two missed
- # heartbeats, the peer is considered to be unreachable.
+      # According to https://www.rabbitmq.com/amqp-0-9-1-errata.html
+      # The client should start sending heartbeats after receiving a Connection.Tune
+      # method, and start monitoring heartbeats after sending Connection.Open.
+      # -and-
+      # Heartbeat frames are sent about every timeout / 2 seconds. After two missed
+      # heartbeats, the peer is considered to be unreachable.
       $self->{heartbeat_tid} = $self->_loop->recurring(
         $heartbeat / 2 => sub {
           return unless time() - $self->heartbeat_sent > $heartbeat / 2;
@@ -445,11 +489,16 @@ sub _tune {
         'Connection::Open' =>
           {virtual_host => $self->vhost, capabilities => '', insist => 1,},
         'Connection::OpenOk' => sub {
+          warn "-- Connection::OpenOk\n" if DEBUG;
+
           $self->is_open(1);
           $self->emit('open');
+          $cb->() if defined $cb;
         },
         sub {
-          $self->emit(error => 'Unable to open connection: ' . shift);
+          my $err = shift;
+          $self->emit(error => 'Unable to open connection: ' . $err);
+          $cb->($err) if defined $cb;
         }
       );
     },
@@ -466,10 +515,12 @@ sub _write_expect {
 
   $channel_id ||= 0;
 
+  my $method_frame = Net::AMQP::Frame::Method->new(
+    method_frame => $method->new(%$args)
+  );
+
   $self->_write_frame(
-    Net::AMQP::Frame::Method->new(    #
-      method_frame => $method->new(%$args)    #
-    ),
+    $method_frame,
     $channel_id
   );
 
@@ -500,7 +551,6 @@ sub _expect {
 
   return unless $queue;
 
-  weaken $self;
   $queue->get(
     sub {
       my $frame = shift;
@@ -525,23 +575,26 @@ sub _expect {
 sub _write_frame {
   my $self = shift;
   my $id   = $self->stream_id;
-  my ($out, $channel) = @_;
+  my ($out, $channel, $cb) = @_;
 
   if ($out->isa('Net::AMQP::Protocol::Base')) {
     $out = $out->frame_wrap;
   }
   $out->channel($channel // 0);
 
-  return $self->_write($id, $out->to_raw_frame);
+  return $self->_write($id, $out->to_raw_frame, $cb);
 }
 
 sub _write {
   my $self  = shift @_;
   my $id    = shift @_;
   my $frame = shift @_;
+  my $cb    = shift @_;
+
+  warn "-> @{[dumper $frame]}" if DEBUG;
 
   utf8::downgrade($frame);
-  $self->_loop->stream($id)->write($frame)
+  $self->_loop->stream($id)->write($frame => $cb)
     if defined $self->_loop->stream($id);
 }
 
@@ -646,16 +699,19 @@ Mojo::RabbitMQ::Client - Mojo::IOLoop based RabbitMQ client
 
   use Mojo::RabbitMQ::Client;
   my $publisher = Mojo::RabbitMQ::Client->publisher(
-    url => 'amqp://guest:guest@127.0.0.1:5672/?exchange=mojo&queue=mojo'
+    url => 'amqp://guest:guest@127.0.0.1:5672/?exchange=mojo&routing_key=mojo'
   );
 
-  $publisher->catch(sub { die "Some error caught in Publisher" } );
-  $publisher->on('success' => sub { say "Publisher ready" });
-
   $publisher->publish('plain text');
-  $publisher->publish({encode => { to => 'json'}});
 
-  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+  $publisher->publish(
+    {encode => { to => 'json'}},
+    routing_key => 'mojo_mq'
+  )->then(sub {
+    say "Message published";
+  })->catch(sub {
+    die "Publishing failed"
+  })->wait;
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::Bundle::Extended qw[ :DEFAULT bag ];
+use Test2::V0 qw[ :DEFAULT bag ];
 
 use Data::Dumper;
 use Data::Record::Serialize;

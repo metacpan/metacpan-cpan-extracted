@@ -17,3 +17,8 @@
     % }
 % }
 
+# To use the OpenAPI functionality, you have to add the following code to
+# your 'start' method.
+#
+$self->plugin("OpenAPI" => {url => $self->home->child("api/api.json")});
+

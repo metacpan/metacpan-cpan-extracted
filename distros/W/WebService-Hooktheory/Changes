@@ -1,0 +1,19 @@
+Revision history for WebService-Hooktheory
+
+0.0202 2018-02-16 18:12:59
+    - Made the activkey attribute read-only.
+    - Improve the activkey setting logic.
+
+0.0201 2018-02-15 20:40:29
+    - UGH! I added an untested regular expression. :(
+
+0.02 2018-02-15 20:32:33
+    - Gracefully handle the case where the request is successful but there is no
+      JSON in the response body.
+
+0.0101 2018-02-15 19:24:32
+    - Improve documentation
+
+0.01 2018-02-15 18:51:28
+    - Minted by Dist::Zilla.
+    - Kickstarted with help from Grinnz!

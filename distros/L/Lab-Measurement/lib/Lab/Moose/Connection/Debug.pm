@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Debug;
-$Lab::Moose::Connection::Debug::VERSION = '3.613';
+$Lab::Moose::Connection::Debug::VERSION = '3.620';
 #ABSTRACT: Debug connection
 
 use Moose;
@@ -45,7 +45,10 @@ sub Query {
 }
 
 sub Clear {
-    carp "Clear called";
+    my $self = shift;
+    if ( $self->verbose ) {
+        carp "Clear called";
+    }
 }
 
 with 'Lab::Moose::Connection';
@@ -65,7 +68,7 @@ Lab::Moose::Connection::Debug - Debug connection
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -86,7 +89,7 @@ C<Read> commands.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

@@ -149,9 +149,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->cur_package_name_with_template_args = op_use->uv.use->package_name_with_template_args;
               compiler->cur_op_use = op_use;
               
-              // Add module load symbol table
-              SPVM_HASH_insert(compiler->module_load_symtable, package_name, strlen(package_name), cur_file);
-              
               // Read file content
               fseek(fh, 0, SEEK_END);
               int32_t file_size = (int32_t)ftell(fh);
@@ -894,15 +891,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // Constant
           SPVM_TYPE* constant_type;
           
-          if (*compiler->bufptr == 'y')  {
-            constant_type = SPVM_TYPE_get_byte_type(compiler);
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 's')  {
-            constant_type = SPVM_TYPE_get_short_type(compiler);
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'L')  {
+          if (*compiler->bufptr == 'L')  {
             constant_type = SPVM_TYPE_get_long_type(compiler);
             compiler->bufptr++;
           }

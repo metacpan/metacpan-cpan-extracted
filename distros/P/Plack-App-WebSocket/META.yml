@@ -42,5 +42,5 @@ requires:
 resources:
   bugtracker: https://github.com/debug-ito/Plack-App-WebSocket/issues
   repository: git://github.com/debug-ito/Plack-App-WebSocket.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

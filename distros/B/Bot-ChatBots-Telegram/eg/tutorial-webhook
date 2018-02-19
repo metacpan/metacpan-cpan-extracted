@@ -1,0 +1,108 @@
+#!/usr/bin/env perl
+
+# save as tutorial-webhook and start as:
+#
+# $ perl tutorial-webhook daemon \
+#      -l 'https://*:3000?cert=server.crt&key=server.key'
+
+use strict;
+use warnings;
+use Mojolicious::Lite;
+
+my $token   = $ENV{TOKEN};
+my $bot_url = $ENV{BOT_URL};
+my $certificate = do { local (@ARGV, $/) = 'server.crt'; <> };
+
+plugin 'Bot::ChatBots::Telegram' => instances => [
+   [
+      'WebHook',
+      processor   => \&process_record,
+      register    => 1,
+      token       => $token,
+      unregister  => 1,
+      url         => $bot_url,
+      certificate => $certificate,
+   ],
+];
+
+# set this as a "shim" to make the whole thing similar to LongPoll
+my $bcb = app->chatbots->telegram->instances->[0];
+
+# encapsulating initialization comes handy
+setup_recurring();
+
+# now it's time to hand operations over to Mojolicious
+app->start;
+
+### EVERYTHING IS UNCHANGED BELOW THIS LINE ############################
+# track nagging...
+{
+   my %nagged;
+   sub setup_recurring {
+      Mojo::IOLoop->recurring(
+         10 => sub {
+            my $sender = $bcb->sender;
+            for my $chat_id (keys %nagged) {
+               $sender->send_message(
+                  {
+                     text => 'whooops!',
+                     chat_id => $chat_id,
+                  }
+               );
+            }
+         }
+      );
+   }
+   sub nag_on  { $nagged{$_[0]} = 1 }
+   sub nag_off { delete $nagged{$_[0]} }
+}
+
+sub process_record {
+   my $record = shift;
+
+   my $type    = $record->{data_type};
+   my $payload = $record->{payload};
+   if ($type eq 'Message' && exists($payload->{from}) ) {
+      my $text      = $payload->{text} || '';
+      my $peer_name = $payload->{from}{first_name} || 'U. N. Known';
+      my $chat_id   = $record->{channel}{id};
+      print {*STDERR} "$peer_name says: $text\n";
+      if (($text eq '/start') || ($text eq '/help')) {
+         $record->{send_response} = <<'END';
+Very simple:
+* for help type /help
+* for greeting type /hello
+* for being annoyed every 10 s type /nag on
+* to stop annoyance type /nag off
+* to be reminded type /remind <seconds> <message>
+END
+      }
+      elsif ($text eq '/hello') {
+         $record->{send_response} = "Hello to you, $peer_name";
+      }
+      elsif ($text eq '/nag on') {
+         nag_on($chat_id);
+         $record->{send_response} = 'OK, to deactivate /nag off';
+      }
+      elsif ($text eq '/nag off') {
+         nag_off($chat_id);
+         $record->{send_response} = 'OK, to reactivate /nag on';
+      }
+      elsif (my (          $delay,        $msg) = $text =~ m{
+            \A /remind \s+ ([1-9]\d*) \s+ (.*)
+         }mxs)
+      {
+         Mojo::IOLoop->timer($delay => sub {
+            $bcb->sender->send_message(
+               {
+                  text => "$peer_name: remember $msg",
+                  chat_id => $chat_id,
+               }
+            );
+         });
+         $record->{send_response} = "I'll try my best!";
+      }
+   }
+
+   return $record; # follow on..
+}

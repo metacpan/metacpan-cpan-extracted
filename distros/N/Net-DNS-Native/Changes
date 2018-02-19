@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::DNS::Native
 
+0.18  Sat Feb 10 21:41:32 DST 2018
+    - Fix possible hanging during destruction
+
 0.17  Fri Feb  9 11:35:24 DST 2018
     - Fix possible warning during global destruction,
       where timedout() call on undefined value occures

@@ -16,7 +16,13 @@ my %prereq = (
 use version;
 my $gfsmxl_min_version   = "0.0.11";
 if (Alien::GfsmXL->install_type ne 'system') {
-  my $gfsmxl_alien_version = Alien::GfsmXL->pkgconfig('gfsmxl')->keyword('Version');
+  my $gfsmxl_alien_version = (Alien::GfsmXL->can('pkgconfig')
+			      ? Alien::GfsmXL->pkgconfig('gfsmxl')->keyword('Version') ##-- RT bug #124235 with Alien::Base v0.41
+			    : (Alien::GfsmXL->can('config')
+			       ? Alien::GfsmXL->config('version')			 ##-- Alien::Base >= v0.41
+			       : undef));
+  die("Failed to determine \$gfsmxl_alien_version") if (!defined($gfsmxl_alien_version));
+
   (my $v_alien = $gfsmxl_alien_version) =~ s/\-/_/g;
   die("Required library libgfsmxl >= v$gfsmxl_min_version not found; we have v$gfsmxl_alien_version\n")
     if (version->parse($v_alien) < version->parse($gfsmxl_min_version));

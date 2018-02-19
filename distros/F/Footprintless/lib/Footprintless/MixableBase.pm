@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::MixableBase;
-$Footprintless::MixableBase::VERSION = '1.26';
+$Footprintless::MixableBase::VERSION = '1.27';
 # ABSTRACT: A base class for using mixins
 # PODNAME: Footprintless::MixableBase
 
@@ -39,7 +39,7 @@ Footprintless::MixableBase - A base class for using mixins
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

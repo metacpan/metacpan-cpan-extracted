@@ -1,6 +1,14 @@
 Release history for Mojolicious::Plugin::FormFieldsFromJSON
 ===========================================================
 
+1.00 2018-02-19
+
+  [IMPROVEMENT]
+  * add method form_field_by_name
+  [MISC]
+  * added test for new method
+  * added tests to test the new behaviour where selected values can be set via stash
+
 0.32 2016-04-26
 
   [IMPROVEMENT]

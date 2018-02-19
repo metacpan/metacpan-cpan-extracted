@@ -1,4 +1,27 @@
 Perltidy Change Log
+  2018 02 19
+      - RT #79947, cuddled-else generalization. A new flag -cb provides
+        'cuddled-else' type formatting for an arbitrary type of block chain. The
+        default is try-catch-finally, but this can be modified with the 
+        parameter -cbl. 
+
+      - Fixed RT #124298: add space after ! operator without breaking !! secret 
+        operator
+
+      - RT #123749: numerous minor improvements to the -wn flag were made.  
+
+      - Fixed a problem with convergence tests in which iterations were stopping 
+        prematurely. 
+
+      - Here doc targets for <<~ type here-docs may now have leading whitespace.
+
+      - Fixed RT #124354. The '-indent-only' flag was not working correctly in the 
+        previous release. A bug in version 20180101 caused extra blank lines 
+        to be output.
+
+      - Issue RT #124114. Some improvements were made in vertical alignment
+        involving 'fat commas'.
+
   2018 01 01
       - Added new flag -wn (--weld-nested-containers) which addresses these issues:
         RT #123749: Problem with promises; 

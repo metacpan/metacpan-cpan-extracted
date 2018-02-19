@@ -4,24 +4,12 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'  => qr/\ADelivery Notification: /,
-    'received' => qr/[ ][(]MessagingServer[)][ ]with[ ]/,
-    'boundary' => qr/Boundary_[(]ID_.+[)]/,
-};
-my $Re1 = {
-    'begin'    => qr/\AThis report relates to a message you sent with the following header fields:/,
-    'endof'    => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-    'rfc822'   => qr!\A(?:Content-type:[ \t]*message/rfc822|Return-path:[ \t]*)!x,
-};
-my $ReFailure = {
-    'hostunknown' => qr{Illegal[ ]host/domain[ ]name[ ]found}x,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'message' => ['This report relates to a message you sent with the following header fields:'] };
+my $MarkingsOf = { 'rfc822'  => qr!\A(?:Content-type:[ \t]*message/rfc822|Return-path:[ \t]*)! };
+my $ReFailures = { 'hostunknown' => qr|Illegal host/domain name found| };
 
-sub pattern     { return $Re0 }
 sub description { 'Oracle Communications Messaging Server' }
-
 sub scan {
     # Detect an error from Oracle Communications Messaging Server
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -40,8 +28,9 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match ||= 1 if $mhead->{'content-type'} =~ $Re0->{'boundary'};
-    $match ||= 1 if $mhead->{'subject'}      =~ $Re0->{'subject'};
+    # 'received' => qr/[ ][(]MessagingServer[)][ ]with[ ]/,
+    $match ||= 1 if index($mhead->{'content-type'}, 'Boundary_(ID_') > -1;
+    $match ||= 1 if index($mhead->{'subject'}, 'Delivery Notification: ') == 0;
     return undef unless $match;
 
     require Sisimai::Address;
@@ -55,10 +44,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -66,7 +55,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -106,7 +95,7 @@ sub scan {
             #   Remote system: dns;mx.example.jp (TCP|17.111.174.67|47323|192.0.2.225|25) (6jo.example.jp ESMTP SENDMAIL-VM)
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[ \t]+Recipient address:[ \t]*([^ ]+[@][^ ]+)\z/ ) {
+            if( $e =~ /\A[ \t]+Recipient address:[ \t]*([^ ]+[@][^ ]+)\z/ ) {
                 #   Recipient address: kijitora@example.jp
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -116,35 +105,35 @@ sub scan {
                 $v->{'recipient'} = Sisimai::Address->s3s4($1);
                 $recipients++;
 
-            } elsif( $e =~ m/\A[ \t]+Original address:[ \t]*([^ ]+[@][^ ]+)\z/ ) {
+            } elsif( $e =~ /\A[ \t]+Original address:[ \t]*([^ ]+[@][^ ]+)\z/ ) {
                 #   Original address: kijitora@example.jp
                 $v->{'recipient'} = Sisimai::Address->s3s4($1);
 
-            } elsif( $e =~ m/\A[ \t]+Date:[ \t]*(.+)\z/ ) {
+            } elsif( $e =~ /\A[ \t]+Date:[ \t]*(.+)\z/ ) {
                 #   Date: Fri, 21 Nov 2014 23:34:45 +0900
                 $v->{'date'} = $1;
 
-            } elsif( $e =~ m/\A[ \t]+Reason:[ \t]*(.+)\z/ ) {
+            } elsif( $e =~ /\A[ \t]+Reason:[ \t]*(.+)\z/ ) {
                 #   Reason: Remote SMTP server has rejected address
                 $v->{'diagnosis'} = $1;
 
-            } elsif( $e =~ m/\A[ \t]+Diagnostic code:[ \t]*([^ ]+);(.+)\z/ ) {
+            } elsif( $e =~ /\A[ \t]+Diagnostic code:[ \t]*([^ ]+);(.+)\z/ ) {
                 #   Diagnostic code: smtp;550 5.1.1 <kijitora@example.jp>... User Unknown
                 $v->{'spec'} = uc $1;
                 $v->{'diagnosis'} = $2;
 
-            } elsif( $e =~ m/\A[ \t]+Remote system:[ \t]*dns;([^ ]+)[ \t]*([^ ]+)[ \t]*.+\z/ ) {
+            } elsif( $e =~ /\A[ \t]+Remote system:[ \t]*dns;([^ ]+)[ \t]*([^ ]+)[ \t]*.+\z/ ) {
                 #   Remote system: dns;mx.example.jp (TCP|17.111.174.67|47323|192.0.2.225|25)
                 #     (6jo.example.jp ESMTP SENDMAIL-VM)
                 my $remotehost = $1; # remote host
                 my $sessionlog = $2; # smtp session
                 $v->{'rhost'} = $remotehost;
 
-                if( $sessionlog =~ m/\A[(]TCP|(.+)|\d+|(.+)|\d+[)]/ ) {
+                if( $sessionlog =~ /\A[(]TCP|(.+)|\d+|(.+)|\d+[)]/ ) {
                     # The value does not include ".", use IP address instead.
                     # (TCP|17.111.174.67|47323|192.0.2.225|25)
                     $v->{'lhost'} = $1;
-                    $v->{'rhost'} = $2 unless $remotehost =~ m/[^.]+[.][^.]+/;
+                    $v->{'rhost'} = $2 unless $remotehost =~ /[^.]+[.][^.]+/;
                 }
             } else {
                 # Original-envelope-id: 0NFC009FLKOUVMA0@mr21p30im-asmtp004.me.com
@@ -159,35 +148,34 @@ sub scan {
                 #  (6jo.example.jp ESMTP SENDMAIL-VM)
                 # Diagnostic-code: smtp;550 5.1.1 <kijitora@example.jp>... User Unknown
                 #
-                if( $e =~ m/\A[Ss]tatus:[ \t]*(\d[.]\d[.]\d)[ \t]*[(](.+)[)]\z/ ) {
+                if( $e =~ /\AStatus:[ \t]*(\d[.]\d[.]\d)[ \t]*[(](.+)[)]\z/ ) {
                     # Status: 5.1.1 (Remote SMTP server has rejected address)
                     $v->{'status'} = $1;
                     $v->{'diagnosis'} ||= $2;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-date: Thu, 29 Apr 2014 23:34:45 +0000 (GMT)
                     $v->{'date'} ||= $1;
 
-                } elsif( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns;mr21p30im-asmtp004.me.com (tcp-daemon)
                     my $localhost = $1;
                     $v->{'lhost'} ||= $localhost;
-                    $v->{'lhost'}   = $localhost unless $v->{'lhost'} =~ m/[^.]+[.][^ ]+/;
+                    $v->{'lhost'}   = $localhost unless $v->{'lhost'} =~ /[^.]+[.][^ ]+/;
                 }
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -242,7 +230,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

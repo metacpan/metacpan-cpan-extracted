@@ -117,7 +117,7 @@ creation_date: 2011-03-29T05:54:40Z
 id: FYPO:0000133
 name: elongated multinucleate cells
 namespace: fission_yeast_phenotype
-def: "A cell phenotype in which cells contain more than one nucleus apiece and are elongated." [PomBase:mah]
+def: "A cell phenotype in which cells contain more than one nucleus apiece and are elongated." [PomBase:mah, PMID:12381658]
 comment: Test comment.
 is_a: FYPO:0000017 ! elongated cells
 is_a: FYPO:0000061 ! multinucleate

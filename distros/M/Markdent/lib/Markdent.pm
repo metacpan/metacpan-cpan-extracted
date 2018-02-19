@@ -1,13 +1,14 @@
 ## no critic (Moose::RequireMakeImmutable)
 package Markdent;
 
+use 5.010;
 use strict;
 use warnings;
 
 # The first version that completely worked with newer versions of Specio.
 use Moose 2.1802 ();
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 1;
 
@@ -25,7 +26,7 @@ Markdent - An event-based Markdown parser toolkit
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -116,13 +117,17 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Speer Jason McIntosh Polina Shubina Tom Hukins
+=for stopwords Andrew Speer Denis Ibaev Jason McIntosh Polina Shubina Tom Hukins
 
 =over 4
 
 =item *
 
 Andrew Speer <andrew.speer@isolutions.com.au>
+
+=item *
+
+Denis Ibaev <dionys@gmail.com>
 
 =item *
 
@@ -140,7 +145,7 @@ Tom Hukins <tom@eborcom.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

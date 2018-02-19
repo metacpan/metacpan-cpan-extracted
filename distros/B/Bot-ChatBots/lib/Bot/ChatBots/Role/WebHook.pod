@@ -396,9 +396,14 @@ this is a hash reference with the following structure:
 
 When this role is consumed along with L<Bot::ChatBots::Role::Source>, this
 helps building records that contain the C<flags> key inside their
-C<source> section. You can then set C<rendered> to a true value if you
-plan to do the rendering yourself, otherwise L</handler> will perform a
-rendering for you (setting a C<204 No Content> response code);
+C<source> section.
+
+You can then set C<rendered> to a true value if you plan to do the
+rendering yourself, otherwise L</handler> will perform a rendering for you
+(using L</code>). Note that if you use "normal" ways for rendering
+a response (via L<Mojolicious::Controller> methods), this flag will be
+automatically set for you when hook L<Mojolicious/after_dispatch> is
+emitted.
 
 =item * C<updates>
 

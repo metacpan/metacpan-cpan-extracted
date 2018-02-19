@@ -29,14 +29,14 @@ BEGIN {
 
 ## no critic (RequireArgUnpacking)
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
-our @EXPORT_OK = qw/ replace replace2 /;
+our @EXPORT_OK = qw/ replace replace2 replace3 /;
 our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle /;
 
 our $DISABLE_CHMOD;
 
-my %NEW_KNOWN_OPTS = map {$_=>1} qw/ debug layers devnull create chmod
+my %NEW_KNOWN_OPTS = map {$_=>1} qw/ debug layers create chmod
 	perms autocancel autofinish in_fh /;
 sub new {  ## no critic (ProhibitExcessComplexity)
 	my $class = shift;
@@ -50,23 +50,12 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 	croak "$class->new: can't use autocancel and autofinish at once"
 		if $opts{autocancel} && $opts{autofinish};
 	unless (defined wantarray) { warnings::warnif("Useless use of $class->new in void context"); return }
-	if (exists $opts{devnull}) { # compatibility mode + deprecation warning
-		   if ($opts{create} ) { $opts{create}='now'   }
-		elsif ($opts{devnull}) { $opts{create}='later' }
-		else                   { $opts{create}='off'   }
-		delete $opts{devnull};
-		carp "The 'devnull' option has been deprecated, use create=>'$opts{create}' instead";
-	}
-	elsif (exists $opts{create}) { # normalize 'create' values
-		my $warn;
-		  if (!$opts{create}) # some false value
-			 { $opts{create}='later'; $warn=1 }
-		elsif ($opts{create} eq 'off' || $opts{create} eq 'no')
+	if (defined $opts{create}) { # normalize 'create' values
+		   if ( $opts{create} eq 'off' || $opts{create} eq 'no' )
 			 { $opts{create} = 'off' }
-		elsif ($opts{create} eq 'now' || $opts{create} eq 'later')
+		elsif ( $opts{create} eq 'now' || $opts{create} eq 'later' )
 			 { } # nothing needed
-		else { $opts{create} = 'now'; $warn=1 } # other true value
-		$warn and carp "This 'create' value is deprecated, use create=>'$opts{create}' instead";
+		else { croak "bad value for 'create' option, must be one of off/no/later/now" }
 	}
 	else { $opts{create} = 'later' } # default
 	# create the object
@@ -128,11 +117,32 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 	return $self;
 }
 
-sub _debug {
-	my $self = shift;
-	return 1 unless $self->{debug};
-	local ($",$,,$\) = (' ');
-	return print {$self->{debug}} @_;
+sub replace3 {
+	unless (defined wantarray) { warnings::warnif("Useless use of "
+		.__PACKAGE__."::replace3 in void context"); return }
+	my $repl = __PACKAGE__->new(@_);
+	return ($repl->in_fh, $repl->out_fh, $repl);
+}
+
+sub replace2 {
+	unless (defined wantarray) { warnings::warnif("Useless use of "
+		.__PACKAGE__."::replace2 in void context"); return }
+	my $repl = __PACKAGE__->new(@_);
+	if (wantarray) {
+		return (
+			File::Replace::SingleHandle->new($repl, 'in'),
+			File::Replace::SingleHandle->new($repl, 'out') );
+	}
+	else {
+		return File::Replace::SingleHandle->new($repl, 'onlyout');
+	}
+}
+
+sub replace {
+	unless (defined wantarray) { warnings::warnif("Useless use of "
+		.__PACKAGE__."::replace in void context"); return }
+	my $repl = __PACKAGE__->new(@_);
+	return File::Replace::DualHandle->new($repl);
 }
 
 sub is_open  { return !!shift->{is_open} }
@@ -146,6 +156,36 @@ sub options {
 	for my $o (keys %NEW_KNOWN_OPTS)
 		{ exists $self->{$o} and $opts{$o} = $self->{$o} }
 	return wantarray ? %opts : \%opts;
+}
+
+our $COPY_DEFAULT_BUFSIZE = 4096;
+my %COPY_KNOWN_OPTS = map {$_=>1} qw/ count bufsize less /;
+sub copy {  ## no critic (ProhibitExcessComplexity)
+	my $self = shift;
+	croak ref($self)."->copy: already closed" unless $self->{is_open};
+	my $_count = @_%2 ? shift : undef;
+	my %opts = @_;
+	if (defined $_count) {
+		exists $opts{count} and croak ref($self)."->copy: count specified twice";
+		$opts{count} = $_count }
+	for (keys %opts) { croak ref($self)."->copy: unknown option '$_'"
+		unless $COPY_KNOWN_OPTS{$_} }
+	$opts{bufsize} = $COPY_DEFAULT_BUFSIZE unless defined $opts{bufsize};
+	croak ref($self)."->copy: bad count" unless $opts{count} && $opts{count}=~/\A\d+\z/;
+	croak ref($self)."->copy: bad bufsize" unless $opts{bufsize} && $opts{bufsize}=~/\A\d+\z/;
+	croak ref($self)."->copy: bad less option" if defined $opts{less}
+		&& $opts{less}!~/\A(?:ok|ignore)\z/;
+	my $remain = $opts{count};
+	while ( $remain>0 && !eof($self->{ifh}) ) {
+		my $in = read $self->{ifh}, my $buf,
+			$remain > $opts{bufsize} ? $opts{bufsize} : $remain;
+		defined $in or croak ref($self)."->copy: read failed: $!";
+		print {$self->{ofh}} $buf or croak ref($self)."->copy: write failed: $!";
+		$remain -= $in;
+	}
+	warnings::warnif(ref($self)."->copy: read $remain less characters than requested")
+		if $remain && !$opts{less};
+	return $opts{count}-$remain;
 }
 
 sub finish {
@@ -174,27 +214,6 @@ sub finish {
 	$self->_debug(ref($self),"->finish: renamed '$ofn' to '$ifn', perms ",
 		sprintf('%05o',$self->{setperms}), "\n");
 	return 1;
-}
-
-sub replace {
-	unless (defined wantarray) { warnings::warnif("Useless use of "
-		.__PACKAGE__."::replace in void context"); return }
-	my $repl = __PACKAGE__->new(@_);
-	return File::Replace::DualHandle->new($repl);
-}
-
-sub replace2 {
-	unless (defined wantarray) { warnings::warnif("Useless use of "
-		.__PACKAGE__."::replace2 in void context"); return }
-	my $repl = __PACKAGE__->new(@_);
-	if (wantarray) {
-		return (
-			File::Replace::SingleHandle->new($repl, 'in'),
-			File::Replace::SingleHandle->new($repl, 'out') );
-	}
-	else {
-		return File::Replace::SingleHandle->new($repl, 'onlyout');
-	}
 }
 
 sub _cancel {
@@ -230,6 +249,13 @@ sub DESTROY {
 	return;
 }
 
+sub _debug {
+	my $self = shift;
+	return 1 unless $self->{debug};
+	local ($",$,,$\) = (' ');
+	return print {$self->{debug}} @_;
+}
+
 1;
 __END__
 
@@ -243,19 +269,30 @@ the original
 =for comment
 REMEMBER to keep these examples in sync with 91_author_pod.t
 
-This module provides three interfaces:
+Next to the normal OO constructor, L<C<new>|/new>, this module provides three
+interfaces:
+
+ use File::Replace 'replace3';
+ 
+ my ($infh,$outfh,$repl) = replace3($filename);
+ while (<$infh>) {
+     # write whatever you like to $outfh here
+     print $outfh "X: $_";
+ }
+ $repl->finish;
+
+The following two provide a bit more magic via tied filehandles:
 
  use File::Replace 'replace2';
  
  my ($infh,$outfh) = replace2($filename);
  while (<$infh>) {
-     # write whatever you like to $outfh here
-     print $outfh "X: $_";
+     print $outfh "Y: $_";
  }
  close $infh;   # closing both handles will
  close $outfh;  # trigger the replace
 
-Or the more magical single filehandle, in which C<print>, C<printf>, and
+Or the even more magical single filehandle, in which C<print>, C<printf>, and
 C<syswrite> go to the output file; C<binmode> to both; C<fileno> only reports
 open/closed status; and the other I/O functions go to the input file:
 
@@ -264,20 +301,9 @@ open/closed status; and the other I/O functions go to the input file:
  my $fh = replace($filename);
  while (<$fh>) {
      # can read _and_ write from/to $fh
-     print $fh "Y: $_";
+     print $fh "Z: $_";
  }
  close $fh;
-
-Or the object oriented:
-
- use File::Replace;
- 
- my $repl = File::Replace->new($filename);
- my $infh = $repl->in_fh;
- while (<$infh>) {
-     print {$repl->out_fh} "Z: $_";
- }
- $repl->finish;
 
 =head1 Description
 
@@ -314,30 +340,31 @@ B<no guarantees> as to whether it will be atomic or not.
 
 =head2 Version
 
-This documentation describes version 0.06 of this module.
+This documentation describes version 0.08 of this module.
 
 =head1 Constructors and Overview
 
-The functions C<< File::Replace->new() >>, C<replace()>, and C<replace2()> take
-exactly the same arguments, and differ only in their return values - C<replace>
-and C<replace2> wrap the functionality of C<File::Replace> inside C<tie>d
-filehandles. Note that C<replace()> and C<replace2()> are normal functions and
-not methods, don't attempt to call them as such. If you don't want to import
-them you can always call them as, for example, C<File::Replace::replace()>.
+The constructors C<< File::Replace->new() >>, C<replace3()>, C<replace2()>, and
+C<replace()> take exactly the same arguments, and differ only in their return
+values - C<replace2> and C<replace> wrap the functionality of C<File::Replace>
+inside C<tie>d filehandles. Note that C<replace3()>, C<replace2()>, and
+C<replace()> are normal functions and not methods, don't attempt to call them
+as such. If you don't want to import them you can always call them as, for
+example, C<File::Replace::replace()>.
 
  File::Replace->new( $filename );
  File::Replace->new( $filename, $layers );
  File::Replace->new( $filename, option => 'value', ... );
  File::Replace->new( $filename, $layers, option => 'value', ... );
- # replace(...) and replace2(...) take the same arguments
+ # replace3(...), replace2(...), and replace(...) take the same arguments
 
 The constructors will open the input file and the temporary output file (the
 latter via L<File::Temp|File::Temp>), and will C<die> in case of errors. The
-options are described in L</Options>. It is strongly recommended that you
-C<use warnings;>, as then this module will issue warnings which may be of
-interest to you.
+options are described in L</Constructor Options>. It is strongly recommended
+that you C<use warnings;>, as then this module will issue warnings which may be
+of interest to you.
 
-=head2 C<< File::Replace->new >>
+=head2 C<new>
 
  use File::Replace;
  my $replace_object = File::Replace->new($filename, ...);
@@ -357,11 +384,47 @@ Please don't re-C<open> the C<in_fh> and C<out_fh> handles, as this may lead to
 confusion.
 
 The method C<< ->is_open >> will return a false value if the replace operation
-has been C<finish>ed or C<cancel>ed, or a true value if it is still active.
-The method C<< ->filename >> returns the filename passed to the constructor.
-The method C<< ->options >> in list context returns the options this object has
-set (including defaults) as a list of key/value pairs, in scalar context it
-returns a hashref of these options.
+has been C<finish>ed or C<cancel>ed, or a true value if it is still active
+(note that this method does I<not> check the state of the underlying
+filehandles). The method C<< ->filename >> returns the filename passed to the
+constructor. The method C<< ->options >> in list context returns the options
+this object has set (including defaults) as a list of key/value pairs, in
+scalar context it returns a hashref of these options.
+
+=head2 C<replace3>
+
+This is a convenience function for shorter code:
+
+ use File::Replace 'replace3';
+ my ($in_fh,$out_fh,$repl_obj) = replace3($filename, ...);
+
+is the same as
+
+ use File::Replace;
+ my $repl_obj = File::Replace->new($filename, ...);
+ my $in_fh    = $repl_obj->in_fh;
+ my $out_fh   = $repl_obj->out_fh;
+
+=head2 C<replace2>
+
+ use File::Replace 'replace2';
+ my ($input_handle, $output_handle) = replace2($filename, ...);
+ my $output_handle = replace2($filename, ...);
+
+In list context, returns a two-element list of two tied filehandles, the first
+being the input filehandle, and the second the output filehandle, and the
+replace operation (C<finish>) is performed when both handles are C<close>d. In
+scalar context, it returns only the output filehandle, and the replace
+operation is performed when this handle is C<close>d. This means that C<close>
+may C<die> instead of just returning a false value.
+
+You cannot re-C<open> these tied filehandles.
+
+You can access the underlying C<File::Replace> object via
+C<< tied(*$handle)->replace >> on both the input and output handle. You can
+also access the original, untied filehandles via C<< tied(*$handle)->in_fh >>
+and C<< tied(*$handle)->out_fh >>, but please don't C<close> or re-C<open>
+these handles as this may lead to confusion.
 
 =head2 C<replace>
 
@@ -392,28 +455,7 @@ filehandles via C<< tied(*$handle)->in_fh >> and C<< tied(*$handle)->out_fh >>,
 but please don't C<close> or re-C<open> these handles as this may lead to
 confusion.
 
-=head2 C<replace2>
-
- use File::Replace 'replace2';
- my ($input_handle, $output_handle) = replace2($filename, ...);
- my $output_handle = replace2($filename, ...);
-
-In list context, returns a two-element list of two tied filehandles, the first
-being the input filehandle, and the second the output filehandle, and the
-replace operation (C<finish>) is performed when both handles are C<close>d. In
-scalar context, it returns only the output filehandle, and the replace
-operation is performed when this handle is C<close>d. This means that C<close>
-may C<die> instead of just returning a false value.
-
-You cannot re-C<open> these tied filehandles.
-
-You can access the underlying C<File::Replace> object via
-C<< tied(*$handle)->replace >> on both the input and output handle. You can
-also access the original, untied filehandles via C<< tied(*$handle)->in_fh >>
-and C<< tied(*$handle)->out_fh >>, but please don't C<close> or re-C<open>
-these handles as this may lead to confusion.
-
-=head1 Options
+=head1 Constructor Options
 
 =head2 Filename
 
@@ -440,7 +482,7 @@ L</in_fh> option - note that C<create> is ignored when you use that option.
 
 =over
 
-=item C<"later"> (default when C<create> omitted)
+=item C<"later"> (default when C<create> omitted or C<undef>)
 
 Instead of the input file, F</dev/null> or its equivalent is opened. This means
 that while the output file is being written, the input file name will not
@@ -470,18 +512,13 @@ C<die>.
 
 =back
 
-The above values were introduced in version 0.06. Using any other than the
-above values will trigger a mandatory deprecation warning. For backwards
-compatibility, if you specify any other than the above values, then a true
-value will be the equivalent of C<now>, and a false value the equivalent of
-C<later>. The deprecation warning will become a fatal error in a future
-version, to allow new values to be added in the future.
-
-B<< The C<devnull> option has been deprecated >> as of version 0.06. Its
-functionality has been merged into the C<create> option. If you use it, then
-the module will operate in a compatibility mode, but also issue a mandatory
-deprecation warning, informing you what C<create> setting to use instead. The
-C<devnull> option will be entirely removed in a future version.
+Previous versions of this module included support for other values of the
+C<create> option, as well as the C<devnull> option. These were replaced by the
+above C<create> options and deprecated in 0.06, and removed as of 0.08. Using
+unrecognized options will result in a fatal error. Note that in 0.06,
+specifying C<undef> for the C<create> option resulted in a deprecation warning,
+that behavior has now been changed so that C<undef> is equivalent to the
+C<create> option not being set.
 
 =head2 C<in_fh>
 
@@ -550,6 +587,27 @@ This option cannot be used together with C<autocancel>.
 If set to a true value, this option enables some debug output for C<new>,
 C<finish>, and C<cancel>. You may also set this to a filehandle, and debug
 output will be sent there.
+
+=head1 Additional Methods
+
+=head2 C<copy>
+
+This method copies a certain number of "characters" from the input handle to
+the output handle, that is, the temporary file. Depending on the status of the
+filehandle, either (8-bit) bytes or characters are read, see L<perlfunc/read>.
+The option C<bufsize> lets you adjust the read buffer size, and the option
+C<< less=>'ignore' >> or C<< less=>'ok' >> suppresses the warning that less
+characters than you requested could be read. The method returns the number of
+characters copied and dies on errors.
+
+ use File::Replace;
+ my $repl = File::Replace->new($filename, ...);
+ $repl->copy(8);                   # copy eight characters
+ $repl->copy(1024, bufsize=>256);  # copy 1024 chars, 256 at a time
+ $repl->copy(2048, less=>'ok');    # copy 2048, but don't warn if less
+ $repl->finish;
+
+This method was added in version 0.08.
 
 =head1 Notes and Caveats
 

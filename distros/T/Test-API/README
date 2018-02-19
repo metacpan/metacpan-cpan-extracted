@@ -2,7 +2,7 @@ NAME
     Test::API - Test a list of subroutines provided by a module
 
 VERSION
-    version 0.008
+    version 0.010
 
 SYNOPSIS
         use Test::More tests => 3;
@@ -100,11 +100,13 @@ SUPPORT
 AUTHOR
     David Golden <dagolden@cpan.org>
 
-CONTRIBUTOR
-    Toby Inkster <mail@tobyinkster.co.uk>
+CONTRIBUTORS
+    *   cpansprout <cpansprout@gmail.com>
+
+    *   Toby Inkster <mail@tobyinkster.co.uk>
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2017 by David Golden.
+    This software is Copyright (c) 2018 by David Golden.
 
     This is free software, licensed under:
 

@@ -6,7 +6,8 @@ WriteMakefile(
   VERSION_FROM      => 'lib/Graph/Feather.pm', # finds $VERSION
   PREREQ_PM         => {
     'DBD::SQLite' => '1.5',
-    'DBI' => 0,
+    # http://www.cpantesters.org/cpan/report/e9b3793a-6bf8-1014-8785-51182680d7e9
+    'DBI' => '1.635',
   },
   TEST_REQUIRES     => {
     'Test::More' => 0,

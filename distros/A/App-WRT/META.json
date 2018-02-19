@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "gpl_1"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "App::WRT" : {
          "file" : "lib/App/WRT.pm",
-         "version" : "v4.2.1"
+         "version" : "v4.2.2"
       },
       "App::WRT::Date" : {
          "file" : "lib/App/WRT/Date.pm"
@@ -75,8 +75,9 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+         "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v4.2.1"
+   "version" : "v4.2.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

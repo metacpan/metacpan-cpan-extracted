@@ -72,6 +72,8 @@ system( 'git', 'config', 'kgb.squash-message-template',
     '${{author-name}}${ ({author-login})}${ {branch}}${ {commit}}${ {project}/}${{module}}${ {log}}'
 );
 
+my $client_script = $ENV{KGB_CLIENT_SCRIPT} || "$R/script/kgb-client";
+
 # the real test client
 {
     my $ccf = $test_bot->client_config_file;
@@ -79,7 +81,7 @@ system( 'git', 'config', 'kgb.squash-message-template',
     print $fh <<EOF;
 #!/bin/sh
 
-tee -a "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $ccf >> $hook_log 2>&1
+tee -a "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $ccf >> $hook_log 2>&1
 EOF
     close $fh;
     chmod 0755, $hook;
@@ -90,7 +92,7 @@ if ( $ENV{TEST_KGB_BOT_RUNNING} ) {
     open( my $fh, '>>', $hook );
     print $fh <<"EOF";
 
-cat "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $R/eg/test-client.conf --status-dir $dir
+cat "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $R/eg/test-client.conf --status-dir $dir
 EOF
     close $fh;
 }
@@ -189,8 +191,9 @@ ok( !ref($commit), 'squashed commit is a plain string' ) or BAIL_OUT 'will fail 
 
 my $commit_id = shift @{ $commits{master} };
 
-TestBot->expect( "#test 03${TestBot::USER_NAME} "
-        . "(03${TestBot::USER}) 05master $commit_id "
+TestBot->expect( "#test "
+        . ${TestBot::COMMIT_USER}
+        . " 05master $commit_id "
         . "12test/06there 3 commits pushed, "
         . " 101 file changed, 032(+)" );
 
@@ -209,8 +212,9 @@ ok( defined($commit), 'squashed new branch commit exists' ) or BAIL_OUT "prematu
 ok( !ref($commit), 'squashed commit is a plain string' )
     or BAIL_OUT "will fail with $commit anyway";
 
-TestBot->expect( "#test 03${TestBot::USER_NAME} (03${TestBot::USER}) "
-        . "05feature "
+TestBot->expect( "#test "
+        . ${TestBot::COMMIT_USER}
+        . " 05feature "
         . $commit_id
         . " 12test/06there New branch with 2 commits pushed, "
         . " 101 file changed, 032(+) since master/"

@@ -1,5 +1,28 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.15 2018-02-19T10:13:22Z
+
+   - Fix skipping subreaper tests on unsupported platforms
+   - Reset session before invoking child callback
+
+0.14 2018-02-18T21:08:17Z
+
+   - Fix race condition in Mojo::IOLoop::ReadWriteProcess::Queue
+
+0.13 2018-02-17T19:34:51Z
+   - Move subreaper and subprocess logics to Mojo::IOLoop::ReadWriteProcess::Session
+   - Use Mojo::IOLoop::ReadWriteProcess::Session as global collector handler
+
+0.12 2018-02-16T12:53:26Z
+
+   - Enhance tests
+   - Add experimental subreaper and subprocess support
+
+0.11 2018-02-12T09:32:05Z
+
+    - update cpanfile requirements (requires Module::Build now)
+    - update POD
+
 0.10 2018-02-06T17:52:11Z
 
     - Prevent build on unsupported platforms

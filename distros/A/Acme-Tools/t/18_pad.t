@@ -1,7 +1,7 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/18_pad.t
 
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 20;
 
 for(

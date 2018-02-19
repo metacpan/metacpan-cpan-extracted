@@ -56,15 +56,6 @@ Mojo::IOLoop::ReadWriteProcess is yet another process manager.
 [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) inherits all events from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter) and can emit
 the following new ones.
 
-## process\_error
-
-    $process->on(process_error => sub {
-      my ($e) = @_;
-      my @errors = @{$e};
-    });
-
-Emitted when the process produce errors.
-
 ## start
 
     $process->on(start => sub {
@@ -82,6 +73,64 @@ Emitted when the process starts.
     });
 
 Emitted when the process stops.
+
+## process\_error
+
+    $process->on(process_error => sub {
+      my ($e) = @_;
+      my @errors = @{$e};
+    });
+
+Emitted when the process produce errors.
+
+## process\_stuck
+
+    $process->on(process_stuck => sub {
+      my ($self) = @_;
+      ...
+    });
+
+Emitted when `blocking_stop` is set and all attempts for killing the process
+in `max_kill_attempts` have been exhausted.
+The event is emitted before attempting to kill it with SIGKILL and becoming blocking.
+
+## SIG\_CHLD
+
+    $process->on(SIG_CHLD => sub {
+      my ($self) = @_;
+      ...
+    });
+
+Emitted when we receive SIG\_CHLD.
+
+## SIG\_TERM
+
+    $process->on(SIG_TERM => sub {
+      my ($self) = @_;
+      ...
+    });
+
+Emitted when the child forked process receives SIG\_TERM, before exiting.
+
+## collected
+
+    $process->on(collected => sub {
+      my ($self) = @_;
+      ...
+    });
+
+Emitted right after status collection.
+
+## collect\_status
+
+    $process->on(collect_status => sub {
+      my ($self) = @_;
+      ...
+    });
+
+Emitted when on child process waitpid.
+It is used internally to get the child process status.
+Note: events attached to it are wiped when process has been stopped.
 
 # ATTRIBUTES
 
@@ -137,6 +186,36 @@ Array or arrayref of options to pass by to the external binary or the code block
 
 Set it to 1 if you want to do blocking stop of the process.
 
+## session
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(sub { print "Hello" });
+    my $session = $process->session;
+    $session->enable_subreaper;
+
+Returns the current [Mojo::IOLoop::ReadWriteProcess::Session](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Session) singleton.
+
+## subreaper
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { print "Hello ".shift() }, args => "User" );
+    $process->subreaper(1)->start();
+    $process->on( stop => sub { $_->disable_subreaper } );
+    $process->stop();
+
+    # The process will print "Hello User"
+
+Mark the current process (not the child) as subreaper on start.
+It's on invoker behalf to disable subreaper when process stops, as it marks the current process and not the
+child.
+
+## ioloop
+
+    my $loop    = $process->ioloop;
+    $subprocess = $process->ioloop(Mojo::IOLoop->new);
+
+Event loop object to control, defaults to the global [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) singleton.
+
 ## max\_kill\_attempts
 
     use Mojo::IOLoop::ReadWriteProcess;
@@ -149,6 +228,13 @@ Defaults to `5`, is the number of attempts before bailing out.
 
 It can be used with blocking\_stop, so if the number of attempts are exhausted,
 a SIGKILL and waitpid will be tried at the end.
+
+## collect\_status
+
+Defaults to `1`, If enabled it will automatically collect the status of the children process.
+Disable it in case you want to manage your process child directly, and do not want to rely on
+automatic collect status. If you won't overwrite your `SIGCHLD` handler,
+the `SIG_CHLD` event will be still emitted.
 
 ## serialize
 
@@ -245,6 +331,58 @@ call `_status()`.
 
 Inspect the codeblock return.
 
+## enable\_subreaper()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+    my $p = process()->enable_subreaper;
+
+Mark the current process (not the child) as subreaper.
+This is used typically if you want to mark further childs as subreapers inside other forks.
+
+    my $master_p = process(
+      sub {
+        my $p = shift;
+        $p->enable_subreaper;
+
+        process(sub { sleep 4; exit 1 })->start();
+        process(
+          sub {
+            sleep 4;
+            process(sub { sleep 1; })->start();
+          })->start();
+        process(sub { sleep 4; exit 0 })->start();
+        process(sub { sleep 4; die })->start();
+        my $manager
+          = process(sub { sleep 2 })->subreaper(1)->start();
+        sleep 1 for (0 .. 10);
+        $manager->stop;
+        return $manager->session->all->size;
+      });
+
+    $master_p->subreaper(1);
+
+    $master_p->on(collected => sub { $status++ });
+
+    # On start we setup the current process as subreaper
+    # So it's up on us to disable it after process is done.
+    $master_p->on(stop => sub { shift()->disable_subreaper });
+    $master_p->start();
+
+## disable\_subreaper()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+    my $p = process()->disable_subreaper;
+
+Unset the current process (not the child) as subreaper.
+
+## prctl()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+    my $p = process();
+    $p->prctl($option, $arg2, $arg3, $arg4, $arg5);
+
+Internal function to execute and wrap the prctl syscall, accepts the same arguments as prctl.
+
 ## diag()
 
     use Mojo::IOLoop::ReadWriteProcess qw(process);
@@ -254,6 +392,24 @@ Inspect the codeblock return.
 
 Internal function to print information to STDERR if verbose attribute is set or either DEBUG mode enabled.
 You can use it if you wish to display information on the process status.
+
+## to\_ioloop()
+
+    use Mojo::IOLoop::ReadWriteProcess qw(process);
+
+    my $p = process(sub {  print "Hello from first process\n"; sleep 1 });
+
+    $p->start(); # Start and sets the handlers
+    my $stream = $p->to_ioloop; # Get the stream and demand to IOLoop
+    my $output;
+
+    # Hook on Mojo::IOLoop::Stream events
+    $stream->on(read => sub { $output .= pop;  $p->is_running ...  });
+
+    Mojo::IOLoop->singleton->start() unless Mojo::IOLoop->singleton->is_running;
+
+Returns a [Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo::IOLoop::Stream) object and demand the wait operation to [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop).
+It needs `set_pipes` enabled. Default IOLoop can be overridden in `ioloop()`.
 
 ## wait()
 
@@ -392,13 +548,13 @@ Gets all the channel output of the process.
 
 Gets all the STDERR output of the process.
 
-## signal()
+## send\_signal()
 
     use Mojo::IOLoop::ReadWriteProcess qw(process);
     use POSIX;
     my $p = process( execute => "/path/to/bin" )->start;
 
-    $p->signal(POSIX::SIGKILL);
+    $p->send_signal(POSIX::SIGKILL);
 
 Send a signal to the process
 

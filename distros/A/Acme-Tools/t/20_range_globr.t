@@ -1,7 +1,7 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/20_range_globr.t
 
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 7+8;
 
 ok_ref([range(11)],     [0,1,2,3,4,5,6,7,8,9,10], 'range(11)' );

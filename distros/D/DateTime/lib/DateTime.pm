@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 use Carp;
 use DateTime::Duration;
@@ -1314,18 +1314,9 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         qr/(ss?)/ =>
             sub { $_[0]->_zero_padded_number( $1, $_[0]->second() ) },
 
-        # I'm not sure this is what is wanted (notably the trailing
-        # and leading zeros it can produce), but once again the LDML
-        # spec is not all that clear.
-        qr/(S+)/ => sub {
-            my $l   = length $1;
-            my $val = sprintf(
-                "%.${l}f",
-                $_[0]->fractional_second() - $_[0]->second()
-            );
-            $val =~ s/^0\.//;
-            $val || 0;
-        },
+        # The LDML spec is not 100% clear on how to truncate this field, but
+        # this way seems as good as anything.
+        qr/(S+)/ => sub { $_[0]->_format_nanosecs( length($1) ) },
         qr/A+/ =>
             sub { ( $_[0]->{local_rd_secs} * 1000 ) + $_[0]->millisecond() },
 
@@ -2334,7 +2325,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.45
+version 1.46
 
 =head1 SYNOPSIS
 
@@ -4586,7 +4577,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Michael Conrad R. Davis M Somerville Nick Tonkin Olaf Alders Ovid Philippe Bruhat (BooK) Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4625,6 +4616,10 @@ Doug Bell <madcityzen@gmail.com>
 =item *
 
 Flávio Soibelmann Glock <fglock@gmail.com>
+
+=item *
+
+Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>
 
 =item *
 
@@ -4702,7 +4697,7 @@ viviparous <viviparous@prc>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2003 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2003 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

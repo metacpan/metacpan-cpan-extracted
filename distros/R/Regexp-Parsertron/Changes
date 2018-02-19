@@ -1,5 +1,19 @@
 Revision history for Perl extension Regexp::Parserton.
 
+1.03  2018-02-12T16:36:00
+	- Remove 'use 5.10.1;' which reappeared after I did 'get reset --hard'.
+	- Update docs re stringification and versions of Perl supported.
+	- Replace say with print since I am switching between Perls.
+	- Remove the Actions module. It was only meant for debugging.
+
+1.02  2018-02-12T13:16:00
+	- Adjust minimum Perl version in Makefile.PL from 5.10.1 to 5.14.0, which is when regexp
+		stringification changed significantly.
+	- Clean up some test scripts, which were not maintaining the internal test count used by my
+		local program test.marpa.pl (which tests all my modules which use Marpa).
+	- Add a couple of missing alternatives to extended regexps of type '3: (?:pattern) etc',
+		specifically under the definition of colon_thingy.
+
 1.01  2018-02-08T12:00:00
 	- Adjust minimum Perl version in Makefile.PL from 5.20.2 to 5.10.1, to match Marpa::R2.
 	- Ensure same version of Perl is 'use'd in all *.pl and *.t files.

@@ -1,5 +1,5 @@
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.613';
+$Lab::Moose::Plot::VERSION = '3.620';
 #ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
 
 
@@ -8,6 +8,7 @@ use strict;
 use 5.010;
 
 use Moose;
+use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints qw/union class_type/;
 use MooseX::Params::Validate;
 use Carp;
@@ -18,16 +19,14 @@ use PDL::Graphics::Gnuplot ();
 use PDL ();
 
 has terminal => (
-    is      => 'ro',
-    isa     => 'Str',
-    default => 'qt'
+    is  => 'ro',
+    isa => 'Str',
 );
 
 has terminal_options => (
     is      => 'ro',
     isa     => 'HashRef',
-    builder => 'build_terminal_options',
-    lazy    => 1,
+    default => sub { {} }
 );
 
 has plot_options => (
@@ -51,17 +50,17 @@ has gpwin => (
     writer   => '_gpwin',
 );
 
-sub build_terminal_options {
-    my $self = shift;
-    my $term = $self->terminal();
+# sub build_terminal_options {
+#     my $self = shift;
+#     my $term = $self->terminal();
 
-    if ( $term =~ /^(qt|x11)$/ ) {
-        return { persist => 1, raise => 0, enhanced => 0 };
-    }
-    else {
-        return {};
-    }
-}
+#     if ( $term =~ /^(qt|x11)$/ ) {
+#         return { persist => 1, raise => 0, enhanced => 0 };
+#     }
+#     else {
+#         return {};
+#     }
+# }
 
 sub build_plot_options {
     return {};
@@ -73,9 +72,10 @@ sub build_curve_options {
 
 
 sub BUILD {
-    my $self  = shift;
-    my $gpwin = PDL::Graphics::Gnuplot->new(
-        $self->terminal(),
+    my $self     = shift;
+    my $terminal = $self->terminal;
+    my $gpwin    = PDL::Graphics::Gnuplot->new(
+        ( defined($terminal) ? $terminal : () ),
         %{ $self->terminal_options() },
         $self->plot_options()
     );
@@ -145,7 +145,7 @@ Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,7 @@ Otherwise they behave like plot.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

@@ -1,0 +1,21 @@
+Changes
+lib/API/MikroTik.pm
+lib/API/MikroTik/Query.pm
+lib/API/MikroTik/Response.pm
+lib/API/MikroTik/Sentence.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/lib/API/MikroTik/Mockup.pm
+t/mikrotik-online.t
+t/mikrotik.t
+t/pod.t
+t/pod_coverage.t
+t/promises.t
+t/query.t
+t/response.t
+t/sentence.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

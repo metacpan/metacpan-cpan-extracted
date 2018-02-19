@@ -5,18 +5,18 @@ NAME
 
 VERSION
 
-    Version 0.37
+    Version 0.42
 
 SYNOPSIS
 
-        use Firefox::Marionette qw(:all);
+        use Firefox::Marionette();
         use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
-        $firefox->find('search-input', BY_ID())->type('Test::More');
+        $firefox->find_by_class('container-fluid')->find_by_id('search-input')->type('Test::More');
     
-        my $file_handle = $firefox->selfie(highlights => [ $firefox->find('//button[@name="lucky"]') ])
+        my $file_handle = $firefox->selfie(highlights => [ $firefox->find_by_name('lucky') ])
     
         $firefox->find('//button[@name="lucky"]')->click();
     
@@ -40,7 +40,8 @@ SUBROUTINES/METHODS
       <https://firefox.org/> binary, rather than the default path.
 
       * capabilities - use the supplied capabilities object, for example to
-      set whether the browser should accept insecure certs
+      set whether the browser should accept insecure certs or whether the
+      browser should use a proxy.
 
       * profile_name - pick a specific existing profile to automate, rather
       than creating a new profile. Note that firefox <https://firefox.com>
@@ -84,96 +85,166 @@ SUBROUTINES/METHODS
 
     returns the current title of the window.
 
- find_element
-
-    *** DEPRECATED - see find. ***
-
  find
 
-    returns the first element in the current browsing context that matches
-    the search parameters supplied;
-
-      * the first parameter is a scalar search value. This can be an xpath
-      <https://en.wikipedia.org/wiki/XPath> expression such as
-      //button[@name="foo"] to find all button elements that have a 'name'
-      of 'foo'.
-
-      * the second optional parameter is a scalar search strategy. This
-      defaults to BY_XPATH()
+    accepts an xpath expression <https://en.wikipedia.org/wiki/XPath>
+    expression> as the first parameter and returns the first element that
+    matches this expression.
 
     This method is subject to the implicit timeout.
 
-        use Firefox::Marionette qw(:all);
+        use Firefox::Marionette();
         use v5.10;
     
         my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     
         $firefox->find('//input[@id="search-input"]')->type('Test::More');
-        $firefox->find('//input[@id="search-input"]', BY_XPATH())->type('Test::More');
-        $firefox->find('search-input', BY_ID())->type('Test::More');
-        $firefox->find('q', BY_NAME())->type('Test::More');
-        $firefox->find('form-control home-search-input', BY_CLASS())->type('Test::More');
-        $firefox->find('input.home-search-input', BY_SELECTOR())->type('Test::More');
     
-        $firefox->find('input', BY_TAG());
-        $firefox->find('API', BY_LINK());
-        $firefox->find('AP', BY_PARTIAL());
+        # OR in list context 
+    
+        foreach my $element ($firefox->find('//input[@id="search-input"]')) {
+            $element->type('Test::More');
+        }
 
- BY_XPATH
+ find_by_id
 
-    This find strategy returns the element(s) that match with supplied
-    xpath <https://en.wikipedia.org/wiki/XPath> expression.
-
- BY_ID
-
-    This find strategy returns the element(s) with a matching 'id'
-    property.
-
- BY_NAME
-
-    This find strategy returns the element(s) with a matching 'name'
-    property.
-
- BY_CLASS
-
-    This find strategy returns the element(s) with a matching 'class'
-    property.
-
- BY_SELECTOR
-
-    This find strategy returns the element(s) with a matching CSS Selector
-    <https://en.wikipedia.org/wiki/Cascading_Style_Sheets#Selector>
-
- BY_TAG
-
-    This find strategy returns the element(s) with a matching tag name.
-
- BY_LINK
-
-    This find strategy returns the link(s) with matching text
-
- BY_PARTIAL
-
-    This find strategy returns the link(s) with matching partial text
-
- find_elements
-
-    *** DEPRECATED - see list. ***
-
- list
-
-    returns all the elements in the current browsing context that match the
-    search parameters supplied;
-
-      * the first parameter is a scalar search value. This can be an xpath
-      <https://en.wikipedia.org/wiki/XPath> expression such as
-      //button[@name="foo"] to find all button elements that have a 'name'
-      of 'foo'.
-
-      * the second optional parameter is a scalar search strategy. This
-      defaults to BY_XPATH().
+    accepts an id
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id>
+    as the first parameter and returns the first element with a matching
+    'id' property.
 
     This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    
+        $firefox->find_by_id('search-input')->type('Test::More');
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->find_by_id('search-input')) {
+            $element->type('Test::More');
+        }
+
+ find_by_name
+
+    This method returns the first element with a matching 'name' property.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_by_name('q')->type('Test::More');
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->find_by_name('q')) {
+            $element->type('Test::More');
+        }
+
+ find_by_class
+
+    accepts a class name
+    <https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class>
+    as the first parameter and returns the first element with a matching
+    'class' property.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_by_class('form-control home-search-input')->type('Test::More');
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->find_by_class('form-control home-search-input')) {
+            $element->type('Test::More');
+        }
+
+ find_by_selector
+
+    accepts a CSS Selector
+    <https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the
+    first parameter and returns the first element that matches that
+    selector.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_by_selector('input.home-search-input')->type('Test::More');
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->list_by_selector('input.home-search-input')) {
+            $element->type('Test::More');
+        }
+
+ find_by_tag
+
+    accepts a tag name
+    <https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as
+    the first parameter and returns the first element with this tag name.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        my $element = $firefox->find_by_tag('input');
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->list_by_tag('input')) {
+            # do something
+        }
+
+ find_by_link
+
+    accepts a text string as the first parameter and returns the first link
+    element that has a matching link text.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_by_link('API')->click();
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->list_by_link('API')) {
+            $element->click();
+        }
+
+ find_by_partial
+
+    accepts a text string as the first parameter and returns the first link
+    element that has a partially matching link text.
+
+    This method is subject to the implicit timeout.
+
+        use Firefox::Marionette();
+        use v5.10;
+    
+        my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+        $firefox->find_by_partial('AP')->click();
+    
+        # OR in list context 
+    
+        foreach my $element ($firefox->list_by_partial('AP')) {
+            $element->click();
+        }
 
  css
 
@@ -209,10 +280,6 @@ SUBROUTINES/METHODS
 
     The executing javascript is subject to the scripts timeout.
 
- page_source
-
-    *** DEPRECATED - see html. ***
-
  html
 
     returns the page source of the content document.
@@ -242,10 +309,6 @@ SUBROUTINES/METHODS
  cookies
 
     returns the contents of the cookie jar in scalar or list context.
-
- send_keys
-
-    *** DEPRECATED - see type. ***
 
  type
 
@@ -367,7 +430,8 @@ SUBROUTINES/METHODS
 
  capabilities
 
-    returns the capabilities of the current firefox binary
+    returns the capabilities of the current firefox binary. You can
+    retrieve timeouts or a proxy with this method.
 
  screen_orientation
 
@@ -522,6 +586,12 @@ SUBROUTINES/METHODS
     returns the version for the Marionette protocol. Current most recent
     version is '3'.
 
+ addons
+
+    returns if pre-existing addons (extensions/themes) are allowed to run.
+    This will be true for Firefox versions less than 55, as -safe-mode
+    cannot be automated.
+
  xvfb
 
     returns the pid of the xvfb process if it exists.
@@ -581,6 +651,8 @@ CONFIGURATION AND ENVIRONMENT
 DEPENDENCIES
 
     Firefox::Marionette requires the following non-core Perl modules
+
+      * IPC::Run
 
       * JSON
 

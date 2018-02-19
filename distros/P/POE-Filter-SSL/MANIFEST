@@ -3,6 +3,7 @@ MANIFEST
 Makefile.PL
 README
 lib/POE/Filter/SSL.pm
+lib/POE/Filter/SSL/PreFilter.pm
 t/00-load.t
 t/pod-coverage.t
 t/pod.t

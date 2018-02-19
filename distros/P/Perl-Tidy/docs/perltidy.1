@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PERLTIDY 1"
-.TH PERLTIDY 1 "2017-12-29" "perl v5.22.1" "User Contributed Perl Documentation"
+.TH PERLTIDY 1 "2018-02-18" "perl v5.22.1" "User Contributed Perl Documentation"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -1707,6 +1707,142 @@ alternatives:
 \&        zzz();
 \&  }
 .Ve
+.IP "\fB\-cb\fR,   \fB\-\-cuddled\-blocks\fR" 4
+.IX Item "-cb, --cuddled-blocks"
+This flag enables the \*(L"cuddled else\*(R" format style on a chain of specified block
+types.  The default is to apply it to a chain consisting of try-catch-finally
+blocks, but it can apply to any desired chain of blocks by specifying their
+names on a separate parameter \fB\-cbl\fR, described in the next section.
+.Sp
+.Vb 9
+\&    # perltidy \-cb:
+\&    try {
+\&        throw Error::Simple( "ok 2\en", 2 );
+\&    } catch Error::Simple with {
+\&        my $err = shift;
+\&        print "$err";
+\&    } finally {
+\&        print "ok 3\en";
+\&    };
+.Ve
+.Sp
+Cuddling between a pair of code blocks requires that the closing brace of the
+first block start a new line.  If this block is entirely on one line in the
+input file, it is necessary to decide if it should be broken to allow cuddling.
+This decision is controlled by the flag \fB\-cbo=n\fR discussed below.  The default
+and recommended value of \fB\-cbo=1\fR bases this decision on the first block in
+the chain.  If it spans multiple lines then cuddling is made and continues
+along the chain, regardless of the sizes of subsequent blocks. Otherwise, short
+lines remain intact.
+.Sp
+So for example, the \fB\-cb\fR flag would not have any effect if the above snippet
+is rewritten as
+.Sp
+.Vb 3
+\&    try { throw Error::Simple( "ok 2\en", 2 ); }
+\&    catch Error::Simple with { my $err = shift; print "$err"; }
+\&    finally { print "ok 3\en"; };
+.Ve
+.Sp
+If the first block spans multiple lines, then cuddling can be done and will
+continue for the subsequent blocks in the chain, as illustrated in the previous
+snippet.
+.Sp
+If there are blank lines between cuddled blocks they will be eliminated.  If
+there are comments after the closing brace where cuddling would occur then
+cuddling will be prevented.  If this occurs, cuddling will restart later in the
+chain if possible.
+.Sp
+The default for this parameter is \fB\-\-nocuddled\-blocks\fR
+.IP "\fB\-cbl\fR,    \fB\-\-cuddled\-block\-list\fR" 4
+.IX Item "-cbl, --cuddled-block-list"
+The block types to which the \fB\-cuddled\-blocks\fR style applies is defined by
+this parameter.  This parameter is a character string, giving a list of
+block types separated by dashes.
+.Sp
+The default value for this string is
+.Sp
+.Vb 1
+\&   \-cbl="try\-catch\-finally"
+.Ve
+.Sp
+This string will cause cuddled formatting to be applied to every block in a chain
+starting with a \*(L"try\*(R" and followed by any number of \*(L"catch\*(R" and \*(L"finally\*(R"
+blocks.
+.Sp
+In general, a string describing a chain of blocks has the form
+.Sp
+.Vb 1
+\&   \-cbl="word1\-word2\-word3\-...\-wordn"
+.Ve
+.Sp
+In this case, a chain begins when an opening block brace preceded by word1 in 
+the list is encountered.  The chain continues if the closing block brace is
+followed immediately by any of word2, word3, etc.
+.Sp
+If the leading word, word1, might be repeated later in a chain then it should
+also be included amoung the secondary words.
+.Sp
+Multiple chain types may be specified by separating the strings with commas or
+spaces.  So for example if we have two chains of code blocks, f1\-f2\-f3  and g1\-g2\-g3\-g4,
+they could be specified as
+.Sp
+.Vb 3
+\&   \-cbl="f1\-f2\-f3  g1\-g2\-g3\-g4"
+\&or
+\&   \-cbl=f1\-f2\-f3,g1\-g2\-g3\-g4
+.Ve
+.Sp
+Spaces are easier to read but commas may avoid quotation difficulties when
+entering data in a command shell.
+.Sp
+To define secondary words that apply to all block types, other than those explicitly specified,
+the leading word can be omitted.  For example, the built-in cuddled-else format specified by
+the \fB\-ce\fR flag can be approximately specified by
+.Sp
+.Vb 3
+\&   \-cbl="if\-else\-elsif unless\-else\-elsif \-continue"
+\&or
+\&   \-cbl=if\-else\-elsif,unless\-else\-elsif,\-continue
+.Ve
+.Sp
+The final string \-continue allows cuddling the optional continue block
+which may follow may other block types.
+.Sp
+As a diagnostic check, the flag \fB\-\-dump\-cuddled\-block\-list\fR or \fB\-dcbl\fR can be
+used to view the hash of values this flag creates.
+.Sp
+Finally, note that the \fB\-cbl\fR flag by itself merely specifies which blocks are formatted
+with the cuddled format. It has no effect unless this formatting style is activated with
+\&\fB\-cb\fR.
+.IP "\fB\-cbo=n\fR,   \fB\-\-cuddled\-break\-option=n\fR" 4
+.IX Item "-cbo=n, --cuddled-break-option=n"
+Cuddled formatting is only possible between a pair of code blocks if the
+closing brace of the first block starts a new line. If a block is encountered
+which is entirely on a single line, and cuddled formatting is selected, it is
+necessary to make a decision as to whether or not to \*(L"break\*(R" the block, meaning
+to cause it to span multiple lines.  This parameter controls that decision. The
+options are:
+.Sp
+.Vb 4
+\&   cbo=0  Never force a short block to break.
+\&   cbo=1  If the first of a pair of blocks is broken in the input file, 
+\&          then break the second.
+\&   cbo=2  Break open all blocks for maximal cuddled formatting.
+.Ve
+.Sp
+The default and recommended value is \fBcbo=1\fR.  With this value, if the starting
+block of a chain spans multiple lines, then a cascade of breaks will occur for
+remaining blocks causing the entire chain to be cuddled.
+.Sp
+The option \fBcbo=0\fR can produce erratic cuddling if there are numerous one-line
+blocks.
+.Sp
+The option \fBcbo=2\fR produces maximal cuddling but will not allow any short blocks.
+.Sp
+Note: at present, this option currently only applies to blocks controlled by
+the \fB\-cb\fR flag.  Cuddling under the \fB\-ce\fR flag corresponds approximately to
+\&\fB\-cbo=1\fR but cannot currently be changed.
 .IP "\fB\-bl\fR,    \fB\-\-opening\-brace\-on\-new\-line\fR" 4
 .IX Item "-bl, --opening-brace-on-new-line"
 Use the flag \fB\-bl\fR to place the opening brace on a new line:
@@ -1914,6 +2050,12 @@ is a sandwich consisting of an initial opening layer, a central section of any
 complexity forming the \*(L"meat\*(R" of the sandwich, and a final closing layer.  This
 predictable structure helps keep the compacted structure readable.
 .Sp
+The inner sandwich layer is required to be at least one line thick.  If this
+cannot be achieved, welding does not occur.  This constraint can cause
+formatting to take a couple of iterations to stabilize when it is first applied
+to a script. The \fB\-conv\fR flag can be used to insure that the final format is
+achieved in a single run.
+.Sp
 Here is an example illustrating a welded container within a welded containers:
 .Sp
 .Vb 11
@@ -1937,8 +2079,6 @@ Here is an example illustrating a welded container within a welded containers:
 \&            $m
 \&        ) );
 .Ve
-.Sp
-Some math and logical expressions can benefit from this option.
 .Sp
 This format option is quite general but there are some limitations.
 .Sp
@@ -2757,6 +2897,38 @@ after the \-pbp parameter.  For example,
 \&        : \*(Aq elsewhere in this document\*(Aq
 \&      );
 .Ve
+.SS "Controlling Vertical Alignment"
+.IX Subsection "Controlling Vertical Alignment"
+Vertical alignment refers to lining up certain symbols in list of consecutive
+similar lines to improve readability.  For example, the \*(L"fat commas\*(R" are
+aligned in the following statement:
+.PP
+.Vb 5
+\&        $data = $pkg\->new(
+\&            PeerAddr => join( ".", @port[ 0 .. 3 ] ),   
+\&            PeerPort => $port[4] * 256 + $port[5],
+\&            Proto    => \*(Aqtcp\*(Aq
+\&        );
+.Ve
+.PP
+The only explicit control on vertical alignment is to turn it off using
+\&\fB\-novalign\fR, a flag mainly intended for debugging.  However, vertical
+alignment can be forced to stop and restart by selectively introducing blank
+lines.  For example, a blank has been inserted in the following code
+to keep somewhat similar things aligned.
+.PP
+.Vb 4
+\&    %option_range = (
+\&        \*(Aqformat\*(Aq             => [ \*(Aqtidy\*(Aq, \*(Aqhtml\*(Aq, \*(Aquser\*(Aq ],
+\&        \*(Aqoutput\-line\-ending\*(Aq => [ \*(Aqdos\*(Aq,  \*(Aqwin\*(Aq,  \*(Aqmac\*(Aq, \*(Aqunix\*(Aq ],
+\&        \*(Aqcharacter\-encoding\*(Aq => [ \*(Aqnone\*(Aq, \*(Aqutf8\*(Aq ],
+\&
+\&        \*(Aqblock\-brace\-tightness\*(Aq    => [ 0, 2 ],
+\&        \*(Aqbrace\-tightness\*(Aq          => [ 0, 2 ],
+\&        \*(Aqparen\-tightness\*(Aq          => [ 0, 2 ],
+\&        \*(Aqsquare\-bracket\-tightness\*(Aq => [ 0, 2 ],
+\&    );
+.Ve
 .SS "Other Controls"
 .IX Subsection "Other Controls"
 .IP "Deleting selected text" 4
@@ -2995,6 +3167,10 @@ the problem.
 .IX Item "Debugging"
 The following flags are available for debugging:
 .Sp
+\&\fB\-\-dump\-cuddled\-block\-list\fR or \fB\-dcbl\fR will dump to standard output the
+internal hash of cuddled block types created by a \fB\-cuddled\-block\-list\fR input
+string.
+.Sp
 \&\fB\-\-dump\-defaults\fR or \fB\-ddf\fR will write the default option set to standard output and quit
 .Sp
 \&\fB\-\-dump\-profile\fR or \fB\-dpro\fR  will write the name of the current 
@@ -3024,6 +3200,11 @@ around tokens.
 Memoization can reduce run time when running perltidy repeatedly in a 
 single process.  It is on by default but can be deactivated for
 testing with \fB\-nmem\fR.
+.Sp
+\&\fB\-\-file\-size\-order\fR or \fB\-fso\fR will cause files to be processed in order of
+increasing size, when multiple files are being processed.  This is useful
+during program development, when large numbers of files with varying sizes are
+processed, because it can reduce virtual memory usage.
 .Sp
 \&\fB\-DEBUG\fR  will write a file with extension \fI.DEBUG\fR for each input file 
 showing the tokenization of all lines of code.
@@ -3412,7 +3593,7 @@ purpose of this rule is to prevent generating confusing filenames such as
 \&\fIperlstyle\fR\|(1), \fIPerl::Tidy\fR\|(3)
 .SH "VERSION"
 .IX Header "VERSION"
-This man page documents perltidy version 20180101.
+This man page documents perltidy version 20180219.
 .SH "BUG REPORTS"
 .IX Header "BUG REPORTS"
 A list of current bugs and issues can be found at the \s-1CPAN\s0 site
@@ -3424,7 +3605,7 @@ A list of current bugs and issues can be found at the \s-1CPAN\s0 site
 To report a new bug or problem, use the link on this page.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-Copyright (c) 2000\-2017 by Steve Hancock
+Copyright (c) 2000\-2018 by Steve Hancock
 .SH "LICENSE"
 .IX Header "LICENSE"
 This package is free software; you can redistribute it and/or modify it

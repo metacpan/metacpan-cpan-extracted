@@ -121,6 +121,13 @@ Files: INSTALL
  t/SPDX/Zlib.txt
  t/SPDX/curl.txt
  t/SPDX/zlib-acknowledgement.txt
+ t/ScanCode-src-composites-rules.todo
+ t/ScanCode-src-composites.todo
+ t/ScanCode-src-foreign-rules.todo
+ t/ScanCode-src-foreign.todo
+ t/ScanCode-src-rules.todo
+ t/ScanCode-src.todo
+ t/ScanCode-tests.todo
  t/devscripts/academic.h
  t/devscripts/artistic-2-0.txt
  t/devscripts/beerware.cpp
@@ -213,18 +220,22 @@ Files: Changes
  bin/licensecheck
  doap.ttl
  lib/App/Licensecheck.pm
+ t/OSI.t
  t/SPDX.t
+ t/ScanCode-src-composites-rules.t
+ t/ScanCode-src-composites.t
+ t/ScanCode-src-foreign-rules.t
+ t/ScanCode-src-foreign.t
+ t/ScanCode-src-rules.t
+ t/ScanCode-src.t
+ t/ScanCode-tests.t
  t/Software-License.t
  t/fedora.t
  t/grant.t
-Copyright: Copyright 2018 Jonas Smedegaard.
-License: GPL-3.0
-
-Files: dist.ini
- t/devscripts.t
- t/grant/LGPL/Model.pm
+ t/lib/Test/Licensecheck.pm
+ t/lib/Test/Licensecheck/ScanCode.pm
  t/license.t
-Copyright: Copyright 2016 Jonas Smedegaard.
+Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: COPYRIGHT
@@ -233,8 +244,10 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: t/OSI.t
-Copyright: Copyright 2017 Jonas Smedegaard.
+Files: dist.ini
+ t/devscripts.t
+ t/grant/LGPL/Model.pm
+Copyright: Copyright 2016 Jonas Smedegaard.
 License: GPL-3.0
 
 Files: Makefile.PL

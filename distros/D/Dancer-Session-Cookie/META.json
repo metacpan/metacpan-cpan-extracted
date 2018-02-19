@@ -7,7 +7,7 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -20,6 +20,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -56,10 +62,12 @@
             "HTTP::Request::Common" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Plack" : "1.0029",
             "Plack::Test" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.96",
             "Test::NoWarnings" : "0",
+            "Test::Requires" : "0",
             "perl" : "5.006"
          }
       }
@@ -67,7 +75,7 @@
    "provides" : {
       "Dancer::Session::Cookie" : {
          "file" : "lib/Dancer/Session/Cookie.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -82,15 +90,18 @@
          "web" : "https://github.com/perldancer/Dancer-Session-Cookie"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>",
       "David Precious <davidp@preshweb.co.uk>",
       "Michael G. Schwern <schwern@pobox.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Neil Kirsopp <neil@broadbean.com>",
       "Nick S. Knutov <nick@knutov.com>",
+      "Paul Cochrane <paul@liekut.de>",
       "Sawyer X <xsawyerx@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

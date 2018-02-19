@@ -7,7 +7,7 @@ use base qw(Inline Exporter);
 
 # Export the cast function if wanted
 our @EXPORT_OK = qw(cast coerce study_classes caught jar j2sdk);
-our $VERSION = '0.61';
+our $VERSION = '0.63';
 
 # DEBUG is set via the DEBUG config
 our $DEBUG = 0 unless defined $DEBUG;
@@ -330,7 +330,7 @@ sub build {
 
 	my $code = $o->get_api('code');
 	my $pcode = $code;
-	my $study_only = ($code =~ /^(STUDY|SERVER)$/);
+	my $study_only = ($code =~ /^(STUDY|SERVER)$/i);
 	my $source = ($study_only ? '' : $o->get_api('modfname') . ".java");
 
 	# Parse code to check for public class
@@ -359,7 +359,7 @@ sub build {
 			"javac" . Inline::Java::Portable::portable("EXE_EXTENSION"));
 		my $redir = Inline::Java::Portable::portable("IO_REDIR");
 
-		my $args = "-deprecation " . $o->get_java_config('EXTRA_JAVAC_ARGS');
+		my $args = "-deprecation -Xlint:unchecked " . $o->get_java_config('EXTRA_JAVAC_ARGS');
 		my $pinstall_dir = Inline::Java::Portable::portable("SUB_FIX_JAVA_PATH", $install_dir);
 		my $cmd = Inline::Java::Portable::portable("SUB_FIX_CMD_QUOTES", 
 			"\"$javac\" $args -d \"$pinstall_dir\" $source > cmd.out $redir");

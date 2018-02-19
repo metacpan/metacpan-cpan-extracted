@@ -4,58 +4,45 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'     => qr/\AMailer Daemon [<][^ ]+[@]/,
-    'subject'  => qr/\ADelivery status notification/,
-    'received' => qr/[ ][(]OpenSMTPD[)][ ]with[ ]/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    # http://www.openbsd.org/cgi-bin/man.cgi?query=smtpd&sektion=8
+    # opensmtpd-5.4.2p1/smtpd/
+    #   bounce.c/317:#define NOTICE_INTRO \
+    #   bounce.c/318:    "    Hi!\n\n"    \
+    #   bounce.c/319:    "    This is the MAILER-DAEMON, please DO NOT REPLY to this e-mail.\n"
+    #   bounce.c/320:
+    #   bounce.c/321:const char *notice_error =
+    #   bounce.c/322:    "    An error has occurred while attempting to deliver a message for\n"
+    #   bounce.c/323:    "    the following list of recipients:\n\n";
+    #   bounce.c/324:
+    #   bounce.c/325:const char *notice_warning =
+    #   bounce.c/326:    "    A message is delayed for more than %s for the following\n"
+    #   bounce.c/327:    "    list of recipients:\n\n";
+    #   bounce.c/328:
+    #   bounce.c/329:const char *notice_warning2 =
+    #   bounce.c/330:    "    Please note that this is only a temporary failure report.\n"
+    #   bounce.c/331:    "    The message is kept in the queue for up to %s.\n"
+    #   bounce.c/332:    "    You DO NOT NEED to re-send the message to these recipients.\n\n";
+    #   bounce.c/333:
+    #   bounce.c/334:const char *notice_success =
+    #   bounce.c/335:    "    Your message was successfully delivered to these recipients.\n\n";
+    #   bounce.c/336:
+    #   bounce.c/337:const char *notice_relay =
+    #   bounce.c/338:    "    Your message was relayed to these recipients.\n\n";
+    #   bounce.c/339:
+    'message' => [' This is the MAILER-DAEMON, please DO NOT REPLY to this'],
+    'rfc822'  => [' Below is a copy of the original message:'],
 };
-# http://www.openbsd.org/cgi-bin/man.cgi?query=smtpd&sektion=8
-# opensmtpd-5.4.2p1/smtpd/
-#   bounce.c/317:#define NOTICE_INTRO \
-#   bounce.c/318:    "    Hi!\n\n"    \
-#   bounce.c/319:    "    This is the MAILER-DAEMON, please DO NOT REPLY to this e-mail.\n"
-#   bounce.c/320:
-#   bounce.c/321:const char *notice_error =
-#   bounce.c/322:    "    An error has occurred while attempting to deliver a message for\n"
-#   bounce.c/323:    "    the following list of recipients:\n\n";
-#   bounce.c/324:
-#   bounce.c/325:const char *notice_warning =
-#   bounce.c/326:    "    A message is delayed for more than %s for the following\n"
-#   bounce.c/327:    "    list of recipients:\n\n";
-#   bounce.c/328:
-#   bounce.c/329:const char *notice_warning2 =
-#   bounce.c/330:    "    Please note that this is only a temporary failure report.\n"
-#   bounce.c/331:    "    The message is kept in the queue for up to %s.\n"
-#   bounce.c/332:    "    You DO NOT NEED to re-send the message to these recipients.\n\n";
-#   bounce.c/333:
-#   bounce.c/334:const char *notice_success =
-#   bounce.c/335:    "    Your message was successfully delivered to these recipients.\n\n";
-#   bounce.c/336:
-#   bounce.c/337:const char *notice_relay =
-#   bounce.c/338:    "    Your message was relayed to these recipients.\n\n";
-#   bounce.c/339:
-my $Re1 = {
-    'begin'  => qr/\A[ \t]*This is the MAILER-DAEMON, please DO NOT REPLY to this e[-]?mail[.]\z/,
-    'rfc822' => qr/\A[ \t]*Below is a copy of the original message:\z/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'expired' => qr{
-        # smtpd/queue.c:221|  envelope_set_errormsg(&evp, "Envelope expired");
-        Envelope[ ]expired
-    }x,
-    'hostunknown' => qr{(?:
-        # smtpd/mta.c:976|  relay->failstr = "Invalid domain name";
-         Invalid[ ]domain[ ]name
-        # smtpd/mta.c:980|  relay->failstr = "Domain does not exist";
-        |Domain[ ]does[ ]not[ ]exist
-        )
-    }x,
-    'notaccept' => qr{
-        # smtp/mta.c:1085|  relay->failstr = "Destination seem to reject all mails";
-        Destination[ ]seem[ ]to[ ]reject[ ]all[ ]mails
-    }x,
-    'networkerror' => qr{(?>
+my $ReFailures = {
+    # smtpd/queue.c:221|  envelope_set_errormsg(&evp, "Envelope expired");
+    'expired'     => qr/Envelope expired/,
+    # smtpd/mta.c:976|  relay->failstr = "Invalid domain name";
+    # smtpd/mta.c:980|  relay->failstr = "Domain does not exist";
+    'hostunknown' => qr/(?:Invalid domain name|Domain does not exist)/,
+    # smtp/mta.c:1085|  relay->failstr = "Destination seem to reject all mails";
+    'notaccept'   => qr/Destination seem to reject all mails/,
+    'networkerror'=> qr{(?>
         #  smtpd/mta.c:972|  relay->failstr = "Temporary failure in MX lookup";
          Address[ ]family[ ]mismatch[ ]on[ ]destination[ ]MXs
         |All[ ]routes[ ]to[ ]destination[ ]blocked
@@ -70,16 +57,11 @@ my $ReFailure = {
         |Temporary[ ]failure[ ]in[ ]MX[ ]lookup
         )
     }x,
-    'securityerror' => qr{
-        # smtpd/mta.c:1013|  relay->failstr = "Could not retrieve credentials";
-        Could[ ]not[ ]retrieve[ ]credentials
-    }x,
+    # smtpd/mta.c:1013|  relay->failstr = "Could not retrieve credentials";
+    'securityerror' => qr/Could not retrieve credentials/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
-sub pattern     { return $Re0 }
 sub description { 'OpenSMTPD' }
-
 sub scan {
     # Detect an error from OpenSMTPD
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -97,9 +79,9 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
-    return undef unless $mhead->{'from'}    =~ $Re0->{'from'};
-    return undef unless grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    return undef unless index($mhead->{'subject'}, 'Delivery status notification') == 0;
+    return undef unless index($mhead->{'from'}, 'Mailer Daemon <') == 0;
+    return undef unless grep { index($_, ' (OpenSMTPD) with ') > -1 } @{ $mhead->{'received'} };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -111,10 +93,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) > -1 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -122,7 +104,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) > -1 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -154,7 +136,7 @@ sub scan {
             #    Below is a copy of the original message:
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A([^ ]+?[@][^ ]+?):?[ ](.+)\z/ ) {
+            if( $e =~ /\A([^ ]+?[@][^ ]+?):?[ ](.+)\z/ ) {
                 # kijitora@example.jp: 550 5.2.2 <kijitora@example>... Mailbox Full
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -167,17 +149,16 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -230,7 +211,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

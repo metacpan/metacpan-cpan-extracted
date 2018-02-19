@@ -4,29 +4,20 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'     => qr/postmaster[@]/,
-    'subject'  => qr/Delivery Status Notification/,
-    'received' => qr/.+[.]hotmail[.]com\b/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This is an automatically generated Delivery Status Notification'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
 };
-my $Re1 = {
-    'begin'  => qr/\AThis is an automatically generated Delivery Status Notification/,
-    'error'  => qr/\A[.]+ while talking to .+[:]\z/,
-    'rfc822' => qr|\AContent-Type: message/rfc822\z|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
+my $ReFailures = {
     'hostunknown' => qr/The mail could not be delivered to the recipient because the domain is not reachable/,
     'userunknown' => qr/Requested action not taken: mailbox unavailable/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # X-Message-Delivery: Vj0xLjE7RD0wO0dEPTA7U0NMPTk7bD0xO3VzPTE=
 # X-Message-Info: AuEzbeVr9u5fkDpn2vR5iCu5wb6HBeY4iruBjnutBzpStnUabbM...
 sub headerlist  { return ['X-Message-Delivery', 'X-Message-Info'] }
-sub pattern     { return $Re0 }
 sub description { 'Microsoft Outlook.com: https://www.outlook.com/' }
-
 sub scan {
     # Detect an error from Microsoft Outlook.com
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -45,10 +36,11 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match++ if $mhead->{'subject'} =~ $Re0->{'subject'};
+    # 'from'     => qr/postmaster[@]/,
+    $match++ if index($mhead->{'subject'}, 'Delivery Status Notification') > -1;
     $match++ if $mhead->{'x-message-delivery'};
     $match++ if $mhead->{'x-message-info'};
-    $match++ if grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    $match++ if grep { index($_, '.hotmail.com') > -1 } @{ $mhead->{'received'} };
     return undef if $match < 2;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -63,15 +55,14 @@ sub scan {
         'date'  => '',      # The value of Arrival-Date header
         'lhost' => '',      # The value of Reporting-MTA header
     };
-
     my $v = undef;
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -79,7 +70,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -112,7 +103,7 @@ sub scan {
                 # Diagnostic-Code: smtp;550 5.2.2 <kijitora@example.jp>... Mailbox Full
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: rfc822;kijitora@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -122,22 +113,21 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status:5.2.0
                     $v->{'status'} = $1;
 
                 } else {
-
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -147,13 +137,13 @@ sub scan {
                 # Reporting-MTA: dns;BLU004-OMC3S13.hotmail.example.com
                 # Received-From-MTA: dns;BLU436-SMTP66
                 # Arrival-Date: Fri, 21 Nov 2014 14:17:34 -0800
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns;BLU004-OMC3S13.hotmail.example.com
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -166,8 +156,8 @@ sub scan {
         $p = $e;
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
@@ -188,9 +178,9 @@ sub scan {
             }
         }
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -242,7 +232,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

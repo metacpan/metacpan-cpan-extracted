@@ -10,8 +10,7 @@ use Dancer::Session::Cookie;
 use FindBin;
 use File::Spec;
 
-eval "use YAML";
-plan skip_all => "YAML is needed for this test" if $@;
+use Test::Requires 'YAML';
 
 plan tests => 3;
 

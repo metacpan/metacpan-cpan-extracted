@@ -2,8 +2,7 @@
 
 #
 # dbfilediff.pm
-# Copyright (C) 2012-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 3221524c041f6e1037daba3af5e80a4df19feb6d $
+# Copyright (C) 2012-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -192,8 +191,8 @@ and L<dbfilediff> compares fields of two files.
 ($VERSION) = 2.0;
 
 use strict;
-use Carp qw(croak);
 use Pod::Usage;
+use Carp qw(croak);
 # use Regexp::Common;
 
 use Fsdb::Filter;
@@ -266,7 +265,7 @@ sub parse_options ($@) {
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	'q|quiet+' => \$self->{_quiet},
 	) or pod2usage(2);
-    croak $self->{_prog} . ": internal error, extra arguments.\n"
+    croak($self->{_prog} . ": internal error, extra arguments.\n")
 	if ($#argv != -1);
 }
 
@@ -285,10 +284,10 @@ sub setup ($) {
     $self->finish_io_option('inputs', -comment_handler => undef);
     $self->finish_io_option('output', -clone => $self->{_ins}[0], -outputheader => 'delay');
     $self->{_out}->col_create($self->{_destination_column})
-	    or croak $self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (maybe it already existed?)\n");
 
 
-    croak $self->{_prog} . ": input streams have different schemas; cannot merge\n"
+    croak($self->{_prog} . ": input streams have different schemas; cannot merge\n")
 	if ($self->{_ins}[0]->compare($self->{_ins}[1]) ne 'identical');
 }
 
@@ -442,7 +441,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2012-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2012-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

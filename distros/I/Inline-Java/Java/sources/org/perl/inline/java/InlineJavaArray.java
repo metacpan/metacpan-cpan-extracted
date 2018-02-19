@@ -19,7 +19,7 @@ class InlineJavaArray {
 		sb.replace(sb.length() - 1, sb.length(), "") ;
 
 		StringTokenizer st2 = new StringTokenizer(sb.toString(), ",") ;
-		ArrayList al = new ArrayList() ;
+		ArrayList<String> al = new ArrayList<>() ;
 		while (st2.hasMoreTokens()){
 			al.add(al.size(), st2.nextToken()) ;
 		}
@@ -35,7 +35,7 @@ class InlineJavaArray {
 		try {
 			array = Array.newInstance(c, dims) ;
 
-			ArrayList args = new ArrayList() ;
+			ArrayList<String> args = new ArrayList<>() ;
 			while (st.hasMoreTokens()){
 				args.add(args.size(), st.nextToken()) ;
 			}
@@ -66,7 +66,7 @@ class InlineJavaArray {
 	
 			for (int i = 0 ; i < nb_sub_dims ; i++){
 				// We want the args from i*nb_args_per_sub_dim -> 
-				ArrayList sub_args = new ArrayList() ; 
+				ArrayList<String> sub_args = new ArrayList<>() ; 
 				for (int j = (i * nb_args_per_sub_dim) ; j < ((i + 1) * nb_args_per_sub_dim) ; j++){
 					sub_args.add(sub_args.size(), (String)args.get(j)) ;
 				}

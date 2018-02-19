@@ -2,7 +2,7 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.3.0';
+$Git::Hooks::GerritChangeId::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -13,7 +13,6 @@ use Path::Tiny;
 use Carp;
 use Try::Tiny;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 ##########
@@ -23,7 +22,8 @@ sub gen_change_id {
 
     my $filename = Path::Tiny->tempfile(UNLINK => 1);
     open my $fh, '>', $filename ## no critic (RequireBriefOpen)
-        or croak "$PKG: internal error: can't open $filename for writing: $!";
+        or $git->fault("Internal error: can't open '$filename' for writing:", {details => $!})
+        and die;
 
     foreach my $info (
         [ tree      => [qw/write-tree/] ],
@@ -71,7 +71,8 @@ sub rewrite_message {
 
     my $msg = eval { $git->read_commit_msg_file($commit_msg_file) };
     unless (defined $msg) {
-        $git->error($PKG, "cannot read commit message file '$commit_msg_file'", $@);
+        $git->fault("Internal error: cannot read commit message file '$commit_msg_file'",
+                    {details => $@});
         return 0;
     }
 
@@ -100,7 +101,20 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckGerritChangeId
+    admin = joe molly
+
+The first section enables the plugin and defines the users C<joe> and C<molly>
+as administrators, effectivelly exempting them from any restrictions the plugin
+may impose.
 
 =head1 DESCRIPTION
 
@@ -185,7 +199,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

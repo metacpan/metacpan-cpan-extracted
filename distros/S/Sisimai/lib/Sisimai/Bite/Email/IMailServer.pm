@@ -4,56 +4,32 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'x-mailer' => qr/\A[<]SMTP32 v[\d.]+[>][ ]*\z/,
-    'subject'  => qr/\AUndeliverable Mail[ ]*\z/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => [''],  # Blank line
+    'rfc822'  => ['Original message follows.'],
+    'error'   => ['Body of message generated response:'],
 };
-my $Re1 = {
-    'begin'  => qr/\A\z/,    # Blank line
-    'error'  => qr/Body of message generated response:/,
-    'rfc822' => qr/\AOriginal message follows[.]\z/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
+
 my $ReSMTP = {
-    'conn' => qr{(?:
-         SMTP[ ]connection[ ]failed,
-        |Unexpected[ ]connection[ ]response[ ]from[ ]server:
-        )
-    },
+    'conn' => qr/(?:SMTP connection failed,|Unexpected connection response from server:)/,
     'ehlo' => qr|Unexpected response to EHLO/HELO:|,
     'mail' => qr|Server response to MAIL FROM:|,
     'rcpt' => qr|Additional RCPT TO generated following response:|,
     'data' => qr|DATA command generated response:|,
 };
-my $ReFailure = {
-    'hostunknown' => qr{
-        Unknown[ ]host
-    },
-    'userunknown' => qr{\A(?:
-         Unknown[ ]user
-        |Invalid[ ]final[ ]delivery[ ]userid    # Filtered ?
-        )
-    }x,
-    'mailboxfull' => qr{
-        \AUser[ ]mailbox[ ]exceeds[ ]allowed[ ]size
-    }x,
-    'securityerr' => qr{
-        \ARequested[ ]action[ ]not[ ]taken:[ ]virus[ ]detected
-    }x,
-    'undefined' => qr{
-        \Aundeliverable[ ]to[ ]
-    }x,
-    'expired' => qr{
-        \ADelivery[ ]failed[ ]\d+[ ]attempts
-    }x,
+my $ReFailures = {
+    'hostunknown' => qr/Unknown host/,
+    'userunknown' => qr/\A(?:Unknown user|Invalid final delivery userid)/,
+    'mailboxfull' => qr/\AUser mailbox exceeds allowed size/,
+    'securityerr' => qr/\ARequested action not taken: virus detected/,
+    'undefined'   => qr/\Aundeliverable to/,
+    'expired'     => qr/\ADelivery failed \d+ attempts/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # X-Mailer: <SMTP32 v8.22>
 sub headerlist  { return ['X-Mailer'] }
-sub pattern     { return $Re0 }
 sub description { 'IPSWITCH IMail Server' }
-
 sub scan {
     # Detect an error from IMailServer
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -72,8 +48,8 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match ||= 1 if $mhead->{'subject'} =~ $Re0->{'subject'};
-    $match ||= 1 if defined $mhead->{'x-mailer'} && $mhead->{'x-mailer'} =~ $Re0->{'x-mailer'};
+    $match ||= 1 if $mhead->{'subject'} =~ /\AUndeliverable Mail[ ]*\z/;
+    $match ||= 1 if defined $mhead->{'x-mailer'} && index($mhead->{'x-mailer'}, '<SMTP32 v') == 0;
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -86,10 +62,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e eq $StartingOf->{'message'}->[0] ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -97,7 +73,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -121,7 +97,7 @@ sub scan {
             # Original message follows.
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A([^ ]+)[ ]([^ ]+)[:][ \t]*([^ ]+[@][^ ]+)/ ) {
+            if( $e =~ /\A([^ ]+)[ ]([^ ]+)[:][ \t]*([^ ]+[@][^ ]+)/ ) {
                 # Unknown user: kijitora@example.com
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -132,7 +108,7 @@ sub scan {
                 $v->{'recipient'} = $3;
                 $recipients++;
 
-            } elsif( $e =~ m/\Aundeliverable[ ]+to[ ]+(.+)\z/ ) {
+            } elsif( $e =~ /\Aundeliverable[ ]+to[ ]+(.+)\z/ ) {
                 # undeliverable to kijitora@example.com
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -146,17 +122,13 @@ sub scan {
                 # Other error message text
                 $v->{'alterrors'} //= '';
                 $v->{'alterrors'}  .= ' '.$e if length $v->{'alterrors'};
-                if( $e =~ $Re1->{'error'} ) {
-                    # Body of message generated response:
-                    $v->{'alterrors'} = $e;
-                }
+                $v->{'alterrors'}   = $e if index($e, $StartingOf->{'error'}->[0]) > -1;
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'} = __PACKAGE__->smtpagent;
 
@@ -175,9 +147,9 @@ sub scan {
             last;
         }
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -231,7 +203,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

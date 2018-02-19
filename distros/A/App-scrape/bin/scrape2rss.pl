@@ -6,8 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use XML::Atom::SimpleFeed;
 use Time::Piece;
-use vars qw($VERSION);
-$VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 

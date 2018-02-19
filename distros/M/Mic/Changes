@@ -1,5 +1,11 @@
 Revision history for Minions
 
+0.001004 2018-02-18T15:44:54Z
+        - Basic support for overloads
+        - Allow non uc slot names
+        - Allow configuration of contracts via an env variable
+        - Enable preconditions by default
+
 0.001003 2017-12-11T14:16:34Z
         - Readonly is not used anymore.
 

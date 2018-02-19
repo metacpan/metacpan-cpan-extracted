@@ -5,40 +5,56 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-# I should maybe use something like Shipwright...
-regen_README('bin/scrape.pl');
-#regen_EXAMPLES();
-
-WriteMakefile1(
+my %module = (
     MIN_PERL_VERSION => '5.006',
     META_MERGE => {
+        "meta-spec" => { version => 2 },
         resources => {
-            repository => 'http://github.com/Corion/app-scrape',
+            repository => {
+                web => 'https://github.com/Corion/App-scrape',
+                url => 'git://github.com/Corion/App-scrape.git',
+                type => 'git',
+            }
         },
+        dynamic_config   => 0, # we promise to keep META.* up-to-date
+        x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
-    #BUILD_REQUIRES => {
-    #                    'Task::Weaken' => 0, #to be sure that weaken is present
-    #},
+
     'NAME'          => 'App::scrape',
     'LICENSE'       => 'perl',
     'VERSION_FROM'  => 'lib/App/scrape.pm', # finds $VERSION
     'EXE_FILES'     => ['bin/scrape.pl', 'bin/scrape2rss.pl'],
-    'PREREQ_PM'     => { 
+    'PREREQ_PM'     => {
                         # the first DOM we implement
                         'HTML::TreeBuilder::XPath' => 0.10, # v0.10 for ->findvalues()
-                        'HTML::Selector::XPath' => 0,
-                        'URI' => 0,
-                        'XML::Atom::SimpleFeed' => 0, # for scrape2rss
-                        'LWP::Simple' => 0, # for page fetching
-                        'Time::Piece' => 0, # for date parsing
-                        'Exporter' => 0,
-                        'Getopt::Long' => 0,
-                        'Pod::Usage' => 0,
-                      }, # e.g., Module::Name => 1.1
+                        'HTML::Selector::XPath'    => 0,
+                        'URI'                      => 0,
+                        'XML::Atom::SimpleFeed'    => 0, # for scrape2rss
+                        'LWP::Simple'              => 0, # for page fetching
+                        'Time::Piece'              => 0, # for date parsing
+                        'Exporter'                 => 0,
+                        'Getopt::Long'             => 0,
+                        'Pod::Usage'               => 0,
+                        'List::MoreUtils'          => 0, # for JSON output
+                        'JSON'                     => 0, # for JSON output
+                      },
     ABSTRACT_FROM   => 'lib/App/scrape.pm', # retrieve abstract from module
     AUTHOR          => 'Max Maischein <corion@cpan.org>',
 );
 
+# This is so that we can do
+#     require 'Makefile.PL'
+# and then call get_module_info
+
+sub get_module_info { %module }
+
+if( ! caller ) {
+    # I should maybe use something like Shipwright...
+    #regen_README($main_file);
+    regen_README('bin/scrape.pl');
+    #regen_EXAMPLES();
+    WriteMakefile1(get_module_info);
+};
 1;
 
 sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
@@ -60,19 +76,50 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     delete $params{AUTHOR} if $] < 5.005;
     delete $params{ABSTRACT_FROM} if $] < 5.005;
     delete $params{BINARY_LOCATION} if $] < 5.005;
-    
+
     WriteMakefile(%params);
 }
 
 sub regen_README {
+    # README is the short version that just tells people what this is
+    # and how to install it
     eval {
-        require Pod::Readme;
+        # Get description
+        my $readme = join "\n",
+            pod_section($_[0], 'NAME', 'no heading' ),
+            pod_section($_[0], 'DESCRIPTION' ),
+            <<INSTALL,
 
-        my $parser = Pod::Readme->new();
+INSTALLATION
 
-        # Read POD from Module.pm and write to README
-        $parser->parse_from_file($_[0], 'README');
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+INSTALL
+            pod_section($_[0], 'REPOSITORY'),
+            pod_section($_[0], 'SUPPORT'),
+            pod_section($_[0], 'BUG TRACKER'),
+            pod_section($_[0], 'AUTHOR'),
+            pod_section($_[0], 'LICENSE' ),
+            pod_section($_[0], 'COPYRIGHT' ),
+    ;
+        update_file( 'README', $readme );
     };
+    # README.mkdn is the documentation that will be shown as the main
+    # page of the repository on Github. Hence we recreate the POD here
+    # as Markdown
     eval {
         require Pod::Markdown;
 
@@ -80,25 +127,54 @@ sub regen_README {
 
         # Read POD from Module.pm and write to README
         $parser->parse_from_file($_[0]);
-        open my $fh, '>', 'README.mkdn'
-            or die "Couldn't open 'README.mkdn': $!";
-        print $fh $parser->as_markdown;
+        my $readme_mkdn = <<STATUS . $parser->as_markdown;
+
+[![Build Status](https://travis-ci.org/Corion/App-scrape.svg?branch=master)](https://github.com/Corion/App-scrape)
+
+STATUS
+        update_file( 'README.mkdn', $readme_mkdn );
     };
 }
 
+sub pod_section {
+    my( $filename, $section, $remove_heading ) = @_;
+    open my $fh, '<', $filename
+        or die "Couldn't read '$filename': $!";
 
-sub regen_EXAMPLES {
-    my $perl = $^X;
-    warn "(Re)Creating lib/App/scrape/Examples.pm\n";
-    if ($perl =~/\s/) {
-        $perl = qq{"$perl"};
+    my @section =
+        grep { /^=head1\s+$section/.../^=/ } <$fh>;
+    pop @section if $section[-1] =~ /^=/;
+    shift @section if $remove_heading;
+
+    # Trim the section
+    if( @section ) {
+        pop @section
+            while $section[-1] =~ /^\s*$/;
+        shift @section
+            while $section[0] =~ /^\s*$/;
     };
-    my $examples = `$perl -w examples/gen_examples_pod.pl`;
-    if ($examples) {
-        $examples =~ s/\r\n/\n/g;
-        if (open my $out, '>', 'lib/App/scrape/Examples.pm') {
-            binmode $out;
-            print $out $examples;
+
+    @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
+    return join "", @section;
+}
+
+sub update_file {
+    my( $filename, $new_content ) = @_;
+    my $content;
+    if( -f $filename ) {
+        open my $fh, '<', $filename
+            or die "Couldn't read '$filename': $!";
+        binmode $fh;
+        local $/;
+        $content = <$fh>;
+    };
+
+    if( $content ne $new_content ) {
+        if( open my $fh, '>', $filename ) {
+            binmode $fh;
+            print $fh $new_content;
+        } else {
+            warn "Couldn't (re)write '$filename': $!";
         };
     };
-};
+}

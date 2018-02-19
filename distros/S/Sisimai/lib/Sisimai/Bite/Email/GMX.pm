@@ -4,29 +4,19 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/\AMAILER-DAEMON[@]/,
-    'subject' => qr/\AMail delivery failed: returning message to sender\z/,
-};
-my $Re1 = {
-    'begin'   => qr/\AThis message was created automatically by mail delivery software/,
-    'rfc822'  => qr/\A--- The header of the original message is following/,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'expired' => qr/delivery[ ]retry[ ]timeout[ ]exceeded/x,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This message was created automatically by mail delivery software'],
+    'rfc822'  => ['--- The header of the original message is following'],
+};
+my $ReFailures = { 'expired' => qr/delivery retry timeout exceeded/ };
 
 # Envelope-To: <kijitora@mail.example.com>
 # X-GMX-Antispam: 0 (Mail was not recognized as spam); Detail=V3;
 # X-GMX-Antivirus: 0 (no virus found)
 # X-UI-Out-Filterresults: unknown:0;
 sub headerlist  { return ['X-GMX-Antispam'] }
-sub pattern     { return $Re0 }
 sub description { 'GMX: http://www.gmx.net' }
-
-
 sub scan {
     # Detect an error from GMX and mail.com
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -44,6 +34,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'from'    => qr/\AMAILER-DAEMON[@]/,
+    # 'subject' => qr/\AMail delivery failed: returning message to sender\z/,
     return undef unless defined $mhead->{'x-gmx-antispam'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -56,10 +48,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -67,7 +59,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -99,8 +91,7 @@ sub scan {
             # 5.1.1 <shironeko@example.jp>... User Unknown
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A["]([^ ]+[@][^ ]+)["]:\z/ ||
-                $e =~ m/\A[<]([^ ]+[@][^ ]+)[>]\z/ ) {
+            if( $e =~ /\A["]([^ ]+[@][^ ]+)["]:\z/ || $e =~ /\A[<]([^ ]+[@][^ ]+)[>]\z/ ) {
                 # "shironeko@example.jp":
                 # ---- OR ----
                 # <kijitora@6jo.example.co.jp>
@@ -115,48 +106,44 @@ sub scan {
                 $v->{'recipient'} = $1;
                 $recipients++;
 
-            } elsif( $e =~ m/\ASMTP error .+ ([A-Z]{4}) command:\z/ ) {
+            } elsif( $e =~ /\ASMTP error .+ ([A-Z]{4}) command:\z/ ) {
                 # SMTP error from remote server after RCPT command:
                 $v->{'command'} = $1;
 
-            } elsif( $e =~ m/\Ahost:[ \t]*(.+)\z/ ) {
+            } elsif( $e =~ /\Ahost:[ \t]*(.+)\z/ ) {
                 # host: mx.example.jp
                 $v->{'rhost'} = $1;
 
             } else {
                 # Get error message
-                if( $e =~ m/\b[45][.]\d[.]\d\b/  ||
-                    $e =~ m/[<][^ ]+[@][^ ]+[>]/ ||
-                    $e =~ m/\b[45]\d{2}\b/ ) {
-
+                if( $e =~ /\b[45][.]\d[.]\d\b/  || $e =~ /[<][^ ]+[@][^ ]+[>]/ || $e =~ /\b[45]\d{2}\b/ ) {
                     $v->{'diagnosis'} ||= $e;
 
                 } else {
-                    next if $e =~ m/\A\z/;
-                    if( $e =~ m/\AReason:\z/ ) {
+                    next if $e eq '';
+                    if( $e eq 'Reason:' ) {
                         # Reason:
                         # delivery retry timeout exceeded
                         $v->{'diagnosis'} = $e;
 
-                    } elsif( $v->{'diagnosis'} =~ m/\AReason:\z/ ) {
+                    } elsif( $v->{'diagnosis'} eq 'Reason:' ) {
                         $v->{'diagnosis'} = $e;
                     }
                 }
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     =  __PACKAGE__->smtpagent;
-        $e->{'diagnosis'} =~ s{\\n}{ }g;
+        $e->{'diagnosis'} =~ s/\\n/ /g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -208,7 +195,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

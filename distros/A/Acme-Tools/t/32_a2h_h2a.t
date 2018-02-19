@@ -1,6 +1,6 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/32_a2h_h2a.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 2;
 my @a=(
         [qw( Make    Model   Sales Used    )],  #alphabetical colnames for tests below

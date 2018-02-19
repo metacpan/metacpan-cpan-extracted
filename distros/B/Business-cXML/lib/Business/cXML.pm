@@ -108,12 +108,12 @@ use Scalar::Util 'blessed';
 use Business::cXML::Transmission;
 
 BEGIN {
-	our $VERSION = 'v0.6.5';
+	our $VERSION = 'v0.6.6';
 	our $CXML_VERSION = '1.2.036';
 	our $USERAGENT = "Business::cXML.pm $VERSION";
 }
 
-our @EXPORT = qw(CXML_LOG_NOTHING CXML_LOG_ERR CXML_LOG_ERROR CXML_LOG_WARN CXML_LOG_WARNING CXML_LOG_INFO);
+our @EXPORT = qw(CXML_LOG_NOTHING CXML_LOG_ERR CXML_LOG_ERROR CXML_LOG_WARN CXML_LOG_WARNING CXML_LOG_INFO CXML_LOG_DEBUG, CXML_LOG_TRACE);
 
 use constant {
 	CXML_LOG_NOTHING => 0,
@@ -122,6 +122,8 @@ use constant {
 	CXML_LOG_WARN    => 2,
 	CXML_LOG_WARNING => 2,
 	CXML_LOG_INFO    => 3,
+	CXML_LOG_DEBUG   => 4,
+	CXML_LOG_TRACE   => 5,
 };
 
 =item C<B<new>( I<%options> )>
@@ -157,8 +159,8 @@ Subroutine, passed to L</sender_callback()>.
 =item B<log_level>
 
 One of: C<CXML_LOG_NOTHING> (default), C<CXML_LOG_ERR>, C<CXML_LOG_WARN>,
-C<CXML_LOG_INFO>.  Alternates C<CXML_LOG_ERROR> and C<CXML_LOG_WARNING> are
-also available.
+C<CXML_LOG_INFO>, C<CXML_LOG_DEBUG>, C<CXML_LOG_TRACE>.  Alternates
+C<CXML_LOG_ERROR> and C<CXML_LOG_WARNING> are also available.
 
 =item B<log_callback>
 
@@ -276,6 +278,10 @@ Your subroutine will be passed 5 arguments:
 
 =item CXML_LOG_INFO = 3 = normal operations like receiving or sending transmissions
 
+=item CXML_LOG_DEBUG = 4 = additional debugging information about processing requests
+
+=item CXML_LOG_TRACE = 5 = full trace logging in some areas
+
 =back
 
 =item 3. A possible long-form message describing the event
@@ -299,7 +305,7 @@ C<Request>, C<Response> and C<Message> transmissions.
 sub _log_default {
 	my ($cxml, $level, $desc, $xml, $tx) = @_;
 	return unless $level <= $cxml->{log_level};
-	$level = ('error', 'warning', 'info')[$level-1];
+	$level = ('error', 'warning', 'info', 'debug', 'trace')[$level-1];
 	# use Data::Dumper;
 	# print STDERR "cXML[$level]: ", $desc, " -- ", $xml, " -- ", Dumper($cxml), "\n";
 	print STDERR "cXML[$level]: ", $desc, " -- ", $xml, "\n";
@@ -310,9 +316,11 @@ sub log_callback {
 	$self->{log_callback} = $callback;
 }
 
-sub _error   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_ERR,  @_); return undef; }
-sub _warning { my $l = shift; $l->{log_callback}->($l, CXML_LOG_WARN, @_); return undef; }
-sub _notice  { my $l = shift; $l->{log_callback}->($l, CXML_LOG_INFO, @_); return undef; }
+sub _error   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_ERR,   @_); return undef; }
+sub _warning { my $l = shift; $l->{log_callback}->($l, CXML_LOG_WARN,  @_); return undef; }
+sub _notice  { my $l = shift; $l->{log_callback}->($l, CXML_LOG_INFO,  @_); return undef; }
+sub _debug   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_DEBUG, @_); return undef; }
+sub _trace   { my $l = shift; $l->{log_callback}->($l, CXML_LOG_TRACE, @_); return undef; }
 
 =item C<B<on>( I<%handlers> )>
 
@@ -381,9 +389,12 @@ sub process {
 	$res->is_response(1);
 
 	unless ($input) {
-		$self->_notice("process() ping-pong");
+		$self->_notice("process(10) ping-pong");
 		$res->status(200, "Pong!");
-		return scalar($res->toString);
+		($err, $str) = $res->toString;
+		$self->_error("process(12) $err", $str) if $err;
+		$self->_trace("process(15) ping-pong returning", $str);
+		return $str;
 	};
 
 	my $req = new Business::cXML::Transmission $input;
@@ -393,7 +404,10 @@ sub process {
 		my $desc = "XML validation failure:\n" . $req->[1];
 		$self->_warning("process(21) $desc", $input);
 		$res->status($req->[0], $desc);
-		return scalar($res->toString);
+		($err, $str) = $res->toString;
+		$self->_error("process(22) $err", $str) if $err;
+		$self->_trace("process(25) error returning", $str);
+		return $str;
 	};
 
 	$res->status(500, "Handler did not set a response status.");
@@ -401,13 +415,27 @@ sub process {
 	$res->payload;  # Trigger creation of payload now that it has a class/type.
 
 	if (defined $self->{sender_callback}) {
-		my $note = $self->{sender_callback}->($self, $req->{sender}, $req->{from});
+		$self->_trace("process(30) sender_callback...");
+		my $note;
+		eval {
+			$note = $self->{sender_callback}->($self, $req->sender, $req->from);
+		};
+		if ($@) {
+			$self->_error("process(31) sender_callback crashed!!!", $@);
+			$res->status(500, "Sender validation encountered an irrecoverable error.");
+			($err, $str) = $res->toString;
+			$self->_error("process(32) $err", $str) if $err;
+			return $str;
+		};
 		if ($note) {
+			$self->_debug("process(33) sender_callback successful");
 			$req->sender->_note($note);
 		} else {
-			$self->_warning("process(31) sender validation failed", $input, $req);
+			$self->_warning("process(34) sender validation failed", $input, $req);
 			$res->status(401, "Invalid sender.");
-			return scalar($res->toString);
+			($err, $str) = $res->toString;
+			$self->_error("process(35) $err", $str) if $err;
+			return $str;
 		};
 	};
 
@@ -415,23 +443,31 @@ sub process {
 		my $desc = "Type '" . $req->type . "' is not implemented.";
 		$self->_warning("process(41) $desc", $input, $req);
 		$res->status(450, $desc);
-		return scalar($res->toString);
+		($err, $str) = $res->toString;
+		$self->_error("process(45) $err", $str) if $err;
+		return $str;
 	};
-
 	$self->_notice("process() received request", $input, $req);
-	$self->{routes}{$req->type}{__handler}->($self, $req, $res);
+	eval {
+		$self->{routes}{$req->type}{__handler}->($self, $req, $res);
+	};
+	if ($@) {
+		$self->_error("process(50) handler for type '" . $req->type . "' crashed!!!", $@);
+		$res->status(500, "Processing for type '" . $req->type . "' encountered an irrecoverable error.");
+	};
 
 	($err, $str) = $res->toString;
-	$self->_error("process(51): $err", $str, $res) if defined $err;
+	$self->_error("process(51): $err", $str, $res) if $err;
 
 	if ($res->status >= 500) {
-		$self->_error("process() responding with 5xx", $str, $res);
+		$self->_error("process(55) responding with 5xx", $str, $res);
 	} elsif ($res->status >= 400) {
-		$self->_warning("process() responding with 4xx", $str, $res);
+		$self->_warning("process(54) responding with 4xx", $str, $res);
 	} else {
-		$self->_notice("process() responding with 2xx", $str, $res);
+		$self->_notice("process(52) responding with 2xx", $str, $res);
 	};
 
+	$self->_debug("process(60) returning", $str);
 	return $str;
 }
 
@@ -538,7 +574,7 @@ sub stringify {
 
 =head1 VERSION
 
-0.6.5 based on cXML DTD 1.2.036
+0.6.6 based on cXML DTD 1.2.036
 
 =head1 AUTHOR
 

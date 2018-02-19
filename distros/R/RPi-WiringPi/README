@@ -73,7 +73,7 @@ SYNOPSIS
         # Serial
         #
     
-        my $dev  = "/dev/ttyAMA0";
+        my $dev  = "/dev/ttyS0";
         my $baud = 115200;
     
         my $ser = $pi->serial($dev, $baud);
@@ -275,49 +275,71 @@ METHODS
     fatal_exit to false (0) to perform the cleanup, and then continue
     running your script. This is for unit testing purposes only.
 
- pin($pin_num)
+ adc()
 
-    Returns a RPi::Pin object, mapped to a specified GPIO pin, which you
-    can then perform operations on. See that documentation for full usage
-    details.
+    There are two different ADCs that you can select from. The default is
+    the ADS1x15 series:
+
+  ADS1115
+
+    Returns a RPi::ADC::ADS object, which allows you to read the four
+    analog input channels on an Adafruit ADS1xxx analog to digital
+    converter.
 
     Parameters:
 
-        $pin_num
+    The default (no parameters) is almost always enough, but please do
+    review the documentation in the link above for further information, and
+    have a look at the ADC tutorial section in this distribution.
 
-    Mandatory, Integer: The pin number to attach to.
+  MCP3008
 
- lcd(...)
+    You can also use an RPi::ADC::MCP3008 ADC.
 
-    Returns a RPi::LCD object, which allows you to fully manipulate LCD
-    displays connected to your Raspberry Pi.
+    Parameters:
 
-    Please see the linked documentation for information regarding the
-    parameters required.
+        model => 'MCP3008'
 
- i2c($addr, [$device])
+    Mandatory, String. The exact quoted string above.
 
-    Creates a new RPi::I2C device object which allows you to communicate
-    with the devices on an I2C bus.
+        channel => $channel
 
-    See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+    Mandatory, Integer. 0 or 1 for the Pi's onboard hardware CS/SS CE0 and
+    CE1 pins, or any GPIO number above 1 in order to use an arbitrary GPIO
+    pin for the CS pin, and we'll do the bit-banging of the SPI bus
+    automatically.
 
- serial($device, $baud)
+ bmp()
 
-    Creates a new RPi::Serial object which allows basic read/write access
-    to a serial bus.
+    Returns a RPi::BMP180 object, which allows you to return the current
+    temperature in farenheit or celcius, along with the ability to retrieve
+    the barometric pressure in kPa.
 
-    See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+ dac(model => 'MCP4922')
 
- spi($channel, $speed)
+    Returns a RPi::DAC::MCP4922 object (supports all 49x2 series DACs).
+    These chips provide analog output signals from the Pi's digital output.
+    Please see the documentation of that module for further information on
+    both the configuration and use of the DAC object.
 
-    Creates a new RPi::SPI object which allows you to communicate on the
-    Serial Peripheral Interface (SPI) bus with attached devices.
+    Parameters:
 
-    See the linked documentation for full documentation on usage, or the
-    RPi::WiringPi::FAQ-Tutorial for usage examples.
+        model => 'MCP4922'
+
+    Optional, String. The model of the DAC you're using. Defaults to
+    MCP4922.
+
+        channel => 0|1
+
+    Mandatory, Bool. The SPI channel to use.
+
+        cs => Integer
+
+    Mandatory, Integer. A valid GPIO pin that the DAC's Chip Select is
+    connected to.
+
+    There are a handful of other parameters that aren't required. For
+    those, please refer to the RPi::DAC::MCP4922 documentation.
 
  dpot($cs, $channel)
 
@@ -335,6 +357,97 @@ METHODS
     The GPS distribution requires gpsd to be installed and running. All
     parameters for the GPS can be sent in here and we'll pass them along.
     Please see the link above for the full documentation on that module.
+
+ hcsr04($trig, $echo)
+
+    Returns a RPi::HCSR04 ultrasonic distance measurement sensor object,
+    allowing you to retrieve the distance from the sensor in inches,
+    centimetres or raw data.
+
+    Parameters:
+
+        $trig
+
+    The trigger pin number, in GPIO numbering scheme.
+
+        $echo
+
+    The echo pin number, in GPIO numbering scheme.
+
+ hygrometer($pin)
+
+    Returns a RPi::DHT11 temperature/humidity sensor object, allows you to
+    fetch the temperature (celcius or farenheit) as well as the current
+    humidity level.
+
+ i2c($addr, [$device])
+
+    Creates a new RPi::I2C device object which allows you to communicate
+    with the devices on an I2C bus.
+
+    See the linked documentation for full documentation on usage, or the
+    RPi::WiringPi::FAQ-Tutorial for usage examples.
+
+    Aruino note: If using I2C with an Arduino, the Pi may speak faster than
+    the Arduino can. If this is the case, try lowering the I2C bus speed on
+    the Pi:
+
+        dtparam=i2c_arm_baudrate=10000
+
+ lcd(...)
+
+    Returns a RPi::LCD object, which allows you to fully manipulate LCD
+    displays connected to your Raspberry Pi.
+
+    Please see the linked documentation for information regarding the
+    parameters required.
+
+ pin($pin_num)
+
+    Returns a RPi::Pin object, mapped to a specified GPIO pin, which you
+    can then perform operations on. See that documentation for full usage
+    details.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory, Integer: The pin number to attach to.
+
+ serial($device, $baud)
+
+    Creates a new RPi::Serial object which allows basic read/write access
+    to a serial bus.
+
+    See the linked documentation for full documentation on usage, or the
+    RPi::WiringPi::FAQ-Tutorial for usage examples.
+
+    NOTE: Bluetooth on the Pi overlays the serial pins (14, 15) on the Pi.
+    To use serial, you must disable bluetooth in the /boot/config.txt file:
+
+        dtoverlay=pi3-disable-bt-overlay
+
+ servo($pin_num)
+
+    This method configures PWM clock and divisor to operate a typical 50Hz
+    servo, and returns a special RPi::Pin object. These servos have a left
+    pulse of 50, a centre pulse of 150 and a right pulse of 250. On exit of
+    the program (or a crash), we automatically clean everything up
+    properly.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory, Integer: The pin number (technically, this *must* be 18 on
+    the Raspberry Pi 3, as that's the only hardware PWM pin.
+
+    Example:
+
+        my $servo = $pi->servo(18);
+    
+        $servo->pwm(50);  # all the way left
+        $servo->pwm(250); # all the way right
 
  shift_register($base, $num_pins, $data, $clk, $latch)
 
@@ -373,100 +486,13 @@ METHODS
     Mandatory: Integer, the GPIO pin number attached to the STCP pin (12)
     on the shift register.
 
- adc()
+ spi($channel, $speed)
 
-    There are two different ADCs that you can select from. The default is
-    the ADS1x15 series:
+    Creates a new RPi::SPI object which allows you to communicate on the
+    Serial Peripheral Interface (SPI) bus with attached devices.
 
-  ADS1115
-
-    Returns a RPi::ADC::ADS object, which allows you to read the four
-    analog input channels on an Adafruit ADS1xxx analog to digital
-    converter.
-
-    Parameters:
-
-    The default (no parameters) is almost always enough, but please do
-    review the documentation in the link above for further information, and
-    have a look at the ADC tutorial section in this distribution.
-
-  MCP3008
-
-    You can also use an RPi::ADC::MCP3008 ADC.
-
-    Parameters:
-
-        model => 'MCP3008'
-
-    Mandatory, String. The exact quoted string above.
-
-        channel => $channel
-
-    Mandatory, Integer. 0 or 1 for the Pi's onboard hardware CS/SS CE0 and
-    CE1 pins, or any GPIO number above 1 in order to use an arbitrary GPIO
-    pin for the CS pin, and we'll do the bit-banging of the SPI bus
-    automatically.
-
- dac(model => 'MCP4922')
-
-    Returns a RPi::DAC::MCP4922 object (supports all 49x2 series DACs).
-    These chips provide analog output signals from the Pi's digital output.
-    Please see the documentation of that module for further information on
-    both the configuration and use of the DAC object.
-
-    Note that if the model parameter is not sent in, we default to MCP4922.
-
- bmp()
-
-    Returns a RPi::BMP180 object, which allows you to return the current
-    temperature in farenheit or celcius, along with the ability to retrieve
-    the barometric pressure in kPa.
-
- hygrometer($pin)
-
-    Returns a RPi::DHT11 temperature/humidity sensor object, allows you to
-    fetch the temperature (celcius or farenheit) as well as the current
-    humidity level.
-
- hcsr04($trig, $echo)
-
-    Returns a RPi::HCSR04 ultrasonic distance measurement sensor object,
-    allowing you to retrieve the distance from the sensor in inches,
-    centimetres or raw data.
-
-    Parameters:
-
-        $trig
-
-    The trigger pin number, in GPIO numbering scheme.
-
-        $echo
-
-    The echo pin number, in GPIO numbering scheme.
-
- servo($pin_num)
-
-    This method configures PWM clock and divisor to operate a typical 50Hz
-    servo, and returns a special RPi::Pin object. These servos have a left
-    pulse of 50, a centre pulse of 150 and a right pulse of 250. On exit of
-    the program (or a crash), we automatically clean everything up
-    properly.
-
-    Parameters:
-
-        $pin_num
-
-    Mandatory, Integer: The pin number (technically, this *must* be 18 on
-    the Raspberry Pi 3, as that's the only hardware PWM pin.
-
-    Example:
-
-        my $servo = $pi->servo(18);
-    
-        $servo->pwm(50);  # all the way left
-        $servo->pwm(250); # all the way right
-
-INTERNAL PUBLIC METHODS
+    See the linked documentation for full documentation on usage, or the
+    RPi::WiringPi::FAQ-Tutorial for usage examples.
 
 RUNNING TESTS
 

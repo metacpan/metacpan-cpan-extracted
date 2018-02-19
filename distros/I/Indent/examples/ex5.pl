@@ -1,15 +1,13 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Utils qw(reduce_duplicit_ws);
+use Indent::Utils qw(remove_last_ws);
 
-my $input = 'a  b';
-reduce_duplicit_ws(\$input);
+my $input = 'a   ';
+remove_last_ws(\$input);
 print "$input|\n";
 
 # Output:
-# a b|
+# a|

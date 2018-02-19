@@ -130,6 +130,20 @@ t/SPDX/WTFPL.txt
 t/SPDX/Zlib.txt
 t/SPDX/curl.txt
 t/SPDX/zlib-acknowledgement.txt
+t/ScanCode-src-composites-rules.t
+t/ScanCode-src-composites-rules.todo
+t/ScanCode-src-composites.t
+t/ScanCode-src-composites.todo
+t/ScanCode-src-foreign-rules.t
+t/ScanCode-src-foreign-rules.todo
+t/ScanCode-src-foreign.t
+t/ScanCode-src-foreign.todo
+t/ScanCode-src-rules.t
+t/ScanCode-src-rules.todo
+t/ScanCode-src.t
+t/ScanCode-src.todo
+t/ScanCode-tests.t
+t/ScanCode-tests.todo
 t/Software-License.t
 t/devscripts.t
 t/devscripts/academic.h
@@ -219,4 +233,6 @@ t/grant/NTP/map.h
 t/grant/NTP/monlist.c
 t/grant/WTFPL/COPYING.WTFPL
 t/grant/misc/rpplexer.h
+t/lib/Test/Licensecheck.pm
+t/lib/Test/Licensecheck/ScanCode.pm
 t/license.t

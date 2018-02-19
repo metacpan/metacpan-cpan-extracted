@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Classes for parsing bioinformatics programs output",
+  "ABSTRACT" => "Classes for parsing bioinformatic programs output",
   "AUTHOR" => "Denis BAURAIN <denis.baurain\@uliege.be>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "Sort::Naturally" => 0,
     "Test::Most" => 0,
     "Tie::IxHash" => 0,
+    "Try::Tiny" => 0,
     "XML::Bare" => "0.53",
     "aliased" => 0,
     "autodie" => 0,
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Most" => 0
   },
-  "VERSION" => "0.180330",
+  "VERSION" => "0.180470",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,6 +61,7 @@ my %FallbackPrereqs = (
   "Sort::Naturally" => 0,
   "Test::Most" => 0,
   "Tie::IxHash" => 0,
+  "Try::Tiny" => 0,
   "XML::Bare" => "0.53",
   "aliased" => 0,
   "autodie" => 0,

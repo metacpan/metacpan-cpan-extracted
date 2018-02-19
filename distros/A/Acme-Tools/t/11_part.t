@@ -1,5 +1,5 @@
 # perl Makefile.PL;make;perl -Iblib/lib t/11_part.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 4;
 
 my( $odd, $even ) = part {$_%2} 1..8;

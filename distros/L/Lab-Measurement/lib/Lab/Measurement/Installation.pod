@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 Introduction
 
@@ -62,14 +62,18 @@ as far as possible. Full support for Lab::Measurement is  provided, e.g., by L<G
 =item * Install cpanminus, make, gcc and gnuplot
 (you can use your package manager).
 
-=item * If you want to use GPIB, you need the
+=item * Install Lab::Measurement (as root):
+
+ cpanm Lab::Measurement
+
+=item * If you use GPIB, you need the
 L<Linux-GPIB|http://linux-gpib.sourceforge.net> drivers, library
 and Perl bindings. See the short installation and configuration guide in
 L<Lab::Measurement::Backends>.
 
-=item * Install Lab::Measurement (as root):
-
- cpanm Lab::Measurement
+=item * If you use VXI-11/Lan and/or USBTMC connections you will need to
+install the L<Lab::VXI11> and L<USB::TMC> distributions. The documentation of
+these modules contains detailed installation instructions.
 
 =item * Have fun!
 
@@ -83,7 +87,7 @@ L<perlbrew|https://perlbrew.pl/>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011-2012  Andreas K. Huettel
             2016       Simon Reinhardt

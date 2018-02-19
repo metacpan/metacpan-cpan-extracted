@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::log::tail;
-$Footprintless::App::Command::log::tail::VERSION = '1.26';
+$Footprintless::App::Command::log::tail::VERSION = '1.27';
 # ABSTRACT: output the last part of a file
 # PODNAME: Footprintless::App::Command::log::tail
 
@@ -51,7 +51,7 @@ Footprintless::App::Command::log::tail - output the last part of a file
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 AUTHOR
 

@@ -24,13 +24,15 @@ name: Dist-Zilla-Plugin-Git-FilePermissions
 no_index:
   directory:
     - corpus
+    - dzil-inc
     - examples
+    - inc
     - t
     - xt
 provides:
   Dist::Zilla::Plugin::Git::FilePermissions:
     file: lib/Dist/Zilla/Plugin/Git/FilePermissions.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Dist::Zilla::Role::BeforeBuild: '0'
   Git::Wrapper: '0'
@@ -46,15 +48,14 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions/issues
   homepage: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions
   repository: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions.git
-version: '0.003'
+version: '0.004'
 x_BuiltWith:
   modules:
-    Dist::Zilla::Plugin::Git::GatherDir: '2.042'
+    Dist::Zilla::Plugin::Git::GatherDir: '2.043'
     Dist::Zilla::Role::BeforeBuild: '6.010'
     ExtUtils::MakeMaker: '7.30'
-    File::Spec: '3.63'
     Git::Wrapper: '0.047'
-    Moose: '2.2006'
+    Moose: '2.2009'
     Path::Tiny: '0.104'
     Perl::Critic: '1.130'
     Perl::Critic::Policy::Bangs::ProhibitDebuggingModules: '1.12'
@@ -64,53 +65,54 @@ x_BuiltWith:
     Perl::Critic::Policy::Bangs::ProhibitUselessRegexModifiers: '1.12'
     Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays: '0.02'
     Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr: '0.01'
-    Perl::Critic::Policy::CodeLayout::ProhibitFatCommaNewline: '95'
-    Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon: '95'
-    Perl::Critic::Policy::CodeLayout::RequireTrailingCommaAtNewline: '95'
-    Perl::Critic::Policy::Compatibility::ConstantLeadingUnderscore: '95'
-    Perl::Critic::Policy::Compatibility::ConstantPragmaHash: '95'
-    Perl::Critic::Policy::Compatibility::PerlMinimumVersionAndWhy: '95'
-    Perl::Critic::Policy::Compatibility::ProhibitUnixDevNull: '95'
-    Perl::Critic::Policy::Documentation::ProhibitAdjacentLinks: '95'
-    Perl::Critic::Policy::Documentation::ProhibitBadAproposMarkup: '95'
-    Perl::Critic::Policy::Documentation::ProhibitDuplicateHeadings: '95'
-    Perl::Critic::Policy::Documentation::ProhibitLinkToSelf: '95'
-    Perl::Critic::Policy::Documentation::ProhibitParagraphEndComma: '95'
-    Perl::Critic::Policy::Documentation::ProhibitParagraphTwoDots: '95'
-    Perl::Critic::Policy::Documentation::ProhibitUnbalancedParens: '95'
-    Perl::Critic::Policy::Documentation::ProhibitVerbatimMarkup: '95'
-    Perl::Critic::Policy::Documentation::RequireEndBeforeLastPod: '95'
-    Perl::Critic::Policy::Documentation::RequireFilenameMarkup: '95'
-    Perl::Critic::Policy::Documentation::RequireLinkedURLs: '95'
-    Perl::Critic::Policy::Freenode::AmpersandSubCalls: '0.024'
-    Perl::Critic::Policy::Freenode::ArrayAssignAref: '0.024'
-    Perl::Critic::Policy::Freenode::BarewordFilehandles: '0.024'
-    Perl::Critic::Policy::Freenode::ConditionalDeclarations: '0.024'
-    Perl::Critic::Policy::Freenode::ConditionalImplicitReturn: '0.024'
-    Perl::Critic::Policy::Freenode::DeprecatedFeatures: '0.024'
-    Perl::Critic::Policy::Freenode::DiscouragedModules: '0.024'
-    Perl::Critic::Policy::Freenode::DollarAB: '0.024'
-    Perl::Critic::Policy::Freenode::Each: '0.024'
-    Perl::Critic::Policy::Freenode::IndirectObjectNotation: '0.024'
-    Perl::Critic::Policy::Freenode::ModPerl: '0.024'
-    Perl::Critic::Policy::Freenode::OpenArgs: '0.024'
-    Perl::Critic::Policy::Freenode::OverloadOptions: '0.024'
-    Perl::Critic::Policy::Freenode::POSIXImports: '0.024'
-    Perl::Critic::Policy::Freenode::PackageMatchesFilename: '0.024'
-    Perl::Critic::Policy::Freenode::Prototypes: '0.024'
-    Perl::Critic::Policy::Freenode::StrictWarnings: '0.024'
-    Perl::Critic::Policy::Freenode::Threads: '0.024'
-    Perl::Critic::Policy::Freenode::Wantarray: '0.024'
-    Perl::Critic::Policy::Freenode::WarningsSwitch: '0.024'
-    Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment: '0.024'
+    Perl::Critic::Policy::CodeLayout::ProhibitFatCommaNewline: '96'
+    Perl::Critic::Policy::CodeLayout::RequireFinalSemicolon: '96'
+    Perl::Critic::Policy::CodeLayout::RequireTrailingCommaAtNewline: '96'
+    Perl::Critic::Policy::Compatibility::ConstantLeadingUnderscore: '96'
+    Perl::Critic::Policy::Compatibility::ConstantPragmaHash: '96'
+    Perl::Critic::Policy::Compatibility::PerlMinimumVersionAndWhy: '96'
+    Perl::Critic::Policy::Compatibility::ProhibitUnixDevNull: '96'
+    Perl::Critic::Policy::Documentation::ProhibitAdjacentLinks: '96'
+    Perl::Critic::Policy::Documentation::ProhibitBadAproposMarkup: '96'
+    Perl::Critic::Policy::Documentation::ProhibitDuplicateHeadings: '96'
+    Perl::Critic::Policy::Documentation::ProhibitLinkToSelf: '96'
+    Perl::Critic::Policy::Documentation::ProhibitParagraphEndComma: '96'
+    Perl::Critic::Policy::Documentation::ProhibitParagraphTwoDots: '96'
+    Perl::Critic::Policy::Documentation::ProhibitUnbalancedParens: '96'
+    Perl::Critic::Policy::Documentation::ProhibitVerbatimMarkup: '96'
+    Perl::Critic::Policy::Documentation::RequireEndBeforeLastPod: '96'
+    Perl::Critic::Policy::Documentation::RequireFilenameMarkup: '96'
+    Perl::Critic::Policy::Documentation::RequireLinkedURLs: '96'
+    Perl::Critic::Policy::Freenode::AmpersandSubCalls: '0.025'
+    Perl::Critic::Policy::Freenode::ArrayAssignAref: '0.025'
+    Perl::Critic::Policy::Freenode::BarewordFilehandles: '0.025'
+    Perl::Critic::Policy::Freenode::ConditionalDeclarations: '0.025'
+    Perl::Critic::Policy::Freenode::ConditionalImplicitReturn: '0.025'
+    Perl::Critic::Policy::Freenode::DeprecatedFeatures: '0.025'
+    Perl::Critic::Policy::Freenode::DiscouragedModules: '0.025'
+    Perl::Critic::Policy::Freenode::DollarAB: '0.025'
+    Perl::Critic::Policy::Freenode::Each: '0.025'
+    Perl::Critic::Policy::Freenode::IndirectObjectNotation: '0.025'
+    Perl::Critic::Policy::Freenode::ModPerl: '0.025'
+    Perl::Critic::Policy::Freenode::OpenArgs: '0.025'
+    Perl::Critic::Policy::Freenode::OverloadOptions: '0.025'
+    Perl::Critic::Policy::Freenode::POSIXImports: '0.025'
+    Perl::Critic::Policy::Freenode::PackageMatchesFilename: '0.025'
+    Perl::Critic::Policy::Freenode::Prototypes: '0.025'
+    Perl::Critic::Policy::Freenode::StrictWarnings: '0.025'
+    Perl::Critic::Policy::Freenode::Threads: '0.025'
+    Perl::Critic::Policy::Freenode::Wantarray: '0.025'
+    Perl::Critic::Policy::Freenode::WarningsSwitch: '0.025'
+    Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment: '0.025'
     Perl::Critic::Policy::HTTPCookies: '0.53'
     Perl::Critic::Policy::Lax::ProhibitComplexMappings::LinesNotStatements: '0.013'
     Perl::Critic::Policy::Modules::PerlMinimumVersion: '1.003'
-    Perl::Critic::Policy::Modules::ProhibitModuleShebang: '95'
-    Perl::Critic::Policy::Modules::ProhibitPOSIXimport: '95'
-    Perl::Critic::Policy::Modules::ProhibitUseQuotedVersion: '95'
+    Perl::Critic::Policy::Modules::ProhibitModuleShebang: '96'
+    Perl::Critic::Policy::Modules::ProhibitPOSIXimport: '96'
+    Perl::Critic::Policy::Modules::ProhibitUseQuotedVersion: '96'
+    Perl::Critic::Policy::Modules::RequireExplicitInclusion: '0.05'
     Perl::Critic::Policy::Modules::RequirePerlVersion: '1.003'
-    Perl::Critic::Policy::Moo::ProhibitMakeImmutable: '0.01'
+    Perl::Critic::Policy::Moo::ProhibitMakeImmutable: '0.02'
     Perl::Critic::Policy::Moose::ProhibitDESTROYMethod: '1.05'
     Perl::Critic::Policy::Moose::ProhibitLazyBuild: '1.05'
     Perl::Critic::Policy::Moose::ProhibitMultipleWiths: '1.05'
@@ -124,20 +126,19 @@ x_BuiltWith:
     Perl::Critic::Policy::Tics::ProhibitUseBase: '0.009'
     Perl::Critic::Policy::TryTiny::RequireBlockTermination: '0.01'
     Perl::Critic::Policy::TryTiny::RequireUse: '0.02'
-    Perl::Critic::Policy::ValuesAndExpressions::ConstantBeforeLt: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::NotWithCompare: '95'
+    Perl::Critic::Policy::ValuesAndExpressions::ConstantBeforeLt: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::NotWithCompare: '96'
     Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection: 1.4.0
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitBarewordDoubleColon: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyCommas: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitNullStatements: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::RequireNumericVersion: '95'
-    Perl::Critic::Policy::ValuesAndExpressions::UnexpandedSpecialLiteral: '95'
-    Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter: '0.100'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitBarewordDoubleColon: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyCommas: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitNullStatements: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::RequireNumericVersion: '96'
+    Perl::Critic::Policy::ValuesAndExpressions::UnexpandedSpecialLiteral: '96'
+    Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter: '0.102'
     Perl::Critic::Policy::Variables::ProhibitUselessInitialization: '0.02'
-    Perl::Critic::Utils: '1.130'
     Pod::Wordlist: '1.20'
     Safe::Isa: '1.000008'
     Test::CPAN::Changes: '0.400002'
@@ -148,19 +149,19 @@ x_BuiltWith:
     Test::DistManifest: '1.014'
     Test::EOL: '2.00'
     Test::Fatal: '0.014'
-    Test::Kwalitee: '1.26'
+    Test::Kwalitee: '1.27'
     Test::MinimumVersion: '0.101082'
     Test::Mojibake: '1.3'
-    Test::More: '1.302105'
+    Test::More: '1.302122'
     Test::NoTabs: '2.00'
     Test::Perl::Critic: '1.03'
     Test::Pod: '1.51'
     Test::Pod::No404s: '0.02'
-    Test::Portability::Files: '0.07'
+    Test::Portability::Files: '0.09'
     Test::Spelling: '0.20'
     Test::TempDir::Tiny: '0.016'
     Test::Version: '2.05'
-    Try::Tiny: '0.28'
+    Try::Tiny: '0.30'
     autodie: '2.29'
     lib: '0.63'
     namespace::autoclean: '0.28'
@@ -195,17 +196,25 @@ x_Dist_Zilla:
       name: Bootstrap::lib
       version: '1.001002'
     -
+      class: Dist::Zilla::Plugin::lib
+      config:
+        Dist::Zilla::Plugin::lib:
+          lib:
+            - dzil-inc/lib
+      name: lib
+      version: '0.001002'
+    -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
         Dist::Zilla::Plugin::PromptIfStale:
           check_all_plugins: '0'
           check_all_prereqs: '0'
           modules:
-            - Dist::Zilla::PluginBundle::Author::SKIRMESS
+            - MyBundle
           phase: build
           run_under_travis: '0'
           skip: []
-      name: '@Author::SKIRMESS/stale modules, build'
+      name: '=MyBundle/stale modules, build'
       version: '0.054'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
@@ -217,7 +226,7 @@ x_Dist_Zilla:
           phase: release
           run_under_travis: '0'
           skip: []
-      name: '@Author::SKIRMESS/stale modules, release'
+      name: '=MyBundle/stale modules, release'
       version: '0.054'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
@@ -228,8 +237,8 @@ x_Dist_Zilla:
           include_releaser: '1'
           order_by: name
           paths: []
-      name: '@Author::SKIRMESS/Git::Contributors'
-      version: '0.030'
+      name: =MyBundle/Git::Contributors
+      version: '0.032'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -251,35 +260,35 @@ x_Dist_Zilla:
           root: .
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: '0'
-      name: '@Author::SKIRMESS/Git::GatherDir'
-      version: '2.042'
+      name: =MyBundle/Git::GatherDir
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
-      name: '@Author::SKIRMESS/VersionFromMainModule'
+      name: =MyBundle/VersionFromMainModule
       version: '0.03'
     -
       class: Dist::Zilla::Plugin::ReversionOnRelease
-      name: '@Author::SKIRMESS/ReversionOnRelease'
+      name: =MyBundle/ReversionOnRelease
       version: '0.06'
     -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
-      name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
-      version: '0.030'
+      class: MyRepositoryBase
+      name: =MyBundle/=MyRepositoryBase
+      version: '0.033'
     -
-      class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
-      name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
-      version: '0.030'
+      class: MyInsertVersion
+      name: =MyBundle/=MyInsertVersion
+      version: '0.033'
     -
       class: Dist::Zilla::Plugin::Git::FilePermissions
-      name: '@Author::SKIRMESS/Git::FilePermissions'
-      version: '0.002'
+      name: =MyBundle/Git::FilePermissions
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::Git::RequireUnixEOL
-      name: '@Author::SKIRMESS/Git::RequireUnixEOL'
-      version: '0.001'
+      name: =MyBundle/Git::RequireUnixEOL
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::NextRelease
-      name: '@Author::SKIRMESS/NextRelease'
+      name: =MyBundle/NextRelease
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::Git::Check
@@ -289,7 +298,6 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - .appveyor.yml
-            - .perlcriticrc
             - .perltidyrc
             - .travis.yml
             - Changes
@@ -301,10 +309,13 @@ x_Dist_Zilla:
             - dist.ini
             - t/00-load.t
             - xt/author/clean-namespaces.t
-            - xt/author/critic.t
             - xt/author/minimum_version.t
             - xt/author/mojibake.t
             - xt/author/no-tabs.t
+            - xt/author/perlcritic-code.t
+            - xt/author/perlcritic-tests.t
+            - xt/author/perlcriticrc-code
+            - xt/author/perlcriticrc-tests
             - xt/author/pod-no404s.t
             - xt/author/pod-spell.t
             - xt/author/pod-syntax.t
@@ -322,54 +333,58 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
-      name: '@Author::SKIRMESS/Git::Check'
-      version: '2.042'
+      name: =MyBundle/Git::Check
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
-      name: '@Author::SKIRMESS/Git::Remote::Check'
+      name: =MyBundle/Git::Remote::Check
       version: 0.1.2
     -
       class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Author::SKIRMESS/PruneCruft'
+      name: =MyBundle/PruneCruft
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Author::SKIRMESS/ManifestSkip'
+      name: =MyBundle/ManifestSkip
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
-      name: '@Author::SKIRMESS/AutoPrereqs'
+      name: =MyBundle/AutoPrereqs
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
-      name: '@Author::SKIRMESS/AutoPrereqs::Perl::Critic'
-      version: '0.004'
+      name: '=MyBundle/AutoPrereqs::Perl::Critic / code'
+      version: '0.005'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
+      name: '=MyBundle/AutoPrereqs::Perl::Critic / tests'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
-      name: '@Author::SKIRMESS/SetScriptShebang'
+      name: =MyBundle/SetScriptShebang
       version: '0.01'
     -
       class: Dist::Zilla::Plugin::Authority
-      name: '@Author::SKIRMESS/Authority'
+      name: =MyBundle/Authority
       version: '1.009'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
-      name: '@Author::SKIRMESS/MinimumPerl'
+      name: =MyBundle/MinimumPerl
       version: '1.006'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
-      name: '@Author::SKIRMESS/MetaNoIndex'
+      name: =MyBundle/MetaNoIndex
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::GithubMeta
-      name: '@Author::SKIRMESS/GithubMeta'
+      name: =MyBundle/GithubMeta
       version: '0.54'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
-      name: '@Author::SKIRMESS/ReadmeAnyFromPod'
+      name: =MyBundle/ReadmeAnyFromPod
       version: '0.163250'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
@@ -378,7 +393,7 @@ x_Dist_Zilla:
           finder_objects:
             -
               class: Dist::Zilla::Plugin::FinderCode
-              name: '@Author::SKIRMESS/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              name: =MyBundle/MetaProvides::Package/AUTOVIV/:InstallModulesPM
               version: '6.010'
           include_underscores: '0'
         Dist::Zilla::Role::MetaProvider::Provider:
@@ -389,7 +404,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000031'
           version: '0.004'
-      name: '@Author::SKIRMESS/MetaProvides::Package'
+      name: =MyBundle/MetaProvides::Package
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
@@ -411,11 +426,11 @@ x_Dist_Zilla:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000031'
           version: '0.004'
-      name: '@Author::SKIRMESS/MetaProvides::Package/ExecFiles'
+      name: =MyBundle/MetaProvides::Package/ExecFiles
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Author::SKIRMESS/MetaConfig'
+      name: =MyBundle/MetaConfig
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaData::BuiltWith
@@ -431,61 +446,57 @@ x_Dist_Zilla:
               - -a
             uname_call: uname
           use_external_file: ~
-      name: '@Author::SKIRMESS/MetaData::BuiltWith'
+      name: =MyBundle/MetaData::BuiltWith
       version: '1.004005'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Author::SKIRMESS/MetaYAML'
+      name: =MyBundle/MetaYAML
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MetaJSON
-      name: '@Author::SKIRMESS/MetaJSON'
+      name: =MyBundle/MetaJSON
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::CPANFile
-      name: '@Author::SKIRMESS/CPANFile'
+      name: =MyBundle/CPANFile
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
           version: '0.006'
-      name: '@Author::SKIRMESS/ReadmeAnyFromPod/ReadmeTextInBuild'
+      name: =MyBundle/ReadmeAnyFromPod/ReadmeTextInBuild
       version: '0.163250'
     -
-      class: Dist::Zilla::Plugin::CopyrightYearFromGit
-      name: '@Author::SKIRMESS/CopyrightYearFromGit'
-      version: '0.003'
-    -
       class: Dist::Zilla::Plugin::License
-      name: '@Author::SKIRMESS/License'
+      name: =MyBundle/License
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::InstallGuide
-      name: '@Author::SKIRMESS/InstallGuide'
+      name: =MyBundle/InstallGuide
       version: '1.200007'
     -
       class: Dist::Zilla::Plugin::ExecDir
-      name: '@Author::SKIRMESS/ExecDir'
+      name: =MyBundle/ExecDir
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::ShareDir
-      name: '@Author::SKIRMESS/ShareDir'
+      name: =MyBundle/ShareDir
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: '1'
-      name: '@Author::SKIRMESS/MakeMaker'
+      name: =MyBundle/MakeMaker
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@Author::SKIRMESS/Manifest'
+      name: =MyBundle/Manifest
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
-      name: '@Author::SKIRMESS/CopyFilesFromBuild'
+      name: =MyBundle/CopyFilesFromBuild
       version: '0.170880'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
@@ -493,7 +504,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
-      name: '@Author::SKIRMESS/Git::CheckFor::CorrectBranch'
+      name: =MyBundle/Git::CheckFor::CorrectBranch
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
@@ -501,20 +512,20 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
-      name: '@Author::SKIRMESS/Git::CheckFor::MergeConflicts'
+      name: =MyBundle/Git::CheckFor::MergeConflicts
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
-      name: '@Author::SKIRMESS/CheckMetaResources'
+      name: =MyBundle/CheckMetaResources
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
-      name: '@Author::SKIRMESS/CheckPrereqsIndexed'
+      name: =MyBundle/CheckPrereqsIndexed
       version: '0.020'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
-      name: '@Author::SKIRMESS/CheckChangesHasContent'
-      version: '0.010'
+      name: =MyBundle/CheckChangesHasContent
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
       config:
@@ -524,34 +535,34 @@ x_Dist_Zilla:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000031'
           version: '0.004'
-      name: '@Author::SKIRMESS/CheckSelfDependency'
+      name: =MyBundle/CheckSelfDependency
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
-      name: '@Author::SKIRMESS/CheckStrictVersion'
+      name: =MyBundle/CheckStrictVersion
       version: '0.001'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: '1'
-      name: '@Author::SKIRMESS/RunExtraTests'
+      name: =MyBundle/RunExtraTests
       version: '0.029'
     -
       class: Dist::Zilla::Plugin::TestRelease
-      name: '@Author::SKIRMESS/TestRelease'
+      name: =MyBundle/TestRelease
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::CheckIssues
-      name: '@Author::SKIRMESS/CheckIssues'
+      name: =MyBundle/CheckIssues
       version: '0.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::SKIRMESS/ConfirmRelease'
+      name: =MyBundle/ConfirmRelease
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Author::SKIRMESS/UploadToCPAN'
+      name: =MyBundle/UploadToCPAN
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
@@ -561,7 +572,7 @@ x_Dist_Zilla:
           match:
             - \.pm$
             - ^bin/
-      name: '@Author::SKIRMESS/CopyFilesFromRelease'
+      name: =MyBundle/CopyFilesFromRelease
       version: '0.006'
     -
       class: Dist::Zilla::Plugin::Git::Commit
@@ -572,7 +583,6 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - .appveyor.yml
-            - .perlcriticrc
             - .perltidyrc
             - .travis.yml
             - Changes
@@ -586,10 +596,13 @@ x_Dist_Zilla:
             - dist.ini
             - t/00-load.t
             - xt/author/clean-namespaces.t
-            - xt/author/critic.t
             - xt/author/minimum_version.t
             - xt/author/mojibake.t
             - xt/author/no-tabs.t
+            - xt/author/perlcritic-code.t
+            - xt/author/perlcritic-tests.t
+            - xt/author/perlcriticrc-code
+            - xt/author/perlcriticrc-tests
             - xt/author/pod-no404s.t
             - xt/author/pod-spell.t
             - xt/author/pod-syntax.t
@@ -611,8 +624,8 @@ x_Dist_Zilla:
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::SKIRMESS/Git::Commit'
-      version: '2.042'
+      name: =MyBundle/Git::Commit
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -620,7 +633,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
@@ -628,8 +641,8 @@ x_Dist_Zilla:
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
-      name: '@Author::SKIRMESS/Git::Tag'
-      version: '2.042'
+      name: =MyBundle/Git::Tag
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -640,8 +653,8 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.11.0
           repo_root: .
-      name: '@Author::SKIRMESS/Git::Push'
-      version: '2.042'
+      name: =MyBundle/Git::Push
+      version: '2.043'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -692,11 +705,11 @@ x_Dist_Zilla:
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::VerifyPhases
-      name: '@Author::SKIRMESS/VerifyPhases'
+      name: =MyBundle/VerifyPhases
       version: '0.016'
     -
       class: Dist::Zilla::Plugin::FinderCode
-      name: '@Author::SKIRMESS/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      name: =MyBundle/MetaProvides::Package/AUTOVIV/:InstallModulesPM
       version: '6.010'
   zilla:
     class: Dist::Zilla::Dist::Builder

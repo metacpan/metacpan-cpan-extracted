@@ -4,7 +4,7 @@ package App::GroupSecret::Crypt;
 use warnings;
 use strict;
 
-our $VERSION = '0.302'; # VERSION
+our $VERSION = '0.304'; # VERSION
 
 use Exporter qw(import);
 use File::Temp;
@@ -254,7 +254,7 @@ App::GroupSecret::Crypt - Collection of crypto-related subroutines
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 FUNCTIONS
 

@@ -19,6 +19,7 @@ do { my $x = {
                       'requires' => {
                                       'App::Cmd' => '0.330',
                                       'Config::Entities' => '1.07',
+                                      'Getopt::Long::Descriptive' => '0',
                                       'IPC::Run' => '0.94',
                                       'IPC::Run3' => '0.048',
                                       'JSON' => '2.90',

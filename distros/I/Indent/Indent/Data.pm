@@ -1,10 +1,8 @@
 package Indent::Data;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Indent::Utils qw(line_size_check string_len);
@@ -14,8 +12,7 @@ use Readonly;
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -158,11 +155,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Data;
 
  # Indent::Data object.
@@ -183,11 +178,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Data;
 
  # Indent::Data object.
@@ -210,11 +203,9 @@ __END__
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Data;
 
  # Indent::Data object.
@@ -239,11 +230,29 @@ L<Readonly>.
 
 =head1 SEE ALSO
 
-L<Indent>,
-L<Indent::Block>,
-L<Indent::Comment>,
-L<Indent::Utils>,
-L<Indent::Word>.
+=over
+
+=item L<Indent>
+
+Class for indent handling.
+
+=item L<Indent::Block>
+
+Class for block indenting.
+
+=item L<Indent::String>
+
+Class for text indenting.
+
+=item L<Indent::Utils>
+
+Utilities for Indent classes.
+
+=item L<Indent::Word>
+
+Class for word indenting.
+
+=back
 
 =head1 REPOSITORY
 
@@ -251,17 +260,18 @@ L<https://github.com/tupinek/Indent>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2005-2018 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut
 

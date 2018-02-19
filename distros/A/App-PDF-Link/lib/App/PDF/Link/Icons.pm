@@ -22,6 +22,8 @@ sub _load_icon_images {
     my %idef =
       ( mscz	    => 'builtin:MuseScore',
 	html	    => 'builtin:iRealPro',
+	sib	    => 'builtin:Sibelius',
+	xml	    => 'builtin:XML',
       );
 
     if ( $env->{all} ) {

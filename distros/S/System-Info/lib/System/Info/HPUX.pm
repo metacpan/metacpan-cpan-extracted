@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::Base";
 
-our $VERSION = "0.050";
+our $VERSION = "0.051";
 
 =head1 NAME
 
@@ -112,6 +112,9 @@ sub _prepare_cpu_type {
 	$machinfo =~ m/Clock\s+speed\s+=\s+(.*)/ and
 	    $self->{__cpu} .= "/$1";
 	}
+
+    (my $v = $self->{__osvers}) =~ s/^[A-Z]+\.//;
+    $self->{__distro} = "HP-UX $v";
     } # _prepare_cpu_type
 
 1;
@@ -120,7 +123,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2017, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2018, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Merijn Brand, Campo
 Weijerman, Alan Burlison, Allen Smith, Alain Barbet, Dominic Dunlop,

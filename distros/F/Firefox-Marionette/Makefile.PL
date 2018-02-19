@@ -106,9 +106,12 @@ WriteMakefile(
       : ()),
     PL_FILES       => {},
     BUILD_REQUIRES => {
-        'Cwd'          => 0,
-        'Test::More'   => 0,
-        'Digest::SHA'  => 0,
+        'Cwd'            => 0,
+        'Test::More'     => 0,
+        'Digest::SHA'    => 0,
+        'HTTP::Daemon'   => 0,
+        'HTTP::Status'   => 0,
+        'HTTP::Response' => 0,
     },
     PREREQ_PM => {
 	'Config::INI::Reader' => 0,

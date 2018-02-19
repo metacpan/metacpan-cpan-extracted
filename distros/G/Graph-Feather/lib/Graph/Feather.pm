@@ -2,8 +2,9 @@ package Graph::Feather;
 use strict;
 use warnings;
 use DBI;
+use DBD::SQLite;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 sub new {
   my ($class, %options) = @_;
@@ -27,8 +28,8 @@ sub new {
     -- Pragmata
     -----------------------------------------------------------------
 
-    PRAGMA foreign_keys=ON;
-    PRAGMA synchronous=OFF;
+    PRAGMA foreign_keys = ON;
+    PRAGMA synchronous  = OFF;
     PRAGMA journal_mode = OFF;
     PRAGMA locking_mode = EXCLUSIVE;
 
@@ -37,36 +38,28 @@ sub new {
     -----------------------------------------------------------------
 
     CREATE TABLE Graph_Attribute(
-      attribute_name NOT NULL,
-      attribute_value NOT NULL
+      attribute_name UNIQUE NOT NULL,
+      attribute_value
     );
-
-    CREATE UNIQUE INDEX idx_Graph_Attribute_name_unique
-      ON Graph_Attribute (attribute_name);
 
     -----------------------------------------------------------------
     -- Vertices
     -----------------------------------------------------------------
 
     CREATE TABLE Vertex(
-      vertex_name NOT NULL
+      vertex_name UNIQUE NOT NULL
     );
-
-    CREATE UNIQUE INDEX idx_Vertex_name_unique
-      ON Vertex (vertex_name);
 
     CREATE TABLE Vertex_Attribute(
       vertex NOT NULL,
       attribute_name NOT NULL,
-      attribute_value NOT NULL,
+      attribute_value,
+      UNIQUE(vertex, attribute_name),
       FOREIGN KEY (vertex)
         REFERENCES Vertex(vertex_name)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
     );
-
-    CREATE UNIQUE INDEX idx_Vertex_Attribute_vertex_name_unique
-      ON Vertex_Attribute (vertex, attribute_name);
 
     -----------------------------------------------------------------
     -- Edges
@@ -75,6 +68,7 @@ sub new {
     CREATE TABLE Edge(
       src NOT NULL,
       dst NOT NULL,
+      UNIQUE(src, dst),
       FOREIGN KEY (src)
         REFERENCES Vertex(vertex_name)
         ON DELETE CASCADE
@@ -85,11 +79,9 @@ sub new {
         ON UPDATE NO ACTION
     );
 
-    CREATE UNIQUE INDEX idx_Edge_src_dst_unique
-      ON Edge (src, dst);
-
-    CREATE INDEX idx_Edge_src
-      ON Edge (src);
+    -- Can use covering index instead
+    -- CREATE INDEX idx_Edge_src
+    --   ON Edge (src);
 
     CREATE INDEX idx_Edge_dst
       ON Edge (dst);
@@ -98,37 +90,13 @@ sub new {
       src NOT NULL,
       dst NOT NULL,
       attribute_name NOT NULL,
-      attribute_value NOT NULL,
-      FOREIGN KEY (src,dst)
-        REFERENCES Edge(src,dst)
+      attribute_value,
+      UNIQUE(src, dst, attribute_name),
+      FOREIGN KEY (src, dst)
+        REFERENCES Edge(src, dst)
         ON DELETE CASCADE
         ON UPDATE NO ACTION
     );
-
-    CREATE UNIQUE INDEX idx_Edge_Attribute_edge_name_unique
-      ON Edge_Attribute (src, dst, attribute_name);
-
-    -----------------------------------------------------------------
-    -- Triggers to synchronise attribute values in Perl land
-    -----------------------------------------------------------------
-
-    CREATE TRIGGER trigger_Vertex_Attribute_delete
-      AFTER DELETE ON Vertex_Attribute
-      BEGIN
-        SELECT _delete_vertex_av(OLD.rowid);
-      END;
-
-    CREATE TRIGGER trigger_Edge_Attribute_delete
-      AFTER DELETE ON Edge_Attribute
-      BEGIN
-        SELECT _delete_edge_av(OLD.rowid);
-      END;
-
-    CREATE TRIGGER trigger_Graph_Attribute_delete
-      AFTER DELETE ON Graph_Attribute
-      BEGIN
-        SELECT _delete_graph_av(OLD.rowid);
-      END;
 
     -----------------------------------------------------------------
     -- Triggers that add vertices and edges when needed elsewhere
@@ -165,18 +133,11 @@ sub new {
   });
 
   ###################################################################
-  # Register trigger functions to synchronise attribute Perl objects
+  # Register hook to synchronise attribute Perl objects
 
-  $self->{dbh}->sqlite_create_function( '_delete_vertex_av', 1, sub {
-    delete $self->{vertex_attribute}{ $_[0] };
-  });
-
-  $self->{dbh}->sqlite_create_function( '_delete_edge_av', 1, sub {
-    delete $self->{edge_attribute}{ $_[0] };
-  });
-
-  $self->{dbh}->sqlite_create_function( '_delete_graph_av', 1, sub {
-    delete $self->{graph_attribute}{ $_[0] };
+  $self->{dbh}->sqlite_update_hook(sub {
+    return unless $_[0] == 9; # DBD::SQLite::DELETE
+    delete $self->{ $_[2] }{ $_[3] };
   });
 
   ###################################################################
@@ -190,6 +151,23 @@ sub new {
 
   return $self;
 };
+
+#####################################################################
+# DB helpers
+#####################################################################
+
+sub _prepare {
+  my ($self, $statement, $attr, @other) = @_;
+
+  # TODO(bh): As of 2018-02 effect/purpose of %attr seems
+  # undefined in DBI documentation. So we fail on them here.
+  if ($attr or @other) {
+    ...
+  }
+
+  $self->{cache}{$statement} //= $self->{dbh}->prepare($statement);
+  return $self->{cache}{$statement};
+}
 
 #####################################################################
 # Basics
@@ -208,33 +186,25 @@ sub add_edge {
 sub has_vertex {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT 1 FROM Vertex WHERE vertex_name = ?
   });
 
-  $sth->execute($v);
+  my ($result) = $self->{dbh}->selectrow_array($sth, {}, $v);
 
-  my $result = !! $sth->fetchrow_arrayref();
-
-  $sth->finish();
-
-  return $result;
+  return !!$result;
 }
 
 sub has_edge {
   my ($self, $src, $dst) = @_;
   
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT 1 FROM Edge WHERE src = ? AND dst = ?
   });
 
-  $sth->execute($src, $dst);
+  my ($result) = $self->{dbh}->selectrow_array($sth, {}, $src, $dst);
 
-  my $result = !! $sth->fetchrow_arrayref();
-
-  $sth->finish();
-
-  return $result;
+  return !!$result;
 }
 
 sub delete_vertex {
@@ -248,12 +218,13 @@ sub delete_vertices {
   
 #  delete_vertex_attributes($self, $_) for @vertices;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE FROM Vertex WHERE vertex_name = ?
   });
 
   $self->{dbh}->begin_work();
   $sth->execute($_) for @vertices;
+  $sth->finish();
   $self->{dbh}->commit();
 }
 
@@ -267,12 +238,13 @@ sub delete_edges {
   
   delete_edge_attributes($self, @$_) for @edges;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE FROM Edge WHERE src = ? AND dst = ?
   });
 
   $self->{dbh}->begin_work();
   $sth->execute(@$_) for @edges;
+  $sth->finish();
   $self->{dbh}->commit();
 }
 
@@ -283,24 +255,26 @@ sub delete_edges {
 sub add_vertices {
   my ($self, @vertices) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     INSERT OR IGNORE INTO Vertex(vertex_name) VALUES (?)
   });
 
   $self->{dbh}->begin_work();
   $sth->execute($_) for @vertices;
+  $sth->finish();
   $self->{dbh}->commit;
 }
 
 sub add_edges { 
   my ($self, @edges) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     INSERT OR IGNORE INTO Edge(src, dst) VALUES (?, ?)
   });
 
   $self->{dbh}->begin_work();
   $sth->execute(@$_) for @edges;
+  $sth->finish();
   $self->{dbh}->commit();
 }
 
@@ -311,35 +285,37 @@ sub add_edges {
 sub vertices {
   my ($self) = @_;
 
-  return map { @$_ } $self->{dbh}->selectall_array(q{
-    SELECT vertex_name FROM Vertex;
+  my $sth = $self->_prepare(q{
+    SELECT vertex_name FROM Vertex
   });
+
+  return map { @$_ } $self->{dbh}->selectall_array($sth);
 }
 
 sub edges {
   my ($self) = @_;
 
-  return $self->{dbh}->selectall_array(q{
-    SELECT src, dst FROM Edge;
+  my $sth = $self->_prepare(q{
+    SELECT src, dst FROM Edge
   });
+
+  return $self->{dbh}->selectall_array($sth);
 }
 
 sub successors {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT dst FROM Edge WHERE src = ?
   });
 
-  $sth->execute($v);
-
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub all_successors {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     WITH RECURSIVE all_successors(v) AS (
       SELECT dst FROM Edge WHERE src = ?
       
@@ -353,39 +329,37 @@ sub all_successors {
     SELECT v FROM all_successors
   });
 
-  $sth->execute($v);
-
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub successorless_vertices {
   my ($self) = @_;
 
-  return map { @$_ } $self->{dbh}->selectall_array(q{
+  my $sth = $self->_prepare(q{
     SELECT vertex_name
     FROM Vertex
       LEFT JOIN Edge
         ON (Vertex.vertex_name = Edge.src)
     WHERE Edge.dst IS NULL
   });
+
+  return map { @$_ } $self->{dbh}->selectall_array($sth);
 }
 
 sub predecessors {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT src FROM Edge WHERE dst = ?
   });
 
-  $sth->execute($v);
-
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub all_predecessors {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     WITH RECURSIVE all_predecessors(v) AS (
       SELECT src FROM Edge WHERE dst = ?
       
@@ -399,21 +373,21 @@ sub all_predecessors {
     SELECT v FROM all_predecessors
   });
 
-  $sth->execute($v);
-
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub predecessorless_vertices {
   my ($self) = @_;
 
-  return map { @$_ } $self->{dbh}->selectall_array(q{
+  my $sth = $self->_prepare(q{
     SELECT vertex_name
     FROM Vertex
       LEFT JOIN Edge
         ON (Vertex.vertex_name = Edge.dst)
     WHERE Edge.src IS NULL
   });
+
+  return map { @$_ } $self->{dbh}->selectall_array($sth);
 }
 
 #####################################################################
@@ -433,21 +407,25 @@ sub edges_at {
 sub edges_to {
   my ($self, $v) = @_;
 
-  return $self->{dbh}->selectall_array(q{
+  my $sth = $self->_prepare(q{
     SELECT src, dst
     FROM Edge
     WHERE dst = ?
-  }, {}, $v);
+  });
+
+  return $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub edges_from {
   my ($self, $v) = @_;
 
-  return $self->{dbh}->selectall_array(q{
+  my $sth = $self->_prepare(q{
     SELECT src, dst
     FROM Edge
     WHERE src = ?
-  }, {}, $v);
+  });
+
+  return $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 #####################################################################
@@ -463,7 +441,7 @@ sub set_vertex_attribute {
 
   delete_vertex_attribute($self, $v, $name);
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     INSERT INTO Vertex_Attribute(
       vertex, attribute_name, attribute_value
     )
@@ -474,25 +452,23 @@ sub set_vertex_attribute {
 
   my $id = $self->{dbh}->sqlite_last_insert_rowid();
 
-  $self->{vertex_attribute}{ $id } = $value;
+  $sth->finish();
+
+  $self->{Vertex_Attribute}{ $id } = $value;
 }
 
 sub _get_vertex_attribute_value_id {
   my ($self, $v, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT rowid
     FROM Vertex_Attribute
     WHERE vertex = ?
       AND attribute_name = ?
   });
 
-  $sth->execute($v, $name);
+  my ($rowid) = $self->{dbh}->selectrow_array($sth, {}, $v, $name);
 
-  my ($rowid) = $sth->fetchrow_array();
-
-  $sth->finish();
-  
   return $rowid;
 }
 
@@ -501,7 +477,7 @@ sub get_vertex_attribute {
 
   my $rowid = _get_vertex_attribute_value_id($self, $v, $name);
   return unless defined $rowid;
-  return $self->{vertex_attribute}{ $rowid };
+  return $self->{Vertex_Attribute}{ $rowid };
 }
 
 sub has_vertex_attribute {
@@ -513,7 +489,7 @@ sub has_vertex_attribute {
 sub delete_vertex_attribute {
   my ($self, $v, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Vertex_Attribute
     WHERE vertex = ?
@@ -521,26 +497,25 @@ sub delete_vertex_attribute {
   });
 
   $sth->execute($v, $name);
+  $sth->finish();
 }
 
 sub get_vertex_attribute_names {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT attribute_name
     FROM Vertex_Attribute
     WHERE vertex = ?
   });
 
-  $sth->execute($v);
-
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth, {}, $v);
 }
 
 sub delete_vertex_attributes {
   my ($self, $v) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Vertex_Attribute
     WHERE vertex = ?
@@ -559,7 +534,7 @@ sub set_edge_attribute {
 
   delete_edge_attribute($self, $src, $dst, $name);
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     INSERT INTO Edge_Attribute(
       src, dst, attribute_name, attribute_value
     )
@@ -570,13 +545,15 @@ sub set_edge_attribute {
 
   my $id = $self->{dbh}->sqlite_last_insert_rowid();
 
-  $self->{edge_attribute}{ $id } = $value;
+  $sth->finish();
+
+  $self->{Edge_Attribute}{ $id } = $value;
 }
 
 sub _get_edge_attribute_value_id {
   my ($self, $src, $dst, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT rowid
     FROM Edge_Attribute
     WHERE src = ?
@@ -584,12 +561,9 @@ sub _get_edge_attribute_value_id {
       AND attribute_name = ?
   });
 
-  $sth->execute($src, $dst, $name);
+  my ($rowid) = $self->{dbh}->selectrow_array($sth,
+    {}, $src, $dst, $name);
 
-  my ($rowid) = $sth->fetchrow_array();
-
-  $sth->finish();
-  
   return $rowid;
 }
 
@@ -598,7 +572,7 @@ sub get_edge_attribute {
 
   my $rowid = _get_edge_attribute_value_id($self, $src, $dst, $name);
   return unless defined $rowid;
-  return $self->{edge_attribute}{ $rowid };
+  return $self->{Edge_Attribute}{ $rowid };
 }
 
 sub has_edge_attribute {
@@ -610,7 +584,7 @@ sub has_edge_attribute {
 sub delete_edge_attribute {
   my ($self, $src, $dst, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Edge_Attribute
     WHERE src = ?
@@ -625,21 +599,21 @@ sub delete_edge_attribute {
 sub get_edge_attribute_names {
   my ($self, $src, $dst) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT attribute_name
     FROM Edge_Attribute
     WHERE src = ?
       AND dst = ?
   });
 
-  $sth->execute($src, $dst);
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth,
+    {}, $src, $dst);
 }
 
 sub delete_edge_attributes {
   my ($self, $src, $dst) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Edge_Attribute
     WHERE src = ?
@@ -647,6 +621,7 @@ sub delete_edge_attributes {
   });
 
   $sth->execute($src, $dst);
+  $sth->finish();
 }
 
 #####################################################################
@@ -658,7 +633,7 @@ sub set_graph_attribute {
 
   delete_graph_attribute($self, $name);
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     INSERT INTO Graph_Attribute(
       attribute_name, attribute_value
     )
@@ -669,24 +644,22 @@ sub set_graph_attribute {
 
   my $id = $self->{dbh}->sqlite_last_insert_rowid();
 
-  $self->{graph_attribute}{ $id } = $value;
+  $sth->finish();
+
+  $self->{Graph_Attribute}{ $id } = $value;
 }
 
 sub _get_graph_attribute_value_id {
   my ($self, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT rowid
     FROM Graph_Attribute
     WHERE attribute_name = ?
   });
 
-  $sth->execute($name);
+  my ($rowid) = $self->{dbh}->selectrow_array($sth, {}, $name);
 
-  my ($rowid) = $sth->fetchrow_array();
-
-  $sth->finish();
-  
   return $rowid;
 }
 
@@ -695,7 +668,7 @@ sub get_graph_attribute {
 
   my $rowid = _get_graph_attribute_value_id($self, $name);
   return unless defined $rowid;
-  return $self->{graph_attribute}{ $rowid };
+  return $self->{Graph_Attribute}{ $rowid };
 }
 
 sub has_graph_attribute {
@@ -707,36 +680,37 @@ sub has_graph_attribute {
 sub delete_graph_attribute {
   my ($self, $name) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Graph_Attribute
     WHERE attribute_name = ?
   });
 
   $sth->execute($name);
+  $sth->finish();
 }
 
 sub get_graph_attribute_names {
   my ($self) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     SELECT attribute_name
     FROM Graph_Attribute
   });
 
-  $sth->execute();
-  return map { @$_ } @{ $sth->fetchall_arrayref() };
+  return map { @$_ } $self->{dbh}->selectall_array($sth);
 }
 
 sub delete_graph_attributes {
   my ($self) = @_;
 
-  my $sth = $self->{dbh}->prepare_cached(q{
+  my $sth = $self->_prepare(q{
     DELETE
     FROM Graph_Attribute
   });
 
   $sth->execute();
+  $sth->finish();
 }
 
 #####################################################################
@@ -935,7 +909,7 @@ to the target graph, overwriting any existing attributes.
 =item feather_import_from($compatible_graph)
 
 Adds vertices, edges, their attributes, and any graph attributes
-from the other graphs, overwriting any existing attributes.
+from the other graph, overwriting any existing attributes.
 
 =back
 

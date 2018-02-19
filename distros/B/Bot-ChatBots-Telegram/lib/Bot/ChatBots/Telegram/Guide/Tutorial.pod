@@ -1,0 +1,801 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::Guide::Tutorial - Tutorial Guide
+
+=head1 INTRODUCTION
+
+L<Telegram|https://www.telegram.org> is a messaging application that is
+more or less in the same market space of
+L<WhatsApp|https://www.whatsapp.com>. Differently from WhatsApp, though,
+Telegram allows for easily creating bots which you can interact with.
+
+L<Bot::ChatBots::Telegram> is a specialization of L<Bot::ChatBots> for
+bots meant to connect to Telegram.
+
+In this guide, we will take a first look to using this module, following
+this sequence:
+
+=over
+
+=item *
+
+registering your bot in Telegram, which ends up getting a I<token>
+
+=item *
+
+set up a simple bot that repeatedly calls the Telegram API for getting new
+activities in the participating chats. We'll make it respond to a couple
+of stimula to warm up a bit;
+
+=item *
+
+take a look at how your bot can be proactive instead of only responding to
+stimula coming from the chats;
+
+=item *
+
+evolve the bot as a web-service that is notified by Telegram of new
+activities, without the need for active I<polling>.
+
+=back
+
+
+=head1 TOKEN
+
+You cannot create a bot without a Telegram account, so you have to create
+one. You will be able to figure out how, no doubts!
+
+After this, you can create many bots for many different purposes. Each of
+them has an associated I<token>, which is a code that identifies your bot
+in the API calls, as well as being used as an authentication code (sort of
+mixing a username and a password in a single string).
+
+How do you get a token for a new bot, then? Simply put, now that you are
+registered you can chat with L<BotFather|https://telegram.me/botfather>,
+which (not surprisingly) is I<another> bot that will guide you through the
+bot registration process. During this, you will also have to assign
+a I<name> to your bot, so that you will be later able to chat with it from
+a Telegram client.
+
+A token will be something like this:
+
+   nnnnnnnnn:ssssssssssssssssssssssss-ssssssssss
+
+where C<n> are digits and C<s> are alphanumeric characters. In the
+following examples, we will assume that the I<token> is available through
+the environment variable C<TOKEN>, like this in bash:
+
+   $ export TOKEN='nnnnnnnnn:ssssssssssssssssssssssss-ssssssssss'
+
+
+=head1 COMPULSIVE, REACTIVE BOT
+
+The simplest way to start is to build a bot with
+L<Bot::ChatBots::Telegram::LongPoll>, like in the example below.
+I<LongPoll> means that the program will enter an indefinite loop,
+continuously asking Telegram for updates (i.e. new messages of interest
+for the bot).
+
+The generic interaction model for longpoll is the following:
+
+ .                            ..Bot Application.....
+                              :                    :
+   __________________         :     ____________   :
+  /                  \        :    /            \  :
+  |                  |<----------1-|            |  :
+  |  Telegram Server |        :    |  LongPoll  |  :
+  |                  |-2---------->|            |  :
+  \__________________/        :    \____________/  :
+              |  ^            :        |           :
+              5  |            :        3           :
+              |  |            :        |           :
+              |  |            :     ___v______     :
+              |  |            :    /          \    :
+              |  +---------------4-|          |    :
+              |               :    |  Sender  |    :
+              +------------------->|          |    :
+                              :    \__________/    :
+                              :                    :
+                              :....................:
+
+   1, 2: Poll for new Update(s)
+   3   : internal call
+   4, 5: Telegram API Request/Response
+
+Your application polls for updates; as a reaction to them, it can decide
+to send a message back to the server, using
+a L<Bot::ChatBots::Telegram::Sender> object that wraps all the machinery
+for the API code.
+
+=head2 The Program
+
+Save this in a file:
+
+   #!/usr/bin/env perl
+   use strict;
+   use warnings;
+   use Bot::ChatBots::Telegram::LongPoll;
+
+   Bot::ChatBots::Telegram::LongPoll->new(
+      token     => $ENV{TOKEN},
+      processor => \&process_record,
+      start     => 1,
+   );
+
+   sub process_record {
+      my $record = shift;
+
+      my $type    = $record->{data_type};
+      my $payload = $record->{payload};
+      if ($type eq 'Message' && exists($payload->{from}) ) {
+         my $text      = $payload->{text} || '';
+         my $peer_name = $payload->{from}{first_name} || 'U. N. Known';
+         print {*STDERR} "$peer_name says: $text\n";
+         if ($text eq '/start') {
+            $record->{send_response} = 'Very simple... just send /hello';
+         }
+         elsif ($text eq '/hello') {
+            $record->{send_response} = "Hello to you, $peer_name";
+         }
+      }
+
+      return $record; # follow on..
+   }
+
+A few comments:
+
+=over
+
+=item *
+
+to get started, our L<Bot::ChatBots::Telegram::LongPoll> needs a few
+configurations, including the C<token> to identify/authenticate as a bot
+in Telegram, a C<processor> sub reference that will be called for each
+incoming L<Update|https://core.telegram.org/bots/api#update> from
+Telegram, and the indication to C<start> right away (i.e. immediately
+enter the indefinite loop for polling new Updates).
+
+=item *
+
+the C<process_record> sub does all the work when a new message is pulled
+from Telegram. When you receive
+a L<Message|https://core.telegram.org/bots/api#message> in the C<Update>,
+you will find it inside C<< $record->{payload} >>; inside that you might
+find the C<text> that was sent, who sent it, etc. etc.
+
+=item *
+
+you don't necessarily have to send something back. You can do this easily
+setting key C<send_response> in C<$record> anyway, just set the message
+you want to appear in the chat and you're done!
+
+=item *
+
+pass C<$record> as the outcome of your function.
+
+=back
+
+=head2 Example Session
+
+Now we can run our program (remember to set the C<TOKEN> environment
+variable!):
+
+   $ export TOKEN='...'
+   $ perl tutorial-longpoll-01
+
+If it blocks... it's a good sign. Now head to your Telegram client, look
+for your bot (it should be right there immediately after C<BotFather>
+created it) and type C</start> (or press the C<Start> button, if any
+appears). You will see something like this (with due change of names):
+
+   You   : /start
+   TheBot: Very simple... just send /hello
+
+Now type C</hello> as hinted:
+
+   You   : /hello
+   TheBot: Hello to you, You
+
+You are online, yay!
+
+
+=head1 COMPULSIVE, PROACTIVE BOT
+
+Your bot might want to say something from time to time. It might be
+a joke. It might be that you asked it to remind you to make a call at
+a given time. Or it might just be trying to warn you about what a splendid
+day you're missing outside!
+
+The first thing to take into consideration is that
+L<Bot::ChatBots::Telegram::LongPoll> relies on L<Mojo::IOLoop> for
+handling the I<undefinitely long loop> where it does the polling from time
+to time. Hence, whatever you can fit inside a L<Mojo::IOLoop> will be
+good!
+
+The second thing you have to take into account is... how do you
+communicate to Telegram I<outside> of an update that came from there? For
+this, you need a L<Bot::ChatBots::Telegram::Sender>, which you can obtain
+a couple of ways, like in the examples below:
+
+   use Bot::ChatBots::Telegram::Sender;
+   my $sender = Bot::ChatBots::Telegram::Sender->new(token => $ENV{TOKEN});
+
+   # $bcb is a Bot::ChatBots::Telegram::LongPoll object
+   my $other_sender = $bcb->sender;
+
+We will use the second approach in the following, although the first one
+is perfectly valid (and it might come handy e.g. inside a L<Minion>). Now
+we are ready to expand your example bot.
+
+=head2 The Program
+
+
+   #!/usr/bin/env perl
+   use strict;
+   use warnings;
+   use Mojo::IOLoop;
+   use Bot::ChatBots::Telegram::LongPoll;
+
+   my $bcb = Bot::ChatBots::Telegram::LongPoll->new(
+      token     => $ENV{TOKEN},
+      processor => \&process_record,
+      start     => 0,   # DO NOT START RIGHT AWAY!
+   );
+
+   setup_recurring();
+
+   # now it's time to hand operations over to Mojo::IOLoop
+   $bcb->start;
+
+   # track nagging...
+   {
+      my %nagged;
+      sub setup_recurring {
+         Mojo::IOLoop->recurring(
+            10 => sub {
+               my $sender = $bcb->sender;
+               for my $chat_id (keys %nagged) {
+                  $sender->send_message(
+                     {
+                        text => 'whooops!',
+                        chat_id => $chat_id,
+                     }
+                  );
+               }
+            }
+         );
+      }
+      sub nag_on  { $nagged{$_[0]} = 1 }
+      sub nag_off { delete $nagged{$_[0]} }
+   }
+
+   sub process_record {
+      my $record = shift;
+
+      my $type    = $record->{data_type};
+      my $payload = $record->{payload};
+      if ($type eq 'Message' && exists($payload->{from}) ) {
+         my $text      = $payload->{text} || '';
+         my $peer_name = $payload->{from}{first_name} || 'U. N. Known';
+         my $chat_id   = $record->{channel}{id};
+         print {*STDERR} "$peer_name says: $text\n";
+         if (($text eq '/start') || ($text eq '/help')) {
+            $record->{send_response} = <<'END';
+   Very simple:
+   * for help type /help
+   * for greeting type /hello
+   * for being annoyed every 10 s type /nag on
+   * to stop annoyance type /nag off
+   * to be reminded type /remind <seconds> <message>
+   END
+         }
+         elsif ($text eq '/hello') {
+            $record->{send_response} = "Hello to you, $peer_name";
+         }
+         elsif ($text eq '/nag on') {
+            nag_on($chat_id);
+            $record->{send_response} = 'OK, to deactivate /nag off';
+         }
+         elsif ($text eq '/nag off') {
+            nag_off($chat_id);
+            $record->{send_response} = 'OK, to reactivate /nag on';
+         }
+         elsif (my (          $delay,        $msg) = $text =~ m{
+               \A /remind \s+ ([1-9]\d*) \s+ (.*)
+            }mxs)
+         {
+            Mojo::IOLoop->timer($delay => sub {
+               $bcb->sender->send_message(
+                  {
+                     text => "$peer_name: remember $msg",
+                     chat_id => $chat_id,
+                  }
+               );
+            });
+            $record->{send_response} = "I'll try my best!";
+         }
+      }
+
+      return $record; # follow on..
+   }
+
+
+The program is a bit more complicated than before, but it does so much
+more! Again, some notes:
+
+=over
+
+=item *
+
+we are setting C<start> to C<0> when creating the object, instead of C<1>
+as before. This will allow us to avoid starting the loop right on the
+spot, define additional things (in our case, encapsulated inside
+C<setup_recurring>) and then C<< $bcb->start >> the loop.
+
+=item *
+
+As anticipated, L<Mojo::IOLoop> is the real workhorse behind this, so we
+can take advantage of its capabilities. Before C<start>ing, we set up
+a recurrent job that will send a nagging message every 10 seconds to all
+channels that ask for it (tracked through variable C<%nagged>).
+
+=item *
+
+The C<process_record> didn't change shape, just got a bit longer. The help
+evolved to explain all the new commands, some of which are quite simple
+(e.g. the nagging handling ones just set or reset a flag in C<%nagged>),
+other again take advantage of L<Mojo::IOLoop> to do something (like the
+new command C</remind>).
+
+=item *
+
+In both callbacks passed to L<Mojo::IOLoop> we use
+a L<Bot::ChatBots::Telegram::Sender> object, relying upon the same object
+that C<$bcb> uses to get new updates. As already anticipated, nothing
+
+=item *
+
+In all cases we send a quick feedback to the user, relying upon
+C<send_message> as before. This will use C<$brb>'s internal
+L<Bot::ChatBots::Telegram::Sender> instance to invoke the Telegram API;
+stops you from creating another object using the same I<token>.
+
+=back
+
+=head2 Example Session
+
+Start the new bot and try it:
+
+   You   : /help
+   TheBot: Very simple:
+           * for help type /help
+           * for greeting type /hello
+           * for being annoyed every 10 s type /nag on
+           * to stop annoyance type /nag off
+           * to be reminded type /remind <seconds> <message>
+
+Let's start some nagging, wait about 40 second before going on with other
+commands:
+
+   You   : /nag on
+   TheBot: OK, to deactivate /nag off
+   (some time after)
+   TheBot: whooops!
+   (10 s after)
+   TheBot: whooops!
+   (10 s after)
+   TheBot: whooops!
+
+You can send other commands in the meantime:
+
+   TheBot: whooops!
+   (10 s after)
+   TheBot: whooops!
+   You   : /hello
+   TheBot: Hello to you, You
+   (some time after)
+   TheBot: whooops!
+   (10 s after)
+   TheBot: whooops!
+
+Enough:
+
+   TheBot: whooops!
+   You   : /nag off
+   TheBot: OK, to reactivate /nag on
+
+Have to do something in 30 seconds?
+
+   You   : /remind 30 do that thing!
+   TheBot: I'll try my best!
+   (30 seconds after)
+   TheBot: You: remember do that thing!
+
+
+=head1 RELAXED, PROACTIVE BOT
+
+Having your bot repeatedly asking for updates is not very appealing, and
+probably also not very scalable as well. For this reason, you can ask
+Telegram to notify you when new Updates are available, by providing
+a I<callback URL> called I<web hook>.
+
+Using web hooks is only marginally more complicated, mostly consisting of
+a different configuration setup. But... there are a few twists that will
+have to be discussed before diving into the code.
+
+This is the generic model for a web hook is the following:
+
+ .                            ..Bot Application.....
+                              :                    :
+   __________________         :     ____________   :
+  /                  \        :    /            \  :
+  |                  |-1---------->|            |  :
+  |  Telegram Server |        :    |  WebHook   |  :
+  |                  |<----------2-|            |  :
+  \__________________/        :    \____________/  :
+              |  ^            :        |           :
+              5  |            :        3           :
+              |  |            :        |           :
+              |  |            :     ___v______     :
+              |  |            :    /          \    :
+              |  +---------------4-|          |    :
+              |               :    |  Sender  |    :
+              +------------------->|          |    :
+                              :    \__________/    :
+                              :                    :
+                              :....................:
+
+   1, 2: WebHook Request/Response
+   3   : internal call
+   4, 5: Telegram API Request/Response
+
+As you can see, it's mostly the same as the longpoll one, except that in
+this case the initial message C<1> is sent from Telegram. Additionally, as
+we already discovered, it's possible to use the sender outside of an
+update.
+
+
+=head2 WebHooks Are Fussy
+
+One thing is to decide when to get Updates using a client, possibly behind
+a proxy; another thing is to set up a service that acts as the contact
+point for Telegram. The road to be a I<server> that Telegram is fine about
+has a few milestones, as you will see in the following subsections.
+
+Telegram will need a URL to contact you:
+
+   $ export BOT_URL="$BOT_PROTO://$BOT_ADDRESS:$BOT_PORT$BOT_PATH"
+
+Before you can C<export> this... you have to decide a few things!
+
+=head3 Find a public spot and set C<BOT_ADDRESS>
+
+While your program will I<still> act as a client to Telegram, it now also
+becomes a I<server>. This means finding out a suitable, public spot on the
+internet; it might be your home computer with a public IP address, a VPS,
+or a free-tier AWS virtual machine if you're lucky to have some capacity.
+
+You might even go the extra mile and set up a DNS resolution to transform
+a I<domain name> into that IP address; Telegram will not insist on this
+anyway.
+
+In the following, we will assume that you know your (public) IP Address:
+
+   $ export BOT_ADDRESS='...'
+
+=head3 Decide a port and set C<BOT_PORT>
+
+Not every port is born equal, because Telegram will contact you only on
+one of the following ones: C<443>, C<80>, C<88> or C<8443>.
+
+Again, we will fit this piece of configuration into an environment
+variable:
+
+   $ export BOT_PORT="...'
+
+=head3 No decision on C<BOT_PROTO='https'>
+
+Telegram will only work with encryption, so you will have to set up TLS.
+This is not difficult to do with L<Mojolicious>, but you still have to set
+up certificates. So, there is actually nothing to decide about
+C<BOT_PROTO>:
+
+   $ export BOT_PROTO='https'
+
+The I<best> would be to obtain a publicly recognised certificate. You can
+reuse something that you already have, buy something, or take a look at
+L<"Let's Encrypt"|https://letsencrypt.org/> to get one free.
+
+Telegram will not insist on this, anyway, and it is also possible to
+generate a self-signed certificate and then hand it over to Telegram. On
+the other hand, it I<will> insist on the certificate and the domain or IP
+address of your endpoint to match, so you will have to generate your
+certificate depending on it, e.g. using the following command:
+
+   $ openssl req -x509  -nodes \
+      -newkey rsa:2048 \
+      -sha256 \
+      -days 365 \
+      -subj "/C=IT/ST=Roma/L=Roma/O=Pinco Pals/CN=$BOT_IP" \
+      -keyout server.key \
+      -out server.crt
+
+Hence, C<server.key> and C<server.crt> will be hanging around in the
+directory you are using, keep this in mind!
+
+You can fiddle with the C<-subj> part of course, as long as you make sure
+that the C<CN> part matches the IP address or domain name you chose for
+your bot endpoint.
+
+=head3 Decide a path and set C<BOT_PATH>
+
+This is really up to you. If you are expanding a previous program, using
+a reverse proxy, or just want to go deeper than the root path, you can
+just do so:
+
+   $ export BOT_PATH='...'
+
+You can also decide to leave this part empty.
+
+=head3 Wrap it all together
+
+I find it useful to put all environment variables in a single
+configuration file that can be C<source>d in a shell:
+
+   # we will ignore BOT_PROTO and just use https
+   export BOT_ADDRESS='...'   # Public IP or public domain address
+   export BOT_PORT='...'      # 80, 88, 443, 8443
+   export BOT_PATH='/'        # or leave it empty
+   export BOT_URL="https://$BOT_ADDRESS:$BOT_PORT$BOT_PATH"
+
+
+=head2 The Program
+
+Our program will be a full-fledged L<Mojolicious> application this time,
+although this does not mean it will be much more complicated. After the
+previous section, we know there are two additional files in the directory,
+namely the certificate file C<server.crt> and the private key file
+C<server.key>.
+
+   #!/usr/bin/env perl
+
+   use strict;
+   use warnings;
+   use Mojolicious::Lite;
+
+   my $token   = $ENV{TOKEN};
+   my $bot_url = $ENV{BOT_URL};
+   my $certificate = do { local (@ARGV, $/) = 'server.crt'; <> };
+
+   plugin 'Bot::ChatBots::Telegram' => instances => [
+      [
+         'WebHook',
+         processor   => \&process_record,
+         register    => 1,
+         token       => $token,
+         unregister  => 1,
+         url         => $bot_url,
+         certificate => $certificate,
+      ],
+   ];
+
+   # set this as a "shim" to make the whole thing similar to LongPoll
+   my $bcb = app->chatbots->telegram->instances->[0];
+
+   # encapsulating initialization comes handy
+   setup_recurring();
+
+   # now it's time to hand operations over to Mojolicious
+   app->start;
+
+   ### EVERYTHING IS UNCHANGED BELOW THIS LINE ############################
+   # track nagging...
+   {
+      my %nagged;
+      sub setup_recurring {
+         Mojo::IOLoop->recurring(
+            10 => sub {
+               my $sender = $bcb->sender;
+               for my $chat_id (keys %nagged) {
+                  $sender->send_message(
+                     {
+                        text => 'whooops!',
+                        chat_id => $chat_id,
+                     }
+                  );
+               }
+            }
+         );
+      }
+      sub nag_on  { $nagged{$_[0]} = 1 }
+      sub nag_off { delete $nagged{$_[0]} }
+   }
+
+   sub process_record {
+      my $record = shift;
+
+      my $type    = $record->{data_type};
+      my $payload = $record->{payload};
+      if ($type eq 'Message' && exists($payload->{from}) ) {
+         my $text      = $payload->{text} || '';
+         my $peer_name = $payload->{from}{first_name} || 'U. N. Known';
+         my $chat_id   = $record->{channel}{id};
+         print {*STDERR} "$peer_name says: $text\n";
+         if (($text eq '/start') || ($text eq '/help')) {
+            $record->{send_response} = <<'END';
+   Very simple:
+   * for help type /help
+   * for greeting type /hello
+   * for being annoyed every 10 s type /nag on
+   * to stop annoyance type /nag off
+   * to be reminded type /remind <seconds> <message>
+   END
+         }
+         elsif ($text eq '/hello') {
+            $record->{send_response} = "Hello to you, $peer_name";
+         }
+         elsif ($text eq '/nag on') {
+            nag_on($chat_id);
+            $record->{send_response} = 'OK, to deactivate /nag off';
+         }
+         elsif ($text eq '/nag off') {
+            nag_off($chat_id);
+            $record->{send_response} = 'OK, to reactivate /nag on';
+         }
+         elsif (my (          $delay,        $msg) = $text =~ m{
+               \A /remind \s+ ([1-9]\d*) \s+ (.*)
+            }mxs)
+         {
+            Mojo::IOLoop->timer($delay => sub {
+               $bcb->sender->send_message(
+                  {
+                     text => "$peer_name: remember $msg",
+                     chat_id => $chat_id,
+                  }
+               );
+            });
+            $record->{send_response} = "I'll try my best!";
+         }
+      }
+
+      return $record; # follow on..
+   }
+
+As you will notice, only the first part changed with respect to the
+proactive version of the longpoll bot (there is a comment line indicating
+where differences end). This is the new part:
+
+   #!/usr/bin/env perl
+
+   use strict;
+   use warnings;
+   use Mojolicious::Lite;
+
+   my $token   = $ENV{TOKEN};
+   my $bot_url = $ENV{BOT_URL};
+   my $certificate = do { local (@ARGV, $/) = 'server.crt'; <> };
+
+   plugin 'Bot::ChatBots::Telegram' => instances => [
+      [
+         'WebHook',
+         processor   => \&process_record,
+         register    => 1,
+         token       => $token,
+         unregister  => 1,
+         url         => $bot_url,
+         certificate => $certificate,
+      ],
+   ];
+
+   # set this as a "shim" to make the whole thing similar to LongPoll
+   my $bcb = app->chatbots->telegram->instances->[0];
+
+   # encapsulating initialization comes handy
+   setup_recurring();
+
+   # now it's time to hand operations over to Mojolicious
+   app->start;
+
+A few comments:
+
+=over
+
+=item *
+
+as anticipated, it will be a full-fledged L<Mojolicious> application, but
+it needs not be a complicated one. L<Mojolicious::Lite> will do fine;
+
+=item *
+
+in addition to C<TOKEN> we now have to be aware of environment variable
+C<BOT_URL> and load the TLS certificate file C<server.crt>, so that it can
+be communicated to Telegram (this is needed only for self-signed
+certificates);
+
+=item *
+
+not surprisingly, we are using L<Bot::ChatBots::Telegram::WebHook> instead
+of L<Bot::ChatBots::Telegram::LongPoll>. It is a L<Mojolicious> plugin, so
+we load it as such with the interface shown in the example;
+
+=item *
+
+our code from the longpoll days was relying upon a variable C<$bcb> to get
+access to a L<Bot::ChatBots::Telegram::Sender> object. Again, this is not
+really necessary, because you only need C<TOKEN> to get yours, but we are
+defining this variable anyway to show the ease of transition from the
+longpoll version to the webhook;
+
+=item *
+
+the call to C<setup_recurring()> is the same as before, which gives you
+why it's handy to encapsulate these configurations in one place;
+
+=item *
+
+last, we C<start> the application instead of the poller.
+
+=back
+
+=head2 Example Session
+
+Save the program as C<tutorial-webhook> and start as:
+
+   $ perl tutorial-webhook daemon \
+       -l "https://*:$BOT_PORT?cert=server.crt&key=server.key"
+
+L<Mojolicious> will work out of the box with the certificate and key you
+generate, but you have to tell it about them!
+
+At this point, just repeat the session you did for the long poll... you
+should notice no difference, because we reused all of its business logic!
+
+=head2 A Note On C<unregister>
+
+Telegram rules require you to I<unregister> your bot URL if you want to
+restart using the long polling interface. For this reason, when you set up
+the plugin you can pass the option:
+
+   unregister => 1
+
+and let the bot do it for you automatically when exiting the process.
+
+Beware though that this can bite you badly if you are automating
+operations in some kind of Platform-as-a-Service environment. When
+upgrading a service (e.g. because you pushed some new feature), they might
+start up the new code and only then tear down the old one; hence, if you
+leave C<unregister> set, the old instance is likely to kill your service,
+because it will I<unregister> the URL that your new instance communicated
+to Telegram.
+
+For this reason... it's probably better to leave C<unregister> unset.
+
+
+=head1 SEE ALSO
+
+The example bots described in this document can be found in the C<eg>
+directory of the distribution, named C<tutorial-longpoll-01>,
+C<tutorial-longpoll-02> and C<tutorial-webhook> respectively.
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Telegram>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

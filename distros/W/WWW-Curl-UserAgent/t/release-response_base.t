@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
@@ -37,7 +37,7 @@ my $ua = WWW::Curl::UserAgent->new(
   my $resp = $ua->request($req);
   ok( $resp->is_success() , "Response is a success");
   ok( $resp->request() , "Got request from response");
-  is( $resp->base()  , 'http://www.example.com' );
+  is( $resp->base()  , 'http://www.example.com/' );
 }
 
 {

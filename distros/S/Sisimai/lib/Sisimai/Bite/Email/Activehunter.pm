@@ -4,22 +4,14 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/\A"MAILER-DAEMON"/,
-    'subject' => qr/FAILURE NOTICE :/,
-};
-my $Re1 = {
-    'begin'   => qr/\A  ----- The following addresses had permanent fatal errors -----\z/,
-    'error'   => qr/\A  ----- Transcript of session follows -----\z/,
-    'rfc822'  => qr|\AContent-type: message/rfc822\z|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['  ----- The following addresses had permanent fatal errors -----'],
+    'rfc822'  => ['Content-type: message/rfc822'],
+};
 
 sub headerlist  { return ['X-AHMAILID'] }
-sub pattern     { return $Re0 }
 sub description { 'TransWARE Active!hunter' };
-
 sub scan {
     # Detect an error from TransWARE Active!hunter
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -37,6 +29,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'from'    => qr/\A"MAILER-DAEMON"/,
+    # 'subject' => qr/FAILURE NOTICE :/,
     return undef unless defined $mhead->{'x-ahmailid'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -49,10 +43,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -60,7 +54,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -88,7 +82,7 @@ sub scan {
             # 550 sorry, no mailbox here by that name (#5.1.1 - chkusr)
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[>]{3}[ \t]+.+[<]([^ ]+?[@][^ ]+?)[>]\z/ ) {
+            if( $e =~ /\A[>]{3}[ \t]+.+[<]([^ ]+?[@][^ ]+?)[>]\z/ ) {
                 # >>> kijitora@example.org <kijitora@example.org>
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -101,7 +95,7 @@ sub scan {
             } else {
                 #  ----- Transcript of session follows -----
                 # 550 sorry, no mailbox here by that name (#5.1.1 - chkusr)
-                next unless $e =~ m/\A[0-9A-Za-z]+/;
+                next unless $e =~ /\A[0-9A-Za-z]+/;
                 $v->{'diagnosis'} = $e;
             }
         } # End of if: rfc822
@@ -162,7 +156,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

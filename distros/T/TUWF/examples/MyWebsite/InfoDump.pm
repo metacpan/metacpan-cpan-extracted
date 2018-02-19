@@ -9,15 +9,7 @@ use warnings;
 use TUWF ':html';
 
 
-TUWF::register(
-  qr/info/       => \&info,
-  qr{info/forms} => \&forms,
-);
-
-
-sub info {
-  my $self = shift;
-
+TUWF::any ['get','post'], '/info' => sub {
   my $tr = sub { Tr; td shift; td shift; end };
 
   html;
@@ -38,45 +30,45 @@ sub info {
     h2 'GET Parameters';
     table;
      thead; Tr; td 'Name'; td 'Value'; end; end;
-     $tr->($_, join "\n---\n", $self->reqGet($_)) for ($self->reqGet());
+     $tr->($_, join "\n---\n", tuwf->reqGet($_)) for (tuwf->reqGets);
     end;
 
     h2 'POST Parameters';
     table;
      thead; Tr; td 'Name'; td 'Value'; end; end;
-     $tr->($_, join "\n---\n", $self->reqPost($_)) for ($self->reqPost());
+     $tr->($_, join "\n---\n", tuwf->reqPost($_)) for (tuwf->reqPosts);
     end;
 
     h2 'Uploaded files';
     table;
      thead; Tr; td 'Name'; td 'File size - File name - Mime type'; end; end;
-     $tr->($_, length($self->reqUploadRaw($_)).' - '.$self->reqPOST($_).' - '.$self->reqUploadMIME($_)) for ($self->reqUploadMIME());
+     $tr->($_, length(tuwf->reqUploadRaw($_)).' - '.tuwf->reqPost($_).' - '.tuwf->reqUploadMIME($_)) for (tuwf->reqUploadMIMEs);
     end;
 
     h2 'HTTP Headers';
     table;
      thead; Tr; td 'Header'; td 'Value'; end; end;
-     $tr->($_, $self->reqHeader($_)) for ($self->reqHeader());
+     $tr->($_, tuwf->reqHeader($_)) for (tuwf->reqHeader);
     end;
 
     h2 'HTTP Cookies';
     table;
      thead; Tr; td 'Cookie'; td 'Value'; end; end;
-     $tr->($_, $self->reqCookie($_)) for ($self->reqCookie());
+     $tr->($_, tuwf->reqCookie($_)) for (tuwf->reqCookie);
     end;
 
     h2 'Misc. request functions';
     table;
      thead; Tr; td 'Function'; td 'Return value'; end; end;
-     $tr->($_, eval "\$self->$_;") for(qw{
-       reqMethod() reqPath() reqBaseURI() reqURI() reqHost() reqIP()
+     $tr->($_, tuwf->$_) for(qw{
+       reqProtocol reqMethod reqPath reqBaseURI reqURI reqQuery reqHost reqIP
      });
     end;
   end;
-}
+};
 
 
-sub forms {
+TUWF::get '/info/forms' => sub {
   html;
    body;
     h1 'Forms for generating some input for /info';
@@ -125,7 +117,7 @@ sub forms {
 
    end;
   end;
-}
+};
 
 
 1;

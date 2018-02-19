@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::LongPoll;
 use strict;
 use warnings;
-{ our $VERSION = '0.010'; }
+{ our $VERSION = '0.012'; }
 
 use Ouch;
 use Try::Tiny;
@@ -29,16 +29,6 @@ has interval => (
 has max_redirects => (
    is => 'ro',
    default => sub { return 5 },
-);
-
-has sender => (
-   is      => 'ro',
-   lazy    => 1,
-   default => sub {    # prefer has-a in this case
-      my $self = shift;
-      require Bot::ChatBots::Telegram::Sender;
-      return Bot::ChatBots::Telegram::Sender->new(token => $self->token);
-   },
 );
 
 has _start => (

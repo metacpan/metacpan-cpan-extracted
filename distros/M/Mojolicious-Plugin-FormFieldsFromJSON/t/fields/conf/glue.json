@@ -1,0 +1,20 @@
+[
+  {
+    "name" : "accept_ticket",
+    "label": "Customer tickets",
+    "type" : "switch",
+    "data" : "1",
+    "validation" : {
+        "required" : { "msg" : "A value is required" }
+    }
+  },
+  {
+    "name" : "accept_timerecording",
+    "label": "Timerecording",
+    "type" : "switch",
+    "data" : "1",
+    "validation" : {
+        "required" : { "msg" : "A value is required" }
+    }
+  }
+]

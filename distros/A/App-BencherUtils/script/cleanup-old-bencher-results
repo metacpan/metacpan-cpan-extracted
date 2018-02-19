@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/BencherUtils/cleanup_old_bencher_results
-# and generated automatically using Perinci::CmdLine::Gen version 0.47
+# Note: This script is a CLI for Riap function /App/BencherUtils/cleanup_old_bencher_results
+# and generated automatically using Perinci::CmdLine::Gen version 0.484
 
-our $DATE = '2017-08-02'; # DATE
+our $DATE = '2018-02-18'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,12 +14,14 @@ use Log::ger;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BencherUtils/cleanup_old_bencher_results",
     program_name => "cleanup-old-bencher-results",
     log => 1,
     config_filename => ["bencher.conf", "cleanup-old-bencher-results.conf"],
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Delete old results
 # PODNAME: cleanup-old-bencher-results
@@ -36,7 +38,7 @@ cleanup-old-bencher-results - Delete old results
 
 =head1 VERSION
 
-This document describes version 0.23 of cleanup-old-bencher-results (from Perl distribution App-BencherUtils), released on 2017-08-02.
+This document describes version 0.240 of cleanup-old-bencher-results (from Perl distribution App-BencherUtils), released on 2018-02-18.
 
 =head1 SYNOPSIS
 
@@ -62,7 +64,7 @@ C<*> marks required options.
 
 =item B<--detail>, B<-l>
 
-=item B<--num-keep>=I<i>
+=item B<--num-keep>=I<s>
 
 Number of old results to keep.
 
@@ -299,7 +301,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

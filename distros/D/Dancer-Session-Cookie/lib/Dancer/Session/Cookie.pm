@@ -1,6 +1,6 @@
 package Dancer::Session::Cookie;
 our $AUTHORITY = 'cpan:YANICK';
-$Dancer::Session::Cookie::VERSION = '0.27';
+$Dancer::Session::Cookie::VERSION = '0.28';
 use strict;
 use warnings;
 # ABSTRACT: Encrypted cookie-based session backend for Dancer
@@ -195,7 +195,7 @@ Dancer::Session::Cookie - Encrypted cookie-based session backend for Dancer
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -207,12 +207,12 @@ Your F<config.yml>:
 =head1 DESCRIPTION
 
 This module implements a session engine for sessions stored entirely
-in cookies. Usually only B<session id> is stored in cookies and
+in cookies. Usually only the B<session id> is stored in cookies and
 the session data itself is saved in some external storage, e.g.
-database. This module allows to avoid using external storage at
+a database. This module allows you to avoid using external storage at
 all.
 
-Since server cannot trust any data returned by client in cookies, this
+Since a server cannot trust any data returned by clients in cookies, this
 module uses cryptography to ensure integrity and also secrecy. The
 data your application stores in sessions is completely protected from
 both tampering and analysis on the client-side.
@@ -227,11 +227,11 @@ the cookie's name, expiration and other attributes as well as its content.
 The setting B<session> should be set to C<cookie> in order to use this session
 engine in a Dancer application. See L<Dancer::Config>.
 
-A mandatory setting is needed as well: B<session_cookie_key>, which should
+Another setting is also required: B<session_cookie_key>, which should
 contain a random string of at least 16 characters (shorter keys are
 not cryptographically strong using AES in CBC mode).
 
-The optional B<session_expires> setting can also be passed, 
+The optional B<session_expires> setting can also be passed,
 which will provide the duration time of the cookie. If it's not present, the
 cookie won't have an expiration value.
 
@@ -250,9 +250,9 @@ Also, changing B<session_cookie_key> will have an effect of immediate
 invalidation of all sessions issued with the old value of key.
 
 B<session_cookie_path> can be used to control the path of the session
-cookie.  The default is /.
+cookie.  The default is C</>.
 
-The global B<session_secure> setting is honoured and a secure (https
+The global B<session_secure> setting is honored and a secure (https
 only) cookie will be used if set.
 
 =head1 DEPENDENCY
@@ -292,7 +292,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Alex Kapranoff.
+This software is copyright (c) 2018, 2015, 2014, 2011 by Alex Kapranoff.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

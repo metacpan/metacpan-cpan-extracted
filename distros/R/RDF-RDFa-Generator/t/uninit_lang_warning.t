@@ -4,18 +4,20 @@ use warnings;
 use Test::More;
 use Test::Output;
 
-use RDF::Trine qw(blank iri literal);
+use Attean;
+use Attean::RDF qw(blank iri literal);
 use RDF::RDFa::Generator;
 
-my $t = RDF::Trine::Statement::Quad->new(
+my $t = Attean::Quad->new(
 	blank('x'),
 	iri('http://example.org/p'),
 	literal(3),
 	iri('http://example.org/graph1'),
 );
+my $store = Attean->get_store('Memory')->new();
+$store->add_quad($t);
+my $model = Attean::QuadModel->new( store => $store ); 
 
-my $model = RDF::Trine::Model->new(); 
-$model->add_statement($t);
 
 my $pretty = RDF::RDFa::Generator::HTML::Pretty->new();
 

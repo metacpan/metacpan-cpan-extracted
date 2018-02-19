@@ -1,22 +1,16 @@
+#002_crud.t
 use Mojo::Base -strict;
-use Mojo::File qw(path);
-use File::Spec::Functions qw(catdir);
-use File::Temp qw(tempdir);
-use Test::Mojo;
 use Test::More;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use Test::Mojo::resources;    # load it from "$FindBin::Bin/lib"
 
-our $tempdir = tempdir(TMPDIR => 1, CLEANUP => 1, TEMPLATE => 'resourcesXXXX');
-
-# our $tempdir = '/tmp/mres'; # tempdir(TMPDIR => 1, TEMPLATE => 'resourcesXXXX');
-# Use the generated application.
-unshift @INC, "$tempdir/blog/lib";
-
-require Mojolicious::Commands;
+our $tempdir = Test::Mojo::resources::tempdir;
 
 # help
-my $commands = Mojolicious::Commands->new;
-my $buffer   = '';
+my $buffer = '';
 {
+  my $commands = Mojolicious::Commands->new;
   open my $handle, '>', \$buffer;
   local *STDOUT = $handle;
   $commands->run('help', 'generate', 'resources');
@@ -26,17 +20,7 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
 
 # Run the command through an example application
 {
-
-  # Install the app to a temporary path
-  local $ENV{MOJO_HOME} = "$tempdir/blog";
-  path($ENV{MOJO_HOME})->make_path({mode => 0700});
-  for (path('t/blog')->list_tree({dir => 1})->each) {
-    my $new_path = $_->to_array;
-    splice @$new_path, 0, 2;    #t/blog/blog.conf -> blog.conf
-    unshift @$new_path, $ENV{MOJO_HOME}; #blog.conf -> $ENV{MOJO_HOME}/blog.conf
-    path(catdir(@$new_path))->make_path({mode => 0700}) if -d $_;
-    $_->copy_to(catdir(@$new_path)) if -f $_;
-  }
+  Test::Mojo::resources::install_app();
 
   # Run the command through the app.
   require Blog;
@@ -57,7 +41,6 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
   local *STDOUT = $handle;
   my $blog = Blog->new;
   push @{$blog->renderer->paths}, $blog->home->rel_file('resources_templates');
-
   my $cm = Mojolicious::Command::generate::resources->new(app => $blog)
     ->run('-t' => 'users,groups');
   like($buffer,
@@ -74,7 +57,6 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
   like($buffer,
        qr{\[write\].+?users[\\/]index.html.ep},
        "written templates/users/index.html.ep");
-
   like($buffer, qr{\[write\].+?blog[\\/]TODO}, "written /blog/TODO ... etc");
   my $home = $cm->app->home;
 
@@ -82,9 +64,10 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
   is_deeply(
             $cm->args,
             {
-             lib                  => $home->rel_file('lib'),
-             templates_root       => $home->rel_file('templates'),
+             lib                  => $home->child('lib'),
              home_dir             => $home,
+             api_dir              => $home->child('api'),
+             templates_root       => $home->child('templates'),
              tables               => [qw(users groups)],
              controller_namespace => $cm->app->routes->namespaces->[0],
              model_namespace      => ref($cm->app) . '::Model',
@@ -93,7 +76,8 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
            );
 }
 
-# TODO: Make requests to the created routes
+
+# Make requests to the created routes
 {
   my $test = Test::Mojo->new('Blog');
   my $blog = $test->app;
@@ -129,7 +113,7 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
       my $size = $col->{COLUMN_SIZE};
       my $required = $col->{NULLABLE} ? '' : 'required=1';
 
-      #form field is generated properly
+      # form field is generated properly
       ($col->{TYPE_NAME} =~ /char/i && $size < 256)
         && $g_ok->element_exists("label[for=$name]")
         ->element_exists("input[type=text][name=$name][size=$size]");
@@ -142,10 +126,10 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
         ->element_exists("input[type=number][name=$name][size=$size]");
     }
 
-    #show
+    # show
     $test->get_ok("/$t/1")->status_is(404)->content_is('Not Found');
 
-    #store
+    # store
     my $form = {};
     my $id   = 1;
     if ($t eq 'groups') {
@@ -170,23 +154,23 @@ like $buffer, qr/Usage: APPLICATION generate resources \[OPTIONS\]/,
         ->element_exists("input[type=hidden][name=id]");
     }
 
-    #update
+    # update
     $form->{id}   = $id;
     $form->{name} = "$form->{name} edited";
     $test->put_ok("/$t/$id" => {Accept => '*/*'}, form => $form)
       ->status_is(302);
     $test->get_ok("/$t/$id")->status_is(200)->content_like(qr/$form->{name}/);
 
-    #index with item(s)
+    # index with item(s)
     $test->get_ok("/$t")->status_is(200)
       ->text_is(
               "table>tbody>tr:last-child>td:first-child>a[href=/$t/$id]" => $id)
       ->content_like(qr/$form->{name}/);
 
-    #remove
+    # remove
     $test->delete_ok("/$t/$id")->status_is(302);
 
-    #empty index again
+    # empty index again
     $test->get_ok("/$t")->status_is(200)
       ->element_exists_not(
                     "table>tbody>tr:last-child>td:first-child>a[href=/$t/$id]");

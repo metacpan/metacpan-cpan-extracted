@@ -7,8 +7,8 @@ import java.io.* ;
 
 public class InlineJavaPerlNatives extends InlineJavaPerlCaller {
 	static private boolean inited = false ;
-	static private Map registered_classes = Collections.synchronizedMap(new HashMap()) ;
-	static private Map registered_methods = Collections.synchronizedMap(new HashMap()) ;
+	static private Map<Class, Class> registered_classes = Collections.synchronizedMap(new HashMap<Class, Class>()) ;
+	static private Map<String, String> registered_methods = Collections.synchronizedMap(new HashMap<String, String>()) ;
 
 
 	protected InlineJavaPerlNatives() throws InlineJavaException {

@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless
 
+1.27 2018-02-13
+
+    - added terse-dump to Util
+
 1.26 2017-10-13
 
     - added support for 127 subnet including from /etc/hosts

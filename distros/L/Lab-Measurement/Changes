@@ -4,6 +4,24 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.620 2018-02-14
+
+  * Add SignalRecovery lock-in driver
+  * OI Mercury: enable axis selection
+  * Add driver for Keysight 34470A digital multimeter
+  * Add USB ids for YokogawaGS200 and SMB100A
+  * Remove non-Moose RSSMB100A driver, superseded by RS_SMB
+  * Remove non-Moose SpectrumSCPI driver, superseded by RS_FSV
+  * Remove non-Moose OI_IPS and OI_Mercury drivers, superseded by Moose versions
+  * VNA support: Add 'set_frq/get_frq' functions for single frequency 
+    measurements
+  * XPRESS: Update example scripts
+  * Moose: support default connection options for instrument drivers
+  * Moose: add abstract sweep framework (port of XPRESS)
+  * Examples: add degaussing script, add FMR example
+  * Documentation: Mention VXI-11 and USBTMC in the Linux installation 
+    instructions
+
 3.613 2017-12-09
 
   * Add DESTROY method in Lab::XPRESS::Sweep to avoid ugly warning

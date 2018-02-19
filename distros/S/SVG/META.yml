@@ -3,9 +3,16 @@ abstract: 'Perl extension for generating Scalable Vector Graphics (SVG) document
 author:
   - 'Ronan Oger <ronan@cpan.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '0.94'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -20,26 +27,31 @@ no_index:
 provides:
   SVG:
     file: lib/SVG.pm
-    version: '2.82'
+    version: '2.84'
   SVG::DOM:
     file: lib/SVG/DOM.pm
-    version: '2.82'
+    version: '2.84'
   SVG::Element:
     file: lib/SVG/Element.pm
-    version: '2.82'
+    version: '2.84'
   SVG::Extension:
     file: lib/SVG/Extension.pm
-    version: '2.82'
+    version: '2.84'
   SVG::XML:
     file: lib/SVG/XML.pm
-    version: '2.82'
+    version: '2.84'
 requires:
+  Exporter: '0'
   Scalar::Util: '0'
+  constant: '0'
   parent: '0'
   perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
   repository: https://github.com/manwar/SVG.git
-version: '2.82'
+version: '2.84'
 x_contributors:
   - 'Peter Wainwright'
   - 'Ian Hickson'

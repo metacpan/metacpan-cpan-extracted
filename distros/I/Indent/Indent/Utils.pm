@@ -1,11 +1,9 @@
 package Indent::Utils;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Readonly;
 
@@ -13,8 +11,7 @@ use Readonly;
 Readonly::Scalar my $DEFAULT_TAB_LENGTH => 8;
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Length of tab.
 our $TAB_LENGTH = $DEFAULT_TAB_LENGTH;
@@ -29,7 +26,7 @@ sub line_size_check {
 	if (! defined $self->{'line_size'}
 		|| $self->{'line_size'} !~ m/^\d+$/ms) {
 
-		err '\'line_size\' parameter must be a positive number.', 
+		err '\'line_size\' parameter must be a positive number.',
 			'line_size', $self->{'line_size'};
 	}
 	return;
@@ -94,7 +91,7 @@ __END__
 
 =head1 SYNOPSIS
 
- use Indent::Utils qw(line_size_check reduce_duplicit_ws remove_first_ws 
+ use Indent::Utils qw(line_size_check reduce_duplicit_ws remove_first_ws
          remove_last_ws remove_ws string_len);
  line_size_check($object_with_line_size_parameter);
  reduce_duplicit_ws(\$string);
@@ -119,7 +116,7 @@ __END__
 
 =item C<line_size_check($object_with_line_size_parameter)>
 
- Line size 'line_size' parameter check. 
+ Line size 'line_size' parameter check.
 
 =item C<reduce_duplicit_ws($string_sr)>
 
@@ -151,11 +148,9 @@ __END__
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Utils qw(reduce_duplicit_ws);
 
  my $input = 'a  b';
@@ -167,11 +162,9 @@ __END__
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Utils qw(remove_first_ws);
 
  my $input = '  a';
@@ -183,11 +176,9 @@ __END__
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Utils qw(remove_last_ws);
 
  my $input = 'a   ';
@@ -199,11 +190,9 @@ __END__
 
 =head1 EXAMPLE4
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Utils qw(remove_ws);
 
  my $input = '   a   ';
@@ -215,11 +204,9 @@ __END__
 
 =head1 EXAMPLE5
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent::Utils qw(string_len);
 
  # Print string length.
@@ -236,10 +223,29 @@ L<Readonly>.
 
 =head1 SEE ALSO
 
-L<Indent>,
-L<Indent::Block>,
-L<Indent::Data>,
-L<Indent::Word>.
+=over
+
+=item L<Indent>
+
+Class for indent handling.
+
+=item L<Indent::Block>
+
+Class for block indenting.
+
+=item L<Indent::Data>
+
+Class for data indenting.
+
+=item L<Indent::String>
+
+Class for text indenting.
+
+=item L<Indent::Word>
+
+Class for word indenting.
+
+=back
 
 =head1 REPOSITORY
 
@@ -247,16 +253,17 @@ L<https://github.com/tupinek/Indent>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD license.
+ © 2005-2018 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

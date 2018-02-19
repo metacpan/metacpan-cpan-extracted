@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Table::Hit;
-# ABSTRACT: internal class for tabular HMMER parser
+# ABSTRACT: Internal class for tabular HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Table::Hit::VERSION = '0.180330';
+$Bio::FastParsers::Hmmer::Table::Hit::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -37,11 +37,11 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Hmmer::Table::Hit - internal class for tabular HMMER parser
+Bio::FastParsers::Hmmer::Table::Hit - Internal class for tabular HMMER parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 

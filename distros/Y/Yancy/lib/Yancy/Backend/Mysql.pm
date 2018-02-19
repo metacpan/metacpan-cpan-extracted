@@ -1,5 +1,5 @@
 package Yancy::Backend::Mysql;
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 # ABSTRACT: A backend for MySQL using Mojo::mysql
 
 #pod =head1 SYNOPSIS
@@ -209,6 +209,7 @@ ENDQ
         # ; say Dumper $c;
         $schema{ $table }{ properties }{ $column } = {
             $self->_map_type( $c ),
+            'x-order' => $c->{ORDINAL_POSITION},
         };
         # Auto_increment columns are allowed to be null
         if ( $c->{IS_NULLABLE} eq 'NO' && !$c->{COLUMN_DEFAULT} && $c->{EXTRA} !~ /auto_increment/ ) {
@@ -221,25 +222,34 @@ ENDQ
 
 sub _map_type {
     my ( $self, $column ) = @_;
+    my %conf;
     my $db_type = $column->{DATA_TYPE};
     if ( $db_type =~ /^(?:character|text|varchar)/i ) {
-        return ( type => 'string' );
+        %conf = ( type => 'string' );
     }
     elsif ( $db_type =~ /^(?:int|integer|smallint|bigint|tinyint)/i ) {
-        return ( type => 'integer' );
+        %conf = ( type => 'integer' );
     }
     elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
-        return ( type => 'number' );
+        %conf = ( type => 'number' );
     }
     elsif ( $db_type =~ /^(?:timestamp)/i ) {
-        return ( type => 'string', format => 'date-time' );
+        %conf = ( type => 'string', format => 'date-time' );
     }
     elsif ( $db_type =~ /^(?:enum)/i ) {
         my @values = $column->{COLUMN_TYPE} =~ /'([^']+)'/g;
-        return ( type => 'string', enum => \@values );
+        %conf = ( type => 'string', enum => \@values );
     }
-    # Default to string
-    return ( type => 'string' );
+    else {
+        # Default to string
+        %conf = ( type => 'string' );
+    }
+
+    if ( $column->{IS_NULLABLE} eq 'YES' ) {
+        $conf{ type } = [ $conf{ type }, 'null' ];
+    }
+
+    return %conf;
 }
 
 1;
@@ -254,7 +264,7 @@ Yancy::Backend::Mysql - A backend for MySQL using Mojo::mysql
 
 =head1 VERSION
 
-version 0.014
+version 0.017
 
 =head1 SYNOPSIS
 

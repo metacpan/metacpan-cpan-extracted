@@ -1,5 +1,5 @@
 # perl Makefile.PL;make;perl -Iblib/lib t/12_ht2t.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 5;
 my $html=join"",<DATA>;
 my %ent=(amp => '&', 160 => ' ');

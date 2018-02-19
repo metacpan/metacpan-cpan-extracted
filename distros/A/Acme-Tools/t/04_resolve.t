@@ -1,5 +1,5 @@
 # perl Makefile.PL; make; perl -Iblib/lib t/04_resolve.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 17;
 
 deb "Resolve: ".resolve(sub{my($x)=(@_); $x**2 - 4*$x -1},20,2)."\n";

@@ -2,7 +2,7 @@
 
 #
 # dbpipeline.pm
-# Copyright (C) 2007-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2007-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -179,8 +179,8 @@ Exporter::export_ok_tags('all');
 my %autoloadable = map { $_ => 1 } @modularized_db_programs, @modularized_db_converters, @modularized_db_non_programs;
 
 use strict;
-use Carp;
 use Pod::Usage;
+use Carp;
 use IO::Pipe;
 
 use Fsdb::Filter;
@@ -196,10 +196,10 @@ our $AUTOLOAD;
 sub AUTOLOAD {
     my $sub = $AUTOLOAD;
     (my $localsub = $sub) =~ s/.*:://;
-    die "dbpipeline: AUTOLOAD on non-autoloadable sub $sub\n"
+    croak("dbpipeline: AUTOLOAD on non-autoloadable sub $sub\n")
 	if (!defined($autoloadable{$localsub}));
     eval "sub $localsub { use Fsdb::Filter::$localsub; return new Fsdb::Filter::$localsub(" . '@_' . "); };\n";
-    $@ and die "dbpipeline: error creating stubs: $@\n";
+    $@ and croak("dbpipeline: error creating stubs: $@\n");
     goto &$sub;
 }
 
@@ -544,14 +544,14 @@ sub dbpipeline_close2_hash ($$$) {
     };
     my %out_hash;
     my $reader = new Fsdb::IO::Reader(-fh => $read_fh);
-    $reader->error and croak "dbpipeline_close2_hash: couldn't setup reader.\n";
-    $reader->read_row_to_href(\%out_hash) or croak "dbpipeline_close2_hash: no output from pipeline.\n";
+    $reader->error and croak("dbpipeline_close2_hash: couldn't setup reader.\n");
+    $reader->read_row_to_href(\%out_hash) or croak("dbpipeline_close2_hash: no output from pipeline.\n");
     # check for eof
     my $o;
     while ($o = $reader->read_rowobj) {
 	next if (!ref($o));  # comment
 	# data is bad
-	$o and croak "dbpipeline_close2_hash: multiple lines of output.\n";
+	$o and croak("dbpipeline_close2_hash: multiple lines of output.\n");
     };
     return \%out_hash;
 }
@@ -655,7 +655,7 @@ sub setup ($) {
     my($self) = @_;
 
     my $prev_module_i = $#{$self->{_modules}};
-    die $self->{_prog} . ": no modules in pipeline.\n"
+    croak($self->{_prog} . ": no modules in pipeline.\n")
         if ($prev_module_i < 0);
 
     #
@@ -665,10 +665,10 @@ sub setup ($) {
     my $i = 0;
     my $mod;
     foreach $mod (@{$self->{_modules}}) {
-	die $self->{_prog} . ": module $i isn't type Fsdb::Filter.\n"
+	croak($self->{_prog} . ": module $i isn't type Fsdb::Filter.\n")
 	    if (ref($mod) !~ /^Fsdb::Filter/);
 	if (defined($prev_mod)) {
-	    die $self->{_prog} . ": incompatible module input and output between modules $i and " . $i+1 . ".\n"
+	    croak($self->{_prog} . ": incompatible module input and output between modules $i and " . $i+1 . ".\n")
 		if ($prev_mod->info('output_type') ne $mod->info('input_type'));
 	    # xxx: above is a bit too strict, since fsdbtext should match fsdb*
 	};
@@ -767,7 +767,7 @@ sub finish ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

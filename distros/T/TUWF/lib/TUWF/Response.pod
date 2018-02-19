@@ -20,12 +20,12 @@ be reset to their defaults. This method is called at the start of each request
 by TUWF, but it can also be useful in your own code:
 
   # create a response, setting headers and content, etc...
-  $self->resCookie(userid => $user);
-  print { $self->resFd() } "Content!\n";
+  tuwf->resCookie(userid => $user);
+  print { tuwf->resFd() } "Content!\n";
   
   # when you later decide that you actually wanted to create a totally
   # different response:
-  $self->resInit();
+  tuwf->resInit();
   # ...after which you can start again
 
 =head2 resHeader(name, value, add)
@@ -161,15 +161,77 @@ Gets or sets the numeric HTTP response status code.
 
 =head2 resRedirect(location, type)
 
-Generate a HTTP redirect to I<location>, which should be a path relative to the
-domain, including leading a slash. If I<type> is not defined, a 301 (Moved
+Generate a HTTP redirect to I<location>, which should be an absolute URL or a
+path relative to the current domain. If I<type> is not defined, a 301 (Moved
 Permanently) is used. If I<type> is 'temp', a 307 (Temporary Redirect) or if
 I<type> is 'post' a 303 (See Other) status code is used. The latter is
 recommended for use as response to a POST request, as it explicitely tells the
 browser to use a GET request for the redirect.
 
-C<resRedirect()> calls C<resInit()>, so if you wish to send any additional
-headers or cookies, you have to set these B<after> calling C<resRedirect()>.
+B<Compatibility note>: TUWF 1.1 and earlier called C<resInit()> in
+C<resRedirect()>, so if you wished to send any additional headers or cookies,
+you had to set these B<after> calling C<resRedirect()>. In TUWF versions after
+1.1, you can also set headers and cookies set before calling C<resRedirect()>.
+
+=head2 resJSON(data)
+
+Sets the content type to C<application/json> and sends the encoded JSON object
+to the client.
+
+=head2 resBinary(data)
+
+Send binary data to the client. This method throws away any data currently
+written to the buffer. This method also disables output compression to prevent
+additional copies of the data. Make sure to set the right content type as well,
+for example:
+
+  tuwf->resHeader('Content-Type' => 'image/jpeg');
+  tuwf->resBinary($image_data);
+
+=head2 resFile(path, filename)
+
+Send the contents of the given file in the given path to the client. This
+method returns 1 if the file exists, 0 if it does not. This method ensures that
+only files within I<path> are served to the client, preventing unwanted path
+traversal.
+
+The I<Content-Type> header is set according to the file extension of
+I<filename> and the L<mime_types|TUWF/mime_types> and
+L<mime_default|TUWF/mime_types> settings. You can always override this by
+calling C<resHeader()> after C<resFile()>.
+
+Examples:
+
+  # Serve 'GET /static/x' requests from /webroot/public
+  TUWF::get qr{/static/(.+)} => sub {
+    tuwf->resFile('/webroot/public', tuwf->captures(1)) || tuwf->resNotFound;
+  };
+
+  # Serve a file in '/webroot/public' if it exists,
+  # otherwise handle the request as usual.
+  TUWF::hook before => sub {
+    tuwf->done if tuwf->resFile('/webroot/public', tuwf->reqPath);
+  };
+
+You might also want to set proper caching headers if the static files don't
+change much:
+
+  tuwf->resHeader('Cache-Control' => 'max-age=31536000');
+
+C<resFile()> uses C<resBinary()> internally, so output compression will be
+disabled for these files. Furthermore, this method is not really suitable for
+sending large files, as the entire files contents will be copied into RAM.
+Range requests, I<If-Modified-Since>, I<ETag> and such are also not supported.
+If any of this is a concern, it's recommended to configure your webserver to
+serve static files directly - without involvement of TUWF.
+
+B<WARNING>: The I<path> argument should not be dependent on any input data from
+the client, or you might still make yourself vulnerable to path traversal!
+
+B<WARNING#2>: This method will follow symlinks, so you have to ensure that
+there are no malicious symlinks inside I<path>. If, in the above example, there
+is a symlink from I</webroot/public/malicious> to I</>, then anyone will be
+able to retrieve any file on your system!
 
 =head2 resNotFound()
 
@@ -189,7 +251,7 @@ L<TUWF>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2017 Yoran Heling.
+Copyright (c) 2008-2018 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

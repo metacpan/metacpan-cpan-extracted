@@ -1,25 +1,23 @@
-# $Id: 31-DSA-SHA1.t 1494 2016-08-22 09:34:07Z willem $	-*-perl-*-
+# $Id: 31-DSA-SHA1.t 1616 2018-01-22 08:54:52Z willem $	-*-perl-*-
 #
 
+use strict;
 use Test::More;
 
 my %prerequisite = (
-	Crypt::OpenSSL::Bignum	=> 0,
-	Crypt::OpenSSL::DSA	=> 0,
-	Digest::SHA		=> 0,
-	Net::DNS		=> 1.01,
-	Net::DNS::SEC::Private	=> 0,
+	'Digest::SHA'  => 5.23,
+	'Net::DNS'     => 1.01,
+	'MIME::Base64' => 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
 	my @revision = grep $_, $prerequisite{$package};
-	eval "use $package @revision";
-	next unless $@;
+	next if eval "use $package @revision; 1;";
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
 
-plan tests => 11;
+plan tests => 12;
 
 
 my %filename;
@@ -31,7 +29,7 @@ END {
 }
 
 
-use_ok('Net::DNS');
+use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
 use_ok('Net::DNS::SEC::DSA');
 
@@ -105,17 +103,20 @@ ok( $wrongprivate, 'set up non-DSA private key' );
 my $sigdata = 'arbitrary data';
 
 my $signature = Net::DNS::SEC::DSA->sign( $sigdata, $private );
-ok( $signature, 'signature generated using private key' );
+ok( $signature, 'signature created using private key' );
 
-my $validated = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
-ok( $validated, 'signature validated using public key' );
+my $verified = Net::DNS::SEC::DSA->verify( $sigdata, $key, $signature );
+ok( $verified, 'signature verified using public key' );
 
 
 ok( !eval { Net::DNS::SEC::DSA->sign( $sigdata, $wrongprivate ) },
-	'signature not generated using wrong private key' );
+	'signature not created using wrong private key' );
 
 ok( !eval { Net::DNS::SEC::DSA->verify( $sigdata, $wrongkey, $signature ) },
-	'signature not validated using wrong public key' );
+	'signature not verified using wrong public key' );
+
+ok( !eval { Net::DNS::SEC::DSA->verify( $sigdata, $key, undef ) },
+	'signature not verified if empty or undefined' );
 
 
 exit;

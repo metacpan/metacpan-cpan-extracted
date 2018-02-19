@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.3.0';
+$Git::Hooks::CheckJira::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -67,21 +67,36 @@ sub _jira {
     # Connect to JIRA if not yet connected
     unless (exists $cache->{jira}) {
         unless (eval { require JIRA::REST; }) {
-            $git->error($PKG, "Please, install Perl module JIRA::REST to use the CheckJira plugin", $@);
+            $git->fault(<<"EOS", {details => $@});
+I could not load the JIRA::REST Perl module.
+
+I need it to talk to your JIRA server, as configured by the $CFG.* options in
+your Git configuration.
+
+Please, install the module or disable these options to proceed.
+EOS
             return;
         }
 
         my %jira;
         for my $option (qw/jiraurl jirauser jirapass/) {
             $jira{$option} = $git->get_config($CFG => $option)
-                or $git->error($PKG, "missing $CFG.$option configuration attribute")
-                    and return;
+                or $git->fault(<<"EOS")
+The $CFG.$option option is missing from the configuration.
+It's required in order to connect to the JIRA server.
+EOS
+                and return;
         }
         $jira{jiraurl} =~ s:/+$::; # trim trailing slashes from the URL
 
         my $jira = eval { JIRA::REST->new($jira{jiraurl}, $jira{jirauser}, $jira{jirapass}) };
         length $@
-            and $git->error($PKG, "cannot connect to the JIRA server at '$jira{jiraurl}' as '$jira{jirauser}", $@)
+            and $git->fault(<<"EOS", {details => $@})
+Cannot connect to the JIRA server at '$jira{jiraurl}' as '$jira{jirauser}.
+
+Please, check your $CFG.jiraurl, $CFG.jirauser,
+and $CFG.jirapass configuration options.
+EOS
                 and return;
         $cache->{jira} = $jira;
     }
@@ -130,22 +145,22 @@ sub check_codes {
                 $code = do $check;
                 unless ($code) {
                     if (length $@) {
-                        $git->error($PKG, "couldn't parse option check-code ($check)", $@);
+                        $git->fault("I couldn't parse $CFG.check-code option ($check).", {details => $@});
                     } elsif (! defined $code) {
-                        $git->error($PKG, "couldn't do option check-code ($check)", $!);
+                        $git->fault("I couldn't do $CFG.check-code option ($check).", {details => $!});
                     } else {
-                        $git->error($PKG, "couldn't run option check-code ($check)");
+                        $git->fault("I couldn't run $CFG.check-code option ($check).");
                     }
                     next CODE;
                 }
             } else {
                 $code = eval $check; ## no critic (BuiltinFunctions::ProhibitStringyEval)
                 length $@
-                    and $git->error($PKG, "couldn't parse option check-code value", $@)
+                    and $git->fault("I couldn't parse $CFG.check-code option value.", {details => $@})
                     and next CODE;
             }
             defined $code and ref $code and ref $code eq 'CODE'
-                or $git->error($PKG, "option check-code must end with a code ref")
+                or $git->fault("The $CFG.check-code option must end with a code-ref.")
                 and next CODE;
             push @{$cache->{codes}}, $code;
         }
@@ -159,7 +174,11 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
 
     unless (@keys) {
         if ($git->get_config_boolean($CFG => 'require')) {
-            $git->error($PKG, "commit @{[substr($commit->commit, 0, 10)]} must cite a JIRA in its message");
+            $git->fault(<<"EOS");
+The commit @{[$commit->commit]} must cite a JIRA in its message.
+
+Please, amend your commit to insert a JIRA key.
+EOS
             return 0;
         } else {
             return 1;
@@ -211,7 +230,31 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
         my $matched_set = Set::Scalar->new(keys %$issues);
 
         if (my $missed_set = $cited_set - $matched_set) {
-            $git->error($PKG, "the JIRA issue(s) @{[$missed_set]} do(es) not match the expression '$JQL'");
+            if ($missed_set->size == 1) {
+                $git->fault(<<"EOS");
+The commit $commit cites an invalid issue:
+
+  @{[$missed_set]}
+
+The issue does not match the JQL expression:
+
+  $JQL
+
+Please, update your issue or fix your $CFG git configuration.
+EOS
+            } else {
+                $git->fault(<<"EOS");
+The commit $commit cites invalid issues:
+
+  @{[$missed_set]}
+
+The issues do not match the JQL expression:
+
+  $JQL
+
+Please, update your issues or fix your $CFG git configuration.
+EOS
+            }
             ++$errors;
         }
     }
@@ -243,7 +286,12 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
       ISSUE:
         while (my ($key, $issue) = each %issues) {
             if ($unresolved && defined $issue->{fields}{resolution}) {
-                $git->error($PKG, "issue $key cannot be used because it is already resolved");
+                $git->fault(<<"EOS");
+The commit cites issue $key which is already resolved.
+
+The $CFG.unresolved option in your configuration requires
+that all JIRA issues be unresolved.
+EOS
                 ++$errors;
                 next ISSUE;
             }
@@ -257,25 +305,44 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
                         next VERSION if $fixversion->{name} eq $version;
                     }
                 }
-                $git->error($PKG, "issue $key has no fixVersion matching '$version', which is required for commits affecting '$ref'");
+                $git->fault(<<"EOS");
+The commit $commit cites issue $key which is invalid.
+
+Commits on '$ref' must cite issues associated with a fixVersion matching
+'$version' according to the $CFG.fixversion options in your configuration.
+EOS
                 ++$errors;
                 next ISSUE;
             }
 
             if ($by_assignee) {
                 my $user = $git->authenticated_user()
-                    or $git->error($PKG, "cannot grok the authenticated user")
+                    or $git->fault(<<"EOS")
+Internal error: I cannot get your username to authorize you.
+Please check your Git::Hooks configuration with regards to the function
+https://metacpan.org/pod/Git::Repository::Plugin::GitHooks#authenticated_user
+EOS
                     and ++$errors
                     and next ISSUE;
 
                 if (my $assignee = $issue->{fields}{assignee}) {
                     my $name = $assignee->{name};
                     $user eq $name
-                        or $git->error($PKG, "issue $key should be assigned to '$user', not '$name'")
+                        or $git->fault(<<"EOS")
+The commit $commit cites issue $key which is assigned to '$name'.
+The $CFG.by-assignee configuration requires that cited issues be assigned
+to you ($user).
+Please, update your issue.
+EOS
                         and ++$errors
                         and next KEY;
                 } else {
-                    $git->error($PKG, "issue $key should be assigned to '$user', but it's unassigned");
+                    $git->fault(<<"EOS");
+The commit $commit cites issue $key which is unassigned.
+The $CFG.by-assignee configuration requires that cited issues be assigned
+to you ($user).
+Please, update your issue.
+EOS
                     ++$errors;
                     next KEY;
                 }
@@ -292,7 +359,7 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
             if (defined $ok) {
                 ++$errors unless $ok;
             } elsif (length $@) {
-                $git->error($PKG, 'error while evaluating check-code', $@);
+                $git->fault('Error while evaluating $CFG.check-code', {details => $@});
                 ++$errors;
             }
         } else {
@@ -355,7 +422,7 @@ sub check_message_file {
 
     my $msg = eval { path($commit_msg_file)->slurp };
     defined $msg
-        or $git->error($PKG, "cannot open file '$commit_msg_file' for reading: $@")
+        or $git->fault("Cannot open file '$commit_msg_file' for reading:", {details => $@})
             and return 0;
 
     # Remove comment lines from the message file contents.
@@ -440,7 +507,7 @@ EOF
 
     foreach my $key (@keys) {
         eval { $jira->POST("/issue/$key/comment", undef, \%comment); 1; }
-            or $git->error($PKG, "Cannot add a comment to JIRA issue $key:", $@)
+            or $git->fault("I could not add a comment to JIRA issue $key.", {details => $@})
             and ++$errors;
     }
 
@@ -483,7 +550,13 @@ sub notify_affected_refs {
             value => $2,
         };
     } elsif ($comment ne 'all') {
-        $git->error($PKG, "Invalid argument to githooks.checkjira.comment: $comment");
+        $git->fault(<<"EOS");
+Configuration error.
+
+The $CFG.comment option is defined as '$comment', but
+the valid values are 'role:ROLE', 'group:GROUP', or 'all'.
+Please, check your git configuration.
+EOS
         return 0;
     }
 
@@ -520,7 +593,56 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckJira
+    admin = joe molly
+
+  [githooks "checkjira"]
+    jiraurl = https://jira.example.net
+    jirauser = jiradmin
+    jirapass = my-secret
+
+    matchlog = (?s)^\\[([^]]+)\\]
+    jql = project IN (ABC, UTF, GIT) AND issuetype IN (Bug, Story) AND status IN ("In progress", "In testing")
+    by-assignee = true
+    fixversion = refs/heads/master             future
+    fixversion = ^refs/heads/(\\d+\\.\\d+)\\.  ^$+
+
+The first section enables the plugin and defines the users C<joe> and C<molly>
+as administrators, effectivelly exempting them from any restrictions the plugin
+may impose.
+
+The second instance enables C<some> of the options specific to this plugin.
+
+The options C<jiraurl>, C<jirauser>, and C<jirapass> specify the JIRA server and
+are usually kept in the global Git configuration file and not in the
+repository's configuration file since they are sensitive and usually the same
+for all repositories.
+
+The C<matchlog> option requires that the JIRA keys be cited at the beginning of
+the commit messages title, enclosed in brackets. By default JIRA keys can be
+cited anywhere, but it's usually a good idea to restrict where they should be
+cited to avoid falselly identifying other words as JIRA keys.
+
+The C<jql> option imposes more restrictions on the cited JIRA issues (besides
+the few restrictions that are imposed by default, such as they being resolved
+and they exist).
+
+The C<by-assignee> option requires that all cited JIRA issues be assigned to the
+user pushing the commits.
+
+The firt C<fixversion> option requires that commits pushed to C<master> must
+cite JIRA issues associated with the fixVersion C<future>. The second option
+requires that commits pushed to branches named after a version name
+(e.g. C<1.0.1>) must cite JIRA issues associated with a fixVersion named after
+the same C<major.minor> version number (e.g. C<1.0>).
 
 =head1 DESCRIPTION
 
@@ -931,7 +1053,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

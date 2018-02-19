@@ -76,6 +76,7 @@
                        {output => [$expiryTime]},
                        {output => ["<a href=\"${RT::WebPath}/Ticket/Display.html?id=$id&Lock=remove\">".loc('Unlock')."</a>"]}],
             maxitems => ($expiry ? 5 : 4),
+            record  => $Ticket,
             i => $i        
         );
         $i++;

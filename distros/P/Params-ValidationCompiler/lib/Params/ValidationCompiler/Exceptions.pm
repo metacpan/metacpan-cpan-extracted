@@ -3,7 +3,7 @@ package Params::ValidationCompiler::Exceptions;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Exception::Class (
     'Params::ValidationCompiler::Exception::BadArguments',
@@ -41,7 +41,7 @@ Params::ValidationCompiler::Exceptions - Defines exceptions thrown by Params::Va
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2016 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

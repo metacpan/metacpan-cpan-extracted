@@ -5,6 +5,7 @@ use strict;
 use Script::Toolbox::Util::Opt;
 use Script::Toolbox::Util::Formatter;
 use Script::Toolbox::Util::Menues;
+use Script::Toolbox::Util::Menus;
 use Script::Toolbox::TableO;
 use IO::File;
 use IO::Dir;
@@ -24,7 +25,9 @@ our @ISA = qw(Exporter);
 # This allows declaration	use Script::Toolbox::Util ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir File FileC System Now Menue KeyMap Stat TmpFile DataMenue) ] );
+our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir
+                               File FileC System Now Menu KeyMap
+                               Stat TmpFile DataMenu Menue DataMenue) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -128,10 +131,12 @@ sub _installSigHandlers()
 #------------------------------------------------------------------------------
 # Log a message and exit the programm with the given error code.
 #------------------------------------------------------------------------------
-sub Exit($$)
+sub Exit(@)
 {
-    my ($exitCode, $message) = _getParam(@_);
+    my ($exitCode, $message, $file, $line) = _getParam(@_);
 
+    $message .= sprintf "\n\tSource:%s:%s", $file, $line if( defined $line &&
+                                                         defined $file );
     Log( $message );
     exit $exitCode;
 }
@@ -832,7 +837,7 @@ sub Now(@)
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-sub _printMenueHeader($) {
+sub _printMenuHeader($) {
     my ($head) = @_;
     return  if( ! defined $head );
     printf "%s", $head;
@@ -840,7 +845,7 @@ sub _printMenueHeader($) {
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-sub _printMenueFooter($) {
+sub _printMenuFooter($) {
     my ($foot) = @_;
     return  if( ! defined $foot );
     printf "%s", $foot;
@@ -868,7 +873,7 @@ sub _getRealIndex($$) {
 # Concatenate several header/footer options into header/footer strings.
 # Return original options array-ref and header/footer strings.
 #------------------------------------------------------------------------------
-sub _normMenueOpts($){
+sub _normMenuOpts($){
     my ($opts) = @_;
 
     my $head = '';
@@ -886,6 +891,18 @@ sub _normMenueOpts($){
 }
 
 #------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+sub _printOption($$$) {
+    my ($op,$form1,$i) = @_;
+
+    my ($def,$form)=_getDefForm($form1,$op);
+    if( defined $def ) {
+        printf $form, $i,$op->{'label'},$def;
+        return;
+    }
+    printf $form, $i,$op->{'label'};
+}
+#------------------------------------------------------------------------------
 # Display a menue, return the selected index number and the menue data structure.
 # If a VALUE or DEFAULT key of a menue option points to a value this value can
 # be changed.
@@ -898,28 +915,22 @@ sub _normMenueOpts($){
 # - header=> an optional head line
 # - footer=> an optional footer line
 #------------------------------------------------------------------------------
-sub Menue($)
-{
+sub Menu($) {
     my ($OPTS) = @_;
 
-    my ($opts,$head,$foot) = _normMenueOpts($OPTS);
+    my ($opts,$head,$foot) = _normMenuOpts($OPTS);
     my ($i,$o) = (0,0);
     my $maxLen = _maxLabelLength($opts);
     my $form1 = "%3d %-${maxLen}s ";
     system("clear");
-    _printMenueHeader($head);
+    _printMenuHeader($head);
     ($i,$o) = (0,0);
     foreach my $op ( @{$opts} )
     {
         next if( ! $op->{'label'} );
-        my ($def,$form)=_getDefForm($form1,$op);
-        if( defined $def ) {
-            printf $form, $i++,$op->{'label'},$def;
-        }else{
-            printf $form, $i++,$op->{'label'};
-        }
+        _printOption($op,$form1,$i++);
     }
-    _printMenueFooter($foot);
+    _printMenuFooter($foot);
     printf "\nSelect: ";
     $o = _getNumber( $i-1);
     _setValue($o, $opts);
@@ -927,92 +938,99 @@ sub Menue($)
     return $o,$opts;
 }
 #------------------------------------------------------------------------------
-# Prepare input for Data Menue. Allowed input formats:
+# Deprecated Menu function. Only for compatibility with legacy software.
+#------------------------------------------------------------------------------
+sub Menue($){
+    return Menu($_[0]);
+}
+
+#------------------------------------------------------------------------------
+# Prepare input for Data Menu. Allowed input formats:
 # INPUT2: [{'label'=>'Max','value'=>'foo'},{'label'=>'Tim','value'=>99}]
 #------------------------------------------------------------------------------
 sub _arrayHandler($$) {
-    my ($dataMenue,$opts) = @_;
+    my ($dataMenu,$opts) = @_;
 
     foreach my $line ( @{$opts} ) {
             next    if( ref $line ne 'HASH' );
             next    if( ! defined $line-{'label'} );
             next    if( ! defined $line-{'value'} );
-            push @{$dataMenue}, $line,
+            push @{$dataMenu}, $line,
     }
     return 'ARRAY';
 }
 
 #------------------------------------------------------------------------------
-# Prepare input for Data Menue. Allowed input formats:
+# Prepare input for Data Menu. Allowed input formats:
 # INPUT3: {}[, {'header'=>'','footer'=>''}]
 #------------------------------------------------------------------------------
 sub _hashHandler($$$) {
-    my ($dataMenue,$opts,$frame) = @_;
+    my ($dataMenu,$opts,$frame) = @_;
 
     foreach my $l ( sort keys %{$opts} ) {
         next    if( ref $opts->{$l} ne '' );
         my $line = {'label' => $l, 'value' => $opts->{$l}};
-        push @{$dataMenue}, $line,
+        push @{$dataMenu}, $line,
     }
     return 'HASH' if( ! defined $frame );
 
-    push @{$dataMenue}, {'header' => $frame->{'header'}} if( defined $frame->{'header'});
-    push @{$dataMenue}, {'footer' => $frame->{'footer'}} if( defined $frame->{'footer'});
+    push @{$dataMenu}, {'header' => $frame->{'header'}} if( defined $frame->{'header'});
+    push @{$dataMenu}, {'footer' => $frame->{'footer'}} if( defined $frame->{'footer'});
     return 'HASH';
 }
 
 
 #------------------------------------------------------------------------------
-# Prepare input for Data Menue. Allowed input formats:
+# Prepare input for Data Menu. Allowed input formats:
 # INPUT1: 'value1 value2 ..'[, {'header'=>'','footer'=>''}]
 #------------------------------------------------------------------------------
 sub _scalarHandler($$$) {
-    my ($dataMenue,$opts,$frame) = @_;
+    my ($dataMenu,$opts,$frame) = @_;
 
     my $i=1;
     foreach my $l ( split /\s+/, $opts ) {
         my $line = {'label' => 'V'.$i++, 'value' => $l};
-        push @{$dataMenue}, $line,
+        push @{$dataMenu}, $line,
     }
     return 'SCALAR' if( ! defined $frame );
-    push @{$dataMenue}, {'header' => $frame->{'header'}} if( defined $frame->{'header'});
-    push @{$dataMenue}, {'footer' => $frame->{'footer'}} if( defined $frame->{'footer'});
+    push @{$dataMenu}, {'header' => $frame->{'header'}} if( defined $frame->{'header'});
+    push @{$dataMenu}, {'footer' => $frame->{'footer'}} if( defined $frame->{'footer'});
     return 'SCALAR';
 }
 
 #------------------------------------------------------------------------------
-# Prepare input for Data Menue. Allowed input formats:
+# Prepare input for Data Menu. Allowed input formats:
 # INPUT1: 'value1 value2 ..'[, {'header'=>'','footer'=>''}]
 # INPUT2: [{'label'=>'Max','value'=>'foo'},{'label'=>'Tim','value'=>99}]
 # INPUT3: {}[, {'header'=>'','footer'=>''}]
 #------------------------------------------------------------------------------
 sub _addData($$$)
 {
-    my ($dataMenue,$opts,$frame) = @_;
+    my ($dataMenu,$opts,$frame) = @_;
 
-    return _arrayHandler ($dataMenue,$opts)        if(ref $opts eq 'ARRAY');
-    return _hashHandler  ($dataMenue,$opts,$frame) if(ref $opts eq 'HASH' );
-    return _scalarHandler($dataMenue,$opts,$frame) if(ref $opts eq '' );
+    return _arrayHandler ($dataMenu,$opts)        if(ref $opts eq 'ARRAY');
+    return _hashHandler  ($dataMenu,$opts,$frame) if(ref $opts eq 'HASH' );
+    return _scalarHandler($dataMenu,$opts,$frame) if(ref $opts eq '' );
 }
 
 #------------------------------------------------------------------------------
 # Remove {label=>"EXIT"} line.
 #------------------------------------------------------------------------------
 sub _returnArray($) {
-    my ($dataMenue) = @_;
-    splice @{$dataMenue},0,1;
-    return $dataMenue;
+    my ($dataMenu) = @_;
+    splice @{$dataMenu},0,1;
+    return $dataMenu;
 }
 
 #------------------------------------------------------------------------------
 # Remove {label=>"EXIT"} line. Return values as white space separated string.
 #------------------------------------------------------------------------------
 sub _returnScalar($) {
-    my ($dataMenue) = @_;
+    my ($dataMenu) = @_;
 
-    splice @{$dataMenue},0,1;
+    splice @{$dataMenu},0,1;
     my     $data='';
-    map { $data .= $_->{'value'} .' ' if( defined $_->{'value'})} @{$dataMenue};
+    map { $data .= $_->{'value'} .' ' if( defined $_->{'value'})} @{$dataMenu};
     chop   $data;
     return $data;
 }
@@ -1022,38 +1040,45 @@ sub _returnScalar($) {
 # Return values as white hash ref with 'label' as key and 'value' as value.
 #------------------------------------------------------------------------------
 sub _returnHash($) {
-    my ($dataMenue) = @_;
+    my ($dataMenu) = @_;
 
-    splice @{$dataMenue},0,1;
+    splice @{$dataMenu},0,1;
     my     %data;
     map {   if( defined $_->{'value'} && defined $_->{'label'} ){
                 my $k = $_->{'label'};
                 my $v = $_->{'value'};
                 $data{$k} = $v;
             }
-        } @{$dataMenue};
+        } @{$dataMenu};
     return \%data;
 }
 
 #------------------------------------------------------------------------------
-# Use Menue to edit small data sets. Two input formats allowed.
+# Use Menu to edit small data sets. Two input formats allowed.
 # INPUT1: 'value1 value2 ..'
 # INPUT2: [{'label'=>'Max','value'=>'foo'},{'label'=>'Tim','value'=>99}]
 #------------------------------------------------------------------------------
-sub DataMenue(@) {
+sub DataMenu(@) {
     my ($opts,$head) = @_;
 
-    my $dataMenue = [{label=>"EXIT"}];
-    my $format    = _addData($dataMenue, $opts,$head);
+    my $dataMenu = [{label=>"RETURN"}];
+    my $format    = _addData($dataMenu, $opts,$head);
 
     while( 1 ) {
-        my ($o,$dataMenue) = Menue($dataMenue);
+        my ($o,$dataMenu) = Menu($dataMenu);
         last if( $o == 0 );
     }
-    return _returnArray ( $dataMenue) if( $format eq 'ARRAY' );
-    return _returnScalar($dataMenue)  if( $format eq 'SCALAR');
-    return _returnHash  ($dataMenue)  if( $format eq 'HASH'  );
+    return _returnArray ( $dataMenu) if( $format eq 'ARRAY' );
+    return _returnScalar($dataMenu)  if( $format eq 'SCALAR');
+    return _returnHash  ($dataMenu)  if( $format eq 'HASH'  );
 }
+#------------------------------------------------------------------------------
+# Deprecated Menu function. Only for compatibility with legacy software.
+#------------------------------------------------------------------------------
+sub DataMenue(@){
+    return DataMenu(@_);
+}
+
 #------------------------------------------------------------------------------
 #  Read a directory and return a hash with filenames stat() structure infos
 #  for every file. An optional pattern (regexp) may be used for selecting files.
@@ -1129,7 +1154,9 @@ sub _getDefForm($$)
 
     my $def;
     $def = $op->{'value'}   if( defined $op->{'value'} );
-    my $form = defined $def ? "$form1 [%s]" : $form1;
+    my $form;
+    if( $op->{'readOnly'} ) { $form = defined $def ? "$form1 <%s>" : $form1 }
+    else                    { $form = defined $def ? "$form1 [%s]" : $form1 }
 
     return $def,"$form\n";
 }
@@ -1233,13 +1260,14 @@ sub _setValue($)
     my $op  = $opts->[$o];
     my $def = defined $op->{'value'} ? $op->{'value'} : '';
 
+    return $def if( $op->{'readOnly'} );
     printf "\n%s [%s]:", $op->{'label'}, $def;
-    return $def if( defined $op->{'readOnly'} );
 
     my $resp = <STDIN>;
     chomp $resp;
 
     $resp = $def if( $resp eq '' );
+    $resp = $op->{'default'} if( defined $op->{'default'} && $resp eq ' ' );
     $op->{'value'} = $resp;
     return $resp;
 }

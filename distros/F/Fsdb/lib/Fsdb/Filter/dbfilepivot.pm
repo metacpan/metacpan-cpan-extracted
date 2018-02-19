@@ -2,7 +2,7 @@
 
 #
 # dbfilepivot.pm
-# Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -344,7 +344,7 @@ sub _find_possible_pivots($) {
 	@;
     print $loop if ($self->{_debug});
     eval $loop;
-    $@ && croak $self->{_prog} . ": internal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ": internal eval error: $@.\n");
 
     if (defined($self->{_sorter_fred})) {
 	$self->{_sorter_fred}->join();
@@ -391,7 +391,7 @@ Internal: setup, parse headers.
 sub setup ($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": invalid empty value (single quote).\n"
+    croak($self->{_prog} . ": invalid empty value (single quote).\n")
 	if ($self->{_empty} eq "'");
 
     #
@@ -414,22 +414,22 @@ sub setup ($) {
 
     pod2usage(2) if (!defined($self->{_key_column}));
     $self->{_key_coli} = $self->{_in}->col_to_i($self->{_key_column});
-    croak $self->{_prog} . ": key column " . $self->{_key_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": key column " . $self->{_key_column} . " is not in input stream.\n")
 	    if (!defined($self->{_key_coli}));
 
     pod2usage(2) if (!defined($self->{_pivot_column}));
     $self->{_pivot_coli} = $self->{_in}->col_to_i($self->{_pivot_column});
-    croak $self->{_prog} . ": pivot column " . $self->{_pivot_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": pivot column " . $self->{_pivot_column} . " is not in input stream.\n")
 	    if (!defined($self->{_pivot_coli}));
 
     if (defined($self->{_value_column})) {
 	$self->{_value_coli} = $self->{_in}->col_to_i($self->{_value_column});
-        croak $self->{_prog} . ": value column " . $self->{_value_column} . " is not in input stream.\n"
+        croak($self->{_prog} . ": value column " . $self->{_value_column} . " is not in input stream.\n")
 	    if (!defined($self->{_value_coli}));
     };
 
     my($npivots, $pivots_aref) = (defined($self->{_possible_pivots}) ? $self->_given_possible_pivots() : $self->_find_possible_pivots());
-    croak $self->{_prog} . ": no input data or pivots\n"
+    croak($self->{_prog} . ": no input data or pivots\n")
 	if ($npivots == 0);
 
     #
@@ -447,7 +447,7 @@ sub setup ($) {
 	my $new_column = $self->{_pivot_column} . $self->{_elem_separator} . $_;
 	$new_columns{$new_column} = 1;
         $self->{_out}->col_create($new_column)
-	    or croak $self->{_prog} . ": cannot create column $new_column (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column $new_column (maybe it already existed?)\n");
 	$tag_colis{$_} = $self->{_out}->col_to_i($new_column);
     };
     $self->{_tag_colis_href} = \%tag_colis;
@@ -494,7 +494,7 @@ sub run ($) {
     #
     my $emit_nf_code = '&$write_fastpath_sub(\@nf);';
     my $check_ordering_code = '
-	die "' . $self->{_prog} . q': keys $old_key and $new_key are out-of-order\n" if ($old_key gt $new_key);
+	die("' . $self->{_prog} . q': keys $old_key and $new_key are out-of-order\n") if ($old_key gt $new_key);
     ';
     $check_ordering_code = '' if ($self->{_pre_sorted} > 1);
     my $value_value = (defined($self->{_value_column})) ? '$fref->[' . $self->{_value_coli} . ']' : '1';
@@ -530,9 +530,9 @@ sub run ($) {
     if ($@) {
 	# propagate sort failure cleanly
 	if ($@ =~ /^$self->{_prog}/) {
-	    croak "$@";
+	    croak("$@");
 	} else {
-	    croak $self->{_prog} . ": internal eval error: $@.\n";
+	    croak($self->{_prog} . ": internal eval error: $@.\n");
 	};
     };
 
@@ -547,7 +547,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

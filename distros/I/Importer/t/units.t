@@ -989,7 +989,7 @@ subtest optimal_import => sub {
     *FDestD::foo = sub { 'xyz' };
     like(
         warns { $optimal->('Fake::ForOptimal::A', 'FDestD', ['F', 'F.pm', 4], 'foo') },
-        qr/Subroutine FDestD::foo redefined at F\.pm line 4/,
+        qr/Subroutine FDestD::foo redefined(?:, called by F\.pm:4)? at F\.pm line 4/,
         "Got redefine warning"
     );
 

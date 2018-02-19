@@ -1,11 +1,11 @@
 #!perl
 
-# Note: This script is a CLI  for Riap function /App/BencherUtils/bencher_module_startup_overhead
-# and generated automatically using Perinci::CmdLine::Gen version 0.47
+# Note: This script is a CLI for Riap function /App/BencherUtils/bencher_module_startup_overhead
+# and generated automatically using Perinci::CmdLine::Gen version 0.484
 
-our $DATE = '2017-08-02'; # DATE
+our $DATE = '2018-02-18'; # DATE
 our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,14 +14,16 @@ use Log::ger;
 
 use Perinci::CmdLine::Any;
 
-Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BencherUtils/bencher_module_startup_overhead",
     program_name => "bencher-module-startup-overhead",
     log => 1,
     pass_cmdline_object => 1,
     config_filename => ["bencher.conf", "bencher-module-startup-overhead.conf"],
     use_utf8 => 1,
-)->run;
+);
+
+$cmdline->run;
 
 # ABSTRACT: Accept a list of module names and perform startup overhead benchmark
 # PODNAME: bencher-module-startup-overhead
@@ -38,7 +40,7 @@ bencher-module-startup-overhead - Accept a list of module names and perform star
 
 =head1 VERSION
 
-This document describes version 0.23 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2017-08-02.
+This document describes version 0.240 of bencher-module-startup-overhead (from Perl distribution App-BencherUtils), released on 2018-02-18.
 
 =head1 SYNOPSIS
 
@@ -292,7 +294,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

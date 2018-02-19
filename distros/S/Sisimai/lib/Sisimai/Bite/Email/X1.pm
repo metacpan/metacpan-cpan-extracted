@@ -4,20 +4,13 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/["]Mail Deliver System["] /,
-    'subject' => qr/\AReturned Mail: /,
-};
-my $Re1 = {
-    'begin'   => qr/\AThe original message was received at (.+)\z/,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $MarkingsOf = {
+    'message' => qr/\AThe original message was received at (.+)\z/,
     'rfc822'  => qr/\AReceived: from \d+[.]\d+[.]\d+[.]\d/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
-sub pattern     { return $Re0 }
 sub description { 'Unknown MTA #1' }
-
 sub scan {
     # Detect an error from Unknown MTA #1
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -35,8 +28,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
-    return undef unless $mhead->{'from'}    =~ $Re0->{'from'};
+    return undef unless index($mhead->{'subject'}, 'Returned Mail: ') == 0;
+    return undef unless index($mhead->{'from'}, '"Mail Deliver System" ') > -1;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -49,10 +42,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -60,7 +53,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -88,7 +81,7 @@ sub scan {
             # kijitora@example.co.jp [User unknown]
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A([^ ]+?[@][^ ]+?)[ \t]+\[(.+)\]\z/ ) {
+            if( $e =~ /\A([^ ]+?[@][^ ]+?)[ \t]+\[(.+)\]\z/ ) {
                 # kijitora@example.co.jp [User unknown]
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -99,15 +92,15 @@ sub scan {
                 $v->{'diagnosis'} = $2;
                 $recipients++;
 
-            } elsif( $e =~ $Re1->{'begin'} ) {
+            } elsif( $e =~ $MarkingsOf->{'message'} ) {
                 # The original message was received at Thu, 29 Apr 2010 23:34:45 +0900 (JST) 
                 $datestring = $1;
             }
         } # End of if: rfc822
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'date'}      = $datestring || '';
@@ -161,7 +154,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

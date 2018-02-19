@@ -1,14 +1,29 @@
-_:rb13621517d5cb4110bd95bab911dde3aar0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa> ;
+_:rb523d9472a11c4e14935fb9c179996134r0 <http://usefulinc.com/ns/doap#browse> <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa> ;
 	a <http://usefulinc.com/ns/doap#GitRepository> ;
 	<http://www.w3.org/ns/prov#has_provenance> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa&serialization=PROV-O#> .
-_:rb191a85a6fe334f9694da2b15be18851fr0 <http://ontologi.es/doap-deps#on> "RDF::Trine 0.133"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb191a85a6fe334f9694da2b15be18851fr1 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Generator 0.102"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb191a85a6fe334f9694da2b15be18851fr2 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
-_:rb191a85a6fe334f9694da2b15be18851fr3 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rb81e230d270e842609cc5b36c72e4b2fer0 <http://ontologi.es/doap-changeset#item> [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Add more tests."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Addition> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Allow passing arguments to create_document."@en
+	], [
+		a <http://ontologi.es/doap-changeset#Change> ;
+		<http://www.w3.org/2000/01/rdf-schema#label> "Use the Attean API with new compatibility layer."@en
+	] .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r0 <http://ontologi.es/doap-deps#on> "perl 5.014"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r1 <http://ontologi.es/doap-deps#on> "RDF::Trine 0.133"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r2 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Generator 0.200"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r3 <http://ontologi.es/doap-deps#on> "RDF::TrineX::Compatibility::Attean"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r4 <http://ontologi.es/doap-deps#on> "Test::More 0.96"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r5 <http://ontologi.es/doap-deps#on> "Test::RDF"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r6 <http://ontologi.es/doap-deps#on> "Module::Load::Conditional"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r7 <http://ontologi.es/doap-deps#on> "RDF::RDFa::Parser"^^<http://ontologi.es/doap-deps#CpanId> .
+_:rbafed95c3ba864a3f80a4a8ed7bc077f2r8 <http://ontologi.es/doap-deps#on> "Dist::Inkt 0.001"^^<http://ontologi.es/doap-deps#CpanId> .
 <http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
-<http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rb191a85a6fe334f9694da2b15be18851fr3 ;
-	<http://ontologi.es/doap-deps#runtime-requirement> _:rb191a85a6fe334f9694da2b15be18851fr0, _:rb191a85a6fe334f9694da2b15be18851fr1 ;
-	<http://ontologi.es/doap-deps#test-requirement> _:rb191a85a6fe334f9694da2b15be18851fr2 ;
+<http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project> <http://ontologi.es/doap-deps#develop-recommendation> _:rbafed95c3ba864a3f80a4a8ed7bc077f2r8 ;
+	<http://ontologi.es/doap-deps#runtime-requirement> _:rbafed95c3ba864a3f80a4a8ed7bc077f2r0, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r1, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r2, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r3 ;
+	<http://ontologi.es/doap-deps#test-requirement> _:rbafed95c3ba864a3f80a4a8ed7bc077f2r4, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r5, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r6, _:rbafed95c3ba864a3f80a4a8ed7bc077f2r7 ;
 	<http://purl.org/dc/terms/contributor> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
 	<http://usefulinc.com/ns/doap#bug-database> <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa/issues> ;
 	<http://usefulinc.com/ns/doap#category> <http://dbpedia.org/resource/Category:Semantic_Web> ;
@@ -20,8 +35,8 @@ _:rb191a85a6fe334f9694da2b15be18851fr3 <http://ontologi.es/doap-deps#on> "Dist::
 	<http://usefulinc.com/ns/doap#maintainer> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
 	<http://usefulinc.com/ns/doap#name> "RDF-Trine-Serializer-RDFa" ;
 	<http://usefulinc.com/ns/doap#programming-language> "Perl" ;
-	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-02> ;
-	<http://usefulinc.com/ns/doap#repository> _:rb13621517d5cb4110bd95bab911dde3aar0 ;
+	<http://usefulinc.com/ns/doap#release> <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-01>, <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-02>, <http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-100> ;
+	<http://usefulinc.com/ns/doap#repository> _:rb523d9472a11c4e14935fb9c179996134r0 ;
 	<http://usefulinc.com/ns/doap#shortdesc> "RDFa Serializer for RDF::Trine" ;
 	<http://usefulinc.com/ns/doap#support-forum> <irc://irc.perl.org/#perlrdf> ;
 	a <http://usefulinc.com/ns/doap#Project> .
@@ -39,6 +54,14 @@ _:rb191a85a6fe334f9694da2b15be18851fr3 <http://ontologi.es/doap-deps#on> "Dist::
 	<http://usefulinc.com/ns/doap#revision> "0.02"^^<http://www.w3.org/2001/XMLSchema#string> ;
 	a <http://usefulinc.com/ns/doap#Version> ;
 	<http://www.w3.org/2000/01/rdf-schema#label> "Improve documentation" .
+<http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/v_0-100> <http://ontologi.es/doap-changeset#changeset> _:rb81e230d270e842609cc5b36c72e4b2fer0 ;
+	<http://ontologi.es/doap-changeset#released-by> <http://purl.org/NET/cpan-uri/person/kjetilk> ;
+	<http://purl.org/dc/terms/identifier> "RDF-Trine-Serializer-RDFa-0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2018-02-11"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	<http://usefulinc.com/ns/doap#file-release> <http://backpan.cpan.org/authors/id/K/KJ/KJETILK/RDF-Trine-Serializer-RDFa-0.100.tar.gz> ;
+	<http://usefulinc.com/ns/doap#revision> "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a <http://usefulinc.com/ns/doap#Version> ;
+	<http://www.w3.org/2000/01/rdf-schema#label> "Support new RDFa generator" .
 <http://purl.org/NET/cpan-uri/person/kjetilk> a <http://xmlns.com/foaf/0.1/Person> ;
 	<http://www.w3.org/2002/07/owl#sameAs> <http://git2prov.org/git2prov?giturl=https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa&serialization=PROV-O#user-Kjetil-Kjernsmo>, <http://www.kjetil.kjernsmo.net/foaf#me> ;
 	<http://xmlns.com/foaf/0.1/mbox> <mailto:kjetilk@cpan.org> ;

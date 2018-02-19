@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
@@ -34,7 +34,7 @@ is ( $Entry->as_string(), '', 'Entry stringifies as expected' );
 test_get( $Group );
 is ( $Group->as_string(), '', 'Group stringifies as expected' );
 test_get( $Header );
-is ( $Header->as_string(), "unknown;\nnone", 'Header stringifies as expected' );
+is ( $Header->as_string(), "unknown; none", 'Header stringifies as expected' );
 test_get( $SubEntry );
 is ( $SubEntry->as_string(), '', 'SubEntrystringifies as expected' );
 test_get( $Version );

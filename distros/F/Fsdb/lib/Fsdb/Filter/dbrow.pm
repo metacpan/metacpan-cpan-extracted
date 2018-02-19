@@ -2,8 +2,7 @@
 
 #
 # dbrow.pm
-# Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
-# $Id: 3fe478660267a8bb5a9f13c957e1169ae188226e $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -250,7 +249,7 @@ sub setup ($) {
 	    exit 1;
         };
 	eval $loop_code;
-	$@ && die $self->{_prog} . ":  eval error compiling user-provided code: $@.\n";
+	$@ && croak($self->{_prog} . ":  eval error compiling user-provided code: $@.\n");
 	$self->{_loop_sub} = $loop_sub;
     }
 }
@@ -270,7 +269,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

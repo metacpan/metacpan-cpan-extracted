@@ -10,7 +10,7 @@ with 'Catmandu::Importer';
 
 use constant BASE_URL => 'https://www.ebi.ac.uk/europepmc/webservices/rest';
 
-has base   => ( is => 'ro', default => sub { return BASE_URL; } );
+has base_url   => ( is => 'ro', default => sub { return BASE_URL; } );
 has source => ( is => 'ro', default => sub { return "MED"; } );
 has module => ( is => 'ro', default => sub { return "search"; } );
 has query  => ( is => 'ro' );
@@ -66,7 +66,7 @@ sub _parse {
 sub _call {
     my ($self) = @_;
 
-    my $url = $self->base;
+    my $url = $self->base_url;
     if ( $self->module eq 'search' ) {
         $url .= '/search?query=' . $self->query;
     }
@@ -134,29 +134,46 @@ sub generator {
     # ...
   });
 
-=head1 OPTIONS
+=head1 CONFIGURATION
 
 =over
 
-=item * source: default is 'MED'
+=item base_url
 
-=item * query: either pmid or query is required.
+Specify the base url of the API. The default is 'https://www.ebi.ac.uk/europepmc/webservices/rest'.
 
-=item * pmid: either pmid or query is required.
+=item source
 
-=item * module: default is 'search', other possible values are 'databaseLinks', 'citations', 'references'
+The default is 'MED'.
 
-=item * db: the name of the database. Use when module is 'databaseLinks'.
+=item query
 
-=item * page: the paging parameter
+Provide a search query. Either pmid or query is required.
 
-=item * raw: optional. If true delivers the raw xml object.
+=item pmid
+
+Specify the PMID of the record you want to import. Either pmid or query is required.
+
+=item module
+
+The default is 'search', other possible values are 'databaseLinks', 'citations' and 'references'.
+
+=item db
+
+Set the name of the database. Use this when module is set to 'databaseLinks'.
+
+=item page
+
+Optional. Set the paging parameter.
+
+=item raw
+
+Optional. If set to true it delivers the raw xml object.
 
 =back
 
 =head1 SEE ALSO
 
-L<Catmandu::Iterable>, L<Catmandu::Fix>,
-L<Catmandu::Importer::PubMed>
+L<Catmandu>, L<Catmandu::Iterable>, L<Catmandu::Fix>,
 
 =cut

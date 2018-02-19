@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package fpl;
-$fpl::VERSION = '1.26';
+$fpl::VERSION = '1.27';
 use Footprintless::App;
 
 # Let dzil --version know what to report:
@@ -24,7 +24,7 @@ fpl - Run footprintless commands
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 AUTHOR
 

@@ -4,28 +4,21 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/[@]googlemail[.]com[>]?\z/,
-    'subject' => qr/Delivery[ ]Status[ ]Notification/,
-};
-my $Re1 = {
-    'begin'   => qr/\A[*][*][ ].+[ ][*][*]\z/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $MarkingsOf = {
+    'message' => qr/\A[*][*][ ].+[ ][*][*]\z/,
     'error'   => qr/\AThe[ ]response([ ]from[ ]the[ ]remote[ ]server)?[ ]was:\z/,
     'html'    => qr{\AContent-Type:[ ]*text/html;[ ]*charset=['"]?(?:UTF|utf)[-]8['"]?\z},
     'rfc822'  => qr{\AContent-Type:[ ]*(?:message/rfc822|text/rfc822-headers)\z},
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
 };
 my $ErrorMayBe = {
     'userunknown'  => qr/because the address couldn't be found/,
     'notaccept'    => qr/Null MX/,
     'networkerror' => qr/DNS type .+ lookup of .+ responded with code NXDOMAIN/
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 sub headerlist  { return ['X-Gm-Message-State'] }
-sub pattern     { return $Re0 }
 sub description { 'G Suite: https://gsuite.google.com/' }
-
 sub scan {
     # Detect an error from G Suite (Transfer from G Suite to a destination host)
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -43,8 +36,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'from'}    =~ $Re0->{'from'};
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'from'}, '<mailer-daemon@googlemail.com>') > -1;
+    return undef unless index($mhead->{'subject'}, 'Delivery Status Notification') > -1;
     return undef unless $mhead->{'x-gm-message-state'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -67,15 +60,15 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            $readcursor |= $Indicators->{'deliverystatus'} if $e =~ $Re1->{'begin'};
+            $readcursor |= $Indicators->{'deliverystatus'} if $e =~ $MarkingsOf->{'message'};
         }
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -103,7 +96,7 @@ sub scan {
                 # Last-Attempt-Date: Fri, 24 Mar 2017 23:34:10 -0700 (PDT)
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: rfc822; kijitora@example.de
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -113,25 +106,25 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.0.0
                     $v->{'status'} = $1;
 
-                } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ARemote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Remote-MTA: dns; 192.0.2.222 (192.0.2.222, the server for the domain.)
                     $v->{'rhost'} = lc $1;
-                    $v->{'rhost'} = '' if $v->{'rhost'} =~ m/\A\s+\z/;  # Remote-MTA: DNS; 
+                    $v->{'rhost'} = '' if $v->{'rhost'} =~ /\A\s+\z/;  # Remote-MTA: DNS; 
 
-                } elsif( $e =~ m/\A[Ll]ast-[Aa]ttempt-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ALast-Attempt-Date:[ ]*(.+)\z/ ) {
                     # Last-Attempt-Date: Fri, 24 Mar 2017 23:34:10 -0700 (PDT)
                     $v->{'date'} = $1;
 
                 } else {
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: smtp; 550 #5.1.0 Address rejected.
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
@@ -139,11 +132,11 @@ sub scan {
                     } else {
                         # Append error messages continued from the previous line
                         if( $endoferror == 0 && length $v->{'diagnosis'} ) {
-                            $endoferror = 1 if $e eq '';
-                            $endoferror = 1 if $e =~ m/\A--/;
+                            $endoferror ||= 1 if $e eq '';
+                            $endoferror ||= 1 if index($e, '--') == 0;
 
                             next if $endoferror;
-                            next unless $e =~ m/\A[ ]/;
+                            next unless index($e, ' ') == 0;
                             $v->{'diagnosis'} .= $e;
                         }
                     }
@@ -153,13 +146,13 @@ sub scan {
                 # Received-From-MTA: dns; sironeko@example.jp
                 # Arrival-Date: Fri, 24 Mar 2017 23:34:07 -0700 (PDT)
                 # X-Original-Message-ID: <06C1ED5C-7E02-4036-AEE1-AA448067FB2C@example.jp>
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; googlemail.com
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -167,7 +160,7 @@ sub scan {
 
                 } else {
                     # Detect SMTP session error or connection error
-                    if( $e =~ $Re1->{'error'} ) {
+                    if( $e =~ $MarkingsOf->{'error'} ) {
                         # The response from the remote server was:
                         $anotherset->{'diagnosis'} .= $e;
 
@@ -179,7 +172,7 @@ sub scan {
                         #
                         # The response from the remote server was:
                         # 550 #5.1.0 Address rejected.
-                        next if $e =~ $Re1->{'html'};
+                        next if $e =~ $MarkingsOf->{'html'};
 
                         if( length $anotherset->{'diagnosis'} ) {
                             # Continued error messages from the previous line like
@@ -198,7 +191,7 @@ sub scan {
                             # Your message wasn't delivered to * because the address couldn't be found.
                             # Check for typos or unnecessary spaces and try again.
                             next unless $e;
-                            next unless $e =~ $Re1->{'begin'};
+                            next unless $e =~ $MarkingsOf->{'message'};
                             $anotherset->{'diagnosis'} = $e;
                         }
                     }
@@ -206,12 +199,11 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
+
     require Sisimai::String;
     require Sisimai::SMTP::Reply;
     require Sisimai::SMTP::Status;
-
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
@@ -219,7 +211,7 @@ sub scan {
         if( exists $anotherset->{'diagnosis'} && length $anotherset->{'diagnosis'} ) {
             # Copy alternative error message
             $e->{'diagnosis'} ||= $anotherset->{'diagnosis'};
-            if( $e->{'diagnosis'} =~ m/\A\d+\z/ ) {
+            if( $e->{'diagnosis'} =~ /\A\d+\z/ ) {
                 # Override the value of diagnostic code message
                 $e->{'diagnosis'} = $anotherset->{'diagnosis'};
 
@@ -228,16 +220,16 @@ sub scan {
                 my $as = undef; # status
                 my $ar = undef; # replycode
 
-                if( $e->{'status'} eq '' || $e->{'status'} =~ m/\A[45][.]0[.]0\z/ ) {
+                if( $e->{'status'} eq '' || $e->{'status'} eq '5.0.0' || $e->{'status'} eq '4.0.0' ) {
                     # Check the value of D.S.N. in $anotherset
                     $as = Sisimai::SMTP::Status->find($anotherset->{'diagnosis'});
-                    if( length($as) > 0 && substr($as, -3, 3) ne '0.0' ) {
+                    if( length($as) > 0 && substr($as, -4, 4) ne '.0.0' ) {
                         # The D.S.N. is neither an empty nor *.0.0
                         $e->{'status'} = $as;
                     }
                 }
 
-                if( $e->{'replycode'} eq '' || $e->{'replycode'} =~ m/\A[45]00\z/ ) {
+                if( $e->{'replycode'} eq '' || $e->{'replycode'} eq '500' || $e->{'replycode'} eq '400' ) {
                     # Check the value of SMTP reply code in $anotherset
                     $ar = Sisimai::SMTP::Reply->find($anotherset->{'diagnosis'});
                     if( length($ar) > 0 && substr($ar, -2, 2) ne '00' ) {
@@ -310,7 +302,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

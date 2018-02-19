@@ -27,11 +27,10 @@ name: Plack-Middleware-Statsd
 provides:
   Plack::Middleware::Statsd:
     file: lib/Plack/Middleware/Statsd.pm
-    version: v0.3.0
+    version: v0.3.3
 recommends:
-  Net::Statsd::Tiny: v0.2.0
+  Net::Statsd::Tiny: v0.3.0
 requires:
-  POSIX: '0'
   Plack::Middleware: '0'
   Plack::Util: '0'
   Plack::Util::Accessor: '0'
@@ -44,6 +43,6 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Statsd/issues
   repository: git://github.com/robrwo/Plack-Middleware-Statsd.git
-version: v0.3.0
+version: v0.3.3
 x_authority: cpan:RRWO
 x_serialization_backend: 'YAML::Tiny version 1.70'

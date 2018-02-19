@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 24;
+use Test::More tests => 35;
 use Test::Exception;
 use Mojolicious::Lite;
 use Test::Mojo;
@@ -62,6 +62,28 @@ my $t = Test::Mojo->new;
      {
       updates => [{hey => 'you'}],
       source_pairs => {flags => {rendered => 0}}
+     },
+     'rest of processed stuff';
+}
+
+{
+   $wh->reset;
+   $t->post_ok('/wh', json => {answer => 'me'})->status_is(200);
+   $t->content_is('All OK!');  # look Ma!
+   is scalar($wh->processed), 1, 'something arrived to the process phase';
+
+   my ($processed) = $wh->processed;
+   ok exists($processed->{refs}), 'refs exists';
+   my $refs = delete $processed->{refs};
+   ok exists($refs->{app}), 'refs.app';
+   isa_ok $refs->{app}, 'Mojolicious';
+   ok exists($refs->{controller}), 'refs.controller';
+   isa_ok $refs->{controller}, 'Mojolicious::Controller';
+   ok exists($refs->{stash}), 'refs.stash';
+
+   is_deeply $processed, {
+      updates => [{answer => 'me'}],
+      source_pairs => {flags => {rendered => 1}},    # look Ma!
      },
      'rest of processed stuff';
 }

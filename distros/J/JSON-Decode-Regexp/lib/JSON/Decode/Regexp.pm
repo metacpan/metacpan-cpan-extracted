@@ -1,7 +1,7 @@
 package JSON::Decode::Regexp;
 
-our $DATE = '2016-11-04'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2018-02-14'; # DATE
+our $VERSION = '0.100'; # VERSION
 
 use 5.010001;
 use strict;
@@ -155,9 +155,9 @@ our $FROM_JSON = qr{
 (?<NUMBER>
   (
     -?
-    (?: 0 | [1-9]\d* )
-    (?: \. \d+ )?
-    (?: [eE] [-+]? \d+ )?
+    (?: 0 | [1-9][0-9]* )
+    (?: \. [0-9]+ )?
+    (?: [eE] [-+]? [0-9]+ )?
   )
 
   (?{ [$^R, 0+$^N] })
@@ -190,7 +190,7 @@ JSON::Decode::Regexp - JSON parser as a single Perl Regex
 
 =head1 VERSION
 
-This document describes version 0.09 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2016-11-04.
+This document describes version 0.100 of JSON::Decode::Regexp (from Perl distribution JSON-Decode-Regexp), released on 2018-02-14.
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/JSON-Decod
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-JSON-Decode-Regexp>.
+Source repository is at L<https://github.com/perlancar/perl-JSON-Decode-Regexp>.
 
 =head1 BUGS
 
@@ -258,7 +258,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

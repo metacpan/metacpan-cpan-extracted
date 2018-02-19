@@ -4,20 +4,15 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/\APostmaster [<]Postmaster[@]AOL[.]com[>]\z/,
-    'subject' => qr/\AUndeliverable: /,
-};
-my $Re1 = {
-    'begin'   => qr|\AContent-Type: message/delivery-status|,
-    'rfc822'  => qr|\AContent-Type: message/rfc822|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'hostunknown' => qr/Host[ ]or[ ]domain[ ]name[ ]not[ ]found/,
-    'notaccept'   => qr/type=MX:[ ]Malformed[ ]or[ ]unexpected[ ]name[ ]server[ ]reply/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Content-Type: message/delivery-status'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+};
+my $ReFailures = {
+    'hostunknown' => qr/Host or domain name not found/,
+    'notaccept'   => qr/type=MX: Malformed or unexpected name server reply/,
+};
 
 # X-AOL-IP: 192.0.2.135
 # X-AOL-VSS-INFO: 5600.1067/98281
@@ -30,9 +25,7 @@ my $Indicators = __PACKAGE__->INDICATORS;
 # X-Outbound-Mail-Relay-Queue-ID: 07391702BF4DC
 # X-Outbound-Mail-Relay-Sender: rfc822; shironeko@aol.example.jp
 sub headerlist  { return ['X-AOL-IP'] }
-sub pattern     { return $Re0 }
 sub description { 'Aol Mail: http://www.aol.com' }
-
 sub scan {
     # Detect an error from Aol Mail
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -50,6 +43,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'from'    => qr/\APostmaster [<]Postmaster[@]AOL[.]com[>]\z/,
+    # 'subject' => qr/\AUndeliverable: /,
     return undef unless $mhead->{'x-aol-ip'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -64,15 +59,14 @@ sub scan {
         'date'  => '',      # The value of Arrival-Date header
         'lhost' => '',      # The value of Reporting-MTA header
     };
-
     my $v = undef;
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -80,7 +74,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -109,7 +103,7 @@ sub scan {
                 # Diagnostic-Code: smtp; 550 5.2.2 <kijitora@example.co.jp>... Mailbox Full
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; userunknown@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -119,26 +113,26 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status:5.2.0
                     $v->{'status'} = $1;
 
-                } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ARemote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Remote-MTA: DNS; mx.example.jp
                     $v->{'rhost'} = lc $1;
 
                 } else {
                     # Get error message
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -152,13 +146,13 @@ sub scan {
                 # X-Outbound-Mail-Relay-Queue-ID: CCBA43800007F
                 # X-Outbound-Mail-Relay-Sender: rfc822; shironeko@aol.example.jp
                 # Arrival-Date: Fri, 21 Nov 2014 17:14:34 -0500 (EST)
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; mx.example.jp
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -171,19 +165,19 @@ sub scan {
         $p = $e;
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
 
         $e->{'agent'}     =  __PACKAGE__->smtpagent;
-        $e->{'diagnosis'} =~ s{\\n}{ }g;
+        $e->{'diagnosis'} =~ s/\\n/ /g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -235,7 +229,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

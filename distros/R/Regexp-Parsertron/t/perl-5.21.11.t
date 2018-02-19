@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -98,7 +97,7 @@ for my $line (@lines)
 		}
 		else
 		{
-			#say "Count: $count. " . $parser -> warning_str;
+			#print "Count: $count. ", $parser -> warning_str, "\n";
 		}
 	}
 	catch

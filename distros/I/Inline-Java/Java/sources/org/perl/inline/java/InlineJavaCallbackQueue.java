@@ -9,7 +9,7 @@ import java.io.* ;
 */
 class InlineJavaCallbackQueue {
 	// private InlineJavaServer ijs = InlineJavaServer.GetInstance() ;
-	private ArrayList queue = new ArrayList() ;
+	private ArrayList<InlineJavaCallback> queue = new ArrayList<>() ;
 	private boolean wait_interrupted = false ;
 	private boolean stream_opened = false ;
 

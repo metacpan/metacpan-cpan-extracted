@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-perlancar
   homepage: https://metacpan.org/release/App-cpanm-perlancar
   repository: git://github.com/perlancar/perl-App-cpanm-perlancar.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -105,7 +105,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.591'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -137,7 +137,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -317,7 +317,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'

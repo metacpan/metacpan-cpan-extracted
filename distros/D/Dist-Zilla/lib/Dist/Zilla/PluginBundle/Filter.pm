@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Filter 6.010;
+package Dist::Zilla::PluginBundle::Filter 6.011;
 # ABSTRACT: use another bundle, with some plugins removed
 
 use Moose;
@@ -7,7 +7,7 @@ with 'Dist::Zilla::Role::PluginBundle';
 use namespace::autoclean;
 
 use List::Util 1.33 qw(any);
-use Class::Load qw(try_load_class);
+use Module::Runtime qw(use_module);
 use Dist::Zilla::Util;
 
 #pod =head1 SYNOPSIS
@@ -66,12 +66,9 @@ sub bundle_config {
 
   my $pkg = Dist::Zilla::Util->expand_config_package_name($bundle);
 
-  my $load_opts = {};
-  if( my $v = $config->{filter}->{version} ){
-    $load_opts->{'-version'} = $v;
-  }
+  my $version = $config->{filter}->{version};
 
-  unless (try_load_class($pkg, $load_opts)) {
+  unless (eval { &use_module($pkg, $version ? $version : ()); 1 }) {
     # XXX Naughty! -- rjbs, 2013-07-23
     Config::MVP::Section->missing_package($pkg, $bundle);
   }
@@ -108,7 +105,7 @@ Dist::Zilla::PluginBundle::Filter - use another bundle, with some plugins remove
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 SYNOPSIS
 
@@ -147,7 +144,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

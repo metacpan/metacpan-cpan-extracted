@@ -1,13 +1,13 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/29_cmd_z2z.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests    => 8;
 warn <<"" and map ok(1),1..8 and exit if $^O!~/^(linux|cygwin)$/;
 Tests for cmd_z2z not available for $^O, only linux and cygwin
 
 my $tmp=tmp();
 my $tf="$tmp/acme-tools.cmd_z2z";
-writefile($tf,join" ",1..1e3);
+writefile($tf,join" ",1..500);
 #print qx(ls -l $tf)."\n";
 my($last,$n)=("",0);
 for(qw(gz bz2 xz gz xz bz2 gz)){
@@ -22,10 +22,10 @@ for(qw(gz bz2 xz gz xz bz2 gz)){
 
 my @f=map"$tf.$_",1..4;
 my $nn=0;
-writefile($_,join" ",map ++$nn,1..1e4) for @f;
+writefile($_,join" ",map ++$nn,1..5000) for @f;
 my $b4=sum(map -s$_,@f);
 if( qx(which pv) and qx(which xz) ){
-  Acme::Tools::cmd_z2z('-vpt','xz',@f);
+  Acme::Tools::cmd_z2z('-vp6t','xz',@f);
   Acme::Tools::cmd_z2z('-vht','gz',map"$_.xz",@f);
 }
 else {

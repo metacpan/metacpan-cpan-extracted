@@ -8,7 +8,6 @@ use Mojo::URL;
 use Mojo::Util;
 use Mojolicious::Routes::Match;
 use Scalar::Util ();
-use Time::HiRes  ();
 
 has [qw(app tx)];
 has match =>
@@ -201,11 +200,10 @@ sub rendered {
   if (!$stash->{'mojo.finished'} && ++$stash->{'mojo.finished'}) {
 
     # Disable auto rendering and stop timer
-    my $app = $self->render_later->app;
-    if (my $started = delete $stash->{'mojo.started'}) {
-      my $elapsed
-        = Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
-      my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+    my $app    = $self->render_later->app;
+    my $timing = $self->helpers->timing;
+    if (defined(my $elapsed = $timing->elapsed('mojo.timer'))) {
+      my $rps  = $timing->rps($elapsed) // '??';
       my $code = $res->code;
       my $msg  = $res->message || $res->default_message($code);
       $app->log->debug("$code $msg (${elapsed}s, $rps/s)");

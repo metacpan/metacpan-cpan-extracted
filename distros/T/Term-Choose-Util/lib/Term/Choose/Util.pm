@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.055';
+our $VERSION = '0.056';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_dir choose_a_file choose_dirs choose_a_number choose_a_subset settings_menu insert_sep
                      length_longest print_hash term_size term_width unicode_sprintf unicode_trim );
@@ -17,7 +17,7 @@ use List::Util            qw( sum );
 
 use Encode::Locale         qw();
 use File::HomeDir          qw();
-use List::MoreUtils        qw( first_index ); #
+use List::MoreUtils        qw( first_index );
 use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold cut_to_printwidth print_columns );
 use Term::ReadKey          qw( GetTerminalSize ReadKey ReadMode );
@@ -66,17 +66,18 @@ sub choose_dirs {
             $key_w = 5;
             $lines .= sprintf "new: %s", _stringify_array( @$new );
         }
-        my $key_cwd = '==>  ';
+        my $key_cwd = "\n     ==>  ";
         $lines  = line_fold( $lines,                                          term_width(), '' , ' ' x $key_w );
         $lines .= "\n";
         $lines .= line_fold( $key_cwd . decode( 'locale_fs', "[$previous]" ), term_width(), '' , ' ' x length $key_cwd );
-        if ( length $o->{info_on_top} ) {
-            $lines = $o->{info_on_top} . "\n" . $lines;
+        if ( length $o->{info} ) {
+            $lines = $o->{info} . "\n" . $lines;
         }
-        if ( defined $o->{prompt} ) {
-            $lines .= "\n" if length $o->{prompt};
-            $lines .= $o->{prompt};
+        if ( ! defined $o->{prompt} ) {
+            $o->{prompt} = ' ';
         }
+        $lines .= "\n" if length $o->{prompt};
+        $lines .= $o->{prompt};
         my $choice = choose(
             [ @pre, sort( @dirs ) ],
             { prompt => $lines, undef => $o->{back}, default => $default_idx, mouse => $o->{mouse},
@@ -126,7 +127,7 @@ sub _prepare_opt_choose_path {
         mouse        => 0,
         layout       => 1,
         order        => 1,
-        info_on_top  => '', # experimental
+        info         => '',
         justify      => 0,
         enchanted    => 1,
         confirm      => ' = ',
@@ -188,7 +189,7 @@ sub _choose_a_path {
             push @dirs, decode( 'locale_fs', $file ) if -d catdir $dir, $file;
         }
         closedir $dh;
-        my $lines = $o->{info_on_top};
+        my $lines = $o->{info};
         $lines .= "\n" if length $lines;
         if ( $a_file ) {
             if ( $curr ) {
@@ -272,7 +273,7 @@ sub _a_file {
             choose( [ ' < ' ], { prompt => $prompt } );
             return;
         }
-        my $lines = $o->{info_on_top};
+        my $lines = $o->{info};
         $lines .= "\n" if length $lines;
         if ( $curr ) {
             $lines .= sprintf "Current file: %s\n", _prepare_string( $curr );
@@ -313,7 +314,7 @@ sub choose_a_number {
     }
     $opt = {} if ! defined $opt;
     my $prompt = $opt->{prompt};
-    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}   : '';    # experimental
+    my $info =         defined $opt->{info}         ? $opt->{info}         : '';
     my $current;
     if ( exists $opt->{current} ) {
        $current      = defined $opt->{current}      ? $opt->{current}      : '';
@@ -355,18 +356,19 @@ sub choose_a_number {
     }
     my %numbers;
     my $result;
-    my $empty = '--';
+    $name = $name . ' ' if length $name;
+    my $empty = '-';
 
     NUMBER: while ( 1 ) {
-        my $lines = $info_on_top;
+        my $lines = $info;
         $lines .= "\n" if length $lines;
         my $new_result = length $result ? $result : $empty;
         my $str_w = print_columns( "$choices_range[0]" );
         my $term_w = term_width();
         if ( defined $current ) {
             $current = insert_sep( $current, $thsd_sep );
-            my $tmp1 = sprintf " current %*s", $longest, $current;     # []
-            my $tmp2 = sprintf "     new %*s", $longest, $new_result;
+            my $tmp1 = sprintf " current ${name}%*s", $longest, $current;
+            my $tmp2 = sprintf "     new ${name}%*s", $longest, $new_result;
             if ( $str_w > $term_w ) {
                 $lines .= sprintf "%*s", $term_w, $new_result;
             }
@@ -376,7 +378,7 @@ sub choose_a_number {
             }
         }
         else {
-            my $tmp = sprintf "%*s", $longest, $new_result; # []
+            my $tmp = sprintf "${name}%s", $new_result;
             $lines .= sprintf "%*s", ( $str_w > $term_w ? $term_w : $str_w ), $tmp;
         }
         if ( defined $prompt ) {
@@ -443,7 +445,7 @@ sub choose_a_subset {
     my $show_fmt    = defined $opt->{show_fmt}     ? $opt->{show_fmt}     : 1;      # experimental
     my $keep_chosen = defined $opt->{keep_chosen}  ? $opt->{keep_chosen}  : 1;      # experimental
     my $mark        = $opt->{mark};                                                 # experimental
-    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}  : '';     # experimental
+    my $info        = defined $opt->{info}         ? $opt->{info}         : '';
     my $index       = defined $opt->{index}        ? $opt->{index}        : 0;
     my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
     my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
@@ -470,7 +472,7 @@ sub choose_a_subset {
     my @cur_avail = @$available;
 
     while ( 1 ) {
-        my $lines = $info_on_top;
+        my $lines = $info;
         $lines .= "\n" if length $lines;
         if ( $show_fmt == 0 ) {
             $lines .= join( ', ', @{$opt->{current}} ) . "\n" if defined $current;
@@ -534,11 +536,11 @@ sub choose_a_subset {
 sub settings_menu {
     my ( $menu, $curr, $opt ) = @_;
     $opt = {} if ! defined $opt;
-    my $prompt      = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
-    my $info_on_top = defined $opt->{info_on_top}  ? $opt->{info_on_top}  : '';         # experimental
-    my $in_place    = $opt->{in_place}; # DEPRECATED
-    my $clear       = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
-    my $mouse       = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
+    my $prompt   = defined $opt->{prompt}       ? $opt->{prompt}       : 'Choose:';
+    my $info     = defined $opt->{info}         ? $opt->{info}         : '';
+    my $in_place =         $opt->{in_place}; # DEPRECATED
+    my $clear    = defined $opt->{clear_screen} ? $opt->{clear_screen} : 1;
+    my $mouse    = defined $opt->{mouse}        ? $opt->{mouse}        : 0;
     #---------------------------------------#
     my $confirm = defined $opt->{confirm} ? $opt->{confirm} : 'CONFIRM';
     my $back    = defined $opt->{back}    ? $opt->{back}    : 'BACK';
@@ -565,7 +567,7 @@ sub settings_menu {
         $curr->{$key} = 0       if ! defined $curr->{$key};
         $new->{$key}  = $curr->{$key};
     }
-    my $lines = $info_on_top;
+    my $lines = $info;
     if ( defined $prompt ) {
         $lines .= "\n" if length $lines;
         $lines .= $prompt;
@@ -771,7 +773,7 @@ Term::Choose::Util - CLI related functions.
 
 =head1 VERSION
 
-Version 0.055
+Version 0.056
 
 =cut
 
@@ -793,6 +795,40 @@ Values in brackets are default values.
 
 Unknown option names are ignored.
 
+Options available for all functions:
+
+=over
+
+=item
+
+clear_screen
+
+If enabled, the screen is cleared before the output.
+
+Values: 0,[1]. Default may change in a future release.
+
+=item
+
+info
+
+A string placed on top of of the output.
+
+=item
+
+prompt
+
+A string placed on top of the available choices.
+
+=item
+
+mouse
+
+See the option I<mouse> in L<Term::Choose>
+
+Values: [0],1,2,3,4.
+
+=back
+
 =head2 choose_a_dir
 
     $chosen_directory = choose_a_dir( { layout => 1, ... } )
@@ -813,14 +849,6 @@ The "back"-menu-entry ("C< < >") causes C<choose_a_dir> to return nothing.
 As an argument it can be passed a reference to a hash. With this hash the user can set the different options:
 
 =over
-
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
 
 =item
 
@@ -867,14 +895,6 @@ layout
 See the option I<layout> in L<Term::Choose>
 
 Values: 0,[1],2,3.
-
-=item
-
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
 
 =item
 
@@ -946,14 +966,6 @@ The second and optional argument is a reference to a hash with these keys (optio
 
 =item
 
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
-
-=item
-
 current
 
 The current value. If set, two prompt lines are displayed - one for the current number and one for the new number.
@@ -962,17 +974,9 @@ The current value. If set, two prompt lines are displayed - one for the current 
 
 name
 
-Sets the name of the number seen in the prompt line.
+If set, the value of I<name> is put in front of the composed number in the info-output.
 
 Default: empty string ("");
-
-=item
-
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
 
 =item
 
@@ -995,14 +999,6 @@ As a first argument it is required a reference to an array which provides the av
 The optional second argument is a hash reference. The following options are available:
 
 =over
-
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
 
 =item
 
@@ -1038,14 +1034,6 @@ Values: 0,1,2,[3].
 
 =item
 
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
-
-=item
-
 order
 
 If set to 1, the items are ordered vertically else they are ordered horizontally.
@@ -1062,14 +1050,6 @@ I<prefix> expects as its value a string. This string is put in front of the elem
 printing. The chosen elements are returned without this I<prefix>.
 
 The default value is "- " if the I<layout> is 3 else the default is the empty string ("").
-
-=item
-
-prompt
-
-The prompt line before the choices.
-
-Defaults to "Choose:".
 
 =back
 
@@ -1121,33 +1101,7 @@ the values (C<0> if not defined) are the indexes of the current value of the res
 
 =back
 
-The optional third argument is a reference to a hash. The keys are
-
-=over
-
-=item
-
-clear_screen
-
-If enabled, the screen is cleared before the output.
-
-Values: 0,[1].
-
-=item
-
-mouse
-
-See the option I<mouse> in L<Term::Choose>
-
-Values: [0],1,2,3,4.
-
-=item
-
-prompt
-
-A prompt string used instead of the default prompt string.
-
-=back
+With the optional third argument can be passed the options.
 
 When C<settings_menu> is called, it displays for each array entry a row with the prompt string and the current value.
 It is possible to scroll through the rows. If a row is selected, the set and displayed value changes to the next. If the

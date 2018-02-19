@@ -1,0 +1,304 @@
+=encoding utf8
+
+=head1 NAME
+
+TUWF::Intro - A cookbook-style introduction to TUWF.
+
+=head1 DESCRIPTION
+
+The main L<TUWF> documentation already has a short introduction and is a good
+reference, but it doesn't really tell you how to get started on a simple
+website. This document lists a bunch of examples, starting from the basics,
+that will show you the general principles and philosophy behind TUWF.
+
+This is a documentation-only module, a C<use TUWF::Intro;> will not work.
+
+
+=head1 THE BASICS
+
+=head2 A single-file website
+
+What sets TUWF apart from many other modern web frameworks is that it does not
+assume a directory structure for your project. There is, by default, no "TUWF
+configuration file" and no C<public/> directory where TUWF will serve files
+from. A TUWF website is more like an old CGI script: You write a script, and
+that script B<is> the website. Here is the script for a complete TUWF website:
+
+  #!/usr/bin/perl
+
+  use strict;
+  use warnings;
+
+  # Load the TUWF module. In this case we also import the 'Txt' function from
+  # TUWF::XML, which allows us to easily output text.
+  use TUWF 'Txt';
+
+  # Register a request handler for the root path.
+  TUWF::get '/' => sub {
+    # Output some text
+    Txt 'Hello, World.';
+  };
+
+  # And now 'run' the website. This should always be the last thing in the script.
+  TUWF::run;
+
+That's it. Save that to I<example.pl> and you have a website that will show an
+I<Hello world> page. If you have L<HTTP::Server::Simple> installed, you can run
+the script on the command line to start a local web server on port 3000. You
+can also point your web server to the script to serve it through CGI or
+FastCGI. See the L<Server configuration|TUWF/"SERVER CONFIGURATION">
+documentation for such configuration examples.
+
+
+=head2 Request handlers & request data
+
+The previous example had a request handler for C</>, which means that the
+subroutine (handler) is called whenever there is a GET request for the root
+path. You can also register a handler for other HTTP methods:
+
+  TUWF::post '/' => sub { .. };
+  TUWF::put '/' => sub { .. };
+  TUWF::any ['GET', 'HEAD', 'POST'], '/' => sub { .. };
+
+And for different paths:
+
+  TUWF::get '/about' => sub { .. };
+  TUWF::post '/forum/create-thread' => sub { .. };
+
+You can also use regular expressions. The sub-expressions are available through
+C<< tuwf->capture() >>:
+
+  TUWF::get qr{/user/(.+)} => sub {
+    my $username = tuwf->capture(1);
+  };
+
+  # Or, using named captures:
+  TUWF::get qr{/user/(?<username>.+)} => sub {
+    my $username = tuwf->capture('username');
+  };
+
+The C<tuwf> function that you see above gives you access to the global I<TUWF
+Object>. This object has many useful methods to get request data, generate a
+response, access a database, and other utilities that come in handy. Here's a
+few examples to get information from the request:
+
+  TUWF::get '/' => sub {
+    my $path = tuwf->reqPath;     # Returns '/' for this handler
+    my $method = tuwf->reqMethod; # Returns 'GET'
+    my $ip = tuwf->reqIP;         # Returns the users' IP address
+
+    # Returns the value of the cookie named 'auth',
+    # or undef if no such cookie was sent.
+    my $auth = tuwf->reqCookie('auth');
+  };
+
+Other request methods can be found in L<TUWF::Request>.
+
+
+=head2 Generating a response
+
+A request handler typically generates a response to send back to the client.
+There are a few different ways to do so. Let's start with the low-level tools
+provided by L<TUWF::Response>; This example does the same as the I<Hello world>
+example we started with:
+
+  TUWF::get '/' => sub {
+    # Set the HTTP response code.
+    # This is a silly example, as '200' is the default.
+    tuwf->resStatus(200);
+
+    # Set a HTTP header.
+    tuwf->resHeader('Cache-Control' => 'no-cache');
+
+    # Write some text to the HTTP body.
+    my $fd = tuwf->resFd;
+    print $fd 'Hello, World.';
+  };
+
+C<resFd> gives you a UTF-8-enabled file handle where you can write a textual
+HTTP body to. You typically don't want to use it, though. There are more
+convenient alternatives available for different types of output. The
+recommended approach of generating dynamic HTML and XML is to use L<TUWF::XML>,
+which can be used directly:
+
+  use TUWF ':Html5';
+
+  # A convenience function that serves as our HTML template. Let's use
+  # title-case function naming here for HTML-generating functions.
+  sub Framework {
+    my %options = @_;
+    Html sub {
+      Head sub {
+        Title $options->{title};
+      };
+      Body sub {
+        H1 $options->{title};
+        Div id => 'main', $options->{body};
+      };
+    };
+  };
+
+  TUWF::get '/' => sub {
+    Framework title => 'Main page', body => sub {
+      Txt 'This is the body of the main page';
+    };
+  };
+
+A note on naming conventions: The above example uses Title case for functions
+that generate HTML. This is a convenient scheme to avoid naming clashes with
+other functions and to make it clear what the function is doing, but you're not
+forced to use this convention. L<TUWF::XML> can export HTML generation
+functions with different naming conventions as well.
+
+If the example seems overly magical to you, don't worry, the rules for
+converting that DSL-like code into proper HTML are all explained in
+L<TUWF::XML>. If you prefer something less magical, you can still use any
+templating system of your choice. Here's an example with
+L<HTML::Template::Pro>:
+
+  use TUWF;
+  use HTML::Template::Pro;
+
+  TUWF::get '/' => sub {
+    my $tpl = HTML::Template::Pro->new(filename => 'templates/main.tmpl');
+    $tpl->param(title => 'Main page');
+    $tpl->param(body => 'This is the body of the main page');
+    tuwf->resBinary($tpl->output);
+  };
+
+See L</Extending TUWF> below for ways to fully integrate alternative templating
+systems in TUWF.
+
+
+=head2 Growing beyond a single file
+
+It's surprising how much you can already do with a single-file website, but
+some projects are too large keep cramming all functionality into a single file.
+In those cases, you'll want to have a directory structure for your project and
+ways to split up assets and functionality into multiple files. TUWF does not
+enforce a directory structure, so we're free to think of something on our own.
+Let's go with the following relatively standard structure:
+
+  myproject/
+  ├── bin/
+  │   └── site.pl
+  ├── lib/
+  │   └── MyProject/
+  │       ├── Homepage.pm
+  │       └── Articles.pm
+  └── public/
+      ├── logo.svg
+      ├── scripts.js
+      └── style.css
+
+Here, I<site.pl> would be our main TUWF script. It doesn't have to do much by
+itself, it would only have to load the right code, and initialize TUWF. Here's
+what it could look like:
+
+  #!/usr/bin/perl
+
+  use strict;
+  use warnings;
+  use FindBin '$Bin';
+  use TUWF;
+
+  # Make sure we can load modules from our 'lib' directory.
+  use lib '$Bin/../lib';
+
+  # Setup a 'before' hook that intercepts requests for static assets.
+  TUWF::hook before => sub {
+    tuwf->done if tuwf->resFile("$Bin/../public", tuwf->reqPath);
+  };
+
+  # Load our Perl modules
+  require MyProject::Homepage;
+  require MyProject::Articles;
+
+  # And run!
+  TUWF::run;
+
+Now, all request handlers can go into the files in C<lib/>. Here's an example
+C<lib/MyProject/Homepage.pm>:
+
+  package MyProject::Homepage;
+
+  use strict;
+  use warnings;
+  use TUWF 'Html5';
+
+  TUWF::get '/' => sub {
+    H1 sprintf 'Hello from %s!', __PACKAGE__;
+  };
+
+  1;
+
+Maintaining the necessary C<require MyProject::..> lines for all modules in the
+project may get tiring for large websites. TUWF comes with a convenient
+function to recursively load all modules in a project:
+
+  TUWF::set import_modules => 0; # Disable legacy import behavior.
+  TUWF::load_recursive 'MyProject';
+
+
+
+=head1 GOING FORWARD
+
+There are many other possible topics to cover. This chapter lists a few
+examples for slightly more advanced scenarios, but this document in by no means
+complete. Check out the documentation for individual TUWF modules to learn more
+about their functionality.
+
+
+=head2 Extending TUWF
+
+TUWF is a very minimal framework. It's more of a small set of tools than a
+full-blown framework which holds all the answers for every scenario you'll
+encounter. If you need anything that's not directly provided by TUWF, there's a
+simple way to extend it: You can easily add methods and data to the main
+C<tuwf> object.
+
+For example, to simplify the earlier example where we used
+L<HTML::Template::Pro> in a request handler, we might want to move the template
+handling code in a separate method and make that method part of TUWF:
+
+  use HTML::Template::Pro;
+
+  sub TUWF::Object::template {
+    my($tuwf, $template, %params) = @_;
+    my $tpl = HTML::Template::Pro->new(filename => "templates/$template.tmpl");
+    $tpl->param(%params);
+    $tuwf->resBinary($tpl->output);
+  };
+
+This method can be defined in the main TUWF script or in any other project
+file. It can be used from a request handler as follows:
+
+  TUWF::get '/' => sub {
+    tuwf->template('main',
+      title => 'Main page',
+      body => 'This is the body of the main page'
+    );
+  };
+
+
+=head1 SEE ALSO
+
+L<TUWF>, L<TUWF::DB>, L<TUWF::Misc>, L<TUWF::Request>, L<TUWF::Response>, L<TUWF::XML>.
+
+The homepage of TUWF can be found at
+L<https://dev.yorhel.nl/tuwf|https://dev.yorhel.nl/tuwf>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008-2018 Yoran Heling.
+
+This module is part of the TUWF framework and is free software available under
+the liberal MIT license. See the COPYING file in the TUWF distribution for the
+details.
+
+
+=head1 AUTHOR
+
+Yoran Heling <projects@yorhel.nl>
+
+=cut

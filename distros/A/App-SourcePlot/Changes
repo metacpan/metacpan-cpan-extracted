@@ -1,5 +1,11 @@
 Revision history for Perl application App::SourcePlot
 
+1.29 2018-02-14
+
+    - Added a workaround for usage on days with leap seconds.
+    - Added a "--date" command line option.
+    - Updated the included JCMT pointing catalog.
+
 1.28 2017-06-02
 
     - Updated the included JCMT pointing catalog.

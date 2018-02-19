@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::V0;
+use Test2::V0 0.000081;
 
 use Markdent::Dialect::Theory::BlockParser;
 use Markdent::Handler::MinimalTree;

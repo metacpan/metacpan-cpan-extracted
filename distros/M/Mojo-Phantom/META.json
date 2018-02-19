@@ -4,7 +4,7 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.018",
+   "generated_by" : "App::ModuleBuildTiny version 0.022",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "Mojo::Phantom" : {
          "file" : "lib/Mojo/Phantom.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Mojo::Phantom::Process" : {
          "file" : "lib/Mojo/Phantom/Process.pm"
@@ -62,6 +62,6 @@
          "url" : "http://github.com/jberger/Mojo-Phantom"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

@@ -5,37 +5,58 @@ use 5.010;
 
 use WWW::SmartSheet;
 use IO::Prompt qw(prompt);
-use List::Util qw(min);
+
+use Data::Dumper;
 
 my $token   = prompt "Enter Smartsheet API access token: ";
 my $w = WWW::SmartSheet->new(token => $token);
 
-my $all_sheets = $w->get_sheets;
-if (not @$all_sheets) {
+my $pagesize = prompt "Sheets per page: ";
+
+display_sheets($pagesize);
+
+sub display_sheets {
+
+  my ($pagesize, $current_page) = @_;
+
+  if (!$current_page) {$current_page = 1;}
+
+  my %all_sheets = %{$w->get_sheets($pagesize, $current_page)};
+  if (not %all_sheets) {
     say "You don't have any sheets. Goodbye!";
-	exit;
+    exit;
+  }
+
+  print "Viewing page $current_page of " . $all_sheets{"totalPages"} . " ($pagesize items per page)\n\n";
+
+  # handling other errors is left as an exercise for the reader
+
+  #  print Dumper \%all_sheets;
+
+  my $i = $pagesize * $current_page - $pagesize;
+
+  foreach my $sheet (@{$all_sheets{"data"}}) {
+
+    $i++;
+    # print Dumper \$sheet;
+    print "\t" . $i . " " . $sheet->{"name"} . " (" . $sheet->{"id"} . ") " . $sheet->{"permalink"} . "\n";
+
+  }
+
+  if ($all_sheets{"totalPages"} != 1) {
+
+    # probably should adjust the prompt if there's no next or previous but this is just an example script
+    my $npq = prompt "Next, Previous, Quit (N,P,Q)? ";
+
+    if ($npq =~ m/^[N]/i) {
+      display_sheets($pagesize, ++$current_page);
+    } elsif ($npq =~ m/^[P]/i) {
+      display_sheets($pagesize, --$current_page);
+    } else {
+      exit;
+    }
+
+  }
+
 }
-
-my $N = min(5, scalar @$all_sheets);
-say "Total sheets:" . scalar @$all_sheets;
-say "Showing the first $N sheets...";
-for my $i (1 .. $N) {
-	say "$i: $all_sheets->[$i-1]{name}   access level: $all_sheets->[$i-1]{accessLevel}";
-} 
-
-
-prompt('Select sheet number');
-
-use Data::Dumper qw(Dumper);
-#print Dumper $all_sheets;
-my $columns = $w->get_columns(0); # sheet number
-print Dumper $columns;
-
-
-#my $sheet_number = prompt("Enter the number of the sheet you want to share:");
-#my $sheet_name  = $all_sheets->[$sheet_number-1]{name};
-#my $sheet_id    = $all_sheets->[$sheet_number-1]{id};
-
-#shareURL = API_URL +'/sheet/' + str(sheet_id) + '/shares?sendEmail=true' #URL used to share a sheet
-
 

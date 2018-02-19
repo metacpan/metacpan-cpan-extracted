@@ -2,7 +2,7 @@ NAME
     POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 VERSION
-    Version 0.38
+    Version 0.41
 
 DESCRIPTION
     This module allows one to secure connections of *POE::Wheel::ReadWrite*
@@ -96,6 +96,7 @@ SYNOPSIS
         exit;
 
     HTTPS-Server
+        use POE::Filter::SSL::PreFilter
         use POE::Filter::SSL;
         use POE::Component::Server::HTTP;
         use HTTP::Status;
@@ -129,9 +130,9 @@ SYNOPSIS
   SSL on an established connection
     Advanced Example
       This example is an IMAP-Relay which forwards the connections to a IMAP
-      server by username. It allows one the uncrypted transfer on port 143,
-      with the option of SSL on the established connection (STARTTLS). On
-      port 993 it allows one to do direct SSL.
+      server by username. It allows one the unencrypted transfer on port
+      143, with the option of SSL on the established connection (STARTTLS).
+      On port 993 it allows one to do direct SSL.
 
       Tested with Thunderbird version 3.0.5.
 
@@ -436,7 +437,7 @@ FUNCTIONS
           *clientCertValid()* if the certificate is valid!
 
         sni
-          Allows to set the SNI hostname indication in first packet of
+          Allows one to set the SNI hostname indication in first packet of
           handshake. See
           https://de.wikipedia.org/wiki/Server_Name_Indication
 
@@ -605,10 +606,10 @@ FUNCTIONS
 
   Internal functions and POE::Filter handler
     VERIFY()
-    X509_get_serialNumber()
-    SSL_CTX_set_tmp_dh()
-    SSL_CTX_set_tmp_rsa()
-    SSL_set_tmp_dh()
+    POE_FILTER_X509_get_serialNumber()
+    POE_FILTER_SSL_CTX_set_tmp_dh()
+    POE_FILTER_SSL_CTX_set_tmp_rsa()
+    POE_FILTER_SSL_set_tmp_dh()
     clone()
     doSSL()
     get()

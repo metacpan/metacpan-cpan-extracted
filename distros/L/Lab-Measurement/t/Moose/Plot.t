@@ -7,12 +7,12 @@ use lib 't';
 use Test::More;
 use Test::File;
 use Lab::Test import => [qw/is_relative_error/];
-use File::Spec::Functions qw/catfile/;
 use Lab::Moose;
 use Module::Load 'autoload';
 use File::Temp qw/tempfile tempdir/;
 use File::Slurper 'read_binary';
 use PDL;
+use File::Glob 'bsd_glob';
 
 eval {
     autoload 'PDL::Graphics::Gnuplot';
@@ -39,10 +39,13 @@ if ( $gp_version < 5 ) {
 my $dir = tempdir(    # CLEANUP => 1
 );
 
+# P::G::G cannot handle backslash filename on windows
+$dir =~ s{\\}{/}g;
+
 # Low-level plotting
 autoload 'Lab::Moose::Plot';
 
-my $file = catfile( $dir, 'low_level_plot.txt' );
+my $file = our_catfile( $dir, 'low_level_plot.txt' );
 
 say $file;
 my $plot = Lab::Moose::Plot->new(
@@ -62,8 +65,9 @@ $plot->plot(
 
 {
 
-    my $folder = datafolder( path => catfile( $dir, 'gnuplot' ) );
-    my $file = datafile(
+    my $folder     = datafolder( path => our_catfile( $dir, 'gnuplot' ) );
+    my $foldername = "$dir/gnuplot_001";
+    my $file       = datafile(
         type     => 'Gnuplot',
         folder   => $folder,
         filename => 'file.dat',
@@ -71,10 +75,10 @@ $plot->plot(
     );
     my $path = $file->path();
 
-    my $AB_plot = catfile( $dir, 'AB_plot.txt' );
-    my $BC_plot = catfile( $dir, 'BC_plot.txt' );
+    my $AB_plot = our_catfile( $dir, 'AB_plot.txt' );
+    my $BC_plot = our_catfile( $dir, 'BC_plot.txt' );
     my $BC_plot_hardcopy = 'BC_plot.png';
-    my $BC_plot_hardcopy_path = catfile( $folder->path(), $BC_plot_hardcopy );
+    my $BC_plot_hardcopy_path = our_catfile( $foldername, $BC_plot_hardcopy );
 
     $file->add_plot(
         x                => 'A',
@@ -110,7 +114,7 @@ $plot->plot(
     }
 
     file_not_empty_ok(
-        catfile( $folder->path(), 'AB_plot.png' ),
+        our_catfile( $foldername, 'AB_plot.png' ),
         'A-B plot hardcopy is not empty'
     );
 
@@ -120,6 +124,13 @@ $plot->plot(
     $file->refresh_plots( refresh => 'BC' );
 
     file_not_empty_ok( $BC_plot_hardcopy_path, "B-C hardcopy is not empty" );
+
+    my @files = bsd_glob("$foldername/*");
+    my @expected_files
+        = qw/AB_plot.png BC_plot.png file.dat file.dat.plot.png META.yml Plot.t/;
+    @expected_files = map { our_catfile( $foldername, $_ ) } @expected_files;
+    is_deeply( \@files, \@expected_files, "output files" );
+    warn "dir: $dir\n";
 
 }
 

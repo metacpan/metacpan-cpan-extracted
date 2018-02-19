@@ -271,7 +271,7 @@ sub run ($) {
     my $reg_input_sub;
     my $eval = "\$reg_input_sub = sub {\n" . $self->{_reg_input_code} . "\n};\n";
     eval $eval;
-    $@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error: $@.\n");
 
 
     for (;;) {

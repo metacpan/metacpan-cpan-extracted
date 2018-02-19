@@ -1,3 +1,29 @@
+0.05 2018-02-10T14:56:42+01:00
+ [Common]
+ - Add missing dependency for Indent::Word.
+ - Remove trailing whitespace.
+
+0.04 2018-02-10T14:48:37+01:00
+ [Common]
+ - Fix LICENSE file.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve README file.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.19 version.
+ - Update author name.
+ - Update copyright years.
+ - Update examples.
+
+ [Indent]
+ - Add return value of get() in doc.
+ - Improve SYNOPSIS section in doc.
+
+ [Indent::Word]
+ - Add example to doc.
+ - Add support for strings with ANSI sequences.
+
 0.03 2013-11-07
  - Add dependency for perl (based on Error::Pure).
  - Update examples/ directory.

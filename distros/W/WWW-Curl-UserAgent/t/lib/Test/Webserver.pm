@@ -4,7 +4,7 @@ use Dancer;
 use Daemon::Daemonize qw//;
 use Digest::MD5 qw(md5_hex);
 
-any [ 'get', 'put', 'post', 'delete' ] => '/code/:code' => sub {
+any [ 'get', 'put', 'post', 'delete', 'patch' ] => '/code/:code' => sub {
     status int params->{code};
 };
 
@@ -25,7 +25,7 @@ get '/redirect/:times' => sub {
     }
 };
 
-any [ 'put', 'post' ] => '/content_md5' => sub {
+any [ 'put', 'post', 'patch' ] => '/content_md5' => sub {
     return md5_hex(request->body);
 };
 

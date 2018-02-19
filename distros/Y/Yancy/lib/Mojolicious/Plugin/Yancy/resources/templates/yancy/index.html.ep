@@ -116,7 +116,11 @@
             </div>
 
             <button @click="fetchPage()" class="btn btn-primary">Refresh</button>
-            <button @click="showAddItem()" class="btn btn-default">Add Item</button>
+            <a v-if="schema['x-view-url']" :href="schema['x-view-url']" class="btn btn-secondary">
+                <i class="fa fa-eye" aria-hidden="true"></i> View
+            </a>
+            <button @click="showAddItem()" class="btn btn-secondary">Add Item</button>
+
             <div v-if="addingItem" class="add-item">
                 <div v-show="error && error.addItem" class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">Error Adding Item</h4>
@@ -135,23 +139,26 @@
                     <tr>
                         <!-- <th><input type="checkbox"></th> -->
                         <th></th>
-                        <th v-for="( col, i ) in columns">{{col}}</th>
+                        <th v-for="( col, i ) in columns">{{col.title}}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <template v-for="( row, i ) in rows">
                     <tr :class="openedRow == i ? 'open' : ''">
                         <!-- <td style="width: 2em"><input type="checkbox"></td> -->
-                        <td style="width: 4em">
-                            <a href="#" @click.prevent="toggleRow(i)">
+                        <td style="width: 5em">
+                            <a v-if="schema['x-view-item-url']" :href="rowViewUrl(row)" title="View">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
+                            <a href="#" @click.prevent="toggleRow(i)" title="Edit">
                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </a>
-                            <a href="#" @click.prevent="confirmDeleteItem(i)">
+                            <a href="#" @click.prevent="confirmDeleteItem(i)" title="Delete">
                                 <i class="fa fa-trash-o" aria-hidden="true"></i>
                             </a>
                         </td>
                         <td v-for="col in columns">
-                            {{ row[col] }}
+                            {{ col.field ? row[col.field] : fillUrl( col.template, row ) }}
                         </td>
                     </tr>
                     <tr>
@@ -178,7 +185,7 @@
 
             <nav aria-label="List page navigation">
                 <ul class="pagination">
-                    <li class="page-item" :class="currentPage == 0 ? 'disabled' : ''">
+                    <li class="page-item" :class="currentPage == 1 ? 'disabled' : ''">
                         <a class="page-link" href="#" aria-label="Previous"
                             @click.prevent="currentPage--"
                         >
@@ -186,14 +193,20 @@
                             <span class="sr-only">Previous</span>
                         </a>
                     </li>
-                    <li v-for="page in totalPages" class="page-item"
-                        :class="page == currentPage + 1 ? 'active': ''"
+                    <li class="page-item disabled" v-if="pagerPages[0] > 1">
+                        <span class="page-link">&hellip;</span>
+                    </li>
+                    <li v-for="page in pagerPages" class="page-item"
+                        :class="page == currentPage ? 'active': ''"
                     >
-                        <a class="page-link" href="#" @click.prevent="currentPage = page - 1">
+                        <a class="page-link" href="#" @click.prevent="currentPage = page">
                             {{ page }}
                         </a>
                     </li>
-                    <li class="page-item" :class="currentPage >= totalPages - 1 ? 'disabled' : ''">
+                    <li class="page-item disabled" v-if="pagerPages[ pagerPages.length - 1 ] < totalPages">
+                        <span class="page-link">&hellip;</span>
+                    </li>
+                    <li class="page-item" :class="currentPage >= totalPages ? 'disabled' : ''">
                         <a class="page-link" href="#" aria-label="Next"
                             @click.prevent="currentPage++"
                         >

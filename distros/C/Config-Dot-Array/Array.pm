@@ -1,21 +1,17 @@
 package Config::Dot::Array;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Config::Utils qw(hash_array);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
 use Readonly;
 
-# Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -267,11 +263,9 @@ Serialize 'config' hash to output.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot::Array;
  use Dumpvalue;
 
@@ -301,11 +295,9 @@ Serialize 'config' hash to output.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot::Array;
 
  # Object with data.
@@ -331,11 +323,9 @@ Serialize 'config' hash to output.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot::Array;
  use Dumpvalue;
 
@@ -398,17 +388,17 @@ L<https://github.com/tupinek/Config-Dot-Array>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

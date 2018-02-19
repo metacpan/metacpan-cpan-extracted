@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '20170111';
+our $VERSION = '20180213';
 
 use URI;
 use base 'RDF::NS';
@@ -22,7 +22,7 @@ RDF::NS::URIS - Popular RDF namespace prefixes from prefix.cc as URI objects
 =head1 SYNOPSIS
 
   use RDF::NS::URIS;
-  use constant NS => RDF::NS::URIS->new('20170111');
+  use constant NS => RDF::NS::URIS->new('20180213');
 
   NS->foaf_Person;             # an URI object
   NS->uri('foaf:Person);       # same

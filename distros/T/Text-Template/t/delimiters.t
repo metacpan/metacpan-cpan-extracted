@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 19;
 
 use_ok 'Text::Template' or exit 1;
 
@@ -80,33 +80,4 @@ while (my ($test, $result) = splice @tests, 0, 2) {
     my $ok = (!defined $text && !defined $result || $text eq $result);
 
     ok($ok) or diag "expected .$result., got .$text.";
-}
-
-# Identical delimiters
-@tests = (
-    [ '@', '@' ],
-    [ '@@', '@@' ],
-    [ 'XX', 'XX' ],
-    [ "\n", 'x'],
-    [ 'x', "\n"],
-    [ "\n", "\n"]
-);
-
-my %vars = (
-    foo => 'toto',
-    bar => 'tata');
-
-for my $d (@tests) {
-    my $template = qq{I like $d->[0]\$foo$d->[1] and $d->[0]\$bar$d->[1] and $d->[0]$d->[1]};
-    my $expected = $template;
-    $expected =~ s{$d->[0]\$(\w+)$d->[1]}{$vars{$1}}g;
-    $expected =~ s{$d->[0]$d->[1]}{}g;
-
-    my $filled = Text::Template->new(
-        TYPE       => 'STRING',
-        SOURCE     => $template,
-        DELIMITERS => $d
-    )->fill_in(HASH => \%vars);
-
-    is $filled, $expected;
 }

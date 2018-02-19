@@ -4,26 +4,36 @@ use strict;
 use warnings;
 use Module::Load '';
 
-my $RetryReasons = __PACKAGE__->retry;
-
+my $GetRetried = __PACKAGE__->retry;
+my $ClassOrder = [
+    [qw|MailboxFull MesgTooBig ExceedLimit Suspend HasMoved NoRelaying UserUnknown
+        Filtered Rejected HostUnknown SpamDetected TooManyConn Blocked
+    |],
+    [qw|MailboxFull SpamDetected PolicyViolation VirusDetected SecurityError
+        SystemError NetworkError Suspend Expired ContentError SystemFull
+        NotAccept MailerError
+    |],
+    [qw|MailboxFull MesgTooBig ExceedLimit Suspend UserUnknown Filtered Rejected
+        HostUnknown SpamDetected TooManyConn Blocked SpamDetected SecurityError
+        SystemError NetworkError Suspend Expired ContentError HasMoved SystemFull
+        NotAccept MailerError NoRelaying SyntaxError OnHold
+    |],
+];
 sub retry {
     # Reason list better to retry detecting an error reason
     # @return   [Array] Reason list
-    return [
-        'undefined', 'onhold', 'systemerror', 'securityerror', 'networkerror',
-        'hostunknown', 'userunknown',
-    ];
+    return [qw|undefined onhold systemerror securityerror networkerror hostunknown userunknown|];
 }
 
 sub index {
     # All the error reason list Sisimai support
     # @return   [Array] Reason list
-    return [ qw|
+    return [qw|
         Blocked ContentError ExceedLimit Expired Filtered HasMoved HostUnknown
         MailboxFull MailerError MesgTooBig NetworkError NotAccept OnHold
         Rejected NoRelaying SpamDetected VirusDetected PolicyViolation SecurityError
         Suspend SystemError SystemFull TooManyConn UserUnknown SyntaxError
-    | ];
+    |];
 }
 
 sub get {
@@ -34,27 +44,21 @@ sub get {
     # @see anotherone
     my $class = shift;
     my $argvs = shift // return undef;
-
     return undef unless ref $argvs eq 'Sisimai::Data';
 
-    unless( grep { $argvs->reason eq $_ } @$RetryReasons ) {
+    unless( grep { $argvs->reason eq $_ } @$GetRetried ) {
         # Return reason text already decided except reason match with the
         # regular expression of ->retry() method.
         return $argvs->reason if length $argvs->reason;
     }
-    return 'delivered' if $argvs->deliverystatus =~ m/\A2[.]/;
+    return 'delivered' if substr($argvs->deliverystatus, 0, 2) eq '2.';
 
     my $statuscode = $argvs->deliverystatus || '';
     my $reasontext = '';
-    my $classorder = [
-        'MailboxFull', 'MesgTooBig', 'ExceedLimit', 'Suspend', 'HasMoved',
-        'NoRelaying', 'UserUnknown', 'Filtered', 'Rejected', 'HostUnknown',
-        'SpamDetected', 'TooManyConn', 'Blocked',
-    ];
 
     if( $argvs->diagnostictype eq 'SMTP' || $argvs->diagnostictype eq '' ) {
         # Diagnostic-Code: SMTP; ... or empty value
-        for my $e ( @$classorder ) {
+        for my $e ( @{ $ClassOrder->[0] } ) {
             # Check the value of Diagnostic-Code: and the value of Status:, it is a
             # deliverystats, with true() method in each Sisimai::Reason::* class.
             my $p = 'Sisimai::Reason::'.$e;
@@ -75,12 +79,11 @@ sub get {
         unless( $reasontext ) {
             # Try to match with message patterns in Sisimai::Reason::Vacation
             Module::Load::load 'Sisimai::Reason::Vacation';
-            $reasontext = 'vacation' if Sisimai::Reason::Vacation->match($argvs->diagnosticcode);
+            $reasontext = 'vacation' if Sisimai::Reason::Vacation->match(lc $argvs->diagnosticcode);
         }
-        $reasontext ||= 'onhold'  if length $argvs->diagnosticcode;
+        $reasontext ||= 'onhold' if length $argvs->diagnosticcode;
         $reasontext ||= 'undefined';
     }
-
     return $reasontext;
 }
 
@@ -96,28 +99,23 @@ sub anotherone {
     return undef unless ref $argvs eq 'Sisimai::Data';
     return $argvs->reason if $argvs->reason;
 
+    my $diagnostic = lc $argvs->diagnosticcode // '';
     my $statuscode = $argvs->deliverystatus // '';
-    my $diagnostic = $argvs->diagnosticcode // '';
     my $commandtxt = $argvs->smtpcommand    // '';
     my $trytomatch = undef;
     my $reasontext = '';
-    my $classorder = [
-        'MailboxFull', 'SpamDetected', 'PolicyViolation', 'VirusDetected',
-        'SecurityError', 'SystemError', 'NetworkError', 'Suspend', 'Expired',
-        'ContentError', 'SystemFull', 'NotAccept', 'MailerError',
-    ];
 
     require Sisimai::SMTP::Status;
     $reasontext = Sisimai::SMTP::Status->name($statuscode);
 
     TRY_TO_MATCH: while(1) {
         $trytomatch ||= 1 if $reasontext eq '';
-        $trytomatch ||= 1 if grep { $reasontext eq $_ } @$RetryReasons;
+        $trytomatch ||= 1 if grep { $reasontext eq $_ } @$GetRetried;
         $trytomatch ||= 1 if $argvs->diagnostictype ne 'SMTP';
         last unless $trytomatch;
 
         # Could not decide the reason by the value of Status:
-        for my $e ( @$classorder ) {
+        for my $e ( @{ $ClassOrder->[1] } ) {
             # Trying to match with other patterns in Sisimai::Reason::* classes
             my $p = 'Sisimai::Reason::'.$e;
             Module::Load::load($p);
@@ -138,7 +136,7 @@ sub anotherone {
                 #  X.7.0   Other or undefined security status
                 $reasontext = 'securityerror';
 
-            } elsif( $argvs->diagnostictype =~ qr/\AX-(?:UNIX|POSTFIX)\z/ ) {
+            } elsif( $argvs->diagnostictype eq 'X-UNIX' || $argvs->diagnostictype eq 'X-POSTFIX' ) {
                 # Diagnostic-Code: X-UNIX; ...
                 $reasontext = 'mailererror';
 
@@ -157,7 +155,7 @@ sub anotherone {
 
             } else {
                 # Check the value of SMTP command
-                if( $commandtxt =~ m/\A(?:EHLO|HELO)\z/ ) {
+                if( $commandtxt eq 'EHLO' || $commandtxt eq 'HELO' ) {
                     # Rejected at connection or after EHLO|HELO
                     $reasontext = 'blocked';
                 }
@@ -177,26 +175,19 @@ sub match {
 
     require Sisimai::SMTP::Status;
     my $reasontext = '';
-    my $classorder = [
-        'MailboxFull', 'MesgTooBig', 'ExceedLimit', 'Suspend', 'UserUnknown',
-        'Filtered', 'Rejected', 'HostUnknown', 'SpamDetected', 'TooManyConn',
-        'Blocked', 'SpamDetected', 'SecurityError', 'SystemError',
-        'NetworkError', 'Suspend', 'Expired', 'ContentError', 'HasMoved',
-        'SystemFull', 'NotAccept', 'MailerError', 'NoRelaying', 'SyntaxError',
-        'OnHold',
-    ];
     my $statuscode = Sisimai::SMTP::Status->find($argv1);
+    my $diagnostic = lc $argv1;
     my $typestring = '';
-       $typestring = uc($1) if $argv1 =~ m/\A(SMTP|X-.+);/i;
+       $typestring = uc($1) if uc($argv1) =~ /\A(SMTP|X-.+);/;
 
     # Diagnostic-Code: SMTP; ... or empty value
-    for my $e ( @$classorder ) {
+    for my $e ( @{ $ClassOrder->[2] } ) {
         # Check the value of Diagnostic-Code: and the value of Status:, it is a
         # deliverystats, with true() method in each Sisimai::Reason::* class.
         my $p = 'Sisimai::Reason::'.$e;
         Module::Load::load($p);
 
-        next unless $p->match($argv1);
+        next unless $p->match($diagnostic);
         $reasontext = $p->text;
         last;
     }
@@ -544,7 +535,7 @@ mail server. This reason has been divided from C<securityerror> at Sisimai 4.22.
 
 L<Sisimai::ARF>
 L<http://tools.ietf.org/html/rfc5965>
-L<http://libsisimai.org/reason/>
+L<https://libsisimai.org/en/reason/>
 
 =head1 AUTHOR
 
@@ -552,7 +543,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

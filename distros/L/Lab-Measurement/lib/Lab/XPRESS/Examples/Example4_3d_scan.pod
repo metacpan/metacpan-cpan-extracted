@@ -1,0 +1,414 @@
+#ABSTRACT: XPRESS for DUMMIES - Example 4
+#PODNAME: Lab::XPRESS::Examples::Example4_3d_scan
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Lab::XPRESS::Examples::Example4_3d_scan - XPRESS for DUMMIES - Example 4
+
+=head1 VERSION
+
+version 3.620
+
+=head1 Abstract
+
+This is a slightly more advanced Lab::Measurment script, which makes use of the
+XPRESS add-on.  
+The script will perform a nested sweep: For each value of RF power, AC
+conductance is measured for different values of gate voltage and RF frequency. 
+The data will be written in several 2d data files, labeled by the the RF power
+value.
+
+=head1 Introduction 
+
+In this example, the main novelty is the usage of two nested frames to record a 3-dimensional dataset. 
+
+ #-------- 0. Import Lab::Measurement -------
+ 
+ use Lab::Measurement;
+ use strict;
+ 
+ #-------- 1. Initialize Instruments --------
+ 
+ my $sens = -1e-9;
+ 
+ my $Biasvoltage = -0.01;
+ 
+ my $voltage_bias = Instrument(
+     'YokogawaGS200',
+     {
+         connection_type => 'LinuxGPIB',
+         gpib_address    => 2,
+         gate_protect    => 0,
+     }
+ );
+ 
+ my $voltage_backgate = Instrument(
+     'YokogawaGS200',
+     {
+         connection_type => 'LinuxGPIB',
+         gpib_address    => 1,
+         gate_protect    => 0,
+     }
+ );
+ 
+ my $srs = Instrument(
+     'SR830',
+     {
+         connection_type => 'LinuxGPIB',
+         gpib_address    => 14
+     }
+ );
+ 
+ my $multimeter = Instrument(
+     'HP3458A',
+     {
+         connection_type => 'LinuxGPIB',
+         gpib_address    => 22,
+         nplc            => 5
+     }
+ );
+ 
+ our $FRQSRC = Instrument(
+     'HP83732A',
+     {
+         connection_type => 'LinuxGPIB',
+         gpib_address    => 28,
+ 
+     }
+ );
+ 
+ $voltage_bias->set_voltage($Biasvoltage);
+ 
+ $FRQSRC->enable_external_am();
+ 
+ $FRQSRC->power_on();
+ 
+ #-------- 3. Define the Sweeps -------------
+ 
+ my $RF_power_sweep = Sweep(
+     'Power',
+     {
+         mode              => 'step',
+         instrument        => $FRQSRC,
+         points            => [ -15, 5 ],
+         stepwidth         => 5,
+         rate              => [5],
+         delay_before_loop => 1
+     }
+ );
+ 
+ my $gate_sweep = Sweep(
+     'Voltage',
+     {
+         mode       => 'step',
+         instrument => $voltage_backgate,
+         points     => [ 5.73, 5.81 ],      # [starting point, target]
+         stepwidth  => [0.0004],
+         rate       => [ 0.05, 0.05 ]
+         , # [rate to approach start, sweeping rate for measurement] in Volts/s
+         jump              => 1,
+         delay_before_loop => 1    # delay before Sweep begins in s
+     }
+ );
+ 
+ my $RF_frequency_sweep = Sweep(
+     'Frequency',
+     {
+         mode       => 'step',
+         instrument => $FRQSRC,
+         points     => [ 114.5e6, 116.1e6 ],    # [starting point, target]
+         stepwidth  => [1.5e3],
+         rate       => [ 15000, 15000 ]
+         ,    # [rate to approach start, sweeping rate for measurement] in Hz/s
+         delay_before_loop => 3
+     }
+ );
+ 
+ #-------- 3. Create a DataFile -------------
+ 
+ my $DataFile = DataFile('Gate_RFsweep_AM.dat');
+ 
+ $DataFile->add_column('Gate');
+ $DataFile->add_column('RF_Frequency');
+ $DataFile->add_column('Current');
+ $DataFile->add_column('X');
+ $DataFile->add_column('Y');
+ $DataFile->add_column('R');
+ $DataFile->add_column('RF_Power');
+ 
+ $DataFile->add_plot(
+     {
+         'type'    => 'pm3d',
+         'x-axis'  => 'Gate',
+         'y-axis'  => 'RF_Frequency',
+         'cb-axis' => 'Current',
+         'refresh' => 'block'
+     }
+ );
+ 
+ $DataFile->add_plot(
+     {
+         'type'    => 'pm3d',
+         'x-axis'  => 'Gate',
+         'y-axis'  => 'RF_Frequency',
+         'cb-axis' => 'R',
+         'refresh' => 'block'
+     }
+ );
+ 
+ #-------- 4. Measurement Instructions -------
+ 
+ my $my_measurement = sub {
+ 
+     my $sweep = shift;
+ 
+     my $gate = $voltage_backgate->get_value( { read_mode => 'cache' } );
+     my $RF_Frequency = $FRQSRC->get_frq();
+     my $RF_Power     = $FRQSRC->get_power();
+     my $current      = $multimeter->get_value() * ($sens);
+     my ( $X, $Y ) = $srs->get_xy();
+ 
+     $sweep->LOG(
+         {
+             Gate         => $gate,
+             RF_Frequency => $RF_Frequency,
+             Current      => $current,
+             X            => $X * ($sens),
+             Y            => $Y * ($sens),
+             R            => sqrt( $X * $X + $Y * $Y ) * ($sens),
+             RF_Power     => $RF_Power
+         }
+     );
+ };
+ 
+ #-------- 5. Put everything together -------
+ 
+ $DataFile->add_measurement($my_measurement);
+ 
+ $RF_frequency_sweep->add_DataFile($DataFile);
+ 
+ my $gateframe = Frame();
+ $gateframe->add_master($gate_sweep);
+ $gateframe->add_slave($RF_frequency_sweep);
+ 
+ my $powerframe = Frame();
+ $powerframe->add_master($RF_power_sweep);
+ $powerframe->add_slave($gateframe);
+ 
+ $powerframe->start();
+ 
+ $FRQSRC->disable_external_am();
+ 
+ $FRQSRC->power_off();
+ 
+ 1;
+
+=head1 The code
+
+=head2 Instrument initialization
+
+    #-------- 1. Initialize Instruments --------
+
+    my $sens =-1e-9;
+
+    my $Biasvoltage=-0.01;
+
+    my $voltage_bias = Instrument('YokogawaGS200', 
+	{
+	connection_type => 'LinuxGPIB',
+	gpib_address => 2,
+	gate_protect => 0, 
+	});
+
+    my $voltage_backgate = Instrument('YokogawaGS200', 
+	{
+	connection_type => 'LinuxGPIB',
+	gpib_address => 1,
+	gate_protect => 0,
+	});
+
+    my $srs = Instrument('SR830',
+	    {
+	 connection_type => 'LinuxGPIB',
+	 gpib_address  => 14
+	    });
+
+
+    my $multimeter = Instrument('HP3458A', 
+	{
+	connection_type => 'LinuxGPIB',
+	gpib_address => 22,
+	nplc => 5
+	});
+
+    our $FRQSRC = Instrument('HP83732A', 
+	{
+	connection_type => 'LinuxGPIB',
+	gpib_address => 28,
+
+	});
+
+    $voltage_bias->set_voltage($Biasvoltage);
+
+    $FRQSRC->enable_external_am();
+
+    $FRQSRC->power_on();
+
+We initialize two Yokos for bias and gate voltage, the SR830 for the AC Lock-in measurement, an Agilent 3458A multimeter (named HP) and a frequency generator.
+The bias voltage is set immediately after initialization and the frequency generator's output is switched on.
+
+=head2 Sweep Objects
+
+    #-------- 3. Define the Sweeps -------------
+
+    my $RF_power_sweep = Sweep('Power',
+	{
+	mode => 'step',
+	instrument => $FRQSRC,
+	points => [-15,5],
+	stepwidth => 5,
+	rate => [5],
+	delay_before_loop => 1
+	});
+
+    my $gate_sweep = Sweep('Voltage', 
+	{
+	mode => 'step',
+	instrument => $voltage_backgate,
+	points => [5.73,5.81],    # [starting point, target]
+	stepwidth => [0.0004],
+	rate => [0.05, 0.05],      # [rate to approach start, sweeping rate for measurement] in Volts/s
+	jump => 1, 
+	delay_before_loop => 1         # delay before Sweep begins in s
+	});
+
+    my $RF_frequency_sweep = Sweep('Frequency', 
+	{
+	mode => 'step',
+	instrument => $FRQSRC,
+	points => [114.5e6, 116.1e6],    # [starting point, target]
+	stepwidth => [1.5e3],
+	rate => [15000, 15000],      # [rate to approach start, sweeping rate for measurement] in Hz/s
+	delay_before_loop => 3
+	});
+
+We want to record conductance on an gate/frequency array for different power values so we have to define three sweep objects: RF power, gate voltage and RF frequency. It might be neccessary to check the duration of the 2d-sweep (gate vs frequency in this case) to carefully choose the amount of steps in RF power. 
+For sweeping RF power, the according sweep object provides only the step mode at the moment. Of course, one can use the "delay_before_loop" flag as well as other default sweep flags (see the documentation of the Sweep base class for details). The gate and frequency sweeps do not contain any novelty. Make sure you specify the frequency in Herz for this sweep object.  
+
+=head2 The DataFile
+
+    #-------- 3. Create a DataFile -------------
+
+    my $DataFile = DataFile('AC_Power_Gate_Frq.dat');
+
+
+      $DataFile->add_column('Gate');
+      $DataFile->add_column('RF_Frequency');
+      $DataFile->add_column('Current');
+      $DataFile->add_column('X');
+      $DataFile->add_column('Y');
+      $DataFile->add_column('R');
+      $DataFile->add_column('RF_Power');
+
+    $DataFile->add_plot({
+	'type' => 'pm3d',
+	'x-axis' => 'Gate',
+	'y-axis' => 'RF_Frequency', 
+	'cb-axis' => 'Current',
+	'refresh' => 'block'
+	}
+	);
+
+
+    $DataFile->add_plot({
+	'type' => 'pm3d',
+	'x-axis' => 'Gate',
+	'y-axis' => 'RF_Frequency', 
+	'cb-axis' => 'R',
+	'refresh' => 'block'
+	}
+	);
+
+We provide all variables we are interested in to the datafile object. Note that we do NOT have to define a data file for each value of RF power: This is done automatically. The XPRESS module will add a string to the filename of the form _RF_Power=X. 
+We also add live plots for DC current and AC conductivity.
+
+=head2 4. The measurement instructions
+
+    #-------- 4. Measurement Instructions -------
+
+
+
+    my $my_measurement = sub {
+
+	my $sweep = shift;
+
+	my $gate = $voltage_backgate->get_value({read_mode => 'cache'});
+	my $RF_Frequency = $FRQSRC->get_frq();
+	my $RF_Power = $FRQSRC->get_power();
+	my $current = $multimeter->get_value()*$sens;
+	my ($X , $Y) = $srs->get_xy();
+
+	$sweep->LOG({
+	    Gate => $gate,
+	    RF_Frequency => $RF_Frequency,
+	    Current => $current,
+	    X => $X*$sens,
+	    Y => $Y*$sens,
+	    R => sqrt($X**2+$Y**2)*$sens,
+	    RF_Power => $RF_Power
+	    });
+    };
+
+The measurement instructions have a standard structure. We successively record all data for a single point in the 3-dimensional parameter space. Note that a little time is saved collecting the gate voltage from the software cache of the instrument via {read_mode => 'cache'}.
+The data is then sent to the LOG routine of the sweep object.
+
+=head2 5. Putting everything in place
+
+First of all, we have to add the measurement to the DataFile object
+
+    $DataFile->add_measurement($my_measurement);
+
+and associate the data file with the "fast" sweep object, i.e., the sweep object that governs the most volatile parameter. In our case this is the frequency sweep:
+
+    $RF_frequency_sweep->add_DataFile($DataFile);
+
+Finally, there comes the magic of XPRESS. We just define the inner frame object as we would do for a simple 2d scan:
+
+    my $gateframe=Frame();
+    $gateframe->add_master($gate_sweep);
+    $gateframe->add_slave($RF_frequency_sweep);
+
+Looks familiar, does it. The outer frame
+
+    my $powerframe = Frame();
+    $powerframe->add_master($RF_power_sweep);
+    $powerframe->add_slave($gateframe);
+
+contains the power sweep as master and the other (gate vs. frequency) frame is provided as slave. That's it. We do not have to care about the details or count brackets of for-loops.
+Last but not least, start the sweep
+
+    $powerframe->start();
+
+    $FRQSRC->disable_external_am();
+
+    $FRQSRC->power_off();
+
+and switch the frequency generator of once we are done to not heat the sample unneccessarily. Enjoy!
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

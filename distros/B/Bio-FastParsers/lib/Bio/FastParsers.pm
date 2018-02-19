@@ -1,8 +1,8 @@
 package Bio::FastParsers;
-# ABSTRACT: Classes for parsing bioinformatics programs output
+# ABSTRACT: Classes for parsing bioinformatic programs output
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::VERSION = '0.180330';
+$Bio::FastParsers::VERSION = '0.180470';
 use strict;
 use warnings;
 
@@ -19,17 +19,19 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers - Classes for parsing bioinformatics programs output
+Bio::FastParsers - Classes for parsing bioinformatic programs output
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 DESCRIPTION
 
 This distribution includes modules for parsing the output files of a selection
-of sequence comparison programs, such as BLAST
-L<https://blast.ncbi.nlm.nih.gov/> or HMMER L<http://hmmer.org/>.
+of sequence comparison programs, including BLAST
+L<https://blast.ncbi.nlm.nih.gov/>, HMMER L<http://hmmer.org/>, CD-HIT
+L<https://github.com/weizhongli/cdhit> and UCLUST
+L<http://www.drive5.com/usearch/>.
 
 These classes are designed to add as few overhead as possible, using
 constructs not far from those that would be found in home-made parsing
@@ -38,10 +40,9 @@ software. In this respect, the approach of these parsers is very different
 from Bioperl's L<Bio::SearchIO>. Hence, C<Bio::FastParsers> classes do not
 need (and are not meant as a replacement for) L<BioPerl>.
 
-C<Bio::FastParsers> modules have been used in production since 2013 but are
-not yet ready for wider adoption due to their lack of documentation. This
-should improve over time. Meanwhile, adventurous users can have a look at the
-L<Bio::FastParsers::Blast::Xml> class which is already fully documented.
+C<Bio::FastParsers> modules have been used in production since 2013 but were
+not yet ready for wider adoption due to their lack of documentation. This is
+now nearly fixed: all modules are documented except for HMMER parsers.
 
 =head1 AUTHOR
 

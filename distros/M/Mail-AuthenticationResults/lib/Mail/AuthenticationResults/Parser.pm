@@ -1,10 +1,10 @@
 package Mail::AuthenticationResults::Parser;
 # ABSTRACT: Class for parsing Authentication Results Headers
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Header;
@@ -317,7 +317,13 @@ Mail::AuthenticationResults::Parser - Class for parsing Authentication Results H
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+Class for parsing Authentication Results headers into objects.
+
+takes a string and returns a L<Mail::AuthenticationResults::Header> object
 
 =head1 METHODS
 

@@ -22,20 +22,49 @@ WriteMakefile(
         'AUTHOR'        => 'Adriano R. Ferreira <ferreira@cpan.org>'
     ) : ()),
     ($EUMM_VERSION >= 6.31 ? (
-        LICENSE => 'perl', 
-#        EXTRA_META => "no_index:\n    file:\n        - inc/Probe.pm\n"
-#        EXTRA_META => { recommends => { 'ExtUtils::Manifest' => 1.50 } },
+        LICENSE => 'perl',
     ) :()),
+    ($EUMM_VERSION >= 6.46 ? (
+        META_MERGE => {
+            'dynamic_config' => 0,
+            'meta-spec'      => { version => 2 },
+            'prereqs' => {
+                configure =>
+                  { recommends => { 'ExtUtils::Manifest' => '1.50' } },
+                develop => {
+                    requires => {
+                        'Test::Pod'           => '1.18',
+                        'Test::Pod::Coverage' => '1.04',
+                    }
+                },
+            },
+            'resources'      => {
+                repository => {
+                    type => 'git',
+                    url  => 'git://github.com/aferreira/cpan-Term-Size-Perl.git',
+                    web  => 'https://github.com/aferreira/cpan-Term-Size-Perl'
+                },
+            },
+            'no_index'       => { file => ['inc/Probe.pm'] },
+        },
+        TEST_REQUIRES => {
+            'Test::More' => '0',
+        },
+    ) : ()),
+    ($EUMM_VERSION >= 6.5503 ? (
+        BUILD_REQUIRES => {
+            'ExtUtils::CBuilder' => '0',
+        },
+    ) : ()),
 
     PREREQ_PM     => {
-        Exporter              => 0,
-        ExtUtils::CBuilder    => 0, # build
-        Test::More            => 0, # build
-    }, 
+        'Exporter'            => '0',
+      ( 'Test::More'          => '0' ) x !!($EUMM_VERSION < 6.46),
+      ( 'ExtUtils::CBuilder'  => '0' ) x !!($EUMM_VERSION < 6.5503),
+    },
     PM => {
-        'Perl.pm' => '$(INST_LIBDIR)/Perl.pm',
+        'Perl.pm'   => '$(INST_LIBDIR)/Perl.pm',
         'Params.pm' => '$(INST_LIBDIR)/Perl/Params.pm'
     },
     clean => { FILES => "Params.pm" },
-
 );

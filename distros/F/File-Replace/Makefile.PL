@@ -13,15 +13,14 @@ WriteMakefile(
 		provides     => {
 			'File::Replace' => {
 				file    => 'lib/File/Replace.pm',
-				version => '0.06',
+				version => '0.08',
 			},
 			'Tie::Handle::Base' => {
 				file    => 'lib/Tie/Handle/Base.pm',
-				version => '0.06',
+				version => '0.08',
 			},
 		},
 		no_index     => {
-			directory => [ 't' ],
 			file      => [
 					'lib/File/Replace/DualHandle.pm',
 					'lib/File/Replace/SingleHandle.pm',
@@ -66,8 +65,7 @@ WriteMakefile(
 		'Exporter'               => 0,
 	},
 	TEST_REQUIRES  => {
-		# CPAN
-		'Test::Fatal'            => '0.014',
+		# CPAN - none
 		# Perl core modules
 		'Encode'                 => 0,
 		'Test::More'             => '1.302096',

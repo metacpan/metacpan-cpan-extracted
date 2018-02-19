@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Test::Most;
+use Hush::Util qw/is_valid_zaddr is_valid_privkey/;
+
+my @INVALID = qw(
+notevenCLOSE
+2340592304958302498503495034985
+zcTOOSHORT
+.zcDukeLetoLDNV3JBGjHuShDavMoNizUSD4REKTznF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFi
+zbDukeLetoLDNV3JBGjHuShDavMoNizUSD4REKTznF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFi
+SKOoooops
+zcDukeLetoLDNV3JBGjHuShDavMoNizUSD4REKTznF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFi
+zcDukeLetoLDNV3JBGjHuShDavMoNizUSD=REKTznF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFi4
+zcDukeLetoLDNV3JBGjHuShDavMoNizUSD4REKTznF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFi4z
+zcDuïueLeoLDNV3JBGjHuShDavMoNiUQb3WnF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFiKwjLOL
+);
+
+my @VALID = qw(
+zcDukeLetoLDNV3JBGjHuShDavMoNiUQb3WnF86ftU42YroUuz6A8UP6GvFeme6k2Bk4RH1MXnZ3L8ajsDQ6SsAFiKwjLOL
+zcUUFRCsiA1zhsbBsWiHuShcfntcqT5Fh6xZ65LhYnoyjZkSnArKs4l1f3cxrunvjM3auSavjrNGoHCxMnjF6oTdeadbee9
+zcKKpEmq9ZvRdfjEK7BHuSh1f8bjjA59CKEcD8oEcDvRqZkSnArKs4l1f3VzhDbvogbwvc3sGv9ZhXB8AuoTau7deadbeeF
+zce8Y2LMuxiXXgDos9uHuShgWHLQxjDShFwJAaKRCJw5TZkSnArKs4l1f35dbwubfZiYJsNawnjp8tuewUSDREKTeadbees
+zcL1SAEnmriuZTuWnRDHuShavv7krfqHEa54kJfhLywRqZkSnArKs4l1f3SfKCpvUqEJKwYdx25ePthWAkTkhm3deadbeeR
+zcEGixE2c3tc5hDkrAZHuShKMUYjpobyYMpcjoLrvnLUKZkSnArKs4l1f3884VxriyUUv2w3uyZbZN8sM4u5W5BdeadbeeE
+zcTGixE2c3tc5hDkrAZHuShKMUYjpobyYMpcjoLrvnLUKZkSnArKs4l1f3884VxriyUUv2w3uyZbZN8sM4u5W5BdeadbeeE
+zcOUFRCsiA1zhsbBsWiHuShcfntcqT5Fh6xZ65LhYnoyjWCgNeSGpbbAzbp5z4bg3cxrunvjM3auSavjrNGoHCxMnjF6oT9
+);
+
+for my $z (@INVALID) {
+   ok( !is_valid_zaddr($z), "$z is not a valid zaddr");
+}
+
+for my $z (@VALID) {
+   ok( is_valid_zaddr($z), "$z is a valid zaddr");
+}
+
+#is_valid_privkey($hushlist);
+
+done_testing;

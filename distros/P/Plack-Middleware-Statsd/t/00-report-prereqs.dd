@@ -22,10 +22,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Net::Statsd::Tiny' => 'v0.2.0'
+                                        'Net::Statsd::Tiny' => 'v0.3.0'
                                       },
                       'requires' => {
-                                      'POSIX' => '0',
                                       'Plack::Middleware' => '0',
                                       'Plack::Util' => '0',
                                       'Plack::Util::Accessor' => '0',

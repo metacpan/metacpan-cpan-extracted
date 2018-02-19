@@ -1,14 +1,15 @@
 package Mail::AuthenticationResults::Header::Group;
 # ABSTRACT: Class modelling Groups of Authentication Results Header parts
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
+
 
 sub _HAS_CHILDREN{ return 1; }
 
@@ -67,7 +68,14 @@ Mail::AuthenticationResults::Header::Group - Class modelling Groups of Authentic
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+A group of classes, typically returned as a search results set, and should include
+all required parts.
+
+Please see L<Mail::AuthenticationResults::Header::Base>
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Log;
-$Lab::Moose::Instrument::Log::VERSION = '3.613';
+$Lab::Moose::Instrument::Log::VERSION = '3.620';
 #ABSTRACT: Role for Lab::Moose::Instrument connection logging.
 
 use Moose::Role;
@@ -112,20 +112,19 @@ Lab::Moose::Instrument::Log - Role for Lab::Moose::Instrument connection logging
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
  use Lab::Moose 'instrument';
  my $instr = instrument(
      type => '...',
+     connection_type => '...',
      connection_options => {...},
-     instrument_options => {
-         # write into newly created logfile:
-         log_file => '/tmp/instr.log',
-         # alternative: write into filehandle:
-         log_fh => $filehandle,
-     },
+     # write into newly created logfile:
+     log_file => '/tmp/instr.log',
+     # alternative: write into filehandle:
+     log_fh => $filehandle,
  );
 
 =head1 DESCRIPTION
@@ -135,7 +134,7 @@ logfile or an existing filehandle.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

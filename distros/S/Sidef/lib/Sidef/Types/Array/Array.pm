@@ -14,6 +14,7 @@ package Sidef::Types::Array::Array {
       q{0+}   => sub { scalar(@{$_[0]}) },
       q{bool} => sub { scalar(@{$_[0]}) };
 
+    use Sidef::Math::Math;
     use Sidef::Types::Number::Number;
 
     sub new {
@@ -776,12 +777,24 @@ package Sidef::Types::Array::Array {
     }
 
     sub sum_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
 
         my $sum = Sidef::Types::Number::Number::ZERO;
 
+        my @list;
+        my $count = 0;
+
         foreach my $obj (@$self) {
-            $sum = $sum->add($arg->run($obj));
+            CORE::push(@list, $block->run($obj));
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $sum   = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $sum = $sum->add(Sidef::Math::Math->sum(CORE::splice(@list)));
         }
 
         return $sum;
@@ -794,22 +807,38 @@ package Sidef::Types::Array::Array {
             goto &sum_by;
         }
 
-        my $sum = $arg // Sidef::Types::Number::Number::ZERO;
+        if (defined($arg)) {
+            my $sum = $arg;
 
-        foreach my $obj (@$self) {
-            $sum = $sum->add($obj);
+            foreach my $obj (@$self) {
+                $sum = $sum->add($obj);
+            }
+
+            return $sum;
         }
 
-        $sum;
+        Sidef::Math::Math->sum(@$self);
     }
 
     sub prod_by {
-        my ($self, $arg) = @_;
+        my ($self, $block) = @_;
 
         my $prod = Sidef::Types::Number::Number::ONE;
 
+        my @list;
+        my $count = 0;
+
         foreach my $obj (@$self) {
-            $prod = $prod->mul($arg->run($obj));
+            CORE::push(@list, $block->run($obj));
+
+            if (++$count > 1e5) {
+                $count = 0;
+                $prod  = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
+            }
+        }
+
+        if (@list) {
+            $prod = $prod->mul(Sidef::Math::Math->prod(CORE::splice(@list)));
         }
 
         return $prod;
@@ -822,13 +851,17 @@ package Sidef::Types::Array::Array {
             goto &prod_by;
         }
 
-        my $prod = $arg // Sidef::Types::Number::Number::ONE;
+        if (defined($arg)) {
+            my $prod = $arg;
 
-        foreach my $obj (@$self) {
-            $prod = $prod->mul($obj);
+            foreach my $obj (@$self) {
+                $prod = $prod->mul($obj);
+            }
+
+            return $prod;
         }
 
-        $prod;
+        Sidef::Math::Math->prod(@$self);
     }
 
     sub _min_max_by {
@@ -1123,6 +1156,7 @@ package Sidef::Types::Array::Array {
         $self;
     }
 
+    *each_k   = \&each_index;
     *each_key = \&each_index;
 
     sub each_kv {
@@ -1192,6 +1226,8 @@ package Sidef::Types::Array::Array {
         bless \@array, __PACKAGE__;
     }
 
+    *collect = \&map;
+
     sub map_kv {
         my ($self, $block) = @_;
 
@@ -1202,6 +1238,8 @@ package Sidef::Types::Array::Array {
 
         bless \@arr, __PACKAGE__;
     }
+
+    *collect_kv = \&map_kv;
 
     sub flat_map {
         my ($self, $block) = @_;
@@ -1396,40 +1434,19 @@ package Sidef::Types::Array::Array {
         bless \@values, __PACKAGE__;
     }
 
-    sub bindex {
+    sub bindex_by {
         my ($self, $obj) = @_;
 
         my $left  = 0;
         my $right = $#$self;
         my ($middle, $item, $cmp);
 
-        if (ref($obj) eq 'Sidef::Types::Block::Block') {
-
-            while ($left <= $right) {
-                $middle = (($right + $left) >> 1);
-                $item   = $self->[$middle];
-                $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
-
-                if ($cmp > 0) {
-                    $right = $middle - 1;
-                }
-                else {
-                    $left = $middle + 1;
-                }
-            }
-
-            return Sidef::Types::Number::Number::MONE;
-        }
-
         while ($left <= $right) {
-            $middle = int(($right + $left) >> 1);
+            $middle = (($right + $left) >> 1);
             $item   = $self->[$middle];
-            $cmp    = CORE::int($item cmp $obj);
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
 
-            if (!$cmp) {
-                return Sidef::Types::Number::Number->_set_uint($middle);
-            }
-            elsif ($cmp > 0) {
+            if ($cmp > 0) {
                 $right = $middle - 1;
             }
             else {
@@ -1437,10 +1454,187 @@ package Sidef::Types::Array::Array {
             }
         }
 
-        return Sidef::Types::Number::Number::MONE;
+        Sidef::Types::Number::Number::MONE;
     }
 
-    *bindex_by = \&bindex;
+    *bsearch_index_by = \&bindex_by;
+
+    sub bindex {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while ($left <= $right) {
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp > 0) {
+                $right = $middle - 1;
+            }
+            else {
+                $left = $middle + 1;
+            }
+        }
+
+        Sidef::Types::Number::Number::MONE;
+    }
+
+    *bsearch_index = \&bindex;
+
+    sub bsearch {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_by = \&bsearch;
+
+    sub bindex_ge_by {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_ge {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_ge_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                if ($left > $right) {
+                    ++$middle;
+                    last;
+                }
+            }
+            else {
+                $right = $middle - 1;
+                $left > $right && last;
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_le_by {
+        my ($self, $obj) = @_;
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($obj->run($item)) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                $left > $right && last;
+            }
+            else {
+                $right = $middle - 1;
+                if ($left > $right) {
+                    --$middle;
+                    last;
+                }
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bindex_le {
+        my ($self, $obj) = @_;
+
+        if (ref($obj) eq 'Sidef::Types::Block::Block') {
+            goto &bindex_le_by;
+        }
+
+        my $left  = 0;
+        my $right = $#$self;
+        my ($middle, $item, $cmp);
+
+        while (1) {
+
+            $middle = (($right + $left) >> 1);
+            $item   = $self->[$middle];
+            $cmp    = CORE::int($item cmp $obj) || return Sidef::Types::Number::Number->_set_uint($middle);
+
+            if ($cmp < 0) {
+                $left = $middle + 1;
+                $left > $right && last;
+            }
+            else {
+                $right = $middle - 1;
+                if ($left > $right) {
+                    --$middle;
+                    last;
+                }
+            }
+        }
+
+        Sidef::Types::Number::Number->_set_uint($middle);
+    }
+
+    sub bsearch_le {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_le($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_le_by = \&bsearch_le;
+
+    sub bsearch_ge {
+        my ($self, $obj) = @_;
+        my $index = $self->bindex_ge($obj);
+        $index->is_mone ? undef : $self->[CORE::int($index)];
+    }
+
+    *bsearch_ge_by = \&bsearch_ge;
 
     sub index {
         my ($self, $obj) = @_;
@@ -1573,6 +1767,46 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Array::Pair->new($self, $arr);
     }
 
+    sub accumulate_by {
+        my ($self, $block) = @_;
+
+        my @acc;
+        my $prev;
+
+        foreach my $item (@$self) {
+            if (defined($prev)) {
+                CORE::push(@acc, $prev = $prev->add($block->run($item)));
+            }
+            else {
+                CORE::push(@acc, $prev = $block->run($item));
+            }
+        }
+
+        bless \@acc;
+    }
+
+    sub accumulate {
+        my ($self, $block) = @_;
+
+        if (defined($block)) {
+            goto &accumulate_by;
+        }
+
+        my @acc;
+        my $prev;
+
+        foreach my $item (@$self) {
+            if (defined($prev)) {
+                CORE::push(@acc, $prev = $prev->add($item));
+            }
+            else {
+                CORE::push(@acc, $prev = $item);
+            }
+        }
+
+        bless \@acc;
+    }
+
     sub reduce {
         my ($self, $obj, $initial) = @_;
 
@@ -1676,8 +1910,37 @@ package Sidef::Types::Array::Array {
                                              );
     }
 
+    sub indices_by {
+        my ($self, $arg) = @_;
+
+        my @indices;
+        if (ref($arg) eq 'Sidef::Types::Block::Block') {
+            foreach my $i (0 .. $#$self) {
+                if ($arg->run($self->[$i])) {
+                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
+                }
+            }
+        }
+        else {
+            foreach my $i (0 .. $#$self) {
+                if ($self->[$i] eq $arg) {
+                    CORE::push(@indices, Sidef::Types::Number::Number->_set_uint($i));
+                }
+            }
+        }
+
+        bless \@indices;
+    }
+
+    *keys_by = \&indices_by;
+
     sub indices {
-        my ($self) = @_;
+        my ($self, $arg) = @_;
+
+        if (defined($arg)) {
+            goto &indices_by;
+        }
+
         bless [map { Sidef::Types::Number::Number->_set_uint($_) } 0 .. $#$self], __PACKAGE__;
     }
 
@@ -2023,6 +2286,16 @@ package Sidef::Types::Array::Array {
     *drop_first = \&shift;
     *drop_left  = \&shift;
 
+    sub shift_while {
+        my ($self, $block) = @_;
+
+        while (@$self and $block->run($self->[0])) {
+            CORE::shift(@$self);
+        }
+
+        $self;
+    }
+
     sub pop {
         my ($self, $num) = @_;
 
@@ -2037,6 +2310,16 @@ package Sidef::Types::Array::Array {
 
     *drop_last  = \&pop;
     *drop_right = \&pop;
+
+    sub pop_while {
+        my ($self, $block) = @_;
+
+        while (@$self and $block->run($self->[-1])) {
+            CORE::pop(@$self);
+        }
+
+        $self;
+    }
 
     sub pop_rand {
         my ($self) = @_;

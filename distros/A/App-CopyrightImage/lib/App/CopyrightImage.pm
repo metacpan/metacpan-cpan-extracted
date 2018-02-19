@@ -12,7 +12,7 @@ use Image::ExifTool qw(:Public);
 
 our @EXPORT = qw(imgcopyright);
 
-our $VERSION = '0.04';
+our $VERSION = '1.01';
 
 sub imgcopyright {
     my (%data) = @_;
@@ -326,7 +326,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2016,2017,2018 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

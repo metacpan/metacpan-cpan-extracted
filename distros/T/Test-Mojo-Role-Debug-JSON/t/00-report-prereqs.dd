@@ -1,0 +1,44 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'IO::Handle' => '0',
+                                      'Mojo::JSON' => '0',
+                                      'Mojolicious' => '0',
+                                      'Role::Tiny' => '0',
+                                      'Test::Mojo::Role::Debug' => '0',
+                                      'Test::Mojo::WithRoles' => '0',
+                                      'perl' => '5.010'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::Mojo::WithRoles' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'Test::Tester' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

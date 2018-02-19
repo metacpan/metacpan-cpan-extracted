@@ -188,7 +188,7 @@ sub setup ($) {
     my($header);
     $header = $self->{_in}->getline;
     my(@columns) = Fsdb::IO::clean_potential_columns(split(/\t/, $header));
-    croak $self->{_prog} . ": don't find any column headings in the first row.\n"
+    croak($self->{_prog} . ": don't find any column headings in the first row.\n")
 	if ($#columns == -1);
 
     $self->finish_io_option('output', -fscode => 't', -cols => \@columns);

@@ -1,14 +1,12 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::String;
+use Indent::Word;
 
 # Object.
-my $i = Indent::String->new(
+my $i = Indent::Word->new(
         'line_size' => 20,
 );
 

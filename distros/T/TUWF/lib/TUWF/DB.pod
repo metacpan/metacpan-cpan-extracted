@@ -45,9 +45,9 @@ most likely work as well, but you might run into some issues.
 =head2 Every request is one transaction
 
 TUWF automatically makes sure that before a request will be processed (that is,
-before the I<pre_request_handler> is called), the database connection will be
-in a clean state and has just started a new transaction. After the request has
-been successfully handled (that is, none of your functions C<die()>'d), the
+before the I<before> hooks are called), the database connection will be in a
+clean state and has just started a new transaction. After the request has been
+successfully handled (that is, none of your functions C<die()>'d), the
 transaction will be committed automatically. If something went wrong while
 processing the request, the transaction will be rolled back before the
 I<error_500_handler> is called. So from the perspective of the database, each
@@ -87,17 +87,28 @@ extended formatting codes in the query.
 
 Example of an "UPDATE or INSERT" query:
 
-  $self->dbExec(
+  tuwf->dbExec(
     'UPDATE users !H !W',
     {'username = ?' => $user, 'email = ?' => $email},
     {'id = ?' => $uid}
-  ) || $self->dbExec(
+  ) || tuwf->dbExec(
     'INSERT INTO users (id, username, email) VALUES(!l)',
     [ $uid, $user, $email ]
   );
 
 Of course, the use of the extended formatting in the above example is not very
 practical. Their advantage is more apparent when the queries get more dynamic.
+
+=head2 dbVal(query, @params)
+
+Accepts the same arguments as C<dbExec()>, and returns the first value of the
+first row.
+
+Examples:
+
+  my $count = tuwf->dbVal('SELECT COUNT(*) FROM users');
+
+  my $exists = tuwf->dbVal('SELECT 1 FROM users WHERE id = ?', $id);
 
 =head2 dbRow(query, @params)
 
@@ -106,16 +117,14 @@ result as a hashref. The return value is equivalent to
 C<$sth-E<gt>fetchrow_hashref()>, except C<dbRow()> returns an empty hash if the
 query did not return any rows.
 
-Examples:
+Example:
 
-  my $count = $self->dbRow('SELECT COUNT(*) AS num FROM users')->{num};
-
-  my %latest_announcement = %{$self->dbRow(q{
+  my %latest_announcement = %{ tuwf->dbRow(q{
     SELECT title, message, post_date
       FROM announcements
      ORDER BY post_date DESC
      LIMIT 1
-  })};
+  }) };
   die "No announcements!" if !keys %latest_announcement;
 
 =head2 dbAll(query, @params)
@@ -138,12 +147,12 @@ is either 0 or 1, and indicates whether there are more rows. That is, if the
 second value is true, calling the this method with the same arguments but with
 the I<page> option increased with one will return at least one more row.
 
-  my($rows, $nextpage) = $self->dbPage(
+  my($rows, $nextpage) = tuwf->dbPage(
     {page => 2, results => 10},
     'SELECT title FROM threads ORDER BY title'
   );
   # $rows is now equivalent to:
-  # $self->dbAll('SELECT title FROM threads ORDER BY title LIMIT 10 OFFSET 10')
+  # tuwf->dbAll('SELECT title FROM threads ORDER BY title LIMIT 10 OFFSET 10')
 
 The value of C<$nextpage> is determined by fetching one row more than requested
 and later removing it from the results.
@@ -243,7 +252,7 @@ L<TUWF>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2017 Yoran Heling.
+Copyright (c) 2008-2018 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

@@ -4,21 +4,11 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'     => qr/[@]bigfoot[.]com[>]/,
-    'subject'  => qr/\AReturned mail: /,
-    'received' => qr/\w+[.]bigfoot[.]com\b/,
-};
-my $Re1 = {
-    'begin'  => qr/\A[ \t]+[-]+[ \t]*Transcript of session follows/,
-    'rfc822' => qr|\AContent-Type: message/partial|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'rfc822'  => ['Content-Type: message/partial'] };
+my $MarkingsOf = { 'message' => qr/\A[ \t]+[-]+[ \t]*Transcript of session follows/ };
 
-sub pattern     { return $Re0 }
 sub description { 'Bigfoot: http://www.bigfoot.com' }
-
 sub scan {
     # Detect an error from Bigfoot
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -37,8 +27,9 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match ||= 1 if $mhead->{'from'} =~ $Re0->{'from'};
-    $match ||= 1 if grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    # 'subject'  => qr/\AReturned mail: /,
+    $match ||= 1 if index($mhead->{'from'}, '@bigfoot.com>') > -1;
+    $match ||= 1 if grep { index($_, '.bigfoot.com ') > -1 } @{ $mhead->{'received'} };
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -55,16 +46,15 @@ sub scan {
         'date'  => '',      # The value of Arrival-Date header
         'lhost' => '',      # The value of Reporting-MTA header
     };
-
     my $v = undef;
     my $p = '';
 
     require Sisimai::Address;
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -72,7 +62,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -101,7 +91,7 @@ sub scan {
                 # Last-Attempt-Date: Sun, 28 Dec 2014 18:17:16 -0800
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; <destinaion@example.net>
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -111,26 +101,26 @@ sub scan {
                     $v->{'recipient'} = Sisimai::Address->s3s4($1);
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.7.1
                     $v->{'status'} = $1;
 
-                } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ARemote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Remote-MTA: DNS; p01c11m075.mx.example.net
                     $v->{'rhost'} = lc $1;
 
                 } else {
                     # Get error message
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 553 Invalid recipient destinaion@example.net (Mode: normal)
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -147,13 +137,13 @@ sub scan {
                 # Reporting-MTA: dns; litemail57.bigfoot.com
                 # Arrival-Date: Sun, 28 Dec 2014 18:17:16 -0800
                 #
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; mx.example.jp
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -163,11 +153,11 @@ sub scan {
                     #    ----- Transcript of session follows -----
                     # >>> RCPT TO:<destinaion@example.net>
                     # <<< 553 Invalid recipient destinaion@example.net (Mode: normal)
-                    if( $e =~ m/\A[>]{3}[ ]+([A-Z]{4})[ ]?/ ) {
+                    if( $e =~ /\A[>]{3}[ ]+([A-Z]{4})[ ]?/ ) {
                         # >>> DATA
                         $commandtxt = $1;
 
-                    } elsif( $e =~ m/\A[<]{3}[ ]+(.+)\z/ ) {
+                    } elsif( $e =~ /\A[<]{3}[ ]+(.+)\z/ ) {
                         # <<< Response
                         $esmtpreply = $1;
                     }
@@ -178,10 +168,10 @@ sub scan {
         # Save the current line for the next loop
         $p = $e;
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
@@ -238,13 +228,11 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 
 This software is distributed under The BSD 2-Clause License.
 
 =cut
-
-
 

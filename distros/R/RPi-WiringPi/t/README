@@ -1,0 +1,45 @@
+RPi::WiringPi test platform GPIO pin connections
+
+# I2C
+
+SCL -> Arduino SCL
+SDA -> Arduino SDA
+
+# LCD
+
+5 -> RS
+6 -> E
+4 -> D4
+17 -> D5
+27 -> D6
+22 -> D7
+
+# ADS1115 ADC
+
+SCL -> SCL
+SDA -> SDA
+18 -> A0
+
+# MCP3008 ADC
+
+11 -> 13 (SCLK)
+9  -> 12 (MISO)
+10 -> 11 (MOSI)
+26 -> 10 (CS)
+
+# MCP4922 DAC
+
+12 -> 3 (CS)
+11 -> 4 (SCLK)
+10 -> 5 (MOSI)
+
+# 74HC595 Shift Register
+
+21 -> 14 (DATA)
+16 -> 12 (LATCH)
+20 -> 11 (SHCP/CLK)
+
+# Serial
+
+14 -> 15 (Rx->Tx)
+

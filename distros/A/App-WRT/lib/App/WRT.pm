@@ -213,7 +213,7 @@ current entry.
 
 package App::WRT;
 
-use version; our $VERSION = version->declare("v4.2.1");
+use version; our $VERSION = version->declare("v4.2.2");
 
 use strict;
 use warnings;
@@ -281,9 +281,6 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       # content in-place, like Net Neutrality protest blackouts):
       overlay        => undef,
 
-      # List of years for the menu:
-      year_list      => [ reverse(1997..(get_date('year') + 1900)) ],
-
       # What gets considered an entry _path_:
       entrypath_expr => qr/^ ([a-z0-9_\/-]+) $/x,
 
@@ -323,9 +320,6 @@ my %default = (
   # situations where every page of a site should serve some other
   # content in-place, like Net Neutrality protest blackouts):
   overlay        => undef,
-
-  # List of years for the menu:
-  year_list      => [ reverse(1997..(get_date('year') + 1900)) ],
 
   # What gets considered an entry _path_:
   entrypath_expr => qr/^ ([a-z0-9_\/-]+) $/x,
@@ -393,11 +387,6 @@ $default{entry_descriptions} = {
   new      => 'newest entries',
   all      => 'all entries',
 };
-{
-  foreach my $yr ( @{ $default{year_list} } ) {
-    $default{entry_descriptions}{$yr} = "entries for $yr";
-  }
-}
 
 # Set up some accessor methods:
 __PACKAGE__->methodspit( keys %default );
@@ -634,32 +623,13 @@ sub link_bar {
   my $self = shift;
   my (@extra_links) = @_;
 
-  my $title = $self->title;
-
   my $output;
+
+  my $title = $self->title;
 
   my (%description) = %{ $self->entry_descriptions() };
 
-  my @years = @{ $self->year_list };
-
-  # This makes the short list of years context sensitive:
-
-  if ( my ($title_year) = $title =~ m/^([0-9]{4})/ ) {
-    # We have a match.
-
-    if    ($title_year == $years[0] ) { $title_year--; }
-    elsif ($title_year == $years[-1]) { $title_year++; }
-
-    if (grep { $title_year eq $_ } @years) {
-      my $prev = $title_year - 1;
-      my $next = $title_year + 1;
-      @years = grep { m/^($prev|$title_year|$next)$/ } @years;
-    }
-  } else {
-    @years = @years[0..2];
-  }
-
-  my @linklist = ( qw(new all), @years, @extra_links );
+  my @linklist = ( qw(new all), @extra_links );
 
   foreach my $link (@linklist) {
     my $link_title;
@@ -670,14 +640,11 @@ sub link_bar {
     }
 
     if ($title ne $link) {
-
       my $href = $self->url_root . $link . '/';
       if ($link eq 'new') {
         $href = $self->url_root;
       }
-
       $output .= a({href => $href, title => $link_title}, $link) . "\n";
-
     } else {
       $output .= qq{<strong><span title="$link_title">$link</span></strong>\n};
     }

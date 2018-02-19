@@ -1,5 +1,10 @@
 Revision history for RT-Extension-TicketLocking
 
+1.07 2018-02-15
+
+ - update code for RTIR 3.0+
+ - update MyLocks component for RT 4.4
+
 1.06 2016-10-21
  - Update documentation
 

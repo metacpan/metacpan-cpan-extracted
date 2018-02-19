@@ -182,6 +182,7 @@ package Sidef::Types::String::String {
         $self->new($$self . "$string");
     }
 
+    *add    = \&append;
     *concat = \&append;
 
     sub prepend {
@@ -312,6 +313,20 @@ package Sidef::Types::String::String {
         my ($self) = @_;
         Sidef::Types::Number::Number->new($$self, 16);
     }
+
+    sub decode_base64 {
+        state $x = require MIME::Base64;
+        MIME::Base64::decode_base64(${$_[0]});
+    }
+
+    *base64_decode = \&decode_base64;
+
+    sub encode_base64 {
+        state $x = require MIME::Base64;
+        MIME::Base64::encode_base64(${$_[0]});
+    }
+
+    *base64_encode = \&encode_base64;
 
     sub md5 {
         state $x = require Digest::MD5;

@@ -1,0 +1,116 @@
+NAME
+
+    Unix::Groups::FFI - Interface to Unix group syscalls
+
+SYNOPSIS
+
+      use Unix::Groups::FFI qw(getgroups setgroups getgrouplist initgroups);
+    
+      my @gids = getgroups;
+      setgroups(@gids);
+      my @gids = getgrouplist($username, $gid);
+      initgroups($username, $gid);
+
+DESCRIPTION
+
+    This module provides a FFI interface to several syscalls related to
+    Unix groups, including getgroups(2), setgroups(2), getgrouplist(3), and
+    initgroups(3). As such it will only work on Unix-like operating
+    systems.
+
+FUNCTIONS
+
+    All functions are exported individually on demand. A function will not
+    be available for export if the system does not implement the
+    corresponding syscall.
+
+ getgroups
+
+      my @gids = getgroups;
+
+    Returns the supplementary group IDs of the current process via
+    getgroups(2).
+
+ setgroups
+
+      setgroups(@gids);
+
+    Sets the supplementary group IDs for the current process via
+    setgroups(2). Attempting to set more than NGROUPS_MAX groups (32 before
+    Linux 2.6.4 or 65536 since Linux 2.6.4) will result in an EINVAL error.
+    Passing an empty list of group IDs may result in unspecified behavior.
+    The CAP_SETGID capability or equivalent privilege is required.
+
+ getgrouplist
+
+      my @gids = getgrouplist($username, $gid);
+      my @gids = getgrouplist($username);
+
+    Returns the group IDs for all groups of which $username is a member,
+    also including $gid (without repetition), via getgrouplist(3). If
+    $username does not exist on the system, an EINVAL error will result.
+
+    As a special case, the primary group ID of $username is included if
+    $gid is not passed.
+
+ initgroups
+
+      initgroups($username, $gid);
+      initgroups($username);
+
+    Initializes the supplementary group access list for the current process
+    to all groups of which $username is a member, also including $gid
+    (without repetition), via initgroups(3). If $username does not exist on
+    the system, an EINVAL error will result. The CAP_SETGID capability or
+    equivalent privilege is required.
+
+    As a special case, the primary group ID of $username is included if
+    $gid is not passed.
+
+ERROR HANDLING
+
+    All functions will throw an exception containing the syscall error
+    message in the event of an error. "$!" in perlvar will also have been
+    set by the syscall, so you could check it after trapping the exception
+    for finer exception handling:
+
+      use Unix::Groups::FFI 'setgroups';
+      use Syntax::Keyword::Try;
+      use Errno qw(EINVAL EPERM ENOMEM);
+    
+      try { setgroups((0)x2**16) }
+      catch {
+        if ($! == EINVAL) {
+          die 'Tried to set too many groups';
+        } elsif ($! == EPERM) {
+          die 'Insufficient privileges to set groups';
+        } elsif ($! == ENOMEM) {
+          die 'Out of memory';
+        } else {
+          die $@;
+        }
+      }
+
+    See the documentation for each syscall for details on the possible
+    error codes.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    POSIX, credentials(7), capabilities(7)
+

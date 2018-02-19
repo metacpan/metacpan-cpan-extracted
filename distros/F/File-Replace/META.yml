@@ -7,7 +7,6 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::stat: '0'
   FindBin: '0'
-  Test::Fatal: '0.014'
   Test::More: '1.302096'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -22,17 +21,16 @@ no_index:
   directory:
     - t
     - inc
-    - t
   file:
     - lib/File/Replace/DualHandle.pm
     - lib/File/Replace/SingleHandle.pm
 provides:
   File::Replace:
     file: lib/File/Replace.pm
-    version: '0.06'
+    version: '0.08'
   Tie::Handle::Base:
     file: lib/Tie/Handle/Base.pm
-    version: '0.06'
+    version: '0.08'
 recommends: {}
 requires:
   Carp: '0'
@@ -50,5 +48,5 @@ resources:
   bugtracker: https://bitbucket.org/haukex/file-replace/issues
   homepage: https://bitbucket.org/haukex/file-replace
   repository: https://bitbucket.org/haukex/file-replace.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

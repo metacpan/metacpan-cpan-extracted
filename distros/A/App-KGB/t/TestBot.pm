@@ -25,7 +25,7 @@ our $USER = $info[0];
 our $COMMIT_USER
     = $USER_NAME
     ? "03${USER_NAME} (03${USER})"
-    : "(03${USER})";
+    : "03${USER} (03${USER})";
 
 sub start {
     my $class = shift;
@@ -53,9 +53,10 @@ sub start {
 
     while(1) {
         warn "# trying port $port\n";
-        last if eval { bind( $srv, pack_sockaddr_in( $port, $addr ) ) };
+        warn("# port $port is available\n"), last
+            if eval { bind( $srv, pack_sockaddr_in( $port, $addr ) ) };
 
-        warn "# port $port busy\n";
+        warn "# port $port is busy\n";
 
         $port++;
         $tries++;
@@ -91,15 +92,24 @@ channels:
    repos:
     - test
 log_file: $dir/kgb-bot.log
+webhook:
+ enabled: 1
+ allowed_networks:
+  - $addr
 EOF
     chmod 0600, $fh;
     close($fh);
 
-    system( File::Spec->catfile( 'script', 'kgb-bot' ),
-        '--config', $conf_file, '--simulate', $self->output_file,
-        '--simulate-color' );
+    my $bot_script =
+        $ENV{KGB_BOT_SCRIPT} || File::Spec->catfile( 'script', 'kgb-bot' );
 
-    while ( not -e $self->pid_file ) {
+    system( $bot_script,
+        '--config', $conf_file, '--simulate', $self->output_file,
+        '--simulate-color' ) == 0
+        or die "bot exec error";
+
+    # wait for the PID file to appear and to have content
+    while ( ( not -e $self->pid_file ) or ( not -s _ ) ) {
         sleep 0.1;
     }
     my $pid = do {
@@ -147,7 +157,8 @@ EOF
 sub get_output {
     my $self = shift;
 
-    open( my $fh, $self->output_file );
+    my $fh;
+    eval { open( $fh, $self->output_file ); 1 } or return '';
     binmode( $fh, ':utf8' );
     local $/ = undef;
     return <$fh>;
@@ -164,6 +175,7 @@ sub stop {
     open my $fh, $self->pid_file;
     my $pid = <$fh>;
     chomp($pid);
+    close($fh);
 
     warn "# stopping test bot, pid $pid\n";
     kill SIGTERM, $pid;

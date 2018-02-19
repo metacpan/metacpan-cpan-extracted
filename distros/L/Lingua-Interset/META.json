@@ -4,13 +4,13 @@
       "Dan Zeman <zeman@ufal.mff.cuni.cz>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.026, CPAN::Meta::Converter version 2.142060",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Lingua-Interset",
    "prereqs" : {
@@ -51,6 +51,6 @@
          "url" : "https://github.com/dan-zeman/interset"
       }
    },
-   "version" : "3.010"
+   "version" : "3.011"
 }
 

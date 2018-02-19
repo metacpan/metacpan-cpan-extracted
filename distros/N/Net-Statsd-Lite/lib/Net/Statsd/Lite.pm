@@ -18,7 +18,7 @@ use Net::Statsd::Lite::Types -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.2';
 
 
 has host => (
@@ -111,7 +111,7 @@ BEGIN {
               if defined $rate;
         }
 
-        my $tmpl  = $PROTOCOL{$name}[0];
+        my $tmpl = $PROTOCOL{$name}[0];
 
         if ( defined $rate ) {
 
@@ -214,7 +214,7 @@ Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packet
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.2
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ $Results
 </%ARGS>
 
 <%INIT>
-if($Type eq 'Report' && !RT::IR::Ticket::IsLinkedToActiveIncidents($Ticket)) {
+if($Type eq 'Report' && !RT::IR->IsLinkedToActiveIncidents($Ticket)) {
     $Ticket->Lock('Take');
     push @$Results, 'You have a lock on this report until you link it to an incident';
 }

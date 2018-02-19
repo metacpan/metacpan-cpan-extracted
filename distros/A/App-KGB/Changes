@@ -1,3 +1,110 @@
+1.38 (2018-02-17)
+  [ Damyan Ivanov ]
+  * webhok/tag_push:
+    + add tag URL
+    + recognize signed tags
+
+1.37 (2018-02-16)
+  [ Damyan Ivanov ]
+  * webhooks: support squashing of branch updates
+
+1.36 (2018-02-12)
+  [ Damyan Ivanov ]
+  * Fix typo missing tag_push webhook events
+
+1.35 (2018-02-12)
+  [ gregor herrmann ]
+  * WWW::Shorten::Debli: use https for deb.li URLs.
+    Thanks to pabs for the pointer.
+
+  [ Damyan Ivanov ]
+  * use the interpreter running the test to run the test client
+    otherwise the system-wide perl is used, which may be configured
+    (e.g. @INC) quite differently
+    Thanks to Slaven Rezić (RT#108400)
+  * fix comparison of Git version to 2.9.0, when the minor version is greater t»
+    "2.15.0" ge "2.9.0" returns false, because it uses string comparison
+    and "1" is less than "9".
+  * bot: preliminary support for GitLab webhook termination at /webhook/
+  * bot: let --debug override the config setting
+  * bump copyright years
+ * TestBot: die if the bot exits with non-zero status
+  * bot:
+    + add support for GitLab webhook termination at /webhook/
+    + add systemd .service file
+    + irc_new_hash: make new entries enter at the top of the list
+    + stop sending /WHO when somebody joins
+    + debug: prepend the line number
+    + fix disabling of colors on use_color=0
+  * Painter: fix 'item_colors' member name mistake
+  * kgb-ci-report
+    + POD: wrap links in L<>, use https
+    + use https for ci.debian.net
+    + use udd-mirror.debian.net for connecting to UDD
+    + allow running without --kgb-config
+  * tests: allow overriding of bot/client location
+
+1.34 (2016-09-26)
+  [ Damyan Ivanov ]
+  * add patch fixing tests in build environments where the current user has no
+    full name (Closes: #769239 -- FTBFS)
+
+  [ gregor herrmann ]
+  * kgb-client.conf(5): change example shortening service from Metamark to
+    TinyURL, following the example of WWW::Shorten. Metamark is not
+    accepting new URLs anymore.
+
+  [ Damyan Ivanov ]
+  * also mention cgit in the web-link description
+  * add a new script, kgb-ci-report. used to notify about CI failures
+  * bump years of copyright
+
+  [ Pierre Schweitzer ]
+  * kgb-client: use login name when the full user name is not available
+    Closes: #772747
+  * Remove ${{project/}} token from the example multi-line message
+    configuration (already removed from the single-line configuration)
+    Closes: #772749
+  * Fix multiline message template
+    Closes: #772750
+
+  [ Damyan Ivanov ]
+  * TestBot:
+    - when waiting for the PID file to appear, also see if it has any content
+    - close the PID file after reading it
+  * kgb-bot:
+    - add the PID to the "Listening on ..." line in the log
+    - rewrite the PID management code using OO interface of Proc::PID::File.
+      This fixes a rather nasty hardly-reproducible bug causing the PID file
+      to be re-created after being removed, which may fool the tests and make
+      them hang.
+      Closes: #782079
+
+  [ gregor herrmann ]
+  * Build.PL:
+    - install new kgb-ci-report script
+    - add DBD::Pg as requirement in Build.PL
+  * Fix some typos in the POD. Thanks to lintian.
+
+  [ Martín Ferrari ]
+  * App::KGB::Client::ServerRef:
+    - More consistent verbose reporting of server communication.
+    - Add --dry-run option for debugging.
+    - Bug fix: use correct method when sending a commit info with
+      default protocol.
+  * App::KGB::Client: format_message: Don't lose data.
+    When the commit object does not have all the info, it still overwrites
+    data coming from the extra arguments. It meant SVN commits were lacking
+    branch and module information completely.
+
+  [ gregor herrmann ]
+  * Fix t/52-client-git.t to work with newer git versions as well.
+    Since 2.9.0, git allows merging branches without a common ancestors only
+    when "--allow-unrelated-histories" is passed. This has lead to test
+    failures.
+    Pass the parameter conditionally.
+
+
 1.33 (2014-08-06)
   * TestBot: set $ENV{USER} to getpwnam($>) to fix discrepancy when running
     under sudo (as in pbuilder)

@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.511   2018-02-10
+        - Bugfix: don't link the original list to a self hash element.
+        - Deprecation: method "config".
+        - Update documentation.
+
 1.510   2018-02-04
         - Bugfix: don't overwrite option "layout"
         - 'cut_to_printwidth': don't copy parameter.

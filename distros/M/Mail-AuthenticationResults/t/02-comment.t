@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
@@ -46,6 +46,18 @@ is( $SetValue, $Comment, 'Returns This Object' );
 
 is( $Comment->value(), 'foo', 'value() correct value returned' );
 is( $Comment->as_string(), '(foo)', 'as_string() correct string returned' );
+
+lives_ok( sub{ $SetValue = $Comment->set_value( 'foo(bar)' ) }, 'set_value("foo(bar)") lives' );
+is( $Comment->value(), 'foo(bar)', 'value() correct value returned' );
+is( $Comment->as_string(), '(foo(bar))', 'as_string() correct string returned' );
+
+lives_ok( sub{ $SetValue = $Comment->safe_set_value( 'foo' ) }, 'safe_set_value("foo") lives' );
+is( $Comment->value(), 'foo', 'value() correct value returned' );
+is( $Comment->as_string(), '(foo)', 'as_string() correct string returned' );
+
+lives_ok( sub{ $SetValue = $Comment->safe_set_value( 'foo(bar)' ) }, 'safe_set_value("foo(bar)") lives' );
+is( $Comment->value(), 'foo(bar)', 'value() correct value returned' );
+is( $Comment->as_string(), '(foo(bar))', 'as_string() correct string returned' );
 
 done_testing();
 

@@ -7,13 +7,17 @@ use warnings;
 use strict;
 use Carp;
 use Data::Dumper;
+use HPCI::File;
+
+use List::Util qw(first);
+use Scalar::Util 'blessed';
 
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::ClassAttribute;
 use MooseX::Types::Path::Class qw(Dir File);
 
-# do nothing, but let roles write before/after/around wrappers
+# available for roles to wrap around, does nothing by default
 sub BUILD {
 }
 
@@ -168,7 +172,7 @@ sub _secs_to_time {
         $base = int( $base / $size );
         $res  = "$rem$name$res";
         }
-    $self->croak("Run time of more than 100 days seems insane ($origbase)");
+    $self->_croak("Run time of more than 100 days seems insane ($origbase)");
     }
 
 sub _time_to_secs {
@@ -186,7 +190,7 @@ sub _time_to_secs {
         my $mult = 1;
         if ($let) {
             $mult = $name2secs{ lc($let) }
-                // $self->croak("Unknown code ($let) in time string ($time)");
+                // $self->_croak("Unknown code ($let) in time string ($time)");
             }
         $res += $num * $mult;
         }
@@ -277,7 +281,7 @@ has 'command' => (
     is        => 'rw',
     isa       => 'Str',
     predicate => '_has_command',
-	trigger   => sub { shift->_only_one( '_has_code' ) },
+    trigger   => sub { shift->_only_one( '_has_code' ) },
 );
 
 =head2 code
@@ -318,14 +322,14 @@ has 'code' => (
     is        => 'ro',
     isa       => 'CodeRef',
     predicate => '_has_code',
-	trigger   => sub { shift->_only_one( '_has_command' ) },
+    trigger   => sub { shift->_only_one( '_has_command' ) },
 );
 
 sub _only_one {
-	my $self      = shift;
-	my $has_other = shift;
-	$self->croak( "Exactly one of 'code' or 'command' attributes must be specified, not both" )
-		if $self->$has_other;
+    my $self      = shift;
+    my $has_other = shift;
+    $self->_croak( "Exactly one of 'code' or 'command' attributes must be specified, not both" )
+        if $self->$has_other;
 }
 
 sub assert_command_filled {
@@ -396,14 +400,14 @@ has '_use_resources_required' => (
     is      => 'ro',
     isa     => 'HashRef[Str]',
     lazy    => 1,
-	builder => '_init_use_resources_required',
+    builder => '_init_use_resources_required',
 );
 
 sub _init_use_resources_required {
-	my $self = shift;
-	$self->res_hash_map( $self->resources_required,
-		$self->_default_resources,
-	);
+    my $self = shift;
+    $self->res_hash_map( $self->resources_required,
+        $self->_default_resources,
+    );
 }
 
 =head2 retry_resources_required
@@ -550,7 +554,9 @@ native_args_string is parsed, controlling how it is separated into
 parameters and values, which parameters are normally provided by altenate
 HPCI mechanisms, how the parameters and values are displayed in the log
 (if it is different from how they are inserted into the command line for
-execution), etc.  Only people writing drivers need to worry about this attribute.
+execution), etc.
+
+Only people writing drivers need to worry about this attribute.
 
 =head2 native_args* support not implemented yet
 
@@ -561,29 +567,29 @@ SGE and Slurm drivers, that is still in progress.
 =cut
 
 has 'native_args_string' => (
-	is       => 'ro',
-	isa      => 'Str',
-	default  => ''
+    is       => 'ro',
+    isa      => 'Str',
+    default  => ''
 );
 
 has 'native_args_string_name' => (
-	is       => 'ro',
-	isa      => 'Maybe[Str]',
-	init_arg => undef,
-	default  => undef    # driver can over-ride this setting
+    is       => 'ro',
+    isa      => 'Maybe[Str]',
+    init_arg => undef,
+    default  => undef    # driver can over-ride this setting
 );
 
 has 'native_args_string_parsing_info' => (
-	is       => 'ro',
-	isa      => 'HashRef',
-	init_arg => undef,
-	builder  => 'default_args_string_parsing_info'
+    is       => 'ro',
+    isa      => 'HashRef',
+    init_arg => undef,
+    builder  => 'default_args_string_parsing_info'
 );
 
 # driver can over-ride this method to provide a non-empty list
 # of parsing info
 sub default_args_string_parsing_info {
-	return {}
+    return {}
 }
 
 
@@ -615,101 +621,189 @@ sub _croak {
     my $msg  = shift;
     $msg = "Stage(" . $self->name . "): $msg";
     $self->fatal($msg);
-    croak $msg;
+    confess $msg;
 }
+
+=head2 storage_class (internal)
+
+The name of key to use to select a storage class from the storage_classes
+attribute for files that do no have an explicit class given.
+
+Defaults to the value of the group's C<storage_class> attribute, (which
+defaults to C<'default'>) - this value is provided automatically by the
+group's stage method if no explicit storage_class value is provided for
+the stage.
+
+=cut
+
+has 'storage_class' => (
+    is       => 'ro',
+    isa      => 'HPCIFileGen',
+	lazy     => 1,
+	default  => sub {
+        # $_[0]->group->storage_class
+        my $self = shift;
+        my $group = $self->group // do {
+            die "Huh? group is undef!";
+        };
+        return $group->storage_class
+    },
+    required => 1,
+);
+
+# has 'storage_classes' => (
+# 	is       => 'ro',
+# 	isa      => 'HPCIListList',
+# 	lazy     => 1,
+# 	default  => sub { $_[0]->group->storage_classes },
+# 	init_arg => undef,
+# );
 
 =head2 files
 
 A hash that can contain lists of files.
 
-The top level of the hash has keys 'in' and 'out' for input and output.
-(The same file might be under both.)
+Throughout this hash, there are filenames contained within hash elements
+that describe the processing required for that file.  Whenever a filename
+is needed, it can either be a string containing a pathname, or it can be
+an HPCI::File object (or subclass), or ot can be a HashRef.  Often, it
+will be the string form, which will be converted to an object internally.
 
-The next level down in each of these is 'req' and 'opt' for required and
-optional.
+The top level of the hash has keys 'in' (for input), 'out' (for output),
+'skipstage', 'rename', and 'delete'.
+(The same file might be listed under multiple keys.)
 
-A file may be listed under both the 'in' and 'out' sub-hashes, but at least one
-of those listings must be under 'opt'.  This would be used for files that are
-updated in place by the stage program.
+The values for these keys are:
+
+=over 4
+
+=item 'in'
+
+a hashref with possible keys:
+
+    'req' (for required input files)
+    'opt' (for required output files)
+
+The value for either of these can be either a filename or a list of filenames.
+
+=item 'out'
+
+a hashref with possible keys:
+
+    'req' (for required output files)
+    'opt' (for required output files)
+
+The value for either of these can be either a filename or a list of filenames.
+
+=item 'skipstage'
+
+either:
 
 =over 4
 
 =item
 
-'in' => 'req' files will be needed as input to the program - (in/req)
+an arrayref
 
 =item
 
-'in' => 'opt' files will be used as input to the program if they are present - (in/opt)
-
-=item
-
-'out' => 'req' files must be generated as output by the program - (out/req)
-
-=item
-
-'out' => 'opt' files can be generated or modified as output by the program - (out/opt)
+a hashref with the keys 'pre' (for pre-requisites) and 'lists'
 
 =back
 
-These lists can be used in a number of ways.
+The arrayref (either the arrayref value of 'skipstage' or the arrayref value
+for the 'lists' hash element) can contain either a list of files, or a hashref
+with keys 'pre' and 'files'.
+
+The 'pre' value (if present) at the top level is a list of files which are
+pre-requisites for all of the lists.  If a list has its own 'pre' list, those
+files are only pre-requities for the files in that list.
+
+=item 'rename'
+
+    a list of pairs of filenames
+
+The file named as the first element in each pair (if it exists) is renamed to
+the second filename in the pair.  It is not considered an error for the first
+file in a pair does not exist - if you want to ensure that a file exists,
+include it as an 'out'->'req' file as well.
+
+=item 'delete'
+
+can be either:
+
+    a scalar filename
+    a list of filenames
+
+These will be removed if the stage completes successfully.  It is not
+considered an error if any of these files does not exist - include them
+in the 'out'->'req' files list if you wish to ensure that they do.
+
+=back
+
+The contents are used at various times:
+
+=over 4
+
+=item the stage is ready to be executed
 
 =over
 
-=item 1
+=item
 
-If stages are allowed to be skipped when unnecessary, the decision to skip a
-stage is made by:
+if a 'skipstage' key is present then checking is done to decide whether the
+stage needs to be executed or can be skipped (treating it as a successful
+completion)
 
-=over 4
+the main content of this key is a list of lists of filenames (the target
+files) - if any of these lists has all of its files existing, then the stage
+can be skipped
+
+if there is a top level and/or a list level 'pre' list, then all of the files
+in the pre list(s) must also exist and be older than the target files (the
+files in the top level 'pre' list are checked against all of the target lists,
+the files in a target level 'pre' list are only checked against that target).
+
+C<skipstage> checking is always done by the parent process, in hopes of
+avoiding the need to create the stage.
 
 =item
 
-all in/req and out/req files must exist
+all 'in'->'req' files must exist, if any is missing, the stage is aborted.
+If the files exist, then the child stage will be set up (if needed) to
+download those files from the long-term storage.
 
 =item
 
-the timestamp on the newest in/req file must be older than the timestamp on the oldest out/req file
+all 'in'->'opt' are checked by the parent. If any exists, then the child stage
+will be set up (if needed) to download them from the long-term storage.
 
 =back
 
-So, the stage will skipped if all the required inputs are older than all of the requierd
-outputs.  If a file is updated in place,, then either it should be listed as optional
-in the output list, or else the stage program must always update the other outputs after
-this one - otherwise the execution of the stage can never happen.
+=item the stage has completed execution
 
-=item 1
-
-If the cluster type is not using a global shared file system for all nodes then this
-attribute is used to control copying of files to and from the cluster node that will
-execute the stage command.
-
-=over 4
+=over
 
 =item
 
-in/req files are copied to the node that will run the stage before the stage is executed
+all 'out'->'req' files must exists and they must have been updated during the
+execution of the stage (otherwise the stage is treated as failing)
 
 =item
 
-in/opt files are copied to the node that will run the stage if they exist before the stage is executed
+any 'out'->'opt' files which exist must have been updated during the execution
+of the stage (otherwise the stage is treated as failing)
 
 =item
 
-out/req files are copied back from the node after the stage has been executed
+clusters that require special treatment of files can take copying actions to
+collect any 'out' files that have been updated
 
 =item
 
-out/opt files are copied back from the node after the stage has been executed if they exists
-(possibly not copyiny them if they have not been changed - that is cluster-specific behaviour)
+if the stage completed successfully, any files lists as 'delete' are removed
 
 =back
-
-=item 1
-
-If automatic validation of stage execution is being done then
-all out/req files must exist and be timestamped later than the start of the execution
-of the stage.
 
 =back
 
@@ -717,9 +811,104 @@ of the stage.
 
 has 'files' => (
     is        => 'ro',
-    isa       => 'HashRef',
-    predicate => '_has_files',
+    isa       => 'Maybe[HashRef]',
+    default   => undef,
 );
+
+has '_use_files' => (
+    is        => 'ro',
+    isa       => 'Maybe[HashRef]',
+    lazy      => 1,
+    init_arg  => undef,
+    builder   => '_use_files_builder',
+);
+
+sub _use_files_builder {
+    my $self      = shift;
+    my $file      = $self->files // return undef;
+    my $use_files = {};
+    SIMPLE_FILES:
+    for my $keys (  [qw(in req)],
+                    [qw(in opt)],
+                    [qw(out req)],
+                    [qw(out opt)],
+                    ['delete']
+                ) {
+        my $source = $file;
+        $source = $source->{$_} or next SIMPLE_FILES for @$keys;
+        my $prev_dest;
+        my $dest = $use_files;
+        for my $key (@$keys) {
+            $prev_dest = $dest;
+            $dest = $dest->{$key} //= {};
+        }
+        $prev_dest->{$keys->[-1]} = $self->_get_file_list($source);
+    }
+    if ( my $skipinfo = $file->{skipstage} ) {
+        $use_files->{skipstage} = {};
+        if (ref($skipinfo) eq 'HASH') {
+            $self->_croak('skipstage hash element must be have keys "pre" and "lists"')
+                unless exists $skipinfo->{pre} && exists $skipinfo->{lists};
+            $use_files->{skipstage}{pre} = $self->_get_file_list( $skipinfo->{pre} );
+            $skipinfo = $skipinfo->{lists};
+            $self->_croak('skipstage->{lists} element must be an array')
+                unless ref($skipinfo) eq 'ARRAY';
+        }
+        else {
+            $self->_croak('skipstage files element must be either a hash or an array')
+                unless ref($skipinfo) eq 'ARRAY';
+            $use_files->{skipstage}{pre} = [];
+        }
+        my $dest_list = $use_files->{skipstage}{lists} = [ ];
+        for my $l (@$skipinfo) {
+            my $dest_hash = { };
+            $self->_croak('skipstage list element must be either a hash or an array')
+                unless ref($l) eq 'ARRAY' || ref($l) eq 'HASH';
+            if (ref($l) eq 'HASH') {
+                $dest_hash->{pre} = $self->_get_file_list( $l->{pre} );
+                $l = $l->{post};
+                $self->_croak('skipstage post element must be an array')
+                    unless ref($l) eq 'ARRAY';
+            }
+            else {
+                $dest_hash->{pre} = [];
+            }
+            $dest_hash->{post} = $self->_get_file_list( $l );
+            push @$dest_list, $dest_hash;
+        }
+    }
+    # TODO: handle rename
+    return $use_files;
+};
+
+sub _get_file_list {
+    my $self   = shift;
+    my $source = shift;
+    $source = [ $source ] unless ref($source);
+    $source = [ $source ] if blessed $source && $source->isa("HPCI::File");
+    my $ref = ref($source);
+    $self->_croak( "Element in files attribute is not an array, a pathname or HPCI::File class. Type is $ref, value is $source")
+        unless $ref eq 'ARRAY';
+    return [ map { $self->_get_file_obj($_) } @$source ];
+}
+
+sub _get_file_obj {
+    my $self = shift;
+    my $file = shift;
+    if (my $ref = ref($file)) {
+        $self->_croak( "Element in files attribute is not a pathname or HPCI::File (sub)class. Type is $ref, value is $file" )
+            unless blessed $file && $file->isa("HPCI::File");
+        return $file;
+    }
+    return $self->_generate_file( $file );
+}
+
+sub _generate_file {
+    my $self = shift;
+    my $path = shift;
+    # TODO: add search through storage_classes list here
+    return $self->storage_class->( $path );
+}
 
 =head2 state, is_ready, is_blocked, is_pass, is_fail
 
@@ -795,11 +984,11 @@ to code that checks the result.
 
 The code will be called with the arguments:
 
-    $coderef->( $stats, $stdout, $stderr, $state )
-        $stats  is a hashref containing the accounting info and status of the job
-        $stdout is the pathname of the stdout file
-        $stderr is the pathname of the srderr file
-        $state  is the state determined by HPCI
+  $coderef->( $stats, $stdout, $stderr, $state )
+    $stats  is a hashref containing the accounting info and status of the job
+    $stdout is the pathname of the stdout file
+    $stderr is the pathname of the stderr file
+    $state  is the state determined by HPCI
                    (only pass/fail - retry has not been decided yet)
 
 The code can use these (and knowledge provided by the user about the stage
@@ -824,9 +1013,11 @@ attribute has been reached.
 
 This code attribute could be used for:
 
-- running a program that always gives an error status, but you might wish to treat it as successful
+- running a program that always gives an error status, but you might wish to
+  treat it as successful
 
-- running a program that can give a zero status but not actually succeed (but perhaps a retry will succeed)
+- running a program that can give a zero status but not actually succeed (but
+  perhaps a retry will succeed)
 
 An example might look like:
 
@@ -854,30 +1045,52 @@ after '_analyse_completion_state' => sub {
     my $self  = shift;
     my $run   = shift;
 
-    if ($self->is_pass && $self->_has_files) {
-        my $script_time = -M $self->script_file;
-        my $files = $self->files;
-		my $fs_delay = $self->group->file_system_delay;
-        FILE:
-        for my $file (map { ref($_) ? @$_ : $_ } $files->{out}{req} ) {
-			while ($fs_delay && ! -e $file) {
-				my $sleep_time = ($fs_delay > 5) ? 5 : $fs_delay;
-				$fs_delay -= $sleep_time;
-				sleep $sleep_time;
-			}
-            next FILE if -e $file && -M _ <= $script_time;
-			$self->_set_state('fail');
-			$run->stats->{failure_detected} = "required output file $file not updated";
-			$self->error(
-				"Stage (", $self->name,
-				") status changed to failed because required output file $file was not updated"
-			);
-			if (-e _) {
-				my $file_time = -M _;
-				$self->error( "mod time: ($file_time) should be more recent (smaller) than script time ($script_time)" );
-			}
-			else {
-				$self->error( "file does not exist" );
+    if ($self->is_pass && (my $files = $self->_use_files) ) {
+        my $script_time = $self->_file_timestamp_for_out( $self->script_file );
+        if ( my $outfiles = $files->{out}) {
+            my $fs_delay = $self->group->file_system_delay;
+          FILE:
+            while ( my ($type, $fileval) = each %$outfiles ) {
+                for my $file ( $self->_scalar_list($fileval) ) {
+                    while ($fs_delay && ! $file->exists) {
+                        my $sleep_time = ($fs_delay > 5) ? 5 : $fs_delay;
+                        $fs_delay -= $sleep_time;
+                        sleep $sleep_time;
+                    }
+                    my $timestamp;
+                    if ($file->exists) {
+                        if ( ($timestamp = $file->timestamp)
+                                <= $script_time) {
+                            $file->accepted_for_out;
+                            next FILE;
+                        }
+                    }
+                    else {
+                        next FILE if $type eq 'opt';
+                    }
+                    # a req file was not found
+                    $self->_set_state('fail');
+                    $run->stats->{failure_detected} = "required output file $file not updated";
+                    $self->error(
+                        "Stage (",
+                        $self->name,
+                        ") status changed to failed because required output file ",
+                        $file,
+                        " was not updated"
+                    );
+                    if ($timestamp) {
+                        $self->error(
+                            "mod time: (",
+                            $timestamp,
+                            ") should be more recent (smaller) than script time (",
+                            $script_time,
+                            ")"
+                        );
+                    }
+                    else {
+                        $self->error( "file does not exist" );
+                    }
+                }
             }
         }
     }
@@ -895,6 +1108,276 @@ after '_analyse_completion_state' => sub {
         $self->_set_state( $code ) if $code eq 'pass' || $code eq 'fail';
     }
 };
+
+# take a value that can be either a scalar or a ArrayRef
+# return a list of scalars
+sub _scalar_list {
+    my $self = shift;
+    my $val  = shift;
+    !defined $val         ? ()
+    : ref $val eq 'ARRAY' ? @$val
+    : ! ref $val          ? $val
+    : $self->_croak('neither a scalar nor an arrayref: '.ref($val).' '.Dumper($val));
+}
+
+# check whether criteria are satisfied to skip executing the stage
+sub _can_be_skipped {
+    my $self = shift;
+    my $skipinfo = $self->_use_files   // return 0;
+    $skipinfo    = $skipinfo->{skipstage} // return 0;
+    my $pre      = $skipinfo->{pre};;
+    my $lol      = $skipinfo->{lists};
+  LIST:
+    for my $l (@$lol) {
+        my $thispre = [@$pre, @{$l->{pre}}];
+        $l = $l->{post};
+        $self->debug( "Considering skipstage, pre: ", Dumper($pre), ", list: ", Dumper( $l ) );
+        unless (@$l) { # an empty list does not qualify for skipping
+            $self->debug( "no skip: empty list element" );
+            next LIST;
+        }
+        my $newest_pre;
+        for my $f (@$pre) {
+            # if there is a pre list
+            #     check that they all exist and
+            #     get latest pre timestamp
+            my $ts = $f->timestamp;
+            unless (defined $ts) {
+                $self->debug( "no skip: missing pre element: $f" );
+                next LIST;
+            }
+            $newest_pre ||= $ts;
+            $newest_pre = $ts if $ts < $newest_pre;
+        }
+        if ($self->_file_list_acceptable_for_skip( $newest_pre, $l )) {
+            $self->debug( "skipping: file list acceptable" );
+            return 1;
+        }
+        $self->debug( "no skip: file list not acceptable" );
+    }
+    return 0;
+}
+
+sub _files_ready_to_start_stage {
+    my $self = shift;
+    return 1 unless my $files = $self->_use_files;
+    my $retval = 1; # success unless missing file(s) found
+    if (my $in = $files->{in}) {
+        while ( my ($type, $fileval) = each %$in ) {
+            for my $file ($self->_scalar_list($fileval)) {
+                # need to check exist on opt files in case
+                #   the driver needs to take special action to
+                #   make it available to the stage when it runs
+                #
+                # go through the entire list of files to give user
+                # a full list of missing files rather than just the
+                # first one we notice - let them fix everything for
+                # the next run instead of needing separate extra
+                # funs to be notified of each successive issue
+                if ( ! $file->exists
+                        && $type eq 'req') {
+                    $self->error("Required input file ($file) not present");
+                    $self->_set_failure_info(
+                        "Failed stage ("
+                        . $self->name
+                        . ") without execution because one or more required input files were not present"
+                    );
+                    $retval = 0;
+                }
+            }
+        }
+    }
+    if ($retval and my $unshared = $files->{unshared}) {
+        # our @HPCI::ScriptSource::pre_commands;
+        # our @HPCI::ScriptSource::post_success_commands;
+        if (my $in = $unshared->{in}) {
+            while ( my ($type, $fileval) = each %$in ) {
+                for my $file ($self->_scalar_list($fileval)) {
+                    my $exists = $self->_unshared_file_exists_for_in($file);
+                    my $get = $self->_unshared_file_download_for_in($file);
+                    push @HPCI::ScriptSource::pre_commands, "if $exists\n";
+                    push @HPCI::ScriptSource::pre_commands, "then\n";
+                    push @HPCI::ScriptSource::pre_commands, "    $get\n";
+                    if ($type eq 'req') {
+                        push @HPCI::ScriptSource::pre_commands, "else\n";
+                        push @HPCI::ScriptSource::pre_commands, "    echo required in file not present: $file 1>&2\n";
+                        push @HPCI::ScriptSource::pre_commands, "    exit 126\n";
+                    }
+                    push @HPCI::ScriptSource::pre_commands, "fi\n";
+                }
+            }
+        }
+        if (my $out = $unshared->{out}) {
+            while ( my ($type, $fileval) = each %$out ) {
+                for my $file ($self->_scalar_list($fileval)) {
+                    my $exists = $self->_unshared_file_exists_for_out($file);
+                    my $put = $self->_unshared_file_upload_for_out($file);
+                    push @HPCI::ScriptSource::post_success_commands, "if $exists\n";
+                    push @HPCI::ScriptSource::post_success_commands, "then\n";
+                    push @HPCI::ScriptSource::post_success_commands, "    $put\n";
+                    if ($type eq 'req') {
+                        push @HPCI::ScriptSource::post_success_commands, "else\n";
+                        push @HPCI::ScriptSource::post_success_commands, "    echo required out file not present: $file 1>&2\n";
+                        push @HPCI::ScriptSource::post_success_commands, "    exit 126\n";
+                    }
+                    push @HPCI::ScriptSource::post_success_commands, "fi\n";
+                }
+            }
+        }
+    }
+    return $retval;
+}
+
+# sub _files_acceptable_for_completed_stage {
+#     my $self = shift;
+#     my $run  = shift;
+#     return 1 unless $self->_use_files;
+#     my $out = $self->files->{out} or return 1;
+#     my $retval = 1; # success unless non-updated file found
+#     my $before = $self->_file_timestamp_for_out( $run->dir );
+#     while ( my ($type, $fileval) = each %$out ) {
+#         for my $file ($self->_scalar_list($fileval)) {
+#             # need to check exist on opt files in case
+#             #   the driver needs to take special action to
+#             #   collect the result from the completed stage
+#             #
+#             # go through the entire list of files to give user
+#             # a full list of invalid files rather than just the
+#             # first one we notice - let them fix everything for
+#             # the next run instead of needing separate extra
+#             # runs to be notified of each successive issue
+#             my $error_text;
+#             if ( ! $self->_file_exists_for_out($file)
+#                     && $type eq 'req') {
+#                 ++$error_text;
+#                 $self->error( "Required output file ($file) is not present" );
+#             }
+#             elsif ($self->_file_timestamp_for_out($file) < $before) {
+#                 # file was not updated
+#                 my $msg = "output file ($file) was not changed";
+#                 if ($type eq 'req') {
+#                     ++$error_text;
+#                     $self->error( "Required $msg" );
+#                 }
+#                 else {
+#                     $self->warn( "Optional $msg" );
+#                 }
+#             }
+#             if ($error_text) {
+#                 $self->_set_failure_info(
+#                     "Failed stage (",
+#                     $self->name,
+#                     ") after 'successful' execution because one or more required output files were not updated"
+#                 );
+#                 $retval = 0;
+#             }
+#         }
+#     }
+#     return $retval;
+# }
+
+sub _files_actions_after_success {
+    my $self = shift;
+    my $run  = shift;
+    return 1 unless $self->_use_files;
+    # TODO: update after _use_files is set up to support rename
+    if (my $pairs = $self->files->{rename}) {
+        for my $pair (@$pairs) {
+            if (ref($pair) ne 'ARRAY' && @$pair != 2) {
+                $self->error( "Ignoring bad rename pair element: ", Dumper($pair) );
+                next;
+            }
+            $self->_rename_file( @$pair );
+        }
+    }
+    for my $file ($self->_scalar_list( $self->files->{delete} ) ) {
+        $file->delete if $file->exists;
+    }
+}
+
+sub _file_exists {
+    return -e $_[1];
+}
+
+sub _file_timestamp {
+    return -e $_[1] ? -M _ : undef;
+}
+
+# allow drivers to over-ride the definition of various file routines
+# in various contexts
+sub _file_exists_for_skip {
+    shift->_file_exists(@_);
+}
+
+sub _file_exists_for_in {
+    shift->_file_exists(@_);
+}
+
+sub _file_exists_for_out {
+    shift->_file_exists(@_);
+}
+
+sub _file_exists_for_delete {
+    shift->_file_exists(@_);
+}
+
+sub _file_accepted_for_out {
+    ; # no action in normal case
+}
+
+sub _file_timestamp_for_skip {
+    shift->_file_timestamp(@_);
+}
+
+sub _file_timestamp_for_out {
+    shift->_file_timestamp(@_);
+}
+
+sub _delete_file {
+    unlink $_[1];
+}
+
+sub _unshared_file_exists_for_in {
+}
+
+sub _unshared_file_download_for_in {
+}
+
+sub _unshared_file_exists_for_out {
+}
+
+sub _unshared_file_upload_for_out {
+}
+
+sub _rename_file {
+    my $self = shift;
+    my $src  = shift;
+    my $dst  = shift;
+    if ($self->_file_exists($src)) {
+        link $src, $dst;
+        unlink $src;
+    }
+}
+
+sub _file_list_acceptable_for_skip {
+    my $self       = shift;
+    my $newest_pre = shift;
+    my $list       = shift;
+    for my $file (@$list) {
+        my $ts = $file->timestamp;
+        if (not defined $ts) {
+            $self->debug( "target file does not exists: $file" );
+            return undef;
+        }
+        if ($newest_pre) {
+            unless ($ts < $newest_pre) {
+                $self->debug( "target too old: $ts should be less than $newest_pre" );
+                return undef;
+            }
+        }
+    }
+    return 1;
+}
 
 =head2 should_choose_retry, choose_retries
 
@@ -1013,16 +1496,20 @@ sub _run_args {
 sub get_run_stats {
     my $self = shift;
     return [
-        $self->_has_failure_info
-        ? { exit_status => $self->_failure_info }
-        : map { $_->stats } @{ $self->runs }
+        $self->_has_failure_info          ? { exit_status => $self->_failure_info }
+        : scalar( @{ $self->runs } ) == 0 ? { exit_status => 'Stage skipped, skipstage determined it was complete',
+                                              final_job_state => 'pass'
+                                            }
+        :                                   map { $_->stats } @{ $self->runs }
     ];
 }
 
 =head2 failure_action ('abort_group', 'abort_deps'*, or 'ignore')
 
-Specifies the action to take if (the final retry of) this stage fails (terminates with
-aa non-zero status).  There are three string values that it can have:
+Specifies the action to take if (the final retry of) this stage fails
+(terminates with non-zero status).
+
+There are three string values that it can have:
 
 =over
 
@@ -1055,7 +1542,7 @@ has 'failure_action' => (
     default  => 'abort_deps',
 );
 
-with qw(HPCI::Env HPCI::CommandScript);
+with qw(HPCI::Env HPCI::CommandScript HPCI::ScriptSource);
 
 =head1 METHODS
 
@@ -1130,7 +1617,8 @@ sub set_argparse_cmd {
 
 =head2 set_gnu_cmd
 
-Set the command line arguments for a command taking GNU's getlongopt-style arguments.
+Set the command line arguments for a command taking GNU's getlongopt-style
+arguments.
 
 =cut
 
@@ -1217,4 +1705,3 @@ The Ontario Institute for Cancer Research
 =cut
 
 1;
-

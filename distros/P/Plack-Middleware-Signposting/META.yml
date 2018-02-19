@@ -1,5 +1,5 @@
 ---
-abstract: 'a base class for Plack implementations of the L<<Signposting>>( https://signposting.org) protocol'
+abstract: 'a base class for Plack implementations of the L<Signposting|https://signposting.org> protocol'
 author:
   - 'Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>'
 build_requires:
@@ -33,8 +33,10 @@ resources:
   bugtracker: https://github.com/LibreCat/Plack-Middleware-Signposting/issues
   homepage: https://github.com/LibreCat/Plack-Middleware-Signposting
   repository: https://github.com/LibreCat/Plack-Middleware-Signposting.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

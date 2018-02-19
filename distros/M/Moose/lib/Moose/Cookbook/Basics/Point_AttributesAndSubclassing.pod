@@ -13,7 +13,7 @@ Moose::Cookbook::Basics::Point_AttributesAndSubclassing - Point and Point3D clas
 
 =head1 VERSION
 
-version 2.2009
+version 2.2010
 
 =head1 SYNOPSIS
 

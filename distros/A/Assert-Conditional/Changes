@@ -3,6 +3,21 @@ Revision history for Assert-Conditional
 0.001    6 June 2015 23:28 MDT 
          Initial alpha release
 
-0.002    J June 2015 22:35 MDT 
+0.002    7 June 2015 22:35 MDT 
           MONGOLIAN VOWEL SEPARATOR is no longer whitespace in Unicode,
           so removed from test.
+
+0.003    30 June 2015 06:31 MDT
+         Bump perl requirement to v5.12
+         Don't run POSIX tests without right macros.
+         Add hash-related assertions.
+
+0.004    11 Feb 2018 11:18 MST
+         Suppress overloading in botch messages for object-related assertions (but not others).
+         Method-related assertions now require a blessed invocant or a known package.
+         Don't carp if we're throwing an exception and exceptions are trapped.
+         Support more than one word in ASSERT_CONDITIONAL (eg: "carp,always").
+         If ASSERT_CONDITIONAL contains "handlers", don't block @SIG{__{WARN,DIE}__}.
+         Don't let assert_isa die prematurely on an unblessed ref.
+
+

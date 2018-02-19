@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000005  2018-02-13 03:52:00Z
+    - to_editor_args() now accepts an array
+    - Set search paths via the $ENV{OPEN_THIS_LIBS} variable
+
 0.000004  2018-02-08 19:06:09Z
     - Try to fix some tests when running under MSWin32
 

@@ -1,0 +1,84 @@
+% my $a = shift;
+{
+  "/<%= $a->{t} %>": {
+    "get": {
+      "operationId": "api.<%= $a->{home_route}{name} %>",
+      "x-mojo-to": "<%= $a->{home_route}{to} %>",
+      "summary": "List all records of type <%= $a->{class_name} %>.",
+      "description":"List all records of type <%= $a->{class_name} %> according to the client's priviledges.",
+      "parameters": [
+        { "$ref": "#/parameters/limit" },
+        { "$ref": "#/parameters/offset" }
+      ],
+      "responses": {
+        %# Refer to shared response-objects or define specific to this path only.
+        "200": {
+          "description": "An array of <%= $a->{class_name} %>.",
+          "schema": { "$ref": "#/definitions/<%= $a->{class_name} %>" }
+        },
+        "default": { "$ref": "#/definitions/ErrorResponse"}
+      }
+    },
+    "post": {
+      "operationId": "api.<%= $a->{store_route}{name} %>",
+      "x-mojo-to": "<%= $a->{store_route}{to} %>",
+      "summary": "Create and store an object of type <%= $a->{class_name} %>Item.",
+      "description": "Create  and store an object of type <%= $a->{class_name} %>Item.",
+       %# Refer to shared parameters and define specific to this path only.
+       % my $json = JSON::PP->new->utf8;
+      "parameters": <%= $json->encode($a->{store_params}) %>,
+      "responses": {
+        "201": {
+          "description": "Expect this response to a valid request. The body  of the response will be empty.",
+          "headers": { "Location": { "description": "The URL of the newly created resource.", "type": "string" } }
+        },
+        "400": {
+          "description": "Bad Request",
+          "schema": { "$ref": "#/definitions/Error"}
+        }
+      }
+    }
+  },
+  "/<%= $a->{t} %>/{id}" : {
+    "get": {
+      "operationId": "api.<%= $a->{show_route}{name} %>",
+      "x-mojo-to": "<%= $a->{show_route}{to} %>",
+      "summary": "Show an object of type <%= $a->{class_name} %>Item.",
+      "description": "Show an object of type <%= $a->{class_name} %>Item.",
+      "parameters": <%= $json->encode($a->{show_params}) %>,
+      "responses": {
+        %# Refer to shared responses or define specific to this path only.
+        "200": {
+          "description": "An object of type <%= $a->{class_name} %>Item.",
+          "schema": { "$ref": "#/definitions/<%= $a->{class_name} %>Item" }
+        },
+        "default": { "$ref": "#/definitions/ErrorResponse"}
+      }
+    },
+    "put": {
+      "operationId": "api.<%= $a->{update_route}{name} %>",
+      "x-mojo-to": "<%= $a->{update_route}{to} %>",
+      "summary": "Update an object of type <%= $a->{class_name} %>Item.",
+      "description": "Update an object of type <%= $a->{class_name} %>Item.",
+      "parameters": <%= $json->encode($a->{update_params}) %>,
+      "responses": {
+        "204" : {
+          "description": "Response to a valid PUT request. Response body will be empty."
+        },
+        "default":  { "$ref": "#/definitions/ErrorResponse"}
+      } 
+    },
+    "delete": {
+      "operationId": "api.<%= $a->{remove_route}{name} %>",
+      "x-mojo-to": "<%= $a->{remove_route}{to} %>",
+      "summary": "Delete an object of type <%= $a->{class_name} %>Item.",
+      "description": "Delete an object of type <%= $a->{class_name} %>Item.",
+      "parameters": <%= $json->encode($a->{show_params}) %>,
+      "responses": {
+        "204": { "description":"No content. The resource is deleted." },
+        "404":{ "description": "Not Found. The resource is already gone." },
+        "default": { "$ref": "#/definitions/ErrorResponse"}
+      }
+    }
+  }
+}

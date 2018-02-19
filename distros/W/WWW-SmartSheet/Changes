@@ -1,3 +1,24 @@
+Revision history for WWW::SmartSheet
 
-v0.01 2013.10.03
-    Experimental release
+0.06  2018-02-18 MANWAR
+      - Added provides as suggested by CPANTS.
+
+0.05  2018-02-17 MANWAR
+      - Added minimum perl version as suggested by CPANTS.
+
+0.04  2018-02-16 MANWAR
+      - Fixed missing abstract in pod.
+      - Stopped using podweaver.
+      - Tidied up code in general.
+      - Tidied up dist.ini.
+
+0.03  2018-02-15 MANWAR
+      - Tidied up version.
+
+0.02  2018-02-13 MANWAR
+      - Merged PR #2, upgrading API v2, thanks @lth2h.
+      - Updated github repo details.
+      - Minor tidied up test script.
+
+0.01  2013-10-03 SZABGAB
+      - Experimental release

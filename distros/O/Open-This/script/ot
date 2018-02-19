@@ -29,7 +29,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000004
+version 0.000005
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,19 @@ names into the appropriate line numbers.  It will look in a lib or t/lib
 directory relative to your current path.  If it thinks it has a Perl module
 name it will also try to require it and use %INC in order to find the module on
 disks.  All security caveats apply when requiring 3rd party modules.
+
+=head1 ENVIRONMENT VARIABLES
+
+By default, C<ot> will search your C<lib> and C<t/lib> directories for local files.  You can override this via the C<$ENV{OPEN_THIS_LIBS}> variable.  It accepts a comma-separated list of libs.
+
+    export OPEN_THIS_LIBS=lib,t/lib,t/other-lib
+
+Or
+
+    OPEN_THIS_LIBS=lib,t/lib,t/other-lib ot Foo::Bar
+
+Probably you want to export this variable in your C<~/.bashrc> file (or some
+other appropriate place in your dot files.
 
 =head1 AUTHOR
 

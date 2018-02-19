@@ -151,3 +151,10 @@ Revision history for POE-Filter-SSL
 	Request client cerfificat only if 'clientcert'-Option has been set
 	Fixed typos in POD (rt.cpan.org #113644)
 
+0.40	05.02.2018
+	Secruity-fix: Certificate verify cannot be used in parallel
+
+0.41	13.02.2018
+	Moved ssl patching of POE::Component::*::* to own module
+	Bugfix: SSL Object cannot be create at first
+

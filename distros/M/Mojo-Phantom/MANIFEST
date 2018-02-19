@@ -6,6 +6,7 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+Mojo-Phantom-0.10.tar.gz
 cpanfile
 lib/Mojo/Phantom.pm
 lib/Mojo/Phantom/Process.pm

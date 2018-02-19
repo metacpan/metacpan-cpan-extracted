@@ -19,13 +19,13 @@ produces output
     http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?QMUJ%E6%97%A5%E6%9C%AC_3
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-WWWJDIC-0.004/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-WWWJDIC-0.005/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents WWW::WWWJDIC version 0.004
-corresponding to git commit L<a7dc49ff9d7d4a793bbe0c03f50e9df190ebd392|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/a7dc49ff9d7d4a793bbe0c03f50e9df190ebd392> released on Tue Oct 10 13:36:27 2017 +0900.
+This documents WWW::WWWJDIC version 0.005
+corresponding to git commit L<d12f085ac5039c3b3fec766b36c7995a022ce383|https://github.com/benkasminbullock/WWW-WWWJDIC/commit/d12f085ac5039c3b3fec766b36c7995a022ce383> released on Tue Feb 13 09:32:00 2018 +0900.
 
 =head1 DESCRIPTION
 
@@ -43,11 +43,7 @@ following sites are available:
 
 =over
 
-=item australia_melb
-
-L<http://nlp.cis.unimelb.edu.au/~jwb/cgi-bin/wwwjdic/wwwjdic>
-
-=item australia_monash
+=item australia
 
 L<http://nihongo.monash.edu/cgi-bin/wwwjdic>
 
@@ -58,10 +54,6 @@ L<http://www.ottix.net/cgi-bin/wwwjdic/wwwjdic>
 =item germany
 
 L<http://wwwjdic.biz/cgi-bin/wwwjdic>
-
-=item japan
-
-L<http://gengo.com/wwwjdic/cgi-data/wwwjdic>
 
 =item sweden
 
@@ -103,7 +95,7 @@ not part of the CPAN distribution.
     my $url = $wwwjdic->lookup_url ($key);
 
 Make a lookup url (the "backdoor URL") which links to a WWWJDIC
-page. As of version 0.004, this URL goes to the combined
+page. As of version 0.005, this URL goes to the combined
 dictionary page.
 
 =head1 SEE ALSO
@@ -164,6 +156,10 @@ active use I have for this module is to get the list of mirrors. In
 version 0.003 I removed the scraper code, leaving only the method
 L</lookup_url> and the function L</get_mirrors>.
 
+Version 0.005 updates the mirror list to remove the Melbourne
+University and "gengo.com" mirrors.
+
+
 
 =head1 AUTHOR
 
@@ -172,7 +168,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2009-2017
+2009-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

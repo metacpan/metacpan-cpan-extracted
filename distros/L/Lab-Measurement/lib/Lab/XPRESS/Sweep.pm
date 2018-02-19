@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep;
-$Lab::XPRESS::Sweep::VERSION = '3.613';
+$Lab::XPRESS::Sweep::VERSION = '3.620';
 #ABSTRACT: Base sweep class
 
 use Role::Tiny::With;
@@ -41,6 +41,7 @@ sub new {
         delay_before_loop => 0,
         delay_in_loop     => 0,
         delay_after_loop  => 0,
+        before_loop       => undef,
 
         points => [ undef, undef ],
 
@@ -529,6 +530,14 @@ sub start {
         $self->before_loop();
         $self->go_to_sweep_start();
         $self->delay( $self->{config}->{delay_before_loop} );
+        my $before_loop = $self->{config}{before_loop};
+
+        if ($before_loop) {
+            if ( ref $before_loop ne 'CODE' ) {
+                croak "'before_loop' argument must be a coderef";
+            }
+            $self->$before_loop();
+        }
 
         # continuous sweep:
         if ( $self->{config}->{mode} eq 'continuous' ) {
@@ -1434,7 +1443,7 @@ Lab::XPRESS::Sweep - Base sweep class
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -1561,13 +1570,14 @@ probably some
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Alexei Iankilevitch, Christian Butschkow
             2015       Christian Butschkow
             2016-2017  Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

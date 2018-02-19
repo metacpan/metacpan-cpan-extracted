@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Bandwidth;
 #ABSTRACT: Role for the SCPI SENSe:BANDwidth subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.613';
+$Lab::Moose::Instrument::SCPI::Sense::Bandwidth::VERSION = '3.620';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -70,7 +70,7 @@ Lab::Moose::Instrument::SCPI::Sense::Bandwidth - Role for the SCPI SENSe:BANDwid
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -90,7 +90,7 @@ Used by R&S VNAs.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
 

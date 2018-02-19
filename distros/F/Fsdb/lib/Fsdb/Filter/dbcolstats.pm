@@ -2,8 +2,7 @@
 
 #
 # dbcolstats.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: b8f85fa383507a09ebfc72e644fadd6e1d5ceed0 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -241,6 +240,7 @@ See the test cases F<dbcolstats_extrema> for examples.
 
 use strict;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::IO::Reader;
 use Fsdb::IO::Writer;
@@ -353,7 +353,7 @@ sub setup($) {
     $self->finish_io_option('input', -comment_handler => $self->create_delay_comments_sub);
     print STDERR "dbcolstats: post-input setup\n" if ($self->{_debug} > 2);
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
     $self->{_key_coli} = undef;
     if (defined($self->{_key_column})) {
@@ -450,7 +450,7 @@ sub _compute_quantile($$$) {
     };
 
     my $save_in = new Fsdb::IO::Reader(-file => $self->{_save_out_filename});
-    $save_in->error && die $self->{_prog} . ": re-read error " . $save_in->error;
+    $save_in->error && croak($self->{_prog} . ": re-read error " . $save_in->error);
 
     # To handle the ugly case of having more ntiles than
     # data, we detect it and replicate the data until we have more
@@ -470,14 +470,14 @@ sub _compute_quantile($$$) {
     for ($i = 1; $#q+1 < $effective_quantile; $i++) {
 	if (--$replicates_left <= 0) {
 	    my $fref = $save_in->read_rowobj;
-	    die "internal error re-reading data\n" if (ref($fref) ne 'ARRAY');
+	    croak("internal error re-reading data\n") if (ref($fref) ne 'ARRAY');
 	    $x = $fref->[0];
 	    $replicates_left = $replicate_data;
 	    # Verify sorted order (in case the user lied to us
 	    # about pre-sorting).
 	    if (defined($last_x) && $x < $last_x) { 
 		my($info) = ($self->{_pre_sorted} ? " (internal error in dbsort)" : " (user specified -S for pre-sorted data but it is unsorted)");
-		die $self->{_prog} . ": cannot process data that is out of order between $last_x and $x $info.\n";
+		croak($self->{_prog} . ": cannot process data that is out of order between $last_x and $x $info.\n");
 	    };
 	    $last_x = $x;
 	};
@@ -581,7 +581,7 @@ sub run_one_key($) {
 	print STDERR "dbcolstats: eval'ing code\n" if ($self->{_debug});
 	print $code if ($self->{_debug});
 	eval $code;
-	$@ and die $self->{_prog} . ": internal error in eval.: $@\n";
+	$@ and croak($self->{_prog} . ": internal error in eval.: $@\n");
 
 	# clean up
        	if ($self->{_quantile} || $self->{_median}) {
@@ -699,7 +699,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -1,3 +1,9 @@
+1.00 Wed Feb 14 16:14:01 GMT 2018
+
+  Bug fixes:
+  - Resolve RT #91784  'run_forked("/usr/bin/echo test") captures no output'
+  - Resolve RT #124415 'The 03_run_forked.t test fails (sometimes) on HPUX'
+
 0.98 Fri May 12 17:00:07 BST 2017
 
   Enhancements:

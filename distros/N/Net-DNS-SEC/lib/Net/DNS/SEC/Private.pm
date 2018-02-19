@@ -1,10 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1397 2015-09-15 18:45:17Z willem $
+# $Id: Private.pm 1616 2018-01-22 08:54:52Z willem $
 #
-use vars qw($VERSION);
-$VERSION = (qw$LastChangedRevision: 1397 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1616 $)[1];
 
 
 =head1 NAME
@@ -41,7 +40,7 @@ use integer;
 use warnings;
 use Carp;
 use File::Spec;
-use FileHandle;
+use IO::File;
 use MIME::Base64;
 
 
@@ -59,7 +58,7 @@ sub _new_keyfile {
 			unless $keyname =~ /^K(.*\.)\+(\d+)\+(\d+)\.private$/;
 	my @identifier = ( signame => $1, algorithm => 0 + $2, keytag => $3 );
 
-	my $handle = new FileHandle($file) or croak qq(open: "$file" $!);
+	my $handle = new IO::File($file) or croak qq(open: "$file" $!);
 
 	my @content;
 	local $_;
@@ -86,13 +85,14 @@ sub _new_params {
 	}
 
 	my $self = bless sub { $param->{shift()} }, $class;
-	croak 'algorithm not specified' unless defined $self->algorithm;
-	croak 'signame not specified'	unless defined $self->signame;
+	$self->algorithm;					# force exception if undefined
+	$self->signame;						# ditto
 	return $self;
 }
 
 
 sub generate_rsa {
+	eval <<'SUBEND'						# compile on demand
 	my ( $class, $domain, $flags, $keysize, $entropy, $algcode ) = @_;
 
 	$keysize ||= 1024;
@@ -110,15 +110,19 @@ sub generate_rsa {
 	my $keyblob = $rsa->get_private_key_string;
 
 	return $class->new_rsa_priv( $keyblob, $domain, $flags, $algcode );
+SUBEND
 }
 
 
 sub new_rsa_priv {
-	my $class   = shift;
-	my $keyblob = shift;
-	my $domain  = shift;
-	my $flags   = shift || 256;
-	my $algcode = shift || 5;
+	eval <<'SUBEND'						# compile on demand
+	my ( $class, $keyblob, $domain, $flags, $keysize, $entropy, $algcode ) = @_;
+
+	carp 'future release will not support deprecated method';
+
+	$flags	 ||= 256;
+	$keysize ||= 1024;
+	$algcode ||= 5;
 
 	require Crypt::OpenSSL::RSA;
 
@@ -177,10 +181,11 @@ END
 		dump_rsa_private_pem => $rsa->get_private_key_string,
 		dump_rsa_private_der => $rsa->get_private_key_string,	# historical
 		);
+SUBEND
 }
 
 
-use vars qw($AUTOLOAD);
+our $AUTOLOAD;
 
 sub AUTOLOAD {				## Default method
 	my ($self) = @_;
@@ -192,7 +197,8 @@ sub AUTOLOAD {				## Default method
 	# Build a method in the class
 	*{$AUTOLOAD} = sub {
 		my $self = shift;
-		&$self($attribute);
+		return if $attribute eq 'destroy';		# fail silently (in cleanup)
+		&$self($attribute) || croak "'$attribute' not defined";
 	};
 
 carp <<"END" if $attribute =~ /^dumprsa/;

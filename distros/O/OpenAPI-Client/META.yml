@@ -1,12 +1,12 @@
 ---
 abstract: 'A client for talking to an Open API powered server'
 author:
-  - 'Ed J <mohawk2@users.noreply.github.com>'
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -18,20 +18,12 @@ no_index:
     - t
     - inc
 requires:
-  JSON::Validator: '1.07'
+  JSON::Validator: '2.03'
   Mojolicious: '7.53'
   Mojolicious::Plugin::OpenAPI: '1.22'
 resources:
-  X_dynamic_config: 0
-  X_metaspec:
-    version: 2
-  X_resources:
-    bugtracker:
-      web: https://github.com/jhthorsen/openapi-client/issues
-    homepage: https://github.com/jhthorsen/openapi-client
-    repository:
-      type: git
-      url: https://github.com/jhthorsen/openapi-client.git
-      web: https://github.com/jhthorsen/openapi-client
-version: '0.14'
+  bugtracker: https://github.com/jhthorsen/openapi-client/issues
+  homepage: https://github.com/jhthorsen/openapi-client
+  repository: https://github.com/jhthorsen/openapi-client.git
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

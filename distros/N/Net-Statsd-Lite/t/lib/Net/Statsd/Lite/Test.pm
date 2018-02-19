@@ -5,7 +5,7 @@ use Test::Roo::Role;
 use Carp;
 use curry;
 use IO::Select;
-use Net::EmptyPort qw/ listen_socket /;
+use IO::Socket;
 
 use Net::Statsd::Lite;
 
@@ -56,19 +56,19 @@ test "test client" => sub {
 
   TODO: {
 
-      local $TODO = "random sample" if $self->output =~ /\|\@\d/;
+        local $TODO = "random sample" if $self->output =~ /\|\@\d/;
 
-      is $result, $self->output, 'expected result';
+        is $result, $self->output, 'expected result';
 
     }
 };
 
 sub send_tests {
-    my ($self, $client) = @_;
+    my ( $self, $client ) = @_;
 
-    foreach my $action (@{ $self->input }) {
+    foreach my $action ( @{ $self->input } ) {
 
-        my ($method, @args) = @{ $action };
+        my ( $method, @args ) = @{$action};
         $client->$method(@args);
 
     }
@@ -80,8 +80,11 @@ sub send_tests {
 sub test_udp {
     my ( $self, $callback ) = @_;
 
-    my $socket = listen_socket( { proto => $self->proto } )
-        or croak $!;
+    my $socket = IO::Socket::INET->new(
+        LocalAddr => '127.0.0.1',
+        LocalPort => 0,
+        Proto     => $self->proto,
+    ) or croak $!;
 
     my $pid = fork;
     if ($pid) {
@@ -114,6 +117,8 @@ sub test_udp {
             max_buffer_size => $self->max_buffer_size,
             autoflush       => $self->autoflush,
         );
+
+        sleep 1;    # wait for server to start
 
         $callback->($client);
 

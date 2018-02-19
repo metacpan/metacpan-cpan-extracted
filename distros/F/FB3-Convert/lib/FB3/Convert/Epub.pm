@@ -47,6 +47,7 @@ sub Reaper {
     processor_params => ['underline']
   };
   $AllowElements->{'div'} = {
+    'exclude_if_inside' => ['p','ul','ol','h1','h2','h3','h4','h5','h6','li','pre','table'], #Если div содежрит block-level элементы, мы его чикаем 
     'allow_attributes' => [],
     processor => \&TransformTo,
     processor_params => ['p'],
@@ -81,8 +82,9 @@ sub Reaper {
   $X->{'ContentDir'} =~ s/\/?[^\/]+$//;
 
   $X->Msg("Parse rootfile ".$RootFile."\n");
-  my $RootDoc = XML::LibXML->new()->parse_file($RootFile) || die "Can't parse file ".$RootFile;
-  #  my $RootFile = $XC->findnodes('/root:package/root:rootfiles/container:rootfile',$CtDoc)->[0]->getAttribute('full-path');
+  
+  my $RootDoc = XML::LibXML->load_xml( location => $RootFile ) || die "Can't parse file ".$RootFile;
+  $RootDoc->setEncoding('utf-8');
 
   # список файлов с контентом
   my @Manifest;
@@ -96,7 +98,6 @@ sub Reaper {
   my @Spine;
   for my $MItem ($XC->findnodes('/root:package/root:spine/root:itemref',$RootDoc)) {
     my $IdRef = $MItem->getAttribute('idref');
-   ## next if grep{$_ eq $IdRef} ("cover","title","annotation"); #очень не уверен, что это зарезервированные idref. Но в epub-мете нигде о них больше не сказано
     push @Spine, $IdRef;
   }
 
@@ -123,17 +124,17 @@ sub Reaper {
 
   unless (defined $Description->{'TITLE-INFO'}->{'BOOK-TITLE'}) {
     my $Title = $XC->findnodes('/root:package/root:metadata/dc:title',$RootDoc)->[0];
-    $Description->{'TITLE-INFO'}->{'BOOK-TITLE'} = $self->html_trim($Title->to_literal) if $Title;
+    $Description->{'TITLE-INFO'}->{'BOOK-TITLE'} = $self->EncodeUtf8($self->html_trim($Title->to_literal)) if $Title;
   }
 
   unless (defined $Description->{'TITLE-INFO'}->{'ANNOTATION'}) {
     my $Annotation = $XC->findnodes('/root:package/root:metadata/dc:description',$RootDoc)->[0];
-    $Description->{'TITLE-INFO'}->{'ANNOTATION'} = $self->EraseTags($self->html_trim($Annotation->to_literal)) if $Annotation;
+    $Description->{'TITLE-INFO'}->{'ANNOTATION'} = $self->EncodeUtf8($self->EraseTags($self->html_trim($Annotation->to_literal))) if $Annotation;
   }
 
   unless (defined $Description->{'TITLE-INFO'}->{'PUBLISHER'}) {
     my $Publisher = $XC->findnodes('/root:package/root:metadata/dc:publisher',$RootDoc)->[0];
-    $Description->{'TITLE-INFO'}->{'PUBLISHER'} = $self->html_trim($Publisher->to_literal) if $Publisher;
+    $Description->{'TITLE-INFO'}->{'PUBLISHER'} = $self->EncodeUtf8($self->html_trim($Publisher->to_literal)) if $Publisher;
   }
   
   unless (defined $Description->{'TITLE-INFO'}->{'GENRES'}) { 
@@ -161,79 +162,97 @@ sub Reaper {
     };
   }
 
-  unless (defined $Description->{'TITLE-INFO'}->{'AUTHORS'}) { 
+  unless (defined $Description->{'TITLE-INFO'}->{'AUTHORS'}) {
     my @Authors;
     for my $Author ($XC->findnodes('/root:package/root:metadata/dc:creator',$RootDoc)) {
-      my $Author = $self->BuildAuthorName($self->html_trim($Author->to_literal));
+      my $Author = $self->BuildAuthorName($self->EncodeUtf8($self->html_trim($Author->to_literal)));
       push @Authors, $Author;
     }
+    push @Authors, $self->BuildAuthorName('Unknown');
     $Description->{'TITLE-INFO'}->{'AUTHORS'} = \@Authors;
   }
 
+  #print Data::Dumper::Dumper($AC);
+  
   #КОНТЕНТ
-
-=pod
-  my $AC= [
-    
-          {
-            'file' => 'c02.xhtml',
-            'content' => "
-            
-            <p>TEXT FROM 2________</p>  
-<h1>UNDERSTANDING CONFIDENCE</h1>
-<h1>UNDERSTANDING CONFIDENCE2</h1>
-<p>ddddd</p>
-<h1>UNDERSTANDING CONFIDENCE3</h1>
-<p>END</p>
-"},
- {
-           'file' => 'ftitlepage.xhtml',
-            'content' => '
-<header>
- <h1 class="bookTitle"><span class="center">CONFIDENCE <des>DESSS</des> POCKETBOOK</span></h1>
-</header>
-<section>
-  <h2 class="bookSubTitle"><span class="center">LITTLE EXERCISES FOR A SELF-ASSURED LIFE</span></h2>
-  <p><b>Gill Hasson</b></p>
-</section>
-'
-          },
-
-          
-];
-  my $AC1= [ 
-          {
-            'file' => 'fpart1.xhtml',
-            'content' => '
-            <p>fdfd</p>
-<h1>ddddd</h1>
-<h1/>
-            <p>fdfd</p>
-<h1>FOUNDATION STONES OF CONFIDENCE</h1>
-'
-          }];
-=cut
-
-#print Data::Dumper::Dumper($AC);
-#exit;
 
   my @Pages;
   foreach (@$AC) {
     $X->Msg("Processing in structure: ".$_->{'file'}."\n",'i');
     push @Pages, $X->Content2Tree($_);
   }
-  
+
   # [#01]
   my @PagesComplete;
-  
+
   #Клеим смежные title
+  #Отрезаем ненужное
   foreach my $Page (@Pages) {
 
-    #<title/> иногда попадаются - режем
+    $Page->{'content'} = CleanNodeEmptyId($X,$Page->{'content'});
+
+    #^<p/> и emptyline режем в начале
     foreach my $Item (@{$Page->{'content'}}) {
-      if (ref $Item eq 'HASH' && exists $Item->{'title'} && !scalar @{$Item->{'title'}->{'value'}}) {
+
+      if (
+          ref $Item eq 'HASH'
+          && exists $Item->{'p'}
+          && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}) )
+        ) {
         $Item = undef;
+      } else {
+        last;
       }
+    }
+
+    #^<p/> и emptyline режем в конце
+    foreach my $Item (reverse @{$Page->{'content'}}) {
+      if (
+          ref $Item eq 'HASH'
+          && exists $Item->{'p'}
+          && ( $X->IsEmptyLineValue($Item->{'p'}->{'value'}) )
+        ) {
+        $Item = undef;
+      } else {
+        last;
+      }
+    }
+    
+    my $c=-1;
+    my $EmptyLineDetect=undef;
+    foreach my $Item (@{$Page->{'content'}}) {
+      $c++;
+      next unless defined $Item;
+      if (ref $Item eq '' && $X->trim($Item) eq '') {
+        $Item=undef;
+        next;
+      }
+      
+      #клеим смежные emptyline
+      if (ref $Item eq 'HASH'
+          && exists $Item->{'p'}
+          && $X->IsEmptyLineValue($Item->{'p'}->{'value'})
+        ) {
+       
+        if (defined $EmptyLineDetect) {
+          push @{$Page->{'content'}->[$EmptyLineDetect]->{p}->{'value'}}, $Item->{'p'}->{'value'};
+          $Item = undef;
+          next;
+        }
+        $EmptyLineDetect = $c;
+      } else {
+        $EmptyLineDetect = undef;
+      }
+    
+      #<title/> иногда попадаются - режем
+      if (
+          ref $Item eq 'HASH'
+          && exists $Item->{'title'}
+        ) {
+          $Item->{'title'}->{'value'} = CleanTitle($X,$Item->{'title'}->{'value'});
+          $Item = undef unless @{$Item->{'title'}->{'value'}};
+      }
+      
     }
 
     for (my $c = scalar @{$Page->{'content'}}; $c>=0; $c--) {
@@ -250,7 +269,6 @@ sub Reaper {
 
           if (ref $Last eq 'HASH' && exists $Last->{'title'}) { #перед нами title, будем клеить текущий title с ним
             $LastTitleOK = $i;
-            #print "FIND TITLE".Data::Dumper::Dumper($Last->{'title'}->{'value'});
             last;
           } else {
             last; #наткнулись на НЕ-title, хватит перебирать
@@ -302,13 +320,10 @@ sub Reaper {
         push @P, clone($Sec) if @{$Sec->{'section'}->{'value'}};
         $Sec->{'section'}->{'value'} = []; #надо закрыть section
         push @{$Sec->{'section'}->{'value'}}, $Item; #и продолжить пушить в новый
-       # push @P, clone($Sec);
-       # $Sec->{'section'}->{'value'} = [];
         next;
-
       }
 
-      push @{$Sec->{'section'}->{'value'}}, $Item;
+      push @{$Sec->{'section'}->{'value'}}, $Item if $Item;
 
       if ( #страница закрывается, пушим section что там в нем осталось
         $c >= scalar @{$Page->{'content'}}
@@ -322,13 +337,12 @@ sub Reaper {
     #одиночки title нам в section не нужны - не валидно
     #таких разжалуем в subtitle
     foreach my $Sec (@P) {
-
-      delete $Sec->{'section'}->{'value'}->[@{$Sec->{'section'}->{'value'}} - 1]
-        if !ref $Sec->{'section'}->{'value'}->[scalar @{$Sec->{'section'}->{'value'}} - 1]
-        && $Sec->{'section'}->{'value'}->[scalar @{$Sec->{'section'}->{'value'}} - 1] eq '';
+      my $Last = pop @{$Sec->{'section'}->{'value'}};
+      push @{$Sec->{'section'}->{'value'}}, $Last unless (ref $Last eq '' && $X->trim($Last) eq '') ;
 
       if (
        scalar @{$Sec->{'section'}->{'value'}} == 1
+        && ref $Sec->{'section'}->{'value'}->[0] eq 'HASH'
         && exists $Sec->{'section'}->{'value'}->[0]->{'title'}
       ) {
 
@@ -345,13 +359,17 @@ sub Reaper {
 
     }
 
-    push @PagesComplete, {ID=>$Page->{'ID'},'content'=>\@P};
+    my $Content;
+    if (scalar @P > 1) {
+      $Content = \@P;
+    } else {
+      $Content = $P[0]->{'section'}->{'value'};  #если section один, то берем только его внутренности, контейнер section лишний 
+    }
+
+    push @PagesComplete, {ID=>$Page->{'ID'},'content'=>$Content};
   }
   @Pages = ();
 
-#print Data::Dumper::Dumper(\@PagesComplete);
-#exit;
-  
   my @Body;
   foreach my $PC (@PagesComplete) {
     push @Body,  {
@@ -380,14 +398,6 @@ sub AssembleContent {
   my $XC = XML::LibXML::XPathContext->new();
   $XC->registerNs('xhtml', $NS{'xhtml'});
 
-  my $XMLDoc = XML::LibXML->new(
-    expand_entities => 0, # не считать & за entity
-    no_network => 1, # не будем тянуть внешние вложения
-    recover => 2, # не падать при кривой структуре. например, не закрыт тег. entity и пр | => 1 - вопить, 2 - совсем молчать
-    load_ext_dtd => 0 # полный молчок про dtd
-  );
-  $XMLDoc->expand_entities(0); #или так?
-
   $X->Error('Spin list is empty or not defined!') unless scalar @$Spine;
 
   my %ReverseManifest; #так проще грепать
@@ -404,24 +414,6 @@ sub AssembleContent {
     #    'id' => $Item->{'id'},
     #  };
     #}
-
-#    if ($Item->{'id'} =~ /^cover$/) { # ты точно cover?!
-#      my $CoverFile = $SelfData{'ContentDir'}.'/'.$Item->{'href'};
-#      my $CoverDoc = $XMLDoc->parse_file($CoverFile) || die "Can't parse file ".$CoverFile;
-#      my $Cover = $XC->findnodes('//xhtml:img',$CoverDoc)->[0];  #или может все-таки xhtml:img[@class="coverpage"] ? не слишком узко?
-#        if ($Cover) {
-#          my $CoverSrcPath = $Cover->getAttribute('src');
-
-#          my $CoverId = "cover_".$Item->{'id'};
-#          my $H = {
-#            'src_path' => $Cover->{'src'},
-#            'new_path' => undef,
-#            'id' => $CoverId,
-#          };
-#          my $Cover = $X->ProcessImg(src=>$Cover->{'src'}); #грязный хак
-#          $X->{'STRUCTURE'}->{'DESCRIPTION'}->{'TITLE-INFO'}->{'COVER'} = $Cover->{'new_path'};
-#        }
-#    }
 
   }
 
@@ -440,9 +432,18 @@ sub AssembleContent {
 
       $X->Msg("Parse content file ".$ContentFile."\n");
 
-      my $ContentDoc = $XMLDoc->parse_file($ContentFile) || die "Can't parse file ".$ContentFile;
-
+      my $ContentDoc = XML::LibXML->load_xml(
+        location => $ContentFile,
+        expand_entities => 0, # не считать & за entity
+        no_network => 1, # не будем тянуть внешние вложения
+        recover => 2, # не падать при кривой структуре. например, не закрыт тег. entity и пр | => 1 - вопить, 2 - совсем молчать
+        load_ext_dtd => 0 # полный молчок про dtd
+      );
+      $ContentDoc->setEncoding('utf-8');
+      
       my $Body = $XC->findnodes('/xhtml:html/xhtml:body',$ContentDoc)->[0];
+      
+      $X->Error("Can't find /html/body node in file $ContentFile. This is true XML?") unless $Body;
 
       #перерисуем все ns-подобные атрибуты. мешают при дальнейшем парсинге
       foreach my $NodeAttr ( $XC->findnodes('//*[@*]', $Body) ) {
@@ -452,7 +453,6 @@ sub AssembleContent {
 
             my $AttrName = $1;
             my $AttrValue =   $NodeAttr->getAttribute($Attr->nodeName);
-            #print $Attr->nodeName." || ".$AttrName." || ".$AttrValue."\n";
 
             $NodeAttr->setAttribute($AttrName => $AttrValue) unless $NodeAttr->getAttribute($AttrName); #переименуем ns-Образный в обычный, если такового нет
             $NodeAttr->removeAttribute( $Attr->nodeName ); #удалим ns-образный
@@ -467,6 +467,8 @@ sub AssembleContent {
       }
 
       my $Content = $X->InNode($Body);
+      $Content =~ s/^\s*//;
+      $Content =~ s/\s*$//;
       push @Pages, {
         content=>$Content,
         file=>$Item->{'href'}
@@ -484,10 +486,58 @@ sub AssembleContent {
 
 }
 
-#sub _Unpacker {
-#    my $self = shift;
-#    print "UNPACK from plugin\n";
-#}
+sub CleanTitle {
+  my $X = shift;
+  my $Node = shift;
+
+  return $Node unless ref $Node eq 'ARRAY';
+
+  foreach my $Item (@$Node) {
+    $Item = undef if ref $Item eq 'HASH' && exists $Item->{'p'} && !scalar @{$Item->{'p'}->{'value'}};  
+  }
+
+  my @Ret;
+  foreach (@$Node) {
+    push @Ret, $_ if defined $_;
+  }
+  
+  return \@Ret;
+}
+
+sub CleanNodeEmptyId {
+  my $X = shift;
+  my $Node = shift;
+
+  return $Node unless ref $Node eq 'ARRAY';
+
+  my $Ret = [];
+
+  foreach my $Item (@$Node) {
+    push @$Ret, $Item;
+    next unless ref $Item eq 'HASH';
+    foreach my $El (keys %$Item) {
+      $Item->{$El}->{'value'} = CleanNodeEmptyId($X,$Item->{$El}->{'value'});
+      if (exists $Item->{$El}->{'attributes'}->{'id'}) {
+        my $Id = $Item->{$El}->{'attributes'}->{'id'};
+        unless (exists $X->{'href_list'}->{"#".$Id}) { #элементы с несуществующими id
+          $X->Msg("Find non exists ID and delete '$Id' in node '$El' [".$X->{'id_list'}->{$Id}."]\n","w");
+          delete $Item->{$El}->{'attributes'}->{'id'}; #удалим id
+          next unless $El =~ /^(a|span)$/;
+          my $Link = $X->trim($Item->{$El}->{'attributes'}->{'xlink:href'});
+          if ($El eq 'a' && $Link ne '') { #<a> c линками оставим
+            $X->Msg("Find link [$Link]. Skip\n");
+            next;
+          }
+          pop @$Ret;
+          push @$Ret, @{$Item->{$El}->{'value'}} if scalar @{$Item->{$El}->{'value'}}; #переносим на место ноды ее внутренности
+          $X->Msg("Delete node '$El'\n");
+        }
+      }
+    }
+  }
+
+  return $Ret;
+}
 
 #Процессоры обработки нод
 
@@ -522,7 +572,7 @@ sub ProcessImg {
 
   #Копируем исходник на новое место с новым уникальным именем
   unless (-f $ImgDestFile) {
-    $X->Msg("copy $ImgSrcFile -> $ImgDestFile\n","w");
+    $X->Msg("copy $ImgSrcFile -> $ImgDestFile\n");
     FB3::Convert::copy($ImgSrcFile, $ImgDestFile) or $X->Error($!." [copy $ImgSrcFile -> $ImgDestFile]");        
   }
 
@@ -544,7 +594,6 @@ sub ProcessHref {
 
   my $NewHref =
   $Href ?
-        #$Href =~ /^[a-z]+\:\/\// || $Href =~ /^mailto:.+/
         $Href =~ /^[a-zA-Z]+\:/
           ? $Href
           : '#'.($Anchor ? 'link_' : '').$X->Path2ID( ($Link
@@ -552,6 +601,9 @@ sub ProcessHref {
                                                        basename($RelPath)."#".$Anchor #текущий section
                                                        ), $RelPath , 'process_href')
         : '';
+        
+        
+  $X->{'href_list'}->{$NewHref} = $Href if $X->trim($NewHref) ne '';     
   $Node->setAttribute('xlink:href' => $NewHref);
 
   return $Node;  
@@ -576,9 +628,9 @@ sub TransformH2Title {
 
   foreach my $Child ($Node->getChildnodes) {
     next if $Child->nodeName =~ /^p$/i;
-      my $NewNode = XML::LibXML::Element->new("p");
-      $NewNode->addChild($Child->cloneNode(1));
-      $Child->replaceNode($NewNode);
+    my $NewNode = XML::LibXML::Element->new("p");
+    $NewNode->addChild($Child->cloneNode(1));
+    $Child->replaceNode($NewNode);
   }
   
   return $Node;

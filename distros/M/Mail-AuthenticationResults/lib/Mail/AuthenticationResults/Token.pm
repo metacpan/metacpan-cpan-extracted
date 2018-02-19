@@ -1,10 +1,10 @@
 package Mail::AuthenticationResults::Token;
 # ABSTRACT: Base class for modelling AuthenticationResults Header parts
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Carp;
 
 
@@ -59,7 +59,11 @@ Mail::AuthenticationResults::Token - Base class for modelling AuthenticationResu
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+Classes representing a tokenised Authentication Results Header, used in parsing
 
 =head1 METHODS
 
@@ -67,7 +71,13 @@ version 1.20180113
 
 Return a new Token object parsed from the given $header string using $args
 
-$args value depend on the subclass of Token used
+$args value depend on the subclass of Token used, possible types are
+
+L<Mail::AuthenticationResults::Token::Assignment> an assignment operator
+L<Mail::AuthenticationResults::Token::Comment> a comment
+L<Mail::AuthenticationResults::Token::QuotedString> a quoted string
+L<Mail::AuthenticationResults::Token::Separator> a separator
+L<Mail::AuthenticationResults::Token::String> a string
 
 =head2 value()
 

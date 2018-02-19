@@ -67,7 +67,7 @@ converted to such a value.  the default is "info"
 
 Normally, the default log is written to both stderr and to the log file.
 Either of those can be suppressed by setting the corresponding attribute to a true value.
-These attributes have no effect if the user proviedes their own logger instead of using the default one.
+These attributes have no effect if the user provides their own logger instead of using the default one.
 
 =back
 
@@ -104,13 +104,13 @@ has 'log_path' => (
 has 'log_no_stdout' => (
 	is      => 'ro',
 	isa     => 'Bool',
-	default => '0',
+	default => $ENV{HPCI_LOG_NO_STDOUT} // '0',
 );
 
 has 'log_no_file' => (
 	is      => 'ro',
 	isa     => 'Bool',
-	default => '0',
+	default => $ENV{HPCI_LOG_NO_FILE} // '0',
 );
 
 subtype 'LogLevel',

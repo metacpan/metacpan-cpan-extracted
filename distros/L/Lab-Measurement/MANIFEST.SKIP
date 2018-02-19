@@ -45,9 +45,6 @@ nytprof
 # dont distribute the real world scripts
 ^examples/RealWorld
 
-# not ported yet
-^lib/Lab/Instrument/SignalRecovery726x.pm
-
 # not ready yet
 ^lib/Lab/Instrument/AgilentE8362A.pm
 ^lib/Lab/XPRESS/Sweep/SweepND.pm

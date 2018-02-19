@@ -44,14 +44,13 @@ WriteMakefile(
     'NAME'              => 'Mail::GPG',
     'VERSION_FROM'      => 'lib/Mail/GPG.pm',
     'PREREQ_PM'         => {
-        'AnyEvent'          => 0,
         'List::MoreUtils'   => 0,
         'MIME::Entity'      => 5.419,
         'MIME::Parser'      => 5.419,
         'Mail::Address'     => 0,
         'MIME::QuotedPrint' => 2.20,
         'GnuPG::Interface'  => 0,
-        'Encode'            => 2.12,
+        'Encode'            => 2.01,
     },
     'EXE_FILES'         => [ 'bin/mgpg-test' ],
     'dist' => {

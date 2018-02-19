@@ -4,14 +4,8 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'       => qr/.+[-]admin[@].+/,
-    'message-id' => qr/\A[<]\d+[.]FML.+[@].+[>]\z/,
-};
-my $Re1 = {
-    'rfc822'  => qr/\AOriginal[ ]mail[ ]as[ ]follows:\z/,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'rfc822' => ['Original mail as follows:'] };
 my $ErrorTitle = {
     'rejected' => qr{(?>
          (?:Ignored[ ])*NOT[ ]MEMBER[ ]article[ ]from[ ]
@@ -27,7 +21,7 @@ my $ErrorTitle = {
         |WARNING:[ ]UNIX[ ]FROM[ ]Loop
         )
     }x,
-    'securityerror' => qr/Security[ ]Alert/,
+    'securityerror' => qr/Security Alert/,
 };
 my $ErrorTable = {
     'rejected' => qr{(?>
@@ -46,14 +40,11 @@ my $ErrorTable = {
         |Loop[ ]Back[ ]Warning:
         )
     }x,
-    'securityerror' => qr/Security[ ]alert:/,
+    'securityerror' => qr/Security alert:/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 sub headerlist  { return ['X-MLServer'] }
-sub pattern     { return $Re0 }
 sub description { 'fml mailing list server/manager' };
-
 sub scan {
     # Detect an error from fml mailing list server/manager
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -72,8 +63,8 @@ sub scan {
     my $mbody = shift // return undef;
 
     return undef unless defined $mhead->{'x-mlserver'};
-    return undef unless $mhead->{'from'} =~ $Re0->{'from'};
-    return undef unless $mhead->{'message-id'} =~ $Re0->{'message-id'};
+    return undef unless $mhead->{'from'} =~ /.+[-]admin[@].+/;
+    return undef unless $mhead->{'message-id'} =~ /\A[<]\d+[.]FML.+[@].+[>]\z/;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -86,10 +77,10 @@ sub scan {
 
     $readcursor |= $Indicators->{'deliverystatus'};
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -106,7 +97,7 @@ sub scan {
                 last if $blanklines > 1;
                 next;
             }
-            $e =~ s/\A[ ]{3}//;
+            substr($e, 0, 3, '') if substr($e, 0, 3) eq '   ';
             push @$rfc822list, $e;
 
         } else {
@@ -118,7 +109,7 @@ sub scan {
             # Original mail as follows:
             $v = $dscontents->[-1];
 
-            if( $e =~ m/[<]([^ ]+?[@][^ ]+?)[>][.]\z/ ) {
+            if( $e =~ /[<]([^ ]+?[@][^ ]+?)[>][.]\z/ ) {
                 # Duplicated Message-ID in <2ndml@example.com>.
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -136,10 +127,9 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'agent'}     = __PACKAGE__->smtpagent;
@@ -209,7 +199,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2017-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

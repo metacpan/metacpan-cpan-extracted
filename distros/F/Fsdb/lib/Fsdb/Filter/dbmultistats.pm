@@ -110,6 +110,11 @@ Default is /tmp.
 Allow up to N reducers to run in parallel.
 Default is the number of CPUs in the machine.
 
+=item B<-F> or B<--fs> or B<--fieldseparator> S
+
+Specify the field (column) separator as C<S>.
+See L<dbfilealter> for valid field separators.
+
 =back
 
 
@@ -199,7 +204,6 @@ use Fsdb::Filter;
 use Fsdb::Filter::dbmapreduce;
 use Fsdb::Filter::dbcolstats;
 use Fsdb::IO::Reader;
-use Fsdb::IO::Writer;
 
 
 =head2 new
@@ -242,6 +246,7 @@ sub set_defaults ($) {
     $self->{_include_non_numeric} = undef;
     $self->{_header} = undef;
     $self->{_output_on_no_input} = undef;
+    $self->{_fscode} = undef;
 }
 
 =head2 parse_options
@@ -266,6 +271,7 @@ sub parse_options ($@) {
 	'c|confidence=f' => \$self->{_confidence_fraction},
 	'd|debug+' => \$self->{_debug},
 	'f|format=s' => \$self->{_format},
+	'F|fs|cs|fieldseparator|columnseparator=s' => \$self->{_fscode},
 	'header=s' => \$self->{_header},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'j|parallelism=i' => \$self->{_max_parallelism},
@@ -300,6 +306,8 @@ sub setup ($) {
     # First, dbcolstats:
     #
     my @dbcolstats_argv = (qw(--no-output-on-no-input --nolog));
+    push(@dbcolstats_argv, '--fieldseparator', $self->{_fscode})
+	if (defined($self->{_fscode}));
     push(@dbcolstats_argv, '--include-non-numeric')
 	if (defined($self->{_include_non_numeric}));
     push(@dbcolstats_argv, '--confidence', $self->{_confidence_fraction})
@@ -323,6 +331,8 @@ sub setup ($) {
 #    push(@dbmapreduce_argv, qw(--noclose --saveoutput), \$self->{_out});
 #    $self->{_child_saves_output} = 1;
     # pass input and output
+    push(@dbmapreduce_argv, '--fieldseparator', $self->{_fscode})
+	if (defined($self->{_fscode}));
     push (@dbmapreduce_argv, "--header", $self->{_header})
 	if (defined($self->{_header}));
     push (@dbmapreduce_argv, "--input", $self->{_input});

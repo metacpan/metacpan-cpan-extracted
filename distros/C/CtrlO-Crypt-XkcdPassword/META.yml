@@ -1,0 +1,43 @@
+---
+abstract: 'Yet another xkcd style password generator'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::SharedFork: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CtrlO-Crypt-XkcdPassword
+requires:
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Crypt::Rijndael: '0'
+  Crypt::URandom: '0'
+  Data::Entropy: '0'
+  Data::Entropy::Algorithms: '0'
+  Data::Entropy::RawSource::CryptCounter: '0'
+  Data::Entropy::Source: '0'
+  Data::Handle: '0'
+  Getopt::Long: '0'
+  Module::Runtime: '0'
+  Pod::Usage: '0'
+  WordList: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/domm/CtrlO-Crypt-XkcdPassword.git
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

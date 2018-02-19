@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.49';
+$Text::Template::VERSION = '1.50';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -205,7 +205,7 @@ sub compile {
 
         next if $t eq '';
 
-        if ($t eq $t_open && (!defined $delim_pats || $state eq 'TEXT')) {    # Brace or other opening delimiter
+        if ($t eq $t_open) {    # Brace or other opening delimiter
             if ($depth == 0) {
                 push @content, [ $state, $cur_item, $lineno ] if $cur_item ne '';
                 $cur_item   = '';
@@ -593,7 +593,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.49
+version 1.50
 
 =head1 SYNOPSIS
 

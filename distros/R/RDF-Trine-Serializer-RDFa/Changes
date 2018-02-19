@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/RDF-Trine-Serializer-RDFa>
 Bug tracker:  <https://github.com/kjetilk/p5-rdf-trine-serializer-rdfa/issues>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.100	2018-02-11	Support new RDFa generator
+
+ - Added: Add more tests.
+ - Added: Allow passing arguments to create_document.
+ - Use the Attean API with new compatibility layer.
+
 0.02	2018-01-16	Improve documentation
 
 0.01	2018-01-16	Initial release

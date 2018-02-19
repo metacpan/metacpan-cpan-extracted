@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.024';
+our $VERSION = '0.026';
 
 1;
 
@@ -150,6 +150,8 @@ Dan Book, C<dbook@cpan.org>
 =item John SJ Anderson (genehack)
 
 =item Matt S Trout (mst)
+
+=item William Taylor (willt)
 
 =back
 

@@ -4,11 +4,9 @@ use strict;
 use warnings;
 
 package WebService::Geocodio;
-{
-  $WebService::Geocodio::VERSION = '0.04';
-}
-
-use Moo::Lax;
+$WebService::Geocodio::VERSION = '0.05';
+use Moo;
+use strictures 2;
 use Carp qw(confess);
 use Scalar::Util qw(blessed);
 with('WebService::Geocodio::Request');
@@ -61,7 +59,7 @@ sub clear_locations {
 sub add_field {
     my $self = shift;
 
-    push @{ $self->fields }, grep { /cd|cd113|stateleg|timezone|school/ } @_;
+    push @{ $self->fields }, grep { /cd|cd113|cd114|cd115|stateleg|timezone|school|census/ } @_;
 }
 
 
@@ -94,7 +92,7 @@ sub _format {
     my $self = shift;
     my $direction = shift;
 
-    my $method = $direction eq 'forward' ? '_forward_formatting' 
+    my $method = $direction eq 'forward' ? '_forward_formatting'
         : '_reverse_formatting';
 
     return [ map {; blessed $_ ? $_->$method : $_ } @{$self->locations} ];
@@ -106,13 +104,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::Geocodio - A Perl interface to Geocod.io
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -149,8 +149,8 @@ version 0.04
 =head1 OVERVIEW
 
 This module is a fairly thin wrapper around the L<Geocod.io|http://geocod.io>
-geocoding web service.  This service currently only supports US based addresses
-at the moment.  Both forward and reverse geocoding is supported. 
+geocoding web service.  This service currently supports US and many Canadian based
+addresses at the moment.  Both forward and reverse geocoding is supported.
 
 In my testing, the service is somewhat finicky about how addresses are
 presented and stored; please read the service API documentation thoroughly 
@@ -181,11 +181,27 @@ You may request the following fields be included in the results:
 
 =item * cd
 
-Congressional District (for the current Congress)
+Congressional District (for the current Congress). This will return detailed
+biographical information about the Senators and Congressional representative
+from this district in the C<current_legislators> field which is structured
+as an array where the member of Congress is first, followed by the Senators
+for the entire state.
+
+It's possible there may be overlaps in a given location, so this field is
+structured as an array since there may be 2 or more possible districts
+for a given location. See the official docs for more information.
 
 =item * cd113
 
-Congressional District (for the 113th Congress which runs through 2015)
+Congressional District (for the 113th Congress which ran through 2015)
+
+=item * cd114
+
+Congressional District (for the 114th Congress which ran through 2017)
+
+=item * cd115
+
+Congressional District (for the 115th Congress which runs through 2019)
 
 =item * stateleg
 
@@ -201,6 +217,12 @@ saving time.
 =item * school
 
 The unified or elementary/secondary school district identifiers for this location.
+
+=item * census
+
+Appends various U.S. Census statistical codes to your lookup. See the API docs
+for more information about these codes and how they can be used with other
+census data sets.
 
 =back
 
@@ -224,9 +246,13 @@ This method takes one or more fields to include in a result set. Valid fields ar
 
 =over 4
 
-=item * cd
+=item * cd (current Congress)
 
 =item * cd113
+
+=item * cd114
+
+=item * cd115
 
 =item * stateleg
 
@@ -234,9 +260,11 @@ This method takes one or more fields to include in a result set. Valid fields ar
 
 =item * school
 
+=item * census
+
 =back
 
-Fields that do not match these valid names are silently discarded. 
+Fields that do not match these valid names are silently discarded.
 
 =head2 geocode
 
@@ -264,7 +292,7 @@ Mark Allen <mrallen1@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Mark Allen.
+This software is copyright (c) 2018 by Mark Allen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

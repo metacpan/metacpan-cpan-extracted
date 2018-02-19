@@ -26,151 +26,152 @@ no_index:
 provides:
   Footprintless:
     file: lib/Footprintless.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App:
     file: lib/Footprintless/App.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Action:
     file: lib/Footprintless/App/Action.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::ActionCommand:
     file: lib/Footprintless/App/ActionCommand.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::config:
     file: lib/Footprintless/App/Command/config.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::deployment:
     file: lib/Footprintless/App/Command/deployment.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::deployment::clean:
     file: lib/Footprintless/App/Command/deployment/clean.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::deployment::deploy:
     file: lib/Footprintless/App/Command/deployment/deploy.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log:
     file: lib/Footprintless/App/Command/log.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log::cat:
     file: lib/Footprintless/App/Command/log/cat.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log::follow:
     file: lib/Footprintless/App/Command/log/follow.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log::grep:
     file: lib/Footprintless/App/Command/log/grep.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log::head:
     file: lib/Footprintless/App/Command/log/head.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::log::tail:
     file: lib/Footprintless/App/Command/log/tail.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::overlay:
     file: lib/Footprintless/App/Command/overlay.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::overlay::clean:
     file: lib/Footprintless/App/Command/overlay/clean.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::overlay::initialize:
     file: lib/Footprintless/App/Command/overlay/initialize.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::overlay::update:
     file: lib/Footprintless/App/Command/overlay/update.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::Command::service:
     file: lib/Footprintless/App/Command/service.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::DocumentationUtil:
     file: lib/Footprintless/App/DocumentationUtil.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::App::UsageException:
     file: lib/Footprintless/App/UsageException.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Command:
     file: lib/Footprintless/Command.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Command::CommandOptions:
     file: lib/Footprintless/Command.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::CommandOptionsFactory:
     file: lib/Footprintless/CommandOptionsFactory.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::CommandRunner:
     file: lib/Footprintless/CommandRunner.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::CommandRunner::ExecutionException:
     file: lib/Footprintless/CommandRunner/ExecutionException.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::CommandRunner::IPCRun:
     file: lib/Footprintless/CommandRunner/IPCRun.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::CommandRunner::IPCRun3:
     file: lib/Footprintless/CommandRunner/IPCRun3.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Deployment:
     file: lib/Footprintless/Deployment.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Extract:
     file: lib/Footprintless/Extract.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Factory:
     file: lib/Footprintless/Factory.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::InvalidEntityException:
     file: lib/Footprintless/InvalidEntityException.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Localhost:
     file: lib/Footprintless/Localhost.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Log:
     file: lib/Footprintless/Log.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::MixableBase:
     file: lib/Footprintless/MixableBase.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Mixins:
     file: lib/Footprintless/Mixins.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Overlay:
     file: lib/Footprintless/Overlay.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Plugin:
     file: lib/Footprintless/Plugin.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource:
     file: lib/Footprintless/Resource.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource::Maven:
     file: lib/Footprintless/Resource/Maven.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource::MavenProvider:
     file: lib/Footprintless/Resource/MavenProvider.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource::Provider:
     file: lib/Footprintless/Resource/Provider.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource::Url:
     file: lib/Footprintless/Resource/Url.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Resource::UrlProvider:
     file: lib/Footprintless/Resource/UrlProvider.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::ResourceManager:
     file: lib/Footprintless/ResourceManager.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Service:
     file: lib/Footprintless/Service.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Tunnel:
     file: lib/Footprintless/Tunnel.pm
-    version: '1.26'
+    version: '1.27'
   Footprintless::Util:
     file: lib/Footprintless/Util.pm
-    version: '1.26'
+    version: '1.27'
 requires:
   App::Cmd: '0.330'
   Config::Entities: '1.07'
+  Getopt::Long::Descriptive: '0'
   IPC::Run: '0.94'
   IPC::Run3: '0.048'
   JSON: '2.90'
@@ -183,7 +184,7 @@ requires:
 resources:
   homepage: https://github.com/lucastheisen/footprintless
   repository: https://github.com/lucastheisen/footprintless.git
-version: '1.26'
+version: '1.27'
 x_Dist_Zilla:
   perl:
     version: '5.025000'
@@ -261,7 +262,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.26
+          tag: v1.27
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

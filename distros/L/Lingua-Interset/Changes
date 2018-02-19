@@ -1,4 +1,16 @@
-3.010
+3.011
+
+Features:
+* Feature 'case': added values 'per' (perlative) and 'cns' (considerative).
+
+Drivers:
+* en::penn --> mul::upos conversion adjusted according to
+  https://github.com/UniversalDependencies/docs/issues/157
+  (verbal particles RP and alphanumeric list bullets LS)
+
+
+
+3.010     2017-11-27 21:11:31+01:00 Europe/Prague
 
 Drivers:
 * pt::freeling should not encode "PA*" (pronoun-article) and "DR*" (relative

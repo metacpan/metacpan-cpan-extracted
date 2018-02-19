@@ -2,12 +2,10 @@ use strict;
 use warnings;
 
 package WebService::Geocodio::Location;
-{
-  $WebService::Geocodio::Location::VERSION = '0.04';
-}
-
+$WebService::Geocodio::Location::VERSION = '0.05';
 use WebService::Geocodio::Fields;
-use Moo::Lax;
+use Moo;
+use strictures 2;
 use Carp qw(confess);
 
 # ABSTRACT: Location object for use with Geocod.io service.
@@ -64,11 +62,13 @@ sub _forward_formatting {
         $s .= ", ";
     }
 
+    if ( $self->has_city && $self->has_state) {
+        $s .= join ", ", (map {; $self->$_ } qw(city state));
+        $s .= " " if ( $self->has_zip );
+    }
+
     if ( $self->has_zip ) {
         $s .= $self->zip
-    }
-    else {
-        $s .= join ", ", (map {; $self->$_ } qw(city state));
     }
 
     return $s;
@@ -91,13 +91,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WebService::Geocodio::Location - Location object for use with Geocod.io service.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 ATTRIBUTES
 
@@ -164,7 +166,7 @@ Mark Allen <mrallen1@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Mark Allen.
+This software is copyright (c) 2018 by Mark Allen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

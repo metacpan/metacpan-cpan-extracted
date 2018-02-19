@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 # ABSTRACT: A simple CMS for administrating data
 
 #pod =head1 SYNOPSIS
@@ -362,6 +362,31 @@ our $VERSION = '0.014';
 #pod         properties => { ... },
 #pod     },
 #pod
+#pod Instead of field names, columns can also be made out of templates using
+#pod a hash with C<title> and C<template> keys. Inside the template key, use
+#pod fields from the row with C<{field}>, like so:
+#pod
+#pod     people => {
+#pod         'x-list-columns' => [
+#pod             { title => "Person", template => '{name} <{email}>' },
+#pod         ],
+#pod     },
+#pod
+#pod =item x-view-url
+#pod
+#pod A URL to view the collection in the application. Will be shown as a button
+#pod in the editor.
+#pod
+#pod =item x-view-item-url
+#pod
+#pod A URL to view the items in the collection. Will be shown as an icon next to
+#pod the item row. Add data from the row in the url using C<{field}>, like so:
+#pod
+#pod     # /people/1
+#pod     /people/{id}
+#pod     # /user/preaction
+#pod     /user/{username}
+#pod
 #pod =back
 #pod
 #pod =head3 Extended Field Configuration
@@ -478,7 +503,7 @@ Yancy - A simple CMS for administrating data
 
 =head1 VERSION
 
-version 0.014
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -835,6 +860,31 @@ order. This helps put useful information on the list page.
         'x-list-columns' => [ 'name', 'email' ],
         properties => { ... },
     },
+
+Instead of field names, columns can also be made out of templates using
+a hash with C<title> and C<template> keys. Inside the template key, use
+fields from the row with C<{field}>, like so:
+
+    people => {
+        'x-list-columns' => [
+            { title => "Person", template => '{name} <{email}>' },
+        ],
+    },
+
+=item x-view-url
+
+A URL to view the collection in the application. Will be shown as a button
+in the editor.
+
+=item x-view-item-url
+
+A URL to view the items in the collection. Will be shown as an icon next to
+the item row. Add data from the row in the url using C<{field}>, like so:
+
+    # /people/1
+    /people/{id}
+    # /user/preaction
+    /user/{username}
 
 =back
 

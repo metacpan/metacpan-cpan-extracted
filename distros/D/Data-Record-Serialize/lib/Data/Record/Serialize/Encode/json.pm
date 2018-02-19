@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::json;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use JSON::MaybeXS qw[ encode_json ];
 
@@ -40,7 +40,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,13 @@ B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
 
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
 as a number.
+
+The output consists of I<concatenated> JSON objects, and is mostly easily
+read by an incremental decoder, e.g.
+
+  use JSON::MaybeXS;
+
+  @data = JSON->new->incr_parse( $json );
 
 It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
@@ -117,6 +124,13 @@ __END__
 #pod
 #pod If a field's type is C<N> or C<I>, it will be properly encoded by JSON
 #pod as a number.
+#pod
+#pod The output consists of I<concatenated> JSON objects, and is mostly easily
+#pod read by an incremental decoder, e.g.
+#pod
+#pod   use JSON::MaybeXS;
+#pod
+#pod   @data = JSON->new->incr_parse( $json );
 #pod
 #pod It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 #pod

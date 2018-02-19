@@ -119,7 +119,7 @@ sub new {
 
 		$doc->ferry($self, {
 			version          => '__UNIMPLEMENTED',
-			payloadID        => 'id',
+			payloadID        => '_id',
 			# timestamp is implicit
 			signatureVersion => '__UNIMPLEMENTED',
 			'xml:lang'       => '_lang',

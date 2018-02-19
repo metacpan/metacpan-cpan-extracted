@@ -4,7 +4,7 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -57,7 +57,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::GitHubREADME::Badge" : {
          "file" : "lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -72,14 +72,15 @@
          "web" : "https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_contributors" : [
       "Nikolay Mishin <mi@ya.ru>",
       "Paul Cochrane <paul@liekut.de>",
       "Randy Stauner <randy@magnificent-tears.com>",
       "Stephan Loyd <stephanloyd9@gmail.com>",
       "Thorsten Klein <grobie@perlwizard.de>",
-      "Thorsten Klein <thorsten@kleinhq.org>"
+      "Thorsten Klein <thorsten@kleinhq.org>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.023",
    "x_static_install" : 1

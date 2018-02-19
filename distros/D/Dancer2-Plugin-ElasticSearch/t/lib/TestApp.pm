@@ -23,7 +23,7 @@ get '/client_status' => sub {
         elastic;
         return 'available';
     } catch {
-        return $_;
+        return "$_";
     };
 };
 

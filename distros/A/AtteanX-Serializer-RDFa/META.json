@@ -1,0 +1,83 @@
+{
+   "abstract" : "RDFa Serializer for Attean",
+   "author" : [
+      "Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AtteanX-Serializer-RDFa",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attean" : "0.019",
+            "Moo" : "0",
+            "RDF::RDFa::Generator" : "0.200",
+            "Types::Standard" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Load::Conditional" : "0",
+            "Test::Modern" : "0",
+            "Test::More" : "0.96",
+            "URI::NamespaceMap" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "AtteanX::Serializer::RDFa" : {
+         "file" : "lib/AtteanX/Serializer/RDFa.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kjetilk/p5-atteanx-serializer-rdfa/issues"
+      },
+      "homepage" : "https://metacpan.org/release/AtteanX-Serializer-RDFa",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kjetilk/p5-atteanx-serializer-rdfa.git",
+         "web" : "https://github.com/kjetilk/p5-atteanx-serializer-rdfa"
+      },
+      "x_IRC" : "irc://irc.perl.org/#perlrdf",
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project"
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

@@ -1,19 +1,18 @@
-# $Id: 23-RSA-SHA256.t 1494 2016-08-22 09:34:07Z willem $	-*-perl-*-
+# $Id: 23-RSA-SHA256.t 1613 2018-01-15 13:47:13Z willem $	-*-perl-*-
 #
 
+use strict;
 use Test::More;
 
 my %prerequisite = (
-	Crypt::OpenSSL::Bignum	=> 0,
-	Crypt::OpenSSL::RSA	=> 0,
-	Net::DNS		=> 1.01,
-	Net::DNS::SEC::Private	=> 0,
+	'Digest::SHA'  => 5.23,
+	'Net::DNS'     => 1.01,
+	'MIME::Base64' => 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
 	my @revision = grep $_, $prerequisite{$package};
-	eval "use $package @revision";
-	next unless $@;
+	next if eval "use $package @revision; 1;";
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
@@ -30,7 +29,7 @@ END {
 }
 
 
-use_ok('Net::DNS');
+use_ok('Net::DNS::SEC');
 use_ok('Net::DNS::SEC::Private');
 use_ok('Net::DNS::SEC::RSA');
 

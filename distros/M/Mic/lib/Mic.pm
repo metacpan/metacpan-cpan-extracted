@@ -6,7 +6,7 @@ use Carp;
 use Params::Validate qw(:all);
 use Mic::Assembler;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001004';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
@@ -14,6 +14,10 @@ our %Bound_implementation_of;
 our %Contracts_for;
 our %Spec_for;
 our %Util_class;
+
+sub import {
+    strict->import();
+}
 
 sub load_class {
     my ($class, $spec) = @_;
@@ -83,7 +87,7 @@ Mic - Simplified OOP with emphasis on modularity and loose coupling.
 
 =head1 SYNOPSIS
 
-    # A simple Set class:
+    # The evolution of a simple Set class:
 
     package Example::Synopsis::Set;
 
@@ -240,7 +244,7 @@ and "OOP to me means only messaging, local retention and protection and hiding o
 In the simplest scenario in which both interface and implementation are defined in the same file, a class can also be defined by calling the C<define_class()> class method, with a hashref that
 specifies the class.
 
-The class defined in the SYNOPSIS could also be defined like this
+The class defined in the SYNOPSIS could also be defined like this (in one file)
 
     package Example::Usage::Set;
 

@@ -5,7 +5,7 @@ package App::GroupSecret::File;
 use warnings;
 use strict;
 
-our $VERSION = '0.302'; # VERSION
+our $VERSION = '0.304'; # VERSION
 
 use App::GroupSecret::Crypt qw(
     generate_secure_random_bytes
@@ -160,6 +160,8 @@ sub decrypt_secret_passphrase {
     my $self        = shift;
     my $private_key = shift or _usage(q{$file->decrypt_secret_passphrase($private_key)});
 
+    die "Private key '$private_key' not found.\n" unless -e $private_key && !-d $private_key;
+
     my $info = read_openssh_key_fingerprint($private_key);
     my $fingerprint = $info->{fingerprint};
 
@@ -168,7 +170,7 @@ sub decrypt_secret_passphrase {
         return decrypt_rsa(\$key->{secret_passphrase}, $private_key);
     }
 
-    die "The private key ($private_key) is not able to decrypt the keyfile.\n";
+    die "Private key '$private_key' not able to decrypt the keyfile.\n";
 }
 
 
@@ -210,7 +212,7 @@ sub find_public_key {
         my @dirs = split(/:/, $ENV{GROUPSECRET_PATH} || ".:keys:$ENV{HOME}/.ssh");
         for my $dir (@dirs) {
             my $filepath = File::Spec->catfile($dir, $key->{filename});
-            return $filepath if -f $filepath;
+            return $filepath if -e $filepath && !-d $filepath;
         }
     }
 }
@@ -250,7 +252,7 @@ App::GroupSecret::File - Reading and writing groupsecret keyfiles
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 

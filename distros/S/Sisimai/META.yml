@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.22.3
+    version: v4.22.4
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -151,8 +151,6 @@ provides:
     file: lib/Sisimai/Data/YAML.pm
   Sisimai::DateTime:
     file: lib/Sisimai/DateTime.pm
-  Sisimai::Incognito:
-    file: lib/Sisimai/Incognito.pm
   Sisimai::MDA:
     file: lib/Sisimai/MDA.pm
   Sisimai::MIME:
@@ -177,8 +175,6 @@ provides:
     file: lib/Sisimai/Order/Email.pm
   Sisimai::Order::JSON:
     file: lib/Sisimai/Order/JSON.pm
-  Sisimai::RFC1918:
-    file: lib/Sisimai/RFC1918.pm
   Sisimai::RFC2606:
     file: lib/Sisimai/RFC2606.pm
   Sisimai::RFC3464:
@@ -187,8 +183,6 @@ provides:
     file: lib/Sisimai/RFC3834.pm
   Sisimai::RFC5322:
     file: lib/Sisimai/RFC5322.pm
-  Sisimai::RFC5737:
-    file: lib/Sisimai/RFC5737.pm
   Sisimai::Reason:
     file: lib/Sisimai/Reason.pm
   Sisimai::Reason::Blocked:
@@ -267,8 +261,6 @@ provides:
     file: lib/Sisimai/SMTP/Reply.pm
   Sisimai::SMTP::Status:
     file: lib/Sisimai/SMTP/Status.pm
-  Sisimai::Skeleton:
-    file: lib/Sisimai/Skeleton.pm
   Sisimai::String:
     file: lib/Sisimai/String.pm
   Sisimai::Time:
@@ -282,9 +274,9 @@ requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/sisimai/p5-Sisimai/issues
-  homepage: http://libsisimai.org/
+  homepage: https://libsisimai.org/
   repository: git://github.com/sisimai/p5-Sisimai.git
-version: 4.22.3
+version: v4.22.4
 x_contributors:
   - 'jcbf <underspell@gmail.com>'
   - 'Jonathan Leroy <jonathan@inikup.com>'

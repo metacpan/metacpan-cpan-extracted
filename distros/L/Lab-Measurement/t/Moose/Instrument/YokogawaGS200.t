@@ -16,18 +16,15 @@ use Data::Dumper;
 my $log_file = catfile(qw/t Moose Instrument YokogawaGS200.yml/);
 
 my $yoko = mock_instrument(
-    type               => 'YokogawaGS200',
-    log_file           => $log_file,
-    instrument_options => {
+    type     => 'YokogawaGS200',
+    log_file => $log_file,
 
-        # linear_step_sweep output interferes with TAP
-        verbose              => 0,
-        max_units            => 10,
-        min_units            => -10,
-        max_units_per_step   => 0.1,
-        max_units_per_second => 10
-        }
-
+    # linear_step_sweep output interferes with TAP
+    verbose              => 0,
+    max_units            => 10,
+    min_units            => -10,
+    max_units_per_step   => 0.1,
+    max_units_per_second => 10
 );
 
 # Test getters and setters

@@ -2,8 +2,7 @@
 
 #
 # dbrowaccumulate.pm
-# Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
-# $Id: 1357ab139e05543b0b6d4c43607af46e804305e7 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -233,28 +232,28 @@ Internal: setup, parse headers.
 sub setup ($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": neither -c nor -C specified, so nothing to accumulate.\n"
+    croak($self->{_prog} . ": neither -c nor -C specified, so nothing to accumulate.\n")
         if (!(defined($self->{_target_column}) || defined($self->{_increment})));
-    croak $self->{_prog} . ": both -c nor -C specified, but can't double accumulate.\n"
+    croak($self->{_prog} . ": both -c nor -C specified, but can't double accumulate.\n")
         if (defined($self->{_target_column}) && defined($self->{_increment}));
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
 
     if (defined($self->{_target_column})) {
 	$self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-	croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+	croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	    if (!defined($self->{_target_coli}));
     };
 
     # early error detection
-    croak $self->{_prog} . ": invalid, non-numeric increment '" . $self->{_increment} . "'\n"
+    croak($self->{_prog} . ": invalid, non-numeric increment '" . $self->{_increment} . "'\n")
 	if (defined($self->{_increment}) && $self->{_increment} !~ /$is_numeric_regexp/);
-    croak $self->{_prog} . ": invalid, non-numeric initial value '" . $self->{_initial_value} . "'\n"
+    croak($self->{_prog} . ": invalid, non-numeric initial value '" . $self->{_initial_value} . "'\n")
 	if ($self->{_initial_value} !~ /$is_numeric_regexp/);
 	
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_out}->col_create($self->{_destination_column})
-	or croak $self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n";
+	or croak($self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n");
 }
 
 =head2 run
@@ -281,7 +280,7 @@ sub run ($) {
 	# already sanity checked
 	$pre_set_x_code = '$x = ' . $self->{_increment} . ';';
     } else {
-	die "internal error";
+	croak("internal error");
     };
 
     my $initial_accum = defined($self->{_initial_value}) ? $self->{_initial_value} + 0 : 0;
@@ -300,14 +299,14 @@ sub run ($) {
     };';
     print STDERR $loop_sub_code if ($self->{_debug});
     eval $loop_sub_code;
-    $@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error: $@.\n");
     &$loop_sub();
 }
 
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -72,6 +72,8 @@ my $R = getcwd;
 my $hook_log = "$dir/hook.log";
 my $hook = "$dir/there.git/hooks/post-receive";
 
+my $client_script = $ENV{KGB_CLIENT_SCRIPT} || "$R/script/kgb-client";
+
 # the real test client
 {
     my $ccf = $test_bot->client_config_file;
@@ -79,7 +81,7 @@ my $hook = "$dir/there.git/hooks/post-receive";
     print $fh <<EOF;
 #!/bin/sh
 
-tee -a "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $ccf >> $hook_log 2>&1
+tee -a "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $ccf >> $hook_log 2>&1
 EOF
     close $fh;
     chmod 0755, $hook;
@@ -90,7 +92,7 @@ if ( $ENV{TEST_KGB_BOT_RUNNING} ) {
     open( my $fh, '>>', $hook );
     print $fh <<"EOF";
 
-cat "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $R/eg/test-client.conf --status-dir $dir
+cat "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $R/eg/test-client.conf --status-dir $dir
 EOF
     close $fh;
 }
@@ -181,9 +183,10 @@ push_ok;
 
 $commit = $c->describe_commit;
 
-TestBot->expect( "#test 03${TestBot::USER_NAME} (03${TestBot::USER})"
-        . ' 12test/06there'
-        . ' Pushed 05tag-1, 05tag-2, 6 other tags and 05tag-9' );
+TestBot->expect( "#test "
+    . ${TestBot::COMMIT_USER}
+    . ' 12test/06there'
+    . ' Pushed 05tag-1, 05tag-2, 6 other tags and 05tag-9' );
 
 $commit = $c->describe_commit;
 is( $commit, undef );

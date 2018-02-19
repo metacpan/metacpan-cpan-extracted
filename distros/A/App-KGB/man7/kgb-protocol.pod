@@ -85,7 +85,7 @@ The commit message.
 =item B<changes> I<list of strings>
 
 List of changes files/directories in the commit. Each string is a path,
-optionaly prepended with C<(A)> for added paths, C<(M)> for modified paths and
+optionally prepended with C<(A)> for added paths, C<(M)> for modified paths and
 C<(D)> for deleted paths. If no prefix is given modification is assumed. An
 additional plus sign flags property changes (Specific to Subversion term), e.g.
 C<(M+)>.

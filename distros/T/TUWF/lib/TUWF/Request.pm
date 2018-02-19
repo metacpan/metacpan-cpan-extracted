@@ -7,9 +7,9 @@ use Encode 'decode_utf8', 'encode_utf8';
 use Exporter 'import';
 use Carp 'croak';
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 our @EXPORT = qw|
-  reqInit reqGets reqGet reqPosts reqPost reqParams reqParam
+  reqInit reqGets reqGet reqPosts reqPost reqParams reqParam reqJSON
   reqUploadMIMEs reqUploadMIME reqUploadRaws reqUploadRaw reqSaveUpload
   reqCookie reqMethod reqHeader reqPath reqQuery reqProtocol reqBaseURI reqURI reqHost reqIP reqFCGI
 |;
@@ -25,38 +25,46 @@ sub reqInit {
       if ($ENV{REQUEST_URI}||'') =~ /\?/;
   }
 
-  my $err = eval {
+  my $ok = eval {
     $self->{_TUWF}{Req}{Cookies} = _parse_cookies($self, $ENV{HTTP_COOKIE} || $ENV{COOKIE});
     $self->{_TUWF}{Req}{GET} = _parse_urlencoded($ENV{QUERY_STRING});
     $self->reqPath(); # let it croak when the path isn't valid UTF-8
     1;
   };
-  return 'utf8' if !$err && $@ && $@ =~ /does not map to Unicode/; # <- UGLY!
+  die TUWF::Exception->new('utf8') if !$ok && $@ && $@ =~ /does not map to Unicode/; # <- UGLY!
   # re-throw if it wasn't a UTF-8 problem. I don't expect this to happen
-  die $@ if !$err;
+  die $@ if !$ok;
 
   my $meth = $self->reqMethod;
-  return 'method' if $meth !~ /^(GET|POST|HEAD)$/;
+  die TUWF::Exception->new('method') if $meth !~ /^(GET|POST|HEAD|DEL|OPTIONS|PUT|PATCH)$/;
 
-  if($meth eq 'POST' && $ENV{CONTENT_LENGTH}) {
-    return 'maxpost' if $self->{_TUWF}{max_post_body} && $ENV{CONTENT_LENGTH} > $self->{_TUWF}{max_post_body};
+  if($meth =~ /^(POST|PUT|PATCH)$/ && $ENV{CONTENT_LENGTH}) {
+    die TUWF::Exception->new('maxpost') if $self->{_TUWF}{max_post_body} && $ENV{CONTENT_LENGTH} > $self->{_TUWF}{max_post_body};
 
     my $data;
-    die "Couldn't read all POST data.\n" if $ENV{CONTENT_LENGTH} > read STDIN, $data, $ENV{CONTENT_LENGTH}, 0;
+    die "Couldn't read all request data.\n" if $ENV{CONTENT_LENGTH} > read STDIN, $data, $ENV{CONTENT_LENGTH}, 0;
 
-    $err = eval {
-      if(($ENV{'CONTENT_TYPE'}||'') =~ m{^multipart/form-data; boundary=(.+)$}) {
+    $ok = eval {
+      if(($ENV{'CONTENT_TYPE'}||'') =~ m{^application/json(?:;.*)?$}) {
+        $self->{_TUWF}{Req}{JSON} = _parse_json($data);
+        die TUWF::Exception->new('json') if !$self->{_TUWF}{Req}{JSON};
+      } elsif(($ENV{'CONTENT_TYPE'}||'') =~ m{^multipart/form-data; boundary=(.+)$}) {
         _parse_multipart($self, $data, $1);
       } else {
         $self->{_TUWF}{Req}{POST} = _parse_urlencoded($data);
       }
       1;
     };
-    return 'utf8' if !$err && $@ && $@ =~ /does not map to Unicode/;
-    die $@ if !$err;
+    die TUWF::Exception->new('utf8') if !$ok && $@ && $@ =~ /does not map to Unicode/;
+    die $@ if !$ok;
   }
+}
 
-  return '';
+
+sub _check_control {
+  # Disallow any control codes, except for x09 (tab), x0a (newline) and x0d (carriage return)
+  die TUWF::Exception->new('controlchar') if $_[0] =~ /[\x00-\x08\x0b\x0c\x0e-\x1f]/;
+  $_[0]
 }
 
 
@@ -74,10 +82,21 @@ sub _parse_urlencoded {
         decode_utf8($s, 1);
       #eg;
       s/%u([0-9a-fA-F]{4})/chr hex($1)/eg;
+      _check_control($_);
     }
     push @{$dat{$key}}, $val;
   }
   return \%dat;
+}
+
+
+sub _parse_json {
+  my $d = shift;
+  die "Received a JSON request body, but was unable to load JSON::XS. Is it installed?\n"
+    unless eval { require JSON::XS; 1 };
+  my $res = eval { JSON::XS::decode_json($d) };
+  return undef if !$res || ref $res ne 'HASH'; # We always expect to receive a JSON object.
+  return $res;
 }
 
 
@@ -113,7 +132,7 @@ sub _parse_multipart {
       }
     }
 
-    $name = decode_utf8 $name, 1;
+    $name = _check_control decode_utf8 $name, 1;
 
     # In the case of a file upload, use the filename as value instead of the
     # data. This is to ensure that reqPOST() always returns decoded data.
@@ -123,11 +142,11 @@ sub _parse_multipart {
     # regular form element. The standards do not require the filename to be
     # present, but I am not aware of any browser that does not send it.
     if($filename) {
-      push @{$nfo->{POST}{$name}}, decode_utf8 $filename, 1;
-      push @{$nfo->{MIMES}{$name}}, decode_utf8 $mime, 1;
+      push @{$nfo->{POST}{$name}}, _check_control decode_utf8 $filename, 1;
+      push @{$nfo->{MIMES}{$name}}, _check_control decode_utf8 $mime, 1;
       push @{$nfo->{FILES}{$name}}, $value; # not decoded, can be binary
     } else {
-      push @{$nfo->{POST}{$name}}, decode_utf8 $value, 1;
+      push @{$nfo->{POST}{$name}}, _check_control decode_utf8 $value, 1;
     }
   }
 }
@@ -148,6 +167,8 @@ sub _parse_cookies {
     next if !$_ || !m{^([^\(\)<>@,;:\\"/\[\]\?=\{\}\t\s]+)=("?)(.*)\2$};
     my($n, $v) = ($1, $3);
     next if $self->{_TUWF}{cookie_prefix} && !($n =~ s/^\Q$self->{_TUWF}{cookie_prefix}\E//);
+    _check_control $n;
+    _check_control $v;
     $dat{$n} = $v if !exists $dat{$n};
   }
   return \%dat;
@@ -206,6 +227,11 @@ sub reqParam {
 }
 
 
+sub reqJSON {
+  return shift->{_TUWF}{Req}{JSON};
+}
+
+
 # saves file contents identified by the form name to the specified file
 # (doesn't support multiple file upload using the same form name yet)
 sub reqSaveUpload {
@@ -238,13 +264,14 @@ sub reqHeader {
   my($self, $name) = @_;
   if(@_ == 2) {
     (my $v = uc $_[1]) =~ tr/-/_/;
-    return $ENV{"HTTP_$v"}||'';
+    $v = $ENV{"HTTP_$v"}||'';
+    return _check_control decode_utf8 $v, 1;
   } else {
     return (map {
       if(/^HTTP_/) { 
         (my $h = lc $_) =~ s/_([a-z])/-\U$1/g;
         $h =~ s/^http-//;
-        decode_utf8 $h, 1;
+        _check_control decode_utf8 $h, 1;
       } else { () }
     } sort keys %ENV);
   }
@@ -254,7 +281,7 @@ sub reqHeader {
 # returns the path part of the current URI, including the leading slash
 sub reqPath {
   (my $u = ($ENV{REQUEST_URI}||'')) =~ s{\?.*$}{};
-  return decode_utf8 $u, 1;
+  return _check_control decode_utf8 $u, 1;
 }
 
 
@@ -272,7 +299,7 @@ sub reqBaseURI {
 
 sub reqQuery {
   my $u = $ENV{QUERY_STRING} ? '?'.$ENV{QUERY_STRING} : '';
-  return decode_utf8 $u, 1;
+  return _check_control decode_utf8 $u, 1;
 }
 
 

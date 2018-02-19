@@ -20,6 +20,7 @@ WriteMakefile(
     'OpenAPI::Client' => '0.14', # "call_p" interface
     'YAML::XS' => '0.68', # local.t needs, <0.68 breaks
     'Mojolicious::Plugin::GraphQL' => '0.10', # promise_code()
+    'Mojolicious::Plugin::OpenAPI' => '1.25', # register returns plugin
     'Test::Snapshot' => '0.02', # better snapshot filenames
   },
   PREREQ_PM => {

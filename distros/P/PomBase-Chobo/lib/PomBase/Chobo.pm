@@ -2,7 +2,7 @@ package PomBase::Chobo;
 
 =head1 NAME
 
-PomBase::Chobo - The great new PomBase::Chobo!
+PomBase::Chobo - Read an OBO file and store in a Chado database
 
 =cut
 
@@ -29,7 +29,7 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.020;
 

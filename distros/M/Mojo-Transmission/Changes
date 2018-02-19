@@ -1,0 +1,7 @@
+Revision history for perl distribution Mojo-Transmission
+
+0.01 2018-02-17T21:41:45+0100
+ - Add add()
+ - Add session()
+ - Add stats()
+ - Add torrent()

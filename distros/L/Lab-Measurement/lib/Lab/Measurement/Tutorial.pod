@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Tutorial on using the Lab::Measurement package stac
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 Introduction
 
@@ -463,7 +463,7 @@ To be done
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2006       Daniel Schroeer
             2010       Daniel Schroeer

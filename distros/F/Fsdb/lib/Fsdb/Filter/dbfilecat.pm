@@ -2,8 +2,7 @@
 
 #
 # dbfilecat.pm
-# Copyright (C) 2013-2015 by John Heidemann <johnh@isi.edu>
-# $Id: b5d7e701dd3144b94bc1eda278c8f221f9593eb7 $
+# Copyright (C) 2013-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -144,8 +143,8 @@ L<Fsdb(3)>
 
 use 5.010;
 use strict;
-use Carp qw(croak carp);
 use Pod::Usage;
+use Carp qw(croak carp);
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -230,23 +229,23 @@ sub setup($) {
 	push(@{$self->{_inputs}}, '-');
     };
     if ($self->{_xargs} && $#{$self->{_inputs}} > 0) {
-	croak $self->{_prog} . ": --xargs and multiple inputs (perhaps you meant NOT --xargs?).\n";
+	croak($self->{_prog} . ": --xargs and multiple inputs (perhaps you meant NOT --xargs?).\n");
     };
     if (!$self->{_xargs} && $self->{_remove_inputs}) {
-	croak $self->{_prog} . ": --remove_inputs only works with --xargs.\n";
+	croak($self->{_prog} . ": --remove_inputs only works with --xargs.\n");
     };
 
     if ($self->{_xargs}) {
-	croak $self->{_prog} . ": --xargs and internal error, no input.\n"
+	croak($self->{_prog} . ": --xargs and internal error, no input.\n")
 	    if ($#{$self->{_inputs}} != 0);
 	# have to delay comments in next line because otherwise _out is not yet open
         $self->finish_io_option('inputs', -header => '#fsdb filename', -comment_handler => $self->create_delay_comments_sub);
-	croak $self->{_prog} . ": xargs setup input stream failed " . $self->{_ins}[0]->error() . "\n"
+	croak($self->{_prog} . ": xargs setup input stream failed " . $self->{_ins}[0]->error() . "\n")
 	    if ($self->{_ins}[0]->error());
     } else {
 	$self->finish_io_option('inputs', -comment_handler => $self->create_pass_comments_sub);
 	foreach (@{$self->{_ins}}) {
-	    croak $self->{_prog} . ": input streams have different schemas; cannot concatenate\n"
+	    croak($self->{_prog} . ": input streams have different schemas; cannot concatenate\n")
 		if ($self->{_ins}[0]->compare($_) ne 'identical');
 	};
 	$self->finish_io_option('output', -clone => $self->{_ins}[0]);
@@ -292,7 +291,7 @@ sub run($) {
 	    if (!$self->{_out}) {
 	    	$self->finish_io_option('output', -clone => $this_in);
 	    } else {
-		croak $self->{_prog} . ": input streams have different schemas; cannot concatenate\n"
+		croak($self->{_prog} . ": input streams have different schemas; cannot concatenate\n")
 		    if ($self->{_out}->compare($this_in) ne 'identical');
 	    };
 	    $self->_run_one($this_in);
@@ -301,7 +300,7 @@ sub run($) {
 		    carp $self->{_prog} . ": --remove-inputs, but cannot remove " . $fref->[0] . "\n";
 	    };
 	};
-	croak $self->{_prog} . ": no input with --xargs\n"
+	croak($self->{_prog} . ": no input with --xargs\n")
 	    if ($inputs == 0);
     } else {
 	foreach my $in (@{$self->{_ins}}) {
@@ -315,7 +314,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2013-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2013-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

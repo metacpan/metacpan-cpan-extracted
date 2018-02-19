@@ -1,4 +1,4 @@
-App-Scheme79asm version 0.001
+App-Scheme79asm version 0.002
 =============================
 
 SIMPLE is a LISP processor defined in the 1979
@@ -6,12 +6,29 @@ B<Design of LISP-Based Processors> paper by Steele and Sussman.
 
 The SIMPLE processor expects input in a particular tagged-pointer
 format. This module takes a string containing a sequence of
-S-expressions of the form C<(tag . value)> representing a tagged
-pointer. Here the tag is either a number or one of several predefined
-values (see the source for a full list), and the value is either a
-number or another tagged pointer. These values are laid out in memory
-and a block of verilog code assigning the memory contents to an array
-named C<mem> is printed.
+S-expressions. Each S-expression is a list of one of three types:
+
+(tag value), for example (symbol nil), represents a value to be
+put in memory (for example a number, or a symbol, or a variable
+reference).
+
+(tag list), where list is of one of these three types,
+represents a tagged pointer. In this case, list is (recursively)
+laid out in memory as per these rules, and a pointer to that location
+(and tagged tag) is put somewhere in memory.
+
+(tag list1 list2), where list1 and list2 are of one of these
+three types (not necessarily the same type). In this case, list1
+and list2 are (recursively) laid out in memory such that list1
+is at position X and list2 is at position X+1, and a pointer of
+type tag and value X is put somewhere in memory.
+
+After this process the very last pointer placed in memory is moved to
+the special location 5 (which is where SIMPLE expects to find the
+expression to be evaluated).
+
+In normal use a single S-expression will be supplied, representing an
+entire program.
 
 INSTALLATION
 

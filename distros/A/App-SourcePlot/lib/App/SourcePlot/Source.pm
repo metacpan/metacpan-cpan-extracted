@@ -29,7 +29,7 @@ use Math::Trig qw/pi/;
 use DateTime;
 use DateTime::Format::Strptime;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 my $locateBug = 0;
 
@@ -453,7 +453,7 @@ sub timeDotY {
 
 =item time_ele_points
 
-These functions return an array of comparative points for different 
+These functions return an array of comparative points for different
 characteristics of this source.  The avaliable comparisons are:
 
   time_ele_points       - time vs elevation
@@ -468,7 +468,7 @@ characteristics of this source.  The avaliable comparisons are:
   pa_time_points       - parallactic angle vs time
   pa_ele_points       - parallactic angle vs elevation
   pa_az_points       - parallactic angle vs azimuth
-  
+
   Example syntax:
 
   @time_ele_points = $obs->time_ele_points();
@@ -591,7 +591,7 @@ sub copy {
 =item calcPoints
 
 Calculations the Elevation, Azimeth, etc. points
-$MW is the main window widget.  Required for 
+$MW is the main window widget.  Required for
 progress bar
 
   $obs->calcPoints($date, $time, $num_points, $MW, $tel);
@@ -721,6 +721,10 @@ sub _calcPoint {
   my $dt = shift;
   my $tel = shift;
 
+  # PAL (and so Astro::Coords) can not handle seconds > 59 (used in the case
+  # of leap seconds), so replace with 59 seconds when this happens.
+  $dt->set_second(59) if $dt->second() > 59;
+
   my $coords = $self->coords();
   $coords->datetime($dt) if defined $dt;
   $coords->telescope($tel) if defined $tel;
@@ -798,6 +802,7 @@ Casey Best
 
 =head1 COPYRIGHT
 
+Copyright (C) 2018 East Asian Observatory.
 Copyright (C) 2012-2014 Science and Technology Facilities Council.
 Copyright (C) 1998, 1999 Particle Physics and Astronomy Research
 Council. All Rights Reserved.

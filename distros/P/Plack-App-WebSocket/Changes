@@ -1,5 +1,13 @@
 Revision history for Plack-App-WebSocket
 
+0.08    2018-02-12
+        - Write this Changes. I forgot that.
+
+0.07    2018-02-12
+        [ENHANCEMENT]
+        - Pass \@handshake_results to on_establish callback (gh#5).
+          Thanks topaz.
+
 0.06    2017-10-16
         [ENHANCEMENT]
         - PR gh#4 by yanick. Thanks!

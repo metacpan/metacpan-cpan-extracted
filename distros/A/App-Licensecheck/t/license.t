@@ -1,77 +1,91 @@
-use strictures 2;
+#!perl
 
-use Test::Roo tests => 22;
-use App::Licensecheck;
+use strict;
+use warnings;
 
-has encoding => ( is => 'ro' );
-has license  => ( is => 'ro', required => 1 );
-has corpus   => ( is => 'ro' );
+use lib 't/lib';
+use Test::Licensecheck tests => 38;
 
-sub _build_description { return shift->license }
-
-test "Parse corpus" => sub {
-	my $self = shift;
-
-	my $app = App::Licensecheck->new;
-	$app->lines(0);
-	$app->deb_fmt(1);
-	$app->encoding( $self->encoding ) if $self->encoding;
-
-	foreach (
-		ref( $self->corpus ) eq 'ARRAY' ? @{ $self->corpus } : $self->corpus )
-	{
-		my ( $license, $copyright ) = $app->parse("t/devscripts/$_");
-		is( $license, $self->license, "Corpus file $_" );
-	}
-};
-
-run_me( { license => 'AFL-3.0', corpus => 'academic.h' } );
-run_me(
-	{ license => 'Apache-2.0', corpus => '../grant/Apache/one_helper.rb' } );
-run_me(
-	{   license => 'Artistic-2.0',
-		corpus  => [qw(artistic-2-0-modules.pm artistic-2-0.txt)]
-	}
+is_licensed( 't/devscripts/academic.h',      'AFL-3.0' );
+is_licensed( 't/grant/Apache/one_helper.rb', 'Apache-2.0' );
+is_licensed(
+	[   qw(
+			t/devscripts/artistic-2-0-modules.pm
+			t/devscripts/artistic-2-0.txt
+			)
+	],
+	'Artistic-2.0'
 );
-run_me( { license => 'Beerware',        corpus => 'beerware.cpp' } );
-run_me( { license => 'BSD~unspecified', corpus => 'bsd-1-clause-1.c' } );
-run_me( { license => 'BSD-2-clause',    corpus => 'bsd.f' } );
-run_me(
-	{   license => 'BSD-3-clause',
-		corpus  => [
-			qw(bsd-3-clause.cpp bsd-3-clause-authorsany.c mame-style.c bsd-regents.c)
-		]
-	}
+is_licensed( 't/devscripts/beerware.cpp',     'Beerware' );
+is_licensed( 't/devscripts/bsd-1-clause-1.c', 'BSD~unspecified' );
+is_licensed( 't/devscripts/bsd.f',            'BSD-2-clause' );
+is_licensed(
+	[   qw(
+			t/devscripts/bsd-3-clause.cpp
+			t/devscripts/bsd-3-clause-authorsany.c
+			t/devscripts/mame-style.c
+			t/devscripts/bsd-regents.c
+			)
+	],
+	'BSD-3-clause'
 );
-run_me( { license => 'BSL',     corpus => 'boost.h' } );
-run_me( { license => 'EPL-1.0', corpus => 'epl.h' } );
+is_licensed( 't/devscripts/boost.h', 'BSL' );
+is_licensed( 't/devscripts/epl.h',   'EPL-1.0' );
 
 # Lisp Lesser General Public License (BTS #806424)
 # see http://opensource.franz.com/preamble.html
-run_me( { license => 'LLGPL',  corpus => 'llgpl.lisp' } );
-run_me( { license => 'GPL',    corpus => 'gpl-no-version.h' } );
-run_me( { license => 'GPL-1+', corpus => 'gpl-1' } );
-run_me(
-	{   license => 'GPL-2',
-		corpus  => [
-			qw(gpl-2 bug-559429 gpl-2-comma.sh gpl-2-incorrect-address copr-iso8859.h)
-		]
-	}
+is_licensed( 't/devscripts/llgpl.lisp',       'LLGPL' );
+is_licensed( 't/devscripts/gpl-no-version.h', 'GPL' );
+is_licensed( 't/devscripts/gpl-1',            'GPL-1+' );
+is_licensed(
+	[   qw(
+			t/devscripts/gpl-2
+			t/devscripts/bug-559429
+			t/devscripts/gpl-2-comma.sh
+			t/devscripts/gpl-2-incorrect-address
+			t/devscripts/copr-iso8859.h
+			)
+	],
+	'GPL-2'
 );
-run_me(
-	{ license => 'GPL-2+', corpus => [qw(gpl-2+ gpl-2+.scm copr-utf8.h)] } );
-run_me( { license => 'GPL-3', corpus => [qw(gpl-3.sh gpl-3-only.c)] } );
-run_me(
-	{   license => 'GPL-3+',
-		corpus  => [
-			qw(gpl-3+ gpl-3+-with-rem-comment.xml gpl-variation.c gpl-3+.el comments-detection.h)
-		]
-	}
+is_licensed(
+	[   qw(
+			t/devscripts/gpl-2+
+			t/devscripts/gpl-2+.scm
+			t/devscripts/copr-utf8.h
+			)
+	],
+	'GPL-2+'
 );
-run_me( { license => 'MPL-1.1', corpus => 'mpl-1.1.sh' } );
-run_me(
-	{ license => 'MPL-2.0', corpus => [qw(mpl-2.0.sh mpl-2.0-comma.sh)] } );
-run_me( { license => 'FTL',   corpus => 'freetype.c' } );
-run_me( { license => 'CDDL',  corpus => 'cddl.h' } );
-run_me( { license => 'ISC',   corpus => 'libuv-isc.am' } );
-run_me( { license => 'Expat', corpus => 'info-at-eof.h' } );
+is_licensed(
+	[   qw(
+			t/devscripts/gpl-3.sh
+			t/devscripts/gpl-3-only.c
+			)
+	],
+	'GPL-3'
+);
+is_licensed(
+	[   qw(
+			t/devscripts/gpl-3+
+			t/devscripts/gpl-3+-with-rem-comment.xml
+			t/devscripts/gpl-variation.c
+			t/devscripts/gpl-3+.el
+			t/devscripts/comments-detection.h
+			)
+	],
+	'GPL-3+'
+);
+is_licensed( 't/devscripts/mpl-1.1.sh', 'MPL-1.1' );
+is_licensed(
+	[   qw(
+			t/devscripts/mpl-2.0.sh
+			t/devscripts/mpl-2.0-comma.sh
+			)
+	],
+	'MPL-2.0'
+);
+is_licensed( 't/devscripts/freetype.c',    'FTL' );
+is_licensed( 't/devscripts/cddl.h',        'CDDL' );
+is_licensed( 't/devscripts/libuv-isc.am',  'ISC' );
+is_licensed( 't/devscripts/info-at-eof.h', 'Expat' );

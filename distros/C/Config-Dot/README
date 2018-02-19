@@ -73,11 +73,9 @@ ERRORS
              Unsupported stay with newline in value.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot;
      use Dumpvalue;
 
@@ -100,11 +98,9 @@ EXAMPLE1
      #       'subkey1' => 'value3',
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot;
 
      # Object with data.
@@ -125,11 +121,9 @@ EXAMPLE2
      # key2=value2
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot;
      use Dumpvalue;
 
@@ -168,18 +162,21 @@ SEE ALSO
     Config::Utils
         Common config utilities.
 
+    Config::Dot::Array
+        Module for simple configure file parsing with arrays.
+
 REPOSITORY
     <https://github.com/tupinek/Config-Dot>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
+     © 2011-2018 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

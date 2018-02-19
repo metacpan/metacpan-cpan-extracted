@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moose;
 
@@ -50,6 +50,11 @@ sub before_build {
 
   FILE:
     for my $file (@files) {
+
+        # Git reports submodules as a file although they are a directory on
+        # the file system. We skip them because the default permissions of
+        # 0644 are suboptimal for directories.
+        next FILE if !-f $file;
 
         # default permission
         my $perm = oct( $self->default );
@@ -148,7 +153,7 @@ Dist::Zilla::Plugin::Git::FilePermissions - fix the file permissions in your Git
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =head1 SYNOPSIS
 
@@ -164,9 +169,9 @@ where your project is saved. Files not in the Git index, and directories, are
 ignored.
 
 Without configuration, every file is changed to the default permission of
-0644. The default permissions can be changed with the B<default> argument
+0644. The default permissions can be changed with the B<default> option
 and you can configure different permissions for some files with the
-B<perms> argument in the F<dist.ini>.
+B<perms> option in the F<dist.ini>.
 
 The plugin runs in the before build phase, which means it will fix the file
 permissions before the files are picked up in the file gather phase. The new
@@ -213,7 +218,7 @@ Sven Kirmess <sven.kirmess@kzone.ch>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Sven Kirmess.
+This software is Copyright (c) 2017-2018 by Sven Kirmess.
 
 This is free software, licensed under:
 

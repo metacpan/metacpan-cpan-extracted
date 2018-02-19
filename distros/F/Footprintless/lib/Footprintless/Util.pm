@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Util;
-$Footprintless::Util::VERSION = '1.26';
+$Footprintless::Util::VERSION = '1.27';
 # ABSTRACT: A utility method package for common functionality in Footprintless
 # PODNAME: Footprintless::Util
 
@@ -25,6 +25,7 @@ our @EXPORT_OK = qw(
     spurt
     temp_dir
     temp_file
+    terse_dumper
 );
 
 my $logger = Log::Any->get_logger();
@@ -235,6 +236,10 @@ sub temp_file {
     return $temp;
 }
 
+sub terse_dumper {
+    Data::Dumper->new( \@_ )->Indent(1)->Sortkeys(1)->Terse(1)->Dump();
+}
+
 1;
 
 __END__
@@ -247,7 +252,7 @@ Footprintless::Util - A utility method package for common functionality in Footp
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -381,6 +386,13 @@ C<File::Temp::HIGH> for extra safety.
 Creates a new temporary directory with mode C<2700>.
 Returns the new L<File::Temp> object.  Uses C<File::Temp> so you can set
 C<File::Temp::HIGH> for extra safety.
+
+=head2 terse_dumper(@to_dump)
+
+Prints a dump of C<@to_dump> using C<Data::Dumper> with C<Data::Dumper::Indent>
+set to 1 and C<Data::Dumper::Terse> set to 1 - this will basically be the same
+as the C<dumper()> function, except it will not include the variable name
+(C<$VAR1 = >).
 
 =over 4
 

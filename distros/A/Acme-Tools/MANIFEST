@@ -37,14 +37,27 @@ t/30_cnttbl.t
 t/31_readable.t
 t/32_a2h_h2a.t
 t/33_refsubs.t
+t/34_tablestring.t
+t/35_subarr.t
+t/36_cmd_due.t
+t/37_cmd_resubst.t
+t/38_base64.t
+t/39_sim.t
+t/40_aoh2.t
+t/41_changed.t
 t/common.pl
 t/test_binsearch_bench.pl
 t/test_fork_bloom.pl
 t/test_k_m.pl
 t/test_md5sum.pl
+t/test_perm.c
 t/test_perm.pl
+t/test_perm2.pl
+t/test_pi.pl
+t/test_pivot.pl
 t/test_resolve_bigfloat.pl
 t/test_speed_pushsort.pl
 Tools.pm
+
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

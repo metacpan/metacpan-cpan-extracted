@@ -297,53 +297,13 @@ Two Installation Methods - Overview
         will generate the output file myfile.pl_tdy instead of
         myfile.pl.tdy, and so on.
 
-  Mac Installation Notes
-    This release contains a patch by Axel Rose to make perltidy work under
-    MacPerl. The patch is in the 'perltidy' script and prompts the user to
-    interactively enter command line arguments.
-
-    The normal installation process (just dropping the .tgz file on a
-    distribution-provided "installme" script) should work.
-
-    MacPerl users may want to open the "perltidy" script and save it as
-    droplet. Then just use the drag&drop mechanism to provide the file
-    parameter.
-
-    Please be sure enclose in quotes any filenames which contain spaces.
-    This is true for all systems, but worth emphasizing for Mac's, where
-    this is common.
 
 Troubleshooting / Other Operating Systems
     Is your system missing from the notes above, or are you having trouble?
-    Perltidy is quite portable. The main source of system-dependent
-    programming, and system problems, has been the external system call to
-    perl to perform a syntax check. This can be skipped with the -nsyn
-    parameter:
+    Perltidy is quite portable. 
 
-      perltidy -nsyn filename
-
-    This is the first thing to try if perltidy seems to cause a system to
-    hang in some way. In fact, this has been such a problem with Windows
-    95/98/Me that the syntax check is deactivated for these systems.
-
-    However, perltidy is also fairly slow, and it may be just taking a long
-    time on a large file, so give it a little time to finish. To illustrate,
-    on a 1.4 GHz PC the following command takes about 0.4 seconds to
-    complete:
-
-            $ time perltidy Makefile.PL
-            real    0m0.398s
-
-    for the small file Makefile.PL supplied with the distribution. On the
-    very large file Tidy.pm (20500 lines, 721k bytes), however, the time
-    increases to 45 seconds:
-
-            $ time perltidy Tidy.pm
-            real    0m45.202s
-
-    Another source of system-dependent programming has to do with locating
-    configuration files. You can see what is going on in the config file
-    search with:
+    If there seems to be a problem locating a configuration file, you can see
+    what is going on in the config file search with:
 
      perltidy -dpro
 

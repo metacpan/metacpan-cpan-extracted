@@ -1,0 +1,48 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "license": {
+      "name": "Apache License, Version 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "title": "t-app",
+    "version": "0.1.0"
+  },
+  "basePath": "/api",
+  "produces": [ "application/json" ],
+  "consumes": [ "application/json" ],
+  "responses": {
+    "error": {
+      "description": "Self sufficient",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [ "error" ],
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/t": {
+      "get": {
+        "operationId": "listT",
+        "x-mojo-to": "Controller::OpenAPI::T#list",
+        "tags": [ "t" ],
+        "responses": {
+          "200": {
+            "description": "Self sufficient",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "default": { "$ref": "#/responses/error" }
+        }
+      }
+    }
+  }
+}

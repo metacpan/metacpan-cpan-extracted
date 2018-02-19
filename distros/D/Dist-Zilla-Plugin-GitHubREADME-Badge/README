@@ -57,8 +57,12 @@ CONFIG
         [GitHubREADME::Badge]
         phase = release
 
-    Which Dist::Zilla phase to add the badges: build or release. The
-    default is build.
+    Which Dist::Zilla phase to add the badges: build, release or filemunge.
+    For the build and release phases, the README that is on disk will be
+    modified, whereas for the filemunge it's the internal zilla version of
+    the README that will be modified.
+
+    The default is build.
 
 SEE ALSO
 

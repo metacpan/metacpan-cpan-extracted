@@ -1,13 +1,14 @@
 package Mail::AuthenticationResults::Token::Comment;
 # ABSTRACT: Class for modelling AuthenticationResults Header parts detected as comments
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Token';
+
 
 sub is {
     my ( $self ) = @_;
@@ -66,7 +67,11 @@ Mail::AuthenticationResults::Token::Comment - Class for modelling Authentication
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+Token representing a comment
 
 =head1 AUTHOR
 

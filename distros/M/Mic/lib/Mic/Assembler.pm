@@ -3,6 +3,7 @@ package Mic::Assembler;
 use strict;
 use Class::Method::Modifiers qw(install_modifier);
 use Carp;
+use Config::Tiny;
 use List::MoreUtils qw( any uniq );
 use Module::Runtime qw( require_module );
 use Params::Validate qw(:all);
@@ -10,7 +11,7 @@ use Package::Stash;
 use Storable qw( dclone );
 use Sub::Name;
 
-use Mic::_Guts;
+use Mic::ContractConfig;
 
 sub new {
     my ($class, %arg) = @_;
@@ -67,6 +68,7 @@ sub assemble {
     $cls_stash->add_symbol('$__Obj_pkg', $obj_stash->name);
     $cls_stash->add_symbol('%__meta__', $spec) if @_ > 0;
 
+    $self->_check_contract_config;
     _add_methods($spec, $obj_stash);
     _make_builder_class($spec);
     _add_class_methods($spec, $cls_stash);
@@ -207,6 +209,20 @@ sub _check_interface {
     $count > 0 or confess "Cannot have an empty interface.";
 }
 
+sub _check_contract_config {
+    my ($self) = @_;
+
+    return if $self->{config_file_read};
+
+    my $config_file = $ENV{MIC_CONTRACTS}
+      or return;
+
+    my $config = Config::Tiny->read($config_file);
+    Mic::ContractConfig::configure($config);
+
+    $self->{config_file_read} = 1;
+}
+
 sub _add_methods {
     my ($spec, $stash) = @_;
 
@@ -287,6 +303,7 @@ sub _add_methods {
     foreach my $name ( @{ $spec->{interface} } ) {
         _add_pre_conditions($spec, $stash, $name, 'object');
         _add_post_conditions($spec, $stash, $name, 'object');
+        _add_overloads($spec, $stash, $name, 'object');
     }
     _add_invariants($spec, $stash);
 }
@@ -332,7 +349,10 @@ sub _add_invariants {
 sub _add_pre_conditions {
     my ($spec, $stash, $name, $type) = @_;
 
-    return unless $Mic::Contracts_for{ $spec->{name} }{pre};
+    if (defined $Mic::Contracts_for{ $spec->{name} }{pre}
+        && ! $Mic::Contracts_for{ $spec->{name} }{pre}) {
+        return;
+    }
 
     _validate_contract_def($spec->{interface_meta}{$type}{$name});
     my $pre_cond_hash = $spec->{interface_meta}{$type}{$name}{require}
@@ -342,7 +362,7 @@ sub _add_pre_conditions {
         foreach my $desc (keys %{ $pre_cond_hash }) {
             my $sub = $pre_cond_hash->{$desc};
             $sub->(@_)
-              or confess "Method '$name' failed precondition '$desc'";
+              or confess "Precondition '$desc' on '$name', is not satisfied";
         }
     };
     install_modifier($stash->name, 'before', $name, $guard);
@@ -385,6 +405,19 @@ sub _add_post_conditions {
         return wantarray ? @$results : $results->[0];
     };
     install_modifier($stash->name, 'around', $name, $guard);
+}
+
+sub _add_overloads {
+    my ($spec, $stash, $name, $type) = @_;
+
+    my $overload_type = $spec->{interface_meta}{$type}{$name}{overloads}
+      or return;
+
+    my $overload = "package ${ \ $stash->name };";
+    $overload .= " use overload '$overload_type' => \\&$name;";
+
+    eval $overload;
+    confess "Failed: [$overload]" if $@;
 }
 
 sub _validate_contract_def {
@@ -561,7 +594,6 @@ sub _object_maker {
     my $stash = Package::Stash->new($class);
 
     my $spec = $stash->get_symbol('%__meta__');
-    my $pkg_key = Mic::_Guts::obfu_name('', $spec);
     my $obj = [ ];
 
     while ( my ($attr, $meta) = each %{ $spec->{implementation}{has} } ) {
@@ -575,8 +607,6 @@ sub _object_maker {
     }
 
     bless $obj => ${ $stash->get_symbol('$__Obj_pkg') };
-    $Mic::_Guts::Implementation_meta{ref $obj} = $spec->{implementation};
-
     return $obj;
 }
 

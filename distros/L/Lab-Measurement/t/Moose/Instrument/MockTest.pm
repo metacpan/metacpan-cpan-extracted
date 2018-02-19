@@ -49,19 +49,22 @@ EOF
 }
 
 sub mock_instrument {
-    my ( $type, $logfile, $instrument_options ) = validated_list(
+    my %args = validated_hash(
         \@_,
-        type               => { isa => 'Str' },
-        log_file           => { isa => 'Str' },
-        instrument_options => { isa => 'HashRef', default => {} },
+        type                           => { isa => 'Str' },
+        log_file                       => { isa => 'Str' },
+        MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1,
     );
+
+    my $type     = delete $args{type};
+    my $log_file = delete $args{log_file};
 
     if ( not defined $connection_module ) {
         return instrument(
             type               => $type,
             connection_type    => 'Mock',
-            connection_options => { log_file => $logfile },
-            instrument_options => $instrument_options,
+            connection_options => { log_file => $log_file },
+            %args
         );
     }
 
@@ -74,7 +77,8 @@ sub mock_instrument {
         type               => $type,
         connection_type    => $connection_module,
         connection_options => $hash,
-        instrument_options => { log_file => $logfile, %{$instrument_options} }
+        log_file           => $log_file,
+        %args,
     );
 }
 

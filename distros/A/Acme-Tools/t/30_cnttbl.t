@@ -1,6 +1,6 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/30_cnttbl.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 2;
 
 #---------- test 1

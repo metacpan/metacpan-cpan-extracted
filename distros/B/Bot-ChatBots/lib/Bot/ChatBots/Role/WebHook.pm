@@ -1,12 +1,12 @@
 package Bot::ChatBots::Role::WebHook;
 use strict;
 use warnings;
-{ our $VERSION = '0.006'; }
+{ our $VERSION = '0.008'; }
 
 use Ouch;
 use Mojo::URL;
 use Log::Any qw< $log >;
-use Scalar::Util qw< blessed weaken >;
+use Scalar::Util qw< blessed weaken refaddr >;
 use Bot::ChatBots::Weak;
 use Try::Tiny;
 
@@ -40,6 +40,12 @@ has path => (
    builder => 'BUILD_path',
 );
 
+has _flags_tracker => (
+   is => 'ro',
+   lazy => 1,
+   builder => '_BUILD_flags_tracker',
+);
+
 has url => (is => 'ro');
 
 sub BUILD_code { return 204 }
@@ -53,12 +59,40 @@ sub BUILD_path {
    return Mojo::URL->new($url)->path->to_string;
 } ## end sub BUILD_path
 
+sub _BUILD_flags_tracker {
+   my $self = shift;
+   $self->app->hook(after_dispatch => sub {
+      $self->_set_flags_rendered(@_);
+   });
+   return {};
+}
+
+sub _track_flags {
+   my ($self, $c, $flags) = @_;
+   $self->_flags_tracker->{refaddr($c)} = $flags;
+   return $self;
+}
+
+sub _set_flags_rendered {
+   my ($self, $c) = @_;
+   $self->_flags_tracker->{refaddr($c)}{rendered} = 1;
+   return $self;
+}
+
+sub _forget_flags {
+   my ($self, $c) = @_;
+   my $rt = $self->_flags_tracker;
+   delete $rt->{refaddr($c)};
+   return $self;
+}
+
 sub handler {
    my $self = shift;
    my $args = (@_ && ref($_[0])) ? $_[0] : {@_};
 
    return sub {
       my $c = shift;
+      my $c_address = refaddr $c;
 
       # whatever happens, the bot "cannot" fail or the platform will hammer
       # us with the same update over and over
@@ -72,6 +106,7 @@ sub handler {
       };
 
       my %flags = (rendered => 0);
+      $self->_track_flags($c => \%flags);
       my @retval = $self->process_updates(
          refs => {
             app        => $self->app,
@@ -84,6 +119,7 @@ sub handler {
          updates => \@updates,
          %$args,    # may override it all!
       );
+      $self->_forget_flags($c);
 
       # did anyone set the flag? Otherwise stick to the safe side
       return $flags{rendered} || $c->rendered($self->code);

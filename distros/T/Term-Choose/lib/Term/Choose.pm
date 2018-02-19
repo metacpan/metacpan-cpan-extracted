@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.510';
+our $VERSION = '1.511';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -138,13 +138,6 @@ sub __validate_and_add_options {
             if ( $key eq 'lf' ) {
                 croak "$sub $key => too many array elements." if @{$opt->{$key}} > 2;
             }
-            else {
-                if ( defined $self->{orig_list} ) {
-                    for ( @{$opt->{$key}} ) {
-                        croak "$sub $key => $_ out of range." if $_ > $#{$self->{orig_list}};
-                    }
-                }
-            }
         }
         elsif ( $valid->{$key} eq 'Str' ) {
             croak "$sub $key => references are not valid values." if ref $opt->{$key} ne '';
@@ -191,7 +184,7 @@ sub __get_key {
 }
 
 
-sub config {
+sub config {            # DEPRECATED 10.02.2018
     my $self = shift;
     my ( $opt ) = @_;
     croak "config: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
@@ -233,13 +226,12 @@ sub __choose {
     }
     # ###
 
-    $self->{orig_list} = $orig_list_ref;
     local $\ = undef;
     local $, = undef;
     local $| = 1;
     $self->{wantarray} = wantarray;
     $self->__undef_to_defaults();
-    $self->__copy_orig_list();
+    $self->__copy_orig_list( $orig_list_ref );
     $self->__length_longest(); #
     $self->{col_width} = $self->{length_longest} + $self->{pad};
     local $SIG{'INT'} = sub {
@@ -261,7 +253,7 @@ sub __choose {
             if ( $self->{ll} ) {
                 return -1;
             }
-            $self->__copy_orig_list();
+            $self->__copy_orig_list( $orig_list_ref );
             $self->{default} = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
             if ( $self->{wantarray} && @{$self->{marked}} ) {
                 $self->{mark} = $self->__marked_rc2idx();
@@ -508,11 +500,11 @@ sub __choose {
                 $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                 my $chosen = $self->__marked_rc2idx();
                 $self->__reset_term( 1 );
-                return $index ? @$chosen : @{$self->{orig_list}}[@$chosen];
+                return $index ? @$chosen : @{$orig_list_ref}[@$chosen];
             }
             else {
                 my $i = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
-                my $chosen = $index ? $i : $self->{orig_list}[$i];
+                my $chosen = $index ? $i : $orig_list_ref->[$i];
                 $self->__reset_term( 1 );
                 return $chosen;
             }
@@ -571,8 +563,10 @@ sub __choose {
 
 sub __marked_idx2rc {
     my ( $self, $list_of_indexes, $boolean ) = @_;
+    my $last_list_idx = $#{$self->{list}};
     if ( $self->{current_layout} == 3 ) {
         for my $idx ( @$list_of_indexes ) {
+            next if $idx > $last_list_idx;
             $self->{marked}[$idx][0] = $boolean;
         }
         return;
@@ -581,6 +575,7 @@ sub __marked_idx2rc {
     my $cols_per_row = @{$self->{rc2idx}[0]};
     if ( $self->{order} == 0 ) {
         for my $idx ( @$list_of_indexes ) {
+            next if $idx > $last_list_idx;
             $row = int( $idx / $cols_per_row );
             $col = $idx % $cols_per_row;
             $self->{marked}[$row][$col] = $boolean;
@@ -590,6 +585,7 @@ sub __marked_idx2rc {
         my $rows_per_col = @{$self->{rc2idx}};
         my $end_last_full_col = $rows_per_col * ( $self->{rest} || $cols_per_row );
         for my $idx ( @$list_of_indexes ) {
+            next if $idx > $last_list_idx;
             if ( $idx <= $end_last_full_col ) {
                 $row = $idx % $rows_per_col;
                 $col = int( $idx / $rows_per_col );
@@ -637,8 +633,8 @@ sub __beep {
 
 
 sub __copy_orig_list {
-    my ( $self ) = @_;
-    $self->{list} = [ @{$self->{orig_list}} ];
+    my ( $self, $orig_list_ref ) = @_;
+    $self->{list} = [ @$orig_list_ref ];
     if ( $self->{ll} ) {
         for ( @{$self->{list}} ) {
             $_ = $self->{undef} if ! defined $_;
@@ -1073,7 +1069,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.510
+Version 1.511
 
 =cut
 
@@ -1104,7 +1100,6 @@ Object-oriented interface:
     my $choice = $new->choose( $array_ref );                       # single choice
     print "$choice\n";
 
-    $new->config( { justify => 1 } );
     my @choices = $new->choose( [ 1 .. 100 ] );                    # multiple choice
     print "@choices\n";
 
@@ -1135,7 +1130,7 @@ To set the different options it can be passed a reference to a hash as an option
 
 For detailed information about the options see L</OPTIONS>.
 
-=head2 config
+=head2 config DEPRECATED
 
     $new->config( \%options );
 
@@ -1458,7 +1453,7 @@ See C<INITIAL_TAB> and C<SUBSEQUENT_TAB> in L<Text::LineFold>.
 
 (default: undefined)
 
-=head2 ll UPDATE
+=head2 ll
 
 If all elements have the same length, the length can be passed with this option.
 
@@ -1492,7 +1487,8 @@ Allowed values: 1 or greater
 =head2 mark
 
 I<mark> expects as its value a reference to an array. The elements of the array are list indexes. C<choose> preselects
-the list-elements correlating to these indexes. This option has only meaning in list context.
+the list-elements correlating to these indexes. This option has only meaning in list context. Elements greater than the
+last index of the list are ignored.
 
 (default: undefined)
 
@@ -1545,10 +1541,11 @@ of L<Win32::Console>.
 
 =head2 no_spacebar
 
-I<no_spacebar> expects as its value a reference to an array. The elements of the array are indexes of choices which
+I<no_spacebar> expects as its value a reference to an array. The elements of the array are indexes of the list which
 should not be markable with the C<SpaceBar> or with the right mouse key. This option has only meaning in list context.
 If an element is preselected with the option I<mark> and also marked as not selectable with the option I<no_spacebar>,
-the user can not remove the preselection of this element.
+the user can not remove the preselection of this element. I<no_spacebar> elements greater than the last index of the
+list are ignored.
 
 (default: undefined)
 
@@ -1594,28 +1591,12 @@ default: "<undef>"
 
 =head2 croak
 
-C<new|config|choose> dies if
-
-=over
-
-=item * passed an invalid number of arguments.
-
-=item * passed an invalid argument.
-
-=item * passed an invalid option name.
-
-=item * passed an invalid option value.
-
-=back
+C<new|config|choose> dies if passed invalid arguments.
 
 =head2 carp
 
-=over
-
-=item * If after pressing a key L<Term::ReadKey>::ReadKey returns C<undef> C<choose> warns with C<EOT: $!> and returns
+If after pressing a key L<Term::ReadKey>::ReadKey returns C<undef> C<choose> warns with C<EOT: $!> and returns
 I<undef> or an empty list in list context.
-
-=back
 
 =head1 REQUIREMENTS
 

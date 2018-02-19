@@ -59,11 +59,7 @@
    "provides" : {
       "Class::DbC" : {
          "file" : "lib/Class/DbC.pm",
-         "version" : "0.000001"
-      },
-      "DbC" : {
-         "file" : "lib/DbC.pm",
-         "version" : "0.000001"
+         "version" : "0.000002"
       }
    },
    "release_status" : "stable",
@@ -77,7 +73,7 @@
          "web" : "https://github.com/arunbear/Class-DbC"
       }
    },
-   "version" : "0.000001",
+   "version" : "0.000002",
    "x_authority" : "cpan:ARUNBEAR",
    "x_contributors" : [
       "Arun Prasaad <arunbear@cpan.org>"

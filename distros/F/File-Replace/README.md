@@ -20,7 +20,7 @@ To install this module type the following:
 	make test
 	make install
 
-If you are running Windows, you may need to use `dmake` or `nmake`
+If you are running Windows, you may need to use `dmake`, `nmake`, or `gmake`
 instead of `make`.
 
 Dependencies

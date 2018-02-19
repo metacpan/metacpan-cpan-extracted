@@ -44,6 +44,7 @@ t/85-pwm_hw_mods.t
 t/90-servo.t
 t/manifest.t
 t/pod-coverage.t
+t/README
 t/RPiTest.pm
 test/adc.pl
 test/alt_mode.pl

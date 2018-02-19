@@ -13,7 +13,13 @@ my %prereq = (
 use version;
 my $gfsm_min_version = "0.0.15";
 if (Alien::Gfsm->install_type ne 'system') {
-  my $gfsm_alien_version = Alien::Gfsm->pkgconfig('gfsm')->keyword('Version');
+  my $gfsm_alien_version = (Alien::Gfsm->can('pkgconfig')
+			    ? Alien::Gfsm->pkgconfig('moot')->keyword('Version') ##-- RT bug #124235 with Alien::Base v0.41
+			    : (Alien::Gfsm->can('config')
+			       ? Alien::Gfsm->config('version')			 ##-- Alien::Base >= v0.41
+			       : undef));
+  die("Failed to determine \$gfsm_alien_version") if (!defined($gfsm_alien_version));
+
   (my $v_alien = $gfsm_alien_version) =~ s/\-/_/g;
   die("Required library libgfsm >= v$gfsm_min_version not found; we have v$gfsm_alien_version\n")
     if (version->parse($v_alien) < version->parse($gfsm_min_version));

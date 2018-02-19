@@ -387,8 +387,8 @@ HEADER
                      . 'defined($sub) ? $sub->($_) : CORE::int($_) } } '
                      . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : $_
-              } @{$array}
-            );
+            } @{$array}
+        );
     }
 
     sub _dump_lookups {
@@ -402,8 +402,8 @@ HEADER
                   : ref($_) ?    ('(map { ref($_) eq "Sidef::Types::String::String" ? $$_ : "$_" }'
                                . ($self->deparse_expr(ref($_) eq 'HASH' ? $_ : {self => $_})) . ')')
                   : qq{"\Q$_\E"}
-              } @{$array}
-            );
+            } @{$array}
+        );
     }
 
     sub _dump_var_attr {
@@ -427,7 +427,7 @@ HEADER
                                    'sub{'
                                  . $self->_dump_sub_init_vars($_->{init_vars}{vars}[0])
                                  . $self->deparse_generic('', ';', '', $_->{code}) . '}'
-                             } @{$_->{subset_blocks}}
+                           } @{$_->{subset_blocks}}
                          )
                          . ']'
                       )
@@ -1074,30 +1074,39 @@ HEADER
               . $self->deparse_block_with_scope($obj->{block});
         }
         elsif ($ref eq 'Sidef::Types::Block::ForIn') {
-
-            my $vars = $self->_dump_sub_init_vars(@{$obj->{vars}});
-
-            my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
-            my $expr  = $self->deparse_args($obj->{expr});
-
-            my $multi = 0;
-            if (
-                @{$obj->{vars}} > 1
-                or (@{$obj->{vars}} == 1
-                    and exists($obj->{vars}[0]{slurpy}))
-              ) {
-                $multi = 1;
-            }
-
             $self->load_mod('Sidef::Types::Block::Block');
 
-            $code =
-                'Sidef::Types::Block::Block::_iterate(sub { '
-              . 'my ($item) = @_; '
-              . 'local @_ = '
-              . ($multi ? '@{('      : '') . '$item'
-              . ($multi ? ')->to_a}' : '')
-              . "; $vars; $block }, $expr)";
+            my @vars = map { $self->_dump_sub_init_vars(@{$_->{vars}}) } @{$obj->{loops}};
+            my $block = 'do' . $self->deparse_block_with_scope($obj->{block});
+
+            my @loops = @{$obj->{loops}};
+
+            $code = $block;
+
+            while (@loops) {
+
+                my $loop = pop(@loops);
+                my $vars = pop @vars;
+                my $expr = $self->deparse_args($loop->{expr});
+
+                my $multi = 0;
+                if (
+                    @{$loop->{vars}} > 1
+                    or (@{$loop->{vars}} == 1
+                        and exists($loop->{vars}[0]{slurpy}))
+                  ) {
+                    $multi = 1;
+                }
+
+                $code =
+                    'Sidef::Types::Block::Block::_iterate(sub { '
+                  . 'my ($item) = @_; '
+                  . 'local @_ = '
+                  . ($multi ? '@{('      : '') . '$item'
+                  . ($multi ? ')->to_a}' : '')
+                  . "; $vars; $code }, $expr)"
+                  . (@loops ? ' // last' : '') . ';';
+            }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
             $code = '('
@@ -1118,7 +1127,7 @@ HEADER
                     map {
                         $self->_dump_string($_) . '=>'
                           . (defined($obj->{$_}) ? $self->deparse_expr({self => $obj->{$_}}) : 'undef')
-                      } sort keys(%{$obj})
+                    } sort keys(%{$obj})
                   )
                   . ')';
             }
@@ -1137,12 +1146,15 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::Given') {
             $self->top_add(q{no warnings 'experimental::smartmatch';});
+
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
+
             $code =
-                "do{given ((my ($vars) = "
+                "sub { my \@given_values; my \$continue = 1; my \$given_value = (my ($vars) = "
               . $self->deparse_args($obj->{expr})
-              . ')[-1])'
-              . $self->deparse_block_with_scope($obj->{block}) . '}';
+              . ')[-1];' . 'do'
+              . $self->deparse_block_with_scope($obj->{block})
+              . '; wantarray ? @given_values : $given_values[-1] }->()';
         }
         elsif ($ref eq 'Sidef::Types::Block::When') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
@@ -1152,7 +1164,11 @@ HEADER
                 $arg = "(my ($vars) = $arg)[-1]";
             }
 
-            $code = 'when($_~~' . $arg . ')' . $self->deparse_block_with_scope($obj->{block});
+            $code =
+                "if (\$continue) {my \$t = $arg;"
+              . "if (defined(\$given_value) ? defined(\$t) ? (\$given_value ~~ \$t) : 0 : 1) {"
+              . "\$continue = 0; \@given_values = do"
+              . $self->deparse_block_with_scope($obj->{block}) . "}};";
         }
         elsif ($ref eq 'Sidef::Types::Block::Case') {
             my $vars = join(',', map { $self->_dump_var($_) } @{$obj->{block}{init_vars}{vars}});
@@ -1162,10 +1178,17 @@ HEADER
                 $arg = "(my ($vars) = $arg)[-1]";
             }
 
-            $code = 'when(!!' . $arg . ')' . $self->deparse_block_with_scope($obj->{block});
+            $code =
+                "if (\$continue and $arg) { \$continue = 0;"
+              . "\@given_values = do"
+              . $self->deparse_block_with_scope($obj->{block}) . '}';
         }
         elsif ($ref eq 'Sidef::Types::Block::Default') {
-            $code = 'default' . $self->deparse_block_with_scope($obj->{block});
+            $code =
+              "if (\$continue) { \$continue = 0; \@given_values = do" . $self->deparse_block_with_scope($obj->{block}) . '}';
+        }
+        elsif ($ref eq 'Sidef::Types::Block::Continue') {
+            $code = '$continue = 1';
         }
         elsif ($ref eq 'Sidef::Types::Block::With') {
             $code = 'do{';
@@ -1187,7 +1210,7 @@ HEADER
         elsif ($ref eq 'Sidef::Types::Block::Gather') {
             $self->load_mod("Sidef::Types::Array::Array");
             $code =
-                "do{my \@_$refaddr;"
+                "do{my \@_$refaddr;" . 'do'
               . $self->deparse_block_with_scope($obj->{block})
               . "; bless(\\\@_$refaddr, 'Sidef::Types::Array::Array')}";
         }
@@ -1206,9 +1229,6 @@ HEADER
         }
         elsif ($ref eq 'Sidef::Types::Block::Next') {
             $code = 'next';
-        }
-        elsif ($ref eq 'Sidef::Types::Block::Continue') {
-            $code = 'continue';
         }
         elsif ($ref eq 'Sidef::Types::Block::Return') {
 
@@ -1302,7 +1322,7 @@ HEADER
                 map {
                     my ($type, $content) = $obj->{$_}->_dump;
                     'Sidef::Types::Number::Number->_set_str(' . "'$type', '$content'" . ')'
-                  } ('from', 'to', 'step')
+                } ('from', 'to', 'step')
             );
         }
         elsif ($ref eq 'Sidef::Types::Glob::Backtick') {
@@ -1323,27 +1343,32 @@ HEADER
             if ($obj->{act} eq 'assert') {
 
                 # Check arity
-                @args == 1
-                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
-                  . " $obj->{file} line $obj->{line} (expected 1 argument)\n";
+                @args > 2
+                  and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " $obj->{file} line $obj->{line} (expected 1 or 2 arguments)\n";
 
                 # Generate code
-                $code = qq~do{my \$a$refaddr = do{$args[0]}; \$a$refaddr or CORE::die "$obj->{act}(\$a$refaddr) failed ~
+                $code =
+                    qq~do{my \$a$refaddr = do{$args[0]}; ~
+                  . qq~my \$m$refaddr = do{$args[1]} // "$obj->{act}(\$a$refaddr)";~
+                  . qq~\$a$refaddr or CORE::die "\$m$refaddr failed ~
                   . qq~at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {
 
                 # Check arity
-                @args == 2
-                  or die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
-                  . " $obj->{file} line $obj->{line} (expected 2 arguments)\n";
+                @args > 3
+                  and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
+                  . " $obj->{file} line $obj->{line} (expected 2 or 3 arguments)\n";
 
                 # Generate code
                 $code = "do{"
                   . "my \$a$refaddr = do{$args[0]};"
                   . "my \$b$refaddr = do{$args[1]};"
-                  . ($obj->{act} eq 'assert_ne' ? qq{CORE::not(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
-                  . qq~ or CORE::die "$obj->{act}(\${\\join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr))})~
+                  . "my \$m$refaddr = do{$args[2]} // ('$obj->{act}('."
+                  . qq~join(', ',map{UNIVERSAL::can(\$_,'dump') ? \$_->dump : \$_}(\$a$refaddr, \$b$refaddr)) . ')');~
+                  . ($obj->{act} eq 'assert_ne' ? qq{!(\$a$refaddr eq \$b$refaddr)} : qq{\$a$refaddr eq \$b$refaddr})
+                  . qq~ or CORE::die "\$m$refaddr~
                   . qq~ failed at \Q$obj->{file}\E line $obj->{line}\\n"}~;
             }
         }

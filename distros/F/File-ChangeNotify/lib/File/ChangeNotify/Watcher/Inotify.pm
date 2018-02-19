@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use File::Find ();
 use Linux::Inotify2 1.2;
@@ -115,7 +115,8 @@ sub _build_mask {
     my $self = shift;
 
     my $mask
-        = IN_MODIFY | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF;
+        = IN_MODIFY | IN_CREATE | IN_DELETE | IN_DELETE_SELF | IN_MOVE_SELF
+        | IN_MOVED_TO;
     $mask |= IN_DONT_FOLLOW unless $self->follow_symlinks();
 
     return $mask;
@@ -201,7 +202,7 @@ sub _convert_event {
     return $self->event_class()->new(
         path => $event->fullname(),
         type => (
-              $event->IN_CREATE() ? 'create'
+              $event->IN_CREATE() || $event->IN_MOVED_TO() ? 'create'
             : $event->IN_MODIFY() ? 'modify'
             : $event->IN_DELETE() ? 'delete'
             :                       'unknown'
@@ -227,7 +228,7 @@ File::ChangeNotify::Watcher::Inotify - Inotify-based watcher subclass
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 
@@ -253,7 +254,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

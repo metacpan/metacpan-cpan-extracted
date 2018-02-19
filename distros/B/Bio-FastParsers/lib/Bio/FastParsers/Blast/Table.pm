@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Table;
-# ABSTRACT: front-end class for tabular BLAST parser
-$Bio::FastParsers::Blast::Table::VERSION = '0.180330';
+# ABSTRACT: Front-end class for tabular BLAST parser
+$Bio::FastParsers::Blast::Table::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -79,7 +79,7 @@ sub next_hsp {
                   || $line =~ $EMPTY_LINE;
 
         # process HSP line
-        my @fields = ( split(/\t/xms, $line), 1, 1 );
+        my @fields = ( split(/\t/xms, $line), +1, +1 );
 
         # Fields for m8/m9 (now 6/7) format:
         #   0.  query id
@@ -181,11 +181,11 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Blast::Table - front-end class for tabular BLAST parser
+Bio::FastParsers::Blast::Table - Front-end class for tabular BLAST parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ version 0.180330
     my $report = Table->new( file => $infile );
 
     # loop through hsps
-    while (my $hsp = $hit->next_hsp) {
+    while (my $hsp = $report->next_hsp) {
         my ($hit_id, $evalue) = ($hsp->hit_id, $hsp->evalue);
         # ...
     }
@@ -207,14 +207,17 @@ version 0.180330
     my $report = Table->new( file => $infile );
 
     # loop through first hits for each query
-    while (my $first_hit = $hit->next_query) {
+    while (my $first_hit = $report->next_query) {
         my ($hit_id, $evalue) = ($hsp->hit_id, $hsp->evalue);
         # ...
     }
 
 =head1 DESCRIPTION
 
-    # TODO
+This module implements a parser for the standard tabular output format of the
+BLAST program (e.g., C<-outfmt 7>). It provides methods for iterating over
+queries, hits and HSPs (e.g., C<next_hsp>). Individual HSPs can then be
+queried using methods described in L<Bio::FastParsers::Blast::Table::Hsp>.
 
 =head1 ATTRIBUTES
 

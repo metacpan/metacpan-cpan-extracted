@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.15 2018-02-15T22:35:36+0100
+ - Require JSON::Validator 2.03
+
 0.14 2017-12-23T17:10:22+0100
  - Add call_p() that returns a Mojo::Promise
 

@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+
+# Play the top repeated note phrases of a MIDI file.
+
+use strict;
+use warnings;
+
+use MIDI::Ngram;
+use Getopt::Long;
+
+my %opts = (
+    file    => undef,    # MIDI file to process
+    size    => 2,        # ngram size
+    max     => 20,       # -1 for all records
+    bpm     => 100,      # Beats per minute
+    dura    => 'qn tqn', # Note durations
+    out     => "$0.mid", # Output MIDI file
+    pause   => '',       # Insert a rest after each phrase
+    analyze => '',       # Analyze all channels
+    loop    => 4,        # Times to choose a weighted phrase
+    weight  => 0,        # Use weighted counts to play
+    ranp    => 0,        # Random patch instead of all piano
+    shuf    => 0,        # Shuffle phrases
+    single  => 0,        # Allow phrases seen only once
+    one     => 0,        # Analyze phrases into one list
+    gestalt => 0,        # Show pitch bounds
+);
+GetOptions( \%opts, 
+    'help|?',
+    'man',
+    'file=s',
+    'size=i',
+    'max=i',
+    'bpm=i',
+    'dura=s',
+    'out=s',
+    'pause=s',
+    'analyze=s',
+    'loop=i',
+    'weight',
+    'ranp',
+    'shuf',
+    'single',
+    'one',
+    'gestalt',
+) or die 'Failed GetOptions';
+
+die "Invalid file: $!"
+    unless $opts{file} && -e $opts{file};
+
+# Turn string lists into arrayrefs
+$opts{dura}    = [ split /(?:\s+|\s*,\s*)/, $opts{dura} ];
+$opts{analyze} = [ split /(?:\s+|\s*,\s*)/, $opts{analyze} ];
+
+# General MIDI patches that are audible and aren't horrible
+my @patches = qw(
+    0 1 2 4 5 7 8 9
+    13 16 21 24 25 26
+    32 34 35 40 42 60
+    68 69 70 71 72 73
+    74 79
+);
+
+my $mng = MIDI::Ngram->new(
+    in_file         => $opts{file},
+    ngram_size      => $opts{size},
+    max_phrases     => $opts{max},
+    bpm             => $opts{bpm},
+    durations       => $opts{dura},
+    out_file        => $opts{out},
+    pause_duration  => $opts{pause},
+    analyze         => $opts{analyze},
+    random_patch    => $opts{ranp},
+    loop            => $opts{loop},
+    weight          => $opts{weight},
+    shuffle_phrases => $opts{shuf},
+    single_phrases  => $opts{single},
+    one_channel     => $opts{one},
+    gestalt         => $opts{gestalt},
+    patches         => \@patches,
+);
+
+my $analysis = $mng->process;
+print $analysis;
+
+if ( $opts{out} ) {
+    my $playback = $mng->populate;
+    print $playback;
+
+    $mng->write;
+}

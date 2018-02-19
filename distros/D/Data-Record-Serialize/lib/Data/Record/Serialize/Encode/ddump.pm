@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::ddump;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Data::Dumper;
 
@@ -28,7 +28,12 @@ before BUILD => sub {
 #pod =cut
 
 
-sub encode { shift; goto &Data::Dumper::Dumper; }
+sub encode {
+    shift;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Trailingcomma = 1;
+    Data::Dumper::Dumper( @_ ) . ",\n";
+}
 
 with 'Data::Record::Serialize::Role::Encode';
 
@@ -43,7 +48,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -56,7 +61,9 @@ version 0.12
 =head1 DESCRIPTION
 
 B<Data::Record::Serialize::Encode::ddump> encodes a record using
-L<B<Data::Dumper>>.
+L<B<Data::Dumper>>.  The resultant encoding may be decoded via
+
+  @data = eval $buf;
 
 It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 
@@ -115,7 +122,9 @@ __END__
 #pod =head1 DESCRIPTION
 #pod
 #pod B<Data::Record::Serialize::Encode::ddump> encodes a record using
-#pod L<B<Data::Dumper>>.
+#pod L<B<Data::Dumper>>.  The resultant encoding may be decoded via
+#pod
+#pod   @data = eval $buf;
 #pod
 #pod It performs the L<B<Data::Record::Serialize::Role::Encode>> role.
 #pod

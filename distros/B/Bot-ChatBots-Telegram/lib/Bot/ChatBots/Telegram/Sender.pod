@@ -48,8 +48,9 @@ Accessor for the L<WWW::Telegram::BotAPI> object, if you want to use it or set
 a new one.
 
 By default, when needed one is instantiated lazily based on the available
-C<token> and with the current L</async> setting. This lazy initialization also
-takes care to start L<Mojo::IOLoop> if it's not already running.
+C<token> (C</async> set to C<1>). This lazy initialization also takes care
+to start L<Mojo::IOLoop> if it's not already running and subject to
+L</start_loop>.
 
 =head2 B<< token >>
 

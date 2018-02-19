@@ -1,6 +1,6 @@
 package Lab::Connection::Socket;
 #ABSTRACT: IP socket connection
-$Lab::Connection::Socket::VERSION = '3.613';
+$Lab::Connection::Socket::VERSION = '3.620';
 use Lab::Bus::Socket;
 use Lab::Connection;
 use Lab::Exception;
@@ -58,11 +58,11 @@ Lab::Connection::Socket - IP socket connection
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2012       David Kalok
             2013       Andreas K. Huettel

@@ -2,8 +2,7 @@
 
 #
 # dbrowdiff.pm
-# Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
-# $Id: 17b7079e396a9ac89246edb3bd38b8b7e8d021c4 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -232,13 +231,13 @@ sub setup ($) {
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
 
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     foreach (qw(absdiff pctdiff)) {
 	$self->{_out}->col_create($_)
-	    or croak $self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n");
     };
 }
 
@@ -287,7 +286,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

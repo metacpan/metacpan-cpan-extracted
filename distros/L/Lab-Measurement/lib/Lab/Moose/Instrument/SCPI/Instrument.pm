@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Instrument;
-$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.613';
+$Lab::Moose::Instrument::SCPI::Instrument::VERSION = '3.620';
 #ABSTRACT: Role for SCPI INSTrument subsystem.
 
 use Moose::Role;
@@ -42,7 +42,7 @@ Lab::Moose::Instrument::SCPI::Instrument - Role for SCPI INSTrument subsystem.
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -56,7 +56,7 @@ Query/Set instrument channel for multi-channel instruments.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

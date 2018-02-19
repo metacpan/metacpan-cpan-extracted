@@ -8,13 +8,13 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
+#include "bstree.h"
 
 #pragma push_macro("free")
 #pragma push_macro("malloc")
 #undef free
 #undef malloc
 #include "queue.h" // will be used outside of the main thread
-#include "bstree.h"
 #pragma pop_macro("free")
 #pragma pop_macro("malloc")
 
@@ -56,6 +56,8 @@ int _dl_phdr_cb(struct dl_phdr_info *info, size_t size, void *data) {
 }
 #endif
 
+typedef struct DNS_result DNS_result;
+
 typedef struct {
     pthread_mutex_t mutex;
     pthread_attr_t thread_attrs;
@@ -82,18 +84,19 @@ typedef struct {
     char *host;
     char *service;
     struct addrinfo *hints;
-    int fd0;
     char extra;
     char pool;
+    DNS_result *res;
 } DNS_thread_arg;
 
-typedef struct {
+struct DNS_result {
     int fd1;
     int error;
     struct addrinfo *hostinfo;
     int type;
     DNS_thread_arg *arg;
-} DNS_result;
+    char dequeued;
+};
 
 queue *DNS_instances = NULL;
 
@@ -104,18 +107,14 @@ void *DNS_getaddrinfo(void *v_arg) {
         pthread_sigmask(SIG_BLOCK, &arg->self->blocked_sig, NULL);
 #endif
     
-    pthread_mutex_lock(&arg->self->mutex);
-    DNS_result *res = bstree_get(arg->self->fd_map, arg->fd0);
-    pthread_mutex_unlock(&arg->self->mutex);
-    
     if (arg->self->notify_on_begin)
-        write(res->fd1, "1", 1);
-    res->error = getaddrinfo(arg->host, arg->service, arg->hints, &res->hostinfo);
+        write(arg->res->fd1, "1", 1);
+    arg->res->error = getaddrinfo(arg->host, arg->service, arg->hints, &arg->res->hostinfo);
     
     pthread_mutex_lock(&arg->self->mutex);
-    res->arg = arg;
+    arg->res->arg = arg;
     if (arg->extra) arg->self->extra_threads_cnt--;
-    write(res->fd1, "2", 1);
+    write(arg->res->fd1, "2", 1);
     pthread_mutex_unlock(&arg->self->mutex);
     
     return NULL;
@@ -474,15 +473,16 @@ _getaddrinfo(Net_DNS_Native *self, char *host, SV* sv_service, SV* sv_hints, int
         res->hostinfo = NULL;
         res->type = type;
         res->arg = NULL;
+        res->dequeued = 0;
         
         DNS_thread_arg *arg = malloc(sizeof(DNS_thread_arg));
         arg->self = self;
         arg->host = strlen(host) ? savepv(host) : NULL;
         arg->service = strlen(service) ? savepv(service) : NULL;
         arg->hints = hints;
-        arg->fd0 = fd[0];
         arg->extra = 0;
         arg->pool  = 0;
+        arg->res = res;
         
         pthread_mutex_lock(&self->mutex);
         DNS_free_timedout(self, 0);
@@ -602,6 +602,7 @@ DESTROY(Net_DNS_Native *self)
                 
                 while (!queue_iterator_end(it)) {
                     arg = queue_at(self->in_queue, it);
+                    arg->res->dequeued = 1;
                     free(arg);
                     queue_iterator_next(it);
                 }
@@ -643,21 +644,24 @@ DESTROY(Net_DNS_Native *self)
             char buf[1];
             
             for (i=0, l=bstree_size(self->fd_map); i<l; i++) {
-                for (j=0; j<2; j++) {
-                    read(fds[i], buf, 1);
-                    // notify_on_begin may send 1
-                    if (buf[0] == '2') break;
+                DNS_result *res = bstree_get(self->fd_map, fds[i]);
+                
+                if (!res->dequeued) {
+                    for (j=0; j<2; j++) {
+                        read(fds[i], buf, 1);
+                        // notify_on_begin may send 1
+                        if (buf[0] == '2') break;
+                    }
+                    
+                    if (!res->error && res->hostinfo) freeaddrinfo(res->hostinfo);
+                    if (res->arg->hints)   free(res->arg->hints);
+                    if (res->arg->host)    Safefree(res->arg->host);
+                    if (res->arg->service) Safefree(res->arg->service);
+                    free(res->arg);
                 }
                 
-                DNS_result *res = bstree_get(self->fd_map, fds[i]);
                 close(res->fd1);
                 close(fds[i]);
-                
-                if (!res->error && res->hostinfo) freeaddrinfo(res->hostinfo);
-                if (res->arg->hints)   free(res->arg->hints);
-                if (res->arg->host)    Safefree(res->arg->host);
-                if (res->arg->service) Safefree(res->arg->service);
-                free(res->arg);
                 free(res);
             }
             

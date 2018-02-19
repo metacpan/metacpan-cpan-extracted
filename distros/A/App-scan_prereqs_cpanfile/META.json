@@ -4,7 +4,7 @@
       "tokuhirom <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.2.0",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -41,17 +41,16 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Test::Requires::Scanner" : "0"
-         },
          "requires" : {
             "CPAN::Meta" : "0",
             "CPAN::Meta::Requirements" : "0",
+            "Exporter" : "5.57",
             "Getopt::Long" : "0",
             "Module::CPANfile" : "0.9020",
             "Module::CoreList" : "0",
             "Module::Metadata" : "0",
             "Perl::PrereqScanner::Lite" : "0.21",
+            "Test::Requires::Scanner" : "0",
             "perl" : "5.008005",
             "version" : "0"
          }
@@ -65,7 +64,7 @@
    "provides" : {
       "App::scan_prereqs_cpanfile" : {
          "file" : "lib/App/scan_prereqs_cpanfile.pm",
-         "version" : "1.03"
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
@@ -79,13 +78,16 @@
          "web" : "https://github.com/tokuhirom/App-scan_prereqs_cpanfile"
       }
    },
-   "version" : "1.03",
+   "version" : "1.10",
    "x_contributors" : [
-      "Syohei YOSHIDA <syohex@gmail.com>",
-      "Kan Fushihara <kan.fushihara@gmail.com>",
+      "Alex Efros <powerman@powerman.name>",
       "HIROSE Masaaki <hirose31@gmail.com>",
-      "Songmu <y.songmu@gmail.com>",
-      "moznion <moznion@gmail.com>",
-      "Alex Efros <powerman@powerman.name>"
-   ]
+      "Kan Fushihara <kan.fushihara@gmail.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Simon Meggle <simon.meggle@consol.de>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "moznion <moznion@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

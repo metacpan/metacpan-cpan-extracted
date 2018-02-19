@@ -6,18 +6,20 @@ use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw( looks_like_number );
 
-our $VERSION = '0.16';
+our $VERSION = '0.18';
 
 our @EXPORT_OK = qw(
-    colorbar
-    colormap
+    add_mapping
     color2rgb
-    rgb2color
+    color_table
+    colorbar
+    colored
+    colored_text
+    colormap
+    colormap_names
     print_colored
     print_colored_text
-    color_table
-    add_mapping
-    colormap_names
+    rgb2color
 );
 
 my $color_mapping = {};
@@ -248,9 +250,24 @@ sub print_colored_text {
 
 sub _print_with_color {
     my ($bg_or_fg, $color, $txt) = @_;
+    print _get_colored_string($bg_or_fg, $color, $txt);
+}
+
+sub colored {
+    my ($color, $txt) = @_;
+    return _get_colored_string('bg', $color, $txt)
+}
+
+sub colored_text {
+    my ($color, $txt) = @_;
+    return _get_colored_string('fg', $color, $txt)
+}
+
+sub _get_colored_string {
+    my ($bg_or_fg, $color, $txt) = @_;
 
     my $code = $bg_or_fg eq 'fg' ? 38 : 48;
-    print "\x1b[${code};5;${color}m" . $txt . "\x1b[0m";
+    return "\x1b[${code};5;${color}m" . $txt . "\x1b[0m";
 }
 
 1; # End of Term::Colormap
@@ -268,7 +285,7 @@ Term::Colormap - Colormaps for ANSI 256 Color Terminals!
 
 =head1 VERSION
 
-Version 0.16
+Version 0.18
 
 =head1 SYNOPSIS
 
@@ -284,16 +301,41 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
 
 =head1 EXPORT
 
-    colorbar
-    colormap
+    add_mapping
     color2rgb
+    color_table
+    colorbar
+    colored
+    colored_text
+    colormap
+    colormap_names
     print_colored
     print_colored_text
-    color_table
-    add_mapping
-    colormap_names
+    rgb2color
 
 =head1 SUBROUTINES/METHODS
+
+=head2 add_mapping
+
+    Add custom colormaps to the list of available colormaps.
+
+    add_mapping('my_colors', [ 1, 3, 5, 7, 9 ])
+
+    color_table('my_colors');
+
+=head2 color2rgb
+
+    Returns rgb value for a color value.
+
+    my $rgb = color2rgb( 255 ); #eeeeee  Very Light Gray
+
+=head2 color_table
+
+    Print color table (color, number, rgb) for a colormap.
+
+    my $rainbow = colormap('rainbow');
+
+    color_table($rainbow);
 
 =head2 colorbar
 
@@ -304,6 +346,22 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
     colorbar($rainbow);          # Prints horizontal colorbar,  2 characters wide per color
     colorbar($rainbow, 3);       # Prints horizontal colorbar,  3 characters wide per color
     colorbar($rainbow, 10, 'v'); # Prints   vertical colorbar, 10 characters wide per color
+
+=head2 colored
+
+    Returns a background colored string which can be printed.
+
+    my $colorful_string = colored( $rainbow->[3], "Text with orange background" );
+
+    print $colorful_string . "\n";
+
+=head2 colored_text
+
+    Returns a colored string which can be printed.
+
+    my $colorful_string = colored( $rainbow->[3], "Orange Text" );
+
+    print $colorful_string . "\n";
 
 =head2 colormap
 
@@ -317,17 +375,11 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
 
     my $ash = colormap('ash');
 
-=head2 color2rgb
+=head2 colormap_names
 
-    Returns rgb value for a color value.
+    Returns the list of available colormaps.
 
-    my $rgb = color2rgb( 255 ); #eeeeee  Very Light Gray
-
-=head2 rgb2color
-
-    Returns color value for an rgb color
-
-    my $color = rgb2color( 'eeeeee' ); 255  Very Light Gray
+    my @available_colormaps = colormap_names();
 
 =head2 print_colored
 
@@ -345,27 +397,11 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
 
     print_colored_text( $rainbow->[3], "Orange Text" );
 
-=head2 color_table
+=head2 rgb2color
 
-    Print color table (color, number, rgb) for a colormap.
+    Returns color value for an rgb color
 
-    my $rainbow = colormap('rainbow');
-
-    color_table($rainbow);
-
-=head2 add_mapping
-
-    Add custom colormaps to the list of available colormaps.
-
-    add_mapping('my_colors', [ 1, 3, 5, 7, 9 ])
-
-    color_table('my_colors');
-
-=head2 colormap_names
-
-    Returns the list of available colormaps.
-
-    my @available_colormaps = colormap_names();
+    my $color = rgb2color( 'eeeeee' ); 255  Very Light Gray
 
 =head1 AVAILABLE COLORMAPS
 

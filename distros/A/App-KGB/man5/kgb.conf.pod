@@ -57,7 +57,7 @@ SOAP service name. Defaults to C<KGB>.
 
 =head2 pid_dir
 
-Directory to store PID file to. Defautls to F</var/run/kgb-bot/>.
+Directory to store PID file to. Defaults to F</var/run/kgb-bot/>.
 
 =head2 include
 
@@ -270,7 +270,7 @@ The separator before the commit log. Default: none.
      # private: yes
  # Some witty answer for people that talk to the bot
  #smart_answers:
- #  - "I wont speak with you!"
+ #  - "I won't speak with you!"
  #  - "Do not disturb!"
  #  - "Leave me alone, I am buzy!"
  # Admins are allowed some special !commands (currently only !version)

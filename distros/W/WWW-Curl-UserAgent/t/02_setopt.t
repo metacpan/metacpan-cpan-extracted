@@ -4,7 +4,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Test::More tests => 22;
+use Test::More tests => 25;
 
 use HTTP::Request;
 use Sub::Override;
@@ -47,6 +47,16 @@ BEGIN {
 
     is $curlopt{WWW::Curl::Easy::CURLOPT_HTTPGET}, undef, 'no GET request';
     is $curlopt{WWW::Curl::Easy::CURLOPT_UPLOAD},  1,     'PUT request';
+    is $curlopt{WWW::Curl::Easy::CURLOPT_INFILESIZE}, length 'content', 'content length';
+}
+
+{
+    note 'PATCH request';
+
+    my %curlopt = request( HTTP::Request->new( PATCH => 'dummy', [], 'content' ) );
+
+    is $curlopt{WWW::Curl::Easy::CURLOPT_HTTPGET}, undef, 'no GET request';
+    is $curlopt{WWW::Curl::Easy::CURLOPT_UPLOAD},  1,     'PATCH request';
     is $curlopt{WWW::Curl::Easy::CURLOPT_INFILESIZE}, length 'content', 'content length';
 }
 

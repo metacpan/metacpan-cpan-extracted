@@ -4,7 +4,7 @@
       "Hao Wu <echowuhao@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Minilla/v3.0.14",
    "license" : [
       "perl_5"
    ],
@@ -20,22 +20,29 @@
          "inc",
          "share",
          "eg",
-         "examples"
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.036"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
          "requires" : {
+            "HTTP::Tiny" : "0",
             "Moose" : "0",
             "URI::Escape" : "0",
             "XML::LibXML" : "0",
@@ -48,22 +55,27 @@
          }
       }
    },
+   "provides" : {
+      "WebService::MerriamWebster" : {
+         "file" : "lib/WebService/MerriamWebster.pm",
+         "version" : "0.14"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/swuecho/Net-MW-API/issues"
+         "web" : "https://github.com/swuecho/WebService_MerriamWebster/issues"
       },
-      "homepage" : "https://github.com/swuecho/Net-MW-API",
+      "homepage" : "https://github.com/swuecho/WebService_MerriamWebster",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/swuecho/Net-MW-API.git",
-         "web" : "https://github.com/swuecho/Net-MW-API"
+         "url" : "git://github.com/swuecho/WebService_MerriamWebster.git",
+         "web" : "https://github.com/swuecho/WebService_MerriamWebster"
       }
    },
-   "version" : "0.11",
+   "version" : "0.14",
    "x_contributors" : [
-      "Hao <echowuhao@gmail.com>",
-      "Hao Wu <hwu@intellisurvey.com>"
-   ]
+      "Hao Wu <hwu@intellisurvey.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
-

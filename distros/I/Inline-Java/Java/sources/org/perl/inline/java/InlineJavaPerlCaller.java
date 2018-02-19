@@ -10,7 +10,7 @@ import java.io.* ;
 public class InlineJavaPerlCaller {
 	private InlineJavaServer ijs = InlineJavaServer.GetInstance() ;
 	private Thread creator = null ;
-	static private Map thread_callback_queues = Collections.synchronizedMap(new HashMap()) ;
+	static private Map<Thread, InlineJavaCallbackQueue> thread_callback_queues = Collections.synchronizedMap(new HashMap<Thread, InlineJavaCallbackQueue>()) ;
 	static private ResourceBundle resources = null ;
 	static private boolean inited = false ;
 
@@ -47,26 +47,6 @@ public class InlineJavaPerlCaller {
 
 	static protected ResourceBundle GetBundle(){
 		return resources ;
-	}
-
-	/* Old interface */
-	/**
-	 * @deprecated  As of 0.48, replaced by {@link #CallPerlSub(String,Object[])}
-	 */
-	public Object CallPerl(String pkg, String method, Object args[]) throws InlineJavaException, InlineJavaPerlException {
-		return CallPerl(pkg, method, args, null) ;
-	}
-
-
-	/* Old interface */
-	/**
-	 * @deprecated  As of 0.48, replaced by {@link #CallPerlSub(String,Object[],Class)}
-	 */
-	public Object CallPerl(String pkg, String method, Object args[], String cast) throws InlineJavaException, InlineJavaPerlException {
-		InlineJavaCallback ijc = new InlineJavaCallback(
-			(String)null, pkg + "::" + method, args, 
-			(cast == null ? null : InlineJavaClass.ValidateClass(cast))) ; 
-		return CallPerl(ijc) ;
 	}
 
 
@@ -128,12 +108,12 @@ public class InlineJavaPerlCaller {
 
 
 	public Object require_file(String file) throws InlineJavaPerlException, InlineJavaException {
-		return CallPerlSub("Inline::Java::Callback::java_require", new Object [] {file, new Boolean("true")}) ;
+		return CallPerlSub("Inline::Java::Callback::java_require", new Object [] {file, Boolean.TRUE}) ;
 	}
 	
 	
 	public Object require_module(String module) throws InlineJavaPerlException, InlineJavaException {
-		return CallPerlSub("Inline::Java::Callback::java_require", new Object [] {module, new Boolean("false")}) ;
+		return CallPerlSub("Inline::Java::Callback::java_require", new Object [] {module, Boolean.FALSE}) ;
 	}
 	
 

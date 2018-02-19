@@ -1,3 +1,8 @@
+0.022   2018-02-13
+
+        * Convert License module to CC0_1_0 .
+        * Remove t/0-signature.t .
+
 0.021   2017-09-30
 
         * Correct some typos in the documentation.

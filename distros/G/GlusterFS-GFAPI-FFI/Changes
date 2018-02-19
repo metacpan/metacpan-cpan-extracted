@@ -1,0 +1,21 @@
+0.4
+
+    - provides convenient classes under GlusterFS::GFAPI::FFI::*
+    - unit-test with mocking up
+
+0.3
+
+    - supports scatter/gather I/O
+    - provides GlusterFS::GFAPI::FFI::File class
+
+0.2     2018-02-01 15:30:40 Asia/Seoul
+
+    - supports and verified all functions that excepts *_async()
+
+0.1     2017-05-17 17:23:53 Asia/Seoul
+
+    - supports and verified default facility functions
+
+0.01    2017-05-13 19:21:45 Asia/Seoul
+
+    - Initial release

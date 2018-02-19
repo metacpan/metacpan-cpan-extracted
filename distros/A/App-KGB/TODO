@@ -59,3 +59,5 @@
    - requires no effort
   Cons:
    - requires small effort (×3) every now and then
+
+* (wishlist) Immplement a command to make the bot re-join #channels.

@@ -2,8 +2,7 @@
 
 #
 # dbfilealter.pm
-# Copyright (C) 2008-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 452833c6982aef27189f6f944be088d26f6413e2 $
+# Copyright (C) 2008-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -354,14 +353,14 @@ sub run ($) {
 		};
 	    }';
     eval $loop_sub_code;
-    $@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error: $@.\n");
 
     &$loop_sub();
 }
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2008-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2008-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

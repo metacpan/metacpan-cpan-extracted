@@ -21,7 +21,7 @@ use vars qw/$VERSION/;
 # Load Tk module
 use Tk;
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 =head1 EXTERNAL MODULES
 
@@ -63,7 +63,7 @@ sub new {
   } else {
     $ET->{X_SIZE} = 200;
     $ET->{Y_SIZE} = 200;
-  }    
+  }
 
   bless($ET, $class);
 
@@ -81,14 +81,14 @@ sub new {
     for ($i=0;$i<$numy;$i++) {
       $frame = $screen->Frame;
       for ($j=0;$j<$numx;$j++) {
-	$ET->{CANVAS}[$i*$numy + $j] = $frame->Canvas(
+        $ET->{CANVAS}[$i*$numy + $j] = $frame->Canvas(
             -background=>"LightCyan3",
-            -relief => 'raised', 
+            -relief => 'raised',
             -width  => $ET->{X_SIZE},
             -height => $ET->{Y_SIZE},
             -cursor => 'top_left_arrow',
-	);
-	$ET->{CANVAS}[$i*$numy + $j]->pack(-side => 'left', -fill => 'x');
+        );
+        $ET->{CANVAS}[$i*$numy + $j]->pack(-side => 'left', -fill => 'x');
       }
       $frame->pack(-side=>'top');
     }
@@ -98,7 +98,7 @@ sub new {
     $ET->{MW}->resizable(0,0);
     $ET->{CANVAS} = $ET->{MW}->Canvas(
           -background=>"LightCyan3",
-          -relief => 'raised', 
+          -relief => 'raised',
           -width  => $ET->{X_SIZE},
           -height => $ET->{Y_SIZE},
           -cursor => 'top_left_arrow',
@@ -202,7 +202,7 @@ Sets and returns the number of canvases.
   $numCan = $plotter->numCanvases();
   $plotter->numCanvases(3);
 
-=cut 
+=cut
 
 sub numCanvases {
   my $self = shift;
@@ -468,7 +468,7 @@ sub worldToPixRatio {
     my ($x, $y) = $self->photoWorldSize();
     $x = $x/$self->origPhot()->width;
     $y = $y/$self->origPhot()->height;
-    $self->worldToPixRatio ($x, $y); 
+    $self->worldToPixRatio ($x, $y);
   }
   return ($self->{W_RATIO_X}, $self->{W_RATIO_Y});
 }
@@ -696,7 +696,7 @@ sub printCanvas {
 }
 
 
-=item flushGraphics 
+=item flushGraphics
 
 This function is not used in this module but should be included as the
 last command before you want your graphics to appear.  Allows for easy
@@ -729,7 +729,7 @@ sub configureTag {
 
 =item bindTag
 
-Binds the items with the given tag.  
+Binds the items with the given tag.
 
   $plotter->bindTag ('oval', '<Any-Enter>' => sub {print "hello"});
 
@@ -821,16 +821,16 @@ sub drawTextVert {
     $num = s/\..+//;
     $font = $before . $num  . '0' . $end;
   }
-  my $t = $self->getCanvas()->create('text', $self->toP($x, $y), 
-     -text => $text, 
-     -font => $font, 
+  my $t = $self->getCanvas()->create('text', $self->toP($x, $y),
+     -text => $text,
+     -font => $font,
      -width => 1,
      -fill => $self->fontColor());
   if (@_) {
     my $tag = shift;
     $self->getCanvas()->addtag ($tag, 'withtag', $t);
   }
-  return $t;  
+  return $t;
 }
 
 
@@ -869,7 +869,7 @@ sub drawText {
     my $tag = shift;
     $self->getCanvas()->addtag ($tag, 'withtag', $t);
   }
-  return $t;  
+  return $t;
 }
 
 
@@ -900,9 +900,9 @@ sub drawTextFromLeft {
     $num = s/\..+//;
     $font = $before . $num  . '0' . $end;
   }
-  my $t = $self->getCanvas()->create('text', $self->toP($x, $y), 
-     -text => $text, 
-     -font => $font, 
+  my $t = $self->getCanvas()->create('text', $self->toP($x, $y),
+     -text => $text,
+     -font => $font,
      -fill => $self->fontColor(),
      -anchor => 'w');
   if (@_) {
@@ -940,9 +940,9 @@ sub drawTextFromRight {
     $num = s/\..+//;
     $font = $before . $num  . '0' . $end;
   }
-  my $t = $self->getCanvas()->create('text', $self->toP($x, $y), 
-     -text => $text, 
-     -font => $font, 
+  my $t = $self->getCanvas()->create('text', $self->toP($x, $y),
+     -text => $text,
+     -font => $font,
      -fill => $self->fontColor(),
      -anchor => 'e');
   if (@_) {
@@ -967,9 +967,9 @@ given.
 # must specify (left, top, right, bottom)
 sub drawOval {
   my $self = shift;
-  my $oval = $self->getCanvas()->create('oval', 
-      $self->toP(shift, shift), 
-      $self->toP(shift, shift), 
+  my $oval = $self->getCanvas()->create('oval',
+      $self->toP(shift, shift),
+      $self->toP(shift, shift),
       -width => $self->penWidth(),
       -outline=>$self->drawColor()
   );
@@ -995,9 +995,9 @@ name if one is given.
 # must specify (left, top, right, bottom)
 sub drawFillOval {
   my $self = shift;
-  my $oval = $self->getCanvas()->create('oval', 
-      $self->toP(shift, shift), 
-      $self->toP(shift, shift), 
+  my $oval = $self->getCanvas()->create('oval',
+      $self->toP(shift, shift),
+      $self->toP(shift, shift),
       -width => $self->penWidth(),
       -outline=>$self->drawColor(),
       -fill => $self->drawColor()
@@ -1025,8 +1025,8 @@ given.
 sub drawLine {
   my $self = shift;
   my $line = $self->getCanvas()->create('line',
-      $self->toP(shift, shift), 
-      $self->toP(shift, shift), 
+      $self->toP(shift, shift),
+      $self->toP(shift, shift),
       -width=>$self->penWidth(),
       -fill =>$self->drawColor());
   if (@_) {
@@ -1095,8 +1095,8 @@ given.
 sub drawBox {
   my $self = shift;
   my $box = $self->getCanvas()->create('rectangle',
-      $self->toP(shift, shift), 
-      $self->toP(shift, shift), 
+      $self->toP(shift, shift),
+      $self->toP(shift, shift),
       -width=>$self->penWidth(),
       -fill =>$self->drawColor());
   if (@_) {
@@ -1146,7 +1146,7 @@ sub photoWorldSize {
     $self->{PHOTO_WORLD_SIZE_Y} = shift;
     $self->{W_RATIO_X} = undef;
   }
-  return ($self->{PHOTO_WORLD_SIZE_X},$self->{PHOTO_WORLD_SIZE_Y}); 
+  return ($self->{PHOTO_WORLD_SIZE_X},$self->{PHOTO_WORLD_SIZE_Y});
 }
 
 
@@ -1244,7 +1244,7 @@ sub phot {
       $self->origPhot($img);
     } else {
       if (defined $self->phot()) {
-	$self->phot()->delete;
+        $self->phot()->delete;
       }
       $img = $self->origPhot();
     }
@@ -1273,8 +1273,8 @@ sub drawPhot {
   if (defined $self->phot()) {
     $x = ($self->toPx($self->width())-$self->phot()->width)/2;
     $y = ($self->toPy($self->height())-$self->phot()->height)/2;
-    $self->getCanvas()->create( 'image',$x,$y, 
-      '-anchor' => 'nw', 
+    $self->getCanvas()->create( 'image',$x,$y,
+      '-anchor' => 'nw',
       '-image'  => $self->phot() );
   }
 }
@@ -1298,7 +1298,7 @@ sub monitorXY {
   my $self = shift;
   if (@_) {
     my ($xref, $yref) = @_;
-    croak "Arguments must be scalar references" 
+    croak "Arguments must be scalar references"
       unless (ref($xref)eq 'SCALAR' && ref($yref) eq 'SCALAR');
 
     # Get the canvas
@@ -1306,9 +1306,9 @@ sub monitorXY {
 
     # Set up a binding for click
     # Call a separate sub for clarity rather than use a closure
-    $canvas->Tk::bind("<Button-1>", 
-		      [ $self => '_XYcallback', 
-			$canvas, Ev('x'), Ev('y'), $xref, $yref ]);
+    $canvas->Tk::bind("<Button-1>",
+                      [ $self => '_XYcallback',
+                        $canvas, Ev('x'), Ev('y'), $xref, $yref ]);
 
   } else {
     # Remove bindings
@@ -1396,7 +1396,7 @@ sub zoomNum {
 sub error {
   my $MW = shift;
   my $errWin = $MW->Toplevel(-borderwidth=>10);
-  $errWin->title('Observation Log Error!');  
+  $errWin->title('Observation Log Error!');
   $errWin->resizable(0,0);
   $errWin->Button(
      -text         => 'Ok',
@@ -1405,7 +1405,7 @@ sub error {
   })->pack(-side=>'bottom');
   my $message = shift;
   $errWin->Label (
-    -text => "\nError!\n\n   ".$message."   \n", 
+    -text => "\nError!\n\n   ".$message."   \n",
     -relief=>'sunken'
   )->pack(-side=>'bottom', pady => 10);
   $errWin->title(shift) if @_;

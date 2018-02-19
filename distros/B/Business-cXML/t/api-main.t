@@ -86,6 +86,7 @@ my $reqStr = read_file('t/xml-assets/punchoutsetup1-request.xml');
 
 $cxml = Business::cXML->new(log_level => CXML_LOG_INFO);
 trap { $cxml->process(scalar(read_file('t/xml-assets/profile-request.xml'))); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[info\]: process.*received request -- .*cXML\[info\]: process.*responding with 2xx -- /s, 'Logging output looks adequate');
 
 $cxml = Business::cXML->new(log_level => CXML_LOG_ERROR);
@@ -98,11 +99,13 @@ sub _failreq {
 # Garbage request
 $cxml = Business::cXML->new(log_level => CXML_LOG_WARNING);
 trap { $cxml->process(scalar(read_file('t/xml-assets/garbage-request.xml'))); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[warning\]: process.* XML validation failure:/s, '');
 
 # 200 / invalid XML
 $cxml->on('PunchOutSetup' => { __handler => \&_failreq });
 trap { $cxml->process($reqStr); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[error\]: process.*validity error.*Invalid/s, 'Invalid XML payload triggers expected error');
 
 # 4xx at caller handler level
@@ -111,6 +114,7 @@ $cxml = Business::cXML->new(
 	handlers  => { PunchOutSetup => { __handler => sub { $_[2]->status(403, 'You cannot do this, ever'); }, }, },
 );
 trap { $cxml->process($reqStr); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[warning\]: process.* responding with 4xx -- .*code="403"/s, 'Error 403 goes through');
 
 # 5xx at caller handler level
@@ -119,6 +123,7 @@ $cxml = Business::cXML->new(
 	handlers  => { PunchOutSetup => { __handler => sub { $_[2]->status(560, 'This is freaking me out!'); }, }, },
 );
 trap { $cxml->process($reqStr); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[error\]: process.* responding with 5xx -- .*code="560"/s, 'Error 560 goes through');
 
 # Invalid status from caller handler
@@ -127,6 +132,7 @@ $cxml = Business::cXML->new(
 	handlers  => { PunchOutSetup => { __handler => sub { $_[2]->status(655, 'Incredible status'); }, }, },
 );
 trap { $cxml->process($reqStr); };
+#diag($trap->stderr);
 ok($trap->stderr =~ /^cXML\[error\]: process.* responding with 5xx -- .*Unsupported actual status code '655'./s, 'Unsupported status code gets trapped into a 500');
 
 

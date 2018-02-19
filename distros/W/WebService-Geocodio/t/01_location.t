@@ -114,4 +114,4 @@ my $loc4 =  WebService::Geocodio::Location->new(
 );
 
 isa_ok($loc4, 'WebService::Geocodio::Location');
-is($loc4->_forward_formatting, 77056, 'JSON serialization prefers zip');
+is($loc4->_forward_formatting, "Houston, TX 77056", 'JSON serialization includes zip if available');

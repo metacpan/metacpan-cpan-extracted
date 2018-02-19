@@ -1,5 +1,11 @@
 Revision history for Perl extension SVG.
 
+2.84  2018.02.19 MANWAR
+      - Removed '+x' bits from the script "xt/author/pod-syntax.t".
+
+2.83  2018.02.12 MANWAR
+      - Merged PR #11 (Test Reports), thanks @genio.
+
 2.82  2017.12.18 MANWAR
       - Fixed subquery (txn-1762542) of the issue RT #123896.
 

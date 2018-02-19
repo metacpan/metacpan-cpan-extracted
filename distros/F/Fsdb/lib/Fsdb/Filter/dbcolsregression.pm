@@ -2,8 +2,7 @@
 
 #
 # dbcolsregression.pm
-# Copyright (C) 1997-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 43fd25b3a4a5ea88ef37b0bb42c578f9cd848703 $
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -217,7 +216,7 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
 
-    croak $self->{_prog} . ": exactly two columns must be specified to compute a correlation.\n"
+    croak($self->{_prog} . ": exactly two columns must be specified to compute a correlation.\n")
 	if ($#{$self->{_columns}} != 1);
     foreach (0..$#{$self->{_columns}}) {
 	my $column = $self->{_columns}[$_];
@@ -274,7 +273,7 @@ sub run ($) {
         $sxy += $x * $y;
     };
 
-    croak $self->{_prog} . ": no input\n"
+    croak($self->{_prog} . ": no input\n")
 	if ($n == 0);
 
     #
@@ -302,7 +301,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1997-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

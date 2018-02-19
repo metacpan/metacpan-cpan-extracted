@@ -86,8 +86,8 @@ class t17 {
 	public void n(){
 	}
 
-	public ArrayList get_al(){
-		return new ArrayList() ;
+	public ArrayList<Object> get_al(){
+		return new ArrayList<Object>() ;
 	}
 
 	public int count(Collection c){

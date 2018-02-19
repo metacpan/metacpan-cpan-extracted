@@ -2,8 +2,7 @@
 
 #
 # dbcolpercentile.pm
-# Copyright (C) 1997-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 704e422c1523fc35e78835d5885f028f9368c7ea $
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -321,19 +320,19 @@ sub setup ($) {
 	$self->{_sorter_fred} = $new_fred;
     };
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     #
     # output
     #
     $self->{_destination_column} = $self->{_mode};
-    croak $self->{_prog} . ": internal error: bad rank mode\n"
+    croak($self->{_prog} . ": internal error: bad rank mode\n")
 	if (!defined($self->{_destination_column}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_out}->col_create($self->{_destination_column})
-	or croak $self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n";
+	or croak($self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n");
     $self->{_destination_coli} = $self->{_out}->col_to_i($self->{_destination_column});
 }
 
@@ -358,7 +357,7 @@ sub _count_rows() {
 	$n++;
 	&$write_fastpath_sub($fref);
     };
-    $save_sink->error and croak $self->{_prog} . ": error writing temporary file.\n";
+    $save_sink->error and croak($self->{_prog} . ": error writing temporary file.\n");
     $save_sink->close;
 
     # reopen _in with our saved data
@@ -420,7 +419,7 @@ sub run ($) {
 		if ($check_sort_order) {
 		    if (defined($last)) {
 		        my $order = ($x <=> $last);
-			croak $self->{_prog} . ": data out of order between $last and $x, should be in " . ($check_sort_order == -1 ? "descending" : "ascending") . " order.\n"
+			croak($self->{_prog} . ": data out of order between $last and $x, should be in " . ($check_sort_order == -1 ? "descending" : "ascending") . " order.\n")
 			    if ($order != $check_sort_order);
 		    };
 		};
@@ -445,7 +444,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

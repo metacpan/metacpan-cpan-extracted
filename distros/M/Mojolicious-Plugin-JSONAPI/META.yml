@@ -1,0 +1,36 @@
+---
+abstract: 'Mojolicious Plugin for building JSON API compliant applications.'
+author:
+  - 'Ali Zia <ziali088@gmail.com>'
+build_requires:
+  Mojolicious::Lite: '0'
+  Test::CPAN::Changes: '0'
+  Test::Mojo: '0'
+  Test::Most: '0'
+  Test::Pod: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-JSONAPI
+provides:
+  Mojolicious::Plugin::JSONAPI:
+    file: lib/Mojolicious/Plugin/JSONAPI.pm
+    version: '0.2'
+requires:
+  JSONAPI::Document: '0'
+  Lingua::EN::Inflexion: '0'
+  Mojo::Base: '0'
+  perl: '5.010'
+resources:
+  repository: https://github.com/ziali088/mojolicious-plugin-jsonapi.git
+version: '0.2'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

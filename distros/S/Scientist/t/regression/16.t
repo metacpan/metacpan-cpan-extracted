@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended -target => 'Scientist';
+use Test2::V0 -target => 'Scientist';
 
 ok(
     dies { $CLASS->new(use => sub { die } )->run },

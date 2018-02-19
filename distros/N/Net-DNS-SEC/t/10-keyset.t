@@ -1,27 +1,29 @@
-# $Id: 10-keyset.t 1494 2016-08-22 09:34:07Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1613 2018-01-15 13:47:13Z willem $	-*-perl-*-
 #
 
+use strict;
 use Test::More;
 
 my %prerequisite = (
-	Net::DNS		=> 1.01,
-	Net::DNS::SEC::Private	=> 0,
-	Net::DNS::SEC::RSA	=> 0,
+	'Digest::SHA'  => 5.23,
+	'Net::DNS'     => 1.01,
+	'MIME::Base64' => 2.13,
 	);
 
 foreach my $package ( sort keys %prerequisite ) {
 	my @revision = grep $_, $prerequisite{$package};
-	eval "use $package @revision";
-	next unless $@;
+	next if eval "use $package @revision; 1;";
 	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
 
-plan tests => 30;
+plan tests => 32;
 
 
-use_ok('Net::DNS::SEC');					# test 1
-use_ok('Net::DNS::SEC::Keyset');				# test 2
+use_ok('Net::DNS::SEC');
+use_ok('Net::DNS::SEC::Keyset');
+use_ok('Net::DNS::SEC::Private');
+use_ok('Net::DNS::SEC::RSA');
 
 
 my %filename = (
@@ -407,4 +409,6 @@ eval { my @array = key_difference( \@keyrr, \@ks_sigs ); };
 
 
 exit;
+
+__END__
 

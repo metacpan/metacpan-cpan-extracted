@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use App::Timestamper::Format;
+
+App::Timestamper::Format->new({ argv => [@ARGV]})->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+App::Timestamper::Format - prefix lines with the timestamps of their arrivals.
+
+=head1 VERSION
+
+version 0.0.2
+
+=head1 SYNOPSIS
+
+    $ long-running-process | tee log | ts-format
+
+=head1 DESCRIPTION
+
+App::Timestamper is a pure-Perl command line program that filters the input
+so the timestamps (in seconds+fractions since the UNIX epoch) are prefixed
+to the lines based on the time of the arrival.
+
+So if the input was something like:
+
+    First Line
+    Second Line
+    Third Line
+
+It will become something like:
+
+    1435254285.978485482\tFirst Line
+    1435254302.569615087\tSecond Line
+    1435254319.809459781\tThird Line
+
+=head1 VERSION
+
+version 0.0.2
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/app-timestamper-format/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

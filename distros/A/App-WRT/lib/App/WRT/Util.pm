@@ -4,7 +4,9 @@ use strict;
 use warnings;
 
 use base qw(Exporter);
-our @EXPORT_OK = qw(dir_list get_date);
+our @EXPORT_OK = qw(dir_list get_date file_put_contents);
+
+=over
 
 =item dir_list($dir, $sort_order, $pattern)
 
@@ -44,6 +46,22 @@ sub high_to_low   { $b <=> $a; } # numeric, high to low
 sub low_to_high   { $a <=> $b; } # numberic, low to high
 sub reverse_alpha { $b cmp $a; } # alphabetical, reversed
 
+=item file_put_contents($file, $contents)
+
+Write $contents string to $file path.  Because:
+
+L<https://secure.php.net/manual/en/function.file-put-contents.php>
+
+=cut
+
+sub file_put_contents {
+  my ($file, $contents) = @_;
+  open(my $fh, '>', $file)
+    or die "Unable to open $file for writing: $!";
+  print $fh $contents;
+  close $fh;
+}
+
 =item get_date('key', 'other_key', ...)
 
 Return current date values for the given key. Valid keys are sec, min, hour,
@@ -78,5 +96,7 @@ Remember that year is given in years after 1900.
     }
   }
 }
+
+=back
 
 1;

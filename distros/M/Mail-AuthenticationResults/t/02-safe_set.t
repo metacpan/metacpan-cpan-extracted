@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
@@ -59,11 +59,15 @@ sub test_value_dies {
     }
 
     lives_ok( sub{ $class->safe_set_value( 'With space' ) }, ( ref $class ) . ' set invalid value spaces' );
-    is( $class->as_string(), $expectkey . 'With_space', ( ref $class ) . ' stringifies spaces correctly' );
+    is( $class->as_string(), $expectkey . '"With space"', ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->safe_set_value( 'pass;' ) }, ( ref $class ) . ' set invalid value semicolon' );
     is( $class->as_string(), $expectkey . 'pass', ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->safe_set_value( 'with(parens)' ) }, ( ref $class ) . ' set invalid value comment' );
-    is( $class->as_string(), $expectkey . 'with_parens', ( ref $class ) . ' stringifies parens correctly' );
+    is( $class->as_string(), $expectkey . '"with parens"', ( ref $class ) . ' stringifies parens correctly' );
+    lives_ok( sub{ $class->safe_set_value( "With\nnewline" ) }, ( ref $class ) . ' set invalid value newline' );
+    is( $class->as_string(), $expectkey . '"With newline"', ( ref $class ) . ' stringifies newline correctly' );
+    lives_ok( sub{ $class->safe_set_value( "With\rreturn" ) }, ( ref $class ) . ' set invalid value return' );
+    is( $class->as_string(), $expectkey . '"With return"', ( ref $class ) . ' stringifies return correctly' );
 }
 
 sub test_value_dies_version {
@@ -87,11 +91,11 @@ sub test_value_dies_header {
     dies_ok( sub{ $class->safe_set_value( 'string' ) }, ( ref $class ) . ' set incorrect type value' );
 
     lives_ok( sub{ $class->safe_set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'With space' ) ) }, ( ref $class ) . ' set invalid value spaces' );
-    is( $class->as_string(), '"With space";' . "\nnone", ( ref $class ) . ' stringifies spaces correctly' );
+    is( $class->as_string(), '"With space"; none', ( ref $class ) . ' stringifies spaces correctly' );
     lives_ok( sub{ $class->safe_set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'pass;' ) ) }, ( ref $class ) . ' set invalid value semicolon' );
-    is( $class->as_string(), '"pass;";' . "\nnone", ( ref $class ) . ' stringifies semicolon correctly' );
+    is( $class->as_string(), '"pass;"; none', ( ref $class ) . ' stringifies semicolon correctly' );
     lives_ok( sub{ $class->safe_set_value( Mail::AuthenticationResults::Header::AuthServID->new()->set_value( 'with(parens)' ) ) }, ( ref $class ) . ' set invalid value comment' );
-    is( $class->as_string(), '"with(parens)";' . "\nnone", ( ref $class ) . ' stringifies parens correctly' );
+    is( $class->as_string(), '"with(parens)"; none', ( ref $class ) . ' stringifies parens correctly' );
 }
 
 done_testing();

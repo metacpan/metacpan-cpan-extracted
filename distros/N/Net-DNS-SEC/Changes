@@ -1,6 +1,14 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.04 February 15, 2018
+
+Feature
+	Cryptographic library access re-engineered using PerlXS
+	directly instead of CPAN Crypt::OpenSSL::(DSA|EDSA|RSA)
+	distributions which have fallen into disrepair.
+
+
 **** 1.03 August 26, 2016
 
 Fix: rt.cpan.org #108908
@@ -258,7 +266,7 @@ Fix: rt.cpan.org #105698
          keyset has to be selfsigned has been loosened.
 
    FEAT: Added a "carp" to the new methods of the NXT RR. Warning that
-	 that record is depricated.
+	 that record is deprecated.
 
    FEAT: Cleaned the tests so that RRSIG and DNSKEY are used except for 
          SIG0 based tests.
@@ -357,7 +365,7 @@ Fix: rt.cpan.org #105698
 
 0.10 January 8 2003
 
-   BUG:  - Crypt::OpenSSL::RSA::new method has been depricated. Code has
+   BUG:  - Crypt::OpenSSL::RSA::new method has been deprecated. Code has
 	   been modified to deal with the new constructors
 
 0.09 January 6 2003
@@ -546,4 +554,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1503 2016-08-26 11:51:16Z willem $
+$Id: Changes 1643 2018-02-15 15:40:34Z willem $

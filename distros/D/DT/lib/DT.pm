@@ -10,7 +10,7 @@ use Sub::Install;
 
 use parent 'DateTime::Moonpig';
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.2.3';
 
 my ($HAVE_PG, $HAVE_ISO);
 

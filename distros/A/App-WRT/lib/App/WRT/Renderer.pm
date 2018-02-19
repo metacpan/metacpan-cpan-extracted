@@ -7,6 +7,7 @@ use 5.10.0;
 use base qw(Exporter);
 our @EXPORT_OK = qw(render);
 
+use App::WRT::Util qw(file_put_contents);
 use Data::Dumper;
 use File::Basename;
 use File::Copy;
@@ -90,14 +91,6 @@ sub render {
 
   # Presumed success:
   return 1;
-}
-
-sub file_put_contents {
-  my ($file, $contents) = @_;
-  open(my $fh, '>', $file)
-    or die "Unable to open $file for writing: $!";
-  print $fh $contents;
-  close $fh;
 }
 
 # Collect a list of things to render:

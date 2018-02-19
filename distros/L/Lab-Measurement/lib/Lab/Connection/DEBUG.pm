@@ -1,6 +1,6 @@
 package Lab::Connection::DEBUG;
 #ABSTRACT: Connection to the DEBUG bus
-$Lab::Connection::DEBUG::VERSION = '3.613';
+$Lab::Connection::DEBUG::VERSION = '3.620';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection;
@@ -46,11 +46,11 @@ Lab::Connection::DEBUG - Connection to the DEBUG bus
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Florian Olbrich

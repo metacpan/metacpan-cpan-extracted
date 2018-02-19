@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Source::Function;
-$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.613';
+$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.620';
 #ABSTRACT: Role for the SCPI SOURce:FUNCtion subsystem
 
 use Moose::Role;
@@ -43,7 +43,7 @@ Lab::Moose::Instrument::SCPI::Source::Function - Role for the SCPI SOURce:FUNCti
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -57,7 +57,7 @@ Query/Set the type of output signal. Can be B<VOLT> or B<CURR>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

@@ -1,0 +1,35 @@
+---
+abstract: 'Turn DBIx results into JSON API documents.'
+author:
+  - 'Ali Zia <ziali088@gmail.com>'
+build_requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  Test::DBIx::Class: '0.52'
+  Test::Most: '0'
+  Test::Pod: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSONAPI-Document
+provides:
+  JSONAPI::Document:
+    file: lib/JSONAPI/Document.pm
+    version: '0.3'
+requires:
+  Lingua::EN::Inflexion: '0'
+  Moo: '0'
+  perl: '5.010'
+resources:
+  repository: https://github.com/ziali088/jsonapi-document.git
+version: '0.3'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

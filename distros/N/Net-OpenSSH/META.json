@@ -42,6 +42,6 @@
          "url" : "https://github.com/salva/p5-Net-OpenSSH"
       }
    },
-   "version" : "0.76",
+   "version" : "0.77",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -36,7 +36,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Mouse;
 use FileHandle;
@@ -110,7 +110,7 @@ sub _finish_stanza
       } @{$current->{synonym}}
     ];
 
-    $current->{synonym} = [values %seen_synonyms];
+    $current->{synonym} = [sort { $a->{synonym} cmp $b->{synonym} } values %seen_synonyms];
   }
 
   my $options = { namespace_from_metadata => $namespace_from_metadata };
@@ -131,6 +131,7 @@ my %interesting_metadata = (
   'default-namespace' => 1,
   'ontology' => 1,
   'date' => 1,
+  'data-version' => 1,
 );
 
 sub parse
@@ -217,7 +218,8 @@ sub parse
               }
             }
             if (defined $field_value) {
-              if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+              if (defined $field_conf->{type} &&
+                  ($field_conf->{type} eq 'SINGLE' || $field_conf->{type} eq 'SINGLE_HASH')) {
                 $current->{$field_name} = $field_value;
               } else {
                 push @{$current->{$field_name}}, $field_value;

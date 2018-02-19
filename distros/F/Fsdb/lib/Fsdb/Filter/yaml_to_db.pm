@@ -2,8 +2,7 @@
 
 #
 # yaml_to_db.pm
-# Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
-# $Id: 54d87bcf09ffd487550f0f7e05ab0a77cf2a3670 $
+# Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -211,7 +210,7 @@ sub setup($) {
     my $yaml_str = join('', $self->{_in}->getlines);
     my $yaml = $self->{_yaml} = Load($yaml_str);
 
-    croak $self->{_prog} . ": yaml is not in expected format (toplevel list)\n"    
+    croak($self->{_prog} . ": yaml is not in expected format (toplevel list)\n")
         if (ref $yaml ne 'ARRAY');
 
     #
@@ -223,7 +222,7 @@ sub setup($) {
     my %cols_hash;
     my $record_no = 0;
     foreach my $href (@$yaml) {
-        croak $self->{_prog} . ": yaml is not in expected format, record $record_no is not a dictionary\n"
+        croak($self->{_prog} . ": yaml is not in expected format, record $record_no is not a dictionary\n")
 	    if (ref $href ne 'HASH');
 	foreach (sort keys %$href) {
 	    next if (defined($cols_hash{$_}));
@@ -280,7 +279,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

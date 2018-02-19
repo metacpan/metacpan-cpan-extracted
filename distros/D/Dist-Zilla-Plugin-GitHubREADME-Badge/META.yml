@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Dist::Zilla::Plugin::GitHubREADME::Badge:
     file: lib/Dist/Zilla/Plugin/GitHubREADME/Badge.pm
-    version: '0.22'
+    version: '0.23'
 requires:
   Dist::Zilla: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge/issues
   homepage: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge
   repository: https://github.com/fayland/perl-Dist-Zilla-Plugin-GitHubREADME-Badge.git
-version: '0.22'
+version: '0.23'
 x_contributors:
   - 'Nikolay Mishin <mi@ya.ru>'
   - 'Paul Cochrane <paul@liekut.de>'
@@ -47,5 +47,6 @@ x_contributors:
   - 'Stephan Loyd <stephanloyd9@gmail.com>'
   - 'Thorsten Klein <grobie@perlwizard.de>'
   - 'Thorsten Klein <thorsten@kleinhq.org>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

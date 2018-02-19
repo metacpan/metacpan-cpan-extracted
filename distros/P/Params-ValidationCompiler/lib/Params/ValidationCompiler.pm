@@ -3,7 +3,7 @@ package Params::ValidationCompiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Params::ValidationCompiler::Compiler;
 
@@ -40,7 +40,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -222,6 +222,12 @@ loaded causes an exception.
 This is useful for CPAN modules where you want to set a name if you can, but
 you do not want to add a prerequisite on L<Sub::Util>.
 
+=item * debug
+
+Sets the C<EVAL_CLOSURE_PRINT_SOURCE> environment variable to true before
+calling C<Eval::Closure::eval_closure()>. This causes the source of the
+subroutine to be printed before it's C<eval>'d.
+
 =back
 
 =head2 source_for(...)
@@ -284,7 +290,7 @@ Tomasz Konojacki <me@xenu.pl>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2016 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

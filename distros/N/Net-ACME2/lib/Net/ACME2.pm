@@ -458,10 +458,14 @@ sub _key_thumbprint {
 sub _get_directory {
     my ($self) = @_;
 
-    return $self->{'_directory'} ||= do {
+    $self->{'_directory'} ||= do {
         my $dir_path = $self->DIRECTORY_PATH();
         $self->{'_ua'}->get("https://$self->{'_host'}$dir_path")->content_struct();
     };
+
+    $self->{'_ua'}->set_new_nonce_url( $self->{'_directory'}{'newNonce'} );
+
+    return $self->{'_directory'};
 }
 
 sub _require_key_id {

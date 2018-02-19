@@ -1,6 +1,6 @@
 
 package Module::Spec::V0;
-$Module::Spec::V0::VERSION = '0.7.0';
+$Module::Spec::V0::VERSION = '0.8.0';
 # ABSTRACT: Module::Spec internal utilities
 use 5.012;
 
@@ -109,7 +109,7 @@ Module::Spec::V0 - Module::Spec internal utilities
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 AUTHOR
 

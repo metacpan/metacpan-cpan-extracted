@@ -43,7 +43,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION $DEBUG %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.43';
+$VERSION = '3.46';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -89,7 +89,7 @@ sub os_ver {
     my $descr   = $force10->description();
     my $os_ver  = undef;
 
-    $os_ver = $1 if ( $descr =~ /Force10\s+Application\s+Software\s+Version:\s+(\S+)/s );
+    $os_ver = $1 if ( $descr =~ /\s+Application\s+Software\s+Version:\s+(\S+)/s );
 
     return $os_ver;
 }

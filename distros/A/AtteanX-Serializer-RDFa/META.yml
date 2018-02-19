@@ -1,0 +1,48 @@
+---
+abstract: 'RDFa Serializer for Attean'
+author:
+  - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
+build_requires:
+  Module::Load::Conditional: '0'
+  Test::Modern: '0'
+  Test::More: '0.96'
+  URI::NamespaceMap: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AtteanX-Serializer-RDFa
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  AtteanX::Serializer::RDFa:
+    file: lib/AtteanX/Serializer/RDFa.pm
+    version: '0.01'
+requires:
+  Attean: '0.019'
+  Moo: '0'
+  RDF::RDFa::Generator: '0.200'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.perl.org/#perlrdf
+  Identifier: http://purl.org/NET/cpan-uri/dist/AtteanX-Serializer-RDFa/project
+  bugtracker: https://github.com/kjetilk/p5-atteanx-serializer-rdfa/issues
+  homepage: https://metacpan.org/release/AtteanX-Serializer-RDFa
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/kjetilk/p5-atteanx-serializer-rdfa.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

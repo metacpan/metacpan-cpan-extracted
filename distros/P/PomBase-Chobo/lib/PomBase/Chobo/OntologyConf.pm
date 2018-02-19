@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use warnings;
 use Carp;
@@ -51,11 +51,48 @@ our %field_conf = (
     }
   },
   def => {
-    type => 'SINGLE',
+    type => 'SINGLE_HASH',
     process => sub {
       my $val = shift;
-      $val =~ s/"(.*)".*/$1/g;
-      $val;
+      if ($val =~ /"(.*)"(?:\s+\[(.*)\])?/) {
+        my $definition = $1;
+        my $dbxrefs = $2 // '';
+
+        my @dbxrefs =
+          grep {
+            !m|^http:| && /^\S+:\S+$/;
+          } split /\s*,\s/, $dbxrefs;
+
+        return {
+          definition => $definition,
+          dbxrefs => \@dbxrefs,
+        }
+      } else {
+        croak qq(failed to parse "def:" line: $val);
+      }
+    },
+    merge => sub {
+      my $self = shift;
+      my $other = shift;
+
+      if (!defined $other->def()) {
+        return $self;
+      } else {
+        if (!defined $self->def()) {
+          return $other->def();
+        } else {
+          if ($self->def()->{definition} ne $other->def()->{definition}) {
+            warn qq("def:" line differ\n  ) . $self->def()->{definition} . "\nversus:\n  " .
+              $other->def()->{definition};
+          }
+          return $self->def();
+        }
+      }
+    },
+    to_string => sub {
+      my $val = shift;
+      my $ret_string = $val->{definition};
+      $ret_string .= ' [' . (join ", ", @{$val->{dbxrefs}}) . ']';
     }
   },
   comment => {
@@ -140,10 +177,12 @@ our %field_conf = (
     type => 'ARRAY',
     process => sub {
       my $val = shift;
-      if ($val =~ /^"(.+?)"\s*(.*)/) {
+      if ($val =~ /^"(.*?[^\\])"\s*(.*)/) {
         my $synonym = $1;
         my @dbxrefs = ();
         my $rest = $2;
+
+        $synonym =~ s/\\(.)/$1/g;
 
         my %ret = (
           synonym => $synonym,

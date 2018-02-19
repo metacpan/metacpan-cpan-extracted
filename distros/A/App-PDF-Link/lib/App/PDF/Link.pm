@@ -4,13 +4,13 @@ package App::PDF::Link;
 
 # pdflink -- insert file links in PDF documents
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Author          : Johan Vromans
 # Created On      : Thu Sep 15 11:43:40 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan 10 13:30:57 2018
-# Update Count    : 340
+# Last Modified On: Thu Feb 15 19:32:54 2018
+# Update Count    : 382
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -30,9 +30,17 @@ sub run {
     my ( $pkg, $env ) = @_;
 
     use PDF::API2::Annotation;
-    die("No attachment support??")
-      unless PDF::API2::Annotation->can( $env->{embed}
-					 ? "fileattachment" : "file" );
+
+    if ( $env->{embed} <= 1 ) {
+	die("No attachment support??")
+	  unless PDF::API2::Annotation->can( $env->{embed}
+					     ? "fileattachment"
+					     : "file" );
+    }
+    else {
+	die("No embedding support??")
+	  unless PDF::API2->can("embeddedfile");
+    }
 
     use PDF::API2::Page;
     *PDF::API2::Page::annotation =
@@ -88,6 +96,7 @@ sub linktargets {
     my $embed = $env->{embed};	# 0 = linked
 				# 1 = embedded
 				# 2 = attached
+    my $action = ( qw( linked embedded attached ) )[$embed];
 
     foreach ( @targets ) {
 	unless ( -r $_ ) {
@@ -104,12 +113,13 @@ sub linktargets {
 	    next;
 	}
 
-	my $action =
-	  $embed
-	    ? $embed == 2 ? "attached" : "embedded"
-	      : "linked";
-
 	warn("\tFile: ", encode_utf8($t), " ($action)\n");
+
+	if ( $action eq "attached" ) {
+	    # Separate objects, no coordinate problems.
+	    $pdf->embeddedfile( $t );
+	    next;
+	}
 
 	my $dx = $env->{iconsz} + $env->{padding};
 	my $dy = $env->{iconsz} + $env->{padding};
@@ -144,16 +154,17 @@ sub linktargets {
 
 	my $border = $env->{border};
 	my @r = ( $x, $y, $x + $env->{iconsz}, $y + $env->{iconsz} );
-	my $ann;
-	$ann = $page->annotation_xx;
-	if ( $embed ) {
+
+	if ( $action eq "embedded" ) {
 	    # This always uses the right coordinates.
+	    my $ann = $page->annotation_xx;
 	    $ann->fileattachment( $t,
 				  -text => "$t $action by pdflink $VERSION",
-				  $embed == 1 ? ( -icon => $p ) : (),
+				  -icon => $p,
 				  -rect => \@r );
 	}
 	else {
+	    my $ann = $page->annotation_xx;
 	    $ann->file( $t, -rect => \@r );
 	    my $scale = $env->{iconsz} / $p->width;
 	    $gfx->image( $p, @r[0,1], $scale );
@@ -332,7 +343,7 @@ sub app_setup {
 
     # Collect command line options in a hash, for they will be needed
     # later.
-    my $clo = {};
+    my $clo = { embed => 0 };
 
     # Sorry, layout is a bit ugly...
     if ( !GetOptions
@@ -477,7 +488,8 @@ own, no other files needed.
 
 =item B<--attach>
 
-Like B<--embed>, but no custom icon is supplied.
+This is similar to B<--embed>, but the files are attached to the PDF
+document and no icons are placed on the pages.
 
 =item B<--all>
 
@@ -899,6 +911,42 @@ sub appearance {
     }
 
     return $self;
+}
+
+package PDF::API2;
+
+#=item $pdf->embeddedfile $file, %opts
+#
+#Adds a file attachment to the document.
+#
+#=cut
+
+sub embeddedfile {
+    my ( $self, $file, %opts ) = @_;
+
+    if ( is_utf8($file)) {
+	# URI must be 7-bit ascii
+	utf8::downgrade($file);
+    }
+
+    # The File Specification.
+    my $fs = PDFDict();
+    $fs->{Type} = PDFName('Filespec');
+
+    $fs->{F} = PDFStr($file);
+    $fs->{UF} = PDFStr( Encode::encode( 'UTF16-BE', "\x{FEFF}$file" ) );
+    $fs->{Desc} = PDFStr("$file attached by pdflink $VERSION");
+
+    $fs->{EF} = PDFDict($file);
+    $fs->{EF}->{F} = PDFDict($file);
+    $self->{pdf}->new_obj($fs->{EF}->{F});
+    $fs->{EF}->{F}->{Type} = PDFName('EmbeddedFile');
+    $fs->{EF}->{F}->{' streamfile'} = $file;
+    $self->{pdf}->new_obj($fs);
+    my $nd = $self->named_destination( 'EmbeddedFiles', $file, $fs );
+    $self->{'pdf'}->out_obj($self->{catalog});
+
+    return($self);
 }
 
 1;

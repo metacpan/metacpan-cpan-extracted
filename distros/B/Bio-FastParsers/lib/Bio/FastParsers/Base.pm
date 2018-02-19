@@ -1,6 +1,6 @@
 package Bio::FastParsers::Base;
-# ABSTRACT: internal (base) class for all FastParsers
-$Bio::FastParsers::Base::VERSION = '0.180330';
+# ABSTRACT: Internal (base) class for all FastParsers
+$Bio::FastParsers::Base::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -11,7 +11,7 @@ use Bio::FastParsers::Types;
 
 
 has 'file' => (
-    is       => 'ro',                   
+    is       => 'ro',
     isa      => 'Bio::FastParsers::Types::File',
     required => 1,
     coerce   => 1,
@@ -32,19 +32,15 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Base - internal (base) class for all FastParsers
+Bio::FastParsers::Base - Internal (base) class for all FastParsers
 
 =head1 VERSION
 
-version 0.180330
-
-=head1 SYNOPSIS
-
-    # TODO    
+version 0.180470
 
 =head1 DESCRIPTION
 
-    # TODO
+Nothing to see here.
 
 =head1 ATTRIBUTES
 

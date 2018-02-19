@@ -3,8 +3,8 @@
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint command=_cpanm
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -14,8 +14,8 @@ my $lcpanm_path = which("lcpanm") or die "Can't find lcpanm in PATH\n";
 
 $ENV{LCPANM_PERL5OPT} = join(
     " ",
-    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::RunShcompgen=-warn_target_loaded;0",
-    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::UseURIFromFoundMirror=-warn_target_loaded;0",
+    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::RunShcompgen=-load_target;0;-warn_target_loaded;0",
+    "-MModule::Load::In::INIT=-ignore_load_error,App::cpanminus::script::Patch::UseURIFromFoundMirror=-load_target;0;-warn_target_loaded;0",
     (defined $ENV{LCPANM_PERL5OPT} ? ($ENV{LCPANM_PERL5OPT}) : ()),
 );
 
@@ -24,7 +24,7 @@ my @cmd = (
     @ARGV,
 );
 
-print "lcpanm-perlancar: exec: ".join(" ", @cmd), "\n" if $ENV{DEBUG};
+print "lcpanm-perlancar: LCPANM_PERL5OPT='$ENV{LCPANM_PERL5OPT}' exec: ".join(" ", @cmd), "\n" if $ENV{DEBUG};
 exec @cmd;
 
 # ABSTRACT: Install modules from local CPAN (PERLANCAR's flavor)
@@ -42,7 +42,7 @@ lcpanm-perlancar - Install modules from local CPAN (PERLANCAR's flavor)
 
 =head1 VERSION
 
-This document describes version 0.002 of lcpanm-perlancar (from Perl distribution App-cpanm-perlancar), released on 2018-01-15.
+This document describes version 0.003 of lcpanm-perlancar (from Perl distribution App-cpanm-perlancar), released on 2018-02-18.
 
 =head1 SYNOPSIS
 

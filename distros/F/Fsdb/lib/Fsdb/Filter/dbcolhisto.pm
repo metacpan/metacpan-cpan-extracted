@@ -2,8 +2,7 @@
 
 #
 # dbcolhisto.pm
-# Copyright (C) 1997-2008 by John Heidemann <johnh@isi.edu>
-# $Id: 018fca2849f105e4a7f53f6f3a2f5b463f780f70 $
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -325,9 +324,9 @@ sub run ($) {
     # sanity check
     #
     if ($n == 0) {
-	croak $self->{_prog} . ": histogram impossible with no input\n";
+	croak($self->{_prog} . ": histogram impossible with no input\n");
     } elsif ($n == 1) {
-	croak $self->{_prog} . ": histogram impossible with singleton input\n";
+	croak($self->{_prog} . ": histogram impossible with singleton input\n");
     };
 
     #
@@ -344,7 +343,7 @@ sub run ($) {
         (defined($bucket_width) ? 1 : 0) +
         (defined($bucket_count) ? 1 : 0);
     if ($n_defined >= 4) {
-        croak $self->{_prog} . ": parameters over-specified.\n";
+        croak($self->{_prog} . ": parameters over-specified.\n");
     } elsif ($n_defined == 3) {
         # fall through, clean up handles it.
     } elsif ($n_defined == 2) {
@@ -362,7 +361,7 @@ sub run ($) {
     	    my($mid) = ($max - $min) / 2 + $min;
     	    $bucket_start = $mid - $bucket_width * $bucket_count / 2;
         } else {
-    	    die "internal error\n";
+    	    croak("internal error\n");
         };
         # Figure the rest out below.
     } elsif ($n_defined == 1) {
@@ -376,7 +375,7 @@ sub run ($) {
     	    $bucket_start = $min;
     	    $bucket_end = $max;
         } else {
-    	    die "internal error\n";
+    	    croak("internal error\n");
         };
     } elsif ($n_defined < 1) {
         $bucket_start = $min;
@@ -441,7 +440,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

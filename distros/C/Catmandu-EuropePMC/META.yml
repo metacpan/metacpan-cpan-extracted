@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-EuropePMC/issues
   homepage: https://github.com/LibreCat/Catmandu-EuropePMC
   repository: https://github.com/LibreCat/Catmandu-EuropePMC.git
-version: '0.18'
+version: '1.00'
 x_contributors:
   - 'Vitali Peil <vitali.peil@uni-bielefeld.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

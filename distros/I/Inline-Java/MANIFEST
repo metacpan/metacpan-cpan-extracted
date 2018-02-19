@@ -1,4 +1,12 @@
 CHANGES
+examples/cgi/CGI.cgi
+examples/cgi/counter.java
+examples/cgi/MOD_PERL.pl
+examples/cgi/MOD_PERL.pm
+examples/shared_jvm_server.pl
+examples/shared_jvm_test.pl
+examples/swing_callback.pl
+examples/swing_gui_test.pl
 Java/JNI.pm
 Java/JNI.xs
 Java/Makefile.PL
@@ -70,28 +78,18 @@ t/12_2_perl_objects.t
 t/13_handles.t
 t/14_encoding.t
 t/15_native_doubles.t
+t/16_subclass.t
 t/99_end.t
-t/CGI.cgi
-t/counter.java
-t/MOD_PERL.pl
-t/MOD_PERL.pm
 t/no_const.class
 t/no_const.java
-t/pod_test.pl
 t/shared.java
-t/shared_jvm_server.pl
-t/shared_jvm_test.pl
-t/swing_callback.pl
-t/swing_gui_test.pl
-t/t1.pl
 t/t13.txt
-t/t2.pl
-t/t3.pl
-t/t4.pl
-t/t5.pl
+t/t16subclass.jar
+t/t16subclass.java
 t/types.class
 t/types.java
 TODO
 xt/manifest.t
+xt/pod_test.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

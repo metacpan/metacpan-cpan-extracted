@@ -31,7 +31,7 @@ my(%params) =
 		SUFFIX   => 'gz'
 	},
 	DISTNAME			=> 'Regexp-Parsertron',
-	MIN_PERL_VERSION	=> 5.10.1,
+	MIN_PERL_VERSION	=> 5.14.0,
 	NAME				=> 'Regexp::Parsertron',
 	PL_FILES 			=> {},
 	PREREQ_PM			=>

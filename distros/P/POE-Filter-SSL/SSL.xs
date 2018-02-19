@@ -16,22 +16,41 @@ static const ASN1_INTEGER *X509_REVOKED_get0_serialNumber(const X509_REVOKED *x)
 MODULE = POE::Filter::SSL      PACKAGE = POE::Filter::SSL
 
 long
-SSL_set_tmp_dh(ssl,dh)
-     SSL *	ssl
-     DH *	dh
+POE_FILTER_SSL_set_tmp_dh(ssl,dh)
+   SSL *	ssl
+   DH *	dh
+   CODE:
+      RETVAL = SSL_set_tmp_dh(ssl,dh);
+   OUTPUT:
+      RETVAL
 
 long
-SSL_CTX_set_tmp_dh(ctx,dh)
+POE_FILTER_SSL_CTX_set_tmp_dh(ctx,dh)
    SSL_CTX *	ctx
    DH *	dh
+   CODE:
+      RETVAL = SSL_CTX_set_tmp_dh(ctx,dh);
+   OUTPUT:
+      RETVAL
 
 long
-SSL_CTX_set_tmp_rsa(ctx,rsa)
+POE_FILTER_SSL_CTX_set_tmp_rsa(ctx,rsa)
    SSL_CTX *	ctx
    RSA *	rsa
+   CODE:
+      RETVAL = SSL_CTX_set_tmp_rsa(ctx,rsa);
+   OUTPUT:
+      RETVAL
+
+int
+POE_FILTER_SSL_get_ex_data_X509_STORE_CTX_idx()
+   CODE:
+      RETVAL = SSL_get_ex_data_X509_STORE_CTX_idx();
+   OUTPUT:
+      RETVAL
 
 ASN1_INTEGER *
-X509_get_serialNumber(cert)
+POE_FILTER_X509_get_serialNumber(cert)
    X509 *      cert
    CODE:
       RETVAL = X509_get_serialNumber(cert);
@@ -39,7 +58,7 @@ X509_get_serialNumber(cert)
       sv_setpvn( ST(0), RETVAL->data, RETVAL->length);
 
 ASN1_INTEGER *
-verify_serial_against_crl_file(crlfile, serial)
+POE_FILTER_verify_serial_against_crl_file(crlfile, serial)
    CODE:
    X509_CRL *crl=NULL;
    X509_REVOKED *revoked;

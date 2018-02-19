@@ -39,7 +39,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.5.1
+    version: v2.5.2
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -76,15 +76,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.5.1
+    version: v2.5.2
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.5.1
+    version: v2.5.2
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.5.1
+    version: v2.5.2
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -105,7 +105,7 @@ resources:
   bugtracker: https://github.com/gfx/p5-Mouse/issues
   homepage: https://github.com/gfx/p5-Mouse
   repository: git://github.com/gfx/p5-Mouse.git
-version: v2.5.1
+version: v2.5.2
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'

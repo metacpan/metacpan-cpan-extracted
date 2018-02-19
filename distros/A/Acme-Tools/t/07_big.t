@@ -1,5 +1,5 @@
 #perl Makefile.PL;make;perl -Iblib/lib t/07_big.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 BEGIN{our $T=15}
 use Test::More tests => $T;
 eval{big(1)};

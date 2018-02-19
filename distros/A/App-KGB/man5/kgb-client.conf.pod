@@ -74,7 +74,7 @@ Timeout of the request. Defaults to the global B<timeout> setting.
 
 =head2 B<status_dir>
 
-Directory to store information about the last successfuly contacted server. If
+Directory to store information about the last successfully contacted server. If
 the request is soon after the last contact, the last server is tried first.
 This way related notifications tend to come out of the same server.
 
@@ -102,7 +102,7 @@ master).
 
 =head2 B<web-link>
 
-URL containing information about the commit (e.g. gitweb, viewvcs).
+URL containing information about the commit (e.g. cgit, gitweb, viewvcs).
 C<${commit}>, C<${branch}>, C<${module}> and C<${project}> in that string are
 substituted with the commit ID, the branch name, the module name and the
 project ID respectively.
@@ -170,7 +170,7 @@ L<App::KGB::Client::CVS>.
   - '^/(website)/()'
  web-link: 'http://svn.debian.org/viewvc/${project}?view=revision&revision=${commit}'
  # web-link: 'http://anonscm.debian.org/gitweb/?p=${project}/${module}.git;a=commitdiff;h=${commit}'
- #short-url-service: 'Metamark'
+ #short-url-service: 'TinyURL'
  short-url-service: 'Debli'
  ignore-branch: 'trunk'
  use-irc-notices: 0

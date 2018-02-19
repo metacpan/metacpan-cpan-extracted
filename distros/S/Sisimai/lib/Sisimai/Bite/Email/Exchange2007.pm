@@ -4,16 +4,12 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'          => qr/\AUndeliverable:/,
-    'content-language' => qr/\A[a-z]{2}(?:[-][A-Z]{2})?\z/,
-};
-my $Re1 = {
-    'begin'  => qr/[ ]Microsoft[ ]Exchange[ ]Server[ ]20\d{2}/,
-    'error'  => qr/[ ]((?:RESOLVER|QUEUE)[.][A-Za-z]+(?:[.]\w+)?);/,
-    'rhost'  => qr/\AGenerating[ ]server:[ ]?(.*)/,
-    'rfc822' => qr/\AOriginal message headers:/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'rfc822' => ['Original message headers:'] };
+my $MarkingsOf = {
+    'message' => qr/[ ]Microsoft[ ]Exchange[ ]Server[ ]20\d{2}/,
+    'error'   => qr/[ ]((?:RESOLVER|QUEUE)[.][A-Za-z]+(?:[.]\w+)?);/,
+    'rhost'   => qr/\AGenerating[ ]server:[ ]?(.*)/,
 };
 my $NDRSubject = {
     'SMTPSEND.DNS.NonExistentDomain'=> 'hostunknown',   # 554 5.4.4 SMTPSEND.DNS.NonExistentDomain
@@ -29,13 +25,10 @@ my $NDRSubject = {
     'RESOLVER.RST.RecipSizeLimit'   => 'mesgtoobig',    # 550 5.2.3 RESOLVER.RST.RecipSizeLimit
     'QUEUE.Expired'                 => 'expired',       # 550 4.4.7 QUEUE.Expired
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # Content-Language: en-US
 sub headerlist  { return ['Content-Language'] };
-sub pattern     { return $Re0 }
 sub description { 'Microsoft Exchange Server 2007' }
-
 sub scan {
     # Detect an error from Microsoft Exchange Server 2007
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -53,9 +46,9 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'subject'},'Undeliverable:') == 0;
     return undef unless defined $mhead->{'content-language'};
-    return undef unless $mhead->{'content-language'} =~ $Re0->{'content-language'};
+    return undef unless $mhead->{'content-language'} =~ /\A[a-z]{2}(?:[-][A-Z]{2})?\z/;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -71,10 +64,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -82,7 +75,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -112,7 +105,7 @@ sub scan {
                 # Original message headers:
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A([^ @]+[@][^ @]+)\z/ ) {
+                if( $e =~ /\A([^ @]+[@][^ @]+)\z/ ) {
                     # kijitora@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -122,7 +115,7 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[#]([45]\d{2})[ ]([45][.]\d[.]\d+)[ ].+\z/ ) {
+                } elsif( $e =~ /\A[#]([45]\d{2})[ ]([45][.]\d[.]\d+)[ ].+\z/ ) {
                     # #550 5.1.1 RESOLVER.ADR.RecipNotFound; not found ##
                     # #550 5.2.3 RESOLVER.RST.RecipSizeLimit; message too large for this recipien=
                     # t ##
@@ -131,17 +124,16 @@ sub scan {
                     $v->{'diagnosis'} = $e;
 
                 } else {
-                    if( length $v->{'diagnosis'} && $v->{'diagnosis'} =~ m/=\z/ ) {
+                    if( length $v->{'diagnosis'} && substr($v->{'diagnosis'}, -1, 1) eq '=' ) {
                         # Continued line of error messages
-                        $v->{'diagnosis'} =~ s/=\z//;
-                        $v->{'diagnosis'} .= $e;
+                        substr($v->{'diagnosis'}, -1, 1, $e);
                     }
                 }
             } else {
                 # Diagnostic information for administrators:
                 #
                 # Generating server: mta22.neko.example.org
-                if( $e =~ $Re1->{'rhost'} ) {
+                if( $e =~ $MarkingsOf->{'rhost'} ) {
                     # Generating server: mta22.neko.example.org
                     next if length $connheader->{'rhost'};
                     $connheader->{'rhost'} = $1;
@@ -154,7 +146,7 @@ sub scan {
 
     require Sisimai::String;
     for my $e ( @$dscontents ) {
-        if( $e->{'diagnosis'} =~ $Re1->{'error'} ) {
+        if( $e->{'diagnosis'} =~ $MarkingsOf->{'error'} ) {
             # #550 5.1.1 RESOLVER.ADR.RecipNotFound; not found ##
             my $f = $1;
             for my $r ( keys %$NDRSubject ) {
@@ -165,7 +157,7 @@ sub scan {
             }
         }
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
-        $e->{'agent'}  = __PACKAGE__->smtpagent;
+        $e->{'agent'} = __PACKAGE__->smtpagent;
     }
     $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
     return { 'ds' => $dscontents, 'rfc822' => $$rfc822part };
@@ -216,7 +208,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.056   2018-02-10
+        - Added the option "info".
+        - Update documentation.
+
 0.055   2018-02-08
         - Added experimental options.
         - Fixed 'reset' in "choose_a_number".

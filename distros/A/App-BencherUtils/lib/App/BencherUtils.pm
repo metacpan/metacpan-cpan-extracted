@@ -1,7 +1,7 @@
 package App::BencherUtils;
 
-our $DATE = '2017-08-02'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.240'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -661,6 +661,40 @@ sub bencher_code {
      {'cmdline.skip_format'=>1}];
 }
 
+$SPEC{bencher_for} = {
+    v => 1.1,
+    summary => 'List distributions that benchmarks specified modules',
+    description => <<'_',
+
+This utility consults <prog:lcpan> (local indexed CPAN mirror) to check if there
+are distributions that benchmarks a specified module. This is done by checking
+the presence of a dependency with the relationship `x_benchmarks`.
+
+_
+    args => {
+        modules => {
+            schema => ['array*', of=>'perl::modname*'],
+            req => 1,
+            pos => 0,
+            greedy => 1,
+        },
+    },
+
+};
+sub bencher_for {
+    require App::lcpan::Call;
+
+    my %args = @_;
+
+    my $res = App::lcpan::Call::call_lcpan_script(
+        argv => ["rdeps", "--phase", "x_benchmarks", @{ $args{modules} }],
+    );
+
+    return $res unless $res->[0] == 200;
+
+    return [200, "OK", [map {$_->{dist}} @{ $res->[2] }]];
+}
+
 1;
 # ABSTRACT: Utilities related to bencher
 
@@ -676,7 +710,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.23 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-08-02.
+This document describes version 0.240 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2018-02-18.
 
 =head1 SYNOPSIS
 
@@ -687,6 +721,8 @@ This distribution includes several utilities:
 =over
 
 =item * L<bencher-code>
+
+=item * L<bencher-for>
 
 =item * L<bencher-module-startup-overhead>
 
@@ -741,6 +777,40 @@ Arguments ('*' denotes required arguments):
 Use code_startup mode instead of normal benchmark.
 
 =item * B<with_process_size> => I<bool>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 bencher_for
+
+Usage:
+
+ bencher_for(%args) -> [status, msg, result, meta]
+
+List distributions that benchmarks specified modules.
+
+This utility consults L<lcpan> (local indexed CPAN mirror) to check if there
+are distributions that benchmarks a specified module. This is done by checking
+the presence of a dependency with the relationship C<x_benchmarks>.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<modules>* => I<array[perl::modname]>
 
 =back
 
@@ -1027,7 +1097,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -23,6 +23,7 @@ Bowen
 Bruhat
 CLDR
 CPAN
+Ceccarelli
 Christian
 Conflicts
 Conrad
@@ -48,6 +49,7 @@ Flávio
 Formatters
 GGGG
 GGGGG
+Gianni
 Glock
 Gregory
 Hansen
@@ -146,6 +148,7 @@ fallback
 fglock
 fiji
 formatter
+gianni
 github
 grinnz
 haukex

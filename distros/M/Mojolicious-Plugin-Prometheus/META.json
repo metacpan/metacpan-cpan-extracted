@@ -59,7 +59,7 @@
    "provides" : {
       "Mojolicious::Plugin::Prometheus" : {
          "file" : "lib/Mojolicious/Plugin/Prometheus.pm",
-         "version" : "v1.0.4"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -73,10 +73,12 @@
          "web" : "https://github.com/tyldum/mojolicious-plugin-prometheus"
       }
    },
-   "version" : "1.0.4",
+   "version" : "1.1.0",
    "x_authority" : "cpan:TYLDUM",
    "x_contributors" : [
       "Christopher Rasch-Olsen Raa <christopher@stix.no>",
-      "Vidar Tyldum <vidar@tyldum.com>"
+      "Roland Lammel <rl@neotel.at>",
+      "Vidar Tyldum <vidar@tyldum.com>",
+      "lammel <lammel@cpan.org>"
    ]
 }

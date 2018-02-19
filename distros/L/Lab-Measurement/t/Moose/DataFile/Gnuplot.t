@@ -55,7 +55,6 @@ $file->log_block(
 $expected .= <<"EOF";
 1\t10\t20
 1\t30\t40
-
 EOF
 file_ok( $path, $expected, "log_block method" );
 
@@ -63,8 +62,7 @@ file_ok( $path, $expected, "log_block method" );
 $block = pdl [ [ 1, 4, 7 ], [ 2, 5, 8 ], [ 3, 6, 9 ] ];
 
 $file->log_block(
-    block       => $block,
-    add_newline => 0
+    block => $block,
 );
 
 $expected .= <<"EOF";
@@ -87,7 +85,6 @@ $expected .= <<"EOF";
 5\t6\t1
 5\t6\t2
 5\t6\t3
-
 EOF
 
 file_ok( $path, $expected, "log_block with 1D pdl" );

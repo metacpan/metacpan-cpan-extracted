@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-01'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2018-02-17'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,7 +57,7 @@ btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.019 of btcindo (from Perl distribution App-btcindo), released on 2018-02-01.
+This document describes version 0.020 of btcindo (from Perl distribution App-btcindo), released on 2018-02-17.
 
 =head1 SYNOPSIS
 
@@ -347,7 +347,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -375,7 +375,7 @@ Filter by currency.
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -385,7 +385,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -425,7 +425,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -473,7 +473,7 @@ Default value:
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 
@@ -503,7 +503,7 @@ Filter by pair.
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -549,7 +549,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -589,7 +589,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--price>=I<s>*
 
@@ -625,7 +625,7 @@ Default value:
 
 Valid values:
 
- ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
+ ["btc_idr","bch_idr","btg_idr","eth_idr","etc_idr","ignis_idr","ltc_idr","nxt_idr","ten_idr","waves_idr","xlm_idr","xrp_idr","xzc_idr","bts_btc","dash_btc","doge_btc","eth_btc","ltc_btc","nxt_btc","xlm_btc","xem_btc","xrp_btc"]
 
 =item B<--secret>=I<s>*
 
@@ -701,7 +701,7 @@ Filter by currency.
 
 Valid values:
 
- ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","waves","xem","xlm","xrp","xzc"]
+ ["bch","btc","btg","bts","dash","doge","etc","eth","idr","ignis","ltc","nxt","ten","waves","xem","xlm","xrp","xzc"]
 
 =item B<--key>=I<s>*
 

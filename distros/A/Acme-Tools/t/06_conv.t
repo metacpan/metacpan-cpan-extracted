@@ -1,6 +1,6 @@
 #perl Makefile.PL;make;perl -Iblib/lib t/06_conv.t
 #perl -I/ext t/06_conv.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 37;
 
 sub check {

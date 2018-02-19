@@ -185,6 +185,14 @@ Mojo::IOLoop->one_tick;
 is_deeply \@results, [], 'promises not resolved';
 is_deeply \@errors, ['third'], 'promise rejected';
 
+# Empty all
+(@results, @errors) = ();
+Mojo::Promise->all()
+  ->then(sub { @results = 'pass', @_ }, sub { @errors = 'fail', @_ });
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['pass'], 'promise resolved';
+is_deeply \@errors, [], 'promise not rejected';
+
 # Settle with promise
 $promise  = Mojo::Promise->new->resolve('works');
 @results  = ();

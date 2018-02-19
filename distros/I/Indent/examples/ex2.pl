@@ -1,24 +1,18 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Data;
+use Indent::String;
 
-# Indent::Data object.
-my $i = Indent::Data->new(
-       'line_size' => '10',
-       'next_indent' => '  ',
-       'output_separator' => "|\n",
+# Object.
+my $i = Indent::String->new(
+        'line_size' => 20,
 );
 
-# Print indented text.
-print $i->indent('text text text text text text')."|\n";
+# Indent.
+print $i->indent(join(' ', ('text') x 7))."\n";
 
 # Output:
-# text text |
-#   text tex|
-#   t text t|
-#   ext|
+# text text text text
+# <--tab->text text text

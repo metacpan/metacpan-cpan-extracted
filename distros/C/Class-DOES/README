@@ -1,0 +1,80 @@
+NAME
+    Class::DOES - Provide a simple ->DOES override
+
+SYNOPSIS
+        package My::Class;
+
+        use Class::DOES qw/Some::Role/;
+
+        if (My::Class->DOES("Some::Role")) {
+            #...
+        }
+
+DESCRIPTION
+    Perl 5.10 introduced a new method in UNIVERSAL: "DOES". This was added
+    to support the concept of roles. A role is an interface (a set of
+    methods, with associated semantics) that a class or an object can
+    implement, without necessarily inheriting from it. A class declares that
+    it implements a given role by overriding the "->DOES" method to return
+    true when passed the name of the role.
+
+    This is all well and flexible, allowing advanced object systems like
+    Moose to implement the "->DOES" override as they see fit, but what about
+    ordinary classes that just want to declare they support a known
+    interface? That's what this module is for: you pass it a list of roles
+    on the "use" line, and it gives you a "->DOES" override that returns
+    true for
+
+    - any role in the supplied list;
+    - any class you inherit from;
+    - any role supported by any class you inherit from.
+
+    It makes the following assumptions:
+
+    - All your inheritance happens through @ISA.
+        That is, you haven't overridden "->isa".
+
+    - Noone else has given you a "->DOES" method.
+        That is, none of your superclasses have their own "->DOES" override
+        (other than one provided by this module).
+
+    If it detects either of these at "use" time, it will issue a warning.
+
+  Setting %DOES directly.
+    This module stores the roles you support in the %DOES hash in your
+    package. If you want "->DOES" to return something other that 1 for a
+    role you support, you can make an entry in your %DOES hash yourself and
+    it will be picked up.
+
+    You should not make entries with false values, as this would be very
+    confusing. If you do, then when "->DOES" is called it will return 1
+    instead of the given value, and will issue a warning.
+
+  DIAGNOSTICS
+    All of these can be disabled with
+
+        no warnings "Class::DOES";
+
+    %s has inherited an incompatible ->DOES
+        You have issued "use Class::DOES" from a class that already has a
+        "->DOES" method. This inherited method will be completely ignored,
+        so any roles it claims to support will be lost.
+
+    %s doesn't use @ISA for inheritance
+        You have issued "use Class::DOES" from a class with an overriden
+        "->isa". Since the exported "->DOES" method uses @ISA to determine
+        inheritance, any extra classes "->isa" claims to inherit from will
+        not be checked for the requested role.
+
+    $%s::DOES{%s} is false, returning 1
+        "->DOES" has found a false entry in a %DOES hash, and is returning 1
+        instead to indicate the role is supported.
+
+AUTHOR
+    Copyright 2009 Ben Morrow <ben@morrow.me.uk>.
+
+    This program is licensed under the same terms as Perl.
+
+BUGS
+    Please send bug reports to <bug-Class-DOES@rt.cpan.org>.
+

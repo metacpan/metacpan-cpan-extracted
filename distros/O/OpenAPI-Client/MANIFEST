@@ -11,11 +11,15 @@ MANIFEST			This list of files
 t/00-basic.t
 t/body-validation.t
 t/client.t
+t/command-local-with-ref.t
 t/command-local.t
 t/command-remote.t
 t/command.t
 t/default-base-url.t
 t/json-request.t
 t/spec.json
+t/spec/dummy.json
+t/spec/with-external-ref.json
+t/spec/with-ref.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

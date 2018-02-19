@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package Acme::Tools;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use 5.008;     #Perl 5.8 was released July 18th 2002
 use strict;
@@ -70,6 +70,9 @@ our @EXPORT = qw(
   not_intersect
   mix
   zip
+  sim
+  sim_perm
+  subarr
   subhash
   hashtrans
   zipb64
@@ -146,6 +149,7 @@ our @EXPORT = qw(
   pwgen
   read_conf
   openstr
+  printed
   ldist
   $Re_isnum
   isnum
@@ -169,7 +173,12 @@ our @EXPORT = qw(
   keysr
   valuesr
   eachr
+  aoh2sql
+  aoh2xls
+  base64
+  unbase64
   ed
+  changed
   $Edcursor
   brainfu
   brainfu2perl
@@ -219,16 +228,18 @@ Acme::Tools - Lots of more or less useful subs lumped together and exported into
 
  print sum(1,2,3);                   # 6
  print avg(2,3,4,6);                 # 3.75
+ print median(2,3,4,6);              # 3.5
+ print percentile(25, 101..199);     # 125
 
- my @list = minus(\@listA, \@listB); # set operations
- my @list = union(\@listA, \@listB); # set operations
+ my @list = minus(\@listA, \@listB); # set operation
+ my @list = union(\@listA, \@listB); # set operation
 
  print length(gzip("abc" x 1000));   # far less than 3000
 
  writefile("/dir/filename",$string); # convenient
- my $s=readfile("/dir/filename");    # also conventient
+ my $s=readfile("/dir/filename");    # also convenient
 
- print "yes!" if between($pi,3,4);
+ print "yes!" if between($PI,3,4);
 
  print percentile(0.05, @numbers);
 
@@ -238,7 +249,12 @@ Acme::Tools - Lots of more or less useful subs lumped together and exported into
  my $dice = random(1,6);
  my $color = random(['red','green','blue','yellow','orange']);
 
- ...and more.
+ pushr $arrayref[$num], @stuff;      # push @{ $arrayref[$num] }, @stuff ... popr, shiftr, unshiftr
+
+ print 2**200;       # 1.60693804425899e+60
+ print big(2)**200;  # 1606938044258990275541962092341162602522202993782792835301376
+
+ ...and much more.
 
 =encoding utf8
 
@@ -254,6 +270,14 @@ Subs created and collected since the mid-90s.
 
  sudo cpan Acme::Tools
  sudo cpanm Acme::Tools   # after: sudo apt-get install cpanminus make   # for Ubuntu 12.04
+
+Or to get the very newest:
+
+ git clone https://github.com/kjetillll/Acme-Tools.git
+ cd Acme-Tools
+ perl Makefile.PL
+ make test
+ sudo make install
 
 =head1 EXPORT
 
@@ -732,6 +756,43 @@ our %conv=(
 		  alen    => 0.0254*12*2,             #0.6096m
 		  favn    => 0.0254*12*2*3,           #1.8288m
 		  kvart   => 0.0254*12*2/4,           #0.1524m a quarter alen
+                  #--https://upload.wikimedia.org/wikipedia/commons/e/eb/English_length_units_graph.svg
+                  twip          => 0.254 / 6 / 12 / 20,
+                  point         => 0.254 / 6 / 12,
+                  pica          => 0.254 / 6,
+                  line          => 0.254 / 12,
+                  barleycorn    => 0.254 / 3,
+                  poppyseed     => 0.254 / 3 / 4,
+                  finger        => 0.254 / 6 / 12 * 63,
+                  palm          => 0.254 * 3,
+                  digit         => 0.254 * 3 / 4,
+                  nail          => 0.254 * 3 / 4 * 3,
+                  stick         => 0.254 * 2,
+                  hand          => 0.254 * 2 * 2,
+                  foot          => 0.254 * 2 * 2 * 3,
+                  shaftment     => 0.254 * 3 * 2,
+                  span          => 0.254 * 3 * 3,
+                  ell           => 0.254 * 3 * 3 * 5,
+                  pace          => 0.254 * 3 * 2 * 5,
+                  step          => 0.254 * 3 * 2 * 5,
+                  cubit         => 0.254 * 3 * 2 * 3,
+                  rod           => 0.254 * 3 * 2 * 3 * 11,
+                  link          => 0.254 * 3 * 2 * 3 * 11 / 25,
+                  yard          => 0.254 * 2 * 2 * 3 * 3,
+                  grade         => 0.254 * 3 * 2 * 5 * 2,
+                  rope          => 0.254 * 3 * 2 * 5 * 2 * 4,
+                  skein         => 0.254 * 3 * 3 * 5 * 96,                   # 96 ell
+                  fathom        => 0.254 * 2 * 2 * 3 * 3 * 2,                # 2 yard
+                  spindle       => 0.254 * 3 * 3 * 5 * 96 * 120,             # 120 skein
+                  gunter_chain  => 0.254 * 2 * 2 * 3 * 3 * 2 * 11,           # 11 fathom
+                  ramsden_chain => 0.254 * 3 * 2 * 5 * 2 * 4 * 5,            # 5 rope
+                  shackle       => 0.254 * 2 * 2 * 3 * 3 * 2 * 15,           # 15 fathom
+                  cable         => 0.254 * 2 * 2 * 3 * 3 * 2 * 100,          # 100 fathom
+                  furlong       => 0.254 * 2 * 2 * 3 * 3 * 2 * 11 * 10,      # 10 gunter_chain, 220 yard
+                  roman_mile    => 0.254 * 3 * 2 * 5 * 2 * 4 * 5 * 50,       # 50 ramsden_chain
+                  statute_mile  => 0.254 * 2 * 2 * 3 * 3 * 2 * 11 * 10 * 8,  # 8 furlong
+                  nautic_mile   => 0.254 * 2 * 2 * 3 * 3 * 2 * 100 * 10,     # 10 cable
+                  league        => 0.254 * 2 * 2 * 3 * 3 * 2 * 100 * 10 * 5, # 5 nautic_mile
 		 },
 	 mass  =>{ #https://en.wikipedia.org/wiki/Unit_conversion#Mass
 		  g            => 1,
@@ -1159,69 +1220,71 @@ our %conv=(
 		  binary_radian => 1/256,
 		  brad          => 1/256,
                  },
-	 money =>{                        # rates at dec 17 2015
-                  AED => 2.389117,        #
-                  ARS => 0.895122,        #
-                  AUD => 6.253619,        #
-                  BGN => 4.847575,        #
-                  BHD => 23.267384,       #
-                  BND => 6.184624,        #
-                  BRL => 2.260703,        #
-                  BTC => 3910.932213547,  #bitcoin
-                  BWP => 0.794654,        #
-                  CAD => 6.289957,        #
-                  CHF => 8.799974,        #
-                  CLP => 0.012410,        #
-                  CNY => 1.353406,        #
-                  COP => 0.00262229,      #
-                  CZK => 0.351171,        #
-                  DKK => 1.271914,        #
-                  EUR => 9.489926,        #
-                  GBP => 13.069440,       #
-                  HKD => 1.131783,        #
-                  HRK => 1.240878,        #
-                  HUF => 0.029947,        #
-                  IDR => 0.00062471,      #
-                  ILS => 2.254456,        #
-                  INR => 0.132063,        #
-                  IRR => 0.00029370,      #
-                  ISK => 0.067245,        #
-                  JPY => 0.071492,        #
-                  KRW => 0.00739237,      #
-                  KWD => 28.862497,       #
-                  KZT => 0.027766,        #
-                  LKR => 0.061173,        #
-                  LTC => 31.78895354018,  #litecoin
-                  LTL => 2.748472,        #
-                  LVL => 13.503025,       #
-                  LYD => 6.296978,        #
-                  MUR => 0.240080,        #
-                  MXN => 0.515159,        #
-                  MYR => 2.032465,        #
-                  NOK => 1.000000000,     #norwegian kroner
-                  NPR => 0.084980,        #
-                  NZD => 5.878331,        #
-                  OMR => 22.795994,       #
-                  PHP => 0.184839,        #
-                  PKR => 0.083779,        #
-                  PLN => 2.207243,        #
-                  QAR => 2.409162,        #
-                  RON => 2.101513,        #
-                  RUB => 0.122991,        #
-                  SAR => 2.339745,        #
-                  SEK => 1.023591,        #
-                  SGD => 6.184624,        #
-                  THB => 0.242767,        #
-                  TRY => 2.994338,        #
-                  TTD => 1.374484,        #
-                  TWD => 0.265806,        #
-                  USD => 8.774159,        #
-                  VEF => 1.395461,        #
-                  ZAR => 0.576487,        #
-                  XBT => 3910.932213547, # bitcoin
-                 mBTC => 3910.932213547, # bitcoin
-                 mXBT => 3910.932213547, # bitcoin
-		 },
+	 money =>{                      # rates at 18th feb 2018
+           NOK => 1.000000000,          #norwegian kroner
+           AED => 2.118503,             #united arab emirates dirham 
+           ARS => 0.393725,             #argentina peso
+           AUD => 6.162408,             #australian dollar
+           BCH => 12118.36327559,       #bitcoin cash
+           BGN => 4.937892,             #bulgarian lev
+           BHD => 20.692023,            #bahrain dinar
+           BND => 5.931982,             #brunei dollar
+           BRL => 2.407647,             #brazilian real
+           BTC => 84864.0984477,        #bitcoin
+           BWP => 0.825478,             #botswana pulaa
+           CAD => 6.201377,             #canadian dollar
+           CHF => 8.391971,             #switzerland franc
+           CLP => 0.013110,             #chili peso
+           CNY => 1.226451,             #china yuan/renminbi
+           COP => 0.00274549,           #colombian peso
+           CZK => 0.380706,             #czech koruna
+           DKK => 1.295957,             #danish kroner
+           ETC => 257.8101864767,       #ethereum-classic
+           ETH => 7410.657012902,       #ethereum
+           EUR => 9.657677,             #euro
+           GBP => 10.913727,            #great britain pound, british pound
+           '£' => 10.913727,            #great britain pound, british pound, symbol
+           HKD => 0.994705,             #hong kong dollar
+           HRK => 1.301015,             #croatian kuna
+           HUF => 0.030922,             #hungarian forint
+           IDR => 0.00057358,           #indonesian rupia
+           ILS => 2.191990,             #israel new shekel
+           INR => 0.121070,             #indian rupee
+           IRR => 0.00020984,           #iranian rial
+           ISK => 0.077647,             #icelandic kroner
+           JPY => 0.073271,             #japanish yen
+           KRW => 0.00729673,           #south korean won
+           KWD => 25.925147,            #kuwait dinar
+           KZT => 0.024338,             #kazakhstanian tenge
+           LKR => 0.050121,             #sri lanka rupee
+           LTC => 1782.926421562,       #litecoin
+           LYD => 5.866758,             #libyan dinar
+           MUR => 0.239306,             #mauritius
+           MXN => 0.418798,             #mexico peso
+           MYR => 1.998096,             #malaysian ringgit
+           NPR => 0.075316,             #nepal rupee
+           NZD => 5.745187,             #new zealand dollar
+           OMR => 20.234592,            #oman rial
+           PHP => 0.148869,             #philippines peso
+           PKR => 0.070338,             #pakistan rupee
+           PLN => 2.319848,             #poland zloty
+           QAR => 2.137418,             #qatar rial
+           RON => 2.070137,             #romaina new nei
+           RUB => 0.137791,             #russia rouble / rubel
+           SAR => 2.074720,             #saudi arabia riyal
+           SEK => 0.976704,             #swedish kroner
+           SGD => 5.931982,             #singapore dollar
+           THB => 0.248282,             #thailand baht
+           TRY => 2.076265,             #turkish new lira
+           TTD => 1.150931,             #trinidad/tobago dollar
+           TWD => 0.267321,             #taiwan dollar
+           USD => 7.780201,             #us dollar
+          '$'  => 7.780201,             #us doller, symbol
+           VEF => 0.778994,             #venezuelan bolivares fuertes
+           XBT => 84864.0984477,        #synonym for BTC
+           XRP => 8.96808208868,        #ripple
+           ZAR => 0.667117,             #south africa rand
+          },
           numbers =>{
 	    dec=>1,hex=>1,bin=>1,oct=>1,roman=>1,      des=>1,#des: spelling error in v0.15-0.16
             dusin=>1,dozen=>1,doz=>1,dz=>1,gross=>144,gr=>144,gro=>144,great_gross=>12*144,small_gross=>10*12,
@@ -1464,15 +1527,49 @@ See L<http://en.wikipedia.org/wiki/Roman_numbers> for more.
 =cut
 
 #alternative algorithm: http://www.rapidtables.com/convert/number/how-number-to-roman-numerals.htm
+#see also t/17_roman.t sub int2roman_old
 sub int2roman {
-  my($n,@p)=(shift,[],[1],[1,1],[1,1,1],[1,2],[2],[2,1],[2,1,1],[2,1,1,1],[1,3],[3]);
-    !defined($n)? undef
+    my $n=shift;
+    !defined$n  ? undef
   : !length($n) ? ""
-  : int($n)!=$n ? croak"int2roman: $n is not an integer"
-  : $n==0       ? ""
   : $n<0        ? "-".int2roman(-$n)
-  : $n>3999     ? "M".int2roman($n-1000)
-  : join'',@{[qw/I V X L C D M/]}[map{my$i=$_;map($_+5-$i*2,@{$p[$n/10**(3-$i)%10]})}(0..3)];
+  : int($n)!=$n ? croak"int2roman: $n is not an integer"
+#  : $] >= 5.014 ?        #s///r modifier introduced in perl v5.14
+#        ("I" x $n)
+#        =~s,I{1000},M,gr #unnecessary, but speedup for n>1000
+#        =~s,I{100},C,gr  #unnecessary, but speedup for n>100
+#        =~s,I{10},X,gr   #unnecessary, but speedup for n>10
+#        =~s,IIIII,V,gr
+#        =~s,IIII,IV,gr
+#        =~s,VV,X,gr
+#        =~s,VIV,IX,gr
+#        =~s,XXXXX,L,gr
+#        =~s,XXXX,XL,gr
+#        =~s,LL,C,gr
+#        =~s,LXL,XC,gr
+#        =~s,CCCCC,D,gr
+#        =~s,CCCC,CD,gr
+#        =~s,DD,M,gr
+#        =~s,DCD,CM,gr
+  : do {
+      $n="I" x $n;
+      $n=~s,I{1000},M,g; #unnecessary, but speedup for n>1000
+      $n=~s,I{100},C,g;  #unnecessary, but speedup for n>100
+      $n=~s,I{10},X,g;   #unnecessary, but speedup for n>10
+      $n=~s,IIIII,V,g;
+      $n=~s,IIII,IV,g;
+      $n=~s,VV,X,g;
+      $n=~s,VIV,IX,g;
+      $n=~s,XXXXX,L,g;
+      $n=~s,XXXX,XL,g;
+      $n=~s,LL,C,g;
+      $n=~s,LXL,XC,g;
+      $n=~s,CCCCC,D,g;
+      $n=~s,CCCC,CD,g;
+      $n=~s,DD,M,g;
+      $n=~s,DCD,CM,g;
+      $n
+     }
 }
 
 sub roman2int {
@@ -1597,7 +1694,7 @@ C<< Math::BigInt->new() >>, C<< Math::BigFloat->new() >> and C<< Math::BigRat->n
 
   print 1/7;          # 0.142857142857143
   print 1/big(7);     # 0      because of integer arithmetics
-  print 1/big(7.0);   # 0      because 7.0 is viewed as an integer
+  print 1/big(7.0);   # 0      because 7.0 is viewed as an integer, see bigf below
   print 1/big('7.0'); # 0.1428571428571428571428571428571428571429
   print 1/bigf(7);    # 0.1428571428571428571428571428571428571429
   print bigf(1/7);    # 0.142857142857143   probably not what you wanted
@@ -1761,6 +1858,8 @@ In the last example $v is changed because the argument is a reference. (To keep 
 
 =cut
 
+#TODO: undef min|max => dont curb min|max
+
 sub curb {
   my($val,$min,$max)=@_;
   croak "curb: wrong args" if @_!=3 or !defined$min or !defined$max or !defined$val or $min>$max;
@@ -1781,7 +1880,7 @@ sub log2  { log($_[0])/log(2)  }
 
 Returns input string as uppercase or lowercase.
 
-Can be used if Perls build in C<uc()> and C<lc()> for some reason does not convert æøå or other latin letters outsize a-z.
+Can be used if Perls build in C<uc()> and C<lc()> for some reason does not convert æøå or other latin1 letters outsize a-z.
 
 Converts C<< æøåäëïöüÿâêîôûãõàèìòùáéíóúýñð >> to and from C<< ÆØÅÄËÏÖÜ?ÂÊÎÔÛÃÕÀÈÌÒÙÁÉÍÓÚÝÑÐ >>
 
@@ -1844,7 +1943,7 @@ sub trim {
   my $s=shift;
   if(ref($s) eq 'SCALAR'){ $$s=~s,^\s+|(?<=\s)\s+|\s+$,,g; return $$s}
   if(ref($s) eq 'ARRAY') { trim(\$_) for @$s; return $s }
-  $s=~s,^\s+|(?<=\s)\s+|\s+$,,g;
+  $s=~s,^\s+|(?<=\s)\s+|\s+$,,g if defined $s;
   $s;
 }
 
@@ -2029,6 +2128,37 @@ sub repl {
 
 =head1 ARRAYS
 
+=head2 subarr
+
+The equivalent of C<substr> on arrays or C<splice> without changing the array.
+Input: 1) array or arrayref, 2) offset and optionally 3) length. Without a
+third argument, subarr returns the rest of the array.
+
+ @top10    = subarr( @array, 0, 10);   # first 10
+ @last_two = subarr( @array, -2, 2);   # last 2
+ @last_two = subarr( $array_ref, -2);  # also last 2
+ @last_six = subarr $array_ref, -6;    # parens are optional
+
+The same can be obtained from C<< @array[$from..$to] >> but that dont work the
+same way with negative offsets and boundary control of length.
+
+=cut
+
+#Todo: sjekk paastand over
+
+
+#sub subarr(+$;$) { #perl>=5.14        # t/35_subarr.t
+sub subarr { #perl<5.14
+  my($a,$o,$l)=@_;
+  $o=@$a+$o if $o<0;
+  $o=0      if $o<0;
+  $o=@$a-1  if $o>@$a-1;
+  $l=@$a-$o if @_<3;
+  die       if $l<0;
+  $l=@$a-$o if $l>@$a-$o;
+  @$a[$o..$o+$l-1];
+}
+
 =head2 min
 
 Returns the smallest number in a list. Undef is ignored.
@@ -2108,6 +2238,114 @@ sub zip {
   return @res;
 }
 
+=head2 sim
+
+B<Input:> Two or more strings
+
+B<Output:> A number 0 - 1 indicating the similarity between two strings.
+
+Requires L<String::Similarity> where the real magic happens.
+
+ sim("Donald Duck", "Donald E. Knuth");    # returns 0.615
+ sim("Kalle Anka", "Kalle And")'           # returns 0.842
+ sim("Kalle Anka", "Kalle Anka");          # returns 1
+ sim("Kalle Anka", "kalle anka");          # returns 0.8
+ sim(map lc, "Kalle Anka", "kalle anka");  # returns 1
+
+Todo: more doc
+
+=cut
+    
+sub sim {
+  require String::Similarity;
+  my($str,@r)=@_;
+  @r==1 and return String::Similarity::similarity(@_); #to param
+  my($min,$mindiff);
+  if(ref($r[0]) eq 'ARRAY'){
+    ($min,$mindiff)=@r[1,2];
+    @r=@{$r[0]};
+  }
+  $min||=0;
+  my $likest;
+  my $simlikest;
+  my $simnestlikest;
+  my $idlikest;
+  for(@r){
+    my($s,$id)=ref($_) eq 'ARRAY' ? @$_ : ($_);
+    my $sim=String::Similarity::similarity($str,$s,$simnestlikest);
+    if($sim>=$simlikest){
+      $simnestlikest=$simlikest;
+      $likest=$s;
+      $simlikest=$sim;
+      $idlikest=$id if defined $id;
+    }
+    elsif($sim>=$simnestlikest){
+      $simnestlikest=$sim;
+    }
+  }
+  my@ret=($simlikest,$likest);
+  @ret=(undef,undef) if $simnestlikest>0 and $simlikest-$simnestlikest<$mindiff;
+  @ret=(undef,undef) if $simlikest<$min;
+  @ret=(@ret,$simnestlikest,$simlikest,$likest);
+  push(@ret, $ret[0] ? $idlikest : undef) if defined $idlikest;
+  return wantarray?@ret:$ret[0];
+}
+
+=head2 sim_perm
+
+B<Input:> Two strings
+
+B<Output:> A number 0 - 1 indicating the maximum similarity between two strings tested
+against all permutations of both strings split on C<< [\s,]+ >> and where the string
+with most words (i.e. names) are cut to as many words as the one with least words.
+
+Requires L<String::Similarity> where the real magic happens.
+
+While sim() is case sensitive, sim_perm() is not.
+
+ Name1                              Name2                                 sim() sim_perm()
+ ---------------------------------- ------------------------------------- ----- ----------
+ Humphrey DeForest Bogart           Bogart Humphrey DeForest               0.71       1.00
+ Humphrey Bogart                    Humphrey Gump Bogart                   0.86       1.00
+ Humphrey deforest Bogart           Bogart DeForest                        0.41       1.00
+ Humfrey DeForest Boghart           BOGART HUMPHREY                        0.05       0.87
+ Humphrey                           Bogart Humphrey                        0.70       1.00
+ Humfrey Deforest Boghart           BOGART D. HUMFREY                      0.15       0.78 *)
+
+sim_perm() was written to identify double-profiles in databases: two people with
+either the same (or similar) email or phone number or zip code and similar enough
+names are going on the list of probable doubles.
+
+*) Todo: should be higher than 0.78, deal with initials better
+
+=cut
+
+sub sim_perm {
+  require String::Similarity;
+  my($s1,$s2)=map upper($_), @_;
+  $s1=~s/^\s*(.+?)\s*$/$1/;
+  $s2=~s/^\s*(.+?)\s*$/$1/;
+  croak if not length($s1) or not length($s2);
+  my $max;
+  for(cart([permutations(split(/[\s,]+/,$s1))],
+           [permutations(split(/[\s,]+/,$s2))]))
+  {
+    my($n1,$n2)=@$_;
+    if(@$n1>@$n2){    pop@$n1 while @$n1>@$n2 }
+    else         {    pop@$n2 while @$n1<@$n2 }
+    my($str1,$str2)=map join(" ",@$_),($n1,$n2);
+    if(defined $max){
+      my $sim=String::Similarity::similarity($str1,$str2,$max);
+      $max=$sim if $sim>$max;
+    }
+    else {
+      $max=String::Similarity::similarity($str1,$str2);
+    }
+    last if $max==1;
+  }
+  return $max;
+}
+    
 
 =head2 pushsort
 
@@ -2501,12 +2739,178 @@ sub splicer  { @_==1 ? splice( @{shift()} )
               :@_==2 ? splice( @{shift()}, shift() )
               :@_==3 ? splice( @{shift()}, shift(), shift() )
               :@_>=4 ? splice( @{shift()}, shift(), shift(), @_ ) : die }
-sub keysr    { keys(   %{shift()} )   } #hm sort(keys%{shift()}) ?
+sub keysr    { ref($_[0]) eq 'HASH' ? keys(%{shift()}) : keysr({@{shift()}})  } #hm sort(keys%{shift()}) ?
 sub valuesr  { values( %{shift()} )    }
 sub eachr    { ref($_[0]) eq 'HASH'  ? each(%{shift()})
              #:ref($_[0]) eq 'ARRAY' ? each(@{shift()})  # perl 5.8.8 cannot compile each on array! eval?
-              :                        croak("eachr needs hashref or arrayref got '".ref($_[0])."'") }
+		   :                        croak("eachr needs hashref or arrayref got '".ref($_[0])."'") }
+#sub mapr    # som scala: hvis map faar subref se kalles den sub paa hvert elem og resultatet returneres
+
 #sub eachr    { each(%{shift()}) }
+
+=head2 aoh2sql
+
+  my @oceania=(
+  {Area=>undef,   Capital=>'Pago Pago',        Code=>'AS', Name=>'American Samoa',                       Population=>54343},
+  {Area=>7686850, Capital=>'Canberra',         Code=>'AU', Name=>'Australia',                            Population=>22751014},
+  {Area=>undef,   Capital=>'West Island',      Code=>'CC', Name=>'Cocos (Keeling) Islands',              Population=>596},
+  {Area=>240,     Capital=>'Avarua',           Code=>'CK', Name=>'Cook Islands',                         Population=>9838},
+  {Area=>undef,   Capital=>'Flying Fish Cove', Code=>'CX', Name=>'Christmas Island',                     Population=>1530},
+  {Area=>18270,   Capital=>'Suva',             Code=>'FJ', Name=>'Fiji',                                 Population=>909389},
+  {Area=>702,     Capital=>'Palikir',          Code=>'FM', Name=>'Micronesia, Federated States of',      Population=>105216},
+  {Area=>549,     Capital=>'Hagatna (Agana)',  Code=>'GU', Name=>'Guam',                                 Population=>161785},
+  {Area=>811,     Capital=>'Tarawa',           Code=>'KI', Name=>'Kiribati',                             Population=>105711},
+  {Area=>181.3,   Capital=>'Majuro',           Code=>'MH', Name=>'Marshall Islands',                     Population=>72191},
+  {Area=>19060,   Capital=>'Noumea',           Code=>'NC', Name=>'New Caledonia',                        Population=>271615},
+  {Area=>undef,   Capital=>'Kingston',         Code=>'NF', Name=>'Norfolk Island',                       Population=>2210},
+  {Area=>21,      Capital=>'Yaren District',   Code=>'NR', Name=>'Nauru',                                Population=>9540},
+  {Area=>260,     Capital=>'Alofi',            Code=>'NU', Name=>'Niue',                                 Population=>1190},
+  {Area=>268680,  Capital=>'Wellington',       Code=>'NZ', Name=>'New Zealand',                          Population=>4438393},
+  {Area=>undef,   Capital=>'Papeete',          Code=>'PF', Name=>'French Polynesia',                     Population=>282703},
+  {Area=>462840,  Capital=>'Port Moresby',     Code=>'PG', Name=>'Papua New Guinea',                     Population=>6672429},
+  {Area=>undef,   Capital=>'Adamstown',        Code=>'PN', Name=>'Pitcairn',                             Population=>48},
+  {Area=>458,     Capital=>'Melekeok',         Code=>'PW', Name=>'Palau',                                Population=>21265},
+  {Area=>28450,   Capital=>'Honiara',          Code=>'SB', Name=>'Solomon Islands',                      Population=>622469},
+  {Area=>undef,   Capital=>undef,              Code=>'TK', Name=>'Tokelau',                              Population=>1337},
+  {Area=>26,      Capital=>'Funafuti',         Code=>'TV', Name=>'Tuvalu',                               Population=>10869},
+  {Area=>12200,   Capital=>'Port-Vila',        Code=>'VU', Name=>'Vanuatu',                              Population=>272264},
+  {Area=>undef,   Capital=>'Mata-Utu',         Code=>'WF', Name=>'Wallis and Futuna',                    Population=>15500},
+  {Area=>2944,    Capital=>'Apia',             Code=>'WS', Name=>'Samoa (Western)',                      Population=>197773}
+  );
+
+ print aoh2sql(\@oceania,{
+    name=>'country',
+    drop=>2,
+   #number=>'numeric',    #default
+   #varchar=>'varchar',   #default, change to varchar2 if Oracle
+   #date=>'date',         #default, perhaps change to 'timestamp with time zone' if postgres
+   #varchar_maxlen=>4000, #default, 4000 (used to be?) is max in Oracle
+   #create=>1,            #default, use 0 to dont include create table 
+   #drop=>0,              #default 0: dont include drop table x; 1: drop table x; 2: drop table if exists x;
+   #end=>"commit;\n",
+   #begin=>"begin;\n",
+   #fix_colnames=>0,
+ });
+
+Returns:
+
+ begin;
+ 
+ drop table if exists country;
+ 
+ create table country (
+   Area                           numeric(9,1),
+   Capital                        varchar(16),
+   Code                           varchar(2) not null,
+   Name                           varchar(36) not null,
+   Population                     numeric(9)
+ );
+ 
+ insert into country values (null,'Pago Pago','AS','American Samoa',54343);
+ insert into country values (7686850,'Canberra','AU','Australia',22751014);
+ insert into country values (null,'West Island','CC','Cocos (Keeling) Islands',596);
+ insert into country values (240,'Avarua','CK','Cook Islands',9838);
+ insert into country values (null,'Flying Fish Cove','CX','Christmas Island',1530);
+ insert into country values (18270,'Suva','FJ','Fiji',909389);
+ insert into country values (702,'Palikir','FM','Micronesia, Federated States of',105216);
+ insert into country values (549,'Hagatna (Agana)','GU','Guam',161785);
+ insert into country values (811,'Tarawa','KI','Kiribati',105711);
+ insert into country values (181.3,'Majuro','MH','Marshall Islands',72191);
+ insert into country values (19060,'Noumea','NC','New Caledonia',271615);
+ insert into country values (null,'Kingston','NF','Norfolk Island',2210);
+ insert into country values (21,'Yaren District','NR','Nauru',9540);
+ insert into country values (260,'Alofi','NU','Niue',1190);
+ insert into country values (268680,'Wellington','NZ','New Zealand',4438393);
+ insert into country values (null,'Papeete','PF','French Polynesia',282703);
+ insert into country values (462840,'Port Moresby','PG','Papua New Guinea',6672429);
+ insert into country values (null,'Adamstown','PN','Pitcairn',48);
+ insert into country values (458,'Melekeok','PW','Palau',21265);
+ insert into country values (28450,'Honiara','SB','Solomon Islands',622469);
+ insert into country values (null,null,'TK','Tokelau',1337);
+ insert into country values (26,'Funafuti','TV','Tuvalu',10869);
+ insert into country values (12200,'Port-Vila','VU','Vanuatu',272264);
+ insert into country values (null,'Mata-Utu','WF','Wallis and Futuna',15500);
+ insert into country values (2944,'Apia','WS','Samoa (Western)',197773);
+ commit;
+
+
+=cut
+
+sub aoh2sql {
+    my($aoh,$conf)=@_;
+    my %def=( #defaults
+	name=>'my_table',
+	number=>'numeric',
+	varchar=>'varchar',
+	date=>'date',
+	varchar_maxlen=>4000,
+	create=>1,
+	drop=>0,  # 1 drop table if exists, 2 plain drop
+	end=>"commit;\n",
+	begin=>"begin;\n",
+	fix_colnames=>0,
+	);
+    my %conf=(%def,(@_<2?():%$conf));
+#    $conf{$_}||=$def{$_} for keys%def;
+    my %col;
+    map $col{$_}++, keys %$_ for @$aoh;
+    my @col=sort keys %col;
+    my @colerr=grep!/^[a-z]\w+$/i,@col;
+    croak "Invalid column name(s): @colerr" if @colerr and !$conf{fix_colnames};
+    my(%t,%tdb);
+    for my $c (@col){
+	my($l,$s,$p,$nn,%ant,$t)=(0,0,0,0);
+	for my $r (@$aoh){
+	    my $v=$$r{$c};
+	    next if !defined$v or $v!~/\S/;
+	    $nn++;
+	    $l=length($v) if length($v)>$l;
+	    no warnings 'uninitialized';
+	    if($v=~/^(18|19|20)\d\d(0[1-9]|1[0-2])(0[1-9]|1\d|2\d|3[01])-?\d\d:?\d\d:?\d\d$/ and $conf{date}){
+		$ant{date}++;
+		next;
+	    }
+	    elsif($v=~/^\s*[-+]?(\d*)(\.\d+)?([Ee]\-?\d+)?\s*$/ and length("$1$2") and $conf{number}){
+		$ant{number}++;
+		$s=length("$1.$2") if length("$1.$2")>$s;#hm
+		$p=length($2)-1 if $2 and length($2)-1>$p;
+		next;
+	    }
+	    else {
+		$ant{varchar}++;
+	    }
+	}
+	$t||='varchar' if $ant{varchar}  or  $ant{number} and $ant{date};
+	$t||='number'  if $ant{number};
+	$t||='date'    if $ant{date};
+	$t||='varchar'; #hm
+	$l=$conf{varchar_maxlen} if $conf{varchar_maxlen} and $l>$conf{varchar_maxlen};
+	$l||=1;
+	my $tdb;
+	$tdb="$conf{$t}($l)"    if $t eq 'varchar';
+	$tdb="$conf{$t}($s)"    if $t eq 'number' and $p==0;
+	$tdb="$conf{$t}($s,$p)" if $t eq 'number' and $p>0 and ++$s;
+	$tdb.=" not null" if $nn == 0+@$aoh;
+	$t{$c}=$t;
+	$tdb{$c}=$tdb;
+    }
+    my $sql;
+    $sql="create table $conf{name} (".
+	 join(",",map sprintf("\n  %-30s %s",do{s/\W+//g;$_},$tdb{$_}), @col). "\n);\n\n" if $conf{create};
+    my $val=sub{my($v,$t)=@_;defined$v or $v="";!length($v)?'null':$t eq 'number' ? $v : "'".repl($v,"\'","''")."'"};
+    for my $r (@$aoh){
+	my $v=join",",map &$val($$r{$_},$t{$_}), @col;
+	$sql.="insert into $conf{name} values ($v);\n";
+    }
+    $sql="drop table $conf{name};\n\n$sql" if $conf{drop}==1;
+    $sql="drop table if exists $conf{name};\n\n$sql" if $conf{drop}>=2;
+    $sql="$conf{begin}\n$sql" if $conf{begin};
+    $sql.=$conf{end};
+    $sql;
+}
+
+sub aoh2xls { croak "Not implemented yet: aoh2xls" }
+
 
 =head1 STATISTICS
 
@@ -2592,8 +2996,8 @@ two stddevs 95%.  Normal distributions are sometimes called Gauss curves
 or Bell shapes. L<https://en.wikipedia.org/wiki/Standard_deviation>
 
  stddev(4,5,6,5,6,4,3,5,5,6,7,6,5,7,5,6,4)         # = 1.0914103126635
- avg(@testscores) + stddev(@testscores)            # = the score for IQ = 115 (by one definition)
- avg(@testscores) - stddev(@testscores)            # = the score for IQ = 85
+ avg(@testscores) + stddev(@testscores)            # = the score for one stddev above avg, 115
+ avg(@testscores) - stddev(@testscores)            # = the score for one stddev below avg, 85
 
 =cut
 
@@ -3878,6 +4282,12 @@ Example, this:
    ['file3.txt','The text....and hop'],
  ]);
 
+Automatic compression:
+
+ writefile('file.txt.gz','my text is compressed by /bin/gzip before written to the file');
+
+Extentions C<.gz>, C<.bz2> and C<.xz> are recognized for compression. See also C<readfile()> and C<openstr()>.
+
 B<Output:> Nothing (for the time being). C<die()>s (C<croak($!)> really) if something goes wrong.
 
 =cut
@@ -3889,7 +4299,7 @@ sub writefile {
 	writefile(@$_) for @$filename;
 	return;
     }
-    open(WRITEFILE,">",$filename) and binmode(WRITEFILE) or croak($!);
+    open(WRITEFILE,openstr(">$filename")) and binmode(WRITEFILE) or croak($!);
     if(!defined $text or !ref($text)){
 	print WRITEFILE $text;
     }
@@ -3944,6 +4354,12 @@ The last example can be rewritten:
  }
 
 With two input arguments, nothing (undef) is returned from C<readfile()>.
+
+Automatic decompression:
+
+ my $txt = readfile('file.txt.gz');  #uses /bin/gunzip to decompress content
+
+Extentions C<.gz>, C<.bz2> and C<.xz> are recognized for decompression. See also C<writefile()> and C<openstr()>.
 
 =cut
 
@@ -4292,17 +4708,36 @@ $ENV{PATH} containing an executable file gzip. Dirs /usr/bin, /bin and
 /usr/local/bin is added to PATH in openstr(). They are checked even if
 PATH is empty.
 
+See also C<writefile()> and C<readfile()> for automatic compression and decompression using C<openstr>.
+
 =cut
 
 our @Openstrpath=(grep$_,split(":",$ENV{PATH}),qw(/usr/bin /bin /usr/local/bin));
+our $Magic_openstr=1;
+sub openstr_prog { @Openstrpath or return $_[0];(grep -x$_, map "$_/$_[0]", @Openstrpath)[0] or croak"$_[0] not found" }
 sub openstr {
   my($fn,$ext)=(shift()=~/^(.*?(?:\.(t?gz|bz2|xz))?)$/i);
-  return $fn if !$ext;
-  my $prog=sub{@Openstrpath or return $_[0];(grep -x$_, map "$_/$_[0]", @Openstrpath)[0] or croak"$_[0] not found"};
+  return $fn if !$ext or !$Magic_openstr;
   $fn =~ /^\s*>/
-      ?  "| ".(&$prog({qw/gz gzip bz2 bzip2 xz xz tgz gzip/   }->{lc($ext)})).$fn
-      :        &$prog({qw/gz zcat bz2 bzcat xz xzcat tgz zcat/}->{lc($ext)})." $fn |";
+      ?  "| ".(openstr_prog({qw/gz gzip bz2 bzip2 xz xz tgz gzip/   }->{lc($ext)})).$fn
+      :        openstr_prog({qw/gz zcat bz2 bzcat xz xzcat tgz zcat/}->{lc($ext)})." $fn |";
 }
+
+=head2 printed
+
+Redirects C<print> and C<printf> from STDOUT to a string which is returned.
+
+ my $p = printed { print "hello!" };     # now $p eq 'hello!'
+ my $p = printed { some_sub() };         # now $p contains whatever was printed by some_sub() and the subs call from it
+
+=cut
+
+sub printed (&) { my $s; open(local *STDOUT, '>', \$s) or croak "ERR: $! $?"; shift->(); $s } #todo catch stderr also?
+
+#todo: sub stdin{}
+#todo: sub stdout{}
+#todo: sub stderr{}
+#todo: sub stdouterr{}
 
 =head1 TIME FUNCTIONS
 
@@ -5137,7 +5572,7 @@ One or more numeric arguments:
 
 First: x (first returned element)
 
-Second: y (last but not including)
+Second: y (up to y but not including y)
 
 Third: step, default 1. The step between each returned element
 
@@ -5153,8 +5588,8 @@ If three arguments: The default step is 1. Use a third argument to use a differe
 
 B<Examples:>
 
- print join ",", range(11);         # prints 0,1,2,3,4,5,6,7,8,9,10      (but not 11)
- print join ",", range(2,11);       # 2,3,4,5,6,7,8,9,10          (but not 11)
+ print join ",", range(11);         # prints 0,1,2,3,4,5,6,7,8,9,10  (but not 11)
+ print join ",", range(2,11);       # 2,3,4,5,6,7,8,9,10             (but not 11)
  print join ",", range(11,2,-1);    # 11,10,9,8,7,6,5,4,3
  print join ",", range(2,11,3);     # 2,5,8
  print join ",", range(11,2,-3);    # 11,8,5
@@ -5170,7 +5605,7 @@ Use C<range> in L<List::Gen> to get a similar lazy generator in Perl.
 =cut
 
 sub range {
-  return _range_accellerated(@_) if @_>3;  #se under
+  return _range_accellerated(@_) if @_>3;  #see below
   my($x,$y,$jump)=@_;
   return (  0 .. $x-1 ) if @_==1;
   return ( $x .. $y-1 ) if @_==2;
@@ -5222,14 +5657,14 @@ sub globr($) {
 
 How many ways (permutations) can six people be placed around a table:
 
- If one person:          one
- If two persons:         two     (they can swap places)
- If three persons:       six
- If four persons:         24
- If five persons:        120
- If six  persons:        720
+ One person:          one way
+ Two persons:         two ways  (they can swap places)
+ Three persons:         6
+ Four persons:         24
+ Five persons:        120
+ Six  persons:        720
 
-The formula is C<x!> where the postfix unary operator C<!>, also known as I<faculty> is defined like:
+The formula is C<x!> where the postfix unary operator C<!>, also known as I<faculty> is defined as:
 C<x! = x * (x-1) * (x-2) ... * 1>. Example: C<5! = 5 * 4 * 3 * 2 * 1 = 120>.Run this to see the 100 first C<< n! >>
 
  perl -MAcme::Tools -le'$i=big(1);print "$_!=",$i*=$_ for 1..100'
@@ -5318,7 +5753,7 @@ know that.
 
 =cut
 
-#TODO: se test_perl.pl
+#TODO: see t/test_perm.pl and t/test_perm2.pl
 
 sub permutations {
   my $code=ref($_[0]) eq 'CODE' ? shift() : undef;
@@ -5383,7 +5818,7 @@ Input: two or more arrayrefs with accordingly x, y, z and so on number of elemen
 Output: An array of x * y * z number of arrayrefs. The arrays being the cartesian product of the input arrays.
 
 It can be useful to think of this as joins in SQL. In C<select> statements with
-more tables behind C<from>, but without any C<where> condition to join the tables.
+more than one table behind C<from>, but without any C<where> condition to join the tables.
 
 B<Advanced usage, with condition(s):>
 
@@ -5419,7 +5854,7 @@ Prints the same as this:
    }
  }
 
-B<And this:> (with a condition: the sum of the first two should be dividable with 3)
+B<This:> with a condition: the sum of the first two should be divisible by 3:
 
  for( cart( \@a1, \@a2, sub{sum(@$_)%3==0}, \@a3 ) ) {
    my($a1,$a2,$a3)=@$_;
@@ -5456,13 +5891,13 @@ B<Example, hash-mode:>
 
 Returns hashrefs instead of arrayrefs:
 
- my @cards=cart(             #5200 cards: 100 decks of 52 cards
-   deck  => [1..100],
-   value => [qw/2 3 4 5 6 7 8 9 10 J Q K A/],
-   col   => [qw/heart diamond club star/],
+ my @cards=cart(          # @card gets 5200 hashrefs, 100 decks of 52 cards
+   deck => [1..100],
+   rank => [qw(2 3 4 5 6 7 8 9 10 J Q K A)],
+   suit => [qw(heart diamond club star)],
  );
  for my $card ( mix(@cards) ) {
-   print "From deck number $$card{deck} we got $$card{value} $$card{col}\n";
+   print "From deck number $$card{deck} we got $$card{rank} $$card{suit}\n";
  }
 
 Note: using sub-ref filters do not work (yet) in hash-mode. Use grep on result instead.
@@ -5483,7 +5918,7 @@ sub cart {
   return @res;
 }
 
-sub cart_easy { #not tested/exported http://stackoverflow.com/questions/2457096/in-perl-how-can-i-get-the-cartesian-product-of-multiple-sets
+sub cart_easy { #not tested, not exported http://stackoverflow.com/questions/2457096/in-perl-how-can-i-get-the-cartesian-product-of-multiple-sets
   my $last = pop @_;
   @_ ? (map {my$left=$_; map [@$left, $_], @$last } cart_easy(@_) )
      : (map [$_], @$last);
@@ -5703,7 +6138,8 @@ sub pivot {
   #print "H = ".join(", ",sort _sortsub keys%h)."\n";
   for my $rad (sort $sortsub_nedover keys(%h)){
     my @rad=(split($;,$rad),
-	     map{
+             map { defined($_)?$_:exists$opt{undefined}?$opt{undefined}:undef }
+	     map {
 	       if(/^\%/ and defined $opt_pro){
 		 my $sum=$h{$rad}{Sum};
 		 my $verdi=$h{$rad}{$_};
@@ -5717,7 +6153,7 @@ sub pivot {
 		 }
 	       }
 	       else{
-		 $h{$rad}{$_};
+                 $h{$rad}{$_};
 	       }
 	     }
 	     @feltfinnes);
@@ -5795,127 +6231,126 @@ As you can see, rows containing multi-lined cells gets an empty line before and 
 sub tablestring {
   my $tab=shift;
   my %o=$_[0] ? %{shift()} : ();
-  my $fjern_tom=$o{fjern_tomme_kolonner};
-  my $ikke_space=$o{ikke_space};
-  my $nodup=$o{nodup}||0;
-  my $ikke_hodestrek=$o{ikke_hodestrek};
-  my $pagesize=exists $o{pagesize} ? $o{pagesize}-3 : 9999999;
-  my $venstretvang=$o{venstre};
-  my(@bredde,@venstre,@hoeyde,@ikketom,@nodup);
-  my $hode=1;
+  my $remove_empty       = $o{remove_empty_columns};
+  my $no_multiline_space = $o{no_multiline_space};
+  my $nodup              = $o{nodup}||0;
+  my $no_header_line     = $o{no_header_line};
+  my $pagesize           = exists $o{pagesize} ? $o{pagesize}-3 : 9999999;
+  my $left_force         = $o{left};
+  my(@width,@left,@height,@not_empty,@nodup);
+  my $head=1;
   my $i=0;
   my $j;
   for(@$tab){
     $j=0;
-    $hoeyde[$i]=0;
+    $height[$i]=0;
     my $nodup_rad=$nodup;
     if(ref($_) eq 'ARRAY'){
       for(@$_){
-	my $celle=$_;
-	$bredde[$j]||=0;
+	my $cell=$_;
+	$width[$j]||=0;
 	if($nodup_rad and $i>0 and $$tab[$i][$j] eq $$tab[$i-1][$j] || ($nodup_rad=0)){
-	  $celle=$nodup==1?"":$nodup;
+	  $cell=$nodup==1?"":$nodup;
 	  $nodup[$i][$j]=1;
 	}
 	else{
-	  my $hoeyde=0;
-	  my $bredere;
+	  my $height=0;
+	  my $wider;
 	  no warnings;
-	  $ikketom[$j]=1 if !$hode && length($celle)>0;
-	  for(split("\n",$celle)){
-	    $bredere=/<input.+type=text.+size=(\d+)/i?$1:0;
+	  $not_empty[$j]=1 if !$head && length($cell)>0;
+	  for(split("\n",$cell)){
+	    $wider=/<input.+type=text.+size=(\d+)/i?$1:0; #hm
 	    s/<[^>]+>//g;
-	    $hoeyde++;
+	    $height++;
 	    s/&gt;/>/g;
 	    s/&lt;/</g;
-	    $bredde[$j]=length($_)+1+$bredere if length($_)+1+$bredere>$bredde[$j];
-	    $venstre[$j]=1 if $_ && !/^\s*[\-\+]?(\d+|\d*\.\d+)\s*\%?$/ && !$hode;
+	    $width[$j]=length($_)+1+$wider if length($_)+1+$wider>$width[$j];
+	    $left[$j]=1 if $_ && !/^\s*[\-\+]?(\d+|\d*\.\d+)\s*\%?$/ && !$head;
 	  }
-	  if( $hoeyde>1 && !$ikke_space){
-	    $hoeyde++ unless $hode;
-	    $hoeyde[$i-1]++ if $i>1 && $hoeyde[$i-1]==1;
+	  if( $height>1 && !$no_multiline_space){
+	    $height++ if !$head;
+	    $height[$i-1]++ if $i>1 && $height[$i-1]==1;
 	  }
-	  $hoeyde[$i]=$hoeyde if $hoeyde>$hoeyde[$i];
+	  $height[$i]=$height if $height>$height[$i];
 	}
 	$j++;
       }
     }
     else{
-      $hoeyde[$i]=1;
-      $ikke_hodestrek=1;
+      $height[$i]=1;
+      $no_header_line=1;
     }
-    $hode=0;
+    $head=0;
     $i++;
   }
-  $i=$#hoeyde;
-  $j=$#bredde;
-  if($i==0 or $venstretvang) { @venstre=map{1}(0..$j)                         }
-  else { for(0..$j){ $venstre[$_]=1 if !$ikketom[$_] }  }
-  my @tabut;
-  my $rad_startlinje=0;
-  my @overskrift;
-  my $overskrift_forrige;
+  $i=$#height;
+  $j=$#width;
+  if($i==0 or $left_force) { @left=map{1}(0..$j)                         }
+  else { for(0..$j){ $left[$_]=1 if !$not_empty[$_] }  }
+  my @tabout;
+  my $row_start_line=0;
+  my @header;
+  my $header_last;
   for my $x (0..$i){
     if($$tab[$x] eq '-'){
       my @tegn=map {$$tab[$x-1][$_]=~/\S/?"-":" "} (0..$j);
-      $tabut[$rad_startlinje]=join(" ",map {$tegn[$_] x ($bredde[$_]-1)} (0..$j));
+      $tabout[$row_start_line]=join(" ",map {$tegn[$_] x ($width[$_]-1)} (0..$j));
     }
     else{
       for my $y (0..$j){
-	next if $fjern_tom && !$ikketom[$y];
+	next if $remove_empty && !$not_empty[$y];
 	no warnings;
-	
-	my @celle=
-            !$overskrift_forrige&&$nodup&&$nodup[$x][$y]
-	    ?($nodup>0?():((" " x (($bredde[$y]-length($nodup))/2)).$nodup))
-            :split("\n",$$tab[$x][$y]);
-	for(0..($hoeyde[$x]-1)){
-	  my $linje=$rad_startlinje+$_;
-	  my $txt=shift @celle || '';
-	  $txt=sprintf("%*s",$bredde[$y]-1,$txt) if length($txt)>0 && !$venstre[$y] && ($x>0 || $ikke_hodestrek);
-	  $tabut[$linje].=$txt;
+	my @cell = !$header_last&&$nodup&&$nodup[$x][$y]
+     	         ? ($nodup>0?():((" " x (($width[$y]-length($nodup))/2)).$nodup))
+                 : split("\n",$$tab[$x][$y]);
+	for(0..($height[$x]-1)){
+	  my $line=$row_start_line+$_;
+	  my $txt=shift(@cell);
+	  $txt='' if !defined$txt;
+	  $txt=sprintf("%*s",$width[$y]-1,$txt) if length($txt)>0 && !$left[$y] && ($x>0 || $no_header_line);
+	  $tabout[$line].=$txt;
 	  if($y==$j){
-	    $tabut[$linje]=~s/\s+$//;
+	    $tabout[$line]=~s/\s+$//;
 	  }
 	  else{
-	    my $bredere;
-	       $bredere = $txt=~/<input.+type=text.+size=(\d+)/i?1+$1:0;
+	    my $wider;
+	       $wider = $txt=~/<input.+type=text.+size=(\d+)/i?1+$1:0;
 	    $txt=~s/<[^>]+>//g;
 	    $txt=~s/&gt;/>/g;
 	    $txt=~s/&lt;/</g;
-	    $tabut[$linje].= ' ' x ($bredde[$y]-length($txt)-$bredere);
+	    $tabout[$line].= ' ' x ($width[$y]-length($txt)-$wider);
 	  }
 	}
       }
     }
-    $rad_startlinje+=$hoeyde[$x];
+    $row_start_line+=$height[$x];
 
     #--lage streker?
-    if(not $ikke_hodestrek){
+    if(not $no_header_line){
       if($x==0){
 	for my $y (0..$j){
-	  next if $fjern_tom && !$ikketom[$y];
-	  $tabut[$rad_startlinje].=('-' x ($bredde[$y]-1))." ";
+	  next if $remove_empty && !$not_empty[$y];
+	  $tabout[$row_start_line].=('-' x ($width[$y]-1))." ";
 	}
-	$rad_startlinje++;
-	@overskrift=("",@tabut);
+	$row_start_line++;
+	@header=("",@tabout);
       }
       elsif(
 	    $x%$pagesize==0 || $nodup>0&&!$nodup[$x+1][$nodup-1]
 	    and $x+1<@$tab
-	    and !$ikke_hodestrek
+	    and !$no_header_line
 	    )
       {
-	push(@tabut,@overskrift);
-	$rad_startlinje+=@overskrift;
-	$overskrift_forrige=1;
+	push(@tabout,@header);
+	$row_start_line+=@header;
+	$header_last=1;
       }
       else{
-	$overskrift_forrige=0;
+	$header_last=0;
       }
     }
   }#for x
-  return join("\n",@tabut)."\n";
+  return join("\n",@tabout)."\n";
 }
 
 =head2 serialize
@@ -6088,8 +6523,8 @@ sub serialize {
   }
   else{
     my $tilbake;
-    my($pakke,$fil,$linje,$sub,$hasargs,$wantarray);
-      ($pakke,$fil,$linje,$sub,$hasargs,$wantarray)=caller($tilbake++) until $sub ne 'serialize' || $tilbake>20;
+    my($pakke,$fil,$line,$sub,$hasargs,$wantarray);
+      ($pakke,$fil,$line,$sub,$hasargs,$wantarray)=caller($tilbake++) until $sub ne 'serialize' || $tilbake>20;
     croak("serialize() argument should be reference!\n".
         "\$r=$r\n".
         "ref(\$r)   = ".ref($r)."\n".
@@ -6169,6 +6604,26 @@ sub cnttbl {
        (map[$_,$$hr{$_}],sort{$$hr{$a}<=>$$hr{$b} or $a cmp $b}keys%$hr),
        (['SUM',$sum]) }
 }
+
+=head2 ref_deep
+
+NOT IMPLEMENTED
+
+Same as ref, but goes deeper.
+
+ print ref_deep( { 10=>[1,'ten'], 100=>[2,'houndred'], 1000=>[3,'thousand'] } );   # prints HASH_of_ARRAYS
+ print ref_deep( { 10=>'ten',     100=>[2,'houndred'], 1000=>[3,'thousand'] } );   # prints same (mixed, deepest)
+ print ref_deep( { 1=>[{a=>3,b=>6},{a=>1,b=>8}], 5=>[{a=>2,b=>5},{a=>7,b=>1}] } ); # HASH_of_ARRAYS_of_HASHES
+
+(Todo, not supported: circular, alternatives for mixed)
+
+=cut
+
+sub ref_deep {
+  my $s=shift; #
+}
+
+
 
 =head2 nicenum
 
@@ -6286,6 +6741,36 @@ sub ed {
   }
   $Edcursor=$p;
   $s;
+}
+
+=head2 changed
+
+ while(<>){
+    my $line=$_;
+    print "\n" if changed(/^\d\d\d\d-\d\d-(\d\d)/);
+    print "\n" if changed(substr($_,8,2));
+ }
+
+Returns undef, 0 or 1. Undef if its the first time C<changed> is
+called on that perl line. 0 if not the first time and the parameters
+differ from the last call on that line. 1 if not the first time and
+the parameters is the exact same as they where on the previous call on
+that line of perl source code.
+
+=cut
+
+our %Changed_lastval;
+sub changed {
+    my $now=join($;,@_);
+    my $key=join($;,caller());
+    my $e=exists $Changed_lastval{$key};
+    if($e){
+	my $last=$Changed_lastval{$key};
+	return 0 if  defined $last and  defined $now and $last eq $now
+                 or !defined $last and !defined $now;
+    }
+    $Changed_lastval{$key}=$now;
+    return $e?1:undef;
 }
 
 #todo: sub unbless eller sub damn
@@ -6962,9 +7447,15 @@ sub _update_currency_file { #call from cron
   my @data=ht2t($data,"Alphabetical order"); shift @data;
   @data=map "$$_[1] ".($$_[4]>1e-2?$$_[4]:$$_[2]?sprintf("%.8f",$amount/$$_[2]):0)."\n",@data;
   my %data=map split,@data;
-  my@tc=qx($exe{curl} -s https://btc-e.com/api/3/ticker/btc_usd-ltc_usd)=~/avg.?:(\d+\.?\d*)/g;
-  push @data,"BTC ".($tc[0]*$data{USD})."\n";
-  push @data,"LTC ".($tc[1]*$data{USD})."\n";
+  my $json=qx( $exe{curl} -s https://api.coinmarketcap.com/v1/ticker/ );
+  eval "require JSON;"; die if $@;
+  my $arr=JSON::decode_json($json);
+  for my $c (qw(BTC LTC XBT ETH XRP BCH ETC)) {
+      my @a=grep$$_{symbol} eq $c,@$arr;
+      next if @a != 1 or !$a[0]{price_usd};
+      push @data, "$c ".($a[0]{price_usd}*$data{USD})."\n";
+  }
+  #die srlz(\@data,'data');
   print $F sort(@data);
   close($F);
   qx($exe{ci} -l -m. -d $fn) if -w"$fn,v";
@@ -6992,6 +7483,34 @@ sub ext2mime {
   #return "application/json";#feks
 }
 
+sub base64 ($;$) { #
+  if ($] >= 5.006) {
+    require bytes;
+    croak "base64 failed: only defined for bytes"
+      if bytes::length($_[0]) > length($_[0])
+      or $] >= 5.008 && $_[0] =~ /[^\0-\xFF]/
+  }
+  my $eol=defined$_[1]?$_[1]:"\n";
+  my $res=pack("u",$_[0]);
+  $res=~s/^.//mg;
+  $res=~s/\n//g;
+  $res=~tr|` -_|AA-Za-z0-9+/|;
+  my $pad=(3-length($_[0])%3)%3;
+  $res=~s/.{$pad}$/'=' x $pad/e if $pad;
+  $res=~s/(.{1,76})/$1$eol/g if length($eol); #todo !=76
+  $res;
+}
+
+sub unbase64 ($) {
+  my $s=shift;
+  $s=~tr,0-9a-zA-Z+=/,,cd;
+  croak "unbase64 failed: length ".length($s)." not multiple of 4" if length($s)%4;
+  $s=~s/=+$//;
+  $s=~tr|A-Za-z0-9+/| -_|;
+  length($s) ? unpack("u",join'',map(chr(32+length($_)*3/4).$_,$s=~/(.{1,60})/gs)) : "";
+}
+
+
 =head1 COMMANDS
 
 =head2 install_acme_command_tools
@@ -7010,6 +7529,7 @@ sub ext2mime {
  Wrote executable /usr/local/bin/2bz2
  Wrote executable /usr/local/bin/2bzip2
  Wrote executable /usr/local/bin/2xz
+ Wrote executable /usr/local/bin/resubst
 
 Examples of commands then made available:
 
@@ -7021,8 +7541,9 @@ Examples of commands then made available:
  ccmd grep string /huge/file   #caches stdout+stderr for 15 minutes (default) for much faster results later
  ccmd "sleep 2;echo hello"     #slow first time. Note the quotes!
  ccmd "du -s ~/*|sort -n|tail" #ccmd store stdout+stderr in /tmp files (default)
- z2z [-pvk1-9o -t type] files  #convert from/to .gz/bz2/xz files, -p progress, -v verbose (output result),
-                               #-k keep org file, -o overwrite, 1-9 compression degree
+ z2z [-pvk1-9oe -t type] files #convert from/to .gz/bz2/xz files, -p progress, -v verbose (output result),
+                               #-k keep org file, -o overwrite, 1-9 compression degree, -e for xz does "extreme"
+                               #compressions, very slow. For some data types this reduces size significantly
                                #2xz and 2bz2 depends on xz and bzip2 being installed on system
  2xz                           #same as z2z with -t xz
  2bz2                          #same as z2z with -t bz2
@@ -7048,8 +7569,7 @@ The commands C<2xz>, C<2bz2> and C<2gz> are just synonyms for C<z2z> with an imp
 
  z2z [-p -k -v -o -1 -2 -3 -4 -5 -6 -7 -8 -9 ] files
 
-Converts (recompresses) files from one compression sc
-
+Converts (recompresses) files from one compression type to another. For instance from .gz to .bz2
 
 
 =head3 due
@@ -7078,7 +7598,7 @@ Like C<du> command but views space used by file extentions instead of dirs. Opti
 
 sub install_acme_command_tools {
   my $dir=(grep -d$_, @_, '/usr/local/bin', '/usr/bin')[0];
-  for( qw( conv due xcat freq finddup ccmd trunc wipe rttop  z2z 2gz 2gzip 2bz2 2bzip2 2xz ) ){
+  for( qw( conv due xcat freq finddup ccmd trunc wipe rttop  z2z 2gz 2gzip 2bz2 2bzip2 2xz resubst) ){
     unlink("$dir/$_");
     writefile("$dir/$_", "#!$^X\nuse Acme::Tools;\nAcme::Tools::cmd_$_(\@ARGV);\n");
     sys("/bin/chmod +x $dir/$_"); #hm umask
@@ -7086,37 +7606,42 @@ sub install_acme_command_tools {
   }
 }
 sub cmd_conv { print conv(@ARGV)."\n"  }
-
-sub cmd_due { #TODO: output from tar tvf and ls and find -ls
-  my %o=_go("zkKmhciMPate:l");
+our @Due_fake_stdin;
+#TODO: output from tar tvf and ls and find -ls
+sub cmd_due {
+  my %o;
+  my @argv=args("zkKmhciMPate:lE:t",\%o,@_);
+  @argv=('.') if !@argv;
   require File::Find;
   no warnings 'uninitialized';
   die"$0: -l not implemented yet\n"                if $o{l}; #man du: default is not to count hardlinks more than once, with -l it does
   die"$0: -h, -k or -m can not be used together\n" if $o{h}+$o{k}+$o{m}>1;
   die"$0: -c and -a can not be used together\n"    if $o{a}+$o{c}>1;
   die"$0: -k and -m can not be used together\n"    if $o{k}+$o{m}>1;
-  my @q=@ARGV; @q=('.') if !@q;
   my(%c,%b,$cnt,$bts,%mtime);
-  my $zext=$o{z}?'(\.(z|Z|gz|bz2|xz|rz|kr))?':'';
-  my $r=qr/(\.[^\.\/]{1,10}$zext)$/;
+  my $zext=$o{z}?'(\.(z|Z|gz|bz2|xz|rz|kr|lrz|rz))?':'';
+  $o{E}||=11;
+  my $r=qr/(\.[^\.\/]{1,$o{E}}$zext)$/i;
   my $qrexcl=exists$o{e}?qr/$o{e}/:0;
  #TODO: ought to work: tar cf - .|tar tvf -|due
- #my $qrstdin=qr/(^| )\-[rwx\-sS]{9} +\d+ \w+ +\w+ +(\d+) [a-zA-Z]+\.? +\d+ +(?:\d\d:\d\d|\d{4}) (.*)$/;
-  my $qrstdin=qr/(^| )\-[rwx\-sS]{9} +(\d+ )?\w+[ \/]+\w+ +(\d+) [a-zA-Z]+\.? +\d+ +(?:\d\d:\d\d|\d{4}) (.*)$/;
-  if(-p STDIN){
-    while(<>){
+  if(-p STDIN or @Due_fake_stdin){
+    my $stdin=join"",map"$_\n",@Due_fake_stdin;
+    open(local *STDIN, '<', \$stdin) or die "ERR: $! $?\n" if $stdin;
+    while(<STDIN>){
       chomp;
-      my($sz,$f)=/$qrstdin/?($2,$3):-f$_?(-s$_,$_):next;
+      next if /\/$/;
+      my($sz,$f)=(/(^| )\-[rwx\-sS]{9}\s+(?:\d )?(?:[\w\-]+(?:\/|\s+)[\w\-]+)\s+(\d+)\s+.*?([^\/]*\.[\w,\-]+)?$/?($2,$3):-f$_?(-s$_,$_):next);
+      #   1576142    240 -rw-r--r--   1 root     root       242153 april  4  2016 /opt/wine-staging/share/wine/wine.inf
       my $ext=$f=~$r?$1:'';
       $ext=lc($ext) if $o{i};
       $cnt++;    $c{$ext}++;
       $bts+=$sz; $b{$ext}+=$sz;
       #$mtime{$ext}.=",$mtime" if
-                                  $o{M} || $o{P} and die"due: -M and -P not yet implemented for STDIN";
+                                  $o{M} || $o{P} and die"due: -M and -P not yet implemented for STDIN\n";
     }
   }
   else { #hm DRY
-    File::Find::find({wanted =>
+    File::Find::find({follow=>0, wanted =>
       sub {
         return if !-f$_;
         return if $qrexcl and defined $File::Find::name and $File::Find::name=~$qrexcl;
@@ -7127,7 +7652,7 @@ sub cmd_due { #TODO: output from tar tvf and ls and find -ls
         $bts+=$sz; $b{$ext}+=$sz;
         $mtime{$ext}.=",$mtime" if $o{M} || $o{P};
 	1;
-      } },@q);
+      } },@argv);
   }
   my($f,$s)=$o{k}?("%14.2f kb",sub{$_[0]/1024})
            :$o{K}?("%14.2f Kb",sub{$_[0]/1000})
@@ -7148,9 +7673,50 @@ sub cmd_due { #TODO: output from tar tvf and ls and find -ls
       my $fmt=$o{t}?'YYYY/MM/DD-MM:MI:SS':'YYYY/MM/DD';
       @r=map tms($_,$fmt), @r;
       "  ".join(" ",@r);
-    };
-  printf("%-11s %8d $f %7.2f%%%s\n",$_,$c{$_},&$s($b{$_}),100*$b{$_}/$bts,&$perc($_)) for @e;
-  printf("%-11s %8d $f %7.2f%%%s\n","Sum",$cnt,&$s($bts),100,&$perc());
+  };
+  my $width=max( 10, grep $_, map length($_), @e );
+  @e=@e[-10..-1] if $o{t} and @e>10; #-t tail
+  printf("%-*s %8d $f %7.2f%%%s\n",$width,$_,$c{$_},&$s($b{$_}),100*$b{$_}/$bts,&$perc($_)) for @e;
+  printf("%-*s %8d $f %7.2f%%%s\n",$width,"Sum",$cnt,&$s($bts),100,&$perc());
+}
+sub cmd_resubst {
+  my %o;
+  my $zo="123456789e";
+  my @argv=args("f:t:vno:gi$zo",\%o,@_);
+  if(exists$o{t}){ $o{t}=~s,\\,\$, } else { $o{t}='' }
+  my($i,$tc,$tbfr,$tbto)=(0,0,0,0);
+  for my $file (@argv){
+      my $zopt=join" ",map"-$_",grep$o{$_},split//,$zo;
+      my $oext=$o{o}?$o{o}:$file=~/\.(gz|bz2|xz)$/i?$1:'';
+      my $open_out_pre=$oext?"|".openstr_prog({qw/gz gzip bz2 bzip2 xz xz/}->{lc($oext)})." $zopt":'';
+      my $open_out="$open_out_pre > $file.tmp$$";
+      my $open_in=openstr($file);
+      #      die srlz(\%o,'o','',1);
+      open my $I, $open_in  or croak"ERR: open $open_in failed. $! $?\n";
+      open my $O, $open_out or croak"ERR: open $open_out failed. $! $?\n";
+      my $c=0;
+      my $mod=join"",grep$o{$_},qw(g i);
+      eval"while(<\$I>){ \$c+=s/\$o{f}/$o{t}/$mod;print \$O \$_ }";
+      $tc+=$c;
+      close($I);close($O);
+      chall($file,"$file.tmp$$") or croak"ERR: chall $file\n" if !$o{n};
+      my($bfr,$bto)=(-s$file,-s"$file.tmp$$");
+      unlink $file or croak"ERR: cant rm $file\n";
+      my $newfile=$o{o}?repl($file,qr/\.(gz|bz2|xz)$/i,".$oext"):$file;
+      rename("$file.tmp$$",$newfile) or croak"ERR: rename $file.tmp$$ -> $newfile failed\n";
+      if($o{v}){
+	my $pr=$bfr?100*$bto/$bfr:0;
+	printf "%*d/%d %*s %7d =>%8d b (%2d%%) %s\n",
+	  length(0+@argv), ++$i, 0+@argv, -15, "$tc/$c", $bfr, $bto, $pr, $file;
+	$tbfr+=$bfr;
+	$tbto+=$bto;
+      }
+  }
+  if($o{v} and @argv>1){
+      printf "Replaces: %d  Bytes before: %d  After: %d   Change: %.1f%%\n",
+        $tc, $tbfr, $tbto, $tbfr?100*($tbto-$tbfr)/$tbfr:0
+  }
+  $tc;
 }
 sub cmd_xcat {
   for my $fn (@_){
@@ -7196,9 +7762,11 @@ sub cmd_ccmd {
 
 sub cmd_trunc { die "todo: trunc not ready yet"} #truncate a file, size 0, keep all other attr
 
+#todo:   wipe -n 4 filer*   #virker ikke! tror det er args() som ikke virker
 sub cmd_wipe  {
-  my %o=_go("n:k");
-  wipe($_,$o{n},$o{k}) for @_;
+  my %o;
+  my @argv=args("n:k",\%o,@_);
+  wipe($_,$o{n},$o{k}) for @argv;
 }
 
 sub cmd_2gz    {cmd_z2z("-t","gz", @_)}
@@ -7208,12 +7776,13 @@ sub cmd_2bzip2 {cmd_z2z("-t","bz2",@_)}
 sub cmd_2xz    {cmd_z2z("-t","xz", @_)}
 #todo?: sub cmd_7z
 sub cmd_z2z {
-  local @ARGV=@_;
-  my %o=_go("pt:kvhon123456789");
+  my %o;
+  my @argv=args("pt:kvhon123456789e",\%o,@_);
   my $t=repl(lc$o{t},qw/gzip gz bzip2 bz2/);
   die "due: unknown compression type $o{t}, known are gz, bz2 and xz" if $t!~/^(gz|bz2|xz)$/;
-  my $sum=sum(map -s$_,@ARGV);
-  print "Converting ".@ARGV." files, total ".bytes_readable($sum)."\n" if $o{v} and @ARGV>1;
+  delete $o{e} if $o{e} and $o{t} ne 'xz' and warn "-e available only for type xz\n";
+  my $sum=sum(map -s$_,@argv);
+  print "Converting ".@argv." files, total ".bytes_readable($sum)."\n" if $o{v} and @argv>1;
   my $cat='cat';
   if($o{p}){ if(qx(which pv)){ $cat='pv' } else { warn repl(<<"",qr/^\s+/) } }
     due: pv for -p not found, install with sudo yum install pv, sudo apt-get install pv or similar
@@ -7222,7 +7791,7 @@ sub cmd_z2z {
   my $start=time_fp();
   my($i,$bsf)=(0,0);#bytes so far
   $Eta{'z2z'}=[];eta('z2z',0,$sum);
-  for(@ARGV){
+  for(@argv){
     my $new=$_; $new=~s/(\.(gz|bz2|xz))?$/.$t/i or die;
     my $ext=defined($2)?lc($2):'';
     my $same=/^$new$/; $new.=".tmp" if $same; die if $o{k} and $same;
@@ -7233,8 +7802,8 @@ sub cmd_z2z {
     #todo: my $cntfile="/tmp/acme-tools-z2z-wc-c.$$";
     #todo: my $cnt="tee >(wc -c>$cntfile)" if $ENV{SHELL}=~/bash/ and $o{v}; #hm dash vs bash
     my $z=  {qw/gz gzip   bz2 bzip2   xz xz/}->{$t};
-    $z.=" -$_" for grep$o{$_},1..9;
-    my $cmd="$cat $_|$unz|$z>$new";
+    $z.=" -$_" for grep$o{$_},1..9,'e';
+    my $cmd=qq($cat "$_"|$unz|$z>"$new");
      #todo: "$cat $_|$unz|$cnt|$z>$new";
     #cat /tmp/kontroll-linux.xz|unxz|tee >(wc -c>/tmp/p)|gzip|wc -c;cat /tmp/p
     $cmd=~s,\|+,|,g; #print "cmd: $cmd\n";
@@ -7246,29 +7815,29 @@ sub cmd_z2z {
     rename($new, replace($new,qr/.tmp$/)) or die if $same;
     if($o{v}){
       $sumnew+=$sznew;
-      my $pr=sprintf"%0.1f%%",100*$sznew/$szold;
+      my $pr=sprintf"%0.1f%%",$szold?100*$sznew/$szold:0;
       #todo: my $szuncmp=-s$cntfile&&time()-(stat($cntfile))[9]<10 ? qx(cat $cntfile) : '';
       #todo: $o{h} ? printf("%6.1f%%  %9s => %9s => %9s %s\n",      $pr,(map bytes_readable($_),$szold,$szuncmp,$sznew),$_)
       #todo:       : printf("%6.1f%% %11d b  => %11d b => %11 b  %s\n",$pr,$szold,$szuncmp,$sznew,$_)
       my $str= $o{h}
       ? sprintf("%-7s %9s => %9s",       $pr,(map bytes_readable($_),$szold,$sznew))
       : sprintf("%-7s %11d b => %11d b", $pr,$szold,$sznew);
-      if(@ARGV>1){
+      if(@argv>1){
 	$i++;
-	$str=$i<@ARGV
-            ? "  ETA:".sec_readable(eta('z2z',$bsf,$sum)-time_fp())." $str"
+	$str=$i<@argv
+            ? "  ETA:".sprintf("%-8s",sec_readable(eta('z2z',$bsf,$sum)-time_fp()))." $str"
 	    : "   TA: 0s $str"
 	  if $sum>1e6;
-        $str="$i/".@ARGV." $str";
+        $str="$i/".@argv." $str";
       }
       print "$str $new\n";
     }
   }
-  if($o{v} and @ARGV>1){
+  if($o{v} and @argv>1){
       my $bytes=$o{h}?'':'bytes ';
       my $str=
         sprintf "%d files compressed in %.3f seconds from %s to %s $bytes (%s bytes) %.1f%% of original\n",
-	  0+@ARGV,
+	  0+@argv,
 	  time_fp()-$start,
 	  (map{$o{h}?bytes_readable($_):$_}($sum,$sumnew,$sumnew-$sum)),
 	  100*$sumnew/$sum;
@@ -7277,7 +7846,30 @@ sub cmd_z2z {
   }
 }
 
-sub _go { require Getopt::Std; my %o; Getopt::Std::getopts(shift() => \%o); %o }
+=head2 args
+
+Parses command line options and arguments:
+
+ my %opt;
+ my @argv=args('i:nJ123',\%opt,@ARGV);   #returns remaining command line elements after C<-o ptions> are parsed into C<%opt>.
+
+Uses C<Getopt::Std::getopts()>. First arg names the different one char
+options and an optional C<:> behind the letter or digit marks that the
+switch takes an argument.
+
+=cut
+
+sub args {
+    my $switches=shift;
+    my $hashref=shift;
+    my $re_sw='^([a-z0-9]:?)+$';
+    croak "ERR: args: first arg $switches dont match $re_sw\n" if $switches !~ /$re_sw/i;
+    croak "ERR: second arg to args() not hashref\n" if ref($hashref) ne 'HASH';
+    local @ARGV=@_;
+    require Getopt::Std;
+    Getopt::Std::getopts($switches => $hashref);
+    (@ARGV);
+}
 
 sub cmd_rttop   { die "rttop: not implemented here yet.\n" }
 sub cmd_whichpm { die "whichpm: not implemented here yet.\n" } #-a (all, inkl VERSION og ls -l)
@@ -7433,6 +8025,7 @@ sub sum      { &Acme::Tools::bfsum      }
 1;
 
 # Ny versjon:
+# + git clone https://github.com/kjetillll/Acme-Tools.git
 # + c-s todo
 # + endre $VERSION
 # + endre Release history under HISTORY
@@ -7443,12 +8036,13 @@ sub sum      { &Acme::Tools::bfsum      }
 # + emacs MANIFEST legg til ev nye t/*.t
 # + perl            Makefile.PL;make test
 # + /usr/bin/perl   Makefile.PL;make test
-# + perlbrew exec "perl ~/Acme-Tools/Makefile.PL ; time make test"
+# + perlbrew exec "perl Makefile.PL ; time make test"
+# + perlbrew exec "perl Makefile.PL ; make test" | grep -P '^(perl-|All tests successful)'
 # + perlbrew use perl-5.10.1; perl Makefile.PL; make test; perlbrew off
 # + test evt i cygwin og mingw-perl
-# + pod2html Tools.pm > Tools.html ; firefox Tools.html 
+# + pod2html Tools.pm > Tools.html ; firefox Tools.html
 # + https://metacpan.org/pod/Acme::Tools
-# + http://cpants.cpanauthors.org/dist/Acme-Tools  #kvalitee
+# + http://cpants.cpanauthors.org/dist/Acme-Tools   #kvalitee
 # + perl Makefile.PL ; make test && make dist
 # + cp -p *tar.gz /htdocs/
 # + ci -l -mversjon -d `cat MANIFEST`
@@ -7499,6 +8093,8 @@ sub sum      { &Acme::Tools::bfsum      }
 
 Release history
 
+ 0.22  Feb 2018   subs: subarr, sim, sim_perm, aoh2sql. command: resubst
+ 
  0.21  Mar 2017   Improved nicenum() and its tests
  
  0.20  Mar 2017   Subs: a2h cnttbl h2a log10 log2 nicenum rstddev sec_readable
@@ -7530,7 +8126,7 @@ Kjetil Skotheim, E<lt>kjetil.skotheim@gmail.comE<gt>
 
 =head1 COPYRIGHT
 
-2008-2017, Kjetil Skotheim
+2008-2018, Kjetil Skotheim
 
 =head1 LICENSE
 

@@ -16,8 +16,12 @@ DESCRIPTION
             allows in some cases for the generated RDFa to include relative
             URIs.
 
-        *   data_context - if non-null, a URI (string) which indicates the
-            context (named graph) containing the data to generate RDFa for.
+        *   data_context - if non-null, an Attean Blank or IRI object or an
+            RDF::Trine::Node which indicates the context (named graph)
+            containing the data to generate RDFa for.
+
+        *   namespacemap - a URI::NamespaceMap object containing preferred
+            CURIE prefixes. This is the preferred method, see note below.
 
         *   namespaces - a {prefix=>uri} hashref of preferred CURIE prefixes.
 
@@ -36,14 +40,14 @@ DESCRIPTION
             default) or '1.1'.
 
   Public Methods
-    `$gen->create_document($model)`
+    `$gen->create_document($model, %opts)`
         Creates a new RDFa file containing triples. $model is an
         RDF::Trine::Model object providing the triples. Returns an
-        XML::LibXML::Document object suitable for serialising using its
+        XML::LibXML::Document object suitable for serializing using its
         `toString` method.
 
         If you're planning on serving the RDFa with the text/html media type,
-        then it is recommended that you use HTML::HTML5::Writer to serialise
+        then it is recommended that you use HTML::HTML5::Writer to serialize
         the document rather than `toString`.
 
         Can also be called as a class method:
@@ -52,11 +56,14 @@ DESCRIPTION
          # Same as:
          # $document = RDF::RDFa::Generator->new->create_document($model)
 
+        Options can also be passed as a HASH. This is typically used for
+        style-specific options.
+
     `$gen->inject_document($document, $model)`
         Injects an existing document with triples. $document is an
         XML::LibXML::Document to inject, or a well-formed XML string. $model
         is an RDF::Trine::Model object providing the triples. Returns an
-        XML::LibXML::Document object suitable for serialising using its
+        XML::LibXML::Document object suitable for serializing using its
         `toString` method.
 
         See `create_document` for information about serving the RDFa with the
@@ -83,20 +90,63 @@ DESCRIPTION
         The notes are a list of RDF::RDFa::Generator::HTML::Pretty::Note
         objects which are added as notes to the end of each subject's data.
 
-    Additionally the methods `serialize_model_to_file`,
-    `serialize_model_to_string`, `serialize_iterator_to_file` and
-    `serialize_iterator_to_string` are provided for compatibility with the
-    RDF::Trine::Serializer interface.
+UPGRADING TO 0.200
+    The recommended upgrade path is to migrate your application to use Attean
+    rather than RDF::Trine as your RDF library. If that is not an option, you
+    may continue to use RDF::Trine, by using a compatibility layer. If you are
+    using this module directly, to upgrade from earlier releases, you would
+    simply add
+
+     use RDF::TrineX::Compatibility::Attean;
+
+    alongside the import of this module. It is in a separate distribution that
+    needs to be installed. If you use the RDF::Trine::Serializer methods, you
+    should instead use RDF::Trine::Serializer::RDFa.
+
+NOTE
+    Version 0.200 introduced a large number of changes to be compatible with
+    both Attean and RDF::Trine. Some of these were backwards-incompatible,
+    some were to support new features, such as the use of URI::NamespaceMap.
+
+  Backwards-incompatible changes
+    The methods `serialize_model_to_file`, `serialize_model_to_string`,
+    `serialize_iterator_to_file` and `serialize_iterator_to_string` that were
+    provided for compatibility with the RDF::Trine::Serializer interface have
+    been moved to a module RDF::Trine::Serializer::RDFa that has to be
+    installed separately to use this with RDF::Trine.
+
+    `data_context` previously accepted a plain-text string URI. Now, it
+    requires an appropriate object, as documented.
+
+    Since RDF 1.1 abandons untyped literals, this module also ceases to emit
+    them.
+
+  Namespace mappings
+    The way namespace mappings are handled have been rewritten. Now, the
+    preferred method to add them is to pass an URI::NamespaceMap object to
+    `namespacemap`. This will override any other options.
+
+    The namespace mappings for the following prefixes will always be added:
+    `rdfa`, `rdf`, `rdfs` and `xsd`.
+
+    If URI::NamespaceMap is not used, but `namespaces` is given as a hashref
+    of prefix-URI pairs, the pairs will be added. If neither are given, all
+    mappings from RDF::NS::Curated, which includes all if RDFa Initial Context
+    will be added. Finally, any pairs from the deprecated `ns` option will be
+    added, but a warning will be emitted.
 
 BUGS
     Please report any bugs to
     <https://github.com/kjetilk/p5-rdf-rdfa-generator/issues>.
 
 SEE ALSO
-    HTML::HTML5::Writer, XML::LibXML, RDF::RDFa::Parser, RDF::Trine,
-    RDF::Prefixes.
+    You may want to use the framework-specific frontends:
+    RDF::Trine::Serializer::RDFa or AtteanX::Serializer::RDFa.
 
-    <http://www.perlrdf.org/>.
+    Other relevant modules:
+
+    HTML::HTML5::Writer, XML::LibXML, RDF::RDFa::Parser, RDF::Trine,
+    URI::NamespaceMap, Attean.
 
 AUTHOR
     Toby Inkster <tobyink@cpan.org>.
@@ -104,7 +154,7 @@ AUTHOR
     Kjetil Kjernsmo <kjetilk@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    Copyright (C) 2010 by Toby Inkster, 2017 Kjetil Kjernsmo
+    Copyright (C) 2010 by Toby Inkster, 2017, 2018 Kjetil Kjernsmo
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8 or, at your

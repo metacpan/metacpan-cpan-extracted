@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.72'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,16 +28,16 @@ requires:
   RPi::DHT11: '1.03'
   RPi::DigiPot::MCP4XXXX: '2.3604'
   RPi::HCSR04: '2.3604'
-  RPi::I2C: '2.3604'
+  RPi::I2C: '2.3605'
   RPi::LCD: '2.3603'
   RPi::Pin: '2.3604'
-  RPi::SPI: '2.3607'
-  RPi::Serial: '2.3602'
+  RPi::SPI: '2.3608'
+  RPi::Serial: '2.3603'
   WiringPi::API: '2.3614'
   parent: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/rpi-wiringpi/issues
   repository: https://github.com/stevieb9/rpi-wiringpi.git
-version: '2.3621'
+version: '2.3622'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

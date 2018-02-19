@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::DomTable;
-# ABSTRACT: front-end class for tabular HMMER domain parser
+# ABSTRACT: Front-end class for tabular HMMER domain parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::DomTable::VERSION = '0.180330';
+$Bio::FastParsers::Hmmer::DomTable::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -115,11 +115,11 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Hmmer::DomTable - front-end class for tabular HMMER domain parser
+Bio::FastParsers::Hmmer::DomTable - Front-end class for tabular HMMER domain parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 

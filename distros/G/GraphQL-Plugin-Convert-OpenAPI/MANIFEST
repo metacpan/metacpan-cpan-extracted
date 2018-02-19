@@ -15,6 +15,7 @@ t/04-execute.t
 t/04-schema.t
 t/05-corpus.yml
 t/05-schema.t
+t/local-full.t
 t/local.t
 t/snapshots/01-execute_t/execute
 t/snapshots/01-schema_t/schema

@@ -38,19 +38,20 @@ use Test::More;
 BEGIN { use_ok 'File::Replace' }
 
 my @testcases = (
-	# default behavior (old and new)
+	# default behavior                           NOTE: "warn" now means "fatal"
 	{                                  expect=>'later', warn=>0 },
-	# new behavior
+	# new behavior (as of 0.06)
 	{                 create=>'no'   , expect=>'off'  , warn=>0 },
 	{                 create=>'off'  , expect=>'off'  , warn=>0 },
 	{                 create=>'now'  , expect=>'now'  , warn=>0 },
 	{                 create=>'later', expect=>'later', warn=>0 },
-	# compatibility behavior
+	# compatibility behavior in 0.06, removed as of 0.08
+	# except that the "undef" case is now equivalent to the default behavior!
 	{                 create=>0      , expect=>'later', warn=>1 },
-	{                 create=>undef  , expect=>'later', warn=>1 },
+	{                 create=>undef  , expect=>'later', warn=>0 },
 	{                 create=>1      , expect=>'now'  , warn=>1 },
 	{                 create=>'true' , expect=>'now'  , warn=>1 },
-	# old, deprecated behavior
+	# old behavior, deprecated in 0.06, removed as of 0.08
 	{ devnull=>0,                    , expect=>'off'  , warn=>2 },
 	{ devnull=>0,     create=>0      , expect=>'off'  , warn=>2 },
 	{ devnull=>0,     create=>undef  , expect=>'off'  , warn=>2 },
@@ -63,7 +64,6 @@ my @testcases = (
 	{ devnull=>1,     create=>0      , expect=>'later', warn=>2 },
 	{ devnull=>1,     create=>undef  , expect=>'later', warn=>2 },
 	{ devnull=>1,     create=>1      , expect=>'now'  , warn=>2 },
-	# old, deprecated behavior (even with new 'create' values)
 	{ devnull=>0,     create=>'no'   , expect=>'now'  , warn=>2 },
 	{ devnull=>0,     create=>'now'  , expect=>'now'  , warn=>2 },
 	{ devnull=>0,     create=>'later', expect=>'now'  , warn=>2 },
@@ -86,9 +86,14 @@ for my $t (@testcases) {
 	my $sub;
 	if ($$t{expect} eq 'off') { $sub = sub {
 		my $fn = newtempfn;
-		ok exception {
-				my $r = File::Replace->new($fn, %opts);
-			}, 'fails ok';
+		if ($$t{warn})
+			# in this case we want the handler below to see the exception
+			{ my $r = File::Replace->new($fn, %opts) }
+		else {
+			ok exception {
+					my $r = File::Replace->new($fn, %opts);
+				}, 'fails ok';
+		}
 		ok $!{ENOENT}, 'ENOENT';
 		ok !-e $fn, "file doesn't exist";
 	} }
@@ -114,16 +119,13 @@ for my $t (@testcases) {
 	} }
 	else { die $$t{expect} }
 	subtest $name => sub {
-		my @w = &warns($sub);
+		my $ex = &exception($sub);
 		if ($$t{warn}) {
-			my $m;
-			   if ($$t{warn}==1) { $m='create' }
-			elsif ($$t{warn}==2) { $m='devnull' }
+			   if ($$t{warn}==1) { like $ex, qr/\bbad\s+value\b.+\bcreate\b/i, "create failure" }
+			elsif ($$t{warn}==2) { like $ex, qr/\bunknown\s+option\b.+\bdevnull\b/i, "devnull failure" }
 			else { die $$t{warn} }
-			is grep(
-				{/\b\Q$m\E\b.+\bdeprecat.+\buse\s+create=>(['"])\Q$$t{expect}\E\1\s+instead\b/is}  ## no critic (ProhibitComplexRegexes)
-				@w), 1, "$m deprecation warning" or diag explain \@w;
 		}
+		else { ok !defined($ex), 'no exception' }
 	};
 }
 

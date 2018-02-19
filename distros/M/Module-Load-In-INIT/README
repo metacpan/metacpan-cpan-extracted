@@ -2,8 +2,8 @@ NAME
     Module::Load::In::INIT - Load modules in INIT phase
 
 VERSION
-    This document describes version 0.004 of Module::Load::In::INIT (from
-    Perl distribution Module-Load-In-INIT), released on 2018-01-15.
+    This document describes version 0.005 of Module::Load::In::INIT (from
+    Perl distribution Module-Load-In-INIT), released on 2018-02-18.
 
 SYNOPSIS
     In the command-line:

@@ -60,7 +60,7 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  PPI
 );
 
 my @exclude = qw(

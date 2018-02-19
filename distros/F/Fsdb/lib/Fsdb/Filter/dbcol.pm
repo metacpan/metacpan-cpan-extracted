@@ -2,8 +2,7 @@
 
 #
 # dbcol.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 2607991a5498804e1c6e26d652175fe92db98515 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -132,6 +131,7 @@ L<Fsdb(3)>
 
 use strict;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -226,7 +226,7 @@ sub setup ($) {
 	foreach (@{$self->{_arg_cols}}) {
 	    my($badf) = $self->{_in}->col_to_i($_);
 	    if (!defined($badf)) {
-		die $self->{_prog} . ":  unknown column ``$_'' for omission.\n"
+		croak($self->{_prog} . ":  unknown column ``$_'' for omission.\n")
 		    if (!$self->{_relaxed_errors});
 		# skip it if relaxed
 		next;
@@ -255,14 +255,14 @@ sub setup ($) {
     my(%new_colnames);
     for my $out_coli (0..$#{$self->{_arg_cols}}) {
 	my $colname = $self->{_arg_cols}[$out_coli];
-	die $self->{_prog} . ":  duplicate colname $colname\n"
+	croak($self->{_prog} . ":  duplicate colname $colname\n")
 	    if (defined($new_colnames{$colname}));
 	$new_colnames{$colname} = $out_coli;
 	my $in_coli = $self->{_in}->col_to_i($colname);
 	if (defined($in_coli)) {
 	    $copy_code .= '$nf['.$out_coli.'] = $fref->['.$in_coli.'];' . "\n";
 	} elsif (!defined($self->{_null_value})) {
-	    die ($self->{_prog} . ":  creating new column ``$colname'' without specifying null value.\n");
+	    croak ($self->{_prog} . ":  creating new column ``$colname'' without specifying null value.\n");
 	} else {
 	    $copy_code .= '$nf['.$out_coli."] = '" . $self->{_null_value} . "';\n";
 	};
@@ -297,7 +297,7 @@ sub setup ($) {
 	    };
         ';
 	eval $loop_sub_code;
-	$@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+	$@ && croak($self->{_prog} . ":  internal eval error: $@.\n");
 	$self->{_loop_sub} = $loop_sub;
     }
 }
@@ -331,7 +331,7 @@ sub finish ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

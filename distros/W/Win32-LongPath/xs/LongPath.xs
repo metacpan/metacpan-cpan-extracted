@@ -1,16 +1,5 @@
 /*********
 ; Windows Interface
-;
-; 1.0	R. Boisvert	8/6/2013
-;	First release.
-; 1.1	R. Boisvert	9/5/2013
-;	Changed newSViv to newSVuv where needed.
-; 1.2	R. Boisvert	9/20/2013
-;	Added definition of IO_REPARSE_TAG_SYMLINK if missing.
-; 1.3	R. Boisvert	12/3/2013
-;	Added support for Cygwin.
-; 1.4	P. Custodio	9/7/2016
-;	Fixed flags for Cygwin.
 *********/
 
 #define PERL_NO_GET_CONTEXT
@@ -22,6 +11,7 @@
 #include "XSUB.h"
 #include "ppport.h"
 
+#include <fcntl.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -157,6 +147,9 @@ OUTPUT:
 
 void
 create_file (WCHAR *path, long access, long dispos, int flags)
+PREINIT:
+  PerlIO *pfh;
+  GV *gv;
 CODE:
   int fd;
   HANDLE fh = CreateFileW (path, access, FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -169,8 +162,35 @@ CODE:
     CloseHandle (fh);
     XSRETURN_EMPTY;
     }
+  char *mode;
+  if ((access & (GENERIC_READ | GENERIC_WRITE))
+    == (GENERIC_READ | GENERIC_WRITE))
+    { mode = "r+"; }
+  else if (access & GENERIC_WRITE)
+    { mode = "w"; }
   else
-    { XSRETURN_IV ((IV)fd); }
+    { mode = "r"; }
+  pfh = PerlIO_fdopen (fd, mode);
+  if (!pfh)
+    {
+    CloseHandle (fh);
+    XSRETURN_EMPTY;
+    }
+  char *packname = "IO::File";
+  gv = (GV*)SvREFCNT_inc (newGVgen (packname));
+  if (gv)
+    (void) hv_delete (GvSTASH (gv), GvNAME (gv), GvNAMELEN (gv), G_DISCARD);
+  if (gv && do_open (gv, "+>&", 3, FALSE, 0, 0, pfh))
+    {
+    ST(0) = sv_2mortal (newRV ((SV*)gv));
+    sv_bless (ST(0), gv_stashpv (packname, TRUE));
+    SvREFCNT_dec (gv);
+    }
+  else
+    {
+    ST(0) = &PL_sv_undef;
+    SvREFCNT_dec (gv);
+    }
 
 bool
 find_close (SV* self)

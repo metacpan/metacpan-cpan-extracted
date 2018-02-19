@@ -114,7 +114,7 @@ Darwin Kernel Version 16.5.0: Fri Mar  3 16:52:33 PST 2017; root:xnu-3789.51.2~3
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2017, Abe Timmerman & H.Merijn Brand All rights reserved.
+(c) 2016-2018, Abe Timmerman & H.Merijn Brand All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

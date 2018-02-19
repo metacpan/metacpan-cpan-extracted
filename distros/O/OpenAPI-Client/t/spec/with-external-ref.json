@@ -1,0 +1,21 @@
+{
+  "swagger": "2.0",
+  "info": {"title": "t-app", "version": "0.1.0"},
+  "basePath": "/ext",
+  "definitions": {
+    "error": {"type": "object"}
+  },
+  "paths": {
+    "/dummy": {
+      "get": {
+        "operationId": "dummy",
+        "responses": {
+          "200": {"$ref": "../spec/dummy.json"},
+          "201": {"$ref": "./dummy.json"},
+          "202": {"$ref": "dummy.json"},
+          "default": {"description": "Err", "schema":{"$ref": "#/definitions/error"}}
+        }
+      }
+    }
+  }
+}

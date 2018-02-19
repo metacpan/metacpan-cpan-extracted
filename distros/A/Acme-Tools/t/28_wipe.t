@@ -1,6 +1,6 @@
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/28_wipe.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 3;
 if($^O eq 'linux'){
   my $f=tmp().'/acme-tools.wipe.tmp';

@@ -2,8 +2,7 @@
 
 #
 # sql_to_db.pm
-# Copyright (C) 2014 by John Heidemann <johnh@isi.edu>
-# $Id: dd1b62c899ec2f2f31abaa9131d4f053b42c038e $
+# Copyright (C) 2014-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -236,7 +235,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2014 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2014-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -8,9 +8,10 @@ This module makes LWP more friendly to these systems
 by plugging in an HTTP and HTTPS protocol implementor
 powered by AnyEvent and AnyEvent::HTTP.
 
-This module is known to work with Coro. Please let
-me (<ikegami@adaelis.com>) know where else this
-is of use so I can add tests and add a mention.
+In short, it allows AnyEvent callbacks and Coro threads
+to execute when LWP is blocked. (Please let me know
+at <ikegami@adaelis.com> what other system this helps
+so I can add tests and add a mention.)
 
 All LWP features and configuration options should still be
 available when using this module.

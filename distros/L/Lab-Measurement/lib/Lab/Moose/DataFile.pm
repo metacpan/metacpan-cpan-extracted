@@ -1,24 +1,25 @@
 package Lab::Moose::DataFile;
+$Lab::Moose::DataFile::VERSION = '3.620';
 #ABSTRACT: Base class for data file types
-$Lab::Moose::DataFile::VERSION = '3.613';
+
 use 5.010;
 use warnings;
 use strict;
 
 use Moose;
+use MooseX::StrictConstructor;
 use MooseX::Params::Validate;
 
 use Lab::Moose::DataFolder;
 
 use File::Basename qw/dirname basename/;
 use File::Path 'make_path';
-use File::Spec::Functions 'catfile';
+use Lab::Moose 'our_catfile';
 use IO::Handle;
 
 use Carp;
 
 use namespace::autoclean;
-
 
 has folder => (
     is       => 'ro',
@@ -75,14 +76,14 @@ sub _open_file {
     my $filename = $self->filename();
 
     my $dirname = dirname($filename);
-    my $dirpath = catfile( $folder, $dirname );
+    my $dirpath = our_catfile( $folder, $dirname );
 
     if ( not -e $dirpath ) {
         make_path($dirpath)
             or croak "cannot make directory '$dirname'";
     }
 
-    my $path = catfile( $folder, $filename );
+    my $path = our_catfile( $folder, $filename );
 
     $self->_path($path);
 
@@ -121,7 +122,7 @@ Lab::Moose::DataFile - Base class for data file types
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -168,10 +169,10 @@ path relative to the current working directory.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

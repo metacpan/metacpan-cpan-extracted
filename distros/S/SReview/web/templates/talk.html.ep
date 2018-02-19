@@ -68,12 +68,12 @@ function edit_length_adj(val) {
 };
 </script>
 <p>This video is for the talk entitled <q><strong><%= $talk_title %></strong></q> by <strong><%= $talk_speakers %></strong> which happened in room <strong><%= $room %></strong> from <strong><%= $talk_start %></strong> to <strong><%= $talk_end %></strong> at <strong><%= $event %></strong></p>
-<p>To be able to see this preview in your browser, you must use an HTML5 browser which supports the WebM format. Alternatively, here is a <a href='<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($room, 0, 1) %>/<%= $slug %>.<%= $exten %>'>direct download <span class="glyphicon glyphicon-download"></span></a> of the same file.</p>
+<p>To be able to see this preview in your browser, you must use an HTML5 browser which supports the WebM format. Alternatively, here is a <a href='<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($talk_start, 0, 10) %>/<%= substr($room, 0, 1) %>/<%= $slug %>.<%= $exten %>'>direct download <span class="glyphicon glyphicon-download"></span></a> of the same file.</p>
 <p>
 <div class="row">
   <div class="col-sm-6">
     <p>In case it is needed (and they were recorded), these are the 20 minutes before...:</p>
-    <div class="embed-responsive embed-responsive-16by9"><video id="video-pre" class="embed-responsive-item" controls="controls" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($room, 0, 1)%>/<%= $slug %>-pre.<%= $exten %>"></video></div>
+    <div class="embed-responsive embed-responsive-16by9"><video id="video-pre" class="embed-responsive-item" controls="controls" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($talk_start, 0, 10) %>/<%= substr($room, 0, 1)%>/<%= $slug %>-pre.<%= $exten %>?date=<%= localtime %>"></video></div>
     <div class="btn-group btn-group-justified">
       <div class="btn-group"><button class="btn" onclick="setPoint('pre', 'start', document.getElementById('video-pre').currentTime);">Take start point</button></div>
       <div class="btn-group"><button class="btn" onclick="setPoint('pre', 'end', document.getElementById('video-pre').currentTime);">Take end point</button></div>
@@ -81,7 +81,7 @@ function edit_length_adj(val) {
   </div>
   <div class="col-sm-6">
     <p>... and after this talk:</p>
-    <div class="embed-responsive embed-responsive-16by9"><video id="video-post" class="embed-responsive-item" controls="controls" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($room, 0, 1)%>/<%= $slug %>-post.<%= $exten %>"></video></div>
+    <div class="embed-responsive embed-responsive-16by9"><video id="video-post" class="embed-responsive-item" controls="controls" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($talk_start, 0, 10) %>/<%= substr($room, 0, 1)%>/<%= $slug %>-post.<%= $exten %>?date=<%= localtime %>"></video></div>
     <div class="btn-group btn-group-justified">
       <div class="btn-group"><button class="btn" onclick="setPoint('post', 'start', document.getElementById('video-post').currentTime);">Take start point</button></div>
       <div class="btn-group"><button class="btn" onclick="setPoint('post', 'end', document.getElementById('video-post').currentTime);">Take end point</button></div>
@@ -91,7 +91,7 @@ function edit_length_adj(val) {
 <div class="row">
   <div class="col-sm-12">
     <p>Main video:</p>
-    <div class="embed-responsive embed-responsive-16by9"><video id="video-main" class="embed-responsive-item" controls="controls" autoplay="autoplay" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($room, 0, 1)%>/<%= $slug %>.<%= $exten %>"></video></div>
+    <div class="embed-responsive embed-responsive-16by9"><video id="video-main" class="embed-responsive-item" controls="controls" autoplay="autoplay" src="<%= $vid_hostname %>/video/<%= $eventid %>/<%= substr($talk_start, 0, 10) %>/<%= substr($room, 0, 1)%>/<%= $slug %>.<%= $exten %>?date=<%= localtime %>"></video></div>
     <div class="btn-group btn-group-justified">
       <div class="btn-group"><button class="btn" onclick="setPoint('main', 'start', document.getElementById('video-main').currentTime);">Take start point</button></div>
       <div class="btn-group"><button class="btn" onclick="setPoint('main', 'end', document.getElementById('video-main').currentTime);">Take end point</button></div>
@@ -130,14 +130,14 @@ function edit_length_adj(val) {
     <legend>OK</legend>
     <div class="form-group">
       %= radio_button choice => 'ok', id => 'ok', $disabled => $disabled, onchange => "formitems('ok')";
-      %= label_for ok => 'This preview looks OK, please transcode it at high quality and release it.'
+      %= label_for ok => 'The current representation of the "main" video above looks OK and contains all content which it should contain; please transcode that at high quality and release it.'
     </div>
   </fieldset>
   <fieldset>
     <legend>Common fixes</legend>
     <div class="form-group">
       %= radio_button choice => 'standard', id => 'standard', $disabled => $disabled, onchange => "formitems('standard')";
-      %= label_for standard => 'This preview has some issues. Please fix the following and generate a new preview:'
+      %= label_for standard => 'This preview has some issues. Please fix the following and generate all three video above anew:'
     </div>
     % foreach my $correction(sort (keys %{$viddata->{corrvals}})) {
     <div class="form-group">

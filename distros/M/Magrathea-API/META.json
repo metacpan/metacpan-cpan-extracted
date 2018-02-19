@@ -1,0 +1,54 @@
+{
+   "abstract" : "Easier access to the Magrathea NTS API",
+   "author" : [
+      "Cliff Stanford <cliff@may.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Magrathea-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Boolean" : "v1.0.8",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Email::Address" : "1.892",
+            "Net::Telnet" : "3.03",
+            "Phone::Number" : "0.01",
+            "enum" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Text::Autoformat" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.3.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

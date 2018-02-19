@@ -10,15 +10,13 @@ my $yoko = instrument(
     type               => 'YokogawaGS200',
     connection_type    => 'LinuxGPIB',
     connection_options => { gpib_address => 1 },
-    instrument_options => {
 
-        # Mandatory protection settings.
-        # Important, as instrument will always do step-sweeps.
-        max_units_per_step   => 0.01,
-        max_units_per_second => 10000,
-        max_units            => 10,
-        min_units            => -10,
-    }
+    # Mandatory protection settings.
+    # Important, as instrument will always do step-sweeps.
+    max_units_per_step   => 0.01,
+    max_units_per_second => 10000,
+    max_units            => 10,
+    min_units            => -10,
 );
 
 my $multimeter = instrument(

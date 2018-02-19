@@ -1,6 +1,6 @@
 package Plack::Middleware::Signposting;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Catmandu::Sane;
 use parent 'Plack::Middleware';
@@ -26,7 +26,7 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::Signposting - a base class for Plack implementations of the L<<Signposting>>( https://signposting.org) protocol
+Plack::Middleware::Signposting - a base class for Plack implementations of the L<Signposting|https://signposting.org> protocol
 
 =begin markdown
 
@@ -35,13 +35,29 @@ Plack::Middleware::Signposting - a base class for Plack implementations of the L
 
 =end markdown
 
+=head1 SYNOPSIS
+
+    package Plack::Middleware::Signposting::Foo;
+
+    use Moo;
+
+    extends 'Plack::Middleware::Signposting';
+
+    sub call {
+        my ($self, $env) = @_;
+
+        ...
+        my @data = ("0001", $relation, $type);
+        $self->to_link_format(\@data);
+    }
+
 =head1 METHODS
 
 =over
 
-=item * to_link_format(ARRAYREF)
+=item * to_link_format(\@ARRAY)
 
-This method produces the format for the link header. It expects an arrayref as input.
+This method produces the format for the link header.
 
 =back
 

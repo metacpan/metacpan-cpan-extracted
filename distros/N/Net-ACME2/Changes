@@ -1,5 +1,8 @@
 Revision history for Perl module Net::ACME2
 
+0.07 11 Feb 2018
+- Fix to request new nonce when there is none set.
+
 0.06 9 Feb 2018
 - Remove unused “Pending” modules (holdovers from Net::ACME)
 

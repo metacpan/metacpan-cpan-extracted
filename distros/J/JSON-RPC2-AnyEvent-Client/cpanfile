@@ -1,5 +1,6 @@
 requires 'AnyEvent';
 requires 'AnyEvent::Handle';
+requires 'AnyEvent::HTTP';
 requires 'JSON::RPC2::Client';
 requires 'JSON::XS';
 requires 'perl', '5.008005';

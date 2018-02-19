@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Term::Colormap'     => '0.16',
+        'Term::Colormap'     => '0.18',
         'Scope::Upper'       => '0.30',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

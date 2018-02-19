@@ -1,0 +1,15 @@
+0.004 2018-02-13
+
+ - Changes file created (GH #2)
+
+0.003 2016-01-21
+
+ - Plugin2 compatibility change: stop using :no_dsl (GH #1, fix by SysPete)
+
+0.002 2015-09-23
+
+ - Packaging fixes
+
+0.001 2015-09-23
+      
+ - Initial release

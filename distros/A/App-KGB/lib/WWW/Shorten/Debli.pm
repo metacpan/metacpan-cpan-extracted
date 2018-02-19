@@ -12,7 +12,7 @@ WWW::Shorten::Debli - Perl interface to deb.li
 
 =head1 DESCRIPTION
 
-A Perl interface to the web site L<http://deb.li>. Deb.li provides a URL
+A Perl interface to the web site L<https://deb.li>. Deb.li provides a URL
 shortening service primarily for Debian contributors.
 
 =cut
@@ -29,7 +29,7 @@ our $VERSION = '0.1';
 use Carp;
 use JSON::RPC::Client::Any;
 
-our $RPC_URL = 'http://deb.li/rpc/json';
+our $RPC_URL = 'https://deb.li/rpc/json';
 
 =head1 Functions
 
@@ -49,7 +49,7 @@ sub makeashorterlink {
         = $rpc->call( $RPC_URL => { method => 'add_url', params => [$url] } );
     return undef unless $res;
     return undef if $res->is_error;
-    return 'http://deb.li/' . $res->result;
+    return 'https://deb.li/' . $res->result;
 }
 
 =item makealongerlink
@@ -65,7 +65,7 @@ If anything goes wrong, then either function will return C<undef>.
 
 sub makealongerlink {
     my $key = shift or croak 'No key / URL passed to makealongerlink';
-    $key =~ s,^http://deb.li/,,;
+    $key =~ s,^https?://deb.li/,,;
     my $rpc = JSON::RPC::Client::Any->new();
     my $res
         = $rpc->call( $RPC_URL => { method => 'get_url', params => [$key] } );
@@ -92,6 +92,6 @@ Foundation; either version 2, or (at your option) any later version.
 
 =head1 SEE ALSO
 
-L<WWW::Shorten>, L<http://deb.li/>
+L<WWW::Shorten>, L<https://deb.li/>
 
 =cut

@@ -10,7 +10,7 @@ Version 0.03
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -108,7 +108,7 @@ the following object methods:
 
 =back
 
-And to make life realy simpel, when imported, one function
+And to make life realy simple, when imported, one function
 
 =over
 
@@ -122,15 +122,15 @@ into a perl data structure. Otherwise it will be C<undef> and print a warning.
 
 =head1 CAVEATS
 
-This is a super simplified way of making straightforward request. It can handle
-mnore complex requests as well, using
+This is a super simplified way of making a straightforward request. It can
+handle more complex requests as well, using
 
     my $resp = $ua->request($http_rqst);
 
 which will give a full C<HTTP::Response> object back. The UserAgent is a full
 subclass of the standard L<LWP::UserAgent>, and one can still change the setting
-of that, like e.g. the C<<$ua->agent('SecretAgent/007')>>. But if you need more
-control over your cache, you definitly need to fall back to
+of that, like e.g. the C<< $ua->agent('SecretAgent/007') >>. But if you need
+more control over your cache, you definitely need to fall back to
 L<LWP::UserAgent::Caching>
 
 =head1 AUTHOR
@@ -139,7 +139,7 @@ Theo van Hoesel, C<< <Th.J.v.Hoesel at THEMA-MEDIA.nl> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Theo van Hoesel.
+Copyright 2016 .. 2018 Theo van Hoesel.
 
 =cut
 

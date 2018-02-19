@@ -57,6 +57,8 @@ sub main {
     }
 }
 
+my $dir_perm;
+
 sub _configure_root {
     my ($root_dir) = @_;
 
@@ -91,12 +93,34 @@ sub _configure_root {
     $git->add( $files[-1] );
     chmod 0644, $files[-1];
 
-    is( ( stat $files[0] )[2] & 07777, _p(0755), sprintf q{File '%s' created correctly}, $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0600), sprintf q{File '%s' created correctly}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0),    sprintf q{File '%s' created correctly}, $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' created correctly}, $files[3]->relative($root_dir) );
+    my $sub_src = _create_submodule();
+    push @files, path($root_dir)->child('s');
+    $git->submodule( 'add', $sub_src, 's' );
+    $dir_perm = ( stat $files[-1] )[2] & 07777;
+
+    is( ( stat $files[0] )[2] & 07777, _p(0755),  sprintf q{File '%s' created correctly},      $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0600),  sprintf q{File '%s' created correctly},      $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0),     sprintf q{File '%s' created correctly},      $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0644),  sprintf q{File '%s' created correctly},      $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' created correctly}, $files[4]->relative($root_dir) );
 
     return @files;
+}
+
+sub _create_submodule {
+    my $dir = path( tempdir() );
+
+    my $git = Git::Wrapper->new($dir);
+    $git->init();
+
+    my $file = $dir->child('file.txt');
+    $file->spew();
+    $git->add('file.txt');
+    $git->config( 'user.email', 'test@example.com' );
+    $git->config( 'user.name',  'Test' );
+    $git->commit( '-m', 'initial' );
+
+    return $dir;
 }
 
 sub _test_with_defaults {
@@ -126,10 +150,11 @@ sub _test_with_defaults {
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
-    is( ( stat $files[0] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[0] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' is unchanged},  $files[4]->relative($root_dir) );
 
     return;
 }
@@ -166,10 +191,11 @@ sub _test_with_changed_defaults {
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
-    is( ( stat $files[0] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[0] )[2] & 07777, _p(0724),  sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0724),  sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0724),  sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0724),  sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' is unchanged},  $files[4]->relative($root_dir) );
 
     return;
 }
@@ -206,10 +232,11 @@ sub _test_with_config_bin {
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
-    is( ( stat $files[0] )[2] & 07777, _p(0755), sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[0] )[2] & 07777, _p(0755),  sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' is unchanged},  $files[4]->relative($root_dir) );
 
     return;
 }
@@ -246,10 +273,11 @@ sub _test_with_config_bin_scripts {
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
-    is( ( stat $files[0] )[2] & 07777, _p(0755), sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0755), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[0] )[2] & 07777, _p(0755),  sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0755),  sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' is unchanged},  $files[4]->relative($root_dir) );
 
     return;
 }
@@ -286,10 +314,11 @@ sub _test_with_config_scripts_unchanged {
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
-    is( ( stat $files[0] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly},  $files[0]->relative($root_dir) );
-    is( ( stat $files[1] )[2] & 07777, _p(0600), sprintf q{File '%s' correctly unchanged}, $files[1]->relative($root_dir) );
-    is( ( stat $files[2] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly},  $files[2]->relative($root_dir) );
-    is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly},  $files[3]->relative($root_dir) );
+    is( ( stat $files[0] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly},  $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0600),  sprintf q{File '%s' correctly unchanged}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly},  $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0644),  sprintf q{File '%s' adjusted correctly},  $files[3]->relative($root_dir) );
+    is( ( stat $files[4] )[2] & 07777, $dir_perm, sprintf q{Submodule '%s' is unchanged},   $files[4]->relative($root_dir) );
 
     return;
 }

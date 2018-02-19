@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::rdb;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 before BUILD => sub {
 
@@ -47,6 +47,7 @@ sub setup {
 sub encode {
     my $self = shift;
 
+    no warnings 'uninitialized';
     join( "\t", @{ $_[0] }{ @{ $self->output_fields } } );
 }
 
@@ -62,7 +63,7 @@ Data::Record::Serialize::Encode::rdb - encoded a record as /rdb
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

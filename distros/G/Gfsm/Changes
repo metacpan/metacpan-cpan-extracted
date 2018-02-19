@@ -1,12 +1,15 @@
 Change log for perl module Gfsm:
 
-v0.407 Thu, 16 Mar 2017 13:41:14 +0100 moocow
-       + gfsm-make-editor.perl fix for att symbol escapes in parseAuxString()
+v0.0408 Fri, 16 Feb 2018 13:56:30 +0100 moocow
+	+ Makefile.PL fix for RT bug #124235 (no more Alien::Gfsm->pkgconfig())
 
-v0.406 Mon, 22 Feb 2016 11:24:17 +0100 moocow
+v0.0407 Thu, 16 Mar 2017 13:41:14 +0100 moocow
+	+ gfsm-make-editor.perl fix for att symbol escapes in parseAuxString()
+
+v0.0406 Mon, 22 Feb 2016 11:24:17 +0100 moocow
 	+ added CONFIGURE_REQUIRES to fix RT bug #112321
 
-v0.405 Mon, 22 Feb 2016 11:24:17 +0100 moocow
+v0.0405 Mon, 22 Feb 2016 11:24:17 +0100 moocow
 	+ external c library dependency now uses new Alien::Gfsm
 
 v0.0404 Fri, 25 Sep 2015 13:01:09 +0200 moocow

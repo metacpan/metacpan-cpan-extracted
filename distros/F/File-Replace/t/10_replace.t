@@ -31,12 +31,12 @@ use FindBin ();
 use lib $FindBin::Bin;
 use File_Replace_Testlib;
 
-use Test::More tests=>8;
+use Test::More tests=>9;
 use File::Temp qw/tempfile/;
 
 ## no critic (RequireCarping)
 
-BEGIN { use_ok 'File::Replace' }
+BEGIN { use_ok 'File::Replace', 'replace3' }
 
 subtest 'basic test' => sub { plan tests=>7;
 	my $fn = newtempfn("Hello,\n");
@@ -135,6 +135,20 @@ subtest 'in_fh' => sub { plan tests=>7;
 	$repl2->finish;
 };
 
+subtest 'replace3' => sub { plan tests=>7;
+	my $fn = newtempfn("Yet Another\n");
+	my ($ifh,$ofh,$r) = replace3($fn);
+	is $ifh, $r->in_fh, 'in_fh';
+	is $ofh, $r->out_fh, 'out_fh';
+	is scalar(<$ifh>), "Yet Another\n", 'readline';
+	ok eof($ifh), 'eof';
+	is slurp($fn), "Yet Another\n", 'before write';
+	print $ofh "Feature";
+	is slurp($fn), "Yet Another\n", 'after write';
+	$r->finish;
+	is slurp($fn), "Feature", 'after finish';
+};
+
 subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 	ok grep( {/\bunclosed file\b.+\bnot replaced\b/i}
 		warns {
@@ -187,7 +201,7 @@ subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;
 	}), 'no warnings about unclosed files';
 };
 
-subtest 'misc failures' => sub { plan tests=>13;
+subtest 'misc failures' => sub { plan tests=>14;
 	like exception { my $r = File::Replace->new() },
 		qr/\bnot enough arguments\b/i, 'not enough args';
 	like exception { my $r = File::Replace->new(newtempfn,BadArg=>1) },
@@ -218,6 +232,8 @@ subtest 'misc failures' => sub { plan tests=>13;
 	no warnings FATAL=>'all'; use warnings;  ## no critic (ProhibitNoWarnings)
 	ok grep( {/\buseless\b.+\bvoid\b\s+\bcontext\b/i}
 		warns { File::Replace->new(newtempfn); 1 }), 'new in void ctx';
+	ok grep( {/\buseless\b.+\bvoid\b\s+\bcontext\b/i}
+		warns { replace3(newtempfn); 1 }), 'replace3 in void ctx';
 	ok grep({/\btoo many arg/i}
 		warns { File::Replace->new(newtempfn)->finish("blah") }
 			), 'finish too many args';

@@ -26,7 +26,7 @@ cmp_deeply(
 );
 
 cmp_deeply(
-   [$sm->_sc_configure(qw(foo Foo MSSQL\Apache2.2))],
+   [$sm->_sc_configure('foo', {display => 'Foo', depends => 'MSSQL\Apache2.2'})],
    [qw(sc config foo),
       'DisplayName= "Foo"',
       'type= own start= auto depend= "MSSQL\Apache2.2"',
@@ -35,12 +35,30 @@ cmp_deeply(
 );
 
 cmp_deeply(
-   [$sm->_sc_configure(qw(foo Foo), [qw(MSSQL Apache2.2)])],
+   [$sm->_sc_configure('foo', {display => 'Foo', depends => [qw(MSSQL Apache2.2)]})],
    [qw(sc config foo),
       'DisplayName= "Foo"',
       'type= own start= auto depend= "MSSQL\Apache2.2"',
    ],
    'sc configure with arrayref deps seems to work',
+);
+
+cmp_deeply(
+   [$sm->_sc_configure('foo', {display => 'Foo', user => 'domain\wes'})],
+   [qw(sc config foo),
+      'DisplayName= "Foo"',
+      'type= own start= auto obj= "domain\wes"',
+   ],
+   'sc configure auth ok',
+);
+
+cmp_deeply(
+   [$sm->_sc_configure('foo', {display => 'Foo', user => 'wes', password => 'gnarl'})],
+   [qw(sc config foo),
+      'DisplayName= "Foo"',
+      'type= own start= auto obj= "wes" password= "gnarl"',
+   ],
+   'sc configure auth ok',
 );
 
 done_testing;

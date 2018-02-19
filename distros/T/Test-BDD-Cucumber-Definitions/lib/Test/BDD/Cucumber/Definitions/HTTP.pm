@@ -16,14 +16,14 @@ use Test::BDD::Cucumber::StepFile qw();
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.11';
+our $VERSION = '0.14';
 
 our @EXPORT_OK = qw(
     S C
     request_send
     code_eq
     header_set header_eq header_re
-    content_set content_eq content_re content_eq_decoded content_re_decoded
+    content_set content_eq content_re
 );
 our %EXPORT_TAGS = (
     util => [
@@ -31,7 +31,7 @@ our %EXPORT_TAGS = (
             request_send
             code_eq
             header_set header_eq header_re
-            content_set content_eq content_re content_eq_decoded content_re_decoded
+            content_set content_eq content_re
             )
     ]
 );
@@ -204,18 +204,9 @@ my $validator_content_eq = validation_for(
 sub content_eq {
     my ($content) = $validator_content_eq->(@_);
 
-    is( S->{http}->{response}->{content}, $content, qq{Http response content eq "$content"} );
+    is( S->{http}->{response_object}->decoded_content(), $content, qq{Http response content eq "$content"} );
 
-    return;
-}
-
-sub content_eq_decoded {
-    my ($content) = $validator_content_eq->(@_);
-
-    is( S->{http}->{response_object}->decoded_content(), $content, qq{Http response decoded content eq "$content"} );
-
-    diag( 'Http response content type = ' . np S->{http}->{response_object}->headers->content_type );
-    diag( 'Http response content charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
+    diag( 'Http response charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
 
     return;
 }
@@ -231,18 +222,9 @@ my $validator_content_re = validation_for(
 sub content_re {
     my ($content) = $validator_content_re->(@_);
 
-    like( S->{http}->{response}->{content}, $content, qq{Http response content re "$content"} );
+    like( S->{http}->{response_object}->decoded_content(), $content, qq{Http response content re "$content"} );
 
-    return;
-}
-
-sub content_re_decoded {
-    my ($content) = $validator_content_re->(@_);
-
-    like( S->{http}->{response_object}->decoded_content(), $content, qq{Http response decoded content re "$content"} );
-
-    diag( 'Http response content type = ' . np S->{http}->{response_object}->headers->content_type );
-    diag( 'Http response content charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
+    diag( 'Http response charset = ' . np S->{http}->{response_object}->headers->content_type_charset );
 
     return;
 }

@@ -1,3 +1,11 @@
+0.026     2018-02-16 20:50:14 EST
+  - Update Prototypes policy to recognize more ways of activating the signatures feature
+
+0.025     2018-02-11 01:31:58 EST
+  - Fix DeprecatedFeatures to recognize correctly-parsed postderef in PPI 1.237+
+  - Avoid warning from running PackageMatchesFilename policy on a document without a filename (willt #29)
+  - Fix another false positive in DollarAB policy
+
 0.024     2017-08-16 22:39:53 EDT
   - Make PackageMatchesFilename more robust against infinite loops
 

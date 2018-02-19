@@ -1,6 +1,6 @@
 #  -*-cperl-*-
 #
-#  Copyright (c) 2002-2017 Greg Sabino Mullane and others: see the Changes file
+#  Copyright (c) 2002-2018 Greg Sabino Mullane and others: see the Changes file
 #  Portions Copyright (c) 2002 Jeffrey W. Baker
 #  Portions Copyright (c) 1997-2001 Edmund Mergl
 #  Portions Copyright (c) 1994-1997 Tim Bunce
@@ -16,7 +16,7 @@ use 5.008001;
 {
 	package DBD::Pg;
 
-	use version; our $VERSION = qv('3.7.0');
+	use version; our $VERSION = qv('3.7.4');
 
 	use DBI ();
 	use DynaLoader ();
@@ -1542,7 +1542,7 @@ use 5.008001;
         elsif ($ans eq 'DBDVERSION') {
             my $simpleversion = $DBD::Pg::VERSION;
             $simpleversion =~ s/_/./g;
-            no warnings;
+            no if $] >= 5.022, warnings => 'redundant';
             return sprintf '%02d.%02d.%1d%1d%1d%1d', split (/\./, "$simpleversion.0.0.0.0.0.0");
         }
          elsif ($ans eq 'KEYWORDS') {
@@ -1683,7 +1683,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.7.0 of the DBD::Pg module
+This documents version 3.7.4 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2757,7 +2757,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.7.0'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.7.4'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -4324,7 +4324,7 @@ Visit the archives at http://grokbase.com/g/perl/dbd-pg
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 1994-2017, Greg Sabino Mullane
+Copyright (C) 1994-2018, Greg Sabino Mullane
 
 This module (DBD::Pg) is free software; you can redistribute it and/or modify it 
 under the same terms as Perl 5.10.0. For more details, see the full text of the 

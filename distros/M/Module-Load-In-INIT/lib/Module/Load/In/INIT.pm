@@ -1,7 +1,7 @@
 package Module::Load::In::INIT;
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 #use warnings; # warns: Too late to run INIT block
@@ -33,8 +33,8 @@ INIT {
             } else {
                 die;
             }
-            $mod->import(@import_args);
         }
+        $mod->import(@import_args);
     }
 }
 
@@ -54,7 +54,7 @@ Module::Load::In::INIT - Load modules in INIT phase
 
 =head1 VERSION
 
-This document describes version 0.004 of Module::Load::In::INIT (from Perl distribution Module-Load-In-INIT), released on 2018-01-15.
+This document describes version 0.005 of Module::Load::In::INIT (from Perl distribution Module-Load-In-INIT), released on 2018-02-18.
 
 =head1 SYNOPSIS
 

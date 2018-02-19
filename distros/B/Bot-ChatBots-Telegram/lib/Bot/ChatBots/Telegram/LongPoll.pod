@@ -16,9 +16,19 @@ Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
    );
    sub processor { # tube-compliant
       my $record = shift;
-      # ... $record is normalized, by default
-      # quick response:
-      $record->{send_response} = 'Hello, world!';
+
+      # ... your business logic goes here...
+      my $message = 'Howdy!';
+
+      if (automatic_via_sender()) { # same as WebHook
+         $record->{send_response} = $message;
+      }
+      elsif (do_it_yourself_via_sender()) { # same as WebHook
+         my $sender = $record->{source}{refs}{sender};
+         $sender->send_response($message, record => $record);
+      }
+      # else nothing is sent back, just a HTTP 204 by default
+
       return $record; # follow on..
    }
 
@@ -40,10 +50,36 @@ You can also pass C<start> in the constructor, this will start the
 L<Mojo::IOLoop> directly (so you can use it in case you don't have other
 stuff to do).
 
-When invoked, the L</processor> tube can return a record with the C<response>
-field set. In this case, this update receiver can act also on the other way
-around, and send the C<response> towards Telegram using a
-L<Bot::ChatBots::Telegram::Sender>.
+When invoked, the L</processor> tube can return a record with the
+C<send_response> field set. In this case, this update receiver can act
+also on the other way around, and send the response towards Telegram
+using a L<Bot::ChatBots::Telegram::Sender>.
+
+ .                            ..Bot Application.....
+                              :                    :
+   __________________         :     ____________   :
+  /                  \        :    /            \  :
+  |                  |<----------1-|            |  :
+  |  Telegram Server |        :    |  LongPoll  |  :
+  |                  |-2---------->|            |  :
+  \__________________/        :    \____________/  :
+              |  ^            :        |           :
+              5  |            :        3 "send_response"
+              |  |            :        |           :
+              |  |            :     ___v______     :
+              |  |            :    /          \    :
+              |  +---------------4-|          |    :
+              |               :    |  Sender  |    :
+              +------------------->|          |    :
+                              :    \__________/    :
+                              :                    :
+                              :....................:
+
+   1, 2: Poll for new Update(s)
+   3   : internal call
+   4, 5: Telegram API Request/Response
+
+
 
 =head1 ACCESSORS
 
@@ -75,14 +111,6 @@ a flag that prevents calls from being sent if another one is ongoing.
 
 Accessors for maximum number of redirects acceptable for the underlying
 L<Mojo::UserAgent>. Defaults to 5.
-
-=head2 B<< sender >>
-
-   my $sender = $obj->sender;
-   $obj->sender(Bot::ChatBots::Telegram::Sender->new(token => $token));
-
-Accessor for the L<Bot::ChatBots::Telegram::Sender> object used for
-managing communications from/to Telegram.
 
 =head2 B<< update_timeout >>
 

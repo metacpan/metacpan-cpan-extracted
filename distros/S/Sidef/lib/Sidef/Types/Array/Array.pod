@@ -159,6 +159,22 @@ Aliases: I<abbreviations>
 
 =cut
 
+=head2 accumulate
+
+Array.accumulate() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 accumulate_by
+
+Array.accumulate_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 all
 
 Array.all() -> I<Obj>
@@ -181,7 +197,49 @@ Array.bindex() -> I<Obj>
 
 Return the
 
-Aliases: I<bindex_by>
+Aliases: I<bsearch_index>
+
+=cut
+
+=head2 bindex_by
+
+Array.bindex_by() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_index_by>
+
+=cut
+
+=head2 bindex_ge
+
+Array.bindex_ge() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_ge_by
+
+Array.bindex_ge_by() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_le
+
+Array.bindex_le() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bindex_le_by
+
+Array.bindex_le_by() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -190,6 +248,36 @@ Aliases: I<bindex_by>
 Array.binsert() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 bsearch
+
+Array.bsearch() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_by>
+
+=cut
+
+=head2 bsearch_ge
+
+Array.bsearch_ge() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_ge_by>
+
+=cut
+
+=head2 bsearch_le
+
+Array.bsearch_le() -> I<Obj>
+
+Return the
+
+Aliases: I<bsearch_le_by>
 
 =cut
 
@@ -459,13 +547,13 @@ Return the
 
 =cut
 
-=head2 each_key
+=head2 each_k
 
-Array.each_key() -> I<Obj>
+Array.each_k() -> I<Obj>
 
 Return the
 
-Aliases: I<each_index>
+Aliases: I<each_key>, I<each_index>
 
 =cut
 
@@ -773,6 +861,16 @@ Aliases: I<indices>
 
 =cut
 
+=head2 keys_by
+
+Array.keys_by() -> I<Obj>
+
+Return the
+
+Aliases: I<indices_by>
+
+=cut
+
 =head2 kv
 
 Array.kv() -> I<Obj>
@@ -865,6 +963,8 @@ Array.map() -> I<Obj>
 
 Return the
 
+Aliases: I<collect>
+
 =cut
 
 =head2 map_kv
@@ -872,6 +972,8 @@ Return the
 Array.map_kv() -> I<Obj>
 
 Return the
+
+Aliases: I<collect_kv>
 
 =cut
 
@@ -1071,6 +1173,14 @@ Return the
 
 =cut
 
+=head2 pop_while
+
+Array.pop_while() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prepend
 
 Array.prepend() -> I<Obj>
@@ -1208,6 +1318,14 @@ Array.shift() -> I<Obj>
 Return the
 
 Aliases: I<drop_left>, I<drop_first>
+
+=cut
+
+=head2 shift_while
+
+Array.shift_while() -> I<Obj>
+
+Return the
 
 =cut
 

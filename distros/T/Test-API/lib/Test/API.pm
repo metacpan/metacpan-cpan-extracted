@@ -5,7 +5,7 @@ use warnings;
 package Test::API;
 # ABSTRACT: Test a list of subroutines provided by a module
 
-our $VERSION = '0.008';
+our $VERSION = '0.010';
 
 use Symbol ();
 
@@ -171,9 +171,17 @@ my %private = map { ; $_ => 1 } qw(
 sub _public_fcns {
     my ($package) = @_;
     no strict qw(refs);
+    my $stash = \%{"$package\::"};
+    my @syms;
+    for (keys %$stash) {
+        push @syms,
+             ref \$stash->{$_} eq 'GLOB'
+               ? \$stash->{$_}
+               : \*{"$package:\:$_"}
+    }
     return grep { substr( $_, 0, 1 ) ne '_' && !$private{$_} && $_ !~ /^\(/ }
-      map { ( my $f = $_ ) =~ s/^\*$package\:://; $f }
-      grep { defined( *$_{CODE} ) } values( %{"$package\::"} );
+      map { ( my $f = *$_ ) =~ s/^\*$package\:://; $f }
+      grep { defined( *$_{CODE} ) } @syms;
 }
 
 #--------------------------------------------------------------------------#
@@ -199,7 +207,7 @@ Test::API - Test a list of subroutines provided by a module
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -314,15 +322,25 @@ L<https://github.com/dagolden/Test-API>
 
 David Golden <dagolden@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Toby Inkster
+=for stopwords cpansprout Toby Inkster
+
+=over 4
+
+=item *
+
+cpansprout <cpansprout@gmail.com>
+
+=item *
 
 Toby Inkster <mail@tobyinkster.co.uk>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by David Golden.
+This software is Copyright (c) 2018 by David Golden.
 
 This is free software, licensed under:
 

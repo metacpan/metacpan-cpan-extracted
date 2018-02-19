@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -198,6 +198,7 @@ ENDQ
             my $is_auto = !!( $t->{sql} =~ /${column}[^,\)]+AUTOINCREMENT/ );
             $schema{ $table }{ properties }{ $column } = {
                 $self->_map_type( $c, $t ),
+                'x-order' => $c->{cid}+1,
             };
             if ( ( $c->{notnull} || $c->{pk} ) && !$is_auto && !$c->{dflt_value} ) {
                 push @{ $schema{ $table }{ required } }, $column;
@@ -213,6 +214,7 @@ ENDQ
 
 sub _map_type {
     my ( $self, $column, $table ) = @_;
+    my %conf;
     my $db_type = $column->{type};
     # ; use Data::Dumper;
     # ; say Dumper $column;
@@ -228,24 +230,34 @@ sub _map_type {
             $constraint =~ s/\s*$//;
             my @values = split ',', substr $constraint, 1, -1;
             s/^\s*'|'\s*$//g for @values;
-            return ( type => 'string', enum => \@values );
+            %conf = ( type => 'string', enum => \@values );
         }
     }
 
-    if ( $db_type =~ /^(?:text|varchar)/i ) {
-        return ( type => 'string' );
+    if ( !$conf{ type } ) {
+        if ( $db_type =~ /^(?:text|varchar)/i ) {
+            %conf = ( type => 'string' );
+        }
+        elsif ( $db_type =~ /^(?:int|integer|smallint|bigint|tinyint|rowid)/i ) {
+            %conf = ( type => 'integer' );
+        }
+        elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
+            %conf = ( type => 'number' );
+        }
+        elsif ( $db_type =~ /^(?:timestamp)/i ) {
+            %conf = ( type => 'string', format => 'date-time' );
+        }
+        else {
+            # Default to string
+            %conf = ( type => 'string' );
+        }
     }
-    elsif ( $db_type =~ /^(?:int|integer|smallint|bigint|tinyint|rowid)/i ) {
-        return ( type => 'integer' );
+
+    if ( $table->{sql} !~ /${col_name}\s+\S+[^,\)]+(?:NOT NULL|PRIMARY KEY)/ ) {
+        $conf{ type } = [ $conf{ type }, 'null' ];
     }
-    elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
-        return ( type => 'number' );
-    }
-    elsif ( $db_type =~ /^(?:timestamp)/i ) {
-        return ( type => 'string', format => 'date-time' );
-    }
-    # Default to string
-    return ( type => 'string' );
+
+    return %conf;
 }
 
 1;
@@ -260,7 +272,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.014
+version 0.017
 
 =head1 SYNOPSIS
 

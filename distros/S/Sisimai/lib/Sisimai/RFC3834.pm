@@ -4,53 +4,42 @@ use strict;
 use warnings;
 
 # http://tools.ietf.org/html/rfc3834
-my $Re0 = {
+my $MarkingsOf = { 'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/ };
+my $AutoReply1 = {
     # http://www.iana.org/assignments/auto-submitted-keywords/auto-submitted-keywords.xhtml
-    'auto-submitted' => qr/\Aauto-(?:generated|replied|notified)/i,
+    'auto-submitted' => qr/\Aauto-(?:generated|replied|notified)/,
     # https://msdn.microsoft.com/en-us/library/ee219609(v=exchg.80).aspx
-    'x-auto-response-suppress' => qr/(?:OOF|AutoReply)/i,
+    'x-auto-response-suppress' => qr/(?:oof|autoreply)/,
     'precedence' => qr/\Aauto_reply\z/,
     'subject' => qr/\A(?>
-         Auto:
-        |Auto[ ]Response:
-        |Automatic[ ]reply:
-        |Out[ ]of[ ](?:the[ ])*Office:
+         auto:
+        |auto[ ]response:
+        |automatic[ ]reply:
+        |out[ ]of[ ](?:the[ ])*office:
         )
-    /xi,
+    /x,
 };
-my $Re1 = {
-    'boundary' => qr/\A__SISIMAI_PSEUDO_BOUNDARY__\z/,
-    'endof'    => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $Re2 = {
+my $Excludings = {
     'subject' => qr{(?:
-          SECURITY[ ]information[ ]for  # sudo
-         |Mail[ ]failure[ ][-]          # Exim
+          security[ ]information[ ]for  # sudo
+         |mail[ ]failure[ ][-]          # Exim
          )
     }x,
-    'from'    => qr/(?:root|postmaster|mailer-daemon)[@]/i,
+    'from'    => qr/(?:root|postmaster|mailer-daemon)[@]/,
     'to'      => qr/root[@]/,
 };
-my $ReV = qr{\A(?>
-     (?:.+?)?Re:
-    |Auto(?:[ ]Response):
-    |Automatic[ ]reply:
-    |Out[ ]of[ ]Office:
+my $SubjectSet = qr{\A(?>
+     (?:.+?)?re:
+    |auto(?:[ ]response):
+    |automatic[ ]reply:
+    |out[ ]of[ ]office:
     )
     [ ]*(.+)\z
-}xi;
+}x;
 
 sub description { 'Detector for auto replied message' }
 sub smtpagent   { 'RFC3834' }
-sub pattern     { return $Re0 }
-sub headerlist  {
-    return [
-        'Auto-Submitted',
-        'Precedence',
-        'X-Auto-Response-Suppress',
-    ];
-}
-
+sub headerlist  { [qw|Auto-Submitted Precedence X-Auto-Response-Suppress|] }
 sub scan {
     # Detect auto reply message as RFC3834
     # @param         [Hash] mhead       Message header of a bounce email
@@ -73,21 +62,21 @@ sub scan {
     return undef unless keys %$mhead;
     return undef unless ref $mbody eq 'SCALAR';
 
-    DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$Re2 ) {
+    DETECT_EXCLUSION_MESSAGE: for my $e ( keys %$Excludings ) {
         # Exclude message from root@
         next unless exists $mhead->{ $e };
         next unless defined $mhead->{ $e };
-        next unless $mhead->{ $e } =~ $Re2->{ $e };
+        next unless lc($mhead->{ $e }) =~ $Excludings->{ $e };
         $leave = 1;
         last;
     }
     return undef if $leave;
 
-    DETECT_AUTO_REPLY_MESSAGE: for my $e ( keys %$Re0 ) {
+    DETECT_AUTO_REPLY_MESSAGE: for my $e ( keys %$AutoReply1 ) {
         # RFC3834 Auto-Submitted and other headers
         next unless exists $mhead->{ $e };
         next unless defined $mhead->{ $e };
-        next unless $mhead->{ $e } =~ $Re0->{ $e };
+        next unless lc($mhead->{ $e }) =~ $AutoReply1->{ $e };
         $match++;
         last;
     }
@@ -95,7 +84,6 @@ sub scan {
 
     require Sisimai::Bite::Email;
     require Sisimai::Address;
-
     my $dscontents = [Sisimai::Bite::Email->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
@@ -108,7 +96,7 @@ sub scan {
 
     RECIPIENT_ADDRESS: {
         # Try to get the address of the recipient
-        for my $e ( 'from', 'return-path' ) {
+        for my $e ('from', 'return-path') {
             # Get the recipient address
             next unless exists  $mhead->{ $e };
             next unless defined $mhead->{ $e };
@@ -130,14 +118,14 @@ sub scan {
         # the boundary string.
         require Sisimai::MIME;
         my $b0 = Sisimai::MIME->boundary($mhead->{'content-type'}, 0);
-        $Re1->{'boundary'} = qr/\A\Q$b0\E\z/ if length $b0;
+        $MarkingsOf->{'boundary'} = qr/\A\Q$b0\E\z/ if length $b0;
     }
 
     BODY_PARSER: {
         # Get vacation message
         for my $e ( @hasdivided ) {
             # Read the first 5 lines except a blank line
-            $countuntil += 1 if $e =~ $Re1->{'boundary'};
+            $countuntil += 1 if $e =~ $MarkingsOf->{'boundary'};
 
             unless( length $e ) {
                 # Check a blank line
@@ -145,8 +133,9 @@ sub scan {
                 last if $blanklines > $countuntil;
                 next;
             }
-            next unless $e =~ / /;
-            next if $e =~ /\AContent-(?:Type|Transfer)/;
+            next unless index($e, ' ') > -1;
+            next if index($e, 'Content-Type') == 0;
+            next if index($e, 'Content-Transfer') == 0;
 
             $v->{'diagnosis'} .= $e.' ';
             $haveloaded++;
@@ -162,10 +151,8 @@ sub scan {
     $v->{'date'}      = $mhead->{'date'};
     $v->{'status'}    = '';
 
-    if( $mhead->{'subject'} =~ $ReV ) {
-        # Get the Subject header from the original message
-        $rfc822part = sprintf("Subject: %s\n", $1);
-    }
+    # Get the Subject header from the original message
+    $rfc822part = 'Subject: '.$1."\n" if lc($mhead->{'subject'}) =~ $SubjectSet;
 
     return { 'ds' => $dscontents, 'rfc822' => $rfc822part };
 }
@@ -212,7 +199,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -70,6 +70,8 @@ my $R = getcwd;
 my $hook_log = "$dir/hook.log";
 my $hook = "$dir/there.git/hooks/post-receive";
 
+my $client_script = $ENV{KGB_CLIENT_SCRIPT} || "$R/script/kgb-client";
+
 # the real test client
 {
     my $ccf = $test_bot->client_config_file;
@@ -77,7 +79,7 @@ my $hook = "$dir/there.git/hooks/post-receive";
     print $fh <<EOF;
 #!/bin/sh
 
-tee -a "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $ccf >> $hook_log 2>&1
+tee -a "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $ccf >> $hook_log 2>&1
 EOF
     close $fh;
     chmod 0755, $hook;
@@ -88,7 +90,7 @@ if ( $ENV{TEST_KGB_BOT_RUNNING} ) {
     open( my $fh, '>>', $hook);
     print $fh <<"EOF";
 
-cat "$dir/reflog" | PERL5LIB=$R/lib $R/script/kgb-client --conf $R/eg/test-client.conf
+cat "$dir/reflog" | PERL5LIB=$R/lib $^X -- $client_script --conf $R/eg/test-client.conf
 EOF
     close $fh;
 }
@@ -376,7 +378,14 @@ is( $commit, undef );
 
 # now the same on the master branch
 $git->command( [ 'checkout', '-q', 'master' ], { STDERR => 0 } );
-$git->command( 'merge', 'allnew' );
+( my $gitversion = Git::command_oneline('version') ) =~ s/^git version\s*//;
+my ( $major, $minor, $patch, $ignored ) = split( /\./, $gitversion );
+note "Git version $major $minor";
+if ( $major > 2 or $major == 2 and $minor >= 9 ) {  # 2.9.0+
+    $git->command( 'merge', 'allnew', '--allow-unrelated-histories' );
+} else {
+    $git->command( 'merge', 'allnew' );
+}
 push_ok();
 $c2 = $commit = $c->describe_commit;
 ok( defined($commit), 'empty branch merge commit exists' );

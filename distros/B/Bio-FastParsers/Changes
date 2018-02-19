@@ -1,3 +1,8 @@
+0.180470  2018-02-16 14:31:00+01:00 Europe/Brussels
+    - Additions
+      - CdHit/Uclust: new clust_mapper method
+      - improved documentation for all parsers
+
 0.180330  2018-02-02 23:49:20+01:00 Europe/Brussels
     - Additions
       - new parser for UCLUST output

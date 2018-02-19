@@ -1,10 +1,8 @@
 package Indent;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Readonly;
@@ -12,8 +10,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -106,7 +103,7 @@ Indent - Class for indent handling.
  use Indent;
  my $indent = Indent->new(%parameters);
  $indent->add([$cur_indent]);
- $indent->get;
+ my $string = $indent->get;
  $indent->remove([$cur_indent]);
  $indent->reset([$reset_value]);
 
@@ -128,7 +125,7 @@ as keyword value pairs. Recognized options are:
 
 =item * C<next_indent>
 
- Next indent. Adding to internal indent variable after every add method 
+ Next indent. Adding to internal indent variable after every add method
  calling.
  Default value is "\t" (tabelator).
 
@@ -141,10 +138,11 @@ as keyword value pairs. Recognized options are:
 =item C<get()>
 
  Get actual indent string.
+ Returns string.
 
 =item C<remove([$cur_indent])>
 
- Method for removing $cur_indent, if defined, or 'next_indent'. Only if 
+ Method for removing $cur_indent, if defined, or 'next_indent'. Only if
  is removable.
 
 =item C<reset([$reset_value])>
@@ -168,11 +166,9 @@ as keyword value pairs. Recognized options are:
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Indent;
 
  # Indent object.
@@ -202,7 +198,7 @@ as keyword value pairs. Recognized options are:
  # Reset.
  $indent->reset;
 
- # Output: 
+ # Output:
  # ->Example
  # ->->Ok
  # ->Example2
@@ -215,11 +211,29 @@ L<Readonly>.
 
 =head1 SEE ALSO
 
-L<Indent::Block>,
-L<Indent::Data>,
-L<Indent::String>,
-L<Indent::Utils>,
-L<Indent::Word>.
+=over
+
+=item L<Indent::Block>
+
+Class for block indenting.
+
+=item L<Indent::Data>
+
+Class for data indenting.
+
+=item L<Indent::String>
+
+Class for text indenting.
+
+=item L<Indent::Utils>
+
+Utilities for Indent classes.
+
+=item L<Indent::Word>
+
+Class for word indenting.
+
+=back
 
 =head1 REPOSITORY
 
@@ -227,17 +241,18 @@ L<https://github.com/tupinek/Indent>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-BSD licence.
+ © 2005-2018 Michal Josef Špaček
+ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 60 ;
+use Test::More;
 use Test::RDF;
 use Test::WWW::Mechanize::PSGI;
 use Module::Load::Conditional qw[can_load];
@@ -45,6 +45,13 @@ foreach my $accept_header (('text/html',
     my $res = $mech->get("/foo/page");
     is($mech->status, 301, "Returns 301");
     is($res->header('Location'), 'http://en.wikipedia.org/wiki/Foo', "Location is Wikipedia page");
+}
+
+{
+    note "Get /foo/controls, no redirects";
+    my $mech = Test::WWW::Mechanize::PSGI->new(app => $tester, requests_redirectable => []);
+    my $res = $mech->get("/foo/controls");
+    is($mech->status, 404, "Returns 404");
 }
 
 {

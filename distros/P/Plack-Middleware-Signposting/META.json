@@ -1,5 +1,5 @@
 {
-   "abstract" : "a base class for Plack implementations of the L<<Signposting>>( https://signposting.org) protocol",
+   "abstract" : "a base class for Plack implementations of the L<Signposting|https://signposting.org> protocol",
    "author" : [
       "Vitali Peil, C<< <vitali.peil at uni-bielefeld.de> >>"
    ],
@@ -64,8 +64,10 @@
          "web" : "https://github.com/LibreCat/Plack-Middleware-Signposting"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
       "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],

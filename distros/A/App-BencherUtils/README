@@ -2,14 +2,16 @@ NAME
     App::BencherUtils - Utilities related to bencher
 
 VERSION
-    This document describes version 0.23 of App::BencherUtils (from Perl
-    distribution App-BencherUtils), released on 2017-08-02.
+    This document describes version 0.240 of App::BencherUtils (from Perl
+    distribution App-BencherUtils), released on 2018-02-18.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities:
 
     *   bencher-code
+
+    *   bencher-for
 
     *   bencher-module-startup-overhead
 
@@ -57,6 +59,35 @@ FUNCTIONS
         Use code_startup mode instead of normal benchmark.
 
     *   with_process_size => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  bencher_for
+    Usage:
+
+     bencher_for(%args) -> [status, msg, result, meta]
+
+    List distributions that benchmarks specified modules.
+
+    This utility consults lcpan (local indexed CPAN mirror) to check if
+    there are distributions that benchmarks a specified module. This is done
+    by checking the presence of a dependency with the relationship
+    "x_benchmarks".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   modules* => *array[perl::modname]*
 
     Returns an enveloped result (an array).
 
@@ -297,7 +328,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

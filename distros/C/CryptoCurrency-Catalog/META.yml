@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CryptoCurrency-Catalog
   homepage: https://metacpan.org/release/CryptoCurrency-Catalog
   repository: git://github.com/perlancar/perl-CryptoCurrency-Catalog.git
-version: '20180131'
+version: '20180210'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -133,7 +133,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'

@@ -48,17 +48,23 @@ isa_ok $uno, 'RPi::I2C';
     is $num, 1023, "I2C read_block() ok"
 }
 
+select(undef, undef, undef, 0.2);
+
 { # write()
     $uno->write(25);
     my @data = _eeprom();
     is $data[0], 25, "I2C write() ok";
 }
 
+select(undef, undef, undef, 0.2);
+
 { # write_byte()
     $uno->write_byte(96, 30);
     my @data = _eeprom();
     is $data[0], 96, "I2C write_byte() ok";
 }
+
+select(undef, undef, undef, 0.2);
 
 { # write_block()
     my @send = qw(5 10 15 20);

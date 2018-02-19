@@ -1,0 +1,364 @@
+#ABSTRACT: XPRESS for DUMMIES - Example 3
+#PODNAME: Lab::XPRESS::Examples::Example3_2samples_2files
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Lab::XPRESS::Examples::Example3_2samples_2files - XPRESS for DUMMIES - Example 3
+
+=head1 VERSION
+
+version 3.620
+
+=head1 Abstract
+
+This is a simple, but fully functional Lab::Measurment script, which makes use
+of the XPRESS add-on.
+The script will perform a magnetic field sweep and backsweep, while measuring
+the DC resistance of two samples. 
+The data will be written in two seperate files, one for each sample. 
+
+=head1 Introduction 
+
+In this example, the main novelty is the usage of two datafiles, for example to
+separate the measurements coming from two different samples. 
+Those two files are populated with data, during the same sweep. Besides that,
+we introduce the magnet type sweep, and a few features, related with the
+configuration of sweeps.
+
+ #-------- 0. Import Lab::Measurement -------
+ 
+ use Lab::Measurement;
+ 
+ #-------- 1. Initialize Instruments --------
+ 
+ my $voltage_source1 = Instrument(
+     'Yokogawa7651',
+     {
+         connection_type => 'VISA_GPIB',
+         gpib_address    => 3,
+         gate_protect    => 0
+     }
+ );
+ 
+ my $multimeter1 = Instrument(
+     'Agilent34410A',
+     {
+         connection_type => 'VISA_GPIB',
+         gpib_address    => 17,
+         nplc =>
+             10    # integration time in number of powerline cylces [10*(1/50)]
+     }
+ );
+ 
+ my $voltage_source2 = Instrument(
+     'Yokogawa7651',
+     {
+         connection_type => 'VISA_GPIB',
+         gpib_address    => 5,
+         gate_protect    => 0
+     }
+ );
+ 
+ my $multimeter2 = Instrument(
+     'Agilent34410A',
+     {
+         connection_type => 'VISA_GPIB',
+         gpib_address    => 11,
+         nplc =>
+             10    # integration time in number of powerline cylces [10*(1/50)]
+     }
+ );
+ 
+ my $magnet = Instrument(
+     'IPSWeiss1',
+     {
+         connection_type => 'Isobus',
+         isobus_address  => 2,
+         base_connection => Connection( 'VISA_GPIB', { gpib_address => 24 } )
+     }
+ );
+ 
+ #-------- 3. Define the Sweeps -------------
+ 
+ my $magnet_sweep = Sweep(
+     'Magnet',
+     {
+         instrument => $magnet,
+         points     => [ -10, -1, 1, 10 ]
+         ,    # [starting point, intermediate steps, target] in Tesla
+         rate => [ 1, 0.7, 0.2, 0.7 ]
+         , # [rate to approach start, ... next section, ...,  ... target] in Tesla/min
+         interval  => 1,    # measurement interval in s
+         backsweep => 1
+     }
+ );
+ 
+ #-------- 3. Create a DataFile -------------
+ 
+ my $DataFile1 = DataFile('MagnFieldSweep_sample1.dat');
+ 
+ $DataFile1->add_column('Field');
+ $DataFile1->add_column('Voltage');
+ $DataFile1->add_column('Current');
+ $DataFile1->add_column('Resistance');
+ 
+ $DataFile1->add_plot(
+     {
+         'x-axis' => 'Field',
+         'y-axis' => 'Resistance'
+     }
+ );
+ 
+ my $DataFile2 = DataFile('MagnFieldSweep_sample2.dat');
+ 
+ $DataFile2->add_column('Field');
+ $DataFile2->add_column('Voltage');
+ $DataFile2->add_column('Current');
+ $DataFile2->add_column('Resistance');
+ 
+ $DataFile2->add_plot(
+     {
+         'x-axis' => 'Field',
+         'y-axis' => 'Resistance'
+     }
+ );
+ 
+ #-------- 4. Measurement Instructions -------
+ 
+ my $my_measurement1 = sub {
+ 
+     my $sweep = shift;
+ 
+     my $voltage    = $voltage_source1->get_value();
+     my $current    = $multimeter1->get_value() * 1e-7;
+     my $resistance = ( $current != 0 ) ? $voltage / $current : '?';
+ 
+     $sweep->LOG(
+         { Field => $magnet->get_value() },
+         0
+     );    #<---- 	0 is the general data space
+           #		values put here will be available in both DataFiles
+ 
+     $sweep->LOG(
+         {
+             Voltage    => $voltage,
+             Current    => $current,
+             Resistance => $resistance
+         },
+         1
+     );    #<---- This will be directed to DataFile1
+ };
+ 
+ my $my_measurement2 = sub {
+ 
+     my $sweep = shift;
+ 
+     my $voltage    = $voltage_source2->get_value();
+     my $current    = $multimeter2->get_value() * 1e-7;
+     my $resistance = ( $current != 0 ) ? $voltage / $current : '?';
+ 
+     $sweep->LOG(
+         {
+             Voltage    => $voltage,
+             Current    => $current,
+             Resistance => $resistance
+         },
+         2
+     );    #<---- This will be directed to DataFile2
+ };
+ 
+ #-------- 5. Put everything together -------
+ 
+ $DataFile1->add_measurement($my_measurement1);
+ $DataFile2->add_measurement($my_measurement2);
+ 
+ $magnet_sweep->add_DataFile($DataFile1);
+ $magnet_sweep->add_DataFile($DataFile2);
+ 
+ $magnet_sweep->start();
+ 
+ 1;
+
+=head1 The code
+
+=head2 Instrument initialization
+
+	#-------- 0. Import Lab::Measurement -------
+
+	use Lab::Measurement;
+	
+	#-------- 1. Initialize Instruments --------
+	
+	my $voltage_source1 = Instrument('Yokogawa7651', 
+		{
+		connection_type => 'VISA_GPIB',
+		gpib_address => 3,
+		gate_protect => 0
+		});
+	
+	my $multimeter1 = Instrument('Agilent34410A', 
+		{
+		connection_type => 'VISA_GPIB',
+		gpib_address => 17,
+		nplc => 10					# integration time in number of powerline cylces [10*(1/50)]
+		});
+	
+	my $voltage_source2 = Instrument('Yokogawa7651', 
+		{
+		connection_type => 'VISA_GPIB',
+		gpib_address => 5,
+		gate_protect => 0
+		});
+	
+	my $multimeter2 = Instrument('Agilent34410A', 
+		{
+		connection_type => 'VISA_GPIB',
+		gpib_address => 11,
+		nplc => 10					# integration time in number of powerline cylces [10*(1/50)]
+		});
+	
+	my $magnet = Instrument('IPSWeiss1', 
+		{
+		connection_type => 'IsoBus',
+		isobus_address => 2,
+		base_connection => Connection('VISA_GPIB', {gpib_address => 24})
+		});
+
+Certainly, it does not come as a surprise to you, that for a magnetic field sweep, we need a instrument, which can control the magnet.
+Here we use IPSWeiss1, which is an individual child-class of Lab::Instrument::IPS (the Oxford IPS) we use in Regensburg. Since it is connected via IsoBus in this example, 
+the initialization has to be slightly different. Under the term IsoBus we understand, that multiple instruments communicate via the same 'base_connection',
+but are still individualy accessible using the isobus_address. In order to provide this base_connection, we request directly a connection of type 'VISA_GPIB' with adsress 24.
+
+=head2 Sweep Objects
+
+	#-------- 3. Define the Sweeps -------------
+	
+	my $magnet_sweep = Sweep('Magnet', 
+		{
+		instrument => $magnet,
+		points => [-10, -1, 1, 10],	# [starting point, intermediate steps, target] in Tesla
+		rate => [1, 0.7, 0.2, 0.7],	# [rate to approach start, ... next section, ...,  ... target] in Tesla/min
+		interval => 1, 				# measurement interval in s
+		backsweep => 1
+		});
+
+Now we use (for the first time), the magnet sweep. There are almost no differences to a voltage sweep, but for this script, we used some other features.
+Most striking is, that 'points' contains more than 2 values. But how can it have more than a start and a target value? The answer is,
+something changes at those points in between. Here it is the rate, why also the 'rate' array is extended. Now what will happen here is:
+The field goes from its initial value to -10T at 1T/min, and beginns to sweep to 10T at 0.7T/min. It will change the rate at -1T to 0.2T/min, and at 1T back to 0.7T/min.
+you can put as many steps into the points array as you want, and even change the direction within it. If you do not provide enough rates, it will use the last one for the rest of the sequence.
+Since we define the parameter 'backsweep' to be 1, the sweep will automatically process the sequence in reverted direction, after finishing the original sweep.
+
+=head2 The DataFileS
+
+	#-------- 3. Create a DataFile -------------
+
+	my $DataFile1 = DataFile('MagnFieldSweep_sample1.dat');
+	
+	$DataFile1->add_column('Field');
+	$DataFile1->add_column('Voltage');
+	$DataFile1->add_column('Current');
+	$DataFile1->add_column('Resistance');
+	
+	
+	$DataFile1->add_plot({
+		'x-axis' => 'Field',
+		'y-axis' => 'Resistance'
+		});
+	
+	my $DataFile2 = DataFile('MagnFieldSweep_sample2.dat');
+	
+	$DataFile2->add_column('Field');
+	$DataFile2->add_column('Voltage');
+	$DataFile2->add_column('Current');
+	$DataFile2->add_column('Resistance');
+	
+	
+	$DataFile2->add_plot({
+		'x-axis' => 'Field',
+		'y-axis' => 'Resistance'
+		});
+
+Just defining two DataFiles, instead of only one. Really nothing interesting here.
+
+=head2 4. The measurement instructions
+
+However, now since we have two DataFiles, and the first two examples still in mind, the question arises: How can the two DataFiles be addressed individually? 
+The answer is in the following code:
+
+	my $my_measurement1 = sub {
+	
+		my $sweep = shift;
+	
+		my $voltage = $voltage_source1->get_value();
+		my $current = $multimeter1->get_value()*1e-7;
+		my $resistance = ($current != 0) ? $voltage/$current : '?';
+	
+		$sweep->LOG({
+			Field => $magnet->get_value()
+			}, 0);						#<---- 	0 is the general data space
+										#		values put here will be available in both DataFiles
+	
+		$sweep->LOG({
+			Voltage => $voltage,
+			Current => $current,
+			Resistance => $resistance
+			}, 1);						#<---- This will be directed to DataFile1
+	};
+	
+	my $my_measurement2 = sub {
+	
+		my $sweep = shift;
+	
+		my $voltage = $voltage_source2->get_value();
+		my $current = $multimeter2->get_value()*1e-7;
+		my $resistance = ($current != 0) ? $voltage/$current : '?';
+	
+		$sweep->LOG({
+			Voltage => $voltage,
+			Current => $current,
+			Resistance => $resistance
+			}, 2);						#<---- This will be directed to DataFile2
+	};
+
+Of course, both DataFiles should have measurement instructions, since both have to know how to collect the data for a single measurement line.
+So we got $my_measurement1 and $my_measurement1. By adding the integers 1 or 2 at the end of the LOG instruction, we can specify to which file these data-values 
+should be directed. There is also the option to put the data via LOG into space 0. This data will be available in both files. 
+In this example, we retrieve and log the magnetic field only once in $my_measurement1, since it should be more or less the same for both samples. 
+
+=head2 5. Putting everything in place
+
+It's not hard to gues how to proceed. Of course we have to connect DataFiles with the corresponding measurement instructions:
+
+	$DataFile1->add_measurement($my_measurement1);
+	$DataFile2->add_measurement($my_measurement2);
+
+And then add the two DataFiles to the sweep, since both should be called each time $magnet_sweep decides it's time for a new measurement point.
+
+	$magnet_sweep->add_DataFile($DataFile1);
+	$magnet_sweep->add_DataFile($DataFile2);
+
+Last but not least, start the sweep:
+
+	$magnet_sweep->start();
+
+Otherwise the script won't do anything. 
+And that's it!
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+
+  Copyright 2017       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -16,7 +15,7 @@ my($parser)	= Regexp::Parsertron -> new(verbose => 1);
 my($result)		= $parser -> parse(re => $re);
 my($node_id)	= 5; # Obtained from displaying and inspecting the tree.
 
-say "Calling append(text => '|C++', uid => $node_id)";
+print "Calling append(text => '|C++', uid => $node_id) \n";
 
 $parser -> append(text => '|C++', uid => $node_id);
 $parser -> print_raw_tree;
@@ -24,12 +23,12 @@ $parser -> print_cooked_tree;
 
 my($as_string) = $parser -> as_string;
 
-say "Original:    $re. Result: $result (0 is success)";
-say "as_string(): $as_string";
+print "Original:    $re. Result: $result (0 is success) \n";
+print "as_string(): $as_string \n";
 
 $result = $parser -> validate;
 
-say "validate():  Result: $result (0 is success)";
+print "validate():  Result: $result (0 is success) \n";
 
 # Return 0 for success and 1 for failure.
 
@@ -39,6 +38,6 @@ $parser -> verbose(0);
 $re		= qr/Perl|JavaScript|(?:Flub|BCPL)/i;
 $result	= $parser -> parse(re => $re);
 
-say "\nAdd complexity to the regexp by parsing a new regexp: $re";
+print "\nAdd complexity to the regexp by parsing a new regexp: $re \n";
 
 $parser -> print_raw_tree;

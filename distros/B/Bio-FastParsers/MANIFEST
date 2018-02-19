@@ -41,12 +41,11 @@ t/author-pod-syntax.t
 t/author-portability.t
 t/blast_table.t
 t/blast_xml.t
-t/cd_hit.t
+t/clusterable.t
 t/hmmer_dom_table.t
 t/hmmer_model.t
 t/hmmer_std.t
 t/hmmer_table.t
-t/uclust.t
 test/Meredith169AA.stock
 test/all_double.hmm
 test/all_double_domtbl.out
@@ -62,6 +61,7 @@ test/blastx.xml
 test/bug-next-hit-blastp.m9
 test/cdHit.out
 test/cdHit.out.clstr
+test/cdHit.out.clstr.idm
 test/cdHit.out.groups
 test/cdHit.out.ids
 test/empty.xml
@@ -84,5 +84,6 @@ test/tblastx.xml
 test/uclust.uc
 test/uclust.uc.fasta
 test/uclust.uc.groups
+test/uclust.uc.idm
 test/uclust.uc.ids
 test/usearch-global.m8

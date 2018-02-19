@@ -8,7 +8,7 @@ use Cwd qw (abs_path);
 use Module::List qw(list_modules);
 use Module::Load;
 
-our $VERSION = '0.07';
+our $VERSION = '1.01';
 
 my $self;
 
@@ -110,7 +110,7 @@ sub _plugins {
     }
 
     if (@_){
-        croak "usage: plugin(['Load::From'], [can => 'sub']), " .
+        croak "usage: plugins(['Load::From'], [can => 'sub']), " .
               "in that order\n";
     }
 
@@ -196,7 +196,7 @@ Plugin::Simple - Load plugins from files or modules.
 
     # load/return only the plugins that can perform specific functions
 
-    @plugins = plugins(can => ['foo', 'bar]); # foo and bar
+    @plugins = plugins(can => ['foo', 'bar']); # foo and bar
 
     # instead of importing 'plugins()', change the name:
 
@@ -241,29 +241,61 @@ To use both options, simply separate them with a comma.
 
 =head1 FUNCTIONS/METHODS
 
-None. We simply install a C<plugin()> function within the namespace of the
+None. We simply install a C<plugins()> function within the namespace of the
 package that C<use>d us.
+
+=head1 EXAMPLE
+
+This example simply uses a single plugin module with a C<plugin_function()>
+function. In the script, we load this file, and check to ensure the plugin does
+in fact have that sub available.
+
+We then call the plugins in a loop (even though in this case there's only one),
+and send in an argument for the plugin to do work on.
+
+=head2 Script
+
+    use warnings;
+    use strict;
+
+    use lib '.';
+
+    use Plugin::Simple;
+
+    my @plugins = plugins(
+        'examples/TestPlugin.pm',
+        can => ['plugin_function']
+    );
+
+    my $plugin_arg = 'Hello!';
+
+    for my $plugin (@plugins){
+        $plugin->plugin_function($plugin_arg);
+    }
+
+=head2 Plugin Module
+
+    package TestPlugin;
+
+    sub plugin_function {
+        shift; # throw away class/obj
+        my ($str) = @_;
+        print "in " . __PACKAGE__ . ", arg is: $str\n";
+    }
+
+    1;
+
+=head2 Output
+
+    in TestPlugin, arg is: Hello!
 
 =head1 AUTHOR
 
 Steve Bertrand, C<< <steveb at cpan.org> >>
 
-=head2 CONTRIBUTING
-
-Any and all feedback and help is appreciated. A Pull Request is the preferred
-method of receiving changes (L<https://github.com/stevieb9/p5-plugin-simple>),
-but regular patches through the bug tracker, or even just email discussions are
-welcomed.
-
 =head1 BUGS
 
 L<https://github.com/stevieb9/p5-plugin-simple/issues>
-
-=head1 SUPPORT
-
-You can find documentation for this script and module with the perldoc command.
-
-    perldoc Plugin::Simple;
 
 =head1 SEE ALSO
 
@@ -271,7 +303,7 @@ There are far too many plugin import modules on the CPAN to mention here.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2016,2017,2018 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

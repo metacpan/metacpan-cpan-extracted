@@ -1,7 +1,41 @@
+0.60 - added HPCI::File class for managing file info
+     - reworked stage->files attribute to use file class info
+	 - added storage_class and storage_classes to group and stage to select
+	   class for files
+	 - added ENV HPCI_LOG_NO_STDOUT and HPCI_LOG_NO_FILE to suppress logging
+	   to stdout or to the log file
+
+0.59 - added test for the various files attributes (skipstage, delete, rename)
+     - fixed some bugs in the handling of skipstage and rename
+
+0.58 - made HPCI::ScriptSource always be included - doesn't hurt if not used
+         and it allows users to explicitly add wrapping to their stage
+         execution scripts
+     - changed logic around out file testing to add a separate acceptance
+         method, so that special copying actions can be handled after validity
+         checking has finished
+
+0.57 - removed duplicate code for timestamp testing, fixed retain copy
+     - partial support for post stage actions in generated script
+
+0.56 - finished adding rename to files attribute handling
+
+0.55 - check in->req files
+     - added skipstage files attribute, and use it to allow skipping stage
+         execution
+     - added delete and rename files attribute, applied after stage succeeds
+     - coded the file actions (exists, timestamp, delete, rename) with names
+         that identified where they are being done, allowing drivers to
+         over-ride the actions in different ways in different contexts
+
+0.54 - added group optional attributes - connect, login, password - to be
+       available for clusters that require accessing with a network connection
+       or require authorization.
+
 0.53 - added file_system_delay attribute to allow shared file system to have a
        delay before a change made on another node is sure to be visible
-	 - use this delay when checking that required output files have been
-	   update
+     - use this delay when checking that required output files have been
+       update
 
 0.52 - script file was being generated before all of the stage roles had been
        loaded
@@ -9,10 +43,10 @@
 
 0.51 - Added code attribute to stage as atternative to command
      - fixed creation of script_file to not occur until it is requested
-	     - would fail if anyone was using the command creation methods to
-		   build the command after the stage was created
-		 - was creating the script_file even if code was provided instead of
-		   command
+         - would fail if anyone was using the command creation methods to
+           build the command after the stage was created
+         - was creating the script_file even if code was provided instead of
+           command
 
 0.50 - Documentation for regexp add_deps
      - fixed some add_dep -> add_deps typos
@@ -22,13 +56,13 @@
 
 0.48 - Added log_no_stdout and log_no_file attributes to suppress writing
        the log either to stdout or to a file.  The default is to continue
-	   writing both.
-	 - Fixed a message that was going explicitly to stdout instend of being
-	   logged.
-	 - Removed a test from t/19-env_key.t which would break if the BoutrosLab
-	   local config is being used. That config setting is a reasonable one
-	   for other locations to set (making max_concurrent have a non-zero
-	   default), so the test is no worth keeping around.
+       writing both.
+     - Fixed a message that was going explicitly to stdout instend of being
+       logged.
+     - Removed a test from t/19-env_key.t which would break if the BoutrosLab
+       local config is being used. That config setting is a reasonable one
+       for other locations to set (making max_concurrent have a non-zero
+       default), so the test is no worth keeping around.
 
 0.47 - Improved docs for verify_completion_state
        - added state argument to verify_completion_state callback

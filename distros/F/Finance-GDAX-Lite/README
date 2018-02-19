@@ -1,0 +1,112 @@
+NAME
+    Finance::GDAX::Lite - Client API library for GDAX (lite edition)
+
+VERSION
+    This document describes version 0.001 of Finance::GDAX::Lite (from Perl
+    distribution Finance-GDAX-Lite), released on 2018-02-14.
+
+SYNOPSIS
+     use Finance::GDAX::Lite;
+
+     my $gdax = Finance::GDAX::Lite->new(
+         key        => 'Your API key',
+         secret     => 'Your API secret',
+         passphrase => 'Your API passphrase',
+     );
+
+     my $res = $gdax->public_request(GET => "/products");
+     # [
+     #   200,
+     #   "OK",
+     #   [
+     #     {
+     #       base_currency => "BCH",
+     #       base_max_size => 200,
+     #       ...
+     #     },
+     #     ...
+     #   ]
+     # ]
+
+     my $res = $gdax->private_request(GET => "/coinbase-accounts");
+     # [
+     #   200,
+     #   "OK",
+     #   [
+     #     {
+     #       active => 1,
+     #       balance => "0.00",
+     #       currency => "USD",
+     #       name => "USD wallet",
+     #       ...
+     #     },
+     #     ...
+     #   ]
+     # ]
+
+     my $res = $gdax->private_request(POST => "/reports", {
+         type => "fills",
+         start_date => "2018-02-01T00:00:00.000Z",
+         end_date   => "2018-02-01T00:00:00.000Z",
+     });
+
+DESCRIPTION
+    <https://gdax.com> is a US cryptocurrency exchange. This module provides
+    a Perl wrapper for its API. This module is an alternative to
+    Finance::GDAX::API and is more lightweight/barebones (no objects, Moose,
+    etc). Please peruse the GDAX API reference to see which API endpoints
+    are available.
+
+METHODS
+  new
+    Usage: new(%args)
+
+    Constructor. Known arguments:
+
+    *   key
+
+    *   secret
+
+    *   passphrase
+
+  public_request
+    Usage: public_request($method, $request_path [, \%params ]) =>
+    [$status_code, $message, $content]
+
+    Will send HTTP request and decode the JSON body for you.
+
+  private_request
+    Usage: public_request($method, $request_path [, \%params ]) =>
+    [$status_code, $message, $content]
+
+    Will send and sign HTTP request and decode the JSON body for you.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-GDAX-Lite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-GDAX-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-GDAX-Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    GDAX API Reference, <https://docs.gdax.com/>
+
+    Finance::GDAX::API
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

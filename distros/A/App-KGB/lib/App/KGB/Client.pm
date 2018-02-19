@@ -6,7 +6,7 @@ use feature 'switch';
 use strict;
 use warnings;
 
-our $VERSION = 1.28;
+our $VERSION = '1.34';
 
 # vim: ts=4:sw=4:et:ai:sts=4
 #
@@ -522,7 +522,7 @@ sub detect_branch_and_module {
 =item shuffle_servers
 
 Returns a shuffled variant of C<< $self-E<gt>servers >>. It considers the last
-successfuly used server by this client instance and puts it first. If there is
+successfully used server by this client instance and puts it first. If there is
 no such server, it considers the state in C<status_dir> and picks the last
 server noted there, if it was used in the last 5 minutes.
 
@@ -807,6 +807,21 @@ sub format_message {
     my $result = '';
     warn "# msg = '$msg'" if 0;
 
+    if ($commit) {
+        $p{author_login} = $commit->author if ($commit->author);
+        $p{author_name} = $commit->author_name if ($commit->author_name);
+        $p{branch} = $commit->branch if ($commit->branch);
+        $p{commit_id} = $commit->id if ($commit->id);
+        $p{log} = $commit->log if ($commit->log);
+    }
+    $p{author_name} ||= $p{author_login};
+    $p{author_login} ||= $p{author_name};
+    if (defined($self->module)) {
+        $p{module} = $self->module;
+    } elsif ($commit and defined($commit->module)) {
+        $p{module} = $commit->module;
+    }
+
     while ( $msg =~ /\$\{([^{}]+)?\{([^{}]+)\}([^{}]+)?\}/ps ) {
         my ( $pre, $token, $post ) = ( $1, $2, $3 );
         warn "# pre = '$pre' token = '$token' post = '$post'" if 0;
@@ -819,33 +834,28 @@ sub format_message {
             push @r, project => $self->repo_id;
         }
         elsif ( $token eq 'author-login' ) {
-            push @r, author => $commit
-                ? $commit->author
-                : $p{author_login};
+            push @r, author => $p{author_login};
         }
         elsif ( $token eq 'author-name' ) {
-            push @r, author => $commit
-                ? $commit->author_name
-                : $p{author_name};
+            push @r, author => $p{author_name};
         }
         elsif ( $token eq 'branch' ) {
-            push @r, branch => $commit ? $commit->branch : $p{branch};
+            push @r, branch => $p{branch};
         }
         elsif ( $token eq 'module' ) {
-            push @r, module => $self->module
-                // ( $commit ? $commit->module : $p{module} );
+            push @r, module => $p{module};
         }
         elsif ( $token eq 'web-link' ) {
             push @r, web => $p{web_link};
         }
         elsif ( $token eq 'commit' ) {
-            push @r, commit_id => $commit ? $commit->id : $p{commit_id};
+            push @r, commit_id => $p{commit_id};
         }
         elsif ( $token eq 'log' ) {
-            push @r, log => $commit ? $commit->log : $p{log};
+            push @r, log => $p{log};
         }
         elsif ( $token eq 'log-first-line' ) {
-            push @r, log => ( split( /\n/, $commit->log ) )[0];
+            push @r, log => ( split( /\n/, $p{log} ) )[0];
         }
         elsif ( $token eq 'changes' ) {
             push @r, '' => $self->colorize_changes( $commit->changes )
@@ -1055,7 +1065,8 @@ sub _get_full_user_name {
     return $self->_full_user_name if $self->_full_user_name;
 
     my $user = getpwnam($login);
-    ( my $full_name = $user->gecos ) =~ s/,.*//;
+    my $full_name = $login;
+    ( $full_name = $user->gecos ) =~ s/,.*// if defined $user;
 
     utf8::decode($full_name);
 

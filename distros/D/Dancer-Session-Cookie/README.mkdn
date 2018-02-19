@@ -4,24 +4,26 @@ Dancer::Session::Cookie - Encrypted cookie-based session backend for Dancer
 
 # VERSION
 
-version 0.27
+version 0.28
 
 # SYNOPSIS
 
 Your `config.yml`:
 
-    session: "cookie"
-    session_cookie_key: "this random key IS NOT very random"
+```
+session: "cookie"
+session_cookie_key: "this random key IS NOT very random"
+```
 
 # DESCRIPTION
 
 This module implements a session engine for sessions stored entirely
-in cookies. Usually only **session id** is stored in cookies and
+in cookies. Usually only the **session id** is stored in cookies and
 the session data itself is saved in some external storage, e.g.
-database. This module allows to avoid using external storage at
+a database. This module allows you to avoid using external storage at
 all.
 
-Since server cannot trust any data returned by client in cookies, this
+Since a server cannot trust any data returned by clients in cookies, this
 module uses cryptography to ensure integrity and also secrecy. The
 data your application stores in sessions is completely protected from
 both tampering and analysis on the client-side.
@@ -36,19 +38,21 @@ the cookie's name, expiration and other attributes as well as its content.
 The setting **session** should be set to `cookie` in order to use this session
 engine in a Dancer application. See [Dancer::Config](https://metacpan.org/pod/Dancer::Config).
 
-A mandatory setting is needed as well: **session\_cookie\_key**, which should
+Another setting is also required: **session\_cookie\_key**, which should
 contain a random string of at least 16 characters (shorter keys are
 not cryptographically strong using AES in CBC mode).
 
-The optional **session\_expires** setting can also be passed, 
+The optional **session\_expires** setting can also be passed,
 which will provide the duration time of the cookie. If it's not present, the
 cookie won't have an expiration value.
 
 Here is an example configuration to use in your `config.yml`:
 
-    session: "cookie"
-    session_cookie_key: "kjsdf07234hjf0sdkflj12*&(@*jk"
-    session_expires: 1 hour
+```
+session: "cookie"
+session_cookie_key: "kjsdf07234hjf0sdkflj12*&(@*jk"
+session_expires: 1 hour
+```
 
 Compromising **session\_cookie\_key** will disclose session data to
 clients and proxies or eavesdroppers and will also allow tampering,
@@ -59,9 +63,9 @@ Also, changing **session\_cookie\_key** will have an effect of immediate
 invalidation of all sessions issued with the old value of key.
 
 **session\_cookie\_path** can be used to control the path of the session
-cookie.  The default is /.
+cookie.  The default is `/`.
 
-The global **session\_secure** setting is honoured and a secure (https
+The global **session\_secure** setting is honored and a secure (https
 only) cookie will be used if set.
 
 # DEPENDENCY
@@ -86,7 +90,7 @@ See [Plack::Middleware::Session::Cookie](https://metacpan.org/pod/Plack::Middlew
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Alex Kapranoff.
+This software is copyright (c) 2018, 2015, 2014, 2011 by Alex Kapranoff.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

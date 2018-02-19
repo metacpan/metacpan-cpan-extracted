@@ -1,5 +1,11 @@
 Revision history for Perl module Mojolicious::Command::nopaste
 
+0.12 2018-02-13
+  - Correct fix for compatibility with newer Mojolicious
+
+0.11 2018-02-13
+  - Fix compatibility with newer Mojolicious
+
 0.10 2017-04-27
   - Fix compatibility with newer Mojolicious
   - Bump Mojolicious requirement to 7.13

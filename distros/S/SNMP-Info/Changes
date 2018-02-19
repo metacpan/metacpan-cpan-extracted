@@ -1,3 +1,26 @@
+version 3.46 (2018-02-17)
+
+  [ENHANCEMENTS]
+
+  * Add method to get err-disable cause for interfaces on Cisco
+
+version 3.45 (2018-02-14)
+
+  [ENHANCEMENTS]
+
+  * Enable Layer3::Foundry for Brocade VDX platform
+
+  [BUG FIXES]
+
+  * #222 #238 #239 handle BayStack switches with port index 128 (zoeloe)
+
+version 3.44 (2018-02-12)
+
+  [ENHANCEMENTS]
+
+  * Improve F10 OS version detection (laelly)
+  * Better IPv6 prefix derivation
+
 version 3.43 (2018-02-02)
 
   [BUG FIXES]

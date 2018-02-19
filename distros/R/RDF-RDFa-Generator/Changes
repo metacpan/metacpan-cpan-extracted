@@ -7,6 +7,22 @@ Bug tracker:  <https://github.com/kjetilk/p5-rdf-rdfa-generator/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Maintainer:   Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
 
+0.200	2018-02-11	Extensive changes to support both Attean and Trine. Backwards incompatible changes.
+
+ - Added: Many more tests.
+ - Added: Use RDF::NS::Curated for the canonical list of namespaces.
+ - Added: Use the Attean API.
+ - Improve CURIE generation.
+ - Improve the HTML of Pretty a bit.
+ - Many minor improvements.
+ - Removed: Remove serialization of plain literals as they don't exist in
+   RDF 1.1.
+ - Removed: Stop using the Trine API.
+ - Removed: Trine serialization methods are deprecated and will croak.
+ - Use URI::NamespaceMap for managing prefixes, RDF::Prefixes can be used
+   through it.
+ - data_context takes an object as input.
+
 0.192	2017-12-22
 
  - Added: More tests.

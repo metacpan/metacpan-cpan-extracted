@@ -8,12 +8,14 @@ package RDF::RDFa::Generator::HTML::Pretty::Note;
 
 use 5.008;
 use strict;
-use warnings;
 use constant XHTML_NS => 'http://www.w3.org/1999/xhtml';
 use XML::LibXML qw':all';
+use Carp;
 
-our $VERSION = '0.192';
+use warnings;
 
+
+our $VERSION = '0.200';
 
 =head1 DESCRIPTION
 
@@ -47,18 +49,18 @@ sub new
 
 =over 4
 
-=item C<< $note->is_relevent_to($node) >>
+=item C<< $note->is_relevant_to($node) >>
 
-$node is an RDF::Trine::Node. Checks if the subject of $note is $node.
+$node is an L<RDF::Trine::Node> or L<Attean> IRI or blank. Checks if the subject of $note is $node.
 
-Alias: is_relelvant_to.
+Alias: is_relevent_to.
 
 =cut
 
 sub is_relevant_to
 {
 	my ($self, $something) = @_;
-	return $self->{'subject'}->equal($something);
+	return $self->{'subject'}->equals($something);
 }
 
 *is_relevent_to = \&is_relevant_to;
@@ -79,7 +81,7 @@ tag that can contain text nodes.
 sub node
 {
 	my ($self, $namespace, $element) = @_;
-	die "unknown namespace" unless $namespace eq XHTML_NS;
+	croak "unknown namespace" unless $namespace eq XHTML_NS;
 	
 	my $node = XML::LibXML::Element->new($element);
 	$node->setNamespace($namespace, undef, 1);
@@ -93,16 +95,11 @@ sub node
 
 __END__
 
-=head1 BUGS
-
-Please report any bugs to L<http://rt.cpan.org/>.
 
 =head1 SEE ALSO
 
 L<RDF::RDFa::Generator>,
 L<RDF::RDFa::Linter>.
-
-L<http://www.perlrdf.org/>.
 
 =head1 AUTHOR
 

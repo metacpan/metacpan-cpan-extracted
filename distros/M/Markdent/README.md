@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.29
+version 0.30
 
 # SYNOPSIS
 
@@ -96,13 +96,14 @@ Dave Rolsky <autarch@urth.org>
 # CONTRIBUTORS
 
 - Andrew Speer <andrew.speer@isolutions.com.au>
+- Denis Ibaev <dionys@gmail.com>
 - Jason McIntosh <jmac@appleseed-sc.com>
 - Polina Shubina <925043@mai.com>
 - Tom Hukins <tom@eborcom.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

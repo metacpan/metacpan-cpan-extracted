@@ -6,7 +6,6 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build: '0.4005'
-  Module::Build::Tiny: '0.035'
   perl: 5.008_001
 dynamic_config: 0
 generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
@@ -28,20 +27,23 @@ no_index:
 provides:
   Mojo::IOLoop::ReadWriteProcess:
     file: lib/Mojo/IOLoop/ReadWriteProcess.pm
-    version: '0.10'
+    version: '0.15'
   Mojo::IOLoop::ReadWriteProcess::Exception:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm
   Mojo::IOLoop::ReadWriteProcess::Pool:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm
   Mojo::IOLoop::ReadWriteProcess::Queue:
     file: lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm
+  Mojo::IOLoop::ReadWriteProcess::Session:
+    file: lib/Mojo/IOLoop/ReadWriteProcess/Session.pm
 requires:
   Mojolicious: '7.24'
 resources:
   bugtracker: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess/issues
   homepage: https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess
   repository: git://github.com/mudler/Mojo-IOLoop-ReadWriteProcess.git
-version: '0.10'
+version: '0.15'
 x_contributors:
   - 'Ettore Di Giacinto <mudler@gentoo.org>'
+  - 'Ettore Di Giacinto <mudler@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

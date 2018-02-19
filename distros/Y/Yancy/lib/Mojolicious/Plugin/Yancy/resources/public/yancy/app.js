@@ -20,16 +20,23 @@ Vue.component('edit-field', {
         example: { }
     },
     data: function () {
-        var fieldType = 'text',
+        var schemaType, fieldType = 'text',
             pattern = this.schema.pattern;
+
+        if ( Array.isArray( this.schema.type ) ) {
+            schemaType = this.schema.type[0];
+        }
+        else {
+            schemaType = this.schema.type;
+        }
 
         if ( this.schema['enum'] ) {
             fieldType = 'select';
         }
-        else if ( this.schema.type == 'boolean' ) {
+        else if ( schemaType == 'boolean' ) {
             fieldType = 'checkbox';
         }
-        else if ( this.schema.type == 'string' ) {
+        else if ( schemaType == 'string' ) {
             if ( this.schema.format == 'textarea' ) {
                 fieldType = 'textarea';
             }
@@ -55,9 +62,9 @@ Vue.component('edit-field', {
                 fieldType = 'markdown';
             }
         }
-        else if ( this.schema.type == 'integer' || this.schema.type == 'number' ) {
+        else if ( schemaType == 'integer' || schemaType == 'number' ) {
             fieldType = 'number';
-            if ( this.schema.type == 'integer' ) {
+            if ( schemaType == 'integer' ) {
                 pattern = this.schema.pattern || '^\\d+$';
             }
         }
@@ -204,7 +211,7 @@ var app = new Vue({
             rows: [],
             columns: [],
             total: 0,
-            currentPage: ( current.page ? parseInt( current.page ) : 0 ),
+            currentPage: ( current.page ? parseInt( current.page ) : 1 ),
             perPage: 25,
             fetching: false,
             error: {},
@@ -326,7 +333,7 @@ var app = new Vue({
                 }
             }
 
-            if ( this.currentCollection ) {
+            if ( this.currentCollection && this.collections[ this.currentCollection ] ) {
                 this.fetchPage();
             }
             else {
@@ -340,7 +347,7 @@ var app = new Vue({
                 self = this,
                 paging = {
                     limit: this.perPage,
-                    offset: this.perPage * this.currentPage
+                    offset: this.perPage * ( this.currentPage - 1 )
                 };
             this.fetching = true;
             delete this.error.fetchPage;
@@ -348,7 +355,7 @@ var app = new Vue({
                 function ( data, status, jqXHR ) {
                     self.rows = data.rows;
                     self.total = data.total;
-                    self.columns = coll.operations["list"].schema['x-list-columns'] || [];
+                    self.columns = self.getListColumns( self.currentCollection ),
                     self.fetching = false;
                     self.updateHash();
                 }
@@ -357,6 +364,19 @@ var app = new Vue({
                     self.$set( self.error, 'fetchPage', errorThrown );
                 }
             );
+        },
+
+        getListColumns: function ( collName ) {
+            var coll = this.collections[ collName ],
+                schema = coll.operations["list"].schema,
+                props = schema.properties,
+                columns = schema['x-list-columns'] || [];
+            return columns.map( function (c) {
+                if ( typeof c == 'string' ) {
+                    return { title: props[ c ].title || c, field: c };
+                }
+                return c;
+            } );
         },
 
         parseHash: function () {
@@ -541,13 +561,39 @@ var app = new Vue({
             return tmpl.replace( /\{([^}]+)\}/g, function ( match, field ) {
                 return data[field];
             } );
+        },
+
+        rowViewUrl: function ( data ) {
+            return this.fillUrl( this.schema[ 'x-view-item-url' ], data );
         }
 
     },
     computed: {
         totalPages: function () {
-            return Math.floor( this.total / this.perPage ) + 1;
+            var mod = this.total % this.perPage,
+                pages = this.total / this.perPage,
+                totalPages = mod == 0 ? pages : Math.floor( pages ) + 1;
+            return totalPages;
         },
+
+        pagerPages: function () {
+            var totalPages = this.totalPages,
+                currentPage = this.currentPage,
+                pages = [];
+            if ( totalPages < 10 ) {
+                for ( var i = 1; i <= totalPages; i++ ) {
+                    pages.push( i );
+                }
+                return pages;
+            }
+            var minPage = currentPage > 4 ? currentPage - 4 : 1,
+                maxPage = minPage + 9 < totalPages ? minPage + 9 : totalPages;
+            for ( var i = minPage; i < maxPage; i++ ) {
+                pages.push( i );
+            }
+            return pages;
+        },
+
         operations: function () {
             return this.collections[ this.currentCollection ] ? this.collections[ this.currentCollection ].operations : {};
         },
@@ -558,7 +604,7 @@ var app = new Vue({
     watch: {
         currentCollection: function () {
             this.data = [];
-            this.currentPage = 0;
+            this.currentPage = 1;
             this.openedRow = null;
             this.addingItem = false;
             this.fetching = false;

@@ -41,6 +41,8 @@ L<https://github.com/pombase/chobo>
 
 =item * a CV named "synonym_type" containing all synonym types from the input OBO files
 
+=item * a CV named "cv_property_type" containing a term named "cv_version"
+
 =back
 
 An example Chado DB containing these is here:

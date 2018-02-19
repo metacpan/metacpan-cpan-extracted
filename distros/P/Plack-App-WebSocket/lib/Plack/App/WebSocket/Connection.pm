@@ -6,7 +6,7 @@ use Scalar::Util qw(weaken refaddr);
 use Devel::GlobalDestruction ();
 use AnyEvent;
 
-our $VERSION = "0.06";
+our $VERSION = "0.08";
 
 sub new {
     my ($class, $conn, $responder) = @_;

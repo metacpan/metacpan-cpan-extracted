@@ -1,13 +1,13 @@
 package App::cpanminus::script::Patch::RunShcompgen;
 
-our $DATE = '2017-07-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
-use Module::Patch 0.12 qw();
+use Module::Patch 0.270 qw();
 use base qw(Module::Patch);
 
 use File::Which;
@@ -19,9 +19,17 @@ my $p_install = sub {
     my $res = $orig->(@_);
 
     {
-        last unless $res; # installation failed
+        warn __PACKAGE__.": Running install() ...\n" if $ENV{DEBUG};
+        unless ($res) {
+            # installation failed
+            warn "  Returning, installation failed\n" if $ENV{DEBUG};
+            last;
+        }
 
-        last unless which("shcompgen");
+        unless (which("shcompgen")) {
+            warn __PACKAGE__.": Skipped, shcompgen not found\n" if $ENV{DEBUG};
+            last;
+        }
 
         # list the exes that got installed
         my @exes;
@@ -30,9 +38,12 @@ my $p_install = sub {
             push @exes, $_;
         }
 
-        last unless @exes;
+        unless (@exes) {
+            warn __PACKAGE__.": Skipped, no exes found\n" if $ENV{DEBUG};
+            return;
+        }
 
-        say "Running shcompgen generate ".join(" ", @exes) if $ENV{DEBUG};
+        warn __PACKAGE__.": Running shcompgen generate --replace ".join(" ", @exes)."\n" if $ENV{DEBUG};
         system "shcompgen", "generate", "--replace", @exes;
     }
 
@@ -67,7 +78,7 @@ App::cpanminus::script::Patch::RunShcompgen - Run shcompgen after distribution i
 
 =head1 VERSION
 
-This document describes version 0.002 of App::cpanminus::script::Patch::RunShcompgen (from Perl distribution App-cpanminus-script-Patch-RunShcompgen), released on 2017-07-22.
+This document describes version 0.003 of App::cpanminus::script::Patch::RunShcompgen (from Perl distribution App-cpanminus-script-Patch-RunShcompgen), released on 2018-02-18.
 
 =head1 SYNOPSIS
 
@@ -109,7 +120,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

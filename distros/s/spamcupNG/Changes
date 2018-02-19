@@ -1,16 +1,134 @@
 ==================================================
-Changes from 2017-01-09 00:00:00 +0000 to present.
+Changes from 2017-02-18 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.7 at 2018-01-09 19:50:59 +0000
+version 0.9 at 2018-02-18 17:48:25 +0000
 ----------------------------------------
+
+  Change: 7d95b725b581e265c74687ea18617463a33f064f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-18 14:47:00 +0000
+
+    Bug fixes and refactoring
+
+    Fixed small bug that was reporting that e-mails with more than 3 days
+    old wouldn't be reported (which in fact is 2). Logging the original
+    message as an error and just reporting that the e-mail was too old
+    and deleted. Small refactorings. 
+
+  Change: dedb6d79d4983c3c06817314a4e2475c0cb28760
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 20:01:06 +0000
+
+    Bug fix regarding error detection 
+
+  Change: bc79be7e2c6a16de5d725deee00f1753734c3db1
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-13 17:50:21 +0000
+
+    Merge pull request #1 from glasswalk3r/log4perl
+
+    Merging addition of Log::Log4perl to the project 
+
+  Change: 7ec62e38a5eb33673208c32196235574fe4ffde0
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-13 17:48:57 +0000
+
+    Merge branch 'master' into log4perl 
+
+  Change: b1323a9c60b3c7064b28e1f80d97e966d00182e0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 17:47:41 +0000
+
+    Fixed logging message in the wrong place 
+
+  Change: 724cc619e91ab7cb26f71c09177c52c5346f8e49
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 17:43:16 +0000
+
+    Merge branch 'log4perl' of github.com:glasswalk3r/spamcupNG into
+    log4perl 
+
+  Change: 9b81731fc3f847a5d94cc41d8654b67e54eec992
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 17:42:10 +0000
+
+    Refactoring
+
+    Removed unnecessary messages from spamcup. Started refactoring
+    main_loop sub on SpamcupNG module. Added additional checkings, now
+    using XPath besides regex. Added more unit tests, based on testing
+    subs that depends on parsing HTML from Spamcop.net website. 
+
+  Change: c1bdf4cbdd6db65b8b6bb866e677016f85ff8bcd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-12 22:49:15 +0000
+
+    Refactoring
+
+    Removed unnecessary messages from spamcup. Started refactoring
+    main_loop sub on SpamcupNG module. Added additional checkings, now
+    using XPath besides regex. Added more unit tests, based on testing
+    subs that depends on parsing HTML from Spamcop.net website. 
+
+  Change: b4290ba2ce68b274b4838c9b6a3b1a33a1ab739f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-05 23:16:46 +0000
+
+    Replacements of messages to STDOUT
+
+    Replaced messages sent to STDOUT to log4perl. Added HTML::TreeBuilder
+    to parse the HTML when a Spam ID is missing (/dev/nulling report). 
+
+  Change: d2f7909115771a795545c840af8fc99f80eb1dcb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-28 13:55:23 +0000
+
+    Refactoring
+
+    Replaced printed messages to STDOUT with the corresponding logging
+    statement. Refactored Pod. Fixed logging configuration. Now DEBUG
+    level will write all messages to a text file. 
+
+  Change: 049aa78ea5aac1571951de758f150a83e2fc35c4
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-26 09:30:29 +0000
+
+    Replaced more print statements with log4perl 
+
+  Change: 932d12be6429b7b7749b319acb42246da4b5834f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-22 13:59:27 +0000
+
+    Added Pod, improved Kwalitee 
+
+  Change: 4879c68484d9a92380cb931f6a522b3e84fedbb5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-21 12:43:24 +0000
+
+    Bug fixes and documentation improvements
+
+    Program is now running, but more tests are required. There are
+    pending TODO's also. 
 
   Change: 7ad46ed7d9b439a1fee88c0e199604ec69dc40b9
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
   Date : 2018-01-09 17:50:39 +0000
 
     Small fix regarding license information 
+
+  Change: 259821a881dbc3c65a2c417012c45ec220fdf3ed
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-09 17:48:20 +0000
+
+    Replaced print messages with corresponding logger method call 
+
+  Change: a0ddeb1a84cf6c1d5fa2e00c95a5b4a802a4e86f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-03 08:52:11 +0000
+
+    Changed command line options and documentation 
 
   Change: 203d6c4607b153b5ee3fe01944610109b72ccb21
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -40,6 +158,10 @@ version 0.7 at 2018-01-09 19:50:59 +0000
     The expected configuration file is now ".spamcupNG.yml". Fixed the
     README regarding setup procedures. Now waiting CPAN to cleanup the
     mess I did with the distribution name to upload it again. :) 
+
+----------------------------------------
+version 0.4 at 2017-06-02 00:32:07 +0000
+----------------------------------------
 
   Change: cc1530e474ea3158553abdbabe5d196e5239d92d
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

@@ -346,6 +346,8 @@ TEST/dbcolstats_extrema_right.out
 TEST/dbcolstats_extrema_wrong.cmd
 TEST/dbcolstats_extrema_wrong.in
 TEST/dbcolstats_extrema_wrong.out
+TEST/dbcolstats_fieldseparator.cmd
+TEST/dbcolstats_fieldseparator.out
 TEST/dbcolstats_fieldseperator.cmd
 TEST/dbcolstats_fieldseperator.out
 TEST/dbcolstats_large_input.cmd
@@ -698,6 +700,8 @@ TEST/dbmultistats_ex.cmd
 TEST/dbmultistats_ex.out
 TEST/dbmultistats_ex_S.cmd
 TEST/dbmultistats_ex_S.out
+TEST/dbmultistats_fieldseparator.cmd
+TEST/dbmultistats_fieldseparator.out
 TEST/dbmultistats_grouped.cmd
 TEST/dbmultistats_grouped.out
 TEST/dbmultistats_grouped_incorrectly.cmd

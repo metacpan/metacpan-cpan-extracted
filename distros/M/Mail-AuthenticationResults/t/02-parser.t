@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
@@ -46,7 +46,7 @@ my $Header;
 lives_ok( sub{ $Header = $Parser->parsed() }, 'Parser returns data' );
 is( ref $Header, 'Mail::AuthenticationResults::Header', 'Returns Header Object' );
 is( $Header->value()->value(), 'test.example.com', 'Authserve Id correct' );
-is( $Header->as_string(), join( ";\n", 'test.example.com', @$Output ), 'As String data matches input data' );
+is( $Header->as_string(), join( ";\n    ", 'test.example.com', @$Output ), 'As String data matches input data' );
 
 my $Search;
 lives_ok( sub{ $Search = $Header->search({ 'key'=>'dmarc','value'=>'none' }) }, 'Searches returns data' );

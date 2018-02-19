@@ -1,0 +1,62 @@
+package Net::DNS::SEC::libcrypto;
+
+#
+# $Id: libcrypto.pod 1616 2018-01-22 08:54:52Z willem $
+#
+
+=head1 NAME
+
+Net::DNS::SEC::libcrypto - Perl interface to OpenSSL libcrypto
+
+
+=head1 DESCRIPTION
+
+Perl XS extension providing access to the OpenSSL libcrypto library
+upon which the Net::DNS::SEC cryptographic components are built.
+
+=cut
+
+
+1;
+__END__
+
+
+=head1 ACKNOWLEDGMENT
+
+Thanks are due to Eric Young and the many developers and 
+contributors to the OpenSSL cryptographic library.
+
+
+=head1 COPYRIGHT
+
+Copyright (c)2018 Dick Franks.
+
+All rights reserved.
+
+
+=head1 LICENSE
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation, and that the name of the author not be used in advertising
+or publicity pertaining to distribution of the software without specific
+prior written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+=head1 SEE ALSO
+
+L<Net::DNS>, L<Net::DNS::SEC>,
+L<OpenSSL|http://www.openssl.org/docs>
+
+=cut
+

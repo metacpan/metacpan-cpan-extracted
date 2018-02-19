@@ -1,11 +1,11 @@
 lib/Fake/Our.pm
-lib/Test/Simply.pm
-Changes
-Makefile.PL
-pMakefile.PL
-MANIFEST
 README
+Changes
+MANIFEST
 META.yml
+LICENSE
+Makefile.PL
+pmake.bat
 t/001_our_scalar.t
 t/002_our_array.t
 t/003_our_hash.t

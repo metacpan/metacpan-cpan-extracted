@@ -1,0 +1,19 @@
+Revision history for Control-CLI-Extreme
+
+0.01	2017-11-19
+	* Initial; first version, branched off from Control-CLI-AvayaData version 2.04
+
+0.02	2018-01-06
+	* Method login() now will accept an empty password, for devices where no password is set but still prompt for
+	  a password on connection
+	* Adjusted cmd() method's timers for detection of command embedded prompt which were sometimes seen to give
+	  some false positives
+
+0.03	2018-02-11
+	* Method login() was failing with SSH publickey authentication on ERS on TCP port other than 22
+
+0.04	2018-02-17
+	* Connection was not working to serial port of non-master switch in an XOS Summit stack
+
+1.00	2018-02-18
+	* First version posted on CPAN

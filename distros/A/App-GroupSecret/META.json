@@ -55,7 +55,7 @@
             "File::Basename" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "Getopt::Long" : "0",
+            "Getopt::Long" : "2.38",
             "IPC::Open2" : "0",
             "IPC::Open3" : "0",
             "MIME::Base64" : "0",
@@ -85,15 +85,15 @@
    "provides" : {
       "App::GroupSecret" : {
          "file" : "lib/App/GroupSecret.pm",
-         "version" : "0.302"
+         "version" : "0.304"
       },
       "App::GroupSecret::Crypt" : {
          "file" : "lib/App/GroupSecret/Crypt.pm",
-         "version" : "0.302"
+         "version" : "0.304"
       },
       "App::GroupSecret::File" : {
          "file" : "lib/App/GroupSecret/File.pm",
-         "version" : "0.302"
+         "version" : "0.304"
       }
    },
    "release_status" : "stable",
@@ -108,7 +108,7 @@
          "web" : "https://github.com/chazmcgarvey/groupsecret"
       }
    },
-   "version" : "0.302",
+   "version" : "0.304",
    "x_authority" : "cpan:CCM",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

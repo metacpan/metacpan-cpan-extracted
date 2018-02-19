@@ -1,14 +1,15 @@
 package Mail::AuthenticationResults::Header::Base;
 # ABSTRACT: Base class for modelling parts of the Authentication Results Header
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use Carp;
 
 use Mail::AuthenticationResults::Header::Group;
+
 
 sub _HAS_KEY{ return 0; }
 sub _HAS_VALUE{ return 0; }
@@ -33,6 +34,8 @@ sub set_key {
     croak 'Key cannot be undefined' if ! defined $key;
     croak 'Key cannot be empty' if $key eq q{};
     croak 'Invalid characters in key' if $key =~ /"/;
+    croak 'Invalid characters in key' if $key =~ /\n/;
+    croak 'Invalid characters in key' if $key =~ /\r/;
     $self->{ 'key' } = $key;
     return $self;
 }
@@ -41,11 +44,13 @@ sub set_key {
 sub key {
     my ( $self ) = @_;
     croak 'Does not have key' if ! $self->_HAS_KEY();
-    return $self->{ 'key' } // q{};
+    return q{} if ! defined $self->{ 'key' }; #5.8
+    return $self->{ 'key' };
 }
 
-sub _safe_value {
-    my ( $self, $value, $args ) = @_;
+
+sub safe_set_value {
+    my ( $self, $value ) = @_;
 
     $value = q{} if ! defined $value;
 
@@ -56,24 +61,11 @@ sub _safe_value {
     $value =~ s/\)/ /g;
     $value =~ s/\\/ /g;
     $value =~ s/"/ /g;
-    $value =~ s/=/ /g;
-
-    $value =~ s/;/ /g if ! exists( $args->{ ';' } );
-
+    $value =~ s/;/ /g;
     $value =~ s/^\s+//;
     $value =~ s/\s+$//;
 
-    $value =~ s/ /_/g if ! exists ( $args->{ ' ' } );
-
-    return $value;
-}
-
-
-sub safe_set_value {
-    my ( $self, $value ) = @_;
-
-    $value = $self->_safe_value( $value );
-    $self->set_value( $self->_safe_value( $value, {} ) );
+    #$value =~ s/ /_/g;
 
     $self->set_value( $value );
     return $self;
@@ -86,6 +78,8 @@ sub set_value {
     croak 'Value cannot be undefined' if ! defined $value;
     #croak 'Value cannot be empty' if $value eq q{};
     croak 'Invalid characters in value' if $value =~ /"/;
+    croak 'Invalid characters in value' if $value =~ /\n/;
+    croak 'Invalid characters in value' if $value =~ /\r/;
     $self->{ 'value' } = $value;
     return $self;
 }
@@ -94,15 +88,17 @@ sub set_value {
 sub value {
     my ( $self ) = @_;
     croak 'Does not have value' if ! $self->_HAS_VALUE();
-    return $self->{ 'value' } // q{};
+    return q{} if ! defined $self->{ 'value' }; # 5.8
+    return $self->{ 'value' };
 }
 
 
 sub stringify {
     my ( $self, $value ) = @_;
-    my $string = $value // q{};
+    my $string = $value;
+    $string = q{} if ! defined $string; #5.8;
 
-    if ( $string =~ /[\s\t \(\);]/ ) {
+    if ( $string =~ /[\s\t \(\);=]/ ) {
         $string = '"' . $string . '"';
     }
 
@@ -113,7 +109,8 @@ sub stringify {
 sub children {
     my ( $self ) = @_;
     croak 'Does not have children' if ! $self->_HAS_CHILDREN();
-    return $self->{ 'children' } // [];
+    return [] if ! defined $self->{ 'children' }; #5.8
+    return $self->{ 'children' };
 }
 
 
@@ -149,6 +146,48 @@ sub add_child {
 }
 
 
+sub ancestor {
+    my ( $self ) = @_;
+
+    my $depth = 0;
+    my $ancestor = $self->parent();
+    my $eldest = $self;
+    while ( defined $ancestor ) {
+        $eldest = $ancestor;
+        $ancestor = $ancestor->parent();
+        $depth++;
+    }
+
+    return ( $eldest, $depth );
+}
+
+
+sub as_string_prefix {
+    my ( $self ) = @_;
+
+    my ( $eldest, $depth ) = $self->ancestor();
+
+    my $indents = 1;
+    if ( $eldest->can( 'indent_by' ) ) {
+        $indents = $eldest->indent_by();
+    }
+
+    my $eol = "\n";
+    if ( $eldest->can( 'eol' ) ) {
+        $eol = $eldest->eol();
+    }
+
+    my $indent = ' ';
+    if ( $eldest->can( 'indent_on' ) ) {
+        if ( $eldest->indent_on( ref $self ) ) {
+            $indent = $eol . ' ' x ( $indents * $depth );
+        }
+    }
+
+    return $indent;
+}
+
+
 sub as_string {
     my ( $self ) = @_;
 
@@ -156,7 +195,7 @@ sub as_string {
         return q{};
     }
 
-    my $string .= $self->stringify( $self->key() );
+    my $string = $self->stringify( $self->key() );
     if ( $self->value() ) {
         $string .= '=' . $self->stringify( $self->value() );
     }
@@ -169,7 +208,8 @@ sub as_string {
     if ( $self->_HAS_CHILDREN() ) { # uncoverable branch false
         # There are no classes which run this code without having children
         foreach my $child ( @{$self->children()} ) {
-            $string .= ' ' . $child->as_string();
+            $string .= $child->as_string_prefix();
+            $string .= $child->as_string();
         }
     }
     return $string;
@@ -259,7 +299,42 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+Set of classes representing the various parts and sub parts of Authentication Results Headers.
+
+L<Mail::AuthenticationResults::Header> represents a complete Authentication Results Header set
+L<Mail::AuthenticationResults::Header::AuthServID> represents the AuthServID part of the set
+L<Mail::AuthenticationResults::Header::Comment> represents a comment
+L<Mail::AuthenticationResults::Header::Entry> represents a main entry
+L<Mail::AuthenticationResults::Header::Group> represents a group of parts, typically as a search result
+L<Mail::AuthenticationResults::Header::SubEntry> represents a sub entry part
+L<Mail::AuthenticationResults::Header::Version> represents a version part
+
+Header
+    AuthServID
+        Version
+        Comment
+        SubEntry
+    Entry
+        Comment
+    Entry
+        Comment
+        SubEntry
+            Comment
+    Entry
+        SubEntry
+        SubEntry
+
+Group
+    Entry
+        Comment
+    SubEntry
+        Comment
+    Entry
+        SubEntry
 
 =head1 METHODS
 
@@ -284,6 +359,9 @@ Croaks if this instance type can not have a key.
 Set the value for this instance.
 
 Munges the value to remove invalid characters before setting.
+
+This method also removes some value characters when their inclusion
+would be likely to break simple parsers.
 
 =head2 set_value( $value )
 
@@ -320,6 +398,15 @@ Returns the parent object for this instance.
 Adds $child as a child of this instance.
 
 Croaks is the relationship between $child and $self is not valid.
+
+=head2 ancestor()
+
+Returns the top Header object and depth of this child
+
+=head2 as_string_prefix()
+
+Return the prefix to as_string for this object when calledas a child
+of another objects as_string method call.
 
 =head2 as_string()
 

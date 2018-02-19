@@ -1,4 +1,4 @@
-Perl6::Export::Attrs version 0.000005
+Perl6::Export::Attrs version 0.000006
 
 Implements a Perl 5 native version of what the Perl 6 symbol export
 mechanism will look like.

@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -136,20 +135,19 @@ for my $test (@test)
 
 		$stats{success}++ if ($outcome == 0);
 
-		say "Case: $$test{item}. got: $got. expected: $expected. outcome: $outcome (0 is success). ";
+		print "Case: $$test{item}. got: $got. expected: $expected. outcome: $outcome (0 is success). \n";
 	}
 	else
 	{
-		say "Case $$test{item} failed to return 0 from parse(). ";
+		print "Case $$test{item} failed to return 0 from parse(). \n";
 	}
 
-	say '-' x 100;
+	print '-' x 100, "\n";
 
 	# Reset for next test.
 
 	$parser -> reset;
 }
 
-print "Statistics: ";
-print "$_: $stats{$_}. " for (sort keys %stats);
-say '';
+print "Statistics: \n";
+print "$_: $stats{$_}. \n" for (sort keys %stats);

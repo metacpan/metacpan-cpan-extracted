@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended -target => 'Scientist';
+use Test2::V0 -target => 'Scientist';
 
 # This is a race to see under normal conditions whether the
 # control() or the candidate() is run first.

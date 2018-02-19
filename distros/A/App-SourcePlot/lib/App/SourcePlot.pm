@@ -22,7 +22,7 @@ display a plot of astronomical sources on adjustable axes.
 use strict;
 #use warnings;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 use Config::IniFiles;
 use Tk;
@@ -112,9 +112,21 @@ my $balloon;
 
 Initializes the Source Plot GUI application and enters the Tk main loop.
 
+Accepts the following arguments in hash form:
+
+=over 4
+
+=item date
+
+The UT date.  Should be in the format YYYY-MM-DD or YYYY/MM/DD.
+
+=back
+
 =cut
 
 sub run_sourceplot_gui {
+  my %arg = @_;
+
   # setting up default values for Source Plot Options
   my $defaults_file = File::Spec->catfile(File::HomeDir->my_home(),
                                           '.splotcfg');
@@ -154,12 +166,20 @@ sub run_sourceplot_gui {
   $balloon = $MW->Balloon();
 
   # set the date to the current date
-  my ($ss, $mm, $hh, $md, $mo, $yr, $wd, $yd, $isdst) = gmtime(time);
-  $mo++;   # this catches the month up to the current date
-  $mo = '0'.$mo if length($mo) < 2;
-  $md = '0'.$md if length($md) < 2;
-  $yr += 1900;
-  $DATE = "$yr\/$mo\/$md";
+  my ($mo, $md, $yr);
+  if (exists $arg{'date'}) {
+    unless ($arg{'date'} =~ /^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/) {
+      print STDERR "Please enter the date in the format YYYY-MM-DD\n";
+      exit 1;
+    }
+    ($yr, $mo, $md) = ($1, $2, $3);
+  }
+  else {
+    (undef, undef, undef, $md, $mo, $yr, undef, undef, undef) = gmtime(time);
+    $mo++;   # this catches the month up to the current date
+    $yr += 1900;
+  }
+  $DATE = sprintf('%4d/%02d/%02d', $yr, $mo, $md);
 
   my $canFrame = $MW->Frame(
                      -takefocus => 1,
@@ -952,7 +972,7 @@ sub editSource {
                               -setgrid    => 1,
                              )->grid(qw/-sticky nsew/, -row=>1);
   $T->bindtags(qw/widget_demo/);        # remove all bindings but dummy "widget_demo"
- 
+
   # create the done button
   my $buttonF = $Top->Frame->pack(-padx=>10, -pady=>10, -fill =>'x');
   my $doneBut = $buttonF->Button(
@@ -1552,7 +1572,7 @@ sub plot {
     $plotter->usingWorld(0);
     $plotter->worldCenter($xborder, $yplot-$yborder);
     $plotter->usingWorld(1);
-   } 
+   }
   }elsif ($X_AXIS =~ /time/i) {
     my $ho = $timeH - 8;
     for ( my $hour = $minX+$lstDiffX*4; $hour < $maxX; $hour += $lstDiffX*4 ) {
@@ -1865,8 +1885,8 @@ sub plot {
 
   # now interact them
   print "    Plotting the grid lines\n" if $locateBug;
-  if (($X_AXIS eq $Y_AXIS) || (($X_AXIS =~ /elevation/i) && 
-     ($Y_AXIS =~ /air mass/i)) || (($X_AXIS =~ /air mass/i) && 
+  if (($X_AXIS eq $Y_AXIS) || (($X_AXIS =~ /elevation/i) &&
+     ($Y_AXIS =~ /air mass/i)) || (($X_AXIS =~ /air mass/i) &&
      ($Y_AXIS =~ /elevation/i))) {
     $plotter->drawColor('purple');
     $plotter->drawLine ($minX, $minY, $maxX, $maxY);
@@ -2330,7 +2350,7 @@ sub calcTime {
                 $plotter->drawText ($x2 - 1.1*$bx, $y2-0.2*$by, 'c', 'ltimeDot'. $source->name());
                 $plotter->fontColor($source->color());
               });
-            $plotter->bindTag('ltimeDot'.$source->name(), '<Any-Leave>' => 
+            $plotter->bindTag('ltimeDot'.$source->name(), '<Any-Leave>' =>
               sub {
                 $plotter->delete ('ltimeDot'.$source->name());
               });
@@ -2489,7 +2509,7 @@ Parameters:
 
     $w     -  Window in which to insert
     $text  -  Text to insert (it's inserted at the "insert" mark)
-    $args  -  One or more tags to apply to text.  If this is empty 
+    $args  -  One or more tags to apply to text.  If this is empty
               then all tags are removed from the text.
 
 Returns:  Nothing
@@ -2529,10 +2549,11 @@ Casey Best (University of Victoria),
 Pam Shimek (University of Victoria),
 Tim Jenness (Joint Astronomy Centre),
 Remo Tilanus (Joint Astronomy Centre),
-Graham Bell (Joint Astronomy Centre).
+Graham Bell (Joint Astronomy Centre / East Asian Observatory).
 
 =head1 COPYRIGHT
 
+Copyright (C) 2016-2018 East Asian Observatory.
 Copyright (C) 2012, 2013 Science and Technology Facilities Council.
 Copyright (C) 1998, 1999 Particle Physics and Astronomy Research
 Council. All Rights Reserved.

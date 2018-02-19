@@ -2,8 +2,7 @@
 
 #
 # dbcolscorrelate.pm
-# Copyright (C) 1998-2015 by John Heidemann <johnh@isi.edu>
-# $Id: bdcf1da03251b46bded7f59984e64e7f5060ae46 $
+# Copyright (C) 1998-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -245,17 +244,17 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
 
-    croak $self->{_prog} . ": at least two columns must be specified to compute a correlation.\n"
+    croak($self->{_prog} . ": at least two columns must be specified to compute a correlation.\n")
 	if ($#{$self->{_columns}} < 1);
     my @output_columns;
     my %columns_processed;
     foreach my $i (0..$#{$self->{_columns}}) {
 	my $column = $self->{_columns}[$i];
-	croak $self->{_prog} . ": column $column is double-listed as an input column (not allowed).\n"
+	croak($self->{_prog} . ": column $column is double-listed as an input column (not allowed).\n")
 	    if (defined($columns_processed{$column}));
 	$columns_processed{$column} = 1;
 	$self->{_colis}[$i] = $self->{_in}->col_to_i($column);
-	croak $self->{_prog} . ": column $column does not exist in the input stream.\n"
+	croak($self->{_prog} . ": column $column does not exist in the input stream.\n")
 	    if (!defined($self->{_colis}[$i]));
 	foreach my $j (0..$#{$self->{_columns}}) {
 	    next if ($i >= $j);
@@ -324,10 +323,10 @@ sub run ($) {
     foreach (0..$#$columns_aref) {
 	my $stats_href = dbpipeline_close2_hash($stats_source_queues[$_], $stats_sinks[$_], $stats_threads[$_]);
 	$means[$_] = $stats_href->{'mean'};
-	croak $self->{_prog} . ": column " . $columns_aref->[$_] . " does not have valid mean.\n"
+	croak($self->{_prog} . ": column " . $columns_aref->[$_] . " does not have valid mean.\n")
 	    if (!defined($means[$_]));
 	$stddevs[$_] = $stats_href->{'stddev'};
-	croak $self->{_prog} . ": column " . $columns_aref->[$_] . " does not have valid standard deviation.\n"
+	croak($self->{_prog} . ": column " . $columns_aref->[$_] . " does not have valid standard deviation.\n")
 	    if (!defined($stddevs[$_]));
     };
 
@@ -393,7 +392,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

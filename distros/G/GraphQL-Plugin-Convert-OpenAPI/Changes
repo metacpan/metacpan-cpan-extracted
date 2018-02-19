@@ -1,5 +1,9 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-OpenAPI
 
+0.10	Mon Feb 19 08:04:52 GMT 2018
+ - test, doc how to use with local OpenAPI app
+ - fix autovivification bug
+
 0.09	Sat Jan 27 09:21:52 GMT 2018
  - update YAML::XS version to dodge breakage
 

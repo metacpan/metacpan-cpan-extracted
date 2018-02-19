@@ -1,6 +1,6 @@
 package Lab::Exception;
 #ABSTRACT: Exception handling classes
-$Lab::Exception::VERSION = '3.613';
+$Lab::Exception::VERSION = '3.620';
 #
 # un/comment the following BEGIN clause to slap in the custom base class above
 #
@@ -172,11 +172,11 @@ Lab::Exception - Exception handling classes
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Hermann Kraus

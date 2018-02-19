@@ -20,7 +20,6 @@ examples/mandelbrot_set.pl
 examples/miller_rabin_primality_test.pl
 examples/newton_s_method.pl
 examples/pi_machin.pl
-examples/power_pairs.pl
 examples/rsa_algorithm.pl
 examples/solve_pell_equation.pl
 examples/tac-compressor.pl

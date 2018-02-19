@@ -2,7 +2,7 @@
 
 #
 # dbsort.pm
-# Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -250,7 +250,7 @@ sub parse_options ($@) {
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { $self->parse_sort_option('<>', @_); },
 	) or pod2usage(2);
-    croak $self->{_prog} . ": internal error, extra arguments.\n"
+    croak($self->{_prog} . ": internal error, extra arguments.\n")
 	if ($#argv != -1);
 }
 
@@ -266,7 +266,7 @@ Internal: setup, parse headers.
 sub setup($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": no sorting key specified.\n"
+    croak($self->{_prog} . ": no sorting key specified.\n")
 	if ($self->{_sort_argv} == -1);
 
     #
@@ -277,13 +277,13 @@ sub setup($) {
     $self->finish_io_option('input', @finish_args);
 
     $self->{_compare_code} = $self->create_compare_code($self->{_in}, $self->{_in});
-    croak $self->{_prog} . ": no sort field specified.\n"
+    croak($self->{_prog} . ": no sort field specified.\n")
 	if (!defined($self->{_compare_code}));
     print "COMPARE CODE:\n\t" . $self->{_compare_code} . "\n" if ($self->{_debug});
     my $compare_sub;
     eval '$self->{_compare_sub} = $compare_sub = ' . $self->{_compare_code} . ';';
-    $@ && croak $self->{_prog} . ":  internal eval error in compare code: $@.\n";
-#    $@ && croak "dbsort.pm:  internal eval error in compare code: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in compare code: $@.\n");
+#    $@ && croak("dbsort.pm:  internal eval error in compare code: $@.\n");
 }
 
 =head2 segment_start
@@ -369,11 +369,11 @@ sub segment_overflow($\@$) {
     my ($out_fn, $final_output) = $self->segment_next_output($input_finished, 'Fsdb:IO');
     my $out;
     if (ref($out_fn) =~ /^Fsdb::IO::Writer/) {
-	die "dbsort segment_overflow: suprise writer and NOT final_output\n"
+	croak("dbsort segment_overflow: suprise writer and NOT final_output\n")
 	    if (!$final_output);
 	$out = $out_fn;   # a bit hacky, but whatever
     } else {
-	die "dbsort segment_overflow: suprise filename and final_output\n"
+	croak("dbsort segment_overflow: suprise filename and final_output\n")
 	    if ($final_output);
 	$out = new Fsdb::IO::Writer(-file => $out_fn, -clone => $self->{_in});
     };
@@ -417,7 +417,7 @@ sub segment_merge_start($$) {
 	my($writer, $merge_fred) = dbpipeline_sink(\@writer_args,
 	    '--output' => $self->{_out},
 	    dbmerge(@merge_args));
-	croak "dbsort: internal error in invoking dbmerge\n"
+	croak("dbsort: internal error in invoking dbmerge\n")
 	    if (!defined($writer) || !defined($merge_fred));
 	$self->{_merge_writer} = $writer;
 	$self->{_merge_fred} = $merge_fred;
@@ -500,7 +500,7 @@ my $i = 0;
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

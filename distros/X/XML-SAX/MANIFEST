@@ -58,3 +58,4 @@ t/42entities.t
 t/99cleanup.t
 
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

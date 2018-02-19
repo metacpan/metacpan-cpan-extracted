@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '2.3.0';
+$Git::Hooks::CheckWhitespace::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -10,7 +10,6 @@ use warnings;
 use Git::Hooks;
 use Text::Glob qw/glob_to_regex/;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 # This routine can act both as an update or a pre-receive hook.
@@ -59,7 +58,10 @@ sub check_affected_refs {
             $old_commit eq $git->undef_commit ? $git->empty_tree : $old_commit,
             $new_commit);
         if ($? != 0) {
-            $git->error($PKG, "whitespace errors in the changed files in $ref", $output);
+            $git->fault(<<"EOS", {details => $output});
+There are extra whitespaces in the changed files in $ref.
+Please, remove them and amend your commit.
+EOS
             ++$errors;
         };
     }
@@ -76,7 +78,10 @@ sub check_commit {
     if ($? == 0) {
         return 1;
     } else {
-        $git->error($PKG, 'whitespace errors in the changed files', $output);
+        $git->fault(<<"EOS", {details => $output});
+There are extra whitespaces in the changed files.
+Please, remove them and amend your commit.
+EOS
         return 0;
     };
 }
@@ -92,7 +97,10 @@ sub check_patchset {
     if ($? == 0) {
         return 1;
     } else {
-        $git->error($PKG, 'whitespace errors in the changed files', $output);
+        $git->fault(<<"EOS", {details => $output});
+There are extra whitespaces in the changed files.
+Please, remove them and amend your commit.
+EOS
         return 0;
     };
 }
@@ -119,7 +127,20 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckWhitespace
+    admin = joe molly
+
+The first section enables the plugin and defines the users C<joe> and C<molly>
+as administrators, effectivelly exempting them from any restrictions the plugin
+may impose.
 
 =head1 DESCRIPTION
 
@@ -165,7 +186,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

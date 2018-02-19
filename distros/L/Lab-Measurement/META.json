@@ -27,10 +27,12 @@
          "requires" : {
             "File::Find" : "0",
             "File::Slurper" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "Perl::Tidy" : "0",
             "Test::More" : "0",
             "lib" : "0",
+            "lines" : "0",
             "perl" : "5.020"
          }
       },
@@ -49,7 +51,6 @@
             "File::Basename" : "0",
             "File::Copy" : "0",
             "File::Path" : "0",
-            "File::Spec::Functions" : "0",
             "Getopt::Long" : "0",
             "Hook::LexWrap" : "0",
             "IO::File" : "0",
@@ -66,6 +67,7 @@
             "Moose::Role" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::Params::Validate" : "0.18",
+            "MooseX::StrictConstructor" : "0",
             "PDL" : "2.007",
             "PDL::Core" : "0",
             "POSIX" : "0",
@@ -77,6 +79,7 @@
             "Storable" : "0",
             "Sys::Hostname" : "0",
             "Term::ReadKey" : "2.30",
+            "Test::More" : "1.001014",
             "Thread::Semaphore" : "0",
             "Tie::Hash" : "0",
             "Time::HiRes" : "0",
@@ -100,13 +103,15 @@
       "test" : {
          "requires" : {
             "File::Find" : "0",
+            "File::Glob" : "0",
             "File::Slurper" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "PDL::Ufunc" : "0",
             "Test::Builder::Module" : "0",
             "Test::Fatal" : "0",
             "Test::File" : "0",
-            "Test::More" : "0",
+            "Test::More" : "1.001014",
             "Test::Tester" : "0",
             "Text::Diff" : "0",
             "aliased" : "0",
@@ -128,7 +133,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.613",
+   "version" : "3.620",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

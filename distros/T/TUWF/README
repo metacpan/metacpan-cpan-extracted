@@ -18,9 +18,11 @@ module for a general introduction.
 Optional dependencies:
   (Perl core modules not listed)
 
-  DBI              for SQL functionality (TUWF::DB)
-  FCGI             to run in a FastCGI environment
-  PerlIO::gzip     output compression
+  DBI                   for SQL functionality (TUWF::DB)
+  FCGI                  to run in a FastCGI environment
+  HTTP::Server::Simple  to run the standalone HTTP server
+  JSON::XS              for JSON requests & responses
+  PerlIO::gzip          for output compression
 
 
 Installing:
@@ -40,7 +42,7 @@ Installing:
 
 Contact
 
-  Homepage: http://dev.yorhel.nl/tuwf
-       Git: http://g.blicky.net/tuwf.git/
+  Homepage: https://dev.yorhel.nl/tuwf
+       Git: https://g.blicky.net/tuwf.git/
      Email: projects@yorhel.nl
 

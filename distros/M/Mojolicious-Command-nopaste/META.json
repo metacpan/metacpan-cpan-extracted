@@ -32,7 +32,7 @@
    "provides" : {
       "Mojolicious::Command::nopaste" : {
          "file" : "lib/Mojolicious/Command/nopaste.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       },
       "Mojolicious::Command::nopaste::Service" : {
          "file" : "lib/Mojolicious/Command/nopaste/Service.pm"
@@ -74,6 +74,6 @@
          "url" : "https://github.com/jberger/Mojolicious-Command-nopaste"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

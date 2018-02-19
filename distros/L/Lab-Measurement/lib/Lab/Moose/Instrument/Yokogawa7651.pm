@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Yokogawa7651;
-$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.613';
+$Lab::Moose::Instrument::Yokogawa7651::VERSION = '3.620';
 #ABSTRACT: Yokogawa7651 voltage/current source.
 
 use 5.010;
@@ -122,7 +122,7 @@ Lab::Moose::Instrument::Yokogawa7651 - Yokogawa7651 voltage/current source.
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -132,13 +132,11 @@ version 3.613
      type => 'Yokogawa7651',
      connection_type => 'LinuxGPIB',
      connection_options => {gpib_address => 15},
-     instrument_options => {
-         # mandatory protection settings
-         max_units_per_step => 0.001, # max step is 1mV/1mA
-         max_units_per_second => 0.01,
-         min_units => -10,
-         max_units => 10,
-     }
+     # mandatory protection settings
+     max_units_per_step => 0.001, # max step is 1mV/1mA
+     max_units_per_second => 0.01,
+     min_units => -10,
+     max_units => 10,
  );
 
  # Step-sweep to new level.
@@ -192,7 +190,7 @@ For XPRESS voltage sweep. Equivalent to C<set_voltage>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

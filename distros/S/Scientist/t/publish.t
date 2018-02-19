@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended -target => 'Scientist';
+use Test2::V0 -target => 'Scientist';
 
 use lib 't/lib';
 use Publishing::Scientist;

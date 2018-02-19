@@ -6,7 +6,7 @@
 package Lingua::Interset::Tagset::ZH::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.010';
+our $VERSION = '3.011';
 
 use utf8;
 use open ':utf8';
@@ -1176,7 +1176,7 @@ Lingua::Interset::Tagset::ZH::Conll - Driver for the Chinese tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.010
+version 3.011
 
 =head1 SYNOPSIS
 

@@ -2,8 +2,7 @@
 
 #
 # dbmerge.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: b578ea71b5b2a54bed1fd517633261c2832cd066 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -209,8 +208,8 @@ L<Fsdb(3)>
 
 use 5.010;
 use strict;
-use Carp qw(croak);
 use Pod::Usage;
+use Carp qw(croak);
 
 use IO::Pipe;
 use IO::Select;
@@ -361,7 +360,7 @@ sub segment_next_output($$) {
         binmode $write_fh, ":utf8";
 	$out = [ $read_fh, $write_fh ];
     } else {
-	die "internal error: dbmege.pm:segment_next_output bad output_type: $output_type\n";
+	croak("internal error: dbmege.pm:segment_next_output bad output_type: $output_type\n");
     };
     return $out;
 }
@@ -386,12 +385,12 @@ sub segment_cleanup($$) {
 	} elsif (ref($file) eq 'Fsdb::BoundedQueue') {
 	    # nothing to do
 	} else {
-	    die "internal error: unknown type in dbmerge::segment_cleanup\n";
+	    croak("internal error: unknown type in dbmerge::segment_cleanup\n");
 	};
 	return;
     };
     my($cleanup_type) = $self->{_files_cleanup}{$file};
-    die "bad (empty) file in dbmerge::segment_cleanup\n"
+    croak("bad (empty) file in dbmerge::segment_cleanup\n")
 	if (!defined($file));
     if (!defined($cleanup_type)) {
 	print "# dbmerge: segment_cleanup:  no cleanup for " . _pretty_fn($file) . "\n" if ($self->{_debug});
@@ -403,7 +402,7 @@ sub segment_cleanup($$) {
 	print "# dbmerge: segment_cleanup:  NamedTmpfile::cleanup_one $file\n" if ($self->{_debug});
 	Fsdb::Support::NamedTmpfile::cleanup_one($file);
     } else {
-	die $self->{_prog} . ": internal error, unknown segment_cleanup type $cleanup_type\n";
+	croak($self->{_prog} . ": internal error, unknown segment_cleanup type $cleanup_type\n");
     };
 }
 
@@ -513,7 +512,7 @@ sub segments_merge_one_depth($$) {
 	    # one left, just punt it next
 	    print "# segments_merge_one_depth: runt at depth $depth pushed to next depth.\n" if ($self->{_debug});
 	    $self->enqueue_work($depth + 1, shift @{$work_depth_ref});
-	    die "internal error\n" if ($#{$work_depth_ref} != -1);
+	    croak("internal error\n") if ($#{$work_depth_ref} != -1);
 	    last;
 	};
 	# are they blocked?  force-start them if they are
@@ -534,7 +533,7 @@ sub segments_merge_one_depth($$) {
 	    } elsif ($work_ref->[0] == 2) {
 		# input is done
 	    } else {
-		die "interal error: unknown status $work_ref->[0]\n";
+		croak("interal error: unknown status $work_ref->[0]\n");
 	    };
 	};
 	# bail out if inputs are not done yet.
@@ -554,7 +553,7 @@ sub segments_merge_one_depth($$) {
 
 	foreach my $i (0..1) {
 	    next if (ref($two_fn[$i][1]) =~ /^(Fsdb::BoundedQueue|IO::)/ || $two_fn[$i][1] eq '-');
-	    croak $self->{_prog} . ": file $two_fn[$i][1] is missing.\n"
+	    croak($self->{_prog} . ": file $two_fn[$i][1] is missing.\n")
 		if (! -f $two_fn[$i][1]);
 	};
 
@@ -589,7 +588,7 @@ sub segments_merge_one_depth($$) {
 			print "# segments_merge_one_depth: Fred post-mortem $desc\n" if ($self->{_debug});
 			# xxx: with TEST/dbmerge_3_input.cmd I sometimes get exit code 255 (!) although things complete. 
 			# turned out Fsdb::Support::Freds::END was messing with $?.
-			croak "dbmerge: merge2 subprocess $desc, exit code: $exit_code\n" if ($exit_code != 0);
+			croak("dbmerge: merge2 subprocess $desc, exit code: $exit_code\n") if ($exit_code != 0);
 			$new_work_ref->[0] = 2;  # done
 		    });
 		$new_work_ref->[2] = $fred;
@@ -755,7 +754,7 @@ sub segments_merge_all($) {
 	    my $fred_or_code = Fsdb::Support::Freds::join_any();
 	    last if (ref($fred_or_code) eq '');
 	    $overall_progress++;
-	    croak "dbmerge: merge thread failed\n"
+	    croak("dbmerge: merge thread failed\n")
 		if ($fred_or_code->exit_code() != 0);
 	    print "# segments_merge_all: merged fred " . $fred_or_code->info() . "\n" if ($self->{_debug});
 	};
@@ -827,7 +826,7 @@ sub segments_merge_all($) {
 	next if ($zombie_work_ref->[0] == 2);
 	print "# waiting on zombie " . $zombie_work_ref->[2]->info() . "\n" if ($self->{_debug});
 	$zombie_work_ref->[2]->join();
-	croak "internal error: zombie didn't reset status\n" if ($zombie_work_ref->[0] != 2);
+	croak("internal error: zombie didn't reset status\n") if ($zombie_work_ref->[0] != 2);
     };
 
     # reap xargs (if it didn't already get picked up)
@@ -851,24 +850,24 @@ Internal: setup, parse headers.
 sub setup($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": no sorting key specified.\n"
+    croak($self->{_prog} . ": no sorting key specified.\n")
 	if ($#{$self->{_sort_argv}} == -1);
 
     if (!$self->{_xargs} && $#{$self->{_inputs}} == -1) {
-	croak $self->{_prog} . ": no input sources specified, use --input or --xargs.\n";
+	croak($self->{_prog} . ": no input sources specified, use --input or --xargs.\n");
     };
     if (!$self->{_xargs} && $#{$self->{_inputs}} == 0) {
-	croak $self->{_prog} . ": only one input source, but can't merge one file.\n";
+	croak($self->{_prog} . ": only one input source, but can't merge one file.\n");
     };
     if ($self->{_xargs} && $#{$self->{_inputs}} > 0) {
-	croak $self->{_prog} . ": --xargs and multiple inputs (perhaps you meant NOT --xargs?).\n";
+	croak($self->{_prog} . ": --xargs and multiple inputs (perhaps you meant NOT --xargs?).\n");
     };
     # prove files exist (early error checking)
     foreach (@{$self->{_inputs}}) {
 	next if (ref($_) ne '');   # skip objects
 	next if ($_ eq '-');   # special case: stdin
 	if (! -f $_) {
-	    croak $self->{_prog} . ": input source $_ does not exist.\n";
+	    croak($self->{_prog} . ": input source $_ does not exist.\n");
 	};
     };
     if ($self->{_remove_inputs}) {
@@ -907,7 +906,7 @@ sub setup($) {
     } else {
         my $xargs_ipc_reader = new IO::Handle;
 	my $xargs_ipc_writer = new IO::Handle;
-	pipe($xargs_ipc_reader, $xargs_ipc_writer) or croak "cannot open pipe\n";
+	pipe($xargs_ipc_reader, $xargs_ipc_writer) or croak("cannot open pipe\n");
 	$self->{_xargs_ipc_status} = 'running';
 	$self->{_xargs_fred} = new Fsdb::Support::Freds('dbmerge:xargs',
 	    sub {
@@ -961,7 +960,7 @@ sub run($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

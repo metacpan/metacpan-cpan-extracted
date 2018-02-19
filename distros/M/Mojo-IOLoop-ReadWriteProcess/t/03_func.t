@@ -8,6 +8,9 @@ use FindBin;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 use Mojo::IOLoop::ReadWriteProcess qw(process queue parallel);
+use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
+
+no warnings;    # This test mocks a lot
 
 subtest _new_err => sub {
   my $p = process();
@@ -79,5 +82,30 @@ subtest _fork_collect_status => sub {
   $p->_fork_collect_status();
   is $p->error->first->to_string, 'Cannot read from errors code pipe';
 };
+
+
+subtest attempt => sub {
+  my $var = 0;
+  attempt(5, sub { $var == 5 }, sub { $var++ });
+  is $var, 5;
+  $var = 0;
+  attempt {
+    attempts  => 6,
+    condition => sub { $var == 6 },
+    cb        => sub { $var++ }
+  };
+  is $var, 6;
+
+  $var = 0;
+  attempt {
+    attempts  => 6,
+    condition => sub { $var == 7 },
+    cb        => sub { $var++ },
+    or        => sub { $var = 42 }
+  };
+
+  is $var, 42;
+};
+
 
 done_testing;

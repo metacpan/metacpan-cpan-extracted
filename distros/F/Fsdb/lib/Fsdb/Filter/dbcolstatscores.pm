@@ -2,8 +2,7 @@
 
 #
 # dbcolstatscores.pm
-# Copyright (C) 1997-2015 by John Heidemann <johnh@isi.edu>
-# $Id: f3e4ee3646cedd3f3d5ca678ebf903a6cfb51601 $
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -168,8 +167,8 @@ L<dbcolscorrelate>
 ($VERSION) = 2.0;
 
 use strict;
-use Carp;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -268,15 +267,15 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_delay_comments_sub);
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_out}->col_create('zscore')
-	or croak $self->{_prog} . ": cannot create column zscore (maybe it already existed?)\n";
+	or croak($self->{_prog} . ": cannot create column zscore (maybe it already existed?)\n");
     if ($self->{_do_tscores}) {
         $self->{_out}->col_create('tscore')
-	    or croak $self->{_prog} . ": cannot create column tscore (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column tscore (maybe it already existed?)\n");
     };
 }
 
@@ -313,7 +312,7 @@ sub run ($) {
     $copy_writer->close;
     my $stats_href = dbpipeline_close2_hash($stats_source_queue, $stats_sink, $stats_thread);
     foreach (qw(mean stddev)) {
-	croak $self->{_prog} . ": internal error, missing stats field $_.\n"
+	croak($self->{_prog} . ": internal error, missing stats field $_.\n")
 	    if (!defined($stats_href->{$_}));
     };
     my $mean = $stats_href->{'mean'};
@@ -325,7 +324,7 @@ sub run ($) {
     $self->{_in} = new Fsdb::IO::Reader(-file => $self->{_copy_filename},
 		    -comment_handler => $self->create_pass_comments_sub);
     my $new_target_coli = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": internal error: old and new target column numbers don't match.\n"
+    croak($self->{_prog} . ": internal error: old and new target column numbers don't match.\n")
 	if ($target_coli != $new_target_coli);
     $read_fastpath_sub = $self->{_in}->fastpath_sub(); # regenerate
     my $write_fastpath_sub = $self->{_out}->fastpath_sub(); # regenerate
@@ -350,7 +349,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.37';
+our $VERSION = '0.42';
 
 sub _TYPE_INDEX       { return 0 }
 sub _MESSAGE_ID_INDEX { return 1 }
@@ -54,7 +54,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.37
+Version 0.42
 
 =head1 SYNOPSIS
 

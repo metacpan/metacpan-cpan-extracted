@@ -1,21 +1,13 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Data;
+use Indent::Utils qw(remove_first_ws);
 
-# Indent::Data object.
-my $i = Indent::Data->new(
-       'line_size' => '10',
-       'next_indent' => '  ',
-       'output_separator' => "|\n",
-);
-
-# Print indented text.
-print $i->indent('text text text text text text', '<->', 1)."|\n";
+my $input = '  a';
+remove_first_ws(\$input);
+print "$input|\n";
 
 # Output:
-# <->text text text text text text|
+# a|

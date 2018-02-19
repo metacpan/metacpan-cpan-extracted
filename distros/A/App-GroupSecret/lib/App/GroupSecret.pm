@@ -5,11 +5,11 @@ package App::GroupSecret;
 use warnings;
 use strict;
 
-our $VERSION = '0.302'; # VERSION
+our $VERSION = '0.304'; # VERSION
 
 use App::GroupSecret::Crypt qw(generate_secure_random_bytes read_openssh_key_fingerprint);
 use App::GroupSecret::File;
-use Getopt::Long qw(GetOptionsFromArray);
+use Getopt::Long 2.38 qw(GetOptionsFromArray);
 use MIME::Base64;
 use Pod::Usage;
 use namespace::clean;
@@ -86,7 +86,6 @@ sub main {
 
 sub filepath {
     shift->{filepath} ||= $ENV{GROUPSECRET_KEYFILE} || 'groupsecret.yml';
-
 }
 
 
@@ -110,7 +109,11 @@ sub _action_print_secret {
     ) or pod2usage(2);
 
     my $file = $self->file;
-    die "No secret in file -- use the \`set-secret' command to set one.\n" if !$file->secret;
+    my $filepath = $file->filepath;
+    die "No keyfile '$filepath' exists -- use the \`add-key' command to create one.\n"
+        unless -e $filepath && !-d $filepath;
+    die "No secret in keyfile '$filepath' exists -- use the \`set-secret' command to set one.\n"
+        if !$file->secret;
 
     if ($decrypt) {
         my $private_key = $self->private_key;
@@ -265,7 +268,7 @@ App::GroupSecret - A simple tool for maintaining a shared group secret
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 DESCRIPTION
 

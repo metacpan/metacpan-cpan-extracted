@@ -10,6 +10,7 @@ lib/Mojo/IOLoop/ReadWriteProcess.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Pool.pm
 lib/Mojo/IOLoop/ReadWriteProcess/Queue.pm
+lib/Mojo/IOLoop/ReadWriteProcess/Session.pm
 minil.toml
 t/00_compile.t
 t/01_run.t
@@ -17,8 +18,19 @@ t/02_parallel.t
 t/03_func.t
 t/04_queues.t
 t/05_serialize.t
+t/06_events.t
+t/07_autodetect.t
+t/08_ioloop.t
+t/09_session.t
 t/data/process_check.sh
+t/data/subreaper/child.sh
+t/data/subreaper/dead_child.sh
+t/data/subreaper/dead_master.sh
+t/data/subreaper/master.sh
+t/data/subreaper/roulette.sh
+t/data/subreaper/spawn.sh
 t/data/term_trap.sh
+t/lib/Mojo/IOLoop/ReadWriteProcess/Test/Utils.pm
 tools/tidy
 META.yml
 MANIFEST

@@ -1,7 +1,7 @@
 package Bot::ChatBots::Telegram::WebHook;
 use strict;
 use warnings;
-{ our $VERSION = '0.010'; }
+{ our $VERSION = '0.012'; }
 
 use Ouch;
 use Log::Any qw< $log >;
@@ -35,27 +35,44 @@ sub parse_request {
    return $req->json;
 }
 
+sub _set_http_response {
+   my ($record, $outcome) = @_;
+
+   my $message = $outcome->{sent_response} = {
+      method  => 'sendMessage',
+      chat_id => $record->{channel}{id},
+
+      ref($outcome->{response}) eq 'HASH'
+      ? (%{$outcome->{response}})    # shallow copy suffices
+      : (text => $outcome->{response})
+   };
+   $record->{source}{refs}{controller}->render(json => $message);
+   $record->{source}{flags}{rendered} = 1;
+
+   return;
+}
+
 around process => sub {
    my ($orig, $self, $record) = @_;
+
+   $record->{source}{refs}{sender} = $self->sender;
+
    my $outcome = $orig->($self, $record);
 
-   # $record and $outcome might be the same, but the flag is
-   # namely supported in $record
-   if (  (ref($outcome) eq 'HASH')
-      && exists($outcome->{send_response})
-      && (!$record->{source}{flags}{rendered}))
-   {
-      my $message = $outcome->{sent_response} = {
-         method  => 'sendMessage',
-         chat_id => $record->{channel}{id},
+   if (ref($outcome) eq 'HASH') {
 
-         ref($outcome->{send_response}) eq 'HASH'
-         ? (%{$outcome->{send_response}})    # shallow copy suffices
-         : (text => $outcome->{send_response})
-      };
-      $record->{source}{refs}{controller}->render(json => $message);
-      $record->{source}{flags}{rendered} = 1;
-   } ## end if ((ref($outcome) eq ...))
+      # check setting the proper HTTP Response
+      # $record and $outcome might be the same, but the flag is
+      # namely supported in $record
+      _set_http_response($record, $outcome)
+         if defined($outcome->{response})
+            && (!$record->{source}{flags}{rendered});
+
+      # check using the sender. We use $outcome as $record here, because
+      # $outcome is what we are going to pass on eventually
+      $self->sender->send_message($outcome->{send_response}, record => $outcome)
+         if defined $outcome->{send_response};
+   }
 
    return $outcome;
 };
@@ -105,7 +122,7 @@ sub _register {
    require WWW::Telegram::BotAPI;
    my $outcome = WWW::Telegram::BotAPI->new(token => $token)
      ->setWebhook($form // {url => ''});
-   $log->info($outcome->{description} // 'unknown result');
+   $log->info($outcome->{description} // 'unknown result') if $log;
    return;
 } ## end sub _register
 

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Turn DBIx results into JSON API documents.",
+   "author" : [
+      "Ali Zia <ziali088@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSONAPI-Document",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Inflexion" : "0",
+            "Moo" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "Test::DBIx::Class" : "0.52",
+            "Test::Most" : "0",
+            "Test::Pod" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "JSONAPI::Document" : {
+         "file" : "lib/JSONAPI/Document.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ziali088/jsonapi-document.git"
+      }
+   },
+   "version" : "0.3",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

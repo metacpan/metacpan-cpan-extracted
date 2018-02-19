@@ -18,8 +18,6 @@ Renders all entries in the current wrt archive to the C<publish_dir> specified
 in the configuration file (normally F<wrt.json>).  By default, this is
 F<./public>.
 
-
-
 Detailed documentation can be found in the L<App::WRT> man page or at
 L<https://github.com/brennen/wrt>.
 
@@ -50,11 +48,10 @@ use App::WRT;
 # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
 # - https://metacpan.org/pod/Pod::Usage
 # - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
-my $render_all  = 0;
 my $config_file = 'wrt.json';
 GetOptions(
-  config => \$config_file,
-  help   => sub { pod2usage(0) },
+  'config=s' => \$config_file,
+  help       => sub { pod2usage(0) },
 ) or pod2usage(2);
 
 unless (-e $config_file) {
@@ -64,6 +61,6 @@ unless (-e $config_file) {
 my $w = App::WRT::new_from_file($config_file);
 
 # This expects a callback to handle logging output:
-$w->render(sub { say $_[0]; } );
+$w->render(sub { say $_[0]; });
 
 exit(0);

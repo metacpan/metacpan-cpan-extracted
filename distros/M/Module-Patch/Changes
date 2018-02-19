@@ -1,3 +1,9 @@
+0.270   2018-02-18 (PERLANCAR)
+
+	- [Bugfix] When -load_target=0 and target is not loaded, don't die
+	  but skip instead.
+
+
 0.26    2017-08-09 (PERLANCAR)
 
 	- Avoid perl 'once' warning when patch module's config is not

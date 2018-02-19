@@ -22,7 +22,7 @@ use Business::cXML::Transmission;
 
 use Business::cXML::Credential;
 
-plan tests => 18;
+plan tests => 19;
 
 my $d;
 my $h;
@@ -95,6 +95,11 @@ cmp_deeply(
 $s = read_file('t/xml-assets/punchoutsetup1-request.xml');
 $t = Business::cXML::Transmission->new(encode_base64($s, ''));
 isa_ok($t, 'Business::cXML::Transmission', 'Parsing Base64-encoded file yields valid transmission');
+cmp_deeply(
+	$t->id,
+	'123456789.2222.55123123@localhost',
+	'Carries payloadID from input XML transmission'
+);
 
 $d = XML::LibXML->load_xml(string => $s)->documentElement->toHash;
 $h = XML::LibXML->load_xml(string => scalar($t->toString))->documentElement->toHash;

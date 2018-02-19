@@ -9,14 +9,14 @@ use Lab::Test import => ['file_ok'];
 use File::Temp qw/tempdir/;
 use Test::File;
 use File::Path 'remove_tree';
-use File::Spec::Functions qw/catfile/;
+use Lab::Moose qw/our_catfile/;
 use YAML::XS 'LoadFile';
 use Lab::Moose;
 
 my $dir = tempdir( CLEANUP => 1 );
 
 # Check numbering
-my $name = catfile( $dir, 'abc def' );
+my $name = our_catfile( $dir, 'abc def' );
 {
     for ( 1 .. 9 ) {
         datafolder( path => $name );
@@ -24,7 +24,7 @@ my $name = catfile( $dir, 'abc def' );
 
     # Check transistion 999 => 1000
 
-    mkdir( catfile( $dir, 'abc def_990' ) )
+    mkdir( our_catfile( $dir, 'abc def_990' ) )
         or die "mkdir failed";
 
     for ( 1 .. 19 ) {
@@ -47,12 +47,12 @@ my $name = catfile( $dir, 'abc def' );
     my $folder = datafolder( path => $name );
     say "path: ", $folder->path();
     my $folder_name = 'abc def_1010';
-    is( $folder->path(), catfile( $dir, $folder_name ) );
+    is( $folder->path(), our_catfile( $dir, $folder_name ) );
     isa_ok( $folder->meta_file, 'Lab::Moose::DataFile::Meta' );
 
     my $meta_file = $folder->meta_file();
     my $meta      = $meta_file->path();
-    is( $meta, catfile( $dir, $folder_name, 'META.yml' ) );
+    is( $meta, our_catfile( $dir, $folder_name, 'META.yml' ) );
 
     my $contents = LoadFile($meta);
 
@@ -64,7 +64,7 @@ my $name = catfile( $dir, 'abc def' );
     $contents = LoadFile($meta);
     hashref_contains( $contents, @expected, qw/abc def/ );
 
-    file_exists_ok( catfile( $folder->path, 'DataFolder.t' ) );
+    file_exists_ok( our_catfile( $folder->path, 'DataFolder.t' ) );
 }
 
 # Create folder in working directory.
@@ -75,8 +75,8 @@ my $name = catfile( $dir, 'abc def' );
     isa_ok( $folder, 'Lab::Moose::DataFolder' );
     my $path = $folder->path();
     is( $path, 'MEAS_001', "default folder name" );
-    file_exists_ok( catfile( $path, 'META.yml' ) );
-    file_exists_ok( catfile( $path, 'script' ) );
+    file_exists_ok( our_catfile( $path, 'META.yml' ) );
+    file_exists_ok( our_catfile( $path, 'script' ) );
     remove_tree($path);
 }
 

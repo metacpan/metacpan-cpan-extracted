@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use File::Find qw( finddepth );
 use File::Spec;
@@ -127,7 +127,7 @@ sub _interesting_events {
             !$old_map->{$path}{is_dir}
             && (   $old_map->{$path}{mtime} != $new_map->{$path}{mtime}
                 || $old_map->{$path}{size} != $new_map->{$path}{size} )
-            ) {
+        ) {
             push @interesting, $self->event_class()->new(
                 path => $path,
                 type => 'modify',
@@ -174,7 +174,7 @@ File::ChangeNotify::Watcher::Default - Fallback default watcher subclass
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 
@@ -200,7 +200,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

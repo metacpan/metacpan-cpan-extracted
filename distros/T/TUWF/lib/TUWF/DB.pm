@@ -5,11 +5,12 @@ use strict;
 use warnings;
 use Carp 'croak';
 use Exporter 'import';
+use Time::HiRes 'time';
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 our @EXPORT = qw|
   dbInit dbh dbCheck dbDisconnect dbCommit dbRollBack
-  dbExec dbRow dbAll dbPage
+  dbExec dbVal dbRow dbAll dbPage
 |;
 our @EXPORT_OK = ('sqlprint');
 
@@ -32,6 +33,8 @@ sub dbInit {
   } else {
     croak 'Invalid value for the db_login setting.';
   }
+  $sql->{private_tuwf} = 1;
+  inject_logging();
 
   $self->{_TUWF}{DB} = {
     sql => $sql,
@@ -49,20 +52,15 @@ sub dbCheck {
   my $self = shift;
   my $info = $self->{_TUWF}{DB};
 
-  my $start;
-  if($self->debug || $self->{_TUWF}{log_slow_pages}) {
-    $info->{queries} = [];
-    $start = [Time::HiRes::gettimeofday()];
-  }
+  my $start = time;
+  $info->{queries} = [];
 
   if(!$info->{sql}->ping) {
     warn "Ping failed, reconnecting";
     $self->dbInit;
   }
   $self->dbRollBack;
-  push(@{$info->{queries}},
-    [ 'ping/rollback', Time::HiRes::tv_interval($start) ])
-   if $self->debug || $self->{_TUWF}{log_slow_pages};
+  push(@{$info->{queries}}, [ 'ping/rollback', {}, time-$start ]);
 }
 
 
@@ -75,7 +73,7 @@ sub dbCommit {
   my $self = shift;
   my $start = [Time::HiRes::gettimeofday()] if $self->debug || $self->{_TUWF}{log_slow_pages};
   $self->{_TUWF}{DB}{sql}->commit();
-  push(@{$self->{_TUWF}{DB}{queries}}, [ 'commit', Time::HiRes::tv_interval($start) ])
+  push(@{$self->{_TUWF}{DB}{queries}}, [ 'commit', {}, Time::HiRes::tv_interval($start) ])
     if $self->debug || $self->{_TUWF}{log_slow_pages};
 }
 
@@ -91,15 +89,21 @@ sub dbExec {
 }
 
 
+# ..return the first column of the first row
+sub dbVal {
+  return sqlhelper(shift, 1, @_);
+}
+
+
 # ..return the first row as an hashref
 sub dbRow {
-  return sqlhelper(shift, 1, @_);
+  return sqlhelper(shift, 2, @_);
 }
 
 
 # ..return all rows as an arrayref of hashrefs
 sub dbAll {
-  return sqlhelper(shift, 2, @_);
+  return sqlhelper(shift, 3, @_);
 }
 
 
@@ -123,9 +127,6 @@ sub sqlhelper { # type, query, @list
   my $self = shift;
   my $type = shift;
   my $sqlq = shift;
-  my $s = $self->{_TUWF}{DB}{sql};
-
-  my $start = [Time::HiRes::gettimeofday()] if $self->debug || $self->{_TUWF}{log_slow_pages} || $self->{_TUWF}{log_queries};
 
   $sqlq =~ s/\r?\n/ /g;
   $sqlq =~ s/  +/ /g;
@@ -133,29 +134,21 @@ sub sqlhelper { # type, query, @list
 
   my($q, $r);
   my $ret = eval {
-    $q = $s->prepare($q[0]);
+    $q = $self->dbh->prepare($q[0]);
     $q->execute($#q ? @q[1..$#q] : ());
-    $r = $type == 1 ? $q->fetchrow_hashref :
-         $type == 2 ? $q->fetchall_arrayref({}) :
+    $r = $type == 1 ? ($q->fetchrow_array)[0] :
+         $type == 2 ? $q->fetchrow_hashref :
+         $type == 3 ? $q->fetchall_arrayref({}) :
                       $q->rows;
-    $q->finish();
     1;
   };
 
-  # count and log, if requested
-  my $itv = Time::HiRes::tv_interval($start) if $self->debug || $self->{_TUWF}{log_slow_pages} || $self->{_TUWF}{log_queries};
-
-  $self->log(sprintf '[%7.2fms] %s | %s', $itv*1000, $q[0], DBI::neat_list([@q[1..$#q]]))
-    if $self->{_TUWF}{log_queries};
-
-  push(@{$self->{_TUWF}{DB}{queries}}, [ \@q, $itv ]) if $self->debug || $self->{_TUWF}{log_slow_pages};
-
   # re-throw the error in the context of the calling code
-  croak $s->errstr if !$ret;
+  croak($self->dbh->errstr || $@) if !$ret;
 
   $r = 0  if $type == 0 && (!$r || $r == 0);
-  $r = {} if $type == 1 && (!$r || ref($r) ne 'HASH');
-  $r = [] if $type == 2 && (!$r || ref($r) ne 'ARRAY');
+  $r = {} if $type == 2 && (!$r || ref($r) ne 'HASH');
+  $r = [] if $type == 3 && (!$r || ref($r) ne 'ARRAY');
 
   return $r;
 }
@@ -203,6 +196,54 @@ sub sqlprint { # query, bind values. Returns new query + bind values
   return($q, @a);
 }
 
+
+# There are generally two approaches to adding logging to DBI: The common and
+# clean approach is to subclass DBD::st and DBD::db (e.g. DBIx::LogAny). But
+# subclassing doesn't stack nicely, and you may need to implement more methods
+# because methods calling each other internally won't be caught.
+#
+# The other approach is to replace the methods of DBD::st and DBD::db directly,
+# as done in DBI::Log. The downside is that it's hacky, unreliable when DBD::*
+# modules come with their own implementation of something, and this approach
+# affects *all* DBI interation and not just those of selected handlers. The
+# latter issue is easily solved by setting a private flag in the DBI object
+# ('private_tuwf' in this case).
+sub inject_logging {
+  require DBI;
+  no warnings 'redefine';
+
+  # The measured SQL timing only includes that of the execute() call, but it's
+  # likely that some query processing also happens during fetching.
+  # Unfortunately, I haven't found a reliable way to trigger on "Okay, I'm done
+  # with executing and fetching this statement". The final() method is not
+  # implicitely called, and adding an object destructor wouldn't work with
+  # cached prepared statements.
+  my $orig_execute = \&DBI::st::execute;
+  *DBI::st::execute = sub {
+    my($self) = @_;
+    my $start = time;
+    my $ret = $orig_execute->(@_);
+
+    if($self->{Database}{private_tuwf}) {
+      my $time = time - $start;
+      my %params = %{$self->{ParamValues} || {}};
+
+      $TUWF::OBJ->log(sprintf
+        '[%7.2fms] %s | %s',
+        $time*1000,
+        $self->{Statement},
+        join ', ',
+          map "$_:".DBI::neat($params{$_}),
+          sort { $a =~ /^[0-9]+$/ && $b =~ /^[0-9]+$/ ? $a <=> $b : $a cmp $b }
+          keys %params
+      ) if $TUWF::OBJ->{_TUWF}{log_queries};
+
+      push @{$TUWF::OBJ->{_TUWF}{DB}{queries}}, [ $self->{Statement}, \%params , $time ];
+    }
+
+    return $ret;
+  };
+}
 
 
 1;

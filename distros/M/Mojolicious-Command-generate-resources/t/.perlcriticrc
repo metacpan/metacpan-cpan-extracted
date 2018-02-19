@@ -30,3 +30,7 @@ minimum_regex_length_to_complain_about = 30
 # as prototypes. See https://github.com/adamkennedy/PPI/issues/194
 # Enable again when the above bug is fixed.
 [-Subroutines::ProhibitSubroutinePrototypes]
+
+# Strangely enough, 4 arguments (including $self) in signature are counted as 6
+[Subroutines::ProhibitManyArgs]
+max_arguments = 7 

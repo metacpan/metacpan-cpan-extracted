@@ -40,8 +40,8 @@
 %left <opval> MULTIPLY DIVIDE REMAINDER
 %right <opval> NOT '~' ARRAY_LENGTH UMINUS
 %nonassoc <opval> INC DEC
-%left <opval> ARROW
 %nonassoc <opval> ')'
+%left <opval> ARROW
 %left <opval> '('
 %left <opval> '[' '{'
 
@@ -538,7 +538,8 @@ new_object
 convert_type
   : '(' type ')' assignable_term
     {
-      $$ = SPVM_OP_build_convert_type(compiler, $2, $4);
+      SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONVERT, $2->file, $2->line);
+      $$ = SPVM_OP_build_convert(compiler, op_convert, $2, $4);
     }
 
 call_field

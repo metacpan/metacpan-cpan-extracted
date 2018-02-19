@@ -216,12 +216,12 @@ sub run ($) {
     my @cols;
     my $start_sub = sub {
 	my($tag, $attrh) = @_;
-	croak $self->{_prog} . ": tr not in table.\n"
+	croak($self->{_prog} . ": tr not in table.\n")
 	    if ($tag eq 'tr' && !$inside{table});
 	if ($tag eq 'th' || $tag eq 'td') {
-	    croak $self->{_prog} . ": badly nested $tag.\n"
+	    croak($self->{_prog} . ": badly nested $tag.\n")
 		if ($inside{th} || $inside{td});
-	    croak $self->{_prog} . ": th or td outside table or tr.\n"
+	    croak($self->{_prog} . ": th or td outside table or tr.\n")
 		if (!$inside{table} || !$inside{tr});
 	    $text = '';
 	    $colspan = $attrh->{colspan};
@@ -288,7 +288,7 @@ sub run ($) {
 		    marked_sections => 1);
     $parser->parse_file($self->{_in});
 
-    croak $self->{_prog} . ": could not find table in html input.\n"
+    croak($self->{_prog} . ": could not find table in html input.\n")
 	if ($#cols == -1);
 }
 

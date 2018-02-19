@@ -1,5 +1,5 @@
 ---
-abstract: 'Client API to the service of Smartsheet.com'
+abstract: 'Interface to SmartSheet API v2.'
 author:
   - 'Gabor Szabo <szabgab@cpan.org>'
 build_requires:
@@ -8,14 +8,21 @@ build_requires:
   strict: 0
   warnings: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: WWW-SmartSheet
+provides:
+  WWW::SmartSheet:
+    file: lib/WWW/SmartSheet.pm
+    version: 0.06
+  WWW::SmartSheet::Sheet:
+    file: lib/WWW/SmartSheet/Sheet.pm
+    version: 0.06
 requires:
   Carp: 0
   Data::Dumper: 0
@@ -23,7 +30,9 @@ requires:
   LWP::UserAgent: 0
   Moo: 0
   MooX::late: 0
+  perl: 5.008
 resources:
   homepage: http://smartsheet.com/
-  repository: https://github.com/szabgab/WWW-SmartSheet.git
-version: 0.01
+  repository: https://github.com/manwar/WWW-SmartSheet.git
+version: 0.06
+x_serialization_backend: 'YAML::Tiny version 1.56'

@@ -1,16 +1,18 @@
 package Lab::Moose::DataFolder;
+$Lab::Moose::DataFolder::VERSION = '3.620';
 #ABSTRACT: Create a data directory with meta data
-$Lab::Moose::DataFolder::VERSION = '3.613';
+
 use 5.010;
 use warnings;
 use strict;
 
 use Moose;
+use MooseX::StrictConstructor;
 use MooseX::Params::Validate;
 
 use Carp;
 
-use File::Spec::Functions qw/catfile/;
+use Lab::Moose qw/our_catfile/;
 use File::Basename qw/basename dirname/;
 use File::Copy 'copy';
 use List::Util 'max';
@@ -23,7 +25,6 @@ use Encode 'decode';
 use utf8;
 
 use Lab::Moose::DataFile::Meta;
-
 
 # Get a copy of @ARGV, before it get's mangled by the user script.
 
@@ -96,7 +97,7 @@ sub _copy_user_script {
         $basename = basename($script);
     }
 
-    my $copy = catfile( $self->path, $basename );
+    my $copy = our_catfile( $self->path, $basename );
 
     copy( $script, $copy )
         or croak "copy of $script to $copy failed: $!";
@@ -179,7 +180,7 @@ Lab::Moose::DataFolder - Create a data directory with meta data
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 DESCRIPTION
 
@@ -222,10 +223,10 @@ attribute:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
-            2017       Andreas K. Huettel
+            2017       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

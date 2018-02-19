@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended -target => 'Scientist';
+use Test2::V0 -target => 'Scientist';
 
 subtest result => sub {
     my $experiment = $CLASS->new(

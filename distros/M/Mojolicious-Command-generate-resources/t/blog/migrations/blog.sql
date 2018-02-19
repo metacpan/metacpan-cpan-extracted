@@ -12,7 +12,7 @@ drop table if exists posts;
 
 create table if not exists groups (
   id    integer primary key autoincrement,
-  name varchar(30),
+  name varchar(30) NOT NULL,
   description  varchar(200)
 );
 

@@ -1,22 +1,22 @@
 {
-   "abstract" : "Client API to the service of Smartsheet.com",
+   "abstract" : "Interface to SmartSheet API v2.",
    "author" : [
       "Gabor Szabo <szabgab@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-SmartSheet",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -26,7 +26,8 @@
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
-            "MooX::late" : "0"
+            "MooX::late" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -38,15 +39,26 @@
          }
       }
    },
+   "provides" : {
+      "WWW::SmartSheet" : {
+         "file" : "lib/WWW/SmartSheet.pm",
+         "version" : "0.06"
+      },
+      "WWW::SmartSheet::Sheet" : {
+         "file" : "lib/WWW/SmartSheet/Sheet.pm",
+         "version" : "0.06"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://smartsheet.com/",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/szabgab/WWW-SmartSheet.git",
-         "web" : "https://github.com/szabgab/WWW-SmartSheet"
+         "url" : "https://github.com/manwar/WWW-SmartSheet.git",
+         "web" : "https://github.com/manwar/WWW-SmartSheet"
       }
    },
-   "version" : "0.01"
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
 

@@ -3,18 +3,18 @@
 use strict;
 use Getopt::Long;
 use FB3::Convert;
-use File::Basename;
 use utf8;
 
 my %OPT;
 GetOptions(
-  'verbose|v=s' => \$OPT{'verbose'},           
+  'verbose|v:1' => \$OPT{'verbose'},           
   'help|h' => \$OPT{'help'},
   'source|s=s' => \$OPT{'source'},
   'destination_dir|dd=s' => \$OPT{'dd'},
   'destination_file|df=s' => \$OPT{'df'},
   'metadata|md=s' => \$OPT{'md'},
   'validate|vl=s' => \$OPT{'vl'},
+  'name|n:1' => \$OPT{'showname'},
   
   'meta_id=s' => \$OPT{'meta_id'},
   'meta_lang|meta_language=s' => \$OPT{'meta_lang'},
@@ -24,6 +24,9 @@ GetOptions(
   'meta_authors=s' => \$OPT{'meta_authors'},
   'meta_date=s' => \$OPT{'meta_date'},
 ) || help();
+
+$OPT{'source'} = $ARGV[0] unless $OPT{'source'};
+$OPT{'df'} = $ARGV[1] unless $OPT{'df'};
 
 if ($OPT{'vl'}) {
   my $Obj = new FB3::Convert(empty=>1);
@@ -42,8 +45,8 @@ my $Obj = new FB3::Convert(
   'destination_dir' => $OPT{'dd'},
   'destination_file' => $OPT{'df'},
   'verbose' => $OPT{'verbose'},
-  'tmpl_path' => dirname(__FILE__),
   'metadata' => $OPT{'md'},
+  'showname' => $OPT{'showname'},
 
   'meta' => {
     'id' => $OPT{'meta_id'},
@@ -56,20 +59,19 @@ my $Obj = new FB3::Convert(
   },
 );
 
-
-
 $Obj->Reap();
 my $FB3Path =  $Obj->FB3Create();
 $Obj->Msg("FB3: ".$FB3Path." created\n","w");
-my $Valid = $Obj->Validate();
-print $Valid;
-$Obj->FB3_2_Zip() if $OPT{'df'};
-$Obj->Cleanup();
+my $ValidErr = $Obj->Validate();
+print $ValidErr;
+$Obj->FB3_2_Zip() if $OPT{'df'} && !$ValidErr;
+$Obj->Cleanup($ValidErr?1:0);
+
 
 sub help {
   print <<_END
   
-  USAGE: convert2fb3.pl --source|s= [--verbose|v] [--help|h] [(--destination_dir|dd) | (--destination_file|df)]
+  USAGE: convert2fb3.pl --source|s= <input.file> [--verbose|v] [--help|h] [(--destination_dir|dd <dest.fb3>) | (--destination_file|df)]  [(--name|n)] [--validate|vl=]
   
   --help : print this text
   --verbose : print processing status. Show parsing warnings if Verbose > 1
@@ -77,6 +79,8 @@ sub help {
   --destination_dir : path for non zipped fb3
   --destination_file :  path for zipped fb3
   --metadata : XML meta description file
+  --name : show name of reaped epub file
+  --validate : don't convert, only validate fb3 file from path
   
   META:
   --meta_id

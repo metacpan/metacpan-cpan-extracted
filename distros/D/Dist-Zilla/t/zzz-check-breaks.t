@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.018
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
 
 use Test::More tests => 3;
 
 SKIP: {
-    eval 'require Module::Runtime::Conflicts; Module::Runtime::Conflicts->check_conflicts';
+    eval { +require Module::Runtime::Conflicts; Module::Runtime::Conflicts->check_conflicts };
     skip('no Module::Runtime::Conflicts module found', 1) if not $INC{'Module/Runtime/Conflicts.pm'};
 
     diag $@ if $@;
@@ -14,7 +14,7 @@ SKIP: {
 }
 
 SKIP: {
-    eval 'require Moose::Conflicts; Moose::Conflicts->check_conflicts';
+    eval { +require Moose::Conflicts; Moose::Conflicts->check_conflicts };
     skip('no Moose::Conflicts module found', 1) if not $INC{'Moose/Conflicts.pm'};
 
     diag $@ if $@;

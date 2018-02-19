@@ -1,12 +1,13 @@
 package Net::DNS::SEC;
 
 #
-# $Id: SEC.pm 1503 2016-08-26 11:51:16Z willem $
+# $Id: SEC.pm 1643 2018-02-15 15:40:34Z willem $
 #
-use vars qw($VERSION $SVNVERSION);
-$VERSION    = '1.03';
-$VERSION    = eval $VERSION;
-$SVNVERSION = (qw$LastChangedRevision: 1503 $)[1];
+our $VERSION;
+$VERSION = '1.04';
+our $SVNVERSION = (qw$LastChangedRevision: 1643 $)[1];
+our $XS_VERSION = $VERSION;
+$VERSION = eval($VERSION);
 
 
 =head1 NAME
@@ -26,30 +27,32 @@ documents.
 Net::DNS::SEC is installed as an extension to an existing Net::DNS
 installation.
 
-The extended features are made available by substituting Net::DNS::SEC
-for Net::DNS in the use declaration.
+The extended features are made available by replacing Net::DNS by
+Net::DNS::SEC in the use declaration.
 
 =cut
 
 
 use strict;
-use base qw(Exporter);
+use base qw(Exporter DynaLoader);
 
 use Net::DNS 1.01 qw(:DEFAULT);
 
-use vars qw(@EXPORT);
-@EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
+our @EXPORT = ( @Net::DNS::EXPORT, qw(algorithm digtype key_difference) );
 
 
 use integer;
 use warnings;
 use Carp;
 
-use Net::DNS::RR::CDS;
-use Net::DNS::RR::DLV;
-use Net::DNS::RR::DS;
-use Net::DNS::RR::RRSIG;
-use Net::DNS::RR::SIG;
+Net::DNS::SEC->bootstrap($XS_VERSION);
+
+
+require Net::DNS::RR::CDS;
+require Net::DNS::RR::DLV;
+require Net::DNS::RR::DS;
+require Net::DNS::RR::RRSIG;
+require Net::DNS::RR::SIG;
 
 
 =head1 UTILITY FUNCTIONS
@@ -119,9 +122,9 @@ __END__
 
 =head1 COPYRIGHT
 
-Copyright (c)2001-2005 RIPE NCC. Author Olaf M. Kolkman
+Copyright (c)2014-2018 Dick Franks
 
-Portions Copyright (c)2014-2015 Dick Franks
+Copyright (c)2001-2005 RIPE NCC. Author Olaf M. Kolkman
 
 All Rights Reserved
 
@@ -147,7 +150,8 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, RFC4033, RFC4034, RFC4035
+L<perl>, L<Net::DNS>, RFC4033, RFC4034, RFC4035,
+L<OpenSSL|http://www.openssl.org/docs>
 
 =cut
 

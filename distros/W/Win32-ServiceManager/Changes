@@ -1,5 +1,8 @@
 Revision history for Win32-ServiceManager
 
+0.002004  2018-02-13 16:25:46-06:00 America/Chicago
+ - add optional user and password configs
+
 0.002003  2014-09-26 23:26:33-05:00 America/Chicago
  - upgrade nssm to 2.24
  - add `check_command` and related `check_command_default` attr for

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Uclust;
-# ABSTRACT: front-end class for UCLUST parser
+# ABSTRACT: Front-end class for UCLUST parser
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::Uclust::VERSION = '0.180330';
+$Bio::FastParsers::Uclust::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -16,6 +16,7 @@ extends 'Bio::FastParsers::Base';
 
 
 with 'Bio::FastParsers::Roles::Clusterable';
+
 
 sub BUILD {
     my $self = shift;
@@ -66,25 +67,109 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Uclust - front-end class for UCLUST parser
+Bio::FastParsers::Uclust - Front-end class for UCLUST parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 
-    # TODO
+    use aliased 'Bio::FastParsers::Uclust';
+
+    # open and parse UCLUST report
+    my $infile = 'test/uclust.uc';
+    my $report = Uclust->new( file => $infile );
+
+    # loop through representatives to get members
+    for my $repr ( $report->all_representatives ) {
+        my $members = $report->members_for($repr);
+        # ...
+    }
+
+    # get representatives ordered by descending cluster size
+    my @reprs = $report->all_representatives_by_cluster_size;
+
+    # create IdMapper
+    # Note: this requires Bio::MUST::Core
+    my $mapper = $report->clust_mapper(':');
+    my @long_ids = $mapper->all_long_ids;
+
+    # ...
 
 =head1 DESCRIPTION
 
-    # TODO
+This module implements a parser for the output file of the UCLUST program. It
+provides methods for getting the ids of the representative sequences (either
+sorted by descending cluster size or not) and for obtaining the members of any
+cluster from the id of its representative.
+
+It also has a method for facilitating the re-mapping of all the ids of every
+cluster on a phylogenetic tree through a L<Bio::MUST::Core::IdMapper> object.
 
 =head1 ATTRIBUTES
 
 =head2 file
 
 Path to UCLUST report file to be parsed
+
+=head1 METHODS
+
+=head2 all_representatives
+
+Returns all the ids of the representative sequences of the clusters (not an
+array reference).
+
+    # $report is a Bio::FastParsers::Uclust
+    for my $repr ( $report->all_representatives ) {
+        # process $repr
+        # ...
+    }
+
+This method does not accept any arguments.
+
+=head2 all_representatives_by_cluster_size
+
+Returns all the ids of the representative sequences of the clusters (not an
+array reference) sorted by descending cluster size (and then lexically by id).
+
+    # $report is a Bio::FastParsers::Uclust
+    for my $repr ( $report->all_representatives_by_cluster_size ) {
+        # process $repr
+        # ...
+    }
+
+This method does not accept any arguments.
+
+=head2 members_for
+
+Returns all the ids of the member sequences of the cluster corresponding to
+the id of the specified representative (as an array refrence).
+
+    # $report is a Bio::FastParsers::Uclust
+    for my $repr ( $report->all_representatives ) {
+        my $members = $report->members_for($repr);
+        # process $members ArrayRef
+        # ...
+    }
+
+This method requires one argument: the id of the representative.
+
+=head2 clust_mapper
+
+Returns a L<Bio::MUST::Core::IdMapper> object associating representative
+sequence ids to stringified full lists of their member sequence ids (including
+the representatives themselves).
+
+This method needs L<Bio::MUST::Core> to be installed on the computer.
+
+    # $report is a Bio::FastParsers::Uclust
+    my $mapper = $report->clust_mapper(':');
+
+The native methods from L<Bio::MUST::Core::IdMapper> can be applied on
+C<$mapper>, e.g., C<all_long_ids> or C<long_id_for>.
+
+This method accepts an optional argument: the id separator (default: C</>).
 
 =head1 AUTHOR
 

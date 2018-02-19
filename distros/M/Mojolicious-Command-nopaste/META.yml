@@ -15,7 +15,7 @@ name: Mojolicious-Command-nopaste
 provides:
   Mojolicious::Command::nopaste:
     file: lib/Mojolicious/Command/nopaste.pm
-    version: '0.10'
+    version: '0.12'
   Mojolicious::Command::nopaste::Service:
     file: lib/Mojolicious/Command/nopaste/Service.pm
   Mojolicious::Command::nopaste::Service::debian:
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://github.com/jberger/Mojolicious-Command-nopaste/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/jberger/Mojolicious-Command-nopaste
-version: '0.10'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -168,13 +168,15 @@ sub read_schema {
         # ; say "Got table $table";
         my $source = $self->dbic->source( $table );
         my @columns = $source->columns;
-        for my $column ( @columns ) {
+        for my $i ( 0..$#columns ) {
+            my $column = $columns[ $i ];
             my $c = $source->column_info( $column );
             # ; use Data::Dumper;
             # ; say Dumper $c;
             my $is_auto = $c->{is_auto_increment};
             $schema{ $table }{ properties }{ $column } = {
                 $self->_map_type( $c ),
+                'x-order' => $i + 1,
             };
             if ( !$c->{is_nullable} && !$is_auto && !$c->{default_value} ) {
                 push @{ $schema{ $table }{ required } }, $column;
@@ -191,27 +193,35 @@ sub read_schema {
 
 sub _map_type {
     my ( $self, $column ) = @_;
+    my %conf;
     my $db_type = $column->{data_type} // 'varchar';
 
-    my @extra;
     if ( $column->{extra}{list} ) {
-        @extra = ( enum => $column->{extra}{list} );
+        %conf = ( enum => $column->{extra}{list} );
     }
 
     if ( $db_type =~ /^(?:text|varchar)/i ) {
-        return ( type => 'string', @extra );
+        %conf = ( %conf, type => 'string' );
     }
     elsif ( $db_type =~ /^(?:int|integer|smallint|bigint|tinyint|rowid)/i ) {
-        return ( type => 'integer', @extra );
+        %conf = ( %conf, type => 'integer' );
     }
     elsif ( $db_type =~ /^(?:double|float|money|numeric|real)/i ) {
-        return ( type => 'number', @extra );
+        %conf = ( %conf, type => 'number' );
     }
     elsif ( $db_type =~ /^(?:timestamp)/i ) {
-        return ( type => 'string', format => 'date-time', @extra );
+        %conf = ( %conf, type => 'string', format => 'date-time' );
     }
-    # Default to string
-    return ( type => 'string', @extra );
+    else {
+        # Default to string
+        %conf = ( %conf, type => 'string' );
+    }
+
+    if ( $column->{is_nullable} ) {
+        $conf{ type } = [ $conf{ type }, 'null' ];
+    }
+
+    return %conf;
 }
 
 1;
@@ -226,7 +236,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 0.014
+version 0.017
 
 =head1 SYNOPSIS
 

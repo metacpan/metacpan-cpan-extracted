@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,23 +15,18 @@ meta-spec:
 name: App-ChangeShebang
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
-    - author
-    - builder
-provides:
-  App::ChangeShebang:
-    file: lib/App/ChangeShebang.pm
-    version: '0.06'
+    - inc
+    - share
+    - t
+    - xt
 requires:
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/shoichikaji/change-shebang/issues
-  homepage: https://github.com/shoichikaji/change-shebang
-  repository: git://github.com/shoichikaji/change-shebang.git
-version: '0.06'
-x_authority: cpan:SKAJI
+  bugtracker: https://github.com/skaji/change-shebang/issues
+  homepage: https://github.com/skaji/change-shebang
+  repository: https://github.com/skaji/change-shebang.git
+version: '0.07'
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

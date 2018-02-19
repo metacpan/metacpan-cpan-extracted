@@ -68,9 +68,9 @@ use warnings;
 no  warnings 'uninitialized';
 
 # use Data::Dumper;
+use App::WRT;
 use Getopt::Long;
 use Pod::Usage;
-use App::WRT;
 
 # Handle options, including help generated from the POD above.  See:
 # - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
@@ -79,9 +79,9 @@ use App::WRT;
 my $from_stdin  = 0;
 my $config_file = 'wrt.json';
 GetOptions(
-  stdin  => \$from_stdin,
-  config => \$config_file,
-  help   => sub { pod2usage(0) },
+  stdin      => \$from_stdin,
+  'config=s' => \$config_file,
+  help       => sub { pod2usage(0) },
 ) or pod2usage(2);
 
 unless (-e $config_file) {

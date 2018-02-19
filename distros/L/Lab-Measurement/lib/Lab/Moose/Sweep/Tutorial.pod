@@ -1,0 +1,467 @@
+#DistZilla: +PodWeaver
+#PODNAME: Lab::Moose::Sweep::Tutorial
+#ABSTRACT: Documentation of high-level sweep framework
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Sweep::Tutorial - Documentation of high-level sweep framework
+
+=head1 VERSION
+
+version 3.620
+
+=head1 Datafiles and datafolders
+
+=head2 Quickstart: Measuring an IV-curve
+
+As a basic example of a 1D sweepm, we measure an IV curve:
+
+ # file: IV.pl
+ use Lab::Moose; # you get 'use warnings; use strict;' for free
+
+ my $source = instrument(
+     type            => 'YokogawaGS200',
+     connection_type => 'USB',
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.1, max_units_per_second => 1
+ );
+
+ my $dmm = instrument(type => 'Agilent34410A', connection_type => 'USB');
+
+ my $sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $source,
+     from => -5, to => 5, step => 0.01
+ );
+
+ my $datafile = sweep_datafile(columns => [qw/voltage current/]);
+
+ my $meas = sub {
+     my $sweep = shift;
+     $sweep->log(
+         voltage => $source->cached_level(),
+         current => $dmm->get_value(),
+     );
+ };
+
+ $sweep->start(
+     measurement => $meas,
+     datafile    => $datafile,
+ );
+
+Running this script repeatedly creates output folders F<MEAS_000>, F<MEAS_001>,
+...
+The folders contain the following files:
+
+=over
+
+=item * F<IV.pl>
+
+Copy of the measurement script.
+
+=item * F<META.yml>
+
+YAML file with various metadata (time of script run, username, hostname, copy of the
+used commandline, Lab::Measurement version, ...).
+
+=item * F<data.dat>
+
+Gnuplot-style datafile:
+
+ # voltage        current
+ -5               42
+ -4.99            43
+ ...
+
+=back
+
+=head3 Backsweeps
+
+To also measure the IV in the reverse direction from -5 to 5 volts, we add the
+C<backsweep> option:
+
+ my $sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $source,
+     from => -5, to => 5, step => 0.01,
+     backsweep  => 1,
+ );
+
+=head2 The datafolder
+
+You can change the name of the datafolder by providing a C<folder> argument to
+the C<start> method:
+
+ $sweep->start(
+     measurement => $meas,
+     datafile    => $datafile,
+     folder      => 'IV_curve'
+ );
+
+This will create output folders with names F<IV_curve_xxx>.
+
+=head2 Multiple datafiles
+
+We can create multiple datafiles:
+
+ my $datafile1 = sweep_datafile(
+     filename => 'data1',
+     columns  => [qw/voltage current/]
+ );
+ my $datafile2 = sweep_datafile(
+     filename => 'data2',
+     columns  => [qw/voltage current/]
+ );
+
+ $sweep->start(
+     measurement => $meas,
+     datafiles   => [$datafile1, $datafile2],
+     folder      => 'IV_curve'
+ );
+
+And in the C<$meas> subroutine, call the sweeps's C<log> method for both datafiles:
+
+ my $meas = sub {
+     my $sweep = shift;
+     my $voltage = $source->cached_level();
+     $sweep->log(
+         datafile => $datafile1,
+         voltage  => $voltage,
+         current  => $dmm1->get_value(),
+     );
+     $sweep->log(
+         datafile => $datafile2,
+         voltage  => $voltage,
+         current  => $dmm2->get_value()
+    );
+ };
+
+=head1 Multi-dimensional sweeps: Datafile dimensions and filename extensions
+
+=head2 2D sweeps
+
+Let us start with a simple 2D sweep: we sweep a gate voltage (outer sweep) and
+a bias voltage and again measure a current:
+
+ use Lab::Moose;
+
+ # As we use two Yokogawa's, we need to provide USB serial IDs
+ my $gate_source = instrument(
+     type               => 'YokogawaGS200',
+     connection_type    => 'USB',
+     connection_options => {serial => '...'},
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.1, max_units_per_second => 1
+ );
+
+ my $bias_source = instrument(
+     type               => 'YokogawaGS200',
+     connection_type    => 'USB',
+     connection_options => {serial => '...'},
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.1, max_units_per_second => 1
+ );
+
+ my $dmm = instrument(type => 'Agilent34410A', connection_type => 'USB');
+
+ my $gate_sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $gate_source,
+     from => 0, to => 1, step => 0.1
+ );
+
+ my $bias_sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $bias_source,
+     from => 0, to => 1, step => 0.1
+ );
+
+ my $datafile = sweep_datafile(columns => [qw/gate bias current/]);
+
+ my $meas = sub {
+     my $sweep = shift;
+     my $v_gate = $gate_source->cached_level();
+     my $v_bias = $bias_source->cached_level();
+     $sweep->log(
+         gate    => $v_gate,
+         bias    => $v_bias,
+         current => $dmm->get_value(),
+     );
+ };
+
+ $gate_sweep->start(
+     slave       => $bias_sweep,
+     measurement => $meas,
+     datafile    => $datafile,
+ );
+
+By default, this will create a 2D block datafile:
+
+ # gate    bias    current
+ 0         0       x
+ 0         0.1     x
+ 0         0.2     x
+ ...
+ 0         1       x
+
+ 0.1       0       x
+ 0.1       0.1     x
+ 0.1       0.2     x
+ ...
+ ...
+
+ 1         0       x
+ ...
+ 1         1       x
+
+Alternatively, we can create multiple 1D datafiles, one for each value of the
+gate voltage. We do this by setting the C<datafile_dim> parameter to 1:
+
+ $gate_sweep->start(
+     slave        => $bias_sweep,
+     measurement  => $meas,
+     datafile     => $datafile,
+     datafile_dim => 1
+ );
+
+The output files will be F<<data_Voltage=0.dat, data_Voltage=0.1.dat, ...,
+data_Voltage=1.dat>> We can customize the F<Voltage=> part in the datafile
+names by providing a
+B<filename extension> in the gate sweep:
+
+ my $gate_sweep = sweep(
+     type               => 'Step::Voltage',
+     instrument         => $gate_source,
+     from => 0, to => 1, step => 0.1,
+     filename_extension => 'Gate=',
+ );
+
+=head2 Higher dimensional sweeps
+
+If we create sweeps setups with dimension > 2, the maximum datafile dimension
+remains 2. E.g. if we create a 3D sweep [Temperature, Gate, Bias], a 2D
+datafile will be created for each value of the temperature sweep.
+If we set C<datafile_dim> to 1, a subfolder will be created for each value of
+the temperature and the subfolders contain 1D datafiles for each gate voltage.
+
+FIXME: link to example script.
+
+=head1 Live plotting
+
+=head2 Line plots
+
+Let us add a simple line plot to our IV measurement:
+
+ my $datafile = sweep_datafile(columns => [qw/voltage current/]);
+ 
+ $datafile->add_plot(
+     x => 'voltage',
+     y => 'current',
+ );
+
+This will create a live line plot, which will be updated for each new data
+point. A copy of the plot will be saved in the output folder in png format with
+filename C<"${datafile}.plot.png">. You can change this filename with the
+C<hard_copy> option:
+
+ $datafile->add_plot(
+     x         => 'voltage',
+     y         => 'current',
+     hard_copy => 'data.png',
+ );
+
+=head2 Color maps (3D plots)
+
+Let us add a color plot to the gate/bias 2D sweep:
+
+ my $datafile = sweep_datafile(columns => [qw/gate bias current/]);
+ 
+ $datafile->add_plot(
+     type => 'pm3d',
+     x    => 'gate',
+     y    => 'bias',
+     z    => 'current'
+ );
+
+By default, the live plot will be updated after a bias sweep is completed.
+
+=head2 Customizing plot and curve options
+
+There are many ways to customize a plot and it's hard copy:
+
+=head3 Terminal options
+
+If we don't want to use gnuplot's default terminal for the live plot or hard copy,
+we use the C<terminal>, C<hard_copy_terminal>, C<terminal_options> and
+C<hard_copy_terminal_options> options:
+
+ $datafile->add_plot(
+     type                       => 'pm3d',
+     x                          => 'gate',
+     y                          => 'bias',
+     z                          => 'current',
+     terminal                   => 'x11',
+     terminal_options           => {linewidth => 3},
+     hard_copy                  => 'data.jpg',
+     hard_copy_terminal         => 'jpeg',
+     hard_copy_terminal_options => {linewidth => 0.5}
+ ); 
+
+=head3 Plot and curve options
+
+L<PDL::Graphics::Gnuplot> separates between plot options and curve options:
+
+ $datafile->add_plot(
+     type => 'pm3d',
+     x    => 'gate',
+     y    => 'bias',
+     z    => 'current',
+     plot_options => {
+         title   => 'x - y plot',
+         xlabel  => 'x (V)',
+         ylabel  => 'y (V)',
+         cblabel => 'current (A)', # label for color box
+         format  => {x => "'%.2e'", y => "'%.2e'"},
+         grid    => 0, # disable grid
+     },
+     curve_options => {
+         with      => 'lines', # default is 'points'
+         linetype  => 2, # color
+         linewidth => 2,
+     },
+ );      
+
+More Plot and curve options are documented in L<PDL::Graphics::Gnuplot>.
+
+=head1 Block data
+
+There are types of instruments which return more than a single data. Examples
+are spectrum and network analyzers, which perform a frequency sweep and return
+an array of data after each sweep.
+
+The C<sparam_sweep> method provided, e.g., by the
+L<Lab::Moose::Instrument::RS_ZVA> returns a 2D PDL with the following format:
+
+ [
+  [freq1    , freq2    , ..., freqN    ],
+  [Re(S11)_1, Re(S11)_2, ..., Re(S11)_N],
+  [Im(S11)_1, Im(S11)_2, ..., Im(S11)_N],
+  [Amp_1    , Amp_2    , ..., Amp_N    ],
+  [phase_1  , phase_2  , ..., phase_N  ],
+ ]
+
+The following script sweeps a voltage source and performs a frequency sweep
+with the VNA for each level of the voltage source. Each VNA sweep is logged
+into a separate datafile which contains one line of data for each frequency
+point.
+
+ use Lab::Moose;
+
+ my $source = instrument(
+     type            => 'YokogawaGS200',
+     connection_type => 'USB',
+     # Safety limits:
+     max_units => 10, min_units => -10,
+     max_units_per_step => 0.1, max_units_per_second => 1
+ );
+
+ my $vna = instrument(
+     type               => 'RS_ZVA',
+     connection_type    => 'VXI11',
+     connection_options => {host => '192.168.x.x'},
+ );
+
+ my $sweep = sweep(
+     type => 'Step::Voltage',
+     instrument => $source,
+     from => -5, to => 5, step => 0.01
+ );
+
+ my $datafile = sweep_datafile(
+     columns => [qw/voltage freq Re_S21 Im_S21 amplitude phase/]);
+
+ my $meas = sub {
+     my $sweep = shift;
+     my $voltage = $source->cached_level();
+     my $block = $vna->sparam_sweep(timeout => 10, average => 100);
+
+     $sweep->log_block(
+         prefix => {voltage => $voltage},
+         block => $block
+     );
+ };
+
+ $sweep->start(
+     measurement => $meas,
+     datafile   => $datafile,
+     datafile_dim => 1, # each VNA trace in a separate file
+     point_dim => 1, # the measurement sub logs blocks, not points
+ );
+
+Without the C<< point_dim => 1 >> setting, only one datafile would be
+generated. One could also log all blocks into a single 2D datafile by setting
+C<< datafile_dim => 2 >>.
+
+=head1 Continuous sweeps
+
+With continuous sweeps, the sweep parameter is ramped in the background while
+data is recorded. This is in constrast with step/list sweeps where the sweep
+parameter is kept constant during data acquisition.
+The rate of measurement points taken is controlled by the C<interval> sweep
+attribute.
+
+For example, the following time sweep records data every 0.5 seconds and
+finishes after 60 seconds:
+
+ use Lab::Moose;
+
+ my $sweep = sweep(
+     type => 'Continuous::Time',
+     interval => 0.5,
+     duration => 60
+ );
+
+=head2 Magnet sweeps
+
+Note that the rate is given in Tesla/min.
+
+ my $sweep = sweep(
+     type => 'Continuous::Magnet',
+     instrument => $ips,
+     from => -1, # Tesla
+     to => 1,
+     rate => 0.1, (Tesla/min, always positive)
+     start_rate => 1, (optional, rate to approach start point)
+     interval => 0.5, # one measurement every 0.5 seconds
+ );
+
+=head1 Further customization
+
+=head2 delay_before_loop, delay_in_loop, delay_after_loop
+
+TODO
+
+=head2 before_loop coderef
+
+TODO
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+
+  Copyright 2018       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

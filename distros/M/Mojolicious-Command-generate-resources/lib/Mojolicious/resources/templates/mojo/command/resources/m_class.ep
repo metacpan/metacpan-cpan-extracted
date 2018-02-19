@@ -8,7 +8,15 @@ sub add($self, $row)  {
   return $self-><%= $a->{db_helper} %>->db->insert('<%= $a->{t} %>', $row)->last_insert_id;
 }
 
-sub all { shift-><%= $a->{db_helper} %>->db->select('<%= $a->{t} %>')->hashes->to_array }
+sub all($self, $opts = {}) {
+  $opts->{limit} //= 100;
+  $opts->{limit} = 100 unless $opts->{limit} =~/^\d+$/;
+  $opts->{offset} //= 0;
+  $opts->{offset} = 0 unless $opts->{offset} =~/^\d+$/;
+  my $sql = $self-><%= $a->{db_helper} %>->abstract->select('<%= $a->{t} %>', '*');
+  $sql .= " LIMIT $opts->{limit}" . ($opts->{offset} ? " OFFSET $opts->{offset}" : '');
+  return $self-><%= $a->{db_helper} %>->db->query($sql)->hashes->to_array;
+}
 
 sub find($self, $id) {
   return $self-><%= $a->{db_helper} %>->db->select('<%= $a->{t} %>', undef, {id => $id})->hash;

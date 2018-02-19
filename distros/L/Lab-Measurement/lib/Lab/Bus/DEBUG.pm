@@ -1,6 +1,6 @@
 package Lab::Bus::DEBUG;
 #ABSTRACT: Interactive debug bus
-$Lab::Bus::DEBUG::VERSION = '3.613';
+$Lab::Bus::DEBUG::VERSION = '3.620';
 use warnings;
 use strict;
 use 5.010;
@@ -237,7 +237,7 @@ Lab::Bus::DEBUG - Interactive debug bus
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 DESCRIPTION
 
@@ -248,7 +248,7 @@ Unfinished, needs testing.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011-2012  Andreas K. Huettel, Florian Olbrich
             2013       Andreas K. Huettel

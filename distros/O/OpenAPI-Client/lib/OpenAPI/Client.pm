@@ -9,7 +9,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -43,16 +43,18 @@ sub call {
 }
 
 sub call_p {
-  my $self = shift;
+  my $self    = shift;
   my $promise = Mojo::Promise->new;
-  $self->call(@_, sub {
-    my ($self, $tx) = @_;
-    my $err = $tx->error;
-    return $promise->reject($err->{message}) if $err && !$err->{code};
-    return $promise->reject('WebSocket handshake failed')
-      if $tx->req->is_handshake && !$tx->is_websocket;
-    $promise->resolve($tx);
-  });
+  $self->call(
+    @_,
+    sub {
+      my ($self, $tx) = @_;
+      my $err = $tx->error;
+      return $promise->reject($err->{message}) if $err && !$err->{code};
+      return $promise->reject('WebSocket handshake failed') if $tx->req->is_handshake && !$tx->is_websocket;
+      $promise->resolve($tx);
+    }
+  );
   $promise;
 }
 

@@ -1,5 +1,20 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3622  2018-02-10
+        - no functional changes
+        - added env var and related info about testing RPi::LCD in the testing
+          section POD (closes #59)
+        - fix small formatting issue (C<<>>) in POD (closes #56)
+        - test fixes/updates
+        - t/RPiTest.pm now checks whether the serial pins (14, 15) are in alt
+          mode 4 (default) or 2 (bluetooth disabled)
+        - add blurb in FAQ and POD about lowering I2C bus speed if using I2C
+          with an Arduino (closes #61)
+        - fix incorrect RPi::Pin POD link in Core (closes #60)
+        - add blurb about disabling bluetooth when using serial (closes #57)
+        - re-added t/README for test GPIO pin usage (closes #58)
+        - bump prereq versions of RPi::Serial, RPi::I2C, RPi::SPI
+
 2.3621  2017-10-03
         - removed the test/images and images/ directory from the repo
         - renamed Util.pm to Core.pm

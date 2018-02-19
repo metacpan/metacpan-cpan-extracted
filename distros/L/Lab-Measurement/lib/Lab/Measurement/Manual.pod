@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation for Lab::Measurement
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 OVERVIEW
 
@@ -73,13 +73,13 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 
 =over
 
-=item * L<examples::XPRESS::Example1_Simple-IV.pl>
+=item * L<Lab::XPRESS::Examples::Example1_Simple_IV>
 
-=item * L<examples::XPRESS::Example2_Gate-IV-scan.pl>
+=item * L<Lab::XPRESS::Examples::Example2_Gate_IV_scan>
 
-=item * L<examples::XPRESS::Example3_2samples-2files.pl>
+=item * L<Lab::XPRESS::Examples::Example3_2samples_2files>
 
-=item * L<examples::XPRESS::Example4_3d-scan.pl>
+=item * L<Lab::XPRESS::Examples::Example4_3d_scan>
 
 =back
 
@@ -179,8 +179,6 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 
 =item * L<Lab::Instrument::HP83732A>
 
-=item * L<Lab::Instrument::RSSMB100A>
-
 =item * L<Lab::Instrument::MG369xB>
 
 =back
@@ -208,8 +206,6 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =over
 
 =item * L<Lab::Instrument::IPS>
-
-=item * L<Lab::Instrument::OI_Mercury::Magnet>
 
 =back
 
@@ -240,8 +236,6 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =over
 
 =item * L<Lab::Instrument::OI_ILM210>
-
-=item * L<Lab::Instrument::OI_Mercury::Level>
 
 =back
 
@@ -303,7 +297,7 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 
 =back
 
-=head3 USB Test&Measurement (Linux kernel driver)
+=head3 USB Test & Measurement (Linux kernel driver)
 
 =over
 
@@ -337,6 +331,8 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 
 =over
 
+=item * L<Lab::Moose::Sweep::Tutorial>
+
 =item * L<Lab::Moose::Developer>
 
 =back
@@ -361,6 +357,28 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 
 =back
 
+=head2 Sweep classes
+
+=over
+
+=item * L<Lab::Moose::Sweep>
+
+=item * L<Lab::Moose::Sweep::Step>
+
+=item * L<Lab::Moose::Sweep::Step::Voltage>
+
+=item * L<Lab::Moose::Sweep::Step::Frequency>
+
+=item * L<Lab::Moose::Sweep::Step::Magnet>
+
+=item * L<Lab::Moose::Sweep::Continuous>
+
+=item * L<Lab::Moose::Sweep::Continuous::Time>
+
+=item * L<Lab::Moose::Sweep::Continuous::Magnet>
+
+=back
+
 =head2 Instrument control classes
 
 =over
@@ -380,6 +398,10 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =item * L<Lab::Moose::Instrument::HP3458A>
 
 =item * L<Lab::Moose::Instrument::HP34410A>
+
+alias: L<Lab::Moose::Instrument::Agilent34410A>
+
+=item * L<Lab::Moose::Instrument::Keysight34470A>
 
 =back
 
@@ -444,6 +466,8 @@ can be used with XPRESS, just like the Lab::Instrument drivers.
 =over
 
 =item * L<Lab::Moose::Instrument::OI_Mercury::Magnet>
+
+contains support for temperature sensor and He/N2 level meters.
 
 =back
 
@@ -525,7 +549,7 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 
 =back
 
-=head3 USB Test&Measurement (Linux kernel driver)
+=head3 USB Test & Measurement
 
 =over
 
@@ -561,9 +585,9 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

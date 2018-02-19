@@ -4,6 +4,9 @@ author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
   - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
 build_requires:
+  Attean: '0.019'
+  RDF::Prefixes: '0'
+  Test::Modern: '0'
   Test::More: '0.96'
   Test::Output: '0'
 configure_requires:
@@ -27,25 +30,28 @@ optional_features: {}
 provides:
   RDF::RDFa::Generator:
     file: lib/RDF/RDFa/Generator.pm
-    version: '0.192'
+    version: '0.200'
   RDF::RDFa::Generator::HTML::Head:
     file: lib/RDF/RDFa/Generator/HTML/Head.pm
-    version: '0.192'
+    version: '0.200'
   RDF::RDFa::Generator::HTML::Hidden:
     file: lib/RDF/RDFa/Generator/HTML/Hidden.pm
-    version: '0.192'
+    version: '0.200'
   RDF::RDFa::Generator::HTML::Pretty:
     file: lib/RDF/RDFa/Generator/HTML/Pretty.pm
-    version: '0.192'
+    version: '0.200'
   RDF::RDFa::Generator::HTML::Pretty::Note:
     file: lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
-    version: '0.192'
+    version: '0.200'
+recommends:
+  Attean: '0.019'
+  RDF::NS: '0'
+  RDF::Prefixes: '0'
 requires:
-  AtteanX::Compatibility::Trine: '0'
   Data::Dumper: '0'
   Icon::FamFamFam::Silk: '0'
-  RDF::Prefixes: '0'
-  RDF::Trine: '0.112'
+  RDF::NS::Curated: '0.100'
+  URI::NamespaceMap: '1.06'
   XML::LibXML: '1.60'
   perl: '5.008'
 resources:
@@ -55,7 +61,7 @@ resources:
   homepage: https://metacpan.org/release/RDF-RDFa-Generator
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-rdf-rdfa-generator.git
-version: '0.192'
+version: '0.200'
 x_contributors:
   - 'ZORAN <zoran@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

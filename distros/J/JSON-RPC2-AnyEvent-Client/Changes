@@ -1,5 +1,8 @@
 Revision history for JSON-RPC2-AnyEvent-Client
 
+0.04 2018-02-15T13:36:00Z
+	clarify deps, fix and verbosify err funcs
+
 0.03 2017-11-29T12:44:22Z
 	add url to error message
 

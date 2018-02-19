@@ -14,15 +14,15 @@ sub match {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
-         ["]The[ ]mail[ ]server[ ]detected[ ]your[ ]message[ ]as[ ]spam[ ]and[ ]
+         ["]the[ ]mail[ ]server[ ]detected[ ]your[ ]message[ ]as[ ]spam[ ]and[ ]
             has[ ]prevented[ ]delivery[.]["]    # CPanel/Exim with SA rejections on
         |(?:\d[.]\d[.]\d|\d{3})[ ]spam\z
         |appears[ ]to[ ]be[ ]unsolicited
-        |Blacklisted[ ]URL[ ]in[ ]message
+        |blacklisted[ ]url[ ]in[ ]message
         |block[ ]for[ ]spam
         |blocked[ ]by[ ](?:
              policy:[ ]no[ ]spam[ ]please
-            |spamAssassin                   # rejected by SpamAssassin
+            |spamassassin                   # rejected by SpamAssassin
             )
         |blocked[ ]for[ ]abuse[.][ ]see[ ]http://att[.]net/blocks   # AT&T
         |bulk[ ]email
@@ -36,7 +36,7 @@ sub match {
         |mail[ ](?:
              appears[ ]to[ ]be[ ]unsolicited    # rejected due to spam
             |content[ ]denied   # http://service.mail.qq.com/cgi-bin/help?subtype=1&&id=20022&&no=1000726
-            |rejete.+[A-Z]{3}.+506
+            |rejete.+[a-z]{3}.+506
             )
         |may[ ]consider[ ]spam
         |message[ ](?:
@@ -45,10 +45,10 @@ sub match {
             |filtered
             |filtered[.][ ](?:
                  please[ ]see[ ]the[ ]faqs[ ]section[ ]on[ ]spam
-                |Refer[ ]to[ ]the[ ]Troubleshooting[ ]page[ ]at[ ]
+                |refer[ ]to[ ]the[ ]troubleshooting[ ]page[ ]at[ ]
                 )
             |looks[ ]like[ ]spam
-            |not[ ]accepted[ ]for[ ]policy[ ]reasons[.][ ]See[ ]http:   # Yahoo!
+            |not[ ]accepted[ ]for[ ]policy[ ]reasons[.][ ]see[ ]http:   # Yahoo!
             |refused[ ]by[ ]mailmarshal[ ]spamprofiler
             |rejected[ ](?:
                  as[ ]spam
@@ -63,8 +63,8 @@ sub match {
             |system[ ]has[ ]detected[ ]that[ ]this[ ]message[ ]is
             )
         |probable[ ]spam
-        |REJECT[ ]bulk[.]advertising
-        |Reject,.+[ ][-][ ]SPAM[.][ ]
+        |reject[ ]bulk[.]advertising
+        |reject,.+[ ][-][ ]spam[.][ ]
         |rejected(?:
              :[ ]spamassassin[ ]score[ ]
             |[ ]by[ ].+[ ][(]spam[)]
@@ -73,7 +73,7 @@ sub match {
         |rejecting[ ]banned[ ]content 
         |related[ ]to[ ]content[ ]with[ ]spam[-]like[ ]characteristics
         |rule[ ]imposed[ ]as[ ].+is[ ]blacklisted[ ]on              # Mailmarshal RBLs
-        |Sender[ ]domain[ ]listed[ ]at[ ].+
+        |sender[ ]domain[ ]listed[ ]at[ ].+
         |sending[ ]address[ ]not[ ]accepted[ ]due[ ]to[ ]spam[ ]filter
         |spam[ ](?:
              .+[ ]exceeded
@@ -87,18 +87,18 @@ sub match {
             |not[ ]accepted
             |refused
             |rejection
-            |Reporting[ ]Address    # SendGrid|a message to an address has previously been marked as Spam by the recipient.
+            |reporting[ ]address    # SendGrid|a message to an address has previously been marked as Spam by the recipient.
             |score[ ]
             )
         |spambouncer[ ]identified[ ]spam    # SpamBouncer identified SPAM
         |spamming[ ]not[ ]allowed
-        |Too[ ]much[ ]spam[.]               # Earthlink
+        |too[ ]much[ ]spam[.]               # Earthlink
         |the[ ]message[ ](?:
              has[ ]been[ ]rejected[ ]by[ ]spam[ ]filtering[ ]engine
             |was[ ]rejected[ ]due[ ]to[ ]classification[ ]as[ ]bulk[ ]mail
             )
-        |The[ ]content[ ]of[ ]this[ ]message[ ]looked[ ]like[ ]spam # SendGrid
-        |This[ ](?:e-mail|mail)[ ](?:
+        |the[ ]content[ ]of[ ]this[ ]message[ ]looked[ ]like[ ]spam # SendGrid
+        |this[ ](?:e-mail|mail)[ ](?:
              cannot[ ]be[ ]forwarded[ ]because[ ]it[ ]was[ ]detected[ ]as[ ]spam
             |is[ ]classified[ ]as[ ]spam[ ]and[ ]is[ ]rejected
             )
@@ -110,7 +110,7 @@ sub match {
                 )
             |scored[ ].+[ ]spam[ ]points
             |was[ ]classified[ ]as[ ]spam
-            |was[ ]rejected[ ]by[ ]Recurrent[ ]Pattern[ ]Detection[ ]System
+            |was[ ]rejected[ ]by[ ]recurrent[ ]pattern[ ]detection[ ]system
             )
         |transaction[ ]failed[ ]spam[ ]message[ ]not[ ]queued       # SendGrid
         |we[ ]dont[ ]accept[ ]spam
@@ -118,7 +118,7 @@ sub match {
         |your[ ](?:
              email[ ](?:
                  appears[ ]similar[ ]to[ ]spam[ ]we[ ]have[ ]received[ ]before
-                |breaches[ ]local[ ]URIBL[ ]policy
+                |breaches[ ]local[ ]uribl[ ]policy
                 |had[ ]spam[-]like[ ]
                 |is[ ](?:considered|probably)[ ]spam
                 |was[ ]detected[ ]as[ ]spam
@@ -127,15 +127,15 @@ sub match {
                  as[ ]spam[ ]and[ ]has[ ]prevented[ ]delivery
                 |has[ ]been[ ](?:
                      temporarily[ ]blocked[ ]by[ ]our[ ]filter
-                    |rejected[ ]because[ ]it[ ]appears[ ]to[ ]be[ ]SPAM
+                    |rejected[ ]because[ ]it[ ]appears[ ]to[ ]be[ ]spam
                     )
-                |has[ ]triggered[ ]a[ ]SPAM[ ]block
+                |has[ ]triggered[ ]a[ ]spam[ ]block
                 |may[ ]contain[ ]the[ ]spam[ ]contents
                 |failed[ ]several[ ]antispam[ ]checks
                 )
             )
         )
-    }xi;
+    }x;
 
     return 1 if $argv1 =~ $regex;
     return 0;
@@ -152,26 +152,13 @@ sub true {
     my $argvs = shift // return undef;
 
     return undef unless ref $argvs eq 'Sisimai::Data';
-    my $statuscode = $argvs->deliverystatus // '';
-    my $reasontext = __PACKAGE__->text;
-
-    return undef unless length $statuscode;
-    return 1 if $argvs->reason eq $reasontext;
+    return undef unless $argvs->deliverystatus;
+    return 1 if $argvs->reason eq 'spamdetected';
 
     require Sisimai::SMTP::Status;
-    my $diagnostic = $argvs->diagnosticcode // '';
-    my $v = 0;
-
-    if( Sisimai::SMTP::Status->name($statuscode) eq $reasontext ) {
-        # Delivery status code points "spamdetected".
-        $v = 1;
-
-    } else {
-        # Matched with a pattern in this class
-        $v = 1 if __PACKAGE__->match($diagnostic);
-    }
-
-    return $v;
+    return 1 if Sisimai::SMTP::Status->name($argvs->deliverystatus) eq 'spamdetected';
+    return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);
+    return 0;
 }
 
 1;
@@ -230,7 +217,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -9,13 +9,17 @@ use Capture::Tiny ':all';
 BEGIN {
     use_ok(
         'Term::Colormap', qw(
-          colorbar
-          colormap
+          add_mapping
           color2rgb
-          rgb2color
+          color_table
+          colorbar
+          colored
+          colored_text
+          colormap
+          colormap_names
           print_colored
           print_colored_text
-          color_table
+          rgb2color
           )
     ) || print "Bail out on imports!\n";
 }
@@ -36,6 +40,11 @@ for my $name ( @valid_colormaps ) {
     my $mapping = colormap($name);
     ok ( scalar @$mapping, "Colormap $name" );
 }
+
+my $colormap_names = join('|', sort ( colormap_names() ) );
+my $expected_names = join('|', sort @valid_colormaps );
+ok( $colormap_names eq $expected_names, 'Colormap_names returns valid names' )
+    or diag( "Got '$colormap_names'\nExpected '$expected_names'" );
 
 dies_ok { colormap('foo') } 'Colormap catches invalid names';
 
@@ -236,6 +245,20 @@ my $normalized_lavender = normalize_colored_text( $colored_output );
 my $expected_lavender = '|[|4|8|;|5|;|9|3|m|T|e|x|t| |o|n| |L|a|v|e|n|d|e|r||[|0|m';
 ok( $normalized_lavender eq $expected_lavender,
     "print_colored( 93, 'Text on Lavender' ) => $colored_output");
+
+# colored_text tests
+my $peach = colored_text( 208, "Peach Colored Text" );
+my $expected_peach = "\x1b[38;5;208mPeach Colored Text\x1b[0m";
+ok($peach eq $expected_peach,
+   "colored_text( 208, 'Peach Colored Text' ) => $peach")
+    or diag("Got '$peach' instead of '$expected_peach'");
+
+# colored tests
+my $lavender = colored( 93, "Text on Lavender" );
+my $exp_lavender = "\x1b[48;5;93mText on Lavender\x1b[0m";
+ok($lavender eq $exp_lavender,
+   "colored_text( 93, 'Text on Lavender' ) => $lavender")
+    or diag("Got '$lavender' instead of '$exp_lavender'");
 
 done_testing();
 exit 0;

@@ -6,6 +6,7 @@ use testlib::Util qw(set_timeout run_server);
 
 use Plack::App::WebSocket;
 use AnyEvent::WebSocket::Server;
+use AnyEvent::WebSocket::Client;
 use AnyEvent;
 use AnyEvent::Handle;
 use Protocol::WebSocket::Handshake::Client;
@@ -37,6 +38,37 @@ sub _get_raw_handshake_response {
         }
     );
     return $response_cv;
+}
+
+sub test_handshake_other_results {
+    my ($server_runner) = @_;
+    my @got_others = ();
+    my $app = Plack::App::WebSocket->new(
+        websocket_server => AnyEvent::WebSocket::Server->new(
+            handshake => sub {
+                my ($req, $res) = @_;
+                return ($res, 1, 2, 3);
+            }
+        ),
+        on_establish => sub {
+            my ($conn, $env, $others) = @_;
+            push @got_others, $others;
+            undef $conn;
+        },
+        on_error => sub {
+            fail("unexpected error happened.");
+        }
+    );
+    my ($port, $server_guard) = run_server($server_runner, $app->to_app);
+    my $client = AnyEvent::WebSocket::Client->new;
+    my $conn = $client->connect("ws://127.0.0.1:$port/")->recv;
+    my $finish_cv = AnyEvent->condvar;
+    $conn->on(finish => sub {
+        note("client finished");
+        $finish_cv->send;
+    });
+    $finish_cv->recv;
+    is_deeply(\@got_others, [[1,2,3]], 'handshake other_results should be obtained from on_establish callback');
 }
 
 sub run_tests {
@@ -90,6 +122,7 @@ sub run_tests {
         is $got_error_env[0]{"plack.app.websocket.error"}, "invalid request";
         like $got_error_env[0]{"plack.app.websocket.error.handshake"}, qr/This is user-defined exception/;
     }
+    test_handshake_other_results($server_runner);
 }
 
 1;

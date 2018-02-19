@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.3.0';
+$Git::Hooks::VERSION = '2.5.0';
 use 5.010;
 use strict;
 use warnings;
@@ -61,12 +61,15 @@ sub run_hook {
                 # specifically for this plugin.
                 (my $CFG = $package) =~ s/.*::/githooks./;
                 if (my $help = $git->get_config(lc $CFG => 'help-on-error')) {
-                    $git->error($package, $help);
+                    $git->fault($help, {prefix => $package});
                 }
             }
         } elsif (length $@) {
             # Old hooks die when they fail...
-            $git->error(__PACKAGE__ . "($hook_basename)", "Hook failed", $@);
+            $git->fault("Hook failed", {
+                prefix  => __PACKAGE__ . "($hook_basename)",
+                details => $@,
+            });
         } else {
             # ...and return undef when they succeed.
         }
@@ -80,13 +83,13 @@ sub run_hook {
         $post_hook->($hook_basename, $git, @args);
     }
 
-    if (my $errors = $git->get_errors()) {
-        $errors .= "\n" unless $errors =~ /\n$/;
+    if (my $faults = $git->get_faults()) {
+        $faults .= "\n" unless $faults =~ /\n$/;
         if (($hook_basename eq 'commit-msg' or $hook_basename eq 'pre-commit')
                 and not $git->get_config_boolean(githooks => 'abort-commit')) {
-            warn $errors;
+            warn $faults;
         } else {
-            die $errors;
+            die $faults;
         }
     }
 
@@ -108,7 +111,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
 
 =head1 SYNOPSIS
 
@@ -308,7 +311,8 @@ For example:
             my ($mode, $sha, $n, $name) = split / /;
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
-                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
+                            {prefix => 'CheckSize'});
                 ++$errors;
             }
         }
@@ -337,7 +341,10 @@ For example:
         if (%violations) {
             # FIXME: this is a lame way to format the output.
             require Data::Dumper;
-            $git->error('Perl::Critic Violations', Data::Dumper::Dumper(\%violations));
+            $git->fault('Violations', {
+                 prefix  => 'Perl::Critic',
+                 details => Data::Dumper::Dumper(\%violations),
+            });
             return 0;
         }
 
@@ -457,7 +464,8 @@ import the PRE_COMMIT directive, like this:
             my ($mode, $sha, $n, $name) = split / /;
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
-                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
+                            {prefix => 'CheckSize'});
                 ++$errors;
             }
         }
@@ -492,7 +500,8 @@ make this check work for other hooks as well:
             my ($mode, $sha, $n, $name) = split / /;
             my $size = $git->file_size(":0:$name");
             if ($size > $LIMIT) {
-                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
+                            {prefix => 'CheckSize'});
                 ++$errors;
             }
         }
@@ -553,7 +562,8 @@ We just have to change the check_new_files function:
             my ($mode, $sha, $n, $name) = split / /;
             my $size = $git->file_size(":0:$name");
             if ($size > $limit) {
-                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $limit");
+                $git->fault("File '$name' has $size bytes, more than our limit of $limit",
+                            {prefix => 'CheckSize'});
                 ++$errors;
             }
         }
@@ -1242,7 +1252,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,15 +1,11 @@
 package Mic::Contracts;
 use strict;
+use Mic::ContractConfig;
 
 sub import {
     my (undef, %contract_for) = @_;
 
-    foreach my $class ( keys %contract_for ) {
-        $Mic::Contracts_for{$class} = $contract_for{$class};
-        if ( $Mic::Contracts_for{$class}{all} ) {
-            $Mic::Contracts_for{$class} = { map { $_ => 1 } qw/pre post invariant/ };
-        }
-    }
+    Mic::ContractConfig::configure(\ %contract_for);
     strict->import();
 }
 
@@ -26,13 +22,15 @@ Mic::Contracts
     # example.pl
 
     use Mic::Contracts
-        'Foo' => { all => 1 }, # all contracts are run
-        'Bar' => { pre => 1 }, # only preconditions are run
+        'Foo' => { all  => 1 }, # all contracts are run
+        'Bar' => { post => 1 }, # postconditions (and preconditions) are run
+        'Baz' => { pre  => 0 }; # all contracts are skipped
 
     use Foo;
     use Bar;
+    use Baz;
 
-    # do stuff with Foo and Bar
+    # do stuff with Foo, Bar and Baz
 
 =head1 DESCRIPTION
 
@@ -112,6 +110,28 @@ The following example illustrates the use of contracts, which are assertions tha
 
     1;
 
+The contract constrains the behaviour of its implementation in various ways:
+
+=over
+
+=item *
+
+The precondition on C<new> requires that its argument is a positive integer.
+
+=item *
+
+The postconditions on C<push> ensure that the queue size increases by one after a push, and that the newly pushed item is at the back of the queue.
+
+=item *
+
+The postcondition on C<pop> ensures that a popped item was previously at the front of the queue.
+
+=item *
+
+The invariant ensures that the queue never exceeds its maximum size.
+
+=back
+
 =head1 Types of Contracts
 
 =head2 Preconditions (require)
@@ -154,26 +174,68 @@ was violated.
 
 =head1 Enabling Contracts
 
-Contracts are not run by default, because they can result in many additional subroutine calls.
+Postconditions and invariants are not run by default, because they can result in many additional subroutine calls.
 
-To enable them, use L<Mic::Contracts>, e.g. to activate contracts
+=head2 Via Code
+
+To enable them, use L<Mic::Contracts>, e.g. to activate all contract types
 for the Example::Contracts::BoundedQueue class, the following can be done:
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { all => 1 };
 
-This turns on preconditions, postconditions and invariants.
-
-    use Mic::Contracts 'Example::Contracts::BoundedQueue' => { pre => 1 };
-
-turns on preconditions only.
+This turns on preconditions, postconditions and invariants. Whereas
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { post => 1 };
 
-turns on postconditions only.
+turns on postconditions (and preconditions). And
 
     use Mic::Contracts 'Example::Contracts::BoundedQueue' => { invariant => 1 };
 
-turns on invariants only.
+turns on invariants (and preconditions).
+
+Any defined preconditions will be run unless they are deactivated, which can be done with:
+
+    use Mic::Contracts 'Example::Contracts::BoundedQueue' => { pre => 0 };
+
+=head2 Via Configuration file
+
+Alternatively, contracts can be controlled more dynamically by setting the environment variable C<MIC_CONTRACTS> to the name of a .ini file. 
+
+For example, given the file my.contracts.ini with the following content
+
+    [Example::Contracts::BoundedQueue]
+    invariant = on
+    pre = off
+
+and by setting C<MIC_CONTRACTS>
+
+    export MIC_CONTRACTS=/path/to/my.contracts.ini
+
+Then invariant checking will be turned on for Example::Contracts::BoundedQueue.
+
+The format of the file is simple: one section per Class/Interface. Then within each section the keys are contract types
+
+=over
+
+=item pre
+
+Preconditions
+
+=item post
+
+Postconditions
+
+=item invariant
+
+Invariants
+
+=item all
+
+All contract types
+
+=back
+
+The values are interpreted as booleans, with 0, 'off' and 'false' being considered false (and anything else considered true).
 
 =head1 See Also
 

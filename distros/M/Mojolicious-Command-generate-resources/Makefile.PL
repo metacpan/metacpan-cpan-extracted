@@ -12,11 +12,12 @@ WriteMakefile(
   AUTHOR        => 'Красимир Беров (berov@cpan.org)',
   ABSTRACT_FROM => 'lib/Mojolicious/Command/generate/resources.pm',
   PREREQ_PM     => {'Mojolicious' => '7.60', perl => '5.020001'},
-  TEST_REQUIRES => {'Mojo::SQLite' => '3.000'},
-  test          => {TESTS          => 't/*.t'},
-  clean         => {FILES          => 'Mojolicious-Command-*'},
-  dist          => {PREOP          => $preop},
-  META_MERGE    => {
+  TEST_REQUIRES =>
+    {'Mojo::SQLite' => '3.000', 'Mojolicious::Plugin::OpenAPI' => '1.25'},
+  test       => {TESTS => 't/*.t'},
+  clean      => {FILES => 'Mojolicious-Command-*'},
+  dist       => {PREOP => $preop},
+  META_MERGE => {
     dynamic_config => 0,
     'meta-spec'    => {version => 2},
     no_index       => {directory => ['t']},

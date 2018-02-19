@@ -1,5 +1,5 @@
 package Syntax::Keyword::Gather;
-$Syntax::Keyword::Gather::VERSION = '1.003001';
+$Syntax::Keyword::Gather::VERSION = '1.003002';
 use strict;
 use warnings;
 
@@ -50,7 +50,7 @@ sub break() {
 }
 
 package Syntax::Keyword::Gather::MagicArrayRef;
-$Syntax::Keyword::Gather::MagicArrayRef::VERSION = '1.003001';
+$Syntax::Keyword::Gather::MagicArrayRef::VERSION = '1.003002';
 use overload
    'bool'   => sub { @{$_[0]} > 0      },
    '0+'     => sub { @{$_[0]} + 0      },
@@ -71,7 +71,7 @@ Syntax::Keyword::Gather - Implements the Perl 6 'gather/take' control structure 
 
 =head1 VERSION
 
-version 1.003001
+version 1.003002
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ as:
    my @list = @{shift @_};
 
    return gather {
-      take $_ if $coderef->($_) for @list
+      do { take $_ if $coderef->($_) } for @list
    };
  }
 
@@ -280,7 +280,7 @@ Damian Conway
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -71,7 +71,7 @@ sub r_name {
 }
 
 sub r_value {
-  return r_arg(qw/pale 314159 _____ LART/);
+  return r_arg(qw/pale 314159 _____ LART/, undef);
 }
 
 sub r_method {
@@ -135,7 +135,8 @@ for my $i ( 0 .. 1000 ) {
     }
 
     if ($return_type eq '_') {
-      ok 1, "$method_name(@args)";
+      my @mapped = map { $_ // '<undef>' } @args;
+      ok 1, "$method_name(@mapped)";
       next;
     }
 

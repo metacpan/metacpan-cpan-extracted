@@ -49,7 +49,7 @@ package Sidef::Object::Lazy {
             code => sub {
               ITEM: {
                     my $item = $iter->() // return undef;
-                    my @arg = ($item);
+                    my @arg  = ($item);
                     foreach my $call (@{$self->{calls}}) {
                         @arg = $call->(@arg);
                         @arg || redo ITEM;
@@ -62,6 +62,16 @@ package Sidef::Object::Lazy {
 
     sub first {
         my ($self, $n) = @_;
+
+        if (!defined($n)) {
+            my @arr;
+            $self->_xs(sub { push(@arr, @_); 1; });
+            return $arr[0];
+        }
+
+        if (ref($n) eq 'Sidef::Types::Block::Block') {
+            return $self->first_by($n);
+        }
 
         $n = CORE::int($n);
         $n > 0 || return Sidef::Types::Array::Array->new([]);
@@ -76,6 +86,11 @@ package Sidef::Object::Lazy {
         );
 
         Sidef::Types::Array::Array->new(\@arr);
+    }
+
+    sub first_by {
+        my ($self, $block) = @_;
+        $self->grep($block)->first(1)->[0];
     }
 
     #
@@ -100,19 +115,7 @@ package Sidef::Object::Lazy {
         $self;
     }
 
-    #
-    ## AUTOLOAD
-    #
-
-    sub DESTROY { }
-
-    our $AUTOLOAD;
-
-    sub AUTOLOAD {
-        my ($self, @arg) = @_;
-        my ($method) = ($AUTOLOAD =~ /^.*[^:]::(.*)$/);
-        $self->to_a->$method(@arg);
-    }
+    *collect = \&map;
 
 }
 

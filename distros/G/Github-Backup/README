@@ -1,0 +1,143 @@
+NAME
+
+    Github::Backup - Back up your Github repositories and/or issues locally
+
+SYNOPSIS
+
+        github_backup \
+            --user stevieb9 \
+            --token 003e12e0780025889f8da286d89d144323c20c1ff7 \
+            --dir /home/steve/github_backup \
+            --repos \
+            --issues
+    
+        # You can store the token in an environment variable as opposed to sending
+        # it on the command line
+    
+        export GITHUB_TOKEN=003e12e0780025889f8da286d89d144323c20c1ff7
+    
+        github_backup -u stevieb9 -d ~/github_backup -r
+
+DESCRIPTION
+
+    The cloud is a wonderful thing, but things do happen. Use this
+    distribution to back up all of your Github repositories and/or issues
+    to your local machine for both assurance of data accessibility due to
+    outage, data loss, or just simply off-line use.
+
+COMMAND LINE USAGE
+
+ -u | --user
+
+    Mandatory: Your Github username.
+
+ -t | --token
+
+    Mandatory: Your Github API token. If you wish to not include this on
+    the command line, you can put the token into the GITHUB_TOKEN
+    environment variable.
+
+ -d | --dir
+
+    Mandatory: The backup directory where your repositories and/or issues
+    will be stored. The format of the directory structure will be as
+    follows:
+
+        backup_dir/
+            - issues/
+                - repo1/
+                    - issue_id_x
+                    - issue_id_y
+                - repo2/
+                    - issue_id_a
+            - repo1/
+                - repository data
+            - repo2/
+                - repository data
+
+    The repositories are stored as found on Github. The issues are stored
+    in JSON format.
+
+ -r | --repos
+
+    Optional: Back up all of your repositories found on Github.
+
+    Note that either --repos or --issues must be sent in.
+
+ -i | --issues
+
+    Optional: Back up all of your issues across all of your Github
+    repositories.
+
+    Note that either --issues or --repos must be sent in.
+
+ -p | --proxy
+
+    Optional: Send in a proxy in the format https://proxy.example.com:PORT
+    and we'll use this to do our fetching.
+
+ -h | --help
+
+    Display the usage information page.
+
+MODULE METHODS
+
+ new
+
+    Instantiates and returns a new Github::Backup object.
+
+    Parameters:
+
+  api_user
+
+    Mandatory, String: Your Github username.
+
+  token
+
+    Mandatory, String: Your Github API token. Note that if you do not wish
+    to store this in code, you can put it into the GITHUB_TOKEN environment
+    variable, and we'll read it in from there instead.
+
+  dir
+
+    Mandatory, String: The directory that you wish to store your downloaded
+    Github information to.
+
+  proxy
+
+    Optional, String: Send in a proxy in the format
+    https://proxy.example.com:PORT and we'll use this to do our fetching.
+
+ repos
+
+    Takes no parameters. Backs up all of your Github repositories, and
+    stores them in the specified backup directory.
+
+ issues
+
+    Takes no parameters. Backs up all of your Github issues. Stores them
+    per-repo within the /backup_dir/issues directory.
+
+FUTURE DIRECTION
+
+    - Slowly, I will add new functionality such as backing up *all* Github
+    data, as well as provide the ability to restore to Github the various
+    items.
+
+    - Add more tests. Usually I don't release a distribution with such few
+    tests, but in this case I have. I digress.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017,2018 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

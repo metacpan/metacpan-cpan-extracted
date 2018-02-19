@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use Hush::App;
+
+my $command   = shift;
+Hush::App::run($command);
+exit;

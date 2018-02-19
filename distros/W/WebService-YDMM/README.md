@@ -63,7 +63,7 @@ This methods no requires parameters.
 
 ## actress(\\%params)
 
-You can get actres information from DMM.
+You can get actress information from DMM.
 
 ## genre(\[$floor\_id\],\\%params)
 

@@ -2,8 +2,7 @@
 
 #
 # dbcolcopylast.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: bb2670752517f9ec2870a2baf611c24b4da7a11d $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -198,12 +197,12 @@ sub setup ($) {
     my $copy_code = '';
     foreach (@{$self->{_copy_cols}}) {
 	my($source_coli) = $self->{_in}->col_to_i($_);
-	croak $self->{_prog} . ": attempt to copy non-existing column $_.\n"
+	croak($self->{_prog} . ": attempt to copy non-existing column $_.\n")
 	    if (!defined($source_coli));
 
 	my($dest_col) = "copylast_" . $_;
 	$self->{_out}->col_create($dest_col)
-	    or croak $self->{_prog} . ": cannot create column '$dest_col' (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column '$dest_col' (maybe it already existed?)\n");
 	my($dest_coli) = $self->{_out}->col_to_i($dest_col);
 
 	$init_code .= '$lfref->[' . $source_coli . '] = $empty;' . "\n";
@@ -232,7 +231,7 @@ sub setup ($) {
 	';
 	print $loop_sub_code if ($self->{_debug});
 	eval $loop_sub_code;
-	$@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+	$@ && croak($self->{_prog} . ":  internal eval error: $@.\n");
 	$self->{_loop_sub} = $loop_sub;
     }
 }
@@ -253,7 +252,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

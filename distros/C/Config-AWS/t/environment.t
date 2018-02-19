@@ -1,0 +1,40 @@
+use Test2::V0;
+use Test2::Tools::Spec;
+
+use Config::AWS;
+use Path::Tiny qw( path );
+
+use Log::Any::Adapter 'Stderr';
+
+describe 'Config::AWS environment tests' => sub {
+    local $ENV{HOME}    = 'tester';
+    local $ENV{HOMEDIR} = 'tester';
+
+    tests 'default_profile' => sub {
+        local $ENV{AWS_DEFAULT_PROFILE} = 'some-profile';
+        is Config::AWS::default_profile(), 'some-profile';
+
+        delete $ENV{AWS_DEFAULT_PROFILE};
+        is Config::AWS::default_profile(), 'default';
+    };
+
+    tests 'credentials_file' => sub {
+        local $ENV{AWS_SHARED_CREDENTIALS_FILE} = 'some-credentials';
+        is Config::AWS::credentials_file(), 'some-credentials';
+
+        delete $ENV{AWS_SHARED_CREDENTIALS_FILE};
+        is path(Config::AWS::credentials_file())->stringify,
+            path('~/.aws/credentials')->stringify;
+    };
+
+    tests 'config_file' => sub {
+        local $ENV{AWS_CONFIG_FILE} = 'some-config';
+        is Config::AWS::config_file(), 'some-config';
+
+        delete $ENV{AWS_CONFIG_FILE};
+        is path(Config::AWS::config_file())->stringify,
+            path('~/.aws/config')->stringify;
+    };
+};
+
+done_testing;

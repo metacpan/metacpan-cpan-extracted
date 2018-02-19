@@ -43,6 +43,7 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "2.12",
+            "Config::Tiny" : "2.23",
             "List::MoreUtils" : "0.33",
             "Module::Runtime" : "0.014",
             "Package::Stash" : "0.36",
@@ -62,7 +63,7 @@
    "provides" : {
       "Mic" : {
          "file" : "lib/Mic.pm",
-         "version" : "0.001003"
+         "version" : "0.001004"
       },
       "Mic::ArrayImpl" : {
          "file" : "lib/Mic/ArrayImpl.pm"
@@ -75,6 +76,9 @@
       },
       "Mic::Class" : {
          "file" : "lib/Mic/Class.pm"
+      },
+      "Mic::ContractConfig" : {
+         "file" : "lib/Mic/ContractConfig.pm"
       },
       "Mic::Contracts" : {
          "file" : "lib/Mic/Contracts.pm"
@@ -100,7 +104,7 @@
          "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001004",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "arunbear <arunbear@gmail.com>"

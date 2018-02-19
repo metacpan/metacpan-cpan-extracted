@@ -15,7 +15,7 @@ sub match {
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
          exceeded[ ]maximum[ ]inbound[ ]message[ ]size
-        |Line[ ]limit[ ]exceeded
+        |line[ ]limit[ ]exceeded
         |max[ ]message[ ]size[ ]exceeded
         |message[ ](?:
              file[ ]too[ ]big
@@ -29,9 +29,9 @@ sub match {
             |too[ ]large[ ]for[ ]this[ ].+
             )
         |size[ ]limit
-        |Taille[ ]limite[ ]du[ ]message[ ]atteinte.+[A-Z]{3}.+514
+        |taille[ ]limite[ ]du[ ]message[ ]atteinte.+[a-z]{3}.+514
         )
-    }ix;
+    }x;
 
     return 1 if $argv1 =~ $regex;
     return 0;
@@ -48,33 +48,21 @@ sub true {
     my $argvs = shift // return undef;
 
     return undef unless ref $argvs eq 'Sisimai::Data';
-    return 1 if $argvs->reason eq __PACKAGE__->text;
+    return 1 if $argvs->reason eq 'mesgtoobig';
 
     require Sisimai::SMTP::Status;
     my $statuscode = $argvs->deliverystatus // '';
-    my $diagnostic = $argvs->diagnosticcode // '';
     my $tempreason = Sisimai::SMTP::Status->name($statuscode);
-    my $reasontext = __PACKAGE__->text;
-    my $v = 0;
 
-    if( $tempreason eq $reasontext ) {
-        # Delivery status code points "mesgtoobig".
-        # Status: 5.3.4
-        # Diagnostic-Code: SMTP; 552 5.3.4 Error: message file too big
-        $v = 1;
+    # Delivery status code points "mesgtoobig".
+    # Status: 5.3.4
+    # Diagnostic-Code: SMTP; 552 5.3.4 Error: message file too big
+    return 1 if $tempreason eq 'mesgtoobig';
 
-    } else {
-        if( $tempreason eq 'exceedlimit' || $statuscode eq '5.2.3' ) {
-            #  5.2.3   Message length exceeds administrative limit
-            $v = 0;
-
-        } else {
-            # Check the value of Diagnosic-Code: header with patterns
-            $v = 1 if __PACKAGE__->match($diagnostic);
-        }
-    }
-
-    return $v;
+    #  5.2.3   Message length exceeds administrative limit
+    return 0 if( $tempreason eq 'exceedlimit' || $statuscode eq '5.2.3' );
+    return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);
+    return 0;
 }
 
 1;
@@ -137,7 +125,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

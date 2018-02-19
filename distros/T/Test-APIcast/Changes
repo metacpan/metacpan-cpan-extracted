@@ -1,5 +1,12 @@
 Revision history for Perl extension Test-APIcast
 
+0.08 2018-02-14T07:37:23Z
+    - `env_to_apicast` to set ENV to APIcast
+    - `env` block in tests to define hash with environment
+
+0.07 2018-02-13T14:06:10Z
+    - Allow defining TEST_NGINX_MANAGEMENT_SERVER
+
 0.06 2018-02-02T10:31:00Z
     - Do not require configuration file (for apicast-cli compatibility)
     - Print APIcast command when DEBUG env is set

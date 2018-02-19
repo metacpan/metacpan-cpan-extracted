@@ -1,6 +1,11 @@
 Changelog for Mojolicious-Plugin-AutoSecrets
 
-0.002 2017-04-27T16:17:04
+0.003 2018-02-11T05:34:35
+ - Remove stray VERSION assignment (Meredith Howard)
+ - v0.002 (Meredith Howard)
+ - Switch to Mojo::File slurp for >7.31.  Fixes #1 (Meredith Howard)
+
+0.002 2017-04-27T16:17:04Z
  - Switch to Mojo::File slurp for >7.31.  Fixes #1 (Meredith Howard)
 
 0.001 2016-11-05T19:39:10Z

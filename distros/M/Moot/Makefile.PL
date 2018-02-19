@@ -12,7 +12,13 @@ my %prereq = (
 ##-- ensure mininum libmoot version
 my $moot_min_version = "2.0.10";
 if (Alien::Moot->install_type ne 'system') {
-  my $moot_alien_version = Alien::Moot->pkgconfig('moot')->keyword('Version');
+  my $moot_alien_version = (Alien::Moot->can('pkgconfig')
+			    ? Alien::Moot->pkgconfig('moot')->keyword('Version') ##-- RT bug #124235 with Alien::Base v0.41
+			    : (Alien::Moot->can('config')
+			       ? Alien::Moot->config('version')			 ##-- Alien::Base >= v0.41
+			       : undef));
+  die("Failed to determine \$moot_alien_version") if (!defined($moot_alien_version));
+
   (my $v_alien = $moot_alien_version) =~ s/\-/_/g;
   die("Required library libmoot >= v$moot_min_version not found; we have v$moot_alien_version\n")
     if (version->parse($v_alien) < version->parse($moot_min_version));

@@ -1,8 +1,5 @@
 package WWW::Curl::UserAgent;
-{
-  $WWW::Curl::UserAgent::VERSION = '0.9.6';
-}
-
+$WWW::Curl::UserAgent::VERSION = '0.9.8';
 # ABSTRACT: UserAgent based on libcurl
 
 use Moose;
@@ -307,13 +304,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 WWW::Curl::UserAgent - UserAgent based on libcurl
 
 =head1 VERSION
 
-version 0.9.6
+version 0.9.8
 
 =head1 SYNOPSIS
 
@@ -558,33 +557,37 @@ been received and handler have been processed.
 
 A test with the tools/benchmark.pl script against loadbalanced webserver
 performing a get requests to a simple echo API on an Intel i5 M 520 with
-Fedora 18 gave the following results:
+Fedora 19 gave the following results:
 
     500 requests (sequentially, 500 iterations):
-    +--------------------------+-----------+------+------+------------+------------+
-    |        User Agent        | Wallclock |  CPU |  CPU |  Requests  | Iterations |
-    |                          |  seconds  |  usr |  sys | per second | per second |
-    +--------------------------+-----------+------+------+------------+------------+
-    | LWP::Parallel::UserAgent |    14     | 0.91 | 0.30 |    35.7    |    413.2   |
-    +--------------------------+-----------+------+------+------------+------------+
-    | LWP::UserAgent           |    15     | 1.00 | 0.30 |    33.3    |    384.6   |
-    +--------------------------+-----------+------+------+------------+------------+
-    | WWW::Curl::Simple        |    15     | 0.68 | 0.35 |    33.3    |    485.4   |
-    +--------------------------+-----------+------+------+------------+------------+
-    | WWW::Curl::UserAgent     |     8     | 0.52 | 0.06 |    62.5    |    862.1   |
-    +--------------------------+-----------+------+------+------------+------------+
+    +-------------------------------+-----------+------+------+------------+------------+
+    |          User Agent           | Wallclock |  CPU |  CPU |  Requests  | Iterations |
+    |                               |  seconds  |  usr |  sys | per second | per second |
+    +-------------------------------+-----------+------+------+------------+------------+
+    | LWP::UserAgent 6.05           |    21     | 1.10 | 0.20 |    23.8    |    384.6   |
+    +-------------------------------+-----------+------+------+------------+------------+
+    | LWP::Parallel::UserAgent 2.61 |    20     | 1.13 | 0.22 |    25.0    |    370.4   |
+    +-------------------------------+-----------+------+------+------------+------------+
+    | WWW::Curl::Simple 0.100191    |    95     | 0.66 | 0.27 |     5.3    |    537.6   |
+    +-------------------------------+-----------+------+------+------------+------------+
+    | Mojo::UserAgent 4.83          |    10     | 1.19 | 0.08 |    50.0    |    393.7   |
+    +-------------------------------+-----------+------+------+------------+------------+
+    | WWW::Curl::UserAgent 0.9.6    |    10     | 0.55 | 0.06 |    50.0    |    819.7   |
+    +-------------------------------+-----------+------+------+------------+------------+
 
     500 requests (5 in parallel, 100 iterations):
-    +--------------------------+-----------+-------+-------+------------+------------+
-    |        User Agent        | Wallclock |  CPU  |  CPU  |  Requests  | Iterations |
-    |                          |  seconds  |  usr  |  sys  | per second | per second |
-    +--------------------------+-----------+-------+-------+------------+------------+
-    | LWP::Parallel::UserAgent |      9    |  1.37 |  0.34 |     55.6   |     58.5   |
-    +--------------------------+-----------+-------+-------+------------+------------+
-    | WWW::Curl::Simple        |    135    | 57.61 | 19.85 |      3.7   |      1.3   |
-    +--------------------------+-----------+-------+-------+------------+------------+
-    | WWW::Curl::UserAgent     |      2    |  0.40 |  0.09 |    250.0   |    204.1   |
-    +--------------------------+-----------+-------+-------+------------+------------+
+    +-------------------------------+-----------+--------+--------+------------+------------+
+    |          User Agent           | Wallclock |   CPU  |   CPU  |  Requests  | Iterations |
+    |                               |  seconds  |   usr  |   sys  | per second | per second |
+    +-------------------------------+-----------+--------+--------+------------+------------+
+    | LWP::Parallel::UserAgent 2.61 |     10    |   1.26 |   0.26 |     50.0   |     65.8   |
+    +-------------------------------+-----------+--------+--------+------------+------------+
+    | WWW::Curl::Simple 0.100191    |    815    | 270.16 | 191.76 |      0.6   |      0.2   |
+    +-------------------------------+-----------+--------+--------+------------+------------+
+    | Mojo::UserAgent 4.83          |      3    |   1.03 |   0.04 |    166.7   |     93.5   |
+    +-------------------------------+-----------+--------+--------+------------+------------+
+    | WWW::Curl::UserAgent 0.9.6    |      3    |   0.42 |   0.06 |    166.7   |    208.3   |
+    +-------------------------------+-----------+--------+--------+------------+------------+
 
 =head1 SEE ALSO
 
@@ -611,7 +614,7 @@ Othello Maurer
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by XING AG.
+This software is copyright (c) 2018 by XING AG.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

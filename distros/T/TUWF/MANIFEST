@@ -10,6 +10,7 @@ lib/TUWF.pm
 lib/TUWF.pod
 lib/TUWF/DB.pm
 lib/TUWF/DB.pod
+lib/TUWF/Intro.pod
 lib/TUWF/Misc.pm
 lib/TUWF/Misc.pod
 lib/TUWF/Request.pm

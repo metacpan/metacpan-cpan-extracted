@@ -1,12 +1,15 @@
-Revision history for JSON-Decode-Regexp
+0.100   2018-02-14 (PERLANCAR)
+
+	- Replace \d with [0-9] [RT#124392].
+
 
 0.09    2016-11-04 (PERLANCAR)
 
 	- Grok hex and octal escape in string.
 
-	- [security] Do not use Perl's eval() to avoid arbitrary code
-	  execution via perl quoting, e.g. this JSON '"@{[1+1]}"' (reported
-	  by Андрей Шедько/ayshedko).
+	- [security] Do not use Perl's eval() for decoding string, to avoid
+	  arbitrary code execution via perl quoting, e.g. this JSON '"@{[1+1]}"'
+	  (reported by Андрей Шедько/ayshedko).
 
 
 0.08    2016-03-31 (PERLANCAR)

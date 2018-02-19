@@ -16,6 +16,9 @@ t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/01-basic.t
 t/02-exports.t
+t/03-sequences.t
+t/responses/after_login.html
+t/responses/failed_load_header.html
 xt/author/00-compile.t
 xt/author/pod-syntax.t
 xt/kwalitee.t

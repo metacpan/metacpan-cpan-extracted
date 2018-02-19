@@ -42,18 +42,24 @@ my $meta = {
                               },
                             },
                             test => {
-                              recommends => { "Software::License" => 0.103008 },
+                              recommends => {
+                                              "File::BaseDir"     => 0,
+                                              "List::MoreUtils"   => 0,
+                                              "Software::License" => 0.103008,
+                                              "YAML::XS"          => 0,
+                                            },
                               requires   => {
-                                              "Test::More"         => 0.98,
-                                              "Test::Requires"     => 0,
-                                              "Test::Roo"          => 0,
-                                              "Test::Script"       => 1.09,
-                                              "UNIVERSAL::require" => 0,
+                                              "File::Basename"        => 0,
+                                              "Test::Builder::Module" => 0,
+                                              "Test::More"            => 0.98,
+                                              "Test::Requires"        => 0,
+                                              "Test::Script"          => 1.09,
+                                              "UNIVERSAL::require"    => 0,
                                             },
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.32" },
+                            "App::Licensecheck" => { file => "lib/App/Licensecheck.pm", version => "v3.0.33" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -68,9 +74,9 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.0.32",
+  "version"            => "v3.0.33",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
-  "x_help_wanted"      => ["documenter", "tester"],
+  "x_help_wanted"      => ["tester", "documenter"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },
 };
 

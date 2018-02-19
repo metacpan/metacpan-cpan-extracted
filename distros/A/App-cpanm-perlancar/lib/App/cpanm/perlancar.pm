@@ -1,7 +1,7 @@
 package App::cpanm::perlancar;
 
-our $DATE = '2018-01-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 
@@ -19,7 +19,7 @@ App::cpanm::perlancar - Install modules from CPAN (PERLANCAR's flavor)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::cpanm::perlancar (from Perl distribution App-cpanm-perlancar), released on 2018-01-15.
+This document describes version 0.003 of App::cpanm::perlancar (from Perl distribution App-cpanm-perlancar), released on 2018-02-18.
 
 =head1 DESCRIPTION
 

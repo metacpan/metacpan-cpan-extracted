@@ -8,23 +8,17 @@ package RDF::RDFa::Generator;
 
 use 5.008;
 use strict;
+
 use warnings;
 
-our $VERSION = '0.192';
+
+our $VERSION = '0.200';
 
 use RDF::RDFa::Generator::HTML::Head;
 use RDF::RDFa::Generator::HTML::Hidden;
 use RDF::RDFa::Generator::HTML::Pretty;
-use RDF::Trine;
+use Carp;
 
-BEGIN
-{
-	$RDF::Trine::Serializer::serializer_names{ 'rdfa' }   = __PACKAGE__;
-	foreach my $type (qw(application/xhtml+xml text/html))
-	{
-		$RDF::Trine::Serializer::media_types{ $type }   = __PACKAGE__;
-	}
-}
 
 =head1 DESCRIPTION
 
@@ -46,7 +40,9 @@ Options include:
 
 =item * B<base> - the base URL where the output data will be published. This allows in some cases for the generated RDFa to include relative URIs.
 
-=item * B<data_context> - if non-null, a URI (string) which indicates the context (named graph) containing the data to generate RDFa for.
+=item * B<data_context> - if non-null, an L<Attean> Blank or IRI object or an L<RDF::Trine::Node> which indicates the context (named graph) containing the data to generate RDFa for.
+
+=item * B<namespacemap> - a L<URI::NamespaceMap> object containing preferred CURIE prefixes. This is the preferred method, see note below. 
 
 =item * B<namespaces> - a {prefix=>uri} hashref of preferred CURIE prefixes. 
 
@@ -77,14 +73,14 @@ sub new
 
 =over 4
 
-=item C<< $gen->create_document($model) >>
+=item C<< $gen->create_document($model, %opts) >>
 
 Creates a new RDFa file containing triples. $model is an RDF::Trine::Model object
 providing the triples. Returns an XML::LibXML::Document object suitable
-for serialising using its C<toString> method.
+for serializing using its C<toString> method.
 
 If you're planning on serving the RDFa with the text/html media type, then
-it is recommended that you use HTML::HTML5::Writer to serialise the
+it is recommended that you use HTML::HTML5::Writer to serialize the
 document rather than C<toString>.
 
 Can also be called as a class method:
@@ -92,6 +88,8 @@ Can also be called as a class method:
  $document = RDF::RDFa::Generator->create_document($model)
  # Same as:
  # $document = RDF::RDFa::Generator->new->create_document($model)
+
+Options can also be passed as a HASH. This is typically used for style-specific options.
 
 =cut
 
@@ -107,7 +105,7 @@ sub create_document
 Injects an existing document with triples. $document is an XML::LibXML::Document
 to inject, or a well-formed XML string. $model is an RDF::Trine::Model object providing
 the triples. Returns an XML::LibXML::Document object suitable
-for serialising using its C<toString> method.
+for serializing using its C<toString> method.
 
 See C<create_document> for information about serving the RDFa with the
 text/html media type.
@@ -151,44 +149,72 @@ sub nodes
 
 =back
 
-Additionally the methods C<serialize_model_to_file>, C<serialize_model_to_string>,
-C<serialize_iterator_to_file> and C<serialize_iterator_to_string> are provided for
-compatibility with the L<RDF::Trine::Serializer> interface.
+=head1 UPGRADING TO 0.200
+
+The recommended upgrade path is to migrate your application to use
+L<Attean> rather than L<RDF::Trine> as your RDF library. If that is
+not an option, you may continue to use L<RDF::Trine>, by using a
+compatibility layer.  If you are using this module directly, to
+upgrade from earlier releases, you would simply add
+
+ use RDF::TrineX::Compatibility::Attean;
+
+alongside the import of this module. It is in a separate distribution
+that needs to be installed. If you use the L<RDF::Trine::Serializer>
+methods, you should instead use L<RDF::Trine::Serializer::RDFa>.
+
+=head1 NOTE
+
+Version 0.200 introduced a large number of changes to be compatible
+with both L<Attean> and L<RDF::Trine>. Some of these were
+backwards-incompatible, some were to support new features, such as the
+use of L<URI::NamespaceMap>.
+
+=head2 Backwards-incompatible changes
+
+The methods C<serialize_model_to_file>, C<serialize_model_to_string>,
+C<serialize_iterator_to_file> and C<serialize_iterator_to_string> that
+were provided for compatibility with the L<RDF::Trine::Serializer>
+interface have been moved to a module L<RDF::Trine::Serializer::RDFa>
+that has to be installed separately to use this with L<RDF::Trine>.
+
+C<data_context> previously accepted a plain-text string URI. Now, it
+requires an appropriate object, as documented.
+
+Since RDF 1.1 abandons untyped literals, this module also ceases to
+emit them.
+
+=head2 Namespace mappings
+
+The way namespace mappings are handled have been rewritten. Now, the
+preferred method to add them is to pass an L<URI::NamespaceMap> object
+to C<namespacemap>. This will override any other options.
+
+The namespace mappings for the following prefixes will always be
+added: C<rdfa>, C<rdf>, C<rdfs> and C<xsd>.
+
+If L<URI::NamespaceMap> is not used, but C<namespaces> is given as a
+hashref of prefix-URI pairs, the pairs will be added. If neither are
+given, all mappings from L<RDF::NS::Curated>, which includes all if
+RDFa Initial Context will be added. Finally, any pairs from the
+deprecated C<ns> option will be added, but a warning will be emitted.
 
 =cut
 
-sub serialize_model_to_string
-{
-	my ($proto, $model) = @_;
-	return $proto->create_document($model)->toString;
+sub serialize_model_to_string {
+  croak 'serialize_model_to_string have been to moved RDF::Trine::Serializer::RDFa';
 }
 
-sub serialize_model_to_file
-{
-	my ($proto, $fh, $model) = @_;
-	print {$fh} $proto->create_document($model)->toString;
+sub serialize_model_to_file {
+  croak 'serialize_model_to_file have been to moved RDF::Trine::Serializer::RDFa';
 }
 
-sub serialize_iterator_to_string
-{
-	my ($proto, $iter) = @_;
-	my $model = RDF::Trine::Model->temporary_model;
-	while (my $st = $iter->next)
-	{
-		$model->add_statement($st);
-	}
-	return $proto->serialize_model_to_string($model);
+sub serialize_iterator_to_string {
+  croak 'serialize_iterator_to_string have been to moved RDF::Trine::Serializer::RDFa';
 }
 
-sub serialize_iterator_to_file
-{
-	my ($proto, $fh, $iter) = @_;
-	my $model = RDF::Trine::Model->temporary_model;
-	while (my $st = $iter->next)
-	{
-		$model->add_statement($st);
-	}
-	return $proto->serialize_model_to_file($fh, $model);
+sub serialize_iterator_to_file {
+  croak 'serialize_iterator_to_string have been to moved RDF::Trine::Serializer::RDFa';
 }
 
 1;
@@ -201,10 +227,12 @@ Please report any bugs to L<https://github.com/kjetilk/p5-rdf-rdfa-generator/iss
 
 =head1 SEE ALSO
 
-L<HTML::HTML5::Writer>, L<XML::LibXML>, L<RDF::RDFa::Parser>, L<RDF::Trine>,
-L<RDF::Prefixes>.
+You may want to use the framework-specific frontends: L<RDF::Trine::Serializer::RDFa> or L<AtteanX::Serializer::RDFa>.
 
-L<http://www.perlrdf.org/>.
+Other relevant modules:
+
+L<HTML::HTML5::Writer>, L<XML::LibXML>, L<RDF::RDFa::Parser>, L<RDF::Trine>,
+L<URI::NamespaceMap>, L<Attean>.
 
 =head1 AUTHOR
 
@@ -214,7 +242,7 @@ Kjetil Kjernsmo E<lt>kjetilk@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (C) 2010 by Toby Inkster, 2017 Kjetil Kjernsmo
+Copyright (C) 2010 by Toby Inkster, 2017, 2018 Kjetil Kjernsmo
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

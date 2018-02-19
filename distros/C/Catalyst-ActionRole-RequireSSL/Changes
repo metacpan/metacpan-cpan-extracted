@@ -1,3 +1,8 @@
+1.00      2018-02-16 00:13:38+03:00 Asia/Qatar
+
+- change HTTP status code from 302 to 301
+- some cleanup in the Git repository and tests
+
 0.07      2013-09-05 20:14:06 UTC
 
 - Fix URI building process
@@ -23,7 +28,7 @@
 
 - Allow chained actions to override parent SSL defaults. This
 will allow you to make every action under a chain not ssl, or an action under
-a Does("RequireSSL") chain Plain. 
+a Does("RequireSSL") chain Plain.
 - Tests
 
 0.01

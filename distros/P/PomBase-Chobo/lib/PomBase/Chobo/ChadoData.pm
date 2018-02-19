@@ -35,13 +35,16 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Mouse;
+
+use Carp qw(confess);
 
 has dbh => (is => 'ro');
 
 has cv_data => (is => 'ro', init_arg => undef, lazy_build => 1);
+has cvprop_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 has db_data => (is => 'ro', init_arg => undef, lazy_build => 1);
 
 has cvterm_data => (is => 'ro', init_arg => undef, lazy_build => 1);
@@ -110,6 +113,31 @@ sub _build_cv_data
 
   my ($cvs_by_cv_id, $cvs_by_cv_name) = $self->_get_cv_or_db('cv');
   return { by_id => $cvs_by_cv_id, by_name => $cvs_by_cv_name };
+}
+
+sub _build_cvprop_data
+{
+  my $self = shift;
+
+  my %by_cv_id = ();
+
+  my $proc = sub {
+    my $row_ref = shift;
+
+    my $cv_id = $row_ref->{cv_id};
+
+    my %data = (
+      cv_id => $cv_id,
+      type_id => $row_ref->{type_id},
+      value => $row_ref->{value}
+    );
+
+    push @{$by_cv_id{$cv_id}}, \%data;
+  };
+
+  $self->_execute("select cv_id, type_id, value from cvprop", $proc);
+
+  return \%by_cv_id;
 }
 
 sub get_cv_by_name
@@ -265,6 +293,10 @@ sub get_cvterms_by_cv_id
   my $self = shift;
   my $cv_id = shift;
 
+  if (!defined $cv_id) {
+    confess "undefined cv_id passed to get_cvterms_by_cv_id()";
+  }
+
   return $self->cvterm_data()->{by_cv_id}->{$cv_id};
 }
 
@@ -281,6 +313,35 @@ sub get_all_cvterms
   my $self = shift;
 
   return values %{$self->cvterm_data()->{by_termid}};
+}
+
+sub get_cvterm_by_name
+{
+  my $self = shift;
+  my $cv_name = shift;
+  my $cvterm_name = shift;
+
+  my $cv = $self->get_cv_by_name($cv_name);
+
+  return $self->get_cvterms_by_cv_id($cv->{cv_id})->{$cvterm_name};
+}
+
+sub get_cvprop_values
+{
+  my $self = shift;
+  my $cv_name = shift;
+  my $prop_type_name = shift;
+
+  my $cv = $self->get_cv_by_name($cv_name);
+  my $cvprops = $self->cvprop_data()->{$cv->{cv_id}};
+  my $prop_type = $self->get_cvterm_by_name($cv_name, $prop_type_name);
+
+  return map {
+    $_->{value}
+  }
+  grep {
+    $_->{type_id} == $prop_type->{cvterm_id}
+  } @{$cvprops // []};
 }
 
 sub get_all_termids

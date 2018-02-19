@@ -1,7 +1,7 @@
 ---
 abstract: 'Module for simple configure file parsing with arrays.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
   Error::Pure::Utils: 0.08
@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,4 +35,4 @@ resources:
   homepage: https://github.com/tupinek/Config-Dot-Array
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/tupinek/Config-Dot-Array
-version: '0.05'
+version: '0.06'

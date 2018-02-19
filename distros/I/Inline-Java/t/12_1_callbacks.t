@@ -5,6 +5,7 @@ use Inline (
 	Java => 'DATA',
 	STUDY => ['org.perl.inline.java.InlineJavaPerlCaller'],
 	STARTUP_DELAY => 20,	
+	EXTRA_JAVA_ARGS => '-Xmx256m',
 ) ;
 
 use Inline::Java qw(cast caught) ;
@@ -288,9 +289,9 @@ class t15 extends InlineJavaPerlCaller {
 
 	public int add_via_perl(int a, int b) throws InlineJavaException, InlineJavaPerlException {
 		String val = (String)CallPerlSub("main::add", 
-			new Object [] {new Integer(a), new Integer(b)}) ;
+			new Object [] {Integer.valueOf(a), Integer.valueOf(b)}) ;
 
-		return new Integer(val).intValue() ;
+		return Integer.valueOf(val).intValue() ;
 	}
 
 	public int [] incr_via_perl(int a[]) throws InlineJavaException, InlineJavaPerlException {
@@ -318,24 +319,24 @@ class t15 extends InlineJavaPerlCaller {
 
 	public int mul_via_perl(int a, int b) throws InlineJavaException, InlineJavaPerlException {
 		String val = (String)CallPerlSub("main::mul", 
-			new Object [] {new Integer(a), new Integer(b)}) ;
+			new Object [] {Integer.valueOf(a), Integer.valueOf(b)}) ;
 
-		return new Integer(val).intValue() ;
+		return Integer.parseInt(val) ;
 	}
 
 	public int add_via_perl_via_java(int a, int b) throws InlineJavaException, InlineJavaPerlException {
 		String val = (String)CallPerlSub("main::add_via_java", 
-			new Object [] {new Integer(a), new Integer(b)}) ;
+			new Object [] {Integer.valueOf(a), Integer.valueOf(b)}) ;
 
-		return new Integer(val).intValue() ;
+		return Integer.parseInt(val);
 	}
 
 	static public int add_via_perl_via_java_t(t15 t, int a, int b) throws InlineJavaException, InlineJavaPerlException {
 		InlineJavaPerlCaller c = new InlineJavaPerlCaller() ;
 		String val = (String)c.CallPerlSub("main::add_via_java_t", 
-			new Object [] {t, new Integer(a), new Integer(b)}) ;
+			new Object [] {t, Integer.valueOf(a), Integer.valueOf(b)}) ;
 
-		return new Integer(val).intValue() ;
+		return Integer.parseInt(val);
 	}
 
 
@@ -343,8 +344,8 @@ class t15 extends InlineJavaPerlCaller {
 		int ret = 0 ;
 		for (int i = 0 ; i < b ; i++){
 			String val = (String)CallPerlSub("add_via_java", 
-				new Object [] {new Integer(ret), new Integer(a)}) ;
-			ret = new Integer(val).intValue() ;
+				new Object [] {Integer.valueOf(ret), Integer.valueOf(a)}) ;
+			ret = Integer.parseInt(val);
 		}
 		return ret ;
 	}
@@ -368,7 +369,7 @@ class t15 extends InlineJavaPerlCaller {
 		}
 		else{
 			return (String)CallPerlSub("twister", 
-				new Object [] {new Integer(max), new Integer(cnt+1), new Integer(explode)}) ;
+				new Object [] {Integer.valueOf(max), Integer.valueOf(cnt+1), Integer.valueOf(explode)}) ;
 		}
 	}
 

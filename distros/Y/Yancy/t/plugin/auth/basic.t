@@ -79,7 +79,7 @@ subtest 'unauthenticated user cannot admin' => sub {
 };
 
 subtest 'user can login' => sub {
-    $t->get_ok( '/yancy/login' )
+    $t->get_ok( '/yancy/login' => { Referer => '/' } )
       ->status_is( 200 )
       ->element_exists(
           'form[method=POST][action=/yancy/login]', 'form exists',
@@ -92,9 +92,17 @@ subtest 'user can login' => sub {
           'form[method=POST][action=/yancy/login] input[name=password]',
           'password input exists',
       )
+      ->element_exists(
+          'form[method=POST][action=/yancy/login] input[name=return_to][value=/]',
+          'return to field exists with correct value',
+      )
       ;
 
-    $t->post_ok( '/yancy/login', form => { username => 'doug', password => '123qwe' } )
+    $t->post_ok( '/yancy/login', form => { username => 'doug', password => '123', } )
+      ->status_is( 400 )
+      ->header_isnt( Location => '/yancy' );
+
+    $t->post_ok( '/yancy/login', form => { username => 'doug', password => '123qwe', } )
       ->status_is( 303 )
       ->header_is( Location => '/yancy' );
 };
@@ -127,6 +135,65 @@ subtest 'user can logout' => sub {
       ->status_is( 200, 'User is logged out successfully' );
     $t->get_ok( '/yancy' )
       ->status_is( 401, 'User is not authorized anymore' );
+};
+
+subtest 'standalone plugin' => sub {
+    my $t = Test::Mojo->new( Mojolicious->new );
+
+    my $base_route = $t->app->routes->any( '' );
+    $base_route->get( '/' )->to( cb => sub { shift->render( data => 'Hello' ) } );
+
+    $t->app->plugin( 'Config' );
+    $t->app->plugin( 'Yancy', {
+        %{ $t->app->config },
+        route => $base_route->any( '/yancy' ),
+    } );
+
+    unshift @{$t->app->plugins->namespaces}, 'Yancy::Plugin';
+
+    $t->app->plugin( 'Auth::Basic', {
+        collection => 'users',
+        username_field => 'username',
+        password_field => 'password', # default
+        password_digest => {
+            type => 'SHA-1',
+        },
+        route => $base_route,
+    });
+
+    $t->get_ok( '/' )
+      ->status_is( 401, 'User is not authorized for root' )
+      ->header_like( 'Content-Type' => qr{^text/html} )
+      ;
+    $t->get_ok( '/yancy' )
+      ->status_is( 401, 'User is not authorized for admin app' )
+      ->header_like( 'Content-Type' => qr{^text/html} )
+      ;
+    $t->get_ok( '/yancy/api' )
+      ->status_is( 401, 'User is not authorized for API spec' )
+      ->header_like( 'Content-Type' => qr{^application/json} )
+      ;
+    $t->post_ok( '/login', form => {
+            username => 'doug',
+            password => 'qwe123',
+            return_to => '/',
+        } )
+      ->status_is( 303 )
+      ->header_is( Location => '/' );
+
+    $t->get_ok( '/' )
+      ->status_is( 200, 'User is authorized for root' )
+      ->content_is( 'Hello' )
+      ->header_like( 'Content-Type' => qr{^text/html} )
+      ;
+    $t->get_ok( '/yancy' )
+      ->status_is( 200, 'User is authorized for admin app' )
+      ->header_like( 'Content-Type' => qr{^text/html} )
+      ;
+    $t->get_ok( '/yancy/api' )
+      ->status_is( 200, 'User is authorized for API spec' )
+      ->header_like( 'Content-Type' => qr{^application/json} )
+      ;
 };
 
 done_testing;

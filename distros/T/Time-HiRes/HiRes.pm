@@ -50,7 +50,7 @@ our @EXPORT_OK = qw (usleep sleep ualarm alarm gettimeofday time tv_interval
 		 stat lstat utime
 		);
 
-our $VERSION = '1.9753';
+our $VERSION = '1.9754';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -94,13 +94,6 @@ sub import {
 XSLoader::load( 'Time::HiRes', $XS_VERSION );
 
 # Preloaded methods go here.
-
-sub tv_interval {
-    # probably could have been done in C
-    my ($a, $b) = @_;
-    $b = [gettimeofday()] unless defined($b);
-    (${$b}[0] - ${$a}[0]) + ((${$b}[1] - ${$a}[1]) / 1_000_000);
-}
 
 # Autoload methods go after =cut, and are processed by the autosplit program.
 

@@ -7,6 +7,14 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.33	2018-02-15
+
+ [ Test Suite ]
+ - Extend testsuite to 2410 succeeding tests and 5313 TODOs (from 227 and 7
+   TODOs), when ScanCode v2.1.1 test data is available below
+   $ENV{XDG_DATA_DIRS} + tests/ScanCode/
+ - Rewrite testsuite to use Test::Builder::Module (not Test::Roo).
+
 v3.0.32	2018-02-09
 
  [ REGRESSIONS ]

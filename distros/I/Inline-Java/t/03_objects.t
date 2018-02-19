@@ -135,18 +135,18 @@ class types3 {
 		return o ;
 	}
 
-	public ArrayList get_unbound(){
-		ArrayList al = new ArrayList() ;
+	public ArrayList<String> get_unbound(){
+		ArrayList<String> al = new ArrayList<>() ;
 		al.add(0, "al_elem") ;
 
 		return al ;
 	}
 
-	public String send_unbound(ArrayList al){
+	public String send_unbound(ArrayList<String> al){
 		return (String)al.get(0) ;
 	}
 
 	public Object _olong(){
-		return new Long("12345") ;
+		return Long.valueOf("12345") ;
 	}
 }

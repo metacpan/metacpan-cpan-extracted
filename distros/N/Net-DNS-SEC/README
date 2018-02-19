@@ -6,7 +6,7 @@ Net::DNS::SEC - DNSSEC extensions to Net::DNS
    -----------
 
 This module is designed as an extension the Net::DNS package
-(http://www.net-dns.org/). 
+(http://search.cpan.org/dist/Net-DNS/).
 
 The module implements the cryptographic signature generation and
 verification functions that are relevant for DNSSEC operations.
@@ -71,21 +71,16 @@ The availability of prerequisites for Net::DNS::SEC is tested at
 installation time.  These are the packages that need to be
 available:
 
-	Crypt::OpenSSL::Bignum
-	Crypt::OpenSSL::DSA
-	Crypt::OpenSSL::RSA
+	Digest::SHA
+	File::Find
 	File::Spec
 	MIME::Base64
 	Test::More
 
-Optional packages extend the repertoire of encryption algorithms.
-Version incompatibilities are reported at installation time, which
-may be corrected following installation.
+The cryptographic heavy lifting is performed using the OpenSSL
+libcrypto library distributed under separate license.
 
-	Crypt::OpenSSL::EC
-	Crypt::OpenSSL::ECDSA
-	Digest::GOST
-	Digest::SHA
+You will also require a C compiler.
 
 
 4. INSTALLATION
@@ -97,21 +92,29 @@ any of the required modules is missing.
 
 To build this module, run the following commands:
 
-	tar xvzf Net-DNS-SEC-?.??.tar.gz
-	cd  Net-DNS-SEC-?.??
+	tar xvzf Net-DNS-SEC-1.??.tar.gz
+	cd  Net-DNS-SEC-1.??
 	perl Makefile.PL
 	make 
 	make test
 	make install
 
 'make test' will do some tests that should all succeed once all
-dependencies are satisfied. Please report failures during the
+dependencies are satisfied. Please report any failure during the
 test phase.
 
 Alternatively, install the package using CPAN:
 
 	perl -MCPAN -e shell;
 	cpan> install Net::DNS::SEC
+
+To build a libcrypto.so library, run the following:
+
+	tar xvzf openssl-1.1.?.tar.gz
+	cd openssl-1.1.?
+	./config shared
+	make	# copy libcrypto.so.1.1 into /usr/lib
+		# required *h files to /usr/local/include/openssl
 
 
 5. MAINTENANCE
@@ -149,11 +152,8 @@ demo/make-signed-keyset	Creates a self-signed keyset from a BIND
 8. ACKNOWLEDGEMENTS
    ----------------
 
-Thanks Ian Robertson, T.J. Mather, and Mike McCauley for their support
-and help with the Crypt::OpenSSL::[RSA|DSA|EC] modules.
-
-Mike McCauley created Crypt::OpenSSL::ECDSA specifically for this
-development.
+Thanks are due to Eric Young and the many developers and contributors
+to the OpenSSL project and cryptographic library.
 
   
 9. COPYRIGHT
@@ -185,4 +185,4 @@ DEALINGS IN THE SOFTWARE.
 
 
 ------------------------------------------------------------------------------
-$Id: README 1378 2015-07-14 07:50:38Z willem $
+$Id: README 1621 2018-01-26 14:18:58Z willem $

@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast::Xml::BlastOutput;
 # ABSTRACT: NCBI BLAST DTD-derived internal class
-$Bio::FastParsers::Blast::Xml::BlastOutput::VERSION = '0.180330';
+$Bio::FastParsers::Blast::Xml::BlastOutput::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -165,15 +165,15 @@ Bio::FastParsers::Blast::Xml::BlastOutput - NCBI BLAST DTD-derived internal clas
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 
-    # TODO
+    # see Bio::FastParsers::Blast::Xml
 
 =head1 DESCRIPTION
 
-    # TODO
+This class implements the C<BlastOutput> level of the XML BLAST parser.
 
 =head1 ATTRIBUTES
 

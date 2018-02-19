@@ -20,7 +20,7 @@ use Config;
 
 use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 
-$VERSION = '0.19';
+$VERSION = '0.21';
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
@@ -2272,12 +2272,14 @@ L<rrdtool.pl|http://cpansearch.perl.org/src/DOUGLEITH/RRD-Editor-0.12/scripts/rr
  
 =head1 VERSION
  
-Ver 0.19
+Ver 0.21
  
 =head1 AUTHOR
  
-Doug Leith 
-    
+Doug Leith
+
+MaxiM Basunov
+
 =head1 BUGS
  
 Please report any bugs or feature requests to C<bug-rrd-db at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=RRD-Editor>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.

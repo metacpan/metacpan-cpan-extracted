@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
 use Markdent::Types;
 use Module::Runtime qw( require_module );
 use Moose::Meta::Class;
-use Params::ValidationCompiler qw( validation_for );
+use Params::ValidationCompiler 0.14 qw( validation_for );
 use Specio::Declare;
 use Try::Tiny;
 
@@ -247,7 +247,7 @@ Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -339,7 +339,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

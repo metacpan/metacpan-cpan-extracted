@@ -206,7 +206,7 @@ sub setup ($) {
 
     my($header);
     $header = $self->{_in}->getline;
-    my $e = $csv->parse($header) or croak $self->{_prog} . ": cannot parse header $header\n";
+    my $e = $csv->parse($header) or croak($self->{_prog} . ": cannot parse header $header\n");
     my(@columns) = Fsdb::IO::clean_potential_columns($csv->fields());
 
     $self->finish_io_option('output', -fscode => $self->{_fscode}, -cols => \@columns);

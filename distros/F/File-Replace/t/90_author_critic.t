@@ -22,8 +22,7 @@ How to run coverage tests:
 Running tests on all Perl versions: Install the required Perl versions (see
 list below), note that some test failures in Perl <5.10 can be ignored. In each
 Perl version, install L<App::cpanminus|App::cpanminus> (may need to do this
-manually on Perls <5.8.9), then install L<Test::Fatal|Test::Fatal>, which
-should install dependencies like Test-Simple, as well as
+manually on Perls <5.8.9), then upgrade L<Test::More|Test::More> as well as
 L<App::Prove|App::Prove> for ease of testing (can use C<perlbrew exec> as shown
 below for this). Then:
 

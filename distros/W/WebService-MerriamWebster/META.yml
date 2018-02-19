@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.88'
 configure_requires:
-  Module::Build::Tiny: '0.036'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,16 +21,24 @@ no_index:
     - share
     - eg
     - examples
+    - author
+    - builder
+provides:
+  WebService::MerriamWebster:
+    file: lib/WebService/MerriamWebster.pm
+    version: '0.14'
 requires:
+  HTTP::Tiny: '0'
   Moose: '0'
   URI::Escape: '0'
   XML::LibXML: '0'
   perl: v5.14.0
 resources:
-  bugtracker: https://github.com/swuecho/Net-MW-API/issues
-  homepage: https://github.com/swuecho/Net-MW-API
-  repository: https://github.com/swuecho/Net-MW-API.git
-version: '0.11'
+  bugtracker: https://github.com/swuecho/WebService_MerriamWebster/issues
+  homepage: https://github.com/swuecho/WebService_MerriamWebster
+  repository: git://github.com/swuecho/WebService_MerriamWebster.git
+version: '0.14'
 x_contributors:
-  - 'Hao <echowuhao@gmail.com>'
   - 'Hao Wu <hwu@intellisurvey.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

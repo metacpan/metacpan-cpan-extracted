@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Tester 6.010;
+package Dist::Zilla::App::Tester 6.011;
 # ABSTRACT: testing library for Dist::Zilla::App
 
 use parent 'App::Cmd::Tester::CaptureExternal';
@@ -43,7 +43,7 @@ sub test_dzil {
 }
 
 {
-  package Dist::Zilla::App::Tester::Result 6.010;
+  package Dist::Zilla::App::Tester::Result 6.011;
 
   BEGIN { our @ISA = qw(App::Cmd::Tester::Result); }
 
@@ -126,7 +126,7 @@ Dist::Zilla::App::Tester - testing library for Dist::Zilla::App
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 DESCRIPTION
 
@@ -166,7 +166,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

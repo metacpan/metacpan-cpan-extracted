@@ -11,7 +11,7 @@ use Encode 'encode_utf8';
 use Scalar::Util 'looks_like_number';
 
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 our @EXPORT = ('formValidate', 'mail');
 our @EXPORT_OK = ('uri_escape', 'kv_validate');
 

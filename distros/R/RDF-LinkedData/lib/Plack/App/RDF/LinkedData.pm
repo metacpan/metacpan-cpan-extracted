@@ -15,11 +15,11 @@ Plack::App::RDF::LinkedData - A Plack application for running RDF::LinkedData
 
 =head1 VERSION
 
-Version 1.92
+Version 1.940
 
 =cut
 
- our $VERSION = '1.92';
+ our $VERSION = '1.940';
 
 
 =head1 SYNOPSIS
@@ -361,7 +361,7 @@ sub call {
 	my $ld = $self->{linkeddata};
 
 	# Never return 405 here if writes are enabled by config, only do it if there isn't a read operation and writes are not enabled
-	my $does_read_operation = $self->does_read_operation($req);
+	my $does_read_operation = $self->check_read_operation($req);
 	$ld->does_read_operation($does_read_operation);
 	unless ($does_read_operation || $self->{config}->{writes_enabled}) {
 		return [ 405, [ 'Content-type', 'text/plain' ], [ 'Method not allowed' ] ];
@@ -389,16 +389,16 @@ A method that returns true if the current request will require authorization.
 
 sub auth_required {
 	my ($self, $req) = @_;
-	return ($self->{config}->{writes_enabled} && (! $self->does_read_operation($req)));
+	return ($self->{config}->{writes_enabled} && (! $self->check_read_operation($req)));
 }
 
-=item C<< does_read_operation ( $request ) >>
+=item C<< check_read_operation ( $request ) >>
 
 A method that will return true if the current request is a pure read operation.
 
 =cut
 
-sub does_read_operation {
+sub check_read_operation {
 	my ($self, $req) = @_;
 	my $uri = $req->uri;
 	my $endpoint_path;

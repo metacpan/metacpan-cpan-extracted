@@ -4,24 +4,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject' => qr/\AFailure Notice\z/,
-};
-my $Re1 = {
-    'begin'   => qr/\ASorry, we were unable to deliver your message/,
-    'rfc822'  => qr/\A--- Below this line is a copy of the message[.]\z/,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Sorry, we were unable to deliver your message'],
+    'rfc822'  => ['--- Below this line is a copy of the message.'],
+};
 
 # X-YMailISG: YtyUVyYWLDsbDh...
 # X-YMail-JAS: Pb65aU4VM1mei...
 # X-YMail-OSG: bTIbpDEVM1lHz...
 # X-Originating-IP: [192.0.2.9]
 sub headerlist  { return ['X-YMailISG'] }
-sub pattern     { return $Re0 }
 sub description { 'Yahoo! MAIL: https://www.yahoo.com' }
-
 sub scan {
     # Detect an error from Yahoo! MAIL
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -39,6 +33,7 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'subject' => qr/\AFailure Notice\z/,
     return undef unless $mhead->{'x-ymailisg'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -51,10 +46,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -62,7 +57,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -88,7 +83,7 @@ sub scan {
             # Remote host said: 550 5.1.1 <kijitora@example.org>... User Unknown [RCPT_TO]
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[<](.+[@].+)[>]:[ \t]*\z/ ) {
+            if( $e =~ /\A[<](.+[@].+)[>]:[ \t]*\z/ ) {
                 # <kijitora@example.org>:
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -99,23 +94,21 @@ sub scan {
                 $recipients++;
 
             } else {
-                if( $e =~ m/\ARemote host said:/ ) {
+                if( index($e, 'Remote host said:') == 0 ) {
                     # Remote host said: 550 5.1.1 <kijitora@example.org>... User Unknown [RCPT_TO]
                     $v->{'diagnosis'} = $e;
 
-                    if( $e =~ m/\[([A-Z]{4}).*\]\z/ ) {
-                        # Get SMTP command from the value of "Remote host said:"
-                        $v->{'command'} = $1;
-                    }
+                    # Get SMTP command from the value of "Remote host said:"
+                    $v->{'command'} = $1 if $e =~ /\[([A-Z]{4}).*\]\z/;
                 } else {
                     # <mailboxfull@example.jp>:
                     # Remote host said:
                     # 550 5.2.2 <mailboxfull@example.jp>... Mailbox Full
                     # [RCPT_TO]
-                    if( $v->{'diagnosis'} =~ m/\ARemote host said:\z/ ) {
+                    if( $v->{'diagnosis'} eq 'Remote host said:' ) {
                         # Remote host said:
                         # 550 5.2.2 <mailboxfull@example.jp>... Mailbox Full
-                        if( $e =~ m/\[([A-Z]{4}).*\]\z/ ) {
+                        if( $e =~ /\[([A-Z]{4}).*\]\z/ ) {
                             # [RCPT_TO]
                             $v->{'command'} = $1;
 
@@ -129,10 +122,10 @@ sub scan {
         } # End of if: rfc822
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
-        $e->{'diagnosis'} =~ s{\\n}{ }g;
+        $e->{'diagnosis'} =~ s/\\n/ /g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
         $e->{'agent'}     =  __PACKAGE__->smtpagent;
     }
@@ -183,7 +176,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

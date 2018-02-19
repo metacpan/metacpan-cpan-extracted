@@ -18,7 +18,7 @@ my %module_build_args = (
     "Vitali Peil"
   ],
   "dist_name" => "Catmandu-EuropePMC",
-  "dist_version" => "0.18",
+  "dist_version" => "1.00",
   "license" => "perl",
   "module_name" => "Catmandu::EuropePMC",
   "recursive_test_files" => 1,

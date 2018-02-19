@@ -1,5 +1,5 @@
 package Test::Selenium::Remote::Driver;
-$Test::Selenium::Remote::Driver::VERSION = '1.23';
+$Test::Selenium::Remote::Driver::VERSION = '1.24';
 # ABSTRACT: Useful testing subclass for Selenium::Remote::Driver
 
 use Moo;

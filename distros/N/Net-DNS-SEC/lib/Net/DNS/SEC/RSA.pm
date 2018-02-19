@@ -1,10 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1376 2015-07-12 19:16:04Z willem $
+# $Id: RSA.pm 1626 2018-01-31 09:48:15Z willem $
 #
-use vars qw($VERSION);
-$VERSION = (qw$LastChangedRevision: 1376 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1626 $)[1];
 
 
 =head1 NAME
@@ -30,14 +29,14 @@ generation and verification procedures.
 
     $signature = Net::DNS::SEC::RSA->sign( $sigdata, $private );
 
-Generates the wire-format binary signature from the binary sigdata
+Generates the wire-format signature from the sigdata octet string
 and the appropriate private key object.
 
 =head2 verify
 
     $validated = Net::DNS::SEC::RSA->verify( $sigdata, $keyrr, $sigbin );
 
-Verifies the signature over the binary sigdata using the specified
+Verifies the signature over the sigdata octet string using the specified
 public key resource record.
 
 =cut
@@ -46,55 +45,70 @@ use strict;
 use integer;
 use warnings;
 use Carp;
+use Digest::SHA;
 use MIME::Base64;
 
-use Crypt::OpenSSL::Bignum;
-use Crypt::OpenSSL::RSA 0.27;
-
+eval { require Digest::MD5 };		## deprecated ##
 
 my %RSA = (
-	1  => 'use_md5_hash',
-	5  => 'use_sha1_hash',
-	7  => 'use_sha1_hash',
-	8  => 'use_sha256_hash',
-	10 => 'use_sha512_hash',
+	1  => ['MD5',	 'Digest::MD5'],
+	5  => ['SHA1',	 'Digest::SHA'],
+	7  => ['SHA1',	 'Digest::SHA'],
+	8  => ['SHA256', 'Digest::SHA', 256],
+	10 => ['SHA512', 'Digest::SHA', 512],
 	);
 
 
 sub sign {
 	my ( $class, $sigdata, $private ) = @_;
 
-	my $hash = $RSA{$private->algorithm} || die 'private key not RSA';
+	my $algorithm = $private->algorithm;			# digest sigdata
+	my ( $mnemonic, $object, @param ) = @{$RSA{$algorithm} || []};
+	die 'public key not RSA' unless $object;
+	my $hash = $object->new(@param);
+	$hash->add($sigdata);
 
-	my @param = map Crypt::OpenSSL::Bignum->new_from_bin( decode_base64( $private->$_ ) ),
-			qw(Modulus PublicExponent PrivateExponent
-			Prime1 Prime2 Exponent1 Exponent2 Coefficient);
-	my $rsa = Crypt::OpenSSL::RSA->new_key_from_parameters(@param);
+	my $nid = Net::DNS::SEC::libcrypto::get_NID($mnemonic);
+	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 
-	$rsa->use_pkcs1_oaep_padding;
-	$rsa->$hash;
-	$rsa->sign($sigdata);
+	my ( $n, $e, $d, $p, $q ) = map decode_base64( $private->$_ ),
+			qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
+
+	Net::DNS::SEC::libcrypto::RSA_set0_factors( $rsa, $p, $q );
+	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $n, $e, $d );
+
+	my $sig = Net::DNS::SEC::libcrypto::RSA_sign( $nid, $hash->digest, $rsa );
+
+	Net::DNS::SEC::libcrypto::RSA_free($rsa);		# destroy private key
+	return $sig;
 }
 
 
 sub verify {
 	my ( $class, $sigdata, $keyrr, $sigbin ) = @_;
 
-	my $hash = $RSA{$keyrr->algorithm} || die 'public key not RSA';
+	my $algorithm = $keyrr->algorithm;			# digest sigdata
+	my ( $mnemonic, $object, @param ) = @{$RSA{$algorithm} || []};
+	die 'public key not RSA' unless $object;
+	my $hash = $object->new(@param);
+	$hash->add($sigdata);
+
+	return unless $sigbin;
+
+	my $nid = Net::DNS::SEC::libcrypto::get_NID($mnemonic);
+	my $rsa = Net::DNS::SEC::libcrypto::RSA_new();
 
 	my $keybin = $keyrr->keybin;				# public key
 	my ( $short, $long ) = unpack( 'Cn', $keybin );		# RFC3110, section 2
 	my $keyfmt = $short ? "x a$short a*" : "x3 a$long a*";
 	my ( $exponent, $modulus ) = unpack( $keyfmt, $keybin );
 
-	my $bn_modulus	= Crypt::OpenSSL::Bignum->new_from_bin($modulus);
-	my $bn_exponent = Crypt::OpenSSL::Bignum->new_from_bin($exponent);
+	Net::DNS::SEC::libcrypto::RSA_set0_key( $rsa, $modulus, $exponent, '' );
 
-	my $rsa = Crypt::OpenSSL::RSA->new_key_from_parameters( $bn_modulus, $bn_exponent );
-	$rsa->use_pkcs1_oaep_padding;
-	$rsa->$hash;
+	my $vrfy = Net::DNS::SEC::libcrypto::RSA_verify( $nid, $hash->digest, $sigbin, $rsa );
 
-	$rsa->verify( $sigdata, $sigbin );
+	Net::DNS::SEC::libcrypto::RSA_free($rsa);
+	return $vrfy;
 }
 
 
@@ -106,15 +120,13 @@ __END__
 
 =head1 ACKNOWLEDGMENT
 
-Andy Vaskys (Network Associates Laboratories) supplied the code for
-handling RSA with SHA1 (Algorithm 5).
-
-The Crypt::OpenSSL::RSA package was created by Ian Robertson.
+Thanks are due to Eric Young and the many developers and 
+contributors to the OpenSSL cryptographic library.
 
 
 =head1 COPYRIGHT
 
-Copyright (c)2014 Dick Franks.
+Copyright (c)2014,2018 Dick Franks.
 
 All rights reserved.
 
@@ -141,8 +153,8 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<Net::DNS>, L<Net::DNS::SEC>,
-L<Crypt::OpenSSL::RSA>,
-RFC2437, RFC3110
+RFC8017, RFC3110,
+L<OpenSSL|http://www.openssl.org/docs>
 
 =cut
 

@@ -12,7 +12,7 @@ import java.lang.reflect.* ;
 	so that it will execute them.
 */
 class InlineJavaUserClassLoader extends URLClassLoader {
-    private HashMap urls = new HashMap() ;
+    private HashMap<URL, String> urls = new HashMap<>() ;
 
 	private Object link = null ;
 	private Method invoke = null ;
@@ -50,8 +50,8 @@ class InlineJavaUserClassLoader extends URLClassLoader {
 		if (link == null){
 			try {
 				InlineJavaUtils.debug(1, "loading InlineJavaUserClassLink via InlineJavaUserClassLoader") ;
-				Class c = Class.forName("InlineJavaUserClassLink", true, this) ;
-				link = c.newInstance() ;
+				Class<?> c = Class.forName("InlineJavaUserClassLink", true, this) ;
+				link = c.getDeclaredConstructor().newInstance() ;
 
 				invoke = find_method(c, "invoke") ;
 				get = find_method(c, "get") ;
@@ -162,7 +162,7 @@ class InlineJavaUserClassLoader extends URLClassLoader {
 	public Object array_get(Object o, int idx) throws InlineJavaException {
 		check_link() ;
 		try {
-			return invoke_via_link(array_get, new Object [] {o, new Integer(idx)}) ;
+			return invoke_via_link(array_get, new Object [] {o, Integer.valueOf(idx)}) ;
 		}
 		catch (NoSuchMethodException me){/* Impossible */}
 		catch (InstantiationException ie){/* Impossible */}
@@ -176,7 +176,7 @@ class InlineJavaUserClassLoader extends URLClassLoader {
 	public void array_set(Object o, int idx, Object elem) throws IllegalArgumentException, InlineJavaException {
 		check_link() ;
 		try {
-			invoke_via_link(array_set, new Object [] {o, new Integer(idx), elem}) ;
+			invoke_via_link(array_set, new Object [] {o, Integer.valueOf(idx), elem}) ;
 		}
 		catch (NoSuchMethodException me){/* Impossible */}
 		catch (InstantiationException ie){/* Impossible */}

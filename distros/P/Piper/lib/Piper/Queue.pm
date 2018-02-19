@@ -16,7 +16,7 @@ use namespace::clean;
 
 with 'Piper::Role::Queue';
 
-our $VERSION = '0.04'; # from Piper-0.04.tar.gz
+our $VERSION = '0.05'; # from Piper-0.05.tar.gz
 
 #pod =head1 SYNOPSIS
 #pod
@@ -161,7 +161,7 @@ Inserts C<@items> to the top of the queue in an order such that C<dequeue(1)> wo
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

@@ -12,13 +12,13 @@ my %wm = (
     AUTHOR       => [ "H.Merijn Brand <h.merijn\@xs4all.nl>",
 		      "Abe Timmerman <abeltje\@cpan.org>" ],
     VERSION_FROM => "lib/System/Info.pm",
-    PREREQ_PM	 => { "Test::More"	 => 0.88,
-		      "Test::NoWarnings" => 0,
-		      },
-    macro        => { TARFLAGS => "--format=ustar -c -v -f",
-		      },
+    macro        => { TARFLAGS => "--format=ustar -c -v -f" },
     );
-$ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
+    $ExtUtils::MakeMaker::VERSION >  6.30 and $wm{LICENSE} = "perl";
+$wm{$ExtUtils::MakeMaker::VERSION >= 6.64 ? "TEST_REQUIRES" : "PREREQ_PM"} = {
+    "Test::More"	=> 0.88,
+    "Test::NoWarnings"	=> 0,
+    };
 
 my $rv = WriteMakefile (%wm);
 
@@ -26,8 +26,7 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
     my $valgrind = join " ", qw(
 	PERL_DESTRUCT_LEVEL=2 PERL_DL_NONLAZY=1
 	    valgrind

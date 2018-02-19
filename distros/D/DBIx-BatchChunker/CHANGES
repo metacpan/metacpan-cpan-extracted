@@ -1,0 +1,12 @@
+DBIx-BatchChunker
+=================
+
+Created:         2018-01-20
+Home page:       <https://metacpan.org/release/DBIx-BatchChunker>
+Bug tracker:     <https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues>
+Maintainer:      Grant Street Group <developers@grantstreet.com>
+
+0.90        2018-01-20
+
+    - Initial release
+

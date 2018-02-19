@@ -9,13 +9,13 @@ lib/Mic/ArrayImpl.pm
 lib/Mic/Assembler.pm
 lib/Mic/Bind.pm
 lib/Mic/Class.pm
+lib/Mic/ContractConfig.pm
 lib/Mic/Contracts.pm
 lib/Mic/Impl.pm
 lib/Mic/Implementation.pm
 lib/Mic/Interface.pm
 lib/Mic/Manual/Construction.pod
 lib/Mic/Tutorial/OOP.pod
-lib/Mic/_Guts.pm
 t/docs/arrayimps/fixed_size_queue.t
 t/docs/arrayimps/set.t
 t/docs/arrayimps/spider.t
@@ -29,6 +29,7 @@ t/docs/construction/positional_args.t
 t/docs/contracts/fixed_size_queue_constructor_post_not_ok.t
 t/docs/contracts/fixed_size_queue_contract_ok.t
 t/docs/contracts/fixed_size_queue_invariant_not_ok.t
+t/docs/contracts/fixed_size_queue_invariant_not_ok_config.t
 t/docs/contracts/fixed_size_queue_invariant_ok.t
 t/docs/contracts/fixed_size_queue_post_not_ok_1.t
 t/docs/contracts/fixed_size_queue_post_not_ok_2.t
@@ -84,6 +85,8 @@ t/lib/Example/Extension/Queue.pm
 t/lib/Example/LoadImp/ArraySet.pm
 t/lib/Example/LoadImp/HashSet.pm
 t/lib/Example/LoadImp/Set.pm
+t/lib/Example/Overloads/HashSet.pm
+t/lib/Example/Overloads/Set.pm
 t/lib/Example/Synopsis/Acme/Counter.pm
 t/lib/Example/Synopsis/ArraySet.pm
 t/lib/Example/Synopsis/Counter.pm

@@ -2,11 +2,11 @@ use strict;
 use warnings;
 
 package WebService::Geocodio::JSON;
-{
-  $WebService::Geocodio::JSON::VERSION = '0.04';
-}
+$WebService::Geocodio::JSON::VERSION = '0.05';
+# ABSTRACT: A JSON de/serializer class
 
 use Moo::Role;
+use strictures 2;
 use JSON;
 use Carp qw(confess);
 
@@ -37,13 +37,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-WebService::Geocodio::JSON
+WebService::Geocodio::JSON - A JSON de/serializer class
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 ATTRIBUTES
 
@@ -67,7 +69,7 @@ Mark Allen <mrallen1@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Mark Allen.
+This software is copyright (c) 2018 by Mark Allen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

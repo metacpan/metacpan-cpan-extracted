@@ -26,6 +26,7 @@ DROLSKY
 DROLSKY's
 Dave
 DebugPrinter
+Denis
 Dialect
 Document
 EndBlockquote
@@ -63,6 +64,7 @@ HTMLTag
 Handler
 HorizontalRule
 Hukins
+Ibaev
 Image
 Internal
 Jason
@@ -118,6 +120,7 @@ bin
 blockquote
 blockquotes
 colspan
+dionys
 doctype
 drolsky
 escapeable

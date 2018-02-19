@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Package::Variant
   importing => ['Moo'],
@@ -92,7 +92,7 @@ Data::Record::Serialize - Flexible serialization of a record
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -368,7 +368,7 @@ If this attribute is not specified, the fields specified by the
 C<types> attribute will be output.  If that is not specified, the
 fields as found in the first data record will be output.
 
-If a field name is specifed in C<fields> but no type is defined in
+If a field name is specified in C<fields> but no type is defined in
 C<types>, it defaults to what is specified via C<default_type>.
 
 =item C<rename_fields>
@@ -388,7 +388,7 @@ those specified in C<format_types>.
 A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
 format.  This will be applied prior to encoding the record, but only
 if the C<format> attribute is also set.  Formats specified here may be
-overriden for specific fields using the C<format_fields> attribute.
+overridden for specific fields using the C<format_fields> attribute.
 
 =item C<format>
 
@@ -812,7 +812,7 @@ __END__
 #pod C<types> attribute will be output.  If that is not specified, the
 #pod fields as found in the first data record will be output.
 #pod
-#pod If a field name is specifed in C<fields> but no type is defined in
+#pod If a field name is specified in C<fields> but no type is defined in
 #pod C<types>, it defaults to what is specified via C<default_type>.
 #pod
 #pod =item C<rename_fields>
@@ -832,7 +832,7 @@ __END__
 #pod A hash mapping a field type (C<N>, C<I>, C<S>) to a C<sprintf> style
 #pod format.  This will be applied prior to encoding the record, but only
 #pod if the C<format> attribute is also set.  Formats specified here may be
-#pod overriden for specific fields using the C<format_fields> attribute.
+#pod overridden for specific fields using the C<format_fields> attribute.
 #pod
 #pod =item C<format>
 #pod

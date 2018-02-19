@@ -30,9 +30,26 @@ print "DBI is version $DBI::VERSION, I am $me, version of DBD::Pg is $DBD::Pg::V
 
 print "Name: $dbh->{Name}\n";
 
-fatal_client();
+$dbh->{RaiseError} = 0;
+$dbh->{PrintError} = 1;
+$dbh->{AutoCommit} = 1;
+$dbh->do('SET client_min_messages = FATAL');
+
+eval { $dbh->selectcol_arrayref('SELECT 1 FROM nonesuch'); };
+
+warn "Errstr: ". $dbh->errstr . "\n";
+warn "Error: $@";
+
+
+read_only_arrays();
 
 exit;
+
+# bad_string_length();
+
+# jsonb_placeholder();
+
+#fatal_client();
 
 #user_arrays();
 
@@ -43,6 +60,63 @@ exit;
 #memory_leak_test_bug_65734();
 
 #memory_leak_arrays();
+
+sub read_only_arrays {
+
+    ## For RT ticket #107556
+
+    $SQL = 'SELECT 5, NULL, ARRAY[1,2,3], ARRAY[1,NULL,3]';
+    $sth = $dbh->prepare($SQL);
+    $sth->execute;
+    while( my $row = $sth->fetchrow_arrayref ) {
+        $row->[0] += 0; # ok
+        $row->[1] += 0; # ok
+        $_ += 0 foreach @{ $row->[2] }; # ok
+        $_ += 0 foreach @{ $row->[3] }; # error: Modification of a read-only value attempted
+    }
+
+    exit;
+
+} ## end of read_only_arrays
+
+sub bad_string_length {
+
+    ## RT Ticket 114548
+    $SQL = 'SELECT md5(x::text) FROM generate_series(1,5) x';
+
+    $sth = $dbh->prepare($SQL);
+    $sth->execute();
+    my $md5size;
+    $sth->bind_columns(\$md5size);
+    while ($sth->fetch()) {
+        print "\n";
+        DDump $md5size;
+        print $md5size , "\n";
+        printf "%vx\n", $md5size;
+        print '.' x 32, '-' x 32 . "\n";
+        print substr($md5size, 0, 32), " (" . length($md5size) . ' -- ' . length(substr($md5size, 0, 32)) . ")\n";
+    }
+
+} ## end of bad_string_length
+
+sub jsonb_placeholder {
+
+    ## Github #33
+    ## https://github.com/bucardo/dbdpg/issues/33
+
+    print "Starting jsonb placeholder test\n";
+
+    $SQL = q{ SELECT '{"a":1}'::jsonb \? 'abc' and 1=$1 };
+
+    for ( my $i=0; $i<100; $i++ ) {
+        print "$i.. ";
+        $sth = $dbh->prepare($SQL);
+        $sth->execute(2);
+        $sth->finish();
+    }
+    print "\n";
+}
+
 
 sub fatal_client {
 

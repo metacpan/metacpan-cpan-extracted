@@ -1,10 +1,11 @@
-package Dist::Zilla::Role::PluginBundle::Easy 6.010;
+package Dist::Zilla::Role::PluginBundle::Easy 6.011;
 # ABSTRACT: something that bundles a bunch of plugins easily
 # This plugin was originally contributed by Christopher J. Madsen
 
 use Moose::Role;
 with 'Dist::Zilla::Role::PluginBundle';
 
+use Module::Runtime 'use_module';
 use namespace::autoclean;
 
 #pod =head1 SYNOPSIS
@@ -35,7 +36,11 @@ use MooseX::Types::Moose qw(Str ArrayRef HashRef);
 use String::RewritePrefix 0.005
   rewrite => {
     -as => '_plugin_class',
-    prefixes => { '' => 'Dist::Zilla::Plugin::', '=' => '' },
+    prefixes => {
+      '=' => '',
+      '%' => 'Dist::Zilla::Stash::',
+      '' => 'Dist::Zilla::Plugin::',
+    },
   },
   rewrite => {
     -as => '_bundle_class',
@@ -45,8 +50,6 @@ use String::RewritePrefix 0.005
       '=' => ''
     },
   };
-
-use namespace::autoclean;
 
 requires 'configure';
 
@@ -159,13 +162,12 @@ sub add_bundle {
   my ($self, $bundle, $payload) = @_;
 
   my $package = _bundle_class($bundle);
-  $payload  ||= {};
+  $payload ||= {};
 
-  my $load_opts = {};
-  if( my $v = $payload->{':version'} ){
-    $load_opts->{'-version'} = $v;
-  }
-  Class::Load::load_class($package, $load_opts);
+  &use_module(
+    $package,
+    $payload->{':version'} ? $payload->{':version'} : (),
+  );
 
   $bundle = "\@$bundle" unless $bundle =~ /^@/;
 
@@ -226,7 +228,7 @@ Dist::Zilla::Role::PluginBundle::Easy - something that bundles a bunch of plugin
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 SYNOPSIS
 
@@ -320,7 +322,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

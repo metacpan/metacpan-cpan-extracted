@@ -24,8 +24,8 @@ namespace: molecular_function
 def: "Catalysis of the reaction: cyanidin 3-O-beta-D-sambubioside +4-coumaryl-CoA <=> cyanidin 3-O-[2" [EC:2.3.1.-]
 xref: MetaCyc:RXN-15329
 is_a: GO:0003674
-synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
-synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
-synonym: "cyanidin 3-O-glucoside-yadda-yadda" NARROW []
-synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
-synonym: "cyanidin 3-O-glucoside-something" NARROW []
+synonym: "cyanidin 3-O-glucoside-yadda-one" EXACT []
+synonym: "cyanidin 3-O-glucoside-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-yadda" NARROW []
+synonym: "cyanidin 3-O-glucoside-yadda-three" EXACT []
+synonym: "cyanidin 3-O-glucoside-\"something\"" NARROW []

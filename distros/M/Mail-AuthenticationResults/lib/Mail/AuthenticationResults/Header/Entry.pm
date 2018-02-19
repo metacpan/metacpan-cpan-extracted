@@ -1,14 +1,15 @@
 package Mail::AuthenticationResults::Header::Entry;
 # ABSTRACT: Class modelling Main Entry parts of the Authentication Results Header
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Scalar::Util qw{ refaddr };
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
+
 
 sub _HAS_KEY{ return 1; }
 sub _HAS_VALUE{ return 1; }
@@ -36,7 +37,15 @@ Mail::AuthenticationResults::Header::Entry - Class modelling Main Entry parts of
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+Entries are the main result of an Authentication Resutls check, an example of this
+would be "dkim=pass" or "dmarc=fail", there may be additional comments of sub entries
+associated with this entry, these are represented as children of this class.
+
+Please see L<Mail::AuthenticationResults::Header::Base>
 
 =head1 AUTHOR
 

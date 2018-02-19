@@ -4,30 +4,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'x-nai'   => qr/Modified by McAfee /,
-    'subject' => qr/\ADelivery Status\z/,
-};
-my $Re1 = {
-    'begin'   => qr/[-]+ The following addresses had delivery problems [-]+\z/,
-    'error'   => qr|\AContent-Type: [^ ]+/[^ ]+; name="deliveryproblems[.]txt"|,
-    'rfc822'  => qr|\AContent-Type: message/rfc822\z|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'userunknown' => qr{(?:
-         User[ ][(].+[@].+[)][ ]unknown[.]
-        |550[ ]Unknown[ ]user[ ][^ ]+[@][^ ]+
-        )
-    }x,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['--- The following addresses had delivery problems ---'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+};
+my $ReFailures = {
+    'userunknown' => qr/(?: User [(].+[@].+[)] unknown[.] |550 Unknown user [^ ]+[@][^ ]+)/,
+};
 
 # X-NAI-Header: Modified by McAfee Email and Web Security Virtual Appliance
 sub headerlist  { return ['X-NAI-Header'] }
-sub pattern     { return $Re0 }
 sub description { 'McAfee Email Appliance' }
-
 sub scan {
     # Detect an error from McAfee
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -46,8 +34,8 @@ sub scan {
     my $mbody = shift // return undef;
 
     return undef unless defined $mhead->{'x-nai-header'};
-    return undef unless $mhead->{'x-nai-header'} =~ $Re0->{'x-nai'};
-    return undef unless $mhead->{'subject'}      =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'x-nai-header'}, 'Modified by McAfee') > -1;
+    return undef unless $mhead->{'subject'} eq 'Delivery Status';
 
     require Sisimai::Address;
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -58,15 +46,14 @@ sub scan {
     my $readcursor = 0;     # (Integer) Points the current cursor position
     my $recipients = 0;     # (Integer) The number of 'Final-Recipient' header
     my $diagnostic = '';    # (String) Alternative diagnostic message
-
     my $v = undef;
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) > -1 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -74,7 +61,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -105,7 +92,7 @@ sub scan {
             #
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[<]([^ ]+[@][^ ]+)[>][ \t]+[(](.+)[)]\z/ ) {
+            if( $e =~ /\A[<]([^ ]+[@][^ ]+)[>][ \t]+[(](.+)[)]\z/ ) {
                 # <kijitora@example.co.jp>   (Unknown user kijitora@example.co.jp)
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -116,25 +103,25 @@ sub scan {
                 $diagnostic = $2;
                 $recipients++;
 
-            } elsif( $e =~ m/\A[Oo]riginal-[Rr]ecipient:[ ]*([^ ]+)\z/ ) {
+            } elsif( $e =~ /\AOriginal-Recipient:[ ]*([^ ]+)\z/ ) {
                 # Original-Recipient: <kijitora@example.co.jp>
                 $v->{'alias'} = Sisimai::Address->s3s4($1);
 
-            } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+            } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                 # Action: failed
                 $v->{'action'} = lc $1;
 
-            } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(.+)\z/ ) {
+            } elsif( $e =~ /\ARemote-MTA:[ ]*(.+)\z/ ) {
                 # Remote-MTA: 192.0.2.192
                 $v->{'rhost'} = lc $1;
 
             } else {
-                if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                     # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                     $v->{'spec'} = uc $1;
                     $v->{'diagnosis'} = $2;
 
-                } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A\t+(.+)\z/ ) {
+                } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A\t+(.+)\z/ ) {
                     # Continued line of the value of Diagnostic-Code header
                     $v->{'diagnosis'} .= ' '.$1;
                     $e = 'Diagnostic-Code: '.$e;
@@ -145,17 +132,16 @@ sub scan {
         # Save the current line for the next loop
         $p = $e;
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'} || $diagnostic);
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -209,7 +195,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

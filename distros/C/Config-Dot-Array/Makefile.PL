@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Module for simple configure file parsing with arrays.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.05;
 author_requires 'Test::More' => 0;
@@ -32,7 +31,7 @@ test_requires 'Error::Pure::Utils' => 0.08;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

@@ -4,26 +4,27 @@
       "Mark Allen <mrallen1@yahoo.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Geocodio",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "2.90",
-            "Moo::Lax" : "0.15",
-            "perl" : "5.014"
+            "JSON" : "2.97001",
+            "Moo" : "2.003004",
+            "perl" : "5.014",
+            "strictures" : "2.000003"
          }
       }
    },
@@ -40,6 +41,7 @@
          "web" : "https://github.com/mrallen1/WebService-Geocodio"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 26;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -30,7 +30,8 @@ $fypo_0000133 = $ontology_data->get_term_by_id($lookup_id);
 
 is ($fypo_0000133->name(), $lookup_name);
 is ($fypo_0000133->id(), $lookup_id);
-is ($fypo_0000133->def(), 'A cell phenotype in which cells contain more than one nucleus apiece and are elongated.');
+is ($fypo_0000133->def()->{definition}, 'A cell phenotype in which cells contain more than one nucleus apiece and are elongated.');
+cmp_deeply ($fypo_0000133->def()->{dbxrefs}, ['PomBase:mah', 'PMID:12381658']);
 is ($fypo_0000133->comment(), 'Test comment.');
 
 is ($ontology_data->get_namespaces(), 2);
@@ -43,7 +44,7 @@ cmp_deeply(\@cv_names, ['external_cv', 'fission_yeast_phenotype']);
 
 my @db_names = sort $ontology_data->get_db_names();
 
-cmp_deeply(\@db_names, ['EXT', 'FYPO', '_global']);
+cmp_deeply(\@db_names, ['EXT', 'FYPO', 'PATO', 'PMID', 'PomBase', '_global']);
 
 my @fypo_cvterms = $ontology_data->get_terms_by_cv_name('fission_yeast_phenotype');
 

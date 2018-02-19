@@ -9,6 +9,7 @@ our ($ROUND, $PREC);
 sub __bernfrac__ {
     my ($n) = @_;    # $n is an unsigned integer
 
+#<<<
     # B(n) = (-1)^(n/2 + 1) * zeta(n)*2*n! / (2*pi)^n
 
     if ($n == 0) {
@@ -79,8 +80,8 @@ sub __bernfrac__ {
 
     Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);         # K = K*d
     Math::MPFR::Rmpfr_set_ui($N, $n - 1, $round);        # N = n-1
-    Math::MPFR::Rmpfr_ui_div($N, 1, $N, $round);         # R = 1/R
-    Math::MPFR::Rmpfr_pow($N, $K, $N, $round);           # N = K^R
+    Math::MPFR::Rmpfr_ui_div($N, 1, $N, $round);         # N = 1/N
+    Math::MPFR::Rmpfr_pow($N, $K, $N, $round);           # N = K^N
 
     Math::MPFR::Rmpfr_ceil($N, $N);                      # N = ceil(N)
 
@@ -109,6 +110,7 @@ sub __bernfrac__ {
     Math::GMPz::Rmpz_neg($d, $d) if $n % 4 == 0;            # d = -d, iff 4|n
     Math::GMPq::Rmpq_set_num($q, $d);                       # numerator
 
+#>>>
     return $q;                                              # Bn
 }
 

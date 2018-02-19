@@ -2,8 +2,7 @@
 
 #
 # dbsubprocess.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 630ba67be630dfda1dae8d724df2877a8f37a54e $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -229,18 +228,18 @@ sub setup ($) {
 
     shift @{$self->{_external_command_argv}}
 	if ($#{$self->{_external_command_argv}} >= 0 && $self->{_external_command_argv}[0] eq '--');
-    croak $self->{_prog} . ": no program given.\n"
+    croak($self->{_prog} . ": no program given.\n")
         if ($#{$self->{_external_command_argv}} < 0);
 
     my $input_ref = ref($self->{_input});
     if ($input_ref =~ /^Fsdb::BoundedQueue/) {
-	croak $self->{_prog} . ": cannot handle BoundedQueue any more.\n"
+	croak($self->{_prog} . ": cannot handle BoundedQueue any more.\n");
     } elsif ($input_ref =~ /^IO::/) {
 	$self->{_in_fileno} = $self->{_input}->fileno;
     } elsif ($input_ref =~ /^Fsdb::IO::Reader/) {
 	# start up a converter Fred
         my $pipe = new IO::Pipe;
-	croak $self->{_prog} . ": error opening pipe.\n"
+	croak($self->{_prog} . ": error opening pipe.\n")
 	    if ($pipe->error);
 	my $input = $self->{_input};
 	my $input_fred = new Fsdb::Support::Freds('dbsubprocess_Fsdb::IO::Reader_converter',
@@ -264,29 +263,29 @@ sub setup ($) {
 	$fh->binmode;
 	$self->{_in_fileno} = $fh->fileno;
     } else {
-	croak $self->{_prog} . ": unknown input method (ref: $input_ref).\n"
+	croak($self->{_prog} . ": unknown input method (ref: $input_ref).\n");
     };
 
     my $output_ref = ref($self->{_output});
     if ($output_ref =~ /^Fsdb::BoundedQueue/) {
-	croak $self->{_prog} . ": cannot handle BoundedQueue any more.\n"
+	croak($self->{_prog} . ": cannot handle BoundedQueue any more.\n");
     } elsif ($output_ref =~ /^IO::/) {
 	$self->{_out_fileno} = $self->{_output}->fileno;
     } elsif ($output_ref =~ /^Fsdb::IO::Writer/) {
-	croak $self->{_prog} . ": cannot handle Fsdb::IO::Writer yet.\n"
+	croak($self->{_prog} . ": cannot handle Fsdb::IO::Writer yet.\n");
     } elsif ($output_ref eq '' && $self->{_output} eq '-') {
 	$self->{_out_fileno} = 1;   # stdout
     } elsif ($output_ref eq '') {
 	# a file
 	my $fh = IO::File->new($self->{_output}, "w");
 	$fh->binmode;
-	croak $self->{_prog} . ": cannot open output file: " . $self->{_output} . ".\n"
+	croak($self->{_prog} . ": cannot open output file: " . $self->{_output} . ".\n")
 	    if ($fh->error);
 	$self->{_out_fileno} = $fh->fileno;
-	croak $self->{_prog} . ": strangely unset fileno for output file: " . $self->{_output} . ".\n"
+	croak($self->{_prog} . ": strangely unset fileno for output file: " . $self->{_output} . ".\n")
 	    if (!defined($self->{_out_fileno}));
     } else {
-	croak $self->{_prog} . ": unknown output method.\n"
+	croak($self->{_prog} . ": unknown output method.\n");
     };
 }
 
@@ -314,21 +313,21 @@ sub run ($) {
     # most of this is cribbed from IPC::Open2, but simplified.
     #
     my $child_rdr_fd = $self->{_in_fileno};
-    croak $self->{_prog} . ": internal error, in_fileno not ready.\n" if (!defined($child_rdr_fd));
+    croak($self->{_prog} . ": internal error, in_fileno not ready.\n") if (!defined($child_rdr_fd));
     my $child_wtr_fd = $self->{_out_fileno};
-    croak $self->{_prog} . ": internal error, out_fileno not ready.\n" if (!defined($child_wtr_fd));
+    croak($self->{_prog} . ": internal error, out_fileno not ready.\n") if (!defined($child_wtr_fd));
     my $args_ref = \@{$self->{_external_command_argv}};
     my $fred = new Fsdb::Support::Freds('dbsubprocess', 
 	sub {
 	    # in child
 	    untie *STDIN;
 	    untie *STDOUT;
-	    open \*STDIN, "<&=", $child_rdr_fd or croak $self->{_prog} . ": cannot reopen stdin from $child_rdr_fd\n";
-	    open \*STDOUT, ">&=", $child_wtr_fd or croak $self->{_prog} . ": cannot reopen stdout to $child_wtr_fd\n";
+	    open \*STDIN, "<&=", $child_rdr_fd or croak($self->{_prog} . ": cannot reopen stdin from $child_rdr_fd\n");
+	    open \*STDOUT, ">&=", $child_wtr_fd or croak($self->{_prog} . ": cannot reopen stdout to $child_wtr_fd\n");
 	    # ignore stderr
-	    exec @$args_ref or croak $self->{_prog} . ": cannot exec: " . join(" ", @$args_ref) . "\n";
+	    exec @$args_ref or croak($self->{_prog} . ": cannot exec: " . join(" ", @$args_ref) . "\n");
 	    # never returns, either way.
-	    die;   # just in case
+	    croak("assert");   # just in case
 	}, $self->{_ending_sub});
     $self->{_fred} = $fred;
 }
@@ -347,13 +346,13 @@ sub finish($) {
     foreach my $fred ($self->{_input_fred}, $self->{_fred}) {
 	if (defined($fred)) {
 	    $fred->join();
-	    croak $self->{_prog} . ": fred failed: " . $fred->error()
+	    croak($self->{_prog} . ": fred failed: " . $fred->error())
 		if ($fred->error());
 	};
     };
     # fake up _out
     my $out = IO::Handle->new_from_fd($self->{_out_fileno}, "w")
-	    or croak $self->{_prog} . ": cannot write log\n";
+	    or croak($self->{_prog} . ": cannot write log\n");
     $self->{_out} = $out;
     $self->SUPER::finish();  # will close it
 #	$out->print("# " . $self->compute_program_log() . "\n");
@@ -361,7 +360,7 @@ sub finish($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

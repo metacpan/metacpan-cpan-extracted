@@ -1,5 +1,53 @@
 Changelog for Yancy
 
+0.017     2018-02-17 22:25:32-06:00 America/Chicago
+
+    [Added]
+
+    - Added `route` configuration to allow Auth plugin to protect more
+      than just the Yancy editor. Now it can protect the entire site.
+
+    [Fixed]
+
+    - Fixed paginator looking bad when more than a few dozen pages
+      existed. Now only 9 pages are shown at maximum.
+    - Fixed login failed not having the correct, 400 HTTP status code
+    - Fixed login form to return to previous page. This will be
+      important when the login form is used for more than just the Yancy
+      editor.
+
+0.016     2018-02-16 22:33:21-06:00 America/Chicago
+
+    [Added]
+
+    - `read_schema` now properly adds `x-order` to show the form fields
+      in the same order as defined in the table schema.
+    - Added templated list columns. Useful information can be shown more
+      compactly in the list view.
+    - Added `x-view-url` and `x-view-item-url` to provide links to view
+      information in the editor.
+
+    [Fixed]
+
+    - Fixed pagination showing blank pages
+
+0.015     2018-02-12 12:52:32-06:00 America/Chicago
+
+    [Added]
+
+    - Allow `null` as a value for optional fields. Now we can specify
+      optional fields as `type: [ "<type>", null ]` and these fields are
+      correctly parsed from the existing schema.
+
+      This fixes validation errors where data could be inserted into the
+      database but not read back out because the JSON::Validator
+      correctly asserted that the data was not allowed to be `null`.
+
+    [Fixed]
+
+    - Fix error when collection in URL is invalid. This seemed to cause
+      very strange errors throughout the application.
+
 0.014     2018-02-09 14:50:26-06:00 America/Chicago
 
     [Added]

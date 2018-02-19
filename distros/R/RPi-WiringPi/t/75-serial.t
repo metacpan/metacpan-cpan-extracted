@@ -36,7 +36,7 @@ if ($> != 0){
 
 my $pi = $mod->new;
 
-my $s = $pi->serial("/dev/ttyAMA0", 115200);
+my $s = $pi->serial("/dev/ttyS0", 115200);
 
 isa_ok $s, 'RPi::Serial';
 

@@ -11,6 +11,27 @@ sub foo ($) { ... }
 use feature 'signatures';
 sub foo ($foo) { ... }
 
+## name ExperimentalSignature
+## failures 0
+## cut
+
+use experimental 'signatures';
+sub foo ($foo) { ... }
+
+## name MojoSignature
+## failures 0
+## cut
+
+use Mojo::Base -base, -signatures;
+sub foo ($foo) { ... }
+
+## name MojoLiteSignature
+## failures 0
+## cut
+
+use Mojolicious::Lite -signatures;
+sub foo ($foo) { ... }
+
 ## name NoPrototype
 ## failures 0
 ## cut

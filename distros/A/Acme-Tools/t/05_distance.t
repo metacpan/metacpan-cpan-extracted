@@ -1,5 +1,5 @@
 #perl Makefile.PL;make;perl -Iblib/lib t/05_distance.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 4;
 
 #--oslo-rio = 10434.047 meter iflg http://www.daftlogic.com/projects-google-maps-distance-calculator.htm

@@ -25,7 +25,9 @@ METHODS
         Returns a new RDFa serializer object. It can any arguments are passed
         on to RDF::RDFa::Generator, see it's documentation for details. This
         includes a `style` argument that names a module that formats the
-        output.
+        output. In addition, a `generator_options` argument may be passed.
+        This is passed to the generator's `create_document` methods as
+        options, and are typically used for style-specific configuration.
 
     `serialize_model_to_file ( $fh, $model )`
         Serializes the $model to RDFa, printing the results to the supplied

@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 c2677426c35ef4d63161d4f98476c503672f4055 COPYRIGHT
+SHA1 e3e0e39296ce1cb035cb7c372a53ac507bbbda5f CREDITS
+SHA1 9ec7ec49cfce077c3198ee5029781a732abead44 Changes
+SHA1 cbed38aac83ee26d2f0057130b50c31e1bf5768f INSTALL
+SHA1 2454ea67cbcfa62e76ec0cafc958c03287d7ab41 LICENSE
+SHA1 9f2e1dc72da9690bc602ab2748d11d84d90e344d MANIFEST
+SHA1 4df117c4bbae84aa1ce07f68c331a757c4c5f340 META.json
+SHA1 1f20eddb1c29752680f95c61ec45035b84861f0c META.yml
+SHA1 77c9c3be04cee3c84db152a5e3328580c50b21c3 Makefile.PL
+SHA1 1f2e7d31aa0f86ea4d49c43100f63980aada697c README
+SHA1 8710a9d0b7d5a858b3128dec05ec72c68085b240 README.pod
+SHA1 bb8ce53662e6b1befe42fa41d7c66934925efd0c dist.ini
+SHA1 ef649ca77e61122a8a0abfe2f5974ea6e1a573eb doap.ttl
+SHA1 8710a9d0b7d5a858b3128dec05ec72c68085b240 lib/AtteanX/Serializer/RDFa.pm
+SHA1 d2f756876c032acd1b2494d9c546d9b1abfa27ac t/01basic.t
+SHA1 6423423caf2d10613eb51f81f0a8080862f15200 t/bytes.t
+SHA1 9728a70140518f483b82251d64d8371cd8df5027 t/fh.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEDsyLxtCi6bk7pBcmf77o3zqeSqUFAlqAsSgACgkQf77o3zqe
+SqU4tA//ZM5ihxpn3k0InFCDkabmyr9cYrz+FyEHOsuZzaMJLIgq117zizl6Mfvb
+w/FktlIFs56p4NgPwP/u47ifS9gjY/R5cC6OXkZTkOclhOWhVhP7VBfOomaPvU7g
+uSgvAqjXWsf1KvD1goJCVKt7HmgsacFnTmzyFq3StQNxQWlWJJsiURoWhwhn0skJ
+ILu2qpqSt554sUJpgBd0//ikpu+ac0FS6yX9sgXdWizNwHtpQrwO6O9O6FvS1Uvu
+MzEIGb734EmdkREoysB6ZyDkdtYodC8vYkFQLcd9OPCDKpyrCdOK5bTloJ6FuSJT
+w6Ve92wIu+YsY0L/pQPleYz1nhWObVFw5AIvL6Ys90gZmU5UVRS5gEkQ6SzAkRcI
+hXVd5iQ9LU2dZ8KKTxJmSrVc5m8LPkj1A43r2Di04pijXTLenujl0hMiBRgkDjq/
+g/U0OzUCYOXm1SR64E0ebVtrmYNT4sIq7KwJlJmm+HJAby10YDvhOX56G1zvPrH1
+pHN9oPBNkQu+EO/3qVHreUSOEn6HvT7VejN9dCEPTo0ifqUpR6GsB5l3rwj51NUw
+gghp2j+42/eWKKwXrvyGvrc1cBT2kRUXJPTX2gj3TWVmloxFb57wlbSYMb17IxVJ
+GYPcoDCj1nKc74WJC18KqTZ8+15W4H1YlB3GQWkC1Oa8P7aE10Y=
+=94Lf
+-----END PGP SIGNATURE-----

@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Target;
-# ABSTRACT: internal class for standard HMMER parser
+# ABSTRACT: Internal class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.180330';
+$Bio::FastParsers::Hmmer::Standard::Target::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -79,11 +79,11 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Hmmer::Standard::Target - internal class for standard HMMER parser
+Bio::FastParsers::Hmmer::Standard::Target - Internal class for standard HMMER parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 

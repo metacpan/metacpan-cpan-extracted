@@ -3,37 +3,42 @@ package RDF::RDFa::Generator::HTML::Head;
 use 5.008;
 use base qw'RDF::RDFa::Generator';
 use strict;
-use warnings;
 use Encode qw'encode_utf8';
-use RDF::Prefixes;
+use URI::NamespaceMap 1.05;
+use RDF::NS::Curated 0.006;
 use XML::LibXML qw':all';
 use Carp;
+use Scalar::Util qw(blessed);
 
-our $VERSION = '0.192';
+use warnings;
+use Data::Dumper;
+
+our $VERSION = '0.200';
 
 sub new
 {
-	my ($class, %opts) = @_;
-	
-	if (!defined $opts{namespaces})
-	{
-		$opts{namespaces} = {};
-		while (<DATA>)
-		{
-			chomp;
-			my ($p, $u)  = split /\s+/;
-			$opts{namespaces}->{$p} ||= $u;
-		}
+   my ($class, %opts) = @_;
+
+	unless (blessed($opts{namespacemap}) && $opts{namespacemap}->isa('URI::NamespaceMap')) {
+	  if (defined $opts{namespaces}) {
+		 $opts{namespacemap} = URI::NamespaceMap->new($opts{namespaces});
+	  } else {
+		 my $curated = RDF::NS::Curated->new;
+		 $opts{namespacemap} = URI::NamespaceMap->new($curated->all);
+	  }
+	  
+	  # handle deprecated {ns}.
+	  if (defined($opts{ns})) {
+		 carp "ns option is deprecated by the RDFa serializer";
+	  }
+	  while (my ($u,$p) = each %{ $opts{ns} }) {
+		 $opts{namespacemap}->add_mapping($p => $u);
+	  }
+
+	  delete $opts{ns};
+	  delete $opts{namespaces}
 	}
-	
-	# handle deprecated {ns}.
-	while (my ($u,$p) = each %{ $opts{ns} })
-	{
-		$opts{namespaces}->{$p} ||= $u;
-	}
-	
-	delete $opts{ns};
-	
+	$opts{namespacemap}->guess_and_add('rdfa', 'rdf', 'rdfs', 'xsd');
 	bless \%opts, $class;
 }
 
@@ -52,7 +57,7 @@ sub inject_document
 	$xc->registerNs('xhtml', 'http://www.w3.org/1999/xhtml');
 	my @sites = $xc->findnodes($proto->injection_site);
 	
-	croak "No suitable place to inject this document." unless @sites;
+	die "No suitable place to inject this document." unless @sites;
 	
 	$sites[0]->appendChild($_) foreach @nodes;
 	return $dom;
@@ -101,25 +106,20 @@ sub nodes
 			XML::LibXML::Element->new('link');
 		$node->setNamespace('http://www.w3.org/1999/xhtml', undef, 1);
 		
-		my $prefixes = RDF::Prefixes->new($self->{namespaces});
-		$self->_process_subject($st, $node, $prefixes)
-		     ->_process_predicate($st, $node, $prefixes)
-		     ->_process_object($st, $node, $prefixes);
-		
-		use Data::Dumper; Dumper($prefixes);
+		$self->_process_subject($st, $node)
+		     ->_process_predicate($st, $node)
+		     ->_process_object($st, $node);
 		
 		if (defined($self->{'version'}) && $self->{'version'} == 1.1
 		and $self->{'prefix_attr'})
 		{
-			$node->setAttribute('prefix', $prefixes->rdfa)
-				if %$prefixes;
-		}
-		else
-		{
-			while (my ($u,$p) = each(%$prefixes))
-			{
-				$node->setNamespace($p, $u, 0);
-			}
+		  if (defined($self->{namespacemap}->rdfa)) {
+			 $node->setAttribute('prefix', $self->{namespacemap}->rdfa->as_string)
+		  }
+		} else {
+		  while (my ($prefix, $nsURI) = $self->{namespacemap}->each_map) {
+			 $node->setNamespace($nsURI->as_string, $prefix, 0);
+		  }
 		}
 		
 		push @nodes, $node;
@@ -135,56 +135,47 @@ sub nodes
 sub _get_stream
 {
 	my ($self, $model) = @_;
-	my $stream;
+	
 	my $data_context = undef;
-
-	if ($model->isa('RDF::Trine::Model')) {
-		if (defined $self->{'data_context'}) {
-			$data_context = ( $self->{'data_context'} =~ /^_:(.*)$/ ) ?
-			  RDF::Trine::Node::Blank->new($1) :
-					RDF::Trine::Node::Resource->new($self->{'data_context'});
-		}
-		$stream = $model->get_statements(undef, undef, undef, $data_context);
-	} elsif ($model->does('Attean::API::Model')) {
-		if (defined $self->{'data_context'}) {
-			$data_context = ( $self->{'data_context'} =~ /^_:(.*)$/ ) ?
-			  Attean::Blank->new($1) :
-					Attean::IRI->new($self->{'data_context'});
-		}
-		$stream = $model->get_quads(undef, undef, undef, $data_context);
-	} else {
-		croak "Unknown RDF model supplied";
+	if (defined($self->{'data_context'})) {
+	  if (! blessed($self->{'data_context'})) {
+		 croak "data_context can't be a string anymore, must be a Attean blank or IRI or an RDF::Trine::Node";
+	  } elsif ($self->{'data_context'}->does('Attean::API::BlankOrIRI')
+				  || $self->{'data_context'}->isa('RDF::Trine::Node')) {
+		 croak "data_context must be a Attean blank or IRI or an RDF::Trine::Node, not " . ref($self->{'data_context'});
+	  }
 	}
-	return $stream;
+	
+	return $model->get_quads(undef, undef, undef, $data_context);
 }
 
 sub _process_subject
 {
-	my ($self, $st, $node, $prefixes) = @_;
+	my ($self, $st, $node) = @_;
 	
 	if (defined $self->{'base'} 
 	and $st->subject->is_resource
-	and $st->subject->uri eq $self->{'base'})
+	and $st->subject->abs eq $self->{'base'})
 	{
 		return $self;
 	}
 	
 	if ($st->subject->is_resource) 
-		{ $node->setAttribute('about', $st->subject->uri); }
+		{ $node->setAttribute('about', $st->subject->abs); }
 	else
-		{ $node->setAttribute('about', '[_:'.$st->subject->blank_identifier.']'); }
+		{ $node->setAttribute('about', '[_:'.$st->subject->value.']'); }
 	
 	return $self;
 }
 
 sub _process_predicate
 {
-	my ($self, $st, $node, $prefixes) = @_;
+	my ($self, $st, $node) = @_;
 
 	my $attr = $st->object->is_literal ? 'property' : 'rel';
 
 	if ($attr eq 'rel'
-	and $st->predicate->uri =~ m'^http://www\.w3\.org/1999/xhtml/vocab\#
+	and $st->predicate->abs =~ m'^http://www\.w3\.org/1999/xhtml/vocab\#
 										(alternate|appendix|bookmark|cite|
 										chapter|contents|copyright|first|glossary|help|icon|
 										index|last|license|meta|next|p3pv1|prev|role|section|
@@ -194,104 +185,79 @@ sub _process_predicate
 		return $self;
 	}
 	elsif ($attr eq 'rel'
-	and $st->predicate->uri =~ m'^http://www\.w3\.org/1999/xhtml/vocab#(.*)$')
+	and $st->predicate->abs =~ m'^http://www\.w3\.org/1999/xhtml/vocab#(.*)$')
 	{
 		$node->setAttribute($attr, ':'.$1);
 		return $self;
 	}
 	elsif (defined($self->{'version'}) && $self->{'version'} == 1.1)
 	{
-		$node->setAttribute($attr, $st->predicate->uri);
+		$node->setAttribute($attr, $st->predicate->abs);
 		return $self;
 	}
 	
-	$node->setAttribute($attr, 
-		$self->_make_curie($st->predicate->uri, $prefixes));
+	$node->setAttribute($attr, $self->_make_curie($st->predicate));
 	
 	return $self;
 }
 
 sub _process_object
 {
-	my ($self, $st, $node, $prefixes) = @_;
+	my ($self, $st, $node) = @_;
 	
 	if (defined $self->{'base'} 
 	and $st->subject->is_resource
-	and $st->subject->uri eq $self->{'base'}
+	and $st->subject->abs eq $self->{'base'}
 	and $st->object->is_resource)
 	{
-		$node->setAttribute('href', $st->object->uri);
+		$node->setAttribute('href', $st->object->abs);
 		return $self;
 	}
 	elsif (defined $self->{'base'} 
 	and $st->object->is_resource
-	and $st->object->uri eq $self->{'base'})
+	and $st->object->abs eq $self->{'base'})
 	{
 		$node->setAttribute('resource', '');
 		return $self;
 	}
 	elsif ($st->object->is_resource)
 	{
-		$node->setAttribute('resource', $st->object->uri);
+		$node->setAttribute('resource', $st->object->abs);
 		return $self;
 	}
 	elsif ($st->object->is_blank)
 	{
-		$node->setAttribute('resource', '[_:'.$st->object->blank_identifier.']');
+		$node->setAttribute('resource', '[_:'.$st->object->value.']');
 		return $self;
 	}
 	
-	$node->setAttribute('content',  encode_utf8($st->object->literal_value));
+	$node->setAttribute('content',  encode_utf8($st->object->value));
 	
-	if (defined $st->object->literal_datatype)
+	if (defined $st->object->datatype)
 	{
-		$node->setAttribute('datatype', 
-			$self->_make_curie($st->object->literal_datatype, $prefixes));
+		$node->setAttribute('datatype', $self->_make_curie($st->object->datatype));
 	}
 	else
 	{
-		$node->setAttribute('xml:lang', ''.$st->object->literal_value_language);
+		$node->setAttribute('xml:lang', ''.$st->object->language);
 	}
 	
 	return $self;
 }
 
-sub _make_curie
-{
-	my ($self, $uri, $prefixes) = @_;	
-	use Data::Dumper; Dumper($prefixes); # this shouldn't do anything, but it fixes a bug!!
-	return $prefixes->get_qname($uri);
+sub _make_curie {
+  my ($self, $uri) = @_;
+  my $curie = $self->{namespacemap}->abbreviate($uri);
+  unless (defined($curie)) {
+	 $uri->value =~ m!(.*)(\#|/)(.*?)$!;
+	 my $trim = $1.$2;
+	 $self->{namespacemap}->guess_and_add($trim);
+	 $curie = $self->{namespacemap}->abbreviate($uri);
+  }
+  unless (defined($curie)) {
+	 $curie = $uri->value;
+  }
+  return $curie;
 }
 
 1;
-
-__DATA__
-bibo    http://purl.org/ontology/bibo/
-cc      http://creativecommons.org/ns#
-ctag    http://commontag.org/ns#
-dbp     http://dbpedia.org/property/
-dc      http://purl.org/dc/terms/
-doap    http://usefulinc.com/ns/doap#
-fb      http://developers.facebook.com/schema/
-foaf    http://xmlns.com/foaf/0.1/
-geo     http://www.w3.org/2003/01/geo/wgs84_pos#
-gr      http://purl.org/goodrelations/v1#
-ical    http://www.w3.org/2002/12/cal/ical#
-og      http://opengraphprotocol.org/schema/
-owl     http://www.w3.org/2002/07/owl#
-rdf     http://www.w3.org/1999/02/22-rdf-syntax-ns#
-rdfa    http://www.w3.org/ns/rdfa#
-rdfs    http://www.w3.org/2000/01/rdf-schema#
-rel     http://purl.org/vocab/relationship/
-rev     http://purl.org/stuff/rev#
-rss     http://purl.org/rss/1.0/
-sioc    http://rdfs.org/sioc/ns#
-skos    http://www.w3.org/2004/02/skos/core#
-tag     http://www.holygoat.co.uk/owl/redwood/0.1/tags/
-v       http://rdf.data-vocabulary.org/#
-vann    http://purl.org/vocab/vann/
-vcard   http://www.w3.org/2006/vcard/ns#
-void    http://rdfs.org/ns/void#
-xfn     http://vocab.sindice.com/xfn#
-xhv     http://www.w3.org/1999/xhtml/vocab#
-xsd     http://www.w3.org/2001/XMLSchema#

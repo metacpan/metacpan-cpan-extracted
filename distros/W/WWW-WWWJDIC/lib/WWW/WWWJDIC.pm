@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT_OK = qw/get_mirrors/;
 use warnings;
 use strict;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use Encode qw/encode decode/;
 use utf8;
 use URI::Escape;

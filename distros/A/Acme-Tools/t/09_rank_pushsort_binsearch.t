@@ -1,6 +1,6 @@
 #perl Makefile.PL;make;          perl -Iblib/lib t/09_rank_pushsort_binsearch.t
 #perl Makefile.PL;make;ATDEBUG=1 perl -Iblib/lib t/09_rank_pushsort_binsearch.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 61;
 
 my @a=(1,10,20,50,70,90,120,130);

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ChangeShebang
 
+0.07  2018-02-17 07:57:12 JST
+
+    - Migrate to milla
+
 0.06 2015-05-31T14:43:25Z
 
     - remove more carefully original shebang and "not running under some shell" stuff

@@ -60,7 +60,7 @@ import java.util.* ;
 
 public class types6 {
 	public static int i = 5 ;
-	public static HashMap hm = new HashMap() ;
+	public static HashMap<String, String> hm = new HashMap<>() ;
 
 	public types6(String k, String v){
 		hm.put(k, v) ;

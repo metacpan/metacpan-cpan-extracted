@@ -1,7 +1,7 @@
 package App::btcindo;
 
-our $DATE = '2018-02-01'; # DATE
-our $VERSION = '0.019'; # VERSION
+our $DATE = '2018-02-17'; # DATE
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,6 +35,7 @@ our @Market_Pairs = (
     'ignis_idr',
     'ltc_idr',
     'nxt_idr',
+    'ten_idr',
     'waves_idr',
     'xlm_idr',
     'xrp_idr',
@@ -340,13 +341,16 @@ _
             schema => ['str*', in=>[qw/day all/]],
             default => 'day',
         },
+        # XXX pair (API chartdata only available for btc_idr at the moment)
     },
 };
 sub price_history {
     my %args = @_;
     _init(\%args);
 
-    my $res = $btcindo->get_price_history(period => $args{period})->{chart};
+    my $res = $btcindo->get_price_history(
+        period => $args{period},
+    )->{chart};
 
     my @rows;
     for my $row (@$res) {
@@ -1058,7 +1062,7 @@ App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.019 of App::btcindo (from Perl distribution App-btcindo), released on 2018-02-01.
+This document describes version 0.020 of App::btcindo (from Perl distribution App-btcindo), released on 2018-02-17.
 
 =head1 SYNOPSIS
 

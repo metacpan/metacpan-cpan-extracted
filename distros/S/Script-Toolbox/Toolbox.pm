@@ -18,7 +18,7 @@ our @ISA = qw(Script::Toolbox::Util Script::Toolbox::Util::Opt Exporter);
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir File FileC
 						           System Now Menue KeyMap Stat TmpFile
-                                   DataMenue
+                                   DataMenue Menu DataMenu
                                   )]);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -27,7 +27,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.54';
+our $VERSION = '0.56';
 
 
 # Preloaded methods go here.
@@ -106,7 +106,7 @@ Script::Toolbox - Framework for the daily business scripts
   #--------------------------
   # Automatic usage messages
   #--------------------------
-  Usage(); # print a usage message for all options
+  Usage(); # print an usage message for all options
            # if available print also the POD
 
   Usage('This is additional text for the usage');
@@ -161,6 +161,11 @@ Script::Toolbox - Framework for the daily business scripts
   Exit( 1, 'Exit message' ); # exit with returncode 1, 
                              # write exit message via Log()
 
+  Exit( 1, 'Exit message', __FILE__, __LINE__ );
+                             # exit with returncode 1, 
+                             # with code line reference,
+                             # write exit message via Log()
+
   $fh = Open( '> /tmp/xx' ); # return an IO::File object with
                              # /tmp/xx opened for write 
                              # die with logfile entry if failed
@@ -188,10 +193,10 @@ Script::Toolbox - Framework for the daily business scripts
 
 
   #----------------
-  # Menue handling
+  # Menu handling
   #----------------
-  # using Menue to start subroutines
-  my $mainMenue = [{'header'=>'This is the line on top'},
+  # using Menu to start subroutines
+  my $mainMenu = [{'header'=>'This is the line on top'},
                    {'footer'=>'This is the bottom line.'},
                    {'label'=>'EXIT',          jump'=>\&_exit,     argv'=>0},
                    {'label'=>'Edit Hosts',    jump'=>\&editHosts, argv'=>$ops},
@@ -199,70 +204,70 @@ Script::Toolbox - Framework for the daily business scripts
                    {'label'=>'Changeable Value','value'=>10},
                    {'label'=>'Read only  Value','value'=>10, 'readOnly'=>1},
                   ];
-  while( 1 ) { my ($o,$mainMenue) = Menue($mainMenue); }
+  while( 1 ) { my ($o,$mainMenu) = Menu($mainMenu); }
 
   # or ...
-  my ($resp, $menue) = Menue([{'label'=>'One'},{'label'=>'Two'},{'label'=>'Three'}]);
+  my ($resp, $menue) = Menu([{'label'=>'One'},{'label'=>'Two'},{'label'=>'Three'}]);
   print 'Second Option' if( $resp == 2 );
 
   # or with header and footer
-  my ($resp, $menue) = Menue([{'header'=>'This is the optional head line.'}, 
+  my ($resp, $menue) = Menu([{'header'=>'This is the optional head line.'}, 
                               {'label' =>'One'},{'label'=>'Two'},{'label'=>'Three'},
                               {'footer'=>'This is the optional footer line.'}]);
   print 'Second Option' if( $resp == 2 );
 
   #----------------
-  # Menue container 
+  # Menu container 
   #----------------
-  my $m = Script::Toolbox::Util::Menues->new({'SubMenue1'=>[{'label'=>'Opt1','label'=>'Opt2'}]});
-  my $m = Script::Toolbox::Util::Menues->new();
+  my $m = Script::Toolbox::Util::Menus->new({'SubMenu1'=>[{'label'=>'Opt1','label'=>'Opt2'}]});
+  my $m = Script::Toolbox::Util::Menus->new();
 
-     $m->addMenue({'MainMenue'=>[{'label'=>'Opt1','label'=>'Opt2'}]});
-     $m->addOption('MainMenue',  {'label'=>'Opt3',     'jump'=>\&callBack });
-     $m->addOption('MainMenue',  {'label'=>'Sub Menue','jump'=>'SubMenue1'}); 
-     $m->addOption('MainMenue',  {'label'=>'Edit Value','value'=>10});
+     $m->addMenu({'MainMenu'=>[{'label'=>'Opt1','label'=>'Opt2'}]});
+     $m->addOption('MainMenu',  {'label'=>'Opt3',     'jump'=>\&callBack });
+     $m->addOption('MainMenu',  {'label'=>'Sub Menu','jump'=>'SubMenu1'}); 
+     $m->addOption('MainMenu',  {'label'=>'Edit Value','value'=>10});
      $m->setAutoHeader();               # enable AutoHeader for all defined menues
-     $m->setAutoHeader('MainMenue');    # enable AutoHeader for one menue
+     $m->setAutoHeader('MainMenu');    # enable AutoHeader for one menue
      $m->delAutoHeader();               # disable AutoHeader for all defined menues
-     $m->delAutoHeader('MainMenue');    # disable AutoHeader for one menue
-     $m->setHeader('MainMenue','My new header of main manue'); # override setAutoHeader()
-     $m->setFooter('MainMenue','------');
+     $m->delAutoHeader('MainMenu');    # disable AutoHeader for one menue
+     $m->setHeader('MainMenu','My new header of main manue'); # override setAutoHeader()
+     $m->setFooter('MainMenu','------');
 
-  my $num = $m->run('MainMenue');        # terminate menue after first selection, return seleted option number
-     $num = $m->run('MainMenue', 3);     # terminate menue after third selection, return last seleted option number
-     $num = $m->run('MainMenue', 0);     # terminate never
-  my $opt = $m->currNumber('MainMenue'); # return number of last seleted option
-  my $lbl = $m->currLabel ('MainMenue'); # return label  of last seleted option
-  my $jmp = $m->currJump  ('MainMenue'); # return callback address of last seleted option
-  my $val = $m->currValue ('MainMenue'); # return data value of last seleted option
-  my $lbl = $m->setCurrLabel ('MainMenue','newLabel'); # set label  of last seleted option
-  my $val = $m->setCurrValue ('MainMenue','newValue'); # set data value of last seleted option
-  my $jmp = $m->setCurrJump  ('MainMenue',\&newCB,$newArgv); # set callback address of last seleted option
+  my $num = $m->run('MainMenu');        # terminate menue after first selection, return seleted option number
+     $num = $m->run('MainMenu', 3);     # terminate menue after third selection, return last seleted option number
+     $num = $m->run('MainMenu', 0);     # terminate never
+  my $opt = $m->currNumber('MainMenu'); # return number of last seleted option
+  my $lbl = $m->currLabel ('MainMenu'); # return label  of last seleted option
+  my $jmp = $m->currJump  ('MainMenu'); # return callback address of last seleted option
+  my $val = $m->currValue ('MainMenu'); # return data value of last seleted option
+  my $lbl = $m->setCurrLabel ('MainMenu','newLabel'); # set label  of last seleted option
+  my $val = $m->setCurrValue ('MainMenu','newValue'); # set data value of last seleted option
+  my $jmp = $m->setCurrJump  ('MainMenu',\&newCB,$newArgv); # set callback address of last seleted option
 
-  my $list= $m->getMatching('MainMenue','^[1]','number','label'); # return all labels where option number starts with one
-  my $list= $m->getMatching('MainMenue','(min|low)','value','number'); # return all option numbers where value match min or low
+  my $list= $m->getMatching('MainMenu','^[1]','number','label'); # return all labels where option number starts with one
+  my $list= $m->getMatching('MainMenu','(min|low)','value','number'); # return all option numbers where value match min or low
 
   #----------------
-  # Data Menues 
+  # Data Menus 
   #----------------
-  # using Menue to display and edit some few data values
-  my $dataMenue = [{'label'=>'EXIT'},
+  # using Menu to display and edit some few data values
+  my $dataMenu = [{'label'=>'EXIT'},
                    {'label'=>'Name',value'=>''},
                    {'label'=>'ZIP', value'=>'01468'},
                    {'label'=>'City',value'=>'Templeton'} ];
 
   while( 1 ) {
-    my ($o,$dataMenue) = Menue($dataMenue);
+    my ($o,$dataMenu) = Menu($dataMenu);
     last if( $o == 0 );
   }
 
   # or ...
-  my $dataMenue = [{'label'=>'Name',value'=>''},
-                  {'label'=>'ZIP', value'=>'01468'},
-                  {'label'=>'City',value'=>'Templeton'} ];
-  $dataMenue = DataMenue($dataMenue)
-  my $data   = DataMenue('aaa bbb ccc');
-  my $data   = DataMenue('aaa bbb ccc',{'header'=>'Top Line', 'footer'=>'Bottom Line'});
+  my $dataMenu = [{'label'=>'Name','value'=>'',         'default'=>'Linus'},
+                  {'label'=>'ZIP', 'value'=>'01468',    'default'=>'00000'},
+                  {'label'=>'City','value'=>'Templeton','default'=>'London'} ];
+  $dataMenu = DataMenu($dataMenu)
+  my $data   = DataMenu('aaa bbb ccc');
+  my $data   = DataMenu('aaa bbb ccc',{'header'=>'Top Line', 'footer'=>'Bottom Line'});
 
 =head1 ABSTRACT
 
@@ -300,10 +305,10 @@ Return a reference to this array or undef if the directory is not readable.
 
 
 
-=item Exit(1,'The reason for the exit.')
+=item Exit(1,'The reason for the exit.', __FILE__, __LINE__)
 
 Exit the script with return value 1. Write the message to the log-channel
-via Log().
+via Log().  __FILE__ and __LINE__ are optional.
 
 
 
@@ -499,7 +504,7 @@ Otherwise default title and headers will be generated.
 =item *
 
 A hash with the keys 'title', 'head' and 'data'. 'title' points to a
-SCALAR value, 'head' points to a array of scalars. 'data' points to
+SCALAR value, 'head' points to an array of scalars. 'data' points to
 an array of arrays or an array of hashes. 
 
 In case of array of hashes, the column heads will be initialized from
@@ -527,11 +532,13 @@ by "\n" as default if <sep> is missing.
 
 =back
 
-=item Menue
+=item Menu
 
 There are two types of menues. Regular menues and data menues.
 All menues use the madatory key 'label'. 
-A data menue has the mandatory key 'value'.
+A data menue has the mandatory key 'value' and optional keys 'default' and
+'readOnly'. The latter has some special effects within Menus containers.
+See also addOption() and run().
 
 Optional keys for both types are 'header' and 'footer'. All Entries with
 these keys will be printed on top resp. below the option lines.
@@ -540,36 +547,76 @@ Regular menues may use the optional keys 'jump' and 'argv'. Jump points
 to a handler subroutine. Argv points to the arguments of the handler
 subroutine.
 
-=item Menues
+=item Menus
 
 This is an object oriented container for regular menues. Each menue generated
-by Menues->new() gets a automatic RETURN option with option number zero and 
-must have a unique menue-name.
+by Menus->new() gets an automatic RETURN option with option number zero and 
+must have an unique menue-name.
 
-Menues-Methods:
+Menus-Methods:
 
 =over 4
 
-=item addMenue(<menueDefs>)
+=item addMenu(<menueDefs>)
 
-Add one or more complete menue definitions to the menues object. A <menueDefs> has this layout:
+Add one or more complete menue definitions to the menues object.
+A <menueDefs> has this layout:
 {<menueName> => [<menueDef>], ...}
 
-<menueDef> is the structure of a simple menue as decribed in item Menue. In the context of
-Menues, a jump target may be also the name of a menue in the same Menues container.
+<menueDef> is the structure of a simple menue as decribed in item Menu.
+In the context of Menus, a jump target may be also the name of a menue
+in the same Menus container.
 
-     $m->addMenue({
-         'SubMenue' =>[{'label'=>'Opt2'}, {'label'=>'Opt3'}],
-         'MainMenue'=>[{'label'=>'Go to submenue','jump'=>'SubMenue'}, {'label'=>'Opt1'}]
+     $m->addMenu({
+         'SubMenu' =>[{'label'=>'Opt2'}, {'label'=>'Opt3'}],
+         'MainMenu'=>[{'label'=>'Go to submenue','jump'=>'SubMenu'}, {'label'=>'Opt1'}]
      });
 
 =item addOption(<menueName>,<labelsDef>)
 
 Add a new option line to the menue <menueName>.
 
-     $m->addOption('MainMenue',  {'label'=>'Opt3',     'jump'=>\&callBack });
-     $m->addOption('MainMenue',  {'label'=>'Sub Menue','jump'=>'SubMenue1'}); 
-     $m->addOption('MainMenue',  {'label'=>'Edit Value','value'=>10});
+     $m->addOption('MainMenu',  {'label'=>'Opt3',      'jump'=>\&callBack });
+     $m->addOption('MainMenu',  {'label'=>'Sub Menu',  'jump'=>'SubMenu1'}); 
+     $m->addOption('MainMenu',  {'label'=>'Edit 1','value'=>10});
+     $m->addOption('MainMenu',  {'label'=>'Edit 2','value'=>10, 'default'=>20});
+     $m->addOption('MainMenu',  {'label'=>'Toggle1', 'readOnly'=>1,
+                                 'value'=>10, 'default'=>20});
+     $m->addOption('MainMenu',  {'label'=>'Toggle2', 'readOnly'=>1, 'value'=>10});
+     $m->addOption('MainMenu',  {'label'=>'Toggle3', 'readOnly'=>1, 'default'=>10});
+     $m->addOption('MainMenu',  {'label'=>'Toggle4', 'readOnly'=>1, });
+
+=over 4
+
+=item Edit 1
+
+Normal edit mode. If you enter <SPACE> the content of value is a space character.
+
+=item Edit 2
+
+Reset to default mode. If you enter <SPACE> the content of value is the
+content of default.
+
+=item Toggle 1
+
+The content of value toggles between 10 and 20 (value and default content).
+
+=item Toggle 2
+
+The content of value toggles between 10 and '' (value and default content).
+
+=item Toggle 3
+
+The content of value toggles between '' and 10 (value and default content).
+
+=item Toggle 4
+
+The content of value toggles between 'x' and '' (value and default content).
+
+
+=back
+
+
 
 =item setHeader(<menueName>,<newHeaderStr>)
 
@@ -584,55 +631,71 @@ Replace the footer of the menue <menueName>.
 Start the menue <menueName>. The run() method returns after 
 the the user has <maxRunCnt> options selected. Default value for <maxRunCnt> is one.
 If <maxRunCnt> is lower than or equal zero, the run() method will never return unless the
-user selects the RETURN option (num=0). The run() method give back the number of the
+user selects the RETURN option (num=0). The run() method returns the number of the
 last selected option.
 
+If the menu runs in endless mode (maxRunCnt < 0), then all <readOnly> options
+will take a special behavior. They are in toggle-mode. See also example at
+addOption().
 
-    while( $m->run('MainMenue') ) { ... }
-    $num = $m->run('MainMenue', 3);
-    $num = $m->run('MainMenue', 0);
+    while( $m->run('MainMenu') ) { ... }
+    $num = $m->run('MainMenu', 3);
+    $num = $m->run('MainMenu', 0);
 
 =item currNumber(<menueName>)
 
 Get the number of the last selected option.
 
-  my $opt = $m->currNumber('MainMenue');
+  my $opt = $m->currNumber('MainMenu');
 
 =item currLabel(<menueName>)
 
 Get the label of the last selected option.
 
-  my $lbl = $m->currLabel ('MainMenue');
+  my $lbl = $m->currLabel ('MainMenu');
 
 =item currJump(<menueName>)
 
 Get the address of the callback function of the last selected option.
 
-  my $jmp = $m->currJump  ('MainMenue');
+  my $jmp = $m->currJump  ('MainMenu');
 
 =item currValue(<menueName>)
 
 Get the data field value of the last selected option.
 
-  my $val = $m->currValue ('MainMenue'); 
+  my $val = $m->currValue ('MainMenu'); 
 
 =item setCurrLabel(<menueName>,<newLabel>)
 
 Change the label string of the last selected option. Return the old label string.
 
-  my $old = $m->setCurrLabel ('MainMenue','newLabel'); 
+  my $old = $m->setCurrLabel ('MainMenu','newLabel'); 
 
 =item setCurrJump(<menueName>,\$newCB,$newArgv)
 
 Change the address of the callback function and argv of the last selected option.
 
-  my ($oldCB,$oldArgv) = $m->setCurrJump  ('MainMenue',<newCallBack>,<newArgv>); 
+  my ($oldCB,$oldArgv) = $m->setCurrJump  ('MainMenu',<newCallBack>,<newArgv>); 
 
 =item setCurrValue(<menueName>,<newValue>)
 
 Change the data field value of the last selected option. Return the old value.
 
-  my $old = $m->currValue ('MainMenue','newValue');
+  my $old = $m->currValue ('MainMenu','newValue');
+
+=item setCurrDefault(<menuName>,<newDefault>)
+
+Set a new default for the current selected option of menue <nemuName>.
+Return the old default.
+
+
+=item setCurrReadOnly(<menuName>,<newReadOnly>)
+
+Set the readOnly flag for the current selected option of menue <nemuName>.
+Return the old readOnly state. <newReadOnly> may be 0, 'false' or undef
+for logical false. Any other values means locical true.
+
 
 =item getMatching(<menueName>,<pattern>,<searchIn>,<return>)
 
@@ -660,20 +723,28 @@ The part of option to return (label,number,value) if search match.
 =item setAutoHeader(), setAutoHeader(<menueName>)
 
 Enable automatic header line generation if no regular header defined.
-The header looks like 'Menue: <menueName>' 
+The header looks like 'Menu: <menueName>' 
 Enable AutoHeader for all menues or only the one selected by <menueName>.
 
 =item delAutoHeader(), delAutoHeader(<menueName>)
 
 Disable AutoHeader for all menues or only the one selected by <menueName>.
 
+=item getLabelValueHash()
+
+Return a hash with all label-value pairs of the menu.
+
+=item getRunCnt(<menuName>)
+
+Return the current value of the running counter of the menu.
+
+
 =back
 
 
+=item DataMenu
 
-=item DataMenue
-
-This is a convenient version to edit values via Menue function. It includes
+This is a convenient version to edit values via Menu function. It includes
 an endless loop and an automatic generated EXIT label and exit handling.
 The edited values will be returned. Acceptable input are the same array with
 'label', 'value' hash or a simple white space separated scalar value.
@@ -684,6 +755,13 @@ An option entry like:
  {'label'=>'Read Only Example', 'value'=>10, 'readOnly'=>1}
 
 causes the value will be displayed only and can not be changed.
+
+If a default is defined, like this:
+
+ {'label'=>'Default Example', 'value'=>10, 'default'=>'99'}
+
+and the input is a single space character, then the 'default' will be
+assigned to 'value'.
 
 =back
 
@@ -700,11 +778,15 @@ None by default. Can export Dir, Exit, File, KeyMap, Log,
 Now, Open, Table, Usage, System, Stat or :all.
 
 
+=head1 DEPRECATED
+
+Menues, Menue, DataMenue will be removed in version 1.0 ;-)
+
 =head1 SEE ALSO
 
 L<IO::File>, L<Fatal>, L<Script::Toolbox::Util>,
 L<Script::Toolbox::Util::Open>,   L<Script::Toolbox::Util::Formatter>,
-L<Script::Toolbox::Util::Menues>, L<Script::Toolbox::TableO>,
+L<Script::Toolbox::Util::Menus>, L<Script::Toolbox::TableO>,
 L<Time::ParseDate>
 
 
@@ -714,7 +796,7 @@ Matthias Eckardt, E<lt>Matthias.Eckardt@imunixx.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2016 by Matthias Eckardt, imunixx GmbH
+Copyright 2002-2018 by Matthias Eckardt, imunixx GmbH
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

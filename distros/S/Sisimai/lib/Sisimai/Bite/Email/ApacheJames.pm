@@ -4,25 +4,17 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'    => qr/\A\[BOUNCE\]\z/,
-    'received'   => qr/JAMES SMTP Server/,
-    'message-id' => qr/\d+[.]JavaMail[.].+[@]/,
-};
-my $Re1 = {
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
     # apache-james-2.3.2/src/java/org/apache/james/transport/mailets/
     #   AbstractNotify.java|124:  out.println("Error message below:");
     #   AbstractNotify.java|128:  out.println("Message details:");
-    'begin'  => qr/\AContent-Disposition:[ ]inline/,
-    'error'  => qr/\AError message below:\z/,
-    'rfc822' => qr|\AContent-Type: message/rfc822|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
+    'message' => ['Content-Disposition: inline'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+    'error'   => ['Error message below:'],
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
-sub pattern     { return $Re0 }
 sub description { 'Java Apache Mail Enterprise Server' }
-
 sub scan {
     # Detect an error from ApacheJames
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -41,9 +33,12 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match ||= 1 if $mhead->{'subject'} =~ $Re0->{'subject'};
-    $match ||= 1 if defined $mhead->{'message-id'} && $mhead->{'message-id'} =~ $Re0->{'message-id'};
-    $match ||= 1 if grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    # 'subject'    => qr/\A\[BOUNCE\]\z/,
+    # 'received'   => qr/JAMES SMTP Server/,
+    # 'message-id' => qr/\d+[.]JavaMail[.].+[@]/,
+    $match ||= 1 if $mhead->{'subject'} eq '[BOUNCE]';
+    $match ||= 1 if defined $mhead->{'message-id'} && index($mhead->{'message-id'}, '.JavaMail.') > -1;
+    $match ||= 1 if grep { index($_, 'JAMES SMTP Server') > -1 } @{ $mhead->{'received'} };
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -59,10 +54,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -70,7 +65,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -101,7 +96,7 @@ sub scan {
             #   Number of lines: 64
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[ ][ ]RCPT[ ]TO:[ ]([^ ]+[@][^ ]+)\z/ ) {
+            if( $e =~ /\A[ ][ ]RCPT[ ]TO:[ ]([^ ]+[@][^ ]+)\z/ ) {
                 #   RCPT TO: kijitora@example.org
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -111,11 +106,11 @@ sub scan {
                 $v->{'recipient'} = $1;
                 $recipients++;
 
-            } elsif( $e =~ m/\A[ ][ ]Sent[ ]date:[ ](.+)\z/ ) {
+            } elsif( $e =~ /\A[ ][ ]Sent[ ]date:[ ](.+)\z/ ) {
                 #   Sent date: Thu Apr 29 01:20:50 JST 2015
                 $v->{'date'} = $1;
 
-            } elsif( $e =~ m/\A[ ][ ]Subject:[ ](.+)\z/ ) {
+            } elsif( $e =~ /\A[ ][ ]Subject:[ ](.+)\z/ ) {
                 #   Subject: Nyaaan
                 $subjecttxt = $1;
 
@@ -124,7 +119,7 @@ sub scan {
 
                 if( $v->{'diagnosis'} ) {
                     # Get an error message text
-                    if( $e =~ m/\AMessage[ ]details:\z/ ) {
+                    if( $e eq 'Message details:' ) {
                         # Message details:
                         #   Subject: nyaan
                         #   ...
@@ -136,25 +131,23 @@ sub scan {
                         #   550 - Requested action not taken: no such user here
                         $v->{'diagnosis'} .= ' '.$e;
                     }
-
                 } else {
                     # Error message below:
                     # 550 - Requested action not taken: no such user here
-                    $v->{'diagnosis'} = $e if $e =~ $Re1->{'error'};
+                    $v->{'diagnosis'} = $e if $e eq $StartingOf->{'error'}->[0];
                 }
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
-    unless( grep { $_ =~ /^Subject:/ } @$rfc822list ) {
+    unless( grep { index($_, 'Subject:') == 0 } @$rfc822list ) {
         # Set the value of $subjecttxt as a Subject if there is no original
         # message in the bounce mail.
-        push @$rfc822list, sprintf("Subject: %s", $subjecttxt);
+        push @$rfc822list, 'Subject: '.$subjecttxt;
     }
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'} || $diagnostic);
@@ -206,7 +199,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

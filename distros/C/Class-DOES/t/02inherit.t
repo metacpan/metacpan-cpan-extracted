@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use lib "tlib";
 
 use t::Utils;
 my $T;

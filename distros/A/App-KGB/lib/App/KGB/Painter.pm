@@ -64,12 +64,12 @@ our %item_colors = (
 
 =head2 new
 
- my $p = App::KGB::Painter->new({ color_codes => { ... }, style => { ... } } );
+ my $p = App::KGB::Painter->new({ color_codes => { ... }, item_colors => { ... } } );
 
 B<color_codes> is a hash with the special symbols interpreted as coloring
 commands by IRC clients.
 
-B<style> is another hash describing what colors to apply to different parts of
+B<item_colors> is another hash describing what colors to apply to different parts of
 the messages.
 
 =cut
@@ -165,7 +165,7 @@ sub colorize_change {
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) Damyan Ivanov <dmn@debian.org>.
+Copyright (c) 2013, 2018, Damyan Ivanov L<dmn@debian.org>.
 
 This module is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

@@ -5,7 +5,7 @@ requires 'Log::Any',              '1.042';
 requires 'Mojolicious',           '7.08';
 requires 'Ouch',                  '0.0409';
 requires 'Try::Tiny',             '0.27';
-requires 'WWW::Telegram::BotAPI', '0.07';
+requires 'WWW::Telegram::BotAPI', '0.10';
 requires 'Moo',                   '2.002005';
 requires 'namespace::clean',      '0.27';
 

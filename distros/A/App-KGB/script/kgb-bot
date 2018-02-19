@@ -5,7 +5,7 @@ use utf8;
 #
 # KGB - an IRC bot helping collaboration
 # Copyright © 2008 Martín Ferrari
-# Copyright © 2008,2009,2010,2011,2012,2013 Damyan Ivanov
+# Copyright © 2008,2009,2010,2011,2012,2013,2018 Damyan Ivanov
 # Copyright © 2010 gregor herrmann
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -79,9 +79,8 @@ use warnings;
 use utf8;
 use open ':encoding(utf8)';
 use App::KGB::Painter;
+use Net::IP;
 use Time::Piece qw(localtime);
-
-our $VERSION = '1.33';
 
 use Cwd;
 
@@ -105,6 +104,12 @@ our $progname;
 our $restart      = 0;
 our $shuttingdown = 0;
 our $painter;
+our $painter_dummy = App::KGB::Painter->new( { simulate => 1 } );
+
+# for JSON::XS, used for debugging
+sub Net::IP::TO_JSON {
+    shift->short;
+}
 
 sub save_progname () {
     $progname = Cwd::realpath($0);
@@ -329,7 +334,13 @@ sub read_conf ($) {
     $conf->{pid_dir}
         = Cwd::realpath( $conf->{pid_dir} // '/var/run/kgb-bot' );
 
-    KGB->debug( JSON::XS::encode_json($conf) );
+    if (    exists $conf->{webhook}
+        and exists $conf->{webhook}{allowed_networks} )
+    {
+        $_ = Net::IP->new($_) for @{ $conf->{webhook}{allowed_networks} };
+    }
+
+    KGB->debug( JSON::XS->new->convert_blessed(1)->encode($conf) );
     return $conf;
 }
 
@@ -340,6 +351,7 @@ sub load_conf($) {
     # Save globals
     $config_file = Cwd::realpath($file);
     $config      = $conf;
+
     return $conf;
 }
 
@@ -357,7 +369,8 @@ sub reload_conf() {
         return -2;    # need restart
     }
 
-    $painter = App::KGB::Painter->new( { styles => $new_conf->{colors} } );
+    $painter =
+        App::KGB::Painter->new( { item_colors => $new_conf->{colors} } );
 
     KGB->out("Configuration file reloaded\n");
     $config = $new_conf;
@@ -372,7 +385,12 @@ sub out {
 sub debug {
     return unless $KGB::debug;
 
-    shift->out( @_ );
+    my $self = shift;
+
+    my $first_line = shift;
+    $first_line = (caller)[2] . ': ' . $first_line;
+
+    $self->out( $first_line, @_ );
 }
 
 sub open_log {
@@ -388,10 +406,6 @@ sub open_log {
         open( STDERR, ">", "/dev/null" )
             or die "Error closing stderr: $!\n";
     }
-}
-
-sub remove_pid() {
-    unlink File::Spec->catfile( $KGB::config->{pid_dir}, 'kgb-bot.pid' );
 }
 
 package KGB::POE;
@@ -420,6 +434,7 @@ sub _start {
     $kernel->yield("_irc_reconnect") unless $KGB::simulate;
 
     KGB->out(
+        "PID $$ ",
         "Listening on http://", $KGB::config->{soap}{server_addr},
         ":",                    $KGB::config->{soap}{server_port},
         "?session=",            $KGB::config->{soap}{service_name},
@@ -538,7 +553,7 @@ sub do_commit_msg {
     my $branch = $data->{branch} // '';
     my $module = $data->{module} // '';
 
-    local $KGB::config->{colors} = {}
+    local $KGB::painter = $KGB::painter_dummy
         if exists $data->{extra}
         and exists $data->{extra}{use_color}
         and not $data->{extra}{use_color};
@@ -839,6 +854,7 @@ package KGB::IRC;
 use strict;
 use warnings;
 
+use App::KGB;
 use Digest::MD5 qw(md5_hex);
 use POE;
 use POE::Component::IRC::Common qw( parse_user matches_mask );
@@ -901,7 +917,10 @@ sub _irc_reconnect {
         my $opts = $KGB::config->{networks}{$net};
         $current{$net} = $opts;
 
-        my $irc = POE::Component::IRC::State->spawn( Alias => "irc_$net" );
+        my $irc = POE::Component::IRC::State->spawn(
+            Alias      => "irc_$net",
+            WhoJoiners => 0,
+        );
 
         # No need to register, as it's done automatically now. If you register
         # twice, POE never exits
@@ -947,8 +966,8 @@ sub irc_registered {
 
     $irc_object->plugin_add(
         'CTCP' => POE::Component::IRC::Plugin::CTCP->new(
-            version    => "KGB v$KGB::VERSION",
-            userinfo   => "KGB v$KGB::VERSION",
+            version    => "KGB v$App::KGB::VERSION",
+            userinfo   => "KGB v$App::KGB::VERSION",
             clientinfo => "VERSION USERINFO CLIENTINFO SOURCE",
             source     => "http://alioth.debian.org/projects/kgb",
         )
@@ -1008,6 +1027,25 @@ sub get_net {
     ( my $net = $obj->get_heap()->session_alias() ) =~ s/^irc_//;
 
     return $net;
+}
+
+sub irc_chan_sync {
+    my ( $kernel, $chan ) = @_[KERNEL, ARG0];
+
+    if ( my $jc = delete $KGB::joining_channels{$chan} ) {
+        KGB->out("Sending messages waiting for $chan");
+        $KGB::config->{chanidx}{$chan} = {
+            name => $chan,
+            network => $jc->{network},
+        };
+
+        for my $stash ( @{ $jc->{pending_messages} } ) {
+            $kernel->yield(
+                irc_notify => $chan,
+                $stash->{message}, $stash->{method}
+            );
+        }
+    }
 }
 
 sub irc_001 {
@@ -1135,8 +1173,10 @@ sub irc_new_hash {
         delete $seen_idx->{ pop @$seen_list };
     }
 
-    push @$seen_list, $hash;
-    $seen_idx->{$hash} = $#$seen_list;
+    # new entries arrive at the top
+    $_++ for values %$seen_idx;
+    unshift @$seen_list, $hash;
+    $seen_idx->{$hash} = 0;
 }
 
 sub irc_notify {
@@ -1198,6 +1238,8 @@ sub irc_command {
 
 package KGB::JSON;
 
+use strict;
+use warnings;
 use JSON::XS;
 use POE;
 use Digest::SHA qw(sha1_hex);
@@ -1397,6 +1439,917 @@ sub do_json_relay_message {
     return 'OK';
 }
 
+package KGB::WebHook;
+
+use strict;
+use warnings;
+use File::Basename;
+use HTTP::Status;
+use JSON;
+use App::KGB::Painter;
+use List::Util qw(max);
+use Net::IP;
+use POE;
+
+sub colorize { KGB::SOAP::colorize( @_ ) };
+sub colorize_change { KGB::SOAP::colorize_change( @_ ) };
+
+=head2 webhook_request I<request> I<response> I<dirmatch>
+
+Handler for webhook HTTP request.
+
+This handler only processes the HTTP part, parsing URI parameters and POST
+contents.
+
+The actual processing and IRC notification is done via an appropriate
+C<gitlab_webhook_*> event, asynchronously.
+
+=cut
+
+sub webhook_request {
+    my ( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
+
+    unless ( $KGB::config->{webhook}{enabled} ) {
+        $response->code(HTTP::Status::HTTP_PRECONDITION_FAILED);
+        $response->content('WebHook support not enabled');
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    my $client_ip = Net::IP->new($response->connection->remote_ip);
+
+    my $allowed = 0;
+
+    my $allowed_nets = $KGB::config->{webhook}{allowed_networks};
+    if ($allowed_nets) {
+        for my $net (@$allowed_nets) {
+            next unless $net->version == $client_ip->version;
+
+            $allowed = 1, last
+                if $net->overlaps($client_ip) != $Net::IP::IP_NO_OVERLAP;
+        }
+    }
+
+    unless ($allowed) {
+        KGB->debug( "Client $client_ip is not whitelisted ("
+                . join( ', ', map( $_->short, @{ $allowed_nets // [] } ) )
+                . ")" );
+        $response->code(HTTP::Status::HTTP_FORBIDDEN);
+        $response->content('Your IP is not allowed to send webhook requests');
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    KGB->debug( "got a webhook request from " . $client_ip->ip );
+
+    unless( $request->method eq 'POST' ) {
+        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
+        $response->message('Request method must be "POST"');
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    KGB->debug('DEBUG: method check passed');
+
+    my $json;
+    my $ok = eval {
+        $json = JSON::from_json( $request->content, { utf8 => 1 } );
+        1;
+    };
+
+    unless ($ok) {
+        my $err = $@;
+        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
+        $response->message('Error decoding JSON body');
+        $response->content($err);
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    KGB->debug('Body decoded');
+
+    unless (
+            $json
+        and ref($json)
+        and ref($json) eq 'HASH'
+        and (   $json->{project}
+            and defined $json->{project}{name}
+            and length $json->{project}{name}
+            or defined $json->{project_name} and length $json->{project_name} )
+        and defined $json->{object_kind}
+        and length $json->{object_kind}
+        )
+    {
+        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
+        $response->message('Empty on invalid JSON body');
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    my $module = $json->{project}{name};
+
+    my $hook_handler;
+    if ( $json->{object_kind} eq 'push' ) {
+        $hook_handler = 'gitlab_webhook_push';
+    }
+    elsif ( $json->{object_kind} eq 'tag_push' ) {
+        $hook_handler = 'gitlab_webhook_tag_push';
+    }
+    elsif ( $json->{object_kind} eq 'wiki_page' ) {
+        $hook_handler = 'gitlab_webhook_wiki_page';
+    }
+    elsif ( $json->{object_kind} eq 'issue' ) {
+        $hook_handler = 'gitlab_webhook_issue';
+    }
+    elsif ( $json->{object_kind} eq 'note' ) {
+        $hook_handler = 'gitlab_webhook_note';
+    }
+    elsif ( $json->{object_kind} eq 'merge_request' ) {
+        $hook_handler = 'gitlab_webhook_merge_request';
+    }
+    elsif ( $json->{object_kind} eq 'pipeline' ) {
+        $hook_handler = 'gitlab_webhook_pipeline';
+    }
+    elsif ( $json->{object_kind} eq 'build' ) {
+        $hook_handler = 'gitlab_webhook_build';
+    }
+    else {
+        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
+        $response->content("Unsupported object_kind: $json->{object_kind}");
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    KGB->debug('Body check passed');
+
+    # form a CGI-like param hash
+    my $param = {};
+    my $uri = URI->new( $request->url );
+    my @query = $request->uri->query_form;
+    while ( my( $key, $value ) = splice( @query, 0, 2 ) ) {
+        next unless length $value;
+
+        if ( exists $param->{$key} ) {
+            $param->{$key} = [ $param->{$key} ] unless ref $param->{$key};
+            push @{ $param->{$key} }, $value;
+        }
+        else {
+            $param->{$key} = $value;
+        }
+    }
+
+    my @channels = $param->{channel} // ();
+    @channels = @{ $channels[0] } if ref $channels[0];
+    s/^(?!#)/#/ for @channels;
+    push @channels, @{ $KGB::config->{broadcast_channels} }
+        unless $param->{private};
+
+    unless (@channels) {
+        KGB->debug("Repository $module has no associated channels.");
+        $response->code(HTTP::Status::HTTP_BAD_REQUEST);
+        $response->content("Repository $module has no assosiated channels.");
+        return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+    }
+
+    $param->{channel} = \@channels;
+
+    $_[KERNEL]->yield( $hook_handler => $json, $param );
+
+    $response->code(HTTP::Status::HTTP_ACCEPTED);
+    $response->message('Notification received');
+    return $_[KERNEL]->post( $_[SENDER], DONE => $response );
+}
+
+my $shortener_loaded = 0;
+
+sub shorten_url {
+    my $service = $KGB::config->{short_url_service} or return shift;
+
+    my $url = shift;
+
+    unless ($shortener_loaded) {
+        my $ok = eval {
+            require WWW::Shorten;
+            WWW::Shorten->import( $service, ':short' );
+            1;
+        };
+
+        unless ($ok) {
+            KGB->out("Unable to load URL shortening service '$service': $@");
+            return $url;
+        }
+
+        $shortener_loaded = 1;
+    }
+
+    my $short_url;
+    my $ok = eval { short_link($url); 1 };
+
+    unless ($ok) {
+        KGB->out(
+            "Failure while calling URL shortening service '$service' for '$url': $@"
+        );
+        return $url;
+    }
+
+    return $short_url if defined($short_url);
+
+    KGB->out("URL shortening service '$service' failed to shorten '$url'.");
+    return $url;
+}
+
+sub to_irc {
+    my ( $p ) = @_;
+
+    # Standard says 512 (minus \r\n), anyway that's further trimmed when
+    # resending to clients because of prefix.
+    # Let's trim on 400, to be safe
+    my $MAGIC_MAX_LINE = ( 400 - length("PRIVMSG ")
+            - max( map( length, @{ $p->{opts}{channel} } ) ) );
+
+    my @tmp;
+    while ( $_ = shift @{ $p->{strings} } ) {
+        if ( length($_) > $MAGIC_MAX_LINE ) {
+            push @tmp, substr( $_, 0, $MAGIC_MAX_LINE );
+            unshift @{ $p->{strings} },
+                colorize( repository => $p->{repository} )
+                . substr( $_, $MAGIC_MAX_LINE );
+        }
+        else {
+            push @tmp, $_;
+        }
+    }
+    @{ $p->{strings} } = @tmp;
+
+    foreach my $chan ( @{ $p->{opts}{channel} } ) {
+        if ($KGB::simulate) {
+            my $fh = IO::File->new(">> $KGB::simulate")
+                or die "Error opening $KGB::simulate for writing: $!\n";
+            $fh->autoflush(1);
+            $fh->binmode(':utf8');
+            for (@{ $p->{strings} } ) {
+                $fh->print("$chan $_\n");
+            }
+            $fh->close;
+        }
+        else {
+            if ( $KGB::config->{chanidx}{$chan}
+                and not exists $KGB::joining_channels{$chan} )
+            {
+                $p->{kernel}->yield(
+                    irc_notify => $chan => $p->{strings},
+                    $p->{opts}{use_notices} ? 'notice' : 'privmsg'
+                );
+            }
+            else {
+                my $net = $p->{opts}{network} // 'oftc';
+
+                my $stash = {
+                    message => $p->{strings},
+                    method  => $p->{opts}{use_notices} ? 'notice' : 'privmsg'
+                };
+
+                if ( my $jc = $KGB::joining_channels{$chan} ) {
+                    # joining already initiated
+                    KGB->out(
+                        "Delaying a message to $chan for after it is joined"
+                    );
+
+                    push @{ $jc->{pending_messages} }, $stash;
+                }
+                else {
+                    # an unknown channel. needs a JOIN
+                    KGB->out("Joining $chan on $net");
+                    $KGB::joining_channels{$chan} =
+                        { network => $net, pending_messages => [$stash] };
+                    $p->{kernel}->post( "irc_$net" => join => $chan );
+                }
+            }
+        }
+    }
+}
+
+=head2 gitlab_webhook_push
+
+Handle a gitlab webhook call fir the C<push> event (branch update).
+
+Expects the body of the POST request (decoded, as a hash reference) in I<ARG0>
+and all the request parameters in I<ARG1>.
+
+The request is expected to conform to the GitLab webhook documentation at
+L<https://salsa.debian.org/help/user/project/integrations/webhooks.md#push-events>.
+
+The request parameters should look like the result of the CGI's param() method.
+
+Supported parameters (?param=value&param=value2...)
+
+=over
+
+=item channel
+
+The name of the channel to post notifications to. Leading hash sign is optional
+and should be URL-encoded if present (%23).
+
+=item network
+
+The name of the IRC network, servicing the channel. Supported networks are
+configured by the bot's admin.
+
+=item private
+
+A boolean flag, indicating that the notifications shouldn't also be posted to
+the C<#commits> channel on Freenode.
+
+=item use_color
+
+A boolean flag enabling colors. Defaults to true.
+
+=item rev_prefix
+
+Optional text to prepend to the commit ID.
+
+=item use_irc_notices
+
+If true, IRC notification uses C<notice> messages, instead of C<privmsg>.
+
+C<notice> messages are usually less intrusive.
+
+=item squash_threshold I<number>
+
+For I<push> events, limit the commit notifications to the given I<number>. If a
+branch update contains more commits, the usual notifications are replaced by a
+single notification about the number of the pushed commits.
+
+B<Default>: 4
+
+=back
+
+=cut
+
+sub gitlab_webhook_push {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook push request for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color}
+        and not $opts->{use_color};
+
+    unless ($body->{commits}
+        and ref( $body->{commits} )
+        and ref( $body->{commits} ) eq 'ARRAY'
+        and @{ $body->{commits} } )
+    {
+        KGB->out("Got invalid or empty 'commits' for module '$module'");
+        return;
+    }
+
+    my $branch = $body->{ref};
+    $branch =~ s{^refs/heads/}{};
+
+    my $rev_prefix = $opts->{rev_prefix} // '';
+
+    my $max_commits = $opts->{squash_threshold} // 4;
+    $max_commits = 4 unless $max_commits and $max_commits =~ /^\d\d?$/;
+
+    if ( @{ $body->{commits} } > $max_commits ) {
+        my @info;
+        push @info, colorize( author => $body->{user_name} )
+            if $body->{user_name};
+        push @info, colorize( branch => $branch ) if $branch;
+        push @info,
+            "$rev_prefix"
+            . colorize( revision => substr( $body->{checkout_sha}, 0, 7 ) )
+            if $body->{checkout_sha};
+        push @info, colorize( module => $module ) if $module ne '';
+        push @info, colorize( separator => '*' ),
+            sprintf( 'pushed %d commits', scalar @{ $body->{commits} } );
+        push @info, colorize( separator => '*' );
+        push @info,
+            colorize(
+            web => sprintf(
+                '%s/compare/%s..%s',
+                $body->{project}{homepage},
+                substr( $body->{before}, 0, 7 ),
+                substr( $body->{after},  0, 7 )
+            )
+            );
+
+        to_irc(
+            {   kernel     => $kernel,
+                strings    => [ join( ' ', @info ) ],
+                repository => $body->{project}{namespace},
+                opts       => $opts,
+            }
+        );
+
+        return;
+    }
+
+    for my $commit ( @{ $body->{commits} } ) {
+        my $path_string;
+        my %dirs;
+
+        my $MAGIC_MAX_FILES = 4;
+        my $author = $commit->{author}{name};
+        my $commit_id = substr( $commit->{id}, 0, 7 );
+
+        my @changes;
+        push @changes,
+            App::KGB::Change->new( { action => 'M', path => $_ } )
+            for @{ $commit->{modified} };
+        push @changes,
+            App::KGB::Change->new( { action => 'A', path => $_ } )
+            for @{ $commit->{added} };
+        push @changes,
+            App::KGB::Change->new( { action => 'D', path => $_ } )
+            for @{ $commit->{removed} };
+        my $changed_files = scalar @changes;
+
+        my $common_dir = App::KGB::Change->detect_common_dir(\@changes)
+            // '';
+
+        my @info;
+
+        push @info, colorize( author => $author ) if $author ne '';
+        push @info, colorize( branch => $branch ) if $branch ne '';
+        push @info, "$rev_prefix" . colorize( revision => $commit_id )
+            if defined $commit_id;
+        push @info, colorize( module => $module )        if $module ne '';
+        push @info, colorize( path   => "$common_dir/" ) if $common_dir ne '';
+
+        if ( $changed_files > $MAGIC_MAX_FILES ) {
+            my %dirs;
+            for my $c (@changes) {
+                my $dir = dirname( $c->path );
+                $dirs{$dir}++;
+            }
+
+            my $dirs = scalar( keys %dirs );
+
+            my $path_string = join( ' ',
+                ( $dirs > 1 )
+                ? sprintf( "(%d files in %d dirs)", $changed_files, $dirs )
+                : sprintf( "(%d files)",            $changed_files ) );
+
+            push @info, colorize( path => $path_string );
+        }
+        else {
+            push @info, join( ' ', map { colorize_change($_) } @changes )
+                if @changes;
+        }
+
+        my @string = join( ' ', @info );
+
+        my $web_string =
+            $commit->{url}
+            ? colorize( web => shorten_url( $commit->{url} ) )
+            : undef;
+
+        my $use_notices = $opts->{use_irc_notices};
+
+        my @log = split( /\n/, $commit->{message} );
+        # for multi-line commit log, emit only the first line if the second one
+        # is empty
+        $#log = 0 if @log and scalar(@log) > 2 and $log[1] eq '';
+
+        # one-line notifications result in:
+        #  user branch commit module changes log link
+        # multi-line notifications look like:
+        #  user branch commit module changes link
+        #  log line 1
+        #  log line 2 ...
+        if ( 1 == @log and length( $log[0] ) <= 80 ) {
+            $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $log[0];
+        }
+        else {
+            push @string, @log;
+        }
+
+        $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+            if defined($web_string);
+
+        to_irc(
+            {   kernel     => $kernel,
+                strings    => \@string,
+                repository => $body->{project}{namespace},
+                opts       => $opts,
+            }
+        );
+    }
+}
+
+sub gitlab_webhook_wiki_page {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook wiki_page request for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color}
+        and not $opts->{use_color};
+    my $rev_prefix = $opts->{rev_prefix} // '';
+
+    my $page = $body->{object_attributes}{slug};
+    my $url = $body->{object_attributes}{url};
+    my $action = $body->{object_attributes}{action};
+    if ( $action eq 'create' ) {
+        $action = 'addition';
+    }
+    elsif ( $action eq 'remove' ) {
+        $action = 'deletion';
+    }
+    else {
+        $action = 'modification';
+    }
+
+    my @info;
+
+    push @info, colorize( author => $body->{user}{name} );
+    push @info, colorize( branch => 'wiki' );
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( $action => $page ) if $page ne '';
+
+    my @string = join( ' ', @info );
+
+    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+
+    my @log = split( /\n/, $body->{object_attributes}{message} // '' );
+    # for multi-line commit log, emit only the first line if the second one
+    # is empty
+    $#log = 0 if @log and scalar(@log) > 2 and $log[1] eq '';
+
+    # one-line notifications result in:
+    #  user branch commit module changes log link
+    # multi-line notifications look like:
+    #  user branch commit module changes link
+    #  log line 1
+    #  log line 2 ...
+    if ( 1 == @log and length( $log[0] ) <= 80 ) {
+        $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $log[0];
+    }
+    else {
+        push @string, @log;
+    }
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+sub gitlab_webhook_tag_push {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook tag_push request for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color}
+        and not $opts->{use_color};
+    my $rev_prefix = $opts->{rev_prefix} // '';
+
+    my $tag = $body->{ref};
+    $tag =~ s{^refs/tags/}{};
+
+    my $branch = 'tags';
+
+    my $message = $body->{message} // '';
+    $branch = 'signed-tags'
+        if $message =~ s/-----BEGIN PGP SIGNATURE-----.*//s;
+
+    my @info;
+
+    push @info, colorize( author => $body->{user_name} );
+    push @info, colorize( branch => $branch );
+    push @info,
+        $rev_prefix . colorize( revision => substr( $body->{after}, 0, 7 ) );
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( addition => $tag ) if $tag ne '';
+
+    my @string = join( ' ', @info );
+
+    my $web_string =
+        $body->{project}{homepage}
+        ? colorize( web => shorten_url(
+            sprintf( '%s/tags/%s', $body->{project}{homepage}, $tag )
+        ) )
+        : undef;
+
+    my @log = split( /\n/, $message );
+    # for multi-line commit log, emit only the first line if the second one
+    # is empty
+    $#log = 0 if @log and scalar(@log) > 2 and $log[1] eq '';
+
+    # one-line notifications result in:
+    #  user branch commit module changes log link
+    # multi-line notifications look like:
+    #  user branch commit module changes link
+    #  log line 1
+    #  log line 2 ...
+    if ( 1 == @log and length( $log[0] ) <= 80 ) {
+        $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $log[0];
+    }
+    else {
+        push @string, @log;
+    }
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+sub gitlab_webhook_issue {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook issue request for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color}
+        and not $opts->{use_color};
+
+    my $url = $body->{object_attributes}{url};
+    my $action = $body->{object_attributes}{action};
+    if ( $action eq 'open' ) {
+        $action = 'addition';
+    }
+    elsif ( $action eq 'close' ) {
+        $action = 'deletion';
+    }
+    else {
+        $action = 'modification';
+    }
+
+    my @info;
+
+    push @info, colorize( author   => $body->{user}{name} );
+    push @info, colorize( branch   => 'issues' );
+    push @info, colorize( module   => $module ) if $module ne '';
+    push @info, colorize( revision => $body->{object_attributes}{id} );
+    push @info, colorize( $action => $body->{object_attributes}{title} );
+
+    my @string = join( ' ', @info );
+
+    my @log = split( /\n/, $body->{object_attributes}{note} // '' );
+    # for multi-line commit log, emit only the first line if the second one
+    # is empty
+    $#log = 0 if @log and scalar(@log) > 2 and $log[1] eq '';
+
+    # one-line notifications result in:
+    #  user branch commit module changes log link
+    # multi-line notifications look like:
+    #  user branch commit module changes link
+    #  log line 1
+    #  log line 2 ...
+    if ( 1 == @log and length( $log[0] ) <= 80 ) {
+        $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $log[0];
+    }
+    else {
+        push @string, @log;
+    }
+    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+my %note_descr = (
+    Commit => 'commented commit ',
+    MergeRequest => 'commented merge request #',
+    Issue => 'commented issue #',
+    Snippet => 'commented snippet #',
+);
+
+sub gitlab_webhook_note {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook note event for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color} and not $opts->{use_color};
+
+    my $url = $body->{object_attributes}{url};
+
+    my $log;
+    if ( my $nt = $body->{object_attributes}{noteable_type} ) {
+        $log = $note_descr{$nt} // "commented something";
+        $log .= substr( $body->{commit}{id}, 0, 7 )
+            if $nt eq 'Commit'
+            and $body->{commit}
+            and $body->{commit}{id};
+        $log .= $body->{merge_request}{id}
+            if $nt eq 'MergeRequest'
+            and $body->{merge_request}
+            and $body->{merge_request}{id};
+        $log .= $body->{issue}{id}
+            if $nt eq 'Issue'
+            and $body->{issue}
+            and $body->{issue}{id};
+        $log .= $body->{snippet}{id}
+            if $nt eq 'Snippet'
+            and $body->{snippet}
+            and $body->{snippet}{id};
+    }
+
+    my @info;
+
+    push @info, colorize( author   => $body->{user}{name} );
+    push @info, colorize( module   => $module ) if $module ne '';
+    push @info, colorize( revision => $body->{object_attributes}{id} )
+        if $body->{object_attributes}{id};
+    push @info, colorize( separator => '*' ) . ' ' . $log;
+
+    my @string = join( ' ', @info );
+
+    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+sub gitlab_webhook_merge_request {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook merge_request event for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color} and not $opts->{use_color};
+
+    my $url = $body->{object_attributes}{url};
+
+    my $log =
+          $body->{object_attributes}{action}
+        . ' of merge request #'
+        . $body->{object_attributes}{id};
+
+    my @info;
+
+    push @info, colorize( author => $body->{user}{name} );
+    push @info, colorize( branch => $body->{object_attributes}{target_branch} )
+        if $body->{object_attributes}{target_branch};
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( revision => $body->{object_attributes}{id} )
+        if $body->{object_attributes}{id};
+    push @info, colorize( separator => '*' ) . ' ' . $log;
+
+    my @string = join( ' ', @info );
+
+    my $web_string = $url ? colorize( web => shorten_url($url) ) : undef;
+
+    $string[0] .= ' ' . colorize( separator => '*' ) . ' ' . $web_string
+        if defined($web_string);
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+sub human_duration {
+    my $seconds = shift;
+
+    my $human_duration;
+
+    my $days    = int( $seconds / ( 3600 * 24 ) ); $seconds %= 3600 * 24;
+    my $hours   = int( $seconds / 3600 ); $seconds %= 3600;
+    my $minutes = int( $seconds / 60 ); $seconds %= 60;
+    my @items;
+    push @items, "$days days"       if $days > 1;
+    push @items, "1 day"            if $days == 1;
+    push @items, "$hours hours"     if $hours > 1;
+    push @items, "1 hour"           if $hours == 1;
+    push @items, "$minutes minutes" if $minutes > 1;
+    push @items, "1 minute"         if $minutes == 1;
+    push @items, "$seconds seconds" if $seconds > 1;
+    push @items, "1 second"         if $seconds == 1;
+
+    if ( @items > 2 ) {
+        my $last = pop @items;
+        $human_duration = join( ', ', @items ) . ' and ' . $last;
+    }
+    elsif ( @items == 1 ) {
+        $human_duration = $items[0];
+    }
+    else {
+        $human_duration = 'no time';
+    }
+
+    return $human_duration;
+}
+
+sub gitlab_webhook_pipeline {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project}{name};
+
+    KGB->debug("Handling webhook pipeline event for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color} and not $opts->{use_color};
+
+    my $log = sprintf(
+        'Pipeline #%d finished in %s. Status: %s',
+        $body->{object_attributes}{id},
+        human_duration( $body->{object_attributes}{duration} ),
+        $body->{object_attributes}{status} // 'UNKNOWN'
+    );
+
+    my @info;
+
+    push @info, colorize( author => $body->{user}{name} );
+    push @info, colorize( branch => $body->{object_attributes}{target_branch} )
+        if $body->{object_attributes}{target_branch};
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( revision => $body->{object_attributes}{id} )
+        if $body->{object_attributes}{id};
+    push @info, colorize( separator => '*' ) . ' ' . $log;
+
+    my @string = join( ' ', @info );
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
+sub gitlab_webhook_build {
+    my ( $kernel, $body, $opts ) = @_[ KERNEL, ARG0, ARG1 ];
+
+    my $module = $body->{project_name};
+
+    KGB->debug("Handling webhook pipeline event for project $module");
+
+    local $KGB::painter = $KGB::painter_dummy
+        if exists $opts->{use_color} and not $opts->{use_color};
+
+    my $log = sprintf(
+        'Build #%d (%s) stage: %s, status: %s',
+        $body->{build_id}, $body->{build_name},
+        $body->{build_stage}  // 'UNKNOWN',
+        $body->{build_status} // 'UNKNOWN'
+    );
+    $log .= ". Duration: " . human_duration( $body->{build_duration} )
+        if defined $body->{build_duration};
+
+    my @info;
+
+    push @info, colorize( author => $body->{user}{name} );
+    push @info, colorize( branch => 'builds' );
+    push @info, colorize( module => $module ) if $module ne '';
+    push @info, colorize( revision => substr( $body->{sha}, 0, 7 ) )
+        if $body->{object_attributes}{id};
+    push @info, colorize( separator => '*' ) . ' ' . $log;
+
+    my @string = join( ' ', @info );
+
+    to_irc(
+        {   kernel     => $kernel,
+            strings    => \@string,
+            repository => $body->{project}{namespace},
+            opts       => $opts,
+        }
+    );
+}
+
 package main;
 
 use strict;
@@ -1444,7 +2397,9 @@ use Cwd;
 $KGB::simulate = Cwd::realpath($KGB::simulate) if $KGB::simulate;
 
 $KGB::painter
-    = App::KGB::Painter->new( { styles => $KGB::config->{colors} } );
+    = App::KGB::Painter->new( { item_colors => $KGB::config->{colors} } );
+
+our $pid_keeper;
 
 unless ($KGB::foreground) {
     pipe IN, OUT or die "pipe: $!\n";
@@ -1460,19 +2415,20 @@ unless ($KGB::foreground) {
         else {
             die $r;
         }
+
+        die "Should not happen";
     }
-    else {
-        $poe_kernel->has_forked;
-    }
+
+    $poe_kernel->has_forked;
+
     close IN;
     eval {
-        die "Already running\n"
-            if (
-            Proc::PID::File->running(
-                verify => 1,
-                dir    => $KGB::config->{pid_dir},
-            )
-            );
+        $pid_keeper = Proc::PID::File->new(
+            verify => 1,
+            dir    => $KGB::config->{pid_dir},
+        );
+        die "Already running\n" if $pid_keeper->alive;
+        $pid_keeper->write;
         POSIX::setsid() or die "setsid: $!\n";
         umask(0022);
         chdir("/") or die "chdir: $!\n";
@@ -1491,9 +2447,6 @@ unless ($KGB::foreground) {
     }
 }
 
-# only after possible forking
-eval " END { KGB::remove_pid() }";
-
 POE::Component::Server::SOAP->new(
     ALIAS   => $KGB::const{SOAPsvc},
     ADDRESS => $KGB::config->{soap}{server_addr},
@@ -1505,6 +2458,11 @@ POE::Component::Server::SOAP->new(
                                 'DIR'           =>      '^/json-rpc',
                                 'SESSION'       =>      $KGB::config->{soap}{service_name},
                                 'EVENT'         =>      'json_request',
+                        },
+                        {
+                                'DIR'           =>      '^/webhook/',
+                                'SESSION'       =>      $KGB::config->{soap}{service_name},
+                                'EVENT'         =>      'webhook_request',
                         },
                         {
                                 'DIR'           =>      '.*',
@@ -1524,13 +2482,22 @@ POE::Session->create(
         "KGB::IRC" => [
             qw(_irc_reconnect irc_registered irc_001
                 irc_public irc_bot_addressed irc_new_hash irc_notify _default
-                irc_command irc_msg),
+                irc_command irc_msg
+                irc_chan_sync
+            ),
         ],
         "KGB::SOAP" => [qw(commit)],
         'KGB::JSON' => [qw(json_request)],
+        'KGB::WebHook' => [qw(
+            webhook_request
+            gitlab_webhook_push gitlab_webhook_tag_push
+            gitlab_webhook_wiki_page gitlab_webhook_issue
+            gitlab_webhook_note gitlab_webhook_merge_request
+            gitlab_webhook_pipeline gitlab_webhook_build
+        )],
     ],
 
-    #    options => {trace => 1, debug => 1}
+    #options => {trace => 1, debug => 1}
 );
 
 $poe_kernel->run;

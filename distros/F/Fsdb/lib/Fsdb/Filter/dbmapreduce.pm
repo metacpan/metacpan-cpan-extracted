@@ -2,7 +2,7 @@
 
 #
 # dbmapreduce.pm
-# Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -120,6 +120,10 @@ can now be different
 With C<--copy-fs> we copy the input field separator to the output,
 but only for non-multi-key-aware reducers.
 (this used to be done automatically).
+Alternatively, one can specify the output field separator
+with C<--fieldseparator>, in which case the output had better
+generate that format.
+An explicit C<--fieldseparator> takes priority over C<--copy-fs>.
 
 
 =head2 Known bugs
@@ -173,6 +177,11 @@ Not done by default.
 
 Allow up to N reducers to run in parallel.
 Default is the number of CPUs in the machine.
+
+=item B<-F> or B<--fs> or B<--fieldseparator> S
+
+Specify the field (column) separator as C<S>.
+See L<dbfilealter> for valid field separators.
 
 =item B<-C FILTER-CODE> or B<--filter-code=FILTER-CODE>
 
@@ -383,7 +392,6 @@ use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
-use Fsdb::IO::Writer;
 use Fsdb::Filter::dbsubprocess;
 use Fsdb::Support::NamedTmpfile;
 use Fsdb::Support::OS;
@@ -437,6 +445,7 @@ sub set_defaults ($) {
     $self->{_parallelism_available} = undef;
     $self->{_test_parallelism} = undef;
     $self->{_header} = undef;
+    $self->{_fscode} = undef;
     $self->set_default_tmpdir;
 }
 
@@ -462,6 +471,7 @@ sub parse_options ($@) {
 	'copy-fs|copy-fieldseparator!' => \$self->{_copy_fscode},
 	'd|debug+' => \$self->{_debug},
 	'f|code-files=s@' => $self->{_code_files},
+	'F|fs|cs|fieldseparator|columnseparator=s' => \$self->{_fscode},
 	'header=s' => \$self->{_header},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'j|parallelism=i' => \$self->{_max_parallelism},
@@ -495,7 +505,7 @@ sub setup($) {
 
     $self->{_prepend_key} = !$self->{_reducer_is_multikey_aware}
 	if (!defined($self->{_prepend_key}));
-    croak $self->{_prog} . ": cannot prepend keys for multikey-aware reducers.\n"
+    croak($self->{_prog} . ": cannot prepend keys for multikey-aware reducers.\n")
 	if ($self->{_prepend_key} && $self->{_reducer_is_multikey_aware});
 
     my $included_code = '';
@@ -503,7 +513,7 @@ sub setup($) {
     # get any extra code
     #
     foreach my $code_file (@{$self->{_code_files}}) {
-	open(IN, "< $code_file") or croak $self->{_prog} . ": cannot read code from $code_file\n";
+	open(IN, "< $code_file") or croak($self->{_prog} . ": cannot read code from $code_file\n");
 	$included_code .= join('', <IN>);
 	close IN;
     };
@@ -558,7 +568,7 @@ sub setup($) {
 		"\n\t;\n};\n";
 	    print STDERR "# dbmapreduce/setup: sub_code: $sub_code" if ($self->{_debug});
 	    eval $sub_code;
-	    $@ && croak $self->{_prog} . ": error evaluating user-provided reducer sub:\n$sub_code\nerror is: $@.\n";
+	    $@ && croak($self->{_prog} . ": error evaluating user-provided reducer sub:\n$sub_code\nerror is: $@.\n");
 	};
 	$self->{_reducer_generator_sub} = $reducer_generator_sub;
     } else {
@@ -606,7 +616,7 @@ sub setup($) {
 	$self->{_key_coli} = undef;
     } elsif (defined($self->{_key_column})) {
 	$self->{_key_coli} = $self->{_in}->col_to_i($self->{_key_column});
-	croak $self->{_prog} . ": key column " . $self->{_key_column} . " is not in input stream.\n"
+	croak($self->{_prog} . ": key column " . $self->{_key_column} . " is not in input stream.\n")
 	    if (!defined($self->{_key_coli}));
     } else {
 	# default to first column
@@ -643,7 +653,7 @@ sub _setup_reducer() {
     my($self) = @_;
 
     if ($self->{_reducer_is_multikey_aware}) {
-#	croak "case not yet handled--need to verify correct sort order\n" if ($self->{_pre_sorted} == 1);
+#	croak("case not yet handled--need to verify correct sort order\n") if ($self->{_pre_sorted} == 1);
 	# No need to do input checking,
 	# and reducer promises to handle whatever we give it,
 	# and we assume it outputs the key, so
@@ -693,7 +703,7 @@ sub _open_new_key {
     $self->{_current_key} = $new_key;
 
     # If already running and can handle multiple tags, just keep going.
-    die "internal error: no more multikey here\n" if ($self->{_reducer_is_multikey_aware});
+    croak("internal error: no more multikey here\n") if ($self->{_reducer_is_multikey_aware});
 
     #
     # make the reducer
@@ -702,10 +712,13 @@ sub _open_new_key {
     my @reducer_modules;
     push(@reducer_modules, &{$self->{_reducer_generator_sub}}($new_key));
     if ($self->{_copy_fscode}) {
-	push(@reducer_modules, dbfilealter('--nolog', '-F', $self->{_in}->fscode()));
+        my($new_fscode) = $self->{_in}->fscode();
+        # explicit fscode overrides --copy-fs
+        $new_fscode = $self->{_fscode} if (defined($self->{_fscode}));
+	push(@reducer_modules, dbfilealter('--nolog', '-F', $new_fscode));
     };
     if ($self->{_prepend_key}) {
-	# croak $self->{_prog} . ": no key_column\n" if (!defined($self->{_key_column}));
+	# croak($self->{_prog} . ": no key_column\n") if (!defined($self->{_key_column}));
 	push(@reducer_modules, dbcolcreate('--no-recreate-fatal', '--nolog', '--first', '-e', $new_key // $self->{_empty}, $self->{_key_column}));
     };
     print STDERR "# reducer output to $output_file (in process $$)\n" if ($self->{_debug});
@@ -715,7 +728,8 @@ sub _open_new_key {
     $work_queue_entry{'status'} = 'running';
     $work_queue_entry{'output'} = $output_file;
     my $debug = $self->{_debug};
-    my($to_reducer_writer, $reducer_fred) = dbpipeline_sink([-clone => $self->{_in}], 
+    my(@dbpipeline_args) = (-clone => $self->{_in});
+    my($to_reducer_writer, $reducer_fred) = dbpipeline_sink(\@dbpipeline_args, 
 	'--fred_description' => 'dbmapreduce:dbpipeline_sink(to_reducer)',
 	'--fred_exit_sub' => sub {
 	    $work_queue_entry{'status'} = 'done';
@@ -743,12 +757,12 @@ sub _close_old_key {
     print STDERR "# dbmapreduce: _close_old_key on " . $self->_key_to_string($key) . "\n" if ($self->{_debug} >= 2);
 
     if (!defined($key)) {
-	croak $self->{_prog} . ": internal error: _close_old_key called on non-final null-key.\n"
+	croak($self->{_prog} . ": internal error: _close_old_key called on non-final null-key.\n")
 	    if (!$final);
     };
-    die "internal error: no more multikey here\n" if ($self->{_reducer_is_multikey_aware});
+    croak("internal error: no more multikey here\n") if ($self->{_reducer_is_multikey_aware});
 
-    croak $self->{_prog} . ": internal error: current key doesn't equal prior key " . $self->_key_to_string($self->{_current_key}) . " != key " . $self->_key_to_string($key) . "\n"
+    croak($self->{_prog} . ": internal error: current key doesn't equal prior key " . $self->_key_to_string($self->{_current_key}) . " != key " . $self->_key_to_string($key) . "\n")
 	if (defined($key) && $self->{_current_key} ne $key);
     # finish the reducer
     print STDERR "# dbmapreduce: _close_old_key closing reducer (" . ($key // "null key") . ")\n" if ($self->{_debug} >= 2);
@@ -782,7 +796,7 @@ sub _check_finished_reducers($$) {
     for(;;) {
         my $fred_or_code = Fsdb::Support::Freds::join_any();
 	last if (ref($fred_or_code) eq '');
-	croak "dbmapreduce: reducer failed\n"
+	croak("dbmapreduce: reducer failed\n")
 	    if ($fred_or_code->exit_code() != 0);
 	print STDERR "# dbmerge:_check_finished_reducers: merged fred " . $fred_or_code->info() . "\n" if ($self->{_debug});
     };
@@ -797,12 +811,12 @@ sub _check_finished_reducers($$) {
 	    my $fred = $work_queue_href->{fred};
 	    print STDERR "# dbmerge:_check_finished_reducers: blocking on pending fred " . $fred->info() . "\n" if ($self->{_debug});
 	    my $exit_code = $fred->join();
-	    croak "dbmapreduce: reducer " . $fred->info() . " failed, exit $exit_code\n" if ($exit_code != 0);
-	    croak "dbmapreduce: reducer didn't leave status done\n"
+	    croak("dbmapreduce: reducer " . $fred->info() . " failed, exit $exit_code\n") if ($exit_code != 0);
+	    croak("dbmapreduce: reducer didn't leave status done\n")
 		if ($work_queue_href->{status} ne 'done');
 	};
 	if ($work_queue_href->{status} ne 'done') {
-	    croak $self->{_prog} . ": internal error, reducer refused to complete\n" if ($force);
+	    croak($self->{_prog} . ": internal error, reducer refused to complete\n") if ($force);
 	    last;
 	};
 	# this one is done, send it to output
@@ -839,7 +853,7 @@ sub _mapper_run($) {
 	'--fred_description' => 'dbmapreduce:dbpipeline_sink(cat_writer)',
 	'--output' => $self->{_output},
 	dbfilecat(qw(--nolog --xargs --removeinputs)));
-    croak $self->{_prog} . ": cannot invoke dbfilecat.\n"
+    croak($self->{_prog} . ": cannot invoke dbfilecat.\n")
 	if ($cat_writer->error);
     $self->{_cat_writer} = $cat_writer;
     $self->{_cat_fred} = $cat_fred;
@@ -859,7 +873,7 @@ sub _mapper_run($) {
             # start a new one
             # check for out-of-order duplicates
             if ($self->{_pre_sorted} == 1) {
-                croak $self->{_prog} . ": single key ``$key'' split into multiple groups, selection of -S was invalid\n"
+                croak($self->{_prog} . ": single key ``$key'' split into multiple groups, selection of -S was invalid\n")
                     if (defined($self->{_key_counts}{$key}));
                 $self->{_key_counts}{$key} = 1;
             };
@@ -871,7 +885,7 @@ sub _mapper_run($) {
             $self->_open_new_key($key);
             $last_key = $key;
 	    $reducer_fastpath_sub = $self->{_current_reducer_fastpath_sub};
-	    die "no reducer\n" if (!defined($reducer_fastpath_sub));
+	    croak("no reducer\n") if (!defined($reducer_fastpath_sub));
         };
         # pass the data to be reduced
 	&{$reducer_fastpath_sub}($fref);
@@ -925,7 +939,7 @@ sub finish($) {
         print STDERR "# mapreduce main: join sorter\n"
 	    if ($self->{_debug});
         $self->{_sorter_fred}->join();
-	croak $self->{_prog} . ": input sorter failed: " . $self->{_sorter_fred}->error()
+	croak($self->{_prog} . ": input sorter failed: " . $self->{_sorter_fred}->error())
 	    if ($self->{_sorter_fred}->error());
     };
 
@@ -942,7 +956,7 @@ sub finish($) {
 	    if ($self->{_debug});
 	$self->{_cat_fred}->join();
 	if (my $error = $self->{_cat_fred}->error()) {
-	    croak $self->{_prog} . ": dbfilecat erred: $error";
+	    croak($self->{_prog} . ": dbfilecat erred: $error");
 	};
     };
 }
@@ -950,7 +964,7 @@ sub finish($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

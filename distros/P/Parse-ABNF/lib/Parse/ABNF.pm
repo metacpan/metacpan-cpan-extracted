@@ -5,7 +5,7 @@ use warnings;
 use Parse::RecDescent;
 use List::Util qw//;
 
-our $VERSION = '0.20';
+our $VERSION = '0.26';
 our $Grammar = q{
 
   {
@@ -223,6 +223,177 @@ sub parse {
   my $string = shift;
   my $result = $self->{_p}->parse($string);
   return $result;
+}
+
+sub _to_jet {
+  my ($p) = @_;
+
+  for ($p->{class}) {
+    if ($_ eq "Group") {
+      my @values = map { _to_jet($_) } @{ $p->{value} };
+      return ["group", {}, \@values];
+    }
+    elsif ($_ eq "Choice") {
+      my @values = map { _to_jet($_) } @{ $p->{value} };
+      return ["choice", {}, \@values];
+    }
+    elsif ($_ eq "Intersection") {
+      my @values = map { _to_jet($_) } @{ $p->{value} };
+      return ["conjunction", {}, \@values];
+    }
+    elsif ($_ eq "Subtraction") {
+      my @values = map { _to_jet($_) } @{ $p->{value} };
+      return ["exclusion", {}, \@values];
+    }
+    elsif ($_ eq "Repetition") {
+      my @values = map { _to_jet($_) } $p->{value};
+      return ["repetition", {
+        min => $p->{min},
+        max => $p->{max},
+      }, \@values];
+    }
+    elsif ($_ eq "Rule") {
+      my @values = map { _to_jet($_) } $p->{value};
+      ... if exists $p->{combine};
+      return ["rule", {
+        name => $p->{name},
+      }, \@values];
+    }
+    elsif ($_ eq "Reference") {
+      return ["ref", {
+        name => $p->{name},
+      }, []];
+    }
+    elsif ($_ eq "Literal") {
+      return ["asciiInsensitiveString", {
+        text => $p->{value}
+      }, []];
+    }
+    elsif ($_ eq "ProseValue") {
+      return ["prose", {
+        text => $p->{value},
+      }, []];
+    }
+    elsif ($_ eq "String") {
+      my @items;
+      for ($p->{type}) {
+        if ($_ eq "decimal") {
+          @items = map { $_ } @{ $p->{value} };
+        }
+        elsif ($_ eq "hex") {
+          @items = map { hex $_ } @{ $p->{value} };
+        }
+        else {
+          ...
+        }
+      }
+
+      my @values = map {
+        ["range", {
+          first => $_,
+          last => $_,
+        }, [] ]
+      } @items;
+
+      return $values[0] if @values == 1;
+
+      return ["group", {}, \@values];
+    }
+    elsif ($_ eq "Range") {
+      return ["range", {
+        first => hex $p->{min},
+        last => hex $p->{max},
+      }, []] if $p->{type} eq 'hex';
+
+      return ["range", {
+        first => $p->{min},
+        last => $p->{max},
+      }, []] if $p->{type} eq 'decimal';
+
+      ...
+    }
+  }
+
+  ...
+}
+
+our %arity = (
+  'grammar'                => [ undef, undef ],
+  'rule'                   => [ 1, 'group' ],
+  'repetition'             => [ 1, 'group' ],
+  'group'                  => [ 2, 'group' ],
+  'exclusion'              => [ 2, 'group' ],
+  'repetition'             => [ 2, 'group' ],
+  'rule'                   => [ 2, 'group' ],
+  'choice'                 => [ 2, 'choice' ],
+  'conjunction'            => [ 2, 'conjunction' ],
+  'orderedChoice'          => [ 2, 'orderedChoice' ],
+  'orderedConjunction'     => [ 2, 'orderedConjunction' ],
+  'ref'                    => [ 0, undef ],
+  'range'                  => [ 0, undef ],
+  'asciiInsensitiveString' => [ 0, undef ],
+);
+
+sub _make_jet_binary {
+  my ($node) = @_;
+
+  my @todo = ($node);
+
+  while (my $current = pop @todo) {
+    
+    my $max = $arity{ $current->[0] }->[0];
+
+    while ( defined $max and $max < @{ $current->[2] } ) {
+
+      my $rhs = pop @{ $current->[2] };
+      my $lhs = pop @{ $current->[2] };
+      my $new = [
+        $arity{ $current->[0] }[1],
+        {},
+        [$lhs, $rhs]
+      ];
+      
+      ... unless defined $new->[0];
+
+      push @{ $current->[2] }, $new;
+    }
+
+    push @todo, @{ $current->[2] };
+  }
+
+  return $node;
+}
+
+sub parse_to_binary_jet {
+  my ($self, $string, %options) = @_;
+
+  my $g = $self->parse_to_jet($string, %options);
+
+  _make_jet_binary($g);
+
+  return $g;
+}
+
+sub parse_to_jet {
+  my ($self, $string, %options) = @_;
+
+  my $result = $self->{_p}->parse($string);
+
+  my @core_rules = map { _to_jet($_) } @$CoreRules;
+  $_->[1]{combine} = 'fallback' for @core_rules;
+
+  my $g = [
+    'grammar',
+    {},
+    [
+      ($options{core} ? @core_rules : ()),
+      map { _to_jet($_) } @$result
+    ]
+  ];
+
+#  _make_jet_binary($g);
+
+  return $g;
 }
 
 sub parse_to_grammar_formal {
@@ -517,6 +688,14 @@ C<$string> into a new Grammar::Formal object. To obtain the ABNF Core rules
 apply it to the string C<$Parse::ABNF::CoreRulesGrammar>. Alternatively,
 pass C<core> as option and the method will do it for you.
 
+=item parse_to_jet($string, %options)
+
+As before, but the result is encoded as simple JSON-Encoding for Trees.
+
+=item parse_to_binary_jet($string, %options)
+
+As before, but nodes other than C<grammar> nodes have at most two children.
+
 =back
 
 =head1 ERROR HANDLING
@@ -564,7 +743,7 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parser-ABNF>
 
 =head1 AUTHOR / COPYRIGHT / LICENSE
 
-  Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>.
+  Copyright (c) 2008-2018 Bjoern Hoehrmann <bjoern@hoehrmann.de>.
   This module is licensed under the same terms as Perl itself.
 
 =cut

@@ -4,33 +4,35 @@ author:
   - 'Julian Knocke'
   - 'Othello Maurer'
 build_requires:
-  FindBin: 0
-  Sub::Override: 0
-  Test::MockObject: 0
-  Test::More: 0
-  strict: 0
-  warnings: 0
+  FindBin: '0'
+  Sub::Override: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: WWW-Curl-UserAgent
 requires:
-  HTTP::Request: 0
-  HTTP::Response: 0
-  IO::Select: 0
-  Moose: 0
-  Time::HiRes: 0
-  WWW::Curl::Easy: 0
-  WWW::Curl::Multi: 0
-  bytes: 0
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  IO::Select: '0'
+  Moose: '0'
+  Time::HiRes: '0'
+  WWW::Curl::Easy: '0'
+  WWW::Curl::Multi: '0'
+  bytes: '0'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/xing/curl-useragent/issues
   homepage: https://github.com/xing/curl-useragent
   repository: git://github.com/xing/curl-useragent.git
-version: 0.9.6
+version: 0.9.8
+x_serialization_backend: 'YAML::Tiny version 1.70'

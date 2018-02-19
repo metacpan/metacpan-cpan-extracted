@@ -56,6 +56,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::PluginBundle::Easy" => 0,
     "Module::Version" => 0,
     "Moose" => 0,
+    "Perl::Critic::PolicyBundle::PERLANCAR" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0,
@@ -69,7 +70,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.591",
+  "VERSION" => "0.592",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -120,6 +121,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Module::Version" => 0,
   "Moose" => 0,
+  "Perl::Critic::PolicyBundle::PERLANCAR" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Test::More" => 0,
   "Test::Pod" => 0,

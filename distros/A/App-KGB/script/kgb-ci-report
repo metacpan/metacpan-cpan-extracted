@@ -1,0 +1,220 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DBD::Pg;
+use DBI;
+use Dpkg::Version;
+use Getopt::Long;
+use JSON::XS qw(decode_json);
+use LWP::UserAgent;
+
+my ( @opt_maintainer, $opt_kgb_config );
+my $opt_verbose      = 1;
+my $opt_distribution = 'debian';
+my $opt_release      = 'sid';
+my $opt_kgb_client   = 'kgb-client';
+
+GetOptions(
+    'm|maintainer=s' => \@opt_maintainer,
+    'kgb-config=s'   => \$opt_kgb_config,
+    'verbose+'       => \$opt_verbose,
+    'quiet'          => sub { $opt_verbose = 0 },
+    'distribution=s' => \$opt_distribution,
+    'release=s'      => \$opt_release,
+    'kgb-client=s'   => \$opt_kgb_client,
+) or exit 1;
+
+die "--maintainer is mandatory" unless @opt_maintainer;
+$opt_verbose = 1 if not $opt_verbose and not $opt_kgb_client;
+
+sub verbose {
+    return unless $opt_verbose;
+
+    warn @_, "\n";
+}
+
+my $db = DBI->connect( 'dbi:Pg:host=udd-mirror.debian.net;dbname=udd',
+    'udd-mirror', 'udd-mirror', { RaiseError => 1 } );
+verbose('Connected to UDD');
+my $st
+    = $db->prepare(
+          "select package, version\n"
+        . 'from packages_summary where maintainer_email in ('
+        . join( ', ', ( ('?') x scalar(@opt_maintainer) ) )
+        . ') and distribution=? and release=?' );
+$st->execute( @opt_maintainer, $opt_distribution, $opt_release );
+
+my $rows = $st->fetchall_arrayref;
+$db->disconnect;
+
+verbose( scalar(@$rows) . ' packages found in UDD' );
+
+my %wanted_packages =
+    map { ( $_->[0] => Dpkg::Version->new( $_->[1] ) ) } @$rows;
+my $maintained = scalar @$rows;
+
+undef $rows; # free the memory
+
+my $debci_status_url = 'https://ci.debian.net/data/status/unstable/amd64/packages.json';
+
+my $ua = LWP::UserAgent->new( agent => "$0" );
+my $res = $ua->get($debci_status_url);
+unless ($res->is_success) {
+    die "Error retrieving $debci_status_url: ".$res->status_line;
+}
+
+my $json = decode_json( ${$res->content_ref} );
+
+verbose( scalar(@$json) . ' packages retrieved from debci' );
+
+my $tested = 0;
+my $tested_but_old = 0;
+my $failing = 0;
+my $regressions = 0;
+my @regressions;
+
+for my $pkg_info (@$json) {
+    next unless $wanted_packages{ $pkg_info->{package} };
+
+    $tested++;
+
+    my $ver = Dpkg::Version->new($pkg_info->{version});
+    my $status = $pkg_info->{status};
+    my $prev_status = $pkg_info->{previous_status};
+
+    my $test_is_old = $ver != $wanted_packages{ $pkg_info->{package} };
+    $tested_but_old++ if $test_is_old;
+
+    next if $test_is_old;
+
+    if ( $status eq 'fail' ) {
+        $failing++;
+
+        push @regressions, "$pkg_info->{package} $pkg_info->{version}"
+            if $prev_status eq 'pass';
+    }
+}
+
+my $msg;
+
+if ( $failing ) {
+    $msg = 'CI coverage: ';
+    if ($tested_but_old) {
+        $msg .= sprintf( '%d+%d of %d',
+            $tested - $tested_but_old,
+            $tested_but_old, $maintained );
+    }
+    else {
+        $msg .= sprintf( '%d of %d', $tested, $maintained );
+    }
+
+    $msg .= sprintf( ' (%0.1f%%).',
+        $maintained ? 100 * $tested / $maintained : 0 );
+
+    $msg .= sprintf(
+        ' %d package%s fail CI tests (%0.1f%%).',
+        $failing,
+        ( $failing > 1 ) ? 's' : '',
+        $tested ? 100 * $failing / $tested : 0
+    );
+
+    if ( @regressions ) {
+        $msg .= ' Regressions: ';
+        my @verb = splice(@regressions, 0, 5);
+        if (@regressions) {
+            $msg .= join( ', ', @verb );
+            $msg .= sprintf ' and %d others', scalar(@regressions);
+        }
+        elsif (@verb > 1) {
+            $msg .= join( ', ', splice( @verb, 0, -1 ) );
+            $msg .= ' and ' . $verb[0];
+        }
+        else {
+            $msg .= $verb[0];
+        }
+    }
+}
+else {
+    $msg = "No packages fail their CI tests!";
+}
+
+verbose($msg);
+
+if ($opt_kgb_config) {
+    system( $opt_kgb_client, '--conf', $opt_kgb_config, '--relay-msg', $msg )
+        == 0
+        or die $!;
+}
+else {
+    warn
+        "Please use --kgb-config if you want the notification to go to IRC.\n";
+}
+
+__END__
+
+=head1 NAME
+
+kgb-ci-report - put DebCI status of maintained packages on IRC
+
+=head1 SYNOPSIS
+
+B<kgb-ci-report> --maintainer I<email> --kgb-config I<path> [option...]
+
+=head1 DESCRIPTION
+
+B<kgb-ci-report> retrieves tha packages with failing CI tests and reports a
+summary on IRC via L<kgb-client(1)>.
+
+The packages are filtered by maintainer email. Intented purpose is invoking it
+from cron, e.g. daily.
+
+It uses UDD (L<https://udd.debian.org>) to get the information about the maintained
+packages, and L<https://ci.debian.net> to fetch their status.
+
+=head1 OPTIONS
+
+=over
+
+=item B<--maintainer> I<email>
+
+=item B<-m> I<email>
+
+Maintainer email. B<Mandatory>. If repeated multiple times all packages
+maintained by any of the emails are considered in the report.
+
+=item B<--kgb-config> I<path>
+
+Path to the L<kgb-client(1)> configuration. B<Mandatory>.
+
+=item B<--quiet>
+
+Stop reporting progress and results.
+
+=item B<--distribution> I<name>
+
+Set the wanted distribution when retrieving the list of maintained packages.
+Defaults to C<debian>.
+
+=item B<--release> I<codename>
+
+Sets the wanted release name when retrieving the list of maintained packages.
+Defaults to C<sid>.
+
+=item B<--kgb-client> I<path>
+
+Path to the kgb-client executable. Defaults to C<kgb-client>.
+
+=back
+
+=head1 AUTHOR, COPYRIGHT AND LICENSE
+
+kgb-ci-report was written during the pkg-perl sprint in Barcelona 2015.
+L<https://wiki.debian.org/Sprints/2015/DebianPerlSprint>
+
+Copyright (C) 2015 Damyan Ivanov L<dmn@debian.org>
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2, or (at your option) any later version.

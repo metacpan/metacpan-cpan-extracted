@@ -1,0 +1,42 @@
+Revision history for MIDI-Ngram
+
+0.08 2018-02-18 18:40:28
+    - Include pitch gestalt in the analysis if requested.
+
+0.07 2018-02-18 15:58:10
+    - Allow analysis to accumulate phrases into a single list.
+    - Renamed a number of attributes to improve meaning.
+    - Improved the eg script code again.
+
+0.06 2018-02-17 16:08:15
+    - Improved the eg/ngram-play code.
+    - Replaced the opus attribute with a single-use variable.
+    - Allow a user defined list of channels to analyze.
+
+0.0501 2018-02-13 22:23:51
+    - Stop displaying the track reference address in the analysis.
+
+0.05 2018-02-13 21:47:45
+    - Used a single data structure for the ngram list.
+    - Fixed the ordering of ngrams for non-shuffled output.
+
+0.04 2018-02-12 20:03:37
+    - Replaced inline printing if --verbose with a returned string of results.
+
+0.03 2018-02-11 10:54:23
+    - Added the note-ngram program to eg/.
+    - Modularized 'isa' routines.
+
+0.02 2018-02-11 02:10:46
+    - Corrected call to _random_patch().
+
+0.0102 2018-02-11 01:25:02
+    - Improved documentation.
+
+0.0101 2018-02-11 01:04:16
+    - Fixed SYNOPSIS typo.
+    - Tested the source attribute.
+
+0.01 2018-02-11 00:30:50
+    - Minted by Dist::Zilla.
+    - Ported functionality from my ngram-play standalone program.

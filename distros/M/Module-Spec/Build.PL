@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Module-Spec",
-  "dist_version" => "0.7.0",
+  "dist_version" => "0.8.0",
   "license" => "perl",
   "module_name" => "Module::Spec",
   "recursive_test_files" => 1,

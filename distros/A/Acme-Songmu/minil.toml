@@ -1,0 +1,8 @@
+name = "Acme-Songmu"
+badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+
+[Metadata]
+x_static_install = 1

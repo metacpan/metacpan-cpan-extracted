@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =head1 SYNOPSIS
 
@@ -87,9 +87,9 @@ The following functions are exportable:
     :special
         beta eta gamma lgamma lngamma digamma zeta
         Ai Ei Li Li2 LambertW BesselJ BesselY lgrt
-        pow sqrt cbrt root exp exp2 exp10 ln log
-        log2 log10 mod abs erf erfc sqr norm hypot
-        agm bernreal harmreal polygonal_root
+        pow sqr sqrt cbrt root exp exp2 exp10 log
+        ln log2 log10 mod polymod erf erfc abs agm
+        hypot norm bernreal harmreal polygonal_root
         polygonal_root2
 
     :ntheory
@@ -102,7 +102,8 @@ The following functions are exportable:
         is_prime is_coprime next_prime is_polygonal
         is_polygonal2 faulhaber_sum ipolygonal_root
         ipolygonal_root2 polygonal rising_factorial
-        falling_factorial
+        falling_factorial subfactorial multinomial
+        is_smooth
 
     :misc
         rand irand seed iseed floor ceil round sgn neg inv
@@ -448,6 +449,18 @@ Remainder of C<x> when is divided by C<y>. Returns NaN when C<y> is zero.
 Implemented as:
 
     x % y = x - y*floor(x/y)
+
+=head2 polymod
+
+    polymod(n, a, b, c, ...)                      #=> (Any, Any, ..., Any)
+
+Returns a list of mod results corresponding to the divisors in C<(a, b, c, ...)>. The divisors are
+given from smallest "unit" to the largest (e.g. 60 seconds per minute, 60 minutes per hour) and the results
+are returned in the same way: from smallest to the largest (5 seconds, 4 minutes).
+
+Example:
+
+    my ($s, $m, $h, $d) = polymod($seconds, 60, 60, 24);
 
 =head2 conj
 
@@ -1040,6 +1053,52 @@ Example:
 
 Generalized m-factorial of C<n>. Returns NaN when C<n> or C<m> is negative. (requires GMP>=5.1.0)
 
+=head2 subfactorial
+
+    subfactorial(n)                               #=> Int | NaN
+    subfactorial(n, k)                            #=> Int | NaN
+
+The number of permutations of C<{1, ..., n}> that have exactly C<k> fixed points,
+given a positive integer C<n> and an optional integer C<k> (if C<k> is ommited, then C<k=0>).
+
+See also:
+
+=over 4
+
+=item * L<https://en.wikipedia.org/wiki/Rencontres_numbers>
+
+=back
+
+
+=head2 binomial
+
+    binomial(n, k)                                #=> Int | NaN
+
+Computes the binomial coefficient C<n> over C<k>, also called the
+"choose" function. The result is equivalent to:
+
+                        n!
+    binomial(n, k) = -------
+                     k!(n-k)!
+
+=head2 multinomial
+
+    multinomial(a, b, c, ...)                     #=> Int | NaN
+
+Computes the multinomial coefficient, given a list of native integers.
+
+Example:
+
+    multinomial(1, 4, 4, 2) = 34650
+
+See also:
+
+=over 4
+
+=item * https://en.wikipedia.org/wiki/Multinomial_theorem
+
+=back
+
 =head2 rising_factorial
 
     rising_factorial(n, k)                        #=> Int | Rat | NaN
@@ -1068,26 +1127,15 @@ For negative values of C<k>, falling factorial is defined as:
 
 When the denominator is zero, NaN is returned.
 
-=head2 binomial
-
-    binomial(n, k)                                #=> Int
-
-Calculates the binomial coefficient C<n> over C<k>, also called the
-"choose" function. The result is equivalent to:
-
-           ( n )       n!
-           |   |  = -------
-           ( k )    k!(n-k)!
-
 =head2 primorial
 
-    primorial(n)                                  #=> Int
+    primorial(n)                                  #=> Int | NaN
 
 Returns the product of all the primes less than or equal to C<n>. (requires GMP>=5.1.0)
 
 =head2 next_prime
 
-    next_prime(n)                                 #=> Int
+    next_prime(n)                                 #=> Int | NaN
 
 Returns the next prime after C<n>.
 
@@ -1120,6 +1168,17 @@ See also:
 
 Returns a true value when C<n> and C<k> are relatively prime to each other. That is, when C<gcd(n, k) == 1>.
 
+=head2 is_smooth
+
+    is_smooth(n, k)                               #=> Bool
+
+Returns a true value when all the prime factors of C<n> are less than or equal to C<k>, where C<n> and C<k> are positive integers.
+
+Example:
+
+    is_smooth(36, 3)    # true  : 36 = 2^2 * 3^2
+    is_smooth(39, 6)    # false : 39 = 3 * 13, where 13 > 6
+
 =head2 is_power
 
     is_power(n)
@@ -1139,7 +1198,6 @@ Example:
     is_power(100, 2)       # true: 100 is a square (10**2)
     is_power(125, 3)       # true: 125 is a cube   ( 5**3)
     is_power(279841)       # true: 279841 is 23**4
-
 
 =head2 is_square
 

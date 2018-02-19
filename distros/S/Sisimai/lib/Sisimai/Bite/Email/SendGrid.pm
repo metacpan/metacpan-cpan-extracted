@@ -4,25 +4,16 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'        => qr/\AMAILER-DAEMON\z/,
-    'return-path' => qr/\A[<]apps[@]sendgrid[.]net[>]\z/,
-    'subject'     => qr/\AUndelivered Mail Returned to Sender\z/,
-};
-my $Re1 = {
-    'begin'  => qr/\AThis is an automatically generated message from SendGrid[.]\z/,
-    'error'  => qr/\AIf you require assistance with this, please contact SendGrid support[.]\z/,
-    'rfc822' => qr|\AContent-Type: message/rfc822|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This is an automatically generated message from SendGrid.'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+};
 
 # Return-Path: <apps@sendgrid.net>
 # X-Mailer: MIME-tools 5.502 (Entity 5.502)
 sub headerlist  { return ['Return-Path', 'X-Mailer'] }
-sub pattern     { return $Re0 }
 sub description { 'SendGrid: http://sendgrid.com/' }
-
 sub scan {
     # Detect an error from SendGrid
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -40,9 +31,10 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'from'        => qr/\AMAILER-DAEMON\z/,
     return undef unless $mhead->{'return-path'};
-    return undef unless $mhead->{'return-path'} =~ $Re0->{'return-path'};
-    return undef unless $mhead->{'subject'}     =~ $Re0->{'subject'};
+    return undef unless $mhead->{'return-path'} eq '<apps@sendgrid.net>';
+    return undef unless $mhead->{'subject'} eq 'Undelivered Mail Returned to Sender';
 
     require Sisimai::DateTime;
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -57,15 +49,14 @@ sub scan {
     my $connheader = {
         'date'    => '',    # The value of Arrival-Date header
     };
-
     my $v = undef;
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e eq $StartingOf->{'message'}->[0] ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -73,7 +64,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -101,7 +92,7 @@ sub scan {
                 # Diagnostic-Code: 550 5.1.1 <kijitora@example.jp>... User Unknown 
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; userunknown@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -111,23 +102,22 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.1.1
                     # Status:5.2.0
                     # Status: 5.1.0 (permanent failure)
                     $v->{'status'} = $1;
 
                 } else {
-
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: 550 5.1.1 <userunknown@example.jp>... User Unknown
                         $v->{'diagnosis'} = $1;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -153,16 +143,16 @@ sub scan {
                 # X-SendGrid-QueueID: 959479146
                 # X-SendGrid-Sender: <bounces+61689-10be-kijitora=example.jp@sendgrid.info>
                 # Arrival-Date: 2012-12-31 23-59-59
-                if( $e =~ m/.+ in (?:End of )?([A-Z]{4}).*\z/ ) {
+                if( $e =~ /.+ in (?:End of )?([A-Z]{4}).*\z/ ) {
                     # in RCPT TO, in MAIL FROM, end of DATA
                     $commandtxt = $1;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     my $arrivaldate = $1;
 
-                    if( $e =~ m/\A[Aa]rrival-[Dd]ate: (\d{4})[-](\d{2})[-](\d{2}) (\d{2})[-](\d{2})[-](\d{2})\z/ ) {
+                    if( $e =~ /\AArrival-Date: (\d{4})[-](\d{2})[-](\d{2}) (\d{2})[-](\d{2})[-](\d{2})\z/ ) {
                         # Arrival-Date: 2011-08-12 01-05-05
                         $arrivaldate .= 'Thu, '.$3.' ';
                         $arrivaldate .= Sisimai::DateTime->monthname(0)->[int($2) - 1];
@@ -178,20 +168,16 @@ sub scan {
         # Save the current line for the next loop
         $p = $e;
     }
-
     return undef unless $recipients;
+
     require Sisimai::String;
     require Sisimai::SMTP::Status;
-
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
         # Get the value of SMTP status code as a pseudo D.S.N.
-        if( $e->{'diagnosis'} =~ m/\b([45])\d\d[ \t]*/ ) {
-            # 4xx or 5xx
-            $e->{'status'} = sprintf("%d.0.0", $1);
-        }
+        $e->{'status'} = $1.'.0.0' if $e->{'diagnosis'} =~ /\b([45])\d\d[ \t]*/;
 
-        if( $e->{'status'} =~ m/[45][.]0[.]0/ ) {
+        if( $e->{'status'} eq '5.0.0' || $e->{'status'} eq '4.0.0' ) {
             # Get the value of D.S.N. from the error message or the value of
             # Diagnostic-Code header.
             my $pseudostatus = Sisimai::SMTP::Status->find($e->{'diagnosis'});
@@ -201,7 +187,7 @@ sub scan {
         if( $e->{'action'} eq 'expired' ) {
             # Action: expired
             $e->{'reason'} = 'expired';
-            if( ! $e->{'status'} || $e->{'status'} =~ m/[45][.]0[.]0/ ) {
+            if( ! $e->{'status'} || substr($e->{'status'}, -4, 4) eq '.0.0' ) {
                 # Set pseudo Status code value if the value of Status is not
                 # defined or 4.0.0 or 5.0.0.
                 my $pseudostatus = Sisimai::SMTP::Status->code('expired');
@@ -258,7 +244,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

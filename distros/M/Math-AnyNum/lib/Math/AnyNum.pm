@@ -11,9 +11,12 @@ use Math::GMPq qw();
 use Math::GMPz qw();
 use Math::MPC qw();
 
-use POSIX qw(ULONG_MAX LONG_MIN);
+use constant {
+              ULONG_MAX => Math::GMPq::_ulong_max(),
+              LONG_MIN  => Math::GMPq::_long_min(),
+             };
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -156,7 +159,9 @@ use overload
         log2  => \&log2,
         log10 => \&log10,
 
-        mod => \&mod,
+        mod     => \&mod,
+        polymod => \&polymod,
+
         abs => sub (_) { goto &abs },      # built-in function
 
         erf  => \&erf,
@@ -173,11 +178,13 @@ use overload
                   );
 
     my %ntheory = (
-        factorial  => \&factorial,
-        dfactorial => \&dfactorial,
-        mfactorial => \&mfactorial,
-        primorial  => \&primorial,
-        binomial   => \&binomial,
+        factorial    => \&factorial,
+        dfactorial   => \&dfactorial,
+        mfactorial   => \&mfactorial,
+        subfactorial => \&subfactorial,
+        primorial    => \&primorial,
+        binomial     => \&binomial,
+        multinomial  => \&multinomial,
 
         rising_factorial  => \&rising_factorial,
         falling_factorial => \&falling_factorial,
@@ -233,6 +240,7 @@ use overload
 
         is_prime   => \&is_prime,
         is_coprime => \&is_coprime,
+        is_smooth  => \&is_smooth,
         next_prime => \&next_prime,
                   );
 
@@ -901,7 +909,7 @@ sub _star2obj {
         $x;
     }
     elsif (ref($x) eq 'Math::GComplex') {
-        return _reals2mpc($x->reals);
+        _reals2mpc($x->reals);
     }
     else {
         (@_) = "$x";
@@ -2268,6 +2276,33 @@ sub imod ($$) {
 }
 
 #
+## POLYMOD
+#
+
+sub polymod {
+    require Math::AnyNum::mod;
+    require Math::AnyNum::div;
+    require Math::AnyNum::sub;
+
+    my @list = map { _star2obj($_) } @_;
+
+    my @r;
+    my $x = shift(@list);
+
+    foreach my $m (@list) {
+        my $mod = __mod__($x, $m);
+
+        $x = __sub__($x, $mod);
+        $x = __div__($x, $m);
+
+        push @r, $mod;
+    }
+
+    push @r, $x;
+    map { bless \$_ } @r;
+}
+
+#
 ## DIVMOD
 #
 
@@ -3100,8 +3135,74 @@ sub harmreal ($) {
 }
 
 #
+## Subfactorial
+#
+
+sub subfactorial ($;$) {
+    my ($x, $y) = @_;
+
+    my ($m, $k);
+
+    if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x < ULONG_MAX) {
+        $m = $x;
+    }
+    elsif (ref($x) eq __PACKAGE__) {
+        $m = _any2ui($$x) // goto &nan;
+    }
+    else {
+        $m = _any2ui(_star2obj($x)) // goto &nan;
+    }
+
+    if (defined($y)) {
+        if (!ref($y) and CORE::int($y) eq $y and $y > LONG_MIN and $y < ULONG_MAX) {
+            $k = $y;
+        }
+        elsif (ref($y) eq __PACKAGE__) {
+            $k = _any2si($$y) // goto &nan;
+        }
+        else {
+            $k = _any2si(_star2obj($y)) // goto &nan;
+        }
+    }
+    else {
+        $k = 0;
+    }
+
+    my $n = $m - $k;
+
+    goto &zero if ($k < 0);
+    goto &one  if ($n == 0);
+    goto &nan  if ($n < 0);
+
+    my $tau  = 6.28318530717958647692528676655900576839433879875;
+    my $prec = 4 + CORE::int(($n * CORE::log($n) + CORE::log($tau * $n) / 2 - $n) / CORE::log(2));
+
+    my $z = Math::GMPz::Rmpz_init();
+    Math::GMPz::Rmpz_fac_ui($z, $n);
+
+    state $round_z = Math::MPFR::MPFR_RNDZ();
+
+    my $f = Math::MPFR::Rmpfr_init2($prec);
+    Math::MPFR::Rmpfr_set_ui($f, 1, $round_z);
+    Math::MPFR::Rmpfr_exp($f, $f, $round_z);
+    Math::MPFR::Rmpfr_z_div($f, $z, $f, $round_z);
+    Math::MPFR::Rmpfr_add_d($f, $f, 0.5, $round_z);
+    Math::MPFR::Rmpfr_floor($f, $f);
+    Math::MPFR::Rmpfr_get_z($z, $f, $round_z);
+
+    if ($k != 0) {
+        my $t = Math::GMPz::Rmpz_init();
+        Math::GMPz::Rmpz_bin_uiui($t, $m, $k);
+        Math::GMPz::Rmpz_mul($z, $z, $t);
+    }
+
+    bless \$z;
+}
+
+#
 ## Factorial
 #
+
 sub factorial ($) {
     my ($x) = @_;
 
@@ -3382,6 +3483,41 @@ sub is_coprime ($$) {
     ref($y)
       ? Math::GMPz::Rmpz_gcd($t, $x, $y)
       : Math::GMPz::Rmpz_gcd_ui($t, $x, $y);
+
+    Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
+}
+
+#
+## Returns a true value if all the divisors of `x` are <= n.
+#
+
+sub is_smooth ($$) {
+    require Math::AnyNum::is_int;
+    my ($x, $n) = @_;
+
+    $x = ref($x) eq __PACKAGE__ ? $$x : _star2obj($x);
+
+    __is_int__($x) || return 0;
+
+    if (ref($x) ne 'Math::GMPz') {
+        $x = _any2mpz($x) // return 0;
+    }
+
+    return 0 if (Math::GMPz::Rmpz_sgn($x) <= 0);
+
+    $n = (ref($n) eq __PACKAGE__ ? _any2mpz($$n) : _star2mpz($n)) // return 0;
+
+    return 0 if (Math::GMPz::Rmpz_sgn($n) <= 0);
+
+    my $p = Math::GMPz::Rmpz_init_set_ui(2);
+    my $t = Math::GMPz::Rmpz_init_set($x);
+
+    for (; Math::GMPz::Rmpz_cmp($p, $n) <= 0 ; Math::GMPz::Rmpz_nextprime($p, $p)) {
+        if (Math::GMPz::Rmpz_divisible_p($t, $p)) {
+            Math::GMPz::Rmpz_remove($t, $t, $p);
+            Math::GMPz::Rmpz_cmp_ui($t, 1) == 0 and return 1;
+        }
+    }
 
     Math::GMPz::Rmpz_cmp_ui($t, 1) == 0;
 }
@@ -3990,7 +4126,7 @@ sub faulhaber_sum ($$) {
 }
 
 #
-## Binomial
+## Binomial coefficient
 #
 
 sub binomial ($$) {
@@ -4031,6 +4167,47 @@ sub binomial ($$) {
     }
 
     bless \$r;
+}
+
+#
+## Multinomial coefficient
+#
+
+sub multinomial {
+    my ($n, @mset) = @_;
+
+    $n = _star2mpz($n) // goto &nan;
+
+    my $bin  = Math::GMPz::Rmpz_init();
+    my $sum  = Math::GMPz::Rmpz_init_set($n);
+    my $prod = Math::GMPz::Rmpz_init_set_ui(1);
+
+    foreach my $k (@mset) {
+
+        if (!ref($k) and CORE::int($k) eq $k and $k > LONG_MIN and $k < ULONG_MAX) {
+            ## `k` is a native integer
+        }
+        else {
+            $k = _any2si(ref($k) eq __PACKAGE__ ? $$k : _star2obj($k)) // goto &nan;
+        }
+
+        $k < 0
+          ? Math::GMPz::Rmpz_sub_ui($sum, $sum, -$k)
+          : Math::GMPz::Rmpz_add_ui($sum, $sum, $k);
+
+        if ($k >= 0 and Math::GMPz::Rmpz_fits_ulong_p($sum)) {
+            Math::GMPz::Rmpz_bin_uiui($bin, Math::GMPz::Rmpz_get_ui($sum), $k);
+        }
+        else {
+            $k < 0
+              ? Math::GMPz::Rmpz_bin_si($bin, $sum, $k)
+              : Math::GMPz::Rmpz_bin_ui($bin, $sum, $k);
+        }
+
+        Math::GMPz::Rmpz_mul($prod, $prod, $bin);
+    }
+
+    bless \$prod;
 }
 
 #

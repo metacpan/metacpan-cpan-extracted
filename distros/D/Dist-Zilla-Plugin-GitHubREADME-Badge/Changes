@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.23  2018-02-18 10:19:37 CST
+        - add a filemunge phase (yanick)
+
 0.22  2017-04-10 08:26:03 CST
         - no code changes, release
 

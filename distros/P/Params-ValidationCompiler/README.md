@@ -4,7 +4,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 # VERSION
 
-version 0.26
+version 0.27
 
 # SYNOPSIS
 
@@ -174,6 +174,12 @@ This subroutine accepts the following additional parameters:
     This is useful for CPAN modules where you want to set a name if you can, but
     you do not want to add a prerequisite on [Sub::Util](https://metacpan.org/pod/Sub::Util).
 
+- debug
+
+    Sets the `EVAL_CLOSURE_PRINT_SOURCE` environment variable to true before
+    calling `Eval::Closure::eval_closure()`. This causes the source of the
+    subroutine to be printed before it's `eval`'d.
+
 ## source\_for(...)
 
 This returns a two element list. The first is a string containing the source
@@ -220,7 +226,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2016 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

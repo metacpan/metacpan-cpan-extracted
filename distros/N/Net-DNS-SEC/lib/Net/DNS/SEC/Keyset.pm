@@ -1,10 +1,9 @@
 package Net::DNS::SEC::Keyset;
 
 #
-# $Id: Keyset.pm 1395 2015-09-14 21:16:13Z willem $
+# $Id: Keyset.pm 1613 2018-01-15 13:47:13Z willem $
 #
-use vars qw($VERSION);
-$VERSION = (qw$LastChangedRevision: 1395 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1613 $)[1];
 
 
 =head1 NAME
@@ -39,7 +38,7 @@ use File::Spec::Functions;
 
 use Net::DNS::ZoneFile;
 
-use vars qw($keyset_err);
+our $keyset_err;
 
 
 sub new {

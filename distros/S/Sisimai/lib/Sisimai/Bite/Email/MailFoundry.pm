@@ -4,21 +4,14 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'  => qr/\AMessage delivery has failed\z/,
-    'received' => qr/[(]MAILFOUNDRY[)] id /,
-};
-my $Re1 = {
-    'begin'  => qr/\AThis is a MIME encoded message\z/,
-    'error'  => qr/\ADelivery failed for the following reason:\z/,
-    'rfc822' => qr|\AContent-Type: message/rfc822\z|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This is a MIME encoded message'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+    'error'   => ['Delivery failed for the following reason:'],
+};
 
-sub pattern     { return $Re0 }
 sub description { 'MailFoundry' }
-
 sub scan {
     # Detect an error from MailFoundry
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -36,8 +29,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
-    return undef unless grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    return undef unless $mhead->{'subject'} eq 'Message delivery has failed';
+    return undef unless grep { index($_, '(MAILFOUNDRY) id') > -1 } @{ $mhead->{'received'} };
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -49,10 +42,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e eq $StartingOf->{'message'}->[0] ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -60,7 +53,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -87,7 +80,7 @@ sub scan {
             # This has been a permanent failure.  No further delivery attempts will be made.
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\AUnable to deliver message to: [<]([^ ]+[@][^ ]+)[>]\z/ ) {
+            if( $e =~ /\AUnable to deliver message to: [<]([^ ]+[@][^ ]+)[>]\z/ ) {
                 # Unable to deliver message to: <kijitora@example.org>
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -99,7 +92,7 @@ sub scan {
 
             } else {
                 # Error message
-                if( $e =~ $Re1->{'error'} ) {
+                if( $e eq $StartingOf->{'error'}->[0] ) {
                     # Delivery failed for the following reason:
                     $v->{'diagnosis'} = $e;
 
@@ -107,7 +100,7 @@ sub scan {
                     # Detect error message
                     next unless length $e;
                     next unless length $v->{'diagnosis'};
-                    next if $e =~ m/\A[-]+/;
+                    next if index($e, '-') == 0;
 
                     # Server mx22.example.org[192.0.2.222] failed with: 550 <kijitora@example.org> No such user here
                     $v->{'diagnosis'} .= ' '.$e;
@@ -115,10 +108,9 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
@@ -172,7 +164,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

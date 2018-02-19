@@ -1,5 +1,5 @@
 #!perl
-use 5.006;
+use 5.008;
 use strict;
 use warnings FATAL => 'all';
 use lib 't';
@@ -16,7 +16,7 @@ my $ARHeader = "Authentication-Results: foo.example.net (foobar) 1 (baz);
              (this surprised me) = (as I wasn't expecting it) 1362471462";
 
 my $AsString = "foo.example.net (foobar) (baz) 1;
-dkim=fail (Because I like it) / 1 (One yay) (wait for it) policy.expired=1362471462 (A dot can go here) (like that) (this surprised me) (as I wasn't expecting it)";
+    dkim=fail (Because I like it) / 1 (One yay) (wait for it) policy.expired=1362471462 (A dot can go here) (like that) (this surprised me) (as I wasn't expecting it)";
 
 my $Parsed;
 

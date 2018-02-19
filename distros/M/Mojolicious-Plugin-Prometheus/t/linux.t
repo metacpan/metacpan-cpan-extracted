@@ -17,7 +17,7 @@ if ($^O eq 'linux') {
 
   # Only Linux supported by Net::Prometheus process collector
   $t->get_ok('/metrics')->status_is(200)->content_type_like(qr(^text/plain))
-    ->content_like(qr/process_cpu_seconds_total/);
+    ->content_like(qr/process_cpu_seconds_total\{worker="\d+"/);
 }
 else {
   plan skip_all => 'Test irrelevant outside Linux';

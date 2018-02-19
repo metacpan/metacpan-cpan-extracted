@@ -1,5 +1,9 @@
 Revision history for Perl extension Mojolicious-Plugin-Prometheus
 
+1.1.0 2018-02-16T19:52:56Z
+    - Add worker pid as label (thanks @lammel)
+    - Response size is now body size only, excluding the header
+
 1.0.4 2018-01-04T12:28:52Z
     - Reformat code with Mojo perltidy settings
     - Minor documentation updates

@@ -4,41 +4,34 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/\AMail Delivery Subsystem/,
-    'subject' => qr/\AReturned mail: [A-Z]/,
-};
-# Error text regular expressions which defined in src/savemail.c
-#   savemail.c:485| (void) fflush(stdout);
-#   savemail.c:486| p = queuename(e->e_parent, 'x');
-#   savemail.c:487| if ((xfile = fopen(p, "r")) == NULL)
-#   savemail.c:488| {
-#   savemail.c:489|   syserr("Cannot open %s", p);
-#   savemail.c:490|   fprintf(fp, "  ----- Transcript of session is unavailable -----\n");
-#   savemail.c:491| }
-#   savemail.c:492| else
-#   savemail.c:493| {
-#   savemail.c:494|   fprintf(fp, "   ----- Transcript of session follows -----\n");
-#   savemail.c:495|   if (e->e_xfp != NULL)
-#   savemail.c:496|       (void) fflush(e->e_xfp);
-#   savemail.c:497|   while (fgets(buf, sizeof buf, xfile) != NULL)
-#   savemail.c:498|       putline(buf, fp, m);
-#   savemail.c:499|   (void) fclose(xfile);
-my $Re1 = {
-    'begin'   => qr/\A[ \t]+[-]+ Transcript of session follows [-]+\z/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'message' => ['----- Transcript of session follows -----'] };
+my $MarkingsOf = {
+    # Error text regular expressions which defined in src/savemail.c
+    #   savemail.c:485| (void) fflush(stdout);
+    #   savemail.c:486| p = queuename(e->e_parent, 'x');
+    #   savemail.c:487| if ((xfile = fopen(p, "r")) == NULL)
+    #   savemail.c:488| {
+    #   savemail.c:489|   syserr("Cannot open %s", p);
+    #   savemail.c:490|   fprintf(fp, "  ----- Transcript of session is unavailable -----\n");
+    #   savemail.c:491| }
+    #   savemail.c:492| else
+    #   savemail.c:493| {
+    #   savemail.c:494|   fprintf(fp, "   ----- Transcript of session follows -----\n");
+    #   savemail.c:495|   if (e->e_xfp != NULL)
+    #   savemail.c:496|       (void) fflush(e->e_xfp);
+    #   savemail.c:497|   while (fgets(buf, sizeof buf, xfile) != NULL)
+    #   savemail.c:498|       putline(buf, fp, m);
+    #   savemail.c:499|   (void) fclose(xfile);
     'error'   => qr/\A[.]+ while talking to .+[:]\z/,
     'rfc822'  => qr{\A[ \t]+-----[ \t](?:
          Unsent[ ]message[ ]follows
         |No[ ]message[ ]was[ ]collected
         )[ \t]-----
     }x,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
-sub pattern     { return $Re0 }
 sub description { 'Sendmail version 5' }
-
 sub scan {
     # Detect an error from V5sendmail
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -56,7 +49,8 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    # 'from'    => qr/\AMail Delivery Subsystem/,
+    return undef unless $mhead->{'subject'} =~ /\AReturned mail: [A-Z]/;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -72,10 +66,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) > -1 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -83,7 +77,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -111,7 +105,7 @@ sub scan {
             # 421 example.org (smtp)... Deferred: Connection timed out during user open with example.org
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A\d{3}[ \t]+[<]([^ ]+[@][^ ]+)[>][.]{3}[ \t]*(.+)\z/ ) {
+            if( $e =~ /\A\d{3}[ \t]+[<]([^ ]+[@][^ ]+)[>][.]{3}[ \t]*(.+)\z/ ) {
                 # 550 <kijitora@example.org>... User unknown
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -127,11 +121,11 @@ sub scan {
                 }
                 $recipients++;
 
-            } elsif( $e =~ m/\A[>]{3}[ \t]*([A-Z]{4})[ \t]*/ ) {
+            } elsif( $e =~ /\A[>]{3}[ \t]*([A-Z]{4})[ \t]*/ ) {
                 # >>> RCPT To:<kijitora@example.org>
                 $commandset[ $recipients ] = $1;
 
-            } elsif( $e =~ m/\A[<]{3}[ ]+(.+)\z/ ) {
+            } elsif( $e =~ /\A[<]{3}[ ]+(.+)\z/ ) {
                 # <<< Response
                 # <<< 501 <shironeko@example.co.jp>... no access from mail server [192.0.2.55] which is an open relay.
                 # <<< 550 Requested User Mailbox not found. No such user here.
@@ -140,17 +134,15 @@ sub scan {
             } else {
                 # Detect SMTP session error or connection error
                 next if $v->{'sessionerr'};
-                if( $e =~ $Re1->{'error'} ) { 
+                if( $e =~ $MarkingsOf->{'error'} ) { 
                     # ----- Transcript of session follows -----
                     # ... while talking to mta.example.org.:
                     $v->{'sessionerr'} = 1;
                     next;
                 }
 
-                if( $e =~ m/\A\d{3}[ \t]+.+[.]{3}[ \t]*(.+)\z/ ) {
-                    # 421 example.org (smtp)... Deferred: Connection timed out during user open with example.org
-                    $anotherset->{'diagnosis'} = $1;
-                }
+                # 421 example.org (smtp)... Deferred: Connection timed out during user open with example.org
+                $anotherset->{'diagnosis'} = $1 if $e =~ /\A\d{3}[ \t]+.+[.]{3}[ \t]*(.+)\z/;
             }
         } # End of if: rfc822
     }
@@ -159,7 +151,7 @@ sub scan {
     unless( $recipients ) {
         # Get the recipient address from the original message
         for my $e ( @$rfc822list ) {
-            if( $e =~ m/^To: (.+)$/ ) {
+            if( $e =~ /^To: (.+)$/ ) {
                 # The value of To: header in the original message
                 $dscontents->[0]->{'recipient'} = Sisimai::Address->s3s4($1);
                 $recipients = 1;
@@ -168,8 +160,8 @@ sub scan {
         }
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $errorindex++;
         $e->{'agent'}   = __PACKAGE__->smtpagent;
@@ -185,12 +177,10 @@ sub scan {
         }
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        unless( $e->{'recipient'} =~ m/\A[^ ]+[@][^ ]+\z/ ) {
+        unless( $e->{'recipient'} =~ /\A[^ ]+[@][^ ]+\z/ ) {
             # @example.jp, no local part
-            if( $e->{'diagnosis'} =~ m/[<]([^ ]+[@][^ ]+)[>]/ ) {
-                # Get email address from the value of Diagnostic-Code header
-                $e->{'recipient'} = $1;
-            }
+            # Get email address from the value of Diagnostic-Code header
+            $e->{'recipient'} = $1 if $e->{'diagnosis'} =~ /[<]([^ ]+[@][^ ]+)[>]/;
         }
         delete $e->{'sessionerr'};
     }
@@ -242,7 +232,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

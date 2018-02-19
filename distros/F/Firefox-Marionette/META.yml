@@ -5,6 +5,9 @@ author:
 build_requires:
   Cwd: '0'
   Digest::SHA: '0'
+  HTTP::Daemon: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -38,5 +41,5 @@ requires:
   base: '0'
   overload: '0'
   perl: '5.006'
-version: '0.37'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

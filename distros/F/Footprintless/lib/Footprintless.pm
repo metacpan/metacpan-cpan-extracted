@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless;
-$Footprintless::VERSION = '1.26';
+$Footprintless::VERSION = '1.27';
 # ABSTRACT: A utility for managing systems with minimal installs
 # PODNAME: Footprintless
 
@@ -189,7 +189,7 @@ Footprintless - A utility for managing systems with minimal installs
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

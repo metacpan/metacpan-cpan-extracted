@@ -13,7 +13,7 @@ dist.ini
 eg/screenshot.png
 eg/templates/not_found.html.ep
 eg/templates/people.html.ep
-eg/templates/people/_index.html.ep
+eg/templates/people/index.html.ep
 eg/yancy.conf
 eg/yancy.data.json
 eg/yancy.null.conf

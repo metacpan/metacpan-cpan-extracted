@@ -24,11 +24,31 @@ Bot::ChatBots::Telegram::WebHook - Telegram updates receiver, web hook
       # more can follow here...
    ];
    app->start;
-   sub processor {
-      my $record = shift;
-      # do whatever you want with $record, e.g. set a quick response
-      $record->{response} = 'your thoughs are important for us!';
-      return $record;
+   sub processor { # tube-compliant
+      my $record = shift; # ... $record is normalized, by default
+
+      # ... your business logic goes here...
+      my $message = 'Howdy!';
+
+      # In a WebHook you're actually processing a HTTP Request from
+      # Telegram, so you can set a response via Mojolicious
+      if (automatic_via_https_response()) { # WebHook only
+         $record->{response} = $message;
+      }
+      elsif (do_it_yourself_via_https_response()) { # WebHook only
+         $record->{source}{refs}{controller}->render(text => $message);
+         $record->{source}{flags}{rendered} = 1; # if Bot::ChatBot <= 0.006
+      }
+      elsif (automatic_via_sender()) { # same as LongPoll
+         $record->{send_response} = $message;
+      }
+      elsif (do_it_yourself_via_sender()) { # same as LongPoll
+         my $sender = $record->{source}{refs}{sender};
+         $sender->send_response($message, record => $record);
+      }
+      # else nothing is sent back, just a HTTP 204 by default
+
+      return $record; # follow on..
    }
 
 =head1 DESCRIPTION
@@ -47,11 +67,57 @@ Most probably you will also want to automatically register your webhook at
 Telegram. In this case, you MUST also provide a L</token>. You can also
 set automatic registration (and unregistration) when creating the object.
 
-When invoked, the L</processor> tube can return a record with the
-C<response> field set. In this case, this response is passed back as the
-answer to the call from the Telegram server (although Telegram documents
-correctly point out that you don't get any feedback about how successful
-this can be).
+When invoked, the L</processor> tube can set a response through either of
+the following keys:
+
+=over
+
+=item C<response>
+
+send the response as the HTTP Response to the HTTP Request that determined
+the Update. This is only available for WebHooks (LongPoll does not receive
+HTTP requests because it... polls), and has the further characteristic of
+not receiving a response itself (because it's already a response). Note
+that this parameter is ignored if you generate the HTTP response yourself
+(via the standard Mojolicious way of doing this);
+
+=item C<send_response>
+
+send the response using L</sender>. In this it behaves exactly as the
+L<Bot::ChatBots::Telegram::LongPoll> correspondent.
+
+=back
+
+You can also set both of them: they are independent mechanisms and as long
+as you understand how they work there is no reason why you shouldn't. The
+following diagram will hopefully help you with this.
+
+
+ .                            ..Bot Application.....
+                              :                    :
+   __________________         :     ____________   :
+  /                  \        :    /            \  :
+  |                  |-1---------->|            |  :
+  |  Telegram Server |        :    |  WebHook   |  :
+  |                  |<----------2-|            |  :
+  \__________________/   "response"\____________/  :
+              |  ^            :        |           :
+              5  |            :        3 "send_response"
+              |  |            :        |           :
+              |  |            :     ___v______     :
+              |  |            :    /          \    :
+              |  +---------------4-|          |    :
+              |               :    |  Sender  |    :
+              +------------------->|          |    :
+                              :    \__________/    :
+                              :                    :
+                              :....................:
+
+   1, 2: WebHook Request/Response
+   3   : internal call
+   4, 5: Telegram API Request/Response
+
+
 
 =head1 ACCESSORS
 
@@ -61,15 +127,56 @@ This class consumes the following roles, inheriting their accessors:
 
 =item *
 
-L<Bot::ChatBots::Telegram::Role::Source>
+L<Bot::ChatBots::Telegram::Role::Source>:
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Telegram::Role::Source/sender>:
+
+=item *
+
+L<Bot::ChatBots::Telegram::Role::Source/token>:
+
+=back
 
 =item *
 
 L<Bot::ChatBots::Role::WebHook>
 
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/app>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/code>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/method>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/path>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook/url>
+
 =back
 
-Additionally, it provides the following ones:
+=back
+
+and also adds its own, as described in the sections below. It is worth
+noticing the presence of L<Bot::ChatBots::Telegram::Role::Source/sender>,
+which gives you back a L<Bot::ChatBots::Telegram::Sender> object suitable
+for sending messages to the Telegram API; the same object is used
+internally to send responses to Update requests when C<send_response> is
+specified.
 
 =head2 B<< auto_register >>
 
@@ -103,7 +210,7 @@ the constructor L</new>.
    $obj->certificate($certificate);
    my $current = $obj->certificate;
 
-Set/get the currently installed certificate.
+set/get the currently installed certificate.
 
 It can be either a string or a hash with the key C<certificate> pointing
 to that string, see L<WWW::Telegram::BotAPI> for additional details, or
@@ -202,7 +309,9 @@ C<$outcome> is a hash reference with a C<response> key inside, AND
 =item *
 
 C<< $record->{source}{flags}{rendered} >> is false (i.e. the response
-hasn't been rendered yet).
+hasn't been rendered yet). See
+L<Bot::ChatBots::Role::WebHook/process_updates> for more information about
+these flags.
 
 =back
 

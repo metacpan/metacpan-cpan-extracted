@@ -55,12 +55,13 @@ my $hook_log = catdir( $r, 'hook.log' );
 # the real test client
 {
     my $R = getcwd;
+    my $client_script = $ENV{KGB_CLIENT_SCRIPT} || "$R/script/kgb-client";
     my $ccf = $test_bot->client_config_file;
     open my $fh, '>', "$repo/hooks/post-commit";
     print $fh <<EOF;
 #!/bin/sh
 
-PERL5LIB=$R/lib $R/script/kgb-client --conf $ccf \$1 \$2 >> $hook_log 2>&1
+PERL5LIB=$R/lib $^X -- $client_script --conf $ccf \$1 \$2 >> $hook_log 2>&1
 EOF
     close $fh;
     chmod 0755, "$repo/hooks/post-commit";
@@ -74,7 +75,7 @@ if ( $ENV{TEST_KGB_BOT_RUNNING} ) {
     open $h, '>>', "$repo/hooks/post-commit";
     print $h <<"EOF";
 
-PERL5LIB=$R/lib $R/script/kgb-client --conf $R/eg/test-client.conf --status-dir $r \$1 \$2 >> /dev/null
+PERL5LIB=$R/lib $^X -- $R/script/kgb-client --conf $R/eg/test-client.conf --status-dir $r \$1 \$2 >> /dev/null
 EOF
     close $h;
 }
@@ -182,7 +183,11 @@ SKIP: {
     in_wd "svn rm file";
     in_wd "svn ci -m 'remove file. Über cool with cyrillics: здрасти'";
 
-    TestBot->expect("#test 03${TestBot::USER_NAME} (03${TestBot::USER}) 4 12test/ 04/file remove file. Über cool with cyrillics: здрасти * 14http://scm.host.org///?commit=4");
+    TestBot->expect( "#test "
+        . ${TestBot::COMMIT_USER}
+        . " 4 12test/ 04/file "
+        . "remove file. Über cool with cyrillics: здрасти "
+        . "* 14http://scm.host.org///?commit=4");
 
     $c->revision(4);
     $c->_called(0);

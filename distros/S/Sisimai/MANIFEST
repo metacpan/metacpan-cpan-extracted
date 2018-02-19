@@ -1,4 +1,5 @@
 ANALYTICAL-PRECISION
+Benchmarks.mk
 Build.PL
 ChangeLog.md
 Changes
@@ -130,7 +131,6 @@ lib/Sisimai/SMTP.pm
 lib/Sisimai/SMTP/Error.pm
 lib/Sisimai/SMTP/Reply.pm
 lib/Sisimai/SMTP/Status.pm
-lib/Sisimai/Skeleton.pm
 lib/Sisimai/String.pm
 lib/Sisimai/Time.pm
 minil.toml
@@ -743,7 +743,6 @@ t/031-rfc5322.t
 t/032-rfc2606.t
 t/040-message.t
 t/041-order.t
-t/042-skeleton.t
 t/043-message-email.t
 t/044-message-json.t
 t/045-order-email.t

@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.3.0';
+$Git::Hooks::CheckLog::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -11,7 +11,6 @@ use Git::Hooks;
 use Git::Message;
 use List::MoreUtils qw/uniq/;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 #############
@@ -48,7 +47,14 @@ sub _spell_checker {
 
     unless (state $tried_to_check) {
         unless (eval { require Text::SpellChecker; }) {
-            $git->error($PKG, "Please, install Perl module Text::SpellChecker to spell messages", $@);
+            $git->fault(<<"EOS", {details => $@});
+I could not load the Text::SpellChecker Perl module.
+
+I need it to spell check your commit's messages as requested by the
+$CFG.spelling option in your configuration.
+
+Please, install the module or disable the option to proceed.
+EOS
             return;
         }
 
@@ -63,7 +69,11 @@ sub _spell_checker {
 
         my $word = eval { $checker->next_word(); };
         length $@
-            and $git->error($PKG, "cannot spell check using Text::SpellChecker", $@)
+            and $git->fault(<<"EOS", {details => $@})
+There was an error while I tried to spell check your commits using the
+Text::SpellChecker module. If you cannot fix it consider disabling the
+$CFG.spelling option in your configuration.
+EOS
                 and return;
 
         $tried_to_check = 1;
@@ -87,8 +97,10 @@ sub spelling_errors {
 
     foreach my $badword ($checker->next_word()) {
         my @suggestions = $checker->suggestions($badword);
-        $git->error($PKG, "commit $id log has a misspelled word: '$badword'",
-                    defined $suggestions[0] ? "suggestions: " . join(', ', @suggestions) : undef,
+        $git->fault("The commit $id log message has a misspelled word: '$badword'",
+                    defined $suggestions[0]
+                        ? {details => "suggestions: " . join(', ', @suggestions)}
+                        : undef,
                 );
         ++$errors;
     }
@@ -104,12 +116,12 @@ sub _pattern_error {
 
     if ($match =~ s/^!\s*//) {
         $text !~ /$match/m
-            or $git->error($PKG, "$what SHOULD NOT match '\Q$match\E'")
+            or $git->fault("The $what SHOULD NOT match '\Q$match\E'")
             and return 1;
     }
     else {
         $text =~ /$match/m
-            or $git->error($PKG, "$what SHOULD match '\Q$match\E'")
+            or $git->fault("The $what SHOULD match '\Q$match\E'")
             and return 1;
     }
 
@@ -122,10 +134,29 @@ sub pattern_errors {
     my $errors = 0;
 
     foreach my $match ($git->get_config($CFG => 'match')) {
-        $errors += _pattern_error($git, $msg, $match, "commit $id log");
+        $errors += _pattern_error($git, $msg, $match, "commit $id log message");
     }
 
     return $errors;
+}
+
+sub revert_errors {
+    my ($git, $id, $msg) = @_;
+
+    if ($git->get_config_boolean($CFG => 'deny-merge-revert')) {
+        if ($msg =~ /This reverts commit ([0-9a-f]{40})/s) {
+            my $reverted_commit = $git->get_commit($1);
+            if ($reverted_commit->parent() > 1) {
+                $git->fault(<<"EOS");
+The commit $id reverts a merge commit, which is not allowed
+by the $CFG.deny-merge-revert option in your configuration.
+EOS
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 sub title_errors {
@@ -133,7 +164,11 @@ sub title_errors {
 
     unless (defined $title and length $title) {
         if ($git->get_config_boolean($CFG => 'title-required')) {
-            $git->error($PKG, "commit $id log needs a title line");
+            $git->fault(<<"EOS");
+The commit $id log message needs a title line.
+This is required by the $CFG.title-required option in your configuration.
+Please, amend your commit to add one.
+EOS
             return 1;
         } else {
             return 0;
@@ -141,7 +176,11 @@ sub title_errors {
     }
 
     ($title =~ tr/\n/\n/) == 1
-        or $git->error($PKG, "commit $id log title should have just one line")
+        or $git->fault(<<"EOS")
+The commit $id log message title must have just one line.
+Please amend your commit and edit its log message so that its first line
+is separated from the rest by an empty line.
+EOS
             and return 1;
 
     my $errors = 0;
@@ -149,21 +188,37 @@ sub title_errors {
     if (my $max_width = $git->get_config_integer($CFG => 'title-max-width')) {
         my $tlen = length($title) - 1; # discount the newline
         $tlen <= $max_width
-            or $git->error($PKG, "commit $id log title should be at most $max_width characters wide, but it has $tlen")
+            or $git->fault(<<"EOS")
+The commit $id log message title is too long.
+It is $tlen characters wide but should be at most $max_width, a limit set by
+the $CFG.title-max-width option in your configuration.
+Please, amend your commit to make its title shorter.
+EOS
                 and ++$errors;
     }
 
     if (my $period = $git->get_config($CFG => 'title-period')) {
         if ($period eq 'deny') {
             $title !~ /\.$/
-                or $git->error($PKG, "commit $id log title SHOULD NOT end in a period")
+                or $git->fault(<<"EOS")
+The commit $id log message title SHOULD NOT end in a period.
+This is required by the $CFG.title-period option in your configuration.
+Please, amend your commit to remove the period.
+EOS
                     and ++$errors;
         } elsif ($period eq 'require') {
             $title =~ /\.$/
-                or $git->error($PKG, "commit $id log title SHOULD end in a period")
+                or $git->fault(<<"EOS")
+The commit $id log message title SHOULD end in a period.
+This is required by the $CFG.title-period option in your configuration.
+Please, amend your commit to add the period.
+EOS
                     and ++$errors;
         } elsif ($period ne 'allow') {
-            $git->error($PKG, "invalid value for the $CFG.title-period option: '$period'")
+            $git->fault(<<"EOS")
+Configuration error: invalid value '$period' for the $CFG.title-period option.
+The valid values are 'deny', 'allow', and 'require'.
+EOS
                 and ++$errors;
         }
     }
@@ -183,10 +238,12 @@ sub body_errors {
     if (my $max_width = $git->get_config_integer($CFG => 'body-max-width')) {
         if (my @biggies = grep {/^\S/} grep {length > $max_width} split(/\n/, $body)) {
             my $theseare = @biggies == 1 ? "this is" : "these are";
-            $git->error($PKG,
-                        "commit $id log body lines should be at most $max_width characters wide, but $theseare bigger",
-                        join("\n", @biggies),
-                    );
+            $git->fault(<<"EOS", {details => join("\n", @biggies)});
+The commit $id log body has lines that are too long.
+The $CFG.body-max-width option in your configuration limits body lines
+to $max_width characters. But the following lines exceed it.
+Please, amend your commit to make its lines shorter.
+EOS
             return 1;
         }
     }
@@ -201,7 +258,11 @@ sub footer_errors {
 
     if ($git->get_config_boolean($CFG => 'signed-off-by')) {
         scalar($cmsg->get_footer_values('signed-off-by')) > 0
-            or $git->error($PKG, "commit $id must have a Signed-off-by footer")
+            or $git->fault(<<"EOS")
+The commit $id must have a Signed-off-by footer.
+This is required by the $CFG.signed-off-by option in your configuration.
+Please, amend your commit to add it.
+EOS
                 and ++$errors;
     }
 
@@ -215,21 +276,15 @@ sub message_errors {
 
     my $id = defined $commit ? $commit->commit : '';
 
-    my $errors = 0;
-
-    $errors += spelling_errors($git, $id, $msg);
-
-    $errors += pattern_errors($git, $id, $msg);
-
     my $cmsg = Git::Message->new($msg);
 
-    $errors += title_errors($git, $id, $cmsg->title);
-
-    $errors += body_errors($git, $id, $cmsg->body);
-
-    $errors += footer_errors($git, $id, $cmsg);
-
-    return $errors;
+    return
+        spelling_errors($git, $id, $msg) +
+        pattern_errors($git, $id, $msg) +
+        revert_errors($git, $id, $msg) +
+        title_errors($git, $id, $cmsg->title) +
+        body_errors($git, $id, $cmsg->body) +
+        footer_errors($git, $id, $cmsg);
 }
 
 sub check_message_file {
@@ -248,7 +303,9 @@ sub check_message_file {
     my $msg = eval {$git->read_commit_msg_file($commit_msg_file)};
 
     unless (defined $msg) {
-        $git->error($PKG, "cannot read commit message file '$commit_msg_file'", $@);
+        $git->fault(<<"EOS", {details => $@});
+I cannot read the commit message file '$commit_msg_file'.
+EOS
         return 0;
     }
 
@@ -341,7 +398,46 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckLog
+    admin = joe molly
+
+  [githooks "checklog"]
+    title-max-width = 60
+    title-period = deny
+    body-max-width = 80
+    spelling = true
+    spelling-lang = pt_BR
+    deny-merge-revert = true
+
+The first section enables the plugin and defines the users C<joe> and C<molly>
+as administrators, effectivelly exempting them from any restrictions the plugin
+may impose.
+
+The second instance enables C<some> of the options specific to this plugin.
+
+The C<title-max-width> and the C<body-max-width> options specify the maxmimum
+width allowed for the lines in the commit message's title and body,
+respectively. Note that indented lines in the body aren't checked against this
+limit.
+
+The C<title-period> option denies commits which message title ends in a
+period. This is a commom practice among the most mature Git projects out there.
+
+The C<spelling> and C<spelling-lang> options spell checks the commit message
+expecting it to be in Brazilian Portuguese.
+
+The C<deny-merge-revert> option denies commits which messages contain the string
+"This reverts commit <SHA-1>", if SHA-1 refers to a merge commit. Reverting a
+merge commit has unexpected consequences, so that it's better to avoid it if at
+all possible.
 
 =head1 DESCRIPTION
 
@@ -394,7 +490,7 @@ option:
 
     git config --add githooks.plugin CheckLog
 
-=for Pod::Coverage spelling_errors pattern_errors title_errors body_errors footer_errors message_errors check_ref check_affected_refs check_message_file check_patchset
+=for Pod::Coverage spelling_errors pattern_errors revert_errors title_errors body_errors footer_errors message_errors check_ref check_affected_refs check_message_file check_patchset
 
 =head1 NAME
 
@@ -510,6 +606,29 @@ language passing its ISO code to this option.
 This option requires the commit to have at least one C<Signed-off-by>
 footer.
 
+=head2 githooks.checklog.deny-merge-revert BOOL
+
+This boolean option allows you to deny commits that revert merge commits, since
+such beasts introduce complications in the repository which you may want to
+avoid. (To know more about this you should read Linus Torvald's L<How to revert
+a faulty
+merge|https://github.com/git/git/blob/master/Documentation/howto/revert-a-faulty-merge.txt>.)
+
+The option is false by default, allowing such reverts.
+
+Note that a revert is detected by the fact that Git introduces a standard
+sentence in the commit's message, like this:
+
+  This reverts commit 3114a008dc474f098babf2e22d444c82c6496c23.
+
+If the committer removes or changes this line during the commit the hook won't
+be able to detect it.
+
+Note also that the C<git-revert> command, which creates the reverting commits
+doesn't invoke the C<commit-msg> hook, so that this check can't be performed at
+commit time. The checking will be performed at push time by a C<pre-receive> or
+C<update> hook though.
+
 =head1 REFERENCES
 
 =over
@@ -563,6 +682,13 @@ has a good discussion about the topic.
 A blog post from Kohsuke Kawaguchi, Jenkins's author, explaining what
 information he usually includes in his commit messages and why.
 
+=item * B<How to revert a faulty merge>
+
+This
+L<message|https://github.com/git/git/blob/master/Documentation/howto/revert-a-faulty-merge.txt>,
+from Linus Torvald's himself, explains why reverting a merge commit is
+problematic and how to deal with it.
+
 =back
 
 =head1 AUTHOR
@@ -571,7 +697,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

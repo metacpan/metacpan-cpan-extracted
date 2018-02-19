@@ -12,6 +12,14 @@ sub create($c) {
 # POST /<%= $a->{t} %>
 # Add a new record to table <%= $a->{t} %>.
 sub store($c) {
+  if($c->current_route =~ /^api\./) { #invoked via OpenAPI
+    $c->openapi->valid_input or return;
+    my $in = $c->validation->output;
+    my $id = $c-><%= $a->{t} %>->add($in);
+    $c->res->headers->location($c->url_for("api.show_<%= $a->{t} %>", id => $id)->to_string);
+    $c->render(openapi => '', status => 201);
+    return;
+  }
 
   # 1. Validate input
   my $validation = $c->_validation;
@@ -51,7 +59,15 @@ sub update($c) {
 # GET /<%= $a->{t} %>/:id
 # Display a record from table <%= $a->{t} %>.
 sub show($c) {
-    my $row = $c-><%= $a->{t} %>->find($c->param('id'));
+  my $row = $c-><%= $a->{t} %>->find($c->param('id'));
+  if($c->current_route =~ /^api\./) { #invoked via OpenAPI
+    $c->render(openapi=> {
+        errors => [{path => $c->url_for, message => 'Not Found'}]
+      }, status => 404) && return unless $row;
+    $c->render(openapi => $row);
+    return;
+  }
+    $row = $c-><%= $a->{t} %>->find($c->param('id'));
     $c->render(text => $c->res->default_message(404), status => 404) && return 
         unless $row;
   $c->render(<%= $a->{t} %> => $row);
@@ -59,14 +75,29 @@ sub show($c) {
 
 # GET /<%= $a->{t} %>
 # List resources from table <%= $a->{t} %>.
-sub index {
-  my $c = shift;
+sub index($c) {
+  if($c->current_route =~ /^api\./) { #invoked via OpenAPI
+    $c->openapi->valid_input or return;
+    my $input = $c->validation->output;
+    $c->render(openapi => $c-><%= $a->{t} %>->all($input));
+    return;
+  }
   $c->render(<%= $a->{t} %> => $c-><%= $a->{t} %>->all);
 }
 
 # DELETE /<%= $a->{t} %>/:id
-sub remove {
-  my $c = shift;
+sub remove($c) {
+  if($c->current_route =~ /^api\./) { #invoked via OpenAPI
+    $c->openapi->valid_input or return;
+    my $input = $c->validation->output;
+    my $row = $c-><%= $a->{t} %>->find($input->{id});
+        $c->render(openapi=> {
+        errors => [{path => $c->url_for, message => 'Not Found'}]
+      }, status => 404) && return unless $row;
+    $c-><%= $a->{t} %>->remove($input->{id});
+    $c->render(openapi => '', status=> 204 );
+    return;
+  }
   $c-><%= $a->{t} %>->remove($c->param('id'));
   $c->redirect_to('home_<%= $a->{t} %>');
 }

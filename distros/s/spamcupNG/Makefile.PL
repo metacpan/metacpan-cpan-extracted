@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008009;
 
 use ExtUtils::MakeMaker;
 
@@ -17,13 +17,17 @@ my %WriteMakefileArgs = (
     "bin/spamcup"
   ],
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.008009",
   "NAME" => "spamcupNG",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Getopt::Std" => 0,
     "HTML::Entities" => "3.69",
     "HTML::Form" => "6.03",
+    "HTML::TreeBuilder::XPath" => "0.14",
     "HTTP::Cookies" => "6.01",
     "LWP::UserAgent" => "6.05",
+    "Log::Log4perl" => "1.48",
     "YAML::XS" => "0.62"
   },
   "TEST_REQUIRES" => {
@@ -31,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.7",
+  "VERSION" => "0.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,13 +43,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Std" => 0,
   "HTML::Entities" => "3.69",
   "HTML::Form" => "6.03",
+  "HTML::TreeBuilder::XPath" => "0.14",
   "HTTP::Cookies" => "6.01",
   "LWP::UserAgent" => "6.05",
+  "Log::Log4perl" => "1.48",
   "Test::More" => 0,
   "YAML::XS" => "0.62"
 );

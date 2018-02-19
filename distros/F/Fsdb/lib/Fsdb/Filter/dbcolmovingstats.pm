@@ -2,8 +2,7 @@
 
 #
 # dbcolmovingstats.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 356dd222b0dd3e651903369cd0cfd06ae9ca2a54 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -274,7 +273,7 @@ sub setup ($) {
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
@@ -282,7 +281,7 @@ sub setup ($) {
     push (@new_cols, "moving_median") if ($self->{_median});
     foreach (@new_cols) {
         $self->{_out}->col_create($_)
-	    or croak $self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column $_ (maybe it already existed?)\n");
     };
     my $write_fastpath_sub = $self->{_out}->fastpath_sub();
 }
@@ -320,7 +319,7 @@ sub run ($) {
     my $fref;
     while ($fref = &$read_fastpath_sub()) {
 	my $x = $fref->[$coli];
-	croak $self->{_prog} . ": null data value.\n" if (!defined($x));
+	croak($self->{_prog} . ": null data value.\n") if (!defined($x));
 	my $x_is_valid = 1;
 	if ($x !~ /$is_numeric_regexp/) {
 	    if ($self->{_include_non_numeric}) {
@@ -406,7 +405,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -2,8 +2,7 @@
 
 #
 # dbcolsplittorows.pm
-# Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
-# $Id: 56d2923e0064a9026e77232e84b7f8a1c48e1947 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -239,19 +238,19 @@ sub setup ($) {
     pod2usage(2) if (!defined($self->{_target_column}));
 
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     # Sanity check user's input to avoid injection attacks.
-    croak $self->{_prog} . ": bad element separator.\n"
+    croak($self->{_prog} . ": bad element separator.\n")
 	if ($self->{_element_separator} =~ /\'/);
-    croak $self->{_prog} . ": bad empty value.\n"
+    croak($self->{_prog} . ": bad empty value.\n")
 	if ($self->{_empty} =~ /\'/);
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     if ($self->{_enumerate}) {
 	$self->{_out}->col_create($self->{_destination_column})
-	    or croak $self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n");
     };
 }
 
@@ -272,7 +271,7 @@ sub run ($) {
     my $enum_coli = undef;
     if ($self->{_enumerate}) {
 	$enum_coli = $self->{_out}->col_to_i($self->{_destination_column});
-	croak $self->{_prog} . ": enumeration column " . $self->{_destion_column} . " doesn't exist, even though we created it.\n"
+	croak($self->{_prog} . ": enumeration column " . $self->{_destion_column} . " doesn't exist, even though we created it.\n")
 	    if (!defined($enum_coli));
     };
 
@@ -294,13 +293,13 @@ sub run ($) {
         };
     }';
     eval $loop;
-    $@ && croak $self->{_prog} . ": interal eval error: $@.\ncode:\n$loop";
+    $@ && croak($self->{_prog} . ": interal eval error: $@.\ncode:\n$loop");
 }
 
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

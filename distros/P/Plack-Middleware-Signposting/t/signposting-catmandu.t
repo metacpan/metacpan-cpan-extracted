@@ -24,14 +24,24 @@ my $data = {
     ]
 };
 
+my $data2 = {
+    _id => 'QWERTZU',
+    signs => [ ["https://orcid.org/987654", "cite-as"] ]
+};
+
 Catmandu->define_store('library', 'Hash');
 Catmandu->store('library')->bag('books')->add($data);
+Catmandu->store('library')->bag('authors')->add($data2);
 
 my $app = builder {
     enable "Plack::Middleware::Signposting::Catmandu",
         store => "library",
         bag => "books",
         match_paths => ['record/(\w+)/*', 'publication/(\w+)/*'];
+    enable "Plack::Middleware::Signposting::Catmandu",
+        store => "library",
+        bag => "authors",
+        match_paths => ['person/(\w+)/*'];
     mount '/publication' => Plack::App::Catmandu::Bag->new(
         store => 'library',
         bag => 'books',
@@ -73,13 +83,13 @@ test_psgi app => $app, client => sub {
         is $res->header('Link'), undef, "Link header not present for /foo/1";
     }
 
-    # {
-    #     my $req = GET "http://localhost/publication/123AX99";
-    #     my $res = $cb->($req);
-    #
-    #     like $res->header('Link'), qr{\<https*:\/\/orcid.org\/i-am-orcid\>; rel="author"}, "ORCID for /publication/1 in Link header";
-    #     like $res->header('Link'), qr{\<https*:\/\/orcid.org\/987654\>; rel="author"}, "second ORCID for /publication/1 in Link header";
-    # }
+    {
+        my $req = GET "http://localhost/person/QWERTZU";
+        my $res = $cb->($req);
+
+        like $res->header('Link'), qr{\<https*:\/\/orcid.org\/987654\>; rel="cite-as"}, "ORCID present for /person/QWERTZU in Link header";
+        # like $res->header('Link'), qr{\<https*:\/\/orcid.org\/987654\>; rel="author"}, "second ORCID for /publication/1 in Link header";
+    }
 };
 
 done_testing;

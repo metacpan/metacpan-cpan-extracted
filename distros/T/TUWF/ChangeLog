@@ -1,3 +1,27 @@
+1.2 - 2018-02-18
+	- Add tuwf() exported function as alias to $self or $TUWF::OBJ
+	- Add TUWF::get/put/post/etc() as better alternative to TUWF::register()
+	- Add TUWF::hook() as better alternative to (pre|post)_request_handler
+	- Add capture() to access route captures
+	- Add standandlone HTTP dev server (requires HTTP::Server::Simple)
+	- Add pass() and done() methods to prematurely abort the current handler
+	- Add 'import_modules' setting
+	- TUWF::Request: Add reqJSON()
+	- TUWF::Request: Disallow control characters in HTTP request data
+	- TUWF::Response: Add resJSON()
+	- TUWF::Response: Add resBinary()
+	- TUWF::Response: Add resFile() + mime_types/mime_default settings
+	- TUWF::Response: Allow setting headers before resRedirect()
+	- TUWF::Response: resRedirect() now sets a relative 'Location' HTTP header
+	- TUWF::DB: Add DB query logging and profiling to non-TUWF database functions
+	- TUWF::DB: Add dbVal()
+	- TUWF::XML: Add functional-style DSL
+	- TUWF::XML: Add HTML5 support
+	- TUWF::XML: Add different naming convention support
+	- TUWF::XML: Add 'mkclass' utility function
+	- Improved error pages
+	- Various documentation improvements
+
 1.1 - 2017-11-26
 	- Disallow exclamation mark in email address validation
 	- Add reqProtocol() method

@@ -11,7 +11,8 @@ use warnings;
 
 use Carp;
 require Encode;
-use Fcntl qw(O_RDONLY O_RDWR O_WRONLY O_APPEND :mode);
+use Fcntl
+  qw(O_APPEND O_BINARY O_CREAT O_RDONLY O_RDWR O_TRUNC O_WRONLY :mode);
 use File::Spec::Functions;
 use Time::Local;
 
@@ -66,8 +67,8 @@ BEGIN
   {
   my @aFuncs =
     qw(abspathL attribL chdirL copyL getcwdL linkL lstatL mkdirL openL
-    readlinkL renameL rmdirL shortpathL statL symlinkL testL unlinkL
-    utimeL volinfoL);
+    readlinkL renameL rmdirL shortpathL statL symlinkL sysopenL testL
+    unlinkL utimeL volinfoL);
   my @aAttribs = qw(
     FILE_ATTRIBUTE_ARCHIVE
     FILE_ATTRIBUTE_COMPRESSED
@@ -116,7 +117,7 @@ BEGIN
     fileattr => [@aAttribs],
     volflags => [@aVolFlags]
     );
-  $VERSION = '1.07';
+  $VERSION = '2.0';
   require XSLoader;
   XSLoader::load ('Win32::LongPath', $VERSION);
   }
@@ -132,6 +133,7 @@ my $GENERIC_RW = 0xC0000000;
 my $CREATE_ALWAYS = 2;
 my $OPEN_EXISTING = 3;
 my $OPEN_ALWAYS = 4;
+my $TRUNC_EXISTING = 5;
 
 my $NOFILE = FILE_ATTRIBUTE_DEVICE | FILE_ATTRIBUTE_DIRECTORY
   | FILE_ATTRIBUTE_OFFLINE;
@@ -427,49 +429,33 @@ if ($sMode =~ /^([^\:]*)(\:.*)/)
   if ($sLayer eq ':')
     { croak 'invalid layer for openL!'; }
   }
-my $nFD;
+my $oFH1;
 if ($sMode eq '' or $sMode eq '<')
-  {
-  $nFD = create_file ($sPath, $GENERIC_READ, $OPEN_EXISTING, O_RDONLY);
-  $sMode = '<';
-  }
+  { $oFH1 = create_file ($sPath, $GENERIC_READ, $OPEN_EXISTING, O_RDONLY); }
 elsif ($sMode eq '+<')
-  {
-  $nFD = create_file ($sPath, $GENERIC_RW, $OPEN_EXISTING, O_RDWR | O_APPEND);
-  $sMode = '>>';
-  }
+  { $oFH1 = create_file ($sPath, $GENERIC_RW, $OPEN_EXISTING, O_RDWR); }
 elsif ($sMode eq '>')
   {
-  $nFD = create_file ($sPath, $GENERIC_WRITE, $CREATE_ALWAYS, O_WRONLY);
-  $sMode = '>';
+  $oFH1 = create_file
+    ($sPath, $GENERIC_WRITE, $CREATE_ALWAYS, O_TRUNC | O_WRONLY);
   }
 elsif ($sMode eq '+>')
   {
-  $nFD = create_file ($sPath, $GENERIC_RW, $CREATE_ALWAYS, O_RDWR | O_APPEND);
-  $sMode = '>>';
+  $oFH1 = create_file
+    ($sPath, $GENERIC_RW, $CREATE_ALWAYS, O_RDWR | O_TRUNC);
   }
 elsif ($sMode eq '>>')
   {
-  $nFD = create_file ($sPath, $GENERIC_WRITE, $OPEN_ALWAYS, O_WRONLY);
-  $sMode = '>>';
+  $oFH1 = create_file
+    ($sPath, $GENERIC_WRITE, $OPEN_ALWAYS, O_APPEND | O_WRONLY);
   }
 elsif ($sMode eq '+>>')
   {
-  $nFD = create_file ($sPath, $GENERIC_RW, $OPEN_ALWAYS, O_RDWR | O_APPEND);
-  $sMode = '>>';
+  $oFH1 = create_file ($sPath, $GENERIC_RW, $OPEN_ALWAYS, O_APPEND | O_RDWR);
   }
 else
   { croak 'invalid mode!'; }
-
-##########
-# o file descriptor valid?
-# o open as Perl file
-# o set layer with binmode
-##########
-
-if (!defined $nFD)
-  { return; }
-if (!CORE::open (my $oFH1, "$sMode&=$nFD"))
+if (!$oFH1)
   { return; }
 else
   {
@@ -674,6 +660,53 @@ if (make_slink ($sTo, $sFrom))
   return 1;
   }
 return;
+}
+
+###########
+# System Open File
+#
+# INPUT:
+#   Arg (1) = filehandle
+#   Arg (2) = path
+#   Arg (3) = mode
+# OUTPUT: 1=success; undef=error
+###########
+
+sub sysopenL
+
+{
+##########
+# o check parms
+# o open file
+##########
+
+my ($oFH, $sPath, $nMode) = @_;
+if (!ref $oFH)
+  { croak 'filehandle reference missing!'; }
+if (!defined $nMode)
+  { croak 'mode missing!'; }
+if (!defined $sPath)
+  { croak 'path missing!'; }
+$sPath = _normalize_path ($sPath);
+if (!defined $sPath)
+  { return; }
+my ($nAccess, $nCreate);
+if ($nMode & O_WRONLY)
+  { $nAccess = $GENERIC_WRITE; }
+elsif ($nMode & O_RDWR)
+  { $nAccess = $GENERIC_RW; }
+else
+  { $nAccess = $GENERIC_READ; }
+if ($nMode & O_TRUNC)
+  { $nCreate = $CREATE_ALWAYS; }
+elsif ($nMode & O_CREAT)
+  { $nCreate = $OPEN_ALWAYS; }
+else
+  { $nCreate = $OPEN_EXISTING; }
+$$oFH = create_file ($sPath, $nAccess, $nCreate, $nMode);
+if ($$oFH && ($nMode & O_BINARY))
+  { binmode $$oFH; }
+return $$oFH ? 1 : undef;
 }
 
 ###########
@@ -1288,10 +1321,11 @@ have the more specific Windows error value.
 This section lists the replacements for native Perl file functions. Since
 L</openL> returns a native Perl file handle, functions that use open file
 handles (read, write, close, binmode, etc.) can be used as is and do not
-have replacement functions. Functions that are specific to the Unix
-environment (chmod, chown, umask, etc.) do not have replacements. A
-replacement for sysopen was not provided since it uses the fdopen () C
-library.
+have replacement functions. In like manner, L</sysopenL> also returns a
+native Perl file handle.
+
+Functions that are specific to the Unix environment (chmod, chown, umask,
+etc.) do not have replacements.
 
 =over 4
 
@@ -1303,9 +1337,7 @@ B<NEWFILE> to B<OLDFILE>.
 	linkL ('goodbye', 'до свидания')
 	  or die ("unable to link file ($^E)");
 
-=item X<lstatL>lstatL
-
-=item lstatL PATH
+=item X<lstatL>lstatL PATH
 
 Does the same thing as the L</statL> function but will retrieve the
 statistics for the link and not the file it links to.
@@ -1358,9 +1390,7 @@ a file handle.
 	close $infh;
 	close $outfh;
 
-=item X<readlinkL>readlinkL
-
-=item readlinkL PATH
+=item X<readlinkL>readlinkL PATH
 
 Returns the path that a junction/mount point or symbolic link points to. If
 B<PATH> is not provided, $_ is used. It will fail for hard links.
@@ -1394,9 +1424,7 @@ information.
 	# fails, can't move directory across volumes
 	renameL ('c:/dir', 'd:/newdir');
 
-=item X<statL>statL
-
-=item statL PATH
+=item X<statL>statL PATH
 
 Returns an object with the statistics for the file. B<PATH> must be a path
 to a file and cannot be a file or directory handle. If it is not provided,
@@ -1551,6 +1579,21 @@ information about symbolic links.
 	symlinkL ('c:/', 'rootpath')
 	  or die ("unable to link file ($^E)");
 
+=item X<sysopenL>sysopenL FILEHANDLEREF,PATH,MODE
+
+Performs the same function as the native Perl sysopen function but only
+supports the three-argument form of sysopen.
+
+B<FILEHANDLEREF> cannot be a bareword file handle or a scalar variable.
+It must be a reference to a scalar value which will be set to be a Perl
+file handle. For example:
+
+	sysopenL (\$fh, $file, O_CREAT | O_EXCL) or die ("unable to open $file: ($^E)");
+
+B<PATH> is the relative or fullpath name of the file.
+
+B<MODE> matches the native definition.
+
 =item X<testL>testL TYPE,PATH
 
 Used to replace the native I<-X> functions. B<TYPE> is the same value as
@@ -1671,9 +1714,7 @@ specification still limits the directory component to MAX_PATH (about
 
 =over 4
 
-=item X<chdirL>chdirL
-
-=item chdirL PATH
+=item X<chdirL>chdirL PATH
 
 Changes the working directory. If B<PATH> is missing it tries to change to
 C<$ENV{HOME}> if it is set, or C<$ENV{LOGDIR}> if that is set. If neither is
@@ -1693,9 +1734,7 @@ in L<File::Spec>.
 
 	print "The current directory is: ", getcwdL (), "\n";
 
-=item X<mkdirL>mkdirL
-
-=item mkdirL PATH
+=item X<mkdirL>mkdirL PATH
 
 Creates a directory which inherits the permissions of the parent. If B<PATH>
 is not provided, $_ is used. An error is returned if the parent directory
@@ -1704,9 +1743,7 @@ does not exist.
 	mkdirL ($dir)
 	  or die ("unable to create $dir ($^E)");
 
-=item X<rmdirL>rmdirL
-
-=item rmdirL PATH
+=item X<rmdirL>rmdirL PATH
 
 Deletes a directory. If B<PATH> is not provided, $_ is used. An error is
 returned if the directory is not empty.
@@ -1742,8 +1779,9 @@ Closes the current directory for reading.
 Opens a directory for reading. If the directory object is already open the
 existing directory will be closed before opening the new one.
 
-	$dir->opendirL ($dir)
-	  or die ("unable to open $dir ($^E)");
+	my $path = 'c:/rootdir/very long directory name/First Level';
+	$dir->opendirL ($path)
+	  or die ("unable to open $path ($^E)");
 
 =item X<readdirL>readdirL
 
@@ -1768,9 +1806,8 @@ B<NOTE>: Only the item name is returned, not the whole path to the item.
 	  or die ("unable to open $path ($^E)");
 	foreach my $file ($dir->readdirL ()) {
 	  # skip parent dir
-	  if ($file eq '..') {
-	    next;
-	  }
+	  if ($file eq '..'){
+	    { next; }
 
 	  # get file stats
 	  my $name = $file eq '.' ? $path : "$path/$file";

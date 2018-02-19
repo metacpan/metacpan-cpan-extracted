@@ -206,7 +206,8 @@ sub pg_putcopydata
   my $check_res = $self->_check_constraints();
 
   if ($check_res) {
-    confess $check_res;
+    use Data::Dumper;
+    confess $check_res . ' while adding ' . Dumper([$row_data]) . ' to ' . $query_table_name;
   }
 
   return 1;

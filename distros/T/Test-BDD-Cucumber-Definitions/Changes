@@ -1,8 +1,32 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.14    2018-02-18
+        [ JSON ]
+        - Module JSON is divided into two separate modules JSON and Struct
+
+        [ Struct ]
+        - Module was added
+
+0.13    2018-02-18
+        [ HTTP ]
+        - The steps in the HTTP::In module have been renamed
+        - For the HTTP::Ru module, documentation is written in POD format
+
+        [ JSON ]
+        - Module "Data" was renamed to "JSON"
+        - For the JSON::Ru module, documentation is written in POD format
+
+0.12    2018-02-11
+        [ HTTP ]
+        - Module HTTP::Ru with the definitions of steps in the Russian language is added
+        - *_decoded functions in module HTTP have been removed
+
+        [ Data ]
+        - Some steps in module Data::In renamed
+
 0.11    2018-02-07
         [Data]
-        Module Data::Ru with the definitions of steps in the Russian language is added
+        - Module Data::Ru with the definitions of steps in the Russian language is added
 
 0.10    2018-02-07
         - The architecture of the module is changed. The utilities are migrated from HTTP::Utils to HTTP,

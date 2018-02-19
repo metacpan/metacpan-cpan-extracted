@@ -4,25 +4,15 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/MAILER-DAEMON[@]messagelabs[.]com/,
-    'subject' => qr/\AMail Delivery Failure/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Content-Type: message/delivery-status'],
+    'rfc822'  => ['Content-Type: text/rfc822-headers'],
 };
-my $Re1 = {
-    'begin'   => qr|\AContent-Type: message/delivery-status|,
-    'error'   => qr/\AReason:[ \t]*(.+)\z/,
-    'rfc822'  => qr|\AContent-Type: text/rfc822-headers\z|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'userunknown' => qr{(?:
-         542[ ].+[ ]Rejected
-        |No[ ]such[ ]user
-        )
-    }x,
+my $ReFailures = {
+    'userunknown'   => qr/(?:542 .+ Rejected|No such user)/,
     'securityerror' => qr/Please turn on SMTP Authentication in your mail client/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # X-Msg-Ref: server-11.tower-143.messagelabs.com!1419367175!36473369!1
 # X-Originating-IP: [10.245.230.38]
@@ -30,9 +20,7 @@ my $Indicators = __PACKAGE__->INDICATORS;
 # X-StarScan-Version: 6.12.5; banners=-,-,-
 # X-VirusChecked: Checked
 sub headerlist  { return ['X-Msg-Ref'] }
-sub pattern     { return $Re0 }
 sub description { 'Symantec.cloud http://www.messagelabs.com' }
-
 sub scan {
     # Detect an error from MessageLabs.com
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -51,8 +39,8 @@ sub scan {
     my $mbody = shift // return undef;
 
     return undef unless defined $mhead->{'x-msg-ref'};
-    return undef unless $mhead->{'from'}    =~ $Re0->{'from'};
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'from'}, 'MAILER-DAEMON@messagelabs.com') > -1;
+    return undef unless index($mhead->{'subject'}, 'Mail Delivery Failure') == 0;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
@@ -66,15 +54,14 @@ sub scan {
         'date'  => '',      # The value of Arrival-Date header
         'lhost' => '',      # The value of Reporting-MTA header
     };
-
     my $v = undef;
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -82,7 +69,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -136,7 +123,7 @@ sub scan {
                 # Final-Recipient: rfc822; maria@dest.example.net
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: rfc822; maria@dest.example.net
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -146,21 +133,21 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.0.0
                     $v->{'status'} = $1;
 
                 } else {
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: smtp; 550 maria@dest.example.net... No such user
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -169,13 +156,13 @@ sub scan {
             } else {
                 # Reporting-MTA: dns; server-15.bemta-3.messagelabs.com
                 # Arrival-Date: Tue, 23 Dec 2014 20:39:34 +0000
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; server-15.bemta-3.messagelabs.com
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Tue, 23 Dec 2014 20:39:34 +0000
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -187,20 +174,18 @@ sub scan {
         # Save the current line for the next loop
         $p = $e;
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
-
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -253,7 +238,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

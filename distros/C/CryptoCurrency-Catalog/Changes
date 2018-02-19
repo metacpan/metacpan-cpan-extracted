@@ -1,3 +1,68 @@
+20180210  2018-02-10 (PERLANCAR)
+
+          - Update to CMC 2018-02-10.
+
+          - New coins:
+            + adbank (ADB)
+            + BlazeCoin (BLAZE)
+            + Bluzelle (BLZ)
+            + CargoX (CXO)
+            + Datawallet (DXT)
+            + DMarket (DMT)
+            + DRP Utility (DRPU)
+            + Elastos (ELA)
+            + EtherSportz (ESZ)
+            + GanjaCoin (MRJA)
+            + GoldMint (MNTP)
+            + GrandCoin (GDC)
+            + Huobi Token (HT)
+            + Iungo (ING)
+            + Jibrel Network (JNT)
+            + KlondikeCoin (KDC)
+            + Medicalchain (MTN)
+            + Monero Gold (XMRG)
+            + Pareto Network (PARETO)
+            + Polymath Network (POLY)
+            + Sense (SENSE)
+            + SportyCo (SPF)
+            + STK (STK)
+            + Swarm (SWM)
+            + SwissBorg (CHSB)
+            + THEKEY (TKY)
+            + Travelflex (TRF)
+            + U.CASH (UCASH)
+            + WePower (WPR)
+            + Zilla (ZLA)
+
+          - Removed coins:
+            + BeaverCoin (BVC)
+            + BT1 [CST] (BT1)
+            + BurstOcean (OCEAN)
+            + Casino (CASINO)
+            + CBD Crystals (CBD)
+            + CryptCoin (CRYPT)
+            + FlavorCoin (FLVR)
+            + GameBet Coin (GBT)
+            + GoldUnionCoin (GUC)
+            + Grantcoin (GRT)
+            + Peerguess (GUESS)
+            + Leek Coin (LEEK)
+            + Lex4All (LEX)
+            + OCOW (OCOW)
+            + RoyalCoin (ROYAL)
+            + Sling (SLING)
+            + SportyFi (SPF)
+            + Stress (STS)
+            + WMCoin (WMC)
+            + YashCoin (YASH)
+
+          - Changed coins:
+            + MAZA (MZC) changed name from MazaCoin
+            + Nano (XRB) changed name from RaiBlocks
+
+          - Total coins now 1516 (from 1506)
+
+
 20180131  2018-01-31 (PERLANCAR)
 
           - [ux] Make by_name() case-insensitive.

@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI;
 use OpenAPI::Client;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -193,7 +193,7 @@ sub _refinfo2fields {
   my ($name, $refinfo, $name2type, $type2info) = @_;
   my %fields;
   my $properties = $refinfo->{properties};
-  my %required = map { ($_ => 1) } @{$refinfo->{required}};
+  my %required = map { ($_ => 1) } @{$refinfo->{required} || []};
   for my $prop (keys %$properties) {
     my $info = $properties->{$prop};
     my $field = _trim_name($prop);
@@ -492,7 +492,7 @@ sub to_graphql {
   };
   +{
     schema => GraphQL::Schema->from_ast(\@ast),
-    root_value => OpenAPI::Client->new($spec, %appargs),
+    root_value => OpenAPI::Client->new($openapi_schema->data, %appargs),
     resolver => make_field_resolver(\%type2info),
   };
 }
@@ -554,8 +554,17 @@ server will instead be the given app.
 =head1 ARGUMENTS
 
 To the C<to_graphql> method: a URL to a specification, or a filename
-containing a JSON specification, of an OpenAPI v2. Optionally, a
-L<Mojolicious> app can be given as the second argument.
+containing a JSON specification, or a data structure, of an OpenAPI v2.
+
+Optionally, a L<Mojolicious> app can be given as the second argument. In
+this case, with a L<Mojolicious::Lite> app, do:
+
+  my $api = plugin OpenAPI => {spec => 'data://main/api.yaml'};
+  plugin(GraphQL => {convert => [ 'OpenAPI', $api->validator->bundle, app ]});
+
+with the usual mapping in the case of a full app. For this to work you
+need L<Mojolicious::Plugin::OpenAPI> version 1.25+, which returns itself
+on C<register>.
 
 =head1 PACKAGE FUNCTIONS
 

@@ -1,6 +1,20 @@
 Revision history for Perl extension Inline::Java
 ------------------------------------------------
 
+0.63 Tue Feb 13 05:52:42 GMT 2018
+ - fix JDK 7 problem with "<>" type on HashMap
+
+0.62 Tue Feb 13 05:37:24 GMT 2018
+ - zap (very) long-deprecated CallPerl interface
+ - type-constrain get*Constructor, all HashMap, ArrayList
+ - build always -Xlint:unchecked
+ - now only JDK7+
+ - reorganise repo a bit, zap obsolete tests
+ - author-test all doc code examples
+ - fix giving "STUDY" as source case-insensitive
+ - increase maxMemory for t/12_1_callbacks.t
+ - t/01_init.t show maxMemory
+
 0.61 Sat Feb 10 05:01:23 GMT 2018
  - manifest test and fix
  - no ask about JNI on build

@@ -18,7 +18,7 @@ use XML::Feed;
 use vars qw{$VERSION};
 
 BEGIN {
-  $VERSION = '1.1.0';
+  $VERSION = '1.1.1';
 }
 
 with 'MooseX::Traits';
@@ -315,8 +315,10 @@ sub build_feed {
   $f->title($self->title)             if defined $self->title;
   $f->url($self->url)                 if defined $self->url;
   $f->description($self->description) if defined $self->description;
-  $f->author($self->author->{name})   if defined $self->author->{name};
-  $f->email($self->author->{email})   if defined $self->author->{email};
+  if (defined $self->{'author'} ) {
+    $f->author($self->author->{name})   if defined $self->author->{name};
+    $f->email($self->author->{email})   if defined $self->author->{email};
+  }
   $f->self_link($self->url)           if defined $self->url;
   $f->id($self->url)                  if defined $self->url;
 
@@ -405,7 +407,7 @@ sub run {
 
 =head1 TO DO
 
-See http://wiki.github.com/davorg/perlanet
+See L<http://wiki.github.com/davorg/perlanet/issues>
 
 =head1 SUPPORT
 

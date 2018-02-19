@@ -2,7 +2,7 @@
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'OpenAPI::Client',
-  AUTHOR         => 'Ed J <mohawk2@users.noreply.github.com>',
+  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/OpenAPI/Client.pm',
   VERSION_FROM   => 'lib/OpenAPI/Client.pm',
@@ -14,23 +14,21 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'JSON::Validator' => '1.07',
+  'JSON::Validator' => '2.03',
   'Mojolicious' => '7.53',
   'Mojolicious::Plugin::OpenAPI' => '1.22'
 }
 ,
   META_MERGE     => {
-    resources => {
-      'dynamic_config' => 0,
-      'meta-spec'      => {version => 2},
-      'resources'      => {
-        bugtracker => {web => 'https://github.com/jhthorsen/openapi-client/issues'},
-        homepage   => 'https://github.com/jhthorsen/openapi-client',
-        repository => {
-          type => 'git',
-          url  => 'https://github.com/jhthorsen/openapi-client.git',
-          web  => 'https://github.com/jhthorsen/openapi-client',
-        },
+    'dynamic_config' => 0,
+    'meta-spec'      => {version => 2},
+    'resources'      => {
+      bugtracker => {web => 'https://github.com/jhthorsen/openapi-client/issues'},
+      homepage   => 'https://github.com/jhthorsen/openapi-client',
+      repository => {
+        type => 'git',
+        url  => 'https://github.com/jhthorsen/openapi-client.git',
+        web  => 'https://github.com/jhthorsen/openapi-client',
       },
     },
   },

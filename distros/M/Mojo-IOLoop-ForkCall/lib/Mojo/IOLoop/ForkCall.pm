@@ -2,7 +2,7 @@ package Mojo::IOLoop::ForkCall;
 
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 $VERSION = eval $VERSION;
 
 use Mojo::IOLoop;
@@ -25,7 +25,7 @@ has 'weaken'       => 0;
 sub run {
   my ($self, @args) = @_;
   my $delay = $self->ioloop->delay(sub{ $self->_run(@args) });
-  $delay->on(error => sub{ $self->emit( error => $_[1] ) });
+  $delay->catch(sub{ $self->emit( error => pop ) });
   return $self;
 }
 

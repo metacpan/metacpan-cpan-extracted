@@ -11,7 +11,6 @@ WriteMakefile
                    'Math::GMPz' => '0.39',
                    'Math::MPC' => '1.07',
                    'Math::MPFR' => '3.36',
-                   'POSIX' => 0,
                    'Test::More' => 0
                  },
   'INSTALLDIRS' => 'site',

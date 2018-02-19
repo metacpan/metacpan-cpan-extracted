@@ -35,51 +35,63 @@ my $O = {
 #------------------------------------------------------------------------------
 sub main
 {
+    my $M =[
+            {'label'=>'rwValue', 'value'=>1 },
+            {'label'=>'roValue', 'value'=>'readOnly','readOnly'=>1},
+            {'label'=>'rwValDef','value'=>30, 'default'=>50},
+            {'label'=>'roValDef','value'=>30, 'default'=>50, 'readOnly'=>1},
+            {'label'=>'roNoValNoDef',                        'readOnly'=>1},
+            {'label'=>'roNoValDef',           'default'=>50, 'readOnly'=>1},
+            {'label'=>'roValNoDef','value'=>30,              'readOnly'=>1},
+            {'label'=>'test8',},
+            {'label'=>'test9',},
+            {'label'=>'test10',          'value'=>30, },
+            {'label'=>'Untermenue 1',    'jump'=>'SubMenu1'},
+            {'label'=>'Untermenue 2',    'jump'=>'SubMenu2'},
+            {'label'=>'InvalidSubMenu', 'jump'=>'SubMenuX'}
+           ];
 	my ($self) = @_;
     my $o = Script::Toolbox->new( $O );
 
-    my $m = Script::Toolbox::Util::Menues->new({'SubMenue2'=>[{'label'=>'test','value'=>10}]});
-       $m->addMenue({'MainMenue'=>[{'label'=>'test1', 'value'=>1 },
-                                   {'label'=>'test2', 'value'=>'readOnly','readOnly'=>1},
-                                   {'label'=>'test3', 'value'=>30,},
-                                   {'label'=>'test4',},
-                                   {'label'=>'test5',},
-                                   {'label'=>'test6',},
-                                   {'label'=>'test7',},
-                                   {'label'=>'test8',},
-                                   {'label'=>'test9',},
-                                   {'label'=>'test10',          'value'=>30,},
-                                   {'label'=>'Untermenue 1',    'jump'=>'SubMenue1'},
-                                   {'label'=>'Untermenue 2',    'jump'=>'SubMenue2'},
-                                   {'label'=>'InvalidSubMenue', 'jump'=>'SubMenueX'}
-                                  ]});
-       $m->addMenue({'SubMenue1'=>[{'label'=>'SubMenue1 Test','value'=>40}]});
-       $m->addOption('MainMenue', {'label'=>'Untermenue 2 via addOption()',    'jump'=>'SubMenue2'});
+    my $m = Script::Toolbox::Util::Menus->new({'SubMenu2'=>[{'label'=>'test','value'=>10}]});
+       $m->addMenu({'MainMenu'=>$M});
+       $m->addMenu({'SubMenu1'=>[{'label'=>'SubMenu1 Test','value'=>40}]});
+       $m->addOption('MainMenu', {'label'=>'Untermenue 2 via addOption()',    'jump'=>'SubMenu2'});
 
        $m->setAutoHeader();
-       $m->setFooter('MainMenue', 'Test:Autoheader, ininite run');
-    my $r = $m->run('MainMenue',-1);
+       $m->setFooter('MainMenu', 'Test:Autoheader, infinite run');
+    my $r = $m->run('MainMenu',-1);
 
     printf "\n%s\n", '-' x 20;
-    my $v = $m->getMatching('MainMenue','test','label','value');
+    my $v = $m->getMatching('MainMenu','test','label','value');
     printf "Values of Labels /test/  : %s\n", join ' ', @{$v};
-       $v = $m->getMatching('MainMenue','(1|3)','number','value');
+       $v = $m->getMatching('MainMenu','(1|3)','number','value');
     printf "Values of Numbers /(1|3)/: %s\n", join ' ', @{$v};
-       $v = $m->getMatching('MainMenue','\d+','value','label');
+       $v = $m->getMatching('MainMenu','\d+','value','label');
     printf "Labels of Values /%s/   : %s\n", '\d+', join ' ',  @{$v};
     printf "\n%s\n", '-' x 20;
 
-    $m->setFooter('MainMenue', 'Test:Autoheader, single run with reaction code');
-    while( $m->run('MainMenue')) {
-            if( $m->currNumber('MainMenue') == 2 ) {
-                my $v = $m->currValue('MainMenue');
+    $m->setFooter('MainMenu', 'Test:Autoheader, single run with reaction code');
+    while( $m->run('MainMenu')) {
+            if( $m->currNumber('MainMenu') == 2 ) {
+                my $v = $m->currValue('MainMenu');
                 my $nv= $v == 0 ? 1 : 0;
                 my $lb= $nv == 0 ? 'test1-off' : 'test1-on';
-                $m->setCurrValue('MainMenue',$nv);
-                $m->setCurrLabel('MainMenue',$lb);
+                $m->setCurrValue('MainMenu',$nv);
+                $m->setCurrLabel('MainMenu',$lb);
 
             }
     }
+
+    $m->addMenu({'MultiSel'=>$M});
+    $m->run('MultiSel',0);
+    $m->run('MultiSel',0);
+    $m->setCurrDefault('bla','blu');     # err-test
+    $m->setCurrDefault('MultiSel','ok'); #  ok-test
+    $m->setCurrReadOnly('bla','blu');     # err-test
+    $m->setCurrReadOnly('MultiSel','ok'); #  ok-test
+    print;
+
 
 #    my $t = Table([ 'Util-Table',
 #                    [ '--H1--',  '--H2--', '--H3--'],

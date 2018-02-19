@@ -26,8 +26,8 @@ sub no_ {
     $mod->unimport;
 }
 
-throws_ok { use_ "My::Target::patch::p1", -load_target=>0 } qr/before/,
-    'target module must be loaded before patch module (-load_target=0)';
+#throws_ok { use_ "My::Target::patch::p1" } qr/before/,
+#    'target module must be loaded before patch module (-load_target=0)';
 
 subtest "patch module config (left as default)" => sub {
     lives_ok { use_ "My::Target::patch::p1" } 'load ok';

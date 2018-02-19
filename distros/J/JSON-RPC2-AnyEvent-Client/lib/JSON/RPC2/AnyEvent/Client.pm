@@ -7,8 +7,9 @@ use utf8;
 use AnyEvent::Handle;
 use AnyEvent::HTTP;
 use JSON::RPC2::Client;
+use Scalar::Util qw(weaken);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 our $AUTOLOAD;  # it's a package global
 
@@ -44,6 +45,7 @@ sub new {
 
 sub __connect_tcp {
    my $self = shift;
+   weaken($self);
    return if $self->{http};
    $self->{handle} = new AnyEvent::Handle
       connect  => [ $self->{host}, $self->{port} ],
@@ -79,7 +81,7 @@ sub __service {
 
 sub __fail_error {
    my ( $self, $error ) = @_;
-   $self->{on_error}->( $error );
+   $self->{on_error}->( $error . ' at ' . join(' ', caller) );
    foreach my $call_id ( keys %{$self->{cb}} ) {
       my $cb = delete $self->{cb}->{$call_id};
       $cb->( $error );
@@ -120,7 +122,7 @@ sub __request_tcp {
    $self->{handle}->push_read( json => sub{
       my ( $handle, $hash ) = @_;
       my ( $failed, $result, $error, $call_id ) = $self->{client}->response( $hash );
-      return $self->__error( $failed ) if $failed;
+      return $self->__fail_error( $failed ) if $failed;
       $self->__do_callback( $call_id, $failed, $result, $error );
    } );
 }
@@ -132,13 +134,13 @@ sub __request_http {
       my ( $resp, $hdr ) = @_;
 
       unless ( $hdr->{Status} =~ /^2/ ) {
-         return $self->__error( "$hdr->{Status} $hdr->{Reason}" );
+         return $self->__fail_error( "$hdr->{Status} $hdr->{Reason}" );
       }
 
       my ( $failed, $result, $error, $call_id ) =
          $self->{client}->response( $resp );
 
-      return $self->__error( $failed ) if $failed;
+      return $self->__fail_error( $failed ) if $failed;
 
       $self->__do_callback( $call_id, $failed, $result, $error );
    };

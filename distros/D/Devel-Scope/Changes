@@ -1,6 +1,22 @@
 Revision history for Devel-Scope
 
-0.0y    Fri Feb  9 03:10:50 UTC 2018
+0.12    Sat Feb 17 08:58:42 UTC 2018
+        * Add more verbose output if tests are failing
+        * Some variants of FreeBSD are failing some tests...
+
+0.11    Wed Feb 14 05:34:51 UTC 2018
+        * Only print filenames as they change
+
+0.10    Mon Feb 12 05:14:19 UTC 2018
+        * Moved invalid environmental variable test to BEGIN block.
+
+0.09    Mon Feb 12 04:33:41 UTC 2018
+        * Added invalid environmental variable test.
+
+0.08    Mon Feb 12 04:04:47 UTC 2018
+        * Refactored tests, ensure multi-line match.
+
+0.07    Fri Feb  9 03:10:50 UTC 2018
         * Added debug_enable() and debug_disable()
 
 0.06    Wed Feb  7 01:33:41 UTC 2018

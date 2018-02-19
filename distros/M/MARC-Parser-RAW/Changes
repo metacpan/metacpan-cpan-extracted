@@ -1,5 +1,9 @@
 Changelog for MARC-Parser-RAW
 
+0.06  2018-02-14 18:17:06 CET
+ - fix tidyall
+ - add new Perl versions to travis
+
 0.05  2016-09-01 14:47:54 CEST
  - fix merge
 

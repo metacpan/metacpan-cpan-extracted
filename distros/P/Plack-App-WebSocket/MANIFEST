@@ -4,6 +4,8 @@ cpanfile
 lib/Plack/App/WebSocket.pm
 lib/Plack/App/WebSocket/Connection.pm
 MANIFEST			This list of files
+META.json
+META.yml
 t/00-load.t
 t/corona.t
 t/testlib/CustomServer.pm
@@ -21,5 +23,3 @@ xt/consistent_version.t
 xt/js/browser.html
 xt/manifest.t
 xt/pod.t
-META.yml
-META.json

@@ -1,14 +1,18 @@
 Changes
 lib/Test/BDD/Cucumber/Definitions.pm
-lib/Test/BDD/Cucumber/Definitions/Data.pm
-lib/Test/BDD/Cucumber/Definitions/Data/In.pm
-lib/Test/BDD/Cucumber/Definitions/Data/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/HTTP.pm
 lib/Test/BDD/Cucumber/Definitions/HTTP/In.pm
+lib/Test/BDD/Cucumber/Definitions/HTTP/Ru.pm
+lib/Test/BDD/Cucumber/Definitions/JSON.pm
+lib/Test/BDD/Cucumber/Definitions/JSON/In.pm
+lib/Test/BDD/Cucumber/Definitions/JSON/Ru.pm
+lib/Test/BDD/Cucumber/Definitions/Struct.pm
+lib/Test/BDD/Cucumber/Definitions/Struct/In.pm
+lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/TypeConstraints.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

@@ -5,10 +5,9 @@ use HTML::TreeBuilder::XPath;
 use HTML::Selector::XPath 'selector_to_xpath';
 use Exporter 'import';
 
-use vars qw($VERSION @EXPORT_OK);
-$VERSION = '0.05';
+our $VERSION = '0.06';
 
-@EXPORT_OK = qw<scrape>;
+our @EXPORT_OK = qw<scrape>;
 
 =head1 NAME
 
@@ -24,12 +23,12 @@ specifying CSS3 or XPath selectors.
     use App::scrape 'scrape';
     use LWP::Simple 'get';
     use Data::Dumper;
-    
+
     my $html = get('http://perlmonks.org');
     my @posts = scrape(
         $html,
         ['a','a@href'],
-        { 
+        {
             absolute => [qw[href src rel]],
             base => 'http://perlmonks.org',
         },
@@ -38,11 +37,11 @@ specifying CSS3 or XPath selectors.
 
     my @posts = scrape(
         $html,
-        { 
+        {
           title => 'a',
           url   => 'a@href',
         },
-        { 
+        {
             absolute => [qw[href src rel]],
             base => 'http://perlmonks.org',
         },
@@ -62,7 +61,7 @@ L<Web::Scraper>.
 
 sub scrape {
     my ($html, $selectors, $options) = @_;
-    
+
     $options ||= {};
     my $delete_tree;
     if (! ref $options->{tree}) {
@@ -72,7 +71,7 @@ sub scrape {
         $delete_tree = 1;
     };
     my $tree = $options->{tree};
-    
+
     $options->{make_uri} ||= {};
     my %make_uri = %{$options->{make_uri}};
 
@@ -93,6 +92,7 @@ sub scrape {
     };
 
     my $rowidx=0;
+    my $found_max = 0;
     for my $selector (@selectors) {
         my ($attr);
         my $s = $selector;
@@ -114,26 +114,30 @@ sub scrape {
         if ($make_uri{ $rowidx }) {
             @nodes = map { URI->new_abs( $_, $options->{base} )->as_string } @nodes;
         };
+        if( $found_max < @nodes) {
+            $found_max = @nodes
+        };
         push @rows, \@nodes;
         $rowidx++;
     };
-    
+
     # Now convert the result from rows to columns
     my @result;
-    for my $idx (0.. $#{ $rows[0] }) {
-        push @result, [ map { 
+    for my $idx (0.. $found_max-1) {
+        push @result, [ map {
                 $rows[$_]->[$idx]
         } 0..$#rows ];
     };
-    
+
     # Now check what the user wants, array or hash:
     if( ref $selectors eq 'HASH') {
         @result = map {
                 my $arr = $_;
                 my $i = 0;
+                my @keys = sort { $a cmp $b } keys( %$selectors );
                 $_ = +{
-                    map { $_ => $arr->[$i++] } sort keys %$selectors
-                      };
+                    map { $_ => $arr->[$i++] } @keys
+                };
             } @result
     };
 
@@ -148,7 +152,7 @@ L<Web::Scraper> - the scraper inspiring this module
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<http://github.com/Corion/App-scrape>.
 
 =head1 SUPPORT

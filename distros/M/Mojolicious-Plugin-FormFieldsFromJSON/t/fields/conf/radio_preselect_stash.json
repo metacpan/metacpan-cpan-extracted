@@ -1,0 +1,8 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "radio",
+        "name" : "article_type",
+        "data" : "internal"
+    }
+ ]

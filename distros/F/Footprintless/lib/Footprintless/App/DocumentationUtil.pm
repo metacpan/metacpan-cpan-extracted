@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::DocumentationUtil;
-$Footprintless::App::DocumentationUtil::VERSION = '1.26';
+$Footprintless::App::DocumentationUtil::VERSION = '1.27';
 # ABSTRACT: A utility class for generating help documentation from POD
 # PODNAME: Footprintless::App::DocumentationUtil
 
@@ -98,7 +98,7 @@ Footprintless::App::DocumentationUtil - A utility class for generating help docu
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 EXPORT_OK
 

@@ -101,7 +101,6 @@ t/schema-as-attr.t
 t/spec/invalid-ref.t
 t/spec/person.json
 t/spec/petstore.json
-t/spec/ref-same-file-at-many-levels.json
 t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
 t/to-json.t

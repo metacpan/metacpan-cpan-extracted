@@ -1,5 +1,11 @@
 Revision history for Group-Git-Taggers-Perl
 
+0.0.4   2018-02-12
+        Updating for release of version 0.0.4
+        Merge pull request #1 from manwar/minor-tidy-up (Ivan Wills)
+        - Fixed minor typo in the pod. (Mohammad S Anwar)
+        - With Moo, you get "__PACKAGE__->meta->make_immutable;" for FREE. (Mohammad S Anwar)
+
 0.0.3   2018-02-05
         Updating for release of version 0.0.3
         Added perl 5.26 to builds (Ivan Wills)

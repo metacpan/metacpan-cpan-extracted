@@ -3,7 +3,7 @@ package Params::ValidationCompiler::Compiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Carp qw( croak );
 use Eval::Closure qw( eval_closure );
@@ -36,7 +36,8 @@ BEGIN {
 }
 
 my %known
-    = map { $_ => 1 } qw( name name_is_optional params slurpy named_to_list );
+    = map { $_ => 1 }
+    qw( debug name name_is_optional params slurpy named_to_list );
 
 # I'd rather use Moo here but I want to make things relatively high on the
 # CPAN river like DateTime use this distro, so reducing deps is important.
@@ -209,6 +210,8 @@ sub subref {
     my $self = shift;
 
     $self->_compile;
+
+    local $ENV{EVAL_CLOSURE_PRINT_SOURCE} = 1 if $self->{debug};
     my $sub = eval_closure(
         source => 'sub { ' . ( join "\n", @{ $self->_source } ) . ' };',
         environment => $self->_env,
@@ -880,7 +883,7 @@ EOF
     if ( $type->can_be_inlined ) {
         $self->_add_to_environment(
             sprintf( 'The %s type', $type->name ),
-            $type->_inline_environment,
+            $type->inline_environment,
         );
     }
 
@@ -921,7 +924,7 @@ Params::ValidationCompiler::Compiler - Object that implements the check subrouti
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =for Pod::Coverage .*
 
@@ -941,7 +944,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2016 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

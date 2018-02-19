@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.23';
+$Selenium::Remote::Driver::VERSION = '1.24';
 use strict;
 use warnings;
 
@@ -879,9 +879,8 @@ sub execute_async_script {
             if ( Scalar::Util::blessed( $args[$i] )
                  and $args[$i]->isa('Selenium::Remote::WebElement') )
             {
-                if ($self->{is_wd3}) {
+                if ($self->{is_wd3} && $self->browser_name ne 'chrome') {
                     $args[$i] = { 'element-6066-11e4-a52e-4f735466cecf' => ( $args[$i] )->{id} };
-                    $args[$i]->{ELEMENT} = $args[$i]->{id} if $self->browser_name eq 'chrome'; #XXX sometimes they prefer the latter/prior
                 } else {
                     $args[$i] = { 'ELEMENT' => ( $args[$i] )->{id} };
                 }
@@ -923,9 +922,8 @@ sub execute_script {
             if ( Scalar::Util::blessed( $args[$i] )
                 and $args[$i]->isa('Selenium::Remote::WebElement') )
             {
-                if ($self->{is_wd3}) {
+                if ($self->{is_wd3} && $self->browser_name ne 'chrome') {
                     $args[$i] = { 'element-6066-11e4-a52e-4f735466cecf' => ( $args[$i] )->{id} };
-                    $args[$i]->{ELEMENT} = $args[$i]->{id} if $self->browser_name eq 'chrome'; #XXX sometimes they prefer the latter/prior
                 } else {
                     $args[$i] = { 'ELEMENT' => ( $args[$i] )->{id} };
                 }
@@ -1729,7 +1727,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 SYNOPSIS
 

@@ -128,7 +128,7 @@ class InlineJavaCallback {
 				StringTokenizer st = new StringTokenizer(resp, " ") ;
 				String c = st.nextToken() ;
 				if (c.equals("callback")){
-					boolean thrown = new Boolean(st.nextToken()).booleanValue() ;
+					boolean thrown = Boolean.parseBoolean(st.nextToken()) ;
 					String arg = st.nextToken() ;
 					InlineJavaClass ijc = new InlineJavaClass(ijs, ijp) ;
 					ret = ijc.CastArgument(cast, arg) ;

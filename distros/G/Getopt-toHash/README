@@ -1,0 +1,40 @@
+    How to use:
+
+    use Getopt::toHash;
+
+    --Grab all arguments, return into hash ref. my $Args =
+    Getopt::toHash->get_em();
+
+    Everything else is optional beyond this point.
+
+    --Validation If you want the module to only make sure certain arguments
+    are there and not validate them.
+    $Args->validate('required'=>['-a','-b','-c']);
+
+    The Module can validate on 7 Different constraints REGEXP -
+    {'REGEXP=>'^[-+]?[0-9]'} - Specify a regex the passed data must comply
+    with. MINMAX - {'MINMAX'=>{min=>20,max=>40}} - Specify minimum and
+    maximum numbers the argument must be. GREATER_THAN -
+    {'GREATER_THAN'=>{min=>20}} - Specify a minimum number the argument
+    must be. LESS_THAN - {'LESS_THAN'=>{max=>40}} - Specify a maximum
+    number the argument must be lower than. ASCII - ['ASCII'] - The
+    argument must be any ASCII text with spaces allowed. NOSPACES -
+    ['NOSPACES'] - The argument must have no spaces. ANY - ['ANY'] - The
+    argument must be defined.
+
+    You can validate each argument on as many types of validation as you
+    want by stringing together each array ref or hash. The Argument must
+    pass each constraint
+
+    --Example 1 - Validating with a inline object. $Args->validate( '-a'=>[
+    'ASCII','NOSPACES',{ 'MINMAX'=>{min=>20,max=>40} } ] );
+
+    --Example 2 - Validating with a hash spec. my %spec = ( '-a'=>[
+    'ASCII','NOSPACES', {'MINMAX'=>{min=>20,max=>40} } ] );
+    $Args->validate(%spec);
+
+    The module will display error messages and die on failed validation by
+    default. If you dont want this you can pass... $Args->validate(
+    no_errors=>'1','-a'=>[ 'ASCII','NOSPACES',{ 'MINMAX'=>{min=>20,max=>40}
+    } ] );
+

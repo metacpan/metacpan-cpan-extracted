@@ -29,5 +29,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/Artistic-2.0
   repository: https://github.com/ronsavage/Tree-DAG_Node.git
-version: '1.30'
+version: '1.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

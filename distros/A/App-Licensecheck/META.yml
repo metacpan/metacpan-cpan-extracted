@@ -3,9 +3,10 @@ abstract: 'simple license checker for source files'
 author:
   - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
 build_requires:
+  File::Basename: '0'
+  Test::Builder::Module: '0'
   Test::More: '0.98'
   Test::Requires: '0'
-  Test::Roo: '0'
   Test::Script: '1.09'
   UNIVERSAL::require: '0'
 configure_requires:
@@ -31,7 +32,7 @@ optional_features: {}
 provides:
   App::Licensecheck:
     file: lib/App/Licensecheck.pm
-    version: v3.0.32
+    version: v3.0.33
 requires:
   Encode: '0'
   Fcntl: '0'
@@ -58,12 +59,12 @@ resources:
   homepage: https://metacpan.org/release/App-Licensecheck
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://anonscm.debian.org/cgit/build-common/licensecheck.git
-version: v3.0.32
+version: v3.0.33
 x_contributors:
   - 'Paul Wise <pabs@debian.org>'
 x_help_wanted:
-  - documenter
   - tester
+  - documenter
 x_provides_scripts:
   licensecheck:
     file: bin/licensecheck

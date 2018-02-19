@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.32'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -195,7 +195,7 @@ sub call {
 	my ($self, %args) = @_;
 	my ($done, $job_id, $outargs);
 	$args{cb1} = sub {
-		($job_id) = @_;
+		($job_id, $outargs) = @_;
 		$done++ unless $job_id;
 	};
 	$args{cb2} = sub {
@@ -253,26 +253,30 @@ sub call_nb {
 		},
 		sub {
 			my ($d, $e, $r) = @_;
+			my ($job_id, $msg);
 			if ($e) {
 				$self->log->error("create_job returned error: $e->{message} ($e->{code}");
-				$callcb->(undef, "$e->{message} ($e->{code}");
-				return;
+				$msg = "$e->{message} ($e->{code}"
+			} else {
+				($job_id, $msg) = @$r; # fixme: check for arrayref?
+				if ($msg) {
+					$self->log->error("create_job returned error: $msg");
+				} elsif ($job_id) {
+					$self->log->debug("create_job returned job_id: $job_id");
+					$self->jobs->{$job_id} = $rescb;
+				}
 			}
-			my ($job_id, $msg) = @$r; # fixme: check for arrayref?
 			if ($msg) {
-				$self->log->error("create_job returned error: $msg");
-				$callcb->(undef, $msg);
-				return;
+				$msg = {error => $msg} unless ref $msg;
+				$msg = encode_json($msg) if $self->{json};
 			}
-			if ($job_id) {
-				$self->log->debug("create_job returned job_id: $job_id");
-				$self->jobs->{$job_id} = $rescb;
-				$callcb->($job_id);
-			}
+			$callcb->($job_id, $msg);
 		}
 	)->catch(sub {
 		my ($delay, $err) = @_;
 		$self->log->error("Something went wrong in call_nb: $err");
+		$err = { error => $err };
+		$err = encode_json($err) if $self->{json};
 		$callcb->(undef, $err);
 	});
 }
@@ -292,7 +296,7 @@ sub find_jobs {
 
 	#print 'filter: ', Dumper($filter);
 	$filter = encode_json($filter) if ref $filter eq 'HASH';
-	
+
 	my ($done, $err, $jobs);
 	Mojo::IOLoop->delay->steps(
 	sub {
@@ -445,9 +449,9 @@ sub announce {
 	my $slots = $args{slots} // 1;
 	my $host = hostname;
 	my $workername = $args{workername} // "$self->{who} $host $0 $$";
-	
+
 	croak "already have action $actionname" if $self->actions->{$actionname};
-	
+
 	my $err;
 	Mojo::IOLoop->delay->steps(
 	sub {
@@ -541,7 +545,7 @@ sub rpc_task_ready {
 			my $outargs = eval { $action->{cb}->($job_id, @args) };
 			$outargs = { error => $@ } if $@;
 			$c->notify('task_done', { cookie => $cookie, outargs => $outargs });
-		} else { 
+		} else {
 			die "unkown mode $action->{mode}";
 		}
 	});
@@ -943,6 +947,10 @@ L<https://github.com/a6502/JobCenter>: JobCenter Orchestration Engine
 
 This software has been developed with support from L<STRATO|https://www.strato.com/>.
 In German: Diese Software wurde mit Unterstützung von L<STRATO|https://www.strato.de/> entwickelt.
+
+=head1 THANKS
+
+Thanks to Eitan Schuler for reporting a bug and providing a pull request.
 
 =head1 AUTHORS
 

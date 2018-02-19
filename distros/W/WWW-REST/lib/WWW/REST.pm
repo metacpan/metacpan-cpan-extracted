@@ -1,7 +1,7 @@
 use 5.006;
 package WWW::REST;
 # $WWW::REST::VERSION = '0.011';
-$WWW::REST::VERSION = '0.021';
+$WWW::REST::VERSION = '0.022';
 use strict;
 use vars '$AUTOLOAD';
 
@@ -118,7 +118,7 @@ WWW::REST - Base class for REST resources
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,7 @@ concept for a resource-oriented API framework, also known as B<REST>
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 METHODS
 
@@ -242,9 +242,14 @@ Shlomi Fish <shlomif@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This work is in the public domain and is not subject to restriction or control
-via any copyright system.  It is available as-is and comes with no guarantee
-whatsoever.
+
+Audrey Tang has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
+
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =head1 BUGS
 
@@ -278,7 +283,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/WWW-REST>
+L<https://metacpan.org/release/WWW-REST>
 
 =item *
 
@@ -314,14 +319,6 @@ L<http://cpanratings.perl.org/d/WWW-REST>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/WWW-REST>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -332,7 +329,7 @@ L<http://cpants.cpanauthors.org/dist/WWW-REST>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/W/WWW-REST>
 

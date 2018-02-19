@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.613';
+$Lab::Moose::VERSION = '3.620';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
 
 use warnings;
@@ -7,59 +7,41 @@ use strict;
 use 5.010;
 
 use MooseX::Params::Validate;
-
+use Moose::Util::TypeConstraints qw/subtype as where message/;
 use Module::Load;
-use Exporter 'import';
 use Lab::Moose::Connection;
 use Carp;
 
-our @EXPORT = qw/instrument datafolder datafile/;
+our @ISA = qw(Exporter);
 
+# FIXME: export 'use warnings; use strict; into caller'
+
+our @EXPORT
+    = qw/instrument datafolder datafile linspace sweep sweep_datafile our_catfile/;
+
+
+# Enable "use warnings; use strict" in caller.
+# See https://www.perlmonks.org/?node_id=1095522
+# and https://metacpan.org/pod/Import::Into
+
+sub import {
+    __PACKAGE__->export_to_level( 1, @_ );
+    strict->import();
+    warnings->import();
+}
 
 sub instrument {
-    my (
-        $instrument_type, $connection_type, $connection, $connection_options,
-        $instrument_options
-        )
-        = validated_list(
+    my %args = validated_hash(
         \@_,
-        type            => { isa => 'Str' },
-        connection_type => { isa => 'Str', optional => 1 },
-        connection      => { isa => 'Lab::Moose::Connection', optional => 1 },
-        connection_options => { isa => 'HashRef', optional => 1 },
-        instrument_options => { isa => 'HashRef', default => {} },
-        );
-
-    $instrument_type = "Lab::Moose::Instrument::$instrument_type";
-    load $instrument_type;
-
-    if (   $connection && $connection_type
-        || $connection && $connection_options ) {
-        croak "give either 'connection' or 'connection_type' arguments";
-    }
-
-    if ($connection) {
-        return $instrument_type->new(
-            connection => $connection,
-            %{$instrument_options}
-        );
-    }
-
-    $connection_type = "Lab::Moose::Connection::$connection_type";
-
-    load $connection_type;
-
-    if ( not $connection_options ) {
-        $connection_options = {};
-    }
-
-    $connection = $connection_type->new( %{$connection_options} );
-
-    return $instrument_type->new(
-        connection => $connection,
-        %{$instrument_options}
+        type                           => { isa => 'Str' },
+        MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1,
     );
 
+    my $type = delete $args{type};
+    $type = "Lab::Moose::Instrument::$type";
+    load $type;
+
+    return $type->new(%args);
 }
 
 
@@ -72,7 +54,7 @@ sub datafolder {
 sub datafile {
     my (%args) = validated_hash(
         \@_,
-        type                           => { isa => 'Str' },
+        type => { isa => 'Str', default => 'Gnuplot' },
         MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1
     );
 
@@ -84,6 +66,78 @@ sub datafile {
 
     return $type->new(%args);
 }
+
+
+sub linspace {
+    my ( $from, $to, $step, $exclude_from ) = validated_list(
+        \@_,
+        from         => { isa => 'Num' },
+        to           => { isa => 'Num' },
+        step         => { isa => 'Num' },
+        exclude_from => { isa => 'Bool', default => 0 },
+    );
+
+    $step = abs($step);
+    my $sign = $to > $from ? 1 : -1;
+
+    my @steps;
+    for ( my $i = $exclude_from ? 1 : 0;; ++$i ) {
+        my $point = $from + $i * $sign * $step;
+        if ( ( $point - $to ) * $sign >= 0 ) {
+            last;
+        }
+        push @steps, $point;
+    }
+    return ( @steps, $to );
+}
+
+sub sweep {
+    my (%args) = validated_hash(
+        \@_,
+        type                           => { isa => 'Str' },
+        MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1
+    );
+
+    my $type = delete $args{type};
+
+    $type = "Lab::Moose::Sweep::$type";
+
+    load $type;
+
+    return $type->new(%args);
+}
+
+sub sweep_datafile {
+    my (%args) = validated_hash(
+        \@_,
+        filename                       => { isa => 'Str', default => 'data' },
+        MX_PARAMS_VALIDATE_ALLOW_EXTRA => 1
+    );
+
+    my $class = 'Lab::Moose::Sweep::DataFile';
+    load $class;
+    return $class->new( params => \%args );
+}
+
+# PDL::Graphics::Gnuplot <= 2.011 cannot handle backslashes on windows.
+sub our_catfile {
+    if ( @_ == 0 ) {
+        return undef;
+    }
+    return join( '/', @_ );
+}
+
+# Some often used subtypes
+
+subtype 'Lab::Moose::PosNum',
+    as 'Num',
+    where { $_ >= 0 },
+    message {"$_ is not a positive number"};
+
+subtype 'Lab::Moose::PosInt',
+    as 'Int',
+    where { $_ >= 0 },
+    message {"$_ is not a positive integer number"};
 
 1;
 
@@ -99,7 +153,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -125,19 +179,23 @@ version 3.613
      filename => 'file.yml'
  );
 
+ my @points = linspace(from => -1, to => 1, step => 0.1);
+
 =head1 SUBROUTINES
 
 =head2 instrument
 
 Load an instrument driver module and call the constructor.
 
-Create instrument with a new connection:
+Create instrument with new connection:
 
  my $instr = instrument(
-     instrument_type => $type,
-     instrument_options => {%instrument_options},
-     connection_type => $connection_type,
-     connection_options => {%connection_options},
+     instrument_type => 'RS_SMB',
+     connection_type => 'VXI11',
+     connection_options => {host => '192.168.2.23'},
+     # other driver specific options
+     foo => 'ON',
+     bar => 'OFF',
  );
 
 Create instrument with existing connection:
@@ -145,10 +203,10 @@ Create instrument with existing connection:
  my $instr = instrument(
      instrument_type => $type,
      connection => $connection_object,
-     instrument_options => {%instrument_options},
+     # driver specific options
+     foo => 'ON',
+     bar => 'OFF',
  );
-
-The C<instrument_options> hashref is optional in both cases.
 
 =head2 datafolder
 
@@ -162,12 +220,23 @@ Load L<Lab::Moose::DataFolder> and call it's C<new> method with C<%args>.
 
 Load Lab::Moose::DataFile::C<$type> and call it's C<new> method with C<%args>.
 
+The default type is 'Gnuplot'.
+
+=head2 linspace
+
+ # create array (-1, -0.9, ..., 0.9, 1) 
+ my @points = linspace(from => -1, to => 1, step => 0.1);
+
+ # create array without first point (-0.9, ..., 1)
+ my @points = linspace(from => -1, to => 1, step => 0.1, exclude_from => 1);
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

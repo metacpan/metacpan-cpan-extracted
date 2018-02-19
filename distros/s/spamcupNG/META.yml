@@ -26,16 +26,23 @@ no_index:
 provides:
   SpamcupNG:
     file: lib/SpamcupNG.pm
-    version: '0.7'
+    version: '0.9'
 requires:
+  Carp: '0'
   Getopt::Std: '0'
   HTML::Entities: '3.69'
   HTML::Form: '6.03'
+  HTML::TreeBuilder::XPath: '0.14'
   HTTP::Cookies: '6.01'
   LWP::UserAgent: '6.05'
+  Log::Log4perl: '1.48'
   YAML::XS: '0.62'
-resources: {}
-version: '0.7'
+  perl: 5.008_009
+resources:
+  bugtracker: https://github.com/glasswalk3r/spamcupNG/issues
+  homepage: https://github.com/glasswalk3r/spamcupNG
+  repository: https://github.com/glasswalk3r/spamcupNG.git
+version: '0.9'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -190,12 +197,20 @@ x_Dist_Zilla:
       name: OurPkgVersion
       version: '0.12'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee

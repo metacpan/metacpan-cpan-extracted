@@ -1,0 +1,79 @@
+{
+   "abstract" : "Run large database changes safely",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-BatchChunker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLDR::Number" : "0",
+            "DBI" : "0",
+            "Data::Float" : "0",
+            "List::Util" : "1.33",
+            "Moo" : "2.00",
+            "Scalar::Util" : "0",
+            "Term::ProgressBar" : "2.14",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Standard" : "1.00",
+            "namespace::clean" : "0"
+         },
+         "suggests" : {
+            "DBIx::Class" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "Path::Class" : "0",
+            "Scalar::Util" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::Tools::Explain" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker/issues"
+      },
+      "homepage" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker.git",
+         "web" : "https://github.com/GrantStreetGroup/DBIx-BatchChunker"
+      }
+   },
+   "version" : "0.90",
+   "x_authority" : "cpan:GSG",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

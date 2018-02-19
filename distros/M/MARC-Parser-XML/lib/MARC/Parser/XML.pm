@@ -3,7 +3,7 @@ package MARC::Parser::XML;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp qw(croak);
 use XML::LibXML::Reader;
@@ -65,7 +65,7 @@ sub _decode {
 
         if ( $field_node->localName =~ m/leader/ ) {
             push @record,
-                [ 'ldr', undef, undef, '_', $field_node->textContent ];
+                [ 'LDR', undef, undef, '_', $field_node->textContent ];
         }
         elsif ( $field_node->localName =~ m/controlfield/ ) {
             push @record,

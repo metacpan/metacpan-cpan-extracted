@@ -1,28 +1,22 @@
 environment:
   matrix:
-    # Cannot run dependency tests as the Test::TCP tests fails on windows:
-    # https://github.com/tokuhirom/Test-TCP/issues/43 
-    - strawberry_version: 5.20.1.1
-      installdeps_options: --quiet --notest
-    - strawberry_version: 5.20.1.1 --x86
-      installdeps_options: --quiet --notest
+    # Should we run dependency tests?
+    - strawberry_version: 5.20.3.3
+      installdeps_options: --verbose --notest
+    - strawberry_version: 5.20.3.3 --x86
+      installdeps_options: --verbose --notest
       
 install:
   - choco install --allowemptychecksum strawberryperl --version %strawberry_version%
-  - path C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - path C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;C:\strawberry\c\bin;%PATH%
   - choco install gnuplot
   - path C:\Program Files\gnuplot\bin;%PATH%
   - perl -V
-  - cpan App::cpanminus
   - cpanm %installdeps_options% --skip-satisfied Dist::Zilla
   - dzil authordeps --missing | cpanm %installdeps_options%
   - dzil listdeps --missing | cpanm %installdeps_options%
   
-  # Change to CPAN once P::G::G pull #67 is released to CPAN.
-  - cpanm %installdeps_options% git://github.com/drzowie/PDL-Graphics-Gnuplot.git
-
-  - cpanm %installdeps_options% Test::Perl::Critic
+  - cpanm %installdeps_options% PDL::Graphics::Gnuplot
 
 build_script:
   - prove --verbose -l -s -r t
-  - prove --verbose -l -r xt\critic\

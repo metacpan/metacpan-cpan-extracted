@@ -1,5 +1,5 @@
 MODULES
-    Indent::Utils - Utilities for Indent classes.
+    Indent modules.
 
 CLASSES
     Indent - Class for indent handling.
@@ -7,6 +7,7 @@ CLASSES
     Indent::Data - Class for data indenting.
     Indent::String - Class for text indenting.
     Indent::Word - Class for word indenting.
+    Indent::Utils - Utilities for Indent classes.
 
 EXAMPLES
     See man pages of each class or module.
@@ -15,12 +16,13 @@ REPOSITORY
     <https://github.com/tupinek/Indent>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    BSD license.
+    © 2005-2018 Michal Josef Špaček
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05

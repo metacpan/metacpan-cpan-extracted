@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.3.0';
+$Git::Hooks::CheckFile::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -13,7 +13,6 @@ use Text::Glob qw/glob_to_regex/;
 use Path::Tiny;
 use List::MoreUtils qw/any none/;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 #############
@@ -69,12 +68,12 @@ sub check_command {
         $command =~ s/\{\}/\'$file\'/g;
         my $message = do {
             if ($exit == -1) {
-                "command '$command' could not be executed: $!";
+                "Command '$command' could not be executed: $!";
             } elsif ($exit & 127) {
-                sprintf("command '%s' was killed by signal %d, %s coredump",
+                sprintf("Command '%s' was killed by signal %d, %s coredump",
                         $command, ($exit & 127), ($exit & 128) ? 'with' : 'without');
             } else {
-                sprintf("command '%s' failed with exit code %d", $command, $exit >> 8);
+                sprintf("Command '%s' failed with exit code %d", $command, $exit >> 8);
             }
         };
 
@@ -82,7 +81,7 @@ sub check_command {
         # $file to avoid confounding the user.
         $output =~ s/\Q$tmpfile\E/$file/g;
 
-        $git->error($PKG, $message, $output);
+        $git->fault($message, {details => $output});
         return;
     } else {
         # FIXME: What should we do with eventual output from a
@@ -136,14 +135,22 @@ sub check_new_files {
 
         if (any  {$basename =~ $_} @{$re_checks{basename}{deny}} and
             none {$basename =~ $_} @{$re_checks{basename}{allow}}) {
-            $git->error($PKG, "File '$file' basename was denied.");
+            $git->fault(<<"EOS");
+The file '$file' basename is not allowed.
+Please, check the $CFG.basename.deny and
+$CFG.basename.allow options in your configuration.
+EOS
             ++$errors;
             next FILE;          # Don't botter checking the contents of invalid files
         }
 
         if (any  {$file =~ $_} @{$re_checks{path}{deny}} and
             none {$file =~ $_} @{$re_checks{path}{allow}}) {
-            $git->error($PKG, "File '$file' path was denied.");
+            $git->fault(<<"EOS");
+The file '$file' path is not allowed.
+Please, check the $CFG.path.deny and
+$CFG.path.allow options in your configuration.
+EOS
             ++$errors;
             next FILE;          # Don't botter checking the contents of invalid files
         }
@@ -159,7 +166,13 @@ sub check_new_files {
         }
 
         if ($file_sizelimit && $file_sizelimit < $size) {
-            $git->error($PKG, "File '$file' has $size bytes but the current limit is just $file_sizelimit bytes.");
+            $git->fault(<<"EOS");
+The file '$file' is too big.
+
+It has $size bytes but the current limit is $file_sizelimit bytes.
+Please, check the $CFG.sizelimit and
+$CFG.basename.sizelimit options in your configuration.
+EOS
             ++$errors;
             next FILE;    # Don't botter checking the contents of huge files
         }
@@ -232,7 +245,47 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckFile
+    admin = joe molly
+
+  [githooks "checkfile"]
+    name = *.p[lm] perlcritic --stern --verbose 10
+    name = *.pp    puppet parser validate --verbose --debug
+    name = *.pp    puppet-lint --no-variable_scope-check --no-documentation-check
+    name = *.sh    bash -n
+    name = *.sh    shellcheck --exclude=SC2046,SC2053,SC2086
+    name = *.yml   yamllint
+    name = *.js    eslint -c ~/.eslintrc.json
+
+    sizelimit = 1M
+
+    path.deny = ^.
+    path.allow = ^[a-zA-Z0-1/_.-]$
+
+The first section enables the plugin and defines the users C<joe> and C<molly>
+as administrators, effectivelly exempting them from any restrictions the plugin
+may impose.
+
+The second instance enables C<some> of the options specific to this plugin.
+
+The C<name> options associate filenames with commands so that any file added or
+modified in the commit which name maches the glob pattern is checked with the
+associated command. The commands usually check the files's syntax and style.
+
+The C<sizelimit> option denies the addition or modification of any file bigger
+than 1MiB, preventing careless users to commit huge binary files.
+
+The C<path.deny> and C<path.allow> options conspire to only allow the addition
+of files which names comprised of only a small set of characters, avoiding names
+which may cause problems.
 
 =head1 DESCRIPTION
 
@@ -404,7 +457,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

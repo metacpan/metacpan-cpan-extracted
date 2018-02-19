@@ -13,7 +13,7 @@ Moose::Cookbook::Meta::Labeled_AttributeTrait - Labels implemented via attribute
 
 =head1 VERSION
 
-version 2.2009
+version 2.2010
 
 =head1 SYNOPSIS
 

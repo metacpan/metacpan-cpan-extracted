@@ -19,7 +19,7 @@ use overload (
     fallback => 1,
 );
 
-our $VERSION = '0.04'; # from Piper-0.04.tar.gz
+our $VERSION = '0.05'; # from Piper-0.05.tar.gz
 
 #pod =head1 SYNOPSIS
 #pod
@@ -248,7 +248,7 @@ String context is overloaded to call this method.  The following are equivalent:
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

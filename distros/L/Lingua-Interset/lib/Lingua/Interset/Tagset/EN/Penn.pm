@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::EN::Penn;
 use strict;
 use warnings;
-our $VERSION = '3.010';
+our $VERSION = '3.011';
 
 use utf8;
 use open ':utf8';
@@ -85,9 +85,9 @@ around BUILDARGS => sub
         # determiner
         # examples: a, the, some
         'DT'    => ['pos' => 'adj', 'prontype' => 'prn'],
-        # existential there
+        # existential there (UD English makes it a PRON)
         # examples: there
-        'EX'    => ['pos' => 'adv', 'advtype' => 'ex'],
+        'EX'    => ['pos' => 'noun', 'prontype' => 'prn', 'advtype' => 'ex'],
         # foreign word
         # examples: kašpárek
         'FW'    => ['foreign' => 'yes'],
@@ -110,7 +110,8 @@ around BUILDARGS => sub
         'JJS'   => ['pos' => 'adj', 'degree' => 'sup'],
         # list item marker
         # examples: 1., a), *
-        'LS'    => ['pos' => 'punc', 'numtype' => 'ord'],
+        # no POS used because punc should not be used for alphanumeric strings
+        'LS'    => ['numtype' => 'ord'],
         # modal
         # examples: can, must
         'MD'    => ['pos' => 'verb', 'verbtype' => 'mod'],
@@ -148,9 +149,9 @@ around BUILDARGS => sub
         # adverb, superlative
         # examples: most, least
         'RBS'   => ['pos' => 'adv', 'degree' => 'sup'],
-        # particle
+        # particle (in the case of English, only the particles of phrasal verbs, which in UD should be tagged ADP or ADV)
         # examples: up, on
-        'RP'    => ['pos' => 'part'],
+        'RP'    => ['pos' => 'part', 'parttype' => 'vbp'],
         # symbol
         # Penn Treebank definition (Santorini 1990):
         # This tag should be used for mathematical, scientific and technical symbols
@@ -201,67 +202,69 @@ around BUILDARGS => sub
     my %em =
     (
         'hyph' => { 'yes' => 'AFX',
-                              '@'    => { 'prontype' => { 'rel' => { 'poss' => { 'yes' => 'WP$',
-                                                                                 '@'    => { 'pos' => { 'adv' => 'WRB',
-                                                                                                        'adj' => 'WDT',
-                                                                                                        '@'   => 'WP' }}}},
-                                                          'int' => { 'poss' => { 'yes' => 'WP$',
-                                                                                 '@'    => { 'pos' => { 'adv' => 'WRB',
-                                                                                                        'adj' => 'WDT',
-                                                                                                        '@'   => 'WP' }}}},
-                                                          'prs' => { 'poss' => { 'yes' => 'PRP$',
-                                                                                 '@'    => 'PRP' }},
-                                                          '@'   => { 'pos' => { 'noun' => { 'nountype' => { 'prop' => { 'number' => { 'plur' => 'NNPS',
-                                                                                                                                      '@'    => 'NNP' }},
-                                                                                                            '@'    => { 'number' => { 'plur' => 'NNS',
-                                                                                                                                      '@'    => 'NN' }}}},
-                                                                                'adj'  => { 'adjtype' => { 'pdt' => 'PDT',
-                                                                                                           '@'   => { 'prontype' => { ''  => { 'degree' => { 'sup' => 'JJS',
-                                                                                                                                                             'cmp' => 'JJR',
-                                                                                                                                                             '@'   => 'JJ' }},
-                                                                                                                                      '@' => 'DT' }}}},
-                                                                                'num'  => 'CD',
-                                                                                'verb' => { 'verbtype' => { 'mod' => 'MD',
-                                                                                                            '@'   => { 'verbform' => { 'part' => { 'tense' => { 'pres' => 'VBG',
-                                                                                                                                                                '@'    => { 'aspect' => { 'imp'  => 'VBG',
-                                                                                                                                                                                          'prog' => 'VBG',
-                                                                                                                                                                                          '@'    => 'VBN' }}}},
-                                                                                                                                       '@'    => { 'tense' => { 'past' => 'VBD',
-                                                                                                                                                                'pres' => { 'number' => { 'sing' => { 'person' => { '3' => 'VBZ',
-                                                                                                                                                                                                                    '@' => 'VBP' }},
-                                                                                                                                                                                          '@'    => 'VBP' }},
-                                                                                                                                                                '@'    => 'VB' }}}}}},
-                                                                                'adv'  => { 'advtype' => { 'ex' => 'EX',
-                                                                                                           '@'  => { 'degree' => { 'sup' => 'RBS',
-                                                                                                                                   'cmp' => 'RBR',
-                                                                                                                                   '@'   => 'RB' }}}},
-                                                                                # IN is either preposition or subordinating conjunction
-                                                                                # TO is either preposition or infinitive mark
-                                                                                'adp'  => 'IN',
-                                                                                'conj' => { 'conjtype' => { 'sub' => 'IN',
-                                                                                                            '@'   => 'CC' }},
-                                                                                'part' => { 'poss' => { 'yes' => 'POS',
-                                                                                                        '@'    => { 'verbform' => { 'inf' => 'TO',
-                                                                                                                                    '@'   => { 'parttype' => { 'inf' => 'TO',
-                                                                                                                                                               '@'   => 'RP' }}}}}},
-                                                                                'int'  => 'UH',
-                                                                                'punc' => { 'numtype' => { 'ord' => 'LS',
-                                                                                                           '@'   => { 'punctype' => { 'peri' => '.',
-                                                                                                                                      'qest' => '.',
-                                                                                                                                      'excl' => '.',
-                                                                                                                                      'comm' => ',',
-                                                                                                                                      'brck' => { 'puncside' => { 'fin' => '-RRB-',
-                                                                                                                                                                  '@'   => '-LRB-' }},
-                                                                                                                                      'quot' => { 'puncside' => { 'fin' => "''",
-                                                                                                                                                                  '@'   => "``" }},
-                                                                                                                                      # This tag is new in PennBioIE. In older data hyphens are tagged ":".
-                                                                                                                                      'dash' => 'HYPH',
-                                                                                                                                      '@'    => ':' }}}},
-                                                                                'sym'  => { 'other/symtype' => { 'currency'   => '$',
-                                                                                                                 'numbersign' => "\#",
-                                                                                                                 '@'          => 'SYM' }},
-                                                                                '@'    => { 'foreign' => { 'yes' => 'FW',
-                                                                                                           '@'       => 'NIL' }}}}}}}
+                    '@'   => { 'advtype' => { 'ex' => 'EX',
+                                              '@'  => { 'prontype' => { 'rel' => { 'poss' => { 'yes' => 'WP$',
+                                                                                               '@'   => { 'pos' => { 'adv' => 'WRB',
+                                                                                                                     'adj' => 'WDT',
+                                                                                                                     '@'   => 'WP' }}}},
+                                                                        'int' => { 'poss' => { 'yes' => 'WP$',
+                                                                                               '@'    => { 'pos' => { 'adv' => 'WRB',
+                                                                                                                      'adj' => 'WDT',
+                                                                                                                      '@'   => 'WP' }}}},
+                                                                        'prs' => { 'poss' => { 'yes' => 'PRP$',
+                                                                                               '@'    => 'PRP' }},
+                                                                        '@'   => { 'pos' => { 'noun' => { 'nountype' => { 'prop' => { 'number' => { 'plur' => 'NNPS',
+                                                                                                                                                    '@'    => 'NNP' }},
+                                                                                                                          '@'    => { 'number' => { 'plur' => 'NNS',
+                                                                                                                                                    '@'    => 'NN' }}}},
+                                                                                              'adj'  => { 'adjtype' => { 'pdt' => 'PDT',
+                                                                                                                         '@'   => { 'prontype' => { ''  => { 'degree' => { 'sup' => 'JJS',
+                                                                                                                                                                           'cmp' => 'JJR',
+                                                                                                                                                                           '@'   => 'JJ' }},
+                                                                                                                                                    '@' => 'DT' }}}},
+                                                                                              'num'  => 'CD',
+                                                                                              'verb' => { 'verbtype' => { 'mod' => 'MD',
+                                                                                                                          '@'   => { 'verbform' => { 'part' => { 'tense' => { 'pres' => 'VBG',
+                                                                                                                                                                              '@'    => { 'aspect' => { 'imp'  => 'VBG',
+                                                                                                                                                                                                        'prog' => 'VBG',
+                                                                                                                                                                                                        '@'    => 'VBN' }}}},
+                                                                                                                                                     '@'    => { 'tense' => { 'past' => 'VBD',
+                                                                                                                                                                              'pres' => { 'number' => { 'sing' => { 'person' => { '3' => 'VBZ',
+                                                                                                                                                                                                                                  '@' => 'VBP' }},
+                                                                                                                                                                                                        '@'    => 'VBP' }},
+                                                                                                                                                                              '@'    => 'VB' }}}}}},
+                                                                                              'adv'  => { 'advtype' => { 'ex' => 'EX',
+                                                                                                                         '@'  => { 'degree' => { 'sup' => 'RBS',
+                                                                                                                                                 'cmp' => 'RBR',
+                                                                                                                                                 '@'   => 'RB' }}}},
+                                                                                              # IN is either preposition or subordinating conjunction
+                                                                                              # TO is either preposition or infinitive mark
+                                                                                              'adp'  => 'IN',
+                                                                                              'conj' => { 'conjtype' => { 'sub' => 'IN',
+                                                                                                                          '@'   => 'CC' }},
+                                                                                              'part' => { 'poss' => { 'yes' => 'POS',
+                                                                                                                      '@'    => { 'verbform' => { 'inf' => 'TO',
+                                                                                                                                                  '@'   => { 'parttype' => { 'inf' => 'TO',
+                                                                                                                                                                             '@'   => 'RP' }}}}}},
+                                                                                              'int'  => 'UH',
+                                                                                              'punc' => { 'numtype' => { 'ord' => 'LS',
+                                                                                                                         '@'   => { 'punctype' => { 'peri' => '.',
+                                                                                                                                                    'qest' => '.',
+                                                                                                                                                    'excl' => '.',
+                                                                                                                                                    'comm' => ',',
+                                                                                                                                                    'brck' => { 'puncside' => { 'fin' => '-RRB-',
+                                                                                                                                                                                '@'   => '-LRB-' }},
+                                                                                                                                                    'quot' => { 'puncside' => { 'fin' => "''",
+                                                                                                                                                                                '@'   => "``" }},
+                                                                                                                                                    # This tag is new in PennBioIE. In older data hyphens are tagged ":".
+                                                                                                                                                    'dash' => 'HYPH',
+                                                                                                                                                    '@'    => ':' }}}},
+                                                                                              'sym'  => { 'other/symtype' => { 'currency'   => '$',
+                                                                                                                               'numbersign' => "\#",
+                                                                                                                               '@'          => 'SYM' }},
+                                                                                              '@'    => { 'foreign' => { 'yes' => 'FW',
+                                                                                                                         '@'   => { 'numtype' => { 'ord' => 'LS',
+                                                                                                                                                   '@'   => 'NIL' }}}}}}}}}}}
     );
     # Now add the references to the attribute hash.
     $attr->{surfeature} = 'pos';
@@ -303,7 +306,7 @@ Lingua::Interset::Tagset::EN::Penn - Driver for the tagset of the Penn Treebank.
 
 =head1 VERSION
 
-version 3.010
+version 3.011
 
 =head1 SYNOPSIS
 

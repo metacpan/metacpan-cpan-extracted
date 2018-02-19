@@ -1,6 +1,6 @@
 # NAME
 
-Mojolicious::Command::generate::resources - Generate M, V & C from database tables
+Mojolicious::Command::generate::resources - Generate MVC & OpenAPI RESTful API files from database tables
 
 # SYNOPSIS
 
@@ -15,14 +15,16 @@ This command uses ["signatures" in feature](https://metacpan.org/pod/feature#sig
 
 # DESCRIPTION
 
-[Mojolicious::Command::generate::resources](https://metacpan.org/pod/Mojolicious::Command::generate::resources) generates directory structure for
-a fully functional
-[MVC](https://metacpan.org/pod/Mojolicious::Guides::Growing#Model-View-Controller)
-[set of files](https://metacpan.org/pod/Mojolicious::Guides::Growing#REpresentational-State-Transfer),
-and [routes](https://metacpan.org/pod/Mojolicious::Guides::Routing)
-based on existing tables in your application's database. 
+An usable release...
 
-This tool's purpose is to promote
+[Mojolicious::Command::generate::resources](https://metacpan.org/pod/Mojolicious::Command::generate::resources) generates directory structure for
+a fully functional [MVC](https://metacpan.org/pod/Mojolicious::Guides::Growing#Model-View-Controller)
+[set of files](https://metacpan.org/pod/Mojolicious::Guides::Growing#REpresentational-State-Transfer),
+[routes](https://metacpan.org/pod/Mojolicious::Guides::Routing) and RESTful API specification in
+[OpenAPI](https://github.com/OAI/OpenAPI-Specification) format based on
+existing tables in your application's database. 
+
+The purpose of this tool is to promote
 [RAD](http://en.wikipedia.org/wiki/Rapid_application_development) by generating
 the boilerplate code for model (M), templates (V) and controller (C) and help
 programmers to quickly create well structured, fully functional applications.
@@ -51,6 +53,28 @@ Both short and long variants are shown as well as the types of values they
 accept. All of them, beside `--tables`, are guessed from your application and
 usually do not need to be specified.
 
+## H|home\_dir=s
+
+Optional. Defaults to `app->home` (which is MyApp home directory). Used to
+set the root directory to which the files will be dumped. If you set this
+option, respectively the `lib` and `api` folders will be created under the
+new `home_dir`. If you want them elsewhere, set these options explicitly.
+
+## L|lib=s
+
+Optional. Defaults to `app->home/lib` (relative to the `--home_dir`
+directory). If you installed [MyApp](https://metacpan.org/pod/MyApp) in some custom path and you wish to
+generate your controllers into e.g. `site_lib`, set this option.
+
+## api\_dir
+
+Optional. Directory where
+the [OpenAPI](https://github.com/OAI/OpenAPI-Specification) `json` file will
+be generated. Defaults to `app->home/api` (relative to the `--home_dir`
+directory). If you installed [MyApp](https://metacpan.org/pod/MyApp) in some custom path and you wish to
+generate your `OpenApi` files into for example `site_lib/MyApp/etc/api`, set
+this option explicitly.
+
 ## C|controller\_namespace=s
 
 Optional. The namespace for the controller classes to be generated. Defaults to
@@ -68,17 +92,6 @@ configuration file. Here is an example.
     # Namespace(s) to load controllers from
     # See /perldoc/Mojolicious#routes
     app->routes->namespaces(['MyApp::C']);
-
-## H|home\_dir=s
-
-Optional. Defaults to `app->home` (which is MyApp home directory). Used to
-set the root directory to which the files will be dumped.
-
-## L|lib=s
-
-Optional. Defaults to `app->home/lib` (relative to the `--home_dir`
-directory). If you installed [MyApp](https://metacpan.org/pod/MyApp) in some custom path and you wish to
-generate your controllers into e.g. `site_lib`, set this option.
 
 ## M|model\_namespace=s
 
@@ -113,7 +126,7 @@ Please report bugs, contribute and make merge requests on
 
 ## args
 
-Used for storing arguments from the commandline template.
+Used for storing arguments from the command-line.
 
     my $args = $self->args;
 
@@ -122,11 +135,12 @@ Used for storing arguments from the commandline template.
     my $description = $command->description;
     $command        = $command->description('Foo!');
 
-Short description of this command, used for the commands list.
+Short description of this command, used for the `~$ mojo generate` commands
+list.
 
 ## routes
 
-    $self->routes();
+    $self->routes;
 
 Returns an ARRAY reference containing routes, prepared after
 `$self->args->{tables}`. Suggested Perl code for the routes is dumped
@@ -162,11 +176,26 @@ arguments to the template. See also ["render\_to\_file" in Mojolicious::Command]
 
 ## generate\_formfields
 
-Generates form-fields from columns information found in the repective table.
+Generates form-fields from columns information found in the respective table.
 The result is put into `_form.html.ep`. The programmer can then modify the
 generated form-fields.
 
     $form_fields = $self->generate_formfields($table_name);
+
+## generate\_openapi
+
+Generates [Open API](https://github.com/OAI/OpenAPI-Specification) file in json
+format. The generated file is put in ["--api\_dir"](#api_dir). The filename is
+`api.json`. This is the file which will be loaded by `MyApp`.
+
+## generate\_path\_api
+
+Generates API definitions and paths for each table. Invoked in
+["generate\_openapi"](#generate_openapi). **Paramaters:** `$t` - the table name;
+`$api_defs_object` - the object API definition, based on the table name;
+`$tmpl_args` - the arguments for the templates. `$api_defs_object` and
+`$tmpl_args` will be enriched with additional key-value pairs as required by
+the OpenAPI specification. Returns `void`.
 
 ## generate\_validation
 
@@ -180,8 +209,7 @@ The work on the features may not go in the same order specified here. Some
 parts may be fully implemented while others may be left for later.
 
     - Improve documentation.
-    - Implement generation of Open API specification out from
-      tables' metadata. More tests.
+    - Append to the existing api.json if it already exists. More tests.
 
 # AUTHOR
 
@@ -195,12 +223,13 @@ This program is free software licensed under
 
     Artistic License 2.0
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+The full text of the license can be found in the LICENSE file included with
+this module.
 
 # SEE ALSO
 
 [Mojolicious::Command::generate](https://metacpan.org/pod/Mojolicious::Command::generate),
 [Mojolicious::Command](https://metacpan.org/pod/Mojolicious::Command),
 [Mojolicious](https://metacpan.org/pod/Mojolicious),
+[Mojolicious::Plugin::OpenAPI](https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI),
 [Perl](https://www.perl.org/).

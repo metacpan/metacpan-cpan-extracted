@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Signposting
 
+0.05  2018-02-14 13:44:56 CET
+    - more POD
+    - better test
+
 0.04  2018-02-09 12:53:04 CET
     - correct path matching
     - better pod

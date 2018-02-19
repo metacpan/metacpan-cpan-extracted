@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.024';
+our $VERSION = '0.026';
 
 use constant DESC => 'wantarray() called';
 use constant EXPL => 'Context-sensitive functions lead to unexpected errors or vulnerabilities. Functions should explicitly return either a list or a scalar value.';

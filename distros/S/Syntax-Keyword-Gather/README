@@ -1,13 +1,7 @@
-NAME
-    Syntax::Keyword::Gather - Implements the Perl 6 'gather/take' control
-    structure in Perl 5
-
-VERSION
-    version 1.003001
-
 SYNOPSIS
-     use Syntax::Keyword::Gather;
 
+     use Syntax::Keyword::Gather;
+    
      my @list = gather {
         # Try to extract odd numbers and odd number names...
         for (@data) {
@@ -25,18 +19,19 @@ SYNOPSIS
        gather => { -as => 'bake' },
        take   => { -as => 'cake' },
      };
-
+    
      my @vals = bake { cake (1...10) };
 
 DESCRIPTION
-    Perl 6 provides a new control structure -- "gather" -- that allows lists
+
+    Perl 6 provides a new control structure -- gather -- that allows lists
     to be constructed procedurally, without the need for a temporary
-    variable. Within the block/closure controlled by a "gather" any call to
-    "take" pushes that call's argument list to an implicitly created array.
-    "take" returns the number of elements it took. This module implements
+    variable. Within the block/closure controlled by a gather any call to
+    take pushes that call's argument list to an implicitly created array.
+    take returns the number of elements it took. This module implements
     that control structure.
 
-    At the end of the block's execution, the "gather" returns the list of
+    At the end of the block's execution, the gather returns the list of
     values stored in the array (in a list context) or a reference to the
     array (in a scalar context).
 
@@ -84,9 +79,9 @@ DESCRIPTION
         }
      };
 
-    There is also a third function -- "gathered" -- which returns a
-    reference to the implicit array being gathered. This is useful for
-    handling defaults:
+    There is also a third function -- gathered -- which returns a reference
+    to the implicit array being gathered. This is useful for handling
+    defaults:
 
      my @odds = gather {
         for @data {
@@ -96,7 +91,7 @@ DESCRIPTION
         take (1,3,5,7,9) unless gathered;
      }
 
-    Note that -- as the example above implies -- the "gathered" function
+    Note that -- as the example above implies -- the gathered function
     returns a special Perl 5 array reference that acts like a Perl 6 array
     reference in boolean, numeric, and string contexts.
 
@@ -112,29 +107,28 @@ DESCRIPTION
         unshift gathered, +grep(/[a-z]/i, @data);
      }
 
-    Conceptually "gather"/"take" is the generalized form from which both
-    "map" and "grep" derive. That is, we could implement those two functions
-    as:
+    Conceptually gather/take is the generalized form from which both map
+    and grep derive. That is, we could implement those two functions as:
 
      sub map (&@) {
        my $coderef = shift;
        my @list = @{shift @_};
-
+    
        return gather {
           take $coderef->($_) for (@list)
        };
      }
-
+    
      sub grep (&@) {
        my $coderef = shift;
        my @list = @{shift @_};
-
+    
        return gather {
-          take $_ if $coderef->($_) for @list
+          do { take $_ if $coderef->($_) } for @list
        };
      }
 
-    A "gather" is also a very handy way of short-circuiting the construction
+    A gather is also a very handy way of short-circuiting the construction
     of a list. For example, suppose we wanted to generate a single sorted
     list of lines from two sorted files, but only up to the first line they
     have in common. We could gather the lines like this:
@@ -154,7 +148,7 @@ DESCRIPTION
         }
      }
 
-    If you like it really short, you can also "gather"/"take" $_ magically:
+    If you like it really short, you can also gather/take $_ magically:
 
     my @numbers_with_two = gather { for (1..20) { take if /2/ } }; #
     @numbers_with_two contains 2, 12, 20
@@ -163,14 +157,18 @@ DESCRIPTION
     topic like in Perl6.
 
 HISTORY
+
     This module was forked from Damian Conway's Perl6::Gather for a few
     reasons.
 
     to avoid the slightly incendiary name
+
     to avoid the use of the Perl6::Exporter
+
     ~ doesn't overload to mean string context
 
 BUGS AND IRRITATIONS
+
     It would be nice to be able to code the default case as:
 
      my @odds = gather {
@@ -180,17 +178,6 @@ BUGS AND IRRITATIONS
         }
      } or (1,3,5,7,9);
 
-    but Perl 5's "or" imposes a scalar context on its left argument. This is
+    but Perl 5's or imposes a scalar context on its left argument. This is
     arguably a bug and definitely an irritation.
-
-AUTHORS
-    *   Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
-
-    *   Damian Conway
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

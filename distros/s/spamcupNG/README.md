@@ -30,13 +30,11 @@ Usage:
      -n Does nothing, just shows if you have unreported spam or not.
      -a Run in a loop untill all spam is reported.
      -s Stupid. Runs without asking confirmation. Use with care.
-     -q Be quiet.
      -c Alternate method for signifying code. (Unpaid users WITHOUT username & password)
      -l Alternate method for providing username. (Paid & unpaid users with password)
      -p Method for providing password. (Required for users with password)
-     -d Debug mode. Prints all kinds of funny things.
-     -D Even more debug mode. Dumps also HTML.
      -v Show version and quit.
+     -V Verbosity mode. Running "perldoc SpamcupNG" will provide more information on that.
      -h You are reading it.
 
 # WARNINGS
@@ -72,11 +70,9 @@ ExecutionOptions:
   all: y
   stupid: y
   nothing: n
-  quiet: n
   alt_code: n
   alt_user: n
-  info_level: n
-  debug_level: n
+  verbosity: INFO
 Accounts:
   Yahoo!:
     e-mail: account@provider1.com.br

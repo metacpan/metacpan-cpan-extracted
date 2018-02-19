@@ -24,7 +24,7 @@ use warnings::register;
 
 use Scalar::Util qw/blessed/;
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 sub warnif {
     if (warnings::enabled()) {

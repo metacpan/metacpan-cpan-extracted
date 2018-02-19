@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Config::Dot::Array;
 use Test::More 'tests' => 4;
 use Test::NoWarnings;

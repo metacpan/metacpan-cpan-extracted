@@ -151,6 +151,8 @@ sub prepare_os {
 	$distro =~ s{\s*[-:/,]\s*Version\s*:?\s*}{ };
 	$distro =~ s/\)\s+\(\w+\)\s*$/)/;    # remove architectural part
 	$distro =~ s/\s+\(?(?:i\d86|x86_64)\)?\s*$//; # i386 i486 i586 x86_64
+	$os{VERSION_ID} && $distro !~ m{\b$os{VERSION_ID}\b}i and
+	    $distro .= " $os{VERSION_ID}";
 	}
     elsif ($os{VERSION} && $os{NAME}) {
 	$distro = qq{$os{NAME} $os{VERSION}};
@@ -238,6 +240,7 @@ sub prepare_os {
 	$self->{__distro} = $distro;
 	$os .= " [$distro]";
 	}
+    $self->{__release_info} = \%os;
     $self->{__os} = $os;
     } # prepare_os
 
@@ -494,7 +497,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2017, Abe Timmerman & H.Merijn Brand, All rights reserved.
+(c) 2016-2018, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

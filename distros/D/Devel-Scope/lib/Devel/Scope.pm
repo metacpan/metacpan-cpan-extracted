@@ -6,14 +6,14 @@ use warnings;
 
 use List::Util qw( min );
 use Scope::Upper qw( SCOPE );
-use Term::Colormap qw( colormap print_colored_text );
+use Term::Colormap qw( colormap print_colored_text colored_text);
 use Time::HiRes qw( tv_interval gettimeofday );
 
 require Exporter;
 our @ISA       = qw( Exporter );
 our @EXPORT_OK = qw( debug debug_enable debug_disable );
 
-our $VERSION = '0.07';
+our $VERSION = '0.12';
 
 my %default_config = (
     'DEVEL_SCOPE_DEPTH'                => 0,
@@ -36,10 +36,22 @@ my $colormap = [ 201,   51,    46,    226,    202, 196 ];
 
 my $start_time = [ gettimeofday ];
 my $tic = $start_time;
+my $last_file = '';
 
 debug("Using " . __PACKAGE__ . ' with ');
 for my $key (sort keys %config) {
     debug("    " . $key . '=' . $config{$key});
+}
+debug("[ total seconds, seconds since last debug call ]");
+debug('D-2 means Depth = 2 ( relative to the file or subroutine )');
+debug('L-4 means Line number 4');
+debug('Stars indicate time spent between debug calls:');
+for my $time_level (1..5) {
+    my $sec = seconds_for_time_level($time_level);
+    my $color_index = min($time_level, $#$colormap);
+    my $stars = colored_text($colormap->[$color_index],
+                             "(" . ('*'x$time_level) . ")");
+    debug("$stars : > $sec seconds");
 }
 debug("-"x40);
 
@@ -61,6 +73,7 @@ sub debug {
         } else {
             $subroutine .= "()";
         }
+        $subroutine =~ s|^main::||;
     } else {
         $line = $line0;
         $subroutine = '';
@@ -78,7 +91,14 @@ sub debug {
     my $time_level = int( $config{'DEVEL_SCOPE_TIME_LOG_OFFSET'}
                           + ( log($elapsed) / $log_base ));
 
-    output("$time_output D-$depth $filename $line $subroutine : ");
+    if ($filename eq $last_file) {
+        $filename = '';
+    } else {
+        output("DEVEL_SCOPE Entering $filename \n");
+        $last_file = $filename;
+    }
+
+    output("$time_output D-$depth L-$line $subroutine : ");
     if ($time_level > 0) {
         # Highligh longer running steps with stars (* = fastish, ***** = slow )
         my $color_index = min($time_level, $#$colormap);
@@ -88,6 +108,12 @@ sub debug {
     }
     output("$message\n");
     $tic = [ gettimeofday ];
+}
+
+sub seconds_for_time_level {
+    my ($level) = @_;
+    my $offset = $config{'DEVEL_SCOPE_TIME_LOG_OFFSET'};
+    return exp( ($level - $offset) * $log_base );
 }
 
 sub output {
@@ -147,7 +173,7 @@ Devel::Scope - Scope based debug
 
 =head1 VERSION
 
-Version 0.07
+Version 0.12
 
 =head1 SYNOPSIS
 

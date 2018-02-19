@@ -4,7 +4,7 @@ package LWP::Protocol::AnyEvent::http;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.8.0');
+use version; our $VERSION = qv('v1.10.0');
 
 use AnyEvent            qw( );
 use AnyEvent::HTTP      qw( http_request );
@@ -25,9 +25,13 @@ sub _get_tls_ctx {
 
    # Convert various ssl_opts values to corresponding AnyEvent::TLS tls_ctx values.
    $tls_ctx{ verify          } = $ssl_opts{SSL_verify_mode};
-   $tls_ctx{ verify_peername } = 'http'                 if defined($ssl_opts{SSL_verifycn_scheme}) && $ssl_opts{SSL_verifycn_scheme} eq 'www';
-   $tls_ctx{ ca_file         } = $ssl_opts{SSL_ca_file} if exists($ssl_opts{SSL_ca_file});
-   $tls_ctx{ ca_path         } = $ssl_opts{SSL_ca_path} if exists($ssl_opts{SSL_ca_path});
+   $tls_ctx{ verify_peername } = 'http'                   if defined($ssl_opts{SSL_verifycn_scheme}) && $ssl_opts{SSL_verifycn_scheme} eq 'www';
+   $tls_ctx{ ca_file         } = $ssl_opts{SSL_ca_file}   if exists($ssl_opts{SSL_ca_file});
+   $tls_ctx{ ca_path         } = $ssl_opts{SSL_ca_path}   if exists($ssl_opts{SSL_ca_path});
+   $tls_ctx{ cert_file       } = $ssl_opts{SSL_cert_file} if exists($ssl_opts{SSL_cert_file});
+   $tls_ctx{ cert            } = $ssl_opts{SSL_cert}      if exists($ssl_opts{SSL_cert});
+   $tls_ctx{ key_file        } = $ssl_opts{SSL_key_file}  if exists($ssl_opts{SSL_key_file});
+   $tls_ctx{ key             } = $ssl_opts{SSL_key}       if exists($ssl_opts{SSL_key});
 
    if ($ssl_opts{verify_hostname}) {
       $tls_ctx{verify} ||= 1;
@@ -135,7 +139,7 @@ sub request {
    }
 
    # Let LWP handle redirects and cookies.
-   my $guard = http_request(
+   http_request(
       $method => $url,
       headers => \%headers,
       %opts,
@@ -199,7 +203,7 @@ LWP::Protocol::AnyEvent::http - Event loop friendly HTTP and HTTPS backend for L
 
 =head1 VERSION
 
-Version 1.8.0
+Version 1.10.0
 
 
 =head1 SYNOPSIS
@@ -213,12 +217,46 @@ Version 1.8.0
     # A reason to want LWP friendly to event loops.
     use Coro qw( async );
 
-    my $ua = LWP::UserAgent->new();
-    $ua->protocols_allowed([qw( http https )]);  # Playing it safe.
-
     for my $url (@urls) {
-        async { process( $ua->get($url) ) };
+        async {
+            my $ua = LWP::UserAgent->new();
+            $ua->protocols_allowed([qw( http https )]);  # The only protocols made safe.
+
+            process( $ua->get($url) );
+        };
     }
+    
+
+
+    # Using a worker pool model to fetch web pages in parallel.
+
+    use Coro                          qw( async );
+    use Coro::Channel                 qw( );
+    use LWP::Protocol::AnyEvent::http qw( );
+    use LWP::UserAgent                qw( );
+
+    my $num_workers = 10;
+
+    my $q = Coro::Channel->new();
+
+    my @threads;
+    for (1..$num_workers) {
+        push @threads, async {
+            my $ua = LWP::UserAgent->new();
+            $ua->protocols_allowed([qw( http https )]);
+
+            while (my $url = $q->get()) {
+                handle_response($ua->get($url));
+            }
+        }
+    }
+
+    while (my $url = get_next_url()) {
+        $q->put($url);
+    }
+
+    $q->shutdown();
+    $_->join() for @threads;
 
 
 =head1 DESCRIPTION
@@ -231,12 +269,48 @@ This module makes LWP more friendly to these systems
 by plugging in an HTTP and HTTPS protocol implementor
 powered by L<AnyEvent> and L<AnyEvent::HTTP>.
 
-This module is known to work with L<Coro>. Please let
-me (C<< <ikegami@adaelis.com> >>) know where else this
-is of use so I can add tests and add a mention.
+In short, it allows AnyEvent callbacks and Coro threads
+to execute when LWP is blocked. (Please let me know
+at C<< <ikegami@adaelis.com> >> what other system this helps
+so I can add tests and add a mention.)
 
 All LWP features and configuration options should still be
 available when using this module.
+
+
+=head1 SSL SUPPORT
+
+Only the following C<ssl_opts> are currently supported:
+
+=over 4
+
+=item * C<verify_hostname>
+
+=item * C<SSL_verify_mode>
+
+Only partially supported. Unspecified or VERIFY_NONE disables verification, anything else enables it.
+
+=item * C<SSL_verifycn_scheme>
+
+Only C<www> is supported. Any other value is ignored.
+
+=item * C<SSL_ca_file>
+
+=item * C<SSL_ca_path>
+
+=item * C<SSL_cert_file>
+
+=item * C<SSL_cert>
+
+=item * C<SSL_key_file>
+
+=item * C<SSL_key>
+
+=back
+
+As with L<LWP::Protocol::https>, if hostname verification is requested by L<LWP::UserAgent>'s C<ssl_opts>, and neither C<SSL_ca_file> nor C<SSL_ca_path> is set, then C<SSL_ca_file> is implied to be the one provided by L<Mozilla::CA>.
+
+The maintainer will be happy to add support for additional options.
 
 
 =head1 SEE ALSO
@@ -310,7 +384,7 @@ L<http://cpanratings.perl.org/d/LWP-Protocol-AnyEvent-http>
 
 =head1 AUTHORS
 
-Eric Brine, C<< <ikegami@adaelis.com> >>
+Eric Brine, C<< <ikegami@adaelis.com> >>, Maintainer
 
 Max Maischein, C<< <corion@cpan.org> >>
 

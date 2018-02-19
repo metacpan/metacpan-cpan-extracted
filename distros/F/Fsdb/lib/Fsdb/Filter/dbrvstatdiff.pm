@@ -3,8 +3,7 @@
 #
 # dbrvstatdiff
 #
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: ae7f061d6c1ab7aa2bd1243c98877ac4cdde0c3d $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -378,8 +377,8 @@ sub setup ($) {
 	$self->{_hyp_class} = -1 if ($hyp_class eq '<=');
 	$self->{_hyp_class} = 0 if ($hyp_class =~ /^==?$/);
 	$self->{_hyp_class} = 1 if ($hyp_class eq '>=');
-	croak $self->{_prog} . ": bad hypothesis specification ``" .
-		$self->{_hypothesis} . "''; not of format <=N, =N, >=N, where N is some number.\n"
+	croak($self->{_prog} . ": bad hypothesis specification ``" .
+		$self->{_hypothesis} . "''; not of format <=N, =N, >=N, where N is some number.\n")
 		if (!defined($self->{_hyp_class}) || !defined($hyp_diff));
 	$self->{_hyp_diff} = $hyp_diff;
     };
@@ -393,7 +392,7 @@ sub setup ($) {
     } elsif ($#{$self->{_arg_fields}} == 3) {
 	($self->{_m1_column}, $self->{_n1_column}, $self->{_m2_column}, $self->{_n2_column}) = @{$self->{_arg_fields}};
         $self->{_ss1_column} = $self->{_ss2_column} = undef;
-	croak $self->{_prog} . ": T-tests require standard deviations, but none were given as arguments.\n"
+	croak($self->{_prog} . ": T-tests require standard deviations, but none were given as arguments.\n")
 	    if (defined($self->{_hyp_diff}));
     } else {
 	carp $self->{_prog} . ": confusing number of fields given; cannot identify desired type of stats.\n";
@@ -411,7 +410,7 @@ sub setup ($) {
 	next if (!defined($self->{$_}));   # maybe unspecified sum-of-squares
 	$coli =~ s/_column/_coli/;
 	$self->{$coli} = $self->{_in}->col_to_i($self->{$_});
-	croak $self->{_prog} . ": unknown selected input column ``$_''.\n"
+	croak($self->{_prog} . ": unknown selected input column ``$_''.\n")
 	    if (!defined($self->{$coli}));
     };
 
@@ -423,9 +422,9 @@ sub setup ($) {
 	if (defined($self->{_hypothesis}));
     foreach (@new_columns) {
 	$self->{_out}->col_create($_)
-	    or croak $self->{_prog} . ": cannot create column ``$_'' (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column ``$_'' (maybe it already existed?)\n");
 	$self->{"_${_}_coli"} = $self->{_out}->col_to_i($_);
-	defined($self->{"_${_}_coli"}) or croak "internal error\n";
+	defined($self->{"_${_}_coli"}) or croak("internal error\n");
     };
 
 }
@@ -553,7 +552,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

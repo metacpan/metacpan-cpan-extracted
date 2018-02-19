@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::RemovePrereqs 6.010;
+package Dist::Zilla::Plugin::RemovePrereqs 6.011;
 # ABSTRACT: a plugin to remove gathered prereqs
 
 use Moose;
@@ -85,7 +85,7 @@ Dist::Zilla::Plugin::RemovePrereqs - a plugin to remove gathered prereqs
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 SYNOPSIS
 
@@ -110,7 +110,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for Perl extension DbC
 
+0.000002 2018-02-10T18:10:08Z
+    - Removed rogue module
+
 0.000001 2018-02-06T19:12:55Z
 
     - original version

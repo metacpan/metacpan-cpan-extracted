@@ -1,0 +1,80 @@
+{
+   "abstract" : "Perl module inspired by https://github.com/github/scientist",
+   "author" : [
+      "Lance Wicks <lancew@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Scientist",
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test2::Compare" : "0",
+            "Types::Standard" : "0",
+            "perl" : "v5.8.8"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "Scientist" : {
+         "file" : "lib/Scientist.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lancew/Scientist/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Scientist",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lancew/Scientist.git",
+         "web" : "https://github.com/lancew/Scientist"
+      }
+   },
+   "version" : "0.012",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

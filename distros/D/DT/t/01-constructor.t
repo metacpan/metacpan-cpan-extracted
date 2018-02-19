@@ -18,9 +18,11 @@ is $dt_iso->epoch, 1518038529, "iso timestamp value";
 eval { DT->import(':no_iso') };
 is $@, '', "import :no_iso no exception";
 
+my $xcpt_regex = qr/(?:odd|hash)/i;
+
 $dt_iso = eval { DT->new('2018-02-07T21:22:09Z') };
-like $@, qr/^Expected a hash or hash reference/, "new :no_iso exception";
+like $@, $xcpt_regex, "new :no_iso exception";
 
 # Pg is not enabled by default
 my $dt_pg = eval { DT->new('2018-02-07 21:22:09.58343-08') };
-like $@, qr/^Expected a hash or hash reference/, "new no :pg exception";
+like $@, $xcpt_regex, "new no :pg exception";

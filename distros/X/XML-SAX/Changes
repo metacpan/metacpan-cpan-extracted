@@ -1,5 +1,13 @@
 Revision history for Perl extension XML::SAX.
 
+1.00  15 Feb 2018  Grant McLean
+    - Add makefile dependency to fix order of build steps RT#62289 (patch from
+      Ed J)
+
+0.99  05 Sep 2011  Grant McLean
+    - Re-release without nested XML-SAX-Base distribution, add prereq instead
+      (note no other changes from 0.96 release)
+
 0.96  06 Aug 2008  Grant McLean
     - Fix breakage of Unicode regexes on 5.6 (introduced in 0.95 release)
 

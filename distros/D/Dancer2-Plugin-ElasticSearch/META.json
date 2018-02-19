@@ -4,13 +4,13 @@
       "Fabrice Gabolde <fgabolde@weborama.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-ElasticSearch",
    "prereqs" : {
@@ -47,6 +47,7 @@
          "web" : "https://github.com/weborama/Dancer2-Plugin-ElasticSearch"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
 }
 

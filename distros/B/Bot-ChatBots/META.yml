@@ -37,6 +37,6 @@ resources:
   bugtracker: https://github.com/polettix/Bot-ChatBots/issues
   homepage: https://github.com/polettix/Bot-ChatBots
   repository: https://github.com/polettix/Bot-ChatBots.git
-version: '0.006'
+version: '0.008'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'

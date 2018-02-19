@@ -7,16 +7,9 @@ use Test::More 0.96 import => ["!pass"];
 use File::Temp;
 use HTTP::Date qw/str2time/;
 
-plan skip_all => "Plack::Test required" unless eval {
-    require Plack::Test;
-};
-
-plan skip_all => "HTTP::Cookies required" unless eval {
-    require HTTP::Cookies;
-};
-
-# available from Plack::Test
-require HTTP::Request::Common;
+use Plack::Test;
+use HTTP::Cookies;
+use HTTP::Request::Common;
 
 my $tempdir = File::Temp->newdir;
 

@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker ;
 
 use strict ;
-require "../Portable.pm" ;
+require "../../lib/Inline/Java/Portable.pm" ;
 
 
 WriteMakefile(

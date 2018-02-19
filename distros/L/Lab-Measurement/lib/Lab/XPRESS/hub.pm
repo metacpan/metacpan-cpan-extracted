@@ -1,5 +1,5 @@
 package Lab::XPRESS::hub;
-$Lab::XPRESS::hub::VERSION = '3.613';
+$Lab::XPRESS::hub::VERSION = '3.620';
 #ABSTRACT: The XPRESS main hub
 
 use Lab::Exception;
@@ -92,14 +92,15 @@ sub Instrument {
     $module = "Lab::Moose::Instrument::" . $instrument;
     load($module);
 
-    my $args_ref          = shift;
-    my $connection_type   = delete $args_ref->{connection_type};
-    my $connection_module = "Lab::Moose::Connection::" . $connection_type;
-    load($connection_module);
-    my $connection = $connection_module->new($args_ref);
+    my $args_ref        = shift;
+    my $connection_type = delete $args_ref->{connection_type};
+
+    # Somewhat problematic, as the args_ref mixes connection options
+    # with instrument options. => Better use the Lab::Moose constructor ;)
     return $module->new(
+        connection_type    => $connection_type,
+        connection_options => $args_ref,
         %{$args_ref},
-        connection => $connection
     );
 }
 
@@ -189,11 +190,11 @@ Lab::XPRESS::hub - The XPRESS main hub
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow

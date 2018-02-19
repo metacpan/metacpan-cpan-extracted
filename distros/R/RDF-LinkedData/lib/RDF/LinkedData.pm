@@ -16,13 +16,15 @@ use URI;
 use HTTP::Headers;
 use Module::Load::Conditional qw[can_load];
 use Encode;
-use RDF::RDFa::Generator 0.102;
+use RDF::RDFa::Generator 0.199;
+use RDF::Trine::Serializer::RDFa;
 use HTML::HTML5::Writer qw(DOCTYPE_XHTML_RDFA);
 use Data::Dumper;
 use Digest::MD5 ('md5_base64');
 use Carp;
 use Try::Tiny;
 use List::Util qw(any);
+use RDF::TrineX::Compatibility::Attean;
 
 with 'MooX::Log::Any';
 
@@ -32,11 +34,11 @@ RDF::LinkedData - A Linked Data server implementation
 
 =head1 VERSION
 
-Version 1.92
+Version 1.940
 
 =cut
 
- our $VERSION = '1.92';
+ our $VERSION = '1.940';
 
 
 =head1 SYNOPSIS
@@ -477,6 +479,14 @@ sub response {
 	}
 
 	my $type = $self->type;
+
+	if (($type eq 'controls')  && (!$self->writes_enabled)) {
+	  $response->status(404);
+	  $response->headers->content_type('text/plain');
+	  $response->body('HTTP 404: Controls are only available in write-enabled applications');
+	  return $response;
+	}
+
 	$self->type('');
 	my $node = $self->my_node($uri);
 	$self->log->info("Try rendering '$type' page for subject node: " . $node->as_string);
@@ -669,8 +679,8 @@ sub _content {
 		my $gen  = RDF::RDFa::Generator->new( style => 'HTML::Pretty',
 														  title => $preds->title( $node ),
 														  base => $self->base_uri,
-														  namespaces => $self->_namespace_hashref);
-		my $writer = HTML::HTML5::Writer->new( charset => 'ascii', markup => 'html' );
+														  namespacemap => $self->namespaces);
+		my $writer = HTML::HTML5::Writer->new( charset => 'ascii', markup => 'html', end_tags => 1);
 		$output{body} = $writer->document($gen->create_document($returnmodel));
 		$output{content_type} = 'text/html';
 	}
@@ -809,9 +819,9 @@ sub _void_content {
 			my $gen = RDF::RDFa::Generator->new( style => 'HTML::Pretty',
 															 title => $self->void_config->{pagetitle} || 'VoID Description',
 															 base => $self->base_uri,
-															 namespaces => $self->_namespace_hashref);
+															 namespacemap => $self->namespaces);
 			my $markup = ($ct eq 'application/xhtml+xml') ? 'xhtml' : 'html';
-			my $writer = HTML::HTML5::Writer->new( charset => 'ascii', markup => $markup );
+			my $writer = HTML::HTML5::Writer->new( charset => 'ascii', markup => $markup, end_tags => 1 );
 			$body = $writer->document($gen->create_document($self->_voidmodel));
 		}
 		my $response = Plack::Response->new;

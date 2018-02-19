@@ -2,8 +2,7 @@
 
 #
 # dbcolmerge.pm
-# Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
-# $Id: 3dfd25a93416ff66eb1930699b1eacadcf68d9b3 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -219,10 +218,10 @@ sub setup ($) {
     my($self) = @_;
 
     # Sanity check user's input to avoid injection attacks.
-    croak $self->{_prog} . ": bad element separator.\n"
+    croak($self->{_prog} . ": bad element separator.\n")
 	if ($self->{_elem_separator} =~ /\'/);
 
-    croak $self->{_prog} . ": no columns to merge selected.\n"
+    croak($self->{_prog} . ": no columns to merge selected.\n")
 	if ($#{$self->{_merge_columns}} == -1);
 
     my(@finish_args) = (-comment_handler => $self->create_pass_comments_sub);
@@ -232,7 +231,7 @@ sub setup ($) {
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_merged_colname} = join($self->{_elem_separator}, @{$self->{_merge_columns}});
     $self->{_out}->col_create($self->{_merged_colname})
-	or croak $self->{_prog} . ": cannot create column " . $self->{_merged_colname} . " (maybe it already existed?)\n";
+	or croak($self->{_prog} . ": cannot create column " . $self->{_merged_colname} . " (maybe it already existed?)\n");
     $self->{_merged_coli} = $self->{_out}->col_to_i($self->{_merged_colname});
 
     #
@@ -241,7 +240,7 @@ sub setup ($) {
     my $code = '';
     my $joiner = '';
     my $empty = $self->{_empty};
-    croak "bad empty value: $empty\n" if ($empty eq "'");
+    croak("bad empty value: $empty\n") if ($empty eq "'");
     $code = '$fref->[' . $self->{_merged_coli} . '] = ';
     foreach (@{$self->{_merge_columns}}) {
 	my $i = $self->{_in}->col_to_i($_);
@@ -277,12 +276,12 @@ sub run ($) {
     }';
     print $loop if ($self->{_debug});
     eval $loop;
-    $@ && croak $self->{_prog} . ": interal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ": interal eval error: $@.\n");
 }
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -22,7 +22,8 @@ RM    := rm -f
 .DEFAULT_GOAL = git-status
 REPOS_TARGETS = git-status git-push git-commit-amend git-tag-list git-diff \
 				git-reset-soft git-rm-cached git-branch
-DEVEL_TARGETS = profile private-sample update-analytical-precision-table loc
+DEVEL_TARGETS = private-sample update-analytical-precision-table
+BENCH_TARGETS = profile speed-test loc
 
 # -----------------------------------------------------------------------------
 .PHONY: clean
@@ -57,7 +58,8 @@ restore-readme:
 	$(CP) /tmp/$(NAME)-README.$(TIME).md ./README.md
 
 check-version-in-readme:
-	grep cpan-v`$(PERL) -Ilib -M$(NAME) -e 'print Sisimai->version'` README.md
+	grep cpan-`$(PERL) -Ilib -M$(NAME) -e 'print Sisimai->version'` README.md
+	grep cpan-`$(PERL) -Ilib -M$(NAME) -e 'print Sisimai->version'` README-JA.md
 
 release-test:
 	$(CP) ChangeLog.md Changes
@@ -81,6 +83,9 @@ $(REPOS_TARGETS):
 $(DEVEL_TARGETS):
 	$(MAKE) -f Developers.mk $@
 
+$(BENCH_TARGETS):
+	$(MAKE) -f Benchmarks.mk $@
+
 diff push branch:
 	@$(MAKE) git-$@
 fix-commit-message: git-commit-amend
@@ -90,4 +95,5 @@ remove-added-file: git-rm-cached
 clean:
 	$(MAKE) -f Repository.mk clean
 	$(MAKE) -f Developers.mk clean
+	$(MAKE) -f Benchmarks.mk clean
 

@@ -2,8 +2,7 @@
 
 #
 # dbmerge2.pm
-# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
-# $Id: 66ef27627d3d5cfbc6108d4e1508b3330952c22d $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -173,8 +172,8 @@ L<Fsdb(3)>
 ($VERSION) = 2.0;
 
 use strict;
-use Carp qw(croak);
 use Pod::Usage;
+use Carp qw(croak);
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -260,7 +259,7 @@ Internal: setup, parse headers.
 sub setup ($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": no sorting key specified.\n"
+    croak($self->{_prog} . ": no sorting key specified.\n")
 	if ($#{$self->{_sort_argv}} == -1);
 
     #
@@ -270,11 +269,11 @@ sub setup ($) {
     $self->finish_io_option('inputs', -comment_handler => $self->create_pass_comments_sub);
     $self->finish_io_option('output', -clone => $self->{_ins}[0]);
 
-    croak $self->{_prog} . ": input streams have different schemas; cannot merge\n"
+    croak($self->{_prog} . ": input streams have different schemas; cannot merge\n")
 	if ($self->{_ins}[0]->compare($self->{_ins}[1]) ne 'identical');
 
     $self->{_compare_code} = $self->create_compare_code(@{$self->{_ins}});;
-    croak $self->{_prog} . ": no merge field specified.\n"
+    croak($self->{_prog} . ": no merge field specified.\n")
 	if (!defined($self->{_compare_code}));
     print "COMPARE CODE:\n\t" . $self->{_compare_code} . "\n" if ($self->{_debug} && $self->{_debug} > 1);
 }
@@ -296,7 +295,7 @@ sub run ($) {
     my($a, $b);
     my $compare_sub;
     eval '$compare_sub = ' . $self->{_compare_code};
-    $@ && croak $self->{_prog} . ":  internal eval error in compare code: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in compare code: $@.\n");
     my @fastpath_subs;
     foreach (0..1) {
 	$fastpath_subs[$_] = $self->{_ins}[$_]->fastpath_sub();
@@ -318,7 +317,7 @@ sub run ($) {
 	};
     };
     # one should be done
-    die if (defined($a) && defined($b));   # assert
+    croak("assert") if (defined($a) && defined($b));   # assert
     # drain the one that's still full
     while (defined($a)) {
 	&{$out_fastpath_sub}($a);
@@ -337,7 +336,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

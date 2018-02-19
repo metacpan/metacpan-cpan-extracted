@@ -1,5 +1,5 @@
 # perl Makefile.PL;make;perl -Iblib/lib t/10_md5sum.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 2;
 my $tmp=tmp();
 if(-d$tmp and -w$tmp){

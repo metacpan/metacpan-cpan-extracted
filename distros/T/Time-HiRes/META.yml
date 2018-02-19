@@ -26,5 +26,5 @@ requires:
   XSLoader: '0'
   perl: '5.006'
   strict: '0'
-version: '1.9753'
+version: '1.9754'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

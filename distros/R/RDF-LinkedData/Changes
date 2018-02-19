@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/RDF-LinkedData>
 Bug tracker:  <https://github.com/kjetilk/RDF-LinkedData/issues>
 Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 
+1.940	2018-02-12	Add support for new RDFa generator.
+
+ [ Bug Fixes ]
+ - Return 404 if controls are requested with no writes.
+
+ [ Other ]
+ - Add support for new RDFa generator.
+ - Change name of method to check read operations.
+ - Make sure end tags are added to HTML output.
+
 1.92	2018-01-16	Overhaul with 6 year development history to enable read and write.
 
  - Added: Add a possible controls type.

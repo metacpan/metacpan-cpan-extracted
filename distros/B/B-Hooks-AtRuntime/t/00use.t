@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use lib "tlib";
 
 use Test::More;
 use Test::Exports;

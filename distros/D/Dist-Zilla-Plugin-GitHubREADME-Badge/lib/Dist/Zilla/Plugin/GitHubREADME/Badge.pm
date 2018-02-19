@@ -1,8 +1,9 @@
 package Dist::Zilla::Plugin::GitHubREADME::Badge;
 
 use strict;
+use warnings;
 use 5.008_005;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Moose;
 use Moose::Util::TypeConstraints qw(enum);
@@ -14,6 +15,7 @@ use Path::Tiny;
 with qw(
   Dist::Zilla::Role::AfterBuild
   Dist::Zilla::Role::AfterRelease
+  Dist::Zilla::Role::FileMunger
 );
 
 has badges => (
@@ -27,8 +29,38 @@ has 'place' => ( is => 'rw', isa => 'Str', default => sub { 'top' } );
 
 has phase => (
     is      => 'ro',
-    isa     => enum([qw(build release)]),
+    isa     => enum([qw(build release filemunge)]),
     default => 'build',
+);
+
+has readme_file => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        my @candidates = qw/ README.md README.mkdn README.markdown /;
+
+
+        # only for the filemunge phase do we look
+        # in the slurped files
+        if( $self->phase eq 'filemunge' ) {
+            for my $file ( @{ $self->zilla->files } ) {
+                return $file if grep { $file->name eq $_ } @candidates;
+            }
+        }
+        else {
+            # for the other phases we look on disk
+            my $root = path($self->zilla->root);
+
+            return Dist::Zilla::File::OnDisk->new( 
+                name    => "$_",
+                content => $_->slurp_raw,
+                encoding => 'bytes',
+            ) for grep { -f $_ } map { $root->child($_) } @candidates 
+        }
+
+        $self->log_fatal('README file not found');
+    },
 );
 
 sub after_build {
@@ -41,6 +73,13 @@ sub after_release {
     $self->add_badges if $self->phase eq 'release';
 }
 
+sub munge_files {
+    my $self = shift;
+
+    $self->add_badges if $self->phase eq 'filemunge';
+}
+
+
 sub add_badges {
     my ($self) = @_;
 
@@ -50,19 +89,6 @@ sub add_badges {
     return unless $repository;
     my ($base_url, $user_name, $repository_name) = ($repository =~ m{^\w+://(.*)/([^\/]+)/(.*?)(\.git|\/|$)});
     return unless $repository_name;
-
-    my $file;
-    foreach my $filename ('README.md', 'README.mkdn', 'README.markdown') {
-        $file = path($self->zilla->root)->child($filename);
-        last if -e "$file";
-    }
-    $self->log_fatal('README file not found') if ! -e "$file";
-
-    my $readme = $file;
-
-    # We are lazy and dealing with only encoded bytes.
-    # If we need to decode we could probably get the encoding from the zilla file object (if Dist::Zilla->VERSION >= 5).
-    my $content = $readme->slurp_raw;
 
     my @badges;
     foreach my $badge (@{$self->badges}) {
@@ -93,13 +119,22 @@ sub add_badges {
         }
     }
 
+    my $readme = $self->readme_file;
+
+    my $content = $readme->encoded_content;
+
     if ($self->place eq 'bottom') {
         $content = $content . "\n\n" . join("\n", @badges);
     } else {
         $content = join("\n", @badges) . "\n\n" . $content;
     }
 
-    $readme->spew_raw($content);
+    $readme->content($content);
+
+    # need to write it to disk if we're in a
+    # phase that is not filemunge
+    path( $readme->name )->spew_raw( $readme->encoded_content )
+        if $self->phase ne 'filemunge';
 }
 
 1;
@@ -164,8 +199,12 @@ Place the badges at the top or bottom of the README. Defaults to top.
     [GitHubREADME::Badge]
     phase = release
 
-Which Dist::Zilla phase to add the badges: build or release.
-The default is build.
+Which Dist::Zilla phase to add the badges: C<build>, C<release> or C<filemunge>.
+For the C<build> and C<release> phases, the README that is on disk will
+be modified, whereas for the C<filemunge> it's the internal zilla version of
+the README that will be modified.
+
+The default is C<build>.
 
 =head1 SEE ALSO
 

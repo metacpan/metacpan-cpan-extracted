@@ -7,7 +7,7 @@ use parent 'WiringPi::API';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3621';
+our $VERSION = '2.3622';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
@@ -366,7 +366,7 @@ Parameters:
 
     $pin_obj
 
-Mandatory: An object instance of L<RPi::WiringPi::Pin> class.
+Mandatory: An object instance of L<RPi::Pin> class.
 
 =head2 unregister_pin($pin_obj)
 
@@ -378,7 +378,7 @@ Parameters:
 
     $pin_obj
 
-Mandatory: An object instance of L<RPi::WiringPi::Pin> class.
+Mandatory: An object instance of L<RPi::Pin> class.
 
 =head2 cleanup()
 
@@ -405,7 +405,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017,2018 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

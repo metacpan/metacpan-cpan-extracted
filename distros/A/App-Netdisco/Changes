@@ -1,3 +1,43 @@
+2.039007 - 2018-02-16
+
+  [ENHANCEMENTS]
+
+  * tune the job picking sql to avoid user jobs ignoring skips
+
+2.039006 - 2018-02-15
+
+  [BUG FIXES]
+
+  * #374 fix ACL with negation (earendilfr)
+
+2.039005 - 2018-02-15
+
+  [BUG FIXES]
+
+  * #375 dependency requirement for DBIx::Class
+
+2.039004 - 2018-02-15
+
+  [BUG FIXES]
+
+  * #374 fix renumber cli command (earendilfr)
+
+2.039003 - 2018-02-12
+
+  [ENHANCEMENTS]
+
+  * actions can now cancel themselves
+  * timeout setting is moved to within workers setting config
+  * nbtstat_timeout setting is renamed to nbtstat_response_timeout
+  * keep (most of the) deferrals count between backend restarts
+
+  [BUG FIXES]
+
+  * routed peers only queue if not also a layer2 neighbor
+  * efficiency improvements in job queue for discovery
+  * allow device autorenumber during discovery to work with netdisco-do
+  * improvements to log messages
+
 2.039002 - 2018-02-07
 
   [BUG FIXES]

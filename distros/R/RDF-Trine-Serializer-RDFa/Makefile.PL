@@ -20,12 +20,24 @@ my $meta = {
                           configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                           develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                           runtime   => {
-                                         requires => { "RDF::RDFa::Generator" => 0.102, "RDF::Trine" => 0.133 },
+                                         requires => {
+                                           "perl" => 5.014,
+                                           "RDF::RDFa::Generator" => "0.200",
+                                           "RDF::Trine" => 0.133,
+                                           "RDF::TrineX::Compatibility::Attean" => 0,
+                                         },
                                        },
-                          test      => { requires => { "Test::More" => 0.96 } },
+                          test      => {
+                                         requires => {
+                                           "Module::Load::Conditional" => 0,
+                                           "RDF::RDFa::Parser" => 0,
+                                           "Test::More" => 0.96,
+                                           "Test::RDF" => 0,
+                                         },
+                                       },
                         },
   "provides"         => {
-                          "RDF::Trine::Serializer::RDFa" => { file => "lib/RDF/Trine/Serializer/RDFa.pm", version => 0.02 },
+                          "RDF::Trine::Serializer::RDFa" => { file => "lib/RDF/Trine/Serializer/RDFa.pm", version => "0.100" },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -42,7 +54,7 @@ my $meta = {
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project",
                           x_IRC        => "irc://irc.perl.org/#perlrdf",
                         },
-  "version"          => 0.02,
+  "version"          => "0.100",
   "x_static_install" => 1,
 };
 

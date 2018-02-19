@@ -468,7 +468,7 @@ Special thanks to [Tim Heaney](http://oylenshpeegul.typepad.com) for his encoura
 
 # VERSION
 
-version 0.04
+version 0.05
 
 # AUTHOR
 

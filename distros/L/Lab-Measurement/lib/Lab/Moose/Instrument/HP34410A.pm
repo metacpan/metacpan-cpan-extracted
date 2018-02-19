@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.613';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.620';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -27,6 +27,19 @@ sub BUILD {
     $self->cls();
 }
 
+around default_connection_options => sub {
+    my $orig     = shift;
+    my $self     = shift;
+    my $options  = $self->$orig();
+    my $usb_opts = { vid => 0x03f0 };    # what is PID??
+
+    $options->{USB} = $usb_opts;
+    $options->{'VISA::USB'} = $usb_opts;
+    $options->{'Socket'} = { port => 5025 };
+
+    return $options;
+};
+
 
 
 sub get_value {
@@ -50,7 +63,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -84,9 +97,9 @@ Perform voltage/current measurement.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use Test::Deep;
 use Text::CSV;
 
@@ -22,7 +22,9 @@ cmp_deeply($row_2, {'cvterm_id' => 401, 'name' => 'exact', 'cv_id' => 301});
 my $row_3 = $sth->fetchrow_hashref();
 cmp_deeply($row_3, {'cvterm_id' => 402, 'name' => 'narrow', 'cv_id' => 301});
 my $row_4 = $sth->fetchrow_hashref();
-is($row_4, undef);
+cmp_deeply($row_4, {'cvterm_id' => 403, 'name' => 'cv_version', 'cv_id' => 302});
+my $row_5 = $sth->fetchrow_hashref();
+is($row_5, undef);
 
 
 $fake_dbh->do('COPY db(name) FROM STDIN CSV');
@@ -55,12 +57,13 @@ my @expected_dbxrefs = (
   { dbxref_id => 200, accession => 'is_a', db_id => 100 },
   { dbxref_id => 201, accession => 'exact', db_id => 101 },
   { dbxref_id => 202, accession => 'narrow', db_id => 101 },
-  { dbxref_id => 203, accession => 'test_dbref_1', db_id => 101 },
-  { dbxref_id => 204, accession => 'test_dbref_2', db_id => 101 }
+  { dbxref_id => 203, accession => 'cv_version', db_id => 101 },
+  { dbxref_id => 204, accession => 'test_dbref_1', db_id => 101 },
+  { dbxref_id => 205, accession => 'test_dbref_2', db_id => 101 }
 );
 
 cmp_deeply([$sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref(),
-            $sth->fetchrow_hashref(), $sth->fetchrow_hashref()],
+            $sth->fetchrow_hashref(), $sth->fetchrow_hashref(), $sth->fetchrow_hashref()],
            \@expected_dbxrefs);
 my $end_row = $sth->fetchrow_hashref();
 is($end_row, undef);

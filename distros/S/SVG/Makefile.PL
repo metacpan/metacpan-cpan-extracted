@@ -9,11 +9,26 @@ WriteMakefile(
     NAME          => 'SVG',
     VERSION_FROM  => 'lib/SVG.pm',
     PREREQ_PM     => {
+        'strict'       => 0,
+        'warnings'     => 0,
+        'constant'     => 0,
         'parent'       => 0,
+        'vars'         => 0,
+        'Exporter'     => 0,
         'Scalar::Util' => 0,
     },
     BUILD_REQUIRES   => {
-        'Test::More' => '0.94',
+        'strict'                => 0,
+        'warnings'              => 0,
+        'ExtUtils::MakeMaker'   => 0,
+        'File::Spec'            => 0,
+        'Test::More'            => '0.94',
+    },
+    CONFIGURE_REQUIRES => {
+        'perl'                  => '5.006',
+        'strict'                => 0,
+        'warnings'              => 0,
+        'ExtUtils::MakeMaker'   => 0,
     },
     MIN_PERL_VERSION => 5.006,
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -25,11 +40,11 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'SVG'            => { file => 'lib/SVG.pm'          , version => '2.82' },
-            'SVG::DOM'       => { file => 'lib/SVG/DOM.pm'      , version => '2.82' },
-            'SVG::Element'   => { file => 'lib/SVG/Element.pm'  , version => '2.82' },
-            'SVG::Extension' => { file => 'lib/SVG/Extension.pm', version => '2.82' },
-            'SVG::XML'       => { file => 'lib/SVG/XML.pm'      , version => '2.82' },
+            'SVG'            => { file => 'lib/SVG.pm'          , version => '2.84' },
+            'SVG::DOM'       => { file => 'lib/SVG/DOM.pm'      , version => '2.84' },
+            'SVG::Element'   => { file => 'lib/SVG/Element.pm'  , version => '2.84' },
+            'SVG::Extension' => { file => 'lib/SVG/Extension.pm', version => '2.84' },
+            'SVG::XML'       => { file => 'lib/SVG/XML.pm'      , version => '2.84' },
         },
         resources   => {
             repository => {

@@ -1,6 +1,10 @@
 Revision history for App-PDF-Link
 
-0.20
+0.21	2018-02-15
+
+	Use a different method to attach files.
+
+0.20	2018-01-10
 
 	Fix --iconsize.
 	Add support for PAR packaging.

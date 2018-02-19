@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 364;    # be careful
+plan tests => 402;    # be careful
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -511,5 +511,69 @@ ok(!is_prime('113822804831'), '!is_prime');
 ok(!is_prime('113822804831',          30),          '!is_prime');
 ok(!is_prime($o->new('113822804831'), $o->new(30)), '!is_prime');
 
+#ok(is_smooth(0,                      0));
+#ok(is_smooth(0,                      40));
+#ok(is_smooth(0,                      Math::AnyNum->new(40)));
+
+ok(is_smooth(1,                      1));
+ok(is_smooth(2,                      30));
+ok(is_smooth(Math::AnyNum->new(1),   Math::AnyNum->new(1)));
+ok(is_smooth(Math::AnyNum->new(1),   20));
+ok(is_smooth(Math::AnyNum->new(2),   20));
+ok(is_smooth(36,                     3));
+ok(is_smooth(36,                     Math::AnyNum->new(3)));
+ok(is_smooth(Math::AnyNum->new(125), Math::AnyNum->new(28)));
+ok(is_smooth(13 * 13 * 13 * 3 * 2,   13));
+ok(is_smooth(19 * 19 * 13 * 13,      19));
+
+#ok(is_smooth(-125,                   5));
+#ok(is_smooth(-125,                   -5));
+#ok(is_smooth(125 * 3,                -5));
+
+is(join(' ', grep { is_smooth($_, 3) } 0 .. 30), '1 2 3 4 6 8 9 12 16 18 24 27');
+
+ok(!is_smooth(13 * 5 * 7,                 11));
+ok(!is_smooth(-13 * 5,                    11));
+ok(!is_smooth(-13 * 5,                    -11));
+ok(!is_smooth(Math::AnyNum->new(-13 * 5), Math::AnyNum->new(-11)));
+ok(!is_smooth(13 * 5,                     -11));
+ok(!is_smooth(13 * 5,                     Math::AnyNum->new(-11)));
+ok(!is_smooth(13 * 5 * 7,                 Math::AnyNum->new(12)));
+ok(!is_smooth(39,                         6));
+ok(!is_smooth(1,                          0));
+ok(!is_smooth(2,                          1));
+ok(!is_smooth(2,                          Math::AnyNum->new(1)));
+ok(!is_smooth(1,                          Math::AnyNum->new(0)));
+
 is(next_prime('165001'),          '165037');
 is(next_prime($o->new('165001')), '165037');
+
+is_deeply(
+    [map { subfactorial($_) } 0 .. 23],
+    [qw(
+       1 0 1 2 9 44 265 1854 14833 133496 1334961 14684570 176214841 2290792932
+       32071101049 481066515734 7697064251745 130850092279664 2355301661033953
+       44750731559645106 895014631192902121 18795307255050944540 413496759611120779881
+       9510425471055777937262
+       )
+    ],
+    "subfactoral(n) for n=0..23"
+         );
+
+is_deeply([map { subfactorial(7, $_) } 0 .. 7], [qw(1854 1855 924 315 70 21 0 1)], "subfactorial(7, n) for n=0..7");
+
+is(subfactorial(Math::AnyNum->new(7), Math::AnyNum->new(5)), 21);
+is(subfactorial(Math::AnyNum->new(7), 5),                    21);
+is(subfactorial(7,                    Math::AnyNum->new(5)), 21);
+
+is(subfactorial(-20, -20), 'NaN');
+is(subfactorial(12,  20),  'NaN');
+is(subfactorial(-12), 'NaN');
+is(subfactorial(0,  0),   1);
+is(subfactorial(0,  -1),  0);
+is(subfactorial(0,  -20), 0);
+is(subfactorial(30, -20), 0);
+
+is(multinomial(3, 17, 9), '11417105700');
+is(multinomial(7, 2, 5, 2, 12, 11), '440981754363423854380800');
+is(multinomial(Math::AnyNum->new(7), 2, 5, Math::AnyNum->new(2), 12, Math::AnyNum->new(11)), '440981754363423854380800');

@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Tools::AfterSubtest;
 
 use lib 't/lib';
@@ -45,13 +45,17 @@ sub tmpfile {
 
 
 my @test_data = (
-
     { a => 1, b => 2, c => 'nyuck nyuck' },
     { a => 3, b => 4, c => 'niagara falls' },
     { a => 5, b => 6, c => 'why youuu !' },
     { a => 7, b => 8, c => 'scale that fish !' },
-
+    { a => 9, b => 10 },
 );
+
+my @expected_data = map { my $obj = $_;
+                          @{$obj}{ grep !defined $obj->{$_}, qw[ a b c ] } = undef;
+                          $obj;
+                      } @test_data;
 
 # just in case we corrupt @test_data;
 my $test_data_nrows = @test_data;
@@ -265,8 +269,8 @@ sub test_db {
 
     is( scalar @$rows, $test_data_nrows, 'correct number of rows' );
 
-    is( $rows->[$_], $test_data[$_], "row[$_]: stored data eq passed data" )
-      foreach 0 .. $#test_data;
+    is( $rows->[$_], $expected_data[$_], "row[$_]: stored data eq passed data" )
+      foreach 0 .. $#expected_data;
 
     $ctx->release;
 }

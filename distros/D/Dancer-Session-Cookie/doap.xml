@@ -52,6 +52,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Mohammad S Anwar</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mohammad.anwar@yahoo.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Neil Kirsopp</foaf:name>
       <foaf:mbox rdf:resource="mailto:neil@broadbean.com" />
     </foaf:Person>
@@ -60,6 +66,12 @@
     <foaf:Person>
       <foaf:name>Nick S. Knutov</foaf:name>
       <foaf:mbox rdf:resource="mailto:nick@knutov.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Paul Cochrane</foaf:name>
+      <foaf:mbox rdf:resource="mailto:paul@liekut.de" />
     </foaf:Person>
   </helper>
   <helper>
@@ -177,6 +189,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.26</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-09-10</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.27</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-09-23</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

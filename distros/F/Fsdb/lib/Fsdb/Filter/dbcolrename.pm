@@ -2,8 +2,7 @@
 
 #
 # dbcolrename.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: ef5f2e367d568155d5b7c0131550d2e76635982c $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -111,8 +110,8 @@ L<Fsdb>.
 ($VERSION) = 2.0;
 
 use strict;
-use Carp;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -177,7 +176,7 @@ sub parse_options ($@) {
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	) or pod2usage(2);
-    croak $self->{_prog} . ": dbcolrename requires an even number of arguments to do (old,new pairs)\n"
+    croak($self->{_prog} . ": dbcolrename requires an even number of arguments to do (old,new pairs)\n")
         if ( ($#argv + 1) % 2 != 0);
     while ($#argv >= 1) {
 	my($old) = shift @argv;
@@ -214,9 +213,9 @@ sub setup ($) {
 	my ($old) = $_;
 	my ($new) = $self->{_rename_map}{$old};
 	my $old_i = $self->{_in}->col_to_i($old);
-	croak $self->{_prog} . ": column `$old' is not in input stream.\n"
+	croak($self->{_prog} . ": column `$old' is not in input stream.\n")
 	    if (!defined($old_i));
-	croak $self->{_prog} . ": column `$new' already exists in the output stream.\n"
+	croak($self->{_prog} . ": column `$new' already exists in the output stream.\n")
 	    if (defined($cur_cols{$new}));
 	$new_cols[$old_i] = $new;
 	$cur_cols{$new} = $old_i;
@@ -247,7 +246,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

@@ -2,8 +2,7 @@
 
 #
 # dbroweval.pm
-# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
-# $Id: 8c28f7b692255da8ba7895ca3d5c79edcf00f160 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -291,6 +290,7 @@ L<Fsdb(3)>
 
 use strict;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Support;
 use Fsdb::Filter;
@@ -398,7 +398,7 @@ sub setup ($) {
     # handle files
     #
     foreach (@{$self->{_code_files}}) {
-	open(INF, "<$_") || die $self->{_prog} . ": cannot open ``$_''.\n";
+	open(INF, "<$_") || croak($self->{_prog} . ": cannot open ``$_''.\n");
 	push(@{$self->{_code_lines}}, _confirm_ending_semicolon(join('', <INF>)));
 	close INF;
     };
@@ -499,7 +499,7 @@ sub setup ($) {
 	print "\nLOOP CODE:\n$loop_code\n"
 	    if ($self->{_debug} >= 2);
 	eval $loop_code;
-	$@ && die $self->{_prog} . ":  eval error compiling user-provided code: $@.\n: CODE:\n$loop_code\n";
+	$@ && croak($self->{_prog} . ":  eval error compiling user-provided code: $@.\n: CODE:\n$loop_code\n");
 	$self->{_loop_sub} = $loop_sub;
     };
     $self->{_beg_code_final} = $beg_code;
@@ -553,7 +553,7 @@ sub compute_program_log($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

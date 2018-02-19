@@ -28,10 +28,7 @@ no_index:
 provides:
   Class::DbC:
     file: lib/Class/DbC.pm
-    version: '0.000001'
-  DbC:
-    file: lib/DbC.pm
-    version: '0.000001'
+    version: '0.000002'
 requires:
   Class::Method::Modifiers: '2.12'
   Module::Runtime: '0.014'
@@ -41,7 +38,7 @@ resources:
   bugtracker: https://github.com/arunbear/Class-DbC/issues
   homepage: https://github.com/arunbear/Class-DbC
   repository: git://github.com/arunbear/Class-DbC.git
-version: '0.000001'
+version: '0.000002'
 x_authority: cpan:ARUNBEAR
 x_contributors:
   - 'Arun Prasaad <arunbear@cpan.org>'

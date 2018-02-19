@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Service;
-$Footprintless::Service::VERSION = '1.26';
+$Footprintless::Service::VERSION = '1.27';
 # ABSTRACT: Performs an action on a service.
 # PODNAME: Footprintless::Service
 
@@ -130,7 +130,7 @@ Footprintless::Service - Performs an action on a service.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

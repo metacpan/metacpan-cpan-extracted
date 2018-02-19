@@ -12,7 +12,7 @@
                                                         
 
 
-This is the README for WWW::WWWJDIC version 0.004.
+This is the README for WWW::WWWJDIC version 0.005.
 
 WWW::WWWJDIC is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -65,11 +65,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm WWW::WWWJDIC
 
-To install the module from the source file, WWW-WWWJDIC-0.004.tar.gz,
+To install the module from the source file, WWW-WWWJDIC-0.005.tar.gz,
 follow this sequence of commands:
 
-    tar xfz WWW-WWWJDIC-0.004.tar.gz
-    cd WWW-WWWJDIC-0.004
+    tar xfz WWW-WWWJDIC-0.005.tar.gz
+    cd WWW-WWWJDIC-0.005
     perl Makefile.PL
     make
     make install
@@ -94,6 +94,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Oct 10 13:36:55 2017.
+This README was written on Tue Feb 13 09:32:36 2018.
 
 -----------------------------------------------------------------------------

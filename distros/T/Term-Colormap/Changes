@@ -1,5 +1,11 @@
 Revision history for Term-Colormap
 
+0.18   Wed Feb 14 05:06:08 UTC 2018
+    * Added colored() and colored_text() with pod and tests.
+
+0.17   Mon Feb 12 04:15:02 UTC 2018
+    * Added tests for colormap_names().
+
 0.16   Sun Feb 4 04:13:12 UTC 2017
     * Updated pod wih references to show_colormap scripts.
     * Show all available colormaps.

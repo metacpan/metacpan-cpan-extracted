@@ -4,36 +4,21 @@ use warnings;
 use utf8;
 use 5.008001;
 
-use version;
-use CPAN::Meta;
-use Getopt::Long;
-use CPAN::Meta::Requirements ();
-use File::Find qw(find);
-use Module::CoreList;
-use Module::CPANfile;
-use File::Spec;
+use Getopt::Long ();
 use File::Basename ();
-use Module::Metadata;
-use Perl::PrereqScanner::Lite;
+use Module::CPANfile ();
 
-our $VERSION = '1.03';
-
-sub debugf {
-    if ($ENV{SCAN_PREREQS_CPANFILE_DEBUG}) {
-        require Data::Dumper;
-        my $format = shift;
-        no warnings 'once';
-        local $Data::Dumper::Terse  = 1;
-        local $Data::Dumper::Indent = 0;
-        my $txt = sprintf($format, map { defined($_) ? Data::Dumper::Dumper($_) : '-' } @_);
-        print $txt, "\n";
-    }
-}
+use App::scan_prereqs_cpanfile qw(
+    debugf find_perl_files scan_inner_packages scan scan_test_requires load_diff_src
+);
 
 my $version;
 my $diff;
 my $include_empty;
 my $scan_test_requires;
+my $dir = ".";
+my $ignorefile;
+my $ignore_regexp;
 my @ignore = qw(eg examples share fatlib _build .git blib local .build);
 my $add_ignore;
 my $p = Getopt::Long::Parser->new(
@@ -43,19 +28,31 @@ $p->getoptions(
     'version!'       => \$version,
     'diff=s'         => \$diff,
     'ignore=s'       => \$add_ignore,
+    'ignore-file=s'    => \$ignorefile,
     'include-empty!' => \$include_empty,
     'scan-test-requires' => \$scan_test_requires,
+    'dir=s'          => \$dir,
 );
 push @ignore, split /,/,$add_ignore if $add_ignore;
+
+if ($ignorefile) {
+    ! -r $ignorefile && die "Unable to read ignore-file '$ignorefile' !" ;
+    open my $fh, '<', $ignorefile;
+    chomp(my @lines = <$fh>);
+    $ignore_regexp = join '|', @lines;
+    close $fh;
+}
+
 if ($version) {
-    printf "%s %s\n", File::Basename::basename($0), $VERSION;
+    printf "%s %s\n",
+        File::Basename::basename($0),
+        $App::scan_prereqs_cpanfile::VERSION;
     exit 0;
 }
 
-&main; exit;
 
-sub main {
-    my ($runtime_files, $test_files, $configure_files, $develop_files) = find_perl_files();
+{
+    my ($runtime_files, $test_files, $configure_files, $develop_files) = find_perl_files($dir, ignore => \@ignore, ignore_regexp => $ignore_regexp);
     debugf($develop_files);
 
     my @inner_packages = scan_inner_packages(@$test_files, @$runtime_files, @$configure_files, @$develop_files);
@@ -74,7 +71,7 @@ sub main {
     my $develop_prereqs = scan($develop_files, \@inner_packages, $meta_prereqs, [qw(develop test runtime)], 'develop', +{ %{$runtime_prereqs||{}}, %{$test_prereqs||{}}});
 
     if ($scan_test_requires) {
-        $develop_prereqs = scan_test_requires($develop_prereqs);
+        $develop_prereqs = scan_test_requires($dir, $develop_prereqs);
     }
 
     print Module::CPANfile->from_prereqs(
@@ -95,207 +92,6 @@ sub main {
     )->to_string($include_empty);
 }
 
-sub scan {
-    my ($files, $inner_packages, $meta_prereqs, $prereq_types, $type, $optional_prereqs) = @_;
-
-    my $prereqs = scan_files(@$files);
-
-    # Remove internal packages.
-    remove_prereqs($prereqs, +{ map { $_ => 1 } @$inner_packages });
-
-    # Remove from meta
-    for my $type (@$prereq_types) {
-        remove_prereqs($prereqs, $meta_prereqs->{$type}->{requires});
-        remove_prereqs($prereqs, $meta_prereqs->{$type}->{recommends});
-    }
-
-    # Runtime prereqs.
-    if ($optional_prereqs) {
-        remove_prereqs($prereqs, $optional_prereqs);
-    }
-
-    # Remove core modules.
-    my $perl_version = $meta_prereqs->{perl} || '5.008001';
-    remove_prereqs($prereqs, blead_corelist($perl_version));
-
-    return $prereqs;
-}
-
-sub scan_inner_packages {
-    my @files = @_;
-    my %uniq;
-    my @list;
-    for my $file (@files) {
-        push @list, grep { !$uniq{$_}++ } Module::Metadata->new_from_file($file)->packages_inside();
-    }
-    return @list;
-}
-
-sub scan_files {
-    my @files = @_;
-
-    my $combined = CPAN::Meta::Requirements->new;
-    for my $file (@files) {
-        debugf("Reading %s", $file);
-
-        my $scanner = Perl::PrereqScanner::Lite->new;
-        $scanner->add_extra_scanner('Moose');
-        my $prereqs = $scanner->scan_file($file);
-        $combined->add_requirements($prereqs);
-    }
-    my $prereqs = $combined->as_string_hash;
-}
-
-sub blead_corelist {
-    my $perl_version = shift;
-    my %corelist = %{$Module::CoreList::version{$perl_version}};
-    for my $module (keys %corelist) {
-        my $upstream = $Module::CoreList::upstream{$module};
-        if ($upstream && $upstream eq 'cpan') {
-            delete $corelist{$module};
-        }
-    }
-    return \%corelist;
-}
-
-sub remove_prereqs {
-    my ($prereqs, $allowed) = @_;
-    return unless $allowed;
-
-    for my $module (keys %$allowed) {
-        if (exists $allowed->{$module}) {
-            if (parse_version($allowed->{$module}) >= parse_version($prereqs->{$module})) {
-                debugf("Core: %s %s >= %s", $module, $allowed->{$module}, $prereqs->{$module});
-                delete $prereqs->{$module}
-            }
-        }
-    }
-}
-
-sub parse_version {
-    my $v = shift;
-    return version->parse(0) unless defined $v;
-    return version->parse(''.$v);
-}
-
-sub load_diff_src {
-    my $src = shift;
-    if (File::Basename::basename($src) eq 'cpanfile') {
-        return Module::CPANfile->load($src)->prereq_specs;
-    } elsif ($src =~ /\.(yml|json)$/) {
-        my $meta = CPAN::Meta->load_file($src);
-        my $meta_prereqs = CPAN::Meta::Prereqs->new($meta->prereqs)->as_string_hash;
-        return $meta_prereqs;
-    } else {
-        die "No META.json and cpanfile\n";
-    }
-}
-
-sub read_from_file {
-    my ($fname, $length) = @_;
-    return q{} if !-f $fname;
-    open my $fh, '<', $fname
-        or Carp::croak("Can't open '$fname' for reading: '$!'");
-    my $buf;
-    read $fh, $buf, $length;
-    return $buf;
-}
-
-sub find_perl_files {
-    my (@runtime_files, @test_files, @configure_files, @develop_files);
-    find(
-        {
-            no_chdir => 1,
-            wanted   => sub {
-                return if $_ eq '.';
-                return if -S $_; # Ignore UNIX socket
-
-                # Ignore files.
-                my (undef, $topdir, ) = File::Spec->splitdir($_);
-                my $basename = File::Basename::basename($_);
-                return if $basename eq 'Build';
-
-                # Ignore build dir like Dist-Name-0.01/.
-                return if -f "$topdir/META.json";
-
-                for my $ignored (@ignore) {
-                    return if $topdir eq $ignored;
-                }
-
-                if ($basename eq 'Build.PL' || $basename eq 'Makefile.PL') {
-                    push @configure_files, $_
-                } elsif ($topdir eq 't') {
-                    if (/\.(pl|pm|psgi|t)$/) {
-                        if ($basename =~ /^(?:author|release)-/) {
-                            # dzil creates author test files to t/author-XXX.t
-                            push @develop_files, $_
-                        } else {
-                            push @test_files, $_
-                        }
-                    }
-                } elsif ($topdir eq 'xt' || $topdir eq 'author' || $topdir eq 'benchmark') {
-                    if (/\.(pl|pm|psgi|t)$/) {
-                        push @develop_files, $_
-                    }
-                } else {
-                    if (/\.(pl|pm|psgi)$/) {
-                        push @runtime_files, $_
-                    } else {
-                        my $header = read_from_file($_, 1024);
-                        if ($header && $header =~ /^#!.*perl/) {
-                            # Skip fatpacked file.
-                            if ($header =~ /This chunk of stuff was generated by App::FatPacker./) {
-                                debugf("fatpacked %s", $_);
-                                return;
-                            }
-
-                            push @runtime_files, $_
-                        }
-                    }
-                }
-            }
-        },
-        '.'
-    );
-    return (\@runtime_files, \@test_files, \@configure_files, \@develop_files);
-}
-
-sub scan_test_requires {
-    my $develop_prereqs = shift;
-
-    require Test::Requires::Scanner;
-
-    my @test_files;
-    find(
-        {
-            no_chdir => 1,
-            wanted   => sub {
-                return if $_ eq '.';
-                return if -S $_; # Ignore UNIX socket
-
-                my (undef, $topdir, ) = File::Spec->splitdir($_);
-                if (($topdir eq 'xt' || $topdir eq 't') && /\.t$/ ) {
-                    push @test_files, $_
-                }
-            },
-        },
-        '.'
-    );
-    my $test_requires_prereqs = Test::Requires::Scanner->scan_files(@test_files);
-
-    for my $module (keys %$test_requires_prereqs) {
-        my $version = $test_requires_prereqs->{$module};
-
-        if (! exists $develop_prereqs->{$module} ||
-            parse_version($version) > parse_version($develop_prereqs->{$module})
-        ) {
-            $develop_prereqs->{$module} = $version || 0;
-        }
-    }
-
-    return $develop_prereqs;
-}
-
 __END__
 
 =head1 NAME
@@ -308,7 +104,9 @@ scan-prereqs-cpanfile - Scan prerequisite modules and generate CPANfile
 
         --diff=META.json      # Generate diff from META.json
         --diff=cpanfile       # Generate diff from cpanfile
-        --ignore=extlib/
+        --ignore=extlib
+        --dir=/foo/bar
+        --scan-test-requires
 
 =head1 DESCRIPTION
 
@@ -343,9 +141,15 @@ With this option, scan-prereqs-cpanfile displays missing prerequisite modules on
 
 =item --ignore
 
-    --ignore=tools/
+    --ignore=tools,extlib
 
 Ignore some directories.
+
+=item --ignore-file
+
+    --ignore-file=ignored.regex
+
+Ignore all files and directories matching a regex pattern listed in this file.
 
 =item --include-empty
 
@@ -357,9 +161,15 @@ By default, phases without any prereqs are not dumped, By giving this option, cp
 
 Defaults to false.
 
-=item --scan-test-requires (EXPERIMENTAL)
+=item --scan-test-requires
 
 Scan test files and include the modules specified by L<Test::Requires> as 'develop' requires.
+
+=item --dir
+
+    --dir=DIRECTORY
+
+Scan for modules in DIRECTORY (instead of '.') 
 
 =back
 

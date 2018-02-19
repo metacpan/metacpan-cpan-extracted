@@ -2,7 +2,7 @@ package Test2::AsyncSubtest::Hub;
 use strict;
 use warnings;
 
-our $VERSION = '0.000097';
+our $VERSION = '0.000100';
 
 use base 'Test2::Hub::Subtest';
 use Test2::Util::HashBase qw/ast_ids/;
@@ -14,14 +14,7 @@ sub init {
 
     if (my $format = $self->format) {
         my $hide = $format->can('hide_buffered') ? $format->hide_buffered : 1;
-
-        if ($hide) {
-            $self->format(undef);
-        }
-        else {
-            require Test2::AsyncSubtest::Formatter;
-            $self->format(Test2::AsyncSubtest::Formatter->new(wrap => $format));
-        }
+        $self->format(undef) if $hide;
     }
 }
 

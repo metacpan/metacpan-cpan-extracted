@@ -1,5 +1,5 @@
 #perl Makefile.PL;make;perl -Iblib/lib t/08_eta.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 6;
 eta(1,100);
 #warn serialize(\%Acme::Tools::Eta,'Eta','',1);

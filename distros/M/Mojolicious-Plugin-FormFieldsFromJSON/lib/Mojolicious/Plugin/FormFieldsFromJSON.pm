@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # ABSTRACT: create form fields based on a definition in a JSON file
 
-our $VERSION = '0.32';
+our $VERSION = '1.00';
 
 use Carp;
 use File::Basename;
@@ -81,7 +81,7 @@ sub register {
             my ($c, $file, $params) = @_;
 
             if ( !$configs{$file} ) {
-                $c->form_fields( $file, only_load => 1 );
+                $self->_load_config_from_file($c, \%configs, $file);
             }
 
             my @fields;
@@ -107,7 +107,7 @@ sub register {
             return '' if !$file;
   
             if ( !$configs{$file} ) {
-                $c->form_fields( $file, only_load => 1 );
+                $self->_load_config_from_file($c, \%configs, $file);
             }
   
             return '' if !$configs{$file};
@@ -200,122 +200,160 @@ sub register {
             return %errors;
         }
     );
-  
+
     $app->helper(
         'form_fields' => sub {
             my ($c, $file, %params) = @_;
-  
-            return '' if !$file;
-  
-            if ( !$configs{$file} && !ref $file ) {
-                my $path;
 
-                # search until first match
-                my $i=0;
-                do {
-                    my $_path= File::Spec->catfile( $self->dir->[$i], $file . '.json' );
-                    $path = $_path if -r $_path;
-                } while ( not defined $path and ++$i <= $#{$self->dir} );
-							
-                if( not defined $path){
-                    $app->log->error( "FORMFIELDS $file: not found in directories" );
-                    $app->log->error( "  $_") for @{$self->dir};
-                    return '';
-                }
- 
-                eval {
-                    my $content     = Mojo::Asset::File->new( path => $path )->slurp;
-                    $configs{$file} = decode_json $content;
-                } or do {
-                    $app->log->error( "FORMFIELDS $file: $@" );
-                    return '';
-                };
-  
-                if ( 'ARRAY' ne ref $configs{$file} ) {
-                    $app->log->error( 'Definition JSON must be an ARRAY' );
-                    return '';
-                }
-            }
- 
-            return if $params{only_load}; 
+            # get form config
+            return '' if !$self->_load_config_from_file($c, \%configs, $file);
             return '' if !$configs{$file} && !ref $file;
-  
             my $field_config = $configs{$file} || $file;
 
             my @fields;
-  
+
             FIELD:
             for my $field ( @{ $field_config } ) {
-                if ( 'HASH' ne ref $field ) {
-                    $app->log->error( 'Field definition must be an HASH - skipping field' );
-                    next FIELD;
+                my $field_content = $self->_build_form_field($c, $field, \%params, $config, \%valid_types);
+
+                if (length $field_content) {
+                    push @fields, $field_content;
                 }
-  
-                my $type      = lc $field->{type};
-                my $orig_type = $type;
-
-                if ( $config->{alias} && $config->{alias}->{$type} ) {
-                    $type = $config->{alias}->{$type};
-                }
-  
-                if ( !$valid_types{$type} ) {
-                    $app->log->warn( "Invalid field type $type - falling back to 'text'" );
-                    $type = 'text';
-                }
-
-                if ( $config->{global_attributes} && $type ne 'hidden' && 'HASH' eq ref $config->{global_attributes} ) {
-
-                    ATTRIBUTE:
-                    for my $attribute ( keys %{ $config->{global_attributes} } ) {
-                        $field->{attributes}->{$attribute} //= '';
-
-                        my $field_attr  = $field->{attributes}->{$attribute};
-                        my $global_attr = $config->{global_attributes}->{$attribute};
-
-                        next ATTRIBUTE if $field_attr =~ m{\Q$global_attr};
-
-                        my $space = length $field_attr ? ' ' : '';
-
-                        $field->{attributes}->{$attribute}  .= $space . $global_attr;
-                    }
-                }
-
-                if ( $field->{translate_sublabels} && $config->{translation_method} && !$field->{translation_method} ) {
-                    $field->{translation_method} = $config->{translation_method};
-                }
-
-                my $sub        = $self->can( '_' . $type );
-                my $form_field = $self->$sub( $c, $field, %params );
-
-                $form_field = Mojo::ByteStream->new( $form_field );
-
-                my $template = $field->{template} // $config->{templates}->{$orig_type} // $config->{template};
-                if ( $template && $type ne 'hidden' ) {
-                    my $label = $field->{label} // '';
-                    my $loc   = $config->{translation_method};
-
-                    if ( $config->{translate_labels} && $loc && 'CODE' eq ref $loc ) {
-                        $label = $loc->($c, $label);
-                    }
-
-                    $form_field = Mojo::ByteStream->new(
-                        $c->render_to_string(
-                            inline  => $template,
-                            id      => $field->{id} // $field->{name} // $field->{label} // '',
-                            label   => $label,
-                            field   => $form_field,
-                            message => $field->{msg}  // '',
-                            info    => $field->{info} // '',
-                        )
-                    );
-                }
-
-                push @fields, $form_field;
             }
 
             return Mojo::ByteStream->new( join "\n\n", @fields );
         }
     );
+
+    $app->helper(
+        'form_field_by_name' => sub {
+            my ($c, $file, $field_name, %params) = @_;
+
+            # get form config
+            return '' if !$self->_load_config_from_file($c, \%configs, $file);
+            return '' if !$configs{$file} && !ref $file;
+            my $field_config = $configs{$file} || $file;
+
+            # find field config
+            my @fields_filtered = grep {
+                $_->{name} eq $field_name
+            } @{ $field_config };
+
+            return '' if !(scalar @fields_filtered);
+
+            return $self->_build_form_field($c, $fields_filtered[0], \%params, $config, \%valid_types);
+        }
+    );
+}
+
+sub _load_config_from_file {
+    my ($self, $c, $configs, $file) = @_;
+
+    return 0 if !$file;
+
+    if ( !$configs->{$file} && !ref $file ) {
+        my $path;
+
+        # search until first match
+        my $i=0;
+        do {
+            my $_path= File::Spec->catfile( $self->dir->[$i], $file . '.json' );
+            $path = $_path if -r $_path;
+        } while ( not defined $path and ++$i <= $#{$self->dir} );
+
+        if( not defined $path){
+            $c->app->log->error( "FORMFIELDS $file: not found in directories" );
+            $c->app->log->error( "  $_") for @{$self->dir};
+            return 0;
+        }
+
+        eval {
+            my $content     = Mojo::Asset::File->new( path => $path )->slurp;
+            $configs->{$file} = decode_json $content;
+        } or do {
+            $c->app->log->error( "FORMFIELDS $file: $@" );
+            return 0;
+        };
+
+        if ( 'ARRAY' ne ref $configs->{$file} ) {
+            $c->app->log->error( 'Definition JSON must be an ARRAY' );
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+sub _build_form_field {
+    my ($self, $c, $field, $params, $plugin_config, $valid_types) = @_;
+
+
+    if ( 'HASH' ne ref $field ) {
+        $c->app->log->error( 'Field definition must be an HASH - skipping field' );
+        return '';
+    }
+
+    my $type      = lc $field->{type};
+    my $orig_type = $type;
+
+    if ( $plugin_config->{alias} && $plugin_config->{alias}->{$type} ) {
+        $type = $plugin_config->{alias}->{$type};
+    }
+
+    if ( !$valid_types->{$type} ) {
+        $c->app->log->warn( "Invalid field type $type - falling back to 'text'" );
+        $type = 'text';
+    }
+
+    if ( $plugin_config->{global_attributes} && $type ne 'hidden' && 'HASH' eq ref $plugin_config->{global_attributes} ) {
+
+        ATTRIBUTE:
+        for my $attribute ( keys %{ $plugin_config->{global_attributes} } ) {
+            $field->{attributes}->{$attribute} //= '';
+
+            my $field_attr  = $field->{attributes}->{$attribute};
+            my $global_attr = $plugin_config->{global_attributes}->{$attribute};
+
+            next ATTRIBUTE if $field_attr =~ m{\Q$global_attr};
+
+            my $space = length $field_attr ? ' ' : '';
+
+            $field->{attributes}->{$attribute}  .= $space . $global_attr;
+        }
+    }
+
+    if ( $field->{translate_sublabels} && $plugin_config->{translation_method} && !$field->{translation_method} ) {
+        $field->{translation_method} = $plugin_config->{translation_method};
+    }
+
+    my $sub        = $self->can( '_' . $type );
+    my $form_field = $self->$sub( $c, $field, %{ $params } );
+
+    $form_field = Mojo::ByteStream->new( $form_field );
+
+    my $template = $field->{template} // $plugin_config->{templates}->{$orig_type} // $plugin_config->{template};
+    if ( $template && $type ne 'hidden' ) {
+        my $label = $field->{label} // '';
+        my $loc   = $plugin_config->{translation_method};
+
+        if ( $plugin_config->{translate_labels} && $loc && 'CODE' eq ref $loc ) {
+            $label = $loc->($c, $label);
+        }
+
+        $form_field = Mojo::ByteStream->new(
+            $c->render_to_string(
+                inline  => $template,
+                id      => $field->{id} // $field->{name} // $field->{label} // '',
+                label   => $label,
+                field   => $form_field,
+                message => $field->{msg}  // '',
+                info    => $field->{info} // '',
+            )
+        );
+#        $c->app->log->debug("rendered formfield: ".$form_field);
+    }
+
+    return $form_field;
 }
 
 sub _hidden {
@@ -353,6 +391,10 @@ sub _select {
     );
 
     my $stash_values = $c->every_param( $name );
+    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
+        my $local_stash = $c->stash( $name );
+        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    }
     my $reset;
     if ( @{ $stash_values || [] } ) {
         $select_params{selected} = $self->_get_highlighted_values(
@@ -527,6 +569,10 @@ sub _radio {
     );
 
     my $stash_values = $c->every_param( $name );
+    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
+        my $local_stash = $c->stash( $name );
+        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    }
     my $reset;
     if ( @{ $stash_values || [] } ) {
         $select_params{selected} = $self->_get_highlighted_values(
@@ -613,6 +659,10 @@ sub _checkbox {
     );
 
     my $stash_values = $c->every_param( $name );
+    if (scalar(@{ $stash_values || [] }) == 0 && defined( $c->stash( $name ))){
+        my $local_stash = $c->stash( $name );
+        $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
+    }
     my $reset;
     if ( @{ $stash_values || [] } ) {
         $select_params{selected} = $self->_get_highlighted_values(
@@ -718,7 +768,7 @@ Mojolicious::Plugin::FormFieldsFromJSON - create form fields based on a definiti
 
 =head1 VERSION
 
-version 0.32
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -731,6 +781,14 @@ version 0.32
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::FormFieldsFromJSON> is a L<Mojolicious> plugin.
+
+=head1 NAME
+
+Mojolicious::Plugin::FormFieldsFromJSON - create form fields based on a definition in a JSON file
+
+=head1 VERSION
+
+version 0.32
 
 =head1 CONFIGURATION
 
@@ -2158,6 +2216,18 @@ As an example, you can see L<Mojolicious::Plugin::FormFieldsFromJSON::Date>.
 =head1 SEE ALSO
 
 L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =head1 AUTHOR
 

@@ -52,11 +52,9 @@ package TestCase {
   set x_int, x_long;
   get x_int, x_long;
   
-  enum {
-    INT_VALUE = 127,
-    FLOAT_PRECICE = 16384.5f,
-    DOUBLE_PRECICE = 65536.5,
-  }
+  sub INT_VALUE : int () { return 127; }
+  sub FLOAT_PRECICE : float () { return 16384.5f; }
+  sub DOUBLE_PRECICE : double () { return 65536.5; }
   
   # Only compile check
   sub eval_block_stack_check : void () {
@@ -101,25 +99,38 @@ package TestCase {
   }
   
   sub pre_inc : int () {
-    my $value_byte = 0y;
-    my $value_short = 0s;
+    my $value_byte = (byte)0;
+    my $value_short = (short)0;
     my $value_int = 0;
     my $value_long = 0L;
+    my $value_float = 0.25f;
+    my $value_double = 0.25;
     
     my $value_byte2 = ++$value_byte;
     my $value_short2 = ++$value_short;
     my $value_int2 = ++$value_int;
     my $value_long2 = ++$value_long;
+    my $value_float2 = ++$value_float;
+    my $value_double2 = ++$value_double;
     
-    if ($value_byte == 1y) {
-      if ($value_byte2 == 1y) {
-        if ($value_short == 1s) {
-          if ($value_short2 == 1s) {
+    
+    if ($value_byte == 1) {
+      if ($value_byte2 == 1) {
+        if ($value_short == 1) {
+          if ($value_short2 == 1) {
             if ($value_int == 1) {
               if ($value_int2 == 1) {
                 if ($value_long == 1L) {
                   if ($value_long2 == 1L) {
-                    return 1;
+                    if ($value_float == 1.25f) {
+                      if ($value_float2 == 1.25f) {
+                        if ($value_double == 1.25) {
+                          if ($value_double2 = 1.25) {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -131,25 +142,37 @@ package TestCase {
   }
 
   sub post_inc : int () {
-    my $value_byte = 0y;
-    my $value_short = 0s;
+    my $value_byte = (byte)0;
+    my $value_short = (short)0;
     my $value_int = 0;
     my $value_long = 0L;
+    my $value_float = 0.25f;
+    my $value_double = 0.25;
     
     my $value_byte2 = $value_byte++;
     my $value_short2 = $value_short++;
     my $value_int2 = $value_int++;
     my $value_long2 = $value_long++;
+    my $value_float2 = $value_float++;
+    my $value_double2 = $value_double++;
     
-    if ($value_byte == 1y) {
-      if ($value_byte2 == 0y) {
-        if ($value_short == 1s) {
-          if ($value_short2 == 0s) {
+    if ($value_byte == 1) {
+      if ($value_byte2 == 0) {
+        if ($value_short == 1) {
+          if ($value_short2 == 0) {
             if ($value_int == 1) {
               if ($value_int2 == 0) {
                 if ($value_long == 1L) {
                   if ($value_long2 == 0L) {
-                    return 1;
+                    if ($value_float == 1.25f) {
+                      if ($value_float2 = 0.25f) {
+                        if ($value_double == 1.25) {
+                          if ($value_double2 == 0.25) {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -161,25 +184,37 @@ package TestCase {
   }
 
   sub pre_dec : int () {
-    my $value_byte = 0y;
-    my $value_short = 0s;
+    my $value_byte = (byte)0;
+    my $value_short = (short)0;
     my $value_int = 0;
     my $value_long = 0L;
+    my $value_float = 0;
+    my $value_double = 0L;
     
     my $value_byte2 = --$value_byte;
     my $value_short2 = --$value_short;
     my $value_int2 = --$value_int;
     my $value_long2 = --$value_long;
+    my $value_float2 = --$value_float;
+    my $value_double2 = --$value_double;
     
-    if ($value_byte == -1y) {
-      if ($value_byte2 == -1y) {
-        if ($value_short == -1s) {
-          if ($value_short2 == -1s) {
+    if ($value_byte == -1) {
+      if ($value_byte2 == -1) {
+        if ($value_short == -1) {
+          if ($value_short2 == -1) {
             if ($value_int == -1) {
               if ($value_int2 == -1) {
                 if ($value_long == -1L) {
                   if ($value_long2 == -1L) {
-                    return 1;
+                    if ($value_float == -1.0f) {
+                      if ($value_float2 == -1.0f) {
+                        if ($value_double == -1.0) {
+                          if ($value_double2 == -1.0) {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -191,25 +226,37 @@ package TestCase {
   }
 
   sub post_dec : int () {
-    my $value_byte = 0y;
-    my $value_short = 0s;
+    my $value_byte = (byte)0;
+    my $value_short = (short)0;
     my $value_int = 0;
     my $value_long = 0L;
+    my $value_float = 1.25f;
+    my $value_double = 1.25;
     
     my $value_byte2 = $value_byte--;
     my $value_short2 = $value_short--;
     my $value_int2 = $value_int--;
     my $value_long2 = $value_long--;
+    my $value_float2 = $value_float--;
+    my $value_double2 = $value_double--;
     
-    if ($value_byte == -1y) {
-      if ($value_byte2 == 0y) {
-        if ($value_short == -1s) {
-          if ($value_short2 == 0s) {
+    if ($value_byte == -1) {
+      if ($value_byte2 == 0) {
+        if ($value_short == -1) {
+          if ($value_short2 == 0) {
             if ($value_int == -1) {
               if ($value_int2 == 0) {
                 if ($value_long == -1L) {
                   if ($value_long2 == 0L) {
-                    return 1;
+                    if ($value_float == 0.25f) {
+                      if ($value_float2 == 1.25f) {
+                        if ($value_double == 0.25) {
+                          if ($value_double2 == 1.25) {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -322,13 +369,13 @@ package TestCase {
     my $test_case : TestCase = undef;
     
     eval {
-      $test_case->{x_byte} = 1y;
+      $test_case->{x_byte} = (byte)1;
     }
     if ($@) {
       return 1;
       
       eval {
-        $test_case->{x_short} = 1s;
+        $test_case->{x_short} = (short)1;
       }
       
       if ($@) {
@@ -470,7 +517,7 @@ package TestCase {
   # SPVM set and get
   sub spvm_set_and_get_byte : int ($nums : byte[]) {
     
-    if ($nums->[0] == 0y) {
+    if ($nums->[0] == 0) {
       if ($nums->[1] == Byte::MAX_VALUE()) {
         return 1;
       }
@@ -480,7 +527,7 @@ package TestCase {
   }
   sub spvm_set_and_get_short : int ($nums : short[]) {
     
-    if ($nums->[0] == 0s) {
+    if ($nums->[0] == 0) {
       if ($nums->[1] == Short::MAX_VALUE()) {
         return 1;
       }
@@ -554,9 +601,9 @@ package TestCase {
   }
 
   sub concat_string_short : String () {
-    "a" . 3s;
+    "a" . (short)3;
     
-    my $value = "a" . 3s;
+    my $value = "a" . (short)3;
     
     return $value;
   }
@@ -603,6 +650,63 @@ package TestCase {
     my $value = "";
     
     return $value;
+  }
+
+  sub assign : int () {
+    # Constant assignment
+    my $success_constant_narrow = 0;
+    {
+      # narrowing constant byte
+      my $value1 : byte = 127;
+      my $value2 : byte = -128;
+      my $value3 = $value1 + $value2;
+      
+      # narrowing constant short
+      my $value4 : short = 32767;
+      my $value5 : short = -32768;
+      my $value6 = $value4 + $value5;
+
+      # narrowing constant int
+      my $value7 : int = 2147483647L;
+      my $value8 : int = -2147483648L;
+      my $value9 = $value7 + $value8;
+      
+      if ($value3 == -1) {
+        if ($value6 == -1) {
+          if ($value9 == -1) {
+            $success_constant_narrow = 1;
+          }
+        }
+      }
+    }
+    
+    # Widning
+    my $success_constant_wide = 0;
+    {
+      my $value1 : short = (byte)127;
+      my $value2 : int = (byte)127;
+      my $value3 : long = (byte)127;
+      my $value4 : float = (byte)127;
+      my $value5 : double = (byte)127;
+      
+      if ($value1 == 127) {
+        if ($value2 == 127) {
+          if ($value3 == 127) {
+            if ($value4 == 127.0f) {
+              if ($value5 = 127.0) {
+                $success_constant_wide = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if ($success_constant_narrow && $success_constant_wide) {
+      return 1;
+    }
+    
+    return 0;
   }
   
   sub special_assign : int () {
@@ -1007,12 +1111,12 @@ package TestCase {
 
   sub spvm_new_object_array_len_element_byte_array : int ($nums : byte[][]) {
     
-    if ($nums->[0][0] == (byte)1) {
-      if ($nums->[0][1] == (byte)2) {
-        if ($nums->[0][2] == (byte)3) {
-          if ($nums->[1][0] == (byte)4) {
-            if ($nums->[1][1] == (byte)5) {
-              if ($nums->[1][2] == (byte)6) {
+    if ($nums->[0][0] == 1) {
+      if ($nums->[0][1] == 2) {
+        if ($nums->[0][2] == 3) {
+          if ($nums->[1][0] == 4) {
+            if ($nums->[1][1] == 5) {
+              if ($nums->[1][2] == 6) {
                 return 1;
               }
             }
@@ -1025,12 +1129,12 @@ package TestCase {
   }
 
   sub spvm_new_object_array_len_element_short_array : int ($nums : short[][]) {
-    if ($nums->[0][0] == (short)1) {
-      if ($nums->[0][1] == (short)2) {
-        if ($nums->[0][2] == (short)3) {
-          if ($nums->[1][0] == (short)4) {
-            if ($nums->[1][1] == (short)5) {
-              if ($nums->[1][2] == (short)6) {
+    if ((int)$nums->[0][0] == (int)(short)1) {
+      if ((int)$nums->[0][1] == (int)(short)2) {
+        if ((int)$nums->[0][2] == (int)(short)3) {
+          if ((int)$nums->[1][0] == (int)(short)4) {
+            if ((int)$nums->[1][1] == (int)(short)5) {
+              if ((int)$nums->[1][2] == (int)(short)6) {
                 return 1;
               }
             }
@@ -1143,30 +1247,31 @@ package TestCase {
   sub exception_zero_divide_int : int () {
     1 / 0;
   }
-  
+
+  # Multiply
   sub divide : int () {
-    my $num1 = 8y / 4y;
-    my $num2 = 8y / 3y;
-    my $num3 = 8s / 4s;
-    my $num4 = 8s / 3s;
-    my $num5 = 8 / 4;
-    my $num6 = 8 / 3;
-    my $num7 = 8L / 4L;
-    my $num8 = 8L / 3L;
-    my $num9 = 1.0f / 2.0f;
-    my $num10 = 1.0 / 2.0;
-    
-    if ($num1 == 2y) {
-      if ($num2 == 2y) {
-        if ($num3 == 2s) {
-          if ($num4 == 2s) {
-            if ($num5 == 2) {
-              if ($num6 == 2) {
-                if ($num7 == 2L) {
-                  if ($num8 == 2L) {
-                    if ($num9 == 0.5f) {
-                      if ($num10 == 0.5) {
-                        return 1;
+    # int
+    my $int_success = 0;
+    {
+      my $value1 : int = 8 / 4;
+      my $value2 : int = (byte)8 / 4;
+      my $value3 : int = 8 / (byte)4;
+      my $value4 : int = (short)8 / 4;
+      my $value5 : int = 8 / (short)4;
+      my $value6 : int = (byte)8 / (byte)4;
+      my $value7 : int = (short)8 / (short)4;
+      my $value8 : int = (byte)8 / (short)4;
+      my $value9 : int = 8 / 3;
+      if ($value1 == 2) {
+        if ($value2 == 2) {
+          if ($value3 == 2) {
+            if ($value4 == 2) {
+              if ($value5 == 2) {
+                if ($value6 == 2) {
+                  if ($value7 == 2) {
+                    if ($value8 == 2) {
+                      if ($value9 == 2) {
+                        $int_success = 1;
                       }
                     }
                   }
@@ -1178,23 +1283,87 @@ package TestCase {
       }
     }
     
+    # float
+    my $float_success = 0;
+    {
+      my $value1 : float = 1.0f / 2.0f;
+      my $value2 : float = (byte)1 / 2.0f;
+      my $value3 : float = 1.0f / (byte)2;
+      my $value4 : float = (short)1 / 2.0f;
+      my $value5 : float = 1.0f / (short)2;
+      my $value6 : float = 1 / 2.0f;
+      my $value7 : float = 1.0f / 2;
+      if ($value1 == 0.5f) {
+        if ($value2 == 0.5f) {
+          if ($value3 == 0.5f) {
+            if ($value4 == 0.5f) {
+              if ($value5 == 0.5f) {
+                if ($value6 == 0.5f) {
+                  if ($value7 == 0.5f) {
+                    $float_success = 1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    # double
+    my $double_success = 0;
+    {
+      my $value1 : double = 1.0 / 2.0;
+      my $value2 : double = (byte)1 / 2.0;
+      my $value3 : double = 1.0 / (byte)2;
+      my $value4 : double = (short)1 / 2.0;
+      my $value5 : double = 1.0 / (short)2;
+      my $value6 : double = 1 / 2.0;
+      my $value7 : double = 1.0 / 2;
+      my $value8 : double = 1.0 / 2.0f;
+      my $value9 : double = 1.0f / 2.0;
+      if ($value1 == 0.5f) {
+        if ($value2 == 0.5f) {
+          if ($value3 == 0.5f) {
+            if ($value4 == 0.5f) {
+              if ($value5 == 0.5f) {
+                if ($value6 == 0.5f) {
+                  if ($value7 == 0.5f) {
+                    if ($value8 == 0.5f) {
+                      if ($value9 == 0.5f) {
+                        $double_success = 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if ($int_success && $float_success && $double_success) {
+      return 1;
+    }
+
     return 0;
   }
-
+  
   sub remainder : int () {
-    my $num1 = 5y % 3y;
-    my $num2 = -3y % 5y;
-    my $num3 = 5s % 3s;
-    my $num4 = -3s % 5s;
+    my $num1 = (byte)((byte)5 % (byte)3);
+    my $num2 = (byte)((byte)-3 % (byte)5);
+    my $num3 = (short)((int)(short)5 % (int)(short)3);
+    my $num4 = (short)((int)(short)-3 % (int)(short)5);
     my $num5 = 5 % 3;
     my $num6 = -3 % 5;
     my $num7 = 5L % 3L;
     my $num8 = -3L % 5L;
     
-    if ($num1 == 2y) {
-      if ($num2 == -3y) {
-        if ($num3 == 2s) {
-          if ($num4 == -3s) {
+    if ($num1 == 2) {
+      if ($num2 == -3) {
+        if ($num3 == 2) {
+          if ($num4 == -3) {
             if ($num5 == 2) {
               if ($num6 == -3) {
                 if ($num7 == 2L) {
@@ -1215,8 +1384,8 @@ package TestCase {
   # Default return value empty
   sub default_return_value_byte : int () {
     
-    if (TestCase::default_return_value_byte_sub() == (byte)0) {
-      if (TestCase::default_return_value_byte_sub_empty() == (byte)0) {
+    if (TestCase::default_return_value_byte_sub() == 0) {
+      if (TestCase::default_return_value_byte_sub_empty() == 0) {
         return 1;
       }
     }
@@ -1231,8 +1400,8 @@ package TestCase {
   }
   sub default_return_value_short : int () {
     
-    if (TestCase::default_return_value_short_sub() == (short)0) {
-      if (TestCase::default_return_value_short_sub_empty() == (short)0) {
+    if ((int)TestCase::default_return_value_short_sub() == (int)(short)0) {
+      if ((int)TestCase::default_return_value_short_sub_empty() == (int)(short)0) {
         return 1;
       }
     }
@@ -1576,7 +1745,7 @@ package TestCase {
   # Object field is initialized zero
   sub object_field_initialized_zero : int () {
     my $obj = new TestCase;
-    if ($obj->{x_byte} == (byte)0) {
+    if ($obj->{x_byte} == 0) {
       if ($obj->{x_int} == 0) {
         if ($obj->{x_string} == undef) {
           return 1;
@@ -1599,8 +1768,8 @@ package TestCase {
     my $minimal = TestCase::Minimal::new();
     $minimal->set_x(3);
     $test_case->{minimal} = $minimal;
-    if ($test_case->{x_byte} == Byte::MAX_VALUE()) {
-      if ($test_case->{x_short} == Short::MAX_VALUE()) {
+    if ((int)$test_case->{x_byte} == (int)Byte::MAX_VALUE()) {
+      if ((int)$test_case->{x_short} == (int)Short::MAX_VALUE()) {
         if ($test_case->{x_int} == Integer::MAX_VALUE()) {
           if ($test_case->{x_long} == Long::MAX_VALUE()) {
             if ($test_case->{x_float} == TestCase::FLOAT_PRECICE()) {
@@ -1639,8 +1808,8 @@ package TestCase {
     $test_case->{x_double} = TestCase::DOUBLE_PRECICE();
     $test_case->{minimal} = $minimal;
 
-    if ($test_case->{x_byte} == Byte::MAX_VALUE()) {
-      if ($test_case->{x_short} == Short::MAX_VALUE()) {
+    if ((int)$test_case->{x_byte} == (int)Byte::MAX_VALUE()) {
+      if ((int)$test_case->{x_short} == (int)Short::MAX_VALUE()) {
         if ($test_case->{x_int} == Integer::MAX_VALUE()) {
           if ($test_case->{x_long} == Long::MAX_VALUE()) {
             if ($test_case->{x_float} == TestCase::FLOAT_PRECICE()) {
@@ -1672,10 +1841,10 @@ package TestCase {
     my $values_float = new float[1000000];
     my $values_double = new double[1000000];
     my $values_object = new TestCase[1000000];
-    if ($values_byte->[0] == 0y) {
-      if ($values_byte->[999999] == 0y) {
-        if ($values_short->[0] == 0s) {
-          if ($values_short->[999999] == 0s) {
+    if ($values_byte->[0] == 0) {
+      if ($values_byte->[999999] == 0) {
+        if ($values_short->[0] == 0) {
+          if ($values_short->[999999] == 0) {
             if ($values_int->[0] == 0) {
               if ($values_int->[999999] == 0) {
                 if ($values_long->[0] == 0L) {
@@ -1709,10 +1878,10 @@ package TestCase {
     my $values_float = new float[10];
     my $values_double = new double[10];
     my $values_object = new TestCase[10];
-    if ($values_byte->[0] == 0y) {
-      if ($values_byte->[9] == 0y) {
-        if ($values_short->[0] == 0s) {
-          if ($values_short->[9] == 0s) {
+    if ($values_byte->[0] == 0) {
+      if ($values_byte->[9] == 0) {
+        if ($values_short->[0] == 0) {
+          if ($values_short->[9] == 0) {
             if ($values_int->[0] == 0) {
               if ($values_int->[9] == 0) {
                 if ($values_long->[0] == 0L) {
@@ -1739,10 +1908,10 @@ package TestCase {
     return 0;
   }
   sub array_init_byte : int () {
-    my $nums = new byte[] {1y, 2y, Byte::MAX_VALUE()};
+    my $nums = new byte[] {(byte)1, (byte)2, Byte::MAX_VALUE()};
     
-    if ($nums->[0] == 1y) {
-      if ($nums->[1] == 2y) {
+    if ($nums->[0] == 1) {
+      if ($nums->[1] == 2) {
         if ($nums->[2] == Byte::MAX_VALUE()) {
           return 1;
         }
@@ -1751,11 +1920,11 @@ package TestCase {
     return 0;
   }
   sub array_init_short : int () {
-    my $nums = new short[] {1s, 2s, 3s};
+    my $nums = new short[] {(short)1, (short)2, (short)3};
     
-    if ($nums->[0] == 1s) {
-      if ($nums->[1] == 2s) {
-        if ($nums->[2] == 3s) {
+    if ((int)$nums->[0] == (int)(short)1) {
+      if ((int)$nums->[1] == (int)(short)2) {
+        if ((int)$nums->[2] == (int)(short)3) {
           return 1;
         }
       }
@@ -1834,58 +2003,6 @@ package TestCase {
   }
 
   enum {
-    BYTE_ZERO = 0y,
-    BYTE_ONE,
-    BYTE_THREE = 3y,
-    BYTE_FOUR,
-    BYTE_SIX = 6y,
-    BYTE_MINUS_MAX = -128y
-  }
-  sub enum_byte  : int () {
-    if (TestCase::BYTE_ZERO() == (byte)0) {
-      if (TestCase::BYTE_ONE() == (byte)1) {
-        if (TestCase::BYTE_THREE() == (byte)3) {
-          if (TestCase::BYTE_FOUR() == (byte)4) {
-            if (TestCase::BYTE_SIX() == (byte)6) {
-              if (TestCase::BYTE_MINUS_MAX() == (byte)-128) {
-                return 1;
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-
-  enum {
-    SHORT_ZERO = 0s,
-    SHORT_ONE,
-    SHORT_THREE = 3s,
-    SHORT_FOUR,
-    SHORT_SIX = 6s,
-    SHORT_MINUS_MAX = -32768s
-  }
-  sub enum_short  : int () {
-    if (TestCase::SHORT_ZERO() == (short)0) {
-      if (TestCase::SHORT_ONE() == (short)1) {
-        if (TestCase::SHORT_THREE() == (short)3) {
-          if (TestCase::SHORT_FOUR() == (short)4) {
-            if (TestCase::SHORT_SIX() == (short)6) {
-              if (TestCase::SHORT_MINUS_MAX() == (short)-32768) {
-                return 1;
-              }
-            }
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-
-  enum {
     INT_ZERO,
     INT_ONE,
     INT_THREE = 3,
@@ -1912,74 +2029,11 @@ package TestCase {
     return 0;
   }
   
-  enum {
-    LONG_ZERO = 0L,
-    LONG_ONE,
-    LONG_THREE = 3L,
-    LONG_MINUS_MAX = -9223372036854775808L
-  }
-  
-  sub enum_long  : int () {
-    if (TestCase::LONG_ZERO() == 0L) {
-      if (TestCase::LONG_ONE() == 1L) {
-        if (TestCase::LONG_THREE() == 3L) {
-          if (TestCase::LONG_MINUS_MAX() == -9223372036854775808L) {
-            return 1;
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-  
-  enum {
-    FLOAT_ZERO = 0.25f,
-    FLOAT_ONE = 1.0f,
-    FLOAT_THREE = 2.5f,
-    FLOAT_MINUS_ZERO = -0.25f
-  }
-
-  sub enum_float  : int () {
-    if (TestCase::FLOAT_ZERO() == 0.25f) {
-      if (TestCase::FLOAT_ONE() == 1.0f) {
-        if (TestCase::FLOAT_THREE() == 2.5f) {
-          if (TestCase::FLOAT_MINUS_ZERO() == -0.25f) {
-            return 1;
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-
-  enum {
-    DOUBLE_ZERO = 0.25,
-    DOUBLE_ONE = 1.0,
-    DOUBLE_THREE = 2.5,
-    DOUBLE_MINUS_ZERO = -0.25
-  }
-
-  sub enum_double  : int () {
-    if (TestCase::DOUBLE_ZERO() == 0.25) {
-      if (TestCase::DOUBLE_ONE() == 1.0) {
-        if (TestCase::DOUBLE_THREE() == 2.5) {
-          if (TestCase::DOUBLE_MINUS_ZERO() == -0.25) {
-            return 1;
-          }
-        }
-      }
-    }
-    
-    return 0;
-  }
-
   # Convert type - floating point narrowing convertion
   sub convert_float_to_byte : int () {
     my $value = (byte)127.1f;
     
-    if ($value == (byte)127) {
+    if ($value == 127) {
       return 1;
     }
     
@@ -1988,7 +2042,7 @@ package TestCase {
   sub convert_float_to_short : int () {
     my $value = (short)32767.1f;
     
-    if ($value == (short)32767) {
+    if ($value == 32767) {
       return 1;
     }
     
@@ -2015,7 +2069,7 @@ package TestCase {
   sub convert_double_to_byte : int () {
     my $value = (byte)127.1;
     
-    if ($value == (byte)127) {
+    if ($value == 127) {
       return 1;
     }
     
@@ -2024,7 +2078,7 @@ package TestCase {
   sub convert_double_to_short : int () {
     my $value = (short)32767.1;
     
-    if ($value == (short)32767) {
+    if ((int)$value == (int)(short)32767) {
       return 1;
     }
     
@@ -2144,7 +2198,7 @@ package TestCase {
   sub convert_byte_to_short_plus : int () {
     my $value = (short)(byte)0x7F;
     
-    if ($value == (short)0x007F) {
+    if ((int)$value == (int)(short)0x007F) {
       return 1;
     }
     
@@ -2153,7 +2207,7 @@ package TestCase {
   sub convert_byte_to_short_minus : int () {
     my $value = (short)(byte)0xFF;
     
-    if ($value == (short)0xFFFF) {
+    if ((int)$value == (int)(short)0xFFFF) {
       return 1;
     }
     
@@ -2272,7 +2326,7 @@ package TestCase {
   sub convert_short_to_short : int () {
     my $value = (short)(short)0xFFFF;
     
-    if ($value == (short)0xFFFF) {
+    if ((int)$value == (int)(short)0xFFFF) {
       return 1;
     }
     
@@ -2319,7 +2373,7 @@ package TestCase {
   sub convert_long_to_short : int () {
     my $value = (short)0xFFFFFFFFFFFFFFFFL;
     
-    if ($value == (short)0xFFFF) {
+    if ((int)$value == (int)(short)0xFFFF) {
       return 1;
     }
     
@@ -2328,7 +2382,7 @@ package TestCase {
   sub convert_long_to_byte : int () {
     my $value = (byte)0xFFFFFFFFFFFFFFFFL;
     
-    if ($value == (byte)0xFF) {
+    if ((int)$value == (int)(byte)0xFF) {
       return 1;
     }
     
@@ -2337,7 +2391,7 @@ package TestCase {
   sub convert_int_to_short : int () {
     my $value = (short)0xFFFFFFFF;
     
-    if ($value == (short)0xFFFF) {
+    if ((int)$value == (int)(short)0xFFFF) {
       return 1;
     }
     
@@ -2346,7 +2400,7 @@ package TestCase {
   sub convert_int_to_byte : int () {
     my $value = (byte)0xFFFFFFFF;
     
-    if ($value == (byte)0xFF) {
+    if ((int)$value == (int)(byte)0xFF) {
       return 1;
     }
     
@@ -2355,7 +2409,7 @@ package TestCase {
   sub convert_short_to_byte : int () {
     my $value = (byte)(short)0xFFFF;
     
-    if ($value == (byte)0xFF) {
+    if ((int)$value == (int)(byte)0xFF) {
       return 1;
     }
     
@@ -2372,9 +2426,9 @@ package TestCase {
       if ($nums->[0] == 2147483647) {
         if ($nums->[1] == 2147483647) {
           # abc
-          if ($values->[0] == (byte)97) {
-            if ($values->[1] == (byte)98) {
-              if ($values->[2] == (byte)99) {
+          if ($values->[0] == 97) {
+            if ($values->[1] == 98) {
+              if ($values->[2] == 99) {
                 if (@$values == 3) {
                   return 1;
                 }
@@ -2389,8 +2443,8 @@ package TestCase {
   }
 
   sub spvm_object_set : int ($obj : TestCase) {
-    if ($obj->{x_byte} == (byte)127) {
-      if ($obj->{x_short} == (short)32767) {
+    if ($obj->{x_byte} == 127) {
+      if ($obj->{x_short} == 32767) {
         if ($obj->{x_int} == 2147483647) {
           if ($obj->{x_long} == 9223372036854775807L) {
             if ($obj->{x_float} == TestCase::FLOAT_PRECICE()) {
@@ -2501,9 +2555,9 @@ package TestCase {
   }
   sub call_sub_return_byte_array_check : int ($nums : byte[]) {
     
-    if ($nums->[0] == (byte)1) {
-      if ($nums->[1] == (byte)2) {
-        if ($nums->[2] == (byte)3) {
+    if ($nums->[0] == 1) {
+      if ($nums->[1] == 2) {
+        if ($nums->[2] == 3) {
           if (@$nums == 3) {
             return 1;
           }
@@ -2525,9 +2579,9 @@ package TestCase {
   }
   sub call_sub_return_short_array_check : int ($nums : short[]) {
     
-    if ($nums->[0] == (short)1) {
-      if ($nums->[1] == (short)2) {
-        if ($nums->[2] == (short)3) {
+    if ((int)$nums->[0] == (int)(short)1) {
+      if ((int)$nums->[1] == (int)(short)2) {
+        if ((int)$nums->[2] == (int)(short)3) {
           if (@$nums == 3) {
             return 1;
           }
@@ -2636,22 +2690,22 @@ package TestCase {
   
   # Negate
   sub negate : int () {
-    my $num_byte = 1y;
-    my $num_short = 1s;
+    my $num_byte = (byte)1;
+    my $num_short = (short)1;
     my $num_int = 1;
     my $num_long = 1L;
     my $num_float = 1f;
     my $num_double = 1d;
     
-    my $num_byte_negate = -$num_byte;
-    my $num_short_negate = -$num_short;
+    my $num_byte_negate : int = -$num_byte;
+    my $num_short_negate : int = -$num_short;
     my $num_int_negate = -$num_int;
     my $num_long_negate = -$num_long;
     my $num_float_negate = -$num_float;
     my $num_double_negate = -$num_double;
     
-    if ($num_byte_negate == -1y) {
-      if ($num_short_negate == -1s) {
+    if ($num_byte_negate == -1) {
+      if ($num_short_negate == -1) {
         if ($num_int_negate == -1) {
           if ($num_long_negate == -1L) {
             if ($num_float_negate == -1f) {
@@ -2667,20 +2721,53 @@ package TestCase {
     return 0;
   }
 
+  # Negate
+  sub plus : int () {
+    my $num_byte = (byte)1;
+    my $num_short = (short)1;
+    my $num_int = 1;
+    my $num_long = 1L;
+    my $num_float = 1f;
+    my $num_double = 1d;
+    
+    my $num_byte_plus : int = +$num_byte;
+    my $num_short_plus : int = +$num_short;
+    my $num_int_plus = +$num_int;
+    my $num_long_plus = +$num_long;
+    my $num_float_plus = +$num_float;
+    my $num_double_plus = +$num_double;
+    
+    if ($num_byte_plus == 1) {
+      if ($num_short_plus == 1) {
+        if ($num_int_plus == 1) {
+          if ($num_long_plus == 1L) {
+            if ($num_float_plus == 1f) {
+              if ($num_double_plus == 1d) {
+                return 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
   # Complement
   sub complement : int () {
-    my $num_byte = 0xF0y;
-    my $num_short = 0xFFF0s;
+    my $num_byte = (byte)0xF0;
+    my $num_short = (short)0xFFF0;
     my $num_int = 0xFFFFFFF0;
     my $num_long = 0xFFFFFFFFFFFFFFF0L;
     
-    my $num_byte_complement = ~$num_byte;
-    my $num_short_complement = ~$num_short;
+    my $num_byte_complement : int = ~$num_byte;
+    my $num_short_complement : int = ~$num_short;
     my $num_int_complement = ~$num_int;
     my $num_long_complement = ~$num_long;
     
-    if ($num_byte_complement == 0xFy) {
-      if ($num_short_complement == 0xFs) {
+    if ($num_byte_complement == (byte)0xF) {
+      if ($num_short_complement == (short)0xF) {
         if ($num_int_complement == 0xF) {
           if ($num_long_complement == 0xFL) {
             return 1;
@@ -2691,32 +2778,107 @@ package TestCase {
     
     return 0;
   }
-  
+
   # Add
-  sub add_byte_max : byte () {
-    return (byte)126 + (byte)1;
-  }
-  
-  sub add_byte_min : byte () {
-    return (byte)-128 + (byte)1;
-  }
-  
-  sub add_byte_overflow : byte () {
-    return (byte)127 + (byte)1;
-  }
-  
-  sub add_short_max : short () {
-    return (short)32766 + (short)1;
-  }
-  
-  sub add_short_min : short () {
-    return (short)-32768 + (short)1;
-  }
-  
-  sub add_short_overflow : short () {
-    return (short)32767 + (short)1;
+  sub add : int () {
+    # int
+    my $int_success = 0;
+    {
+      my $value1 : int = 1 + 2;
+      my $value2 : int = (byte)1 + 3;
+      my $value3 : int = 1 + (byte)4;
+      my $value4 : int = (short)1 + 5;
+      my $value5 : int = 1 + (short)6;
+      my $value6 : int = (byte)1 + (byte)7;
+      my $value7 : int = (short)1 + (short)8;
+      my $value8 : int = (byte)1 + (short)9;
+      if ($value1 == 3) {
+        if ($value2 == 4) {
+          if ($value3 == 5) {
+            if ($value4 == 6) {
+              if ($value5 == 7) {
+                if ($value6 == 8) {
+                  if ($value7 == 9) {
+                    if ($value8 == 10) {
+                      $int_success = 1;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    # float
+    my $float_success = 0;
+    {
+      my $value1 : float = 0.25f + 0.5f;
+      my $value2 : float = (byte)2 + 0.5f;
+      my $value3 : float = 0.5f + (byte)2;
+      my $value4 : float = (short)2 + 0.5f;
+      my $value5 : float = 0.5f + (short)2;
+      my $value6 : float = 2 + 0.5f;
+      my $value7 : float = 0.5f + 2;
+      if ($value1 == 0.75f) {
+        if ($value2 == 2.5f) {
+          if ($value3 == 2.5f) {
+            if ($value4 == 2.5f) {
+              if ($value5 == 2.5f) {
+                if ($value6 == 2.5f) {
+                  if ($value7 == 2.5f) {
+                    $float_success = 1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    # double
+    my $double_success = 0;
+    {
+      my $value1 : double = (byte)2 + 0.5;
+      my $value2 : double = 0.5 + (byte)2;
+      my $value3 : double = (short)2 + 0.5;
+      my $value4 : double = 0.5 + (short)2;
+      my $value5 : double = 2 + 0.5;
+      my $value6 : double = 0.5 + 2;
+      my $value7 : double = 0.5 + 0.25;
+      my $value8 : double = 0.5 + 0.25f;
+      my $value9 : double = 0.25f + 0.5;
+      if ($value1 == 2.5) {
+        if ($value2 == 2.5) {
+          if ($value3 == 2.5) {
+            if ($value4 == 2.5) {
+              if ($value5 == 2.5) {
+                if ($value6 == 2.5) {
+                  if ($value7 == 0.75) {
+                    if ($value8 == 0.75) {
+                      if ($value9 == 0.75) {
+                        $double_success = 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if ($int_success && $float_success && $double_success) {
+      return 1;
+    }
+
+    return 0;
   }
 
+  # Add
   sub add_int_max : int () {
     return (int)2147483646 + (int)1;
   }
@@ -2742,30 +2904,38 @@ package TestCase {
   }
 
   # Subtract
-  sub subtract_byte_max : byte () {
-    return (byte)127 - (byte)1;
-  }
-  
-  sub subtract_byte_min : byte () {
-    return (byte)-127 - (byte)1;
-  }
-  
-  sub subtract_byte_underflow : byte () {
-    return (byte)-128 - (byte)1;
-  }
-  
-  sub subtract_short_max : short () {
-    return (short)32767 - (short)1;
-  }
-  
-  sub subtract_short_min : short () {
-    return (short)-32767 - (short)1;
-  }
-  
-  sub subtract_short_underflow : short () {
-    return (short)-32768 - (short)1;
+  sub subtract : int () {
+    my $value1 : int = 1 - 2;
+    my $value2 : int = (byte)1 - 3;
+    my $value3 : int = 1 - (byte)4;
+    my $value4 : int = (short)1 - 5;
+    my $value5 : int = 1 - (short)6;
+    my $value6 : int = (byte)1 - (byte)7;
+    my $value7 : int = (short)1 - (short)8;
+    my $value8 : int = (byte)1 - (short)9;
+
+    if ($value1 == -1) {
+      if ($value2 == -2) {
+        if ($value3 == -3) {
+          if ($value4 == -4) {
+            if ($value5 == -5) {
+              if ($value6 == -6) {
+                if ($value7 == -7) {
+                  if ($value8 == -8) {
+                    return 1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return 0;
   }
 
+  # Subtract
   sub subtract_int_max : int () {
     return (int)2147483647 - (int)1;
   }
@@ -2791,30 +2961,105 @@ package TestCase {
   }
 
   # Multiply
-  sub multiply_byte_plus : byte () {
-    return (byte)32 * (byte)2;
-  }
-  
-  sub multiply_byte_minus : byte () {
-    return (byte)32 * (byte)-2;
-  }
-  
-  sub multiply_byte_overflow : byte () {
-    return (byte)64 * (byte)2;
-  }
+  sub multiply : int () {
+    # int
+    my $int_success = 0;
+    {
+      my $value1 : int = -2 * 2;
+      my $value2 : int = (byte)-2 * 3;
+      my $value3 : int = -2 * (byte)4;
+      my $value4 : int = (short)-2 * 5;
+      my $value5 : int = -2 * (short)6;
+      my $value6 : int = (byte)-2 * (byte)7;
+      my $value7 : int = (short)-2 * (short)8;
+      my $value8 : int = (byte)-2 * (short)9;
+      if ($value1 == -4) {
+        if ($value2 == -6) {
+          if ($value3 == -8) {
+            if ($value4 == -10) {
+              if ($value5 == -12) {
+                if ($value6 == -14) {
+                  if ($value7 == -16) {
+                    if ($value8 == -18) {
+                      $int_success = 1;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    # float
+    my $float_success = 0;
+    {
+      my $value1 : float = 0.25f * 0.5f;
+      my $value2 : float = (byte)2 * 0.5f;
+      my $value3 : float = 0.5f * (byte)2;
+      my $value4 : float = (short)2 * 0.5f;
+      my $value5 : float = 0.5f * (short)2;
+      my $value6 : float = 2 * 0.5f;
+      my $value7 : float = 0.5f * 2;
+      if ($value1 == 0.125f) {
+        if ($value2 == 1.0f) {
+          if ($value3 == 1.0f) {
+            if ($value4 == 1.0f) {
+              if ($value5 == 1.0f) {
+                if ($value6 == 1.0f) {
+                  if ($value7 == 1.0f) {
+                    $float_success = 1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    # double
+    my $double_success = 0;
+    {
+      my $value1 : double = (byte)2 * 0.5;
+      my $value2 : double = 0.5 * (byte)2;
+      my $value3 : double = (short)2 * 0.5;
+      my $value4 : double = 0.5 * (short)2;
+      my $value5 : double = 2 * 0.5;
+      my $value6 : double = 0.5 * 2;
+      my $value7 : double = 0.5 * 0.25;
+      my $value8 : double = 0.5 * 0.25f;
+      my $value9 : double = 0.25f * 0.5;
+      if ($value1 == 1.0) {
+        if ($value2 == 1.0) {
+          if ($value3 == 1.0) {
+            if ($value4 == 1.0) {
+              if ($value5 == 1.0) {
+                if ($value6 == 1.0) {
+                  if ($value7 == 0.125) {
+                    if ($value8 == 0.125) {
+                      if ($value9 == 0.125) {
+                        $double_success = 1;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    if ($int_success && $float_success && $double_success) {
+      return 1;
+    }
 
-  sub multiply_short_plus : short () {
-    return (short)8192 * (short)2;
+    return 0;
   }
   
-  sub multiply_short_minus : short () {
-    return (short)8192 * (short)-2;
-  }
-  
-  sub multiply_short_overflow : short () {
-    return (short)16384 * (short)2;
-  }
-  
+  # Multiply
   sub multiply_int_plus : int () {
     return (int)536870912 * (int)2;
   }
@@ -2842,9 +3087,9 @@ package TestCase {
   # SPVM Functions
   sub spvm_new_byte_array_string : int ($values : byte[]) {
     
-    if ($values->[0] == (byte)0xE3) {
-      if ($values->[1] == (byte)0x81) {
-        if ($values->[2] == (byte)0x82) {
+    if ((int)$values->[0] == (int)(byte)0xE3) {
+      if ((int)$values->[1] == (int)(byte)0x81) {
+        if ((int)$values->[2] == (int)(byte)0x82) {
           if (@$values == 3) {
             return 1;
           }
@@ -2857,9 +3102,9 @@ package TestCase {
 
   sub spvm_new_byte_array_data : int ($values : byte[]) {
     
-    if ($values->[0] == (byte)97) {
-      if ($values->[1] == (byte)98) {
-        if ($values->[2] == (byte)99) {
+    if ($values->[0] == 97) {
+      if ($values->[1] == 98) {
+        if ($values->[2] == 99) {
            if (@$values == 3) {
              return 1;
            }
@@ -2872,9 +3117,9 @@ package TestCase {
 
   sub spvm_new_byte_array_data_pack : int ($values : byte[]) {
     
-    if ($values->[0] == (byte)97) {
-      if ($values->[1] == (byte)98) {
-        if ($values->[2] == (byte)Byte::MAX_VALUE()) {
+    if ($values->[0] == 97) {
+      if ($values->[1] == 98) {
+        if ($values->[2] == Byte::MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }
@@ -2887,9 +3132,9 @@ package TestCase {
 
   sub spvm_new_short_array_data_pack : int ($values : short[]) {
     
-    if ($values->[0] == (short)97) {
-      if ($values->[1] == (short)98) {
-        if ($values->[2] == (short)Short::MAX_VALUE()) {
+    if ((int)$values->[0] == (int)(short)97) {
+      if ((int)$values->[1] == (int)(short)98) {
+        if ((int)$values->[2] == (int)(short)Short::MAX_VALUE()) {
            if (@$values == 3) {
              return 1;
            }
@@ -2965,7 +3210,7 @@ package TestCase {
     
     my $total = (byte)0;
     for (my $i = 0; $i < @$nums; $i++) {
-      $total = $total + $nums->[$i];
+      $total = (byte)((int)$total + (int)$nums->[$i]);
     }
     
     return $total;
@@ -2976,7 +3221,7 @@ package TestCase {
     
     my $total = (short)0;
     for (my $i = 0; $i < @$nums; $i++) {
-      $total = $total + $nums->[$i];
+      $total = (short)((int)$total + (int)$nums->[$i]);
     }
     
     return $total;
@@ -3237,9 +3482,9 @@ package TestCase {
   
   # call_sub arguments
   sub call_sub_args_byte : int ($var1 : byte, $var2 : byte, $var3 : byte) {
-    if ($var1 == (byte)0) {
-      if ($var2 == (byte)127) {
-        if ($var3 == (byte)-128) {
+    if ($var1 == 0) {
+      if ($var2 == 127) {
+        if ($var3 == -128) {
           return 1;
         }
       }
@@ -3248,9 +3493,9 @@ package TestCase {
     return 0;
   }
   sub call_sub_args_short : int ($var1 : short, $var2 : short, $var3 : short) {
-    if ($var1 == (short)0) {
-      if ($var2 == (short)32767) {
-        if ($var3 == (short)-32768) {
+    if ((int)$var1 == (int)(short)0) {
+      if ((int)$var2 == (int)(short)32767) {
+        if ((int)$var3 == (int)(short)-32768) {
           return 1;
         }
       }
@@ -3284,7 +3529,7 @@ package TestCase {
   
   # If
   sub if_true_byte : int () {
-    if ((byte)1) {
+    if ((int)(byte)1) {
       return 1;
     }
     
@@ -3292,7 +3537,7 @@ package TestCase {
   }
   
   sub if_true_short : int () {
-    if ((short)1) {
+    if ((int)(short)1) {
       return 1;
     }
     
@@ -3340,7 +3585,7 @@ package TestCase {
   }
 
   sub if_false_byte : int () {
-    if ((byte)0) {
+    if ((int)(byte)0) {
       return 0;
     }
     
@@ -3348,7 +3593,7 @@ package TestCase {
   }
   
   sub if_false_short : int () {
-    if ((short)0) {
+    if ((int)(short)0) {
       return 0;
     }
     
@@ -3512,7 +3757,7 @@ package TestCase {
   
   sub if_eq_int_same  : int () {
     
-    if ((int)3 == (int)3) {
+    if (3 == 3) {
       return 1;
     }
     else {
@@ -3522,7 +3767,7 @@ package TestCase {
   
   sub if_eq_int_different  : int () {
     
-    if ((int)3 == (int)2) {
+    if (3 == 2) {
       return 0;
     }
     else {
@@ -3653,7 +3898,7 @@ package TestCase {
   
   sub if_ne_short_same  : int () {
     
-    if ((short)3 != (short)3) {
+    if ((int)(short)3 != (int)(short)3) {
       return 0;
     }
     else {
@@ -3663,7 +3908,7 @@ package TestCase {
   
   sub if_ne_short_different  : int () {
     
-    if ((short)3 != (short)2) {
+    if ((int)(short)3 != (int)(short)2) {
       return 1;
     }
     else {
@@ -3808,7 +4053,7 @@ package TestCase {
 
   sub if_gt_short_left_big  : int () {
     
-    if ((short)3 > (short)1) {
+    if ((int)(short)3 > (int)(short)1) {
       return 1;
     }
     else {
@@ -3818,7 +4063,7 @@ package TestCase {
 
   sub if_gt_short_same  : int () {
     
-    if ((short)3 > (short)3) {
+    if ((int)(short)3 > (int)(short)3) {
       return 0;
     }
     else {
@@ -3828,7 +4073,7 @@ package TestCase {
 
   sub if_gt_short_right_big  : int () {
     
-    if ((short)3 > (short)4) {
+    if ((int)(short)3 > (int)(short)4) {
       return 0;
     }
     else {
@@ -3989,7 +4234,7 @@ package TestCase {
 
   sub if_ge_short_left_big  : int () {
     
-    if ((short)3 >= (short)1) {
+    if ((int)(short)3 >= (int)(short)1) {
       return 1;
     }
     else {
@@ -3999,7 +4244,7 @@ package TestCase {
 
   sub if_ge_short_same  : int () {
     
-    if ((short)3 >= (short)3) {
+    if ((int)(short)3 >= (int)(short)3) {
       return 1;
     }
     else {
@@ -4009,7 +4254,7 @@ package TestCase {
 
   sub if_ge_short_right_big  : int () {
     
-    if ((short)3 >= (short)4) {
+    if ((int)(short)3 >= (int)(short)4) {
       return 0;
     }
     else {
@@ -4170,7 +4415,7 @@ package TestCase {
 
   sub if_lt_short_left_big  : int () {
     
-    if ((short)3 < (short)1) {
+    if ((int)(short)3 < (int)(short)1) {
       return 0;
     }
     else {
@@ -4180,7 +4425,7 @@ package TestCase {
 
   sub if_lt_short_same  : int () {
     
-    if ((short)3 < (short)3) {
+    if ((int)(short)3 < (int)(short)3) {
       return 0;
     }
     else {
@@ -4190,7 +4435,7 @@ package TestCase {
 
   sub if_lt_short_right_big  : int () {
     
-    if ((short)3 < (short)4) {
+    if ((int)(short)3 < (int)(short)4) {
       return 1;
     }
     else {
@@ -4351,7 +4596,7 @@ package TestCase {
 
   sub if_le_short_left_big  : int () {
     
-    if ((short)3 <= (short)1) {
+    if ((int)(short)3 <= (int)(short)1) {
       return 0;
     }
     else {
@@ -4361,7 +4606,7 @@ package TestCase {
 
   sub if_le_short_same  : int () {
     
-    if ((short)3 <= (short)3) {
+    if ((int)(short)3 <= (int)(short)3) {
       return 1;
     }
     else {
@@ -4371,7 +4616,7 @@ package TestCase {
 
   sub if_le_short_right_big  : int () {
     
-    if ((short)3 <= (short)4) {
+    if ((int)(short)3 <= (int)(short)4) {
       return 1;
     }
     else {
@@ -4498,34 +4743,139 @@ package TestCase {
       return 0;
     }
   }
+  
+  sub bit_and : int () {
+    # byte
+    my $byte_success = 0;
+    {
+      my $value1 : int = (byte)0xFF & (byte)0x0F;
+      if ($value1 & 0xFF == 0x0F) {
+        $byte_success = 1;
+      }
+    }
 
-  # Bit shift right logical
-  sub bit_shift_right_logical_byte : int () {
-    # 11000001 >>> 2
-    my $value = (byte)0xC1 >>> 2;
+    # short
+    my $short_success = 0;
+    {
+      my $value1 : int = (short)0xFF00 & (short)0xF0F0;
+      if ($value1 & 0xFFFF == 0xF000) {
+        $short_success = 1;
+      }
+    }
     
-    # 00110000
-    if ($value == (byte)0x30) {
+    # int
+    my $int_success = 0;
+    {
+      my $value1 = 0xFF00 & 0xF0F0;
+      if ($value1 == 0xF000) {
+        $int_success = 1;
+      }
+    }
+    
+    # long
+    my $long_success = 0;
+    {
+      my $value1 = 0xFF00FF00L & 0xF0F0F0F0L;
+      if ($value1 == 0xF000F000L) {
+        $long_success = 1;
+      }
+    }
+    
+    if ($byte_success && $short_success && $int_success && $long_success) {
       return 1;
     }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_right_logical_short : int () {
-    # 11000000 00000001 >>> 2
-    my $value = (short)0xC001 >>> 2;
     
-    # 00110000 00000000
-    if ($value == (short)0x3000) {
+    return 0;
+  }
+
+  sub bit_or : int () {
+    # byte
+    my $byte_success = 0;
+    {
+      my $value1 : int = (byte)0xF0 | (byte)0xFF;
+      if ($value1 & 0xFF == 0xFF) {
+        $byte_success = 1;
+      }
+    }
+
+    # short
+    my $short_success = 0;
+    {
+      my $value1 : int = (short)0xFF00 | (short)0xF0F0;
+      if ($value1 & 0xFFFF == 0xFFF0) {
+        $short_success = 1;
+      }
+    }
+
+    # int
+    my $int_success = 0;
+    {
+      my $value1 = 0xFF00 | 0xF0F0;
+      if ($value1 == 0xFFF0) {
+        $int_success = 1;
+      }
+    }
+    
+    # long
+    my $long_success = 0;
+    {
+      my $value2 = 0xFF00FF00L | 0xF0F0F0F0L;
+      if ($value2 == 0xFFF0FFF0L) {
+        $long_success = 1;
+      }
+    }
+
+    if ($byte_success && $short_success && $int_success && $long_success) {
       return 1;
     }
-    else {
-      return 0;
-    }
+    
+    return 0;
   }
-  
+
+  sub bit_xor : int () {
+    # byte
+    my $byte_success = 0;
+    {
+      my $value1 : int = (byte)0xF0 ^ (byte)0x0F;
+      if ($value1 & 0xFF == 0xFF) {
+        $byte_success = 1;
+      }
+    }
+    
+    # short
+    my $short_success = 0;
+    {
+      my $value1 : int = (short)0xFF00 ^ (short)0xF0F0;
+      if ($value1 & 0xFFFF == 0x0FF0) {
+        $short_success = 1;
+      }
+    }
+    
+    # int
+    my $int_success = 0;
+    {
+      my $value1 = 0xFF00 ^ 0xF0F0;
+      if ($value1 == 0x0FF0) {
+        $int_success = 1;
+      }
+    }
+    
+    # long
+    my $long_success = 0;
+    {
+      my $value1 = 0xFF00FF00L ^ 0xF0F0F0F0L;
+      if ($value1 == 0x0FF00FF0L) {
+        $long_success = 1;
+      }
+    }
+    
+    if ($byte_success && $short_success && $int_success && $long_success) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
   sub bit_shift_right_logical_int : int () {
     # 11000000 00000000 00000000 00000001 >>> 2
     my $value = 0xC0000001 >>> 2;
@@ -4552,33 +4902,6 @@ package TestCase {
     }
   }
 
-  # Bit shift right logical
-  sub bit_shift_right_byte : int () {
-    # 11000001 >> 2
-    my $value = (byte)0xC1 >> 2;
-    
-    # 11110000
-    if ($value == (byte)0xF0) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_right_short : int () {
-    # 11000000 00000001 >> 2
-    my $value = (short)0xC001 >> 2;
-    
-    # 11110000 00000000
-    if ($value == (short)0xF000) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
   sub bit_shift_right_int : int () {
     # 11000000 00000000 00000000 00000001 >> 2
     my $value = 0xC0000001 >> 2;
@@ -4604,23 +4927,29 @@ package TestCase {
       return 0;
     }
   }
-
+  
+  sub literal_character : int () {
+    my $value = 'a';
+    
+    return 1;
+  }
+  
   sub number_literal_specifier : int () {
     my $value1 = 255f;
     my $value2 = 255d;
     my $value3 = 255L;
-    my $value4 = -128y;
-    my $value5 = -32768s;
-    my $value6 = 127y;
-    my $value7 = -128s;
+    my $value4 = (byte)-128;
+    my $value5 = (short)-32768;
+    my $value6 = (byte)127;
+    my $value7 = (short)-128;
     
     if ($value1 == (float)255) {
       if ($value2 == (double)255) {
         if ($value3 == (long)255) {
-          if ($value4 == (byte)-1) {
-            if ($value5 == (short)-1) {
-              if ($value6 == (byte)127) {
-                if ($value7 == (short)32767) {
+          if ($value4 == -1) {
+            if ($value5 == -1) {
+              if ($value6 == 127) {
+                if ($value7 == 32767) {
                   return 1;
                 }
               }
@@ -4646,16 +4975,16 @@ package TestCase {
   
   sub number_literal_hex_specifier : int () {
     my $value3 = 0xFFL;
-    my $value4 = 0xFFy;
-    my $value5 = 0xFFFFs;
-    my $value6 = 0x7Fy;
-    my $value7 = 0x7FFFs;
+    my $value4 = (byte)0xFF;
+    my $value5 = (short)0xFFFF;
+    my $value6 = (byte)0x7F;
+    my $value7 = (short)0x7FFF;
     
     if ($value3 == (long)255) {
-      if ($value4 == (byte)-1) {
-        if ($value5 == (short)-1) {
-          if ($value6 == (byte)127) {
-            if ($value7 == (short)32767) {
+      if ($value4 == -1) {
+        if ($value5 == -1) {
+          if ($value6 == 127) {
+            if ($value7 == 32767) {
               return 1;
             }
           }
@@ -4727,16 +5056,16 @@ package TestCase {
 
   sub number_literal_octal_specifier : int () {
     my $value3 = 0377L;
-    my $value4 = 0377y;
-    my $value5 = 0177777s;
-    my $value6 = 0177y;
-    my $value7 = 077777s;
+    my $value4 = (byte)0377;
+    my $value5 = (short)0177777;
+    my $value6 = (byte)0177;
+    my $value7 = (short)077777;
     
     if ($value3 == (long)255) {
-      if ($value4 == (byte)-1) {
-        if ($value5 == (short)-1) {
-          if ($value6 == (byte)127) {
-            if ($value7 == (short)32767) {
+      if ($value4 == -1) {
+        if ($value5 == -1) {
+          if ($value6 == 127) {
+            if ($value7 == 32767) {
               return 1;
             }
           }
@@ -4759,16 +5088,16 @@ package TestCase {
 
   sub number_literal_binary_specifier : int () {
     my $value3 = 0b11111111L;
-    my $value4 = 0b11111111y;
-    my $value5 = 0b1111111111111111s;
-    my $value6 = 0b1111111y;
-    my $value7 = 0b111111111111111s;
+    my $value4 = (byte)0b11111111;
+    my $value5 = (short)0b1111111111111111;
+    my $value6 = (byte)0b1111111;
+    my $value7 = (short)0b111111111111111;
     
     if ($value3 == (long)255) {
-      if ($value4 == (byte)-1) {
-        if ($value5 == (short)-1) {
-          if ($value6 == (byte)127) {
-            if ($value7 == (short)32767) {
+      if ($value4 == -1) {
+        if ($value5 == -1) {
+          if ($value6 == 127) {
+            if ($value7 == 32767) {
               return 1;
             }
           }
@@ -4877,89 +5206,6 @@ package TestCase {
   }
   
   # Bit shift left
-  sub bit_shift_left_byte : int () {
-    # 00000011 << 2
-    my $value = (byte)0x3 << 2;
-    
-    # 00001100
-    if ($value == (byte)0xC) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_left_byte_max : int () {
-    
-    # 01000000 << 1
-    my $value = (byte)0x40 << 1;
-    
-    # 10000000
-    if ($value == (byte)0x80) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_left_byte_overflow : int () {
-    
-    # 10000000 << 1
-    my $value = (byte)0x80 << 1;
-    
-    # 00000000
-    if ($value == (byte)0) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_left_short : int () {
-    
-    # 00000011 00000000 << 2
-    my $value = (short)0x300 << 2;
-    
-    # 00001100 00000000
-    if ($value == (short)0xC00) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_left_short_max : int () {
-    
-    # 01000000 00000000 << 1
-    my $value = (short)0x4000 << 1;
-    
-    # 10000000 00000000
-    if ($value == (short)0x8000) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-  
-  sub bit_shift_left_short_overflow : int () {
-    
-    # 10000000 00000000 << 1
-    my $value = (short)0x8000 << 1;
-    
-    # 00000000 00000000
-    if ($value == (short)0) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
   sub bit_shift_left_int : int () {
     
     # 00000011 00000000 00000000 00000000 << 2
@@ -5081,7 +5327,15 @@ package TestCase {
     
     return 0;
   }
-  
+
+  sub array : int () {
+    
+    my $nums = new int[(byte)3];
+    $nums->[2] = 4;
+    if ($nums->[(byte)2] == 4) {
+      return 1;
+    }
+  }
   sub array_set_and_get_array_element_first : int () {
     
     my $nums = new int[3];
@@ -5116,14 +5370,14 @@ package TestCase {
   # Sum
   sub sum_byte : byte ($a : byte, $b :byte,) {
     
-    my $total = $a + $b;
+    my $total = (byte)((int)$a + (int)$b);
     
     return $total;
   }
 
   sub sum_short : short ($a : short, $b :short) {
     
-    my $total = $a + $b;
+    my $total = (short)((int)$a + (int)$b);
     
     return $total;
   }

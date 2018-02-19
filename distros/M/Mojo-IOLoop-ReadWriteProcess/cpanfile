@@ -1,7 +1,7 @@
 requires 'Mojolicious', '7.24';
 
 on configure => sub {
-    requires 'Module::Build::Tiny', '0.035';
+    requires 'Module::Build';
     requires 'perl', '5.008_001';
 };
 

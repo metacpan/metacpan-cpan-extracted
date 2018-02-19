@@ -96,7 +96,7 @@ Calls the specified subroutine with the supplied arguments and tries
 to create an object of type 'cast' with the result.
 
    /* Example */
-   Integer sum = (Integer)CallPerlSub("main::add", new Object [] {new Integer(5), new Integer(3)}, Integer.class) ;
+   Integer sum = (Integer)CallPerlSub("main::add", new Object [] {Integer.valueOf(5), Integer.valueOf(3)}, Integer.class) ;
       
 =item public Object CallPerlStaticMethod(String pkg, String method,
 Object args[], Class cast)
@@ -107,7 +107,7 @@ notation) with the supplied arguments and tries to create an object
 of type 'cast' with the result.
 
    /* Example */
-   Integer sum = (Integer)CallPerlStaticMethod("main", "add", new Object [] {new Integer(5), new Integer(3)}, Integer.class) ;
+   Integer sum = (Integer)CallPerlStaticMethod("main", "add", new Object [] {Integer.valueOf(5), Integer.valueOf(3)}, Integer.class) ;
 
 =item public Object eval(String code, Class cast) 
 throws InlineJavaPerlException, InlineJavaException
@@ -205,8 +205,6 @@ It is now possible to use callbacks from different Java threads. One of the
 big advantages of this is that you can now handle, for example, SWING events 
 in Perl. Here's an example:
 
-=for comment
-
    use Inline Java => <<'END' ;
       import java.util.* ;
       import org.perl.inline.java.* ;
@@ -261,11 +259,9 @@ in Perl. Here's an example:
    $b->quit() ;  # in JNI mode
 
    sub button_pressed {
-      print('click!' . "\n") ; # prints click!
+      print("click!\n") ; # prints click!
       $b->StopCallbackLoop() ;
    }
-
-=for comment
 
 The StartCallbackLoop method can be called on any 
 C<org.perl.inline.java.InlineJavaPerlCaller> object and will block the 
@@ -289,8 +285,6 @@ while waiting for callbacks. In version 0.51 a new API for callback loops
 was introduced, allowing for callbacks to be processed much in the same 
 fashion one uses select(2) to read data from a filehandle. Here's an 
 example: 
-
-=for comment
 
    use Inline Java => <<'END' ;
       import java.util.* ;
@@ -360,8 +354,6 @@ example:
       print('click!' . "\n") ; # prints click!
       $b->CloseCallbackStream() ;
    }
-
-=for comment
 
 The StartCallbackStream method can be called on any InlineJavaPerlCaller object
 to initialize a channel to receive callbacks. The WaitForCallback method can 

@@ -8,6 +8,7 @@ lib/HPCD/uni/Stage.pm
 lib/HPCI.pm
 lib/HPCI/CommandScript.pm
 lib/HPCI/Env.pm
+lib/HPCI/File.pm
 lib/HPCI/Group.pm
 lib/HPCI/HTML.PM
 lib/HPCI/JobGroup.pm
@@ -43,4 +44,5 @@ t/16-choose_retries.t
 t/17-verify_completion_state_callback.t
 t/18-required_output_files.t
 t/19-env_key.t
+t/20-skipstage.t
 TODO

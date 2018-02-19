@@ -95,7 +95,7 @@ command: CALC:DATA:CALL? SDATA
 id: 18
 method: Query
 read_length: 29
-retval: 23323234eee41c3ab621dbba889e6db6bbe222b96dce9db886f95eb90a
+retval: 233232345550ec3aa3b4d3ba572dcb36ed8d0fb8e7c78a390fb593380a
 retval_enc: hex
 timeout: 10
 ---
@@ -111,7 +111,7 @@ command: CALC:DATA:CALL? SDATA
 id: 21
 method: Query
 read_length: 29
-retval: 233232344e8babb92aaaeb39b450fbb7c8babdb8f85a7bb84c2d0fb90a
+retval: 233232349b9cd93a29a0b2bad26ea0b4197047b7dac17139f07c89380a
 retval_enc: hex
 timeout: 10
 ---
@@ -127,7 +127,7 @@ command: CALC:DATA:CALL? SDATA
 id: 24
 method: Query
 read_length: 29
-retval: 23323234d84dbf38a0e4bf3a1aac33b8fe1de7b8f80ef6b7da7e01b90a
+retval: 233232349c2065bac1f9293a11d391b7b2544836058d8739d622b6370a
 retval_enc: hex
 timeout: 10
 ---
@@ -334,6 +334,18 @@ id: 62
 method: Query
 retval: "HIGH\n"
 ---
-command: '*RST'
+command: SENS:SWE:POIN 1
 id: 63
+method: Write
+---
+command: SENS:FREQ:STAR 1234500000
+id: 64
+method: Write
+---
+command: SENS:FREQ:STOP 1234500000
+id: 65
+method: Write
+---
+command: '*RST'
+id: 66
 method: Write

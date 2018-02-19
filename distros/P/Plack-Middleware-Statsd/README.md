@@ -4,18 +4,19 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.3.0
+version v0.3.3
 
 # SYNOPSIS
 
 ```perl
 use Plack::Builder;
-use Net::Statsd::Client;
+use Net::Statsd::Tiny;
 
 builder {
 
   enable "Statsd",
-    client      => Net::Statsd::Client->new( ... );
+    client      => Net::Statsd::Tiny->new( ... ),
+    sample_rate => 1.0;
 
   ...
 
@@ -45,7 +46,7 @@ to a statsd server.
 
 ## client
 
-This is a statsd client, such as an [Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client) object.
+This is a statsd client, such as an instance of [Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny).
 
 If one is omitted, then it will default to one defined in the
 environment hash at `psgix.monitor.statsd`.
@@ -54,14 +55,24 @@ environment hash at `psgix.monitor.statsd`.
 set.
 
 The only restriction on the client is that it has the same API as
-[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client) or similar modules, by supporting the following
+[Net::Statsd::Tiny](https://metacpan.org/pod/Net::Statsd::Tiny) or similar modules, by supporting the following
 methods:
 
 - `increment`
 - `timing_ms` or `timing`
 - `set_add`
 
+This has been tested with [Net::Statsd::Lite](https://metacpan.org/pod/Net::Statsd::Lite) and
+[Net::Statsd::Client](https://metacpan.org/pod/Net::Statsd::Client).
+
 Other statsd client modules may be used via a wrapper class.
+
+## sample\_rate
+
+The default sampling rate to used, which should be a value between 0 and 1.
+This will override the default rate of the ["client"](#client), if there is one.
+
+The default is `1`.
 
 # METRICS
 
@@ -109,7 +120,11 @@ The following metrics are logged:
 
 - `psgi.response.time`
 
-    The response time, in ms (rounded up using `ceil`).
+    The response time, in ms.
+
+    As of v0.3.1, this is no longer rounded up to an integer. If this
+    causes problems with your statsd daemon, then you may need to use a
+    subclassed version of your statsd client to work around this.
 
 - `psgi.response.x-sendfile`
 
@@ -124,8 +139,8 @@ The following metrics are logged:
 
     This counter is incremented when the harakiri flag is set.
 
-If you want to rename these, then you will need to use a wrapper
-class for the ["client"](#client).
+If you want to rename these, or modify sampling rates, then you will
+need to use a wrapper class for the ["client"](#client).
 
 # EXAMPLES
 
@@ -146,6 +161,15 @@ sub finalize {
   $c->next::method(@_);
 }
 ```
+
+# KNOWN ISSUES
+
+## Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
 
 # SEE ALSO
 

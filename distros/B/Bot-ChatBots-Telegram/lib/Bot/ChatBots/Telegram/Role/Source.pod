@@ -22,6 +22,14 @@ and L<Bot::ChatBots::Telegram::LongPoll>.
 
 This role defines the accessors in the following subsections.
 
+=head2 B<< sender >>
+
+   my $sender = $obj->sender;
+   $obj->sender(Bot::ChatBots::Telegram::Sender->new(token => $token));
+
+Accessor for the L<Bot::ChatBots::Telegram::Sender> object useful for
+managing communications to Telegram.
+
 =head2 B<< token >>
 
    my $token = $obj->token;
@@ -45,7 +53,72 @@ Predicate function to assess whether a L</token> is present or not.
    my $record = $self->normlize_record($input_record);
 
 Perform some normalization on the record to give it a more "general"
-shape. Which is still in a state of flux.
+shape. Which is still in a state of flux, so a look to the code might
+be helpful.
+
+So far you should find the following keys in the returned record:
+
+=over
+
+=item C<chan>
+
+optional element containing data about the Chat where the Update
+came from. It is present when C<data_type> is either C<Message> or
+C<CallbackQuery> and absent otherwise.
+
+In the C<Message> case, it is the expansion of the C<chat> part of the
+C<payload>.
+
+In the C<CallbackQuery> case, it can be:
+
+=over
+
+=item *
+
+the expansion of the C<chat> part inside the C<message> part of the 
+Update data, if C<message> is present (Telegram documentation states
+this field is optional in the API), otherwise
+
+=item *
+
+a simple anonymous hash where the C<id> field is filled with the
+C<chat_instance> field from the payload. Whether this is meaningful
+or not is debatable.
+
+=back
+
+=item C<data_type>
+
+the Telegram type for the data pointed to by the optional field. For
+example, if the optional field in the Update is C<edited_message>, then
+C<data_type> will be C<Message>. See
+L<https://core.telegram.org/bots/api#update> for the mapping between
+C<type> and C<data_type>.
+
+=item C<payload>
+
+the actual optional object pointed to by C<type>. For example, if
+C<type> is C<message>, then C<payload> will point to a hash with the
+contents explained at
+L<https://core.telegram.org/bots/api#message>.
+
+=item C<sender>
+
+whatever is contained in the C<from> field of the C<payload>
+
+=item C<source>
+
+points to a hash containing the C<technology> (set to C<telegram>) and
+C<token> (either inherited, or set to whatever value is pointed by key
+C<object_token> in C<source> itself)
+
+=item C<type>
+
+the field name of the optional part in a Telegram's Update, see
+L<https://core.telegram.org/bots/api#update> (e.g. C<message>,
+C<edited_message> and so on).
+
+=back
 
 =head1 SEE ALSO
 
@@ -57,7 +130,7 @@ Flavio Poletti <polettix@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+Copyright (C) 2016, 2018 by Flavio Poletti <polettix@cpan.org>
 
 This module is free software. You can redistribute it and/or modify it
 under the terms of the Artistic License 2.0.

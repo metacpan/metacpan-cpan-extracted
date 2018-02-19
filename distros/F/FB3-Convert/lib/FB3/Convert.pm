@@ -15,10 +15,10 @@ use File::Copy qw(copy);
 use File::Temp qw/ tempfile tempdir /;
 use FB3::Validator;
 use utf8;
+use Encode qw(encode_utf8 decode_utf8);
 use HTML::Entities;
-#use open qw(:std :utf8);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 =head1 NAME
 
@@ -105,10 +105,11 @@ my %AllowElementsMain = (
   },
   'li' => {
     'allow_attributes' => [],
-    'allow_elements_inside' => {'em'=>undef}
+    'allow_elements_inside' => {'em'=>undef,a=>undef}
   },
   'root_fb3_container' => {
     'allow_elements_inside' => {
+      'span'=>undef, 
       'div'=>undef,
       'b'=>undef,
       'h1'=>undef,
@@ -374,8 +375,10 @@ sub new {
   $X->{'DestinationFile'} = $DestinationFile;
   $X->{'Module'} = $Module;
   $X->{'verbose'} = $Args{'verbose'} ? $Args{'verbose'} : 0;
-  $X->{'tmpl_path'} = $Args{'tmpl_path'} || dirname(__FILE__);
+  $X->{'showname'} = $Args{'showname'} ? 1 : 0;
   $X->{'allow_elements'} = \%AllowElementsMain;
+  $X->{'href_list'} = {}; #собираем ссылки в документе
+  $X->{'id_list'} = {}; #собираем ссылки в документе
   
   #Наша внутренняя структура данных конвертора. шаг влево  - расстрел
   $X->{'STRUCTURE'} = {
@@ -421,7 +424,7 @@ sub new {
     #   'new_path' => 'img/794__1000516292.jpg'
     # }
   ],
-  'CSS_LIST' => [ # так же состилями
+  'CSS_LIST' => [ # так же со стилями
     #{
     #  'id' => 'mainCSS',
     #  'new_path' => undef,
@@ -478,6 +481,8 @@ sub Reap {
   my $X = shift;
   my $Processor = $MODULES{$X->{'ClassName'}};
   my $File = $X->{'Source'};
+  
+  $X->Msg("working with file ".$File."\n",'w',1) if $X->{'showname'} || $X->{'verbose'};
   $File = $Processor->{class}->_Unpacker($X,$File) if $Processor->{'unpack'};
   
   my $ProcStrcture = $Processor->{'class'}->Reaper($X, source => ($File || $X->{'Source'}));
@@ -492,8 +497,7 @@ sub _Unpacker {
   my $X = shift;
   my $Source = shift;
 
-  #my $TMPPath = '/tmp/epub';
-  my $TMPPath = tempdir();
+  my $TMPPath = tempdir(CLEANUP=>1);
 
   $X->{'SourceDir'} = $TMPPath;
   $X->{'unzipped'} = 1;
@@ -602,7 +606,7 @@ sub FB3Create {
             );  
   
   #финальное приведение section к валидному виду
-  foreach my $Section ($XC->findnodes( "/fb3-body/section/section/section", $Body)) {
+  foreach my $Section ($XC->findnodes( "/fb3-body/section/section/section", $Body), $XC->findnodes( "/fb3-body/section/section", $Body)) {
     $Section = $X->Transform2Valid(node=>$Section);
   }
   
@@ -682,7 +686,7 @@ sub FB3Create {
   
   print FHdesc qq{<fb3-relations>
     };
-  
+
   foreach (@{$TitleInfo->{'AUTHORS'}}) {
 
     my $First = $_->{'first-name'};
@@ -837,14 +841,12 @@ sub Obj2DOM {
   undef $Doc unless $Sub; #первый заход парсинга. $Doc fresh and virginity
 
   unless ($Doc) {
-    #$X->Msg("CREATE DOC\n");
     $Doc = XML::LibXML::Document->new('1.0', 'utf-8');
   }
 
   my $First=0;
   if (!$Parent) {
     $First=1;
-    #$X->Msg("CREATE ROOT\n");
     $Parent = $Doc->createElement($Root->{'name'});
     if ($Root->{'attributes'}) {
       foreach my $RAttr ( keys %{$Root->{'attributes'}}) {
@@ -857,11 +859,9 @@ sub Obj2DOM {
 
     foreach my $Key (sort keys %$Obj) {
       my $Value = $Obj->{$Key};
-      #$X->Msg("KEY ".$Key."\n","w");
 
       if ($Key eq 'attributes') {
         foreach (sort keys %{$Obj->{'attributes'}}) {
-          #$X->Msg("CREATE ATTR $_\n");
           $Compact = 1 if $_ eq 'CP_compact' && $Obj->{'attributes'}->{$_}; #все следующие вложенные ноды - в формате compact
           $Parent->addChild($Doc->createAttribute( $_ => $Obj->{'attributes'}->{$_} )) unless $First;
         }
@@ -889,7 +889,6 @@ sub Obj2DOM {
       }
     }
   } elsif (ref $Obj eq '') {
-    #$X->Msg("PLAIN NODE $Obj\n");
     $Parent->appendTextNode($Obj);
   }
 
@@ -928,6 +927,7 @@ sub Content2Tree {
 sub NormalizeTree {
   my $X = shift;
   my $Data = shift;
+  
   return unless ref $Data eq 'ARRAY';
 
   my @Ar;
@@ -947,8 +947,13 @@ sub NormalizeTree {
     }
 
     if (!ref $Item) {
-      my $Str = $X->trim($Item);
-      $Str =~ s/[\s\t]//g;
+      my $Str;
+      unless ($Item =~ /^\s+$/) {
+        $Str = $X->trim($Item);
+      } else {
+        $Str = $Item;
+      }
+      $Str =~ s/[\n\r]//g;
       next if $Str eq '';
     }
 
@@ -962,39 +967,45 @@ sub NormalizeTree {
 sub ProcNode {
   my $X = shift;
   my $Node = shift;
-  my $RelPath = shift; #для честных  уникальных  id и пр.
-  my $LastGoodParent = shift;
+  my $RelPath = shift;
+  my $LastGoodParent = lc(shift);
   my @Dist;
  
   my %AllowElements = %{$X->{'allow_elements'}};
-
-#  print "PARENT".$LastGoodParent."\n";
  
   foreach my $Child ( $Node->getChildnodes ) {
 
-    my $Allow =
-      ($Child->nodeName !~ /#text/i
-      && exists $AllowElements{$LastGoodParent}
-      && (
-         # !$AllowElements{$LastGoodParent}->{'allow_elements_inside'} ||
-          exists $AllowElements{$LastGoodParent}->{'allow_elements_inside'}->{$Child->nodeName}) )
-      ? 1 : 0;
+    my $ChildNodeName = lc($Child->nodeName);
+  
+    my $Allow = 1;
     
-    #print "LOCALPARENT ".$LastGoodParent." || ".$Child->nodeName." ALLOW".$Allow."\n";
-    
+    if ($AllowElements{$ChildNodeName}->{'exclude_if_inside'}) { #проверка на вшивость 1
+      $Allow = 0 if $X->NodeHaveInside($Child, $AllowElements{$ChildNodeName}->{'exclude_if_inside'});
+    }
+
+    if ($Allow) { #проверка на вшивость 2
+      $Allow =
+        ($Child->nodeName !~ /#text/i
+        && exists $AllowElements{$LastGoodParent}
+        && (
+           # !$AllowElements{$LastGoodParent}->{'allow_elements_inside'} ||
+            exists $AllowElements{$LastGoodParent}->{'allow_elements_inside'}->{$ChildNodeName}) )
+        ? 1 : 0;
+    }
+
     #если ноду прибиваем, нужно чтобы дочерние работали по правилам пэрент-ноды (она ведь теперь и есть пэрент для последующих вложенных)      
-    my $GoodParent = $Allow ? $Child->nodeName : $LastGoodParent; #если нода прошла разрешение, то теперь она становится последней parent в ветке и далее равняемся на ее правила 
+    my $GoodParent = $Allow ? $ChildNodeName : $LastGoodParent; #если нода прошла разрешение, то теперь она становится последней parent в ветке и далее равняемся на ее правила 
       
     #разрешенные атрибуты текущей ноды
     my $AllowAttributes =
       $Allow
-      && exists $AllowElements{$Child->nodeName}->{'allow_attributes'}
-      && $AllowElements{$Child->nodeName}->{'allow_attributes'}
+      && exists $AllowElements{$ChildNodeName}->{'allow_attributes'}
+      && $AllowElements{$ChildNodeName}->{'allow_attributes'}
       ? $X->NodeGetAllowAttributes($Child)
       : 0;
         
-    if ($Allow && $AllowElements{$Child->nodeName}->{'processor'}) {
-      $Child =  $AllowElements{$Child->nodeName}->{'processor'}->($X,'node'=>$Child, 'relpath'=>$RelPath, params=>$AllowElements{$Child->nodeName}->{'processor_params'});
+    if ($Allow && $AllowElements{$ChildNodeName}->{'processor'}) {
+      $Child =  $AllowElements{$ChildNodeName}->{'processor'}->($X,'node'=>$Child, 'relpath'=>$RelPath, params=>$AllowElements{$ChildNodeName}->{'processor_params'});
     }
     
     my $NodeName = $Child->nodeName; #имя могло измениться процессором
@@ -1010,10 +1021,27 @@ sub ProcNode {
           }
         :   &ProcNode($X,$Child,$RelPath,$GoodParent) # не выводим тэг, шагаем дальше строить дерево
         ;
-  #  $GoodParent = $LastGoodParent;
   }
 
   return \@Dist;
+}
+
+sub NodeHaveInside {
+  my $X = shift;
+  my $Node = shift;
+  my $Elements = shift;
+  
+  my %H = map {lc($_)=>1} @$Elements;
+  
+  foreach my $Child ( $Node->getChildnodes ) {
+    if (exists $H{lc($Child->nodeName())}) {
+      undef %H;
+      return 1;
+    }
+  }
+  
+  undef %H;
+  return 0;
 }
 
 sub ConvertIds {
@@ -1027,6 +1055,7 @@ sub ConvertIds {
     #так же должны быть преобразованы <a href !!!
     my $Id = $X->Path2ID($Href,undef,'convert_id');
     $Attributes->{'id'} = 'link_'.$Id;
+    $X->{'id_list'}->{$Attributes->{'id'}} = $Href;
   }
 
   return $Attributes;
@@ -1149,8 +1178,9 @@ sub Msg {
   my $X = shift;
   my $Str = shift;
   my $Type = shift || 'i';
+  my $Force = shift;
 
-  return if !$X->{'verbose'} && $Type ne 'e';
+  return if !$X->{'verbose'} && $Type ne 'e' && !$Force;
 
   my $Color;
   if ($Type eq 'w') {
@@ -1168,6 +1198,7 @@ sub Error {
   my $X = shift;
   my $ErrStr = shift;
   Msg($X,$ErrStr."\n",'e');
+  ForceRmDir($X,$X->{'DestinationDir'});
   exit;
 }
 
@@ -1182,12 +1213,19 @@ sub Validate {
 
 sub Cleanup {
   my $X = shift;
+  my $CleanDest = shift;
+  
   if ($X->{'unzipped'} && $X->{'SourceDir'}) { #если наследили распаковкой в tmp
     ForceRmDir($X,$X->{'SourceDir'});
     $X->Msg("Clean tmp directory ".$X->{'SourceDir'}."\n");
-    return 1;
+
   }
-  return 0;
+  
+  #просят почистить результат
+  if ($CleanDest) {
+    ForceRmDir($X,$X->{'DestinationDir'}) if $X->{'DestinationDir'};
+  }
+  
 }
 
 sub ForceRmDir{
@@ -1284,6 +1322,22 @@ sub BuildAuthorName  {
     'middle-name' => $MiddleName,
     'last-name' => $LastName,
   };
+}
+
+sub EncodeUtf8 {
+  my $X = shift;
+  my $Out = shift;
+  $Out = Encode::encode_utf8($Out);
+  return $Out;
+}
+
+sub IsEmptyLineValue {
+  my $X = shift;
+  my $Item = shift;
+  return 0 unless ref $Item eq 'ARRAY';
+  
+  return 1 if (!scalar @$Item || (scalar @$Item == 1 && $Item->[0] =~ /^[\s\t\n\r]+$/) );
+  return 0;
 }
 
 sub ParseMetaFile {

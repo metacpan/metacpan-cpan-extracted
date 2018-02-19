@@ -4,26 +4,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/\AMail Delivery Subsystem/,
-    'subject' => qr/(?:see transcript for details\z|\AWarning: )/,
-};
-# Error text regular expressions which defined in sendmail/savemail.c
-#   savemail.c:1040|if (printheader && !putline("   ----- Transcript of session follows -----\n",
-#   savemail.c:1041|          mci))
-#   savemail.c:1042|  goto writeerr;
-#
-my $Re1 = {
-    'begin'   => qr/\A[ \t]+[-]+ Transcript of session follows [-]+\z/,
-    'error'   => qr/\A[.]+ while talking to .+[:]\z/,
-    'rfc822'  => qr{\AContent-Type:[ ]*(?:message/rfc822|text/rfc822-headers)\z},
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    # Error text regular expressions which defined in sendmail/savemail.c
+    #   savemail.c:1040|if (printheader && !putline("   ----- Transcript of session follows -----\n",
+    #   savemail.c:1041|          mci))
+    #   savemail.c:1042|  goto writeerr;
+    'rfc822'  => ['Content-Type: message/rfc822', 'Content-Type: text/rfc822-headers'],
+    'message' => ['   ----- Transcript of session follows -----'],
+    'error'   => ['... while talking to '],
+};
 
-sub pattern     { return $Re0 }
 sub description { 'V8Sendmail: /usr/sbin/sendmail' }
-
 sub scan {
     # Parse bounce messages from Sendmail
     # @param         [Hash] mhead       Message header of a bounce email
@@ -41,11 +33,11 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
-    unless( $mhead->{'subject'} =~ m/\A[ \t]*Fwd?:/i ) {
+    return undef unless $mhead->{'subject'} =~ /(?:see transcript for details\z|\AWarning: )/;
+    unless( lc($mhead->{'subject'}) =~ /\A[ \t]*fwd?:/ ) {
         # Fwd: Returned mail: see transcript for details
         # Do not execute this code if the bounce mail is a forwarded message.
-        return undef unless $mhead->{'from'} =~ $Re0->{'from'};
+        return undef unless index($mhead->{'from'}, 'Mail Delivery Subsystem') > -1;
     }
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -69,10 +61,10 @@ sub scan {
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -80,7 +72,8 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ||
+                index($e, $StartingOf->{'rfc822'}->[1]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -110,7 +103,7 @@ sub scan {
                 # Last-Attempt-Date: Fri, 14 Feb 2014 12:30:08 -0500
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; userunknown@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -120,36 +113,36 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Xx]-[Aa]ctual-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                } elsif( $e =~ /\AX-Actual-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # X-Actual-Recipient: RFC822; kijitora@example.co.jp
                     $v->{'alias'} = $1;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.1.1
                     # Status:5.2.0
                     # Status: 5.1.0 (permanent failure)
                     $v->{'status'} = $1;
 
-                } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ARemote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Remote-MTA: DNS; mx.example.jp
                     $v->{'rhost'} = lc $1;
-                    $v->{'rhost'} = '' if $v->{'rhost'} =~ m/\A\s+\z/;  # Remote-MTA: DNS; 
+                    $v->{'rhost'} = '' if $v->{'rhost'} =~ /\A\s+\z/;  # Remote-MTA: DNS; 
 
-                } elsif( $e =~ m/\A[Ll]ast-[Aa]ttempt-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ALast-Attempt-Date:[ ]*(.+)\z/ ) {
                     # Last-Attempt-Date: Fri, 14 Feb 2014 12:30:08 -0500
                     $v->{'date'} = $1;
 
                 } else {
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -165,21 +158,21 @@ sub scan {
                 # Reporting-MTA: dns; mx.example.jp
                 # Received-From-MTA: DNS; x1x2x3x4.dhcp.example.ne.jp
                 # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
-                if( $e =~ m/\A[>]{3}[ ]+([A-Z]{4})[ ]?/ ) {
+                if( $e =~ /\A[>]{3}[ ]+([A-Z]{4})[ ]?/ ) {
                     # >>> DATA
                     $commandtxt = $1;
 
-                } elsif( $e =~ m/\A[<]{3}[ ]+(.+)\z/ ) {
+                } elsif( $e =~ /\A[<]{3}[ ]+(.+)\z/ ) {
                     # <<< Response
                     $esmtpreply = $1;
 
-                } elsif( $e =~ m/\A[Rr]eporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AReporting-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; mx.example.jp
                     next if length $connheader->{'rhost'};
                     $connheader->{'rhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Rr]eceived-[Ff]rom-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AReceived-From-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Received-From-MTA: DNS; x1x2x3x4.dhcp.example.ne.jp
                     next if( exists $connheader->{'lhost'} && length $connheader->{'lhost'} );
 
@@ -187,7 +180,7 @@ sub scan {
                     $connheader->{'lhost'} = lc $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[Aa]rrival-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AArrival-Date:[ ]*(.+)\z/ ) {
                     # Arrival-Date: Wed, 29 Apr 2009 16:03:18 +0900
                     next if length $connheader->{'date'};
                     $connheader->{'date'} = $1;
@@ -196,14 +189,14 @@ sub scan {
                 } else {
                     # Detect SMTP session error or connection error
                     next if $sessionerr;
-                    if( $e =~ $Re1->{'error'} ) { 
+                    if( index($e, $StartingOf->{'error'}->[0]) == 0 ) { 
                         # ----- Transcript of session follows -----
                         # ... while talking to mta.example.org.:
                         $sessionerr = 1;
                         next;
                     }
 
-                    if( $e =~ m/\A[<](.+)[>][.]+ (.+)\z/ ) {
+                    if( $e =~ /\A[<](.+)[>][.]+ (.+)\z/ ) {
                         # <kijitora@example.co.jp>... Deferred: Name server: example.co.jp.: host name lookup failure
                         $anotherset->{'recipient'} = $1;
                         $anotherset->{'diagnosis'} = $2;
@@ -212,8 +205,8 @@ sub scan {
                         # ----- Transcript of session follows -----
                         # Message could not be delivered for too long
                         # Message will be deleted from queue
-                        next if $e =~ m/\A[ \t]*[-]+/;
-                        if( $e =~ m/\A[45]\d\d[ \t]([45][.]\d[.]\d)[ \t].+/ ) {
+                        next if $e =~ /\A[ \t]*[-]+/;
+                        if( $e =~ /\A[45]\d\d[ \t]([45][.]\d[.]\d)[ \t].+/ ) {
                             # 550 5.1.2 <kijitora@example.org>... Message
                             #
                             # DBI connect('dbname=...')
@@ -221,7 +214,7 @@ sub scan {
                             $anotherset->{'status'} = $1;
                             $anotherset->{'diagnosis'} .= ' '.$e;
 
-                        } elsif( $e =~ m/\A(?:Message|Warning:) / ) {
+                        } elsif( index($e, 'Message: ') == 0 || index($e, 'Warning: ') == 0 ) {
                             # Message could not be delivered for too long
                             # Warning: message still undelivered after 4 hours
                             $anotherset->{'diagnosis'} .= ' '.$e;
@@ -235,8 +228,8 @@ sub scan {
         $p = $e;
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
@@ -247,30 +240,24 @@ sub scan {
 
         if( exists $anotherset->{'diagnosis'} && length $anotherset->{'diagnosis'} ) {
             # Copy alternative error message
-            $e->{'diagnosis'}   = $anotherset->{'diagnosis'} if $e->{'diagnosis'} =~ m/\A[ \t]+\z/;
+            $e->{'diagnosis'}   = $anotherset->{'diagnosis'} if $e->{'diagnosis'} =~ /\A[ \t]+\z/;
             $e->{'diagnosis'} ||= $anotherset->{'diagnosis'};
-
-            if( $e->{'diagnosis'} =~ m/\A\d+\z/ ) {
-                # Override the value of diagnostic code message
-                $e->{'diagnosis'} = $anotherset->{'diagnosis'};
-            }
+            $e->{'diagnosis'}   = $anotherset->{'diagnosis'} if $e->{'diagnosis'} =~ /\A\d+\z/;
         }
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         if( exists $anotherset->{'status'} && length $anotherset->{'status'} ) {
             # Check alternative status code
-            if( ! $e->{'status'} || $e->{'status'} !~ m/\A[45][.]\d[.]\d\z/ ) {
+            if( ! $e->{'status'} || $e->{'status'} !~ /\A[45][.]\d[.]\d\z/ ) {
                 # Override alternative status code
                 $e->{'status'} = $anotherset->{'status'};
             }
         }
 
-        unless( $e->{'recipient'} =~ m/\A[^ ]+[@][^ ]+\z/ ) {
+        unless( $e->{'recipient'} =~ /\A[^ ]+[@][^ ]+\z/ ) {
             # @example.jp, no local part
-            if( $e->{'diagnosis'} =~ m/[<]([^ ]+[@][^ ]+)[>]/ ) {
-                # Get email address from the value of Diagnostic-Code header
-                $e->{'recipient'} = $1;
-            }
+            # Get email address from the value of Diagnostic-Code header
+            $e->{'recipient'} = $1 if $e->{'diagnosis'} =~ /[<]([^ ]+[@][^ ]+)[>]/;
         }
     }
     $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
@@ -320,7 +307,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

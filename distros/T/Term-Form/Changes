@@ -1,8 +1,15 @@
 Revision history for Term::Form
 
 
+0.313   2018-02-11
+        - Bugfix newline.
+
+0.312   2018-02-10
+        - Added the option 'info'.
+        - Update documentation.
+
 0.311   2018-02-08
-        - Added option 'clear_screen'.
+        - Added the option 'clear_screen'.
         - Modified option 'auto_up'.
         - "fill_form" has "back" on by default.
         - Update documentation.

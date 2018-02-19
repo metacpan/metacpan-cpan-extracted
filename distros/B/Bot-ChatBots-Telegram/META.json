@@ -4,7 +4,7 @@
       "Flavio Poletti <polettix@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -26,7 +26,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.007"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
@@ -46,7 +46,7 @@
             "Moo" : "2.002005",
             "Ouch" : "0.0409",
             "Try::Tiny" : "0.27",
-            "WWW::Telegram::BotAPI" : "0.07",
+            "WWW::Telegram::BotAPI" : "0.10",
             "namespace::clean" : "0.27",
             "perl" : "5.010"
          }
@@ -72,7 +72,7 @@
          "web" : "https://github.com/polettix/Bot-ChatBots-Telegram"
       }
    },
-   "version" : "0.010",
+   "version" : "0.012",
    "x_contributors" : [
       "Flavio Poletti <flavio.poletti@ericsson.com>",
       "Flavio Poletti <flavio@polettix.it>"

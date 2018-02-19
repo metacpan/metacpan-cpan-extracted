@@ -4,21 +4,15 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'  => qr/\AUndeliverable Mail: ["]/,
-};
-my $Re1 = {
-    'begin'    => qr/\AYour message:\z/,
-    'rfc822'   => undef,
-    'error'    => qr/\ACould not be delivered because of\z/,
-    'rcpts'    => qr/\AThe following recipients were affected:/,
-    'endof'    => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message'  => ['Your message:'],
+    'error'    => ['Could not be delivered because of'],
+    'rcpts'    => ['The following recipients were affected:'],
+};
+my $MarkingsOf = { 'rfc822' => undef };
 
-sub pattern     { return $Re0 }
 sub description { 'Trustwave Secure Email Gateway' }
-
 sub scan {
     # Detect an error from MailMarshalSMTP
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -35,12 +29,10 @@ sub scan {
     my $class = shift;
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
-
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'subject'}, 'Undeliverable Mail: "') == 0;
 
     require Sisimai::MIME;
     require Sisimai::String;
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
@@ -56,22 +48,22 @@ sub scan {
     if( length $boundary00 ) {
         # Convert to regular expression
         $boundary00 = '--'.$boundary00.'--';
-        $Re1->{'rfc822'} = qr/\A\Q$boundary00\E\z/; 
+        $MarkingsOf->{'rfc822'} = qr/\A\Q$boundary00\E\z/; 
 
     } else {
-        $Re1->{'rfc822'} = qr/\A[ \t]*[+]+[ \t]*\z/;
+        $MarkingsOf->{'rfc822'} = qr/\A[ \t]*[+]+[ \t]*\z/;
     }
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            $readcursor |= $Indicators->{'deliverystatus'} if $e =~ $Re1->{'begin'};
+            $readcursor |= $Indicators->{'deliverystatus'} if $e eq $StartingOf->{'message'}->[0];
         }
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            $readcursor |= $Indicators->{'message-rfc822'} if $e =~ $Re1->{'rfc822'};
+            $readcursor |= $Indicators->{'message-rfc822'} if $e =~ $MarkingsOf->{'rfc822'};
         }
 
         if( $readcursor & $Indicators->{'message-rfc822'} ) {
@@ -86,7 +78,7 @@ sub scan {
         } else {
             # Before "message/rfc822"
             next unless $readcursor & $Indicators->{'deliverystatus'};
-            last if $e =~ $Re1->{'rfc822'};
+            last if $e =~ $MarkingsOf->{'rfc822'};
 
             # Your message:
             #    From:    originalsender@example.com
@@ -100,7 +92,7 @@ sub scan {
             #    dummyuser@blabla.xxxxxxxxxxxx.com
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[ \t]{4}([^ ]+[@][^ ]+)\z/ ) {
+            if( $e =~ /\A[ \t]{4}([^ ]+[@][^ ]+)\z/ ) {
                 # The following recipients were affected: 
                 #    dummyuser@blabla.xxxxxxxxxxxx.com
                 if( length $v->{'recipient'} ) {
@@ -113,7 +105,7 @@ sub scan {
 
             } else {
                 # Get error message lines
-                if( $e =~ $Re1->{'error'} ) {
+                if( $e eq $StartingOf->{'error'}->[0] ) {
                     # Could not be delivered because of
                     #
                     # 550 5.1.1 User unknown
@@ -121,7 +113,7 @@ sub scan {
 
                 } elsif( length $v->{'diagnosis'} && $endoferror == 0 ) {
                     # Append error messages
-                    $endoferror = 1 if $e =~ $Re1->{'rcpts'};
+                    $endoferror = 1 if index($e, $StartingOf->{'rcpts'}->[0]) == 0;
                     next if $endoferror;
 
                     $v->{'diagnosis'} .= ' '.$e;
@@ -135,17 +127,17 @@ sub scan {
                     # Reporting-MTA:      <relay.xxxxxxxxxxxx.com>
                     # MessageName:        <B549996730000.000000000001.0003.mml>
                     # Last-Attempt-Date:  <16:21:07 seg, 22 Dezembro 2014>
-                    if( $e =~ m/\AOriginal Sender:[ \t]+[<](.+)[>]\z/ ) {
+                    if( $e =~ /\AOriginal Sender:[ \t]+[<](.+)[>]\z/ ) {
                         # Original Sender:    <originalsender@example.com>
                         # Use this line instead of "From" header of the original
                         # message.
-                        push @$rfc822list, sprintf("From: %s", $1);
+                        push @$rfc822list, 'From: '.$1;
 
-                    } elsif( $e =~ m/\ASender-MTA:[ \t]+[<](.+)[>]\z/ ) {
+                    } elsif( $e =~ /\ASender-MTA:[ \t]+[<](.+)[>]\z/ ) {
                         # Sender-MTA:         <10.11.12.13>
                         $v->{'lhost'} = $1;
 
-                    } elsif( $e =~ m/\AReporting-MTA:[ \t]+[<](.+)[>]\z/ ) {
+                    } elsif( $e =~ /\AReporting-MTA:[ \t]+[<](.+)[>]\z/ ) {
                         # Reporting-MTA:      <relay.xxxxxxxxxxxx.com>
                         $v->{'rhost'} = $1;
                     }
@@ -153,7 +145,6 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
 
     for my $e ( @$dscontents ) {
@@ -210,7 +201,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

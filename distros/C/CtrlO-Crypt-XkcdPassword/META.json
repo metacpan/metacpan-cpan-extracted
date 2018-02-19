@@ -1,0 +1,70 @@
+{
+   "abstract" : "Yet another xkcd style password generator",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CtrlO-Crypt-XkcdPassword",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Crypt::Rijndael" : "0",
+            "Crypt::URandom" : "0",
+            "Data::Entropy" : "0",
+            "Data::Entropy::Algorithms" : "0",
+            "Data::Entropy::RawSource::CryptCounter" : "0",
+            "Data::Entropy::Source" : "0",
+            "Data::Handle" : "0",
+            "Getopt::Long" : "0",
+            "Module::Runtime" : "0",
+            "Pod::Usage" : "0",
+            "WordList" : "0",
+            "base" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::SharedFork" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/CtrlO-Crypt-XkcdPassword.git",
+         "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

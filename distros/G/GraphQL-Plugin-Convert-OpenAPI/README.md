@@ -43,8 +43,17 @@ server will instead be the given app.
 # ARGUMENTS
 
 To the `to_graphql` method: a URL to a specification, or a filename
-containing a JSON specification, of an OpenAPI v2. Optionally, a
-[Mojolicious](https://metacpan.org/pod/Mojolicious) app can be given as the second argument.
+containing a JSON specification, or a data structure, of an OpenAPI v2.
+
+Optionally, a [Mojolicious](https://metacpan.org/pod/Mojolicious) app can be given as the second argument. In
+this case, with a [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious::Lite) app, do:
+
+    my $api = plugin OpenAPI => {spec => 'data://main/api.yaml'};
+    plugin(GraphQL => {convert => [ 'OpenAPI', $api->validator->bundle, app ]});
+
+with the usual mapping in the case of a full app. For this to work you
+need [Mojolicious::Plugin::OpenAPI](https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI) version 1.25+, which returns itself
+on `register`.
 
 # PACKAGE FUNCTIONS
 

@@ -22,6 +22,7 @@ my $builder = My::Builder->new(
     },
     test_requires => {
         autodie               => 0,
+        'Dpkg::Version'       => 0,
         'File::Remove'        => 0,
         'Git'                          => 0,
         perl                  => '5.010',
@@ -40,6 +41,7 @@ my $builder = My::Builder->new(
     requires => {
         perl                           => '5.010',
         'Class::Accessor'              => 0,
+        'DBD::Pg'                      => 0,
         'Digest::SHA'                  => 0,
         'DirHandle'                    => 0,
         'File::Touch'                  => 0,
@@ -48,6 +50,7 @@ my $builder = My::Builder->new(
         'IPC::System::Simple'          => 0,
         'JSON::XS'                     => 0,
         $json_rpc_client_module        => 0,
+        'Net::IP'                      => 0,
         'POE'                          => 0,
         'POE::Component::IRC'          => '5.56',
         'POE::Component::Server::SOAP' => 0,
@@ -73,7 +76,7 @@ my $builder = My::Builder->new(
     },
     etc_files => { 'etc/kgb.conf' => 'etc/kgb-bot/kgb.conf' },
     man_files => { 'man5/*' => 'man5/' },
-    script_files => [ 'script/kgb-client' ],
+    script_files => [ 'script/kgb-client', 'script/kgb-ci-report' ],
     no_index => {
         directory => [ 'privinc' ],
     },

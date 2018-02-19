@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -23,6 +22,11 @@ my(@test)	=
 },
 {
 	item		=> 2,
+	expected	=> '(?^:^)',
+	re			=> qr/^/,
+},
+{
+	item		=> 3,
 	expected	=> '(?^:(?:))',
 	re			=> qr/(?:)/,
 },
@@ -59,18 +63,18 @@ for my $test (@test)
 
 			$stats{success}++ if ($outcome == 0);
 
-			#say "Case: $$test{item}. got: $got. expected: $expected. outcome: $outcome (0 is success). ";
+			#print "Case: $$test{item}. got: $got. expected: $expected. outcome: $outcome (0 is success). \n";
 		}
 		else
 		{
-			#say "Case $$test{item} failed to return 0 from parse(). ";
+			#print "Case $$test{item} failed to return 0 from parse(). \n";
 		}
 	}
 	catch
 	{
-		#say map{"# $_\n"} split(/\n/, $_);
+		#print map{"# $_\n"} split(/\n/, $_);
 
-		ok(1 == 1, "As expected, unable to parse qr/$$test{re}/");
+		ok(1 == 1, "As expected, unable to parse qr/$$test{re}/"); $count++;
 	};
 
 	# Reset for next test.
@@ -78,9 +82,8 @@ for my $test (@test)
 	$parser -> reset;
 }
 
-#print "Statistics: ";
-#print "$_: $stats{$_}. " for (sort keys %stats);
-#say '';
+#print "Statistics: \n";
+#print "$_: $stats{$_}. \n" for (sort keys %stats);
 
 print "# Internal test count: $count\n";
 

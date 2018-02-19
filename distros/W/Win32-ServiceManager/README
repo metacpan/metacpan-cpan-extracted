@@ -1,18 +1,13 @@
-NAME
-    Win32::ServiceManager - Manage Windows Services
-
-VERSION
-    version 0.002003
-
 SYNOPSIS
+
      use Win32::ServiceManager;
      use Path::Class 'file';
-
+    
      my $dir = file(__FILE__)->parent->absolute;
      my $sc = Win32::ServiceManager->new(
         nssm_path => $dir->file(qw( cgi exe nssm.exe ))->stringify,
      );
-
+    
      $sc->create_service(
         name => 'LynxWebServer01',
         display => 'Lynx Web Server 1',
@@ -26,7 +21,9 @@ SYNOPSIS
      $sc->delete_service('LynxWebServer01');
 
 METHODS
-  create_service
+
+ create_service
+
      $sc->create_service(
         name        => 'GRWeb1',
         display     => 'Giant Robot Web Worker 1',
@@ -35,169 +32,188 @@ METHODS
         use_nssm    => 1,
         command     => 'C:\code\GR\script\server.pl -p 3001',
         depends     => [qw(MSSQL Apache2.4)],
+        user        => 'DOMAIN\username',
+        password    => 'hunter2',
      );
 
     Takes a hash of the following arguments:
 
-    * "name"
+      * name
 
-      (required) The name of the service (which is used when doing a "sc
-      start" etc.)
+      (required) The name of the service (which is used when doing a sc
+      start etc.)
 
-    * "use_nssm"
+      * use_nssm
 
       (defaults to the value of use_nssm_default) Set this to start your
       service with "nssm"
 
-    * "use_perl"
+      * use_perl
 
       (defaults to the value of use_perl_default) Set this to create perl
       services. Uses $^X. If for some reason you want to use a different
-      perl you will have to set "use_perl" to false.
+      perl you will have to set use_perl to false.
 
-    * "display"
+      * display
 
       (required) The display name to give the service
 
-    * "description"
+      * description
 
       (optional) The description to give the service.
 
-    * "check_command"
+      * check_command
 
       (defaults to the value of check_command_default) This will check that
       the command you passed exists on the filesystem and if it does not
       exists it will die
 
-    * "command"
+      * command
 
       (required) The command that is effectively your service
 
-    * "args"
+      * args
 
       (optional) Arguments that get passed to the command above. XXX: do
       these even make sense?
 
-    * "depends"
+      * depends
 
-      (optional) List of service names that must be started for your service
-      to function. You may either pass a string or an array ref. A string
-      gets passed on directly, the array reference gets properly joined
-      together.
+      (optional) List of service names that must be started for your
+      service to function. You may either pass a string or an array ref. A
+      string gets passed on directly, the array reference gets properly
+      joined together.
 
-    * "idempotent"
+      * user
+
+      (optional) The user account under which to run the service. If left
+      blank, the default value is LocalSystem.
+
+      * password
+
+      (optional) The password credential for user. Required for any other
+      user than LocalSystem. If a blank password is desired, use an empty
+      string.
+
+      * idempotent
 
       (defaults to the value of idempotent_default) Set this to get errors
-      if the service already exists. Note that unlike the other methods this
-      one is not %100 idempotent. If a service has the exact same name but a
-      different command it this will mask that problem. I am willing to
-      resolve this if you have patches on how to read this information
+      if the service already exists. Note that unlike the other methods
+      this one is not %100 idempotent. If a service has the exact same name
+      but a different command it this will mask that problem. I am willing
+      to resolve this if you have patches on how to read this information
       (preferably without diving into the registry.)
 
-    Note: there are many options that "sc" can use to create and modify
+    Note: there are many options that sc can use to create and modify
     services. I have taken the few that we use in my project and forced the
     rest upon you, gentle user. For example, whether you like it or not
     these services will restart on failure and start automatically on boot.
     I am completely willing to add more options, but in 4 distinct projects
     we have never needed more than the above. Patches Welcome!
 
-  start_service
+ start_service
+
      $sc->start_service('GRWeb1', { non_blocking => 1 });
 
     Starts a service with the passed name. The second argument is an
     optional hashref with the following options:
 
-    * "non_blocking"
+      * non_blocking
 
-      (defaults to the value of "non_blocking_default") Set this to false if
-      you want to block until the service starts.
+      (defaults to the value of "non_blocking_default") Set this to false
+      if you want to block until the service starts.
 
-    * "idempotent"
+      * idempotent
 
       (defaults to the value of "idempotent_default") Set this to false if
       you want errors when the service is already started or starting.
 
-  stop_service
+ stop_service
+
      $sc->stop_service('GRWeb1', { non_blocking => 1 });
 
-    Stops a service with the passed name. The second argument is an optional
-    hashref with the following options:
+    Stops a service with the passed name. The second argument is an
+    optional hashref with the following options:
 
-    * "non_blocking"
+      * non_blocking
 
-      (defaults to the value of "non_blocking_default") Set this to false if
-      you want to block until the service stops.
+      (defaults to the value of "non_blocking_default") Set this to false
+      if you want to block until the service stops.
 
-    * "idempotent"
+      * idempotent
 
       (defaults to the value of "idempotent_default") Set this to false if
       you want errors when the service is already stopped or stopping
 
-  restart_service
+ restart_service
+
      $sc->restart_service('GRWeb1', { non_blocking => 1 });
 
     Stops and starts a service with the passed name. The second argument is
     an optional hashref with the following options:
 
-    * "non_blocking"
+      * non_blocking
 
-      (defaults to the value of "non_blocking_default") Set this to false if
-      you want to block until the service starts. (Note that the blocking
-      until the service has stopped is required.)
+      (defaults to the value of "non_blocking_default") Set this to false
+      if you want to block until the service starts. (Note that the
+      blocking until the service has stopped is required.)
 
-    * "idempotent"
+      * idempotent
 
       (defaults to the value of "idempotent_default") Set this to false if
       you want errors when the service is already stopped or stopping
 
-  get_status
+ get_status
+
      $sc->start_service('GRWeb1')
         unless $sc->get_status('GRWeb1')->{current_state} eq 'running';
 
     Returns the status info about the specified service. The status info is
     a hash containing the following keys:
 
-    Note that for reasons unknown to me the underlying win32 "GetStatus"
-    call fails when restarting services, so I added a retry counter. If you
-    are interested in finding out when and how seriously your services fail
-    the count, turn on "warnings".
+    Note that for reasons unknown to me the underlying win32 GetStatus call
+    fails when restarting services, so I added a retry counter. If you are
+    interested in finding out when and how seriously your services fail the
+    count, turn on "warnings".
 
-    * "current_state"
+      * current_state
 
       Can be any of the following
 
-      * "stopped"
+	* stopped
 
-      * "start pending"
+	* start pending
 
-      * "stop pending"
+	* stop pending
 
-      * "running"
+	* running
 
-      * "continue pending"
+	* continue pending
 
-      * "pause pending"
+	* pause pending
 
-      * "paused"
+	* paused
 
     Note that there is much more information that could be included in
-    "get_status", but I've only needed the "current_state" so far. If you
-    need something else I will gladly add more information to the returned
-    hash, or better yet, send a patch.
+    get_status, but I've only needed the current_state so far. If you need
+    something else I will gladly add more information to the returned hash,
+    or better yet, send a patch.
 
-  get_services
+ get_services
+
      my $services = $sc->get_services;
      say "$_ is installed!" for keys %$services;
 
-    Returns a hashref of services. Keys are the display name, values are the
-    real name.
+    Returns a hashref of services. Keys are the display name, values are
+    the real name.
 
-  delete_service
+ delete_service
+
      $sc->delete_service('GRWeb1', { idempotent => 0 });
 
     Deletes a service
 
-    * "autostop"
+      * autostop
 
       (defaults to false) Set this to true if you want the service to be
       stopped in addition to being deleted. If you set it to a hash
@@ -209,62 +225,74 @@ METHODS
       as that should ensure that the service is truly gone after the code
       runs.
 
-    * "idempotent"
+      * idempotent
 
       (defaults to the value of "idempotent_default") Set this to false if
       you want errors when the service doesn't exist
 
 ATTRIBUTES
-  check_command_default
-    The default value of "check_command" for the "create_service" method.
+
+ check_command_default
+
+    The default value of check_command for the "create_service" method.
     Default is true.
 
-  use_nssm_default
-    The default value of "use_nssm" for the "create_service" method.
+ use_nssm_default
 
-  use_perl_default
-    The default value of "use_perl" for the "create_service" method.
+    The default value of use_nssm for the "create_service" method.
 
-  idempotent_default
+ use_perl_default
+
+    The default value of use_perl for the "create_service" method.
+
+ idempotent_default
+
     Set this to true (default) to idempotently start, stop, delete, and
     create services.
 
-  non_blocking_default
+ non_blocking_default
+
     Set this to true (default) to asyncronously to start or stop services.
     Sometimes blocking is better as it allows for restarts, for example.
 
-  nssm_path
-    Set this to the path to nssm (default is just "nssm_64.exe", or
-    "nssm_32.exe" if you set "nssm_bits" to 32).
+ nssm_path
 
-  nssm_bits
+    Set this to the path to nssm (default is just nssm_64.exe, or
+    nssm_32.exe if you set "nssm_bits" to 32).
+
+ nssm_bits
+
     "nssm" comes in both 32 and 64 bit flavors. This specifies when of the
-    bundled "nssm" binaries to use. (default is 64)
+    bundled nssm binaries to use. (default is 64)
 
-  warnings
-    Set this to true to get warnings for non-serious failures. Currently the
-    only such warning is in "get_status".
+ warnings
+
+    Set this to true to get warnings for non-serious failures. Currently
+    the only such warning is in "get_status".
 
 nssm
-    nssm <http://nssm.cc> is a handy service wrapper for Windows. Instead of
-    adding hooks directly to your program to handly Windows service signals,
-    this program runs your program for you and intercepts the signals and
-    acts appropriately. It is open source and clocks in at less than two
-    megabytes of RAM. The code is at "git://git.nssm.cc/nssm/nssm.git".
+
+    nssm <http://nssm.cc> is a handy service wrapper for Windows. Instead
+    of adding hooks directly to your program to handly Windows service
+    signals, this program runs your program for you and intercepts the
+    signals and acts appropriately. It is open source and clocks in at less
+    than two megabytes of RAM. The code is at
+    git://git.nssm.cc/nssm/nssm.git.
 
 PRO-TIPS
+
     The best way to use this module is to subclass it for your software. So
     for example we have a subclass that looks something like the following:
 
      package Lynx::ServiceManager
-
+    
      use Moo;
      extends 'Win32::ServiceManager';
-
+    
      our $DIR = file(__FILE__)->parent->absolute;
      sub create_catalyst_service {
         my ($self, $i) = @_;
-
+    
         $self->create_service(
            name => "LynxWebServer$i",
            display => "Lynx Web Server $i",
@@ -273,33 +301,25 @@ PRO-TIPS
               $dir->file(qw( App script server.pl ))->stringify .
                  " -p 300$i",
         );
-
+    
      }
-
+    
      sub start_catalyst_service { $_[0]->start_service("LynxWebServer$_[1]", $_[2]) }
-
+    
      ...
 
     The above makes it very easy for use to start, stop, add, and remove
     catalyst services.
 
 CAVEAT LECTOR
+
     I have used this at work and am confident in it, but it has only been
     used on Windows Server 2008. The tests can do no better than ensure the
     generated strings are as expected, instead of ensuring that a service
     was correctly created or started or whatever.
 
-    Additionally, in my own work when I get an error from "sc" I just report
+    Additionally, in my own work when I get an error from sc I just report
     it and move forward. Because of this I have done very little to make
     exceptions useful. I am open to making them objects but again, I do not
     need that myself, so Patches Welcome!
-
-AUTHOR
-    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

@@ -41,6 +41,7 @@ META.yml
 privinc/My/Builder.pm
 script/kgb-add-project
 script/kgb-bot
+script/kgb-ci-report
 script/kgb-client
 script/kgb-split-config
 t/00-compile.t
@@ -55,10 +56,18 @@ t/54-client-git-squash.t
 t/55-client-git-merges-ff.t
 t/56-client-git-ff-merge-2.t
 t/57-client-git-squash-tags.t
+t/70-webhook-push.t
+t/71-webhook-push_tag.t
+t/72-webhook-wiki_page.t
+t/73-webhook-issue.t
+t/74-webhook-notes.t
+t/75-webhook-merge-request.t
+t/76-webhook-pipeline.t
+t/77-webhook-build.t
+t/78-webhook-push-squash.t
 t/critic.t
 t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/TestBot.pm
-t/version.t
 TODO

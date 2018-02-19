@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.6, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojo::RabbitMQ::Client:
     file: lib/Mojo/RabbitMQ/Client.pm
-    version: v0.0.9
+    version: v0.1.0
   Mojo::RabbitMQ::Client::Channel:
     file: lib/Mojo/RabbitMQ/Client/Channel.pm
   Mojo::RabbitMQ::Client::Consumer:
@@ -43,17 +43,19 @@ provides:
 requires:
   File::ShareDir: '0'
   List::Util: '1.33'
-  Mojolicious: '6.10'
+  Mojolicious: '7.53'
   Net::AMQP: '0.06'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/inway/mojo-rabbitmq-client/issues
   homepage: https://github.com/inway/mojo-rabbitmq-client
   repository: git://github.com/inway/mojo-rabbitmq-client.git
-version: 0.0.9
+version: 0.1.0
 x_contributors:
-  - 'Vidar Tyldum <vidar@tyldum.com>'
-  - 'Stephan Kulow <coolo@suse.de>'
+  - 'Christopher Rasch-Olsen Raa <christopher@stix.no>'
+  - 'Patrick Goldmann <patrick.goldmann@googlemail.com>'
   - 'Richard Lippmann <lippmann@findus-internet-opac.de>'
   - 'Sebastian Podjasek <sebastian@podjasek.pl>'
+  - 'Stephan Kulow <coolo@suse.de>'
+  - 'Vidar Tyldum <vidar@tyldum.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

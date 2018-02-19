@@ -28,9 +28,9 @@ Examples:
   # Let the query string be the following:
   #  "key=value&foo=bar1&foo=bar2"
   # Then:
-  my @list = $self->reqGets();      # @list = ('key', 'foo')
-  my @foo  = $self->reqGets('foo'); # @foo = ('bar1', 'bar2')
-  my @no   = $self->reqGets('no');  # @no = ()
+  my @list = tuwf->reqGets();      # @list = ('key', 'foo')
+  my @foo  = tuwf->reqGets('foo'); # @foo = ('bar1', 'bar2')
+  my @no   = tuwf->reqGets('no');  # @no = ()
 
 =head2 reqGet(name)
 
@@ -39,7 +39,7 @@ C<(reqGets($name))[0]>. The name argument is required. Since this method only
 ever returns a scalar value, it is safe to use when constructing lists:
 
   my %stuff = (
-    name => $self->reqGet('name'),
+    name => tuwf->reqGet('name'),
   );
 
 Don't do that with C<reqGets()>, as it may leave you vulnerable to parameter
@@ -47,14 +47,17 @@ injection!
 
 =head2 reqPosts(name)
 
-Behaves the same as C<reqGets()>, but fetches the information from the POST
-data of the request instead. Unlike many CGI libraries, C<reqPost()> will
-B<not> return the file contents when the parameter comes from a file upload
-input element, instead, it will return the file name.
+Behaves the same as C<reqGets()>, but fetches the information from the body of
+the request instead. Unlike many CGI libraries, C<reqPost()> will B<not> return
+the file contents when the parameter comes from a file upload input element,
+instead, it will return the file name.
+
+Contrary to its name, this method also works for I<PUT> and I<PATCH> requests,
+if they have a body with a supported content type,
 
 =head2 reqPost(name)
 
-Behaves the same as C<reqGet()>, but for POST data.
+Behaves the same as C<reqGet()>, but for the request body.
 
 =head2 reqParams(name)
 
@@ -73,6 +76,14 @@ returned instead of its contents.
 Behaves the same as C<reqGet()>, but works on both POST and GET data. If a
 parameter is set in both the POST and GET data, only the value in the POST data
 is returned.
+
+=head2 reqJSON()
+
+Returns the decoded JSON object if the request body was of type
+C<application/json>; Returns C<undef> otherwise.
+
+This requires the L<JSON::XS> module. If this module is not available, any
+request with a JSON body will automatically get a 500 response.
 
 =head2 reqUploadMIMEs(name)
 
@@ -131,14 +142,15 @@ For example:
   TUWF::set(cookie_prefix => 'ex_');
   
   # ...later, when processing a request,
-  my $auth = $self->reqCookie('auth');  # actually means 'ex_auth'
+  my $auth = tuwf->reqCookie('auth');  # actually means 'ex_auth'
   
   # when assuming the 'ex_auth' cookie to be present,
-  my @cookies = $self->reqCookie();     # @cookies = ('auth')
+  my @cookies = tuwf->reqCookie();     # @cookies = ('auth')
 
 =head2 reqMethod()
 
-Returns the HTTP request method. Can be either C<HEAD>, C<GET> or C<POST>.
+Returns the HTTP request method. Can be either C<DELETE>, C<GET>, C<HEAD>,
+C<OPTIONS>, C<PATCH>, C<POST> or C<PUT>.
 
 =head2 reqHeader(name)
 
@@ -160,6 +172,11 @@ Includes a leading slash.
 =head2 reqProtocol()
 
 Returns the protocol used to perform the request, i.e. C<http> or C<https>.
+
+Note that the detected protocol may be wrong if your website is running behind
+a reverse proxy that is either terminating or stripping HTTPS. As a workaround,
+you can manually set the correct C<HTTPS> environment variable to C<0> or C<1>
+in your initialization code or, even better, in your web server configuration.
 
 =head2 reqBaseURI()
 
@@ -201,7 +218,7 @@ L<TUWF>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2017 Yoran Heling.
+Copyright (c) 2008-2018 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

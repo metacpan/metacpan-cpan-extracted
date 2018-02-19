@@ -5,11 +5,11 @@ use warnings;
 
 $|++;
 
-use Test::More tests => 57;
+use Test::More tests => 69;
 use Test::NoWarnings;
 my $verbose = 0;
 
-BEGIN { use_ok "System::Info", qw( sysinfo si_uname ) }
+BEGIN { use_ok "System::Info", qw( sysinfo sysinfo_hash si_uname ) }
 
 ok defined &sysinfo, "sysinfo  imported";
 ok defined &si_uname, "si_uname imported";
@@ -40,11 +40,16 @@ ok defined &si_uname, "si_uname imported";
     $counter += ok ($si->os,   $si->os);
     $counter += ok ($si->host, $si->host);
 
-    my $sysinfo = sysinfo ();
+    ok (my $sysinfo = sysinfo (), "sysinfo function");
     is join ( " ", @{ $si }{map "_$_" => qw( host os cpu_type )}),
        $sysinfo, "test sysinfo $sysinfo";
 
     is ($counter, $expect, "sysinfo: $sysinfo");
+
+    ok (my $si_hash = sysinfo_hash (), "sysinfo_hash function");
+    ok (ref $si, "Returns a ref");
+    ok (defined $si_hash->{$_}, "Element $_ present and set") for
+	qw( cpu cpu_count cpu_cores cpu_type distro hostname os osname osvers );
     }
 
 {   my $si = System::Info->new;

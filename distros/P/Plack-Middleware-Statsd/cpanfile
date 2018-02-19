@@ -1,4 +1,3 @@
-requires "POSIX" => "0";
 requires "Plack::Middleware" => "0";
 requires "Plack::Util" => "0";
 requires "Plack::Util::Accessor" => "0";
@@ -8,7 +7,7 @@ requires "parent" => "0";
 requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
-recommends "Net::Statsd::Tiny" => "v0.2.0";
+recommends "Net::Statsd::Tiny" => "v0.3.0";
 
 on 'test' => sub {
   requires "File::Spec" => "0";

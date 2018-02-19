@@ -13,7 +13,7 @@ Moose::Manual::Resources - Links to various tutorials, videos, blogs, presentati
 
 =head1 VERSION
 
-version 2.2009
+version 2.2010
 
 =head1 Resources
 

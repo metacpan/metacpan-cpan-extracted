@@ -1,0 +1,26 @@
+.TRAVIS.PL
+.travis.yml
+.travis.yml.docker
+Changes
+COPYING-GPLV2
+COPYING-LGPLV3
+lib/GlusterFS/GFAPI/FFI.pm
+lib/GlusterFS/GFAPI/FFI/Dir.pm
+lib/GlusterFS/GFAPI/FFI/DirEntry.pm
+lib/GlusterFS/GFAPI/FFI/File.pm
+lib/GlusterFS/GFAPI/FFI/Util.pm
+lib/GlusterFS/GFAPI/FFI/Volume.pm
+MAINTAINERS
+Makefile.PL
+MANIFEST			This list of files
+perl-glusterfs-api.spec
+README.md
+t/00-api.t
+t/01-unit.t
+t/lib/Test.pm
+t/lib/TestDir.pm
+t/lib/TestFile.pm
+t/lib/TestVolume.pm
+VERSION
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

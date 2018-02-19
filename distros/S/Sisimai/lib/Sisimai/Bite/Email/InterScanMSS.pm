@@ -4,27 +4,13 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'     => qr/InterScan MSS/,
-    'received' => qr/[ ][(]InterScanMSS[)][ ]with[ ]/,
-    'subject'  => [
-        'Mail could not be delivered',
-        # メッセージを配信できません。
-        '=?iso-2022-jp?B?GyRCJWElQyU7ITwlOCRyR1s/LiRHJC0kXiQ7JHMhIxsoQg==?=',
-        # メール配信に失敗しました
-        '=?iso-2022-jp?B?GyRCJWEhPCVrR1s/LiRLPDpHVCQ3JF4kNyQ/GyhCDQo=?=',
-    ],
-};
-my $Re1 = {
-    'begin'  => qr|\AContent-type: text/plain|,
-    'rfc822' => qr|\AContent-type: message/rfc822|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Content-type: text/plain'],
+    'rfc822'  => ['Content-type: message/rfc822'],
+};
 
-sub pattern     { return $Re0 }
 sub description { 'Trend Micro InterScan Messaging Security Suite' }
-
 sub scan {
     # Detect an error from InterScanMSS
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -42,9 +28,17 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
+    my $tryto = [
+        'Mail could not be delivered',
+        # メッセージを配信できません。
+        '=?iso-2022-jp?B?GyRCJWElQyU7ITwlOCRyR1s/LiRHJC0kXiQ7JHMhIxsoQg==?=',
+        # メール配信に失敗しました
+        '=?iso-2022-jp?B?GyRCJWEhPCVrR1s/LiRLPDpHVCQ3JF4kNyQ/GyhCDQo=?=',
+    ];
 
-    $match ||= 1 if $mhead->{'from'} =~ $Re0->{'from'};
-    $match ||= 1 if grep { $mhead->{'subject'} eq $_ } @{ $Re0->{'subject'} };
+    # 'received' => qr/[ ][(]InterScanMSS[)][ ]with[ ]/,
+    $match ||= 1 if index($mhead->{'from'}, 'InterScan MSS') > -1;
+    $match ||= 1 if grep { $mhead->{'subject'} eq $_ } @$tryto;
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -57,10 +51,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -68,7 +62,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -92,8 +86,8 @@ sub scan {
             # Received >>> 550 5.1.1 <kijitora@example.co.jp>... user unknown
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]\z/ ||
-                $e =~ m/\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]/ ) {
+            if( $e =~ /\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]\z/ ||
+                $e =~ /\A.+[<>]{3}[ \t]+.+[<]([^ ]+[@][^ ]+)[>]/ ) {
                 # Sent <<< RCPT TO:<kijitora@example.co.jp>
                 # Received >>> 550 5.1.1 <kijitora@example.co.jp>... user unknown
                 my $cr = $1;
@@ -106,31 +100,30 @@ sub scan {
                 $recipients = scalar @$dscontents;
             }
 
-            if( $e =~ m/\ASent[ \t]+[<]{3}[ \t]+([A-Z]{4})[ \t]/ ) {
+            if( $e =~ /\ASent[ \t]+[<]{3}[ \t]+([A-Z]{4})[ \t]/ ) {
                 # Sent <<< RCPT TO:<kijitora@example.co.jp>
                 $v->{'command'} = $1
 
-            } elsif( $e =~ m/\AReceived[ \t]+[>]{3}[ \t]+(\d{3}[ \t]+.+)\z/ ) {
+            } elsif( $e =~ /\AReceived[ \t]+[>]{3}[ \t]+(\d{3}[ \t]+.+)\z/ ) {
                 # Received >>> 550 5.1.1 <kijitora@example.co.jp>... user unknown
                 $v->{'diagnosis'} = $1;
 
             } else {
                 # Error message in non-English
-                if( $e =~ m/[ ][>]{3}[ ]([A-Z]{4})/ ) {
+                if( $e =~ /[ ][>]{3}[ ]([A-Z]{4})/ ) {
                     # >>> RCPT TO ...
                     $v->{'command'} = $1;
 
-                } elsif( $e =~ m/[ ][<]{3}[ ](.+)/ ) {
+                } elsif( $e =~ /[ ][<]{3}[ ](.+)/ ) {
                     # <<< 550 5.1.1 User unknown
                     $v->{'diagnosis'} = $1;
                 }
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
@@ -186,7 +179,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

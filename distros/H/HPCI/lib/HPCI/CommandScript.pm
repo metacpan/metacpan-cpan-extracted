@@ -28,7 +28,12 @@ sub _build_script_file {
 			$self->$meth($fh) if $self->can($meth);
 		}
 
+        $self->print_pre_commands($fh) if $self->can('print_pre_commands');
+
 		print $fh $self->command, "\n";
+
+        $self->print_post_commands($fh) if $self->can('print_post_commands');
+
 		close $fh;
 		chmod(0755, $csn);
 

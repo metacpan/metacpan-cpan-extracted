@@ -5,11 +5,13 @@ use strict;
 use warnings;
 use base qw(RDF::Trine::Serializer);
 use RDF::RDFa::Generator;
+use RDF::TrineX::Compatibility::Attean;
+
 
 our $AUTHORITY = 'cpan:KJETILK';
 our ($VERSION);
 BEGIN {
-  $VERSION = '0.02';
+  $VERSION = '0.100';
   $RDF::Trine::Serializer::serializer_names{ 'rdfa' } = __PACKAGE__;
   $RDF::Trine::Serializer::format_uris{ 'http://www.w3.org/ns/formats/RDFa' } = __PACKAGE__;
   foreach my $type (qw(application/xhtml+xml text/html)) {
@@ -20,19 +22,21 @@ BEGIN {
 
 sub new {
   my ($class, %args) = @_;
+  my $opts = $args{generator_options};
+  delete $args{generator_options};
   my $gen = RDF::RDFa::Generator->new(%args); 
-  my $self = bless( { gen => $gen }, $class);
+  my $self = bless( { gen => $gen, opts => $opts }, $class);
   return $self;
 }
 
 sub serialize_model_to_string {
   my ($self, $model) = @_;
-  return $self->{gen}->create_document($model)->toString;
+  return $self->{gen}->create_document($model, %{$self->{opts}})->toString;
 }
 
 sub serialize_model_to_file {
   my ($self, $fh, $model) = @_;
-  print {$fh} $self->{gen}->create_document($model)->toString;
+  print {$fh} $self->{gen}->create_document($model, %{$self->{opts}})->toString;
 }
 
 sub serialize_iterator_to_string {
@@ -41,7 +45,7 @@ sub serialize_iterator_to_string {
   while (my $st = $iter->next) {
 	 $model->add_statement($st);
   }
-  return $self->{gen}->serialize_model_to_string($model);
+  return $self->serialize_model_to_string($model);
 }
 
 sub serialize_iterator_to_file {
@@ -50,7 +54,7 @@ sub serialize_iterator_to_file {
   while (my $st = $iter->next) {
 	 $model->add_statement($st);
   }
-  return $self->{gen}->serialize_model_to_file($fh, $model);
+  return $self->serialize_model_to_file($fh, $model);
 }
 
 
@@ -96,7 +100,10 @@ L<RDF::Trine::Serializer> class.
 Returns a new RDFa serializer object. It can any arguments are passed
 on to L<RDF::RDFa::Generator>, see it's documentation for
 details. This includes a C<style> argument that names a module that
-formats the output.
+formats the output. In addition, a C<generator_options> argument may
+be passed. This is passed to the generator's C<create_document>
+methods as options, and are typically used for style-specific
+configuration.
 
 =item C<< serialize_model_to_file ( $fh, $model ) >>
 

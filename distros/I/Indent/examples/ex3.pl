@@ -1,26 +1,13 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Data;
+use Indent::Utils qw(reduce_duplicit_ws);
 
-# Indent::Data object.
-my $i = Indent::Data->new(
-       'line_size' => '10',
-       'next_indent' => '  ',
-       'output_separator' => "|\n",
-);
-
-# Print indented text.
-print $i->indent('text text text text text text', '<->')."|\n";
+my $input = 'a  b';
+reduce_duplicit_ws(\$input);
+print "$input|\n";
 
 # Output:
-# <->text te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt te|
-# <->  xt|
+# a b|

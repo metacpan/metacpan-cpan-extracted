@@ -1,4 +1,5 @@
 requires 'Class::Method::Modifiers', '2.12';
+requires 'Config::Tiny', '2.23';
 requires 'List::MoreUtils',  '0.33';
 requires 'Module::Runtime', '0.014';
 requires 'Package::Stash', '0.36';

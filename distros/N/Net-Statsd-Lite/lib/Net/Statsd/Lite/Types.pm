@@ -10,7 +10,7 @@ use Type::Utils -all;
 
 BEGIN { extends "Types::Standard" }
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.2';
 
 
 declare "PosInt", as Int,
@@ -48,11 +48,11 @@ Net::Statsd::Lite::Types - A type library for Net::Statsd::Lite
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.2
 
 =head1 DESCRIPTION
 
-This module provides types for L<Net::Statsd::Tiny>.
+This module provides types for L<Net::Statsd::Lite>.
 
 The types declared here are intended for internal use, and subject to
 change.

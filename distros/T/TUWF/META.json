@@ -23,47 +23,56 @@
          "recommends" : {
             "DBI" : "0",
             "FCGI" : "0",
+            "HTTP::Server::Simple" : "0",
+            "JSON::XS" : "0",
             "PerlIO::gzip" : "0"
          },
          "requires" : {
-            "perl" : "v5.8.0"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "TUWF" : {
          "file" : "lib/TUWF.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "TUWF::DB" : {
          "file" : "lib/TUWF/DB.pm",
-         "version" : "1.1"
+         "version" : "1.2"
+      },
+      "TUWF::Exception" : {
+         "file" : "lib/TUWF.pm"
       },
       "TUWF::Misc" : {
          "file" : "lib/TUWF/Misc.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "TUWF::Object" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Request" : {
          "file" : "lib/TUWF/Request.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "TUWF::Response" : {
          "file" : "lib/TUWF/Response.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "TUWF::XML" : {
          "file" : "lib/TUWF/XML.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       },
       "TUWF::func" : {
+         "file" : "lib/TUWF.pm"
+      },
+      "TUWF::http" : {
          "file" : "lib/TUWF.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "homepage" : "https://dev.yorhel.nl/tuwf",
       "license" : [
          "http://opensource.org/licenses/mit-license.php"
       ],
@@ -71,6 +80,6 @@
          "url" : "https://g.blicky.net/tuwf.git/"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

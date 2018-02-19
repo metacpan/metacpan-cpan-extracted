@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.613';
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.620';
 #ABSTRACT: Role for network analyzer sweeps
 
 # Some default exports like 'inner' would collide with PDL
@@ -8,7 +8,7 @@ use Moose::Role qw/with requires/;
 use MooseX::Params::Validate 'validated_hash';
 use Moose::Util::TypeConstraints 'enum';
 use Lab::Moose::Instrument qw/
-    timeout_param getter_params precision_param
+    timeout_param getter_params precision_param validated_setter
     /;
 
 use Carp;
@@ -79,7 +79,6 @@ sub _get_data_columns {
 }
 
 
-
 sub sparam_sweep {
     my ( $self, %args ) = validated_hash(
         \@_,
@@ -135,6 +134,58 @@ sub sparam_sweep {
     return $self->_get_data_columns( $catalog, $freq_array, $points_ref );
 }
 
+sub _ensure_single_point_mode {
+    my $self   = shift;
+    my $points = $self->cached_sense_sweep_points();
+    if ( $points != 1 ) {
+        croak "not in single point mode (have $points points)";
+    }
+    my $start = $self->cached_sense_frequency_start();
+    my $stop  = $self->cached_sense_frequency_stop();
+    if ( $start != $stop ) {
+        croak <<"EOF";
+not in single point mode:
+start frequency: $start
+stop frequency: $stop
+EOF
+    }
+}
+
+sub _rel_error {
+    my $a = shift;
+    my $b = shift;
+    return ( abs( ( $a - $b ) / $b ) );
+}
+
+
+sub set_frq {
+    my ( $self, $value, %args ) = validated_setter( \@_ );
+    my $points = $self->cached_sense_sweep_points();
+    if ( $points != 1 ) {
+        $self->sense_sweep_points( value => 1 );
+    }
+    my $start = $self->cached_sense_frequency_start();
+    my $stop  = $self->cached_sense_frequency_stop();
+
+    if ( _rel_error( $start, $value ) > 1e-14 ) {
+        $self->sense_frequency_start( value => $value );
+    }
+    if ( _rel_error( $stop, $value ) > 1e-14 ) {
+        $self->sense_frequency_stop( value => $value );
+    }
+
+    $self->_ensure_single_point_mode();
+}
+
+
+sub get_frq {
+
+    # ensure single point mode
+    my $self = shift;
+    $self->_ensure_single_point_mode();
+    return $self->cached_sense_frequency_start();
+}
+
 
 1;
 
@@ -150,7 +201,7 @@ Lab::Moose::Instrument::VNASweep - Role for network analyzer sweeps
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -201,6 +252,25 @@ floating point type. Has to be 'single' or 'double'. Defaults to 'single'.
 
 =back
 
+=head2 set_frq
+
+ # Prepare VNA for single point measurement at frequency 4GHz:
+ $vna->set_frq(value => 4e9);
+
+Set VNA to single point mode. That is only a single frequency is measured and
+one point of data is returned per measurement.
+
+This high-level function make the VNA usable with L<Lab::Moose::Sweep::Step::Frequency>.
+
+Will croak if the VNA does not support single point mode.
+
+=head2 get_frq
+
+ my $frq = $vna->get_frq();
+
+Get frequency of VNA in single point mode. Croak if the VNA is not configured
+for single point measurement.
+
 =head1 REQUIRED METHODS
 
 The following methods are required for role consumption.
@@ -248,10 +318,11 @@ native byte order.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2018       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

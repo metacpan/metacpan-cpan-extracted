@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 233;
+plan tests => 239;
 
 use Math::AnyNum qw(:special rat float complex);
 
@@ -201,6 +201,13 @@ is(root(125, rat(3)),     5);
 is(root(125, complex(3)), 5);
 is(root(125, rat(3)),     5);
 is(root(125, int(3)),     5);
+
+is(join(' ', polymod(86400 - 1,                60, 60,                    24)), '59 59 23 0');
+is(join(' ', polymod(86400,                    60, 60,                    24)), '0 0 0 1');
+is(join(' ', polymod(Math::AnyNum->new(83400), 42, Math::AnyNum->new(23), 9)),  '30 7 5 9');
+is(join(' ', polymod(Math::AnyNum->new(83400), Math::AnyNum->new(42), 23)), '30 7 86');
+is(join(' ', polymod('33400i', '3+9i', '5+2i')), '-3+i 2+4i 652-39i');
+is(join(' ', polymod(polymod('33400i', '3+9i', '5+2i'))), '-1+5i 690+613i -1-i');
 
 #<<<
 is(polygonal_root('3599999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999937', Math::AnyNum::ipow(10, 128)), 9);

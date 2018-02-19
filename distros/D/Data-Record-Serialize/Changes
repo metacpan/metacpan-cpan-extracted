@@ -1,3 +1,18 @@
+0.13      2018-02-12 15:59:58-05:00 America/New_York
+
+  [BUG FIX]
+
+    * the rdb encoder warned if a field was undefined. it's now quiet.
+    * the Data::Dumper encoder didn't output eval'able code when
+      multiple records were written.
+
+  [ ENHANCEMENTS ]
+
+    * update docs for JSON encoder to indicate that it is a
+      stream of conactenated objects, and needs to be read
+      with an incremental parser.
+
+
 0.12      2017-06-15 15:43:52-04:00 America/New_York
 
   [BUILD]

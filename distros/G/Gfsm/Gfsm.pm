@@ -9,7 +9,7 @@ use Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.0407';
+our $VERSION = '0.0408';
 
 require XSLoader;
 XSLoader::load('Gfsm', $VERSION);
@@ -252,10 +252,10 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2013 by Bryan Jurish
+Copyright (C) 2005-2018 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

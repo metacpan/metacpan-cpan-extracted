@@ -2,8 +2,7 @@
 
 #
 # dbformmail.pm
-# Copyright (C) 1997-2015 by John Heidemann <johnh@isi.edu>
-# $Id: c8aa2b24886b06b214823a1d8477f09388c822fc $
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -147,8 +146,8 @@ L<Fsdb>.
 $VERSION = 2.0;
 
 use strict;
-use Carp;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;
@@ -213,7 +212,7 @@ sub parse_options ($@) {
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	) or pod2usage(2);
     if ($#argv >= 0) {
-	croak $self->{_prog} . ": format file already defined as " . $self->{_format_file} . "\n"
+	croak($self->{_prog} . ": format file already defined as " . $self->{_format_file} . "\n")
 	    if (defined($self->{_format_file}));
 	$self->{_format_file} = $argv[0];
     };
@@ -252,7 +251,7 @@ sub run ($) {
     # Read the form.
     #
     open(FORM, "<" . $self->{_format_file})
-	or croak $self->{_prog} . ": cannot open " . $self->{_format_file} . ".\n";
+	or croak($self->{_prog} . ": cannot open " . $self->{_format_file} . ".\n");
     my @form = ();
     while (<FORM>) {
 	s/\@/\\\@/g;   # quote @'s
@@ -260,7 +259,7 @@ sub run ($) {
     };
     close FORM;
 
-    croak ($self->{_prog} . ": no To: line in form.\n")
+    croak($self->{_prog} . ": no To: line in form.\n")
 	if (!grep(/^To:/i, @form));
 
     # find an end-of-form marker
@@ -272,7 +271,8 @@ sub run ($) {
 	    last;
 	};
     };
-    croak $self->{_prog} . ": cannot find an end-of-form marker that's not already in the data.\n" if (!defined($end_of_form_marker));
+    croak($self->{_prog} . ": cannot find an end-of-form marker that's not already in the data.\n")
+        if (!defined($end_of_form_marker));
 
     #
     # Generate the code.
@@ -289,7 +289,7 @@ sub run ($) {
 
     while ($fref = &$read_fastpath_sub()) {
 	my $result = eval $code;
-	$@ && die ($self->{_prog} . ": internal eval error ``$@''.\n");
+	$@ && croak($self->{_prog} . ": internal eval error ``$@''.\n");
 
 	# This is not a very elegant to extract the destination.  :-<
 	my(@field_names) = qw(to cc subject);
@@ -329,7 +329,7 @@ sub run ($) {
 	    my $subject_arg = (defined($fields{"subject"}) ? "-s '" . $fields{"subject"} . "' " : "");
 	    print "Mail $subject_arg $cc_arg '" . $fields{"to"} . "' <<'$end_of_form_marker'\n$result_body\n$end_of_form_marker\n\n";
 	} else {
-	    die $self->{_prog} . ": unknown mechanism " . $self->{_mechanism} . ".\n";
+	    croak($self->{_prog} . ": unknown mechanism " . $self->{_mechanism} . ".\n");
 	};
     };
 };
@@ -355,7 +355,7 @@ sub finish ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

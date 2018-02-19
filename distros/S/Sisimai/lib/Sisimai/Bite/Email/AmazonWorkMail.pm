@@ -5,25 +5,17 @@ use strict;
 use warnings;
 
 # https://aws.amazon.com/workmail/
-my $Re0 = {
-    'subject' => qr/Delivery[_ ]Status[_ ]Notification[_ ].+Failure/,
-    'received'=> qr/.+[.]smtp-out[.].+[.]amazonses[.]com\b/,
-    'x-mailer'=> qr/\AAmazon WorkMail\z/,
-};
-my $Re1 = {
-    'begin'   => qr/\ATechnical report:\z/,
-    'rfc822'  => qr|\Acontent-type: message/rfc822\z|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Technical report:'],
+    'rfc822'  => ['content-type: message/rfc822'],
+};
 
 # X-Mailer: Amazon WorkMail
 # X-Original-Mailer: Amazon WorkMail
 # X-Ses-Outgoing: 2016.01.14-54.240.27.159
 sub headerlist  { return ['X-SES-Outgoing', 'X-Original-Mailer'] }
-sub pattern     { return $Re0 }
 sub description { 'Amazon WorkMail: https://aws.amazon.com/workmail/' }
-
 sub scan {
     # Detect an error from Amazon WorkMail
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -43,11 +35,13 @@ sub scan {
     my $match = 0;
     my $xmail = $mhead->{'x-original-mailer'} || $mhead->{'x-mailer'} || '';
 
+    # 'subject' => qr/Delivery[_ ]Status[_ ]Notification[_ ].+Failure/,
+    # 'received'=> qr/.+[.]smtp-out[.].+[.]amazonses[.]com\b/,
     $match++ if $mhead->{'x-ses-outgoing'};
     if( $xmail ) {
         # X-Mailer: Amazon WorkMail
         # X-Original-Mailer: Amazon WorkMail
-        $match++ if $xmail =~ $Re0->{'x-mailer'};
+        $match++ if $xmail eq 'Amazon WorkMail';
     }
     return undef if $match < 2;
 
@@ -65,10 +59,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e eq $StartingOf->{'message'}->[0] ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -76,7 +70,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -103,7 +97,7 @@ sub scan {
                 # Status: 4.4.7
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; kijitora@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -113,16 +107,16 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.1.1
                     $v->{'status'} = $1;
 
                 } else {
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <kijitora@example.jp>... User Unknown
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
@@ -133,7 +127,7 @@ sub scan {
                 #
                 # Reporting-MTA: dsn; a27-85.smtp-out.us-west-2.amazonses.com
                 #
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*[DNSdns]+;[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*[DNSdns]+;[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; mx.example.jp
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
@@ -145,7 +139,7 @@ sub scan {
             # <head>
             # <meta name="Generator" content="Amazon WorkMail v3.0-2023.77">
             # <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-            last if $e =~ m/\A[<]!DOCTYPE HTML[>][<]html[>]\z/;
+            last if index($e, '<!DOCTYPE HTML><html>') == 0;
         } # End of if: rfc822
     }
 
@@ -158,27 +152,22 @@ sub scan {
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( $e->{'status'} =~ m/\A[45][.][01][.]0\z/ ) {
+        if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
             # Get other D.S.N. value from the error message
             my $pseudostatus = '';
             my $errormessage = $e->{'diagnosis'};
 
-            if( $e->{'diagnosis'} =~ m/["'](\d[.]\d[.]\d.+)['"]/ ) {
-                # 5.1.0 - Unknown address error 550-'5.7.1 ...
-                $errormessage = $1;
-            }
-
+            # 5.1.0 - Unknown address error 550-'5.7.1 ...
+            $errormessage = $1 if $e->{'diagnosis'} =~ /["'](\d[.]\d[.]\d.+)['"]/;
             $pseudostatus = Sisimai::SMTP::Status->find($errormessage);
             $e->{'status'} = $pseudostatus if length $pseudostatus;
         }
 
-        if( $e->{'diagnosis'} =~ m/[<]([245]\d\d)[ ].+[>]/ ) {
-            # 554 4.4.7 Message expired: unable to deliver in 840 minutes.
-            # <421 4.4.2 Connection timed out>
-            $e->{'replycode'} = $1;
-        }
-        $e->{'reason'} ||= Sisimai::SMTP::Status->name($e->{'status'});
-        $e->{'agent'}    = __PACKAGE__->smtpagent;
+        # 554 4.4.7 Message expired: unable to deliver in 840 minutes.
+        # <421 4.4.2 Connection timed out>
+        $e->{'replycode'} = $1 if $e->{'diagnosis'} =~ /[<]([245]\d\d)[ ].+[>]/;
+        $e->{'reason'}  ||= Sisimai::SMTP::Status->name($e->{'status'});
+        $e->{'agent'}     = __PACKAGE__->smtpagent;
     }
     $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
     return { 'ds' => $dscontents, 'rfc822' => $$rfc822part };
@@ -227,7 +216,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

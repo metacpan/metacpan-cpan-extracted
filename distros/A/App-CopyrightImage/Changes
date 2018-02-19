@@ -1,6 +1,14 @@
 Revision history for App-CopyrightImage
 
-0.04    UNRELEASED
+1.01    2018-02-11
+        - remove perl 5.8 from Travis
+
+1.00    2018-02-11
+        - no functional change
+        - add Github information to Makefile.PL
+        - made POD tests developer only
+
+0.04    2016-07-28
         - added tests for 'dst' and 'remove'
         - updated POD with warnings that 'remove' DOES edit original files
           without making copies

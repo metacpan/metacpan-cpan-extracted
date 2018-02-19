@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -35,12 +35,15 @@
       },
       "test" : {
          "requires" : {
+            "Clone" : "0",
+            "File::Spec" : "0",
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.19",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

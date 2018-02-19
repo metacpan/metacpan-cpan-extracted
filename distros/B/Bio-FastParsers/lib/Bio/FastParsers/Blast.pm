@@ -1,6 +1,6 @@
 package Bio::FastParsers::Blast;
-# ABSTRACT: classes for parsing BLAST output
-$Bio::FastParsers::Blast::VERSION = '0.180330';
+# ABSTRACT: Classes for parsing BLAST output
+$Bio::FastParsers::Blast::VERSION = '0.180470';
 use strict;
 use warnings;
 
@@ -15,19 +15,20 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Blast - classes for parsing BLAST output
+Bio::FastParsers::Blast - Classes for parsing BLAST output
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 
-    # TODO
+    # see Bio::FastParsers::Blast::Table
+    # see Bio::FastParsers::Blast::Xml
 
 =head1 DESCRIPTION
 
-    # TODO
+Parsers for two BLAST output formats are available: tabular and XML.
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use warnings;
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 our $Debug   = 0;
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 use File::Slurp::Tiny 'read_lines';
 
@@ -3391,8 +3391,10 @@ Sean M. Burke, C<< <sburke@cpan.org> >>
 
 Copyright 1998-2001, 2004, 2007 by Sean M. Burke and David Hand.
 
-This program is free software. It is released under the Artistic License 2.0.
-See L<http://opensource.org/licenses/Artistic-2.0>.
+This Program of ours is 'OSI Certified Open Source Software';
+you can redistribute it and/or modify it under the terms of
+The Perl License, a copy of which is available at:
+http://dev.perl.org/licenses/
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

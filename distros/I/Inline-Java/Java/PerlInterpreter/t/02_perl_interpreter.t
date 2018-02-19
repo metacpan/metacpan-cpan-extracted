@@ -121,7 +121,7 @@ class InlineJavaPerlInterpreterTests implements Runnable {
 			pi.require("Carp") ;
 			ok("1", "1") ;
 			Integer sum = (Integer)pi.eval("34 + 56", Integer.class) ;
-			ok(sum, new Integer(90)) ;
+			ok(sum, Integer.valueOf(90)) ;
 			String name = (String)pi.CallPerlSub("whats_your_name", null, String.class) ;
 			ok(name, "perl") ;
 	
@@ -132,12 +132,12 @@ class InlineJavaPerlInterpreterTests implements Runnable {
 
 			pi.StartCallbackLoop();
 
-			ArrayList a = new ArrayList() ;
+			ArrayList<Integer> a = new ArrayList<>() ;
 			for (int i = 0 ; i < 100 ; i++){
-				a.add(new Integer(i * 2)) ;
+				a.add(Integer.valueOf(i * 2)) ;
 			}
 			sum = (Integer)pi.CallPerlSub("sum_array_list", new Object [] {a}, Integer.class) ;
-			ok(sum, new Integer(9900)) ;
+			ok(sum, Integer.valueOf(9900)) ;
 
 			pi.destroy() ;
 			ok("1", "1") ;

@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::LinuxGPIB;
-$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.613';
+$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.620';
 #ABSTRACT: Connection back end to the LinuxGpib library and kernel drivers
 
 
@@ -300,7 +300,7 @@ Lab::Moose::Connection::LinuxGPIB - Connection back end to the LinuxGpib library
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -455,7 +455,7 @@ Call device clear (ibclr) on the connection.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

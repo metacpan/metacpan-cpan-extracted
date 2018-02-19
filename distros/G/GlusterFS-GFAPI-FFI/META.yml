@@ -1,0 +1,61 @@
+---
+abstract: 'FFI Perl binding for GlusterFS libgfapi'
+author:
+  - 'Ji-Hyeon Gim <potatogim@gluesys.com>'
+build_requires:
+  Data::Dumper: '0'
+  Devel::Peek: '0'
+  ExtUtils::MakeMaker: '0'
+  IO::Select: '0'
+  IPC::Open3: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Symbol: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Time::HiRes: '0'
+  locale: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GlusterFS-GFAPI-FFI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  FFI::Platypus: '0'
+  FFI::Platypus::Buffer: '0'
+  FFI::Platypus::Declare: '0'
+  FFI::Platypus::Memory: '0'
+  Fcntl: '0'
+  File::Spec: '0'
+  Generator::Object: '0'
+  List::MoreUtils: '0'
+  Moo: '0'
+  POSIX: '0'
+  Scalar::Util::Numeric: '0'
+  Try::Tiny: '0'
+  overload: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  X_type: git
+  X_url: https://github.com/gluster/libgfapi-perl.git
+  X_web: https://github.com/gluster/libgfapi-perl
+version: '0.4'
+x_bugtracker:
+  web: https://github.com/gluster/libgfapi-perl/issues
+x_homepage: https://github.com/gluster/libgfapi-perl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

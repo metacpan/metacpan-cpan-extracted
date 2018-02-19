@@ -1,6 +1,6 @@
 package Lab::Connection;
 #ABSTRACT: Connection base class
-$Lab::Connection::VERSION = '3.613';
+$Lab::Connection::VERSION = '3.620';
 use strict;
 
 #use POSIX; # added for int() function
@@ -338,7 +338,7 @@ Lab::Connection - Connection base class
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -474,7 +474,7 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2010-2011  Andreas K. Huettel, Florian Olbrich
             2012       Florian Olbrich, Hermann Kraus, Stefan Geissler

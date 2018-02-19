@@ -1,5 +1,14 @@
+0.057	- 2018-02-11,  H.Merijn Brand
+    * Add VERSION_ID to distroname if set
+    * Add DragonFly (PR#2 - xenu)
+    * Add sysinfo_hash
+    * It's 2018
+    * Add get_core_count
+    * Add CentOS 7.4
+    * Makefile.PL dependencies based on EU::MM version (PR#3 - jkeenan)
+
 0.056	- 2017-09-22,  H.Merijn Brand
-    * Use Darwin infor internally lowercase (RT#97441 from Test::Smoke)
+    * Use Darwin info internally lowercase (RT#97441 from Test::Smoke)
     * Add arm for aarch64 (RT#119691)
     * Add info for Ubuntu-16.04
     * Use lsb_release (command) as fallback

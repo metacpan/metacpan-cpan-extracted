@@ -1,0 +1,43 @@
+---
+abstract: "Songmu's sample module"
+author:
+  - 'Songmu <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Songmu
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Songmu:
+    file: lib/Acme/Songmu.pm
+    version: v0.0.3
+requires:
+  Class::Accessor::Lite::Lazy: '0.03'
+  Encode: '0'
+  Time::Piece: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/Songmu/Acme-Songmu/issues
+  homepage: https://github.com/Songmu/Acme-Songmu
+  repository: git://github.com/Songmu/Acme-Songmu.git
+version: v0.0.3
+x_authority: cpan:SONGMU
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

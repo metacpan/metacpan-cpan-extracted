@@ -1,10 +1,8 @@
 package Config::Dot;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Config::Utils qw(hash);
 use English qw(-no_match_vars);
@@ -14,8 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -257,11 +254,9 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 EXAMPLE1
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot;
  use Dumpvalue;
 
@@ -285,11 +280,9 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 EXAMPLE2
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot;
 
  # Object with data.
@@ -311,11 +304,9 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 EXAMPLE3
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Config::Dot;
  use Dumpvalue;
 
@@ -363,6 +354,10 @@ L<Readonly>.
 
 Common config utilities.
 
+=item L<Config::Dot::Array>
+
+Module for simple configure file parsing with arrays.
+
 =back
 
 =head1 REPOSITORY
@@ -371,17 +366,17 @@ L<https://github.com/tupinek/Config-Dot>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2015 Michal Špaček
+ © 2011-2018 Michal Josef Špaček
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

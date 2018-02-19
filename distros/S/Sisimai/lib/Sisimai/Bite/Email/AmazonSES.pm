@@ -5,35 +5,19 @@ use strict;
 use warnings;
 
 # http://aws.amazon.com/ses/
-my $Re0 = {
-    'from'    => qr/\AMAILER-DAEMON[@]email[-]bounces[.]amazonses[.]com\z/,
-    'subject' => qr/\ADelivery Status Notification [(]Failure[)]\z/,
-};
-my $Re1 = {
-    'begin'   => qr/\A(?:
-         The[ ]following[ ]message[ ]to[ ][<]
-        |An[ ]error[ ]occurred[ ]while[ ]trying[ ]to[ ]deliver[ ]the[ ]mail[ ]
-        )
-    /x,
-    'rfc822'  => qr|\Acontent-type: message/rfc822\z|,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReE = {
-    'x-mailer' => qr/Amazon[ ]WorkMail/,
-};
-my $ReFailure = {
-    'expired' => qr/Delivery[ ]expired/x,
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['The following message to <', 'An error occurred while trying to deliver the mail '],
+    'rfc822'  => ['content-type: message/rfc822'],
+};
+my $ReFailures = { 'expired' => qr/Delivery expired/ };
 
 # X-SenderID: Sendmail Sender-ID Filter v1.0.0 nijo.example.jp p7V3i843003008
 # X-Original-To: 000001321defbd2a-788e31c8-2be1-422f-a8d4-cf7765cc9ed7-000000@email-bounces.amazonses.com
 # X-AWS-Outgoing: 199.255.192.156
 # X-SES-Outgoing: 2016.10.12-54.240.27.6
 sub headerlist  { return ['X-AWS-Outgoing', 'X-SES-Outgoing', 'x-amz-sns-message-id'] }
-sub pattern     { return $Re0 }
 sub description { 'Amazon SES(Sending): http://aws.amazon.com/ses/' };
-
 sub scan {
     # Detect an error from Amazon SES
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -53,7 +37,9 @@ sub scan {
     my $match = 0;
     my $xmail = $mhead->{'x-mailer'} || '';
 
-    return undef if $xmail =~ $ReE->{'x-mailer'};
+    # 'from'    => qr/\AMAILER-DAEMON[@]email[-]bounces[.]amazonses[.]com\z/,
+    # 'subject' => qr/\ADelivery Status Notification [(]Failure[)]\z/,
+    return undef if index($xmail, 'Amazon WorkMail') > -1;
     $match ||= 1 if $mhead->{'x-aws-outgoing'};
     $match ||= 1 if $mhead->{'x-ses-outgoing'};
     return undef unless $match;
@@ -73,10 +59,11 @@ sub scan {
     my $p = '';
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ||
+                index($e, $StartingOf->{'message'}->[1]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -84,7 +71,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -117,7 +104,7 @@ sub scan {
                 # content-type: message/rfc822
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[Ff]inal-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                if( $e =~ /\AFinal-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # Final-Recipient: RFC822; userunknown@example.jp
                     if( length $v->{'recipient'} ) {
                         # There are multiple recipient addresses in the message body.
@@ -127,36 +114,35 @@ sub scan {
                     $v->{'recipient'} = $1;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[Xx]-[Aa]ctual-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
+                } elsif( $e =~ /\AX-Actual-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ) {
                     # X-Actual-Recipient: RFC822; kijitora@example.co.jp
                     $v->{'alias'} = $1;
 
-                } elsif( $e =~ m/\A[Aa]ction:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\AAction:[ ]*(.+)\z/ ) {
                     # Action: failed
                     $v->{'action'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ss]tatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
+                } elsif( $e =~ /\AStatus:[ ]*(\d[.]\d+[.]\d+)/ ) {
                     # Status: 5.1.1
                     # Status:5.2.0
                     # Status: 5.1.0 (permanent failure)
                     $v->{'status'} = $1;
 
-                } elsif( $e =~ m/\A[Rr]emote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ARemote-MTA:[ ]*(?:DNS|dns);[ ]*(.+)\z/ ) {
                     # Remote-MTA: DNS; mx.example.jp
                     $v->{'rhost'} = lc $1;
 
-                } elsif( $e =~ m/\A[Ll]ast-[Aa]ttempt-[Dd]ate:[ ]*(.+)\z/ ) {
+                } elsif( $e =~ /\ALast-Attempt-Date:[ ]*(.+)\z/ ) {
                     # Last-Attempt-Date: Fri, 14 Feb 2014 12:30:08 -0500
                     $v->{'date'} = $1;
 
                 } else {
-
-                    if( $e =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*(.+?);[ ]*(.+)\z/ ) {
+                    if( $e =~ /\ADiagnostic-Code:[ ]*(.+?);[ ]*(.+)\z/ ) {
                         # Diagnostic-Code: SMTP; 550 5.1.1 <userunknown@example.jp>... User Unknown
                         $v->{'spec'} = uc $1;
                         $v->{'diagnosis'} = $2;
 
-                    } elsif( $p =~ m/\A[Dd]iagnostic-[Cc]ode:[ ]*/ && $e =~ m/\A[ \t]+(.+)\z/ ) {
+                    } elsif( index($p, 'Diagnostic-Code:') == 0 && $e =~ /\A[ \t]+(.+)\z/ ) {
                         # Continued line of the value of Diagnostic-Code header
                         $v->{'diagnosis'} .= ' '.$1;
                         $e = 'Diagnostic-Code: '.$e;
@@ -173,7 +159,7 @@ sub scan {
                 #
                 # Reporting-MTA: dns; a192-79.smtp-out.amazonses.com
                 #
-                if( $e =~ m/\A[Rr]eporting-MTA:[ ]*[DNSdns]+;[ ]*(.+)\z/ ) {
+                if( $e =~ /\AReporting-MTA:[ ]*[DNSdns]+;[ ]*(.+)\z/ ) {
                     # Reporting-MTA: dns; mx.example.jp
                     next if length $connheader->{'lhost'};
                     $connheader->{'lhost'} = lc $1;
@@ -186,7 +172,7 @@ sub scan {
         $p = $e;
     }
 
-    if( $recipients == 0 && $$mbody =~ m/notificationType/ ) {
+    if( $recipients == 0 && index($$mbody, 'notificationType') > -1 ) {
         # Try to parse with Sisimai::Bite::JSON::AmazonSES module
         require Sisimai::Bite::JSON::AmazonSES;
         my $j = Sisimai::Bite::JSON::AmazonSES->scan($mhead, $mbody);
@@ -197,36 +183,32 @@ sub scan {
             $recipients = scalar @{ $j->{'ds'} };
         }
     }
-
     return undef unless $recipients;
+
     require Sisimai::String;
     require Sisimai::SMTP::Status;
-
     for my $e ( @$dscontents ) {
         # Set default values if each value is empty.
         map { $e->{ $_ } ||= $connheader->{ $_ } || '' } keys %$connheader;
 
         $e->{'agent'}     = __PACKAGE__->smtpagent;
-        $e->{'diagnosis'} =~ s{\\n}{ }g;
+        $e->{'diagnosis'} =~ s/\\n/ /g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( $e->{'status'} =~ m/\A[45][.][01][.]0\z/ ) {
+        if( $e->{'status'} =~ /\A[45][.][01][.]0\z/ ) {
             # Get other D.S.N. value from the error message
             my $pseudostatus = '';
             my $errormessage = $e->{'diagnosis'};
 
-            if( $e->{'diagnosis'} =~ m/["'](\d[.]\d[.]\d.+)['"]/ ) {
-                # 5.1.0 - Unknown address error 550-'5.7.1 ...
-                $errormessage = $1;
-            }
-
+            # 5.1.0 - Unknown address error 550-'5.7.1 ...
+            $errormessage = $1 if $e->{'diagnosis'} =~ /["'](\d[.]\d[.]\d.+)['"]/;
             $pseudostatus = Sisimai::SMTP::Status->find($errormessage);
             $e->{'status'} = $pseudostatus if length $pseudostatus;
         }
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -278,7 +260,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

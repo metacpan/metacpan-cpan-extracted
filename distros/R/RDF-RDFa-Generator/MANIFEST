@@ -23,6 +23,5 @@ lib/RDF/RDFa/Generator/HTML/Pretty.pm
 lib/RDF/RDFa/Generator/HTML/Pretty/Note.pm
 t/01basic.t
 t/02_kk_namespaces.t
-t/02_kk_trine.t
 t/03_kk_attean.t
 t/uninit_lang_warning.t

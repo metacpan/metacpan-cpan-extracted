@@ -43,6 +43,6 @@
          "url" : "https://git.ieval.ro/?p=app-scheme79asm.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

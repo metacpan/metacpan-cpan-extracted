@@ -1,6 +1,13 @@
 Revision history for Perl extension File::Replace.
 
-0.06	Sat, Sep 30 2017
+0.08	Sat, Feb 10 2018
+	- REMOVED the deprecated "devnull" option and "create" values
+	- Added "replace3" convenience constructor
+	- Added "copy" method
+	- Now this module depends only on core modules
+	- Various smaller documentation updates
+
+0.06	Sat, Sep 30 2017	commit d4264a671eb6539b245a1a1e52e2498e4a7dfa3d
 	- DEPRECATED "devnull" option (merged into "create" option)
 	- DEPRECATED previous "create" option values
 	- added "in_fh" option

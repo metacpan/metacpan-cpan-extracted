@@ -1,3 +1,8 @@
+0.020   2018-02-17 (PERLANCAR)
+
+	- Add pair: ten_idr.
+
+
 0.019   2018-02-01 (PERLANCAR)
 
 	- ticker: Remove --pair argument because the API only provides

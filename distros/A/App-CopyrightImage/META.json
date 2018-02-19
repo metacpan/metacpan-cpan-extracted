@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/p5-app-copyrightimage/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/p5-app-copyrightimage.git",
+         "web" : "https://github.com/stevieb9/p5-app-copyrightimage"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

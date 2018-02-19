@@ -48,6 +48,7 @@ kgb-client - relay commits to KGB servers
                     --[no]-use-color
                     --message-template I<template>
                     --batch-messages
+                    --dry-run
 
 =item B<kgb-client> I<option>... I</svn/repo> I<revision>
 
@@ -209,7 +210,7 @@ my ($conf_file,      $uri,        $proxy,
     $fake,           $protocol,   $relay_msg,
     $help,           $man,        $use_irc_notices,
     $use_color,      %colors,     $msg_template,
-    $batch_messages,
+    $batch_messages, $dry_run,
 
     # Git
     $squash_threshold, $squash_msg_template,
@@ -223,7 +224,8 @@ $single_line_commits = 'auto';
 $use_color           = 1;
 $msg_template = '${{author-name} }${{branch} }${{commit} }${{module}}${ {changes}}${ {log-first-line}}${ * {web-link}}';
 # multi-line notifications
-# $msg_template = '${{author-name} }${{branch} }${{commit} }${{project}/}${{module}}${ {changes}}${ * {web-link}}${\n{log}}';
+# $msg_template = '${{author-name} }${{branch} }${{commit} }${{module}}${ {changes}}${ * {web-link}}
+# ${{log}}';
 
 Getopt::Long::Configure('pass_through');
 
@@ -429,6 +431,7 @@ GetOptions(
     'use-color!'                 => \$use_color,
     'message-template=s'         => \$msg_template,
     'batch-messages!'            => \$batch_messages,
+    'dry-run!'                   => \$dry_run,
     'squash-threshold=s'         => \$squash_threshold,
     'squash-msg-template=s'      => \$squash_msg_template,
     'branch-ff-msg-template=s'   => \$branch_ff_msg_template,
@@ -452,6 +455,7 @@ push @servers, { uri => $uri } if $uri;
         {   password => $password,
             timeout  => $timeout,
             verbose  => $verbose,
+            dry_run  => $dry_run,
             %$_
         }
         )

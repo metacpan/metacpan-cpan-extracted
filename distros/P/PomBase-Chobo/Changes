@@ -1,6 +1,33 @@
 Revision history for PomBase-Chobo
 
+0.020     2018-02-19 15:19:37
+          Warn if "def:" lines differ when merging terms
+
+0.019     2018-02-16 18:10:46
+          Require a version of List::Util that has the uniq() function to
+          prevent failures on older Perls.
+
+0.018     2018-02-14 20:06:21
+          Fixes several bugs we storing dbxrefs from "def:" lines
+
+0.017     2018-02-14 17:28:35
+          Fix bug handling odd dbxrefs that have no accession
+
+0.016     2018-02-14 17:16:01
+          Store dbxrefs for term definitions
+
+0.015     2018-02-14 11:05:39
+          Bug fix: allow single character synonyms (eg. "I" from so-simple.obo)
+
+0.014     2018-02-13 23:43:39
+          Allow escaped double quotes in synonyms - example from chebi.obo:
+          "alpha-GalCer-6\"-(4-chlorophenyl)carbamate" RELATED [ChEBI:]
+
+0.013     2018-02-13 20:22:12
+          Store the data-version from the OBO file in the cvprop table
+
 0.012     2017-02-22 11:36:03
+          Exit with a non-zero code when parsing or loading fails
 
 0.011     2016-08-18 13:09:42
           Ignore trailing modifiers - See section "Trailing Modifiers" in:

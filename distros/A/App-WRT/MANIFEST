@@ -1,5 +1,4 @@
 .travis.yml
-App-WRT-v4.2.0.tar.gz
 benchmark.pl
 bin/wrt
 bin/wrt-addprop
@@ -24,30 +23,6 @@ example/archives/image_test/index
 example/archives/image_test/machin_stderr.png
 example/archives/include_test/index
 example/files/include_me
-example/public/2014/1/1/index.html
-example/public/2014/1/1/test_entry/index.html
-example/public/2014/1/2/index.html
-example/public/2014/1/2/tag-something.prop
-example/public/2014/1/index.html
-example/public/2014/index.html
-example/public/all/index.html
-example/public/feed
-example/public/feed.xml
-example/public/gallery_test/index.html
-example/public/gallery_test/machin_stderr.png
-example/public/gallery_test/Thumbs/machin_stderr.png
-example/public/icon_test/dir/index.html
-example/public/icon_test/dir/index.icon.png
-example/public/icon_test/dir/subentry.icon.png
-example/public/icon_test/dir/subentry/index.html
-example/public/icon_test/index.html
-example/public/icon_test/textfile.icon.png
-example/public/icon_test/textfile/index.html
-example/public/image_test/index.html
-example/public/image_test/machin_stderr.png
-example/public/image_test/Thumbs/machin_stderr.png
-example/public/include_test/index.html
-example/public/index.html
 example/templates/basic
 example/wrt.json
 lib/App/WRT.pm
@@ -60,8 +35,7 @@ lib/App/WRT/MethodSpit.pm
 lib/App/WRT/Renderer.pm
 lib/App/WRT/Util.pm
 MANIFEST			This list of files
-META.json
-META.yml
+readme.html
 README.pod
 t/eval_perl.t
 t/spittest.pl
@@ -71,3 +45,5 @@ t/wrt_date.t
 t/wrt_html.t
 t/wrt_markup.t
 t/wrt_util.t
+META.yml
+META.json

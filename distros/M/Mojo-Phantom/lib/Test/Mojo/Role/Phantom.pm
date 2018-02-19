@@ -55,7 +55,7 @@ sub phantom_ok {
         }
         die $err if $err;
       },
-    )->tap(on => error => sub{ Test::More::fail($_[1]) })->wait;
+    )->catch(sub{ Test::More::fail(pop) })->wait;
   };
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   return $t->success(Test::More::subtest($name => $block));

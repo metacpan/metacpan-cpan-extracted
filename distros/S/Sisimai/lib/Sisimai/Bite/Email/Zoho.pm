@@ -4,32 +4,18 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'     => qr/mailer-daemon[@]mail[.]zoho[.]com\z/,
-    'subject'  => qr{\A(?:
-         Undelivered[ ]Mail[ ]Returned[ ]to[ ]Sender
-        |Mail[ ]Delivery[ ]Status[ ]Notification
-        )
-    }x,
-    'x-mailer' => qr/\AZoho Mail\z/,
-};
-my $Re1 = {
-    'begin'  => qr/\AThis message was created automatically by mail delivery/,
-    'rfc822' => qr/\AReceived:[ \t]*from mail[.]zoho[.]com/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReFailure = {
-    'expired' => qr/Host not reachable/
-};
 my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This message was created automatically by mail delivery'],
+    'rfc822'  => ['from mail.zoho.com by mx.zohomail.com'],
+};
+my $ReFailures = { 'expired' => qr/Host not reachable/ };
 
 # X-ZohoMail: Si CHF_MF_NL SS_10 UW48 UB48 FMWL UW48 UB48 SGR3_1_09124_42
 # X-Zoho-Virus-Status: 2
 # X-Mailer: Zoho Mail
 sub headerlist  { return ['X-ZohoMail'] }
-sub pattern     { return $Re0 }
 sub description { 'Zoho Mail: https://www.zoho.com' }
-
 sub scan {
     # Detect an error from Zoho Mail
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -47,6 +33,9 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
 
+    # 'from'     => qr/mailer-daemon[@]mail[.]zoho[.]com\z/,
+    # 'subject'  => qr/\A(?:Undelivered Mail Returned to Sender|Mail Delivery Status Notification)/x,
+    # 'x-mailer' => qr/\AZoho Mail\z/,
     return undef unless $mhead->{'x-zohomail'};
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -60,10 +49,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -71,7 +60,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) > -1 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -104,7 +93,7 @@ sub scan {
             # shironeko@example.org Invalid Address, ERROR_CODE :550, ERROR_CODE :Requested action not taken: mailbox unavailable
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A([^ ]+[@][^ ]+)[ \t]+(.+)\z/ ) {
+            if( $e =~ /\A([^ ]+[@][^ ]+)[ \t]+(.+)\z/ ) {
                 # kijitora@example.co.jp Invalid Address, ERROR_CODE :550, ERROR_CODE :5.1.=
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -114,14 +103,14 @@ sub scan {
                 $v->{'recipient'} = $1;
                 $v->{'diagnosis'} = $2;
 
-                if( $v->{'diagnosis'} =~ m/=\z/ ) {
+                if( substr($v->{'diagnosis'}, -1, 1) eq '=' ) {
                     # Quoted printable
-                    $v->{'diagnosis'} =~ s/=\z//;
+                    substr($v->{'diagnosis'}, -1, 1, '');
                     $qprintable = 1;
                 }
                 $recipients++;
 
-            } elsif( $e =~ m/\A\[Status: .+[<]([^ ]+[@][^ ]+)[>],/ ) {
+            } elsif( $e =~ /\A\[Status: .+[<]([^ ]+[@][^ ]+)[>],/ ) {
                 # Expired
                 # [Status: Error, Address: <kijitora@6kaku.example.co.jp>, ResponseCode 421, , Host not reachable.]
                 if( length $v->{'recipient'} ) {
@@ -141,16 +130,16 @@ sub scan {
         } # End of if: rfc822
     }
     return undef unless $recipients;
-    require Sisimai::String;
 
+    require Sisimai::String;
     for my $e ( @$dscontents ) {
         $e->{'agent'}     =  __PACKAGE__->smtpagent;
-        $e->{'diagnosis'} =~ s{\\n}{ }g;
+        $e->{'diagnosis'} =~ s/\\n/ /g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        SESSION: for my $r ( keys %$ReFailure ) {
+        SESSION: for my $r ( keys %$ReFailures ) {
             # Verify each regular expression of session errors
-            next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+            next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
             $e->{'reason'} = $r;
             last;
         }
@@ -202,7 +191,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

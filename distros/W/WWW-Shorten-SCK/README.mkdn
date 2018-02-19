@@ -4,12 +4,7 @@ WWW::Shorten::SCK - Perl interface to sck.pm
 
 # VERSION
 
-version 0.5
-
-# DESCRIPTION
-
-A Perl interface to the web sck.pm. SCK keep a database of long URLs,
-and give you a tiny one.
+version 0.7
 
 # SYNOPSIS
 
@@ -19,6 +14,11 @@ and give you a tiny one.
     my $short_url = "";
     $short_url = makeashorterlink($long_url);
     $long_url = makealongerlink($short_url);
+
+# DESCRIPTION
+
+A Perl interface to the web sck.pm. SCK keep a database of long URLs,
+and give you a tiny one.
 
 # METHODS
 
@@ -41,12 +41,12 @@ See the main [WWW::Shorten](https://metacpan.org/pod/WWW::Shorten) docs.
 
 # SEE ALSO
 
-[WWW::Shorten](https://metacpan.org/pod/WWW::Shorten), [perl](https://metacpan.org/pod/perl), [http://sck.pm/](http://sck.pm/)
+[WWW::Shorten](https://metacpan.org/pod/WWW::Shorten), [perl](https://metacpan.org/pod/perl), [https://www.sck.pm/](https://www.sck.pm/)
 
 # BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/celogeek/WWW-Shorten-SCK/issues
+[https://github.com/celogeek/WWW-Shorten-SCK/issues](https://github.com/celogeek/WWW-Shorten-SCK/issues)
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

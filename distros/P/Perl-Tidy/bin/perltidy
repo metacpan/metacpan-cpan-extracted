@@ -1603,6 +1603,133 @@ alternatives:
 	zzz();
   }
 
+=item B<-cb>,   B<--cuddled-blocks>
+
+This flag enables the "cuddled else" format style on a chain of specified block
+types.  The default is to apply it to a chain consisting of try-catch-finally
+blocks, but it can apply to any desired chain of blocks by specifying their
+names on a separate parameter B<-cbl>, described in the next section.  
+
+    # perltidy -cb:
+    try {
+        throw Error::Simple( "ok 2\n", 2 );
+    } catch Error::Simple with {
+        my $err = shift;
+        print "$err";
+    } finally {
+        print "ok 3\n";
+    };
+
+Cuddling between a pair of code blocks requires that the closing brace of the
+first block start a new line.  If this block is entirely on one line in the
+input file, it is necessary to decide if it should be broken to allow cuddling.
+This decision is controlled by the flag B<-cbo=n> discussed below.  The default
+and recommended value of B<-cbo=1> bases this decision on the first block in
+the chain.  If it spans multiple lines then cuddling is made and continues
+along the chain, regardless of the sizes of subsequent blocks. Otherwise, short
+lines remain intact.
+
+So for example, the B<-cb> flag would not have any effect if the above snippet
+is rewritten as
+
+    try { throw Error::Simple( "ok 2\n", 2 ); }
+    catch Error::Simple with { my $err = shift; print "$err"; }
+    finally { print "ok 3\n"; };
+
+If the first block spans multiple lines, then cuddling can be done and will
+continue for the subsequent blocks in the chain, as illustrated in the previous
+snippet.
+
+If there are blank lines between cuddled blocks they will be eliminated.  If
+there are comments after the closing brace where cuddling would occur then
+cuddling will be prevented.  If this occurs, cuddling will restart later in the
+chain if possible.  
+
+The default for this parameter is B<--nocuddled-blocks>
+
+=item B<-cbl>,    B<--cuddled-block-list>     
+
+The block types to which the B<-cuddled-blocks> style applies is defined by
+this parameter.  This parameter is a character string, giving a list of
+block types separated by dashes.
+
+The default value for this string is 
+
+   -cbl="try-catch-finally" 
+
+This string will cause cuddled formatting to be applied to every block in a chain
+starting with a "try" and followed by any number of "catch" and "finally"
+blocks.
+
+In general, a string describing a chain of blocks has the form
+
+   -cbl="word1-word2-word3-...-wordn"
+
+In this case, a chain begins when an opening block brace preceded by word1 in 
+the list is encountered.  The chain continues if the closing block brace is
+followed immediately by any of word2, word3, etc. 
+
+If the leading word, word1, might be repeated later in a chain then it should
+also be included amoung the secondary words.
+
+Multiple chain types may be specified by separating the strings with commas or
+spaces.  So for example if we have two chains of code blocks, f1-f2-f3  and g1-g2-g3-g4,
+they could be specified as
+
+   -cbl="f1-f2-f3  g1-g2-g3-g4"
+or
+   -cbl=f1-f2-f3,g1-g2-g3-g4  
+
+Spaces are easier to read but commas may avoid quotation difficulties when
+entering data in a command shell.
+
+To define secondary words that apply to all block types, other than those explicitly specified,
+the leading word can be omitted.  For example, the built-in cuddled-else format specified by
+the B<-ce> flag can be approximately specified by
+
+   -cbl="if-else-elsif unless-else-elsif -continue"
+or
+   -cbl=if-else-elsif,unless-else-elsif,-continue
+
+The final string -continue allows cuddling the optional continue block
+which may follow may other block types.
+
+As a diagnostic check, the flag B<--dump-cuddled-block-list> or B<-dcbl> can be
+used to view the hash of values this flag creates.
+
+Finally, note that the B<-cbl> flag by itself merely specifies which blocks are formatted
+with the cuddled format. It has no effect unless this formatting style is activated with
+B<-cb>.
+
+
+=item B<-cbo=n>,   B<--cuddled-break-option=n>
+
+Cuddled formatting is only possible between a pair of code blocks if the
+closing brace of the first block starts a new line. If a block is encountered
+which is entirely on a single line, and cuddled formatting is selected, it is
+necessary to make a decision as to whether or not to "break" the block, meaning
+to cause it to span multiple lines.  This parameter controls that decision. The
+options are:
+
+   cbo=0  Never force a short block to break.
+   cbo=1  If the first of a pair of blocks is broken in the input file, 
+          then break the second.
+   cbo=2  Break open all blocks for maximal cuddled formatting.
+
+The default and recommended value is B<cbo=1>.  With this value, if the starting
+block of a chain spans multiple lines, then a cascade of breaks will occur for
+remaining blocks causing the entire chain to be cuddled.
+
+The option B<cbo=0> can produce erratic cuddling if there are numerous one-line
+blocks.
+
+The option B<cbo=2> produces maximal cuddling but will not allow any short blocks.
+
+Note: at present, this option currently only applies to blocks controlled by
+the B<-cb> flag.  Cuddling under the B<-ce> flag corresponds approximately to
+B<-cbo=1> but cannot currently be changed.
+
+
 =item B<-bl>,    B<--opening-brace-on-new-line>     
 
 Use the flag B<-bl> to place the opening brace on a new line:
@@ -1791,6 +1918,12 @@ is a sandwich consisting of an initial opening layer, a central section of any
 complexity forming the "meat" of the sandwich, and a final closing layer.  This
 predictable structure helps keep the compacted structure readable.
 
+The inner sandwich layer is required to be at least one line thick.  If this
+cannot be achieved, welding does not occur.  This constraint can cause
+formatting to take a couple of iterations to stabilize when it is first applied
+to a script. The B<-conv> flag can be used to insure that the final format is
+achieved in a single run.
+
 Here is an example illustrating a welded container within a welded containers:
 
 	# default formatting
@@ -1812,8 +1945,6 @@ Here is an example illustrating a welded container within a welded containers:
             ) ),
             $m
         ) );
-
-Some math and logical expressions can benefit from this option.
 
 This format option is quite general but there are some limitations.  
 
@@ -2642,6 +2773,36 @@ after the -pbp parameter.  For example,
 
 =back
 
+=head2 Controlling Vertical Alignment
+
+Vertical alignment refers to lining up certain symbols in list of consecutive
+similar lines to improve readability.  For example, the "fat commas" are
+aligned in the following statement:
+
+        $data = $pkg->new(
+            PeerAddr => join( ".", @port[ 0 .. 3 ] ),   
+            PeerPort => $port[4] * 256 + $port[5],
+            Proto    => 'tcp'
+        );
+
+The only explicit control on vertical alignment is to turn it off using
+B<-novalign>, a flag mainly intended for debugging.  However, vertical
+alignment can be forced to stop and restart by selectively introducing blank
+lines.  For example, a blank has been inserted in the following code
+to keep somewhat similar things aligned.
+
+    %option_range = (
+        'format'             => [ 'tidy', 'html', 'user' ],
+        'output-line-ending' => [ 'dos',  'win',  'mac', 'unix' ],
+        'character-encoding' => [ 'none', 'utf8' ],
+
+        'block-brace-tightness'    => [ 0, 2 ],
+        'brace-tightness'          => [ 0, 2 ],
+        'paren-tightness'          => [ 0, 2 ],
+        'square-bracket-tightness' => [ 0, 2 ],
+    );
+
+
 =head2 Other Controls
 
 =over 4
@@ -2881,6 +3042,10 @@ the problem.
 
 The following flags are available for debugging:
 
+B<--dump-cuddled-block-list> or B<-dcbl> will dump to standard output the
+internal hash of cuddled block types created by a B<-cuddled-block-list> input
+string.
+
 B<--dump-defaults> or B<-ddf> will write the default option set to standard output and quit
 
 B<--dump-profile> or B<-dpro>  will write the name of the current 
@@ -2910,6 +3075,11 @@ B<--no-memoize> or B<-nmem>  will turn of memoizing.
 Memoization can reduce run time when running perltidy repeatedly in a 
 single process.  It is on by default but can be deactivated for
 testing with B<-nmem>.
+
+B<--file-size-order> or B<-fso> will cause files to be processed in order of
+increasing size, when multiple files are being processed.  This is useful
+during program development, when large numbers of files with varying sizes are
+processed, because it can reduce virtual memory usage. 
 
 B<-DEBUG>  will write a file with extension F<.DEBUG> for each input file 
 showing the tokenization of all lines of code.
@@ -3310,7 +3480,7 @@ perlstyle(1), Perl::Tidy(3)
 
 =head1 VERSION
 
-This man page documents perltidy version 20180101.
+This man page documents perltidy version 20180219.
 
 =head1 BUG REPORTS
 
@@ -3322,7 +3492,7 @@ To report a new bug or problem, use the link on this page.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2017 by Steve Hancock
+Copyright (c) 2000-2018 by Steve Hancock
 
 =head1 LICENSE
 

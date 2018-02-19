@@ -1,7 +1,7 @@
 package Sidef::Math::Math {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Object::Object
@@ -11,6 +11,37 @@ package Sidef::Math::Math {
 
     sub new {
         bless {}, __PACKAGE__;
+    }
+
+    sub _binsplit {
+        my ($arr, $method) = @_;
+
+        my $sub = sub {
+            my ($s, $n, $m) = @_;
+
+            $n == $m
+              ? $s->[$n]
+              : __SUB__->($s, $n, ($n + $m) >> 1)->$method(__SUB__->($s, (($n + $m) >> 1) + 1, $m));
+        };
+
+        my $end = $#$arr;
+
+        if ($end < 0) {
+            return undef;
+        }
+
+        if ($end <= 1e5) {
+            return $sub->($arr, 0, $end);
+        }
+
+        my @partial;
+
+        while (@$arr) {
+            my @head = splice(@$arr, 0, 1e5);
+            push @partial, $sub->(\@head, 0, $#head);
+        }
+
+        __SUB__->(\@partial, $method);
     }
 
     sub gcd {
@@ -27,35 +58,20 @@ package Sidef::Math::Math {
 
     sub lcm {
         my ($self, @list) = @_;
-
-        my $lcm = $list[0];
-        foreach my $i (1 .. $#list) {
-            $lcm = $lcm->lcm($list[$i]);
-        }
-
-        $lcm;
+        @list || return Sidef::Types::Number::Number::ONE;
+        _binsplit(\@list, 'lcm');
     }
 
     sub sum {
         my ($self, @list) = @_;
-
-        my $sum = Sidef::Types::Number::Number::ZERO;
-        foreach my $n (@list) {
-            $sum = $sum->add($n);
-        }
-
-        $sum;
+        @list || return Sidef::Types::Number::Number::ZERO;
+        _binsplit(\@list, 'add');
     }
 
     sub prod {
         my ($self, @list) = @_;
-
-        my $prod = Sidef::Types::Number::Number::ONE;
-        foreach my $n (@list) {
-            $prod = $prod->mul($n);
-        }
-
-        $prod;
+        @list || return Sidef::Types::Number::Number::ONE;
+        _binsplit(\@list, 'mul');
     }
 
     *product = \&prod;
@@ -85,12 +101,9 @@ package Sidef::Math::Math {
     sub avg {
         my ($self, @list) = @_;
 
-        my $sum = Sidef::Types::Number::Number::ZERO;
-        foreach my $n (@list) {
-            $sum = $sum->add($n);
-        }
+        my $sum = $self->sum(@list);
+        my $n   = Sidef::Types::Number::Number->_set_uint(scalar(@list));
 
-        my $n = Sidef::Types::Number::Number->new(scalar(@list));
         $sum->div($n);
     }
 

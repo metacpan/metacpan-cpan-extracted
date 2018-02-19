@@ -1,5 +1,10 @@
 Revision history for MARC-Parser-XML
 
+0.03  2018-02-14 17:48:38 CET
+ - fix leader
+ - add new Perl versions to travis
+ - fix tidyall
+
 0.02  2016-09-09 11:24:29 CEST
  - declare minimum perl version
 

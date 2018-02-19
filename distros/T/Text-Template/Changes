@@ -1,5 +1,11 @@
 Revision history for Text::Template
 
+1.50  2018-02-10
+  *** Revert support for identical start/end delimiters (e.g.: @@foo@@, XXfooXX)
+      due to breakage with nested tags (see
+      https://github.com/mschout/perl-text-template/issues/8).  Will revisit
+      this in a future release.
+
 1.49  2018-02-07
     - Fix failing tests in v1.48 under perl < 5.8.9
 

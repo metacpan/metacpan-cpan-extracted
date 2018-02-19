@@ -1,3 +1,18 @@
+0.04 February 2018
+- Fix for https://rt.cpan.org/Public/Bug/Display.html?id=124457 /
+  https://github.com/hoehrmann/Graph-Feather/issues/1
+
+0.03 February 2018
+- Allow undef as attribute value
+
+0.02 February 2018
+- internal: more TODO comments
+- internal: use _prepare method throughout
+- internal: code simplification with prepared statements
+- internal: minor improvements to DB schema
+- internal: use sqlite_update_hook instead of triggers
+            to support objects as attribute values
+
 0.01 January 2018
 - Initial release
 

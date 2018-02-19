@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::PulseLength;
 #ABSTRACT: Pulse length sweep
-$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.613';
+$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.620';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -92,7 +92,7 @@ Lab::XPRESS::Sweep::PulseLength - Pulse length sweep
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -253,7 +253,7 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Andreas K. Huettel

@@ -82,6 +82,12 @@ this plugin will also expose
 - `http_request_size_bytes`, request size histogram partitoned over HTTP method
 - `http_response_size_bytes`, response size histogram partitoned over HTTP method
 
+# RUNNING UNDER HYPNOTOAD
+
+When running under a preforking daemon like [Hypnotoad](https://metacpan.org/pod/Mojo::Server::Hypnotoad), you will not get global metrics but only the metrics of each worker, randomly.
+
+The `worker` label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
+
 # AUTHOR
 
 Vidar Tyldum

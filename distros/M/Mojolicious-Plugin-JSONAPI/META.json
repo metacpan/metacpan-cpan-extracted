@@ -1,0 +1,67 @@
+{
+   "abstract" : "Mojolicious Plugin for building JSON API compliant applications.",
+   "author" : [
+      "Ali Zia <ziali088@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-JSONAPI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.004"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSONAPI::Document" : "0",
+            "Lingua::EN::Inflexion" : "0",
+            "Mojo::Base" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mojolicious::Lite" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::Mojo" : "0",
+            "Test::Most" : "0",
+            "Test::Pod" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::JSONAPI" : {
+         "file" : "lib/Mojolicious/Plugin/JSONAPI.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ziali088/mojolicious-plugin-jsonapi.git"
+      }
+   },
+   "version" : "0.2",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
+}
+

@@ -2,8 +2,7 @@
 
 #
 # dbjoin.pm
-# Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
-# $Id: 653e1186837d37a1668d02763a023b730484a03c $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -110,6 +109,9 @@ Default is an I<inner join>.
 
 Explicitly specify the join type.
 TYPE must be inner, outer, left (outer), right (outer).
+(Recall tha inner join requires data on both sides,
+outer joins keep all records from both sides for outer,
+or all of the first or second input for left and right outer joins.)
 Default: inner.
 
 =item B<-m METHOD> or B<--method METHOD>
@@ -328,7 +330,7 @@ sub parse_options ($@) {
 	'R|ascending' => sub { $self->parse_sort_option(@_); },
 	'<>' => sub { $self->parse_sort_option('<>', @_); },
 	) or pod2usage(2);
-    croak $self->{_prog} . ": internal error, extra arguments.\n"
+    croak($self->{_prog} . ": internal error, extra arguments.\n")
 	if ($#argv != -1);
 }
 
@@ -343,11 +345,11 @@ Internal: setup, parse headers.
 sub setup($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": no sorting key specified.\n"
+    croak($self->{_prog} . ": no sorting key specified.\n")
 	if ($#{$self->{_sort_argv}} == -1);
-    croak $self->{_prog} . ": unknown join type " . $self->{_join_type} . ".\n"
+    croak($self->{_prog} . ": unknown join type " . $self->{_join_type} . ".\n")
 	if (!($self->{_join_type} eq 'inner' || $self->{_join_type} eq 'outer' || $self->{_join_type} eq 'left' || $self->{_join_type} eq 'right'));
-    croak $self->{_prog} . ": unknown join method " . $self->{_join_method} . ".\n"
+    croak($self->{_prog} . ": unknown join method " . $self->{_join_method} . ".\n")
 	if (!($self->{_join_method} eq 'merge' || $self->{_join_method} eq 'lefthash' || $self->{_join_method} eq 'righthash'));
 
     $self->setup_exactly_two_inputs;
@@ -378,7 +380,7 @@ sub setup($) {
     };
 
     # can't move next check earlier; it must be fater "finish_io_option".
-    croak $self->{_prog} . ": cannot handle input data with different field separators.\n"
+    croak($self->{_prog} . ": cannot handle input data with different field separators.\n")
 	if (!defined($self->{_ins}[0]->compare($self->{_ins}[1])));
 
     #
@@ -405,7 +407,7 @@ sub setup($) {
 	my @col_i;
 	foreach (0..1) {
 	    $col_i[$_] = $self->{_ins}[$_]->col_to_i($key);
-	    die($self->{_prog} . ": column ``$key'' is not in " . ($_ == 0 ? "left" : "right") ." join source.\n") if (!defined($col_i[$_]));
+	    croak($self->{_prog} . ": column ``$key'' is not in " . ($_ == 0 ? "left" : "right") ." join source.\n") if (!defined($col_i[$_]));
 	    # for merge join, details are copy
 	    $copy_codes[$_] .= '$out_fref->[' . $i . '] = $frefs[' . $_ . "]->[$col_i[$_]];\n";
 	    # for hash join, also build the hash key
@@ -438,7 +440,7 @@ sub setup($) {
         next if (defined($all_keys{$key}));  # already got it
 	push(@output_columns, $key);
 	$col_i = $self->{_ins}[0]->col_to_i($key);
-	defined($col_i) or die "assert";
+	defined($col_i) or croak("assert");
 	$copy_codes[0] .= '$out_fref->[' . $i . '] = $frefs[0]->[' . $col_i . '];' . "\n";
 	$all_keys{$key} = $i;
 	if ($self->{_join_method} ne 'merge') {
@@ -461,11 +463,11 @@ sub setup($) {
         # (this represents duplicate fieds in the two merged things).
         # Reject this because we don't want to silently prefer one to the other.
         if (defined($all_keys{$key})) {
-	    croak $self->{_prog} . ": column $key is in both of the joined files, but is not joined upon.\nAll non-joined columns must be unique.\nBefore joining you must\nrename one of the source columns\nor remove one of the duplicate input columns.\n";
+	    croak($self->{_prog} . ": column $key is in both of the joined files, but is not joined upon.\nAll non-joined columns must be unique.\nBefore joining you must\nrename one of the source columns\nor remove one of the duplicate input columns.\n");
         };
 	push(@output_columns, $key);
 	$col_i = $self->{_ins}[1]->col_to_i($key);
-	defined($col_i) or die "assert";
+	defined($col_i) or croak("assert");
 	$copy_codes[1] .= '$out_fref->[' . $i . '] = $frefs[1]->[' . $col_i . '];' . "\n";
 	$all_keys{$key} = $i;
 	if ($self->{_join_method} ne 'merge') {
@@ -497,13 +499,13 @@ sub setup($) {
     # comparision code
     #
     $self->{_compare_code} = $self->create_compare_code(@{$self->{_ins}}, 'frefs[0]', 'frefs[1]');;
-    croak $self->{_prog} . ": no join field specified.\n"
+    croak($self->{_prog} . ": no join field specified.\n")
 	if (!defined($self->{_compare_code}));
 
     print "COMPARE CODE:\n\t" . $self->{_compare_code} . "\n" if ($self->{_debug});
     foreach (0..1) {
        $self->{_compare_code_ins}[$_] = $self->create_compare_code($self->{_ins}[$_], $self->{_ins}[$_], "prev_frefs[$_]", "frefs[$_]");
-       croak $self->{_prog} . ": no join field specified.\n"
+       croak($self->{_prog} . ": no join field specified.\n")
 	    if (!defined($self->{_compare_code_ins}[$_]));
     };
 }
@@ -532,7 +534,7 @@ sub run_merge_join($) {
 	 '$check_compare_subs[0] = ' . $self->{_compare_code_ins}[0] . "\n" .
 	 '$check_compare_subs[1] = ' . $self->{_compare_code_ins}[1] . "\n";
     eval $code;
-    $@ && croak $self->{_prog} . ":  internal eval error in compare code: $@.\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in compare code: $@.\n");
 
     my @fastpath_subs;
     foreach (0..1) {
@@ -549,7 +551,7 @@ sub run_merge_join($) {
     $code = '$copy_left_to_out_fref = sub {' . "\n" . $self->{_copy_codes}[0] . "\n};\n" .
 	    '$copy_right_to_out_fref = sub {' . "\n" . $self->{_copy_codes}[1] . "\n};\n";
     eval $code;
-    $@ && croak $self->{_prog} . ":  internal eval error in copy code: $@.\n$code\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in copy code: $@.\n$code\n");
     my $reset_out_fref = sub {
 	$out_fref =  [ ($self->{_empty}) x $self->{_out}->ncols ];
     };
@@ -574,14 +576,14 @@ sub run_merge_join($) {
 	$prev_frefs[0] = $frefs[0];
 	$frefs[0] = &{$fastpath_subs[0]}();
 	if (defined($frefs[0])) {
-	    &{$check_compare_subs[0]}() <= 0 or die "dbjoin: left stream is unsorted.\n";
+	    &{$check_compare_subs[0]}() <= 0 or croak("dbjoin: left stream is unsorted.\n");
 	};
     };
     my $advance_right = sub {
 	$prev_frefs[1] = $frefs[1];
 	$frefs[1] = &{$fastpath_subs[1]}();
 	if (defined($frefs[1])) {
-	    &{$check_compare_subs[1]}() <= 0 or die "dbjoin: right stream is unsorted.\n";
+	    &{$check_compare_subs[1]}() <= 0 or croak("dbjoin: right stream is unsorted.\n");
 	};
     };
 
@@ -631,8 +633,8 @@ until_eof:
 
 until_match:
 	for (;;) {
-	    defined($frefs[0]) or die "assert";
-	    defined($frefs[1]) or die "assert";
+	    defined($frefs[0]) or croak("assert");
+	    defined($frefs[1]) or croak("assert");
 
 	    $left_right_cmp = &{$compare_sub}();
 
@@ -654,9 +656,9 @@ until_match:
 	#
 	# match, whoo hoo!
 	#
-	$left_right_cmp == 0 or die "assert";
-	defined($frefs[0]) or die "assert";
-	defined($frefs[1]) or die "assert";
+	$left_right_cmp == 0 or croak("assert");
+	defined($frefs[0]) or croak("assert");
+	defined($frefs[1]) or croak("assert");
 
 	# accumulate rights
 	# Sigh, we save them in memory.
@@ -672,7 +674,7 @@ accumulate_rights:
 	    $left_right_cmp = &{$compare_sub}();
 	    last accumulate_rights if ($left_right_cmp != 0);
 	};
-	(!defined($frefs[1]) || $left_right_cmp != 0) or die "assert";
+	(!defined($frefs[1]) || $left_right_cmp != 0) or croak("assert");
 	#
 	# Ok, this is a bit gross, but we do it anyway.
 	# Right is now one beyond a match.
@@ -698,14 +700,14 @@ walk_lefts:
 	    $left_right_cmp = &{$compare_sub}();
 	    last walk_lefts if ($left_right_cmp != 0);
 	};
-	(!defined($frefs[0]) || $left_right_cmp != 0) or die "assert";
+	(!defined($frefs[0]) || $left_right_cmp != 0) or croak("assert");
 	# Put back our one-beyond right.  Could even be eof.
 	$frefs[1] = $right_fref_past_match; 
 
 	# ok, we're now past a match,
 	# and maybe at eof on one stream.
 	# loop back to try again.
-	(!defined($frefs[0]) || !defined($frefs[1]) || $left_right_cmp != 0) or die "assert";
+	(!defined($frefs[0]) || !defined($frefs[1]) || $left_right_cmp != 0) or croak("assert");
     };
 
     # Ok, now at least one side or the other is eof.
@@ -777,7 +779,7 @@ sub run_hash_join($$$) {
 		'$build_key_from_fullside = sub {' . "\n\t" . 'my($key) = ""; ' . $self->{_build_key_from_fullside_code} .
 		"\n\t" . 'return $key;' . "\n};\n";
     eval $code;
-    $@ && croak $self->{_prog} . ":  internal eval error in hash build code: $@.\n$code\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in hash build code: $@.\n$code\n");
 
     while ($fref = &{$fastpath_subs[$hashside]}()) {
 	# build the hash entry
@@ -789,7 +791,7 @@ sub run_hash_join($$$) {
 		push(@{$hashed_table_overflow{$key}}, $aref);
 	    } else {
 		# new overflow
-		die "internal error: confused about overflow on $key\n"
+		croak("internal error: confused about overflow on $key\n")
 		    if (defined($hashed_table_overflow{$key}));
 		my @new_overflow = ($hashed_table{$key}, $aref);
 		$hashed_table_overflow{$key} = \@new_overflow;
@@ -817,7 +819,7 @@ sub run_hash_join($$$) {
 	    '$build_output_from_hit = sub {' . "\n" . $reset_output_code . $self->{_build_output_from_hit_code} . "\n};\n" .
 	    '$merge_output_from_hit = sub {' . "\n" . $self->{_merge_output_from_hit_code} . "\n};\n";
     eval $code;
-    $@ && croak $self->{_prog} . ":  internal eval error in hash probe code: $@.\n$code\n";
+    $@ && croak($self->{_prog} . ":  internal eval error in hash probe code: $@.\n$code\n");
 
     #
     # Probe.
@@ -894,13 +896,13 @@ sub run($) {
     } elsif ($self->{_join_method} eq 'lefthash') {
 	$self->run_hash_join(0, 1);
     } else {
-	die $self->{_prog} . ": unknown join method " . $self->{_join_method} . "\n";
+	croak($self->{_prog} . ": unknown join method " . $self->{_join_method} . "\n");
     };
 }
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

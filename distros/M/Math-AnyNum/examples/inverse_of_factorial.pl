@@ -31,7 +31,7 @@ for my $n (1 .. 100) {
 
     printf("F(%2s!) =~ %s\n", $n, $i);
 
-    if ($i->round(-20) != $j->round(-20)) {
+    if ($i->round(-50) != $j->round(-50)) {
         die "$i != $j";
     }
 

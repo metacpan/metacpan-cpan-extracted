@@ -1,6 +1,6 @@
 
 package Module::Spec::V2;
-$Module::Spec::V2::VERSION = '0.7.0';
+$Module::Spec::V2::VERSION = '0.8.0';
 # ABSTRACT: Load modules based on V2 specifications
 use 5.012;
 
@@ -105,7 +105,7 @@ sub need_modules {
     state $SUB_FOR = {
         '-all'   => \&_need_all_modules,
         '-any'   => \&_need_any_modules,
-        '-oneof' => \&_need_first
+        '-oneof' => \&_need_first_module,
     };
     croak(qq{Unknown operator "$op"}) unless my $sub = $SUB_FOR->{$op};
     if ( @_ == 1 && ref $_[0] eq 'HASH' ) {
@@ -332,7 +332,7 @@ Module::Spec::V2 - Load modules based on V2 specifications
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 SYNOPSIS
 

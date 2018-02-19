@@ -33,6 +33,17 @@ use Test::Differences;
     is( $name, 't/lib/Foo/Bar.pm', 'found local file' );
 }
 
+{
+    local $ENV{OPEN_THIS_LIBS} = 'lib,t/lib,t/other-lib';
+
+    my $text = 'Foo::Baz';
+    my $name = Open::This::_maybe_find_local_file($text);
+    is(
+        $name, 't/other-lib/Foo/Baz.pm',
+        'found local file in non-standard location'
+    );
+}
+
 eq_or_diff(
     parse_text('t/lib/Foo/Bar.pm line 222.'),
     { file_name => 't/lib/Foo/Bar.pm', line_number => 222, },
@@ -122,6 +133,12 @@ eq_or_diff(
     [ to_editor_args('Foo::Bar::do_something()') ],
     [ $^O eq 'MSWin32' ? () : ('+3'), 't/lib/Foo/Bar.pm', ],
     'open in vim on line 3'
+);
+
+eq_or_diff(
+    [ to_editor_args('t/lib/Foo/Bar.pm line 2') ],
+    [ '+2', 't/lib/Foo/Bar.pm', ],
+    'open in vim on line 2'
 );
 
 my $more = parse_text('Test::More');

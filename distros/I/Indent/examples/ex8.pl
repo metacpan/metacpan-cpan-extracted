@@ -1,15 +1,22 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Utils qw(remove_ws);
+use Indent::Data;
 
-my $input = '   a   ';
-remove_ws(\$input);
-print "$input|\n";
+# Indent::Data object.
+my $i = Indent::Data->new(
+       'line_size' => '10',
+       'next_indent' => '  ',
+       'output_separator' => "|\n",
+);
+
+# Print indented text.
+print $i->indent('text text text text text text')."|\n";
 
 # Output:
-# a|
+# text text |
+#   text tex|
+#   t text t|
+#   ext|

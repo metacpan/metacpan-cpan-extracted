@@ -57,6 +57,7 @@ sub _shared_tests {
     _multi_event_tests(@_);
     _filter_tests(@_);
     _dir_add_remove_tests(@_);
+    _create_and_rename_tests(@_);
 }
 
 sub _basic_tests {
@@ -174,6 +175,48 @@ sub _multi_event_tests {
             "added/modified/deleted $path1 and added/modified $path2",
         );
     }
+}
+
+sub _create_and_rename_tests {
+    my $class      = shift;
+    my $events_sub = shift;
+
+    my $dir = tempdir( CLEANUP => 1 );
+
+    my $watcher = $class->new(
+        directories     => $dir,
+        follow_symlinks => 0,
+        filter          => qr/\.txt/,
+        sleep_interval  => 0,
+    );
+
+    my $path      = "$dir/file.txt";
+    my $temp_path = "$dir/file.txt-tmp";
+
+    create_file($temp_path);
+    rename $temp_path, $path
+        or die "Cannot rename $temp_path to $path: $!";
+
+    my @events = $events_sub->($watcher);
+
+    # The filter matches the temporary file as well as the final file, but
+    # whether we get any events on the temporary file depends on the backend in
+    # use. (KQueue on Mac OS doesn't report events for the temporary, but
+    # Inotify on Linux does.) Changing the filter to match only the final file
+    # would work, but the test would then hang under a version of Inotify that
+    # isn't patched to treat IN_MOVED_TO as a 'create' event (because no events
+    # would ever match). So ignore events that aren't for the final file.
+
+    _is_events(
+        [ grep { $_->path eq $path } @events ],
+        [
+            {
+                path => $path,
+                type => 'create',
+            },
+        ],
+        'single creation event on final file for create/rename',
+    ) or diag( Dumper( \@events ) );
 }
 
 sub _filter_tests {

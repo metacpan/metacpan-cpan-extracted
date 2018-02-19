@@ -1,0 +1,31 @@
+---
+abstract: 'Easier access to the Magrathea NTS API'
+author:
+  - 'Cliff Stanford <cliff@may.be>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Text::Autoformat: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Magrathea-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Attribute::Boolean: v1.0.8
+  Carp: '0'
+  Data::Dumper: '0'
+  Email::Address: '1.892'
+  Net::Telnet: '3.03'
+  Phone::Number: '0.01'
+  enum: '0'
+  perl: '5.010000'
+version: v1.3.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

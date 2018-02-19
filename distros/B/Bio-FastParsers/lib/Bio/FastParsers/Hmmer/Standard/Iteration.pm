@@ -1,7 +1,7 @@
 package Bio::FastParsers::Hmmer::Standard::Iteration;
-# ABSTRACT: front-end class for standard HMMER parser
+# ABSTRACT: Front-end class for standard HMMER parser
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::Standard::Iteration::VERSION = '0.180330';
+$Bio::FastParsers::Hmmer::Standard::Iteration::VERSION = '0.180470';
 use Moose;
 use namespace::autoclean;
 
@@ -148,11 +148,11 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Hmmer::Standard::Iteration - front-end class for standard HMMER parser
+Bio::FastParsers::Hmmer::Standard::Iteration - Front-end class for standard HMMER parser
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 

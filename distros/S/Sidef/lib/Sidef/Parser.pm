@@ -49,7 +49,6 @@ package Sidef::Parser {
                      | false\b                        (?{ Sidef::Types::Bool::Bool::FALSE })
                      | next\b                         (?{ state $x = bless({}, 'Sidef::Types::Block::Next') })
                      | break\b                        (?{ state $x = bless({}, 'Sidef::Types::Block::Break') })
-                     | continue\b                     (?{ state $x = bless({}, 'Sidef::Types::Block::Continue') })
                      | Block\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Block::Block') })
                      | Backtick\b                     (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Backtick') })
                      | ARGF\b                         (?{ state $x = bless({}, 'Sidef::Meta::Glob::ARGF') })
@@ -722,7 +721,7 @@ package Sidef::Parser {
               /\G\h*\Q$end_delim\E/gc
               || $self->fatal_error(
                                     code  => $_,
-                                    pos   => pos,
+                                    pos   => pos($_),
                                     error => "can't find the closing delimiter: '$end_delim'",
                                    )
              );
@@ -751,7 +750,7 @@ package Sidef::Parser {
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
                                        code   => $_,
-                                       pos    => pos,
+                                       pos    => pos($_),
                                        error  => "invalid type <<$type>> for variable '$name'",
                                        reason => "expected a type, such as: Str, Num, File, etc...",
                                       );
@@ -875,7 +874,7 @@ package Sidef::Parser {
               /\G\h*\Q$end_delim\E/gc
               || $self->fatal_error(
                                     code  => $_,
-                                    pos   => pos,
+                                    pos   => pos($_),
                                     error => "can't find the closing delimiter: '$end_delim'",
                                    )
              );
@@ -1102,7 +1101,7 @@ package Sidef::Parser {
                 if (/\G\h*=\h*/gc) {
                     my $args = $self->parse_obj(code => $opt{code}, multiline => 1) // $self->fatal_error(
                                                                   code  => $_,
-                                                                  pos   => pos,
+                                                                  pos   => pos($_),
                                                                   error => "expected an expression after variable declaration",
                     );
 
@@ -1377,7 +1376,7 @@ package Sidef::Parser {
                 @{$vars}
                   || $self->fatal_error(
                                         code  => $_,
-                                        pos   => pos,
+                                        pos   => pos($_),
                                         error => q{expected one or more variable names after <enum>},
                                        );
 
@@ -1794,10 +1793,16 @@ package Sidef::Parser {
                 return bless({expr => $expr, block => $block}, 'Sidef::Types::Block::Case');
             }
 
-            # "default {...}" construct
-            if (exists($self->{current_given}) && /\Gdefault\h*(?=\{)/gc) {
+            # "default {...}" or "else { ... }" construct for `given/when`
+            if (exists($self->{current_given}) && /\G(?:default|else)\h*(?=\{)/gc) {
                 my $block = $self->parse_block(code => $opt{code});
                 return bless({block => $block}, 'Sidef::Types::Block::Default');
+            }
+
+            # `continue` keyword inside a given/when construct
+            if (exists($self->{current_given}) && /\Gcontinue\b/gc) {
+                state $x = bless({}, 'Sidef::Types::Block::Continue');
+                return $x;
             }
 
             # "do {...}" construct
@@ -2631,57 +2636,66 @@ package Sidef::Parser {
             if (ref($obj) eq 'Sidef::Types::Block::For' and /\G\h*(?=[*:]?$self->{var_name_re})/goc) {
 
                 my $class_name = $self->{class};
-                my $vars_end   = $#{$self->{vars}{$class_name}};
 
-                my @vars;
+                my @loops;
+                {
+                    my @vars;
+                    while (/\G([*:])?($self->{var_name_re})/gc) {
 
-                while (/\G([*:])?($self->{var_name_re})/gc) {
+                        my $type = $1;
+                        my $name = $2;
+                        push @vars,
+                          bless(
+                                {
+                                 name  => $name,
+                                 type  => 'var',
+                                 class => $class_name,
+                                 (
+                                  $type
+                                  ? (
+                                     slurpy => 1,
+                                     ($type eq '*' ? (array => 1) : (hash => 1)),
+                                    )
+                                  : ()
+                                 ),
+                                },
+                                'Sidef::Variable::Variable'
+                               );
 
-                    my $type = $1;
-                    my $name = $2;
-                    push @vars,
-                      bless(
-                            {
-                             name  => $name,
-                             type  => 'var',
-                             class => $class_name,
-                             (
-                              $type
-                              ? (
-                                 slurpy => 1,
-                                 ($type eq '*' ? (array => 1) : (hash => 1)),
-                                )
-                              : ()
-                             ),
-                            },
-                            'Sidef::Variable::Variable'
-                           );
+                        unshift @{$self->{vars}{$class_name}},
+                          {
+                            obj   => $vars[-1],
+                            name  => $name,
+                            count => 1,
+                            type  => 'var',
+                            line  => $self->{line},
+                          };
 
-                    unshift @{$self->{vars}{$class_name}},
+                        $type && last;
+                        /\G\h*,\h*/gc || last;
+                    }
+
+                    /\G\h*(?:in|∈|=|)\h*/gc
+                      || $self->fatal_error(
+                                            error => "expected the token <<in>> after variable declaration in for-loop",
+                                            code  => $_,
+                                            pos   => pos($_),
+                                           );
+
+                    my $expr = (
+                                /\G(?=\()/
+                                ? $self->parse_arg(code => $opt{code})
+                                : $self->parse_obj(code => $opt{code})
+                               );
+
+                    push @loops,
                       {
-                        obj   => $vars[-1],
-                        name  => $name,
-                        count => 1,
-                        type  => 'var',
-                        line  => $self->{line},
+                        vars => \@vars,
+                        expr => $expr,
                       };
 
-                    $type && last;
-                    /\G\h*,\h*/gc || last;
+                    /\G\h*,\h*/gc && redo;
                 }
-
-                /\G\h*(?:in|∈|)\h*/gc
-                  || $self->fatal_error(
-                                        error => "expected the token <<in>> after variable declaration in for-loop",
-                                        code  => $_,
-                                        pos   => pos($_),
-                                       );
-
-                my $expr = (
-                            /\G(?=\()/
-                            ? $self->parse_arg(code => $opt{code})
-                            : $self->parse_obj(code => $opt{code})
-                           );
 
                 my $block = (
                              /\G\h*(?=\{)/gc
@@ -2693,15 +2707,21 @@ package Sidef::Parser {
                                                  )
                             );
 
-                # Remove the for-loop variables from the current scope
-                splice(@{$self->{vars}{$class_name}},
-                       $#{$self->{vars}{$class_name}} - $vars_end - scalar(@vars),
-                       scalar(@vars));
+                # Remove the for-loop variables from the outer scope
+#<<<
+                my %loop_vars = map {
+                    map { refaddr($_) => 1 } @{$_->{vars}}
+                } @loops;
+
+                @{$self->{vars}{$class_name}} = grep {
+                       ref($_) ne 'HASH'
+                    or not exists $loop_vars{refaddr($_->{obj})}
+                } @{$self->{vars}{$class_name}};
+#>>>
 
                 # Store the info
-                $obj->{vars}  = \@vars;
                 $obj->{block} = $block;
-                $obj->{expr}  = $expr;
+                $obj->{loops} = \@loops;
 
                 # Re-bless the $obj into a different class
                 bless $obj, 'Sidef::Types::Block::ForIn';
@@ -2722,7 +2742,7 @@ package Sidef::Parser {
                             @arg = (
                                 map {
                                     { $self->{class} => [$_] }
-                                  } @{$arg->{$self->{class}}}
+                                } @{$arg->{$self->{class}}}
                             );
 
                             if (/\G\h*(?=\{)/gc) {

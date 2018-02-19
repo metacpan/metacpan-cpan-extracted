@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Find a minimum solution to a Pell equation: x^2 - d*y^2 = 1, where `d` is known.
+# Find the smallest solution in positive integers to the Pell equation: x^2 - d*y^2 = ±1, where `d` is known.
 
 # See also:
 #   https://en.wikipedia.org/wiki/Pell%27s_equation
@@ -30,31 +30,47 @@ sub sqrt_convergents {
     return @convergents;
 }
 
-sub continued_frac {
-    my ($i, $c) = @_;
-    $i < 0 ? 0 : ($c->[$i] + continued_frac($i - 1, $c))->inv;
+sub cfrac_denominator {
+    my (@cfrac) = @_;
+
+    my ($f1, $f2) = (0, 1);
+
+    foreach my $n (@cfrac) {
+        ($f1, $f2) = ($f2, $n * $f2 + $f1);
+    }
+
+    return $f1;
 }
 
 sub solve_pell {
     my ($d) = @_;
 
-    my ($k, @c) = sqrt_convergents($d);
+    return if is_square($d);
 
-    my @period = @c;
-    for (my $i = 0 ; ; ++$i) {
-        if ($i > $#c) { push @c, @period; $i = 2 * $i - 1 }
+    my ($k, @period) = sqrt_convergents($d);
 
-        my $x = continued_frac($i, [$k, @c])->denominator;
-        my $p = 4 * $d * ($x * $x - 1);
+    my @solutions;
 
-        if (is_square($p)) {
-            return ($x, isqrt($p) / (2 * $d));
-        }
+    my $x = cfrac_denominator($k, @period);
+    my $p1 = 4 * $d * ($x * $x + 1);
+
+    if (is_square($p1)) {
+        push @solutions, [$x, isqrt($p1) / (2 * $d)];
+        $x = cfrac_denominator($k, @period, @period);
     }
+
+    my $p2 = 4 * $d * ($x * $x - 1);
+    push @solutions, [$x, isqrt($p2) / (2 * $d)];
+
+    return @solutions;
 }
 
-foreach my $d (1 .. 25) {
-    is_square($d) && next;
-    my ($x, $y) = solve_pell($d);
-    printf("x^2 - %2dy^2 = 1       minimum solution: x=%4s and y=%4s\n", $d, $x, $y);
+foreach my $d (1 .. 30) {
+
+    my @solutions = solve_pell($d);
+
+    foreach my $solution (@solutions) {
+        my ($x, $y) = @$solution;
+        printf("x^2 - %2dy^2 = %2d    minimum solution: x=%5s and y=%5s\n", $d, $x**2 - $d * $y**2, $x, $y);
+    }
 }

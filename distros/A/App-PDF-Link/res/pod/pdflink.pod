@@ -80,7 +80,8 @@ own, no other files needed.
 
 =item B<--attach>
 
-Like B<--embed>, but no custom icon is supplied.
+This is similar to B<--embed>, but the files are attached to the PDF
+document and no icons are placed on the pages.
 
 =item B<--all>
 

@@ -1,6 +1,6 @@
 package Lab::Bus;
 #ABSTRACT: Bus base class
-$Lab::Bus::VERSION = '3.613';
+$Lab::Bus::VERSION = '3.620';
 use strict;
 
 use Lab::Generic;
@@ -163,7 +163,7 @@ Lab::Bus - Bus base class
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ and many more...
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011-2012  Andreas K. Huettel, Florian Olbrich
             2014       Alexei Iankilevitch

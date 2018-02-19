@@ -2,8 +2,7 @@
 
 #
 # xml_to_db.pm
-# Copyright (C) 2011-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 54d87bcf09ffd487550f0f7e05ab0a77cf2a3670 $
+# Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -212,18 +211,18 @@ Returns an aref.
 =cut
 sub _find_entities {
     my($self) = @_;
-    croak $self->{_prog} . ": no XML input.\n" if (!defined($self->{_xml_in}));
+    croak($self->{_prog} . ": no XML input.\n") if (!defined($self->{_xml_in}));
     my @entity_path = split(m@/@, $self->{_entity});
     my $href = $self->{_xml_in};
     my $last_entity = pop(@entity_path);
     foreach (@entity_path) {
-	croak $self->{_prog} . ": missing element $_ of entity path.\n"
+	croak($self->{_prog} . ": missing element $_ of entity path.\n")
 	    if (!defined($href->{$_}));
-	croak $self->{_prog} . ": element $_ of entity path is not href.\n"
+	croak($self->{_prog} . ": element $_ of entity path is not href.\n")
 	    if (ref($href->{$_}) ne 'HASH');
 	$href = $href->{$_};
     };
-    croak $self->{_prog} . ": last $last_entity of entity path is not present.\n"
+    croak($self->{_prog} . ": last $last_entity of entity path is not present.\n")
         if (!defined($href->{$last_entity}));
     if (ref($href->{$last_entity}) eq 'ARRAY') {
 	return $href->{$last_entity};
@@ -235,7 +234,7 @@ sub _find_entities {
 	};
 	return \@a;
     } else {
-	croak $self->{_prog} . ": last $last_entity of entity path is not an aref or href.\n"
+	croak($self->{_prog} . ": last $last_entity of entity path is not an aref or href.\n");
     };
 }
 
@@ -307,7 +306,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

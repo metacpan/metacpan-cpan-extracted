@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DummySource;
-$Lab::Moose::Instrument::DummySource::VERSION = '3.613';
+$Lab::Moose::Instrument::DummySource::VERSION = '3.620';
 #ABSTRACT: Dummy YokogawaGS200 source for use with 'Debug' connection
 
 use 5.010;
@@ -30,6 +30,12 @@ has source_level_timestamp => (
     init_arg => undef,
 );
 
+has verbose => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 1
+);
+
 with qw(
     Lab::Moose::Instrument::Common
     Lab::Moose::Instrument::LinearStepSweep
@@ -56,12 +62,20 @@ sub set_level {
         value => { isa => 'Num' },
     );
 
-    return $self->linear_step_sweep( to => $value, %args );
+    return $self->linear_step_sweep(
+        to => $value, verbose => $self->verbose,
+        %args
+    );
 }
 
 #
 # Aliases for Lab::XPRESS::Sweep API
 #
+
+sub cached_level {
+    my $self = shift;
+    return $self->get_level(@_);
+}
 
 sub get_level {
     my $self = shift;
@@ -95,7 +109,7 @@ Lab::Moose::Instrument::DummySource - Dummy YokogawaGS200 source for use with 'D
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -105,13 +119,11 @@ version 3.613
      type => 'DummySource',
      connection_type => 'Debug',
      connection_options => {verbose => 0},
-     instrument_options => {
-         # mandatory protection settings
-         max_units_per_step => 0.001, # max step is 1mV/1mA
-         max_units_per_second => 0.01,
-         min_units => -10,
-         max_units => 10,
-     }
+     # mandatory protection settings
+     max_units_per_step => 0.001, # max step is 1mV/1mA
+     max_units_per_second => 0.01,
+     min_units => -10,
+     max_units => 10,
  );
 
  # Step-sweep to new level.
@@ -124,7 +136,7 @@ version 3.613
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

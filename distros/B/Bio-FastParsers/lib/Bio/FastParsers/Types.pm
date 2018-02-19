@@ -1,6 +1,6 @@
 package Bio::FastParsers::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::FastParsers
-$Bio::FastParsers::Types::VERSION = '0.180330';
+$Bio::FastParsers::Types::VERSION = '0.180470';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -35,15 +35,11 @@ Bio::FastParsers::Types - Distribution-wide Moose types for Bio::FastParsers
 
 =head1 VERSION
 
-version 0.180330
-
-=head1 SYNOPSIS
-
-    # TODO
+version 0.180470
 
 =head1 DESCRIPTION
 
-    # TODO
+Nothing to see here.
 
 =head1 AUTHOR
 

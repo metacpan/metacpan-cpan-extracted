@@ -28,7 +28,7 @@ OPTIONS:
 END
 
 has usage => sub {
-  my $self = shift; 
+  my $self = shift;
   my $usage = $USAGE;
   if (my $add = $self->service_usage) {
     $usage .= "\n$add";
@@ -38,7 +38,7 @@ has usage => sub {
 
 has [qw/channel name desc service_usage token update/];
 has [qw/copy open private irc_handled/] => 0;
-has clip => sub { 
+has clip => sub {
   die "Clipboard module not available. Do you need to install it?\n"
     unless eval 'use Clipboard; 1';
   monkey_patch 'Clipboard::Xclip',
@@ -90,7 +90,7 @@ sub add_token {
 
 sub paste { die 'Not implemented' }
 
-sub slurp { 
+sub slurp {
   my ($self, @files) = @_;
   @files = @{ $self->files } unless @files;
 
@@ -122,7 +122,7 @@ sub post_to_irc {
   my $name = $self->name || 'someone';
 
   my $err;
-  my $catch = sub { $err = $_[1]; Mojo::IOLoop->stop };
+  my $catch = sub { $err = pop; Mojo::IOLoop->stop };
   $irc->on(error     => $catch);
   $irc->on(irc_error => $catch);
 
@@ -132,9 +132,9 @@ sub post_to_irc {
     my $delay = Mojo::IOLoop->delay(
       sub { $irc->write( privmsg => $chan, ":$name pasted $paste", shift->begin ) },
       sub { $irc->disconnect( shift->begin ) },
-      sub { Mojo::IOLoop->stop }, 
+      sub { Mojo::IOLoop->stop },
     );
-    $delay->on(error => $catch);
+    $delay->catch($catch);
   });
 
   $irc->connect(sub{
@@ -145,7 +145,7 @@ sub post_to_irc {
   });
 
   Mojo::IOLoop->start;
-  
+
   die $err if $err;
 }
 

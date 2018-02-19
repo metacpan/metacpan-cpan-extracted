@@ -1,0 +1,53 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: AtteanX-Serializer-RDFa
+Upstream-Contact: Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>
+Source: https://metacpan.org/release/AtteanX-Serializer-RDFa
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ t/bytes.t
+ t/fh.t
+Copyright: Copyright 2018 Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ README.pod
+ lib/AtteanX/Serializer/RDFa.pm
+Copyright: This software is copyright (c) 2017, 2018 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2017 by Kjetil Kjernsmo.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2018 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

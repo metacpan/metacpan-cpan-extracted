@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.82';
+our $VERSION = '2.84';
 
 =pod
 

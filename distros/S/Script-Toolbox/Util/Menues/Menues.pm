@@ -1,5 +1,9 @@
 package Script::Toolbox::Util::Menues;
 
+# THIS IS DEPRECATED CODE.
+# DON'T USE IT.
+# USE Script::Toolbox::Util::Menus
+
 use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 

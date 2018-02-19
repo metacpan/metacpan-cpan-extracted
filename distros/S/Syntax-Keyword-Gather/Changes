@@ -1,5 +1,8 @@
 Revision history for Syntax-Keyword-Gather
 
+1.003002  2018-02-16 06:42:33-08:00 America/Los_Angeles
+   - Fix invalid syntax in grep example (Thanks Dan Book!)
+
 1.003001  2014-08-20 18:39:35-05:00 America/Chicago
    - Fix docs that should have been updated in 1.003000
      (Thanks Grzegorz Rożniecki!)

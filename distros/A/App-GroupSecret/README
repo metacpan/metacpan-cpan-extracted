@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.302
+    version 0.304
 
 SYNOPSIS
 
@@ -220,12 +220,13 @@ ENVIRONMENT
  GROUPSECRET_KEYFILE
 
     If set, this program will use the value as a path to the keyfile. The
-    "--file=path" option takes precedence if it is used.
+    "--file=path" option takes precedence if used.
 
  GROUPSECRET_PRIVATE_KEY
 
-    If set, this program will use the value as a path to the keyfile. The
-    "--private-key=path" option takes precedence if it is used.
+    If set, this program will use the value as a path to private key used
+    for decryption. The "--private-key=path" option takes precedence if
+    used.
 
  GROUPSECRET_PATH
 
@@ -271,7 +272,7 @@ EXAMPLES
     This will be the Ansible Vault password. You can see it if you want
     using the "print-secret" command, but you don't need to.
 
-    Finally, we'll take advantage of the fact that a Ansible Vault password
+    Then we'll take advantage of the fact that an Ansible Vault password
     file can be an executable program that prints the Vault password to
     STDOUT. Create a file named vault-password with the following script,
     and make it executable (chmod +x vault-password):
@@ -299,7 +300,7 @@ EXAMPLES
 
     What this does is execute vault-password which executes groupsecret to
     print the secret contained in the vault-password.yml file (which is
-    actually the Vault password) to <STDOUT>. In order to do this,
+    actually the Vault password) to STDOUT. In order to do this,
     groupsecret will decrypt the keyfile passphrase using any one of the
     private keys that have associated public keys added to the keyfile.
 

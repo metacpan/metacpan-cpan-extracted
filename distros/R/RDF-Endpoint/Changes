@@ -6,6 +6,11 @@ Home page:    <http://search.cpan.org/dist/RDF-Endpoint/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=RDF-Endpoint>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.10  2018-02-16
+
+ - (Update) Changes to support the new RDFa serializer (#157 from Kjetil
+   Kjernsmo).
+
 0.09  2017-09-13
 
  - (Update) Switch from HTML::HTML5::Parser to XML::LibXML parser for RDFa

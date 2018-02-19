@@ -4,9 +4,10 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2017
 #-------------------------------------------------------------------------------
 # podDocumentation
+# Example for sub attr is not showing up in the documentation
 
 package Data::Edit::Xml;
-our $VERSION = 20180125;
+our $VERSION = 20180126;
 use v5.8.0;
 use warnings FATAL => qw(all);
 use strict;
@@ -733,7 +734,7 @@ sub depth($)                                                                    
   $a                                                                            # Return ancestry
  }
 
-sub isFirst($@)                                                                 #CX Return the specified node if it is first under its parent and optionally has the specified context, else return B<undef>
+sub isFirst($@)                                                                 #BCX Return the specified node if it is first under its parent and optionally has the specified context, else return B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $parent = $node->parent;                                                   # Parent
@@ -741,7 +742,7 @@ sub isFirst($@)                                                                 
   $node == $parent->first ? $node : undef                                       # First under parent
  }
 
-sub isLast($@)                                                                  #CX Return the specified node if it is last under its parent and optionally has the specified context, else return B<undef>
+sub isLast($@)                                                                  #BCX Return the specified node if it is last under its parent and optionally has the specified context, else return B<undef>
  {my ($node, @context) = @_;                                                    # Node, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $parent = $node->parent;                                                   # Parent
@@ -845,6 +846,12 @@ sub first($@)                                                                   
   $c ? $c->at(@context) : undef;                                                # Return first node if in specified context
  }
 
+sub firstText($@)                                                             #CX Return the first node if it is a text node otherwise undef
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  my $l = &first(@_);                                                           # First node
+  $l ? $l->isText : undef                                                       # Test whether the first node exists and is a text node
+ }
+
 sub firstBy($@)                                                                 # Return a list of the first instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
  {my ($node, @tags) = @_;                                                       # Node, tags to search for.
   my %tags;                                                                     # Tags found first
@@ -902,6 +909,12 @@ sub last($@)                                                                    
   return $node->content->[-1] unless @context;                                  # Return last node if no context specified
   my ($c) = reverse $node->contents;                                            # Last node
   $c ? $c->at(@context) : undef;                                                # Return last node if in specified context
+ }
+
+sub lastText($@)                                                              #CX Return the last node if it is a text node otherwise undef
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  my $l = &last(@_);                                                            # Last node
+  $l ? $l->isText : undef                                                       # Test whether the last node exists and is a text node
  }
 
 sub lastBy($@)                                                                  # Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
@@ -971,6 +984,12 @@ sub next($@)                                                                    
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
 
+sub nextText($@)                                                              #CX Return the next node if it is a text node otherwise undef
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  my $n = &next(@_);                                                            # Next node
+  $n ? $n->isText : undef                                                       # Test whether the next node exists and is a text node
+ }
+
 sub nextIn($@)                                                                  #X Return the next node matching one of the named tags.
  {my ($node, @tags) = @_;                                                       # Node, tags to search for.
   my %tags = map {$_=>1} @tags;                                                 # Hashify tags
@@ -1000,8 +1019,8 @@ sub nextOn($@)                                                                  
     @a                                                                          # Current node and matching following nodes
    }
   else
-   {shift @c while @c > 1 and $tags{$c[1]->tag};                                  # Proceed forwards but staying on acceptable tags
-    return $c[0]                                                                  # Current node or last acceptable tag reached while staying on acceptable tags
+   {shift @c while @c > 1 and $tags{$c[1]->tag};                                # Proceed forwards but staying on acceptable tags
+    return $c[0]                                                                # Current node or last acceptable tag reached while staying on acceptable tags
    }
  }
 
@@ -1020,6 +1039,12 @@ sub prev($@)                                                                    
      }
    }
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
+ }
+
+sub prevText($@)                                                              #CX Return the previous node if it is a text node otherwise undef
+ {my ($node, @context) = @_;                                                    # Node, optional context.
+  my $p = &prev(@_);                                                            # Previous node
+  $p ? $p->isText : undef                                                       # Test whether the previous node exists and is a text node
  }
 
 sub prevIn($@)                                                                  #X Return the next previous node matching one of the named tags.
@@ -1381,7 +1406,7 @@ sub wrapTo($$$@)                                                                
   $new                                                                          # Return new node
  }
 
-sub unwrap($@)                                                                  #CI Unwrap a node by inserting its content into its parent at the point containing the node and return the parent node.
+sub unwrap($@)                                                                  #CIX Unwrap a node by inserting its content into its parent at the point containing the node and return the parent node.
  {my ($node, @context) = @_;                                                    # Node to unwrap, optional context.
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $parent = $node->parent;                                                   # Parent node
@@ -1398,6 +1423,20 @@ sub unwrap($@)                                                                  
     $node->disconnectLeafNode;                                                  # Disconnect node from parse tree
    }
   $parent                                                                       # Return the parent node
+ }
+
+sub unwrapContentsKeepingText($@)                                               #CX Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else undef if not in the optional context.
+ {my ($node, @context) = @_;                                                    # Node to unwrap, optional context.
+  return undef if @context and !$node->at(@context);                            # Not in specified context
+  $node->by(sub
+   {if ($_->isText or $_ == $node) {}                                           # Keep interior text nodes
+    else                                                                        # Unwrap interior node
+     {$_->putPrevAsText(" ");                                                   # Separate from preceding content
+      $_->putNextAsText(" ");                                                   # Separate from following content
+      $_->unwrap;                                                               # Unwrap non text tag
+     }
+   });
+  $node                                                                         # Return the node to show success
  }
 
 #1 Contents                                                                     # The children of each node.
@@ -1500,7 +1539,7 @@ sub isAllBlankText($@)                                                          
   return undef if @context and !$node->at(@context);                            # Optionally check context
   my @c = $node->contents;
   return $node if @c == 0;                                                      # No content
-  return undef if @c  > 1;                                                      # Content other than text
+  return undef if @c  > 1;                                                      # Content other than text (adjacent text elements are merged so there can only be one)
   $node->stringContent =~ m(\A\s*\Z)s ? $node : undef
  }
 
@@ -2217,6 +2256,10 @@ L<at|/at>
 
 Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>. Ancestry is specified by providing the expected tags that the parent, the parent's parent etc. must match at each level. If B<undef> is specified then any tag is assumed to match at that level. If a regular expression is specified then the current parent node tag must match the regular expression at that level. If all supplied tags match successfully then the starting node is returned else B<undef>
 
+L<atOrBelow|/atOrBelow>
+
+Confirm that the node or one of its ancestors has the specified context as recognized by L<at|/at> and return the first node that matches the context or B<undef> if none do.
+
 L<attr :lvalue|/attr :lvalue>
 
 Return the value of an attribute of the current node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
@@ -2272,8 +2315,8 @@ Construct a parse tree from a file or a string
 
 New parse - call this method statically as in Data::Edit::Xml::new(file or string) B<or> with no parameters and then use L</input>, L</inputFile>, L</inputString>, L</errorFile>  to provide specific parameters for the parse, then call L</parse> to perform the parse and return the parse tree.
 
-     Parameter          Description
-  1  $fileNameOrString  File name or string
+     Parameter          Description          
+  1  $fileNameOrString  File name or string  
 
 Example:
 
@@ -2288,7 +2331,7 @@ Example:
     </d>
   </a>
   END
-
+  
   ok -p $x eq <<END;
   <a>
     <b>
@@ -2299,7 +2342,7 @@ Example:
     </d>
   </a>
   END
-
+  
 
 This is a static method and so should be invoked as:
 
@@ -2395,26 +2438,26 @@ Example:
 
 
   ok Data::Edit::Xml::cdata eq q(CDATA);
-
+  
 
 =head3 parse($)
 
 Parse input XML specified via: L<inputFile|/inputFile>, L<input|/input> or L<inputString|/inputString>.
 
-     Parameter  Description
-  1  $parser    Parser created by L</new>
+     Parameter  Description                
+  1  $parser    Parser created by L</new>  
 
 Example:
 
 
   my $x = Data::Edit::Xml::new;
-
+  
   $x->inputString = <<END;
   <a id="aa"><b id="bb"><c id="cc"/></b></a>
   END
-
+  
   $x->parse;
-
+  
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
@@ -2422,7 +2465,7 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head2 Node by Node
 
@@ -2432,9 +2475,9 @@ Construct a parse tree node by node.
 
 Create a new text node.
 
-     Parameter  Description
-  1  undef      Any reference to this package
-  2  $text      Content of new text node
+     Parameter  Description                    
+  1  undef      Any reference to this package  
+  2  $text      Content of new text node       
 
 Example:
 
@@ -2444,68 +2487,68 @@ Example:
     <b class="bb" id="2"/>
   </a>
   END
-
+  
   $x->putLast($x->newText("t"));
-
+  
   ok -p $x eq <<END;
   <a class="aa" id="1">
     <b class="bb" id="2"/>
   t
   </a>
   END
-
+  
 
 =head3 newTag($$%)
 
 Create a new non text node.
 
-     Parameter    Description
-  1  undef        Any reference to this package
-  2  $command     The tag for the node
-  3  %attributes  Attributes as a hash.
+     Parameter    Description                    
+  1  undef        Any reference to this package  
+  2  $command     The tag for the node           
+  3  %attributes  Attributes as a hash.          
 
 Example:
 
 
   my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");
-
+  
   $x->putLast($x->newTag("b", id=>2, class=>"bb"));
-
+  
   ok -p $x eq <<END;
   <a class="aa" id="1">
     <b class="bb" id="2"/>
   </a>
   END
-
+  
 
 =head3 newTree($%)
 
 Create a new tree.
 
-     Parameter    Description
-  1  $command     The name of the root node in the tree
-  2  %attributes  Attributes of the root node in the tree as a hash.
+     Parameter    Description                                         
+  1  $command     The name of the root node in the tree               
+  2  %attributes  Attributes of the root node in the tree as a hash.  
 
 Example:
 
 
   my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");
-
+  
   ok -s $x eq '<a class="aa" id="1"/>';
-
+  
 
 =head3 replaceSpecialChars($)
 
 Replace < > " with &lt; &gt; &quot;  Larry Wall's excellent L<Xml parser|https://metacpan.org/pod/XML::Parser/> unfortunately replaces &lt; &gt; &quot; &amp; etc. with their expansions in text by default and does not seem to provide an obvious way to stop this behavior, so we have to put them back gain using this method. Worse, we cannot decide whether to replace & with &amp; or leave it as is: consequently you might have to examine the instances of & in your output text and guess based on the context.
 
-     Parameter  Description
-  1  $string    String to be edited.
+     Parameter  Description           
+  1  $string    String to be edited.  
 
 Example:
 
 
   ok Data::Edit::Xml::replaceSpecialChars(q(<">)) eq "&lt;&quot;&gt;";
-
+  
 
 =head2 Parse tree
 
@@ -2515,9 +2558,9 @@ Construct a parse tree from another parse tree
 
 Returns a renewed copy of the parse tree, optionally checking that the starting node is in a specified context: use this method if you have added nodes via the L</"Put as text"> methods and wish to add them to the parse tree.  Returns the starting node of the new parse tree or B<undef> if the optional context constraint was not supplied but not satisfied.
 
-     Parameter  Description
-  1  $node      Node to renew from
-  2  @context   Optional context
+     Parameter  Description         
+  1  $node      Node to renew from  
+  2  @context   Optional context    
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -2530,23 +2573,23 @@ Example:
 
 
   my $a = Data::Edit::Xml::new("<a/>");
-
+  
   $a->putFirstAsText(qq(<b/>));
-
+  
   ok !$a->go(q(b));
-
+  
   my $A = $a->renew;
-
+  
   ok -t $A->go(q(b)) eq q(b)
-
+  
 
 =head3 clone($@)
 
 Return a clone of the parse tree optionally checking that the starting node is in a specified context: the parse tree is cloned without converting it to string and reparsing it so this method will not L<renew|/renew> any nodes added L<as text|/Put as text>.  Returns the starting node of the new parse tree or B<undef> if the optional context constraint was not supplied but not satisfied.
 
-     Parameter  Description
-  1  $node      Node to clone from
-  2  @context   Optional context
+     Parameter  Description         
+  1  $node      Node to clone from  
+  2  @context   Optional context    
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -2559,33 +2602,33 @@ Example:
 
 
   my $a = Data::Edit::Xml::new("<a> </a>");
-
+  
   my $A = $a->clone;
-
+  
   ok -s $A eq q(<a/>);
-
+  
   ok $a->equals($A);
-
+  
 
 =head3 equals($$)
 
 Return the first node if the two parse trees are equal, else B<undef> if they are not equal.
 
-     Parameter  Description
-  1  $node1     Parse tree 1
-  2  $node2     Parse tree 2.
+     Parameter  Description    
+  1  $node1     Parse tree 1   
+  2  $node2     Parse tree 2.  
 
 Example:
 
 
   my $a = Data::Edit::Xml::new("<a> </a>");
-
+  
   my $A = $a->clone;
-
+  
   ok -s $A eq q(<a/>);
-
+  
   ok $a->equals($A);
-
+  
 
 Use B<equalsX> to execute L<equals|/equals> but B<die> 'equals' instead of returning B<undef>
 
@@ -2593,36 +2636,36 @@ Use B<equalsX> to execute L<equals|/equals> but B<die> 'equals' instead of retur
 
 Save a copy of the parse tree to a file which can be L<restored|/restore> and return the saved node.
 
-     Parameter  Description
-  1  $node      Parse tree
-  2  $file      File.
+     Parameter  Description  
+  1  $node      Parse tree   
+  2  $file      File.        
 
 Example:
 
 
   $y->save($f);
-
+  
   my $Y = Data::Edit::Xml::restore($f);
-
+  
   ok $Y->equals($y);
-
+  
 
 =head3 restore($)
 
 Return a parse tree from a copy saved in a file by L</save>.
 
-     Parameter  Description
-  1  $file      File
+     Parameter  Description  
+  1  $file      File         
 
 Example:
 
 
   $y->save($f);
-
+  
   my $Y = Data::Edit::Xml::restore($f);
-
+  
   ok $Y->equals($y);
-
+  
 
 Use B<restoreX> to execute L<restore|/restore> but B<die> 'restore' instead of returning B<undef>
 
@@ -2645,9 +2688,9 @@ Pretty print the parse tree.
 
 Return a readable string representing a node of a parse tree and all the nodes below it. Or use L<-p|/opString> $node
 
-     Parameter  Description
-  1  $node      Start node
-  2  $depth     Optional depth.
+     Parameter  Description      
+  1  $node      Start node       
+  2  $depth     Optional depth.  
 
 Example:
 
@@ -2664,21 +2707,21 @@ Example:
     </c>
   </a>
   END
-
+  
   my $a = Data::Edit::Xml::new($s);
-
+  
   ok $s eq $a->prettyString;
-
+  
   ok $s eq -p $a;
-
+  
 
 =head3 prettyStringNumbered($$)
 
 Return a readable string representing a node of a parse tree and all the nodes below it with a L<number|/number> attached to each tag. The node numbers can then be used as described in L<Order|/Order> to monitor changes to the parse tree.
 
-     Parameter  Description
-  1  $node      Start node
-  2  $depth     Optional depth.
+     Parameter  Description      
+  1  $node      Start node       
+  2  $depth     Optional depth.  
 
 Example:
 
@@ -2695,9 +2738,9 @@ Example:
     </c>
   </a>
   END
-
+  
   $a->numberTree;
-
+  
   ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
@@ -2710,55 +2753,38 @@ Example:
     </c>
   </a>
   END
-
+  
 
 =head3 prettyStringCDATA($$)
 
 Return a readable string representing a node of a parse tree and all the nodes below it with the text fields wrapped with <CDATA>...</CDATA>.
 
-     Parameter  Description
-  1  $node      Start node
-  2  $depth     Optional depth.
+     Parameter  Description      
+  1  $node      Start node       
+  2  $depth     Optional depth.  
 
 Example:
 
 
-  if (1)
-
+  my $a = Data::Edit::Xml::new("<a><b>A</b></a>");
+  
+  my $b = $a->first;
+  
   $b->first->replaceWithBlank;
-
+  
   ok $a->prettyStringCDATA eq <<END;
   <a>
       <b><CDATA> </CDATA></b>
   </a>
   END
-
-  my $a = Data::Edit::Xml::new("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>");
-
-  map {$_->replaceWithBlank} grep {$_->isText}               $a->contents;
-
-  map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;
-
-  ok $a->prettyStringCDATA eq <<'END';
-  <a><CDATA> </CDATA>
-      <A/>
-  <CDATA>  </CDATA>
-      <C/>
-  <CDATA>  </CDATA>
-      <E/>
-  <CDATA>  </CDATA>
-      <G/>
-  <CDATA>  </CDATA>
-  </a>
-  END
-
+  
 
 =head3 prettyStringContent($)
 
 Return a readable string representing all the nodes below a node of a parse tree.
 
-     Parameter  Description
-  1  $node      Start node.
+     Parameter  Description  
+  1  $node      Start node.  
 
 Example:
 
@@ -2775,7 +2801,7 @@ Example:
     </c>
   </a>
   END
-
+  
   ok $a->prettyStringContent eq <<END;
   <b>
     <A/>
@@ -2786,7 +2812,7 @@ Example:
     <D/>
   </c>
   END
-
+  
 
 =head2 Dense
 
@@ -2796,8 +2822,8 @@ Print the parse tree.
 
 Return a dense string representing a node of a parse tree and all the nodes below it. Or use L<-s|/opString> $node
 
-     Parameter  Description
-  1  $node      Start node.
+     Parameter  Description  
+  1  $node      Start node.  
 
 Example:
 
@@ -2812,16 +2838,16 @@ Example:
     </d>
   </a>
   END
-
+  
   ok -s $x eq '<a><b><c id="42"/></b><d><e/></d></a>';
-
+  
 
 =head3 stringQuoted($)
 
 Return a quoted string representing a parse tree a node of a parse tree and all the nodes below it. Or use L<-o|/opString> $node
 
-     Parameter  Description
-  1  $node      Start node
+     Parameter  Description  
+  1  $node      Start node   
 
 Example:
 
@@ -2838,33 +2864,33 @@ Example:
     </c>
   </a>
   END
-
+  
   ok $a->stringQuoted eq q('<a><b><A/><B/></b><c><C/><D/></c></a>');
-
+  
 
 =head3 stringReplacingIdsWithLabels($)
 
 Return a string representing the specified parse tree with the id attribute of each node set to the L<Labels|/Labels> attached to each node.
 
-     Parameter  Description
-  1  $node      Start node.
+     Parameter  Description  
+  1  $node      Start node.  
 
 Example:
 
 
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';
-
+  
   my $s = $x->stringReplacingIdsWithLabels;
-
+  
   ok $s eq '<a><b id="1, 2, 3, 4"><c id="5, 6, 7, 8"/></b></a>';
-
+  
 
 =head3 stringContent($)
 
 Return a string representing all the nodes below a node of a parse tree.
 
-     Parameter  Description
-  1  $node      Start node.
+     Parameter  Description  
+  1  $node      Start node.  
 
 Example:
 
@@ -2881,34 +2907,34 @@ Example:
     </c>
   </a>
   END
-
+  
   ok $a->stringContent eq "<b><A/><B/></b><c><C/><D/></c>";
-
+  
 
 =head3 stringNode($)
 
 Return a string representing a node showing the attributes, labels and node number
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
 
   ok -r $x eq '<a><b><c/></b></a>';
-
+  
   my $b = $x->go(q(b));
-
+  
   $b->addLabels(1..2);
-
+  
   $b->addLabels(3..4);
-
+  
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
-
+  
   $b->numberTree;
-
+  
   ok -S $b eq "b(2) 0:1 1:2 2:3 3:4";
-
+  
 
 =head2 Conditions
 
@@ -2918,9 +2944,9 @@ Print a subset of the the parse tree determined by the conditions attached to it
 
 Return a string representing a node of a parse tree and all the nodes below it subject to conditions to select or reject some nodes.
 
-     Parameter    Description
-  1  $node        Start node
-  2  @conditions  Conditions to be regarded as in effect.
+     Parameter    Description                              
+  1  $node        Start node                               
+  2  @conditions  Conditions to be regarded as in effect.  
 
 Example:
 
@@ -2931,70 +2957,70 @@ Example:
     <c/>
   </a>
   END
-
+  
   my $b = $x >= 'b';
-
+  
   my $c = $x >= 'c';
-
+  
   $b->addConditions(qw(bb BB));
-
+  
   $c->addConditions(qw(cc CC));
-
+  
   ok $x->stringWithConditions         eq '<a><b/><c/></a>';
-
+  
   ok $x->stringWithConditions(qw(bb)) eq '<a><b/></a>';
-
+  
   ok $x->stringWithConditions(qw(cc)) eq '<a><c/></a>';
-
+  
 
 =head3 addConditions($@)
 
 Add conditions to a node and return the node.
 
-     Parameter    Description
-  1  $node        Node
-  2  @conditions  Conditions to add.
+     Parameter    Description         
+  1  $node        Node                
+  2  @conditions  Conditions to add.  
 
 Example:
 
 
   $b->addConditions(qw(bb BB));
-
+  
   ok join(' ', $b->listConditions) eq 'BB bb';
-
+  
 
 =head3 deleteConditions($@)
 
 Delete conditions applied to a node and return the node.
 
-     Parameter    Description
-  1  $node        Node
-  2  @conditions  Conditions to add.
+     Parameter    Description         
+  1  $node        Node                
+  2  @conditions  Conditions to add.  
 
 Example:
 
 
   ok join(' ', $b->listConditions) eq 'BB bb';
-
+  
   $b->deleteConditions(qw(BB));
-
+  
   ok join(' ', $b->listConditions) eq 'bb';
-
+  
 
 =head3 listConditions($)
 
 Return a list of conditions applied to a node.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
 
   $b->addConditions(qw(bb BB));
-
+  
   ok join(' ', $b->listConditions) eq 'BB bb';
-
+  
 
 =head1 Attributes
 
@@ -3064,27 +3090,27 @@ Get or set the attributes of nodes.
 
 Return the value of an attribute of the current node as an L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> B<sub>.
 
-     Parameter   Description
-  1  $node       Node in parse tree
-  2  $attribute  Attribute name.
+     Parameter   Description         
+  1  $node       Node in parse tree  
+  2  $attribute  Attribute name.     
 
 =head3 setAttr($@)
 
 Set the values of some attributes in a node and return the node.
 
-     Parameter  Description
-  1  $node      Node in parse tree
-  2  %values    (attribute name=>new value)*
+     Parameter  Description                   
+  1  $node      Node in parse tree            
+  2  %values    (attribute name=>new value)*  
 
 Example:
 
 
   ok -s $x eq '<a number="2"/>';
-
+  
   $x->setAttr(first=>1, second=>2, last=>undef);
-
+  
   ok -s $x eq '<a first="1" number="2" second="2"/>';
-
+  
 
 =head2 Other Operations on Attributes
 
@@ -3094,164 +3120,164 @@ Perform operations other than get or set on the attributes of a node
 
 Return the values of the specified attributes of the current node as a list
 
-     Parameter    Description
-  1  $node        Node in parse tree
-  2  @attributes  Attribute names.
+     Parameter    Description         
+  1  $node        Node in parse tree  
+  2  @attributes  Attribute names.    
 
 Example:
 
 
   ok -s $x eq '<a first="1" number="2" second="2"/>';
-
+  
   is_deeply [$x->attrs(qw(third second first ))], [undef, 2, 1];
-
+  
 
 =head3 attrCount($)
 
 Return the number of attributes in the specified node.
 
-     Parameter  Description
-  1  $node      Node in parse tree.
+     Parameter  Description          
+  1  $node      Node in parse tree.  
 
 Example:
 
 
   ok -s $x eq '<a first="1" number="2" second="2"/>';
-
+  
   ok $x->attrCount == 3;
-
+  
 
 =head3 getAttrs($)
 
 Return a sorted list of all the attributes on this node.
 
-     Parameter  Description
-  1  $node      Node in parse tree.
+     Parameter  Description          
+  1  $node      Node in parse tree.  
 
 Example:
 
 
   ok -s $x eq '<a first="1" number="2" second="2"/>';
-
+  
   is_deeply [$x->getAttrs], [qw(first number second)];
-
+  
 
 =head3 deleteAttr($$$)
 
 Delete the attribute, optionally checking its value first and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $attr      Attribute name
-  3  $value     Optional attribute value to check first.
+     Parameter  Description                               
+  1  $node      Node                                      
+  2  $attr      Attribute name                            
+  3  $value     Optional attribute value to check first.  
 
 Example:
 
 
   ok -s $x eq '<a delete="me" number="2"/>';
-
+  
   $x->deleteAttr(qq(delete));
-
+  
   ok -s $x eq '<a number="2"/>';
-
+  
 
 =head3 deleteAttrs($@)
 
 Delete any attributes mentioned in a list without checking their values and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  @attrs     Attribute names to delete
+     Parameter  Description                
+  1  $node      Node                       
+  2  @attrs     Attribute names to delete  
 
 Example:
 
 
   ok -s $x eq '<a first="1" number="2" second="2"/>';
-
+  
   $x->deleteAttrs(qw(first second third number));
-
+  
   ok -s $x eq '<a/>';
-
+  
 
 =head3 renameAttr($$$)
 
 Change the name of an attribute regardless of whether the new attribute already exists and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $old       Existing attribute name
-  3  $new       New attribute name.
+     Parameter  Description              
+  1  $node      Node                     
+  2  $old       Existing attribute name  
+  3  $new       New attribute name.      
 
 Example:
 
 
   ok $x->printAttributes eq qq( no="1" word="first");
-
+  
   $x->renameAttr(qw(no number));
-
+  
   ok $x->printAttributes eq qq( number="1" word="first");
-
+  
 
 =head3 changeAttr($$$)
 
 Change the name of an attribute unless it has already been set and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $old       Existing attribute name
-  3  $new       New attribute name.
+     Parameter  Description              
+  1  $node      Node                     
+  2  $old       Existing attribute name  
+  3  $new       New attribute name.      
 
 Example:
 
 
   ok $x->printAttributes eq qq( number="1" word="first");
-
+  
   $x->changeAttr(qw(number word));
-
+  
   ok $x->printAttributes eq qq( number="1" word="first");
-
+  
 
 =head3 renameAttrValue($$$$$)
 
 Change the name and value of an attribute regardless of whether the new attribute already exists and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $old       Existing attribute name
-  3  $oldValue  Existing attribute value
-  4  $new       New attribute name
-  5  $newValue  New attribute value.
+     Parameter  Description               
+  1  $node      Node                      
+  2  $old       Existing attribute name   
+  3  $oldValue  Existing attribute value  
+  4  $new       New attribute name        
+  5  $newValue  New attribute value.      
 
 Example:
 
 
   ok $x->printAttributes eq qq( number="1" word="first");
-
+  
   $x->renameAttrValue(qw(number 1 numeral I));
-
+  
   ok $x->printAttributes eq qq( numeral="I" word="first");
-
+  
 
 =head3 changeAttrValue($$$$$)
 
 Change the name and value of an attribute unless it has already been set and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $old       Existing attribute name
-  3  $oldValue  Existing attribute value
-  4  $new       New attribute name
-  5  $newValue  New attribute value.
+     Parameter  Description               
+  1  $node      Node                      
+  2  $old       Existing attribute name   
+  3  $oldValue  Existing attribute value  
+  4  $new       New attribute name        
+  5  $newValue  New attribute value.      
 
 Example:
 
 
   ok $x->printAttributes eq qq( numeral="I" word="first");
-
+  
   $x->changeAttrValue(qw(word second greek mono));
-
+  
   ok $x->printAttributes eq qq( numeral="I" word="first");
-
+  
 
 =head1 Traversal
 
@@ -3265,10 +3291,10 @@ This order allows you to edit children before their parents
 
 Post-order traversal of a parse tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
@@ -3283,18 +3309,18 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->by(sub{$s .= $_->tag}); ok $s eq "cbeda"
-
+  
 
 =head3 byX($$@)
 
 Post-order traversal of a parse tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call
-  3  @context   Accumulated context.
+     Parameter  Description           
+  1  $node      Starting node         
+  2  $sub       Sub to call           
+  3  @context   Accumulated context.  
 
 Example:
 
@@ -3309,18 +3335,18 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->byX(sub{$s .= $_->tag}); ok $s eq "cbeda"
-
+  
 
 =head3 byReverse($$@)
 
 Reverse post-order traversal of a parse tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
@@ -3335,18 +3361,18 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->byReverse(sub{$s .= $_->tag}); ok $s eq "edcba"
-
+  
 
 =head3 byReverseX($$@)
 
 Reverse post-order traversal of a parse tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
@@ -3361,9 +3387,9 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->byReverse(sub{$s .= $_->tag}); ok $s eq "edcba"
-
+  
 
 =head2 Pre-order
 
@@ -3373,40 +3399,40 @@ This order allows you to edit children after their parents
 
 Pre-order traversal down through a parse tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
 
   my $s; $x->down(sub{$s .= $_->tag}); ok $s eq "abcde"
-
+  
 
 =head3 downX($$@)
 
 Pre-order traversal down through a parse tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
 
   my $s; $x->down(sub{$s .= $_->tag}); ok $s eq "abcde"
-
+  
 
 =head3 downReverse($$@)
 
 Reverse pre-order traversal down through a parse tree or sub tree calling the specified B<sub> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
@@ -3421,18 +3447,18 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->downReverse(sub{$s .= $_->tag}); ok $s eq "adebc"
-
+  
 
 =head3 downReverseX($$@)
 
 Reverse pre-order traversal down through a parse tree or sub tree calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $sub       Sub to call for each sub node
-  3  @context   Accumulated context.
+     Parameter  Description                    
+  1  $node      Starting node                  
+  2  $sub       Sub to call for each sub node  
+  3  @context   Accumulated context.           
 
 Example:
 
@@ -3447,9 +3473,9 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x->downReverse(sub{$s .= $_->tag}); ok $s eq "adebc"
-
+  
 
 =head2 Pre and Post order
 
@@ -3459,37 +3485,37 @@ Visit the parent first, then the children, then the parent again.
 
 Traverse parse tree visiting each node twice calling the specified B<sub> at each node and returning the specified starting node. The B<sub>s are passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $before    Sub to call when we meet a node
-  3  $after     Sub to call we leave a node
-  4  @context   Accumulated context.
+     Parameter  Description                      
+  1  $node      Starting node                    
+  2  $before    Sub to call when we meet a node  
+  3  $after     Sub to call we leave a node      
+  4  @context   Accumulated context.             
 
 Example:
 
 
   my $s; my $n = sub{$s .= $_->tag}; $x->through($n, $n);
-
+  
   ok $s eq "abccbdeeda"
-
+  
 
 =head3 throughX($$$@)
 
 Traverse parse tree visiting each node twice calling the specified B<sub> within L<eval|http://perldoc.perl.org/functions/eval.html>B<{}> at each node and returning the specified starting node. The B<sub> is passed references to the current node and all of its L<ancestors|/ancestry>. The value of the current node is also made available via B<$_>.
 
-     Parameter  Description
-  1  $node      Starting node
-  2  $before    Sub to call when we meet a node
-  3  $after     Sub to call we leave a node
-  4  @context   Accumulated context.
+     Parameter  Description                      
+  1  $node      Starting node                    
+  2  $before    Sub to call when we meet a node  
+  3  $after     Sub to call we leave a node      
+  4  @context   Accumulated context.             
 
 Example:
 
 
   my $s; my $n = sub{$s .= $_->tag}; $x->through($n, $n);
-
+  
   ok $s eq "abccbdeeda"
-
+  
 
 =head2 Range
 
@@ -3499,9 +3525,9 @@ Ranges of nodes
 
 Return a list consisting of the specified node and its following siblings optionally including only those nodes that match one of the tags in the specified list.
 
-     Parameter  Description
-  1  $start     Start node
-  2  @match     Optional list of tags to match
+     Parameter  Description                     
+  1  $start     Start node                      
+  2  @match     Optional list of tags to match  
 
 Example:
 
@@ -3531,31 +3557,31 @@ Example:
     </b>
   </a>
   END
-
+  
   my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
-
+  
   my @f = $d->from;
-
+  
   ok @f == 4;
-
+  
   ok $d == $f[0];
-
+  
   my @F = $d->from(qw(c));
-
+  
   ok @F == 2;
-
+  
   ok -M $F[1] == 12;
-
+  
   ok $D == $t[-1];
-
+  
 
 =head3 to($@)
 
 Return a list of the sibling nodes preceding the specified node optionally including only those nodes that match one of the tags in the specified list.
 
-     Parameter  Description
-  1  $end       End node
-  2  @match     Optional list of tags to match
+     Parameter  Description                     
+  1  $end       End node                        
+  2  @match     Optional list of tags to match  
 
 Example:
 
@@ -3585,28 +3611,28 @@ Example:
     </b>
   </a>
   END
-
+  
   my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
-
+  
   my @t = $D->to;
-
+  
   ok @t == 4;
-
+  
   my @T = $D->to(qw(c));
-
+  
   ok @T == 2;
-
+  
   ok -M $T[1] == 7;
-
+  
 
 =head3 fromTo($$@)
 
 Return a list of the nodes between the specified start and end nodes optionally including only those nodes that match one of the tags in the specified list.
 
-     Parameter  Description
-  1  $start     Start node
-  2  $end       End node
-  3  @match     Optional list of tags to match
+     Parameter  Description                     
+  1  $start     Start node                      
+  2  $end       End node                        
+  3  @match     Optional list of tags to match  
 
 Example:
 
@@ -3636,23 +3662,23 @@ Example:
     </b>
   </a>
   END
-
+  
   my ($d, $c, $D) = $a->findByNumbers(5, 7, 10);
-
+  
   my @r = $d->fromTo($D);
-
+  
   ok @r == 3;
-
+  
   my @R = $d->fromTo($D, qw(c));
-
+  
   ok @R == 1;
-
+  
   ok -M $R[0] == 7;
-
+  
   ok !$D->fromTo($d);
-
+  
   ok 1 == $d->fromTo($d);
-
+  
 
 =head1 Position
 
@@ -3662,9 +3688,9 @@ Confirm that the position L<navigated|/Navigation> to is the expected position.
 
 Confirm that the node has the specified L<ancestry|/ancestry> and return the starting node if it does else B<undef>. Ancestry is specified by providing the expected tags that the parent, the parent's parent etc. must match at each level. If B<undef> is specified then any tag is assumed to match at that level. If a regular expression is specified then the current parent node tag must match the regular expression at that level. If all supplied tags match successfully then the starting node is returned else B<undef>
 
-     Parameter  Description
-  1  $start     Starting node
-  2  @context   Ancestry.
+     Parameter  Description    
+  1  $start     Starting node  
+  2  @context   Ancestry.      
 
 Example:
 
@@ -3678,32 +3704,58 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->go(qw(b c -1 f))->at(qw(f c b a));
-
+  
   ok  $a->go(qw(b c  1 e))->at(undef, qr(c|d), undef, qq(a));
-
-  ok  $a->go(qw(b c  d))  ->at(qw(d c b),    undef);
-
-  ok !$a->go(qw(b c  d))  ->at(qw(d c b),    undef, undef);
-
-  ok !$a->go(qw(b c  d))  ->at(qw(d e b));
-
+  
+  ok $d->context eq q(d c b a);
+  
+  ok  $d->at(qw(d c b), undef);
+  
+  ok !$d->at(qw(d c b), undef, undef);
+  
+  ok !$d->at(qw(d e b));
+  
 
 Use B<atX> to execute L<at|/at> but B<die> 'at' instead of returning B<undef>
+
+=head2 atOrBelow($@)
+
+Confirm that the node or one of its ancestors has the specified context as recognized by L<at|/at> and return the first node that matches the context or B<undef> if none do.
+
+     Parameter  Description    
+  1  $start     Starting node  
+  2  @context   Ancestry.      
+
+Example:
+
+
+  ok $d->context eq q(d c b a);
+  
+  ok  $d->atOrBelow(qw(d c b a));
+  
+  ok  $d->atOrBelow(qw(  c b a));
+  
+  ok  $d->atOrBelow(qw(    b a));
+  
+  ok !$d->atOrBelow(qw(  c   a));
+  
+
+Use B<atOrBelowX> to execute L<atOrBelow|/atOrBelow> but B<die> 'atOrBelow' instead of returning B<undef>
 
 =head2 ancestry($)
 
 Return a list containing: (the specified node, its parent, its parent's parent etc..)
 
-     Parameter  Description
-  1  $start     Starting node.
+     Parameter  Description     
+  1  $start     Starting node.  
 
 Example:
 
 
   $a->numberTree;
-
+  
   ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
@@ -3716,16 +3768,16 @@ Example:
     </c>
   </a>
   END
-
+  
   is_deeply [map {-t $_} $a->findByNumber(7)->ancestry], [qw(D c a)];
-
+  
 
 =head2 context($)
 
 Return a string containing the tag of the starting node and the tags of all its ancestors separated by single spaces.
 
-     Parameter  Description
-  1  $start     Starting node.
+     Parameter  Description     
+  1  $start     Starting node.  
 
 Example:
 
@@ -3740,33 +3792,33 @@ Example:
     </d>
   </a>
   END
-
+  
   ok $x->go(qw(d e))->context eq 'e d a';
-
+  
 
 =head2 containsSingleText($)
 
 Return the singleton text element below this node else return B<undef>
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
 
   my $a = Data::Edit::Xml::new("<a><b>bb</b><c>cc<d/>ee</c></a>");
-
+  
   ok  $a->go(q(b))->containsSingleText->text eq q(bb);
-
+  
   ok !$a->go(q(c))->containsSingleText;
-
+  
 
 =head2 depth($)
 
 Returns the depth of the specified node, the  depth of a root node is zero.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -3796,24 +3848,27 @@ Example:
     </b>
   </a>
   END
-
+  
   ok 0 == $a->depth;
-
+  
   ok 4 == $a->findByNumber(14)->depth;
-
+  
 
 =head2 isFirst($@)
 
 Return the specified node if it is first under its parent and optionally has the specified context, else return B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node              
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
 specified by the first parameter is not in this context then this method
 returns B<undef> immediately.
+
+Use B<isFirstNonBlank> to skip a (rare) initial blank text CDATA. Use B<isFirstNonBlankX> to die rather
+then receive a returned B<undef> or false result.
 
 
 
@@ -3830,9 +3885,9 @@ Example:
     </d>
   </a>
   END
-
+  
   ok $x->go(q(b))->isFirst;
-
+  
 
 Use B<isFirstX> to execute L<isFirst|/isFirst> but B<die> 'isFirst' instead of returning B<undef>
 
@@ -3840,14 +3895,17 @@ Use B<isFirstX> to execute L<isFirst|/isFirst> but B<die> 'isFirst' instead of r
 
 Return the specified node if it is last under its parent and optionally has the specified context, else return B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node              
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
 specified by the first parameter is not in this context then this method
 returns B<undef> immediately.
+
+Use B<isLastNonBlank> to skip a (rare) initial blank text CDATA. Use B<isLastNonBlankX> to die rather
+then receive a returned B<undef> or false result.
 
 
 
@@ -3864,9 +3922,9 @@ Example:
     </d>
   </a>
   END
-
+  
   ok $x->go(q(d))->isLast;
-
+  
 
 Use B<isLastX> to execute L<isLast|/isLast> but B<die> 'isLast' instead of returning B<undef>
 
@@ -3874,9 +3932,9 @@ Use B<isLastX> to execute L<isLast|/isLast> but B<die> 'isLast' instead of retur
 
 Return the specified node if it is the only node under its parent (and ancestors) ignoring any surrounding blank text.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node              
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -3891,15 +3949,15 @@ Example:
   my $x = Data::Edit::Xml::new(<<END)->first->first;
   <a id="aa"><b id="bb"><c id="cc"/></b></a>
   END
-
+  
   ok $x->isOnlyChild;
-
+  
   ok $x->isOnlyChild(qw(c));
-
+  
   ok $x->isOnlyChild(qw(c b));
-
+  
   ok $x->isOnlyChild(qw(c b a));
-
+  
 
 Use B<isOnlyChildX> to execute L<isOnlyChild|/isOnlyChild> but B<die> 'isOnlyChild' instead of returning B<undef>
 
@@ -3907,9 +3965,9 @@ Use B<isOnlyChildX> to execute L<isOnlyChild|/isOnlyChild> but B<die> 'isOnlyChi
 
 Confirm that this node is empty, that is: this node has no content, not even a blank string of text. To test for blank nodes, see L<isAllBlankText|/isAllBlankText>.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node              
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -3923,18 +3981,18 @@ Example:
 
   my $x = Data::Edit::Xml::new(<<END);
   <a>
-
+  
   </a>
   END
-
+  
   ok $x->isEmpty;
-
+  
   my $x = Data::Edit::Xml::new(<<END)->first->first;
   <a id="aa"><b id="bb"><c id="cc"/></b></a>
   END
-
+  
   ok $x->isEmpty;
-
+  
 
 Use B<isEmptyX> to execute L<isEmpty|/isEmpty> but B<die> 'isEmpty' instead of returning B<undef>
 
@@ -3942,10 +4000,10 @@ Use B<isEmptyX> to execute L<isEmpty|/isEmpty> but B<die> 'isEmpty' instead of r
 
 Confirm that the string representing the tags at the level below this node match a regular expression.
 
-     Parameter  Description
-  1  $node      Node
-  2  $re        Regular expression
-  3  @context   Optional context.
+     Parameter  Description         
+  1  $node      Node                
+  2  $re        Regular expression  
+  3  @context   Optional context.   
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -3964,9 +4022,9 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $x->go(q(b))->over(qr(d.+e));
-
+  
 
 Use B<overX> to execute L<over|/over> but B<die> 'over' instead of returning B<undef>
 
@@ -3974,10 +4032,10 @@ Use B<overX> to execute L<over|/over> but B<die> 'over' instead of returning B<u
 
 Confirm that the string representing the tags following this node matches a regular expression.
 
-     Parameter  Description
-  1  $node      Node
-  2  $re        Regular expression
-  3  @context   Optional context.
+     Parameter  Description         
+  1  $node      Node                
+  2  $re        Regular expression  
+  3  @context   Optional context.   
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -3996,9 +4054,9 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $x->go(qw(b e))->matchAfter (qr(\Af g\Z));
-
+  
 
 Use B<matchAfterX> to execute L<matchAfter|/matchAfter> but B<die> 'matchAfter' instead of returning B<undef>
 
@@ -4006,10 +4064,10 @@ Use B<matchAfterX> to execute L<matchAfter|/matchAfter> but B<die> 'matchAfter' 
 
 Confirm that the string representing the tags preceding this node matches a regular expression
 
-     Parameter  Description
-  1  $node      Node
-  2  $re        Regular expression
-  3  @context   Optional context.
+     Parameter  Description         
+  1  $node      Node                
+  2  $re        Regular expression  
+  3  @context   Optional context.   
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4028,9 +4086,9 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $x->go(qw(b e))->matchBefore(qr(\Ac d\Z));
-
+  
 
 Use B<matchBeforeX> to execute L<matchBefore|/matchBefore> but B<die> 'matchBefore' instead of returning B<undef>
 
@@ -4038,8 +4096,8 @@ Use B<matchBeforeX> to execute L<matchBefore|/matchBefore> but B<die> 'matchBefo
 
 Return a list representing the path to a node which can then be reused by L<get|/get> to retrieve the node as long as the structure of the parse tree has not changed along the path.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -4062,18 +4120,18 @@ Example:
     </b>
   </a>
   END
-
+  
   is_deeply [$x->go(qw(b d 1 e))->path], [qw(b d 1 e)];
-
+  
   $x->by(sub {ok $x->go($_->path) == $_});
-
+  
 
 =head2 pathString($)
 
 Return a string representing the L<path|/path> to a node
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -4103,9 +4161,9 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $a->findByNumber(9)->pathString eq 'b c 1 d e';
-
+  
 
 =head1 Navigation
 
@@ -4115,9 +4173,9 @@ Move around in the parse tree
 
 Return the node reached from the specified node via the specified L<path|/path>: (index positionB<?>)B<*> where index is the tag of the next node to be chosen and position is the optional zero based position within the index of those tags under the current node. Position defaults to zero if not specified. Position can also be negative to index back from the top of the index array. B<*> can be used as the last position to retrieve all nodes with the final tag.
 
-     Parameter  Description
-  1  $node      Node
-  2  @position  Search specification.
+     Parameter  Description            
+  1  $node      Node                   
+  2  @position  Search specification.  
 
 Example:
 
@@ -4131,15 +4189,15 @@ Example:
     </a>
   </aa>
   END
-
+  
   ok $x->go(qw(a c))   ->id == 1;
-
+  
   ok $x->go(qw(a c -2))->id == 3;
-
+  
   ok $x->go(qw(a c *)) == 4;
-
+  
   ok 1234 == join '', map {$_->id} $x->go(qw(a c *));
-
+  
 
 Use B<goX> to execute L<go|/go> but B<die> 'go' instead of returning B<undef>
 
@@ -4147,9 +4205,9 @@ Use B<goX> to execute L<go|/go> but B<die> 'go' instead of returning B<undef>
 
 Return an array of all the nodes with the specified tag below the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $tag       Tag.
+     Parameter  Description  
+  1  $node      Node         
+  2  $tag       Tag.         
 
 Example:
 
@@ -4164,9 +4222,9 @@ Example:
     <e id="e2"><c id="6"/></e>
   </a>
   END
-
+  
   is_deeply [map{-u $_} $x->c(q(d))],  [qw(d1 d2)];
-
+  
 
 =head2 First
 
@@ -4176,9 +4234,9 @@ Find nodes that are first amongst their siblings.
 
 Return the first node below this node optionally checking its context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4223,23 +4281,63 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->go(q(b))->first->id == 13;
-
+  
   ok  $a->go(q(b))->first(qw(c b a));
-
+  
   ok !$a->go(q(b))->first(qw(b a));
-
+  
 
 Use B<firstX> to execute L<first|/first> but B<die> 'first' instead of returning B<undef>
+
+=head3 firstText($@)
+
+Return the first node if it is a text node otherwise undef
+
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>AA
+    <b/>
+  BB
+    <c/>
+  CC
+    <d/>
+    <e/>
+    <f/>
+  DD
+    <g/>
+  HH
+  </a>
+  END
+  
+  ok  $a->firstText;
+  
+  ok !$a->go(qw(c))->firstText;
+  
+
+Use B<firstTextX> to execute L<firstText|/firstText> but B<die> 'firstText' instead of returning B<undef>
 
 =head3 firstBy($@)
 
 Return a list of the first instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4274,35 +4372,35 @@ Example:
     </b>
   </a>
   END
-
+  
   my %f = $a->firstBy;
-
+  
   ok $f{b}->id == 12;
-
+  
 
 =head3 firstDown($@)
 
 Return a list of the first instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all first instances if no tags are specified.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
 
   my %f = $a->firstDown;
-
+  
   ok $f{b}->id == 15;
-
+  
 
 =head3 firstIn($@)
 
 Return the first node matching one of the named tags under the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4319,9 +4417,9 @@ Example:
   <CDATA>  </CDATA>
   </a>
   END
-
+  
   ok $a->firstIn(qw(b B c C))->tag eq qq(C);
-
+  
 
 Use B<firstInX> to execute L<firstIn|/firstIn> but B<die> 'firstIn' instead of returning B<undef>
 
@@ -4329,9 +4427,9 @@ Use B<firstInX> to execute L<firstIn|/firstIn> but B<die> 'firstIn' instead of r
 
 Return the specified node if it is first in its index and optionally L<at|/at> the specified context else B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4368,11 +4466,11 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->findByNumber (5)->firstInIndex;
-
+  
   ok !$a->findByNumber(7) ->firstInIndex;
-
+  
 
 Use B<firstInIndexX> to execute L<firstInIndex|/firstInIndex> but B<die> 'firstInIndex' instead of returning B<undef>
 
@@ -4380,9 +4478,9 @@ Use B<firstInIndexX> to execute L<firstInIndex|/firstInIndex> but B<die> 'firstI
 
 Return the first node encountered in the specified context in a depth first post-order traversal of the parse tree.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Array of tags specifying context.
+     Parameter  Description                        
+  1  $node      Node                               
+  2  @context   Array of tags specifying context.  
 
 Example:
 
@@ -4409,13 +4507,13 @@ Example:
     </b3>
   </a>
   END
-
+  
   ok $x->firstContextOf(qw(d c))         ->id     eq qq(d1);
-
+  
   ok $x->firstContextOf(qw(e c b2))      ->id     eq qq(e2);
-
+  
   ok $x->firstContextOf(qw(CDATA d c b2))->string eq qq(DD22);
-
+  
 
 Use B<firstContextOfX> to execute L<firstContextOf|/firstContextOf> but B<die> 'firstContextOf' instead of returning B<undef>
 
@@ -4427,9 +4525,9 @@ Find nodes that are last amongst their siblings.
 
 Return the last node below this node optionally checking its context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4474,25 +4572,65 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->go(q(b))->last ->id == 22;
-
+  
   ok  $a->go(q(b))->last(qw(g b a));
-
+  
   ok !$a->go(q(b))->last(qw(b a));
-
+  
   ok !$a->go(q(b))->last(qw(b a));
-
+  
 
 Use B<lastX> to execute L<last|/last> but B<die> 'last' instead of returning B<undef>
+
+=head3 lastText($@)
+
+Return the last node if it is a text node otherwise undef
+
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>AA
+    <b/>
+  BB
+    <c/>
+  CC
+    <d/>
+    <e/>
+    <f/>
+  DD
+    <g/>
+  HH
+  </a>
+  END
+  
+  ok  $a->lastText;
+  
+  ok !$a->go(qw(c))->lastText;
+  
+
+Use B<lastTextX> to execute L<lastText|/lastText> but B<die> 'lastText' instead of returning B<undef>
 
 =head3 lastBy($@)
 
 Return a list of the last instance of each specified tag encountered in a post-order traversal from the specified node or a hash of all first instances if no tags are specified.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4527,35 +4665,35 @@ Example:
     </b>
   </a>
   END
-
+  
   my %l = $a->lastBy;
-
+  
   ok $l{b}->id == 23;
-
+  
 
 =head3 lastDown($@)
 
 Return a list of the last instance of each specified tag encountered in a pre-order traversal from the specified node or a hash of all first instances if no tags are specified.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
 
   my %l = $a->lastDown;
-
+  
   ok $l{b}->id == 26;
-
+  
 
 =head3 lastIn($@)
 
 Return the first node matching one of the named tags under the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4572,9 +4710,9 @@ Example:
   <CDATA>  </CDATA>
   </a>
   END
-
+  
   ok $a->lastIn(qw(e E f F))->tag eq qq(E);
-
+  
 
 Use B<lastInX> to execute L<lastIn|/lastIn> but B<die> 'lastIn' instead of returning B<undef>
 
@@ -4582,9 +4720,9 @@ Use B<lastInX> to execute L<lastIn|/lastIn> but B<die> 'lastIn' instead of retur
 
 Return the specified node if it is last in its index and optionally L<at|/at> the specified context else B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4621,11 +4759,11 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->findByNumber(10)->lastInIndex;
-
+  
   ok !$a->findByNumber(7) ->lastInIndex;
-
+  
 
 Use B<lastInIndexX> to execute L<lastInIndex|/lastInIndex> but B<die> 'lastInIndex' instead of returning B<undef>
 
@@ -4633,9 +4771,9 @@ Use B<lastInIndexX> to execute L<lastInIndex|/lastInIndex> but B<die> 'lastInInd
 
 Return the last node encountered in the specified context in a depth first reverse pre-order traversal of the parse tree.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Array of tags specifying context.
+     Parameter  Description                        
+  1  $node      Node                               
+  2  @context   Array of tags specifying context.  
 
 Example:
 
@@ -4662,13 +4800,13 @@ Example:
     </b3>
   </a>
   END
-
+  
   ok $x-> lastContextOf(qw(d c))         ->id     eq qq(d3);
-
+  
   ok $x-> lastContextOf(qw(e c b2     )) ->id     eq qq(e2);
-
+  
   ok $x-> lastContextOf(qw(CDATA e c b2))->string eq qq(EE22);
-
+  
 
 Use B<lastContextOfX> to execute L<lastContextOf|/lastContextOf> but B<die> 'lastContextOf' instead of returning B<undef>
 
@@ -4680,9 +4818,9 @@ Find sibling nodes after the specified node.
 
 Return the node next to the specified node, optionally checking its context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4727,23 +4865,63 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->go(qw(b b e))->next ->id == 19;
-
+  
   ok  $a->go(qw(b b e))->next(qw(f b b a));
-
+  
   ok !$a->go(qw(b b e))->next(qw(f b a));
-
+  
 
 Use B<nextX> to execute L<next|/next> but B<die> 'next' instead of returning B<undef>
+
+=head3 nextText($@)
+
+Return the next node if it is a text node otherwise undef
+
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>AA
+    <b/>
+  BB
+    <c/>
+  CC
+    <d/>
+    <e/>
+    <f/>
+  DD
+    <g/>
+  HH
+  </a>
+  END
+  
+  ok  $a->go(qw(c))->nextText->text eq q(CC);
+  
+  ok !$a->go(qw(e))->nextText;
+  
+
+Use B<nextTextX> to execute L<nextText|/nextText> but B<die> 'nextText' instead of returning B<undef>
 
 =head3 nextIn($@)
 
 Return the next node matching one of the named tags.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4760,9 +4938,9 @@ Example:
   <CDATA>  </CDATA>
   </a>
   END
-
+  
   ok $a->firstIn(qw(b B c C))->nextIn(qw(A G))->tag eq qq(G);
-
+  
 
 Use B<nextInX> to execute L<nextIn|/nextIn> but B<die> 'nextIn' instead of returning B<undef>
 
@@ -4770,9 +4948,9 @@ Use B<nextInX> to execute L<nextIn|/nextIn> but B<die> 'nextIn' instead of retur
 
 Step forwards as far as possible while remaining on nodes with the specified tags. In scalar context return the last such node reached or the starting node if no such steps are possible. In array context return the start node and any following matching nodes.
 
-     Parameter  Description
-  1  $node      Start node
-  2  @tags      Tags identifying nodes that can be step on to context.
+     Parameter  Description                                             
+  1  $node      Start node                                              
+  2  @tags      Tags identifying nodes that can be step on to context.  
 
 Example:
 
@@ -4788,15 +4966,15 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $c->id == 1;
-
+  
   ok $c->nextOn(qw(d))  ->id == 2;
-
+  
   ok $c->nextOn(qw(c d))->id == 4;
-
+  
   ok $e->nextOn(qw(c d))     == $e;
-
+  
 
 =head2 Prev
 
@@ -4806,9 +4984,9 @@ Find sibling nodes before the specified node.
 
 Return the node before the specified node, optionally checking its context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4853,23 +5031,63 @@ Example:
     </b>
   </a>
   END
-
+  
   ok  $a->go(qw(b b e))->prev ->id == 17;
-
+  
   ok  $a->go(qw(b b e))->prev(qw(d b b a));
-
+  
   ok !$a->go(qw(b b e))->prev(qw(d b a));
-
+  
 
 Use B<prevX> to execute L<prev|/prev> but B<die> 'prev' instead of returning B<undef>
+
+=head3 prevText($@)
+
+Return the previous node if it is a text node otherwise undef
+
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  ok -p $a eq <<END;
+  <a>AA
+    <b/>
+  BB
+    <c/>
+  CC
+    <d/>
+    <e/>
+    <f/>
+  DD
+    <g/>
+  HH
+  </a>
+  END
+  
+  ok  $a->go(qw(c))->prevText->text eq q(BB);
+  
+  ok !$a->go(qw(e))->prevText;
+  
+
+Use B<prevTextX> to execute L<prevText|/prevText> but B<die> 'prevText' instead of returning B<undef>
 
 =head3 prevIn($@)
 
 Return the next previous node matching one of the named tags.
 
-     Parameter  Description
-  1  $node      Node
-  2  @tags      Tags to search for.
+     Parameter  Description          
+  1  $node      Node                 
+  2  @tags      Tags to search for.  
 
 Example:
 
@@ -4886,9 +5104,9 @@ Example:
   <CDATA>  </CDATA>
   </a>
   END
-
+  
   ok $a->lastIn(qw(e E f F))->prevIn(qw(A G))->tag eq qq(A);
-
+  
 
 Use B<prevInX> to execute L<prevIn|/prevIn> but B<die> 'prevIn' instead of returning B<undef>
 
@@ -4896,9 +5114,9 @@ Use B<prevInX> to execute L<prevIn|/prevIn> but B<die> 'prevIn' instead of retur
 
 Step backwards as far as possible while remaining on nodes with the specified tags. In scalar context return the last such node reached or the starting node if no such steps are possible. In array context return the start node and any preceding matching nodes.
 
-     Parameter  Description
-  1  $node      Start node
-  2  @tags      Tags identifying nodes that can be step on to context.
+     Parameter  Description                                             
+  1  $node      Start node                                              
+  2  @tags      Tags identifying nodes that can be step on to context.  
 
 Example:
 
@@ -4914,15 +5132,15 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $c->id == 1;
-
+  
   ok $e->id == 5;
-
+  
   ok $e->prevOn(qw(d))  ->id == 4;
-
+  
   ok $e->prevOn(qw(c d))     == $c;
-
+  
 
 =head2 Upto
 
@@ -4932,15 +5150,15 @@ Methods for moving up the parse tree from a node.
 
 Return the first ancestral node that matches the specified context.
 
-     Parameter  Description
-  1  $node      Start node
-  2  @tags      Tags identifying context.
+     Parameter  Description                
+  1  $node      Start node                 
+  2  @tags      Tags identifying context.  
 
 Example:
 
 
   $a->numberTree;
-
+  
   ok -z $a eq <<END;
   <a id="1">
     <b id="2">
@@ -4958,9 +5176,9 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $a->findByNumber(8)->upto(qw(b c))->number == 4;
-
+  
 
 Use B<uptoX> to execute L<upto|/upto> but B<die> 'upto' instead of returning B<undef>
 
@@ -4972,10 +5190,10 @@ Edit the data in the parse tree and change the structure of the parse tree by L<
 
 Change the name of a node, optionally  confirming that the node is in a specified context and return the node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $name      New name
-  3  @tags      Optional: tags defining the required context.
+     Parameter  Description                                    
+  1  $node      Node                                           
+  2  $name      New name                                       
+  3  @tags      Optional: tags defining the required context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -4988,11 +5206,11 @@ Example:
 
 
   my $a = Data::Edit::Xml::new('<a/>');
-
+  
   $a->change(qq(b));
-
+  
   ok -s $a eq '<b/>';
-
+  
 
 Use B<changeX> to execute L<change|/change> but B<die> 'change' instead of returning B<undef>
 
@@ -5004,9 +5222,9 @@ Move nodes around in the parse tree by cutting and pasting them.
 
 Cut out a node so that it can be reinserted else where in the parse tree.
 
-     Parameter  Description
-  1  $node      Node to cut out
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node to cut out   
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5025,24 +5243,24 @@ Example:
     </b>
   </a>
   END
-
+  
   my $c = $a->go(qw(b c))->cut;
-
+  
   ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
   </a>
   END
-
+  
 
 =head3 putFirst($$@)
 
 Place a L<cut out|/cut> or L<new|/new> node at the front of the content of the specified node and return the new node.
 
-     Parameter  Description
-  1  $old       Original node
-  2  $new       New node
-  3  @context   Optional context.
+     Parameter  Description        
+  1  $old       Original node      
+  2  $new       New node           
+  3  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5061,27 +5279,27 @@ Example:
     </b>
   </a>
   END
-
+  
   my $c = $a->go(qw(b c))->cut;
-
+  
   $a->putFirst($c);
-
+  
   ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-
+  
 
 =head3 putLast($$@)
 
 Place a L<cut out|/cut> or L<new|/new> node last in the content of the specified node and return the new node.
 
-     Parameter  Description
-  1  $old       Original node
-  2  $new       New node
-  3  @context   Optional context.
+     Parameter  Description        
+  1  $old       Original node      
+  2  $new       New node           
+  3  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5099,25 +5317,25 @@ Example:
     <b id="bb"/>
   </a>
   END
-
+  
   $a->putLast($a->go(qw(c))->cut);
-
+  
   ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
     <c id="cc"/>
   </a>
   END
-
+  
 
 =head3 putNext($$@)
 
 Place a L<cut out|/cut> or L<new|/new> node just after the specified node and return the new node.
 
-     Parameter  Description
-  1  $old       Original node
-  2  $new       New node
-  3  @context   Optional context.
+     Parameter  Description        
+  1  $old       Original node      
+  2  $new       New node           
+  3  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5135,25 +5353,25 @@ Example:
     <c id="cc"/>
   </a>
   END
-
+  
   $a->go(qw(c))->putNext($a->go(q(b))->cut);
-
+  
   ok -p $a eq <<END;
   <a id="aa">
     <c id="cc"/>
     <b id="bb"/>
   </a>
   END
-
+  
 
 =head3 putPrev($$@)
 
 Place a L<cut out|/cut> or L<new|/new> node just before the specified node and return the new node.
 
-     Parameter  Description
-  1  $old       Original node
-  2  $new       New node
-  3  @context   Optional context.
+     Parameter  Description        
+  1  $old       Original node      
+  2  $new       New node           
+  3  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5171,16 +5389,16 @@ Example:
     <b id="bb"/>
   </a>
   END
-
+  
   $a->go(qw(c))->putPrev($a->go(q(b))->cut);
-
+  
   ok -p $a eq <<END;
   <a id="aa">
     <b id="bb"/>
     <c id="cc"/>
   </a>
   END
-
+  
 
 =head2 Fusion
 
@@ -5190,10 +5408,10 @@ Join consecutive nodes
 
 Concatenate two successive nodes and return the target node.
 
-     Parameter  Description
-  1  $target    Target node to replace
-  2  $source    Node to concatenate
-  3  @context   Optional context of $target
+     Parameter  Description                  
+  1  $target    Target node to replace       
+  2  $source    Node to concatenate          
+  3  @context   Optional context of $target  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5217,11 +5435,11 @@ Example:
     </c>
   </a>
   END
-
+  
   my $a = Data::Edit::Xml::new($s);
-
+  
   $a->go(q(b))->concatenate($a->go(q(c)));
-
+  
   my $t = <<END;
   <a>
     <b>
@@ -5232,17 +5450,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $t eq -p $a;
-
+  
 
 =head3 concatenateSiblings($@)
 
 Concatenate preceding and following nodes as long as they have the same tag as the specified node and return the specified node.
 
-     Parameter  Description
-  1  $node      Concatenate around this node
-  2  @context   Optional context.
+     Parameter  Description                   
+  1  $node      Concatenate around this node  
+  2  @context   Optional context.             
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5270,9 +5488,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $a->go(qw(b 3))->concatenateSiblings;
-
+  
   ok -p $a eq <<END;
   <a>
     <b>
@@ -5283,7 +5501,7 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head2 Put as text
 
@@ -5293,10 +5511,10 @@ Add text to the parse tree.
 
 Add a new text node first under a parent and return the new text node.
 
-     Parameter  Description
-  1  $node      The parent node
-  2  $text      The string to be added which might contain unparsed Xml as well as text
-  3  @context   Optional context.
+     Parameter  Description                                                              
+  1  $node      The parent node                                                          
+  2  $text      The string to be added which might contain unparsed Xml as well as text  
+  3  @context   Optional context.                                                        
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5315,9 +5533,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(qw(b c))->putFirstAsText("<d id=\"dd\">DDDD</d>");
-
+  
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
@@ -5325,16 +5543,16 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 putLastAsText($$@)
 
 Add a new text node last under a parent and return the new text node.
 
-     Parameter  Description
-  1  $node      The parent node
-  2  $text      The string to be added which might contain unparsed Xml as well as text
-  3  @context   Optional context.
+     Parameter  Description                                                              
+  1  $node      The parent node                                                          
+  2  $text      The string to be added which might contain unparsed Xml as well as text  
+  3  @context   Optional context.                                                        
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5353,9 +5571,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(qw(b c))->putLastAsText("<e id=\"ee\">EEEE</e>");
-
+  
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
@@ -5363,16 +5581,16 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 putNextAsText($$@)
 
 Add a new text node following this node and return the new text node.
 
-     Parameter  Description
-  1  $node      The parent node
-  2  $text      The string to be added which might contain unparsed Xml as well as text
-  3  @context   Optional context.
+     Parameter  Description                                                              
+  1  $node      The parent node                                                          
+  2  $text      The string to be added which might contain unparsed Xml as well as text  
+  3  @context   Optional context.                                                        
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5391,9 +5609,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(qw(b c))->putNextAsText("<n id=\"nn\">NNNN</n>");
-
+  
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb">
@@ -5402,16 +5620,16 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 putPrevAsText($$@)
 
 Add a new text node following this node and return the new text node
 
-     Parameter  Description
-  1  $node      The parent node
-  2  $text      The string to be added which might contain unparsed Xml as well as text
-  3  @context   Optional context.
+     Parameter  Description                                                              
+  1  $node      The parent node                                                          
+  2  $text      The string to be added which might contain unparsed Xml as well as text  
+  3  @context   Optional context.                                                        
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5431,9 +5649,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(qw(b c))->putPrevAsText("<p id=\"pp\">PPPP</p>");
-
+  
   ok -p $x eq <<END;
   <a id="aa">
     <b id="bb"><p id="pp">PPPP</p>
@@ -5442,7 +5660,7 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head2 Break in and out
 
@@ -5452,9 +5670,9 @@ Break nodes out of nodes or push them back
 
 Concatenate the nodes following and preceding the start node, unwrapping nodes whose tag matches the start node and return the start node. To concatenate only the preceding nodes, use L<breakInBackwards|/breakInBackwards>, to concatenate only the following nodes, use L<breakInForwards|/breakInForwards>.
 
-     Parameter  Description
-  1  $start     The start node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $start     The start node     
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5481,9 +5699,9 @@ Example:
     <d/>
   </a>
   END
-
+  
   $a->go(qw(b 1))->breakIn;
-
+  
   ok -p $a eq <<END;
   <a>
     <b>
@@ -5497,15 +5715,15 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 breakInForwards($@)
 
 Concatenate the nodes following the start node, unwrapping nodes whose tag matches the start node and return the start node in the manner of L<breakIn|/breakIn>.
 
-     Parameter  Description
-  1  $start     The start node
-  2  @context   Optional context..
+     Parameter  Description         
+  1  $start     The start node      
+  2  @context   Optional context..  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5532,9 +5750,9 @@ Example:
     <d/>
   </a>
   END
-
+  
   $a->go(q(b))->breakInForwards;
-
+  
   ok -p $a eq <<END;
   <a>
     <d/>
@@ -5548,15 +5766,15 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 breakInBackwards($@)
 
 Concatenate the nodes preceding the start node, unwrapping nodes whose tag matches the start node and return the start node in the manner of L<breakIn|/breakIn>.
 
-     Parameter  Description
-  1  $start     The start node
-  2  @context   Optional context..
+     Parameter  Description         
+  1  $start     The start node      
+  2  @context   Optional context..  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5583,9 +5801,9 @@ Example:
     <d/>
   </a>
   END
-
+  
   $a->go(qw(b 1))->breakInBackwards;
-
+  
   ok -p $a eq <<END;
   <a>
     <b>
@@ -5599,23 +5817,23 @@ Example:
     <d/>
   </a>
   END
-
+  
 
 =head3 breakOut($@)
 
 Lift child nodes with the specified tags under the specified parent node splitting the parent node into clones and return the cut out original node.
 
-     Parameter  Description
-  1  $parent    The parent node
-  2  @tags      The tags of the modes to be broken out.
+     Parameter  Description                              
+  1  $parent    The parent node                          
+  2  @tags      The tags of the modes to be broken out.  
 
 Example:
 
 
   my $A = Data::Edit::Xml::new("<a><b><d/><c/><c/><e/><c/><c/><d/></b></a>");
-
+  
   $a->go(q(b))->breakOut($a, qw(d e));
-
+  
   ok -p $a eq <<END;
   <a>
     <d/>
@@ -5631,7 +5849,7 @@ Example:
     <d/>
   </a>
   END
-
+  
 
 =head2 Replace
 
@@ -5641,10 +5859,10 @@ Replace nodes in the parse tree with nodes or text
 
 Replace a node (and all its content) with a L<new node|/newTag> (and all its content) and return the new node.
 
-     Parameter  Description
-  1  $old       Old node
-  2  $new       New node
-  3  @context   Optional context..
+     Parameter  Description         
+  1  $old       Old node            
+  2  $new       New node            
+  3  @context   Optional context..  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5657,20 +5875,20 @@ Example:
 
 
   my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
-
+  
   $x->go(qw(b c))->replaceWith($x->newTag(qw(d id dd)));
-
+  
   ok -s $x eq '<a><b><d id="dd"/></b></a>';
-
+  
 
 =head3 replaceWithText($$@)
 
 Replace a node (and all its content) with a new text node and return the new node.
 
-     Parameter  Description
-  1  $old       Old node
-  2  $text      Text of new node
-  3  @context   Optional context.
+     Parameter  Description        
+  1  $old       Old node           
+  2  $text      Text of new node   
+  3  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5683,19 +5901,19 @@ Example:
 
 
   my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
-
+  
   $x->go(qw(b c))->replaceWithText(qq(BBBB));
-
+  
   ok -s $x eq '<a><b>BBBB</b></a>';
-
+  
 
 =head3 replaceWithBlank($@)
 
 Replace a node (and all its content) with a new blank text node and return the new node.
 
-     Parameter  Description
-  1  $old       Old node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $old       Old node           
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5708,47 +5926,47 @@ Example:
 
 
   my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));
-
+  
   $x->go(qw(b c))->replaceWithBlank;
-
+  
   ok -s $x eq '<a><b> </b></a>';
-
+  
 
 =head3 replaceContentWith($@)
 
 Replace the content of a node with the specified nodes and return the replaced content
 
-     Parameter  Description
-  1  $node      Node whose content is to be replaced
-  2  @content   New content
+     Parameter  Description                           
+  1  $node      Node whose content is to be replaced  
+  2  @content   New content                           
 
 Example:
 
 
   my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));
-
+  
   $x->replaceContentWith(map {$x->newTag($_)} qw(B C));
-
+  
   ok -s $x eq '<a><B/><C/></a>';
-
+  
 
 =head3 replaceContentWithText($@)
 
 Replace the content of a node with the specified texts and return the replaced content
 
-     Parameter  Description
-  1  $node      Node whose content is to be replaced
-  2  @text      Texts to form new content
+     Parameter  Description                           
+  1  $node      Node whose content is to be replaced  
+  2  @text      Texts to form new content             
 
 Example:
 
 
   my $x = Data::Edit::Xml::new(qq(<a><b/><c/></a>));
-
+  
   $x->replaceContentWithText(qw(b c));
-
+  
   ok -s $x eq '<a>bc</a>';
-
+  
 
 =head2 Wrap and unwrap
 
@@ -5758,10 +5976,10 @@ Wrap and unwrap nodes to alter the depth of the parse tree
 
 Wrap the original node in a new node  forcing the original node down - deepening the parse tree - return the new wrapping node.
 
-     Parameter    Description
-  1  $old         Node
-  2  $tag         Tag for the new node or tag
-  3  %attributes  Attributes for the new node or tag.
+     Parameter    Description                          
+  1  $old         Node                                 
+  2  $tag         Tag for the new node or tag          
+  3  %attributes  Attributes for the new node or tag.  
 
 Example:
 
@@ -5773,9 +5991,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(qw(b c))->wrapWith(qw(C id 1));
-
+  
   ok -p $x eq <<END;
   <a>
     <b>
@@ -5785,23 +6003,23 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 wrapUp($@)
 
 Wrap the original node in a sequence of new nodes forcing the original node down - deepening the parse tree - return the array of wrapping nodes.
 
-     Parameter  Description
-  1  $node      Node to wrap
-  2  @tags      Tags to wrap the node with - with the uppermost tag rightmost.
+     Parameter  Description                                                     
+  1  $node      Node to wrap                                                    
+  2  @tags      Tags to wrap the node with - with the uppermost tag rightmost.  
 
 Example:
 
 
   my $c = Data::Edit::Xml::newTree("c", id=>33);
-
+  
   my ($b, $a) = $c->wrapUp(qw(b a));
-
+  
   ok -p $a eq <<'END';
   <a>
     <b>
@@ -5809,23 +6027,23 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 wrapDown($@)
 
 Wrap the content of the specified node in a sequence of new nodes forcing the original node up - deepening the parse tree - return the array of wrapping nodes.
 
-     Parameter  Description
-  1  $node      Node to wrap
-  2  @tags      Tags to wrap the node with - with the uppermost tag rightmost.
+     Parameter  Description                                                     
+  1  $node      Node to wrap                                                    
+  2  @tags      Tags to wrap the node with - with the uppermost tag rightmost.  
 
 Example:
 
 
   my $a = Data::Edit::Xml::newTree("a", id=>33);
-
+  
   my ($b, $c) = $a->wrapDown(qw(b c));
-
+  
   ok -p $a eq <<END;
   <a id="33">
     <b>
@@ -5833,16 +6051,16 @@ Example:
     </b>
   </a>
   END
-
+  
 
 =head3 wrapContentWith($$@)
 
 Wrap the content of a node in a new node: the original node then contains just the new node which, in turn, contains all the content of the original node - returns the new wrapped node.
 
-     Parameter    Description
-  1  $old         Node
-  2  $tag         Tag for new node
-  3  %attributes  Attributes for new node.
+     Parameter    Description               
+  1  $old         Node                      
+  2  $tag         Tag for new node          
+  3  %attributes  Attributes for new node.  
 
 Example:
 
@@ -5856,9 +6074,9 @@ Example:
     </b>
   </a>
   END
-
+  
   $x->go(q(b))->wrapContentWith(qw(D id DD));
-
+  
   ok -p $x eq <<END;
   <a>
     <b>
@@ -5870,7 +6088,7 @@ Example:
     </b>
   </a>
   END
-
+  
   ok -p $a eq <<END;
   <a>
     <b id="1"/>
@@ -5885,17 +6103,17 @@ Example:
     <f id="10"/>
   </a>
   END
-
+  
 
 =head3 wrapTo($$$@)
 
 Wrap all the nodes starting and ending at the specified nodes with a new node with the specified tag and attributes and return the new node.  Return B<undef> if the start and end nodes are not siblings - they must have the same parent for this method to work.
 
-     Parameter    Description
-  1  $start       Start node
-  2  $end         End node
-  3  $tag         Tag for the wrapping node
-  4  %attributes  Attributes for the wrapping node
+     Parameter    Description                       
+  1  $start       Start node                        
+  2  $end         End node                          
+  3  $tag         Tag for the wrapping node         
+  4  %attributes  Attributes for the wrapping node  
 
 Example:
 
@@ -5909,9 +6127,9 @@ Example:
     </a>
   </aa>
   END
-
+  
   $x->go(qw(a c))->wrapTo($x->go(qw(a c -1)), qq(C), id=>1234);
-
+  
   ok -p $x eq <<END;
   <aa>
     <a>
@@ -5926,7 +6144,7 @@ Example:
     </a>
   </aa>
   END
-
+  
 
 Use B<wrapToX> to execute L<wrapTo|/wrapTo> but B<die> 'wrapTo' instead of returning B<undef>
 
@@ -5934,9 +6152,9 @@ Use B<wrapToX> to execute L<wrapTo|/wrapTo> but B<die> 'wrapTo' instead of retur
 
 Unwrap a node by inserting its content into its parent at the point containing the node and return the parent node.
 
-     Parameter  Description
-  1  $node      Node to unwrap
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node to unwrap     
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5949,11 +6167,54 @@ Example:
 
 
   ok -s $x eq "<a>A<b> c </b>B</a>";
-
+  
   $b->unwrap;
-
+  
   ok -s $x eq "<a>A c B</a>";
+  
 
+Use B<unwrapX> to execute L<unwrap|/unwrap> but B<die> 'unwrap' instead of returning B<undef>
+
+=head3 unwrapContentsKeepingText($@)
+
+Unwrap all the non text nodes below a specified node adding a leading and a trailing space to prevent unwrapped content from being elided and return the specified node else undef if not in the optional context.
+
+     Parameter  Description        
+  1  $node      Node to unwrap     
+  2  @context   Optional context.  
+
+Use the B<@context> parameter to provide an optional context for this method as
+understood by method L<at|/at> .  If a context is supplied and the node
+specified by the first parameter is not in this context then this method
+returns B<undef> immediately.
+
+
+
+Example:
+
+
+  ok -p $x eq <<END;
+  <a>
+    <b>
+      <c>
+        <d>DD</d>
+  EE
+        <f>FF</f>
+      </c>
+    </b>
+  </a>
+  END
+  
+  $x->go(qw(b))->unwrapContentsKeepingText;
+  
+  ok -p $x eq <<END;
+  <a>
+    <b>  DD EE FF  </b>
+  </a>
+  END
+  
+
+Use B<unwrapContentsKeepingTextX> to execute L<unwrapContentsKeepingText|/unwrapContentsKeepingText> but B<die> 'unwrapContentsKeepingText' instead of returning B<undef>
 
 =head1 Contents
 
@@ -5963,9 +6224,9 @@ The children of each node.
 
 Return a list of all the nodes contained by this node or an empty list if the node is empty or not in the optional context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -5987,17 +6248,17 @@ Example:
     <e id="e2"><c id="6"/></e>
   </a>
   END
-
+  
   is_deeply [map{-u $_} $x->contents], [qw(b1 d1 e1 b2 d2 e2)];
-
+  
 
 =head2 contentAfter($@)
 
 Return a list of all the sibling nodes following this node or an empty list if this node is last or not in the optional context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6016,17 +6277,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentAfter;
-
+  
 
 =head2 contentBefore($@)
 
 Return a list of all the sibling nodes preceding this node or an empty list if this node is last or not in the optional context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6045,17 +6306,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentBefore;
-
+  
 
 =head2 contentAsTags($@)
 
 Return a string containing the tags of all the nodes contained by this node separated by single spaces or the empty string if the node is empty or does not match the optional context
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6074,17 +6335,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $x->go(q(b))->contentAsTags eq 'c d e f g';
-
+  
 
 =head2 contentAfterAsTags($@)
 
 Return a string containing the tags of all the sibling nodes following this node separated by single spaces or the empty string if the node is empty or does not match the optional context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6103,19 +6364,19 @@ Example:
     </b>
   </a>
   END
-
+  
   ok 'f g' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentAfter;
-
+  
   ok $x->go(qw(b e))->contentAfterAsTags eq 'f g';
-
+  
 
 =head2 contentBeforeAsTags($@)
 
 Return a string containing the tags of all the sibling nodes preceding this node separated by single spaces or the empty string if the node is empty or does not match the optional context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @context   Optional context.
+     Parameter  Description        
+  1  $node      Node               
+  2  @context   Optional context.  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6134,18 +6395,18 @@ Example:
     </b>
   </a>
   END
-
+  
   ok 'c d' eq join ' ', map {$_->tag} $x->go(qw(b e))->contentBefore;
-
+  
   ok $x->go(qw(b e))->contentBeforeAsTags eq 'c d';
-
+  
 
 =head2 position($)
 
 Return the index of a node in its parent's content.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -6180,18 +6441,18 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $a->go(qw(b 1 b))->id == 26;
-
+  
   ok $a->go(qw(b 1 b))->position == 2;
-
+  
 
 =head2 index($)
 
 Return the index of a node in its parent index.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -6226,33 +6487,33 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $a->go(qw(b 1))->id == 23;
-
+  
   ok $a->go(qw(b 1))->index == 1;
-
+  
 
 =head2 present($@)
 
 Return the count of the number of the specified tag types present immediately under a node or a hash {tag} = count for all the tags present under the node if no names are specified.
 
-     Parameter  Description
-  1  $node      Node
-  2  @names     Possible tags immediately under the node.
+     Parameter  Description                                
+  1  $node      Node                                       
+  2  @names     Possible tags immediately under the node.  
 
 Example:
 
 
   is_deeply {$a->first->present}, {c=>2, d=>2, e=>1};
-
+  
 
 =head2 isText($@)
 
 Return the specified node if this node is a text node, optionally in the specified context, else return B<undef>.
 
-     Parameter  Description
-  1  $node      Node to test
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node to test      
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6269,11 +6530,11 @@ Example:
       <b><CDATA> </CDATA></b>
   </a>
   END
-
+  
   ok $b->first->isText;
-
+  
   ok $b->first->isText(qw(b a));
-
+  
 
 Use B<isTextX> to execute L<isText|/isText> but B<die> 'isText' instead of returning B<undef>
 
@@ -6281,9 +6542,9 @@ Use B<isTextX> to execute L<isText|/isText> but B<die> 'isText' instead of retur
 
 Return the specified node if this node is a text node, optionally in the specified context, and contains nothing other than whitespace else return B<undef>. See also: L<isAllBlankText|/isAllBlankText>
 
-     Parameter  Description
-  1  $node      Node to test
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node to test      
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6300,9 +6561,9 @@ Example:
       <b><CDATA> </CDATA></b>
   </a>
   END
-
+  
   ok $b->first->isBlankText;
-
+  
 
 Use B<isBlankTextX> to execute L<isBlankText|/isBlankText> but B<die> 'isBlankText' instead of returning B<undef>
 
@@ -6310,9 +6571,9 @@ Use B<isBlankTextX> to execute L<isBlankText|/isBlankText> but B<die> 'isBlankTe
 
 Return the specified node if this node, optionally in the specified context, does not contain anything or if it does contain something it is all whitespace else return B<undef>. See also: L<bitsNodeTextBlank|/bitsNodeTextBlank>
 
-     Parameter  Description
-  1  $node      Node to test
-  2  @context   Optional context
+     Parameter  Description       
+  1  $node      Node to test      
+  2  @context   Optional context  
 
 Use the B<@context> parameter to provide an optional context for this method as
 understood by method L<at|/at> .  If a context is supplied and the node
@@ -6334,17 +6595,17 @@ Example:
     <d/>
   </a>
   END
-
+  
   $a->by(sub{$_->replaceWithBlank(qw(z))});
-
+  
   my ($b, $c, $d) = $a->firstBy(qw(b c d));
-
+  
   ok  $c->isAllBlankText;
-
+  
   ok  $c->isAllBlankText(qw(c b a));
-
+  
   ok !$c->isAllBlankText(qw(c a));
-
+  
 
 Use B<isAllBlankTextX> to execute L<isAllBlankText|/isAllBlankText> but B<die> 'isAllBlankText' instead of returning B<undef>
 
@@ -6352,8 +6613,8 @@ Use B<isAllBlankTextX> to execute L<isAllBlankText|/isAllBlankText> but B<die> '
 
 Return a bit string that shows if there are any non text nodes, text nodes or blank text nodes under a node. An empty string is returned if there are no child nodes.
 
-     Parameter  Description
-  1  $node      Node to test.
+     Parameter  Description    
+  1  $node      Node to test.  
 
 Example:
 
@@ -6377,17 +6638,17 @@ Example:
       <e/>
   </a>
   END
-
+  
   ok '100' eq -B $x;
-
+  
   ok '100' eq -B $x->go(q(b));
-
+  
   ok '110' eq -B $x->go(q(c));
-
+  
   ok '111' eq -B $x->go(q(d));
-
+  
   ok !-B $x->go(qw(e));
-
+  
 
 =head1 Order
 
@@ -6397,15 +6658,15 @@ Number and verify the order of nodes.
 
 Find the node with the specified number as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the parse tree containing the specified node and return the found node or B<undef> if no such node exists.
 
-     Parameter  Description
-  1  $node      Node in the parse tree to search
-  2  $number    Number of the node required.
+     Parameter  Description                       
+  1  $node      Node in the parse tree to search  
+  2  $number    Number of the node required.      
 
 Example:
 
 
   $a->numberTree;
-
+  
   ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
@@ -6418,9 +6679,9 @@ Example:
     </c>
   </a>
   END
-
+  
   ok q(D) eq -t $a->findByNumber(7);
-
+  
 
 Use B<findByNumberX> to execute L<findByNumber|/findByNumber> but B<die> 'findByNumber' instead of returning B<undef>
 
@@ -6428,15 +6689,15 @@ Use B<findByNumberX> to execute L<findByNumber|/findByNumber> but B<die> 'findBy
 
 Find the nodes with the specified numbers as made visible by L<prettyStringNumbered|/prettyStringNumbered> in the parse tree containing the specified node and return the found nodes in a list with B<undef> for nodes that do not exist.
 
-     Parameter  Description
-  1  $node      Node in the parse tree to search
-  2  @numbers   Numbers of the nodes required.
+     Parameter  Description                       
+  1  $node      Node in the parse tree to search  
+  2  @numbers   Numbers of the nodes required.    
 
 Example:
 
 
   $a->numberTree;
-
+  
   ok $a->prettyStringNumbered eq <<END;
   <a id="1">
     <b id="2">
@@ -6449,22 +6710,22 @@ Example:
     </c>
   </a>
   END
-
+  
   is_deeply [map {-t $_} $a->findByNumbers(1..3)], [qw(a b A)];
-
+  
 
 =head2 numberTree($)
 
 Number the nodes in a parse tree in pre-order so they are numbered in the same sequence that they appear in the source. You can see the numbers by printing the tree with L<prettyStringNumbered()|/prettyStringNumbered>.
 
-     Parameter  Description
-  1  $node      Node
+     Parameter  Description  
+  1  $node      Node         
 
 Example:
 
 
   $x->numberTree;
-
+  
   ok -z $x eq <<END;
   <a id="1">
     <b id="2">
@@ -6475,15 +6736,15 @@ Example:
     </d>
   </a>
   END
-
+  
 
 =head2 above($$)
 
 Return the specified node if it is above the specified target otherwise B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  $target    Target.
+     Parameter  Description  
+  1  $node      Node         
+  2  $target    Target.      
 
 Example:
 
@@ -6506,17 +6767,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $b->id eq 'b1';
-
+  
   ok $e->id eq "e1";
-
+  
   ok $E->id eq "e2";
-
+  
   ok  $b->above($e);
-
+  
   ok !$E->above($e);
-
+  
 
 Use B<aboveX> to execute L<above|/above> but B<die> 'above' instead of returning B<undef>
 
@@ -6524,9 +6785,9 @@ Use B<aboveX> to execute L<above|/above> but B<die> 'above' instead of returning
 
 Return the specified node if it is below the specified target otherwise B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  $target    Target.
+     Parameter  Description  
+  1  $node      Node         
+  2  $target    Target.      
 
 Example:
 
@@ -6549,13 +6810,13 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $d->id eq 'd1';
-
+  
   ok $e->id eq "e1";
-
+  
   ok !$d->below($e);
-
+  
 
 Use B<belowX> to execute L<below|/below> but B<die> 'below' instead of returning B<undef>
 
@@ -6563,9 +6824,9 @@ Use B<belowX> to execute L<below|/below> but B<die> 'below' instead of returning
 
 Return the specified node if it occurs after the target node in the parse tree or else B<undef> if the node is L<above|/above>, L<below|/below> or L<before|/before> the target.
 
-     Parameter  Description
-  1  $node      Node
-  2  $target    Target
+     Parameter  Description  
+  1  $node      Node         
+  2  $target    Target       
 
 Example:
 
@@ -6588,13 +6849,13 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $c->id eq 'c1';
-
+  
   ok $e->id eq "e1";
-
+  
   ok $e->after($c);
-
+  
 
 Use B<afterX> to execute L<after|/after> but B<die> 'after' instead of returning B<undef>
 
@@ -6602,9 +6863,9 @@ Use B<afterX> to execute L<after|/after> but B<die> 'after' instead of returning
 
 Return the specified node if it occurs before the target node in the parse tree or else B<undef> if the node is L<above|/above>, L<below|/below> or L<after|/after> the target.
 
-     Parameter  Description
-  1  $node      Node
-  2  $target    Target.
+     Parameter  Description  
+  1  $node      Node         
+  2  $target    Target.      
 
 Example:
 
@@ -6627,13 +6888,13 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $e->id eq "e1";
-
+  
   ok $E->id eq "e2";
-
+  
   ok $e->before($E);
-
+  
 
 Use B<beforeX> to execute L<before|/before> but B<die> 'before' instead of returning B<undef>
 
@@ -6641,9 +6902,9 @@ Use B<beforeX> to execute L<before|/before> but B<die> 'before' instead of retur
 
 Return the first node that is out of the specified order when performing a pre-ordered traversal of the parse tree.
 
-     Parameter  Description
-  1  $node      Node
-  2  @nodes     Following nodes.
+     Parameter  Description       
+  1  $node      Node              
+  2  @nodes     Following nodes.  
 
 Example:
 
@@ -6666,29 +6927,29 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $b->id eq 'b1';
-
+  
   ok $c->id eq 'c1';
-
+  
   ok $d->id eq 'd1';
-
+  
   ok $e->id eq "e1";
-
+  
   ok  $e->disordered($c        )->id eq "c1";
-
+  
   ok  $b->disordered($c, $e, $d)->id eq "d1";
-
+  
   ok !$c->disordered($e);
-
+  
 
 =head2 commonAncestor($@)
 
 Find the most recent common ancestor of the specified nodes or B<undef> if there is no common ancestor.
 
-     Parameter  Description
-  1  $node      Node
-  2  @nodes     @nodes
+     Parameter  Description  
+  1  $node      Node         
+  2  @nodes     @nodes       
 
 Example:
 
@@ -6718,17 +6979,17 @@ Example:
     </b>
   </a>
   END
-
+  
   my ($b, $e, @n) = $a->findByNumbers(2, 4, 6, 9);
-
+  
   ok $e == $e->commonAncestor;
-
+  
   ok $e == $e->commonAncestor($e);
-
+  
   ok $b == $e->commonAncestor($b);
-
+  
   ok $b == $e->commonAncestor(@n);
-
+  
 
 Use B<commonAncestorX> to execute L<commonAncestor|/commonAncestor> but B<die> 'commonAncestor' instead of returning B<undef>
 
@@ -6736,9 +6997,9 @@ Use B<commonAncestorX> to execute L<commonAncestor|/commonAncestor> but B<die> '
 
 Return the first node if the specified nodes are all in order when performing a pre-ordered traversal of the parse tree else return B<undef>
 
-     Parameter  Description
-  1  $node      Node
-  2  @nodes     Following nodes.
+     Parameter  Description       
+  1  $node      Node              
+  2  @nodes     Following nodes.  
 
 Example:
 
@@ -6761,19 +7022,19 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $e->id eq "e1";
-
+  
   ok $E->id eq "e2";
-
+  
   ok  $e->ordered($E);
-
+  
   ok !$E->ordered($e);
-
+  
   ok  $e->ordered($e);
-
+  
   ok  $e->ordered;
-
+  
 
 Use B<orderedX> to execute L<ordered|/ordered> but B<die> 'ordered' instead of returning B<undef>
 
@@ -6785,9 +7046,9 @@ Analyze and generate tables of contents
 
 Table of Contents number the nodes in a parse tree.
 
-     Parameter  Description
-  1  $node      Node
-  2  @match     Optional list of tags to descend into e3se all tags will be descended into
+     Parameter  Description                                                                 
+  1  $node      Node                                                                        
+  2  @match     Optional list of tags to descend into e3se all tags will be descended into  
 
 Example:
 
@@ -6804,25 +7065,25 @@ Example:
     </c>
   </a>
   END
-
+  
   my $t = $a->tocNumbers();
-
+  
   is_deeply {map {$_=>$t->{$_}->tag} keys %$t},
-
+  
   "1"  =>"b",
-
+  
   "1 1"=>"A",
-
+  
   "1 2"=>"B",
-
+  
   "2"  =>"c",
-
+  
   "2 1"=> "C",
-
+  
   "2 2"=>"D"
-
+  
   }
-
+  
 
 =head1 Labels
 
@@ -6832,129 +7093,129 @@ Label nodes so that they can be cross referenced and linked by L<Data::Edit::Xml
 
 Add the named labels to the specified node and return that node.
 
-     Parameter  Description
-  1  $node      Node in parse tree
-  2  @labels    Names of labels to add.
+     Parameter  Description              
+  1  $node      Node in parse tree       
+  2  @labels    Names of labels to add.  
 
 Example:
 
 
   ok -r $x eq '<a><b><c/></b></a>';
-
+  
   my $b = $x->go(q(b));
-
+  
   ok $b->countLabels == 0;
-
+  
   $b->addLabels(1..2);
-
+  
   $b->addLabels(3..4);
-
+  
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
-
+  
 
 =head2 countLabels($)
 
 Return the count of the number of labels at a node.
 
-     Parameter  Description
-  1  $node      Node in parse tree.
+     Parameter  Description          
+  1  $node      Node in parse tree.  
 
 Example:
 
 
   ok -r $x eq '<a><b><c/></b></a>';
-
+  
   my $b = $x->go(q(b));
-
+  
   ok $b->countLabels == 0;
-
+  
   $b->addLabels(1..2);
-
+  
   $b->addLabels(3..4);
-
+  
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
-
+  
   ok $b->countLabels == 4;
-
+  
 
 =head2 getLabels($)
 
 Return the names of all the labels set on a node.
 
-     Parameter  Description
-  1  $node      Node in parse tree.
+     Parameter  Description          
+  1  $node      Node in parse tree.  
 
 Example:
 
 
   ok -r $x eq '<a><b><c/></b></a>';
-
+  
   my $b = $x->go(q(b));
-
+  
   ok $b->countLabels == 0;
-
+  
   $b->addLabels(1..2);
-
+  
   $b->addLabels(3..4);
-
+  
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
-
+  
   is_deeply [1..4], [$b->getLabels];
-
+  
 
 =head2 deleteLabels($@)
 
 Delete the specified labels in the specified node or all labels if no labels have are specified and return that node.
 
-     Parameter  Description
-  1  $node      Node in parse tree
-  2  @labels    Names of the labels to be deleted
+     Parameter  Description                        
+  1  $node      Node in parse tree                 
+  2  @labels    Names of the labels to be deleted  
 
 Example:
 
 
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';
-
+  
   $b->deleteLabels(1,4) for 1..2;
-
+  
   ok -r $x eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';
-
+  
 
 =head2 copyLabels($$)
 
 Copy all the labels from the source node to the target node and return the source node.
 
-     Parameter  Description
-  1  $source    Source node
-  2  $target    Target node.
+     Parameter  Description   
+  1  $source    Source node   
+  2  $target    Target node.  
 
 Example:
 
 
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c/></b></a>';
-
+  
   $b->copyLabels($c) for 1..2;
-
+  
   ok -r $x eq '<a><b id="1, 2, 3, 4"><c id="1, 2, 3, 4"/></b></a>';
-
+  
 
 =head2 moveLabels($$)
 
 Move all the labels from the source node to the target node and return the source node.
 
-     Parameter  Description
-  1  $source    Source node
-  2  $target    Target node.
+     Parameter  Description   
+  1  $source    Source node   
+  2  $target    Target node.  
 
 Example:
 
 
   ok -r $x eq '<a><b id="2, 3"><c id="1, 2, 3, 4"/></b></a>';
-
+  
   $b->moveLabels($c) for 1..2;
-
+  
   ok -r $x eq '<a><b><c id="1, 2, 3, 4"/></b></a>';
-
+  
 
 =head1 Operators
 
@@ -6992,9 +7253,9 @@ Operator access to methods use the assign versions to avoid 'useless use of oper
 
 -z: L<prettyStringNumbered|/prettyStringNumbered>.
 
-     Parameter  Description
-  1  $node      Node
-  2  $op        Monadic operator.
+     Parameter  Description        
+  1  $node      Node               
+  2  $op        Monadic operator.  
 
 Example:
 
@@ -7009,25 +7270,25 @@ Example:
     </d>
   </a>
   END
-
+  
   my $prev = -b $x->go(q(d));
-
+  
   ok -t $prev eq q(b);
-
+  
   my $next = -c $x->go(q(b));
-
+  
   ok -t $next eq q(d);
-
+  
   my $first = -f $x;
-
+  
   ok -t $first eq q(b);
-
+  
   my $last  = -l $x;
-
+  
   ok -t $last eq q(d);
-
+  
   ok -o $x eq "'<a><b><c id=\"42\"/></b><d><e/></d></a>'";
-
+  
   ok -p $x eq <<END;
   <a>
     <b>
@@ -7038,13 +7299,13 @@ Example:
     </d>
   </a>
   END
-
+  
   ok -s $x eq '<a><b><c id="42"/></b><d><e/></d></a>';
-
+  
   ok -t $x eq 'a';
-
+  
   $x->numberTree;
-
+  
   ok -z $x eq <<END;
   <a id="1">
     <b id="2">
@@ -7055,14 +7316,14 @@ Example:
     </d>
   </a>
   END
-
+  
 
 =head2 opContents($)
 
 @{} : content of a node.
 
-     Parameter  Description
-  1  $node      Node.
+     Parameter  Description  
+  1  $node      Node.        
 
 Example:
 
@@ -7077,17 +7338,17 @@ Example:
     </d>
   </a>
   END
-
+  
   ok 'bd' eq join '', map {$_->tag} @$x ;
-
+  
 
 =head2 opAt($$)
 
 <= : Check that a node is in the context specified by the referenced array of words.
 
-     Parameter  Description
-  1  $node      Node
-  2  $context   Reference to array of words specifying the parents of the desired node.
+     Parameter  Description                                                              
+  1  $node      Node                                                                     
+  2  $context   Reference to array of words specifying the parents of the desired node.  
 
 Example:
 
@@ -7102,35 +7363,35 @@ Example:
     </d>
   </a>
   END
-
+  
   ok (($x >= [qw(d e)]) <= [qw(e d a)]);
-
+  
 
 =head2 opNew($$)
 
 ** : create a new node from the text on the right hand side: if the text contains a non word character \W the node will be create as text, else it will be created as a tag
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Name node of node to create or text of new text element
+     Parameter  Description                                              
+  1  $node      Node                                                     
+  2  $text      Name node of node to create or text of new text element  
 
 Example:
 
 
   my $a = Data::Edit::Xml::new("<a/>");
-
+  
   my $b = $a ** q(b);
-
+  
   ok -s $b eq "<b/>";
-
+  
 
 =head2 opPutFirst($$)
 
 >> : put a node or string first under a node and return the new node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place first under the node.
+     Parameter  Description                                  
+  1  $node      Node                                         
+  2  $text      Node or text to place first under the node.  
 
 Example:
 
@@ -7138,23 +7399,23 @@ Example:
   ok -p $a eq <<END;
   <a/>
   END
-
+  
   my $f = $a >> qq(first);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-
+  
 
 =head2 opPutFirstAssign($$)
 
 >>= : put a node or string first under a node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place first under the node.
+     Parameter  Description                                  
+  1  $node      Node                                         
+  2  $text      Node or text to place first under the node.  
 
 Example:
 
@@ -7162,23 +7423,23 @@ Example:
   ok -p $a eq <<END;
   <a/>
   END
-
+  
   $a >>= qq(first);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
   </a>
   END
-
+  
 
 =head2 opPutLast($$)
 
 << : put a node or string last under a node and return the new node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place last under the node.
+     Parameter  Description                                 
+  1  $node      Node                                        
+  2  $text      Node or text to place last under the node.  
 
 Example:
 
@@ -7188,24 +7449,24 @@ Example:
     <first/>
   </a>
   END
-
+  
   my $l = $a << qq(last);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-
+  
 
 =head2 opPutLastAssign($$)
 
 <<= : put a node or string last under a node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place last under the node.
+     Parameter  Description                                 
+  1  $node      Node                                        
+  2  $text      Node or text to place last under the node.  
 
 Example:
 
@@ -7215,24 +7476,24 @@ Example:
     <first/>
   </a>
   END
-
+  
   $a <<= qq(last);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
     <last/>
   </a>
   END
-
+  
 
 =head2 opPutNext($$)
 
 > + : put a node or string after the specified node and return the new node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place after the first node.
+     Parameter  Description                                  
+  1  $node      Node                                         
+  2  $text      Node or text to place after the first node.  
 
 Example:
 
@@ -7243,9 +7504,9 @@ Example:
     <last/>
   </a>
   END
-
+  
   $f += qq(next);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
@@ -7253,15 +7514,15 @@ Example:
     <last/>
   </a>
   END
-
+  
 
 =head2 opPutNextAssign($$)
 
 += : put a node or string after the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place after the first node.
+     Parameter  Description                                  
+  1  $node      Node                                         
+  2  $text      Node or text to place after the first node.  
 
 Example:
 
@@ -7272,11 +7533,11 @@ Example:
     <last/>
   </a>
   END
-
+  
   my $f = -f $a;
-
+  
   $f += qq(next);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
@@ -7284,15 +7545,15 @@ Example:
     <last/>
   </a>
   END
-
+  
 
 =head2 opPutPrev($$)
 
 < - : put a node or string before the specified node and return the new node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place before the first node.
+     Parameter  Description                                   
+  1  $node      Node                                          
+  2  $text      Node or text to place before the first node.  
 
 Example:
 
@@ -7304,9 +7565,9 @@ Example:
     <last/>
   </a>
   END
-
+  
   $l -= qq(prev);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
@@ -7315,15 +7576,15 @@ Example:
     <last/>
   </a>
   END
-
+  
 
 =head2 opPutPrevAssign($$)
 
 -= : put a node or string before the specified node,
 
-     Parameter  Description
-  1  $node      Node
-  2  $text      Node or text to place before the first node.
+     Parameter  Description                                   
+  1  $node      Node                                          
+  2  $text      Node or text to place before the first node.  
 
 Example:
 
@@ -7335,11 +7596,11 @@ Example:
     <last/>
   </a>
   END
-
+  
   my $l = -l $a;
-
+  
   $l -= qq(prev);
-
+  
   ok -p $a eq <<END;
   <a>
     <first/>
@@ -7348,15 +7609,15 @@ Example:
     <last/>
   </a>
   END
-
+  
 
 =head2 opBy($$)
 
 x= : Traverse a parse tree in post-order.
 
-     Parameter  Description
-  1  $node      Parse tree
-  2  $code      Code to execute against each node.
+     Parameter  Description                         
+  1  $node      Parse tree                          
+  2  $code      Code to execute against each node.  
 
 Example:
 
@@ -7371,17 +7632,17 @@ Example:
     </d>
   </a>
   END
-
+  
   my $s; $x x= sub{$s .= -t $_}; ok $s eq "cbeda"
-
+  
 
 =head2 opGo($$)
 
 >= : Search for a node via a specification provided as a reference to an array of words each number.  Each word represents a tag name, each number the index of the previous tag or zero by default.
 
-     Parameter  Description
-  1  $node      Node
-  2  $go        Reference to an array of search parameters.
+     Parameter  Description                                  
+  1  $node      Node                                         
+  2  $go        Reference to an array of search parameters.  
 
 Example:
 
@@ -7396,25 +7657,25 @@ Example:
     </d>
   </a>
   END
-
+  
   ok (($x >= [qw(d e)]) <= [qw(e d a)]);
-
+  
 
 =head2 opAttr($$)
 
 % : Get the value of an attribute of this node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $attr      Reference to an array of words and numbers specifying the node to search for.
+     Parameter  Description                                                                    
+  1  $node      Node                                                                           
+  2  $attr      Reference to an array of words and numbers specifying the node to search for.  
 
 Example:
 
 
   my $a = Data::Edit::Xml::new('<a number="1"/>');
-
+  
   ok $a %  qq(number) == 1;
-
+  
 
 =head1 Statistics
 
@@ -7424,28 +7685,28 @@ Statistics describing the parse tree.
 
 Return the count of the number of instances of the specified tags under the specified node, either by tag in array context or in total in scalar context.
 
-     Parameter  Description
-  1  $node      Node
-  2  @names     Possible tags immediately under the node.
+     Parameter  Description                                
+  1  $node      Node                                       
+  2  @names     Possible tags immediately under the node.  
 
 Example:
 
 
   my $x = Data::Edit::Xml::new(<<END);
   <a>
-
+  
   </a>
   END
-
+  
   ok $x->count == 0;
-
+  
 
 =head2 countTags($)
 
 Count the number of tags in a parse tree.
 
-     Parameter  Description
-  1  $node      Parse tree.
+     Parameter  Description  
+  1  $node      Parse tree.  
 
 Example:
 
@@ -7457,17 +7718,17 @@ Example:
     </b>
   </a>
   END
-
+  
   ok $a->countTags == 3;
-
+  
 
 =head2 countTagNames($$)
 
 Return a reference to a hash showing the number of instances of each tag on and below the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $count     Count of tags so far.
+     Parameter  Description            
+  1  $node      Node                   
+  2  $count     Count of tags so far.  
 
 Example:
 
@@ -7484,17 +7745,17 @@ Example:
     </b>
   </a>
   END
-
+  
   is_deeply $x->countTagNames,  { a => 1, b => 2, c => 3 };
-
+  
 
 =head2 countAttrNames($$)
 
 Return a reference to a hash showing the number of instances of each attribute on and below the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $count     Count of attributes so far.
+     Parameter  Description                  
+  1  $node      Node                         
+  2  $count     Count of attributes so far.  
 
 Example:
 
@@ -7511,17 +7772,17 @@ Example:
     </b>
   </a>
   END
-
+  
   is_deeply $x->countAttrNames, { A => 1, B => 2, C => 4 };
-
+  
 
 =head2 countAttrValues($$)
 
 Return a reference to a hash showing the number of instances of each attribute value on and below the specified node.
 
-     Parameter  Description
-  1  $node      Node
-  2  $count     Count of attributes so far.
+     Parameter  Description                  
+  1  $node      Node                         
+  2  $count     Count of attributes so far.  
 
 Example:
 
@@ -7538,25 +7799,25 @@ Example:
     </b>
   </a>
   END
-
+  
   is_deeply $x->countAttrValues, { A => 1, B => 2, C => 4 };
-
+  
 
 =head2 countOutputClasses($$)
 
 Count instances of outputclass attributes
 
-     Parameter  Description
-  1  $node      Node
-  2  $count     Count so far.
+     Parameter  Description    
+  1  $node      Node           
+  2  $count     Count so far.  
 
 Example:
 
 
   my $a = Data::Edit::Xml::newTree("a", id=>1, class=>2, href=>3, outputclass=>4);
-
+  
   is_deeply { 4 => 1 }, $a->countOutputClasses;
-
+  
 
 =head1 Debug
 
@@ -7569,51 +7830,51 @@ Debugging methods
 
 Build a tree representation of the parsed XML which can be easily traversed to look for things.
 
-     Parameter  Description
-  1  $parent    The parent node
-  2  $parse     The remaining parse
+     Parameter  Description          
+  1  $parent    The parent node      
+  2  $parse     The remaining parse  
 
 =head2 disconnectLeafNode($)
 
 Remove a leaf node from the parse tree and make it into its own parse tree.
 
-     Parameter  Description
-  1  $node      Leaf node to disconnect.
+     Parameter  Description               
+  1  $node      Leaf node to disconnect.  
 
 =head2 reindexNode($)
 
 Index the children of a node so that we can access them by tag and number.
 
-     Parameter  Description
-  1  $node      Node to index.
+     Parameter  Description     
+  1  $node      Node to index.  
 
 =head2 indexNode($)
 
 Merge multiple text segments and set parent and parser after changes to a node
 
-     Parameter  Description
-  1  $node      Node to index.
+     Parameter  Description     
+  1  $node      Node to index.  
 
 =head2 prettyStringEnd($)
 
 Return a readable string representing a node of a parse tree and all the nodes below it as a here document
 
-     Parameter  Description
-  1  $node      Start node
+     Parameter  Description  
+  1  $node      Start node   
 
 =head2 numberNode($)
 
 Ensure that this node has a number.
 
-     Parameter  Description
-  1  $node      Node
+     Parameter  Description  
+  1  $node      Node         
 
 =head2 printAttributes($)
 
 Print the attributes of a node.
 
-     Parameter  Description
-  1  $node      Node whose attributes are to be printed.
+     Parameter  Description                               
+  1  $node      Node whose attributes are to be printed.  
 
 Example:
 
@@ -7621,37 +7882,37 @@ Example:
   my $x = Data::Edit::Xml::new(my $s = <<END);
   <a no="1" word="first"/>
   END
-
+  
   ok $x->printAttributes eq qq( no="1" word="first");
-
+  
 
 =head2 printAttributesReplacingIdsWithLabels($)
 
 Print the attributes of a node replacing the id with the labels.
 
-     Parameter  Description
-  1  $node      Node whose attributes are to be printed.
+     Parameter  Description                               
+  1  $node      Node whose attributes are to be printed.  
 
 =head2 checkParentage($)
 
 Check the parent pointers are correct in a parse tree.
 
-     Parameter  Description
-  1  $x         Parse tree.
+     Parameter  Description  
+  1  $x         Parse tree.  
 
 =head2 checkParser($)
 
 Check that every node has a parser.
 
-     Parameter  Description
-  1  $x         Parse tree.
+     Parameter  Description  
+  1  $x         Parse tree.  
 
 =head2 nn($)
 
 Replace new lines in a string with N to make testing easier.
 
-     Parameter  Description
-  1  $s         String.
+     Parameter  Description  
+  1  $s         String.      
 
 
 =head1 Index
@@ -7673,631 +7934,677 @@ Replace new lines in a string with N to make testing easier.
 
 8 L<at|/at>
 
-9 L<attr :lvalue|/attr :lvalue>
+9 L<atOrBelow|/atOrBelow>
 
-10 L<attrCount|/attrCount>
+10 L<atOrBelowX|/atOrBelow>
 
-11 L<attributes|/attributes>
+11 L<attr :lvalue|/attr :lvalue>
 
-12 L<attrs|/attrs>
+12 L<attrCount|/attrCount>
 
-13 L<atX|/at>
+13 L<attributes|/attributes>
 
-14 L<before|/before>
+14 L<attrs|/attrs>
 
-15 L<beforeX|/before>
+15 L<atX|/at>
 
-16 L<below|/below>
+16 L<before|/before>
 
-17 L<belowX|/below>
+17 L<beforeX|/before>
 
-18 L<bitsNodeTextBlank|/bitsNodeTextBlank>
+18 L<below|/below>
 
-19 L<breakIn|/breakIn>
+19 L<belowX|/below>
 
-20 L<breakInBackwards|/breakInBackwards>
+20 L<bitsNodeTextBlank|/bitsNodeTextBlank>
 
-21 L<breakInBackwardsNonBlank|/breakInBackwards>
+21 L<breakIn|/breakIn>
 
-22 L<breakInBackwardsNonBlankX|/breakInBackwards>
+22 L<breakInBackwards|/breakInBackwards>
 
-23 L<breakInForwards|/breakInForwards>
+23 L<breakInBackwardsNonBlank|/breakInBackwards>
 
-24 L<breakInForwardsNonBlank|/breakInForwards>
+24 L<breakInBackwardsNonBlankX|/breakInBackwards>
 
-25 L<breakInForwardsNonBlankX|/breakInForwards>
+25 L<breakInForwards|/breakInForwards>
 
-26 L<breakInNonBlank|/breakIn>
+26 L<breakInForwardsNonBlank|/breakInForwards>
 
-27 L<breakInNonBlankX|/breakIn>
+27 L<breakInForwardsNonBlankX|/breakInForwards>
 
-28 L<breakOut|/breakOut>
+28 L<breakInNonBlank|/breakIn>
 
-29 L<by|/by>
+29 L<breakInNonBlankX|/breakIn>
 
-30 L<byReverse|/byReverse>
+30 L<breakOut|/breakOut>
 
-31 L<byReverseX|/byReverseX>
+31 L<by|/by>
 
-32 L<byX|/byX>
+32 L<byReverse|/byReverse>
 
-33 L<c|/c>
+33 L<byReverseX|/byReverseX>
 
-34 L<cdata|/cdata>
+34 L<byX|/byX>
 
-35 L<change|/change>
+35 L<c|/c>
 
-36 L<changeAttr|/changeAttr>
+36 L<cdata|/cdata>
 
-37 L<changeAttrValue|/changeAttrValue>
+37 L<change|/change>
 
-38 L<changeNonBlank|/change>
+38 L<changeAttr|/changeAttr>
 
-39 L<changeNonBlankX|/change>
+39 L<changeAttrValue|/changeAttrValue>
 
-40 L<changeX|/change>
+40 L<changeNonBlank|/change>
 
-41 L<checkParentage|/checkParentage>
+41 L<changeNonBlankX|/change>
 
-42 L<checkParser|/checkParser>
+42 L<changeX|/change>
 
-43 L<class|/class>
+43 L<checkParentage|/checkParentage>
 
-44 L<clone|/clone>
+44 L<checkParser|/checkParser>
 
-45 L<cloneNonBlank|/clone>
+45 L<class|/class>
 
-46 L<cloneNonBlankX|/clone>
+46 L<clone|/clone>
 
-47 L<commonAncestor|/commonAncestor>
+47 L<cloneNonBlank|/clone>
 
-48 L<commonAncestorX|/commonAncestor>
+48 L<cloneNonBlankX|/clone>
 
-49 L<concatenate|/concatenate>
+49 L<commonAncestor|/commonAncestor>
 
-50 L<concatenateNonBlank|/concatenate>
+50 L<commonAncestorX|/commonAncestor>
 
-51 L<concatenateNonBlankX|/concatenate>
+51 L<concatenate|/concatenate>
 
-52 L<concatenateSiblings|/concatenateSiblings>
+52 L<concatenateNonBlank|/concatenate>
 
-53 L<concatenateSiblingsNonBlank|/concatenateSiblings>
+53 L<concatenateNonBlankX|/concatenate>
 
-54 L<concatenateSiblingsNonBlankX|/concatenateSiblings>
+54 L<concatenateSiblings|/concatenateSiblings>
 
-55 L<conditions|/conditions>
+55 L<concatenateSiblingsNonBlank|/concatenateSiblings>
 
-56 L<containsSingleText|/containsSingleText>
+56 L<concatenateSiblingsNonBlankX|/concatenateSiblings>
 
-57 L<content|/content>
+57 L<conditions|/conditions>
 
-58 L<contentAfter|/contentAfter>
+58 L<containsSingleText|/containsSingleText>
 
-59 L<contentAfterAsTags|/contentAfterAsTags>
+59 L<content|/content>
 
-60 L<contentAfterAsTagsNonBlank|/contentAfterAsTags>
+60 L<contentAfter|/contentAfter>
 
-61 L<contentAfterAsTagsNonBlankX|/contentAfterAsTags>
+61 L<contentAfterAsTags|/contentAfterAsTags>
 
-62 L<contentAfterNonBlank|/contentAfter>
+62 L<contentAfterAsTagsNonBlank|/contentAfterAsTags>
 
-63 L<contentAfterNonBlankX|/contentAfter>
+63 L<contentAfterAsTagsNonBlankX|/contentAfterAsTags>
 
-64 L<contentAsTags|/contentAsTags>
+64 L<contentAfterNonBlank|/contentAfter>
 
-65 L<contentAsTagsNonBlank|/contentAsTags>
+65 L<contentAfterNonBlankX|/contentAfter>
 
-66 L<contentAsTagsNonBlankX|/contentAsTags>
+66 L<contentAsTags|/contentAsTags>
 
-67 L<contentBefore|/contentBefore>
+67 L<contentAsTagsNonBlank|/contentAsTags>
 
-68 L<contentBeforeAsTags|/contentBeforeAsTags>
+68 L<contentAsTagsNonBlankX|/contentAsTags>
 
-69 L<contentBeforeAsTagsNonBlank|/contentBeforeAsTags>
+69 L<contentBefore|/contentBefore>
 
-70 L<contentBeforeAsTagsNonBlankX|/contentBeforeAsTags>
+70 L<contentBeforeAsTags|/contentBeforeAsTags>
 
-71 L<contentBeforeNonBlank|/contentBefore>
+71 L<contentBeforeAsTagsNonBlank|/contentBeforeAsTags>
 
-72 L<contentBeforeNonBlankX|/contentBefore>
+72 L<contentBeforeAsTagsNonBlankX|/contentBeforeAsTags>
 
-73 L<contents|/contents>
+73 L<contentBeforeNonBlank|/contentBefore>
 
-74 L<contentsNonBlank|/contents>
+74 L<contentBeforeNonBlankX|/contentBefore>
 
-75 L<contentsNonBlankX|/contents>
+75 L<contents|/contents>
 
-76 L<context|/context>
+76 L<contentsNonBlank|/contents>
 
-77 L<copyLabels|/copyLabels>
+77 L<contentsNonBlankX|/contents>
 
-78 L<count|/count>
+78 L<context|/context>
 
-79 L<countAttrNames|/countAttrNames>
+79 L<copyLabels|/copyLabels>
 
-80 L<countAttrValues|/countAttrValues>
+80 L<count|/count>
 
-81 L<countLabels|/countLabels>
+81 L<countAttrNames|/countAttrNames>
 
-82 L<countOutputClasses|/countOutputClasses>
+82 L<countAttrValues|/countAttrValues>
 
-83 L<countTagNames|/countTagNames>
+83 L<countLabels|/countLabels>
 
-84 L<countTags|/countTags>
+84 L<countOutputClasses|/countOutputClasses>
 
-85 L<cut|/cut>
+85 L<countTagNames|/countTagNames>
 
-86 L<cutNonBlank|/cut>
+86 L<countTags|/countTags>
 
-87 L<cutNonBlankX|/cut>
+87 L<cut|/cut>
 
-88 L<deleteAttr|/deleteAttr>
+88 L<cutNonBlank|/cut>
 
-89 L<deleteAttrs|/deleteAttrs>
+89 L<cutNonBlankX|/cut>
 
-90 L<deleteConditions|/deleteConditions>
+90 L<deleteAttr|/deleteAttr>
 
-91 L<deleteLabels|/deleteLabels>
+91 L<deleteAttrs|/deleteAttrs>
 
-92 L<depth|/depth>
+92 L<deleteConditions|/deleteConditions>
 
-93 L<disconnectLeafNode|/disconnectLeafNode>
+93 L<deleteLabels|/deleteLabels>
 
-94 L<disordered|/disordered>
+94 L<depth|/depth>
 
-95 L<down|/down>
+95 L<disconnectLeafNode|/disconnectLeafNode>
 
-96 L<downReverse|/downReverse>
+96 L<disordered|/disordered>
 
-97 L<downReverseX|/downReverseX>
+97 L<down|/down>
 
-98 L<downX|/downX>
+98 L<downReverse|/downReverse>
 
-99 L<equals|/equals>
+99 L<downReverseX|/downReverseX>
 
-100 L<equalsX|/equals>
+100 L<downX|/downX>
 
-101 L<errorsFile|/errorsFile>
+101 L<equals|/equals>
 
-102 L<findByNumber|/findByNumber>
+102 L<equalsX|/equals>
 
-103 L<findByNumbers|/findByNumbers>
+103 L<errorsFile|/errorsFile>
 
-104 L<findByNumberX|/findByNumber>
+104 L<findByNumber|/findByNumber>
 
-105 L<first|/first>
+105 L<findByNumbers|/findByNumbers>
 
-106 L<firstBy|/firstBy>
+106 L<findByNumberX|/findByNumber>
 
-107 L<firstContextOf|/firstContextOf>
+107 L<first|/first>
 
-108 L<firstContextOfX|/firstContextOf>
+108 L<firstBy|/firstBy>
 
-109 L<firstDown|/firstDown>
+109 L<firstContextOf|/firstContextOf>
 
-110 L<firstIn|/firstIn>
+110 L<firstContextOfX|/firstContextOf>
 
-111 L<firstInIndex|/firstInIndex>
+111 L<firstDown|/firstDown>
 
-112 L<firstInIndexNonBlank|/firstInIndex>
+112 L<firstIn|/firstIn>
 
-113 L<firstInIndexNonBlankX|/firstInIndex>
+113 L<firstInIndex|/firstInIndex>
 
-114 L<firstInIndexX|/firstInIndex>
+114 L<firstInIndexNonBlank|/firstInIndex>
 
-115 L<firstInX|/firstIn>
+115 L<firstInIndexNonBlankX|/firstInIndex>
 
-116 L<firstNonBlank|/first>
+116 L<firstInIndexX|/firstInIndex>
 
-117 L<firstNonBlankX|/first>
+117 L<firstInX|/firstIn>
 
-118 L<firstX|/first>
+118 L<firstNonBlank|/first>
 
-119 L<from|/from>
+119 L<firstNonBlankX|/first>
 
-120 L<fromTo|/fromTo>
+120 L<firstText|/firstText>
 
-121 L<getAttrs|/getAttrs>
+121 L<firstTextNonBlank|/firstText>
 
-122 L<getLabels|/getLabels>
+122 L<firstTextNonBlankX|/firstText>
 
-123 L<go|/go>
+123 L<firstTextX|/firstText>
 
-124 L<goX|/go>
+124 L<firstX|/first>
 
-125 L<guid|/guid>
+125 L<from|/from>
 
-126 L<href|/href>
+126 L<fromTo|/fromTo>
 
-127 L<id|/id>
+127 L<getAttrs|/getAttrs>
 
-128 L<index|/index>
+128 L<getLabels|/getLabels>
 
-129 L<indexes|/indexes>
+129 L<go|/go>
 
-130 L<indexNode|/indexNode>
+130 L<goX|/go>
 
-131 L<input|/input>
+131 L<guid|/guid>
 
-132 L<inputFile|/inputFile>
+132 L<href|/href>
 
-133 L<inputString|/inputString>
+133 L<id|/id>
 
-134 L<isAllBlankText|/isAllBlankText>
+134 L<index|/index>
 
-135 L<isAllBlankTextNonBlank|/isAllBlankText>
+135 L<indexes|/indexes>
 
-136 L<isAllBlankTextNonBlankX|/isAllBlankText>
+136 L<indexNode|/indexNode>
 
-137 L<isAllBlankTextX|/isAllBlankText>
+137 L<input|/input>
 
-138 L<isBlankText|/isBlankText>
+138 L<inputFile|/inputFile>
 
-139 L<isBlankTextNonBlank|/isBlankText>
+139 L<inputString|/inputString>
 
-140 L<isBlankTextNonBlankX|/isBlankText>
+140 L<isAllBlankText|/isAllBlankText>
 
-141 L<isBlankTextX|/isBlankText>
+141 L<isAllBlankTextNonBlank|/isAllBlankText>
 
-142 L<isEmpty|/isEmpty>
+142 L<isAllBlankTextNonBlankX|/isAllBlankText>
 
-143 L<isEmptyNonBlank|/isEmpty>
+143 L<isAllBlankTextX|/isAllBlankText>
 
-144 L<isEmptyNonBlankX|/isEmpty>
+144 L<isBlankText|/isBlankText>
 
-145 L<isEmptyX|/isEmpty>
+145 L<isBlankTextNonBlank|/isBlankText>
 
-146 L<isFirst|/isFirst>
+146 L<isBlankTextNonBlankX|/isBlankText>
 
-147 L<isFirstNonBlank|/isFirst>
+147 L<isBlankTextX|/isBlankText>
 
-148 L<isFirstNonBlankX|/isFirst>
+148 L<isEmpty|/isEmpty>
 
-149 L<isFirstX|/isFirst>
+149 L<isEmptyNonBlank|/isEmpty>
 
-150 L<isLast|/isLast>
+150 L<isEmptyNonBlankX|/isEmpty>
 
-151 L<isLastNonBlank|/isLast>
+151 L<isEmptyX|/isEmpty>
 
-152 L<isLastNonBlankX|/isLast>
+152 L<isFirst|/isFirst>
 
-153 L<isLastX|/isLast>
+153 L<isFirstNonBlank|/isFirst>
 
-154 L<isOnlyChild|/isOnlyChild>
+154 L<isFirstNonBlankX|/isFirst>
 
-155 L<isOnlyChildNonBlank|/isOnlyChild>
+155 L<isFirstX|/isFirst>
 
-156 L<isOnlyChildNonBlankX|/isOnlyChild>
+156 L<isLast|/isLast>
 
-157 L<isOnlyChildX|/isOnlyChild>
+157 L<isLastNonBlank|/isLast>
 
-158 L<isText|/isText>
+158 L<isLastNonBlankX|/isLast>
 
-159 L<isTextNonBlank|/isText>
+159 L<isLastX|/isLast>
 
-160 L<isTextNonBlankX|/isText>
+160 L<isOnlyChild|/isOnlyChild>
 
-161 L<isTextX|/isText>
+161 L<isOnlyChildNonBlank|/isOnlyChild>
 
-162 L<labels|/labels>
+162 L<isOnlyChildNonBlankX|/isOnlyChild>
 
-163 L<last|/last>
+163 L<isOnlyChildX|/isOnlyChild>
 
-164 L<lastBy|/lastBy>
+164 L<isText|/isText>
 
-165 L<lastContextOf|/lastContextOf>
+165 L<isTextNonBlank|/isText>
 
-166 L<lastContextOfX|/lastContextOf>
+166 L<isTextNonBlankX|/isText>
 
-167 L<lastDown|/lastDown>
+167 L<isTextX|/isText>
 
-168 L<lastIn|/lastIn>
+168 L<labels|/labels>
 
-169 L<lastInIndex|/lastInIndex>
+169 L<last|/last>
 
-170 L<lastInIndexNonBlank|/lastInIndex>
+170 L<lastBy|/lastBy>
 
-171 L<lastInIndexNonBlankX|/lastInIndex>
+171 L<lastContextOf|/lastContextOf>
 
-172 L<lastInIndexX|/lastInIndex>
+172 L<lastContextOfX|/lastContextOf>
 
-173 L<lastInX|/lastIn>
+173 L<lastDown|/lastDown>
 
-174 L<lastNonBlank|/last>
+174 L<lastIn|/lastIn>
 
-175 L<lastNonBlankX|/last>
+175 L<lastInIndex|/lastInIndex>
 
-176 L<lastX|/last>
+176 L<lastInIndexNonBlank|/lastInIndex>
 
-177 L<listConditions|/listConditions>
+177 L<lastInIndexNonBlankX|/lastInIndex>
 
-178 L<matchAfter|/matchAfter>
+178 L<lastInIndexX|/lastInIndex>
 
-179 L<matchAfterNonBlank|/matchAfter>
+179 L<lastInX|/lastIn>
 
-180 L<matchAfterNonBlankX|/matchAfter>
+180 L<lastNonBlank|/last>
 
-181 L<matchAfterX|/matchAfter>
+181 L<lastNonBlankX|/last>
 
-182 L<matchBefore|/matchBefore>
+182 L<lastText|/lastText>
 
-183 L<matchBeforeNonBlank|/matchBefore>
+183 L<lastTextNonBlank|/lastText>
 
-184 L<matchBeforeNonBlankX|/matchBefore>
+184 L<lastTextNonBlankX|/lastText>
 
-185 L<matchBeforeX|/matchBefore>
+185 L<lastTextX|/lastText>
 
-186 L<moveLabels|/moveLabels>
+186 L<lastX|/last>
 
-187 L<navtitle|/navtitle>
+187 L<listConditions|/listConditions>
 
-188 L<new|/new>
+188 L<matchAfter|/matchAfter>
 
-189 L<newTag|/newTag>
+189 L<matchAfterNonBlank|/matchAfter>
 
-190 L<newText|/newText>
+190 L<matchAfterNonBlankX|/matchAfter>
 
-191 L<newTree|/newTree>
+191 L<matchAfterX|/matchAfter>
 
-192 L<next|/next>
+192 L<matchBefore|/matchBefore>
 
-193 L<nextIn|/nextIn>
+193 L<matchBeforeNonBlank|/matchBefore>
 
-194 L<nextInX|/nextIn>
+194 L<matchBeforeNonBlankX|/matchBefore>
 
-195 L<nextNonBlank|/next>
+195 L<matchBeforeX|/matchBefore>
 
-196 L<nextNonBlankX|/next>
+196 L<moveLabels|/moveLabels>
 
-197 L<nextOn|/nextOn>
+197 L<navtitle|/navtitle>
 
-198 L<nextX|/next>
+198 L<new|/new>
 
-199 L<nn|/nn>
+199 L<newTag|/newTag>
 
-200 L<number|/number>
+200 L<newText|/newText>
 
-201 L<numbering|/numbering>
+201 L<newTree|/newTree>
 
-202 L<numberNode|/numberNode>
+202 L<next|/next>
 
-203 L<numbers|/numbers>
+203 L<nextIn|/nextIn>
 
-204 L<numberTree|/numberTree>
+204 L<nextInX|/nextIn>
 
-205 L<opAt|/opAt>
+205 L<nextNonBlank|/next>
 
-206 L<opAttr|/opAttr>
+206 L<nextNonBlankX|/next>
 
-207 L<opBy|/opBy>
+207 L<nextOn|/nextOn>
 
-208 L<opContents|/opContents>
+208 L<nextText|/nextText>
 
-209 L<opGo|/opGo>
+209 L<nextTextNonBlank|/nextText>
 
-210 L<opNew|/opNew>
+210 L<nextTextNonBlankX|/nextText>
 
-211 L<opPutFirst|/opPutFirst>
+211 L<nextTextX|/nextText>
 
-212 L<opPutFirstAssign|/opPutFirstAssign>
+212 L<nextX|/next>
 
-213 L<opPutLast|/opPutLast>
+213 L<nn|/nn>
 
-214 L<opPutLastAssign|/opPutLastAssign>
+214 L<number|/number>
 
-215 L<opPutNext|/opPutNext>
+215 L<numbering|/numbering>
 
-216 L<opPutNextAssign|/opPutNextAssign>
+216 L<numberNode|/numberNode>
 
-217 L<opPutPrev|/opPutPrev>
+217 L<numbers|/numbers>
 
-218 L<opPutPrevAssign|/opPutPrevAssign>
+218 L<numberTree|/numberTree>
 
-219 L<opString|/opString>
+219 L<opAt|/opAt>
 
-220 L<ordered|/ordered>
+220 L<opAttr|/opAttr>
 
-221 L<orderedX|/ordered>
+221 L<opBy|/opBy>
 
-222 L<otherprops|/otherprops>
+222 L<opContents|/opContents>
 
-223 L<outputclass|/outputclass>
+223 L<opGo|/opGo>
 
-224 L<over|/over>
+224 L<opNew|/opNew>
 
-225 L<overNonBlank|/over>
+225 L<opPutFirst|/opPutFirst>
 
-226 L<overNonBlankX|/over>
+226 L<opPutFirstAssign|/opPutFirstAssign>
 
-227 L<overX|/over>
+227 L<opPutLast|/opPutLast>
 
-228 L<parent|/parent>
+228 L<opPutLastAssign|/opPutLastAssign>
 
-229 L<parse|/parse>
+229 L<opPutNext|/opPutNext>
 
-230 L<parser|/parser>
+230 L<opPutNextAssign|/opPutNextAssign>
 
-231 L<path|/path>
+231 L<opPutPrev|/opPutPrev>
 
-232 L<pathString|/pathString>
+232 L<opPutPrevAssign|/opPutPrevAssign>
 
-233 L<position|/position>
+233 L<opString|/opString>
 
-234 L<present|/present>
+234 L<ordered|/ordered>
 
-235 L<prettyString|/prettyString>
+235 L<orderedX|/ordered>
 
-236 L<prettyStringCDATA|/prettyStringCDATA>
+236 L<otherprops|/otherprops>
 
-237 L<prettyStringContent|/prettyStringContent>
+237 L<outputclass|/outputclass>
 
-238 L<prettyStringEnd|/prettyStringEnd>
+238 L<over|/over>
 
-239 L<prettyStringNumbered|/prettyStringNumbered>
+239 L<overNonBlank|/over>
 
-240 L<prev|/prev>
+240 L<overNonBlankX|/over>
 
-241 L<prevIn|/prevIn>
+241 L<overX|/over>
 
-242 L<prevInX|/prevIn>
+242 L<parent|/parent>
 
-243 L<prevNonBlank|/prev>
+243 L<parse|/parse>
 
-244 L<prevNonBlankX|/prev>
+244 L<parser|/parser>
 
-245 L<prevOn|/prevOn>
+245 L<path|/path>
 
-246 L<prevX|/prev>
+246 L<pathString|/pathString>
 
-247 L<printAttributes|/printAttributes>
+247 L<position|/position>
 
-248 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
+248 L<present|/present>
 
-249 L<props|/props>
+249 L<prettyString|/prettyString>
 
-250 L<putFirst|/putFirst>
+250 L<prettyStringCDATA|/prettyStringCDATA>
 
-251 L<putFirstAsText|/putFirstAsText>
+251 L<prettyStringContent|/prettyStringContent>
 
-252 L<putFirstAsTextNonBlank|/putFirstAsText>
+252 L<prettyStringEnd|/prettyStringEnd>
 
-253 L<putFirstAsTextNonBlankX|/putFirstAsText>
+253 L<prettyStringNumbered|/prettyStringNumbered>
 
-254 L<putFirstNonBlank|/putFirst>
+254 L<prev|/prev>
 
-255 L<putFirstNonBlankX|/putFirst>
+255 L<prevIn|/prevIn>
 
-256 L<putLast|/putLast>
+256 L<prevInX|/prevIn>
 
-257 L<putLastAsText|/putLastAsText>
+257 L<prevNonBlank|/prev>
 
-258 L<putLastAsTextNonBlank|/putLastAsText>
+258 L<prevNonBlankX|/prev>
 
-259 L<putLastAsTextNonBlankX|/putLastAsText>
+259 L<prevOn|/prevOn>
 
-260 L<putLastNonBlank|/putLast>
+260 L<prevText|/prevText>
 
-261 L<putLastNonBlankX|/putLast>
+261 L<prevTextNonBlank|/prevText>
 
-262 L<putNext|/putNext>
+262 L<prevTextNonBlankX|/prevText>
 
-263 L<putNextAsText|/putNextAsText>
+263 L<prevTextX|/prevText>
 
-264 L<putNextAsTextNonBlank|/putNextAsText>
+264 L<prevX|/prev>
 
-265 L<putNextAsTextNonBlankX|/putNextAsText>
+265 L<printAttributes|/printAttributes>
 
-266 L<putNextNonBlank|/putNext>
+266 L<printAttributesReplacingIdsWithLabels|/printAttributesReplacingIdsWithLabels>
 
-267 L<putNextNonBlankX|/putNext>
+267 L<props|/props>
 
-268 L<putPrev|/putPrev>
+268 L<putFirst|/putFirst>
 
-269 L<putPrevAsText|/putPrevAsText>
+269 L<putFirstAsText|/putFirstAsText>
 
-270 L<putPrevAsTextNonBlank|/putPrevAsText>
+270 L<putFirstAsTextNonBlank|/putFirstAsText>
 
-271 L<putPrevAsTextNonBlankX|/putPrevAsText>
+271 L<putFirstAsTextNonBlankX|/putFirstAsText>
 
-272 L<putPrevNonBlank|/putPrev>
+272 L<putFirstNonBlank|/putFirst>
 
-273 L<putPrevNonBlankX|/putPrev>
+273 L<putFirstNonBlankX|/putFirst>
 
-274 L<reindexNode|/reindexNode>
+274 L<putLast|/putLast>
 
-275 L<renameAttr|/renameAttr>
+275 L<putLastAsText|/putLastAsText>
 
-276 L<renameAttrValue|/renameAttrValue>
+276 L<putLastAsTextNonBlank|/putLastAsText>
 
-277 L<renew|/renew>
+277 L<putLastAsTextNonBlankX|/putLastAsText>
 
-278 L<renewNonBlank|/renew>
+278 L<putLastNonBlank|/putLast>
 
-279 L<renewNonBlankX|/renew>
+279 L<putLastNonBlankX|/putLast>
 
-280 L<replaceContentWith|/replaceContentWith>
+280 L<putNext|/putNext>
 
-281 L<replaceContentWithText|/replaceContentWithText>
+281 L<putNextAsText|/putNextAsText>
 
-282 L<replaceSpecialChars|/replaceSpecialChars>
+282 L<putNextAsTextNonBlank|/putNextAsText>
 
-283 L<replaceWith|/replaceWith>
+283 L<putNextAsTextNonBlankX|/putNextAsText>
 
-284 L<replaceWithBlank|/replaceWithBlank>
+284 L<putNextNonBlank|/putNext>
 
-285 L<replaceWithBlankNonBlank|/replaceWithBlank>
+285 L<putNextNonBlankX|/putNext>
 
-286 L<replaceWithBlankNonBlankX|/replaceWithBlank>
+286 L<putPrev|/putPrev>
 
-287 L<replaceWithNonBlank|/replaceWith>
+287 L<putPrevAsText|/putPrevAsText>
 
-288 L<replaceWithNonBlankX|/replaceWith>
+288 L<putPrevAsTextNonBlank|/putPrevAsText>
 
-289 L<replaceWithText|/replaceWithText>
+289 L<putPrevAsTextNonBlankX|/putPrevAsText>
 
-290 L<replaceWithTextNonBlank|/replaceWithText>
+290 L<putPrevNonBlank|/putPrev>
 
-291 L<replaceWithTextNonBlankX|/replaceWithText>
+291 L<putPrevNonBlankX|/putPrev>
 
-292 L<restore|/restore>
+292 L<reindexNode|/reindexNode>
 
-293 L<restoreX|/restore>
+293 L<renameAttr|/renameAttr>
 
-294 L<save|/save>
+294 L<renameAttrValue|/renameAttrValue>
 
-295 L<setAttr|/setAttr>
+295 L<renew|/renew>
 
-296 L<string|/string>
+296 L<renewNonBlank|/renew>
 
-297 L<stringContent|/stringContent>
+297 L<renewNonBlankX|/renew>
 
-298 L<stringNode|/stringNode>
+298 L<replaceContentWith|/replaceContentWith>
 
-299 L<stringQuoted|/stringQuoted>
+299 L<replaceContentWithText|/replaceContentWithText>
 
-300 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
+300 L<replaceSpecialChars|/replaceSpecialChars>
 
-301 L<stringWithConditions|/stringWithConditions>
+301 L<replaceWith|/replaceWith>
 
-302 L<style|/style>
+302 L<replaceWithBlank|/replaceWithBlank>
 
-303 L<tag|/tag>
+303 L<replaceWithBlankNonBlank|/replaceWithBlank>
 
-304 L<text|/text>
+304 L<replaceWithBlankNonBlankX|/replaceWithBlank>
 
-305 L<through|/through>
+305 L<replaceWithNonBlank|/replaceWith>
 
-306 L<throughX|/throughX>
+306 L<replaceWithNonBlankX|/replaceWith>
 
-307 L<to|/to>
+307 L<replaceWithText|/replaceWithText>
 
-308 L<tocNumbers|/tocNumbers>
+308 L<replaceWithTextNonBlank|/replaceWithText>
 
-309 L<tree|/tree>
+309 L<replaceWithTextNonBlankX|/replaceWithText>
 
-310 L<type|/type>
+310 L<restore|/restore>
 
-311 L<unwrap|/unwrap>
+311 L<restoreX|/restore>
 
-312 L<unwrapNonBlank|/unwrap>
+312 L<save|/save>
 
-313 L<unwrapNonBlankX|/unwrap>
+313 L<setAttr|/setAttr>
 
-314 L<upto|/upto>
+314 L<string|/string>
 
-315 L<uptoX|/upto>
+315 L<stringContent|/stringContent>
 
-316 L<wrapContentWith|/wrapContentWith>
+316 L<stringNode|/stringNode>
 
-317 L<wrapDown|/wrapDown>
+317 L<stringQuoted|/stringQuoted>
 
-318 L<wrapTo|/wrapTo>
+318 L<stringReplacingIdsWithLabels|/stringReplacingIdsWithLabels>
 
-319 L<wrapToX|/wrapTo>
+319 L<stringWithConditions|/stringWithConditions>
 
-320 L<wrapUp|/wrapUp>
+320 L<style|/style>
 
-321 L<wrapWith|/wrapWith>
+321 L<tag|/tag>
+
+322 L<text|/text>
+
+323 L<through|/through>
+
+324 L<throughX|/throughX>
+
+325 L<to|/to>
+
+326 L<tocNumbers|/tocNumbers>
+
+327 L<tree|/tree>
+
+328 L<type|/type>
+
+329 L<unwrap|/unwrap>
+
+330 L<unwrapContentsKeepingText|/unwrapContentsKeepingText>
+
+331 L<unwrapContentsKeepingTextNonBlank|/unwrapContentsKeepingText>
+
+332 L<unwrapContentsKeepingTextNonBlankX|/unwrapContentsKeepingText>
+
+333 L<unwrapContentsKeepingTextX|/unwrapContentsKeepingText>
+
+334 L<unwrapNonBlank|/unwrap>
+
+335 L<unwrapNonBlankX|/unwrap>
+
+336 L<unwrapX|/unwrap>
+
+337 L<upto|/upto>
+
+338 L<uptoX|/upto>
+
+339 L<wrapContentWith|/wrapContentWith>
+
+340 L<wrapDown|/wrapDown>
+
+341 L<wrapTo|/wrapTo>
+
+342 L<wrapToX|/wrapTo>
+
+343 L<wrapUp|/wrapUp>
+
+344 L<wrapWith|/wrapWith>
 
 =head1 Installation
 
@@ -8327,42 +8634,49 @@ under the same terms as Perl itself.
 =cut
 
 
-sub aboveX           {&above           (@_) || die 'above'}
-sub afterX           {&after           (@_) || die 'after'}
-sub atX              {&at              (@_) || die 'at'}
-sub beforeX          {&before          (@_) || die 'before'}
-sub belowX           {&below           (@_) || die 'below'}
-sub changeX          {&change          (@_) || die 'change'}
-sub commonAncestorX  {&commonAncestor  (@_) || die 'commonAncestor'}
-sub equalsX          {&equals          (@_) || die 'equals'}
-sub findByNumberX    {&findByNumber    (@_) || die 'findByNumber'}
-sub firstX           {&first           (@_) || die 'first'}
-sub firstContextOfX  {&firstContextOf  (@_) || die 'firstContextOf'}
-sub firstInX         {&firstIn         (@_) || die 'firstIn'}
-sub firstInIndexX    {&firstInIndex    (@_) || die 'firstInIndex'}
-sub goX              {&go              (@_) || die 'go'}
-sub isAllBlankTextX  {&isAllBlankText  (@_) || die 'isAllBlankText'}
-sub isBlankTextX     {&isBlankText     (@_) || die 'isBlankText'}
-sub isEmptyX         {&isEmpty         (@_) || die 'isEmpty'}
-sub isFirstX         {&isFirst         (@_) || die 'isFirst'}
-sub isLastX          {&isLast          (@_) || die 'isLast'}
-sub isOnlyChildX     {&isOnlyChild     (@_) || die 'isOnlyChild'}
-sub isTextX          {&isText          (@_) || die 'isText'}
-sub lastX            {&last            (@_) || die 'last'}
-sub lastContextOfX   {&lastContextOf   (@_) || die 'lastContextOf'}
-sub lastInX          {&lastIn          (@_) || die 'lastIn'}
-sub lastInIndexX     {&lastInIndex     (@_) || die 'lastInIndex'}
-sub matchAfterX      {&matchAfter      (@_) || die 'matchAfter'}
-sub matchBeforeX     {&matchBefore     (@_) || die 'matchBefore'}
-sub nextX            {&next            (@_) || die 'next'}
-sub nextInX          {&nextIn          (@_) || die 'nextIn'}
-sub orderedX         {&ordered         (@_) || die 'ordered'}
-sub overX            {&over            (@_) || die 'over'}
-sub prevX            {&prev            (@_) || die 'prev'}
-sub prevInX          {&prevIn          (@_) || die 'prevIn'}
-sub restoreX         {&restore         (@_) || die 'restore'}
-sub uptoX            {&upto            (@_) || die 'upto'}
-sub wrapToX          {&wrapTo          (@_) || die 'wrapTo'}
+sub aboveX                      {&above                      (@_) || die 'above'}                      
+sub afterX                      {&after                      (@_) || die 'after'}                      
+sub atX                         {&at                         (@_) || die 'at'}                         
+sub atOrBelowX                  {&atOrBelow                  (@_) || die 'atOrBelow'}                  
+sub beforeX                     {&before                     (@_) || die 'before'}                     
+sub belowX                      {&below                      (@_) || die 'below'}                      
+sub changeX                     {&change                     (@_) || die 'change'}                     
+sub commonAncestorX             {&commonAncestor             (@_) || die 'commonAncestor'}             
+sub equalsX                     {&equals                     (@_) || die 'equals'}                     
+sub findByNumberX               {&findByNumber               (@_) || die 'findByNumber'}               
+sub firstX                      {&first                      (@_) || die 'first'}                      
+sub firstContextOfX             {&firstContextOf             (@_) || die 'firstContextOf'}             
+sub firstInX                    {&firstIn                    (@_) || die 'firstIn'}                    
+sub firstInIndexX               {&firstInIndex               (@_) || die 'firstInIndex'}               
+sub firstTextX                  {&firstText                  (@_) || die 'firstText'}                  
+sub goX                         {&go                         (@_) || die 'go'}                         
+sub isAllBlankTextX             {&isAllBlankText             (@_) || die 'isAllBlankText'}             
+sub isBlankTextX                {&isBlankText                (@_) || die 'isBlankText'}                
+sub isEmptyX                    {&isEmpty                    (@_) || die 'isEmpty'}                    
+sub isFirstX                    {&isFirst                    (@_) || die 'isFirst'}                    
+sub isLastX                     {&isLast                     (@_) || die 'isLast'}                     
+sub isOnlyChildX                {&isOnlyChild                (@_) || die 'isOnlyChild'}                
+sub isTextX                     {&isText                     (@_) || die 'isText'}                     
+sub lastX                       {&last                       (@_) || die 'last'}                       
+sub lastContextOfX              {&lastContextOf              (@_) || die 'lastContextOf'}              
+sub lastInX                     {&lastIn                     (@_) || die 'lastIn'}                     
+sub lastInIndexX                {&lastInIndex                (@_) || die 'lastInIndex'}                
+sub lastTextX                   {&lastText                   (@_) || die 'lastText'}                   
+sub matchAfterX                 {&matchAfter                 (@_) || die 'matchAfter'}                 
+sub matchBeforeX                {&matchBefore                (@_) || die 'matchBefore'}                
+sub nextX                       {&next                       (@_) || die 'next'}                       
+sub nextInX                     {&nextIn                     (@_) || die 'nextIn'}                     
+sub nextTextX                   {&nextText                   (@_) || die 'nextText'}                   
+sub orderedX                    {&ordered                    (@_) || die 'ordered'}                    
+sub overX                       {&over                       (@_) || die 'over'}                       
+sub prevX                       {&prev                       (@_) || die 'prev'}                       
+sub prevInX                     {&prevIn                     (@_) || die 'prevIn'}                     
+sub prevTextX                   {&prevText                   (@_) || die 'prevText'}                   
+sub restoreX                    {&restore                    (@_) || die 'restore'}                    
+sub unwrapX                     {&unwrap                     (@_) || die 'unwrap'}                     
+sub unwrapContentsKeepingTextX  {&unwrapContentsKeepingText  (@_) || die 'unwrapContentsKeepingText'}  
+sub uptoX                       {&upto                       (@_) || die 'upto'}                       
+sub wrapToX                     {&wrapTo                     (@_) || die 'wrapTo'}                     
 
 sub firstNonBlank
  {my $r = &first($_[0]);
@@ -8379,6 +8693,42 @@ sub firstNonBlank
 sub firstNonBlankX
  {my $r = &firstNonBlank(@_);
   die 'first' unless defined($r);
+  $r
+ }
+
+sub isFirstNonBlank
+ {my $r = &isFirst($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &isFirst($r, @_)
+   }
+  else
+   {return &isFirst(@_);
+   }
+ }
+
+sub isFirstNonBlankX
+ {my $r = &isFirstNonBlank(@_);
+  die 'isFirst' unless defined($r);
+  $r
+ }
+
+sub isLastNonBlank
+ {my $r = &isLast($_[0]);
+  return undef unless $r;
+  if ($r->isBlankText)
+   {shift @_;
+    return &isLast($r, @_)
+   }
+  else
+   {return &isLast(@_);
+   }
+ }
+
+sub isLastNonBlankX
+ {my $r = &isLastNonBlank(@_);
+  die 'isLast' unless defined($r);
   $r
  }
 
@@ -8456,7 +8806,7 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>555;
+use Test::More tests=>566;
 use Data::Table::Text qw(:all);
 
 #Test::More->builder->output("/dev/null");                                       # Show only errors during testing - but this must be commented out for production
@@ -8743,6 +9093,27 @@ END
     ok $@ =~ m(\ACannot unwrap the outer most node)s;
    }
 
+  if (1) {
+    my $x = Data::Edit::Xml::new(qq(<a><b><c><d>DD</d>EE<f>FF</f></c></b></a>));#TunwrapContentsKeepingText
+    ok -p $x eq <<END;                                                          #TunwrapContentsKeepingText
+<a>
+  <b>
+    <c>
+      <d>DD</d>
+EE
+      <f>FF</f>
+    </c>
+  </b>
+</a>
+END
+    $x->go(qw(b))->unwrapContentsKeepingText;                                   #TunwrapContentsKeepingText
+    ok -p $x eq <<END;                                                          #TunwrapContentsKeepingText
+<a>
+  <b>  DD EE FF  </b>
+</a>
+END
+   }
+
   if (1)
    {my $x = Data::Edit::Xml::new(qq(<a><b><c id="cc"/></b></a>));               #TreplaceWith
     $x->go(qw(b c))->replaceWith($x->newTag(qw(d id dd)));                      #TreplaceWith
@@ -8941,9 +9312,9 @@ if (1)                                                                          
   ok -s $x eq "<a>                    </a>";
  }
 
-if (1)                                                                          #TprettyStringCDATA
- {my $a = Data::Edit::Xml::new("<a><b>A</b></a>");
-  my $b = $a->first;
+if (1)
+ {my $a = Data::Edit::Xml::new("<a><b>A</b></a>");                              #TprettyStringCDATA
+  my $b = $a->first;                                                            #TprettyStringCDATA
      $b->first->replaceWithBlank;                                               #TprettyStringCDATA
   ok $a->prettyStringCDATA eq <<END;                                            #TprettyStringCDATA #TisText #TisBlankText
 <a>
@@ -9334,6 +9705,32 @@ END
 </a>
 END
 }
+
+if (1)                                                                          # Next/Prev Text
+ {my $a = Data::Edit::Xml::new("<a>AA<b/>BB<c/>CC<d/><e/><f/>DD<g/>HH</a>");
+  ok -p $a eq <<END;                                                            #TfirstText #TlastText #TnextText #TprevText
+<a>AA
+  <b/>
+BB
+  <c/>
+CC
+  <d/>
+  <e/>
+  <f/>
+DD
+  <g/>
+HH
+</a>
+END
+  ok  $a->firstText;                                                            #TfirstText
+  ok !$a->go(qw(c))->firstText;                                                 #TfirstText
+  ok  $a->lastText;                                                             #TlastText
+  ok !$a->go(qw(c))->lastText;                                                  #TlastText
+  ok  $a->go(qw(c))->nextText->text eq q(CC);                                   #TnextText
+  ok !$a->go(qw(e))->nextText;                                                  #TnextText
+  ok  $a->go(qw(c))->prevText->text eq q(BB);                                   #TprevText
+  ok !$a->go(qw(e))->prevText;                                                  #TprevText
+ }
 
 if (1)
  {my $a = Data::Edit::Xml::new(<<END);                                          #Tfirst #Tlast #Tnext #Tprev #TfirstBy #TlastBy #Tindex #Tposition
@@ -10348,11 +10745,12 @@ END
  }
 
 if (1)                                                                          # *NonBlank
- {my $a = Data::Edit::Xml::new("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>"); #TprettyStringCDATA
-  map {$_->replaceWithBlank} grep {$_->isText}               $a->contents;          #TprettyStringCDATA
-  map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;          #TprettyStringCDATA
+ {my $a = Data::Edit::Xml::new
+   ("<a>1<A/>2<B/>3<C/>4<D/>5<E/>6<F/>7<G/>8<H/>9</a>");
+  map {$_->replaceWithBlank} grep {$_->isText}               $a->contents;
+  map {$_->cut}              grep {$_->tag =~ m/\A[BDFH]\Z/} $a->contents;
 
-  ok $a->prettyStringCDATA eq <<'END';                                          #TprettyStringCDATA #TfirstNonBlank #TnextNonBlank #TfirstIn #TnextIn  #TlastNonBlank #TprevNonBlank #TlastIn #TprevIn
+  ok $a->prettyStringCDATA eq <<'END';                                          #TfirstNonBlank #TnextNonBlank #TfirstIn #TnextIn  #TlastNonBlank #TprevNonBlank #TlastIn #TprevIn
 <a><CDATA> </CDATA>
     <A/>
 <CDATA>  </CDATA>

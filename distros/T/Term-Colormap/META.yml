@@ -18,15 +18,15 @@ name: Term-Colormap
 provides:
   Term::Colormap:
     file: lib/Term/Colormap.pm
-    version: '0.16'
+    version: '0.18'
   Term::Colormap::Brewer:
     file: lib/Term/Colormap/Brewer.pm
-    version: '0.16'
+    version: '0.18'
 requires:
   Scalar::Util: '0'
   Term::ReadKey: '0'
   perl: '5.006'
 resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/xxfelixxx/perl-term-colormap
-version: '0.16'
+version: '0.18'

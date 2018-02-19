@@ -39,9 +39,11 @@ ok(exists $s3_res->{releases});
 ok(exists $s3_res->{aliases});
 sleep(1);
 
-my $s4_res = $ws->search(artist => { mbid => '070d193a-845c-479f-980e-bef15710653e', inc => 'nothing-here' });
-exit_if_mb_busy($s4_res);
-ok(exists $s4_res->{error});
+eval {
+    my $s4_res = $ws->search(artist => { mbid => '070d193a-845c-479f-980e-bef15710653e', inc => 'nothing-here' });
+    exit_if_mb_busy($s4_res);
+};
+like($@, qr/not a valid.*inc.*subquery/i);
 sleep(1);
 
 my $s5_res = $ws->search(artist => { artist => 'Coldplay' });

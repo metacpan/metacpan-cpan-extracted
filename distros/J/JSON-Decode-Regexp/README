@@ -1,10 +1,15 @@
-SYNOPSIS
+NAME
+    JSON::Decode::Regexp - JSON parser as a single Perl Regex
 
+VERSION
+    This document describes version 0.100 of JSON::Decode::Regexp (from Perl
+    distribution JSON-Decode-Regexp), released on 2018-02-14.
+
+SYNOPSIS
      use JSON::Decode::Regexp qw(from_json);
      my $data = from_json(q([1, true, "a", {"b":null}]));
 
 DESCRIPTION
-
     This module is a packaging of Randal L. Schwartz' code (with some
     modification) originally posted at:
 
@@ -13,22 +18,18 @@ DESCRIPTION
     The code is licensed "just like Perl".
 
 FUNCTIONS
-
- from_json($str) => DATA
-
+  from_json($str) => DATA
     Decode JSON in $str. Dies on error.
 
 FAQ
-
- How does this module compare to other JSON modules on CPAN?
-
+  How does this module compare to other JSON modules on CPAN?
     As of version 0.04, performance-wise this module quite on par with
-    JSON::PP (faster on strings and longer arrays/objects, slower on
-    simpler JSON) and a bit slower than JSON::Tiny. And of course all three
-    are much slower than XS-based modules like JSON::XS.
+    JSON::PP (faster on strings and longer arrays/objects, slower on simpler
+    JSON) and a bit slower than JSON::Tiny. And of course all three are much
+    slower than XS-based modules like JSON::XS.
 
-    JSON::Decode::Regexp does not yet support Unicode, and does not
-    pinpoint exact location on parse error.
+    JSON::Decode::Regexp does not yet support Unicode, and does not pinpoint
+    exact location on parse error.
 
     In general, I don't see a point in using it in production (I recommend
     instead JSON::XS or Cpanel::JSON::XS if you can use XS modules, or
@@ -36,10 +37,33 @@ FAQ
     that demonstrates the power of Perl regular expressions and beautiful
     code.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/JSON-Decode-Regexp>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-JSON-Decode-Regexp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Decode-Regexp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Pure-perl modules: JSON::Tiny, JSON::PP, Pegex::JSON,
     JSON::Decode::Marpa.
 
     XS modules: JSON::XS, Cpanel::JSON::XS.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2013 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

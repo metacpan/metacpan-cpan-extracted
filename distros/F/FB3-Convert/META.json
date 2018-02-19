@@ -33,6 +33,7 @@
             "HTML::Entities" : "0",
             "Hash::Merge" : "0",
             "UUID::Tiny" : "0",
+            "XML::Diff" : "0",
             "XML::LibXML" : "0",
             "XML::LibXSLT" : "0",
             "perl" : "5.014"
@@ -42,7 +43,7 @@
    "provides" : {
       "FB3::Convert" : {
          "file" : "lib/FB3/Convert.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "FB3::Convert::Epub" : {
          "file" : "lib/FB3/Convert/Epub.pm"
@@ -54,6 +55,6 @@
          "http://opensource.org/licenses/lgpl-license.php"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

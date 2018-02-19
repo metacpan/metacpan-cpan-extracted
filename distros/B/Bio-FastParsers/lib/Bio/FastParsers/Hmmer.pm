@@ -1,14 +1,14 @@
 package Bio::FastParsers::Hmmer;
-# ABSTRACT: classes for parsing HMMER output
+# ABSTRACT: Classes for parsing HMMER output
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::FastParsers::Hmmer::VERSION = '0.180330';
+$Bio::FastParsers::Hmmer::VERSION = '0.180470';
 use strict;
 use warnings;
 
+use Bio::FastParsers::Hmmer::Model;
 use Bio::FastParsers::Hmmer::Standard;
 use Bio::FastParsers::Hmmer::Table;
 use Bio::FastParsers::Hmmer::DomTable;
-use Bio::FastParsers::Hmmer::Model;
 
 1;
 
@@ -18,19 +18,23 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Hmmer - classes for parsing HMMER output
+Bio::FastParsers::Hmmer - Classes for parsing HMMER output
 
 =head1 VERSION
 
-version 0.180330
+version 0.180470
 
 =head1 SYNOPSIS
 
-    # TODO
+    # see Bio::FastParsers::Hmmer::Model
+    # see Bio::FastParsers::Hmmer::Standard
+    # see Bio::FastParsers::Hmmer::Table;
+    # see Bio::FastParsers::Hmmer::DomTable;
 
 =head1 DESCRIPTION
 
-    # TODO
+Parsers for the HMMER model and three output formats are available: standard,
+tabular and domain-wise tabular.
 
 =head1 AUTHOR
 

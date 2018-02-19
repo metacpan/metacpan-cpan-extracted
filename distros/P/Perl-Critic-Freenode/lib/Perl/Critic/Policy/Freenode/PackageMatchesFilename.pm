@@ -7,7 +7,7 @@ use Perl::Critic::Utils qw(:severities :classification :ppi);
 use Path::Tiny 'path';
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.024';
+our $VERSION = '0.026';
 
 use constant DESC => 'No package matching the module filename';
 use constant EXPL => 'A Perl module file is expected to contain a matching package name, so it can be used after loading it from the filesystem. A module file that doesn\'t contain a matching package name usually indicates an error.';
@@ -18,7 +18,7 @@ sub applies_to { 'PPI::Document' }
 
 sub violates {
 	my ($self, $elem, $doc) = @_;
-	return () unless $doc->is_module and $doc->filename =~ m/\.pm\z/;
+	return () unless $doc->is_module and $doc->filename and $doc->filename =~ m/\.pm\z/;
 	
 	my $packages = $elem->find('PPI::Statement::Package') || [];
 	

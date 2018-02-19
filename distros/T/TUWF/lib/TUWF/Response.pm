@@ -6,11 +6,13 @@ use strict;
 use warnings;
 use Exporter 'import';
 use POSIX 'strftime';
+use Carp 'croak';
 
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 our @EXPORT = qw|
-  resInit resHeader resCookie resBuffer resFd resStatus resRedirect resNotFound resFinish
+  resInit resHeader resCookie resBuffer resFd resStatus resRedirect
+  resNotFound resJSON resBinary resFile resFinish
 |;
 
 
@@ -161,16 +163,17 @@ sub resStatus {
 }
 
 
-# Redirect to an other page, accepts an URL (relative to current hostname) and
+# Redirect to an other page, accepts an URL (either relative or absolute) and
 # an optional type consisting of 'temp' (temporary) or 'post' (after posting a form).
 # No type argument means a permanent redirect.
 sub resRedirect {
   my($self, $url, $type) = @_;
 
-  $self->resInit;
+  $self->resBuffer('clear');
   my $fd = $self->resFd();
   print $fd 'Redirecting...';
-  $self->resHeader('Location' => $self->reqBaseURI().$url);
+  $self->resHeader('Content-Type' => 'text/plain');
+  $self->resHeader('Location' => $url);
   $self->resStatus(!$type ? 301 : $type eq 'temp' ? 307 : 303);
 }
 
@@ -182,6 +185,50 @@ sub resNotFound {
 }
 
 
+sub resJSON {
+  my($self, $obj) = @_;
+  croak "Unable to load JSON::XS, is it installed?\n"
+    unless eval { require JSON::XS; 1 };
+
+  $self->resHeader('Content-Type' => 'application/json; charset=UTF-8');
+  $self->resBuffer('clear');
+  $self->resBinary(JSON::XS::encode_json($obj));
+}
+
+
+sub resBinary {
+  my($self, $data) = @_;
+  $self->resBuffer('none');
+
+  # Write to the buffer directly, bypassing the fd. This avoids extra copying
+  # and bypasses the ':utf8' filter.
+  $self->{_TUWF}{Res}{content} = $data;
+}
+
+
+sub resFile {
+  my($self, $path, $fn) = @_;
+
+  # This also catches files with '..' somewhere in the middle of the name.
+  # Let's just disallow that too to simplify this check, I'd err on the side of
+  # caution.
+  croak "Possible path traversal attempt" if $fn =~ /\.\./;
+
+  my $file = "$path/$fn";
+  return 0 if !-f $file;
+  open my $F, '<', $file or croak "Unable to open '$file': $!";
+  {
+      local $/=undef;
+      $self->resBinary(scalar <$F>);
+  }
+
+  my $ext = $fn =~ m{\.([^/\.]+)$} ? lc $1 : '';
+  my $ctype = $self->{_TUWF}{mime_types}{$ext} || $self->{_TUWF}{mime_default};
+  $self->resHeader('Content-Type' => "$ctype; charset=UTF-8"); # Adding a charset to binary formats should be safe, too.
+  return 1;
+}
+
+
 # Send everything we have buffered to the client
 sub resFinish {
   my $self = shift;
@@ -190,7 +237,11 @@ sub resFinish {
   close $i->{fd};
   $self->resHeader('Content-Length' => length($i->{content}));
 
-  printf "Status: %d\r\n", $i->{status};
+  if($self->{_TUWF}{http}) {
+    printf "HTTP/1.0 %d Hi, I am a HTTP response.\r\n", $i->{status};
+  } else {
+    printf "Status: %d\r\n", $i->{status};
+  }
   printf "%s: %s\r\n", $i->{headers}[$_*2], $i->{headers}[$_*2+1]
     for (0..$#{$i->{headers}}/2);
   printf "Set-Cookie: %s\r\n", $i->{cookies}{$_} for (keys %{$i->{cookies}});

@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.3.0';
+$Git::Hooks::CheckAcls::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -10,7 +10,6 @@ use warnings;
 use Try::Tiny;
 use Git::Hooks;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 ##########
@@ -71,7 +70,16 @@ sub check_ref {
         next unless $git->match_user($who);
         next unless match_ref($ref, $refspec);
         if ($what =~ /[^CRUD-]/) {
-            $git->error($PKG, "invalid acl 'what' component: '$what'");
+            $git->fault(<<EOS);
+Configuration error in a $CFG.acl option.
+
+It has an invalid second argument:
+
+  acl = $who *$what* $refspec
+
+The valid values are combinations of the letters 'CRUD'.
+Please, check your configuration and fix it.
+EOS
             return 0;
         }
         return 1 if index($what, $op) != -1;
@@ -86,9 +94,16 @@ sub check_ref {
     );
 
     if (my $myself = eval { $git->authenticated_user() }) {
-        $git->error($PKG, "you ($myself) cannot $op{$op} ref $ref");
+        $git->fault(<<EOS);
+Authorization error: you ($myself) cannot $op{$op} reference $ref.
+Please, check the $CFG.acl options in your configuration.
+EOS
     } else {
-        $git->error($PKG, "cannot grok authenticated username", $@);
+        $git->fault(<<EOS, {details => $@});
+Internal error: I cannot get your username to authorize you.
+Please check your Git::Hooks configuration with regards to the function
+https://metacpan.org/pod/Git::Repository::Plugin::GitHooks#authenticated_user
+EOS
     }
 
     return 0;
@@ -126,7 +141,24 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = CheckAcls
+    admin = joe molly
+
+  [githooks "checkacls"]
+    acl = ^.      CRUD ^refs/heads/{USER}/
+    acl = ^.      U    ^refs/heads/
+
+This allows users C<joe> and C<molly> do anything. Every other user can create,
+rewind, update, and delete branches prefixed with their own usernames, but they
+can only update other branches.
 
 =head1 DESCRIPTION
 
@@ -263,7 +295,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

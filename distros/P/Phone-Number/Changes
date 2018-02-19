@@ -1,0 +1,6 @@
+Revision history for Perl extension Phone::Number.
+
+0.01  Thu May  3 23:59:04 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Phone::Number
+

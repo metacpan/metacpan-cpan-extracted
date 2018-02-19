@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -15,4 +14,4 @@ my($parser)	= Regexp::Parsertron -> new(verbose => 1);
 
 my($result) = $parser -> parse(re => $re);
 
-say "Original:  $re. Result: $result. (0 is success)";
+print "Original:  $re. Result: $result. (0 is success). \n";

@@ -36,20 +36,20 @@ package TestCase {
   get x_byte, x_int, x_long;
   set x_byte, x_int, x_long;
   
-  enum {
-    BYTE_MAX = 127y,
-    BYTE_MIN = -128y,
-    SHORT_MAX = 32767s,
-    SHORT_MIN = -32768s,
-    INT_MAX = 2147483647,
-    INT_MIN = -2147483648,
-    LONG_MAX = 9223372036854775807L,
-    LONG_MIN = -9223372036854775808L,
-    FLOAT_PRECICE = 32767f,
-    DOUBLE_PRECICE = 2147483647.0,
-  }
+  sub BYTE_MAX : byte () { return (byte)127; }
+  sub BYTE_MIN : byte () { return (byte)-128; }
+  sub SHORT_MAX : short () { return (short)32767; }
+  sub SHORT_MIN : short () { return (short)-32768; }
+  sub INT_MAX : int () { return 2147483647; }
+  sub INT_MIN : int () { return -2147483648; }
+  sub LONG_MAX : long () { return 9223372036854775807L; }
+  sub LONG_MIN : long () { return -9223372036854775808L; }
+  sub FLOAT_PRECICE : float () { return 32767f; }
+  sub DOUBLE_PRECICE : double () { return 2147483647.0; }
   
   sub main : int ($mvar : int) {
+    my $num : byte = 127;
+    
     eval {
       exception_croak_return_object();
     };
@@ -132,16 +132,12 @@ package TestCase {
     }
 
     CORE::warn("warn");
-    CORE::warn(1y . "\n");
-    CORE::warn(1s . "\n");
     CORE::warn(1 . "\n");
     CORE::warn(1L . "\n");
     CORE::warn(0.5f . "\n");
     CORE::warn(0.5 . "\n");
 
     CORE::warn("warn");
-    CORE::warn(1y . "\n");
-    CORE::warn(1s . "\n");
     CORE::warn(1 . "\n");
     CORE::warn(1L . "\n");
     CORE::warn(0.5f . "\n");
@@ -301,7 +297,6 @@ package TestCase {
       2,
       3
     };
-    CORE::print(TestCase::ONE() . "\n");
     
     # Logical or
     {
@@ -457,9 +452,6 @@ package TestCase {
     {
       my $nums : int[][];
     }
-    
-    CORE::print(TestCase::EnumD::THREE() . "\n");
-    CORE::print(TestCase::EnumD::FORE() . "\n");
     
     # Core functions
     {
@@ -1030,7 +1022,7 @@ package TestCase {
       my $num0 = (byte)0;
       my $num1 = (byte)1;
       my $num2 = (byte)2;
-      my $num3 = $num0 + $num1 + $num2;
+      my $num3 = (byte)((int)$num0 + (int)$num1 + (int)$num2);
       CORE::print($num3 . "\n");
     }
 
@@ -1038,7 +1030,7 @@ package TestCase {
       my $num0 = (short)0;
       my $num1 = (short)1;
       my $num2 = (short)2;
-      my $num3 = $num0 + $num1 + $num2;
+      my $num3 = (short)((int)$num0 + (int)$num1 + (int)$num2);
       CORE::print($num3 . "\n");
     }
 
@@ -1046,10 +1038,6 @@ package TestCase {
     # croak $error;
     
     return $mvar + 3;
-  }
-
-  enum {
-    ONE = 0.25f
   }
 
   # Call void function

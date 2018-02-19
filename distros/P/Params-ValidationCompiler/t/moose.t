@@ -63,6 +63,26 @@ subtest(
     }
 );
 
+# This tests that a type which provides an inline_environment actually has
+# that env available.
+subtest(
+    'empty enum subtype',
+    sub {
+        my $enum    = enum [qw( red green blue )];
+        my $subtype = subtype( as $enum );
+        my $sub     = validation_for(
+            params => {
+                foo => { type => $subtype },
+            },
+        );
+        is(
+            { $sub->( foo => 'red' ) },
+            { foo => 'red' },
+            'enum type is validated properly'
+        );
+    }
+);
+
 done_testing();
 
 sub _test_int_type {

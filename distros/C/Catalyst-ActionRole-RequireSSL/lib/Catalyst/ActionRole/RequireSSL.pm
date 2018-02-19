@@ -1,8 +1,5 @@
 package Catalyst::ActionRole::RequireSSL;
-{
-  $Catalyst::ActionRole::RequireSSL::VERSION = '0.07';
-}
-
+$Catalyst::ActionRole::RequireSSL::VERSION = '1.00';
 use Moose::Role;
 with 'Catalyst::ActionRole::RequireSSL::Role';
 use namespace::autoclean;
@@ -13,7 +10,7 @@ Catalyst::ActionRole::RequireSSL - Force an action to be secure only.
 
 =head1 VERSION
 
-version 0.07
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -23,29 +20,29 @@ version 0.07
 
   sub bar : Local Does('RequireSSL') { ... }
   sub bar : Local Does('NoSSL') { ... }
-  
+
 =head2 HIERARCHY
 
 You can chain the SSL Roles to allow for enforced combinations such as all
 secure apart from a certain action and vice versa. See the tests to see this
 in action.
-   
+
 =cut
 
 around execute => sub {
   my $orig = shift;
   my $self = shift;
   my ($controller, $c) = @_;
-  
+
   unless(defined $c->config->{require_ssl}->{disabled}) {
-    $c->config->{require_ssl}->{disabled} = 
+    $c->config->{require_ssl}->{disabled} =
       $c->engine->isa("Catalyst::Engine::HTTP") ? 1 : 0;
   }
   #use Data::Dumper;warn Dumper($c->action);
   if (!$c->req->secure && $c->req->method eq "POST"
       && !$c->config->{require_ssl}->{ignore_on_post})
   {
-    $c->error("Cannot secure request on POST") 
+    $c->error("Cannot secure request on POST")
   }
 
   unless(
@@ -56,10 +53,10 @@ around execute => sub {
     ) {
     my $uri = $c->req->uri->clone;
     $uri->scheme('https');
-    $c->res->redirect( $uri );
+    $c->res->redirect( $uri, 301 );
     $c->detach();
   } else {
-    $c->log->warn("Would've redirected to SSL") 
+    $c->log->warn("Would've redirected to SSL")
       if $c->config->{require_ssl}->{disabled} && $c->debug;
     $self->$orig( @_ );
   }

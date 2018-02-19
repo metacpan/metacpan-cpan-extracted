@@ -1011,6 +1011,28 @@ nsec_without_unslept(struct timespec *sleepfor,
 #define IS_SAFE_PATHNAME(pv, len, opname) (((len)>1)&&memchr((pv), 0, (len)-1)?(SETERRNO(ENOENT, LIB_INVARG),WARNEMU(opname),FALSE):(TRUE))
 #endif
 
+/* Mac OS (Classic) (MacOS 9) */
+#ifdef MACOS_TRADITIONAL
+/* has tz.tz_minuteswest which needs to be added to tv_sec */
+#define GETTIMEOFDAY_TZ
+/* has unsigned time_t */
+#define UNSIGNED_TIME_T
+#endif
+
+#ifdef GETTIMEOFDAY_TZ
+#define mygettimeofday(tv, tz) gettimeofday(tv, tz)
+#else
+#define mygettimeofday(tv, tz) gettimeofday(tv, NULL)
+#endif
+
+#ifdef UNSIGNED_TIME_T
+#define SvTIME(sv) SvUV(sv)
+#define newSVtimet) newSVuv(t)
+#else
+#define SvTIME(sv) SvIV(sv)
+#define newSVtime(t) newSViv(t)
+#endif
+
 MODULE = Time::HiRes            PACKAGE = Time::HiRes
 
 PROTOTYPES: ENABLE
@@ -1278,22 +1300,23 @@ alarm(seconds,interval=0)
 #endif /* #ifdef HAS_UALARM */
 
 #ifdef HAS_GETTIMEOFDAY
-#    ifdef MACOS_TRADITIONAL	/* fix epoch TZ and use unsigned time_t */
 void
 gettimeofday()
         PREINIT:
         struct timeval Tp;
+#ifdef GETTIMEOFDAY_TZ
         struct timezone Tz;
+#endif
         PPCODE:
         int status;
-        status = gettimeofday (&Tp, &Tz);
-
+	status = mygettimeofday (&Tp, &Tz);
 	if (status == 0) {
+#ifdef MACOS_TRADITIONAL
 	     Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
+#endif
              if (GIMME == G_ARRAY) {
                  EXTEND(sp, 2);
-                 /* Mac OS (Classic) has unsigned time_t */
-                 PUSHs(sv_2mortal(newSVuv(Tp.tv_sec)));
+                 PUSHs(sv_2mortal(newSVtime(Tp.tv_sec)));
                  PUSHs(sv_2mortal(newSViv(Tp.tv_usec)));
              } else {
                  EXTEND(sp, 1);
@@ -1305,12 +1328,16 @@ NV
 time()
         PREINIT:
         struct timeval Tp;
+#ifdef GETTIMEOFDAY_TZ
         struct timezone Tz;
+#endif
         CODE:
         int status;
-        status = gettimeofday (&Tp, &Tz);
+        status = mygettimeofday (&Tp, &Tz);
 	if (status == 0) {
+#ifdef MACOS_TRADITIONAL
             Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
+#endif
 	    RETVAL = Tp.tv_sec + (Tp.tv_usec / NV_1E6);
         } else {
 	    RETVAL = -1.0;
@@ -1318,41 +1345,62 @@ time()
 	OUTPUT:
 	RETVAL
 
-#    else	/* MACOS_TRADITIONAL */
-void
-gettimeofday()
-        PREINIT:
-        struct timeval Tp;
-        PPCODE:
-	int status;
-        status = gettimeofday (&Tp, NULL);
-	if (status == 0) {
-	     if (GIMME == G_ARRAY) {
-	         EXTEND(sp, 2);
-                 PUSHs(sv_2mortal(newSViv(Tp.tv_sec)));
-                 PUSHs(sv_2mortal(newSViv(Tp.tv_usec)));
-             } else {
-                 EXTEND(sp, 1);
-                 PUSHs(sv_2mortal(newSVnv(Tp.tv_sec + (Tp.tv_usec / NV_1E6))));
-             }
-        }
-
 NV
-time()
-        PREINIT:
-        struct timeval Tp;
-        CODE:
-	int status;
-        status = gettimeofday (&Tp, NULL);
-	if (status == 0) {
-            RETVAL = Tp.tv_sec + (Tp.tv_usec / NV_1E6);
-	} else {
-	    RETVAL = -1.0;
-	}
-	OUTPUT:
-	RETVAL
+tv_interval(SV* start, ...)
+    PREINIT:
+    struct timeval Tp;
+#ifdef GETTIMEOFDAY_TZ
+    struct timezone Tz;
+#endif
+    SV* end;
+    time_t end_sec;
+    IV end_usec;
+    SV** avalue;
 
-#    endif	/* MACOS_TRADITIONAL */
+    CODE:
+
+    if (items >= 2) {
+        end = ST(1);
+    } else {
+        end = NULL;
+    }
+
+    if (!end || !SvROK(end)) {
+        int status;
+        status = mygettimeofday (&Tp, &Tz);
+#ifdef MACOS_TRADITIONAL
+        Tp.tv_sec += Tz.tz_minuteswest * 60;	/* adjust for TZ */
+#endif
+        if (status == 0) {
+            end_sec = Tp.tv_sec;
+            end_usec = Tp.tv_usec;
+        } else {
+            end_sec = 0;
+            end_usec = 0;
+        }
+    } else {
+        end = SvRV(end);
+        if (SvTYPE(end) != SVt_PVAV) croak("Not an array reference in tv_interal()");
+
+        avalue = av_fetch((AV*)end, 0, FALSE);
+        end_sec = avalue ? SvTIME(*avalue) : 0;
+        avalue = av_fetch((AV*)end, 1, FALSE);
+        end_usec = avalue ? SvIV(*avalue) : 0;
+    }
+
+    if (!SvROK(start)) croak("Not an array reference in tv_interval()");
+    start = SvRV(start);
+    if (SvTYPE(start) != SVt_PVAV) croak("Not an array reference in tv_interva()");
+
+    avalue = av_fetch((AV*)start, 0, FALSE);
+    RETVAL = end_sec - (avalue ? SvTIME(*avalue) : 0);
+
+    avalue = av_fetch((AV*)start, 1, FALSE);
+    RETVAL += ((end_usec - (avalue ? SvIV(*avalue) : 0)) / NV_1E6);
+
+    OUTPUT:
+    RETVAL
+
 #endif /* #ifdef HAS_GETTIMEOFDAY */
 
 #if defined(HAS_GETITIMER) && defined(HAS_SETITIMER)

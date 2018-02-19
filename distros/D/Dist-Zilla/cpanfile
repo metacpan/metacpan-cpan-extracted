@@ -3,6 +3,7 @@ requires "App::Cmd::Setup" => "0.330";
 requires "App::Cmd::Tester" => "0.306";
 requires "App::Cmd::Tester::CaptureExternal" => "0";
 requires "Archive::Tar" => "0";
+requires "Archive::Tar::Wrapper" => "0.15";
 requires "CPAN::Meta::Converter" => "2.101550";
 requires "CPAN::Meta::Merge" => "0";
 requires "CPAN::Meta::Prereqs" => "2.120630";

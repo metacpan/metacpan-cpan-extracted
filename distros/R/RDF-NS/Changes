@@ -1,3 +1,27 @@
+20180213  2018-02-13 10:16:58 CET
+ - 2082 prefixes
+ - added:   add ago agr alethio alice allot aml amt aprov aseonto assoc
+            atlas audit bci bdc bdd bdo bdr bds bflc bob bot brk brt cd
+            ceterms clapit composer connard cpi cpov customer cwlgit cwrc
+            d3s datacron dbkwik dcatnl ddb decprov dk doacc docker doi dsw
+            dto edg emergel emergelm eustd euvoc fhir fnml fr fssp fun
+            fuseki gdc geoloc geor gg globalcube gobierno gvoi gvoith
+            halyard hasco huto hva iab id ido ifcowl im imo ims iotlite
+            isaterms it iter its ja json ldl ldn lgt linkrel literature
+            llalg lmdb loupe m3 marcrole mdont medred meeting memento mesh
+            nature nih nkos nobel nrv ns2 ogdl4m ontoneo opa oplangel
+            oplbenefit oplli oplp oplstocks oplwebsrv orcid osd ottr owms
+            pair pand pato pcdmuse pcdt pep persee pmc pop provinsi qbe
+            rankrage rdare rdax s3n s4bldg s4envi salad sciprov scra seeds
+            sfn shacl smartapi sosa ssno sto svcs task td tg tosh tsn
+            tsnchange ttla ttp tui tx umls vehma vehman ver w3cgeo
+ - changed: bag content doas eat geo geom jerm jpost mime mv og orth premis
+            purl saref sem sg sgg
+
+ - Test on Perl 5.26 instead of 5.12
+
+20180213  2018-02-13 10:16:58 CET
+
 20170111  2017-01-11 17:02:03 CET
  - 1922 prefixes
  - added:   apf art asawoo bb bblfish biml bioc cdt clinic cpack crime
@@ -16,7 +40,7 @@
             ogc res role san seas units verb wikipedia wp
 
 
-20170111  2017-01-11 17:02:03 CET
+20180213  2018-02-13 10:16:58 CET
 
 20160409  2016-04-09 14:03:22 CEST
  - 1793 prefixes

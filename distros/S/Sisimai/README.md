@@ -1,10 +1,10 @@
-![](http://libsisimai.org/static/images/logo/sisimai-x01.png)
+![](https://libsisimai.org/static/images/logo/sisimai-x01.png)
 
 [![License](https://img.shields.io/badge/license-BSD%202--Clause-orange.svg)](https://github.com/sisimai/p5-Sisimai/blob/master/LICENSE)
 [![Coverage Status](https://img.shields.io/coveralls/sisimai/p5-Sisimai.svg)](https://coveralls.io/r/sisimai/p5-Sisimai)
 [![Build Status](https://travis-ci.org/sisimai/p5-Sisimai.svg?branch=master)](https://travis-ci.org/sisimai/p5-Sisimai) 
 [![Perl](https://img.shields.io/badge/perl-v5.10--v5.26-blue.svg)](https://www.perl.org)
-[![CPAN](https://img.shields.io/badge/cpan-v4.22.3-blue.svg)](https://metacpan.org/pod/Sisimai)
+[![CPAN](https://img.shields.io/badge/cpan-v4.22.4-blue.svg)](https://metacpan.org/pod/Sisimai)
 
 - [**README-JA(日本語)**](README-JA.md)
 - [What is Sisimai](#what-is-sisimai)
@@ -43,7 +43,7 @@ structured data from parsed results. Sisimai is the system formerly known as
 bounceHammer 4. __Sisimai__ is a coined word: Sisi (the number 4 is pronounced
 __Si__ in Japanese) and MAI (acronym of __Mail Analyzing Interface__).
 
-![](http://libsisimai.org/static/images/figure/sisimai-overview-1.png)
+![](https://libsisimai.org/static/images/figure/sisimai-overview-1.png)
 
 Key features
 -------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ Command line demo
 -------------------------------------------------------------------------------
 The following screen shows a demonstration of Sisimai at the command line using
 Perl(p5-Sisimai) and Ruby(rb-Sisimai) version of Sisimai.
-![](http://libsisimai.org/static/images/demo/sisimai-dump-01.gif)
+![](https://libsisimai.org/static/images/demo/sisimai-dump-01.gif)
 
 Setting Up Sisimai
 ===============================================================================
@@ -74,7 +74,7 @@ Setting Up Sisimai
 System requirements
 -------------------------------------------------------------------------------
 More details about system requirements are available at
-[Sisimai | Getting Started](http://libsisimai.org/en/start) page.
+[Sisimai | Getting Started](https://libsisimai.org/en/start/) page.
 
 * [Perl 5.10.1 or later](http://www.perl.org/)
 * [__Class::Accessor::Lite__](https://metacpan.org/pod/Class::Accessor::Lite)
@@ -211,7 +211,7 @@ print $data->[0]->catch->{'x-mailer'};    # Apple Mail (2.1283)
 ```
 
 More information about the callback feature is available at
-[Sisimai | How To Parse - Callback](http://libsisimai.org/en/usage/#callback)
+[Sisimai | How To Parse - Callback](https://libsisimai.org/en/usage/#callback)
 Page.
 
 One-Liner
@@ -225,7 +225,7 @@ $ perl -MSisimai -lE 'print Sisimai->dump(shift)' /path/to/mbox
 
 Output example
 -------------------------------------------------------------------------------
-![](http://libsisimai.org/static/images/demo/sisimai-dump-02.gif)
+![](https://libsisimai.org/static/images/demo/sisimai-dump-02.gif)
 
 ```json
 [{"rhost": "mx.example.co.jp","recipient": "filtered@example.co.jp","token": "01b88ad40b2f7089a6b1986ade14d323aaad9da2","deliverystatus": "5.2.1","smtpcommand": "RCPT","alias": "filtered@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.2.1 <filtered@example.co.jp>... User Unknown","lhost": "smtp.example.com","replycode": "550","reason": "userunknown","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp"},{"lhost": "smtp.example.com","reason": "userunknown","replycode": "550","destination": "example.co.jp","action": "failed","softbounce": 0,"timezoneoffset": "+0000","diagnostictype": "SMTP","feedbacktype": "","listid": "","timestamp": 1403375674,"senderdomain": "example.jp","rhost": "mx.example.co.jp","recipient": "userunknown@example.co.jp","deliverystatus": "5.1.1","token": "948ed89b794207632dbab0ce3b72175553d9de83","smtpcommand": "RCPT","alias": "userunknown@example.co.jp","addresser": "kijitora@example.jp","subject": "test","smtpagent": "Email::Postfix","messageid": "","diagnosticcode": "550 5.1.1 <userunknown@example.co.jp>... User Unknown"}]
@@ -238,7 +238,7 @@ Differences between bounceHammer and Sisimai
 -------------------------------------------------------------------------------
 The following table show the differences between ver.2 (bounceHammer 2.7.13p3)
 and Sisimai. More information about differences are available at
-[Sisimai | Differences](http://libsisimai.org/en/diff) page.
+[Sisimai | Differences](https://libsisimai.org/en/diff/) page.
 
 | Features                                       | bounceHammer  | Sisimai     |
 |------------------------------------------------|---------------|-------------|
@@ -248,7 +248,7 @@ and Sisimai. More information about differences are available at
 | WebUI/API                                      | Included      | N/A         |
 | Database schema for storing parsed bounce data | Available     | N/A[1]      |
 | Analytical precision ratio(2000 emails)[2]     | 0.49          | 1.00        |
-| The speed of parsing email(1000 emails)        | 4.24s         | 2.10s       |
+| The speed of parsing email(1000 emails)        | 4.24s         | 1.95s       |
 | The number of detectable bounce reasons        | 19            | 29          |
 | Parse 2 or more bounces in a single email      | Only 1st rcpt | ALL         |
 | Parse FeedBack Loop Message/ARF format mail    | Unable        | OK          |
@@ -257,7 +257,7 @@ and Sisimai. More information about differences are available at
 | Easy to install                                | No            | Yes         |
 | Install using cpan, cpanm, or cpm command      | N/A           | OK          |
 | Dependencies (Except core modules of Perl)     | 24 modules    | 2 modules   |
-| LOC:Source lines of code                       | 18200 lines   | 9800 lines  |
+| LOC:Source lines of code                       | 18200 lines   | 8700 lines  |
 | The number of tests in t/, xt/ directory       | 27365 tests   | 230000 tests|
 | License                                        | GPLv2 or Perl | 2 clause BSD|
 | Support Contract provided by Developer         | End Of Sales  | Available   |
@@ -267,9 +267,9 @@ and Sisimai. More information about differences are available at
 
 Other specification of Sisimai
 -------------------------------------------------------------------------------
-- [**Parser Engines**](http://libsisimai.org/en/engine)
-- [**Bounce Reason List**](http://libsisimai.org/en/reason)
-- [**Data Structure of Sisimai::Data**](http://libsisimai.org/en/data)
+- [**Parser Engines**](https://libsisimai.org/en/engine/)
+- [**Bounce Reason List**](https://libsisimai.org/en/reason/)
+- [**Data Structure of Sisimai::Data**](https://libsisimai.org/en/data/)
 
 
 Contributing
@@ -293,7 +293,7 @@ Other Information
 Related sites
 -------------------------------------------------------------------------------
 * __@libsisimai__ | [Sisimai on Twitter (@libsisimai)](https://twitter.com/libsisimai)
-* __libSISIMAI.ORG__ | [Sisimai | The Successor To bounceHammer, Library to parse bounce mails](http://libsisimai.org/)
+* __libSISIMAI.ORG__ | [Sisimai | The Successor To bounceHammer, Library to parse bounce mails](https://libsisimai.org/)
 * __Sisimai Blog__ | [blog.libsisimai.org](http://blog.libsisimai.org/)
 * __Facebook Page__ | [facebook.com/libsisimai](https://www.facebook.com/libsisimai/)
 * __GitHub__ | [github.com/sisimai/p5-Sisimai](https://github.com/sisimai/p5-Sisimai)
@@ -318,7 +318,7 @@ Author
 
 Copyright
 ===============================================================================
-Copyright (C) 2014-2017 azumakuniyuki, All Rights Reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All Rights Reserved.
 
 License
 ===============================================================================

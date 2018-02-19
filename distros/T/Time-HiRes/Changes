@@ -1,5 +1,15 @@
 Revision history for the Perl extension Time::HiRes.
 
+1.9754 [2018-02-16]
+ - unify the gettimeofday() and time() forked code
+   that had near identical code paths for MacOS Classic
+   (which has two unusual features: unsigned time_t,
+   and a special tz struct member), and for non-MacOS Classic
+ - tv_interval should be implemented in XS
+   [rt.cpan.org #106456]
+   thanks to Sergey Aleynikov (suggested implementation simplified
+   by the above-mentioned MacOS Classic simplification)
+
 1.9753 [2018-01-11]
  - in t/clock.t in a fast system we need to burn more CPU,
    reported and fix suggested by Joel C. Maslak <jmaslak@antelope.net>

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use charnames qw< :full >;
 use Carp qw(croak carp);

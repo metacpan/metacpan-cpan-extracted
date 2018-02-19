@@ -1,7 +1,7 @@
 # tms() and other time stuff
 # make test
 # perl Makefile.PL; make; perl -Iblib/lib t/27_tms.t
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More;
 use Digest::MD5 'md5_hex';
 if( $^O=~/(?<!cyg)win/i ) { plan skip_all => 'POSIX::tzset not ok on windows'  }

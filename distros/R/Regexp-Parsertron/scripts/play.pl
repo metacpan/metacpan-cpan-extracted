@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use v5.10.1;
 use strict;
 use warnings;
 
@@ -63,24 +62,23 @@ for my $key (sort keys %input)
 		{
 			$found = $parser -> find($target);
 
-			say "uids of nodes whose text matches =>$target<=: ", join(', ', @$found);
+			print "uids of nodes whose text matches =>$target<=: ", join(', ', @$found), "\n";
 		}
 
 		$result = $parser -> validate;
 
-		say "Calling validate() on $s: $result (0 is success)";
-		say "Case: $key. as_string: $as_string. result: $result (0 is success)";
+		print "Calling validate() on $s: $result (0 is success) \n";
+		print "Case: $key. as_string: $as_string. result: $result (0 is success) \n";
 	}
 	catch
 	{
-		say $_;
+		print $_, "\n";
 	};
 
-	say '-' x 100;
+	print '-' x 100, "\n";
 
 	$parser -> reset;
 }
 
-print "Statistics: ";
-print "$_: $stats{$_}. " for (sort keys %stats);
-say '';
+print "Statistics: \n";
+print "$_: $stats{$_}. \n" for (sort keys %stats);

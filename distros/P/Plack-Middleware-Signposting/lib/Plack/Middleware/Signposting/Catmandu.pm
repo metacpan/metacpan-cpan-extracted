@@ -1,6 +1,6 @@
 package Plack::Middleware::Signposting::Catmandu;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Catmandu::Sane;
 use Catmandu;
@@ -8,7 +8,6 @@ use Catmandu::Fix;
 use Plack::Request;
 use Plack::Util::Accessor;
 use Moo;
-use parent 'Plack::Middleware';
 
 extends 'Plack::Middleware::Signposting';
 

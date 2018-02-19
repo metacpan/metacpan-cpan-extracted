@@ -4,22 +4,21 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'    => qr/[@]googlemail[.]com[>]?\z/,
-    'subject' => qr/Delivery[ ]Status[ ]Notification/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Delivery to the following recipient'],
+    'error'   => ['The error that the other server returned was:'],
 };
-my $Re1 = {
-    'begin'   => qr/Delivery to the following recipient/,
+my $MarkingsOf = {
     'start'   => qr/Technical details of (?:permanent|temporary) failure:/,
-    'error'   => qr/The error that the other server returned was:/,
     'rfc822'  => qr{\A(?:
          -----[ ]Original[ ]message[ ]-----
         |[ \t]*-----[ ]Message[ ]header[ ]follows[ ]-----
         )\z
     }x,
-    'endof'   => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
 };
-my $ReFailure = {
+
+my $ReFailures = {
     'expired' => qr{(?:
          DNS[ ]Error:[ ]Could[ ]not[ ]contact[ ]DNS[ ]servers
         |Delivery[ ]to[ ]the[ ]following[ ]recipient[ ]has[ ]been[ ]delayed
@@ -105,12 +104,9 @@ my $StateTable = {
     # 550 550 Unknown user *****@***.**.*** (state 18).
     '18' => { 'command' => 'DATA', 'reason' => 'filtered' },
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 sub headerlist  { return ['X-Failed-Recipients'] }
-sub pattern     { return $Re0 }
 sub description { 'Google Gmail: https://mail.google.com' }
-
 sub scan {
     # Detect an error from Google Gmail
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -147,15 +143,15 @@ sub scan {
     #
     #   -- OR --
     #   THIS IS A WARNING MESSAGE ONLY.
-    #   
+    #
     #   YOU DO NOT NEED TO RESEND YOUR MESSAGE.
-    #   
+    #
     #   Delivery to the following recipient has been delayed:
-    #   
+    #
     #        mailboxfull@example.jp
-    #   
+    #
     #   Message will be retried for 2 more day(s)
-    #   
+    #
     #   Technical details of temporary failure:
     #   Google tried to deliver your message, but it was rejected by the recipient
     #   domain. We recommend contacting the other email provider for further infor-
@@ -165,18 +161,18 @@ sub scan {
     #   -- OR --
     #
     #   Delivery to the following recipient failed permanently:
-    #   
+    #
     #        userunknown@example.jp
-    #   
+    #
     #   Technical details of permanent failure:=20
     #   Google tried to deliver your message, but it was rejected by the server for=
     #    the recipient domain example.jp by mx.example.jp. [192.0.2.59].
-    #   
+    #
     #   The error that the other server returned was:
     #   550 5.1.1 <userunknown@example.jp>... User Unknown
     #
-    return undef unless $mhead->{'from'}    =~ $Re0->{'from'};
-    return undef unless $mhead->{'subject'} =~ $Re0->{'subject'};
+    return undef unless index($mhead->{'from'}, '<mailer-daemon@googlemail.com>') > -1;
+    return undef unless index($mhead->{'subject'}, 'Delivery Status Notification') > -1;
 
     require Sisimai::Address;
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -190,15 +186,15 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            $readcursor |= $Indicators->{'deliverystatus'} if $e =~ $Re1->{'begin'};
+            $readcursor |= $Indicators->{'deliverystatus'} if index($e, $StartingOf->{'message'}->[0]) > -1;
         }
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -235,7 +231,7 @@ sub scan {
             #
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[ \t]+([^ ]+[@][^ ]+)\z/ ) {
+            if( $e =~ /\A[ \t]+([^ ]+[@][^ ]+)\z/ ) {
                 # kijitora@example.jp: 550 5.2.2 <kijitora@example>... Mailbox Full
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -253,23 +249,22 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
+
     require Sisimai::String;
     require Sisimai::SMTP::Status;
-
     for my $e ( @$dscontents ) {
         $e->{'agent'}     = __PACKAGE__->smtpagent;
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
         unless( $e->{'rhost'} ) {
             # Get the value of remote host
-            if( $e->{'diagnosis'} =~ m/[ \t]+by[ \t]+([^ ]+)[.][ \t]+\[(\d+[.]\d+[.]\d+[.]\d+)\][.]/ ) {
+            if( $e->{'diagnosis'} =~ /[ \t]+by[ \t]+([^ ]+)[.][ \t]+\[(\d+[.]\d+[.]\d+[.]\d+)\][.]/ ) {
                 # Google tried to deliver your message, but it was rejected by # the server 
                 # for the recipient domain example.jp by mx.example.jp. [192.0.2.153].
                 my $hostname = $1;
                 my $ipv4addr = $2;
-                if( $hostname =~ m/[-0-9a-zA-Z]+[.][a-zA-Z]+\z/ ) {
+                if( $hostname =~ /[-0-9a-zA-Z]+[.][a-zA-Z]+\z/ ) {
                     # Maybe valid hostname
                     $e->{'rhost'} = $hostname;
                 } else {
@@ -279,7 +274,7 @@ sub scan {
             }
         }
 
-        $statecode0 = $1 if $e->{'diagnosis'} =~ m/[(]state[ ](\d+)[)][.]/;
+        $statecode0 = $1 if $e->{'diagnosis'} =~ /[(]state[ ](\d+)[)][.]/;
         if( exists $StateTable->{ $statecode0 } ) {
             # (state *)
             $e->{'reason'}  = $StateTable->{ $statecode0 }->{'reason'};
@@ -287,9 +282,9 @@ sub scan {
 
         } else {
             # No state code
-            SESSION: for my $r ( keys %$ReFailure ) {
+            SESSION: for my $r ( keys %$ReFailures ) {
                 # Verify each regular expression of session errors
-                next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+                next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
                 $e->{'reason'} = $r;
                 last;
             }
@@ -298,10 +293,9 @@ sub scan {
 
         # Set pseudo status code
         $e->{'status'} = Sisimai::SMTP::Status->find($e->{'diagnosis'});
-        if( $e->{'status'} =~ m/\A[45][.][1-7][.][1-9]\z/ ) {
+        if( $e->{'status'} =~ /\A[45][.][1-7][.][1-9]\z/ ) {
             # Override bounce reason 
             $e->{'reason'} = Sisimai::SMTP::Status->name($e->{'status'});
-
         }
     }
 
@@ -352,7 +346,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

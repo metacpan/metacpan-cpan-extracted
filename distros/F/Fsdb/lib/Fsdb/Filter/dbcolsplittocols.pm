@@ -2,7 +2,7 @@
 
 #
 # dbcolsplittocols.pm
-# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -253,18 +253,18 @@ sub setup($) {
     pod2usage(2) if (!defined($self->{_target_column}));
 
     $self->{_target_coli} = $self->{_in}->col_to_i($self->{_target_column});
-    croak $self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n"
+    croak($self->{_prog} . ": target column " . $self->{_target_column} . " is not in input stream.\n")
 	if (!defined($self->{_target_coli}));
 
     # Sanity check user's input to avoid injection attacks.
-    croak $self->{_prog} . ": bad element separator.\n"
+    croak($self->{_prog} . ": bad element separator.\n")
 	if ($self->{_elem_separator} =~ /\'/);
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     my(@new_columns);
     if ($self->{_enumerate}) {
 	# xxx: need to estimate how many we need, but we can't do that.
-	croak $self->{_prog} . ": enumeration is not currently supported\n";
+	croak($self->{_prog} . ": enumeration is not currently supported\n");
     } else {
         if (defined($self->{_destination_column_list})) {
             @new_columns = split(/[\s+]/, $self->{_destination_column_list});
@@ -282,7 +282,7 @@ sub setup($) {
     my $new_ci = 0;
     foreach (@new_columns) {
 	$self->{_out}->col_create($_)
-	    or croak $self->{_prog} . ": cannot create column " . $_ . " (maybe it already existed?)\n";
+	    or croak($self->{_prog} . ": cannot create column " . $_ . " (maybe it already existed?)\n");
 	my $i = $self->{_out}->col_to_i($_);
 	push(@new_colis, $i);
 	$code .= '$fref->[' . $i . '] = $p[' . $new_ci . '];' . "\n";
@@ -313,13 +313,13 @@ sub run ($) {
     }';
     print $loop if ($self->{_debug});
     eval $loop;
-    $@ && croak $self->{_prog} . ": interal eval error: $@.\n";
+    $@ && croak($self->{_prog} . ": interal eval error: $@.\n");
 }
 
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

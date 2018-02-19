@@ -58,12 +58,16 @@
       },
       "test" : {
          "recommends" : {
-            "Software::License" : "0.103008"
+            "File::BaseDir" : "0",
+            "List::MoreUtils" : "0",
+            "Software::License" : "0.103008",
+            "YAML::XS" : "0"
          },
          "requires" : {
+            "File::Basename" : "0",
+            "Test::Builder::Module" : "0",
             "Test::More" : "0.98",
             "Test::Requires" : "0",
-            "Test::Roo" : "0",
             "Test::Script" : "1.09",
             "UNIVERSAL::require" : "0"
          }
@@ -72,7 +76,7 @@
    "provides" : {
       "App::Licensecheck" : {
          "file" : "lib/App/Licensecheck.pm",
-         "version" : "v3.0.32"
+         "version" : "v3.0.33"
       }
    },
    "release_status" : "stable",
@@ -90,13 +94,13 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project"
    },
-   "version" : "v3.0.32",
+   "version" : "v3.0.33",
    "x_contributors" : [
       "Paul Wise <pabs@debian.org>"
    ],
    "x_help_wanted" : [
-      "documenter",
-      "tester"
+      "tester",
+      "documenter"
    ],
    "x_provides_scripts" : {
       "licensecheck" : {

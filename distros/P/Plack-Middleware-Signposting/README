@@ -1,14 +1,29 @@
 NAME
 
     Plack::Middleware::Signposting - a base class for Plack implementations
-    of the <Signposting>( https://signposting.org) protocol
+    of the Signposting <https://signposting.org> protocol
+
+SYNOPSIS
+
+        package Plack::Middleware::Signposting::Foo;
+    
+        use Moo;
+    
+        extends 'Plack::Middleware::Signposting';
+    
+        sub call {
+            my ($self, $env) = @_;
+    
+            ...
+            my @data = ("0001", $relation, $type);
+            $self->to_link_format(\@data);
+        }
 
 METHODS
 
-      * to_link_format(ARRAYREF)
+      * to_link_format(\@ARRAY)
 
-      This method produces the format for the link header. It expects an
-      arrayref as input.
+      This method produces the format for the link header.
 
 MODULES
 

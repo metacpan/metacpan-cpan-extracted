@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_logger;
 #ABSTRACT: XPRESS logging module
-$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.613';
+$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.620';
 
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -598,11 +598,11 @@ Lab::XPRESS::Data::XPRESS_logger - XPRESS logging module
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler

@@ -2,6 +2,8 @@ Changes
 Makefile.PL
 MANIFEST			This list of files
 README
+SEC.xs
+typemap
 demo/getkeyset.pl
 demo/key2ds
 demo/make-signed-keyset
@@ -12,6 +14,8 @@ lib/Net/DNS/SEC/DSA.pm
 lib/Net/DNS/SEC/ECDSA.pm
 lib/Net/DNS/SEC/ECCGOST.pm
 lib/Net/DNS/SEC/RSA.pm
+lib/Net/DNS/SEC/libcrypto.pod
+t/00-install.t
 t/00-load.t
 t/00-pod.t
 t/10-keyset.t
@@ -20,7 +24,6 @@ t/22-RSA-SHA1.t
 t/23-RSA-SHA256.t
 t/24-RSA-SHA512.t
 t/31-DSA-SHA1.t
-t/41-ECC-GOST.t
 t/51-ECDSA-P256.t
 t/52-ECDSA-P384.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

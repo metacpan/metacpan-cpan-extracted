@@ -2,8 +2,8 @@ NAME
     App::cpanm::perlancar - Install modules from CPAN (PERLANCAR's flavor)
 
 VERSION
-    This document describes version 0.002 of App::cpanm::perlancar (from
-    Perl distribution App-cpanm-perlancar), released on 2018-01-15.
+    This document describes version 0.003 of App::cpanm::perlancar (from
+    Perl distribution App-cpanm-perlancar), released on 2018-02-18.
 
 DESCRIPTION
     See the included cpanm-perlancar script.

@@ -14,7 +14,7 @@ use Types::Common::Numeric qw(PositiveOrZeroNum);
 
 use Moo::Role;
 
-our $VERSION = '0.04'; # from Piper-0.04.tar.gz
+our $VERSION = '0.05'; # from Piper-0.05.tar.gz
 
 #TODO: Look into making this Log::Any-compatible
 
@@ -162,7 +162,7 @@ These methods should be used to determine the appropriate debug and verbosity le
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

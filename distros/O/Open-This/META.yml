@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/oalders/open-this/issues
   homepage: https://github.com/oalders/open-this
   repository: https://github.com/oalders/open-this.git
-version: '0.000004'
+version: '0.000005'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -71,7 +71,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Author::OALDERS/CheckChangesHasContent'
@@ -82,11 +82,11 @@ x_Dist_Zilla:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::OALDERS/MakeMaker'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@Author::OALDERS/CPANFile'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ContributorsFile
       name: '@Author::OALDERS/ContributorsFile'
@@ -94,31 +94,31 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::OALDERS/MetaJSON'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::OALDERS/MetaYAML'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::OALDERS/Manifest'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::OALDERS/MetaNoIndex'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::OALDERS/MetaConfig'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Author::OALDERS/MetaResources'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::OALDERS/License'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::OALDERS/InstallGuide'
@@ -130,11 +130,11 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: '@Author::OALDERS/Prereqs'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
@@ -146,13 +146,14 @@ x_Dist_Zilla:
           stopwords:
             - Alders
             - "Alders'"
+            - libs
           wordlist: Pod::Wordlist
       name: '@Author::OALDERS/Test::PodSpelling'
       version: '2.007005'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::OALDERS/PodCoverageTests'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -163,7 +164,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Author::OALDERS/TestRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::OALDERS/Test::ReportPrereqs'
@@ -264,7 +265,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::OALDERS/PruneCruft'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@Author::OALDERS/CopyFilesFromBuild'
@@ -346,7 +347,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::OALDERS/ShareDir'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::TravisCI::StatusBadge
       name: '@Author::OALDERS/TravisCI::StatusBadge'
@@ -354,11 +355,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::OALDERS/UploadToCPAN'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -366,7 +367,7 @@ x_Dist_Zilla:
           phase: develop
           type: recommends
       name: '@Author::OALDERS/@Git::VersionManager/pluginbundle version'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::RewriteVersion::Transitional
       config:
@@ -425,7 +426,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000004
+          tag: v0.000005
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -450,7 +451,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::OALDERS/@Git::VersionManager/NextRelease'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -487,48 +488,48 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.010'
+      version: '6.011'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.010'
+      version: '6.011'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.010'
+    version: '6.011'
 x_contributors:
   - 'Olaf Alders <olaf@wundersolutions.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

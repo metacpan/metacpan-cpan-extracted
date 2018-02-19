@@ -1,0 +1,13 @@
+Changes
+Emergency.md
+lib/Magrathea/API.pm
+lib/Magrathea/API/Abbreviation.pm
+lib/Magrathea/API/Emergency.pm
+lib/Magrathea/API/Status.pm
+Makefile.PL
+MANIFEST
+README
+README.md
+t/Magrathea-API.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

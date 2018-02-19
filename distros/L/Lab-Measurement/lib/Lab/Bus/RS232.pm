@@ -1,6 +1,6 @@
 package Lab::Bus::RS232;
 #ABSTRACT: RS232 or Virtual Comm port bus
-$Lab::Bus::RS232::VERSION = '3.613';
+$Lab::Bus::RS232::VERSION = '3.620';
 use strict;
 use warnings;
 
@@ -305,7 +305,7 @@ Lab::Bus::RS232 - RS232 or Virtual Comm port bus
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -368,7 +368,7 @@ Probably many. So far BrutalRead and Clear are not implemented because not neede
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2010       Andreas K. Huettel
             2011-2012  Andreas K. Huettel, Florian Olbrich

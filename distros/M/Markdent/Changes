@@ -1,3 +1,13 @@
+0.30   2018-02-18
+
+- Require Perl 5.10. Perl 5.8.x has very weird parsing failures on valid Perl
+  code in this distribution.
+
+- Specify required versions of Params::ValidationCompiler and Test2::V0. This
+  module does not work with just any versions of those two. Fixed by Denis
+  Ibaev. GitHub #11.
+
+
 0.29   2017-12-31
 
 - Make the GitHub dialect look for fenced code blocks before other types of

@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PodVersion 6.010;
+package Dist::Zilla::Plugin::PodVersion 6.011;
 # ABSTRACT: add a VERSION head1 to each Perl document
 
 use Moose;
@@ -17,6 +17,11 @@ use namespace::autoclean;
 #pod distribution, indicating the version of the dist being built.  This section is
 #pod added after C<=head1 NAME>.  If there is no such section, the version section
 #pod will not be added.
+#pod
+#pod Note that this plugin is not useful if you are using the
+#pod L<[PodWeaver]|Dist::Zilla::Plugin::PodWeaver> plugin, as it also adds a
+#pod C<=head1 VERSION> section (via the L<[Version]|Pod::Weaver::Section::Version>
+#pod section).
 #pod
 #pod =cut
 
@@ -98,7 +103,7 @@ Dist::Zilla::Plugin::PodVersion - add a VERSION head1 to each Perl document
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 DESCRIPTION
 
@@ -106,6 +111,11 @@ This plugin adds a C<=head1 VERSION> section to most perl files in the
 distribution, indicating the version of the dist being built.  This section is
 added after C<=head1 NAME>.  If there is no such section, the version section
 will not be added.
+
+Note that this plugin is not useful if you are using the
+L<[PodWeaver]|Dist::Zilla::Plugin::PodWeaver> plugin, as it also adds a
+C<=head1 VERSION> section (via the L<[Version]|Pod::Weaver::Section::Version>
+section).
 
 =head1 SEE ALSO
 
@@ -120,7 +130,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

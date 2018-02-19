@@ -1,5 +1,14 @@
 Revision history for groupsecret.
 
+0.304     2018-02-14 21:11:33-07:00 MST7MDT
+
+  * Now explicitly required Getopt::Long 2.38. Thanks cpantesters!
+
+0.303     2018-02-14 09:28:23-07:00 MST7MDT
+
+  * Improve error messages.
+  * Allow finding pubkeys that are symlinks.
+
 0.302     2017-12-02 11:28:57-07:00 MST7MDT
 
   * Documentation fixes.

@@ -10,13 +10,12 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Test::Most: '0'
-  blib: '1.01'
   perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150001'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,34 +28,34 @@ no_index:
 provides:
   Piper:
     file: lib/Piper.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Config:
     file: lib/Piper/Config.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Instance:
     file: lib/Piper/Instance.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Logger:
     file: lib/Piper/Logger.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Path:
     file: lib/Piper/Path.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Process:
     file: lib/Piper/Process.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Queue:
     file: lib/Piper/Queue.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Role::Logger:
     file: lib/Piper/Role/Logger.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Role::Queue:
     file: lib/Piper/Role/Queue.pm
-    version: '0.04'
+    version: '0.05'
   Piper::Role::Segment:
     file: lib/Piper/Role/Segment.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -78,7 +77,7 @@ resources:
   bugtracker: https://github.com/regina-verbae/Piper/issues
   homepage: http://metacpan.org/release/Piper/
   repository: git://github.com/regina-verbae/Piper.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:EHLERS
 x_contributors:
   - 'Tim Heaney <oylenshpeegul@gmail.com>'

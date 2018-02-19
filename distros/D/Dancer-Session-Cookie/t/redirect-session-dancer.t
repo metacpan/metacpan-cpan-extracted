@@ -5,16 +5,13 @@ use warnings;
 
 use Test::More import => ["!pass"];
 
-plan skip_all => "Plack::Test required" unless eval {
-    require Plack::Test;
+use Test::Requires {
+    'Plack::Test'   => 0,
+    'HTTP::Cookies' => 0,
+    # available from Plack::Test
+    'HTTP::Request::Common' => 0,
 };
 
-plan skip_all => "HTTP::Cookies required" unless eval {
-    require HTTP::Cookies;
-};
-
-# available from Plack::Test
-require HTTP::Request::Common;
 
 sub mk_request {
     my ( $app, $jar, $url, $check_ok ) = @_;

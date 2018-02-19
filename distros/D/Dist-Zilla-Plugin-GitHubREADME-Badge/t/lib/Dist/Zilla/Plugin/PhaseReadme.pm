@@ -1,8 +1,8 @@
-use strict;
-use warnings;
-
 package # no_index
   Dist::Zilla::Plugin::PhaseReadme;
+
+use strict;
+use warnings;
 
 use Moose;
 with qw(

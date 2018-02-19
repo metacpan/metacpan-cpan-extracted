@@ -10,23 +10,30 @@ use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use Hash::Util qw(lock_hash);
 use Exporter 'import';
+use Log::Log4perl 1.48 qw(get_logger :levels);
+use Carp;
+use HTML::TreeBuilder::XPath 0.14;
 
-our @EXPORT_OK = qw(read_config main_loop get_browser %MAP);
+our @EXPORT_OK = qw(read_config main_loop get_browser %MAP config_logger);
+our %MAP       = (
+    'check_only' => 'n',
+    'all'        => 'a',
+    'stupid'     => 's',
+    'alt_code'   => 'c',
+    'alt_user'   => 'l',
+    'verbosity'  => 'V',
+);
 
-our %MAP = (
-    'nothing'     => 'n',
-    'all'         => 'a',
-    'stupid'      => 's',
-    'quiet'       => 'q',
-    'alt_code'    => 'c',
-    'alt_user'    => 'l',
-    'info_level'  => 'd',
-    'debug_level' => 'D'
+my %regexes = (
+    no_user_id    => qr/\>No userid found\</i,
+    next_id       => qr/sc\?id\=(.*?)\"\>/i,
+    http_500      => qr/500/,
+    too_old_email => qr/Sorry, this email is too old/i,
 );
 
 lock_hash(%MAP);
 
-our $VERSION = '0.7'; # VERSION
+our $VERSION = '0.9'; # VERSION
 
 =head1 NAME
 
@@ -38,7 +45,7 @@ SpamcupNG - module to export functions for spamcup program
 
 =head1 DESCRIPTION
 
-Spamcup NG is a Perl web crawler for finishing Spamcop.net reports automatically. This module implements the functions used by the spamcup program.
+SpamcupNG is a Perl web crawler for finishing Spamcop.net reports automatically. This module implements the functions used by the spamcup program.
 
 See the README.md file on this project for more details.
 
@@ -65,7 +72,19 @@ sub read_config {
     my ( $cfg, $cmd_opts ) = @_;
     my $data = LoadFile($cfg);
 
+    # sanity checking
+    for my $opt ( keys( %{ $data->{ExecutionOptions} } ) ) {
+        die
+"$opt is not a valid option for configuration files. Check the documentation."
+          unless ( exists( $MAP{$opt} ) );
+    }
+
     for my $opt ( keys(%MAP) ) {
+
+        if ( $opt eq 'verbosity' ) {
+            $cmd_opts->{'V'} = $data->{ExecutionOptions}->{$opt};
+            next;
+        }
 
         if ( exists( $data->{ExecutionOptions}->{$opt} )
             and ( $data->{ExecutionOptions}->{$opt} eq 'y' ) )
@@ -105,9 +124,104 @@ sub get_browser {
 
 =pod
 
+=head2 config_logger
+
+Configures a L<Log::Log4perl> object, as defined by the verbosity parameter (-V in the command line).
+
+Expected parameters:
+
+=over
+
+=item *
+
+level
+
+=item *
+
+path to a log file
+
+=back
+
+If the verbosity is set to DEBUG, all messages will be sent to a log file opened as C<spamcup.log> in append mode.
+
+Otherwise, all messages will be sent to C<STDOUT>.
+
+Verbosity modes are:
+
+=over
+
+=item *
+
+DEBUG
+
+=item *
+
+INFO
+
+=item *
+
+WARN
+
+=item *
+
+ERROR
+
+=item *
+
+FATAL
+
+=back
+
+Depending on the verbosity level, more or less information you be provided. See L<Log::Log4perl> for more details about the levels.
+
+=cut
+
+sub config_logger {
+    my ( $level, $log_file ) = @_;
+    croak "Must receive a string for the level parameter"
+      unless ( ( defined($level) ) and ( $level ne '' ) );
+    croak "Must receive a string for the log file parameter"
+      unless ( ( defined($log_file) ) and ( $log_file ne '' ) );
+
+# :TODO:21/01/2018 12:07:01:ARFREITAS: Do we need to import :levels from Log::Log4perl at all?
+    my %levels = (
+        DEBUG => $DEBUG,
+        INFO  => $INFO,
+        WARN  => $WARN,
+        ERROR => $ERROR,
+        FATAL => $FATAL
+    );
+    croak "The value '$level' is not a valid value for level"
+      unless ( exists( $levels{$level} ) );
+
+    my $conf;
+
+    if ( $level eq 'DEBUG' ) {
+        $conf = qq(
+log4perl.category.SpamcupNG = DEBUG, Logfile
+log4perl.appender.Logfile          = Log::Log4perl::Appender::File
+log4perl.appender.Logfile.filename = $log_file
+log4perl.appender.Logfile.layout   = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.Logfile.layout.ConversionPattern = [%d] - %p - %F %L - %m%n
+	);
+    }
+    else {
+        $conf = qq(
+log4perl.category.SpamcupNG = $level, Screen
+log4perl.appender.Screen = Log::Log4perl::Appender::Screen
+log4perl.appender.Screen.stderr = 0
+log4perl.appender.Screen.layout = Log::Log4perl::Layout::SimpleLayout
+		);
+    }
+
+    Log::Log4perl::init( \$conf );
+}
+
+=pod
+
 =head2 main_loop
 
-Processes all the pending spam reports in a loop until finished.
+Processes all the pending SPAM reports in a loop until finished.
 
 Expects as parameter (in this sequence):
 
@@ -133,15 +247,11 @@ pass => The password to Spamcop
 
 =item *
 
-debug => true (1) or false (0) to enable/disable debug information
-
-=item *
-
 delay => time in seconds to wait for next iteration with Spamcop website
 
 =item *
 
-quiet => true (1) or false (0) to enable/disable messages
+verbosity => defines what level of information should be provided. Uses the same values as defined by L<Log::Log4perl>.
 
 As confusing as it seems, current implementation may accept debug messages
 B<and> disable other messages.
@@ -158,35 +268,11 @@ Returns true if everything went right, or C<die> if a fatal error happened.
 
 =cut
 
-# :TODO:23/04/2017 16:04:17:ARFREITAS: probably this sub is too large
-# It should be refactored to at least separate the parsing from HTML content recover
-sub main_loop {
+sub _self_auth {
     my ( $ua, $opts_ref ) = @_;
-
-    # last seen SPAM id
-    my $last_seen;
-
-    # Get first page that contains link to next one...
-
-# :TODO:23/04/2017 17:06:59:ARFREITAS: replace all this debugging checks with Log::Log4perl
-    if ( $opts_ref->{debug} ) {
-        if ( $opts_ref->{pass} ) {
-            print 'D: GET http://', $opts_ref->{ident},
-              ':******@members.spamcop.net/', "\n";
-        }
-        else {
-            print 'D: GET http://www.spamcop.net/?code=', $opts_ref->{ident},
-              "\n";
-        }
-    }
-
-    if ( $opts_ref->{debug} ) {
-        print 'D: sleeping for ', $opts_ref->{delay}, " seconds.\n";
-    }
-
-    sleep $opts_ref->{delay};
-
+    my $logger = get_logger('SpamcupNG');
     my $req;
+    my $auth_is_ok = 0;
 
     if ( $opts_ref->{pass} ) {
         $req = HTTP::Request->new( GET => 'http://members.spamcop.net/' );
@@ -198,160 +284,205 @@ sub main_loop {
             GET => 'http://www.spamcop.net/?code=' . $opts_ref->{ident} );
     }
 
+    if ( $logger->is_debug() ) {
+        $logger->debug( "Request details:\n" . $req->as_string );
+    }
+
     my $res = $ua->request($req);
+
+    if ( $logger->is_debug() ) {
+        $logger->debug( "Got HTTP response:\n" . $res->as_string );
+    }
 
     # verify response
     if ( $res->is_success ) {
-        if ( $opts_ref->{debug} ) {
-            print "D: Got HTTP response\n";
-        }
+        $auth_is_ok = 1;
     }
     else {
-        my $response = $res->status_line();
-        if ( $response =~ /500/ ) {
-            die "E: Can\'t connect to server: " . $response;
+        my $res_status = $res->status_line();
+
+        if ( $res_status =~ $regexes{http_500} ) {
+            $logger->fatal("Can\'t connect to server: $res_status");
         }
         else {
-            warn $response;
-            die
-"E: Can\'t connect to server or invalid credentials. Please verify your username and password and try again.\n";
+            $logger->warn($res_status);
+            $logger->fatal(
+'Cannot connect to server or invalid credentials. Please verify your username and password and try again.'
+            );
         }
     }
 
-    if ( $opts_ref->{debug} ) {
-        print
-"\n--------------------------------------------------------------------------\n";
-        print $res->content;
-        print
-"--------------------------------------------------------------------------\n\n";
-    }
+    my $content = $res->content;
 
     # Parse id for link
-    if ( $res->content =~ /\>No userid found\</i ) {
-        die
-"E: No userid found. Please check that you have entered correct code. Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.\n";
+    if ( $content =~ $regexes{no_user_id} ) {
+        $logger->fatal(
+'No userid found. Please check that you have entered correct code. Also consider obtaining a password to Spamcop.net instead of using the old-style authorization token.'
+        );
     }
 
-    my $fullname;
-
-    if ( $res->content =~ /(Welcome, .*?)\./ ) {
-
-        # found full name, print out the greeting string
-        print "* $1\n";
+    if ($auth_is_ok) {
+        return $content;
+    }
+    else {
+        return undef;
     }
 
-    my $nextid;
+}
 
-    if ( $res->content =~ /sc\?id\=(.*?)\"\>/gi ) {    # this is easy to parse
-            # userid ok, new spam available
-        $nextid = $1;
+sub _check_next_id {
+    my $content_ref = shift;
+    my $next_id;
+    my $logger = get_logger('SpamcupNG');
+
+    if ( $$content_ref =~ $regexes{next_id} ) {
+        $next_id = $1;
+        $logger->info("ID of the next SPAM is '$next_id'");
     }
     else {
         # userid ok, no new spam
-        unless ( $opts_ref->{quiet} ) {
-            print "* No unreported spam found. Quitting.\n";
-        }
-        return -1;    # quit
+        $logger->info('No unreported SPAM found.');
     }
 
-    if ( $opts_ref->{quiet} ) {
-        print "* ID of the next spam is '$nextid'.\n";
+    return $next_id;
+}
+
+sub _check_error {
+    my $content_ref = shift;
+    my $tree        = HTML::TreeBuilder::XPath->new;
+    $tree->parse_content($$content_ref);
+    my @errors = $tree->findnodes('//div[@id="content"]/div[@class="error"]');
+    if ( scalar(@errors) > 0 ) {
+        return $errors[0]->as_trimmed_text;
+    }
+    else {
+        return;
+    }
+}
+
+sub main_loop {
+    my ( $ua, $opts_ref ) = @_;
+    my $logger = get_logger('SpamcupNG');
+
+    # last seen SPAM id
+    my $last_seen;
+
+    # Get first page that contains link to next one...
+
+    if ( $logger->is_debug ) {
+        $logger->debug( "Sleeping for " . $opts_ref->{delay} . ' seconds' );
+    }
+
+    sleep $opts_ref->{delay};
+    my $response = _self_auth( $ua, $opts_ref );
+    my $next_id;
+
+    if ($response) {
+        $next_id = _check_next_id( \$response );
+        return -1 unless ( defined($next_id) );
+    }
+    else {
+        return 0;
     }
 
     # avoid loops
-    if ( ($last_seen) and ( $nextid eq $last_seen ) ) {
-        die
-"E: I have seen this ID earlier. We don't want to report it again. This usually happens because of a bug in Spamcup. Make sure you use latest version! You may also want to go check from Spamcop what's happening: http://www.spamcop.net/sc?id=$nextid\n";
+    if ( ($last_seen) and ( $next_id eq $last_seen ) ) {
+        $logger->fatal(
+"I have seen this ID earlier, we do not want to report it again. This usually happens because of a bug in Spamcup. Make sure you use latest version! You may also want to go check from Spamcop what is happening: http://www.spamcop.net/sc?id=$next_id"
+        );
     }
 
-    $last_seen = $nextid;    # store for comparison
+    $last_seen = $next_id;    # store for comparison
 
-    $req = undef;
-    $res = undef;
-
-    # Fetch the spam report form
-
-    if ( $opts_ref->{debug} ) {
-        print "D: GET http://www.spamcop.net/sc?id=$nextid\n";
-        print 'D: Sleeping for ', $opts_ref->{delay}, " seconds.\n";
+    # Fetch the SPAM report form
+    if ( $logger->is_debug ) {
+        $logger->debug( 'Sleeping for ' . $opts_ref->{delay} . ' seconds' );
     }
 
     sleep $opts_ref->{delay};
 
-    $req =
-      HTTP::Request->new( GET => 'http://www.spamcop.net/sc?id=' . $nextid );
-    $res = $ua->request($req);
+    # Getting a SPAM report
+    my $req =
+      HTTP::Request->new( GET => 'http://www.spamcop.net/sc?id=' . $next_id );
 
-    if ( $res->is_success ) {
-        if ( $opts_ref->{debug} ) {
-            print "D: Got HTTP response\n";
-            print "D: Headers follow:\n" . $res->headers->as_string . "\n\n";
-        }
-
-    }
-    else {
-        die "E: Can't connect to server. Try again later.\n\n";
+    if ( $logger->is_debug ) {
+        $logger->debug( "Request to be sent:\n" . $req->as_string );
     }
 
-    if ( $opts_ref->{debug} ) {
-        print
-"\n--------------------------------------------------------------------------\n";
-        print $res->content;
-        print
-"--------------------------------------------------------------------------\n\n";
+    my $res = $ua->request($req);
+
+    if ( $logger->is_debug ) {
+        $logger->debug( "Got HTTP response:\n" . $res->as_string );
+    }
+
+    unless ( $res->is_success ) {
+        $logger->fatal("Can't connect to server. Try again later.");
+        return 0;
+    }
+
+    if ( my $error_msg = _check_error( \( $res->content ) ) ) {
+        $logger->error($error_msg);
     }
 
     # parse the spam
-
-    my $_cancel = 0;
-
+    my $_cancel  = 0;
     my $base_uri = $res->base();
-    if ( !$base_uri ) {
-        print "E: No base uri found. Internal error? Please report this.\n";
-        exit;
+
+    unless ($base_uri) {
+        $logger->fatal(
+'No base URI found. Internal error? Please report this error by registering an issue on Github'
+        );
     }
 
+# :TODO:07/02/2018 10:17:30:ARFREITAS: too many regexes being compiled repeated times, compile than once and reuse them later!
     $res->content =~
       /(\<form action[^>]+name=\"sendreport\"\>.*?\<\/form\>)/sgi;
-    my $formdata = "<html><body>$1</body></html>";
-    my $form = HTML::Form->parse( $formdata, $base_uri );
+    my $form_data = $1;
 
-    # print the header of the spam
+    if ( defined($form_data) ) {
+        $form_data = "<html><body>$1</body></html>";
+    }
+    else {
+        $logger->error('Could not parse form data from HTTP response');
+
+        # :WORKAROUND:18/02/2018 14:20:17:ARFREITAS: to avoid warnings
+        $form_data = '';
+    }
+
+    # :TODO:18/02/2018 14:19:49:ARFREITAS: refactor to make form parsing a sub
+    my $form = HTML::Form->parse( $form_data, $base_uri );
 
     if ( $res->content =~
-/Please make sure this email IS spam.*?size=2\>\n(.*?)\<a href\=\"\/sc\?id\=$nextid/sgi
+/Please make sure this email IS spam.*?size=2\>\n(.*?)\<a href\=\"\/sc\?id\=$next_id/sgi
       )
     {
 
-        unless ( $opts_ref->{quiet} ) {
+        if ( $logger->is_info ) {
             my $spamhead = decode_entities($1);
-            print "* Head of the spam follows >>>\n";
             $spamhead =~ s/\n/\t/igs;    # prepend a tab to each line
             $spamhead =~ s/<\/?strong>//gi;
             $spamhead =~ s/<br>/\n/gsi;
             $spamhead =~ s/<\/?font>//gi;
             binmode( STDOUT, ":utf8" );
-            print "\t$spamhead\n";
-            print "<<<\n";
+            $logger->info("Head of the SPAM follows:\n$spamhead");
         }
 
         # parse form fields
         # verify form
         unless ($form) {
-            if ( $opts_ref->{debug} ) {
-                print
-"D: Spamcop returned invalid HTML form. Usually temporary error.\n";
-            }
-            die "E: Temporary Spamcop.net error. Try again later! Quitting.\n";
+
+            $logger->fatal(
+'Could not find the HTML form to report the SPAM! May be a temporary Spamcop.net error, try again later! Quitting...'
+            );
         }
         else {
-            if ( $opts_ref->{debug} ) {
-                print "D: Form data follows:\n" . $form->dump . "\n\n";
+
+            if ( $logger->is_debug ) {
+                $logger->debug( 'Form data follows: ' . $form->dump );
             }
 
             # how many recepients for reports
             my $max = $form->value("max");
-
             my $willsend;
             my $wontsend;
 
@@ -380,21 +511,30 @@ sub main_loop {
                 }
             }
 
-            print
-"Would send the report to the following addresses: (Reason in parenthesis)\n";
-            if ($willsend) {
-                print $willsend;
-            }
-            else {
-                print "\t--none--\n";
-            }
+            if ( $logger->is_info ) {
 
-            print "Following addresses would not be used:\n";
-            if ($wontsend) {
-                print $wontsend;
-            }
-            else {
-                print "\t--none--\n";
+                my $message =
+'Would send the report to the following addresses (reason in parenthesis): ';
+
+                if ($willsend) {
+                    $message .= $willsend;
+                }
+                else {
+                    $message .= '--none--';
+                }
+
+                $logger->info($message);
+                $message = 'Following addresses would not be used: ';
+
+                if ($wontsend) {
+                    $message .= $wontsend;
+                }
+                else {
+                    $message .= '--none--';
+                }
+
+                $logger->info($message);
+
             }
 
         }
@@ -419,7 +559,6 @@ sub main_loop {
             # little delay for automatic processing
             sleep $opts_ref->{delay};
         }
-        print "...\n";
 
     }
     elsif ( $res->content =~ /Send Spam Report\(S\) Now/gi ) {
@@ -430,6 +569,8 @@ sub main_loop {
 "* Preview headers not available, but you can still report this. Are you sure this is spam? [y/N] ";
 
             my $reply = <>;
+            chomp($reply);
+
             if ( $reply && $reply !~ /^y/i ) {
 
                 # not Y
@@ -443,26 +584,19 @@ sub main_loop {
         }
 
     }
-    elsif ( $res->content =~
-/Sorry, this email is too old.*This mail was received on (.*?)\<\/.*\>/gsi
-      )
-    {
-        # perhaps it's too old then
-        my $ondate = $1;
-        unless ( $opts_ref->{quiet} ) {
-            print
-"W: This spam is too old. You must report spam within 3 days of receipt. This mail was received on $ondate. Deleted.\n";
-        }
-        return 0;
 
+    elsif ( $res->content =~ $regexes{too_old_email} ) {
+        $logger->warn('This SPAM is too old and thus was deleted.');
+        return 0;
     }
     elsif ( $res->content =~
 /click reload if this page does not refresh automatically in \n(\d+) seconds/gs
       )
     {
         my $delay = $1;
-        print
-"W: Spamcop seems to be currently overloaded. Trying again in $delay seconds. Wait...\n";
+        $logger->warn(
+"Spamcop seems to be currently overloaded. Trying again in $delay seconds. Wait..."
+        );
         sleep $opts_ref->{delay};
 
         # fool it to avoid duplicate detector
@@ -474,64 +608,69 @@ sub main_loop {
     elsif ( $res->content =~
         /No source IP address found, cannot proceed. Not full header/gs )
     {
-        print
-"W: No source IP address found. Your report might be missing headers. Skipping.\n";
+        $logger->warn(
+'No source IP address found. Your report might be missing headers. Skipping.'
+        );
         return 0;
     }
 
+    # :TODO:07/02/2018 10:15:44:ARFREITAS: Need to add a checking for this
+
+#<div class="fixedmsg">0: Received: by 2002:a17:902:526d:: with SMTP id z100-v6mr2179638plh.396.1517918532644; Tue, 06 Feb 2018 04:02:12 -0800 (PST)</div>
+#No unique hostname found for source: 2002:a17:902:526d:0:0:0:0<br>
+#<div class="warning">Possible forgery. Supposed receiving system not associated with any of your mailhosts</div>
+#Will not trust this Received line.<br>
+#<div class="error">Mailhost configuration problem, identified internal IP as source</div>
+#Mailhost:<br>
+#Please correct this situation - register every email address where you receive spam<br>
+#<div class="error">No source IP address found, cannot proceed.</div>
+
     else {
         # Shit happens. If you know it should be parseable, please report a bug!
-        print
-"W: Can't parse Spamcop.net's HTML. If this does not happen very often you can ignore this warning. Otherwise check if there's new version available. Skipping.\n";
+        $logger->warn(
+"Can't parse Spamcop.net's HTML. If this does not happen very often you can ignore this warning. Otherwise check if there's new version available. Skipping."
+        );
         return 0;
     }
 
     if ( $opts_ref->{check_only} ) {
-        print
-"* You gave option -n, so we'll stop here. The spam was NOT reported.\n";
+        $logger->info(
+'You gave option -n, so we\'ll stop here. The SPAM was NOT reported.'
+        );
         exit;
     }
 
-    if ( $opts_ref->{debug} ) {
-        print "\n\nD: Starting the parse phase...\n";
-    }
-
+    $logger->debug('Starting the parse phase...');
     undef $req;
     undef $res;
 
     # Submit the form to Spamcop OR cancel report
+    unless ($_cancel) {    # SUBMIT spam
 
-    if ( !$_cancel ) {    # SUBMIT spam
-
-        if ( $opts_ref->{debug} ) {
-            print "D: Submitting form. We will use the default recipients.\n";
-            print "D: GET http://www.spamcop.net/sc?id=$nextid\n";
-            print 'D: Sleeping for ', $opts_ref->{delay}, " seconds.\n";
+        if ( $logger->is_debug ) {
+            $logger->debug(
+                'Submitting form. We will use the default recipients.');
+            $logger->debug(
+                'Sleeping for ' . $opts_ref->{delay} . ' seconds.' );
         }
         sleep $opts_ref->{delay};
         $res = LWP::UserAgent->new->request( $form->click() )
-          ;               # click default button, submit
+          ;                # click default button, submit
     }
-    else {                # CANCEL SPAM
-        if ( $opts_ref->{debug} ) {
-            print "D: About to cancel report.\n";
-        }
+    else {                 # CANCEL SPAM
+        $logger->debug('About to cancel report.');
         $res = LWP::UserAgent->new->request( $form->click('cancel') )
-          ;               # click cancel button
+          ;                # click cancel button
+    }
+
+    if ( $logger->is_debug ) {
+        $logger->debug( "Got HTTP response:\n" . $res->as_string );
     }
 
     # Check the outcome of the response
-    if ( $res->is_success ) {
-        if ( $opts_ref->{debug} ) {
-            print "D: Got HTTP response\n";
-            print "D: -- content follows -------------------------\n";
-            print $res->content;
-            print "D: -- content ended   -------------------------\n\n";
-        }
-
-    }
-    else {
-        die "E: Can't connect to server. Try again later. Quitting.\n";
+    unless ( $res->is_success ) {
+        $logger->fatal('Cannot connect to server. Try again later. Quitting.');
+        return 0;
     }
 
     if ($_cancel) {
@@ -540,6 +679,7 @@ sub main_loop {
 
     # parse respond
     my $report;
+
     if ( $res->content =~ /(Spam report id .*?)\<p\>/gsi ) {
         $report = $1 || "-none-\n";
         $report =~ s/\<br\>//gi;
@@ -547,23 +687,39 @@ sub main_loop {
     elsif ( $res->content =~ /report for mole\@devnull.spamcop.net/ ) {
         $report = 'Mole report(s)';
     }
+    elsif ( $res->content =~ /\/dev\/null/ ) {
+        my $tree = HTML::TreeBuilder::XPath->new;
+        $tree->parse_content( $res->content );
+        my @dev_nulling = $tree->findnodes('//*[@id="content"]');
+        $report = $dev_nulling[0]->as_trimmed_text;
+    }
     else {
-        print
-"W: Spamcop.net returned unexpected content. If this does not happen very often you can ignore this. Otherwise check if there new version available. Continuing.\n";
+        $logger->warn(
+'Spamcop.net returned unexpected content (no SPAM report id). If this does not happen very often you can ignore this. Otherwise check if there new version available. Continuing.'
+        );
     }
 
     # print the report
-
-    unless ( $opts_ref->{quiet} ) {
-        print "Spamcop.net sent following spam reports:\n";
-        print "$report\n" if $report;
-        print "* Finished processing.\n";
+    if ( $logger->is_info ) {
+        $logger->info('Spamcop.net sent following SPAM reports:');
+        $logger->info("$report") if $report;
+        $logger->info('Finished processing.');
     }
 
     return 1;
 
     # END OF THE LOOP
 }
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Log::Log4perl>
+
+=back
 
 =head1 AUTHOR
 

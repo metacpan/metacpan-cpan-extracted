@@ -1,6 +1,6 @@
 #!perl
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 
 use lib 't/lib';
 
@@ -22,18 +22,25 @@ ok(
 ) or diag $@;
 
 $s->send( { a => 1, b => 2, c => 'nyuck nyuck' } );
+$s->send( { a => 1, b => 2 } );
 
-my $VAR1;
 
-ok( lives { $VAR1 = eval "$buf" }, 'deserialize record', ) or diag $@;
+my @VAR1;
+
+ok( lives { @VAR1 = eval $buf }, 'deserialize record', ) or diag $@;
 
 is(
-    $VAR1,
-    {
-        a => '1',
-        b => '2',
-        c => 'nyuck nyuck',
-    },
+    \@VAR1,
+    [ {
+            a => '1',
+            b => '2',
+            c => 'nyuck nyuck',
+        },
+        {
+            a => '1',
+            b => '2',
+        },
+    ],
     'properly formatted'
 );
 

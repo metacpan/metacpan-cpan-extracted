@@ -1,40 +1,18 @@
 package Lab::Moose::Instrument::LinearStepSweep;
-$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.613';
+$Lab::Moose::Instrument::LinearStepSweep::VERSION = '3.620';
 #ABSTRACT: Role for linear step sweeps used by voltage/current sources.
-
+use 5.010;
 use Moose::Role;
 use MooseX::Params::Validate;
 use Lab::Moose::Instrument 'setter_params';
 
 # time() returns floating seconds.
 use Time::HiRes qw/time usleep/;
-
+use Lab::Moose 'linspace';
 use Carp;
 
 requires qw/max_units_per_second max_units_per_step min_units max_units
     source_level cached_source_level source_level_timestamp/;
-
-sub linspace {
-    my ( $from, $to, $step ) = validated_list(
-        \@_,
-        from => { isa => 'Num' },
-        to   => { isa => 'Num' },
-        step => { isa => 'Num' },
-    );
-
-    $step = abs($step);
-    my $sign = $to > $from ? 1 : -1;
-
-    my @steps;
-    for ( my $i = 1;; ++$i ) {
-        my $point = $from + $i * $sign * $step;
-        if ( ( $point - $to ) * $sign >= 0 ) {
-            last;
-        }
-        push @steps, $point;
-    }
-    return ( @steps, $to );
-}
 
 
 sub linear_step_sweep {
@@ -48,6 +26,7 @@ sub linear_step_sweep {
     my $verbose        = delete $args{verbose};
     my $from           = $self->cached_source_level();
     my $last_timestamp = $self->source_level_timestamp();
+    my $distance       = abs( $to - $from );
 
     # Enforce max_units/min_units.
     my $min = $self->min_units();
@@ -65,17 +44,30 @@ sub linear_step_sweep {
 
     # Enforce step size and rate.
     my $step = abs( $self->max_units_per_step() );
+
     my $rate = abs( $self->max_units_per_second() );
     if ( $step < 1e-9 ) {
         croak "step size must be > 0";
     }
-    if ( $rate == 1e-9 ) {
+
+    if ( $rate < 1e-9 ) {
         croak "rate must be > 0";
     }
 
-    my @steps         = linspace( from => $from, to => $to, step => $step );
-    my $time_per_step = $step / $rate;
-    my $time          = time();
+    my @steps = linspace(
+        from         => $from, to => $to, step => $step,
+        exclude_from => 1
+    );
+
+    my $time_per_step;
+    if ( $distance < $step ) {
+        $time_per_step = $distance / $rate;
+    }
+    else {
+        $time_per_step = $step / $rate;
+    }
+
+    my $time = time();
 
     if ( $time < $last_timestamp ) {
 
@@ -128,7 +120,7 @@ Lab::Moose::Instrument::LinearStepSweep - Role for linear step sweeps used by vo
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 METHODS
 
@@ -147,7 +139,7 @@ source_level, cached_source_level, source_level_timestamp >
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

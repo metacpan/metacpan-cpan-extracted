@@ -1,5 +1,20 @@
 Revision history for Firefox-Marionette
 
+0.42  Mon Feb 19 22:29:00 2018
+       Documentation/test coverage fixes.
+
+0.41  Mon Feb 19 00:38:00 2018
+       Adding proxy support.
+
+0.40  Thu Feb 15 21:32:00 2018
+       Merge find/list queries.
+
+0.39  Web Feb 14 19:25:00 2018
+       Allow nested find/list queries.
+
+0.38  Sun Feb 11 07:08:00 2018
+       More test fixes for Firefox 52.6 on darwin.
+
 0.37  Sat Feb 10 08:57:00 2018
        Test fixes for Firefox 52.6 on darwin.
 
@@ -8,7 +23,7 @@ Revision history for Firefox-Marionette
 
 0.35  Thu Feb  8 19:07:00 2018
        Adding support for Dragonfly BSD.
-       More 11 exit detection. 
+       More exit 11 detection. 
 
 0.34  Web Feb  7 07:03:00 2018
        Adding support for RHEL7/RHEL6/jessie.

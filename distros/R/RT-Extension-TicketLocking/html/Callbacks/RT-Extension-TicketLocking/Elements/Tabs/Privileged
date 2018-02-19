@@ -1,7 +1,9 @@
 <%INIT>
 my $request_path = $HTML::Mason::Commands::r->path_info;
 
-return unless $request_path =~ m{^/Ticket/};
+return unless $request_path =~ m{^/(?:Ticket|RTIR)/};
+return unless PageMenu()->child('actions');
+
 return unless ( $DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/;
 my $id  = $1;
 

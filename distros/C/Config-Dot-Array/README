@@ -71,11 +71,9 @@ ERRORS
                      Conflict in '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot::Array;
      use Dumpvalue;
 
@@ -104,11 +102,9 @@ EXAMPLE1
      #          1  'value5'
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot::Array;
 
      # Object with data.
@@ -133,11 +129,9 @@ EXAMPLE2
      # key2=value3
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Config::Dot::Array;
      use Dumpvalue;
 
@@ -186,14 +180,14 @@ REPOSITORY
     <https://github.com/tupinek/Config-Dot-Array>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2015 Michal Špaček
+     © 2011-2018 Michal Josef Špaček
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

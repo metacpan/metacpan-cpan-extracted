@@ -4,11 +4,11 @@ use warnings;
 
 use Test2::IPC;
 
-our $VERSION = '0.000097';
+our $VERSION = '0.000100';
 
 our @CARP_NOT = qw/Test2::Util::HashBase/;
 
-use Carp qw/croak cluck/;
+use Carp qw/croak cluck confess/;
 use Test2::Util qw/get_tid CAN_THREAD CAN_FORK/;
 use Scalar::Util qw/blessed/;
 use List::Util qw/first/;
@@ -52,7 +52,7 @@ sub init {
     croak "'name' is a required attribute"
         unless $self->{+NAME};
 
-    $self->{+SEND_TO} ||= Test2::API::test2_stack()->top;
+    my $to = $self->{+SEND_TO} ||= Test2::API::test2_stack()->top;
 
     $self->{+STACK} = [@STACK];
     $_->{+_IN_USE}++ for reverse @STACK;
@@ -71,15 +71,18 @@ sub init {
         my $args = delete $self->{hub_init_args} || {};
         my $hub = Test2::AsyncSubtest::Hub->new(
             %$args,
-            ipc => $ipc,
-            nested => 1,
+            ipc       => $ipc,
+            nested    => $to->nested + 1,
+            buffered  => 1,
             formatter => $formatter,
         );
         $self->{+HUB} = $hub;
     }
 
     $self->{+TRACE} ||= Test2::Util::Trace->new(
-        frame => [caller(1)],
+        frame    => [caller(1)],
+        buffered => $to->buffered,
+        nested   => $to->nested,
     );
 
     my $hub = $self->{+HUB};
@@ -112,19 +115,32 @@ sub _pre_filter {
 
 sub context {
     my $self = shift;
+
+    my $send_to = $self->{+SEND_TO};
+
+    confess "Attempt to close AsyncSubtest when original parent hub (a non async-subtest?) has ended"
+        if $send_to->ended;
+
     return Test2::API::Context->new(
         trace => $self->{+TRACE},
-        hub   => $self->{+SEND_TO},
+        hub   => $send_to,
     );
 }
 
 sub _gen_event {
     my $self = shift;
-    my ($type, $id) = @_;
+    my ($type, $id, $hub) = @_;
 
     my $class = "Test2::AsyncSubtest::Event::$type";
 
-    return $class->new(id => $id, trace => Test2::Util::Trace->new(frame => [caller(1)]));
+    return $class->new(
+        id    => $id,
+        trace => Test2::Util::Trace->new(
+            frame    => [caller(1)],
+            buffered => $hub->buffered,
+            nested   => $hub->nested,
+        ),
+    );
 }
 
 sub cleave {
@@ -150,7 +166,7 @@ sub attach {
         if $self->{+HUB}->is_local;
 
     $self->{+_ATTACHED} = [ $$, get_tid, $id ];
-    $self->{+HUB}->send($self->_gen_event('Attach', $id));
+    $self->{+HUB}->send($self->_gen_event('Attach', $id, $self->{+HUB}));
 }
 
 sub detach {
@@ -169,7 +185,7 @@ sub detach {
 
     my $id = $att->[2];
 
-    $self->{+HUB}->send($self->_gen_event('Detach', $id));
+    $self->{+HUB}->send($self->_gen_event('Detach', $id, $self->{+HUB}));
 
     delete $self->{+_ATTACHED};
 }
@@ -227,7 +243,11 @@ sub run {
     unless ($ok) {
         my $e = Test2::Event::Exception->new(
             error => $err,
-            trace => Test2::Util::Trace->new(frame => [caller(0)]),
+            trace => Test2::Util::Trace->new(
+                frame    => [caller(0)],
+                buffered => $hub->buffered,
+                nested   => $hub->nested,
+            ),
         );
         $hub->send($e);
     }
@@ -292,7 +312,13 @@ sub finish {
     my $collapse   = $params{collapse};
     my $no_plan    = $params{no_plan} || ($collapse && $no_asserts) || $skip;
 
-    $hub->finalize($self->trace, !$no_plan)
+    my $trace = Test2::Util::Trace->new(
+        frame    => $self->{+TRACE}->{frame},
+        buffered => $hub->buffered,
+        nested   => $hub->nested,
+    );
+
+    $hub->finalize($trace, !$no_plan)
         unless $hub->no_ending || $hub->ended;
 
     if ($hub->ipc) {

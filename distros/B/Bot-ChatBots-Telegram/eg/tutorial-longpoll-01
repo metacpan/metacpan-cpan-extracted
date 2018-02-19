@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Bot::ChatBots::Telegram::LongPoll;
+
+Bot::ChatBots::Telegram::LongPoll->new(
+   token     => $ENV{TOKEN},
+   processor => \&process_record,
+   start     => 1,
+);
+
+sub process_record {
+   my $record = shift;
+
+   my $type    = $record->{data_type};
+   my $payload = $record->{payload};
+   if ($type eq 'Message' && exists($payload->{from}) ) {
+      my $text      = $payload->{text} || '';
+      my $peer_name = $payload->{from}{first_name} || 'U. N. Known';
+      print {*STDERR} "$peer_name says: $text\n";
+      if ($text eq '/start') {
+         $record->{send_response} = 'Very simple... just send /hello';
+      }
+      elsif ($text eq '/hello') {
+         $record->{send_response} = "Hello to you, $peer_name";
+      }
+   }
+
+   return $record; # follow on..
+}

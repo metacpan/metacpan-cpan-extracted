@@ -3,7 +3,10 @@ abstract: 'RDFa Serializer for RDF::Trine'
 author:
   - 'Kjetil Kjernsmo (KJETILK) <kjetilk@cpan.org>'
 build_requires:
+  Module::Load::Conditional: '0'
+  RDF::RDFa::Parser: '0'
   Test::More: '0.96'
+  Test::RDF: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
@@ -25,10 +28,12 @@ optional_features: {}
 provides:
   RDF::Trine::Serializer::RDFa:
     file: lib/RDF/Trine/Serializer/RDFa.pm
-    version: '0.02'
+    version: '0.100'
 requires:
-  RDF::RDFa::Generator: '0.102'
+  RDF::RDFa::Generator: '0.200'
   RDF::Trine: '0.133'
+  RDF::TrineX::Compatibility::Attean: '0'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#perlrdf
   Identifier: http://purl.org/NET/cpan-uri/dist/RDF-Trine-Serializer-RDFa/project
@@ -36,6 +41,6 @@ resources:
   homepage: https://metacpan.org/release/RDF-Trine-Serializer-RDFa
   license: http://dev.perl.org/licenses/
   repository: git://github.com/kjetilk/p5-rdf-trine-serializer-rdfa.git
-version: '0.02'
+version: '0.100'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

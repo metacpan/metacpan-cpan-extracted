@@ -1,3 +1,9 @@
+0.008  2018-02-11 15:29:50 CET
+   - release after 67 PASSes on CPAN Testers
+
+0.007  2018-02-11 10:22:53 CET
+   - use "after_render" for automatically tracking rendered stuff
+
 0.006  2016-12-05 16:07:36 CET
    - "use warnings" everywhere, thanks to Mohammad S Anwar (@manwar
      on GitHub) for the heads-up

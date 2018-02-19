@@ -16,6 +16,7 @@ lives_ok {
       [
          WebHook => path => '/telegram',
          processor => sub { push @records, shift },
+         token => 'whatever',
       ],
      ];
 } ## end lives_ok

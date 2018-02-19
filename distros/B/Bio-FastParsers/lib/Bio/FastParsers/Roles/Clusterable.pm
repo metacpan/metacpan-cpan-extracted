@@ -1,13 +1,15 @@
 package Bio::FastParsers::Roles::Clusterable;
-# ABSTRACT: Attrs and methods common to CD-HIT and UCLUST drivers
+# ABSTRACT: Attributes and methods common to CD-HIT and UCLUST drivers
 # CONTRIBUTOR: Amandine BERTRAND <amandine.bertrand@doct.uliege.be>
-$Bio::FastParsers::Roles::Clusterable::VERSION = '0.180330';
+$Bio::FastParsers::Roles::Clusterable::VERSION = '0.180470';
 use Moose::Role;
 
 use autodie;
 use feature qw(say);
 
+use Carp;
 use Sort::Naturally;
+use Try::Tiny;
 
 
 # private attributes
@@ -24,7 +26,6 @@ has '_members_for' => (
     },
 );
 
-
 sub all_representatives_by_cluster_size {
     my $self = shift;
 
@@ -39,6 +40,36 @@ sub all_representatives_by_cluster_size {
     return @list;
 }
 
+
+sub clust_mapper {
+    my $self = shift;
+    my $sep  = shift // q{/};
+
+    # do not force Bio::FastParsers to depend on Bio::MUST::Core
+    my $bmc = try   { require Bio::MUST::Core }
+              catch { return }
+    ;
+    unless ($bmc) {
+        carp 'Warning: Bio::MUST::Core not installed; returning nothing!';
+        return;
+    }
+
+    my @abbr_ids;
+    my @long_ids;
+
+    for my $repr ( $self->all_representatives_by_cluster_size ) {
+    	push @abbr_ids, $repr;
+    	push @long_ids, join $sep,
+    	    nsort ( @{ $self->members_for($repr) }, $repr )
+    	;
+    }
+
+    return Bio::MUST::Core::IdMapper->new(
+        abbr_ids => \@abbr_ids,
+        long_ids => \@long_ids,
+    );
+}
+
 no Moose::Role;
 1;
 
@@ -48,19 +79,20 @@ __END__
 
 =head1 NAME
 
-Bio::FastParsers::Roles::Clusterable - Attrs and methods common to CD-HIT and UCLUST drivers
+Bio::FastParsers::Roles::Clusterable - Attributes and methods common to CD-HIT and UCLUST drivers
 
 =head1 VERSION
 
-version 0.180330
-
-=head1 SYNOPSIS
-
-    # TODO
+version 0.180470
 
 =head1 DESCRIPTION
 
-    # TODO
+This role implements the attributes and methods that are common to CD-HIT and
+UCLUST parsers. Those are documented in their respective modules:
+L<Bio::FastParsers::CdHit> and L<Bio::FastParsers::Uclust>.
+
+Available methods are: C<all_representatives>,
+C<all_representatives_by_cluster_size>, C<members_for> and C<clust_mapper>.
 
 =head1 AUTHOR
 

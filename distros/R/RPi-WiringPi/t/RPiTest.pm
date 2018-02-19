@@ -25,11 +25,17 @@ sub check_pin_status {
     my $config = default_pin_config();
 
     for (@gpio_pins){
+        if ($_ == 14 || $_ == 15){
+            # serial pins
+            my $alt = get_alt($_);
+            ok $alt == $config->{$_}{alt} || $alt == 2, "pin $_ set back to default mode ok";
+            is read_pin($_), $config->{$_}{state}, "pin $_ set back to default state ok";
+            next;
+        }
         is get_alt($_), $config->{$_}{alt}, "pin $_ set back to default mode ok";
         is read_pin($_), $config->{$_}{state}, "pin $_ set back to default state ok";
     }
 }
-
 sub default_pin_config {
     # default pin configurations
 

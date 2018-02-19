@@ -4,25 +4,13 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    # X-Mailer: Internet Mail Service (5.0.1461.28)
-    # X-Mailer: Microsoft Exchange Server Internet Mail Connector Version ...
-    'x-mailer'  => qr{\A(?:
-         Internet[ ]Mail[ ]Service[ ][(][\d.]+[)]\z
-        |Microsoft[ ]Exchange[ ]Server[ ]Internet[ ]Mail[ ]Connector
-        )
-    }x,
-    'x-mimeole' => qr/\AProduced By Microsoft Exchange/,
-    # Received: by ***.**.** with Internet Mail Service (5.5.2657.72)
-    'received'  => qr/\Aby .+ with Internet Mail Service [(][\d.]+[)]/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['Your message'],
+    'rfc822'  => ['Content-Type: message/rfc822'],
+    'error'   => ['did not reach the following recipient(s):'],
 };
-my $Re1 = {
-    'begin'  => qr/\AYour message/,
-    'error'  => qr/\Adid not reach the following recipient[(]s[)]:/,
-    'rfc822' => qr|\AContent-Type: message/rfc822|,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $CodeTable = {
+my $ErrorCodes = {
     'onhold' => [
         '000B099C', # Host Unknown, Message exceeds size limit, ...
         '000B09AA', # Unable to relay for, Message exceeds size limit,...
@@ -49,15 +37,12 @@ my $CodeTable = {
         '000C0595', # Ambiguous Recipient
     ],
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # X-MS-TNEF-Correlator: <00000000000000000000000000000000000000@example.com>
 # X-Mailer: Internet Mail Service (5.5.1960.3)
 # X-MS-Embedded-Report: 
 sub headerlist  { return ['X-MS-Embedded-Report', 'X-MimeOLE'] };
-sub pattern     { return $Re0 }
 sub description { 'Microsoft Exchange Server 2003' }
-
 sub scan {
     # Detect an error from Microsoft Exchange Server 2003
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -84,20 +69,22 @@ sub scan {
         if( defined $mhead->{'x-mailer'} ) {
             # X-Mailer:  Microsoft Exchange Server Internet Mail Connector Version 4.0.994.63
             # X-Mailer: Internet Mail Service (5.5.2232.9)
-            $match ||= 1 if $mhead->{'x-mailer'} =~ $Re0->{'x-mailer'};
+            my $tryto = ['Internet Mail Service (', 'Microsoft Exchange Server Internet Mail Connector'];
+            my $value = $mhead->{'x-mailer'} || '';
+            $match ||= 1 if index($value, $tryto->[0]) == 0 || index($value, $tryto->[1]) == 0;
             last if $match;
         }
 
         if( defined $mhead->{'x-mimeole'} ) {
             # X-MimeOLE: Produced By Microsoft Exchange V6.5
-            $match ||= 1 if $mhead->{'x-mimeole'} =~ $Re0->{'x-mimeole'};
+            $match ||= 1 if index($mhead->{'x-mimeole'}, 'Produced By Microsoft Exchange') == 0;
             last if $match;
         }
 
         last unless scalar @{ $mhead->{'received'} };
         for my $e ( @{ $mhead->{'received'} } ) {
             # Received: by ***.**.** with Internet Mail Service (5.5.2657.72)
-            next unless $e =~ $Re0->{'received'};
+            next unless index($e, ' with Internet Mail Service (') > -1;
             $match = 1;
             last(EXCHANGE_OR_NOT);
         }
@@ -119,14 +106,13 @@ sub scan {
         'date'    => '',    # The value of "Date"
         'subject' => '',    # The value of "Subject"
     };
-
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( index($e, $StartingOf->{'message'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -134,7 +120,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -169,8 +155,8 @@ sub scan {
                 #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
                 $v = $dscontents->[-1];
 
-                if( $e =~ m/\A[ \t]*([^ ]+[@][^ ]+) on[ \t]*.*\z/ ||
-                    $e =~ m/\A[ \t]*.+(?:SMTP|smtp)=([^ ]+[@][^ ]+) on[ \t]*.*\z/ ) {
+                if( $e =~ /\A[ \t]*([^ ]+[@][^ ]+) on[ \t]*.*\z/ ||
+                    $e =~ /\A[ \t]*.+(?:SMTP|smtp)=([^ ]+[@][^ ]+) on[ \t]*.*\z/ ) {
                     # kijitora@example.co.jp on Thu, 29 Apr 2007 16:51:51 -0500
                     #   kijitora@example.com on 4/29/99 9:19:59 AM
                     if( length $v->{'recipient'} ) {
@@ -182,13 +168,13 @@ sub scan {
                     $v->{'msexch'} = 0;
                     $recipients++;
 
-                } elsif( $e =~ m/\A[ \t]+(MSEXCH:.+)\z/ ) {
+                } elsif( $e =~ /\A[ \t]+(MSEXCH:.+)\z/ ) {
                     #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
                     $v->{'diagnosis'} .= $1;
 
                 } else {
                     next if $v->{'msexch'};
-                    if( $v->{'diagnosis'} =~ m/\AMSEXCH:.+/ ) {
+                    if( index($v->{'diagnosis'}, 'MSEXCH:') == 0 ) {
                         # Continued from MEEXCH in the previous line
                         $v->{'msexch'} = 1;
                         $v->{'diagnosis'} .= ' '.$e;
@@ -206,19 +192,19 @@ sub scan {
                 #  Subject: ...
                 #  Sent:    Thu, 29 Apr 2010 18:14:35 +0000
                 #
-                if( $e =~ m/\A[ \t]+To:[ \t]+(.+)\z/ ) {
+                if( $e =~ /\A[ \t]+To:[ \t]+(.+)\z/ ) {
                     #  To:      shironeko@example.jp
                     next if length $connheader->{'to'};
                     $connheader->{'to'} = $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[ \t]+Subject:[ \t]+(.+)\z/ ) {
+                } elsif( $e =~ /\A[ \t]+Subject:[ \t]+(.+)\z/ ) {
                     #  Subject: ...
                     next if length $connheader->{'subject'};
                     $connheader->{'subject'} = $1;
                     $connvalues++;
 
-                } elsif( $e =~ m/\A[ \t]+Sent:[ \t]+([A-Z][a-z]{2},.+[-+]\d{4})\z/ ||
+                } elsif( $e =~ m|\A[ \t]+Sent:[ \t]+([A-Z][a-z]{2},.+[-+]\d{4})\z| ||
                          $e =~ m|\A[ \t]+Sent:[ \t]+(\d+[/]\d+[/]\d+[ \t]+\d+:\d+:\d+[ \t].+)|) {
                     #  Sent:    Thu, 29 Apr 2010 18:14:35 +0000
                     #  Sent:    4/29/99 9:19:59 AM
@@ -229,23 +215,22 @@ sub scan {
             }
         } # End of if: rfc822
     }
-
     return undef unless $recipients;
+
     require Sisimai::String;
     require Sisimai::SMTP::Status;
-
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( $e->{'diagnosis'} =~ m{\AMSEXCH:.+[ \t]*[(]([0-9A-F]{8})[)][ \t]*(.*)\z} ) {
+        if( $e->{'diagnosis'} =~ /\AMSEXCH:.+[ \t]*[(]([0-9A-F]{8})[)][ \t]*(.*)\z/ ) {
             #     MSEXCH:IMS:KIJITORA CAT:EXAMPLE:EXCHANGE 0 (000C05A6) Unknown Recipient
             my $capturedcode = $1;
             my $errormessage = $2;
             my $pseudostatus = '';
 
-            for my $r ( keys %$CodeTable ) {
+            for my $r ( keys %$ErrorCodes ) {
                 # Find captured code from the error code table
-                next unless grep { $capturedcode eq $_ } @{ $CodeTable->{ $r } };
+                next unless grep { $capturedcode eq $_ } @{ $ErrorCodes->{ $r } };
                 $e->{'reason'} = $r;
                 $pseudostatus = Sisimai::SMTP::Status->code($r);
                 $e->{'status'} = $pseudostatus if length $pseudostatus;
@@ -263,15 +248,15 @@ sub scan {
                 delete $e->{'alterrors'};
             }
         }
-        $e->{'agent'}  = __PACKAGE__->smtpagent;
+        $e->{'agent'} = __PACKAGE__->smtpagent;
         delete $e->{'msexch'};
     }
 
     if( scalar(@$rfc822list) == 0 ) {
         # When original message does not included in the bounce message
-        push @$rfc822list, sprintf("From: %s", $connheader->{'to'});
-        push @$rfc822list, sprintf("Date: %s", $connheader->{'date'});
-        push @$rfc822list, sprintf("Subject: %s", $connheader->{'subject'});
+        push @$rfc822list, 'From: '.$connheader->{'to'};
+        push @$rfc822list, 'Date: '.$connheader->{'date'};
+        push @$rfc822list, 'Subject: '.$connheader->{'subject'};
     }
     $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
     return { 'ds' => $dscontents, 'rfc822' => $$rfc822part };
@@ -322,7 +307,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

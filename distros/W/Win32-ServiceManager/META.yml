@@ -2,12 +2,13 @@
 abstract: 'Manage Windows Services'
 author:
   - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+  - 'Wes Malone <wesm@cpan.org>'
 build_requires:
   Test::Deep: '0.11'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.142690'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,4 +25,5 @@ resources:
   bugtracker: https://github.com/frioux/Win32-ServiceManager/issues
   homepage: https://github.com/frioux/Win32-ServiceManager
   repository: https://github.com/frioux/Win32-ServiceManager.git
-version: '0.002003'
+version: '0.002004'
+x_serialization_backend: 'YAML::Tiny version 1.64'

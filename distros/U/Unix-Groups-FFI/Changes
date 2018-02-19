@@ -1,0 +1,8 @@
+0.002     2018-02-17 22:15:28 EST
+  - Die with EINVAL error if a nonexistent username is passed to initgroups or getgrouplist
+  - Fix tests for unspecified behavior on OS X (thanks plicease)
+  - Fix getgrouplist interface for OS X (thanks plicease)
+  - Properly report error context from caller rather than FFI::Platypus
+
+0.001     2018-02-16 20:49:04 EST
+  - First release

@@ -59,7 +59,7 @@
    "provides" : {
       "WebService::YDMM" : {
          "file" : "lib/WebService/YDMM.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -73,10 +73,11 @@
          "web" : "https://github.com/AnaTofuZ/p5-webservice-YDMM"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:ANATOFUZ",
    "x_contributors" : [
-      "AnaTofuZ <anatofuz@gmail.com>"
+      "AnaTofuZ <anatofuz@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::log::cat;
-$Footprintless::App::Command::log::cat::VERSION = '1.26';
+$Footprintless::App::Command::log::cat::VERSION = '1.27';
 # ABSTRACT: output a file
 # PODNAME: Footprintless::App::Command::log::cat
 
@@ -51,7 +51,7 @@ Footprintless::App::Command::log::cat - output a file
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 AUTHOR
 

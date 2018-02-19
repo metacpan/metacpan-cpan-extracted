@@ -9,18 +9,19 @@ use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 
 use Mojo::IOLoop::ReadWriteProcess qw(queue process);
+use Mojo::IOLoop::ReadWriteProcess::Session;
 
 subtest queues => sub {
   my $q = queue;
-  $q->pool->maximum_processes(2);
+  $q->pool->maximum_processes(3);
   $q->queue->maximum_processes(800);
 
-  my $proc = 100;
+  my $proc = 10;
   my $fired;
 
   my $i = 1;
   for (1 .. $proc) {
-    $q->add(process(sub { shift; return shift() })->args($i));
+    $q->add(process(sub { shift; return shift() })->set_pipes(0)->args($i));
     $i++;
   }
 
@@ -31,12 +32,13 @@ subtest queues => sub {
       $output{shift->return_status}++;
     });
   is $q->queue->size,             $proc - $q->pool->maximum_processes;
-  is $q->pool->size,              2;
-  is $q->pool->maximum_processes, 2;
+  is $q->pool->size,              3;
+  is $q->pool->maximum_processes, 3;
   $q->consume;
   is $fired, $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
+  is $q->done->size,  $proc;
 
   $i = 1;
   for (1 .. $proc) {
@@ -45,17 +47,17 @@ subtest queues => sub {
   }
 };
 
-subtest not_autostart_queues => sub {
-  my $q = queue(auto_start => 0);
+subtest test_2 => sub {
+  my $q = queue;
   $q->pool->maximum_processes(2);
   $q->queue->maximum_processes(800);
 
-  my $proc = 100;
+  my $proc = 10;
   my $fired;
 
   my $i = 1;
   for (1 .. $proc) {
-    $q->add(process(sub { shift; return shift() })->args($i));
+    $q->add(process(sub { shift; return shift() })->set_pipes(0)->args($i));
     $i++;
   }
 
@@ -72,6 +74,7 @@ subtest not_autostart_queues => sub {
   is $fired, $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
+  is $q->done->size,  $proc;
 
   $i = 1;
   for (1 .. $proc) {
@@ -85,12 +88,12 @@ subtest atomic_queues => sub {
   $q->pool->maximum_processes(1);
   $q->queue->maximum_processes(800);
 
-  my $proc = 700;
+  my $proc = 10;
   my $fired;
 
   my $i = 1;
   for (1 .. $proc) {
-    $q->add(process(sub { shift; return shift() })->args($i));
+    $q->add(process(sub { shift; return shift() })->set_pipes(0)->args($i));
     $i++;
   }
 
@@ -107,6 +110,7 @@ subtest atomic_queues => sub {
   is $fired, $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
+  is $q->done->size,  $proc;
 
   $i = 1;
   for (1 .. $proc) {
@@ -115,11 +119,11 @@ subtest atomic_queues => sub {
   }
 };
 
-subtest 'auto starting queues on add' => sub {
-  my $q = queue(auto_start_add => 1);
+subtest test_3 => sub {
+  my $q = queue();
   $q->pool->maximum_processes(2);
   $q->queue->maximum_processes(100000);
-  my $proc = 1000;
+  my $proc = 10;
   my $fired;
   my %output;
   my $i = 1;
@@ -127,7 +131,7 @@ subtest 'auto starting queues on add' => sub {
 # Started as long as resources allows (maximum_processes of the main pool)
 # That requires then to subscribe for each process event's separately (manually)
   for (1 .. $proc) {
-    my $p = process(sub { shift; return shift() + 42 })->args($i);
+    my $p = process(sub { shift; return shift() + 42 })->set_pipes(0)->args($i);
     $p->once(
       stop => sub {
         $fired++;
@@ -141,6 +145,7 @@ subtest 'auto starting queues on add' => sub {
   $q->consume;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
+  is $q->done->size,  $proc;
   is $fired, $proc;
   $i = 1;
   for (1 .. $proc) {
@@ -148,5 +153,8 @@ subtest 'auto starting queues on add' => sub {
     $i++;
   }
 };
+
+is(Mojo::IOLoop::ReadWriteProcess::Session->singleton->all->size,         40);
+is(Mojo::IOLoop::ReadWriteProcess::Session->singleton->all_orphans->size, 0);
 
 done_testing;

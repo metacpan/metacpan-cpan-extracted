@@ -1,6 +1,6 @@
 package Lab::Instrument::HP3458A;
 #ABSTRACT: Agilent 3458A Multimeter
-$Lab::Instrument::HP3458A::VERSION = '3.613';
+$Lab::Instrument::HP3458A::VERSION = '3.620';
 use strict;
 use Lab::Instrument;
 use Lab::Instrument::Multimeter;
@@ -514,7 +514,7 @@ Lab::Instrument::HP3458A - Agilent 3458A Multimeter
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -726,7 +726,7 @@ probably many
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich

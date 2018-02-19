@@ -1,6 +1,6 @@
 NAME
-    Mojolicious::Command::generate::resources - Generate M, V & C from
-    database tables
+    Mojolicious::Command::generate::resources - Generate MVC & OpenAPI
+    RESTful API files from database tables
 
 SYNOPSIS
       Usage: APPLICATION generate resources [OPTIONS]
@@ -13,11 +13,14 @@ PERL REQUIREMENTS
     required.
 
 DESCRIPTION
-    Mojolicious::Command::generate::resources generates directory structure
-    for a fully functional MVC set of files, and routes based on existing
-    tables in your application's database.
+    An usable release...
 
-    This tool's purpose is to promote RAD
+    Mojolicious::Command::generate::resources generates directory structure
+    for a fully functional MVC set of files, routes and RESTful API
+    specification in OpenAPI <https://github.com/OAI/OpenAPI-Specification>
+    format based on existing tables in your application's database.
+
+    The purpose of this tool is to promote RAD
     <http://en.wikipedia.org/wiki/Rapid_application_development> by
     generating the boilerplate code for model (M), templates (V) and
     controller (C) and help programmers to quickly create well structured,
@@ -46,6 +49,26 @@ OPTIONS
     values they accept. All of them, beside "--tables", are guessed from
     your application and usually do not need to be specified.
 
+  H|home_dir=s
+    Optional. Defaults to "app->home" (which is MyApp home directory). Used
+    to set the root directory to which the files will be dumped. If you set
+    this option, respectively the "lib" and "api" folders will be created
+    under the new "home_dir". If you want them elsewhere, set these options
+    explicitly.
+
+  L|lib=s
+    Optional. Defaults to "app->home/lib" (relative to the "--home_dir"
+    directory). If you installed MyApp in some custom path and you wish to
+    generate your controllers into e.g. "site_lib", set this option.
+
+  api_dir
+    Optional. Directory where the OpenAPI
+    <https://github.com/OAI/OpenAPI-Specification> "json" file will be
+    generated. Defaults to "app->home/api" (relative to the "--home_dir"
+    directory). If you installed MyApp in some custom path and you wish to
+    generate your "OpenApi" files into for example "site_lib/MyApp/etc/api",
+    set this option explicitly.
+
   C|controller_namespace=s
     Optional. The namespace for the controller classes to be generated.
     Defaults to "app->routes->namespaces->[0]", usually MyApp::Controller,
@@ -62,15 +85,6 @@ OPTIONS
       # Namespace(s) to load controllers from
       # See /perldoc/Mojolicious#routes
       app->routes->namespaces(['MyApp::C']);
-
-  H|home_dir=s
-    Optional. Defaults to "app->home" (which is MyApp home directory). Used
-    to set the root directory to which the files will be dumped.
-
-  L|lib=s
-    Optional. Defaults to "app->home/lib" (relative to the "--home_dir"
-    directory). If you installed MyApp in some custom path and you wish to
-    generate your controllers into e.g. "site_lib", set this option.
 
   M|model_namespace=s
     Optional. The namespace for the model classes to be generated. Defaults
@@ -100,7 +114,7 @@ ATTRIBUTES
     Mojolicious::Command and implements the following new ones.
 
   args
-    Used for storing arguments from the commandline template.
+    Used for storing arguments from the command-line.
 
       my $args = $self->args;
 
@@ -108,10 +122,11 @@ ATTRIBUTES
       my $description = $command->description;
       $command        = $command->description('Foo!');
 
-    Short description of this command, used for the commands list.
+    Short description of this command, used for the "~$ mojo generate"
+    commands list.
 
   routes
-      $self->routes();
+      $self->routes;
 
     Returns an ARRAY reference containing routes, prepared after
     "$self->args->{tables}". Suggested Perl code for the routes is dumped in
@@ -143,11 +158,24 @@ METHODS
         $self->render_template_to_file($tmpl_file, $target_file, $template_args);
 
   generate_formfields
-    Generates form-fields from columns information found in the repective
+    Generates form-fields from columns information found in the respective
     table. The result is put into "_form.html.ep". The programmer can then
     modify the generated form-fields.
 
         $form_fields = $self->generate_formfields($table_name);
+
+  generate_openapi
+    Generates Open API <https://github.com/OAI/OpenAPI-Specification> file
+    in json format. The generated file is put in "--api_dir". The filename
+    is "api.json". This is the file which will be loaded by "MyApp".
+
+  generate_path_api
+    Generates API definitions and paths for each table. Invoked in
+    "generate_openapi". Paramaters: $t - the table name; $api_defs_object -
+    the object API definition, based on the table name; $tmpl_args - the
+    arguments for the templates. $api_defs_object and $tmpl_args will be
+    enriched with additional key-value pairs as required by the OpenAPI
+    specification. Returns "void".
 
   generate_validation
     Generates code for the "_validation" method in the respective controler.
@@ -159,8 +187,7 @@ TODO
     Some parts may be fully implemented while others may be left for later.
 
         - Improve documentation.
-        - Implement generation of Open API specification out from
-          tables' metadata. More tests.
+        - Append to the existing api.json if it already exists. More tests.
 
 AUTHOR
         Красимир Беров
@@ -176,6 +203,6 @@ COPYRIGHT
     with this module.
 
 SEE ALSO
-    Mojolicious::Command::generate, Mojolicious::Command, Mojolicious, Perl
-    <https://www.perl.org/>.
+    Mojolicious::Command::generate, Mojolicious::Command, Mojolicious,
+    Mojolicious::Plugin::OpenAPI, Perl <https://www.perl.org/>.
 

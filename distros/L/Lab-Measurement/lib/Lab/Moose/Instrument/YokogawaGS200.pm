@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::YokogawaGS200;
-$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.613';
+$Lab::Moose::Instrument::YokogawaGS200::VERSION = '3.620';
 #ABSTRACT: YokogawaGS200 voltage/current source.
 
 use 5.010;
@@ -13,6 +13,16 @@ use Lab::Moose::Instrument::Cache;
 use namespace::autoclean;
 
 extends 'Lab::Moose::Instrument';
+
+around default_connection_options => sub {
+    my $orig     = shift;
+    my $self     = shift;
+    my $options  = $self->$orig();
+    my $usb_opts = { vid => 0x0b21, pid => 0x0039 };
+    $options->{USB} = $usb_opts;
+    $options->{'VISA::USB'} = $usb_opts;
+    return $options;
+};
 
 has [qw/max_units_per_second max_units_per_step min_units max_units/] =>
     ( is => 'ro', isa => 'Num', required => 1 );
@@ -123,7 +133,7 @@ Lab::Moose::Instrument::YokogawaGS200 - YokogawaGS200 voltage/current source.
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -133,13 +143,11 @@ version 3.613
      type => 'YokogawaGS200',
      connection_type => 'LinuxGPIB',
      connection_options => {gpib_address => 15},
-     instrument_options => {
-         # mandatory protection settings
-         max_units_per_step => 0.001, # max step is 1mV/1mA
-         max_units_per_second => 0.01,
-         min_units => -10,
-         max_units => 10,
-     }
+     # mandatory protection settings
+     max_units_per_step => 0.001, # max step is 1mV/1mA
+     max_units_per_second => 0.01,
+     min_units => -10,
+     max_units => 10,
  );
 
  # Step-sweep to new level.
@@ -196,9 +204,9 @@ For XPRESS voltage sweep. Equivalent to C<set_voltage>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

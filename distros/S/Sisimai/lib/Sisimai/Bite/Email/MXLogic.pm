@@ -5,29 +5,18 @@ use strict;
 use warnings;
 
 # Based on Sisimai::Bite::Email::Exim
-my $Re0 = {
-    'from'      => qr/\AMail Delivery System/,
-    'subject'   => qr{(?:
-         Mail[ ]delivery[ ]failed(:[ ]returning[ ]message[ ]to[ ]sender)?
-        |Warning:[ ]message[ ].+[ ]delayed[ ]+
-        |Delivery[ ]Status[ ]Notification
-        )
-    }x,
-    'message-id' => qr/\A[<]mxl[~][0-9a-f]+/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'message' => ['This message was created automatically by mail delivery software.'],
+    'rfc822'  => ['Included is a copy of the message header:'],
 };
-my $Re1 = {
-    'rfc822' => qr/\AIncluded is a copy of the message header:\z/,
-    'begin'  => qr/\AThis message was created automatically by mail delivery software[.]\z/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
-};
-my $ReCommand = [
+
+my $ReCommands = [
     qr/SMTP error from remote (?:mail server|mailer) after ([A-Za-z]{4})/,
     qr/SMTP error from remote (?:mail server|mailer) after end of ([A-Za-z]{4})/,
 ];
-my $ReFailure = {
-    'userunknown' => qr{
-        user[ ]not[ ]found
-    }x,
+my $ReFailures = {
+    'userunknown' => qr/user not found/,
     'hostunknown' => qr{(?>
          all[ ](?:
              host[ ]address[ ]lookups[ ]failed[ ]permanently
@@ -36,11 +25,7 @@ my $ReFailure = {
         |Unrouteable[ ]address
         )
     }x,
-    'mailboxfull' => qr{(?:
-         mailbox[ ]is[ ]full:?
-        |error:[ ]quota[ ]exceed
-        )
-    }x,
+    'mailboxfull' => qr/(?:mailbox is full:?|error: quota exceed)/,
     'notaccept' => qr{(?:
          an[ ]MX[ ]or[ ]SRV[ ]record[ ]indicated[ ]no[ ]SMTP[ ]service
         |no[ ]host[ ]found[ ]for[ ]existing[ ]SMTP[ ]connection
@@ -52,11 +37,9 @@ my $ReFailure = {
         |LMTP[ ]error[ ]after[ ]
         )
     }x,
-    'contenterror' => qr{
-        Too[ ]many[ ]["]Received["][ ]headers
-    }x,
+    'contenterror'=> qr/Too many ["]Received["] headers/,
 };
-my $ReDelayed = qr{(?:
+my $ReDelaying = qr{(?:
      retry[ ]timeout[ ]exceeded
     |No[ ]action[ ]is[ ]required[ ]on[ ]your[ ]part
     |retry[ ]time[ ]not[ ]reached[ ]for[ ]any[ ]host[ ]after[ ]a[ ]long[ ]failure[ ]period
@@ -65,15 +48,12 @@ my $ReDelayed = qr{(?:
     |Message[ ].+[ ](?:has[ ]been[ ]frozen|was[ ]frozen[ ]on[ ]arrival[ ]by[ ])
     )
 }x;
-my $Indicators = __PACKAGE__->INDICATORS;
 
 # X-MX-Bounce: mta/src/queue/bounce
 # X-MXL-NoteHash: ffffffffffffffff-0000000000000000000000000000000000000000
 # X-MXL-Hash: 4c9d4d411993da17-bbd4212b6c887f6c23bab7db4bd87ef5edc00758
 sub headerlist  { return ['X-MXL-NoteHash', 'X-MXL-Hash', 'X-MX-Bounce'] }
-sub pattern     { return $Re0 }
 sub description { 'McAfee SaaS' }
-
 sub scan {
     # Detect an error from MXLogic
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -92,11 +72,17 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
+    # 'message-id' => qr/\A[<]mxl[~][0-9a-f]+/,
     $match ||= 1 if defined $mhead->{'x-mx-bounce'};
     $match ||= 1 if defined $mhead->{'x-mxl-hash'};
     $match ||= 1 if defined $mhead->{'x-mxl-notehash'};
-    $match ||= 1 if $mhead->{'subject'} =~ $Re0->{'subject'};
-    $match ||= 1 if $mhead->{'from'}    =~ $Re0->{'from'};
+    $match ||= 1 if index($mhead->{'from'}, 'Mail Delivery System') == 0;
+    $match ||= 1 if $mhead->{'subject'} =~ qr{(?:
+         Mail[ ]delivery[ ]failed(:[ ]returning[ ]message[ ]to[ ]sender)?
+        |Warning:[ ]message[ ].+[ ]delayed[ ]+
+        |Delivery[ ]Status[ ]Notification
+        )
+    }x;
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -110,10 +96,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e eq $StartingOf->{'message'}->[0] ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -121,7 +107,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -151,7 +137,7 @@ sub scan {
             #    host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A[ \t]*[<]([^ ]+[@][^ ]+)[>]:(.+)\z/ ) {
+            if( $e =~ /\A[ \t]*[<]([^ ]+[@][^ ]+)[>]:(.+)\z/ ) {
                 # A message that you have sent could not be delivered to one or more
                 # recipients.  This is a permanent error.  The following address failed:
                 #
@@ -177,7 +163,7 @@ sub scan {
     if( scalar @{ $mhead->{'received'} } ) {
         # Get the name of local MTA
         # Received: from marutamachi.example.org (c192128.example.net [192.0.2.128])
-        $localhost0 = $1 if $mhead->{'received'}->[-1] =~ m/from[ \t]([^ ]+) /;
+        $localhost0 = $1 if $mhead->{'received'}->[-1] =~ /from[ \t]([^ ]+) /;
     }
 
     require Sisimai::String;
@@ -188,12 +174,10 @@ sub scan {
         $e->{'diagnosis'} =~ s/[-]{2}.*\z//g;
         $e->{'diagnosis'} =  Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( ! $e->{'rhost'} ) {
+        unless( $e->{'rhost'} ) {
             # Get the remote host name
-            if( $e->{'diagnosis'} =~ m/host[ \t]+([^ \t]+)[ \t]\[.+\]:[ \t]/ ) {
-                # host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
-                $e->{'rhost'} = $1;
-            }
+            # host neko.example.jp [192.0.2.222]: 550 5.1.1 <kijitora@example.jp>... User Unknown
+            $e->{'rhost'} = $1 if $e->{'diagnosis'} =~ /host[ \t]+([^ \t]+)[ \t]\[.+\]:[ \t]/;
 
             unless( $e->{'rhost'} ) {
                 if( scalar @{ $mhead->{'received'} } ) {
@@ -203,9 +187,9 @@ sub scan {
             }
         }
 
-        if( ! $e->{'command'} ) {
+        unless( $e->{'command'} ) {
             # Get the SMTP command name for the session
-            SMTP: for my $r ( @$ReCommand ) {
+            SMTP: for my $r ( @$ReCommands ) {
                 # Verify each regular expression of SMTP commands
                 next unless $e->{'diagnosis'} =~ $r;
                 $e->{'command'} = uc $1;
@@ -217,22 +201,22 @@ sub scan {
                 # MAIL | Connected to 192.0.2.135 but sender was rejected.
                 $e->{'reason'} = 'rejected';
 
-            } elsif( $e->{'command'} =~ m/\A(?:HELO|EHLO)\z/ ) {
+            } elsif( $e->{'command'} eq 'HELO' || $e->{'command'} eq 'EHLO' ) {
                 # HELO | Connected to 192.0.2.135 but my name was rejected.
                 $e->{'reason'} = 'blocked';
 
             } else {
                 # Verify each regular expression of session errors
-                SESSION: for my $r ( keys %$ReFailure ) {
+                SESSION: for my $r ( keys %$ReFailures ) {
                     # Check each regular expression
-                    next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+                    next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
                     $e->{'reason'} = $r;
                     last;
                 }
 
                 unless( $e->{'reason'} ) {
                     # The reason "expired"
-                    $e->{'reason'} = 'expired' if $e->{'diagnosis'} =~ $ReDelayed;
+                    $e->{'reason'} = 'expired' if $e->{'diagnosis'} =~ $ReDelaying;
                 }
             }
         }
@@ -287,7 +271,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

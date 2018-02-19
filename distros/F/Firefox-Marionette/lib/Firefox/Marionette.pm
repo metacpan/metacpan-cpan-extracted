@@ -10,6 +10,7 @@ use Firefox::Marionette::Element::Rect();
 use Firefox::Marionette::Timeouts();
 use Firefox::Marionette::Capabilities();
 use Firefox::Marionette::Profile();
+use Firefox::Marionette::Proxy();
 use JSON();
 use IPC::Run();
 use Socket();
@@ -34,30 +35,79 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.37';
+our $VERSION = '0.42';
 
-sub _ANYPROCESS                    { return -1 }
-sub _COMMAND                       { return 0 }
-sub _DEFAULT_HOST                  { return 'localhost' }
-sub _WIN32_ERROR_SHARING_VIOLATION { return 0x20 }
-sub _NUMBER_OF_MCOOKIE_BYTES       { return 16 }
-sub _MAX_DISPLAY_LENGTH            { return 10 }
-sub _NUMBER_OF_TERM_ATTEMPTS       { return 4 }
-sub _MIN_VERSION_FOR_NEW_CMDS      { return 56 }
-sub _MIN_VERSION_FOR_NEW_SENDKEYS  { return 55 }
-sub _MIN_VERSION_FOR_HEADLESS      { return 55 }
-sub _MIN_VERSION_FOR_WD_HEADLESS   { return 56 }
-sub _MIN_VERSION_FOR_SAFE_MODE     { return 55 }
-sub _MIN_VERSION_FOR_AUTO_LISTEN   { return 55 }
+sub _ANYPROCESS                     { return -1 }
+sub _COMMAND                        { return 0 }
+sub _DEFAULT_HOST                   { return 'localhost' }
+sub _WIN32_ERROR_SHARING_VIOLATION  { return 0x20 }
+sub _NUMBER_OF_MCOOKIE_BYTES        { return 16 }
+sub _MAX_DISPLAY_LENGTH             { return 10 }
+sub _NUMBER_OF_TERM_ATTEMPTS        { return 4 }
+sub _MIN_VERSION_FOR_NEW_CMDS       { return 56 }
+sub _MIN_VERSION_FOR_NEW_SENDKEYS   { return 55 }
+sub _MIN_VERSION_FOR_HEADLESS       { return 55 }
+sub _MIN_VERSION_FOR_WD_HEADLESS    { return 56 }
+sub _MIN_VERSION_FOR_SAFE_MODE      { return 55 }
+sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
+sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
+sub _DEFAULT_SOCKS_VERSION          { return 5 }
 
-sub BY_XPATH    { return 'xpath' }
-sub BY_ID       { return 'id' }
-sub BY_NAME     { return 'name' }
-sub BY_TAG      { return 'tag name' }
-sub BY_CLASS    { return 'class name' }
-sub BY_SELECTOR { return 'css selector' }
-sub BY_LINK     { return 'link text' }
-sub BY_PARTIAL  { return 'partial link text' }
+sub BY_XPATH {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_XPATH()) HAS BEEN REPLACED BY find ****'
+    );
+    return 'xpath';
+}
+
+sub BY_ID {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_ID()) HAS BEEN REPLACED BY find_by_id ****'
+    );
+    return 'id';
+}
+
+sub BY_NAME {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_NAME()) HAS BEEN REPLACED BY find_by_name ****'
+    );
+    return 'name';
+}
+
+sub BY_TAG {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_TAG()) HAS BEEN REPLACED BY find_by_tag ****'
+    );
+    return 'tag name';
+}
+
+sub BY_CLASS {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_CLASS()) HAS BEEN REPLACED BY find_by_class ****'
+    );
+    return 'class name';
+}
+
+sub BY_SELECTOR {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_SELECTOR()) HAS BEEN REPLACED BY find_by_selector ****'
+    );
+    return 'css selector';
+}
+
+sub BY_LINK {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_LINK()) HAS BEEN REPLACED BY find_by_link ****'
+    );
+    return 'link text';
+}
+
+sub BY_PARTIAL {
+    Carp::carp(
+'**** DEPRECATED METHOD - using find(..., BY_PARTIAL()) HAS BEEN REPLACED BY find_by_partial ****'
+    );
+    return 'partial link text';
+}
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -85,20 +135,22 @@ sub new {
     return $self;
 }
 
-sub _setup_arguments {
+sub _check_addons {
     my ( $self, %parameters ) = @_;
-    my @arguments = ('-marionette');
-
-    if ( $parameters{firefox_binary} ) {
-        $self->{firefox_binary} = $parameters{firefox_binary};
-    }
+    $self->{addons} = 1;
+    my @arguments = ();
     if ( !$parameters{addons} ) {
         if ( $self->_is_safe_mode_okay() ) {
             push @arguments, '-safe-mode';
+            $self->{addons} = 0;
         }
     }
+    return @arguments;
+}
 
-    $self->{debug} = $parameters{debug};
+sub _check_visible {
+    my ( $self, %parameters ) = @_;
+    my @arguments = ();
     if (   ( defined $parameters{capabilities} )
         && ( !$parameters{capabilities}->moz_headless() ) )
     {
@@ -119,8 +171,8 @@ sub _setup_arguments {
         }
         else {
             if ( $self->_xvfb_exists() && ( $self->_launch_xvfb() ) ) {
-                $self->{_xvfb_support_for_headless} = 1;
-                $self->{visible}                    = 0;
+                $self->{_launched_xvfb_anyway} = 1;
+                $self->{visible}               = 0;
             }
             else {
                 Carp::carp('Unable to launch firefox with -headless option');
@@ -128,6 +180,38 @@ sub _setup_arguments {
             }
         }
     }
+    $self->_launch_xvfb_if_required();
+    return @arguments;
+}
+
+sub _launch_xvfb_if_required {
+    my ($self) = @_;
+    if ( $self->{visible} ) {
+        if (   ( $OSNAME eq 'MSWin32' )
+            || ( $OSNAME eq 'darwin' )
+            || ( $OSNAME eq 'cygwin' )
+            || ( $ENV{DISPLAY} )
+            || ( $self->{_launched_xvfb_anyway} ) )
+        {
+        }
+        elsif ( $self->_xvfb_exists() && ( $self->_launch_xvfb() ) ) {
+            $self->{_launched_xvfb_anyway} = 1;
+        }
+    }
+    return;
+}
+
+sub _setup_arguments {
+    my ( $self, %parameters ) = @_;
+    my @arguments = ('-marionette');
+
+    if ( $parameters{firefox_binary} ) {
+        $self->{firefox_binary} = $parameters{firefox_binary};
+    }
+    push @arguments, $self->_check_addons(%parameters);
+
+    $self->{debug} = $parameters{debug};
+    push @arguments, $self->_check_visible(%parameters);
     if ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
         push @arguments, ( '-P', $self->{profile_name} );
@@ -143,6 +227,22 @@ sub _setup_arguments {
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
     }
     return @arguments;
+}
+
+sub _is_new_hostport_okay {
+    my ($self) = @_;
+    $self->_initialise_version();
+    if (
+        ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} <
+            _MIN_VERSION_FOR_HOSTPORT_PROXY() )
+      )
+    {
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
 
 sub _is_new_sendkeys_okay {
@@ -256,6 +356,7 @@ sub _launch {
         && ( $OSNAME ne 'cygwin' )
         && ( $self->_visible() )
         && ( !$ENV{DISPLAY} )
+        && ( !$self->{_launched_xvfb_anyway} )
         && ( $self->_xvfb_exists() )
         && ( $self->_launch_xvfb() ) )
     { # if not MacOS or Win32 and no DISPLAY variable, launch Xvfb if at all possible
@@ -263,7 +364,7 @@ sub _launch {
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
         return $self->_launch_unix(@arguments);
     }
-    elsif ( $self->{_xvfb_support_for_headless} ) {
+    elsif ( $self->{_launched_xvfb_anyway} ) {
         local $ENV{DISPLAY}    = $self->_xvfb_display();
         local $ENV{XAUTHORITY} = $self->_xvfb_xauthority();
         return $self->_launch_unix(@arguments);
@@ -325,7 +426,7 @@ sub _xvfb_exists {
         return 0;
     }
     eval { require Crypt::URandom; } or do {
-        Carp::croak('Unable to load Crypt::URandom');
+        Carp::carp('Unable to load Crypt::URandom');
         return 0;
     };
     if ( my $pid = fork ) {
@@ -806,9 +907,7 @@ sub _get_port {
           or Carp::croak(
             "Failed to close '$self->{profile_path}':$EXTENDED_OS_ERROR");
     }
-    if ($port) {
-        return $port;
-    }
+    return $port;
 }
 
 sub _initial_socket_setup {
@@ -820,24 +919,94 @@ sub _initial_socket_setup {
     return $self->new_session($capabilities);
 }
 
+sub _request_proxy {
+    my ( $self, $proxy ) = @_;
+    my $build = {};
+    if ( $proxy->type() ) {
+        $build->{proxyType} = $proxy->type();
+    }
+    elsif ( $proxy->pac() ) {
+        $build->{proxyType} = 'pac';
+    }
+    if ( $proxy->pac() ) {
+        $build->{proxyAutoconfigUrl} = $proxy->pac()->as_string();
+    }
+    if ( $proxy->ftp() ) {
+        $build->{ftpProxy} = $proxy->ftp();
+        if ( !$self->_is_new_hostport_okay() ) {
+            if ( $build->{ftpProxy} =~ s/:(\d+)$//smx ) {
+                $build->{ftpProxyPort} = $1 + 0;
+            }
+        }
+    }
+    if ( $proxy->http() ) {
+        $build->{httpProxy} = $proxy->http();
+        if ( !$self->_is_new_hostport_okay() ) {
+            if ( $build->{httpProxy} =~ s/:(\d+)$//smx ) {
+                $build->{httpProxyPort} = $1 + 0;
+            }
+        }
+    }
+    if ( $proxy->none() ) {
+        $build->{noProxy} = [ $proxy->none() ];
+    }
+    if ( $proxy->https() ) {
+        $build->{sslProxy} = $proxy->https();
+        if ( !$self->_is_new_hostport_okay() ) {
+            if ( $build->{sslProxy} =~ s/:(\d+)$//smx ) {
+                $build->{sslProxyPort} = $1 + 0;
+            }
+        }
+    }
+    if ( $proxy->socks() ) {
+        $build->{socksProxy} = $proxy->socks();
+        if ( !$self->_is_new_hostport_okay() ) {
+            if ( $build->{socksProxy} =~ s/:(\d+)$//smx ) {
+                $build->{socksProxyPort} = $1 + 0;
+            }
+        }
+    }
+    if ( $proxy->socks_version() ) {
+        $build->{socksProxyVersion} = $build->{socksVersion} =
+          $proxy->socks_version() + 0;
+    }
+    elsif ( $proxy->socks() ) {
+        $build->{socksProxyVersion} = $build->{socksVersion} =
+          _DEFAULT_SOCKS_VERSION();
+    }
+    return $build;
+}
+
 sub new_session {
     my ( $self, $capabilities ) = @_;
     my $parameters = {};
     if (   ( defined $capabilities )
         && ( $capabilities->isa('Firefox::Marionette::Capabilities') ) )
     {
-        my $actual = {
-            acceptInsecureCerts => $capabilities->accept_insecure_certs()
-            ? JSON::true()
-            : JSON::false(),
-            pageLoadStrategy     => $capabilities->page_load_strategy(),
-            'moz:webdriverClick' => $capabilities->moz_webdriver_click()
-            ? JSON::true
-            : JSON::false(),
-            'moz:accessibilityChecks' =>
-              $capabilities->moz_accessibility_checks() ? JSON::true()
-            : JSON::false(),
-        };
+        my $actual = {};
+        if ( defined $capabilities->accept_insecure_certs() ) {
+
+            $actual->{acceptInsecureCerts} =
+              $capabilities->accept_insecure_certs()
+              ? JSON::true()
+              : JSON::false();
+        }
+        if ( defined $capabilities->page_load_strategy() ) {
+            $actual->{pageLoadStrategy} = $capabilities->page_load_strategy();
+        }
+        if ( defined $capabilities->moz_webdriver_click() ) {
+            $actual->{'moz:webdriverClick'} =
+              $capabilities->moz_webdriver_click() ? JSON::true : JSON::false();
+        }
+        if ( defined $capabilities->moz_accessibility_checks() ) {
+            $actual->{'moz:accessibilityChecks'} =
+              $capabilities->moz_accessibility_checks()
+              ? JSON::true()
+              : JSON::false();
+        }
+        if ( $capabilities->proxy() ) {
+            $actual->{proxy} = $self->_request_proxy( $capabilities->proxy() );
+        }
         $parameters = $actual;    # for Mozilla 57 and after
         foreach my $key ( sort { $a cmp $b } keys %{$actual} ) {
             $parameters->{capabilities}->{requiredCapabilities}->{$key} =
@@ -906,6 +1075,11 @@ sub _create_capabilities {
             $self->{_page_load_timeouts_key} = 'pageLoad';
         }
     }
+    my %optional;
+    if ( defined $parameters->{proxy} ) {
+        $optional{proxy} = Firefox::Marionette::Proxy->new(
+            $self->_response_proxy( $parameters->{proxy} ) );
+    }
 
     return Firefox::Marionette::Capabilities->new(
         accept_insecure_certs => $parameters->{acceptInsecureCerts} ? 1 : 0,
@@ -928,33 +1102,123 @@ sub _create_capabilities {
         moz_accessibility_checks => $parameters->{'moz:accessibilityChecks'}
         ? 1
         : 0,
+        %optional,
     );
+}
+
+sub _response_proxy {
+    my ( $self, $parameters ) = @_;
+    my %proxy;
+    if ( defined $parameters->{proxyType} ) {
+        $proxy{type} = $parameters->{proxyType};
+    }
+    if ( defined $parameters->{proxyAutoconfigUrl} ) {
+        $proxy{pac} = $parameters->{proxyAutoconfigUrl};
+    }
+    if ( defined $parameters->{ftpProxy} ) {
+        $proxy{ftp} = $parameters->{ftpProxy};
+        if ( $parameters->{ftpProxyPort} ) {
+            $proxy{ftp} .= q[:] . $parameters->{ftpProxyPort};
+        }
+    }
+    if ( defined $parameters->{httpProxy} ) {
+        $proxy{http} = $parameters->{httpProxy};
+        if ( $parameters->{httpProxyPort} ) {
+            $proxy{http} .= q[:] . $parameters->{httpProxyPort};
+        }
+    }
+    if ( defined $parameters->{sslProxy} ) {
+        $proxy{https} = $parameters->{sslProxy};
+        if ( $parameters->{sslProxyPort} ) {
+            $proxy{https} .= q[:] . $parameters->{sslProxyPort};
+        }
+    }
+    if ( defined $parameters->{noProxy} ) {
+        $proxy{none} = $parameters->{noProxy};
+    }
+    if ( defined $parameters->{socksProxy} ) {
+        $proxy{socks} = $parameters->{socksProxy};
+        if ( $parameters->{socksProxyPort} ) {
+            $proxy{socks} .= q[:] . $parameters->{socksProxyPort};
+        }
+    }
+    if ( defined $parameters->{socksProxyVersion} ) {
+        $proxy{socks_version} = $parameters->{socksProxyVersion};
+    }
+    elsif ( defined $parameters->{socksVersion} ) {
+        $proxy{socks_version} = $parameters->{socksVersion};
+    }
+    return %proxy;
 }
 
 sub find_elements {
     my ( $self, $value, $using ) = @_;
     Carp::carp(
-        '**** DEPRECATED METHOD - find_elements HAS BEEN REPLACED BY list ****'
+        '**** DEPRECATED METHOD - find_elements HAS BEEN REPLACED BY find ****'
     );
-    return $self->find( $value, $using );
+    return $self->_find( $value, $using );
 }
 
 sub list {
-    my ( $self, $value, $using ) = @_;
-    $using ||= BY_XPATH();
-    my $message_id = $self->_new_message_id();
-    $self->_send_request(
-        [
-            _COMMAND(),
-            $message_id,
-            $self->_command('WebDriver:FindElements'),
-            { using => $using, value => $value }
-        ]
+    my ( $self, $value, $using, $from ) = @_;
+    Carp::carp('**** DEPRECATED METHOD - list HAS BEEN REPLACED BY find ****');
+    return $self->_find( $value, $using, $from );
+}
+
+sub list_by_id {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_id HAS BEEN REPLACED BY find_by_id ****'
     );
-    my $response = $self->_get_response($message_id);
-    return
-      map { Firefox::Marionette::Element->new( $self, %{$_} ) }
-      @{ $response->result() };
+    return $self->_find( $value, 'id', $from );
+}
+
+sub list_by_name {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_name HAS BEEN REPLACED BY find_by_name ****'
+    );
+    return $self->_find( $value, 'name', $from );
+}
+
+sub list_by_tag {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_tag HAS BEEN REPLACED BY find_by_tag ****'
+    );
+    return $self->_find( $value, 'tag name', $from );
+}
+
+sub list_by_class {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_class HAS BEEN REPLACED BY find_by_class ****'
+    );
+    return $self->_find( $value, 'class name', $from );
+}
+
+sub list_by_selector {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_selector HAS BEEN REPLACED BY find_by_selector ****'
+    );
+    return $self->_find( $value, 'css selector', $from );
+}
+
+sub list_by_link {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_link HAS BEEN REPLACED BY find_by_link ****'
+    );
+    return $self->_find( $value, 'link text', $from );
+}
+
+sub list_by_partial {
+    my ( $self, $value, $from ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - list_by_partial HAS BEEN REPLACED BY find_by_partial ****'
+    );
+    return $self->_find( $value, 'partial link text', $from );
 }
 
 sub add_cookie {
@@ -1754,20 +2018,67 @@ sub find_element {
 }
 
 sub find {
-    my ( $self, $value, $using ) = @_;
-    $using ||= BY_XPATH();
+    my ( $self, $value, $using, $from ) = @_;
+    return $self->_find( $value, $using, $from );
+}
+
+sub find_by_id {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'id', $from );
+}
+
+sub find_by_name {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'name', $from );
+}
+
+sub find_by_tag {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'tag name', $from );
+}
+
+sub find_by_class {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'class name', $from );
+}
+
+sub find_by_selector {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'css selector', $from );
+}
+
+sub find_by_link {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'link text', $from );
+}
+
+sub find_by_partial {
+    my ( $self, $value, $from ) = @_;
+    return $self->_find( $value, 'partial link text', $from );
+}
+
+sub _find {
+    my ( $self, $value, $using, $from ) = @_;
+    $using ||= 'xpath';
     my $message_id = $self->_new_message_id();
+    my $parameters = { using => $using, value => $value };
+    if ( defined $from ) {
+        $parameters->{element} = $from->uuid();
+    }
+    my $command =
+      wantarray ? 'WebDriver:FindElements' : 'WebDriver:FindElement';
     $self->_send_request(
-        [
-            _COMMAND(),
-            $message_id,
-            $self->_command('WebDriver:FindElement'),
-            { using => $using, value => $value }
-        ]
-    );
+        [ _COMMAND(), $message_id, $self->_command($command), $parameters, ] );
     my $response = $self->_get_response($message_id);
-    return Firefox::Marionette::Element->new( $self,
-        %{ $response->result()->{value} } );
+    if (wantarray) {
+        return
+          map { Firefox::Marionette::Element->new( $self, %{$_} ) }
+          @{ $response->result() };
+    }
+    else {
+        return Firefox::Marionette::Element->new( $self,
+            %{ $response->result()->{value} } );
+    }
 }
 
 sub active_frame {
@@ -1820,19 +2131,19 @@ sub quit {
                 ]
             );
             my $response = $self->_get_response($message_id);
-        }
-        my $socket = delete $self->{_socket};
-        close $socket
-          or
-          Carp::croak("Failed to close socket to firefox:$EXTENDED_OS_ERROR");
-        if ( $OSNAME eq 'MSWin32' ) {
-            $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
-            $self->_reap();
-        }
-        else {
-            while ( kill 0, $self->_pid() ) {
-                sleep 1;
+            my $socket   = delete $self->{_socket};
+            close $socket
+              or Carp::croak(
+                "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+            if ( $OSNAME eq 'MSWin32' ) {
+                $self->{_win32_process}->Wait( Win32::Process::INFINITE() );
                 $self->_reap();
+            }
+            else {
+                while ( kill 0, $self->_pid() ) {
+                    sleep 1;
+                    $self->_reap();
+                }
             }
         }
     }
@@ -2136,6 +2447,11 @@ sub _new_message_id {
     return $self->{last_message_id};
 }
 
+sub addons {
+    my ($self) = @_;
+    return $self->{addons};
+}
+
 sub _send_request {
     my ( $self, $object ) = @_;
     my $json   = JSON::encode_json($object);
@@ -2280,18 +2596,18 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.37
+Version 0.42
 
 =head1 SYNOPSIS
 
-    use Firefox::Marionette qw(:all);
+    use Firefox::Marionette();
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find('search-input', BY_ID())->type('Test::More');
+    $firefox->find_by_class('container-fluid')->find_by_id('search-input')->type('Test::More');
 
-    my $file_handle = $firefox->selfie(highlights => [ $firefox->find('lucky', BY_NAME()) ])
+    my $file_handle = $firefox->selfie(highlights => [ $firefox->find_by_name('lucky') ])
 
     $firefox->find('//button[@name="lucky"]')->click();
 
@@ -2313,7 +2629,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * firefox_binary - use the specified path to the L<Firefox|https://firefox.org/> binary, rather than the default path.
 
-=item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs>
+=item * capabilities - use the supplied L<capabilities|Firefox::Marionette::Capabilities> object, for example to set whether the browser should L<accept insecure certs|Firefox::Marionette::Capabilities#accept_insecure_certs> or whether the browser should use a L<proxy|Firefox::Marionette::Proxy>.
 
 =item * profile_name - pick a specific existing profile to automate, rather than creating a new profile.  Note that L<firefox|https://firefox.com> refuses to allow more than one instance of a profile to run at the same time.  Profile names can be obtained by using the L<Firefox::Marionette::Profile::names()|Firefox::Marionette::Profile#names> method.  NOTE: firefox ignores any changes made to the profile on the disk while it is running.
 
@@ -2341,61 +2657,151 @@ returns the current L<URI|URI> of current top level browsing context for Desktop
 
 returns the current title of the window.
 
-=head2 find_element
-
-*** DEPRECATED - see L<find|Firefox::Marionette#find>. ***
-
 =head2 find
 
-returns the first element in the current browsing context that matches the search parameters supplied;
-
-=over 4
-
-=item * the first parameter is a scalar search value.  This can be an L<xpath|https://en.wikipedia.org/wiki/XPath> expression such as C<//button[@name="foo"]> to find all button elements that have a 'name' of 'foo'.
-
-=item * the second optional parameter is a scalar search strategy.  This defaults to L<BY_XPATH()|Firefox::Marionette#BY_XPATH>
-
-=back
+accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> expression> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
 
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
-    use Firefox::Marionette qw(:all);
+    use Firefox::Marionette();
     use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    # All these methods accomplish the same goal
-
     $firefox->find('//input[@id="search-input"]')->type('Test::More');
-    $firefox->find('//input[@id="search-input"]', BY_XPATH())->type('Test::More');
-    $firefox->find('search-input', BY_ID())->type('Test::More');
-    $firefox->find('q', BY_NAME())->type('Test::More');
-    $firefox->find('form-control home-search-input', BY_CLASS())->type('Test::More');
-    $firefox->find('input.home-search-input', BY_SELECTOR())->type('Test::More');
 
-    # Some additional strategies
+    # OR in list context 
 
-    $firefox->find('input', BY_TAG());
-    $firefox->find('API', BY_LINK());
-    $firefox->find('AP', BY_PARTIAL());
+    foreach my $element ($firefox->find('//input[@id="search-input"]')) {
+        $element->type('Test::More');
+    }
 
-=head2 find_elements
+=head2 find_by_id
 
-*** DEPRECATED - see L<list|Firefox::Marionette#list>. ***
-
-=head2 list
-
-returns all the elements in the current browsing context that match the search parameters supplied;
-
-=over 4
-
-=item * the first parameter is a scalar search value.  This can be an L<xpath|https://en.wikipedia.org/wiki/XPath> expression such as C<//button[@name="foo"]> to find all button elements that have a 'name' of 'foo'.
-
-=item * the second optional parameter is a scalar search strategy.  This defaults to L<BY_XPATH()|Firefox::Marionette#BY_XPATH>.
-
-=back
+accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'id' property.
 
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_by_id('search-input')->type('Test::More');
+
+    # OR in list context 
+
+    foreach my $element ($firefox->find_by_id('search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_name
+
+This method returns the first L<element|Firefox::Marionette::Element> with a matching 'name' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_by_name('q')->type('Test::More');
+
+    # OR in list context 
+
+    foreach my $element ($firefox->find_by_name('q')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_class
+
+accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'class' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_by_class('form-control home-search-input')->type('Test::More');
+
+    # OR in list context 
+
+    foreach my $element ($firefox->find_by_class('form-control home-search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_selector
+
+accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches that selector.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_by_selector('input.home-search-input')->type('Test::More');
+
+    # OR in list context 
+
+    foreach my $element ($firefox->list_by_selector('input.home-search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_tag
+
+accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with this tag name.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    my $element = $firefox->find_by_tag('input');
+
+    # OR in list context 
+
+    foreach my $element ($firefox->list_by_tag('input')) {
+        # do something
+    }
+
+=head2 find_by_link
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_by_link('API')->click();
+
+    # OR in list context 
+
+    foreach my $element ($firefox->list_by_link('API')) {
+        $element->click();
+    }
+
+=head2 find_by_partial
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a partially matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+    $firefox->find_by_partial('AP')->click();
+
+    # OR in list context 
+
+    foreach my $element ($firefox->list_by_partial('AP')) {
+        $element->click();
+    }
 
 =head2 css
 
@@ -2421,10 +2827,6 @@ accepts a scalar containing a javascript function that is executed in the browse
 
 The executing javascript is subject to the L<scripts|Firefox::Marionette::Timeouts#scripts> timeout.
 
-=head2 page_source
-
-*** DEPRECATED - see L<html|Firefox::Marionette#html>. ***
-
 =head2 html
 
 returns the page source of the content document.
@@ -2448,10 +2850,6 @@ here be cookie monsters! This method returns L<itself|Firefox::Marionette> to ai
 =head2 cookies
 
 returns the contents of the cookie jar in scalar or list context.
-
-=head2 send_keys
-
-*** DEPRECATED - see L<type|Firefox::Marionette#type>. ***
 
 =head2 type
 
@@ -2543,7 +2941,7 @@ sends keys to the input field of a currently displayed modal message box
 
 =head2 capabilities
 
-returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary
+returns the L<capabilities|Firefox::Marionette::Capabilities> of the current firefox binary.  You can retrieve L<timeouts|Firefox::Marionette::Timeouts> or a L<proxy|Firefox::Marionette::Proxy> with this method.
 
 =head2 screen_orientation
 
@@ -2653,6 +3051,10 @@ returns the application type for the Marionette protocol.  Should be 'gecko'.
 
 returns the version for the Marionette protocol.  Current most recent version is '3'.
 
+=head2 addons
+
+returns if pre-existing addons (extensions/themes) are allowed to run.  This will be true for Firefox versions less than 55, as -safe-mode cannot be automated.
+
 =head2 xvfb
 
 returns the pid of the xvfb process if it exists.
@@ -2676,38 +3078,6 @@ This method returns a human readable error message describing how the Firefox pr
 =head2 alive
 
 This method returns true or false depending on if the Firefox process is still running.
-
-=head2 BY_XPATH
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) that match with supplied L<xpath|https://en.wikipedia.org/wiki/XPath> expression.
-
-=head2 BY_ID
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'id' property.
-
-=head2 BY_NAME
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'name' property.
-
-=head2 BY_CLASS
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching 'class' property.
-
-=head2 BY_SELECTOR
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching L<CSS Selector|https://en.wikipedia.org/wiki/Cascading_Style_Sheets#Selector>
-
-=head2 BY_TAG
-
-This L<find|Firefox::Marionette#find> strategy returns the element(s) with a matching tag name.
-
-=head2 BY_LINK
-
-This L<find|Firefox::Marionette#find> strategy returns the link(s) with matching text
-
-=head2 BY_PARTIAL
-
-This L<find|Firefox::Marionette#find> strategy returns the link(s) with matching partial text
 
 =head1 DIAGNOSTICS
 
@@ -2737,6 +3107,9 @@ Firefox::Marionette requires no configuration files or environment variables.  I
 Firefox::Marionette requires the following non-core Perl modules
  
 =over
+ 
+=item *
+L<IPC::Run|IPC::Run>
  
 =item *
 L<JSON|JSON>

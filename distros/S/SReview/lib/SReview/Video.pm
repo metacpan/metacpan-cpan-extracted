@@ -490,6 +490,33 @@ sub _probe_vstream_id {
 	return $self->_get_videodata->{index};
 }
 
+=head2 extra_params
+
+Add extra parameters. This should be used sparingly, rather add some
+abstraction.
+
+=cut
+
+has 'extra_params' => (
+	traits => ['Hash'],
+	isa => 'HashRef[Str]',
+	is => 'ro',
+	handles => {
+		add_param => 'set',
+		drop_param => 'delete',
+	},
+	builder => "_probe_extra_params",
+	lazy => 1,
+);
+
+sub _probe_extra_params {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->extra_params;
+	}
+	return {};
+}
+
 # Only to be used by the Videopipe class when doing multiple passes
 has 'pass' => (
 	is => 'rw',
@@ -544,7 +571,9 @@ sub writeopts {
 		if(defined($self->quality)) {
 			push @opts, ('-crf', $self->quality);
 		}
-		push @opts, ('-speed', $self->speed);
+		if(defined($self->speed)) {
+			push @opts, ('-speed', $self->speed);
+		}
 		if($self->has_pass) {
 			push @opts, ('-pass', $self->pass, '-passlogfile', $self->url . '-multipass');
 		}
@@ -581,6 +610,12 @@ sub writeopts {
 
 	if(!defined($self->duration) && $#{$pipe->inputs}>0) {
 		push @opts, '-shortest';
+	}
+
+	if(scalar(keys(%{$self->extra_params}))>0) {
+		foreach my $param(keys %{$self->extra_params}) {
+			push @opts, ("-$param", $self->extra_params->{$param});
+		}
 	}
 
 	push @opts, $self->url;
@@ -628,6 +663,10 @@ sub _probe_videodata {
 }
 
 sub speed {
+	my $self = shift;
+	if($self->has_reference) {
+		return $self->reference->speed;
+	}
 	return 4;
 }
 

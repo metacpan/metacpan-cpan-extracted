@@ -20,7 +20,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                       unique_columns => ['name'],
                     },
                     dbxref =>{
-                      id_counter => 203,
+                      id_counter => 204,
                       column_names => [
                         'dbxref_id', 'accession', 'db_id',
                       ],
@@ -28,6 +28,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                         [ 200, 'is_a', 100 ],
                         [ 201, 'exact', 101 ],
                         [ 202, 'narrow', 101 ],
+                        [ 203, 'cv_version', 101 ],
                       ],
                       unique_columns => ['accession', 'db_id'],
                     },
@@ -39,6 +40,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                       rows => [
                         [ 300, 'relationship' ],
                         [ 301, 'synonym_type' ],
+                        [ 302, 'cv_property_type' ],
                       ],
                       unique_columns => ['name'],
                     },
@@ -52,6 +54,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                         [ 400, 'is_a', 'is_a', 300, 200, 1, 0],
                         [ 401, 'exact', 'exact', 301, 201, 0, 0],
                         [ 402, 'narrow', 'narrow', 301, 202, 0, 0],
+                        [ 403, 'cv_version', 'cv_version', 302, 203, 0, 0],
                       ],
                       unique_columns => ['name', 'cv_id'],
                     },
@@ -74,11 +77,19 @@ has storage => (is => 'rw', isa => 'HashRef',
                     cvterm_dbxref => {
                       id_counter => 701,
                       column_names => [
-                        'cvterm_dbxref_id', 'cvterm_id', 'dbxref_id',
+                        'cvterm_dbxref_id', 'cvterm_id', 'dbxref_id', 'is_for_definition',
                       ],
                       rows => [
                       ],
                     },
+                    cvprop => {
+                      id_counter => 801,
+                      column_names => [
+                        'cvprop_id', 'cv_id', 'type_id', 'value',
+                      ],
+                      rows => [
+                      ],
+                    }
                   }
                 });
 

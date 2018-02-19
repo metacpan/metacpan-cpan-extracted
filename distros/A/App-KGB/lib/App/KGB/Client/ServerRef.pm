@@ -86,6 +86,10 @@ seconds.
 
 Be verbose about communicating with KGB server.
 
+=item B<dry_run>
+
+Perform all processing, but do not communicate with the server.
+
 =back
 
 =head1 METHODS
@@ -143,7 +147,7 @@ Helper method sending commit information via JSON-RPC. Dies on errors.
 require v5.10.0;
 use base 'Class::Accessor::Fast';
 
-__PACKAGE__->mk_accessors( qw( uri proxy password timeout verbose ) );
+__PACKAGE__->mk_accessors( qw( uri proxy password timeout verbose dry_run ) );
 
 use utf8;
 use Carp qw(confess);
@@ -211,17 +215,12 @@ sub send_changes {
 
     my $meth;
     if ( $protocol_ver eq 'auto' ) {
-        $meth = 'send_changes_json';
+        $meth = 'send_changes_v4';
     }
     else {
         $meth = "send_changes_v$protocol_ver";
         die "Unsupported protocol version requested ($protocol_ver)\n"
             unless $self->can($meth);
-    }
-
-    if ( $self->verbose ) {
-        print "About to contact ", $self->proxy, "\n";
-        print "Commit: ", YAML::Dump($info), "\n";
     }
 
     $self->$meth($info);
@@ -238,6 +237,14 @@ sub send_changes_soap {
     my ( $self, $message ) = @_;
 
     require SOAP::Lite;
+
+    if ( $self->verbose ) {
+        printf "SOAP call: %s/%s\n", $self->uri, $self->proxy;
+        print "Message:\n", YAML::Dump($message);
+    }
+    if ( $self->dry_run ) {
+        return;
+    }
 
     my $s = SOAP::Lite->new( uri => $self->uri, proxy => $self->proxy );
     $s->transport->proxy->timeout( $self->timeout // 15 );
@@ -288,6 +295,15 @@ sub send_changes_json {
 
     $rpc->ua->default_header( 'X-KGB-Auth', $hash );
     $rpc->ua->default_header( 'X-KGB-Project', $repo_id );
+
+    if ( $self->verbose ) {
+        printf "JSON/RPC call: %s/json-rpc\n", $self->uri;
+        print "Headers:\n", $rpc->ua->default_headers->as_string;
+        print "Message:\n", YAML::Dump($message);
+    }
+    if ( $self->dry_run ) {
+        return;
+    }
 
     my $res = $rpc->call( $self->uri . '/json-rpc', $message );
 

@@ -16,6 +16,7 @@ use Moose::Instrument::MockTest qw/mock_instrument/;
 use MooseX::Params::Validate;
 use File::Spec::Functions 'catfile';
 use Data::Dumper;
+use Time::HiRes 'sleep';
 
 my $log_file = catfile(qw/t Moose Instrument RS_ZVA.yml/);
 
@@ -28,6 +29,8 @@ isa_ok( $zva, 'Lab::Moose::Instrument::RS_ZVA' );
 
 $zva->rst();
 
+# needs some time after RST ?!
+sleep(0.1);
 my $catalog = $zva->sparam_catalog();
 is_deeply(
     $catalog, [ 'Re(S21)', 'Im(S21)' ],
@@ -57,7 +60,8 @@ for my $i ( 1 .. 3 ) {
         ) || diag("pdl: $pdl");
     }
     my $amp = $data->slice(":,3");
-    ok( all( $amp < -50 ), "amplitude < -50 dB" );
+    print $amp;
+    ok( all( $amp < -40 ), "amplitude < -40 dB" );
     my $phase = $data->slice(":,4");
     ok( all( abs($phase) < 3.14159 ), "phase is in interval [-pi,pi]" );
 }
@@ -106,5 +110,11 @@ scpi_set_get_test(
     values => [qw/HIGH NORM HIGH/], is_numeric => 0
 );
 
+# set_frq / get_frq
+{
+    my $frq = 1.2345e9;
+    $zva->set_frq( value => $frq );
+    is_float( $zva->get_frq(), $frq, "single sweep mode" );
+}
 $zva->rst();
 done_testing();

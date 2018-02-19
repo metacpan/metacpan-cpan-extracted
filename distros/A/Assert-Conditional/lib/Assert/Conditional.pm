@@ -146,7 +146,12 @@ to override the current defaults.  It has three possible values:
 
 Here is the list of the support global variables, available for import,
 which are normally controlled by the C<ASSERT_CONDITIONAL> environment 
-variable.
+variable. These may be combined for stacked effects, but "never" cancels
+all of them. For example:
+
+    ASSERT_CONDITIONAL="carp,always"
+    ASSERT_CONDITIONAL="carp,handlers"
+    ASSERT_CONDITIONAL="carp,always,handlers"
 
 =over
 
@@ -158,13 +163,27 @@ them, they will never never make a peep nor raise an exception.
 =item always
 
 Assertions are always imported, and even if you somehow manage to avoid importing
-them, they will still raise an exception on error.
+them, they will still raise an exception on error. This is the default.
 
 =item carp
 
 Assertions are always imported but they do not raise an exception if they fail;
 instead they old carp at you.  This is true even if you manage to call an assertion
 you haven't imported.
+
+Note that if combined, you can get both effects:
+
+    ASSERT_CONDITIONAL="carp,always"
+
+=item handlers
+
+Only usable in conjunction with another of the previous three, as in 
+
+    ASSERT_CONDITIONAL="always,handlers"
+
+Unless this option is specified, C<$SIG{__WARN__}> and C<$SIG{__DIE__}>
+handlers will be suppressed if the assertion fails and therefore a C<carp>
+or C<confess> is needed.
 
 =back
 
@@ -188,7 +207,7 @@ use Scalar::Util        qw< reftype blessed looks_like_number openhandle >;
 use Attribute::Handlers;
 use Unicode::Normalize    < {check,}NF{,K}{C,D} >;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 sub  Assert                                ;
@@ -329,6 +348,7 @@ sub  check                                 ;
 sub  check_args                            ;
 sub _coredump_message            ( ;$    ) ;
 sub  export_to_level                       ;
+sub _get_invocant_type           (  $    ) ;
 sub  import                                ;
 sub _reimport_nulled_code_protos           ;
 sub _run_code_test               (  $$   ) ;
@@ -2422,6 +2442,7 @@ sub assert_known_package($)
     &assert_nonempty;
     my($arg) = @_;
     my $stash = do { no strict "refs"; \%{ $arg . "::" } };
+    no overloading;
     %$stash                     || botch "unknown package $arg";
 }
 
@@ -2458,13 +2479,27 @@ The invocant can invoke the method.
 
 =cut
 
+sub _get_invocant_type($) {
+    my($invocant) = @_;
+    my $type;
+    if (blessed $invocant) {
+        $type = "object";
+    } else {
+        $type = "package";
+        #assert_known_package($invocant);
+    }
+    return $type;
+}
+
 sub assert_can($@)
     :Assert( qw[object] )
 {
     my($invocant, @methods) = @_;
     @methods                            || botch "need one or more methods to check against";
+    my $type = _get_invocant_type $invocant;
     for my $method (@methods) {
-        $invocant->can($method)         || botch "cannot invoke $method on $invocant";
+        no overloading;
+        $invocant->can($method)         || botch "cannot invoke $method method on $type $invocant";
     }
 }
 
@@ -2479,8 +2514,10 @@ sub assert_cant($@)
 {
     my($invocant, @methods) = @_;
     @methods                            || botch "need one or more methods to check against";
+    my $type = _get_invocant_type $invocant;
     for my $method (@methods) {
-       !$invocant->can($method)         || botch "method $method should not be invocable on $invocant";
+        no overloading;
+       !$invocant->can($method)         || botch "method $method should not be invocable on $type $invocant";
     }
 }
 
@@ -2495,8 +2532,10 @@ sub assert_isa($@)
 {
     my($subclass, @superclasses) = @_;
     @superclasses                       || botch "needs one or more superclasses to check against";
+    my $type = _get_invocant_type $subclass;
     for my $superclass (@superclasses) {
-        $subclass->isa($superclass)     || botch "your $subclass should be a subclass of $superclass";
+        no overloading;
+        $subclass->isa($superclass)     || botch "your $subclass $type should be a subclass of $superclass";
     }
 }
 
@@ -2511,8 +2550,10 @@ sub assert_ainta($@)
 {
     my($subclass, @superclasses) = @_;
     @superclasses                       || botch "needs one or more superclasses to check against";
+    my $type = _get_invocant_type $subclass;
     for my $superclass (@superclasses) {
-       !$subclass->isa($superclass)     || botch "your $subclass should not be a subclass of $superclass";
+        no overloading;
+       !$subclass->isa($superclass)     || botch "your $subclass $type should not be a subclass of $superclass";
     }
 }
 
@@ -2527,8 +2568,10 @@ sub assert_does($@)
 {
     my($invocant, @roles) = @_;
     @roles                              || botch "needs one or more roles to check against";
+    my $type = _get_invocant_type $invocant;
     for my $role (@roles) {
-        $invocant->DOES($role)          || botch "your $invocant does not have role $role";
+        no overloading;
+        $invocant->DOES($role)          || botch "your $invocant $type does not have role $role";
     }
 }
 
@@ -2543,8 +2586,10 @@ sub assert_doesnt($@)
 {
     my($invocant, @roles) = @_;
     @roles                              || botch "needs one or more roles to check against";
+    my $type = _get_invocant_type $invocant;
     for my $role (@roles) {
-       !$invocant->DOES($role)          || botch "your $invocant should not have role $role";
+        no overloading;
+       !$invocant->DOES($role)          || botch "your $invocant $type should not have role $role";
     }
 }
 

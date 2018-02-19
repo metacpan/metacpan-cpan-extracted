@@ -1,5 +1,5 @@
 package Win32::ServiceManager;
-$Win32::ServiceManager::VERSION = '0.002003';
+$Win32::ServiceManager::VERSION = '0.002004';
 # ABSTRACT: Manage Windows Services
 
 use Moo;
@@ -58,8 +58,11 @@ sub _sc_install {
 }
 
 sub _sc_configure {
-   qw(sc config), $_[1], qq(DisplayName= "$_[2]"),
-   qq(type= own start= auto) . $_[0]->_depends($_[3])
+   my ($self, $name, $c) = @_;
+   qw(sc config), $name, qq(DisplayName= "$c->{display}"),
+   qq(type= own start= auto)
+   . $self->_depends($c->{depends})
+   . $self->_auth($c->{user}, $c->{password})
 }
 
 sub _depends {
@@ -71,6 +74,15 @@ sub _depends {
    $d = join '\\', @$depends if ref $depends;
 
    return qq( depend= "$d");
+}
+
+sub _auth {
+   my ($self, $user, $pass) = @_;
+   return '' unless $user;
+
+   join ' ', '', grep defined $_,
+      $user ? qq(obj= "$user") : undef,
+      $pass ? qq(password= "$pass") : undef,
 }
 
 sub _sc_failure { qw(sc failure), $_[1], 'reset= 60', 'actions= restart/60000' }
@@ -91,9 +103,15 @@ sub create_service {
 
    my $name    = $args{name}    or die 'name is required!';
    my $display = $args{display} or die 'display is required!';
+   die "can't provide a password without a 'user'" if $args{password} && !$args{user};
 
-   my $depends = $args{depends};
    my $description = $args{description};
+   my $config = {
+      display => $display,
+      depends => $args{depends},
+      user => $args{user},
+      password => $args{password},
+   };
 
    # we don't totally check for idempotence here...
    if (!$idempotent || $idempotent && !$self->_is_service_created($name)) {
@@ -123,7 +141,7 @@ sub create_service {
       }
    }
 
-   capture($self->_sc_configure($name, $display, $depends));
+   capture($self->_sc_configure($name, $config));
    capture($self->_sc_failure($name));
    capture($self->_sc_description($name, $description)) if $description;
 }
@@ -278,7 +296,7 @@ Win32::ServiceManager - Manage Windows Services
 
 =head1 VERSION
 
-version 0.002003
+version 0.002004
 
 =head1 SYNOPSIS
 
@@ -314,6 +332,8 @@ version 0.002003
     use_nssm    => 1,
     command     => 'C:\code\GR\script\server.pl -p 3001',
     depends     => [qw(MSSQL Apache2.4)],
+    user        => 'DOMAIN\username',
+    password    => 'hunter2',
  );
 
 Takes a hash of the following arguments:
@@ -362,6 +382,16 @@ XXX: do these even make sense?
 (optional) List of service names that must be started for your service to
 function.  You may either pass a string or an array ref.  A string gets passed
 on directly, the array reference gets properly joined together.
+
+=item * C<user>
+
+(optional) The user account under which to run the service. If left blank, the
+default value is B<LocalSystem>.
+
+=item * C<password>
+
+(optional) The password credential for L<user>. Required for any other user
+than LocalSystem. If a blank password is desired, use an empty string.
 
 =item * C<idempotent>
 
@@ -613,13 +643,23 @@ and move forward.  Because of this I have done very little to make exceptions
 useful.  I am open to making them objects but again, I do not need that myself,
 so B<Patches Welcome!>
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
+=item *
+
+Wes Malone <wesm@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

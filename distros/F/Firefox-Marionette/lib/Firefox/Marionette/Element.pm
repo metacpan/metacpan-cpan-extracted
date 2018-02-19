@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.42';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -106,6 +106,109 @@ sub is_displayed {
     return $self->browser()->is_displayed($self);
 }
 
+sub list {
+    my ( $self, $value, $using ) = @_;
+    Carp::carp(
+        '**** DEPRECATED METHOD - using list HAS BEEN REPLACED BY find ****');
+    return $self->browser()->find( $value, $using, $self );
+}
+
+sub list_by_id {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_id HAS BEEN REPLACED BY find_by_id ****'
+    );
+    return $self->browser()->find_by_id( $value, $self );
+}
+
+sub list_by_name {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_name HAS BEEN REPLACED BY find_by_name ****'
+    );
+    return $self->browser()->find_by_name( $value, $self );
+}
+
+sub list_by_tag {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_tag HAS BEEN REPLACED BY find_by_tag ****'
+    );
+    return $self->browser()->find_by_tag( $value, $self );
+}
+
+sub list_by_class {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_class HAS BEEN REPLACED BY find_by_class ****'
+    );
+    return $self->browser()->find_by_class( $value, $self );
+}
+
+sub list_by_selector {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_selector HAS BEEN REPLACED BY find_by_selector ****'
+    );
+    return $self->browser()->find_by_selector( $value, $self );
+}
+
+sub list_by_link {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_link HAS BEEN REPLACED BY find_by_link ****'
+    );
+    return $self->browser()->find_by_link( $value, $self );
+}
+
+sub list_by_partial {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using list_by_partial HAS BEEN REPLACED BY find_by_partial ****'
+    );
+    return $self->browser()->find_by_partial( $value, $self );
+}
+
+sub find {
+    my ( $self, $value, $using ) = @_;
+    return $self->browser()->find( $value, $using, $self );
+}
+
+sub find_by_id {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_id( $value, $self );
+}
+
+sub find_by_name {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_name( $value, $self );
+}
+
+sub find_by_tag {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_tag( $value, $self );
+}
+
+sub find_by_class {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_class( $value, $self );
+}
+
+sub find_by_selector {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_selector( $value, $self );
+}
+
+sub find_by_link {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_link( $value, $self );
+}
+
+sub find_by_partial {
+    my ( $self, $value ) = @_;
+    return $self->browser()->find_by_partial( $value, $self );
+}
+
 1;    # Magic true value required at end of module
 __END__
 
@@ -115,7 +218,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.37
+Version 0.42
 
 =head1 SYNOPSIS
 
@@ -223,6 +326,174 @@ returns true or false if the element is selected.
 =head2 is_displayed
 
 returns true or false if the element is displayed.
+
+=head2 find
+
+accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> expression> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    $div->find('//input[@id="search-input"]')->type('Test::More');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find('//input[@id="search-input"]')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_id
+
+accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'id' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    $div->find_by_id('search-input')->type('Test::More');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find_by_id('search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_name
+
+This method returns the first L<element|Firefox::Marionette::Element> with a matching 'name' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    $div->find_by_name('q')->type('Test::More');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find_by_name('q')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_class
+
+accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'class' property.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    $div->find_by_class('form-control home-search-input')->type('Test::More');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find_by_class('form-control home-search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_selector
+
+accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches that selector.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    $div->find_by_selector('input.home-search-input')->type('Test::More');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find_by_selector('input.home-search-input')) {
+        $element->type('Test::More');
+    }
+
+=head2 find_by_tag
+
+accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with this tag name.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('main-content');
+    my $input = $div->find_by_tag('input');
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('main-content');
+    foreach my $element ($div->find_by_tag('input')) {
+        # do something
+    }
+
+=head2 find_by_link
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('container-fluid');
+    $div->find_by_link('API')->click();
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('container-fluid');
+    foreach my $element ($div->find_by_link('API')) {
+        $element->click();
+    }
+
+=head2 find_by_partial
+
+accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a partially matching link text.
+
+This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    my $div = $firefox->find_by_class('container-fluid');
+    $div->find_by_partial('AP')->click();
+
+    # OR in list context
+
+    my $div = $firefox->find_by_class('container-fluid');
+    foreach my $element ($div->find_by_partial('AP')) {
+        $element->click();
+    }
 
 =head1 DIAGNOSTICS
 

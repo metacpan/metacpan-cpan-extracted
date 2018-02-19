@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Minter 6.010;
+package Dist::Zilla::Dist::Minter 6.011;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -6,6 +6,7 @@ extends 'Dist::Zilla';
 
 use File::pushd ();
 use Dist::Zilla::Path;
+use Module::Runtime 'require_module';
 
 use namespace::autoclean;
 
@@ -29,7 +30,7 @@ sub _new_from_profile {
 
   my $config_class =
     $arg->{config_class} ||= 'Dist::Zilla::MVP::Reader::Finder';
-  Class::Load::load_class($config_class);
+  require_module($config_class);
 
   $arg->{chrome}->logger->log_debug(
     { prefix => '[DZ] ' },
@@ -55,7 +56,7 @@ sub _new_from_profile {
     { '' => 'Dist::Zilla::MintingProfile::', '=', => '' },
     $profile_data->[0],
   );
-  Class::Load::load_class($module);
+  require_module($module);
 
   my $profile_dir = $module->profile_dir($profile_data->[1]);
 
@@ -151,7 +152,7 @@ Dist::Zilla::Dist::Minter - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 AUTHOR
 
@@ -159,7 +160,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

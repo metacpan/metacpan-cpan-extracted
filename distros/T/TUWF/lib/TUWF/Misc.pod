@@ -280,7 +280,7 @@ L<TUWF>, L<URI::Escape>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2017 Yoran Heling.
+Copyright (c) 2008-2018 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

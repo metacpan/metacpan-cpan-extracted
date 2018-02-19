@@ -2,8 +2,7 @@
 
 #
 # dbcolneaten.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 08aa35fa94fdc4d03a4df698dd6cad51ed924281 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -244,7 +243,7 @@ Format the header for the current object to output stream C<$out>.
 sub format_header ($) {
     my($self, $out) = @_;
 
-    croak if ($self->{_out} != $out);  # assert
+    croak("assertion failure\n") if ($self->{_out} != $out);  # assert
 
     # Write out a comment that shows the header fields.
     # get Fsdb::IO to generate the prequel
@@ -305,10 +304,10 @@ sub run ($) {
     #
     foreach (@{$self->{_field_specs}}) {
         my($field_name, $op, $value) = m/([^<>=]*)\s*([<>=]+)\s*(\d+)/;
-        croak $self->{_prog} . ": unknown field specification.\n"
+        croak($self->{_prog} . ": unknown field specification.\n")
 	    if (!defined($field_name) || !defined($value));
         my($field_col) = $self->{_in}->col_to_i($field_name);
-        die ($self->{_prog} . ": unknown column ``$field_name''.\n")
+        croak ($self->{_prog} . ": unknown column ``$field_name''.\n")
 	    if (!defined($field_col));
         if ($op eq '=') {
     	    $colwidths[$field_col] = $value;
@@ -317,7 +316,7 @@ sub run ($) {
         } elsif ($op eq '<=') {
             $colwidths[$field_col] = $value if ($colwidths[$field_col] > $value);
         } else {
-            die $self->{_prog} . ": bad operation $op in field spec $_.\n";
+            croak($self->{_prog} . ": bad operation $op in field spec $_.\n");
         };
     }
 
@@ -366,7 +365,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

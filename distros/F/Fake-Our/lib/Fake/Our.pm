@@ -8,10 +8,10 @@ package Fake::Our;
 # Copyright (c) 2014, 2015, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.11';
+$VERSION = '0.14';
 
 use 5.00503;
-# use strict; # since import() use $^H
+use strict;
 local $^W = 1;
 
 sub import {

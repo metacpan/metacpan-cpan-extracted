@@ -14,6 +14,15 @@ BEGIN {
 
 our $ApicastBinary = $ENV{TEST_NGINX_APICAST_BINARY} || 'bin/apicast';
 
+our %EnvToNginx = ();
+
+sub env_to_apicast (@) {
+    my %env = (@_);
+
+    # merge two hashes, new %env takes precedence
+    %EnvToNginx = (%EnvToNginx, %env);
+};
+
 add_block_preprocessor(sub {
     my $block = shift;
     my $seq = $block->seq_num;
@@ -81,8 +90,18 @@ my $write_nginx_config = sub {
     my $AccLogFile = $Test::Nginx::Util::AccLogFile;
     my $ServerPort = $Test::Nginx::Util::ServerPort;
     my $backend_port = Test::APIcast::get_random_port();
-    my $management_port = Test::APIcast::get_random_port();
     my $echo_port = Test::APIcast::get_random_port();
+
+    my $management_server_name = $ENV{TEST_NGINX_MANAGEMENT_SERVER_NAME};
+
+    my $management_port;
+    if (defined $management_server_name) {
+        $management_port = $ServerPort;
+        $management_server_name = "'$management_server_name'"
+    } else {
+        $management_port = Test::APIcast::get_random_port();
+        $management_server_name = 'nil'
+    }
 
     my $environment = $block->environment;
 
@@ -108,12 +127,19 @@ my $write_nginx_config = sub {
 
     my ($env, $env_file) = tempfile();
 
-    my $apicast_cmd = "APICAST_CONFIGURATION_LOADER='' $apicast_cli start --test --environment $env_file";
+    my $apicast_cmd = "APICAST_CONFIGURATION_LOADER='test' $apicast_cli start --test --environment $env_file";
 
     if (defined $configuration_file) {
         $apicast_cmd .= " --configuration $configuration_file"
     } else {
         $configuration_file = "";
+    }
+
+    my %env = (%EnvToNginx, $block->env);
+    my @env_list = ();
+
+    for my $key (keys %env) {
+        push @env_list, "$key='$env{$key}'";
     }
 
     if (defined $environment) {
@@ -137,7 +163,10 @@ return {
     },
     env = {
         THREESCALE_CONFIG_FILE = [[$configuration_file]],
-        APICAST_CONFIGURATION_LOADER = 'boot',
+        APICAST_CONFIGURATION_LOADER = 'boot', ${\(join(', ', @env_list))}
+    },
+    server_name = {
+        management = $management_server_name
     },
     sites_d = [============================[$sites_d]============================],
 }
@@ -173,5 +202,9 @@ BEGIN {
         return $write_nginx_config->($block);
     }
 }
+
+our @EXPORT = qw(
+    env_to_apicast
+);
 
 1;

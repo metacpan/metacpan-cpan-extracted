@@ -1,5 +1,16 @@
 Revision history for Test-API
 
+0.010     2018-02-16 22:00:49-05:00 America/New_York
+
+    - No changes from 0.009-TRIAL
+
+0.009     2018-01-22 11:15:13-05:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Revised internals for constants/subrefs in the stash (a breaking
+      change planned for Perl 5.28)
+
 0.008     2017-04-02 13:30:12-04:00 America/New_York
 
     - No changes from 0.007-TRIAL

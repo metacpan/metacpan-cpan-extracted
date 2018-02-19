@@ -389,8 +389,6 @@ my @good_tests = (
     q{assert_open_handle(*DATA)},
     q{assert_open_handle(\*DATA)},
     q{assert_open_handle(*DATA{IO})},
-    q{assert_regular_file($00)},
-    q{assert_text_file($000)},
     q{assert_directory("/")},
 
 
@@ -790,8 +788,6 @@ my @bad_tests = (
     q{assert_regular_file($100)},
     q{assert_text_file($1000)},
     q{assert_directory($0)},
-    q{assert_directory($00)},
-    q{assert_directory($000)},
 
 
 );
@@ -812,9 +808,9 @@ my @good_posix = (
     q{assert_exited(1 << 8)},
     q{assert_exited(1 << 10)},
     q{assert_happy_exit(0)},
-    q{system("perl", "-e", "exit 0"); assert_happy_exit},
+    q{system($^X, "-e", "exit 0"); assert_happy_exit},
     q{assert_sad_exit(1<<8)},
-    q{system("perl", "-e", "exit 1"); assert_sad_exit},
+    q{system($^X, "-e", "exit 1"); assert_sad_exit},
 );
 
 my @bad_posix = (

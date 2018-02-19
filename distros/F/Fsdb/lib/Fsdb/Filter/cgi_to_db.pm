@@ -2,7 +2,7 @@
 
 #
 # cgi_to_db.pm
-# Copyright (C) 1998-2007 by John Heidemann
+# Copyright (C) 1998-2018 by John Heidemann
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License,
@@ -276,11 +276,11 @@ sub run ($) {
     # Note the tmpfile is NOT in fsdb format.
     #
     $self->{_save_in_filename} = Fsdb::Support::NamedTmpfile::alloc($self->{_tmpdir});
-    open (TMP, ">$self->{_save_in_filename}") or croak $self->{_prog} . ": cannot write to " . $self->{_save_in_filename} . "\n";
+    open (TMP, ">$self->{_save_in_filename}") or croak($self->{_prog} . ": cannot write to " . $self->{_save_in_filename} . "\n");
     my %columns_found;
     my @columns_ordered;
     foreach my $fn (@{$self->{_inputs}}) {
-	open(IN, "<$fn") or croak $self->{_prog} . ": cannot open input file $fn\n";
+	open(IN, "<$fn") or croak($self->{_prog} . ": cannot open input file $fn\n");
 	my $at_end_of_record = 1;
 	while (<IN>) {
 	    print TMP $_;
@@ -291,7 +291,7 @@ sub run ($) {
 	    };
 	    $at_end_of_record = 0;
 	    my($key, $value) = m/^([^=]*)=(.*)$/;
-	    croak $self->{_prog} .  " missing key in $_ in file $fn" if (!defined($key));
+	    croak($self->{_prog} .  " missing key in $_ in file $fn") if (!defined($key));
 	    next if (defined($columns_found{$key}));
 	    # new one!
 	    $columns_found{$key} = 1;
@@ -307,7 +307,7 @@ sub run ($) {
     #
     $self->finish_io_option('output', -fscode => 'S', -rscode => 'C',
 	    -cols => \@columns_ordered);
-    open (TMP, "<$self->{_save_in_filename}") or croak $self->{_prog} . ": cannot read from " . $self->{_save_in_filename} . "\n";
+    open (TMP, "<$self->{_save_in_filename}") or croak($self->{_prog} . ": cannot read from " . $self->{_save_in_filename} . "\n");
     my %row;
     my $at_end_of_record = 1;
     my $unescape = $self->{_unescape};
@@ -321,8 +321,8 @@ sub run ($) {
 	};
 	$at_end_of_record = 0;
 	my($key, $value) = m/^([^=]*)=(.*)$/;
-	croak $self->{_prog} .  ": interal error, empty $key." if (!defined($key));
-	croak $self->{_prog} .  ": interal error, found key $key in second pass." if (!defined($columns_found{$key}));
+	croak($self->{_prog} .  ": interal error, empty $key.") if (!defined($key));
+	croak($self->{_prog} .  ": interal error, found key $key in second pass.") if (!defined($columns_found{$key}));
 
 	#
 	# deal with the value
@@ -339,13 +339,13 @@ sub run ($) {
 	$value =~ s/\r//g;  # second check on CRs
 	$row{$key} = $value;
     };
-    croak $self->{_prog} .  ": internal error, tmpfile finished in middle of record.\n" if (!$at_end_of_record);
+    croak($self->{_prog} .  ": internal error, tmpfile finished in middle of record.\n") if (!$at_end_of_record);
     close TMP;
 }
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

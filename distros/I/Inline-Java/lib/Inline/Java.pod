@@ -42,6 +42,10 @@ occurs the first time you run your Java code. The namespace is
 cached, and subsequent calls use the cached version.
    Z<>
 
+=head1 JDK COMPATIBILITY
+
+As of version 0.62, the minimum JDK supported is JDK 7. This is due to the
+"diamond operator" C<< <> >> used for generic C<ArrayList>s among others.
 
 =head1 USING THE Inline::Java MODULE
 
@@ -476,13 +480,13 @@ are not known to C<Inline::Java>. This is also true for return types:
          }
 
          public HashMap get_hash(){
-            HashMap h = new HashMap() ;
+            HashMap<String, String> h = new HashMap<>() ;
             h.put("key", "value") ;
 
             return h ;
          }
 
-         public String do_stuff_to_hash(HashMap h){
+         public String do_stuff_to_hash(HashMap<String, String> h){
            return (String)h.get("key") ;
          }
       }
@@ -644,13 +648,12 @@ class to allow reading or writing from Perl. Here's an example:
       }
    END
 
-    my $o = Pod_91->getReader('data.txt') ;
-    my $h = new Inline::Java::Handle($o) ;
-    while (<$h>){
-      chomp($_) ;
-      print($_ . "\n") ; # prints data
-    }
-
+    my $o = Pod_91->getReader('t/t13.txt') ;
+    my $h = Inline::Java::Handle->new($o) ;
+    # read one line
+    my $text = <$h>;
+    chomp $text;
+    print($text . "\n") ; # prints 1
 
 =for comment
 
@@ -678,6 +681,7 @@ script anymore. Here's how to use the 'studying' function:
    use Inline (
       Java => 'study',
       study => ['java.util.HashMap'],
+      autostudy => 1,
    ) ;
 
    my $hm = new java::util::HashMap() ;

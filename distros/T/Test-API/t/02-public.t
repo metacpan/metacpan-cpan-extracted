@@ -17,7 +17,7 @@ use Test::More;
 use Test::Builder::Tester 1.18;
 use Test::API;
 
-plan tests => 11;
+plan tests => 12;
 
 require_ok('t::lib::NoSubs');
 require_ok('t::lib::SubFoo');
@@ -60,3 +60,12 @@ test_out("ok 1 - public API for t::lib::PvtFoo");
 public_ok('t::lib::PvtFoo');
 test_test('public_ok - private provided, none expected');
 
+{
+    package PackWithConst;
+    use constant foo => 1;
+    $INC{"PackWithConst.pm"}++;
+}
+
+test_out("ok 1 - public API for PackWithConst");
+public_ok("PackWithConst", "foo");
+test_test('public_ok - works with packages containing constants');

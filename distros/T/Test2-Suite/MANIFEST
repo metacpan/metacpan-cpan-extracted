@@ -46,6 +46,7 @@ lib/Test2/Compare/Wildcard.pm
 lib/Test2/Event/Times.pm
 lib/Test2/Manual.pm
 lib/Test2/Manual/Anatomy.pm
+lib/Test2/Manual/Anatomy/Context.pm
 lib/Test2/Manual/Anatomy/EndToEnd.pm
 lib/Test2/Manual/Anatomy/Event.pm
 lib/Test2/Manual/Concurrency.pm
@@ -229,5 +230,6 @@ t/regression/27-3-Test2-Tools-ClassicCompare.t
 t/regression/43-bag-on-empty.t
 t/regression/Test2-Mock.t
 t/regression/Test2-Tools-Class.t
+t/regression/async_subtest_missing_parent.t
 t/regression/todo_and_facets.t
 t/regression/utf8-mock.t

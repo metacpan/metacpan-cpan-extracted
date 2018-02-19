@@ -4,7 +4,7 @@ package Data::Record::Serialize::Encode::dbi;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Data::Record::Serialize::Types -types;
 
@@ -460,7 +460,7 @@ Data::Record::Serialize::Encode::dbi - store a record in a database
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SR830;
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
-$Lab::Moose::Instrument::SR830::VERSION = '3.613';
+$Lab::Moose::Instrument::SR830::VERSION = '3.620';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;
@@ -402,7 +402,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -716,7 +716,7 @@ This driver consumes the following roles:
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

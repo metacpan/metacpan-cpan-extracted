@@ -16,14 +16,14 @@ sub test_run {
     is $out, (@$expect ? join("\n", @$expect, '') : undef), $msg;
 }
 
-test_run ["geo"] => ['http://www.w3.org/2003/01/geo/wgs84_pos#'],
+test_run ["geo"] => ['http://www.opengis.net/ont/geosparql#'],
     "look up URI";
-test_run ['wgs.prefix'] => ["geo"],
+test_run ['wgs.prefix'] => ["pos"],
     "normalize prefix";
 test_run ['xsd,foaf.json'] => ['"foaf": "http://xmlns.com/foaf/0.1/",
 "xsd": "http://www.w3.org/2001/XMLSchema#"'], 
     "JSON (multiple prefixes)";
-test_run ['http://www.w3.org/2003/01/geo/wgs84_pos#'] => ["geo"],
+test_run ['http://www.opengis.net/ont/geosparql#'] => ["geo"],
     "look up prefix of a namespace";
 test_run ['http://notanamespace.foo/'] => [],
     "unknown namespace";

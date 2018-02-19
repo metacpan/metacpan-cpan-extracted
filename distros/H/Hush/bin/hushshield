@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Try::Tiny;
+use lib 'lib';
+use Hush::List;
+use Hush::Util qw/barf/;
+use Data::Dumper;
+use Hush::RPC;
+
+my ($taddr,$zaddr,$amount) = @ARGV;
+
+die "You must specify an amount!" unless $amount;
+print "Attempting to move $amount HUSH from $taddr -> $zaddr\n";
+
+my $memo     =<<MEMO;
+I must not fear. Fear is the mind-killer. Fear is the little-death that brings
+total obliteration. I will face my fear. I will permit it to pass over me and
+through me. And when it has gone past I will turn the inner eye to see its path.
+Where the fear has gone there will be nothing. Only I will remain.
+    -- Bene Gesserit Litany Against Fear.
+MEMO
+my $rpc      = Hush::RPC->new;
+my $raw_memo = unpack("h*",$memo); # backend wants hex-encoded memo-field
+
+die "Invalid taddr!" unless $taddr =~ m/^t1[A-z0-9]+$/;
+die "Invalid zaddr!" unless $zaddr =~ m/^zc[A-z0-9]+$/;
+
+# sent from 1 taddr to 1 zaddr
+if ($amount && $amount > 0 && $amount < 21_000_000) {
+    print "z_sendmany beginning\n";
+    my $opid     = $rpc->z_sendmany($taddr,[{
+            address => $zaddr,
+            amount  => $amount,
+            memo    => $raw_memo
+    }]);
+    print "z_sendmany complete\n";
+    my $status = $rpc->z_getoperationstatus([[$opid]]);
+    warn Dumper [ $opid, $status ];
+
+} else {
+    die "Invalid amount!";
+}

@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.64';
+our $VERSION = '2.65';
 
 =head1 SYNOPSIS
 
@@ -235,33 +235,21 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.64, 2017-11-20
-several small bugfixes and enhancements
+=head2 2.65, 2018-02-16
+Minor release, bug fix and -F option.
 
 =over 4
 
-=item BUG FIX
-
-In L<dbroweval>, the C<next row> option previously did not
-correctly set up C<_last_fieldname>.  It now does.
-
 =item ENHANCEMENT
 
-The L<csv_to_db> converter now has an optional C<-F x> option
+L<dbmultistats> and L<dbmapreduce> now both take a C<-F x> option
 to set the field separator.
 
-=item ENHANCEMENT
+=item BUG FIX
 
-Finally L<dbcolsplittocols> has a C<--header> option,
-and a new C<-N> option to give the list of resulting output columns.
-
-=item INCOMPATIBLE CHANGE
-
-Now L<dbcolstats> and L<dbmultistats> produce no output
-(but a schema) when given no input but a schema.
-Previously they gave a null row of output.
-The C<--output-on-no-input> and C<--no-output-on-no-input> 
-options can control this behavior.
+Fixed missing C<use Carp> in L<dbcolstats>.
+Also went back and cleaned up all uses of C<croak()>.
+Thanks to Zefram for the bug report.
 
 =back
 
@@ -3448,6 +3436,36 @@ and if it is provided processes the data in one pass.
 
 Version 2.62 was supposed to have this improvement, but did not (and now does):
 L<dbroweval> logs are now quoted.
+
+=back
+
+=head2 2.64, 2017-11-20
+several small bugfixes and enhancements
+
+=over 4
+
+=item BUG FIX
+
+In L<dbroweval>, the C<next row> option previously did not
+correctly set up C<_last_fieldname>.  It now does.
+
+=item ENHANCEMENT
+
+The L<csv_to_db> converter now has an optional C<-F x> option
+to set the field separator.
+
+=item ENHANCEMENT
+
+Finally L<dbcolsplittocols> has a C<--header> option,
+and a new C<-N> option to give the list of resulting output columns.
+
+=item INCOMPATIBLE CHANGE
+
+Now L<dbcolstats> and L<dbmultistats> produce no output
+(but a schema) when given no input but a schema.
+Previously they gave a null row of output.
+The C<--output-on-no-input> and C<--no-output-on-no-input> 
+options can control this behavior.
 
 =back
 

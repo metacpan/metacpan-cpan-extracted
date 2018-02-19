@@ -8,9 +8,11 @@ use HTTP::Cookies 6.01;
 use Getopt::Std;
 use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
-use SpamcupNG qw(main_loop get_browser read_config %MAP);
 
-our $VERSION = '0.7'; #VERSION
+# :TODO:21/01/2018 12:41:41:ARFREITAS: must capture die/croak to be able to log those messages
+use SpamcupNG qw(main_loop get_browser read_config %MAP config_logger);
+
+our $VERSION = '0.9'; #VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -19,7 +21,7 @@ my $accounts;
 
 # :TODO:23/04/2017 17:15:49:ARFREITAS: migrate to Getopt::Long, too many options here
 # to use mnemonics
-getopts( 'vnac:sqdhDul:p:', \%opts );
+getopts( 'vnac:shul:p:V:', \%opts );
 
 print_footer() if ( $opts{v} );
 
@@ -32,17 +34,14 @@ if ( $opts{h} ) {
   -n Does nothing, just shows if you have unreported SPAM or not.
   -a Run in a loop untill all SPAM is reported.
   -s Stupid. Runs without asking confirmation. Use with care.
-  -q Be quiet.
   -c Alternate method for signifying code. (Unpaid users WITHOUT username & password)
   -l Alternate method for providing username. (Paid & unpaid users with password)
   -p Method for providing password. (Required for users with password)
-  -d Debug mode. Prints all kinds of funny things.
-  -D Even more debug mode. Dumps also HTML.
   -v Show version and quit.
+  -V <LEVEL> Verbosity level of information during program execution. Valid values are: DEBUG, INFO, WARN, ERROR, FATAL, default is INFO.
   -h You are reading it.
 
- By default the script confirms every SPAM it's about to report. With option -s it does not
- ask for confirmation.
+ By default the script confirms every SPAM it's about to report. With option -s it does not ask for confirmation.
 
  You can combine one or more options. If you're using command line options you MUST put those before the code.
 
@@ -58,50 +57,46 @@ my $cfg = File::Spec->catfile( $ENV{HOME}, '.spamcupNG.yml' );
 
 if ( ( -e $cfg ) and ( scalar(@ARGV) < 1 ) ) {
     $accounts = read_config( $cfg, \%opts );
-	$opts{delay} = DELAY;
+    $opts{delay} = DELAY;
 }
 else {
-    warn
-"Couldn't find the standard configuration file $cfg, using command line options available";
-
-    # DEBUG++: option -D dumps all HTML, used with in development only
-    # force d if D
-    if ( $opts{D} ) {
-        $opts{d} = 1;
-    }
-
-    if ( $opts{n} ) {
-        print
-"* Running with -n. Not actually reporting SPAM, just showing what is about to happen.\n";
-    }
-
-    unless ( $opts{q} ) {
-
-        if ( $opts{a} ) {
-            print
-              "* Running with -a. Runs in a loop while all SPAM is reported.\n";
-        }
-
-        if ( $opts{d} ) {
-            print
-"* Running with -d. Information mode. Prints all kinds of funny things.\n";
-        }
-        if ( $opts{D} ) {
-            print "* Running with -D. Even more messages. Dumps also HTML.\n";
-        }
-
-        if ( $opts{s} ) {
-            print
-"* Running with -s. No report confirmation will be asked.\n* Make sure you don't post false reports!\n";
-            sleep DELAY;
-        }
-
-    }
-
-    my ( $ident, $pass ) = define_auth( \%opts );
-    compat_opts( $ident, $pass, \%opts );
+    $opts{V} = 'INFO' unless ( exists( $opts{V} ) );
 }
 
+config_logger( $opts{V}, File::Spec->catfile( $ENV{HOME}, 'spamcup.log' ) );
+my $logger = Log::Log4perl->get_logger('SpamcupNG');
+
+if ( ( $logger->is_warn() ) and ( not -e $cfg ) ) {
+    $logger->warn(
+"Couldn't find the standard configuration file $cfg, using command line options available"
+    );
+}
+
+if ( ( $opts{n} ) and ( $logger->is_info() ) ) {
+    $logger->info(
+'Running with -n. Not actually reporting SPAM, just showing what is about to happen.'
+    );
+}
+
+if ( $logger->is_info() ) {
+    $logger->info("Running with logger in $opts{V} mode.");
+
+    if ( $opts{a} ) {
+        $logger->info(
+            'Running with -a. Runs in a loop while all SPAM is reported.');
+    }
+
+    if ( $opts{s} ) {
+        $logger->info(
+'Running with -s. No report confirmation will be asked. Make sure you do not post false reports!'
+        );
+        sleep DELAY;
+    }
+
+}
+
+my ( $ident, $pass ) = define_auth( \%opts );
+compat_opts( $ident, $pass, \%opts );
 my $ua = get_browser( 'spamcupNG', $VERSION );
 
 if ($accounts) {
@@ -109,13 +104,15 @@ if ($accounts) {
     foreach my $account ( keys( %{$accounts} ) ) {
         $opts{ident} = $accounts->{$account}->{'e-mail'};
         $opts{pass}  = $accounts->{$account}->{password};
-        print "Running reports for $account account\n" unless ( $opts{quiet} );
+        $logger->info("Running reports for $account account")
+          if ( $logger->is_info() );
         run_report( $ua, \%opts );
     }
 
+    $logger->info('All accounts verified, quitting.');
 }
 else {
-    print "* Using ID '$opts{ident}'.\n" unless ( $opts{quiet} );
+    $logger->info("Using ID '$opts{ident}'.") if ( $logger->is_info() );
     run_report( $ua, \%opts );
 }
 
@@ -140,22 +137,20 @@ sub run_report {
     my ( $ua, $opts_ref ) = @_;
     my $retval;
 
-    if ( $opts_ref->{all} and not( $opts_ref->{nothing} ) ) {
+    if ( $opts_ref->{all} and not( $opts_ref->{check_only} ) ) {
 
         # run while there is more spam
         while (1) {    # Ugly, but does the thing...
             $retval = main_loop( $ua, $opts_ref );
             last if ( $retval == -1 );    # no more spam
 
-            unless ( $opts_ref->{quiet} ) {
-
-                unless ($retval) {
-                    print
-                      "W: Error occured while processing SPAM. Continuing.\n";
-                }
-                print
-"\n-------------------------------------------------------\n* Processing next SPAM.\n";
+            unless ($retval) {
+                $logger->warn(
+'Something did not go well while processing SPAM. Going to the next.'
+                );
             }
+
+            $logger->info('Processing next SPAM.');
         }
     }
     else {
@@ -236,20 +231,18 @@ You can also provide all the parameters in the command line. Check the command l
 
 Usage: spamcup [options] <Spamcop-Username>
 
-   $ spamcup.pl -h
-   spamcup.pl <options> <Spamcop-Username>
+   $ spamcup -h
+   spamcup <options> <Spamcop-Username>
 
    Options:
     -n Does nothing, just shows if you have unreported SPAM or not.
     -a Run in a loop untill all SPAM is reported.
     -s Stupid. Runs without asking confirmation. Use with care.
-    -q Be quiet.
     -c Alternate method for signifying code. (Unpaid users WITHOUT username & password)
     -l Alternate method for providing username. (Paid & unpaid users with password)
     -p Method for providing password. (Required for users with password)
-    -d Debug mode. Prints all kinds of funny things.
-    -D Even more debug mode. Dumps also HTML.
     -v Show version and quit.
+    -V <LEVEL> Verbosity level of information during program execution. Or log level. Valid values are: DEBUG, INFO, WARN, ERROR, FATAL.
     -h You are reading it.
 
 =head1 DESCRIPTION
@@ -262,6 +255,64 @@ introducing forced delays to not overwhelm Spamcop.net website. All reports are 
 Spamcup NG is a fork from the original Spamcup project.
 
 Spamcup is copyright (C) Toni Willberg E<lt>toniw@iki.fiE<gt> L<http://toniw.iki.fi>.
+
+=head2 FEATURES
+
+spamcupNG provides the following features:
+
+=over
+
+=item *
+
+Can use both command line parameters and/or a configuration file. The configuration file allows you to define and use multiple accounts of Spamcop 
+(but you can't send reports from them in parallel and never will since we want to be as polite as possible with Spamcop website).
+
+=item *
+
+Advanced logging capabilities (provided by usage of L<Log::Log4perl>): you can setup additional levels of information on screen or even have 
+everything logged into a text file (if DEBUG is enabled). See L<SpamcupNG> for details about that.
+
+=item *
+
+Compatibility with the original Spamcup project: you can reuse your configuration file and/or command line options with minor adjustments.
+
+=back
+
+=head2 MOTIVATIONS
+
+The motivations for this distribution where inquired at L<http://cpanratings.perl.org/dist/spamcupNG#13180>, and since I considered it a fair 
+question, here are the motivations of using SpamcupNG instead of L<WWW::Mechanize::SpamCop>.
+
+=over
+
+=item Compatible with Spamcup
+
+SpamcupNG is a directly replacement for Spamcup original project. I used myself Spamcup for years and never had an issue, since the Spamcop.net
+webpage didn't change at all. The reasons for writing a replacement was to be able to use multiple accounts in the configuration file.
+
+That said, you can use the same configuration file you have for Spamcup, with small changes.
+
+=item SpamcupNG is ready for using
+
+SpamcupNG is an application ready to use, while L<WWW::Mechanize::SpamCop> is a Perl module. Of course, you probably can make the same command
+line program by using it, or even a GUI for it. Maybe in the future SpamcupNG uses L<WWW::Mechanize::SpamCop> internally.
+
+=item More features
+
+Being a application, SpamcupNG has more features (see next section).
+
+=item Uses modern Perl coding practices
+
+SpamcupNG uses more modern practices for Perl development, which might (or not!) make it more robust. Also, this distribution is being activaly
+developed.
+
+=item WWW::Mechanize is not required
+
+L<WWW::Mechanize> (the base of L<WWW::Mechanize::SpamCop>) is pretty neaty, easier to use then L<LWP::UserAgent>, but on the other hand has 
+more dependencies and wouldn't add any value compared to the already in place webcrawler implementation. If the Spamcop.net website changes, I
+might consider moving to it, but not before that.
+
+=back
 
 =head1 WARNINGS
 
@@ -304,11 +355,9 @@ The configuration file must be written as an YAML file, with the exact propertie
     all: y
     stupid: y
     nothing: n
-    quiet: n
     alt_code: n
+	verbosity: INFO
     alt_user: n
-    info_level: n
-    debug_level: n
     Accounts:
       Provider1:
         e-mail: account@provider1.com.br
@@ -320,6 +369,17 @@ The configuration file must be written as an YAML file, with the exact propertie
 You can use any name instead of "Provider1" or "Provider2" as long as their are valid key names for YAML format.
 
 All those options have their corresponding command line parameter. Be sure to take care of file permissions to avoid disclosure of your Spamcop.net password!
+
+=head2 VERBOSITY
+
+C<spamcup> uses L<Log::Log4perl>, so you can use the default values for logging.
+
+If you use C<INFO>, only basic information is printed to C<STDOUT>. This should be your default level.
+
+If you define C<DEBUG>, all messages (including HTML from Spamcop.net website) will go to the C<spamcup.log> file, located at your home directory.
+Nothing will be printed to C<STDOUT> or C<STDERR>.
+
+All other levels will show more or less messages to C<STDOUT>, depending on the severity of the messages.
 
 =head1 SEE ALSO
 

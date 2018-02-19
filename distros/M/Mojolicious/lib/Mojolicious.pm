@@ -18,7 +18,6 @@ use Mojolicious::Static;
 use Mojolicious::Types;
 use Mojolicious::Validator;
 use Scalar::Util ();
-use Time::HiRes  ();
 
 has commands => sub {
   my $commands = Mojolicious::Commands->new(app => shift);
@@ -66,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.64';
+our $VERSION  = '7.66';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -129,7 +128,7 @@ sub dispatch {
     my $method = $req->method;
     my $path   = $req->url->path->to_abs_string;
     $self->log->debug(qq{$method "$path"});
-    $stash->{'mojo.started'} = [Time::HiRes::gettimeofday];
+    $c->helpers->timing->begin('mojo.timer');
   }
 
   # Routes
@@ -1042,6 +1041,8 @@ Olivier Mengue
 Pascal Gaudette
 
 Paul Evans
+
+Paul Robins
 
 Paul Tomlin
 

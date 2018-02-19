@@ -1,15 +1,12 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Utils qw(remove_last_ws);
+use Indent::Utils qw(string_len);
 
-my $input = 'a   ';
-remove_last_ws(\$input);
-print "$input|\n";
+# Print string length.
+print string_len("\tab\t")."\n";
 
 # Output:
-# a|
+# 18

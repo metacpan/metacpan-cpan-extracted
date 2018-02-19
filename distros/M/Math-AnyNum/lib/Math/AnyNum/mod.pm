@@ -69,8 +69,13 @@ sub __mod__ {
     #
   Math_GMPz__Math_GMPz: {
 
-        my $sgn_y = Math::GMPz::Rmpz_sgn($y)
-          || goto &_nan;
+        if (Math::GMPz::Rmpz_fits_ulong_p($y)) {
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_mod_ui($r, $x, Math::GMPz::Rmpz_get_ui($y) || goto &_nan);
+            return $r;
+        }
+
+        my $sgn_y = Math::GMPz::Rmpz_sgn($y) || goto &_nan;
 
         my $r = Math::GMPz::Rmpz_init();
         Math::GMPz::Rmpz_mod($r, $x, $y);

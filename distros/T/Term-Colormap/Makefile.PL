@@ -3,9 +3,16 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
   'NAME' => 'Term::Colormap',
+  'VERSION_FROM' => 'lib/Term/Colormap.pm',
+  'PREREQ_PM' => {
+                   'Capture::Tiny' => 0,
+                   'Scalar::Util' => 0,
+                   'Term::ReadKey' => 0,
+                   'Test::Exception' => 0,
+                   'Test::More' => 0
+                 },
+  'INSTALLDIRS' => 'site',
   'EXE_FILES' => [
                    'bin/color_numbers',
                    'bin/felix',
@@ -13,17 +20,8 @@ WriteMakefile
                    'bin/hbar',
                    'bin/highlight',
                    'bin/show_brewer_colormap',
-                   'bin/show_brewer_colormap~',
-                   'bin/show_colormap',
-                   'bin/show_colormap~'
+                   'bin/show_colormap'
                  ],
-  'VERSION_FROM' => 'lib/Term/Colormap.pm',
-  'PREREQ_PM' => {
-                   'Test::More' => 0,
-                   'Scalar::Util' => 0,
-                   'Test::Exception' => 0,
-                   'Capture::Tiny' => 0,
-                   'Term::ReadKey' => 0
-                 }
+  'PL_FILES' => {}
 )
 ;

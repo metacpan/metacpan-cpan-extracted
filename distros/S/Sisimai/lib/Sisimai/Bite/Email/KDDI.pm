@@ -4,32 +4,22 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'from'       => qr/no-reply[@].+[.]dion[.]ne[.]jp/,
-    'reply-to'   => qr/\Afrom[ \t]+\w+[.]auone[-]net[.]jp[ \t]/,
-    'received'   => qr/\Afrom[ ](?:.+[.])?ezweb[.]ne[.]jp[ ]/,
-    'message-id' => qr/[@].+[.]ezweb[.]ne[.]jp[>]\z/,
-};
-my $Re1 = {
-    'begin' => qr/\AYour[ ]mail[ ](?:
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = { 'rfc822' => ['Content-Type: message/rfc822'] };
+my $MarkingsOf = {
+    'message' => qr/\AYour[ ]mail[ ](?:
          sent[ ]on:?[ ][A-Z][a-z]{2}[,]
         |attempted[ ]to[ ]be[ ]delivered[ ]on:?[ ][A-Z][a-z]{2}[,]
         )
     /x,
-    'rfc822' => qr|\AContent-Type: message/rfc822\z|,
-    'error'  => qr/Could not be delivered to:? /,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
 };
-my $ReFailure = {
-    'mailboxfull' => qr/As[ ]their[ ]mailbox[ ]is[ ]full/x,
-    'norelaying'  => qr/Due[ ]to[ ]the[ ]following[ ]SMTP[ ]relay[ ]error/x,
-    'hostunknown' => qr/As[ ]the[ ]remote[ ]domain[ ]doesnt[ ]exist/x,
+my $ReFailures = {
+    'mailboxfull' => qr/As their mailbox is full/,
+    'norelaying'  => qr/Due to the following SMTP relay error/,
+    'hostunknown' => qr/As the remote domain doesnt exist/,
 };
-my $Indicators = __PACKAGE__->INDICATORS;
 
-sub pattern     { return $Re0 }
 sub description { 'au by KDDI: http://www.au.kddi.com' }
-
 sub scan {
     # Detect an error from au by KDDI
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -48,14 +38,14 @@ sub scan {
     my $mbody = shift // return undef;
     my $match = 0;
 
-    $match ||= 1 if $mhead->{'from'} =~ $Re0->{'from'};
-    $match ||= 1 if $mhead->{'reply-to'} && $mhead->{'reply-to'} =~ $Re0->{'reply-to'};
-    $match ||= 1 if grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    # 'message-id' => qr/[@].+[.]ezweb[.]ne[.]jp[>]\z/,
+    $match ||= 1 if $mhead->{'from'} =~ /no-reply[@].+[.]dion[.]ne[.]jp/;
+    $match ||= 1 if $mhead->{'reply-to'} && $mhead->{'reply-to'} eq 'no-reply@app.auone-net.jp';
+    $match ||= 1 if grep { index($_, 'ezweb.ne.jp (') > -1 } @{ $mhead->{'received'} };
     return undef unless $match;
 
     require Sisimai::String;
     require Sisimai::Address;
-
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
     my @hasdivided = split("\n", $$mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
@@ -66,10 +56,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -77,7 +67,7 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( $e eq $StartingOf->{'rfc822'}->[0] ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -98,7 +88,7 @@ sub scan {
             next unless length $e;
 
             $v = $dscontents->[-1];
-            if( $e =~ m/\A[ \t]+Could not be delivered to: [<]([^ ]+[@][^ ]+)[>]/ ) {
+            if( $e =~ /\A[ \t]+Could not be delivered to: [<]([^ ]+[@][^ ]+)[>]/ ) {
                 # Your mail sent on: Thu, 29 Apr 2010 11:04:47 +0900 
                 #     Could not be delivered to: <******@**.***.**>
                 #     As their mailbox is full.
@@ -113,13 +103,13 @@ sub scan {
                     $v->{'recipient'} = $r;
                     $recipients++;
                 }
-            } elsif( $e =~ m/Your mail sent on: (.+)\z/ ) {
+            } elsif( $e =~ /Your mail sent on: (.+)\z/ ) {
                 # Your mail sent on: Thu, 29 Apr 2010 11:04:47 +0900 
                 $v->{'date'} = $1;
 
             } else {
                 #     As their mailbox is full.
-                $v->{'diagnosis'} .= $e.' ' if $e =~ m/\A[ \t]+/;
+                $v->{'diagnosis'} .= $e.' ' if $e =~ /\A[ \t]+/;
             }
         } # End of if: rfc822
     }
@@ -142,9 +132,9 @@ sub scan {
 
             } else {
                 # SMTP command is not RCPT
-                SESSION: for my $r ( keys %$ReFailure ) {
+                SESSION: for my $r ( keys %$ReFailures ) {
                     # Verify each regular expression of session errors
-                    next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+                    next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
                     $e->{'reason'} = $r;
                     last;
                 }
@@ -198,7 +188,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

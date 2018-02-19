@@ -5,9 +5,7 @@ META.json
 README.md
 cpanfile
 lib/Class/DbC.pm
-lib/DbC.pm
 minil.toml
-t/00_compile.t
 t/docs/bounded_queue_contract_ok.t
 t/docs/bounded_queue_contract_ok_emulated.t
 t/docs/bounded_queue_invariant_not_ok_for_new.t

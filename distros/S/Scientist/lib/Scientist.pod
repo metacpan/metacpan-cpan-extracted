@@ -1,8 +1,6 @@
 
 =encoding UTF-8
 
-=for Pod::Coverage BUILD
-
 =head1 NAME
 
 Scientist - Test new code against old.
@@ -117,6 +115,10 @@ Candidate code to be included in the experiment.
 
 This code will be executed and discarded when the experiment is run.
 
+=item BUILD
+
+This creates simply creates better column headers for the diagnostic output.
+
 =back
 
 =head1 Functions
@@ -185,6 +187,8 @@ James Raspass
 
 Joshua Keroes
 
+Mohammad S Anwar
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2016 by Lance Wicks.
@@ -222,12 +226,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-http://www.infoq.com/news/2016/02/github-scientist-refactoring
+L<GitHub Scientist Refactoring|http://www.infoq.com/news/2016/02/github-scientist-refactoring>
 
-http://githubengineering.com/scientist/
+L<GitHub Engineering Scientist|http://githubengineering.com/scientist/>
 
-https://news.ycombinator.com/item?id=11104781
+L<Some other ports of Scientist|https://news.ycombinator.com/item?id=11104781>
 
-https://github.com/ziyasal/scientist.js
+L<Javascript interpretation of Scientist|https://github.com/ziyasal/scientist.js>
 
-http://tech-blog.cv-library.co.uk/2016/03/03/introducing-scientist/
+L<CV-Library blog Introducing Scientist|http://tech-blog.cv-library.co.uk/2016/03/03/introducing-scientist/>

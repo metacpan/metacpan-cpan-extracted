@@ -1,210 +1,119 @@
-use strictures 2;
+#!perl
 
-use Test::Roo;
-use App::Licensecheck;
+use strict;
+use warnings;
 
-has encoding => ( is => 'ro' );
-has license  => ( is => 'ro', required => 1 );
-has corpus   => ( is => 'ro' );
-
-sub _build_description { return shift->license }
-
-test "Parse corpus" => sub {
-	my $self = shift;
-
-	my $app = App::Licensecheck->new;
-	$app->lines(0);
-	$app->deb_fmt(1);
-	$app->encoding( $self->encoding ) if $self->encoding;
-
-	foreach (
-		ref( $self->corpus ) eq 'ARRAY' ? @{ $self->corpus } : $self->corpus )
-	{
-		my ( $license, $copyright ) = $app->parse("t/grant/$_");
-		is( $license, $self->license, "Corpus file $_" );
-	}
-};
+use lib 't/lib';
+use Test::Licensecheck tests => 44;
 
 # AFL
-run_me(
-	{   license => 'AFL-2.0 and/or LGPL-2+',
-		corpus  => 'AFL_and_more/xdgmime.c'
-	}
+is_licensed(
+	't/grant/AFL_and_more/xdgmime.c',
+	[ 'AFL-2.0 and/or LGPL-2+', 'AFL-2.0 or LGPL-2+' ]
 );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me(
-		{   license => 'AFL-2.0 or LGPL-2+',
-			corpus  => 'AFL_and_more/xdgmime.c'
-		}
-	);
-}
 
 # AGPL
-run_me( { license => 'AGPL-3+', corpus => 'AGPL/fastx.c' } );
-run_me( { license => 'AGPL-3+', corpus => 'AGPL/fet.cpp' } );
-run_me( { license => 'AGPL-3+', corpus => 'AGPL/setup.py' } );
+is_licensed(
+	[   qw(
+			t/grant/AGPL/fastx.c
+			t/grant/AGPL/fet.cpp
+			t/grant/AGPL/setup.py
+			)
+	],
+	'AGPL-3+'
+);
 
 # Apache
-run_me(
-	{ license => 'Apache-2.0 or GPL-2', corpus => 'Apache_and_more/PIE.htc' }
+is_licensed( 't/grant/Apache_and_more/PIE.htc', 'Apache-2.0 or GPL-2' );
+is_licensed(
+	't/grant/Apache_and_more/rust.lang',
+	'Apache-2.0 or MIT~unspecified'
 );
-run_me(
-	{   license => 'Apache-2.0 or MIT~unspecified',
-		corpus  => 'Apache_and_more/rust.lang'
-	}
-);
-run_me(
-	{   license => 'Apache-2.0 or GPL-2',
-		corpus  => 'Apache_and_more/select2.js'
-	}
-);
-run_me(
-	{   license => 'Apache-2.0 or BSD-3-clause',
-		corpus  => 'Apache_and_more/test_run.py'
-	}
+is_licensed( 't/grant/Apache_and_more/select2.js', 'Apache-2.0 or GPL-2' );
+is_licensed(
+	't/grant/Apache_and_more/test_run.py',
+	'Apache-2.0 or BSD-3-clause'
 );
 
 # CC-BY-SA
-run_me(
-	{   license => 'CC-BY-SA-3.0 and/or GFDL-1.2',
-		corpus  => 'CC-BY-SA_and_more/WMLA'
-	}
+is_licensed(
+	't/grant/CC-BY-SA_and_more/WMLA',
+	'CC-BY-SA-3.0 and/or GFDL-1.2'
 );
-run_me(
-	{   license => 'CC-BY-SA-2.0 or GPL-3',
-		corpus  => 'CC-BY-SA_and_more/cewl.rb'
-	}
-);
-run_me(
-	{   license => 'CC-BY-SA-3.0 or LGPL-2',
-		corpus  => 'CC-BY-SA_and_more/utilities.scad'
-	}
+is_licensed( 't/grant/CC-BY-SA_and_more/cewl.rb', 'CC-BY-SA-2.0 or GPL-3' );
+is_licensed(
+	't/grant/CC-BY-SA_and_more/utilities.scad',
+	'CC-BY-SA-3.0 or LGPL-2'
 );
 
 # EPL
-run_me(
-	{   license =>
-			'AGPL-3+ and/or Apache-2.0+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
-		corpus => 'EPL_and_more/Base64Coder.java'
-	}
+is_licensed(
+	't/grant/EPL_and_more/Base64Coder.java',
+	[   'AGPL-3+ and/or Apache-2.0+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
+		'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+'
+	]
 );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me(
-		{   license =>
-				'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+',
-			corpus => 'EPL_and_more/Base64Coder.java'
-		}
-	);
-}
 
 # LGPL
-run_me( { license => 'LGPL-2.1', corpus => 'LGPL/Model.pm' } );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me( { license => 'LGPL', corpus => 'LGPL/PKG-INFO' } );
-}
+is_licensed( 't/grant/LGPL/Model.pm', 'LGPL-2.1' );
+is_licensed( 't/grant/LGPL/PKG-INFO', [ '', 'LGPL' ] );
 
-run_me( { license => 'LGPL-2.1',  corpus => 'LGPL/criu.h' } );
-run_me( { license => 'LGPL',      corpus => 'LGPL/dqblk_xfs.h' } );
-run_me( { license => 'LGPL',      corpus => 'LGPL/exr.h' } );
-run_me( { license => 'LGPL-2.1',  corpus => 'LGPL/gnome.h' } );
-run_me( { license => 'LGPL',      corpus => 'LGPL/jitterbuf.h' } );
-run_me( { license => 'LGPL-2.1',  corpus => 'LGPL/libotr.m4' } );
-run_me( { license => 'LGPL-3',    corpus => 'LGPL/pic.c' } );
-run_me( { license => 'LGPL-2.1+', corpus => 'LGPL/strv.c' } );
-run_me( { license => 'LGPL-2+',   corpus => 'LGPL/table.py' } );
-run_me(
-	{ license => 'LGPL-2.1 or LGPL-3', corpus => 'LGPL/videoplayer.cpp' } );
-run_me(
-	{   license => 'LGPL-2.1+ and/or LGPL-bdwgc',
-		corpus  => 'LGPL_and_more/colamd.c'
-	}
+is_licensed( 't/grant/LGPL/criu.h',          'LGPL-2.1' );
+is_licensed( 't/grant/LGPL/dqblk_xfs.h',     'LGPL' );
+is_licensed( 't/grant/LGPL/exr.h',           'LGPL' );
+is_licensed( 't/grant/LGPL/gnome.h',         'LGPL-2.1' );
+is_licensed( 't/grant/LGPL/jitterbuf.h',     'LGPL' );
+is_licensed( 't/grant/LGPL/libotr.m4',       'LGPL-2.1' );
+is_licensed( 't/grant/LGPL/pic.c',           'LGPL-3' );
+is_licensed( 't/grant/LGPL/strv.c',          'LGPL-2.1+' );
+is_licensed( 't/grant/LGPL/table.py',        'LGPL-2+' );
+is_licensed( 't/grant/LGPL/videoplayer.cpp', 'LGPL-2.1 or LGPL-3' );
+is_licensed(
+	't/grant/LGPL_and_more/colamd.c',
+	'LGPL-2.1+ and/or LGPL-bdwgc'
 );
-run_me(
-	{   license => 'LGPL-2.1 or GPL-2.0 and/or MPL-1.1',
-		corpus  => 'LGPL_and_more/da.aff'
-	}
+is_licensed(
+	't/grant/LGPL_and_more/da.aff',
+	[ 'LGPL-2.1 or GPL-2.0 and/or MPL-1.1', 'GPL-2 or LGPL-2.1 or MPL-1.1' ]
 );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me(
-		{   license => 'GPL-2 or LGPL-2.1 or MPL-1.1',
-			corpus  => 'LGPL_and_more/da.aff'
-		}
-	);
-}
 
 # MPL
-run_me(
-	{   license => 'GPL-2+ or LGPL-2.1+ and/or MPL-1.1',
-		corpus  => 'MPL_and_more/symbolstore.py'
-	}
+is_licensed(
+	't/grant/MPL_and_more/symbolstore.py',
+	[   'GPL-2+ or LGPL-2.1+ and/or MPL-1.1',
+		'GPL-2+ or LGPL-2.1+ or MPL-1.1'
+	]
 );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me(
-		{   license => 'GPL-2+ or LGPL-2.1+ or MPL-1.1',
-			corpus  => 'MPL_and_more/symbolstore.py'
-		}
-	);
-}
 
 # misc
-run_me(
-	{   license => 'GPL-3 and/or LGPL-2.1 or LGPL-3',
-		corpus  => 'misc/rpplexer.h'
-	}
+is_licensed(
+	't/grant/misc/rpplexer.h',
+	[   'GPL-3 and/or LGPL-2.1 or LGPL-3',
+		'GPL-3 or LGPL-2.1 with Qt exception or LGPL-3 with Qt exception or Qt'
+	]
 );
-TODO: {
-	local $TODO = 'not yet handled';
-	run_me(
-		{   license =>
-				'GPL-3 or LGPL-2.1 with Qt exception or LGPL-3 with Qt exception or Qt',
-			corpus => 'misc/rpplexer.h'
-		}
-	);
-}
 
 # MIT
-run_me(
-	{   license => 'bdwgc',
-		corpus  => 'MIT/gc.h'
-	}
-);
-
-run_me( { license => 'bdwgc-matlab', corpus => 'MIT/old_colamd.c' } );
-run_me(
-	{   license => 'MIT~old',
-		corpus  => 'MIT/harfbuzz-impl.c'
-	}
-);
-run_me(
-	{   license => 'MIT~oldstyle~permission',
-		corpus  => 'MIT/spaces.c'
-	}
-);
+is_licensed( 't/grant/MIT/gc.h',            'bdwgc' );
+is_licensed( 't/grant/MIT/old_colamd.c',    'bdwgc-matlab' );
+is_licensed( 't/grant/MIT/harfbuzz-impl.c', 'MIT~old' );
+is_licensed( 't/grant/MIT/spaces.c',        'MIT~oldstyle~permission' );
 
 # NTP
-run_me(
-	{   license => 'NTP',
-		corpus  => [
-			qw<NTP/helvO12.bdf NTP/install.sh NTP/directory.h NTP/map.h NTP/monlist.c>
-		]
-	}
+is_licensed(
+	[   qw(
+			t/grant/NTP/helvO12.bdf
+			t/grant/NTP/install.sh
+			t/grant/NTP/directory.h
+			t/grant/NTP/map.h
+			t/grant/NTP/monlist.c
+			)
+	],
+	'NTP'
 );
-run_me(
-	{   license => 'NTP~disclaimer',
-		corpus  => 'NTP/gslcdf-module.c'
-	}
-);
+is_licensed( 't/grant/NTP/gslcdf-module.c', 'NTP~disclaimer' );
 
 # WTFPL
-run_me(
-	{   license => 'WTFPL-1.0',
-		corpus  => 'WTFPL/COPYING.WTFPL'
-	}
-);
+is_licensed( 't/grant/WTFPL/COPYING.WTFPL', 'WTFPL-1.0' );
 
 done_testing;

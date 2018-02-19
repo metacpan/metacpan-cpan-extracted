@@ -68,11 +68,19 @@ sub set_key_id {
     return $self;
 }
 
+sub set_new_nonce_url {
+    my ($self, $url) = @_;
+
+    $self->{'_nonce_url'} = $url;
+
+    return $self;
+}
+
 #GETs submit no data and thus are not signed.
 sub get {
     my ( $self, $url ) = @_;
 
-    return $self->_request_and_set_last_nonce( 'GET', $url );
+    return $self->_request( 'GET', $url );
 }
 
 sub post_full_jwt {
@@ -166,9 +174,9 @@ sub _request {
 }
 
 sub _request_and_set_last_nonce {
-    my ( $self, $type, @args ) = @_;
+    my ( $self, $type, $url, @args ) = @_;
 
-    my $resp = $self->_request( $type, @args );
+    my $resp = $self->_request( $type, $url, @args );
 
     #NB: ACME’s replay protection works thus:
     #   - each server response includes a nonce
@@ -182,14 +190,31 @@ sub _request_and_set_last_nonce {
     if ( my $nonce = $resp->header($_NONCE_HEADER) ) {
         $self->{'_last_nonce'} = $nonce;
     }
+    else {
+        warn "Received no $_NONCE_HEADER from $url!";
+    }
 
     return $resp;
+}
+
+sub _get_first_nonce {
+    my ($self) = @_;
+
+    my $url = $self->{'_nonce_url'} or die "Need newNonce URL!";
+
+    $self->_request_and_set_last_nonce( 'HEAD', $url );
+
+    if (!$self->{'_nonce_url'}) {
+        die "Didn’t get a new nonce from “$self->{'_nonce_url'}”!";
+    }
+
+    return;
 }
 
 sub _create_jwt {
     my ( $self, $jwt_method, $url, $data ) = @_;
 
-    die "Need a nonce before JWS can be created!" if !$self->{'_last_nonce'};
+    $self->_get_first_nonce() if !$self->{'_last_nonce'};
 
     $self->{'_jwt_maker'} ||= do {
         my $class;

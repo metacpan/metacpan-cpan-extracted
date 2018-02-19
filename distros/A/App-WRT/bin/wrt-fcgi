@@ -19,10 +19,22 @@ use strict;
 use warnings;
 no  warnings 'uninitialized';
 
-use CGI::Fast;
 use App::WRT;
+use CGI::Fast;
+use Getopt::Long;
+use Pod::Usage;
 
-my $w = App::WRT::new_from_file('wrt.json');
+# Handle options, including help generated from the POD above.  See:
+# - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+# - https://metacpan.org/pod/Pod::Usage
+# - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+my $config_file = 'wrt.json';
+GetOptions(
+  'config=s' => \$config_file,
+  help       => sub { pod2usage(0) },
+) or pod2usage(2);
+
+my $w = App::WRT::new_from_file($config_file);
 
 # use Data::Dumper;
 

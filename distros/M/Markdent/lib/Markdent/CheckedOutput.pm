@@ -3,7 +3,7 @@ package Markdent::CheckedOutput;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 sub new {
     my $class  = shift;
@@ -42,7 +42,7 @@ Markdent::CheckedOutput - This class has no user-facing parts
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SUPPORT
 
@@ -60,7 +60,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dave Rolsky.
+This software is copyright (c) 2018 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

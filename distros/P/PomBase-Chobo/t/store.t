@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 24;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -31,7 +31,7 @@ cmp_deeply([
   sort {
     $a->{id} cmp $b->{id};
   } map {
-    { name => $_->{name}, id => $_->{id}, definition => $_->{def} }
+    { name => $_->{name}, id => $_->{id}, definition => $_->{def}->{definition} }
   } $ontology_data->get_terms()],
            [{ name => 'molecular_function', id => 'GO:0003674',
               definition => 'Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions.' },
@@ -42,6 +42,8 @@ cmp_deeply([
 my $sth = $fake_handle->prepare("select cvterm_id, definition, name, cv_id from cvterm order by name");
 $sth->execute();
 
+my $cv_version_term = $sth->fetchrow_hashref();
+is ($cv_version_term->{name}, 'cv_version');
 my $cyanidin_term = $sth->fetchrow_hashref();
 is ($cyanidin_term->{name}, $cyanidin_name);
 is ($cyanidin_term->{definition}, $cyanidin_def);
@@ -72,20 +74,34 @@ $sth->execute();
 my $synonym_1 = $sth->fetchrow_hashref();
 my $synonym_2 = $sth->fetchrow_hashref();
 my $synonym_3 = $sth->fetchrow_hashref();
+my $synonym_4 = $sth->fetchrow_hashref();
+my $synonym_5 = $sth->fetchrow_hashref();
 
 cmp_deeply ($synonym_1,
             {
               type_id => $narrow_term->{cvterm_id},
-              synonym => 'cyanidin 3-O-glucoside-something',
+              synonym => 'cyanidin 3-O-glucoside-"something"',
               cvterm_id => $cyanidin_term->{cvterm_id},
             });
 cmp_deeply ($synonym_2,
             {
               type_id => $exact_term->{cvterm_id},
-              synonym => 'cyanidin 3-O-glucoside-yadda-yadda',
+              synonym => 'cyanidin 3-O-glucoside-yadda',
               cvterm_id => $cyanidin_term->{cvterm_id},
             });
 cmp_deeply ($synonym_3,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'cyanidin 3-O-glucoside-yadda-one',
+              cvterm_id => $cyanidin_term->{cvterm_id},
+            });
+cmp_deeply ($synonym_4,
+            {
+              type_id => $exact_term->{cvterm_id},
+              synonym => 'cyanidin 3-O-glucoside-yadda-three',
+              cvterm_id => $cyanidin_term->{cvterm_id},
+            });
+cmp_deeply ($synonym_5,
             {
               type_id => $exact_term->{cvterm_id},
               synonym => 'molecular function',
@@ -106,13 +122,26 @@ while (defined (my $dbxref = $sth->fetchrow_hashref())) {
   }
 }
 
-
 $sth = $fake_handle->prepare("select cvterm_id, dbxref_id from cvterm_dbxref order by cvterm_id");
 $sth->execute();
 
-my $cvterm_dbxref = $sth->fetchrow_hashref();
+my @cvterm_dbxrefs = ();
+
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+
 is ($sth->fetchrow_hashref(), undef);
 
+ok(scalar(grep {
+  $_->{cvterm_id} == $molecular_function_term->{cvterm_id};
+} @cvterm_dbxrefs) == 2);
 
-is($cvterm_dbxref->{cvterm_id}, $molecular_function_term->{cvterm_id});
+my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $fake_handle);
+
+my @cv_version_values = $chado_data->get_cvprop_values('molecular_function', 'cv_version');
+
+is(scalar(@cv_version_values), 1);
+is($cv_version_values[0], 'releases/2016-05-07');
+
 

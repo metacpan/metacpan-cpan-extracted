@@ -2,7 +2,7 @@ package Data::Record::Serialize::Role::Default;
 
 use Moo::Role;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Hash::Util qw[ hv_store ];
 
@@ -98,7 +98,7 @@ Data::Record::Serialize::Role::Default
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =begin pod_coverage
 

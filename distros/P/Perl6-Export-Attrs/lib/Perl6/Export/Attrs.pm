@@ -1,6 +1,6 @@
  package Perl6::Export::Attrs;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use warnings;
 use strict;
@@ -141,7 +141,7 @@ sub _generic_import {
     REQUEST:
     while ($argno < @_) {
         my $request = $_[$argno];
-        if (my ($sub_name) = $request =~ m/\A & ($IDENT) (?:\(\))? \z/xms) {
+        if (my ($sub_name) = $request =~ m/\A &? ($IDENT) (?:\(\))? \z/xms) {
             if (exists $request{$sub_name}) {
                 splice @_, $argno, 1;
                 next REQUEST;
@@ -220,7 +220,7 @@ Perl6::Export::Attrs - The Perl 6 'is export(...)' trait as a Perl 5 attribute
 
 =head1 VERSION
 
-This document describes Perl6::Export::Attrs version 0.000005
+This document describes Perl6::Export::Attrs version 0.000006
 
 
 =head1 SYNOPSIS

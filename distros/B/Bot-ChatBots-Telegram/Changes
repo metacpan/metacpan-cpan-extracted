@@ -1,3 +1,22 @@
+0.012  2018-02-11 15:31:30 CET
+   - release after 71 PASSes on CPAN Testers (thanks!)
+
+0.011001  2018-02-11 10:28:52 CET
+   - require WWW::Telegram::BotAPI 0.10 or newer
+   - move sender accessor in Source role
+   - armonize (send_)?response in WebHook with LongPoll
+   - make "sender" available in $record for processors
+   - fix error about $log not available during global destruction
+   - fix documentation bugs and add enhancements
+   - add Tutorial guide and associated examples
+   - TRIAL release
+
+0.011  2018-01-27 15:22:09 CET
+   - fix chat expansion into channel for CallbackQuery Updates
+     (GH#3, thanks xeonvs)
+   - document the effect of normalize_record
+   - TRIAL release
+
 0.010  2018-01-13 23:28:06 CET
    - remove incorrect assumption about WWW::Telegram::BotAPI
    - release after 71 PASSes on CPAN Testers (thanks!)

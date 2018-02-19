@@ -3,7 +3,7 @@ package Firefox::Marionette::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.42';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -76,6 +76,11 @@ sub moz_accessibility_checks {
     return $self->{moz_accessibility_checks};
 }
 
+sub proxy {
+    my ($self) = @_;
+    return $self->{proxy};
+}
+
 1;    # Magic true value required at end of module
 __END__
 
@@ -85,7 +90,7 @@ Firefox::Marionette::Capabilities - Represents Firefox Capabilities retrieved us
 
 =head1 VERSION
 
-Version 0.37
+Version 0.42
 
 =head1 SYNOPSIS
 
@@ -113,6 +118,8 @@ accepts a hash as a parameter.  Allowed keys are below;
 
 =item * page_load_strategy - The page load strategy to use for the current session.  Must be one of 'none', 'eager', or 'normal'.
 
+=item * proxy - describes the L<proxy|Firefox::Marionette::Proxy> setup for the upcoming browser session.
+
 =item * timeouts - describes the L<timeouts|Firefox::Marionette::Timeouts> imposed on certian session operations.
 
 =item * moz_webdriver_click - use a WebDriver conforming L<click|Firefox::Marionette#click>.  Allowed values are 1 or 0.  Default is 0.  This function will return undef for Firefox versions less than 57.
@@ -136,6 +143,10 @@ returns the page load strategy being used for the current session.  It will be o
 =head2 timeouts
 
 returns the current L<timeouts|Firefox::Marionette::Timeouts> object
+
+=head2 proxy
+
+returns the current L<proxy|Firefox::Marionette::Proxy> object
 
 =head2 browser_version 
 

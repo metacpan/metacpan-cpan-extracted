@@ -1,6 +1,6 @@
 package Date::Hebrew::Simple;
 
-$Date::Hebrew::Simple::VERSION   = '0.06';
+$Date::Hebrew::Simple::VERSION   = '0.08';
 $Date::Hebrew::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Hebrew::Simple - Represents Hebrew date.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
@@ -78,6 +78,26 @@ sub BUILD {
 
     # prints today's Hebrew date.
     print Date::Hebrew::Simple->new, "\n";
+
+    my $date = Date::Hebrew::Simple->new({ year => 5778, month => 11, day => 1 });
+
+    # prints the given Hebrew date
+    print $date->as_string, "\n";
+
+    # prints the equivalent Julian day
+    print $date->to_julian, "\n";
+
+    # prints the equivalent Gregorian date
+    print sprintf("%04d-%02d-%02d", $date->to_gregorian), "\n";
+
+    # prints day of the week index (0 for Yom Rishon, 1 for Yom Sheni and so on).
+    print $date->day_of_week, "\n";
+
+    # prints the Hebrew date equivalent of the Gregorian date (2018-02-12).
+    print $date->from_gregorian(2018, 02, 12), "\n";
+
+    # prints the Hebrew date equivalent of the Julian day (2458134.5).
+    print $date->from_julian(2458134.5), "\n";
 
 =head1 METHODS
 

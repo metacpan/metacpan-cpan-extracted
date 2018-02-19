@@ -1,32 +1,37 @@
 Revision history for Piper
 
-0.04      2017-03-12 16:28:23-04:00 America/New_York
+0.05      2018-02-13 08:35:59-05:00 America/New_York
+
+	[ CHANGES ]
+		- Fixed bug where precision loss during calculation of segment pressure could cause an infinite loop.
+
+0.04      2017-03-12 16:28:23-04:00
 
     [ CHANGES ]
 
-          - Replaced 'any' in has_pending with short-circuiting for loop
-             - Fixes segfault in Perl versions 10 and 12 (thanks @CPANTesters!)
+        - Replaced 'any' in has_pending with short-circuiting for loop
+           - Fixes segfault in Perl versions 10 and 12 (thanks @CPANTesters!)
 
-0.03      2017-02-28 22:15:27-05:00 America/New_York
+0.03      2017-02-28 22:15:27-05:00
 
     [ CHANGES ]
 
-          - Added LICENSE to POD (thanks @manwar)
+        - Added LICENSE to POD (thanks @manwar)
 
-0.02      2017-02-28 08:56:28-05:00 America/New_York
+0.02      2017-02-28 08:56:28-05:00
 
     [** INCOMPATIBLE CHANGES **]
 
-          - Method eject sends data to parent's drain instead of main drain
-             - Old behavior becomes $instance->main->eject
-          - Method inject sends data to parent's queue instead of main
-             - Old behavior becomes $instance->main->inject
+        - Method eject sends data to parent's drain instead of main drain
+           - Old behavior becomes $instance->main->eject
+        - Method inject sends data to parent's queue instead of main
+           - Old behavior becomes $instance->main->inject
 
     [ CHANGES ]
     
-          - Added methods has_pending and flush
-          - Coerce enabled attribute to boolean
+        - Added methods has_pending and flush
+        - Coerce enabled attribute to boolean
 
-0.01      2017-02-20 10:15:01-05:00 America/New_York
+0.01      2017-02-20 10:15:01-05:00
 
-          - Initial release.
+        - Initial release

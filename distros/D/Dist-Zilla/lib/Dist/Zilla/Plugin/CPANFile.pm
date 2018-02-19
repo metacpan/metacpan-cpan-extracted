@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::CPANFile 6.010;
+package Dist::Zilla::Plugin::CPANFile 6.011;
 # ABSTRACT: produce a cpanfile prereqs file
 
 use Moose;
@@ -11,7 +11,7 @@ use Dist::Zilla::File::FromCode;
 #pod =head1 SYNOPSIS
 #pod
 #pod     # dist.ini
-#pod     [CPANfile]
+#pod     [CPANFile]
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -23,8 +23,15 @@ use Dist::Zilla::File::FromCode;
 #pod file.  It defaults, of course, to F<cpanfile>.
 #pod
 #pod     # dist.ini
-#pod     [CPANfile]
+#pod     [CPANFile]
 #pod     filename = dzil-generated-cpanfile
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod * L<Module::CPANfile>
+#pod * L<Carton>
+#pod * L<cpanm>
 #pod
 #pod =cut
 
@@ -97,12 +104,12 @@ Dist::Zilla::Plugin::CPANFile - produce a cpanfile prereqs file
 
 =head1 VERSION
 
-version 6.010
+version 6.011
 
 =head1 SYNOPSIS
 
     # dist.ini
-    [CPANfile]
+    [CPANFile]
 
 =head1 DESCRIPTION
 
@@ -116,8 +123,26 @@ If given, parameter allows you to specify an alternate name for the generated
 file.  It defaults, of course, to F<cpanfile>.
 
     # dist.ini
-    [CPANfile]
+    [CPANFile]
     filename = dzil-generated-cpanfile
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Module::CPANfile>
+
+=item *
+
+L<Carton>
+
+=item *
+
+L<cpanm>
+
+=back
 
 =head1 AUTHOR
 
@@ -125,7 +150,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

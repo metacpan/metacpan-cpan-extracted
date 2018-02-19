@@ -33,3 +33,9 @@ Revision history for Perl6-Export-Attrs
 
     * Added dependency for PadWalker 
       (thanks Dave!)
+
+
+0.000006  Sat Feb 17 11:04:49 2018
+
+    * Fixed long-standing problem with named exports
+      (Thanks--and apologies--to Alex, Slaven, Karen, and especially Niko)

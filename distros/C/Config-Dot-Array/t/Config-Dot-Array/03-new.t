@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Config::Dot::Array;
 use English qw(-no_match_vars);
 use Test::More 'tests' => 10;

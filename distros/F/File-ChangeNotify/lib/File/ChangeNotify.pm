@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Carp qw( confess );
 
@@ -70,7 +70,7 @@ File::ChangeNotify - Watch for changes to files, cross-platform style
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -148,9 +148,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords H. Merijn Branch Karen Etheridge
+=for stopwords Aaron Crane H. Merijn Branch Karen Etheridge
 
 =over 4
+
+=item *
+
+Aaron Crane <arc@cpan.org>
 
 =item *
 
@@ -164,7 +168,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

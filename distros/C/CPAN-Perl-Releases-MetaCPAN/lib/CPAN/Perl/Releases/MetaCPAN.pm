@@ -2,10 +2,9 @@ package CPAN::Perl::Releases::MetaCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 use JSON::PP ();
 use HTTP::Tinyish;
-use HTTP::Tiny;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(perl_tarballs perl_versions perl_pumpkins);
@@ -15,9 +14,9 @@ sub new {
     my $uri = $option{uri} || "https://fastapi.metacpan.org/v1/release";
     $uri =~ s{/$}{};
     my $cache = exists $option{cache} ? $option{cache} : 1;
-    my $http_class = HTTP::Tiny->can_ssl ? "HTTP::Tiny" : "HTTP::Tinyish";
-    my $http = $http_class->new(agent => __PACKAGE__ . "/$VERSION");
-    bless { uri => $uri, http => $http, cache => $cache }, $class;
+    my $http = HTTP::Tinyish->new(agent => __PACKAGE__ . "/$VERSION");
+    my $json = JSON::PP->new->canonical(1);
+    bless { uri => $uri, http => $http, cache => $cache, json => $json }, $class;
 }
 
 sub get {
@@ -40,9 +39,14 @@ sub get {
         sort => [ { date => 'desc' } ],
         fields => [qw( name date author version status maturity authorized download_url )],
     };
-    my $res = $self->{http}->post($uri, { content => JSON::PP::encode_json($query) });
+    my $res = $self->{http}->post($uri, {
+        content => $self->{json}->encode($query),
+        headers => {
+            'content-type' => 'application/json',
+        }
+    });
     die "$res->{status} $res->{reason}, $uri\n" unless $res->{success};
-    my $hash = JSON::PP::decode_json($res->{content});
+    my $hash = $self->{json}->decode($res->{content});
     my $releases = [
         map { $_->{authorized} = 1; $_ }
         grep { $_->{authorized} }

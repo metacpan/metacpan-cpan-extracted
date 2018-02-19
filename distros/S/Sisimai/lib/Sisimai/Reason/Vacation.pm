@@ -14,13 +14,13 @@ sub match {
     my $class = shift;
     my $argv1 = shift // return undef;
     my $regex = qr{(?>
-         I[ ]am[ ](?:
+         i[ ]am[ ](?:
              away[ ](?:on[ ]vacation|until)
             |out[ ]of[ ]the[ ]office
             )
-        |I[ ]will[ ]be[ ]traveling[ ]for[ ]work[ ]on
+        |i[ ]will[ ]be[ ]traveling[ ]for[ ]work[ ]on
         )
-    }xi;
+    }x;
     
     return 1 if $argv1 =~ $regex;
     return 0;
@@ -68,7 +68,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

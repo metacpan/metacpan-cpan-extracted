@@ -29,8 +29,6 @@ along with this program. If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 
-use Test::Fatal 'exception';
-
 BEGIN {
 	# "parent" pragma wasn't core until 5.10.1, so just do it ourselves
 	# instead of using "base".
@@ -91,6 +89,13 @@ sub spew {
 	return $fn;
 }
 
+#use Test::Fatal 'exception';
+# We really only use "exception" for really simple cases, so let's
+# use this cheapo replacement so we can depend only on core modules!
+sub exception (&) {  ## no critic (ProhibitSubroutinePrototypes)
+	return eval { shift->(); 1 } ? undef : ($@ || confess "\$@ was false");
+}
+
 sub warns (&) {  ## no critic (ProhibitSubroutinePrototypes)
 	my $sub = shift;
 	my @warns;
@@ -131,6 +136,12 @@ sub warns (&) {  ## no critic (ProhibitSubroutinePrototypes)
 	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
 	# we can't mock CORE::print, but we can use a tied handle to cause it to return false
 	sub WRITE { return undef }  ## no critic (ProhibitExplicitReturnUndef)
+}
+{
+	package Tie::Handle::Unreadable;
+	require Tie::Handle::Base;
+	our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
+	sub READ { return undef }  ## no critic (ProhibitExplicitReturnUndef)
 }
 {
 	package Tie::Handle::FakeFileno;

@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use Mouse;
 use Carp;
@@ -134,7 +134,11 @@ sub make_object
     croak "no argument passed to new()";
   }
 
-  if ($object->{is_relationshiptype}) {
+  if ($object->{is_obsolete} && $object->{name} && $object->{name} !~ /^obsolete/i) {
+    $object->{name} = "OBSOLETE " . $object->{id} . " " . $object->{name};
+  }
+
+  if ($object->{is_relationshiptype} && $object->{name}) {
     $object->{name} =~ s/ /_/g;
   }
 
@@ -205,7 +209,8 @@ sub merge
     my $field_conf = $PomBase::Chobo::OntologyConf::field_conf{$name};
 
     if (defined $field_conf) {
-      if (defined $field_conf->{type} && $field_conf->{type} eq 'SINGLE') {
+      if (defined $field_conf->{type} &&
+            ($field_conf->{type} eq 'SINGLE' || $field_conf->{type} eq 'SINGLE_HASH')) {
         my $res = undef;
         if (defined $field_conf->{merge}) {
           $res = $field_conf->{merge}->($self, $other_term);
@@ -283,7 +288,13 @@ sub to_string
     my @ret_lines = ();
 
     if (ref $value) {
-      for my $single_value (@$value) {
+      my @values;
+      if ($field_conf{$name}->{type} eq 'SINGLE_HASH') {
+        push @values, $value;
+      } else {
+        @values = @$value;
+      }
+      for my $single_value (@values) {
         my $to_string_proc = $field_conf{$name}->{to_string};
         my $value_as_string;
         if (defined $to_string_proc) {

@@ -1,5 +1,20 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.2    2018-02-14 00:38:33+00:00 Europe/London
+  [Tests]
+  - Remove the use of Test::TCP in an attempt to work around Windows
+    test failures.
+
+  [Other Changes]
+  - Perltidied source.
+
+v0.4.1    2018-02-10 23:53:37+00:00 Europe/London
+  [Documentation]
+  - Fixed reference to the wrong module in Net::Statsd::Lite::Types.
+
+  [Tests]
+  - Add sleep to give a chance for the test server to start.
+
 v0.4.0    2018-02-07 21:41:25+00:00 Europe/London
   [Enhancements]
   - Removed the use of IO::String, which increases the performance

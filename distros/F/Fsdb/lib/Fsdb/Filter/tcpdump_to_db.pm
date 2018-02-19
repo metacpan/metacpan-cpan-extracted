@@ -2,8 +2,7 @@
 
 #
 # tcpdump_to_db.pm
-# Copyright (C) 1999-2007 by John Heidemann <johnh@isi.edu>
-# $Id: 43409abf10f685dcc1abf480ced38d92f914c5c6 $
+# Copyright (C) 1999-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -225,7 +224,7 @@ Convert tcpdump h:mm:ss.SS format to absolute seconds.
 sub _conv_time {
     my($self, $raw) = @_;
     my($h, $m, $s, $f) = ($raw =~ /^\s*(\d+):(\d+):(\d+)\.(\d+)\s*$/);
-    die "$0: input doesn't look like an ascii formatted tcpdump.  Giving up.\n"
+    croak("$0: input doesn't look like an ascii formatted tcpdump.  Giving up.\n")
 	if (!defined($h));
     my $S = (($h * 60) + $m) * 60 + $s;
     if ($self->{_daytime}) {
@@ -300,7 +299,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

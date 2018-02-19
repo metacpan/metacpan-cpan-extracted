@@ -1,54 +1,50 @@
-NAME
-    scrape.pl - simple HTML scraping from the command line
-
-ABSTRACT
-    This is a simple program to extract data from HTML by specifying CSS3 or
-    XPath selectors.
-
-SYNOPSIS
-        scrape.pl URL selector selector ...
-
-        # Print page title
-        scrape.pl http://perl.org title
-        # The Perl Programming Language - www.perl.org
-
-        # Print links with titles, make links absolute
-        scrape.pl http://perl.org a //a/@href --uri=2
-    
-        # Print all links to JPG images, make links absolute
-        scrape.pl http://perl.org a[@href=$"jpg"]
+scrape.pl - simple HTML scraping from the command line
 
 DESCRIPTION
-    This program fetches an HTML page and extracts nodes matched by XPath or
-    CSS selectors from it.
 
-    If URL is `-', input will be read from STDIN.
+This program fetches an HTML page and extracts nodes
+matched by XPath or CSS selectors from it.
 
-OPTIONS
-    --sep
-        Separator character to use for columns. Default is tab.
+If URL is C<->, input will be read from STDIN.
 
-    --uri COLUMNS
-        Numbers of columns to convert into absolute URIs, if the known
-        attributes do not everything you want.
 
-    --no-uri
-        Switches off the automatic translation to absolute URIs for known
-        attributes like `href' and `src'.
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
 
 REPOSITORY
-    The public repository of this module is
-    http://github.com/Corion/App-scrape.
+
+The public repository of this module is
+L<http://github.com/Corion/App-scrape>.
 
 SUPPORT
-    The public support forum of this program is http://perlmonks.org/.
+
+The public support forum of this program is
+L<http://perlmonks.org/>.
+
 
 AUTHOR
-    Max Maischein `corion@cpan.org'
 
-COPYRIGHT (c)
-    Copyright 2011-2011 by Max Maischein `corion@cpan.org'.
+Max Maischein C<corion@cpan.org>
 
 LICENSE
-    This module is released under the same terms as Perl itself.
 
+This module is released under the same terms as Perl itself.
+
+COPYRIGHT (c)
+
+Copyright 2011-2018 by Max Maischein C<corion@cpan.org>.

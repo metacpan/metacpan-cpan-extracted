@@ -200,13 +200,13 @@ sub setup ($) {
 
     my(@finish_args) = (-comment_handler => $self->create_pass_comments_sub);
     if (!defined($self->{_header}) && $#{$self->{_cols}} == -1) {
-        croak $self->{_prog} . ": must specify either --header or columns.\n";
+        croak($self->{_prog} . ": must specify either --header or columns.\n");
     } elsif (defined($self->{_header}) && $#{$self->{_cols}} == -1) {
 	push(@finish_args, -header => $self->{_header});
     } elsif (!defined($self->{_header}) && $#{$self->{_cols}} > -1) {
 	push(@finish_args, -fscode => $self->{_fscode}, -cols => $self->{_cols});
     } else {
-        croak $self->{_prog} . ": cannot specific both --header and columns.\n";
+        croak($self->{_prog} . ": cannot specific both --header and columns.\n");
     };
     
 

@@ -143,6 +143,7 @@ L<Fsdb(3)>
 
 use strict;
 use Pod::Usage;
+use Carp;
 
 use Fsdb::Filter;
 use Fsdb::IO::Reader;

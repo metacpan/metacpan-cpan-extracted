@@ -8,7 +8,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/WWW/REST.pm',
-    't/0-signature.t',
     't/00-compile.t',
     't/1-basic.t'
 );

@@ -3,7 +3,7 @@
 # time ( perl Makefile.PL;make;ATDEBUG=1 perl -Iblib/lib t/03_bloomfilter.t )
 # perl Makefile.PL;make;perl -Iblib/lib t/03_bloomfilter.t
 
-BEGIN{require 't/common.pl'}
+use lib '.'; BEGIN{require 't/common.pl'}
 use Test::More tests => 28;
 
 my $error_rate=0.02;

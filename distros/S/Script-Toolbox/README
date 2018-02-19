@@ -1,3 +1,24 @@
+Script::Toolbox version 0.56 (2018/02/16)
+=========================================
+- new methods:
+- getRunCnt()
+- setCurrDefault()
+- setCurrReadOnly()
+- Exit() with __FILE__ and __LINE__
+- Toggle mode within menus containers
+
+Script::Toolbox version 0.55 (2018/02/14)
+=========================================
+- bug fix for readOnly option in DataMenus
+- default values for data menus
+- new method getLabelValueHash()
+- spelling mistake (Menue=>Menu) fixed
+  I'm sorry for this. Menue and DataMenue
+  are now deprecated and replaced by
+  Menu and DataMenu.
+  The old function name are also available
+  for compability reasons.
+
 Script::Toolbox version 0.54 (2016/06/22)
 =========================================
 - bug fix in Menues->addOption() 

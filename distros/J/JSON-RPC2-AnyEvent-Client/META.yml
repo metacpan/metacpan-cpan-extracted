@@ -31,9 +31,10 @@ no_index:
 provides:
   JSON::RPC2::AnyEvent::Client:
     file: lib/JSON/RPC2/AnyEvent/Client.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   AnyEvent: '0'
+  AnyEvent::HTTP: '0'
   AnyEvent::Handle: '0'
   JSON::RPC2::Client: '0'
   JSON::XS: '0'
@@ -43,5 +44,5 @@ resources:
   bugtracker: https://github.com/oklas/p5-JSON-RPC2-AnyEvent-Client/issues
   homepage: https://github.com/oklas/p5-JSON-RPC2-AnyEvent-Client
   repository: git://github.com/oklas/p5-JSON-RPC2-AnyEvent-Client.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

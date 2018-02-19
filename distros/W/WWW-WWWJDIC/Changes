@@ -1,3 +1,7 @@
+0.005 2018-02-13
+
+- Update data to reflect the current mirrors
+
 0.004 2017-10-10
 
 - Remove unnecessary dependences from Makefile.PL

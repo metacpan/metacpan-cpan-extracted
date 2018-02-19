@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -56,12 +56,12 @@
          "web" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
    "x_static_install" : 1
 }
 

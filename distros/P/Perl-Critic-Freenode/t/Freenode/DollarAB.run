@@ -35,6 +35,7 @@ my $x = $b[1]||" ";
 ## cut
 
 sort { @{$a} <=> @{$b} } ();
+sort { scalar(@{$a->{ids}}) <=> scalar(@{$b->{ids}}) } ();
 
 ## name InnerBlock
 ## failures 0

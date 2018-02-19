@@ -38,7 +38,6 @@ Revision history for Perl module Mojolicious::Command::generate::routes
     - Fixed failing tests on Windows again.
     - Small change in show.html.ep
 
-
 0.09 Sun Jan 28 20:25:37 CET 2018
     - Improved Makefile.PL. Automated generation of README and README.md.
     - Attribute 'description' now extracts description form POD.
@@ -52,3 +51,23 @@ Revision history for Perl module Mojolicious::Command::generate::routes
 0.10 Sun Jan 28 20:42:50 CET 2018
     - Improved Makefile.PL.
 
+0.11 Sun Feb 11 02:03:42 CET 2018
+    - Code optimisations and POD improvements
+    - Added templates for description of resources in OpenAPI format.
+    - Implemented generation of Schema object definitions for each table.
+
+0.12 Sun Feb 11 22:21:14 CET 2018
+    - Using Mojo::File instead of File::Spec.
+    - Fixed potential bug in 'routes' attribite.
+    - New instruction in generated TODO file.
+    - Using now Mojo::Util::getop().
+
+0.13 Sun Feb 18 02:00:31 CET 2018
+    - Heavy refactoring. Now all the API is in just one file - api.json.
+    - Added tests for generated API.
+    - Added tests for the generated code via the API.
+
+0.14 Sun Feb 18 14:47:45 CET 2018
+    - Added some very basic tests.
+    - Improved 'description' attribute.
+    - Improved documentation.

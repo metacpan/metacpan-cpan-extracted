@@ -87,6 +87,7 @@ sub from_node {
 				UserFullName      => '_ext_name',
 				UserPrintableName => '_ext_name',
 				User              => '_ext_uid',
+				UserId            => '_ext_uid',
 				UniqueUsername    => '_ext_uid',
 				UniqueName        => '_ext_uid',
 			},

@@ -48,7 +48,7 @@ use warnings;
 
 use parent 'Exporter';
 
-use Carp qw(carp cluck croak confess);
+use Carp qw(carp cluck croak confess shortmess longmess);
 use File::Spec;
 use File::Basename qw(basename dirname);
 use Cwd qw(cwd abs_path);
@@ -80,7 +80,6 @@ sub  his_sub                 ( ;$  ) ;
 sub  his_subroutine          ( ;$  ) ;
 sub _init_envariables        (     ) ;
 sub _init_public_vars        (     ) ;
-sub _init_zero_vars          (     ) ;
 sub  name_of_coderef         (  $  ) ;
 sub  NOT_REACHED             (     ) ;
 sub  panic                   (  $  ) ;
@@ -107,26 +106,17 @@ our $VERSION = 0.001_000;
 
 our %EXPORT_TAGS;
 
-our @CARP_NOT;
 
 push our @EXPORT_OK, do {
     my %seen;
     grep { !$seen{$_}++ } map { @$_ } values %EXPORT_TAGS;
 };
 
-my @_Friendly_Mods;
-
-BEGIN {
-    @_Friendly_Mods = qw(
-        Assert::Conditional::Utils
-        Assert::Conditional
-        Attribute::Handlers
-    );
-    for my $friend (@_Friendly_Mods) {
-        push @CARP_NOT, $friend;
-        $Carp::Internal{$friend}++;
-    }
-}
+our @CARP_NOT = qw(
+    Assert::Conditional::Utils
+    Assert::Conditional
+    Attribute::Handlers
+);
 
 $EXPORT_TAGS{all} = \@EXPORT_OK;
 
@@ -177,7 +167,7 @@ sub Export : ATTR(BEGIN)
     }
 }
 
-our($Assert_Debug, $Assert_Always, $Assert_Carp, $Assert_Never)
+our($Assert_Debug, $Assert_Always, $Assert_Carp, $Assert_Never, $Allow_Handlers)
     :Export( qw[vars] );
 
 our $Pod_Generation;
@@ -191,22 +181,27 @@ sub _init_envariables() {
         ASSERT_CONDITIONAL
         ASSERT_CONDITIONAL_BUILD_POD
         ASSERT_CONDITIONAL_DEBUG
+        ASSERT_CONDITIONAL_ALLOW_HANDLERS
     );
 
-    $Pod_Generation //= $ASSERT_CONDITIONAL_BUILD_POD || 0;
+    $Pod_Generation //= $ASSERT_CONDITIONAL_BUILD_POD      || 0;
+    $Allow_Handlers //= $ASSERT_CONDITIONAL_ALLOW_HANDLERS || 0;
+    $Assert_Debug   //= $ASSERT_CONDITIONAL_DEBUG          || 0;
 
-    $Assert_Debug ||= $ASSERT_CONDITIONAL_DEBUG // 0;
-
-    if (defined($ASSERT_CONDITIONAL) && $ASSERT_CONDITIONAL) {
+    if ($ASSERT_CONDITIONAL) {
         for ($ASSERT_CONDITIONAL) {
-            if    ( /^carp$/   ) { $Assert_Carp   ||= 1 }
-            elsif ( /^always$/ ) { $Assert_Always ||= 1 }
-            elsif ( /^never$/  ) { $Assert_Never  ||= 1 }
-            else {
+            unless (/\b(?: carp | always | never )\b/x) {
                 warn("Ignoring unknown value '$_' of ASSERT_CONDITIONAL envariable");
+                next;
             }
+            if ( /\b carp     \b/x ) { $Assert_Carp    ||= 1 }
+            if ( /\b always   \b/x ) { $Assert_Always  ||= 1 }
+            if ( /\b never    \b/x ) { $Assert_Never   ||= 1 }
+            if ( /\b handlers \b/x ) { $Allow_Handlers ||= 1 }
         }
-    }
+    } 
+
+    $Assert_Always ||= 1 unless $Assert_Carp || $Assert_Never;
 
     if ($Assert_Never) {
         warn q(Ignoring $Assert_Always because $Assert_Never is true) if $Assert_Always;
@@ -214,19 +209,6 @@ sub _init_envariables() {
         $Assert_Always = $Assert_Carp = 0;
     }
 
-    $Assert_Always  ||= $Assert_Carp;
-
-    _init_zero_vars();
-}
-
-# I bet you didn't know you could do this. :)
-
-sub _init_zero_vars() {
-    our $Start_Dir     = cwd();
-    our $Original_0    = $0;
-                 $0    = basename($Original_0);
-                 $00   = File::Spec->abs2rel($Original_0, $Start_Dir);
-                 $000  = abs_path($Original_0);
 }
 
 sub _init_public_vars() {
@@ -391,26 +373,22 @@ variables as previously described.
 sub botch($)
     :Export( qw[botch] )
 {
+    return if $Assert_Never;
+
     my($msg) = @_;
     my $sub = his_assert;
-    require Carp;
-    local @SIG{<__{DIE,WARN}__>};
+
+    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
 
     my $botch = "$0\[$$]: botched assertion $sub: \u$msg";
 
-    #my $file = his_filename(1);
-    #my $line = his_line(1);
-    #my $where = "at $file $line\n";
-
-    $botch .= ", bailing out" unless $Assert_Carp;
-    if ($Assert_Carp || !$Assert_Never) {
-        Carp::carp($botch) if $Assert_Carp || !$^S;
+    if ($Assert_Carp) { 
+        Carp::carp($botch) 
     }
-    unless ($Assert_Carp || $Assert_Never) {
-        my $sub = his_sub(-1);
-        local our @CARP_NOT;
-        delete @Carp::Internal{ @_Friendly_Mods  };
-        Carp::confess("$botch\n   Beginning stack dump in $sub");
+
+    if ($Assert_Always) {
+        $botch = shortmess("$botch, bailing out");
+        Carp::confess("$botch\n   Beginning stack dump from failed $sub");
     }
 }
 
@@ -495,7 +473,7 @@ sub panic($)
     :Export( qw[lint botch] )
 {
     my($msg) = @_;
-    local @SIG{<__{DIE,WARN}__>};
+    local @SIG{<__{DIE,WARN}__>} unless $Allow_Handlers;
     Carp::confess("Panicking on internal error: $msg");
 }
 

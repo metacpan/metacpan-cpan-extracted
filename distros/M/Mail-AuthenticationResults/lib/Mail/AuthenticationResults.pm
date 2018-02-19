@@ -1,10 +1,10 @@
 package Mail::AuthenticationResults;
 # ABSTRACT: Object Oriented Authentication-Results Headers
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Carp;
 
 use Mail::AuthenticationResults::Parser;
@@ -37,7 +37,7 @@ Mail::AuthenticationResults - Object Oriented Authentication-Results Headers
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
 
 =head1 DESCRIPTION
 

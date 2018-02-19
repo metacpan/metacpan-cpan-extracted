@@ -1,6 +1,10 @@
 # WebService-MusicBrainz
 
-This module will search the MusicBrainz database through their web service and return objects with the found data.  This module is not backward compatible with pre-1.0 versions.  Version 1.0 is a complete re-write based on Mojolicious.
+This module will search the MusicBrainz database through their web service and
+return objects with the found data.  This module is not backward compatible
+with pre-1.0 versions.  Version 1.0 is a complete re-write based on
+Mojolicious and implements [MusicBrainz Web Service Version
+2](https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2).
 
 ## INSTALLATION
 

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "App::Cmd" => "0.330",
     "Config::Entities" => "1.07",
+    "Getopt::Long::Descriptive" => 0,
     "IPC::Run" => "0.94",
     "IPC::Run3" => "0.048",
     "JSON" => "2.90",
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.90"
   },
-  "VERSION" => "1.26",
+  "VERSION" => "1.27",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +49,7 @@ my %FallbackPrereqs = (
   "Config::Entities" => "1.07",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Getopt::Long::Descriptive" => 0,
   "IPC::Run" => "0.94",
   "IPC::Run3" => "0.048",
   "JSON" => "2.90",

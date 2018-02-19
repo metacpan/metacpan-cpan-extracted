@@ -1,10 +1,12 @@
+Changes
 lib/Class/DOES.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01basic.t
 t/02inherit.t
 t/03warnings.t
-t/Utils.pm
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+tlib/t/Utils.pm

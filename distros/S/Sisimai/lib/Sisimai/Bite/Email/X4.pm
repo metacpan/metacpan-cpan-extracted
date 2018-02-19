@@ -4,25 +4,22 @@ use feature ':5.10';
 use strict;
 use warnings;
 
-my $Re0 = {
-    'subject'  => qr{\A(?:
-         failure[ ]notice
-        |Permanent[ ]Delivery[ ]Failure
-        )
-    }xi,
-    'received' => qr/\A[(]qmail[ ]+\d+[ ]+invoked[ ]+for[ ]+bounce[)]/,
+my $Indicators = __PACKAGE__->INDICATORS;
+my $StartingOf = {
+    'rfc822' => ['--- Below this line is a copy of the message.', '--- Original message follows.'],
+    'error'  => ['Remote host said:'],
 };
-#  qmail-remote.c:248|    if (code >= 500) {
-#  qmail-remote.c:249|      out("h"); outhost(); out(" does not like recipient.\n");
-#  qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
-#  qmail-remote.c:271|  if (code >= 500) quit("D"," failed after I sent the message");
-#
-# Characters: K,Z,D in qmail-qmqpc.c, qmail-send.c, qmail-rspawn.c
-#  K = success, Z = temporary error, D = permanent error
-#
-# MTA module for qmail clones
-my $Re1 = {
-    'begin'  => qr{\A(?>
+my $MarkingsOf = {
+    #  qmail-remote.c:248|    if (code >= 500) {
+    #  qmail-remote.c:249|      out("h"); outhost(); out(" does not like recipient.\n");
+    #  qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
+    #  qmail-remote.c:271|  if (code >= 500) quit("D"," failed after I sent the message");
+    #
+    # Characters: K,Z,D in qmail-qmqpc.c, qmail-send.c, qmail-rspawn.c
+    #  K = success, Z = temporary error, D = permanent error
+    #
+    # MTA module for qmail clones
+    'message' => qr{\A(?>
          He/Her[ ]is[ ]not.+[ ]user
         |Hi[.][ ].+[ ]unable[ ]to[ ]deliver[ ]your[ ]message[ ]to[ ]the[ ]following[ ]addresses
         |Su[ ]mensaje[ ]no[ ]pudo[ ]ser[ ]entregado
@@ -38,41 +35,32 @@ my $Re1 = {
             )
         |We're[ ]sorry[.]
         )
-    }ix,
-    'rfc822' => qr{\A(?:
-         ---[ ]Below[ ]this[ ]line[ ]is[ ]a[ ]copy[ ]of[ ]the[ ]message[.]
-        |---[ ]Original[ ]message[ ]follows[.]
-        )
-    }xi,
-    'error'  => qr/\ARemote host said:/,
-    'sorry'  => qr/\A[Ss]orry[,.][ ]/,
-    'endof'  => qr/\A__END_OF_EMAIL_MESSAGE__\z/,
+    }x,
 };
 
 my $ReSMTP = {
     # Error text regular expressions which defined in qmail-remote.c
     # qmail-remote.c:225|  if (smtpcode() != 220) quit("ZConnected to "," but greeting failed");
-    'conn'  => qr/(?:Error:)?Connected[ ]to[ ].+[ ]but[ ]greeting[ ]failed[.]/x,
+    'conn' => qr/(?:Error:)?Connected to .+ but greeting failed[.]/,
     # qmail-remote.c:231|  if (smtpcode() != 250) quit("ZConnected to "," but my name was rejected");
-    'ehlo'  => qr/(?:Error:)?Connected[ ]to[ ].+[ ]but[ ]my[ ]name[ ]was[ ]rejected[.]/x,
+    'ehlo' => qr/(?:Error:)?Connected to .+ but my name was rejected[.]/,
     # qmail-remote.c:238|  if (code >= 500) quit("DConnected to "," but sender was rejected");
     # reason = rejected
-    'mail'  => qr/(?:Error:)?Connected[ ]to[ ].+[ ]but[ ]sender[ ]was[ ]rejected[.]/x,
+    'mail' => qr/(?:Error:)?Connected to .+ but sender was rejected[.]/,
     # qmail-remote.c:249|  out("h"); outhost(); out(" does not like recipient.\n");
     # qmail-remote.c:253|  out("s"); outhost(); out(" does not like recipient.\n");
     # reason = userunknown
-    'rcpt'  => qr/(?:Error:)?.+[ ]does[ ]not[ ]like[ ]recipient[.]/x,
+    'rcpt' => qr/(?:Error:)?.+ does not like recipient[.]/,
     # qmail-remote.c:265|  if (code >= 500) quit("D"," failed on DATA command");
     # qmail-remote.c:266|  if (code >= 400) quit("Z"," failed on DATA command");
     # qmail-remote.c:271|  if (code >= 500) quit("D"," failed after I sent the message");
     # qmail-remote.c:272|  if (code >= 400) quit("Z"," failed after I sent the message");
-    'data'  => qr{(?:
+    'data' => qr{(?:
          (?:Error:)?.+[ ]failed[ ]on[ ]DATA[ ]command[.]
         |(?:Error:)?.+[ ]failed[ ]after[ ]I[ ]sent[ ]the[ ]message[.]
         )
     }x,
 };
-
 my $ReHost = qr{(?:
     # qmail-remote.c:261|  if (!flagbother) quit("DGiving up on ","");
      Giving[ ]up[ ]on[ ](.+[0-9a-zA-Z])[.]?\z
@@ -80,7 +68,6 @@ my $ReHost = qr{(?:
     |remote[ ]host[ ]([-0-9a-zA-Z.]+[0-9a-zA-Z])[ ]said:
     )
 }x;
-
 my $ReLDAP = {
     # qmail-ldap-1.03-20040101.patch:19817 - 19866
     'suspend'     => qr/Mailaddress is administrative?le?y disabled/,            # 5.2.1
@@ -108,50 +95,41 @@ my $ReLDAP = {
     }x,
 };
 
-# userunknown + expired
-my $ReOnHold  = qr/\A[^ ]+ does not like recipient[.][ \t]+.+this message has been in the queue too long[.]\z/;
+# qmail-send.c:922| ... (&dline[c],"I'm not going to try again; this message has been in the queue too long.\n")) nomem();
+my $ReDelaying  = qr/this message has been in the queue too long[.]\z/;
+my $ReIsOnHold  = qr/\A[^ ]+ does not like recipient[.][ \t]+.+this message has been in the queue too long[.]\z/;
 
 # qmail-remote-fallback.patch
-my $ReCommand = qr/Sorry,[ ]no[ ]SMTP[ ]connection[ ]got[ ]far[ ]enough;[ ]most[ ]progress[ ]was[ ]([A-Z]{4})[ ]/x;
-my $ReFailure = {
+my $ReCommands = qr/Sorry,[ ]no[ ]SMTP[ ]connection[ ]got[ ]far[ ]enough;[ ]most[ ]progress[ ]was[ ]([A-Z]{4})[ ]/x;
+my $ReFailures = {
     # qmail-local.c:589|  strerr_die1x(100,"Sorry, no mailbox here by that name. (#5.1.1)");
     # qmail-remote.c:253|  out("s"); outhost(); out(" does not like recipient.\n");
-    'userunknown' => qr{(?:
-         no[ ]mailbox[ ]here[ ]by[ ]that[ ]name
-        |[ ]does[ ]not[ ]like[ ]recipient[.]
-        )
-    }x,
+    'userunknown' => qr/(?:no mailbox here by that name| does not like recipient[.])/,
     # error_str.c:192|  X(EDQUOT,"disk quota exceeded")
-    'mailboxfull' => qr/disk[ ]quota[ ]exceeded/x,
+    'mailboxfull' => qr/disk quota exceeded/,
     # qmail-qmtpd.c:233| ... result = "Dsorry, that message size exceeds my databytes limit (#5.3.4)";
     # qmail-smtpd.c:391| ... out("552 sorry, that message size exceeds my databytes limit (#5.3.4)\r\n"); return;
-    'mesgtoobig'  => qr/Message[ ]size[ ]exceeds[ ]fixed[ ]maximum[ ]message[ ]size:/x,
+    'mesgtoobig'  => qr/Message size exceeds fixed maximum message size:/,
     # qmail-remote.c:68|  Sorry, I couldn't find any host by that name. (#4.1.2)\n"); zerodie();
     # qmail-remote.c:78|  Sorry, I couldn't find any host named ");
-    'hostunknown' => qr/\ASorry[,][ ]I[ ]couldn[']t[ ]find[ ]any[ ]host[ ]/x,
+    'hostunknown' => qr/\ASorry, I couldn't find any host /,
+    'systemfull'  => qr/Requested action not taken: mailbox unavailable [(]not enough free space[)]/,
     'systemerror' => qr{(?>
          bad[ ]interpreter:[ ]No[ ]such[ ]file[ ]or[ ]directory
         |system[ ]error
         |Unable[ ]to\b
         )
     }x,
-    'networkerror' => qr{Sorry(?:
+    'networkerror'=> qr{Sorry(?:
          [,][ ]I[ ]wasn[']t[ ]able[ ]to[ ]establish[ ]an[ ]SMTP[ ]connection
         |[,][ ]I[ ]couldn[']t[ ]find[ ]a[ ]mail[ ]exchanger[ ]or[ ]IP[ ]address
         |[.][ ]Although[ ]I[']m[ ]listed[ ]as[ ]a[ ]best[-]preference[ ]MX[ ]
             or[ ]A[ ]for[ ]that[ ]host
         )
     }x,
-    'systemfull' => qr/Requested action not taken: mailbox unavailable [(]not enough free space[)]/,
 };
 
-# qmail-send.c:922| ... (&dline[c],"I'm not going to try again; this message has been in the queue too long.\n")) nomem();
-my $ReDelayed  = qr{this[ ]message[ ]has[ ]been[ ]in[ ]the[ ]queue[ ]too[ ]long[.]\z}x;
-my $Indicators = __PACKAGE__->INDICATORS;
-
-sub pattern     { return $Re0 }
 sub description { 'Unknown MTA #4 qmail clones' }
-
 sub scan {
     # Detect an error from Unknown MTA #4, qmail clones
     # @param         [Hash] mhead       Message headers of a bounce email
@@ -169,13 +147,15 @@ sub scan {
     my $mhead = shift // return undef;
     my $mbody = shift // return undef;
     my $match = 0;
+    my $tryto = qr/\A[(]qmail[ ]+\d+[ ]+invoked[ ]+for[ ]+bounce[)]/;
 
     # Pre process email headers and the body part of the message which generated
     # by qmail, see http://cr.yp.to/qmail.html
     #   e.g.) Received: (qmail 12345 invoked for bounce); 29 Apr 2009 12:34:56 -0000
     #         Subject: failure notice
-    $match ||= 1 if $mhead->{'subject'} =~ $Re0->{'subject'};
-    $match ||= 1 if grep { $_ =~ $Re0->{'received'} } @{ $mhead->{'received'} };
+    $match ||= 1 if index($mhead->{'subject'}, 'failure notice') == 0;
+    $match ||= 1 if index($mhead->{'subject'}, 'Permanent Delivery Failure') == 0;
+    $match ||= 1 if grep { $_ =~ $tryto } @{ $mhead->{'received'} };
     return undef unless $match;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
@@ -188,10 +168,10 @@ sub scan {
     my $v = undef;
 
     for my $e ( @hasdivided ) {
-        # Read each line between $Re1->{'begin'} and $Re1->{'rfc822'}.
+        # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
-            if( $e =~ $Re1->{'begin'} ) {
+            if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
             }
@@ -199,7 +179,8 @@ sub scan {
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
             # Beginning of the original message part
-            if( $e =~ $Re1->{'rfc822'} ) {
+            if( index($e, $StartingOf->{'rfc822'}->[0]) == 0 ||
+                index($e, $StartingOf->{'rfc822'}->[1]) == 0 ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
             }
@@ -225,7 +206,7 @@ sub scan {
             # Giving up on 192.0.2.153.
             $v = $dscontents->[-1];
 
-            if( $e =~ m/\A(?:To[ ]*:)?[<](.+[@].+)[>]:[ \t]*\z/ ) {
+            if( $e =~ /\A(?:To[ ]*:)?[<](.+[@].+)[>]:[ \t]*\z/ ) {
                 # <kijitora@example.jp>:
                 if( length $v->{'recipient'} ) {
                     # There are multiple recipient addresses in the message body.
@@ -239,7 +220,7 @@ sub scan {
                 # Append error message
                 next unless length $e;
                 $v->{'diagnosis'} .= $e.' ';
-                $v->{'alterrors'}  = $e if $e =~ $Re1->{'error'};
+                $v->{'alterrors'}  = $e if index($e, $StartingOf->{'error'}->[0]) == 0;
 
                 next if $v->{'rhost'};
                 $v->{'rhost'} = $1 if $e =~ $ReHost;
@@ -252,7 +233,7 @@ sub scan {
     for my $e ( @$dscontents ) {
         $e->{'diagnosis'} = Sisimai::String->sweep($e->{'diagnosis'});
 
-        if( ! $e->{'command'} ) {
+        unless( $e->{'command'} ) {
             # Get the SMTP command name for the session
             SMTP: for my $r ( keys %$ReSMTP ) {
                 # Verify each regular expression of SMTP commands
@@ -263,7 +244,7 @@ sub scan {
 
             unless( $e->{'command'} ) {
                 # Verify each regular expression of patches
-                $e->{'command'} = uc $1 if $e->{'diagnosis'} =~ $ReCommand;
+                $e->{'command'} = uc $1 if $e->{'diagnosis'} =~ $ReCommands;
             }
         }
 
@@ -272,28 +253,28 @@ sub scan {
             # MAIL | Connected to 192.0.2.135 but sender was rejected.
             $e->{'reason'} = 'rejected';
 
-        } elsif( $e->{'command'} =~ m/\A(?:HELO|EHLO)\z/ ) {
+        } elsif( $e->{'command'} eq 'HELO' || $e->{'command'} eq 'EHLO' ) {
             # HELO | Connected to 192.0.2.135 but my name was rejected.
             $e->{'reason'} = 'blocked';
 
         } else {
             # Try to match with each error message in the table
-            if( $e->{'diagnosis'} =~ $ReOnHold ) {
+            if( $e->{'diagnosis'} =~ $ReIsOnHold ) {
                 # To decide the reason require pattern match with 
                 # Sisimai::Reason::* modules
                 $e->{'reason'} = 'onhold';
 
             } else {
-                SESSION: for my $r ( keys %$ReFailure ) {
+                SESSION: for my $r ( keys %$ReFailures ) {
                     # Verify each regular expression of session errors
                     if( $e->{'alterrors'} ) {
                         # Check the value of "alterrors"
-                        next unless $e->{'alterrors'} =~ $ReFailure->{ $r };
+                        next unless $e->{'alterrors'} =~ $ReFailures->{ $r };
                         $e->{'reason'} = $r;
                     }
                     last if $e->{'reason'};
 
-                    next unless $e->{'diagnosis'} =~ $ReFailure->{ $r };
+                    next unless $e->{'diagnosis'} =~ $ReFailures->{ $r };
                     $e->{'reason'} = $r;
                     last;
                 }
@@ -308,7 +289,7 @@ sub scan {
                 }
 
                 unless( $e->{'reason'} ) {
-                    $e->{'reason'} = 'expired' if $e->{'diagnosis'} =~ $ReDelayed;
+                    $e->{'reason'} = 'expired' if $e->{'diagnosis'} =~ $ReDelaying;
                 }
             }
         }
@@ -364,7 +345,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2017 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2018 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

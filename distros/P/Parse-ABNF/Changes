@@ -1,5 +1,7 @@
 Revision history for Perl extension Parse::ABNF.
 
+0.24 October 2017
+  - Parse to JET format
 
 0.20 October 2017
   - Changes to Grammar::Formal conversion

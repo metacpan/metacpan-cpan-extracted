@@ -1,0 +1,177 @@
+NAME
+
+    Mojo::Phantom - Interact with your client side code via PhantomJS
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+    
+      use Test::More;
+      use Test::Mojo::WithRoles qw/Phantom/;
+    
+      any '/' => 'index';
+    
+      my $t = Test::Mojo::WithRoles->new;
+      $t->phantom_ok('/' => <<'JS');
+        var text = page.evaluate(function(){
+          return document.getElementById('name').innerHTML;
+        });
+        perl.is(text, 'Bender', 'name changed after loading');
+      JS
+    
+      done_testing;
+    
+      __DATA__
+    
+      @@ index.html.ep
+    
+      <!DOCTYPE html>
+      <html>
+        <head></head>
+        <body>
+          <p id="name">Leela</p>
+          <script>
+            (function(){ document.getElementById('name').innerHTML = 'Bender' })();
+          </script>
+        </body>
+      </html>
+
+DESCRIPTION
+
+    Mojo::Phantom is the transport backbone for Test::Mojo::Role::Phantom.
+    Currently it is used to evaluate javascript tests using PhantomJS,
+    though more is possible. Please note that this class is not yet as
+    stable as the public api for the test role.
+
+WARNING
+
+    The upstream phantom.js has been retired in favor of headless chrome. A
+    Mojo::Chrome (and related Test::Mojo::Role::Chrome) is planned and is
+    already in the works (perhaps it is released already who knows?!).
+    While this module will continue to function, just know that it depends
+    on a project that is defunct.
+
+ATTRIBUTES
+
+    Mojo::Phantom inherits the attributes from Mojo::Base and implements
+    the following new ones.
+
+ arguments
+
+    An array reference containing command-line arguments to be passed
+    directly to the PhantomJS process.
+
+ base
+
+    An instance of Mojo::URL used to make relative urls absolute. This is
+    used, for example, in setting cookies
+
+ bind
+
+    A hash reference used to bind JS methods and Perl functions. Keys are
+    methods to be created in the perl object in javascript. Values are
+    functions for those methods to invoke when the message is received by
+    the Perl process. The functions may be relative to the package or are
+    absolute if they contain ::. If the function is false, then the key is
+    used as the function name.
+
+ cookies
+
+    An array reference containing Mojo::Cookie::Response objects.
+
+ package
+
+    The package for binding relative function names. Defaults to main
+
+ setup
+
+    An additional string of javascript which is executed after the page
+    object is created but before the url is opened.
+
+ sep
+
+    A string used to separate messages from the JS side. Defaults to
+    --MOJO_PHANTOM_MSG--.
+
+ template
+
+    A string which is used to build a Mojo::Template object. It takes as
+    its arguments the instance, a target url, and a string of javascript to
+    be evaluated.
+
+    The default handles much of what this module does, you should be very
+    sure of why you need to change this before doing so.
+
+ no_exit
+
+    Do not automatically call phantom.exit() after the provided JavaScript
+    code. This is useful when testing asynchronous events.
+
+ note_console
+
+    Redirect console.log output to TAP as note events. This is usually
+    helpful when writing tests. The default is off for Mojo::Phantom and on
+    for Test::Mojo::Role::Phantom.
+
+ exe
+
+    The executable name or path to call PhantomJS. You may substitute a
+    compatible platform, for example using casperjs to use CasperJS.
+
+    Note that while you can use this to specify the full path of an
+    alternate version of PhantomJS, during the install of Mojo::Phantom you
+    must have phantomjs in your PATH for configuration and testing.
+
+METHODS
+
+    Mojo::Phantom inherits all methods from Mojo::Base and implements the
+    following new ones.
+
+ execute_file
+
+    A lower level function which handles the message passing etc. You
+    probably want execute_url. Takes a file path to start phantomjs with
+    and a callback.
+
+    Returns a pre-initialized instance of Mojo::Phantom::Process. The end
+    user likely does not need to worry about this object, though it might
+    be useful if the process needs to be killed or the stream timeout needs
+    to be lengthened.
+
+ execute_url
+
+    Builds the template for PhantomJS to execute and starts it. Takes a
+    target url, a string of javascript to be executed in the context that
+    the template provides and a callback. By default this is the page
+    context. The return value is the same as "execute_file".
+
+    The executable name or path to call PhantomJS. You may substitute a
+    compatible platform, for example using casperjs to use CasperJS.
+
+NOTES
+
+    NOTE that if your Perl version does not provide CORE::die and
+    CORE::warn, they will be monkey-patched into the CORE namespace before
+    executing the javascript.
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Test-Mojo-Phantom
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+    Graham Ollis (plicease)
+
+    Sebastian Paaske TÃ¸rholm (Eckankar)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2015 by "AUTHOR" and "CONTRIBUTORS".
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

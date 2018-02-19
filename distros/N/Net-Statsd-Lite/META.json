@@ -66,12 +66,10 @@
             "File::Spec" : "0",
             "IO::Select" : "0",
             "Module::Metadata" : "0",
-            "Net::EmptyPort" : "0",
             "Test::More" : "0",
             "Test::Roo" : "0",
             "Test::Roo::DataDriven" : "0",
             "Test::Roo::Role" : "0",
-            "Test::TCP" : "2.19",
             "curry" : "0",
             "if" : "0",
             "lib" : "0",
@@ -82,11 +80,11 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.2"
       },
       "Net::Statsd::Lite::Types" : {
          "file" : "lib/Net/Statsd/Lite/Types.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.2"
       }
    },
    "release_status" : "stable",
@@ -100,7 +98,7 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.2",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

@@ -3,9 +3,9 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Time::HiRes qw/gettimeofday tv_interval/;
 use Net::Prometheus;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
-has prometheus => sub { state $prom = Net::Prometheus->new };
+has prometheus => sub { state $prom = _init_prometheus() };
 has route => sub {undef};
 has http_request_duration_seconds => sub {
   undef;
@@ -20,6 +20,18 @@ has http_requests_total => sub {
   undef;
 };
 
+sub _init_prometheus {
+  my $prom = Net::Prometheus->new(disable_process_collector => 1);
+  Mojo::IOLoop->next_tick(
+    sub {
+      my $process_collector
+        = Net::Prometheus::ProcessCollector->new(labels => [worker => $$]);
+      $prom->register($process_collector);
+    }
+  );
+  return $prom;
+}
+
 sub register {
   my ($self, $app, $config) = @_;
 
@@ -29,7 +41,7 @@ sub register {
       subsystem => $config->{subsystem}        // undef,
       name      => "http_request_duration_seconds",
       help      => "Histogram with request processing time",
-      labels    => [qw/method/],
+      labels    => [qw/worker method/],
       buckets   => $config->{duration_buckets} // undef,
     )
   );
@@ -40,7 +52,7 @@ sub register {
       subsystem => $config->{subsystem} // undef,
       name      => "http_request_size_bytes",
       help      => "Histogram containing request sizes",
-      labels    => [qw/method/],
+      labels    => [qw/worker method/],
       buckets   => $config->{request_buckets}
         // [(1, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
     )
@@ -52,7 +64,7 @@ sub register {
       subsystem => $config->{subsystem} // undef,
       name      => "http_response_size_bytes",
       help      => "Histogram containing response sizes",
-      labels    => [qw/method code/],
+      labels    => [qw/worker method code/],
       buckets   => $config->{response_buckets}
         // [(5, 50, 100, 1_000, 10_000, 50_000, 100_000, 500_000, 1_000_000)],
     )
@@ -65,7 +77,7 @@ sub register {
       name      => "http_requests_total",
       help =>
         "How many HTTP requests processed, partitioned by status code and HTTP method.",
-      labels => [qw/method code/],
+      labels => [qw/worker method code/]
     )
   );
 
@@ -81,15 +93,15 @@ sub register {
     before_dispatch => sub {
       my ($c) = @_;
       $c->stash('prometheus.start_time' => [gettimeofday]);
-      $self->http_request_size_bytes->observe($c->req->method,
-        $c->req->content->asset->size);
+      $self->http_request_size_bytes->observe($$, $c->req->method,
+        $c->req->content->body_size);
     }
   );
 
   $app->hook(
     after_render => sub {
       my ($c) = @_;
-      $self->http_request_duration_seconds->observe($c->req->method,
+      $self->http_request_duration_seconds->observe($$, $c->req->method,
         tv_interval($c->stash('prometheus.start_time')));
     }
   );
@@ -97,9 +109,9 @@ sub register {
   $app->hook(
     after_dispatch => sub {
       my ($c) = @_;
-      $self->http_requests_total->inc($c->req->method, $c->res->code);
-      $self->http_response_size_bytes->observe($c->req->method, $c->res->code,
-        $c->res->content->asset->size);
+      $self->http_requests_total->inc($$, $c->req->method, $c->res->code);
+      $self->http_response_size_bytes->observe($$, $c->req->method, $c->res->code,
+        $c->res->content->body_size);
     }
   );
 
@@ -205,6 +217,12 @@ this plugin will also expose
 =item * C<http_response_size_bytes>, response size histogram partitoned over HTTP method
 
 =back
+
+=head1 RUNNING UNDER HYPNOTOAD
+
+When running under a preforking daemon like L<Hypnotoad|Mojo::Server::Hypnotoad>, you will not get global metrics but only the metrics of each worker, randomly.
+
+The C<worker> label will include the pid of the current worker so metrics can be aggregated per worker in Prometheus.
 
 =head1 AUTHOR
 

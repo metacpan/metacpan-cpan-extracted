@@ -8,7 +8,7 @@ class InlineJavaClass {
 	private InlineJavaServer ijs ;
 	private InlineJavaProtocol ijp ;
 
-	static private HashMap class2jni_code = new HashMap() ;
+	static private HashMap<Class, String> class2jni_code = new HashMap<>() ;
 	static {
 		class2jni_code.put(byte.class, "B") ;
 		class2jni_code.put(short.class, "S") ;
@@ -21,7 +21,7 @@ class InlineJavaClass {
 		class2jni_code.put(void.class, "V") ;
 	} ;
 
-	static private HashMap class2wrapper = new HashMap() ;
+	static private HashMap<Class, Class> class2wrapper = new HashMap<>() ;
 	static {
 		class2wrapper.put(byte.class, java.lang.Byte.class) ;
 		class2wrapper.put(short.class, java.lang.Short.class) ;
@@ -34,7 +34,7 @@ class InlineJavaClass {
 		class2wrapper.put(void.class, java.lang.Void.class) ;
 	} ;
 
-	static private HashMap name2class = new HashMap() ;
+	static private HashMap<String, Class> name2class = new HashMap<>() ;
 	static {
 		name2class.put("byte", byte.class) ;
 		name2class.put("short", short.class) ;
@@ -130,7 +130,7 @@ class InlineJavaClass {
 	Object CastArgument(Class p, String argument) throws InlineJavaException {
 		Object ret = null ;
 	
-		ArrayList tokens = new ArrayList() ;
+		ArrayList<String> tokens = new ArrayList<>() ;
 		StringTokenizer st = new StringTokenizer(argument, ":") ;
 		for (int j = 0 ; st.hasMoreTokens() ; j++){
 			tokens.add(j, st.nextToken()) ;
@@ -186,7 +186,7 @@ class InlineJavaClass {
 					l += (((long)c[i]) << (8 * i)) ;
 				}
 				double d = Double.longBitsToDouble(l) ;
-				ret = new Double(d) ;
+				ret = Double.valueOf(d) ;
 			}
 			else {
 				throw new InlineJavaCastException("Can't convert reference to " + p.getName()) ;
@@ -195,7 +195,7 @@ class InlineJavaClass {
 		else if (ClassIsBool(p)){
 			if (type.equals("undef")){
 				InlineJavaUtils.debug(4, "args is undef -> forcing to bool false") ;
-				ret = new Boolean("false") ;
+				ret = Boolean.FALSE;
 				InlineJavaUtils.debug(4, " result is " + ret.toString()) ;
 			}
 			else if (type.equals("scalar")){
@@ -207,7 +207,7 @@ class InlineJavaClass {
 				else{
 					arg = "true" ;
 				}
-				ret = new Boolean(arg) ;
+				ret = Boolean.valueOf(arg) ;
 				InlineJavaUtils.debug(4, " result is " + ret.toString()) ;
 			}
 			else{
@@ -217,7 +217,7 @@ class InlineJavaClass {
 		else if (ClassIsChar(p)){
 			if (type.equals("undef")){
 				InlineJavaUtils.debug(4, "args is undef -> forcing to char '\0'") ;
-				ret = new Character('\0') ;
+				ret = Character.valueOf('\0') ;
 				InlineJavaUtils.debug(4, " result is " + ret.toString()) ;
 			}
 			else if (type.equals("scalar")){
@@ -230,7 +230,7 @@ class InlineJavaClass {
 				else if (arg.length() > 1){
 					throw new InlineJavaCastException("Can't convert " + arg + " to " + p.getName()) ;
 				}
-				ret = new Character(c) ;
+				ret = Character.valueOf(c) ;
 				InlineJavaUtils.debug(4, " result is " + ret.toString()) ;
 			}
 			else{
@@ -388,7 +388,7 @@ class InlineJavaClass {
 	/*
 		Determines if class is of numerical type.
 	*/
-	static private HashMap numeric_classes = new HashMap() ;
+	static private HashMap<Class, Boolean> numeric_classes = new HashMap<>() ;
 	static {
 		Class [] list = {
 			java.lang.Byte.class,
@@ -406,7 +406,7 @@ class InlineJavaClass {
 			double.class,
 		} ;
 		for (int i = 0 ; i < list.length ; i++){
-			numeric_classes.put(list[i], new Boolean(true)) ;
+			numeric_classes.put(list[i], Boolean.TRUE) ;
 		}
 	}
 	static boolean ClassIsNumeric (Class p){
@@ -414,14 +414,14 @@ class InlineJavaClass {
 	}
 
 
-	static private HashMap double_classes = new HashMap() ;
+	static private HashMap<Class, Boolean> double_classes = new HashMap<>();
 	static {
 		Class [] list = {
 			java.lang.Double.class,
 			double.class,
 		} ;
 		for (int i = 0 ; i < list.length ; i++){
-			double_classes.put(list[i], new Boolean(true)) ;
+			double_classes.put(list[i], Boolean.TRUE) ;
 		}
 	}
 	static boolean ClassIsDouble (Class p){
@@ -432,7 +432,7 @@ class InlineJavaClass {
 	/*
 		Class is String or StringBuffer
 	*/
-	static private HashMap string_classes = new HashMap() ;
+	static private HashMap<Class, Boolean> string_classes = new HashMap<>();
 	static {
 		Class csq = ValidateClassQuiet("java.lang.CharSequence") ;
 		Class [] list = {
@@ -441,7 +441,7 @@ class InlineJavaClass {
 			csq
 		} ;
 		for (int i = 0 ; i < list.length ; i++){
-			string_classes.put(list[i], new Boolean(true)) ;
+			string_classes.put(list[i], Boolean.TRUE) ;
 		}
 	}
 	static boolean ClassIsString (Class p){
@@ -452,14 +452,14 @@ class InlineJavaClass {
 	/*
 		Class is Char
 	*/
-	static private HashMap char_classes = new HashMap() ;
+	static private HashMap<Class, Boolean> char_classes = new HashMap<>() ;
 	static {
 		Class [] list = {
 			java.lang.Character.class,
 			char.class,
 		} ;
 		for (int i = 0 ; i < list.length ; i++){
-			char_classes.put(list[i], new Boolean(true)) ;
+			char_classes.put(list[i], Boolean.TRUE) ;
 		}
 	}
 	static boolean ClassIsChar (Class p){
@@ -470,14 +470,14 @@ class InlineJavaClass {
 	/*
 		Class is Bool
 	*/
-	static private HashMap bool_classes = new HashMap() ;
+	static private HashMap<Class, Boolean> bool_classes = new HashMap<>() ;
 	static {
 		Class [] list = {
 			java.lang.Boolean.class,
 			boolean.class,
 		} ;
 		for (int i = 0 ; i < list.length ; i++){
-			bool_classes.put(list[i], new Boolean(true)) ;
+			bool_classes.put(list[i], Boolean.TRUE) ;
 		}
 	}
 	static boolean ClassIsBool (Class p){

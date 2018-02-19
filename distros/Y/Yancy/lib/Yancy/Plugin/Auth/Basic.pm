@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -141,6 +141,11 @@ our $VERSION = '0.014';
 #pod         },
 #pod     };
 #pod
+#pod =item route
+#pod
+#pod The root route that this auth module should protect. Defaults to
+#pod protecting only the Yancy editor application.
+#pod
 #pod =back
 #pod
 #pod =head1 TEMPLATES
@@ -246,7 +251,7 @@ sub register {
     push @{ $app->yancy->config->{collections}{$coll}{properties}{$password_field}{'x-filter'} }, 'auth.digest';
 
     # Add authentication check
-    my $route = $app->yancy->route;
+    my $route = $config->{route} || $app->yancy->route;
     my $auth_route = $route->under( sub {
         my ( $c ) = @_;
         # Check auth
@@ -315,11 +320,12 @@ sub _post_login {
     my $pass = $c->param( 'password' );
     if ( $c->yancy->auth->check( $user, $pass ) ) {
         $c->yancy->auth->current_user( $user );
-        $c->res->headers->location( $c->url_for( 'yancy.index' ) );
+        my $to = $c->req->param( 'return_to' ) // $c->url_for( 'yancy.index' );
+        $c->res->headers->location( $to );
         return $c->rendered( 303 );
     }
     $c->flash( error => 'Username or password incorrect' );
-    return $c->render( 'yancy/auth/login' );
+    return $c->render( 'yancy/auth/login', status => 400 );
 }
 
 sub _get_logout {
@@ -339,7 +345,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 0.014
+version 0.017
 
 =head1 DESCRIPTION
 
@@ -479,6 +485,11 @@ Not all Digest types require additional configuration.
         },
     };
 
+=item route
+
+The root route that this auth module should protect. Defaults to
+protecting only the Yancy editor application.
+
 =back
 
 =head1 TEMPLATES
@@ -586,6 +597,7 @@ __DATA__
         <div class="col-md-4">
             <h1>Login</h1>
             <form action="<%= url_for 'yancy.check_login' %>" method="POST">
+                <input type="hidden" name="return_to" value="<%= $c->req->headers->referrer %>" />
                 <div class="form-group">
                     <label for="yancy-username">Username</label>
                     <input class="form-control" id="yancy-username" name="username" placeholder="username">

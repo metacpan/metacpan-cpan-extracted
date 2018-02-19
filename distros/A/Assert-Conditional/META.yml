@@ -36,4 +36,4 @@ requires:
   Unicode::Normalize: '0'
   parent: '0'
   perl: '5.012'
-version: '0.003'
+version: '0.004'

@@ -1,9 +1,12 @@
 package Mojo::RabbitMQ::Client::Channel;
 use Mojo::Base 'Mojo::EventEmitter';
+use Mojo::Promise;
 
 use Mojo::RabbitMQ::Client::LocalQueue;
 use Mojo::RabbitMQ::Client::Method;
 use Mojo::RabbitMQ::Client::Method::Publish;
+
+use constant DEBUG => $ENV{MOJO_RABBITMQ_DEBUG} // 0;
 
 has id            => 0;
 has is_open       => 0;
@@ -31,6 +34,7 @@ sub open {
   $self->client->_write_expect(
     'Channel::Open'   => {},
     'Channel::OpenOk' => sub {
+      warn "-- Channel::OpenOk\n" if DEBUG;
       $self->is_open(1)->is_active(1)->emit('open');
     },
     sub {
@@ -147,6 +151,7 @@ sub _close {
   $self->client->_write_expect(
     'Channel::Close'   => {},
     'Channel::CloseOk' => sub {
+      warn "-- Channel::CloseOk\n" if DEBUG;
       $self->is_open(0)->is_active(0);
       $self->client->delete_channel($self->id);
       $self->emit('close');
@@ -191,8 +196,22 @@ sub declare_exchange {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Exchange::DeclareOk'
+    'Exchange::DeclareOk' => sub {
+      warn "-- Exchange::DeclareOk\n" if DEBUG;
+    }
   );
+}
+
+sub declare_exchange_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->declare_exchange(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub delete_exchange {
@@ -205,8 +224,22 @@ sub delete_exchange {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Exchange::DeleteOk'
+    'Exchange::DeleteOk' => sub {
+      warn "-- Exchange::DeleteOk\n" if DEBUG;
+    }
   );
+}
+
+sub delete_exchange_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->delete_exchange(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub declare_queue {
@@ -224,8 +257,22 @@ sub declare_queue {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Queue::DeclareOk'
+    'Queue::DeclareOk' => sub {
+      warn "-- Queue::DeclareOk\n" if DEBUG;
+    }
   );
+}
+
+sub declare_queue_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->declare_queue(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub bind_queue {
@@ -237,8 +284,22 @@ sub bind_queue {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Queue::BindOk'
+    'Queue::BindOk' => sub {
+      warn "-- Queue::BindOk\n" if DEBUG;
+    }
   );
+}
+
+sub bind_queue_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->bind_queue(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub unbind_queue {
@@ -249,8 +310,22 @@ sub unbind_queue {
       @_,             # queue, exchange, routing_key
       ticket => 0,
     },
-    'Queue::UnbindOk'
+    'Queue::UnbindOk' => sub {
+      warn "-- Queue::UnbindOk\n" if DEBUG;
+    }
   );
+}
+
+sub unbind_queue_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->unbind_queue(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub purge_queue {
@@ -262,8 +337,22 @@ sub purge_queue {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Queue::PurgeOk'
+    'Queue::PurgeOk' => sub {
+      warn "-- Queue::PurgeOk\n" if DEBUG;
+    }
   );
+}
+
+sub purge_queue_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->purge_queue(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub delete_queue {
@@ -277,8 +366,22 @@ sub delete_queue {
       ticket => 0,
       nowait => 0,    # FIXME
     },
-    'Queue::DeleteOk'
+    'Queue::DeleteOk' => sub {
+      warn "-- Queue::DeleteOk\n" if DEBUG;
+    }
   );
+}
+
+sub delete_queue_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->delete_queue(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub publish {
@@ -288,6 +391,21 @@ sub publish {
     client  => $self->client,
     channel => $self
   )->setup(@_);
+}
+
+sub publish_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = Mojo::RabbitMQ::Client::Method::Publish->new(
+    client  => $self->client,
+    channel => $self
+  )->setup(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub consume {
@@ -303,7 +421,9 @@ sub consume {
       ticket => 0,
       nowait => 0
     },
-    'Basic::ConsumeOk'
+    'Basic::ConsumeOk' => sub {
+      warn "-- Basic::ConsumeOk\n" if DEBUG;
+    }
   );
   $method->on(
     success => sub {
@@ -327,7 +447,9 @@ sub cancel {
       @_,    # consumer_tag
       nowait => 0,
     },
-    'Basic::CancelOk'
+    'Basic::CancelOk' => sub {
+      warn "-- Basic::CancelOk\n" if DEBUG;
+    }
   );
   $method->on(
     success => sub {
@@ -353,8 +475,10 @@ sub get {
   );
   $method->on(
     success => sub {
+      warn "-- Basic::GetOk|GetEmpty\n" if DEBUG;
       my $this  = shift;
       my $frame = shift;
+
       $this->emit(empty => $frame)
         if $frame->method_frame->isa('Net::AMQP::Protocol::Basic::GetEmpty');
       $self->_push_read_header_and_body(
@@ -372,14 +496,33 @@ sub get {
   return $method;
 }
 
+sub get_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->get(@_);
+  $method->on('message' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('empty' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
+}
+
 sub ack {
   my $self = shift;
   my %args = ();
   if (ref($_[0]) eq 'HASH') {
-    $args{delivery_tag} = $_[0]->{deliver}->method_frame->delivery_tag;
+    if (defined $_[0]->{ok}) {
+      $args{delivery_tag} = $_[0]->{ok}->method_frame->delivery_tag;
+    } elsif (defined $_[0]->{deliver}) {
+      $args{delivery_tag} = $_[0]->{deliver}->method_frame->delivery_tag;
+    }
   } else {
     %args = @_;
   }
+
+  die "ack requires delivery_tag in arguments" unless defined $args{delivery_tag};
 
   return $self->_prepare_method(
     'Basic::Ack' => {
@@ -389,6 +532,18 @@ sub ack {
       %args,
     }
   );
+}
+
+sub ack_p {
+  my $self = shift;
+
+  my $promise = Mojo::Promise->new;
+  my $method = $self->ack(@_);
+  $method->on('success' => sub { shift; $promise->resolve($self, @_) });
+  $method->on('error' => sub { shift; $promise->reject($self, @_) });
+  $method->deliver;
+
+  return $promise;
 }
 
 sub qos {
@@ -631,6 +786,22 @@ Internal exchanges are used to construct wiring that is not visible to applicati
 
 =back
 
+=head2 declare_exchange_p
+
+Same as L<declare_exchange> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->declare_exchange_p(
+    exchange => 'mojo',
+    type => 'fanout',
+    durable => 1,
+    ...
+  )->then(sub {
+    say "Exchange declared...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Exchange declaration error: $err";
+  })->wait;
+
 =head2 delete_exchange
 
   $channel->delete_exchange(exchange => 'mojo')->deliver;
@@ -654,6 +825,19 @@ If set, the server will only delete the exchange if it has no queue bindings. If
 queue bindings the server does not delete it but raises a channel exception instead.
 
 =back
+
+=head2 delete_exchange_p
+
+Same as L<delete_exchange> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->delete_exchange_p(
+    exchange => 'mojo'
+  )->then(sub {
+    say "Exchange deleted...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Exchange removal error: $err";
+  })->wait;
 
 =head2 declare_queue
 
@@ -704,6 +888,20 @@ using the Delete method as normal.
 
 =back
 
+=head2 declare_queue_p
+
+Same as L<declare_queue> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->declare_queue_p(
+    queue => 'mq',
+    durable => 1
+  )->then(sub {
+    say "Queue declared...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Queue declaration error: $err";
+  })->wait;
+
 =head2 bind_queue
 
   $channel->bind_queue(
@@ -744,6 +942,21 @@ of empty routing keys depends on the exchange implementation.
 
 =back
 
+=head2 bind_queue_p
+
+Same as L<bind_queue> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->bind_queue_p(
+    exchange => 'mojo',
+    queue => 'mq',
+    routing_key => ''
+  )->then(sub {
+    say "Queue bound...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Queue binding error: $err";
+  })->wait;
+
 =head2 unbind_queue
 
   $channel->unbind_queue(
@@ -774,6 +987,21 @@ Specifies the routing key of the binding to unbind.
 
 =back
 
+=head2 unbind_queue_p
+
+Same as L<unbind_queue> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->unbind_queue_p(
+    exchange => 'mojo',
+    queue => 'mq',
+    routing_key => ''
+  )->then(sub {
+    say "Queue unbound...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Queue unbinding error: $err";
+  })->wait;
+
 =head2 purge_queue
 
   $channel->purge_queue(queue => 'mq')->deliver;
@@ -791,6 +1019,19 @@ Following arguments are accepted:
 Specifies the name of the queue to purge.
 
 =back
+
+=head2 purge_queue_p
+
+Same as L<purge_queue> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->purge_queue_p(
+    queue => 'mq',
+  )->then(sub {
+    say "Queue purged...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Queue purging error: $err";
+  })->wait;
 
 =head2 delete_queue
 
@@ -820,6 +1061,20 @@ has consumers the server does does not delete it but raises a channel exception 
 If set, the server will only delete the queue if it has no messages.
 
 =back
+
+=head2 delete_queue_p
+
+Same as L<delete_queue> but auto-delivers method and returns a L<Mojo::Promise> object.
+
+  $channel->delete_queue_p(
+    queue => 'mq',
+    if_empty => 1
+  )->then(sub {
+    say "Queue removed...";
+  })->catch(sub {
+    my $err = shift;
+    warn "Queue removal error: $err";
+  })->wait;
 
 =head2 publish
 

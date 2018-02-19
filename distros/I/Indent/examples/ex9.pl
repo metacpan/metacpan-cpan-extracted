@@ -1,14 +1,24 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
-use Indent::Utils qw(string_len);
+use Indent::Data;
 
-# Print string length.
-print string_len("\tab\t")."\n";
+# Indent::Data object.
+my $i = Indent::Data->new(
+       'line_size' => '10',
+       'next_indent' => '  ',
+       'output_separator' => "|\n",
+);
+
+# Print indented text.
+print $i->indent('text text text text text text', '<->')."|\n";
 
 # Output:
-# 18
+# <->text te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt te|
+# <->  xt|

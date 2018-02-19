@@ -14,13 +14,13 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b0bc9b31f974621704f22946a4a138149c05b845 Changes
-SHA1 f6e708b2108ba080ca41a9bc8a81069a64972a27 Changes.ttl
-SHA1 e713d133a95f0d9360cdcd14b2d71e57fa3777c9 Changes.xml
+SHA1 597c233aaf0e69382730564bd41862e1bf25c3a0 Changes
+SHA1 67d700a384867c0bb5c68ee91be4610151bee7c2 Changes.ttl
+SHA1 10262f6fa665b0e8e4b52c0653b9f3a5cbfcdbdc Changes.xml
 SHA1 14a506260237169ed443ed15a269369cee605be3 LICENSE
 SHA1 a880a04c60560af52246e3e4014b68a1c29e4e36 MANIFEST
-SHA1 cbd7759d9ee3fc640b7e146ab46b5fca15d2f252 META.yml
-SHA1 ecf59b06da7774ff442c352f8e9eaffd209e48a7 Makefile.PL
+SHA1 371f5178c17767c01a8ffcdff060098374cf4945 META.yml
+SHA1 e79e737f521a42b6b0daa4076f447c4595d7fa17 Makefile.PL
 SHA1 aa41899f8d0b06e1cac0e5f6b465a0fe46f017b7 README
 SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
 SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
@@ -33,7 +33,7 @@ SHA1 fa532ce949d1c607589aded93d5ea1d49a27e5d8 inc/Module/Install/Scripts.pm
 SHA1 f7882569ead92975e7559e169c2a2e86c3de1e57 inc/Module/Install/Share.pm
 SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
 SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 a26945da61ef18683098dbd763602baee5731ce3 lib/RDF/Endpoint.pm
+SHA1 d3af47cc65c5affd73fe187c069abdee9aa1f24d lib/RDF/Endpoint.pm
 SHA1 084485f2e97af1bc0e8e74a72d5f14a57348a368 rdf_endpoint.json
 SHA1 e9be4ad1506ad066ef2a5efb5b11b6cfacee90fd scripts/endpoint.psgi
 SHA1 19ac766464ef05698ac985e2a42e87dbb7912f3f share/index.html
@@ -67,7 +67,7 @@ SHA1 9eb5c0dd1f1e99ad3d05afaae4d3179b714f94a5 t/psgi.t
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAlm5p2wACgkQhPK6VMqoyC06OwCeIUgmJ/wAcQt5Cq0dtc5uwrEP
-j8cAoK5PTiINBybdc3dRGiVEGW7kGMoI
-=j4Gj
+iEYEARECAAYFAlqHGI4ACgkQhPK6VMqoyC2DrwCgkqrEF20s6p4rnG8zC9tBkvci
+YRcAni+ywT/r+2N40D8Cq2ZzrLZiFZm/
+=dDoY
 -----END PGP SIGNATURE-----

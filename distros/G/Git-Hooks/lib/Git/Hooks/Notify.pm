@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.3.0';
+$Git::Hooks::Notify::VERSION = '2.5.0';
 use 5.010;
 use utf8;
 use strict;
@@ -15,7 +15,6 @@ use Set::Scalar;
 use List::MoreUtils qw/any/;
 use Try::Tiny;
 
-my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
 
 sub pretty_log {
@@ -158,7 +157,7 @@ EOF
         # Force indentation of commit message lines
         $html =~ s:^( +):'&nbsp;' x length($1):egm;
         # Force indentation of commit numstat lines
-        $html =~ s[^(\d+)\t(\d+)\t]
+        $html =~ s[^(\d+|-)\t(\d+|-)\t]
             [$1 .
             '&nbsp;' x (8 - length($1)) .
             $2 .
@@ -238,10 +237,11 @@ sub notify_affected_refs {
                 notify($git, $ref, $old_commit, $new_commit, $rule, $message);
             } catch {
                 my $error = $_;
-                $git->error($PKG, 'Could not send mail to the following recipients: '
-                                . join(", ", $error->recipients) . "\n"
-                                . 'Error message: ' . $error->message . "\n"
-                            );
+                $git->fault(
+                    sprintf('I could not send mail to the following recipients: %s\n',
+                            join(", ", $error->recipients)),
+                    {details => $error->message}
+                );
                 ++$errors;
             };
         }
@@ -267,7 +267,39 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.3.0
+version 2.5.0
+
+=head1 SYNOPSIS
+
+As a C<Git::Hooks> plugin you don't use this Perl module directly. Instead, you
+may configure it in a Git configuration file like this:
+
+  [githooks]
+    plugin = Notify
+
+  [githooks "notify"]
+    from = githooks@example.net
+    commit-url = https://github.com/userid/repoid/commit/%H
+    rule = gnustavo@cpan.org
+    rule = fred@example.net barney@example.net -- lib/Git/Hooks/Notify.pm
+    rule = batman@example.net robin@example.net -- Changes lib/
+
+The first section enables the plugin.
+
+The second instance enables C<some> of the options specific to this plugin.
+
+The C<from> option defines the value of the C<From:> header in the
+notifications.
+
+The C<commit-url> option defines a URL pattern to embed links to commits in
+the notifications.
+
+The C<rule> options specifies who must be notified about what changes in the
+repository. The first rule notifies C<gnustavo@cpan.org> about every new
+commits. The second rule notifies to the Bedrock fellows only about changes
+affecting the F<lib/Git/Hooks/Notify.pm> file. The third rule notifies the
+Dynamic Duo about changes affecting the F<Changes> file in the repository root
+and changes affecting any file under the F<lib/> directory.
 
 =head1 DESCRIPTION
 
@@ -522,7 +554,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -23,6 +23,7 @@ do { my $x = {
                                       'App::Cmd::Tester' => '0.306',
                                       'App::Cmd::Tester::CaptureExternal' => '0',
                                       'Archive::Tar' => '0',
+                                      'Archive::Tar::Wrapper' => '0.15',
                                       'CPAN::Meta::Converter' => '2.101550',
                                       'CPAN::Meta::Merge' => '0',
                                       'CPAN::Meta::Prereqs' => '2.120630',

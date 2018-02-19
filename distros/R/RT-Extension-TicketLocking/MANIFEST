@@ -76,3 +76,4 @@ README
 xt/rt.t
 xt/rtir.t
 xt/test_suite.pl
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Tools for working with directory and file names",
    "author" : [
-      "unknown"
+      "Perl 5 Porters"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -35,12 +35,21 @@
             "Carp" : "0",
             "File::Basename" : "0",
             "Scalar::Util" : "0",
-            "Test" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "3.62",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.perl.org/rt3/"
+      },
+      "homepage" : "http://dev.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://perl5.git.perl.org/perl.git"
+      }
+   },
+   "version" : "3.74",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -2,8 +2,7 @@
 
 #
 # yaml_to_db.pm
-# Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
-# $Id: 54d87bcf09ffd487550f0f7e05ab0a77cf2a3670 $
+# Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -132,7 +131,7 @@ exit 0;
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 2011-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2011-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

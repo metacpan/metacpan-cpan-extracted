@@ -103,7 +103,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>
-          <xsl:when test="not(preceding-sibling::*)">
+          <xsl:when test="not(preceding-sibling::*) and not(parent::fb:cite[parent::fb:section[ancestor::fb:body[@name='notes']]]/preceding-sibling::*) and not(following-sibling::fb:subtitle)">
             <title>
               <p><xsl:apply-templates/></p>
             </title>
@@ -229,10 +229,9 @@
     <xsl:variable name="first-p" select="fb:*[local-name()=$paragraph-name][1]"/>
     <xsl:if test="$first-p">
       <xsl:element name="{$holder-name}">
-        <xsl:apply-templates select="fb:subtitle"/>
         <xsl:call-template name="TitledType"/>
         <xsl:apply-templates select="$first-p | $first-p/following-sibling::*
-          [ local-name()=$paragraph-name or local-name()='empty-line' ]"/>
+          [ local-name()=$paragraph-name or local-name()='empty-line' ] | fb:subtitle"/>
 				<xsl:apply-templates select="fb:text-author"/>
       </xsl:element>
     </xsl:if>

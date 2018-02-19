@@ -6,6 +6,7 @@ use Mojo::Collection;
 use Mojo::Exception;
 use Mojo::IOLoop;
 use Mojo::Util qw(dumper hmac_sha1_sum steady_time);
+use Time::HiRes qw(gettimeofday tv_interval);
 use Scalar::Util 'blessed';
 
 sub register {
@@ -40,6 +41,11 @@ sub register {
 
   $app->helper('reply.exception' => sub { _development('exception', @_) });
   $app->helper('reply.not_found' => sub { _development('not_found', @_) });
+
+  $app->helper('timing.begin'         => \&_timing_begin);
+  $app->helper('timing.elapsed'       => \&_timing_elapsed);
+  $app->helper('timing.rps'           => \&_timing_rps);
+  $app->helper('timing.server_timing' => \&_timing_server_timing);
 
   $app->helper(ua => sub { shift->app->ua });
 }
@@ -148,6 +154,24 @@ sub _static {
   return !!$c->rendered if $c->app->static->serve($c, $file);
   $c->app->log->debug(qq{Static file "$file" not found});
   return !$c->helpers->reply->not_found;
+}
+
+sub _timing_begin { shift->stash->{'mojo.timing'}{shift()} = [gettimeofday] }
+
+sub _timing_elapsed {
+  my ($c, $name) = @_;
+  return undef unless my $started = $c->stash->{'mojo.timing'}{$name};
+  return tv_interval($started, [gettimeofday()]);
+}
+
+sub _timing_rps { $_[1] == 0 ? undef : sprintf '%.3f', 1 / $_[1] }
+
+sub _timing_server_timing {
+  my ($c, $metric, $desc, $dur) = @_;
+  my $value = $metric;
+  $value .= qq{;desc="$desc"} if defined $desc;
+  $value .= ";dur=$dur"       if defined $dur;
+  $c->res->headers->append('Server-Timing' => $value);
 }
 
 sub _url_with {
@@ -460,6 +484,68 @@ Alias for L<Mojolicious::Controller/"session">.
 Alias for L<Mojolicious::Controller/"stash">.
 
   %= stash('name') // 'Somebody'
+
+=head2 timing->begin
+
+  $c->timing->begin('foo');
+
+Create named timestamp for L<"timing-E<gt>elapsed">. Note that this helper is
+EXPERIMENTAL and might change without warning!
+
+=head2 timing->elapsed
+
+  my $elapsed = $c->timing->elapsed('foo');
+
+Return fractional amount of time in seconds since named timstamp has been
+created with L</"timing-E<gt>begin"> or C<undef> if no such timestamp exists.
+Note that this helper is EXPERIMENTAL and might change without warning!
+
+  # Log timing information
+  $c->timing->begin('database_stuff');
+  ...
+  my $elapsed = $c->timing->elapsed('database_stuff');
+  $c->app->log->debug("Database stuff took $elapsed seconds");
+
+=head2 timing->rps
+
+  my $rps = $c->timing->rps('0.001');
+
+Return fractional number of requests that could be performed in one second if
+every singe one took the given amount of time in seconds or C<undef> if the
+number is too low. Note that this helper is EXPERIMENTAL and might change
+without warning!
+
+  # Log more timing information
+  $c->timing->begin('web_stuff');
+  ...
+  my $elapsed = $c->timing->elapsed('web_stuff');
+  my $rps     = $c->timing->rps($elapsed);
+  $c->app->log->debug("Web stuff took $elapsed seconds ($rps per second)");
+
+=head2 timing->server_timing
+
+  $c->timing->server_timing('metric');
+  $c->timing->server_timing('metric', 'Some Description');
+  $c->timing->server_timing('metric', 'Some Description', '0.001');
+
+Create C<Server-Timing> header with optional description and duration. Note that
+this helper is EXPERIMENTAL and might change without warning!
+
+  # "Server-Timing: miss"
+  $c->timing->server_timing('miss');
+
+  # "Server-Timing: dc;desc=atl"
+  $c->timing->server_timing('dc', 'atl');
+
+  # "Server-Timing: db;desc=Database;dur=0.0001"
+  $c->timing->begin('database_stuff');
+  ...
+  my $elapsed = $c->timing->elapsed('database_stuff');
+  $c->timing->server_timing('db', 'Database', $elapsed);
+
+  # "Server-Timing: miss, dc;desc=atl"
+  $c->timing->server_timing('miss');
+  $c->timing->server_timing('dc', 'atl');
 
 =head2 title
 

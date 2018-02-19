@@ -3,7 +3,7 @@ use ExtUtils::Embed ;
 use Config ;
 
 use strict ;
-require "../Portable.pm" ;
+require "../../lib/Inline/Java/Portable.pm" ;
 
 
 my $ccopts = ccopts() ;

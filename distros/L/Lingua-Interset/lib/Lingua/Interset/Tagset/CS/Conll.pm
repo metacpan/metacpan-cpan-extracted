@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::CS::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.010';
+our $VERSION = '3.011';
 
 use utf8;
 use open ':utf8';
@@ -5409,7 +5409,7 @@ Lingua::Interset::Tagset::CS::Conll - Driver for the Czech tagset of the CoNLL 2
 
 =head1 VERSION
 
-version 3.010
+version 3.011
 
 =head1 SYNOPSIS
 

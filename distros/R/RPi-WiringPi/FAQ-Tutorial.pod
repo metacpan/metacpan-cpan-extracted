@@ -228,6 +228,11 @@ Allows you to read and write to devices on the I2C bus using the external
 L<RPi::I2C> distribution. Please refer to that documentation for full usage
 instructions.
 
+Aruino note: The Arduino may not be able to keep up with the I2C bus speed of
+the Pi. If this is the case, lower the I2C bus speed on the Pi:
+
+    dtparam=i2c_arm_baudrate=10000
+
 =head2 Instantiation and communication
 
     my $device_addr = 0x04;
@@ -264,7 +269,16 @@ Allows you to perform basic read and write operations on a standard serial
 interface using the L<RPi::Serial> library. See that documentation for full
 usage information.
 
-    my $dev  = "/dev/ttyAMA0";
+=head2 Note
+
+Bluetooth on the Pi overlays the serial pins (14, 15) on the Pi. To use
+serial, you must disable bluetooth in the C</boot/config.txt> file:
+
+    dtoverlay=pi3-disable-bt-overlay
+
+=head2 Usage
+
+    my $dev  = "/dev/ttyS0";
     my $baud = 115200;
 
     my $ser = $pi->serial($dev, $baud);
@@ -671,6 +685,14 @@ test files for the pins that are needed. After confirmed and connected, set
 These tests only occur in automated mode when building on a Perl that doesn't
 have prerequisites installed.
 
+=head3 LCD Testing
+
+In order to perform the L<RPi::LCD> test, a 2 row by 16 column or 4 row by 20
+column LCD must be connected and operable. Then, set the following environment
+variable to a true value:
+
+    export RPI_LCD=1
+
 =head2 Automated with L<Test::BrewBuild>
 
 L<Test::BrewBuild> has some special features specifically to facilitate the
@@ -725,6 +747,7 @@ environment variables for the full test platform.
 
     PI_BOARD=1                  # It's a Pi
     RPI_ARDUINO=1               # Arduino I2C connected
+    RPI_LCD=1                   # LCD is connected
     RPI_SERIAL=1                # Serial enabled, and loopback
     RPI_HCSR04=1                # sonic distance sensor
     BB_RPI_LCD=5,6,4,17,27,22   # Auto-testing LCD enabled
@@ -739,7 +762,7 @@ add things as I think of them.
 =head2 Pins
 
 Any time you accept a pin number to pass along to an external module for use,
-you *must* call C<$self-E<gt>>register_pin($pin_num)> in order to have the
+you *must* call C<<$self->register_pin($pin_num)>> in order to have the
 cleanup functionality tidy things up properly. Neglecting to do this will
 prevent the cleanup regimen from knowing about these pins, and therefore will be
 left in an inconsistent state, possibly causing damage on a different run.
@@ -750,7 +773,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017,2018 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

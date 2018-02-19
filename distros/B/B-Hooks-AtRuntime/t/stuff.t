@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use strict;
+use lib "tlib";
 use warnings;
 
 use Test::More;

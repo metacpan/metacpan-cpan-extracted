@@ -1,13 +1,14 @@
 package Mail::AuthenticationResults::Header::AuthServID;
 # ABSTRACT: Class modelling the AuthServID part of the Authentication Results Headerr
 
-require 5.010;
+require 5.008;
 use strict;
 use warnings;
-our $VERSION = '1.20180113'; # VERSION
+our $VERSION = '1.20180215'; # VERSION
 use Carp;
 
 use base 'Mail::AuthenticationResults::Header::Base';
+
 
 sub _HAS_VALUE{ return 1; }
 
@@ -41,7 +42,20 @@ Mail::AuthenticationResults::Header::AuthServID - Class modelling the AuthServID
 
 =head1 VERSION
 
-version 1.20180113
+version 1.20180215
+
+=head1 DESCRIPTION
+
+The AuthServID is typically the first section of an Authentication Results Header, it records
+the server responsible for performing the Authentication Results checks, and can additionally hold
+a version number (assumed to be 1 if not present).
+
+Some providers also add additional sub entries to the field, hence this class is capable of
+being a parent to version, comment, and sub entry types.
+
+This class is set as the value for a Mail::AuthenticationResults::Header class.
+
+Please see L<Mail::AuthenticationResults::Header::Base>
 
 =head1 AUTHOR
 

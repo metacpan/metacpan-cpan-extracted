@@ -2,8 +2,7 @@
 
 #
 # dbcolcreate.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: 216a06b5b795af4bf85c8c70b3b7fdc22ddf85b4 $
+# Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -217,7 +216,7 @@ Internal: setup, parse headers.
 sub setup ($) {
     my($self) = @_;
 
-    croak $self->{_prog} . ": no new columns to create.\n"
+    croak($self->{_prog} . ": no new columns to create.\n")
 	if ($#{$self->{_creations}} == -1);
 
     $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
@@ -232,7 +231,7 @@ sub setup ($) {
     foreach (@{$self->{_creations}}) {
 	if (defined($existing_cols{$_})) {
 	    next if (!$self->{_recreate_fatal});
-	    croak $self->{_prog} . ": attempt to create pre-existing column $_.\n"
+	    croak($self->{_prog} . ": attempt to create pre-existing column $_.\n");
 	};
 	$coli++;
 	if ($self->{_first}) {
@@ -245,7 +244,7 @@ sub setup ($) {
 	my $quote = "'";
 	if ($val =~ /\'/) {
 	    $quote = '|';
-	    croak $self->{_prog} . ": internal error: cannot find reasonable way to do quoting.\n"
+	    croak($self->{_prog} . ": internal error: cannot find reasonable way to do quoting.\n")
 		if ($val =~ /\|/);
 	};
 	$insert_args .= "\t\t, q" . $quote . $val . $quote . "\n";
@@ -283,7 +282,7 @@ sub setup ($) {
 	    };
 	';
 	eval $loop_sub_code;
-	$@ && die $self->{_prog} . ":  internal eval error: $@.\n";
+	$@ && croak( $self->{_prog} . ":  internal eval error: $@.\n");
 	$self->{_loop_sub} = $loop_sub;
     }
 }
@@ -304,7 +303,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

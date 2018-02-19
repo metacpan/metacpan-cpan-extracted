@@ -2,7 +2,7 @@
 
 #
 # dbrowuniq.pm
-# Copyright (C) 1997-2016 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -341,7 +341,7 @@ sub setup ($) {
 	};
     } else {
 	foreach (@{$self->{_uniquifying_cols}}) {
-	    croak $self->{_prog} . ": unknown column ``$_''.\n"
+	    croak($self->{_prog} . ": unknown column ``$_''.\n")
 		if (!defined($self->{_in}->col_to_i($_)));
 	};
     };
@@ -350,11 +350,11 @@ sub setup ($) {
     if ($self->{_count}) {
 	if ($self->{_out}->col_to_i($self->{_destination_column})) {
 	    if (!$self->{_incremental}) {
-		croak $self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (it already exists)\n";
+		croak($self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (it already exists)\n");
 	    };
 	} else {
 	    $self->{_out}->col_create($self->{_destination_column})
-		or croak $self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (maybe it already existed?)\n";
+		or croak($self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (maybe it already existed?)\n");
 	    $self->{_incremental} = undef;   
 	};
     };
@@ -383,7 +383,7 @@ sub run ($) {
     my $check_code = '1';
     foreach (@{$self->{_uniquifying_cols}}) {
 	my $coli = $self->{_in}->col_to_i($_);
-	croak $self->{_prog} . ": internal error, cannot find column $_ even after checking already.\n"
+	croak($self->{_prog} . ": internal error, cannot find column $_ even after checking already.\n")
 	    if (!defined($coli));
 	$check_code .= " && (\$first_prev_fref->[$coli] eq \$this_fref->[$coli])";
     };
@@ -443,13 +443,13 @@ sub run ($) {
 	# handle last row
 	' . $handle_end_of_prev_code . "\n";
     eval $loop_code;
-    $@ && croak $self->{_prog} . ": internal eval error: $@\n";
+    $@ && croak($self->{_prog} . ": internal eval error: $@\n");
 };
 
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1997-2016 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

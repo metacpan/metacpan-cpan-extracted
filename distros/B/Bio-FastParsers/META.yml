@@ -1,5 +1,5 @@
 ---
-abstract: 'Classes for parsing bioinformatics programs output'
+abstract: 'Classes for parsing bioinformatic programs output'
 author:
   - 'Denis BAURAIN <denis.baurain@uliege.be>'
 build_requires:
@@ -28,6 +28,7 @@ requires:
   Sort::Naturally: '0'
   Test::Most: '0'
   Tie::IxHash: '0'
+  Try::Tiny: '0'
   XML::Bare: '0.53'
   aliased: '0'
   autodie: '0'
@@ -36,5 +37,5 @@ requires:
   perl: '5.010'
   strict: '0'
   warnings: '0'
-version: '0.180330'
+version: '0.180470'
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::Constant: '0.22'
   ExtUtils::PkgConfig: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,5 +34,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/lstein/Perl-GD
-version: '2.67'
+version: '2.68'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

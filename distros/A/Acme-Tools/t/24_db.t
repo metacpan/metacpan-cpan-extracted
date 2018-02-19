@@ -2,7 +2,7 @@
 # perl Makefile.PL; make; perl -Iblib/lib t/24_db.t
 no strict;
 no warnings;
-#BEGIN{require 't/common.pl'}
+#use lib '.'; BEGIN{require 't/common.pl'}
 use Acme::Tools;
 use Test::More tests => 10;
 ok(1) for 1..10;exit;#4now

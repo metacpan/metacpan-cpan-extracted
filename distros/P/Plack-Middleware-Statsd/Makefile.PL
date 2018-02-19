@@ -17,7 +17,6 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Plack::Middleware::Statsd",
   "PREREQ_PM" => {
-    "POSIX" => 0,
     "Plack::Middleware" => 0,
     "Plack::Util" => 0,
     "Plack::Util::Accessor" => 0,
@@ -41,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.3.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +51,6 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "Module::Metadata" => 0,
-  "POSIX" => 0,
   "Plack::Builder" => 0,
   "Plack::Middleware" => 0,
   "Plack::Middleware::ContentLength" => 0,

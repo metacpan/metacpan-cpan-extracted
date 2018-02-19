@@ -7,18 +7,16 @@ use Scalar::Util qw(blessed);
 use Carp qw(carp confess);
 use POE;
 
-use vars qw($VERSION @ISA);
-$VERSION = '0.39';
+use vars qw($VERSION);
+$VERSION = '0.41';
 sub DOSENDBACK () { 1 }
 
-our $globalinfos;
-
-my $PATCH         = 18;
-my $HANDSHAKE     = 19;
-my $EVENT_FLUSHED = 20;
-my $EVENT_INPUT   = 21;
+our $globalinfos = {};
 
 BEGIN {
+   our $HANDSHAKE     = 19;
+   our $EVENT_FLUSHED = 20;
+   our $EVENT_INPUT   = 21;
    eval {
       require Net::SSLeay;
       Net::SSLeay->import( 1.30 );
@@ -29,19 +27,6 @@ BEGIN {
 
    no warnings 'redefine';
    my $old_new = \&POE::Wheel::ReadWrite::new;
-   my $old_set_filter = \&POE::Wheel::ReadWrite::set_filter;
-   my $old_set_input_filter = \&POE::Wheel::ReadWrite::set_input_filter;
-   my $old_set_output_filter = \&POE::Wheel::ReadWrite::set_output_filter;
-   my $old_rw_put = \&POE::Wheel::ReadWrite::put;
-   *POE::Wheel::ReadWrite::put = sub {
-      my $self = shift;
-      my $unique_id = $self->[POE::Wheel::ReadWrite::UNIQUE_ID()];
-      if (defined($self->[$EVENT_FLUSHED])) {
-         $self->[POE::Wheel::ReadWrite::EVENT_FLUSHED] = $self->[$EVENT_FLUSHED];
-         $self->[$EVENT_FLUSHED] = undef;
-      }
-      $old_rw_put->($self, @_);
-   };
    *POE::Wheel::ReadWrite::new = sub {
       my $class = shift;
       my %arg = @_;
@@ -70,75 +55,28 @@ BEGIN {
             }
          }
       );
-      $poe_kernel->state(
-         $self->[$PATCH] = ref($self) . "($unique_id) -> ssl patch",
-         sub {
-            my $type = $_[ARG0];
-            my $self = $_[ARG1];
-            if ($_[HEAP]->{self}->{PreFilter}) {
-               $_[HEAP]->{self}->{"PreFilter".ref($self).$self->[POE::Wheel::ReadWrite::UNIQUE_ID()]} = $_[HEAP]->{self}->{PreFilter}->clone()
-                  unless ($_[HEAP]->{self}->{"PreFilter".ref($self).$self->[POE::Wheel::ReadWrite::UNIQUE_ID()]});
-               if ($type eq "input") {
-                  $old_set_input_filter->($self, POE::Filter::Stackable->new(
-                     Filters => [
-                        $_[HEAP]->{self}->{"PreFilter".ref($self).$self->[POE::Wheel::ReadWrite::UNIQUE_ID()]},
-                        $self->get_input_filter()
-                     ]
-                  ));
-               } else {
-                  $old_set_output_filter->($self, POE::Filter::Stackable->new(
-                     Filters => [
-                        $_[HEAP]->{self}->{"PreFilter".ref($self).$self->[POE::Wheel::ReadWrite::UNIQUE_ID()]},
-                        $self->get_output_filter()
-                     ]
-                  ));
-               }
-            }
-         }
-      );
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "input" => $self);
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "output" => $self);
       return $self;
+   };
+   my $old_rw_put = \&POE::Wheel::ReadWrite::put;
+   *POE::Wheel::ReadWrite::put = sub {
+      my $self = shift;
+      my $unique_id = $self->[POE::Wheel::ReadWrite::UNIQUE_ID()];
+      if (defined($self->[$EVENT_FLUSHED])) {
+         $self->[POE::Wheel::ReadWrite::EVENT_FLUSHED] = $self->[$EVENT_FLUSHED];
+         $self->[$EVENT_FLUSHED] = undef;
+      }
+      $old_rw_put->($self, @_);
    };
    my $old_destroy = \&POE::Wheel::ReadWrite::DESTROY;
    *POE::Wheel::ReadWrite::DESTROY = sub {
       my $self = shift;
-      if ($self->[$PATCH]) {
-         $poe_kernel->state($self->[$PATCH]);
-         $self->[$PATCH] = undef;
-      }
       if ($self->[$HANDSHAKE]) {
          $poe_kernel->state($self->[$HANDSHAKE]);
          $self->[$HANDSHAKE] = undef;
       }
       return $old_destroy->($self, @_);
    };
-   *POE::Wheel::ReadWrite::set_filter = sub {
-      my $self = shift;
-      my $new_filter = shift;
-      my $unique_id = $self->[POE::Wheel::ReadWrite::UNIQUE_ID()];
-      my $ret = $old_set_filter->($self, $new_filter, @_);
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "input" => $self);
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "output" => $self);
-      return $ret;
-   };
-   *POE::Wheel::ReadWrite::set_input_filter = sub {
-      my $self = shift;
-      my $new_filter = shift;
-      my $unique_id = $self->[POE::Wheel::ReadWrite::UNIQUE_ID()];
-      my $ret = $old_set_input_filter->($self, $new_filter, @_);
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "input" => $self);
-      return $ret;
-   };
-   *POE::Wheel::ReadWrite::set_output_filter = sub {
-      my $self = shift;
-      my $new_filter = shift;
-      my $unique_id = $self->[POE::Wheel::ReadWrite::UNIQUE_ID()];
-      my $ret = $old_set_output_filter->($self, $new_filter, @_);
-      $poe_kernel->yield(ref($self) . "($unique_id) -> ssl patch" => "output" => $self);
-      return $ret;
-   };
-   #my $old_get_one  = \&POE::Filter::Stackable::get_one;
+   my $old_get_one  = \&POE::Filter::Stackable::get_one;
    *POE::Filter::Stackable::get_one = sub {
       my ($self) = @_;
       my $return = [ ];
@@ -190,9 +128,7 @@ BEGIN {
          $old_put->($self, $data, @_);
       }
    };
-   *POE::Filter::HTTPD::get_pending = sub {
-      return undef;
-   }
+   use warnings 'redefine';
 }
 
 require XSLoader;
@@ -209,8 +145,9 @@ sub checkForDoSendback {
 }
 
 sub PEMdataToX509 {
+   my $unblessed = shift;
    my $x509 = shift;
-   my $bio = dataToBio($x509);
+   my $bio = dataToBio($unblessed, $x509);
    my $x509result = undef;
    die "Error using x509: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
       unless ($x509result = Net::SSLeay::PEM_read_bio_X509($bio));
@@ -219,9 +156,9 @@ sub PEMdataToX509 {
 }
 
 sub PEMdataToEVP_PKEY {
-   my $ssl = shift;
+   my $unblessed = shift;
    my $crt = shift;
-   my $bio = dataToBio($crt);
+   my $bio = dataToBio($unblessed, $crt);
    my $evp_pkey = undef;
    die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
       unless ($evp_pkey = Net::SSLeay::PEM_read_bio_PrivateKey($bio));
@@ -230,24 +167,24 @@ sub PEMdataToEVP_PKEY {
 }
 
 sub CTX_add_client_CA {
+   my $unblessed = shift;
    my $ctx = shift;
    my $x509 = shift;
-   my $ssl = shift;
-   my $err = Net::SSLeay::X509_STORE_add_cert(Net::SSLeay::CTX_get_cert_store($ctx), PEMdataToX509($x509));
+   my $err = Net::SSLeay::X509_STORE_add_cert(Net::SSLeay::CTX_get_cert_store($ctx), PEMdataToX509($unblessed, $x509));
    die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
       if ($err && ($err != 1));
-   $err = Net::SSLeay::CTX_add_client_CA($ctx, PEMdataToX509($x509));
+   $err = Net::SSLeay::CTX_add_client_CA($ctx, PEMdataToX509($unblessed, $x509));
    die "Error using cacrt: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
       if ($err && ($err != 1));
 }
 
 sub dataToBio {
+   my $unblessed = shift;
    my $data = shift;
-   my $self = $globalinfos->[3] || {};
    my $bio = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem());
    my $sent = Net::SSLeay::BIO_write($bio, $data);
    print "Wrote ".$sent." of ".length($data)." bytes.\n"
-      if $self->{debug};
+      if $unblessed->{debug};
    die "Cannot write to bio!"
       if (($sent) != length($data));
    return $bio;
@@ -259,10 +196,9 @@ sub new {
    my $params = {@_};
    my $self = bless({}, $type);
 
-   $globalinfos = [0, 0, [], $self];
-
+   $self->{unblessed} = {};
    $self->{buffer} = '';
-   $self->{debug} = $params->{debug} || 0;
+   $self->{unblessed}->{debug} = $params->{debug} || 0;
    $self->{cacrl} = $params->{cacrl}
       if $self->{cacrl};
    $self->{client} = $params->{client} || 0;
@@ -287,28 +223,28 @@ sub new {
    }
    if ($params->{keymem} || $params->{key}) {
       if ($params->{keymem}) {
-         $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
+         $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{unblessed}, $params->{keymem}));
          print "Loaded keymem(".length($params->{keymem})." Bytes) with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
       } else {
          $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
          print "Loaded key from file ".$params->{key}." with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
       }
       die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
    }
    if ($params->{crtmem} || $params->{crt}) {
       if ($params->{crtmem}) {
-         my $crt = PEMdataToX509($params->{crtmem});
+         my $crt = PEMdataToX509($self->{unblessed}, $params->{crtmem});
          $err = Net::SSLeay::CTX_use_certificate($self->{context}, $crt);
          print "Loaded crtmem(".length($params->{crtmem})." Bytes/".$crt.") with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
       } else {
          # TODO:XXX:FIXME: Errorchecking!
          $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
          print "Loaded crt from file ".$params->{crt}." with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
       }
       die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
@@ -320,23 +256,23 @@ sub new {
       if ($params->{cacrtmem}) {
          if (ref($params->{cacrtmem}) eq "ARRAY") {
             foreach my $curcert (@{$params->{cacrtmem}}) {
-               $err = CTX_add_client_CA($self->{context}, $curcert, $self->{ssl});
+               $err = CTX_add_client_CA($self->{unblessed}, $self->{context}, $curcert);
                last
                   unless $err;
             }
          } else {
-            $err = CTX_add_client_CA($self->{context}, $params->{cacrtmem}, $self->{ssl});
+            $err = CTX_add_client_CA($self->{unblessed}, $self->{context}, $params->{cacrtmem});
             print "Loaded cacrtmem(".length($params->{cacrtmem})." Bytes) with result ".$err."\n"
-               if $self->{debug};
+               if $self->{unblessed}->{debug};
          }
       } else {
          $err = Net::SSLeay::CTX_load_verify_locations($self->{context}, $params->{cacrt}, '');
          print "Loaded cacrt from file ".$params->{cacrt}." with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
          $err = Net::SSLeay::CTX_set_client_CA_list($self->{context}, Net::SSLeay::load_client_CA_file($params->{cacrt}))
             unless ($err && ($err == 1));
          print "Set client cacrt from file ".$params->{cacrt}." with result ".$err."\n"
-            if $self->{debug};
+            if $self->{unblessed}->{debug};
       }
       $err = Net::SSLeay::CTX_set_verify_depth($self->{context}, $params->{caverifydepth} || 5)
          unless ($err && ($err == 1));
@@ -356,6 +292,7 @@ sub new {
    $self->{wbio} = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem())
       or die("Error creating w BIO: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error()));
    $self->{ssl} = Net::SSLeay::new($self->{context});
+   $globalinfos->{int($self->{ssl})} = $self->{unblessed};
    $err = Net::SSLeay::set_bio($self->{ssl}, $self->{rbio}, $self->{wbio});
    die "Error setting r/w BIOs: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
       if ($err && ($err != 1));
@@ -364,7 +301,7 @@ sub new {
        $params->{dhcertmem}) {
       my $dhbio = undef;
       if ($params->{dhcertmem}) {
-         $dhbio = dataToBio($params->{dhcertmem});
+         $dhbio = dataToBio($self->{unblessed}, $params->{dhcertmem});
       } else {
          die "Cannot open dhcert file!"
             unless ((-s $params->{dhcert}) && ($dhbio = Net::SSLeay::BIO_new_file($params->{dhcert}, "r")));
@@ -372,22 +309,22 @@ sub new {
       # TODO:XXX:FIXME: Errorchecking!
       my $dhret = Net::SSLeay::PEM_read_bio_DHparams($dhbio);
       print "Loaded dhcert with result ".$err."\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       Net::SSLeay::BIO_free($dhbio);
       die "Couldn't set DH parameters!"
-         if (SSL_set_tmp_dh($self->{ssl}, $dhret) < 0);
+         if (POE_FILTER_SSL_set_tmp_dh($self->{ssl}, $dhret) < 0);
       print "Set dhcert params with result ".$err."\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       #die "Couldn't set CTX DH parameters!"
-      #   if (SSL_CTX_set_tmp_dh($self->{context}, $dhret) < 0);
+      #   if (POE_FILTER_SSL_CTX_set_tmp_dh($self->{context}, $dhret) < 0);
       # TODO:XXX:FIXME: Errorchecking!
       my $rsa = Net::SSLeay::RSA_generate_key(2048, 73);
       #die "Couldn't set RSA key!"
       #   if (!Net::SSLeay::set_tmp_rsa($self->{ssl}, $rsa));
       die "Couldn't set RSA key!"
-         if (!SSL_CTX_set_tmp_rsa($self->{context}, $rsa));
+         if (!POE_FILTER_SSL_CTX_set_tmp_rsa($self->{context}, $rsa));
       print "Set dhrsa with result ".$err."\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       Net::SSLeay::RSA_free($rsa);
    }
    my $orfilter = 0;
@@ -401,15 +338,15 @@ sub new {
    #Net::SSLeay::CTX_set_verify($self->{context}, $orfilter, \&VERIFY);
    Net::SSLeay::set_verify($self->{ssl}, $orfilter, \&VERIFY);
    print "Set verify ".($params->{blockbadclientcert} ? "FORCE" : "")." ".$orfilter."\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    if ($params->{sni}) {
       my $err = Net::SSLeay::set_tlsext_host_name($self->{ssl}, $params->{sni});
       print "Set sni with result ".$err."\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       die "Error setting sni:".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
    }
-   $self->{ignoreVerifyErrors} = $params->{ignoreVerifyErrors}
+   $self->{unblessed}->{ignoreVerifyErrors} = $params->{ignoreVerifyErrors}
       if ($params->{ignoreVerifyErrors} &&
      (ref($params->{ignoreVerifyErrors}) eq "ARRAY"));
 
@@ -418,33 +355,36 @@ sub new {
 
 sub VERIFY {
    my ($ok, $x509_store_ctx) = @_;
-   my $self = $globalinfos->[3] || {};
+   my $ssl = Net::SSLeay::X509_STORE_CTX_get_ex_data($x509_store_ctx, POE_FILTER_SSL_get_ex_data_X509_STORE_CTX_idx());
+   my $unblessed = $globalinfos->{int($ssl)} || die;
    print "VERIFY ".$ok
-      if $self->{debug};
+      if $unblessed->{debug};
    my $errcode = Net::SSLeay::X509_STORE_CTX_get_error($x509_store_ctx);
-   if ($self->{ignoreVerifyErrors} &&
-  (ref($self->{ignoreVerifyErrors}) eq "ARRAY") && (scalar(grep { $errcode == $_ }
-     @{$self->{ignoreVerifyErrors}}))) {
+   if ($unblessed->{ignoreVerifyErrors} &&
+  (ref($unblessed->{ignoreVerifyErrors}) eq "ARRAY") && (scalar(grep { $errcode == $_ }
+     @{$unblessed->{ignoreVerifyErrors}}))) {
       $ok = 1;
       print " -> ".$ok." (Ignoring error ".$errcode.")"
-         if $self->{debug};
+         if $unblessed->{debug};
    }
    print "\n"
-      if $self->{debug};
-   $globalinfos->[0] = $ok ? 1 : 2
-      if ($globalinfos->[0] != 2);
-   $globalinfos->[1]++;
+      if $unblessed->{debug};
+   $unblessed->{ok} = $ok ? 1 : 2
+      if (!defined($unblessed->{ok}) ||
+                  ($unblessed->{ok} != 2));
+   $unblessed->{chaincount}++;
    # TODO:XXX:FIXME: Chainlength check
    #X509_STORE_CTX_set_error($x509_store_ctx, X509_V_ERR_CERT_CHAIN_TOO_LONG)
    #   if (X509_STORE_CTX_get_error_depth(ctx) > uuu);
    # TODO:XXX:FIXME: No globalconfig
    #    ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
    #    mydata = SSL_get_ex_data(ssl, mydata_index);
+   #push(@{$unblessed->{ssls}}, int($x509_store_ctx));
    if (my $x = Net::SSLeay::X509_STORE_CTX_get_current_cert($x509_store_ctx)) {
-      push(@{$globalinfos->[2]},[Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_subject_name($x)),
-                                 Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_issuer_name($x)),
-                                 X509_get_serialNumber($x),
-                                 $errcode]);
+      push(@{$unblessed->{chain}},[Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_subject_name($x)),
+                                   Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_issuer_name($x)),
+                                   POE_FILTER_X509_get_serialNumber($x),
+                                   $errcode]);
    }
    Net::SSLeay::X509_STORE_CTX_set_error($x509_store_ctx, 0);
    return 1; # $ok; # 1=accept cert, 0=reject
@@ -458,7 +398,7 @@ sub clone {
 sub get_one_start {
    my ($self, $data) = @_;
    print "GETONESTART: NETWORK -> SSL -> POE: ".$self->hexdump(join("", @$data))."\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    $self->writeToSSLBIO(join("", @$data), $self->{accepted} ? 0 : 1);
    []
 }
@@ -466,32 +406,32 @@ sub get_one_start {
 sub get_one {
    my $self = shift;
    print "GETONE: BEGIN\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    my @return = ();
    push(@return, $self) if ($self->doSSL() || $self->{buffer});
    my $data = Net::SSLeay::read($self->{ssl});
    push(@return, $data)
       if $data;
    print "GETONE: END: ".scalar(@return)."\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    [@return]
 }
 
 sub get {
    my ($self, $chunks) = @_;
    print "GET: BEGIN\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    my @return = ();
    #print "GET:\n"
-   #   if $self->{debug};
+   #   if $self->{unblessed}->{debug};
    push(@return, $self) if ($self->doSSL() || $self->{buffer});
    foreach my $data (@$chunks) {
       print "GET: NETWORK -> SSL -> POE: ".join("", @$data)."\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       $self->writeToSSLBIO(join("", @$data));
       my $data = Net::SSLeay::read($self->{ssl});
       print "GET: Read ".length($data)." bytes.\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       push(@return, $data);
    }
    [@return]
@@ -500,7 +440,7 @@ sub get {
 sub put {
    my ($self, $chunks) = @_;
    print "PUT: BEGIN\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    my @return = ();
    $self->doSSL();
    if ($self->{accepted}) {
@@ -514,7 +454,7 @@ sub put {
    foreach my $data (@$chunks) {
       next if (ref($data) eq "POE::Filter::SSL");
       print "PUT: POE -> SSL -> NETWORK: ".$self->hexdump($data)."\r\n"
-         if $self->{debug};
+         if $self->{unblessed}->{debug};
       if ($self->{accepted}) {
          $self->writeToSSL($data);
       } else {
@@ -557,14 +497,12 @@ sub doSSL {
    my $self = shift;
    my $ret = 0;
    print "SSLing..."
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    unless ($self->{accepted}) {
       my $err = $self->{client} ?
          Net::SSLeay::connect($self->{ssl}) :
          Net::SSLeay::accept($self->{ssl});
       if ($err == 1) {
-         $self->{infos} = [((@$globalinfos)[0..2])];
-         $globalinfos = [0, 0, []];
          $self->{accepted}++;
          $ret++;
       } else {
@@ -608,7 +546,7 @@ sub doSSL {
       $self->{buffer} .= $data;
    }
    print $ret."\n"
-      if $self->{debug};
+      if $self->{unblessed}->{debug};
    return $ret;
 }
 
@@ -619,7 +557,7 @@ sub getCipher {
 
 sub clientCertExists {
    my $self = shift;
-   return ((ref($self->{infos}) eq "ARRAY") && ($self->{infos}->[1]));
+   return ((ref($self->{unblessed}->{chain}) eq "ARRAY") && ($self->{unblessed}->{chaincount}));
 }
 
 sub clientCertValid {
@@ -628,12 +566,12 @@ sub clientCertValid {
    if (defined($self->{cacrl})) {
       $valid = $self->clientCertNotOnCRL($self->{cacrl}) ? 1 : 0;
    }
-   return $self->clientCertExists() ? (($self->{infos}->[0] ne "2") && scalar(@{$self->{infos}->[2]}) && $valid) : undef;
+   return $self->clientCertExists() ? (($self->{unblessed}->{ok} ne "2") && scalar(@{$self->{unblessed}->{chain}}) && $valid) : undef;
 }
 
 sub clientCertIds {
    my $self = shift;
-   return $self->clientCertExists ? @{$self->{infos}->[2]} : undef;
+   return $self->clientCertExists ? @{$self->{unblessed}->{chain}} : undef;
 }
 
 sub clientCertNotOnCRL {
@@ -645,14 +583,14 @@ sub clientCertNotOnCRL {
       my $badcrls = 0;
       my $jump = 0;
       print("----- SSL Infos BEGIN ---------------"."\n")
-         if $self->{debug};
-      foreach (@{$self->{infos}->[2]}) {
-         my $crlstatus = verify_serial_against_crl_file($crlfilename, $_->[2]);
+         if $self->{unblessed}->{debug};
+      foreach (@{$self->{unblessed}->{chain}}) {
+         my $crlstatus = POE_FILTER_verify_serial_against_crl_file($crlfilename, $_->[2]);
          $badcrls++ if $crlstatus;
          $crlstatus = $crlstatus ? "INVALID (".($crlstatus !~ m,^CRL:, ? $self->hexdump($crlstatus) : $crlstatus).")" : "VALID";
          my $t = ("  " x $jump++);
          if (ref($_) eq "ARRAY") {
-            if ($self->{debug}){
+            if ($self->{unblessed}->{debug}){
                print(" ".$t."  |---[ Subcertificate ]---\n") if $t;
                print(" ".$t."  | Subject Name: ".$_->[0]."\n");
                print(" ".$t."  | Issuer Name : ".$_->[1]."\n");
@@ -660,11 +598,13 @@ sub clientCertNotOnCRL {
                print(" ".$t."  | CRL Status  : ".$crlstatus."\n");
             }
          } else {
-            print(" NOCERTINFOS!"."\n") if $self->{debug};
+            print(" NOCERTINFOS!"."\n")
+               if $self->{unblessed}->{debug};
             return 0;
          }
       }
-      print("----- SSL Infos END -----------------"."\n") if $self->{debug};
+      print("----- SSL Infos END -----------------"."\n")
+         if $self->{unblessed}->{debug};
       return 1 unless $badcrls;
    }
    return 0;
@@ -678,6 +618,8 @@ sub handshakeDone {
 
 sub DESTROY {
    my $self = shift;
+   #print "DESTROY: ".int($self->{ssl})."\n";
+   delete $globalinfos->{int($self->{ssl})};
    Net::SSLeay::free($self->{ssl})
       if $self->{ssl};
    Net::SSLeay::CTX_free($self->{context})
@@ -698,7 +640,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.39
+Version 0.41
 
 =head1 DESCRIPTION
 
@@ -807,6 +749,7 @@ By default I<POE::Filter::SSL> acts as a SSL server. To use it in client mode yo
 
 =item HTTPS-Server
 
+  use POE::Filter::SSL::PreFilter
   use POE::Filter::SSL;
   use POE::Component::Server::HTTP;
   use HTTP::Status;
@@ -1318,13 +1261,13 @@ Example:
 
 =item VERIFY()
 
-=item X509_get_serialNumber()
+=item POE_FILTER_X509_get_serialNumber()
 
-=item SSL_CTX_set_tmp_dh()
+=item POE_FILTER_SSL_CTX_set_tmp_dh()
 
-=item SSL_CTX_set_tmp_rsa()
+=item POE_FILTER_SSL_CTX_set_tmp_rsa()
 
-=item SSL_set_tmp_dh()
+=item POE_FILTER_SSL_set_tmp_dh()
 
 =item clone()
 

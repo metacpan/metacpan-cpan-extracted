@@ -42,7 +42,7 @@ sub MY::install {
         $script =~ s/install :: (.*)$/install :: $1 install_sax_pureperl/m;
         $script .= <<"INSTALL";
 
-install_sax_pureperl :
+install_sax_pureperl : pure_install
 \t\@\$(PERL) -MXML::SAX -e "XML::SAX->add_parser(q(XML::SAX::PurePerl))->save_parsers()"
 
 INSTALL

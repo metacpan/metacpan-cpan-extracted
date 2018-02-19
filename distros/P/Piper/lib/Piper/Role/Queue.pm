@@ -11,7 +11,7 @@ use warnings;
 
 use Moo::Role;
 
-our $VERSION = '0.04'; # from Piper-0.04.tar.gz
+our $VERSION = '0.05'; # from Piper-0.05.tar.gz
 
 #pod =head1 DESCRIPTION
 #pod
@@ -131,7 +131,7 @@ Verify the functionality of a new queue class by downloading the L<Piper> tests 
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

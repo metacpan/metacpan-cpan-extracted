@@ -6,7 +6,7 @@ sourceplot - display a plot of astronomical sources on adjustable axes
 
 =head1 SYNOPSIS
 
-    sourceplot [--help | --version]
+    sourceplot [--help | --version] [--date YYYY-MM-DD]
 
 =head1 PURPOSE
 
@@ -26,6 +26,24 @@ The first thing most observers will want to double click on is a source
 in the Catalog Window, which will plot that source.  Currently the only
 moving sources that can be plotted are planets, the Sun and the Moon,
 which can be added via the 'Planets' button in the Edit Window.
+
+=head2 Command Line Options
+
+=over 4
+
+=item --help | --man
+
+Show this documentation.
+
+=item --version
+
+Show version information.
+
+=item --date YYYY-MM-DD
+
+Select initial date.
+
+=back
 
 =head2 Plotting Window
 
@@ -249,15 +267,16 @@ sourceplot when it starts up.
 use strict;
 use warnings;
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 use Pod::Usage;
 use Getopt::Long;
 use App::SourcePlot;
 
-my ($option_help, $option_version);
+my ($option_help, $option_version, $option_date);
 GetOptions('help|man' => \$option_help,
-           'version' => \$option_version)
+           'version' => \$option_version,
+           'date=s' => \$option_date)
   or pod2usage(-verbose => 0);
 pod2usage(-verbose => 2) if $option_help;
 
@@ -267,7 +286,11 @@ if ($option_version) {
   exit(0);
 }
 
-App::SourcePlot::run_sourceplot_gui();
+my %arg = ();
+
+$arg{'date'} = $option_date if defined $option_date;
+
+App::SourcePlot::run_sourceplot_gui(%arg);
 
 __END__
 
@@ -281,10 +304,11 @@ Casey Best (University of Victoria),
 Pam Shimek (University of Victoria),
 Tim Jenness (Joint Astronomy Centre),
 Remo Tilanus (Joint Astronomy Centre),
-Graham Bell (Joint Astronomy Centre).
+Graham Bell (Joint Astronomy Centre / East Asian Observatory).
 
 =head1 COPYRIGHT
 
+Copyright (C) 2018 East Asian Observatory.
 Copyright (C) 2012 Science and Technology Facilities Council.
 Copyright (C) 1998, 1999 Particle Physics and Astronomy Research
 Council. All Rights Reserved.

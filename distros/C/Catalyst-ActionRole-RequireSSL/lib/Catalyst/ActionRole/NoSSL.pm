@@ -11,7 +11,7 @@ Catalyst::ActionRole::NoSSL - Force an action to be plain.
 
 =head1 VERSION
 
-version 0.07
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -21,7 +21,7 @@ version 0.07
 
   sub bar : Local Does('RequireSSL') { ... }
   sub bar : Local Does('NoSSL') { ... }
-   
+
 =cut
 
 around execute => sub {
@@ -30,11 +30,11 @@ around execute => sub {
   my ($controller, $c) = @_;
 
   if($c->req->secure && $self->check_chain($c) &&
-    ( $c->req->method ne "POST" || 
+    ( $c->req->method ne "POST" ||
       $c->config->{require_ssl}->{ignore_on_post} )) {
     my $uri = $c->req->uri->clone;
     $uri->scheme('http');
-    $c->res->redirect( $uri );
+    $c->res->redirect( $uri, 301 );
     $c->detach();
   } else {
     $self->$orig( @_ );

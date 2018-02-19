@@ -1,0 +1,61 @@
+{
+    "schema_class": "Test::JSONAPI::Schema",
+    "resultsets": [
+        "Post",
+        "Comment",
+        "Author"
+    ],
+    "fixture_sets": {
+        "basic": {
+            "Author": [
+                [
+                    "id",
+                    "name",
+                    "age"
+                ],
+                [
+                    1,
+                    "John Doe",
+                    28
+                ]
+            ],
+            "Comment": [
+                [
+                    "id",
+                    "post_id",
+                    "author_id",
+                    "description",
+                    "likes"
+                ],
+                [
+                    1,
+                    1,
+                    1,
+                    "This is a really good post",
+                    2
+                ],
+                [
+                    2,
+                    1,
+                    1,
+                    "Another really good post",
+                    4
+                ]
+            ],
+            "Post": [
+                [
+                    "id",
+                    "author_id",
+                    "title",
+                    "description"
+                ],
+                [
+                    1,
+                    1,
+                    "Intro to JSON API Role",
+                    "This is a Perl transformer for the JSON API specification"
+                ]
+            ]
+        }
+    }
+}

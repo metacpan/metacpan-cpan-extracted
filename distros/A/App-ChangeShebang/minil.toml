@@ -1,3 +1,0 @@
-name = "App-ChangeShebang"
-authority = "cpan:SKAJI"
-module_maker = "ExtUtilsMakeMaker"

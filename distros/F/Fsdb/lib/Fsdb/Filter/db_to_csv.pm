@@ -2,8 +2,7 @@
 
 #
 # db_to_csv.pm
-# Copyright (C) 2007 by John Heidemann <johnh@isi.edu>
-# $Id: 2fc5da9ab90db77e3b4b2adfdf26f9fe040194df $
+# Copyright (C) 2007-2018 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -234,7 +233,7 @@ sub run ($) {
     my $out_fh = $self->{_out};
     while ($fref = &{$read_fastpath_sub}()) {
 	$csv->combine(@$fref)
-	    or croak $self->{_prog} . ": failed on this line: " . join("  ", @$fref) . ".\n";
+	    or croak($self->{_prog} . ": failed on this line: " . join("  ", @$fref) . ".\n");
 	$out_fh->print($csv->string . "\n");
     };
 }
@@ -244,7 +243,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2008 by John Heidemann <johnh@isi.edu>
+Copyright (C) 2007-2018 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

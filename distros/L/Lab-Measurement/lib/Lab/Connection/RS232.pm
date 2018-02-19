@@ -13,7 +13,7 @@
 
 package Lab::Connection::RS232;
 #ABSTRACT: RS232 Connection base class
-$Lab::Connection::RS232::VERSION = '3.613';
+$Lab::Connection::RS232::VERSION = '3.620';
 use Lab::Connection;
 use strict;
 use Lab::Exception;
@@ -85,7 +85,7 @@ Lab::Connection::RS232 - RS232 Connection base class
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,7 @@ terms as Perl itself.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Andreas K. Huettel
             2016       Simon Reinhardt

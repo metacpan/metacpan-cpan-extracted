@@ -12,7 +12,7 @@ public class types {
 	}
 
 	public HashMap hm(){
-		HashMap hm = new HashMap() ;
+		HashMap<String, String> hm = new HashMap<>() ;
 		hm.put("key", "value") ;
 
 		return hm ;

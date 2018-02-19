@@ -74,13 +74,19 @@
       },
       "HPCI" : {
          "file" : "lib/HPCI.pm",
-         "version" : "0.53"
+         "version" : "0.60"
       },
       "HPCI::CommandScript" : {
          "file" : "lib/HPCI/CommandScript.pm"
       },
       "HPCI::Env" : {
          "file" : "lib/HPCI/Env.pm"
+      },
+      "HPCI::File" : {
+         "file" : "lib/HPCI/File.pm"
+      },
+      "HPCI::File::Classes" : {
+         "file" : "lib/HPCI/File.pm"
       },
       "HPCI::Group" : {
          "file" : "lib/HPCI/Group.pm"
@@ -119,6 +125,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.53",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.60",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

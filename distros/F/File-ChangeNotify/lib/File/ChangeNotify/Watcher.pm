@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Class::Load qw( load_class );
 use File::ChangeNotify::Event;
@@ -130,7 +130,7 @@ File::ChangeNotify::Watcher - Role consumed by all watchers
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -160,7 +160,7 @@ vary. Implementations that hook into some sort of kernel event interface
 happening than one implemented purely in userspace code (like the Default
 class).
 
-By default, events are returned in the form L<File::ChangeNotify::Event>
+By default, events are returned in the form of L<File::ChangeNotify::Event>
 objects, but this can be overridden by providing an "event_class" attribute to
 the constructor.
 
@@ -265,7 +265,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2017 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

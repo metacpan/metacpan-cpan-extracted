@@ -1,5 +1,14 @@
 Revision history and release notes for Mail::GPG.
 
+1.0.12 Mon Feb 12, 2018, joern
+    Bugfix:
+    - Reverted 1.0.11 changes to I/O multiplexing and
+      put back IO::Select implementation. Event/AnyEvent
+      method dropped completely due to bad results on
+      CPAN testing and reports of a blocking test suite.
+      Tuned IO::Select for better performance on big
+      message bodies. 
+
 1.0.11 Sat Aug 26, 2017, joern
     Bugfix:
     - Fixed I/O issue on (specific) bigger message bodies.

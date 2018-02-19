@@ -337,6 +337,14 @@ Aliases: I<airy>
 
 =cut
 
+=head2 arithmetic_derivative
+
+Number.arithmetic_derivative() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 as_bin
 
 Number.as_bin() -> I<Obj>
@@ -1623,6 +1631,14 @@ Return the
 
 =cut
 
+=head2 multinomial
+
+Number.multinomial() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nan
 
 Number.nan() -> I<Obj>
@@ -2109,6 +2125,14 @@ Return the
 
 =cut
 
+=head2 sqrt_cfrac
+
+Number.sqrt_cfrac() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 sqrtmod
 
 Number.sqrtmod() -> I<Obj>
@@ -2131,6 +2155,8 @@ Number.stirling() -> I<Obj>
 
 Return the
 
+Aliases: I<stirling1>
+
 =cut
 
 =head2 stirling2
@@ -2144,6 +2170,14 @@ Return the
 =head2 stirling3
 
 Number.stirling3() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 subfactorial
+
+Number.subfactorial() -> I<Obj>
 
 Return the
 

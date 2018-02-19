@@ -1,7 +1,7 @@
 package Module::Patch;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '0.26'; # VERSION
+our $DATE = '2018-02-18'; # DATE
+our $VERSION = '0.270'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -88,11 +88,14 @@ sub import {
             or die "BUG: $self: Bad patch module name '$target', it should ".
                 "end with '::Patch::YourCategory'";
 
-        if (is_loaded($target) && !$loaded_by_us{$target}) {
-            if ($load && $warn) {
-                warn "$target is loaded before ".__PACKAGE__.", this is not ".
-                    "recommended since $target might export subs before ".
-                    __PACKAGE__." gets the chance to patch them";
+        if (is_loaded($target)) {
+            if (!$loaded_by_us{$target}) {
+                if ($load && $warn) {
+                    warn "$target is loaded before ".__PACKAGE__.", this is ".
+                        "not recommended since $target might export subs ".
+                        "before " . __PACKAGE__." gets the chance to patch " .
+                        "them";
+                }
             }
         } else {
             if ($load) {
@@ -100,8 +103,11 @@ sub import {
                 die if $@;
                 $loaded_by_us{$target}++;
             } else {
-                die "FATAL: $self: $target is not loaded, please ".
-                    "'use $target' before patching";
+                if ($warn) {
+                    warn "$target does not exist and we are told not to load ".
+                        "it, skipped patching";
+                }
+                return;
             }
         }
 
@@ -279,7 +285,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.26 of Module::Patch (from Perl distribution Module-Patch), released on 2017-08-09.
+This document describes version 0.270 of Module::Patch (from Perl distribution Module-Patch), released on 2018-02-18.
 
 =head1 SYNOPSIS
 
@@ -548,7 +554,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

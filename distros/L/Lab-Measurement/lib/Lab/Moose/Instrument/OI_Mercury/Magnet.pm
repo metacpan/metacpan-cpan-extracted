@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.613';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.620';
 #ABSTRACT: Oxford Instruments Mercury Cryocontrol magnet power supply
 
 use 5.010;
@@ -20,6 +20,22 @@ has verbose => (
     isa     => 'Bool',
     default => 1
 );
+
+has magnet => (
+    is      => 'ro',
+    isa     => enum( [qw/X Y Z/] ),
+    default => 'Z'
+);
+
+# default connection options:
+around default_connection_options => sub {
+    my $orig    = shift;
+    my $self    = shift;
+    my $options = $self->$orig();
+    $options->{Socket}{port}    = 7020;
+    $options->{Socket}{timeout} = 10;
+    return $options;
+};
 
 
 sub _parse_setter_retval {
@@ -157,11 +173,38 @@ sub get_n2_level_counter {
 # now follow the core magnet functions
 #
 
+sub validated_magnet_getter {
+    my $args_ref   = shift;
+    my %extra_args = @_;
+    my ( $self, %args ) = validated_getter(
+        $args_ref,
+        channel => { isa => enum( [qw/X Y Z/] ), optional => 1 },
+        %extra_args,
+    );
+    my $channel = delete $args{channel} // $self->magnet();
+    $channel = "GRP$channel";
+    return ( $self, $channel, %args );
+}
+
+sub validated_magnet_setter {
+    my $args_ref   = shift;
+    my %extra_args = @_;
+    my ( $self, $value, %args ) = validated_setter(
+        $args_ref,
+        channel => { isa => enum( [qw/X Y Z/] ), optional => 1 },
+        %extra_args,
+    );
+
+    my $channel = delete $args{channel} // $self->magnet();
+    $channel = "GRP$channel";
+    return ( $self, $value, $channel, %args );
+}
+
 
 sub oim_get_current {
-    my ( $self, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:CURR";
+    my $cmd = "READ:DEV:$channel:PSU:SIG:CURR";
     my $current = $self->query( command => $cmd, %args );
     $current = $self->_parse_getter_retval( $cmd, $current );
     $current =~ s/A$//;
@@ -170,9 +213,9 @@ sub oim_get_current {
 
 
 sub oim_get_field {
-    my ( $self, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:FLD";
+    my $cmd = "READ:DEV:$channel:PSU:SIG:FLD";
     my $field = $self->query( command => $cmd, %args );
     $field = $self->_parse_getter_retval( $cmd, $field );
     $field =~ s/T$//;
@@ -181,20 +224,20 @@ sub oim_get_field {
 
 
 sub oim_get_heater {
-    my ( $self, %args ) = validated_getter( \@_ );
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:SWHT";
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+    my $cmd = "READ:DEV:$channel:PSU:SIG:SWHT";
     my $heater = $self->query( command => $cmd, %args );
     return $self->_parse_getter_retval( $cmd, $heater );
 }
 
 
 sub oim_set_heater {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
         \@_,
         value => { isa => enum( [qw/ON OFF/] ) },
     );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:SWHT";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:SWHT";
 
     my $rv = $self->query( command => "$cmd:$value", %args );
 
@@ -203,12 +246,12 @@ sub oim_set_heater {
 
 
 sub oim_force_heater {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
         \@_,
         value => { isa => enum( [qw/ON OFF/] ) },
     );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:SWHN";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:SWHN";
     my $heater = $self->query( command => "$cmd:$value", %args );
 
     return $self->_parse_setter_retval( $cmd, $heater );
@@ -216,9 +259,9 @@ sub oim_force_heater {
 
 
 sub oim_get_current_sweeprate {
-    my ( $self, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:RCST";
+    my $cmd = "READ:DEV:$channel:PSU:SIG:RCST";
     my $sweeprate = $self->query( command => $cmd, %args );
     $sweeprate = $self->_parse_getter_retval( $cmd, $sweeprate );
     $sweeprate =~ s/A\/m$//;
@@ -227,9 +270,9 @@ sub oim_get_current_sweeprate {
 
 
 sub oim_set_current_sweeprate {
-    my ( $self, $value, %args ) = validated_setter( \@_ );
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:RCST";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:RCST";
 
     my $rv = $self->query( command => "$cmd:$value", %args );
 
@@ -242,9 +285,9 @@ sub oim_set_current_sweeprate {
 
 
 sub oim_get_field_sweeprate {
-    my ( $self, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:RFST";
+    my $cmd = "READ:DEV:$channel:PSU:SIG:RFST";
     my $sweeprate = $self->query( command => $cmd, %args );
     $sweeprate = $self->_parse_getter_retval( $cmd, $sweeprate );
     $sweeprate =~ s/T\/m$//;
@@ -253,9 +296,9 @@ sub oim_get_field_sweeprate {
 
 
 sub oim_set_field_sweeprate {
-    my ( $self, $value, %args ) = validated_setter( \@_ );
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter( \@_ );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:RFST";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:RFST";
 
     my $rv = $self->query( command => "$cmd:$value", %args );
 
@@ -268,33 +311,33 @@ sub oim_set_field_sweeprate {
 
 
 sub oim_get_activity {
-    my ( $self, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:ACTN";
+    my $cmd = "READ:DEV:$channel:PSU:ACTN";
     my $action = $self->query( command => $cmd, %args );
     return $self->_parse_getter_retval( $cmd, $action );
 }
 
 
 sub oim_set_activity {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
         \@_,
         value => { isa => enum( [qw/HOLD RTOS RTOZ CLMP/] ) },
     );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:ACTN";
+    my $cmd = "SET:DEV:$channel:PSU:ACTN";
     my $rv = $self->query( command => "$cmd:$value", %args );
     return $self->_parse_setter_retval( $cmd, $rv );
 }
 
 
 sub oim_set_current_setpoint {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
         \@_,
         value => { isa => 'Num' },
     );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:CSET";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:CSET";
     my $rv = $self->query( command => "$cmd:$value", %args );
     $rv = $self->_parse_setter_retval( $cmd, $rv );
     $rv =~ s/A$//;
@@ -303,8 +346,8 @@ sub oim_set_current_setpoint {
 
 
 sub oim_get_current_setpoint {
-    my ( $self, $value, %args ) = validated_getter( \@_ );
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:CSET";
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+    my $cmd = "READ:DEV:$channel:PSU:SIG:CSET";
     my $result = $self->query( command => $cmd, %args );
     $result = $self->_parse_getter_retval( $cmd, $result );
     $result =~ s/A$//;
@@ -313,12 +356,12 @@ sub oim_get_current_setpoint {
 
 
 sub oim_set_field_setpoint {
-    my ( $self, $value, %args ) = validated_setter(
+    my ( $self, $value, $channel, %args ) = validated_magnet_setter(
         \@_,
         value => { isa => 'Num' },
     );
 
-    my $cmd = "SET:DEV:GRPZ:PSU:SIG:FSET";
+    my $cmd = "SET:DEV:$channel:PSU:SIG:FSET";
     my $rv = $self->query( command => "$cmd:$value", %args );
 
     $rv = $self->_parse_setter_retval( $cmd, $rv );
@@ -328,9 +371,9 @@ sub oim_set_field_setpoint {
 
 
 sub oim_get_field_setpoint {
-    my ( $self, $value, %args ) = validated_getter( \@_ );
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
 
-    my $cmd = "READ:DEV:GRPZ:PSU:SIG:FSET";
+    my $cmd = "READ:DEV:$channel:PSU:SIG:FSET";
     my $result = $self->query( command => $cmd, %args );
     $result = $self->_parse_getter_retval( $cmd, $result );
     $result =~ s/T$//;
@@ -339,8 +382,8 @@ sub oim_get_field_setpoint {
 
 
 sub oim_get_fieldconstant {
-    my ( $self, %args ) = validated_getter( \@_ );
-    my $cmd = "READ:DEV:GRPZ:PSU:ATOB";
+    my ( $self, $channel, %args ) = validated_magnet_getter( \@_ );
+    my $cmd = "READ:DEV:$channel:PSU:ATOB";
     my $result = $self->query( command => $cmd, %args );
     return $self->_parse_getter_retval( $cmd, $result );
 }
@@ -390,7 +433,6 @@ sub sweep_to_field {
     return $self->oim_get_field(%args);
 }
 
-# This config_sweep can just handle step/list sweeps
 sub config_sweep {
     my ( $self, %args ) = validated_hash(
         \@_,
@@ -461,9 +503,19 @@ sub wait {
 }
 
 sub active {
+    my $self = shift;
 
-    # would be required for continous sweep
-    return 0;
+    # with the legacy command set, one could use the "X" command to find
+    # whether the magnet has finshed the sweep
+    # We do it manually by comparing field and setpoint.
+    my $field  = $self->oim_get_field();
+    my $target = $self->oim_get_field_setpoint();
+    if ( abs( $field - $target ) < $self->max_field_deviation() ) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
 
 sub exit {
@@ -487,7 +539,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury Cryocont
 
 =head1 VERSION
 
-version 3.613
+version 3.620
 
 =head1 SYNOPSIS
 
@@ -496,10 +548,8 @@ version 3.613
  my $magnet = instrument(
      type => 'OI_Mercury::Magnet',
      connection_type => 'Socket',
-     connection_options => {
-         host => '192.168.3.15',
-         port => 7020,
-     }
+     connection_options => {host => '192.168.3.15'},
+     magnet => 'X', # 'X', 'Y' or 'Z'. default is 'Z'
  );
 
  say "He level (%): ", $magnet->get_he_level();
@@ -531,7 +581,10 @@ Level meter: B<DB5.L1>
 
 =item *
 
-Magnet: B<GRPZ> (cannot be customized yet)
+Magnet: B<Z> (use DEV:GRPZ:PSU)
+
+The default can be changed to B<X> or B<Y> with the C<magnet> attribute in
+the constructor as shown in SYNOPSIS.
 
 =back
 
@@ -694,9 +747,9 @@ Returns the current to field factor (A/T)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
-  Copyright 2017       Simon Reinhardt
+  Copyright 2017-2018  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

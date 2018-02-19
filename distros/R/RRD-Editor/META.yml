@@ -3,11 +3,14 @@ abstract: 'Portable, standalone (no need for RRDs.pm) tool to create and edit RR
 author:
   - 'Doug Leith <dougleith@cpan.org>'
 build_requires:
+  Clone: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::Deep: '0'
+  Test::Exception: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,5 +23,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.19'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

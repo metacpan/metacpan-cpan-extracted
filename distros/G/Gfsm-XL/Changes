@@ -2,6 +2,9 @@
 ##
 ## Change Log for perl package Gfsm::XL
 
+v0.11 Fri, 16 Feb 2018 14:02:33 +0100 moocow
+	* Makefile.PL fix for RT bug #124235 (no more Alien::GfsmXL->pkgconfig())
+
 v0.10 Wed, 24 Feb 2016 09:10:10 +0100 mooocow
 	* added CONFIGURE_REQUIRES to fix RT bug #112321
 

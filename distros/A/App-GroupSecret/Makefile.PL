@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Spec" => 0,
     "File::Temp" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.38",
     "IPC::Open2" => 0,
     "IPC::Open3" => 0,
     "MIME::Base64" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.302",
+  "VERSION" => "0.304",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,7 +59,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.38",
   "IO::Handle" => 0,
   "IPC::Open2" => 0,
   "IPC::Open3" => 0,

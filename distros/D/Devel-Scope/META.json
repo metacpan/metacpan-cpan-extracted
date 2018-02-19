@@ -33,11 +33,11 @@
       "runtime" : {
          "requires" : {
             "Scope::Upper" : "0.30",
-            "Term::Colormap" : "0.16",
+            "Term::Colormap" : "0.18",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.07"
+   "version" : "0.12"
 }
