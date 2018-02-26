@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.14, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +36,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.3.0
+    version: v4.3.1
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::autocolor:
@@ -49,8 +49,6 @@ provides:
     file: lib/App/sdif/debug.pm
   App::sdif::default:
     file: lib/App/sdif/default.pm
-  App::sdif::osx_autocolor:
-    file: lib/App/sdif/osx_autocolor.pm
 requires:
   Getopt::EX: v1.7.1
   List::Util: '1.45'
@@ -61,7 +59,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: git://github.com/kaz-utashiro/sdif-tools.git
-version: 4.3.0
+version: 4.3.1
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

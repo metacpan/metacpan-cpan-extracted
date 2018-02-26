@@ -8,13 +8,14 @@ use Pod::Usage 1.69;
 use CPAN;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
 
-our $VERSION = '0.011'; # VERSION
-my ( $distro, $help, $version_check );
+our $VERSION = '0.012'; # VERSION
+my ( $distro, $help, $version_check, $comment );
 
 GetOptions(
-    'help'     => \$help,
-    'distro=s' => \$distro,
-    'version'  => \$version_check
+    'help'      => \$help,
+    'distro=s'  => \$distro,
+    'comment=s' => \$comment,
+    'version'   => \$version_check
 ) or pod2usage(1);
 
 pod2usage( -exitval => 0, -verbose => 2 ) if $help;
@@ -30,8 +31,9 @@ my $distribution = '^' . $distro;
 my $filename     = "$distro.yml";
 $filename =~ s/\//./;
 my %data = (
-    comment  => 'Tests hang smoker',
-    match    => { distribution => $distribution },
+    comment => $comment || 'Tests hang smoker',
+    match    => { distribution  => $distribution },
+    env      => { PERLBREW_PERL => $ENV{PERLBREW_PERL} },
     disabled => 1
 );
 
@@ -41,10 +43,11 @@ die "$prefs_dir does not exist or it is not readable\n"
   unless ( -d $prefs_dir );
 my $full_path = File::Spec->catfile( $prefs_dir, $filename );
 
-if (-f $full_path) {
+if ( -f $full_path ) {
     warn "$full_path already exists, will not overwrite it.";
     exit(1);
-} else {
+}
+else {
     DumpFile( $full_path, \%data );
 }
 
@@ -71,6 +74,12 @@ This is a required parameter: not providing it will cause the program to abort w
 =item B<--help>
 
 This help message.
+
+=item B<--comment>
+
+Addeds a customized comment to the distroprefs file. It's entirely optional, and if not given, the default text will
+be the string C<Tests hang smoker>. Sometimes you want to add an distroprefs when, for example, the distribution uses
+too much disk space, and an different message will help to identify that.
 
 =item B<--version>
 

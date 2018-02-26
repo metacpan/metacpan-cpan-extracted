@@ -130,6 +130,7 @@ README.md
 screenshot/donate.jpg
 screenshot/How_to_chat_like_a_hacker.jpg
 screenshot/IRCShell.png
+script/check_dependencies.pl
 t/https.t
 t/load_module.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

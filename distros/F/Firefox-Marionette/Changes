@@ -1,5 +1,12 @@
 Revision history for Firefox-Marionette
 
+0.44  Thu Feb 22 20:48:00 2018
+       s/find_by/find/g
+       Adding download support
+
+0.43  Thu Feb 22 20:48:00 2018
+       Exception handling fixes.
+
 0.42  Mon Feb 19 22:29:00 2018
        Documentation/test coverage fixes.
 

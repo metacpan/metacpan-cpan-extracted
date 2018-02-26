@@ -3,12 +3,10 @@ use warnings;
 use Test::More;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;
-use POSIX 'geteuid', 'getegid';
+use POSIX qw(getuid getgid);
 
-plan skip_all => 'Non-root test' if geteuid() == 0;
-
-my $uid = geteuid();
-my $gid = getegid();
+my $uid = getuid();
+my $gid = getgid();
 my $user = getpwuid $uid;
 my $group = getgrgid $gid;
 
@@ -19,7 +17,7 @@ my $failed = 1;
 Mojo::IOLoop->timer(0.1 => sub { $failed = 0; Mojo::IOLoop->stop });
 Mojo::IOLoop->start;
 ok !$failed, 'Server has started';
-cmp_ok geteuid(), '==', $uid, 'User has not changed';
-cmp_ok getegid(), '==', $gid, 'Group has not changed';
+cmp_ok getuid(), '==', $uid, 'User has not changed';
+cmp_ok getgid(), '==', $gid, 'Group has not changed';
 
 done_testing;

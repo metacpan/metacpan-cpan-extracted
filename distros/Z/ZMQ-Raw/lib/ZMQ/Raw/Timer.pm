@@ -1,5 +1,5 @@
 package ZMQ::Raw::Timer;
-$ZMQ::Raw::Timer::VERSION = '0.23';
+$ZMQ::Raw::Timer::VERSION = '0.24';
 use strict;
 use warnings;
 use Carp;
@@ -13,7 +13,7 @@ ZMQ::Raw::Timer - ZeroMQ Timer class
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 DESCRIPTION
 

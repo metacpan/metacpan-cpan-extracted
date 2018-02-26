@@ -1,5 +1,5 @@
 package Lingua::Postcodes;
-$Lingua::Postcodes::VERSION = '0.002';
+$Lingua::Postcodes::VERSION = '0.003';
 use strict;
 use warnings;
 use utf8;
@@ -84,7 +84,7 @@ my %POSTCODES = (
     IE => { EN => 'Eircode' },
     IL => { EN => 'Postal code' },
     IM => { EN => 'Postcode' },
-    IN => { EN => 'PIN code' },
+    IN => { EN => 'PIN', HI => 'डाक कोड', TA => 'அஞ்சல் குறியீடு' },
     IO => { EN => 'Postcode' },
     IQ => { EN => 'Postal code' },
     IR => { EN => 'Postal code' },
@@ -222,7 +222,7 @@ Lingua::Postcodes - Returns the names of postcodes/zipcodes
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -261,7 +261,7 @@ Lingua::Postcodes - Provide names for postcodes/zipcodes
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

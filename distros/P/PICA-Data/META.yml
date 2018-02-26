@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/gbv/PICA-Data/issues
   homepage: https://github.com/gbv/PICA-Data
   repository: https://github.com/gbv/PICA-Data.git
-version: '0.35'
+version: '0.36'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

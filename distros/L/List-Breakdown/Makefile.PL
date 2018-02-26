@@ -4,6 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     NAME             => 'List::Breakdown',
     AUTHOR           => 'Tom Ryder <tom@sanctum.geek.nz>',
     VERSION_FROM     => 'lib/List/Breakdown.pm',
@@ -22,15 +23,20 @@ WriteMakefile(
         'Exporter' => '0',
     },
     META_MERGE => {
+        'meta-spec' => { version => 2 },
         provides => {
             'List::Breakdown' => {
-                version => '0.20',
+                version => '0.21',
                 file => 'lib/List/Breakdown.pm',
             },
         },
         resources => {
             homepage => 'https://sanctum.geek.nz/cgit/List-Breakdown.git/',
-            repository => 'https://sanctum.geek.nz/code/List-Breakdown.git/',
+            repository => {
+                type => 'git',
+                url => 'https://sanctum.geek.nz/code/List-Breakdown.git/',
+                web => 'https://sanctum.geek.nz/cgit/List-Breakdown.git/',
+            },
         },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

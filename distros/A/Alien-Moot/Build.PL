@@ -1,8 +1,10 @@
 ##-*- Mode: CPerl -*-
 use strict;
 use warnings;
-
 use Alien::Base::ModuleBuild;
+
+##-- we don't expect moot to build anywhere but linux
+die("cowardly refusing to build on non-linux system; edit Build.PL and try again!") if ($^O !~ /linux/i);
 
 my $builder = Alien::Base::ModuleBuild->new
   (

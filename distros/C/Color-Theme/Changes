@@ -1,4 +1,9 @@
-Revision history for Color-Theme
+0.10.1  2018-02-25 (PERLANCAR)
+
+        - No spec changes.
+
+        - Split Color::Theme::Util and Color::Theme::Role::* to their own dists.
+
 
 0.01    2014-12-11 (PERLANCAR)
 

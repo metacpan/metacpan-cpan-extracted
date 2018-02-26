@@ -12,16 +12,17 @@ require File::Basename;
 require Data::Dumper;
 use Text::Diff;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 our @EXPORT = qw(is_deeply_snapshot);
 
 sub is_deeply_snapshot {
   my ($got, $description) = @_;
-  my $expected = undef;
+  my $expected = "undef\n";
   my $filename = _get_filename($description);
   if (-f $filename) {
     no strict;
-    $expected = _read_file($filename);
+    local $@;
+    $expected = eval { _read_file($filename) };
     Test::More::diag("Error in snapshot '$filename': $@") if $@;
   } else {
     Test::More::diag("No snapshot filename '$filename' found");

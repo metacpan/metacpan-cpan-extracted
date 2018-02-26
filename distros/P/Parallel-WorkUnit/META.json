@@ -58,7 +58,7 @@
    "provides" : {
       "Parallel::WorkUnit" : {
          "file" : "lib/Parallel/WorkUnit.pm",
-         "version" : "1.110"
+         "version" : "1.112"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/jmaslak/Parallel-WorkUnit"
       }
    },
-   "version" : "1.110",
+   "version" : "1.112",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

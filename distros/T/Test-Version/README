@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.05
+    version 2.07
 
 SYNOPSIS
 
@@ -156,6 +156,8 @@ BUGS
 
 CONTRIBUTORS
 
+      * Damyan Ivanov <dmn@debian.org>
+
       * Dave Rolsky <autarch@urth.org>
 
       * Gabor Szabo <gabor@szabgab.com>
@@ -176,7 +178,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2016 by Caleb Cushing.
+    This software is Copyright (c) 2018 by Caleb Cushing.
 
     This is free software, licensed under:
 

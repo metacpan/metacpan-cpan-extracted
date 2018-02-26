@@ -35,7 +35,7 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Encode" : "0",
+            "Encode" : "2.11",
             "Exporter" : "5.57",
             "PerlIO::encoding" : "0",
             "constant" : "0",
@@ -58,7 +58,7 @@
    "provides" : {
       "File::Slurper" : {
          "file" : "lib/File/Slurper.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/Leont/file-slurp-sane"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
       "Jim Davis <revhippie@gmail.com>",
       "Leon Timmermans <fawaka@gmail.com>",

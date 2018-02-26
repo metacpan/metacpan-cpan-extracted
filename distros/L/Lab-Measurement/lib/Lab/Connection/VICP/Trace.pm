@@ -1,6 +1,6 @@
 package Lab::Connection::VICP::Trace;
 #ABSTRACT: ???
-$Lab::Connection::VICP::Trace::VERSION = '3.620';
+$Lab::Connection::VICP::Trace::VERSION = '3.621';
 use 5.010;
 use warnings;
 use strict;
@@ -32,7 +32,7 @@ Lab::Connection::VICP::Trace - ???
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 COPYRIGHT AND LICENSE
 

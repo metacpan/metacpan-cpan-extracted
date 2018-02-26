@@ -16,6 +16,7 @@ sub call{
     $data->{post_event} = 1 if not defined $data->{post_event};
     $data->{post_event_list} = [qw(login stop state_change input_qrcode new_group new_friend new_group_member lose_group lose_friend lose_group_member friend_request)] 
         if ref $data->{post_event_list} ne 'ARRAY'; 
+    $data->{post_stdout} = 0 if not defined $data->{post_stdout};
 
     if(defined $data->{poll_api}){
         $client->on('_mojo_weixin_plugin_openwx_poll_over' => sub{
@@ -25,24 +26,27 @@ sub call{
         });
         $client->emit('_mojo_weixin_plugin_openwx_poll_over');
     }
-
+    
     $client->on(all_event => sub{
         my($client,$event,@args) =@_;
         return if not first {$event eq $_} @{ $data->{post_event_list} };
-        if(defined $data->{post_api} and ($event eq  'login' or $event eq 'stop' or $event eq 'state_change') ){
+        if($event eq  'login' or $event eq 'stop' or $event eq 'state_change'){
             my $post_json = {};
             $post_json->{post_type} = "event";
             $post_json->{event} = $event;
             $post_json->{params} = [@args];
-            my($data,$ua,$tx) = $client->http_post($data->{post_api},{ua_connect_timeout=>5,ua_request_timeout=>5,ua_inactivity_timeout=>5,ua_retry_times=>1},json=>$post_json);
-            if($tx->success){
-                $client->debug("插件[".__PACKAGE__ ."]事件[".$event . "](@args)上报成功");
-            }
-            else{
-                $client->warn("插件[".__PACKAGE__ . "]事件[".$event."](@args)上报失败:" . $client->encode("utf8",$tx->error->{message}));
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
+            if(defined $data->{post_api}){
+                my($data,$ua,$tx) = $client->http_post($data->{post_api},{ua_connect_timeout=>5,ua_request_timeout=>5,ua_inactivity_timeout=>5,ua_retry_times=>1},json=>$post_json);
+                if($tx->success){
+                    $client->debug("插件[".__PACKAGE__ ."]事件[".$event . "](@args)上报成功");
+                }
+                else{
+                    $client->warn("插件[".__PACKAGE__ . "]事件[".$event."](@args)上报失败:" . $client->encode("utf8",$tx->error->{message}));
+                }
             } 
         }
-        elsif(defined $data->{post_api} and $event eq 'input_qrcode'){
+        elsif($event eq 'input_qrcode'){
             my ($qrcode_path,$qrcode_data) = @args;
             eval{ $qrcode_data = Mojo::Util::b64_encode($qrcode_data);};
             if($@){
@@ -54,12 +58,15 @@ sub call{
             $post_json->{event} = $event;
             $post_json->{params} = [$qrcode_path,$qrcode_data];
             push @{ $post_json->{params} },$client->qrcode_upload_url if defined $client->qrcode_upload_url;
-            my($data,$ua,$tx) = $client->http_post($data->{post_api},json=>$post_json);
-            if($tx->success){
-                $client->debug("插件[".__PACKAGE__ ."]事件[".$event . "]上报成功");
-            }
-            else{
-                $client->warn("插件[".__PACKAGE__ . "]事件[".$event."]上报失败:" . $client->encode("utf8",$tx->error->{message}));
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
+            if(defined $data->{post_api}){
+                my($data,$ua,$tx) = $client->http_post($data->{post_api},json=>$post_json);
+                if($tx->success){
+                    $client->debug("插件[".__PACKAGE__ ."]事件[".$event . "]上报成功");
+                }
+                else{
+                    $client->warn("插件[".__PACKAGE__ . "]事件[".$event."]上报失败:" . $client->encode("utf8",$tx->error->{message}));
+                }
             }
         }
         elsif($event =~ /^new_group|lose_group|new_friend|lose_friend|new_group_member|lose_group_member$/){
@@ -73,6 +80,7 @@ sub call{
                 $post_json->{params} = [$args[0]->to_json_hash(0)];
             }
             $check_event_list->append($post_json);
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
             $client->http_post($data->{post_api},json=>$post_json,sub{
                 my($data,$ua,$tx) = @_;
                 if($tx->success){
@@ -91,6 +99,7 @@ sub call{
                 params    => [$object->to_json_hash(0),$property,$old,$new],
             };
             $check_event_list->append($post_json);
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
             $client->http_post($data->{post_api},json=>$post_json,sub{
                 my($data,$ua,$tx) = @_;
                 if($tx->success){
@@ -110,6 +119,7 @@ sub call{
                 params    => [$id,$displayname,$verify,$ticket],
             };
             $check_event_list->append($post_json);
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
             $client->http_post($data->{post_api},json=>$post_json,sub{
                 my($data,$ua,$tx) = @_;
                 if($tx->success){
@@ -127,6 +137,7 @@ sub call{
                 event     => $event,
                 params    => [$event eq 'update_user'?$ref->to_json_hash():map {$_->to_json_hash()} @{$ref}], 
             };
+            $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
             $client->http_post($data->{post_api},json=>$post_json,sub{
                 my($data,$ua,$tx) = @_;
                 if($tx->success){
@@ -145,14 +156,15 @@ sub call{
         delete $post_json->{media_data} if ($post_json->{format} eq "media" and ! $data->{post_media_data});
         $post_json->{post_type} = "receive_message";
         $check_event_list->append($post_json);
+        $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
         $client->http_post($data->{post_api},json=>$post_json,sub{
             my($data,$ua,$tx) = @_;
             if($tx->success){
-                $client->debug("插件[".__PACKAGE__ ."]接收消息[".$msg->id."]上报成功");
+                $client->debug( $tx->res->body );
                 if($tx->res->headers->content_type =~m#text/json|application/json#){
                     #文本类的返回结果必须是json字符串
                     my $json;
-                    eval{$json = $client->from_json($tx->res->body)};
+                    eval{$json = $client->decode_json($tx->res->body);$client->reform($json)};
                     if($@){$client->warn($@);return}
                     if(defined $json){
                         #暂时先不启用format的属性
@@ -160,7 +172,6 @@ sub call{
                         #if((!defined $json->{format}) or (defined $json->{format} and $json->{format} eq "text")){
                         #    $msg->reply(Encode::encode("utf8",$json->{reply})) if defined $json->{reply};
                         #}
-
                         $msg->reply($json->{reply}) if defined $json->{reply};
                         $msg->reply_media($json->{media}) if defined $json->{media} and $json->{media} =~ /^https?:\/\//;
                     }
@@ -182,6 +193,7 @@ sub call{
         delete $post_json->{media_data} if ($post_json->{format} eq "media" and ! $data->{post_media_data});
         $post_json->{post_type} = "send_message";
         $check_event_list->append($post_json);
+        $client->stdout_line($client->to_json($post_json)) if $data->{post_stdout};
         $client->http_post($data->{post_api},json=>$post_json,sub{
             my($data,$ua,$tx) = @_;
             if($tx->success){
@@ -189,7 +201,7 @@ sub call{
                 if($tx->res->headers->content_type =~m#text/json|application/json#){
                     #文本类的返回结果必须是json字符串
                     my $json;
-                    eval{$json = $client->from_json($tx->res->body)};
+                    eval{$json = $client->decode_json($tx->res->body);$client->reform($json)};
                     if($@){$client->warn($@);return}
                     if(defined $json){
                         #{code=>0,reply=>"回复的消息",format=>"text"}
@@ -269,6 +281,7 @@ sub call{
     get '/openwx/get_user_info'     => sub {$_[0]->safe_render(json=>$client->user->to_json_hash());};
     get '/openwx/get_friend_info'   => sub {$_[0]->safe_render(json=>[map {$_->to_json_hash()} @{$client->friend}]); };
     get '/openwx/get_group_info'    => sub {$_[0]->safe_render(json=>[map {$_->to_json_hash()} @{$client->group}]); };
+    get '/openwx/get_group_basic_info' =>  sub {$_[0]->safe_render(json=>[map {delete $_->{member};$_} map {$_->to_json_hash()} @{$client->group}]); };
     any [qw(GET POST)] => '/openwx/check_event'          => sub{
         my $c = shift;
         $c->render_later;
@@ -731,15 +744,13 @@ sub call{
     };
     any '/*whatever'  => sub{whatever=>'',$_[0]->safe_render(text=>"api not found",status=>403)};
     package Mojo::Weixin::Plugin::Openwx;
+    no utf8;
     $server = Mojo::Weixin::Server->new();   
     $server->app($server->build_app("Mojo::Weixin::Plugin::Openwx::App"));
     $server->app->secrets("hello world");
     $server->app->log($client->log);
-    if(ref $data eq "ARRAY"){#旧版本兼容性
-        $server->listen([ map { 'http://' . (defined $_->{host}?$_->{host}:"0.0.0.0") .":" . (defined $_->{port}?$_->{port}:5000)} @$data]);
-    }
-    elsif(ref $data eq "HASH" and ref $data->{listen} eq "ARRAY"){
-        my @listen;
+    my @listen;
+    if(ref $data eq "HASH" and ref $data->{listen} eq "ARRAY"){
         for my $listen (@{$data->{listen}}) {
             if($listen->{tls}){
                 my $listen_url = 'https://' . ($listen->{host} // "0.0.0.0") . ":" . ($listen->{port}//443);
@@ -755,11 +766,13 @@ sub call{
                 push @listen,$listen_url;
             }
             else{
-                push @listen,'http://' . ($listen->{host} // "0.0.0.0") . ":" . ($listen->{port}//5000) ;
+                push @listen,'http://' . ($listen->{host} // "0.0.0.0") . ":" . ($listen->{port}//3000) ;
             }
         }   
-        $server->listen(\@listen) ;
     }
+    else{ @listen = ( 'http://0.0.0.0:3000' ); }
+    $server->listen(\@listen) ;
+    $client->info("插件[Mojo::Weixin::Plugin::Openwx]监听地址: [ " . join(", ",@listen) . " ]");
     $server->start;
 }
 1;

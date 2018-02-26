@@ -3,19 +3,16 @@ use strict;
 use warnings;
 use parent 'DBIx::DataModel::Meta';
 use DBIx::DataModel;
-use DBIx::DataModel::Meta::Utils;
+use DBIx::DataModel::Meta::Utils qw/define_class define_readonly_accessors/;
 use DBIx::DataModel::Source::Join;
 use DBIx::DataModel::Meta::Source::Join;
 
-use Params::Validate     qw/validate SCALAR ARRAYREF CODEREF UNDEF BOOLEAN
-                                     OBJECT HASHREF/;
+use Params::Validate     qw/validate_with SCALAR ARRAYREF CODEREF UNDEF BOOLEAN
+                                          OBJECT HASHREF/;
 use List::MoreUtils      qw/any firstval lastval uniq/;
-use Scalar::Util         qw/reftype/;
 use Module::Load         qw/load/;
-use Carp;
+use Carp::Clan           qw[^(DBIx::DataModel::|SQL::Abstract)];
 use namespace::clean;
-
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
 
 #----------------------------------------------------------------------
 # Params::Validate specification for new()
@@ -28,6 +25,7 @@ my $spec = {
                                    default => 'DBIx::DataModel::Schema'},
 
   sql_no_inner_after_left_join => {type => BOOLEAN, optional => 1},
+  join_with_USING              => {type => BOOLEAN, optional => 1},
 
   # fields below are in common with tables (schema is a kind of "pseudo-root")
   auto_insert_columns          => {type => HASHREF, default => {}},
@@ -63,10 +61,6 @@ my $statement_class = 'DBIx::DataModel::Statement';
 $spec->{statement_class}        = {type    => SCALAR, 
                                    isa     => $statement_class,
                                    default => $statement_class};
-my $connected_source_class = 'DBIx::DataModel::ConnectedSource';
-$spec->{connected_source_class} = {type    => SCALAR, 
-                                   isa     => $connected_source_class,
-                                   default => $connected_source_class};
 
 
 #----------------------------------------------------------------------
@@ -77,7 +71,11 @@ sub new {
   my $class = shift;
 
   # check parameters
-  my $self = validate(@_, $spec);
+  my $self = validate_with(
+    params      => \@_,
+    spec        => $spec,
+    allow_extra => 0,
+   );
 
   # canonical representations (arrayref) for some attributes
   for my $attr (qw/isa table_parent parent join_parent/) {
@@ -95,7 +93,7 @@ sub new {
   bless $self, $class;
 
   # create the Perl class
-  DBIx::DataModel::Meta::Utils->define_class(
+  define_class(
     name    => $self->{class},
     isa     => $isa,
     metadm  => $self,
@@ -105,9 +103,7 @@ sub new {
 }
 
 # accessors for args passed to new()
-DBIx::DataModel::Meta::Utils->define_readonly_accessors(
-  __PACKAGE__, grep {$_ ne 'isa'} keys %$spec
- );
+define_readonly_accessors(__PACKAGE__, grep {$_ ne 'isa'} keys %$spec);
 
 # accessors for internal lists of other meta-objects
 foreach my $kind (qw/table association type join/) {
@@ -226,7 +222,7 @@ sub Composition {
 # PUBLIC BACK-END METHODS FOR DECLARING SCHEMA MEMBERS
 #----------------------------------------------------------------------
 
-# common pattern for qw/table association type/; "join" is specific (see below)
+# common pattern for defining tables, associations and types
 foreach my $kind (qw/table association type/) {
   my $metaclass = "${kind}_metaclass";
   no strict 'refs';
@@ -250,6 +246,7 @@ foreach my $kind (qw/table association type/) {
 }
 
 
+# defining joins (different from the common pattern above)
 sub define_join {
   my $self = shift;
 
@@ -271,6 +268,7 @@ sub define_join {
     my $join_spec = {
       operator  => $join->{kind},
       condition => $join->{condition},
+      using     => $join->{using},
     };
     push @sqla_join_args, $join_spec, $join->{db_table};
   }
@@ -338,7 +336,9 @@ sub _parse_join_path {
   # build first member of the @join result
   my %first_join = (kind => '', name => $initial_table);
   $initial_table =~ s/\|(.+)$//  and $first_join{alias} = $1;
-  my $table = $self->table($initial_table);
+  my $table = $self->table($initial_table)
+    or croak "...->join('$initial_table', ...) : this schema has "
+           . "no table named '$initial_table'";
   $first_join{table}       = $table;
   $first_join{primary_key} = [$table->primary_key];
   $first_join{db_table}    = $table->db_from;
@@ -354,8 +354,9 @@ sub _parse_join_path {
   my $seen_left_join;
 
   foreach my $join_name (@join_names) {
-    # if it is a INNER (<=>) or LEFT (=>) connector ..
-    if ($join_name =~ /^<?=>$/) {
+
+    # if it is a connector like '=>' or '<=>' or '<=' (see SQLAM syntax) ...
+    if ($join_name =~ /^[<>]?=[<>=]?$/) {
       !$join_kind or croak "'$join_kind' can't be followed by '$join_name'";
       $join_kind = $join_name;
       # TODO: accept more general join syntax as recognized by SQLA::More::join
@@ -388,10 +389,23 @@ sub _parse_join_path {
       # build new join hashref and insert it into appropriate structures
       my $left_table  = $source_join->{alias} || $source_join->{db_table};
       my $right_table = $alias || $path->{to}->db_from;
-      my %condition;
+      my %condition;   # for joining with a ON clause
+      my $using = [];  # for joining with a USING clause
       while (my ($left_col, $right_col) = each %{$path->{on}}) {
+        if ($left_col eq $right_col) {
+          # both cols of equal name ==> can participate in a USING clause
+          push @$using, $left_col if $using;
+        }
+        else {
+          # USING clause no longer possible as soon as there are unequal names
+          undef $using;
+        }
+
+        # for the ON clause, prefix column names by their table names
         # FIXME: honor SQL::Abstract's "name_sep" setting
-        $condition{"$left_table.$left_col"} = { -ident => "$right_table.$right_col" };
+        $left_col  = "$left_table.$left_col";
+        $right_col = "$right_table.$right_col";
+        $condition{$left_col} = { -ident => $right_col };
       }
       my $db_table = $path->{to}->db_from;
       $db_table .= "|$alias" if $alias;
@@ -400,7 +414,9 @@ sub _parse_join_path {
                        alias     => $alias,
                        table     => $path->{to},
                        db_table  => $db_table,
-                       condition => \%condition,   };
+                       condition => \%condition,
+                       using     => $using,
+                     };
       push @joins, $new_join;
       $source{$alias || $path_name} = $new_join;
 

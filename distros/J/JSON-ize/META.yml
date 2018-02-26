@@ -1,0 +1,27 @@
+---
+abstract: 'Use JSON easily in one-liners'
+author:
+  - 'Mark A. Jensen'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-ize
+provides:
+  JSON::ize:
+    file: lib/JSON/ize.pm
+    version: '0.101'
+requires:
+  JSON: '2'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=JSONize
+  repository: https://github.com/majensen/jsonize
+version: '0.101'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

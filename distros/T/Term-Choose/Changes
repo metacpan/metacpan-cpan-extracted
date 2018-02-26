@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.512   2018-02-25
+        - "line_fold": 'split' with limit -1 preserves trailing empty fields.
+        - Warning if deprecated method "config" is used.
+        - Env var "tc_reset_auto_up".
+
 1.511   2018-02-10
         - Bugfix: don't link the original list to a self hash element.
         - Deprecation: method "config".

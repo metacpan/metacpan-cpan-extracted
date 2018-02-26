@@ -1,3 +1,40 @@
+2.039011 - 2018-02-25
+
+  [ENHANCEMENTS]
+
+  * use PG COPY for bulk insert of jobs with prefix
+  * support IP prefix enum expansion in scheduler
+
+  [BUG FIXES]
+
+  * avoid skips that go twice past max_deferrals not being reduced
+  * move random() in TastyJobs to where it is more useful
+
+2.039010 - 2018-02-22
+
+  [NEW FEATURES]
+
+  * support for multiples of the same action in schedule config
+
+2.039009 - 2018-02-22
+
+  [NEW FEATURES]
+
+  * Port Properties DB table to gather and store port error disable
+  * show errored ports in Device Port view, and errored ports report
+  * support system_reports config to allow easier build-in reports
+  * support for "queue only" submission of jobs to netdisco-do using --enqueue
+  * support for job params (device, port, extra) in schedule config
+
+  [ENHANCEMENTS]
+
+  * larger port status icons in Device Ports view
+  * --quiet mode for netdisco-do
+
+  [BUG FIXES]
+
+  * handle malformed IPs in c_ip results
+
 2.039007 - 2018-02-16
 
   [ENHANCEMENTS]

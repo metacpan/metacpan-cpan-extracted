@@ -3,23 +3,28 @@ package Test::BDD::Cucumber::Definitions::Struct::In;
 use strict;
 use warnings;
 
-use Test::BDD::Cucumber::StepFile qw(Given When Then);
+use Test::BDD::Cucumber::Definitions qw(Given When Then);
 use Test::BDD::Cucumber::Definitions::Struct qw(:util);
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
 
-# data structure jsonpath "" eq ""
-Then qr/data structure jsonpath "(.+?)" eq "(.+)"/, sub {
+# http response content read JSON
+When qr/http response content read JSON/, sub {
+    read_content();
+};
+
+# struct data element "" eq ""
+Then qr/struct data element "(.+?)" eq "(.*)"/, sub {
     my ( $jsonpath, $value ) = ( $1, $2 );
 
     jsonpath_eq( $jsonpath, $value );
 };
 
-# data structure jsonpath "" re ""
-Then qr/data structure jsonpath "(.+?)" re "(.+)"/, sub {
+# struct data element "" re ""
+Then qr/struct data element "(.+?)" re "(.+)"/, sub {
     my ( $jsonpath, $value ) = ( $1, $2 );
 
     jsonpath_re( $jsonpath, $value );

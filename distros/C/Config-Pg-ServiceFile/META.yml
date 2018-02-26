@@ -1,0 +1,35 @@
+---
+abstract: 'PostgreSQL connection service file parser'
+author:
+  - 'Paul Williams <kwakwa@cpan.org>'
+build_requires:
+  Data::Section: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Config-Pg-ServiceFile
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Config::INI::Reader: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kwakwaversal/config-pg-servicefile/issues
+  homepage: https://github.com/kwakwaversal/config-pg-servicefile
+  repository: https://github.com/kwakwaversal/config-pg-servicefile.git
+version: '0.02'
+x_contributors:
+  - 'Paul Williams <kwakwaversal@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

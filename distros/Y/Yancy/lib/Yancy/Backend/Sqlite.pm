@@ -1,5 +1,5 @@
 package Yancy::Backend::Sqlite;
-our $VERSION = '0.017';
+our $VERSION = '0.020';
 # ABSTRACT: A backend for SQLite using Mojo::SQLite
 
 #pod =head1 SYNOPSIS
@@ -50,12 +50,12 @@ our $VERSION = '0.017';
 #pod So, if you have the following schema:
 #pod
 #pod     CREATE TABLE people (
-#pod         id SERIAL,
+#pod         id INTEGER PRIMARY KEY,
 #pod         name VARCHAR NOT NULL,
 #pod         email VARCHAR NOT NULL
 #pod     );
 #pod     CREATE TABLE business (
-#pod         id SERIAL,
+#pod         id INTEGER PRIMARY KEY,
 #pod         name VARCHAR NOT NULL,
 #pod         email VARCHAR NULL
 #pod     );
@@ -126,7 +126,8 @@ sub create {
     my $inserted_id = $self->sqlite->db->insert( $coll, $params )->last_insert_id;
     # SQLite does not have a 'returning' syntax. Assume id field is correct
     # if passed, created otherwise:
-    return $self->get( $coll, $params->{$id_field} // $inserted_id );
+    return $self->get( $coll, $params->{$id_field} // $inserted_id )
+        || die "Could not fetch newly-created item (table missing primary key?)\n";
 }
 
 sub get {
@@ -272,7 +273,7 @@ Yancy::Backend::Sqlite - A backend for SQLite using Mojo::SQLite
 
 =head1 VERSION
 
-version 0.017
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -322,12 +323,12 @@ database.
 So, if you have the following schema:
 
     CREATE TABLE people (
-        id SERIAL,
+        id INTEGER PRIMARY KEY,
         name VARCHAR NOT NULL,
         email VARCHAR NOT NULL
     );
     CREATE TABLE business (
-        id SERIAL,
+        id INTEGER PRIMARY KEY,
         name VARCHAR NOT NULL,
         email VARCHAR NULL
     );
@@ -372,7 +373,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

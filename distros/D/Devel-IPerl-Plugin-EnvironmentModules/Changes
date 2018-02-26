@@ -1,5 +1,12 @@
 Revision history for perl distribution Devel-IPerl-Plugin-EnvironmentModules
 
+0.03 2018-02-20T09:34:18+1300
+ - integrate changes to PERL5LIB into the current kernel
+ - move to Capture::Tiny for module_avail, module_list and module_show for
+   improved functionality
+ - more simple tests for cpan testers.
+ - add supported helpers module_list_array and module_search
+
 0.02 2018-02-09T16:16:19+1300
  - Plugin created
  - add supported helpers module_avail, module_list, module_load, module_show and

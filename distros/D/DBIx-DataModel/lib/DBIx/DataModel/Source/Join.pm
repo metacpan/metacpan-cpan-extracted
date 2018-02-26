@@ -4,9 +4,32 @@ use strict;
 use parent 'DBIx::DataModel::Source';
 use mro 'c3';
 require 5.008; # for filehandle in memory
-use Carp;
+use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+sub db_from {
+  my $self = shift;
+
+  # list of join components from the Meta::Join
+  my $db_from   = $self->metadm->db_from;
+
+  # if there is no db_schema, just return that list
+  my $db_schema = $self->schema->db_schema
+    or return $db_from;
+
+  # otherwise, prefix each table in list with $db_schema. The list is of
+  # shape: [-join => $table1, $join_spec1, $table2, $join_spec2 .... $table_n];
+  # therefore tables are at odd positions in the list. Tables already containing
+  # a '.' are left untouched.
+  my @copy = @$db_from;
+  for (my $i=1; $i < @copy; $i += 2) {
+    /\./ or $_ = "$db_schema.$_" for $copy[$i];
+  }
+
+  return \@copy;
+}
+
+
+
 
 # Support for Storable::{freeze,thaw} : just a stupid blank operation,
 # but that will force Storable::thaw to try to reload the join class ... 
@@ -75,7 +98,7 @@ DBIx::DataModel::Source::Join - Parent for Join classes
 
 This is the parent class for all join classes created through
 
-  $schema->Join($classname, ...);
+  $schema->join($classname, ...);
 
 =head1 METHODS
 

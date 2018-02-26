@@ -8,8 +8,8 @@ use NpsSDK::Errors;
 
 our $VERSION = '1.4'; # VERSION
 
-our ($logger, $environment, $secret_key, $timeout, $log_level, $log_file, $sanitize,
-     $proxy_url, $proxy_port, $proxy_user, $proxy_pass, $certificate, $certificate_key, $cert_verify_peer);
+our ($logger, $environment, $secret_key, $timeout, $sanitize, $proxy_url, $proxy_port,
+     $proxy_user, $proxy_pass, $certificate, $certificate_key, $cert_verify_peer);
 
 sub configure {
     my %params = (@_);
@@ -18,8 +18,6 @@ sub configure {
     $sanitize = $params{sanitize} if defined $params{sanitize};
     $timeout = $params{timeout} ? $params{timeout} : 60;
     $logger = $params{logger};
-    $log_level = $params{log_level} if defined $params{log_level};
-    $log_file = $params{log_file} if defined $params{log_file};
     $proxy_url = $params{proxy_url} if defined $params{proxy_url};
     $proxy_port = $params{proxy_port} if defined $params{proxy_port};
     $proxy_user = $params{proxy_user} if defined $params{proxy_user};

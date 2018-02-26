@@ -1,0 +1,71 @@
+{
+   "abstract" : "Load mix-ins or components to your C3-based class",
+   "author" : [
+      "Ash Berlin <ash@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-C3-Componentised",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::C3" : "0.20",
+            "Class::Inspector" : "1.32",
+            "MRO::Compat" : "0.09",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Class-C3-Componentised@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-C3-Componentised"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Class-C3-Componentised.git",
+         "web" : "https://github.com/p5sagit/Class-C3-Componentised"
+      }
+   },
+   "version" : "1.001002",
+   "x_authority" : "cpan:FREW",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20180120';
+our $VERSION = '5.20180220';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -328,6 +328,7 @@ sub changes_between {
     5.027006 => '2017-11-20',
     5.027007 => '2017-12-20',
     5.027008 => '2018-01-20',
+    5.027009 => '2018-02-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -15014,6 +15015,155 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.027009 => {
+        delta_from => 5.027008,
+        changed => {
+            'B::Op_private'         => '5.027009',
+            'Carp'                  => '1.46',
+            'Carp::Heavy'           => '1.46',
+            'Config'                => '5.027009',
+            'Cwd'                   => '3.74',
+            'Devel::PPPort'         => '3.39',
+            'Encode'                => '2.96',
+            'Encode::Unicode'       => '2.17',
+            'Errno'                 => '1.29',
+            'ExtUtils::Command'     => '7.32',
+            'ExtUtils::Command::MM' => '7.32',
+            'ExtUtils::Liblist'     => '7.32',
+            'ExtUtils::Liblist::Kid'=> '7.32',
+            'ExtUtils::MM'          => '7.32',
+            'ExtUtils::MM_AIX'      => '7.32',
+            'ExtUtils::MM_Any'      => '7.32',
+            'ExtUtils::MM_BeOS'     => '7.32',
+            'ExtUtils::MM_Cygwin'   => '7.32',
+            'ExtUtils::MM_DOS'      => '7.32',
+            'ExtUtils::MM_Darwin'   => '7.32',
+            'ExtUtils::MM_MacOS'    => '7.32',
+            'ExtUtils::MM_NW5'      => '7.32',
+            'ExtUtils::MM_OS2'      => '7.32',
+            'ExtUtils::MM_QNX'      => '7.32',
+            'ExtUtils::MM_UWIN'     => '7.32',
+            'ExtUtils::MM_Unix'     => '7.32',
+            'ExtUtils::MM_VMS'      => '7.32',
+            'ExtUtils::MM_VOS'      => '7.32',
+            'ExtUtils::MM_Win32'    => '7.32',
+            'ExtUtils::MM_Win95'    => '7.32',
+            'ExtUtils::MY'          => '7.32',
+            'ExtUtils::MakeMaker'   => '7.32',
+            'ExtUtils::MakeMaker::Config'=> '7.32',
+            'ExtUtils::MakeMaker::Locale'=> '7.32',
+            'ExtUtils::MakeMaker::version'=> '7.32',
+            'ExtUtils::MakeMaker::version::regex'=> '7.32',
+            'ExtUtils::Mkbootstrap' => '7.32',
+            'ExtUtils::Mksymlists'  => '7.32',
+            'ExtUtils::ParseXS'     => '3.38',
+            'ExtUtils::ParseXS::Constants'=> '3.38',
+            'ExtUtils::ParseXS::CountLines'=> '3.38',
+            'ExtUtils::ParseXS::Eval'=> '3.38',
+            'ExtUtils::ParseXS::Utilities'=> '3.38',
+            'ExtUtils::Typemaps'    => '3.38',
+            'ExtUtils::Typemaps::Cmd'=> '3.38',
+            'ExtUtils::Typemaps::InputMap'=> '3.38',
+            'ExtUtils::Typemaps::OutputMap'=> '3.38',
+            'ExtUtils::Typemaps::Type'=> '3.38',
+            'ExtUtils::testlib'     => '7.32',
+            'File::Spec'            => '3.74',
+            'File::Spec::AmigaOS'   => '3.74',
+            'File::Spec::Cygwin'    => '3.74',
+            'File::Spec::Epoc'      => '3.74',
+            'File::Spec::Functions' => '3.74',
+            'File::Spec::Mac'       => '3.74',
+            'File::Spec::OS2'       => '3.74',
+            'File::Spec::Unix'      => '3.74',
+            'File::Spec::VMS'       => '3.74',
+            'File::Spec::Win32'     => '3.74',
+            'IPC::Cmd'              => '1.00',
+            'Math::BigFloat::Trace' => '0.49',
+            'Math::BigInt::Trace'   => '0.49',
+            'Module::CoreList'      => '5.20180220',
+            'Module::CoreList::Utils'=> '5.20180220',
+            'POSIX'                 => '1.82',
+            'PerlIO::encoding'      => '0.26',
+            'Storable'              => '3.06',
+            'Storable::Limit'       => undef,
+            'Storable::__Storable__'=> '3.06',
+            'Test2'                 => '1.302122',
+            'Test2::API'            => '1.302122',
+            'Test2::API::Breakage'  => '1.302122',
+            'Test2::API::Context'   => '1.302122',
+            'Test2::API::Instance'  => '1.302122',
+            'Test2::API::Stack'     => '1.302122',
+            'Test2::Event'          => '1.302122',
+            'Test2::Event::Bail'    => '1.302122',
+            'Test2::Event::Diag'    => '1.302122',
+            'Test2::Event::Encoding'=> '1.302122',
+            'Test2::Event::Exception'=> '1.302122',
+            'Test2::Event::Fail'    => '1.302122',
+            'Test2::Event::Generic' => '1.302122',
+            'Test2::Event::Note'    => '1.302122',
+            'Test2::Event::Ok'      => '1.302122',
+            'Test2::Event::Pass'    => '1.302122',
+            'Test2::Event::Plan'    => '1.302122',
+            'Test2::Event::Skip'    => '1.302122',
+            'Test2::Event::Subtest' => '1.302122',
+            'Test2::Event::TAP::Version'=> '1.302122',
+            'Test2::Event::Waiting' => '1.302122',
+            'Test2::EventFacet'     => '1.302122',
+            'Test2::EventFacet::About'=> '1.302122',
+            'Test2::EventFacet::Amnesty'=> '1.302122',
+            'Test2::EventFacet::Assert'=> '1.302122',
+            'Test2::EventFacet::Control'=> '1.302122',
+            'Test2::EventFacet::Error'=> '1.302122',
+            'Test2::EventFacet::Info'=> '1.302122',
+            'Test2::EventFacet::Meta'=> '1.302122',
+            'Test2::EventFacet::Parent'=> '1.302122',
+            'Test2::EventFacet::Plan'=> '1.302122',
+            'Test2::EventFacet::Render'=> '1.302122',
+            'Test2::EventFacet::Trace'=> '1.302122',
+            'Test2::Formatter'      => '1.302122',
+            'Test2::Formatter::TAP' => '1.302122',
+            'Test2::Hub'            => '1.302122',
+            'Test2::Hub::Interceptor'=> '1.302122',
+            'Test2::Hub::Interceptor::Terminator'=> '1.302122',
+            'Test2::Hub::Subtest'   => '1.302122',
+            'Test2::IPC'            => '1.302122',
+            'Test2::IPC::Driver'    => '1.302122',
+            'Test2::IPC::Driver::Files'=> '1.302122',
+            'Test2::Tools::Tiny'    => '1.302122',
+            'Test2::Util'           => '1.302122',
+            'Test2::Util::ExternalMeta'=> '1.302122',
+            'Test2::Util::Facets2Legacy'=> '1.302122',
+            'Test2::Util::HashBase' => '1.302122',
+            'Test2::Util::Trace'    => '1.302122',
+            'Test::Builder'         => '1.302122',
+            'Test::Builder::Formatter'=> '1.302122',
+            'Test::Builder::Module' => '1.302122',
+            'Test::Builder::Tester' => '1.302122',
+            'Test::Builder::Tester::Color'=> '1.302122',
+            'Test::Builder::TodoDiag'=> '1.302122',
+            'Test::More'            => '1.302122',
+            'Test::Simple'          => '1.302122',
+            'Test::Tester'          => '1.302122',
+            'Test::Tester::Capture' => '1.302122',
+            'Test::Tester::CaptureRunner'=> '1.302122',
+            'Test::Tester::Delegate'=> '1.302122',
+            'Test::use::ok'         => '1.302122',
+            'Time::HiRes'           => '1.9753',
+            'XS::APItest'           => '0.96',
+            'bigint'                => '0.49',
+            'bignum'                => '0.49',
+            'bigrat'                => '0.49',
+            'encoding'              => '2.22',
+            'if'                    => '0.0608',
+            'mro'                   => '1.22',
+            'ok'                    => '1.302122',
+            'threads'               => '2.22',
+            'warnings'              => '1.41',
+        },
+        removed => {
+            'Module::CoreList::TieHashDelta'=> 1,
+        }
+    },
 );
 
 sub is_core
@@ -15038,6 +15188,11 @@ sub is_core
     # On the way if we pass the required module version, we can
     # short-circuit and return true
     if (defined($module_version)) {
+        my $module_version_object = eval { version->parse($module_version) };
+        if (!defined($module_version_object)) {
+            (my $err = $@) =~ s/^Invalid version format\b/Invalid version '$module_version' specified/;
+            die $err;
+        }
         # The Perl releases aren't a linear sequence, but a tree. We need to build the path
         # of releases from 5 to the specified release, and follow the module's version(s)
         # along that path.
@@ -15055,7 +15210,7 @@ sub is_core
             last RELEASE if $prn > $perl_version;
             next unless defined(my $next_module_version
                                    = $delta{$prn}->{changed}->{$module});
-            return 1 if version->parse($next_module_version) >= version->parse($module_version);
+            return 1 if eval { version->parse($next_module_version) >= $module_version_object };
         }
         return 0;
     }
@@ -15863,6 +16018,13 @@ sub is_core
         removed => {
         }
     },
+    5.027009 => {
+        delta_from => 5.027008,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -16250,6 +16412,7 @@ sub is_core
     'Test2::EventFacet::Meta'=> 'cpan',
     'Test2::EventFacet::Parent'=> 'cpan',
     'Test2::EventFacet::Plan'=> 'cpan',
+    'Test2::EventFacet::Render'=> 'cpan',
     'Test2::EventFacet::Trace'=> 'cpan',
     'Test2::Formatter'      => 'cpan',
     'Test2::Formatter::TAP' => 'cpan',
@@ -16702,6 +16865,7 @@ sub is_core
     'Test2::EventFacet::Meta'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Parent'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Plan'=> 'http://github.com/Test-More/test-more/issues',
+    'Test2::EventFacet::Render'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::EventFacet::Trace'=> 'http://github.com/Test-More/test-more/issues',
     'Test2::Formatter'      => 'http://github.com/Test-More/test-more/issues',
     'Test2::Formatter::TAP' => 'http://github.com/Test-More/test-more/issues',

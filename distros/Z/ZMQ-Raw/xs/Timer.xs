@@ -16,18 +16,19 @@ _new (class, context, after, interval)
 	CODE:
 		ctx = ZMQ_SV_TO_PTR (Context, context);
 
-		zmq_raw_mutex_lock (timers_mutex);
-		if (timers == NULL)
+		zmq_raw_mutex_lock (ctx->mutex);
+		if (ctx->timers == NULL)
 		{
-			timers = zmq_raw_timers_create();
-			if (timers == NULL)
+			ctx->timers = zmq_raw_timers_create();
+			if (ctx->timers == NULL)
+			{
+				zmq_raw_mutex_unlock (ctx->mutex);
 				zmq_raw_check_error (-1);
-
-			atexit (zmq_raw_timers_cleanup);
+			}
 		}
-		zmq_raw_mutex_unlock (timers_mutex);
+		zmq_raw_mutex_unlock (ctx->mutex);
 
-		timer = zmq_raw_timers_start (timers, ctx->context,
+		timer = zmq_raw_timers_start (ctx->timers, ctx->context,
 			after, SvIOK (interval) ? SvIV (interval) : 0);
 		if (timer == NULL)
 			zmq_raw_check_error (-1);

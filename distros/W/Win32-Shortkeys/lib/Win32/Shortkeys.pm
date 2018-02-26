@@ -7,11 +7,11 @@ Win32::Shortkeys - A shortkeys perl script for windows
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut
 
@@ -149,8 +149,11 @@ sub process_key {
         if ( $shk_use_clpbrd{$shk} ) {
             my $data = $self->{shkm}->get_data;
             $data =~ s/\n/\015\012/g;
-            my $oct = Encode::encode("cp1250", $data);
+            #utf8 required:
+            #my $oct = Encode::encode("cp1250", $data);
+            my $oct = Encode::encode("iso-8859-1", $data);
             Win32::Clipboard::Set($oct);
+            #Win32::Clipboard::Set($data);
             usleep( $self->{usleep_delay} );
             # send length($shk) + 1 delete keys + ctrl + v
             paste_from_clpb( length($shk) + 1 );

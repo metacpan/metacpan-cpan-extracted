@@ -1,5 +1,12 @@
 Revision history for Perl extension DBD::mysqlPPrawSjis
 
+0.13 2018-02-21 00:00:00
+  - change META.yml version 1.3 to 1.4
+  - remove pMakefile.PL
+  - add pmake.bat
+  - add LICENSE
+  - created by INABA Hitoshi
+
 0.12 2018-02-04 00:00:00
   - retry Kwalitee Indicator: distname_matches_name_in_meta
   - created by INABA Hitoshi

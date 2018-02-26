@@ -1,11 +1,11 @@
 lib/Stable/Module.pm
-lib/Test/Simply.pm
 Changes
 Makefile.PL
-pMakefile.PL
+pmake.bat
 MANIFEST
 README
 META.yml
+LICENSE
 t/0101_Cwd_cwd.t
 t/0201_FindBin_Bin.t
 t/0301_FileBasename_fileparse.t

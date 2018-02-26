@@ -1,30 +1,33 @@
 ---
-abstract: ~
+abstract: 'Load mix-ins or components to your C3-based class'
 author:
   - 'Ash Berlin <ash@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  Test::Exception: '0.31'
+  Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.01'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Class-C3-Componentised
 no_index:
   directory:
-    - inc
     - t
+    - xt
 requires:
-  Carp: 0
-  Class::C3: 0.20
-  Class::Inspector: 0
-  MRO::Compat: 0
-  Test::Exception: 0
-  perl: 5.6.2
+  Class::C3: '0.20'
+  Class::Inspector: '1.32'
+  MRO::Compat: '0.09'
+  perl: '5.006002'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-C3-Componentised
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/p5sagit/Class-C3-Componentised.git
-version: 1.001000
+version: '1.001002'
+x_authority: cpan:FREW
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

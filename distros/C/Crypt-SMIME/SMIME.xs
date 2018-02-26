@@ -40,6 +40,9 @@ struct crypt_smime {
     X509_STORE* pubkeys_store;
 
     bool pubkeys_are_tainted;
+
+    X509_VERIFY_PARAM *verify_params;
+    bool verify_time_is_tainted;
 };
 typedef struct crypt_smime * Crypt_SMIME;
 
@@ -249,6 +252,10 @@ static SV* check(Crypt_SMIME this, char* signed_mime, int flags) {
         return NULL;
     }
 
+    if(this->verify_params) {
+        X509_STORE_set1_param(this->pubkeys_store, this->verify_params);
+    }
+
     err = CMS_verify(cms, this->pubkeys_stack, this->pubkeys_store, detached, outbuf, flags);
     CMS_ContentInfo_free(cms);
 
@@ -265,7 +272,7 @@ static SV* check(Crypt_SMIME this, char* signed_mime, int flags) {
     result = newSVpv(bufmem->data, bufmem->length);
     BIO_free(outbuf);
 
-    if (this->pubkeys_are_tainted) {
+    if (this->pubkeys_are_tainted || this->verify_time_is_tainted) {
         SvTAINTED_on(result);
     }
 
@@ -432,6 +439,9 @@ DESTROY(Crypt_SMIME this)
         }
         if (this->pubkeys_store) {
             X509_STORE_free(this->pubkeys_store);
+        }
+        if (this->verify_params) {
+            X509_VERIFY_PARAM_free(this->verify_params);
         }
         safefree(this);
 
@@ -1041,6 +1051,15 @@ getSigners(SV* indata, int informat=CRYPT_SMIME_FORMAT_SMIME)
 	RETVAL = newRV((SV*) result);
     OUTPUT:
 	RETVAL
+
+void
+setAtTime(Crypt_SMIME this, time_t timestamp)
+    CODE:
+        if ( ! this->verify_params) {
+            this->verify_params = X509_VERIFY_PARAM_new();
+        }
+        X509_VERIFY_PARAM_set_time(this->verify_params, timestamp);
+        this->verify_time_is_tainted = SvTAINTED(ST(1));
 
 # -----------------------------------------------------------------------------
 # End of File.

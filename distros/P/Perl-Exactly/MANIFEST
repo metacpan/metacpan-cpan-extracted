@@ -1,9 +1,10 @@
 lib/Perl/Exactly.pm
 lib/Perl/Exactly.pm.conf
-Changes
-Makefile.PL
-pMakefile.PL
-MANIFEST
 README
+Changes
+MANIFEST
 META.yml
+LICENSE
+Makefile.PL
+pmake.bat
 t/001_test.t

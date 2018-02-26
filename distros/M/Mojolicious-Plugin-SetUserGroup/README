@@ -17,7 +17,7 @@ SYNOPSIS
       
       # Root only
       plugin SetUserGroup => {user => $user, group => $group}
-        if $< == 0 or $> == 0;
+        if $> == 0;
 
 DESCRIPTION
 
@@ -31,10 +31,11 @@ DESCRIPTION
     privileged ports such as port 80 or 443, but run worker processes as
     unprivileged users. However, if the application is not started as root,
     it will most likely fail to change credentials. So, you should only set
-    the user/group when the application is started as root.
+    the user/group when the application is started as root or a user with
+    the CAP_SETUID and CAP_SETGID capabilities(7).
 
-    This module requires Unix::Groups and thus will only work on Unix-like
-    systems like Linux, OS X, and BSD.
+    This plugin only works on systems with a concept of Unix users and
+    groups, such as Linux, OS X, or BSD.
 
     The morbo development server is currently incompatible with this plugin
     as the lowered credentials causes the application worker to shut down.
@@ -52,11 +53,11 @@ METHODS
       $plugin->register(Mojolicious->new, {user => $user, group => $group});
 
     Install callback to change process credentials on the next Mojo::IOLoop
-    tick. If option user is undefined or the current effective user and
-    group are already correct, no credential change will occur. If option
-    group is undefined but user is defined, the group will be set to a
-    group matching the user name. If credential changes fail, an error will
-    be logged and the process will be stopped.
+    tick. If option user is undefined or the current user and group are
+    already correct, no credential change will occur. If option group is
+    undefined but user is defined, the group will be set to a group
+    matching the user name. If credential changes fail, an error will be
+    logged and the process will be stopped.
 
 AUTHOR
 
@@ -77,5 +78,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Mojolicious, POSIX, Unix::Groups
+    Mojolicious, POSIX, Unix::Groups::FFI
 

@@ -9,7 +9,7 @@ use File::Slurp;    # For read_file().
 
 use Moo;
 
-our $VERSION = '2.46';
+our $VERSION = '2.47';
 
 # ------------------------------------------------
 
@@ -159,12 +159,11 @@ It returns a new object of type C<GraphViz2::Filer>.
 
 =head1 Methods
 
-=head1 get_annotations()
+=head2 get_annotations()
 
 Returns a hash (sic) keyed by *.pl name, with the values being the text off line 3 of each script.
 
 This text is used to annotate html/index.html, the output of scripts/generate.demo.pl.
-
 
 =head2 get_files($dir_name, $type)
 

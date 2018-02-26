@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::BDD::Cucumber::StepFile qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::HTTP qw(C :util);
+use Test::BDD::Cucumber::Definitions qw(C Given When Then);
+use Test::BDD::Cucumber::Definitions::HTTP qw(:util);
 
 =encoding utf8
 
@@ -16,7 +16,7 @@ Test::BDD::Cucumber::Definitions::HTTP::Ru - Шаги на русском язы
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
@@ -57,7 +57,7 @@ our $VERSION = '0.14';
 =cut
 
 # http request header "" set ""
-When qr/заголовок HTTP-запроса "(.+?)" установлен в значение "(.+)"/, sub {
+When qr/заголовок HTTP-запроса "(.+?)" установлен в значение "(.*)"/, sub {
     my ( $header, $value ) = ( $1, $2 );
 
     header_set( $header, $value );
@@ -88,9 +88,10 @@ When qr/тело HTTP-запроса заполнено данными/, sub {
 
 =pod
 
-Отправить запрос любым HTTP-методом на любой URL:
+Отправить запрос любым HTTP-методом на любой URL (внутри URL можно использовать
+переменные окружения):
 
-    When HTTP-запрос "GET" отправлен на "http://metacpan.org"
+    When HTTP-запрос "GET" отправлен на "http://${TEST_HOST}/index.html"
 
 =cut
 
@@ -127,7 +128,7 @@ Then qr/код HTTP-ответа равен "(.+)"/, sub {
 =cut
 
 # http response header "" eq ""
-Then qr/заголовок HTTP-ответа "(.+?)" равен "(.+)"/, sub {
+Then qr/заголовок HTTP-ответа "(.+?)" равен "(.*)"/, sub {
     my ( $name, $value ) = ( $1, $2 );
 
     header_eq( $name, $value );
@@ -157,7 +158,7 @@ Then qr/заголовок HTTP-ответа "(.+?)" совпадает с "(.+)
 =cut
 
 # http response content eq ""
-Then qr/содержимое HTTP-ответа равно "(.+)"/, sub {
+Then qr/содержимое HTTP-ответа равно "(.*)"/, sub {
     my ($value) = ($1);
 
     content_eq($value);

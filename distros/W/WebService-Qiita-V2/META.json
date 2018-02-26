@@ -42,11 +42,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Crypt::SSLeay" : "0.72",
+            "JSON" : "2.97001",
+            "LWP::UserAgent" : "6.32",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0.014",
             "Test::More" : "0.98"
          }
       }
@@ -54,7 +58,7 @@
    "provides" : {
       "WebService::Qiita::V2" : {
          "file" : "lib/WebService/Qiita/V2.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "WebService::Qiita::V2::Client" : {
          "file" : "lib/WebService/Qiita/V2/Client.pm"
@@ -77,5 +81,5 @@
          "web" : "https://github.com/risou/WebService-Qiita-V2"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }

@@ -28,7 +28,7 @@ L<REFERENCE|DBIx::DataModel::Doc::Reference>
 
 =item *
 
-L<MISC|DBIx::DataModel::Doc::Misc>
+L<COOKBOOK|DBIx::DataModel::Doc::Cookbook>
 
 =item *
 
@@ -46,7 +46,7 @@ with C<DBIx::DataModel>. The goal here is conciseness, not
 completeness; a full reference is given in 
 the L<REFERENCE|DBIx::DataModel::Doc::Reference> chapter.
 
-The tutorial is a gentle expansion of the examples given 
+The use case for this tutorial is the same as the one shown
 in the L<SYNOPSIS|DBIx::DataModel/SYNOPSIS>,
 namely a small human resources management system.
 
@@ -55,7 +55,11 @@ namely a small human resources management system.
 Before starting with C<DBIx::DataModel>, you should have 
 installed CPAN modules L<DBI|DBI> and 
 L<SQL::Abstract::More|SQL::Abstract::More>.
-You also need a database management system with a L<DBD|DBD> driver. 
+You also need a database management system (DBMS) with a L<DBD|DBD> driver.
+Many such systems are available, either commercial or free;
+if you don't know where to start, have a look at
+L<DBD::SQLite>, which is open source and very easy to install.
+
 
 Use your database modeling tool to create some tables for employees,
 departments, activities (an employee working in a department from
@@ -98,12 +102,15 @@ the client program. We decided to use the suffixes
 C<_id> for auto-generated keys, and C<_code> for user-supplied
 codes.
 
-All examples in this document use I<single-schema> mode, which
-is the simplest way to work with C<DBIx::DataModel>. 
+All examples in this document use
+L<single-schema mode|DBIx::DataModel::Doc::Glossary/"single-schema mode">,
+which is the simplest way to work with C<DBIx::DataModel>. 
 If your application needs to simultaneously work with several databases
 that share the same schema structure (like for example when
-transferring data between various sources), then you need
-to work in I<multi-schema> mode; explanations are provided
+transferring data between a production environment and a development
+environment), then you need to work in 
+L<multi-schema mode|DBIx::DataModel::Doc::Glossary/"multi-schema mode">;
+explanations are provided in
 L<DBIx::DataModel::Doc::Reference/"SCHEMA METHODS">.
 
 
@@ -111,11 +118,14 @@ L<DBIx::DataModel::Doc::Reference/"SCHEMA METHODS">.
 
 C<DBIx::DataModel> needs to acquire some knowledge about 
 the datamodel. The rest of this chapter will go through the 
-steps to manually write the necessary declarations, which
-are quite concise; however, you may gain some time
-by using 
-L<DBIx::DataModel::Schema::Generator|DBIx::DataModel::Schema::Generator>
-to automatically create a skeleton of these declarations.
+steps to write the necessary declarations.
+Part of this work can be automated through
+L<DBIx::DataModel::Schema::Generator|DBIx::DataModel::Schema::Generator>,
+which is able to inspect a given database connection to gain information about
+tables, primary keys and foreign key constraints, and from there
+produce a schema skeleton. For this tutorial, we will not use
+the schema generator and write declarations manually;
+as you will see, this is not much work, as the syntax is quite concise.
 
 First load C<DBIx::DataModel> :
 
@@ -126,7 +136,10 @@ Now define a I<schema> :
   DBIx::DataModel->Schema('HR');
 
 Here we have chosen a simple acronym C<HR> as the schema name, but it 
-could as well have been something like C<Human::Resources>.
+could as well have been something like C<Human::Resources>. The schema
+name should not conflict with names of modules in your Perl installation;
+so it is probably a good idea to use a prefix like
+C<My::Company::Schema>.
 
 The schema now is a Perl class, so we can invoke its C<Table>
 method to declare the first table within the schema :
@@ -146,8 +159,12 @@ Other tables are declared in a similar fashion :
     ->Table(qw/Skill         t_skill           skill_code/)
     ->Table(qw/EmployeeSkill t_employee_skill  emp_id  skill_code/);
 
-This last declaration has 4 arguments because the primary key
+Observe that declarations can be chained because each of them
+returns the schema again.
+
+The last declaration has 4 arguments because the primary key
 ranges over 2 columns.
+
 
 =head1 DECLARE COLUMN TYPES
 
@@ -158,8 +175,8 @@ back and forth within the client code, it's easier to do it at the ORM
 level. So we define conversion routines within a "Date" column type
 
   HR->Type(Date => 
-     fromDB => sub {$_[0] =~ s/(\d\d\d\d)-(\d\d)-(\d\d)/$3.$2.$1/   if $_[0]},
-     toDB   => sub {$_[0] =~ s/(\d\d)\.(\d\d)\.(\d\d\d\d)/$3-$2-$1/ if $_[0]},
+     from_DB  => sub {$_[0] =~ s/(\d\d\d\d)-(\d\d)-(\d\d)/$3.$2.$1/   if $_[0]},
+     to_DB    => sub {$_[0] =~ s/(\d\d)\.(\d\d)\.(\d\d\d\d)/$3-$2-$1/ if $_[0]},
      validate => sub {$_[0] =~ m/\d\d\.\d\d\.\d\d\d\d/},
    );
 
@@ -170,8 +187,22 @@ method on the I<meta-table> objects associated with our tables.
   HR::Employee->metadm->define_column_type(Date => qw/d_birth/);
   HR::Activity->metadm->define_column_type(Date => qw/d_begin d_end/);
 
-Here we just perform scalar conversions; another design choice 
-could be to "inflate" the data to some kind of Perl objects.
+Such declarations start with the name of the type, followed
+by the list of columns to which this type is applied.
+
+Another way to use column types is to apply them at the
+level of statements; this is useful for example with aggregation functions  :
+
+  my $date_youngest = HR::Employee->select(
+    -columns      => 'max(d_birth)|youngest',
+    -column_types => {Date => [qw/youngest/]},
+   );
+
+In this date example we just performed scalar conversions; another design choice 
+could be to "inflate" the data to L<DateTime> objects (or to any other Perl module
+working with dates); this is demonstrated in the
+L<cookbook|DBix::DataModel::Doc::Cookbook/"Object inflation/deflation">.
+
 
 =head1 DECLARE ASSOCIATIONS
 
@@ -184,8 +215,10 @@ and activities:
                   [qw/Activity   activities  * /]);
 
 The C<Association> method takes two references to lists of arguments;
-in each of them, we find : class name, role name, multiplicity, and
-optionally the names of columns participating in the join. Here
+each of them contains the name of the table class, 
+a L<role name|DBIx::DataModel::Doc::Glossary/"role name">,
+a L<multiplicity|DBIx::DataModel::Doc::Glossary/"multiplicity">,
+and optionally the names of columns participating in the join. Here
 column names are not specified, so the method assumes that the join
 is on C<dpt_code> (from the primary key of the class
 with multiplicity 1 in the association). This declaration
@@ -198,23 +231,24 @@ corresponds to the following UML diagram :
   +----------------+                            +--------------+
 
 
-Like when reading the diagram, the declaration should be read crosswise :
-here we are stating that a department may be associated
-with several activities; therefore the C<HR::Department> class will
-contain an C<activities> method which returns an arrayref. Conversely,
-an activity is associated with exactly one department, so the
+The declaration should be read crosswise :
+it states that a department may be associated
+with several activities -- therefore the C<HR::Department> class will
+contain an C<activities> method which returns an arrayref --
+and conversely, an activity is associated with exactly one department
+-- so the
 C<HR::Activity> class will contain a C<department> method which returns a
 single instance of C<HR::Department>.
 
-Since associations are symmetric, the two arrayrefs in the
-C<Association> declaration could as well be given in the reverse 
-order, yielding exactly the same effect.
+The two arrayrefs in the C<Association> declaration could as well be
+given in the reverse order : the effect would be exactly the same,
+because associations are symmetric.
 
 =head3 Choosing role names
 
 Technically, a role name can be any valid Perl identifier, so it
 can be chosen arbitrarily; however, in most cases it is a good
-idea to take the name of the associated table : this will make it
+idea to use a name reminding of the associated table : this will make it
 easier to follow method calls and joins that navigate between
 tables. In addition, it is also a good idea to use role names
 in I<singular> when the multiplicity is 1, and in I<plural> when
@@ -237,30 +271,29 @@ we will introduce the new concept of I<composition>.
   HR->Composition([qw/Employee   employee    1 /],
                   [qw/Activity   activities  * /]);
 
-This looks exactly like an association declaration; but it states
-that an activity somehow "belongs" to an employee (cannot exist
-without being attached to an employee, and is often created and 
-deleted together with the employee). In a UML class diagram, this
-would be pictured with a black diamond on the Employee side.
-Using a composition instead of an association in this particular
-example would perhaps be debated by some data modelers; but at least
-it allows us to illustrate the concept.
+This looks exactly like an association declaration; but it states that
 
-A composition declaration behaves in all respects like an association.
-The main difference is in C<insert> and C<delete> methods, which will
-be able to perform more complex operations on data trees : for example 
-it will be possible in one method call to insert an employee together
-with its activities. Compositions also support auto-expansion 
-of data trees through the 
-L<auto_expand()|DBIx::DataModel::Doc::Reference/auto_expand()>
-method.
+an activity somehow "belongs" to an employee (cannot exist without
+being attached to an employee). In a UML class diagram, this would be
+pictured with a black diamond on the Employee side.  In this
+particular example, the usage of a composition instead of an
+association would perhaps be debated by some data modelers; but we
+made this choice for the sake of the example.
+
+A composition behaves in all respects like an association, but it
+has additional functionalities for the  C<insert> and C<delete> methods;
+see the 
+L<reference manual|DBIx::DataModel::Doc::Reference/"Special semantics for compositions"> for details.
 
 
 =head2 Many-to-many associations
 
 Now comes the association between employees and skills, which
-is a many-to-many association. This happens in two steps: first
-we declare as usual the associations with the linking table :
+is a 
+a L<many-to-many|DBIx::DataModel::Doc::Glossary/"many-to-many association">
+association. This requires an intermediate linking table that
+will store pairs C<< (emp_id, skill_code) >>, so we start
+by declaring associations with the linking table, in the usual way :
 
   HR->Association([qw/Employee      employee   1 /],
                   [qw/EmployeeSkill emp_skills * /]);
@@ -277,15 +310,23 @@ This looks almost exactly like the previous declarations, except that
 the last arguments are no longer column names, but rather I<role names>:
 these are the sequences of roles to follow in order to implement the 
 association. This example is just an appetizer; more explanations are 
-provided in the reference section.
+provided in
+L<DBIx::DataModel::Doc::Design/"Many-to-many associations">.
+
 
 =head1 USE THE SCHEMA
 
-To use the schema, we first need to give it a database
+=head2 Connecting to the database
+
+To use the schema, we first need to provide it with a database
 connection :
 
   my $dbh = DBI->connect(...); # parameters according to your RDBMS
   HR->dbh($dbh);               # give $dbh handle to the schema
+
+=head2 Inserting data
+
+=head3 Basic insert() method
 
 Now we can start populating the database:
 
@@ -297,25 +338,29 @@ Now we can start populating the database:
         [qw/ Claudio      Monteverdi /],
     );
 
-This form of C<insert()>, supplying a list of arrayrefs with column names
-in the first arrayref, is convenient for inserting a bunch of rows at
-once. The other form is to supply one or several hashrefs, where each
-hashref corresponds to a record to create, and yields the same result :
+This form of C<insert()> is convenient for inserting a bunch of rows at
+once : it takes as arguments a first arrayref of column names, followed
+by a list of arrayrefs containing values for each row.
 
-    HR->table('Employee')->insert(
+The other form of C<insert()> is to supply one or several hashrefs, where each
+hashref corresponds to a record to create : 
+
+  my ($bach_id, $berlioz_id, $monteverdi_id)
+    = HR->table('Employee')->insert(
       {firstname => "Johann",  lastname => "Bach"      },
       {firstname => "Hector",  lastname => "Berlioz"   },
       {firstname => "Claudio", lastname => "Monteverdi"},
     );
 
-According to our earlier assumptions, keys are generated automatically
-within the database, so they need not be supplied here. The return
-value of the method is the list of generated ids (provided that your
-database driver supports DBI's L<last_insert_id|DBI/last_insert_id>
-method).
+The result is the same in both cases.
 
-Similarly, we create some departments and skills
-(here with explicit primary keys, and using both insertion syntaxes) :
+In this example, it is assumed that keys are generated automatically
+within the database (see the C<AUTO_INCREMENT> clause in the
+L</"BASIC ASSUMPTIONS"> section); therefore  they need not be supplied here.
+The return value of the method is the list of ids generated by the database.
+
+Next we create some departments and skills,
+here with explicit primary keys, and using both insertion syntaxes :
 
   HR->table('Department')->insert(
     {dpt_code => "CPT",  dpt_name => "Counterpoint" },
@@ -329,23 +374,35 @@ Similarly, we create some departments and skills
     [qw/ GT          Guitar     /],
    );
 
-To perform updates, there is either a class method or an object method.
-Here is an example with the class method :
+=head3 C<insert_into_*()> methods
 
-  HR->table('Employee')->update($bach_id => {firstname => "Johann Sebastian"});
-
-Associations have their own insert methods, named C<insert_into_*> :
+For inserting data into the C<Activity> table, instead
+of addressing the table directly, we can
+take advantage of the C<insert_into_activities>  in the
+associated C<Employee> class : 
 
   my $bach = HR->table('Employee')->fetch($bach_id); 
   
   $bach->insert_into_activities({d_begin => '01.01.1695',
 			         d_end   => '18.07.1750',
 			         dpt_code => 'CPT'});
-  
+
+In addition to the columns explicitly listed above, this method
+automatically adds the foreign key C<< emp_id => $bach_id >> that
+will link the activity to the C<$bach> employee. The same can 
+be done for employee skills :
+
   $bach->insert_into_emp_skills({skill_code => 'VL'},
 			        {skill_code => 'KB'});
 
-Compositions implement cascaded inserts from a given data tree :
+
+=head3 Cascaded inserts
+
+Since there is a
+L<composition|DBIx::DataModel::Doc::Glossary/"composition">
+between classes C<Employee> and C<Activity>, we can supply a
+whole data tree to the C<insert()> method, and cascaded inserts
+will be performed automatically :
 
   HR->table('Employee')->insert(
     {firstname  => "Richard",  
@@ -355,7 +412,7 @@ Compositions implement cascaded inserts from a given data tree :
                       dpt_code => 'ORCH'      } ]}
   );
 
-and if we need the keys of records generated by those insertions, we
+For retrieving the keys of records generated by those insertions, we
 can use the C<< -returning => {} >> option :
 
   my $data = {firstname  => "Richard",  
@@ -368,14 +425,59 @@ can use the C<< -returning => {} >> option :
   #                      activities => [{act_id => ...}]};
 
 
-The C<select()> method retrieves several records from a class :
+=head2 Updating data
+
+The C<update()> method can be used either as a class
+method, like this :
+
+  HR->table('Employee')->update($bach_id => {firstname => "Johann Sebastian"});
+
+or as an instance method, like this :
+
+   my $bach = HR->table('Employee')->fetch($bach_id);
+   $bach->update({firstname => "Johann Sebastian"});
+
+Using named parameters, the class method can also update several
+records in one single instruction :
+
+  HR->table('Employee')->update(
+    -set   => {retired => 'true'     },
+    -where => {age     => {">" => 65}},
+    );
+
+
+=head2 Deleting data
+
+The C<deleting()> method can be used either as a class
+method, like this :
+
+  HR->table('Employee')->delete($bach_id);
+
+or as an instance method, like this :
+
+   my $bach = HR->table('Employee')->fetch($bach_id);
+   $bach->delete;
+
+Using named parameters, the class method can also delete several
+records in one single instruction :
+
+  HR->table('Employee')->delete(-where => { age => {">" => 65} }
+
+
+=head2 Selecting data
+
+=head3 Basic select()
+
+The C<select()> method retrieves records from a class :
 
   my $all_employees = HR->table('Employee')->select; 
   foreach my $emp (@$all_employees) {
     do_something_with($emp);
   }
 
-or maybe we want something more specific :
+That method can take arguments to specify various aspects of the
+SQL request to generate, like for example the list of columns,
+the filtering conditions or the ordering to apply :
 
   my @columns  = qw/firstname lastname/;
   my %criteria = (lastname => {-like => 'B%'});
@@ -385,8 +487,26 @@ or maybe we want something more specific :
     -order_by => 'd_birth',
    );
 
-From a given object, role methods allow us to get associated
-objects :
+=head3 Selecting from a join
+
+Instead of selecting from a single table, we can select
+from a 
+L<join|DBIx::DataModel::Doc::Glossary/"join">
+of several tables :
+
+  my $results = HR->join(qw/Employee activities department/)->select(...);
+
+Results from this join will be instances of a subclass that inherits from
+C<Employee> I<and> C<Activity> I<and> C<Department> : therefore all
+methods of all parent classes are available.
+
+=head3 Selecting through path methods
+
+Since an association was declared between tables
+C<Employee> and C<Skill>, the C<Employee> class has a
+L<path method|DBIx::DataModel::Doc::Glossary/"path method">
+named C<skills> that automatically selects all skills
+related to a given employee :
 
   foreach my $emp (@$all_employees) {
     print "$emp->{firstname} $emp->{lastname} ";
@@ -394,20 +514,30 @@ objects :
     print " has skills ", join(", ", @skill_names) if @skill_names;
   }
 
-Passing arguments to role methods, we can restrict to 
-specific columns or specific rows, exactly like the 
-C<select()> method :
+Path methods are nothing but wrappers around the basic
+C<select()> method, so they can take exactly the same arguments.
+Here is an example with the C<activities> method in class
+C<Employee> :
 
   my @columns = qw/d_begin d_end/;
   my %criteria = (d_end => undef);
   my $current_activities = $some_emp->activities(-columns => \@columns,
                                                  -where   => \%criteria);
 
-And it is possible to join on several roles at once:
+And it is possible to join path methods, starting from an initial object :
 
   my $result = $emp->join(qw/activities department/)
                    ->select(-columns => \@columns,
                             -where   => \%criteria);
 
-This concludes our short tutorial. More examples are given
-in the L<Reference|DBIx::DataModel::Doc::Reference> chapter.
+
+=head1 CONCLUSION
+
+This concludes our short tutorial.
+
+Detailed descriptions of all constructs are given in the
+L<Reference|DBIx::DataModel::Doc::Reference> chapter;
+explanations of the overall architecture of C<DBIx::DataModel>
+are given in the
+L<Design|DBIx::DataModel::Doc::Design> chapter.
+

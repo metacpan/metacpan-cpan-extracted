@@ -1,7 +1,6 @@
 package Pithub::PullRequests::Comments;
-$Pithub::PullRequests::Comments::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github v3 Pull Request Comments API
 
 use Moo;
@@ -84,7 +83,7 @@ Pithub::PullRequests::Comments - Github v3 Pull Request Comments API
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 METHODS
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension DBD::PgPPSjis.
 
+0.0801004  2018-02-21 00:00:00
+  - change META.yml version 1.3 to 1.4
+  - remove pMakefile.PL
+  - add pmake.bat
+  - add LICENSE
+  - created by INABA Hitoshi
+
 0.0801003  2018-02-04 00:00:00
   - try Kwalitee Indicator: main_module_version_matches_dist_version
   - created by INABA Hitoshi

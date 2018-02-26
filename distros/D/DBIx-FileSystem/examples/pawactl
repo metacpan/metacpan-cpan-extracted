@@ -4,12 +4,6 @@
 #
 # pawactl   : packet warehouse control program
 #
-# Last Update:		$Author: marvin $
-# Update Date:		$Date: 2007/12/07 17:15:21 $
-# Source File:		$Source: /home/cvsroot/tools/FileSystem/examples/pawactl,v $
-# CVS/RCS Revision:	$Revision: 1.2 $
-# Status:		$State: Exp $
-# 
 # Imagine a warehouse for packet distribution: Some well known senders are
 # allowed to send packets to the warehouse. There are well known destinations
 # where the packets will be delivered to. A warehouse process is responsible
@@ -83,56 +77,6 @@
 #
 # License:
 #   You may distribute under the terms of the GNU General Public License.
-#
-# CVS/RCS Log:
-# $Log: pawactl,v $
-# Revision 1.2  2007/12/07 17:15:21  marvin
-# - finalized enum, access class and examples
-#
-# Revision 1.1  2007/12/04 18:27:26  marvin
-# - new directory examples
-# - bug fixes: handling quotes in SQL
-# - addes access class
-#
-# Revision 1.11  2007/11/15 17:19:09  marvin
-# - added int option 'enums' to FileSystem module and pawactl example
-#
-# Revision 1.10  2007/08/09 15:13:24  marvin
-# - bugfix: display of defaultvalues from defaultfile wrong (cat/vi)
-# - pawactl: setup some more usefull sample values
-#
-# Revision 1.9  2007/06/15 13:27:40  marvin
-# - added bitfield/flags type as an extension of type 'int' (option flags =>)
-# - added Postgres speicific types cidr and inet
-# - minor fixes in code and docs
-#
-# Revision 1.8  2004/05/28 14:32:44  marvin
-# - rename delcp --> uniq
-# - new command: vgrep
-# - command 'new' removed
-#
-# Revision 1.7  2004/01/29 19:16:45  marvin
-# - delcp option now also checks for uniqueness
-#
-# Revision 1.6  2003/08/11 13:58:27  marvin
-# extended %vdirs check at startup
-#
-# Revision 1.5  2003/07/17 17:32:24  marvin
-# pawactl custom command example hello --> count
-#
-# Revision 1.4  2003/07/16 18:32:33  marvin
-# Added custom commands
-# valok and rmcheck now get $dbh param
-#
-# Revision 1.3  2003/07/11 17:59:17  marvin
-# valok now gets additional parameter: a hashref of all values read from file
-#
-# Revision 1.2  2003/07/11 15:40:57  marvin
-# multiline descriptions, cp now checks filename
-#
-# Revision 1.1.1.1  2003/04/09 11:07:10  marvin
-# Imported Sources
-#
 #
 
 
@@ -234,7 +178,7 @@ my %vdirs =
 	 enums  => {   1 => [ "VerySlow", "slow like a worm" ],
 		     123 => [ "Slow",     "just as fast as an ant" ],
 		     456 => [ "Medium",   "the usual speed, known to work well\n".
-			    		  "with most destinations. recommended" ],
+			      		  "with most destinations. recommended" ],
 		     789 => [ "Fast",     "only for the strong ones" ],
 		   },
 	 pos	=> $pos++,			
@@ -270,6 +214,7 @@ my %vdirs =
        addr => 					# columnname in DB
        { type	=> 'char',
 	 len	=> 20,			
+	 cpdelete => 1,				# delete this col on 'cp'
 	 var	=> 'Address',
 	 desc	=> "The Address of the destination\n".
 	 	   "NOTE: This description consists of three lines\n".

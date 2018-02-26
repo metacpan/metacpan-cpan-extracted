@@ -1,13 +1,12 @@
 package Mojolicious::Plugin::SetUserGroup;
 use Mojo::Base 'Mojolicious::Plugin';
 
-use List::Util 'any';
 use Mojo::IOLoop;
-use POSIX qw(geteuid getegid setuid setgid);
-use Unix::Groups 'setgroups';
+use POSIX qw(getuid getgid setuid setgid);
+use Unix::Groups::FFI 'initgroups';
 use Carp 'croak';
 
-our $VERSION = '0.005';
+our $VERSION = '1.000';
 
 sub register {
 	my ($self, $app, $conf) = @_;
@@ -56,24 +55,13 @@ sub _setusergroup {
 	}
 	
 	# Check if user and group are already correct
-	return if geteuid() == $uid and getegid() == $gid;
-	
-	# Secondary groups
-	my @gids = ($gid);
-	my @groups = ($group);
-	$! = 0;
-	while (my ($name, undef, $id, $members) = getgrent) {
-		if ($id != $gid and any { $_ eq $user } split ' ', $members) {
-			push @gids, $id;
-			push @groups, $name;
-		}
-	} continue { $! = 0; }
-	# Empty list may indicate getgrent is done, or an error
-	die _error($app, qq{Failed to read groups: $!}) if $!;
+	return if getuid() == $uid and getgid() == $gid;
 	
 	my $rc = setgid($gid);
 	unless (defined $rc and $rc == 0) { die _error($app, qq{Can't switch to group "$group": $!}); }
-	unless (setgroups(@gids)) { die _error($app, qq{Can't set supplemental groups "@groups": $!}); }
+	my $error;
+	{ local $@; unless (eval { initgroups($user, $gid); 1 }) { $error = "$!" } }
+	if (defined $error) { die _error($app, qq{Can't set supplemental groups for user "$user": $error}); }
 	$rc = setuid($uid);
 	unless (defined $rc and $rc == 0) { die _error($app, qq{Can't switch to user "$user": $!}); }
 }
@@ -99,7 +87,7 @@ credentials
   
   # Root only
   plugin SetUserGroup => {user => $user, group => $group}
-    if $< == 0 or $> == 0;
+    if $> == 0;
 
 =head1 DESCRIPTION
 
@@ -113,10 +101,11 @@ This allows an application to be started as root so it can bind to privileged
 ports such as port 80 or 443, but run worker processes as unprivileged users.
 However, if the application is not started as root, it will most likely fail to
 change credentials. So, you should only set the user/group when the application
-is started as root.
+is started as root or a user with the C<CAP_SETUID> and C<CAP_SETGID>
+L<capabilities(7)>.
 
-This module requires L<Unix::Groups> and thus will only work on Unix-like
-systems like Linux, OS X, and BSD.
+This plugin only works on systems with a concept of Unix users and groups, such
+as Linux, OS X, or BSD.
 
 The L<morbo> development server is currently incompatible with this plugin as
 the lowered credentials causes the application worker to shut down. Make sure
@@ -134,11 +123,11 @@ L<Mojolicious::Plugin> and implements the following new ones.
   $plugin->register(Mojolicious->new, {user => $user, group => $group});
 
 Install callback to change process credentials on the next L<Mojo::IOLoop>
-tick. If option C<user> is undefined or the current effective user and group
-are already correct, no credential change will occur. If option C<group> is
-undefined but C<user> is defined, the group will be set to a group matching the
-user name. If credential changes fail, an error will be logged and the process
-will be stopped.
+tick. If option C<user> is undefined or the current user and group are already
+correct, no credential change will occur. If option C<group> is undefined but
+C<user> is defined, the group will be set to a group matching the user name. If
+credential changes fail, an error will be logged and the process will be
+stopped.
 
 =head1 AUTHOR
 
@@ -163,4 +152,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<POSIX>, L<Unix::Groups>
+L<Mojolicious>, L<POSIX>, L<Unix::Groups::FFI>

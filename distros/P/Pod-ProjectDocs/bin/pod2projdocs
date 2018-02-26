@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.50';    # VERSION
+our $VERSION = '0.51';    # VERSION
 
 use Getopt::Long;
 use Pod::Usage;
@@ -47,6 +47,8 @@ my $p = Pod::ProjectDocs->new(
 );
 $p->gen();
 
+=encoding utf-8
+
 =head1 NAME
 
 pod2projdocs - generates CPAN like project documents from pod.
@@ -56,15 +58,16 @@ pod2projdocs - generates CPAN like project documents from pod.
 pod2projdocs [options]
 
  Options:
-    -help        display this help and exist
-    -out         directory path that you want to generate documents into
-    -lib         your project's library-root-directory path
-    -title       your project's title
-    -desc        your project's description
-    -noindex     don't create index for all generated pages
-    -forcegen    generate documents each time, ignoring last modified timestamp
-    -lang        set this language as xml:lang (default 'en')
-    -except      the files matches this regex won't be parsed
+    -help         display this help and exist
+    -out          directory path that you want to generate documents into
+    -lib          your project's library-root-directory path
+    -title        your project's title
+    -desc         your project's description
+    -noindex      don't create index for all generated pages
+    -forcegen     generate documents each time, ignoring last modified timestamp
+    -nosourcecode suppress inclusion of the original source code in the generated output
+    -lang         set this language as xml:lang (default 'en')
+    -except       the files matches this regex won't be parsed
 
  You can set each option with their first character,
  for example, you can write -o instead of -out.
@@ -81,15 +84,28 @@ generates CPAN like project documents from pod.
 
 L<Pod::ProjectDocs>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
+=over 4
+
+=item Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
+
+=item L<Martin Gruner|https://github.com/mgruner> (current maintainer)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005 Lyo Kato. All rights reserved.
+=over 4
 
-This library is free software. You can redistribute it and/or modify it under
-the same terms as perl itself.
+=item © 2005 by Lyo Kato
+
+=item © 2018 by Martin Gruner
+
+=back
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
 
 =cut

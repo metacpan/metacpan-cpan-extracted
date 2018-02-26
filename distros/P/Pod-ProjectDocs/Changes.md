@@ -1,3 +1,6 @@
+## 0.51 2018-02-20
+- Allow regexp objects to be passed as value for 'except', thanks to Erik Huelsmann.
+
 ## 0.50 2018-01-09
 - Added `-nosourcecode` option to suppress inclusion of the original sources.
 

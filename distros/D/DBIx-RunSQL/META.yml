@@ -2,11 +2,8 @@
 abstract: 'run SQL from a file'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
+build_requires: {}
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
@@ -17,12 +14,10 @@ no_index:
   directory:
     - t
     - inc
-requires:
-  DBI: '0'
-  perl: '5.006'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-RunSQL
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/Corion/dbix--runsql
-version: '0.15'
+  repository: git://github.com/Corion/dbix--runsql.git
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

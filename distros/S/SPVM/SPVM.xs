@@ -15,7 +15,7 @@
 
 #include "spvm_compiler.h"
 #include "spvm_hash.h"
-#include "spvm_dynamic_array.h"
+#include "spvm_list.h"
 #include "spvm_util_allocator.h"
 #include "spvm_constant_pool.h"
 #include "spvm_runtime.h"
@@ -35,7 +35,7 @@
 #include "spvm_api.h"
 #include "spvm_opcode_builder.h"
 #include "spvm_jitcode_builder.h"
-#include "spvm_dynamic_array.h"
+#include "spvm_list.h"
 #include "spvm_constant_pool_builder.h"
 #include "spvm_jitcode_builder.h"
 #include "spvm_string_buffer.h"
@@ -77,11 +77,8 @@ SPVM_OBJECT* SPVM_XS_UTIL_get_object(SV* sv_object) {
 
 int SPVM_XS_UTIL_compile_jit_sub(SPVM_API* api, int32_t sub_id) {
   dSP;
-
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
   
-  // Subroutine information
-  SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+  (void)api;
   
   // String buffer for jitcode
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
@@ -3124,9 +3121,6 @@ compile(...)
   // Create compiler
   SPVM_COMPILER* compiler = SPVM_COMPILER_new();
   
-  // Debug model
-  HV* hv_env = get_hv("ENV", 0);
-  
   // Add package
   AV* av_package_infos = get_av("SPVM::PACKAGE_INFOS", 0);
   int32_t av_package_infos_length = (int32_t)av_len(av_package_infos) + 1;
@@ -3154,7 +3148,7 @@ compile(...)
       
       // push package to compiler use stack
       SPVM_OP* op_use_package = SPVM_OP_new_op_use_from_package_name(compiler, name, file, line);
-      SPVM_DYNAMIC_ARRAY_push(compiler->op_use_stack, op_use_package);
+      SPVM_LIST_push(compiler->op_use_stack, op_use_package);
       SPVM_HASH_insert(compiler->op_use_symtable, name, strlen(name), op_use_package);
     }
   }
@@ -3168,7 +3162,7 @@ compile(...)
       SV** sv_include_path_ptr = av_fetch(av_include_paths, i, 0);
       SV* sv_include_path = sv_include_path_ptr ? *sv_include_path_ptr : &PL_sv_undef;
       char* include_path = SvPV_nolen(sv_include_path);
-      SPVM_DYNAMIC_ARRAY_push(compiler->include_pathes, include_path);
+      SPVM_LIST_push(compiler->include_pathes, include_path);
     }
   }
   
@@ -3294,13 +3288,13 @@ get_native_sub_names(...)
   // Get compiler
   SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
   
-  SPVM_DYNAMIC_ARRAY* op_subs = compiler->op_subs;
+  SPVM_LIST* op_subs = compiler->op_subs;
   
   AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
   {
     int32_t sub_index;
     for (sub_index = 0; sub_index < op_subs->length; sub_index++) {
-      SPVM_OP* op_sub = SPVM_DYNAMIC_ARRAY_fetch(op_subs, sub_index);
+      SPVM_OP* op_sub = SPVM_LIST_fetch(op_subs, sub_index);
       SPVM_SUB* sub = op_sub->uv.sub;
       
       if (sub->is_native) {
@@ -3356,62 +3350,34 @@ get_no_native_sub_names(...)
 }
 
 SV*
-get_native_sub_names_from_package(...)
+get_package_load_path(...)
   PPCODE:
 {
   (void)RETVAL;
-  
-  SV* sv_package_name = ST(0);
-  const char* package_name = SvPV_nolen(sv_package_name);
   
   // API
   SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  
-  SPVM_DYNAMIC_ARRAY* native_sub_name_ids = SPVM_HASH_search(runtime->native_sub_name_ids_symtable, package_name, strlen(package_name));
-  
-  AV* av_native_sub_names = (AV*)sv_2mortal((SV*)newAV());
-  
-  {
-    int32_t sub_name_index;
-    for (sub_name_index = 0; sub_name_index < native_sub_name_ids->length; sub_name_index++) {
-      
-      int32_t sub_name_id = (int32_t)(intptr_t)SPVM_DYNAMIC_ARRAY_fetch(native_sub_name_ids, sub_name_index);
-      
-      const char* native_sub_name = (char*)&runtime->constant_pool[sub_name_id + 1];
-      assert(native_sub_name);
-      
-      int32_t native_sub_name_length = (int32_t)strlen(native_sub_name);
-      SV* sv_native_sub_name = sv_2mortal(newSVpvn(native_sub_name, native_sub_name_length));
-      av_push(av_native_sub_names, SvREFCNT_inc(sv_native_sub_name));
-    }
-  }
-  
-  SV* sv_native_sub_names = sv_2mortal(newRV_inc((SV*)av_native_sub_names));
-  
-  XPUSHs(sv_native_sub_names);
-  XSRETURN(1);
-}
 
-SV*
-get_use_package_path(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
+
 
   SV* sv_package_name = ST(0);
   const char* package_name = SvPV_nolen(sv_package_name);
   
-  const char* use_package_path = (const char*)(intptr_t)SPVM_HASH_search(compiler->use_package_path_symtable, package_name, strlen(package_name));
+
+  int32_t package_id = (int32_t)(intptr_t)SPVM_HASH_search(runtime->package_symtable, package_name, strlen(package_name));
   
-  int32_t use_package_path_length = (int32_t)strlen(use_package_path);
-  SV* sv_use_package_path = sv_2mortal(newSVpvn(use_package_path, use_package_path_length));
+  // Subroutine information
+  SPVM_CONSTANT_POOL_PACKAGE* constant_pool_package = (SPVM_CONSTANT_POOL_PACKAGE*)&runtime->constant_pool[package_id];
   
-  XPUSHs(sv_use_package_path);
+  int32_t package_load_path_id = constant_pool_package->load_path_id;
+  
+  const char* package_load_path = (char*)&runtime->constant_pool[package_load_path_id + 1];
+  
+  int32_t package_load_path_length = (int32_t)strlen(package_load_path);
+  SV* sv_package_load_path = sv_2mortal(newSVpvn(package_load_path, package_load_path_length));
+  
+  XPUSHs(sv_package_load_path);
   
   XSRETURN(1);
 }
@@ -3422,8 +3388,10 @@ bind_native_sub(...)
 {
   (void)RETVAL;
   
-  // Get compiler
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)SvIV(SvRV(get_sv("SPVM::COMPILER", 0)));
+  // API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
   
   SV* sv_native_sub_name = ST(0);
   SV* sv_native_address = ST(1);
@@ -3435,9 +3403,10 @@ bind_native_sub(...)
   IV native_address = SvIV(sv_native_address);
   
   // Set native address to subroutine
-  SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, native_sub_name, strlen(native_sub_name));
-  SPVM_SUB* sub = op_sub->uv.sub;
-  sub->native_address = (void*)native_address;
+  int32_t sub_id = (int32_t)(intptr_t)SPVM_HASH_search(runtime->sub_symtable, native_sub_name, strlen(native_sub_name));
+  SPVM_CONSTANT_POOL_SUB* constant_pool_sub = (SPVM_CONSTANT_POOL_SUB*)&runtime->constant_pool[sub_id];
+  
+  constant_pool_sub->native_address = (void*)native_address;
   
   XSRETURN(0);
 }
@@ -3483,20 +3452,20 @@ build_field_symtable(...)
   HV* hv_field_symtable = get_hv("SPVM::FIELD_SYMTABLE", 0);
   
   // name, arg_types, return_type
-  SPVM_DYNAMIC_ARRAY* op_packages = compiler->op_packages;
+  SPVM_LIST* op_packages = compiler->op_packages;
   {
     int32_t package_index;
     for (package_index = 0; package_index < op_packages->length; package_index++) {
-      SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(op_packages, package_index);
+      SPVM_OP* op_package = SPVM_LIST_fetch(op_packages, package_index);
       const char* package_name = op_package->uv.package->op_name->uv.name;
       
       HV* hv_package_info = (HV*)sv_2mortal((SV*)newHV());
       
-      SPVM_DYNAMIC_ARRAY* op_fields = op_package->uv.package->op_fields;
+      SPVM_LIST* op_fields = op_package->uv.package->op_fields;
       {
         int32_t field_index;
         for (field_index = 0; field_index < op_fields->length; field_index++) {
-          SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, field_index);
+          SPVM_OP* op_field = SPVM_LIST_fetch(op_fields, field_index);
           SPVM_FIELD* field = op_field->uv.field;
           const char* field_name = field->op_name->uv.name;
           

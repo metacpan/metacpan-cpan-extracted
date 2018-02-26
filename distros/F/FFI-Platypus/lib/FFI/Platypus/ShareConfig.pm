@@ -6,7 +6,7 @@ use File::ShareDir qw( dist_dir );
 use File::Spec;
 use JSON::PP qw( decode_json );
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 sub get
 {
@@ -40,7 +40,7 @@ FFI::Platypus::ShareConfig
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 AUTHOR
 
@@ -61,6 +61,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

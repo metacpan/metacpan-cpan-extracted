@@ -1,6 +1,6 @@
 package MooX::Thunking;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # this bit would be MooX::Utils but without initial _ on func name
 use strict;
@@ -37,6 +37,7 @@ sub import {
         return if @_; # attempt at setting, hand to auto
         return if $self->$resolved_name; # already resolved
         $self->$resolved_name(1);
+        local $@;
         return if !eval { CodeLike->($self->{$name}); 1 }; # not a thunk
         my $setter = "_set_$name";
         $self->$setter($self->{$name}->());

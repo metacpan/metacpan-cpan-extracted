@@ -77,10 +77,17 @@ sub catch {
 
 # http://blogs.msdn.com/brettsh/archive/2006/06/07/620986.aspx
 #open (my $TF, ">:raw:encoding(UTF16-LE):crlf:utf8", $tmp_path)  or die "Unable to make new temporary file: $!";
+    #with utf-8 this would suffice  open( $TF, ">:encoding($args{encoding})", $args{tmp_file} ) 
+    # http://grokbase.com/t/perl/unicode/111hf8z9as/encoding-utf16-le-on-windows
+    # Files opened on Windows already have the :crlf layer pushed by default,
+    #so you somehow need to get the :encoding layer *below* it. If you have it on top, 
+    #then the crlf substitution happens *after* the encoding, leading to incorrect data.
+    #this open( $TF, ">:encoding($args{encoding})", $args{tmp_file} ) or die "Unable to make new temporary file: $!";
+    #insert "blank" between each character, I suspect this comes from the explanation above
+   open( $TF, ">:raw:encoding($args{encoding}):crlf", $args{tmp_file} ) or die "Unable to make new temporary file: $!";
     
-     open( $TF, ">:encoding($args{encoding})", $args{tmp_file} ) or die "Unable to make new temporary file: $!";
 
-print $TF "\N{BOM}";
+print $TF "\N{BOM}" if ($args{encoding} eq "UTF-8" || $args{encoding} eq "UTF-16BE");
 
 #commentaire vide : <!-----> trois lignes sucessives font que les données ne sont plus
 #produites. Le prochain commentaire non vide remet le compteur à zéro

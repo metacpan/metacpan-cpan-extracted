@@ -21,7 +21,7 @@ is $options{ dsn }, "dbi:SQLite:dbname=db/my-test-app.sqlite", "DSN gets appname
 
 DBIx::RunSQL->handle_command_line(
     "my-test-app",
-    '--dsn' => 'dbi:Magic:',
+    ['--dsn' => 'dbi:Magic:'],
 );
 ($package,%options)= @received;
 

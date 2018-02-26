@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.81';
+our $VERSION = '1.82';
 
 =encoding utf8
 
@@ -238,7 +238,7 @@ class constructor, it does not accept any parameter by user. The options have to
 sub new
 {
 	my ($class) = @_;
-	bless {_is_root_element => 1, error => \0}, $class;
+	bless {}, $class;
 }
 
 =head3 run
@@ -251,6 +251,7 @@ sub run
 {
 	my $self = shift;
 	$self->{_authenticated} = 0;
+	$self->{_is_root_element} = 1;
 	$self->{error} = \0;
 	$self->errors = [];
 	$self->{_passthrough} = 0;

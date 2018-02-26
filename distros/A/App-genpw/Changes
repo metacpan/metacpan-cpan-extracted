@@ -1,3 +1,16 @@
+0.005   2018-02-20 (PERLANCAR)
+
+	- Add conversion pattern: %m (base64 character: A-Za-z0-9 + /).
+
+        - genpw: switch from Perinci::CmdLine::Inline to Perinci::CmdLine::Any
+          to get --config-profile.
+
+
+0.004   2018-02-20 (PERLANCAR)
+
+	- Add conversion pattern: %h (hexdigit 0-9a-f).
+
+
 0.003   2018-01-16 (PERLANCAR)
 
 	- Add conversion pattern: %b (base58 character) and %B (base56

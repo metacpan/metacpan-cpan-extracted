@@ -71,7 +71,7 @@
          "web" : "https://github.com/gbv/PICA-Data"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",
@@ -80,6 +80,6 @@
       "Johann Rolschewski <jorol@cpan.org>",
       "Johann Rolschewski <rolschewski@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0221"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

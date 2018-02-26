@@ -8,7 +8,7 @@ use base 'Class::Accessor';
 
 use vars qw[ $VERSION %tags %totals %columns %safety_check ];
 
-$VERSION = '0.47';
+$VERSION = '0.48';
 
 BEGIN {
   Finance::Bank::Postbank_de::Account->mk_accessors(qw( number balance balance_unavailable balance_prev transactions_future iban blz account_type name));

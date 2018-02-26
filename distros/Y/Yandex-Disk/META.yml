@@ -25,6 +25,7 @@ requires:
   File::Spec: '3.4801'
   IO::Socket::SSL: '2.002'
   JSON::XS: '3.04'
+  LWP::Protocol::https: '6.07'
   LWP::UserAgent: '6.27'
   URI::Escape: '3.31'
   perl: '5.008008'
@@ -32,4 +33,4 @@ resources:
   bugtracker: https://github.com/vrag86/perl-yandex-disk-api/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/vrag86/perl-yandex-disk-api
-version: '0.02'
+version: '0.03'

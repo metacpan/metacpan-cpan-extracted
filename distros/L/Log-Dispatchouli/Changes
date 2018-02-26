@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+2.016     2018-02-21 12:47:46-05:00 America/New_York
+        - the Proxy logger now respects the same overloading as the root logger
+        - muted works as a constructor argument (thanks, Dan Book)
+
 2.015     2016-10-17 15:42:54-04:00 America/New_York
         - Log::Dispatchouli subclass can now provide its own proxy_class
           method to use something other than Log::Dispatchouli::Proxy

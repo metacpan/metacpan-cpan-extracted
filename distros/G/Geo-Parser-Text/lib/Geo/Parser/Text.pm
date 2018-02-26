@@ -3,6 +3,8 @@ package Geo::Parser::Text;
 use 5.006;
 use strict;
 use warnings;
+use utf8::all;
+use open ':utf8';
 
 use XML::Simple;
 use LWP::UserAgent;
@@ -12,7 +14,7 @@ use Data::Dumper;
 
 
 use constant DEBUG    => 0;
-use constant GEO_HOST => q{http://geocode.xyz};
+use constant GEO_HOST => q{https://geocode.xyz};
 
 sub new {
     my $class = shift;
@@ -89,15 +91,16 @@ warn $result if DEBUG;
 
 =head1 NAME
 
-Geo::Parser::Text - Perl extension for parsing, geocoding and standardizing locations from free form text. (See Geocode.xyz or Geolytica.com or addrs.xyz for coverage details)
+Geo::Parser::Text - Perl extension for geoparsing, geocoding and standardizing locations from free form text. Worldwide Coverage. Geocode places to latitude, longitude, elevation.
+And vice-versa.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.051
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.051';
 
 
 =head1 SYNOPSIS
@@ -116,75 +119,69 @@ our $VERSION = '0.04';
                      
 	# Example...
 
+	#!/usr/bin/perl
+	use strict;
 	use Geo::Parser::Text;
 	use Data::Dumper;
-	my $g = Geo::Parser::Text->new('http://geocode.xyz');
-
+	my $g = Geo::Parser::Text->new('https://geocode.xyz');
 	my $str = "The most important museums of Amsterdam are located on the Museumplein, located at the southwestern side of the Rijksmuseum.";
-	my $ref = $g->geocode(scantext=>$str,strict=>1,region='NL'); #in strict mode will return top matches only using context aware parsing (which may be slower)
+	my $ref = $g->geocode(scantext=>$str,region=>'NL');
 	print Dumper $ref;
 
 	#expected response
 	$Response = {
-              'match' => [
-                         {
-                           'latt' => '52.35704',
-                           'confidence' => '0.8',
-                           'longt' => '4.88356',
-                           'location' => 'MUSEUMPLEIN, AMSTERDAM, NL'
-                         },
-                         {
-                           'confidence' => '0.8',
-                           'latt' => '52.36017396823732',
-                           'longt' => '4.895017880552782',
-                           'location' => 'Amsterdam, NL'
-                         },
-                         {
-                           'latt' => '52.35994',
-                           'confidence' => '0.7',
-                           'longt' => '4.88539',
-                           'location' => 'Rijksmuseum, NL'
-                         },
-                         {
-                           'location' => '1, MUSEUMPLEIN, RIJKSMUSEUM, NL',
-                           'longt' => '4.88345',
-                           'confidence' => '0.5',
-                           'latt' => '52.3576'
-                         },
-                         {
-                           'location' => 'Museumplein, NL',
-                           'longt' => '4.88194',
-                           'latt' => '52.35722',
-                           'confidence' => '0.5'
-                         },
-                         {
-                           'location' => 'most, NL',
-                           'longt' => '6.01528',
-                           'confidence' => '0.5',
-                           'latt' => '51.38417'
-                         }
-                       ]
-            };
+          'match' => [
+                     {
+                       'longt' => '4.88355',
+                       'location' => 'RIJKSMUSEUM, AMSTERDAM, NL',
+                       'matchtype' => 'street',
+                       'confidence' => '1.0',
+                       'MentionIndices' => '112',
+                       'latt' => '52.35976'
+                     },
+                     {
+                       'longt' => '4.87986',
+                       'location' => 'MUSEUMPLEIN, AMSTERDAM, NL',
+                       'matchtype' => 'street',
+                       'confidence' => '1.0',
+                       'MentionIndices' => '59',
+                       'latt' => '52.35791'
+                     },
+                     {
+                       'longt' => '4.89574',
+                       'location' => 'Amsterdam,NL',
+                       'matchtype' => 'locality',
+                       'confidence' => '0.4',
+                       'MentionIndices' => '30',
+                       'latt' => '52.36014'
+                     }
+                   ]
+        };
     
 
     	#or
 
 	#forward geocode and cleanup/standardize input address
-	my $ref = $g->geocode(locate=>'10 Downing St, londino UK');                    
+
+	my $ref = $g->geocode(locate=>'10 Downing St, Londino UK');                    
   	print Dumper $ref;
 
 	#expected response
-	$Response = {
-              'longt' => '-0.1275923',
-              'standard' => {
-                            'prov' => 'GB',
-                            'confidence' => '0.80',
-                            'city' => 'London',
-                            'addresst' => '10 Downing St, London SW1A 2AB, UK',
-                            'stnumber' => '10'
-                          },
-              'latt' => '51.5034066'
-            };
+	$Response  = {
+          'standard' => {
+                        'stnumber' => '10',
+                        'addresst' => 'DOWNING STREET',
+                        'city' => 'Londino',
+                        'prov' => 'UK',
+                        'countryname' => 'United Kingdom',
+                        'postal' => {},
+                        'confidence' => '0.60'
+                      },
+          'longt' => '-0.12768',
+          'elevation' => {},
+          'latt' => '51.50354'
+        };
+
 
 
 	#reverse geocode
@@ -209,30 +206,45 @@ our $VERSION = '0.04';
 	
 =head1 DESCRIPTION
 
-This module provides a Perl frontend for the geocode.xyz, geocoder.ca and addrs.xyz API. 
-It allows the programmer to extract locations containing street addresses, street intersections and city names along with their geocoded latitude,longitude from bodies of text such as microblogs or wikipedia entries. (It should work with any type of text, but dumping html text or paragraphs containing over 200 words, will slow down the response considerably. If you need faster parsing grab the geocode.xyz server image on the AWS, and run it on a faster server.
-If you run your own instance, make sure to pass the instance ip address or domain name at invocation eg, Geo::Parser::Text->new($server). For North American locations use geolytica.com, and for Australia and New Zealand use addrs.xyz
+This module provides a Perl front end for the geocode.xyz, geocoder.ca API. 
+
+It allows the programmer to extract locations containing street addresses, street intersections and city names along with their geocoded latitude,longitude from bodies of text such as microblogs or wikipedia entries. (It should work with any type of text, but dumping html text or paragraphs containing over 200 words, will slow down the response. 
+
+If you need faster parsing grab the geocode.xyz server image on the AWS, and run it on a faster server.
+
+If you run your own instance, make sure to pass the instance ip address or domain name at invocation eg, Geo::Parser::Text->new($server). For North American locations use geocoder.ca
 
 The api also geocodes single locations (returning the location matched with the highest probability from a string of text. If you pass a latitude,longitude pair, it will reverse geocode that point)
 
-For explanation on the API responses see http://geocode.xyz/api
+Geocoding requests also return the elevation value of the point in meters.
+
+For explanation on the API responses see https://geocode.xyz/api
  
 =head2 METHODS
 
 =head2 new
 
-my $geo = new ( host => 'geocode.xyz');
+my $geo = new ( host => 'https://geocode.xyz');
 
-Initialize with the default server. geocode.xyz for Europe, geocoder.ca for North America, addrs.xyz for Australia and New Zealand.
+Initialize with the default server. https://geocode.xyz for Worldwide coverage, https://geocoder.ca for North America.
 
 =head2 geocode
 
 my $ref = $geo->geocode(locate=>'Paris France');
+or
+my $ref = $geo->geocode(scantext=>'Paris France');
 
-Set the text to be scanned or string to be geocoded and return the hash reference with the response. 
+Set the text to be scanned or string to be geocoded and return a hash reference with the response.
+ 
 Takes a hash of parameter names and values.
 You are required to pass a hash to geocode with either the scantext or locate key set to the text you want to geocode/geoparse.
-You may also pass other optional arguments as described in the API.
+
+You may also pass other optional arguments as described in the API at https://geocode.xyz/api.
+
+Foe eg:
+my $ref = $geo->geocode(locate=>'Paris France', auth=>'your auth code for unthrottled access', region=>'FR');
+
+
 
 =over 1
 
@@ -248,10 +260,15 @@ XML::Simple,
 LWP::UserAgent,
 HTTP::Request,
 URI
+Data::Dumper
+
+=head1 SEE ALSO
+
+This module was featured in the 2016 Perl Advent Calendar. L<Read the article|http://perladvent.org/2016/2016-12-16.html>.
 
 =head1 AUTHOR
 
-Ervin Ruci, C<< <eruci at geocoder.ca> >>
+Ervin Ruci, C<< <eruci at geocode.xyz> >>
 
 =head1 BUGS
 
@@ -297,7 +314,7 @@ L<http://search.cpan.org/dist/Geo-Parser-Text/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Ervin Ruci.
+Copyright 2018 Ervin Ruci.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -338,7 +355,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =head1 SEE ALSO
 
-Geo::Coder::Canada
+Geo::Coder::CA
+Geo::Coder::List
+HTML::GoogleMaps::V3
 Geo::Coder::OpenCage
 Geo::Parse::OSM
 Text::NLP

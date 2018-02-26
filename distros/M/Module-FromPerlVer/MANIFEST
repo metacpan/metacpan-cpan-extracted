@@ -1,0 +1,18 @@
+./README
+./CHANGES
+./MANIFEST
+./Makefile.PL
+./lib/Module/FromPerlVer.pm
+./t/00-usable.t
+./t/01-defaults.t
+./t/version/5.005003/etc/version.dat
+./t/version/5.005003/lib/Foo.pm
+./t/version/5.005003/pod/Foo.pod
+./t/version/5.888_888/etc/version.dat
+./t/version/5.888_888/lib/Foo.pm
+./t/version/5.888_888/pod/Foo.pod
+./t/version/5.999_999/etc/version.dat
+./t/version/5.999_999/lib/Foo.pm
+./t/version/5.999_999/pod/Foo.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

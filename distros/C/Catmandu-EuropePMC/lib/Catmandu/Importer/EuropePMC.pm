@@ -1,5 +1,7 @@
 package Catmandu::Importer::EuropePMC;
 
+our $VERSION = '1.01';
+
 use Catmandu::Sane;
 use Catmandu::Importer::XML;
 use Try::Tiny;
@@ -42,9 +44,9 @@ sub _request {
     my $res;
     try {
         $res = $ua->get($url);
-        die $res->status_line unless $res->is_success;
+        #die $res->status_line unless $res->is_success;
 
-        return $res->content;
+        $res->is_success ? return $res->content : return '';
     }
     catch {
         Catmandu::Error->throw("Status code: $res->status_line");

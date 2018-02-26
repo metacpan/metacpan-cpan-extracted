@@ -8,7 +8,7 @@ use Test::More tests => 2;
 
 use Mail::Run::Crypt;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $name = 'mrc_custom';
 my %opts = (

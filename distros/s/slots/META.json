@@ -1,0 +1,48 @@
+{
+   "abstract" : "A simple pragma for managing class slots.",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "slots",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MOP" : "0.14",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevan/p5-slots/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/p5-slots.git",
+         "web" : "https://github.com/stevan/p5-slots"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -8,7 +8,7 @@ package Stable::Module;
 # Copyright (c) 2014, 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 use 5.00503;

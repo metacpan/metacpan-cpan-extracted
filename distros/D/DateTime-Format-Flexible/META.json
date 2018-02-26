@@ -4,7 +4,7 @@
       "Tom Heady (cpan@punch.net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::MockTime" : "0",
+            "Test::Simple" : "0.44"
          }
       },
       "configure" : {
@@ -38,14 +40,9 @@
             "List::MoreUtils" : "0",
             "Module::Pluggable" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::MockTime" : "0",
-            "Test::Simple" : "0.44"
-         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.28"
+   "version" : "0.29",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

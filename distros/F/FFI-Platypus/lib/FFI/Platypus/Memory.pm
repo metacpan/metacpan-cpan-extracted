@@ -6,7 +6,7 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup );
@@ -59,7 +59,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -196,6 +196,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

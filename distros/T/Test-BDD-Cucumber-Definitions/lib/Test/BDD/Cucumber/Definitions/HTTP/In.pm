@@ -3,16 +3,16 @@ package Test::BDD::Cucumber::Definitions::HTTP::In;
 use strict;
 use warnings;
 
-use Test::BDD::Cucumber::StepFile qw(Given When Then);
-use Test::BDD::Cucumber::Definitions::HTTP qw(C :util);
+use Test::BDD::Cucumber::Definitions qw(C Given When Then);
+use Test::BDD::Cucumber::Definitions::HTTP qw(:util);
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]
 
 # http request header "" set ""
-When qr/http request header "(.+?)" set "(.+)"/, sub {
+When qr/http request header "(.+?)" set "(.*)"/, sub {
     my ( $header, $value ) = ( $1, $2 );
 
     header_set( $header, $value );
@@ -40,7 +40,7 @@ Then qr/http response code eq "(.+)"/, sub {
 };
 
 # http response header "" eq ""
-Then qr/http response header "(.+?)" eq "(.+)"/, sub {
+Then qr/http response header "(.+?)" eq "(.*)"/, sub {
     my ( $name, $value ) = ( $1, $2 );
 
     header_eq( $name, $value );
@@ -54,7 +54,7 @@ Then qr/http response header "(.+?)" re "(.+)"/, sub {
 };
 
 # http response content eq ""
-Then qr/http response content eq "(.+)"/, sub {
+Then qr/http response content eq "(.*)"/, sub {
     my ($value) = ($1);
 
     content_eq($value);

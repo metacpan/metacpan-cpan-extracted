@@ -2,8 +2,8 @@ NAME
     Color::Theme - Color theme structure
 
 VERSION
-    This document describes version 0.01 of Color::Theme (from Perl
-    distribution Color-Theme), released on 2014-12-11.
+    This document describes version 0.10.1 of Color::Theme (from Perl
+    distribution Color-Theme), released on 2018-02-25.
 
 DESCRIPTION
     This module specifies a structure for color themes. The distribution
@@ -54,7 +54,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

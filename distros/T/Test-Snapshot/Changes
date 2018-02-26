@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-Snapshot
 
+0.06	Fri Feb 23 02:17:16 GMT 2018
+ - localise $@ to avoid spurious diag - thanks @nohuhu
+
 0.05	Fri Jan 26 22:53:04 GMT 2018
  - generate diff rather than full dump on test-fail
 

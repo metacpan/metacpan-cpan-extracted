@@ -3,6 +3,6 @@ if.pm
 LICENSE
 Makefile.PL
 MANIFEST
+META.json			Module meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
 t/if.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,48 @@
+{
+   "abstract" : "The Games::LatticeGenerator for cut&fold.",
+   "author" : [
+      "Pawel Biernacki <pawel.f.biernacki@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Games-LatticeGenerator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AI::Prolog" : "0.741",
+            "Capture::Tiny" : "0.25",
+            "Carp" : "1.36",
+            "GD::Image" : "2.38",
+            "GD::Simple" : "0",
+            "Math::Trig" : "1.23",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

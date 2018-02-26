@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -97,7 +97,7 @@ sub _open_collect_status {
 
   return unless $self;
 
-  $self->_status($? // $e);
+  $self->_status($e // $?) unless defined $self->_status;
   $self->_diag("Forked code Process Exit status: " . $self->exit_status)
     if DEBUG;
 
@@ -139,9 +139,16 @@ sub _clean_pidfile { unlink(shift->pidfile) if $_[0]->pidfile }
 sub _collect {
   my ($self, $pid) = @_;
   $pid //= $self->pid;
-  waitpid $pid, 0;
-  return $self->_open_collect_status($pid) if $self->execute;
-  return $self->_fork_collect_status($pid) if $self->code;
+
+  $self->session->_protect(
+    sub {
+      local $?;
+      waitpid $pid, 0 unless defined $self->_status;
+      return $self->_open_collect_status($pid) if $self->execute;
+      return $self->_fork_collect_status($pid) if $self->code;
+    });
+
+  $self;
 }
 
 sub _fork_collect_status {
@@ -154,7 +161,7 @@ sub _fork_collect_status {
   my $rt;
   my @result_error;
 
-  $self->_status($? // $e);
+  $self->_status($e // $?) unless defined $self->_status;
   $self->_diag("Forked code Process Exit status: " . $self->exit_status)
     if DEBUG;
 
@@ -295,6 +302,8 @@ sub _fork {
         for qw(read_stream error_stream write_stream channel_in channel_out);
     }
     $self->session->reset;
+    $self->session->subreaper(0);    # Subreaper bit does not persist in fork
+
     $! = 0;
     my $rt;
     eval { $rt = [$code->($self, @args)]; };
@@ -353,8 +362,12 @@ sub wait {
 sub wait_stop   { shift->wait->stop }
 sub errored     { !!@{shift->error} ? 1 : 0 }
 sub exit_status { defined $_[0]->_status ? shift->_status >> 8 : undef }
-sub restart     { $_[0]->is_running ? $_[0]->stop->start : $_[0]->start; }
-sub is_running  { $_[0]->process_id ? kill 0 => $_[0]->process_id : 0; }
+
+sub restart {
+  $_[0]->{_status} = undef;
+  $_[0]->is_running ? $_[0]->stop->start : $_[0]->start;
+}
+sub is_running { $_[0]->process_id ? kill 0 => $_[0]->process_id : 0; }
 
 sub write_pidfile {
   my ($self, $pidfile) = @_;
@@ -444,7 +457,7 @@ sub start {
 }
 
 sub send_signal {
-  my $self = shift;
+  my $self   = shift;
   my $signal = shift // $self->_default_kill_signal;
   return unless $self->is_running;
   $self->_diag("Sending signal '$signal' to " . $self->process_id) if DEBUG;
@@ -454,6 +467,11 @@ sub send_signal {
 
 sub stop {
   my $self = shift;
+
+  return $self unless defined $self->pid;
+
+  $self->_diag("Stopping " . $self->pid) if DEBUG;
+
   return $self->_shutdown(1) unless $self->is_running;
 
   my $ret;
@@ -468,9 +486,13 @@ sub stop {
         . $self->pid)
       if DEBUG;
     sleep $self->sleeptime_during_kill if $self->sleeptime_during_kill;
-    $self->send_signal();
-    $ret = waitpid($self->process_id, WNOHANG);
-    $self->_status($?);
+    $self->session->_protect(
+      sub {
+        local $?;
+        $self->send_signal();
+        $ret = waitpid($self->process_id, WNOHANG);
+        $self->_status($?) if $ret == $self->process_id;
+      });
     $attempt++;
   }
 
@@ -480,9 +502,12 @@ sub stop {
     $self->_diag(
       "Could not kill process id: " . $self->process_id . ", blocking attempt")
       if DEBUG;
-    $self->emit('process_stuck')->send_signal($self->_default_blocking_signal);
-    waitpid($self->process_id, 0);
-    $self->_status($?);
+    $self->emit('process_stuck');
+
+    ### XXX: avoid to protect on blocking.
+    $self->send_signal($self->_default_blocking_signal);
+    $ret = waitpid($self->process_id, 0);
+    $self->_status($?) if $ret == $self->process_id;
   }
   elsif ($self->is_running) {
     $self->_diag("Could not kill process id: " . $self->process_id) if DEBUG;
@@ -493,13 +518,23 @@ sub stop {
 }
 
 sub _shutdown {
-  my $self = shift;
-  waitpid $self->pid, 0 if pop && $self->pid;
-  $self->emit('collect_status') if !defined $self->_status;
+  my ($self, $wait) = @_;
+  return $self unless $self->pid;
+
+  $self->_diag("Shutdown " . $self->pid) if DEBUG;
+  $self->session->_protect(
+    sub {
+      local $?;
+      waitpid $self->pid, 0;
+      $self->emit('collect_status');
+    }) if $wait && !defined $self->_status;
+
+  $self->emit('collect_status') unless defined $self->_status;
   $self->_clean_pidfile;
   $self->emit('process_error', $self->error)
     if $self->error && $self->error->size > 0;
   $self->unsubscribe('collect_status');
+
   return $self->emit('stop');
 }
 

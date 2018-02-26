@@ -26,16 +26,17 @@ no warnings 'redefine';
 }
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-{
 # Test when there is nothing left to commit (using the starting $output)
-local $Module::Release::Git::run_output = $Module::Release::Git::fine_output;
+foreach my $try (qw(fine_output clean_output_git_2x)) {
+	no strict 'refs';
+	local $Module::Release::Git::run_output = ${ "Module::Release::Git::$try" };
 
-my $rc = eval { $class->$method() };
-my $at = $@;
+	my $rc = eval { $class->$method() };
+	my $at = $@;
 
-ok( ! $at, "(Nothing left to commit) \$@ undef (good)" );
-ok( $rc, "(Nothing left to commit) returns true (good)" );
-}
+	ok( ! $at, "(Nothing left to commit) \$@ undef (good)" );
+	ok( $rc, "(Nothing left to commit) returns true (good)" );
+	}
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Test when there is a new file
@@ -71,7 +72,7 @@ the test run to try different things.
 
 BEGIN {
 package Module::Release::Git;
-use vars qw( $run_output $fine_output
+use vars qw( $run_output $fine_output $clean_output_git_2x
 	$newfile_output $changedfile_output
 	$untrackedfile_output $combined_output
 	);
@@ -79,6 +80,12 @@ use vars qw( $run_output $fine_output
 $fine_output = <<"HERE";
 # On branch master
 nothing to commit (working directory clean)
+HERE
+
+$clean_output_git_2x = <<"HERE";
+On branch master
+Your branch is up-to-date with 'origin/master'
+nothing to commit, working tree clean
 HERE
 
 no warnings 'redefine';

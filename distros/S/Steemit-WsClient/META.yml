@@ -1,0 +1,40 @@
+---
+abstract: 'perl lirary for interacting with the steemit websocket services!'
+author:
+  - 'snkoehn <snkoehn@cpan.com>'
+build_requires:
+  Math::BigInt: '1.999810'
+  Math::BigInt::GMP: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Steemit-WsClient
+provides:
+  Steemit::Base58:
+    file: lib/Steemit/Base58.pm
+  Steemit::ECDSA:
+    file: lib/Steemit/ECDSA.pm
+  Steemit::WsClient:
+    file: lib/Steemit/WsClient.pm
+    version: '0.07'
+requires:
+  Bytes::Random::Secure: '0.05'
+  Crypt::RIPEMD160: '0'
+  Date::Calc: '0'
+  Digest::SHA: '0'
+  IO::Socket::SSL: '0'
+  Math::BigInt: '1.999810'
+  Math::BigInt::GMP: '0'
+  Math::EllipticCurve::Prime: '0'
+  Modern::Perl: '0'
+  Mojo::Base: '0'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

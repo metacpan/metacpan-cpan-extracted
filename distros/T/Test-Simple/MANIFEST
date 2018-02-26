@@ -228,6 +228,10 @@ t/Test2/behavior/Subtest_events.t
 t/Test2/behavior/Subtest_plan.t
 t/Test2/behavior/Subtest_todo.t
 t/Test2/behavior/Taint.t
+t/Test2/behavior/disable_ipc_a.t
+t/Test2/behavior/disable_ipc_b.t
+t/Test2/behavior/disable_ipc_c.t
+t/Test2/behavior/disable_ipc_d.t
 t/Test2/behavior/err_var.t
 t/Test2/behavior/init_croak.t
 t/Test2/behavior/intercept.t

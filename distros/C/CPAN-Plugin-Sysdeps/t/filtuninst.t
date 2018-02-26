@@ -14,7 +14,7 @@ plan 'no_plan';
 
 isa_ok $p, 'CPAN::Plugin::Sysdeps';
 
-if ($p->{installer} =~ m{^(apt-get|pkg|homebrew|chocolatey)$}) {
+if ($p->{installer} =~ m{^(apt-get|pkg|pkg_add|homebrew|chocolatey|yum|dnf)$}) {
     {
 	my @packages = $p->_filter_uninstalled_packages(qw(libdoesnotexist1 libdoesnotexist2));
 	is_deeply \@packages, [qw(libdoesnotexist1 libdoesnotexist2)];

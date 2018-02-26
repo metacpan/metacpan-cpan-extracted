@@ -39,7 +39,7 @@ pwgen-xkcd.pl - Generate a xkcd-style password
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 USAGE
 
@@ -60,7 +60,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2018 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

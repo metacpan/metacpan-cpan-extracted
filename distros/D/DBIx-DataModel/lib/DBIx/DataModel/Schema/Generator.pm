@@ -11,13 +11,11 @@ no warnings 'uninitialized';
 use Carp;
 use List::Util   qw/max/;
 use Exporter     qw/import/;
-use Scalar::Does qw/does/;
 use DBI;
 use Try::Tiny;
 use Module::Load ();
+use Carp::Clan   qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
 
 our @EXPORT = qw/fromDBIxClass fromDBI/;
 
@@ -85,7 +83,7 @@ sub parse_DBI {
 
   # dbh connection
   my $arg1    = shift or croak "missing arg (dsn for DBI->connect(..))";
-  my $dbh = does($arg1, 'DBI::db') ? $arg1 : do {
+  my $dbh = ref $arg1 && $arg1->isa('DBI::db') ? $arg1 : do {
     my $user    = shift || "";
     my $passwd  = shift || "";
     my $options = shift || {RaiseError => 1};
@@ -160,7 +158,7 @@ sub parse_DBIx_Class {
   my $dbic_schema = shift or croak "missing arg (DBIC schema name)";
 
   # load the DBIx::Class schema
-  Module::Load::load $dbic_schema or croak $@;
+  eval {Module::Load::load $dbic_schema; 1} or croak $@;
 
   # global hash to hold assoc. info (because we must collect info from
   # both tables to get both directions of the association)
@@ -481,7 +479,7 @@ If L<SQL::Translator|SQL::Translator> is installed
 
   use DBIx::DataModel::Schema::Generator;
   my $generator 
-    = DBIx::DataModel::Schema::Generator(schema => "My::New::Schema");
+    = DBIx::DataModel::Schema::Generator->new(schema => "My::New::Schema");
 
   $generator->parse_DBI($connection_string, $user, $passwd, \%options);
   $generator->parse_DBI($dbh);

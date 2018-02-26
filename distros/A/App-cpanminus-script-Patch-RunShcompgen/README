@@ -3,9 +3,9 @@ NAME
     distribution installation
 
 VERSION
-    This document describes version 0.003 of
+    This document describes version 0.004 of
     App::cpanminus::script::Patch::RunShcompgen (from Perl distribution
-    App-cpanminus-script-Patch-RunShcompgen), released on 2018-02-18.
+    App-cpanminus-script-Patch-RunShcompgen), released on 2018-02-20.
 
 SYNOPSIS
     In the command-line:

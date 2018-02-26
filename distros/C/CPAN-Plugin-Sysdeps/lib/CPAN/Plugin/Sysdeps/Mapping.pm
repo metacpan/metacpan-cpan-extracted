@@ -3,11 +3,12 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 # shortcuts
 #  os and distros
 use constant os_freebsd  => (os => 'freebsd');
+use constant os_openbsd  => (os => 'openbsd');
 use constant os_windows  => (os => 'MSWin32');
 use constant os_darwin   => (os => 'darwin'); # really means installer=homebrew
 use constant like_debian => (linuxdistro => '~debian');
@@ -397,11 +398,15 @@ sub mapping {
       # real testing with redis-server
       [os_freebsd,
        [package => 'redis']],
+      [os_openbsd,
+       [package => 'redis']],
       [like_debian,
        [package => 'redis-server']]],
 
      [cpanmod => ['Cairo', 'Prima::Cairo'],
       [os_freebsd,
+       [package => 'cairo']],
+      [os_openbsd,
        [package => 'cairo']],
       [like_debian,
        [package => 'libcairo2-dev']],
@@ -472,6 +477,8 @@ sub mapping {
      ],
       
      [cpanmod => 'Compress::Raw::Lzma',
+      [os_openbsd,
+       [package => 'xz']],
       [like_debian,
        [package => 'liblzma-dev']],
       [os_darwin,
@@ -507,6 +514,8 @@ sub mapping {
      [cpanmod => 'Convert::Recode',
       [os_freebsd,
        [package => 'recode']],
+      [os_openbsd,
+       [package => 'recode']],
       [like_debian,
        [package => 'recode']],
       [like_fedora,
@@ -541,6 +550,8 @@ sub mapping {
 
      [cpanmod => [qw(Crypt::DH::GMP Math::GMPq Math::GMPz Math::BigInt::GMP)],
       [os_freebsd,
+       [package => 'gmp']],
+      [os_openbsd,
        [package => 'gmp']],
       [like_debian,
        [linuxdistrocodename => 'squeeze',
@@ -621,6 +632,11 @@ sub mapping {
      [cpanmod => 'Crypt::Sodium',
       [os_freebsd,
        [package => 'libsodium']],
+      [os_openbsd,
+      # does not work
+       [package => 'libsodium']],
+      [os_openbsd,
+       [package => 'libsodium']],
       [like_debian,
        [linuxdistrocodename => ['squeeze', 'wheezy'],
 	[package => []], # not available before jessie
@@ -666,6 +682,8 @@ sub mapping {
      [cpanmod => ['Data::UUID::LibUUID', 'UUID'],
       [os_freebsd,
        [package => 'e2fsprogs-libuuid']],
+      [os_openbsd,
+       [package => 'ossp-uuid']],
       [like_debian,
        [package => 'uuid-dev']],
       [like_fedora,
@@ -723,6 +741,8 @@ sub mapping {
      [cpanmod => 'DBD::mysql',
       [os_freebsd,
        [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
+      [os_openbsd,
+       [package => 'mariadb-client']],
       [like_debian,
        [linuxdistrocodename => 'stretch',
 	[package => 'default-libmysqlclient-dev']],
@@ -749,6 +769,8 @@ sub mapping {
      [cpanmod => 'DBD::Pg',
       [os_freebsd,
        [package => 'postgresql95-server | postgresql93-server']],
+      [os_openbsd,
+       [package => 'postgresql-server']],
       [like_debian,
        [package => 'libpq-dev']],
       [like_fedora,
@@ -952,6 +974,19 @@ sub mapping {
       [os_freebsd,
        [package => 'ta-lib']]], # alternative would be Alien::TALib
 
+     [cpanmod => 'Firefox::Marionette',
+      [os_freebsd,
+       [package => [ 'firefox', 'xorg-vfbserver', 'xauth' ]]],
+      [os_openbsd,
+       [package => [ 'firefox' ]]],
+      [like_debian,
+       [package => [ 'firefox-esr', 'xvfb', 'xauth' ]]],
+      [like_fedora,
+       [package => [ 'firefox', 'xorg-x11-server-Xvfb', 'xorg-x11-xauth' ]]],
+      [os_windows,
+       [package => [ 'firefox' ]]],
+     ],
+
      [cpanmod => ['FTDI::D2XX', 'Device::FTDI'],
       # neither libftdi nor libftdi1 seem to work on FreeBSD
       [like_debian,
@@ -1000,6 +1035,8 @@ sub mapping {
      [cpanmod => 'GD',
       [os_freebsd,
        [package => 'libgd']],
+      [os_openbsd,
+       [package => 'gd']],
       [like_debian,
        [linuxdistrocodename => ['precise', 'wheezy'],
 	[package => 'libgd2-noxpm-dev | libgd2-xpm-dev']],
@@ -1066,6 +1103,8 @@ sub mapping {
      [cpanmod => 'Git::XS',
       [os_freebsd,
        [package => 'libgit2']],
+      [os_openbsd,
+       [package => 'libgit2']],
       [like_debian,
        [linuxdistrocodename => ['squeeze', 'wheezy'],
 	[package => []]], # N/A
@@ -1096,6 +1135,8 @@ sub mapping {
 
      [cpanmod => 'Glib::Object::Introspection',
       [os_freebsd,
+       [package => 'gobject-introspection']],
+      [os_openbsd,
        [package => 'gobject-introspection']],
       [like_debian,
        [package => 'libgirepository1.0-dev']],
@@ -1144,10 +1185,12 @@ sub mapping {
        [package => 'libgnome2-dev']], # does not work, module does not look into /usr/include/libgnome-2.0/
      ],
 
-     [cpanmod => ['GnuPG', 'GnuPG::Interface'],
+     [cpanmod => ['GnuPG', 'GnuPG::Interface', 'Module::Signature'],
       [os_freebsd,
        [package => 'gnupg1'] #  XXX what about gnupg (version 2)?
       ],
+      [os_openbsd,
+       [package => 'gnupg']],
       [like_debian,
        [package => 'gnupg']],
       [like_fedora,
@@ -2206,6 +2249,8 @@ sub mapping {
      [cpanmod => 'Pango',
       [os_freebsd,
        [package => 'pango']],
+      [os_openbsd,
+       [package => 'pango']],
       [like_debian,
        [package => 'libpango1.0-dev']],
       [like_fedora,
@@ -2644,6 +2689,9 @@ sub mapping {
      [cpanmod => 'Unix::Statgrab',
       [os_freebsd,
        [package => 'libstatgrab']],
+      [os_openbsd,
+	# doesn't work
+       [package => 'libstatgrab']],
       [like_debian,
        # unfortunately does not work in wheezy, the library version is too old for the module
        # jessie and later is fine
@@ -2726,6 +2774,9 @@ sub mapping {
        [package => 'npm']]],
 
      [cpanmod => 'WWW::Curl',
+      [os_openbsd,
+	# doesn't work
+       [package => 'curl']],
       # XXX freebsd?
       [like_debian,
        [package => 'libcurl4-openssl-dev | libcurl4-gnutls-dev | libcurl4-nss-dev']],
@@ -2735,6 +2786,9 @@ sub mapping {
 
      [cpanmod => 'WWW::Mechanize::PhantomJS',
       [os_freebsd,
+       [package => 'phantomjs']],
+      [os_openbsd,
+	# doesn't work
        [package => 'phantomjs']],
       [like_debian,
        [linuxdistrocodename => [qw(squeeze wheezy jessie precise)],
@@ -2756,6 +2810,9 @@ sub mapping {
      [cpanmod => 'XML::LibXML',
       [os_freebsd,
        [package => 'libxml2']],
+      [os_openbsd,
+	# doesn't work at the moment
+       [package => 'libxml2']],
       [like_debian,
        [package => 'libxml2-dev']],
       [like_fedora,
@@ -2765,6 +2822,8 @@ sub mapping {
      [cpanmod => 'XML::LibXSLT',
       [os_freebsd,
        [package => 'libxslt']],
+      [os_openbsd,
+       [package => 'libxslt']],
       [like_debian,
        [package => ['libxslt1-dev', 'libgdbm-dev']]],
       [like_fedora,
@@ -2772,6 +2831,8 @@ sub mapping {
 
      [cpanmod => 'XML::Parser',
       [os_freebsd,
+       [package => 'expat']],
+      [os_openbsd,
        [package => 'expat']],
       [like_debian,
        [package => 'libexpat1-dev']],

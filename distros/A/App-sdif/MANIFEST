@@ -18,7 +18,6 @@ lib/App/sdif/autocolor/Apple_Terminal.pm
 lib/App/sdif/colors.pm
 lib/App/sdif/debug.pm
 lib/App/sdif/default.pm
-lib/App/sdif/osx_autocolor.pm
 minil.toml
 script/cdif
 script/sdif

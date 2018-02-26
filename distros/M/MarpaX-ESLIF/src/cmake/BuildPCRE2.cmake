@@ -36,14 +36,31 @@ ENDIF ()
 # We force the install command with DESTDIR= in any case, so that it always remains local
 # even if user says "make install DESTDIR=/somewhere/else
 #
-EXTERNALPROJECT_ADD(pcre2
-  URL "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23-patched.tar.gz"
-  UPDATE_COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23/CMakeLists_fixed.txt" "${CMAKE_CURRENT_BINARY_DIR}/pcre2/src/pcre2/CMakeLists.txt"
-  PREFIX "${CMAKE_CURRENT_BINARY_DIR}/pcre2"
-  CMAKE_ARGS ${_PCRE2_CMAKE_ARGS}
-  CMAKE_CACHE_ARGS ${_CMAKE_CACHE_ARGS}
-  INSTALL_COMMAND "${CMAKE_MAKE_PROGRAM}" install "DESTDIR="
-  )
+# On Unix this is make
+# On Unix this is nmake, usually lowercase (I have never seen this with capital letter(s))
+#
+IF ("${CMAKE_MAKE_PROGRAM}" MATCHES ".*make")
+  EXTERNALPROJECT_ADD(pcre2
+    URL "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23-patched.tar.gz"
+    UPDATE_COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23/CMakeLists_fixed.txt" "${CMAKE_CURRENT_BINARY_DIR}/pcre2/src/pcre2/CMakeLists.txt"
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/pcre2"
+    CMAKE_ARGS ${_PCRE2_CMAKE_ARGS}
+    CMAKE_CACHE_ARGS ${_CMAKE_CACHE_ARGS}
+    INSTALL_COMMAND "${CMAKE_MAKE_PROGRAM}" install DESTDIR=
+    )
+ELSE ()
+  EXTERNALPROJECT_ADD(pcre2
+    URL "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23-patched.tar.gz"
+    UPDATE_COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23/CMakeLists_fixed.txt" "${CMAKE_CURRENT_BINARY_DIR}/pcre2/src/pcre2/CMakeLists.txt"
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/pcre2"
+    CMAKE_ARGS ${_PCRE2_CMAKE_ARGS}
+    CMAKE_CACHE_ARGS ${_CMAKE_CACHE_ARGS}
+    #
+    # Only make (nmake) can handle the install DESTDIR= argument AFAIK
+    #
+    # INSTALL_COMMAND "${CMAKE_MAKE_PROGRAM}" install DESTDIR=
+    )
+ENDIF ()
 SET (PCRE2_INCLUDE_DIR "${3RDPARTY_OUTPUT_PATH}/include")
 IF (WIN32 AND ((CMAKE_BUILD_TYPE STREQUAL Debug) OR (CMAKE_BUILD_TYPE STREQUAL RelWithDebInfo)))
   SET (PCRE2_LINK_FLAGS  "${3RDPARTY_OUTPUT_PATH}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}pcre2-8d${CMAKE_STATIC_LIBRARY_SUFFIX}")

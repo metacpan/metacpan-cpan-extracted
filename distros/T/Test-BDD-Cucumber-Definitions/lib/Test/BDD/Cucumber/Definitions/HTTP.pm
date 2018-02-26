@@ -10,16 +10,15 @@ use Exporter qw(import);
 use Hash::MultiValue;
 use HTTP::Response;
 use HTTP::Tiny;
-use Params::ValidationCompiler qw( validation_for );
-use Test::BDD::Cucumber::Definitions::TypeConstraints qw(:all);
-use Test::BDD::Cucumber::StepFile qw();
+use Params::ValidationCompiler qw(validation_for);
+use Test::BDD::Cucumber::Definitions qw(S);
+use Test::BDD::Cucumber::Definitions::HTTP::Types qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 our @EXPORT_OK = qw(
-    S C
     request_send
     code_eq
     header_set header_eq header_re
@@ -44,17 +43,14 @@ const my $HTTP_INTERNAL_EXCEPTION => 599;
 
 ## no critic [Subroutines::RequireArgUnpacking]
 
-sub S { return Test::BDD::Cucumber::StepFile::S }
-sub C { return Test::BDD::Cucumber::StepFile::C }
-
 my $validator_header_set = validation_for(
     params => [
 
         # http request header name
-        { type => ValueString },
+        { type => HttpHeader },
 
         # http request header value
-        { type => ValueString },
+        { type => HttpString }
     ]
 );
 
@@ -70,7 +66,7 @@ my $validator_content_set = validation_for(
     params => [
 
         # http request content
-        { type => ValueString },
+        { type => HttpString },
     ]
 );
 
@@ -86,19 +82,15 @@ my $validator_request_send = validation_for(
     params => [
 
         # http request method
-        { type => ValueString },
+        { type => HttpMethod },
 
         # http request url
-        { type => ValueString },
+        { type => HttpUrl },
     ]
 );
 
 sub request_send {
     my ( $method, $url ) = $validator_request_send->(@_);
-
-    if ( $ENV{BDD_HTTP_HOST} ) {
-        $url =~ s/\$BDD_HTTP_HOST/$ENV{BDD_HTTP_HOST}/x;
-    }
 
     my $options = {
         headers => S->{http}->{request}->{headers},
@@ -134,7 +126,7 @@ my $validator_code_eq = validation_for(
     params => [
 
         # http response code
-        { type => ValueInteger },
+        { type => HttpCode },
     ]
 );
 
@@ -152,10 +144,10 @@ my $validator_header_eq = validation_for(
     params => [
 
         # http response header name
-        { type => ValueString },
+        { type => HttpHeader },
 
         # http response header value
-        { type => ValueString },
+        { type => HttpString },
 
     ]
 );
@@ -174,10 +166,10 @@ my $validator_header_re = validation_for(
     params => [
 
         # http response header name
-        { type => ValueString },
+        { type => HttpHeader },
 
         # http response header value
-        { type => ValueRegexp }
+        { type => HttpRegexp }
     ]
 );
 
@@ -196,7 +188,7 @@ my $validator_content_eq = validation_for(
     params => [
 
         # http response content
-        { type => ValueString },
+        { type => HttpString },
 
     ]
 );
@@ -215,7 +207,7 @@ my $validator_content_re = validation_for(
     params => [
 
         # http response content
-        { type => ValueRegexp }
+        { type => HttpRegexp }
     ]
 );
 

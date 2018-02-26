@@ -1,0 +1,23 @@
+---
+abstract: 'A simple pragma for managing class slots.'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: slots
+requires:
+  MOP: '0.14'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/stevan/p5-slots/issues
+  repository: https://github.com/stevan/p5-slots.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

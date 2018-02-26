@@ -3,7 +3,7 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "0.08";
+our $VERSION = "0.10";
 
 BEGIN {
     $ENV{TEST_NGINX_BINARY} ||= 'openresty';
@@ -11,12 +11,16 @@ BEGIN {
 
 use Test::Nginx::Socket::Lua -Base;
 
-use Cwd qw(cwd);
+use Cwd qw(cwd abs_path);
+use File::Spec::Functions qw(catfile);
+use File::Slurp qw(read_file);
 
 my $pwd = cwd();
 our $path = $ENV{TEST_NGINX_APICAST_PATH} ||= "$pwd/gateway";
 our $spec = "$pwd/spec";
 our $servroot = $Test::Nginx::Util::ServRoot;
+
+our $Fixtures = abs_path($ENV{TEST_NGINX_FIXTURES} || catfile('t', 'fixtures'));
 
 # src/?/policy.lua allows us to require apicast.policy.apolicy
 $ENV{TEST_NGINX_LUA_PATH} = "$path/src/?.lua;$path/src/?/policy.lua;;";
@@ -113,7 +117,7 @@ our $dns = sub ($$$) {
 };
 
 sub Test::Base::Filter::random_port {
-    my ($self) = @_;
+    my ($self, $code) = @_;
 
     my $block = $self->current_block;
     my $random_port = $block->random_port;
@@ -130,7 +134,7 @@ sub Test::Base::Filter::random_port {
 
     $ENV{TEST_NGINX_RANDOM_PORT} = $random_port;
 
-    return $random_port
+    return $code;
 }
 
 
@@ -151,6 +155,23 @@ sub Test::Base::Filter::env {
     my ($self, $input) = @_;
 
     return Test::Nginx::Util::expand_env_in_config($input);
+}
+
+sub Test::Base::Filter::fixture {
+    my $name = filter_arguments;
+
+    if (! $name) {
+        bail_out("fixture filter needs argument - file to be loaded");
+    };
+
+    my $file = catfile($Fixtures, $name);
+
+    if (! -f $file) {
+        bail_out("$file is not a file - fixture cannot be loaded");
+    }
+    my $contents = read_file($file);
+
+    return $contents;
 }
 
 1;

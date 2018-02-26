@@ -1,7 +1,6 @@
 package Pithub::Search;
-$Pithub::Search::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github legacy Search API
 
 use Moo;
@@ -68,7 +67,7 @@ Pithub::Search - Github legacy Search API
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 METHODS
 

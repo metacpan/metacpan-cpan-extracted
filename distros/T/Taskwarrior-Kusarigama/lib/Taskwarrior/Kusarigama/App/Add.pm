@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::App::Add;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Add plugins to Taskwarrior
-$Taskwarrior::Kusarigama::App::Add::VERSION = '0.6.0';
+$Taskwarrior::Kusarigama::App::Add::VERSION = '0.7.0';
 
 use 5.10.0;
 
@@ -55,7 +55,7 @@ Taskwarrior::Kusarigama::App::Add - Add plugins to Taskwarrior
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 

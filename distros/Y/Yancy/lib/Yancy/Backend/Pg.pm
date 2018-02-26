@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '0.017';
+our $VERSION = '0.020';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -169,23 +169,25 @@ sub delete {
 
 sub read_schema {
     my ( $self ) = @_;
+    my $database = $self->pg->db->query( 'SELECT current_schema()' )->array->[0];
+
     my %schema;
     my $tables_q = <<ENDQ;
 SELECT * FROM information_schema.tables
-WHERE table_schema NOT IN ('information_schema','pg_catalog')
+WHERE table_schema=?
 ENDQ
 
     my $key_q = <<ENDQ;
 SELECT * FROM information_schema.table_constraints as tc
 JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name)
-WHERE tc.table_name=? AND constraint_type = 'PRIMARY KEY'
+WHERE tc.table_schema=? AND tc.table_name=? AND constraint_type = 'PRIMARY KEY'
 ENDQ
 
-    my @tables = @{ $self->pg->db->query( $tables_q )->hashes };
+    my @tables = @{ $self->pg->db->query( $tables_q, $database )->hashes };
     my %keys;
     for my $t ( @tables ) {
         my $table = $t->{table_name};
-        my @keys = @{ $self->pg->db->query( $key_q, $table )->hashes };
+        my @keys = @{ $self->pg->db->query( $key_q, $database, $table )->hashes };
         $keys{ $table } = \@keys;
         # ; use Data::Dumper;
         # ; say Dumper \@keys;
@@ -196,10 +198,11 @@ ENDQ
 
     my $columns_q = <<ENDQ;
 SELECT * FROM information_schema.columns
-WHERE table_schema NOT IN ('information_schema','pg_catalog')
+WHERE table_schema=?
+ORDER BY ordinal_position ASC
 ENDQ
 
-    my @columns = @{ $self->pg->db->query( $columns_q )->hashes };
+    my @columns = @{ $self->pg->db->query( $columns_q, $database )->hashes };
     for my $c ( @columns ) {
         my $table = $c->{table_name};
         my $column = $c->{column_name};
@@ -274,7 +277,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 0.017
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -377,7 +380,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

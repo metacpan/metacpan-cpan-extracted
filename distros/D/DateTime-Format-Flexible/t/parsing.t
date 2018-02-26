@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use lib '.';
 
-use Test::More tests => 8042;
+use Test::More tests => 8048;
 use File::Spec::Functions 'catfile';
 
 use t::lib::helper;

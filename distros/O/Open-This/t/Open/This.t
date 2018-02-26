@@ -28,6 +28,13 @@ use Test::Differences;
 }
 
 {
+    my $text = q{Open::This::do_something('HASH(0x25521248)')};
+    my $name = Open::This::_maybe_extract_subroutine_name( \$text );
+    is( $name, 'do_something', 'subroutine name with args' );
+    is( $text, 'Open::This',   'sub name stripped' );
+}
+
+{
     my $text = 'Foo::Bar';
     my $name = Open::This::_maybe_find_local_file($text);
     is( $name, 't/lib/Foo/Bar.pm', 'found local file' );

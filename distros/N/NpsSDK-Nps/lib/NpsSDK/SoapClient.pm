@@ -8,9 +8,11 @@ use NpsSDK::Utils;
 use NpsSDK::Constants; 
 use NpsSDK::Errors;
 
-use Data::Structure::Util qw( unbless ); 
-use Log::Log4perl;
-our $VERSION = '1.5'; # VERSION
+use Data::Structure::Util qw( unbless );
+
+use Encode qw(encode);
+
+our $VERSION = '1.6'; # VERSION
 
 my $connection; 
 my $response; 
@@ -18,25 +20,17 @@ my $error;
 
 sub _setup {
     my $self = shift;
-    if (defined $NpsSDK::Configuration::logger) { 
-        NpsSDK::LogException->error if ($NpsSDK::Configuration::log_level eq $Log::Log4perl::DEBUG and 
+    if (defined $NpsSDK::Configuration::logger) {
+        NpsSDK::LogException->error if ($NpsSDK::Configuration::logger->is_debug() and 
                                 $NpsSDK::Configuration::environment eq $NpsSDK::Constants::PRODUCTION_ENV); 
 
-    if ($NpsSDK::Configuration::log_level > $Log::Log4perl::DEBUG){
         eval {  require SOAP::Lite;
                 SOAP::Lite->import(+trace => [ transport => sub {
                 my ($http_object) = @_;
-                NpsSDK::Utils::masking_func($http_object, \&NpsSDK::Utils::mask_data);
+                NpsSDK::Utils::log_data($http_object);
                 }]);
              }
-        } else {
-        eval {  require SOAP::Lite;
-                SOAP::Lite->import(+trace => [ transport => sub {
-                my ($http_object) = @_;
-                NpsSDK::Utils::masking_func($http_object, sub{return $_[0]});
-                }]);
-             }
-        }
+
     } else {
         use SOAP::Lite;
     }
@@ -97,10 +91,13 @@ sub soap_call {
     
     if (defined $error) {
         if ($error == 1) {
+            $NpsSDK::Configuration::logger->warn(encode("UTF-8", "Timeout error"));
             return NpsSDK::TimeoutException->new();
         } elsif ($error == 2 ) {
+            $NpsSDK::Configuration::logger->warn(encode("UTF-8", "Connection error"));
             return NpsSDK::ConnectionException->new();
         } else {
+            $NpsSDK::Configuration::logger->error(encode("UTF-8", "Unknown error"));
             return NpsSDK::UnknownError->new();
         }
     } else {

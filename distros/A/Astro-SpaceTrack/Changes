@@ -1,3 +1,12 @@
+0.104		2018-02-22	T. R. Wyant
+    Add Celestrak Planet Labs & Spire Global datasets
+
+    Canned status updates for decay of Iridiums 3, 43, and 49.
+    Iridium 49 decay Feb 13 2018.
+
+    Normalize names of Iridium satellites in canned status table by
+    removing leading zeroes.
+
 0.103		2018-01-16	T. R. Wyant
     Iridium 34 decayed January 8 2017. So marked in canned status.
 

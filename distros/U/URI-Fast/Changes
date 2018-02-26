@@ -1,0 +1,10 @@
+0.03 2018-02-20
+-10% speedup in stringification by not creating variables
+-Bugfix: setting auth or query did not clear sub-attributes
+-Bugfix: host was being appended regardless of presence
+
+0.02 2018-02-20
+-Bump minimum URI::Encode::XS version to 0.07 (thanks eserte!)
+
+0.01 2018-02-19
+-Initial release

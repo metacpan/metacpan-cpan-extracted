@@ -5,7 +5,7 @@ use warnings;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or build gzip
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::gzip - Find or build gzip
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 SYNOPSIS
 

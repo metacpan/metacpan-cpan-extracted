@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Data::Bitfield qw( bitfield boolfield );
 use Future::Utils qw( repeat );
@@ -355,7 +355,7 @@ sub read_csd
          ( $buf ) = @_;
          $buf =~ s/^\xFF*//;
          $buf =~ s/^\0// or
-            return Future->fail( "Expected response 00; got " . ord( $buf ) );
+            return Future->fail( sprintf "Expected response 00; got %02X to SEND_CSD", ord $buf );
 
          $self->_recv_data_block( $buf, 16 );
       });
@@ -446,7 +446,7 @@ sub read_block
          ( $buf ) = @_;
          $buf =~ s/^\xFF*//;
          $buf =~ s/^\0// or
-            return Future->fail( "Expected response 00; got " . ord( $buf ) );
+            return Future->fail( sprintf "Expected response 00; got %02X to READ_SINGLE_BLOCK", ord $buf );
 
          $self->_recv_data_block( $buf, 512 );
       });

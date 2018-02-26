@@ -30,7 +30,7 @@ L<REFERENCE|DBIx::DataModel::Doc::Reference>
 
 =item *
 
-L<MISC|DBIx::DataModel::Doc::Misc>
+L<COOKBOOK|DBIx::DataModel::Doc::Cookbook>
 
 =item *
 
@@ -59,8 +59,8 @@ intend to extend the framework.
 Internal implementation for insertions into the database :
 takes keys and values within C<%$obj>, generates SQL for 
 insertion of those values into C<< $obj->db_from() >>,
-and executes it. Never called directly, but used by the protected method
-L</"_singleInsert">.
+and executes it. This method is never called directly, but
+used by the protected method L</"_singleInsert">.
 
 The optional C<%args> argument can pass additional options
 to L<SQL::Abstract::More/insert>; currently only one option is 

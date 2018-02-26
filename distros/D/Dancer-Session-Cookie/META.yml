@@ -23,11 +23,10 @@ build_requires:
   Test::More: '0.96'
   Test::NoWarnings: '0'
   Test::Requires: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,7 +35,7 @@ name: Dancer-Session-Cookie
 provides:
   Dancer::Session::Cookie:
     file: lib/Dancer/Session/Cookie.pm
-    version: '0.28'
+    version: '0.29'
 requires:
   Crypt::CBC: '0'
   Crypt::Rijndael: '0'
@@ -50,13 +49,14 @@ requires:
   String::CRC32: '0'
   Time::Duration::Parse: '0'
   base: '0'
+  perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/perldancer/Dancer-Session-Cookie/issues
   homepage: https://github.com/perldancer/Dancer-Session-Cookie
   repository: https://github.com/perldancer/Dancer-Session-Cookie.git
-version: '0.28'
+version: '0.29'
 x_authority: cpan:YANICK
 x_contributors:
   - 'Breno G. de Oliveira <garu@cpan.org>'

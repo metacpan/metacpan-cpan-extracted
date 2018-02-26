@@ -3,7 +3,7 @@ package Pod::ProjectDocs::DocManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.50';    # VERSION
+our $VERSION = '0.51';    # VERSION
 
 use Moose;
 use Carp();

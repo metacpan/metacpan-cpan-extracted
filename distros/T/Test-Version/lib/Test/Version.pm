@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.07'; # VERSION
 
 use parent 'Exporter';
 use Test::Builder;
@@ -211,7 +211,10 @@ sub version_all_ok {
 
   $name ||= "all modules in $dir have valid versions";
 
-  my @files = File::Find::Rule->perl_module->in( $dir );
+  my @files = File::Find::Rule->perl_module->extras({
+    untaint => 1,
+    ($^O eq 'MSWin32' ? (untaint_pattern => qr|^(([a-zA-Z]:)?[-+@\w./]+)$|x) : ()),
+  })->in($dir);
 
   {
     local $_IN_VERSION_ALL_OK = 1;
@@ -262,7 +265,7 @@ Test::Version - Check to see that version's in modules are sane
 
 =head1 VERSION
 
-version 2.05
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -422,7 +425,7 @@ If you are using L<Dist::Zilla> there is a plugin
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/plicease/test-version/issues
+L<https://github.com/plicease/test-version/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -430,9 +433,13 @@ feature.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Gabor Szabo Karen Etheridge Michael G. Schwern Mike Doherty particle
+=for stopwords Damyan Ivanov Dave Rolsky Gabor Szabo Karen Etheridge Michael G. Schwern Mike Doherty particle
 
 =over 4
+
+=item *
+
+Damyan Ivanov <dmn@debian.org>
 
 =item *
 
@@ -476,7 +483,7 @@ Caleb Cushing <xenoterracide@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Caleb Cushing.
+This software is Copyright (c) 2018 by Caleb Cushing.
 
 This is free software, licensed under:
 

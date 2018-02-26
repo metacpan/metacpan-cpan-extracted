@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Steemit/WsClient.pm
+lib/Steemit/Base58.pm
+lib/Steemit/ECDSA.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/02-base58.t
+t/01-keys.t
+t/03-transactions.t
+t/04-ecdsa.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+META.json

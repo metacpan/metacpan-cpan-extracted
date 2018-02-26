@@ -1,4 +1,5 @@
 .gitignore
+bin/run-sql.pl
 Changes
 lib/DBIx/RunSQL.pm
 Makefile.PL
@@ -15,6 +16,8 @@ t/03-comment.t
 t/04-handle-parameters.t
 t/05-output-bool.t
 t/05-select.t
+t/06-quiet.t
+t/formatter.t
 t/rt115442.t
 t/rt77378.sql
 t/rt77378.t
@@ -22,8 +25,9 @@ t/trigger.sql
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t
-xt/99-minimumversion.t
 xt/99-pod.t
+xt/99-synopsis.t
 xt/99-todo.t
 xt/99-unix-text.t
 xt/99-versions.t
+xt/meta-lint.t

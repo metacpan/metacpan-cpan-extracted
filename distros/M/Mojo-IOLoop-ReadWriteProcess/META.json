@@ -55,7 +55,7 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.15"
+         "version" : "0.19"
       },
       "Mojo::IOLoop::ReadWriteProcess::Exception" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/Exception.pm"
@@ -81,7 +81,7 @@
          "web" : "https://github.com/mudler/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.15",
+   "version" : "0.19",
    "x_contributors" : [
       "Ettore Di Giacinto <mudler@gentoo.org>",
       "Ettore Di Giacinto <mudler@users.noreply.github.com>"

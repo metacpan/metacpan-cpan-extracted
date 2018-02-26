@@ -36,13 +36,14 @@ use Clone 'clone';
 
 use App::Aphra::File;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.5';
 
 has commands => (
   isa => 'HashRef',
   is => 'ro',
   default => sub { {
     build => \&build,
+    serve => \&serve,
   } },
 );
 
@@ -60,8 +61,8 @@ sub _build_config_defaults {
     wrapper    => 'page',
     target     => 'docs',
     extensions => {
-      template => 'tt',
-      markdown => 'md',
+      tt => 'template',
+      md => 'markdown',
     },
     output     => 'html',
   };
@@ -123,7 +124,7 @@ sub _build_template {
   my $self = shift;
 
   my $exts = clone $self->config->{extensions};
-  delete $exts->{template};
+  delete $exts->{tt};
 
   return Template->new(
     LOAD_TEMPLATES => [
@@ -179,6 +180,18 @@ sub _make_do_this {
 
     $f->process;
   };
+}
+
+sub serve {
+  my $self = shift;
+
+  require App::HTTPThis;
+  if ($@) {
+    croak "App::HTTPThis must be installed for 'serve' command";
+  }
+
+  local @ARGV = $self->config->{target};
+  App::HTTPThis->new->run;
 }
 
 sub version {

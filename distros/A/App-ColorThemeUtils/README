@@ -1,0 +1,90 @@
+NAME
+    App::ColorThemeUtils - CLI utilities related to color themes
+
+VERSION
+    This document describes version 0.001 of App::ColorThemeUtils (from Perl
+    distribution App-ColorThemeUtils), released on 2018-02-25.
+
+DESCRIPTION
+    This distribution contains the following CLI utilities:
+
+    *   list-color-theme-modules
+
+    *   list-color-themes
+
+FUNCTIONS
+  list_color_theme_modules
+    Usage:
+
+     list_color_theme_modules(%args) -> [status, msg, result, meta]
+
+    List color theme modules.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_color_themes
+    Usage:
+
+     list_color_themes(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   module => *perl::modname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ColorThemeUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ColorThemeUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ColorThemeUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::Theme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

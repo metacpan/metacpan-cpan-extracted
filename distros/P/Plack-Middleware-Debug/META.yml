@@ -3,45 +3,54 @@ abstract: 'display information about the current request/response'
 author:
   - 'Marcel Grunauer, C<< <marcel@cpan.org> >>'
 build_requires:
-  Test::More: 0.70
+  Test::More: '0.70'
+  Test::Requires: '0.08'
 configure_requires:
-  Module::Build::Tiny: 0.026
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-Middleware-Debug
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Class::Method::Modifiers: 1.05
-  Data::Dump: 0
-  Encode: 2.23
-  File::ShareDir: 1.00
-  Plack: 0
-  Text::MicroTemplate: 0.15
-  parent: 0
-  perl: 5.008001
+  Class::Method::Modifiers: '1.05'
+  Data::Dump: '0'
+  Data::Dumper::Concise: '0'
+  Encode: '2.23'
+  File::ShareDir: '1.00'
+  Plack: '0'
+  Text::MicroTemplate: '0.15'
+  parent: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/miyagawa/Plack-Middleware-Debug/issues
   homepage: https://github.com/miyagawa/Plack-Middleware-Debug
   repository: https://github.com/miyagawa/Plack-Middleware-Debug.git
-version: 0.16
+version: '0.17'
 x_contributors:
+  - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
   - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
   - 'Chisel <chisel@chizography.net>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Eugen Konkov <kes-kes@yandex.ru>'
+  - 'franck cuny <franck@lumberjaph.net>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'John Napiorkowski <jjn1056@yahoo.com>'
+  - 'John SJ Anderson <genehack@genehack.org>'
   - 'Jonathan Swartz <swartz@pobox.com>'
   - 'Marcel Gruenauer <hanekomu@gmail.com>'
+  - 'M Somerville <dracos@users.noreply.github.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
   - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
-  - 'franck cuny <franck@lumberjaph.net>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

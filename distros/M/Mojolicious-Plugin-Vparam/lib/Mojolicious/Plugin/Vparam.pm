@@ -5,7 +5,7 @@ use Mojolicious::Plugin::Vparam::Common qw(:all);
 use version;
 use List::MoreUtils qw(firstval natatime mesh);
 
-our $VERSION    = '3.03';
+our $VERSION    = '3.04';
 
 # Regext for shortcut parser
 our $SHORTCUT_REGEXP = qr{
@@ -318,6 +318,7 @@ sub register {
                         $vars->{dom}->find($attr{cpath})->map('text')->each;
                 }
             } elsif ($attr{xpath}) {
+                # XML
                 unless (exists $vars->{xml}) {
                     $vars->{xml} = Mojolicious::Plugin::Vparam::XML::parse_xml(
                         $self->req->body // ''
@@ -327,6 +328,10 @@ sub register {
                     @input = map {$_->textContent}
                         $vars->{xml}->findnodes($attr{xpath});
                 }
+            } elsif ($type && $type eq 'object') {
+                # PHP, jQuery, Ruby, etc.
+                my @names = grep m{^$name\[}, @{$self->req->params->names};
+                @input = ( { map { $_ => params($self, $_) } @names });
             } else {
                 # POST parameters
                 @input = params($self, $name);
@@ -598,6 +603,10 @@ L<Mojo::JSON::Pointer>.
 
 Simple XML/HTML values extraction and validation using CSS selector engine
 from L<Mojo::DOM::CSS> or XPath from L<XML::LibXML>.
+
+=item *
+
+Support objects via parameters
 
 =item *
 
@@ -1182,6 +1191,15 @@ RU: Taxpayer Identification Number
 =head2 kpp
 
 RU: Code of reason for registration
+
+=head2 object
+
+Simple objects via parameters (without validation!). Example:
+
+# {foo => [ {bar => 1, baz => 2} ]}
+?param1[foo][0][bar]=1&param1[foo][0][baz]=2
+
+This is experimental feature. We think how to validate parameters.
 
 =head1 ATTRIBUTES
 

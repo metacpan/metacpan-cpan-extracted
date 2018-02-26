@@ -13,14 +13,11 @@ requires "Readonly" => "0";
 requires "Template" => "0";
 requires "perl" => "v5.8.0";
 
-on 'build' => sub {
+on 'test' => sub {
   requires "File::Path" => "0";
   requires "Test::More" => "0";
-  requires "lib" => "0";
-};
-
-on 'test' => sub {
   requires "Test::Pod" => "0";
+  requires "lib" => "0";
 };
 
 on 'configure' => sub {

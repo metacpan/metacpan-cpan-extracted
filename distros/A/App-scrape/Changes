@@ -1,7 +1,11 @@
+0.07 20180223
+    + Use Text::CSV_XS for CSV output
+    + CSV output now adds headers if there are names
+
 0.06 20180212
     + Actually output data even if the first selector is not found
-	+ Add JSON output format
-	+ Add functionality to fetch more than one URL
+    + Add JSON output format
+    + Add functionality to fetch more than one URL
 
 0.05 20151029
     . Remove MYMETA.* from the distribution, reported by

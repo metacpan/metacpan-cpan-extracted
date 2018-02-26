@@ -3,7 +3,7 @@ use warnings;
 
 package Term::Chrome;
 # ABSTRACT: DSL for colors and other terminal chrome
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 # Pre-declare packages
 {
@@ -106,6 +106,30 @@ sub _plus
     bless \@new
 }
 
+my %reverse = (
+    # Unfortunately there isn't a perfect mapping
+    # Reference:
+    # https://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf page 75
+    1 => 22,
+    2 => 22,
+    3 => 23,
+    4 => 24,   # Underlined
+    5 => 25,
+    6 => 25,
+    7 => 27,
+    8 => 28,
+    9 => 29,
+    21 => 24,  # Double underline
+
+    22 => 1,
+    23 => 3,
+    24 => 4,
+    25 => 5,
+    27 => 7,
+    28 => 8,
+    29 => 9,
+);
+
 sub _reverse
 {
     my $self = shift;
@@ -114,7 +138,7 @@ sub _reverse
     push @new, 49 if $self->[1]; # ResetBg
     # Reset/ResetFlags/ResetFg/ResetBg are removed
     # Other flags are reversed
-    push @new, map { (!$_ || $_ == 22 || $_ > 30) ? () : ($_ > 20 ? $_-20 : $_+20) } @{$self}[2..$#$self];
+    push @new, map { (!$_ || $_ > 30 || !exists $reverse{$_}) ? () : $reverse{$_} } @{$self}[2..$#$self];
     bless \@new, 'Term::Chrome::Flag'
 }
 
@@ -220,7 +244,7 @@ sub _reverse
     bless [
         undef, undef,
         # Reset/ResetFlags/ResetFg/ResetBg are removed
-        map { (!$_ || $_ == 22 || $_ > 30) ? () : ($_ > 20 ? $_-20 : $_+20) } @{$self}[2..$#$self]
+        map { (!$_ || $_ > 30 || !exists $reverse{$_}) ? () : $reverse{$_} } @{$self}[2..$#$self]
     ]
 }
 
@@ -237,7 +261,7 @@ sub _plus
         # Reset
         return $other if !$other->[2];
         # ResetFlags
-        return $other if $other->[2] == 22;
+        return $other if $#$other == 8 || ($self->[2] && $self->[2] < 30 && $other->[2] == $reverse{$self->[2]});
         # Concat flags
         __PACKAGE__->$new(@$self, @{$other}[2..$#$other])
     } elsif ($other->isa(Term::Chrome::)) {
@@ -258,13 +282,13 @@ package
 # due to a bug in perl < 5.18
 # (according to a comment in Types::Serialiser source)
 
-my $mk_flag = sub { Term::Chrome::Flag->$new(undef, undef, $_[0]) };
+my $mk_flag = sub { Term::Chrome::Flag->$new(undef, undef, @_) };
 
 my %const = (
     Reset      => $mk_flag->(''),
     ResetFg    => $mk_flag->(39),
     ResetBg    => $mk_flag->(49),
-    ResetFlags => $mk_flag->(22),
+    ResetFlags => $mk_flag->(22, 23, 24, 25, 27, 28),
     Standout   => $mk_flag->(7),
     Underline  => $mk_flag->(4),
     Reverse    => $mk_flag->(7),

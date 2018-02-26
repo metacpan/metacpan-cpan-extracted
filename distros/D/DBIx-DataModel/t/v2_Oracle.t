@@ -4,14 +4,15 @@ use warnings;
 use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
 
 use DBIx::DataModel -compatibility=> undef;
-
-use constant NTESTS  => 12;
-use Test::More tests => NTESTS;
+use Test::More;
 
 
 SKIP: {
   eval "use DBD::Oracle; 1"
-    or skip "DBD::Oracle is not installed", NTESTS;
+    or plan skip_all => "DBD::Oracle is not installed";
+
+  $ENV{DBI_DSN}
+    or plan skip_all => "ENV{DBI_DSN} is not defined";
 
   # declare datamodel
   eval "use DBIx::DataModel::Statement::Oracle; 1";
@@ -21,8 +22,6 @@ SKIP: {
    )->Table(All_tables => ALL_TABLES => qw/TABLE_NAME OWNER/);
 
   # connect to DB
-  $ENV{DBI_DSN}
-    or skip "ENV{DBI_DSN} is not defined", NTESTS;
   my $dbh = DBI->connect(undef, undef, undef, 
                          {RaiseError => 1, AutoCommit => 1});
   ORA->dbh($dbh);
@@ -99,7 +98,10 @@ SKIP: {
                           -limit     => 3,
                           -result_as => 'statement');
   my $rows = $stmt->next(10);
-  is_deeply($rows, [@$tables[2,3,4]], "limit")
+  is_deeply($rows, [@$tables[2,3,4]], "limit");
+
+
+  done_testing;
 }
 
 

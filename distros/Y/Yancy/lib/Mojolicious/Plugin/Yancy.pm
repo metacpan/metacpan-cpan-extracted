@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '0.017';
+our $VERSION = '0.020';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -100,6 +100,36 @@ our $VERSION = '0.017';
 #pod         return 1;
 #pod     } );
 #pod     $auth_route->add_child( $_ ) for @need_auth;
+#pod
+#pod =head2 yancy.plugin
+#pod
+#pod Add a Yancy plugin. Yancy plugins are Mojolicious plugins that require
+#pod Yancy features and are found in the L<Yancy::Plugin> namespace.
+#pod
+#pod     use Mojolicious::Lite;
+#pod     plugin 'Yancy';
+#pod     app->yancy->plugin( 'Auth::Basic', { collection => 'users' } );
+#pod
+#pod You can also add the Yancy::Plugin namespace into the default plugin
+#pod lookup locations. This allows you to treat them like any other
+#pod Mojolicious plugin.
+#pod
+#pod     # Lite app
+#pod     use Mojolicious::Lite;
+#pod     plugin 'Yancy', ...;
+#pod     unshift @{ app->plugins->namespaces }, 'Yancy::Plugin';
+#pod     plugin 'Auth::Basic', ...;
+#pod
+#pod     # Full app
+#pod     use Mojolicious;
+#pod     sub startup {
+#pod         my ( $app ) = @_;
+#pod         $app->plugin( 'Yancy', ... );
+#pod         unshift @{ $app->plugins->namespaces }, 'Yancy::Plugin';
+#pod         $app->plugin( 'Auth::Basic', ... );
+#pod     }
+#pod
+#pod Yancy does not do this for you to avoid namespace collisions.
 #pod
 #pod =head2 yancy.list
 #pod
@@ -303,6 +333,7 @@ use Mojo::JSON qw( true false );
 use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Sys::Hostname qw( hostname );
+use Yancy::Util qw( load_backend );
 
 #pod =method register
 #pod
@@ -314,7 +345,7 @@ sub register {
     my ( $self, $app, $config ) = @_;
     my $route = $config->{route} // $app->routes->any( '/yancy' );
     $route->to( return_to => $config->{return_to} // '/' );
-    $config->{controller_class} //= 'Yancy';
+    $config->{api_controller} //= 'Yancy::API';
 
     # Resources and templates
     my $share = path( __FILE__ )->sibling( 'Yancy' )->child( 'resources' );
@@ -325,24 +356,18 @@ sub register {
     # Helpers
     $app->helper( 'yancy.config' => sub { return $config } );
     $app->helper( 'yancy.route' => sub { return $route } );
-    $app->helper( 'yancy.backend' => sub {
-        state $backend;
-        if ( !$backend ) {
-            my ( $type, $arg );
-            if ( !ref $config->{backend} ) {
-                ( $type ) = $config->{backend} =~ m{^([^:]+)};
-                $arg = $config->{backend};
-            }
-            else {
-                ( $type, $arg ) = %{ $config->{backend} };
-            }
-            my $class = 'Yancy::Backend::' . ucfirst $type;
-            if ( my $e = load_class( $class ) ) {
-                die ref $e ? "Could not load class $class: $e" : "Could not find class $class";
-            }
-            $backend = $class->new( $arg, $config->{collections} );
+    $app->helper( 'yancy.plugin' => sub {
+        my ( $c, $name, @args ) = @_;
+        my $class = 'Yancy::Plugin::' . $name;
+        if ( my $e = load_class( $class ) ) {
+            die ref $e ? "Could not load class $class: $e" : "Could not find class $class";
         }
-        return $backend;
+        my $plugin = $class->new;
+        $plugin->register( $c->app, @args );
+    } );
+
+    $app->helper( 'yancy.backend' => sub {
+        state $backend = load_backend( $config->{backend}, $config->{collections} );
     } );
 
     $app->helper( 'yancy.list' => sub {
@@ -406,7 +431,7 @@ sub register {
     $route->get( '/' )->name( 'yancy.index' )
         ->to(
             template => 'yancy/index',
-            controller => $config->{controller_class},
+            controller => $config->{api_controller},
             action => 'index',
         );
 
@@ -459,7 +484,7 @@ sub _build_openapi_spec {
         $paths{ '/' . $name } = {
             get => {
                 'x-mojo-to' => {
-                    controller => $config->{controller_class},
+                    controller => $config->{api_controller},
                     action => 'list_items',
                     collection => $name,
                 },
@@ -510,7 +535,7 @@ sub _build_openapi_spec {
             },
             post => {
                 'x-mojo-to' => {
-                    controller => $config->{controller_class},
+                    controller => $config->{api_controller},
                     action => 'add_item',
                     collection => $name,
                 },
@@ -552,7 +577,7 @@ sub _build_openapi_spec {
 
             get => {
                 'x-mojo-to' => {
-                    controller => $config->{controller_class},
+                    controller => $config->{api_controller},
                     action => 'get_item',
                     collection => $name,
                     id_field => $id_field,
@@ -576,7 +601,7 @@ sub _build_openapi_spec {
 
             put => {
                 'x-mojo-to' => {
-                    controller => $config->{controller_class},
+                    controller => $config->{api_controller},
                     action => 'set_item',
                     collection => $name,
                     id_field => $id_field,
@@ -608,7 +633,7 @@ sub _build_openapi_spec {
 
             delete => {
                 'x-mojo-to' => {
-                    controller => $config->{controller_class},
+                    controller => $config->{api_controller},
                     action => 'delete_item',
                     collection => $name,
                     id_field => $id_field,
@@ -680,7 +705,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 0.017
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -786,6 +811,36 @@ authentication or authorization checks:
         return 1;
     } );
     $auth_route->add_child( $_ ) for @need_auth;
+
+=head2 yancy.plugin
+
+Add a Yancy plugin. Yancy plugins are Mojolicious plugins that require
+Yancy features and are found in the L<Yancy::Plugin> namespace.
+
+    use Mojolicious::Lite;
+    plugin 'Yancy';
+    app->yancy->plugin( 'Auth::Basic', { collection => 'users' } );
+
+You can also add the Yancy::Plugin namespace into the default plugin
+lookup locations. This allows you to treat them like any other
+Mojolicious plugin.
+
+    # Lite app
+    use Mojolicious::Lite;
+    plugin 'Yancy', ...;
+    unshift @{ app->plugins->namespaces }, 'Yancy::Plugin';
+    plugin 'Auth::Basic', ...;
+
+    # Full app
+    use Mojolicious;
+    sub startup {
+        my ( $app ) = @_;
+        $app->plugin( 'Yancy', ... );
+        unshift @{ $app->plugins->namespaces }, 'Yancy::Plugin';
+        $app->plugin( 'Auth::Basic', ... );
+    }
+
+Yancy does not do this for you to avoid namespace collisions.
 
 =head2 yancy.list
 
@@ -987,7 +1042,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

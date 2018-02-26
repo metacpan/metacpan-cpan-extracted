@@ -3,7 +3,7 @@
 #
 # Manage database tables with a simulated filesystem shell environment
 #
-# Mar 2003    Alexander Haderer
+# Mar 2003,2018    Alexander Haderer
 #
 # License:
 #
@@ -21,12 +21,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# Last Update:		$Author: marvin $
-# Update Date:		$Date: 2007/12/13 15:06:46 $
-# Source File:		$Source: /home/cvsroot/tools/FileSystem/FileSystem.pm,v $
-# CVS/RCS Revision:	$Revision: 1.22 $
-# Status:		$State: Exp $
-#
 
 package DBIx::FileSystem;
 
@@ -40,7 +34,7 @@ use constant NOFILE => 1;	# file not found in db
 use constant NFOUND => 2;	# more than one entry found
 use constant ERROR  => 3;	# nothing found, errorstring set
 
-$DBIx::FileSystem::VERSION = '1.7';
+$DBIx::FileSystem::VERSION = '2.5';
 
 @ISA = qw( Exporter );
 @EXPORT = qw( );
@@ -58,7 +52,8 @@ use vars qw( $OUT $vwd $dbh );
 
 use DBI;
 use Term::ReadLine;
-use POSIX qw{tmpnam};
+use File::Temp ();
+use POSIX;
 
 use Fcntl;
 
@@ -509,6 +504,8 @@ sub com_cp() {
 	    $select .= "'$new',";
 	  }elsif( exists $vdirs->{$vwd}{cols}{$col}{uniq} ) {
 	    $select .= "NULL,";
+	  }elsif( exists $vdirs->{$vwd}{cols}{$col}{cpdelete} ) {
+	    $select .= "NULL,";
 	  }else{
 	    $select .= "$col,";
 	  }
@@ -582,10 +579,12 @@ sub com_vi() {
     if( $vdirs->{$vwd}{edit} ) {
       my $fnc = $vdirs->{$vwd}{fnamcol};
       if( (length($arg)<=$vdirs->{$vwd}{cols}{$fnc}{len}) and !($arg=~/\W+/)) {
-	while( 1 ) { $tmpf = tmpnam();
-		     sysopen( FN, $tmpf, O_RDWR | O_CREAT | O_EXCL ) && last; }
-	$r = print_file( \*FN, $arg, 2 );
-	close( FN );
+	my $fh = File::Temp->new( UNLINK => 0, 
+				  TEMPLATE => "${arg}.XXXXXXXX", 
+				  TMPDIR => 1 );
+	$tmpf = $fh->filename();
+	$r = print_file( $fh, $arg, 2 );
+	close( $fh );
 	$tmpf_mtime = (stat $tmpf)[9];	# remember mtime of tempfile
 	if( $r==0 or $r==1 ) {
 	  while( 1 ) {
@@ -1325,22 +1324,16 @@ sub var_value_v() {
       $s .= "$PRG: can't exec var query '$ref' :\n  " . $dbh->errstr;
       return $s;
     }
-    $s .= "$var = \n" unless defined $value;
-    my $found = 0;
+
+    my $selected = '';
+    my $available = '';
+    $selected = "    $value" if defined $value;
     while( ($rval) = $st->fetchrow_array() ) {
-      if( defined $value and $value eq $rval ) {
-	$found = 1;
-      }else{
-	$s .= "#";
-      }
-      $s .= "$var = $rval\n";
+      next if defined $value and $value eq $rval;
+      $available .= "    $rval\n";
     }
     $st->finish();
-    if( $found == 0 and defined $value ) {
-      $s .= "### NOTE: File '$value' does not exist in dir '$ref'!\n";
-      $s .= "### NOTE: This value will be rejected when saving!\n";
-      $s .= "$var = $value\n";
-    }
+    $s .= "$var = {\n  Selected:\n$selected\n  Available:\n$available}\n";
   }elsif( defined $flags ) {
     my $i;
     my $maxlen = 0;
@@ -1376,13 +1369,13 @@ sub var_value_v() {
     if( defined $value ) {
       $s .= "#\n$var = {\n$on$off}\n";
     }else{
-      $s .= "#\n$var = \n#$var = {\n$on$off#}\n";
+      $s .= "#\n$var = {   # undefined!\n$on$off}\n";
     }
 
   }elsif( defined $enums ) {
     my $i;
     my $maxlen = 0;
-    foreach $i (sort keys(%{$enums}) ) {
+    foreach $i (keys(%{$enums}) ) {
       if( length( $enums->{$i}[0] ) > $maxlen ) {
 	$maxlen = length( $enums->{$i}[0] );
       }
@@ -1393,7 +1386,7 @@ sub var_value_v() {
     if( defined $value and !exists $enums->{$value} ) {
       $selected .= "    *unknown-enum-value*\n";
     }
-    foreach $i (sort keys(%{$enums}) ) {
+    foreach $i (sort { $a <=> $b } keys(%{$enums}) ) {
       my $first = 1;
       foreach my $dscline (split '\n', $enums->{$i}[1] ) {
 	if( $first ) {
@@ -1404,12 +1397,12 @@ sub var_value_v() {
 	}
       }
       if( defined $value and $value == $i) {
-	$selected .= "    $enums->{$i}[0]\n";
+	$selected .= "    $enums->{$i}[0]";
       }else{
 	$avail .= "    $enums->{$i}[0]\n";
       }
     }
-    $s .= "#\n$var = {\n$selected$avail}\n";
+    $s .= "#\n$var = {\n$selected\n$avail}\n";
 
   }else{
     $s .= "$var = ";
@@ -1617,7 +1610,7 @@ sub create_sql_from_file( ) {
     chop( $line );
     $line =~ s/^\s*//;		# remove leading space
     next MAIN if $line =~ /^$/;	# skip empty lines
-    next MAIN if $line =~ /^\#.*/;	# skip comment lines
+    next MAIN if $line =~ /^\#.*/;# skip comment lines
     unless( $line =~ /=/ ) {	# missing = ?
       $err = "line $lineno: missing '='";
       last MAIN;
@@ -1645,6 +1638,41 @@ sub create_sql_from_file( ) {
 	# check types
 	if( defined $cols->{$col}{ref} ) {
 	  # type ref
+
+	  # 1st parse ref section like an enum to get the 'real' $val
+	  if( $val eq '{' ) {
+	    undef $val;
+	    my $mode = '{';
+	    my $l;
+	  VALREF: while( defined ( $l = <TF> ) ) {
+	      chop( $l );
+	      $lineno++;
+	      $l =~ s/\s*$//;			# remove trailing space
+	      $l =~ s/^\s*//;			# remove leading space
+	      next VALREF if $l =~ /^$/;	# skip empty lines
+	      next VALREF if $l =~ /^\#.*/;	# skip comment lines
+	      if( $l eq 'Selected:' )  { $mode = 'sel'; next VALREF; }
+	      if( $l eq 'Available:' ) { $mode = 'ava'; next VALREF; }
+	      if( $l eq '}' ) 	 { $mode = '}';   last VALREF; }
+	      if( $mode eq 'sel' ) {
+		if( ! defined $val ) {
+		  $val = $l;
+		}else{
+		  $err = "line $lineno: only one elem may be selected for '$var'";
+		  last MAIN;
+		}
+	      }
+	    } # loop VALREF
+	    if( $mode ne '}' ) {
+	      $err = "line $lineno: missing '}' from refs section";
+	      last MAIN;
+	    }
+	  }else{
+	    $err = "line $lineno: refs must start with '{'";
+	    last MAIN;
+	  }
+
+	  # now we have a $val (probably undef!), process it
 	  my $rdir = $cols->{$col}{ref};
 	  my $rfnc = $vdirs->{$rdir}{fnamcol};
 	  if( defined $vdirs->{$rdir}{cols}{$rfnc}{len} ) {
@@ -1659,33 +1687,37 @@ sub create_sql_from_file( ) {
 	      last MAIN;
 	    }
 	  }
-	  # check if val exists in referneced table
-	  my $st;
-	  my $dbval;
-	  $st = $dbh->prepare("select $rfnc from $rdir where $rfnc=?");
-	  unless( $st ) {
-	    $err = "$PRG: internal error: prepare 'exist' query '$rdir':\n  ";
-  	    $err .= $dbh->errstr;
-	    last MAIN;
+	  # check if val exists in referenced table
+	  if( defined $val ) {
+	    my $st;
+	    my $dbval;
+	    $st = $dbh->prepare("select $rfnc from $rdir where $rfnc=?");
+	    unless( $st ) {
+	      $err = "$PRG: internal error: prepare 'exist' query '$rdir':\n  ";
+	      $err .= $dbh->errstr;
+	      last MAIN;
+	    }
+	    unless( $st->execute( $val ) ) {
+	      $err = "$PRG: internal error: exec 'exist' query '$rdir':\n  ";
+	      $err .= $dbh->errstr;
+	      last MAIN;
+	    }
+	    $dbval = $st->fetchrow_array();
+	    $st->finish();
+	    unless( defined $dbval ) {
+	      $err = "line $lineno: reference '$val' does no exist in '$rdir'";
+	      last MAIN;
+	    }
 	  }
-	  unless( $st->execute( $val ) ) {
-	    $err = "$PRG: internal error: exec 'exist' query '$rdir':\n  ";
-  	    $err .= $dbh->errstr;
-	    last MAIN;
-	  }
-	  $dbval = $st->fetchrow_array();
-	  $st->finish();
-	  unless( defined $dbval ) {
-	    $err = "line $lineno: reference '$val' does no exist in '$rdir'";
-	    last MAIN;
-	  }
+
+	  my $sqlval = defined $val ? $dbh->quote( $val ) : "NULL";
 	  if( $insert_flag ) {
 	    $sql1 .= "$col,";
-	    $sql2 .= "'$val',";
+	    $sql2 .= "$sqlval,";
 	  }else{
-	    $sql1 .= "$col='$val',";
+	    $sql1 .= "$col=$sqlval,";
 	  }
-	  $filevars{$col}       = $val;
+	  $filevars{$col} 	= $val;
 	  $filevarslineno{$col} = $lineno;
 
 	}elsif( $cols->{$col}{type} eq 'char' ) {
@@ -1713,7 +1745,7 @@ sub create_sql_from_file( ) {
 	}elsif( $cols->{$col}{type} eq 'int' ) {
 	  # type int
 	  if( exists $cols->{$col}{flags} ) {	# flags: process the flags
-	    if( $val eq '{' ) {
+	    if( $val =~ /{.*/ ) {
 	      $val = 0;
 	      my $mode = '{';
 	      my $l;
@@ -1754,7 +1786,7 @@ sub create_sql_from_file( ) {
 	      $err = "line $lineno: flags must start with '{'";
 	      last MAIN;
 	    }
-	  }elsif( exists $cols->{$col}{enums} ) {	# enums: process the enums
+	  }elsif( exists $cols->{$col}{enums} ) { # enums: process the enums
 
 	    if( $val eq '{' ) {
 	      $val = 'NULL';
@@ -1815,7 +1847,17 @@ sub create_sql_from_file( ) {
 	  }else{
 	    $sql1 .= "$col=$val,";
 	  }
-	  $filevars{$col}       = $val;
+
+	  # workaroud: if enum and no elem was selected $val is 'NULL'
+	  # normally $val here is defined and has usefull value, the
+	  # empty/NULL  case will be handled above ($vlen > 0) but enum 
+	  # is special. $val must stay NULL to make the sql's
+	  # work, but the user supplied valok functions expect 'undef'
+	  if( $val eq 'NULL' ) {
+	    $filevars{$col} = undef;
+	  }else{
+	    $filevars{$col} = $val;
+	  }
 	  $filevarslineno{$col} = $lineno;
 
 	}elsif( $cols->{$col}{type} eq 'smallint' ) {
@@ -1949,7 +1991,7 @@ sub create_sql_from_file( ) {
   if( !defined $err and $hasuniqcols == 1 ) {
     foreach my $col (keys(%filevars) ) {
       my $valerr = "";
-      if( exists $cols->{$col}{uniq} ) {
+      if( exists $cols->{$col}{uniq} and defined $filevars{$col} ) {
 	my $st;
 	my $dbval;
 	$st = $dbh->prepare(
@@ -2115,6 +2157,10 @@ sub do_vgrep() {
 #     dbpasswd: database user's password
 #    progdbver: program's databaase layout version string
 #
+# or
+#         rdbh: reference to DBI database handle setup elsewhere
+#    progdbver: program's databaase layout version string
+#
 # return: the object
 #
 sub new {
@@ -2124,33 +2170,46 @@ sub new {
   bless( $self, $class );
 
   $self->{dbh} = undef;
+  $self->{rdbh} = undef;
   $self->{err} = "Ok";
 
   # initialize object
- FINI: while( 1 ) {
-    if( exists $params{dbconn} and defined( $params{dbconn} ) ){
-      $self->{dbconn} = $params{dbconn};
-    }else{
-      $self->{dbconn} = undef;
-      $self->{err} = "parameter 'dbconn' undefined";
-      last FINI;
-    }
+  if( exists $params{rdbh} and defined( $params{rdbh} ) ){
     if( exists $params{progdbver} and defined( $params{progdbver} ) ) {
       $self->{progdbver} = $params{progdbver};
+      $self->{rdbh} = $params{rdbh};
     }else{
       $self->{progdbver} = undef;
       $self->{err} = "parameter 'progdbver' undefined";
+    }
+  }else{
+
+  FINI: while( 1 ) {
+      if( exists $params{dbconn} and defined( $params{dbconn} ) ){
+	$self->{dbconn} = $params{dbconn};
+      }else{
+	$self->{dbconn} = undef;
+	$self->{err} = "parameter 'dbconn' undefined";
+	last FINI;
+      }
+      if( exists $params{progdbver} and defined( $params{progdbver} ) ) {
+	$self->{progdbver} = $params{progdbver};
+      }else{
+	$self->{progdbver} = undef;
+	$self->{err} = "parameter 'progdbver' undefined";
+	last FINI;
+      }
+      $self->{dbh} = DBI->connect( $self->{dbconn}, 
+				   $params{dbuser}, $params{dbpasswd}, 
+				   { PrintError => 0, AutoCommit => 1, 
+				     ChopBlanks =>1 } );
+      unless( $self->{dbh} ) {
+	$self->{err} = "connect: " . $DBI::errstr;
+	last FINI;
+      }
+      $self->{rdbh} = \$self->{dbh};
       last FINI;
     }
-    $self->{dbh} = DBI->connect( $self->{dbconn}, 
-				 $params{dbuser}, $params{dbpasswd}, 
-				 { PrintError => 0, AutoCommit => 1, 
-				   ChopBlanks =>1 } );
-    unless( $self->{dbh} ) {
-      $self->{err} = "connect: " . $DBI::errstr;
-      last FINI;
-    }
-    last FINI;
   }
 
   return $self;
@@ -2169,6 +2228,7 @@ sub DESTROY {
   $self->{dbh}->disconnect() if defined $self->{dbh};
 
   $self->{dbh} = undef;
+  $self->{rdbh} = undef;
   $self->{dbconn} = undef;
   $self->{progdbver} = undef;
   $self->{err} = "object destroyed";
@@ -2191,9 +2251,9 @@ sub database_bad {
   my $self = shift;
   my $ret = 1;
 
-  if( defined $self->{dbh} ) {	
+  if( defined ${$self->{rdbh}} ) {	
     # check version number
-    my $st = $self->{dbh}->prepare( 
+    my $st = ${$self->{rdbh}}->prepare( 
 		       "SELECT value FROM tablestatus WHERE tag='version'" );
     if( $st ) {
       if( $st->execute() ) {
@@ -2206,10 +2266,10 @@ sub database_bad {
 	}
 	$st->finish();
       }else{
-	$self->{err} = "exec query dbversion: " . $self->{dbh}->errstr;
+	$self->{err} = "exec query dbversion: " . ${$self->{rdbh}}->errstr;
       }
     }else{
-      $self->{err} = "prepare qry dbversion: " . $self->{dbh}->errstr;
+      $self->{err} = "prepare qry dbversion: " . ${$self->{rdbh}}->errstr;
     }
   }
   if( $ret ) {
@@ -2267,8 +2327,8 @@ sub get_conf_by_var {
   my $r = ERROR;
   my $st;
 
-  unless( defined $self->{dbh} ) {
-    $self->{err} = "DBIx::FileSystem object not initialized";
+  unless( defined ${$self->{rdbh}} ) {
+    $self->{err} = "DBIx::FileSystem database not initialized";
     return $r;
   }
 
@@ -2313,9 +2373,9 @@ sub get_conf_by_var {
 	$qry = "SELECT count($fnamcol) FROM $dir WHERE $searchvar" .
 	  $self->sqlize( $searchvars->{$searchvar} ) .
 	  " AND $fnamcol = '$defaultfname'";
-	$st = $self->{dbh}->prepare( "$qry" );
+	$st = ${$self->{rdbh}}->prepare( "$qry" );
 	unless( $st ) {
-	  $self->{err} = "prepare extra qry: " . $self->{dbh}->errstr;
+	  $self->{err} = "prepare extra qry: " . ${$self->{rdbh}}->errstr;
 	  last DB;
 	}
 	if( $st->execute() ) {
@@ -2327,7 +2387,7 @@ sub get_conf_by_var {
 	  }
 	  $st->finish();
 	}else{
-	  $self->{err} = "exec extra qry: " . $self->{dbh}->errstr;
+	  $self->{err} = "exec extra qry: " . ${$self->{rdbh}}->errstr;
 	  last DB;
 	}
       }
@@ -2354,9 +2414,9 @@ sub get_conf_by_var {
     }
     ### print "qry: '$qry'\n";
 
-    $res = $self->{dbh}->selectall_arrayref( $qry, { Slice => {} } );
-    if( !defined $res or defined $self->{dbh}->{err} ) {
-      $self->{err} = "get_conf_by_var(): query: " . $self->{dbh}->errstr;
+    $res = ${$self->{rdbh}}->selectall_arrayref( $qry, { Slice => {} } );
+    if( !defined $res or defined ${$self->{rdbh}}->{err} ) {
+      $self->{err} = "get_conf_by_var(): query: " . ${$self->{rdbh}}->errstr;
       last DB;
     }
 
@@ -2427,17 +2487,19 @@ sub sqlize {
       if( $self->isanumber( $val->[1] ) ) {
 	$r = " $val->[0] $val->[1]";
       }else{
-	$r = " $val->[0] " . $self->{dbh}->quote( $val->[1] );
+	$r = " $val->[0] " . ${$self->{rdbh}}->quote( $val->[1] );
       }
     }else{
       $r = " IS NULL";
     }
-  }else{
+  }elsif( ref( $val ) eq '' ) {		# scalar
     if( $self->isanumber( $val ) ) {
       $r = "=$val";
     }else{
-      $r = "=" . $self->{dbh}->quote( $val );
+      $r = "=" . ${$self->{rdbh}}->quote( $val );
     }
+  }else{
+    $r = "='-->INVALID-SEARCH-VALUE-SPECIFIED<--'";
   }
 
   return $r;
@@ -2507,6 +2569,8 @@ DBIx::FileSystem - Manage tables like a filesystem
 				 dbpasswd => $DBPWD,
 				 progdbver => $PROGDBVER );
 
+  my $fs = new DBIx::FileSystem( rdbh => \$dbh_set_elsehwere,
+				 progdbver => $PROGDBVER );
   my %vars = ( column_1 => undef,	# columns to read from db
 	       column_2 => undef   );
 
@@ -2644,7 +2708,7 @@ Constructor. Parameters are:
 
 =item dbconn
 
-Mandatory.
+Mandatory unless parameter rdbh is set
 DBI connect string to an existing database. Depends on the underlying 
 database. Example: "dbi:Pg:dbname=myconfig;host=the_host";
 
@@ -2658,6 +2722,16 @@ DBI database user needed to connect to the database given in $DBCONN.
 May be undef.
 DBI password needed by $DBUSER to connect to the database given in $DBCONN.
 May be set to undef if no password checking is done.
+
+=item rdbh
+
+Mandatory unless parameter dbconn, dbuser, and dbpasswd are set.
+A reference to an DBI database handle. Its up to ther user to connect
+to the database before accessing data and to disconnect after everything
+has been done. Method database_bad() should be
+called after 'new' to check the version number (expect a connected DBI handle).
+The database must contain the tablestatus table defined elsehwere in 
+this document, see VERSION INFORMATION.
 
 =item progdbver
 
@@ -2958,6 +3032,14 @@ The COLUMN_SETTING defines the layout of a column (database column).
     # file the value entered must be uniq for this
     # variable in all files in the dir.
     uniq => 1,			
+
+    # optional: when this option exists and is set
+    # then this column will be set to NULL ('use default')
+    # when copying a file with 'cp', but no 'uniq'
+    # checking takes place. 'cpdelete' is useful 
+    # to avoid breaking a config because of duplicates
+    # when copying files with command 'cp'
+    cpdelete => 1,			
 
     # optional: when this option is set the variable
     # behaves like a collection of flags. Each flag has

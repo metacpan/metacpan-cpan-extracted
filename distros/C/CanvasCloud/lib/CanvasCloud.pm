@@ -1,5 +1,5 @@
 package CanvasCloud;
-$CanvasCloud::VERSION = '0.003';
+$CanvasCloud::VERSION = '0.004';
 # ABSTRACT: Perl access for Canvas LMS API
 
 use Moose;
@@ -54,7 +54,7 @@ CanvasCloud - Perl access for Canvas LMS API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

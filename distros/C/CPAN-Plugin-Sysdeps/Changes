@@ -1,5 +1,11 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.45  2018-02-24
+	- add Fedora (dnf) support (by David Dick)
+	- add OpenBSD (pkg_add) support (by David Dick)
+	- add --batch option to cpan-sysdeps (by David Dick)
+	- mapping update (Firefox::Marionette, by David Dick)
+
 0.44  2018-02-02
 	- mapping update
 	- usage of Hash::Util is now optional

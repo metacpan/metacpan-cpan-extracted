@@ -1,5 +1,16 @@
 Revision history for Group-Git-Taggers-Maven
 
+0.0.3   2018-02-19
+        Updating for release of version 0.0.3
+        Added skipping lock files (Ivan Wills)
+        Fixed config (Ivan Wills)
+        Added auto running tests (Ivan Wills)
+        Added travisCI config (Ivan Wills)
+        Adding pom.xml to stop words (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        License update (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+
 0.0.2   2015-08-29
         Updating for release of version 0.0.2
         Removed creation of makefile (Ivan Wills)

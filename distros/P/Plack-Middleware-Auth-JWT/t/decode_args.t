@@ -204,7 +204,7 @@ subtest 'some bad tokens' => sub {
                 is( $res->code, 401, 'status 401' );
                 like(
                     $res->content,
-                    qr/malformed JSON string/,
+                    qr/invalid header part/,
                     'cannot decode'
                 );
             };

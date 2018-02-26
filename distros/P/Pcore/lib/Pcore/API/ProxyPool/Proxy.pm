@@ -57,9 +57,9 @@ around new => sub ( $orig, $self, $uri, $source ) {
 our $PROXY_TEST_TIMEOUT = 10;
 
 our $CHECK_SCHEME = {
-    tcp => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5 ] ],    # default scheme
-    udp => [ [$PROXY_TYPE_SOCKS5] ],
-    http  => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5, $PROXY_TYPE_HTTP ], [ 'www.google.com', 80 ],  \&_test_scheme_httpx, ],
+    tcp   => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5 ] ],                                                                       # default scheme
+    udp   => [ [$PROXY_TYPE_SOCKS5] ],
+    http  => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5, $PROXY_TYPE_HTTP ], [ 'www.google.com', 80 ], \&_test_scheme_httpx, ],
     https => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5, $PROXY_TYPE_HTTP ], [ 'www.google.com', 443 ], \&_test_scheme_httpx, ],
     whois => [ [ $PROXY_TYPE_CONNECT, $PROXY_TYPE_SOCKS4, $PROXY_TYPE_SOCKS5 ], [ 'whois.iana.org', 43 ], \&_test_scheme_whois, ],
 };

@@ -318,6 +318,7 @@ enum {
   SPVM_OPCODE_C_CODE_MOVE_OBJECT,
   SPVM_OPCODE_C_CODE_PUSH_AUTO_DEC_REF_COUNT,
   SPVM_OPCODE_C_CODE_LEAVE_SCOPE,
+  SPVM_OPCODE_C_CODE_CHECK_LOOP_JIT,
 };
 
 enum {
@@ -327,9 +328,7 @@ enum {
 extern const char* const SPVM_OPCODE_C_CODE_NAMES[];
 
 struct SPVM_opcode {
-  int16_t code;
-  int8_t has_label;
-  int8_t dummy;
+  int32_t code;
   int32_t operand0;
   int32_t operand1;
   int32_t operand2;

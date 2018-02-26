@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account::Report;
-$CanvasCloud::API::Account::Report::VERSION = '0.003';
+$CanvasCloud::API::Account::Report::VERSION = '0.004';
 # ABSTRACT: extends L<CanvasCloud::API::Account>
 
 use Moose;
@@ -30,15 +30,7 @@ sub run {
 
     ## Process Args
     if ( defined $args && ref( $args ) eq 'HASH' ) {
-        my $struct = {};
-
-        if ( exists $args->{term_id} && defined $args->{term_id} ) {
-            my $term_id = $args->{term_id} + 0;
-            die 'Illegal Term '.$term_id if ( $term_id < 0 );
-            $struct->{'parameters[enrollment_term_id]'} = $term_id;
-        }
-
-        $r->content( $self->encode_url( $struct ) );
+        $r->content( $self->encode_url( { map { $_ => $args->{$_} } keys %$args } ) );
     }
 
     return $self->send( $r );
@@ -61,7 +53,7 @@ CanvasCloud::API::Account::Report - extends L<CanvasCloud::API::Account>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 
@@ -84,6 +76,8 @@ return data object response from GET ->uri / $report / $report_id
 return data object response from POST ->uri / $report
 
 arguments are POST'ed
+
+  note(*): Most arguments will be in the form of parameters[named_argument_for_report] = "value"
 
 =head1 AUTHOR
 

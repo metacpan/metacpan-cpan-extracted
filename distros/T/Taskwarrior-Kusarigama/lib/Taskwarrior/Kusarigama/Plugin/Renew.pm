@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Renew;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a follow-up task upon completion
-$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.6.0';
+$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.7.0';
 
 use 5.10.0;
 use strict;
@@ -70,7 +70,7 @@ Taskwarrior::Kusarigama::Plugin::Renew - create a follow-up task upon completion
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 DESCRIPTION
 

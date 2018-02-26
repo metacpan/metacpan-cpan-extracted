@@ -1,5 +1,17 @@
 Revision history for Test::Strict.
 
+0.45  2018-02-22 16:45:00 MANWAR
+      - Revisited to address issue #17, (Devel::Cover no longer prereq).
+
+0.44  2018-02-21 19:20:00 MANWAR
+      - Added key 'clean' and 'dist' to Makefile.PL script.
+
+0.43  2018-02-20 15:00:00 MANWAR
+      - Bumped the version.
+
+0.42  2018-02-20 13:00:00 MANWAR
+      - Addressed issue #17, (Devel::Cover no longer prereq).
+
 0.41  2018-02-09 12:30:00 MANWAR
       - Merged pull request #23, thanks @arc.
 

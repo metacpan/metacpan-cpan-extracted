@@ -1,7 +1,8 @@
-package Pcore::SMTP v0.4.0;
+package Pcore::SMTP v0.4.1;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle qw[:TLS_CTX];
+use Pcore::Util::Scalar qw[is_ref is_plain_arrayref];
 use Pcore::Util::Data qw[from_b64 to_b64];
 use Pcore::Util::Text qw[encode_utf8];
 use Authen::SASL;
@@ -36,12 +37,14 @@ const our $STATUS_REASON => {
     504 => q[Command parameter not implemented],
     521 => q[<domain> does not accept mail (see rfc1846)],
     530 => q[Access denied (???a Sendmailism)],
+    534 => q[Please log in via your web browser],
     535 => q[AUTH failed with the remote server],
     550 => q[Requested action not taken: mailbox unavailable],
     551 => q[User not local; please try <forward-path>],
     552 => q[Requested mail action aborted: exceeded storage allocation],
     553 => q[Requested action not taken: mailbox name not allowed],
     554 => q[Transaction failed],
+    555 => q[Syntax error],
 };
 
 sub sendmail ( $self, @ ) {
@@ -59,9 +62,13 @@ sub sendmail ( $self, @ ) {
         splice @_, 1, -1
     );
 
-    $args{to}  = [ $args{to} ]  if $args{to}  and ref $args{to} ne 'ARRAY';
-    $args{cc}  = [ $args{cc} ]  if $args{cc}  and ref $args{cc} ne 'ARRAY';
-    $args{bcc} = [ $args{bcc} ] if $args{bcc} and ref $args{bcc} ne 'ARRAY';
+    $args{to}  = undef if defined $args{to}  && !$args{to};
+    $args{cc}  = undef if defined $args{cc}  && !$args{cc};
+    $args{bcc} = undef if defined $args{bcc} && !$args{bcc};
+
+    $args{to}  = [ $args{to} ]  if defined $args{to}  && !is_plain_arrayref $args{to};
+    $args{cc}  = [ $args{cc} ]  if defined $args{cc}  && !is_plain_arrayref $args{cc};
+    $args{bcc} = [ $args{bcc} ] if defined $args{bcc} && !is_plain_arrayref $args{bcc};
 
     Pcore::AE::Handle->new(
         connect          => 'smtp://' . $self->host . q[:] . $self->port,
@@ -388,7 +395,7 @@ sub _DATA ( $self, $h, $args, $cb ) {
 
     $buf .= $CRLF;
 
-    $buf .= ref $args->{body} ? $args->{body}->$* : $args->{body} if defined $args->{body};
+    $buf .= is_ref $args->{body} ? $args->{body}->$* : $args->{body} if defined $args->{body};
 
     # escape "."
     $buf =~ s/\x0A[.]/\x0A../smg;
@@ -454,35 +461,33 @@ sub _QUIT ( $self, $h, $cb ) {
 sub _read_response ( $self, $h, $cb ) {
     my $data = [];
 
-    $h->on_read(
-        sub ($h) {
-            $h->unshift_read(
-                line => $CRLF,
-                sub ( $h, $line, $eol ) {
-                    $line =~ s[\A(\d{3})(.?)][]sm;
+    $h->on_read( sub ($h) {
+        $h->unshift_read(
+            line => $CRLF,
+            sub ( $h, $line, $eol ) {
+                $line =~ s[\A(\d{3})(.?)][]sm;
 
-                    my $status = $1;
+                my $status = $1;
 
-                    my $more = $2 eq q[-];
+                my $more = $2 eq q[-];
 
-                    push $data->@*, $line;
+                push $data->@*, $line;
 
-                    # response finished
-                    if ( !$more ) {
+                # response finished
+                if ( !$more ) {
 
-                        # remove wathcher
-                        $h->on_read;
+                    # remove wathcher
+                    $h->on_read;
 
-                        $cb->( result [ $status, $STATUS_REASON ], $data );
-                    }
-
-                    return;
+                    $cb->( result [ $status, $STATUS_REASON ], $data );
                 }
-            );
 
-            return;
-        }
-    );
+                return;
+            }
+        );
+
+        return;
+    } );
 
     return;
 }
@@ -494,20 +499,20 @@ sub _read_response ( $self, $h, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 47                   | Subroutines::ProhibitExcessComplexity - Subroutine "sendmail" with high complexity score (23)                  |
+## |    3 | 50                   | Subroutines::ProhibitExcessComplexity - Subroutine "sendmail" with high complexity score (29)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 160                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 167                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 421                  | * Private subroutine/method '_RSET' declared but not used                                                      |
-## |      | 429                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
-## |      | 435                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
+## |      | 428                  | * Private subroutine/method '_RSET' declared but not used                                                      |
+## |      | 436                  | * Private subroutine/method '_VRFY' declared but not used                                                      |
+## |      | 442                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 430                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
+## |    3 | 437                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 464, 466             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 470, 472             | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 50                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 53                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

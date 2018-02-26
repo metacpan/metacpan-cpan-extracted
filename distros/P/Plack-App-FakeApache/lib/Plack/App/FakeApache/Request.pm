@@ -1,7 +1,8 @@
 package Plack::App::FakeApache::Request;
-
-use Moose;
-
+$Plack::App::FakeApache::Request::VERSION = '0.09';
+use Moo;
+use MooX::HandlesVia;
+use Types::Standard qw/HashRef Any InstanceOf Bool Str Maybe/;
 use APR::Pool;
 use APR::Table;
 
@@ -22,14 +23,13 @@ my $NS = "plack.app.fakeapache";
 # Plack related attributes:
 has env => (
     is       => 'ro',
-    isa      => 'HashRef[Any]',
+    isa      => HashRef,
     required => 1,
 );
 
 has plack_request => (
-    is         => 'ro',
-    isa        => 'Plack::Request',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['Plack::Request'],
     handles    => {
         method       => 'method',
         unparsed_uri => 'request_uri',
@@ -38,9 +38,8 @@ has plack_request => (
 );
 
 has plack_response => (
-    is         => 'ro',
-    isa        => 'Plack::Response',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['Plack::Response'],
     handles    => {
         set_content_length => 'content_length',
         content_type     => 'content_type',
@@ -62,76 +61,71 @@ has server => (
 
 # Apache related attributes
 has _apr_pool => (
-    is         => 'ro',
-    isa        => 'APR::Pool',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['APR::Pool'],
 );
 
 has headers_in => (
-    is         => 'ro',
-    isa        => 'APR::Table',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['APR::Table'],
 );
 
 has headers_out => (
-    is         => 'ro',
-    isa        => 'APR::Table',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['APR::Table'],
 );
 
 has err_headers_out => (
-    is         => 'ro',
-    isa        => 'APR::Table',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['APR::Table'],
 );
 
 has _subprocess_env => (
-    is         => 'ro',
-    isa        => 'APR::Table',
-    lazy_build => 1,
+    is         => 'lazy',
+    isa        => InstanceOf['APR::Table'],
 );
 
-has dir_config => (
-    isa     => 'HashRef[Any]',
-    traits  => ['Hash'],
+
+has dir_config => ( 
+    is => 'bare',
+    isa => HashRef,
     default => sub { {} },
-    handles => {
-        dir_config => 'accessor'
-    }
+    handles_via => 'Hash',
+    handles => { dir_config => 'accessor' },
 );
+
 
 has location => (
     is      => 'rw',
-    isa     => "Str",
+    isa     => Str,
     default => '/',
 );
 
 has filename => (
     is         => 'rw',
-    isa        => 'Str|Undef',
-    lazy_build => 1,
+    isa        => Maybe[Str],
 );
 
 has root => (
     is         => 'rw',
-    isa        => 'Str',
+    isa        => Str,
     default    => cwd(),
 );
 
 has is_initial_req => (
-    is         => 'ro',
-    isa        => 'Bool',
+    is         => 'lazy',
+    isa        => Bool,
     default    => 1,
 );
 
 has auth_type => (
     is         => 'ro',
-    isa        => 'Str',
+    isa        => Str,
 );
 
 has auth_name => (
     is         => 'ro',
-    isa        => 'Str',
+    isa        => Str,
 );
 
 # builders

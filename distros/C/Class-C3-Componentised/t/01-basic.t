@@ -8,7 +8,7 @@ use Class::Inspector;
 
 use lib "$FindBin::Bin/lib";
 
-plan tests => 23;
+plan tests => 25;
 
 BEGIN {
   package TestPackage::A;
@@ -58,11 +58,11 @@ eval { MyModule->load_optional_class('ENDS::WITH::COLONS::') };
 like( $@, qr/Invalid class name 'ENDS::WITH::COLONS::'/, 'Throw on Class::' );
 
 # Simulate a PAR environment
-{ 
+{
   my @code;
   local @INC = @INC;
   unshift @INC, sub {
-    if ($_[1] eq 'VIRTUAL/PAR/PACKAGE.pm') {
+    if ($_[1] =~ m{^VIRTUAL/PAR/PACKAGE[0-9]*\.pm$}) {
       return (sub { return 0 unless @code; $_ = shift @code; 1; } );
     }
     else {
@@ -73,30 +73,39 @@ like( $@, qr/Invalid class name 'ENDS::WITH::COLONS::'/, 'Throw on Class::' );
   $retval = eval { MyModule->load_optional_class('FAKE::PAR::PACKAGE') };
   ok( !$@, 'load_optional_class on a nonexistent PAR class did not throw' );
   ok( !$retval, 'nonexistent PAR package not loaded' );
-  
+
 
   # simulate a class which does load but does not return true
   @code = (
-    q/package VIRTUAL::PAR::PACKAGE;/,
+    q/package VIRTUAL::PAR::PACKAGE1;/,
     q/0;/,
   );
 
-  $retval = eval { MyModule->load_optional_class('VIRTUAL::PAR::PACKAGE') };
+  $retval = eval { MyModule->load_optional_class('VIRTUAL::PAR::PACKAGE1') };
   ok( $@, 'load_optional_class of a no-true-returning PAR module did throw' );
   ok( !$retval, 'no-true-returning PAR package not loaded' );
-  
-  # simulate a normal class (no one adjusted %INC so it will be tried again
+
+  # simulate a normal class
   @code = (
-    q/package VIRTUAL::PAR::PACKAGE;/,
+    q/package VIRTUAL::PAR::PACKAGE2;/,
     q/1;/,
   );
 
-  $retval = eval { MyModule->load_optional_class('VIRTUAL::PAR::PACKAGE') };
+  $retval = eval { MyModule->load_optional_class('VIRTUAL::PAR::PACKAGE2') };
   ok( !$@, 'load_optional_class of a PAR module did not throw' );
   ok( $retval, 'PAR package "loaded"' );
-  
+
   # see if we can still load stuff with the coderef present
-  $retval = eval { MyModule->load_optional_class('Class::C3') };
+  $retval = eval { MyModule->load_optional_class('AnotherModule') };
   ok( !$@, 'load_optional_class did not throw' ) || diag $@;
-  ok( $retval, 'Class::C3 loaded' );
+  ok( $retval, 'AnotherModule loaded' );
+
+  @code = (
+    q/package VIRTUAL::PAR::PACKAGE3;/,
+    q/1;/,
+  );
+
+  $retval = eval { MyModule->ensure_class_found('VIRTUAL::PAR::PACKAGE3') };
+  ok( !$@, 'ensure_class_found of a PAR module did not throw' );
+  ok( $retval, 'PAR package "found"' );
 }

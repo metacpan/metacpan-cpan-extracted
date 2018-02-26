@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "File::Slurper",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Encode" => 0,
+    "Encode" => "2.11",
     "Exporter" => "5.57",
     "PerlIO::encoding" => 0,
     "constant" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Encode" => 0,
+  "Encode" => "2.11",
   "Exporter" => "5.57",
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,

@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use Carp ();
 use IO::File ();
-use IPC::Run ();
+use IPC::Run3 'run3';
 
 use PDF::WebKit::Configuration;
 use PDF::WebKit::Source;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 use Moo;
 use namespace::clean;
@@ -97,7 +97,8 @@ sub to_pdf {
   my $input = $self->source->is_html ? $self->source->content : undef;
   my $output;
 
-  IPC::Run::run( \@args, "<", \$input, ">", \$output );
+  my %opt = map +( "binmode_std$_" => ":raw" ), "in", "out", "err";
+  run3 \@args, \$input, \$output, \my $err, \%opt;
 
   if ($path) {
     $output = do { local (@ARGV,$/) = ($path); <> };
@@ -260,7 +261,7 @@ Chrome browsers).
 =head2 Configuration
 
 Configuration of PDF::WebKit is configured globally by calling the
-C<PDF::WebKit->configure> class method:
+C<< PDF::WebKit->configure >> class method:
 
   PDF::WebKit->configure(sub {
     # default `which wkhtmltopdf`
@@ -335,6 +336,10 @@ L<WKHTMLTOPDF|http://search.cpan.org/~tbr/WKHTMLTOPDF-0.02/lib/WKHTMLTOPDF.pm>
 =head1 AUTHOR
 
 Philip Garrett <philip.garrett@icainformatics.com>
+
+=head1 CONTRIBUTORS
+
+Christian Walde <walde.christian@gmail.com>
 
 =head1 CONTRIBUTING
 

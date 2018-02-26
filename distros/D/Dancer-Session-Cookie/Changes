@@ -1,5 +1,15 @@
 Revision history for Dancer-Session-Cookie
 
+0.29 2018-02-19
+  [ MISC ]
+    - Added appveyor integration for Windows CI. [GH#11, Paul Cochrane]
+    - Set minimal Perl version to be 5.8. [GH#10, Paul Cochrane]
+    - Misc code cleanup. [GH#14, GH#15, GH#16, GH#17, Paul Cochrane]
+    - Added appveyor and travis badges to README. [GH#13, Paul Cochrane]
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 69 insertions(+), 21 deletions(-)
+
 0.28 2018-02-10
   [ BUG FIXES ]
     - Tests require Plack::Test v1.0029+. [GH#8, Mohammad S Anwar]
@@ -84,11 +94,11 @@ Revision history for Dancer-Session-Cookie
 
 0.14 2011-03-12
   [ Michael G. Schwern ]
-    - Fix for Dancer > v1.3012 
-    - Add support for session_secure to serve https only cookies. 
-    - Add missing MYMETA.yml 
-    - Make Dancer::Session::Cookie honor the session_name setting      
-      added to Dancer::Session::Abstract
+    - Fix for Dancer > v1.3012
+    - Add support for session_secure to serve https only cookies.
+    - Add missing MYMETA.yml
+    - Make Dancer::Session::Cookie honor the session_name setting added to
+      Dancer::Session::Abstract
     - Add session_cookie_path to control the path of the cookie.
 
 0.13 2010-11-28T17:19:58Z

@@ -14,3 +14,4 @@
 ^SMIME\.bs$
 ^SMIME\.c$
 ^SMIME\.o$
+^\.git

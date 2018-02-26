@@ -995,9 +995,8 @@ sub color_table {
 	print $painter->("$grey/$grey", sprintf(" %-19s", $grey));
     }
     print "\n";
-    for my $g (0..23) {
-	my $grey = sprintf "L%02d", $g;
-	print $painter->("$grey/$grey", " $grey");
+    for ('000', 'L00' .. 'L23', '555') {
+	print $painter->("$_/$_", " $_");
     }
     print "\n";
     for my $alt (0, 1) {
@@ -1039,7 +1038,7 @@ format is also supported, but currently limited up to three files.
 
 =head2 STARTUP and MODULE
 
-B<cdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.sdifrc>
+B<sdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.sdifrc>
 file if available when starting up.  You can define original and
 default option there.  To show the line number always, define like
 this:
@@ -1051,10 +1050,8 @@ prefix.  Next command load B<App::sdif::colors> module.
 
     $ sdif -Mcolors
 
-You can also define options in module file, and activate by B<-M>
-option.
-
-Read `perldoc Getopt::EX::Module` for detail.
+You can also define options in module file.  Read `perldoc
+Getopt::EX::Module` for detail.
 
 =head2 COLOR
 
@@ -1343,7 +1340,8 @@ This is equivalent to :
 
 =head2 -Mcolors
 
-Following options are available by default.
+Following options are available by default.  Use `perldoc -m
+App::sdif::colors` to see actual setting.
 
   --light
   --green

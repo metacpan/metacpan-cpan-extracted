@@ -14,10 +14,10 @@ has on_finish => ( is => 'rw', isa => Maybe [CodeRef] );
 
 around new => sub ( $orig, $self, @ ) {
     my %args = (
-        listen    => undef,                                     # RPC server listen
+        listen    => undef,    # RPC server listen
         token     => undef,
-        class     => undef,                                     # mandatory
-        buildargs => undef,                                     # class constructor arguments
+        class     => undef,    # mandatory
+        buildargs => undef,    # class constructor arguments
         on_ready  => undef,
         on_finish => undef,
         @_[ 2 .. $#_ ],

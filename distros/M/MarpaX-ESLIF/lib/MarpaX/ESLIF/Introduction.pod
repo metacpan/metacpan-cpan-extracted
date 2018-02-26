@@ -14,7 +14,7 @@ MarpaX::ESLIF::Introduction - MarpaX::ESLIF's Introduction
 
 =head1 VERSION
 
-version 2.0.34
+version 2.0.38
 
 =head1 DESCRIPTION
 
@@ -193,6 +193,20 @@ Internally, all chunks of characters are converted to UTF-8. This guarantees thr
 =item uniform internal processing
 
 =item native compatibility with the regular expression engine
+
+=back
+
+A recognizer always owns a stream, the later is shared in two cases:
+
+=over
+
+=item Lexeme search
+
+A sub-recognizer is started, and it shares the stream with its parent. Nevertheless parent stream is guaranteed to never crunch any data until this sub-recognizer finishes. At most, new data may be appended. When this sub-recognizer finishes, it updates the parent position in the stream if the lexeme it was looking for is found. The end-user never has control on such sub-recognizer.
+
+=item Shared top-level recognizer
+
+The end-user can create a new top-level recognizer that shares the stream with another top-level recognizer. Then, it is guaranteed that everytime one of them updates its stream, the other's stream changes the same way.
 
 =back
 
@@ -557,7 +571,7 @@ L<MarpaX::ESLIF::BNF>, L<MarpaX::ESLIF::Tutorial::Calculator>, L<PCRE2|http://ww
 
 =head1 NOTES
 
-The perl interface is using an I<all-in-one> version of the underlying L<marpaESLIF C library|https://github.com/jddurand/c-marpaESLIF>. This mean that character conversion relies on I<iconv> (or native API on Windows) to do character translation if needed.
+The perl interface is using an I<all-in-one> version of the underlying L<marpaESLIF C library|https://github.com/jddurand/c-marpaESLIF>. This mean that character conversion relies on L<libiconv|https://www.gnu.org/software/libiconv> to do character translation if needed.
 
 =head1 AUTHOR
 

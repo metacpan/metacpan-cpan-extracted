@@ -57,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "1.0",
+  "VERSION" => "1.1",
   "test" => {
     "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }

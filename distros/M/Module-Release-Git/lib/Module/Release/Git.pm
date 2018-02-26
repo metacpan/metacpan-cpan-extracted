@@ -6,10 +6,11 @@ use Exporter qw(import);
 
 our @EXPORT = qw(
 	check_vcs vcs_tag vcs_exit make_vcs_tag get_vcs_tag_format
+	get_recent_contributors
 	);
 
 use vars qw($VERSION);
-$VERSION = '1.011';
+$VERSION = '1.012';
 
 =encoding utf8
 
@@ -51,9 +52,9 @@ sub check_vcs {
 
 	no warnings 'uninitialized';
 
-	my( $branch ) = $git_status =~ /^# On branch (\w+)/;
+	my( $branch ) = $git_status =~ /On branch (\w+)/;
 
-	my $up_to_date = $git_status =~ /working directory clean/m;
+	my $up_to_date = $git_status =~ /working (directory|tree) clean/m;
 
 	$self->_die( "\nERROR: Git is not up-to-date: Can't release files\n\n$git_status\n" )
 		unless $up_to_date;
@@ -157,6 +158,26 @@ sub vcs_exit {
 	return 1;
 	}
 
+=item get_recent_contributors()
+
+Return a list of contributors since last release.
+
+=cut
+
+sub get_recent_contributors {
+	my $self = shift;
+
+	chomp( my $last_tagged_commit    = $self->run("git rev-list --tags --max-count=1") );
+	chomp( my @commits_from_last_tag = $self->run("git rev-list $last_tagged_commit..HEAD") );
+	my @authors_since_last_tag =
+		map { qx{git show --no-patch --pretty=format:'%an <%ae>' $_} }
+		@commits_from_last_tag;
+	my %authors = map { $_, 1 } @authors_since_last_tag;
+	my @authors = sort keys %authors;
+
+	return @authors;
+	}
+
 =back
 
 =head1 TO DO
@@ -185,7 +206,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

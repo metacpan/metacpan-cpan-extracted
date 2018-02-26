@@ -23,18 +23,18 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'autodie'          => '2.26',
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
-        'File::Share'      => '0.25',
+        'autodie'              => '2.26',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
+        'File::Share'          => '0.25',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'BankAccount-Validator-UK-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.33' },
-            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.33' },
+            'BankAccount::Validator::UK'       => { file => 'lib/BankAccount/Validator/UK.pm'     , version => '0.36' },
+            'BankAccount::Validator::UK::Rule' => { file => 'lib/BankAccount/Validator/UK/Rule.pm', version => '0.36' },
         },
         resources => {
             repository => {

@@ -1,16 +1,16 @@
 {
    "abstract" : "UML-based Object-Relational Mapping (ORM) framework",
    "author" : [
-      "Laurent Dami <laurent.dami AT etat.ge.ch>"
+      "Laurent Dami <dami AT cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-DataModel",
    "prereqs" : {
@@ -26,41 +26,50 @@
       },
       "runtime" : {
          "recommends" : {
-            "DBD::Mock" : "0",
-            "Lingua::EN::Inflect::Phrase" : "0"
+            "Cpanel::JSON::XS" : "0",
+            "Excel::Writer::XLSX" : "0",
+            "File::Tabular" : "0",
+            "JSON::MaybeXS" : "0",
+            "Lingua::EN::Inflect::Phrase" : "0",
+            "List::Categorize" : "0.04",
+            "YAML::XS" : "0"
          },
          "requires" : {
             "Acme::Damn" : "0",
-            "Carp" : "0",
+            "Carp::Clan" : "0",
+            "Clone" : "0",
             "DBI" : "0",
             "MRO::Compat" : "0",
             "Module::Build" : "0",
             "Module::Load" : "0",
             "Params::Validate" : "0",
-            "SQL::Abstract::More" : "1.21",
-            "Scalar::Does" : "0",
-            "Scalar::Util" : "0",
+            "SQL::Abstract::More" : "1.33",
+            "Scalar::Util" : "1.07",
             "Storable" : "0",
-            "Test::More" : "0",
             "Try::Tiny" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.008"
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::Mock" : "1.39",
+            "DBD::SQLite" : "1.38",
+            "FindBin" : "0"
          }
       }
    },
    "provides" : {
       "DBIx::DataModel" : {
          "file" : "lib/DBIx/DataModel.pm",
-         "version" : "2.46"
+         "version" : "3.0"
       },
       "DBIx::DataModel::Compatibility::V0" : {
          "file" : "lib/DBIx/DataModel/Compatibility/V0.pm"
       },
       "DBIx::DataModel::Compatibility::V1" : {
          "file" : "lib/DBIx/DataModel/Compatibility/V1.pm"
-      },
-      "DBIx::DataModel::ConnectedSource" : {
-         "file" : "lib/DBIx/DataModel/ConnectedSource.pm"
       },
       "DBIx::DataModel::Meta" : {
          "file" : "lib/DBIx/DataModel/Meta.pm"
@@ -94,6 +103,60 @@
       },
       "DBIx::DataModel::Schema::Generator" : {
          "file" : "lib/DBIx/DataModel/Schema/Generator.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Categorize" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Categorize.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Count" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Count.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Fast_statement" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Fast_statement.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::File_tabular" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/File_tabular.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Firstrow" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Firstrow.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Flat_arrayref" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Flat_arrayref.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Hashref" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Hashref.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Json" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Json.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Rows" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Rows.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Sql" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Sql.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Statement" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Statement.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Sth" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Sth.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Subquery" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Subquery.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Table" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Table.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Tsv" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Tsv.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Xlsx" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Xlsx.pm"
+      },
+      "DBIx::DataModel::Schema::ResultAs::Yaml" : {
+         "file" : "lib/DBIx/DataModel/Schema/ResultAs/Yaml.pm"
       },
       "DBIx::DataModel::Source" : {
          "file" : "lib/DBIx/DataModel/Source.pm"
@@ -129,5 +192,6 @@
          "url" : "https://github.com/damil/DBIx-DataModel"
       }
    },
-   "version" : "2.46"
+   "version" : "3.0",
+   "x_serialization_backend" : "JSON::PP version 2.97000"
 }

@@ -9,21 +9,21 @@ DESCRIPTION
 
     Let 123 a pull request filed against the official Gentoo Github
     repository. pram retrieves this PR from the Github CDN as a patch using
-    the HTTP protocol. pram then performs various operations on the patch
-    and adds the necessary headers to close one or more Gentoo bug reports
-    but also the Github pull request automatically. pram then opens up
-    $EDITOR for you to review the contribution. Eventually, pram merges the
-    patch using git and especially the git-am command. Git is an essential
-    part of the backend of pram for merging patches.
+    the HTTP protocol. pram then adds the necessary headers to close one or
+    more Gentoo bug reports but also the PR automatically. pram then opens
+    up the patch with $EDITOR for you to review it. Eventually, if you deem
+    the contribution good enough and accept it, pram merges it using the
+    git am command. Git is an essential part of the backend of pram for
+    merging patches.
 
     At Gentoo we are very opinionated. We are against merge commits. We
     think they add unnecessary clutter to the history of a git repository.
     We want to keep the history of the Portage tree as linear as possible.
-    For this reason, we want to leverage the tools offered by Github to
-    merge contributions without compromising our standards.
+    For this reason, we leverage the tools offered by Github to merge
+    contributions as patches without compromising our standards.
 
     Originally, pram was written to ease the triaging of Gentoo Github PRs
-    and make it more convenient. Yet, it can be used to merge PRs against
+    and make it more convenient. Yet, it can be used to merge PRs from
     virtually any Github repository. Give it a try!
 
 SYNOPSIS
@@ -40,7 +40,7 @@ SYNOPSIS
 
 EXAMPLE
 
-     # GENTOO DEVELOPERS! Bear in mind that pram fetches pull requets from the
+     # GENTOO DEVELOPERS! Bear in mind that pram fetches pull requests from the
      # Gentoo Github repository by default. You don't need to specify it.
 
      # Fetch PR 123 and display it in emacs.
@@ -57,7 +57,7 @@ EXAMPLE
 
 VERSION
 
-    version 0.100100
+    version 0.100200
 
 COPYRIGHT AND LICENSE
 

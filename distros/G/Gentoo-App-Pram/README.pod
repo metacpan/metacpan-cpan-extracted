@@ -39,7 +39,7 @@ pram <pull request number>
 
 =head1 EXAMPLE
 
- # GENTOO DEVELOPERS! Bear in mind that pram fetches pull requets from the
+ # GENTOO DEVELOPERS! Bear in mind that pram fetches pull requests from the
  # Gentoo Github repository by default. You don't need to specify it.
 
  # Fetch PR 123 and display it in emacs.
@@ -56,7 +56,7 @@ pram <pull request number>
 
 =head1 VERSION
 
-version 0.100100
+version 0.100200
 
 =head1 COPYRIGHT AND LICENSE
 

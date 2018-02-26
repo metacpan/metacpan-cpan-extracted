@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.23';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.24';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -53,6 +53,8 @@ sub handle_record {
 
     # On déplace le PPN
     $self->sudoc->ppn_move($record, $self->sudoc->c->{biblio}->{ppn_move});
+
+    $self->converter->build($record);
 
     # Est-ce qu'il faut passer la notice ?
     if ( $self->converter->skip($record) ) {
@@ -167,7 +169,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 AUTHOR
 
@@ -175,7 +177,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Fréderic Demians.
+This software is Copyright (c) 2017 by Fréderic Demians.
 
 This is free software, licensed under:
 

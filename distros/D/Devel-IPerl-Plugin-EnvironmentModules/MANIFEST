@@ -6,7 +6,10 @@ Makefile.PL
 MANIFEST			This list of files
 README.pod
 t/00-basic.t
-t/lib/Env/Modulecmd.pm
-t/modules.t
+t/01-cpantesters.t
+xt/bin/modulecmd
+xt/lib/Env/Modulecmd.pm
+xt/modules-query.t
+xt/modules.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

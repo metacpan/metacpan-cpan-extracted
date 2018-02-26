@@ -11,7 +11,7 @@ sub usage (;$) {
     if ($msg) { warn $msg, "\n" }
     die <<EOF;
 usage: $0 [--cpandist Dist-Name | --cpanmod Mod::Name]
-          [--uninstalled|--dry-run|--run] [--debug]
+          [--uninstalled|--dry-run|--run] [--debug] [--batch]
           [--os ...] [--osvers ...]
           [--linuxdistro ...] [--linuxdistroversion ...] [--linuxdistrocodename]
 EOF
@@ -29,6 +29,7 @@ GetOptions(
 	   'debug'                 => \my $debug,
 	   'n|dryrun|dry-run'      => \my $dryrun,
 	   'run'                   => \my $run,
+	   'batch'                 => \my $batch,
 	  )
     or usage;
 
@@ -57,6 +58,7 @@ my $sysdeps = CPAN::Plugin::Sysdeps->new({
 					 },
 					 ($debug ? 'debug' : ()),
 					 ($dryrun? 'dryrun' : ()),
+					 ($batch? 'batch' : ()),
 					);
 my @packages = $sysdeps->_map_cpandist($dist);
 if (@packages) {

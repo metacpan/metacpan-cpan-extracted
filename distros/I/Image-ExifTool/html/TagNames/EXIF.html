@@ -18,6 +18,11 @@ TIFF-based RAW images, and even some AVI and MOV videos.</p>
 ExifTool family 1 group names.  When writing EXIF information, the default
 <b>Group</b> listed below is used unless another group is specified.</p>
 
+<p>Mandatory tags (indicated by a colon after the <b>Writable</b> type) may be
+added automatically with default values when creating a new IFD, and the IFD
+is removed automatically when deleting tags if only default-valued mandatory
+tags remain.</p>
+
 <p>The table below lists all EXIF tags.  Also listed are TIFF, DNG, HDP and
 other tags which are not part of the EXIF specification, but may co-exist
 with EXIF tags in some images.  Tags which are part of the EXIF 2.31
@@ -33,7 +38,7 @@ official EXIF 2.31 specification.
 <th>Writable</th><th>Group</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td title='0x0001 = 1'>0x0001</td>
-<td>InteropIndex</td>
+<td><u>InteropIndex</u></td>
 <td class=c title=' ! = Unsafe'>string!</td>
 <td class=c>InteropIFD</td>
 <td><span class=s>&#39;R03&#39; = R03 - DCF option file (Adobe RGB)
@@ -57,7 +62,8 @@ official EXIF 2.31 specification.
 <td>SubfileType</td>
 <td class=c title=' ! = Unsafe'>int32u!</td>
 <td class=c>IFD0</td>
-<td><span class=s>0x0 = Full-resolution Image
+<td><span class=s><span class=n>(called NewSubfileType by the TIFF specification)</span>
+  <br>0x0 = Full-resolution Image
   <br>0x1 = Reduced-resolution image
   <br>0x2 = Single page of multi-page image
   <br>0x3 = Single page of multi-page reduced-resolution image
@@ -77,7 +83,8 @@ official EXIF 2.31 specification.
 <td>OldSubfileType</td>
 <td class=c title=' ! = Unsafe'>int16u!</td>
 <td class=c>IFD0</td>
-<td><span class=s>1 = Full-resolution image
+<td><span class=s><span class=n>(called SubfileType by the TIFF specification)</span>
+  <br>1 = Full-resolution image
   <br>2 = Reduced-resolution image
   <br>3 = Single page of multi-page image</span></td></tr>
 <tr class=b>
@@ -448,7 +455,7 @@ it is JpgFromRawLength)</span></span></td></tr>
 <td>SubIFD
   <br>A100DataOffset</td>
 <td class=c>-<br>no</td>
-<td class=c>-<br>-</td>
+<td class=c>-<br>IFD0</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
   <br><span class=n>(the data offset in original Sony DSLR-A100 ARW images)</span></td></tr>
 <tr>
@@ -494,7 +501,7 @@ it is JpgFromRawLength)</span></span></td></tr>
 <td title='0x0153 = 339'>0x0153</td>
 <td>SampleFormat</td>
 <td class=c>no</td>
-<td class=c>-</td>
+<td class=c>SubIFD</td>
 <td><span class=s><span class=n>(SamplesPerPixel values)</span>
   <br>[Values 0-3]</span><table class=cols><tr>
   <td>1 = Unsigned
@@ -1296,7 +1303,7 @@ conversion)</span></span></td></tr>
 <td title='0x8649 = 34377'>0x8649</td>
 <td>PhotoshopSettings</td>
 <td class=c>-</td>
-<td class=c>-</td>
+<td class=c>IFD0</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
 <tr class=b>
 <td title='0x8769 = 34665'>0x8769</td>
@@ -1734,7 +1741,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
 <td>SensingMethod</td>
 <td class=c>no</td>
 <td class=c>-</td>
-<td><span class=s><span class=n>(values 1 and 6 are not standard EXIF)</span></span><table class=cols><tr>
+<td><table class=cols><tr>
   <td>1 = Monochrome area
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
@@ -1833,6 +1840,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNotePentax6
   <br>MakerNotePhaseOne
   <br>MakerNoteReconyx
+  <br>MakerNoteReconyx2
   <br>MakerNoteRicoh
   <br>MakerNoteRicoh2
   <br>MakerNoteRicohText
@@ -1853,8 +1861,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteUnknownText
   <br>MakerNoteUnknownBinary
   <br><u>MakerNoteUnknown</u></td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Apple.html'>Apple Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Canon.html'>Canon Tags</a>
@@ -1918,6 +1926,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Pentax.html#S1'>Pentax S1 Tags</a>
   <br>--&gt; <a href='PhaseOne.html'>PhaseOne Tags</a>
   <br>--&gt; <a href='Reconyx.html'>Reconyx Tags</a>
+  <br>--&gt; <a href='Reconyx.html#Type2'>Reconyx Type2 Tags</a>
   <br>--&gt; <a href='Ricoh.html'>Ricoh Tags</a>
   <br>--&gt; <a href='Ricoh.html#Type2'>Ricoh Type2 Tags</a>
   <br>--&gt; <a href='Ricoh.html#Text'>Ricoh Text Tags</a>
@@ -2239,8 +2248,13 @@ indicated by &quot;Uncalibrated&quot; with an InteropIndex of &quot;R03&quot;.  
 <td><u>CustomRendered</u></td>
 <td class=c>int16u</td>
 <td class=c>ExifIFD</td>
-<td><span class=s>0 = Normal
-  <br>1 = Custom</span></td></tr>
+<td><span class=s><span class=n>(only 0 and 1 are standard EXIF, but other values are used by Apple iOS
+devices)</span>
+  <br>0 = Normal
+  <br>1 = Custom
+  <br>3 = HDR
+  <br>6 = Panorama
+  <br>8 = Portrait</span></td></tr>
 <tr>
 <td title='0xa402 = 41986'>0xa402</td>
 <td><u>ExposureMode</u></td>
@@ -2672,13 +2686,13 @@ the specification)</span></span></td></tr>
 <td title='0xc616 = 50710'>0xc616</td>
 <td>CFAPlaneColor</td>
 <td class=c>no</td>
-<td class=c>-</td>
+<td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0xc617 = 50711'>0xc617</td>
 <td>CFALayout</td>
 <td class=c>no</td>
-<td class=c>-</td>
+<td class=c>SubIFD</td>
 <td><span class=s>1 = Rectangular
   <br>2 = Even columns offset down 1/2 row
   <br>3 = Even columns offset up 1/2 row
@@ -2864,7 +2878,7 @@ the specification)</span></span></td></tr>
   <br>MakerNotePentax5
   <br>DNGPrivateData</td>
 <td class=c title=' ! = Unsafe'>-<br>undef!<br>-<br>-<br>undef!</td>
-<td class=c>-<br>IFD0<br>-<br>-<br>IFD0</td>
+<td class=c>IFD0<br>IFD0<br>IFD0<br>IFD0<br>IFD0</td>
 <td>--&gt; <a href='Sony.html#SR2Private'>Sony SR2Private Tags</a>
   <br>--&gt; <a href='DNG.html#AdobeData'>DNG AdobeData Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
@@ -2971,7 +2985,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td title='0xc6c5 = 50885'>0xc6c5</td>
 <td>SRawType</td>
 <td class=c>no</td>
-<td class=c>-</td>
+<td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0xc6d2 = 50898'>0xc6d2</td>
@@ -3001,7 +3015,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td title='0xc6f5 = 50933'>0xc6f5</td>
 <td>ProfileIFD</td>
 <td class=c>-</td>
-<td class=c>-</td>
+<td class=c>IFD0</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr class=b>
 <td title='0xc6f6 = 50934'>0xc6f6</td>
@@ -3487,7 +3501,7 @@ these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 5, 2017</i>
+<br><i>Last revised Feb 13, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

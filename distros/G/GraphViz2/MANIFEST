@@ -180,6 +180,8 @@ t/sample.stt.1.dat
 t/sample.stt.2.dat
 t/sample.xml
 t/test.t
+t/test_more_methods.t
+t/test_new.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

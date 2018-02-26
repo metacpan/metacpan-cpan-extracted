@@ -56,6 +56,6 @@
          "web" : "https://github.com/Ingenico-NPS-Latam/nps-sdk-perl"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

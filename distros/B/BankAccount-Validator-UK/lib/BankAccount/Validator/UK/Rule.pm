@@ -1,6 +1,6 @@
 package BankAccount::Validator::UK::Rule;
 
-$BankAccount::Validator::UK::Rule::VERSION   = '0.33';
+$BankAccount::Validator::UK::Rule::VERSION   = '0.36';
 $BankAccount::Validator::UK::Rule::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ BankAccount::Validator::UK::Rule - Rules for validating UK bank account.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.36
 
 =cut
 
@@ -35,10 +35,10 @@ substituting  sort  code  if found, as provided by VOCALINK in the document date
 sub get_sort_codes {
 
     my $sort_codes = {};
-    my $file       = dist_file('BankAccount-Validator-UK', 'scsubtab.txt');
+    my $file_name  = dist_file('BankAccount-Validator-UK', 'scsubtab.txt');
 
-    open(my $FILE, $file);
-    while (my $row = <$FILE>) {
+    open(my $SOURCE, "<", $file_name);
+    while (my $row = <$SOURCE>) {
         chomp $row;
         my ($left, $right) = split /\s/, $row, 2;
         $left  =~ s/^\s+//g;
@@ -50,7 +50,7 @@ sub get_sort_codes {
             $sort_codes->{$left} = $right;
         }
     }
-    close($FILE);
+    close($SOURCE);
 
     return $sort_codes;
 }
@@ -58,8 +58,8 @@ sub get_sort_codes {
 =head2 get_rules()
 
 It is used by the module L<BankAccount::Validator::UK> internally.It returns every
-possible rules cover by the document, as provided by VOCALINK dated 9th October 2017
-and is called valacdos.txt.
+possible rules cover by the document, as provided  by VOCALINK dated 13th February
+2018 and is called valacdos.txt.
 
 =cut
 
@@ -97,14 +97,15 @@ sub get_rules {
 
 sub _raw_data {
 
-    my $raw_data = [];
-    my $file     = dist_file('BankAccount-Validator-UK', 'valacdos.txt');
-    open(my $FILE, $file);
-    while (my $row = <$FILE>) {
+    my $raw_data  = [];
+    my $file_name = dist_file('BankAccount-Validator-UK', 'valacdos.txt');
+
+    open(my $SOURCE, "<", $file_name);
+    while (my $row = <$SOURCE>) {
         chomp $row;
         push @$raw_data, $row;
     }
-    close($FILE);
+    close($SOURCE);
 
     return $raw_data;
 }

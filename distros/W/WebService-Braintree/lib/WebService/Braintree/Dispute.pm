@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute;
-$WebService::Braintree::Dispute::VERSION = '1.0';
+$WebService::Braintree::Dispute::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -44,6 +44,18 @@ This takes a dispute id and marks it as disputed.
 sub finalize {
     my ($class, $id) = @_;
     $class->gateway->dispute->finalize($id);
+}
+
+=head2 add_file_evidence
+
+This takes a dispute id and a document_upload id and adds the upload to the
+dispute's evidence.
+
+=cut
+
+sub add_file_evidence {
+    my ($class, $id, $upload_id) = @_;
+    $class->gateway->dispute->add_file_evidence($id, $upload_id);
 }
 
 =head2 add_text_evidence

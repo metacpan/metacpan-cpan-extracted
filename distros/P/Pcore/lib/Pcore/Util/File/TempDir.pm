@@ -3,11 +3,11 @@ package Pcore::Util::File::TempDir;
 use Pcore -class, -const;
 use Pcore::Util::Scalar qw[refaddr];
 
-has base => ( is => 'lazy', isa => Str );
-has tmpl => ( is => 'lazy', isa => Str );
-has mode => ( is => 'lazy', isa => Maybe [ Int | Str ], default => 'rwx------' );
-has umask => ( is => 'ro', isa => Maybe [ Int | Str ] );
-has lazy => ( is => 'ro', isa => Bool, default => 0 );
+has base  => ( is => 'lazy', isa => Str );
+has tmpl  => ( is => 'lazy', isa => Str );
+has mode  => ( is => 'lazy', isa => Maybe [ Int | Str ], default => 'rwx------' );
+has umask => ( is => 'ro',   isa => Maybe [ Int | Str ] );
+has lazy  => ( is => 'ro',   isa => Bool, default => 0 );
 
 has path => ( is => 'lazy', isa => Str, init_arg => undef );
 has owner_pid => ( is => 'ro', isa => Str, default => $$, init_arg => undef );

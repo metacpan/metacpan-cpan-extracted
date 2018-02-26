@@ -157,4 +157,44 @@ subtest test_3 => sub {
 is(Mojo::IOLoop::ReadWriteProcess::Session->singleton->all->size,         40);
 is(Mojo::IOLoop::ReadWriteProcess::Session->singleton->all_orphans->size, 0);
 
+subtest stress_test => sub {
+  plan skip_all => "set STRESS_TEST=1 (be careful)" unless $ENV{STRESS_TEST};
+  Mojo::IOLoop::ReadWriteProcess::Session->singleton->reset;
+
+  my $q = queue();
+  $q->pool->maximum_processes(50);
+  $q->queue->maximum_processes(100000);
+  my $proc = 200;
+  my $fired;
+  my %output;
+  my $i = 1;
+
+# Started as long as resources allows (maximum_processes of the main pool)
+# That requires then to subscribe for each process event's separately (manually)
+  for (1 .. $proc) {
+    my $p = process(sub { shift; sleep 4; exit shift() })->set_pipes(0)
+      ->internal_pipes(0)->args($i);
+    $p->once(
+      stop => sub {
+        $fired++;
+        $output{shift->exit_status}++;
+      });
+    $q->add($p);
+    $i++;
+  }
+
+  is $q->pool->maximum_processes, 50;
+  $q->consume;
+  is $q->queue->size, 0;
+  is $q->pool->size,  0;
+  is $q->done->size,  $proc;
+  is $fired, $proc;
+  $i = 1;
+  for (1 .. $proc) {
+    is $output{$i}, 1 or diag explain \%output;
+    $i++;
+  }
+  is(Mojo::IOLoop::ReadWriteProcess::Session->singleton->all->size, 200);
+};
+
 done_testing;

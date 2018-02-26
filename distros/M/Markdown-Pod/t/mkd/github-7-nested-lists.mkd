@@ -1,0 +1,9 @@
+* Fruits
+    * Apples
+    * Oranges
+* Vegetables
+    * Carrots
+    * Peppers
+        * Chili Peppers
+        * Bell Peppers
+    * Lettuce

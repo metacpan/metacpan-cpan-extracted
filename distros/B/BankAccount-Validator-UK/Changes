@@ -1,5 +1,15 @@
 Revision history for BankAccount::Validator::UK
 
+0.36  2018-02-26T10:30:00:+01:00
+      - Improved data loading.
+
+0.35  2018-02-25T16:30:00:+01:00
+      - Used namespace::autoclean instead.
+
+0.34  2018-02-23T15:35:00:+01:00
+      - Updated the valacdos.txt (v4.70)
+      - Added sort code range 302880 - 302880 for Mod11.
+
 0.33  2017-09-14T11:25:00:+01:00
       - Updated the valacdos.txt (v4.60)
       - Added sort code range 040072-040073

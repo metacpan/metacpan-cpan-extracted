@@ -30,7 +30,7 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/synopsis-cpp.pl> in the distribution.)  
+(This example is included as L<F<synopsis-cpp.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/synopsis-cpp.pl> in the distribution.)  
 
     
     # Print all the comments in a C program:
@@ -60,25 +60,25 @@ produces output
     
 
 
-(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/synopsis-comment.pl> in the distribution.)  
+(This example is included as L<F<synopsis-comment.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/synopsis-comment.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents version 0.17 of C::Tokenize corresponding
-to git commit L<e7734a52fb15da79a33967349ffcfbec72127ef8|https://github.com/benkasminbullock/C-Tokenize/commit/e7734a52fb15da79a33967349ffcfbec72127ef8> released on Thu Aug 31 09:22:10 2017 +0900.
+This documents version 0.18 of C::Tokenize corresponding
+to git commit L<cac6e4c67b2ddcd7b3fb030ebb367f124a33057c|https://github.com/benkasminbullock/C-Tokenize/commit/cac6e4c67b2ddcd7b3fb030ebb367f124a33057c> released on Thu Feb 22 13:47:15 2018 +0900.
 
 =head1 DESCRIPTION
 
 This module provides a tokenizer, L</tokenize>, which breaks C source
-code into its smallest meaningful components, and the regexs which
-match each of these components. For example, the module supplies a
-regex L</$comment_re> which matches a C comment.
+code into its smallest meaningful components, and the regexes which
+match each of these components. For example, L</$comment_re> matches a
+C comment.
 
-As well as the basic components of C, it also supplies regexes for,
-for example, local include statements, L</$include_local>, or C
-variables, L</$cvar_re>, as well as extra functions, like
-L</decomment> to remove the comment syntax of traditional C comments,
-and L</strip_comments> which removes all comments from a C program.
+As well as components of C, it supplies regexes for local include
+statements, L</$include_local>, and C variables, L</$cvar_re>, as well
+as extra functions, like L</decomment> to remove the comment syntax of
+traditional C comments, and L</strip_comments>, which removes all
+comments from a C program.
 
 =head1 REGULAR EXPRESSIONS
 
@@ -89,9 +89,9 @@ using, for example,
 
 to import C<$cpp_re>.
 
-Most of the following regular expressions do not do any capturing,
-except where noted. If you want to capture, add your own parentheses
-around the regular expression.
+The following regular expressions do not capture, except where
+noted. To capture, add your own parentheses around the regular
+expression.
 
 =head2 Comments
 
@@ -121,7 +121,8 @@ L</strip_comments> for removing all comments from a program.
 =item $cpp_re
 
 Match all C preprocessor instructions, such as #define, #include,
-#endif, and so on.
+#endif, and so on. A multiline preprocessor instruction is matched as
+#one piece.
 
 =item $include_local
 
@@ -154,7 +155,7 @@ produces output
     Include statement #include "that.h" includes file that.h.
 
 
-(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/includes.pl> in the distribution.)  
+(This example is included as L<F<includes.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/includes.pl> in the distribution.)  
 
 This was added in version 0.12 of C::Tokenize.
 
@@ -166,8 +167,8 @@ This was added in version 0.12 of C::Tokenize.
 
 =item $octal_re
 
-Match an octal number, a number with digits 0 to 7 only which begins
-with a leading zero.
+Match an octal number, which is a number consisting of the digits 0 to
+7 only which begins with a leading zero.
 
 =item $hex_re
 
@@ -242,7 +243,7 @@ produces output
     & q is a C variable.
 
 
-(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/cvar.pl> in the distribution.)  
+(This example is included as L<F<cvar.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/cvar.pl> in the distribution.)  
 
 Because in theory this can contain very complex things, this regex is
 somewhat heuristic and there are edge cases where it is known to
@@ -391,7 +392,7 @@ produces output
     int z;
 
 
-(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/strip-comments.pl> in the distribution.)  
+(This example is included as L<F<strip-comments.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/strip-comments.pl> in the distribution.)  
 
 This function was moved to this module from L<XS::Check> in version
 0.14.
@@ -420,7 +421,7 @@ produces output
     }
 
 
-(This example is included as L<F<strip-json.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.17/examples/strip-json.pl> in the distribution.)  
+(This example is included as L<F<strip-json.pl>|https://fastapi.metacpan.org/source/BKB/C-Tokenize-0.18/examples/strip-json.pl> in the distribution.)  
 
 =head1 EXPORTS
 
@@ -487,7 +488,12 @@ The C language does not impose a requirement that included file names
 end in .h. You can include a file with any name. However, the regexes
 L</$include> and L</$include_local> insist on a final .h.
 
+=item $cvar_re misses some cases
+
+See the discussion under L</$cvar_re>.
+
 =back
+
 
 
 =head1 AUTHOR
@@ -497,7 +503,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2018
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -29,17 +29,18 @@ no_index:
 provides:
   Config::ENV:
     file: lib/Config/ENV.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Exporter::Lite: '0'
 resources:
   bugtracker: https://github.com/cho45/Config-ENV/issues
   homepage: https://github.com/cho45/Config-ENV
   repository: git://github.com/cho45/Config-ENV.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'ysasaki <aloelight@gmail.com>'
   - 'issm <issmxx@gmail.com>'
   - 'karupanerura <karupa@cpan.org>'
+  - 'Wataru TOYA <watrty@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

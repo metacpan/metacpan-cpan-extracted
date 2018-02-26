@@ -1,11 +1,12 @@
 package Dancer::Session::Cookie;
 our $AUTHORITY = 'cpan:YANICK';
-$Dancer::Session::Cookie::VERSION = '0.28';
+$Dancer::Session::Cookie::VERSION = '0.29';
 use strict;
 use warnings;
 # ABSTRACT: Encrypted cookie-based session backend for Dancer
 # VERSION
 
+use 5.008;
 use base 'Dancer::Session::Abstract';
 
 use Session::Storage::Secure 0.010;
@@ -195,7 +196,7 @@ Dancer::Session::Cookie - Encrypted cookie-based session backend for Dancer
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 

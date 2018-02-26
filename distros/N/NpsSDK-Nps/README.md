@@ -55,7 +55,7 @@ my $params = {
     'psp_CardSecurityCode' => '123'
 };
 
-my $response = NpsSDK::Nps::pay_online_2p($params);
+my $response = NpsSDK::Nps::pay_online_2p($params);	
 ```
 
 ## environments
@@ -71,7 +71,7 @@ $NpsSDK::Constants::SANDBOX_ENV
 ## Advanced configurations
 
 Nps SDK allows you to log what’s happening with you request inside of our SDK.
-In order to do so you will have to create a logger with Log::Log4perl as DEBUG and pass it by configuration.
+In order to do so you will have to create a logger with Log::Log4perl and pass it by configuration.
 
 ```perl
 use NpsSDK::Nps;
@@ -83,42 +83,62 @@ NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  logger      => $logger);
 ```
 
-The $Log::Log4perl::INFO level will write concise information of the request and will mask sensitive data of the request. 
-The $Log::Log4perl::DEBUG level will write information about the request to let developers debug it in a more detailed way.
+The INFO level will write concise information of the request and will mask sensitive data of the request. 
+The DEBUG level will write information about the request to let developers debug it in a more detailed way.
+
+Simple debug screen logging example:
 
 ```perl
 use NpsSDK::Nps;
 use warnings; 
 use strict;
 
+use Log::Log4perl;
+
+Log::Log4perl->init(\<<CONFIG);
+log4perl.rootLogger = DEBUG, screen
+
+log4perl.appender.screen = Log::Log4perl::Appender::Screen
+log4perl.appender.screen.stderr = 0
+log4perl.appender.screen.layout = PatternLayout
+log4perl.appender.screen.layout.ConversionPattern = %d %p %m%n
+
+CONFIG
+
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",
-                                 logger      => $logger,
-                                 log_level   => $Log::Log4perl::INFO);
-
+                                 logger      => $logger);
 ```
 
-Simple Debug Example:
+You can also save the logs in a file:
 
 ```perl
 use NpsSDK::Nps;
 use warnings; 
 use strict;
 
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($DEBUG);
-my $logger = get_logger();
-my $appender = Log::Log4perl::Appender->new("Log::Dispatch::Screen");
-$logger->add_appender($appender);
-my $layout = Log::Log4perl::Layout::PatternLayout->new(
-                     "%d %p:");
-$appender->layout($layout);
+use Log::Log4perl;
+
+Log::Log4perl->init(\<<CONFIG);
+log4perl.rootLogger = DEBUG, screen, file
+
+log4perl.appender.screen = Log::Log4perl::Appender::Screen
+log4perl.appender.screen.stderr = 0
+log4perl.appender.screen.layout = PatternLayout
+log4perl.appender.screen.layout.ConversionPattern = %d %p %m%n
+
+log4perl.appender.file = Log::Log4perl::Appender::File
+log4perl.appender.file.filename = YOUR_LOG_FILE.log
+log4perl.appender.file.mode = append
+log4perl.appender.file.layout = PatternLayout
+log4perl.appender.file.layout.ConversionPattern = %d %p %m%n
+CONFIG
 
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",
-                                 logger      => $logger,
-                                 log_level   => $Log::Log4perl::INFO);
+                                 logger      => $logger);
 ```
+
 
 Sanitize allows the SDK to truncate to a fixed size some fields that could make request fail, like extremely long name.
 

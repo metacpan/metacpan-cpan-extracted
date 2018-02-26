@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-Rewrite
 
+2.100 Mon 26 Feb 2018
+	- Response status code rewriting support
+
 2.000 Thu 14 May 2015
 	- New interface with separate `request`/`response` rewrite callbacks,
 	  with unambiguous return value protocol, which supports redirecting

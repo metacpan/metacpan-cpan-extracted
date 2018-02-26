@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "FileHandle" => 0,
     "Getopt::Long" => 0,
     "List::Compare" => 0,
-    "List::Util" => "1.42",
+    "List::Util" => "1.49",
     "Mouse" => 0,
     "Mouse::Role" => 0,
     "Text::CSV" => 0,
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "FileHandle" => 0,
   "Getopt::Long" => 0,
   "List::Compare" => 0,
-  "List::Util" => "1.42",
+  "List::Util" => "1.49",
   "Mouse" => 0,
   "Mouse::Role" => 0,
   "Test::Deep" => 0,

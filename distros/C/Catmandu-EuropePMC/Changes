@@ -1,5 +1,8 @@
 Revision history for Catmandu-EuropePMC
 
+1.01  2018-02-23 09:13:14 CET
+	- test with network environment variable
+
 1.00  2018-02-14 12:07:37 CET
     - improve documentation
 

@@ -1,3 +1,6 @@
+0.100200
+- Fix a bunch of typos in the README.pod file.
+
 0.100100
 - Fix a bug with chomp.
 - Improve man pages and add more examples.

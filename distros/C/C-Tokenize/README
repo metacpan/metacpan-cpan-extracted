@@ -6,7 +6,7 @@
                                                     
 
 
-This is the README for C::Tokenize version 0.17.
+This is the README for C::Tokenize version 0.18.
 
 C::Tokenize is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -27,15 +27,15 @@ four sections:
 C::Tokenize - reduce a C file to a series of tokens
 
 This module provides a tokenizer, "tokenize", which breaks C source
-code into its smallest meaningful components, and the regexs which
-match each of these components. For example, the module supplies a
-regex "$comment_re" which matches a C comment.
+code into its smallest meaningful components, and the regexes which
+match each of these components. For example, "$comment_re" matches a
+C comment.
 
-As well as the basic components of C, it also supplies regexes for,
-for example, local include statements, "$include_local", or C
-variables, "$cvar_re", as well as extra functions, like
-"decomment" to remove the comment syntax of traditional C comments,
-and "strip_comments" which removes all comments from a C program.
+As well as components of C, it supplies regexes for local include
+statements, "$include_local", and C variables, "$cvar_re", as well
+as extra functions, like "decomment" to remove the comment syntax of
+traditional C comments, and "strip_comments", which removes all
+comments from a C program.
 
 -----------------------------------------------------------------------------
 
@@ -68,11 +68,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm C::Tokenize
 
-To install the module from the source file, C-Tokenize-0.17.tar.gz, follow
+To install the module from the source file, C-Tokenize-0.18.tar.gz, follow
 this sequence of commands:
 
-    tar xfz C-Tokenize-0.17.tar.gz
-    cd C-Tokenize-0.17
+    tar xfz C-Tokenize-0.18.tar.gz
+    cd C-Tokenize-0.18
     perl Makefile.PL
     make
     make install
@@ -97,6 +97,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Aug 31 09:22:54 2017.
+This README was written on Thu Feb 22 13:47:39 2018.
 
 -----------------------------------------------------------------------------

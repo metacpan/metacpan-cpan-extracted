@@ -9,7 +9,7 @@ package Perl::Exactly;
 ######################################################################
 
 use 5.00503;
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 use strict;
 

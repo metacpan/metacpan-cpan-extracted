@@ -5,7 +5,7 @@ use strict;
 use subs qw();
 use vars qw($VERSION);
 
-$VERSION = '0.15';
+$VERSION = '0.151';
 
 =encoding utf8
 
@@ -19,15 +19,15 @@ App::Module::Lister - List the Perl modules in @INC
 	prompt> perl Lister.pm
 
 		---OR---
-	# rename this file to something your webserver will treat as a 
+	# rename this file to something your webserver will treat as a
 	# CGI script and upload it. Run it to see the module list
 	prompt> cp Lister.pm lister.cgi
 		... modify the shebang line if you must
 	prompt> ftp www.example.com
 		... upload file
 	prompt> wget http://www.example.com/cgi-bin/lister.cgi
-	
-	
+
+
 =head1 DESCRIPTION
 
 This is a program to list all of the Perl modules it finds in C<@INC>
@@ -59,7 +59,7 @@ in L<perlrun>. If that doesn't work for you, you'll probably see an
 error like:
 
 	 /usr/bin/env: bad interpreter: No such file or directory
-	 
+
 That's similar to the error you'll see if you have the wrong path
 to C<perl>.
 
@@ -75,29 +75,29 @@ run(\*STDOUT) unless caller;
 
 sub run {
 	my $fh = shift || \*STDOUT;
-	
+
 	my( $wanted, $reporter, $clear ) = generator();
 
 	print $fh "This is Perl $]\n";
-	
-	foreach my $inc ( @INC ) {		
+
+	foreach my $inc ( @INC ) {
 		find( { wanted => $wanted }, $inc );
-		
+
 		my $count = 0;
 		foreach my $file ( $reporter->() ) {
 			my $version = parse_version_safely( $file );
-			
+
 			my $module_name = path_to_module( $inc, $file );
-			
+
 			print $fh "$module_name\t$version\n";
-			
+
 			#last if $count++ > 5;
 			}
-			
+
 		$clear->();
 		}
 	}
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -119,34 +119,34 @@ the output to C<STDOUT>.
 
 Returns three closures to find, report, and clear a list of modules.
 See their use in C<run>.
-	
+
 =cut
 
-sub generator {			
+sub generator {
 	my @files = ();
-	
-	sub { push @files, 
-		File::Spec->canonpath( $File::Find::name ) 
+
+	sub { push @files,
+		File::Spec->canonpath( $File::Find::name )
 		if m/\A\w+\.pm\z/ },
 	sub { @files },
 	sub { @files = () }
 	}
-	
+
 =item parse_version_safely( FILENAME )
 
 Find the C<$VERSION> in C<FILENAME> and return its value. The entire
 statement in the file must be on a single line with nothing else (just
 like for the PAUSE indexer). If the version is undefined, it returns the
 string C<'undef'>.
-	
+
 =cut
 
 sub parse_version_safely { # stolen from PAUSE's mldistwatch, but refactored
 	my( $file ) = @_;
-	
+
 	local $/ = "\n";
 	local $_; # don't mess with the $_ in the map calling this
-	
+
 	return unless open FILE, "<$file";
 
 	my $in_pod = 0;
@@ -158,17 +158,17 @@ sub parse_version_safely { # stolen from PAUSE's mldistwatch, but refactored
 
 		next unless /([\$*])(([\w\:\']*)\bVERSION)\b.*\=/;
 		my( $sigil, $var ) = ( $1, $2 );
-		
+
 		$version = eval_version( $_, $sigil, $var );
 		last;
 		}
 	close FILE;
 
 	return 'undef' unless defined $version;
-	
+
 	return $version;
 	}
-	
+
 =item eval_version( STATEMENT, SIGIL, VAR )
 
 Used by C<parse_version_safely> to evaluate the C<$VERSION> line
@@ -181,13 +181,13 @@ The C<SIGIL> may be either a C<$> (for a scalar) or a C<*> for a
 typeglob.
 
 The C<VAR> is the variable identifier.
-	
+
 =cut
 
 sub eval_version {
 	my( $line, $sigil, $var ) = @_;
-	
-	my $eval = qq{ 
+
+	my $eval = qq{
 		package  # hide from PAUSE
 			ExtUtils::MakeMaker::_version;
 
@@ -196,7 +196,7 @@ sub eval_version {
 			$line
 			}; \$$var
 		};
-		
+
 	my $version = do {
 		local $^W = 0;
 		no strict;
@@ -210,24 +210,24 @@ sub eval_version {
 
 Turn a C<PATH> into a Perl module name, ignoring the C<@INC> directory
 specified in C<INC_DIR>.
-	
+
 =cut
 
 sub path_to_module {
 	my( $inc, $path ) = @_;
-	
+
 	my $module_path = substr( $path, length $inc );
 	$module_path =~ s/\.pm\z//;
-	
+
 	# XXX: this is cheating and doesn't handle everything right
 	my @dirs = grep { ! /\W/ } File::Spec->splitdir( $module_path );
 	shift @dirs;
-	
+
 	my $module_name = join "::", @dirs;
-	
+
 	return $module_name;
 	}
-	
+
 1;
 
 =back
@@ -236,7 +236,7 @@ sub path_to_module {
 
 =over 4
 
-=item * 
+=item *
 
 Guessing the module name from the full path name isn't perfect. If I
 run into directories that aren't part of the module name in one of the
@@ -283,9 +283,9 @@ Some bits stolen from C<mldistwatch> in the PAUSE code, by Andreas König.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2007-2013, brian d foy, All Rights Reserved.
+Copyright © 2007-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+You may redistribute this under the terms of the Artistic 2 license.
 
 =cut
 

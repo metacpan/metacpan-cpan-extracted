@@ -32,6 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Array::Diff" : "0",
+            "Capture::Tiny" : "0",
+            "Devel::IPerl" : "0.009",
             "Env::Modulecmd" : "1.3",
             "perl" : "v5.10.0"
          }
@@ -47,6 +50,6 @@
          "url" : "https://github.com/kiwiroy/Devel-IPerl-Plugin-EnvironmentModules.git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

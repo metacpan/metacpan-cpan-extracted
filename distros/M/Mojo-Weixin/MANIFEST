@@ -88,10 +88,12 @@ lib/Mojo/Weixin/Util.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+NOTICE
 Plugin.md
 README.md
 screenshot/donate.jpg
 screenshot/IRCShell.jpg
+script/check_dependencies.pl
 t/https.t
 t/load_module.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

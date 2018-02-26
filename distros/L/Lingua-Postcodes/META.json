@@ -4,7 +4,7 @@
       "Lance Wicks <lancew@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,25 +37,27 @@
    "provides" : {
       "Lingua::Postcodes" : {
          "file" : "lib/Lingua/Postcodes.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/lancew/Ligua-Postcodes/issues"
+         "web" : "https://github.com/lancew/Lingua-Postcodes/issues"
       },
-      "homepage" : "https://github.com/lancew/Ligua-Postcodes",
+      "homepage" : "https://github.com/lancew/Lingua-Postcodes",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/lancew/Ligua-Postcodes.git",
-         "web" : "https://github.com/lancew/Ligua-Postcodes"
+         "url" : "https://github.com/lancew/Lingua-Postcodes.git",
+         "web" : "https://github.com/lancew/Lingua-Postcodes"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Lance Wicks <lw@judocoach.com>",
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
-   ]
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Radhi M <radhedeve@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

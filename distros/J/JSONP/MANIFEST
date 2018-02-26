@@ -1,6 +1,5 @@
 buildme
 Changes
-JSONP-1.80.tar.gz
 lib/JSONP.pm
 LICENSE
 Makefile.PL

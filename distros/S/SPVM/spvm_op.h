@@ -142,7 +142,7 @@ enum {
   SPVM_OP_C_FLAG_BLOCK_SWITCH = 8,
   SPVM_OP_C_FLAG_BLOCK_SUB = 32,
   SPVM_OP_C_FLAG_BLOCK_EVAL = 64,
-  SPVM_OP_C_FLAG_BLOCK_LOOP_NEXT_STEP = 128,
+  SPVM_OP_C_FLAG_BLOCK_LOOP_INCREMENT = 128,
 };
 
 enum {
@@ -205,6 +205,7 @@ struct SPVM_op {
     SPVM_OUR* our;
     SPVM_PACKAGE_VAR* package_var;
     SPVM_UNDEF* undef;
+    int32_t loop_block_index;
   } uv;
   int32_t code;
   int32_t flag;

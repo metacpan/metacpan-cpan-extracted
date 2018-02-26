@@ -4,7 +4,6 @@ use warnings;
 no strict   'refs';
 no warnings 'once';
 
-use DBIx::DataModel::ConnectedSource;
 use DBIx::DataModel::Meta;
 use DBIx::DataModel::Meta::Schema;
 use DBIx::DataModel::Meta::Source;
@@ -104,23 +103,6 @@ my $orig_Schema = \&Schema;
   return $schema_class;
 };
 
-
-
-#----------------------------------------------------------------------
-package DBIx::DataModel::ConnectedSource;
-#----------------------------------------------------------------------
-use strict;
-use warnings;
-
-sub ColumnType {
-  my ($self, $typeName, @args) = @_;
-  $self->{meta_source}->define_column_type($typeName, @args);
-}
-
-sub AutoExpand {
-  my ($self, @roles) = @_;
-  $self->{meta_source}->define_auto_expand(@roles);
-}
 
 
 #----------------------------------------------------------------------

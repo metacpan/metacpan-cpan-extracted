@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account;
-$CanvasCloud::API::Account::VERSION = '0.003';
+$CanvasCloud::API::Account::VERSION = '0.004';
 # ABSTRACT: extends L<CanvasCloud::API>
 
 use Moose;
@@ -34,7 +34,7 @@ CanvasCloud::API::Account - extends L<CanvasCloud::API>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 

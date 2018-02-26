@@ -84,7 +84,7 @@ use File::Copy;
 use File::Temp qw(tempfile);
 
 BEGIN {
-    ( $VERSION = q($Id: Tidy.pm,v 1.74 2018/02/19 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
+    ( $VERSION = q($Id: Tidy.pm,v 1.74 2018/02/20 13:56:49 perltidy Exp $) ) =~ s/^.*\s+(\d+)\/(\d+)\/(\d+).*$/$1$2$3/; # all one line for MakeMaker
 }
 
 sub streamhandle {
@@ -9414,6 +9414,7 @@ sub weld_len_left_to_go {
 
     # Given the index of a token in the 'to_go' array
     # return the length of any weld to its left
+    return if ( $i < 0 );
     my $weld_len =
       weld_len_left( $type_sequence_to_go[$i], $types_to_go[$i] );
     return $weld_len;
@@ -9424,6 +9425,7 @@ sub weld_len_right_to_go {
 
     # Given the index of a token in the 'to_go' array
     # return the length of any weld to its right
+    return if ( $i < 0 );
     if ( $i > 0 && $types_to_go[$i] eq 'b' ) { $i-- }
     my $weld_len =
       weld_len_right( $type_sequence_to_go[$i], $types_to_go[$i] );

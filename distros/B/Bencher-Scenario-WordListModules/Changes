@@ -1,3 +1,17 @@
+0.051   2018-02-20 (PERLANCAR)
+
+	- Remove participant:
+	  WordListC::Password::SecLists::10Million::Top100000; Add
+	  participants:
+	  WordListC::Password::10Million::Top{100000,1000000}.
+
+
+0.050   2018-02-20 (PERLANCAR)
+
+	- Add participant:
+	  WordListC::Password::SecLists::10Million::Top100000.
+
+
 0.04    2017-01-25 (PERLANCAR)
 
 	- No functional changes.

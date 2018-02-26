@@ -7,8 +7,8 @@ use Pcore::Util::UUID qw[uuid_str];
 use Pcore::Util::Digest qw[md5_hex];
 use Pcore::AE::Handle;
 
-has handle => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
-has password => ( is => 'ro', isa => Str );
+has handle     => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
+has password   => ( is => 'ro', isa => Str );
 has on_connect => ( is => 'ro', isa => CodeRef, required => 1 );
 
 has is_pgsql => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
@@ -17,12 +17,12 @@ has state => ( is => 'ro', isa => Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BU
 has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
 has parameter => ( is => 'ro', isa => HashRef, init_arg => undef );
 has key_data  => ( is => 'ro', isa => HashRef, init_arg => undef );
-has tx_status => ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
-has wbuf         => ( is => 'ro', isa => ArrayRef, init_arg => undef );                                                     # outgoing messages buffer
-has sth          => ( is => 'ro', isa => HashRef,  init_arg => undef );                                                     # currently executed sth
-has prepared_sth => ( is => 'ro', isa => HashRef,  init_arg => undef );
+has tx_status    => ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
+has wbuf         => ( is => 'ro', isa => ArrayRef,                                                     init_arg => undef );    # outgoing messages buffer
+has sth          => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );    # currently executed sth
+has prepared_sth => ( is => 'ro', isa => HashRef,                                                      init_arg => undef );
 
-const our $PROTOCOL_VER => "\x00\x03\x00\x00";                                                                              # v3
+const our $PROTOCOL_VER => "\x00\x03\x00\x00";                                                                                 # v3
 
 # FRONTEND
 const our $PG_MSG_BIND             => 'B';

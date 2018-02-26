@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =head1 SYNOPSIS
 

@@ -39,6 +39,7 @@
       "test" : {
          "requires" : {
             "Graph::Directed" : "0",
+            "JSON" : "0",
             "List::UtilsBy" : "0",
             "Test::More" : "0"
          }
@@ -52,6 +53,6 @@
          "web" : "https://github.com/hoehrmann/Graph-Feather"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,4 +1,10 @@
 Perltidy Change Log
+  2018 02 20
+      - RT #124469, #124494, perltidy often making empty files.  The previous had
+        an index error causing it to fail, particularly in version 5.18 of Perl.
+
+        Please avoid version 20180219.
+
   2018 02 19
       - RT #79947, cuddled-else generalization. A new flag -cb provides
         'cuddled-else' type formatting for an arbitrary type of block chain. The

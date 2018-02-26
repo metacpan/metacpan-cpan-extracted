@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Alien::Base::ModuleBuild;
 
+##-- we don't expect this package to build anywhere but linux
+die("cowardly refusing to build on non-linux system; edit Build.PL and try again!") if ($^O !~ /linux/i);
+
 ##======================================================================
 my $class = Alien::Base::ModuleBuild->subclass
     (

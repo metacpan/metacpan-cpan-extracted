@@ -32,7 +32,7 @@ use CallBackery::Config;
 use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 
-our $VERSION = '0.12.3';
+our $VERSION = '0.12.5';
 
 use Mojo::Base 'Mojolicious';
 
@@ -84,7 +84,6 @@ has securityHeaders => sub { {
     # the browser should obej the servers settings regarding content-type
     'X-Content-Type-Options' => 'nosniff',
     # do not store our data ever
-    'Cache-Control' => 'no-store',
     'Pragma' => 'private',
 }};
 

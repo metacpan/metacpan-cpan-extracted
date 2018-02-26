@@ -1,10 +1,11 @@
 lib/DBD/PgPPSjis.pm
 Changes
 Makefile.PL
-pMakefile.PL
+pmake.bat
 MANIFEST
 README
 META.yml
+LICENSE
 PostgreSjis.pl
 t/00_load.t
 t/05_connect.t

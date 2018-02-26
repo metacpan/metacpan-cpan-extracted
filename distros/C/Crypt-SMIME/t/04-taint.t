@@ -93,13 +93,13 @@ This is a test mail. Please ignore...
 $verify =~ s/\r?\n|\r/\r\n/g;
 
 # -----------------------------------------------------------------------------
-plan tests => 6;
+plan tests => 7;
 use_ok('Crypt::SMIME');
 
 taint_checking_ok();
 
 subtest 'Untainted' => sub {
-    plan tests => 18;
+    plan tests => 20;
 
     my $smime = Crypt::SMIME->new();
     untaint $key;
@@ -119,6 +119,12 @@ subtest 'Untainted' => sub {
     my $verified;
     lives_ok {$verified = $smime->check($signed)} 'Verify an untainted message';
     untainted_ok $verified, 'The verified message shall be untainted';
+
+    lives_ok {
+        $smime->setAtTime(time);
+        $verified = $smime->check($signed);
+    } 'Verify an untainted message with untainted parameters';
+    untainted_ok $verified, 'The verified message shall still be untainted';
 
     my $encrypted;
     lives_ok {$encrypted = $smime->encrypt($plain)} 'Encrypt an untainted message';
@@ -256,4 +262,32 @@ subtest 'Tainted public keys' => sub {
     lives_ok {$smime->setPublicKeyStore()} 'Load the default public key store';
     lives_ok {$signed = $smime->sign($plain)} 'Sign an untainted message';
     untainted_ok $signed, 'The signed message shall be untainted now';
+};
+
+subtest 'Tainted verification parameters' => sub {
+    plan tests => 9;
+
+    my $smime = Crypt::SMIME->new();
+    untaint $key;
+    untaint $crt;
+    lives_ok {$smime->setPrivateKey($key, $crt)} 'Set an untainted keypair';
+    lives_ok {$smime->setPublicKey($crt)} 'Set an untainted public key';
+    lives_ok {$smime->setPublicKey([$crt])} 'Set an untainted public key';
+
+    my $signed;
+    untaint $plain;
+    lives_ok {$signed = $smime->sign($plain)} 'Sign an untainted message';
+    untainted_ok $signed, 'The signed message shall be untainted';
+
+    my $verified;
+    lives_ok {$verified = $smime->check($signed)} 'Verify an untainted message';
+    untainted_ok $verified, 'The verified message shall be untainted';
+
+    lives_ok {
+        my $time = time;
+        taint $time;
+        $smime->setAtTime($time);
+        $verified = $smime->check($signed);
+    } 'Verify an untainted message with tainted parameters';
+    tainted_ok $verified, 'The verified message shall be tainted';
 };

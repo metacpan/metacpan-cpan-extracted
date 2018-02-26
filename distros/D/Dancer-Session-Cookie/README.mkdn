@@ -1,10 +1,13 @@
+[![Build Status](https://travis-ci.org/perldancer/Dancer-Session-Cookie.svg?branch=master)](https://travis-ci.org/perldancer/Dancer-Session-Cookie)
+[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/perldancer/Dancer-Session-Cookie?branch=master&svg=true)](https://ci.appveyor.com/project/perldancer/Dancer-Session-Cookie)
+
 # NAME
 
 Dancer::Session::Cookie - Encrypted cookie-based session backend for Dancer
 
 # VERSION
 
-version 0.28
+version 0.29
 
 # SYNOPSIS
 

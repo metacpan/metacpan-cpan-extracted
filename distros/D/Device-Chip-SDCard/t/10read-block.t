@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Device::Chip::Adapter;
+use Test::Device::Chip::Adapter 0.05;  # ->expect_assert_ss, etc..
 
 use Device::Chip::SDCard;
 

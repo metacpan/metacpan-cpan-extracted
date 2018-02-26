@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(parse_text to_editor_args);
@@ -103,7 +103,7 @@ sub _maybe_extract_line_number {
 sub _maybe_extract_subroutine_name {
     my $text = shift;    # scalar ref
 
-    if ( $$text =~ s{::(\w+)\(\)}{} ) {
+    if ( $$text =~ s{::(\w+)\(.*\)}{} ) {
         return $1;
     }
     return undef;
@@ -141,7 +141,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000005
+version 0.000006
 
 =head1 DESCRIPTION
 

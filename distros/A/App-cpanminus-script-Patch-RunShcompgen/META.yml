@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanminus-script-Patch-RunShcompgen
   homepage: https://metacpan.org/release/App-cpanminus-script-Patch-RunShcompgen
   repository: git://github.com/perlancar/perl-App-cpanminus-script-Patch-RunShcompgen.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

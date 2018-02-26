@@ -1,4 +1,4 @@
-requires "Crypt::JWT" => "0";
+requires "Crypt::JWT" => "0.020";
 requires "Plack::Middleware" => "0";
 requires "Plack::Request" => "0";
 requires "Plack::Util" => "0";

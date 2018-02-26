@@ -1,5 +1,17 @@
 Revision history for B::Hooks::AtRuntime.
 
+6       2018-02-20
+    - More test fixes for no-.-in-@INC.
+
+5       2018-02-17
+    - Test fixes for no-.-in-@INC.
+
+4       2016-01-06
+    - Skip a test on pre-5.8.4.
+
+3       2016-01-04
+    - ppport.h has caller_cx.
+
 2       2015-12-25
     - Change to XS-based ::run, eliminating extra scope.
     - Add after_runtime.

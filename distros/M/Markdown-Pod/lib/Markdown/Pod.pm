@@ -4,7 +4,7 @@ package Markdown::Pod;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Encode qw( encodings );
 use List::Util qw( first );
@@ -20,9 +20,9 @@ sub markdown_to_pod {
     my $self = shift;
     my ( $dialect, $markdown, $encoding ) = validated_list(
         \@_,
-        dialect  => { isa => Str, default => 'Standard', optional => 1 },
-        markdown => { isa => Str },
-        encoding => { isa => Str, default => q{},        optional => 1 },
+        dialect  => { type => 'Str', default => 'Standard', optional => 1 },
+        markdown => { type => 'Str' },
+        encoding => { type => 'Str', default => q{},        optional => 1 },
     );
 
     my $capture = q{};
@@ -91,7 +91,7 @@ Markdown::Pod - Convert Markdown to POD
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -193,7 +193,7 @@ Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Keedi Kim.
+This software is copyright (c) 2018 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

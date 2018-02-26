@@ -1,7 +1,7 @@
 # vim: sw=4 ts=4 ft=perl
 
 package WebService::Braintree::HTTP;
-$WebService::Braintree::HTTP::VERSION = '1.0';
+$WebService::Braintree::HTTP::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -17,34 +17,51 @@ use constant CLIENT_VERSION => $WebService::Braintree::VERSION || 'development';
 
 has 'config' => (is => 'ro', default => sub { WebService::Braintree->configuration });
 
+my $LF = "\r\n";
+
 sub post {
-    my ($self, $path, $params) = @_;
-    $self->make_request($path, $params, 'POST');
+    my $self = shift;
+    $self->make_request(POST => @_);
 }
 
 sub put {
-    my ($self, $path, $params) = @_;
-    $self->make_request($path, $params, 'PUT');
+    my $self = shift;
+    $self->make_request(PUT => @_);
 }
 
 sub get {
-    my ($self, $path, $params) = @_;
-    $self->make_request($path, $params, 'GET');
+    my $self = shift;
+    $self->make_request(GET => @_);
 }
 
 sub delete {
-    my ($self, $path, $params) = @_;
-    $self->make_request($path, undef, 'DELETE');
+    my $self = shift;
+    $self->make_request(DELETE => @_);
 }
 
 sub make_request {
-    my ($self, $path, $params, $verb) = @_;
+    my ($self, $verb, $path, $params, $file) = @_;
     my $request = HTTP::Request->new($verb => $self->config->base_merchant_url . $path);
     $request->headers->authorization_basic($self->config->public_key, $self->config->private_key);
 
-    if ($params) {
-        $request->content(hash_to_xml($params));
+    if ($file) {
+        my $boundary = DateTime->now->strftime('%Q');
+        $request->content_type("multipart/form-data; boundary=${boundary}");
+
+        my @form_params = map {
+            $self->add_form_field($_, $params->{$_})
+        } keys %{$params // {}};
+        push @form_params, $self->add_file_part(file => $file);
+
+        $request->content(
+            join("", (
+                map { "--${boundary}${LF}${_}" } @form_params
+            )) . "--${boundary}--"
+        );
+    }
+    elsif ($params) {
         $request->content_type("text/xml; charset=utf-8");
+        $request->content(hash_to_xml($params));
     }
 
     $request->header("X-ApiVersion" => $self->config->api_version);
@@ -78,12 +95,53 @@ sub make_request {
 
 sub check_response_code {
     my ($self, $code) = @_;
-    confess "NotFoundError"       if $code eq '404';
+    confess "ClientError"         if $code eq '400';
     confess "AuthenticationError" if $code eq '401';
     confess "AuthorizationError"  if $code eq '403';
+    confess "NotFoundError"       if $code eq '404';
     confess "ServerError"         if $code eq '500';
     confess "DownForMaintenance"  if $code eq '503';
 }
+
+sub add_form_field {
+    my ($self, $key, $value) = @_;
+    return "Content-Disposition: form-data; name=\"${key}\"${LF}${LF}${value}${LF}";
+}
+
+sub add_file_part {
+    my ($self, $key, $file) = @_;
+
+    my $mime_type = $self->mime_type_for_file_name($file);
+
+    my $contents = do {
+        local $/;
+        open(my $fh, '<', $file) or die "Cannot open $file for reading: $!\n";
+        <$fh>;
+    };
+
+    return "Content-Disposition: form-data; name=\"${key}\"; filename=\"${file}\"${LF}"
+        . "Content-Type: ${mime_type}${LF}${LF}${contents}${LF}";
+}
+
+sub mime_type_for_file_name {
+    my ($self, $filename) = @_;
+    my ($ext) = $filename =~ /\.([^.]+)$/;
+    $ext = lc($ext // '');
+
+    if ($ext eq 'jpeg' || $ext eq 'jpg') {
+        return 'image/jpeg';
+    }
+    elsif ($ext eq 'png') {
+        return 'image/png';
+    }
+    elsif ($ext eq 'pdf') {
+        return 'application/pdf';
+    }
+    else {
+        return 'application/octet-stream';
+    }
+}
+
 
 __PACKAGE__->meta->make_immutable;
 

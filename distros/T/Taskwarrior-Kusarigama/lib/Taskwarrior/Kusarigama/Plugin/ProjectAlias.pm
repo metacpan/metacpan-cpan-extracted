@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::ProjectAlias;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: turn @foo into project:foo
-$Taskwarrior::Kusarigama::Plugin::ProjectAlias::VERSION = '0.6.0';
+$Taskwarrior::Kusarigama::Plugin::ProjectAlias::VERSION = '0.7.0';
 
 use strict;
 use warnings;
@@ -44,7 +44,7 @@ Taskwarrior::Kusarigama::Plugin::ProjectAlias - turn @foo into project:foo
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Plack::App::FakeApache::Log;
-
-use Moose;
+$Plack::App::FakeApache::Log::VERSION = '0.09';
+use Moo;
 
 use Apache2::Const -compile => qw(:log);
 use APR::Const;

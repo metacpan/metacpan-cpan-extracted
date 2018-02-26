@@ -6,7 +6,7 @@ File README for DBIx::FileSystem
 
 DBIx::FileSystem - Manage database tables like a filesystem
 
-   (C) 2003, 2007  by Alexander Haderer
+   (C) 2003, 2018  by Alexander Haderer
 
    You may distribute under the terms of the GNU General Public License.
 
@@ -269,6 +269,36 @@ CHANGES:
 	  compatible with older perls
 	- added missing requirement "Test::Simple" to Makefile.PL
 
+1.8	21 jan 2008
+	- bugfix: 'use of uninitialized value' when saving a file where a
+	  var is NULL/undef and defined with option 'uniq'
+
+1.9 	28 mar 2008
+	- bugfix: user supplied valok-check got string 'NULL' instead of 
+	  undef when an enum has nothing selected
+	- bugfix: enum descriptions in vi/cat now sorted numerically by 
+	  enum value instead of lexically by enum value
+
+2.0 	08 jul 2008
+	- added new alternate parameter rdbh for constructor of access class
+	- added test for above parameter
+
+2.1	missing
+
+2.2	08 sep 2011
+	- modified handling of 'ref' type: Now similar like enum/flags
+	- new column property 'cpdelete': delete value on copy 'cp'
+
+2.3	18 oct 2011
+	- bugfix: can now save a flags field with undefined value as given
+	  when editing a file with vi
+
+2.4	04 jan 2012
+	- bugfix: #466 fisctl shell -- use of uninitialized value bei cat/vi
+
+2.5	22 feb 2018
+	- bugfix: #2962 DBIx::FileSystem: Bugfix POSIX::tmpnam --> File::Temp
+
 COPYRIGHT:
 ----------
 
@@ -286,17 +316,6 @@ IF YOU HAVE PROBLEMS:
 ---------------------
 
 Please send comments and bug-reports to <afrika@cpan.org>
-
-
-  
-
-CVS INFO:
---------
-Last Update:		$Author: marvin $
-Update Date:		$Date: 2007/12/13 15:06:47 $
-Source File:		$Source: /home/cvsroot/tools/FileSystem/README,v $
-CVS/RCS Revision:	$Revision: 1.19 $
-Status:			$State: Exp $
 
 
 ---------------------------------------------------------------------------

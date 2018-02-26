@@ -2,8 +2,8 @@ NAME
     AppBase::Grep - A base for grep-like CLI utilities
 
 VERSION
-    This document describes version 0.004 of AppBase::Grep (from Perl
-    distribution AppBase-Grep), released on 2018-01-30.
+    This document describes version 0.005 of AppBase::Grep (from Perl
+    distribution AppBase-Grep), released on 2018-02-26.
 
 FUNCTIONS
   grep
@@ -24,8 +24,8 @@ FUNCTIONS
     Why? For grepping lines from files or stdin, abgrep is no match for the
     standard grep (or its many alternatives): it's orders of magnitude
     slower and currently has fewer options. But AppBase::Grep is a quick way
-    to create grep-like utilities that greps from a custom sources but have
-    common features with the standard grep.
+    to create grep-like utilities that grep from a custom sources but have
+    common/standard grep features.
 
     Compared to the standard grep, AppBase::Grep also has these unique
     features:
@@ -78,6 +78,9 @@ ENVIRONMENT
     Boolean. If set to true, will set default "--color" to "always" instead
     of "auto". If set to false, will set default "--color" to "never"
     instead of "auto". This behavior is not in GNU grep.
+
+  COLOR_THEME
+    String.
 
 HOMEPAGE
     Please visit the project's homepage at

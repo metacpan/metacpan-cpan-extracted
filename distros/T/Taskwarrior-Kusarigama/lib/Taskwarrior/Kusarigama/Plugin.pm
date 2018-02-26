@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Base class for Kusarigama plugins
-$Taskwarrior::Kusarigama::Plugin::VERSION = '0.6.0';
+$Taskwarrior::Kusarigama::Plugin::VERSION = '0.7.0';
 
 use 5.10.0;
 
@@ -73,7 +73,7 @@ Taskwarrior::Kusarigama::Plugin - Base class for Kusarigama plugins
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 

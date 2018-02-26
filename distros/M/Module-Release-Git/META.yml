@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 keywords:
   - workflow
   - module
@@ -33,4 +33,5 @@ resources:
   bugtracker: https://github.com/briandfoy/module-release-git/issues
   homepage: https://github.com/briandfoy/module-release-git
   repository: https://github.com/briandfoy/module-release-git.git
-version: '1.011'
+version: '1.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

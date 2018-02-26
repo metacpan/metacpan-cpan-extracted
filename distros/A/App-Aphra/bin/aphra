@@ -14,6 +14,26 @@ C<aphra> is a simple static sitebuilder written in Perl. It takes a directory
 tree of input template, processes them using the Template Toolkit and outputs
 a directory tree of expanded templates.
 
+=head1 COMMANDS
+
+C<aphra> has two command modes.
+
+=over 4
+
+=item B<build>
+
+Examines the files in the input directory, processes them in various ways
+and leaves the processed version in the output directory.
+
+See most of the rest of this documentation for the gory details.
+
+=item C<serve>
+
+Starts a local HTTP server which serves the files currently in the
+output directory.
+
+You need to have L<App::HTTPThis> installed in order for this to work.
+
 =head1 OPTIONS
 
 C<aphra> takes a number of command line options which alter the way that it
@@ -60,7 +80,7 @@ and will normally be stored in the layouts directory. See the L<Template
 Toolkit> documentation for more details of the C<WRAPPER> directive. The
 default value for this option is "page".
 
-    $ aphra --wrapper my_awesome_layput
+    $ aphra --wrapper my_awesome_layout
 
 =item B<target>
 
@@ -89,12 +109,12 @@ Template Toolkit processor and templates with the extension C<.md> are
 converted from Markdown to the output format (see above) using C<pandoc>
 before they are processed by the Template Toolkit.
 
-Extensions options are more complex than other options. They consist of the
-name of a text format as recognised by C<pandoc> and an extension string.
+Extensions options are more complex than other options. They consist of an
+extension string and the name of a text format as recognised by C<pandoc>.
 These two parts are separated by an equals sign. This option can be
 repeated in order to define multiple extensions.
 
-    $ aphra --extensions markdown=md --extensions template=tt
+    $ aphra --extensions md=markdown --extensions tt=template
 
 =back
 

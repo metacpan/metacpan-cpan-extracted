@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureControl;
 #ABSTRACT: Generic temperature control instrument base class
-$Lab::Instrument::TemperatureControl::VERSION = '3.620';
+$Lab::Instrument::TemperatureControl::VERSION = '3.621';
 use strict;
 
 our @ISA = ('Lab::Instrument');
@@ -71,7 +71,7 @@ Lab::Instrument::TemperatureControl - Generic temperature control instrument bas
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 COPYRIGHT AND LICENSE
 

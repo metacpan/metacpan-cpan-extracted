@@ -165,7 +165,7 @@ subtest "it returns subscriptions associated with a paypal account" => sub {
     plan skip_all => "Cannot create a nonce - cannot use the old Vault flow.";
 
     my $customer = WebService::Braintree::Customer->create()->customer;
-    my $payment_method_token = "paypal-account-" . int(rand(10000));
+    my $payment_method_token = "paypal-account-" . int(rand(1000000));
     my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
         consent_code => "consent-code",
         token => $payment_method_token,

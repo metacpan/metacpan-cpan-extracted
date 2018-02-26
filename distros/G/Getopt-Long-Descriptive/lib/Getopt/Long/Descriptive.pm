@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.101';
+$Getopt::Long::Descriptive::VERSION = '0.102';
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
@@ -290,14 +290,20 @@ sub _nohidden {
 }
 
 sub _expand {
-  return map { {(
-    spec       => $_->[0] || '',
-    desc       => @$_ > 1 ? $_->[1] : 'spacer',
-    constraint => $_->[2] || {},
+  my @expanded;
 
-    # if @$_ is 0 then we got [], a spacer
-    name       => @$_ ? _munge((split /[:=|!+]/, $_->[0] || '')[0]) : '',
-  )} } @_;
+  for my $opt (@_) {
+    push @expanded, {
+      spec       => $opt->[0] || '',
+      desc       => @$opt > 1 ? $opt->[1] : 'spacer',
+      constraint => $opt->[2] || {},
+
+      # if @$_ is 0 then we got [], a spacer
+      name       => @$opt ? _munge((split /[:=|!+]/, $opt->[0] || '')[0]) : '',
+    };
+  }
+
+  return @expanded;
 }
 
 my %HIDDEN = (
@@ -350,9 +356,11 @@ sub _build_describe_options {
         $opt->{constraint}->{one_of} = delete $opt->{desc};
         $opt->{desc} = 'hidden';
       }
+
       if ($HIDDEN{$opt->{desc}}) {
         $opt->{constraint}->{hidden}++;
       }
+
       if ($opt->{constraint}->{one_of}) {
         for my $one_opt (_expand(
           @{delete $opt->{constraint}->{one_of}}
@@ -370,13 +378,14 @@ sub _build_describe_options {
           push @opts, $one_opt;
         }
       }
+
       if ($opt->{constraint}{shortcircuit}
         && exists $opt->{constraint}{default}
       ) {
         carp('option "' . $opt->{name} . q[": 'default' does not make sense for shortcircuit options]);
       }
-      push @opts, $opt;
 
+      push @opts, $opt;
     }
 
     my @go_conf = @{ $arg->{getopt_conf} || $arg->{getopt} || [] };
@@ -687,7 +696,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

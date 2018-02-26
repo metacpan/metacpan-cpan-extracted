@@ -2,7 +2,7 @@ package DateTime::Format::Flexible;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use base 'DateTime::Format::Builder';
 
@@ -198,6 +198,7 @@ my $formats =
  # 2005-06-12 T3Tp (15)
  { length => [16,17],    params => $MDYHMS,   regex => qr{\A${MON}${DAY}${YEAR}T${HMS}T\z},                               postprocess => [ \&_fix_year, \&_fix_zero_month ] } ,
  { length => [17,18,20], params => $MDYHMS,   regex => qr{\A${MON}${DELIM}${DAY}${DELIM}${YEAR}\s?T${HMS}T\z},            postprocess => [ \&_fix_year, \&_fix_zero_month ] } ,
+ { length => [17..20], params => $DMYHM,    regex => qr{\A${DAY}${DELIM}X${MON}X${DELIM}${YEAR}\sT${HM}T\z},            postprocess => [ \&_fix_year, \&_fix_zero_month ] } ,
  { length => [20],     params => $MDYHMS,   regex => qr{\AX${MON}X${DELIM}${DAY}${DELIM}${YEAR}\s?T${HMS}T\z},          postprocess => \&_fix_year } ,
  { length => [21],     params => $MDYHMAP,  regex => qr{\A${MON}${DELIM}${DAY}${DELIM}${YEAR}\s?T${HM}T\s${AMPM}\z},    postprocess => [ \&_fix_ampm, \&_fix_zero_month ] } ,
  { length => [20,21],  params => $YMDHMAP,  regex => qr{\A${YYYYMMDD}\s?T${HM}T\s${AMPM}\z},                            postprocess => \&_fix_ampm } ,

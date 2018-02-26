@@ -23,8 +23,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Base" : "0.006",
-            "Alien::Build" : "0.32",
+            "Alien::Build" : "1.36",
             "Alien::Build::MM" : "0.32",
             "Capture::Tiny" : "0",
             "ExtUtils::MakeMaker" : "6.52",
@@ -51,7 +50,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0.038",
+            "Alien::Base" : "1.36",
             "base" : "0",
             "perl" : "5.006"
          }
@@ -76,7 +75,22 @@
          "web" : "https://github.com/plicease/Alien-gzip"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.05",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

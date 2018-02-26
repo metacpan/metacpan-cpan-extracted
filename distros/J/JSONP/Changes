@@ -1,6 +1,10 @@
 Revision history for Perl extension JSONP.
 
 
+1.82
+
+	- add _is_root_element key to $self in run sub instead of doing it in constructor new sub
+
 1.81
 
 	- exclude colons as well from allowed chars for keys in autovivification

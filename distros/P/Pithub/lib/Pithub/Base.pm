@@ -1,7 +1,6 @@
 package Pithub::Base;
-$Pithub::Base::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github v3 base class for all Pithub modules
 
 use Moo;
@@ -289,6 +288,11 @@ sub has_token {
     return 0;
 }
 
+
+sub rate_limit {
+    return shift->request( method => 'GET', path => '/rate_limit' );
+}
+
 sub _build__json {
     my ($self) = @_;
     return JSON->new->utf8($self->utf8);
@@ -413,7 +417,7 @@ Pithub::Base - Github v3 base class for all Pithub modules
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 DESCRIPTION
 
@@ -542,10 +546,6 @@ B<clear_jsonp_callback>: reset the jsonp_callback attribute
 
 =item *
 
-B<has_jsonp_callback>: check if the jsonp_callback attribute is set
-
-=back
-
 =head2 per_page
 
 Controls how many items are fetched per API call, aka "page".  See
@@ -574,10 +574,6 @@ There are two helper methods:
 B<clear_per_page>: reset the per_page attribute
 
 =item *
-
-B<has_per_page>: check if the per_page attribute is set
-
-=back
 
 =head2 prepare_request
 
@@ -657,10 +653,6 @@ B<clear_repo>: reset the repo attribute
 
 =item *
 
-B<has_repo>: check if the repo attribute is set
-
-=back
-
 =head2 token
 
 If the OAuth token is set, L<Pithub> will sent it via an HTTP header
@@ -693,17 +685,6 @@ There are two helper methods:
 B<clear_user>: reset the user attribute
 
 =item *
-
-B<has_user>: check if the user attribute is set
-
-=back
-
-It might make sense to use this together with the repo attribute:
-
-    my $c = Pithub::Repos::Commits->new( user => 'plu', repo => 'Pithub' );
-    my $result = $c->list;
-    my $result = $c->list_comments;
-    my $result = $c->get('6b6127383666e8ecb41ec20a669e4f0552772363');
 
 =head2 utf8
 
@@ -858,6 +839,43 @@ This method always returns a L<Pithub::Result> object.
 
 This method checks if a token has been specified, or if not, and a request
 object is passed, then it looks for an Authorization header in the request.
+
+=head2 rate_limit
+
+Query the rate limit for the current object and authentication method.
+
+=for Pod::Coverage has_jsonp_callback
+
+B<has_jsonp_callback>: check if the jsonp_callback attribute is set
+
+=back
+
+=for Pod::Coverage has_per_page
+
+B<has_per_page>: check if the per_page attribute is set
+
+=back
+
+=for Pod::Coverage has_prepare_request
+
+=for Pod::Coverage has_repo
+
+B<has_repo>: check if the repo attribute is set
+
+=back
+
+=for Pod::Coverage has_user
+
+B<has_user>: check if the user attribute is set
+
+=back
+
+It might make sense to use this together with the repo attribute:
+
+    my $c = Pithub::Repos::Commits->new( user => 'plu', repo => 'Pithub' );
+    my $result = $c->list;
+    my $result = $c->list_comments;
+    my $result = $c->get('6b6127383666e8ecb41ec20a669e4f0552772363');
 
 =head1 AUTHOR
 

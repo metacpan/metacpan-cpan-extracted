@@ -9,20 +9,20 @@ use Pcore::Core::Env::Share;
 use Fcntl qw[LOCK_EX SEEK_SET];
 
 has is_par => ( is => 'lazy', isa => Bool, init_arg => undef );    # process run from PAR distribution
-has _main_dist => ( is => 'lazy', isa => Maybe [ InstanceOf ['Pcore::Dist'] ], init_arg => undef );    # main dist
-has pcore => ( is => 'lazy', isa => InstanceOf ['Pcore::Dist'],             init_arg => undef );       # pcore dist
-has share => ( is => 'lazy', isa => InstanceOf ['Pcore::Core::Env::Share'], init_arg => undef );       # share object
-has _dist_idx => ( is => 'lazy', isa => HashRef, default => sub { {} }, init_arg => undef );           # registered dists. index
-has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );                              # parsed CLI data
+has _main_dist => ( is => 'lazy', isa => Maybe      [ InstanceOf ['Pcore::Dist'] ], init_arg => undef );    # main dist
+has pcore      => ( is => 'lazy', isa => InstanceOf ['Pcore::Dist'],                init_arg => undef );    # pcore dist
+has share      => ( is => 'lazy', isa => InstanceOf ['Pcore::Core::Env::Share'],    init_arg => undef );    # share object
+has _dist_idx     => ( is => 'lazy', isa => HashRef, default  => sub { {} }, init_arg => undef );           # registered dists. index
+has cli           => ( is => 'ro',   isa => HashRef, init_arg => undef );                                   # parsed CLI data
 has user_cfg_path => ( is => 'lazy', isa => Str,     init_arg => undef );
-has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                              # $HOME/.pcore/pcore.ini config
+has user_cfg      => ( is => 'lazy', isa => HashRef, init_arg => undef );                                   # $HOME/.pcore/pcore.ini config
 
 has can_scan_deps => ( is => 'lazy', isa => Bool, init_arg => undef );
 
 _normalize_inc();
 
 # create $ENV object
-$ENV = __PACKAGE__->new;                                                                               ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+$ENV = __PACKAGE__->new;                                                                                    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
 $ENV->_INIT;
 

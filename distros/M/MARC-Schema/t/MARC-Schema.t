@@ -10,8 +10,8 @@ use MARC::Schema;
     can_ok $schema, qw(check _error _initialize _load_schema);
     ok $schema->{fields}, 'load default schema';
     ok $schema->{fields}->{LDR}, 'got a schema definition';
-    is $schema->{fields}->{LDR}->{positions}->[0]->{position}, '00-04',
-        'got a schema property \'position\'';
+    is $schema->{fields}->{LDR}->{positions}->{'00-04'}->{label},
+        'Record length', 'got a schema property \'label\'';
 }
 
 # load inline schema
@@ -64,8 +64,8 @@ use MARC::Schema;
     my @check  = $schema->check($record);
     is $check[0]->{message}, 'field is not repeatable',
         'field is not repeatable';
-    is $check[1]->{subfields}->{a}->{message},
-        q{subfield 'a' is not repeatable}, 'subfield is not repeatable';
+    is $check[1]->{subfields}->{a}->{message}, q{subfield is not repeatable},
+        'subfield is not repeatable';
     is $check[1]->{subfields}->{x}->{message}, 'unknown subfield',
         'unknown subfield';
     is $check[2]->{message}, 'unknown field', 'unknown field';

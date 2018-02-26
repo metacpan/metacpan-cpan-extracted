@@ -38,24 +38,28 @@ WriteMakefile(
 );
 
 
-# Build shared library
+# Add Build shared library make rule
 sub MY::postamble {
-  my $postamble = SPVM::Build::create_postamble(
-    module_names => [qw(
-      SPVM::CORE
-      SPVM::Math
-      SPVM::Byte
-      SPVM::Short
-      SPVM::Integer
-      SPVM::Long
-      SPVM::Float
-      SPVM::Double
-      SPVM::Arrays
-    )]
+  my $spvm_build = SPVM::Build->new;
+  
+  my @module_names = qw(
+    SPVM::CORE
+    SPVM::Math
+    SPVM::Byte
+    SPVM::Short
+    SPVM::Integer
+    SPVM::Long
+    SPVM::Float
+    SPVM::Double
+    SPVM::Arrays
   );
   
-  return $postamble;
+  my $make_rule = '';
+  for my $module_name (@module_names) {
+    $make_rule .= $spvm_build->create_build_shared_lib_make_rule($module_name);
+  }
+  
+  return $make_rule;
 }
-
 
 1;

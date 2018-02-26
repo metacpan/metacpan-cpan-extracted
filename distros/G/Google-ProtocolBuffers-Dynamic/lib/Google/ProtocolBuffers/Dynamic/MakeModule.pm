@@ -98,11 +98,16 @@ my %boolean_options = map +($_ => [$_, 1], "no_$_" => [$_, 0]), qw(
     generic_extension_methods
 );
 
+my %string_options = map { $_ => 1 } qw(
+    accessor_style
+    client_services
+);
+
 sub _to_option {
     my ($options, $key, $value) = @_;
 
-    if ($key eq 'accessor_style') {
-        $options->{accessor_style} = $value;
+    if (exists $string_options{$key}) {
+        $options->{$key} = $value;
         return 1;
     }
     return 0 unless my $boolean = $boolean_options{$key};
@@ -200,7 +205,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 AUTHOR
 

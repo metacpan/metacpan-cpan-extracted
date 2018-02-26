@@ -28,7 +28,7 @@ L<REFERENCE|DBIx::DataModel::Doc::Reference>
 
 =item *
 
-L<MISC|DBIx::DataModel::Doc::Misc>
+L<COOKBOOK|DBIx::DataModel::Doc::Cookbook>
 
 =item *
 
@@ -44,7 +44,18 @@ GLOSSARY
 
 =head1 GLOSSARY
 
+=head2 A
+
+
 =over
+
+=item anonymous role
+
+An empty L</"role name"> in an L</association> declaration, expressed
+by characters C<--> or by the word C<'none'>. This tells
+C<DBIx::DataModel> that no L</"path method"> should be generated
+for this side of the association.
+
 
 =item API
 
@@ -62,6 +73,17 @@ roles of the partipating tables.
 An association declaration in C<DBIx::DataModel> involves similar 
 information, except that no more than two tables can participate,
 and at least one role name is mandatory.
+
+=item association end
+
+A term sometimes used in UML literature as synonym to
+L</"role name">.
+
+=back
+
+=head2 C
+
+=over
 
 =item component
 
@@ -128,6 +150,27 @@ usually belong to a module that will be
 loaded through L<use|perlfunc/use>, and therefore will be 
 executed at compile-time. 
 
+=back
+
+=head2 D
+
+=over
+
+=item database schema
+
+A container within the database management system for holding tables
+and other database objects.  By default, table names are looked up
+within the default schema of the current database session; but if
+multiple schemata are supported, table names may be prefixed by the name
+of another schema :  C<SELECT * FROM FOREIGN_SCHEMA.TABLE_NAME WHERE ...>.
+
+Not to be confounded with a L</schema> at the C<DBIx::DataModel> level.
+
+=item database view
+
+A L</view> declared within the database through an SQL definition of shape
+C<CREATE VIEW view_name AS SELECT ...>.
+
 =item DB
 
 DataBase
@@ -140,9 +183,19 @@ The generic database-independent interface for Perl -- see L<DBI>.
 
 Abreviation for L<DBIx::Class>, another L</ORM> for Perl.
 
+=item DBIDM
+
+Abreviation for C<DBIx::DataModel>.
+
 =item dbh
 
 A DBI database handle, created by a call to L<DBI/connect>.
+
+=back
+
+=head2 F
+
+=over
 
 =item fast statement 
 
@@ -158,6 +211,17 @@ before that row gets overwritten by the next row.
 A column or set of columns that contains the primary key
 of another table.
 
+=back
+
+=head2 I
+
+=over
+
+=item impedance mismatch
+
+Term used in ORM literature to express the gap between database
+concepts and object-oriented concepts. The challenge of ORM design
+is to find the best way to reduce the "impedance mismatch".
 
 =item inner join
 
@@ -167,6 +231,16 @@ Within C<DBIx::DataModel>, inner joins are inferred automatically
 from the L<multiplicities|/multiplicity> in L<associations|/association>,
 or may be explicitly required with a bidirectional arrow: 
 C<< ->join(qw/table <=> role1 <=> role2/) >>.
+
+=item invocant
+
+The subject of a method call. It can be either a Perl class or a Perl object.
+
+=back
+
+=head2 J
+
+=over
 
 =item JDBC
 
@@ -198,6 +272,12 @@ A typical join condition states that the
 L</foreign key> of the first table should match the L</primary key>
 of the second table.
 
+=back
+
+
+=head2 L
+
+=over
 
 =item left join
 
@@ -209,6 +289,30 @@ from the L<multiplicities|/multiplicity> in L<associations|/association>,
 or may be explicitly required with a directed arrow: 
 C<< ->join(qw/table => role1 => role2/) >>.
 
+=back
+
+
+=head2 M
+
+=over
+
+=item many-to-many association
+
+An association in which the maximum multiplicity is C<'*'> on both
+sides. This is a conceptual notion; to be implemented in a database,
+a many-to-many association needs  an intermediate linking table
+for storing pairs of keys from both sides of the association.
+
+=item meta-schema
+
+An instance of
+L<DBIx::DataModel::Meta::Schema|DBIx::DataModel::Meta::Schema>, 
+corresponding to a given schema subclass
+(a subclass of 
+L<DBIx::DataModel::Schema|DBIx::DataModel::Schema>),
+that holds information about the tables, associations, types, etc.
+defined in that schema subclass.
+
 =item multiplicity
 
 A specification on one side of an L</association>, which
@@ -218,6 +322,23 @@ are C<0..*>, C<0..1>, C<1..1>, C<1..*>.
 C<*> is a shorthand for C<0..*>, and 
 C<1> is a shorthand for C<1..1>.
 
+=item multi-schema mode
+
+A way of using C<DBIx::DataModel> in which
+a L</schema> subclass may have several instances, with
+different database connexions. In this mode, tables and joins
+are accessed through calls to a C<$schema> object; therefore that
+reference must be passed around through the whole application.
+Multi-schema mode is triggered by the first call to
+L<DBIx::DataModel::Doc::Reference/"Schema::new()">.
+
+The other, more simple mode is L</single-schema mode>.
+
+=back
+
+=head2 O
+
+=over
 
 =item OO
 
@@ -230,37 +351,90 @@ framework of classes and methods
 to encapsulate interactions with a L</RDBMS>.
 There are many ORMs for Perl; C<DBIx::DataModel> is just one of them.
 
+=item ORM view
+
+A L</view> declared within the ORM layer through a call to the
+L<View()|DBIx::DataModel::Reference/View()> method; such views
+are not known to the database.
+
+=back
+
+=head2 P
+
+=over
+
 =item path method
 
 A method automatically installed in a L</table> class
 when an L</association> is declared. Path methods
 are used to get access to related records in other tables.
 
+=item placeholder
+
+In L</SQL>, placeholders are special marks positioned at specific places
+in a SQL request, to denote that these places will be replaced by
+actual values in a later I<binding> operation. SQL placeholders are usually
+identified by a question mark C<'?'>; their order of appearance
+must match the order in which values are bound.
+
+At the C<DBIx::DataModel> level, there is an additional mechanism of
+I<named parameters>, identified by a I<placeholder_prefix> defined
+in the schema, which defaults to C<?:>. This gives additional
+flexibility for binding values either I<before> or I<after> the statement
+is composed. Examples are given in the
+L<design document|DBIx::DataModel::Doc::Design/"Stepwise parameter binding through named placeholders">.
+
+
 =item primary key
 
 A column or set of columns that uniquely identifies any 
 single row within a table.
+
+=back
+
+=head2 R
+
+=over
+
+=item record
+
+Synonym to L</row>.
+
+=item result kind
+
+A way to transform data rows coming from the database
+into a datastructure suitable for user's needs. Result kinds
+are specified through the C<-result_as> argument to the
+L<select()|DBIx::DataModel::Doc::Reference/"select()">
+method. Each result kind is implemented by a subclass
+of L<DBIx::DataModel::Schema::ResultAs>.
+
 
 =item RDBMS
 
 Relational DataBase Management System.
 
 
+=item referential integrity rule
+
+A rule declared within the L</"database schema"> in order
+to ensure that the database will never contain dangling references :
+alteration or deletion of a L</"primary key"> is only allowed
+when the system contains no L</"foreign key"> pointing to that value.
+
+
 =item role name
 
 In UML notation, each side of an association may be decorated with a
-"role name". These are optional in UML, like many other modeling constructs;
+"role name" (also called "association end" sometimes in the literature).
+Role names are optional in UML, like many other modeling constructs;
 they are used mainly when a same class participates in several associations,
-and disambiguation is necessary. 
+in which case it helps to disambiguate the roles.
 However, when declaring an 
 L<Association()|DBIx::DataModel::Doc::Reference/"Association()">
 in C<DBIx::DataModel>, role names are mandatory, because they 
-are used to generate path methods for navigating between
-the two participating classes.
+are used to generate path methods for navigating between classes.
 
-=item record
-
-Synonym to L</row>.
 
 =item row
 
@@ -269,16 +443,55 @@ Within C<DBIx::DataModel>, rows are plain hashrefs
 (C<< { column_name => column_value } >>), blessed as instances of 
 a L</table> or a L</view>.
 
+=back
+
+=head2 S
+
+=over
+
 =item schema
 
-An instance of a subclass of 
+An instance of a subclass of
 L<DBIx::DataModel::Schema|DBIx::DataModel::Schema>, that
-holds information about its tables, views and associations, and
-encapsulates a L</dbh>.
+encapsulates a L</dbh> connexion to the database.
+
+
+
+ When C<DBIx::DataModel> is used
+in L</single-schema mode>, the term "schema" also refers to the
+subclass itself, because that subclass has only one L</singleton> instance.
+
+Not to be confounded with a L</database schema>. A Perl schema
+may switch between several database schemata through the
+L<db_schema()|DBIx::DataModel::Reference/db_schema()> method.
+
+
+=item single-schema mode
+
+The most simple way of using C<DBIx::DataModel>, in which
+the L</schema> subclass has only one single instance.
+The advantage in that mode is that tables and joins can be
+accessed through class method calls, without the need to pass
+around a C<$schema> reference through the whole application.
+The disadvantage is that it is not possible to access several
+database connexions simultaneously; it this is a need, then
+use L</multi-schema mode>.
+
+=item singleton
+
+In mathematics, a set with only one member. In programming, a
+class with only one instance.
 
 =item source
 
 Either a L</table> or a L</join>.
+
+=item SQL
+
+An acronym for L<Structured Query Language|https://en.wikipedia.org/wiki/SQL>,
+a standard adopted by most database vendors to express requests to a
+relational database system.
+
 
 =item SQLA
 
@@ -288,7 +501,8 @@ used by several L</ORM>s.
 
 =item SQLAM
 
-Abreviation for L<SQL::Abstract::More>, the SQL generator module
+Abreviation for L<SQL::Abstract::More>, a subclass of
+L</SQLA> which is the SQL generator module
 used by C<DBIx::DataModel>.
 
 
@@ -305,6 +519,12 @@ A DBI statement handle, created by a call to L<DBI/prepare>.
 C<DBIx::DataModel> encapsulates C<$sth> handles within
 L</statement> objects.
 
+=back
+
+=head2 T
+
+=over
+
 
 =item table
 
@@ -312,6 +532,11 @@ A subclass of L<DBIx::DataModel::Source::Table|DBIx::DataModel::Source::Table>,
 created by method L<DBIx::DataModel::Doc::Reference/Table()>, 
 that encapsulates access to a database table (or database view).
 
+=back
+
+=head2 U
+
+=over
 
 =item UML
 
@@ -322,6 +547,21 @@ UML is L<http://www.holub.com/goodies/uml/>.
 Association definitions in C<DBIx::DataModel> 
 are closely inspired by UML associations
 (see L<DBIx::DataModel::Doc::Reference/"Association()">).
+
+=back
+
+
+=head2 V
+
+=over
+
+=item View
+
+A SQL request packaged like a table, so that clients see it in the same
+way as regular tables in the database. Views can be either
+L<database views|/"database view">, declared directly within
+the database, or L<ORM views|/"ORM view">, declared within
+the ORM layer.
 
 =back
 

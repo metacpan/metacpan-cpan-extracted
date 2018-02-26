@@ -1,22 +1,23 @@
 package Net::DNS::Extlang;
 
-use 5.20.0;
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 =head1 NAME
 
 Net::DNS::Extlang - DNS extension language
 
-=head1 Version
-
-Version 0.1.
 
 =head1 SYNOPSIS
 
     use Net::DNS::Extlang;
 
-    $ext = new Net::DNS::Extlang(file => '/etc/dnsext.txt',
-     domain => 'arpa, lang => 'en', resolver => resobj)
+    $extobj = new Net::DNS::Extlang(
+	domain   => 'arpa',
+	file     => '/etc/dnsext.txt',
+	lang     => 'en',
+	resolver => $resobj
+    )
+
 
 =head1 DESCRIPTION
 
@@ -25,131 +26,163 @@ or the DNS.  If file is provided, it reads descriptions from that file,
 otherwise it looks in <name>.rrname.<domain> and <val>.rrtype.<domain>
 for descriptions in the desired language.
 
-Provide a resolver if you want other than the default resolver
-settings.
+Provide a resolver if you want other than the default resolver settings.
 
 =cut
 
+
 use strict;
+use warnings;
 use integer;
 use Carp;
-require Net::DNS::Resolver;
+
 
 =head1 METHODS
 
 =head2 new
-
-    $ext = new Net::DNS::Extlang(file => '/etc/dnsext.txt',
-     domain => 'arpa', lang => 'en', resolver => resobj)
+					
+    $extobj = new Net::DNS::Extlang(
+	domain   => 'arpa',
+	file     => '/etc/dnsext.txt',
+	lang     => 'en',
+	resolver => new Net::DNS::Resolver()
+    )
 
 Create an object corresponding to a set of extension language entries
 in a file or the DNS.  Provide either a file or a domain argument.
 If you provide a domain, the lang and resolver are optional.
 
-In addition to using its methods, you can push the object onto @INC
-to let it automatically create rrtype routines as required.
+In addition to using its methods, Net::DNS::Extlang can be accessed
+by Net::DNS to create rrtype packages automatically as required.
 
 =cut
 
 sub new {
 	my $class = shift;
 
-	my %args = (lang => 'en', file => undef, domain => undef, resolver => undef, @_);
+	my %args = (
+		lang => 'en',	domain => 'services.net.',		# defaults
+		@_
+		);
 
 	my $self = bless {
-		file => $args{'file'},
-		domain => $args{'domain'},
-		lang => $args{'lang'},
-		rrnames => {},		# RRs by name
-		rrnums => {},		# RRs by number
-	}, $class;
+		domain	 => $args{domain},
+		file	 => $args{file},
+		lang	 => $args{lang},
+		resolver => $args{resolver},
+		rrnames	 => {},					# RRs by name
+		rrnums	 => {},					# RRs by number
+		}, $class;
 
-	if($args{file} and $args{domain}) {
-		croak "Cannot get extensions from both file and DNS";
-	}
-	if($args{file}) {
-		_xlreadfile($self, $args{file});
-	}
-	$self;
+	$self->_xlreadfile( $args{file} ) if $args{file};
+
+	return $self;
 }
+
+
+=head2 domain, file, lang, resolver
+
+Access method which returns extlang configuration attribute.
+
+=cut
+
+sub domain { shift->{domain} }
+sub file { shift->{file} }
+sub lang { shift->{lang} }
+sub resolver { shift->{resolver} }
+
 
 # read a file, set the text parts of $self->rrnames and $self->rrnums
 
 sub _xlreadfile {
 	my ($self, $file) = @_;
 
-	open(my $rrfile, "<", $file) or croak "Cannot open ext lange file $file";
+	open(my $rrfile, "<", $file) or croak "Extlang file '$file' $!";
 	my @xllist = ();
 
 	while(<$rrfile>) {
 		chomp;
-		next if m{^\s*($|#)};	# comments or blank line
-		if(m{^\s+(.*)}) {
-			push @xllist, $1;
+		next if m/^\s*($|#)/;	# comments or blank line
+		if( m/^\s/ ) {
+			push @xllist, join ' ', split;
 			next;
 		}
 		# must be a new one, store current one
-		_xlstorerecord($self, @xllist) if $#xllist >= 0;
+		$self->xlstorerecord(@xllist) if scalar @xllist;
 
 		@xllist = ($_);
 	}
-	_xlstorerecord($self, @xllist) if $#xllist >= 0;
+	$self->xlstorerecord(@xllist) if scalar @xllist;
 
 	close $rrfile;
 }
 
-# store a record with rrname/number and list of fields
+
+=head2 xlstorerecord
+
+    $rrr = $ext->xlstorerecord( $identifier, @field )
+
+Store a record with rrname/number and list of fields.
+
+=cut
+
 # only do rudimentary syntax checking here
 
 # match head record, $1 = name, $2 = number, $3 = description
 # ignores I/A third subfield
-my $headpattern = qr{^ (?<rrname>[a-z0-9][-a-z0-9]*):(?<rrtype>\d+)(?: :[a-z]+)? (?: \s+ (?<rrcomment>.*))?$}ix;
+my $headpattern = qr{^ ([A-Z][-A-Z0-9]*) : (\d+)\S* \s* (.*) $}ix;
 
 
 # match a field, $1 = type, $2 = quals, $3 - name, $4 = comment
-my $fieldpattern = qr{^ (?<type>I[124]|AA?|AAAA|[ZNRSTX]|B32|B64|T6|X[P68]) # field type
-	(?:\[ (?<quals> (?:[CALMX]|[-a-zA-Z0-9]+=\d+) (?:,(?:[CALMX]|[-a-zA-Z0-9]+=\d+))* )\])?
-	(?: :(?<name>[-a-zA-Z0-9]+))?	# optional field name
-	(?: \s+ (?<comment>.*))?$}ix;	# optional comment
+my $fieldpattern = qr{^(I[124]|AAAA|AA|B32|B64|T6|X[P68]|[ANRSTXZ])
+	(?:\[( (?: [CALMX]|[-A-Z0-9]+=\d+\W*)+ )\])?
+	:? ([a-z][-a-z0-9]*)? \s*(.*) $}ix;
 
-sub _xlstorerecord {
+
+sub xlstorerecord {
 	my ($self, $rr, @fieldlist) = @_;
 
 	croak "no rr record" if !$rr;
 
-	my ($rrname, $rrnum, $rrcomment ) = $rr =~ m{$headpattern};
+	my ($rrname, $rrnum, $rrcomment ) = $rr =~ m{$headpattern}o;
 	croak "invalid rr record $rr" if !$rrname or !$rrnum;
 
-	$rrnum = 0+$rrnum;	# force to a number
-	# parse each of them into a hash of fields via $fieldpattern
-	my @fieldstructs = ();
-	foreach my $field (@fieldlist) {
-		$field =~ m{$fieldpattern} || croak("invalid field in $rrname: $field");
-		push @fieldstructs, { %+ }; # copy the field's entries from %+
+	# parse each field descriptor into a hash via $fieldpattern
+	my @fieldstructs;
+	foreach (@fieldlist) {
+		m{$fieldpattern}o || croak "invalid field in $rrname: $_";
+		my $q = $2 || '';
+		push @fieldstructs, {
+			type	=> uc($1),
+			quals	=> join(',', sort split /,/, uc $q),	# alphabetize quals
+			name	=> $3,
+			comment	=> $4
+		};
 	}
 
 	# make up an rr thing
 	my $rrr = {
 		mnemon => $rrname,
-		number => $rrnum,
+		number => 0 + $rrnum,
 		comment => $rrcomment,
-		fields => \@fieldstructs
+		fields => [@fieldstructs]
 	};
 
 	# stash it by name and number
 	$self->{rrnames}->{$rrname} = $rrr;
 	$self->{rrnums}->{$rrnum} = $rrr;
-
-	$rrr;
 }
+
+sub _xlstorerecord { &xlstorerecord }	## now a public method (used in RRTYPEgen and Net::DNS)
+
 
 =head2 getrr
 
-     %rrinfo = $ext->getrr(nameornumber)
+    $rrinfo = $ext->getrr(nameornumber)
 
 Retrieve the rr description by number (if the argument is all digits)
-or name (otherwise.)  %rrinfo is a hash with fields mnemon, number,
-comment, and fields: the lines in the description
+or name (otherwise.)  $rrinfo is a reference to a hash with entries for
+mnemon, number, comment, and fields: the lines in the description
 stanza.  Each field is a hash with entries type (field type),
 quals (optional qualifiers), name (optional field name), and comment.
 
@@ -161,63 +194,52 @@ If there's no description for that name or number it returns undef.
 
 sub getrr {
 	my ($self, $rrn) = @_;
-	my ($res, $name);
+	my $name;
 
 	croak("Need rrname or rrtype in getrr") unless $rrn;
 	
 	if($rrn =~ m{^\d+$}) {		# look up by number
-		return $self->{rrnums}->{$rrn} if exists $self->{rrnums}->{$rrn};
-		return undef if defined $self->{file}; # not in the file
-		# try from the DNS
-		$name = "$rrn.rrtype.$self->{domain}";
+		return $self->{rrnums}->{$rrn} if $self->{rrnums}->{$rrn};
+		return undef if defined $self->{file};		# not in the file
+		$name = "$rrn.rrtype.$self->{domain}";		# try DNS
+
 	} else {			# look up by name
 		$rrn = uc $rrn;		# RRTYPES are UPPER CASE
-
-		return $self->{rrnames}->{$rrn} if exists $self->{rrnames}->{$rrn};
-		return undef if defined $self->{file}; # not in the file
-		# try from the DNS
-		$name = "$rrn.rrname.$self->{domain}";
+		return $self->{rrnames}->{$rrn} if $self->{rrnames}->{$rrn};
+		return undef if defined $self->{file};		# not in the file
+		$name = "$rrn.rrname.$self->{domain}";		# try DNS
 	}
 
 	# look it up
-	$res = $self->{resolver};
-	$res = $self->{resolver} = new Net::DNS::Resolver unless $res;
-	my $answer = $res->query($name, 'TXT');
-	return undef unless $answer;	# nothing there
+	my $res = $self->{resolver} ||= do {
+		require Net::DNS::Resolver;
+		new Net::DNS::Resolver();
+	};
 
-	foreach my $rr ($answer->answer) {
+	my $response = $res->query($name, 'TXT') || return;	# undef if nothing there
+
+	foreach my $rr ($response->answer) {
 		next if $rr->type ne 'TXT';
 
 		my @txt = $rr->txtdata;
 
 		next unless $txt[0] eq "RRTYPE=1";
 			
-		my ($trname, $trno) = $txt[1] =~ m{$headpattern};
+		my ($trname, $trno) = $txt[1] =~ m{$headpattern}o;
 		croak "invalid description $txt[1]" if !$trname or !$trno;
 
 		# make sure it's the right rr
-		if($rrn =~ m{^\d+$}) {
-			croak "wrong rrtype $rrn $txt[1]" if $rrn != $trno;
-		} else {
-			croak "wrong rrtype $rrn $txt[1]" if lc $rrn ne lc $trname;
-		}
+		croak "wrong rrtype $rrn $txt[1]" unless $txt[1] =~ m/$rrn/;
 		
 		shift @txt;		# get rid of desc tag
-		return _xlstorerecord($self, @txt); # will croak if bad syntax
-	}
-
-	# didn't find it, note for next time
-	if($rrn =~ m{^\d+$}) {		# look up by number
-		$self->{rrnums}->{$rrn} = undef;
-	} else {			# look up by name
-		$self->{rrnames}->{$rrn} = undef;
+		return $self->xlstorerecord(@txt);	# will croak if bad syntax
 	}
 }
 
 =head2 compile / compilerr
 
-     $code = $ext->compile(nameornumber)
-     $code = $ext->compilerr($rrr)
+    $code = $ext->compile(nameornumber)
+    $code = $ext->compilerr($rrr)
 
 Compile the rr description into Net::DNS::RR:<name> and return
 the perl code, suitable to pass to eval().
@@ -246,25 +268,31 @@ method name is prefixed with 'f'.
 
 sub _cchunk($@) {
 	my ($rrr, %pats) = @_;
+	my $type = $rrr->{type};
+	my $qual = $rrr->{quals};
 
-	if(exists $rrr->{quals}) {
-		my $q = join(',', sort split /,/,uc $rrr->{quals}); # alphabetize them
-		my $k = uc $rrr->{type} . "[$q]";
-		#		print "check $k\n" if $CDEBUG;
+	if($qual) {
+		my $k = $type . "[$qual]";
+#		print "check $k\n" if $CDEBUG;
 		return $pats{$k} if exists $pats{$k};
 	}
-	#	print "check $rrr->{type}\n" if $CDEBUG;
-	return $pats{uc $rrr->{type}} if exists $pats{uc $rrr->{type}};
-	return $pats{"default"};
+
+#	print "check $type\n" if $CDEBUG;
+	return exists($pats{$type}) ? $pats{$type} : $pats{"default"};
 }
+
 
 # substitite  #WORD# in the string with $p{WORD} in the list
 # csub($string, 'FOO' => "foo", 'BAR' => "bahr", ... )
 sub _csub($@) {
 	my ($str, %subs) = @_;
 
-	return $str =~ s{#([A-Z]+)#}{$subs{$1}}gr;
+	for ($str) {
+		s/#([A-Z]+)#/$subs{$1}/eg;
+		return $_;
+	}
 }
+
 
 # names that conflict with RR methods
 my %dirtywords = map { ($_, 1) } qw( new decode encode canonical print string plain token name owner next last
@@ -284,7 +312,7 @@ sub compilerr {
 
 	my $rrname = uc $rrr->{mnemon};
 	my $rrnum = $rrr->{number};
-	my $rrcomment = $rrr->{comment};
+	my $rrcomment = $rrr->{comment} || '';
 	my $rrfields = $rrr->{fields};
 	
 	my ($usedomainname,		# if there's an N field
@@ -306,26 +334,21 @@ sub compilerr {
 
 	foreach my $f (@$rrfields) {
 		$fieldno++;
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, lc $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, lc $f->{name});
 
-		if($type eq "Z") {	# no Z types implemented yet
-			carp("Unimplemented field type Z[$quals] in $rrname");
-			return undef;
-		}
+		carp("Unimplemented field type Z[$quals] in $rrname") && return if $type eq "Z";
 
 		# censor dirty words
 		$name = $f->{name} = "f$name" if $dirtywords{$name};
 
 		# make a name if there isn't one yet
-		if(!$name or exists $fields{$name}) {
-			$name = "field$fieldno";
-			$f->{name} = $name;
-		}
+		$f->{name} = $name = "field$fieldno" if !$name or exists $fields{$name};
+
 		$fields{$name} = $fieldno;
 
 		if($type eq 'N') {
 			$usedomainname = 1;
-			$usemailbox = 1 if defined $quals and $quals =~ m{A};
+			$usemailbox = 1 if $quals =~ m{A};
 		} elsif($type eq 'S') {
 			$usetext = 1;
 		} elsif($type eq "B64") {
@@ -335,7 +358,7 @@ sub compilerr {
 		} elsif($type eq "T" or $type eq "T6") {
 			$usetime = 1;
 		} elsif($type eq "R" ) {
-			if(defined($quals) and $quals eq "L") {
+			if( $quals eq "L" ) {
 				$usensechelp = 1;
 			} else {
 				$userrtype = 1;
@@ -367,62 +390,47 @@ sub compilerr {
 	$uses .= "use Net::DNS::Parameters qw(typebyname typebyval);\n" if $userrtype;
 	$uses .= "use Net::DNS::Extlang::Nsechelp;\n" if $usensechelp;
 
-	# glom it all together into one string to eval
-	my $code = <<CODE;
-# generated routine for $rrname $rrcomment
-package Net::DNS::RR::$rrname;
-use strict;
-use base qw(Net::DNS::RR);
-$uses
-use Carp;
-use integer;
 
-sub _decode_rdata {			## decode rdata from wire-format octet string
-	my (\$self, \$data, \$offset, \@opaque ) = \@_;
-	my \$origoffset = \$offset;
-	##	\$data		reference to a wire-format packet buffer
-	##	\$offset		location of rdata within packet buffer
-$decode
-}
-
-sub _encode_rdata {			## encode rdata as wire-format octet string
-	my (\$self, \$offset, \@opaque) = \@_;
-	my \$encdata = '';
-
-$encode
-}
-
-sub _format_rdata {			## format rdata portion of RR string.
-	my (\$self, \@opaque) = \@_;
-
-	$format
-}
-
-
-sub _parse_rdata {			## populate RR from rdata in argument list
-	my \$self = shift;
-
-$parse
-}
-
-sub _defaults {				## specify RR attribute default values
-	my \$self = shift;
-
-	## Note that this code is executed once only after module is loaded.
-$defaults
-}
-$fieldfns
-
-# also make by number
+	# glom it all together and return string
+my $identifier = $rrname;
+$identifier =~ s/\W/_/g;
+ 
+	return <<"CODE";
+# generated package $rrname;	$rrcomment
 package Net::DNS::RR::TYPE$rrnum;
 use strict;
-use base qw(Net::DNS::RR::$rrname);
+use base qw(Net::DNS::RR);
+use integer;
+use Carp;
+$uses
+
+$decode
+
+$encode
+
+$format
+
+$parse
+
+$defaults
+
+$fieldfns
+
+
+{
+	# also make accessible by symbolic name
+	package Net::DNS::RR::$identifier;
+	our \@ISA = qw(Net::DNS::RR::TYPE$rrnum);	# Avoid "use base ...;" (RT#123702)
+}
+
 
 1;
-CODE
 
-return $code;
+__END__
+
+CODE
 }
+
 
 # make the per-field functions
 # field function
@@ -451,7 +459,7 @@ sub #FIELD# {
 	my $self = shift;
 
 	$self->#FIELD#_bin( pack "H*", map { die "!hex!" if m/[^0-9A-Fa-f]/; $_ } join "", @_ ) if scalar @_;
-	unpack "H*", $self->#FIELD#_bin() if defined wantarray;
+	unpack "H*", $self->#FIELD#_bin() || '' if defined wantarray;
 
 }
 EOF
@@ -532,16 +540,16 @@ EOF
 sub _bn($$$) {
 	my ($type, $name, $quals) = @_;
 
-	return "${name}_bin" if $type eq "B64" or ($type eq "X" and not defined $quals);
+	return "${name}_bin" if $type eq "B64" or ($type eq "X" and not $quals);
 	$name;
 }
 
 sub _perfield {
 	my ($rrfields) = @_;
-	my ($fieldfns);
+	my $fieldfns = '';
 	  
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 		# make a field function
 
 		# if it's an integer field with named values
@@ -609,7 +617,7 @@ sub _perfield {
 		if($type eq "B64") {	# extra set/get function for text version of the field
 			$fieldfns .= _csub($b64field, FIELD => $name );
 		}
-		if($type eq "X" and not defined $quals) {	# extra set/get function for text version of the field
+		if( $type eq "X" and not $quals ) {	# extra set/get function for text version of the field
 			$fieldfns .= _csub($hexfield, FIELD => $name );
 		}
 	}
@@ -619,28 +627,40 @@ sub _perfield {
 sub _fielddefault {
 	my ($rrfields) = @_;
 	my ($defaults);
-	  
+
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 
 		my $defval =  _cchunk($f,
-				'default' => 'undef',
-				'I1' => '0',
-				'I2' => '0',
-				'I4' => '0',
-				'A' => 'pack "x4",0',
-				'AA' => 'pack "x8"',
-				'AAAA' => 'pack "x16"',
-				'S[M]' => '[]',
-				'S' => '""',
+				default => q(''),
+				'I1'	=> q(0),
+				'I2'	=> q(0),
+				'I4'	=> q(0),
+				'A'	=> q('0.0.0.0'),
+				'AA'	=> q('00:00:00:00'),
+				'AAAA'	=> q('::'),
+				'N'	=> q(''),
+				'N[A]'	=> q('<>'),
+				'R'	=> q('NULL'),
+				'S'	=> q(''),
+				'S[M]'	=> q('', ''),
+				'T'	=> q(0),
 				     );
 
-		$defaults .= _csub("	\$self->{#FIELD#} = #DEFVAL#;\n",
+		$defaults .= _csub("	\$self->#FIELD#(#DEFVAL#);\n",
 			FIELD => _bn($type, $name, $quals),
 			DEFVAL => $defval);
 	}
-	$defaults;
+
+	return $defaults ? <<"CODE" : '';
+sub _defaults {				## specify RR attribute default values
+	my \$self = shift;
+
+	## Note that this code is executed once only after module is loaded.
+$defaults}
+CODE
 }
+
 
 # extract fields from binary data
 # triple of unpack code, size or 0 or -1, code string with #O# offset
@@ -676,7 +696,7 @@ sub _fielddecode {
 	my $offoff = 0;
 	  
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 
 		my $cch = _cchunk($f, 'default' => [ '???', '???', -1 ],
 			'I1' => [ 'C', 1, undef ],
@@ -715,8 +735,18 @@ sub _fielddecode {
 			else { $offoff += $size; } # 0 for offset updated, -1 for not so this has to be last
 		}
 	}
-	$decode;
+
+	return $decode ? <<"CODE" : '';
+sub _decode_rdata {			## decode rdata from wire-format octet string
+	my (\$self, \$data, \$offset, \@opaque ) = \@_;
+	my \$origoffset = \$offset;
+	## \$data	reference to a wire-format packet buffer
+	## \$offset	location of rdata within packet buffer
+
+$decode}
+CODE
 }
+
 
 # turn fields into binary data
 # triple of pack codes, and code to create the stuff to pack, size
@@ -729,7 +759,7 @@ sub _fieldencode {
 	my ($packpat, @args, $packcode);
 	  
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 
 		my $cch = _cchunk($f, 'default' => [ '???', '???', -1 ],
 			'I1' => [ 'C', undef, 1 ],
@@ -780,7 +810,11 @@ sub _fieldencode {
 			}
 		}
 		$packpat .= $pat;
-		push @args,$field =~ s{#F#}{'$self->{' . _bn($type, $name, $quals) . '}'}egr;
+
+		for ($field) {
+			s/#F#/join('', '$self->{', _bn($type, $name, $quals), '}')/eg;
+			push @args, $_;
+		}
 	}
 	# now generate the code
 	if($packpat) {
@@ -795,8 +829,16 @@ sub _fieldencode {
 			$packcode .= "pack '$packpat'," . join(", ", @args) . ";\n";
 		}
 	}
-	$packcode;
+
+	return $packcode ? <<"CODE" : '';
+sub _encode_rdata {			## encode rdata as wire-format octet string
+	my (\$self, \$offset, \@opaque) = \@_;
+	my \$encdata = '';
+
+$packcode}
+CODE
 }
+
 
 # parse arguments to make a new RR
 sub _fieldparse {
@@ -804,7 +846,7 @@ sub _fieldparse {
 	my ($decode, $eaten);		# $eaten means all the arguments have been eaten
 	  
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 
 		carp("Field with no argument $name") if $eaten;
 
@@ -823,8 +865,15 @@ sub _fieldparse {
 			FIELD => $name,
 			VAL => $val);
 	}
-	$decode;
+
+	return $decode ? <<"CODE" : '';
+sub _parse_rdata {			## populate RR from rdata in argument list
+	my \$self = shift;
+
+$decode}
+CODE
 }
+
 
 # format RR fields into an array
 sub _fieldformat {
@@ -832,7 +881,7 @@ sub _fieldformat {
 	my (@rdata);		# $eaten means all the arguments have been eaten
 	  
 	foreach my $f (@$rrfields) {
-		my ($type, $quals, $name) = (uc $f->{type}, $f->{quals}, $f->{name});
+		my ($type, $quals, $name) = ($f->{type}, $f->{quals}, $f->{name});
 
 		my $fmt = _cchunk($f, 'default' => '$self->{#FIELD#}',
 			'N' => '$self->{#FIELD#}->string',
@@ -853,8 +902,18 @@ sub _fieldformat {
 				 );
 		push @rdata, _csub($fmt, FIELD => $name);
 	}
-	"(" . join(",\n\t", @rdata) . "\n\t);\n";
+
+	my $format = "(" . join(",\n\t", @rdata) . "\n\t)";
+
+	return scalar(@rdata) ? <<"CODE" : '';
+sub _format_rdata {			## format rdata portion of RR string.
+	my \$self = shift;
+
+	$format
 }
+CODE
+}
+
 
 =head1 Field types
 

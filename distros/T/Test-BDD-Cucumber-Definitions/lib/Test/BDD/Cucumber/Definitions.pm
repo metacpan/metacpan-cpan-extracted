@@ -4,6 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
+use Exporter qw(import);
+use Test::BDD::Cucumber::StepFile qw(Given When Then);
+
 =head1 NAME
 
 Test::BDD::Cucumber::Definitions - The great new Test::BDD::Cucumber::Definitions!
@@ -14,7 +17,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
@@ -33,14 +36,20 @@ Perhaps a little code snippet.
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
+=cut
+
+our @EXPORT_OK = qw(
+    S C Given When Then
+);
+
 =head1 SUBROUTINES/METHODS
 
 =head2 function1
 
 =cut
 
-sub function1 {
-}
+sub S { return Test::BDD::Cucumber::StepFile::S }
+sub C { return Test::BDD::Cucumber::StepFile::C }
 
 =head2 function2
 

@@ -1,11 +1,12 @@
 package Plack::App::FakeApache::Connection;
-
-use Moose;
+$Plack::App::FakeApache::Connection::VERSION = '0.09';
+use Moo;
+use Types::Standard qw/Str/;
 use Plack::App::FakeApache::Log;
 
 has remote_ip => (
     is => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 has log => ( 

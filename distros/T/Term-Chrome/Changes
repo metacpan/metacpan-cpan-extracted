@@ -1,5 +1,10 @@
 Revision history for Term-Chrome
 
+2.01  2018-02-20 23:40:44 CET
+	- Fix reverse of Reset and attribute flags
+	- Improve documentation of Reset flags
+	- Repository moved to github.com/dolmen-perl5/Term-Chrome
+
 2.00  2016-03-04 01:17:31 CET
 	- Add '!' operator overloading to reverse a chrome:
            - !Bold means 'unbold',

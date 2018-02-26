@@ -5,7 +5,6 @@ our $VERSION = '1.4'; # VERSION
 sub new { 
     my $self = {};
     bless ($self, "NpsSDK::TimeoutException");
-    print "Timeout Error \n";
     return $self;
 }
 
@@ -22,7 +21,6 @@ package NpsSDK::ConnectionException;
 sub new { 
     my $self = {};
     bless ($self, "NpsSDK::ConnectionException");
-    print "Connection Error \n";
     return $self;
 }
 
@@ -39,7 +37,6 @@ package NpsSDK::UnknownError;
 sub new{
     my $self = shift;
     bless ($self, "NpsSDK::UnknownError");
-    print "Unknown Error \n";
     return $self;
 }
 

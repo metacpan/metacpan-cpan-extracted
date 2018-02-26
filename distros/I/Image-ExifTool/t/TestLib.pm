@@ -33,7 +33,7 @@ my $noTimeLocal;
 sub nearEnough($$);
 sub nearTime($$$$);
 sub formatValue($);
-sub writeInfo($$;$$);
+sub writeInfo($$;$$$);
 
 #------------------------------------------------------------------------------
 # Compare 2 binary files
@@ -314,8 +314,12 @@ sub check($$$;$$$)
     # get a list of found tags
     my @tags;
     if ($exifTool) {
-        # sort tags by group to make it a bit prettier
-        @tags = $exifTool->GetTagList($info, 'Group0');
+        if ($$exifTool{NO_SORT}) {
+            @tags = $exifTool->GetFoundTags();
+        } else {
+            # sort tags by group to make it a bit prettier
+            @tags = $exifTool->GetTagList($info, 'Group0');
+        }
     } else {
         @tags = sort keys %$info;
     }
@@ -379,10 +383,11 @@ sub writeCheck($$$;$$$)
 #------------------------------------------------------------------------------
 # Call Image::ExifTool::WriteInfo with error checking
 # Inputs: 0) ExifTool ref, 1) src file, 2) dst file, 3) true if nothing should change
+#         4) true to ignore warnings
 # Return: true on success
-sub writeInfo($$;$$)
+sub writeInfo($$;$$$)
 {
-    my ($exifTool, $src, $dst, $same) = @_;
+    my ($exifTool, $src, $dst, $same, $ignore) = @_;
     # erase temporary file created by WriteInfo() if no destination file is given
     # (may be left over from previous crashed tests)
     unlink "${src}_exiftool_tmp" if not defined $dst and not ref $src;
@@ -391,6 +396,7 @@ sub writeInfo($$;$$)
     $err .= "  Error: WriteInfo() returned $result\n" if $result != ($same ? 2 : 1);
     my $info = $exifTool->GetInfo('Warning', 'Error');
     foreach (sort keys %$info) {
+        next if $ignore and $_ eq 'Warning';
         my $tag = Image::ExifTool::GetTagName($_);
         $err .= "  $tag: $$info{$_}\n";
     }

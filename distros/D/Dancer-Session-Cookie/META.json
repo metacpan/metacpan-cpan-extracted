@@ -7,7 +7,7 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,6 +42,7 @@
             "String::CRC32" : "0",
             "Time::Duration::Parse" : "0",
             "base" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -67,15 +68,14 @@
             "Test::Exception" : "0",
             "Test::More" : "0.96",
             "Test::NoWarnings" : "0",
-            "Test::Requires" : "0",
-            "perl" : "5.006"
+            "Test::Requires" : "0"
          }
       }
    },
    "provides" : {
       "Dancer::Session::Cookie" : {
          "file" : "lib/Dancer/Session/Cookie.pm",
-         "version" : "0.28"
+         "version" : "0.29"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/perldancer/Dancer-Session-Cookie"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>",

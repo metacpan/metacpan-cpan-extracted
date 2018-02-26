@@ -25,6 +25,7 @@ lib/Net/GitHub/V3/Orgs.pm
 lib/Net/GitHub/V3/PullRequests.pm
 lib/Net/GitHub/V3/Query.pm
 lib/Net/GitHub/V3/Repos.pm
+lib/Net/GitHub/V3/ResultSet.pm
 lib/Net/GitHub/V3/Search.pm
 lib/Net/GitHub/V3/Users.pm
 lib/Net/GitHub/V4.pm
@@ -36,6 +37,7 @@ xt/v3/02-user-pass.t
 xt/v3/100-users.t
 xt/v3/200-repos.t
 xt/v3/300-pull.t
+xt/v3/400-pagination.t
 xt/v3/500-org.t
 xt/v3/600-git_data.t
 xt/v3/700-gists.t

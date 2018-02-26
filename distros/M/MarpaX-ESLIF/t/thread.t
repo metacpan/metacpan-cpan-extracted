@@ -44,7 +44,7 @@ use Log::Any qw/$log/;
 use threads;
 my $NTHREAD;
 BEGIN {
-    $NTHREAD = 5;
+    $NTHREAD = 3;
 }
 use Test::More tests => 3 + $NTHREAD * 5;
 BEGIN { require_ok('MarpaX::ESLIF') }

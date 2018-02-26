@@ -8,16 +8,19 @@ use warnings;
 no warnings 'uninitialized';
 use strict;
 use mro 'c3';
-use Carp;
-use List::MoreUtils qw/firstval/;
-use Module::Load    qw/load/;
+use List::MoreUtils              qw/firstval/;
+use Module::Load                 qw/load/;
+use Scalar::Util                 qw/refaddr/;
+use Storable                     qw/freeze/;
+use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
+use DBIx::DataModel::Meta::Utils qw/does/;
 
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+
 
 #----------------------------------------------------------------------
-# RUNTIME PUBLIC METHODS
+# accessors
 #----------------------------------------------------------------------
 
 sub schema {
@@ -47,29 +50,117 @@ sub primary_key {
   }
 }
 
+#----------------------------------------------------------------------
+# select and fetch
+#----------------------------------------------------------------------
 
-# several class methods, only available if in single-schema mode;
-# such methods are delegated to the ConnectedSource class.
-foreach my $method (qw/select fetch fetch_cached bless_from_DB/) {
+# methods delegated to the Statement class
+foreach my $method (qw/select bless_from_DB/) {
   no strict 'refs';
   *{$method} = sub {
-    my $class = shift;
-    not ref($class) 
-      or croak "$method() should be called as class method";
+    my $self = shift;
 
-    my $metadm      = $class->metadm;
-    my $meta_schema = $metadm->schema;
-    my $schema      = $meta_schema->class->singleton;
-    my $cs_class    = $meta_schema->connected_source_class;
-    load $cs_class;
-    my $cs          = $cs_class->new($metadm, $schema);
-    return $cs->$method(@_);
+    $self->_is_called_as_class_method
+      or croak "$method() should be called as a class method";
+
+    my $stmt_class = $self->metadm->schema->statement_class;
+    load $stmt_class;
+    my $statement  = $stmt_class->new($self);
+    return $statement->$method(@_);
   };
 }
 
 
+sub fetch {
+  my $self = shift;
+
+  $self->_is_called_as_class_method
+    or croak "fetch() should be called as a class method";
+
+  my %select_args;
+
+  # if last argument is a hashref, it contains arguments to the select() call
+  no warnings 'uninitialized';
+  if (does $_[-1], 'HASH') {
+    %select_args = %{pop @_};
+  }
+
+  return $self->select(-fetch => \@_, %select_args);
+}
 
 
+sub fetch_cached {
+  my $self = shift;
+  my $dbh_addr    = refaddr $self->schema->dbh;
+  my $freeze_args = freeze \@_;
+  return $self->metadm->{fetch_cached}{$dbh_addr}{$freeze_args}
+           ||= $self->fetch(@_);
+}
+
+
+
+#----------------------------------------------------------------------
+# join
+#----------------------------------------------------------------------
+
+
+sub join {
+  my ($self, $first_role, @other_roles) = @_;
+
+  # direct references to utility objects
+  my $schema      = $self->schema;
+  my $meta_schema = $schema->metadm;
+
+  # find first join information
+  my $path   = $self->metadm->path($first_role)
+    or croak "could not find role $first_role in " . $self->metadm->class;
+
+  # build search criteria on %$self from first join information
+  my (%criteria, @left_cols);
+  my $prefix = $schema->placeholder_prefix;
+  while (my ($left_col, $right_col) = each %{$path->{on}}) {
+    $criteria{$right_col} = "$prefix$left_col";
+    push @left_cols, $left_col;
+  }
+
+  # choose meta_source (just a table or build a join) 
+  my $meta_source = @other_roles  ? $meta_schema->define_join($path->{to}{name},
+                                                              @other_roles)
+                                  : $path->{to};
+
+  # build args for the statement
+  my $source = bless {__schema => $schema}, $meta_source->class;
+  my @stmt_args = ($source, -where => \%criteria);
+
+  # keep a reference to @left_cols so that Source::join can bind them
+  push @stmt_args, -_left_cols => \@left_cols;
+
+  # TODO: should add -select_as => 'firstrow' if all multiplicities are 1
+
+  # build and return the new statement
+  my $statement = $meta_schema->statement_class->new(@stmt_args);
+
+  if (!$self->_is_called_as_class_method) { # called as instance method
+    my $left_cols = $statement->{args}{-_left_cols}
+      or die "statement had no {left_cols} entry";
+
+    # check that all foreign keys are present
+    my $missing = join ", ", grep {not exists $self->{$_}} @$left_cols;
+    not $missing
+      or croak "cannot follow role '$first_role': missing column '$missing'";
+
+    # bind to foreign keys
+    $statement->bind(map {($_ => $self->{$_})} @$left_cols);
+  }
+
+
+  return $statement;
+}
+
+
+#----------------------------------------------------------------------
+# column handlers and column expansion
+#----------------------------------------------------------------------
 
 
 sub expand {
@@ -108,40 +199,20 @@ sub apply_column_handler {
 }
 
 
-sub join {
-  my ($self, $first_role, @other_roles) = @_;
+#----------------------------------------------------------------------
+# utilities
+#----------------------------------------------------------------------
 
-  my $metadm      = $self->metadm;
-  my $meta_schema = $metadm->schema;
-  my $schema      = $self->schema;
-  my $class       = $meta_schema->connected_source_class;
-  load $class;
-  my $conn_src    = $class->new($metadm, $schema);
-  my $statement   = $conn_src->join($first_role, @other_roles);
 
-  # if called as an instance method
-  if (ref $self) {
-    my $left_cols = $statement->{args}{-_left_cols}
-      or die "statement had no {left_cols} entry";
+sub _is_called_as_class_method {
+  my $self = shift;
 
-    # check that all foreign keys are present
-    my $missing = join ", ", grep {not exists $self->{$_}} @$left_cols;
-    not $missing
-      or croak "cannot follow role '$first_role': missing column '$missing'";
+  # class method call in the usual Perl sense
+  return 1 if ! ref $self; 
 
-    # bind to foreign keys
-    $statement->bind(map {($_ => $self->{$_})} @$left_cols);
-  }
-
-  # else if called as class method
-  else {
-    if ($DBIx::DataModel::COMPATIBILITY > 1.99) {
-      carp 'join() was called as class method on a Table; instead, you should '
-         . 'call $schema->table($name)->join(...)';
-    }
-  }
-
-  return $statement;
+  # fake class method call : an object with only one field '__schema'
+  my @k = keys %$self;
+  return @k == 1 && $k[0] eq '__schema';
 }
 
 

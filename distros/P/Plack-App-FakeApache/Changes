@@ -1,5 +1,14 @@
 Changes for Plack::App::FakeApache
 
+0.09 - Moo port to be released fully.
+
+0.08 - without_cgi configuration to make factoring CGI.pm out of a
+       codebase possible.
+       Port to Moo
+       Port to dzil
+
+0.07 - Change repo address
+
 0.06 - Support for a minimal shim over exit()
 
 0.05 - Allow Plack::App::FakeApache to use a subclass of

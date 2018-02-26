@@ -1,7 +1,6 @@
 package DestroyDollarUnderscore;
-
-use warnings;
 use strict;
+use warnings;
 
 undef ($_);
 

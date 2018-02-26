@@ -3,16 +3,14 @@ use strict;
 use warnings;
 use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
-use DBIx::DataModel::Meta::Utils;
+use DBIx::DataModel::Meta::Utils qw/define_class define_readonly_accessors/;
 
-use Params::Validate qw/validate SCALAR ARRAYREF HASHREF OBJECT/;
+use Params::Validate qw/validate_with SCALAR ARRAYREF HASHREF OBJECT/;
 use Scalar::Util     qw/weaken/;
 use List::MoreUtils  qw/any/;
-use Carp;
+use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 use namespace::clean;
-
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
 
 #----------------------------------------------------------------------
 # COMPILE-TIME METHODS
@@ -29,9 +27,7 @@ my %common_arg_spec = (
   # other slot filled later : 'name'
 );
 
-DBIx::DataModel::Meta::Utils->define_readonly_accessors(
-  __PACKAGE__, keys %common_arg_spec, 'name'
-);
+define_readonly_accessors(__PACKAGE__, keys %common_arg_spec, 'name');
 
 
 sub _new_meta_source { # called by new() in Meta::Table and Meta::Join
@@ -43,7 +39,11 @@ sub _new_meta_source { # called by new() in Meta::Table and Meta::Join
   my %spec = (%common_arg_spec, %$more_arg_spec);
 
   # validate the parameters
-  my $self = validate(@_, \%spec);
+  my $self = validate_with(
+    params      => \@_,
+    spec        => \%spec,
+    allow_extra => 0,
+   );
 
   # force into arrayref if accepts ARRAYREF but given as scalar
   for my $attr (grep {($spec{$_}{type} || 0) & ARRAYREF} keys %spec) {
@@ -73,7 +73,7 @@ sub _new_meta_source { # called by new() in Meta::Table and Meta::Join
   }
 
   # create the Perl class
-  DBIx::DataModel::Meta::Utils->define_class(
+  define_class(
     name   => $self->{class},
     isa    => \@isa,
     metadm => $self,
@@ -117,11 +117,18 @@ sub _consolidate_hash {
   my ($self, $field, $optional_hash_key) = @_;
   my %hash;
 
-  foreach my $meta_source ($self, $self->ancestors, $self->{schema}) {
+  my @meta_sources = ($self, $self->ancestors, $self->{schema});
+
+  foreach my $meta_source (reverse @meta_sources) {
     while (my ($name, $val) = each %{$meta_source->{$field} || {}}) {
-      $hash{$name} ||= $val;
+      $val ? $hash{$name} = $val : delete $hash{$name};
     }
   }
+  # foreach my $meta_source ($self, $self->ancestors, $self->{schema}) {
+  #   while (my ($name, $val) = each %{$meta_source->{$field} || {}}) {
+  #     $hash{$name} ||= $val;
+  #   }
+  # }
   return $optional_hash_key ? $hash{$optional_hash_key} : %hash;
 }
 

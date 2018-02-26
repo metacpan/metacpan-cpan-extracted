@@ -10,12 +10,6 @@
 #
 # Dec 2007	Alexander Haderer
 #
-# Last Update:            $Author: marvin $
-# Update Date:            $Date: 2007/12/07 17:15:21 $
-# Source File:            $Source: /home/cvsroot/tools/FileSystem/examples/access,v $
-# CVS/RCS Revision:       $Revision: 1.1 $
-# Status:                 $State: Exp $
-#
 
 use strict;
 use DBIx::FileSystem qw( :symbols );

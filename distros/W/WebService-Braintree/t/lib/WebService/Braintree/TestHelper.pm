@@ -153,7 +153,6 @@ sub verify_sandbox {
                 sub_merchant_account => 0,
             }, 'WebService::Braintree::MerchantAccount'),
         );
-        # Change to ->each
         my %merchants;
         WebService::Braintree::MerchantAccount->all->each(sub {
             my $merchant = shift;
@@ -209,9 +208,11 @@ sub verify_sandbox {
                 sleep 10;
 
                 # Refresh the list of merchants
-                %merchants = map {
-                    $_->id => $_
-                } @{WebService::Braintree::MerchantAccount->all};
+                %merchants = ();
+                WebService::Braintree::MerchantAccount->all->each(sub {
+                    my $merchant = shift;
+                    $merchants{$merchant->id} = $merchant;
+                });
             }
 
             return unless cmp_deeply($merchants{$id}, $details->[0], "Validate sub-merchant '$id'");

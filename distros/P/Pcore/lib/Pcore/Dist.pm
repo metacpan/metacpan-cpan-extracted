@@ -3,9 +3,9 @@ package Pcore::Dist;
 use Pcore -class;
 use Config;
 
-has root => ( is => 'ro', isa => Maybe [Str], required => 1 );    # absolute path to the dist root
-has is_cpan_dist => ( is => 'ro', isa => Bool, required => 1 );   # dist is installed as CPAN module, root is undefined
-has share_dir    => ( is => 'ro', isa => Str,  required => 1 );   # absolute path to the dist share dir
+has root         => ( is => 'ro', isa => Maybe [Str], required => 1 );    # absolute path to the dist root
+has is_cpan_dist => ( is => 'ro', isa => Bool,        required => 1 );    # dist is installed as CPAN module, root is undefined
+has share_dir    => ( is => 'ro', isa => Str,         required => 1 );    # absolute path to the dist share dir
 
 has module => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::Perl::Module'], predicate => 1 );
 

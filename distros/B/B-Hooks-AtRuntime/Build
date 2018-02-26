@@ -11,7 +11,7 @@ sub magic_number_matches {
   open $FH, '<','_build/magicnum' or return 0;
   my $filenum = <$FH>;
   close $FH;
-  return $filenum == 471588;
+  return $filenum == 472808;
 }
 
 my $progname;

@@ -2,9 +2,10 @@ package Firefox::Marionette::Response;
 
 use strict;
 use warnings;
+use Firefox::Marionette::Exception::NotFound();
 use Firefox::Marionette::Exception::Response();
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 sub _TYPE_INDEX       { return 0 }
 sub _MESSAGE_ID_INDEX { return 1 }
@@ -12,15 +13,21 @@ sub _ERROR_INDEX      { return 2 }
 sub _RESULT_INDEX     { return 3 }
 
 sub new {
-    my ( $class, $parameters ) = @_;
+    my ( $class, $message, $parameters ) = @_;
     my $response = bless {
-        type       => $parameters->[ _TYPE_INDEX() ],
-        message_id => $parameters->[ _MESSAGE_ID_INDEX() ],
-        error      => $parameters->[ _ERROR_INDEX() ],
-        result     => $parameters->[ _RESULT_INDEX() ],
+        type       => $message->[ _TYPE_INDEX() ],
+        message_id => $message->[ _MESSAGE_ID_INDEX() ],
+        error      => $message->[ _ERROR_INDEX() ],
+        result     => $message->[ _RESULT_INDEX() ],
     }, $class;
     if ( $response->error() ) {
-        Firefox::Marionette::Exception::Response->throw($response);
+        if ( $response->error()->{error} eq 'no such element' ) {
+            Firefox::Marionette::Exception::NotFound->throw( $response,
+                $parameters );
+        }
+        else {
+            Firefox::Marionette::Exception::Response->throw($response);
+        }
     }
     return $response;
 }
@@ -54,7 +61,7 @@ Firefox::Marionette::Response - Represents a Marionette protocol response
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 sub record_layout
@@ -128,7 +128,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -371,6 +371,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

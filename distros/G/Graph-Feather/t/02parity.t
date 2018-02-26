@@ -4,6 +4,7 @@ use Test::More;
 use Graph::Directed;
 use List::UtilsBy qw/sort_by/;
 use Graph::Feather;
+use JSON;
 
 my @meta = map {
   [ split/\s+/, s/^\s+|\s+$//gr ]
@@ -54,6 +55,14 @@ my @meta = map {
   _  delete_graph_attribute      g n
   ss get_graph_attribute_names   g 
   _  delete_graph_attributes     g 
+
+  hr get_vertex_attributes       g v
+  hr get_edge_attributes         g v v
+  hr get_graph_attributes        g 
+
+  _  set_vertex_attributes       g v hr
+  _  set_edge_attributes         g v v hr
+  _  set_graph_attributes        g hr
 };
 
 my $max_vertices = 16;
@@ -86,6 +95,12 @@ sub r_vertices {
   map { r_vertex() } 0 .. int rand 10;
 }
 
+sub r_hr {
+  return {
+    map { r_name(), r_value() } 1 .. int rand 4
+  };
+}
+
 for my $i ( 0 .. 1000 ) {
   my $d = Graph::Directed->random_graph(
     vertices => int(rand($max_vertices)),
@@ -109,6 +124,7 @@ for my $i ( 0 .. 1000 ) {
       'es' => \&r_edges,
       'n'  => \&r_name,
       '.'  => \&r_value,
+      'hr' => \&r_hr,
     );
 
     my @args = map { $arg_map{$_}->() } @arg_types;
@@ -129,18 +145,28 @@ for my $i ( 0 .. 1000 ) {
       } elsif ($return_type =~ /^(b)$/) {
         @$return = !! scalar $g->$method_name(@args);
 
+      } elsif ($return_type =~ /^(hr)$/) {
+        my $hr = $g->$method_name(@args);
+        my @keys = sort keys %$hr;
+        my @vals = map { $hr->{$_} } @keys;
+        @$return = (@keys, @vals);
+
       } else {
         @$return = scalar $g->$method_name(@args);
       }
     }
 
+    my @mapped = map { $_ // '<undef>' } @args;
+
+    @mapped = JSON->new->encode([@args ]);
+
+
     if ($return_type eq '_') {
-      my @mapped = map { $_ // '<undef>' } @args;
       ok 1, "$method_name(@mapped)";
       next;
     }
 
-    next if is_deeply \@return_d, \@return_f, "$method_name(@args)";
+    next if is_deeply \@return_f, \@return_d, "$method_name(@mapped)";
     next;
 
     require YAML::XS;

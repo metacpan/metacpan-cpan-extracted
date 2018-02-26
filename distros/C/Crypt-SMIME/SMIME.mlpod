@@ -253,10 +253,11 @@ C<$flags> のデフォルト値は C<0>
 >>
 
 The resulting message will be tainted if the original S/MIME message,
-the C<$flags>, or at least one public key is tainted.
+the C<$flags>, verification time (L</"setAtTime()">) or at least one
+of the provided public keys are tainted.
 J<< ja;
-元の S/MIME メッセージ, C<$flags>, または公開鍵の少なくとも一つが汚染されている
-(tainted) ならば、検証されたメッセージも汚染される。
+元の S/MIME メッセージ, C<$flags>, 検証時刻 (L</"setAtTime">), または
+公開鍵の少なくとも一つが汚染されている(tainted) ならば、検証されたメッセージも汚染される。
 >>
 
 =item encrypt()
@@ -329,6 +330,20 @@ J<< ja;
 渡されたMIMEメッセージがS/MIMEで暗号化されたものなら真を返す。
 暗号化後に署名したメッセージを渡した場合は、暗号文が直接見えない為、
 偽を返す事に注意。
+>>
+
+=back
+
+=item setAtTime()
+
+  $yesterday = time - (60*60*24);
+  $smime->setAtTime($yesterday);
+
+Set the time to use for verification. Default is to use the current time.
+Must be an unix epoch timestamp.
+J<< ja;
+検証時に用いる時刻を設定する。デフォルトは現在時刻。
+UNIX epoch 形式でなければならない。
 >>
 
 =back

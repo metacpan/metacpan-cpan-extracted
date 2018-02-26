@@ -1,5 +1,9 @@
 Revision history for ZMQ-Raw
 
+0.24      2018-02-20 09:46:49+02:00 Africa/Johannesburg
+
+ - Perl threading fixes.
+
 0.23      2018-01-18 10:28:15+02:00 Africa/Johannesburg
 
  - Scaling of timers has been improved

@@ -1,11 +1,13 @@
 package Pithub::Repos;
-$Pithub::Repos::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github v3 Repos API
 
 use Moo;
 use Carp qw(croak);
+use Pithub::Issues;
+use Pithub::Markdown;
+use Pithub::PullRequests;
 use Pithub::Repos::Collaborators;
 use Pithub::Repos::Commits;
 use Pithub::Repos::Contents;
@@ -131,6 +133,11 @@ sub hooks {
 }
 
 
+sub issues {
+    return shift->_create_instance('Pithub::Issues', @_);
+}
+
+
 sub keys {
     return shift->_create_instance('Pithub::Repos::Keys', @_);
 }
@@ -170,6 +177,19 @@ sub list {
             %args,
         );
     }
+}
+
+
+sub markdown {
+    my $self = shift;
+    return $self->_create_instance('Pithub::Markdown',
+        mode => 'gfm', context => sprintf( '%s/%s', $self->user, $self->repo ),
+        @_);
+}
+
+
+sub pull_requests {
+    return shift->_create_instance('Pithub::PullRequests', @_);
 }
 
 
@@ -245,7 +265,7 @@ Pithub::Repos - Github v3 Repos API
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 METHODS
 
@@ -380,6 +400,10 @@ Examples:
 
 Provides access to L<Pithub::Repos::Hooks>.
 
+=head2 issues
+
+Provides access to L<Pithub::Issues> for this repo.
+
 =head2 keys
 
 Provides access to L<Pithub::Repos::Keys>.
@@ -439,6 +463,15 @@ Examples:
     my $result = $repos->list( org => 'CPAN-API' );
 
 =back
+
+=head2 markdown
+
+Provides access to L<Pithub::Markdown> setting the current repository as the
+default context. This also sets the mode to default to 'gfm'.
+
+=head2 pull_requests
+
+Provides access to L<Pithub::PullRequests>.
 
 =head2 releases
 

@@ -15,6 +15,10 @@ sub last_id{
   return $dbi->last_id(@_);
 }
 
+sub model{
+  return shift->dbi->model(@_);
+}
+
 
 ## 添加
 ## 返回值为 hashref

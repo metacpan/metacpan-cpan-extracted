@@ -1,3 +1,8 @@
+v0.4.1 2018-02-25T08:33:51Z
+ - code formatted
+ - status 534 added
+ - status 555 added
+
 v0.4.0 2017-06-02T07:20:53Z
  - No issues on bugtracker were closed since the last release
  - Pcore::AE::Handle <-> Pcore::AE::Handle2

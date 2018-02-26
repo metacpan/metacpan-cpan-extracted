@@ -4,6 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     NAME             => 'Music::Lyrics::LRC',
     AUTHOR           => q{Tom Ryder <tom@sanctum.geek.nz>},
     VERSION_FROM     => 'lib/Music/Lyrics/LRC.pm',
@@ -27,7 +28,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Music::Lyrics::LRC' => {
-                version => '0.11',
+                version => '0.13',
                 file => 'lib/Music/Lyrics/LRC.pm',
             },
         },

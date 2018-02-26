@@ -8,7 +8,7 @@ use Test::More tests => 7;
 
 use List::Breakdown 'breakdown';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 my @t = 1 .. 3;
 

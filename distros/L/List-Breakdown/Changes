@@ -6,6 +6,11 @@ documented here anyway for comprehensiveness' sake. Entries with "No
 important changes" are likely to be trivial things like documentation
 fixes or Perl::Tidy runs.
 
+0.21 2018-02-21
+
+ - Update repository metadata
+ - Begin signing distributions with Module::Signature
+
 0.20 2017-10-07
 
  - Add LICENSE to MANIFEST

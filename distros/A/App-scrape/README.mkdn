@@ -58,6 +58,11 @@ If URL is `-`, input will be read from STDIN.
     one run. If this is not given, the first argument on the command line will be
     taken as the only URL to be fetched.
 
+- **--keep-url**
+
+    Add the fetched URL as another column with the given name in the output.
+    If you use CSV output, the URL will always be in the first column.
+
 - **--name**
 
     Name of the output column.

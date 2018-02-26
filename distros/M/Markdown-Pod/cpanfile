@@ -1,6 +1,6 @@
 requires "Getopt::Long" => "0";
 requires "List::Util" => "0";
-requires "Markdent" => "0.25";
+requires "Markdent" => "0.27";
 requires "Moose" => "0";
 requires "MooseX::Params::Validate" => "0";
 requires "MooseX::SemiAffordanceAccessor" => "0";
@@ -38,10 +38,16 @@ on 'develop' => sub {
   requires "IO::Handle" => "0";
   requires "IPC::Open3" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Wordlist" => "0";
+  requires "Software::License::Perl_5" => "0";
   requires "Test::CPAN::Meta" => "0";
+  requires "Test::MinimumVersion" => "0";
   requires "Test::More" => "0";
+  requires "Test::Perl::Critic" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
+  requires "Test::Portability::Files" => "0";
   requires "Test::Spelling" => "0.12";
   requires "Test::Version" => "1";
+  requires "perl" => "5.006";
 };

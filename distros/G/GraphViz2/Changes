@@ -1,5 +1,14 @@
 Revision history for Perl extension GraphViz2.
 
+2.47  2018-02-23T10:06:00
+	- Adopt github pull request from ThornyS, with thanx. This is part of CPAN via the PRC aka
+		Pull Request Challenge.
+	- Adjust tests in t/test_more_methods.t to work with BSD-based systems, and for systems
+		which don't use '/' as a dir separator. As a consequence, running the tests no longer
+		leaves test output files in t/.
+	- Fix some code in Config.pm which triggered a warning from Perl which said:
+		'panic: attempt to copy freed scalar ...'.
+
 2.46  2017-05-11T09:57:00
 	- Change the default value for the 'graph' attribute within GraphViz2::Parse::ISA from {} to ''.
 		This makes it match the default for each other module in the GraphViz2::Parse::* namespace.

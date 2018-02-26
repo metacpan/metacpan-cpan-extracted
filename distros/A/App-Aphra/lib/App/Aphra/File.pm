@@ -28,7 +28,7 @@ around BUILDARGS => sub {
   croak "No app attribute\n" unless $args{app};
   if ($args{filename}) {
     debug("Got $args{filename}");
-    my @exts = values %{ $args{app}->config->{extensions}};
+    my @exts = keys %{ $args{app}->config->{extensions}};
     my ($name, $path, $ext) = fileparse($args{filename}, @exts);
     chop($path) if $name;
     chop($name) if $ext;
@@ -42,7 +42,7 @@ sub is_template {
   my $self = shift;
 
   return scalar grep { $_ eq $self->extension }
-    values %{$self->app->config->{extensions}};
+    keys %{$self->app->config->{extensions}};
 }
 
 sub destination_dir {

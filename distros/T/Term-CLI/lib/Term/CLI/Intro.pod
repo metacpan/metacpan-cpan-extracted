@@ -1,0 +1,233 @@
+#===============================================================================
+#
+#       Module:  Term::CLI::Intro
+#
+#       Author:  Steven Bakker (SBAKKER), <Steven.Bakker@ams-ix.net>
+#      Created:  22/Feb/18
+#
+#   Copyright (c) 2018 Steven Bakker
+#
+#   This module is free software; you can redistribute it and/or modify
+#   it under the same terms as Perl itself. See "perldoc perlartistic."
+#
+#   This software is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+#===============================================================================
+
+=head1 NAME
+
+Term::CLI::Intro - introduction to Term::CLI class structure
+
+=head1 VERSION
+
+version 0.03002
+
+=head1 DESCRIPTION
+
+This manual entry provides information on the class structure of
+the L<Term::CLI> classes.
+
+For an introduction in the usage of this library, including code
+examples, see L<Term::CLI::Tutorial>(3p).
+
+=head1 CLASS SUMMARY
+
+=head2 Classes
+
+=over 36
+
+=item L<Term::CLI::ReadLine>
+
+Wrapper around L<Term::ReadLine> to provide a single, global
+L<Term::ReadLine>(3p) instance.
+
+=item L<Term::CLI>
+
+CLI reader and parser class.
+
+=item L<Term::CLI::Base>
+
+Base class for L<Term::CLI>(3p) objects.
+
+=item L<Term::CLI::Element>
+
+Base class for CLI syntax elements.
+
+=item L<Term::CLI::Command>
+
+CLI syntax element for (sub-)commands.
+
+=item L<Term::CLI::Command::Help>
+
+CLI syntax element for the C<help> command.
+
+=item L<Term::CLI::Argument>
+
+Base CLI syntax element or command line arguments.
+
+=item L<Term::CLI::Argument::Enum>
+
+CLI syntax element for arguments from a fixed set of strings.
+
+=item L<Term::CLI::Argument::Filename>
+
+CLI syntax element for file/directory name arguments.
+
+=item L<Term::CLI::Argument::Number>
+
+Base class for numeric arguments.
+
+=item L<Term::CLI::Argument::Number::Float>
+
+CLI syntax element for floating point number arguments.
+
+=item L<Term::CLI::Argument::Number::Int>
+
+CLI syntax element for integer arguments.
+
+=item L<Term::CLI::Argument::String>
+
+CLI syntax element for string arguments.
+
+=back
+
+=head2 Roles
+
+=over 36
+
+=item L<Term::CLI::Role::CommandSet>
+
+Methods to deal with a list of L<Term::CLI::Command> objects.
+
+=item L<Term::CLI::Role::ArgumentSet>
+
+Methods to deal with a list of L<Term::CLI::Argument> objects.
+
+=item L<Term::CLI::Role::HelpText>
+
+Methods to provide help text on a command.
+
+=back
+
+=head1 CLASS RELATIONSHIPS
+
+=head2 Classes
+
+=over 16
+
+=item C<X ---E<gt> Y>
+
+I<Y> inherits from I<X>
+
+=back
+
+    Term::ReadLine
+        |
+        +--> Term::CLI::ReadLine
+
+    Term::CLI::Base
+        |
+        +--> Term::CLI
+        |
+        +--> Term::CLI::Element
+                |
+                +--> Term::CLI::Command
+                |       |
+                |       +--> Term::CLI::Command::Help
+                |
+                +--> Term::CLI::Argument
+                        |
+                        +--> Term::CLI::Argument::String
+                        |
+                        +--> Term::CLI::Argument::Filename
+                        |
+                        +--> Term::CLI::Argument::Enum
+                        |
+                        +--> Term::CLI::Argument::Number
+                                |
+                                +--> Term::CLI::Argument::Number::Int
+                                |
+                                +--> Term::CLI::Argument::Number::Float
+
+=head2 Roles
+
+=over 16
+
+=item C<X ---E<gt> Y>
+
+I<X> consumes I<Y>
+
+=back
+
+    Term::CLI -----------+
+                          \
+                           +---> Term::CLI::Role::CommandSet
+                          /
+    Term::CLI::Command --+
+              \     \
+               \     +---> Term::CLI::Role::ArgumentSet
+                \
+                 +---> Term::CLI::Role::HelpText
+
+=head2 Ownership
+
+=over 16
+
+=item C<X ---E<lt> Y>
+
+I<X> owns (possibly multiple) I<Y> (i.e. "one to many").
+
+=item C<X --- Y>
+
+I<X> owns at most one I<Y> (i.e. "one to one").
+
+=back
+
+            +----- Term::CLI::ReadLine
+           /
+    Term::CLI
+           \
+            +----< Term::CLI::Command
+
+
+                     +----- Term::CLI::ReadLine
+                    /
+    Term::CLI::Command ---< Term::CLI::Argument
+                    \
+                     +----< Term::CLI::Command
+
+=head1 SEE ALSO
+
+L<Term::CLI::Tutorial>(3p).
+
+L<Term::CLI>(3p),
+L<Term::CLI::Argument>(3p),
+L<Term::CLI::Argument::Enum>(3p),
+L<Term::CLI::Argument::FileName>(3p),
+L<Term::CLI::Argument::Number>(3p),
+L<Term::CLI::Argument::Number::Float>(3p),
+L<Term::CLI::Argument::Number::Int>(3p),
+L<Term::CLI::Argument::String>(3p),
+L<Term::CLI::Command>(3p),
+L<Term::CLI::Role::CommandSet>(3p),
+L<Term::CLI::Role::ArgumentSet>(3p),
+L<Term::ReadLine>(3p).
+
+=head1 AUTHOR
+
+Steven Bakker E<lt>sbakker@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2018 Steven Bakker
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See "perldoc perlartistic."
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

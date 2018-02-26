@@ -13,6 +13,7 @@ WriteMakefile(
     PREREQ_PM         => {
         'URI::Escape'           => 3.31,
         'LWP::UserAgent'        => 6.27,
+        'LWP::Protocol::https'  => 6.07,
         'JSON::XS'              => 3.04,
         'File::Basename'        => 2.85,
         'Encode'                => 2.60,

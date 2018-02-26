@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.511';
+our $VERSION = '1.512';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -49,7 +49,7 @@ sub DESTROY {
 }
 
 
-sub __defaults {
+sub __defaults {        #hae
     my ( $self ) = @_;
     my $prompt = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     return {
@@ -87,7 +87,7 @@ sub __undef_to_defaults {
 }
 
 
-sub __valid_options {
+sub __valid_options {       #hae
     return {
         beep            => '[ 0 1 ]',
         clear_screen    => '[ 0 1 ]',
@@ -187,6 +187,12 @@ sub __get_key {
 sub config {            # DEPRECATED 10.02.2018
     my $self = shift;
     my ( $opt ) = @_;
+    ###################
+    print 'The method "config" is deprecated and will be removed with the next release.' . "\n";
+    print 'Continue with ENTER ';
+    my $p = <STDIN>;
+    print "\n";
+    ##################
     croak "config: called with " . @_ . " arguments - 0 or 1 arguments expected" if @_ > 1;
     if ( defined $opt ) {
         croak "config: the argument must be a HASH reference" if ref $opt ne 'HASH';
@@ -195,7 +201,7 @@ sub config {            # DEPRECATED 10.02.2018
 }
 
 
-sub choose {
+sub choose {      #hae
     if ( ref $_[0] ne 'Term::Choose' ) {
         return Term::Choose->new()->__choose( @_ );
     }
@@ -267,6 +273,9 @@ sub __choose {
         }
         next GET_KEY if $key == NEXT_get_key;
         next GET_KEY if $key == KEY_Tilde;
+        if ( exists $ENV{TC_RESET_AUTO_UP} ) {
+            $ENV{TC_RESET_AUTO_UP} = 1 if $key != KEY_ENTER;
+        }
 
         # $self->{rc2idx} holds the new list (AoA) formatted in "__size_and_layout" appropriate to the chosen layout.
         # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
@@ -632,7 +641,7 @@ sub __beep {
 }
 
 
-sub __copy_orig_list {
+sub __copy_orig_list {      #hae
     my ( $self, $orig_list_ref ) = @_;
     $self->{list} = [ @$orig_list_ref ];
     if ( $self->{ll} ) {
@@ -912,7 +921,7 @@ sub __wr_screen {
 }
 
 
-sub __wr_cell {
+sub __wr_cell {     # hae
     my( $self, $row, $col ) = @_;
     my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
     my $idx = $self->{rc2idx}[$row][$col];
@@ -946,12 +955,12 @@ sub __wr_cell {
 # __copy_orig_list, __wr_cell, __print_columns, __unicode_trim
 
 
-sub __print_columns {
+sub __print_columns {       #hae
     #my $self = $_[0];
     print_columns( $_[1] );
 }
 
-sub __unicode_trim {
+sub __unicode_trim {        #hae
     #my $self = $_[0];
     cut_to_printwidth( $_[1], $_[2] );
 }
@@ -1069,7 +1078,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.511
+Version 1.512
 
 =cut
 

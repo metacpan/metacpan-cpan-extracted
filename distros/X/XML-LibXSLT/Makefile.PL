@@ -198,8 +198,6 @@ if (have_library($::is_Win32 ? "libexslt" : "exslt")) {
     $config{DEFINE} .= " -DHAVE_EXSLT"
 }
 
-$config{LIBS}.=' '.$Config{libs};
-
 if ($DEBUG) {
   print "LIBS: $config{LIBS}\n";
   print "INC: $config{INC}\n";
@@ -263,9 +261,9 @@ WriteMakefile(
         },
         'resources' => {
             'repository' => {
-                'type' => 'hg',
-                'url'  => 'https://bitbucket.org/shlomif/perl-xml-libxslt',
-                'web'  => 'https://bitbucket.org/shlomif/perl-xml-libxslt',
+                'type' => 'git',
+                'url'  => 'https://github.com/shlomif/perl-XML-LibXSLT',
+                'web'  => 'https://github.com/shlomif/perl-XML-LibXSLT',
             },
         },
     },

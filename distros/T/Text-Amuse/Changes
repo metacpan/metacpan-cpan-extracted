@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.99 2018-02-23
+
+ - Use \par instead of \endgraf in multiparagraph footnotes
+
 0.98 2018-02-03
 
  - Fix the latex output of full page images

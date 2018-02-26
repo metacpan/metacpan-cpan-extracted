@@ -29,7 +29,7 @@ has is_connected => ( is => 'ro', isa => Bool, default => 0, init_arg => undef )
 # mask data on send, for websocket client only
 has _send_masked => ( is => 'ro', isa => Bool, default => 0, init_arg => undef );
 
-has _msg => ( is => 'ro', isa => ArrayRef, init_arg => undef );                                      # fragmentated message data, [$payload, $op, $rsv1]
+has _msg     => ( is => 'ro', isa      => ArrayRef, init_arg => undef );                             # fragmentated message data, [$payload, $op, $rsv1]
 has _deflate => ( is => 'ro', init_arg => undef );
 has _inflate => ( is => 'ro', init_arg => undef );
 

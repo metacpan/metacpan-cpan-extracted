@@ -1,62 +1,176 @@
 NAME
+
     Plack::App::FakeApache - Wrapping mod_perl2 applications in Plack
 
 SYNOPSIS
-      use Plack::App::FakeApache;
 
+      use Plack::App::FakeApache;
+    
       my $app = Plack::App::FakeApache->new( 
-        handler    => "My::ResponseHandler"
+        response_handler => "My::ResponseHandler"
         dir_config => { ... }
-      )->to_app;
+      )->to_app;    
 
 DESCRIPTION
+
     Plack::App::FakeApache transforms a mod_perl2 application into a PSGI
     application
 
 NOTICE
+
     This is Proof of Concept code originating in the mocking code developed
     to test an internal very non-trivial mod_perl2 application. Features
     have been added on a need to have basis.
 
+    This code has been extended to make a different non-trivial mod_perl
+    app work under plack too. If you need to use this module for serious
+    work you will almost certainly need to read and modify the source.
+    Contributions welcomed.
+
 CONFIGURATION
-    handler (required)
+
+    *_handler arguments support multiple "stacked" handlers if passed as an
+    arrayref.
+
+    authen_handler
+
+    authz_handler
+
+    response_handler (required)
+
+    handler (alias for response_handler)
+
+      Handlers for the respective request phases. Pass a blessed object, a
+      class name or use the Class->method syntax. See the mod_perl docs for
+      calling conventions.
+
+    request_class
+
+      If you want to subclass Plack::App::FakeApache::Request do so here.
+      Make sure that your subclass inherits from
+      Plack::App::FakeApache::Request (duh). This is for use in situations
+      where you've subclasssed Apache2::Request and want to make it work
+      under PSGI.
+
+    without_cgi
+
+      CGI.pm does bad things to STDIN and ENV. If your mod_perl app uses
+      these, but your're transitioning away from CGI.pm (e.g. in order to
+      support POST parameters with your app running under Plack::Client),
+      then you can selectively set this to false. For example:
+
+        my $app = Plack::App::FakeApache->new({ 
+            handler       => 'MyApp',
+            without_cgi   => 1,
+         })->to_app;
+      
+         my $client = Plack::Client->new( 'psgi-local' => { apps => { myapp => $app } } );
+      
+         my $res = $client->post('psgi-local://myapp/path/to/wherever', 
+                                 [], { parms => 'go', here => 'yeah' });
+
     dir_config
-        Hash used to resolve $req->dir_config() requests
+
+      Hash used to resolve $req->dir_config() requests. Defaults to an
+      empty hashref.
+
+    root
+
+      Root directory of the file system (optional, defaults to the current
+      working directory)
+
+    logger
+
+      The destination of the log messages (i.e. the errorlog). This should
+      be a file handle
+
+    request_args
+
+      Aditional args passed to the fake request object. E.g. auth_name and
+      auth_type.
 
 APACHE METHODS
-    The following methods from Apache2::RequestRec and mixins are supported:
+
+    The following methods from Apache2::RequestRec and mixins are
+    supported:
 
     headers_in
+
     headers_out
+
     subprecess_env
+
     dir_config
+
     method
+
     unparsed_uri
+
     uri
+
     user
+
     hostname
+
     content_type
+
     content_encoding
+
     status
+
     log_reason (implemented as a no-op)
+
     read
+
     print
+
     write
 
+    filename
+
+    construct_url
+
+    auth_type
+
+    auth_name
+
+    is_initial_req
+
 PLACK METHODS
+
     A few methods have been added to the interface to enable interaction
     with Plack:
 
     plack_request
-        Returns the underling Plack::Request object
+
+      Returns the underling Plack::Request object
 
     plack_response
-        Returns the underlying Plack::Response object. During the request
-        phase this is incomplete.
+
+      Returns the underlying Plack::Response object. During the request
+      phase this is incomplete.
 
     finalize
-        Fills information into the response object and finalizes it.
+
+      Fills information into the response object and finalizes it.
+
+MOD_PERL OVERRIDES
+
+    mod_perl overrides exit with ModPerl::Util. The way I (kd) have handled
+    this was that in order to avoid the horrors of overriding
+    CORE::GLOBAL::EXIT was to have a subroutine main::legacy_exit defined
+    in the startup.pl or in the .psgi file which calls die "EXIT 0".
+    Meanwhile this specific exception is ignored by Plack::APP::FakeApache.
+
+    TODO: There are other circumstances where exception handling routines
+    in upstream legacy mod_perl code are insufficiently well structured to
+    catch at the plack level, so the exception handling won't catch them.
+    In this situation a user configurable list of exception content
+    earmarked for custom handling is desirable (e.g. where a 500 error
+    really ought to be treated as a 404). I intend to implement this some
+    time RSN.
 
 AUTHOR
-    Peter Makholm, peter@makholm.net
+
+    Kieren Diment zarquon@cpan.org. Peter Makholm, peter@makholm.net
 

@@ -66,7 +66,7 @@
 [JFIF, JFIF, Image] 2 - Resolution Unit: inches
 [JFIF, JFIF, Image] 3 - X Resolution: ###
 [JFIF, JFIF, Image] 5 - Y Resolution: ###
-[JFIF, JFIF, Preview] 16 - Thumbnail Image: (Binary data 1558 bytes)
+[JFIF, JFXX, Preview] 16 - Thumbnail Image: (Binary data 1558 bytes)
 [APP8, SPIFF, Image] 0 - SPIFF Version: #.#
 [APP8, SPIFF, Image] 2 - Profile ID: Continuous-tone_Base
 [APP8, SPIFF, Image] 3 - Color Components: #
@@ -154,7 +154,7 @@
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:#cc#b###-##d#-##d#-#ac#-bb##c##f#d#a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
-[ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: ADBE
+[ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Adobe_Systems_Inc.
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: #.#.#
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display_Device_Profile
 [ICC_Profile, ICC-header, Image] 16 - Color Space Data: RGB_
@@ -168,7 +168,7 @@
 [ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective,_Glossy,_Positive,_Color
 [ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
 [ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: #.####_#_#.#####
-[ICC_Profile, ICC-header, Image] 80 - Profile Creator: ADBE
+[ICC_Profile, ICC-header, Image] 80 - Profile Creator: Adobe_Systems_Inc.
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: #
 [ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright_####_Adobe_Systems_Incorporated
 [ICC_Profile, ICC_Profile, Image] desc - Profile Description: Adobe_RGB_(####)

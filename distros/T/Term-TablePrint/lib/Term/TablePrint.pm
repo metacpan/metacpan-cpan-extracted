@@ -5,7 +5,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -210,6 +210,7 @@ sub __win_size_dependet_code {
             );
             return;
         }
+        $ENV{TC_RESET_AUTO_UP} = 0;
         my $row = choose(
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
@@ -240,6 +241,9 @@ sub __win_size_dependet_code {
                     }
                     $auto_jumped_to_first_row = 0;
                 }
+                elsif ( $ENV{TC_RESET_AUTO_UP} ) {
+                    $auto_jumped_to_first_row = 0;
+                }
                 else {
                     $old_row = 0;
                     $auto_jumped_to_first_row = 1;
@@ -267,6 +271,7 @@ sub __win_size_dependet_code {
             }
             $self->__print_single_row( $a_ref, $row, $self->{longest_col_name} + 1 );
         }
+        delete $ENV{TC_RESET_AUTO_UP};
     }
 }
 
@@ -603,7 +608,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.063
+Version 0.064
 
 =cut
 

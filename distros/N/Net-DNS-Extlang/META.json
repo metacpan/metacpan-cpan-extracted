@@ -32,12 +32,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Net::DNS" : "1.07",
-            "perl" : "5.016"
+            "Net::DNS" : "1.11",
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.1",
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

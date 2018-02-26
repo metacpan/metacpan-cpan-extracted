@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 
 extends 'Group::Git::Taggers';
 
-our $VERSION = version->new('0.0.2');
+our $VERSION = version->new('0.0.3');
 
 sub match {
     my ($self, $project) = @_;
@@ -36,7 +36,7 @@ Group::Git::Taggers::Maven - Tags repositories as containing Maven's pom.xml cod
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Taggers::Maven version 0.0.2
+This documentation refers to Group::Git::Taggers::Maven version 0.0.3
 
 =head1 SYNOPSIS
 

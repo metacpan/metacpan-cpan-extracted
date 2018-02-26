@@ -59,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-App-cpanminus-script-Patch-RunShcompgen"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

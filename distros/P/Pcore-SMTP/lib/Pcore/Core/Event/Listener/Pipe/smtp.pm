@@ -4,6 +4,7 @@ use Pcore -class, -ansi;
 use Pcore::SMTP;
 use Pcore::AE::Handle qw[:TLS_CTX];
 use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Scalar qw[is_ref];
 
 with qw[Pcore::Core::Event::Listener::Pipe];
 
@@ -38,15 +39,14 @@ sub sendlog ( $self, $ev ) {
 
         $self->{_tmpl}->cache_string_tmpl( subject => \$self->{tmpl} );
 
-        $self->{_smtp} = Pcore::SMTP->new(
-            {   host     => $self->{host},
-                port     => $self->{port},
-                username => $self->{username},
-                password => $self->{password},
-                tls      => $self->{tls},
-                tls_ctx  => $self->{tls_ctx}
-            }
-        );
+        $self->{_smtp} = Pcore::SMTP->new( {
+            host     => $self->{host},
+            port     => $self->{port},
+            username => $self->{username},
+            password => $self->{password},
+            tls      => $self->{tls},
+            tls_ctx  => $self->{tls_ctx}
+        } );
     }
 
     # sendlog
@@ -60,7 +60,7 @@ sub sendlog ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $body = $LF . ( ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
+            $body = $LF . ( is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
 
             # remove all trailing "\n"
             local $/ = '';
@@ -94,7 +94,7 @@ sub sendlog ( $self, $ev ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 66                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 10                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -17,7 +17,7 @@ name: Gentoo-App-Pram
 provides:
   Gentoo::App::Pram:
     file: lib/Gentoo/App/Pram.pm
-    version: '0.100100'
+    version: '0.100200'
 requires:
   Encode: '0'
   File::Basename: '0'
@@ -31,5 +31,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/monsieurp/Gentoo-App-Pram/
-version: '0.100100'
+version: '0.100200'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

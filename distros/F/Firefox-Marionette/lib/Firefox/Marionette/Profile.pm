@@ -7,14 +7,13 @@ use File::Spec();
 use FileHandle();
 use Fcntl();
 use Config::INI::Reader();
-use Carp();
 
 BEGIN {
     if ( $OSNAME eq 'MSWin32' ) {
         require Win32;
     }
 }
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -25,7 +24,7 @@ sub _profile_ini_directory {
         my $home_directory =
           ( getpwuid $EFFECTIVE_USER_ID )[ _GETPWUID_DIR_INDEX() ];
         defined $home_directory
-          or Carp::croak(
+          or Firefox::Marionette::Exception->throw(
             "Failed to execute getpwuid for $OSNAME:$EXTENDED_OS_ERROR");
         $profile_ini_directory = File::Spec->catdir( $home_directory, 'Library',
             'Application Support', 'Firefox' );
@@ -43,7 +42,7 @@ sub _profile_ini_directory {
         my $home_directory =
           ( getpwuid $EFFECTIVE_USER_ID )[ _GETPWUID_DIR_INDEX() ];
         defined $home_directory
-          or Carp::croak(
+          or Firefox::Marionette::Exception->throw(
             "Failed to execute getpwuid for $OSNAME:$EXTENDED_OS_ERROR");
         $profile_ini_directory =
           File::Spec->catdir( $home_directory, '.mozilla', 'firefox' );
@@ -129,6 +128,14 @@ sub existing {
 sub new {
     my ($class) = @_;
     my $profile = bless { comments => q[], keys => {} }, $class;
+    $profile->{_download_directory} = File::Temp->newdir(
+        File::Spec->catdir(
+            File::Spec->tmpdir(),
+            'firefox_marionette_download_directory_XXXXXXXXXXX'
+        )
+      )
+      or Firefox::Marionette::Exception->throw(
+        "Failed to create temporary directory:$EXTENDED_OS_ERROR");
     $profile->set_value( 'browser.startup.homepage', 'about:blank', 1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
         'ignore', 1 );
@@ -138,6 +145,17 @@ sub new {
     $profile->set_value( 'xpinstall.signatures.require', 'false', 0 );
     $profile->set_value( 'toolkit.telemetry.reportingpolicy.firstRun',
         'false', 0 );
+    $profile->set_value( 'browser.download.useDownloadDir', 'true', 0 );
+    $profile->set_value( 'browser.download.downloadDir',
+        $profile->{_download_directory}->dirname(), 1 );
+    $profile->set_value( 'browser.download.dir',
+        $profile->{_download_directory}->dirname(), 1 );
+    $profile->set_value( 'browser.download.lastDir',
+        $profile->{_download_directory}->dirname(), 1 );
+    $profile->set_value( 'browser.download.defaultFolder',
+        $profile->{_download_directory}->dirname(), 1 );
+    $profile->set_value( 'browser.download.folderList', 2, 0 )
+      ;    # the last folder specified for a download
     $profile->set_value( 'marionette.port', _ANY_PORT() );
     return $profile;
 }
@@ -149,14 +167,16 @@ sub save {
       FileHandle->new( $temp_path,
         Fcntl::O_WRONLY() | Fcntl::O_CREAT() | Fcntl::O_EXCL(),
         Fcntl::S_IRWXU() )
-      or
-      Carp::croak("Failed to open '$temp_path' for writing:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open '$temp_path' for writing:$EXTENDED_OS_ERROR");
     $handle->write( $self->_as_string() )
-      or Carp::croak("Failed to write to '$temp_path':$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to write to '$temp_path':$EXTENDED_OS_ERROR");
     $handle->close()
-      or Carp::croak("Failed to close '$temp_path':$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close '$temp_path':$EXTENDED_OS_ERROR");
     rename $temp_path, $path
-      or Carp::croak(
+      or Firefox::Marionette::Exception->throw(
         "Failed to rename '$temp_path' to '$path':$EXTENDED_OS_ERROR");
     return;
 }
@@ -203,7 +223,8 @@ sub parse {
     $self->{comments} = q[];
     $self->{keys}     = {};
     my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() )
-      or Carp::croak("Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
+      or Firefox::Marionette::Exception->throw(
+        "Failed to open '$path' for reading:$EXTENDED_OS_ERROR");
     while ( my $line = <$handle> ) {
         chomp $line;
         if (
@@ -224,10 +245,12 @@ sub parse {
             $self->{keys}->{$name} = { value => $value };
         }
         else {
-            Carp::croak("Failed to parse '$line'");
+            Firefox::Marionette::Exception->throw("Failed to parse '$line'");
         }
     }
-    close $handle or Carp::croak("Failed to close '$path':$EXTENDED_OS_ERROR");
+    close $handle
+      or Firefox::Marionette::Exception->throw(
+        "Failed to close '$path':$EXTENDED_OS_ERROR");
     return $self;
 
 }
@@ -241,7 +264,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =head1 SYNOPSIS
 
@@ -308,7 +331,37 @@ accepts a key name (such as C<browser.startup.homepage>) and removes the key fro
 
 =head1 DIAGNOSTICS
 
-None.
+=over
+ 
+=item C<< Failed to execute getpwuid for %s:%s >>
+ 
+The module was unable to to execute L<perlfunc/getpwuid>.  This is probably a bug in this module's logic.  Please report as described in the BUGS AND LIMITATIONS section below.
+
+=item C<< Failed to open '%s' for writing:%s >>
+ 
+The module was unable to open the named file.  Maybe your disk is full or the file permissions need to be changed?
+
+=item C<< Failed to write to '%s':%s >>
+ 
+The module was unable to write to the named file.  Maybe your disk is full?
+
+=item C<< Failed to close '%s':%s >>
+ 
+The module was unable to close a handle to the named file.  Something is seriously wrong with your environment.
+
+=item C<< Failed to rename '%s' to '%s':%s >>
+ 
+The module was unable to rename the named file to the second file.  Something is seriously wrong with your environment.
+
+=item C<< Failed to open '%s' for reading:%s >>
+ 
+The module was unable to open the named file.  Maybe your disk is full or the file permissions need to be changed?
+
+=item C<< Failed to parse line '%s' >>
+ 
+The module was unable to parse the line for a Firefox prefs.js configuration.  This is probably a bug in this module's logic.  Please report as described in the BUGS AND LIMITATIONS section below.
+
+=back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
@@ -316,7 +369,7 @@ Firefox::Marionette::Profile requires no configuration files or environment vari
 
 =head1 DEPENDENCIES
 
-Firefox::Marionette requires the following non-core Perl modules
+Firefox::Marionette::Profile requires the following non-core Perl modules
  
 =over
  

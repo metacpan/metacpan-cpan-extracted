@@ -45,7 +45,7 @@ has scheme_is_valid => ( is => 'lazy', init_arg => undef );
 has is_http   => ( is => 'lazy', default => 0, init_arg => undef );
 has is_secure => ( is => 'lazy', default => 0, init_arg => undef );
 
-has default_port => ( is => 'lazy', default => 0, init_arg => undef );
+has default_port => ( is => 'lazy', default  => 0, init_arg => undef );
 has connect_port => ( is => 'lazy', init_arg => undef );
 has connect      => ( is => 'lazy', init_arg => undef );
 

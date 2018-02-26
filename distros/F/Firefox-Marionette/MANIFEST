@@ -7,7 +7,9 @@ lib/Firefox/Marionette/Proxy.pm
 lib/Firefox/Marionette/Window/Rect.pm
 lib/Firefox/Marionette/Element.pm
 lib/Firefox/Marionette/Element/Rect.pm
+lib/Firefox/Marionette/Exception.pm
 lib/Firefox/Marionette/Exception/Response.pm
+lib/Firefox/Marionette/Exception/NotFound.pm
 lib/Firefox/Marionette/Response.pm
 lib/Firefox/Marionette/Timeouts.pm
 Makefile.PL

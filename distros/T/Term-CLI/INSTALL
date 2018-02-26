@@ -1,0 +1,66 @@
+INSTALLATION INSTRUCTIONS FOR TERM::CLI
+
+
+BUILDING FROM A TARBALL
+=======================
+
+If you downloaded the distribution tarball, simply install using:
+
+    tar xzf Term-CLI-*.tar.gz
+    cd Term-CLI-*
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Building a Package
+------------------
+
+The tarball repository also contains a "pkg" directory with package
+building information.
+
+Currently, there's only an RPM spec file, so you can do:
+
+    rpmbuild -tb Term-CLI-*.tar.gz
+
+The output from "rpmbuild" should indicate where the RPM package
+is written.
+
+
+BUILDING FROM GIT
+=================
+
+Without Dist::Zilla
+-------------------
+
+If you cloned the repository, you can try to run:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Though that is *not* the same as doing it from the tarball (the
+modules will not have a "$VERSION".
+
+
+With Dist::Zilla
+----------------
+
+If you happen to have Dist::Zilla installed (and a lot of plugins),
+you can do:
+
+    dzil clean
+    dzil build
+    cd Term-CLI-*
+    perl Makefile.PL
+    make install
+
+Building a Package
+
+This is similar to the above, except you first have to build a tarball:
+
+    dzil clean
+    dzil build
+    rpmbuild -tb Term-CLI-*.tar.gz
+

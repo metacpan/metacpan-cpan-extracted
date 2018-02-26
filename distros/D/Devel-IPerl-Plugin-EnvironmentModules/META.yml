@@ -18,11 +18,14 @@ no_index:
     - t
     - inc
 requires:
+  Array::Diff: '0'
+  Capture::Tiny: '0'
+  Devel::IPerl: '0.009'
   Env::Modulecmd: '1.3'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/kiwiroy/Devel-IPerl-Plugin-EnvironmentModules/issues
   homepage: https://github.com/kiwiroy/Devel-IPerl-Plugin-EnvironmentModules
   repository: https://github.com/kiwiroy/Devel-IPerl-Plugin-EnvironmentModules.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

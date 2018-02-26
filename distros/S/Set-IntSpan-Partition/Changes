@@ -1,5 +1,8 @@
 Revision history for Perl extension Set::IntSpan::Partition.
 
+0.04 February 2018
+  - fix https://rt.cpan.org/Public/Bug/Display.html?id=123879
+
 0.03 December 2017
   - Replace Heap::Simple with Heap::MinMax
 

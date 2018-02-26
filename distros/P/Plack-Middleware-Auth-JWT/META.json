@@ -4,13 +4,13 @@
       "Thomas Klausner <domm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Auth-JWT",
    "prereqs" : {
@@ -26,7 +26,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::JWT" : "0",
+            "Crypt::JWT" : "0.020",
             "Plack::Middleware" : "0",
             "Plack::Request" : "0",
             "Plack::Util" : "0",
@@ -55,6 +55,7 @@
          "web" : "https://github.com/domm/Plack-Middleware-Auth-JWT"
       }
    },
-   "version" : "0.901"
+   "version" : "0.903",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

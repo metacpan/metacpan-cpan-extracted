@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Mercury::Magnet;
-$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.620';
+$Lab::Moose::Instrument::OI_Mercury::Magnet::VERSION = '3.621';
 #ABSTRACT: Oxford Instruments Mercury Cryocontrol magnet power supply
 
 use 5.010;
@@ -539,7 +539,7 @@ Lab::Moose::Instrument::OI_Mercury::Magnet - Oxford Instruments Mercury Cryocont
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 SYNOPSIS
 

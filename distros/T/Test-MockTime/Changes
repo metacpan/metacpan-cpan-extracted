@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  0.16 - 22 Feb 2018
+
+      * Fixed calls to CORE::localtime in test suite to cope with years > 2020 as per RT #124508.  Thanks to Bernhard M. W. for patch.
+
   0.15 - 03 Sep 2015
 
       * Corrected README.  Merged POD into pm file

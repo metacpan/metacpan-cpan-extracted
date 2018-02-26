@@ -29,7 +29,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000005
+version 0.000006
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,9 @@ version 0.000005
 
     # open Foo::Bar at the do_something() subroutine
     ot "Foo::Bar::do_something()"
+
+    # open Foo::Bar at the do_something() subroutine
+    ot "Foo::Bar::do_something('HASH(0x25521248)')"
 
     # open output from git-grep
     ot lib/Open/This.pm:17

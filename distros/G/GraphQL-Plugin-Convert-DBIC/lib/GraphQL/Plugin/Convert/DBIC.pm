@@ -5,11 +5,12 @@ use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
 
-our $VERSION = "0.04";
+our $VERSION = "0.06";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
   guid => 'String',
+  uuid => 'String',
   wlongvarchar => 'String',
   wvarchar => 'String',
   wchar => 'String',
@@ -74,14 +75,34 @@ my %TYPEMAP = (
   tinytext => 'String',
   mediumtext => 'String',
   longtext => 'String',
+  # pgsql
+  'timestamp with time zone' => 'DateTime',
+  'timestamp without time zone' => 'DateTime',
+  enum => sub {
+    my $info = shift;
+    my $extra = $info->{extra};
+
+    return {
+      kind => 'enum',
+      name => _dbicsource2pretty($extra->{custom_type_name}),
+      values => { map { _trim_name($_) => { value => $_ } } @{ $extra->{list} } },
+    }
+  },
 );
 my %TYPE2SCALAR = map { ($_ => 1) } qw(ID String Int Float Boolean);
 
 sub _dbicsource2pretty {
   my ($source) = @_;
-  $source = $source->source_name || $source;
+  $source = eval { $source->source_name } || $source;
   $source =~ s#.*::##;
   join '', map ucfirst, split /_+/, $source;
+}
+
+sub _trim_name {
+  my ($name) = @_;
+  return if !defined $name;
+  $name =~ s#[^a-zA-Z0-9_]+#_#g;
+  $name;
 }
 
 sub _apply_modifier {
@@ -192,7 +213,7 @@ sub to_graphql {
   my @ast;
   my (
     %name2type, %name2column21, %name2pk21, %name2fk21, %name2rel21,
-    %name2column2rawtype,
+    %name2column2rawtype, %seentype,
   );
   for my $source (map $dbic_schema->source($_), $dbic_schema->sources) {
     my $name = _dbicsource2pretty($source);
@@ -206,6 +227,12 @@ sub to_graphql {
       my $info = $columns_info->{$column};
       DEBUG and _debug("schema_dbic2graphql($name.col)", $column, $info);
       my $rawtype = $TYPEMAP{ lc $info->{data_type} };
+      if ( 'CODE' eq ref $rawtype ) {
+        my $col_spec = $rawtype->($info);
+        push @ast, $col_spec unless $seentype{$col_spec->{name}};
+        $rawtype = $col_spec->{name};
+        $seentype{$col_spec->{name}} = 1;
+      }
       $name2column2rawtype{$name}->{$column} = $rawtype;
       my $fulltype = _apply_modifier(
         !$info->{is_nullable} && 'non_null',

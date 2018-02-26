@@ -542,9 +542,11 @@ different from other models)</span>
 approximate Light Value.  May not be valid for some models, eg. Optio S)</span></span></td></tr>
 <tr>
 <td title='0x0016 = 22'>0x0016</td>
-<td>ExposureCompensation</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
+<td>ExposureCompensation
+  <br>ExposureCompensation</td>
+<td class=c>int16u<br>int16u[2]</td>
+<td><span class=s><span class=n>(some models write two values here.  The second value is meaning of the
+second value is not yet known)</span></span></td></tr>
 <tr class=b>
 <td title='0x0017 = 23'>0x0017</td>
 <td>MeteringMode</td>
@@ -827,22 +829,25 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>15 = Video
   <br>16 = Mirror Lock-up
   <br>255 = n/a</td></tr></table>
-<span class=s>[Value 2]</span><table class=cols><tr>
-  <td>0 = Shutter Button
+<span class=s>[Value 2]
+  <br>0 = Shutter Button
   <br>1 = Remote Control (3 s delay)
   <br>2 = Remote Control
   <br>4 = Remote Continuous Shooting
-  <br>10 = Composite Average
-  <br>11 = Composite Additive
-  <br>12 = Composite Bright</td></tr></table>
-<span class=s>[Value 3]</span><table class=cols><tr>
+  <br>[Value 3]</span><table class=cols><tr>
   <td>0 = Single Exposure
   <br>1 = Multiple Exposure
+  <br>2 = Composite Average
+  <br>3 = Composite Additive
+  <br>4 = Composite Bright
   <br>8 = Interval Shooting
+  <br>10 = Interval Composite Average
+  <br>11 = Interval Composite Additive
+  <br>12 = Interval Composite Bright
   <br>15 = Interval Movie
   <br>16 = HDR
-  <br>32 = HDR Strong 1</td><td>&nbsp;&nbsp;</td>
-  <td>48 = HDR Strong 2
+  <br>32 = HDR Strong 1
+  <br>48 = HDR Strong 2
   <br>64 = HDR Strong 3
   <br>80 = HDR Manual
   <br>224 = HDR Auto
@@ -1941,6 +1946,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'4 2'</td><td>= smc PENTAX-FA 80-320mm F4.5-5.6</td>
 </tr><tr><td>'4 3'</td><td>= smc PENTAX-FA 43mm F1.9 Limited</td>
 </tr><tr><td>'4 6'</td><td>= smc PENTAX-FA 35-80mm F4-5.6</td>
+</tr><tr><td>'4 9'</td><td>= Irix 11mm F4 Firefly</td>
 </tr><tr><td>'4 10'</td><td>= Irix 15mm F2.4</td>
 </tr><tr><td>'4 12'</td><td>= smc PENTAX-FA 50mm F1.4</td>
 </tr><tr><td>'4 15'</td><td>= smc PENTAX-FA 28-105mm F4-5.6 [IF]</td>
@@ -2086,6 +2092,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'8 30'</td><td>= Sigma 17-70mm F2.8-4 DC Macro HSM | C</td>
 </tr><tr><td>'8 31'</td><td>= Sigma 18-35mm F1.8 DC HSM</td>
 </tr><tr><td>'8 32'</td><td>= Sigma 30mm F1.4 DC HSM | A</td>
+</tr><tr><td>'8 33'</td><td>= Sigma 18-200mm F3.5-6.3 DC Macro HSM</td>
 </tr><tr><td>'8 34'</td><td>= Sigma 18-300mm F3.5-6.3 DC Macro HSM</td>
 </tr><tr><td>'8 59'</td><td>= HD PENTAX-D FA 150-450mm F4.5-5.6 ED DC AW</td>
 </tr><tr><td>'8 60'</td><td>= HD PENTAX-D FA* 70-200mm F2.8 ED DC AW</td>
@@ -2214,8 +2221,10 @@ released, including time for focusing.  Not valid for some models)</span></span>
   <br>5 = On but Disabled
   <br>6 = On (Video)
   <br>7 = On (AA simulation off)
+  <br>8 = Off (AA simulation type 1) (8)
   <br>12 = Off (AA simulation type 1)
   <br>15 = On (AA simulation type 1)
+  <br>16 = Off (AA simulation type 2) (16)
   <br>20 = Off (AA simulation type 2)
   <br>23 = On (AA simulation type 2)</td></tr></table>
 </td></tr>
@@ -4859,11 +4868,16 @@ stored as ASCII text in a format very similar to some HP models.</p>
 <td>MakerNotes</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
+<tr class=b>
+<td>'mknt'</td>
+<td>MakerNotes</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 30, 2017</i>
+<br><i>Last revised Nov 7, 2017</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

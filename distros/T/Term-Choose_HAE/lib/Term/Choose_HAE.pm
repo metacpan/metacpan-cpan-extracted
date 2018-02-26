@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '0.052';
+our $VERSION = '0.054';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -48,8 +48,8 @@ sub choose {
 
 
 sub __copy_orig_list {
-    my ( $self ) = @_;
-    $self->{list} = [ @{$self->{orig_list}} ];
+    my ( $self, $orig_list ) = @_;
+    $self->{list} = [ @$orig_list ];
     if ( $self->{ll} ) {
         for ( @{$self->{list}} ) {
             $_ = $self->{undef} if ! defined $_;
@@ -185,7 +185,7 @@ Term::Choose_HAE - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 0.052
+Version 0.054
 
 =cut
 
@@ -226,7 +226,6 @@ Object-oriented interface:
     my $choice = $new->choose( $array_ref );                       # single choice
     print "$choice\n";
 
-    $new->config( { justify => 1 } );
     my @choices = $new->choose( [ 1 .. 100 ] );                    # multiple choice
     print "@choices\n";
 

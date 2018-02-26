@@ -11,7 +11,7 @@ BEGIN {
 
 require_ok $pkg;
 
-use Catmandu::Importer::EuropePMC;
+my $network_test = $ENV{NETWORK_TEST} || "";
 
 dies_ok {$pkg->new(module => 'search')} "required argument missing";
 
@@ -31,23 +31,28 @@ can_ok($importer, 'each');
 
 can_ok($importer, 'count');
 
-lives_ok { $pkg->new(
-        query => '10779411',
-        module => 'citations',
-        page => '2',
-        ) } "ok for citations";
+SKIP: {
+    skip "No NETWORK_TEST env variable set.", 1 unless $network_test;
 
-lives_ok { $pkg->new(
-        query => '10779411',
-        module => 'references',
-        page => '3',
-        ) } "ok for references";
+    lives_ok { $pkg->new(
+            query => '10779411',
+            module => 'citations',
+            page => '2',
+            ) } "ok for citations";
 
-lives_ok { $pkg->new(
-		query => '10779411',
-		module => 'databaseLinks',
-		db => 'uniprot',
-		page => '1',
-		) } "ok for databaseLinks";
+    lives_ok { $pkg->new(
+            query => '10779411',
+            module => 'references',
+            page => '3',
+            ) } "ok for references";
+
+    lives_ok { $pkg->new(
+    		query => '10779411',
+    		module => 'databaseLinks',
+    		db => 'uniprot',
+    		page => '1',
+    		) } "ok for databaseLinks";
+
+}
 
 done_testing;

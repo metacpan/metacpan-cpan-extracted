@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-Middleware-Rewrite",
    "prereqs" : {
@@ -35,26 +35,24 @@
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
             "HTTP::Request::Common" : "0",
             "Plack::Builder" : "0",
             "Plack::Test" : "0",
-            "Test::More" : "0.88"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/ap/Plack-Middleware-Rewrite/issues"
+         "web" : "https://github.com/ap/Plack-Middleware-Rewrite/issues"
       },
-      "homepage" : "http://github.com/ap/Plack-Middleware-Rewrite",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ap/Plack-Middleware-Rewrite"
+         "url" : "git://github.com/ap/Plack-Middleware-Rewrite.git",
+         "web" : "https://github.com/ap/Plack-Middleware-Rewrite"
       }
    },
-   "version" : "2.000"
+   "version" : "2.100"
 }
 

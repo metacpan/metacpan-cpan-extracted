@@ -57,3 +57,5 @@ t/Program-segment.t
 t/Program-split_segment.t
 t/Segment.t
 t/test_utils.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

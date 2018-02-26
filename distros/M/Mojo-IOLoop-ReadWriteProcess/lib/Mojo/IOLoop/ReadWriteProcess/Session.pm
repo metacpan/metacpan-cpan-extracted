@@ -24,7 +24,8 @@ has process_table  => sub { {} };
 has 'handler';
 
 my $singleton;
-sub new { $singleton ||= shift->SUPER::new(@_); }
+
+sub new { $singleton ||= __PACKAGE__->SUPER::new }
 
 sub disable {
   $singleton->_protect(sub { $SIG{CHLD} = $singleton->handler() });
@@ -91,12 +92,12 @@ sub _resolve {
   my ($el, $w) = (pop, pop);
   return
     exists $singleton->{$w}->{$el} ?
-    $el eq 'orphan'
+    $w eq 'orphans'
       ? $singleton->{$w}->{$el}
       : ${$singleton->{$w}->{$el}}
     : undef;
 }
-sub orphan  { _resolve(orphan        => pop()) }
+sub orphan  { _resolve(orphans       => pop()) }
 sub resolve { _resolve(process_table => pop()) }
 
 sub clean {
@@ -119,22 +120,17 @@ sub contains {
   $singleton->all->grep(sub { $_->pid eq $pid })->size == 1;
 }
 
-sub reset {
-  $_[0]->{events} = {};
-  $_[0]->orphans({});
-  shift->process_table({});
-}
+sub reset { @{+shift}{qw(events orphans process_table)} = ({}, {}, {}) }
 
+# XXX: This should be replaced by PR_GET_CHILD_SUBREAPER
 sub disable_subreaper {
-  $singleton->subreaper(1)
-    unless $singleton->_prctl(PR_SET_CHILD_SUBREAPER, 0) == 0;
-  $singleton;
+  $singleton->subreaper(
+    $singleton->_prctl(PR_SET_CHILD_SUBREAPER, 0) == 0 ? 0 : 1);
 }
 
 sub enable_subreaper {
-  $singleton->subreaper(0)
-    unless $singleton->_prctl(PR_SET_CHILD_SUBREAPER, 1) == 0;
-  $singleton;
+  $singleton->subreaper(
+    $singleton->_prctl(PR_SET_CHILD_SUBREAPER, 1) == 0 ? 1 : 0);
 }
 
 sub _get_prctl_syscall {
@@ -449,7 +445,7 @@ Returns the L<Mojo::IOLoop::ReadWriteProcess> process identified by its pid if b
 =head2 register()
 
     use Mojo::IOLoop::ReadWriteProcess::Session qw(session);
-    my $process = session->register(Mojo::IOLoop::ReadWriteProcess->new);
+    my $process = session->register('pid' => Mojo::IOLoop::ReadWriteProcess->new);
 
 Register the L<Mojo::IOLoop::ReadWriteProcess> process to the session.
 
@@ -463,7 +459,7 @@ Unregister the corresponding L<Mojo::IOLoop::ReadWriteProcess> with the given pi
 =head2 collect()
 
     use Mojo::IOLoop::ReadWriteProcess::Session qw(session);
-    my $process = session->collect(123342, 0, undef);
+    my $process = session->collect(123342 => 0 => undef);
 
 Collect the status for the given pid.
 

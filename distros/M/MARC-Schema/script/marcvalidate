@@ -37,8 +37,21 @@ while ( my $record = $parser->next() ) {
     $record_count++;
     my @result = $schema->check($record);
     if (@result > 0) {
-        print "Record $record_count:\n";
-        p @result;
+        print_error($record_count, \@result);
+    }
+}
+
+sub print_error {
+    my ($record_count, $error) = @_;
+    foreach my $error (@{$error}) {
+        if ($error->{subfields}) {
+            foreach my $subfield_code (keys %{$error->{subfields}}) {
+                print qq{$record_count\t$error->{tag}\t$error->{subfields}->{$subfield_code}->{message}\t$subfield_code\n};
+            }
+        }
+        if ($error->{message}) {
+            print qq{$record_count\t$error->{tag}\t$error->{message}\n};
+        }
     }
 }
 

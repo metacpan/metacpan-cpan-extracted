@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen
   homepage: https://metacpan.org/release/Perinci-CmdLine-Gen
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Gen.git
-version: '0.484'
+version: '0.485'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -113,7 +113,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.591'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -325,7 +325,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'

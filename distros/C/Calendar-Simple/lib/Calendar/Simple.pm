@@ -31,7 +31,7 @@ use base 'Exporter';
 
 our @EXPORT = qw(calendar);
 our @EXPORT_OK = qw(date_span);
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 use Time::Local;
 use Carp;
@@ -86,7 +86,7 @@ sub calendar {
 			   month => $mon,
 			   day => 1)->day_of_week % 7;
   } else {
-    $first = (localtime timelocal 0, 0, 0, 1, $mon -1, $year - 1900)[6];
+    $first = (localtime timelocal 0, 0, 0, 1, $mon -1, $year)[6];
   }
 
   $first -= $start_day;

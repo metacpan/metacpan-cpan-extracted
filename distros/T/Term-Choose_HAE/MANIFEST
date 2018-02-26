@@ -7,8 +7,6 @@ README
 t/00_load/00-load.t
 t/01_arguments/01_new.t
 t/01_arguments/01_new_invalid.t
-t/01_arguments/02_config.t
-t/01_arguments/02_config_invalid.t
 t/01_arguments/Data_Test_Arguments.pm
 xt/00_get_key_linux.t
 xt/01_option.t

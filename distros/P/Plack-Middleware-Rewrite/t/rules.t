@@ -3,10 +3,11 @@ use warnings;
 
 use Plack::Test;
 use Plack::Builder;
-use Test::More 0.88; # for done_testing
+use Test::More tests => 35;
 use HTTP::Request::Common;
 
 my $did_run;
+my $status;
 my $app = sub { $did_run = 1; [ 200, [ 'Content-Type' => 'text/plain' ], [ $_[0]{'PATH_INFO'} ] ] };
 
 my $xhtml = 'application/xhtml+xml';
@@ -24,6 +25,9 @@ $app = builder {
 
 		return sub { $_->set( 'Content-Type', $xhtml ) }
 			if ( $_[0]{'HTTP_ACCEPT'} || '' ) =~ m{application/xhtml\+xml(?!\s*;\s*q=0)};
+
+		return sub { $_->status( $status ) }
+			if defined $status;
 
 		return [ 302, [ Location => 'http://localhost/correct' ], [] ]
 			if m{^/psgi-redirect};
@@ -116,6 +120,11 @@ test_psgi app => $app, client => sub {
 	$res = $cb->( GET 'http://localhost/' . ( 'blah' x 8 ) . '?CODE' );
 	is $res->content, '/blah x 8', '... and can modify the body if intended';
 
+	$status = 999;
+	$res = $cb->( GET 'http://localhost/' );
+	is $res->code, 999, '... or the status';
+	undef $status;
+
 	$res = $cb->( GET 'http://localhost/', Accept => "$xhtml;q=0" );
 	is $res->header( 'Content-Type' ), 'text/plain', '... triggering only as requested';
 
@@ -149,5 +158,3 @@ test_psgi app => builder {
 	my $res = $cb->( GET 'http://localhost/' );
 	ok !$res->content, 'Redirects from the wrapped app are passed through untouched';
 };
-
-done_testing;

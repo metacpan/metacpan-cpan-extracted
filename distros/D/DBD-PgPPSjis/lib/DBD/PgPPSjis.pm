@@ -5,22 +5,8 @@ use DBI;
 use Carp ();
 use IO::Socket ();
 
-=head1 NAME
-
-DBD::PgPPSjis - Pure Perl PostgreSQL driver for (not raw) ShiftJIS
-
-=head1 SYNOPSIS
-
-  use DBI;
-
-  my $dbh = DBI->connect('dbi:PgPPSjis:dbname=$dbname', '', '');
-
-  # See the DBI module documentation for full details
-
-=cut
-
 use vars qw($VERSION);
-$VERSION = '0.0801003';
+$VERSION = '0.0801004';
 $VERSION = $VERSION;
 my $BUFFER_LEN = 1500;
 my $DEBUG;
@@ -1588,6 +1574,20 @@ sub _m {
 
 __END__
 
+=pod
+
+=head1 NAME
+
+DBD::PgPPSjis - Pure Perl PostgreSQL driver for (not raw) ShiftJIS
+
+=head1 SYNOPSIS
+
+  use DBI;
+
+  my $dbh = DBI->connect('dbi:PgPPSjis:dbname=$dbname', '', '');
+
+  # See the DBI module documentation for full details
+
 =head1 DESCRIPTION
 
 This software was made from DBD::PgPP to support ShiftJIS scripting.
@@ -1963,7 +1963,7 @@ L<http://developer.postgresql.org/docs/postgres/protocol.html>
 
 Hiroyuki OYAMA E<lt>oyama@module.jpE<gt>
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
 ShiftJIS support 2015, 2018 INABA Hitoshi
 Copyright (C) 2004 Hiroyuki OYAMA.  All rights reserved.

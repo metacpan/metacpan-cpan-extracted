@@ -1,3 +1,16 @@
+0.0313 2018-02-26
+  - fix shared lib dependency bug
+  - sub descripter position is changed
+    before: sub sin : native double ($x : double);
+    after : native sub sin : double ($x : double);
+  - fix windows dll not loading bug
+0.0312 2018-02-23
+  - fix bug that last statement can't do leave scope logic
+0.0311 2018-02-21
+  - shared library building temporaly directory is cleaned up in the scope
+  - cleanup shared library loading
+  - fix exception stack trace subroutine name
+  - fix all warnings
 0.0310 2018-02-16
   - enum value must be int type
   - remove byte literal b

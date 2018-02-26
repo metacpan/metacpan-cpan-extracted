@@ -14,6 +14,7 @@ dist.ini
 docs/FEATURE_PARITY.md
 lib/WebService/Braintree.pm
 lib/WebService/Braintree/#CustomerSearch.pm#
+lib/WebService/Braintree/AchMandate.pm
 lib/WebService/Braintree/AddOn.pm
 lib/WebService/Braintree/AddOnGateway.pm
 lib/WebService/Braintree/Address.pm
@@ -61,6 +62,9 @@ lib/WebService/Braintree/Dispute/Status.pm
 lib/WebService/Braintree/Dispute/TransactionDetails.pm
 lib/WebService/Braintree/DisputeGateway.pm
 lib/WebService/Braintree/DisputeSearch.pm
+lib/WebService/Braintree/DocumentUpload.pm
+lib/WebService/Braintree/DocumentUpload/Kind.pm
+lib/WebService/Braintree/DocumentUploadGateway.pm
 lib/WebService/Braintree/ErrorCodes.pm
 lib/WebService/Braintree/ErrorCodes/Address.pm
 lib/WebService/Braintree/ErrorCodes/AltPay.pm
@@ -72,6 +76,7 @@ lib/WebService/Braintree/ErrorCodes/CreditCard/Options.pm
 lib/WebService/Braintree/ErrorCodes/Customer.pm
 lib/WebService/Braintree/ErrorCodes/Descriptor.pm
 lib/WebService/Braintree/ErrorCodes/Dispute.pm
+lib/WebService/Braintree/ErrorCodes/DocumentUpload.pm
 lib/WebService/Braintree/ErrorCodes/IndustryType.pm
 lib/WebService/Braintree/ErrorCodes/MerchantAccount.pm
 lib/WebService/Braintree/ErrorCodes/MerchantAccount/ApplicantDetails.pm
@@ -88,9 +93,15 @@ lib/WebService/Braintree/ErrorCodes/Subscription.pm
 lib/WebService/Braintree/ErrorCodes/Subscription/Modification.pm
 lib/WebService/Braintree/ErrorCodes/Transaction.pm
 lib/WebService/Braintree/ErrorCodes/Transaction/Options.pm
+lib/WebService/Braintree/ErrorResult.pm
+lib/WebService/Braintree/EuropeBankAccount.pm
+lib/WebService/Braintree/EuropeBankAccountGateway.pm
 lib/WebService/Braintree/Gateway.pm
 lib/WebService/Braintree/GenericSearch.pm
 lib/WebService/Braintree/HTTP.pm
+lib/WebService/Braintree/IbanBankAccount.pm
+lib/WebService/Braintree/IdealPayment.pm
+lib/WebService/Braintree/IdealPaymentGateway.pm
 lib/WebService/Braintree/Merchant.pm
 lib/WebService/Braintree/MerchantAccount.pm
 lib/WebService/Braintree/MerchantAccount/AddressDetails.pm
@@ -139,6 +150,8 @@ lib/WebService/Braintree/TransparentRedirect.pm
 lib/WebService/Braintree/TransparentRedirect/QueryString.pm
 lib/WebService/Braintree/TransparentRedirectGateway.pm
 lib/WebService/Braintree/UnknownPaymentMethod.pm
+lib/WebService/Braintree/UsBankAccount.pm
+lib/WebService/Braintree/UsBankAccountGateway.pm
 lib/WebService/Braintree/Util.pm
 lib/WebService/Braintree/ValidationError.pm
 lib/WebService/Braintree/ValidationErrorCollection.pm
@@ -175,6 +188,10 @@ t/sandbox/customer.t
 t/sandbox/customer_search.t
 t/sandbox/disbursement.t
 t/sandbox/dispute.t
+t/sandbox/document_upload.t
+t/sandbox/fixtures/document_upload/bt_logo.png
+t/sandbox/fixtures/document_upload/gif_extension_bt_logo.gif
+t/sandbox/fixtures/document_upload/malformed_pdf.pdf
 t/sandbox/merchant.t
 t/sandbox/merchant_account.t
 t/sandbox/payment_method.t

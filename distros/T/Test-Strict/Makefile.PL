@@ -14,9 +14,10 @@ my %conf = (
         'File::Spec'    => 0.01,
         'FindBin'       => 0.01,
         'File::Find'    => 0.01,
-        'Devel::Cover'  => 0.43,
         'File::Temp'    => 0.01,
     },
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'Test-Strict-*' },
 );
 
 if (eval { ExtUtils::MakeMaker->VERSION(6.3002) }) {
@@ -27,7 +28,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(6.46) }) {
     $conf{META_MERGE} = {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Test::Strict' => { file => 'lib/Test/Strict.pm', version => '0.41' },
+            'Test::Strict' => { file => 'lib/Test/Strict.pm', version => '0.45' },
         },
         resources   => {
             repository  => {

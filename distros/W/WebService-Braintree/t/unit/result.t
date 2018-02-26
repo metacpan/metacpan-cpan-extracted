@@ -8,6 +8,7 @@ use Test::More;
 use lib qw(lib t/lib);
 
 use WebService::Braintree::TestHelper;
+use WebService::Braintree::ErrorResult;
 use WebService::Braintree::Result;
 
 subtest "multiple errors" => sub {
@@ -17,7 +18,7 @@ subtest "multiple errors" => sub {
         }
     };
 
-    my $result = WebService::Braintree::Result->new(response => $response);
+    my $result = WebService::Braintree::ErrorResult->new($response->{api_error_response});
     invalidate_result($result) or return;
 
     is ($result->message, "Customer ID is invalid.\nCredit card number is invalid.");
@@ -47,7 +48,7 @@ subtest "allow access to relevant objects on error response" => sub {
         }
     };
 
-    my $result = WebService::Braintree::Result->new(response => $response);
+    my $result = WebService::Braintree::ErrorResult->new($response->{api_error_response});
     is($result->subscription->random_subscription_info, "foo");
     is($result->transaction, undef);
 };

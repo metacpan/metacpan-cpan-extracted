@@ -1,5 +1,8 @@
 Revision history for Perl extension Config-ENV
 
+0.16 2018-02-21T05:13:46Z
+	- FIX: for perl 5.26 (by kga)
+
 0.15 2017-06-08T09:04:15Z
 	- FIX: local config is broken when localize guard object has released in a different order (by karupanerura)
 

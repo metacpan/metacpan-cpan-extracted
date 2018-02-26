@@ -30,6 +30,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/advent.t',
+    't/jsonWithSharedStream.t',
     't/test.t',
     't/thread.t'
 );

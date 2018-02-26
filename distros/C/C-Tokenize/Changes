@@ -1,5 +1,9 @@
 Revision history for perl module C::Tokenize
 
+0.18 2018-02-22
+
+* Fixes for regexes for #include matching
+
 0.17 2017-08-31
 
 * Correction of documentation of "strip_comments".

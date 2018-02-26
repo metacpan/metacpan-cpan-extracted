@@ -6,18 +6,118 @@ package DBIx::DataModel::Source::Table;
 use warnings;
 no warnings 'uninitialized';
 use strict;
-use mro 'c3';
 use parent 'DBIx::DataModel::Source';
-use Carp;
-use Storable             qw/freeze/;
-use Scalar::Util         qw/refaddr reftype/;
-use Scalar::Does         qw/does/;
-use Module::Load         qw/load/;
-use List::MoreUtils      qw/none/;
+use Acme::Damn                   qw/damn/;
+use Module::Load                 qw/load/;
+use List::MoreUtils              qw/none/;
+use Params::Validate             qw/validate_with HASHREF/;
+use DBIx::DataModel::Meta::Utils qw/does/;
+use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+
+#------------------------------------------------------------
+# insert
+#------------------------------------------------------------
+
+sub insert {
+  my $self = shift;
+
+  $self->_is_called_as_class_method
+    or croak "insert() should be called as a class method";
+  my $class = ref $self || $self;
+
+  # end of list may contain options, recognized because option name is a scalar
+  my $options      = $self->_parse_ending_options(\@_, qr/^-returning$/);
+  my $want_subhash = does($options->{-returning}, 'HASH');
+
+  # records to insert
+  my @records = @_;
+  @records or croak "insert(): no record to insert";
+
+  my $got_records_as_arrayrefs = does($records[0], 'ARRAY');
+
+  # if data is received as arrayrefs, transform it into a list of hashrefs.
+  # NOTE : this is a bit stupid; a more efficient implementation
+  # would be to prepare one single DB statement and then execute it on
+  # each data row, or even SQL like INSERT ... VALUES(...), VALUES(..), ...
+  # (supported by some DBMS), but that would require some refactoring 
+  # of _singleInsert and _rawInsert.
+  if ($got_records_as_arrayrefs) {
+    my $header_row = shift @records;
+    my $n_headers  = @$header_row;
+    foreach my $data_row (@records) {
+      does($data_row, 'ARRAY')
+        or croak "data row after a header row should be an arrayref";
+      my $n_vals = @$data_row;
+      $n_vals == $n_headers
+        or croak "insert([\@headers],[\@row1],...): "
+                ."got $n_vals values for $n_headers headers";
+      my %real_record;
+      @real_record{@$header_row} = @$data_row;
+      $data_row = \%real_record;
+    }
+  }
+
+  # insert each record, one by one
+  my @results;
+  my $meta_source        = $self->metadm;
+  my %no_update_column   = $meta_source->no_update_column;
+  my %auto_insert_column = $meta_source->auto_insert_column;
+  my %auto_update_column = $meta_source->auto_update_column;
+
+  my $schema = $self->schema;
+  while (my $record = shift @records) {
+
+    # TODO: shallow copy in order not to perturb the caller
+    # BUT : if the insert injects a primary key, we want to retrieve it !
+    # SO => contradiction
+    # $record = {%$record} unless $got_records_as_arrayrefs;
+
+    # bless, apply column handers and remove unwanted cols
+    bless $record, $class;
+    $record->apply_column_handler('to_DB');
+    delete $record->{$_} foreach keys %no_update_column;
+    while (my ($col, $handler) = each %auto_insert_column) {
+      $record->{$col} = $handler->($record, $class);
+    }
+    while (my ($col, $handler) = each %auto_update_column) {
+      $record->{$col} = $handler->($record, $class);
+    }
+
+    # inject schema
+    $record->{__schema} = $schema;
+
+    # remove subtrees (they will be inserted later)
+    my $subrecords = $record->_weed_out_subtrees;
+
+    # do the insertion. The result depends on %$options.
+    my @single_result = $record->_singleInsert(%$options);
+
+    # NOTE: at this point, $record is expected to hold its own primary key
+
+    # insert the subtrees into DB, and keep the return vals if $want_subhash
+    if ($subrecords) {
+      my $subresults = $record->_insert_subtrees($subrecords, %$options);
+      if ($want_subhash) {
+        does($single_result[0], 'HASH')
+          or die "_single_insert(..., -returning => {}) "
+               . "did not return a hashref";
+        $single_result[0]{$_} = $subresults->{$_} for keys %$subresults;
+      }
+    }
+
+    push @results, @single_result;
+  }
+
+  # choose what to return according to context
+  return @results if wantarray;             # list context
+  return          if not defined wantarray; # void context
+  carp "insert({...}, {...}, ..) called in scalar context" if @results > 1;
+  return $results[0];                       # scalar context
+}
+
 
 sub _singleInsert {
   my ($self, %options) = @_; 
@@ -101,7 +201,6 @@ sub _singleInsert {
 sub _rawInsert {
   my ($self, %options) = @_; 
   my $class  = ref $self or croak "_rawInsert called as class method";
-  my $metadm = $class->metadm;
 
   # clone $self as mere unblessed hash (for SQLA) and extract ref to $schema 
   my %values = %$self;
@@ -112,8 +211,7 @@ sub _rawInsert {
 
   # cleanup $options
   if ($options{-returning}) {
-    my $reftype = reftype $options{-returning} || '';
-    if ($reftype eq 'HASH' && !keys %{$options{-returning}}) {
+    if (does($options{-returning}, 'HASH') && !keys %{$options{-returning}}) {
       delete $options{-returning};
     }
   }
@@ -121,7 +219,7 @@ sub _rawInsert {
   # perform the insertion
   my $sqla         = $schema->sql_abstract;
   my ($sql, @bind) = $sqla->insert(
-    -into   => $metadm->db_from,
+    -into   => $self->db_from,
     -values => \%values,
     %options,
    );
@@ -141,7 +239,7 @@ sub _get_last_insert_id {
   my ($self, $col) = @_;
   my $class               = ref $self;
   my ($dbh, %dbh_options) = $self->schema->dbh;
-  my $table               = $self->metadm->db_from;
+  my $table               = $self->db_from;
 
   my $id
       # either callback given by client ...
@@ -191,7 +289,7 @@ sub _weed_out_subtrees {
                                  $sqla->is_bind_value_with_type($v)))
         ||
         # literal SQL in the form $k => \ ["FUNC(?)", $v]
-        (does($v, 'REF') && does($$v, 'ARRAY'))
+        (ref $v eq 'REF' && does($$v, 'ARRAY'))
        ){
         # do nothing (pass the ref to SQL::Abstract::More)
       }
@@ -209,31 +307,13 @@ sub _weed_out_subtrees {
 
 
 
-sub has_invalid_columns {
-  my ($self) = @_;
-  my $results = $self->apply_column_handler('validate');
-  my @invalid;			# names of invalid columns
-  while (my ($k, $v) = each %$results) {
-    push @invalid, $k if defined($v) and not $v;
-  }
-  return @invalid ? \@invalid : undef;
-}
-
-
-
-
-
-#------------------------------------------------------------
-# Internal utility functions
-#------------------------------------------------------------
-
 sub _insert_subtrees {
   my ($self, $subrecords, %options) = @_;
   my $class = ref $self;
   my %results;
 
   while (my ($role, $arrayref) = each %$subrecords) {
-    reftype $arrayref eq 'ARRAY'
+    does $arrayref, 'ARRAY'
       or croak "Expected an arrayref for component role $role in $class";
     next if not @$arrayref;
 
@@ -249,81 +329,268 @@ sub _insert_subtrees {
 }
 
 
-# 'insert class method only available if schema is in singleton mode;
-# this method is delegated to the ConnectedSource class.
-sub insert {
-  my $class = shift;
-  not ref($class) 
-    or croak "insert() should be called as class method";
-
-  my $metadm      = $class->metadm;
-  my $meta_schema = $metadm->schema;
-  my $schema      = $meta_schema->class->singleton;
-  my $cs_class    = $meta_schema->connected_source_class;
-  load $cs_class;
-  $cs_class->new($metadm, $schema)->insert(@_);
-}
-
-
-
-
 #------------------------------------------------------------
-# update and delete
+# delete
 #------------------------------------------------------------
 
-# update() and delete(): differentiate between usage as
-# $obj->update(), or $class->update(@args). In both cases, we then
-# delegate to the ConnectedSource class
+my $delete_spec = {
+  -where => {type => HASHREF, optional => 0},
+};
 
-sub delete {
-  my ($self, @args) = @_;
 
-  my $metadm      = $self->metadm;
-  my $meta_schema = $metadm->schema;
-  my $schema;
+sub _parse_delete_args {
+  my $self = shift;
 
-  if (ref $self) { # if called as $obj->$method()
-    not @args or croak "delete() : too many arguments";
-    @args = ($self);
-    $schema = delete $self->{__schema};
+  my @pk_cols = $self->metadm->primary_key;
+  my $where;
+  my @cascaded;
+
+  if ($self->_is_called_as_class_method) {
+    # parse arguments
+    @_ or croak "delete() as class method: not enough arguments";
+
+    my $uses_named_args = ! ref $_[0] && $_[0] =~ /^-/;
+    if ($uses_named_args) {
+      my %args = validate_with(params      => \@_,
+                               spec        => $delete_spec,
+                               allow_extra => 0);
+      $where = $args{-where};
+    }
+    else { # uses positional args
+      if (does $_[0], 'HASH') { # called as: delete({fields})
+        my $hash = shift;
+        @{$where}{@pk_cols} = @{$hash}{@pk_cols};
+        !@_ or croak "delete() : too many arguments";
+      }
+      else { # called as: delete(@primary_key)
+        my ($n_vals, $n_keys) = (scalar(@_), scalar(@pk_cols));
+        $n_vals == $n_keys
+          or croak "delete(): got $n_vals cols in primary key, expected $n_keys";
+        @{$where}{@pk_cols} = @_;
+      }
+      my $missing = join ", ", grep {!defined $where->{$_}} @pk_cols;
+      croak "delete(): missing value for $missing" if $missing;
+    }
+  }
+  else { # called as instance method
+
+    # build $where from primary key
+    @{$where}{@pk_cols} = @{$self}{@pk_cols};
+
+    # cascaded delete
+  COMPONENT_NAME:
+    foreach my $component_name ($self->metadm->components) {
+      my $components = $self->{$component_name} or next COMPONENT_NAME;
+      does($components, 'ARRAY')
+        or croak "delete() : component $component_name is not an arrayref";
+      push @cascaded, @$components;
+    }
   }
 
-  # if in single-schema mode, or called as $class->delete(@args)
-  $schema ||= $meta_schema->class->singleton;
-
-  # delegate to the connected_source class
-  my $cs_class    = $meta_schema->connected_source_class;
-  load $cs_class;
-  $cs_class->new($metadm, $schema)->delete(@args);
+  return ($where, \@cascaded);
 }
+
+
+sub delete {
+  my $self = shift;
+
+  my $schema             = $self->schema;
+  my ($where, $cascaded) = $self->_parse_delete_args(@_);
+
+  # perform cascaded deletes for components within $self
+  $_->delete foreach @$cascaded;
+
+  # perform this delete
+  my ($sql, @bind) = $schema->sql_abstract->delete(
+    -from  => $self->db_from,
+    -where => $where,
+   );
+  $schema->_debug($sql . " / " . CORE::join(", ", @bind) );
+  my $method = $schema->dbi_prepare_method;
+  my $sth    = $schema->dbh->$method($sql);
+  $sth->execute(@bind);
+}
+
+
+#------------------------------------------------------------
+# update
+#------------------------------------------------------------
+
+my $update_spec = {
+  -set   => {type => HASHREF, optional => 0},
+  -where => {type => HASHREF, optional => 0},
+};
+
+
+sub _parse_update_args  { # returns ($schema, $to_set, $where)
+  my $self = shift;
+
+  my ($to_set, $where);
+
+  if ($self->_is_called_as_class_method) {
+    @_
+      or croak "update() as class method: not enough arguments";
+
+    my $uses_named_args = ! ref $_[0] && $_[0] =~ /^-/;
+    if ($uses_named_args) {
+      my %args = validate_with(params      => \@_,
+                               spec        => $update_spec,
+                               allow_extra => 0);
+      ($to_set, $where) = @args{qw/-set -where/};
+    }
+    else { # uses positional args: update([@primary_key], {fields_to_update})
+      does $_[-1], 'HASH'
+        or croak "update(): expected a hashref as last argument";
+      $to_set = { %{pop @_} };  # shallow copy
+      my @pk_cols = $self->metadm->primary_key;
+      if (@_) {
+        my ($n_vals, $n_keys) = (scalar(@_), scalar(@pk_cols));
+        $n_vals == $n_keys
+          or croak "update(): got $n_vals cols in primary key, expected $n_keys";
+        @{$where}{@pk_cols} = @_;
+      }
+      else {
+        # extract primary key from hashref
+        @{$where}{@pk_cols} = delete @{$to_set}{@pk_cols};
+      }
+    }
+  }
+  else { # called as instance method
+    my %clone = %$self;
+
+    # extract primary key from object
+    $where->{$_} = delete $clone{$_} foreach $self->metadm->primary_key;
+
+    if (!@_) {        # if called as $obj->update()
+      delete $clone{__schema};
+      $to_set = \%clone;
+    }
+    elsif (@_ == 1) { # if called as $obj->update({field => $val, ...})
+      does $_[0], 'HASH'
+        or croak "update() as instance method: unexpected argument";
+      $to_set = $_[0];
+    }
+    else {
+      croak "update() as instance method: too many arguments";
+    }
+  }
+
+  return ($to_set, $where);
+}
+
+
+sub _apply_handlers_for_update {
+  my ($self, $to_set, $where) = @_;
+
+  # class of the invocant
+  my $class  = ref $self || $self;
+
+  # apply no_update and auto_update
+  my %no_update_column = $self->metadm->no_update_column;
+  delete $to_set->{$_} foreach keys %no_update_column;
+  my %auto_update_column = $self->metadm->auto_update_column;
+  while (my ($col, $handler) = each %auto_update_column) {
+    $to_set->{$col} = $handler->($to_set, $class);
+  }
+
+  # apply 'to_DB' handlers. Need temporary bless as an object
+  my $schema = $self->schema;
+  $to_set->{__schema} = $schema; # in case the handlers need it
+  bless $to_set, $class;
+  $to_set->apply_column_handler('to_DB');
+  delete $to_set->{__schema};
+  damn $to_set;
+
+
+  # detect references to foreign objects
+  my $sqla = $schema->sql_abstract;
+  my @sub_refs;
+  foreach my $key (keys %$to_set) {
+    my $val     = $to_set->{$key};
+    next if !ref $val;
+    push @sub_refs, $key
+      if does($val, 'HASH')
+        ||( does($val, 'ARRAY')
+              && !$sqla->{array_datatypes}
+              && !$sqla->is_bind_value_with_type($val) );
+    # reftypes SCALAR or REF are OK; they are used by SQLA for verbatim SQL
+  }
+
+  # remove references to foreign objects
+  if (@sub_refs) {
+    carp "data passed to update() contained nested references : ",
+      CORE::join ", ", sort @sub_refs;
+    delete @{$to_set}{@sub_refs};
+  }
+
+  # THINK : instead of removing references to foreign objects, one could
+  # maybe perform recursive updates (including insert/update/delete of child
+  # objects)
+}
+
+
 
 
 sub update  {
-  my ($self, @args) = @_;
+  my $self = shift;
 
-  my $metadm      = $self->metadm;
-  my $meta_schema = $metadm->schema;
-  my $schema;
+  # prepare datastructures for generating the SQL
+  my ($to_set, $where) = $self->_parse_update_args(@_);
+  $self->_apply_handlers_for_update($to_set, $where);
 
-  if (ref $self) { 
-    if (@args) { # if called as $obj->update({field => $val, ...})
-      # will call $class->update(@prim_key, {field => $val, ...}
-      unshift @args, $self->primary_key;
-    }
-    else { # if called as $obj->update()
-      # will call $class->update($self)
-      @args = ($self);
-    }
-    $schema = delete $self->{__schema};
+  # database request
+  my $schema       = $self->schema;
+  my $sqla         = $schema->sql_abstract;
+  my ($sql, @bind) = $sqla->update(
+    -table => $self->db_from,
+    -set   => $to_set,
+    -where => $where,
+   );
+  $schema->_debug(do {no warnings 'uninitialized';
+                      $sql . " / " . CORE::join(", ", @bind);});
+  my $prepare_method = $schema->dbi_prepare_method;
+  my $sth            = $schema->dbh->$prepare_method($sql);
+  $sqla->bind_params($sth, @bind);
+  return $sth->execute(); # will return the number of updated records
+}
+
+
+#------------------------------------------------------------
+# utility methods
+#------------------------------------------------------------
+
+sub db_from {
+  my $self = shift;
+
+  my $db_from   = $self->metadm->db_from;
+  my $db_schema = $self->schema->db_schema;
+
+  # prefix table with $db_schema if non-empty and there is no hardwired db_schema
+  return $db_schema && $db_from !~ /\./ ? "$db_schema.$db_from" : $db_from;
+}
+
+sub has_invalid_columns {
+  my ($self) = @_;
+  my $results = $self->apply_column_handler('validate');
+  my @invalid;			# names of invalid columns
+  while (my ($k, $v) = each %$results) {
+    push @invalid, $k if defined($v) and not $v;
   }
+  return @invalid ? \@invalid : undef;
+}
 
-  # if in single-schema mode, or called as $class->update(@args)
-  $schema ||= $meta_schema->class->singleton;
+sub _parse_ending_options {
+  my ($class_or_self, $args_ref, $regex) = @_;
 
-  # delegate to the connected_source class
-  my $cs_class = $meta_schema->connected_source_class;
-  load $cs_class;
-  $cs_class->new($metadm, $schema)->update(@args);
+  # end of list may contain options, recognized because option name is a
+  # scalar matching the given regex
+  my %options;
+  while (@$args_ref >= 2 && !ref $args_ref->[-2] 
+                         && $args_ref->[-2] && $args_ref->[-2] =~ $regex) {
+    my ($opt_val, $opt_name) = (pop @$args_ref, pop @$args_ref);
+    $options{$opt_name} = $opt_val;
+  }
+  return \%options;
 }
 
 
@@ -378,6 +645,8 @@ This module implements
 
 =item L<hasInvalidColumns|DBIx::DataModel::Doc::Reference/hasInvalidColumns>
 
+=item L<db_from|DBIx::DataModel::Doc::Reference/db_from>
+
 =back
 
 
@@ -388,10 +657,9 @@ Laurent Dami, C<< <laurent.dami AT etat.ge.ch> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006..2012 Laurent Dami.
+Copyright 2006..2017 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-
 
 

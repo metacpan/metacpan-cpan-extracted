@@ -9,11 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "generates CPAN like project documents from pod.",
   "AUTHOR" => "Martin Gruner <martin.gruner\@cpan.org>, Lyo Kato <lyo.kato\@gmail.com>",
-  "BUILD_REQUIRES" => {
-    "File::Path" => 0,
-    "Test::More" => 0,
-    "lib" => 0
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -40,9 +35,12 @@ my %WriteMakefileArgs = (
     "Template" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::Pod" => 0
+    "File::Path" => 0,
+    "Test::More" => 0,
+    "Test::Pod" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.50",
+  "VERSION" => "0.51",
   "test" => {
     "TESTS" => "t/*.t"
   }

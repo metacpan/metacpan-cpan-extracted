@@ -18,6 +18,10 @@ use File::Spec;
 # test will fail
 # This test might also fail in various non-Linux environments...
 
+if ( $^O eq 'MSWin32' ) {
+    plan( skip_all => 'skip fork tests on MSWin32' ) ;
+}
+
 my $tmpfile =
     File::Spec->catfile( File::Spec->tmpdir, 'CtrlO_Crypt_XkcdPassword.txt' );
 unlink($tmpfile);

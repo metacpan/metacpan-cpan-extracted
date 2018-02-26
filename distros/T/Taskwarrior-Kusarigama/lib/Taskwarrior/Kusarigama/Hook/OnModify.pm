@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnModify;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the task modification stage
-$Taskwarrior::Kusarigama::Hook::OnModify::VERSION = '0.6.0';
+$Taskwarrior::Kusarigama::Hook::OnModify::VERSION = '0.7.0';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Taskwarrior::Kusarigama::Hook::OnModify - Role for plugins running during the ta
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,7 @@ use Pod::ProjectDocs;
 Pod::ProjectDocs->new(
     outroot  => "$FindBin::Bin/01_project_output",
     libroot  => "$FindBin::Bin/sample/lib",
+    except   => [qr/some-random-non-existing-value-to-test-except/],
     forcegen => 1,
 )->gen();
 

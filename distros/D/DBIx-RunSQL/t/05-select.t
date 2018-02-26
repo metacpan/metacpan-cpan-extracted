@@ -11,6 +11,7 @@ my $can_run = eval {
 
 if (not $can_run) {
     plan skip_all => "SQLite not installed";
+    exit;
 }
 
 plan tests => 6;

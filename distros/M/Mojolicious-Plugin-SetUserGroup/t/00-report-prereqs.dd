@@ -13,10 +13,9 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'List::Util' => '1.33',
                                       'Mojolicious' => '6.0',
                                       'POSIX' => '0',
-                                      'Unix::Groups' => '0',
+                                      'Unix::Groups::FFI' => '0',
                                       'perl' => '5.010001'
                                     }
                     },

@@ -54,4 +54,4 @@ resources:
   bugtracker: https://github.com/fredericd/koha-sudoc/issues
   homepage: http://www.tamil.fr/sudoc/sudoc.html
   repository: https://github.com/fredericd/koha-sudoc
-version: '2.23'
+version: '2.24'

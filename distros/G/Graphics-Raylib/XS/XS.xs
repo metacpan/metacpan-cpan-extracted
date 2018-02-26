@@ -849,7 +849,11 @@ Vector2
 GetGesturePinchVector()
 
 int
-GetHexValue(color)
+ColorToInt(color)
+    Color    color
+
+Vector3
+ColorToHSV(color)
     Color    color
 
 Color *

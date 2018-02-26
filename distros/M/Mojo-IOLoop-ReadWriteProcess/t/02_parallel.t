@@ -133,16 +133,19 @@ subtest stress_test => sub {
   plan skip_all => "set STRESS_TEST=1 (be careful)" unless $ENV{STRESS_TEST};
 
   # Push the maximum_processes boundaries and let's see events are fired.
-  my $n_proc = 100;
+  my $n_proc = 2000;
   my $fired;
   my $p = pool;
   $p->maximum_processes($n_proc);
-  $p->add(code => sub { sleep 3; exit(20) }, internal_pipes => 0, set_pipes => 0)
-    for 1 .. $n_proc;
+  $p->add(
+    code => sub { sleep 3; exit(20) },
+    internal_pipes => 0,
+    set_pipes      => 0
+  ) for 1 .. $n_proc;
   $p->once(stop => sub { $fired++ });
   $p->start->wait;
   is $fired, $n_proc;
-  $p->each(sub {is $_->exit_status,"20"});
+  $p->each(sub { is $_->exit_status, "20" });
 };
 
 done_testing;

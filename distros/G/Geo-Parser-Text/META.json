@@ -1,16 +1,16 @@
 {
-   "abstract" : "Perl extension for parsing, geocoding and standardizing locations from free form text. (See Geocode.xyz or Geolytica.com or addrs.xyz for coverage details)",
+   "abstract" : "Perl extension for geoparsing, geocoding and standardizing locations from free form text. Worldwide Coverage. Geocode places to latitude, longitude, elevation. And vice-versa.",
    "author" : [
       "Ervin Ruci <eruci@geocoder.ca>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Parser-Text",
    "no_index" : {
@@ -32,14 +32,17 @@
       },
       "runtime" : {
          "requires" : {
-            "HTTP::Request" : "1",
-            "LWP::UserAgent" : "1",
-            "URI" : "1",
-            "XML::Simple" : "1",
-            "perl" : "5.006"
+            "Data::Dumper" : "2.161",
+            "HTTP::Request" : "6.14",
+            "LWP::UserAgent" : "6.32",
+            "URI" : "1.73",
+            "XML::Simple" : "2.24",
+            "perl" : "5.006",
+            "utf8::all" : "0.024"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04"
+   "version" : "0.051",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

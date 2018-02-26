@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Vparam
 
+3.04    23-02-2018
+    - Add new type "object"
+
 3.03    15-11-2017
     - No error for hash params if optional and value not set
 

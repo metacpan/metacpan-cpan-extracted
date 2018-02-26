@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Carp: '1.22'
-  Data::Dumper: '2.101'
-  File::Spec: '3.26'
-  HTML::Template: '2.1'
-version: '0.03'
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Spec: '0'
+  HTML::Template: '0'
+version: '0.04'

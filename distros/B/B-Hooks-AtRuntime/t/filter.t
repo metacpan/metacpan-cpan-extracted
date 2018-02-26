@@ -11,10 +11,10 @@ no warnings "redefine";
 my $dt = \&Test::More::done_testing;
 *done_testing = *Test::More::done_testing = sub { 1; };
 
-require "t/basic.t";
-require "t/timing.t";
-require "t/destroy.t";
-require "t/scope.t";
-require "t/stuff.t";
+require "./t/basic.t";
+require "./t/timing.t";
+require "./t/destroy.t";
+require "./t/scope.t";
+require "./t/stuff.t";
 
 $dt->();

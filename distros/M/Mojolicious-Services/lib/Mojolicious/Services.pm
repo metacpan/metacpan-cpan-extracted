@@ -5,10 +5,10 @@ use Mojo::Loader qw/find_modules load_class/;
 use Mojo::Util qw/camelize decamelize/;
 use Scalar::Util;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.1.0';
 
 has services => sub{{}};
-has namespaces=>sub{["Mojolicious::Service"]};
+has namespaces => sub{["Mojolicious::Service"]};
 has lazy => 1;
 
 
@@ -18,13 +18,14 @@ sub load_service{
   # Try all namespaces and full module name
   my $suffix = $name =~ /^[a-z0-9]/ ? camelize $name : $name;
   my @classes = map {"${_}::$suffix"} @{$self->namespaces};
-  for my $class (@classes, $name) {
+  for my $class (@classes, $name){
     if(_load($class)){
-      my $service = $class->new(models=>$self->models,dbi=>$self->dbi,app=>$self->app);
+      my $service = $class->new(models => $self->models, dbi => $self->dbi, app => $self->app, parent => $self);
       Scalar::Util::weaken $service->{app};
       Scalar::Util::weaken $service->{models};
       Scalar::Util::weaken $service->{dbi};
-      $self->service($name,$service);
+      Scalar::Util::weaken $service->{parent};
+      $self->service($name, $service);
       return $service;
     }
   }
@@ -36,24 +37,25 @@ sub load_service{
 sub load_all_service{
   my $self = shift;
   foreach(map{find_modules($_)}@{$self->namespaces}){
-    $_=~/^.+\:([^\:]+)$/;
+    $_ =~ /^.+\:([^\:]+)$/;
     my $name = decamelize($1);
     if(_load($_)){
-      my $service = $_->new(models=>$self->models,dbi=>$self->dbi,app=>$self->app);
+      my $service = $_->new(models => $self->models, dbi => $self->dbi, app => $self->app, parent => $self);
       Scalar::Util::weaken $service->{app};
       Scalar::Util::weaken $service->{models};
       Scalar::Util::weaken $service->{dbi};
-      $self->service($name,$service);
+      Scalar::Util::weaken $service->{parent};
+      $self->service($name, $service);
     }
   }
 }
 
 sub new{
-  my ($self,$conf) = @_;
+  my ($self, $conf) = @_;
   my $namespaces = delete $conf->{namespaces} if($conf->{namespaces});
   $self = $self->SUPER::new($conf);
   if($namespaces && ref $namespaces eq "ARRAY"){
-    unshift(@{$self->namespaces},$_) for(reverse @$namespaces);
+    unshift(@{$self->namespaces}, $_) for(reverse @{$namespaces});
   }
   $self->load_all_service unless($self->lazy);
   return $self;
@@ -81,9 +83,9 @@ sub service{
 
 
 
-sub _load {
+sub _load{
   my $module = shift;
-  return $module->isa('Mojolicious::Service') unless my $e = load_class $module;
+  return $module->isa('Mojolicious::Service') unless(my $e = load_class $module);
   ref $e ? die $e : return undef;
 }
 

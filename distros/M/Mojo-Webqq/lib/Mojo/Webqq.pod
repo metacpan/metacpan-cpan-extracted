@@ -27,19 +27,19 @@ Mojo::Webqq - A Webqq Client Framework base on Mojolicious
     use Mojo::Webqq;
     my $client=Mojo::Webqq->new(
         http_debug  =>  0,         #是否打印详细的debug信息
-        log_level   =>  "info"     #日志打印级别，debug|info|msg|warn|error|fatal
-        login_type  =>  "qrlogin"  #登录方式，qrlogin 表示二维码登录
+        log_level   =>  "info",    #日志打印级别，debug|info|msg|warn|error|fatal
+        login_type  =>  "qrlogin", #登录方式，qrlogin 表示二维码登录
     );
 
     #初始化一个客户端，采用账号密码登录方式，需要显式设置账号和密码
     use Mojo::Webqq;
     use Digest::MD5 qw(md5_hex);
     my $client=Mojo::Webqq->new(
-        account     => 123456      #QQ账号
-        pwd         => md5_hex('你的QQ账号登录密码')  #登录密码
-        http_debug  =>  0,         #是否打印详细的debug信息
-        log_level   =>  "info"     #日志打印级别，debug|info|msg|warn|error|fatal
-        login_type  =>  "login"    #登录方式，login 表示账号密码登录
+        account     => 123456,      #QQ账号
+        pwd         => md5_hex('你的QQ账号登录密码'),  #登录密码
+        http_debug  =>  0,          #是否打印详细的debug信息
+        log_level   =>  "info",     #日志打印级别，debug|info|msg|warn|error|fatal
+        login_type  =>  "login",    #登录方式，login 表示账号密码登录
     );
     
     #注意: 原生的SmartQQ是不支持账号密码登录的
@@ -474,9 +474,13 @@ Mojo::Webqq - A Webqq Client Framework base on Mojolicious
     #如果你完全不关注这些特性，可以关闭定期更新
     is_update_user      #是否定期更新个人信息，默认值 0
     is_update_group     #是否定期更新群组信息，默认值 1
+    is_update_group_member #是否定期更新群成员信息，默认值 1
+    is_update_group_member_ext  #是否定期更新群成员扩展信息，扩展信息包含QQ号，默认值0，即新增成员才会更新
     is_update_friend    #是否定期更新好友信息，默认值 1
     is_update_discuss   #是否定期更新讨论组信息，默认值 1
     update_interval     #定时更新群组、好友、讨论组等信息的时间间隔，默认600秒
+
+    group_member_use_friend_markname #群成员使用好友备注名(如果是好友关系并且备注存在)
 
     is_fetch_notice     #是否获取公告信息，默认值 1
 
@@ -1498,6 +1502,8 @@ QQ群每日签到插件
 
     $client->load("SmartReply",data=>{
         apikey          => '4c53b48522ac4efdfe5dfb4f6149ae51', #可选，参考http://www.tuling123.com/html/doc/apikey.html
+        friend_reply    => 1, #是否针对好友消息智能回复
+        group_reply     => 1, #是否针对群消息智能回复
         allow_group     => ["PERL学习交流"],  #可选，允许插件的群，可以是群名称或群号码
         ban_group       => ["私人群",123456], #可选，禁用该插件的群，可以是群名称或群号码
         ban_user        => ["坏蛋",123456], #可选，禁用该插件的用户，可以是用户的显示名称或qq号码

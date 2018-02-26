@@ -1,0 +1,80 @@
+NAME
+
+    Encode::Simple - Encode and decode text, simply
+
+SYNOPSIS
+
+      use Encode::Simple qw(encode decode encode_lax decode_lax);
+      my $characters = decode 'cp1252', $bytes;
+      my $characters = decode_lax 'UTF-8', $bytes;
+      my $bytes = encode 'Shift_JIS', $characters;
+      my $bytes = encode_lax 'ASCII', $characters;
+
+DESCRIPTION
+
+    This module is a simple wrapper around Encode that presents "encode"
+    and "decode" functions with straightforward behavior and error
+    handling. See Encode::Supported for a list of supported encodings.
+
+FUNCTIONS
+
+    All functions are exported by name, as well as via the tags :all,
+    :strict, and :lax. By default, "encode" and "decode" are exported.
+
+ encode
+
+      my $bytes = encode $encoding, $characters;
+
+    Encodes the input string of characters into a byte string using
+    $encoding. Throws an exception if the input string contains characters
+    that are not valid or possible to represent in $encoding.
+
+ encode_lax
+
+      my $bytes = encode_lax $encoding, $characters;
+
+    Encodes the input string of characters as in "encode", but instead of
+    throwing an exception on invalid input, any invalid characters are
+    encoded as a substitution character (the substitution character used
+    depends on the encoding). Note that some encoders do not respect this
+    option and may throw an exception anyway, this notably includes
+    Encode::Unicode (but not UTF-8).
+
+ decode
+
+      my $characters = decode $encoding, $bytes;
+
+    Decodes the input byte string into a string of characters using
+    $encoding. Throws an exception if the input bytes are not valid for
+    $encoding.
+
+ decode_lax
+
+      my $characters = decode_lax $encoding, $bytes;
+
+    Decodes the input byte string as in "decode", but instead of throwing
+    an exception on invalid input, any malformed bytes will be decoded to
+    the Unicode replacement character (U+FFFD). Note that some encoders do
+    not respect this option and may throw an exception anyway, this notably
+    includes Encode::Unicode (but not UTF-8).
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Unicode::UTF8
+

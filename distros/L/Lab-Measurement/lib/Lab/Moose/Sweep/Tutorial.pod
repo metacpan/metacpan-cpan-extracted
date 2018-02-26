@@ -14,7 +14,7 @@ Lab::Moose::Sweep::Tutorial - Documentation of high-level sweep framework
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 Datafiles and datafolders
 
@@ -439,20 +439,48 @@ Note that the rate is given in Tesla/min.
      instrument => $ips,
      from => -1, # Tesla
      to => 1,
-     rate => 0.1, (Tesla/min, always positive)
-     start_rate => 1, (optional, rate to approach start point)
+     rate => 0.1, # (Tesla/min, always positive)
+     start_rate => 1, # (optional, rate to approach start point)
      interval => 0.5, # one measurement every 0.5 seconds
  );
 
 =head1 Further customization
 
-=head2 delay_before_loop, delay_in_loop, delay_after_loop
+=head2 The delay_before_loop, delay_in_loop, and delay_after_loop attributes
 
-TODO
+These attributes can be used to introduce delays into a sweep:
 
-=head2 before_loop coderef
+ my $sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $source,
+     from => -5, to => 5, step => 0.01,
+     delay_before_loop => 1.5,
+     delay_in_loop => 0.1,
+     delay_after_loop => 2.5,
+ );
 
-TODO
+With C<delay_before_loop> set, the sweep will sleep 1.5 seconds before
+starting the sweep (after going to the start point of the sweep). With
+C<delay_in_loop> set, there is a sleep between going to the setpoint and
+calling the measurement subroutine. The C<delay_after_loop> causes a delay
+between finishing the sweep and going back to the start point.
+
+=head2 The before_loop coderef
+
+The C<before_loop> coderef is used to execute arbitrary code at the start of a sweep:
+
+ my $before_loop = sub {
+     print("will start loop now\n");
+ };
+
+ my $sweep = sweep(
+     type       => 'Step::Voltage',
+     instrument => $source,
+     from => -5, to => 5, step => 0.01,
+     before_loop => $before_loop,
+ );
+
+The C<$before_loop> code is called after a possible C<delay_before_loop> delay.
 
 =head1 COPYRIGHT AND LICENSE
 

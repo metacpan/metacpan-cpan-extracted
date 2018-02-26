@@ -1,7 +1,7 @@
 package App::cpm::Resolver::Cascade;
 use strict;
 use warnings;
-our $VERSION = '0.958';
+our $VERSION = '0.960';
 
 sub new {
     my $class = shift;

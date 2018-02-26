@@ -17,7 +17,9 @@ $obj = Thunking->new(children => sub { [$obj] });
 is_deeply $obj->children, [ $obj ];
 
 $obj = Thunking->new(children => [$obj]);
+$@ = '';
 is_deeply $obj->children, [ $obj ];
+is $@, '', '$@ still empty';
 
 $obj = Thunking->new(children => sub { { key => 'delayed wrong type' } });
 eval { $obj->children };

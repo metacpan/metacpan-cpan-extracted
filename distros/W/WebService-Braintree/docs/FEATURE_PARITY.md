@@ -63,16 +63,16 @@ Braintree API. These classes follow a specific form:
 | Customer | update\_from\_transparent\_redirect | Yes | No | |
 | Discount | all | | Yes | Yes |
 | Dispute | accept | | Yes | |
-| Dispute | add\_file\_evidence | | No | |
+| Dispute | add\_file\_evidence | | Yes | |
 | Dispute | add\_text\_evidence | | Yes | |
 | Dispute | finalize | | Yes | |
 | Dispute | find | | Yes | |
 | Dispute | remove\_evidence | | Yes | |
 | Dispute | search | | Yes | |
-| DocumentUpload | create | | No | |
-| EuropeBankAccount | find | | No | |
-| IdealPayment | sale | | No | |
-| IdealPayment | find | | No | |
+| DocumentUpload | create | | Yes | |
+| EuropeBankAccount | find | | Yes | |
+| IdealPayment | find | | Yes | |
+| IdealPayment | sale | | Yes | |
 | Merchant | provision\_raw\_apple\_pay | | No | |
 | MerchantAccount | all | ??? | Yes | |
 | MerchantAccount | create | | Yes | |
@@ -124,8 +124,8 @@ Braintree API. These classes follow a specific form:
 | TransparentRedirect | update\_credit\_card\_data | | Yes | |
 | TransparentRedirect | update\_customer\_data | | Yes | |
 | TransparentRedirect | url | | Yes | |
-| UsBankAccount | find | | No | |
-| UsBankAccount | sale | | No | |
+| UsBankAccount | find | | Yes | |
+| UsBankAccount | sale | | Yes | |
 | WebhookNotification | parse | | Yes | |
 | WebhookNotification | verify | | Yes | |
 | WebhookTesting | sample\_notification | | Yes | |

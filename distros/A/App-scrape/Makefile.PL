@@ -37,6 +37,7 @@ my %module = (
                         'Pod::Usage'               => 0,
                         'List::MoreUtils'          => 0, # for JSON output
                         'JSON'                     => 0, # for JSON output
+                        'Text::CSV_XS'             => 0, # for CSV output
                       },
     ABSTRACT_FROM   => 'lib/App/scrape.pm', # retrieve abstract from module
     AUTHOR          => 'Max Maischein <corion@cpan.org>',

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-08-16'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-02-26'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -120,7 +120,7 @@ diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.003 of diffwc (from Perl distribution App-diffwc), released on 2017-08-16.
+This document describes version 0.004 of diffwc (from Perl distribution App-diffwc), released on 2018-02-26.
 
 =head1 SYNOPSIS
 
@@ -142,7 +142,7 @@ This is a wrapper for the GNU command-line utility B<diff>. It adds word
 highlighting and colors (note that GNU diff 3.4 or later supports C<--color>
 already).
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-diffwc-0.003/share/images/screenshot.jpg" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-diffwc-0.004/share/images/screenshot.jpg" />
 
 =head1 COMPLETION
 
@@ -177,6 +177,17 @@ It is also recommended to install C<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 COLOR
+
+Boolean.
+
+=head2 COLOR_THEME
+
+String. Will search color themes in C<App::diffwc::ColorTheme::*> as well as
+C<Generic::ColorTheme::*> modules.
 
 =head1 HOMEPAGE
 
@@ -213,7 +224,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

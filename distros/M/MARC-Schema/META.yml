@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/jorol/MARC-Schema/issues
   homepage: https://github.com/jorol/MARC-Schema
   repository: https://github.com/jorol/MARC-Schema.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.69'

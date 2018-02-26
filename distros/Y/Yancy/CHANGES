@@ -1,5 +1,98 @@
 Changelog for Yancy
 
+0.020     2018-02-25 14:42:31-06:00 America/Chicago
+
+    [Added]
+
+    - Added a new responsive sidebar menu to the editor. This menu
+      performs better on mobile devices.
+
+    [Fixed]
+
+    - Fixed integration test for other backends. This wouldn't have
+      prevented installing, but could have hidden bugs in backends.
+    - Fixed "add item" button to be more visible when the add item form
+      was open. Clicking on the "add item" button will now close the add
+      item form.
+    - Fixed bad Auth::Basic plugin configuration causing strange errors.
+      The configuration is now checked for sanity before continuing.
+    - Fixed `auth` layout being too big for the page, causing
+      a scrollbar to appear.
+
+    [Docs]
+
+    - Moved standalone app docs to another file. This should
+      de-emphasize the standalone app, which is more of a curiosity than
+      a useful product.
+
+    [Other]
+
+    - Upgrade to Bootstrap 4.0.0 release. Previously we were using the
+      4.0.0 beta version. The stable release version re-adds offset
+      classes and other utilities that we need.
+    - Moved `controller_class` configuration to `api_controller`, which
+      better defines what the class does. The controller class itself is
+      now `Yancy::Controller::Yancy::API`, to better describe what it
+      does and to free up the `Yancy` name for future development.
+
+      This future development should make the `MultiTenant` controller
+      more useful and make developing apps with Yancy even easier.
+
+0.019     2018-02-23 23:25:57-06:00 America/Chicago
+
+    [Added]
+
+    - Added a layout template for auth plugin. This layout template
+      doesn't have confusing links like "Yancy" and "Back to
+      Application".
+    - Added error message when login fails
+
+    [Fixed]
+
+    - Fixed missing documentation for title/description fields in
+      collections. Thanks @lindleyw! [Github #11]
+    - Fixed documentation for auth plugin: The code examples were
+      completely broken.
+    - Fixed login form losing the return to URL if there was a login
+      failure.
+    - Fixed editor displaying no content when URL points to
+      a non-existent page
+    - Fixed "Back to Application" link being collapsed behind a menu
+      button on small screens
+    - Fixed collection title not being used in the collection navigation
+      list
+    - Improved responsiveness of editor application: Now the collection
+      list takes up more space on smaller screens to avoid wrapping of
+      collection names.
+
+0.018     2018-02-21 18:10:29-06:00 America/Chicago
+
+    [Added]
+
+    - Added `plugin` helper to easily load Yancy plugins
+    - Added `auth->route` helper to Yancy::Plugin::Auth::Basic to allow
+      adding more routes that require authentication.
+
+    [Fixed]
+
+    - Fixed displaying login form requiring authentication if auth
+      covered the entire site
+    - Fixed wrong tables being found when reading MySQL or Postgres
+      database schemas. These database systems allow multiple schemas in
+      a single database instance, so we need to make sure we're reading
+      from the right schema.
+    - Fixed the SQLite backend docs using invalid SQL syntax. Thanks
+      @Akron [Github #10]
+    - Fixed test module (Yancy::Backend::Test) being installed with rest
+      of project
+
+    [Other]
+
+    - Run all tests under all backends using Travis. All supported
+      backends are running all Yancy tests instead of just their
+      individual backend tests. This should help to ensure that every
+      backend has the same behavior and functionality.
+
 0.017     2018-02-17 22:25:32-06:00 America/Chicago
 
     [Added]

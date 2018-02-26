@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,26 +20,26 @@ meta-spec:
 name: Markdown-Pod
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Markdown::Pod:
     file: lib/Markdown/Pod.pm
-    version: '0.006'
+    version: '0.007'
   Markdown::Pod::Handler:
     file: lib/Markdown/Pod/Handler.pm
-    version: '0.006'
+    version: '0.007'
   Markdown::Pod::script:
     file: lib/Markdown/Pod/script.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Getopt::Long: '0'
   List::Util: '0'
-  Markdent: '0.25'
+  Markdent: '0.27'
   Moose: '0'
   MooseX::Params::Validate: '0'
   MooseX::SemiAffordanceAccessor: '0'
@@ -52,9 +52,10 @@ resources:
   bugtracker: https://github.com/keedi/Markdown-Pod/issues
   homepage: https://github.com/keedi/Markdown-Pod
   repository: https://github.com/keedi/Markdown-Pod.git
-version: '0.006'
+version: '0.007'
 x_authority: cpan:KEEDI
 x_contributors:
   - 'Andrew Speer (ASPEER) <andrew@webdyne.org>'
   - 'Jason McIntosh (JMAC) <jmac@jmac.org>'
   - 'Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

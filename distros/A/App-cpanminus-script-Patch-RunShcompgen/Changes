@@ -1,3 +1,9 @@
+0.004   2018-02-20 (PERLANCAR)
+
+	- [Bugfix] Used 'return' instead of 'last' to return original
+	  install() result.
+
+
 0.003   2018-02-18 (PERLANCAR)
 
 	- No functional changes.

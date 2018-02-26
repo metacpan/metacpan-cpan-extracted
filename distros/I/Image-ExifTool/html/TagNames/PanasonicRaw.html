@@ -50,105 +50,120 @@
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0008 = 8'>0x0008</td>
-<td>BlackLevel1</td>
-<td class=c>int16u</td>
-<td><span class=s><span class=n>(summing BlackLevel1+2+3 values gives the common bias that must be added to
-the BlackLevelRed/Green/Blue tags below)</span></span></td></tr>
+<td>SamplesPerPixel</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td title='0x0009 = 9'>0x0009</td>
-<td>BlackLevel2</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
+<td>CFAPattern</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
+<td><span class=s>0 = n/a
+  <br>1 = [Red,Green][Green,Blue]
+  <br>2 = [Green,Red][Blue,Green]
+  <br>3 = [Green,Blue][Red,Green]
+  <br>4 = [Blue,Green][Green,Red]</span></td></tr>
 <tr class=b>
 <td title='0x000a = 10'>0x000a</td>
-<td>BlackLevel3</td>
-<td class=c>int16u</td>
+<td>BitsPerSample</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x000b = 11'>0x000b</td>
+<td>Compression</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
+<td><span class=s>34316 = Panasonic RAW 1
+  <br>34826 = Panasonic RAW 2
+  <br>34828 = Panasonic RAW 3</span></td></tr>
+<tr class=b>
 <td title='0x000e = 14'>0x000e</td>
 <td>LinearityLimitRed</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x000f = 15'>0x000f</td>
 <td>LinearityLimitGreen</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0010 = 16'>0x0010</td>
 <td>LinearityLimitBlue</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0011 = 17'>0x0011</td>
 <td>RedBalance</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(found in Digilux 2 RAW images)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0012 = 18'>0x0012</td>
 <td>BlueBalance</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0013 = 19'>0x0013</td>
 <td>WBInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PanasonicRaw.html#WBInfo'>PanasonicRaw WBInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0017 = 23'>0x0017</td>
 <td>ISO</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0018 = 24'>0x0018</td>
 <td>HighISOMultiplierRed</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0019 = 25'>0x0019</td>
 <td>HighISOMultiplierGreen</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x001a = 26'>0x001a</td>
 <td>HighISOMultiplierBlue</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x001c = 28'>0x001c</td>
 <td>BlackLevelRed</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x001d = 29'>0x001d</td>
 <td>BlackLevelGreen</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x001e = 30'>0x001e</td>
 <td>BlackLevelBlue</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0024 = 36'>0x0024</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0025 = 37'>0x0025</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0026 = 38'>0x0026</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0027 = 39'>0x0027</td>
 <td>WBInfo2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PanasonicRaw.html#WBInfo2'>PanasonicRaw WBInfo2 Tags</a></td></tr>
+<tr>
+<td title='0x002d = 45'>0x002d</td>
+<td>RawFormat</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x002e = 46'>0x002e</td>
 <td>JpgFromRaw</td>
@@ -225,21 +240,26 @@ the BlackLevelRed/Green/Blue tags below)</span></span></td></tr>
 <td class=c>-</td>
 <td>--&gt; <a href='PanasonicRaw.html#DistortionInfo'>PanasonicRaw DistortionInfo Tags</a></td></tr>
 <tr>
+<td title='0x0120 = 288'>0x0120</td>
+<td>CameraIFD</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PanasonicRaw.html#CameraIFD'>PanasonicRaw CameraIFD Tags</a></td></tr>
+<tr class=b>
 <td title='0x02bc = 700'>0x02bc</td>
 <td>ApplicationNotes</td>
 <td class=c title=' ! = Unsafe'>int8u!</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x83bb = 33723'>0x83bb</td>
 <td>IPTC-NAA</td>
 <td class=c title=' ! = Unsafe'>int32u!</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8769 = 34665'>0x8769</td>
 <td>ExifOffset</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8825 = 34853'>0x8825</td>
 <td>GPSInfo</td>
 <td class=c>-</td>
@@ -463,9 +483,22 @@ the BlackLevelRed/Green/Blue tags below)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CameraIFD'>PanasonicRaw CameraIFD Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x1101 = 4353'>0x1101</td>
+<td>FocusDistance</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 11, 2015</i>
+<br><i>Last revised Feb 20, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

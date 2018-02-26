@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.015';
+$Log::Dispatchouli::VERSION = '2.016';
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
@@ -245,6 +245,7 @@ sub new {
   $self->{debug}  = exists $arg->{debug}
                   ? ($arg->{debug} ? 1 : 0)
                   : ($self->env_value('DEBUG') ? 1 : 0);
+  $self->{muted}  = $arg->{muted};
 
   $self->{fail_fatal} = exists $arg->{fail_fatal} ? $arg->{fail_fatal} : 1;
 
@@ -696,7 +697,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.015
+version 2.016
 
 =head1 SYNOPSIS
 
@@ -1044,7 +1045,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker George Hartzell Matt Phillips Olivier Mengué Randy Stauner Sawyer X
+=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Matt Phillips Olivier Mengué Randy Stauner Sawyer X
 
 =over 4
 
@@ -1055,6 +1056,10 @@ Christopher J. Madsen <perl@cjmweb.net>
 =item *
 
 Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
 
 =item *
 
@@ -1080,7 +1085,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2018 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -5,21 +5,23 @@ package DBIx::DataModel::Statement;
 
 use warnings;
 use strict;
-use Carp;
-use List::Util       qw/min first/;
+use List::Util       qw/min/;
 use List::MoreUtils  qw/firstval any/;
-use Scalar::Util     qw/weaken refaddr reftype dualvar/;
-use Params::Validate qw/validate ARRAYREF HASHREF/;
+use Scalar::Util     qw/weaken dualvar/;
 use POSIX            qw/LONG_MAX/;
-use Acme::Damn       qw/damn/;
 use Clone            qw/clone/;
-use Try::Tiny;
+use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Try::Tiny        qw/try catch/;
+use Module::Load     qw/load/;
+use mro              qw/c3/;
 
 use DBIx::DataModel;
-use DBIx::DataModel::Meta::Utils;
+use DBIx::DataModel::Meta::Utils qw/define_readonly_accessors does/;
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+#----------------------------------------------------------------------
+# internals
+#----------------------------------------------------------------------
 
 use overload
 
@@ -50,22 +52,22 @@ use constant {
 #----------------------------------------------------------------------
 
 sub new {
-  my ($class, $connected_source, %other_args) = @_;
+  my ($class, $source, %other_args) = @_;
 
-  # check $connected_source
-  $connected_source 
-    && $connected_source->isa('DBIx::DataModel::ConnectedSource')
-    or croak "invalid connected_source for DBIx::DataModel::Statement->new()";
+  # check $source
+  $source 
+    && $source->isa('DBIx::DataModel::Source')
+    or croak "invalid source for DBIx::DataModel::Statement->new()";
 
   # build the object
   my $self = bless {status           => NEW,
                     args             => {},
                     pre_bound_params => {},
                     bound_params     => [],
-                    connected_source => $connected_source}, $class;
+                    source           => $source}, $class;
 
   # add placeholder_regex
-  my $prefix = $connected_source->schema->{placeholder_prefix};
+  my $prefix = $source->schema->{placeholder_prefix};
   $self->{placeholder_regex} = qr/^\Q$prefix\E(.+)/;
 
   # parse remaining args, if any
@@ -76,24 +78,30 @@ sub new {
 
 
 # accessors
-DBIx::DataModel::Meta::Utils->define_readonly_accessors(
-  __PACKAGE__, qw/connected_source status/,
-);
-sub meta_source {shift->{connected_source}->meta_source}
-sub schema      {shift->{connected_source}->schema}
+define_readonly_accessors( __PACKAGE__, qw/source status/);
+
+# proxy methods
+sub meta_source {shift->{source}->metadm}
+sub schema      {shift->{source}->schema}
 
 
-
-# THINK : not documented yet, is this method useful ?
+# back to the original state
 sub reset {
   my ($self, %other_args) = @_;
 
-  my $new = (ref $self)->new($self->{connected_source}, %other_args);
+  my $new = (ref $self)->new($self->{source}, %other_args);
   %$self = (%$new);
 
   return $self;
 }
 
+
+sub arg {
+  my ($self, $arg_name) = @_;
+
+  my $args = $self->{args} || {};
+  return $args->{$arg_name};
+}
 
 
 
@@ -105,8 +113,8 @@ sub reset {
 sub sql {
   my ($self) = @_;
 
-  $self->{status} >= SQLIZED
-    or croak "can't call sql() when in status $self->{status}";
+  $self->status >= SQLIZED
+    or croak "can't call sql() when in status ". $self->status;
 
   return wantarray ? ($self->{sql}, @{$self->{bound_params}})
                    : $self->{sql};
@@ -118,10 +126,13 @@ sub bind {
 
   # arguments can be a list, a hashref or an arrayref
   if (@args == 1) {
-    for (reftype($args[0]) || "") {
-      /^HASH$/  and do {@args = %{$args[0]}; last;};
-      /^ARRAY$/ and do {my $i = 0; @args = map {($i++, $_)} @{$args[0]}; last};
-      #otherwise
+    if (does $args[0], 'HASH') {
+      @args = %{$args[0]};
+    }
+    elsif (does $args[0], 'ARRAY') {
+      my $i = 0; @args = map {($i++, $_)} @{$args[0]};
+    }
+    else {
       croak "unexpected arg type to bind()";
     }
   }
@@ -135,7 +146,7 @@ sub bind {
 
   # do bind (different behaviour according to status)
   my %args = @args;
-  if ($self->{status} < SQLIZED) {
+  if ($self->status < SQLIZED) {
     while (my ($k, $v) = each %args) {
       $self->{pre_bound_params}{$k} = $v;
     }
@@ -148,6 +159,10 @@ sub bind {
     }
   }
 
+  # THINK : probably we should check here that $args{__schema}, if present,
+  # is the same as $self->schema (same database connection) ... but how
+  # to check for "sameness" on database handles ?
+
   return $self;
 }
 
@@ -155,8 +170,8 @@ sub bind {
 sub refine {
   my ($self, %more_args) = @_;
 
-  $self->{status} <= REFINED
-    or croak "can't refine() when in status $self->{status}";
+  $self->status <= REFINED
+    or croak "can't refine() when in status " . $self->status;
   $self->{status} = REFINED;
 
   my $args = $self->{args};
@@ -200,7 +215,7 @@ sub refine {
 
       # -columns : store in $self->{args}{-columns}; can restrict previous list
       /^-columns$/ and do {
-        my @cols = ref $v ? @$v : ($v);
+        my @cols = does($v, 'ARRAY') ? @$v : ($v);
         if (my $old_cols = $args->{-columns}) {
           unless (@$old_cols == 1 && $old_cols->[0] eq '*' ) {
             foreach my $col (@cols) {
@@ -215,15 +230,17 @@ sub refine {
       };
 
 
-      # other args are just stored, will be used later
+      # other args are just stored, they will be used later
       /^-( order_by       | group_by  | having    | for
          | union(?:_all)? | intersect | except    | minus
          | result_as      | post_SQL  | pre_exec  | post_exec  | post_bless
          | limit          | offset    | page_size | page_index
          | column_types   | prepare_attrs         | dbi_prepare_method
-         | _left_cols     | where_on
+         | _left_cols     | where_on              | join_with_USING
          )$/x
          and do {$args->{$k} = $v; last SWITCH};
+
+      # TODO : this hard-coded list of args should be more abstract
 
       # otherwise
       croak "invalid arg : $k";
@@ -240,8 +257,8 @@ sub refine {
 sub sqlize {
   my ($self, @args) = @_;
 
-  $self->{status} < SQLIZED
-    or croak "can't sqlize() when in status $self->{status}";
+  $self->status < SQLIZED
+    or croak "can't sqlize() when in status ". $self->status;
 
   # merge new args into $self->{args}
   $self->refine(@args) if @args;
@@ -253,14 +270,13 @@ sub sqlize {
   my $sql_abstract = $self->schema->sql_abstract;
   my $result_as    = $args->{-result_as} || "";
 
-
   # build arguments for SQL::Abstract::More
   $self->refine(-where => $source_where) if $source_where;
   my @args_to_copy = qw/-columns -where
                         -union -union_all -intersect -except -minus
                         -order_by -group_by -having
                         -limit -offset -page_size -page_index/;
-  my %sqla_args = (-from         => clone($meta_source->db_from),
+  my %sqla_args = (-from         => clone($self->source->db_from),
                    -want_details => 1);
   defined $args->{$_} and $sqla_args{$_} = $args->{$_} for @args_to_copy;
   $sqla_args{-columns} ||= $meta_source->default_columns;
@@ -277,12 +293,18 @@ sub sqlize {
     }
   }
 
-  # EXPERIMENTAL: "where_on"
+  # "where_on" : conditions to be added in joins
   if (my $where_on = $args->{-where_on}) {
-    # retrieve components of the join
+    # check proper usage
+    does $sqla_args{-from}, 'ARRAY'
+      or croak "datasource for '-where_on' was not a join";
+
+    # retrieve components of the join and check again for proper usage
     my ($join_op, $first_table, @other_join_args) = @{$sqla_args{-from}};
     $join_op eq '-join'
       or croak "datasource for '-where_on' was not a join";
+
+    # reverse index (table_name => $join_hash)
     my %by_dest_table = reverse @other_join_args;
 
     # insert additional conditions into appropriate places
@@ -292,11 +314,30 @@ sub sqlize {
       $join_cond->{condition}
         = $sql_abstract->merge_conditions($join_cond->{condition},
                                           $additional_cond);
+      delete $join_cond->{using};
     }
 
-    # TODO: should be able to use paths and aliases as keys, instead of 
+    # TODO: should be able to use paths and aliases as keys, instead of
     # database table names.
     # TOCHECK: is this stuff still compatible with the bind() method ?
+  }
+
+  # adjust join conditions for ON clause or for USING clause
+  if (does $sqla_args{-from}, 'ARRAY') {
+    $sqla_args{-from}[0] eq '-join'
+      or croak "datasource is an arrayref but does not start with -join";
+    my $join_with_USING
+      = exists $args->{-join_with_USING} ? $args->{-join_with_USING}
+                                         : $self->schema->{join_with_USING};
+    for (my $i = 2; $i < @{$sqla_args{-from}}; $i += 2) {
+      my $join_cond = $sqla_args{-from}[$i];
+      if ($join_with_USING) {
+        delete $join_cond->{condition} if $join_cond->{using};
+      }
+      else {
+        delete $join_cond->{using};
+      }
+    }
   }
 
   # generate SQL
@@ -341,10 +382,10 @@ sub prepare {
 
   my $meta_source = $self->meta_source;
 
-  $self->sqlize(@args) if @args or $self->{status} < SQLIZED;
+  $self->sqlize(@args) if @args or $self->status < SQLIZED;
 
-  $self->{status} == SQLIZED
-    or croak "can't prepare() when in status $self->{status}";
+  $self->status == SQLIZED
+    or croak "can't prepare() when in status " . $self->status;
 
   # log the statement and bind values
   $self->schema->_debug("PREPARE $self->{sql} / @{$self->{bound_params}}");
@@ -365,12 +406,20 @@ sub prepare {
 }
 
 
+sub sth {
+  my ($self) = @_;
+
+  $self->prepare              if $self->status < PREPARED;
+  return $self->{sth};
+}
+
+
 
 sub execute {
   my ($self, @bind_args) = @_;
 
   # if not prepared yet, prepare it
-  $self->prepare              if $self->{status} < PREPARED;
+  $self->prepare              if $self->status < PREPARED;
 
   # TODO: DON'T REMEMBER why the line below was here. Keep it around for a while ...
   push @bind_args, offset => $self->{offset}  if $self->{offset};
@@ -379,7 +428,7 @@ sub execute {
 
   # shortcuts
   my $args = $self->{args};
-  my $sth  = $self->{sth};
+  my $sth  = $self->sth;
 
   # previous row_count, row_num and reuse_row are no longer valid
   delete $self->{reuse_row};
@@ -411,105 +460,33 @@ sub execute {
 }
 
 
+
+
+
+my %cache_result_class;
+
 sub select {
   my $self = shift;
 
   $self->refine(@_) if @_;
 
-  my $args = $self->{args}; # all combined args
-
-  my $callbacks = CORE::join ", ", grep {exists $args->{$_}} 
-                                        qw/-pre_exec -post_exec -post_bless/;
+  my $arg_result_as = $self->arg(-result_as) || 'rows';
 
  SWITCH:
-  my ($result_as, @key_cols) 
-    = ref $args->{-result_as} ? @{$args->{-result_as}}
-                              : ($args->{-result_as} || "rows");
+  my ($result_as, @subclass_args)
+    = does($arg_result_as, 'ARRAY') ? @$arg_result_as : ($arg_result_as);
+
+  # historically,some kinds of results accepted various aliases
+  $result_as =~ s/^flat(?:_array|)$/flat_arrayref/;
+  $result_as =~ s/^arrayref$/rows/;
+  $result_as =~ s/^fast-statement$/fast_statement/;
+
   for ($result_as) {
-
-    # CASE statement : the DBIx::DataModel::Statement object 
-    /^statement$/i and do {
-        delete $self->{args}{-result_as};
-        return $self;
-      };
-
-    # for all other cases, must first sqlize the statement
-    $self->sqlize if $self->{status} < SQLIZED;
-
-    # CASE sql : just return the SQL and bind values
-    /^sql$/i        and do {
-      not $callbacks 
-        or croak "$callbacks incompatible with -result_as=>'sql'";
-      return $self->sql;
-    };
-
-    # CASE subquery : return a ref to an arrayref with SQL and bind values
-    /^subquery$/i        and do {
-      not $callbacks 
-        or croak "$callbacks incompatible with -result_as=>'subquery'";
-      my ($sql, @bind) = $self->sql;
-      return \ ["($sql)", @bind];
-    };
-
-    # for all other cases, must first execute the statement
-    $self->execute;
-
-    # CASE sth : return the DBI statement handle
-    /^sth$/i        and do {
-        not $args->{-post_bless}
-          or croak "-post_bless incompatible with -result_as=>'sth'";
-        return $self->{sth};
-      };
-
-    # CASE rows : all data rows (this is the default)
-    /^(rows|arrayref)$/i  and return $self->all;
-
-    # CASE firstrow : just the first row
-    /^firstrow$/i   and return $self->_next_and_finish;
-
-    # CASE hashref : all data rows, put into a hashref
-    /^hashref$/i   and do {
-      @key_cols or @key_cols = $self->meta_source->primary_key
-        or croak "-result_as=>'hashref' impossible: no primary key";
-      my %hash;
-      while (my $row = $self->next) {
-        my @key;
-        foreach my $col (@key_cols) {
-          my $val = $row->{$col};
-          $val = '' if not defined $val; # $val might be 0, so no '||'
-          push @key, $val;
-        }
-        my $last_key_item = pop @key;
-        my $node          = \%hash;
-        $node = $node->{$_} ||= {} foreach @key;
-        $node->{$last_key_item} = $row;
-      }
-      $self->{sth}->finish;
-      return \%hash;
-    };
-
-    # CASE fast_statement : creates a reusable row
-    /^fast[-_]statement$/i and do {
-        $self->_build_reuse_row;
-        return $self;
-      };
-
-    # CASE flat_arrayref : flattened columns from each row
-    /^flat(?:_array(?:ref)?)?$/ and do {
-      $self->_build_reuse_row;
-      my @vals;
-      my $hash_key_name = $self->{sth}{FetchHashKeyName} || 'NAME';
-      my $cols = $self->{sth}{$hash_key_name};
-      while (my $row = $self->next) {
-        push @vals, @{$row}{@$cols};
-      }
-      $self->{sth}->finish;
-      return \@vals;
-    };
-
-
-    # OTHERWISE
-    croak "unknown -result_as value: $_"; 
+    my $subclass = $cache_result_class{$_}
+               ||= $self->_find_result_class($_)
+      or croak "didn't find any ResultAs subclass to implement -result_as => '$_'";
+    my $result_maker = $subclass->new(@subclass_args);
+    return $result_maker->get_result($self);
   }
 }
 
@@ -518,7 +495,7 @@ sub row_count {
   my ($self) = @_;
 
   if (! exists $self->{row_count}) {
-    $self->sqlize if $self->{status} < SQLIZED;
+    $self->sqlize if $self->status < SQLIZED;
     my ($sql, @bind) = $self->sql;
 
     # get syntax used for LIMIT clauses ...
@@ -575,9 +552,9 @@ sub row_num {
 sub next {
   my ($self, $n_rows) = @_;
 
-  $self->execute if $self->{status} < EXECUTED;
+  $self->execute if $self->status < EXECUTED;
 
-  my $sth      = $self->{sth}          or croak "absent sth in statement";
+  my $sth      = $self->sth            or croak "absent sth in statement";
   my $callback = $self->{row_callback} or croak "absent callback in statement";
 
   if (not defined $n_rows) {  # if user wants a single row
@@ -648,8 +625,11 @@ sub page_rows {
 sub bless_from_DB {
   my ($self, $row) = @_;
 
-  # inject ref to $schema if in multi-schema mode
-  $row->{__schema} = $self->schema unless $self->schema->{is_singleton};
+  # inject ref to $schema if in multi-schema mode or if temporary
+  # db_schema is set
+  my $schema = $self->schema;
+  $row->{__schema} = $schema unless $schema->{is_singleton}
+                                 && !$schema->{db_schema};
 
   # bless into appropriate class
   bless $row, $self->meta_source->class;
@@ -665,28 +645,57 @@ sub bless_from_DB {
 }
 
 
+sub headers {
+  my $self = shift;
+
+  $self->status == EXECUTED
+    or $self->execute(@_);
+
+  my $hash_key_name = $self->sth->{FetchHashKeyName} || 'NAME';
+  return @{$self->sth->{$hash_key_name}};
+}
+
+
+sub finish {
+  my $self = shift;
+  $self->sth->finish;
+}
+
+
+sub make_fast {
+  my ($self) = @_;
+
+  $self->status == EXECUTED
+    or croak "cannot make_fast() when in state " . $self->status;
+
+  # create a reusable hash and bind_columns to it (see L<DBI/bind_columns>)
+  my %row;
+  $self->sth->bind_columns(\(@row{$self->headers}));
+  $self->{reuse_row} = \%row;
+}
+
+
 #----------------------------------------------------------------------
 # PRIVATE METHODS IN RELATION WITH SELECT()
 #----------------------------------------------------------------------
 
-sub _build_reuse_row {
-  my ($self) = @_;
+sub _forbid_callbacks {
+  my ($self, $subclass) = @_;
 
-  $self->{status} == EXECUTED
-    or croak "cannot _build_reuse_row() when in state $self->{status}";
-
-  # create a reusable hash and bind_columns to it (see L<DBI/bind_columns>)
-  my %row;
-  my $hash_key_name = $self->{sth}{FetchHashKeyName} || 'NAME';
-  $self->{sth}->bind_columns(\(@row{@{$self->{sth}{$hash_key_name}}}));
-  $self->{reuse_row} = \%row; 
+  my $callbacks = CORE::join ", ", grep {$self->arg($_)} 
+                                        qw/-pre_exec -post_exec -post_bless/;
+  if ($callbacks) {
+    $subclass =~ s/^.*:://;
+    croak "$callbacks incompatible with -result_as=>'$subclass'";
+  }
 }
+
 
 
 sub _next_and_finish {
   my $self = shift;
   my $row_or_rows = $self->next( @_ ); # pass original parameters
-  $self->{sth}->finish;
+  $self->finish;
   return $row_or_rows;
 }
 
@@ -725,7 +734,7 @@ sub _compute_from_DB_handlers {
   # handlers may be overridden from args{-column_types}
   if (my $col_types = $self->{args}{-column_types}) {
     while (my ($type_name, $columns) = each %$col_types) {
-      ref $columns or $columns = [$columns];
+      $columns = [$columns] unless does $columns, 'ARRAY';
       my $type = $self->schema->metadm->type($type_name)
         or croak "no such column type: $type_name";
       $handlers{$_} = $type->{handlers} foreach @$columns;
@@ -741,6 +750,29 @@ sub _compute_from_DB_handlers {
   $self->{from_DB_handlers} = $from_DB_handlers;
 
   return $self;
+}
+
+sub _find_result_class {
+  my $self         = shift;
+  my $name         = ucfirst shift;
+  my $schema       = $self->schema;
+  my $schema_class = ref $schema || $schema;
+
+  # try to find subclass $name within namespace of schema or ancestors
+  foreach my $namespace (@{$schema->resultAs_classes}) {
+    my $class = "${namespace}::ResultAs::${name}";
+
+    # see if that class is already loaded (by checking for a 'get_result' method)
+    my $is_loaded  = defined &{$class."::get_result"};
+
+    # otherwise, try to load the module
+    $is_loaded ||= try   {load $class; 1}
+                   catch {die $_ if $_ !~ /^Can't locate(?! object method)/};
+
+    return $class if $is_loaded; # true : class is found, exit loop
+  }
+
+  return; # false : class not found
 }
 
 
@@ -767,20 +799,8 @@ the manual (purpose, lifecycle, etc.).
 
 =head1 METHODS
 
-=head2 new
-
-  my $statement 
-    = DBIx::DataModel::Statement->new($connected_source, %options);
-
-This is the statement constructor; C<$connected_source> is an
-instance of L<DBIx::DataModel::ConnectedSource>. 
-If present, C<%options> are delegated
-to the L<refine()|DBIx::DataModel::Doc::Reference/refine()> method.
-
-Explicit calls to the statement constructor are exceptional;
-the usual way to create a statement is through 
-L<ConnectedSource::select()|DBIx::DataModel::Doc::Reference/ConnectedSource::select()>.
-
+Methods for statements are described in the 
+L<Reference manual|DBIx::DataModel::Doc::Reference/"STATEMENTS">.
 
 =head1 PRIVATE METHOD NAMES
 
@@ -794,6 +814,8 @@ redefined in subclasses :
 =item _bless_from_DB
 
 =item _compute_from_DB_handlers
+
+=item _find_result_class
 
 =back
 

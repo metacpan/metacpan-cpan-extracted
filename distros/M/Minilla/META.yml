@@ -4,6 +4,7 @@ author:
   - 'Tokuhiro Matsuno < tokuhirom@gmail.com >'
 build_requires:
   CPAN::Meta::Validator: '0'
+  File::Copy::Recursive: '0'
   File::Temp: '0'
   JSON: '0'
   Module::Build::Tiny: '0.035'
@@ -13,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.15, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +33,7 @@ no_index:
 provides:
   Minilla:
     file: lib/Minilla.pm
-    version: v3.0.14
+    version: v3.0.16
   Minilla::CLI:
     file: lib/Minilla/CLI.pm
   Minilla::CLI::Build:
@@ -132,7 +133,7 @@ recommends:
   Pod::Escapes: '0'
   Software::License: '0.103010'
   Test::CPAN::Meta: '0'
-  Test::MinimumVersion: '0.101080'
+  Test::MinimumVersion::Fast: '0.04'
   Test::PAUSE::Permissions: '0'
   Test::Pod: '0'
   Test::Spellunker: v0.2.7
@@ -144,7 +145,6 @@ requires:
   Config::Identity: '0'
   Data::Section::Simple: '0.04'
   ExtUtils::Manifest: '1.54'
-  File::Copy::Recursive: '0'
   File::Which: '0'
   File::pushd: '0'
   Getopt::Long: '2.36'
@@ -167,7 +167,7 @@ resources:
   bugtracker: https://github.com/tokuhirom/Minilla/issues
   homepage: https://github.com/tokuhirom/Minilla
   repository: git://github.com/tokuhirom/Minilla.git
-version: v3.0.14
+version: v3.0.16
 x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Alex Kapranoff <alex@kapranoff.ru>'

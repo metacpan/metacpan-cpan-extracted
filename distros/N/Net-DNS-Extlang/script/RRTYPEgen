@@ -1,6 +1,6 @@
-#!perl
-
-our $VERSION = '0.1';
+#!/usr/bin/perl
+#
+our $VERSION = '0.2';
 
 =head1 NAME
 
@@ -14,42 +14,32 @@ RRTYPEgen RRTYPE=<version> <name>:<number <attribute> ...
 
 B<RRTYPEgen> builds a perl Net::DNS RR subtype implementation package
 from the DNS extension language specification using the code generator
-in Net::DNS::Extlang.  It prints the generated
-code to stdout.
-
-If called with no arguments, it prints "1;\n" for success, which is how
-Net::DNS tests that RRTYPEgen has been installed.
+in Net::DNS::Extlang.  It prints the generated code to stdout.
 
 =cut
 
 use strict;
+use warnings;
 use integer;
+
+use Net::DNS::Extlang;
+
 
 # see what we think of the arguments
 my ( $tag, $identity, @attribute ) = @ARGV;
 
-unless($tag) {				# for probe in Parameters.pm
-	print "1;\n";
-	exit;
-}
+exit unless defined $tag;
 
-exit 1 unless defined($tag) && $tag =~ /^RRTYPE=\d+$/;
+die "$0: Invalid DNSextlang RRTYPE specification" unless $tag =~ /^RRTYPE=\d+$/;
 
-# include now to avoid startup recursion
-eval("require Net::DNS::Extlang") or die "Cannot load Net::DNS::Extlang from\n" . join("\n  ",@INC); 
+my $ext = new Net::DNS::Extlang();
 
-my $ext = new Net::DNS::Extlang(domain => 'invalid');
+my $rrr = $ext->xlstorerecord( $identity, @attribute );
 
-my $rrr = $ext->_xlstorerecord($identity, @attribute);
+print( $ext->compilerr($rrr) || exit 1 );			# write package to STDOUT
 
-my $code = $ext->compilerr($rrr);
+exit;
 
-if ($code) {
-	print $code;
-	exit 0;
-}
-print "0; # compile failed\n";
-exit 1;
 
 =head1 COPYRIGHT
 

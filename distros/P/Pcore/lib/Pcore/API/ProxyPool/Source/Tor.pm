@@ -61,7 +61,7 @@ sub new_identity ($self) {
 
     if ( !$h ) {
         $h = Pcore::AE::Handle2->new(
-            connect => [ $self->host, $self->control_port ],
+            connect  => [ $self->host, $self->control_port ],
             on_error => sub ( $h, $fatal, $message ) {
                 $h->destroy;
 

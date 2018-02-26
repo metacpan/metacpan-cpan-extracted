@@ -4,13 +4,13 @@ use Test::More;
 use Mojo::Asset::File;
 use Mojo::IOLoop;
 use Mojo::Server::Prefork;
-use POSIX 'geteuid', 'getegid', ':sys_wait_h';
+use POSIX qw(getuid getgid geteuid :sys_wait_h);
 use Time::HiRes 'usleep';
 
 plan skip_all => 'Non-root test' if geteuid() == 0;
 
-my $uid = geteuid();
-my $gid = getegid();
+my $uid = getuid();
+my $gid = getgid();
 my $user = getpwuid 0;
 my $group = getgrgid 0;
 
@@ -51,7 +51,7 @@ unless ($completed) {
 my $log = $templog->slurp;
 unlike $log, qr/Test worker has started/, 'Workers failed to start';
 like $log, qr/Can't (switch to (user|group)|set supplemental groups)/, 'right error';
-cmp_ok geteuid(), '==', $uid, 'User has not changed';
-cmp_ok getegid(), '==', $gid, 'Group has not changed';
+cmp_ok getuid(), '==', $uid, 'User has not changed';
+cmp_ok getgid(), '==', $gid, 'Group has not changed';
 
 done_testing;

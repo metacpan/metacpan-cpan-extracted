@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -141,7 +141,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -177,6 +177,11 @@ algorithm suggested in L<https://xkcd.com/936/>: It selects 4 words
 from a curated list of words and combines them into a hopefully easy
 to remember password (actually a passphrase, but we're all trying to
 getting things done, so who cares..).
+
+See L<this
+explaination|https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength>
+for detailed information on the security of passwords generated from a
+known word list.
 
 But L<https://xkcd.com/927/> also applies to this module, as there are
 already a lot of modules on CPAN implementing
@@ -364,11 +369,19 @@ case. But the API also allows for more or less words, or even some digits.
 
 =head1 THANKS
 
-Thanks to L<Ctrl O|http://www.ctrlo.com/> for funding the development of this module.
+=over
 
-We learned the usage of C<Data::Entropy> from
+=item * Thanks to L<Ctrl O|http://www.ctrlo.com/> for funding the development of this module.
+
+=item * We learned the usage of C<Data::Entropy> from
 L<https://metacpan.org/pod/Crypt::Diceware>, which also implements an
 algorithm to generate a random passphrase.
+
+=item * L<m_ueberall|https://twitter.com/m_ueberall/status/965263922310909952>
+for pointing out
+L<https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength>
+
+=back
 
 =head1 AUTHOR
 
@@ -376,7 +389,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2018 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

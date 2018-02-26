@@ -1,5 +1,8 @@
 Revision history for Authen-Simple-PlugAuth
 
+0.03      2018-02-23 11:33:37 -0500
+  - Deprecated.  Subject to removal after 30 June 2018.
+
 0.02      2015-12-01 11:26:38 -0500
   - Documentation improvements
   - Moved repository to clustericious org on github

@@ -51,4 +51,4 @@ resources:
   bugtracker: https://github.com/dotse/zonemaster-backend/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/dotse/zonemaster-backend
-version: 2.0.1
+version: 2.0.2

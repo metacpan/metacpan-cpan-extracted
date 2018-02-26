@@ -19,7 +19,7 @@ NAME
 
     You can also look over the test suite for guidance of usage, especially
     the xt/sandbox tests. Not all of these tests work (ones marked
-    todo_skip. This is because they are an adaptation of code used against
+    todo_skip). This is because they are an adaptation of code used against
     Braintree's private integration server.
 
     As of version 0.94, with appropriate manual intervention for your
@@ -101,6 +101,14 @@ NAME
 
     Accept, and find disputes.
 
+  WebService::Braintree::EuropeBankAccount
+
+    Find Europe Bank Accounts.
+
+  WebService::Braintree::IdealPayment
+
+    Find IdealPayment payment methods.
+
   WebService::Braintree::Merchant
 
     Provision merchants from "raw ApplePay".
@@ -139,6 +147,10 @@ NAME
     Manage the transparent redirection of ????.
 
     NOTE: This class needs significant help in documentation.
+
+  WebService::Braintree::UsBankAccount
+
+    Find US Bank Accounts.
 
  SEARCHING
 

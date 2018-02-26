@@ -29,5 +29,7 @@ add_stopwords(qw/
     NSW
     Hornsby
     Maven
+    pom
+    xml
 /);
 all_pod_files_spelling_ok();

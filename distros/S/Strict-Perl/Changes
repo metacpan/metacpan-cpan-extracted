@@ -1,5 +1,13 @@
 Revision history for this software.
 
+2018.03 2018-02-21 00:00:00
+  - change META.yml version 1.3 to 1.4
+  - remove pMakefile.PL
+  - remove lib/Test/Simply.pm
+  - add pmake.bat
+  - add LICENSE
+  - created by INABA Hitoshi
+
 2018.02 2018-02-04 00:00:00
   - try Removal of the current directory (".") from @INC
   - try Kwalitee Indicator: buildtool_not_executable

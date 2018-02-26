@@ -1,4 +1,23 @@
 Revision history for WebService-Braintree
+1.1    2018-02-24
+        Added new interfaces:
+            DocumentUpload
+                ->create()
+            EuropeBankAccount
+                ->find()
+                ->sale()
+            IdealPayment
+                ->find()
+                ->sale()
+            UsBankAccount
+                ->find()
+                ->sale()
+        Added new methods:
+            Dispute
+                ->add_file_evidence()
+        Unsuccessful results are now ::ErrorResult, not ::Result.
+            ::Result->api_error_repsonse is now removed.
+
 1.0    2018-01-13
         Added new interfaces:
             AddOn
@@ -30,6 +49,7 @@ Revision history for WebService-Braintree
                 ->transactions()
             PaymentMethod
                 ->grant()
+                ->revoke()
             PayPalAccount
                 ->create()
                 ->delete()

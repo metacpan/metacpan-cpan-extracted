@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -82,7 +82,21 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.47",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.48",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Bakkiaraj Murugesan (bakkiaraj)",
+      "Dylan Cali (calid)",
+      "pipcet",
+      "Zaki Mughal (zmughal)",
+      "Fitz Elliott (felliott)",
+      "Vickenty Fesunov (vyf)",
+      "Gregor Herrmann (gregoa)",
+      "Shlomi Fish (shlomif)",
+      "Damyan Ivanov",
+      "Ilya Pavlov (Ilya33)"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01",
+   "x_use_unsafe_inc" : 0
 }
 

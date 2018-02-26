@@ -1,14 +1,5 @@
-========================================================================
-SEEKING MAINTAINER
 
-I am no longer working in Perl regularly and as such I will be happy to
-put this repository in someone else's capable hands. Please send a
-message to @kingpong on Github if you are interested in taking over.
-Thanks!
-========================================================================
-
-
-PDF-WebKit version 1.1
+PDF-WebKit version 1.2
 =======================
 
 
@@ -33,7 +24,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  * IPC::Run
+  * IPC::Run3
   * Moo
   * XML::LibXML 1.62 (recommended)
 

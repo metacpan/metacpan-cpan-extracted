@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0.42'
   Path::Class: '0.013'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,13 +18,14 @@ name: Alien-LibGumbo
 provides:
   Alien::LibGumbo:
     file: lib/Alien/LibGumbo.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Alien::Base: '0.005'
   File::ShareDir: '1.03'
   Path::Class: '0.013'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ruz/Alien-LibGumbo
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

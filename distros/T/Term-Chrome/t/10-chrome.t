@@ -2,13 +2,13 @@
 use strict;
 use warnings FATAL => 'all';
 
-use Test::More 0.98 tests => 59;
+use Test::More 0.98 tests => 62;
 use Term::Chrome;
 use Scalar::Util 'refaddr';
 
 is(Red->term, "\e[31m", 'Red');
 is(Bold->term, "\e[1m", 'Bold');
-is((!Bold)->term, "\e[21m", '!Bold');
+is((!Bold)->term, "\e[22m", '!Bold');
 note(join('', "[Not bold] ", Bold, "[Bold]", !Bold, " [Not bold]"));
 isa_ok(Red, 'Term::Chrome', 'Red');
 isa_ok(Bold, 'Term::Chrome', 'Bold');
@@ -41,13 +41,16 @@ is("$BoldRed",       "\e[1;31m", "Red+Bold stringification");
 cmp_ok((Bold + Red)->term, 'eq', $BoldRed->term, '(Bold + Red) eq (Red + Bold)');
 
 # The reverse of a reset flag is nothing
-is((!Reset)->term, '');
-is((!ResetFg)->term, '');
-is((!ResetBg)->term, '');
-is((!ResetFlags)->term, '');
+is((!Reset)->term, '', '!Reset');
+is((!ResetFg)->term, '', '!ResetFg');
+is((!ResetBg)->term, '', '!ResetBg');
+is((!ResetFlags)->term, "\e[1;3;4;5;7;8m", '!ResetFlags');
+is((!!ResetFlags)->term, ResetFlags->term, '!!ResetFlags');
+is((ResetFg+ResetBg)->term, "\e[39;49m", 'ResetFg+ResetBg');
+is((ResetBg+ResetFg)->term, "\e[49;39m", 'ResetBg+ResetFg');
 
-is((!Bold)->term, "\e[21m");
-is((!(Bold+Underline))->term, "\e[21;24m");
+is((!Bold)->term, "\e[22m");
+is((!(Bold+Underline))->term, "\e[22;24m");
 is((!Red)->term, ResetFg->term);
 is((!(Red/Blue))->term, (ResetFg+ResetBg)->term);
 is((!(Red/Blue+Bold))->term, (ResetFg+ResetBg+!Bold)->term);

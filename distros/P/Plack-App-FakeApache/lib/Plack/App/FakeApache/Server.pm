@@ -1,6 +1,6 @@
 package Plack::App::FakeApache::Server;
-
-use Moose;
+$Plack::App::FakeApache::Server::VERSION = '0.09';
+use Moo;
 
 use Plack::App::FakeApache::Log;
 

@@ -89,7 +89,7 @@ TestBot->expect(
         '#test Test User',
         'master checkou test-repo',
         '* pushed 2 commits',
-        '* http://git/test/compare/before..after' )
+        '* http://git/test/compare/before...after' )
 );
 
 diag `cat t/bot/kgb-bot.log`;

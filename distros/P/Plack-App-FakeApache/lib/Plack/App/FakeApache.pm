@@ -1,11 +1,11 @@
 package Plack::App::FakeApache;
+$Plack::App::FakeApache::VERSION = '0.09';
 use Try::Tiny;
 use strict;
 use warnings;
 
 use Plack::Util;
-use Plack::Util::Accessor qw( authen_handler authz_handler response_handler handler dir_config root logger request_args request_class);
-use CGI::Emulate::PSGI;
+use Plack::Util::Accessor qw( authen_handler authz_handler response_handler handler dir_config root logger request_args request_class without_cgi);
 
 use parent qw( Plack::Component );
 use attributes;
@@ -14,8 +14,6 @@ use Carp;
 use Module::Load;
 use Scalar::Util qw( blessed );
 use Apache2::Const qw(OK DECLINED HTTP_OK HTTP_UNAUTHORIZED HTTP_NOT_FOUND);
-
-our $VERSION = 0.06;
 
 sub _get_phase_handlers
 {
@@ -36,16 +34,14 @@ sub _run_first
     my $fallback_status = shift;
 
 
-	# NOTE.  I don't think this will mess people around who don't use
-	# CGI, but if it does this could be conditionally applied with a
-	# boolean $fake_req->shim_cgi_brain_damage or something.
-
 	# Mangle env to cope with certain kinds of CGI brain damage.
-	my $env = $fake_req->plack_request->env;
-	local %ENV = (%ENV, CGI::Emulate::PSGI->emulate_environment($env));
-	# and stdin!
-	local *STDIN  = $env->{'psgi.input'};
-
+	unless ($self->without_cgi) {
+		require CGI::Emulate::PSGI;
+		my $env = $fake_req->plack_request->env;
+		local %ENV = (%ENV, CGI::Emulate::PSGI->emulate_environment($env));
+		# and stdin!
+		local *STDIN  = $env->{'psgi.input'};
+	}
 
     my $status = OK;
     foreach my $handler ($self->_get_phase_handlers($phase))
@@ -66,7 +62,7 @@ sub call {
 
     my %args = (
         env => $env,
-        dir_config => $self->dir_config,
+        dir_config => $self->dir_config || {}, 
         request_class => $self->request_class || 'Plack::App::FakeApache::Request',
         %{$self->request_args || {}}
     );
@@ -133,17 +129,26 @@ sub prepare_app {
     # Workaround for mod_perl handlers doing CGI->new($r). CGI doesn't
     # know our fake request class, so we hijack CGI->new() and explicitly
     # pass the request query string instead...
-    my $new = CGI->can('new');
-    no warnings qw(redefine);
-    *CGI::new = sub {
-        my $request_class = $self->request_class || 'Plack::App::FakeApache::Request';
+	unless ($self->without_cgi) {
+		my $new = CGI->can('new');
+		no warnings qw(redefine);
+		*CGI::new = sub {
+			my $request_class = $self->request_class || 'Plack::App::FakeApache::Request';
 
-        if (blessed($_[1]) and $_[1]->isa($request_class)) {
-            return $new->(CGI => $_[1]->env->{QUERY_STRING} || $_[1]->plack_request->content);
-        }
-        return $new->(@_);
-    };
-
+			if (blessed($_[1]) and $_[1]->isa($request_class)) {
+				return $new->(CGI => $_[1]->env->{QUERY_STRING} || $_[1]->plack_request->content);
+			}
+			return $new->(@_);
+		};
+	}
+	else { 
+		my $new = CGI->can('new');
+		no warnings qw/redefine/;
+		*CGI::new = sub {
+			warn "CALLING CGI->new\n";
+			return $new(@_);
+		};
+	}
     return;
 }
 
@@ -171,7 +176,7 @@ sub _massage_handler
 }
 
 package Plack::App::FakeApache::Tie;
-
+$Plack::App::FakeApache::Tie::VERSION = '0.09';
 sub TIEHANDLE {
     my $class = shift;
     my $r = shift;
@@ -232,7 +237,7 @@ Handlers for the respective request phases. Pass a blessed object, a class
 name or use the C<Class-E<gt>method> syntax. See the mod_perl docs for calling
 conventions.
 
-=request_class
+=item request_class
 
 If you want to subclass Plack::App::FakeApache::Request do so here.
 Make sure that your subclass inherits from
@@ -240,9 +245,27 @@ Plack::App::FakeApache::Request (duh).  This is for use in situations
 where you've subclasssed Apache2::Request and want to make it work
 under PSGI.
 
+=item without_cgi
+
+CGI.pm does bad things to STDIN and ENV.  If your mod_perl app uses
+these, but your're transitioning away from CGI.pm (e.g. in order to
+support POST parameters with your app running under L<Plack::Client>),
+then you can selectively set this to false. For example:
+
+  my $app = Plack::App::FakeApache->new({ 
+      handler       => 'MyApp',
+      without_cgi   => 1,
+   })->to_app;
+
+   my $client = Plack::Client->new( 'psgi-local' => { apps => { myapp => $app } } );
+
+   my $res = $client->post('psgi-local://myapp/path/to/wherever', 
+                           [], { parms => 'go', here => 'yeah' });
+
+
 =item dir_config
 
-Hash used to resolve $req->dir_config() requests
+Hash used to resolve $req->dir_config() requests.  Defaults to an empty hashref.
 
 =item root
 
@@ -334,18 +357,24 @@ Fills information into the response object and finalizes it.
 
 =head1 MOD_PERL OVERRIDES
 
-mod_perl overrides exit with L<ModPerl::Util>.  The way I've handled
-(kd) this was that in order to override the horrors of overriding
+mod_perl overrides exit with L<ModPerl::Util>.  The way I (kd) have handled
+ this was that in order to avoid the horrors of overriding
 CORE::GLOBAL::EXIT was to have a subroutine main::legacy_exit defined
-in the startup.pl or in the .psgi file which calls die "EXIT $number".
+in the startup.pl or in the .psgi file which calls die "EXIT 0".
 Meanwhile this specific exception is ignored by
 Plack::APP::FakeApache.
 
+TODO: There are other circumstances where exception handling routines
+in upstream legacy mod_perl code are insufficiently well structured to
+catch at the plack level, so the exception handling won't catch them.
+In this situation a user configurable list of exception content
+earmarked for custom handling is desirable (e.g. where a 500 error
+really ought to be treated as a 404).  I intend to implement this some
+time RSN.
 
 =head1 AUTHOR
 
+Kieren Diment L<zarquon@cpan.org>.
 Peter Makholm, L<peter@makholm.net>
-
-Override subrequest, more cgi.pm support and exit support by Kieren Diment L<zarquon@cpan.org>.
 
 =cut

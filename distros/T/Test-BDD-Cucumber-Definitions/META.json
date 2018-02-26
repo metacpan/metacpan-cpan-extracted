@@ -32,14 +32,17 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Zip" : "0",
             "Const::Fast" : "0",
             "DDP" : "0",
             "HTTP::Response" : "0",
             "HTTP::Tiny" : "0",
             "Hash::MultiValue" : "0",
+            "IO::String" : "0",
             "JSON::Path" : "0",
             "JSON::XS" : "0",
             "MooseX::Types" : "0",
+            "MooseX::Types::Common" : "0",
             "Params::ValidationCompiler" : "0.22",
             "Test::BDD::Cucumber" : "0",
             "Try::Tiny" : "0",
@@ -61,6 +64,6 @@
          "web" : "https://github.com/ivanych/Test-BDD-Cucumber-Definitions"
       }
    },
-   "version" : "0.14",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

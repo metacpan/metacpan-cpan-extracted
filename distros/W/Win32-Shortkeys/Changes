@@ -9,5 +9,8 @@ Revision history for Perl module Win32::Shortkeys
 0.04 2018.02.02
       ProtocolEncoding arg when parser is created in Ripper->catch
       ProtocolEncoding set to the arg received in Shortkeys->parse_file
+0.05 2018.02.21 
+      ripper.pm : layers for writing the xml file have to use the :raw ... :crlf mantra to write UTF-16LE and UTF-16 (BE)
+      shortkeys.pm : Encoding used is iso-8859-1 instead of cp1250 to pass data to clipboard
 
 

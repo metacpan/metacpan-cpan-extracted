@@ -1,3 +1,8 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
 use Test::More import => ['!pass'];
 use Test::Exception;
 use Test::NoWarnings;
@@ -7,9 +12,9 @@ use warnings;
 use Dancer;
 use Dancer::ModuleLoader;
 
-BEGIN { 
+BEGIN {
     plan tests => 11;
-    use_ok 'Dancer::Session::Cookie' 
+    use_ok 'Dancer::Session::Cookie'
 }
 
 my $session;

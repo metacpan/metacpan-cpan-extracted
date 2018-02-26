@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive::Usage;
 # ABSTRACT: the usage description for GLD
-$Getopt::Long::Descriptive::Usage::VERSION = '0.101';
+$Getopt::Long::Descriptive::Usage::VERSION = '0.102';
 use List::Util qw(max);
 
 #pod =head1 SYNOPSIS
@@ -37,7 +37,7 @@ use List::Util qw(max);
 sub new {
   my ($class, $arg) = @_;
 
-  my @to_copy = qw(options leader_text show_defaults);
+  my @to_copy = qw(leader_text options show_defaults);
 
   my %copy;
   @copy{ @to_copy } = @$arg{ @to_copy };
@@ -86,7 +86,9 @@ sub option_text {
     my $desc = $opt->{desc};
     my $assign;
     if ($desc eq 'spacer') {
-      $string .= sprintf "$spec_fmt\n", $opt->{spec};
+      my @lines = $self->_split_description($length, $opt->{spec});
+
+      $string .= length($_) ? sprintf("$spec_fmt\n", $_) : "\n" for @lines;
       next;
     }
 
@@ -184,7 +186,7 @@ sub _split_description {
 
 sub _parse_assignment {
     my ($assign_spec) = @_;
-    my $argument;
+
     my $result = 'STR';
     my $desttype;
     if (length($assign_spec) < 2) {
@@ -192,12 +194,15 @@ sub _parse_assignment {
         return '';
     }
 
-    $argument = substr $assign_spec, 1, 2;
-    if ($argument =~ m/^i/ or $argument =~ m/^o/) {
+    my $optional = substr($assign_spec, 0, 1) eq ':';
+    my $argument = substr $assign_spec, 1, 2;
+
+    if ($argument =~ m/^[io]/ or $assign_spec =~ m/^:[+0-9]/) {
         $result = 'INT';
     } elsif ($argument =~ m/^f/) {
         $result = 'NUM';
     }
+
     if (length($assign_spec) > 2) {
         $desttype = substr($assign_spec, 2, 1);
         if ($desttype eq '@') {
@@ -207,9 +212,11 @@ sub _parse_assignment {
             $result = "KEY=${result}...";
         }
     }
-    if (substr($assign_spec, 0, 1) eq ':') {
+
+    if ($optional) {
         return "[=$result]";
     }
+
     # with leading space so it can just blindly be appended.
     return " $result";
 }
@@ -273,7 +280,7 @@ Getopt::Long::Descriptive::Usage - the usage description for GLD
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

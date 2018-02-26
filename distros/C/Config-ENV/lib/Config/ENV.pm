@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use Carp;
+use File::Spec;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub import {
 	my $class   = shift;
@@ -60,7 +61,7 @@ sub config ($$) { ## no critic
 
 sub load ($) { ## no critic
 	my $filename = shift;
-	my $hash = do "$filename";
+	my $hash = do File::Spec->catfile('.', $filename);
 
 	croak $@ if $@;
 	croak $^E unless defined $hash;

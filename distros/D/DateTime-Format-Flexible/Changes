@@ -1,5 +1,9 @@
 Revision history for Perl module DateTime::Format::Flexible
 
+0.29 Web Feb 21 2018
+  - add support for 19 February 2018 at 10:33
+    - thanks Rod Taylor rt #124520
+
 0.28 Thu Mar 23 2016
   - fix tests under perl 5.25.10+ with -Ddefault_inc_excludes_dot
     - thanks Kent Fredric rt #120698

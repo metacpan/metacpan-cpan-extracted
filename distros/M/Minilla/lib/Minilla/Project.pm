@@ -21,7 +21,7 @@ use Minilla::ReleaseTest;
 use Minilla::ModuleMaker::ModuleBuild;
 use Minilla::ModuleMaker::ModuleBuildTiny;
 use Minilla::ModuleMaker::ExtUtilsMakeMaker;
-use Minilla::Util qw(slurp_utf8 find_dir cmd spew_raw slurp_raw);
+use Minilla::Util qw(slurp_utf8 find_dir cmd spew_raw slurp_raw spew_utf8);
 use Encode qw(decode_utf8);
 use URI;
 
@@ -262,7 +262,7 @@ sub _build_dist_name {
         my $conf = $self->config;
         if ($conf->{name} =~ /::/) {
             (my $better_name = $conf->{name}) =~ s/::/-/g;
-            Carp::croak(qq!You shouldn't set 'name="$conf->{name}"' in minil.toml. You need to set the value as 'name="$better_name"'.!);
+            Carp::croak(qq(You shouldn't set 'name="$conf->{name}"' in minil.toml. You need to set the value as 'name="$better_name"'.));
         }
         $dist_name = $conf->{name};
     }
@@ -583,7 +583,7 @@ sub generate_minil_toml {
     my %pause;
     if (eval { %pause = Config::Identity::PAUSE->load; 1; } && exists $pause{user}) {
         my $user = uc($pause{user});
-        $content .= qq{\nauthority="cpan:${user}"\n},
+        $content .= qq(\nauthority="cpan:${user}"\n);
     }
     warn $@ if $@;
 
@@ -651,7 +651,7 @@ sub regenerate_readme_md {
                     push @badges, "[![Build Status]($image_uri)]($build_uri)";
                 } elsif ($service_name eq 'appveyor') {
                     ( my $appveyor_repository_name = $repository_name ) =~ s/\./-/g;
-                    push @badges, "[![Build Status](https://img.shields.io/appveyor/ci/$user_name/$appveyor_repository_name/master.svg)](https://ci.appveyor.com/project/$user_name/$appveyor_repository_name/branch/master)";
+                    push @badges, "[![Build Status](https://img.shields.io/appveyor/ci/$user_name/$appveyor_repository_name/master.svg?logo=appveyor)](https://ci.appveyor.com/project/$user_name/$appveyor_repository_name/branch/master)";
                 } elsif ($service_name eq 'coveralls') {
                     push @badges, "[![Coverage Status](https://img.shields.io/coveralls/$user_name/$repository_name/master.svg?style=flat)](https://coveralls.io/r/$user_name/$repository_name?branch=master)"
                 } elsif ($service_name eq 'codecov') {
@@ -671,7 +671,7 @@ sub regenerate_readme_md {
         $markdown = join(' ', @badges) . $markdown
     }
 
-    spew_raw($fname, $markdown);
+    spew_utf8($fname, $markdown);
 }
 
 sub verify_prereqs {

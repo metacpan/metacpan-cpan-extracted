@@ -1,0 +1,10 @@
+Build.PL
+README.md
+lib/JSON/ize.pm
+MANIFEST
+t/001_simple.t
+t/002_pod.t
+t/sample/bad.json
+t/sample/good.json
+META.yml
+META.json

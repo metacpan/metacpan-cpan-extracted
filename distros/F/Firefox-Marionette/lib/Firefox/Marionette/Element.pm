@@ -3,7 +3,7 @@ package Firefox::Marionette::Element;
 use strict;
 use warnings;
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 sub new {
     my ( $class, $browser, %parameters ) = @_;
@@ -116,57 +116,113 @@ sub list {
 sub list_by_id {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_id HAS BEEN REPLACED BY find_by_id ****'
+'**** DEPRECATED METHOD - using list_by_id HAS BEEN REPLACED BY find_id ****'
     );
-    return $self->browser()->find_by_id( $value, $self );
+    return $self->browser()->find_id( $value, $self );
 }
 
 sub list_by_name {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_name HAS BEEN REPLACED BY find_by_name ****'
+'**** DEPRECATED METHOD - using list_by_name HAS BEEN REPLACED BY find_name ****'
     );
-    return $self->browser()->find_by_name( $value, $self );
+    return $self->browser()->find_name( $value, $self );
 }
 
 sub list_by_tag {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_tag HAS BEEN REPLACED BY find_by_tag ****'
+'**** DEPRECATED METHOD - using list_by_tag HAS BEEN REPLACED BY find_tag ****'
     );
-    return $self->browser()->find_by_tag( $value, $self );
+    return $self->browser()->find_tag( $value, $self );
 }
 
 sub list_by_class {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_class HAS BEEN REPLACED BY find_by_class ****'
+'**** DEPRECATED METHOD - using list_by_class HAS BEEN REPLACED BY find_class ****'
     );
-    return $self->browser()->find_by_class( $value, $self );
+    return $self->browser()->find_class( $value, $self );
 }
 
 sub list_by_selector {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_selector HAS BEEN REPLACED BY find_by_selector ****'
+'**** DEPRECATED METHOD - using list_by_selector HAS BEEN REPLACED BY find_selector ****'
     );
-    return $self->browser()->find_by_selector( $value, $self );
+    return $self->browser()->find_selector( $value, $self );
 }
 
 sub list_by_link {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_link HAS BEEN REPLACED BY find_by_link ****'
+'**** DEPRECATED METHOD - using list_by_link HAS BEEN REPLACED BY find_link ****'
     );
-    return $self->browser()->find_by_link( $value, $self );
+    return $self->browser()->find_link( $value, $self );
 }
 
 sub list_by_partial {
     my ( $self, $value ) = @_;
     Carp::carp(
-'**** DEPRECATED METHOD - using list_by_partial HAS BEEN REPLACED BY find_by_partial ****'
+'**** DEPRECATED METHOD - using list_by_partial HAS BEEN REPLACED BY find_partial ****'
     );
-    return $self->browser()->find_by_partial( $value, $self );
+    return $self->browser()->find_partial( $value, $self );
+}
+
+sub find_by_id {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_id HAS BEEN REPLACED BY find_id ****'
+    );
+    return $self->browser()->find_id( $value, $self );
+}
+
+sub find_by_name {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_name HAS BEEN REPLACED BY find_name ****'
+    );
+    return $self->browser()->find_name( $value, $self );
+}
+
+sub find_by_tag {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_tag HAS BEEN REPLACED BY find_tag ****'
+    );
+    return $self->browser()->find_tag( $value, $self );
+}
+
+sub find_by_class {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_class HAS BEEN REPLACED BY find_class ****'
+    );
+    return $self->browser()->find_class( $value, $self );
+}
+
+sub find_by_selector {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_selector HAS BEEN REPLACED BY find_selector ****'
+    );
+    return $self->browser()->find_selector( $value, $self );
+}
+
+sub find_by_link {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_link HAS BEEN REPLACED BY find_link ****'
+    );
+    return $self->browser()->find_link( $value, $self );
+}
+
+sub find_by_partial {
+    my ( $self, $value ) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using find_by_partial HAS BEEN REPLACED BY find_partial ****'
+    );
+    return $self->browser()->find_partial( $value, $self );
 }
 
 sub find {
@@ -174,39 +230,39 @@ sub find {
     return $self->browser()->find( $value, $using, $self );
 }
 
-sub find_by_id {
+sub find_id {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_id( $value, $self );
+    return $self->browser()->find_id( $value, $self );
 }
 
-sub find_by_name {
+sub find_name {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_name( $value, $self );
+    return $self->browser()->find_name( $value, $self );
 }
 
-sub find_by_tag {
+sub find_tag {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_tag( $value, $self );
+    return $self->browser()->find_tag( $value, $self );
 }
 
-sub find_by_class {
+sub find_class {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_class( $value, $self );
+    return $self->browser()->find_class( $value, $self );
 }
 
-sub find_by_selector {
+sub find_selector {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_selector( $value, $self );
+    return $self->browser()->find_selector( $value, $self );
 }
 
-sub find_by_link {
+sub find_link {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_link( $value, $self );
+    return $self->browser()->find_link( $value, $self );
 }
 
-sub find_by_partial {
+sub find_partial {
     my ( $self, $value ) = @_;
-    return $self->browser()->find_by_partial( $value, $self );
+    return $self->browser()->find_partial( $value, $self );
 }
 
 1;    # Magic true value required at end of module
@@ -218,7 +274,7 @@ Firefox::Marionette::Element - Represents a Firefox element retrieved using the 
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =head1 SYNOPSIS
 
@@ -338,17 +394,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
+    my $div = $firefox->find_class('main-content');
     $div->find('//input[@id="search-input"]')->type('Test::More');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
+    my $div = $firefox->find_class('main-content');
     foreach my $element ($div->find('//input[@id="search-input"]')) {
         $element->type('Test::More');
     }
 
-=head2 find_by_id
+=head2 find_id
 
 accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'id' property.
 
@@ -359,17 +415,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
-    $div->find_by_id('search-input')->type('Test::More');
+    my $div = $firefox->find_class('main-content');
+    $div->find_id('search-input')->type('Test::More');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
-    foreach my $element ($div->find_by_id('search-input')) {
+    my $div = $firefox->find_class('main-content');
+    foreach my $element ($div->find_id('search-input')) {
         $element->type('Test::More');
     }
 
-=head2 find_by_name
+=head2 find_name
 
 This method returns the first L<element|Firefox::Marionette::Element> with a matching 'name' property.
 
@@ -380,17 +436,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
-    $div->find_by_name('q')->type('Test::More');
+    my $div = $firefox->find_class('main-content');
+    $div->find_name('q')->type('Test::More');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
-    foreach my $element ($div->find_by_name('q')) {
+    my $div = $firefox->find_class('main-content');
+    foreach my $element ($div->find_name('q')) {
         $element->type('Test::More');
     }
 
-=head2 find_by_class
+=head2 find_class
 
 accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with a matching 'class' property.
 
@@ -401,17 +457,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
-    $div->find_by_class('form-control home-search-input')->type('Test::More');
+    my $div = $firefox->find_class('main-content');
+    $div->find_class('form-control home-search-input')->type('Test::More');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
-    foreach my $element ($div->find_by_class('form-control home-search-input')) {
+    my $div = $firefox->find_class('main-content');
+    foreach my $element ($div->find_class('form-control home-search-input')) {
         $element->type('Test::More');
     }
 
-=head2 find_by_selector
+=head2 find_selector
 
 accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches that selector.
 
@@ -422,17 +478,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
-    $div->find_by_selector('input.home-search-input')->type('Test::More');
+    my $div = $firefox->find_class('main-content');
+    $div->find_selector('input.home-search-input')->type('Test::More');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
-    foreach my $element ($div->find_by_selector('input.home-search-input')) {
+    my $div = $firefox->find_class('main-content');
+    foreach my $element ($div->find_selector('input.home-search-input')) {
         $element->type('Test::More');
     }
 
-=head2 find_by_tag
+=head2 find_tag
 
 accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/tagName> as the first parameter and returns the first L<element|Firefox::Marionette::Element> with this tag name.
 
@@ -443,17 +499,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('main-content');
-    my $input = $div->find_by_tag('input');
+    my $div = $firefox->find_class('main-content');
+    my $input = $div->find_tag('input');
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('main-content');
-    foreach my $element ($div->find_by_tag('input')) {
+    my $div = $firefox->find_class('main-content');
+    foreach my $element ($div->find_tag('input')) {
         # do something
     }
 
-=head2 find_by_link
+=head2 find_link
 
 accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a matching link text.
 
@@ -464,17 +520,17 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('container-fluid');
-    $div->find_by_link('API')->click();
+    my $div = $firefox->find_class('container-fluid');
+    $div->find_link('API')->click();
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('container-fluid');
-    foreach my $element ($div->find_by_link('API')) {
+    my $div = $firefox->find_class('container-fluid');
+    foreach my $element ($div->find_link('API')) {
         $element->click();
     }
 
-=head2 find_by_partial
+=head2 find_partial
 
 accepts a text string as the first parameter and returns the first link L<element|Firefox::Marionette::Element> that has a partially matching link text.
 
@@ -485,13 +541,13 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    my $div = $firefox->find_by_class('container-fluid');
-    $div->find_by_partial('AP')->click();
+    my $div = $firefox->find_class('container-fluid');
+    $div->find_partial('AP')->click();
 
     # OR in list context
 
-    my $div = $firefox->find_by_class('container-fluid');
-    foreach my $element ($div->find_by_partial('AP')) {
+    my $div = $firefox->find_class('container-fluid');
+    foreach my $element ($div->find_partial('AP')) {
         $element->click();
     }
 

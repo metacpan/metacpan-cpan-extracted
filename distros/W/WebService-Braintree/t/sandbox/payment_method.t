@@ -120,7 +120,7 @@ subtest "Create" => sub {
     subtest "it doesn't return an error if credit card options are present for a paypal nonce" => sub {
         plan skip_all => "Error communicating with PayPal";
         my $customer = WebService::Braintree::Customer->create()->customer;
-        my $original_token = "paypal-account-" . int(rand(10000));
+        my $original_token = "paypal-account-" . int(rand(1000000));
         my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
             consent_code => "consent-code",
             token => $original_token,
@@ -701,7 +701,7 @@ subtest "Update" => sub {
         plan skip_all => "Error communicating with PayPal";
         subtest "it updates a paypal account's token" => sub {
             my $customer = WebService::Braintree::Customer->create()->customer;
-            my $original_token = "paypal-account-" . int(rand(10000));
+            my $original_token = "paypal-account-" . int(rand(1000000));
             my $nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
                 consent_code => "consent-code",
                 token => $original_token,
@@ -712,7 +712,7 @@ subtest "Update" => sub {
                 customer_id => $customer->id,
             });
 
-            my $updated_token = "UPDATED_TOKEN-" . int(rand(10000));
+            my $updated_token = "UPDATED_TOKEN-" . int(rand(1000000));
             my $updated_result = WebService::Braintree::PaymentMethod->update(
                 $original_token,
                 {
@@ -760,8 +760,8 @@ subtest "Update" => sub {
 
         subtest "it returns an error if a token for account is used to attempt an update" => sub {
             my $customer = WebService::Braintree::Customer->create()->customer;
-            my $first_token = "paypal-account-" . int(rand(10000));
-            my $second_token = "paypal-account-" . int(rand(10000));
+            my $first_token = "paypal-account-" . int(rand(1000000));
+            my $second_token = "paypal-account-" . int(rand(1000000));
             my $first_nonce = WebService::Braintree::TestHelper::nonce_for_paypal_account({
                 consent_code => "consent-code",
                 token => $first_token,

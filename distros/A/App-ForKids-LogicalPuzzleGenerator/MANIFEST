@@ -1,0 +1,21 @@
+Changes
+lib/App/ForKids/LogicalPuzzleGenerator.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Animal.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Color.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Fruit.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Name.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Race.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Variable/Profession.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Fact.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Fact/True.pm
+lib/App/ForKids/LogicalPuzzleGenerator/Fact/NotTrue.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

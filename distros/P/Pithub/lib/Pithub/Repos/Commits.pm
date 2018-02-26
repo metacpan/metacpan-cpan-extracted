@@ -1,7 +1,6 @@
 package Pithub::Repos::Commits;
-$Pithub::Repos::Commits::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github v3 Repo Commits API
 
 use Moo;
@@ -126,7 +125,7 @@ Pithub::Repos::Commits - Github v3 Repo Commits API
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 METHODS
 
@@ -146,7 +145,7 @@ Examples:
     my $result = $c->compare(
         user => 'plu',
         repo => 'Pithub',
-        base => 'v0.01008,
+        base => 'v0.01008',
         head => ' master ',
     );
 

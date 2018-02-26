@@ -44,7 +44,7 @@ sub _apply_component_to_class {
         $target->$f($parent)
      }
   }
-} 
+}
 
 {
    no strict 'refs';
@@ -90,7 +90,7 @@ sub _apply_component_to_class {
 
 =head1 NAME
 
-Class::C3::Componentised::ApplyHooks
+Class::C3::Componentised::ApplyHooks - Run methods before or after components are injected
 
 =head1 SYNOPSIS
 
@@ -119,7 +119,7 @@ Class::C3::Componentised::ApplyHooks
 =head1 DESCRIPTION
 
 This package allows a given component to run methods on the class that is being
-injected into before or after the component is injected.  Note from the 
+injected into before or after the component is injected.  Note from the
 L</SYNOPSIS> that all C<Load Actions> may be run more than once.
 
 =head1 IMPORT ACTION

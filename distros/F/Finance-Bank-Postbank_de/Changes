@@ -1,5 +1,8 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.48 20180222
+  + Add some text aliases used/produced by some BSD version of SSL
+
 0.47 20170716
   + Add one more numeric identifier for certificates
     This fixes RT #122506, reported by Slaven Rezic

@@ -8,7 +8,7 @@ package Fake::Encode;
 # Copyright (c) 2016, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 use 5.00503;

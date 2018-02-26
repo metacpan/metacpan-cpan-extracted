@@ -25,8 +25,8 @@ use overload    #
   fallback => 1;
 
 has _promise => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Promise'], required => 1 );
-has _cb => ( is => 'ro', isa => CodeRef, required => 1 );
-has _self => ( is => 'ro', isa => Object );
+has _cb      => ( is => 'ro', isa => CodeRef,                             required => 1 );
+has _self    => ( is => 'ro', isa => Object );
 
 has response => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Result'], init_arg => undef );
 

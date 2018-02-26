@@ -7,21 +7,22 @@ package DBIx::DataModel::Schema;
 
 use warnings;
 use strict;
-use Carp;
+use DBIx::DataModel::Meta::Utils qw/does/;
 use DBIx::DataModel::Source::Table;
 
-use Scalar::Util     qw/blessed reftype/;
-use Scalar::Does     qw/does/;
+use Scalar::Util     qw/blessed/;
 use Module::Load     qw/load/;
-use Params::Validate qw/validate SCALAR ARRAYREF CODEREF UNDEF 
-                                 OBJECT BOOLEAN/;
+use Params::Validate qw/validate_with SCALAR ARRAYREF CODEREF UNDEF
+                                      OBJECT BOOLEAN/;
 use Acme::Damn       qw/damn/;
-use SQL::Abstract::More 1.21;
+use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+
+use SQL::Abstract::More 1.33;
 use Try::Tiny;
+use mro              qw/c3/;
 
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
 
 my $spec = {
   dbh                   => {type => OBJECT|ARRAYREF, optional => 1},
@@ -29,10 +30,12 @@ my $spec = {
   sql_abstract          => {type => OBJECT,
                             isa  => 'SQL::Abstract::More',
                             optional => 1},
-  dbi_prepare_method    => {type => SCALAR,  default  => 'prepare'},
-  placeholder_prefix    => {type => SCALAR,  default  => '?:'},
-  select_implicitly_for => {type => SCALAR,  default  => ''},
-  autolimit_firstrow    => {type => BOOLEAN, optional => 1},
+  dbi_prepare_method    => {type => SCALAR,   default  => 'prepare'},
+  placeholder_prefix    => {type => SCALAR,   default  => '?:'},
+  select_implicitly_for => {type => SCALAR,   default  => ''},
+  autolimit_firstrow    => {type => BOOLEAN,  optional => 1},
+  db_schema             => {type => SCALAR,   optional => 1},
+  resultAs_classes      => {type => ARRAYREF, optional => 1},
 };
 
 
@@ -44,7 +47,11 @@ sub new {
     or croak "$class is already used in single-schema mode, can't call new()";
 
   # validate params
-  my %params = validate(@_, $spec);
+  my %params = validate_with(
+    params      => \@_,
+    spec        => $spec,
+    allow_extra => 0,
+   );
 
   # instantiate and call 'setter' methods for %params
   my $self = bless {}, $class;
@@ -54,6 +61,9 @@ sub new {
 
   # default SQLA
   $self->{sql_abstract} ||= SQL::Abstract::More->new;
+
+  # default resultAs_classes
+  $self->{resultAs_classes} ||= mro::get_linear_isa($class);
 
   # from now on, singleton mode will be forbidden
   $class->metadm->{singleton} = undef;
@@ -147,7 +157,8 @@ sub dbh {
 
 # some rw setters/getters
 my @accessors = qw/debug select_implicitly_for dbi_prepare_method 
-                   sql_abstract placeholder_prefix autolimit_firstrow/;
+                   sql_abstract placeholder_prefix autolimit_firstrow
+                   db_schema resultAs_classes/;
 foreach my $accessor (@accessors) {
   no strict 'refs';
   *$accessor = sub {
@@ -162,10 +173,17 @@ foreach my $accessor (@accessors) {
 }
 
 
+sub with_db_schema {
+  my ($self, $db_schema) = @_;
+  ref $self or $self = $self->singleton;
+
+  # return a shallow copy of $self with db_schema set to the given arg
+  return bless { %$self, db_schema => $db_schema}, ref $self;
+}
 
 
 my @default_state_components = qw/dbh debug select_implicitly_for
-                                  dbi_prepare_method /;
+                                  dbi_prepare_method db_schema/;
 
 sub localize_state {
   my ($self, @components) = @_; 
@@ -179,6 +197,17 @@ sub localize_state {
   return DBIx::DataModel::Schema::_State->new($self, \%saved_state);
 }
 
+
+
+
+sub do_after_commit {
+  my ($self, $coderef) = @_;
+  ref $self or $self = $self->singleton;
+
+  $self->{transaction_dbhs}
+    or croak "do_after_commit() called outside of a transaction";
+  push @{$self->{after_commit_callbacks}}, $coderef;
+}
 
 
 sub do_transaction { 
@@ -252,6 +281,7 @@ sub do_transaction {
         # commit all dbhs and then reset the list of dbhs
         $_->commit foreach @$transaction_dbhs;
         delete $self->{transaction_dbhs};
+
         last RETRY; # transaction successful, get out of the loop
       }
       catch {
@@ -273,10 +303,16 @@ sub do_transaction {
             catch {push @rollback_errs, $_};
         }
         delete $self->{transaction_dbhs};
+        delete $self->{after_commit_callbacks};
         DBIx::DataModel::Schema::_Exception->throw($err, @rollback_errs);
       };
     }
   }
+
+  # execute the after_commit callbacks
+  my $callbacks = delete $self->{after_commit_callbacks} || [];
+  $_->() foreach @$callbacks;
+
   return $in_context->{return}->();
 }
 
@@ -304,12 +340,10 @@ while (my ($local, $remote) = each %accessor_map) {
     ref $self or $self = $self->singleton;
 
     my $meta_source = $self->metadm->$remote(@_) or return;
-    my $cs_class = $self->metadm->connected_source_class;
-    load $cs_class;
-    return $cs_class->new($meta_source, $self);
+    my $obj = bless {__schema => $self}, $meta_source->class;
+    return $obj;
   }
 }
-
 
 #----------------------------------------------------------------------
 # UTILITY FUNCTIONS (PRIVATE)

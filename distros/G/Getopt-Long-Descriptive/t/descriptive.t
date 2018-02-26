@@ -193,14 +193,14 @@ is_opt(
 
   like(
     $usage->text,
-    qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
+    qr/foo option\n[\t\x20]*\n\tbar options:\n\s+--bar/,
     "spacer and non-option description found",
   );
 
   local $SIG{__WARN__} = sub {}; # we know that this will warn; don't care
   like(
     $usage->(1),
-    qr/foo option\n\s+\n\tbar options:\n\s+--bar/,
+    qr/foo option\n[\t\x20]*\n\tbar options:\n\s+--bar/,
     "CODEISH: spacer and non-option description found",
   );
 }
@@ -218,6 +218,7 @@ is_opt(
     [ 'optional|o!'  => "optional" ],
     [ 'increment|i+' => "incremental option" ],
   );
+
   like(
     $usage->text,
     qr/\[-bhiloSs\]/,
@@ -315,22 +316,37 @@ is_opt(
 {
   local @ARGV;
   my ($opt, $usage) = describe_options(
-    "%c %o",
+    "test %o",
     [ foo => "a foo option" ],
     [ bar => "a bar option" ],
     [ baz => "a baz option with a very long description."
              . " It just goes on for a really long time."
              . " This allows us to test line wrapping and"
              . " make sure the output always looks spiffy" ],
+    [], # blank line
+    [ "We can do the same thing with a long spacer.  This option line is a"
+    . " spacer and it will be longer than the 78 column line that we use by"
+    . " default." ],
+    [], # blank line
+    [ xyz => "an xyz option" ],
   );
 
-  my $expect = qr/
-	--baz  a baz option with a very long description. It just goes on for
-	       a really long time. This allows us to test line wrapping and
-	       make sure the output always looks spiffy/;
+  my $expect = <<"EOO";
+test [long options...]
+\t--foo  a foo option
+\t--bar  a bar option
+\t--baz  a baz option with a very long description. It just goes on for
+\t       a really long time. This allows us to test line wrapping and
+\t       make sure the output always looks spiffy
 
+\tWe can do the same thing with a long spacer.  This option line
+\tis a spacer and it will be longer than the 78 column line that
+\twe use by default.
 
-  like($usage->text, $expect, 'long option description is wrapped cleanly');
+\t--xyz  an xyz option
+EOO
+
+  is($usage->text, $expect, 'long option description is wrapped cleanly');
 }
 
 {
@@ -349,13 +365,20 @@ is_opt(
   is($@, '', "no error in eval");
 }
 
-{
+subtest "descriptions for option value types" => sub {
   my $p = \&Getopt::Long::Descriptive::Usage::_parse_assignment;
 
   is ($p->('=s'), ' STR', 'string');
   is ($p->('=i'), ' INT', 'int (i)');
   is ($p->('=o'), ' INT', 'int (o)');
   is ($p->('=f'), ' NUM', 'float');
+
+  is ($p->(':s'), '[=STR]', 'optional string');
+  is ($p->(':i'), '[=INT]', 'optional int (i)');
+  is ($p->(':+'), '[=INT]', 'optional int (+)');
+  is ($p->(':2'), '[=INT]', 'optional int (2)');
+  is ($p->(':o'), '[=INT]', 'optional int (o)');
+  is ($p->(':f'), '[=NUM]', 'optional float');
 
   is ($p->('=s@'), ' STR...', 'strings');
   is ($p->('=i@'), ' INT...', 'ints (i)');
@@ -366,6 +389,6 @@ is_opt(
   is ($p->('=i%'), ' KEY=INT...', 'int maps (i)');
   is ($p->('=o%'), ' KEY=INT...', 'int maps (o)');
   is ($p->('=f%'), ' KEY=NUM...', 'float maps');
-}
+};
 
 done_testing;

@@ -1,5 +1,22 @@
 Revision history for YAML-Tiny
 
+1.73    2018-02-21 21:07:59Z
+
+        - shipping 1.72 as stable, with no changes.
+
+1.72    2017-02-12 23:17:26Z (TRIAL RELEASE)
+
+        [FIXED]
+
+        - fix compatibility with Test::Builder 0.94 in test shim
+
+1.71    2017-02-04 05:44:07Z (TRIAL RELEASE)
+
+        [FIXED]
+
+        - Perform correct stripping of leading white space in literal/folded
+          text blocks (Flavio Poletti, GitHub #44, fixes RT#56045).
+
 1.70    2017-01-22 08:59:54Z
 
         [FIXED]

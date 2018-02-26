@@ -3,6 +3,7 @@ abstract: 'Qiita API(v2) Client'
 author:
   - 'risou <risou.f@gmail.com>'
 build_requires:
+  Test::Fatal: '0.014'
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,7 +27,7 @@ no_index:
 provides:
   WebService::Qiita::V2:
     file: lib/WebService/Qiita/V2.pm
-    version: '0.01'
+    version: '0.02'
   WebService::Qiita::V2::Client:
     file: lib/WebService/Qiita/V2/Client.pm
   WebService::Qiita::V2::Client::Base:
@@ -34,9 +35,12 @@ provides:
   WebService::Qiita::V2::Client::Methods:
     file: lib/WebService/Qiita/V2/Client/Methods.pm
 requires:
+  Crypt::SSLeay: '0.72'
+  JSON: '2.97001'
+  LWP::UserAgent: '6.32'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/risou/WebService-Qiita-V2/issues
   homepage: https://github.com/risou/WebService-Qiita-V2
   repository: git://github.com/risou/WebService-Qiita-V2.git
-version: '0.01'
+version: '0.02'

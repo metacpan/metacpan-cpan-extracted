@@ -12,7 +12,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow::Pom;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.0.3;
+our $VERSION  = 1.0.4;
 our $workflow = App::Git::Workflow::Pom->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -40,7 +40,7 @@ sub run {
     # check local branches first
     my $type   = $option{all} ? 'both' : $option{remote} ? 'remote' : 'local';
     my $prefix = $option{all} || $option{remote} ? '(?:\w+/)?' : '';
-    my @branch = grep {/^$prefix(\w+_)?$jira_re(?:\D|$)/} $workflow->branches($type);
+    my @branch = grep {/^$prefix(?:[a-z]+\/)?(\w+_)?$jira_re(?:\D|$)/i} $workflow->branches($type);
 
     if (@branch) {
         my $branch = which_branch(@branch);
@@ -126,7 +126,7 @@ git-jira - Checkout any branch mentioning the passed Jira
 
 =head1 VERSION
 
-This documentation refers to git-jira version 1.0.3
+This documentation refers to git-jira version 1.0.4
 
 =head1 SYNOPSIS
 

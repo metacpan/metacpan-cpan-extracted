@@ -26,4 +26,4 @@ requires:
 resources:
   homepage: https://github.com/mbarbon/google-protobuf-dynamic
   repository: https://github.com/mbarbon/google-protobuf-dynamic.git
-version: '0.20'
+version: '0.21'

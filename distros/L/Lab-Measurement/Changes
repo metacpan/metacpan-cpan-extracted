@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.621 2018-02-26
+
+  * Enable creation of genereric Lab::Moose::Instrument objects
+  * Improve sweep tutorial
+
 3.620 2018-02-14
 
   * Add SignalRecovery lock-in driver

@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 # Platypus Man,
 # Platypus Man,
@@ -41,7 +41,7 @@ sub new
 {
   my($class, %args) = @_;
   my @lib;
-  if(defined $args{lib})
+  if(exists $args{lib})
   {
     if(!ref($args{lib}))
     {
@@ -529,7 +529,7 @@ sub _have_pm
 
 package FFI::Platypus::Function;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 use overload '&{}' => sub {
   my $ffi = shift;
@@ -550,7 +550,7 @@ use overload '&{}' => sub {
   sub { $self->{code}->(@_) };
 };
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 sub new
 {
@@ -579,13 +579,13 @@ sub get_data
 
 package FFI::Platypus::ClosureData;
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 package FFI::Platypus::Type;
 
 use Carp qw( croak );
 
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 sub new
 {
@@ -679,7 +679,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -798,7 +798,13 @@ the L<lib|/lib> attribute.
 =item lib
 
 Either a pathname (string) or a list of pathnames (array ref of strings) 
-to pre-populate the L<lib|/lib> attribute.
+to pre-populate the L<lib|/lib> attribute.  Use C<[undef]> to search the
+current process for symbols.
+
+0.48
+
+C<undef> (without the array reference) can be used to search the current
+process for symbols.
 
 =item ignore_not_found
 
@@ -2252,6 +2258,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

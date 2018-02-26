@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
 
 if (1 == 0) {
   # the line below artificially populates DBIx::DataModel::Schema namespace
-  # at compile time, even if never executed. So the previous implementation
+  # at compile time, even if never executed. The previous implementation
   # of Utils::define_class got tricked by this case.
   require DBIx::DataModel::Schema::Foo::Bar;
 }
@@ -19,4 +19,6 @@ DBIx::DataModel->Schema('HR')
 
 
 ok(scalar(keys %{HR::}), "class HR is defined");
+
+done_testing;
 

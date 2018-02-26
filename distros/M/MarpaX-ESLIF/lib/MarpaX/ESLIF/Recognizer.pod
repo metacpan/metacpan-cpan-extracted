@@ -14,7 +14,7 @@ MarpaX::ESLIF::Recognizer - MarpaX::ESLIF's recognizer
 
 =head1 VERSION
 
-version 2.0.34
+version 2.0.38
 
 =head1 SYNOPSIS
 
@@ -45,6 +45,24 @@ MarpaX::ESLIF:Grammar object instance. Required.
 An object implementing L<MarpaX::ESLIF::Recognizer::Interface> methods. Required.
 
 =back
+
+=head2 $eslifRecognizer->newFrom($eslifGrammar)
+
+  my $eslifRecognizerNewFom = $eslifRecognizer->newFrom($eslifGrammar);
+
+Returns a recognizer instance that is sharing the stream of C<$eslifRecognizer>, but applied to the other grammar C<$eslifGrammar>.
+
+=head2 $eslifRecognizer->set_exhausted_flag($flag)
+
+  $eslifRecognizer->set_exhausted_flag($flag);
+
+Changes the isWithExhaustion() flag associated with the C<$eslifRecognizer> recognizer instance.
+
+=head2 $eslifRecognizer->share($eslifRecognizerShared)
+
+  $eslifRecognizer->share($eslifRecognizerShared);
+
+Shares the stream of C<$eslifRecognizerShared> recognizer instance with the C<$eslifRecognizer> instance.
 
 =head2 $eslifRecognizer->isCanContinue()
 

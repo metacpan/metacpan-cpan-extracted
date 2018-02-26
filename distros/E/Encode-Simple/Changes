@@ -1,0 +1,7 @@
+0.002     2018-02-22 21:09:15 EST
+  - Promote utf8 warnings used by Encode::Unicode to exceptions in encode/decode,
+    and suppress them in encode_lax/decode_lax. This brings the inconsistent API
+    more in line with Encode::utf8, which does not use utf8 warnings.
+
+0.001     2018-02-21 22:02:42 EST
+  - First release

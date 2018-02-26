@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '0.017';
+our $VERSION = '0.020';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -20,14 +20,14 @@ our $VERSION = '0.017';
 #pod             },
 #pod         },
 #pod     };
-#pod     plugin 'Auth::Basic' => {
+#pod     app->yancy->plugin( 'Auth::Basic' => {
 #pod         collection => 'users',
 #pod         username_field => 'username',
 #pod         password_field => 'password', # default
 #pod         password_digest => {
 #pod             type => 'SHA-1',
 #pod         },
-#pod     };
+#pod     } );
 #pod
 #pod     # yancy.conf
 #pod     {
@@ -94,10 +94,10 @@ our $VERSION = '0.017';
 #pod             },
 #pod         },
 #pod     };
-#pod     plugin 'Auth::Basic' => {
+#pod     app->yancy->plugin( 'Auth::Basic' => {
 #pod         collection => 'users',
 #pod         password_digest => { type => 'SHA-1' },
-#pod     };
+#pod     } );
 #pod
 #pod =item password_field
 #pod
@@ -133,13 +133,13 @@ our $VERSION = '0.017';
 #pod
 #pod     # Use Bcrypt for passwords
 #pod     # Install the Digest::Bcrypt module first!
-#pod     plugin 'Auth::Basic' => {
+#pod     app->yancy->plugin( 'Auth::Basic' => {
 #pod         password_digest => {
 #pod             type => 'Bcrypt',
 #pod             cost => 12,
 #pod             salt => 'abcdefgh♥stuff',
 #pod         },
-#pod     };
+#pod     } );
 #pod
 #pod =item route
 #pod
@@ -166,6 +166,11 @@ our $VERSION = '0.017';
 #pod This template displays an error message that the user is not authorized
 #pod to view this page. This most-often appears when the user is not logged in.
 #pod
+#pod =item layouts/yancy/auth.html.ep
+#pod
+#pod The layout that Yancy uses when displaying the login form, the
+#pod unauthorized error message, and other auth-related pages.
+#pod
 #pod =back
 #pod
 #pod =head1 FILTERS
@@ -181,6 +186,20 @@ our $VERSION = '0.017';
 #pod =head1 HELPERS
 #pod
 #pod This plugin adds the following Mojolicious helpers:
+#pod
+#pod =head2 yancy.auth.route
+#pod
+#pod The L<route object|Mojolicious::Routes::Route> that requires
+#pod authentication.  Add your own routes as children of this route to
+#pod require authentication for your own routes.
+#pod
+#pod     my $auth_route = $app->yancy->auth->route;
+#pod     $auth_route->get( '/', sub {
+#pod         my ( $c ) = @_;
+#pod         return $c->render(
+#pod             data => 'You are authorized to view this page',
+#pod         );
+#pod     } );
 #pod
 #pod =head2 yancy.auth.current_user
 #pod
@@ -240,18 +259,47 @@ use Digest;
 sub register {
     my ( $self, $app, $config ) = @_;
     # Prepare and validate backend data configuration
-    my $coll = $config->{collection};
+    die "Error configuring Auth::Basic plugin: No password digest type defined\n"
+        unless $config->{password_digest} && $config->{password_digest}{type};
+
+    my $coll = $config->{collection}
+        || die "Error configuring Auth::Basic plugin: No collection defined\n";
+    die sprintf(
+        q{Error configuring Auth::Basic plugin: Collection "%s" not found}."\n",
+        $coll,
+    ) unless $app->yancy->config->{collections}{$coll};
+
     my $username_field = $config->{username_field};
     my $password_field = $config->{password_field} || 'password';
-    my $digest = Digest->new( delete $config->{password_digest}{type}, %{ $config->{password_digest} } );
+
+    my $digest_type = delete $config->{password_digest}{type};
+    my $digest = eval {
+        Digest->new( $digest_type, %{ $config->{password_digest} } )
+    };
+    if ( my $error = $@ ) {
+        if ( $error =~ m{Can't locate Digest/${digest_type}\.pm in \@INC} ) {
+            die sprintf(
+                q{Error configuring Auth::Basic plugin: Password digest type "%s" not found}."\n",
+                $digest_type,
+            );
+        }
+        die "Error configuring Auth::Basic plugin: Error loading Digest module: $@\n";
+    }
+
     $app->yancy->filter->add( 'auth.digest' => sub {
         my ( $name, $value, $field ) = @_;
         return $digest->add( $value )->b64digest;
     } );
     push @{ $app->yancy->config->{collections}{$coll}{properties}{$password_field}{'x-filter'} }, 'auth.digest';
 
-    # Add authentication check
+    # Add login pages
     my $route = $config->{route} || $app->yancy->route;
+    push @{ $app->renderer->classes }, __PACKAGE__;
+    $route->get( '/login', \&_get_login, 'yancy.login_form' );
+    $route->post( '/login', \&_post_login, 'yancy.check_login' );
+    $route->get( '/logout', \&_get_logout, 'yancy.logout' );
+
+    # Add authentication check
     my $auth_route = $route->under( sub {
         my ( $c ) = @_;
         # Check auth
@@ -273,8 +321,17 @@ sub register {
     my @routes = @{ $route->children }; # Loop over copy while we modify original
     for my $r ( @routes ) {
         next if $r eq $auth_route; # Can't reparent ourselves or route disappears
+
+        # Don't add auth to unauthed routes. We need to add the plugin's
+        # routes first so that they are picked up before the `under` we
+        # created, but now we're going back to add auth to all
+        # previously-created routes, so we need to skip the ones that
+        # must be visited by unauthed users.
+        next if grep { $r->name eq $_ } qw( yancy.login_form yancy.check_login yancy.logout );
+
         $auth_route->add_child( $r );
     }
+    $app->helper( 'yancy.auth.route' => sub { $auth_route } );
 
     # Add auth helpers
     $app->helper( 'yancy.auth.get_user' => sub {
@@ -302,16 +359,13 @@ sub register {
         delete $c->session->{ username };
     } );
 
-    # Add login pages
-    push @{ $app->renderer->classes }, __PACKAGE__;
-    $route->get( '/login' )->to( cb => \&_get_login )->name( 'yancy.login_form' );
-    $route->post( '/login' )->to( cb => \&_post_login )->name( 'yancy.check_login' );
-    $route->get( '/logout' )->to( cb => \&_get_logout )->name( 'yancy.logout' );
 }
 
 sub _get_login {
     my ( $c ) = @_;
-    return $c->render( 'yancy/auth/login' );
+    return $c->render( 'yancy/auth/login',
+        return_to => $c->req->headers->referrer,
+    );
 }
 
 sub _post_login {
@@ -325,7 +379,12 @@ sub _post_login {
         return $c->rendered( 303 );
     }
     $c->flash( error => 'Username or password incorrect' );
-    return $c->render( 'yancy/auth/login', status => 400 );
+    return $c->render( 'yancy/auth/login',
+        status => 400,
+        user => $user,
+        return_to => $c->req->param( 'return_to' ),
+        login_failed => 1,
+    );
 }
 
 sub _get_logout {
@@ -345,7 +404,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 0.017
+version 0.020
 
 =head1 DESCRIPTION
 
@@ -371,14 +430,14 @@ then authorized to use the administration application and API.
             },
         },
     };
-    plugin 'Auth::Basic' => {
+    app->yancy->plugin( 'Auth::Basic' => {
         collection => 'users',
         username_field => 'username',
         password_field => 'password', # default
         password_digest => {
             type => 'SHA-1',
         },
-    };
+    } );
 
     # yancy.conf
     {
@@ -438,10 +497,10 @@ primary key, we don't need to provide a C<username_field>.
             },
         },
     };
-    plugin 'Auth::Basic' => {
+    app->yancy->plugin( 'Auth::Basic' => {
         collection => 'users',
         password_digest => { type => 'SHA-1' },
-    };
+    } );
 
 =item password_field
 
@@ -477,13 +536,13 @@ Not all Digest types require additional configuration.
 
     # Use Bcrypt for passwords
     # Install the Digest::Bcrypt module first!
-    plugin 'Auth::Basic' => {
+    app->yancy->plugin( 'Auth::Basic' => {
         password_digest => {
             type => 'Bcrypt',
             cost => 12,
             salt => 'abcdefgh♥stuff',
         },
-    };
+    } );
 
 =item route
 
@@ -510,6 +569,11 @@ url_for 'yancy.check_login' >>
 This template displays an error message that the user is not authorized
 to view this page. This most-often appears when the user is not logged in.
 
+=item layouts/yancy/auth.html.ep
+
+The layout that Yancy uses when displaying the login form, the
+unauthorized error message, and other auth-related pages.
+
 =back
 
 =head1 FILTERS
@@ -525,6 +589,20 @@ store the Base64-encoded result instead.
 =head1 HELPERS
 
 This plugin adds the following Mojolicious helpers:
+
+=head2 yancy.auth.route
+
+The L<route object|Mojolicious::Routes::Route> that requires
+authentication.  Add your own routes as children of this route to
+require authentication for your own routes.
+
+    my $auth_route = $app->yancy->auth->route;
+    $auth_route->get( '/', sub {
+        my ( $c ) = @_;
+        return $c->render(
+            data => 'You are authorized to view this page',
+        );
+    } );
 
 =head2 yancy.auth.current_user
 
@@ -582,7 +660,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -591,16 +669,23 @@ the same terms as the Perl 5 programming language system itself.
 
 __DATA__
 @@ yancy/auth/login.html.ep
-% layout 'yancy';
-<main id="app" class="container-fluid" style="margin-top: 10px">
+% layout 'yancy/auth';
+<main id="app" class="container-fluid">
     <div class="row justify-content-md-center">
         <div class="col-md-4">
             <h1>Login</h1>
+            % if ( stash 'login_failed' ) {
+            <div class="login-error alert alert-danger" role="alert">
+              Login failed: User or password incorrect!
+            </div>
+            % }
             <form action="<%= url_for 'yancy.check_login' %>" method="POST">
-                <input type="hidden" name="return_to" value="<%= $c->req->headers->referrer %>" />
+                <input type="hidden" name="return_to" value="<%= stash 'return_to' %>" />
                 <div class="form-group">
                     <label for="yancy-username">Username</label>
-                    <input class="form-control" id="yancy-username" name="username" placeholder="username">
+                    <input class="form-control" id="yancy-username" name="username"
+                        placeholder="username" value="<%= stash 'user' %>"
+                    >
                 </div>
                 <div class="form-group">
                     <label for="yancy-password">Password</label>
@@ -613,8 +698,8 @@ __DATA__
 </main>
 
 @@ yancy/auth/unauthorized.html.ep
-% layout 'yancy';
-<main class="container-fluid" style="margin-top: 10px">
+% layout 'yancy/auth';
+<main class="container-fluid">
     <div class="row">
         <div class="col">
             <h1>Unauthorized</h1>

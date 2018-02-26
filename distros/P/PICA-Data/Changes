@@ -1,6 +1,10 @@
 Revision history for PICA::Data
 
-0.35  2018-01-29 16:48:55 CET
+0.36  2018-02-25 13:31:30 CET
+    - Modify schema format to align with Avram
+    - Add PICA::Schema::Builder and extend PICA::Schema
+    - align PICA::Schema with Avram specification
+    - add PICA::Schema::Builder
 
 0.35  2018-01-29 16:29:52 CET
     - add PICA::Schema

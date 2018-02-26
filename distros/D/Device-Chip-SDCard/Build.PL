@@ -10,11 +10,13 @@ my $build = Module::Build->new(
       'Device::Chip' => 0,
       'Future::Utils' => 0,
    },
-   build_requires => {
-      'Test::Device::Chip::Adapter' => 0,
+   test_requires => {
+      'Test::Device::Chip::Adapter' => '0.05',
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
    create_makefile_pl => 'small',
    create_license => 1,

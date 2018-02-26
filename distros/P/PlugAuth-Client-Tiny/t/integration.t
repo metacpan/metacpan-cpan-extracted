@@ -14,7 +14,7 @@ BEGIN {
 
   my $diag = 'Test::Clustericious::Blocking, Test::Clustericious::Cluster 0.25, Clustericious 1.06 and PlugAuth 0.32';
 
-  plan skip_all => "Test requires $diag: $@" unless eval $code;
+  plan skip_all => "Test requires $diag" unless eval $code;
 }
 
 plan tests => 6;

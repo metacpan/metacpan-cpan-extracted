@@ -34,7 +34,7 @@ provides:
     file: lib/LWP/Protocol/https/hosts.pm
   LWP::UserAgent::DNS::Hosts:
     file: lib/LWP/UserAgent/DNS/Hosts.pm
-    version: '0.12'
+    version: '0.13'
 requires:
   LWP::Protocol: '0'
   LWP::Protocol::http: '0'
@@ -45,9 +45,9 @@ resources:
   bugtracker: https://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts/issues
   homepage: https://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts
   repository: git://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts.git
-version: '0.12'
+version: '0.13'
 x_authority: cpan:MASAKI
 x_contributors:
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
-  - 'Masaki Nakagawa <masaki.nakagawa@gmail.com>'
+  - 'ikasam_a <masaki.nakagawa@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

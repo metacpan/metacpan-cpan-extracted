@@ -19,7 +19,10 @@ WriteMakefile(
 }
 ,
   PREREQ_PM => {
+  'Array::Diff' => '0',
+  'Capture::Tiny' => '0',
   'Env::Modulecmd' => '1.3',
+  'Devel::IPerl' => '0.009',
   'perl' => 'v5.10.0'
 }
 ,

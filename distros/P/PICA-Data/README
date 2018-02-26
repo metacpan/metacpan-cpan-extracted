@@ -13,6 +13,9 @@ SYNOPSIS
         $parser = PICA::Parser::XML->new( @options );
         $writer = PICA::Writer::Plain->new( @options );
     
+        use PICA::Schema;
+        $schema = PICA::Schema->new();
+    
         # parse records
         while ( my $record = $parser->next ) {
             
@@ -40,6 +43,9 @@ SYNOPSIS
             # stringify record
             my $plain = $record->string;
             my $xml = $record->string('xml');
+    
+            # validate record
+            my $errors = $schema->check($record);
         }
       
         # parse single record from string

@@ -1,5 +1,5 @@
 package WebService::Braintree::Discount;
-$WebService::Braintree::Discount::VERSION = '1.0';
+$WebService::Braintree::Discount::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -18,7 +18,7 @@ extends "WebService::Braintree::ResultObject";
 
 =head2 all()
 
-This returns all the add-ons.
+This returns all the discounts.
 
 =cut
 

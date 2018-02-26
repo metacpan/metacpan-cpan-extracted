@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Gen"
       }
    },
-   "version" : "0.484",
+   "version" : "0.485",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -169,7 +169,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.591"
+            "version" : "0.592"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -437,7 +437,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
-            "version" : "2.057"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",

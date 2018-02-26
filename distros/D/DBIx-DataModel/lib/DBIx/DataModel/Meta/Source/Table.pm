@@ -3,16 +3,14 @@ use strict;
 use warnings;
 use parent "DBIx::DataModel::Meta::Source";
 use DBIx::DataModel;
-use DBIx::DataModel::Meta::Utils;
-
-use Carp;
-use Params::Validate qw/HASHREF ARRAYREF SCALAR/;
-use List::MoreUtils  qw/any/;
-use Scalar::Does     qw/does/;
+use DBIx::DataModel::Meta::Utils qw/define_method does/;
+use Params::Validate             qw/HASHREF ARRAYREF SCALAR/;
+use List::MoreUtils              qw/any/;
+use Carp::Clan                   qw[^(DBIx::DataModel::|SQL::Abstract)];
 
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+
 
 sub new {
   my $class = shift;
@@ -92,12 +90,13 @@ sub define_navigation_method {
     my $statement = $self->join(@path); # Source::join, not Schema::join
 
     # return either the resulting rows, or the query statement
-    return ref $self ? $statement->select(@args)   # when instance method
-                     : $statement->refine(@args);  # when class method
+    return $self->_is_called_as_class_method
+             ? $statement->refine(@args)  # when class method
+             : $statement->select(@args); # when instance method
   };
 
   # install the method
-  DBIx::DataModel::Meta::Utils->define_method(
+  define_method(
     class => $self->{class},
     name  => $method_name,
     body  => $method_body,
@@ -162,7 +161,7 @@ sub define_auto_expand {
   };
 
   # install the method
-  DBIx::DataModel::Meta::Utils->define_method(
+  define_method(
     class          => $self->{class},
     name           => 'auto_expand',
     body           => $body,

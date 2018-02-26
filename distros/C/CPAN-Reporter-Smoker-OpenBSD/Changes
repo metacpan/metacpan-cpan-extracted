@@ -1,10 +1,197 @@
 ==================================================
-Changes from 2017-01-02 00:00:00 +0000 to present.
+Changes from 2017-02-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2018-01-02 20:07:41 +0000
+version 0.012 at 2018-02-26 02:25:58 +0000
 ------------------------------------------
+
+  Change: 7ad9b861993ed12d46ada9828f782caa7d107d9d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-25 23:24:16 +0000
+
+    Enhancements for dblock
+
+    dblock now accepts custom comments. dblock now adds the PERBREW_PERL
+    environment variable to be matched against the perl version that was
+    identified some issue. 
+
+  Change: be530ec91b76823f20d0eaea487e66e8b7ee3b27
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-21 19:25:38 +0000
+
+    Added distroprefs to disable distro smoking tests 
+
+  Change: 6a78c834e5366de9462c7c9d7ac2d215d4d9a473
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-18 20:06:39 +0000
+
+    Merge pull request #2 from glasswalk3r/DBIx-Class-extended-tests
+
+    Enabled DBIx::Class module extended testing 
+
+  Change: b21e26ebbb1da5d1f55c70a4f8301339590e9874
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-18 20:00:47 +0000
+
+    Improvements and refactoring 
+
+  Change: 57aab7347e5cdc04f045aa24ba332389c687a1c3
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-18 15:45:43 +0000
+
+    Removed required modules testing
+
+    It was taking too much time to run the tests, and some modules where
+    requiring user input since where running outside the smoker. Better
+    leave them to be tested under the smoke. 
+
+  Change: d595af0f47c517f5a49e65a22b3b1dd492f851a1
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-16 19:41:38 +0000
+
+    Bug fixes of errors identified during testing 
+
+  Change: 6f3cff62011558b493a5244b3e15ffcf36856b8c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-16 14:24:30 +0000
+
+    Added more distros to be blocked 
+
+  Change: ca8735d97bf54cc1798ec81d260ca1606c25108b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-15 19:34:45 +0000
+
+    Bug fixes of errors identified during testing 
+
+  Change: b09026c726320e4038ed895b002c9320217d19d3
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-13 20:12:34 +0000
+
+    Extended tests for DBIx::Class 
+
+  Change: 3662ee8a2a71dc9aad1fad1b7432fd9d6e722cb2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-11 01:31:59 +0000
+
+    Small bug fixes, improved testing for DBIx::Class
+
+    Fixed small bug regarding configuration for extended tests of
+    DBIx::Class Fixed the "flavor" of some packages of OpenBSD that were
+    not being installed properly. Added LOTS of dependencies to
+    install_perl.sh to favor DBIx::Class, but those dependencies should
+    be installed elsewhere and with testing enabled. 
+
+  Change: 046552baac4aea520ce874db32e5e46dd11bd46e
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-09 19:13:22 +0000
+
+    Merge pull request #1 from glasswalk3r/using_parallel
+
+    Using parallel 
+
+  Change: cb6d09e89eb64a98ada530f6292929f14b456008
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-02-09 19:13:04 +0000
+
+    Merge branch 'master' into using_parallel 
+
+  Change: 7290e851b014a2d52e11a37b1c09a8cba8e2de54
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-08 16:31:00 +0000
+
+    Small fixes 
+
+  Change: 989913d54e176b70a2df825761cc8cb34af267b1
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-05 13:22:35 +0000
+
+    Added more distroprefs 
+
+  Change: 6d5829361fc82b624ebbeb63f24aae8cf879379e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-02-04 20:10:34 +0000
+
+    Set OpenBSD 6.2 as default 
+
+  Change: 08d801680e64070fedbb72aed78829d4cc574eae
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-23 14:43:49 +0000
+
+    Added function to cleanup CPAN related files
+
+    This function should be executed periodically to remove files that
+    are not required after provisioning. 
+
+  Change: dba4fcbf17ce47a6edbec37956c85bdef66e827b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-21 13:26:29 +0000
+
+    Small fixes 
+
+  Change: 9814f0321823ab4e91dba31fd0d310c67b5c639f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-21 13:20:43 +0000
+
+    Small fixes 
+
+  Change: 311eef2a2ec135166107c55ebc7ba15b0e3f4537
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-21 13:06:41 +0000
+
+    Replaced Mysql with MariaDB for correctness 
+
+  Change: 094e040da54e7671e846de79deac21fa560ea346
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-01-21 13:05:00 +0000
+
+    Missed the keyboard configuration
+
+    Which is also implemented with --provision option. 
+
+  Change: eeeb8e91f8644dd31d57ffb225673e531367491f
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2018-01-21 12:59:34 +0000
+
+    Updated the README.md
+
+    Some information was outdated, some were missing. 
+
+  Change: 929750b358f66b8f8a62390c009b8d7674a7873d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-19 16:58:34 +0000
+
+    More distroprefs for blocking distributions 
+
+  Change: 8d31890d2bddd213fb552443c6948d269b74db36
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-17 16:06:42 +0000
+
+    More distroprefs for blocking distributions 
+
+  Change: 0de6ff32ae919a5c6ed897aaed36d564c410cdfb
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-12 12:26:37 +0000
+
+    New distroprefs files blocking distros on Smoker 
+
+  Change: afe99b5c684cf47c8578d7b010e36f37d183b9ef
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-05 17:52:30 +0000
+
+    Added preference files for problematic distros 
+
+  Change: b5a6b32bd6f78777906ea1995c0f5d15c4340e8b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-04 07:20:44 +0000
+
+    Non required package_dir variable removed 
+
+  Change: 5a6384a01c60baa86db27a8cc85d8e10bc6309a4
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2018-01-02 18:08:24 +0000
+
+    Increase release version 
 
   Change: 57722895f8a0dc5db9cf5e2678fe97b1d8f1ab82
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -25,6 +212,17 @@ version 0.011 at 2018-01-02 20:07:41 +0000
 
     Added more preference files 
 
+  Change: 4551fb1bc03af51fe627c40e6928b3233b5967cf
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-27 16:11:13 +0000
+
+    Bug fixes and improvements
+
+    Added missing instructions to make parallel work to compile perl and
+    install required modules. Added optimizations to the Vagrantfile that
+    were already applied to the master branch. Preliminary tests shows a
+    reduction from 9148 seconds to 5384 seconds to provision to users. 
+
   Change: aa73a5633314cf3c4d0d145c863f6856ca5f0b22
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
   Date : 2017-12-26 18:56:54 +0000
@@ -36,6 +234,12 @@ version 0.011 at 2018-01-02 20:07:41 +0000
   Date : 2017-12-26 08:18:44 +0000
 
     Measuring provisioning time for users 
+
+  Change: 46645fcc7d35be3facf14e44cb55ade1a878e52f
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-26 05:59:11 +0000
+
+    Bug fixes, matching changes on master branch 
 
   Change: cd7b851ff707584c3bf37afa8f7e7dce1cd34880
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
@@ -53,9 +257,22 @@ version 0.011 at 2018-01-02 20:07:41 +0000
 
     Small improvement regarding guest name resolution 
 
+  Change: aedee50cbdd8eb116ef7edf3298eda5d5134775d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-22 17:18:45 +0000
+
+    ÂAdding parallel program to the project in order to speed up the
+    perl installing 
+
   Change: eaac43ef502fc03cc3f54df3c26c4541791f3e2b
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
   Date : 2017-12-22 13:06:40 +0000
+
+    More bug fixes for vagrant user provisioning 
+
+  Change: 2d9f829f706e57e40fe439e5e4ccf8a18efe851c
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-22 13:04:35 +0000
 
     More bug fixes for vagrant user provisioning 
 
@@ -64,6 +281,29 @@ version 0.011 at 2018-01-02 20:07:41 +0000
   Date : 2017-12-22 12:41:53 +0000
 
     Bug fixes 
+
+  Change: a4ccdf7c60eb0906d121edfc2cd455171346bdc5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-22 12:38:40 +0000
+
+    Bug fixes 
+
+  Change: e157d178812ed4f8e660a97009c995b7d56e367b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-20 19:52:15 +0000
+
+    Included more automation steps for vagrant user
+
+    Some required modules will be installed during the provisioning (only
+    the perl and basic modules will be available). metabase-relayd
+    configuration was added as well. Cleaning up the vagrant home
+    directory when finished the provisioning. 
+
+  Change: be8f695a495bc4f584074e72577f335957860a3e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-12-19 18:36:01 +0000
+
+    Experimentations with parallel to install new perl 
 
   Change: 2f3fcb375519684663547bd233eb1693f1852906
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

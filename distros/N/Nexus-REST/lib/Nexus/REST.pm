@@ -1,9 +1,6 @@
 package Nexus::REST;
-{
-  $Nexus::REST::VERSION = '0.001';
-}
 # ABSTRACT: Thin wrapper around Nexus's REST API
-
+$Nexus::REST::VERSION = '0.002';
 use 5.010;
 use utf8;
 use strict;
@@ -13,7 +10,7 @@ use Carp;
 use URI;
 use MIME::Base64;
 use URI::Escape;
-use JSON;
+use JSON 2.23;
 use Data::Util qw/:check/;
 use REST::Client;
 
@@ -24,9 +21,9 @@ sub new {
     is_instance($URL, 'URI')
         or croak __PACKAGE__ . "::new: URL argument must be a string or a URI object.\n";
 
-    # Append the service suffix if not already specified
-    unless ($URL->path =~ m@/service/local$@) {
-        $URL->path($URL->path . '/service/local');
+    # Append the service prefix if not already specified
+    if ($URL->path =~ m@^/*$@) {
+        $URL->path($URL->path . '/service');
     }
 
     # If no password is set we try to lookup the credentials in the .netrc file
@@ -63,7 +60,7 @@ sub new {
     # simply force the sending of the authentication header.
     $rest->addHeader(Authorization => 'Basic ' . encode_base64("$username:$password"));
 
-    $rest->addHeader(accept => 'application/json');
+    $rest->addHeader(Accept => 'application/json');
 
     # Configure UserAgent name
     $rest->getUseragent->agent(__PACKAGE__);
@@ -188,6 +185,40 @@ sub POST {
     return $self->_content();
 }
 
+sub get_iterator {
+    my ($self, $path, $query) = @_;
+
+    return Nexus::REST::Iterator->new($self, $path, $query);
+}
+
+package Nexus::REST::Iterator;
+$Nexus::REST::Iterator::VERSION = '0.002';
+sub new {
+    my ($class, $nexus, $path, $query) = @_;
+
+    return bless {
+        nexus => $nexus,
+        path  => $path,
+        query => $query,
+        batch => $nexus->GET($path, $query),
+    } => $class;
+}
+
+sub next {
+    my ($self) = @_;
+
+    unless (@{$self->{batch}{items}}) {
+        unless ($self->{batch}{continuationToken}) {
+            delete @{$self}{keys %$self}; # Don't hold a reference to Nexus more than needed
+            return;
+        }
+        $self->{query}{continuationToken} = $self->{batch}{continuationToken};
+        $self->{batch} = $self->{nexus}->GET($self->{path}, $self->{query});
+    }
+
+    return shift @{$self->{batch}{items}};
+}
+
 1;
 
 __END__
@@ -202,7 +233,7 @@ Nexus::REST - Thin wrapper around Nexus's REST API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -215,15 +246,15 @@ version 0.001
 L<Nexus|http://www.sonatype.org/nexus/> is an artifact repository manager
 from L<Sonatype|http://www.sonatype.com/>.
 
-This module is a thin wrapper around Nexus's REST API:
+This module is a thin wrapper around L<Sonatype' Nexus 3 REST
+API|https://help.sonatype.com/display/NXRM3/REST+and+Integration+API>. It makes
+it easy to invoke the REST API endpoints without having to deal with data
+convertion into JSON and with HTTP.
 
-=over
-
-=item * L<Core API|https://repository.sonatype.org/nexus-restlet1x-plugin/default/docs/index.html>
-
-=item * L<Indexer Lucene Plugin|https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/index.html>
-
-=back
+The best way to get to know the API is using it's L<swagger|https://swagger.io/>
+UI. As of Nexus 3.6.1, this interface is available under the API item via the
+System sub menu of the Administration menu.  For Nexus 3.3.0 through 3.6.0, use
+the following URL: "<nexus_url>/swagger-ui/".
 
 =head1 CONSTRUCTOR
 
@@ -235,8 +266,18 @@ The constructor needs up to four arguments:
 
 =item * URL
 
-A string or a URI object denoting the base URL of the Nexus
-server. This is a required argument.
+A string or a URI object denoting the base URL of the Nexus API service.
+
+This should contain the path prefix, which you can check at the bottom of the
+swagger UI page. It should be something like this:
+
+  https://nexus.company.com/service
+
+It the path prefix isn't specified the prefix C</service> will be tried by
+default. (Note that up to Nexus 3.7 the default prefix was
+C</service/siesta>. Make sure to specify it if you're using an old version.)
+
+This is a required argument.
 
 =item * USERNAME
 
@@ -264,7 +305,7 @@ overwrites any value associated with the C<host> key in this hash.
 
 =head1 REST METHODS
 
-Nexus's REST API documentation lists dozens of "resources" which can be
+Nexus's REST API documentation lists a few "resources" which can be
 operated via the standard HTTP requests: GET, DELETE, PUT, and
 POST. Nexus::REST objects implement four methods called GET, DELETE,
 PUT, and POST to make it easier to invoke and get results from Nexus's
@@ -276,8 +317,8 @@ All four methods need two arguments:
 
 =item * RESOURCE
 
-This is the resource's 'path', sans the C</service/local> prefix. For
-example, ...
+This is the resource's 'path'. For example, C</rest/beta/assets> and
+C</rest/beta/search>.
 
 This argument is required.
 
@@ -372,7 +413,46 @@ Updates RESOURCE based on VALUE.
 
 =head1 UTILITY METHODS
 
-This module still doesn't provide any utility methods.
+=head2 get_iterator RESOURCE [, QUERY]
+
+Some REST methods may return paginated results, such as: /rest/beta/assets,
+/rest/beta/components, /rest/beta/search, and /rest/beta/tasks. The pagination
+is controlled by means of a C<continuationToken> field which can be returned by
+these methods. If it is, then you can get subsequent results by replaying the
+method and passing the continuationToken as a new parameter. You should do
+something like this:
+
+    %query = (repository => 'releases', version => '1.2.3');
+
+    do {
+        my $search = $nexus->GET('/rest/beta/search', \%query);
+
+        if ($search->{continuationToken}) {
+            $query{continuationToken} = $search->{continuationToken};
+        } else {
+            delete $query{continuationToken};
+        }
+
+        foreach my $item (@{$search->{items}}) {
+            # do something with $item
+        }
+    } while (exists $query{continuationToken});
+
+In order to make it easier to work with methods with paginated results, you can
+wrap them with this utility method. Like this:
+
+    my $iterator = $nexus->get_iterator('/rest/beta/search', {
+        repository => 'releases',
+        version    => '1.2.3',
+    });
+
+    while (my $item = $iterator->next) {
+        # do something with $item
+    }
+
+The B<get_iterator> method returns an B<Nexus::REST::Iterator> object, which
+provides a single method: B<next>. Each call to C<next> returns a new item until
+all are exausted, when it returns undef.
 
 =head1 SEE ALSO
 
@@ -394,7 +474,7 @@ Gustavo L. de M. Chaves <gnustavo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by CPqD <www.cpqd.com.br>.
+This software is copyright (c) 2018 by CPqD <www.cpqd.com.br>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

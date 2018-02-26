@@ -7,7 +7,7 @@ use base qw( Exporter );
 our @EXPORT = qw( scalar_to_buffer buffer_to_scalar );
 
 # ABSTRACT: Convert scalars to C buffers
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 use constant _incantation => 
@@ -41,13 +41,13 @@ FFI::Platypus::Buffer - Convert scalars to C buffers
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
  use FFI::Platypus::Buffer;
  my($pointer, $size) = scalar_to_buffer $scalar;
- my $scalar2 = buffer_to_scallar $pointer, $size;
+ my $scalar2 = buffer_to_scalar $pointer, $size;
 
 =head1 DESCRIPTION
 
@@ -114,6 +114,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

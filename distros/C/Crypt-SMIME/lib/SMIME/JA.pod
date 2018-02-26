@@ -155,8 +155,8 @@ C<$flags> として C<Crypt::SMIME::NO_CHECK_CERTIFICATE>
 C<$flags> のデフォルト値は C<0>
 であり、この場合には全ての整合性についての検証を行う。
 
-元の S/MIME メッセージ, C<$flags>, または公開鍵の少なくとも一つが汚染されている
-(tainted) ならば、検証されたメッセージも汚染される。
+元の S/MIME メッセージ, C<$flags>, 検証時刻 (L</setAtTime>), または
+公開鍵の少なくとも一つが汚染されている(tainted) ならば、検証されたメッセージも汚染される。
 
 =item encrypt()
 
@@ -197,6 +197,18 @@ C<Subject> はS/MIMEを認識できないメーラのために, multipartの
 渡されたMIMEメッセージがS/MIMEで暗号化されたものなら真を返す。
 暗号化後に署名したメッセージを渡した場合は、暗号文が直接見えない為、
 偽を返す事に注意。
+
+=back
+
+=over
+
+=item setAtTime()
+
+  $yesterday = time - (60*60*24);
+  $smime->setAtTime($yesterday);
+
+検証時に用いる時刻を設定する。デフォルトは現在時刻。
+UNIX epoch 形式でなければならない。
 
 =back
 

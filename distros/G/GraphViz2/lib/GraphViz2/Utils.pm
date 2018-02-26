@@ -28,7 +28,7 @@ has config =>
 	required => 0,
 );
 
-our $VERSION = '2.46';
+our $VERSION = '2.47';
 
 # ------------------------------------------------
 
@@ -43,7 +43,7 @@ sub generate_demo_environment
 	push @environment,
 	{left => 'Author', right => mark_raw(qq|<a href="http://savage.net.au/">Ron Savage</a>|)},
 	{left => 'Date',   right => Date::Simple -> today},
-	{left => 'OS',     right => 'Debian V 6'},
+	{left => 'OS',     right => 'Debian V 8.10'},
 	{left => 'Perl',   right => $Config{version} };
 
 	return \@environment;

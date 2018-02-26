@@ -1,11 +1,6 @@
 package String::ToIdentifier::EN;
-BEGIN {
-  $String::ToIdentifier::EN::AUTHORITY = 'cpan:RKITOVER';
-}
-{
-  $String::ToIdentifier::EN::VERSION = '0.11';
-}
-
+our $AUTHORITY = 'cpan:AVAR';
+$String::ToIdentifier::EN::VERSION = '0.12';
 use 5.008001;
 use strict;
 use warnings;
@@ -296,51 +291,15 @@ L<Lingua::EN::Inflect::Phrase>
 
 =head1 AUTHOR
 
-Rafael Kitover, C<< <rkitover@cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-string-toidentifier-en at
-rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-ToIdentifier-EN>.  I
-will be notified, and then you'll automatically be notified of progress on your
-bug as I make changes.
+Rafael Kitover, C<< <rkitover@gmail.com> >>
 
 =head1 REPOSITORY
 
 L<http://github.com/rkitover/string-toidentifier-en>
 
-=head1 SUPPORT
-
-More information on this module is available at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=String-ToIdentifier-EN>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/String-ToIdentifier-EN>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/String-ToIdentifier-EN>
-
-=item * MetaCPAN
-
-L<https://metacpan.org/module/String::ToIdentifier::EN>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/String-ToIdentifier-EN/>
-
-=back
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 Rafael Kitover <rkitover@cpan.org>.
+Copyright (c) 2018 Rafael Kitover <rkitover@gmail.com>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

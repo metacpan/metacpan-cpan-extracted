@@ -12,7 +12,7 @@ sub CLI ($self) {
             release => { desc => 'enables the RELEASE_TESTING env variable', },
             smoke   => { desc => 'enables the AUTOMATED_TESTING env variable', },
             all     => { desc => 'enables the RELEASE_TESTING, AUTOMATED_TESTING and AUTHOR_TESTING env variables', },
-            jobs    => { desc => 'number of parallel test jobs to run',                        isa     => 'PositiveInt' },
+            jobs    => { desc => 'number of parallel test jobs to run', isa => 'PositiveInt' },
             verbose => { desc => 'enables verbose testing (TEST_VERBOSE env variable on Makefile.PL, --verbose on Build.PL' },
             keep    => {
                 desc    => 'keep temp build dir',

@@ -1,5 +1,13 @@
 Revision history for Music-Lyrics-LRC
 
+0.13    2018-02-21
+
+ - Fix botched Changes file for previous release...
+
+0.12    2018-02-21
+
+ - Begin signing distributions with Module::Signature
+
 0.11    2017-12-08
 
  - Add basic load() and save() method tests

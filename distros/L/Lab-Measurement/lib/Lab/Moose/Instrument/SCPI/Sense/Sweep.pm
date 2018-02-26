@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Sense::Sweep;
 #ABSTRACT: Role for the SCPI SENSe:SWEep subsystem
-$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.620';
+$Lab::Moose::Instrument::SCPI::Sense::Sweep::VERSION = '3.621';
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
 use Lab::Moose::Instrument
@@ -57,7 +57,7 @@ Lab::Moose::Instrument::SCPI::Sense::Sweep - Role for the SCPI SENSe:SWEep subsy
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 METHODS
 

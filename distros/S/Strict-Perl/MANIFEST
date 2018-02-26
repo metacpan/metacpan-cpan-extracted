@@ -1,9 +1,9 @@
 lib/Strict/Perl.pm
-lib/Test/Simply.pm
 Changes
 Makefile.PL
-pMakefile.PL
+pmake.bat
 MANIFEST
 README
 META.yml
+LICENSE
 t/001_test.t

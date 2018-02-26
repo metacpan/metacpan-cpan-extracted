@@ -9,8 +9,10 @@ plugin 'Probe::CommandLine' => (
 
 share {
 
+  meta->prop->{out_of_source} = 1;
+
   plugin Download => (
-    url     => 'ftp://ftp.gnu.org/gnu/gzip/',
+    url     => 'http://ftp.gnu.org/gnu/gzip/',
     filter  => qr/^gzip-.*\.tar\.xz$/,
     version => qr/([0-9\.]+)/,
   );
@@ -21,5 +23,7 @@ share {
   plugin Extract => 'tar.xz';
   
   plugin 'Build::Autoconf' => ();
+  
+  test [ '%{make} check' ];
 
 };

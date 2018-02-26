@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.064   2018-02-25
+        - Use env var "tc_reset_auto_up" to reset auto-up if a key other than Enter was pressed.
+
 0.063   2018-02-04
         - Bugfix: no output if one table row and "keep_header" enabled.
 

@@ -25,12 +25,13 @@ my %module_build_args = (
     "Ruslan Zakirov <Ruslan.Zakirov\@gmail.com>"
   ],
   "dist_name" => "Alien-LibGumbo",
-  "dist_version" => "0.04",
+  "dist_version" => "0.05",
   "license" => "perl",
   "module_name" => "Alien::LibGumbo",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
+    "perl" => "5.010",
     "Alien::Base" => "0.005",
     "File::ShareDir" => "1.03",
     "Path::Class" => "0.013"

@@ -1,5 +1,5 @@
 package Selenium::CanStartBinary::FindBinary;
-$Selenium::CanStartBinary::FindBinary::VERSION = '1.24';
+$Selenium::CanStartBinary::FindBinary::VERSION = '1.26';
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ Selenium::CanStartBinary::FindBinary - Coercions for finding webdriver binaries 
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =for Pod::Coverage *EVERYTHING*
 
@@ -103,7 +103,7 @@ L<Selenium::Remote::Driver|Selenium::Remote::Driver>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
+https://github.com/teodesian/Selenium-Remote-Driver/issues
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

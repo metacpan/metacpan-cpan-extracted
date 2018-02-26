@@ -391,7 +391,7 @@ subtest 'Calling find with a nonexistant ID returns a NotFoundError' => sub {
 done_testing();
 
 sub generate_id {
-    return 'sub_merchant_account_id' . int(rand(1000));
+    return 'sub_merchant_account_id' . int(rand(1000000));
 }
 
 # While this function may seem a little overly complicated, the alternative is

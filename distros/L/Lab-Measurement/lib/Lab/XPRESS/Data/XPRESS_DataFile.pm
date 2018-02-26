@@ -1,6 +1,6 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
 #ABSTRACT: XPRESS data file module
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.620';
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.621';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);
@@ -609,7 +609,7 @@ Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 COPYRIGHT AND LICENSE
 

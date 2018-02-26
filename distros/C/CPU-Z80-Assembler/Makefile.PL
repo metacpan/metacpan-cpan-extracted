@@ -38,7 +38,7 @@ WriteMakefile(
         : ()
     ),
 
-    ($mm_ver >= 6.31 ? (LICENSE => 'perl_5_16') : ()),
+    ($mm_ver >= 6.31 ? (LICENSE => 'perl_5') : ()),
 
     ($mm_ver <= 6.45
         ? ()

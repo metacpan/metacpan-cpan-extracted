@@ -59,10 +59,38 @@ if ($^O ne 'MSWin32') {
     }
 
     {
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $p = CPAN::Plugin::Sysdeps->new('pkg_add');
+	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
+	is scalar(@cmds), 1;
+	maybe_shift_sudo $cmds[-1];
+	is_deeply $cmds[-1], [qw(pkg_add libfoo libbar)];
+	like $warnings[0], qr{batch=0 NYI for pkg_add}, 'expected warning';
+	is @warnings, 1, 'only one warning';
+    }
+
+    {
 	my $p = CPAN::Plugin::Sysdeps->new('homebrew');
 	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
 	is scalar(@cmds), 2;
 	is_deeply $cmds[-1], [qw(brew install libfoo libbar)];
+    }
+
+    {
+	my $p = CPAN::Plugin::Sysdeps->new('yum');
+	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
+	is scalar(@cmds), 1;
+	maybe_shift_sudo $cmds[-1];
+	is_deeply $cmds[-1], [qw(yum install libfoo libbar)];
+    }
+
+    {
+	my $p = CPAN::Plugin::Sysdeps->new('dnf');
+	my @cmds = $p->_install_packages_commands(qw(libfoo libbar));
+	is scalar(@cmds), 1;
+	maybe_shift_sudo $cmds[-1];
+	is_deeply $cmds[-1], [qw(dnf install libfoo libbar)];
     }
 } else {
     {

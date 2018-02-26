@@ -11,6 +11,7 @@ struct zmq_raw_timers
 {
 	zmq_raw_mutex *mutex;
 	void *timers;
+	int timer_count;
 	void *thread;
 	int running;
 
@@ -70,12 +71,14 @@ done:
 	timers->wakeup_item.events = ZMQ_POLLIN;
 	timers->wakeup_item.socket = timers->wakeup_recv;
 	timers->mutex = zmq_raw_mutex_create();
+	timers->timer_count = 0;
 	return timers;
 }
 
 void zmq_raw_timers_destroy (zmq_raw_timers *timers)
 {
 	assert (timers);
+	assert (timers->timer_count == 0);
 
 	zmq_raw_mutex_lock (timers->mutex);
 	timers->running = 0;
@@ -141,6 +144,10 @@ static void zmq_raw_timer_destroy (zmq_raw_timer *timer)
 	if (timer->recv && !timer->recv_sv)
 		zmq_close (timer->recv);
 
+	zmq_raw_mutex_lock (timer->timers->mutex);
+	--timer->timers->timer_count;
+	zmq_raw_mutex_unlock (timer->timers->mutex);
+
 	free (timer);
 }
 
@@ -188,6 +195,7 @@ zmq_raw_timer *zmq_raw_timers_start (zmq_raw_timers *timers, void *context, int 
 	timer->timers = timers;
 	zmq_raw_timers__start (timer);
 
+	++timer->timers->timer_count;
 	zmq_raw_mutex_unlock (timers->mutex);
 
 	return timer;

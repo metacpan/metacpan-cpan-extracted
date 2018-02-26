@@ -22,7 +22,7 @@ const our $TX_STATUS_ERROR => 'E';    # in a failed transaction block (queries w
 require Pcore::PgSQL::DBH;
 
 has max_dbh => ( is => 'ro', isa => PositiveInt, default => 3 );
-has backlog => ( is => 'ro', isa => Maybe [PositiveInt], default => 1_000 );
+has backlog  => ( is => 'ro',   isa => Maybe [PositiveInt], default => 1_000 );
 has host     => ( is => 'lazy', isa => Str );
 has port     => ( is => 'ro',   isa => PositiveOrZeroInt, default => 5432 );
 has username => ( is => 'lazy', isa => Str );

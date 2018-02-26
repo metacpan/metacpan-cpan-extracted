@@ -4,11 +4,9 @@ package Markdown::Pod::Handler;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
-use Markdent::Types qw(
-    Bool Str HashRef OutputStream HeaderLevel
-);
+use Markdent::Types;
 
 use namespace::autoclean;
 use Moose;
@@ -20,13 +18,13 @@ with 'Markdent::Role::EventsAsMethods';
 
 has encoding => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     default => q{},
 );
 
 has _output => (
     is       => 'ro',
-    isa      => OutputStream,
+    isa      => t('OutputStream'),
     required => 1,
     init_arg => 'output',
 );
@@ -52,6 +50,8 @@ use constant {
 
 my @style_stack;
 
+my $list_depth = 0;
+
 sub _stream {
     my ( $self, @params ) = @_;
     print { $self->_output } @params;
@@ -67,7 +67,7 @@ sub end_document { }
 
 sub text {
     my $self = shift;
-    my ($text) = validated_list( \@_, text => { isa => Str } );
+    my ($text) = validated_list( \@_, text => { type => 'Str' } );
 
     if (@style_stack) {
         # This allows the end_link() handler to know that *some* text was inside
@@ -97,14 +97,14 @@ sub text {
 
 sub start_header {
     my $self = shift;
-    my ($level) = validated_list( \@_, level => { isa => HeaderLevel }, );
+    my ($level) = validated_list( \@_, level => { type => 'HeaderLevel' }, );
 
     $self->_stream("\n=head$level ");
 }
 
 sub end_header {
     my $self = shift;
-    my ($level) = validated_list( \@_, level => { isa => HeaderLevel }, );
+    my ($level) = validated_list( \@_, level => { type => 'HeaderLevel' }, );
 
     $self->_stream("\n");
 }
@@ -123,10 +123,10 @@ sub start_link {
     my $self = shift;
     my %p    = validated_hash(
         \@_,
-        uri            => { isa => Str },
-        title          => { isa => Str, optional => 1 },
-        id             => { isa => Str, optional => 1 },
-        is_implicit_id => { isa => Bool, optional => 1 },
+        uri            => { type => 'Str' },
+        title          => { type => 'Str', optional => 1 },
+        id             => { type => 'Str', optional => 1 },
+        is_implicit_id => { type => 'Bool', optional => 1 },
     );
 
     delete @p{ grep { !defined $p{$_} } keys %p };
@@ -180,7 +180,7 @@ sub end_emphasis {
 
 sub preformatted {
     my $self = shift;
-    my ($text) = validated_list( \@_, text => { isa => Str }, );
+    my ($text) = validated_list( \@_, text => { type => 'Str' }, );
 
     chomp $text;
     $text =~ s/^/    /gsm;
@@ -202,30 +202,36 @@ sub end_blockquote {
 sub start_unordered_list {
     my $self = shift;
 
+    $self->_stream("\n") if $list_depth;
+    $list_depth++;
     $self->_stream("=over\n\n");
 }
 
 sub end_unordered_list {
     my $self = shift;
 
+    $list_depth--;
     $self->_stream("=back\n\n");
 }
 
 sub start_ordered_list {
     my $self = shift;
 
+    $self->_stream("\n") if $list_depth;
+    $list_depth++;
     $self->_stream("=over\n\n");
 }
 
 sub end_ordered_list {
     my $self = shift;
 
+    $list_depth--;
     $self->_stream("=back\n\n");
 }
 
 sub start_list_item {
     my $self = shift;
-    my %p = validated_hash( \@_, bullet => { isa => Str }, );
+    my %p = validated_hash( \@_, bullet => { type => 'Str' }, );
 
     $self->_stream("=item $p{bullet}\n\n");
 }
@@ -277,8 +283,8 @@ sub code_block {
     my $self = shift;
     my ($code) = validated_list(
         \@_,
-        code     => { isa => Str },
-        language => { isa => Str, optional => 1 }
+        code     => { type => 'Str' },
+        language => { type => 'Str', optional => 1 }
     );
     $code =~ s/^(.*)$/ $1/mg;
     $self->_stream("\n$code\n");
@@ -288,11 +294,11 @@ sub image {
     my $self = shift;
     my %p    = validated_hash(
         \@_,
-        alt_text       => { isa => Str },
-        uri            => { isa => Str, optional => 1 },
-        title          => { isa => Str, optional => 1 },
-        id             => { isa => Str, optional => 1 },
-        is_implicit_id => { isa => Bool, optional => 1 },
+        alt_text       => { type => 'Str' },
+        uri            => { type => 'Str', optional => 1 },
+        title          => { type => 'Str', optional => 1 },
+        id             => { type => 'Str', optional => 1 },
+        is_implicit_id => { type => 'Bool', optional => 1 },
     );
 
     delete @p{ grep { !defined $p{$_} } keys %p };
@@ -315,22 +321,22 @@ sub start_html_tag {
     my $self = shift;
     my ( $tag, $attributes ) = validated_list(
         \@_,
-        tag        => { isa => Str },
-        attributes => { isa => HashRef },
+        tag        => { type => 'Str' },
+        attributes => { type => 'HashRef' },
     );
 }
 
 sub end_html_tag {
     my $self = shift;
-    my ( $tag, $attributes ) = validated_list( \@_, tag => { isa => Str }, );
+    my ( $tag, $attributes ) = validated_list( \@_, tag => { type => 'Str' }, );
 }
 
 sub html_tag {
     my $self = shift;
     my ( $tag, $attributes ) = validated_list(
         \@_,
-        tag        => { isa => Str },
-        attributes => { isa => HashRef },
+        tag        => { type => 'Str' },
+        attributes => { type => 'HashRef' },
     );
 
     my $attributes_str = q{};
@@ -346,7 +352,7 @@ sub html_tag {
 
 sub html_block {
     my $self = shift;
-    my ($html) = validated_list( \@_, html => { isa => Str }, );
+    my ($html) = validated_list( \@_, html => { type => 'Str' }, );
 
     chomp $html;
     $self->_output()->print(
@@ -369,7 +375,7 @@ sub line_break {
 
 sub html_entity {
     my $self = shift;
-    my ($entity) = validated_list( \@_, entity => { isa => Str } );
+    my ($entity) = validated_list( \@_, entity => { type => 'Str' } );
 
     $self->_stream("E<$entity>");
 }
@@ -382,7 +388,7 @@ sub horizontal_rule {
 
 sub auto_link {
     my $self = shift;
-    my ($uri) = validated_list( \@_, uri => { isa => Str } );
+    my ($uri) = validated_list( \@_, uri => { type => 'Str' } );
     $self->_stream("L<$uri>");
 }
 
@@ -469,7 +475,7 @@ Markdown::Pod::Handler - Parser module to convert from markdown to POD
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -581,7 +587,7 @@ L<Text::MultiMarkdown>, L<Text::Markdown>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Keedi Kim.
+This software is copyright (c) 2018 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package WebService::Braintree::PaymentMethod;
-$WebService::Braintree::PaymentMethod::VERSION = '1.0';
+$WebService::Braintree::PaymentMethod::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -54,7 +54,7 @@ sub delete {
 
 =head2 grant()
 
-This takes a token and revokes the corresponding payment method (if found).
+This takes a token and grants the corresponding payment method (if found).
 
 =cut
 

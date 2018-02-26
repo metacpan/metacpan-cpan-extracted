@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 4fda1fa48eff0c5c38bdd9bcd43d2a8ca69a317e Changes
+SHA1 f92175a32a06d94dcf6d1a19c7e002f2bb2b9b7f LICENSE
+SHA1 dd2abc20512d298a7508bfb4f3c729cc60134ab4 MANIFEST
+SHA1 f1b230fab4d073dc7c0e4dc55b570421d0dace3f META.json
+SHA1 104db532c3ccf3b4f60e74aa8bca6f2aa2783e5a META.yml
+SHA1 f2646390ac7d63e9c8574d128fced8e38d9b35ee Makefile.PL
+SHA1 78d97e9bac13853cc185242fde50e839d24d7cdc README
+SHA1 51c9accec018adff8cd746dad9d000407aeac2c5 bin/runcrypt
+SHA1 6efbdf9cf894e19e539b806ed24444210e2ec0bd lib/Mail/Run/Crypt.pm
+SHA1 15438a2a7d77eab0e385b41b3742a9da4a1dd94f t/custom-name.t
+SHA1 706f18c2d0f3f91e96f54288155132f3d7dbbdb0 t/encrypt-explicit.t
+SHA1 66d018d9b58cedbe6a7315ba530a1af413d94dab t/encrypt-sign.t
+SHA1 aa04b3c334d065d20d12ee550623b064dad339ad t/encrypt.t
+SHA1 b8ba33d6f773fe9ffdf4211b9e5e4357aef21ee6 t/require-key-data.t
+SHA1 11b4dd66510e3e7869929e219d862e099cd17ebf t/require-mailto.t
+SHA1 7d9bdd979932caf83ddd20b96c26dc1986b16365 xt/manifest.t
+SHA1 59e7d967227ea6d3c29c0e08a3bb3c134aedeb0a xt/pod-coverage.t
+SHA1 1a3d2d6b8f39547b9ee68bf5cfa562e5be5ebdb7 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEMXmQoUWXofz4LZU6ta9fiSWSZgkFAlqM7SAACgkQta9fiSWS
+ZgnjRA/9Hcj7BczVE3qckEPmOxQb2Hg6TWlEzoTP4A8IL71bMqwEn2m43XeQ2zP+
+i7PxU6wyIuJwZW0QWpekFQeyjois/VFVcvqy6fTwSDOsQlT0LYZqGiShLq43wq5J
++IdGPiWgXupefr9AkStrTubAs7JT1KudLxynkXBU7/hVcuFKh0DNyYL9MbQ1qMox
+kThrIqemiYvM0AU+xKQA+A1v8XCQgENLpPKW/iKmwXuGPPnPMKxzxdCIG6jXoAH9
+o6dXgsL7U9XiUE3Huqlcx1gesEGD/z9yMBVBJg7KUReYa+pc2JbBYMcfpzLh1awC
+mnt/9luCWuz+uMZnfBs1NtYRtbscQz0jSKTLk/QBv4O7rOmhhy7RxhChYLvkDbCL
+Qwl61kf46gnKphwxkRzTfrJoGKdb0E6W7dKYZsGbE6EbCO3/i9715p06LOtrOuLQ
+63DH+upbbgkxPVkFu5B+5O9DmQjLTezqNwWz/T+s/E4RsRzvmpZMepaFuIVyfS0g
++YFuEykwi50kFMHIlweFm1ct79KKMyGaEf3vffvxRU5pDF2hM9zdlzW3I6GzRJ7r
+YKEWZ0GgfrgnL61Wash4ZknARGxC4x2uc6K8W4bXewF3zfRVJjc/iefSzclb6IRI
+lCxCrt7zrX0WSho1qGs3YzpHzLWuxhgmWZIy0pIIpiIfuFl4RLY=
+=umlW
+-----END PGP SIGNATURE-----

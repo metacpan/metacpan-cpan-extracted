@@ -17,7 +17,7 @@ our %EXPORT_TAGS = (
    );
 Exporter::export_ok_tags('constants');
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -372,7 +372,8 @@ value for C<$flags> is C<0>, which performs all the verifications.
 
 
 The resulting message will be tainted if the original S/MIME message,
-the C<$flags>, or at least one public key is tainted.
+the C<$flags>, verification time (L</setAtTime()>) or at least one
+of the provided public keys are tainted.
 
 
 =item encrypt()
@@ -421,6 +422,19 @@ Return true if the given string is an encrypted S/MIME message. Note that if the
 message was signed with non-detached signature after encryption, this method
 returns false because in that case the encrypted message is hidden in the
 signature.
+
+
+=back
+
+=over
+
+=item setAtTime()
+
+  $yesterday = time - (60*60*24);
+  $smime->setAtTime($yesterday);
+
+Set the time to use for verification. Default is to use the current time.
+Must be an unix epoch timestamp.
 
 
 =back

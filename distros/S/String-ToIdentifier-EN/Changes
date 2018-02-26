@@ -1,5 +1,8 @@
 Revision history for String::ToIdentifier::EN
 
+0.12 2018-02-26 04:04:09
+    - re-release dist with updated dist files gh#2
+
 0.11 2013-08-27 19:00:41
     - POD typo fixes from dsteinbrunner #1
 

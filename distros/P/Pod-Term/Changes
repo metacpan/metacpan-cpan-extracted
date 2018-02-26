@@ -1,0 +1,6 @@
+Revision history for Perl extension Pod::Term.
+
+0.01  Fri Feb 23 10:11:40 2018
+	- original version; created by h2xs 1.23 with options
+		-AX Pod::Term
+

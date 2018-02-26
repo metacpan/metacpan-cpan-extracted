@@ -29,7 +29,7 @@ L<REFERENCE|DBIx::DataModel::Doc::Reference>
 
 =item *
 
-L<MISC|DBIx::DataModel::Doc::Misc>
+COOKBOOK
 
 =item *
 
@@ -55,6 +55,12 @@ the following external sources :
 a C<DBI> connection, a L<SQL::Translator> parser, or a
 C<DBIx::Class> schema. 
 See L<DBIx::DataModel::Schema::Generator|DBIx::DataModel::Schema::Generator>.
+That schema skeleton contains enough information to be immediately
+usable with minimal functionalities; but it is usually a good idea
+to enrich the schema with additional specifications, like for example
+types and column definitions.
+
+
 
 =head2 Add custom methods into a generated table class
 
@@ -88,18 +94,60 @@ Another way to achieve the same result is to use C<DBIx::DataModel>'s
 L<internal utility method|DBIx::DataModel::Meta::Utils/define_method>
 for injecting methods into classes :
 
-   use DBIx::DataModel::Meta::Utils;
-   DBIx::DataModel::Meta::Utils->define_method(
-      class          => 'Some::Schema::Foo',
-      name           => 'my_added_method,
-      body           => sub {my $self = shift; ...},
+   use DBIx::DataModel::Meta::Utils qw/define_method/;
+   define_method(
+      class => 'Some::Schema::Foo',
+      name  => 'my_added_method',
+      body  => sub {my $self = shift; ...},
     );
   
 
+
+=head2 Views within the ORM
+
+
+C<define_table()> declarations usually map directly to database tables
+or database views; but it is also possible to map to an SQL query,
+possibly with a predefined C<where> clause :
+
+  $schema->metadm->define_table(
+    class       => 'View_example',
+    db_name     => 'Foo INNER JOIN Bar ON Foo.fk=Bar.pk',
+    where       => {col => $special_filter},
+    primary_key => [qw/some_foo_col some_bar_col/],
+    parents     => [map {$schema->metadm->table($_)} qw/Foo Bar/],
+  );
+
+The same can be declared through the front-end C<View()> method :
+
+  $schema->View('View_example', '*',
+                'Foo INNER JOIN Bar ON Foo.fk=Bar.pk',
+                {col => $special_filter}, [qw/Foo Bar/],
+                {primary_key => [qw/some_foo_col some_bar_col/],
+                 parents     => [map {$schema->metadm->table($_)} qw/Foo Bar/]},
+                );
+
+
+This is exactly the same idea as a database view, except that it is
+implemented within the ORM, not within the database. Such views can
+join several tables, or can specify WHERE clauses to filter the
+data. ORM views are useful to implement application-specific or
+short-lived requests, that would not be worth registering persistently
+within the database model. They can also be useful if you have no
+administration rights in the database.
+
+
 =head2 Object inflation/deflation
 
-Here is an example of inflating/deflating a scalar value from 
-the database into a Perl object :
+The term "object inflation" means that a scalar value read from a
+column in the database is transformed into an Perl object in memory,
+and is transformed back into a scalar value when writing into the
+database. The standard example for such situations is the handling
+of dates, because Perl programs often need to perform operations
+on dates that are not possible with a plain scalar format.
+
+Here is an example of automatic inflation/deflation of date columns
+to Perl objects of class L<Date::Simple> :
 
   # declare column type
   use Date::Simple;
@@ -111,6 +159,11 @@ the database into a Perl object :
   # apply column type to columns
   My::Table1->metadm->define_column_type(Date_simple => qw/d_start d_end/);
   My::Table2->metadm->define_column_type(Date_simple => qw/d_birth/);
+
+With this automatic conversion, all functionalities of L<Date::Simple>
+can be applied to date columns within rows of C<Table1> and C<Table2> :
+comparisons, date arithmetics, etc.
+
 
 B<Caveat>: the C<from_DB> / C<to_DB> functions do not apply
 automatically within C<-where> conditions. So the following
@@ -139,36 +192,125 @@ At places where a plain value is expected, you can put an arrayref of
 2 elements, where the first element is a type specification, and the
 second element is the value. This is convenient when the DBD driver
 needs additional information about the values used in the statement.
-See L<SQL::Abstract::More/"BIND VALUES WITH TYPES"> for explanations
-and examples. This can also be automated within a C<to_DB> handler,
-as shown above for object inflation.
+See L<SQL::Abstract::More/"BIND VALUES WITH TYPES"> for explanations.
+
+  my $rows = $source->select(
+    -where => {col => [{sql_type => 'some_type'}, $val]}
+  );
+  $source->insert(
+    {key => $pk, some_col => [{sql_type => 'some_type'}, $val]}
+  );
+  $record->update(
+    {some_col => [{sql_type => 'some_type'}, $val]}
+  );
+
+This can also be automated within a C<to_DB> handler :
+
+  # adding type information for the DBD handler to inform Oracle about XML data
+  $schema->Type(XML => 
+     to_DB  => sub {$_[0] = [{dbd_attrs => {ora_type => ORA_XMLTYPE}}, $_[0]]
+                        if $_[0]},
+    );
 
 =head2 Quoting table and column names
 
 By default, table or column names are inserted "as is" in the generated SQL;
 but sometimes this could cause conflicts with SQL reserved words.
 The solution is to quote table and column names, by activating the
-C<quote_char> option of L<SQL::Abstract>. Here is an example (assuming
+C<quote_char> option of L<SQL::Abstract>, inherited through
+L<SQL::Abstract::More>. Here is an example (assuming
 single-schema mode) :
 
   # define the schema
-  DBIx::DataModel->Schema('FOO');
+  DBIx::DataModel->Schema('SCH');
 
   # feed the schema with a custom instance of SQL::Abstract::More
   my $sqlam = SQL::Abstract::More->new(quote_char => "`");
-  FOO->singleton->sql_abstract($sqlam);
+  SCH->singleton->sql_abstract($sqlam);
 
   # define a table
-  FOO->Table(qw/Config CONFIG KEY/);
+  SCH->Table(qw/Config CONFIG KEY/);
 
   # produce SQL with quoted table and column names
-  my ($sql, @bind) = FOO::Config->select(
+  my ($sql, @bind) = SCH::Config->select(
     -columns   => [qw/KEY VALUE/],
     -where     => {KEY => 123},
     -result_as => 'sql',
    );
 
   print $sql; # SELECT `KEY`, `VALUE` FROM `CONFIG` WHERE ( `KEY` = ? )
+
+
+=head2 Self-referential associations
+
+Associations can be self-referential, i.e. describing tree
+structures :
+
+  $schema->Association([qw/OrganisationalUnit parent   1 ou_id       /],
+                       [qw/OrganisationalUnit children * parent_ou_id/],
+
+However, when there are several self-referential associations,
+we might get into problems : consider
+
+  $schema->Association([qw/Person mother   1 pers_id  /],
+                       [qw/Person children * mother_id/])
+         ->Association([qw/Person father   1 pers_id  /],
+                       [qw/Person children * father_id/]); # BUG: children
+
+This does not work because there are two definitions  of the "children"
+role name in the same class "Person".
+One solution is to distinguish these
+roles, and then write by hand a general "children" role :
+
+  $schema->Association([qw/Person mother          1 pers_id  /],
+                       [qw/Person mother_children * mother_id/])
+         ->Association([qw/Person father          1 pers_id  /],
+                       [qw/Person father_children * father_id/]);
+  
+  package MySchema::Person;
+  sub children {
+    my $self = shift;
+    my $id = $self->{pers_id};
+    my $sql = "SELECT * FROM Person WHERE mother_id = $id OR father_id = $id";
+    my $children = $self->dbh->selectall_arrayref($sql, {Slice => {}});
+    MySchema::Person->bless_from_DB($_) foreach @$children;
+    return $children;
+  }
+
+Alternatively, since rolenames C<mother_children> and C<father_children>
+are most probably useless, we might just specify unidirectional
+associations : 
+
+  $schema->Association([qw/Person mother  1 pers_id  /],
+                       [qw/Person ---     * mother_id/])
+         ->Association([qw/Person father  1 pers_id  /],
+                       [qw/Person ---     * father_id/]);
+
+And here is a more sophisticated way to define the "children" method,
+that will accept additional "where" criteria, like every regular method.
+
+  package MySchema::Person;
+  sub children {
+    my $self      = shift; # remaining args in @_ will be passed to select()
+    my $class     = ref $self;
+    my $id        = $self->{pers_id};
+    my $statement = $self->schema->table($class)->select(
+      -where => [mother_id => $id, 
+                 father_id => $id],
+      -result_as => 'statement'
+    );
+    return $statement->select(@_);
+  }
+
+This definition forces the join on C<mother_id> or 
+C<father_id>, while leaving open the possibility for the caller
+to specify additional criteria. For example, all female children 
+of a person (either father or mother) can now be retrieved through
+
+  $person->children(-where => {gender => 'F'})
+
+Observe that C<mother_id> and C<father_id> are inside an arrayref
+instead of a hashref, so that L<SQL::Abstract> will generate an SQL 'OR'.
 
 
 =head2 Schema versioning
@@ -181,17 +323,17 @@ schema versioning.
 
 =head1 DATA RETRIEVAL
 
-=head2 Aggregator functions
+=head2 Database functions
 
-Use normal SQL syntax for aggregators, and give them
+Use normal SQL syntax for database functions, and give them
 column aliases (with a vertical bar C<|>) in order to retrieve the results.
 
   my $row = $source->select(-columns   => [qw/MAX(col1)|max_col1
-                                              AVG(col2)|foo
-                                              COUNT(DISTINCT(col3))|bar/],
+                                              AVG(col2)|avg_col2
+                                              COUNT(DISTINCT(col3))|n_col3/],
                             -where     => ...,
                             -result_as => 'firstrow');
-  print "max is : $row->{max_col1}, average is $row->{foo}";
+  print "max is : $row->{max_col1}, average is $row->{avg_col2}";
 
 Or you can dispense with column aliases, and retrieve the results
 directly into an arrayref, using C<< -result_as => 'flat_arrayref' >> :
@@ -203,9 +345,9 @@ directly into an arrayref, using C<< -result_as => 'flat_arrayref' >> :
                                   -result_as => 'flat_arrayref');
   my ($max_col1, $avg_col2, $count_col3) = @$array_ref;
 
-B<Caveat>: currently, C<from_DB> handlers do not apply to 
-aggregator functions. So if the aggregated result needs any transformation,
-you have to specify a column type for it :
+B<Caveat>: C<from_DB> handlers do not apply to 
+database functions. So if the result needs any transformation,
+you have to specify a column type for it at the statement level :
 
   my $row = $source->select(
     -columns      => [qw/MAX(d_begin)|max_d_begin MIN(d_end)|min_d_end .../],
@@ -215,30 +357,84 @@ you have to specify a column type for it :
   );
 
 
-=head2 Database functions or stored procedures
 
-Like above: normal SQL syntax and column aliases.
 
-  my $rows = $source->select(-columns => [qw/FUNC(col1,col2)|func
-                                            (col3+99)|big_col3/],
-                             -where    => ...,
-                             );
-  print "$_->{func} and $_->{big_col3}" foreach @$rows;
+=head2 Conditions on functions with special syntax
+
+Some database systems have SQL functions with special syntax.
+For example a fulltext search in Oracle is expressed as
+
+  ... WHERE CONTAINS(fulltext_field, 'word') > 0
+
+This does not fit well in a hashref to be passed as a C<-where> condition for 
+L<SQL::Abstract::More>, because the name of the field and the bind value
+are lost within the SQL syntax. To make it easier, we define a I<special operator>
+for L<SQL::Abstract::More> :
+
+  # define the schema
+  DBIx::DataModel->Schema('SCH');
+  
+  # feed the schema with a custom instance of SQL::Abstract::More
+  my $sqlam = SQL::Abstract::More->new(
+    sql_dialect => "Oracle",
+    special_ops => [{regex   => qr/^contains(:?_all|_any)?$/i,
+                     handler => \&_fulltext_contains_for_Oracle}],
+   );
+  SCH->singleton->sql_abstract($sqlam);
+  
+  sub _fulltext_contains_for_Oracle {
+    my ($self, $field, $op, $arg) = @_;
+
+    my $sql = "CONTAINS($field, ?) > 0";
+    my @bind;
+
+    # Oracle connector for words : default '&', but '|' if op is -contains_any
+    my $connector = ($op =~ /any$/) ? ' | ' : ' & ';
+
+    # words to be passed to the CONTAINS function
+    my @words = ref $arg ? @$arg : ($arg);
+    @words = map { split /\s+/ } grep {$_} @words;
+
+    @bind = (join $connector, @words);
+    return ($sql, @bind);
+  }
+
+Now fulltext queries can be expressed easily as
+
+  my $results = SCH->table('Table1')->select(
+    -where => {fulltext_field1 => {-contains_all => ['ab', 'cd']},
+               fulltext_field2 => {-contains_any => ['ef', 'gh', 'ij']},
+              },
+   );
 
 
 =head2 Nested queries
 
+For inserting a nested query within a basic query, we need to
+pass the SQL and bind values of the nested query to L<SQL::Abstract>;
+the syntax for this is a reference to an
+arrayref (in other words a double reference), as explained in
+L<SQL::Abstract/"Literal SQL with placeholders and bind values (subqueries)">.
+
+C<DBIx::DataModel> has a feature to produce exactly this datastructure :
+
   my $subquery = $source1->select(..., -result_as => 'subquery');
-  my $rows     = $source2->select(
+
+Then it is easy to insert the subquery within another query.
+
+  my $rows = $source2->select(
       -columns => ...,
-      -where   => {foo => 123, bar => {-not_in => $subquery}}
+      -where   => {foo => 123, bar => {-not_in => $subquery}},
    );
 
-=head2 Hashref inflation
 
-There is no need for a hashref inflator: rows returned
-by a C<select()> can be used directly as hashrefs.
-For example here is a loop that prints a hash slice from  each row :
+
+=head2 "Hashref inflation"
+
+Unlike other ORMs, there is no need here to transform results into
+hashrefs, because rows returned by a C<select()> can be used directly
+as hashrefs.  For example here is a loop that prints a hash slice from
+each row :
 
   my $rows       = $schema->table($name)->select(...);
   my @print_cols = qw/col3 col6 col7/;
@@ -246,31 +442,33 @@ For example here is a loop that prints a hash slice from  each row :
     print @{$row}{@print_cols};
   }
 
-In fact, each row is a I<blessed> hashref. This can be a problem
+The only differences between row objects and plain Perl hashrefs are
+that :
+
+=over
+
+=item a.
+
+they are blessed into a source class
+
+=item b.
+
+they may contain an additional key C<< $row->{__schema}  >>
+if C<DBIx::DataModel> is used in
+L<multi-schema mode|DBIx::DataModel::Doc::Glossary/"multi-schema mode">.
+
+=back
+
+Those differences can often be ignored; but nevertheless they can be a problem
 with some external modules like L<JSON> that croak when encoding
-a blessed reference. In that case you can use the C<unbless> function
+a blessed reference. In that case you can use the C<unbless()> function
+which removes both the blessing and the C<__schema> key. Unblessing is
+recursively applied to nested datastructures :
 
-  foreach my $row (@$rows) {
-    $schema->unbless($row);
-    print to_json($row);
-  }
-
-
-
-=head2 Custom SQL
+  $schema->unbless($rows);
+  my $json = JSON->new->encode($rows);
 
 
-Create a 'Perl view' to encapsulate your SQL, i.e. a 
-L<DBIx::DataModel::Source::Table>, possibly with 
-a C<where> clause :
-
-  $meta_schema->define_table(
-    name     => 'MyView',
-    db_table => 'TABLE1 EXOTIC JOIN TABLE2 ON ...',
-    where    => {col1 => $filter1, col2 => $filter2}
-    parents  => [map {meta_schema->table($_)} qw/Table1 Table2/],
-  );
-  
 
 =head1 DATA UPDATE
 
@@ -311,22 +509,25 @@ a C<where> clause :
   # commits in both $initial_dbh and $other_dbh are performed here
 
 
-=head2 Generating random keys
+=head2 Generating primary keys
 
-Override the 
-L<_singleInsert()|DBIx::DataModel::Doc::Internals/"_singleInsert"> method
+Most database systems have mechanisms to generate primary keys
+automatically, generally as a sequence of natural numbers; however,
+there may be situations where one would like primary keys to be generated
+under other algorithms, like for example taking a random number, or taking
+the next "free slot" in a sparse sequence of numbers. Algorithmic
+generation of keys can be implemented in the ORM layer by overriding the
+L<_singleInsert()|DBIx::DataModel::Doc::Internals/"_singleInsert"> method.
+Here is an example :
 
-  package MySchema::SomeTable;
-
-  sub _singleInsert {
+  sub insert_with_random_key {
     my ($self) = @_;
     my $class = ref $self;
-
     my ($key_column) = $class->primKey;
-
+  
     for (1..$MAX_ATTEMPTS) {
       my $random_key = int(rand($MAX_RANDOM));
-
+  
         $self->{$key_column} = $random_key;
         eval {$self->_rawInsert; 1} 
           and return $random_key;   # SUCCESS
@@ -336,51 +537,65 @@ L<_singleInsert()|DBIx::DataModel::Doc::Internals/"_singleInsert"> method
      }
      croak "cannot generate a random key for $class: $@";
   }
-
-=head2 Cascaded insert
-
-First insert an arrayref of subrecords within the 
-main record hashref; then call C<insert> on that main
-record. See example in 
-L<insert()|DBIx::DataModel::Doc::Reference/"insert()">.
-This only works if the two classes are associated through a 
-L<Composition|DBIx::DataModel::Doc::Reference/"Composition()">.
-A datastructure containing the keys of all generated records
-can be retrieved by using the option 
-
-  my $tree_of_keys = $table->insert(..., -returning => {});
-
-=head2 Cascaded delete
-
-  # first gather information tree from the database
-  my $author = My::DB::Author->fetch($author_id);
-  my $distribs = $author->expand('distributions');
-  $_->expand('modules') foreach @$distribs;
   
-  # then delete the whole tree from the database
-  $author->delete;
+  foreach my $class (@tables_with_random_keys) {
+    define_method(
+      class          => $schema->metadm->table($class)->class,
+      name           => '_singleInsert',
+      body           => \&insert_with_random_key,
+    );
+  }
 
-This only works if the two classes are associated through a 
-L<Composition|DBIx::DataModel::Doc::Reference/"Composition()">.
+
+=head2 Cascaded operations
+
+Some database systems support cascaded operations : for example
+a constraint definition with a clause like C<ON DELETE CASCADE>
+will automatically delete child rows (rows containing foreign keys)
+when the parent row (the row containing the primary key) is deleted.
+
+C<DBIx::DataModel> does not know about such cascaded operations in the
+database; but it can perform some cascaded operations at the ORM level,
+when tables are associated through a 
+L<composition|DBIx::DataModel::Doc::Glossary/"composition">.
+In that case, the C<insert()> method can accept a data tree as argument,
+and will automatically perform recursive inserts in the children tables;
+an example is given in the
+L<quickstart tutorial|DBIx::DataModel::Doc::Quickstart/"Cascaded inserts">.
+Cascaded deletes are also supported : 
+
+  my $bach = HR->table('Employee')->fetch($bach_id); 
+  $bach->expand('activities');
+  $bach->delete; # deletes the Employee together with its Activities
+
 The C<expand> operations retrieve related records and add them
 into a tree in memory. Then C<delete> removes from the database
-all records found in the tree; therefore this is not a "true" cascaded 
-delete, because the client code is responsible for fetching the
-related records. 
+all records found in the tree.
 
-True cascaded delete is best implemented directly in the 
-database, rather than at the ORM layer.
+Observe that this is not a "true" cascaded 
+delete, because the client code is responsible for fetching the
+related records first. 
+
+
 
 =head2 Timestamp validation
 
-Goal : make sure that the record was not touched between the time
-it was presented to the user (display form) and the time
+Suppose we want to sure that the record was not touched between the time
+it was presented to the user in a display form and the time
 the user wants to update or delete that record. 
 
 In order to do this, we will suppose that every record in every
 table has a timestamp field C<TS_MODIF>, updated automatically by
-a trigger within the database. Below is a callback function that 
-checks if the timestamp is still valid :
+a trigger within the database. When defining the schema, we
+register an I<auto_update> callback on that column; such callbacks
+are called automatically both on C<update()> and C<insert()> calls :
+
+  DBIx::DataModel->define_schema(
+   class               => 'My::Schema',
+   auto_update_columns => {TS_MODIF => \&_check_time_stamp},
+  );
+
+The body of the callback looks like this : 
 
   sub _check_time_stamp {
     my ($record, $table, $where) = @_;
@@ -402,14 +617,6 @@ checks if the timestamp is still valid :
      }
   }
 
-This callback function can then be registered as an I<auto_update_column>
-when defining the schema :
-
-  DBIx::DataModel->define_schema(
-   class               => 'My::Schema',
-   auto_update_columns => {TS_MODIF => \&_check_time_stamp},
-  );
-
 =head1 DATA CONVERSION
 
 =head2 JSON
@@ -424,23 +631,5 @@ provided they possess a C<TO_JSON> method. Such a method is implemented in
 the L<DBIx::DataModel::Source/DBIx::DataModel::Source> class, so 
 any data row can be converted into JSON.
 
-=head2 DBD Datatypes
-
-DBD drivers sometimes need additional information about the datatypes
-of values in SQL statements. At the L<DBI> level, this is done with 
-explicit calls to the L<DBI/bind_param> method. Within C<DBIx::DataModel>,
-datatype specifications can be passed directly as arrayrefs of shape
-C<< [$orig_value, \%datatype] >>, everywhere an ordinary value would
-be used. Here are some examples :
-
-   my $rows = $source->select(
-    -where => {col => [$val, {sql_type => 'some_type'}]}
-  );
-  $source->insert(
-    {key => $pk, some_col => [$val, {sql_type => 'some_type'}]}
-  );
-  $record->update(
-    {some_col => [$val, {sql_type => 'some_type'}]}
-  );
 
 

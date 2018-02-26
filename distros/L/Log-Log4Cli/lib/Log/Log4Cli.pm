@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use parent qw(Exporter);
 
-use Carp qw(croak);
 use Term::ANSIColor qw(colored);
 
 BEGIN {
@@ -16,7 +15,7 @@ BEGIN {
     };
 }
 
-our $VERSION = '0.20'; # Don't forget to change in pod below
+our $VERSION = '0.21'; # Don't forget to change in pod below
 
 our @EXPORT = qw(
     die_fatal
@@ -47,18 +46,28 @@ our $COLORS = {
 our $LEVEL = 0;
 our $POSITIONS = undef;
 our $COLOR;              # color on/off switcher; defined below
-our $STATUS = undef;     # exit code
+our $STATUS = undef;     # exit code; deprecated TODO: remove it
 
 my $FD;                  # descriptor to write messages; defined below
 
-sub _die($$$) {
+sub _die($$$$) {
+    my $log_msg = $_[2] . (defined $_[3] ? "$_[3]. " : "") .
+        "Exit $_[0], ET " . (time - $^T) . "s\n";
+
     if ($^S) {
         # inside eval block
-        $STATUS = $_[0];
-        croak defined $_[2] ? "$_[2]" : "Died";
+        $STATUS = $_[0]; # deprecated TODO: remove it
+
+        my ($file, $line) = (caller(1))[1,2];
+        CORE::die bless {
+            ERR_MESSAGE => ($_[3] ? "$_[3]" : "Died") . " at $file line $line.",
+            EXIT_CODE => $_[0],
+            FILE => $file,
+            LINE => $line,
+            LOG_MESSAGE => $_[1] ? $log_msg : '',
+        }, 'Log::Log4Cli::Exception';
     } else {
-        print $FD $_[1] . (defined $_[2] ? "$_[2]. " : "") .
-            "Exit $_[0], ET " . (time - $^T) . "s\n" if ($_[1]);
+        print $FD $log_msg if ($_[1]);
         exit $_[0];
     }
 }
@@ -71,9 +80,9 @@ sub _pfx($) {
         (($POSITIONS or $LEVEL > 4) ? join(":", (caller(1))[1,2]) . " " : "");
 }
 
-sub die_fatal(;$;$) { _die $_[1] || 127, $LEVEL > -2 && _pfx('FATAL'), $_[0] }
-sub die_alert(;$;$) { _die $_[1] || 0,   $LEVEL > -1 && _pfx('ALERT'), $_[0] }
-sub die_info(;$;$)  { _die $_[1] || 0,   $LEVEL >  1 && _pfx('INFO'),  $_[0] }
+sub die_fatal(;$;$) { _die $_[1] || 127, $LEVEL > -2, _pfx('FATAL'), $_[0] }
+sub die_alert(;$;$) { _die $_[1] || 0,   $LEVEL > -1, _pfx('ALERT'), $_[0] }
+sub die_info(;$;$)  { _die $_[1] || 0,   $LEVEL >  1, _pfx('INFO'),  $_[0] }
 
 sub log_fatal(&) { print $FD _pfx('FATAL') . $_[0]->($_) . "\n" if $LEVEL > -2 }
 sub log_error(&) { print $FD _pfx('ERROR') . $_[0]->($_) . "\n" if $LEVEL > -1 }
@@ -95,6 +104,20 @@ log_fd(\*STDERR);
 
 1;
 
+package Log::Log4Cli::Exception;
+
+use 5.006;
+use strict;
+use warnings;
+
+use overload '""' => \&as_string;
+
+sub as_string {
+    $_[0]->{ERR_MESSAGE};
+}
+
+1;
+
 __END__
 
 =head1 NAME
@@ -111,7 +134,7 @@ Log::Log4Cli -- Lightweight logger for command line tools
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 
@@ -188,7 +211,7 @@ L<Term::ANSIColor|Term::ANSIColor>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016,2017 Michael Samoglyadov.
+Copyright 2016-2018 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

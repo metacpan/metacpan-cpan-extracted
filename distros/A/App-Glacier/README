@@ -1,0 +1,53 @@
+App::Glacier
+============
+
+Command line utility for working with Amazon Glacier, an online file storage 
+web service that provides storage for data archiving and backup.
+
+Usage:
+
+  glacier COMMAND [OPTIONS] [ARGS]
+
+The COMMAND requests a particular action, such as ls (list), get, or put.
+
+The tool uses versioned file naming scheme, sp that multiple copies of the
+same file can be kept. Files are versioned in reverse chronological order,
+so that version 1 refers to the latest copy, 2 to the penultimate copy, and
+so on.
+
+Examples:
+
+1. List vaults
+
+  glacier ls
+
+2. List files in a vault, using detailed output format.
+
+  glacier ls -l VAULT
+
+3. Get latest version of FILE from the vault:
+
+  glacier get VAULT FILE
+
+4. Get the penultimate version of FILE:
+
+  glacier get VAULT 'FILE;2'
+
+5. Store the file:
+
+  glacier put VAULT FILE
+
+6. Create a vault:
+
+  glacier mkvault NEWNAME
+
+
+Copying
+=======
+This package is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+See http://www.gnu.org/licenses.
+

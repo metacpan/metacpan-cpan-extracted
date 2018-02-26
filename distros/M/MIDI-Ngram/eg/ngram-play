@@ -7,9 +7,11 @@ use warnings;
 
 use MIDI::Ngram;
 use Getopt::Long;
+use File::Find::Rule;
 
 my %opts = (
-    file    => undef,    # MIDI file to process
+    dir     => undef,    # Directory of MIDI files
+    files   => undef,    # MIDI files to process
     size    => 2,        # ngram size
     max     => 20,       # -1 for all records
     bpm     => 100,      # Beats per minute
@@ -28,7 +30,8 @@ my %opts = (
 GetOptions( \%opts, 
     'help|?',
     'man',
-    'file=s',
+    'dir=s',
+    'files=s',
     'size=i',
     'max=i',
     'bpm=i',
@@ -45,10 +48,12 @@ GetOptions( \%opts,
     'gestalt',
 ) or die 'Failed GetOptions';
 
-die "Invalid file: $!"
-    unless $opts{file} && -e $opts{file};
+my @files;
+@files = File::Find::Rule->file()->name('*.mid')->in($opts{dir})
+    if $opts{dir};
 
 # Turn string lists into arrayrefs
+$opts{files}   = @files ? \@files : [ split /(?:\s+|\s*,\s*)/, $opts{files} ];
 $opts{dura}    = [ split /(?:\s+|\s*,\s*)/, $opts{dura} ];
 $opts{analyze} = [ split /(?:\s+|\s*,\s*)/, $opts{analyze} ];
 
@@ -62,7 +67,7 @@ my @patches = qw(
 );
 
 my $mng = MIDI::Ngram->new(
-    in_file         => $opts{file},
+    in_file         => $opts{files},
     ngram_size      => $opts{size},
     max_phrases     => $opts{max},
     bpm             => $opts{bpm},

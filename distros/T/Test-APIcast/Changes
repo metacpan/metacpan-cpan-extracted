@@ -1,5 +1,11 @@
 Revision history for Perl extension Test-APIcast
 
+0.10 2018-02-21T14:34:28Z
+    - `fixture` filter to load fixtures
+
+0.09 2018-02-20T09:27:17Z
+    - `random_port` filter returns the same input
+
 0.08 2018-02-14T07:37:23Z
     - `env_to_apicast` to set ENV to APIcast
     - `env` block in tests to define hash with environment

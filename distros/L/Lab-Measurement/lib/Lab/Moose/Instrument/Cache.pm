@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Cache;
-$Lab::Moose::Instrument::Cache::VERSION = '3.620';
+$Lab::Moose::Instrument::Cache::VERSION = '3.621';
 #ABSTRACT: Role for device cache functionality in Moose::Instrument drivers
 
 
@@ -154,7 +154,7 @@ Lab::Moose::Instrument::Cache - Role for device cache functionality in Moose::In
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 SYNOPSIS
 

@@ -6,4 +6,7 @@ Revision history for Perl extension Yandex::Disk.
 0.02  Tue Oct  10 12:43:00 2017
 	- Delete 'use Data::Printer'
 		-b 5.8.1 -XAn Yandex::Disk
+0.02  Thu Feb  22 16:14:00 2018
+	- Added methods: listAllFiles, lastUploadedFiles
+		-b 5.8.1 -XAn Yandex::Disk
 

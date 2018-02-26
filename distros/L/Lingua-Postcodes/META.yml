@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Lingua-Postcodes
 provides:
   Lingua::Postcodes:
     file: lib/Lingua/Postcodes.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Exporter: '0'
   perl: '5.008'
@@ -24,10 +24,12 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/lancew/Ligua-Postcodes/issues
-  homepage: https://github.com/lancew/Ligua-Postcodes
-  repository: https://github.com/lancew/Ligua-Postcodes.git
-version: '0.002'
+  bugtracker: https://github.com/lancew/Lingua-Postcodes/issues
+  homepage: https://github.com/lancew/Lingua-Postcodes
+  repository: https://github.com/lancew/Lingua-Postcodes.git
+version: '0.003'
 x_contributors:
   - 'Lance Wicks <lw@judocoach.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Radhi M <radhedeve@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

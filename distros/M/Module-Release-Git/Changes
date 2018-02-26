@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Release::Git
 
+1.012 2018-02-26T11:46:00Z
+	* Adjust git output matching for new output strings. This should 
+	still work on older gits.
+
 1.011 2016-01-26T19:06:04Z
 	* Freshen the distro.
 

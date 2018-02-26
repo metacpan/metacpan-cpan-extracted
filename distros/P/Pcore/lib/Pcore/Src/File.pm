@@ -19,11 +19,11 @@ has was_changed => ( is => 'lazy', isa => Bool,      init_arg => undef );
 has severity    => ( is => 'rw',   isa => Int,       default  => 0, init_arg => undef );
 has severity_range => ( is => 'lazy', isa => Enum [ keys Pcore::Src::File->cfg->{SEVERITY_RANGE}->%* ], init_arg => undef );
 
-has _can_write => ( is => 'rw', isa => Bool, default => 0, init_arg => undef );
-has _in_size  => ( is => 'lazy', isa => Int, init_arg => undef );
-has _in_md5   => ( is => 'lazy', isa => Str, init_arg => undef );
-has _out_size => ( is => 'lazy', isa => Int, init_arg => undef );
-has _out_md5  => ( is => 'lazy', isa => Str, init_arg => undef );
+has _can_write => ( is => 'rw',   isa => Bool, default  => 0, init_arg => undef );
+has _in_size   => ( is => 'lazy', isa => Int,  init_arg => undef );
+has _in_md5    => ( is => 'lazy', isa => Str,  init_arg => undef );
+has _out_size  => ( is => 'lazy', isa => Int,  init_arg => undef );
+has _out_md5   => ( is => 'lazy', isa => Str,  init_arg => undef );
 
 has dist_cfg => ( is => 'lazy', isa => HashRef, init_arg => undef );
 

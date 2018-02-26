@@ -2,25 +2,23 @@ package Firefox::Marionette::Exception::Response;
 
 use strict;
 use warnings;
-use overload '""' => 'string';
+use base qw(Firefox::Marionette::Exception);
 
-our $VERSION = '0.42';
+our $VERSION = '0.44';
 
 sub throw {
     my ( $class, $response ) = @_;
-    my $self = bless { response => $response }, $class;
-    Carp::croak($self);
+    my $self = bless {
+        string => $response->error()->{error} . q[: ]
+          . $response->error()->{message},
+        response => $response
+    }, $class;
+    return $self->SUPER::_throw();
 }
 
 sub error {
     my ($self) = @_;
     return $self->{response}->error()->{error};
-}
-
-sub string {
-    my ($self) = @_;
-    return $self->{response}->error()->{error} . q[: ]
-      . $self->{response}->error()->{message};
 }
 
 sub trace {
@@ -33,11 +31,11 @@ __END__
 
 =head1 NAME
 
-Firefox::Marionette::Exception::Response - Represents a Marionette protocol response
+Firefox::Marionette::Exception::Response - Represents an exception thrown by Firefox in a Marionette Response
 
 =head1 VERSION
 
-Version 0.42
+Version 0.44
 
 =head1 SYNOPSIS
 
@@ -46,17 +44,13 @@ Version 0.42
 
 =head1 DESCRIPTION
 
-This module handles the implementation of an error in a Marionette protocol response.  This should not be used by users of L<Firefox::Marionette|Firefox::Marionette>
+This module handles the implementation of an error in a Marionette protocol response.  
 
 =head1 SUBROUTINES/METHODS
 
 =head2 throw
  
 accepts a Marionette L<response|Firefox::Marionette::Response> as it's only parameter and calls Carp::croak.
-
-=head2 string
-
-returns a stringified version of the error and message fields on the error.
 
 =head2 error
 

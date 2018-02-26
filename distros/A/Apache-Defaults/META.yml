@@ -1,0 +1,35 @@
+---
+abstract: 'Get default settings for Apache httpd daemon'
+author:
+  - 'Sergey Poznyakoff <gray@gnu.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0.23'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Apache-Defaults
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Apache::Defaults:
+    file: lib/Apache/Defaults.pm
+    version: '1.00'
+requires:
+  DateTime::Format::Strptime: '1.54'
+  File::Spec: '3.40'
+  IPC::Open3: '1.13'
+  Shell::GetEnv: '0.10'
+  Text::ParseWords: '3.28'
+  perl: '5.014002'
+resources:
+  repository: git://git.gnu.org.ua/apache-defaults.git
+version: '1.00'

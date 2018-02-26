@@ -1,5 +1,12 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.06	Fri Feb 23 02:32:52 GMT 2018
+ - handle multiply-used enums (thanks @nohuhu)
+ - DBIC schema test refactored to use Test::Snapshot (thanks @nohuhu)
+
+0.05	Thu Feb 22 19:26:12 GMT 2018
+ - handle Postgres enums, dates etc (thanks @nohuhu)
+
 0.04	Wed Dec 20 20:05:03 GMT 2017
  - handle mysql medium/longtext
 

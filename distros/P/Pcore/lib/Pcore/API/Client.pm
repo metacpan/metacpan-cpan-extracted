@@ -20,7 +20,7 @@ has persistent => ( is => 'ro', isa => Maybe [PositiveOrZeroInt], default => 600
 has timeout => ( is => 'ro', isa => Maybe [PositiveOrZeroInt] );
 
 # WebSocket options
-has compression => ( is => 'ro', isa => Bool, default => 0 );
+has compression    => ( is => 'ro', isa => Bool, default => 0 );
 has listen_events  => ( is => 'ro', isa => ArrayRef );
 has forward_events => ( is => 'ro', isa => ArrayRef );
 has on_connect     => ( is => 'ro', isa => Maybe [CodeRef] );

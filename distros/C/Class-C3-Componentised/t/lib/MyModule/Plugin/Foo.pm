@@ -1,9 +1,12 @@
 package # hide from pause
   MyModule::Plugin::Foo;
+use strict;
+use warnings;
 
-use Class::C3;
+use MRO::Compat;
+use mro 'c3';
 
-sub message { 
+sub message {
   "Foo";
 }
 

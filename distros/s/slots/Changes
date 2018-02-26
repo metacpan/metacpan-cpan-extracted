@@ -1,0 +1,11 @@
+Revision history for Perl extension slots
+
+0.03 2018-02-25
+    - first release with proper permissions
+
+0.02 2018-01-31
+    - Switch the internals to just use the MOP
+      APIs for everything, silly not to.
+
+0.01 2017-10-16
+    - initial release

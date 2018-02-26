@@ -33,7 +33,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use warnings;
 use Carp;

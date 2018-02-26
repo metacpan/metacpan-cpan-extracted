@@ -1,6 +1,6 @@
 package Calendar::Plugin::Renderer::Util;
 
-$Calendar::Plugin::Renderer::Util::VERSION   = '0.12';
+$Calendar::Plugin::Renderer::Util::VERSION   = '0.13';
 $Calendar::Plugin::Renderer::Util::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,14 +9,12 @@ Calendar::Plugin::Renderer::Util - Helper package for Calendar::Plugin::Renderer
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-use vars qw(@ISA @EXPORT);
-require Exporter;
-@ISA    = qw(Exporter);
-@EXPORT = qw(round_number get_max_week_rows);
+use parent 'Exporter';
+our @EXPORT = qw(round_number get_max_week_rows);
 
 use 5.006;
 use strict; use warnings;

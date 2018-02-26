@@ -1,5 +1,5 @@
 package WebService::Braintree::DisputeSearch;
-$WebService::Braintree::DisputeSearch::VERSION = '1.0';
+$WebService::Braintree::DisputeSearch::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 

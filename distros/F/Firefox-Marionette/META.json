@@ -40,6 +40,7 @@
             "Config" : "0",
             "Config::INI::Reader" : "0",
             "Crypt::URandom" : "0",
+            "DirHandle" : "0",
             "English" : "0",
             "Exporter" : "0",
             "Fcntl" : "0",
@@ -59,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.42",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

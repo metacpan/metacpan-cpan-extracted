@@ -69,6 +69,7 @@ html/TagNames/GIF.html
 html/TagNames/GIMP.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
+html/TagNames/GoPro.html
 html/TagNames/H264.html
 html/TagNames/HP.html
 html/TagNames/HTML.html
@@ -138,6 +139,7 @@ html/TagNames/Radiance.html
 html/TagNames/Rawzor.html
 html/TagNames/Real.html
 html/TagNames/Reconyx.html
+html/TagNames/Red.html
 html/TagNames/Ricoh.html
 html/TagNames/Samsung.html
 html/TagNames/Sanyo.html
@@ -207,6 +209,8 @@ lib/Image/ExifTool/Charset.pm
 lib/Image/ExifTool/Charset/Arabic.pm
 lib/Image/ExifTool/Charset/Baltic.pm
 lib/Image/ExifTool/Charset/Cyrillic.pm
+lib/Image/ExifTool/Charset/DOSLatin1.pm
+lib/Image/ExifTool/Charset/DOSLatinUS.pm
 lib/Image/ExifTool/Charset/Greek.pm
 lib/Image/ExifTool/Charset/Hebrew.pm
 lib/Image/ExifTool/Charset/JIS.pm
@@ -258,6 +262,7 @@ lib/Image/ExifTool/GIMP.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
 lib/Image/ExifTool/Geotag.pm
+lib/Image/ExifTool/GoPro.pm
 lib/Image/ExifTool/H264.pm
 lib/Image/ExifTool/HP.pm
 lib/Image/ExifTool/HTML.pm
@@ -343,6 +348,7 @@ lib/Image/ExifTool/PostScript.pm
 lib/Image/ExifTool/PrintIM.pm
 lib/Image/ExifTool/Qualcomm.pm
 lib/Image/ExifTool/QuickTime.pm
+lib/Image/ExifTool/QuickTimeStream.pl
 lib/Image/ExifTool/README
 lib/Image/ExifTool/RIFF.pm
 lib/Image/ExifTool/RSRC.pm
@@ -351,6 +357,7 @@ lib/Image/ExifTool/Radiance.pm
 lib/Image/ExifTool/Rawzor.pm
 lib/Image/ExifTool/Real.pm
 lib/Image/ExifTool/Reconyx.pm
+lib/Image/ExifTool/Red.pm
 lib/Image/ExifTool/Ricoh.pm
 lib/Image/ExifTool/Samsung.pm
 lib/Image/ExifTool/Sanyo.pm
@@ -541,6 +548,8 @@ t/Geotag_6.out
 t/Geotag_7.out
 t/Geotag_8.out
 t/Geotag_9.out
+t/GoPro.t
+t/GoPro_2.out
 t/HTML.t
 t/HTML_2.out
 t/IPTC.t
@@ -725,6 +734,8 @@ t/Real.t
 t/Real_2.out
 t/Real_3.out
 t/Real_4.out
+t/Red.t
+t/Red_2.out
 t/Ricoh.t
 t/Ricoh_2.out
 t/Ricoh_3.out
@@ -912,6 +923,7 @@ t/images/Geotag.log
 t/images/Geotag.xml
 t/images/Geotag2.log
 t/images/Geotag3.log
+t/images/GoPro.jpg
 t/images/HTML.html
 t/images/ICC_Profile.icc
 t/images/IPTC.jpg
@@ -980,6 +992,7 @@ t/images/Radiance.hdr
 t/images/Real.ra
 t/images/Real.ram
 t/images/Real.rm
+t/images/Red.r3d
 t/images/Ricoh.jpg
 t/images/Ricoh2.jpg
 t/images/Sanyo.jpg

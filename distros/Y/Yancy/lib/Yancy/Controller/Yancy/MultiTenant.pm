@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::MultiTenant;
-our $VERSION = '0.017';
+our $VERSION = '0.020';
 # ABSTRACT: A controller to show a user only their content
 
 #pod =head1 DESCRIPTION
@@ -215,7 +215,7 @@ Yancy::Controller::Yancy::MultiTenant - A controller to show a user only their c
 
 =head1 VERSION
 
-version 0.017
+version 0.020
 
 =head1 DESCRIPTION
 
@@ -292,7 +292,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Doug Bell.
+This software is copyright (c) 2018 by Doug Bell.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

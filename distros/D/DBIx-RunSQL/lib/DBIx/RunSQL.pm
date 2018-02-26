@@ -3,7 +3,7 @@ use strict;
 use DBI;
 
 use vars qw($VERSION);
-$VERSION = '0.15';
+$VERSION = '0.17';
 
 =head1 NAME
 
@@ -15,7 +15,6 @@ DBIx::RunSQL - run SQL from a file
 
     #!/usr/bin/perl -w
     use strict;
-    use lib 'lib';
     use DBIx::RunSQL;
 
     my $test_dbh = DBIx::RunSQL->create(
@@ -145,7 +144,8 @@ C<verbose> - print each SQL statement as it is run
 
 =item *
 
-C<verbose_handler> - callback to call with each SQL statement instead of C<print>
+C<verbose_handler> - callback to call with each SQL statement instead of
+C<print>
 
 =item *
 
@@ -160,7 +160,8 @@ but a row was found.
 
 =item *
 
-C<output_string> - whether to output the (one) row and column, without any headers
+C<output_string> - whether to output the (one) row and column, without any
+headers
 
 =back
 
@@ -186,13 +187,11 @@ sub run_sql_file {
 
     my $dbh = DBI->connect(...)
 
-    for my $file (sort glob '*.sql') {
-        DBIx::RunSQL->run_sql_file(
-            verbose => 1,
-            dbh     => $dbh,
-            sql     => 'create table foo',
-        );
-    };
+    DBIx::RunSQL->run_sql(
+        verbose => 1,
+        dbh     => $dbh,
+        sql     => \@sql_statements,
+    );
 
 Runs an SQL string on a prepared database handle.
 Returns the number of errors encountered.
@@ -280,13 +279,21 @@ sub run_sql {
             } elsif( defined $sth->{NUM_OF_FIELDS} and 0 < $sth->{NUM_OF_FIELDS} ) {
                 # SELECT statement, output results
                 if( $args{ output_bool }) {
-                    my $res = $self->format_results( sth => $sth, no_header_when_empty => 1, %args );
+                    my $res = $self->format_results(
+                        sth => $sth,
+                        no_header_when_empty => 1,
+                        %args
+                    );
                     print $res;
                     $errors = length $res > 0;
-                    
+
                 } elsif( $args{ output_string }) {
-                    local $self->{formatter} = 'tab';
-                    print $self->format_results( sth => $sth, headers => 0, %args );
+                    local $args{formatter} = 'tab';
+                    print $self->format_results(
+                        sth => $sth,
+                        no_header_when_empty => 1,
+                        %args
+                    );
 
                 } else {
                     print $self->format_results( sth => $sth, %args );
@@ -295,62 +302,6 @@ sub run_sql {
         };
     };
     $errors
-}
-
-sub parse_command_line {
-    my ($package,$appname,@argv) =  @_;
-    require Getopt::Long; Getopt::Long->import();
-    require Pod::Usage; Pod::Usage->import();
-
-    if (! @argv) { @argv = @ARGV };
-
-    local @ARGV = @argv;
-    if (GetOptions(
-        'user:s' => \my $user,
-        'password:s' => \my $password,
-        'dsn:s' => \my $dsn,
-        'verbose' => \my $verbose,
-        'force|f' => \my $force,
-        'sql:s' => \my $sql,
-        'bool' => \my $output_bool,
-        'string' => \my $output_string,
-        'help|h' => \my $help,
-        'man' => \my $man,
-    )) {
-        no warnings 'newline';
-        if( $sql and ! -f $sql ) {
-            $sql = \"$sql",
-        };
-        return {
-        user     => $user,
-        password => $password,
-        dsn      => $dsn,
-        verbose  => $verbose,
-        force    => $force,
-        sql      => $sql,
-        output_bool => $output_bool,
-        output_string => $output_string,
-        help     => $help,
-        man      => $man,
-        };
-    } else {
-        return undef;
-    };
-}
-
-sub handle_command_line {
-    my ($package,$appname,@argv) =  @_;
-
-    my $opts = $package->parse_command_line($appname,@argv)
-        or pod2usage(2);
-    pod2usage(1) if $opts->{help};
-    pod2usage(-verbose => 2) if $opts->{man};
-
-    $opts->{dsn} ||= sprintf 'dbi:SQLite:dbname=db/%s.sqlite', $appname;
-    my( $dbh, $exitcode) = $package->create(
-        %$opts
-    );
-    return $exitcode
 }
 
 =head2 C<< DBIx::RunSQL->format_results %options >>
@@ -392,7 +343,7 @@ sub format_results {
     my( $self, %options )= @_;
     my $sth= delete $options{ sth };
 
-    if( ! exists $options{ formatter }) {
+    if( ! $options{ formatter }) {
         if( eval { require "Text/Table.pm" }) {
             $options{ formatter }= 'Text::Table';
         } else {
@@ -415,7 +366,7 @@ sub format_results {
                           $print_header ? join( "\t", @columns ) : (),
                           map { join( "\t", @$_ ) } @$res
                       ;
-            
+
         } else {
             my $t= $options{formatter}->new(@columns);
             $t->load( @$res );
@@ -480,6 +431,109 @@ sub split_sql {
 
 1;
 
+=head2 C<< DBIx::RunSQL->parse_command_line >>
+
+    my $options = DBIx::RunSQL->parse_command_line( 'my_application', \@ARGV );
+
+Helper function to turn a command line array into options for DBIx::RunSQL
+invocations. The array of command line items is modified in-place.
+
+If the reference to the array of command line items is missing, C<@ARGV>
+will be modified instead.
+
+=cut
+
+sub parse_command_line {
+    my ($package,$appname,$argv) =  @_;
+    require Getopt::Long; Getopt::Long->import('GetOptionsFromArray');
+    require Pod::Usage; Pod::Usage->import();
+
+    if (! $argv) { $argv = \@ARGV };
+
+    if (GetOptionsFromArray( $argv,
+        'user:s'     => \my $user,
+        'password:s' => \my $password,
+        'dsn:s'      => \my $dsn,
+        'verbose'    => \my $verbose,
+        'force|f'    => \my $force,
+        'sql:s'      => \my $sql,
+        'bool'       => \my $output_bool,
+        'string'     => \my $output_string,
+        'quiet'      => \my $no_header_when_empty,
+        'format:s'   => \my $formatter_class,
+        'help|h'     => \my $help,
+        'man'        => \my $man,
+    )) {
+        no warnings 'newline';
+        if( $sql and ! -f $sql ) {
+            $sql = \"$sql",
+        };
+        return {
+        user                 => $user,
+        password             => $password,
+        dsn                  => $dsn,
+        verbose              => $verbose,
+        force                => $force,
+        sql                  => $sql,
+        no_header_when_empty => $no_header_when_empty,
+        output_bool          => $output_bool,
+        output_string        => $output_string,
+        formatter            => $formatter_class,
+        help                 => $help,
+        man                  => $man,
+        };
+    } else {
+        return undef;
+    };
+}
+
+sub handle_command_line {
+    my ($package,$appname,$argv) =  @_;
+
+    my $opts = $package->parse_command_line($appname,$argv)
+        or pod2usage(2);
+    pod2usage(1) if $opts->{help};
+    pod2usage(-verbose => 2) if $opts->{man};
+
+    $opts->{dsn} ||= sprintf 'dbi:SQLite:dbname=db/%s.sqlite', $appname;
+    my( $dbh, $exitcode) = $package->create(
+        %$opts
+    );
+    return $exitcode
+}
+
+=head2 C<< DBIx::RunSQL->handle_command_line >>
+
+    DBIx::RunSQL->handle_command_line( 'my_application', \@ARGV );
+
+Helper function to run the module functionality from the command line. See below
+how to use this function in a good self-contained script.
+This function
+passes the following command line arguments and options to C<< ->create >>:
+
+  --user
+  --password
+  --dsn
+  --sql
+  --quiet
+  --format
+  --force
+  --verbose
+  --bool
+  --string
+
+In addition, it handles the following switches through L<Pod::Usage>:
+
+  --help
+  --man
+
+If no dsn is given, this function will use
+C< dbi:SQLite:dbname=db/$appname.sqlite >
+as the default database.
+
+See also the section PROGRAMMER USAGE for a sample program to set
+up a database from an SQL file.
+
 =head1 PROGRAMMER USAGE
 
 This module abstracts away the "run these SQL statements to set up
@@ -492,20 +546,25 @@ looks like this:
 
     #!/usr/bin/perl -w
     use strict;
-    use lib 'lib';
     use DBIx::RunSQL;
 
-    my $exitcode = DBIx::RunSQL->handle_command_line('myapp');
+    my $exitcode = DBIx::RunSQL->handle_command_line('myapp', \@ARGV);
     exit $exitcode;
 
     =head1 NAME
 
     create-db.pl - Create the database
 
+    =head1 SYNOPSIS
+
+      create-db.pl "select * from mytable where 1=0"
+
     =head1 ABSTRACT
 
     This sets up the database. The following
     options are recognized:
+
+    =head1 OPTIONS
 
     =over 4
 
@@ -523,6 +582,27 @@ looks like this:
     The alternative SQL file to use
     instead of C<sql/create.sql>.
 
+    =item C<--quiet>
+
+    Output no headers for empty SELECT resultsets
+
+    =item C<--bool>
+
+    Set the exit code to 1 if at least one result row was found
+
+    =item C<--string>
+
+    Output the (single) column that the query returns as a string without
+    any headers
+
+    =item C<--format> formatter
+
+    Use a different formatter for table output. Supported formatters are
+
+      tab - output results as tab delimited columns
+
+      Text::Table - output results as ASCII table
+
     =item C<--force>
 
     Don't stop on errors
@@ -531,27 +611,9 @@ looks like this:
 
     Show this message.
 
+    =back
+
     =cut
-
-=head2 C<< DBIx::RunSQL->handle_command_line >>
-
-Parses the command line. This is a convenience method, which
-passes the following command line arguments to C<< ->create >>:
-
-  --user
-  --password
-  --dsn
-  --sql
-  --force
-  --verbose
-
-In addition, it handles the following switches through L<Pod::Usage>:
-
-  --help
-  --man
-
-See also the section PROGRAMMER USAGE for a sample program to set
-up a database from an SQL file.
 
 =head1 NOTES
 
@@ -611,7 +673,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2009-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2009-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

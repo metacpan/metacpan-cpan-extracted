@@ -2,7 +2,7 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
@@ -238,6 +238,9 @@ PICA::Data - PICA record processing
     $parser = PICA::Parser::XML->new( @options );
     $writer = PICA::Writer::Plain->new( @options );
 
+    use PICA::Schema;
+    $schema = PICA::Schema->new();
+
     # parse records
     while ( my $record = $parser->next ) {
         
@@ -265,6 +268,9 @@ PICA::Data - PICA record processing
         # stringify record
         my $plain = $record->string;
         my $xml = $record->string('xml');
+
+        # validate record
+        my $errors = $schema->check($record);
     }
   
     # parse single record from string

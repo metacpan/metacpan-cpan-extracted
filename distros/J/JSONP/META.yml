@@ -25,4 +25,4 @@ requires:
   Time::HiRes: '0'
   Want: '0'
   perl: '5.01'
-version: '1.81'
+version: '1.82'

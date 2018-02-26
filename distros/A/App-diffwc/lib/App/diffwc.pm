@@ -1,7 +1,7 @@
 package App::diffwc;
 
-our $DATE = '2017-08-16'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-02-26'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -19,6 +19,33 @@ sub postprocess {
     require Text::WordDiff::Unified::ANSIColor;
 
     my $fh = shift;
+
+    if ($ENV{COLOR_THEME}) {
+        require Color::Theme::Util;
+        my $theme = Color::Theme::Util::get_color_theme(
+            {module_prefixes => [qw/App::diffwc::ColorTheme Generic::ColorTheme/]}, $ENV{COLOR_THEME});
+        require Color::Theme::Util::ANSI;
+        if ($theme->{colors}{path_line}) {
+            for my $c (keys %Colors) {
+                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi($theme, $c);
+            }
+        } elsif ($theme->{colors}{color1}) {
+            my %map = (
+                path_line    => 'color3',
+                linum_line   => 'color4',
+                delete_line  => 'color1',
+                insert_line  => 'color5',
+                delete_word  => 'color1',
+                insert_word  => 'color5',
+            );
+            for my $c (keys %Colors) {
+                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi(
+                    $theme, $map{$c});
+            }
+        } else {
+            warn "Unsuitable color theme '$ENV{COLOR_THEME}', ignored";
+        }
+    }
 
     local $Text::WordDiff::Unified::ANSIColor::colors{delete_line} = $Colors{delete_line};
     local $Text::WordDiff::Unified::ANSIColor::colors{insert_line} = $Colors{insert_line};
@@ -80,7 +107,7 @@ App::diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.003 of App::diffwc (from Perl distribution App-diffwc), released on 2017-08-16.
+This document describes version 0.004 of App::diffwc (from Perl distribution App-diffwc), released on 2018-02-26.
 
 =head1 SYNOPSIS
 
@@ -110,7 +137,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

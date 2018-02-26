@@ -34,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist
   homepage: https://metacpan.org/release/App-wordlist
   repository: git://github.com/perlancar/perl-App-wordlist.git
-version: '0.263'
+version: '0.264'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -42,7 +42,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: GenPericmdScript::wordlist
-      version: '0.420'
+      version: '0.421'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -114,7 +114,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.590'
+      version: '0.592'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -146,7 +146,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -326,7 +326,7 @@ x_Dist_Zilla:
           skips: []
           switch: []
       name: '@Author::PERLANCAR/Test::Compile'
-      version: '2.057'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Author::PERLANCAR/Test::Perl::Critic'
@@ -348,9 +348,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
       version: '0.03'
     -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
-      name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.04'
+      class: Dist::Zilla::Plugin::Acme::CPANModules::Blacklist
+      name: '@Author::PERLANCAR/Acme::CPANModules::Blacklist'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
@@ -358,7 +358,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.005'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'

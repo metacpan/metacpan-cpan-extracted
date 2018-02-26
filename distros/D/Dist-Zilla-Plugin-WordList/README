@@ -3,18 +3,22 @@ NAME
     distribution
 
 VERSION
-    This document describes version 0.051 of Dist::Zilla::Plugin::WordList
+    This document describes version 0.052 of Dist::Zilla::Plugin::WordList
     (from Perl distribution Dist-Zilla-Plugin-WordList), released on
-    2017-12-25.
+    2018-02-20.
 
 SYNOPSIS
     In dist.ini:
 
-     [Bencher::Scenario]
+     [WordList]
 
 DESCRIPTION
     This plugin is to be used when building "WordList::*" distribution.
     Currently it does the following:
+
+    *   Check that wordlist is sorted
+
+    *   Check that wordlist does not contain any duplicates
 
     *   Replace "# STATS" placeholder (which must exist) with word list
         statistics
@@ -40,11 +44,13 @@ SEE ALSO
 
     Pod::Weaver::Plugin::WordList
 
+    Dist::Zilla::Plugin::WordListC
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

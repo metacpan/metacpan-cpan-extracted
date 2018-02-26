@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 #
-# Last Update:            $Author: marvin $
-# Update Date:            $Date: 2007/12/10 17:54:22 $
-# Source File:            $Source: /home/cvsroot/tools/FileSystem/t/02_access_data.t,v $
-# CVS/RCS Revision:       $Revision: 1.3 $
-# Status:                 $State: Exp $
-#
 use strict;
 use Test::More tests => 127;
 
@@ -93,7 +87,7 @@ SKIP: {
   %svars = ( fname => "um5333" );
   $r = $fs->get_conf_by_var( "warehouse", undef, "fname", \%vars, \%svars );
   is( $r, ERROR, "wrong db version + query" );
-  like( $fs->get_err, '/^DBIx::FileSystem object not initialized/', 
+  like( $fs->get_err, '/^DBIx::FileSystem database not initialized/', 
 	"wrong db version + query: err message" );
 
   ########################################################################

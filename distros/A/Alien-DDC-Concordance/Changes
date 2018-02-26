@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution Alien::DDC::Concordance
 
+v0.003 Thu, 22 Feb 2018 13:35:09 +0100 moocow
+	+ cowardly refuse to build anywhere but linux ("fixes" RT bug #124451)
+
 v0.002 Wed, 02 Mar 2016 15:45:11 +0100 moocow
 	+ specify Alien::Base::ModuleBuild in configure_requires, fixes RT bug #112613
 

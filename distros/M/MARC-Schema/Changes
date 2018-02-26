@@ -1,5 +1,8 @@
 Revision history for MARC-Schema
 
+0.05  2018-02-25 15:20:54 CET
+  - Modify schema format to align with Avram
+
 0.04  2018-02-02 19:08:41 CET
   - fix variable name
   - fix check value bug

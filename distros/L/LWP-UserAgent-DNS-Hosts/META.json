@@ -68,7 +68,7 @@
       },
       "LWP::UserAgent::DNS::Hosts" : {
          "file" : "lib/LWP/UserAgent/DNS/Hosts.pm",
-         "version" : "0.12"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -82,11 +82,11 @@
          "web" : "https://github.com/masaki/p5-LWP-UserAgent-DNS-Hosts"
       }
    },
-   "version" : "0.12",
+   "version" : "0.13",
    "x_authority" : "cpan:MASAKI",
    "x_contributors" : [
       "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
-      "Masaki Nakagawa <masaki.nakagawa@gmail.com>"
+      "ikasam_a <masaki.nakagawa@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

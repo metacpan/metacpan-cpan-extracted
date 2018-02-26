@@ -1692,7 +1692,7 @@ sub to_irc {
             {
                 $p->{kernel}->yield(
                     irc_notify => $chan => $p->{strings},
-                    $p->{opts}{use_notices} ? 'notice' : 'privmsg'
+                    $p->{opts}{use_irc_notices} ? 'notice' : 'privmsg'
                 );
             }
             else {
@@ -1700,7 +1700,7 @@ sub to_irc {
 
                 my $stash = {
                     message => $p->{strings},
-                    method  => $p->{opts}{use_notices} ? 'notice' : 'privmsg'
+                    method  => $p->{opts}{use_irc_notices} ? 'notice' : 'privmsg'
                 };
 
                 if ( my $jc = $KGB::joining_channels{$chan} ) {
@@ -1725,7 +1725,7 @@ sub to_irc {
 
 =head2 gitlab_webhook_push
 
-Handle a gitlab webhook call fir the C<push> event (branch update).
+Handle a gitlab webhook call for the C<push> event (branch update).
 
 Expects the body of the POST request (decoded, as a hash reference) in I<ARG0>
 and all the request parameters in I<ARG1>.
@@ -1774,7 +1774,7 @@ For I<push> events, limit the commit notifications to the given I<number>. If a
 branch update contains more commits, the usual notifications are replaced by a
 single notification about the number of the pushed commits.
 
-B<Default>: 4
+B<Default>: 20
 
 =back
 
@@ -1805,8 +1805,8 @@ sub gitlab_webhook_push {
 
     my $rev_prefix = $opts->{rev_prefix} // '';
 
-    my $max_commits = $opts->{squash_threshold} // 4;
-    $max_commits = 4 unless $max_commits and $max_commits =~ /^\d\d?$/;
+    my $max_commits = $opts->{squash_threshold} // 20;
+    $max_commits = 20 unless $max_commits and $max_commits =~ /^\d\d?$/;
 
     if ( @{ $body->{commits} } > $max_commits ) {
         my @info;
@@ -1824,7 +1824,7 @@ sub gitlab_webhook_push {
         push @info,
             colorize(
             web => sprintf(
-                '%s/compare/%s..%s',
+                '%s/compare/%s...%s',
                 $body->{project}{homepage},
                 substr( $body->{before}, 0, 7 ),
                 substr( $body->{after},  0, 7 )
@@ -1850,6 +1850,13 @@ sub gitlab_webhook_push {
         my $author = $commit->{author}{name};
         my $commit_id = substr( $commit->{id}, 0, 7 );
 
+        my $via;
+        $via = $body->{user_name}
+            if $body->{user_name}
+            and $body->{user_email}
+            and $commit->{author}{email}
+            and $body->{user_email} ne $commit->{author}{email};
+
         my @changes;
         push @changes,
             App::KGB::Change->new( { action => 'M', path => $_ } )
@@ -1868,6 +1875,7 @@ sub gitlab_webhook_push {
         my @info;
 
         push @info, colorize( author => $author ) if $author ne '';
+        push @info, '(via ' . colorize( author => $via ) . ')' if $via;
         push @info, colorize( branch => $branch ) if $branch ne '';
         push @info, "$rev_prefix" . colorize( revision => $commit_id )
             if defined $commit_id;
@@ -1901,8 +1909,6 @@ sub gitlab_webhook_push {
             $commit->{url}
             ? colorize( web => shorten_url( $commit->{url} ) )
             : undef;
-
-        my $use_notices = $opts->{use_irc_notices};
 
         my @log = split( /\n/, $commit->{message} );
         # for multi-line commit log, emit only the first line if the second one

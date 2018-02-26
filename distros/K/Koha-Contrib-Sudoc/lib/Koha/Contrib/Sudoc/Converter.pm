@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.23';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.24';
 use Moose;
 use Modern::Perl;
 
@@ -13,17 +13,11 @@ has item => ( is => 'rw', isa => 'HashRef' );
 
 
 
-sub skip {
-    my ($self, $record) = @_;
-    return 0;
-}
-
-
-sub init {
+sub build {
     my ($self, $record) = @_;
 
-    my $myrcr = $self->sudoc->c->{rcr};
     # On crée la structure de données items
+    my $myrcr = $self->sudoc->c->{rcr};
     my $item = {};
     for my $field ( @{$record->fields} ) {
         next if ref $field eq 'MARC::Moose::Field::Control';
@@ -41,6 +35,16 @@ sub init {
         $item->{$rcr}->{$id}->{$field->tag} = $field;
     }
     $self->item($item);
+}
+
+
+sub skip {
+    return 0;
+}
+
+
+sub init {
+    my ($self, $record) = @_;
 
     # On supprime de la notice SUDOC les champs à exclure
     my $exclure = $self->sudoc->c->{biblio}->{exclure};
@@ -201,7 +205,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 DESCRIPTION
 
@@ -211,6 +215,7 @@ notice ou d'une notice qui existe déjà dans Koha:
 
  Méthode       ajout  modif 
  --------------------------
+ build           0      0
  skip            O      O
  init            O      O
  authoritize     O      O
@@ -245,16 +250,19 @@ Les exemplaires courants.
 
 =head1 METHODS
 
+=head2 build
+
+Fabrique les structures de données nécessaires
+
 =head2 skip
 
 La notice doit-elle être passée ? Par défaut, on garde toute notice.
 
 =head2 init
 
-Méthode appelée après C<skip> pour un enregistrement SUDOC entrant, que ce
-soit un doublon ou une nouvelle notice. Initialisation du hash item.
-Suppression de la notice entrante des champs définis dans C<sudoc.conf> :
-C<biblio-exclure>
+Méthode appelée après C<skip> pour un enregistrement SUDOC entrant, que ce soit
+un doublon ou une nouvelle notice.  Suppression de la notice entrante des
+champs définis dans C<sudoc.conf> : C<biblio-exclure>
 
 =head2 authoritize
 
@@ -297,7 +305,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Fréderic Demians.
+This software is Copyright (c) 2017 by Fréderic Demians.
 
 This is free software, licensed under:
 

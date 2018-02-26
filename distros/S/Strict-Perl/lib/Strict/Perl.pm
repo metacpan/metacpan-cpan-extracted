@@ -8,7 +8,7 @@ package Strict::Perl;
 # Copyright (c) 2014, 2015, 2017, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2018.02';
+$VERSION = '2018.03';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -306,7 +306,7 @@ Strict::Perl - Perl module to restrict old/unsafe constructs
 
 =head1 SYNOPSIS
 
-  use Strict::Perl 2018.02; # must version, must match
+  use Strict::Perl 2018.03; # must version, must match
 
 =head1 DESCRIPTION
 
@@ -318,7 +318,7 @@ in your script.
 
 Version specify is required when use Strict::Perl, like;
 
-  use Strict::Perl 2018.02;
+  use Strict::Perl 2018.03;
 
 It's die if specified version doesn't match Strict::Perl's version.
 

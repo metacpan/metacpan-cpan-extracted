@@ -142,7 +142,7 @@ has valid_attributes =>
 	required => 0,
 );
 
-our $VERSION = '2.46';
+our $VERSION = '2.47';
 
 # -----------------------------------------------
 
@@ -1742,7 +1742,7 @@ $level defaults to 'debug', and $message defaults to ''.
 
 If called with $level eq 'error', it dies with $message.
 
-=head2 logger($logger_object])
+=head2 logger($logger_object)
 
 Gets or sets the log object.
 
@@ -1994,7 +1994,7 @@ Also, the code, and 'dot', both accept newlines embedded within such labels.
 
 Together, these allow HTML labels to be formatted nicely in the calling code.
 
-See <the Graphviz docs|http://www.graphviz.org/content/node-shapes#record> for their discussion on whitespace.
+See L<the Graphviz docs|https://graphviz.gitlab.io/_pages/doc/info/shapes.html#record> for their discussion on whitespace.
 
 =head2 I'm having trouble with special characters in node names and labels
 

@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2017-02-01 00:00:00 +0000 to present.
+Changes from 2017-02-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2018-02-01 21:19:56 +0000
+version 0.004 at 2018-02-20 20:31:26 +0000
 ------------------------------------------
+
+  Change: 84bb2eb0e43b80e972b10d0f69afa8b0948370eb
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-20 14:30:31 +0000
+
+    version bump 
+
+  Change: c23bf1a75c24a1285326cdc61f860e5c788fd0d2
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-20 14:27:22 +0000
+
+    Simplify Report arguments 
 
   Change: b05b4134c6846fcf7ada1f001bd23e34d38e983c
   Author: tedkat <tedkat@cpan.org>

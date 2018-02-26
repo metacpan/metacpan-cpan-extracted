@@ -15,6 +15,8 @@ use Digest::MD5 qw(md5_hex);
 use XML::Twig; 
 use XML::Parser; 
 
+use Data::Dumper; use Data::UUID; $Data::Dumper::Terse = 1; 
+
 our $VERSION = '1.4'; # VERSION
 
 sub add_extra_info {
@@ -219,21 +221,26 @@ sub replace_cvcs {
     return $data;
 }
 
-sub masking_func {
-    my ($http_object, $func) = @_;
-    my $xml = XML::Twig->new(pretty_print => 'indented');
-    my $xml_to_parse = $func->($http_object->content);
+sub log_data {
+    my ($http_object) = @_;
+    my $xml_debug = XML::Twig->new(pretty_print => 'indented');
+    my $xml_info = XML::Twig->new(pretty_print => 'indented');
+
     if (ref($http_object) eq "HTTP::Request") {
-        $xml->safe_parse($xml_to_parse);
-        print "Request: \n";
-        $NpsSDK::Configuration::logger->log($NpsSDK::Configuration::log_level, encode("UTF-8", $xml->sprint()));
-        print "\n";		
-    } elsif (ref($http_object) eq "HTTP::Response") {
-        $xml->safe_parse($xml_to_parse);
-        print "Response: \n";
-        $NpsSDK::Configuration::logger->log($NpsSDK::Configuration::log_level, encode("UTF-8", $xml->sprint()));
-        print "\n";
+        show_logs($http_object, $xml_debug, $xml_info);
     }
+
+    if (ref($http_object) eq "HTTP::Response" and $http_object->code ne 500) {
+        show_logs($http_object, $xml_debug, $xml_info);
+    }
+}
+
+sub show_logs {
+    my ($object, $debug, $info) = @_;
+    $debug->safe_parse($object->content);
+    $info->safe_parse(mask_data($object->content));
+    $NpsSDK::Configuration::logger->debug(encode("UTF-8", ref($object) . " " . $debug->sprint()));
+    $NpsSDK::Configuration::logger->info(encode("UTF-8", ref($object) . " " . $info->sprint()));
 }
 
 sub encode_params {

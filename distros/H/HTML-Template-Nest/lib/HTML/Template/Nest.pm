@@ -1,6 +1,5 @@
 package HTML::Template::Nest;
 
-use 5.020001;
 use strict;
 use warnings;
 use File::Spec;
@@ -9,7 +8,7 @@ use Data::Dumper;
 use HTML::Template;
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new{
 	my ($class,%opts) = @_;

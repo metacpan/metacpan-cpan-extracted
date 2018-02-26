@@ -1,4 +1,10 @@
 Revision history for Device-Chip-SDCard
 
+0.02    2018-02-26 00:41:16
+        [CHANGES]
+         * Declare correct dependency on version of Test::D:C:A
+         * Use configure_requires and test_requires correctly
+         * More detail in ->fail error messages
+
 0.01    2016/01/22 18:16:08
         First version, released on an unsuspecting world.

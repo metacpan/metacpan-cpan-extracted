@@ -4,7 +4,7 @@ use warnings;
 use DBI;
 use DBD::SQLite;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub new {
   my ($class, %options) = @_;
@@ -480,6 +480,38 @@ sub get_vertex_attribute {
   return $self->{Vertex_Attribute}{ $rowid };
 }
 
+sub set_vertex_attributes {
+  my ($self, $v, $attr) = @_;
+
+  $self->delete_vertex_attributes($v);
+  $self->add_vertex($v);
+  $self->set_vertex_attribute($v, $_, $attr->{$_})
+    for keys %$attr;
+}
+
+sub get_vertex_attributes {
+  my ($self, $v) = @_;
+
+  my $sth = $self->_prepare(q{
+    SELECT
+      rowid,
+      attribute_name
+    FROM Vertex_Attribute
+    WHERE vertex = ?
+  });
+
+  my @result;
+
+  for ($self->{dbh}->selectall_array($sth, {}, $v)) {
+    push @result,
+      $_->[1],
+      $self->{Vertex_Attribute}{ $_->[0] };
+  }
+
+  return undef unless $self->has_vertex($v);  
+  return { @result };
+}
+
 sub has_vertex_attribute {
   my ($self, $v, $name) = @_;
   my $rowid = _get_vertex_attribute_value_id($self, $v, $name);
@@ -575,10 +607,42 @@ sub get_edge_attribute {
   return $self->{Edge_Attribute}{ $rowid };
 }
 
+sub get_edge_attributes {
+  my ($self, $src, $dst) = @_;
+
+  my $sth = $self->_prepare(q{
+    SELECT
+      rowid,
+      attribute_name
+    FROM Edge_Attribute
+    WHERE src = ?
+      AND dst = ?
+  });
+
+  my @result;
+
+  for ($self->{dbh}->selectall_array($sth, {}, $src, $dst)) {
+    push @result,
+      $_->[1],
+      $self->{Edge_Attribute}{ $_->[0] };
+  }
+  
+  return { @result };
+}
+
 sub has_edge_attribute {
   my ($self, $src, $dst, $name) = @_;
   my $rowid = _get_edge_attribute_value_id($self, $src, $dst, $name);
   return defined $rowid;
+}
+
+sub set_edge_attributes {
+  my ($self, $src, $dst, $attr) = @_;
+
+  $self->delete_edge_attributes($src, $dst);
+  $self->add_edge($src, $dst);
+  $self->set_edge_attribute($src, $dst, $_, $attr->{$_})
+    for keys %$attr;
 }
 
 sub delete_edge_attribute {
@@ -671,10 +735,39 @@ sub get_graph_attribute {
   return $self->{Graph_Attribute}{ $rowid };
 }
 
+sub get_graph_attributes {
+  my ($self) = @_;
+
+  my $sth = $self->_prepare(q{
+    SELECT
+      rowid,
+      attribute_name
+    FROM Graph_Attribute
+  });
+
+  my @result;
+
+  for ($self->{dbh}->selectall_array($sth, {})) {
+    push @result,
+      $_->[1],
+      $self->{Graph_Attribute}{ $_->[0] };
+  }
+  
+  return { @result };
+}
+
 sub has_graph_attribute {
   my ($self, $name) = @_;
   my $rowid = _get_graph_attribute_value_id($self, $name);
   return defined $rowid;
+}
+
+sub set_graph_attributes {
+  my ($self, $attr) = @_;
+
+  $self->delete_graph_attributes();
+  $self->set_graph_attribute($_, $attr->{$_})
+    for keys %$attr;
 }
 
 sub delete_graph_attribute {
@@ -867,6 +960,10 @@ See the documentation of Graph::Directed for details:
 
 =item delete_vertex_attribute
 
+=item set_vertex_attributes
+
+=item get_vertex_attributes
+
 =item get_vertex_attribute_names
 
 =item delete_vertex_attributes
@@ -879,6 +976,10 @@ See the documentation of Graph::Directed for details:
 
 =item delete_edge_attribute
 
+=item set_edge_attributes
+
+=item get_edge_attributes
+
 =item get_edge_attribute_names
 
 =item delete_edge_attributes
@@ -889,7 +990,11 @@ See the documentation of Graph::Directed for details:
 
 =item has_graph_attribute
 
+=item set_graph_attributes
+
 =item delete_graph_attribute
+
+=item get_graph_attributes
 
 =item get_graph_attribute_names
 

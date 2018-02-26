@@ -1,7 +1,6 @@
 package Pithub;
-$Pithub::VERSION = '0.01033';
 our $AUTHORITY = 'cpan:PLU';
-
+our $VERSION = '0.01034';
 # ABSTRACT: Github v3 API
 
 use Moo;
@@ -63,6 +62,11 @@ sub issues {
 }
 
 
+sub markdown {
+    return shift->_create_instance('Pithub::Markdown', @_);
+}
+
+
 sub orgs {
     return shift->_create_instance('Pithub::Orgs', @_);
 }
@@ -108,7 +112,7 @@ Pithub - Github v3 API
 
 =head1 VERSION
 
-version 0.01033
+version 0.01034
 
 =head1 SYNOPSIS
 
@@ -137,9 +141,9 @@ version 0.01033
 
     # No need to provide user/repo to each module:
     my $pit = Pithub->new(
-      user  => $user,
-      repo  => $repo,
-      token => $oauth_token,
+      user  => 'plu',
+      repo  => 'pithub',
+      token => 'my_oauth_token',
     );
 
     $pit->repos->get;
@@ -181,6 +185,10 @@ Provides access to L<Pithub::GitData>.
 =head2 issues
 
 Provides access to L<Pithub::Issues>.
+
+=head2 markdown
+
+Provides access to L<Pithub::Markdown>.
 
 =head2 orgs
 

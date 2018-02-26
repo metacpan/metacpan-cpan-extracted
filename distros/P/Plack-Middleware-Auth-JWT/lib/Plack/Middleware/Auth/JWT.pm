@@ -2,7 +2,7 @@ package Plack::Middleware::Auth::JWT;
 
 # ABSTRACT: Token-based Auth (aka Bearer Token) using JSON Web Tokens (JWT)
 
-our $VERSION = '0.901';
+our $VERSION = '0.903';
 
 use 5.010;
 use strict;
@@ -12,7 +12,7 @@ use Plack::Util;
 use Plack::Util::Accessor
     qw(decode_args decode_callback psgix_claims psgix_token token_required ignore_invalid_token token_header_name token_query_name);
 use Plack::Request;
-use Crypt::JWT qw(decode_jwt);
+use Crypt::JWT 0.020 qw(decode_jwt);
 
 sub prepare_app {
     my $self = shift;
@@ -122,7 +122,7 @@ Plack::Middleware::Auth::JWT - Token-based Auth (aka Bearer Token) using JSON We
 
 =head1 VERSION
 
-version 0.901
+version 0.903
 
 =head1 SYNOPSIS
 

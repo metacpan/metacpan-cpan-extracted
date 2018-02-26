@@ -3,7 +3,7 @@ use 5.008_001;
 use strict;
 use warnings;
 use parent qw(Plack::Middleware);
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Encode;
 use File::ShareDir;
@@ -18,20 +18,8 @@ use Try::Tiny;
 sub TEMPLATE {
     <<'EOTMPL' }
 % my $stash = $_[0];
-<script type="text/javascript" charset="utf-8">
-    // When jQuery is sourced, it's going to overwrite whatever might be in the
-    // '$' variable, so store a reference of it in a temporary variable...
-    var _$ = window.$;
-    if (typeof jQuery == 'undefined') {
-        var jquery_url = '<%= $stash->{BASE_URL} %>/debug_toolbar/jquery.js';
-        document.write(unescape('%3Cscript src="' + jquery_url + '" type="text/javascript"%3E%3C/script%3E'));
-    }
-</script>
-<script type="text/javascript" src="<%= $stash->{BASE_URL} %>/debug_toolbar/toolbar.min.js"></script>
-<script type="text/javascript" charset="utf-8">
-    // Now that jQuery is done loading, put the '$' variable back to what it was...
-    var $ = _$;
-</script>
+<script src="<%= $stash->{BASE_URL} %>/debug_toolbar/jquery.js"></script>
+<script src="<%= $stash->{BASE_URL} %>/debug_toolbar/toolbar.min.js"></script>
 <style type="text/css">
     @import url(<%= $stash->{BASE_URL} %>/debug_toolbar/toolbar.min.css);
 </style>
@@ -100,15 +88,18 @@ sub prepare_app {
     for my $spec (@{ $self->panels || $self->default_panels }) {
         my ($package, %args);
         if (ref $spec eq 'ARRAY') {
-            # For the backward compatiblity
+            # For the backward compatibility
             # [ 'PanelName', key1 => $value1, ... ]
             $package = shift @$spec;
-            $builder->add_middleware("Debug::$package", @$spec);
+            $package = "Debug::$package" unless $package =~ /^\+/s;
+            $builder->add_middleware($package, @$spec);
         } else {
             # $spec could be a code ref (middleware) or a string
             # copy so that we do not change default_panels
             my $spec_copy = $spec;
-            $spec_copy = "Debug::$spec_copy" unless ref $spec_copy;
+            unless (ref $spec_copy) {
+                $spec_copy = "Debug::$spec_copy" unless $spec_copy =~ /^\+/s;;
+            }
             $builder->add_middleware($spec_copy);
         }
     }
@@ -176,9 +167,11 @@ The debug middleware offers a configurable set of panels that displays
 information about the current request and response. The information is
 generated only for responses with a status of 200 (C<OK>) and a
 C<Content-Type> that contains C<text/html> or C<application/xhtml+xml>
-and is embedded in the HTML that is sent back to the browser. Also the
-code is injected directly before the C<< </body> >> tag so if there is
-no such tag, the information will not be injected.
+and is embedded in the HTML that is sent back to the browser.
+
+Note that the code is injected B<directly before the closing tag> (C<<
+</body> >>) so if there is no such tag, the debug panel will not be
+injected at all.
 
 To enable the middleware, just use L<Plack::Builder> as usual in your C<.psgi>
 file:
@@ -195,7 +188,7 @@ expected to be a reference to an array of panel specifications.  If given,
 only those panels will be enabled. If you don't pass a C<panels>
 argument, the default list of panels - C<Environment>, C<Response>,
 C<Timer>, C<Memory>, C<Session> and C<DBITrace> - will be enabled, each with
-their default settings, and automatically disabled if their targer modules or
+their default settings, and automatically disabled if their target modules or
 middleware components are not loaded.
 
 Each panel specification can take one of three forms:
@@ -205,8 +198,13 @@ Each panel specification can take one of three forms:
 =item A string
 
 This is interpreted as the base name of a panel in the
-C<Plack::Middeware::Debug::> namespace. The panel class is loaded and a panel
-object is created with its default settings.
+C<Plack::Middeware::Debug::> namespace, unless preceded by C<+>, in
+which case it's interpreted as an absolute name similar to how
+L<Plack::Builder> handles such names,
+e.g. C<+My::Plack::Middleware::Debug::Something>.
+
+The panel class is loaded and a panel object is created with its
+default settings.
 
 =item An array reference
 
@@ -250,7 +248,7 @@ if you have custom debug panels in your framework or web application.
 
 The C<Debug> middleware is designed to be easily extensible. You might
 want to write a custom debug panel for your framework or for your web
-application. Each debug panel is also a Plack middleware copmonent and
+application. Each debug panel is also a Plack middleware component and
 is easy to write one.
 
 Let's look at the anatomy of the C<Timer> debug panel. Here is the code from

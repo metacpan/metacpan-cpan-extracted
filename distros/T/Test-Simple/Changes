@@ -1,3 +1,15 @@
+1.302125  2018-02-21 23:10:39-08:00 America/Los_Angeles
+
+    - No changes since trial
+
+1.302124  2018-02-13 22:02:48-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix a test to skip without threads
+
+1.302123  2018-02-13 21:39:31-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Make it possible to disable IPC
+
 1.302122  2018-02-05 08:13:56-08:00 America/Los_Angeles
 
     - Add 'mode' ro render facet

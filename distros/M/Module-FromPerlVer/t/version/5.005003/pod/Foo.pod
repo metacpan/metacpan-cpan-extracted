@@ -1,0 +1,7 @@
+=head1 NAME
+
+Foo - A generic module.
+
+=head1 SEE ALSO
+
+Bar.pm

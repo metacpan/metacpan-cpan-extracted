@@ -19,7 +19,7 @@ use CPU::Z80::Assembler::Parser;
 use Iterator::Simple::Lookahead;
 use Asm::Preproc::Token;
 
-our $VERSION = '2.15';
+our $VERSION = '2.16';
 
 #------------------------------------------------------------------------------
 # Class::Struct cannot be used with Exporter

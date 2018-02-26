@@ -12,8 +12,12 @@ use Mojolicious::Lite;
 # gets put under /api. Magic!
 get '/echo' => sub {
   my $self = shift->openapi->valid_input or return;
-  $self->render(openapi => j $self->validation->output);
+  $self->render(openapi => $self->req->param('arg'));
 }, 'echo';
+post '/echo' => sub {
+  my $self = shift->openapi->valid_input or return;
+  $self->render(openapi => $self->req->json);
+}, 'echoPost';
 get '/other/:id' => sub {
   my $self = shift->openapi->valid_input or return;
   my $args = $self->validation->output;
@@ -47,16 +51,32 @@ my $t = Test::Mojo->new;
 subtest 'REST request' => sub {
   $t->get_ok(
     '/api/echo?arg=Hello',
-  )->content_like(
-    qr/Hello/,
+  )->json_is(
+    'Hello',
+  );
+};
+
+subtest 'REST post' => sub {
+  $t->post_ok('/api/echo', { Content_Type => 'application/json' },
+    j {hi=>"there"},
+  )->json_is(
+    { hi => 'there' },
   );
 };
 
 subtest 'GraphQL with POST' => sub {
   $t->post_ok('/graphql', { Content_Type => 'application/json' },
-    '{"query":"{echo(arg: \"Yo\")}"}',
+    j { query=>'{echo(arg: "Yo")}' },
   )->json_is(
-    { 'data' => { 'echo' => '{"arg":"Yo"}' } },
+    { data => { echo => 'Yo' } },
+  );
+};
+
+subtest 'GraphQL with "object"' => sub {
+  $t->post_ok('/graphql', { Content_Type => 'application/json' },
+    j {query=>'mutation m {echoPost(body: [{key:"one", value:"two"}]) { key value }}'},
+  )->json_is(
+    { data => { echoPost => [{key=>"one", value=>"two"}] } },
   );
 };
 
@@ -120,6 +140,18 @@ paths:
           description: Echo response
           schema:
             type: string
+    post:
+      operationId: echoPost
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+      responses:
+        200:
+          description: Echo response
+          schema:
+            type: object
   /other/{id}:
     get:
       operationId: query with space

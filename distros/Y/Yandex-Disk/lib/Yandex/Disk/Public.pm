@@ -27,7 +27,7 @@ use base 'Yandex::Disk';
 
 #Class for Public actions under Yandex Disk files and folders
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub publicFile {
     my $self = shift;

@@ -25,7 +25,7 @@ requires:
   FileHandle: '0'
   Getopt::Long: '0'
   List::Compare: '0'
-  List::Util: '1.42'
+  List::Util: '1.49'
   Mouse: '0'
   Mouse::Role: '0'
   Text::CSV: '0'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://github.com/pombase/chobo/issues
   homepage: https://github.com/pombase/chobo
   repository: https://github.com/pombase/chobo.git
-version: '0.020'
+version: '0.021'
 x_serialization_backend: 'YAML::Tiny version 1.70'

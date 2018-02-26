@@ -1,0 +1,343 @@
+# dnsextlang rrtype descriptions
+# version 1.0
+A:1:I a host address [RFC1035]
+   A:addr IPv4 address
+
+NS:2:A an authoritative name server [RFC1035]
+   N[C]:host Host name
+
+MD:3:AO a mail destination (OBSOLETE - use MX) [RFC1035]
+   N[C]:host Host name
+
+MF:4:AO a mail forwarder (OBSOLETE - use MX) [RFC1035]
+   N[C]:host Host name
+
+CNAME:5:A the canonical name for an alias [RFC1035]
+   N[C]:host Host name
+
+SOA:6:A marks the start of a zone of authority [RFC1035]
+   N[C]:primary Primary server name
+   N[A]:mailbox Responsible mailbox
+   I4:serial Serial number
+   I4:refresh Refresh time (seconds)
+   I4:retry Retry time (seconds)
+   I4:expire Expire time (seconds)
+   I4:minimum Minium time (seconds)
+
+MB:7:AE a mailbox domain name (EXPERIMENTAL) [RFC1035]
+   N[C]:host Host name
+
+MG:8:AE a mail group member (EXPERIMENTAL) [RFC1035]
+   N[A]:mailbox Mailbox name
+
+MR:9:AE a mail rename domain name (EXPERIMENTAL) [RFC1035]
+   N[A]:mailbox Mailbox name
+
+NULL:10:AE a null RR (EXPERIMENTAL) [RFC1035]
+
+#WKS:11:I a well known service description [RFC1035]
+#   A:address IPv4 address
+#   I1:protocol Protocol number
+#   Z[WKS]:bitmap Bit Map
+
+PTR:12:A a domain name pointer [RFC1035]
+   N[C]:host Host name
+
+HINFO:13:A host information [RFC1035]
+   S:cpu CPU type
+   S:os Operating system
+
+MINFO:14:A mailbox or mail list information [RFC1035]
+   N[A]:respbox Responsible mailbox
+   N[A]:errbox Error mailbox
+
+MX:15:A mail exchange [RFC1035]
+   I2:priority Priority (lower values are higher priority)
+   N[C]:hostname Host name
+
+TXT:16:A text strings [RFC1035]
+   S[M]:text Strings
+
+RP:17:A for Responsible Person [RFC1183]
+   N[A]:mailbox Mailbox
+   N:text Text location
+
+AFSDB:18:A for AFS Data Base location [RFC1183][RFC5864]
+    I2:subtype Subtype
+    N:hostname Hostname
+
+X25:19:A for X.25 PSDN address [RFC1183]
+   S:address PSDN address
+
+ISDN:20:A for ISDN address [RFC1183]
+   S[M]:address ISDN address, and optional subaddress
+
+RT:21:A for Route Through [RFC1183]
+   I2:preference Preference
+   N:hostname Intermediate host
+
+#NSAP:22:I for NSAP address, NSAP style A record [RFC1706]
+#   Z[NSAP]:address NSAP Address 
+
+NSAP-PTR:23:I for domain name pointer, NSAP style [RFC1348][RFC1637][RFC1706]
+   N:hostname Host name
+
+SIG:24:A for security signature [RFC4034][RFC3755][RFC2535][RFC2536][RFC2537][RFC2931][RFC3110][RFC3008]
+   I2:sigtype Type covered
+   I1:algorithm Algorithm
+   I1:labels Labels
+   I4:ttl Original TTL
+   T:expires Signature expiration time
+   T:signed Time signed
+   I2:footprint Key footprint
+   N[C]:name Signer's name
+   B64:signature Signature data
+
+KEY:25:A for security key [RFC4034][RFC3755][RFC2535][RFC2536][RFC2537][RFC2539][RFC3008][RFC3110]
+   I2:flags Flags
+   I1:protocol Protocol
+   I1:algorithm Algorithm
+   B64:data Key data
+
+PX:26:I X.400 mail mapping information [RFC2163]
+   I2:pref Preference
+   N:idomain Internet mail domain
+   N:xdomain X.400 mail domain
+
+GPOS:27:A Geographical Position [RFC1712]
+   S:longitude Longitude (decimal degrees)
+   S:latitude Latitude (decimal degrees)
+   S:altitude Altitude (meters)
+
+AAAA:28:I IP6 Address [RFC3596]
+   AAAA:address Address
+
+LOC:29:A Location Information [RFC1876]
+   I1:version Version
+   I1:sphere Sphere size
+   I2:hprecision Horiz precision
+   I2:vprecision Vert precision
+   I4:latitude Latitude (offset milliseconds)
+   I4:longitude Longitude (offset milliseconds)
+   I4:altitude Altitude (offset cm)
+
+#NXT:30:A Next Domain (OBSOLETE) [RFC3755][RFC2535]
+#   N[C]:next Domain
+#   Z[NXT]:rrtypes Bitmap of rrtypes
+
+#EID:31:A Endpoint Identifier [Michael_Patton][http://ana-3.lcs.mit.edu/~jnc/nimrod/dns.txt]
+
+#NIMLOC:32:A Nimrod Locator [1][Michael_Patton][http://ana-3.lcs.mit.edu/~jnc/nimrod/dns.txt]
+
+SRV:33:I Server Selection [1][RFC2782]
+   I2:priority Priority
+   I2:weight Weight
+   I2:port Port
+   N:target Target host name
+
+#ATMA:34:A ATM Address 
+
+NAPTR:35:I Naming Authority Pointer [RFC2915][RFC2168][RFC3403]
+   I2:order Order
+   I2:pref Preference
+   S:flags Flags
+   S:services Services
+   S:regex Regular expression
+   N:replacement Replacement
+
+KX:36:I Key Exchanger [RFC2230]
+   I2:pref Preference
+   N:exchanger Exchanger
+
+CERT:37:A CERT [RFC4398]
+   I2[PKIX=1,SPKI=2,PGP=2,IPKIX=4,ISPKI=5,IPGP=6,ACPKIX=7,IACPKIX=8,URI=253,OID=254]:type Type
+   I2:tag Key tag
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   B64:certificate Certificate or CRL
+
+#A6:38:A A6 (OBSOLETE - use AAAA) [RFC3226][RFC2874][RFC6563]
+#   Z[A6P]:preflen Prefix length
+#   Z[A6S]:suffix Address suffix
+#   N:prefname Prefix name
+
+DNAME:39:A DNAME [RFC6672]
+   N:source Source name
+
+#SINK:40:A SINK [Donald_E_Eastlake][http://tools.ietf.org/html/draft-eastlake-kitchen-sink]
+
+#OPT:41:A OPT [RFC6891][RFC3225]
+
+#APL:42:I APL [RFC3123]
+#   Z[APL]:prefixes Prefixes
+
+DS:43:A Delegation Signer [RFC4034][RFC3658]
+   I2:keytag Key tag
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,DSA-NSEC-SHA1=6,RSASHA1-NSEC3-SHA1=7,RSASHA256=8,RSASHA512=10,ECC-GOST=12,ECDSAP256SHA256=13,ECDSAP384SHA384=14,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   I1[SHA-1=1,SHA-256=2,GOST=3,SHA-384=4]:digtype Digest type
+   X:digest Digest
+
+SSHFP:44:A SSH Key Fingerprint [RFC4255]
+  I1:algorithm Algorithm
+  I1:ftype Fingerprint type
+  X:fingerprint Fingerprint
+
+#IPSECKEY:45:I IPSECKEY [RFC4025]
+#   I1:prec Precedence
+#   I1:gtype Gateway type
+#   I1:algorithm Algorithm
+#   Z[IPSECKEY]:gateway Gateway
+#   B64:key Public key
+
+RRSIG:46:A RRSIG [RFC4034][RFC3755]
+   R:rrtype Type covered (Type mnemonic)
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   I1:labels Labels
+   I4:origttl Original TTL
+   T:expire Signature expiration (timestamp)
+   T:inception Signature inception (timestamp)
+   I2:keytag Key tag
+   N:signer Signer's name
+   B64:signature Signature
+
+NSEC:47:A NSEC [RFC4034][RFC3755]
+   N:next Next domain name
+   R[L]:types Type bitmaps (as window blocks)
+
+DNSKEY:48:A DNSKEY [RFC4034][RFC3755]
+   I2:flags Flags
+   I1:protocol Protocol (must be 3)
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   B64:publickey Public key
+
+DHCID:49:I DHCID [RFC4701]
+   B64:dhcpinfo DHCP information
+
+NSEC3:50:A NSEC3 [RFC5155]
+   I1[SHA-1=1]:algorithm Hash algorithm
+   I1[OPTOUT=1]:flags Flags
+   I2:iterations Iterations
+   X[C]:salt Salt
+   B32:next Next hashed owner
+   R[L]:types Type bitmaps (as window blocks)
+
+NSEC3PARAM:51:A NSEC3PARAM [RFC5155]
+   I1[SHA-1=1]:algorithm Hash algorithm
+   I1[OPTOUT=1]:flags Flags
+   I2:iterations Iterations
+   X[C]:salt Salt
+
+TLSA:52:A TLSA [RFC6698]
+   I1:usage Certificate usage
+   I1:selector Certificate selector
+   I1:mtype Matching Type
+   X:cert Certificate association data
+
+SMIMEA:53:A S/MIME cert association [draft-ietf-dane-smime]
+   I1:usage Certificate usage
+   I1:selector Certificate selector
+   I1:mtype Matching Type
+   X:cert Certificate association data
+
+#HIP:55:A Host Identity Protocol [RFC-ietf-hip-rfc5205-bis-10]
+#   I1:pkalg PK algorithm
+#   Z[HIPHIT]:hit HIT
+#   Z[HIPPK]:pubkey Public Key
+#   N[O]:servers Rendezvous servers
+
+#NINFO:56:A NINFO [Jim_Reid]
+
+#RKEY:57:A RKEY [Jim_Reid]
+
+#TALINK:58:A Trust Anchor LINK [Wouter_Wijngaards]
+
+CDS:59:A Child DS [RFC7344]
+   I2:keytag Key tag
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,DSA-NSEC-SHA1=6,RSASHA1-NSEC3-SHA1=7,RSASHA256=8,RSASHA512=10,ECC-GOST=12,ECDSAP256SHA256=13,ECDSAP384SHA384=14,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   I1[SHA-1=1,SHA-256=2,GOST=3,SHA-384=4]:digtype Digest type
+   X:digest Digest
+
+CDNSKEY:60:A DNSKEY(s) the Child wants reflected in DS [RFC7344]
+   I2:flags Flags
+   I1:protocol Protocol (must be 3)
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   B64:publickey Public key
+
+OPENPGPKEY:61:A OpenPGP Key [RFC7929]
+   B64:key PGP key
+
+CSYNC:62:A Child-To-Parent Synchronization [RFC7477]
+   I4:serial SOA serial
+   I2:flags Flags
+   R[L]:Types
+
+SPF:99:A  [RFC7208]
+  S[M]:text SPF data
+
+NID:104:A  [RFC6742]
+   I2:preference Preference
+   AA:nodeid Node ID
+
+L32:105:A  [RFC6742]
+   I2:preference Preference
+   A:locator Locator32
+
+L64:106:A  [RFC6742]
+   I2:preference Preference
+   AA:locator Locator64
+
+LP:107:A  [RFC6742]
+   I2:preference Preference
+   N:pointer Pointer
+
+EUI48:108:A an EUI-48 address [RFC7043]
+   X6:address Address (digit pairs separated by hyphens)
+
+EUI64:109:A an EUI-64 address [RFC7043]
+   X8:address Address (digit pairs separated by hyphens)
+
+# dynamically generated:A, does not appear in zones
+#TKEY:249 Transaction Key [RFC2930]
+
+# dynamically generated:A, does not appear in zones
+#TSIG:250 Transaction Signature [RFC2845]
+
+# query only:A, does not appear in zones
+#IXFR:251 incremental transfer [RFC1995]
+
+# query only:A, does not appear in zones
+#AXFR:252 transfer of an entire zone [RFC1035][RFC5936]
+
+# query only:A, does not appear in zones
+#MAILB:253 mailbox-related RRs (MB, MG or MR) [RFC1035]
+
+# query only:A, does not appear in zones
+#MAILA:254 mail agent RRs (OBSOLETE - see MX) [RFC1035]
+
+# query only:A, does not appear in zones
+#ANY:255 any RRTYPEs
+
+URI:256:A URI [RFC7553]
+   I2:priority Priority
+   I2:weight Weight
+   S[X]:target Target
+
+CAA:257:A Certification Authority Restriction [RFC6844]
+   I1:flags Flags
+   S:tag Tag
+   S[X]:value Value
+
+#AVC:258:A Application Visibility and Control [Wolfgang_Riedel]
+
+DOA:259:A Digital Object Architecture [draft-durand-doa-over-dns-02]
+   I4:enterprise DOA enterprise identifier
+   I4:type DOA type
+   I1[Local=1,URI=2,HOL=3]:location DOA Location
+   S:mediatype DOA media type
+   B64:data DOA data
+
+DLV:32769:A DNSSEC Lookaside Validation [RFC4431]
+   I2:key Key tag
+   I1[RSAMD5=1,DH=2,DSA=3,ECC=4,RSASHA1=5,INDIRECT=252,PRIVATEDNS=253,PRIVATEOID=254]:algorithm Algorithm
+   I1:type Digest type
+   X:digest Digest
+

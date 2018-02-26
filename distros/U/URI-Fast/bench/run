@@ -1,0 +1,85 @@
+#!perl
+
+
+use URI;
+use URI::Fast qw(uri);
+use Benchmark qw(:all);
+
+my @urls = (
+  '/foo/bar/baz',
+  'http://www.test.com',
+  'https://test.com/some/path?aaaa=bbbb&cccc=dddd&eeee=ffff',
+  'https://user:pwd@192.168.0.1:8000/foo/bar?baz=bat&slack=fnord&asdf=the+quick%20brown+fox+%26+hound#foofrag',
+);
+
+sub test {
+  my ($msg, $count, $tests) = @_;
+  print "--------------------------------------------------------------------------------\n";
+  print "$msg\n";
+  print "--------------------------------------------------------------------------------\n";
+  timethese $count, $tests;
+  print "\n";
+}
+
+test "Basics", 400_000, {
+  'file'     => sub{ my $uri = uri $urls[0]; $uri->scheme; },
+  'simple'   => sub{ my $uri = uri $urls[1]; $uri->scheme; },
+  'basic'    => sub{ my $uri = uri $urls[2]; $uri->scheme; },
+  'complete' => sub{ my $uri = uri $urls[3]; $uri->scheme; },
+};
+
+test 'Constructor', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[1]) },
+  'URI::Fast' => sub{ my $uri = uri $urls[1] },
+};
+
+test 'Parse scheme', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->scheme },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; $uri->scheme },
+};
+
+test 'Update scheme', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[1]); $uri->scheme('https') },
+  'URI::Fast' => sub{ my $uri = uri $urls[1]; $uri->scheme('https') },
+};
+
+test 'Parse path', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); my $p = $uri->path },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; my $p = $uri->path },
+};
+
+test 'Split path', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); my @p = $uri->path_segments },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; my @p = $uri->path },
+};
+
+test 'Update path', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->path('/foo/bar') },
+  'URI::Fast/string' => sub{ my $uri = uri $urls[3]; $uri->path('/foo/bar') },
+  'URI::Fast/list' => sub{ my $uri = uri $urls[3]; $uri->path(['foo', 'bar']) },
+};
+
+test 'Parse authorization', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->host },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; $uri->host },
+};
+
+test 'Update authorization', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->host('test.com') },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; $uri->host('test.com') },
+};
+
+test 'Parse query', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->query_form },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; $uri->param('asdf') },
+};
+
+test 'Set query parameter', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); $uri->query_form(foo => 'bar') },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; $uri->param('foo', 'bar') },
+};
+
+test 'Stringification', 200_000, {
+  'URI' => sub{ my $uri = URI->new($urls[3]); my $str = "$uri" },
+  'URI::Fast' => sub{ my $uri = uri $urls[3]; my $str = "$uri" },
+};

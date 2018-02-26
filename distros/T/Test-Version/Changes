@@ -1,5 +1,11 @@
 Revision history for Test-Version
 
+2.07      2018-02-21
+  - Fix tests to work with -T on Strawberry / MSWin32 Perl
+
+2.06_01   2017-11-12
+  - Support running in taint mode (Damyan Ivanov++)
+
 2.05      2016-09-17
   - Bump requirement for newer version of Module::Metadata (again)
     Required for ignore_unindexable

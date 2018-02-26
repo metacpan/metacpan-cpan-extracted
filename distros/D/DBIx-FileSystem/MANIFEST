@@ -8,4 +8,6 @@ examples/access
 t/00_shell.t
 t/01_access_isanumber.t
 t/02_access_data.t
+t/03_access_data_dbh.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

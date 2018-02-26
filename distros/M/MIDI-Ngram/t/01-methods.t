@@ -11,11 +11,11 @@ throws_ok {
 } qr/Missing required arguments: in_file/, 'file required';
 
 throws_ok {
-    $obj = MIDI::Ngram->new( in_file => 'foo' )
-} qr/File foo does not exist!/, 'bogus file';
+    $obj = MIDI::Ngram->new( in_file => 'eg/twinkle_twinkle.mid' )
+} qr/Invalid list/, 'invalid in_file';
 
 $obj = MIDI::Ngram->new(
-    in_file    => 'eg/twinkle_twinkle.mid',
+    in_file    => [ 'eg/twinkle_twinkle.mid' ],
     ngram_size => 3,
     weight     => 1,
 );

@@ -14,7 +14,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -684,8 +684,8 @@ example the C code:
  int
  sum(int *array, int size)
  {
-   int total,i;
-   for(i=0,total=0; i<size; i++)
+   int total, i;
+   for (i = 0, total = 0; i < size; i++)
    {
      total += array[i];
    }
@@ -1011,6 +1011,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -12,14 +12,14 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Plack-Middleware-Auth-JWT
 requires:
-  Crypt::JWT: '0'
+  Crypt::JWT: '0.020'
   Plack::Middleware: '0'
   Plack::Request: '0'
   Plack::Util: '0'
@@ -30,4 +30,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/domm/Plack-Middleware-Auth-JWT.git
-version: '0.901'
+version: '0.903'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -10,6 +10,9 @@ do { my $x = {
                                       }
                       },
        'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.005'
+                                      },
                       'requires' => {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -30,14 +33,6 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Version' => '1',
                                       'Try::Tiny' => '0.24'
-                                    },
-                      'suggests' => {
-                                      'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
-                                      'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
-                                      'Dist::Zilla::Plugin::Git::Commit' => '2.020',
-                                      'Dist::Zilla::Plugin::Git::Tag' => '0',
-                                      'Dist::Zilla::Plugin::NextRelease' => '5.033',
-                                      'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004'
                                     }
                     },
        'runtime' => {

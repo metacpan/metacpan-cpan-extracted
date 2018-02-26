@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -38,11 +38,7 @@ sub _load_schema {
     }
     my $schema = decode_json($json);
 
-    # rename MARC leader according to the Catmandu::MARC specification
-    if (exists $schema->{Leader}) {
-        $schema->{LDR} = delete $schema->{Leader};
-    }
-    return $schema;
+    return $schema->{fields};
 }
 
 sub check {
@@ -94,7 +90,7 @@ sub check_field {
             if ($sfspec) {
                 if (!$sfspec->{repeatable} && $sfcounter{$code}++) {
                     $errors{$code} = {
-                        message    => qq{subfield '$code' is not repeatable},
+                        message    => 'subfield is not repeatable',
                         label      => $sfspec->{label},
                         repeatable => 'false'
                     };

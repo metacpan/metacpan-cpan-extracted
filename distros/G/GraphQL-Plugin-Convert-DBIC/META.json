@@ -49,7 +49,8 @@
             "DBD::SQLite" : "0",
             "DBIx::Class::Schema" : "0",
             "GraphQL" : "0.21",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Snapshot" : "0.05"
          }
       }
    },
@@ -67,6 +68,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97000"
 }

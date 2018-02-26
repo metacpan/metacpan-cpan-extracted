@@ -1,0 +1,17 @@
+NAME
+    Revision History for Algorithm::Bertsekas.
+
+SYNOPSIS
+    A list of changes to the Algorithm::Bertsekas module.
+
+DESCRIPTION
+
+    Version 0.21 (Algorithm::Bertsekas-0.21 Released on 22th Feb 2018)
+	    1. Modified the 'auction' subroutine.
+		2. removed the 'get_edges', 'mkbg' and 'bidding' subroutines.
+		3. Added the 'auctionRound' subroutine.
+		4. Updated perldoc for Bertsekas.pm
+
+    Version 0.10 (Algorithm::Bertsekas Released on 10th Feb 2018)
+		Algorithm::Bertsekas released on CPAN
+

@@ -32,7 +32,7 @@ File::Path::Tiny::rm ($DOWNLOAD_FILE);
 
 
 BEGIN {
-    use_ok("Yandex::Disk", "new");
+    use_ok("Yandex::Disk");
 }
 
 can_ok("Yandex::Disk", "new");
@@ -45,6 +45,8 @@ testDiskInfo();
 testCreateFolder();
 testUploadFile();
 testListFiles();
+testListAllFiles();
+testLastUploadedFiles();
 testDownloadFile();
 testCompareFile();
 testDeleteResource();
@@ -115,6 +117,21 @@ sub testListFiles {
     my $found_file = grep {$_->{name} eq 'small_file'} @$list;
     ok ($found_file, "Test listFiles");
 }
+
+sub testListAllFiles {
+    can_ok("Yandex::Disk", "listAllFiles");
+    my $list = $disk->listAllFiles();
+    my $found_file = grep {$_->{name} eq 'small_file'} @$list;
+    ok ($found_file, "Test listAllFiles");
+}
+
+sub testLastUploadedFiles {
+    can_ok("Yandex::Disk", "lastUploadedFiles");
+    my $list = $disk->lastUploadedFiles();
+    my $found_file = grep {$_->{name} eq 'small_file'} @$list;
+    ok ($found_file, "Test lastUploadedFiles");
+}
+
 
 sub get_md5 {
     my $fname = shift;

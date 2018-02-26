@@ -4,6 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
+    (MM->can('signature_target') ? (SIGN => 1) : ()),
     NAME             => 'Mail::Run::Crypt',
     AUTHOR           => q{Tom Ryder <tom@sanctum.geek.nz>},
     VERSION_FROM     => 'lib/Mail/Run/Crypt.pm',
@@ -20,7 +21,6 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'                      => 0,
         'English'                   => 0,
-        'File::stat'                => 0,
         'Getopt::Long::Descriptive' => 0,
         'IPC::Run3'                 => 0,
         'Mail::GnuPG'               => 0,
@@ -31,7 +31,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Mail::Run::Crypt' => {
-                version => '0.10',
+                version => '0.11',
                 file => 'lib/Mail/Run/Crypt.pm',
             },
         },

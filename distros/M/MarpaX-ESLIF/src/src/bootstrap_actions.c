@@ -3669,7 +3669,8 @@ static short _marpaESLIF_bootstrap_G1_action_single_symbol_4b(void *userDatavp, 
                                                      NULL, /* marpaESLIFRecognizerParentp */
                                                      1, /* fakeb */
                                                      0, /* wantedStartCompletionsi */
-                                                     1 /* A grammar is always transformed to valid UTF-8 before being parsed */);
+                                                     1, /* A grammar is always transformed to valid UTF-8 before being parsed */
+                                                     1 /* grammmarIsOnStackb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
@@ -5800,7 +5801,8 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_regex_to_
                                                      NULL, /* marpaESLIFRecognizerParentp */
                                                      1, /* fakeb */
                                                      0, /* wantedStartCompletionsi */
-                                                     1 /* A grammar is always transformed to valid UTF-8 before being parsed */);
+                                                     1, /* A grammar is always transformed to valid UTF-8 before being parsed */
+                                                     1 /* grammmarIsOnStackb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }
@@ -5913,7 +5915,8 @@ static inline marpaESLIF_bootstrap_utf_string_t *_marpaESLIF_bootstrap_character
                                                      NULL, /* marpaESLIFRecognizerParentp */
                                                      1, /* fakeb */
                                                      0, /* wantedStartCompletionsi */
-                                                     1 /* A grammar is always transformed to valid UTF-8 before being parsed */);
+                                                     1, /* A grammar is always transformed to valid UTF-8 before being parsed */
+                                                     1 /* grammmarIsOnStackb */);
   if (marpaESLIFRecognizerp == NULL) {
     goto err;
   }

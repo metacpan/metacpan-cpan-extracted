@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account::SISImport;
-$CanvasCloud::API::Account::SISImport::VERSION = '0.003';
+$CanvasCloud::API::Account::SISImport::VERSION = '0.004';
 # ABSTRACT: extends L<CanvasCloud::API::Account>
 
 use Moose;
@@ -58,7 +58,7 @@ CanvasCloud::API::Account::SISImport - extends L<CanvasCloud::API::Account>
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 ATTRIBUTES
 

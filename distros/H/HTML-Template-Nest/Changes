@@ -7,3 +7,6 @@ Revision history for Perl extension HTML::Template::Nest.
 0.03  Sun Jul 17 19:29:05 2017
 	- updated POD, corrected missing dependencies in
 		Makefile.PL
+
+0.04  Fri Dec 23 17:00:03 2018
+    - relaxed unnecessarily stringent package requirements

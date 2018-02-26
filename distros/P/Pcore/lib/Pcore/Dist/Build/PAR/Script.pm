@@ -17,11 +17,11 @@ has crypt   => ( is => 'ro', isa => Bool,    required => 1 );
 has clean   => ( is => 'ro', isa => Bool,    required => 1 );
 has mod     => ( is => 'ro', isa => HashRef, required => 1 );
 
-has tree => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::Tree'], init_arg => undef );
-has par_suffix     => ( is => 'lazy', isa => Str,     init_arg => undef );
-has exe_filename   => ( is => 'lazy', isa => Str,     init_arg => undef );
-has main_mod       => ( is => 'lazy', isa => HashRef, default  => sub { {} }, init_arg => undef );    # main modules, found during deps processing
-has shared_objects => ( is => 'ro',   isa => HashRef, init_arg => undef );
+has tree           => ( is => 'lazy', isa => InstanceOf ['Pcore::Util::File::Tree'], init_arg => undef );
+has par_suffix     => ( is => 'lazy', isa => Str,                                    init_arg => undef );
+has exe_filename   => ( is => 'lazy', isa => Str,                                    init_arg => undef );
+has main_mod       => ( is => 'lazy', isa => HashRef,                                default  => sub { {} }, init_arg => undef );    # main modules, found during deps processing
+has shared_objects => ( is => 'ro',   isa => HashRef,                                init_arg => undef );
 
 sub _build_tree ($self) {
     return Pcore::Util::File::Tree->new;

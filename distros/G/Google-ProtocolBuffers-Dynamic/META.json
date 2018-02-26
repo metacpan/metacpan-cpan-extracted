@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Google-ProtocolBuffers-Dynamic",
    "prereqs" : {
@@ -56,6 +56,6 @@
          "web" : "https://github.com/mbarbon/google-protobuf-dynamic"
       }
    },
-   "version" : "0.20"
+   "version" : "0.21"
 }
 

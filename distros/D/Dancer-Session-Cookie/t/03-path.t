@@ -1,9 +1,10 @@
 #!/usr/bin/env perl
 
-use Test::More import => ['!pass'];
-
 use strict;
 use warnings;
+
+use Test::More import => ['!pass'];
+
 use Dancer;
 
 my $CLASS = 'Dancer::Session::Cookie';

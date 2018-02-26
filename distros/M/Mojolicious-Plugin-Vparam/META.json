@@ -5,13 +5,13 @@
       "Roman V. Nikolaev <rshadow@rambler.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-Vparam",
    "no_index" : {
@@ -55,6 +55,6 @@
          "url" : "https://github.com/dr-co/libmojolicious-plugin-vparam-perl"
       }
    },
-   "version" : "3.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "3.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

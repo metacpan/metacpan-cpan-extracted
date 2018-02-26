@@ -108,6 +108,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                     resizeBehavior.setWidth(i, String(col.width));
                 }
             });
+
             var selectionModel = table.getSelectionModel();
             var currentRow = null;
             selectionModel.setSelectionMode(qx.ui.table.selection.Model.SINGLE_SELECTION);
@@ -119,7 +120,12 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                     }
                 },this);
             },this);
+            var processing = false;
             model.addListener('dataChanged',function(e){
+                if (processing){
+                    return;
+                }
+                processing = true;
                 var lastData = this.getSelection();
                 new qx.util.DeferredCall(function(){
                     if (currentRow !== null && qx.lang.Type.isObject(lastData) ){
@@ -133,7 +139,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                             cfg.table.forEach(function(col,i){
                                 if (col.primary){
                                     gotPrimary = true;
-                                    if (!qx.lang.Type.isObject(currentData) || !qx.lang.Type.isObject(lastData) || currentData[col.key] != lastData[col.key]){
+                                    if (!qx.lang.Type.isObject(currentData)
+                                        || !qx.lang.Type.isObject(lastData)
+                                        || currentData[col.key] != lastData[col.key]){
                                         equal = false;
                                     }
                                 }
@@ -145,6 +153,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                                     selectionModel.setSelectionInterval(currentRow+offset,currentRow+offset);
                                 }
                                 this.setSelection(currentData);
+                                processing = false;
                                 return;
                             }
                         }
@@ -152,6 +161,7 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                     table.resetSelection();
                     table.clearFocusedRowHighlight();
                     this.setSelection({});
+                    processing = false;
                 },this).schedule();
             },this);
 

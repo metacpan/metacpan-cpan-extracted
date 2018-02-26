@@ -1,7 +1,6 @@
 package Plack::App::WrapApacheReq;
+$Plack::App::WrapApacheReq::VERSION = '0.09';
 use parent qw(Plack::App::FakeApache);
-
-our $VERSION = $Plack::App::FakeApache::VERSION;
 
 1;
 

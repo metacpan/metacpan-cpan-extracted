@@ -1,31 +1,16 @@
 use strict;
 use warnings;
+use Test::More;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use DBIDM_Test qw/die_ok sqlLike HR_connect $dbh/;
 
-use DBIx::DataModel -compatibility=> undef;
+HR_connect;
 
-use constant NTESTS  => 3;
-use Test::More tests => NTESTS;
-
-DBIx::DataModel->Schema('HR') # Human Resources
-->Table(Employee   => T_Employee   => qw/emp_id/)
-->Table(Department => T_Department => qw/dpt_id/)
-->Table(Activity   => T_Activity   => qw/act_id/)
-->Composition([qw/Employee   employee   1 /],
-              [qw/Activity   activities * /])
-->Association([qw/Department department 1 /],
-              [qw/Activity   activities * /]);
 
 SKIP: {
   eval "use JSON 2.0; 1"
-    or skip "JSON 2.0 does not seem to be installed", NTESTS;
-
-  eval "use DBD::Mock 1.36; 1"
-    or skip "DBD::Mock 1.36 does not seem to be installed", NTESTS;
-
-  my $dbh = DBI->connect('DBI:Mock:', '', '', 
-                         {RaiseError => 1, AutoCommit => 1});
-
-  HR->dbh($dbh);
+    or plan skip_all => "JSON 2.0 does not seem to be installed";
 
   # fake data
   $dbh->{mock_add_resultset} = [ [qw/emp_id firstname lastname/],
@@ -44,6 +29,10 @@ SKIP: {
 
   my $data_from_json = $json_converter->decode($json_text);
   is_deeply($emp, $data_from_json,             "json preserved nested strucure");
+
+
+  done_testing;
 }
+
 
 

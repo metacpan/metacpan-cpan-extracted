@@ -1,0 +1,1478 @@
+#===============================================================================
+#
+#       Module:  Term::CLI::Tutorial
+#
+#       Author:  Steven Bakker (SBAKKER), <Steven.Bakker@ams-ix.net>
+#      Created:  08/Feb/18
+#
+#   Copyright (c) 2018 Steven Bakker
+#
+#   This module is free software; you can redistribute it and/or modify
+#   it under the same terms as Perl itself. See "perldoc perlartistic."
+#
+#   This software is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+#===============================================================================
+
+=head1 NAME
+
+Term::CLI::Tutorial - tips, tricks, and examples for Term::CLI
+
+=head1 VERSION
+
+version 0.03002
+
+=head1 SYNOPSIS
+
+ use Term::CLI;
+
+=head1 DESCRIPTION
+
+This manual shows how to use L<Term::CLI> to build a working CLI application
+with command-line editing capabilities, command history, command completion,
+and more.
+
+For an introduction in the object class structure, see
+L<Term::CLI::Intro>(3p).
+
+=head1 INTRODUCTION
+
+If you have ever found yourself needing to write a command-line
+(shell-like) interface to your program, then L<Term::CLI> may be for you.
+
+L<Term::CLI> provides a readline-based command line interface, including
+history, completion and input verification.
+
+The most notable features are:
+
+=over
+
+=item *
+
+syntax checking, including option parsing
+
+=item *
+
+command, filename, and parameter completion
+
+=item *
+
+command and parameter abbreviation
+
+=item *
+
+command callbacks
+
+=back
+
+Input syntax is specified by combining L<Term::CLI::Command> and
+L<Term::CLI::Argument> objects, together with L<Getopt::Long>-like
+option specifications, and providing L<callback|Term::CLI::CommandSet/callback>
+functions for command execution.
+
+In the following sections, we will embark on the journey to building a simple
+shell with a few basic commands, but one that looks quite polished.
+
+The F<tutorial> directory in the module's source tree has source code
+for all examples (F<example_01_basic_repl.pl>, F<example_02.pl>, etc.), that
+progressively build the final application.
+
+=head1 THE BSSH CONCEPT
+
+The Basically Simple SHell (BS Shell), is a command-line interpreter with a
+few simple commands:
+
+=over
+
+=item B<cp> I<src-path> ... I<dst-path>
+
+Copy I<src> to I<dst>.
+
+=item B<echo> [ I<arg> ... ]
+
+Print arguments to F<STDOUT> and terminate with a newline.
+
+=item B<exit> [ I<code> ]
+
+Exit with code I<code> (0 if not given).
+
+=item B<ls> [ I<file> ... ]
+
+See L<ls>(1).
+
+=item B<make> {B<love>|B<money>} {B<now|later|never|forever>}
+
+A silly command for illustration purposes.
+
+=item B<sleep> I<seconds>
+
+Sleep for I<seconds> seconds.
+
+=item B<do> {B<something>|B<nothing>} B<while> {B<working>|B<sleeping>}
+
+Do something during another activity.
+
+=item B<interface> I<iface> {B<up>|B<down>}
+
+Turn interface I<iface> up or down.
+
+=back
+
+That's it. Now, let's start building something.
+
+=head1 THE REPL
+
+The basic design of an interactive interface follows the well-established REPL
+(Read, Evaluate, Print, Loop) principle:
+
+    LOOP
+        input = read_a_line
+        output = evaluate_line( input )
+        print_result( output )
+    END-LOOP
+
+L<Term::CLI> provides a framework to make this happen:
+
+    use 5.014_001;
+    use Term::CLI;
+
+    my $term = Term::CLI->new(
+        name => 'bssh',             # A basically simple shell.
+    );
+
+    say "\n[Welcome to BSSH]";
+    while (defined (my $line = $term->readline)) {
+        $term->execute($line);
+    }
+    say "\nexit";
+    exit 0;
+
+This example is pretty much non-functional, since the L<Term::CLI> object is
+not aware of any command syntax yet: everything you type will result in an
+error, even empty lines and comments (i.e. lines starting with C<#> as the
+first non-blank character).
+
+    bash$ perl tutorial/example_01_basic_repl.pl
+
+    [Welcome to BSSH]
+
+    ~>
+    ERROR: missing command
+
+    ~> # This is a comment!
+    ERROR: unknown command '#'
+
+    ~> exit
+    ERROR: unknown command 'exit'
+
+    ~> ^D
+    -- exit
+
+=head2 Ignoring input patterns
+
+Let's first make sure that empty lines and comments are ignored. We I<could>
+add a line to the C<while> loop:
+
+    while (my $line = $term->readline) {
+        next if /^\s*(?:#.*)?$/; # Skip comments and empty lines.
+        $term->execute($line);
+    }
+
+But it's actually nicer to let L<Term::CLI> handle this for us:
+
+    my $term = Term::CLI->new(
+        name => 'bssh',             # A basically simple shell.
+        skip => qr/^\s*(?:#.*)?$/,  # Skip comments and empty lines.
+    );
+
+Now we get:
+
+    bash$ perl tutorial/example_02_ignore_blank.pl
+
+    [Welcome to BSSH]
+    ~>
+    ~> # This is a comment!
+    ~> exit
+    ERROR: unknown command 'exit'
+    ~> ^D
+    -- exit
+
+=head2 Setting the prompt
+
+The default prompt for L<Term::CLI> is C<~E<gt>>. To change this, we can call
+the L<prompt|Term::CLI/prompt> method, or just specify it as an argument to
+the constructor:
+
+    my $term = Term::CLI->new(
+        name   => 'bssh',             # A basically simple shell.
+        skip   => qr/^\s*(?:#.*)?$/,  # Skip comments and empty lines.
+        prompt => 'bssh> ',           # A more descriptive prompt.
+    );
+
+This gives us:
+
+    bash$ perl tutorial/example_03_setting_prompt.pl
+
+    [Welcome to BSSH]
+    bssh>
+    bssh> # This is a comment!
+    bssh> exit
+    ERROR: unknown command 'exit'
+    bssh>
+    -- exit
+
+=head1 ADDING COMMANDS
+
+Adding a command to a L<Term::CLI> object is a matter of creating
+an array of L<Term::CLI::Command> instances and passing it to the
+L<Term::CLI>'s C<add_command> method.
+
+    my $term = Term::CLI->new(
+        name     => 'bssh',             # A basically simple shell.
+        skip     => qr/^\s*(?:#.*)?$/,  # Skip comments and empty lines.
+        prompt   => 'bssh> ',           # A more descriptive prompt.
+    );
+
+    $term->add_command, Term::CLI::Command->new(
+        ...
+    );
+
+It is also possible to build the C<commands> list inside the constructor call:
+
+    my $term = Term::CLI->new(
+        ...
+        commands => [
+            Term::CLI::Command->new( ... ),
+            ...
+        ]
+    );
+
+However, the code quickly becomes unwieldy when a large number of
+commands and options are added.
+
+You can also build a list first, and then call C<add_command>:
+
+    my $term = Term::CLI->new(
+        ...
+    );
+
+    my @commands;
+    push @commands, Term::CLI::Command->new(
+        ...
+    );
+
+    ...
+
+    $term->add_command(@commands);
+
+This is the method we'll use for this tutorial, and comes in
+handy further down the line.
+
+So, now that we have the basic mechanism out of the way, let's
+add our first command, the highly useful C<exit>.
+
+=head2 The C<exit> command (optional argument)
+
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<exit> [ I<code> ]
+
+This illustrates the use of a single, optional argument. Here's the code:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'exit',
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            execute_exit($cmd->name, @{$args{arguments}});
+            return %args;
+        },
+        arguments => [
+            Term::CLI::Argument::Number::Int->new(  # Integer
+                name => 'excode',
+                min => 0,             # non-negative
+                inclusive => 1,       # "0" is allowed
+                min_occur => 0,       # occurrence is optional
+                max_occur => 1,       # no more than once
+            ),
+        ],
+    );
+
+Let's unpack that, shall we?
+
+The L<Term::CLI::Command constructor|Term::CLI::Command/CONSTRUCTOR>
+takes three attributes:
+
+=over
+
+=item B<name =E<gt>> 'exit'
+
+The name of the command. This is a mandatory attribute.
+
+=item B<callback =E<gt> \&execute_exit>
+
+The function to call when the command is executed.
+
+=item B<arguments =E<gt>> [ ... ]
+
+A list of arguments that the command takes.
+
+=back
+
+=head3 The C<callback> function
+
+The callback function is called when the command is executed.
+
+    callback => sub {
+        my ($cmd, %args) = @_;
+        return %args if $args{status} < 0;
+        execute_exit($cmd->name, @{$args{arguments}});
+        return %args;
+    },
+
+In this case, we also have to define C<execute_exit>:
+
+    sub execute_exit {
+        my ($cmd, $excode) = @_;
+        $excode //= 0;
+        say "-- $cmd: $excode";
+        exit $excode;
+    }
+
+The callback function
+(see L<callback in Term::CLI::Role::CommandSet|Term::CLI::Role::CommandSet/callback>)
+is called with a reference to the command object that owns the callback, along
+with a number of (I<key>, I<value>) pairs. It is expected to return a similar
+structure (while possibly modifying the C<status> and/or C<error> values).
+
+Since the callback function is called even in the face of parse errors, it is
+important to check the C<status> flag. A negative value indicates a parse
+error, so we don't do anything in that case (the L<Term::CLI> default callback
+will print the error for us).
+
+The command arguments are found under the C<arguments> key, as an ArrayRef of
+scalars. The exit code is the only (optional) argument, so that is found as
+the first element of the list: C<< $args{arguments}->[0] >>. If it is not given,
+we default to C<0>.
+
+=head3 The C<arguments> list
+
+The C<arguments> attribute is an ArrayRef made up of L<Term::CLI::Argument>
+instances, or more precisely, object classes derived from that. At this
+moment, we have a number of pre-defined sub-classes:
+L<Term::CLI::Argument::Enum>,
+L<Term::CLI::Argument::Number::Float>.
+L<Term::CLI::Argument::Number::Int>,
+L<Term::CLI::Argument::Filename>,
+L<Term::CLI::Argument::String>.
+In our case, we need an optional, non-negative integer, so:
+
+    Term::CLI::Argument::Number::Int->new(  # Integer
+        name => 'excode',
+        min => 0,             # non-negative
+        inclusive => 1,       # "0" is allowed
+        min_occur => 0,       # occurrence is optional
+        max_occur => 1,       # no more than once
+    ),
+
+The C<inclusive> and C<max_occur> can be left out in this case, as their
+defaults are C<1> anyway.
+
+=head3 Trying out the C<exit> command
+
+    bash$ perl tutorial/example_04.pl
+
+    [Welcome to BSSH]
+    bssh> exit ok
+    ERROR: arg#1, 'ok': not a valid number for excode
+    bssh> exit 0 1
+    ERROR: arg#1, excode: too many arguments
+    bssh> exit 2
+    -- exit: 2
+
+Note that command abbreviation also works, i.e. you can type:
+
+    e
+    ex
+    exi
+    exit
+
+=head1 GETTING HELP
+
+Before adding more commands to our application, it's perhaps a good
+moment to look at the built-in help features of L<Term::CLI>.
+
+By default, there is no help available in a L<Term::CLI> application:
+
+    bss> help
+    ERROR: unknown command 'help'
+
+However, there is a special L<Term::CLI::Command::Help> class (derived
+from L<Term::CLI::Command>) that implements a C<help> command, including
+command line completion:
+
+    push @commands, Term::CLI::Command::Help->new();
+
+If you add this to the application, you'll get:
+
+    bash$ perl tutorial/example_05_add_help.pl
+
+    [Welcome to BSSH]
+    bssh> help
+    Commands:
+        exit [excode]
+        help [cmd ...]             show help
+    bssh> help exit
+    Usage:
+        exit [excode]
+    bssh> help h
+    Usage:
+        help [--pod] [-p] [cmd ...]
+
+    Description:
+        Show help for any given command sequence. The "--pod"
+        option (or "-p") will cause raw POD to be shown.
+
+Note that we don't have to specify the full command to get help on:
+command abbreviation works here as well (C<help h>). Also, if you'd type
+C<help h>, then hit the I<TAB> key, it would autocomplete to C<help help>.
+
+The C<--pod> option is handy if you want to copy the help text into a
+manual page:
+
+    bssh> help --pod help
+
+    =head2 Usage:
+
+    B<help> [B<--pod>] [B<-p>] [I<cmd> ...]
+
+    =head2 Description:
+
+    Show help for any given command sequence.
+    The C<--pod> option (or C<-p>) will cause raw POD
+    to be shown.
+
+=head2 Fleshing out help text
+
+As you may have already seen, the help text for the C<exit> command
+is rather sparse (unlike that of the C<help> command itself): it only
+shows a "usage" line.
+
+The L<Term::CLI::Command::Help> class is smart enough to construct a
+usage line from the given command (including its options, parameters
+and sub-commands), but it cannot magically describe what a command
+is all about. You'll have to specify that yourself, using the C<summary>
+and C<description> attributes in the C<exit> command definition:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'exit',
+        summary => 'exit B<bssh>',
+        description => "Exit B<bssh> with code I<excode>,\n"
+                    ."or C<0> if no exit code is given.",
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            execute_exit($cmd->name, @{$args{arguments}});
+            return %args;
+        },
+        arguments => [
+            Term::CLI::Argument::Number::Int->new(  # Integer
+                name => 'excode',
+                min => 0,             # non-negative
+                inclusive => 1,       # "0" is allowed
+                min_occur => 0,       # occurrence is optional
+                max_occur => 1,       # no more than once
+            ),
+        ],
+    );
+
+The C<summary> text is what is displayed in the command summary, the
+C<description> text is shown in the full help for the command:
+
+    bash $perl tutorial/example_06_add_help_text.pl
+
+    [Welcome to BSSH]
+    bssh> help
+      Commands:
+        exit [excode]              exit bssh
+        help [cmd ...]             show help
+    bssh> help exit
+      Usage:
+        exit [excode]
+
+      Description:
+        Exit bssh with code excode, or 0 if no exit code is given.
+
+The help text is in POD format, translated for the screen using
+L<Pod::Text::Termcap>(3p), and piped through an appropriate pager
+(see L<Term::CLI::Command::Help> for more details).
+
+=head1 ADDING MORE COMMANDS
+
+The following examples will show various types and combination of
+arguments:
+
+=over
+
+=item *
+
+The C<echo> command takes zero or more arbitrary string arguments
+(L<M6::CLI::Argument::String>).
+
+=item *
+
+The C<make> command takes two string arguments, each from a set
+of pre-defined values.
+(L<M6::CLI::Argument::Enum>).
+
+=item *
+
+The C<ls> command demonstrates the use of file name arguments
+(L<M6::CLI::Argument::Filename>).
+
+=item *
+
+The C<cp> command demonstrates how to set up a variable number
+of arguments (L<M6::CLI::Argument::Filename>).
+
+=item *
+
+The C<sleep> command demonstrates a numerical argument
+(L<M6::CLI::Argument::Int>).
+
+=back
+
+=head2 The C<echo> command (optional arguments)
+
+Next up, the C<echo> command.
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<echo> [ I<arg> ... ]
+
+That is, the C<echo> command takes zero or more arbitrary
+string arguments.
+
+The implementation is straightforward:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'echo',
+        summary => 'print arguments to F<stdout>',
+        description => "The C<echo> command prints its arguments\n"
+                    .  "to F<stdout>, separated by spaces, and\n"
+                    .  "terminated by a newline.\n",
+        arguments => [
+            Term::CLI::Argument::String->new( name => 'arg', occur => 0 ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            say "@{$args{arguments}}";
+            return %args;
+        }
+    );
+
+However, the C<echo> and C<exit> commands both start with the
+same prefix (C<e>), so let's see what happens with the abbreviations:
+
+    bash$ perl tutorial/example_07_echo_command.pl
+
+    [Welcome to BSSH]
+    bssh> e hello, world
+    ERROR: ambiguous command 'e' (matches: echo exit)
+    bssh> ec hello, world
+    hello, world
+    bssh> ex
+    -- exit: 0
+
+=head2 The C<make> command (enum arguments)
+
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<make> {B<love>|B<money>} {B<now|later|never|forever>}
+
+Arguments with fixed set of values can be specified with
+L<Term::CLI::Argument::Enum> objects:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'make',
+        summary => 'make I<target> at time I<when>',
+        description => "Make I<target> at time I<when>.\n"
+                    .  "Possible values for I<target> are:\n"
+                    .  "C<love>, C<money>.\n"
+                    .  "Possible values for I<when> are:\n"
+                    .  "C<now>, C<never>, C<later>, or C<forever>.",
+        arguments => [
+            Term::CLI::Argument::Enum->new( name => 'target',
+                value_list => [qw( love money)],
+            ),
+            Term::CLI::Argument::Enum->new( name => 'when',
+                value_list => [qw( now later never forever )],
+            ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            my @args = @{$args{arguments}};
+            say "making $args[0] $args[1]";
+            return %args;
+        }
+    );
+
+The "enum" parameters support completion, as well as abbreviations. Thus,
+C<m m l> will expand to C<make money later>, and C<make l n> will
+fail because C<n> is ambiguous:
+
+    bash$ perl tutorial/example_08_make_command.pl
+
+    [Welcome to BSSH]
+    bssh> m m l
+    making money later
+    bssh> m l n
+    ERROR: arg#2, 'n': ambiguous value (matches: now never) for when
+
+=head3 Command and parameter completion
+
+    m<TAB>          make
+    m l<TAB>        m love
+    m l l<TAB>      m l later
+    m l n<TAB>      m l n
+    m l n<TAB><TAB> (displays "never" and "now" as completions)
+
+=head2 The C<ls> command (file name arguments)
+
+The C<ls> command takes zero or more file name arguments.
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<ls> [ I<path> ... ]
+
+The code for this:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'ls',
+        summary => 'list file(s)',
+        description => "List file(s) given by the arguments.\n"
+                    .  "If no arguments are given, the command\n"
+                    .  "will list the current directory.",
+        arguments => [
+            Term::CLI::Argument::Filename->new( name => 'arg', occur => 0 ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            my @args = @{$args{arguments}};
+            system('ls', @args);
+            $args{status} = $?;
+            return %args;
+        }
+    );
+
+Output should look like:
+
+    bash$ perl tutorial/example_07.pl
+
+    [Welcome to BSSH]
+    bssh> ls
+    blib      lib           MANIFEST     t
+    Copying   Makefile      MYMETA.json  Term-CLI-0.01.tar.gz
+    cover_db  Makefile.old  MYMETA.yml   TODO
+    examples  Makefile.PL   pm_to_blib   tutorial
+    bssh> _
+
+Options are passed directly to the L<ls>(1) command. This is
+because we didn't specify any options in the command definition,
+so everything is assumed to be an argument, and the
+L<Term::CLI::Argument::Filename> class is not particularly picky
+about the arguments it gets, juost so long as they are not empty:
+
+    bssh> ls -F lib/Term
+    CLI/  CLI.pm
+    bssh> _
+
+=head3 File name completion
+
+    ls t<TAB><TAB>          (lists "t/" and "tutorial/" as completions)
+    ls tu<TAB>              ls tutorial
+    ls tutorial e<TAB>      ls tutorial examples
+
+=head2 The C<cp> command (variable number of arguments)
+
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<cp> I<src-path> ... I<dst-path>
+
+Ideally, we would like to specify this as:
+
+    Term::CLI::Command->new(
+        name => 'cp',
+        arguments => [
+            Term::CLI::Argument::Filename->new(
+                name => 'src-path',
+                min_occur => 1,
+                max_occur => 0 ),
+            Term::CLI::Argument::Filename->new(
+                name => 'dst-path',
+                min_occur => 1,
+                max_occur => 1 ),
+        ],
+        ...
+    )
+
+Unfortunately, that will not work. L<Term::CLI::Command> can work with
+a variable number of arguments, but only if that variable number is at
+I<the end of the list>.
+
+To see why this is the case, it is important to realise that L<Term::CLI>
+parses an input line strictly from left to right, without any backtracking
+(which proper recursive descent parsers typically do). So, suppose you enter
+C<< cp foo bar<TAB> >>. The completion code now has to decide what this C<bar>
+is that needs to be completed. Since the first argument to C<cp> can be one or
+more file names, this C<bar> can be a I<src-path>, but it can also be meant to
+be a I<dst-path>. There is no way to tell for certain, so the code will be
+"greedy", in the sense that it will classify all arguments as I<src-path>
+arguments.
+
+There's no way around this, except by using options, but that's a separate
+topic.
+
+For now, there's no other way than to specify a single
+L<Term::CLI::Argument::Filename>, with a minimum occurrence of 2, and no
+maximum. De distinction between I<src-path> and I<dst-path> needs to be
+made in the callback code.
+
+    push @commands, Term::CLI::Command->new(
+        name => 'cp',
+        summary => 'copy files',
+        description => "Copy files. The last argument in the\n"
+                    .  "list is the destination.\n",
+        arguments => [
+            Term::CLI::Argument::Filename->new( name => 'path',
+                min_occur => 2,
+                max_occur => 0
+            ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            my @src = @{$args{arguments}};
+            my $dst = pop @src;
+
+            say "command:     ".$cmd->name;
+            say "source:      ".join(', ', @src);
+            say "destination: ".$dst;
+
+            return %args;
+        }
+    );
+
+Example:
+
+    bash$ perl tutorial/example_10_cp_command.pl
+
+    [Welcome to BSSH]
+    bssh> cp
+    ERROR: need at least 2 'path' arguments
+    bssh> cp foo bar baz
+    command:     cp
+    source:      foo, bar
+    destination: baz
+    bssh> cp -r foo
+    command:     cp
+    source:      -r
+    destination: foo
+    bssh> ^D
+    -- exit: 0
+
+Note that this setup does not recognise options, so all options will
+be passed as regular arguments.
+
+=head2 The C<sleep> command (single integer argument)
+
+From L<THE BSSH CONCEPT|/THE BSSH CONCEPT> section above:
+
+S<    >B<sleep> I<seconds>
+
+This is an almost trivial implementation:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'sleep',
+        summary => 'sleep for I<time> seconds',
+        description => "Sleep for I<time> seconds.\n"
+                    .  "Report the actual time spent sleeping.\n"
+                    .  "This number can be smaller than I<time>\n"
+                    .  "in case of an interruption (e.g. INT signal).",
+        arguments => [
+            Term::CLI::Argument::Number::Int->new( name => 'time',
+                min => 1, inclusive => 1
+            ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+
+            my $time = $args{arguments}->[0];
+
+            say "-- sleep: $time";
+
+            my %oldsig = %::SIG; # Save signals;
+
+            # Make sure we can interrupt the sleep() call.
+            $::SIG{INT} = $::SIG{QUIT} = sub {
+                say STDERR "(interrupted by $_[0])";
+            };
+
+            my $slept = sleep($time);
+
+            %::SIG = %oldsig; # Restore signal handlers.
+
+            say "-- woke up after $slept sec", $slept == 1 ? '' : 's';
+            return %args;
+        }
+    );
+
+The L<Term::CLI::Argument::Number::Int> allows us to set a minimum and maximum
+value (and whether or not the boundaries are included in the allowed range).
+Our time to sleep should obviously be a positive integer.
+
+See it in action:
+
+    bash$ perl tutorial/example_11_sleep_command.pl
+
+    [Welcome to BSSH]
+    bssh> help sleep
+      Usage:
+        sleep time
+
+      Description:
+        Sleep for time seconds. Report the actual time spent sleeping. This number
+        can be smaller than time in case of an interruption (e.g. INT signal).
+    bssh> sleep 3
+    -- sleep: 3
+    -- woke up after 3 secs
+    bssh> sleep 30
+    -- sleep: 30
+    ^C(interrupted by INT)
+    -- woke up after 5 secs
+    bssh> ^D
+    -- exit: 0
+
+=head1 SUB-COMMANDS
+
+You may have noticed that so far, we've only added commands with arguments.
+But what if we want to implement something like:
+
+S<    >B<show> { B<load>|B<clock> }
+
+Well, as it turns out, L<Term::CLI::Command|Term::CLI::Command>(3p) can handle
+that as well: instead of specifying C<arguments> in the constructor, you can
+specify C<commands>. Just like for L<Term::CLI>, the C<commands> attribute
+takes a reference to an array of L<Term::CLI::Command> objects.
+
+=head2 The C<show> command
+
+The code for the C<show> command looks almost trivial:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'show',
+        summary => 'show system properties',
+        description => "Show some system-related information,\n"
+                    .  "such as the system clock or load average.",
+        commands => [
+            Term::CLI::Command->new( name => 'clock',
+                summary => 'show system time',
+                description => 'Show system time and date.',
+                callback => sub {
+                    my ($self, %args) = @_;
+                    return %args if $args{status} < 0;
+                    say scalar(localtime);
+                    return %args;
+                },
+            ),
+            Term::CLI::Command->new( name => 'load',
+                summary => 'show system load',
+                description => 'Show system load averages.',
+                callback => sub {
+                    my ($self, %args) = @_;
+                    return %args if $args{status} < 0;
+                    system('uptime');
+                    $args{status} = $?;
+                    return %args;
+                },
+            ),
+        ],
+    );
+
+Adding this to our ever-growing C<bssh> code, we get:
+
+    bash$ perl tutorial/example_12_show_command.pl
+
+    [Welcome to BSSH]
+    bssh> help show
+      Usage:
+        show {clock|load}
+
+      Description:
+        Show some system-related information, such as the system clock or load
+        average.
+
+      Sub-Commands:
+        show clock                                   show system time
+        show load                                    show system load
+    bssh> show clock
+    Wed Feb 21 14:21:56 2018
+    bssh> show load
+     14:21:59 up 1 day, 15:30,  1 user,  load average: 0.19, 0.33, 0.40
+    bssh> ^D
+    -- exit: 0
+
+=head2 Combining arguments and sub-commands
+
+A L<Term::CLI::Command> object can have both arguments and (sub-)commands
+as well. If this is the case, the parser expects the arguments before the
+sub-commands, and there can be no variable number of arguments.
+
+This technique can be used to specify arguments that are common to
+sub-commands (the C<interface> command), or to create syntactic sugar
+(the C<do> command).
+
+=head2 Syntactic sugar: the C<do> command
+
+The specification says:
+
+S<    >B<do> {B<something>|B<nothing>} B<while> {B<working>|B<sleeping>}
+
+Code:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'do',
+        summary => 'Do I<action> while I<activity>',
+        description => "Do I<action> while I<activity>.\n"
+                    .  "Possible values for I<action> are:\n"
+                    .  "C<nothing>, C<something>.\n"
+                    .  "Possible values for I<activity> are:\n"
+                    .  "C<sleeping>, C<working>.",
+        arguments => [
+            Term::CLI::Argument::Enum->new( name => 'action',
+                value_list => [qw( something nothing )],
+            ),
+        ],
+        commands => [
+            Term::CLI::Command->new(
+                name => 'while',
+                arguments => [
+                    Term::CLI::Argument::Enum->new( name => 'activity',
+                        value_list => [qw( eating sleeping )],
+                    ),
+                ],
+            ),
+        ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            return %args if $args{status} < 0;
+            my @args = @{$args{arguments}};
+            say "doing $args[0] while $args[1]";
+            return %args;
+        }
+    );
+
+=head2 Common argument(s): the C<interface> command
+
+The specification says:
+
+S<    >B<interface> I<iface> {B<up>|B<down>}
+
+The I<iface> argument is used by both sub-commands.
+
+Code:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'interface',
+        summary => 'Turn I<iface> up or down',
+        description => "Turn the I<iface> interface up or down.",
+        arguments => [
+            Term::CLI::Argument::String->new( name => 'iface' )
+        ],
+        commands => [
+            Term::CLI::Command->new(
+                name => 'up',
+                summary => 'Bring I<iface> up',
+                description => 'Bring the I<iface> interface up.',
+                callback => sub {
+                    my ($cmd, %args) = @_;
+                    return %args if $args{status} < 0;
+                    my @args = @{$args{arguments}};
+                    say "bringing up $args[0]";
+                    return %args;
+                }
+            ),
+            Term::CLI::Command->new(
+                name => 'down',
+                summary => 'Shut down I<iface>',
+                description => 'Shut down the I<iface> interface.',
+                callback => sub {
+                    my ($cmd, %args) = @_;
+                    return %args if $args{status} < 0;
+                    my @args = @{$args{arguments}};
+                    say "shutting down $args[0]";
+                    return %args;
+                }
+            ),
+        ],
+    );
+
+With the above two additions, we have:
+
+    bash$ perl tutorial/example_13_sub_cmd_and_args.pl
+
+    [Welcome to BSSH]
+    bssh> help
+      Commands:
+        cp path1 path2 ...                           copy files
+        do action while activity                     do action while activity
+        echo arg ...                                 print arguments to stdout
+        exit excode                                  exit bssh
+        help cmd ...                                 show help
+        interface iface {up|down}                    turn iface up or down
+        ls arg ...                                   list file(s)
+        make target when                             make target at time when
+        show {clock|load}                            show system properties
+        sleep time                                   sleep for time seconds
+    bssh> do something wh s
+    doing something while sleeping
+    bssh> i eth0 u
+    bringing up eth0
+    bssh> i eth0 d
+    shutting down eth0
+    bssh> ^D
+    -- exit: 0
+
+=head1 BONUS POINTS: A C<debug> COMMAND
+
+The fun thing of nesting commands is that we can easily implement this:
+
+    use Data::Dumper;
+
+    push @commands, Term::CLI::Command->new(
+        name => 'debug',
+        usage => 'B<debug> I<cmd> ...',
+        summary => 'debug commands',
+        description => "Print some debugging information regarding\n"
+                    .  "the execution of a command.",
+        commands => [ @commands ],
+        callback => sub {
+            my ($cmd, %args) = @_;
+            my @args = @{$args{arguments}};
+            say "# --- DEBUG ---";
+            my $d = Data::Dumper->new([\%args], [qw(args)]);
+            print $d->Maxdepth(2)->Indent(1)->Terse(1)->Dump;
+            say "# --- DEBUG ---";
+            return %args;
+        }
+    );
+
+Here, we basically added a C<debug> command that takes any other command
+structure as a sub-command and, after the sub-command has executed,
+will print some status information.
+
+    bash$ perl tutorial/example_10.pl
+
+    [Welcome to BSSH]
+    bssh> debug <TAB><TAB>
+    cp     echo   exit   ls     make   show   sleep
+    bssh> debug echo hi
+    hi
+    # --- DEBUG ---
+    {
+      'error' => '',
+      'status' => 0,
+      'arguments' => [
+        'hi'
+      ],
+      'command_path' => [
+        'Term::CLI=HASH(0x55e95ae02e20)',
+        'Term::CLI::Command=HASH(0x55e95b0c3998)',
+        'Term::CLI::Command=HASH(0x55e95b03f780)'
+      ],
+      'options' => {}
+    }
+    # --- DEBUG ---
+    bssh> exit
+    -- exit: 0
+
+Note the addition of the static C<usage> line, because the autogenerated
+usage line is too long (it lists every possible sub-command):
+
+    bash$ perl tutorial/example_14_debug_command.pl
+
+    [Welcome to BSSH]
+    bssh> help
+      Commands:
+        cp path1 path2 ...                           copy files
+        debug cmd ...                                debug commands
+        [...]
+    bssh> help debug
+      Usage:
+        debug cmd ...
+    
+      Description:
+        Print some debugging information regarding the execution of cmd.
+    
+      Sub-Commands:
+        debug cp path1 path2 ...                     copy files
+        debug do action while activity               Do action while activity
+        debug echo arg ...                           print arguments to stdout
+        debug exit excode                            exit bssh
+        debug help cmd ...                           show help
+        debug interface iface {down|up}              Turn iface up or down
+        debug ls arg ...                             list file(s)
+        debug make target when                       make target at time when
+        debug show {clock|load}                      show system properties
+        debug sleep time                             sleep for time seconds
+
+=head3 Caveat on C<parent>
+
+Note that this construction is not entirely without consequences, though:
+adding a
+L<Term::CLI::Command> to another
+L<Term::CLI::Command> or a
+L<Term::CLI>
+object (or any object that consumes the L<Term::CLI::Role::CommandSet> role)
+will cause the 
+L<Term::CLI::Command> object's
+C<parent> attribute to be set.
+
+At this moment, the L<parent|Term::CLI::Command/parent> attribute is only
+used to find the
+L<root_node|Term::CLI::Command/root_node>,
+but this may change in the future.
+
+To ensure the hierarchy still makes sense then, add the C<@commands> to the
+debug command I<before> adding them to the L<Term::CLI> object.
+
+And, yes, you can in principle do this:
+
+    my $debug = Term::CLI::Command->new( name => 'debug', ... );
+    push @commands, $debug;
+    $debug->add_command(@commands);
+    $term->add_command(@commands);
+
+This would give you a debug command that can debug itself:
+C<debug debug debug ...> (but I<why> would you want that!?).
+
+=head1 ADDING OPTIONS
+
+You may have noticed that the output of the C<debug> command above showed
+an C<options> key that points to a HashRef. This contains valid command
+line options from the input. To have the parsing and completion code
+recognise command line options, simply pass an C<options> parameter to
+the L<Term::CLI::Command> constructor call:
+
+    push @commands, Term::CLI::Command->new(
+        name => 'show',
+        options => [ 'verbose|v' ],
+        commands => [
+            Term::CLI::Command->new( name => 'clock',
+                options => [ 'timezone|tz|t=s' ],
+                callback => \&do_show_clock,
+            ),
+            Term::CLI::Command->new( name => 'load',
+                callback => \&do_show_uptime,
+            ),
+        ],
+    );
+
+    sub do_show_clock {
+        my ($self, %args) = @_;
+        return %args if $args{status} < 0;
+        my $opt = $args{options};
+
+        local($::ENV{TZ});
+        if ($opt->{timezone}) {
+            $::ENV{TZ} = $opt->{timezone};
+        }
+        say scalar(localtime);
+        return %args;
+    }
+
+    sub do_show_uptime {
+        my ($self, %args) = @_;
+        return %args if $args{status} < 0;
+        system('uptime');
+        $args{status} = $?;
+        return %args;
+    }
+
+The value should be an ArrayRef with the allowed options in
+L<Getopt::Long>(3p) format. The L<Term::CLI> code will turn
+on C<bundling> (allow grouping of single letter options, i.e. C<-a>
+nd C<-b> can be written as C<-ab>) and C<require_order> (no mixing of
+options and arguments).
+
+Above, we've added a C<--verbose> option to the C<show> command, and a
+specific C<--timezone> option to the C<clock> sub-command.
+
+The following commands should be allowed now:
+
+    bash$ perl tutorial/example_15_options.pl
+    
+    [Welcome to BSSH]
+    bssh> help show clock
+      Usage:
+        show clock [--timezone=s] [--tz=s] [-ts]
+    
+      Description:
+        Show system time and date.
+    bssh> show clock
+    Wed Feb 21 15:40:46 2018
+    bssh> show --verbose clock --tz=UTC
+    Wed Feb 21 14:41:02 2018
+    bssh> show clock -t UTC
+    Wed Feb 21 14:41:05 2018
+
+However, the C<--verbose> option cannot be specified after C<clock>:
+
+    bssh> show clock --verbose --tz=UTC
+    ERROR: Unknown option: verbose
+
+Note, though, that the C<--verbose> option after C<show> I<is> recorded
+in the C<options> hash when C<do_show_clock> is called:
+
+    bssh> debug show --verbose clock --tz CET
+    Tue Feb 21 14:41:45 2018
+    # --- DEBUG ---
+    {
+      'options' => {
+        'verbose' => 1,
+        'timezone' => 'CET'
+      },
+      'error' => '',
+      'arguments' => [],
+      'command_path' => [
+        'Term::CLI=HASH(0x55efdbf10bc8)',
+        'Term::CLI::Command=HASH(0x55efdc040a28)',
+        'Term::CLI::Command=HASH(0x55efdc040fe0)',
+        'Term::CLI::Command=HASH(0x55efdc041070)'
+      ],
+      'status' => 0
+    }
+    # --- DEBUG ---
+
+If you want C<--verbose> to be valid after C<clock>, you'll need to
+specify it explicitly in its options:
+
+    Term::CLI::Command->new( name => 'clock',
+        options => [ 'verbose|v', 'timezone|tz|t=s' ],
+        ...
+    ),
+
+=head1 DEALING WITH HISTORY
+
+By default, the L<Term::CLI> objects do not try to read or write
+to history files, so you will have to tell the application to do
+so explicitly. Fortunately, that's not hard:
+
+    $cli->read_history();
+
+    while (defined (my $l = $cli->readline)) {
+        ...
+    }
+
+    $cli->write_history()
+        or warn "cannot write history: ".$cli->error."\n";
+
+(Note that we don't raise a warning if we cannot read the history
+file: you don't want to get a warning if you run the application
+for the first time.)
+
+By default, if the application is named C<bssh>, the history will
+be read/written to/from C<~/.bssh_history>, and L<Term::CLI> will
+remember 1000 lines of input history.
+
+See the L<HISTORY CONTROL|Term::CLI/HISTORY CONTROL> 
+section in the L<Term::CLI> documentation for more information
+on how to change the defaults.
+
+=head1 COMPARISON WITH OTHER IMPLEMENTATIONS
+
+Here are some examples of how you might go about it without
+L<Term::CLI>. We've only decided to imlement a few of the
+simpler commands.
+
+=head2 Naive implementation
+
+The "naive" implementation uses no fancy modules, just a loop
+reading from F<STDIN> and some explicit C<if> statements matching
+the commands:
+
+    use Modern::Perl;
+    use Text::ParseWords qw( shellwords );
+    use Term::ReadLine;
+
+    print "bssh> ";
+    while (<>) {
+        next if /^\s*(?:#.*)?$/; # Skip comments and empty lines.
+        evaluate_input($_);
+    } continue {
+        print "bssh> ";
+    }
+    print "\n";
+    execute_exit('exit', 0);
+
+    sub evaluate_input {
+        my $cmd_line = shift;
+        my @cmd_line = shellwords($cmd_line);
+        if (!@cmd_line) {
+            say STDERR "cannot parse input (unbalanced quote?)";
+            return;
+        }
+        return execute_cp(@cmd_line)    if $cmd_line[0] eq 'cp';
+        return execute_echo(@cmd_line)  if $cmd_line[0] eq 'echo';
+        return execute_exit(@cmd_line)  if $cmd_line[0] eq 'exit';
+        return execute_ls(@cmd_line)    if $cmd_line[0] eq 'ls';
+        return execute_make(@cmd_line)  if $cmd_line[0] eq 'make';
+        return execute_sleep(@cmd_line) if $cmd_line[0] eq 'sleep';
+        say STDERR "unknown command: '$cmd_line[0]'";
+    }
+
+    sub execute_cp { ... }
+    sub execute_ls { ... }
+    sub execute_echo { ... }
+    sub execute_exit { ... }
+    sub execute_sleep { ... }
+
+    sub execute_make {
+        my ($cmd, @args) = @_;
+        if (@args != 2) {
+            say STDERR "$cmd: need exactly two arguments";
+            return;
+        }
+        if ($args[0] !~ /^(love|money)$/) {
+            say STDERR "$cmd: unknown target '$args[0]'";
+            return;
+        }
+        elsif ($args[1] !~ /^(now|later|never|forever)$/) {
+            say STDERR "$cmd: unknown period '$args[0]'";
+            return;
+        }
+        say "making $args[0] $args[1]";
+    }
+
+(This full script can be found in as F<examples/simple_cli.pl> in the source
+distribution.)
+
+This performs the basic actions, but does not offer anything else.
+
+=head2 IMPLEMENTATION WITH TERM::READLINE
+
+Replacing the REPL above by a L<Term::ReadLine>(3p) construction, we get:
+
+    use Modern::Perl;
+    use Text::ParseWords qw( shellwords );
+    use Term::ReadLine;
+
+    my $term = Term::ReadLine->new('bssh');
+    while (defined(my $cmd_line = $term->readline('bssh> '))) {
+        evaluate_input($_);
+    }
+    execute_exit('exit', 0);
+
+(This script can be found as F<examples/readline_cli.pl> in the source
+distribution.)
+
+This adds a few nice features:
+
+=over
+
+=item * Input editing
+
+=item * History
+
+=back
+
+But lacks some others:
+
+=over
+
+=item * Command line completion
+
+By default L<Term::ReadLine> performs
+file name completion, so e.g. the C<make> command will show file name completions,
+not the valid targets.
+
+It's possible to set up custom completion routines, but it's not trivial.
+
+=item * Command and parameter abbreviation
+
+You can't write C<ex 0>, or C<m l a>.
+
+To support abbreviations, you'd have to add prefix matching in the
+C<evaluate_input> and various C<execute_*> routines, making sure
+to do something sensible with ambiguous prefixes (e.g. throwing an
+error). You'd have to do that for every sub-command/parameter, though.
+
+=item * Built-in help
+
+=back
+
+=head1 SEE ALSO
+
+L<Term::CLI::Intro>(3p).
+
+L<Getopt::Long>(3p),
+L<Term::CLI>(3p),
+L<Term::CLI::Argument>(3p),
+L<Term::CLI::Argument::Enum>(3p),
+L<Term::CLI::Argument::FileName>(3p),
+L<Term::CLI::Argument::Number>(3p),
+L<Term::CLI::Argument::Number::Float>(3p),
+L<Term::CLI::Argument::Number::Int>(3p),
+L<Term::CLI::Argument::String>(3p),
+L<Term::CLI::Command>(3p),
+L<Term::CLI::Role::CommandSet>(3p),
+L<Term::ReadLine>(3p).
+
+=head1 FILES
+
+The following files in the source distribution illustrate the examples above:
+
+=over
+
+=item F<examples/simple_cli.pl>
+
+The "naive" implementation with a simple read loop.
+
+=item F<examples/readline_cli.pl>
+
+The simple L<Term::ReadLine> implementation that adds
+command line editing,
+filename completion,
+and command history.
+
+=item F<tutorial/term_cli.pl>
+
+The full-blown L<Term::CLI> implementation with all of the
+features of F<tutorial/readline_cli.pl>, adding all the goodness.
+
+=item F<tutorial/example_01.pl> ... F<tutorial/example_12.pl>
+
+The tutorial code.
+
+=back
+
+=head1 AUTHOR
+
+Steven Bakker E<lt>sbakker@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2018 Steven Bakker
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. See "perldoc perlartistic."
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

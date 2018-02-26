@@ -24,9 +24,9 @@ use HTTP::Request::Common;
     set session_cookie_key  => "John has a long mustache";
     set session             => "cookie";
 
-    hook before => sub { 
-        if ( !session('uid') 
-            && request->path_info !~ m{^/login} 
+    hook before => sub {
+        if ( !session('uid')
+            && request->path_info !~ m{^/login}
         ) {
             return redirect '/login/';
         }

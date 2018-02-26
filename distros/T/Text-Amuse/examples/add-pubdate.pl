@@ -21,7 +21,9 @@ foreach my $repo (@repos) {
                      my $date = `git log --follow -n 1 --format="\%ci" --diff-filter=A $f`;
                      chomp $date;
                      if ($date) {
-                         muse_rewrite_header($f, { pubdate => $date })
+                         my $muse = path($f);
+                         my $body = $muse->slurp;
+                         $muse->spew("#pubdate $date\n", $body);
                      }
                  }
              }

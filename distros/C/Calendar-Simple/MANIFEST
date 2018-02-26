@@ -11,3 +11,4 @@ t/pod_coverage.t
 t/date_span.t
 bin/pcal
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json

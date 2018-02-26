@@ -36,7 +36,7 @@
             "File::Share" : "0.25",
             "Moo" : "2.000000",
             "autodie" : "2.26",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -44,11 +44,11 @@
    "provides" : {
       "BankAccount::Validator::UK" : {
          "file" : "lib/BankAccount/Validator/UK.pm",
-         "version" : "0.33"
+         "version" : "0.36"
       },
       "BankAccount::Validator::UK::Rule" : {
          "file" : "lib/BankAccount/Validator/UK/Rule.pm",
-         "version" : "0.33"
+         "version" : "0.36"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/manwar/BankAccount-Validator-UK"
       }
    },
-   "version" : "0.33",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

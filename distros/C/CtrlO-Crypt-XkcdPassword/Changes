@@ -1,9 +1,15 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.002   2018-02-19T19:21:27
+    - fix copyright year (spotted by koki)
+    - add link to https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength (suggested by twitter.com/m_ueberall)
+    - skip t/40-fork.t on MSWin32 (uncovered by CPAN testers)
+
+
 1.001   2018-02-18T14:31:05
-    * minor documentation improvements
+    - minor documentation improvements
 
 
 1.000   2018-02-18T14:01:17
-    * first release to CPAN
+    - first release to CPAN
 

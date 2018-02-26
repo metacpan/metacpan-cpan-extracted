@@ -1,5 +1,24 @@
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.19 2018-02-22T13:41:50Z
+
+   - Minor bugfixes to Session
+   - Make session constructor fixed
+
+0.18 2018-02-21T12:01:07Z
+
+   - Guard stop() from possible race conditions
+   - Fix typo in Session, it caused orphan processes to not be resolved correctly
+
+0.17 2018-02-20T14:01:59Z
+
+   - Fix minor issue in tests, stabilize serialize test and events
+   - Reset session and subreaper bit on forked child process
+
+0.16 2018-02-19T13:32:54Z
+
+   - Fix minor issue in event test that made them unstable
+
 0.15 2018-02-19T10:13:22Z
 
    - Fix skipping subreaper tests on unsupported platforms

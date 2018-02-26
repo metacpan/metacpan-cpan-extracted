@@ -11,12 +11,12 @@ README
 t/00_load/00-load.t
 t/01_arguments/01_new.t
 t/01_arguments/01_new_invalid.t
-t/01_arguments/02_config.t
-t/01_arguments/02_config_invalid.t
 t/01_arguments/Data_Test_Arguments.pm
 xt/00_get_key_linux.t
 xt/01_option.t
+xt/01_option_hae.t
 xt/02_option_error.t
+xt/02_option_error_hae.t
 xt/cntr_choose.t
 xt/critic.t
 xt/get_key_linux.pl
@@ -37,15 +37,20 @@ xt/Y3_choose_function_invalid.t
 xt/Y3_choose_method.t
 xt/Y3_choose_method_invalid.t
 xt/Y_choose_function_arguments.pl
+xt/Y_choose_function_arguments_hae.pl
 xt/Y_choose_function_invalid_arguments.pl
+xt/Y_choose_function_invalid_arguments_hae.pl
 xt/Y_choose_method_arguments.pl
+xt/Y_choose_method_arguments_hae.pl
 xt/Y_choose_method_invalid_arguments.pl
+xt/Y_choose_method_invalid_arguments_hae.pl
 xt/Y_Data_Test_Arguments.pm
 xt/year_copyright.t
 xt/Z0_clone_win.t
 xt/Z1_hide_cursor.t
 xt/Z2_choose.t
 xt/Z_choose.pl
+xt/Z_choose_hae.pl
 xt/Z_Data_Test_Choose.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

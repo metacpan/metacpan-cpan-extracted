@@ -1,16 +1,16 @@
 {
    "abstract" : "Convert Strings to English Program Identifiers",
    "author" : [
-      "Rafael Kitover <rkitover@cpan.org>"
+      "Rafael Kitover <rkitover@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300036, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-ToIdentifier-EN",
    "no_index" : {
@@ -21,7 +21,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -44,8 +44,9 @@
       },
       "test" : {
          "requires" : {
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "lib" : "0",
             "utf8" : "0"
@@ -68,7 +69,8 @@
          "web" : "http://github.com/rkitover/string-toidentifier-en"
       }
    },
-   "version" : "0.11",
-   "x_authority" : "cpan:RKITOVER"
+   "version" : "0.12",
+   "x_authority" : "cpan:AVAR",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

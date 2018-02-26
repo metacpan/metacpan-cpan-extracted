@@ -6,7 +6,7 @@ ENDIF ()
 # Usually the version here correspong to the NEXT version - it is git tagged
 # when we do make marpaESLIFPerlRelease
 #
-MYPACKAGESTART (marpaESLIF 2 0 34)
+MYPACKAGESTART (marpaESLIF 2 0 38)
 
 ###########
 # Library #
@@ -57,13 +57,14 @@ ENDFOREACH ()
 ###############
 # Executables #
 ###############
-MYPACKAGETESTEXECUTABLE(marpaESLIFTester     test/marpaESLIFTester.c)
-MYPACKAGETESTEXECUTABLE(adventTester         test/adventTester.c)
-MYPACKAGETESTEXECUTABLE(jsonTester           test/jsonTester.c)
-MYPACKAGETESTEXECUTABLE(selfTester           test/selfTester.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester      test/exceptionTester.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester2     test/exceptionTester2.c)
-MYPACKAGETESTEXECUTABLE(exceptionTester3     test/exceptionTester3.c)
+MYPACKAGETESTEXECUTABLE(marpaESLIFTester           test/marpaESLIFTester.c)
+MYPACKAGETESTEXECUTABLE(adventTester               test/adventTester.c)
+MYPACKAGETESTEXECUTABLE(jsonTester                 test/jsonTester.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterWithSharedStream test/jsonTesterWithSharedStream.c)
+MYPACKAGETESTEXECUTABLE(selfTester                 test/selfTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester            test/exceptionTester.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester2           test/exceptionTester2.c)
+MYPACKAGETESTEXECUTABLE(exceptionTester3           test/exceptionTester3.c)
 
 ################
 # Dependencies #

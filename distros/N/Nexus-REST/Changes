@@ -1,5 +1,16 @@
 Revision history for perl module JIRA-REST. -*- text -*-
 
+0.002     2018-02-21 14:22:37-03:00 America/Sao_Paulo
+
+  [Changes]
+
+  - Support the new Nexus 3 REST API and drop mention to the old APIs.
+
+  - Implement a get_iterator method which makes it easier to deal with paginated
+    results.
+
+  - Implement two example scripts.
+
 0.001     2014-09-05 08:24:37 America/Sao_Paulo
 
   [Changes]

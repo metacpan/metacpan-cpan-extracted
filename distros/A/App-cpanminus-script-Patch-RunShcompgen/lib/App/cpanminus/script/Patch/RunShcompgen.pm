@@ -1,7 +1,7 @@
 package App::cpanminus::script::Patch::RunShcompgen;
 
-our $DATE = '2018-02-18'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-02-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ my $p_install = sub {
 
         unless (@exes) {
             warn __PACKAGE__.": Skipped, no exes found\n" if $ENV{DEBUG};
-            return;
+            last;
         }
 
         warn __PACKAGE__.": Running shcompgen generate --replace ".join(" ", @exes)."\n" if $ENV{DEBUG};
@@ -78,7 +78,7 @@ App::cpanminus::script::Patch::RunShcompgen - Run shcompgen after distribution i
 
 =head1 VERSION
 
-This document describes version 0.003 of App::cpanminus::script::Patch::RunShcompgen (from Perl distribution App-cpanminus-script-Patch-RunShcompgen), released on 2018-02-18.
+This document describes version 0.004 of App::cpanminus::script::Patch::RunShcompgen (from Perl distribution App-cpanminus-script-Patch-RunShcompgen), released on 2018-02-20.
 
 =head1 SYNOPSIS
 

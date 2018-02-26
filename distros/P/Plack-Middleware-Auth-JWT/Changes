@@ -1,5 +1,15 @@
 Revision history for Plack::Middleware::Auth::JWT
 
+0.903	2018-02-25T22:38:16
+    - require Crypt::JWT 0.020 to finally fix
+      https://rt.cpan.org/Ticket/Display.html?id=124565
+
+
+0.902	2018-02-25T20:48:59
+    - adapt test for malformed tokens, as Crypt::JWT-0.20 returns a
+      different error (spotted by Slaven Rezic via CPAN testers)
+
+
 0.901   2017-06-13T11:02:23
     - add ignore_invalid_token option
 

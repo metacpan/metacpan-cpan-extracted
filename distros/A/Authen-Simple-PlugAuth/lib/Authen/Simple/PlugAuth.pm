@@ -6,7 +6,7 @@ use base 'Authen::Simple::Adapter';
 use PlugAuth::Client::Tiny;
 
 # ABSTRACT: Simple PlugAuth authentication
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 __PACKAGE__->options({
@@ -46,7 +46,7 @@ Authen::Simple::PlugAuth - Simple PlugAuth authentication
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -61,6 +61,11 @@ version 0.02
  }
 
 =head1 DESCRIPTION
+
+B<NOTE>: Development for this tool is winding down, and L<PlugAuth::Client::Tiny>
+and modules that depend on are deprecated.  Please contact me ASAP if you depend
+on this tool. This distribution may be removed from CPAN, but not before
+june 30, 2018.
 
 Authenticate against a L<PlugAuth> server through the Authen::Simple framework.
 

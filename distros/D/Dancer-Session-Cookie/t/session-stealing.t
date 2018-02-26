@@ -35,7 +35,7 @@ sub mk_request {
     mk_request( $app, $jars[1], '/?foo=two' );
 }
 
-# Retrieve both stored 
+# Retrieve both stored
 {
     my $res = mk_request( $app, $jars[0], '/' );
     is( $res->content, 'one', 'Correct content' );

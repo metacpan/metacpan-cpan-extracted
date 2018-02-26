@@ -1,5 +1,9 @@
 Revision history for PomBase-Chobo
 
+0.021     2018-02-20 18:06:18
+          Require an even more recent version of List::Util to prevent
+          test failures.
+
 0.020     2018-02-19 15:19:37
           Warn if "def:" lines differ when merging terms
 

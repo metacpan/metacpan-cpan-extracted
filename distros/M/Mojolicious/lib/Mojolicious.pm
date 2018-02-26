@@ -40,7 +40,7 @@ has log              => sub {
   return $mode eq 'development' ? $log : $log->level('info');
 };
 has 'max_request_size';
-has mode => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
+has mode     => sub { $ENV{MOJO_MODE} || $ENV{PLACK_ENV} || 'development' };
 has moniker  => sub { Mojo::Util::decamelize ref shift };
 has plugins  => sub { Mojolicious::Plugins->new };
 has renderer => sub { Mojolicious::Renderer->new };
@@ -65,7 +65,7 @@ has ua       => sub {
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.66';
+our $VERSION  = '7.69';
 
 sub AUTOLOAD {
   my $self = shift;

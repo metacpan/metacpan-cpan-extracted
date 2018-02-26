@@ -1,3 +1,16 @@
+1.112 - Feb 23, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Released as prod version with 1.111 fixes
+
+1.111 - Feb 22, 2018
+Joelle Maslak <jmaslak@antelope.net>
+ * Minor documentation update (remove reference to "ordered" attribute)
+ * Storable in 5.27.9 now supports (experimentally) regexp freezing,
+   which caused a test to fail (we tested that if a regexp was returned
+   from a child, that should have thrown an exception - which most version
+   of storable do).
+ * Released as DEV (TRIAL) version for CPAN Testers validation
+
 1.110 - Jan 8, 2018
 Joelle Maslak <jmaslak@antelope.net>
  * Provide ordered response support (spawn work units, have the

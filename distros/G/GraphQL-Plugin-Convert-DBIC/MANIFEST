@@ -10,11 +10,13 @@ t/02-execute.t
 t/lib-dbicschema/Schema.pm
 t/lib-dbicschema/Schema/Result/Blog.pm
 t/lib-dbicschema/Schema/Result/BlogTag.pm
+t/lib-dbicschema/Schema/Result/Pg.pm
 t/lib-dbicschema/Schema/Result/Photo.pm
 t/lib-dbicschema/Schema/Result/Photoset.pm
 t/lib-dbicschema/Schema/ResultSet/Blog.pm
 t/lib-dbicschema/Schema/ResultSet/Photo.pm
 t/lib-dbicschema/Schema/ResultSet/Photoset.pm
+t/snapshots/01-dbicschema_t/schema
 t/test.db
 xt/manifest.t
 xt/pod.t

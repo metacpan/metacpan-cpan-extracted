@@ -41,7 +41,7 @@
    "provides" : {
       "B::Hooks::AtRuntime" : {
          "file" : "lib/B/Hooks/AtRuntime.pm",
-         "version" : "5"
+         "version" : "6"
       }
    },
    "release_status" : "stable",
@@ -56,5 +56,5 @@
          "url" : "http://github.com/mauzo/B-Hooks-AtRuntime"
       }
    },
-   "version" : "5"
+   "version" : "6"
 }

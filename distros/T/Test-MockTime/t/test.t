@@ -38,7 +38,9 @@ ok(($mock >= 100) && ($mock <= 101), "Absolute time works");
 sleep 2;
 $mock = time;
 ok(($mock >= 102) && ($mock <= 103), "Absolute time is still in sync after two seconds sleep:$mock");
-$mock = Time::Local::timelocal(localtime);
+my @localtime = localtime;
+$localtime[5] += 1900; # to make sure that year=70 is not interpreted as 2070
+$mock = Time::Local::timelocal(@localtime);
 $real = Time::Local::timelocal(CORE::localtime);
 ok($mock <= $real, "localtime seems ok");
 Test::MockTime::set_fixed_time(CORE::time);

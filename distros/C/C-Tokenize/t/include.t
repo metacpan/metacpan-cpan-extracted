@@ -1,0 +1,22 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use C::Tokenize qw/$include $include_local/;
+my $ia = '#include "file.h"';
+ok ($ia =~ $include_local, "match local include");
+ok ($ia =~ $include, "match include");
+my $ib = '#include <file.h>';
+ok ($ib !~ $include_local, "don't match local include");
+ok ($ib =~ $include, "match include");
+my $ic = '#include <net/inet.h>';
+ok ($ic =~ $include, "match include with path");
+
+done_testing ();

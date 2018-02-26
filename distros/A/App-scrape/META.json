@@ -27,7 +27,7 @@
          "web" : "https://github.com/Corion/App-scrape"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27202",
    "x_static_install" : 1
 }

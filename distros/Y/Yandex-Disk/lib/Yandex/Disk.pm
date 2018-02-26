@@ -13,7 +13,7 @@ use URI::Escape;
 use Encode;
 use IO::Socket::SSL;
 
-our $VERSION    = '0.02';
+our $VERSION    = '0.03';
 
 my $WAIT_RETRY  = 20;
 my $BUFF_SIZE = 8192;
@@ -205,6 +205,47 @@ sub listFiles {
     return $json_res->{_embedded}->{items};
 }
 
+sub listAllFiles {
+    my $self = shift;
+    my %opt = @_;
+    my $limit = $opt{-limit} || 999999;
+    my $media_type = $opt{-media_type};
+    my $offset = $opt{-offset};
+    $offset = 0 if not $offset;
+
+    my $param = "?limit=$limit&offset=$offset";
+    $param .= '&media_type=' . $media_type if $media_type;
+
+    my $res = $self->__request('https://cloud-api.yandex.net/v1/disk/resources/files' . $param, 'GET');
+    my $code = $res->code;
+    if ($code ne '200') {
+        croak "Error on listFiles. Error: " . $res->status_line;
+    }
+    my $json_res = __fromJson($res->decoded_content);
+
+    return $json_res->{items};
+}
+
+sub lastUploadedFiles {
+    my $self = shift;
+    my %opt = @_;
+    my $limit = $opt{-limit} || 999999;
+    my $media_type = $opt{-media_type};
+
+    my $param = "?limit=$limit";
+    $param .= '&media_type=' . $media_type if $media_type;
+
+    my $res = $self->__request('https://cloud-api.yandex.net/v1/disk/resources/last-uploaded' . $param, 'GET');
+    my $code = $res->code;
+    if ($code ne '200') {
+        croak "Error on listFiles. Error: " . $res->status_line;
+    }
+    my $json_res = __fromJson($res->decoded_content);
+
+    return $json_res->{items};
+}
+
+
 sub public {
     my $self = shift;
     return Yandex::Disk::Public->new( -token => $self->{token} );
@@ -293,8 +334,7 @@ sub __upload_file {
 
 
 sub __request {
-    my ($self, $url, $type, $param) = @_;
-    $param = {} if not $param;
+    my ($self, $url, $type) = @_;
 
     my $ua = $self->{ua};
     my $req = HTTP::Request->new($type => $url);
@@ -330,7 +370,6 @@ B<Yandex::Disk> - a simple API for Yandex Disk
 
 =head1 SYNOPSYS
     
-    use Data::Printer;
     use Yandex::Disk;
 
     my $TOKEN = 'aaaabbbbccc'; #Auth token. You can get token from module L<Yandex::OAuth>
@@ -374,7 +413,9 @@ B<Yandex::Disk> - a simple API for Yandex Disk
 
 Return disk info data as hashref
 
-    $disk->getDiskInfo();
+    my $info = $disk->getDiskInfo();
+
+    $info:
     Example output:
         {
             max_file_size    1073741824,
@@ -460,10 +501,36 @@ List files in folder. Return arrayref to hashref(keys: "path", "type", "name", "
         -limit              => Limit max files to output (default: unlimited)
         -offset             => Offset records from start (default: 0)
 
+=head2 listAllFiles(%opt)
 
-=head1 Public files
+List all files on YandexDisk. Return arrayref to hashref(keys: "path", "type", "name", "preview", "created", "modified", "md5", "mime_type", "size")
+    
+    $disk->listAllFiles();
+    Options:
+        -media_type         => Type of file to return. Afaible types listed below. Multiple types can be specified by using a comma. (default: all types) 
+        -limit              => Limit max files to output (default: unlimited)
+        -offset             => Offset records from start (default: 0)
+
+Media types:
+audio, backup, book, compressed, data, development, diskimage, document, encoded, executable, flash, font, image, settings, spreadsheet, text, unknown, video, web
+
+=head2 lastUploadedFiles(%opt)
+
+List last uploaded files. Return arrayref to hashref(keys: "path", "type", "name", "preview", "created", "modified", "md5", "mime_type", "size")
+    
+    $disk->lastUploadedFiles();
+    Options:
+        -media_type         => Type of file to return. Afaible types same as listAllFiles. Multiple types can be specified by using a comma. (default: all types) 
+        -limit              => Limit max files to output (default: unlimited)
+
+
+
+=head2 Public files
 
 my $public = $disk->public();  #Create L<Yandex::Disk::Public> object
+
+=head1 CLI/API
+Sparrow plugin https://sparrowhub.org/info/yandex-disk
 
 =head1 DEPENDENCE
 

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.47
+    version 0.48
 
 SYNOPSIS
 
@@ -110,7 +110,13 @@ CONSTRUCTORS
     lib
 
       Either a pathname (string) or a list of pathnames (array ref of
-      strings) to pre-populate the lib attribute.
+      strings) to pre-populate the lib attribute. Use [undef] to search the
+      current process for symbols.
+
+      0.48
+
+      undef (without the array reference) can be used to search the current
+      process for symbols.
 
     ignore_not_found
 
@@ -1534,6 +1540,12 @@ AUTHOR
     Vickenty Fesunov (vyf)
 
     Gregor Herrmann (gregoa)
+
+    Shlomi Fish (shlomif)
+
+    Damyan Ivanov
+
+    Ilya Pavlov (Ilya33)
 
 COPYRIGHT AND LICENSE
 

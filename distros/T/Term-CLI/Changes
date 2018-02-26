@@ -1,0 +1,27 @@
+0.03002 -- 2018-02-26
+
+    [Bug Fixes]
+
+    - Fix float comparision in test -- fixes #1
+      On Perl installs compiled with -Duselongdouble,
+      1.23e-4 is 0.000123000000000000008, not 0.000123.
+
+    - dist.ini: add dependencies not picked up by AutoPrereqs
+
+    [Other Changes]
+
+    - Update version and dependencies.
+
+0.03001 -- 2018-02-26
+
+    - Switch to using Dist::Zilla.
+    - Some code cleanups (remove unnecessary "use" clauses).
+    - Fix some POD pages.
+
+0.02 -- 2018-02-24
+    
+    - Fix version numbers: package Foo 0.02 { ... }
+
+0.01 -- 2018-02-24
+
+    - First release.

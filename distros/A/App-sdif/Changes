@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.3.1 2018-02-24T02:42:36Z
+
+    - Remove App::sdif::osx_autocolor.
+    - Minor document fix.
+
 4.3.0 2018-01-11T23:27:51Z
 
     - Update --color option to take "when" argument.

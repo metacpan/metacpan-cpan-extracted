@@ -1,3 +1,6 @@
+0.06 February 2018
+- Added get/set_(vertex/edge/graph)_attributes
+
 0.04 February 2018
 - Fix for https://rt.cpan.org/Public/Bug/Display.html?id=124457 /
   https://github.com/hoehrmann/Graph-Feather/issues/1

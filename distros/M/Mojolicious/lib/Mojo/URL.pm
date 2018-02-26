@@ -87,7 +87,13 @@ sub path {
 }
 
 sub path_query {
-  my $self  = shift;
+  my ($self, $pq) = @_;
+
+  if (defined $pq) {
+    return $self unless $pq =~ /^([^?#]*)(?:\?([^#]*))?/;
+    return defined $2 ? $self->path($1)->query($2) : $self->path($1);
+  }
+
   my $query = $self->query->to_string;
   return $self->path->to_string . (length $query ? "?$query" : '');
 }
@@ -399,6 +405,7 @@ L<Mojo::Path/"merge">, defaults to a L<Mojo::Path> object.
 =head2 path_query
 
   my $path_query = $url->path_query;
+  $url           = $url->path_query('/foo/bar?a=1&b=2');
 
 Normalized version of L</"path"> and L</"query">.
 

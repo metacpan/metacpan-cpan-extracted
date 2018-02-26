@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.04
+    0.05
 
 INSTALLATION
 
@@ -25,12 +25,12 @@ INSTALLATION
 
 DEPENDENCIES
 
-            Win32::Clipboard        0.58
-            Win32::Shortkeys::Kbh   0.01
-            Config::YAML::Tiny
-            Test::Simple    0.44
-            Encode  2.84
             XML::Parser     2.44
             Time::HiRes     1.9733
+            Win32::Clipboard        0.58
+            Config::YAML::Tiny
+            Win32::Shortkeys::Kbh   0.01
+            Encode  2.84
+            Test::Simple    0.44
             Carp    1.4
 

@@ -39,6 +39,7 @@
             "File::Spec" : "3.4801",
             "IO::Socket::SSL" : "2.002",
             "JSON::XS" : "3.04",
+            "LWP::Protocol::https" : "6.07",
             "LWP::UserAgent" : "6.27",
             "URI::Escape" : "3.31",
             "perl" : "5.008008"
@@ -57,5 +58,5 @@
          "url" : "https://github.com/vrag86/perl-yandex-disk-api"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

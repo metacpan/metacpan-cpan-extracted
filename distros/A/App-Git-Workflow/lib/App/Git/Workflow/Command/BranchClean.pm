@@ -12,7 +12,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION = 1.0.3;
+our $VERSION = 1.0.4;
 our $workflow = App::Git::Workflow->new;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -154,7 +154,7 @@ git-branch-clean - Clean old branches out of the repository
 
 =head1 VERSION
 
-This documentation refers to git-branch-clean version 1.0.3
+This documentation refers to git-branch-clean version 1.0.4
 
 =head1 SYNOPSIS
 

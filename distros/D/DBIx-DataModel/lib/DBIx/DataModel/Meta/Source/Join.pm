@@ -1,11 +1,9 @@
 package DBIx::DataModel::Meta::Source::Join;
 use strict;
 use warnings;
-use Params::Validate qw/HASHREF ARRAYREF/;
+use Params::Validate qw/ARRAYREF/;
 
 use parent "DBIx::DataModel::Meta::Source";
-
-use namespace::clean;
 
 sub new {
   my $class = shift;

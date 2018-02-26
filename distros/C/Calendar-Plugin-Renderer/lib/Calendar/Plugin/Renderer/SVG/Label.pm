@@ -1,6 +1,6 @@
 package Calendar::Plugin::Renderer::SVG::Label;
 
-$Calendar::Plugin::Renderer::SVG::Label::VERSION   = '0.12';
+$Calendar::Plugin::Renderer::SVG::Label::VERSION   = '0.13';
 $Calendar::Plugin::Renderer::SVG::Label::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Plugin::Renderer::SVG::Label - Interface to 'label' of calendar in SVG
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 

@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Read;
-$Lab::Moose::DataFile::Read::VERSION = '3.620';
+$Lab::Moose::DataFile::Read::VERSION = '3.621';
 #ABSTRACT: Read a gnuplot-style 2D data file
 
 use 5.010;
@@ -158,7 +158,7 @@ Lab::Moose::DataFile::Read - Read a gnuplot-style 2D data file
 
 =head1 VERSION
 
-version 3.620
+version 3.621
 
 =head1 SYNOPSIS
 

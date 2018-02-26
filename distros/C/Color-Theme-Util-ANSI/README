@@ -1,0 +1,44 @@
+NAME
+    Color::Theme::Util::ANSI - Utility routines related to color themes and
+    ANSI code
+
+VERSION
+    This document describes version 0.001 of Color::Theme::Util::ANSI (from
+    Perl distribution Color-Theme-Util-ANSI), released on 2018-02-25.
+
+FUNCTIONS
+  theme_color_to_ansi
+    Usage: theme_color_to_ansi($color_theme, $item, $args, $is_bg) => str
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Color-Theme-Util-ANSI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Color-Theme-Util-ANSI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-Theme-Util-ANSI
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::Theme::Util
+
+    Color::Theme::Role::ANSI
+
+    Color::Theme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

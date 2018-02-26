@@ -19,6 +19,7 @@ open STDOUT, '>', \my $output;
 
 my $exitcode = DBIx::RunSQL->handle_command_line(
     "my-test-app",
+    [
     '--bool',
     '--dsn' => 'dbi:SQLite:dbname=:memory:',
     '--sql' => <<'SQL',
@@ -27,6 +28,7 @@ my $exitcode = DBIx::RunSQL->handle_command_line(
         insert into foo (bar,baz) values (2,'world');
         select * from foo;
 SQL
+    ]
 );
 
 is $exitcode, 1, "We get a nonzero exit code if a row gets selected with --bool"

@@ -281,7 +281,7 @@ NECESSARY FOR PROPER RENDERING OF THE IMAGE).
 
 <blockquote>Use "<code>exiftool -a -G1 -s img.tif</code>" to see where the
 information is stored.  Any tags remaining in other IFD's must be deleted
-individually from a TIFF-format file if desired.  For convenience, a
+individually from a TIFF-format file if desired.  For convenience, a CommonIFD0
 <a href="TagNames/Shortcuts.html">shortcut tag</a> is provided to simplify the
 deletion of common metadata tags from IFD0 by adding "<code>-CommonIFD0=</code>"
 to the command line.
@@ -410,7 +410,7 @@ individual tags contained in the block. For all block types except EXIF, the
 metadata is copied byte-for-byte from the original image.  With EXIF however,
 the metadata may be restructured to ensure that it is self-contained.  Also note
 that EXIF may not be written as a block to TIFF-based file formats.  Beware that
-<b>any existing metadata</b> of this type in the distination file <b>will be
+<b>any existing metadata</b> of this type in the destination file <b>will be
 overwritten</b> by the new block.
 
 <pre><span class='blk'># copy EXIF as a block between same-named JPG files in different directories</span>
@@ -426,7 +426,7 @@ exiftool -tagsfromfile src.jpg -xmp dst.cr2
 <!-- vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv -->
 <!-- NOTE: CHANGES TO FAQ 10 MUST ALSO BE REFLECTED IN ExifTool.pod! -->
 
-<blockquote><i>[Also see <a href="#Q18">FAQ number 18</a> for help on displaying
+<blockquote><i>[Also see <a href="#Q18">FAQ number 18</a> for help with
 special characters in a Windows console.]</i></blockquote>
 
 <blockquote>Certain meta information formats allow coded character sets other
@@ -465,7 +465,8 @@ in the application documentation for more details.<br><br></li>
 specified for some metadata types:
 <blockquote><code>-charset TYPE=CHARSET</code></blockquote>
 (where <code>TYPE</code> is "<code>exif</code>", "<code>iptc</code>",
-"<code>id3</code>", "<code>photoshop</code>" or "<code>quicktime</code>")</li></ol>
+"<code>id3</code>", "<code>photoshop</code>", "<code>quicktime</code>" or
+"<code>riff</code>")</li></ol>
 
 Valid <code>CHARSET</code> values are (with aliases given in brackets, case is
 not significant):
@@ -492,12 +493,12 @@ MIE and Vorbis information:</blockquote>
 
 <!-- NOTE: CHANGES TO FAQ 10 MUST ALSO BE REFLECTED IN ExifTool.pod! -->
 
-<blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
-format (called "string" in the <a href="TagNames/index.html">ExifTool tag name
-documentation</a>).  By default ExifTool does not convert these strings.
-However, it is not uncommon for applications to write UTF&#8209;8 or other
-encodings where ASCII is expected.  To deal with these, ExifTool allows the
-internal EXIF string encoding to be specified with
+<blockquote><a name="exif"><b>EXIF</b></a>: Most textual information in EXIF is
+stored in ASCII format (called "string" in the
+<a href="TagNames/EXIF.html">EXIF Tags documentation</a>).  By default ExifTool
+does not convert these strings. However, it is not uncommon for applications to
+write UTF&#8209;8 or other encodings where ASCII is expected. To deal with
+these, ExifTool allows the internal EXIF string encoding to be specified with
 "<code>-charset exif=CHARSET</code>", which causes EXIF string values to be
 converted from the specified character set when reading, and stored with this
 character set when writing.  The
@@ -526,9 +527,9 @@ using the specified external character set.</blockquote>
 
 <!-- NOTE: CHANGES TO FAQ 10 MUST ALSO BE REFLECTED IN ExifTool.pod! -->
 
-<blockquote><b>IPTC</b><span class='sm'><sup>&dagger;</sup></span>: The
-value of the IPTC:CodedCharacterSet tag determines how the internal IPTC string
-values are interpreted.  If CodedCharacterSet exists and has a value of
+<blockquote><a name="iptc"><b>IPTC</b></a><span class='sm'><sup>&dagger;</sup></span>:
+The value of the IPTC:CodedCharacterSet tag determines how the internal IPTC
+string values are interpreted.  If CodedCharacterSet exists and has a value of
 "<code>UTF8</code>" (or "<code>ESC&nbsp;%&nbsp;G</code>") then string values are
 assumed to be stored as UTF&#8209;8.  Otherwise the internal IPTC encoding is
 assumed to be Windows Latin1 (cp1252), but this can be changed with
@@ -562,41 +563,43 @@ new IPTC.</blockquote>
 <blockquote class='sm'><sup>&dagger;</sup> <span class=lt>Refers to the older
 <a href="http://www.iptc.org/site/News_Exchange_Formats/IIM/">IPTC IIM</a> format.
 The more recent
-<a href="http://iptc.cms.apa.at/site/Photo_Metadata/IPTC_Core_&amp;_Extension/">IPTC
-Core and Extension specifications</a> actually use the XMP format (see below).</span>
+<a href="https://iptc.org/standards/photo-metadata/iptc-standard/">IPTC
+Photo Metadata Standard</a> actually uses the XMP format (see below).</span>
 </blockquote>
 
 <!-- NOTE: CHANGES TO FAQ 10 MUST ALSO BE REFLECTED IN ExifTool.pod! -->
 
-<blockquote><b>XMP</b>: Exiftool reads XMP encoded as UTF&#8209;8, UTF&#8209;16
-or UTF&#8209;32, and converts them all to UTF&#8209;8 internally.  Also, all XML
-character entity references and numeric character references are converted. 
-When writing, ExifTool always encodes XMP as UTF&#8209;8, converting the
-following 5 characters to XML character references: <code>&amp; &lt; &gt; &#39;
-&quot;</code>. By default no further conversion is performed, however the
-<code>-charset</code> or <code>-L</code> option may be used used to convert
-text to/from a specified external character set when reading/writing.</blockquote>
+<blockquote><a name="xmp"><b>XMP</b></a>: Exiftool reads XMP encoded as
+UTF&#8209;8, UTF&#8209;16 or UTF&#8209;32, and converts them all to UTF&#8209;8
+internally.  Also, all XML character entity references and numeric character
+references are converted. When writing, ExifTool always encodes XMP as
+UTF&#8209;8, converting the following 5 characters to XML character references:
+<code>&amp; &lt; &gt; &#39; &quot;</code>. By default no further conversion is
+performed, however the <code>-charset</code> or <code>-L</code> option may be
+used used to convert text to/from a specified external character set when
+reading/writing.</blockquote>
 
-<blockquote><b>PNG</b>: <a href="TagNames/PNG.html#TextualData">PNG TextualData
-tags</a> are stored as tEXt, zTXt and iTXt chunks in PNG images.  The tEXt and
-zTXt chunks use ISO 8859-1 encoding, while iTXt uses UTF&#8209;8.  When reading,
-ExifTool converts all PNG textual data to the external character set specified
-by the <code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by
-default.  When writing, ExifTool generates a tEXt chunk (or zTXt with the
-<code>-z</code> option) if the text doesn't contain special characters or if
-Latin encoding is specified (<code>-L</code> or <code>-charset latin</code>);
-otherwise an iTXt chunk is used and the text is converted from the specified
-external character set and stored as UTF&#8209;8.</blockquote>
-
-<blockquote><b>JPEG Comment</b>: The encoding for the JPEG Comment (COM segment)
-is not specified, so ExifTool reads/writes this text without
-conversion.</blockquote>
-
-<blockquote><b>ID3</b>: The ID3v1 specification officially supports only ISO
-8859&#8209;1 encoding (a subset of Windows Latin1), although some applications
-may incorrectly use other character sets.  By default ExifTool converts ID3v1
-text from Latin to the external character set specified by the
+<blockquote><a name="png"><b>PNG</b></a>:
+<a href="TagNames/PNG.html#TextualData">PNG TextualData tags</a> are stored as
+tEXt, zTXt and iTXt chunks in PNG images.  The tEXt and zTXt chunks use ISO
+8859-1 encoding, while iTXt uses UTF&#8209;8.  When reading, ExifTool converts
+all PNG textual data to the external character set specified by the
 <code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by default. 
+When writing, ExifTool generates a tEXt chunk (or zTXt with the <code>-z</code>
+option) if the text doesn't contain special characters or if Latin encoding is
+specified (<code>-L</code> or <code>-charset latin</code>); otherwise an iTXt
+chunk is used and the text is converted from the specified external character
+set and stored as UTF&#8209;8.</blockquote>
+
+<blockquote><a name="com"><b>JPEG Comment</b></a>: The encoding for the JPEG
+Comment (COM segment) is not specified, so ExifTool reads/writes this text
+without conversion.</blockquote>
+
+<blockquote><a name="id3"><b>ID3</b></a>: The ID3v1 specification officially
+supports only ISO 8859&#8209;1 encoding (a subset of Windows Latin1), although
+some applications may incorrectly use other character sets.  By default ExifTool
+converts ID3v1 text from Latin to the external character set specified by the
+<code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by default.
 However, the internal ID3v1 charset may be specified with
 "<code>-charset id3=CHARSET</code>".  The encoding for ID3v2 information is
 stored in the file, so ExifTool converts ID3v2 text from this encoding to the
@@ -604,47 +607,48 @@ external character set specified by <code>-charset</code> or <code>-L</code>, or
 to UTF&#8209;8 by default. ExifTool does not currently write ID3
 information.</blockquote>
 
-<blockquote><b>PDF</b>: PDF text strings are stored in either PDFDocEncoding
-(similar to Windows Latin1) or Unicode (UCS&#8209;2).  When reading, ExifTool
-converts to the external character set specified by the <code>-charset</code> or
-<code>-L</code> option, or to UTF&#8209;8 by default.  When writing, ExifTool
-encodes input text from the specified character set as Unicode only if the
-string contains special characters, otherwise PDFDocEncoding is
-used.</blockquote>
+<blockquote><a name="pdf"><b>PDF</b></a>: PDF text strings are stored in either
+PDFDocEncoding (similar to Windows Latin1) or Unicode (UCS&#8209;2).  When
+reading, ExifTool converts to the external character set specified by the
+<code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by default. 
+When writing, ExifTool encodes input text from the specified character set as
+Unicode only if the string contains special characters, otherwise PDFDocEncoding
+is used.</blockquote>
 
-<blockquote><b>Photoshop</b>: Some Photoshop resource names are stored as
-Pascal strings with unknown encoding.  By default, ExifTool assumes MacRoman
-encoding and converts this to UTF&#8209;8, but the internal and external
-character sets may be specified with "<code>-charset Photoshop=CHARSET</code>"
-and "<code>-charset CHARSET</code>" respectively.</blockquote>
+<blockquote><a name="photoshop"><b>Photoshop</b></a>: Some Photoshop resource
+names are stored as Pascal strings with unknown encoding.  By default, ExifTool
+assumes MacRoman encoding and converts this to UTF&#8209;8, but the internal and
+external character sets may be specified with
+"<code>-charset Photoshop=CHARSET</code>" and "<code>-charset CHARSET</code>"
+respectively.</blockquote>
 
-<blockquote><b>QuickTime</b>: QuickTime text strings may be stored in a
-variety of poorly documented formats, and ExifTool does its best to decode
-these according to the <code>-charset</code> option setting.  For some
-QuickTime strings where the internal encoding is not known, ExifTool assumes
-a default encoding of MacRoman, but this may be changed with
+<blockquote><a name="quicktime"><b>QuickTime</b></a>: QuickTime text strings may
+be stored in a variety of poorly documented formats, and ExifTool does its best
+to decode these according to the <code>-charset</code> option setting.  For some
+QuickTime strings where the internal encoding is not known, ExifTool assumes a
+default encoding of MacRoman, but this may be changed with
 "<code>-charset QuickTime=CHARSET</code>".</blockquote>
 
-<blockquote><b>AIFF</b>: AIFF strings are assumed to be stored in MacRoman, and
-are converted according to the <code>-charset</code> option when reading.
-</blockquote>
+<blockquote><a name="aiff"><b>AIFF</b></a>: AIFF strings are assumed to be
+stored in MacRoman, and are converted according to the <code>-charset</code>
+option when reading. </blockquote>
 
-<blockquote><b>RIFF</b>: The internal encoding of RIFF strings (eg. in AVI and
-WAV files) is assumed to be Latin unless otherwise specified by the RIFF CSET
-chunk or the "<code>-charset RIFF=CHARSET</code>" option.
-</blockquote>
+<blockquote><a name="riff"><b>RIFF</b></a>: The internal encoding of RIFF
+strings (eg. in AVI and WAV files) is assumed to be Latin unless otherwise
+specified by the RIFF CSET chunk or the "<code>-charset RIFF=CHARSET</code>"
+option. </blockquote>
 
-<blockquote><b>MIE</b>: MIE strings are stored as either UTF&#8209;8 or ISO
-8859&#8209;1. When reading, UTF&#8209;8 strings are converted according to
-the <code>-charset</code> or <code>-L</code> option, and ISO 8859&#8209;1
-strings are never converted.  When writing, input strings are converted from
-the specified character set to UTF&#8209;8.  The resulting strings are stored as
-UTF&#8209;8 if they contain multi-byte UTF&#8209;8 character sequences,
-otherwise they are stored as ISO 8859&#8209;1.</blockquote>
+<blockquote><a name="mie"><b>MIE</b></a>: MIE strings are stored as either
+UTF&#8209;8 or ISO 8859&#8209;1. When reading, UTF&#8209;8 strings are converted
+according to the <code>-charset</code> or <code>-L</code> option, and ISO
+8859&#8209;1 strings are never converted.  When writing, input strings are
+converted from the specified character set to UTF&#8209;8.  The resulting
+strings are stored as UTF&#8209;8 if they contain multi-byte UTF&#8209;8
+character sequences, otherwise they are stored as ISO 8859&#8209;1.</blockquote>
 
-<blockquote><b>Vorbis</b>: Vorbis comments are stored as UTF&#8209;8,
-and are converted to the character set specified by <code>-charset</code> or
-<code>-L</code> when reading.</blockquote>
+<blockquote><a name="vorbis"><b>Vorbis</b></a>: Vorbis comments are stored as
+UTF&#8209;8, and are converted to the character set specified by
+<code>-charset</code> or <code>-L</code> when reading.</blockquote>
 
 <blockquote class=prog>
 <b>Programmers</b>: ExifTool returns all values as byte strings of encoded
@@ -839,10 +843,12 @@ or double quotes instead on Windows):
 </pre>
 
 With the <code>-f</code> option, the value of any missing tag is printed as a
-dash.  Without this option, missing tags generate a minor warning and the
-line in the <code>-p</code> output is not printed.  The <code>-m</code> option
-may be used to ignore minor warnings, which causes these lines to be printed
-with an empty value for missing tags.</blockquote>
+dash (or the value of the
+<a href="ExifTool.html#MissingTagValue">API MissingTagValue option</a>, if set).
+Without this option, missing tags generate a minor warning and the line in the
+<code>-p</code> output is not printed.  The <code>-m</code> option may be used
+to ignore minor warnings, which causes these lines to be printed with an empty
+value for missing tags.</blockquote>
 
 <blockquote>
 See the <code>-p</code> option in the <a href="exiftool_pod.html">application
@@ -879,7 +885,8 @@ fact that the XMP specification recommends a few KB of padding at the end of the
 record (ExifTool adds 2424 bytes by default, but this padding is omitted if the
 <code>-z</code> option is used), and partly due to the flexibility of the XMP
 format which allows the information to be written in various styles, some of
-which are more compact than others.
+which are more compact than others (the <code>-z</code> option also causes a
+more compact form to be written).
 </blockquote>
 
 <blockquote>You may also notice that the values of some "offset" tags (like
@@ -900,8 +907,11 @@ valid.  The numbers represent degrees, (and optionally) minutes and
 seconds.</blockquote>
 
 <blockquote>For EXIF GPS coordinates, the reference direction is specified
-separately with the EXIF:GPSLatitudeRef or EXIF:GPSLongitudeRef
-tag.</blockquote>
+separately with the EXIF:GPSLatitudeRef or EXIF:GPSLongitudeRef tag. 
+GPSLatitudeRef may be written with a string ending in "<code>N</code>" or
+"<code>S</code>", or with a signed coordinate value, positive for the northern
+hemisphere or negative for the south.  GPSLongitudeRef accepts similar values,
+but for E and W.</blockquote>
 
 <blockquote>For XMP GPS coordinates, the reference direction is specified within
 the XMP:GPSLatitude or XMP:GPSLongitude value, with west longitudes and south
@@ -926,7 +936,7 @@ coordinate styles to the proper format for the specific tag used.
 
 <blockquote>When reading, ExifTool reports coordinates in the format
 <pre>DDD deg MM' SS.SS"</pre>
-where <code>DDD</code> is degress, <code>MM</code> is minutes, and <code>SS.SS</code>
+where <code>DDD</code> is degrees, <code>MM</code> is minutes, and <code>SS.SS</code>
 is seconds.  The <code>-n</code> option may be used to change this to decimal
 degrees, or any arbitrary format may be specified with the <code>-c</code> option.
 See the <a href="exiftool_pod.html">application documentation</a> for details.
@@ -993,7 +1003,7 @@ example:
 
 Using <code>-m</code> will downgrade the minor error to a warning, allowing the
 file to be written, but <u>some MakerNote information may be lost when ignoring
-certain types of errors like this</u>. </blockquote>
+errors like this</u>. </blockquote>
 
 <a name="Q16"></a>
 <p>16. <b>"Why doesn't ExifTool rename my AVI files?"</b></p>
@@ -1003,16 +1013,22 @@ types</u><span class='sm'><sup>&dagger;</sup></span> when <u>any
 tag</u><span class='sm'><sup>&Dagger;</sup></span> is being written and a
 directory name is specified on the command line.  To force exiftool to process
 other files, they must either be listed on the command line by name, or be
-specified using the <code>-ext</code> option, something like this:
+specified using the <code>-ext</code> or <code>-ext+</code> option, something
+like this:
 
-<pre>exiftool -ext AVI -ext JPG -d pics/%Y/%m "-directory&lt;dateTimeOriginal" DIR
+<pre><span class=blk># process AVI files in addition to other writable file types</span>
+exiftool -ext+ AVI -d pics/%Y/%m "-directory&lt;dateTimeOriginal" DIR
+
+<span class=blk># process only AVI and JPG files</span>
+exiftool -ext AVI -ext JPG -d pics/%Y/%m "-directory&lt;dateTimeOriginal" DIR
 </pre>
 
-When a single <code>-ext</code> option is used, only files of the specified type
-are processed.  However, multiple <code>-ext</code> options may be used in the
-same command (as in the example above) to process any number of different file
-types, or <code>-ext "*"</code> may be used to process files with any extension
-(or none at all).
+When <code>-ext</code> is used, only files with the specified extension(s) are
+processed, however <code>-ext+</code> may be used to add to the list of normally
+processed files (as in the first example above).  Multiple <code>-ext</code> or
+<code>-ext+</code> options may be used in the same command (as in the second
+example above) to process any number of different file types, or
+<code>-ext "*"</code> may be used to process files with any extension (or none at all).
 </blockquote>
 
 <blockquote class='sm'><sup>&dagger;</sup> <span class=lt>The
@@ -1135,7 +1151,8 @@ keywords, use "<code>+&lt;</code>" or "<code>-&lt;</code>".
 </blockquote>
 
 <a name="Q18"></a>
-<p>18. <b>"Special characters don't display properly in my Windows console"</b></p>
+<p>18a. <b>"Special characters don't display properly in my Windows console"</b>, or
+<br>18b. <b>"I'm having problems with special characters on the Windows command line"</b></p>
 
 <blockquote>The Windows cmd.exe console uses an MS-DOS encoding by default
 (cp437 or something similar, depending on your region).  The exiftool
@@ -1168,16 +1185,19 @@ change the code page for exiftool when launched via the Windows GUI.  If anyone
 can figure out how to do this, please let me know.)
 </blockquote>
 
-<blockquote>On some Windows systems, using UTF&#8209;8 doesn't seem to work. In
-this case, a Windows character set may be the best alternative:  For instance,
-for Windows Latin1 (cp1252) type "<code>chcp 1252</code>" in the console to
-switch to cp1252, then run exiftool with "<code>-charset cp1252</code>" (or
-<code>-L</code>).  This same technique can be used for other supported Windows
-code pages.</blockquote>
+<blockquote>Note that Windows will <b>recode arguments on the command
+line</b> from the current console code page to the system code page, so the
+ExifTool <code>-charset</code> should be set to the system code page for
+command-line arguments.  However, this technique may yield unexpected results
+since not all characters may be represented using the system code page.  To get
+around this limitation, arguments may be read from an ExifTool argument file
+using the <code>-@</code> option.  UTF&#8209;8 encoding is recommended for the
+argument file, and with this you would also set <code>-charset filename=utf8</code>
+if using special characters in filename arguments within the file.</blockquote>
 
-<blockquote>A final alternative is to bypass the command-line encoding problems
-totally by extracting/writing to/from a separate text file, and using a UTF&#8209;8
-aware text editor to view/edit the text.  For example:
+<blockquote>Another way to bypass the console/command-line encoding problems for
+individual tag values is to extract/write to/from a separate text file and use a
+UTF&#8209;8 aware text editor to view/edit the text.  For example:
 
 <pre><span class=blk># extracting...</span>
 exiftool image.jpg &gt; out.txt
@@ -1252,7 +1272,8 @@ lib/Image/ExifTool/Exif.pm source code.
 </blockquote>
 
 <a name="Q20"></a>
-<p>20. <b>"ExifTool won't write an image due to errors"</b></p>
+<p>20a. <b>"ExifTool won't write an image due to errors"</b>, or
+<br>20b. <b>"How do I repair corrupted EXIF?"</b></p>
 
 <blockquote>Minor errors may be ignored using the <code>-m</code> option
 (<a href="#Q15">FAQ 15</a> discusses this with respect to MakerNote errors), but
@@ -1346,7 +1367,8 @@ In Windows a newline is "<code>&amp;#xd;&amp;#xa;</code>" instead of just
 must be used in Mac/Linux shells around arguments containing a dollar sign,
 but double quotes are used instead in Windows.  Also note that this technique
 is slower since the implied <code>-tagsFromFile</code> adds an extra unnecessary
-processing pass to read tags from the file.)
+processing pass to read tags from the file, but most of this delay may be
+avoided with the <code>-fast3</code> option.)
 <pre>exiftool '-comment&lt;line 1$/line 2' image.jpg
 </pre></li>
 </ol>
@@ -1357,8 +1379,8 @@ processing pass to read tags from the file.)
 
 <blockquote>When writing, tag assignments on the command line are queued and
 applied together as each target file is processed.  In general, assignments
-later on the command line override earlier assignments, but there are
-exceptions:
+later on the command line override earlier assignments (ie. they are evaluated
+left-to-right), but there are exceptions:
 <ol><li>When writing list-type tags (eg. <code>-keywords=one</code>), new values
 are accumulated rather than overriding earlier assignments.<br>&nbsp;</li>
 <li>When copying values to list-type tags (eg.
@@ -1428,10 +1450,11 @@ the DateTimeOriginal tag exists in the image.</blockquote>
 <a name="Q24"></a>
 <p>24. <b>"When I write a file the date/time gets reset to today's date"</b></p>
 
-<blockquote>There is sometimes confusion between date/time values stored in the
-metadata of the file itself and date/time values stored in the filesystem (ie.
-in the disk directory information).  A command like this may be used to extract
-all date/time information with an indication of where it is stored:
+<blockquote>You should be aware of the difference between date/time values
+stored in the metadata of the file itself and date/time values stored in the
+filesystem (ie. in the disk directory information).  A command like this may be
+used to extract all date/time information with an indication of where it is
+stored:
 
 <pre>exiftool -time:all -a -G0:1 -s c:\images\test.jpg</pre>
 
@@ -1445,9 +1468,9 @@ and should give an output something like this:
 [EXIF:ExifIFD]  CreateDate                      : 2003:10:31 15:44:19</pre>
 
 The <code>-G0:1</code> option causes the family 0 and 1 group names to be
-reported in square brackets for each tag.  Tags labelled "File:System" are
-"pseudo" tags stored in the filesystem, while the others are "real" tags stored
-in the metadata of the file.</blockquote>
+reported in square brackets for each tag.  Tags labelled "<b>File:System</b>"
+are "<b>pseudo</b>" tags stored in the filesystem, while the others are real
+tags stored in the metadata of the file.</blockquote>
 
 <blockquote>ExifTool's <b>default behaviour is to set all filesystem times to
 the current date/time when any "real" tag is written</b>, but the
@@ -1508,6 +1531,13 @@ and will often catch more problems when writing, but it does not attempt to do a
 full validation.  There are other packages that are designed to do validation
 like this, for example, <a href="http://jhove.sourceforge.net">JHOVE</a>.</blockquote>
 
+<blockquote><b>Update:</b> ExifTool now has an experimental <code>-validate</code>
+option.  The following command invokes the validation feature and shows all
+associated Error and Warning messages:
+
+<pre>exiftool -validate -error -warning -a test.jpg</pre>
+</blockquote>
+
 <a name="Q26"></a>
 <p>26. <b>"How do I import information from a database?"</b></p>
 
@@ -1548,9 +1578,12 @@ in the database.</blockquote>
 
 <blockquote>Tag names may be prefixed by a group name to write to a specific
 group (using the same format as when <code>-G</code> or <code>-G1</code> is
-added to the export command).  Tags with empty values are ignored.  To delete a
-tag, set the tag value to "-" and use the <code>-f</code> option when
-importing.</blockquote>
+added to the export command).  To delete a tag, set the tag value to "-" (or the
+MissingTagValue if this API option was used) and use the <code>-f</code> option
+when importing.  Tags with an empty value are ignored in a CSV import, or set to
+an empty string in a JSON import (unless <code>-f</code> is used and the API
+MissingTagValue option is set to an empty string, in which case the tag is
+deleted).  </blockquote>
 
 <blockquote>See the <code>-csv</code> or <code>-j</code> option in the
 <a href="exiftool_pod.html#input_output_text_formatting">application documentation</a>
@@ -1591,7 +1624,7 @@ proper technique for shifting a date/time value when copying:
 </blockquote>
 
 <hr>
-<i>Last revised Mar 31, 2017</i>
+<i>Last revised Feb 20, 2018</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

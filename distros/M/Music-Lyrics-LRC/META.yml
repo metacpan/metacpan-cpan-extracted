@@ -22,7 +22,7 @@ no_index:
 provides:
   Music::Lyrics::LRC:
     file: lib/Music/Lyrics/LRC.pm
-    version: '0.11'
+    version: '0.13'
 requires:
   Carp: '0'
   English: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   homepage: https://sanctum.geek.nz/cgit/Music-Lyrics-LRC.git/
   repository: https://sanctum.geek.nz/code/Music-Lyrics-LRC.git/
-version: '0.11'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

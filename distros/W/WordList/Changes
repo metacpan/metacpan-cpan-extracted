@@ -1,4 +1,22 @@
+0.1.4   2018-02-20 (PERLANCAR)
+
+	- No spec changes.
+
+	- [doc] Mention WordListC.
+
+        - Move implementation to WordListC and make it our base module.
+
+
+0.1.3   2018-02-20 (PERLANCAR)
+
+	- No spec changes.
+
+	- [doc] Remove warning label, some rewording in Description.
+
+
 0.1.2   2017-12-24 (PERLANCAR)
+
+	- No spec changes.
 
 	- [Bugfix] Forgot to set DATA filehandle to :utf8.
 

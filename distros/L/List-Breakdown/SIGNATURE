@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 d38fce7b946fc212563531655a017db84e5f1966 Changes
+SHA1 f92175a32a06d94dcf6d1a19c7e002f2bb2b9b7f LICENSE
+SHA1 ccdad0d20b7502626b91e86d786177f999157f80 MANIFEST
+SHA1 83391c82879b3904e0b4f279523d5960d1e2a6a4 META.json
+SHA1 890df45a57a57bf83d39bc65fa95d03ef16dc493 META.yml
+SHA1 8dec75780dabbae96e4ad34f6da47a9f5809c377 Makefile.PL
+SHA1 45c7b23c9e3ed2d761dd5de8c9cd3092ede74319 README
+SHA1 39e369e9966e59a563ff6f8e341a2ea48f13a3dd lib/List/Breakdown.pm
+SHA1 5ff2d9e0a4ba46e8fc851317216a5338d06c46ed t/errors.t
+SHA1 41b90a97c7cfd123067ab1b55fbbaef839457a89 t/intervals.t
+SHA1 050cb75df387fa25661d22fdf364e04ee5325940 t/monitoring.t
+SHA1 dd8128fa87c64b8529605e268bd89a599ce5c9a4 t/records.t
+SHA1 380a001a2164327eabbb0e434e86754aa8bf81c2 t/words.t
+SHA1 7d9bdd979932caf83ddd20b96c26dc1986b16365 xt/manifest.t
+SHA1 59e7d967227ea6d3c29c0e08a3bb3c134aedeb0a xt/pod-coverage.t
+SHA1 1a3d2d6b8f39547b9ee68bf5cfa562e5be5ebdb7 xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEMXmQoUWXofz4LZU6ta9fiSWSZgkFAlqM8KYACgkQta9fiSWS
+ZgnRgg//cuDJxunKS4nOnoJZCfRyXLu/W5P3/1vvOrwjwRWpNa1BldlSofT5Ddon
+WZVEi2ga/6HrZTttG6iBMRBAa+7wF0JGXkTmlNn4gjf1gonDsWvL3QM94MmToQm/
+mPxGSmkpcgeWrRf/+++vA9ZhF+hgNIZe/r7D2fjQILAqYiAESmqZ+SjY8FDtL1j8
+METTFH6kE/6yftDQHHIKE2I92xxoQbNAQraj62boS2Z/z/LBcYLTVaS4p1u7gnCK
+7FdTCAdVn4PzLycbGs6bRg7fwa1/DT65ZtQmV0KT+dM/BR974WP1xSFZFFh9m9GO
+n/an/Bt2sa3iUCWjP/eTAu+tLabdDSrCbeqwuedkKXCabtWBRLorSavhgaxQWJUn
+xmsbnqio8ejHt1lFf1K/4NcClCE76QuRmZMMj45QR9b/K5xMkO2KaKH9PrcwmePh
+4UR4LkF8uyNZBt1Tv+VTvJziLtpO6Q/rZBTtMW6aa4r4gSDZ96C62j9Er6Jna7nU
+HND609TXQIuDm0qXRGWhWfC+7o7Lai1iBU99Pv88SuN0q/dtm14O8VEaqYFhjfBB
+Jh2uX2AdOuIla65W8ZE7UawCkN5JmbX2Ked9ExU18Kboq5TcDLEhDUVBTCwMfZZq
+IpTeeUTma8/QCCDVzys0rrdsCC4EsPE7jJlDiVfFQifOQ6MyGlM=
+=XKt9
+-----END PGP SIGNATURE-----

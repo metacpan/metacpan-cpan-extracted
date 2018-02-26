@@ -1,6 +1,9 @@
 Revision history for Mojolicious-Plugin-DBIxCustom
 
-0.1.1   2017-10-9
+1.2.0   2018-02-26
+        在Model类中添加model方法.
+
+0.1.1   2017-11-9
          基础程序没有任何修改，仅仅修改了发布到cpan上用到的一些属性
 
 0.1.0   2017-10-30

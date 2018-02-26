@@ -1,5 +1,6 @@
 ^meta/
 ^other/
+^svntag\.sh$
 
 # Begin standard Module::Manifest::Skip list:
 

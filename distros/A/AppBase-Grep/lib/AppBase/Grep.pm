@@ -1,7 +1,7 @@
 package AppBase::Grep;
 
-our $DATE = '2018-01-30'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-02-26'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,8 +32,8 @@ Examples of CLI utilities that are based on this: <prog:abgrep>,
 Why? For grepping lines from files or stdin, <prog:abgrep> is no match for the
 standard grep (or its many alternatives): it's orders of magnitude slower and
 currently has fewer options. But AppBase::Grep is a quick way to create
-grep-like utilities that greps from a custom sources but have common features
-with the standard grep.
+grep-like utilities that grep from a custom sources but have common/standard
+grep features.
 
 Compared to the standard grep, AppBase::Grep also has these unique features:
 
@@ -106,6 +106,31 @@ sub grep {
     my $opt_count  = $args{count};
     my $opt_quiet  = $args{quiet};
     my $opt_linum  = $args{line_number};
+
+    if ($ENV{COLOR_THEME}) {
+        require Color::Theme::Util;
+        my $theme = Color::Theme::Util::get_color_theme(
+            {module_prefixes => [qw/AppBase::Grep::ColorTheme Generic::ColorTheme/]}, $ENV{COLOR_THEME});
+        require Color::Theme::Util::ANSI;
+        if ($theme->{colors}{label}) {
+            for my $c (keys %Colors) {
+                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi($theme, $c);
+            }
+        } elsif ($theme->{colors}{color1}) {
+            my %map = (
+                label     => 'color1',
+                separator => 'color2',
+                linum     => 'color3',
+                match     => 'color4',
+            );
+            for my $c (keys %Colors) {
+                $Colors{$c} = Color::Theme::Util::ANSI::theme_color_to_ansi(
+                    $theme, $map{$c});
+            }
+        } else {
+            warn "Unsuitable color theme '$ENV{COLOR_THEME}', ignored";
+        }
+    }
 
     my (@str_patterns, @re_patterns);
     for my $p ( grep {defined} $args{pattern}, @{ $args{regexps} // [] }) {
@@ -241,7 +266,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.004 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2018-01-30.
+This document describes version 0.005 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2018-02-26.
 
 =head1 FUNCTIONS
 
@@ -265,8 +290,8 @@ L<grep-coin> (from L<App::CryptoCurrencyUtils>).
 Why? For grepping lines from files or stdin, L<abgrep> is no match for the
 standard grep (or its many alternatives): it's orders of magnitude slower and
 currently has fewer options. But AppBase::Grep is a quick way to create
-grep-like utilities that greps from a custom sources but have common features
-with the standard grep.
+grep-like utilities that grep from a custom sources but have common/standard
+grep features.
 
 Compared to the standard grep, AppBase::Grep also has these unique features:
 
@@ -328,6 +353,10 @@ Return value:  (any)
 Boolean. If set to true, will set default C<--color> to C<always> instead of
 C<auto>. If set to false, will set default C<--color> to C<never> instead of
 C<auto>. This behavior is not in GNU grep.
+
+=head2 COLOR_THEME
+
+String.
 
 =head1 HOMEPAGE
 

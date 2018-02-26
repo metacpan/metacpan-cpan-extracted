@@ -6,26 +6,50 @@ use strict;
 use warnings;
 
 use Carp;
-use Module::Load         qw/load/;
-use Params::Validate     qw/validate SCALAR ARRAYREF CODEREF UNDEF BOOLEAN
-                                     OBJECT HASHREF/;
-use List::MoreUtils      qw/any/;
-use mro 'c3';
-
-use namespace::clean;
-
+use Module::Load               qw/load/;
+use Params::Validate           qw/validate_with SCALAR ARRAYREF CODEREF
+                                                BOOLEAN OBJECT HASHREF/;
+use List::MoreUtils            qw/any/;
+use mro                        qw/c3/;
 use DBIx::DataModel;
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
+use SQL::Abstract::More 1.33;
+use Carp::Clan                 qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Exporter                   qw/import/;
+
+our @EXPORT = qw/define_class define_method define_readonly_accessors
+                 does/;
+
+
+BEGIN {no strict 'refs'; *does = \&SQL::Abstract::More::does;}
+
+
+my %seen_class_method;
+
+sub _check_call_as_class_method {
+  my $first_arg = $_[0];
+
+  if ($first_arg && !ref $first_arg && $first_arg->isa(__PACKAGE__) ) {
+    my $func = (caller(1))[3];
+    carp "calling $func() as class method is obsolete; import and call as a function"
+      unless $seen_class_method{$func}++;
+    shift @_;
+  }
+}
+
+
 
 sub define_class {
-  my $self = shift;
+  &_check_call_as_class_method;
 
   # check parameters
-  my %params = validate(@_, {
+  my %params = validate_with(
+    params => \@_,
+    spec   => {
       name    => {type => SCALAR  },
       isa     => {type => ARRAYREF},
       metadm  => {isa  => 'DBIx::DataModel::Meta'},
-    }
+    },
+    allow_extra => 0,
   );
 
   # deactivate strict refs because we'll be playing with symbol tables
@@ -53,23 +77,26 @@ sub define_class {
   mro::set_mro($params{name}, 'c3');
 
   # install an accessor to the metaclass object within the package
-  $self->define_method(class          => $params{name},
-                       name           => 'metadm', 
-                       body           => sub {return $params{metadm}},
-                       check_override => 0,                          );
+  define_method(class          => $params{name},
+                name           => 'metadm', 
+                body           => sub {return $params{metadm}},
+                check_override => 0,                          );
 }
 
 
 sub define_method {
-  my $self = shift;
+  &_check_call_as_class_method;
 
   # check parameters
-  my %params = validate(@_, {
+  my %params = validate_with(
+    params => \@_,
+    spec   => {
       class          => {type => SCALAR               },
       name           => {type => SCALAR               },
       body           => {type => CODEREF              },
       check_override => {type => BOOLEAN, default => 1},
-    }
+    },
+    allow_extra => 0,
   );
 
   # fully qualified name
@@ -92,10 +119,12 @@ sub define_method {
 
 
 sub define_readonly_accessors {
-  my ($self, $target_class, @accessors) = @_;
+  &_check_call_as_class_method;
+
+  my ($target_class, @accessors) = @_;
 
   foreach my $accessor (@accessors) {
-    $self->define_method(
+    define_method(
       class => $target_class,
       name  => $accessor, 
       body  => sub { my $self = shift;

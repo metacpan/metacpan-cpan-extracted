@@ -1,0 +1,7 @@
+Revision history for Pg::ServiceFile
+
+0.02  2018-02-25 23:33:54 UTC
+    - Account for comment character in connection files (thanks Erik Rijkers!)
+
+0.01  2018-02-23 23:42:06 UTC
+    - Initial release

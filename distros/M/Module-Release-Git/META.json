@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "workflow",
       "module",
@@ -62,5 +62,6 @@
          "web" : "https://github.com/briandfoy/module-release-git"
       }
    },
-   "version" : "1.011"
+   "version" : "1.012",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

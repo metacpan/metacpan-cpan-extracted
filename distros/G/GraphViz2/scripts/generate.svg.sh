@@ -54,7 +54,25 @@ perl -Ilib scripts/generate.demo.pl svg
 
 PM=Perl-modules/html/graphviz2
 
+if [ -d "$DR/$PM" ]
+then
+	# Due to a bug in bash, this true branch cannot be empty.
+
+	echo Dir $DR/$PM exists
+else
+	mkdir $DR/$PM
+fi
+
+if [ -d "/home/ron/savage.net.au/$PM" ]
+then
+	# Due to a bug in bash, this true branch cannot be empty.
+
+	echo Dir /home/ron/savage.net.au/$PM exists
+else
+	mkdir ~/savage.net.au/$PM
+fi
+
 cp html/* $DR/$PM
-cp html/* ~/savage.net.au/$PM
+cp html/* /home/ron/savage.net.au/$PM
 
 echo Check the version number in the demo index

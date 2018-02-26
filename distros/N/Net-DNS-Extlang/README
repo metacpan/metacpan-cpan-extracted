@@ -16,31 +16,28 @@ To install this module, run the following commands:
 USE WITH Net::DNS
 
 While Net::DNS::Extlang can load rrtype descriptions from either a
-text file or the DNS, when invoked automatically by Net::DNS to handle
-an unknown rrtype it only reads from the DNS.  
+text file or the DNS, it is designed to be invoked automatically by
+Net::DNS to handle unknown rrtypes.  
 
 The dnsextlang draft proposes that rrtype data is stored in the DNS at
-{rrname,rrtype}.arpa.  That is the default in Net::DNS since version
-1.07.  Until the IETF approves this and puts the info at that
-location, you'll have to set the DNS location yourself by setting
-$DNSEXTLANG in Net::DNS::Parameters.  For the time being, the author
-has put rrtype data at {rrname,rrtype}.services.net, so you can put
-this in your program after you include Net::DNS 
+{rrname,rrtype}.arpa.  Until the IETF approves this and puts the domain
+at that location, Net::DNS::Extlang ships with a default domain suffix
+(services.net.).  For the time being, the author has put rrtype data
+at {rrname,rrtype}.services.net.
 
-    $Net::DNS::Parameters::DNSEXTLANG = 'services.net.';
+The domain suffix used automatically by Net::DNS can be specified using
+the following global assignment:
+
+    use Net::DNS;
+    $Net::DNS::Parameters::DNSEXTLANG = 'arbitrary.example.';
+
+Assigning undef will cause automatic package generation to be suppressed.
 
 Once you've done that, the intention is that new rrtypes installed
 on the fly work just like the ones built into Net::DNS.  The first
-time Net::DNS sees an unknown RR type or number, it creates code
-on the fly to handle the type.
+time Net::DNS sees an unknown RRtype, it creates implementation code
+to handle the type.
 
-Rather than loading Net::DNS::Extlang and its type compiler into the
-process that's using Net::DNS, when Net::DNS sees an unknown rrname or
-rrtype, looks up the name or type itself in the DNS lookup to find the
-description and then passes the description to the external program
-RRTYPEgen, which compiles the description into a perl module
-Net::DNS::RR::<typename>.  Net::DNS loads the compiled module, and
-uses it the same way it uses a built-in RR module.
 
 SUPPORT AND DOCUMENTATION
 
@@ -66,7 +63,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 John Levine
+Copyright (C) 2017, 2018 Standcore LLC
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

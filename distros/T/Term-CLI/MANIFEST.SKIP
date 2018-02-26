@@ -1,0 +1,7 @@
+^cover_db/
+^scratch/
+dist\.ini
+.bak$
+.old$
+^Makefile$
+^MYMETA\.(?:json|yml)$

@@ -45,6 +45,6 @@
          "web" : "https://github.com/hoehrmann/Parse-ABNF"
       }
    },
-   "version" : "0.26",
+   "version" : "0.30",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -42,6 +42,13 @@ are_events("log with proxy with prefix", [
   'A: B: 3',
 ]);
 
+$proxy->("4");
+
+are_events("proxy log overloading", [
+  'A: B: 4',
+]);
+
+
 $proxy->set_prefix('C: ');
 $proxy->log("4");
 $proxy->log({ prefix => 'D: ' }, "5");

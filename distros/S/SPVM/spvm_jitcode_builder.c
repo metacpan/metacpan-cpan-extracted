@@ -9,7 +9,7 @@
 #include "spvm_string_buffer.h"
 #include "spvm_sub.h"
 #include "spvm_op.h"
-#include "spvm_dynamic_array.h"
+#include "spvm_list.h"
 #include "spvm_type.h"
 #include "spvm_object.h"
 #include "spvm_runtime.h"
@@ -515,22 +515,10 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
   // Is void
   int32_t sub_is_void = constant_pool_sub->is_void;
 
-  // Subroutine object my base index
-  int32_t sub_object_mys_base = constant_pool_sub->object_mys_base;
-
-  // Subroutine object my length
-  int32_t sub_object_mys_length = constant_pool_sub->object_mys_length;
-  
   // Return type code
   int32_t return_type_id = constant_pool_sub->return_type_id;
   SPVM_CONSTANT_POOL_TYPE* return_type = (SPVM_CONSTANT_POOL_TYPE*)&constant_pool[return_type_id];
   int32_t return_type_code = return_type->code;
-  
-  // Mys length
-  int32_t mys_length = constant_pool_sub->mys_length;
-  
-  // My type ids base
-  int32_t my_type_ids_base = constant_pool_sub->my_type_ids_base;
   
   // Call subroutine argument stack top
   int32_t call_sub_arg_stack_top = -1;
@@ -580,7 +568,7 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
   }
 
   // Arguments
-  SPVM_STRING_BUFFER_add(string_buffer, "(SPVM_API* api, SPVM_API_VALUE* args)");
+  SPVM_STRING_BUFFER_add(string_buffer, "(SPVM_API* api, SPVM_API_VALUE* args, int32_t on_stack_replacement, SPVM_API_VALUE* call_stack, int32_t label_id)");
   
   // Block start
   SPVM_STRING_BUFFER_add(string_buffer, " {\n");
@@ -695,12 +683,7 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
   while (opcode_index < opcode_base + opcode_length) {
 
     // Line label
-    if (opcodes[opcode_index].has_label) {
-      SPVM_STRING_BUFFER_add(string_buffer, "L");
-    }
-    else {
-      SPVM_STRING_BUFFER_add(string_buffer, "// L");
-    }
+    SPVM_STRING_BUFFER_add(string_buffer, "L");
     SPVM_STRING_BUFFER_add_int(string_buffer, opcode_index);
     SPVM_STRING_BUFFER_add(string_buffer, ": ");
     
@@ -1872,7 +1855,7 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
             const char* call_sub_arg_type_name = SPVM_JITCODE_BUILDER_get_type_name(call_sub_arg_type_code);
             
             SPVM_STRING_BUFFER_add(string_buffer, "    *(");
-            SPVM_STRING_BUFFER_add(string_buffer, call_sub_arg_type_name);
+            SPVM_STRING_BUFFER_add(string_buffer, (char*)call_sub_arg_type_name);
             SPVM_STRING_BUFFER_add(string_buffer, "*)&call_sub_args[");
             SPVM_STRING_BUFFER_add_int(string_buffer, call_sub_arg_index);
             SPVM_STRING_BUFFER_add(string_buffer, "]");
@@ -1898,7 +1881,7 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
           SPVM_JITCODE_BUILDER_add_operand(string_buffer, call_sub_return_type_name, opcode->operand0);
           SPVM_STRING_BUFFER_add(string_buffer, " = ");
           SPVM_STRING_BUFFER_add(string_buffer, "*(");
-          SPVM_STRING_BUFFER_add(string_buffer, call_sub_return_type_name);
+          SPVM_STRING_BUFFER_add(string_buffer, (char*)call_sub_return_type_name);
           SPVM_STRING_BUFFER_add(string_buffer, "*)&call_sub_return_value;");
           SPVM_STRING_BUFFER_add(string_buffer, ";\n");
         }
@@ -1916,9 +1899,10 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
         SPVM_STRING_BUFFER_add(string_buffer, "  if (croak_flag) {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    croak_flag = 0;\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    api->set_exception(api, api->create_exception_stack_trace(api, ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, sub_id);
-        SPVM_STRING_BUFFER_add(string_buffer, " , api->get_exception(api), ");
+        SPVM_STRING_BUFFER_add(string_buffer, " api->get_exception(api), ");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
+        SPVM_STRING_BUFFER_add(string_buffer, ", ");
+        SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, "));\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    goto L");
         SPVM_STRING_BUFFER_add_int(string_buffer,  opcode->operand0);
@@ -1930,9 +1914,10 @@ void SPVM_JITCODE_BUILDER_build_sub_jitcode(SPVM_STRING_BUFFER* string_buffer, i
       case SPVM_OPCODE_C_CODE_IF_CROAK_RETURN: {
         SPVM_STRING_BUFFER_add(string_buffer, "  if (croak_flag) {\n");
         SPVM_STRING_BUFFER_add(string_buffer, "    api->set_exception(api, api->create_exception_stack_trace(api, ");
-        SPVM_STRING_BUFFER_add_int(string_buffer, sub_id);
-        SPVM_STRING_BUFFER_add(string_buffer, " , api->get_exception(api), ");
+        SPVM_STRING_BUFFER_add(string_buffer, " api->get_exception(api), ");
         SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand1);
+        SPVM_STRING_BUFFER_add(string_buffer, ", ");
+        SPVM_STRING_BUFFER_add_int(string_buffer, opcode->operand2);
         SPVM_STRING_BUFFER_add(string_buffer, "));\n");
         if (!sub_is_void) {
           SPVM_STRING_BUFFER_add(string_buffer, "    return_value = 0;\n");

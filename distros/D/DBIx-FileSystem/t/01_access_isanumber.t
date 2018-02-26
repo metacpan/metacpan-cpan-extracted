@@ -1,11 +1,5 @@
 #!/usr/bin/perl -w
 #
-# Last Update:            $Author: marvin $
-# Update Date:            $Date: 2007/12/12 15:24:54 $
-# Source File:            $Source: /home/cvsroot/tools/FileSystem/t/01_access_isanumber.t,v $
-# CVS/RCS Revision:       $Revision: 1.4 $
-# Status:                 $State: Exp $
-#
 use strict;
 use Test::More tests => 40;
 use POSIX;

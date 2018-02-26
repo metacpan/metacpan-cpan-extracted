@@ -5,39 +5,18 @@ new (class)
 	SV *class
 
 	PREINIT:
-		dMY_CXT;
 		int i;
 		zmq_raw_context *ctx = NULL;
 
 	CODE:
-		for (i = 0; i < MAX_CONTEXT_COUNT; ++i)
-		{
-			zmq_raw_context *tmp = &MY_CXT.contexts[i];
-			if (tmp->context == NULL)
-			{
-				ctx = tmp;
-				break;
-			}
-		}
-
-		if (ctx == NULL)
-			croak_usage ("too many contexts created");
-
+		Newxz (ctx, 1, zmq_raw_context);
+		ctx->mutex = zmq_raw_mutex_create();
 		ctx->context = zmq_ctx_new();
-		if (ctx->context == NULL)
-			zmq_raw_check_error (-1);
+		ctx->reference_count = 1;
+		ctx->timers = NULL;
 
-		ctx->counter = zmq_atomic_counter_new();
-		if (ctx->counter == NULL)
-		{
-			zmq_ctx_term (ctx->context);
-			ctx->context = NULL;
-
-			zmq_raw_check_error (-1);
-		}
-
-		zmq_atomic_counter_inc (ctx->counter);
-		ZMQ_NEW_OBJ (RETVAL, "ZMQ::Raw::Context", ctx);
+		ZMQ_NEW_REFCOUNTED_OBJ (RETVAL, "ZMQ::Raw::Context",
+			ctx, zmq_raw_ctx_dup);
 
 	OUTPUT: RETVAL
 
@@ -70,35 +49,27 @@ shutdown (self)
 		zmq_raw_check_error (rc);
 
 void
-CLONE (...)
-	PREINIT:
-		dMY_CXT;
-		int i;
-
-	CODE:
-		for (i = 0; i < MAX_CONTEXT_COUNT; ++i)
-		{
-			zmq_raw_context *ctx = &MY_CXT.contexts[i];
-			if (ctx->counter)
-				zmq_atomic_counter_inc (ctx->counter);
-		}
-
-void
 DESTROY(self)
 	SV *self
 
 	PREINIT:
-		dMY_CXT;
 		zmq_raw_context *ctx;
 
 	CODE:
 		ctx = ZMQ_SV_TO_PTR (Context, self);
 
-		if (zmq_atomic_counter_dec (ctx->counter) == 0)
+		zmq_raw_mutex_lock (ctx->mutex);
+		if (--ctx->reference_count > 0)
 		{
-			zmq_atomic_counter_destroy (&ctx->counter);
-			zmq_ctx_term (ctx->context);
-
-			ctx->counter = NULL;
-			ctx->context = NULL;
+			zmq_raw_mutex_unlock (ctx->mutex);
+			XSRETURN (0);
 		}
+
+		if (ctx->timers)
+			zmq_raw_timers_destroy (ctx->timers);
+
+		zmq_ctx_term (ctx->context);
+		zmq_raw_mutex_unlock (ctx->mutex);
+		zmq_raw_mutex_destroy (ctx->mutex);
+		Safefree (ctx);
+

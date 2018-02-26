@@ -232,11 +232,14 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;dv3b&#39; = DMB MAF, extending dv3a, with 3GPP timed text, DID, TVA, REL, IPMP
   <br>&#39;dvr1&#39; = DVB (.DVB) over RTP
   <br>&#39;dvt1&#39; = DVB (.DVB) over MPEG-2 Transport Stream
+  <br>&#39;heic&#39; = High Efficiency Image Format HEVC still image (.HEIC)
+  <br>&#39;hevc&#39; = High Efficiency Image Format HEVC sequence (.HEICS)
   <br>&#39;isc2&#39; = ISMACryp 2.0 Encrypted File
   <br>&#39;iso2&#39; = MP4 Base Media v2 [ISO 14496-12:2005]
   <br>&#39;isom&#39; = MP4  Base Media v1 [IS0 14496-12:2003]
   <br>&#39;jpm &#39; = JPEG 2000 Compound Image (.JPM) [ISO 15444-6]
   <br>&#39;jpx &#39; = JPEG 2000 with extensions (.JPX) [ISO 15444-2]
+  <br>&#39;mif1&#39; = High Efficiency Image Format still image (.HEIF)
   <br>&#39;mj2s&#39; = Motion JPEG 2000 [ISO 15444-3] Simple Profile
   <br>&#39;mjp2&#39; = Motion JPEG 2000 [ISO 15444-3] General Profile
   <br>&#39;mmp4&#39; = MPEG-4/3GPP Mobile Profile (.MP4/3GP) (for NTT)
@@ -245,6 +248,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;mp42&#39; = MP4 v2 [ISO 14496-14]
   <br>&#39;mp71&#39; = MP4 w/ MPEG-7 Metadata [per ISO 14496-12]
   <br>&#39;mqt &#39; = Sony / Mobile QuickTime (.MQV) US Patent 7,477,830 (Sony Corp)
+  <br>&#39;msf1&#39; = High Efficiency Image Format sequence (.HEIFS)
   <br>&#39;odcf&#39; = OMA DCF DRM Format 2.0 (OMA-TS-DRM-DCF-V2_0-20060303-A)
   <br>&#39;opf2&#39; = OMA PDCF DRM Format 2.1 (OMA-TS-DRM-DCF-V2_1-20070724-C)
   <br>&#39;opx2&#39; = OMA PDCF DRM + XBS extensions (OMA-TS-DRM_XBS-V1_0-20070529-C)
@@ -293,14 +297,15 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
 <tr>
 <td>'iinf'</td>
-<td>ItemInformation?</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td>ItemInformation</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ItemInfo'>QuickTime ItemInfo Tags</a>
+  <br>--&gt; <a href='QuickTime.html#ItemInfo'>QuickTime ItemInfo Tags</a></td></tr>
 <tr class=b>
 <td>'iloc'</td>
-<td>ItemLocation?</td>
+<td>ItemLocation</td>
 <td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(parsed, but not extracted as a tag)</span></span></td></tr>
 <tr>
 <td>'ilst'</td>
 <td>ItemList</td>
@@ -317,13 +322,23 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'iprp'</td>
+<td>ItemProperties</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ItemProp'>QuickTime ItemProp Tags</a></td></tr>
+<tr>
+<td>'iref'</td>
+<td>ItemReference</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ItemRef'>QuickTime ItemRef Tags</a></td></tr>
+<tr class=b>
 <td>'keys'</td>
 <td>Keys</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
 <tr>
 <td>'pitm'</td>
-<td>PrimaryItemReference?</td>
+<td>PrimaryItemReference</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -359,9 +374,10 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;mdta&#39; = Metadata Tags
   <br>&#39;meta&#39; = NRT Metadata
   <br>&#39;mjsm&#39; = MPEG-J
-  <br>&#39;nrtm&#39; = Non-Real Time Metadata</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;ocsm&#39; = Object Content
-  <br>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;nrtm&#39; = Non-Real Time Metadata
+  <br>&#39;ocsm&#39; = Object Content</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;pict&#39; = Picture
   <br>&#39;priv&#39; = Private
   <br>&#39;sdsm&#39; = Scene Description
   <br>&#39;soun&#39; = Audio Track
@@ -411,8 +427,21 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>&nbsp;</td><td>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
+<h2><a name='ItemInfo'>QuickTime ItemInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'infe'</td>
+<td>ItemInfoEntry</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(parsed, but not extracted as a tag)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ItemList'>QuickTime ItemList Tags</a></h2>
-<p>As well as these tags, the &#39;mdta&#39; handler uses numerical tag ID&#39;s which are
+<p>As well as these tags, the &quot;mdta&quot; handler uses numerical tag ID&#39;s which are
 added dynamically to this table after processing the Meta Keys information.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -3509,6 +3538,90 @@ defined in this table.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='ItemProp'>QuickTime ItemProp Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'ipco'</td>
+<td>ItemPropertyContainer</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ItemPropCont'>QuickTime ItemPropCont Tags</a></td></tr>
+<tr class=b>
+<td>'ipma'</td>
+<td>ItemPropertyAssociation</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(parsed, but not extracted as a tag)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ItemPropCont'>QuickTime ItemPropCont Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'auxC'</td>
+<td>AuxiliaryImageType</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'clap'</td>
+<td>CleanAperture</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(4 numbers: width, height, left and top)</span></span></td></tr>
+<tr>
+<td>'colr'</td>
+<td>ICC_Profile</td>
+<td class=c>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr class=b>
+<td>'hvcC'</td>
+<td>HEVCConfiguration?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'irot'</td>
+<td>Rotation</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ispe'</td>
+<td>ImageSpatialExtent</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'pasp'</td>
+<td>PixelAspectRatio</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'pixi'</td>
+<td>ImagePixelDepth</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'rloc'</td>
+<td>RelativeLocation</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ItemRef'>QuickTime ItemRef Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'cdsc'</td>
+<td>ContentDescribes</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(parsed, but not extracted as a tag)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Keys'>QuickTime Keys Tags</a></h2>
 <p>This directory contains a list of key names which are used to decode
 ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
@@ -3579,161 +3692,191 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'detected-face'</td>
+<td>FaceInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#FaceInfo'>QuickTime FaceInfo Tags</a></td></tr>
+<tr class=b>
+<td>'detected-face.bounds'</td>
+<td>DetectedFaceBounds</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'detected-face.face-id'</td>
+<td>DetectedFaceID</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'detected-face.roll-angle'</td>
+<td>DetectedFaceRollAngle</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'detected-face.yaw-angle'</td>
+<td>DetectedFaceYawAngle</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'direction.facing'</td>
 <td>CameraDirection</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'direction.motion'</td>
 <td>CameraMotion</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'director'</td>
 <td>Director</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'genre'</td>
 <td>Genre</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'information'</td>
 <td>Information</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'keywords'</td>
 <td>Keywords</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'location.ISO6709'</td>
 <td>GPSCoordinates</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'location.body'</td>
 <td>LocationBody</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'location.date'</td>
 <td>LocationDate</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'location.name'</td>
 <td>LocationName</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'location.note'</td>
 <td>LocationNote</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'location.role'</td>
 <td>LocationRole</td>
 <td class=c>no</td>
 <td><span class=s>0 = Shooting Location
   <br>1 = Real Location
   <br>2 = Fictional Location</span></td></tr>
-<tr>
+<tr class=b>
 <td>'make'</td>
 <td>Make</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'model'</td>
 <td>Model</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.audio.balance'</td>
 <td>Balance</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.audio.bass'</td>
 <td>Bass</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.audio.gain'</td>
 <td>AudioGain</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.audio.mute'</td>
 <td>Mute</td>
 <td class=c>no</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.audio.pitchshift'</td>
 <td>PitchShift</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.audio.treble'</td>
 <td>Trebel</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.visual.brightness'</td>
 <td>Brightness</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.visual.color'</td>
 <td>Color</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.movie.visual.contrast'</td>
 <td>Contrast</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'player.movie.visual.tint'</td>
 <td>Tint</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'player.version'</td>
 <td>PlayerVersion</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'producer'</td>
 <td>Producer</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'publisher'</td>
 <td>Publisher</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'rating.user'</td>
 <td>UserRating</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'software'</td>
 <td>Software</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'title'</td>
 <td>Title</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'version'</td>
 <td>Version</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'video-orientation'</td>
+<td>VideoOrientation</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -3741,6 +3884,32 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td>Year</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceInfo'>QuickTime FaceInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'crec'</td>
+<td>FaceRec</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#FaceRec'>QuickTime FaceRec Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceRec'>QuickTime FaceRec Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'cits'</td>
+<td>FaceItem</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Movie'>QuickTime Movie Tags</a></h2>
@@ -3755,36 +3924,41 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#CMovie'>QuickTime CMovie Tags</a></td></tr>
 <tr class=b>
+<td>'gps '</td>
+<td>GPSDataList?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'htka'</td>
 <td>HTCTrack</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'iods'</td>
 <td>InitialObjectDescriptor?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'meta'</td>
 <td>Meta</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'mvhd'</td>
 <td>MovieHeader</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#MovieHeader'>QuickTime MovieHeader Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'trak'</td>
 <td>Track</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'udta'</td>
 <td>UserData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'uuid'</td>
 <td>UUID-USMT
   <br>UUID-Canon
@@ -4263,11 +4437,13 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td>AudioSampleDesc
   <br>VideoSampleDesc
   <br>HintSampleDesc
+  <br>MetaSampleDesc
   <br>OtherSampleDesc</td>
-<td class=c>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='QuickTime.html#AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a>
   <br>--&gt; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc Tags</a>
   <br>--&gt; <a href='QuickTime.html#HintSampleDesc'>QuickTime HintSampleDesc Tags</a>
+  <br>--&gt; <a href='QuickTime.html#MetaSampleDesc'>QuickTime MetaSampleDesc Tags</a>
   <br>--&gt; <a href='QuickTime.html#OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></td></tr>
 <tr>
 <td>'stsh'</td>
@@ -4336,26 +4512,377 @@ atoms.</p>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'chan'</td>
+<td>AudioChannelLayout</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLayout'>QuickTime ChannelLayout Tags</a></td></tr>
+<tr>
 <td>'damr'</td>
 <td>DecodeConfig</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#DecodeConfig'>QuickTime DecodeConfig Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'pinf'</td>
 <td>PurchaseInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'sinf'</td>
 <td>ProtectionInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'wave'</td>
 <td>Wave</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Wave'>QuickTime Wave Tags</a></td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='ChannelLayout'>QuickTime ChannelLayout Tags</a></h2>
+<p>Audio channel layout.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>LayoutFlags</td>
+<td class=c>no</td>
+<td><table class=cols><tr>
+  <td>0 = UseDescriptions
+  <br>1 = UseBitmap
+  <br>100 = Mono
+  <br>101 = Stereo
+  <br>102 = StereoHeadphones
+  <br>103 = MatrixStereo
+  <br>104 = MidSide
+  <br>105 = XY
+  <br>106 = Binaural
+  <br>107 = Ambisonic_B_Format
+  <br>108 = Quadraphonic
+  <br>109 = Pentagonal
+  <br>110 = Hexagonal
+  <br>111 = Octagonal
+  <br>112 = Cube
+  <br>113 = MPEG_3_0_A
+  <br>114 = MPEG_3_0_B
+  <br>115 = MPEG_4_0_A
+  <br>116 = MPEG_4_0_B
+  <br>117 = MPEG_5_0_A
+  <br>118 = MPEG_5_0_B
+  <br>119 = MPEG_5_0_C
+  <br>120 = MPEG_5_0_D
+  <br>121 = MPEG_5_1_A
+  <br>122 = MPEG_5_1_B
+  <br>123 = MPEG_5_1_C
+  <br>124 = MPEG_5_1_D
+  <br>125 = MPEG_6_1_A
+  <br>126 = MPEG_7_1_A
+  <br>127 = MPEG_7_1_B
+  <br>128 = MPEG_7_1_C
+  <br>129 = Emagic_Default_7_1
+  <br>130 = SMPTE_DTV
+  <br>131 = ITU_2_1
+  <br>132 = ITU_2_2
+  <br>133 = DVD_4
+  <br>134 = DVD_5
+  <br>135 = DVD_6
+  <br>136 = DVD_10
+  <br>137 = DVD_11
+  <br>138 = DVD_18
+  <br>139 = AudioUnit_6_0
+  <br>140 = AudioUnit_7_0
+  <br>141 = AAC_6_0</td><td>&nbsp;&nbsp;</td>
+  <td>142 = AAC_6_1
+  <br>143 = AAC_7_0
+  <br>144 = AAC_Octagonal
+  <br>145 = TMH_10_2_std
+  <br>146 = TMH_10_2_full
+  <br>147 = DiscreteInOrder
+  <br>148 = AudioUnit_7_0_Front
+  <br>149 = AC3_1_0_1
+  <br>150 = AC3_3_0
+  <br>151 = AC3_3_1
+  <br>152 = AC3_3_0_1
+  <br>153 = AC3_2_1_1
+  <br>154 = AC3_3_1_1
+  <br>155 = EAC_6_0_A
+  <br>156 = EAC_7_0_A
+  <br>157 = EAC3_6_1_A
+  <br>158 = EAC3_6_1_B
+  <br>159 = EAC3_6_1_C
+  <br>160 = EAC3_7_1_A
+  <br>161 = EAC3_7_1_B
+  <br>162 = EAC3_7_1_C
+  <br>163 = EAC3_7_1_D
+  <br>164 = EAC3_7_1_E
+  <br>165 = EAC3_7_1_F
+  <br>166 = EAC3_7_1_G
+  <br>167 = EAC3_7_1_H
+  <br>168 = DTS_3_1
+  <br>169 = DTS_4_1
+  <br>170 = DTS_6_0_A
+  <br>171 = DTS_6_0_B
+  <br>172 = DTS_6_0_C
+  <br>173 = DTS_6_1_A
+  <br>174 = DTS_6_1_B
+  <br>175 = DTS_6_1_C
+  <br>176 = DTS_7_0
+  <br>177 = DTS_7_1
+  <br>178 = DTS_8_0_A
+  <br>179 = DTS_8_0_B
+  <br>180 = DTS_8_1_A
+  <br>181 = DTS_8_1_B
+  <br>182 = DTS_6_1_D
+  <br>183 = AAC_7_1_B
+  <br>65535 = Unknown</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>AudioChannels</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>AudioChannelTypes</td>
+<td class=c>no</td>
+<td><table class=cols><tr>
+  <td>Bit 0 = Left
+  <br>Bit 1 = Right
+  <br>Bit 2 = Center
+  <br>Bit 3 = LFEScreen
+  <br>Bit 4 = LeftSurround
+  <br>Bit 5 = RightSurround
+  <br>Bit 6 = LeftCenter
+  <br>Bit 7 = RightCenter
+  <br>Bit 8 = CenterSurround
+  <br>Bit 9 = LeftSurroundDirect
+  <br>Bit 10 = RightSurroundDirect
+  <br>Bit 11 = TopCenterSurround
+  <br>Bit 12 = VerticalHeightLeft
+  <br>Bit 13 = VerticalHeightCenter
+  <br>Bit 14 = VerticalHeightRight
+  <br>Bit 15 = TopBackLeft
+  <br>Bit 16 = TopBackCenter
+  <br>Bit 17 = TopBackRight</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>NumChannelDescriptions</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>Channel1Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>Channel1Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
+<td>Channel1Coordinates</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(3 numbers:  for rectangular coordinates left/right, back/front, down/up; for
+spherical coordinates left/right degrees, down/up degrees, distance)</span></span></td></tr>
+<tr class=b>
+<td class=r title='36 = 0x24'>36</td>
+<td>Channel2Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr>
+<td class=r title='40 = 0x28'>40</td>
+<td>Channel2Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr class=b>
+<td class=r title='44 = 0x2c'>44</td>
+<td>Channel2Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='56 = 0x38'>56</td>
+<td>Channel3Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr class=b>
+<td class=r title='60 = 0x3c'>60</td>
+<td>Channel3Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr>
+<td class=r title='64 = 0x40'>64</td>
+<td>Channel3Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='76 = 0x4c'>76</td>
+<td>Channel4Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr>
+<td class=r title='80 = 0x50'>80</td>
+<td>Channel4Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>Channel4Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='96 = 0x60'>96</td>
+<td>Channel5Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr class=b>
+<td class=r title='100 = 0x64'>100</td>
+<td>Channel5Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr>
+<td class=r title='104 = 0x68'>104</td>
+<td>Channel5Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='116 = 0x74'>116</td>
+<td>Channel6Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>Channel6Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>Channel6Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='136 = 0x88'>136</td>
+<td>Channel7Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr class=b>
+<td class=r title='140 = 0x8c'>140</td>
+<td>Channel7Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr>
+<td class=r title='144 = 0x90'>144</td>
+<td>Channel7Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='156 = 0x9c'>156</td>
+<td>Channel8Label</td>
+<td class=c>no</td>
+<td>--&gt; <a href='QuickTime.html#ChannelLabel'>QuickTime ChannelLabel Values</a></td></tr>
+<tr>
+<td class=r title='160 = 0xa0'>160</td>
+<td>Channel8Flags</td>
+<td class=c>no</td>
+<td><span class=s>Bit 0 = Rectangular
+  <br>Bit 1 = Spherical
+  <br>Bit 2 = Meters</span></td></tr>
+<tr class=b>
+<td class=r title='164 = 0xa4'>164</td>
+<td>Channel8Coordinates</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ChannelLabel'>QuickTime ChannelLabel Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>ChannelLabel</th><th>Value</th><th>ChannelLabel</th><th>Value</th><th>ChannelLabel</th></tr>
+<tr><td class=r>0</td><td>= Unused</td>
+<td class='r b'>36</td><td class=b>= RightWide</td>
+<td class=r>305</td><td>= ForeignLanguage</td>
+</tr><tr><td class=r>1</td><td>= Left</td>
+<td class='r b'>37</td><td class=b>= LFE2</td>
+<td class=r>400</td><td>= Discrete</td>
+</tr><tr><td class=r>2</td><td>= Right</td>
+<td class='r b'>38</td><td class=b>= LeftTotal</td>
+<td class=r>65536</td><td>= Discrete_0</td>
+</tr><tr><td class=r>3</td><td>= Center</td>
+<td class='r b'>39</td><td class=b>= RightTotal</td>
+<td class=r>65537</td><td>= Discrete_1</td>
+</tr><tr><td class=r>4</td><td>= LFEScreen</td>
+<td class='r b'>40</td><td class=b>= HearingImpaired</td>
+<td class=r>65538</td><td>= Discrete_2</td>
+</tr><tr><td class=r>5</td><td>= LeftSurround</td>
+<td class='r b'>41</td><td class=b>= Narration</td>
+<td class=r>65539</td><td>= Discrete_3</td>
+</tr><tr><td class=r>6</td><td>= RightSurround</td>
+<td class='r b'>42</td><td class=b>= Mono</td>
+<td class=r>65540</td><td>= Discrete_4</td>
+</tr><tr><td class=r>7</td><td>= LeftCenter</td>
+<td class='r b'>43</td><td class=b>= DialogCentricMix</td>
+<td class=r>65541</td><td>= Discrete_5</td>
+</tr><tr><td class=r>8</td><td>= RightCenter</td>
+<td class='r b'>44</td><td class=b>= CenterSurroundDirect</td>
+<td class=r>65542</td><td>= Discrete_6</td>
+</tr><tr><td class=r>9</td><td>= CenterSurround</td>
+<td class='r b'>45</td><td class=b>= Haptic</td>
+<td class=r>65543</td><td>= Discrete_7</td>
+</tr><tr><td class=r>10</td><td>= LeftSurroundDirect</td>
+<td class='r b'>100</td><td class=b>= UseCoordinates</td>
+<td class=r>65544</td><td>= Discrete_8</td>
+</tr><tr><td class=r>11</td><td>= RightSurroundDirect</td>
+<td class='r b'>200</td><td class=b>= Ambisonic_W</td>
+<td class=r>65545</td><td>= Discrete_9</td>
+</tr><tr><td class=r>12</td><td>= TopCenterSurround</td>
+<td class='r b'>201</td><td class=b>= Ambisonic_X</td>
+<td class=r>65546</td><td>= Discrete_10</td>
+</tr><tr><td class=r>13</td><td>= VerticalHeightLeft</td>
+<td class='r b'>202</td><td class=b>= Ambisonic_Y</td>
+<td class=r>65547</td><td>= Discrete_11</td>
+</tr><tr><td class=r>14</td><td>= VerticalHeightCenter</td>
+<td class='r b'>203</td><td class=b>= Ambisonic_Z</td>
+<td class=r>65548</td><td>= Discrete_12</td>
+</tr><tr><td class=r>15</td><td>= VerticalHeightRight</td>
+<td class='r b'>204</td><td class=b>= MS_Mid</td>
+<td class=r>65549</td><td>= Discrete_13</td>
+</tr><tr><td class=r>16</td><td>= TopBackLeft</td>
+<td class='r b'>205</td><td class=b>= MS_Side</td>
+<td class=r>65550</td><td>= Discrete_14</td>
+</tr><tr><td class=r>17</td><td>= TopBackCenter</td>
+<td class='r b'>206</td><td class=b>= XY_X</td>
+<td class=r>65551</td><td>= Discrete_15</td>
+</tr><tr><td class=r>18</td><td>= TopBackRight</td>
+<td class='r b'>207</td><td class=b>= XY_Y</td>
+<td class=r>131071</td><td>= Discrete_65535</td>
+</tr><tr><td class=r>33</td><td>= RearSurroundLeft</td>
+<td class='r b'>301</td><td class=b>= HeadphonesLeft</td>
+<td class=r>4294967295</td><td>= Unknown</td>
+</tr><tr><td class=r>34</td><td>= RearSurroundRight</td>
+<td class='r b'>302</td><td class=b>= HeadphonesRight</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr><tr><td class=r>35</td><td>= LeftWide</td>
+<td class='r b'>304</td><td class=b>= ClickTrack</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='DecodeConfig'>QuickTime DecodeConfig Tags</a></h2>
 <blockquote>
@@ -4568,45 +5095,51 @@ atoms.</p>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'avcC'</td>
+<td>AVCConfiguration?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'btrt'</td>
 <td>BitrateInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'clap'</td>
 <td>CleanAperture</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#CleanAperture'>QuickTime CleanAperture Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'colr'</td>
 <td>ColorRepresentation</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'fiel'</td>
 <td>VideoFieldOrder</td>
 <td class=c>no</td>
 <td><span class=s>[Value 0]
   <br>1 = Progressive
   <br>2 = 2:1 Interlaced</span></td></tr>
-<tr>
+<tr class=b>
 <td>'gama'</td>
 <td>Gamma</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pasp'</td>
 <td>PixelAspectRatio</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'st3d'</td>
 <td>Stereoscopic3D</td>
 <td class=c>no</td>
 <td><span class=s>0 = Monoscopic
   <br>1 = Stereoscopic Top-Bottom
-  <br>2 = Stereoscopic Left-Right</span></td></tr>
-<tr class=b>
+  <br>2 = Stereoscopic Left-Right
+  <br>3 = Stereoscopic Stereo-Custom</span></td></tr>
+<tr>
 <td>'sv3d'</td>
 <td>SphericalVideo</td>
 <td class=c>-</td>
@@ -4815,6 +5348,30 @@ https://github.com/google/spatial-media/blob/master/docs/spherical-video-v2-rfc.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MetaSampleDesc'>QuickTime MetaSampleDesc Tags</a></h2>
+<p>MP4 metadata sample description.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0004 = 4'>0x0004</td>
+<td>MetaFormat</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'btrt'</td>
+<td>BitrateInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
+<tr>
+<td>'keys'</td>
+<td>Keys</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -4940,16 +5497,21 @@ https://github.com/google/spatial-media/blob/master/docs/spherical-video-v2-rfc.
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'cdsc'</td>
+<td>ContentDescribes</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'chap'</td>
 <td>ChapterListTrackID</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'mpod'</td>
 <td>ElementaryStreamTrack</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'tmcd'</td>
 <td>TimeCode</td>
 <td class=c>no</td>
@@ -5021,6 +5583,16 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td>FirmwareVersion</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>"FOV\0"</td>
+<td>FieldOfView</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'GPMF'</td>
+<td>GoProGPMF</td>
+<td class=c>-</td>
+<td>--&gt; <a href='GoPro.html#GPMF'>GoPro GPMF Tags</a></td></tr>
 <tr class=b>
 <td>'GoPr'</td>
 <td>GoProType</td>
@@ -6244,9 +6816,113 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Stream'>QuickTime Stream Tags</a></h2>
+<p>Tags extracted from QuickTime movie data when the ExtractEmbedded option is
+used.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'Accelerometer'</td>
+<td>Accelerometer</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(right/up/backward acceleration in units of g)</span></span></td></tr>
+<tr class=b>
+<td>'GPSAltitude'</td>
+<td>GPSAltitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'GPSAltitudeRef'</td>
+<td>GPSAltitudeRef</td>
+<td class=c>no</td>
+<td><span class=s>0 = Above Sea Level
+  <br>1 = Below Sea Level</span></td></tr>
+<tr class=b>
+<td>'GPSDateTime'</td>
+<td>GPSDateTime</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'GPSLatitude'</td>
+<td>GPSLatitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'GPSLongitude'</td>
+<td>GPSLongitude</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'GPSSpeed'</td>
+<td>GPSSpeed</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'GPSSpeedRef'</td>
+<td>GPSSpeedRef</td>
+<td class=c>no</td>
+<td><span class=s>&#39;K&#39; = km/h
+  <br>&#39;M&#39; = mph
+  <br>&#39;N&#39; = knots</span></td></tr>
+<tr>
+<td>'GPSTrack'</td>
+<td>GPSTrack</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'GPSTrackRef'</td>
+<td>GPSTrackRef</td>
+<td class=c>no</td>
+<td><span class=s>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</span></td></tr>
+<tr>
+<td>'SampleDuration'</td>
+<td>SampleDuration</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'SampleTime'</td>
+<td>SampleTime</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(sample decoding time)</span></span></td></tr>
+<tr>
+<td>'Text'</td>
+<td>Text</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'TimeCode'</td>
+<td>TimeCode</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'fdsc'</td>
+<td>GoPro_fdsc</td>
+<td class=c>-</td>
+<td>--&gt; <a href='GoPro.html#fdsc'>GoPro fdsc Tags</a></td></tr>
+<tr class=b>
+<td>'gpmd'</td>
+<td>GoPro_gpmd</td>
+<td class=c>-</td>
+<td>--&gt; <a href='GoPro.html#GPMF'>GoPro GPMF Tags</a></td></tr>
+<tr>
+<td>'mebx'</td>
+<td>QuickTime_mebx</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
+<tr class=b>
+<td>'rtmd'</td>
+<td>Sony_rtmd</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Sony.html#rtmd'>Sony rtmd Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 6, 2017</i>
+<br><i>Last revised Feb 7, 2018</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

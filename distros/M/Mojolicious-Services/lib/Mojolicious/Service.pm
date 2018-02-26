@@ -2,7 +2,7 @@ package Mojolicious::Service;
 use Mojo::Base -base;
 use Carp qw/cluck confess/;
 
-has [qw/dbi models app c dmn/];
+has [qw/dbi models app c dmn parent/];
 
 sub model{
   my ($self, $name) = @_;
@@ -12,6 +12,12 @@ sub model{
   
   # Get model
   return $self->models->{$name};
+}
+
+sub service{
+  my $self = shift;
+  return $self->parent->service(@_) if($self->parent);
+  confess "require [parent] field";
 }
 
 ## 调用 model 层的 create 方法
@@ -208,7 +214,7 @@ sub AUTOLOAD{
     my $mmethod = "count_by_" . $field;
     my $model = $self->model($table);
     cluck "the model [$table] if not found!" unless($model);
-  
+    
     return $model->$mmethod(@_);
   }
   
@@ -223,7 +229,6 @@ sub AUTOLOAD{
     
     return $model->$mmethod(@_);
   }
-  
   
   confess qq{Can't locate object method "$method" via package "$package"}
 }

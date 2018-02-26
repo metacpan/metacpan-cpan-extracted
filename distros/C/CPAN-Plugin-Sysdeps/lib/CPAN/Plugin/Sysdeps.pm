@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 
 use List::Util 'first';
 
@@ -26,7 +26,7 @@ sub new {
 	    } else {
 		$options = $arg;
 	    }
-	} elsif ($arg =~ m{^(apt-get|aptitude|pkg|yum|chocolatey|homebrew)$}) { # XXX are there more package installers?
+	} elsif ($arg =~ m{^(apt-get|aptitude|pkg|pkg_add|yum|dnf|chocolatey|homebrew)$}) { # XXX are there more package installers?
 	    $installer = $1;
 	} elsif ($arg eq 'batch') {
 	    $batch = 1;
@@ -81,7 +81,7 @@ sub new {
 	} else {
 	    $linuxdistrocodename = $get_linux_info->()->{linuxdistrocodename};
 	}
-    } elsif ($os eq 'freebsd') {
+    } elsif (($os eq 'freebsd') || ($os eq 'openbsd')) {
 	# Note: don't use $Config{osvers}, as this is just the OS
 	# version of the system which built the current perl, not the
 	# actually running OS version.
@@ -97,11 +97,17 @@ sub new {
 	    $installer = 'pkg';
 	} elsif ($os eq 'gnukfreebsd') {
 	    $installer = 'apt-get';
+	} elsif ($os eq 'openbsd') {
+	    $installer = 'pkg_add';
 	} elsif ($os eq 'linux') {
 	    if      (__PACKAGE__->_is_linux_debian_like($linuxdistro)) {
 		$installer = 'apt-get';
 	    } elsif (__PACKAGE__->_is_linux_fedora_like($linuxdistro)) {
-		$installer = 'yum';
+                if (_detect_dnf()) {
+                    $installer = 'dnf';
+		} else {
+		    $installer = 'yum';
+		}
 	    } else {
 		die __PACKAGE__ . " has no support for linux distribution $linuxdistro $linuxdistroversion\n";
 	    }
@@ -208,7 +214,7 @@ sub _detect_linux_distribution_lsb_release {
 sub _detect_linux_distribution_fallback {
     if (open my $fh, '<', '/etc/redhat-release') {
 	my $contents = <$fh>;
-	if ($contents =~ m{^(CentOS|RedHat) (Linux )?release (\d+)\S* \((.*?)\)}) {
+	if ($contents =~ m{^(CentOS|RedHat|Fedora) (Linux )?release (\d+)\S* \((.*?)\)}) {
 	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => $3};
 	}
     }
@@ -366,6 +372,21 @@ sub _map_cpandist {
     ();
 }
 
+sub _detect_dnf {
+    my @cmd = ('dnf', '--help');
+    require IPC::Open3;
+    require Symbol;
+    my $err = Symbol::gensym();
+    my $fh;
+    eval {
+	    if (my $pid = IPC::Open3::open3(undef, $fh, $err, @cmd)) {
+		    waitpid $pid, 0;
+		    return $? == 0;
+		}
+    };
+    return;
+}
+
 sub _find_missing_deb_packages {
     my($self, @packages) = @_;
     return () if !@packages;
@@ -444,6 +465,38 @@ sub _find_missing_freebsd_pkg_packages {
     @missing_packages;
 }
 
+sub _find_missing_openbsd_pkg_packages {
+    my($self, @packages) = @_;
+    return () if !@packages;
+
+    require IPC::Open3;
+    require Symbol;
+
+    my @missing_packages;
+    for my $package (@packages) {
+        my $err = Symbol::gensym();
+        my $fh;
+        my $package_in_repository;
+        eval {
+            if (my $pid = IPC::Open3::open3(undef, $fh, $err, 'pkg_info', $package)) {
+                waitpid $pid, 0;
+                if ($? == 0) {
+                    $package_in_repository = 1;
+                }
+            }
+        };
+        if ($package_in_repository) {
+            my @cmd = ('pkg_info', '-q', '-e', "${package}->=0");
+            system @cmd;
+            if ($? != 0) {
+                push @missing_packages, $package;
+            }
+        }
+    }
+
+    @missing_packages;
+}
+
 sub _find_missing_homebrew_packages {
     my($self, @packages) = @_;
     return () if !@packages;
@@ -488,10 +541,12 @@ sub _filter_uninstalled_packages {
     my $find_missing_packages;
     if      ($self->_is_apt_installer) {
 	$find_missing_packages = '_find_missing_deb_packages';
-    } elsif ($self->{installer} eq 'yum') {
+    } elsif (($self->{installer} eq 'yum') || ($self->{installer} eq 'dnf')) {
 	$find_missing_packages = '_find_missing_rpm_packages';
     } elsif ($self->{os} eq 'freebsd') {
 	$find_missing_packages = '_find_missing_freebsd_pkg_packages';
+    } elsif ($self->{os} eq 'openbsd') {
+	$find_missing_packages = '_find_missing_openbsd_pkg_packages';
     } elsif ($self->{os} eq 'MSWin32') {
 	$find_missing_packages = '_find_missing_chocolatey_packages';
     } elsif ($self->{installer} eq 'homebrew') {
@@ -546,7 +601,7 @@ sub _install_packages_commands {
     if ($self->{batch}) {
 	if ($self->_is_apt_installer) {
 	    push @install_cmd, '-y';
-	} elsif ($self->{installer} eq 'yum') {
+	} elsif (($self->{installer} eq 'yum') || ($self->{installer} eq 'dnf')) {
 	    push @install_cmd, '-y';
 	} elsif ($self->{installer} eq 'pkg') { # FreeBSD's pkg
 	    # see below
@@ -558,7 +613,7 @@ sub _install_packages_commands {
     } else {
 	if ($self->_is_apt_installer) {
 	    @pre_cmd = ('sh', '-c', 'echo -n "Install package(s) '."@packages".'? (y/N) "; read yn; [ "$yn" = "y" ]');
-	} elsif ($self->{installer} eq 'yum') {
+	} elsif (($self->{installer} eq 'yum') || ($self->{installer} eq 'dnf')) {
 	    # interactive by default
 	} elsif ($self->{installer} eq 'pkg') { # FreeBSD's pkg
 	    # see below
@@ -578,7 +633,9 @@ sub _install_packages_commands {
     }
 
     # the installer subcommand
-    push @install_cmd, 'install'; # XXX is this universal?
+    if ($self->{installer} ne 'pkg_add') {
+        push @install_cmd, 'install';
+    }
 
     # post options
     if ($self->{batch} && $self->{installer} eq 'pkg') {
@@ -586,6 +643,9 @@ sub _install_packages_commands {
     }
     if ($self->{batch} && $self->{installer} eq 'chocolatey') {
 	push @install_cmd, '-y';
+    }
+    if ($self->{batch} && $self->{installer} eq 'pkg_add') {
+	push @install_cmd, '-I';
     }
 
     push @install_cmd, @packages;
@@ -632,7 +692,7 @@ Possible arguments are:
 
 =over
 
-=item C<apt-get>, C<aptitude>, C<pkg>, C<yum>, C<homebrew>
+=item C<apt-get>, C<aptitude>, C<pkg>, C<yum>, C<dnf>, C<homebrew>
 
 Force a particular installer for system packages. If not set, then the
 plugin find a default for the current operating system or linux
@@ -642,7 +702,7 @@ distributions:
 
 =item Debian-like distributions: C<apt-get>
 
-=item Fedora-like distributions: C<yum>
+=item Fedora-like distributions: C<yum> or C<dnf>
 
 =item FreeBSD: C<pkg>
 
@@ -938,13 +998,15 @@ L<https://twitter.com/jscook2345> Justin Cook.
 
 Max Maischein (CORION) - Windows/chocolatey support
 
+David Dick (DDICK) - OpenBSD and Fedora support
+
 =head1 AUTHOR
 
 Slaven Rezic
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016,2017 by Slaven ReziE<x0107>
+Copyright (C) 2016,2017,2018 by Slaven ReziE<x0107>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
@@ -952,6 +1014,6 @@ at your option, any later version of Perl 5 you may have available.
 
 =head1 SEE ALSO
 
-L<cpan-sysdeps>, L<CPAN>, L<apt-get(1)>, L<aptitude(1)>, L<pkg(8)>, L<yum(1)>.
+L<cpan-sysdeps>, L<CPAN>, L<apt-get(1)>, L<aptitude(1)>, L<pkg(8)>, L<yum(1)>, L<dnf(1)>.
 
 =cut

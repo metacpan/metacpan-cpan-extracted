@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 278;
+use Test::More tests => 314;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -433,7 +433,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 198);
+		skip($skip_message, 232);
 	}
 	ok($firefox, "Firefox has started in Marionette mode without defined capabilities, but with a defined profile and debug turned off");
 	ok($firefox->go(URI->new("https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html")), "https://www.w3.org/WAI/UA/TS/html401/cp0101/0101-FRAME-TEST.html has been loaded");
@@ -475,7 +475,7 @@ SKIP: {
 			$screen_orientation = $firefox->screen_orientation();
 			ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
 		} or do {
-			if ($@ =~ /Only supported in Fennec/) {
+			if (($@->isa('Firefox::Marionette::Exception')) && ($@ =~ /Only supported in Fennec.* in .* at line \d+/)) {
 				local $TODO = "Only supported in Fennec";
 				ok($screen_orientation, "\$firefox->screen_orientation() is " . $screen_orientation);
 			} else {
@@ -488,9 +488,9 @@ SKIP: {
 		$result = $firefox->switch_to_window($original_window_handle);
 	} or do {
 		chomp $@;
-		if ($firefox->addons()) {
+		if (!$firefox->addons()) {
 			diag("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@");
-			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 179);
+			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 213);
 		}
 	};
 	ok($result, "\$firefox->switch_to_window() used to move back to the original window:$@");
@@ -549,6 +549,8 @@ SKIP: {
 	ok($firefox->list_by_id('search-input')->property('id') eq 'search-input', "Correctly found element with list_by_id");
 	ok($firefox->find_by_id('search-input')->property('id') eq 'search-input', "Correctly found element with find_by_id");
 	ok($firefox->find_by_class('main-content')->find_by_id('search-input')->property('id') eq 'search-input', "Correctly found nested element with find_by_id");
+	ok($firefox->find_id('search-input')->property('id') eq 'search-input', "Correctly found element with find_id");
+	ok($firefox->find_class('main-content')->find_id('search-input')->property('id') eq 'search-input', "Correctly found nested element with find_id");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_id('search-input')) {
 		ok($element->property('id') eq 'search-input', "Correctly found nested element with list_by_id");
@@ -562,6 +564,12 @@ SKIP: {
 	}
 	ok($count == 1, "Found elements with nested find_by_id:$count");
 	$count = 0;
+	foreach my $element ($firefox->find_class('main-content')->find_id('search-input')) {
+		ok($element->property('id') eq 'search-input', "Correctly found nested element with find_id");
+		$count += 1;
+	}
+	ok($count == 1, "Found elements with nested find_id:$count");
+	$count = 0;
 	foreach my $element ($firefox->find_by_id('search-input')) {
 		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find_by_id");
 		$count += 1;
@@ -572,6 +580,8 @@ SKIP: {
 	ok($firefox->list_by_name('q')->property('id') eq 'search-input', "Correctly found element with list_by_name");
 	ok($firefox->find_by_name('q')->property('id') eq 'search-input', "Correctly found element with find_by_name");
 	ok($firefox->find_by_class('main-content')->find_by_name('q')->property('id') eq 'search-input', "Correctly found nested element with find_by_name");
+	ok($firefox->find_name('q')->property('id') eq 'search-input', "Correctly found element with find_name");
+	ok($firefox->find_class('main-content')->find_name('q')->property('id') eq 'search-input', "Correctly found nested element with find_name");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_name('q')) {
 		ok($element->property('id') eq 'search-input', "Correctly found nested element with list_by_name");
@@ -590,11 +600,19 @@ SKIP: {
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_name:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_name('q')) {
+		ok($element->property('id') eq 'search-input', "Correctly found element with wantarray find_name");
+		$count += 1;
+	}
+	ok($count == 1, "Found elements with wantarray find_name:$count");
 	ok($firefox->find('input', 'tag name')->property('id'), "Correctly found element when searching by tag name");
 	ok($firefox->find('input', BY_TAG())->property('id'), "Correctly found element when searching by tag name");
 	ok($firefox->list_by_tag('input')->property('id'), "Correctly found element with list_by_tag");
 	ok($firefox->find_by_tag('input')->property('id'), "Correctly found element with find_by_tag");
 	ok($firefox->find_by_class('main-content')->find_by_tag('input')->property('id'), "Correctly found nested element with find_by_tag");
+	ok($firefox->find_tag('input')->property('id'), "Correctly found element with find_tag");
+	ok($firefox->find_class('main-content')->find_tag('input')->property('id'), "Correctly found nested element with find_tag");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_tag('input')) {
 		ok($element->property('id'), "Correctly found nested element with list_by_tag");
@@ -613,11 +631,19 @@ SKIP: {
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_tag:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_tag('input')) {
+		ok($element->property('id'), "Correctly found element with wantarray find_tag");
+		$count += 1;
+	}
+	ok($count == 2, "Found elements with wantarray find_by_tag:$count");
 	ok($firefox->find('form-control home-search-input', 'class name')->property('id'), "Correctly found element when searching by class name");
 	ok($firefox->find('form-control home-search-input', BY_CLASS())->property('id'), "Correctly found element when searching by class name");
 	ok($firefox->list_by_class('form-control home-search-input')->property('id'), "Correctly found element with list_by_class");
 	ok($firefox->find_by_class('form-control home-search-input')->property('id'), "Correctly found element with find_by_class");
 	ok($firefox->find_by_class('main-content')->find_by_class('form-control home-search-input')->property('id'), "Correctly found nested element with find_by_class");
+	ok($firefox->find_class('form-control home-search-input')->property('id'), "Correctly found element with find_class");
+	ok($firefox->find_class('main-content')->find_class('form-control home-search-input')->property('id'), "Correctly found nested element with find_class");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_class('form-control home-search-input')) {
 		ok($element->property('id'), "Correctly found nested element with list_by_class");
@@ -630,11 +656,19 @@ SKIP: {
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_class:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_class('main-content')->find_class('form-control home-search-input')) {
+		ok($element->property('id'), "Correctly found element with wantarray find_class");
+		$count += 1;
+	}
+	ok($count == 1, "Found elements with wantarray find_by_class:$count");
 	ok($firefox->find('input.home-search-input', 'css selector')->property('id'), "Correctly found element when searching by css selector");
 	ok($firefox->find('input.home-search-input', BY_SELECTOR())->property('id'), "Correctly found element when searching by css selector");
 	ok($firefox->list_by_selector('input.home-search-input')->property('id'), "Correctly found element with list_by_selector");
 	ok($firefox->find_by_selector('input.home-search-input')->property('id'), "Correctly found element with find_by_selector");
 	ok($firefox->find_by_class('main-content')->find_by_selector('input.home-search-input')->property('id'), "Correctly found nested element with find_by_selector");
+	ok($firefox->find_selector('input.home-search-input')->property('id'), "Correctly found element with find_selector");
+	ok($firefox->find_class('main-content')->find_selector('input.home-search-input')->property('id'), "Correctly found nested element with find_selector");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('main-content')->list_by_selector('input.home-search-input')) {
 		ok($element->property('id'), "Correctly found nested element with list_by_selector");
@@ -653,11 +687,19 @@ SKIP: {
 		$count += 1;
 	}
 	ok($count == 1, "Found elements with wantarray find_by_selector:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_selector('input.home-search-input')) {
+		ok($element->property('id'), "Correctly found wantarray element with find_selector");
+		$count += 1;
+	}
+	ok($count == 1, "Found elements with wantarray find_by_selector:$count");
 	ok($firefox->find('API', 'link text')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by link text");
 	ok($firefox->find('API', BY_LINK())->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by link text");
 	ok($firefox->list_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with list_by_link");
 	ok($firefox->find_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_by_link");
 	ok($firefox->find_by_class('container-fluid')->find_by_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_link");
+	ok($firefox->find_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_link");
+	ok($firefox->find_class('container-fluid')->find_link('API')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_link");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('container-fluid')->list_by_link('API')) {
 		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with list_by_link");
@@ -676,11 +718,19 @@ SKIP: {
 		$count += 1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_link:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_link('API')) {
+		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_link");
+		$count += 1;
+	}
+	ok($count == 2, "Found elements with wantarray find_by_link:$count");
 	ok($firefox->find('AP', 'partial link text')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by partial link text");
 	ok($firefox->find('AP', BY_PARTIAL())->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element when searching by partial link text");
 	ok($firefox->list_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with list_by_partial");
 	ok($firefox->find_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_by_partial");
 	ok($firefox->find_by_class('container-fluid')->find_by_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_by_partial");
+	ok($firefox->find_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found element with find_partial");
+	ok($firefox->find_class('container-fluid')->find_partial('AP')->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with find_partial");
 	$count = 0;
 	foreach my $element ($firefox->find_by_class('container-fluid')->list_by_partial('AP')) {
 		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found nested element with list_by_partial");
@@ -699,6 +749,12 @@ SKIP: {
 		$count +=1;
 	}
 	ok($count == 2, "Found elements with wantarray find_by_partial:$count");
+	$count = 0;
+	foreach my $element ($firefox->find_partial('AP')) {
+		ok($element->property('href') eq 'https://fastapi.metacpan.org/', "Correctly found wantarray element with find_partial");
+		$count +=1;
+	}
+	ok($count == 2, "Found elements with wantarray find_partial:$count");
 	my $css_rule;
 	ok($css_rule = $firefox->find('//input[@id="search-input"]')->css('display'), "The value of the css rule 'display' is '$css_rule'");
 	ok($result = $firefox->find('//input[@id="search-input"]')->is_enabled() =~ /^[01]$/, "is_enabled returns 0 or 1:$result");
@@ -748,7 +804,7 @@ SKIP: {
 	}
 	my $clicked;
 	while ($firefox->uri() eq 'https://metacpan.org/') {
-		ELEMENT: foreach my $element ($firefox->list('//a[@href="https://fastapi.metacpan.org"]')) {
+		ELEMENT: foreach my $element ($firefox->find('//a[@href="https://fastapi.metacpan.org"]')) {
 			$clicked = 1;
 			$element->click();
 			sleep 2;
@@ -781,7 +837,8 @@ SKIP: {
 	ok($firefox->script('return window.find("lucky");'), "metacpan.org contains the phrase 'lucky' in a 'window.find' javascript command");
 	my $cookie = Firefox::Marionette::Cookie->new(name => 'BonusCookie', value => 'who really cares about privacy', expiry => time + 500000);
 	ok($firefox->add_cookie($cookie), "\$firefox->add_cookie() adds a Firefox::Marionette::Cookie without a domain");
-	foreach my $element ($firefox->list_by_name('lucky')) {
+	ok($firefox->find_id('search-input')->clear()->find_id('search-input')->type('Test::More'), "Sent 'Test::More' to the 'search-input' field directly to the element");
+	foreach my $element ($firefox->find_name('lucky')) {
 		eval {
 			ok($firefox->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 		} or do {
@@ -792,6 +849,28 @@ SKIP: {
 			}	
 		};
 	}
+	while(not eval { $firefox->find_partial('Download') }) {
+		if (($@) && ($@->isa('Firefox::Marionette::Exception::NotFound'))) {
+			diag("Firefox::Marionette::Exception::NotFound thrown during find of Download link");
+		} else {
+			die $@;
+		}
+		sleep 1;
+	}
+	ok($firefox->find_partial('Download')->click(), "Clicked on the download link");
+	while(!$firefox->downloads()) {
+		sleep 1;
+	}
+	while($firefox->downloading()) {
+		sleep 1;
+	}
+	$count = 0;
+	foreach my $path ($firefox->downloads()) {
+		diag("Downloaded $path");
+		$count += 1;
+	}
+	ok($count == 1, "Downloaded 1 files:$count");
+
 	my $alert_text = 'testing alert';
 	$firefox->script(qq[alert('$alert_text')]);
 	$result = undef;
@@ -977,4 +1056,10 @@ SKIP: {
 	}
 }
 ok($at_least_one_success, "At least one firefox start worked");
+eval "no warnings; sub File::Temp::newdir { \$! = POSIX::EACCES(); return; } use warnings;";
+ok(!$@, "File::Temp::newdir is redefined to fail:$@");
+eval { Firefox::Marionette->new(); };
+my $output = "$@";
+chomp $output;
+ok($@->isa('Firefox::Marionette::Exception') && $@ =~ / in .* at line \d+/, "When File::Temp::newdir is forced to fail, a Firefox::Marionette::Exception is thrown:$output");
 

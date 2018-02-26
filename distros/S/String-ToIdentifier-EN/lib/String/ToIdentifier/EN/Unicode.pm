@@ -1,11 +1,6 @@
 package String::ToIdentifier::EN::Unicode;
-BEGIN {
-  $String::ToIdentifier::EN::Unicode::AUTHORITY = 'cpan:RKITOVER';
-}
-{
-  $String::ToIdentifier::EN::Unicode::VERSION = '0.11';
-}
-
+our $AUTHORITY = 'cpan:AVAR';
+$String::ToIdentifier::EN::Unicode::VERSION = '0.12';
 use strict;
 use warnings;
 use base 'String::ToIdentifier::EN';

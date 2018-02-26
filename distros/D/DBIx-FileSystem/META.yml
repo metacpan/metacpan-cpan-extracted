@@ -1,12 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         DBIx-FileSystem
-version:      1.7
-version_from: FileSystem.pm
-installdirs:  site
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-FileSystem
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    DBI:                           1
-    Test::Simple:                  0.47
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  DBI: '1'
+  Test::Simple: '0.47'
+version: '2.5'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

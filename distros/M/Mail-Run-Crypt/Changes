@@ -3,6 +3,11 @@ Revision history for Perl module Mail::Run::Crypt
 This project began life as a monolithic Perl script. It does much the
 same thing now but it's refactored out into an application and a module.
 
+0.11 2018-02-21
+
+ - Remove unneeded File::Stat dependency
+ - Begin signing distributions with Module::Signature
+
 0.10 2017-12-04
 
  - Switch to translatable shebang for binscript

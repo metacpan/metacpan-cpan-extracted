@@ -18,6 +18,7 @@ lib/PICA/Parser/Plus.pm
 lib/PICA/Parser/XML.pm
 lib/PICA/Path.pm
 lib/PICA/Schema.pm
+lib/PICA/Schema/Builder.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
 lib/PICA/Writer/Generic.pm
@@ -32,6 +33,7 @@ t/20-parser.t
 t/30-writer.t
 t/40-holdings.t
 t/50-schema.t
+t/60-schema-builder.t
 t/author-pod-syntax.t
 t/files/bgb.example
 t/files/dump.dat

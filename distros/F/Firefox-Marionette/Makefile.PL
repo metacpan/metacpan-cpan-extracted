@@ -118,6 +118,7 @@ WriteMakefile(
         'JSON'                => 0,
 	'Config'              => 0,
         'FileHandle'          => 0,
+        'DirHandle'           => 0,
         'File::Temp'          => 0,
         'File::Spec'          => 0,
         'Socket'              => 0,

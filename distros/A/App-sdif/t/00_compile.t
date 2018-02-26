@@ -12,7 +12,6 @@ use_ok $_ for qw(
     App::sdif::debug
     App::sdif::default
     App::sdif::colors
-    App::sdif::osx_autocolor
     App::sdif::autocolor
     App::sdif::autocolor::Apple_Terminal
 

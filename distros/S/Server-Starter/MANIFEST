@@ -32,5 +32,7 @@ t/11-specified-fd.t
 t/12-stop-server.pl
 t/12-stop.t
 t/13-unix-daemonize.t
+t/14-without-port-env.pl
+t/14-without-port.t
 META.yml
 MANIFEST

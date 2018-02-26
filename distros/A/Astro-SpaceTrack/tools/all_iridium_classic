@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use JSON;
 use Pod::Usage;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 my %opt;
 
@@ -111,6 +111,7 @@ my \@all_iridium_classic = (
 EOD
 
     foreach my $body ( @{ $data } ) {
+	$body->[1] =~ s/ ( [0-9]+ ) / $1 + 0 /smxe;
 	print <<"EOD";
     [ $body->[0], '$body->[1]', '$body->[2]', '$body->[3]', $symbolic[$body->[4]] ],
 EOD

@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::WordList;
 
-our $DATE = '2017-12-25'; # DATE
-our $VERSION = '0.051'; # VERSION
+our $DATE = '2018-02-20'; # DATE
+our $VERSION = '0.052'; # VERSION
 
 use 5.014;
 use strict;
@@ -109,13 +109,13 @@ Dist::Zilla::Plugin::WordList - Plugin to use when building WordList::* distribu
 
 =head1 VERSION
 
-This document describes version 0.051 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2017-12-25.
+This document describes version 0.052 of Dist::Zilla::Plugin::WordList (from Perl distribution Dist-Zilla-Plugin-WordList), released on 2018-02-20.
 
 =head1 SYNOPSIS
 
 In F<dist.ini>:
 
- [Bencher::Scenario]
+ [WordList]
 
 =head1 DESCRIPTION
 
@@ -123,6 +123,10 @@ This plugin is to be used when building C<WordList::*> distribution. Currently
 it does the following:
 
 =over
+
+=item * Check that wordlist is sorted
+
+=item * Check that wordlist does not contain any duplicates
 
 =item * Replace C<# STATS> placeholder (which must exist) with word list statistics
 
@@ -152,13 +156,15 @@ L<WordList>
 
 L<Pod::Weaver::Plugin::WordList>
 
+L<Dist::Zilla::Plugin::WordListC>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

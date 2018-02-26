@@ -36,7 +36,7 @@ our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf
 # 6.4.1
@@ -245,7 +245,7 @@ our $include_local = qr/
 			      \s*
 			      include
 			      \s*
-			      "((?:[^"]|\\"))"
+			      "((?:[^"]|\\")+)"
 			  )
 			  (\s|$comment_re)*
 			  $
@@ -258,7 +258,7 @@ our $include = qr/
 			      include
 			      \s*
 			      ["<]
-			      ([a-zA-Z0-9\-]+\.h)
+			      ((?:[^">]|\\")+)
 			      [">]
 			  )
 			  (\s|$comment_re)*

@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.24';
+$Selenium::Remote::Driver::VERSION = '1.26';
 use strict;
 use warnings;
 
@@ -397,6 +397,10 @@ sub _execute_command {
 sub new_session {
     my ( $self, $extra_capabilities ) = @_;
     $extra_capabilities ||= {};
+
+    #XXX chromedriver is broken
+    $FORCE_WD2 = 1 if $self->browser_name eq 'chrome';
+
     my $args = {
         'desiredCapabilities' => {
             'browserName'        => $self->browser_name,
@@ -1727,7 +1731,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.24
+version 1.26
 
 =head1 SYNOPSIS
 
@@ -1914,6 +1918,8 @@ extra_capabilities may? not work, because chromedriver considers the chromeOptio
 Other bindings get around this by just using the 'old' way of passing desired capabilities.  You can do this too like so:
 
     $Selenium::Remote::Driver::FORCE_WD2=1;
+
+This is now forced on during construction for chrome.
 
 =head1 CONSTRUCTOR
 
@@ -3477,7 +3483,7 @@ L<Wight|Wight>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
+https://github.com/teodesian/Selenium-Remote-Driver/issues
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

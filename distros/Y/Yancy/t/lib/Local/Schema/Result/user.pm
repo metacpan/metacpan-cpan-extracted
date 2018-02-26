@@ -9,6 +9,9 @@ __PACKAGE__->add_columns(
     email => {
         is_nullable => 0,
     },
+    password => {
+        is_nullable => 0,
+    },
     access => {
         default_value => 'user',
         extra => {

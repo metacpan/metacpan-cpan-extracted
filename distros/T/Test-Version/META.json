@@ -5,7 +5,7 @@
       "Caleb Cushing <xenoterracide@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -30,12 +30,13 @@
       },
       "develop" : {
          "requires" : {
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
@@ -85,8 +86,9 @@
          "web" : "https://github.com/plicease/test-version"
       }
    },
-   "version" : "2.05",
+   "version" : "2.07",
    "x_contributors" : [
+      "Damyan Ivanov <dmn@debian.org>",
       "Dave Rolsky <autarch@urth.org>",
       "Gabor Szabo <gabor@szabgab.com>",
       "Karen Etheridge <ether@cpan.org>",
@@ -94,6 +96,6 @@
       "Mike Doherty <doherty@cs.dal.ca>",
       "particle <particle@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

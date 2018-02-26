@@ -25,49 +25,49 @@ name: ZMQ-Raw
 provides:
   ZMQ::Raw:
     file: lib/ZMQ/Raw.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Context:
     file: lib/ZMQ/Raw/Context.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Curve:
     file: lib/ZMQ/Raw/Curve.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Error:
     file: lib/ZMQ/Raw/Error.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Loop:
     file: lib/ZMQ/Raw/Loop.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Loop::Event:
     file: lib/ZMQ/Raw/Loop/Event.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Loop::Handle:
     file: lib/ZMQ/Raw/Loop/Handle.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Loop::Promise:
     file: lib/ZMQ/Raw/Loop/Promise.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Loop::Timer:
     file: lib/ZMQ/Raw/Loop/Timer.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Message:
     file: lib/ZMQ/Raw/Message.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Poller:
     file: lib/ZMQ/Raw/Poller.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Proxy:
     file: lib/ZMQ/Raw/Proxy.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Socket:
     file: lib/ZMQ/Raw/Socket.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Timer:
     file: lib/ZMQ/Raw/Timer.pm
-    version: '0.23'
+    version: '0.24'
   ZMQ::Raw::Z85:
     file: lib/ZMQ/Raw/Z85.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -78,7 +78,7 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com//jacquesg/p5-ZMQ-Raw.git
-version: '0.23'
+version: '0.24'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -243,7 +243,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.23
+          tag: v0.24
           tag_format: v%v
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:

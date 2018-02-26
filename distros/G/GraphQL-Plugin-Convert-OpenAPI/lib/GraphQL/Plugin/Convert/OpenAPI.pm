@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use JSON::Validator::OpenAPI;
 use OpenAPI::Client;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -42,7 +42,7 @@ sub _map_args {
   my ($type, $args, $type2info) = @_;
   DEBUG and _debug('OpenAPI._map_args', $type, $args, $type2info);
   die "Undefined type" if !defined $type;
-  return $args if $TYPE2SCALAR{$type} or $type2info->{$type}{is_enum};
+  return $args if $TYPE2SCALAR{$type} or ($type2info->{$type}||{})->{is_enum};
   if (ref $type eq 'ARRAY') {
     # type modifiers
     my ($mod, $typespec) = @$type;
@@ -52,10 +52,27 @@ sub _map_args {
   }
   my $field2prop = $type2info->{$type}{field2prop};
   my $field2type = $type2info->{$type}{field2type};
+  my $field2is_hashpair = $type2info->{$type}{field2is_hashpair};
   +{ map {
-    ($field2prop->{$_} => _map_args(
-      $field2type->{$_}, $args->{$_}, $type2info,
-    ))
+    my $value;
+    if ($field2is_hashpair->{$_}) {
+      my $pairtype = _remove_modifiers($field2type->{$_});
+      my $value_type = $type2info->{$pairtype}{field2type}{value};
+      my $pairs = $args->{$_};
+      my %hashval;
+      for my $pair (@$pairs) {
+        $hashval{$pair->{key}} = _map_args(
+          $value_type, $pair->{value}, $type2info,
+        );
+      }
+      DEBUG and _debug('OpenAPI._map_args(hashpair)', $type, $pairtype, $pairs, $value_type, \%hashval);
+      $value = \%hashval;
+    } else {
+      $value = _map_args(
+        $field2type->{$_}, $args->{$_}, $type2info,
+      );
+    }
+    ($field2prop->{$_} => $value)
   } keys %$args };
 }
 
@@ -405,11 +422,15 @@ sub _kind2name2endpoint {
           $name2type,
           $type2info,
         );
+        my $typename = _remove_modifiers($type);
+        my $is_hashpair = ($type2info->{$typename}||{})->{is_hashpair};
         $type = _make_input(
           $type,
           $name2type,
           $type2info,
         );
+        $type2info->{$pseudo_type}{field2is_hashpair}{$argfield} = $is_hashpair
+          if $is_hashpair;
         $type2info->{$pseudo_type}{field2type}{$argfield} = $type;
         ($argfield => {
           type => _apply_modifier($_->{required} && 'non_null', $type),

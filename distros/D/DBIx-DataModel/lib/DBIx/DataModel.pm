@@ -6,39 +6,29 @@ package DBIx::DataModel;
 use 5.008;
 use warnings;
 use strict;
-use MRO::Compat  (); # don't want to call MRO::Compat::import()
+use version;
+use MRO::Compat;
+use DBIx::DataModel::Meta::Utils qw/does/;
+use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-our $VERSION = '2.46';
+our $VERSION = '3.0';
 
 # compatibility setting : see import()
 our $COMPATIBILITY = $VERSION; # from 2.20, no longer automatic compatibility
 
-# Modules considered to belong to the same family for carp/croak (see L<Carp>).
-# All inner classes import the same list.
-our @CARP_NOT = qw[
-  DBIx::DataModel::Compatibility::V0
-  DBIx::DataModel::Compatibility::V1
-  DBIx::DataModel::ConnectedSource
-  DBIx::DataModel::Meta
-  DBIx::DataModel::Meta::Association
-  DBIx::DataModel::Meta::Path
-  DBIx::DataModel::Meta::Schema
-  DBIx::DataModel::Meta::Source
-  DBIx::DataModel::Meta::Source::Join
-  DBIx::DataModel::Meta::Source::Table
-  DBIx::DataModel::Meta::Type
-  DBIx::DataModel::Meta::Utils
-  DBIx::DataModel::Schema
-  DBIx::DataModel::Schema::Generator
-  DBIx::DataModel::Source
-  DBIx::DataModel::Source::Table
-  DBIx::DataModel::Source::Join
-  DBIx::DataModel::Statement
-  DBIx::DataModel::Statement::JDBC
-  DBIx::DataModel::Statement::Oracle
-  SQL::Abstract
-  SQL::Abstract::More
-];
+sub import {
+  my ($class, %args) = @_;
+  if (exists $args{-compatibility}) {
+    $COMPATIBILITY = $args{-compatibility} # explicit number
+                  || $VERSION;             # undef : means no compatibility
+  }
+
+  require DBIx::DataModel::Compatibility::V1
+    if version->parse($COMPATIBILITY) < version->parse("1.99");
+  require DBIx::DataModel::Compatibility::V0
+    if version->parse($COMPATIBILITY) < version->parse("1.00");
+}
+
 
 sub define_schema {
   my ($class, %params) = @_;
@@ -49,23 +39,12 @@ sub define_schema {
 }
 
 sub Schema { # syntactic sugar for ->define_schema()
-  my ($class, $schema_class_name, %params) = @_;
+  my $class             = shift;
+  my $schema_class_name = shift;
+  my %params  = scalar(@_) == 1 && does($_[0], 'HASH') ? %{$_[0]} : @_;
   my $meta_schema = $class->define_schema(class => $schema_class_name, %params);
   return $meta_schema->class;
 }
-
-
-sub import {
-  my ($class, %args) = @_;
-  if (exists $args{-compatibility}) {
-    $COMPATIBILITY = $args{-compatibility} # explicit number
-                  || $VERSION;             # undef : means no compatibility
-  }
-
-  require DBIx::DataModel::Compatibility::V1 if $COMPATIBILITY < 1.99;
-  require DBIx::DataModel::Compatibility::V0 if $COMPATIBILITY < 1.00;
-}
-
 
 
 1; # End of DBIx::DataModel
@@ -76,24 +55,44 @@ __END__
 
 DBIx::DataModel - UML-based Object-Relational Mapping (ORM) framework
 
+=head1 INTRODUCTION
+
+C<DBIx::DataModel> is a framework for building Perl
+abstractions (classes, objects and methods) that interact
+with relational database management systems (RDBMS).
+Of course the ubiquitous L<DBI|DBI> module is used as
+a basic layer for communicating with databases; on top of that,
+C<DBIx::DataModel> provides facilities for generating SQL queries,
+joining tables automatically, navigating through the results,
+converting values, building complex datastructures and packaging
+the results in various formats.
+
+More explanations are given in the L</DESCRIPTION> section below,
+after the synopsis.
+
 =head1 VERSION
 
-Version 2 of C<DBIx::DataModel> is a major refactoring from versions
-1.*, with a number of incompatible changes in the API (classes
-renamed, arguments renamed or reorganized, etc. -- see
-L<DBIx::DataModel::Doc::Delta_v2>). 
+This is the 3rd generation of C<DBIx::DataModel>. The external
+application programming interface (API) remains fully compatible with
+version 2.0; however the inheritance API has slightly changed and may
+therefore bring some incompatibilities in client classes that inherit
+from C<DBIx::DataModel::Source::Table>.
 
-Initial subversions of the 2.* family included a layer of
-compatibility with version 1.*, so that old applications would
-continue to work (see L<DBIx::DataModel::Compatibility::V1>). Since
-version 2.20, this compatibility layer is no longer loaded
-automatically; however, it can still be added on demand by writing
+Recent changes are documented in L<DBIx::DataModel::Doc::Delta_v3>.
+Older changes are in L<DBIx::DataModel::Doc::Delta_v2>
+and L<DBIx::DataModel::Doc::Delta_v1>.
 
-  use DBIx::DataModel -compatibility => 1.0;
+Compatibility layers with older versions may be
+L<loaded on demand|DBIx::DataModel::Compatibility::V1>.
 
 =head1 SYNOPSIS
 
-=head2 in file "My/Schema.pm"
+This section is a short appetizer on the main features
+of C<DBIx::DataModel>. The first part is about schema declaration;
+the second part is about how to use that schema in database requests.
+
+
+=head2 in file "My/Schema.pm" (schema declaration)
 
 =head3 Schema 
 
@@ -105,7 +104,7 @@ Declare the schema, either in shorthand notation :
 
   DBIx::DataModel->Schema('My::Schema');
 
-or in verbose form : 
+or in verbose form :
 
   DBIx::DataModel->define_schema(
     class => 'My::Schema',
@@ -128,7 +127,7 @@ or to be ignored in every table :
 
 Declare a "column type" with some handlers, either in shorthand notation :
 
-  My::Schema->Type(Date => 
+  My::Schema->Type(Date =>
      from_DB  => sub {$_[0] =~ s/(\d\d\d\d)-(\d\d)-(\d\d)/$3.$2.$1/},
      to_DB    => sub {$_[0] =~ s/(\d\d)\.(\d\d)\.(\d\d\d\d)/$3-$2-$1/},
      validate => sub {$_[0] =~ m/(\d\d)\.(\d\d)\.(\d\d\d\d)/},
@@ -165,7 +164,7 @@ examples of column types :
      to_DB    => sub {$_[0] = join ";", @$_[0] if ref $_[0]},
     });
   
-  # adding SQL type information for the DBD handler
+  # adding type information for the DBD handler to inform Oracle about XML data
   My::Schema->metadm->define_type(
     name     => 'XML',
     handlers => {
@@ -177,9 +176,11 @@ examples of column types :
 
 Declare the tables, either in shorthand notation :
 
-  My::Schema->Table(qw/Employee   T_Employee   emp_id/)
-            ->Table(qw/Department T_Department dpt_id/)
-            ->Table(qw/Activity   T_Activity   act_id/);
+  #                    Perl Class   DB Table     Primary key
+  #                    ==========   ========     ===========
+  My::Schema->Table(qw/Employee     T_Employee   emp_id     /)
+            ->Table(qw/Department   T_Department dpt_id     /)
+            ->Table(qw/Activity     T_Activity   act_id     /);
 
 or in verbose form :
 
@@ -199,8 +200,9 @@ or in verbose form :
     primary_key => 'act_id',
   );
 
-Each table then becomes a Perl class (prefixed with the Schema name,
-i.e. C<My::Schema::Employee>, etc.).
+Each table then becomes a Perl class prefixed with the Schema name,
+i.e. C<My::Schema::Employee>, etc.
+
 
 =head3 Column types within tables
 
@@ -221,8 +223,8 @@ shorthand notation :
   #                           =====      ====     ============  ====
   My::Schema->Composition([qw/Employee   employee   1           emp_id /],
                           [qw/Activity   activities *           emp_id /])
-            ->Association([qw/Department department 1           /],
-                          [qw/Activity   activities *           /]);
+            ->Association([qw/Department department 1                  /],
+                          [qw/Activity   activities *                  /]);
 
 
 or in verbose form :
@@ -256,7 +258,7 @@ or in verbose form :
     },
   );
 
-Declare a n-to-n association, on top of the linking table
+Declare a n-to-n association
 
   My::Schema->Association([qw/Department departments * activities department/],
                           [qw/Employee   employees   * activities employee/]);
@@ -280,12 +282,12 @@ Declare a n-to-n association, on top of the linking table
 
 
 
-=head3 Additional methods
+=head3 Adding methods into the generated classes
 
 For details that could not be expressed in a declarative way,
 just add a new method into the table class :
 
-  package My::Schema::Activity; 
+  package My::Schema::Activity;
   
   sub active_period {
     my $self = shift;
@@ -310,9 +312,9 @@ See L<DBIx::DataModel::Schema::Generator>.
 
 
 
-=head2 in file "myClient.pl"
+=head2 in file "my_client.pl" (schema usage)
 
-=head3 Database connection
+=head3 Connecting the schema to the database
 
   use My::Schema;
   use DBI;
@@ -324,10 +326,10 @@ See L<DBIx::DataModel::Schema::Generator>.
 =head3 Simple data retrieval
 
 Search employees whose name starts with 'D'
-(select API is taken from L<SQL::Abstract>)
+(the select API is taken from L<SQL::Abstract::More>)
 
   my $empl_D = My::Schema->table('Employee')->select(
-    -where => {lastname => {-like => 'D%'}}
+    -where => {lastname => {-like => 'D%'}},
   );
 
 idem, but we just want a subset of the columns, and order by age.
@@ -335,28 +337,34 @@ idem, but we just want a subset of the columns, and order by age.
   my $empl_F = My::Schema->table('Employee')->select(
     -columns  => [qw/firstname lastname d_birth/],
     -where    => {lastname => {-like => 'F%'}},
-    -order_by => 'd_birth'
+    -order_by => 'd_birth',
   );
 
-Print some info from employees. Because of the
-'from_DB' handler associated with column type 'date', column 'd_birth'
-has been automatically converted to display format.
+Print some info from employees.
 
   foreach my $emp (@$empl_D) {
     print "$emp->{firstname} $emp->{lastname}, born $emp->{d_birth}\n";
   }
 
+As demonstrated here, each database row is just a Perl hashref, with
+database columns as hash keys (unlike most other ORMs where columns
+are accessed through method calls).
+
+Column 'd_birth' is directly printable because it
+has been automatically converted to the appropriate format
+through the 'from_DB' handler associated with column type 'date'.
+
 
 =head3 Methods to follow joins
 
-Follow the joins through role methods
+Follow the joins through path methods
 
   foreach my $act (@{$emp->activities}) {
     printf "working for %s from $act->{d_begin} to $act->{d_end}", 
       $act->department->{name};
   }
 
-Role methods can take arguments too, like C<select()>
+Path methods can take arguments too, like C<select()>
 
   my $recent_activities
     = $dpt->activities(-where => {d_begin => {'>=' => '2005-01-01'}});
@@ -371,7 +379,8 @@ a data tree in memory; then remove all class information and
 export that tree.
 
   $_->expand('activities') foreach @$empl_D;
-  my $export = My::Schema->unbless({employees => $empl_D});
+  My::Schema->unbless($empl_D);
+  my $export = {employees => $empl_D};
   use Data::Dumper; print Dumper ($export); # export as PerlDump
   use XML::Simple;  print XMLout ($export); # export as XML
   use JSON;         print to_json($export); # export as Javascript
@@ -384,8 +393,7 @@ encounter a blessed reference.
 
 =head3 Database join
 
-Select associated tables directly from a database join, 
-in one single SQL statement (instead of iterating through role methods).
+Select columns from several tables through a database join
 
   my $lst = My::Schema->join(qw/Employee activities department/)
                       ->select(-columns => [qw/lastname dept_name d_begin/],
@@ -399,7 +407,7 @@ Same thing, but forcing INNER joins
 
 =head3 Statements and pagination
 
-Instead of retrieving directly a list or records, get a
+Instead of retrieving directly a list of records, get a
 L<statement|DBIx::DataModel::Statement> :
 
   my $statement 
@@ -436,7 +444,7 @@ Go to a specific page and retrieve the corresponding rows
 For fetching related rows : prepare a statement before the loop, execute it
 at each iteration.
 
-  my $statement = $schema->table($name)->join(qw/role1 role2/);
+  my $statement = $schema->table($name)->join(qw/path1 path2/);
   $statement->prepare(-columns => ...,
                       -where   => ...);
   my $list = $schema->table($name)->select(...);
@@ -449,7 +457,7 @@ at each iteration.
 
 Fast statement : each data row is retrieved into the same
 memory location (avoids the overhead of allocating a hashref
-for each row). Faster, but such rows cannot be accumulated
+for each row). This is faster, but such rows cannot be accumulated
 into an array (they must be used immediately) :
 
   my $fast_stmt = ..->select(..., -result_as => "fast_statement");
@@ -457,149 +465,136 @@ into an array (they must be used immediately) :
     do_something_immediately_with($row);
   }
 
+
+=head3 Other kinds of results
+
+  my $json = $source->select(..., -result_as => 'json');
+  my $yaml = $source->select(..., -result_as => 'yaml');
+  my $tree = $source->select(..., -result_as => [categorize => ($key1, $key2)]);
+  $source->select(..., -result_as => [tsv  => $name_of_tab_separated_file]);
+  $source->select(..., -result_as => [xlsx => $name_of_Excel_file]);
+  ...
+
+
 =head3 Insert
 
   my $table = $schema->table($table_name);
 
-  #  If you provide the primary key (called 'my_code' in this example):
-  $table->insert({my_code => $pk_val, field1 => $val1, field2 => $val2, ...});
+  # if the primary key is supplied by the client
+  $table->insert({pk_column => $pk_val, col1 => $val1, col2 => $val2, ...});
 
-  #  If your database provides the primary key:
-  my $id = $table->insert({field1 => $val1, field2 => $val2, ...});
+  # if the primary key is generated by the database
+  my $id = $table->insert({col1 => $val1, col2 => $val2, ...});
   #  This assumes your DBD driver implements last_insert_id.
-  #  If not, you can provide one as an option to the schema.
 
-  #  Insert multiple records using a list of arrayrefs.
-  #  First arrayref defines column names
-  $table->insert(
-                  [qw/  field1  field2  /],
+  # insert multiple records using a list of arrayrefs -- first arrayref 
+  # defines column names
+  $table->insert( [qw/  col1    col2    /],
                   [qw/  val11   val12   /],
-                  [qw/  val22   val22   /],
-                );
+                  [qw/  val22   val22   /], );
 
-  #  Or just insert a list of hashes
+  # alternatively, insert multiple records expressed as a list of hashes
   $table->insert(
-      {field1 => val11, field2 => val12},
-      {field2 => val21, field2 => val22},
+      {col1 => val11, col2 => val12},
+      {col1 => val21, col2 => val22},
   );
 
-  # insertion through the association Employee - Activity
+  # insert into a related table (the foreign key will be filled automatically)
   $an_employee->insert_into_activities({d_begin => $today,
                                         dpt_id  => $dpt});
 
+
 =head3 Update
 
-  # update on a set of fields, primary key included
+  # update on a set of columns, primary key included
   my $table = $schema->table($table_name);
-  $table->update({pk_field => $pk, field1 => $val1, field2 => $val2, ...});
+  $table->update({pk_column => $pk, col1 => $val1, col2 => $val2, ...});
 
-  # update on a set of fields, primary key passed separately
-  $table->update(@primary_key, {field1 => $val1, field2 => $val2, ...});
+  # update on a set of columns, primary key passed separately
+  $table->update(@primary_key, {col1 => $val1, col2 => $val2, ...});
 
-  # bulk update
-  $table->update(-set   => {field1 => $val1, field2 => $val2, ...},
+  # update all records matching some condition
+  $table->update(-set   => {col1 => $val1, col2 => $val2, ...},
                  -where => \%condition);
 
-  # invoking instances instead of table classes
-  $obj->update({field1 => $val1, ...}); # updates specified fields
-  $obj->update;                         # updates all fields stored in memory
+  # update() invoked as instance method instead of class method
+  $obj->update({col1 => $val1, ...}); # updates specified columns
+  $obj->update;                       # updates all columns stored in memory
 
 
 =head3 Delete
 
-  # invoking a table class
+  # delete() as class method
   my $table = $schema->table($table_name);
   $table->delete(@primary_key);
 
-  # invoking an instance
+  # delete all records matching some condition
+  $table->delete(-where => \%condition);
+
+  # delete() as instance method
   $obj->delete;
 
 
 =head1 DESCRIPTION
 
-=head2 Introduction
-
-C<DBIx::DataModel> is a framework for building Perl
-abstractions (classes, objects and methods) that interact
-with relational database management systems (RDBMS).  
-Of course the ubiquitous L<DBI|DBI> module is used as
-a basic layer for communicating with databases; on top of that,
-C<DBIx::DataModel> provides facilities for generating SQL queries,
-joining tables automatically, navigating through the results,
-converting values, and building complex datastructures so that other
-modules can conveniently exploit the data.
-
 =head2 Perl ORMs
 
 There are many other CPAN modules offering 
 somewhat similar features, like
-L<Class::DBI|Class::DBI>,
 L<DBIx::Class|DBIx::Class>,
-L<Tangram|Tangram>,
 L<Rose::DB::Object|Rose::DB::Object>,
 L<Jifty::DBI|Jifty::DBI>,
 L<Fey::ORM|Fey::ORM>,
-just to name a few well-known alternatives.
+just to name a few ...
+there is more than one way to do it!
 Frameworks in this family are called
 I<object-relational mappings> (ORMs)
 -- see L<http://en.wikipedia.org/wiki/Object-relational_mapping>.
-The mere fact that Perl ORMs are so numerous demonstrates that there is
-more than one way to do it!
 
-For various reasons, none of these did fit nicely in my context, 
-so I decided to write C<DBIx:DataModel>. 
-Of course there might be also some reasons why C<DBIx:DataModel>
-will not fit in I<your> context, so just do your own shopping.
-Comparing various ORMs is complex and time-consuming, because
-of the many issues and design dimensions involved; as far as I know,
-there is no thorough comparison summary, but here are some pointers :
-
-=over
-
-=item * 
-
-general discussion on RDBMS - Perl 
-mappings at L<http://poop.sourceforge.net> (good but outdated).
-
-=item *
-
-L<http://www.perlfoundation.org/perl5/index.cgi?orm>
-
-=item *
-
-L<http://osdir.com/ml/lang.perl.modules.dbi.rose-db-object/2006-06/msg00021.html>, a detailed comparison between Rose::DB and DBIx::Class.
-
-=back
 
 =head2 Strengths of C<DBIx::DataModel>
 
-The L<DESIGN|DBIx::DataModel::Doc::Design> chapter of this 
-documentation will help you understand the philosophy of
-C<DBIx::DataModel>. Just as a summary, here are some
-of its strong points :
+The L<DESIGN|DBIx::DataModel::Doc::Design> chapter of this
+documentation explains the main design decisions of
+C<DBIx::DataModel>. Some of the strong points are :
 
 =over
 
 =item *
 
-Centralized, UML-style declaration of tables and relationships 
-(instead of many files with declarations such as 'has_many', 'belongs_to', 
+centralized, UML-style declaration of tables and relationships
+(instead of many files with declarations such as 'has_many', 'belongs_to',
 etc.)
 
 =item *
 
-efficiency through fine control of collaboration with the DBI layer
+limited coupling with the database schema : there is no need to declare
+every column of every table; C<DBIx::DataModel> only needs to know
+about tables, associations, primary keys and foreign keys
+
+=item *
+
+exposure of database operations like joins, bulk updates, subqueries,
+etc.  The database is not hidden behind object-oriented programming
+concepts, as some other ORMs try to do, but rather made to explicitly
+collaborate with the object-oriented layer.
+
+=item *
+
+efficiency through a very lightweight infrastructure (row objects
+are just blessed hashrefs) and through
+fine tuning of interaction with the DBI layer
 (prepare/execute, fetch into reusable memory location, etc.)
 
 =item *
 
-uses L<SQL::Abstract::More> for an improved API
+usage of L<SQL::Abstract::More> for an improved API
 over L<SQL::Abstract> (named parameters, additional clauses,
 simplified 'order_by', support for values with associated datatypes, etc.)
 
 =item *
 
-clear conceptual distinction between 
+clear conceptual distinction between
 
 =over
 
@@ -621,13 +616,10 @@ data rows            (lightweight hashrefs containing nothing but column
 
 =item *
 
-joins with simple syntax and possible override of default 
-INNER JOIN/LEFT JOIN properties; instances of joins multiply
-inherit from their member tables.
-
-=item *
-
-named placeholders
+simple syntax for joins, with the possibility to override default
+INNER JOIN/LEFT JOIN properties, and with clever usage of Perl
+multiple inheritance for simultaneous access to the methods of all
+tables that participate in that join
 
 =item *
 
@@ -641,14 +633,11 @@ more costly in memory)
 
 =back
 
-C<DBIx::DataModel> is used in production
-within a mission-critical application with several hundred
-users, for managing Geneva courts of law.
-
 
 =head2 Limitations
 
-Here are some current limitations of C<DBIx::DataModel> :
+Here are some limitations of C<DBIx::DataModel>, in comparison
+with other Perl ORMs :
 
 =over
 
@@ -670,22 +659,9 @@ explicitly manage C<insert> and C<update> operations.
 =item no 'cascaded update' nor 'insert or update'
 
 Cascaded inserts and deletes are supported, but not cascaded updates.
-This would need 'insert or update', which at the moment is not
-supported either.
+This would need 'insert or update', which is not supported.
 
 =back
-
-=head2 Backwards compatibility
-
-Major version 2.0 and 1.0 introduced some incompatible
-changes in the architecture 
-(see L<DBIx::DataModel::Doc::Delta_v2>
- and L<DBIx::DataModel::Doc::Delta_v1>).
-
-Compatibility layers can be loaded on demand by supplying
-the desired version number upon loading C<DBIx::DataModel> :
-
-  use DBIx::DataModel 2.0 -compatibility => 0.8;
 
 
 =head1 INDEX TO THE DOCUMENTATION
@@ -693,7 +669,7 @@ the desired version number upon loading C<DBIx::DataModel> :
 Although the basic principles are quite simple, there are many
 details to discuss, so the documentation is quite long.
 In an attempt to accomodate for different needs of readers,
-it has been structured as follows :
+the documentation has been structured as follows :
 
 =over
 
@@ -704,10 +680,11 @@ architecture of C<DBIx::DataModel>, its main distinctive features and
 the motivation for such features; it is of interest if you are
 comparing various ORMs, or if you want to globally understand
 how C<DBIx::DataModel> works, and what it can or cannot do.
-This chapter also details the concept of B<statements>, which
-underlies all SELECT requests to the database.
+This chapter also details the concept of 
+L<statements|DBIx::DataModel::Doc::Glossary/"STATEMENT OBJECTS">.
 
-=item * 
+
+=item *
 
 The L<QUICKSTART|DBIx::DataModel::Doc::Quickstart> chapter
 is a guided tour that 
@@ -723,10 +700,8 @@ manipulation methods.
 
 =item *
 
-The L<MISC|DBIx::DataModel::Doc::Misc> chapter discusses
-how this framework interacts with its context
-(Perl namespaces, DBI layer, etc.), and
-how to work with self-referential associations.
+The L<COOKBOOK|DBIx::DataModel::Doc::Cookbook> chapter
+provides some recipes for common ORM tasks.
 
 =item *
 
@@ -744,9 +719,10 @@ implement these terms.
 
 =item *
 
-The L<DELTA_v2|DBIx::DataModel::Doc::Delta_v2>
+The L<DELTA_v3|DBIx::DataModel::Doc::Delta_v3>,
+L<DELTA_v2|DBIx::DataModel::Doc::Delta_v2>
 and L<DELTA_v1|DBIx::DataModel::Doc::Delta_v1> chapters
-summarize the differences with previous versions.
+summarize the differences between major versions.
 
 
 =item *
@@ -756,12 +732,6 @@ documentation explains how to automatically generate a schema from
 a C<DBI> connection, from a L<SQL::Translator|SQL::Translator> description
 or from an existing C<DBIx::Class|DBIx::Class> schema.
 
-=item *
-
-The L<DBIx::DataModel::Statement|DBIx::DataModel::Statement>
-documentation documents the methods of 
-statements (not included in the 
-general L<REFERENCE|DBIx::DataModel::Doc::Reference> chapter).
 
 =back
 
@@ -771,8 +741,8 @@ L<http://www.slideshare.net/ldami/dbix-datamodel-endetail>
 =head1 SIDE-EFFECTS
 
 Upon loading, L<DBIx::DataModel::Join> adds a coderef
-into global C<@INC> (see L<perlfunc/require>), so that it can take 
-control and generate a class on the fly when retrieving frozen
+into global C<@INC> (see L<perlfunc/require>), so that it can
+generate a class on the fly when retrieving frozen
 objects from L<Storable/thaw>. This should be totally harmless unless
 you do some very special things with C<@INC>.
 
@@ -782,9 +752,6 @@ you do some very special things with C<@INC>.
 Bugs should be reported via the CPAN bug tracker at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-DataModel>.
 
-There is a discussion group at 
-L<http://groups.google.com/group/dbix-datamodel>.
-
 Sources are stored in an open repository at
 L<http://github.com/damil/DBIx-DataModel>.
 
@@ -792,7 +759,7 @@ L<http://github.com/damil/DBIx-DataModel>.
 
 =head1 AUTHOR
 
-Laurent Dami, E<lt>laurent.dami AT etat  ge  chE<gt>
+Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -804,13 +771,12 @@ Thanks to
   Alex Solovey
   Sergiy Zuban
 
-who contributed with ideas, bug fixes and/or
-improvements.
+who contributed with ideas, bug fixes and/or improvements.
 
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2006-2013 by Laurent Dami.
+Copyright 2005-2018 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

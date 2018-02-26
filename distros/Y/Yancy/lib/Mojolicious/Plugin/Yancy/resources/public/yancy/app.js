@@ -232,6 +232,11 @@ var app = new Vue({
             }
         },
 
+        setCollection: function ( name ) {
+            this.currentCollection = name;
+            $( '#sidebar-collapse' ).collapse('hide');
+        },
+
         fetchSpec: function () {
             var self = this;
             delete self.error.fetchSpec;
@@ -349,10 +354,20 @@ var app = new Vue({
                     limit: this.perPage,
                     offset: this.perPage * ( this.currentPage - 1 )
                 };
+
             this.fetching = true;
             delete this.error.fetchPage;
             $.get( coll.operations["list"].url, paging ).done(
                 function ( data, status, jqXHR ) {
+                    if ( paging.offset > data.total ) {
+                        // We somehow got to a page that doesn't exist,
+                        // so go to the first page instead
+                        self.fetching = false;
+                        self.currentPage = 1;
+                        self.fetchPage();
+                        return;
+                    }
+
                     self.rows = data.rows;
                     self.total = data.total;
                     self.columns = self.getListColumns( self.currentCollection ),
@@ -499,6 +514,10 @@ var app = new Vue({
         },
 
         showAddItem: function () {
+            if ( this.addingItem ) {
+                this.cancelAddItem();
+                return;
+            }
             this.toggleRow();
             this.newItem = this.createBlankItem();
             this.addingItem = true;

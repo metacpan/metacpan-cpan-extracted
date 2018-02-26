@@ -1,5 +1,5 @@
 package WebService::Braintree::Gateway;
-$WebService::Braintree::Gateway::VERSION = '1.0';
+$WebService::Braintree::Gateway::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -18,6 +18,9 @@ my %gateways = (
   customer => 'Customer',
   discount => 'Discount',
   dispute => 'Dispute',
+  document_upload => 'DocumentUpload',
+  europe_bank_account => 'EuropeBankAccount',
+  ideal_payment => 'IdealPayment',
   merchant => 'Merchant',
   merchant_account => 'MerchantAccount',
   payment_method => 'PaymentMethod',
@@ -28,6 +31,7 @@ my %gateways = (
   subscription => 'Subscription',
   transaction => 'Transaction',
   transparent_redirect => 'TransparentRedirect',
+  us_bank_account => 'UsBankAccount',
   webhook_notification => 'WebhookNotification',
   webhook_testing => 'WebhookTesting',
 );

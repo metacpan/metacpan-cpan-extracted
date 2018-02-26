@@ -1,17 +1,19 @@
 package # hide from pause
   MyModule;
+use strict;
+use warnings;
 
 use base 'Class::C3::Componentised';
 
 sub component_base_class { "MyModule::Plugin" }
 
-sub message { 
+sub message {
   my $msg = $_[0]->maybe::next::method() || '';
-  
+
   return $msg . ' ' . __PACKAGE__;
 }
 
-sub new { 
+sub new {
   return bless {}, shift;
 }
 

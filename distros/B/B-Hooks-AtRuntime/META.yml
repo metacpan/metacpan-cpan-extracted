@@ -20,7 +20,7 @@ name: B-Hooks-AtRuntime
 provides:
   B::Hooks::AtRuntime:
     file: lib/B/Hooks/AtRuntime.pm
-    version: '5'
+    version: '6'
 requires:
   Exporter::Tiny: '0'
   Filter::Util::Call: '0'
@@ -31,4 +31,4 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=B-Hooks-AtRuntime
   license: http://opensource.org/licenses/bsd-license.php
   repository: http://github.com/mauzo/B-Hooks-AtRuntime
-version: '5'
+version: '6'

@@ -5,7 +5,7 @@ use DBI;
 use Carp;
 use vars qw($VERSION $err $errstr $state $drh);
 
-$VERSION = '0.12';
+$VERSION = '0.13';
 $VERSION = $VERSION;
 $err = 0;
 $errstr = '';
@@ -673,6 +673,8 @@ sub DESTROY
 1;
 __END__
 
+=pod
+
 =head1 NAME
 
 DBD::mysqlPPrawSjis - Pure Perl MySQL driver for raw ShiftJIS
@@ -907,9 +909,8 @@ I<UPDATE>.
 To install this module type the following:
 
    perl Makefile.PL
-   make.bat install
-   make.bat test
-   perl mysql_sjistest.pl
+   make test
+   make install
 
 =head1 SUPPORT OPERATING SYSTEM
 
@@ -1224,11 +1225,11 @@ L<Net::MySQL>, L<DBD::mysql>, L<Sjis>
 Hiroyuki OYAMA E<lt>oyama@module.jpE<gt>
 INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2002-2011 Hiroyuki OYAMA. Japan. All rights reserved.
 Copyright (C) 2011 Takuya Tsuchida
-ShiftJIS support 2005,2008,2009,2011 INABA Hitoshi
+ShiftJIS support 2005,2008,2009,2011,2018 INABA Hitoshi
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

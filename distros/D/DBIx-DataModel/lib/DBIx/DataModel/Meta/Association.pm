@@ -3,17 +3,16 @@ use strict;
 use warnings;
 use parent "DBIx::DataModel::Meta";
 use DBIx::DataModel;
-use DBIx::DataModel::Meta::Utils;
+use DBIx::DataModel::Meta::Utils qw/define_method define_readonly_accessors/;
 
-use Carp;
-use Params::Validate qw/validate SCALAR ARRAYREF HASHREF OBJECT UNDEF/;
+use Carp::Clan       qw[^(DBIx::DataModel::|SQL::Abstract)];
+use Params::Validate qw/validate_with SCALAR ARRAYREF HASHREF OBJECT UNDEF/;
 use List::MoreUtils  qw/pairwise/;
 use Scalar::Util     qw/weaken dualvar looks_like_number/;
 use Module::Load     qw/load/;
 use POSIX            qw/LONG_MAX/;
 use namespace::clean;
 
-{no strict 'refs'; *CARP_NOT = \@DBIx::DataModel::CARP_NOT;}
 
 # specification for parameters to new()
 my $association_spec = {
@@ -41,13 +40,21 @@ my $association_end_spec = {
 sub new {
   my $class = shift;
 
-  my $self = validate(@_, $association_spec);
+  my $self = validate_with(
+    params      => \@_,
+    spec        => $association_spec,
+    allow_extra => 0,
+   );
 
   # work on both association ends (A and  B)
   for my $letter (qw/A B/) {
     # parse parameters for this association end
     my @letter_params = %{$self->{$letter}};
-    my $assoc_end = validate(@letter_params, $association_end_spec);
+    my $assoc_end = validate_with(
+      params      => \@letter_params,
+      spec        => $association_end_spec,
+      allow_extra => 0,
+     );
 
     croak "join_cols is present but empty"
       if $assoc_end->{join_cols} && !@{$assoc_end->{join_cols}};
@@ -110,9 +117,7 @@ sub new {
 
 
 # accessor methods
-DBIx::DataModel::Meta::Utils->define_readonly_accessors(
-  __PACKAGE__, qw/schema name kind path_AB path_BA/,
-);
+define_readonly_accessors(__PACKAGE__, qw/schema name kind path_AB path_BA/);
 
 
 #----------------------------------------------------------------------
@@ -208,7 +213,7 @@ sub _install_path {
     };
 
     # define the method
-    DBIx::DataModel::Meta::Utils->define_method(
+    define_method(
       class => $self->{$from}{table}{class},
       name  => $method_name,
       body  => $method_body,

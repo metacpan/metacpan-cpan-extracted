@@ -1,5 +1,13 @@
 Revision history for git-workflow-tools
 
+1.0.4   2018-02-26
+        Updating for release of version 1.0.4
+        Added perl 5.26 to travis (Ivan Wills)
+        Update date (Ivan Wills)
+        Added the ability to support git flowy style branches (eg feature/...) (Ivan Wills)
+        Removed executable bits (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 1.0.3   2017-10-03
         Updating for release of version 1.0.3
         Adding new files to tests (Ivan Wills)

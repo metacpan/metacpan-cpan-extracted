@@ -8,7 +8,8 @@ no strict 'refs';
 use parent      qw/DBIx::DataModel::Statement/;
 use mro         qw/c3/;
 use DBD::Oracle 1.62 qw/:ora_fetch_orient :ora_exe_modes/;
-use Carp;
+use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
+
 
 sub sqlize {
   my ($self, @args) = @_;
@@ -103,7 +104,8 @@ from L<DBIx::DataModel::Statement> in order to take advantage
 of L<DBD::Oracle/"Scrollable Cursor Methods">.
 
 This is interesting for applications that need to do pagination
-within result sets, because Oracle has no support for LIMIT/OFFSET in SQL.
+within result sets, because Oracle prior to version 12 had
+no support for LIMIT/OFFSET in SQL.
 So here we use some special methods of the Oracle driver to jump
 to a specific row within a resultset, and then extract a limited
 number of rows.

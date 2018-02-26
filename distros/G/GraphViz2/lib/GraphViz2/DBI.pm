@@ -29,7 +29,7 @@ has dbh =>
 
 has graph =>
 (
-	default  => sub{return {} },
+	default  => sub{return '' },
 	is       => 'rw',
 	#isa     => 'GraphViz2',
 	required => 0,
@@ -67,7 +67,7 @@ has type =>
 	required => 0,
 );
 
-our $VERSION = '2.46';
+our $VERSION = '2.47';
 
 # -----------------------------------------------
 

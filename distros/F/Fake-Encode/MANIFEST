@@ -1,10 +1,10 @@
 lib/Fake/Encode.pm
-lib/Test/Simply.pm
 Changes
 Makefile.PL
-pMakefile.PL
+pmake.bat
 MANIFEST
 README
 META.yml
+LICENSE
 t/001_encode.t
 t/002_decode.t

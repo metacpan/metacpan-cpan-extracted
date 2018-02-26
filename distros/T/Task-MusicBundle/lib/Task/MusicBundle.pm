@@ -5,7 +5,7 @@ BEGIN {
 # ABSTRACT: A bundle of MIDI and music modules
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 1;
 
 __END__
@@ -20,7 +20,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,8 @@ L<Csound>
 
 L<MIDI>
 
+L<MIDI::Drummer::Tiny>
+
 L<MIDI::Morph> - Jun 04, 2005
 
 L<MIDI::Pitch> - Nov 30, 2005
@@ -96,11 +98,19 @@ L<Music::Gestalt> - Jul 13, 2005
 
 L<Music::Harmonics> - May 11, 2005
 
+L<Music::Interval::Barycentric>
+
 L<Music::Intervals>
 
 L<Music::LilyPondUtil>
 
 L<Music::NeoRiemannianTonnetz>
+
+L<Music::Note::Frequency>
+
+L<Music::Note::Role::Operators>
+
+L<Music::PitchNum>
 
 L<Music::RecRhythm>
 
@@ -113,6 +123,8 @@ L<Music::Tempo> - Aug 08, 2003
 L<Music::Tension>
 
 L<Music::VoiceGen>
+
+L<Music::Voss>
 
 L<Text::Chord::Piano>
 

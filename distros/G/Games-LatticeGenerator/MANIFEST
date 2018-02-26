@@ -1,0 +1,22 @@
+Changes
+lib/Games/LatticeGenerator.pm
+lib/Games/LatticeGenerator/ObjectDescribedByFacts.pm
+lib/Games/LatticeGenerator/ObjectWithName.pm
+lib/Games/LatticeGenerator/Geometry/Point.pm
+lib/Games/LatticeGenerator/Geometry/Stretch.pm
+lib/Games/LatticeGenerator/Geometry/Polygon.pm
+lib/Games/LatticeGenerator/Geometry/Quadrangle.pm
+lib/Games/LatticeGenerator/Geometry/Trapezoid.pm
+lib/Games/LatticeGenerator/Geometry/IsoscelesTrapezoid.pm
+lib/Games/LatticeGenerator/Geometry/Solid.pm
+lib/Games/LatticeGenerator/Model.pm
+lib/Games/LatticeGenerator/Model/Spaceship.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

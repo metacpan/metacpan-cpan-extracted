@@ -5,7 +5,7 @@ plugin 'PkgConfig' => 'raylib';
 share {
     plugin Download => (
         url => 'https://github.com/raysan5/raylib/archive/'
-             . '468309d06c7ac3e3278057cfb1cfc19b332833bf'
+             . '788049df093a0e3df0c2d5aef19502cca2de3462'
              . '.tar.gz'
     );
 
@@ -13,8 +13,9 @@ share {
     plugin 'Build::CMake';
 
     build [
-        [ '%{cmake}', -G => '%{cmake_generator}', '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
-          '-DSHARED_RAYLIB=ON', '-DSTATIC_RAYLIB=ON',
+        [ '%{cmake}', -G => '%{cmake_generator}',
+          '-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON', '-DWITH_PIC=ON',
+          '-DSHARED=ON', '-DSTATIC=ON',
           '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
           '-DBUILD_EXAMPLES=OFF', '-DBUILD_GAMES=OFF', '.'],
 

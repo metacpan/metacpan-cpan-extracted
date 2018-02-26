@@ -1,5 +1,14 @@
 Release history for Markdown-Pod
 
+0.007     2018-02-24 17:58:42+09:00 Asia/Seoul
+    - [GitHub #7] Fix nested list converting bug (ZMUGHAL)
+      - Add extra newline when starting a nested list
+      - Reported-by: JMAC, olafhering
+    - [GitHub #8] Markdent v0.27 uses Specio for types (ZMUGHAL)
+      - Fixes an installation error that occurs when using the version
+        v0.27 or later of Markdent using Specio
+      - Reported-by: markwilkinson, rsrpsinr
+
 0.006     2015-02-22 17:41:28+09:00 Asia/Seoul
     - [GitHub #6] Use a stack to handle styles inside other styles (ZMUGHAL)
     - [GitHub #5] Smarter use of code formatting (ZMUGHAL)

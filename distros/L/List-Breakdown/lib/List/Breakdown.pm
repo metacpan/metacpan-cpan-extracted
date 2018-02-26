@@ -1,4 +1,3 @@
-## no critic (RequirePODUseEncodingUTF8)
 package List::Breakdown;
 
 # Force me to write this properly
@@ -17,7 +16,7 @@ use base qw(Exporter);    ## no critic (ProhibitUseBase)
 our @EXPORT_OK = 'breakdown';
 
 # Specify package version
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 # Dispatch table of functions to handle different ref types for the spec
 # hashref's values
@@ -104,7 +103,7 @@ List::Breakdown - Build sublist structures matching conditions
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =head1 SYNOPSIS
 

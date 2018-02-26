@@ -7,6 +7,10 @@
 
 # .git
 \B\.git\b
+\B\.gitignore\b
+\B\.travis.yml\b
+\bMYMETA\.json\b
+\bMYMETA\.yml\b
 
 #!start included C:\Perl\lib\ExtUtils\MANIFEST.SKIP
 # Avoid version control files.

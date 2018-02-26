@@ -1,3 +1,24 @@
+1.41 (2018-02-24)
+  [ Damyan Ivanov ]
+  * mark not released versions as 'Not Released' to make Test::CPAN::Changes
+    happy
+  * add a test ensuring the current release has an entry in Changes
+  * webhook: fix accounting the `use_irc_notices` option
+
+  [ gregor herrmann ]
+  * fix a typo in POD
+
+1.40 (2018-02-20)
+  [ Damyan Ivanov ]
+  * webhook/push:
+    + fix the compare URL when squashing branch updates
+    + change the default for squash_threshold from 4 to 20
+
+1.39 (2018-02-19)
+  [ Damyan Ivanov ]
+  * webhook/push: handle the case when the author is not the person pushing the
+    branch
+
 1.38 (2018-02-17)
   [ Damyan Ivanov ]
   * webhok/tag_push:
@@ -432,7 +453,7 @@
   * add tests for simulated IRC output
 1.12 (2011-08-13)
   * Updated META.*
-1.11 (no public release)
+1.11 (Not Released)
   * test creation of brand new, orphan branch
   * fix: no warnings when commits have no author
   * bot: log repository on authentication failure
@@ -445,7 +466,7 @@
   * add a Perl::Critic test for conditional declarations
   * bot: do not answer back if no answers are configured
   * rate-lmit autoresponses
-1.09 (no official release)
+1.09 (Not Released)
   [ Damyan Ivanov ]
   * Skip some tests when required SVN::* or Git modules are unavailable
   * Fix dist_name from App::KGB to App-KGB
@@ -488,7 +509,7 @@
 1.03 (2010-04-28)
   * Synchronized versions of kgb-bot and KGB
 
-1.02 (no official release)
+1.02 (Not Released)
   * Protocol v2
     + Adds a new parameter, revision prefix, which is printed plain before the
       bold commit ID

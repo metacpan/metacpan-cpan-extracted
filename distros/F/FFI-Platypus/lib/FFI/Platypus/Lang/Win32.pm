@@ -5,7 +5,7 @@ use warnings;
 use Config;
 
 # ABSTRACT: Documentation and tools for using Platypus with the Windows API
-our $VERSION = '0.47'; # VERSION
+our $VERSION = '0.48'; # VERSION
 
 
 sub abi
@@ -187,7 +187,7 @@ FFI::Platypus::Lang::Win32 - Documentation and tools for using Platypus with the
 
 =head1 VERSION
 
-version 0.47
+version 0.48
 
 =head1 SYNOPSIS
 
@@ -244,6 +244,12 @@ Fitz Elliott (felliott)
 Vickenty Fesunov (vyf)
 
 Gregor Herrmann (gregoa)
+
+Shlomi Fish (shlomif)
+
+Damyan Ivanov
+
+Ilya Pavlov (Ilya33)
 
 =head1 COPYRIGHT AND LICENSE
 

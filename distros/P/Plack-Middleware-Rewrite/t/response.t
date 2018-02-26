@@ -3,9 +3,10 @@ use warnings;
 
 use Plack::Test;
 use Plack::Builder;
-use Test::More 0.88; # for done_testing
+use Test::More tests => 10;
 use HTTP::Request::Common;
 
+my $status;
 my $content = 'blah' x 8;
 my $app = sub { [ 200, [ 'Content-Type' => 'text/plain' ], [ $content ] ] };
 
@@ -15,6 +16,8 @@ $app = builder {
 	enable 'Rewrite', response => sub {
 		$_->set( 'Content-Type', $xhtml )
 			if ( $_[0]{'HTTP_ACCEPT'} || '' ) =~ m{application/xhtml\+xml(?!\s*;\s*q=0)};
+
+		$_->status( $status ) if defined $status;
 
 		for ( $_[0]{'QUERY_STRING'} || () ) {
 			return 1234567890          if 'SCALAR' eq $_;
@@ -44,6 +47,11 @@ test_psgi app => $app, client => sub {
 	$res = $cb->( GET 'http://localhost/?CODE' );
 	is $res->content, 'blah x 8', '... and can modify the body if intended';
 
+	$status = 999;
+	$res = $cb->( GET 'http://localhost/' );
+	is $res->code, 999, '... or the status';
+	undef $status;
+
 	$res = $cb->( GET 'http://localhost/', Accept => "$xhtml;q=0" );
 	is $res->header( 'Content-Type' ), 'text/plain', '... triggering only as requested';
 
@@ -68,5 +76,3 @@ test_psgi app => $app, client => sub {
 		&& $res->content eq $content,
 		'... or hashes';
 };
-
-done_testing;

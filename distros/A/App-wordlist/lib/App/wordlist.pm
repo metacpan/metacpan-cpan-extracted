@@ -1,7 +1,7 @@
 package App::wordlist;
 
-our $DATE = '2018-01-07'; # DATE
-our $VERSION = '0.263'; # VERSION
+our $DATE = '2018-02-20'; # DATE
+our $VERSION = '0.264'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,17 +37,23 @@ sub _length_in_graphemes {
 
 sub _list_installed {
     require Module::List;
-    my $mods = Module::List::list_modules(
+    my $mods1 = Module::List::list_modules(
         "WordList::",
         {
             list_modules  => 1,
             list_pod      => 0,
             recurse       => 1,
         });
+    my $mods2 = Module::List::list_modules(
+        "WordListC::",
+        {
+            list_modules  => 1,
+            list_pod      => 0,
+            recurse       => 1,
+        });
     my @res;
-    for my $wl0 (sort keys %$mods) {
-        $wl0 =~ s/\AWordList:://;
-        my $wl = $wl0;
+    for my $wl0 ((sort keys %$mods1), (sort keys %$mods2)) {
+        (my $wl = $wl0) =~ s/\AWordListC?:://;
 
         my $type;
         if ($wl =~ /^(Base|MetaSyntactic)\z/) {
@@ -61,6 +67,8 @@ sub _list_installed {
             $type = 'Char';
         } elsif ($wl =~ s/^Phrase:://) {
             $type = 'Phrase';
+        } elsif ($wl =~ s/^Password:://) {
+            $type = 'Password';
         } elsif ($wl =~ s/^Test:://) {
             $type = 'Test';
         } else {
@@ -73,7 +81,7 @@ sub _list_installed {
         }
 
         push @res, {
-            name => $wl0,
+            name => $wl,
             lang => $lang,
             type => $type,
         };
@@ -342,9 +350,17 @@ sub wordlist {
         };
 
         for my $wl (@$wordlists) {
-            my $mod = "WordList::$wl";
-            (my $modpm = $mod . ".pm") =~ s!::!/!g;
-            require $modpm;
+            my $mod;
+            {
+                my $modpm;
+                $mod = "WordList::$wl";
+                ($modpm = $mod . ".pm") =~ s!::!/!g;
+                last if eval { require $modpm; 1 };
+                $mod = "WordListC::$wl";
+                ($modpm = $mod . ".pm") =~ s!::!/!g;
+                last if eval { require $modpm; 1 };
+                die;
+            }
             my $obj = $mod->new;
             $obj->each_word(
                 sub {
@@ -468,7 +484,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.263 of App::wordlist (from Perl distribution App-wordlist), released on 2018-01-07.
+This document describes version 0.264 of App::wordlist (from Perl distribution App-wordlist), released on 2018-02-20.
 
 =head1 SYNOPSIS
 
@@ -637,6 +653,8 @@ L<App::GamesWordlist> (L<games-wordlist>) which greps from
 C<Games::Word::Wordlist::*> instead.
 
 L<WordList> and C<WordList::*> modules.
+
+L<WordListC> and C<WordListC::*> modules.
 
 =head1 AUTHOR
 

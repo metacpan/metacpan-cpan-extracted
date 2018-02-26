@@ -10,6 +10,7 @@ requires "Storable" => "0";
 requires "String::CRC32" => "0";
 requires "Time::Duration::Parse" => "0";
 requires "base" => "0";
+requires "perl" => "5.008";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -31,7 +32,6 @@ on 'test' => sub {
   requires "Test::More" => "0.96";
   requires "Test::NoWarnings" => "0";
   requires "Test::Requires" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {

@@ -2,11 +2,7 @@ package Class::C3::Componentised;
 
 =head1 NAME
 
-Class::C3::Componentised
-
-=head1 DESCRIPTION
-
-Load mix-ins or components to your C3-based class.
+Class::C3::Componentised - Load mix-ins or components to your C3-based class
 
 =head1 SYNOPSIS
 
@@ -21,7 +17,7 @@ Load mix-ins or components to your C3-based class.
 
   package main;
 
-  MyModule->load_components( qw/Foo Bar/ ); 
+  MyModule->load_components( qw/Foo Bar/ );
   # Will load MyModule::Component::Foo and MyModule::Component::Bar
 
 =head1 DESCRIPTION
@@ -29,7 +25,7 @@ Load mix-ins or components to your C3-based class.
 This will inject base classes to your module using the L<Class::C3> method
 resolution order.
 
-Please note: these are not plugins that can take precedence over methods 
+Please note: these are not plugins that can take precedence over methods
 declared in MyModule. If you want something like that, consider
 L<MooseX::Object::Pluggable>.
 
@@ -50,15 +46,14 @@ use MRO::Compat;
 use Carp ();
 use List::Util ();
 
-our $VERSION = '1.001000';
-
-$VERSION = eval $VERSION if $VERSION =~ /_/; # numify for warning-free dev releases
+our $VERSION = '1.001002';
+$VERSION =~ tr/_//d;
 
 my $invalid_class = qr/(?: \b:\b | \:{3,} | \:\:$ )/x;
 
 =head2 load_components( @comps )
 
-Loads the given components into the current module. If a module begins with a 
+Loads the given components into the current module. If a module begins with a
 C<+> character, it is taken to be a fully qualified class name, otherwise
 C<< $class->component_base_class >> is prepended to it.
 
@@ -78,7 +73,8 @@ sub load_components {
 
 =head2 load_own_components( @comps )
 
-Similar to L<load_components>, but assumes every class is C<"$class::$comp">.
+Similar to L<load_components|/load_components( @comps )>, but assumes every
+class is C<"$class::$comp">.
 
 =cut
 
@@ -98,8 +94,8 @@ sub _load_components {
 
 =head2 load_optional_components
 
-As L<load_components>, but will silently ignore any components that cannot be 
-found.
+As L<load_components|/load_components( @comps )>, but will silently ignore any
+components that cannot be found.
 
 =cut
 
@@ -166,11 +162,6 @@ sub ensure_class_loaded {
 Returns true if the specified class is installed or already loaded, false
 otherwise.
 
-Note that the underlying mechanism (Class::Inspector->installed()) used by this
-sub will not, at the time of writing, correctly function when @INC includes
-coderefs. Since PAR relies upon coderefs in @INC, this function should be
-avoided in modules that are likely to be included within a PAR.
-
 =cut
 
 sub ensure_class_found {
@@ -183,7 +174,7 @@ sub ensure_class_found {
 
 =head2 inject_base
 
-Does the actual magic of adjusting @ISA on the target module.
+Does the actual magic of adjusting C<@ISA> on the target module.
 
 =cut
 
@@ -250,7 +241,7 @@ sub load_optional_class {
 
 Matt S. Trout and the L<DBIx::Class team|DBIx::Class/CONTRIBUTORS>
 
-Pulled out into seperate module by Ash Berlin C<< <ash@cpan.org> >>
+Pulled out into separate module by Ash Berlin C<< <ash@cpan.org> >>
 
 Optimizations and overall bolt-tightening by Peter "ribasushi" Rabbitson
 C<< <ribasushi@cpan.org> >>

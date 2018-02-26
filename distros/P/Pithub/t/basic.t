@@ -93,6 +93,11 @@ my @tree = (
         ],
     },
     {
+        accessor => 'markdown',
+        isa      => 'Pithub::Markdown',
+        methods  => [qw(render)],
+    },
+    {
         accessor => 'orgs',
         isa      => 'Pithub::Orgs',
         methods  => [qw(get list update)],
@@ -157,9 +162,24 @@ my @tree = (
                 methods  => [qw(create delete get list update test)],
             },
             {
+                accessor => 'issues',
+                isa      => 'Pithub::Issues',
+                methods  => [qw(create get list update)],
+            },
+            {
                 accessor => 'keys',
                 isa      => 'Pithub::Repos::Keys',
                 methods  => [qw(create delete get list)],
+            },
+            {
+                accessor => 'markdown',
+                isa      => 'Pithub::Markdown',
+                methods  => [qw(render)],
+            },
+            {
+                accessor => 'pull_requests',
+                isa      => 'Pithub::PullRequests',
+                methods  => [qw(commits create files get is_merged list merge update)],
             },
             {
                 accessor => 'releases',
@@ -281,6 +301,7 @@ sub validate_tree {
             my $val = $obj->$accessor(@{ $node->{args} || [] });
             isa_ok $val, $node->{isa};
             can_ok $val, @$methods if @{ $methods || [] };
+            can_ok $val, 'rate_limit';
 
             foreach my $attr ( keys %attributes ) {
                 is $obj->$attr, $attributes{$attr}, "Attribute ${attr} was curried to ${obj}";

@@ -1,7 +1,7 @@
 package App::genpw;
 
-our $DATE = '2018-01-16'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-02-20'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,8 +15,10 @@ our %SPEC;
 my $symbols            = [split //, q(~`!@#$%^&*()_-+={}[]|\\:;"'<>,.?/)];                          # %s
 my $letters            = ["A".."Z","a".."z"];                                                       # %l
 my $digits             = ["0".."9"];                                                                # %d
+my $hexdigits          = ["0".."9","a".."f"];                                                       # %h
 my $letterdigits       = [@$letters, @$digits];                                                     # %a
 my $letterdigitsymbols = [@$letterdigits, @$symbols];                                               # %x
+my $base64characters   = ["A".."Z","a".."z","0".."9","+","/"];                                      # %m
 my $base58characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz123456789)]; # %b
 my $base56characters   = [split //, q(ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789)];   # %B
 
@@ -36,11 +38,13 @@ be used as-is. Available conversions:
 
     %l   Random Latin letter (A-Z, a-z)
     %d   Random digit (0-9)
+    %h   Random hexdigit (0-9a-f)
     %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
     %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
     %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+    %m   Base64 character (A-Z, a-z, 0-9, +, /)
     %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
-    %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
+    %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
     %%   A literal percent sign
     %w   Random word
 
@@ -61,6 +65,8 @@ sub _fill_conversion {
         return join("", map {'%'} 1..$len);
     } elsif ($matches->{CONV} eq 'd') {
         return join("", map {$digits->[rand(@$digits)]} 1..$len);
+    } elsif ($matches->{CONV} eq 'h') {
+        return join("", map {$hexdigits->[rand(@$hexdigits)]} 1..$len);
     } elsif ($matches->{CONV} eq 'l') {
         return join("", map {$letters->[rand(@$letters)]} 1..$len);
     } elsif ($matches->{CONV} eq 'a') {
@@ -69,6 +75,8 @@ sub _fill_conversion {
         return join("", map {$symbols->[rand(@$symbols)]} 1..$len);
     } elsif ($matches->{CONV} eq 'x') {
         return join("", map {$letterdigitsymbols->[rand(@$letterdigitsymbols)]} 1..$len);
+    } elsif ($matches->{CONV} eq 'm') {
+        return join("", map {$base64characters->[rand(@$base64characters)]} 1..$len);
     } elsif ($matches->{CONV} eq 'b') {
         return join("", map {$base58characters->[rand(@$base58characters)]} 1..$len);
     } elsif ($matches->{CONV} eq 'B') {
@@ -118,7 +126,7 @@ sub _set_case {
 sub _fill_pattern {
     my ($pattern, $words) = @_;
 
-    $pattern =~ s/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdlswx%]))/
+    $pattern =~ s/(?<all>%(?:(?<N>\d+)(?:\$(?<M>\d+))?)?(?<CONV>[abBdhlmswx%]))/
         _fill_conversion({%+}, $words)/eg;
 
     $pattern;
@@ -212,7 +220,7 @@ App::genpw - Generate random password
 
 =head1 VERSION
 
-This document describes version 0.003 of App::genpw (from Perl distribution App-genpw), released on 2018-01-16.
+This document describes version 0.005 of App::genpw (from Perl distribution App-genpw), released on 2018-02-20.
 
 =head1 SYNOPSIS
 
@@ -281,11 +289,13 @@ be used as-is. Available conversions:
 
  %l   Random Latin letter (A-Z, a-z)
  %d   Random digit (0-9)
+ %h   Random hexdigit (0-9a-f)
  %a   Random letter/digit (Alphanum) (A-Z, a-z, 0-9; combination of %l and %d)
  %s   Random ASCII symbol, e.g. "-" (dash), "_" (underscore), etc.
  %x   Random letter/digit/ASCII symbol (combination of %a and %s)
+ %m   Base64 character (A-Z, a-z, 0-9, +, /)
  %b   Base58 character (A-Z, a-z, 0-9 minus IOl0)
- %b   Base56 character (A-Z, a-z, 0-9 minus IOol01)
+ %B   Base56 character (A-Z, a-z, 0-9 minus IOol01)
  %%   A literal percent sign
  %w   Random word
 

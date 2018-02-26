@@ -1,0 +1,100 @@
+NAME
+    Color::Theme::Role - Role for class wanting to support color themes
+
+VERSION
+    This document describes version 0.020 of Color::Theme::Role (from Perl
+    distribution Color-Theme-Role), released on 2018-02-25.
+
+DESCRIPTION
+    This role is for class that wants to support color themes. Color theme
+    is represented as a structure according to the specification described
+    in Color::Theme.
+
+    Color theme module. Color themes are put in modules under
+    "Color::Theme::Themes::" (configurable using "color_theme_module_prefix"
+    attribute). Each color theme modules can contain one or more color
+    themes. The module must define a package global variable named
+    %color_themes that contain color themes keyed by their names. Example:
+
+     package MyProject::ColorThemes::Default;
+
+     our %color_themes = (
+         no_color => {
+             v => 1.1,
+             summary => 'Special theme that means no color',
+             colors => {
+             },
+             no_color => 1,
+         },
+
+         default => {
+             v => 1.1,
+             summary => 'Default color theme',
+             colors => {
+             },
+         },
+     );
+
+ATTRIBUTES
+  color_theme => HASH
+    Get/set color theme.
+
+  color_theme_args => HASH
+    Get/set arguments for color theme. This can be
+
+  color_theme_module_prefix => STR (default: CLASS + "::ColorTheme::")
+    Each project should have its own class prefix. For example,
+    Text::ANSITable has its color themes in "Text::ANSITable::ColorTheme::"
+    namespace, Data::Dump::Color has them in
+    "Data::Dump::Color::ColorTheme::" and so on.
+
+METHODS
+  $cl->list_color_themes($detail) => array
+    Will search packages under "color_theme_module_prefix" for color theme
+    modules, then list all color themes for each module. If, for example,
+    the color theme modules found are "MyProject::ColorTheme::Default" and
+    "MyProject::ColorTheme::Extras", will return something like:
+
+     ['Default::theme1', 'Default::theme2', 'Extras::extra3', 'Extras::extra4']
+
+  $cl->get_color_theme($name) => hash
+    Get color theme hash data structure by name. Note that name must be
+    prefixed by color theme module name (minus the
+    "color_theme_module_prefix").
+
+  $cl->get_theme_color($item_name) => str
+    Get an item's color value from the current color theme (will get from
+    the color theme's "colors" hash, then the $item_name key from that
+    hash). If color value is a coderef, it will be
+
+  $cl->get_theme_color_as_rgb($item_name, \%args) => str|hash
+    Like "get_theme_color", but if the resulting color value is a coderef,
+    will call that coderef, passing %args to it and returning the value.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Color-Theme-Role>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Color-Theme-Role>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-Theme-Role>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::Theme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

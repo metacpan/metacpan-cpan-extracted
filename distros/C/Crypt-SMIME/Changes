@@ -1,5 +1,12 @@
 Revision history for Crypt::SMIME
 
+0.25    Thu Feb 22 18:34:02 JST 2018
+        - Fix the test '03-chained-certs.t' which can fail depending
+          on the used libcrypto, Reported by Thomas Eckardt.
+
+0.24    Wed Feb 21 13:39:48 JST 2018
+        - New method: setAtTime(), Patch by Markus Benning.
+
 0.23    Tue Jan 23 18:29:53 JST 2018
         - Improve Makefile.PL (again) so it works on Windows too,
           Suggested by Thomas Eckardt.

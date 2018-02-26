@@ -5,7 +5,10 @@ MANIFEST			This list of files
 README.md
 t/00-report-prereqs.t
 t/diff.t
+t/errors.t
 t/snapshot.t
+t/snapshots/errors_t/error
+t/undef.t
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

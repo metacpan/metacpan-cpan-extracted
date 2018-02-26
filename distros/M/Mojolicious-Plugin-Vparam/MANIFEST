@@ -1,12 +1,6 @@
+.travis.yml
 Changes
-debian/changelog
-debian/compat
-debian/control
-debian/copyright
-debian/libmojolicious-plugin-vparam-perl.docs
-debian/rules
-debian/source/format
-.gitignore
+lib/Mojolicious/Plugin/Vparam.pm
 lib/Mojolicious/Plugin/Vparam/Address.pm
 lib/Mojolicious/Plugin/Vparam/Barcode.pm
 lib/Mojolicious/Plugin/Vparam/Bool.pm
@@ -18,8 +12,8 @@ lib/Mojolicious/Plugin/Vparam/Internet.pm
 lib/Mojolicious/Plugin/Vparam/ISIN.pm
 lib/Mojolicious/Plugin/Vparam/JSON.pm
 lib/Mojolicious/Plugin/Vparam/Numbers.pm
+lib/Mojolicious/Plugin/Vparam/Object.pm
 lib/Mojolicious/Plugin/Vparam/Phone.pm
-lib/Mojolicious/Plugin/Vparam.pm
 lib/Mojolicious/Plugin/Vparam/RU.pm
 lib/Mojolicious/Plugin/Vparam/Text.pm
 lib/Mojolicious/Plugin/Vparam/UUID.pm
@@ -50,6 +44,7 @@ t/036_unknown.t
 t/040_array.t
 t/041_multiline.t
 t/042_multijoin.t
+t/043_objects.t
 t/045_load.t
 t/046_load-array.t
 t/047_load-code.t
@@ -105,6 +100,5 @@ t/920_range.t
 t/925_size.t
 t/990_manifest.t
 t/995_pod.t
-.travis.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

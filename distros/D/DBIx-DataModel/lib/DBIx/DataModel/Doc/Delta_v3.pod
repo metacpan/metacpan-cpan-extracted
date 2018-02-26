@@ -1,0 +1,279 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Delta_v3 - Differences introduced in version 3.0
+
+=head1 DESCRIPTION
+
+This document enumerates the main differences introduced in
+the version 3.0 of C<DBIx::DataModel>. 
+This consists of some additional features, and some
+refactoring of the internal architecture.
+
+For older changes, see L<DBIx::DataModel::Doc::Delta_v2>
+and L<DBIx::DataModel::Doc::Delta_v1>.
+
+For regular client operations, version 3.0 is fully compatible with
+version 2.0. However, the inheritance application programming
+interface has slightly changed; therefore client classes that inherit
+from C<DBIx::DataModel::Source::Table> may need some refactoring.
+This is discussed at the end of the document; before that, the initial
+chapters present the new features of version 3.0.
+
+
+=head1 Support for changing database schema
+
+A L<DBIx::DataModel schema|DBIx::DataModel::Doc::Glossary/schema>
+usually accesses tables within the 
+L<database schema|DBIx::DataModel::Doc::Glossary/"database schema">
+of its current database connexion. Previous versions
+of C<DBIx::DataModel> already allowed a table declaration
+to explicitly specify another database schema, like this :
+
+  $schema->Table(qw/Class1 OTHER_SCHEMA.TABLE1 primary_key_1/);
+
+but in this case the Perl class is statically bound to the
+C<OTHER_SCHEMA> database schema.
+
+In some situations you may want to I<dynamically> change the
+database schema. The 3.0 API has two new methods for doing this :
+
+=over
+
+=item *
+
+The L<db_schema|DBIx::DataModel::Doc::Reference/"db_schema()">
+method tells the schema object to automatically prepend a
+database schema name in front of table names. Therefore the above example
+can be rewritten as 
+
+  $schema->Table(qw/Class1 TABLE1 primary_key_1/);
+  $schema->db_schema('OTHER_SCHEMA'); 
+
+except that the C<OTHER_SCHEMA> prefix will now be prepended in front
+of every table in SQL requests (not only TABLE1). This effect can be cancelled
+later by another call to C<db_schema()> :
+
+  $schema->db_schema(''); # empty string -- back to the default DB schema
+
+=item *
+
+The L<with_db_schema|DBIx::DataModel::Doc::Reference/"with_db_schema()">
+is very similar but it returns a I<copy> of the schema object instead
+of altering it directly. This is useful in chained method calls like
+
+  $rows = $schema->with_db_schema($string)->join(qw/Table path1 ../)->...;
+
+Here the join is applied to a temporary copy of the C<$schema>; that copy
+is dismissed after the join, so the original C<$schema> is left untouched.
+
+=back
+
+
+
+=head1 Executing code after the outermost commit
+
+
+Method L<do_after_commit|DBIx::DataModel::Doc::Reference/"do_after_commit()">
+makes it possible to register coderefs to be executed after the end of the
+outermost transaction. This is useful in situations of distributed
+computations where the database must be accessed by other processes
+under other database connections. An example is provided in the reference
+documentation.
+
+
+=head1 Option C<join_with_USING> at statement or at schema level
+
+In most DBMS, when column names on both sides of a join are identical, the join
+can be expressed as
+
+  SELECT * FROM T1 INNER JOIN T2 USING (A, B)
+
+instead of
+
+  SELECT * FROM T1 INNER JOIN T2 ON T1.A=T2.A AND T1.B=T2.B
+
+The advantage of this syntax with a USING clause is that the joined
+columns will appear only once in the results, and they do not need to
+be prefixed by a table name if they are needed in the select list or
+in the WHERE part of the SQL.
+
+To express joins with the USING syntax in C<DBIx::DataModel>,
+activate the boolean option C<join_with_USING>  when defining
+a schema : this will be automatically applied to all statements
+within that schema. Alternatively, this option can be overridden
+at the statement level through the C<-join_with_USING> argument
+to the L<select()|DBIx::DataModel::Doc::Reference/"select()">
+method.
+
+
+=head1 Extensible set of C<-result_as> result kinds
+
+L<Result kinds|DBIx::DataModel::Doc::Glossary/"result kind">,
+specified through the C<-result_as> argument to the
+L<select()|DBIx::DataModel::Doc::Reference/"select()">
+method, are no longer hardwired within the
+L<DBIx::DataModel::Statement> class.
+
+Each result kind is implemented by a subclass
+of L<DBIx::DataModel::Schema::ResultAs>.
+Such subclasses are detected automatically, either
+in the namespace of C<DBIx::DataModel::Schema::ResultAs>,
+or in the namespace of the current schema class.
+Other namespaces may even be specified through the
+C<resultAs_classes> argument to 
+L<define_schema()|DBIx::DataModel::Doc::Reference/"define_schema()">.
+Therefore this is an extensible framework in which clients
+can add new result kinds or extend existing result kinds.
+
+Result kinds currently shipped with C<DBIx::DataModel> are :
+
+=over
+
+
+=item L<Categorize|DBIx::DataModel::Schema::ResultAs::Categorize>
+
+=item L<Count|DBIx::DataModel::Schema::ResultAs::Count>
+
+=item L<Fast_statement|DBIx::DataModel::Schema::ResultAs::statement>
+
+=item L<File_tabular|DBIx::DataModel::Schema::ResultAs::tabular>
+
+=item L<Firstrow|DBIx::DataModel::Schema::ResultAs::Firstrow>
+
+=item L<Flat_arrayref|DBIx::DataModel::Schema::ResultAs::arrayref>
+
+=item L<Hashref|DBIx::DataModel::Schema::ResultAs::Hashref>
+
+=item L<Json|DBIx::DataModel::Schema::ResultAs::Json>
+
+=item L<Rows|DBIx::DataModel::Schema::ResultAs::Rows>
+
+=item L<Sql|DBIx::DataModel::Schema::ResultAs::Sql>
+
+=item L<Statement|DBIx::DataModel::Schema::ResultAs::Statement>
+
+=item L<Sth|DBIx::DataModel::Schema::ResultAs::Sth>
+
+=item L<Subquery|DBIx::DataModel::Schema::ResultAs::Subquery>
+
+=item L<Table|DBIx::DataModel::Schema::ResultAs::Table>
+
+=item L<Tsv|DBIx::DataModel::Schema::ResultAs::Tsv>
+
+=item L<Xlsx|DBIx::DataModel::Schema::ResultAs::Xlsx>
+
+=item L<Yaml|DBIx::DataModel::Schema::ResultAs::Yaml>
+
+=back
+
+
+
+=head1 Architectural changes
+
+=head2 Suppression of C<ConnectedSource> class
+
+In L<multi-schema mode|DBIx::DataModel::Doc::Glossary/"multi-schema mode">,
+objects representing data rows, tables or joins must know to which
+schema they belong : in version 2.0, this was handled by 
+a class called C<ConnectedSource>, that encapsulated a reference to a
+datasource paired together with a reference to a schema. 
+Instances of C<ConnectedSource> acted as proxy objects, forwarding
+most method calls to the associated datasource.
+
+The problem with that approach was with inheritance and overriding :
+is a datasource subclass wanted to override a parent method
+(typically the C<update()> or C<insert()> method), that override
+was not always taken into account, depending on whether the method
+call was invoked on the proxy object or directly on the datasource object.
+
+The new architecture in version 3.0 dropped the C<ConnectedSource> class :
+all method calls go directly to datasource classes. However, a schema reference
+still needs to be passed to class method calls : for example in
+
+  $schema->table('T1')->update(-set => ..., -where => ...);
+
+we intend to call the C<update()> I<class method> within the C<T1> Table
+subclass. To make this work, C<DBIx::DataModel> twists a little bit
+the Perl regular architecture : it creates a temporary C<object> of
+class C<T1>, containing only one attribute, namely the reference to the
+schema. Methods in class C<T1> recognize such temporary objects and
+then behave as class methods instead of instance methods, even if
+technically this is an instance method call. By contrast, calls
+to C<update()> in 
+
+
+  my $list = $schema->table('T1')->select(-where => ...);
+  foreach my $row (@$list) {
+    $row->update({field => $new_value});
+  }
+
+are treated as regular instance method calls.
+
+
+
+=head2 Separation of steps for the C<update()> method
+
+Previous implementations of the C<update()> method were monolithic, with
+all algorithmic steps coded together. Therefore any override of that method
+within subclasses had to re-implement every step. This was not very efficient
+because the reason to override is usually to modify the update data at a very
+specific moment within the algorithm; therefore there is no need to rewrite
+the whole process.
+
+The new architecture divides the update into three steps :
+
+=over
+
+=item 1.
+
+parsing the arguments (not a trivial task)
+
+=item 2.
+
+applying handlers and other transformation to the data to be updated
+
+=item 3.
+
+issuing the database request
+
+=back
+
+More precisely, the skeleton for the C<update()> method looks like this :
+
+
+  sub update  {
+    my $self = shift;
+
+    # prepare datastructures for generating the SQL
+    my ($to_set, $where) = $self->_parse_update_args(@_);
+
+    # transform the data if necessary
+    $self->_apply_handlers_for_update($to_set, $where);
+
+    # database request 
+    ...
+  }
+
+With this architecture, subclasses can decide to only override the
+C<_apply_handers_for_update()> method, instead of overriding the whole
+C<update()> method.
+
+
+
+=head2 C<Meta::Utils> subroutines instead of methods
+
+Utilies within L<DBIx::DataModel::Meta::Utils> are now subroutines instead
+of methods : this makes more sense because that class has no internal state
+and therefore is not object-oriented; as a result, calls to these utilities are
+less verbose.
+
+=head2 Dependency on L<Scalar::Does> is dropped
+
+L<Scalar::Does> started as a very small and simple module, but then evolved
+into a much richer module with more features but also more dependencies.
+Since the needs of C<DBIx::DataModel> are very limited, most of the
+complexity of L<Scalar::Does> was unused. Therefore the dependency
+on L<Scalar::Does> has been dropped, replaced by a very simplistic
+implementation of the C<does> method within L<SQL::Abstract::More>.

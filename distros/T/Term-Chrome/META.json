@@ -1,10 +1,10 @@
 {
    "abstract" : "DSL for colors and other terminal chrome",
    "author" : [
-      "Olivier Mengué <dolmen@cpan.org>"
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.18",
             "Dist::Zilla" : "5.043",
             "Dist::Zilla::Plugin::LicenseFromModule" : "0.05",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.142470",
@@ -61,15 +61,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/dolmen/p5-Term-Chrome/issues"
+         "web" : "https://github.com/dolmen-perl5/Term-Chrome/issues"
       },
-      "homepage" : "https://github.com/dolmen/p5-Term-Chrome",
+      "homepage" : "https://github.com/dolmen-perl5/Term-Chrome",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dolmen/p5-Term-Chrome.git",
-         "web" : "https://github.com/dolmen/p5-Term-Chrome"
+         "url" : "https://github.com/dolmen-perl5/Term-Chrome.git",
+         "web" : "https://github.com/dolmen-perl5/Term-Chrome"
       }
    },
-   "version" : "2.00"
+   "version" : "2.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"
 }
 

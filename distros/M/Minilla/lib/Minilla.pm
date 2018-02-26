@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.0.14");
+use version; our $VERSION = version->declare("v3.0.16");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -260,7 +260,7 @@ See L<CPAN::Meta::Spec>.
 Embed badges image (e.g. Travis-CI) to README.md. It ought to be array and each elements must be service name. Now, supported services are only 'travis', 'circleci', 'appveyor', 'coveralls', 'codecov', 'gitter' and 'metacpan'.
 
 You can send additional parameters as required by your CI provider by including a
-query string along with your service name: eg. C<travis?token=[YOUR_TOKEN_GOES_HERE]&branch=dev>
+query string along with your service name: e.g. C<travis?token=[YOUR_TOKEN_GOES_HERE]&branch=dev>
 
 =item PL_files
 

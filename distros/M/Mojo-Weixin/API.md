@@ -8,6 +8,7 @@
 |[/openwx/get_user_info](API.md#获取用户数据)      |running |获取登录用户数据 |
 |[/openwx/get_friend_info](API.md#获取好友数据)  |running |获取好友数据 |
 |[/openwx/get_group_info](API.md#获取群组数据)       |running |获取群组数据 |
+|[/openwx/get_group_basic_info](API.md#获取群组基本数据)       |running |获取群组基本数据 |
 |[/openwx/get_avatar](API.md#获取用户或群组头像)          |running |获取用户或群组头像|
 |数据搜索相关                  |        |                |
 |[/openwx/search_friend](API.md#搜索好友对象)        |running |搜索好友对象|
@@ -298,6 +299,16 @@ API是通过加载`Openwx插件`的形式提供的，上述代码保存成 xxxx.
     },
 ]
 ```
+
+### 获取群组基本数据
+|   API  |获取群组基本数据（不包含群成员）
+|--------|:------------------------------------------|
+|uri     |/openwx/get_group_basic_info|
+|请求方法|GET\|POST|
+|请求参数|无|
+|调用示例|http://127.0.0.1:3000/openwx/get_group_basic_info|
+
+
 ### 发送好友消息
 |   API  |发送好友消息
 |--------|:------------------------------------------|
@@ -448,6 +459,7 @@ $client->load("Openwx",data=>{
     listen => [{host=>xxx,port=>xxx}],           #可选，发送消息api监听端口
     post_api=> 'http://127.0.0.1:3000/post_api', #可选，接收消息或事件的上报地址
     post_event => 1,                             #可选，是否上报事件，为了向后兼容性，默认值为1
+    post_stdout => 0,                            #可选，上报数据是否打印到stdout，适合管道交互信息方式，默认0
     post_media_data => 1,                        #可选，是否上报经过base64编码的图片原始数据，默认值为1
     post_event_list => ['login','stop','state_change','input_qrcode'], #可选，上报事件列表
 });
@@ -716,7 +728,7 @@ Server: Mojolicious (Perl)
 
 |  事件名称                    |事件说明    |上报参数列表
 |------------------------------|:-----------|:-----------------------------------------|
-|login                         |客户端登录  | *1*：表示经过二维码扫描，好友等id可能会发生变化<br>*0*： 表示未经过二维码扫描，好友等id不会发生变化
+|login                         |客户端登录  | *1*：表示经过二维码扫描，好友等id可能会发生变化<br>*0*： 表示未经过二维码扫描，好友等id不会发生变化<br>*-1*：表示登录异常，第二个参数包含异常原因
 |stop                          |客户端停止    | 客户端停止运行，程序退出
 |state_change                  |客户端状态变化|旧的状态，新的状态 （参见[客户端状态说明](https://github.com/sjdy521/Mojo-Weixin/blob/master/Controller-API.md#客户端运行状态介绍)）
 |input_qrcode                  |扫描二维码  | 二维码本地保存路径，二维码原始数据的base64编码

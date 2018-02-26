@@ -1,0 +1,68 @@
+NAME
+    Color::Theme::Util - Utility routines related to color themes
+
+VERSION
+    This document describes version 0.020 of Color::Theme::Util (from Perl
+    distribution Color-Theme-Util), released on 2018-02-25.
+
+SYNOPSIS
+FUNCTIONS
+  create_color_theme_transform
+    Usage: create_color_theme_transform($basect, $func) => hash
+
+    Create a new color theme by applying transform function $func (code) to
+    base theme $basetheme (hash). For example if you want to create a
+    reddish Text::ANSITable color theme from the default theme:
+
+     use Color::RGB::Util qw(mix_2_rgb_colors);
+     use Color::Theme::Util qw(create_color_theme_transform);
+     use Text::ANSITable;
+
+     my $basetheme = Text::ANSITable->get_color_theme("Default::default_gradation");
+     my $redtheme  = create_color_theme_transform(
+         $basetheme, sub { mix_2_rgb_colors(shift, 'ff0000') });
+
+     # use the color theme
+     my $t = Text::ANSITable->new;
+     $t->color_theme($redtheme);
+
+  get_color_theme
+    Usage: get_color_name([ \%opts ], $name)
+
+    Get color theme structure. Options:
+
+    *   module_prefixes => array
+
+        Default: "["Generic::ColorTheme"]".
+
+    *   theme_prefixes => array
+
+        Default: "["Default"]".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Color-Theme-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Color-Theme-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-Theme-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::Theme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

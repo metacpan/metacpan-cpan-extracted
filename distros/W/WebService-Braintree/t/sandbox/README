@@ -93,7 +93,8 @@ Go to Account > Merchant Account Info (top-side menu). Click on the green
 NOTE: You must have a Marketplace account. The Marketplace features are only
 enabled for US sandbox accounts. To have a Marketplace account, you have to have
 selected "United States" as your country when signing up for your account. Then,
-you can sign up for your sandbox with Marketplace features enabled.
+you can sign up for your sandbox with Marketplace features enabled. Many of the
+tests will not work properly unless you have a Marketplace account.
 
 The necessary sub-merchant accounts are created (if necessary) by the
 verify_sandbox() function in t/lib/WebService/Braintree/TestHelper.pm

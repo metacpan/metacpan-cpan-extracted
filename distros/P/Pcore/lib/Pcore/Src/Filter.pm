@@ -2,9 +2,9 @@ package Pcore::Src::Filter;
 
 use Pcore -role;
 
-has file => ( is => 'ro', isa => InstanceOf ['Pcore::Src::File'], required => 1, weak_ref => 1 );
-has buffer    => ( is => 'ro',   isa => ScalarRef, required => 1 );
-has has_kolon => ( is => 'lazy', isa => Bool,      init_arg => undef );
+has file      => ( is => 'ro',   isa => InstanceOf ['Pcore::Src::File'], required => 1, weak_ref => 1 );
+has buffer    => ( is => 'ro',   isa => ScalarRef,                       required => 1 );
+has has_kolon => ( is => 'lazy', isa => Bool,                            init_arg => undef );
 
 sub src_cfg ($self) {
     return Pcore::Src::File->cfg;

@@ -20,7 +20,7 @@ no_index:
 provides:
   List::Breakdown:
     file: lib/List/Breakdown.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -28,5 +28,5 @@ requires:
 resources:
   homepage: https://sanctum.geek.nz/cgit/List-Breakdown.git/
   repository: https://sanctum.geek.nz/code/List-Breakdown.git/
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

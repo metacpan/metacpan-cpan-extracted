@@ -158,7 +158,7 @@ L<MarpaX::ESLIF::BNF>, L<MarpaX::ESLIF::Tutorial::Calculator>, L<PCRE2|http://ww
 
 =head1 NOTES
 
-The perl interface is using an I<all-in-one> version of the underlying L<marpaESLIF C library|https://github.com/jddurand/c-marpaESLIF>. This mean that character conversion relies on I<iconv> (or native API on Windows) to do character translation if needed.
+The perl interface is using an I<all-in-one> version of the underlying L<marpaESLIF C library|https://github.com/jddurand/c-marpaESLIF>. This mean that character conversion relies on L<libiconv|https://www.gnu.org/software/libiconv> to do character translation if needed.
 TRAILER
 close(INTRO) || warn "Cannot close $dst, $!";
 

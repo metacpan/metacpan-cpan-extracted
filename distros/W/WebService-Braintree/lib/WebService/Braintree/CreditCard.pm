@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard;
-$WebService::Braintree::CreditCard::VERSION = '1.0';
+$WebService::Braintree::CreditCard::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -131,7 +131,7 @@ sub expired_cards {
 
 =head2 expiring_between()
 
-This takes two DateTime objects and returns a list of all the credit cards expiring
+This takes two DateTime's and returns a list of all the credit cards expiring
 between them.
 
 =cut

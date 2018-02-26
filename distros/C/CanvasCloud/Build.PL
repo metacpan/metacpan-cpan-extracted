@@ -19,7 +19,7 @@ my %module_build_args = (
     "Ted Katseres"
   ],
   "dist_name" => "CanvasCloud",
-  "dist_version" => "0.003",
+  "dist_version" => "0.004",
   "license" => "perl",
   "module_name" => "CanvasCloud",
   "recursive_test_files" => 1,

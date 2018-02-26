@@ -153,8 +153,8 @@ sub parent_typemap_serialize_params {
     return "$str, %p}"; # custom params to typemap are not rewritable by typemap's params to it's parent
 }
 
-sub outmap { return $cur_typemaps->get_outputmap(xstype => $_[0]) || $top_typemaps->get_outputmap(xstype => $_[0]); }
-sub inmap  { return $cur_typemaps->get_inputmap(xstype => $_[0]) || $top_typemaps->get_inputmap(xstype => $_[0]); }
+sub outmap { return $cur_typemaps->get_outputmap(xstype => $_[0]) || ($top_typemaps && $top_typemaps->get_outputmap(xstype => $_[0])); }
+sub inmap  { return $cur_typemaps->get_inputmap(xstype => $_[0]) || ($top_typemaps && $top_typemaps->get_inputmap(xstype => $_[0])); }
 
 package
     ExtUtils::ParseXS; # hide from pause

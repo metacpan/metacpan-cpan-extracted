@@ -1,5 +1,5 @@
 package WebService::Braintree::DisputeGateway;
-$WebService::Braintree::DisputeGateway::VERSION = '1.0';
+$WebService::Braintree::DisputeGateway::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
@@ -25,6 +25,15 @@ sub finalize {
     confess "ArgumentError" unless validate_id($id);
 
     $self->_make_request("/disputes/${id}/finalize", "put", undef);
+}
+
+sub add_file_evidence {
+    my $self = shift;
+    my ($id, $upload_id) = @_;
+    confess "ArgumentError" unless validate_id($id);
+    confess "ArgumentError" unless validate_id($upload_id);
+
+    $self->_make_request("/disputes/${id}/evidence", "post", {document_upload_id => $upload_id});
 }
 
 sub add_text_evidence {

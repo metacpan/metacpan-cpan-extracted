@@ -6,7 +6,7 @@ Test::Strict - Check syntax, presence of use strict; and test coverage
 
 =head1 VERSION
 
-Version 0.41
+Version 0.45
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ use File::Find;
 use Config;
 
 our $COVER;
-our $VERSION = '0.41';
+our $VERSION = '0.45';
 our $PERL    = $^X || 'perl';
 our $COVERAGE_THRESHOLD = 50; # 50%
 our $UNTAINT_PATTERN    = qr|^(.*)$|;
@@ -458,6 +458,10 @@ The total coverage is the return value of C<all_cover_ok()>.
 =cut
 
 sub all_cover_ok {
+    my $cover_bin    = _cover_path();
+    die "ERROR: Cover binary not found, please install Devel::Cover.\n"
+        unless (defined $cover_bin);
+
     my $threshold = shift || $COVERAGE_THRESHOLD;
     my @dirs = @_ ? @_
         : (File::Spec->splitpath( $0 ))[1] || '.';
@@ -466,7 +470,6 @@ sub all_cover_ok {
     _all_files(@dirs);
     _make_plan();
 
-    my $cover_bin    = _cover_path() or do{ $Test->skip(); $Test->diag("Cover binary not found"); return};
     my $perl_bin     = _untaint($PERL);
     local $ENV{PATH} = _untaint($ENV{PATH}) if $ENV{PATH};
     if ($IS_WINDOWS and ! -d $DEVEL_COVER_DB) {

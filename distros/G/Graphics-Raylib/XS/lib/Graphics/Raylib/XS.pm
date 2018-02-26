@@ -381,7 +381,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	GetGestureHoldDuration
 	GetGesturePinchAngle
 	GetGesturePinchVector
-	GetHexValue
+	ColorToInt
+        ColorToHSV
 	GetImageData
 	GetKeyPressed
 	GetMatrixModelview
@@ -1233,7 +1234,8 @@ None by default.
   float GetGestureHoldDuration(void)
   float GetGesturePinchAngle(void)
   Vector2 GetGesturePinchVector(void)
-  int GetHexValue(Color color)
+  int ColorToInt(Color color)
+  Vector3 ColorToHSV(Color color)
   Color *GetImageData(Image image)
   int GetKeyPressed(void)
   Matrix GetMatrixModelview()

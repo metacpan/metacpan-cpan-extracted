@@ -9,12 +9,26 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 446)">
 <title>Perl</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-446 148.5,-446 148.5,4 -4,4"/>
-<!-- $start -->
-<g id="node1" class="node"><title>$start</title>
-<path fill="none" stroke="blue" d="M12,-405.5C12,-405.5 116,-405.5 116,-405.5 122,-405.5 128,-411.5 128,-417.5 128,-417.5 128,-429.5 128,-429.5 128,-435.5 122,-441.5 116,-441.5 116,-441.5 12,-441.5 12,-441.5 6,-441.5 0,-435.5 0,-429.5 0,-429.5 0,-417.5 0,-417.5 0,-411.5 6,-405.5 12,-405.5"/>
-<text text-anchor="middle" x="24.5" y="-419.8" font-family="Times,serif" font-size="14.00">$start</text>
-<polyline fill="none" stroke="blue" points="49,-405.5 49,-441.5 "/>
-<text text-anchor="middle" x="88.5" y="-419.8" font-family="Times,serif" font-size="14.00">input $end </text>
+<!-- exp -->
+<g id="node1" class="node"><title>exp</title>
+<path fill="none" stroke="blue" d="M13.5,-0.5C13.5,-0.5 114.5,-0.5 114.5,-0.5 120.5,-0.5 126.5,-6.5 126.5,-12.5 126.5,-12.5 126.5,-146.5 126.5,-146.5 126.5,-152.5 120.5,-158.5 114.5,-158.5 114.5,-158.5 13.5,-158.5 13.5,-158.5 7.5,-158.5 1.5,-152.5 1.5,-146.5 1.5,-146.5 1.5,-12.5 1.5,-12.5 1.5,-6.5 7.5,-0.5 13.5,-0.5"/>
+<text text-anchor="middle" x="19.5" y="-75.8" font-family="Times,serif" font-size="14.00">exp</text>
+<polyline fill="none" stroke="blue" points="37.5,-0.5 37.5,-158.5 "/>
+<text text-anchor="middle" x="82" y="-143.3" font-family="Times,serif" font-size="14.00">NUM </text>
+<text text-anchor="middle" x="82" y="-128.3" font-family="Times,serif" font-size="14.00">VAR </text>
+<text text-anchor="middle" x="82" y="-113.3" font-family="Times,serif" font-size="14.00">VAR &#39;=&#39; exp </text>
+<text text-anchor="middle" x="82" y="-98.3" font-family="Times,serif" font-size="14.00">exp &#39;+&#39; exp </text>
+<text text-anchor="middle" x="82" y="-83.3" font-family="Times,serif" font-size="14.00">exp &#39;&#45;&#39; exp </text>
+<text text-anchor="middle" x="82" y="-68.3" font-family="Times,serif" font-size="14.00">exp &#39;*&#39; exp </text>
+<text text-anchor="middle" x="82" y="-53.3" font-family="Times,serif" font-size="14.00">exp &#39;/&#39; exp </text>
+<text text-anchor="middle" x="82" y="-38.3" font-family="Times,serif" font-size="14.00">&#39;&#45;&#39; exp </text>
+<text text-anchor="middle" x="82" y="-23.3" font-family="Times,serif" font-size="14.00">exp &#39;^&#39; exp </text>
+<text text-anchor="middle" x="82" y="-8.3" font-family="Times,serif" font-size="14.00">&#39;(&#39; exp &#39;)&#39; </text>
+</g>
+<!-- exp&#45;&gt;exp -->
+<g id="edge1" class="edge"><title>exp&#45;&gt;exp</title>
+<path fill="none" stroke="grey" d="M126.778,-108.08C137.264,-104.081 144.5,-94.5547 144.5,-79.5 144.5,-69.1499 141.08,-61.4126 135.535,-56.2881"/>
+<polygon fill="grey" stroke="grey" points="137.133,-53.1624 126.778,-50.9196 133.474,-59.1302 137.133,-53.1624"/>
 </g>
 <!-- input -->
 <g id="node2" class="node"><title>input</title>
@@ -23,11 +37,6 @@
 <polyline fill="none" stroke="blue" points="50.5,-330.5 50.5,-368.5 "/>
 <text text-anchor="middle" x="87" y="-353.3" font-family="Times,serif" font-size="14.00">(empty) </text>
 <text text-anchor="middle" x="87" y="-338.3" font-family="Times,serif" font-size="14.00">input line </text>
-</g>
-<!-- $start&#45;&gt;input -->
-<g id="edge1" class="edge"><title>$start&#45;&gt;input</title>
-<path fill="none" stroke="grey" d="M64,-405.437C64,-397.487 64,-387.813 64,-378.813"/>
-<polygon fill="grey" stroke="grey" points="67.5001,-378.699 64,-368.699 60.5001,-378.699 67.5001,-378.699"/>
 </g>
 <!-- input&#45;&gt;input -->
 <g id="edge3" class="edge"><title>input&#45;&gt;input</title>
@@ -51,31 +60,22 @@
 <path fill="none" stroke="grey" d="M64,-330.086C64,-322.607 64,-313.513 64,-304.097"/>
 <polygon fill="grey" stroke="grey" points="67.5001,-303.814 64,-293.814 60.5001,-303.815 67.5001,-303.814"/>
 </g>
-<!-- exp -->
-<g id="node4" class="node"><title>exp</title>
-<path fill="none" stroke="blue" d="M13.5,-0.5C13.5,-0.5 114.5,-0.5 114.5,-0.5 120.5,-0.5 126.5,-6.5 126.5,-12.5 126.5,-12.5 126.5,-146.5 126.5,-146.5 126.5,-152.5 120.5,-158.5 114.5,-158.5 114.5,-158.5 13.5,-158.5 13.5,-158.5 7.5,-158.5 1.5,-152.5 1.5,-146.5 1.5,-146.5 1.5,-12.5 1.5,-12.5 1.5,-6.5 7.5,-0.5 13.5,-0.5"/>
-<text text-anchor="middle" x="19.5" y="-75.8" font-family="Times,serif" font-size="14.00">exp</text>
-<polyline fill="none" stroke="blue" points="37.5,-0.5 37.5,-158.5 "/>
-<text text-anchor="middle" x="82" y="-143.3" font-family="Times,serif" font-size="14.00">NUM </text>
-<text text-anchor="middle" x="82" y="-128.3" font-family="Times,serif" font-size="14.00">VAR </text>
-<text text-anchor="middle" x="82" y="-113.3" font-family="Times,serif" font-size="14.00">VAR &#39;=&#39; exp </text>
-<text text-anchor="middle" x="82" y="-98.3" font-family="Times,serif" font-size="14.00">exp &#39;+&#39; exp </text>
-<text text-anchor="middle" x="82" y="-83.3" font-family="Times,serif" font-size="14.00">exp &#39;&#45;&#39; exp </text>
-<text text-anchor="middle" x="82" y="-68.3" font-family="Times,serif" font-size="14.00">exp &#39;*&#39; exp </text>
-<text text-anchor="middle" x="82" y="-53.3" font-family="Times,serif" font-size="14.00">exp &#39;/&#39; exp </text>
-<text text-anchor="middle" x="82" y="-38.3" font-family="Times,serif" font-size="14.00">&#39;&#45;&#39; exp </text>
-<text text-anchor="middle" x="82" y="-23.3" font-family="Times,serif" font-size="14.00">exp &#39;^&#39; exp </text>
-<text text-anchor="middle" x="82" y="-8.3" font-family="Times,serif" font-size="14.00">&#39;(&#39; exp &#39;)&#39; </text>
-</g>
 <!-- line&#45;&gt;exp -->
-<g id="edge4" class="edge"><title>line&#45;&gt;exp</title>
+<g id="edge5" class="edge"><title>line&#45;&gt;exp</title>
 <path fill="none" stroke="grey" d="M64,-195.476C64,-187.084 64,-178.118 64,-169.036"/>
 <polygon fill="grey" stroke="grey" points="67.5001,-168.755 64,-158.755 60.5001,-168.755 67.5001,-168.755"/>
 </g>
-<!-- exp&#45;&gt;exp -->
-<g id="edge5" class="edge"><title>exp&#45;&gt;exp</title>
-<path fill="none" stroke="grey" d="M126.778,-108.08C137.264,-104.081 144.5,-94.5547 144.5,-79.5 144.5,-69.1499 141.08,-61.4126 135.535,-56.2881"/>
-<polygon fill="grey" stroke="grey" points="137.133,-53.1624 126.778,-50.9196 133.474,-59.1302 137.133,-53.1624"/>
+<!-- $start -->
+<g id="node4" class="node"><title>$start</title>
+<path fill="none" stroke="blue" d="M12,-405.5C12,-405.5 116,-405.5 116,-405.5 122,-405.5 128,-411.5 128,-417.5 128,-417.5 128,-429.5 128,-429.5 128,-435.5 122,-441.5 116,-441.5 116,-441.5 12,-441.5 12,-441.5 6,-441.5 0,-435.5 0,-429.5 0,-429.5 0,-417.5 0,-417.5 0,-411.5 6,-405.5 12,-405.5"/>
+<text text-anchor="middle" x="24.5" y="-419.8" font-family="Times,serif" font-size="14.00">$start</text>
+<polyline fill="none" stroke="blue" points="49,-405.5 49,-441.5 "/>
+<text text-anchor="middle" x="88.5" y="-419.8" font-family="Times,serif" font-size="14.00">input $end </text>
+</g>
+<!-- $start&#45;&gt;input -->
+<g id="edge4" class="edge"><title>$start&#45;&gt;input</title>
+<path fill="none" stroke="grey" d="M64,-405.437C64,-397.487 64,-387.813 64,-378.813"/>
+<polygon fill="grey" stroke="grey" points="67.5001,-378.699 64,-368.699 60.5001,-378.699 67.5001,-378.699"/>
 </g>
 </g>
 </svg>

@@ -1,5 +1,5 @@
 package WebService::Braintree::TransparentRedirect::QueryString;
-$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '1.0';
+$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '1.1';
 use 5.010_001;
 use strictures 1;
 
