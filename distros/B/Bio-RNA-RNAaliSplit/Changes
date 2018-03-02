@@ -15,3 +15,9 @@ Revision history for Bio::RNA::RNAaliSplit
 	  modules 
 	- remove obsolete symbols
 	- use FileDirUtil consistently instead of custom FileDir.pm 
+
+0.06	 Wed Feb 28 2018
+        - added R-scape wrapper
+	- added scripts/eval_alignment.pl
+	- added Path::Class::File dependency to Makefile.PL
+	- added WrapRscape test

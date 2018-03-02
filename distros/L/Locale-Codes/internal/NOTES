@@ -73,6 +73,10 @@ find . -name \*.swp
 #########################################################################
 To create a patch for perl:
 
+***NOTE***
+When perl 5.28 is released, submit a patch that removes it from core.  Then
+this section is no longer needed.
+
    cd /tmp
    git clone git://perl5.git.perl.org/perl.git perl-git
    cd perl-git

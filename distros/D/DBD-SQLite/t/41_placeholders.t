@@ -6,7 +6,8 @@ BEGIN {
 	$^W = 1;
 }
 
-use t::lib::Test qw/connect_ok/;
+use lib "t/lib";
+use SQLiteTest qw/connect_ok/;
 use Test::More;
 use Test::NoWarnings;
 
@@ -29,9 +30,9 @@ eval {
     $sth->bind_param(':baz', "AAAAAAA");
 };
 ok $@, "binding unexisting named parameters returns error";
-print "# expected bind error: $@";
+print "# expected bind error: $@\n";
 ok $warn, "... and warning";
-print "# expected bind warning: $warn";
+print "# expected bind warning: $warn\n";
 $sth->execute;
 {
     my ($count) = $dbh->selectrow_array(

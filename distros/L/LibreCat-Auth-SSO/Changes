@@ -1,0 +1,9 @@
+0.01  2018-02-27 13:26:30 CET
+  - add Moo::Role LibreCat::Auth::SSO
+  - add implementing package LibreCat::Auth::SSO::CAS
+  - add implementing package LibreCat::Auth::SSO::ORCID
+  - add tests
+  - setup milla
+  - use WWW::ORCID
+  - add documentation
+  - add example Plack application to directory examples

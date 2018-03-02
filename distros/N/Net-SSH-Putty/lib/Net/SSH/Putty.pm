@@ -16,8 +16,7 @@ use namespace::clean 0.25;
 use File::Spec;
 use Carp;
 use File::Temp qw/:POSIX/;
-use feature 'say';
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 =head1 SYNOPSIS
 
@@ -268,7 +267,7 @@ A experimental method.
 
 You can setup the C<plink.exe> program to generate a log file of the SSH session, but the log contains binary information.
 
-This method tries to read those contents and return an array reference with only the test.
+This method tries to read those contents and return an array reference with only the text from it.
 
 Expects as parameter the complete path to this "binary" log file.
 
@@ -346,7 +345,7 @@ This program is a hack, not a robust solution. Keep that in mind if you're going
 The C<download> method is not very flexible. If you need to download a series of files, it will be inefficient since multiple SFTP sessions
 will be open instead of a single one. Maybe in the future this might change.
 
-Also, since c<read_log> is experimental and output redirection on MS Windows requires using C<system> invoking the shell, this might be considered 
+Also, since C<read_log> is experimental and output redirection on MS Windows requires using C<system> invoking the shell, this might be considered 
 insecure if malicious values are used during object creation. Taint mode is not active in this module.
 
 =head1 SEE ALSO

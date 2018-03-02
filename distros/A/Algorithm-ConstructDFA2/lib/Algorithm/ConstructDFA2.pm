@@ -10,7 +10,7 @@ use Memoize;
 use Log::Any qw//;
 use DBI;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has 'input_alphabet' => (
   is       => 'ro',
@@ -204,6 +204,7 @@ sub _deploy_schema {
     CREATE TABLE Edge (
       src INTEGER NOT NULL,
       dst INTEGER NOT NULL,
+      UNIQUE(src, dst),
       FOREIGN KEY (dst)
         REFERENCES Vertex(value)
         ON DELETE NO ACTION
@@ -215,8 +216,9 @@ sub _deploy_schema {
     );
 
     CREATE INDEX Edge_idx_dst ON Edge (dst);
-    CREATE INDEX Edge_idx_src ON Edge (src);
-    CREATE UNIQUE INDEX src_dst_unique02 ON Edge (src, dst);
+
+    -- can use covering index instead
+    -- CREATE INDEX Edge_idx_src ON Edge (src);
 
     CREATE TRIGGER trigger_Edge_insert
       BEFORE INSERT ON Edge
@@ -237,6 +239,7 @@ sub _deploy_schema {
     CREATE TABLE Closure (
       root INTEGER NOT NULL,
       e_reachable INTEGER NOT NULL,
+      UNIQUE(root, e_reachable),
       FOREIGN KEY (root)
         REFERENCES Vertex(value)
         ON DELETE NO ACTION
@@ -247,9 +250,10 @@ sub _deploy_schema {
         ON UPDATE NO ACTION
     );
 
-    CREATE INDEX Closure_idx_src ON Closure(root);
     CREATE INDEX Closure_idx_dst ON Closure(e_reachable);
-    CREATE UNIQUE INDEX src_dst_unique ON Closure(root, e_reachable);
+
+    -- can use covering index instead
+    -- CREATE INDEX Closure_idx_src ON Closure(root);
 
     -----------------------------------------------------------------
     -- DFA States
@@ -257,10 +261,8 @@ sub _deploy_schema {
 
     CREATE TABLE State (
       state_id INTEGER PRIMARY KEY NOT NULL,
-      vertex_str TEXT NOT NULL
+      vertex_str TEXT UNIQUE NOT NULL
     );
-
-    CREATE UNIQUE INDEX vertex_str_unique ON State (vertex_str);
 
     -----------------------------------------------------------------
     -- DFA State Composition
@@ -269,6 +271,7 @@ sub _deploy_schema {
     CREATE TABLE Configuration (
       state INTEGER NOT NULL,
       vertex INTEGER NOT NULL,
+      UNIQUE(state, vertex),
       FOREIGN KEY (state)
         REFERENCES State(state_id)
         ON DELETE CASCADE
@@ -279,10 +282,10 @@ sub _deploy_schema {
         ON UPDATE NO ACTION
     );
 
-    CREATE INDEX Configuration_idx_state ON Configuration (state);
     CREATE INDEX Configuration_idx_vertex ON Configuration (vertex);
-    CREATE UNIQUE INDEX state_vertex_unique
-      ON Configuration (state, vertex);
+
+    -- can use covering index instead
+    -- CREATE INDEX Configuration_idx_state ON Configuration (state);
 
     -----------------------------------------------------------------
     -- Input Graph Vertex Match data
@@ -291,6 +294,7 @@ sub _deploy_schema {
     CREATE TABLE Match (
       vertex INTEGER NOT NULL,
       input INTEGER NOT NULL,
+      UNIQUE(vertex, input),
       FOREIGN KEY (input)
         REFERENCES Input(value)
         ON DELETE NO ACTION
@@ -302,8 +306,9 @@ sub _deploy_schema {
     );
 
     CREATE INDEX Match_idx_input ON Match (input);
-    CREATE INDEX Match_idx_vertex ON Match (vertex);
-    CREATE UNIQUE INDEX vertex_input_unique ON Match (vertex, input);
+
+    -- can use covering index instead
+    -- CREATE INDEX Match_idx_vertex ON Match (vertex);
 
     -----------------------------------------------------------------
     -- DFA Transitions
@@ -313,6 +318,7 @@ sub _deploy_schema {
       src INTEGER NOT NULL,
       input INTEGER NOT NULL,
       dst INTEGER NOT NULL,
+      UNIQUE(src, input),
       FOREIGN KEY (dst)
         REFERENCES State(state_id)
         ON DELETE CASCADE
@@ -329,8 +335,9 @@ sub _deploy_schema {
 
     CREATE INDEX Transition_idx_dst ON Transition (dst);
     CREATE INDEX Transition_idx_input ON Transition (input);
-    CREATE INDEX Transition_idx_src ON Transition (src);
-    CREATE UNIQUE INDEX src_input_unique ON Transition (src, input);
+
+    -- can use covering index instead
+    -- CREATE INDEX Transition_idx_src ON Transition (src);
 
     -----------------------------------------------------------------
     -- Views
@@ -373,9 +380,20 @@ sub _deploy_schema {
         INNER JOIN Edge e
           ON (e.src = c1.vertex AND e.dst = c2.vertex)
         INNER JOIN Match m
-          ON (m.input = tr.input AND m.vertex = c1.vertex)
+          ON (m.input = tr.input AND m.vertex = c1.vertex);
     
-
+    CREATE VIEW view_transitions_as_configuration_pair AS
+    SELECT
+      c1.rowid AS src_id,
+      c2.rowid AS dst_id
+    FROM
+      view_transitions_as_5tuples t
+        INNER JOIN Configuration c1
+          ON (c1.state = t.src_state
+            AND c1.vertex = t.src_vertex)
+        INNER JOIN Configuration c2
+          ON (c2.state = t.dst_state
+            AND c2.vertex = t.dst_vertex);
   });
 }
 

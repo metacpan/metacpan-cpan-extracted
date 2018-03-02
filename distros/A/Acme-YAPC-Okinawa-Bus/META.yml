@@ -1,0 +1,38 @@
+---
+abstract: "It's Tweet shere"
+author:
+  - 'AnaTofuZ <anatofuz@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-YAPC-Okinawa-Bus
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::YAPC::Okinawa::Bus:
+    file: lib/Acme/YAPC/Okinawa/Bus.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus/issues
+  homepage: https://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus
+  repository: git://github.com/AnaTofuZ/xs-Acme-YAPC-Okinawa-Bus.git
+version: '0.01'
+x_authority: cpan:ANATOFUZ
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

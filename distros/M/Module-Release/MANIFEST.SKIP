@@ -57,8 +57,10 @@
 ^MYMETA\.
 #!end included /usr/local/perls/perl-5.18.1/lib/5.18.1/ExtUtils/MANIFEST.SKIP
 
-\.releaserc
 \.travis\.yml
+\.?appveyor.yml
+\.releaserc
+\.lwpcookies
 \.bbproj
 sf_upload
 t/ftp/

@@ -9,7 +9,7 @@ use Carp;
 
 our @EXPORT = qw(check_vcs vcs_tag make_vcs_tag);
 
-$VERSION = '2.123';
+$VERSION = '2.125';
 
 =encoding utf8
 
@@ -108,7 +108,7 @@ sub check_vcs {
 	if($question_count)
 		{
     	$self->_print "\nWARNING: Subversion is not up-to-date ($question_count files unknown); ",
-      "continue anwyay? [Ny] " ;
+      "continue anyway? [Ny] " ;
 		die "Exiting\n" unless <> =~ /^[yY]/;
 		}
 
@@ -178,7 +178,7 @@ sub vcs_tag {
 	# Make sure the top-level path exists
 	#
 	# Can't use $self->run() because of a bug where $fh isn't closed, which
-	# stops $? from being properly propogated.  Reported to brian d foy as
+	# stops $? from being properly propagated.  Reported to brian d foy as
 	# part of RT#6489
 	$self->run( "svn list $tag_url 2>&1" );
 	if( $? ) {
@@ -247,7 +247,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 
@@ -257,9 +257,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the Artistic License 2.0.
 
 =cut
 

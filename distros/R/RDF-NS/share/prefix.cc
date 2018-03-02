@@ -2232,3 +2232,7 @@ vehma	http://deductions.github.io/vehicule-management.owl.ttl#	20180213
 vehman	http://deductions.github.io/vehicule-management.owl.ttl#	20180213
 ver	https://w3id.org/version/ontology#	20180213
 w3cgeo	http://www.w3.org/2003/01/geo/wgs84_pos#	20180213
+besluit	http://data.vlaanderen.be/ns/besluit#	20180227
+bgt	http://bgt.basisregistraties.overheid.nl/def/bgt#	20180227
+geo7	https://www.geo7.ch/	20180227
+shui	https://vocab.eccenca.com/shui/	20180227

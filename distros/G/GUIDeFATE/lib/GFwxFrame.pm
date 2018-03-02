@@ -3,7 +3,7 @@ package GFwxFrame;
    use strict;
    use warnings;
 
-   our $VERSION = '0.052';
+   our $VERSION = '0.065';
    
    use Exporter 'import';
    our @EXPORT_OK      = qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale>;
@@ -29,7 +29,7 @@ package GFwxFrame;
    
    my $lastMenuLabel;  #bug workaround in menu generator
    
-   my $winScale=8;
+   my $winScale=6.5;
    my $font = Wx::Font->new(     3*$winScale,
                                 wxDEFAULT,
                                 wxNORMAL,
@@ -48,6 +48,8 @@ package GFwxFrame;
     setupContent($self,$panel);  #then add content
     return $self;
    }
+
+# setupContent  sets up the initial content before Mainloop can be run.
    
    sub setupContent{
 	   my ($self,$panel)=@_;
@@ -120,7 +122,7 @@ package GFwxFrame;
          
         sub aTC{
 			 my ($self,$panel, $id, $text, $location, $size, $action)=@_;
-			 $self->{"txtctrl".$id} = Wx::TextCtrl->new(
+			 $self->{"textctrl".$id} = Wx::TextCtrl->new(
                                         $panel,
                                         $id,
                                         $text,
@@ -128,7 +130,7 @@ package GFwxFrame;
                                         $size,
                                         wxTE_PROCESS_ENTER
                                         );
-            EVT_TEXT_ENTER( $self, $id, $action );
+            EVT_TEXT_ENTER( $self, $id, $action);
 		 }
          
          sub aST{
@@ -149,7 +151,6 @@ package GFwxFrame;
 			                                         ); 
 			
 			if ($panelType eq "I"){  # Image panels start with I
-				$content=~s/^\s+|\s+$//g;
 				if (! -e $content){ return; }
 				no warnings;   # sorry about that...suppresses a "Useless string used in void context"
 			    my $image = Wx::Perl::Imagick->new($content);
@@ -165,7 +166,6 @@ package GFwxFrame;
 				 else {"print failed to load image $content \n";}
 			 }
 			if ($panelType eq "T"){  # handle
-				$content=~s/^\s+|\s+$//g;
 				
 				$self->{"TextCtrl".($id+1)} = Wx::TextCtrl->new(
                    $self->{"subpanel".$id}, 
@@ -180,6 +180,7 @@ package GFwxFrame;
 		 }
    }
    
+#functions for GUIDeFATE to load the widgets into the backend
    sub addButton{
 	   push (@buttons,shift );
    }
@@ -199,10 +200,57 @@ package GFwxFrame;
 	   my ($name,$style)=@_;
 	   $styles{$name}=$style;
    }
+
+# Functions for internal use 
+   sub getSize{
+	   my ($self,$id,$arrayRef)=@_;
+	   my $found=getItem($self,$id,$arrayRef);
+	   return ( $found!=-1) ? $$arrayRef[$found][4]:0;
+	   
+   }
+   sub getLocation{
+	   my ($self,$id,$arrayRef)=@_;
+	   my $found=getItem($self,$id,$arrayRef);
+	   return ( $found!=-1) ? $$arrayRef[$found][3]:0;
+	   
+   }   
+   sub getItem{
+	   my ($self,$id,$arrayRef)=@_;
+	   my $i=0; my $found=-1;
+	   while ($i<@$arrayRef){
+		   if ($$arrayRef[$i][0]==$id) {
+			   $found=$i;
+			   }
+		   $i++;
+	   }
+	   return $found;
+   }
+   sub setScale{
+	   $winScale=shift;
+	   $font = Wx::Font->new(     3*$winScale,
+                                wxDEFAULT,
+                                wxNORMAL,
+                                wxNORMAL,
+                                0,
+                                "",
+                                wxFONTENCODING_DEFAULT);	   
+   }
+   sub reSize{
+	   my ($self,$id,$newSize)=@_;
+   }   
+#  The functions for GUI Interactions
+#Static Text functions
+   sub setLabel{
+	   my ($self,$id,$text)=@_;	   
+	   $self->{$id}->SetLabel($text);
+   }
    
+
+#Image functions
    sub setImage{
-	   my ($self,$file,$id)=@_;
-	   my $size=getPanelSize($self,$id);
+	   my ($self,$id,$file)=@_;
+	   $id=~s/[^\d]//g;
+	   my $size=getSize($self,$id,\@subpanels);
 	   if ($size){
 	       my $image = Wx::Perl::Imagick->new($file);
 		   if ($image){
@@ -220,17 +268,25 @@ package GFwxFrame;
 			 
 	   
    }
-   sub setScale{
-	   $winScale=shift;
-	   $font = Wx::Font->new(     3*$winScale,
-                                wxDEFAULT,
-                                wxNORMAL,
-                                wxNORMAL,
-                                0,
-                                "",
-                                wxFONTENCODING_DEFAULT);	   
+
+#Text input functions
+   sub getValue{
+	   my ($self,$id)=@_;
+	   if (!$self->{$id}) {print "can not get  Value for widget ". $id.": Widget not found\n";}
+	   else { $self->{$id}->GetValue();}
    }
-   
+   sub setValue{
+	   my ($self,$id,$text)=@_;
+	   if (!$self->{$id}) {print "can not set  Value for widget ". $id.": Widget not found\n";}
+	   else {  $self->{$id}->SetValue($text);}
+   }
+   sub appendValue{
+	   my ($self,$id,$text)=@_;
+	   if (!$self->{$id}) {print "can not Append  Value to widget ". $id.": Widget not found\n";}
+	    else { $self->{$id}->AppendText($text);}
+   }
+
+#Message box, Fileselector and Dialog Boxes
    sub showFileSelectorDialog{
 	 
      my ($self, $message,$load) = @_;
@@ -270,27 +326,7 @@ package GFwxFrame;
 	   
    };
    
-   sub getPanelSize{
-	   my ($self,$id)=@_;
-	   my $found=getPanel($self,$id);
-	   return ( $found!=-1) ? $subpanels[$found][4]:0;
-	   
-   }
-   sub getPanel{
-	   my ($self,$id)=@_;
-	   my $i=0; my $found=-1;
-	   while ($i<@subpanels){
-		   if ($subpanels[$i][0]==$id) {
-			   $found=$i;
-			   }
-		   $i++;
-	   }
-	   return $found;
-   }
-   sub reSize{
-	   my ($self,$id,$newSize)=@_;
-	   
-   }
+# quit
    sub quit{
 	   my ($self) = @_;
 	   $self ->Close(1);

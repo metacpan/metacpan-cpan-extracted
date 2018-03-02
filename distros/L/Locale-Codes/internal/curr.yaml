@@ -9385,7 +9385,7 @@ currency:
       MMK: Kyat
       MNT: Tugrik
       MOP: Pataca
-      MRO: Ouguiya
+      MRU: Ouguiya
       MUR: Mauritius Rupee
       MVR: Rufiyaa
       MWK: Malawi Kwacha
@@ -9423,7 +9423,7 @@ currency:
       SOS: Somali Shilling
       SRD: Surinam Dollar
       SSP: South Sudanese Pound
-      STD: Dobra
+      STN: Dobra
       SVC: El Salvador Colon
       SYP: Syrian Pound
       SZL: Lilangeni
@@ -9603,7 +9603,7 @@ currency:
         - DJF
         - Djibouti Franc
       dobra: 
-        - STD
+        - STN
         - Dobra
       dominican peso: 
         - DOP
@@ -9792,7 +9792,7 @@ currency:
         - NOK
         - Norwegian Krone
       ouguiya: 
-        - MRO
+        - MRU
         - Ouguiya
       pa'anga: 
         - TOP
@@ -10069,7 +10069,6 @@ currency:
       454: Malawi Kwacha
       458: Malaysian Ringgit
       462: Rufiyaa
-      478: Ouguiya
       480: Mauritius Rupee
       484: Mexican Peso
       496: Tugrik
@@ -10095,7 +10094,6 @@ currency:
       643: Russian Ruble
       646: Rwanda Franc
       654: Saint Helena Pound
-      678: Dobra
       682: Saudi Riyal
       690: Seychelles Rupee
       694: Leone
@@ -10124,6 +10122,8 @@ currency:
       882: Tala
       886: Yemeni Rial
       901: New Taiwan Dollar
+      929: Ouguiya
+      930: Dobra
       931: Peso Convertible
       932: Zimbabwe Dollar
       933: Belarusian Ruble
@@ -10310,7 +10310,7 @@ currency:
         - 262
         - Djibouti Franc
       dobra: 
-        - 678
+        - 930
         - Dobra
       dominican peso: 
         - 214
@@ -10499,7 +10499,7 @@ currency:
         - 578
         - Norwegian Krone
       ouguiya: 
-        - 478
+        - 929
         - Ouguiya
       pa'anga: 
         - 776
@@ -13743,6 +13743,7 @@ language:
       cnk: Khumi Chin
       cnl: Lalana Chinantec
       cno: Con
+      cnr: Montenegrin
       cns: Central Asmat
       cnt: Tepetotutla Chinantec
       cnu: Chenoua
@@ -34032,6 +34033,9 @@ language:
       montagnais: 
         - moe
         - Montagnais
+      montenegrin: 
+        - cnr
+        - Montenegrin
       montol: 
         - mtl
         - Montol
@@ -44311,6 +44315,7 @@ language:
       chv: Chuvash
       chy: Cheyenne
       cmc: Chamic languages
+      cnr: Montenegrin
       cop: Coptic
       cor: Cornish
       cos: Corsican
@@ -45603,6 +45608,9 @@ language:
       mongolian: 
         - mon
         - Mongolian
+      montenegrin: 
+        - cnr
+        - Montenegrin
       mossi: 
         - mos
         - Mossi
@@ -46210,6 +46218,7 @@ langvar:
       hsistemo: Standard H-system orthographic fallback for spelling Esperanto
       ijekavsk: Serbian with Ijekavian pronunciation
       itihasa: Epic Sanskrit
+      ivanchov: Bulgarian in 1899 orthography
       jauer: Jauer dialect of Romansh
       jyutping: Jyutping Cantonese Romanization
       kkcor: Common Cornish orthography of Revived Cornish
@@ -46288,6 +46297,9 @@ langvar:
       buddhist hybrid sanskrit: 
         - bauddha
         - Buddhist Hybrid Sanskrit
+      bulgarian in 1899 orthography: 
+        - ivanchov
+        - Bulgarian in 1899 orthography
       classical sanskrit: 
         - laukika
         - Classical Sanskrit
@@ -46654,6 +46666,7 @@ script:
       Qaaa: Reserved for private use (start)
       Qabx: Reserved for private use (end)
       Rjng: Rejang
+      Rohg: Hanifi Rohingya
       Roro: Rongorongo
       Runr: Runic
       Samr: Samaritan
@@ -46667,6 +46680,8 @@ script:
       Sidd: Siddham
       Sind: Khudawadi
       Sinh: Sinhala
+      Sogd: Sogdian
+      Sogo: Old Sogdian
       Sora: Sora Sompeng
       Soyo: Soyombo
       Sund: Sundanese
@@ -46870,6 +46885,9 @@ script:
       hangul: 
         - Hang
         - Hangul
+      hanifi rohingya: 
+        - Rohg
+        - Hanifi Rohingya
       hanunoo: 
         - Hano
         - Hanunoo
@@ -47098,6 +47116,9 @@ script:
       old persian: 
         - Xpeo
         - Old Persian
+      old sogdian: 
+        - Sogo
+        - Old Sogdian
       old south arabian: 
         - Sarb
         - Old South Arabian
@@ -47173,6 +47194,9 @@ script:
       sinhala: 
         - Sinh
         - Sinhala
+      sogdian: 
+        - Sogd
+        - Sogdian
       sora sompeng: 
         - Sora
         - Sora Sompeng
@@ -47313,12 +47337,15 @@ script:
       138: Syriac (Estrangelo variant)
       139: Manichaean
       140: Mandaic, Mandaean
+      141: Sogdian
+      142: Old Sogdian
       145: Mongolian
       159: Nabataean
       160: Arabic
       161: Arabic (Nastaliq variant)
       165: N'Ko
       166: Adlam
+      167: Hanifi Rohingya
       170: Thaana
       175: Old Turkic, Orkhon Runic
       176: Old Hungarian (Hungarian Runic)
@@ -47640,6 +47667,9 @@ script:
       hangul (hangul, hangeul): 
         - 286
         - Hangul (Hangul, Hangeul)
+      hanifi rohingya: 
+        - 167
+        - Hanifi Rohingya
       hanunoo (hanunoo): 
         - 371
         - Hanunoo (Hanunoo)
@@ -47868,6 +47898,9 @@ script:
       old persian: 
         - '030'
         - Old Persian
+      old sogdian: 
+        - 142
+        - Old Sogdian
       old south arabian: 
         - 105
         - Old South Arabian
@@ -47943,6 +47976,9 @@ script:
       sinhala: 
         - 348
         - Sinhala
+      sogdian: 
+        - 141
+        - Sogdian
       sora sompeng: 
         - 398
         - Sora Sompeng

@@ -119,8 +119,9 @@ cmp_ok(@tables, '>', 0, "tables returns array");
 $rows = 0;
 if ($sth = $dbh->column_info(undef, undef, $ODBCTEST::table_name, undef)) {
     my $fetched = $sth->fetchall_arrayref;
-    cmp_ok(scalar(@$fetched), '>', 0, "column info returns more than one row for test table") or
-        diag(Dumper($fetched));
+    cmp_ok(scalar(@$fetched), '>', 0, "column info returns a row for test table " .
+               $ODBCTEST::table_name) or
+               diag(Dumper($fetched));
 }
 
 $rows = 0;
@@ -225,4 +226,3 @@ sub commitTest {
 
 
 # ------------------------------------------------------------
-

@@ -1,0 +1,32 @@
+---
+uri_base: "http://localhost:5000"
+store:
+  #whitelist for users that can use SSO
+  #cas authorization matches on sso_cas
+  #orcid authorization matches on sso_orcid
+  users:
+    package: "Catmandu::Store::Hash"
+    options:
+      init_data:
+        - _id: "njfranck"
+          sso_cas: "njfranck"
+          sso_orcid: "0000-0002-5268-9669"
+          roles:
+            - admin
+        - _id: "phochste"
+          sso_cas: "phochste"
+          sso_orcid: "0000-0001-8390-6171"
+          roles:
+            - editor
+        - _id: "nsteenla"
+          sso_cas: "nsteenla"
+          sso_orcid: "0000-0002-4268-8355"
+          roles:
+            - editor
+
+orcid:
+  client_id: "my-orcid-client-id"
+  client_secret: "my-orcid-client-secret"
+  sandbox: 1
+cas:
+  cas_url: "https://localhost:8443/cas"

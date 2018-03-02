@@ -8,12 +8,25 @@ TODO:
     size & block size.
   - Fix to support MLSD & MLST commands.
 
+  - Replace useSSL with SSL_version in test scripts. (depreciated v0.39)
+    (use the new FTPSSL_SSL_VER environment variable for t/*.t progs)
+    Maybe put all question/answers into it's own helper module to simplify
+    keeping this mess in sync between test scripts.
+
 Version - YYYY/MM/DD
 --------------------
+0.40 2018/02/26 08:30:00
+  - Updated the copyright to 2018.
+  - Updated README to reference the new FTPSSL_SSL_VER environment variable for
+    the test case prompts.  (t/*.t)  Also fixed several typos in this file.
+  - BugId 124570 asked for "_mdtm()" to allow for dates from 1999 & earlier.
+  - Made the same BugId change in t/10-complex.t
+
 0.39 2017/10/23 08:30:00
   - Updated the LISCENSE file to 2017 (from 2015)
   - Changed default from TLS v1.0 to TLS v1.2 and rearranged the POD a bit.
-  - Started depreciating useSSL.  Now prints out warning if used!  Warning
+    (BugId: 123338)
+  - Started depreciating useSSL.  Now prints out a warning if used!  Warning
     says to use option "SSL_version" instead.
 
 0.38 2017/03/30 08:30:00
@@ -345,7 +358,7 @@ Version - YYYY/MM/DD
     without the need to make a local copy of the file on your file system.
   - Added xtransfer() as well.
   - Added transfer & xtransfer validation to 10-complex.t to test things out.
-  - Added a new environment variable default for *.t prompts.
+  - Added a new environment variable default for t/*.t prompts.
   - Bug # 95411 - Patch provided by ian@iansramblings.com.  Fixes hang issue
     when the command channel unexpectedly drops.  Does this by implementing
     a timeout in response().
@@ -469,8 +482,8 @@ Version - YYYY/MM/DD
     string!
   - Fixed a bug in t/10-complex.t and added optional environment variables
     for some of the connection values to make it easier for me to quickly
-    rerun tests during development without having to key in ansers to questions
-    with no good default values over & over again.
+    rerun tests during development without having to key in answers to questions
+    with no good default values over & over again.  They all begin with FTPSSL_.
   - Wrote t/20-certificate.t to test certificates out.  But this and
     t/10-complex.t are probably incompatable in most settings.  Anyone else
     trying to use this test case will have to modify this code to point to their

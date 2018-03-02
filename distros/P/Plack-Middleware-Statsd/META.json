@@ -60,6 +60,7 @@
             "HTTP::Request::Common" : "0",
             "Module::Metadata" : "0",
             "Plack::Builder" : "0",
+            "Plack::MIME" : "0",
             "Plack::Middleware::ContentLength" : "0",
             "Plack::Middleware::Head" : "0",
             "Plack::Test" : "0",
@@ -74,7 +75,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.3.3"
+         "version" : "v0.3.4"
       }
    },
    "release_status" : "stable",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.3.3",
+   "version" : "v0.3.4",
    "x_authority" : "cpan:RRWO",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

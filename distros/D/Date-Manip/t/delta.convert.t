@@ -18,7 +18,7 @@ sub test {
   $obj->parse($delta);
   $obj->convert($to);
   @val = $obj->value();
-  return (@val,$$obj{"data"}{"business"});
+  return (@val,($$obj{"data"}{"mode"} eq 'business' ? 1 : 0) );
 }
 
 $obj = new Date::Manip::Delta;
@@ -70,7 +70,9 @@ $tests="
 
 '0:0:0:0:0:0:31556952'          semi    => 0 0 52 1 5 49 12 0
 
-'0:0:0:0:0:0:31556952'          approx  => 1 0 0 0 0 0 0 0
+'0:0:0:0:0:0:31556952'          approx  => 0 0 52 1 5 49 12 0
+
+'0:0:0:0:0:0:31556952'          estimated  => 1 0 0 0 0 0 0 0
 
 #
 
@@ -86,7 +88,9 @@ $tests="
 
 '0:0:0:367:0:0:0'               semi    => 0 0 52 3 0 0 0 0
 
-'0:0:0:367:0:0:0'               approx  => 1 0 0 1 18 10 48 0
+'0:0:0:367:0:0:0'               approx  => 0 0 52 3 0 0 0 0
+
+'0:0:0:367:0:0:0'               estimated  => 1 0 0 1 18 10 48 0
 
 #
 
@@ -142,7 +146,9 @@ $tests="
 
 '0:0:0:0:0:0:8452755 business'  semi    => 0 0 52 0 7 59 15 1
 
-'0:0:0:0:0:0:8452755 business'  approx  => 1 0 0 0 0 0 0 1
+'0:0:0:0:0:0:8452755 business'  approx  => 0 0 52 0 7 59 15 1
+
+'0:0:0:0:0:0:8452755 business'  estimated  => 1 0 0 0 0 0 3 1
 
 #
 
@@ -166,7 +172,9 @@ $tests="
 
 '0:0:53:0:0:0:0 business'       semi    => 0 0 53 0 0 0 0 1
 
-'0:0:53:0:0:0:0 business'       approx  => 1 0 0 4 1 0 45 1
+'0:0:53:0:0:0:0 business'       approx  => 0 0 53 0 0 0 0 1
+
+'0:0:53:0:0:0:0 business'       estimated  => 1 0 0 4 1 0 48 1
 
 #
 

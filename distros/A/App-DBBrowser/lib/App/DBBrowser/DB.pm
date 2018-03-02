@@ -6,652 +6,192 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.058';
+our $VERSION = '2.001';
 
+use Scalar::Util qw( looks_like_number );
 
-
-=head1 NAME
-
-App::DBBrowser::DB - Database plugin documentation.
-
-=head1 VERSION
-
-Version 1.058
-
-
-=head1 DESCRIPTION
-
-A database plugin provides the database specific methods. C<App::DBBrowser> considers a module whose name matches
-C</^App::DBBrowser::DB::[^:']+\z/> and which is located in one of the C<@INC> directories as a database plugin.
-Plugins with the name C<App::DBBrowser::DB::$database_driver> should be for general use of C<$database_driver>
-databases.
-
-The user can add an installed database plugin to the available plugins in the option menu (C<db-browser -h>) by
-selecting I<DB> and then I<DB Plugins>.
-
-A suitable database plugin provides the methods named in this documentation.
-
-Column names passed as arguments to plugin methods are already quoted with the C<DBI> C<quote_identifier> method.
-
-
-=head1 PLUGIN API VERSION
-
-This documentation describes the plugin API version C<1.5>.
-
-Supported plugin API version: C<1.5>.
-
-
-=head1 METHODS
-
-
-=head2 new
-
-The constructor method.
-
-=over
-
-=item Arguments
-
-A reference to a hash. The hash entries are:
-
-        app_dir             # path to the application directoriy
-        home_dir
-        db_plugin           # name of the database plugin
-        add_metadata        # true or false
-
-        # SQLite only:
-        sqlite_search       # if true, don't use cached database names
-        db_cache_file       # path to the file with the cached database names
-
-=item return
-
-The object.
-
-=back
-
-=cut
 
 sub new {
     my ( $class, $info, $opt ) = @_;
-    my $db_module = 'App::DBBrowser::DB::' . $info->{db_plugin};
+    my $db_module  = $info->{plugin};
     eval "require $db_module" or die $@;
 
     my $plugin = $db_module->new( {
-        app_dir             => $info->{app_dir},
-        home_dir            => $info->{home_dir},
-        db_plugin           => $info->{db_plugin},
-        db_cache_file       => $info->{db_cache_file},
-        sqlite_search       => $info->{sqlite_search},
-        clear_screen        => $info->{clear_screen},
-        add_metadata        => $opt->{G}{metadata},
+        app_dir       => $info->{app_dir},
+        add_metadata  => $opt->{G}{meta},
+        reset_search_cache => $info->{sqlite_search},
+
     } );
-
-    my $minimum_pav = 1.5;
-
-    my $pav;
-    $pav = $plugin->plugin_api_version() if $plugin->can( 'plugin_api_version' );
-    if ( defined $pav && $pav < $minimum_pav ) {
-        print "Database plugin \"$info->{db_plugin}\" complies to the plugin API version $pav.\n";
-        print "Supported minimum plugin API version is $minimum_pav!\n";
-        exit;
-    }
-
     bless { Plugin => $plugin }, $class;
 }
 
 
 sub message_method_undef_return {
-    my ( $self, $method ) = @_;
-    return sprintf '%s method %s: no return value', ref $self->{Plugin}, $method;
+    my ( $sf, $method ) = @_;
+    return sprintf '%s method %s: no return value', ref $sf->{Plugin}, $method;
 }
 
 
-sub debug {
-    my ( $self, $dbh, $info, $opt, $db_opt ) = @_;
-    return if ! $self->{Plugin}->can( 'debug' );
-    $self->{Plugin}->debug( $dbh, $info, $opt, $db_opt );
-}
-
-
-
-=head2 plugin_api_version
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-The version of the plugin-API to which the plugin refers.
-
-See L</PLUGIN API VERSION> for the plugin API version described by this documentation.
-
-=back
-
-=cut
-
-sub plugin_api_version {
-    my ( $self ) = @_;
-    my $plugin_api_version = $self->{Plugin}->plugin_api_version();
-    return $plugin_api_version;
-}
-
-
-
-=head2 db_driver
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-The name of the C<DBI> database driver used by the plugin.
-
-=back
-
-=cut
-
-sub db_driver {
-    my ( $self ) = @_;
-    my $db_driver = $self->{Plugin}->db_driver();
-    die $self->message_method_undef_return( 'db_driver' ) if ! defined $db_driver;
-    return $db_driver;
-}
-
-
-
-=head2 driver_prefix
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-The driver-private prefix.
-
-=back
-
-Example for the database driver C<Pg>:
-
-    sub driver_prefix {
-        return 'pg';
+sub driver {
+    my ( $sf ) = @_;
+    ###
+    if ( ! $sf->{Plugin}->can( 'get_db_driver' ) && $sf->{Plugin}->can( 'db_driver' ) ) {
+        require Term::Choose;
+        Term::Choose::choose( [ 'Close with ENTER' ], { prompt => 'Please update your database Plugin!' } );
+        exit;
     }
-
-=cut
-
-sub driver_prefix {
-    my ( $self ) = @_;
-    return if ! $self->{Plugin}->can( 'driver_prefix' );
-    my $driver_prefix = $self->{Plugin}->driver_prefix();
-    if ( defined $driver_prefix && $driver_prefix !~ /_\z/ ) {
-        $driver_prefix .= '_';
-    }
-    return $driver_prefix;
+    ###
+    my $driver = $sf->{Plugin}->get_db_driver();
+    die $sf->message_method_undef_return( 'driver' ) if ! defined $driver;
+    return $driver;
 }
 
-
-
-=head2 read_arguments
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-A reference to an array of hashes. The hashes have two or three key-value pairs:
-
-    { name => 'string', prompt => 'string', keep_secret => true/false }
-
-C<name> holds the field name for example like "user" or "host".
-
-The value of C<prompt> is used as the prompt string, when the user is asked for the data. The C<prompt> entry is
-optional. If C<prompt> doesn't exist, the value of C<name> is used instead.
-
-If C<keep_secret> is true, the user input should not be echoed to the terminal. Also the data is not stored in the
-plugin configuration file if C<keep_secret> is true.
-
-=back
-
-An example C<read_arguments> method:
-
-    sub read_arguments {
-        my ( $self ) = @_;
-        return [
-            { name => 'host', prompt => "Host",     keep_secret => 0 },
-            { name => 'port', prompt => "Port",     keep_secret => 0 },
-            { name => 'user', prompt => "User",     keep_secret => 0 },
-            { name => 'pass', prompt => "Password", keep_secret => 1 },
-        ];
-    }
-
-The information returned by the method C<read_arguments> is used to build the entries of the C<db-browser> options
-I<Fields> and I<Login Data>.
-
-=cut
 
 sub read_arguments {
-    my ( $self ) = @_;
-    return [] if ! $self->{Plugin}->can( 'read_arguments' );
-    my $data = $self->{Plugin}->read_arguments();
-    return [] if ! defined $data;
-    return $data;
+    my ( $sf ) = @_;
+    return undef, [] if ! $sf->{Plugin}->can( 'read_arguments' );
+    my $read_args = $sf->{Plugin}->read_arguments();
+    return [] if ! defined $read_args;
+    return $read_args;
 }
 
-
-
-=head2 environment_variables
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-A reference to an array of environment variables.
-
-=back
-
-An example C<environment_variables> method:
-
-    sub environment_variables {
-        my ( $self ) = @_;
-        return [ qw( DBI_DSN DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
-    }
-
-See the C<db-browser> option I<ENV Variables>.
-
-=cut
-
-sub environment_variables {
-    my ( $self ) = @_;
-    return [] if ! $self->{Plugin}->can( 'environment_variables' );
-    my $env_variables = $self->{Plugin}->environment_variables();
+sub env_variables {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'env_variables' );
+    my $env_variables = $sf->{Plugin}->env_variables();
     return [] if ! defined $env_variables;
     return $env_variables;
 }
 
+sub set_attributes {
+    my ( $sf ) = @_;
+    return [] if ! $sf->{Plugin}->can( 'set_attributes' );
+    my $attributes = $sf->{Plugin}->set_attributes();
+    return [] if ! defined $attributes;
+    return $attributes;
+}
 
 
-=head2 choose_arguments
+sub databases {
+    my ( $sf, $connect_parameter ) = @_;
+    my ( $user_db, $sys_db ) = $sf->{Plugin}->get_databases( $connect_parameter );
+    $user_db = [] if ! defined $user_db;
+    $sys_db  = [] if ! defined $sys_db;
+    return $user_db, $sys_db;
+}
 
-=over
 
-=item Arguments
-
-none
-
-=item return
-
-A reference to an array of hashes. The hashes have three or four key-value pairs:
-
-    { name => 'string', prompt => 'string', default_index => index, avail_values => [ value_1, value_2, value_3, ... ] }
-
-The value of C<name> is the name of the database connection attribute.
-
-The value of C<prompt> is used as the prompt string. The C<prompt> entry is optional. If C<prompt> doesn't exist, the
-value of C<name> is used instead.
-
-C<avail_values> holds the available values for that attribute as an array reference.
-
-The C<avail_values> array entry of the index position C<default_index> is used as the default value.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::SQLite>:
-
-    sub choose_arguments {
-        my ( $self ) = @_;
-        return [
-            { name => 'sqlite_unicode',             default_index => 1, avail_values => [ 0, 1 ] },
-            { name => 'sqlite_see_if_its_a_number', default_index => 1, avail_values => [ 0, 1 ] },
-        ];
+sub db_handle {
+    my ( $sf, $db, $connect_parameter ) = @_;
+    my $dbh = $sf->{Plugin}->get_db_handle( $db, $connect_parameter );
+    die $sf->message_method_undef_return( 'db_handle' ) if ! defined $dbh;
+    if ( $dbh->{Driver}{Name} eq 'SQLite' ) {
+        if ( ! $sf->{Plugin}->can( 'regexp' ) ) {
+            $dbh->sqlite_create_function( 'regexp', 3, sub {
+                    my ( $regex, $string, $case_sensitive ) = @_;
+                    $string = '' if ! defined $string;
+                    return $string =~ m/$regex/sm if $case_sensitive;
+                    return $string =~ m/$regex/ism;
+                }
+            );
+        }
+        if ( ! $sf->{Plugin}->can( 'truncate' ) ) {
+            $dbh->sqlite_create_function( 'truncate', 2, sub {
+                    my ( $number, $places ) = @_;
+                    return if ! defined $number;
+                    return $number if ! looks_like_number( $number );
+                    return sprintf "%.*f", $places, int( $number * 10 ** $places ) / 10 ** $places;
+                }
+            );
+        }
+        if ( ! $sf->{Plugin}->can( 'bit_length' ) ) {
+            $dbh->sqlite_create_function( 'bit_length', 1, sub {
+                    use bytes;
+                    return length $_[0];
+                }
+            );
+        }
+        if ( ! $sf->{Plugin}->can( 'char_length' ) ) {
+            $dbh->sqlite_create_function( 'char_length', 1, sub {
+                    return length $_[0];
+                }
+            );
+        }
     }
-
-C<choose_arguments> determines the database handle attributes with predefined values offered in the C<db-browser> option
-I<DB Options>.
-
-=cut
-
-sub choose_arguments {
-    my ( $self ) = @_;
-    return [] if ! $self->{Plugin}->can( 'choose_arguments' );
-    my $connect_attributes = $self->{Plugin}->choose_arguments();
-    return [] if ! defined $connect_attributes;
-    return $connect_attributes;
-}
-
-
-
-=head2 available_databases
-
-=over
-
-=item Arguments
-
-A reference to a hash. If C<available_databases> uses the C<get_db_handle> method, the hash reference can be
-passed to C<get_db_handle> as the second argument. See L</get_db_handle> for more info about the passed hash reference.
-
-=item return
-
-If the object attribute I<add_metadata> is true, C<available_databases> returns the "user-databases" as an
-array-reference and the "system-databases" (if any) as an array-reference.
-
-If I<add_metadata> is not true, C<available_databases> returns only the "user-databases" as an
-array-reference.
-
-=back
-
-=cut
-
-sub available_databases {
-    my ( $self, $connect_parameter ) = @_;
-    my ( $user_db, $system_db ) = $self->{Plugin}->available_databases( $connect_parameter );
-    return $user_db, $system_db;
-}
-
-
-
-=head2 get_db_handle
-
-=over
-
-=item Arguments
-
-The database name and a reference to a hash of hashes.
-
-The hash of hashes provides the settings gathered from the option I<Database settings>.
-
-    $connect_parameter = {
-        use_env_var => {
-            env_var => true or false,
-            env_var => true or false,
-            ...
-        },
-        chosen_arg => {
-            attribute => chosen value,
-            attribute => chosen value,
-            ...
-        },
-        required => {
-            name => true or false,
-            name => true or false,
-            ...
-        },
-        read_arg => {
-            name => user input,
-            name => user input,
-            ...
-        },
-        keep_secret = {
-            name => true or false,
-            name => true or false,
-            ...
-        },
-        dir_sqlite => [     # array reference with directories where to search for SQLite databases
-            /path/dir,
-            ...
-        ]
-    };
-
-For example for the plugin C<mysql> the hash of hashes held by C<$connect_parameter> could look like this:
-
-    $connect_parameter = {
-        use_env_var => {
-            DBI_HOST => 1,
-            DBI_USER => 0,
-            DBI_PASS => 0,
-        },
-        read_arg => {
-            host => undef,
-            pass => undef,
-            user => 'db_user_name',
-            port => undef
-        },
-        chosen_arg => {
-            mysql_enable_utf8 => 1
-        },
-        required => {
-            port => 0,
-            user => 1,
-            pass => 1,
-            host => 1
-        },
-        keep_secret => {
-            port => 0,
-            host => 0,
-            pass => 1,
-            user => 0
-        },
-    };
-
-=item return
-
-Database handle.
-
-=back
-
-=cut
-
-sub get_db_handle {
-    my ( $self, $db, $connect_parameter ) = @_;
-    my $dbh = $self->{Plugin}->get_db_handle( $db, $connect_parameter );
-    die $self->message_method_undef_return( 'get_db_handle' ) if ! defined $dbh;
     return $dbh;
 }
 
 
-
-=head2 get_schema_names
-
-=over
-
-=item Arguments
-
-The database handle and the database name.
-
-=item return
-
-If I<add_metadata> is true, C<get_schema_names> returns the "user-schemas" as an array-reference
-and the "system-schemas" (if any) as an array-reference.
-
-If I<add_metadata> is not true, C<get_schema_names> returns only the "user-schemas" as an
-array-reference.
-
-=back
-
-=cut
-
-sub get_schema_names {
-    my ( $self, $dbh, $db ) = @_;
-    return [] if ! $self->{Plugin}->can( 'get_schema_names' );
-    my ( $user_schemas, $system_schemas ) = $self->{Plugin}->get_schema_names( $dbh, $db );
-    return $user_schemas, $system_schemas;
-}
-
-
-
-=head2 get_table_names
-
-=over
-
-=item Arguments
-
-The database handle and the schema name.
-
-=item return
-
-If I<add_metadata> is true, C<get_table_names> returns the "user-tables" as an array-reference and
-the "system-tables" (if any) as an array-reference.
-
-If I<add_metadata> is not true, C<get_table_names> returns only the "user-tables" as
-an array-reference.
-
-=back
-
-=cut
-
-sub get_table_names {
-    my ( $self, $dbh, $schema ) = @_;
-    my ( $user_tbl, $system_tbl ) = $self->{Plugin}->get_table_names( $dbh, $schema );
-    return $user_tbl, $system_tbl;
-}
-
-
-
-=head2 primary_key_auto
-
-=over
-
-=item Arguments
-
-none
-
-=item return
-
-The primary-key-autoincrement statement.
-
-=back
-
-Example for the database driver C<Pg>:
-
-    sub primary_key_auto {
-        return "SERIAL PRIMARY KEY";
+sub schemas {
+    my ( $sf, $dbh, $db ) = @_;
+    my ( $user_schema, $sys_schema );
+    if ( $sf->{Plugin}->can( 'schemas' ) ) {
+        ( $user_schema, $sys_schema ) = $sf->{Plugin}->get_schemas( $dbh, $db );
     }
-
-=cut
-
-sub primary_key_auto {
-    my ( $self ) = @_;
-    return if ! $self->{Plugin}->can( 'primary_key_auto' ); #
-    return $self->{Plugin}->primary_key_auto();
-}
-
-
-
-=head2 column_names_and_types
-
-=over
-
-=item Arguments
-
-Database handle, database name, schema name, available tables as an array reference.
-
-=item return
-
-Two hash references - one for the column names and one for the column types:
-
-    $col_names = {
-        table_1 => [ column_1_name, column_2_name, ... ],
-        table_2 => [ column_1_name, column_2_name, ... ],
-        ...
-    }
-
-    $col_types = {
-        table_1 => [ column_1_type, column_2_type, ... ],
-        table_2 => [ column_1_type, column_2_type, ... ],
-        ...
-    }
-
-=back
-
-=cut
-
-sub column_names_and_types {
-    my ( $self, $dbh, $db, $schema, $tables ) = @_;
-    my ( $col_names, $col_types ) = $self->{Plugin}->column_names_and_types( $dbh, $db, $schema, $tables );
-    die $self->message_method_undef_return( 'column_names_and_types' ) if ! defined $col_names;
-    $col_types = {} if ! defined $col_types;
-    for my $table ( keys %$col_types ) {
-        for ( @{$col_types->{$table}} ) {
-            s/integer/int/i;
+    else {
+        my $driver = $dbh->{Driver}{Name}; #
+        if ( $driver eq 'SQLite' ) {
+            $user_schema = [ 'main' ]; # [ undef ];
         }
-    }
-    return $col_names, $col_types;
-}
-
-
-
-=head2 primary_and_foreign_keys
-
-The method C<primary_and_foreign_keys> is optional.
-
-=over
-
-=item Arguments
-
-Database handle, database name, schema name, available tables as an array reference.
-
-=item return
-
-Two hash references - one for the primary keys and one for the foreign keys:
-
-    $primary_keys = {
-        table_1 => [ 'primary_key_col_1' [ , ... ] ],
-        table_2 => [ 'primary_key_col_1' [ , ... ] ],
-        ...
-    };
-
-    $foreign_keys = {
-        table_1 => {
-            fk_name_1 => {
-                foreign_key_col   => [ 'foreign_key_col_1' [ , ... ] ],
-                reference_table   => 'Reference_table',
-                reference_key_col => [ 'reference_key_col_1' [ , ... ] ],
-            fk_name_2 => {
-                ...
+        elsif( $driver eq 'mysql' ) {
+            # MySQL 5.7 Reference Manual  /  MySQL Glossary:
+            # In MySQL, physically, a schema is synonymous with a database.
+            # You can substitute the keyword SCHEMA instead of DATABASE in MySQL SQL syntax,
+            $user_schema = [ $db ];
+        }
+        elsif( $driver eq 'Pg' ) {
+            my $sth = $dbh->table_info( undef, '%', undef, undef );
+            # DBD::Pg  3.7.0:
+            # The TABLE_SCHEM and TABLE_NAME will be quoted via quote_ident().
+            # pg_schema: the unquoted name of the schema
+            my $info = $sth->fetchall_hashref( 'pg_schema' );
+            my $qr = qr/^(?:pg_|information_schema$)/;
+            for my $schema ( keys %$info ) {
+                if ( $schema =~ /$qr/ ) {
+                    push @$sys_schema, $schema;
+                }
+                else {
+                    push @$user_schema, $schema;
+                }
             }
-        table_2 => {
-            ...
         }
-    };
-
-=back
-
-=cut
-
-sub primary_and_foreign_keys {
-    my ( $self, $dbh, $db, $schema, $tables ) = @_;
-    return if ! $self->{Plugin}->can( 'primary_and_foreign_keys' );
-    my ( $pk_cols, $fks ) = $self->{Plugin}->primary_and_foreign_keys( $dbh, $db, $schema, $tables );
-    return $pk_cols, $fks;
+        else {
+            my $sth = $dbh->table_info( undef, '%', undef, undef );
+            my $info = $sth->fetchall_hashref( 'TABLE_SCHEM' );
+            $user_schema = [ keys %$info ];
+        }
+    }
+    $user_schema = [] if ! defined $user_schema;
+    $sys_schema  = [] if ! defined $sys_schema;
+    return $user_schema, $sys_schema;
 }
 
 
+#sub primary_key_auto {
+#    my ( $sf ) = @_;
+#    return if ! $sf->{Plugin}->can( 'primary_key_auto' ); #
+#    return $sf->{Plugin}->primary_key_auto();
+#}
 
-=head2 sql_regexp
 
-=over
-
-=item Arguments
-
-Column name, C<$do_not_match_regexp> (true/false), C<$case_sensitive> (true/false).
-
-Use the placeholder instead of the string which should match or not match the regexp.
-
-=item return
-
-The sql regexp substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::mysql>:
-
-    sub sql_regexp {
-        my ( $self, $col, $do_not_match_regexp, $case_sensitive ) = @_;
-        if ( $do_not_match_regexp ) {
+sub regexp {
+    my ( $sf, $col, $do_not_match, $case_sensitive ) = @_;
+    if ( $sf->{Plugin}->can( 'sql_regexp' ) ) {
+        my $sql_regexp = $sf->{Plugin}->sql_regexp( $col, $do_not_match, $case_sensitive );
+        die $sf->message_method_undef_return( 'sql_regexp' ) if ! defined $sql_regexp;
+        $sql_regexp = ' ' . $sql_regexp if $sql_regexp !~ /^\ /;
+        return $sql_regexp;
+    }
+    elsif ( $sf->driver eq 'SQLite' ) {
+        if ( $do_not_match ) {
+            return sprintf ' NOT REGEXP(?,%s,%d)', $col, $case_sensitive;
+        }
+        else {
+            return sprintf ' REGEXP(?,%s,%d)', $col, $case_sensitive;
+        }
+    }
+    elsif ( $sf->driver eq 'mysql' ) {
+        if ( $do_not_match ) {
             return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
             return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
         }
@@ -660,218 +200,85 @@ Example form the plugin C<App::DBBrowser::DB::mysql>:
             return ' '. $col . ' REGEXP BINARY ?'     if   $case_sensitive;
         }
     }
-
-=cut
-
-sub sql_regexp {
-    my ( $self, $quote_col, $do_not_match_regexp, $case_sensitive ) = @_;
-    my $sql_regexp = $self->{Plugin}->sql_regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
-    die $self->message_method_undef_return( 'sql_regexp' ) if ! defined $sql_regexp;
-    $sql_regexp = ' ' . $sql_regexp if $sql_regexp !~ /^\ /;
-    return $sql_regexp;
+    elsif ( $sf->driver eq 'Pg' ) {
+        if ( $do_not_match ) {
+            return ' '. $col . '::text' . ' !~* ?' if ! $case_sensitive;
+            return ' '. $col . '::text' . ' !~ ?'  if   $case_sensitive;
+        }
+        else {
+            return ' '. $col . '::text' . ' ~* ?'  if ! $case_sensitive;
+            return ' '. $col . '::text' . ' ~ ?'   if   $case_sensitive;
+        }
+    }
 }
 
-
-
-=head2 concatenate
-
-=over
-
-=item Arguments
-
-A reference to an array of strings.
-
-=item return
-
-The sql substatement which concatenates the passed strings.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::Pg>:
-
-    sub concatenate {
-        my ( $self, $arg ) = @_;
-        return join( ' || ', @$arg );
-    }
-
-=cut
 
 sub concatenate {
-    my ( $self, $arg ) = @_;
-    my $concatenated = $self->{Plugin}->concatenate( $arg );
-    die $self->message_method_undef_return( 'concatenate' ) if ! defined $concatenated;
-    return $concatenated;
+    my ( $sf, $arg ) = @_;
+    if ( $sf->{Plugin}->can( 'concatenate' ) ) {
+        my $concatenated = $sf->{Plugin}->concatenate( $arg );
+        die $sf->message_method_undef_return( 'concatenate' ) if ! defined $concatenated;
+        return $concatenated;
+    }
+    return 'concat(' . join( ',', @$arg ) . ')'  if $sf->driver eq 'mysql';
+
+    return join( ' || ', @$arg );
 }
 
-
-
-# scalar functions
-
-
-=head2 epoch_to_datetime
-
-=over
-
-=item Arguments
-
-The column name and the interval.
-
-The interval is 1 (seconds), 1000 (milliseconds) or 1000000 (microseconds).
-
-=item return
-
-The sql epoch to datetime substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::mysql>:
-
-    sub epoch_to_datetime {
-        my ( $self, $col, $interval ) = @_;
-        return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')";
-    }
-
-=cut
 
 sub epoch_to_datetime {
-    my ( $self, $quote_col, $interval ) = @_;
-    my $quote_f = $self->{Plugin}->epoch_to_datetime( $quote_col, $interval );
-    die $self->message_method_undef_return( 'epoch_to_datetime' ) if ! defined $quote_f;
-    return $quote_f;
+    my ( $sf, $col, $interval ) = @_;
+
+    return $sf->{Plugin}->epoch_to_datetime( $col, $interval )    if $sf->{Plugin}->can( 'epoch_to_datetime' );
+
+    return "DATETIME($col/$interval,'unixepoch','localtime')"     if $sf->driver eq 'SQLite';
+
+    # mysql: FROM_UNIXTIME doesn't work with negative timestamps
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->driver eq 'mysql';
+
+    return "(TO_TIMESTAMP(${col}::bigint/$interval))::timestamp"  if $sf->driver eq 'Pg';
 }
 
-
-
-=head2 epoch_to_date
-
-=over
-
-=item Arguments
-
-The column name and the interval.
-
-The interval is 1 (seconds), 1000 (milliseconds) or 1000000 (microseconds).
-
-=item return
-
-The sql epoch to date substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::mysql>:
-
-    sub epoch_to_date {
-        my ( $self, $col, $interval ) = @_;
-        return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')";
-    }
-
-=cut
 
 sub epoch_to_date {
-    my ( $self, $quote_col, $interval ) = @_;
-    my $quote_f = $self->{Plugin}->epoch_to_date( $quote_col, $interval );
-    die $self->message_method_undef_return( 'epoch_to_date' ) if ! defined $quote_f;
-    return $quote_f;
+    my ( $sf, $col, $interval ) = @_;
+
+    return $sf->{Plugin}->epoch_to_date( $col, $interval )   if $sf->{Plugin}->can( 'epoch_to_date' );
+
+    return "DATE($col/$interval,'unixepoch','localtime')"    if $sf->driver eq 'SQLite';
+
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->driver eq 'mysql';
+
+    return "(TO_TIMESTAMP(${col}::bigint/$interval))::date"  if $sf->driver eq 'Pg';
 }
 
-
-
-=head2 truncate
-
-=over
-
-=item Arguments
-
-The column name and the precision (int).
-
-=item return
-
-The sql truncate substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::mysql>:
-
-    sub truncate {
-        my ( $self, $col, $precision ) = @_;
-        return "TRUNCATE($col,$precision)";
-    }
-
-=cut
 
 sub truncate {
-    my ( $self, $quote_col, $precision ) = @_;
-    my $quote_f = $self->{Plugin}->truncate( $quote_col, $precision );
-    die $self->message_method_undef_return( 'truncate' ) if ! defined $quote_f;
-    return $quote_f;
+    my ( $sf, $col, $precision ) = @_;
+
+    return $sf->{Plugin}->truncate( $col, $precision )  if $sf->{Plugin}->can( 'truncate' );
+
+    return "TRUNC($col,$precision)"                     if $sf->driver eq 'Pg';
+
+    return "TRUNCATE($col,$precision)";
 }
-
-
-
-=head2 bit_length
-
-=over
-
-=item Arguments
-
-The column name.
-
-=item return
-
-The sql bit length substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::Pg>:
-
-The sql bit length substatement.
-
-    sub bit_length {
-        my ( $self, $col ) = @_;
-        return "BIT_LENGTH($col)";
-    }
-
-=cut
 
 
 sub bit_length {
-    my ( $self, $quote_col ) = @_;
-    my $quote_f = $self->{Plugin}->bit_length( $quote_col );
-    die $self->message_method_undef_return( 'bit_length' ) if ! defined $quote_f;
-    return $quote_f;
+    my ( $sf, $col ) = @_;
+
+    return $sf->{Plugin}->bit_length( $col ) if $sf->{Plugin}->can( 'bit_length' );
+
+    return "BIT_LENGTH($col)";
 }
 
 
-
-=head2 char_length
-
-=over
-
-=item Arguments
-
-The column name.
-
-=item return
-
-The sql char length substatement.
-
-=back
-
-Example form the plugin C<App::DBBrowser::DB::Pg>:
-
-    sub char_length {
-        my ( $self, $col ) = @_;
-        return "CHAR_LENGTH($col)";
-    }
-
-
-=cut
-
 sub char_length {
-    my ( $self, $quote_col ) = @_;
-    my $quote_f = $self->{Plugin}->char_length( $quote_col );
-    die $self->message_method_undef_return( 'char_length' ) if ! defined $quote_f;
-    return $quote_f;
+    my ( $sf, $col ) = @_;
+
+    return $sf->{Plugin}->char_length( $col ) if $sf->{Plugin}->can( 'char_length' );
+
+    return "CHAR_LENGTH($col)";
 }
 
 
@@ -882,10 +289,338 @@ sub char_length {
 
 __END__
 
-
 =pod
 
 =encoding UTF-8
+
+=head1 NAME
+
+App::DBBrowser::DB - Database plugin documentation.
+
+=head1 VERSION
+
+Version 2.001
+
+=head1 DESCRIPTION
+
+This version introduces backwards incompatible changes.
+
+A database plugin provides the database specific methods. C<App::DBBrowser> considers a module whose name matches
+C</^App::DBBrowser::DB::[^:']+\z/> and which is located in one of the C<@INC> directories as a database plugin.
+Plugins with the name C<App::DBBrowser::DB::$database_driver> should be for general use of C<$database_driver>
+databases.
+
+The user can add an installed database plugin to the available plugins in the options menu (C<db-browser -h>) by
+selecting I<DB> and then I<DB Plugins>.
+
+A suitable database plugin provides the methods named in this documentation.
+
+=head1 METHODS
+
+=head2 Required methods
+
+=head3 new( \%info )
+
+The constructor method.
+
+When C<db-browser> calls the plugin constructor it passes a reference to a hash ($info):
+
+    sub new {
+        my ( $class, $info ) = @_;
+        my $self = {
+            app_dir       => $info->{app_dir},       # path to the application directoriy
+            add_metadata  => $info->{add_metadata},  # true or false
+
+            # for SQLite databases:
+            reset_search_cache => $info->{reset_search_cache}, # true ore false
+        };
+        return bless $self, $class;
+    }
+
+C<reset_search_cache> is true if C<db-browser> is called with the argument C<-s|--search> - see
+L<db-browser/SYNOPSIS>.
+
+Returns the created object.
+
+=head3 get_db_driver()
+
+Returns the name of the C<DBI> database driver used by the plugin.
+
+=head3 get_databases( \%connect_parameters );
+
+If C<get_databases> uses the method C<get_db_handle>, C<\%connect_parameters> can be passed to C<get_db_handle> as the
+second argument. See L</get_db_handle> for more info about the passed hash reference.
+
+Returns two array references: the first reference refers to the array of user-databases the second refers to the array
+of system-databases. The second array reference is optional.
+
+If the option I<add_metadata> is true, user-databases and system-databases are used else only the user-databases are
+used.
+
+=head3 get_db_handle( $database_name, \%connect_parameters )
+
+The data in C<\%connect_parameters> represents the settings from the option I<Database settings>. Which
+I<Database settings> are available depends on the methods C<read_arguments>, C<env_variables> and C<set_attributes>.
+
+For example the hash of hashes for a C<mysql> plugin could look like this:
+
+    $connect_parameters = {
+        use_env_var => {
+            DBI_HOST => 1,
+            DBI_USER => 0,
+            DBI_PASS => 0,
+        },
+        arguments => {
+            host => undef,
+            pass => undef,
+            user => 'db_user_name',
+            port => undef
+        },
+        attributes => {
+            mysql_enable_utf8 => 1
+        },
+        required => {
+            port => 0,
+            user => 1,
+            pass => 1,
+            host => 1
+        },
+        secret => {
+            port => 0,
+            host => 0,
+            pass => 1,
+            user => 0
+        },
+    };
+
+
+C<db-browser> expects a database handle with the attribute I<RaiseError> enabled.
+
+Returns the database handle.
+
+=head2 Optional methods
+
+=head3 DB configuration methods
+
+If the following three methods are available, the C<db-brower> user can configure the different database settings in the
+options menu. These configurations are then available in the C<get_db_handle> argument C<$connect_parameter>.
+
+If the database driver is C<SQLite>, only C<set_attributes> is used.
+
+=head4 read_arguments()
+
+Returns a reference to an array of hashes. The hashes have two or three key-value pairs:
+
+    { name => 'string', prompt => 'string', secret => true/false }
+
+C<name> holds the field name for example like "user" or "host".
+
+The value of C<prompt> is used as the prompt string, when the user is asked for the data. The C<prompt> entry is
+optional. If C<prompt> doesn't exist, the value of C<name> is used instead.
+
+If C<secret> is true, the user input should not be echoed to the terminal. Also the data is not stored in the
+plugin configuration file if C<secret> is true.
+
+An example C<read_arguments> method:
+
+    sub read_arguments {
+        my ( $self ) = @_;
+        return [
+            { name => 'host', prompt => "Host",     secret => 0 },
+            { name => 'port', prompt => "Port",     secret => 0 },
+            { name => 'user', prompt => "User",     secret => 0 },
+            { name => 'pass', prompt => "Password", secret => 1 },
+        ];
+    }
+
+The information returned by the method C<read_arguments> is used to build the C<db-browser> options menu entry I<Fields>
+and I<Login Data>.
+
+=head4 env_variables()
+
+Returns a reference to an array of environment variables.
+
+An example C<env_variables> method:
+
+    sub env_variables {
+        my ( $self ) = @_;
+        return [ qw( DBI_DSN DBI_HOST DBI_PORT DBI_USER DBI_PASS ) ];
+    }
+
+See the C<db-browser -h> option I<ENV Variables>.
+
+=head4 set_attributes()
+
+Returns a reference to an array of hashes. The hashes have three or four key-value pairs:
+
+    { name => 'string', prompt => 'string', default => index, values => [ value_1, value_2, value_3, ... ] }
+
+The value of C<name> is the name of the database connection attribute.
+
+The value of C<prompt> is used as the prompt string. The C<prompt> entry is optional. If C<prompt> doesn't exist, the
+value of C<name> is used instead.
+
+C<values> holds the available values for that attribute as an array reference.
+
+The C<values> array entry of the index position C<default> is used as the default value.
+
+Example from the plugin C<App::DBBrowser::DB::SQLite>:
+
+    sub set_attributes {
+        my ( $self ) = @_;
+        return [
+            { name => 'sqlite_unicode',             default => 1, values => [ 0, 1 ] },
+            { name => 'sqlite_see_if_its_a_number', default => 1, values => [ 0, 1 ] },
+        ];
+    }
+
+C<set_attributes> determines the database handle attributes offered in the C<db-browser> option
+I<DB Options>.
+
+=head3 SQL related methods
+
+The following methods are already built in. These methods provided by the plugin overwrite the built in methods.
+
+Whether passed column names are quoted or not depends on how C<db-browser> was configured.
+
+=head4 get_schemas( $dbh, $database_name )
+
+C<$dbh> is the database handle returned by the method C<db_hanlde>.
+
+Returns the user-schemas as an array-reference and the system-schemas as an array-reference (if any).
+
+If the option I<add_metadata> is true, user-schemas and system-schemas are used else only the user-schemas are used.
+
+=head4 regexp( $column_name, $do_not_match, $case_sensitive )
+
+C<$do_not_match> and C<$case_sensitive> are true or false.
+
+Returns the SQL regexp substatement.
+
+Use the appropriate placeholder instead of the string that should match or not match the regexp.
+
+Example (C<mysql>):
+
+    sub regexp {
+        my ( $self, $col, $do_not_match, $case_sensitive ) = @_;
+        if ( $do_not_match ) {
+            return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
+            return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
+        }
+        else {
+            return ' '. $col . ' REGEXP ?'            if ! $case_sensitive;
+            return ' '. $col . ' REGEXP BINARY ?'     if   $case_sensitive;
+        }
+    }
+
+=head4 concatenate( \@strings )
+
+Returns the SQL substatement which concatenates the passed strings.
+
+Example (C<Pg>):
+
+    sub concatenate {
+        my ( $self, $arg ) = @_;
+        return join( ' || ', @$arg );
+    }
+
+=head4 epoch_to_datetime( $column_name, $interval )
+
+The interval is C<1> (seconds), C<1000> (milliseconds) or C<1000000> (microseconds).
+
+Returns the SQL "epoch to datetime" substatement.
+
+Example (C<mysql>):
+
+    sub epoch_to_datetime {
+        my ( $self, $col, $interval ) = @_;
+        return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')";
+    }
+
+=head4 epoch_to_date( $column_name, $interval )
+
+The interval is C<1> (seconds), C<1000> (milliseconds) or C<1000000> (microseconds).
+
+Returns the SQL "epoch to date" substatement.
+
+Example (C<mysql>):
+
+    sub epoch_to_date {
+        my ( $self, $col, $interval ) = @_;
+        return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')";
+    }
+
+=head4 truncate( $column_name, $precision )
+
+C<$precision> is an integer value.
+
+The SQL truncate substatement.
+
+Example (C<mysql>):
+
+    sub truncate {
+        my ( $self, $col, $precision ) = @_;
+        return "TRUNCATE($col,$precision)";
+    }
+
+=head4 bit_length( $column_name )
+
+Returns the SQL bit length substatement.
+
+Example (C<Pg>):
+
+    sub bit_length {
+        my ( $self, $col ) = @_;
+        return "BIT_LENGTH($col)";
+    }
+
+=head4 char_length( $column_name )
+
+Returns the SQL char length substatement.
+
+Example (C<Pg>):
+
+    sub char_length {
+        my ( $self, $col ) = @_;
+        return "CHAR_LENGTH($col)";
+    }
+
+=head1 EXAMPLE
+
+A simple plugin which provides only the required methods:
+
+    package App::DBBrowser::DB::MyPlugin;
+    use strict;
+    use DBI;
+
+    sub new {
+        my ( $class, $info ) = @_;  # no use for $info in this plugin
+        my $self = {};
+        return bless $self, $class;
+    }
+
+    sub get_db_driver {
+        my ( $self ) = @_;
+        return 'mysql';
+    }
+
+    sub get_db_handle {
+        my ( $self, $db, $connect_parameter ) = @_;
+        # "$connect_parameter" contains no data because this plugin does not
+        # provide the methods "env_variables", "read_arguments" and "set_attributes"
+        my $dbh = DBI->connect( "DBI:mysql:dbname=$db", 'user', 'password', {
+            RaiseError => 1,
+            PrintError => 0,
+        }) or die $DBI::errstr;
+        return $dbh;
+    }
+
+    sub get_databases {
+        my ( $self, $connect_parameter ) = @_;
+        return [ 'My_DB_1', 'My_DB_2' ];
+    }
+
+    1;
 
 =head1 AUTHOR
 

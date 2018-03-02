@@ -32,7 +32,6 @@
             "Crypt::OpenSSL::RSA" : "0.28",
             "Digest::SHA" : "0",
             "Encode" : "0",
-            "Getopt::Long" : "2.33",
             "HTTP::Tiny" : "0.042",
             "IO::File" : "1.13",
             "IO::Socket::SSL" : "1.42",
@@ -51,15 +50,15 @@
    "provides" : {
       "Crypt::LE" : {
          "file" : "lib/Crypt/LE.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       },
       "Crypt::LE::Challenge::Simple" : {
          "file" : "lib/Crypt/LE/Challenge/Simple.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       },
       "Crypt::LE::Complete::Simple" : {
          "file" : "lib/Crypt/LE/Complete/Simple.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
@@ -72,5 +71,5 @@
          "url" : "https://github.com/do-know"
       }
    },
-   "version" : "0.29"
+   "version" : "0.30"
 }

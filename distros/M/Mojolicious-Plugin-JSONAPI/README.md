@@ -4,7 +4,7 @@ Mojolicious::Plugin::JSONAPI - Mojolicious Plugin for building JSON API complian
 
 # VERSION
 
-version 0.2
+version 0.3
 
 # SYNOPSIS
 
@@ -19,7 +19,7 @@ version 0.2
 
         $self->resource_routes({
             resource => 'post',
-            relationships => ['author', 'comments'],
+            relationships => ['author', 'comments', 'email-templates'],
         });
 
         # Now the following routes are available:
@@ -39,6 +39,11 @@ version 0.2
         # POST '/api/posts/:post_id/relationships/comments' -> to('api-posts#post_related_comments')
         # PATCH '/api/posts/:post_id/relationships/comments' -> to('api-posts#patch_related_comments')
         # DELETE '/api/posts/:post_id/relationships/comments' -> to('api-posts#delete_related_comments')
+
+        # GET '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#get_related_email_templates')
+        # POST '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#post_related_email_templates')
+        # PATCH '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#patch_related_email_templates')
+        # DELETE '/api/posts/:post_id/relationships/email-templates' -> to('api-posts#delete_related_email_templates')
 
         # You can use the following helpers too:
 
@@ -80,10 +85,11 @@ Creates a set of routes for the given resource. `$spec` is a hash reference that
 
 Specifying `relationships` will create additional routes that fall under the resource.
 
-Routes will point to controller actions, the names of which follow the pattern `{http_method}_{resource}`.
+Routes will point to controller actions, the names of which follow the pattern `{http_method}_{resource}`, with
+dashes replaced with underscores (i.e. 'email-templates' -> 'email\_templates').
 
 **NOTE**: Your relationships should be in the correct form (singular/plural) based on the relationship in your
-schema management system. For example, if you have a resource called 'post' and it has many comments, make
+schema management system. For example, if you have a resource called 'post' and it has many 'comments', make
 sure comments is passed in as a plural noun.
 
 ## render\_error(_Str_ $status, _ArrayRef_ $errors, _HashRef_ $data. _HashRef_ $meta)

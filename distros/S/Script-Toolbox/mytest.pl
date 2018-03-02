@@ -30,10 +30,33 @@ my $O = {
 #}
 
 
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+sub testCheckBox(){
+
+    my $x;
+       $x = CheckBox('Head1',',AAA,BBB,ccc','ccc'       );
+       $x = CheckBox('Head2',',AAA,BBB,ccc','ccc|AAA'   );
+       $x = CheckBox('Head3',',AAA,BBB,ccc'             );
+       $x = CheckBox('Head4',',AAA,BBB,ccc','ccc',   1  );
+
+    my $m = Script::Toolbox::Util::Menus->new();
+       $x = CheckBox('Head5',',AAA,BBB,ccc','ccc',    0,$m);
+       $x = CheckBox('Head6',',AAA,BBB,ccc','ccc|AAA',0,$m);
+       $x = CheckBox('Head7',',AAA,BBB,ccc',undef,    0,$m);
+       $x = CheckBox('Head8',',AAA,BBB,ccc','ccc|AAA',1,$m);
+
+       $x = CheckBox('Head9',',AAA,BBB,ccc','ccc',    0,$m,'testmenu');
+       $x = CheckBox('HeadA',',AAA,BBB,ccc','ccc|AAA',0,$m,'testmenu');
+       $x = CheckBox('HeadB',',AAA,BBB,ccc',undef,    0,$m,'testmenu');
+       $x = CheckBox('HeadC',',AAA,BBB,ccc','ccc',    1,$m,'testmenu');
+    return;
+}
+
 
 #------------------------------------------------------------------------------
 #------------------------------------------------------------------------------
-sub main
+sub test1()
 {
     my $M =[
             {'label'=>'rwValue', 'value'=>1 },
@@ -115,7 +138,17 @@ sub main
 #    print $T->asString("\n\n");
 #	return;
 }
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+sub main(){
+    #test1();
+    testCheckBox();
+    return;
+}
+
 main();
+
 
 ############################################################################
 1;

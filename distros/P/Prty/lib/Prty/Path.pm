@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -207,6 +207,7 @@ sub copy {
         my ($destDir) = $class->split($destPath);
         $class->mkdir($destDir,-recursive=>1);
     }
+
 
     my $fh2 = Prty::FileHandle->new('>',$destPath);
     while (<$fh1>) {
@@ -1851,7 +1852,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Shell;
 use Prty::File::Image;
@@ -251,7 +251,7 @@ sub execute {
     my $self = shift;
 
     my $cmd = $self->command;
-    print "$cmd\n";
+    # print "$cmd\n";
     Prty::Shell->exec($cmd);
 
     return;
@@ -467,7 +467,7 @@ sub negate {
 
 =head4 Synopsis
 
-    $cmd = $class->morph($input1,$input2,$outPattern,$morph);
+    $cmd = $class->morph($input1,$input2,$outPattern,$n);
 
 =head4 Arguments
 
@@ -475,23 +475,58 @@ sub negate {
 
 =item $input1
 
-Image-Objekt oder Bilddatei-Pfad des ersten Input-Bildes.
+Pfad oder Bilddatei-Objekt des ersten Bildes.
 
 =item $input2
 
-Image-Objekt oder Bilddatei-Pfad des zweiten Input-Bildes.
+Pfad oder Bilddatei-Objekt des zweiten Bildes.
 
 =item $outPattern
 
-Pfad-Muster für die generierte Bildfolge.
+Pfad-Muster für die erzeugte Bildfolge. Z.B. "$dir/%02d"
+
+=item $n
+
+Anzahl der erzeugten Zwischenbilder.
 
 =back
 
 =head4 Description
 
-Generiere ein convert-Kommando, das Zwischenbilder für die
-Bilder $input1 und $input2 erzeugt und unter dem Pfad-Muster
-speichert.
+Generiere ein convert-Kommando, das $n Zwischenbilder für die
+Bilder $input1 und $input2 erzeugt. Unter dem Pfad-Muster
+$outPattern werden $n+2 Bilder gespeichert: Die $n gemorphten
+Bilder plus die beiden Ausgangsbilder.
+
+Wird als $input1 oder $input2 ein Objekt angegeben, muss dieses
+eine Methode path() besitzen, die den Pfad zur Bilddatei liefert,
+wie die Objekte der Klasse Prty::File::Image.
+
+Beim convert-Kommando kann man bei der Morph-Operation zwar auch mehrere
+Bilddateien angeben, aber dann wird extrem viel Speicher benötigt.
+Besser ist es, die Bilder paarweise zu morphen und das letzte Bild
+
+=head4 Example
+
+Erzeuge einen convert-Aufruf für 5 Zwischenbilder (hier an der
+Kommandozeile):
+
+    $ perl -MPrty::ImageMagick -E 'say Prty::ImageMagick->morph("1.jpg","2.jpg","tmp/%02d.jpg",5)->command'
+
+Erzeugtes Kommando:
+
+    convert 1.jpg 2.jpg -morph 5 tmp/%02d.jpg
+
+Wird das Kommando ausgeführt, entstehen in Unterverzeichnis tmp
+(das vorab existieren muss) sechs Bilder:
+
+    00.jpg entspricht 1.jpg (die Bilder sind nicht identisch!)
+    01.jpg
+    02.jpg
+    03.jpg
+    04.jpg
+    05.jpg
+    06.jpg entspricht 2.jpg (die Bilder sind nicht identisch!)
 
 =cut
 
@@ -504,20 +539,22 @@ sub morph {
     my $outPattern = shift;
     my $morph = shift;
 
-    # Bild-Objekte der Input-Dateien
+    # Pfade der Bilddateien bestimmen
 
-    my $img1 = ref $input1? $input1: Prty::File::Image->new($input1);
-    my $img2 = ref $input2? $input2: Prty::File::Image->new($input2);
+    if (ref $input1) {
+        $input1 = $input1->path;
+    }
+    if (ref $input2) {
+        $input2 = $input2->path;
+    }
 
     # Kommando erzeugen
 
     my $self = $class->new;
     $self->addCommand('convert');
-    $self->addElement($img1->path);
-    $self->addElement($img2->path);
+    $self->addElement($input1);
+    $self->addElement($input2);
     $self->addOption(-morph=>$morph);
-    $self->addOption(-delay=>0); # nötig?
-    Prty::Path->mkdir($outPattern,-createParent=>1); # Erzeuge Verz.
     $self->addElement($outPattern);
 
     return $self;
@@ -527,7 +564,7 @@ sub morph {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use File::Temp qw/tempdir/;
 
 require q[./t/helper.pm];
 
-my $has_git = eval { App::MechaCPAN::run(qw/git --version/); 1; };
+my $has_git = &App::MechaCPAN::has_git;
 local $ENV{GIT_SSL_NO_VERIFY}='true';
 
 # Notes:

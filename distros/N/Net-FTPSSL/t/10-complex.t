@@ -861,8 +861,11 @@ sub test_mdtm_in_gmt {
    if ( defined $tm &&
         $tm =~ m/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/ ) {
       my ($yr, $mon, $day, $hr, $min, $sec) = ($1, $2, $3, $4, $5, $6);
-      my $gm = timegm ( $sec, $min, $hr, $day, $mon - 1, $yr - 1900 );
-      my $loc = timelocal ( $sec, $min, $hr, $day, $mon - 1, $yr - 1900 );
+
+      # For the Time::Local functions, using 4 digit year option.
+      # instead of the $yr - 1900 option.
+      my $gm = timegm ( $sec, $min, $hr, $day, $mon - 1, $yr );
+      my $loc = timelocal ( $sec, $min, $hr, $day, $mon - 1, $yr );
 
       if ( abs ($gm - $now) <= abs ($loc - $now) ) {
          $msg = "The FTP/S server correctly uses UTC/GMT time for MDTM.";

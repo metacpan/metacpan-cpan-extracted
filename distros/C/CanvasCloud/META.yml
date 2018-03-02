@@ -28,5 +28,5 @@ requires:
 resources:
   homepage: https://github.com/tedkat/CanvasCloud
   repository: https://github.com/tedkat/CanvasCloud.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'YAML::Tiny version 1.70'

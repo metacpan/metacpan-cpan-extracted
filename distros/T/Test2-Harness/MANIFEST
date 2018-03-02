@@ -32,6 +32,7 @@ lib/App/Yath/Util.pm
 lib/Test2/Formatter/QVF.pm
 lib/Test2/Formatter/Stream.pm
 lib/Test2/Formatter/Test2.pm
+lib/Test2/Formatter/Test2/Composer.pm
 lib/Test2/Harness.pm
 lib/Test2/Harness/Event.pm
 lib/Test2/Harness/Feeder.pm
@@ -135,6 +136,8 @@ t/Test2/Tools/HarnessTester.t
 t/example_log.jsonl.bz2
 t/failure_cases.t
 t/failure_cases/badplan.tx
+t/failure_cases/buffered_subtest_abrupt_end.tx
+t/failure_cases/buffered_subtest_abrupt_end_nested.tx
 t/failure_cases/dupnums.tx
 t/failure_cases/exit.tx
 t/failure_cases/missingnums.tx
@@ -171,6 +174,7 @@ t2/relative_paths.t
 t2/require_file.pm
 t2/require_file.t
 t2/simple.t
+t2/subtests.t
 test.pl
 xt/acceptance/help.t
 xt/acceptance/init.t

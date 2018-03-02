@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Time::HiRes ();
 use Prty::Option;
@@ -63,6 +63,10 @@ Datei-Deskriptor, auf den die Logmeldungen geschrieben werden.
 
 Zeichenkette, die jeder Meldung im Log vorangestellt wird.
 
+=item quiet => $bool
+
+Unterdrck stdout und stderr.
+
 =item time => $bool (Default: 0)
 
 Gib nach jedem Kommando die Zeit aus, die es benötigt hat.
@@ -98,6 +102,7 @@ sub new {
         log=>0,
         logDest=>*STDOUT,
         msgPrefix=>'',
+        quiet=>0,
         time=>0,
         timePrefix=>'',
         timeSummary=>0,
@@ -246,7 +251,7 @@ sub exec {
     # Optionen
 
     my $capture = undef;
-    my $quiet = 0;
+    my $quiet = $self->get('quiet');
     my $sloppy = 0;
 
     if (@_) {
@@ -531,7 +536,7 @@ sub checkError {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

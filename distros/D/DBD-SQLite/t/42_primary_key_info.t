@@ -6,7 +6,8 @@ BEGIN {
 	$^W = 1;
 }
 
-use t::lib::Test qw/connect_ok/;
+use lib "t/lib";
+use SQLiteTest qw/connect_ok/;
 use Test::More;
 use Test::NoWarnings;
 

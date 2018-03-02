@@ -1,0 +1,79 @@
+{
+   "abstract" : "declare with type constraint",
+   "author" : [
+      "Kenta, Kobayashi <kentafly88@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Variable-Declaration",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Lock" : "0",
+            "Import::Into" : "0",
+            "Keyword::Simple" : "0",
+            "PPR" : "0",
+            "Type::Tie" : "0",
+            "perl" : "v5.12.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Variable::Declaration" : {
+         "file" : "lib/Variable/Declaration.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/Variable-Declaration/issues"
+      },
+      "homepage" : "https://github.com/kfly8/Variable-Declaration",
+      "repository" : {
+         "url" : "git://github.com/kfly8/Variable-Declaration.git",
+         "web" : "https://github.com/kfly8/Variable-Declaration"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY"
+}

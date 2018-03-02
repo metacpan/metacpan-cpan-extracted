@@ -22,7 +22,6 @@ build_requires:
   Test::Routine: '0'
   Test::Routine::Util: '0'
   autodie: '0'
-  blib: '1.01'
   if: '0'
   lib: '0'
   perl: '5.006'
@@ -30,7 +29,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +38,7 @@ name: Dist-Zilla-Role-TextTemplater
 provides:
   Dist::Zilla::Role::TextTemplater:
     file: lib/Dist/Zilla/Role/TextTemplater.pm
-    version: v0.8.6
+    version: v0.8.7
 requires:
   Carp: '0'
   Dist::Zilla::File::InMemory: '0'
@@ -47,7 +46,7 @@ requires:
   Dist::Zilla::Role::ErrorLogger: v0.9.0
   List::Util: '0'
   Moose::Role: '0'
-  Text::Template: '0'
+  Text::Template: '>= 0, != 1.48, != 1.49'
   namespace::autoclean: '0'
   overload: '0'
   perl: '5.006'
@@ -59,5 +58,5 @@ resources:
   homepage: https://metacpan.org/release/Dist-Zilla-Role-TextTemplater
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Role-TextTemplater
-version: v0.8.6
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: v0.8.7
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -22,6 +22,7 @@ use Carp;
 use Log::Log4perl qw(get_logger :levels);
 
 extends 'Config::Model::Backend::Any';
+with "Config::Model::Role::FileHandler";
 
 use Config::Model::Exception;
 
@@ -32,7 +33,7 @@ my $has_augeas = 1;
 eval { require Config::Augeas; };
 $has_augeas = 0 if $@;
 
-our $VERSION = '0.123';
+our $VERSION = '0.124';
 
 my $logger = get_logger('Backend::Augeas');
 
@@ -239,10 +240,10 @@ sub read {
         }
     }
 
-    my $cdir = $args{root} . $args{config_dir};
+    my $cdir = $self->get_tuned_config_dir(%args);
     $logger->info( "Read config data through Augeas in directory '$cdir' " . "file $args{file}" );
 
-    my $mainpath = '/files' . $args{config_dir} . $args{file};
+    my $mainpath = '/files' . $args{config_dir} . '/'. $args{file};
 
     my @result  = $self->augeas_deep_match($mainpath);
     my @cm_path = @result;
@@ -403,12 +404,12 @@ sub write {
         }
     }
 
-    my $cdir = $args{root} . $args{config_dir};
+    my $cdir = $self->get_tuned_config_dir(%args);
     get_logger("Data::Write")
         ->info( "Write config data through Augeas in directory '$cdir' " . "file $args{file}" );
 
     my $set_in     = $args{set_in} || '';
-    my $mainpath   = '/files' . $args{config_dir} . $args{file};
+    my $mainpath   = '/files' . $args{config_dir} . '/' . $args{file};
     my $augeas_obj = $self->{augeas_obj} ||= Config::Augeas->new(
         root => $args{root},
         save => $args{save} );

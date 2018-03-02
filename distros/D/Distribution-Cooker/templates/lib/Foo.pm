@@ -9,6 +9,8 @@ use vars qw($VERSION);
 
 $VERSION = '0.11';
 
+=encoding utf8
+
 =head1 NAME
 
 [% module %] - [% description %]
@@ -28,15 +30,15 @@ $VERSION = '0.11';
 =cut
 
 sub new {
-	
+
 	}
-	
+
 =item init
 
 =cut
 
 sub init {
-	
+
 	}
 
 
@@ -60,7 +62,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) [% year %], brian d foy, All Rights Reserved.
+Copyright © [% year %], brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

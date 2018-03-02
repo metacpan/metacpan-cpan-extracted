@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::ammata00;
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 30 10:43:29 EDT 2017
-#    Data version: tzdata2017b
-#    Code version: tzcode2017b
+#    Generated on: Thu Mar  1 10:33:43 EST 2018
+#    Data version: tzdata2018c
+#    Code version: tzcode2018c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.60';
+$VERSION='6.61';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -697,6 +697,15 @@ END { undef $VERSION; }
         [ [2067,11,6,7,0,0],[2067,11,6,1,0,0],'-06:00:00',[-6,0,0],
           'CST',0,[2068,3,11,7,59,59],[2068,3,11,1,59,59],
           '2067110607:00:00','2067110601:00:00','2068031107:59:59','2068031101:59:59' ],
+     ],
+   2068 =>
+     [
+        [ [2068,3,11,8,0,0],[2068,3,11,3,0,0],'-05:00:00',[-5,0,0],
+          'CDT',1,[2068,11,4,6,59,59],[2068,11,4,1,59,59],
+          '2068031108:00:00','2068031103:00:00','2068110406:59:59','2068110401:59:59' ],
+        [ [2068,11,4,7,0,0],[2068,11,4,1,0,0],'-06:00:00',[-6,0,0],
+          'CST',0,[2069,3,10,7,59,59],[2069,3,10,1,59,59],
+          '2068110407:00:00','2068110401:00:00','2069031007:59:59','2069031001:59:59' ],
      ],
 );
 

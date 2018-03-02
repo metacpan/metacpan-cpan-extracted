@@ -1,3 +1,6 @@
+ApacheMobileFilter 4.21
+Fixed bug (thanks to Scott Pakin) https://groups.google.com/forum/#!topic/amf-device-detection/1uvTlnZ-xcs
+
 ApacheMobileFilter 4.20
 Add AMF_BROWSER_TYPE for detect browser
 Add AMF_BROWSER_VERSION for detect browser version

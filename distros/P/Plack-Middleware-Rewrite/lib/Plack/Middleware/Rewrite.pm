@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Plack::Middleware::Rewrite;
-$Plack::Middleware::Rewrite::VERSION = '2.100';
+$Plack::Middleware::Rewrite::VERSION = '2.101';
 # ABSTRACT: mod_rewrite for Plack
 
 use parent 'Plack::Middleware';
@@ -96,7 +96,7 @@ Plack::Middleware::Rewrite - mod_rewrite for Plack
 
 =head1 VERSION
 
-version 2.100
+version 2.101
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,8 @@ version 2.100
 
          return [200, [qw(Content-Type text/plain)], ['You found it!']]
              if $_ eq '/easter-egg';
-     }, response => sub {
+     },
+     response => sub {
          $_->status( 303 )
              if $_->status eq 201 and $_->get( 'Location' );
 

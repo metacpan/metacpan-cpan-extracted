@@ -1,3 +1,9 @@
+2018-02-26  Dominique Dumont  <domi.dumont@free.fr> v0.124
+
+    * Handle backend parameter based on Path::Tiny that were
+      introduced with Config::Model 2.117
+    * Build.PL: require Config::Model::Itself 2.117
+
 2017-12-30  Dominique Dumont  <domi.dumont@free.fr> v0.123
 
     * Build.PL: require Config::Model::Itself 2.116 for tests

@@ -36,5 +36,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: https://github.com/s31tz/Prty.git
-version: 1.123
+version: 1.124
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

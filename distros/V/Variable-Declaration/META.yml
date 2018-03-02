@@ -1,0 +1,43 @@
+---
+abstract: 'declare with type constraint'
+author:
+  - 'Kenta, Kobayashi <kentafly88@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Variable-Declaration
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Variable::Declaration:
+    file: lib/Variable/Declaration.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Data::Lock: '0'
+  Import::Into: '0'
+  Keyword::Simple: '0'
+  PPR: '0'
+  Type::Tie: '0'
+  perl: v5.12.0
+resources:
+  bugtracker: https://github.com/kfly8/Variable-Declaration/issues
+  homepage: https://github.com/kfly8/Variable-Declaration
+  repository: git://github.com/kfly8/Variable-Declaration.git
+version: '0.01'
+x_authority: cpan:KFLY

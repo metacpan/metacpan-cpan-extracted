@@ -36,11 +36,11 @@ my $build = Module::Build->new
    requires       => {
 		      'Log::Log4perl'     => '1.11', # for TRACE log level
 		      'Config::Augeas'    => '0.303',
-		      'Config::Model'     => '2.111',
+		      'Config::Model'     => '2.117',
 		      'Mouse'             => 0,
 		     },
    build_requires => {
-       'Config::Model'     => '2.116', # for BackendMgr::backend_obj
+       'Config::Model'     => '2.117',
        'Config::Model::Itself' => '2.012', # for t/model_extension.t
        'Test::More'        => 0,
        'Test::Exception'   => 0,

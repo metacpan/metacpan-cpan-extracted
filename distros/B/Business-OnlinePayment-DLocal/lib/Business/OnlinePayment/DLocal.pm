@@ -14,7 +14,7 @@ use Log::Scrubber qw(disable $SCRUBBER scrubber :Carp scrubber_add_scrubber);
 @ISA     = qw(Business::OnlinePayment::HTTPS);
 $me      = 'Business::OnlinePayment::DLocal';
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # PODNAME: Business::OnlinePayment::DLocal
 # ABSTRACT: Business::OnlinePayment::DLocal - DLocal (astropay) backend for Business::OnlinePayment
 
@@ -49,11 +49,11 @@ sub test_transaction {
     if (! defined $testMode) { $testMode = $self->{'test_transaction'} || 0; }
     $self->{'test_transaction'} = $testMode;
     if($testMode) {
-        $self->server('sandbox.astropaycard.com');
+        $self->server('sandbox.dlocal.com');
         $self->port('443');
         $self->path('/api_curl/cc/sale');
     } else {
-        $self->server('astropaycard.com');
+        $self->server('api.dlocal.com');
         $self->port('443');
         $self->path('/api_curl/cc/sale');
     }
@@ -307,7 +307,7 @@ sub _send_request {
     my %remap_fields = $self->field_map();
 
     $self->_dlocal_scrubber_add_card($content{'card_number'});
-    scrubber_add_scrubber({'cc_cvv='.$content{'cvv2'}=>'cc_cvv=DELETED'});
+    scrubber_add_scrubber({'cc_cvv='.$content{'cvv2'}=>'cc_cvv=DELETED'}) if defined $content{'cvv2'};
 
     my $message = '';
     foreach my $key ( @{$config->{'control'}} ) { $message .= $content{$remap_fields{$key}}//''; }
@@ -466,7 +466,7 @@ Business::OnlinePayment::DLocal - Business::OnlinePayment::DLocal - DLocal (astr
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

@@ -9,6 +9,7 @@ WriteMakefile(
     MIN_PERL_VERSION  => 5.006,
     BUILD_REQUIRES    => {
      'Test::More'     =>  '0.40',
+     'Modern::Perl'   =>  '0',
     },
     PREREQ_PM         => {
      'Regexp::Common' =>  0,
@@ -20,7 +21,7 @@ WriteMakefile(
     META_MERGE        => {
       "meta-spec" => { version => 2 },
       provides    => {
-          'Regexp::Common::time' => { file => 'lib/Regexp/Common/time.pm', version => '0.15' },
+          'Regexp::Common::time' => { file => 'lib/Regexp/Common/time.pm', version => '0.16' },
       },
       resources => {
         repository => {

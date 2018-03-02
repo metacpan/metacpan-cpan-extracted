@@ -27,7 +27,9 @@ our @ISA = qw(Exporter);
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir
                                File FileC System Now Menu KeyMap
-                               Stat TmpFile DataMenu Menue DataMenue) ] );
+                               Stat TmpFile DataMenu Menue DataMenue
+                               CheckBox
+                               )] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
@@ -903,8 +905,8 @@ sub _printOption($$$) {
     printf $form, $i,$op->{'label'};
 }
 #------------------------------------------------------------------------------
-# Display a menue, return the selected index number and the menue data structure.
-# If a VALUE or DEFAULT key of a menue option points to a value this value can
+# Display a menu, return the selected index number and the menu data structure.
+# If a VALUE or DEFAULT key of a menu option points to a value this value can
 # be changed.
 # If a jump target is defined, the corresponding function will be called with
 # argv=> as arguments.
@@ -1083,7 +1085,7 @@ sub DataMenue(@){
 #  Read a directory and return a hash with filenames stat() structure infos
 #  for every file. An optional pattern (regexp) may be used for selecting files.
 #------------------------------------------------------------------------------
-sub Stat($$)
+sub Stat($@)
 {
     my ($path,$patt) = _getParam( @_ );
 
@@ -1113,16 +1115,16 @@ sub Stat($$)
 }
 
 #------------------------------------------------------------------------------
-# Jump to a callback function of a menue option.
+# Jump to a callback function of a menu option.
 #------------------------------------------------------------------------------
 sub _jump($$)
 {
-    my ($o,$menue) = @_;
+    my ($o,$menu) = @_;
 
-    return if( !defined $menue->[$o]->{'jump'} ); #option has no callback
+    return if( !defined $menu->[$o]->{'jump'} ); #option has no callback
 
-    my $call = $menue->[$o]->{'jump'};
-    my $args = defined $menue->[$o]->{'argv'} ? $menue->[$o]->{'argv'} : undef;
+    my $call = $menu->[$o]->{'jump'};
+    my $args = defined $menu->[$o]->{'argv'} ? $menu->[$o]->{'argv'} : undef;
 
     if( ref $call eq 'CODE' ) { $call->($args); return; }
     Log("\nERROR: Can't call function $call(). It's not a code reference.");
@@ -1244,7 +1246,7 @@ sub _getChar($)
 }
 
 #------------------------------------------------------------------------------
-# Read a line from STDIN and assign it to the "value" key of an menue option.
+# Read a line from STDIN and assign it to the "value" key of an menu option.
 # Data structure: [{label=>,value=>,readOnly=>,jump=>,argv=>},...]
 # After this function value=> has one of the following values:
 # - the read line if not empty
@@ -1272,6 +1274,159 @@ sub _setValue($)
     return $resp;
 }
 
+#------------------------------------------------------------------------------
+# Return the options as array reference.
+# If $opt is not already an array reference, it mut be a string like:
+# '<sep><opt1><sep><opt2>...'
+#------------------------------------------------------------------------------
+sub _checkOptions($){
+    my ($opt) = @_;
+
+    return $opt if( ref $opt eq 'ARRAY');
+    my ($sep,$opstr) = $opt =~ m/(.)(.*)/;
+    my @Ops          = split /[$sep]/, $opstr;
+    return \@Ops;
+}
+
+#------------------------------------------------------------------------------
+# Add given $options as read only menu options to the menu with name $menuName
+# in menu-container $m.
+# $options: an array reference 
+#           or a CSV like string (first character is the separator).
+#           Such as: ',opt1,opt2,opt3'
+# $defaults: a regular expression. If it matches against an option, this
+# option gets into selected state.
+#------------------------------------------------------------------------------
+sub _ops2CheckBox($$$$){
+    my ($m,$menuName,$options,$defaults) = @_;
+
+    $options = _checkOptions($options);
+    foreach my $x (@{$options}) {
+        my $v = '';
+           $v = $x =~ /$defaults/ ? 'x' : ''    if(defined $defaults);
+        $m->addOption($menuName =>{'label'=>$x, 'value'=>$v, 'readOnly'=>1});
+    }
+    return;
+}
+
+#------------------------------------------------------------------------------
+# Add the check box menu to the menus container $m.
+#------------------------------------------------------------------------------
+sub _ckeckBox2Container($$$){
+    my ($m,$menuName,$header) = @_;
+
+    $m->addMenu( {$menuName =>[{'header'=>$header}]});
+    return;
+}
+
+#------------------------------------------------------------------------------
+# Return the menuname if defined or a random number between 0 and 10000.
+#------------------------------------------------------------------------------
+sub _checkMenuName($){
+    my ($name) = @_;
+
+    return $name if( defined $name );
+    return sprintf "TMP_%d", int(rand(10000));
+}
+
+#------------------------------------------------------------------------------
+# Is $m  pointing to a menus container? If yes, do nothig otherwise return
+# an empty menus container.
+#------------------------------------------------------------------------------
+sub _checkMenuContainer($){
+    my ($m) = @_;
+    return $m   if( ref $m eq 'Script::Toolbox::Util::Menus' ); 
+    return Script::Toolbox::Util::Menus->new();
+}
+
+#------------------------------------------------------------------------------
+# Return the labels of all selected and unselected options.
+#------------------------------------------------------------------------------
+sub _getOptStates($$){
+    my ($m,$name) = @_;
+
+    my $on = $m->getMatching($name,'.+','value','label');
+    my $off= $m->getMatching($name,'^$','value','label');
+    return {'on'=>$on,'off'=>$off};
+}
+
+#------------------------------------------------------------------------------
+# Clear all option values of menu $menuName in container $m.
+# Set the option with $label in selected state.
+#------------------------------------------------------------------------------
+sub _setRadioButton($$$){
+    my ($m,$menuName,$label) = @_;
+
+    my $lv = $m->getLabelValueHash($menuName);
+    map { $lv->{$_} = '' } keys %{$lv};
+    $lv->{$label} = 'x';
+    $m->setValues($menuName,$lv);
+    return;
+}
+#------------------------------------------------------------------------------
+# Set all option value to of-state except for the selected.
+#------------------------------------------------------------------------------
+sub _radioButton($$){
+    my ($m,$name) = @_;
+
+    while(1) {
+        my $op = $m->run($name,1);
+        my $cl = $m->currLabel($name);
+        last    if( $cl eq 'RETURN' );
+        _setRadioButton($m,$name,$cl);
+    }
+    return;
+}
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+sub _cleanUpTmps($){
+    my ($m) = @_;
+
+    my $def = $m->{'def'};
+    foreach my $x (sort keys %{$def}) {
+        next    if( $x !~ /^TMP_[0-9]+/ );
+        delete $m->{'def'}{$x};
+    }
+    return;
+}
+
+#------------------------------------------------------------------------------
+# If no      radio button checkbox accept all default patterns.
+# If it's a  radio button checkbox accept only the first pattern (asume
+# we have patterns like 'a|b|c'). Otherwise clear all defaults.
+#------------------------------------------------------------------------------
+sub _checkDefaults($$$){
+    my ($m,$menuName,$defaults) = @_;
+
+    my @x     = split /[|]/, $defaults;
+    _setRadioButton($m,$menuName,$x[0]);
+}
+
+#------------------------------------------------------------------------------
+# Display some options via menu.
+# defaults: me|dk|ek
+# Return a hash with two keys 'on' and 'off'. These keys points to arrays
+# with option labels. 'on' means the value of this option is not an empty
+# string.
+#------------------------------------------------------------------------------
+sub CheckBox($$@){
+    my ($header,$options,$defaults,$radio,$m,$menuName) = @_;
+
+    $menuName = _checkMenuName($menuName);
+    $m        = _checkMenuContainer($m);
+    if( ! defined $m->{'def'}{$menuName} ) {
+        _ckeckBox2Container($m,$menuName,$header);
+        _ops2CheckBox($m,$menuName,$options,$defaults);
+    }
+    _checkDefaults($m, $menuName, $defaults)    if($radio);
+    $m->setHeader($menuName,$header);
+    if($radio) { _radioButton($m,$menuName) }
+    else       { $m->run($menuName,0)       }
+    
+    my $ret =  _getOptStates($m,$menuName); #{selected,unselected}
+    _cleanUpTmps($m);
+    return $ret;
+} 
 1;
 __END__
 

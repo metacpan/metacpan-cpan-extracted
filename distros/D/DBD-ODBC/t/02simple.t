@@ -184,9 +184,21 @@ my $sth = $dbh->prepare("SELECT * FROM $ODBCTEST::table_name ORDER BY COL_A");
 ok(defined($sth), "prepare select from table");
 if ($sth) {
    ok($sth->execute(), "Execute select");
+   # the following 1 in the first arg is technically ok as ODBC says when the field descriptor
+   # (the 2nd arg) is a header field (e.g. SQL_COLUMN_COUNT) the driver should ignore it.
+   # However, some drivers (postgres) don't. You need to change the 1 to 0 for postgres to work.
+   # BUT it gets worse. Postgres doesn't have SQLColattributes (and deprecated ODBC 2.0 API)
+   # and so the driver manager maps calls to SQLColAttributes to SQLColAttribute. All would
+   # be well, BUT unixODBC until version 2.3.5 has a bug in it where when it maps
+   # SQLColAttributes to SQLColAttribute and you pass 0 for the column it will error with
+   # with invalid descripto index because bookmarks are not enabled and it did not handle
+   # SQL_COLUMN_COUNT - sigh.
+   # So, the upshot is if I don't change the arg below all drivers I know except postgres
+   # will work and if I do change the arg below all drivers on systems not with unixODBC 2.3.5
+   # (most now) will fail.
    my $colcount = $sth->func(1, 0, 'ColAttributes'); # 1 for col (unused) 0 for SQL_COLUMN_COUNT
    #diag("Column count is: $colcount\n");
-   is($sth->{NUM_OF_FIELDS}, $colcount,
+   is($colcount, $sth->{NUM_OF_FIELDS},
       'NUM_OF_FIELDS = ColAttributes(SQL_COLUMN_COUNT)');
    my ($coltype, $colname, $i, @row);
    my $is_ok = 0;
@@ -204,7 +216,7 @@ if ($sth) {
           diag("Coltype $coltype for column $colname not found in list ", join(', ', @{$ODBCTEST::TestFieldInfo{$colname}}), "\n");
       }
    }
-   is($is_ok, $colcount, "Col count matches correct col count");
+   is($colcount, $is_ok, "Col count matches correct col count");
    # print "not " unless $is_ok == $colcount;
    # print "ok 9\n";
 

@@ -1,5 +1,5 @@
 package Date::Manip::TZ;
-# Copyright (c) 2008-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use Date::Manip::Base;
 use Data::Dumper;
 
 our $VERSION;
-$VERSION='6.60';
+$VERSION='6.70';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.
@@ -689,8 +689,8 @@ sub _get_curr_zone {
    }
 
    if (! $currzone) {
-      warn "ERROR: Date::Manip unable to determine Time Zone.\n";
-      die;
+      warn "ERROR: Date::Manip unable to determine Time Zone.  GMT will be used.\n";
+      $currzone = 'Etc/GMT';
    }
 
    return $currzone;

@@ -199,3 +199,166 @@ sub get_public_key_point {
    return $public_key;
 }
 1;
+
+
+__END__
+
+=head1 NAME
+
+Steemit::ECDSA - perl library wich implements ecda helper methods used by the Steemit::WsClient distribution
+
+=head1 SYNOPSIS
+
+   use Steemit::ECDSA;
+
+   my ( $r, $s, $i ) = Steemit::ECDSA::ecdsa_sign( $message, Math::BigInt->from_bytes( $plain_secret_key) );
+
+   my $pubkey = Steemit::ECDSA::recoverPubKey($message, $r, $s, $i )
+
+   Steemit::ECDSA::ecdsa_verify( $message, $pubkey, $r, $s) or die "invalid signature";
+
+
+
+
+
+=head1 SUBROUTINES/METHODS
+
+
+=head2    is_signature_canonical_canonical($binary_signature)
+
+accepts a binary representation of ($i+27+4).$r.$s and will check for a canonical signature
+its internaly used and canonical signatures are important for security, and enforced by teh server
+
+=head2    bytes_32_sha256 {
+
+take a message and return the 32 most significant bytes from the scha256 hash
+
+=head2    calcPubKeyRecoveryParam {
+
+internaly used to determine the parameter that lets us recalculate the public key from the signature
+
+=head2    recoverPubKey {
+
+recover the signature
+
+=head2    get_compressed_public_key {
+
+transform the x and y based coordinates from a public key to only teh x and a parameter wich defines whether y is even or odd
+
+=head2    get_recovery_factor {
+
+get the parameter needed by the above method
+
+=head2    point_from_x {
+
+get the point on the curve wich coresponds to a point x and a recovery factor
+
+=head2    recover_y {
+
+get only the y coorinate of the point
+
+=head2    get_public_key_point {
+
+take a key and get the public key for it as point
+
+
+=head1 REPOSITORY
+
+L<https://github.com/snkoehn/perlSteemit>
+
+
+=head1 AUTHOR
+
+snkoehn, C<< <snkoehn at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-steemit at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Steemit::WsClient>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Steemit::ECDSA
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Steemit::WsClient>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Steemit::WsClient>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Steemit::WsClient>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Steemit::WsClient/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2018 snkoehn.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+
+
+
+
+
+
+

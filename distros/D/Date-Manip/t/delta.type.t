@@ -30,7 +30,7 @@ $obj->config("forcedate","now,America/New_York");
 
 $tests="
 
-normal [ 0 0 0 0 1 2 3 ]   => 0
+standard [ 0 0 0 0 1 2 3 ] => 0
 
 business                   => 0
 
@@ -44,7 +44,7 @@ approx                     => 0
 
 ###
 
-normal [ 0 0 1 2 1 2 3 ]   => 0
+standard [ 0 0 1 2 1 2 3 ] => 0
 
 business                   => 0
 
@@ -116,9 +116,9 @@ approx                     => 0
 
 delta [ 1 0 0 0 10 20 30 ] => 0
 
-business                   => 1
+business                   => 0
 
-standard                   => 0
+standard                   => 1
 
 exact                      => 0
 

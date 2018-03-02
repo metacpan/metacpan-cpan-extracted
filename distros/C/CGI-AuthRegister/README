@@ -1,16 +1,16 @@
 <? read_starfish_conf(); echo &readme_line(); !>
 #+
-CGI::AuthRegister version 1.0
+CGI::AuthRegister version 1.1
 =============================
 #-
 
-The CGI::Authenticate module provides a simple, transparent, and
+The CGI::AuthRegister module provides a simple, transparent, and
 flexible framework for authentication and registration of users
 through CGI programs implemented in Perl.  Further documentation is a
-part of the file Authenticate.pm in pod format.  The convert it in
+part of the file AuthRegister.pm in pod format.  The convert it in
 other formats, such as HTML, you can use a command such as:
 
-	  pod2html Authenticate.pm
+	  pod2html AuthRegister.pm
 
 INSTALLATION
 
@@ -31,7 +31,7 @@ No significant dependencies.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+Copyright 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

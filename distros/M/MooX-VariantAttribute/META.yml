@@ -21,7 +21,7 @@ no_index:
 provides:
   MooX::VariantAttribute:
     file: lib/MooX/VariantAttribute.pm
-    version: '0.08'
+    version: '0.09'
   MooX::VariantAttribute::Role:
     file: lib/MooX/VariantAttribute/Role.pm
 requires:
@@ -30,8 +30,9 @@ requires:
   Moo: '0'
   MooX::ReturnModifiers: '0.09'
   Scalar::Util: '0'
+  Type::Tiny: '1.002001'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

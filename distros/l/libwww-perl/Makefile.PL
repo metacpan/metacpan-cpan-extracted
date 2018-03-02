@@ -83,7 +83,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.32",
+  "VERSION" => "6.33",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/local/*.t t/robot/*.t"
   }

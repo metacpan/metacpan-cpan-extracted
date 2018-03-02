@@ -274,9 +274,10 @@ sub run($$){
     my ($self,$name,$cnt) = @_;
 
     return      if( ! validateParams(\$self,\$name) );
-    $self->{'_cnt'} = 1    if( ! defined $cnt);
-    $self->{'_cnt'} = 1    if( $cnt !~ /^[-]?\d+$/ );
-    $self->{'_cnt'} =-1    if( $cnt == 0 );
+    $cnt = 1    if( ! defined $cnt);
+    $cnt = 1    if( $cnt !~ /^[-]?\d+$/ );
+    $cnt = -1   if( $cnt == 0 );
+    $self->{'_cnt'} = $cnt;
     my $o; my $m;
     while($self->{'_cnt'}--) {
         my $p   = $self->_getParams($name);
@@ -458,6 +459,42 @@ sub getLabelValueHash($$){
         $lvh->{$l} = $v;
     }
     return $lvh;
+}
+
+#------------------------------------------------------------------------------
+# Take a value hash {<label> => <value>} as input.
+# Copy the value of the value hash to the value of the menu option
+# if they have the same label.
+#------------------------------------------------------------------------------
+sub setValues($$$){
+    my ($self,$name,$values) = @_;
+
+    my $L = $self->{'def'}{$name}{'opts'};
+    my $lvh;
+    foreach my $x (@{$L}) {
+        my $l = $x->{'label'};
+        my $v = $values->{$l};
+        next    if( ! defined $v );
+        $x->{'value'} = $v;
+    }
+}
+
+#------------------------------------------------------------------------------
+# Take a value hash {<label> => <value>} as input.
+# Copy the value of the value hash to the default field of the menu option
+# if they have the same label.
+#------------------------------------------------------------------------------
+sub setDefaults($$$){
+    my ($self,$name,$values) = @_;
+
+    my $L = $self->{'def'}{$name}{'opts'};
+    my $lvh;
+    foreach my $x (@{$L}) {
+        my $l = $x->{'label'};
+        my $v = $values->{$l};
+        next    if( ! defined $v );
+        $x->{'default'} = $v;
+    }
 }
 
 1;

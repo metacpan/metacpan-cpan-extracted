@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -273,7 +273,7 @@ foreach my $hpuxz (keys %hpux_zones) {
    'AST4APT'       => 'America/Blanc-Sablon',
    'AWST-8AWDT'    => 'Australia/Perth',
    'BST11BDT'      => 'America/Adak',
-   'CAT-2CAST'     => 'Africa/Khartoum',
+   'CAT-2CAST'     => 'Africa/Juba',
    'CET-1CEST'     => 'CET',
    'CET-1WEMT'     => 'Europe/Monaco',
    'CET-1WEST'     => 'Europe/Luxembourg',

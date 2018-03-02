@@ -1,5 +1,19 @@
 Revision history for Test-Harness
 
+3.41    27-02-2018
+        - Released 3.40_01 without code modifications
+
+3.40_01 23-07-2017
+        - Return handle for pipes and sockets #58 (Erik Huelsmann)
+        - TAP v13 plan allows trailing whitespace (Steffen Schwigon)
+        - prove: add a --statefile=<path> option to customize the .prove file
+          (Ævar Arnfjörð Bjarmason)
+        - Avoid non-deterministic source handling, make a SourceHandler tie an
+          error. (Michael Schwern, Leon Timmermans)
+        - Fix and simplify MSWin32 colorization (Roy Ivy III)
+        - Fix file source handler to accept single extensions option (Tomoki Aonuma)
+        - Spelling fixes (Brian Wightman)
+
 3.39    06-04-2017
         - Make tests pass when PERL_USE_UNSAFE_INC=0
 

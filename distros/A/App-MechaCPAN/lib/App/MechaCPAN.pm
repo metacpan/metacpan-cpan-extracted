@@ -22,6 +22,7 @@ BEGIN
 {
   our @EXPORT_OK = qw/
     url_re git_re git_extract_re
+    has_git has_updated_git min_git_ver
     logmsg info success error
     dest_dir inflate_archive
     run restart_script
@@ -29,7 +30,7 @@ BEGIN
   our %EXPORT_TAGS = ( go => [@EXPORT_OK] );
 }
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 require App::MechaCPAN::Perl;
 require App::MechaCPAN::Install;
@@ -177,6 +178,48 @@ sub main
   }
 
   return $ret;
+}
+
+sub _git_str
+{
+  state $_git_str;
+
+  if ( !defined $_git_str )
+  {
+    $_git_str = '';
+    my $git_version_str = eval { run(qw/git --version/); };
+    if ( defined $git_version_str )
+    {
+      ($_git_str) = $git_version_str =~ m/git version (\d+[.]\d+[.]\d+)/;
+    }
+  }
+
+  return $_git_str;
+}
+
+sub min_git_ver
+{
+  return '1.7.7';
+}
+
+sub has_updated_git
+{
+  my $git_version_str = _git_str;
+  if ($git_version_str)
+  {
+    use version 0.77;
+    if ( version->parse($git_version_str) >= version->parse(min_git_ver) )
+    {
+      return 1;
+    }
+  }
+
+  return;
+}
+
+sub has_git
+{
+  return _git_str && has_updated_git;
 }
 
 sub url_re

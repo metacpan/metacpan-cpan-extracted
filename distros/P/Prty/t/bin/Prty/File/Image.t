@@ -40,6 +40,17 @@ sub test_unitTest : Test(7) {
 
 # -----------------------------------------------------------------------------
 
+sub test_scaleFactor : Test(1) {
+    my $self = shift;
+
+    my $file = $self->testPath('t/data/image/test001.jpg');
+    my $img = Prty::File::Image->new($file);
+    my $scale = $img->scaleFactor(320,180);
+    $self->floatIs($scale,0.5);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_property : Test(4) {
     my $self = shift;
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
-use Prty::Perl;
+use Prty::Reference;
 use Prty::Http::Cookie;
 use Prty::FileHandle;
 use Scalar::Util ();
@@ -266,7 +266,7 @@ sub set {
     while (@_) {
         my $key = shift;
         my $val = shift;
-        $self->$key(Prty::Perl->isArrayRef($val)? @$val: $val);
+        $self->$key(Prty::Reference->isArrayRef($val)? @$val: $val);
     }
 
     return;
@@ -977,7 +977,7 @@ sub asString {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

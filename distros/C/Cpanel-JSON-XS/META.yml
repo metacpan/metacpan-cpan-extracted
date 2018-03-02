@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 8.3004, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/rurban/Cpanel-JSON-XS/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Cpanel-JSON-XS
-version: '4.01'
+version: '4.02'
 x_contributors:
   - 'Ashley Willis <ashleyw@cpan.org>'
   - 'Daniel Dragan <bulk88@hotmail.com>'

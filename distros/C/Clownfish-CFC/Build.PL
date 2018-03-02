@@ -24,7 +24,7 @@ my $builder = Clownfish::CFC::Build->new(
     license     => 'apache',
     dist_author =>
         'The Apache Lucy Project <dev at lucy dot apache dot org>',
-    dist_version       => '0.6.2',
+    dist_version       => '0.6.3',
     dist_abstract      => 'CFC Apache Clownfish compiler',
     requires           => { 'perl' => '5.8.3', },
     configure_requires => { 'Module::Build' => 0.280801 },

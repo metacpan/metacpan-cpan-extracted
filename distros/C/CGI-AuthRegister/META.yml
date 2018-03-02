@@ -1,15 +1,21 @@
-# <? read_starfish_conf(); &generate_header; &generate_META_yml !>
-#+
-# file: META.yml
-# CGI::AuthRegister - Simple CGI Authentication and Registration in Perl
-# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
-# $Date: $
-# $Id: $
---- #YAML:1.0
-name: CGI::AuthRegister
-abstract: Simple CGI Authentication and Registration in Perl
-version: 1.0
-authored_by:
-  - Vlado Keselj http://web.cs.dal.ca/~vlado
-license: perl
-#-
+---
+abstract: 'AuthRegister Module for Simple CGI Authentication and Registration in Perl'
+author:
+  - 'Vlado Keselj http://web.cs.dal.ca/~vlado'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CGI-AuthRegister
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '1.1'

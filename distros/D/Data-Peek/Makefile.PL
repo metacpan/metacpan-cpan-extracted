@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright PROCURA B.V. (c) 2008-2017 H.Merijn Brand
+# Copyright PROCURA B.V. (c) 2008-2018 H.Merijn Brand
 
 require 5.008; # <- also see postamble at the bottom for META.yml
 use strict;
@@ -33,9 +33,20 @@ my %wm = (
 $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 
 unless (exists $ENV{AUTOMATED_TESTING} and $ENV{AUTOMATED_TESTING} == 1) {
-    if (prompt ("Do you want to install module DP as a shortcut for Data::Peek ?", "y") =~ m/[yY]/) {
+    my $dp_ok = 1;
+    eval {
+	require DP;
+	$dp_ok = 0;
+	if ($INC{"DP.pm"} and open my $fh, "<", $INC{"DP.pm"}) {
+	    my $line1 = <$fh>;
+	    $line1 =~ m/^use Data::Peek;/ and $dp_ok = 1;
+	    close $fh;
+	    }
+	};
+
+    if ($dp_ok and prompt ("Do you want to install module DP as a shortcut for Data::Peek ?", "y") =~ m/[yY]/) {
 	local $/;
-	open my $pm, "<", "Peek.pm" or die "CAnnot read Peek.pm: $!\n";
+	open my $pm, "<", "Peek.pm" or die "Cannot read Peek.pm: $!\n";
 	my $vsn = do { <$pm> =~ m/^\$VERSION\s*=\s*"([0-9._]+)/m; $1 };
 	close   $pm;
 
@@ -114,8 +125,11 @@ sub postamble
 __END__
 use Data::Peek;
 
+use strict;
+use warnings;
+
 BEGIN { *DP:: = \%Data::Peek:: }
-$VERSION = ::VERSION::;
+our $VERSION = ::VERSION::;
 
 1;
 
@@ -137,7 +151,7 @@ H.Merijn Brand <h.m.brand@xs4all.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2014 H.Merijn Brand
+Copyright (C) 2008-2018 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

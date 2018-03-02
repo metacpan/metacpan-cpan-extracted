@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw(check_kwalitee cpants_lint cpants_pass_regex );
 
-$VERSION = '2.123';
+$VERSION = '2.125';
 
 =encoding utf8
 
@@ -35,8 +35,10 @@ It looks in local_name to get the name of the distribution file.
 
 sub check_kwalitee
 	{
-	eval "require Module::CPANTS::Analyse; 1" or
-		$_[0]->_die( "You need Module::CPANTS::Analyse to check kwalitee" );
+	my $cpants_analyse = "Module::CPANTS::Analyse";
+	my $cpants_lint    = "App::CPANTS::Lint";
+	eval "require $cpants_analyse; require $cpants_lint; 1" or
+		$_[0]->_die( "You need $cpants_analyse and $cpants_lint to check kwalitee" );
 
 	$_[0]->_print( "Checking kwalitee... " );
 
@@ -82,7 +84,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 
@@ -92,9 +94,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the Artistic License 2.0.
 
 =cut
 

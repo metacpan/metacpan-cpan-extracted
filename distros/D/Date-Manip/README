@@ -15,30 +15,28 @@ DESCRIPTION
     efficiently, but no other module can do all of the operations available
     in Date::Manip.
 
-    Since many other date/time modules exist, some of which may do the
-    specific operation(s) you need faster, be sure to read "SHOULD I USE
-    DATE::MANIP" in Date::Manip::Misc before deciding which of the Date and
-    Time modules from CPAN is for you. However, if you want one module to do
-    it all, Date::Manip is the one to use.
-
     Date::Manip has functionality to work with several fundamental types of
     data.
 
     dates
         The word date is used extensively here and is somewhat misleading.
         In Date::Manip, a date consists of three pieces of information: a
-        calendar date, a time of day, and time zone information. Calendar
-        dates and times are fully handled. Time zones are handled as well,
-        but depending on how you use Date::Manip, there may be some
-        limitations as discussed below.
+        calendar date (year, month, day), a time of day (hour, minute,
+        second), and time zone information. Calendar dates and times are
+        fully handled. Time zones are handled as well, but depending on how
+        you use Date::Manip, there may be some limitations as discussed
+        below.
 
     delta
         A delta is an amount of time (i.e. the amount of time between two
-        different dates). A delta refers only to an amount of time. It
-        includes no information about a starting or ending date/time. Most
-        people will think of a delta as an amount of time, but the term
-        'time' is already used so much in this module that I didn't want to
-        use it here in order to avoid confusion.
+        different dates). Think of it as the duration of an event or the
+        amount of time between two dates.
+
+        A delta refers only to an amount of time. It includes no information
+        about a starting or ending date/time. Most people will think of a
+        delta as an amount of time, but the term 'time' is already used so
+        much in this module that I didn't want to use it here in order to
+        avoid confusion.
 
     recurrence
         A recurring event is something which occurs on a regular recurring
@@ -58,11 +56,13 @@ DESCRIPTION
         similar to the Unix date command.
 
     *   Determine the amount of time between two dates, or add an amount of
-        time to a date to get a second date.
+        time (a delta) to a date to get a second date.
 
     *   Work with dates with dates using international formats (foreign
         month names, 12/10/95 referring to October rather than December,
         etc.).
+
+    *   Convert dates from one timezone to another.
 
     *   To find a list of dates where a recurring event happens.
 
@@ -190,6 +190,12 @@ SEE ALSO
     Date::Manip::Misc
         Miscellaneous information about Date::Manip (who should use it;
         acknowledgments).
+
+        Since many other date/time modules exist, some of which may do the
+        specific operation(s) you need faster, be sure to read "SHOULD I USE
+        DATE::MANIP" in Date::Manip::Misc before deciding which of the Date
+        and Time modules from CPAN is for you. However, if you want one
+        module to do it all, Date::Manip is the one to use.
 
     Date::Manip::History
         Musings on the history of Date::Manip written around it's 20th

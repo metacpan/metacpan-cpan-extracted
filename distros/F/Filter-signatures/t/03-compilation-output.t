@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 13;
 use Data::Dumper;
 
 require Filter::signatures;
@@ -113,6 +113,53 @@ SUB
 Filter::signatures::transform_arguments();
 is $_, <<'RESULT', "RT #xxxxxx Single-line functions work";
 sub foo { my ($bar,$baz)=@_; print "Yey\n"; }
+RESULT
+
+{ local $TODO = "Recursive parentheses don't work on $]"
+  if( $] < 5.010 );
+
+$_ = <<'SUB';
+sub staleUploads( $self, $timeout = 3600, $now = time() ) {
+}
+SUB
+Filter::signatures::transform_arguments();
+is $_, <<'RESULT', "Default arguments with parentheses work";
+sub staleUploads { my ($self,$timeout,$now)=@_;$timeout = 3600 if @_ <= 1;$now = time() if @_ <= 2;
+}
+RESULT
+
+$_ = <<'SUB';
+sub staleUploads( $self, $timeout = 3600, $now = time((()))) {
+}
+SUB
+Filter::signatures::transform_arguments();
+is $_, <<'RESULT', "Default arguments with multiple parentheses work";
+sub staleUploads { my ($self,$timeout,$now)=@_;$timeout = 3600 if @_ <= 1;$now = time((())) if @_ <= 2;
+}
+RESULT
+
+$_ = <<'SUB';
+sub ( $self, $now = localtime(1)) {
+}
+SUB
+Filter::signatures::transform_arguments();
+is $_, <<'RESULT', "Default arguments with parentheses and values work";
+sub  { my ($self,$now)=@_;$now = localtime(1) if @_ <= 1;
+}
+RESULT
+
+}
+
+$_ = <<'SUB';
+sub ( $self, $cb = sub {
+}) {
+}
+SUB
+Filter::signatures::transform_arguments();
+is $_, <<'RESULT', "Default arguments with parentheses and values work";
+sub  { my ($self,$cb)=@_;$cb = sub { } if @_ <= 1;
+
+}
 RESULT
 
 if( $Test::More::VERSION > 0.87 ) { # 5.8.x compatibility

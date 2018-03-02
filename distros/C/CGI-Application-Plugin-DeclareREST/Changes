@@ -1,6 +1,10 @@
-﻿Revision history for CGI::Application::Plugin::DeclareREST
+Revision history for CGI::Application::Plugin::DeclareREST
 
-0.01      2013-08-02 12:29:49 Europe/Helsinki
+0.03      2018-02-28 16:30:48+02:00 Europe/Helsinki
+          ! Fix test failure with Test::WWW::Mechanize::PSGI 0.38 change
+
+0.02      2017-02-01 15:36:49+02:00 Europe/Helsinki
+          + Fix the any method
 
 0.01      2013-08-01 19:03:12 Europe/Helsinki
           - First version

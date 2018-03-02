@@ -78,4 +78,4 @@ my $client = Google::Ads::AdWords::Client->new({version => "v201710"});
 $client->set_die_on_faults(1);
 
 # Call the example
-upload_html5_zip($client);
+upload_media_bundle($client);

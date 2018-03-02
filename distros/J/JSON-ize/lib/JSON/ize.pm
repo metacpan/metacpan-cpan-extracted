@@ -2,12 +2,13 @@ package JSON::ize;
 use base Exporter;
 use JSON 2.00;
 use strict;
+use warnings;
 
 our $JOBJ = JSON->new();
 our $_last_out = "";
 
 our @EXPORT = qw/jsonize jsonise J parsej pretty_json ugly_json/;
-our $VERSION = "0.101";
+our $VERSION = "0.102";
 
 sub jobj { $JOBJ }
 
@@ -117,6 +118,23 @@ L<JSON>, L<JSON::XS>.
  Mark A. Jensen
  CPAN: MAJENSEN
  mark -dot- jensen -at- nih -dot- gov
+
+=head1 LICENSE
+
+Copyright (c) 2018 Mark A. Jensen.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
 
 =cut
 

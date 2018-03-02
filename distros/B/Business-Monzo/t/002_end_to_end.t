@@ -44,6 +44,14 @@ isa_ok(
 	'Business::Monzo::Account'
 );
 
+note( "Pot" );
+my @pots = $Monzo->pots;
+
+isa_ok(
+	my $Pot = $pots[0],
+	'Business::Monzo::Pot'
+);
+
 my @transactions = $Monzo->transactions( account_id => $Account->id );
 
 isa_ok(

@@ -4,7 +4,7 @@
       "Bron Gondwana <brong@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "Date::Format" : "2.24",
+            "File::MMagic" : "1.30",
             "List::MoreUtils" : "0.01",
             "List::Pairwise" : "1.00",
             "Net::DAVTalk" : "0.08",
@@ -42,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

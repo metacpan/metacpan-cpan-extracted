@@ -20,20 +20,31 @@ Basic use:
 
 (1) Your source code goes into a perl-version-specific directory:
 
-    ./version/v5.X.Y/bin
-    ./version/v5.X.Y/lib
-    ./version/v5.X.Y/t
+    ./version/v5.8.8/bin/...
+    ./version/v5.8.8/lib/...
+    ./version/v5.8.8/t/...
+
+    or into Git with tags like
+
+    perl/v5.24
+    perl/5.005003
+    perl/5.005_003
+
 
 (2) Your Makefile.PL (or Build.PL or whatever) does a:
 
     use Module::FromPerlVer;
 
+    use Module::FromPerlVer qw( use_dir 1 );    # copy from dir
+    use Module::FromPerlVer qw( use_git 1 );    # checkout with tag
+    
 (3) The contents of your install directory are populated
     via bulk copy from ./version of the higest version 
-    number not greater than the Perl used for installation.
+    number not greater than the Perl used for installation
+    or checkout of tag for the higest version.
 
 For regression testing of current modules with older versions
-of Perl you can pass ( force_version => X ) to ignore $^V and
+of Perl you can pass ( perl_version => X ) to ignore $^V and
 run the code as if the perl's v-string is X.
 
  

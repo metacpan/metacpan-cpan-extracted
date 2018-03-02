@@ -17,11 +17,11 @@ Geo::Coder::XYZ - Provides a geocoding functionality using https://geocode.xyz
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ sub new {
 
     @locations = $geocoder->geocode('Portland, USA');
     diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
-    	
+
 =cut
 
 sub geocode {
@@ -91,25 +91,42 @@ sub geocode {
 		$location = "$1, United Kingdom";	# geocode.xyz gets confused between England and New England
 	}
 	$location =~ s/\s/+/g;
-	my %query_parameters = ('locate' => $location, 'json' => 1, 'moreinfo' => 1);
+	my %query_parameters = ('locate' => $location, 'json' => 1);
+	if(wantarray) {
+		# moreinfo is needed to find alternatives when the given location is ambiguous
+		$query_parameters{'moreinfo'} = 1;
+	}
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string;
 
 	my $res = $self->{ua}->get($url);
 
 	if ($res->is_error) {
-		Carp::croak("geocode.xyz API returned error: " . $res->status_line());
+		Carp::carp("geocode.xyz API returned error: on $url " . $res->status_line());
+		return { };
 	}
 
-	my $json = JSON->new->utf8;
-	my $rc = $json->decode($res->content);
+	my $json = JSON->new()->utf8();
+	my $rc;
+	eval {
+		$rc = $json->decode($res->content());
+	};
+	if(!defined($rc)) {
+		if($@) {
+			Carp::carp("$url: $@");
+			return { };
+		}
+		Carp::carp("$url: can't decode the JSON ", $res->content());
+		return { };
+	}
 
-	if(wantarray && $rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'} &&
+	if($rc->{'otherlocations'} && $rc->{'otherlocations'}->{'loc'} &&
 	   (ref($rc->{'otherlocations'}->{'loc'}) eq 'ARRAY')) {
 		my @rc = @{$rc->{'otherlocations'}->{'loc'}};
-		if(scalar(@rc)) {
+	   	if(wantarray) {
 			return @rc;
 		}
+		return $rc[0];
 	}
 	return $rc;
 
@@ -159,10 +176,10 @@ sub reverse_geocode {
 	}
 
 	my $latlng = $param{latlng}
-		or Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+		or Carp::carp("Usage: reverse_geocode(latlng => \$latlng)");
 
 	return $self->geocode(location => $latlng, reverse => 1);
-};
+}
 
 =head1 AUTHOR
 
@@ -181,7 +198,7 @@ L<Geo::Coder::GooglePlaces>, L<HTML::GoogleMaps::V3>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2018 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

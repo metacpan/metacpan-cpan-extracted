@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 no bytes;
 use Prty::Section::Object;
@@ -727,7 +727,7 @@ Als Beispiel siehe prty-confluence:
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

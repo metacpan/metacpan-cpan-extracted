@@ -1,23 +1,27 @@
 ---
-name: Tie-Hash-Regex
-version: 1.02
+abstract: 'Match hash keys using Regular Expressions'
 author:
   - 'Dave Cross <dave@mag-sol.com>'
-abstract: Match hash keys using Regular Expressions
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Attribute::Handlers: 0
-  Tie::Hash: 0
-  perl: 5.6.0
 build_requires:
-  Test::More: 0
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Tie-Hash-Regex
 provides:
   Tie::Hash::Regex:
     file: lib/Tie/Hash/Regex.pm
-    version: 15
-generated_by: Module::Build version 0.280801
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '1.12'
+requires:
+  Attribute::Handlers: '0'
+  Tie::Hash: '0'
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,8 @@
 Revision history for Perl extension Teamcity-Executor
 
+1.3.0 2018-02-26T16:24:04Z
+  - add support for synchronous touch method
+
 1.2.0 2018-01-30T09:08:43Z
   - extend logging of failed jobs
 

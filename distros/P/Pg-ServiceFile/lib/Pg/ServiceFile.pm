@@ -7,7 +7,7 @@ use Types::Path::Tiny 'Path';
 
 # ABSTRACT: Basic PostgreSQL connection service file interface
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has data => (
     is  => 'lazy',
@@ -85,13 +85,13 @@ Pg::ServiceFile - Basic PostgreSQL connection service file interface
 
 L<Pg::ServiceFile> is a partially complete interface to the PostgreSQL
 connection service file. It's complete in the fact that it reads the C<<
-$ENV{PGSERVICEFILE} >> or user service file as standard, but will not
-automatically retrieve and merge the system-wide service file or check
-C<PGSYSCONFDIR>.
+$ENV{PGSERVICEFILE} >> or the user service file C<< ~/.pg_service.conf >> as
+standard, but will not automatically retrieve and merge the system-wide service
+file or check C<PGSYSCONFDIR>.
 
 If you know the connection service file you want to use, and just want the data
-as a C<HASH> reference, you can use the simpler module L<Config::Pg::ServiceFile>
-which has less dependencies and features.
+as a C<HASH> reference, you can use the simpler module
+L<Config::Pg::ServiceFile> which has less dependencies and features.
 
 =head1 ATTRIBUTES
 

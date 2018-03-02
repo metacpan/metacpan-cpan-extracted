@@ -7,23 +7,19 @@ use warnings;
 use Carp         ();
 use Scalar::Util ();
 
-use UNIVERSAL::Object;
-use Directory::Scanner::API::Stream;
-
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use constant DEBUG => $ENV{DIR_SCANNER_STREAM_APPLICATION_DEBUG} // 0;
 
 ## ...
 
-our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object', 'Directory::Scanner::API::Stream') }
-our %HAS; BEGIN {
-	%HAS = (
-		stream   => sub {},
-		function => sub {},
-	)
-}
+use parent 'UNIVERSAL::Object';
+use roles 'Directory::Scanner::API::Stream';
+use slots (
+	stream   => sub {},
+	function => sub {},
+);
 
 ## ...
 
@@ -32,7 +28,7 @@ sub BUILD {
 	my $stream = $self->{stream};
 	my $f      = $self->{function};
 
-	(Scalar::Util::blessed($stream) && $stream->DOES('Directory::Scanner::API::Stream'))
+	(Scalar::Util::blessed($stream) && $stream->roles::DOES('Directory::Scanner::API::Stream'))
 		|| Carp::confess 'You must supply a directory stream';
 
 	(defined $f)
@@ -84,7 +80,7 @@ Directory::Scanner::Stream::Application - Apply function to streaming directory 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -101,7 +97,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stevan Little.
+This software is copyright (c) 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

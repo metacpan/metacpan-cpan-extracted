@@ -21,13 +21,15 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Path::Tiny" => 0,
     "Scalar::Util" => 0,
-    "UNIVERSAL::Object" => 0
+    "UNIVERSAL::Object" => "0.14",
+    "roles" => "0.03",
+    "slots" => "0.03"
   },
   "TEST_REQUIRES" => {
     "Test::Fatal" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +43,9 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Test::Fatal" => 0,
   "Test::More" => "0.88",
-  "UNIVERSAL::Object" => 0
+  "UNIVERSAL::Object" => "0.14",
+  "roles" => "0.03",
+  "slots" => "0.03"
 );
 
 

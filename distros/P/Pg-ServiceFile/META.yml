@@ -24,7 +24,7 @@ no_index:
     - xt
 requires:
   Config::Pg::ServiceFile: '0'
-  Moo: '0'
+  Moo: '1.006000'
   Types::Path::Tiny: '0'
   Types::Standard: '0'
   perl: '5.008005'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/kwakwaversal/pg-servicefile/issues
   homepage: https://github.com/kwakwaversal/pg-servicefile
   repository: https://github.com/kwakwaversal/pg-servicefile.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Paul Williams <kwakwaversal@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

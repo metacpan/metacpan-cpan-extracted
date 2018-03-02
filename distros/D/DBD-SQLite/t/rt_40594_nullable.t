@@ -7,7 +7,8 @@ BEGIN {
 }
 
 use Test::More;
-use t::lib::Test;
+use lib "t/lib";
+use SQLiteTest;
 use DBD::SQLite;
 
 BEGIN {

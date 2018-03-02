@@ -196,6 +196,9 @@ mingw_modfl(long double x, long double *ip)
 /* excluding the final \0, so the string s may continue */
 # define memEQc(s, c) memEQ(s, ("" c ""), sizeof(c)-1)
 #endif
+#ifndef He_IS_SVKEY
+# define He_IS_SVKEY(he) HeKLEN (he) == HEf_SVKEY
+#endif
 
 /* av_len has 2 different possible types */
 #ifndef HVMAX_T
@@ -262,15 +265,15 @@ mingw_modfl(long double x, long double *ip)
 #define F_ESCAPE_SLASH    0x00080000UL
 #define F_SORT_BY         0x00100000UL
 #define F_ALLOW_STRINGIFY 0x00200000UL
-#define F_HOOK            0x80000000UL // some hooks exist, so slow-path processing
+#define F_HOOK            0x80000000UL /* some hooks exist, so slow-path processing */
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
 #define SET_RELAXED (F_RELAXED | F_ALLOW_BAREKEY | F_ALLOW_SQUOTE)
 
-#define INIT_SIZE   32 // initial scalar size to be allocated
-#define INDENT_STEP 3  // spaces per indentation level
+#define INIT_SIZE   32 /* initial scalar size to be allocated */
+#define INDENT_STEP 3  /* default spaces per indentation level */
 
-#define SHORT_STRING_LEN 16384 // special-case strings of up to this size
+#define SHORT_STRING_LEN 16384 /* special-case strings of up to this size */
 
 #define DECODE_WANTS_OCTETS(json) ((json)->flags & F_UTF8)
 
@@ -329,6 +332,7 @@ enum {
 typedef struct {
   U32 flags;
   U32 max_depth;
+  U32 indent_length;         /* how much padding to use when indenting */
   STRLEN max_size;
 
   SV *cb_object;
@@ -347,7 +351,8 @@ INLINE void
 json_init (JSON *json)
 {
   Zero (json, 1, JSON);
-  json->max_depth = 512;
+  json->max_depth     = 512;
+  json->indent_length = INDENT_STEP;
 }
 
 /* dTHX/threads TODO*/
@@ -920,7 +925,7 @@ encode_indent (pTHX_ enc_t *enc)
 {
   if (enc->json.flags & F_INDENT)
     {
-      int spaces = enc->indent * INDENT_STEP;
+      int spaces = enc->indent * enc->json.indent_length;
 
       need (aTHX_ enc, spaces);
       memset (enc->cur, ' ', spaces);
@@ -1061,7 +1066,7 @@ retrieve_hk (pTHX_ HE *he, char **key, I32 *klen)
 {
   int utf8;
 
-  if (HeKLEN (he) == HEf_SVKEY)
+  if (He_IS_SVKEY(he))
     {
       STRLEN len;
       SV *sv = HeSVKEY (he);
@@ -4027,6 +4032,21 @@ void get_ascii (JSON *self)
         get_allow_stringify  = F_ALLOW_STRINGIFY
     PPCODE:
         XPUSHs (boolSV (self->flags & ix));
+
+void indent_length (JSON *self, int val = INDENT_STEP)
+    PPCODE:
+        if (0 <= val && val <= 15) {
+            self->indent_length = val;
+        } else {
+            warn("The acceptable range of indent_length() is 0 to 15.");
+        }
+        XPUSHs (ST (0));
+
+U32 get_indent_length (JSON *self)
+    CODE:
+        RETVAL = self->indent_length;
+    OUTPUT:
+        RETVAL
 
 void max_depth (JSON *self, U32 max_depth = 0x80000000UL)
     PPCODE:

@@ -6,9 +6,9 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 lib/Lingua/EN/Titlecase/Simple.pm
 lib/Lingua/EN/Titlecase/Simple.pod
-t/00-compile.t
 t/titlecase.t
 t/wantarray.t

@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Titlecase-Simple",
    "prereqs" : {
@@ -22,8 +22,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter::Tidy" : "0",
-            "perl" : "5.010",
+            "perl" : "5.008001",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -32,9 +31,7 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "File::Find" : "0",
-            "File::Temp" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "constant" : "0",
             "if" : "0",
             "open" : "0"
@@ -52,6 +49,6 @@
          "web" : "https://github.com/ap/titlecase"
       }
    },
-   "version" : "1.001"
+   "version" : "1.003"
 }
 

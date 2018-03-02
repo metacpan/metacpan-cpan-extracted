@@ -2,7 +2,7 @@ Build.PL
 Changes
 eg/query_utdf
 eg/README
-inc/Astro/UTDF/Test.pm
+inc/My/Module/Test.pm
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Astro/UTDF.pm
@@ -21,6 +21,7 @@ xt/author/critic.t
 xt/author/executable.t
 xt/author/kwalitee.t
 xt/author/manifest.t
+xt/author/minimum_perl.t
 xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t

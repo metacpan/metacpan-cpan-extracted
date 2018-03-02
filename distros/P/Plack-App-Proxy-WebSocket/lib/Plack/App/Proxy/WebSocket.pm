@@ -1,10 +1,7 @@
 package Plack::App::Proxy::WebSocket;
-{
-  $Plack::App::Proxy::WebSocket::VERSION = '0.03';
-}
 # ABSTRACT: proxy HTTP and WebSocket connections
 
-use warnings FATAL => 'all';
+use warnings;
 use strict;
 
 use AnyEvent::Handle;
@@ -14,8 +11,11 @@ use HTTP::Request;
 use HTTP::Parser::XS qw/parse_http_response HEADERS_AS_HASHREF/;
 use Plack::Request;
 use URI;
+use namespace::clean;
 
 use parent 'Plack::App::Proxy';
+
+our $VERSION = '0.04'; # VERSION
 
 
 sub call {
@@ -75,7 +75,7 @@ sub call {
                 my $hdl = shift;
                 my $buf = delete $hdl->{rbuf};
 
-                return $writer->write($buf) if $writer;
+                return eval { $writer->write($buf) } if $writer;
                 $buffer .= $buf;
 
                 my ($ret, $http_version, $status, $message, $headers) =
@@ -83,9 +83,14 @@ sub call {
                 $server->push_shutdown if $ret == -2;
                 return if $ret < 0;
 
-                $headers = [$self->response_headers(HTTP::Headers->new(%$headers))] unless $status == 101;
+                if ($status == 101) {
+                    $headers = [$self->switching_response_headers(HTTP::Headers->new(%$headers))];
+                }
+                else {
+                    $headers = [$self->response_headers(HTTP::Headers->new(%$headers))];
+                }
                 $writer = $res->([$status, $headers]);
-                $writer->write(substr($buffer, $ret));
+                eval { $writer->write(substr($buffer, $ret)) };
                 $buffer = undef;
             });
 
@@ -114,7 +119,7 @@ sub build_headers_from_env {
     my $headers = $self->SUPER::build_headers_from_env($env, $req);
 
     # if x-forwarded-for already existed, append the remote address; the super
-    # method fails to maintain a list of mutiple proxies
+    # method fails to maintain a list of multiple proxies
     if (my $forwarded_for = $env->{HTTP_X_FORWARDED_FOR}) {
         $headers->{'X-Forwarded-For'} = "$forwarded_for, $env->{REMOTE_ADDR}";
     }
@@ -131,11 +136,35 @@ sub build_headers_from_env {
     $headers;
 }
 
+
+sub switching_response_headers {
+    my ($self, $headers) = @_;
+
+    # Save Connection and related headers
+    my @connection_tokens = $headers->header('Connection');
+    my @other_headers = map { $_ => $headers->header($_) } @connection_tokens;
+
+    $self->filter_headers( $headers );
+
+    # Remove PSGI forbidden headers
+    $headers->remove_header('Status');
+
+    # Add Connection and other headers listed in Connection back in
+    $headers->push_header('Connection' => \@connection_tokens, @other_headers);
+
+    my @headers;
+    $headers->scan( sub { push @headers, @_ } );
+
+    return @headers;
+}
+
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -143,7 +172,7 @@ Plack::App::Proxy::WebSocket - proxy HTTP and WebSocket connections
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -193,6 +222,11 @@ to the host and port number of a URI (if given).
 
 This is called internally.
 
+=head2 switching_response_headers
+
+Like C<response_headers> from L<Plack::App::Proxy> but doesn't filter the
+"Connection" header nor the headers listed by the "Connection" header.
+
 =head1 CAVEATS
 
 L<Starman> ignores the C<Connection> HTTP response header from applications
@@ -201,13 +235,22 @@ expect the value of that header to be C<Upgrade>.  Therefore, WebSocket
 proxying does not work on L<Starman>.  Your best bet is to use a server that
 doesn't mess with the C<Connection> header, like L<Twiggy>.
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
-Charles McGarvey <ccm@cpan.org>
+Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Charles McGarvey.
+This software is copyright (c) 2018 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

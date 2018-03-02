@@ -1,3 +1,18 @@
+1.43 (2018-03-02)
+  [ Damyan Ivanov ]
+  * improve pipeline notifications
+  * improve commit squash handling
+
+1.42 (2018-02-26)
+  [ Martín Ferrari ]
+  * Speed-up KGB joining of channels and setup.
+    Monkey-patch the delayed command dispatcher in PoCO::IRC to ignore
+    flood-prevention measures for high-priority messages (JOIN, MODE, etc), now
+    joins of many channels can be completed in a few seconds.
+
+  [ Damyan Ivanov ]
+  * webhooks: make use_irc_notices=1 the default, as advertised
+
 1.41 (2018-02-24)
   [ Damyan Ivanov ]
   * mark not released versions as 'Not Released' to make Test::CPAN::Changes

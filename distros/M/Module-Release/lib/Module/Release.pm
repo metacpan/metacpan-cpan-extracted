@@ -24,12 +24,13 @@ use warnings;
 no warnings;
 use vars qw($VERSION);
 
-$VERSION = '2.123';
+$VERSION = '2.125';
 
 use Carp qw(carp croak);
 use File::Basename qw(dirname);
 use File::Spec;
 use Scalar::Util qw(blessed);
+use DateTime;
 
 my %Loaded_mixins = ( );
 
@@ -82,8 +83,7 @@ Do you want debugging output? Set this to a true value
 =item CPAN_PASS
 
 Your CPAN password. If you don't set this and you want to upload to
-PAUSE, you should be prompted for it. Failing that, the module tries
-to upload anonymously but cannot claim the file for you.
+PAUSE, you should be prompted for it.
 
 =back
 
@@ -100,6 +100,10 @@ C<ConfigReader::Simple> to get these values:
 The name of the file to run as F<Makefile.PL>.  The default is
 C<"Makefile.PL">, but you can set it to C<"Build.PL"> to use a
 C<Module::Build>-based system.
+
+If this is set to C<"Build.PL">, this his will also cause
+C<Module::Build::Prereqs> to use C<Test::Prereqs::Build> instead of
+C<Test::Prereqs>.
 
 =item makefile
 
@@ -191,6 +195,7 @@ sub _set_defaults {
 			debug          => $ENV{RELEASE_DEBUG} || 0,
 			local_file     => undef,
 			remote_file    => undef,
+			input_fh       => *STDIN{IO},
 			output_fh      => *STDOUT{IO},
 			debug_fh       => *STDERR{IO},
 			null_fh        => IO::Null->new(),
@@ -244,10 +249,6 @@ sub _process_configuration {
 
 	# Figure out options
 	$self->{cpan} = $self->config->cpan_user eq '<none>' ? 0 : 1;
-
-	$self->{passive_ftp} =
-		($self->config->passive_ftp && $self->config->passive_ftp =~ /^y(es)?/) ? 1 : 0;
-
 
 	{
 	my @pairs = (
@@ -359,7 +360,7 @@ sub mixin_loaded { exists $Loaded_mixins{ $_[1] } }
 
 =back
 
-=head2 Methods for configuation and settings
+=head2 Methods for configuration and settings
 
 =over 4
 
@@ -555,6 +556,16 @@ sub reset_perls {
 	}
 
 
+=item input_fh
+
+Return the value of input_fh.
+
+=cut
+
+sub input_fh {
+    return $_[0]->{input_fh};
+}
+
 =item output_fh
 
 If quiet is off, return the value of output_fh. If output_fh is not
@@ -585,7 +596,7 @@ sub null_fh  {
 
 =item quiet
 
-Get the value of queit mode (true or false).
+Get the value of quiet mode (true or false).
 
 =item turn_quiet_on
 
@@ -1020,7 +1031,7 @@ sub check_manifest {
 
 =item manifest_name
 
-Return the name of the manifes file, probably F<MANIFEST>.
+Return the name of the manifest file, probably F<MANIFEST>.
 
 =item manifest
 
@@ -1184,23 +1195,6 @@ sub check_for_passwords {
 	$_[0]->_debug( "CPAN pass is " . $_[0]->config->cpan_pass . "\n" );
 	}
 
-=item get_readme()
-
-Read and parse the F<README> file.  This is pretty specific, so
-you may well want to overload it.
-
-=cut
-
-sub get_readme {
-	open my $fh, '<README' or return '';
-	my $data = do {
-		local $/;
-		<$fh>;
-		};
-
-	return $data;
-	}
-
 =item get_changes()
 
 Read and parse the F<Changes> file.  This is pretty specific, so
@@ -1209,7 +1203,7 @@ you may well want to overload it.
 =cut
 
 sub get_changes {
-	open my $fh, '<:utf8', 'Changes' or return '';
+	open my $fh, '<:encoding(UTF-8)', 'Changes' or return '';
 
 	my $data = <$fh>;  # get first line
 
@@ -1219,6 +1213,37 @@ sub get_changes {
 		}
 
 	return $data;
+	}
+
+=item show_recent_contributors()
+
+Show recent contributors before creating/extending Changes.
+
+This output relies upon the method C<get_recent_contributors()> having been
+implemented in the relevant mixin for your version control system.
+
+=cut
+
+sub show_recent_contributors {
+	my $self = shift;
+	return unless $self->can( 'get_recent_contributors' );
+	my @contributors = $self->get_recent_contributors;
+	$self->_print("Contributors since last release:\n") if @contributors;
+	$self->_print( "\t", $_, "\n" ) for @contributors;
+	}
+
+=item get_release_date()
+
+Return a string representing the current date and time (in UTC) in the
+L<CPAN::Changes::Spec> format so that it can be added directly to the
+Changes file.
+
+=cut
+
+sub get_release_date {
+	my $self = shift;
+	my $dt = DateTime->now(time_zone => 'UTC');
+	return $dt->datetime . 'Z';
 	}
 
 =item run
@@ -1245,7 +1270,7 @@ sub run {
 	$self->_debug( "$command\n" );
 	$self->_die( "Didn't get a command!" ) unless defined $command;
 
-	open my($fh), "$command |" or $self->_die( "Could not open command [$command]: $!" );
+	open my($fh), "-|", "$command" or $self->_die( "Could not open command [$command]: $!" );
 	$fh->autoflush;
 
 	my $output = '';
@@ -1287,7 +1312,17 @@ sub get_env_var {
 	return $pass if defined( $pass ) && length( $pass );
 
 	$self->_print( "$field is not set.  Enter it now: " );
-	$pass = <>;
+	if ($field eq 'CPAN_PASS') {
+		# don't echo passwords to the screen
+		require Term::ReadKey;
+		local $| = 1;
+		Term::ReadKey::ReadMode('noecho');
+		$pass = $self->_slurp;
+		Term::ReadKey::ReadMode('restore');
+	}
+	else {
+		$pass = $self->_slurp;
+	}
 	chomp $pass;
 
 	return $pass if defined( $pass ) && length( $pass );
@@ -1309,6 +1344,17 @@ output_fh to a null filehandle, output goes nowhere.
 =cut
 
 sub _print { print { $_[0]->output_fh } @_[1..$#_] }
+
+=item _slurp
+
+Read a line from whatever is in input_fh and return it.
+
+=cut
+
+sub _slurp {
+    my $fh = $_[0]->input_fh;
+    return <$fh>;
+}
 
 =item _dashes()
 
@@ -1371,7 +1417,7 @@ H.Merijn Brand has contributed many patches and features.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 
@@ -1381,10 +1427,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the Artistic License 2.0.
 
 =cut
 

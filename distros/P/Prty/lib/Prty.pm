@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 =encoding utf8
 
@@ -36,7 +36,7 @@ L<Prty::Array> - Operationen auf Arrays
 
 =item *
 
-L<Prty::AsciiTable> - ASCII-Tabelle
+L<Prty::AsciiTable> - ASCII-Tabelle parsen
 
 =item *
 
@@ -57,6 +57,10 @@ L<Prty::ColumnFormat> - Format einer Text-Kolumne
 =item *
 
 L<Prty::CommandLine> - Konstruiere eine Unix-Kommandozeile
+
+=item *
+
+L<Prty::Concat> - Konkateniere Zeichenketten
 
 =item *
 
@@ -388,7 +392,15 @@ L<Prty::JavaScript> - Generierung von JavaScript-Code
 
 =item *
 
-L<Prty::LaTeX::Generator> - LaTeX-Generator
+L<Prty::LaTeX::Code> - Generator für LaTeX Code
+
+=item *
+
+L<Prty::LaTeX::Document> - Erzeuge LaTeX Dokument
+
+=item *
+
+L<Prty::LaTeX::Figure> - Erzeuge LaTeX Figure
 
 =item *
 
@@ -465,6 +477,10 @@ L<Prty::Progress> - Berechne Fortschrittsinformation
 =item *
 
 L<Prty::Record> - Verarbeitung von Text-Records
+
+=item *
+
+L<Prty::Reference> - Operationen auf Referenzen
 
 =item *
 
@@ -604,6 +620,10 @@ L<Prty::System> - Information über das System und seine Umgebung
 
 =item *
 
+L<Prty::TeX::Code> - Generator für TeX Code
+
+=item *
+
 L<Prty::Template> - Klasse für HTML/XML/Text-Generierung
 
 =item *
@@ -682,7 +702,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

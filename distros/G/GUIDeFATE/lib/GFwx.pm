@@ -3,13 +3,13 @@ package GFwx;
    use strict;
    use warnings;
    
-   our $VERSION = '0.052';
+   our $VERSION = '0.065';
 
    use parent qw(Wx::App);              # Inherit from Wx::App
    use Exporter 'import';
    use GFwxFrame qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale>;
    
-   our @EXPORT_OK      = qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale $frame  $winScale $winWidth $winHeight $winTitle>;
+   our @EXPORT_OK      = qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale $frame $winScale $winWidth $winHeight $winTitle>;
    our $frame;
    
    our $winX=30;
@@ -31,6 +31,13 @@ package GFwx;
        $self->SetTopWindow($frame);    # Define the toplevel window
        $frame->Show(1);                # Show the frame
    }
+   
+   
+sub getFrame{
+	return $frame;
+	
+}
+   
    1;
 
 

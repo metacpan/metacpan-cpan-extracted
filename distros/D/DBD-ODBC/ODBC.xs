@@ -96,9 +96,9 @@ void odbc_getdiagrec(sth, record)
     rc = SQLGetDiagRec(SQL_HANDLE_STMT, imp_sth->hstmt, record,
                        state, &native, msg, sizeof(msg), &msg_len);
     if (SQL_SUCCEEDED(rc)) {
-        XPUSHs(sv_2mortal(newSVpv(state, 0)));
+        XPUSHs(sv_2mortal(newSVpvn(state, 0)));
         XPUSHs(sv_2mortal(newSViv(native)));
-        XPUSHs(sv_2mortal(newSVpv(msg, 0)));
+        XPUSHs(sv_2mortal(newSVpvn(msg, 0)));
     } else if (rc == SQL_NO_DATA) {
       # no diags found
     } else {
@@ -161,7 +161,7 @@ void odbc_getdiagfield(sth, record, identifier)
         } else if (info_ptr == &ret_type) {
             XPUSHs(sv_2mortal(newSViv(ret_type)));
         } else {
-            XPUSHs(sv_2mortal(newSVpv(buf, 0)));
+            XPUSHs(sv_2mortal(newSVpvn(buf, 0)));
         }
     } else if (rc == SQL_NO_DATA) {
       # no diags found
@@ -287,7 +287,7 @@ _statistics(dbh, sth, catalog, schema, table, unique, quick)
  #	rc = odbc_describe_col(sth, colno, ColumnName, sizeof(ColumnName), &NameLength,
  #			&DataType, &ColumnSize, &DecimalDigits, &Nullable);
  #	if (rc) {
- #		XPUSHs(newSVpv(ColumnName, 0));
+ #		XPUSHs(newSVpvn(ColumnName, 0));
  #		XPUSHs(newSViv(DataType));
  #		XPUSHs(newSViv(ColumnSize));
  #		XPUSHs(newSViv(DecimalDigits));
@@ -326,9 +326,9 @@ void odbc_getdiagrec(dbh, record)
     rc = SQLGetDiagRec(SQL_HANDLE_DBC, imp_dbh->hdbc, record,
                            state, &native, msg, sizeof(msg), &msg_len);
     if (SQL_SUCCEEDED(rc)) {
-        XPUSHs(sv_2mortal(newSVpv(state, 0)));
+        XPUSHs(sv_2mortal(newSVpvn(state, 0)));
         XPUSHs(sv_2mortal(newSViv(native)));
-        XPUSHs(sv_2mortal(newSVpv(msg, 0)));
+        XPUSHs(sv_2mortal(newSVpvn(msg, 0)));
     } else if (rc == SQL_NO_DATA) {
       # no diags found
     } else {
@@ -392,7 +392,7 @@ void odbc_getdiagfield(dbh, record, identifier)
         } else if (info_ptr == &ret_type) {
             XPUSHs(sv_2mortal(newSViv(ret_type)));
         } else {
-            XPUSHs(sv_2mortal(newSVpv(buf, 0)));
+            XPUSHs(sv_2mortal(newSVpvn(buf, 0)));
         }
     } else if (rc == SQL_NO_DATA) {
       # no diags found
@@ -516,5 +516,3 @@ GetFunctions(dbh, func)
 
 
 MODULE = DBD::ODBC    PACKAGE = DBD::ODBC::db
-
-

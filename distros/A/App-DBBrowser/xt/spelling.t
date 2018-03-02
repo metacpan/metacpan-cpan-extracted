@@ -34,3 +34,4 @@ csv
 sql
 substatement
 IFS
+RaiseError

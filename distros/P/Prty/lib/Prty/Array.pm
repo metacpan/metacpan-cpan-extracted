@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
-use Prty::Perl;
+use Prty::Reference;
 use Prty::Math;
 
 # -----------------------------------------------------------------------------
@@ -504,7 +504,7 @@ sub select {
     my $test = CORE::shift;
 
     my @arr;
-    if (Prty::Perl->isCodeRef($test)) {
+    if (Prty::Reference->isCodeRef($test)) {
         for (@$arr) {
             CORE::push @arr,$_ if $test->($_);
         }
@@ -966,7 +966,7 @@ sub restore {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

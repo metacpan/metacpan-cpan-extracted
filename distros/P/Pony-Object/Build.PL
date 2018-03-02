@@ -20,7 +20,7 @@ my $builder = Module::Build->new
   },
   requires =>
   {
-    'perl' => '5.012',
+    'perl' => '5.014',
     'Module::Load' => 0,
     'Storable' => 0,
     'Carp' => 0,
@@ -39,4 +39,3 @@ my $builder = Module::Build->new
 );
 
 $builder->create_build_script();
-

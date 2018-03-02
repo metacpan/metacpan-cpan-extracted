@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use Carp qw/croak confess/;
 use POSIX ":sys_wait_h";
@@ -212,7 +212,7 @@ sub handle_signal {
 
     $self->{+SIGNAL} = $sig;
 
-    die "Runner cought SIG$sig, Attempting to shut down cleanly...\n";
+    die "Runner caught SIG$sig. Attempting to shut down cleanly...\n";
 }
 
 sub preload {

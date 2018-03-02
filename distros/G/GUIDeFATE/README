@@ -63,7 +63,6 @@ perl
 #!/usr/bin/perl -w
 use strict;
 use GUIDeFATE;
-use GUIDeFATE qw<$frame>;
 package Main;
 
 my $window=<<END;
@@ -81,8 +80,8 @@ my $window=<<END;
 
 END
 
-GUIDeFATE::convert($window);
-my $gui=GUIDeFATE->new();
+
+my $gui=GUIDeFATE->new($window);
 $gui->MainLoop;
 
 This produces something like 
@@ -97,6 +96,7 @@ EDIT> have implemented Menu and image subpanels at version 0.0.2
 EDIT> have implemented Multiline text ctrl subpanels at version 0.0.3
 EDIT> have implemented Message Boxes and  file selector at Version 0.04
 EDIT> have implemented an potential modification to allow other backends 
+EDIT> Have implemented a Tk backend
 
 
 Copyright (C) 2018 Saif Ahmed

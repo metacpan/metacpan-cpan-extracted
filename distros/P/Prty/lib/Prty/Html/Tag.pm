@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Template;
 use Prty::String;
@@ -2101,7 +2101,7 @@ sub import {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

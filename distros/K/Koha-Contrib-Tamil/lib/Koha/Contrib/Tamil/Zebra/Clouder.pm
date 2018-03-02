@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Zebra::Clouder;
 # ABSTRACT: Class generating keywords clouds from Koha Zebra indexes
-$Koha::Contrib::Tamil::Zebra::Clouder::VERSION = '0.052';
+$Koha::Contrib::Tamil::Zebra::Clouder::VERSION = '0.053';
 use Moose;
 use Carp;
 
@@ -299,7 +299,7 @@ Koha::Contrib::Tamil::Zebra::Clouder - Class generating keywords clouds from Koh
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 AUTHOR
 
@@ -307,7 +307,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Fréderic Démians.
+This software is Copyright (c) 2018 by Fréderic Démians.
 
 This is free software, licensed under:
 

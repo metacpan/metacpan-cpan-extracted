@@ -6,7 +6,7 @@ LWP::UserAgent::Caching - HTTP::Casing based UserAgent, finally done right
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -90,6 +90,7 @@ sub new {
 }
 
 sub request {
+    $_[1]->headers->user_agent( $_[0]->agent ); # FIX: only set during request
     return shift->{http_caching}->make_request(@_);
 }
 

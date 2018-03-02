@@ -1,13 +1,13 @@
 
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 30 10:45:15 EDT 2017
-#    Data version: tzdata2017b
-#    Code version: tzcode2017b
+#    Generated on: Thu Mar  1 10:39:45 EST 2018
+#    Data version: tzdata2018c
+#    Code version: tzcode2018c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -58,12 +58,14 @@ database:
      Africa/Ceuta                         afceut00
      Africa/El_Aaiun                      afel_a00
      Africa/Johannesburg                  afjoha00
+     Africa/Juba                          afjuba00
      Africa/Khartoum                      afkhar00
      Africa/Lagos                         aflago00
      Africa/Maputo                        afmapu00
      Africa/Monrovia                      afmonr00
      Africa/Nairobi                       afnair00
      Africa/Ndjamena                      afndja00
+     Africa/Sao_Tome                      afsao_00
      Africa/Tripoli                       aftrip00
      Africa/Tunis                         aftuni00
      Africa/Windhoek                      afwind00
@@ -491,7 +493,6 @@ The zoneinfo database provides several standard aliases, including:
      Africa/Freetown                      Africa/Abidjan
      Africa/Gaborone                      Africa/Maputo
      Africa/Harare                        Africa/Maputo
-     Africa/Juba                          Africa/Khartoum
      Africa/Kampala                       Africa/Nairobi
      Africa/Kigali                        Africa/Maputo
      Africa/Kinshasa                      Africa/Lagos
@@ -508,7 +509,6 @@ The zoneinfo database provides several standard aliases, including:
      Africa/Nouakchott                    Africa/Abidjan
      Africa/Ouagadougou                   Africa/Abidjan
      Africa/Porto-Novo                    Africa/Lagos
-     Africa/Sao_Tome                      Africa/Abidjan
      Africa/Timbuktu                      Africa/Abidjan
      America/Anguilla                     America/Port_of_Spain
      America/Antigua                      America/Port_of_Spain
@@ -591,7 +591,6 @@ The zoneinfo database provides several standard aliases, including:
      Brazil/West                          America/Manaus
      Canada/Atlantic                      America/Halifax
      Canada/Central                       America/Winnipeg
-     Canada/East-Saskatchewan             America/Regina
      Canada/Eastern                       America/Toronto
      Canada/Mountain                      America/Edmonton
      Canada/Newfoundland                  America/St_Johns
@@ -715,7 +714,8 @@ default alias can be overridden as described above.
      AWST-8AWDT                           Australia/Perth
      BST11BDT                             America/Adak
                                           America/Nome
-     CAT-2CAST                            Africa/Khartoum
+     CAT-2CAST                            Africa/Juba
+                                          Africa/Khartoum
      CET-1CEST                            CET
                                           Europe/Berlin
                                           Europe/Brussels
@@ -817,6 +817,7 @@ default alias can be overridden as described above.
                                           Asia/Gaza
                                           Asia/Hebron
                                           Asia/Amman
+                                          Asia/Famagusta
                                           Asia/Nicosia
                                           Europe/Sofia
                                           Europe/Riga
@@ -826,7 +827,6 @@ default alias can be overridden as described above.
                                           Europe/Kiev
                                           Europe/Uzhgorod
                                           Europe/Istanbul
-                                          Asia/Famagusta
                                           Europe/Simferopol
                                           Europe/Kaliningrad
                                           Europe/Minsk
@@ -845,12 +845,12 @@ default alias can be overridden as described above.
                                           America/Indiana/Vincennes
                                           America/Indiana/Winamac
                                           America/Thunder_Bay
+                                          America/Grand_Turk
                                           America/Iqaluit
                                           America/Port-au-Prince
                                           America/Pangnirtung
                                           America/Kentucky/Monticello
                                           America/Indiana/Petersburg
-                                          America/Grand_Turk
                                           America/Cancun
                                           America/Jamaica
                                           America/Indiana/Tell_City
@@ -1360,6 +1360,7 @@ L<Date::Manip::TZ> module.
                         America/Lima
                         America/Panama
                         America/Thunder_Bay
+                        America/Grand_Turk
                         America/Jamaica
                         America/Nassau
                         America/Bogota
@@ -1383,7 +1384,6 @@ L<Date::Manip::TZ> module.
                         America/Kentucky/Monticello
                         Etc/GMT-5
                         E
-                        America/Grand_Turk
                         America/Resolute
                         America/Indiana/Knox
                         America/Indiana/Tell_City
@@ -1593,6 +1593,7 @@ L<Date::Manip::TZ> module.
      0      -00:44:30   Africa/Monrovia
      0      -00:43:08   Africa/Monrovia
      0      -00:36:45   Europe/Lisbon
+                        Africa/Sao_Tome
      0      -00:30:20   Africa/Casablanca
      0      -00:27:04   Atlantic/Faroe
      0      -00:25:21   Europe/Dublin
@@ -1618,6 +1619,7 @@ L<Date::Manip::TZ> module.
                         Africa/Bissau
                         Africa/El_Aaiun
                         America/Danmarkshavn
+                        Africa/Sao_Tome
                         Etc/GMT
                         UT
                         UTC
@@ -1661,6 +1663,7 @@ L<Date::Manip::TZ> module.
      0      +00:19:32   Europe/Amsterdam
      0      +00:20:00   Europe/Amsterdam
      0      +00:24:36   Europe/Luxembourg
+     0      +00:26:56   Africa/Sao_Tome
      0      +00:29:32   Europe/Monaco
      0      +00:29:46   Europe/Zurich
      0      +00:34:08   Europe/Zurich
@@ -1700,9 +1703,10 @@ L<Date::Manip::TZ> module.
                         Europe/Andorra
                         Europe/Gibraltar
                         Africa/Ceuta
-                        Africa/Windhoek
+                        Africa/Sao_Tome
                         Etc/GMT+1
                         N
+                        Africa/Windhoek
                         Africa/Tripoli
                         Europe/Vilnius
                         Europe/Lisbon
@@ -1759,17 +1763,20 @@ L<Date::Manip::TZ> module.
                         Africa/Cairo
                         Africa/Johannesburg
                         Africa/Maputo
+                        Africa/Windhoek
                         Europe/Athens
                         Asia/Jerusalem
                         Asia/Damascus
                         Europe/Vilnius
                         Europe/Helsinki
                         Europe/Tallinn
+                        Asia/Famagusta
                         Asia/Nicosia
                         Europe/Kiev
                         Europe/Zaporozhye
                         Europe/Riga
                         Asia/Amman
+                        Africa/Khartoum
                         Europe/Bucharest
                         Europe/Chisinau
                         Europe/Kaliningrad
@@ -1778,16 +1785,15 @@ L<Date::Manip::TZ> module.
                         Etc/GMT+2
                         O
                         Europe/Istanbul
-                        Asia/Famagusta
                         Europe/Simferopol
                         Europe/Minsk
-                        Africa/Khartoum
-                        Africa/Windhoek
+                        Africa/Juba
                         Europe/Moscow
                         Europe/Ulyanovsk
                         Europe/Warsaw
      0      +02:02:04   Europe/Kiev
      0      +02:05:09   Africa/Cairo
+     0      +02:06:28   Africa/Juba
      0      +02:10:08   Africa/Khartoum
      0      +02:10:20   Africa/Maputo
      0      +02:13:28   Asia/Nicosia
@@ -1823,11 +1829,12 @@ L<Date::Manip::TZ> module.
                         Asia/Riyadh
                         Asia/Qatar
                         Europe/Istanbul
-                        Africa/Khartoum
-                        Asia/Famagusta
+                        Africa/Juba
                         Etc/GMT+3
                         P
                         Antarctica/Syowa
+                        Africa/Khartoum
+                        Asia/Famagusta
                         Europe/Saratov
                         Europe/Ulyanovsk
                         Europe/Astrakhan
@@ -1929,6 +1936,7 @@ L<Date::Manip::TZ> module.
      0      +05:07:48   Asia/Almaty
      0      +05:19:24   Asia/Colombo
      0      +05:19:32   Asia/Colombo
+     0      +05:21:10   Asia/Kolkata
      0      +05:30:00   Asia/Colombo
                         Asia/Kolkata
                         Asia/Thimphu
@@ -1942,8 +1950,8 @@ L<Date::Manip::TZ> module.
      0      +05:45:00   Asia/Kathmandu
      0      +05:48:48   Asia/Novokuznetsk
      0      +05:50:20   Asia/Urumqi
-     0      +05:53:20   Asia/Kolkata
-                        Asia/Dhaka
+     0      +05:53:20   Asia/Dhaka
+                        Asia/Kolkata
      0      +05:53:28   Asia/Kolkata
      0      +05:58:36   Asia/Thimphu
      0      +06:00:00   Asia/Urumqi
@@ -1976,13 +1984,12 @@ L<Date::Manip::TZ> module.
      0      +06:01:40   Asia/Dhaka
      0      +06:06:36   Asia/Hovd
      0      +06:11:26   Asia/Krasnoyarsk
-     0      +06:24:40   Asia/Yangon
+     0      +06:24:47   Asia/Yangon
      0      +06:27:40   Indian/Cocos
      0      +06:30:00   Indian/Cocos
                         Asia/Yangon
                         Asia/Colombo
                         Asia/Dhaka
-                        Asia/Kolkata
      0      +06:42:04   Asia/Bangkok
      0      +06:46:46   Asia/Kuala_Lumpur
      0      +06:55:25   Asia/Singapore
@@ -2212,7 +2219,7 @@ L<Date::Manip::TZ> module.
                         Asia/Srednekolymsk
                         Asia/Ust-Nera
                         Pacific/Kosrae
-     0      +12:13:21   America/Adak
+     0      +12:13:22   America/Adak
      0      +12:13:48   Pacific/Chatham
      0      +12:15:00   Pacific/Chatham
      0      +12:15:20   Pacific/Wallis
@@ -2221,7 +2228,7 @@ L<Date::Manip::TZ> module.
      0      +12:33:04   Pacific/Apia
      0      +12:37:12   Pacific/Pago_Pago
      0      +12:45:00   Pacific/Chatham
-     0      +12:58:21   America/Nome
+     0      +12:58:22   America/Nome
      0      +13:00:00   Pacific/Tongatapu
                         Pacific/Enderbury
                         Pacific/Fakaofo
@@ -2334,11 +2341,11 @@ L<Date::Manip::TZ> module.
                         America/Indiana/Vevay
                         America/Indiana/Vincennes
                         America/Indiana/Winamac
+                        America/Grand_Turk
                         America/Port-au-Prince
                         America/Pangnirtung
                         America/Kentucky/Monticello
                         America/Indiana/Petersburg
-                        America/Grand_Turk
                         America/Cancun
                         America/Eirunepe
                         America/Lima
@@ -2475,8 +2482,8 @@ L<Date::Manip::TZ> module.
                         Europe/Zurich
                         Europe/Andorra
                         Africa/Ceuta
-                        Africa/Windhoek
                         Antarctica/Troll
+                        Africa/Windhoek
                         Africa/Tripoli
                         Africa/Tunis
                         Europe/Vilnius
@@ -2507,6 +2514,7 @@ L<Date::Manip::TZ> module.
                         Asia/Jerusalem
                         Europe/Helsinki
                         Asia/Amman
+                        Asia/Famagusta
                         Asia/Nicosia
                         Europe/Sofia
                         Europe/Riga
@@ -2516,7 +2524,6 @@ L<Date::Manip::TZ> module.
                         Europe/Zaporozhye
                         Europe/Uzhgorod
                         Europe/Istanbul
-                        Asia/Famagusta
                         Africa/Cairo
                         Europe/Simferopol
                         Europe/Kaliningrad
@@ -2524,6 +2531,7 @@ L<Date::Manip::TZ> module.
                         Europe/Moscow
                         Europe/Samara
                         Europe/Ulyanovsk
+                        Africa/Juba
                         Africa/Khartoum
                         Europe/Berlin
                         Africa/Johannesburg
@@ -2589,9 +2597,9 @@ L<Date::Manip::TZ> module.
                         Asia/Ashgabat
                         Asia/Oral
                         Asia/Colombo
-     1      +06:30:00   Asia/Colombo
+     1      +06:30:00   Asia/Kolkata
+                        Asia/Colombo
                         Asia/Karachi
-                        Asia/Kolkata
      1      +07:00:00   Asia/Omsk
                         Asia/Barnaul
                         Asia/Novokuznetsk
@@ -2668,8 +2676,8 @@ L<Date::Manip::TZ> module.
                         Asia/Kamchatka
                         Asia/Anadyr
      1      +13:45:00   Pacific/Chatham
-     1      +14:00:00   Pacific/Tongatapu
-                        Pacific/Apia
+     1      +14:00:00   Pacific/Apia
+                        Pacific/Tongatapu
                         Asia/Anadyr
 
 
@@ -2799,17 +2807,19 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Bogota
                       Europe/Zurich
                       Europe/Brussels
-     BOST             America/La_Paz
      BST              Europe/London
                       America/Adak
                       America/Nome
                       Europe/Gibraltar
+                      America/La_Paz
                       Europe/Dublin
      C                C
-     CAST             Africa/Khartoum
+     CAST             Africa/Juba
+                      Africa/Khartoum
      CAT              Africa/Maputo
                       Africa/Khartoum
                       Africa/Windhoek
+                      Africa/Juba
      CDDT             America/Rankin_Inlet
                       America/Resolute
      CDT              America/Chicago
@@ -3033,6 +3043,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      DMT              Europe/Dublin
      E                E
      EAT              Africa/Nairobi
+                      Africa/Juba
                       Africa/Khartoum
      EDDT             America/Iqaluit
      EDT              America/New_York
@@ -3047,12 +3058,12 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Indiana/Vincennes
                       America/Indiana/Winamac
                       America/Thunder_Bay
+                      America/Grand_Turk
                       America/Iqaluit
                       America/Port-au-Prince
                       America/Pangnirtung
                       America/Kentucky/Monticello
                       America/Indiana/Petersburg
-                      America/Grand_Turk
                       America/Cancun
                       America/Jamaica
                       America/Indiana/Tell_City
@@ -3067,6 +3078,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Asia/Hebron
                       Europe/Helsinki
                       Asia/Amman
+                      Asia/Famagusta
                       Asia/Nicosia
                       Europe/Sofia
                       Europe/Riga
@@ -3076,7 +3088,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Zaporozhye
                       Europe/Uzhgorod
                       Europe/Istanbul
-                      Asia/Famagusta
                       Africa/Cairo
                       Europe/Simferopol
                       Europe/Kaliningrad
@@ -3094,6 +3105,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Vilnius
                       Europe/Helsinki
                       Europe/Tallinn
+                      Asia/Famagusta
                       Asia/Nicosia
                       Europe/Kiev
                       Europe/Zaporozhye
@@ -3105,7 +3117,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Kaliningrad
                       Europe/Uzhgorod
                       Europe/Istanbul
-                      Asia/Famagusta
                       Europe/Simferopol
                       Europe/Minsk
                       Europe/Moscow
@@ -3122,6 +3133,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Toronto
                       America/Panama
                       America/Thunder_Bay
+                      America/Grand_Turk
                       America/Jamaica
                       America/Nassau
                       America/Detroit
@@ -3138,7 +3150,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Cancun
                       America/Pangnirtung
                       America/Kentucky/Monticello
-                      America/Grand_Turk
                       America/Resolute
                       America/Indiana/Knox
                       America/Indiana/Tell_City
@@ -3169,6 +3180,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Africa/Monrovia
                       Africa/Bissau
                       America/Danmarkshavn
+                      Africa/Sao_Tome
                       Europe/Gibraltar
      GMT+1            Etc/GMT+1
      GMT+10           Etc/GMT+10
@@ -3202,11 +3214,11 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Pacific/Honolulu
      HKST             Asia/Hong_Kong
      HKT              Asia/Hong_Kong
-     HMT              Asia/Kolkata
-                      Asia/Dhaka
+     HMT              Asia/Dhaka
                       America/Havana
                       Europe/Helsinki
                       Atlantic/Azores
+                      Asia/Kolkata
      HST              Pacific/Honolulu
                       America/Adak
      I                I
@@ -3217,9 +3229,9 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      IMT              Asia/Irkutsk
                       Europe/Istanbul
                       Europe/Sofia
-     IST              Europe/Dublin
+     IST              Asia/Kolkata
+                      Europe/Dublin
                       Asia/Jerusalem
-                      Asia/Kolkata
                       Asia/Gaza
                       Asia/Hebron
      JDT              Asia/Tokyo
@@ -3269,6 +3281,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Minsk
                       America/Montevideo
                       Europe/Moscow
+                      Asia/Kolkata
                       Asia/Colombo
      MPT              America/Denver
                       America/Boise
@@ -3448,6 +3461,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Africa/Ndjamena
      WAT              Africa/Ndjamena
                       Africa/Lagos
+                      Africa/Sao_Tome
                       Africa/Windhoek
      WEMT             Europe/Monaco
                       Europe/Lisbon

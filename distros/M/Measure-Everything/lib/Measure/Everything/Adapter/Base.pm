@@ -33,7 +33,7 @@ Measure::Everything::Adapter::Base - Base class for adapters
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 DESCRIPTION
 

@@ -856,8 +856,10 @@ use warnings;
 
 use App::KGB;
 use Digest::MD5 qw(md5_hex);
+use Monkey::Patch;
 use POE;
 use POE::Component::IRC::Common qw( parse_user matches_mask );
+use POE::Component::IRC::Constants qw( MSG_PRI MSG_TEXT PRI_HIGH );
 use Schedule::RateLimiter;
 
 our %current = ();
@@ -865,6 +867,26 @@ our $irc_object;
 our $autoresponse_limitter
     = Schedule::RateLimiter->new( iterations => 5, seconds => 30,
     block => 0 );
+
+# Monkey patch to avoid delaying high priority commands when flood protection
+# is enabled.
+sub _sl_delayed {
+    my $orig_func = shift;
+    my $self = $_[OBJECT];
+    return if !defined $self->{socket};
+
+    while (@{ $self->{send_queue} } &&
+        $self->{send_queue}[0][MSG_PRI] <= PRI_HIGH)
+    {
+        my $arg = (shift @{$self->{send_queue}})->[MSG_TEXT];
+        warn ">>> $arg\n" if $self->{debug};
+        $self->send_event(irc_raw_out => $arg) if $self->{raw};
+        $self->{socket}->put($arg);
+    }
+    return $orig_func->(@_);
+}
+my $patch = Monkey::Patch::patch_package('POE::Component::IRC', 'sl_delayed',
+    \&_sl_delayed);
 
 # Handles the connection, disconnection and real-time configuration changes WRT
 # IRC servers and channels
@@ -1592,6 +1614,8 @@ sub webhook_request {
         }
     }
 
+    $param->{use_irc_notices} = 1 unless exists $param->{use_irc_notices};
+
     my @channels = $param->{channel} // ();
     @channels = @{ $channels[0] } if ref $channels[0];
     s/^(?!#)/#/ for @channels;
@@ -1765,6 +1789,7 @@ Optional text to prepend to the commit ID.
 =item use_irc_notices
 
 If true, IRC notification uses C<notice> messages, instead of C<privmsg>.
+Defaults to C<1>.
 
 C<notice> messages are usually less intrusive.
 
@@ -1808,7 +1833,16 @@ sub gitlab_webhook_push {
     my $max_commits = $opts->{squash_threshold} // 20;
     $max_commits = 20 unless $max_commits and $max_commits =~ /^\d\d?$/;
 
-    if ( @{ $body->{commits} } > $max_commits ) {
+    my $commit_count = scalar @{ $body->{commits} };
+    $commit_count = $body->{total_commits_count}
+        if $body->{total_commits_count}
+        and $body->{total_commits_count} > $commit_count;
+
+    my $to_show_count = scalar @{ $body->{commits} };
+    $to_show_count = $max_commits if $max_commits < $to_show_count;
+
+    if ( $to_show_count != $commit_count ) {
+        # not all commits will be shown, prepend a summary of the push
         my @info;
         push @info, colorize( author => $body->{user_name} )
             if $body->{user_name};
@@ -1819,7 +1853,8 @@ sub gitlab_webhook_push {
             if $body->{checkout_sha};
         push @info, colorize( module => $module ) if $module ne '';
         push @info, colorize( separator => '*' ),
-            sprintf( 'pushed %d commits', scalar @{ $body->{commits} } );
+            sprintf( 'pushed %d commits (first %d follow)',
+            $commit_count, $to_show_count );
         push @info, colorize( separator => '*' );
         push @info,
             colorize(
@@ -1838,10 +1873,9 @@ sub gitlab_webhook_push {
                 opts       => $opts,
             }
         );
-
-        return;
     }
 
+    my $shown = 0;
     for my $commit ( @{ $body->{commits} } ) {
         my $path_string;
         my %dirs;
@@ -1938,6 +1972,9 @@ sub gitlab_webhook_push {
                 opts       => $opts,
             }
         );
+
+        $shown++;
+        last if $shown >= $to_show_count;
     }
 }
 
@@ -2289,21 +2326,30 @@ sub gitlab_webhook_pipeline {
     local $KGB::painter = $KGB::painter_dummy
         if exists $opts->{use_color} and not $opts->{use_color};
 
-    my $log = sprintf(
-        'Pipeline #%d finished in %s. Status: %s',
-        $body->{object_attributes}{id},
-        human_duration( $body->{object_attributes}{duration} ),
-        $body->{object_attributes}{status} // 'UNKNOWN'
-    );
+    my $id = $body->{object_attributes}{id};
+    my $status = $body->{object_attributes}{status};
+
+    my $log;
+    if ( my $duration = $body->{object_attributes}{duration} ) {
+        $log = sprintf( "[%s] %s", human_duration($duration), $status )
+    }
+    else {
+        $log = $status;
+    }
+
+    if ( my $builds = $body->{builds} ) {
+        my @build_info;
+        push @build_info, sprintf( '%s: %s', $_->{name}, $_->{status} )
+            for @$builds;
+        $log .= ' (' . join( '; ', @build_info ) . ')' if @build_info;
+    }
 
     my @info;
 
     push @info, colorize( author => $body->{user}{name} );
-    push @info, colorize( branch => $body->{object_attributes}{target_branch} )
-        if $body->{object_attributes}{target_branch};
+    push @info, colorize( branch => 'pipeline' );
     push @info, colorize( module => $module ) if $module ne '';
-    push @info, colorize( revision => $body->{object_attributes}{id} )
-        if $body->{object_attributes}{id};
+    push @info, colorize( revision => $id ) if $id;
     push @info, colorize( separator => '*' ) . ' ' . $log;
 
     my @string = join( ' ', @info );
@@ -2322,7 +2368,7 @@ sub gitlab_webhook_build {
 
     my $module = $body->{project_name};
 
-    KGB->debug("Handling webhook pipeline event for project $module");
+    KGB->debug("Handling webhook build event for project $module");
 
     local $KGB::painter = $KGB::painter_dummy
         if exists $opts->{use_color} and not $opts->{use_color};

@@ -1,5 +1,5 @@
 package Date::Manip::Date;
-# Copyright (c) 1995-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -27,7 +27,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.60';
+$VERSION='6.70';
 END { undef $VERSION; }
 
 ########################################################################
@@ -1984,8 +1984,9 @@ sub _parse_delta {
 
       # We can't handle a delta longer than 10000 years
       if (abs($dy)  > 10000       ||
-          abs($dm)  > 12000       ||   # 10000*12
-          abs($dw)  > 53000       ||   # 10000*53
+          abs($dm)  > 120000      ||   # 10000*12
+          abs($dw)  > 530000      ||   # 10000*53
+          abs($dd)  > 3660000     ||   # 10000*366
           abs($dh)  > 87840000    ||   # 10000*366*24
           abs($dmn) > 5270400000  ||   # 10000*366*24*60
           abs($ds)  > 316224000000) {  # 10000*366*24*60*60
@@ -2006,7 +2007,7 @@ sub _parse_delta {
          $$noupdate = 1;
       }
 
-      my $business = $$delta{'data'}{'business'};
+      my $business = ($$delta{'data'}{'mode'} eq 'business' ? 1 : 0);
 
       my($date2,$offset,$abbrev);
       ($err,$date2,$offset,$isdst,$abbrev) =
@@ -3352,15 +3353,16 @@ sub _calc_date_delta {
    $subtract     = 0  if (! $subtract);
    my @delta     = @{ $$delta{'data'}{'delta'} };
    my @date      = @{ $$self{'data'}{'date'} };
-   my $business  = $$delta{'data'}{'business'};
+   my $business = ($$delta{'data'}{'mode'} eq 'business' ? 1 : 0);
    my $tz        = $$self{'data'}{'tz'};
    my $isdst     = $$self{'data'}{'isdst'};
 
    # We can't handle a delta longer than 10000 years
    my($dy,$dm,$dw,$dd,$dh,$dmn,$ds) = @delta;
    if (abs($dy)  > 10000       ||
-       abs($dm)  > 12000       ||   # 10000*12
-       abs($dw)  > 53000       ||   # 10000*53
+       abs($dm)  > 120000      ||   # 10000*12
+       abs($dw)  > 530000      ||   # 10000*53
+       abs($dd)  > 3660000     ||   # 10000*366
        abs($dh)  > 87840000    ||   # 10000*366*24
        abs($dmn) > 5270400000  ||   # 10000*366*24*60
        abs($ds)  > 316224000000) {  # 10000*366*24*60*60

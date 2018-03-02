@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Array;
 use Prty::Option;
@@ -396,7 +396,7 @@ sub split {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

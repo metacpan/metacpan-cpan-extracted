@@ -31,7 +31,6 @@ release - give your Perl distros to the world
 
 	# set $ENV{AUTOMATED_TESTING} to a true value
 	release -a
-	
 
 =head1 DESCRIPTION
 
@@ -43,8 +42,7 @@ you should write your own script to match your process.
 
 This program automates Perl module releases. It makes the
 distribution, tests it, checks that source control is up to date, tags
-source control, uploads it to the PAUSE anonymous FTP directory and
-claims it on PAUSE.
+source control, and uploads it to the PAUSE.
 
 By default this script assumes that you use CVS, but recognizes SVN
 and git and switches when appropriate.
@@ -78,7 +76,7 @@ source control complains, fail.
 
 =item Upload to PAUSE
 
-This program used to use FTP uploads, but PAUSE has turned that feature.
+This program used to use FTP uploads, but PAUSE has turned off that feature.
 Now it uploads through the web form.
 
 =item Tag the repository
@@ -154,19 +152,13 @@ release does not test the perls in any particular order.
 
 =item automated_testing
 
-Set C<automated_testing> to the value you want for the 
+Set C<automated_testing> to the value you want for the
 $ENV{AUTOMATED_TESTING} setting. By default this is 0, so
 testing is started in interactive mode.
 
 =item cpan_user
 
 The PAUSE user
-
-=item passive_ftp
-
-Set C<passive_ftp> to "y" or "yes" for passive FTP transfers.  Usually
-this is to get around a firewall issue. Note that PAUSE has turned off
-FTP uploads, so this setting is useless now.
 
 =item perls
 
@@ -244,7 +236,7 @@ A string representing options to add to the command line.
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github as part of the Module::Release project:
+This source is in GitHub as part of the Module::Release project:
 
 	https://github.com/briandfoy/module-release
 
@@ -254,7 +246,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may use this software under the same terms as Perl itself.
 
@@ -270,7 +262,7 @@ the automated_testing feature.
 =cut
 
 use Getopt::Std;
-use Module::Release '2.01';
+use Module::Release '2.021';
 
 my $class = "Module::Release";
 
@@ -383,19 +375,19 @@ my $skip_prereqs = $opts{p} || $release->config->skip_prereqs;
 my $skip_dist    = $opts{D} || $release->config->skip_dist;
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Set automated testing from command line, config, environment, or default 
+# Set automated testing from command line, config, environment, or default
 {
 no warnings 'uninitialized';
 
-$ENV{AUTOMATED_TESTING} = ( 
-	grep { defined } ( 
-		$opts{a}, $release->config->automated_testing, 
-		$ENV{AUTOMATED_TESTING}, 0 ) 
+$ENV{AUTOMATED_TESTING} = (
+	grep { defined } (
+		$opts{a}, $release->config->automated_testing,
+		$ENV{AUTOMATED_TESTING}, 0 )
 	)[0];
 $release->_debug( "Automated testing is $ENV{AUTOMATED_TESTING}; -a was $opts{a};" .
 	" automated_testing was " . $release->config->automated_testing . ";\n" );
-}	
-	
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # test with a bunch of perls
 unless( $opts{T} ) {
@@ -416,7 +408,7 @@ unless( $opts{T} ) {
 		else {
 			$opts{t} or $release->_print( "Skipping prereq checks. Shame on you!\n" );
 			}
-		
+
 		unless( $skip_dist ) {
 			$release->dist;
 			$release->disttest;
@@ -494,21 +486,15 @@ if( $opts{t} ) {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CPAN::Spec::Changes
 unless( $release->debug or $opts{C} ) {
+	$release->show_recent_contributors;
+
 	my $changes = "Changes";
 	my $bak     = $changes . ".bak";
 
 	die "Changes file does not exist!\n" unless -e $changes;
 
 	$release->_print( "\n", "-" x 73, "\n", "Enter Changes section\n\n> " );
-
-	my( $year, $month, $day, $hour, $minute, $second )
-		= (gmtime)[5,4,3,2,1,0];
-	$year += 1900;
-	$month += 1;
-	my $datetime = sprintf "%4d-%02d-%02dT%02d:%02d:%02dZ",
-		$year, $month, $day, $hour, $minute, $second;
-
-	my $str = $Version . ' ' . $datetime . "\n";
+	my $str = $Version . ' ' . $release->get_release_date . "\n";
 
 	while( <STDIN> ) {
 		$_ =~ s/\A \s* (\*|-)? \s*/- /; # Make bullets (-)
@@ -522,8 +508,8 @@ unless( $release->debug or $opts{C} ) {
 
 	rename $changes, $bak or die "Could not backup $changes. $!\n";
 
-	open my $in, '<:utf8', $bak or die "Could not read old $changes file! $!\n";
-	open my $out, ">:utf8", $changes;
+	open my $in, '<:encoding(UTF-8)', $bak or die "Could not read old $changes file! $!\n";
+	open my $out, ">:encoding(UTF-8)", $changes;
 
 	while( <$in> ) {
 		print $out $_;
@@ -543,9 +529,9 @@ unless( $release->debug or $opts{C} ) {
 		elsif( -d '.git' ) { 'git commit -a -m' }
 		};
 
-	my $cvs_commit = `$command "* for version $Version" 2>&1`;
+	my $vcs_commit = `$command "* for version $Version" 2>&1`;
 
-	$release->_print( $cvs_commit );
+	$release->_print( $vcs_commit );
 	}
 else {
 	$release->_print( "Skipping Changes file" );
@@ -570,7 +556,7 @@ while( $release->should_upload_to_pause ) {
 	$release->_print("Now uploading to PAUSE\n" );
 	$release->_print("============Uploading to PAUSE\n");
 	last if $release->debug;
-	
+
 	$release->web_upload;
 
 	last;

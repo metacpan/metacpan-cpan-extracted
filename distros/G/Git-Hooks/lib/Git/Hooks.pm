@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.5.0';
+$Git::Hooks::VERSION = '2.6.3';
 use 5.010;
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -142,6 +142,10 @@ options. (More on this later.)
         use Git::Hooks;
 
         run_hook($0, @ARGV);
+
+In fact, this module installs a script called F<githooks.pl> containing the
+three lines above, so that all you have to do is to create symbolic links in
+your Git repository's F<.git/hook> pointing to it.
 
 =head1 INTRODUCTION
 
@@ -227,6 +231,10 @@ If you already have some handy hooks and want to keep using them,
 don't worry. Git::Hooks can drive external hooks very easily.
 
 =head1 USAGE
+
+Please, read the L<Git::Hooks::Tutorial> if you want an easy guide to start
+using the framework. Most probably you can set it up in a few minutes with
+it. Continue on if you want to get deeper in the Documentation.
 
 There are a few simple steps you should do in order to set up
 Git::Hooks so that you can configure it to use some predefined plugins
@@ -368,53 +376,59 @@ own documentation for more details.
 
 =over
 
-=item * Git::Hooks::CheckAcls
+=item * L<Git::Hooks::CheckAcls>
 
 Allow you to specify Access Control Lists to tell who can commit or
 push to the repository and affect which Git refs.
 
-=item * Git::Hooks::CheckFile
+=item * L<Git::Hooks::CheckFile>
 
 Check if the contents of newly added or modified files comply with specified
 policies.
 
-=item * Git::Hooks::CheckJira
+=item * L<Git::Hooks::CheckJira>
 
 Integrate Git with the L<JIRA|http://www.atlassian.com/software/jira/>
 ticketing system by requiring that every commit message cites valid
 JIRA issues.
 
-=item * Git::Hooks::CheckCommit
+=item * L<Git::Hooks::CheckCommit>
 
 Check various aspects of commits like author and committer names and emails,
 and signatures.
 
-=item * Git::Hooks::CheckLog
+=item * L<Git::Hooks::CheckLog>
 
 Check commit log messages formatting.
 
-=item * Git::Hooks::CheckRewrite
+=item * L<Git::Hooks::CheckRewrite>
 
 Check if a B<git rebase> or a B<git commit --amend> is safe, meaning
 that no rewritten commit is contained by any other branch besides the
 current one. This is useful, for instance, to prevent rebasing commits
 already pushed.
 
-=item * Git::Hooks::CheckReference
+=item * L<Git::Hooks::CheckReference>
 
 Check if newly added reference names (branches, tags are just the most
 common Git references) comply with specified policies, so that you can
 impose a strict structure to the repository's reference hierarchies.
 
-=item * Git::Hooks::GerritChangeId
+=item * L<Git::Hooks::GerritChangeId>
 
 Inserts a C<Change-Id> line in the commit log message to allow
 integration with Gerrit's code review system.
 
-=item * Git::Hooks::Notify
+=item * L<Git::Hooks::Notify>
 
 Sends email notifications to interested parties about pushed commits affecting
 specific files in the repository.
+
+=item * L<Git::Hooks::PrepareLog>
+
+Prepare commit log messages before they are opened by the editor. It can be used
+to pre-format or to insert automatic information in the message before the user
+is given a chance to edit it.
 
 =back
 
@@ -1139,6 +1153,8 @@ The following commands may give you an idea as to which commands to use:
 
 =item * L<fortune|https://en.wikipedia.org/wiki/Fortune_(Unix)>
 
+=item * L<FIGlet|http://www.figlet.org/>
+
 =item * L<cowsay|https://en.wikipedia.org/wiki/Cowsay>
 
 =item * C<fortune -s | cowsay>
@@ -1228,7 +1244,7 @@ though.
 
 =over
 
-=item * L<Git::Hooks wiki|https://github.com/gnustavo/Git-Hooks/wiki>
+=item * L<Git::Hooks::Tutorial>
 
 Tutorials for Git users and administrators.
 

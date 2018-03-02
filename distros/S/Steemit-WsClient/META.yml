@@ -1,10 +1,10 @@
 ---
-abstract: 'perl lirary for interacting with the steemit websocket services!'
+abstract: 'perl library for interacting with the steemit websocket services!'
 author:
   - 'snkoehn <snkoehn@cpan.com>'
 build_requires:
   Math::BigInt: '1.999810'
-  Math::BigInt::GMP: '0'
+  Math::BigInt::GMP: '1.6'
   Test::More: '0'
 configure_requires:
   Module::Build: '0'
@@ -22,7 +22,7 @@ provides:
     file: lib/Steemit/ECDSA.pm
   Steemit::WsClient:
     file: lib/Steemit/WsClient.pm
-    version: '0.07'
+    version: '0.10'
 requires:
   Bytes::Random::Secure: '0.05'
   Crypt::RIPEMD160: '0'
@@ -30,11 +30,11 @@ requires:
   Digest::SHA: '0'
   IO::Socket::SSL: '0'
   Math::BigInt: '1.999810'
-  Math::BigInt::GMP: '0'
+  Math::BigInt::GMP: '1.6'
   Math::EllipticCurve::Prime: '0'
   Modern::Perl: '0'
   Mojo::Base: '0'
 resources:
   license: http://opensource.org/licenses/artistic-license-2.0.php
-version: '0.07'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

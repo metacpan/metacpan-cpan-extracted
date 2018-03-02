@@ -28,7 +28,7 @@ An example `.cfp` file might look like:
         "nickname": "Pfind",
         "version": "v2.3.8",
         "prerequisites": {
-            "Clownfish": "v0.6.2"
+            "Clownfish": "v0.6.3"
         }
     }
 

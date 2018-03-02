@@ -1,0 +1,30 @@
+NAME
+    Acme::BadFont - Cope with a bad font in your editor
+
+SYNOPSIS
+      use warnings;
+      use Acme::BadFont;
+
+      my $f = "1OO";
+      print $f + 1, "\n";   # 101
+      my $d = "I.S";
+      print $d * 2, "\n";   # 3
+
+DESCRIPTION
+    If the font in your editor is bad, this module will help by fixing the
+    numbers in your strings.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    None so far.
+
+COPYRIGHT
+    Copyright (c) 2017 the Acme::BadFont "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

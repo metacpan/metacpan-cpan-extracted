@@ -16,7 +16,7 @@ use Plack::Util::Accessor qw/ client sample_rate /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.3.4';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -79,6 +79,7 @@ sub call {
             }
 
             if ( my $type = $env->{CONTENT_TYPE} ) {
+                $type =~ s#\.#-#g;
                 $type =~ s#/#.#g;
                 $type =~ s/;.*$//;
                 $measure->(
@@ -110,6 +111,7 @@ sub call {
             }
 
             if ( my $type = $h->get('Content-Type') ) {
+                $type =~ s#\.#-#g;
                 $type =~ s#/#.#g;
                 $type =~ s/;.*$//;
                 $measure->(
@@ -152,7 +154,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.3
+version v0.3.4
 
 =head1 SYNOPSIS
 

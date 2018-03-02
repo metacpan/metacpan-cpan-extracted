@@ -79,13 +79,7 @@ Asia/Dhaka
 Asia/Kolkata
 Asia/Yangon
    =>
-   0
-   Asia/Dhaka
-   Asia/Kolkata
-   Asia/Yangon
-   1
-   Asia/Colombo
-   Asia/Karachi
+   5
    Asia/Kolkata
 ";
 

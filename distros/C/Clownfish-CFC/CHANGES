@@ -1,5 +1,12 @@
 Revision history for Apache Clownfish
 
+0.6.3  2018-02-20
+
+  Bugfixes:
+
+    * Fix build issue with recent Go versions
+    * [CLOWNFISH-119] - Build fails if "." is not in @INC
+
 0.6.2  2017-11-15
 
   Improvements:

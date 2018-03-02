@@ -2,29 +2,20 @@
 
 use lib './lib';
 use lib './t';
-use Test::More tests => 4;
+use Test::More;
 
-SKIP: {
-  skip "Perl version < 5.020", 4 if $] < 5.020;
+if ($] < 5.020) {
+  plan(skip_all =>  "Perl version < 5.020");
+}
+else {
+  plan(tests => 4);
   use_ok 'Pony::Object';
-
-  package Purple::Class {
-    use Pony::Object;
-    
-    sub sum($self, $a, $b = 0) {
-      return $a + $b;
-    }
-    
-    sub sum_it($self, @args) {
-      return $self->sum(@args);
-    }
-  }
+  require 'Purple/Object.pm';
 
   package main {
-    my $summer = new Purple::Class;
+    my $summer = new Purple::Object;
     ok($summer->sum(1, 2) == 3, "Test easy sum method");
     ok($summer->sum(1) == 1, "Test default sum method");
     ok($summer->sum_it(1) == 1, "Test array sum method");
   }
 }
-

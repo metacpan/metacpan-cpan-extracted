@@ -5,14 +5,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Object;
 use Cwd ();
 use Prty::Array;
 use Prty::Perl;
 use Prty::Option;
-use Scalar::Util ();
 use Prty::FileHandle;
 use Encode ();
 
@@ -1483,152 +1482,6 @@ sub getSubroutine {
 
 # -----------------------------------------------------------------------------
 
-=head2 Referenzen
-
-=head3 refType() - Liefere Grundtyp der Referenz
-
-=head4 Synopsis
-
-    $refType = $class->refType($ref);
-
-=head4 Alias
-
-reftype()
-
-=head4 Description
-
-Liefere den Grundtyp der Referenz.
-
-Grundtypen sind:
-
-    SCALAR
-    ARRAY
-    HASH
-    CODE
-    GLOB
-    IO
-    REF
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub refType {
-    return Scalar::Util::reftype($_[1]);
-}
-
-{
-    no warnings 'once';
-    *reftype = \&refType;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isBlessedRef() - Test, ob Referenz geblesst ist
-
-=head4 Synopsis
-
-    $bool = $class->isBlessedRef($ref);
-
-=head4 Alias
-
-isBlessed()
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isBlessedRef {
-    my ($class,$ref) = @_;
-    return Scalar::Util::blessed($ref)? 1: 0;
-}
-
-{
-    no warnings 'once';
-    *isBlessed = \&isBlessedRef;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isArrayRef() - Teste auf Array-Referenz
-
-=head4 Synopsis
-
-    $bool = $class->isArrayRef($ref);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isArrayRef {
-    my ($class,$ref) = @_;
-    $ref = Scalar::Util::reftype($ref);
-    return defined $ref && $ref eq 'ARRAY'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isHashRef() - Teste auf Hash-Referenz
-
-=head4 Synopsis
-
-    $bool = $class->isHashRef($ref);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isHashRef {
-    my ($class,$ref) = @_;
-    $ref = Scalar::Util::reftype($ref);
-    return defined $ref && $ref eq 'HASH'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isCodeRef() - Teste auf Code-Referenz
-
-=head4 Synopsis
-
-    $bool = $class->isCodeRef($ref);
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isCodeRef {
-    my ($class,$ref) = @_;
-    $ref = Scalar::Util::reftype($ref);
-    return defined $ref && $ref eq 'CODE'? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
-=head3 isRegexRef() - Teste auf Regex-Referenz
-
-=head4 Synopsis
-
-    $bool = $class->isRegexRef($ref);
-
-=head4 Caveats
-
-Wenn die Regex-Referenz umgeblesst wurde, muss sie auf
-eine Subklasse von Regex geblesst worden sein, sonst schlägt
-der Test fehl. Aktuell gibt es nicht den Grundtyp REGEX, der
-von reftype() geliefert würde, sondern eine Regex-Referenz gehört
-standardmäßig zu der Klasse Regex.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub isRegexRef {
-    my ($class,$ref) = @_;
-    return Scalar::Util::blessed($ref) && $ref->isa('Regexp')? 1: 0;
-}
-
-# -----------------------------------------------------------------------------
-
 =head2 Suchpfade
 
 =head3 basicIncPaths() - Grundlegende Modul-Suchpfade
@@ -1922,7 +1775,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

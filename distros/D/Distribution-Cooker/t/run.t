@@ -1,4 +1,4 @@
-use Test::More 0.95;
+use Test::More 0.98;
 
 my $class  = 'Distribution::Cooker';
 my $module = 'Foo::Bar';

@@ -1,5 +1,5 @@
 package Date::Manip::Base;
-# Copyright (c) 1995-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 1995-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -26,7 +26,7 @@ use Encode qw(encode_utf8 from_to find_encoding decode _utf8_off _utf8_on is_utf
 require Date::Manip::Lang::index;
 
 our $VERSION;
-$VERSION='6.60';
+$VERSION='6.70';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -174,7 +174,7 @@ sub _init_config {
 
       'format_mmmyyyy'   => '',
 
-      # *** DEPRECATED ***
+      # *** DEPRECATED 7.0 ***
 
       'tz'               => '',
      };
@@ -184,8 +184,7 @@ sub _init_config {
    #
 
    # non-business
-   $$self{'data'}{'len'}{'yrlen'} = 365.2425;
-   $$self{'data'}{'len'}{'0'} =
+   $$self{'data'}{'len'}{'standard'} =
      { 'yl'   => 31556952,  # 365.2425 * 24 * 3600
        'ml'   => 2629746,   # yl / 12
        'wl'   => 604800,    # 6 * 24 * 3600
@@ -252,11 +251,11 @@ sub _init_business_length {
    my $d_to_s = $$self{'data'}{'len'}{'bdlength'};
    my $w_to_d = $x;
 
-   $$self{'data'}{'len'}{'1'} = { 'yl' => $y_to_d * $d_to_s,
-                                  'ml' => $y_to_d * $d_to_s / 12,
-                                  'wl' => $w_to_d * $d_to_s,
-                                  'dl' => $d_to_s,
-                                };
+   $$self{'data'}{'len'}{'business'} = { 'yl' => $y_to_d * $d_to_s,
+                                         'ml' => $y_to_d * $d_to_s / 12,
+                                         'wl' => $w_to_d * $d_to_s,
+                                         'dl' => $d_to_s,
+                                       };
 
    return;
 }
@@ -333,9 +332,9 @@ sub _init_now {
    #
    #                     force    => 0/1             SetDate/ForceDate information
    #                     set      => 0/1
-   #                     setsecs  => SECS            time (in secs since epoch) when
+   #                     setsecs  => SECS            time (secs since epoch) when
    #                                                 SetDate was called
-   #                     setdate  => [Y,M,D,H,MN,S]  the date (IN GMT) we're calling
+   #                     setdate  => [Y,M,D,H,MN,S]  date (IN GMT) we're calling
    #                                                 now when SetDate was called
    #
    #                     tz       => ZONE            timezone we're working in
@@ -368,17 +367,52 @@ sub _init_language {
 # MAIN METHODS
 ###############################################################################
 
+# Use an algorithm from Calendar FAQ (except that I subtract 305 to get
+# Jan 1, 0001 = day #1.
+#
+sub days_since_1BC {
+   my($self,$arg) = @_;
+
+   if (ref($arg)) {
+      my($y,$m,$d) = @$arg;
+      $m = ($m + 9) % 12;
+      $y = $y - $m/10;
+      return 365*$y + $y/4 - $y/100 + $y/400 + ($m*306 + 5)/10 + ($d - 1) - 305;
+   } else {
+      my $g   = $arg + 305;
+      my $y   = (10000*$g + 14780)/3652425;
+      my $ddd = $g - (365*$y + $y/4 - $y/100 + $y/400);
+      if ($ddd < 0) {
+         $y   = $y - 1;
+         $ddd = $g - (365*$y + $y/4 - $y/100 + $y/400);
+      }
+      my $mi  = (100*$ddd + 52)/3060;
+      my $mm  = ($mi + 2) % 12 + 1;
+      $y      = $y + ($mi + 2)/12;
+      my $dd  = $ddd - ($mi*306 + 5)/10 + 1;
+      return [$y, $mm, $dd];
+   }
+}
+
+# Algorithm from the Calendar FAQ
+#
+sub day_of_week {
+   my($self,$date) = @_;
+   my($y,$m,$d)    = @$date;
+
+   my $a   = (14-$m)/12;
+   $y      = $y-$a;
+   $m      = $m + 12*$a - 2;
+   my $dow = ($d + $y + $y/4 - $y/100 + $y/400 + (31*$m)/12) % 7;
+   $dow    = 7  if ($dow==0);
+   return $dow;
+}
+
 sub leapyear {
    my($self,$y) = @_;
-   $y += 0;
-   return $$self{'cache'}{'ly'}{$y}
-     if (exists $$self{'cache'}{'ly'}{$y});
-
-   $$self{'cache'}{'ly'}{$y} = 0, return 0 unless ($y %   4 == 0);
-   $$self{'cache'}{'ly'}{$y} = 1, return 1 unless ($y % 100 == 0);
-   $$self{'cache'}{'ly'}{$y} = 0, return 0 unless ($y % 400 == 0);
-   $$self{'cache'}{'ly'}{$y} = 1;
-   return 1;
+   return 1  if ( ( ($y % 4 == 0) and ($y % 100 != 0) ) or
+                  $y % 400 == 0 );
+   return 0;
 }
 
 sub days_in_year {
@@ -386,156 +420,75 @@ sub days_in_year {
    return ($self->leapyear($y) ? 366 : 365);
 }
 
-{
-   my(@leap)=(31,29,31,30, 31,30,31,31, 30,31,30,31);
-   my(@nonl)=(31,28,31,30, 31,30,31,31, 30,31,30,31);
+# Uses algorithm from:
+# http://www.dispersiondesign.com/articles/time/number_of_days_in_a_month
+#
+sub days_in_month {
+   my($self,$y,$m) = @_;
+   if (! $m) {
+      return (31,29,31,30, 31,30,31,31, 30,31,30,31)  if ($self->leapyear($y));
+      return (31,28,31,30, 31,30,31,31, 30,31,30,31);
 
-   sub days_in_month {
-      my($self,$y,$m) = @_;
+   } elsif ($m == 2) {
+      return 28 + $self->leapyear($y);
 
-      if ($m) {
-         return ($self->leapyear($y) ? $leap[$m-1] : $nonl[$m-1]);
-      } else {
-         return ($self->leapyear($y) ? @leap : @nonl);
-      }
+   } else {
+      return 31 - ($m-1) % 7 % 2;
    }
 }
 
 {
-   # DinM        =     (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-   my(@doy_days) = ( 0, 31, 59, 90,120,151,181,212,243,273,304,334,365);
+   # DinM        =      (31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+   my(@doy_days) = ( [0, 31, 59, 90,120,151,181,212,243,273,304,334,365],
+                     [0, 31, 60, 91,121,152,182,213,244,274,305,335,366],
+                   );
 
-   # Note: I tested storing both leap year and non-leap year days in
-   # a hash, but it was slightly slower.
-
-   my($lyd,$n,$remain,$day,$y,$m,$d,$h,$mn,$s,$arg);
 
    sub day_of_year {
       my($self,@args) = @_;
-
       no integer;
-      if ($#args == 1) {
+      my($n,$ly,$tmp,$remain,$day,$y,$m,$d,$h,$mn,$s,$time);
 
+      if (@args == 2) {
          # $date = day_of_year($y,$day);
-         ($y,$n) = @args;
 
-         $lyd    = $self->leapyear($y);
-         $remain = ($n - int($n));
-         $n      = int($n);
+         ($y,$tmp) = @args;
+
+         $ly     = $self->leapyear($y);
+         $time   = 1  if ($tmp =~ /\./);
+         $n      = int($tmp);
+         $remain = $tmp - $n;
 
          # Calculate the month and the day
          for ($m=1; $m<=12; $m++) {
-            last  if ($n<=($doy_days[$m] + ($m==1 ? 0 : $lyd)));
+            last  if ($n<=($doy_days[$ly][$m]));
          }
-         $d = $n-($doy_days[$m-1] + (($m-1)<2 ? 0 : $lyd));
-         return [$y,$m,$d]  if (! $remain);
+         $d = $n-($doy_days[$ly][$m-1]);
+         return [$y,$m,$d]  if (! $time);
 
          # Calculate the hours, minutes, and seconds into the day.
-         $remain *= 24;
-         $h       = int($remain);
-         $remain  = ($remain - $h)*60;
-         $mn      = int($remain);
-         $remain  = ($remain - $mn)*60;
-         $s       = $remain;
+
+         $s       = $remain * 86400;
+         $mn      = int($s/60);
+         $s       = $s - ($mn*60);
+         $s       = sprintf('%0.2f',$s)  if ("$s" ne int($s));
+         $h       = int($mn/60);
+         $mn      = $mn % 60;
 
          return [$y,$m,$d,$h,$mn,$s];
 
       } else {
-         $arg  = $args[0];
-         @args = @$arg;
+         ($y,$m,$d,$h,$mn,$s) = @{ $args[0] };
 
-         ($y,$m,$d,$h,$mn,$s) = @args;
-         $lyd     = $self->leapyear($y);
-         $lyd     = 0  if ($m <= 2);
-         $day     = ($doy_days[$m-1]+$d+$lyd);
-         return $day  if ($#args==2);
+         $ly      = ($m > 2 ? $self->leapyear($y) : 0);
+         $day     = ($doy_days[$ly][$m-1]+$d);
 
-         $day    += ($h*3600 + $mn*60 + $s)/(24*3600);
+         return $day  if (! defined $h);
+
+         $day    += ($h*3600 + $mn*60 + $s)/86400;
          return $day;
       }
    }
-}
-
-sub days_since_1BC {
-   my($self,$arg) = @_;
-
-   if (ref($arg)) {
-      my($y,$m,$d) = @$arg;
-      $y += 0;
-      $m += 0;
-
-      if (! exists $$self{'cache'}{'ds1_mon'}{$y}{$m}) {
-
-         if (! exists $$self{'cache'}{'ds1_mon'}{$y}{1}) {
-
-            my($Ny,$N4,$N100,$N400,$cc,$yy);
-
-            my $yyyy  = "0000$y";
-
-            $yyyy     =~ /(\d\d)(\d\d)$/o;
-            ($cc,$yy) = ($1,$2);
-
-            # Number of full years since Dec 31, 1BC (starting at 0001)
-            $Ny       = $y - 1;
-
-            # Number of full 4th years (0004, 0008, etc.) since Dec 31, 1BC
-            $N4       = int($Ny/4);
-
-            # Number of full 100th years (0100, 0200, etc.)
-
-            $N100     = $cc + 0;
-            $N100--   if ($yy==0);
-
-            # Number of full 400th years (0400, 0800, etc.)
-            $N400     = int($N100/4);
-
-            $$self{'cache'}{'ds1_mon'}{$y}{1} =
-              $Ny*365 + $N4 - $N100 + $N400 + 1;
-         }
-
-         my($i,$j);
-         my @mon   = $self->days_in_month($y,0);
-         for ($i=2; $i<=12; $i++) {
-            $j     = shift(@mon);
-            $$self{'cache'}{'ds1_mon'}{$y}{$i} =
-              $$self{'cache'}{'ds1_mon'}{$y}{$i-1} + $j;
-         }
-      }
-
-      return ($$self{'cache'}{'ds1_mon'}{$y}{$m} + $d - 1);
-
-   } else {
-      my($days) = $arg;
-      my($y,$m,$d);
-
-      $y = int($days/$$self{'data'}{'len'}{'yrlen'})+1;
-      while ($self->days_since_1BC([$y,1,1]) > $days) {
-         $y--;
-      }
-      $m = 12;
-      while ( ($d=$self->days_since_1BC([$y,$m,1])) > $days ) {
-         $m--;
-      }
-      $d = ($days-$d+1);
-      return [$y,$m,$d];
-   }
-}
-
-sub day_of_week {
-   my($self,$date) = @_;
-   my($y,$m,$d) = @$date;
-   $y += 0;
-   $m += 0;
-
-   my($dayofweek,$dec31) = ();
-   if (! exists $$self{'cache'}{'dow_mon'}{$y}{$m}) {
-      $dec31 = 7;               # Dec 31, 1BC was Sunday
-      $$self{'cache'}{'dow_mon'}{$y}{$m} =
-        ( $self->days_since_1BC([$y,$m,1])+$dec31 ) % 7;
-   }
-   $dayofweek = ($$self{'cache'}{'dow_mon'}{$y}{$m}+$d-1) % 7;
-   $dayofweek = 7  if ($dayofweek==0);
-   return $dayofweek;
 }
 
 # Can be the nth DoW of year or month (if $m given).  Returns undef if
@@ -851,16 +804,19 @@ sub calc_date_days {
 
 sub calc_date_delta {
    my($self,$date,$delta,$subtract) = @_;
-   my($y,$m,$d,$h,$mn,$s,$dy,$dm,$dw,$dd,$dh,$dmn,$ds) = (@$date,@$delta);
+   my($y,$m,$d,$h,$mn,$s)           = @$date;
+   my($dy,$dm,$dw,$dd,$dh,$dmn,$ds) = @$delta;
 
-   ($y,$m,$d)           = @{ $self->_calc_date_ymwd([$y,$m,$d], [$dy,$dm,$dw,$dd],
-                                                    $subtract) };
+   ($y,$m,$d) =
+     @{ $self->_calc_date_ymwd([$y,$m,$d], [$dy,$dm,$dw,$dd], $subtract) };
+
    return $self->calc_date_time([$y,$m,$d,$h,$mn,$s],[$dh,$dmn,$ds],$subtract);
 }
 
 sub calc_date_time {
    my($self,$date,$time,$subtract) = @_;
-   my($y,$m,$d,$h,$mn,$s,$dh,$dmn,$ds) = (@$date,@$time);
+   my($y,$m,$d,$h,$mn,$s)          = @$date;
+   my($dh,$dmn,$ds)                = @$time;
 
    if ($ds > 59  ||  $ds < -59) {
       $dmn += int($ds/60);
@@ -1660,12 +1616,41 @@ sub _is_int {
    return 1;
 }
 
+# $flag = $self->_is_num($string [,$low, $high]);
+#    Returns 1 if $string is a valid number (integer or real), 0 otherwise.
+#    If $low is entered, $string must be >= $low.  If $high is entered,
+#    $string must be <= $high.  It is valid to check only one of the bounds.
+sub _is_num {
+   my($self,$N,$low,$high)=@_;
+   return 0  if (! defined $N  or
+                 ($N !~ /^\s*[-+]?\d+(\.\d*)?\s*$/o  &&
+                  $N !~ /^\s*[-+]?\.\d+\s*$/o)  or
+                 defined $low   &&  $N<$low  or
+                 defined $high  &&  $N>$high);
+   return 1;
+}
+
 ###############################################################################
 # Split/Join functions
 
 sub split {
-   my($self,$op,$string,$no_normalize) = @_;
-   $no_normalize = 0  if (! $no_normalize);
+   my($self,$op,$string,$arg) = @_;
+
+   my %opts;
+   if (ref($arg) eq 'HASH') {
+      %opts = %{ $arg };
+   } elsif ($arg) {
+      # ***DEPRECATED 7.0***
+      %opts = ('nonorm' => 1);
+   }
+
+   # ***DEPRECATED 7.0***
+   if ($op eq 'delta') {
+      $opts{'mode'} = 'standard';
+   } elsif ($op eq 'business') {
+      $opts{'mode'} = 'business';
+      $op = 'delta';
+   }
 
    if ($op eq 'date') {
 
@@ -1674,6 +1659,19 @@ sub split {
           $string =~ /^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/o) {
          my($y,$m,$d,$h,$mn,$s) = ($1+0,$2+0,$3+0,$4+0,$5+0,$6+0);
          return [$y,$m,$d,$h,$mn,$s];
+      } else {
+         return undef;
+      }
+
+   } elsif ($op eq 'hms') {
+      if ($string =~ /^(\d\d)(\d\d)(\d\d)$/o     ||
+          $string =~ /^(\d\d)(\d\d)()$/o         ||
+          $string =~ /^(\d\d?):(\d\d):(\d\d)$/o  ||
+          $string =~ /^(\d\d?):(\d\d)()$/o       ||
+          $string =~ /^(\d\d?)()()$/o) {
+         my($err,$h,$mn,$s) = $self->_hms_fields( { 'out' => 'list' },[$1,$2,$3]);
+         return undef  if ($err);
+         return [$h,$mn,$s];
       } else {
          return undef;
       }
@@ -1693,41 +1691,31 @@ sub split {
          return undef;
       }
 
-   } elsif ($op eq 'hms') {
-      if ($string =~ /^(\d\d)(\d\d)(\d\d)$/o     ||
-          $string =~ /^(\d\d)(\d\d)()$/o         ||
-          $string =~ /^(\d\d?):(\d\d):(\d\d)$/o  ||
-          $string =~ /^(\d\d?):(\d\d)()$/o       ||
-          $string =~ /^(\d\d?)()()$/o) {
-         my($err,$h,$mn,$s) = $self->_hms_fields( { 'out' => 'list' },[$1,$2,$3]);
-         return undef  if ($err);
-         return [$h,$mn,$s];
-      } else {
-         return undef;
-      }
-
    } elsif ($op eq 'time') {
       if ($string =~ /^[-+]?\d+(:[-+]?\d+){0,2}$/o) {
-         my($err,$dh,$dmn,$ds) = $self->_time_fields( { 'nonorm'   => $no_normalize,
-                                                        'source'   => 'string',
-                                                        'sign'     => -1,
-                                                      }, [split(/:/,$string)]);
+         my($err,$dh,$dmn,$ds) =
+           $self->_time_fields( { 'nonorm'   =>
+                                  (exists($opts{'nonorm'}) ? $opts{'nonorm'} : 0),
+                                  'source'   => 'string',
+                                  'sign'     => -1,
+                                }, [split(/:/,$string)]);
          return undef  if ($err);
          return [$dh,$dmn,$ds];
       } else {
          return undef;
       }
 
-   } elsif ($op eq 'delta'  ||  $op eq 'business') {
+   } elsif ($op eq 'delta') {
       my($err,@delta) = $self->_split_delta($string);
       return undef  if ($err);
 
-      ($err,@delta) = $self->_delta_fields( { 'business' =>
-                                              ($op eq 'business' ? 1 : 0),
-                                              'nonorm'   => $no_normalize,
-                                              'source'   => 'string',
-                                              'sign'     => -1,
-                                            }, [@delta]);
+      ($err,@delta) =
+        $self->_delta_fields( { 'mode'     => $opts{'mode'},
+                                'nonorm'   => (exists($opts{'nonorm'}) ?
+                                               $opts{'nonorm'} : 0),
+                                'source'   => 'string',
+                                'sign'     => -1,
+                              }, [@delta]);
 
       return undef  if ($err);
       return [@delta];
@@ -1735,7 +1723,24 @@ sub split {
 }
 
 sub join{
-   my($self,$op,$data,$no_normalize) = @_;
+   my($self,$op,$data,$arg) = @_;
+
+   my %opts;
+   if (ref($arg) eq 'HASH') {
+      %opts = %{ $arg };
+   } elsif ($arg) {
+      # ***DEPRECATED 7.0***
+      %opts = ('nonorm' => 1);
+   }
+
+   # ***DEPRECATED 7.0***
+   if ($op eq 'delta') {
+      $opts{'mode'} = 'standard';
+   } elsif ($op eq 'business') {
+      $opts{'mode'} = 'business';
+      $op = 'delta';
+   }
+
    my @data = @$data;
 
    if ($op eq 'date') {
@@ -1764,20 +1769,23 @@ sub join{
       return "$h:$mn:$s";
 
    } elsif ($op eq 'time') {
-      my($err,$dh,$dmn,$ds) = $self->_time_fields( { 'nonorm'   => $no_normalize,
-                                                     'source'   => 'list',
-                                                     'sign'     => 0,
-                                                   }, [@data]);
+      my($err,$dh,$dmn,$ds) =
+        $self->_time_fields( { 'nonorm'   =>
+                               (exists($opts{'nonorm'}) ? $opts{'nonorm'} : 0),
+                               'source'   => 'list',
+                               'sign'     => 0,
+                             }, [@data]);
       return undef  if ($err);
       return "$dh:$dmn:$ds";
 
-   } elsif ($op eq 'delta'  ||  $op eq 'business') {
-      my ($err,@delta) = $self->_delta_fields( { 'business' =>
-                                                 ($op eq 'business' ? 1 : 0),
-                                                 'nonorm'   => $no_normalize,
-                                                 'source'   => 'list',
-                                                 'sign'     => 0,
-                                               }, [@data]);
+   } elsif ($op eq 'delta') {
+      my ($err,@delta) =
+        $self->_delta_fields( { 'mode'     => $opts{'mode'},
+                                'nonorm'   => (exists($opts{'nonorm'}) ?
+                                               $opts{'nonorm'} : 0),
+                                'source'   => 'list',
+                                'sign'     => 0,
+                              }, [@data]);
       return undef  if ($err);
       return join(':',@delta);
    }
@@ -1801,24 +1809,109 @@ sub _split_delta {
    }
 }
 
-# $opts = { business => 0/1,
+# Check that type is not inconsistent with @delta.
+#
+# An exact delta cannot have semi-exact or approximate fields set.
+# A semi-exact delta cannot have approximate fields set.
+# An exact, semi-exact, or approximate delta cannot have non-integer values.
+#
+# If the type was not explicitly specified, guess what it is.
+#
+# Returns ($err,$type,$type_from)
+#
+sub _check_delta_type {
+   my($self,$mode,$type,$type_from,@delta) = @_;
+
+   my $est    = 0;
+   foreach my $f (@delta) {
+      if (! $self->_is_int($f)) {
+         $est = 1;
+         last;
+      }
+   }
+
+   my $approx = 0;
+   if (! $est) {
+      $approx = 1  if ($delta[0]  ||  $delta[1]);
+   }
+
+   my $semi   = 0;
+   if (! $est  &&  ! $approx) {
+      if ($mode eq 'business') {
+         $semi = 1  if ($delta[2]);
+      } else {
+         $semi = 1  if ($delta[2]  ||  $delta[3]);
+      }
+   }
+
+   if ($est) {
+      # If some of the fields are non-integer, then type must be estimated.
+
+      if ($type ne 'estimated') {
+         if ($type_from eq 'opt') {
+            return ("Type must be estimated for non-integers");
+         }
+         $type = 'estimated';
+         $type_from = 'det';
+      }
+
+   } elsif ($approx) {
+      # If some of the approximate fields are set, then type must be
+      # approx or estimated.
+
+      if ($type ne 'approx'  &&  $type ne 'estimated') {
+         if ($type_from eq 'opt') {
+            return("Type must be approx/estimated");
+         }
+         $type = 'approx';
+         $type_from = 'det';
+      }
+
+   } elsif ($semi) {
+      # If some of the semi-exact fields are set, then type must be
+      # semi, approx, or estimated
+
+      if ($type ne 'semi'  &&  $type ne 'approx'  &&  $type ne 'estimated') {
+         if ($type_from eq 'opt') {
+            return("Type must be semi/approx/estimated");
+         }
+         $type = 'semi';
+         $type_from = 'det';
+      }
+
+   } else {
+
+      if (! $type) {
+         $type = 'exact';
+         $type_from = 'det';
+      }
+   }
+
+   return ('',$type,$type_from);
+}
+
+# This function returns the fields in a delta in the desired format.
+#
+# $opts = { mode     => standard/business
+#           type     => exact/semi/approx/estimated
 #           nonorm   => 0/1,
-#           source   => string, list
+#           source   => string, list, delta
 #           sign     => 0/1/-1
 #         }
 # $fields = [Y,M,W,D,H,Mn,S]
 #
-# This function formats the fields in a delta.
-#
 # If the business option is 1, treat it as a business delta.
 #
-# If the nonorm option is 1, fields are NOT normalized.  By
-# default, they are normalized.
+# If the nonorm option is 1, fields are NOT normalized.  By default,
+# they are normalized.
 #
-# If source is 'string', then the source of the fields is splitting
-# a delta (so we need to handle carrying the signs).  If it's 'list',
-# then the source is a valid delta, so each field is correctly signed
-# already.
+# If source is 'string', then the source of the fields is a string
+# that has been split, so we need to handle carrying the signs.  If
+# the option is 'list', then the source is a valid delta, so each
+# field is correctly signed already.  In both cases, the type of
+# delta will need to be determined.  If the source is 'delta', then
+# it comes from a Date::Manip::Delta object.  In this case the type
+# must be specified.  If type is not passed in, it will be set.
 #
 # If the sign option is 1, a sign is added to every field.  If the
 # sign option is -1, all negative fields are signed.  If the sign
@@ -1839,9 +1932,9 @@ sub _delta_fields {
 
    foreach my $f (@fields) {
       $f=0  if (! defined($f));
-      return (1)  if ($f !~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/o);
+      return ("Non-numerical field")  if (! $self->_is_num($f));
    }
-   return (1)  if (@fields > 7);
+   return ("Delta may contain only 7 fields")  if (@fields > 7);
    while (@fields < 7) {
       unshift(@fields,0);
    }
@@ -1851,7 +1944,85 @@ sub _delta_fields {
    # work correctly.  Get rid of all positive signs and leading 0's.
    #
 
-   if ($$opts{'source'} eq 'string') {
+   my $mode   = $$opts{'mode'};
+   my $source = $$opts{'source'};
+   @fields    = $self->_sign_source($source,@fields);
+
+   #
+   # Figure out the type of delta.  When called from Date::Manip::Base, it'll
+   # be determined from the data.  When called from Date::Manip::Delta, it'll
+   # be specified.
+   #
+
+   my ($type,$type_from);
+   if (defined $source  &&  $source eq 'delta') {
+      if (! exists $$opts{'type'}) {
+         return ("Type must be specified");
+      }
+      $type = $$opts{'type'};
+
+   } else {
+      my $err;
+      ($err,$type,$type_from) = $self->_check_delta_type($mode,'','init',@fields);
+      $$opts{'type'}      = $type;
+      $$opts{'type_from'} = $type_from;
+      return($err)  if ($err);
+   }
+
+   #
+   # Normalize values, if desired.
+   #
+
+   my $norm = 1-$$opts{'nonorm'};
+   if ($norm) {
+      if ($mode eq 'business') {
+
+         if ($type eq 'estimated') {
+            @fields = $self->_normalize_bus_est(@fields);
+
+         } elsif ($type eq 'approx'  ||
+                  $type eq 'semi') {
+            @fields = $self->_normalize_bus_approx(@fields);
+
+         } else {
+            @fields = $self->_normalize_bus_exact(@fields);
+         }
+
+      } else {
+
+         if ($type eq 'estimated') {
+            @fields = $self->_normalize_est(@fields);
+
+         } elsif ($type eq 'approx'  ||
+                  $type eq 'semi') {
+            @fields = $self->_normalize_approx(@fields);
+
+         } else {
+            @fields = $self->_normalize_exact(@fields);
+         }
+
+      }
+   }
+
+   #
+   # Now make sure that the signs are included as appropriate.
+   #
+
+   @fields = $self->_sign_fields($$opts{'sign'},@fields);
+
+   return (0,@fields);
+}
+
+# If a set of fields came from splitting a string, not all of the fields
+# are signed.  If it comes from a list, we just want to remove extra '+'
+# signs.
+#
+sub _sign_source {
+   my($self,$source,@fields) = @_;
+
+   # Needed to handle fractional fields
+   no integer;
+   if ($source eq 'string') {
 
       # if the source is splitting a delta, not all fields are signed,
       # so we need to carry the negative signs.
@@ -1872,69 +2043,101 @@ sub _delta_fields {
       }
    }
 
-   #
-   # Normalize them.  Values will be signed only if they are
-   # negative.  Handle fractional values.
-   #
+   return @fields;
+}
 
-   my $nonorm = $$opts{'nonorm'};
-   foreach my $f (@fields) {
-      if ($f != int($f)) {
-         $nonorm = 0;
-         last;
+# This applies the correct sign to each field based on the $sign option:
+#
+#    1 : all fields signed
+#   -1 : all negative fields signed
+#    0 : minimum number of signs for a joined set of fields
+#
+sub _sign_fields {
+   my($self,$sign,@fields) = @_;
+   $sign = 0  if (! defined $sign);
+
+   if      ($sign == 1) {
+      # All fields signed
+      foreach my $f (@fields) {
+         $f = "+$f"  if ($f > 0);
+      }
+
+   } elsif ($sign == 0) {
+      # Minimum number of signs
+      my $s = ($fields[0] < 0 ? '-' : '+');
+      foreach my $f (@fields[1..$#fields]) {
+         if ($f > 0  &&  $s eq '-') {
+            $f   = "+$f";
+            $s   = '+';
+         } elsif ($f < 0) {
+            if ($s eq '-') {
+               $f *= -1;
+            } else {
+               $s  = '-';
+            }
+         }
       }
    }
 
-   my($y,$m,$w,$d,$h,$mn,$s) = @fields;
-   if (! $nonorm) {
-      ($y,$m)           = $self->_normalize_ym($y,$m)    if ($y || $m);
-      ($m,$w)           = $self->_normalize_mw($m,$w)    if (int($m) != $m);
-      if ($$opts{'business'}) {
-         ($w,$d)        = $self->_normalize_wd($w,$d,1)  if (int($w) != $w);
-         ($d,$h,$mn,$s) = $self->_normalize_bus_dhms($d,$h,$mn,$s);
-      } else {
-         ($w,$d)        = $self->_normalize_wd($w,$d,0)  if ($w || $d);
-         ($d,$h)        = $self->_normalize_dh($d,$h)    if (int($d) != $d);
-         ($h,$mn,$s)    = $self->_normalize_hms($h,$mn,$s);
-      }
+   return @fields;
+}
+
+# $opts = { nonorm   => 0/1,
+#           source   => string, list
+#           sign     => 0/1/-1
+#         }
+# $fields = [H,M,S]
+#
+# This function formats the fields in an amount of time measured in
+# hours, minutes, and seconds.
+#
+# It is similar to how _delta_fields (above) works.
+#
+sub _time_fields {
+   my($self,$opts,$fields) = @_;
+   my @fields = @$fields;
+
+   #
+   # Make sure that all fields are defined, numerical, and that there
+   # are 3 of them.
+   #
+
+   foreach my $f (@fields) {
+      $f=0  if (! defined($f));
+      return (1)  if (! $self->_is_int($f));
+   }
+   return (1)  if (@fields > 3);
+   while (@fields < 3) {
+      unshift(@fields,0);
+   }
+
+   #
+   # Make sure each field is the correct sign so that the math will
+   # work correctly.  Get rid of all positive signs and leading 0's.
+   #
+
+   my $source = $$opts{'source'};
+   @fields    = $self->_sign_source($source,@fields);
+
+   #
+   # Normalize them.  Values will be signed only if they are
+   # negative.
+   #
+
+   my $norm = 1-$$opts{'nonorm'};
+   if ($norm) {
+      my($h,$mn,$s) = @fields;
+      $s  += $h*3600 + $mn*60;
+      @fields = __normalize_hms($h,$mn,$s);
    }
 
    #
    # Now make sure that the signs are included as appropriate.
    #
 
-   if (! $$opts{'sign'}) {
-      # Minimum number of signs
-      my $sign;
-      if ($y >= 0) {
-         $sign = '+';
-      } else {
-         $sign = '-';
-      }
-      foreach my $f ($m,$w,$d,$h,$mn,$s) {
-         if ($f > 0) {
-            if ($sign eq '-') {
-               $f    = "+$f";
-               $sign = '+';
-            }
+   @fields = $self->_sign_fields($$opts{'sign'},@fields);
 
-         } elsif ($f < 0) {
-            if ($sign eq '-') {
-               $f *= -1;
-            } else {
-               $sign = '-';
-            }
-         }
-      }
-
-   } elsif ($$opts{'sign'} == 1) {
-      # All fields signed
-      foreach my $f ($y,$m,$w,$d,$h,$mn,$s) {
-         $f = "+$f"  if ($f > 0);
-      }
-   }
-
-   return (0,$y,$m,$w,$d,$h,$mn,$s);
+   return (0,@fields);
 }
 
 # $opts = { out   => string, list
@@ -1962,7 +2165,7 @@ sub _hms_fields {
 
    foreach my $f (@fields) {
       $f=0  if (! $f);
-      return (1)  if ($f !~ /^\d+$/o);
+      return (1)  if (! $self->_is_int($f,0));
    }
    return (1)  if (@fields > 3);
    while (@fields < 3) {
@@ -1995,109 +2198,6 @@ sub _hms_fields {
    return (0,$h,$m,$s);
 }
 
-# $opts = { nonorm   => 0/1,
-#           source   => string, list
-#           sign     => 0/1/-1
-#         }
-# $fields = [H,M,S]
-#
-# This function formats the fields in an amount of time measured in
-# hours, minutes, and seconds.
-#
-# It is similar to how _delta_fields (above) works.
-#
-sub _time_fields {
-   my($self,$opts,$fields) = @_;
-   my @fields = @$fields;
-
-   #
-   # Make sure that all fields are defined, numerical, and that there
-   # are 3 of them.
-   #
-
-   foreach my $f (@fields) {
-      $f=0  if (! defined($f));
-      return (1)  if ($f !~ /^[+-]?\d+$/o);
-   }
-   return (1)  if (@fields > 3);
-   while (@fields < 3) {
-      unshift(@fields,0);
-   }
-
-   #
-   # Make sure each field is the correct sign so that the math will
-   # work correctly.  Get rid of all positive signs and leading 0's.
-   #
-
-   if ($$opts{'source'} eq 'string') {
-
-      # If the source is splitting a string, not all fields are signed,
-      # so we need to carry the negative signs.
-
-      my $sign = '+';
-      foreach my $f (@fields) {
-         if ($f =~ /^([-+])/o) {
-            $sign = $1;
-         } else {
-            $f = "$sign$f";
-         }
-         $f *= 1;
-      }
-
-   } else {
-      foreach my $f (@fields) {
-         $f *= 1;
-      }
-   }
-
-   #
-   # Normalize them.  Values will be signed only if they are
-   # negative.
-   #
-
-   my($h,$mn,$s) = @fields;
-   unless ($$opts{'nonorm'}) {
-      ($h,$mn,$s)       = $self->_normalize_hms($h,$mn,$s);
-   }
-
-   #
-   # Now make sure that the signs are included as appropriate.
-   #
-
-   if (! $$opts{'sign'}) {
-      # Minimum number of signs
-      my $sign;
-      if ($h >= 0) {
-         $sign = '+';
-      } else {
-         $sign = '-';
-      }
-      foreach my $f ($mn,$s) {
-         if ($f > 0) {
-            if ($sign eq '-') {
-               $f    = "+$f";
-               $sign = '+';
-            }
-
-         } elsif ($f < 0) {
-            if ($sign eq '-') {
-               $f *= -1;
-            } else {
-               $sign = '-';
-            }
-         }
-      }
-
-   } elsif ($$opts{'sign'} == 1) {
-      # All fields signed
-      foreach my $f ($h,$mn,$s) {
-         $f = "+$f"  if ($f > 0);
-      }
-   }
-
-   return (0,$h,$mn,$s);
-}
-
 # $opts = { source     => string, list
 #           out        => string, list
 #         }
@@ -2123,7 +2223,7 @@ sub _offset_fields {
 
    foreach my $f (@fields) {
       $f=0  if (! defined $f  ||  $f eq '');
-      return (1)  if ($f !~ /^[+-]?\d+$/o);
+      return (1)  if (! $self->_is_int($f));
    }
    return (1)  if (@fields > 3);
    while (@fields < 3) {
@@ -2240,95 +2340,6 @@ sub _date_fields {
    }
 }
 
-sub _normalize_ym {
-   my($self,$y,$m) = @_;
-   no integer;
-
-   $m += $y*12;
-   $y  = int($m/12);
-   $m -= $y*12;
-
-   return ($y,$m);
-}
-
-# This is only used for deltas with fractional months.
-#
-sub _normalize_mw {
-   my($self,$m,$w) = @_;
-   no integer;
-
-   my $d  = ($m-int($m)) * $$self{'data'}{'len'}{'yrlen'}/12;
-   $w    += $d/7;
-   $m     = int($m);
-
-   return ($m,$w);
-}
-
-sub _normalize_bus_dhms {
-   my($self,$d,$h,$mn,$s) = @_;
-   no integer;
-
-   my $dl = $$self{'data'}{'len'}{'1'}{'dl'};
-
-   $s  += $d*$dl + $h*3600 + $mn*60;
-   $d   = int($s/$dl);
-   $s  -= $d*$dl;
-
-   $mn  = int($s/60);
-   $s  -= $mn*60;
-   $s   = int($s);
-
-   $h   = int($mn/60);
-   $mn -= $h*60;
-
-   return ($d,$h,$mn,$s);
-}
-
-sub _normalize_hms {
-   my($self,$h,$mn,$s) = @_;
-   no integer;
-
-   $s  += $h*3600 + $mn*60;
-   $mn  = int($s/60);
-   $s  -= $mn*60;
-   $s   = int($s);
-
-   $h   = int($mn/60);
-   $mn -= $h*60;
-
-   return ($h,$mn,$s);
-}
-
-# Business deltas only mix week and day if the week has a fractional
-# part.
-#
-sub _normalize_wd {
-   my($self,$w,$d,$business) = @_;
-   no integer;
-
-   my $weeklen = ($business ? $$self{'data'}{'len'}{'workweek'} : 7);
-
-   $d += $w*$weeklen;
-   $w  = int($d/$weeklen);
-   $d -= $w*$weeklen;
-
-   return ($w,$d);
-}
-
-# This is only done for non-business days with a fractional part.
-# part.
-#
-sub _normalize_dh {
-   my($self,$d,$h) = @_;
-   no integer;
-
-   $h += $d*24;
-   $d  = int($h/24);
-   $h -= $d*24;
-
-   return ($d,$h);
-}
-
 # $self->_delta_convert(FORMAT,DELTA)
 #    This converts delta into the given format. Returns '' if invalid.
 #
@@ -2337,6 +2348,148 @@ sub _delta_convert {
    my $fields = $self->split($format,$delta);
    return undef  if (! defined $fields);
    return $self->join($format,$fields);
+}
+
+###############################################################################
+# Normalize the different types of deltas
+
+sub __normalize_ym {
+   my($y,$m,$s,$mon) = @_;
+
+   if (defined($s)) {
+      $m      = int($s/$mon);
+      $s     -= $m*$mon;
+      $y      = int($m/12);
+      $m     -= $y*12;
+
+      return($y,$m,$s);
+   } else {
+      $m     += $y*12;
+      $y      = int($m/12);
+      $m     -= $y*12;
+
+      return($y,$m);
+   }
+}
+sub __normalize_wd {
+   my($w,$d,$s,$wk,$day) = @_;
+
+   $d      = int($s/$day);
+   $s     -= $d*$day;
+   $w      = int($d/$wk);
+   $d     -= $w*$wk;
+
+   return($w,$d,$s);
+}
+sub __normalize_hms {
+   my($h,$mn,$s) = @_;
+
+   $h      = int($s/3600);
+   $s     -= $h*3600;
+   $mn     = int($s/60);
+   $s     -= $mn*60;
+   $s      = int($s);
+
+   return($h,$mn,$s);
+}
+
+sub _normalize_est {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   # Figure out how many seconds there are in the estimated delta
+   #
+   # 365.2425/12 days/month * 24 hours/day * 3600 sec/hour = 2629746 sec/month
+
+   my $mon = 2629746;
+   my $day = 86400;
+   my $wk  = 7;
+   $s     += ($y*12+$m)*$mon + ($w*$wk + $d)*$day +
+             $h*3600 + $mn*60;
+
+   ($y,$m,$s)  = __normalize_ym($y,$m,$s,$mon);
+   ($w,$d,$s)  = __normalize_wd($w,$d,$s,$wk,$day);
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
+}
+sub _normalize_bus_est {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   # Figure out how many seconds there are in the estimated delta
+   #
+   # 365.2425/12 * wk_len/7 days/month * day sec/day = X sec/month
+
+   my $day = $$self{'data'}{'len'}{'bdlength'};
+   my $wk  = $$self{'data'}{'len'}{'workweek'};
+   my $mon = 365.2425/12 * $wk/7 * $day;
+
+   $s     += ($y*12+$m)*$mon + ($w*$wk + $d)*$day +
+             $h*3600 + $mn*60;
+
+   ($y,$m,$s)  = __normalize_ym($y,$m,$s,$mon);
+   ($w,$d,$s)  = __normalize_wd($w,$d,$s,$wk,$day);
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
+}
+
+sub _normalize_approx {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   my $wk  = 7;
+   my $day = 86400;
+   $s     += ($w*$wk + $d)*$day + $h*3600 + $mn*60;
+
+   ($y,$m)     = __normalize_ym($y,$m);
+   ($w,$d,$s)  = __normalize_wd($w,$d,$s,$wk,$day);
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
+}
+sub _normalize_bus_approx {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   my $wk  = $$self{'data'}{'len'}{'workweek'};
+   my $day = $$self{'data'}{'len'}{'bdlength'};
+   $s     += ($w*$wk + $d)*$day + $h*3600 + $mn*60;
+
+   ($y,$m)     = __normalize_ym($y,$m);
+   ($w,$d,$s)  = __normalize_wd($w,$d,$s,$wk,$day);
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
+}
+
+sub _normalize_exact {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   $s     += $h*3600 + $mn*60;
+
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
+}
+sub _normalize_bus_exact {
+   my($self,$y,$m,$w,$d,$h,$mn,$s) = @_;
+   no integer;
+
+   my $day = $$self{'data'}{'len'}{'bdlength'};
+
+   $s     += $d*$day + $h*3600 + $mn*60;
+
+   # Calculate d
+
+   $d      = int($s/$day);
+   $s     -= $d*$day;
+
+   ($h,$mn,$s) = __normalize_hms($h,$mn,$s);
+
+   return ($y,$m,$w,$d,$h,$mn,$s);
 }
 
 ###############################################################################

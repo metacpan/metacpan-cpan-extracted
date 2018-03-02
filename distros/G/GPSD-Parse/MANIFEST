@@ -23,6 +23,7 @@ t/45-direction.t
 t/50-signed.t
 t/55-unsigned.t
 t/60-poll_signed_toggle.t
+t/65-tpv_methods.t
 t/data/gps.json
 t/manifest.t
 t/pod-coverage.t

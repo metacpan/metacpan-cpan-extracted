@@ -32,8 +32,9 @@ resources:
   bugtracker: https://github.com/LibreCat/Dancer-Plugin-Catmandu-SRU/issues
   homepage: https://github.com/LibreCat/Dancer-Plugin-Catmandu-SRU
   repository: https://github.com/LibreCat/Dancer-Plugin-Catmandu-SRU.git
-version: '0.0501'
+version: '0.0502'
 x_contributors:
+  - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'njfranck <njfranck@ca20c521.ugent.be>'

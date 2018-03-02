@@ -4,7 +4,7 @@
       "Stevan Little <stevan@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -25,8 +25,10 @@
             "FindBin" : "0",
             "Path::Tiny" : "0",
             "Scalar::Util" : "0",
-            "UNIVERSAL::Object" : "0",
-            "perl" : "v5.10.0"
+            "UNIVERSAL::Object" : "0.14",
+            "perl" : "v5.10.0",
+            "roles" : "0.03",
+            "slots" : "0.03"
          }
       },
       "test" : {
@@ -44,7 +46,7 @@
          "web" : "https://github.com/stevan/p5-Directory-Scanner"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

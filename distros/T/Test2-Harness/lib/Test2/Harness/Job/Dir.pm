@@ -2,7 +2,7 @@ package Test2::Harness::Job::Dir;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use File::Spec();
 
@@ -276,7 +276,7 @@ sub _poll_event {
     return if $id > $self->{+_STDOUT_INDEX};
     return if $id > $self->{+_STDERR_INDEX};
 
-    # All cought up, time for the event!
+    # All caught up, time for the event!
     shift @$buffer;
     $self->{+_EVENTS_INDEX} = $id;
 

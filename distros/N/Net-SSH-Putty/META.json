@@ -4,7 +4,7 @@
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -37,7 +37,6 @@
             "File::Temp" : "0",
             "Moo" : "2.000001",
             "Types::Standard" : "1.000005",
-            "feature" : "0",
             "namespace::clean" : "0.25",
             "strict" : "0",
             "warnings" : "0"
@@ -54,7 +53,7 @@
    "provides" : {
       "Net::SSH::Putty" : {
          "file" : "lib/Net/SSH/Putty.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -68,7 +67,7 @@
          "web" : "https://github.com/glasswalk3r/net-ssh-putty"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

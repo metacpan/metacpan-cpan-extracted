@@ -5,13 +5,14 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Test::Builder ();
 use Prty::Option;
 use Prty::Path;
 use Prty::Object;
 use Test::More ();
+use Prty::Converter;
 use Prty::System;
 use Prty::Test::Class::Method;
 
@@ -760,6 +761,9 @@ nichts
 sub syntaxOk {
     my ($self,$program,$text) = @_;
 
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
+
     # Suche Programm via PATH, wenn kein absoluter Pfad
     $program = Prty::System->searchProgram($program);
 
@@ -803,6 +807,9 @@ okTest()
 sub ok {
     my ($self,$bool,$text) = @_;
 
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
+
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::ok($bool,$text);    
 }
@@ -832,6 +839,9 @@ isTest()
 sub is {
     my ($self,$got,$expected,$text) = @_;
 
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
+
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::is($got,$expected,$text);    
 }
@@ -860,6 +870,9 @@ isntTest()
 
 sub isnt {
     my ($self,$got,$expected,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::isnt($got,$expected,$text);    
@@ -894,10 +907,14 @@ von $expected genommen.
 sub floatIs {
     my ($self,$got,$expected,$places,$text) = @_;
 
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
+
     # Runde auf die Nachkommastellen des erwarteten Werts
 
     if (!defined $places) {
-        $places = length($expected =~ /\.(\d+)/);
+        $expected =~ /\.(\d+)/;
+        $places = length($1);
     }
     if ($places) {
         $got = sprintf '%.*f',$places,$got;
@@ -931,6 +948,9 @@ sub isClass {
 
     $text ||= "Object is a $class";
 
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
+
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::ok($ref->isa($class),$text);    
 }
@@ -950,6 +970,9 @@ sub isClass {
 
 sub isDeeply {
     my ($self,$gotRef,$expectedRef,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::is_deeply($gotRef,$expectedRef,$text);    
@@ -974,6 +997,9 @@ likeTest()
 
 sub like {
     my ($self,$got,$regex,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::like($got,$regex,$text);    
@@ -1003,6 +1029,9 @@ unlikeTest()
 
 sub unlike {
     my ($self,$got,$regex,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::unlike($got,$regex,$text);    
@@ -1034,6 +1063,9 @@ Vergleich auf numerische Verschiedenheit:
 
 sub cmpOk {
     my ($self,$this,$op,$that,$text) = @_;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $text = Prty::Converter->umlautToAscii($text);
 
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     return Test::More::cmp_ok($this,$op,$that,$text);    
@@ -1118,7 +1150,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

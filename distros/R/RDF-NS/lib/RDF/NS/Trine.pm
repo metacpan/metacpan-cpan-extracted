@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '20180213';
+our $VERSION = '20180227';
 
 use RDF::Trine::Node::Resource;
 use RDF::Trine::Node::Blank;
@@ -29,7 +29,7 @@ RDF::NS::Trine - Popular RDF namespace prefixes from prefix.cc as RDF::Trine nod
 =head1 SYNOPSIS
 
   use RDF::NS::Trine;
-  use constant NS => RDF::NS::Trine->new('20180213');
+  use constant NS => RDF::NS::Trine->new('20180227');
 
   NS->foaf_Person;        # iri('http://xmlns.com/foaf/0.1/Person')
   NS->uri('foaf:Person);  #  same RDF::Trine::Node::Resource

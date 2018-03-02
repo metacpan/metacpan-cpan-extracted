@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Option;
 
@@ -275,7 +275,7 @@ Liefere die Extension des Bilddateinamens.
 
 =head2 Objektmethoden
 
-=head3 asString() - Liefere die Dateinamen
+=head3 asString() - Liefere den Dateinamen
 
 =head4 Synopsis
 
@@ -283,7 +283,14 @@ Liefere die Extension des Bilddateinamens.
 
 =head4 Returns
 
-String
+Bild-Dateiname (String)
+
+=head4 Description
+
+Bilde aus den Angaben Bildnummer (number), Bildbreite (width),
+Bildhöhe (height), dem optionalen Beschreibungstext (text) und der
+Deteiendung (extension) einen Bild-Dateinamen und liefere diesen
+zurück.
 
 =cut
 
@@ -306,7 +313,7 @@ sub asString {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -113,7 +113,7 @@ perl -I../lib date.week_of_year.1.t 1
 perl -I../lib delta.calc.delta_delta_approx.t 1
 perl -I../lib delta.calc.delta_delta_business.0.t 1
 perl -I../lib delta.calc.delta_delta_business.1.t 1
-perl -I../lib delta.calc.delta_delta_exact.t 1
+perl -I../lib delta.calc.delta_delta_semi.t 1
 perl -I../lib delta.cmp.t 1
 perl -I../lib delta.convert.t 1
 perl -I../lib delta.init_args.t 1
@@ -121,7 +121,9 @@ perl -I../lib delta.is.t 1
 perl -I../lib delta.parse.fract.t 1
 perl -I../lib delta.parse.t 1
 perl -I../lib delta.printf.t 1
-perl -I../lib delta.set.t 1
+perl -I../lib delta.set.1.t 1
+perl -I../lib delta.set.2.t 1
+perl -I../lib delta.set.3.t 1
 perl -I../lib delta.type.t 1
 perl -I../lib delta.value.t 1
 perl -I../lib dm5.convtz.t 1

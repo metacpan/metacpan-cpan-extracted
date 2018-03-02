@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use POSIX ();
 use Time::Local ();
@@ -77,13 +77,15 @@ sub umlautToAscii {
 
     my $ref = ref $arg? $arg: \$arg;
 
-    $$ref =~ s/ä/ae/g;
-    $$ref =~ s/ö/oe/g;
-    $$ref =~ s/ü/ue/g;
-    $$ref =~ s/Ä/Ae/g;
-    $$ref =~ s/Ö/Oe/g;
-    $$ref =~ s/Ü/Ue/g;
-    $$ref =~ s/ß/ss/g;
+    if (defined $$ref) {
+        $$ref =~ s/ä/ae/g;
+        $$ref =~ s/ö/oe/g;
+        $$ref =~ s/ü/ue/g;
+        $$ref =~ s/Ä/Ae/g;
+        $$ref =~ s/Ö/Oe/g;
+        $$ref =~ s/Ü/Ue/g;
+        $$ref =~ s/ß/ss/g;
+    }
 
     return ref $arg? (): $$ref;
 }
@@ -390,7 +392,7 @@ sub stringToKeyVal {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

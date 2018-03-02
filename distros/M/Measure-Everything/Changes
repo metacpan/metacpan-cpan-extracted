@@ -1,5 +1,9 @@
 Changes for Measure::Everything
 
+1.002   2018-02-27T13:17:32
+    - added Measure::Everything::Adapter::Test
+
+
 1.001   2015-08-01T18:01:35
     - added some docs
 

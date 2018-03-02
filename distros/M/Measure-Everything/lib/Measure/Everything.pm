@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Module::Runtime qw(use_module);
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 # ABSTRACT: Log::Any for Stats
 
@@ -43,7 +43,7 @@ Measure::Everything - Log::Any for Stats
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ C<Measure::Everything> tries to provide a standard measuring API for
 modules (like L<Log::Any|https://metacpan.org/pod/Log::Any> does for
 logging). C<Measure::Everything::Adapter>s allow applications to
 choose the mechanism for measuring stats (for example
-C<InfluxDB|https://influxdb.com>, <OpenTSDB|http://opentsdb.net/>,
+L<InfluxDB|https://influxdb.com>, L<OpenTSDB|http://opentsdb.net/>,
 Graphite, etc).
 
 For now, C<Measure::Everything> only supports C<InfluxDB>, because

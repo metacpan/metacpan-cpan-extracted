@@ -3,6 +3,8 @@ abstract: 'Automate software releases'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
+  File::Temp: '0'
   Test::More: '1'
   Test::Output: '0'
   Test::Without::Module: '0'
@@ -10,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 keywords:
   - workflow
   - module
@@ -18,7 +20,7 @@ keywords:
   - pause
   - automation
   - testing
-license: perl
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -30,10 +32,13 @@ no_index:
 requires:
   CACertOrg::CA: '0'
   ConfigReader::Simple: '0'
+  DateTime: '0'
   IO::Null: '0'
   Mojolicious: '4.50'
+  Term::ReadKey: '0'
   URI: '0'
   perl: '5.010'
 resources:
   repository: https://github.com/briandfoy/module-release
-version: '2.123'
+version: '2.125'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

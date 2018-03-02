@@ -23,5 +23,5 @@ WriteMakefile(
     },
     no_index => {directory => ['t']}
   },
-    test => { TESTS => 't/01-parse.t t/03-feed-find.t t/04-opml.t t/06-atom10.t' }
+    test => { TESTS => 't/01-parse.t t/03-feed-find.t t/04-opml.t t/06-atom10.t t/08-noapp.t t/09-enclosures.t' }
 );

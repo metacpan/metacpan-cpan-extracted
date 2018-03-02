@@ -59,6 +59,35 @@ group {
         } );
     };
 
+    get '/pots/listV1' => sub {
+        my ( $c ) = @_;
+
+        $c->render( json => {
+            pots => [
+                {
+                    id        => "pot_0000778xxfgh4iu8z83nWb",
+                    name      => "Peter Pan's Savings",
+                    style     => "piggy_bank",
+                    balance   => 133700,
+                    currency  => "GBP",
+                    created   => "2017-11-09T12:30:53.695Z",
+                    updated   => "2017-11-09T12:30:53.695Z",
+                    deleted   => Mojo::JSON::false
+                },
+                {
+                    id        => "pot_0000779h4iuxxnWfg8z83b",
+                    name      => "Tinker Bell's Break",
+                    style     => "beach_ball",
+                    balance   => 33700,
+                    currency  => "GBP",
+                    created   => "2017-11-09T12:30:53.695Z",
+                    updated   => "2017-11-09T12:30:53.695Z",
+                    deleted   => Mojo::JSON::false
+                },
+            ],
+        } );
+    };
+
     get '/balance' => sub {
         my ( $c ) = @_;
 

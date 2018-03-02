@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2017-08-31 21:00:45 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2018-02-28 18:41:03 UTC.
 
 on runtime => sub {
     requires 'Dist::Iller' => '0.1401';
@@ -73,6 +73,7 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::Test::Compile' => '2.057';
     requires 'Dist::Zilla::Plugin::Test::EOF' => '0.0501';
     requires 'Dist::Zilla::Plugin::Test::EOL' => '0.18';
+    requires 'Dist::Zilla::Plugin::Test::Kwalitee::Extra' => 'v0.2.1';
     requires 'Dist::Zilla::Plugin::Test::NoTabs' => '0.15';
     requires 'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.027';
     requires 'Dist::Zilla::Plugin::Test::Version' => '1.05';
@@ -104,5 +105,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1408';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0319';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0320';
 };

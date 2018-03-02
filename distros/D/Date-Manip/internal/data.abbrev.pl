@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -26,10 +26,9 @@
    'BDST'        => 'Europe/Gibraltar',
    'BDT'         => 'America/Adak',
    'BMT'         => 'America/Barbados',
-   'BOST'        => 'America/La_Paz',
    'BST'         => 'Europe/London',
    'C'           => 'C',
-   'CAST'        => 'Africa/Khartoum',
+   'CAST'        => 'Africa/Juba',
    'CAT'         => 'Africa/Maputo',
    'CDDT'        => 'America/Rankin_Inlet',
    'CDT'         => [ 'America/Chicago' => 'America/Winnipeg' ],
@@ -89,13 +88,13 @@
    'HDT'         => 'America/Adak',
    'HKST'        => 'Asia/Hong_Kong',
    'HKT'         => 'Asia/Hong_Kong',
-   'HMT'         => 'Asia/Kolkata',
+   'HMT'         => 'Asia/Dhaka',
    'HST'         => 'Pacific/Honolulu',
    'I'           => 'I',
    'IDDT'        => 'Asia/Jerusalem',
    'IDT'         => 'Asia/Jerusalem',
    'IMT'         => 'Asia/Irkutsk',
-   'IST'         => 'Europe/Dublin',
+   'IST'         => 'Asia/Kolkata',
    'JDT'         => 'Asia/Tokyo',
    'JMT'         => 'Asia/Jerusalem',
    'JST'         => 'Asia/Tokyo',

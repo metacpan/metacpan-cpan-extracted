@@ -8,9 +8,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::HexString: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   Alien::HIDAPI: '0'
@@ -35,22 +33,18 @@ no_index:
 provides:
   Device::HID:
     file: lib/Device/HID.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   Alien::HIDAPI: '0.004'
-  Carp: '0'
-  Device::HID::XS: '0'
   perl: '5.006'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/athreef/Device-HID/issues
   homepage: https://github.com/athreef/Device-HID
   repository: https://github.com/athreef/Device-HID.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -75,10 +69,6 @@ x_Dist_Zilla:
           phase: build
           type: requires
       name: BuildRequires
-      version: '6.010'
-    -
-      class: Dist::Zilla::Plugin::AutoPrereqs
-      name: TestRequires
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::MakeMaker::Awesome
@@ -228,7 +218,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -245,7 +235,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -258,11 +248,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.005
+          tag: v0.006
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -276,7 +266,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -292,7 +282,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
+          git_version: 2.16.1
           repo_root: .
       name: Git::NextVersion
       version: '2.042'
@@ -311,21 +301,6 @@ x_Dist_Zilla:
           version: '0.006'
       name: ReadmePodInRoot
       version: '0.163250'
-    -
-      class: Dist::Zilla::Plugin::Git::CommitBuild
-      config:
-        Dist::Zilla::Plugin::Git::CommitBuild:
-          branch: build/%b
-          build_root: ~
-          message: 'Build results of %h (on %b)'
-          multiple_inheritance: 0
-          release_branch: ~
-          release_message: 'Build results of %h (on %b)'
-        Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.1
-          repo_root: .
-      name: Git::CommitBuild
-      version: '2.042'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.280801'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - clownfish
 license: apache
@@ -24,114 +24,114 @@ no_index:
 provides:
   Clownfish::CFC:
     file: lib/Clownfish/CFC.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Base:
     file: lib/Clownfish/CFC/Base.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core:
     file: lib/Clownfish/CFC/Binding/Core.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core::Aliases:
     file: lib/Clownfish/CFC/Binding/Core/Aliases.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core::Class:
     file: lib/Clownfish/CFC/Binding/Core/Class.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core::File:
     file: lib/Clownfish/CFC/Binding/Core/File.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core::Function:
     file: lib/Clownfish/CFC/Binding/Core/Function.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Core::Method:
     file: lib/Clownfish/CFC/Binding/Core/Method.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl:
     file: lib/Clownfish/CFC/Binding/Perl.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::Class:
     file: lib/Clownfish/CFC/Binding/Perl/Class.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::Constructor:
     file: lib/Clownfish/CFC/Binding/Perl/Constructor.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::Method:
     file: lib/Clownfish/CFC/Binding/Perl/Method.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::Pod:
     file: lib/Clownfish/CFC/Binding/Perl/Pod.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::Subroutine:
     file: lib/Clownfish/CFC/Binding/Perl/Subroutine.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Binding::Perl::TypeMap:
     file: lib/Clownfish/CFC/Binding/Perl/TypeMap.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::CBlock:
     file: lib/Clownfish/CFC/Model/CBlock.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Class:
     file: lib/Clownfish/CFC/Model/Class.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::DocuComment:
     file: lib/Clownfish/CFC/Model/DocuComment.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::File:
     file: lib/Clownfish/CFC/Model/File.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::FileSpec:
     file: lib/Clownfish/CFC/Model/FileSpec.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Function:
     file: lib/Clownfish/CFC/Model/Function.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Hierarchy:
     file: lib/Clownfish/CFC/Model/Hierarchy.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Method:
     file: lib/Clownfish/CFC/Model/Method.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::ParamList:
     file: lib/Clownfish/CFC/Model/ParamList.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Parcel:
     file: lib/Clownfish/CFC/Model/Parcel.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Prereq:
     file: lib/Clownfish/CFC/Model/Prereq.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Symbol:
     file: lib/Clownfish/CFC/Model/Symbol.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Type:
     file: lib/Clownfish/CFC/Model/Type.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Variable:
     file: lib/Clownfish/CFC/Model/Variable.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Model::Version:
     file: lib/Clownfish/CFC/Model/Version.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Parser:
     file: lib/Clownfish/CFC/Parser.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Perl::Build:
     file: lib/Clownfish/CFC/Perl/Build.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Perl::Build::Charmonic:
     file: lib/Clownfish/CFC/Perl/Build/Charmonic.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Test:
     file: lib/Clownfish/CFC/Test.pm
-    version: '0.006002'
+    version: '0.006003'
   Clownfish::CFC::Util:
     file: lib/Clownfish/CFC/Util.pm
-    version: '0.006002'
+    version: '0.006003'
 requires:
   perl: v5.8.3
 resources:
   bugtracker: https://issues.apache.org/jira/browse/CLOWNFISH
   homepage: http://lucy.apache.org
   repository: https://git-wip-us.apache.org/repos/asf/lucy-clownfish.git
-version: v0.6.2
+version: v0.6.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

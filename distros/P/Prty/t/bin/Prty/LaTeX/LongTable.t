@@ -6,7 +6,8 @@ use base qw/Prty::Test::Class/;
 use strict;
 use warnings;
 
-use Prty::LaTeX::Generator;
+use Prty::LaTeX::Code;
+use Prty::Unindent;
 
 # -----------------------------------------------------------------------------
 
@@ -22,18 +23,19 @@ sub test_unitTest_0 : Test(2) {
     my $tab = Prty::LaTeX::LongTable->new;
     $self->is(ref($tab),'Prty::LaTeX::LongTable');
 
-    my $gen = Prty::LaTeX::Generator->new;
-    my $code = $tab->latex($gen);
+    my $l = Prty::LaTeX::Code->new;
+    my $code = $tab->latex($l);
     $self->is($code,'');
 }
 
 # -----------------------------------------------------------------------------
 
-sub test_unitTest_1 : Test(0) {
+sub test_unitTest_1 : Test(1) {
     my $self = shift;
 
     my $tab = Prty::LaTeX::LongTable->new(
         alignments => ['l','r','c'],
+        caption => 'Ein Test',
         titles => ['Links','Rechts','Zentriert'],
         rows => [
             ['A',1,'AB'],
@@ -43,9 +45,28 @@ sub test_unitTest_1 : Test(0) {
         ],            
     );
 
-    my $gen = Prty::LaTeX::Generator->new;
-    my $code = $tab->latex($gen);
-    # warn "-----\n".$code."-----\n";
+    my $l = Prty::LaTeX::Code->new;
+    my $code = $tab->latex($l);
+    $self->is($code,Prty::Unindent->string(q~
+        \begin{longtable}[c]{|lrc|}
+        \hline
+        Links & Rechts & Zentriert \\\\ \hline
+        \endfirsthead
+        \multicolumn{3}{r}{\emph{Fortsetzung}} \\\\
+        \hline
+        Links & Rechts & Zentriert \\\\ \hline
+        \endhead
+        \hline
+        \multicolumn{3}{r}{\emph{weiter}} \\\\
+        \endfoot
+        \caption{Ein Test}
+        \endlastfoot
+        A & 1 & AB \\\\ \hline
+        AB & 2 & CD \\\\ \hline
+        ABC & 3 & EF \\\\ \hline
+        ABCD & 4 & GH \\\\ \hline
+        \end{longtable}
+    ~));
 }
 
 # -----------------------------------------------------------------------------

@@ -6,38 +6,36 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '1.058';
+our $VERSION = '2.001';
 
-use Clone                  qw( clone );
-use List::MoreUtils        qw( any );
-use Term::Choose           qw();
+use Clone           qw( clone );
+use List::MoreUtils qw( any );
+
+use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( term_width );
+use Term::TablePrint       qw( print_table);
 
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::DB;
-
+use App::DBBrowser::Auxil;
 
 
 sub new {
     my ( $class, $info, $opt ) = @_;
-    bless { info => $info, opt => $opt }, $class;
+    bless { i => $info, o => $opt }, $class; # no opt
 }
 
 
-sub __union_tables {
-    my ( $self, $sql, $dbh, $data ) = @_;
-    my $db     = $sql->{print}{db};
-    my $schema = $sql->{print}{schema};
-    my $no_lyt = Term::Choose->new();
+sub union_tables {
+    my ( $sf, $dbh, $data ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
     my $u = $data;
-    if ( ! defined $u->{col_names} || ! defined $u->{col_types} ) {
-        my $obj_db = App::DBBrowser::DB->new( $self->{info}, $self->{opt} );
-        ( $u->{col_names}, $u->{col_types} ) = $obj_db->column_names_and_types( $dbh, $db, $schema, $u->{tables} ); # ###
-    }
+    my $tbls = [ sort keys %{$u->{tables}} ];
+    ( $u->{col_names}, $u->{col_types} ) = $sf->__column_names_and_types( $dbh, $data, $tbls );
     my $union = {
-        unused_tables => [ map { "- $_" } @{$u->{tables}} ],
+        unused_tables => [ map { "- $_" } @$tbls ],
         used_tables   => [],
         used_cols     => {},
         saved_cols    => [],
@@ -48,30 +46,21 @@ sub __union_tables {
         my $all_tables    = '  All Tables';
         my $info          = '  INFO';
         my @pre_tbl  = ( undef, $enough_tables );
-        my @post_tbl = ( $all_tables, $info );
-        my $prompt   = $self->{union_all} ? 'One UNION table for cols:' : 'Choose UNION table:';
+        my @post_tbl = ( $all_tables ); #, $info
+        my $prompt   = $sf->{union_all} ? 'One UNION table for cols:' : 'Choose UNION table:';
         my $choices  = [ @pre_tbl, map( "+ $_", @{$union->{used_tables}} ), @{$union->{unused_tables}}, @post_tbl ];
-        $self->__print_union_statement( $union );
+        $sf->__print_union_statement( $union );
         # Choose
-        my $idx_tbl = $no_lyt->choose(
+        my $idx_tbl = choose(
             $choices,
-            { %{$self->{info}{lyt_stmt_v}}, prompt => $prompt, index => 1 }
+            { %{$sf->{i}{lyt_stmt_v}}, prompt => $prompt, index => 1 }
         );
         if ( ! defined $idx_tbl || ! defined $choices->[$idx_tbl] ) {
             return;
         }
         my $union_table = $choices->[$idx_tbl];
         if ( $union_table eq $info ) {
-            if ( ! defined $u->{tables_info} ) {
-                $u->{tables_info} = $self->__get_tables_info( $dbh, $db, $schema, $u, 'union' );
-            }
-            my $tbl_info = $self->__print_tables_info( $u );
-            # Choose
-            $no_lyt->choose(
-                $tbl_info,
-                { %{$self->{info}{lyt_3}}, prompt => '' }
-            );
-            next UNION_TABLE;
+            #next UNION_TABLE;
         }
         elsif ( $union_table eq $enough_tables ) {
             return if ! @{$union->{used_tables}};
@@ -79,12 +68,12 @@ sub __union_tables {
         }
         elsif ( $union_table eq $all_tables ) {
             $union = {
-                unused_tables => [ map { "- $_" } @{$u->{tables}} ],
+                unused_tables => [ map { "- $_" } @$tbls ],
                 used_tables   => [],
                 used_cols     => {},
                 saved_cols    => [],
             };
-            $self->{union_all} = 1;
+            $sf->{union_all} = 1;
             next UNION_TABLE;
         }
         my $backup_union = clone( $union );
@@ -93,25 +82,24 @@ sub __union_tables {
         if ( $check_idx < 0 ) {
             my $idx_used_table = $idx_tbl - @pre_tbl;
             delete $union->{used_cols}{$union_table};
-            $self->{idx_reset_used_tables} = $idx_used_table;
+            $sf->{idx_reset_used_tables} = $idx_used_table;
         }
         else {
             my $idx_unused_table = $check_idx;
             splice( @{$union->{unused_tables}}, $idx_unused_table, 1 );
             push @{$union->{used_tables}}, $union_table;
-            $self->{idx_reset_used_tables} = -1;
+            $sf->{idx_reset_used_tables} = -1;
         }
 
         UNION_COLUMN: while ( 1 ) {
             my ( $all_cols, $privious_cols, $void ) = ( q['*'], q['^'], q[' '] );
             my @short_cuts = ( ( @{$union->{saved_cols}} ? $privious_cols : $void ), $all_cols );
-            my @pre_col = ( $self->{info}{ok}, @short_cuts );
-            my $choices = [ @pre_col, @{$u->{col_names}{$union_table}} ];
-            $self->__print_union_statement( $union );
+            my @pre_col = ( undef, $sf->{i}{ok}, @short_cuts );
+            $sf->__print_union_statement( $union );
             # Choose
-            my @col = $no_lyt->choose(
-                $choices,
-                { %{$self->{info}{lyt_stmt_h}}, prompt => 'Choose Column:', no_spacebar => [ 0 .. $#pre_col ] }
+            my @col = choose(
+                [ @pre_col, @{$u->{col_names}{$union_table}} ],
+                { %{$sf->{i}{lyt_stmt_h}}, prompt => 'Choose Column:', no_spacebar => [ 0 .. $#pre_col ] }
             );
             if ( ! defined $col[0] ) {
                 if ( defined $union->{used_cols}{$union_table} ) {
@@ -119,7 +107,7 @@ sub __union_tables {
                     next UNION_COLUMN;
                 }
                 else {
-                    delete $self->{union_all} if $self->{union_all};
+                    delete $sf->{union_all} if $sf->{union_all};
                     $union = clone( $backup_union );
                     last UNION_COLUMN;
                 }
@@ -136,14 +124,14 @@ sub __union_tables {
                 $union->{saved_cols} = $union->{used_cols}{$union_table};
                 last UNION_COLUMN;
             }
-            elsif ( $col[0] eq $self->{info}{ok} ) {
+            elsif ( $col[0] eq $sf->{i}{ok} ) {
                 shift @col;
                 push @{$union->{used_cols}{$union_table}}, @col;
                 if ( ! @{$union->{used_cols}{$union_table}} ) {
-                    my $table = splice( @{$union->{used_tables}}, $self->{idx_reset_used_tables}, 1 );
+                    my $table = splice( @{$union->{used_tables}}, $sf->{idx_reset_used_tables}, 1 );
                     push @{$union->{unused_tables}}, "- $table";
-                    delete $self->{idx_reset_used_tables};
-                    delete $self->{union_all} if $self->{union_all};
+                    delete $sf->{idx_reset_used_tables};
+                    delete $sf->{union_all} if $sf->{union_all};
                     next UNION_TABLE;
                 }
                 $union->{saved_cols} = $union->{used_cols}{$union_table};
@@ -153,11 +141,11 @@ sub __union_tables {
                 push @{$union->{used_cols}{$union_table}}, @col;
             }
         }
-        if ( $self->{union_all} ) {
+        if ( $sf->{union_all} ) {
             my @selected_cols = @{$union->{used_cols}{$union_table}};
             $union = {
                 unused_tables => [],
-                used_tables   => [ @{$u->{tables}} ],
+                used_tables   => [ @$tbls ],
                 used_cols     => {},
                 saved_cols    => [],
             };
@@ -168,36 +156,33 @@ sub __union_tables {
         }
     }
 
-
     # column names in the result-set of a UNION are taken from the first query.
     my $first_table = $union->{used_tables}[0];
-    $sql->{print}{columns} = $union->{used_cols}{$first_table};
-    for my $col ( @{$sql->{print}{columns}} ) {
-        $sql->{quote}{columns}{$col} = $dbh->quote_identifier( $col );
-    }
     my $c;
-    $sql->{quote}{table} = "(";
+    my $qt_table = "(";
+    my $qt_columns = $ax->quote_simple_many( $dbh, $union->{used_cols}{$first_table} );
     for my $table ( @{$union->{used_tables}} ) {
         $c++;
-        $sql->{quote}{table} .= " SELECT ";
-        $sql->{quote}{table} .= join( ', ', map { $dbh->quote_identifier( $_ ) } @{$union->{used_cols}{$table}} );
-        $sql->{quote}{table} .= " FROM " . $dbh->quote_identifier( undef, $schema, $table );
-        $sql->{quote}{table} .= $c < @{$union->{used_tables}} ? " UNION ALL " : " )";
+        $qt_table .= " SELECT ";
+        my $qt_cols = $ax->quote_simple_many( $dbh, $union->{used_cols}{$table} );
+        $qt_table .= join( ', ', @$qt_cols );
+        $qt_table .= " FROM " . $ax->quote_table( $dbh, $u->{tables}{$table} );
+        $qt_table .= $c < @{$union->{used_tables}} ? " UNION ALL " : " )";
     }
-    if ( $self->{union_all} ) {  # alias: required if mysql, Pg, ...
-        $sql->{quote}{table} .= " AS UNION_ALL_TABLES";
+    if ( $sf->{union_all} ) {  # alias: required if mysql, Pg, ...
+        $qt_table .= " AS UNION_ALL_TABLES";
     }
     else {
-        $sql->{quote}{table} .= " AS UNION_SELECTED_TABLES";
+        $qt_table .= " AS UNION_SELECTED_TABLES";
     }
-    return 1;
+    return $qt_table, $qt_columns;
 }
 
 
 sub __print_union_statement {
-    my ( $self, $union ) = @_;
+    my ( $sf, $union ) = @_;
     my $str;
-    if ( $self->{union_all} ) {
+    if ( $sf->{union_all} ) {
         $str = 'UNION ALL TABLES';
         if ( @{$union->{used_tables}} ) {
             $str .= "\n" . 'Cols: ';
@@ -230,85 +215,45 @@ sub __print_union_statement {
         }
     }
     $str .= "\n";
-    print $self->{info}{clear_screen};
-    print line_fold( $str, term_width() - 2, '', ' ' x $self->{info}{stmt_init_tab} );
+    print $sf->{i}{clear_screen};
+    print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
 }
 
 
-sub __get_tables_info {
-    my ( $self, $dbh, $db, $schema, $u_or_j, $type ) = @_;
-    my $tables_info = {};
-    my $obj_db = App::DBBrowser::DB->new( $self->{info}, $self->{opt} );
-    my ( $pk, $fk ) = $obj_db->primary_and_foreign_keys( $dbh, $db, $schema, $u_or_j->{tables} ); # ###
-    for my $table ( @{$u_or_j->{tables}} ) {
-        push @{$tables_info->{$table}}, 'Table => ' . $table;
-        if ( defined $u_or_j->{col_types}{$table} ) {
-            push @{$tables_info->{$table}}, join( ' | ', map {
-                            lc( $u_or_j->{col_types}{$table}[$_] )
-                        . ' ' . $u_or_j->{col_names}{$table}[$_]   } 0 .. $#{$u_or_j->{col_names}{$table}} );
-        }
-        else {
-            push @{$tables_info->{$table}}, join ' | ',  @{$u_or_j->{col_names}{$table}};
-        }
-        if ( $type eq 'join' ) {
-            if ( defined $pk && @{$pk->{$table}} ) {
-                push @{$tables_info->{$table}}, 'PK: primary key (' . join( ',', @{$pk->{$table}} ) . ')';
-            }
-            if ( defined $fk ) {
-                for my $fk_name ( sort keys %{$fk->{$table}} ) {
-                    if ( $fk->{$table}{$fk_name} ) {
-                        push @{$tables_info->{$table}}, 'FK: '
-                            . 'foreign key (' . join( ',', @{$fk->{$table}{$fk_name}{foreign_key_col}} )
-                            . ') references ' . $fk->{$table}{$fk_name}{reference_table}
-                            . '(' . join( ',', @{$fk->{$table}{$fk_name}{reference_key_col}} )
-                            . ')';
-                    }
-                }
-            }
-        }
+
+sub __column_names_and_types {
+    my ( $sf, $dbh, $data, $tables ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
+    my ( $col_names, $col_types );
+    for my $table ( @$tables ) {
+        my $sth = $dbh->prepare( "SELECT * FROM " . $ax->quote_table( $dbh, $data->{tables}{$table} ) . " LIMIT 0" );
+        $sth->execute() if $sf->{i}{driver} ne 'SQLite';
+        $col_names->{$table} ||= $sth->{NAME};
+        $col_types->{$table} ||= $sth->{TYPE};
     }
-    return $tables_info;
+    return $col_names, $col_types;
 }
 
 
-sub __print_tables_info {
-    my ( $self, $ref ) = @_;
-    my $col_max = term_width() - 1;
-    my $ch_info = [ 'Close with ENTER' ];
-    for my $table ( @{$ref->{tables}} ) {
-        push @{$ch_info}, " ";
-        for my $line ( @{$ref->{tables_info}{$table}} ) {
-            my $text = line_fold( $line, $col_max, '', '' );
-            push @{$ch_info}, split /\R+/, $text;
-        }
-    }
-    return $ch_info;
-}
-
-
-sub __join_tables {
-    my ( $self, $sql, $dbh, $data ) = @_;
-    my $db     = $sql->{print}{db};
-    my $schema = $sql->{print}{schema};
-    my $stmt_v = Term::Choose->new( $self->{info}{lyt_stmt_v} );
+sub join_tables {
+    my ( $sf, $dbh, $data ) = @_;
+    my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o} );
     my $j = $data;
-    if ( ! defined $j->{col_names} || ! defined $j->{col_types} ) {
-        my $obj_db = App::DBBrowser::DB->new( $self->{info}, $self->{opt} );
-        ( $j->{col_names}, $j->{col_types} ) = $obj_db->column_names_and_types( $dbh, $db, $schema, $j->{tables} ); # ###
-    }
+    my $tbls = [ sort keys %{$j->{tables}} ]; # name
+    ( $j->{col_names}, $j->{col_types} ) = $sf->__column_names_and_types( $dbh, $data, $tbls );
     my $join = {};
 
     MASTER: while ( 1 ) {
         $join = {};
-        $join->{quote}{stmt} = "SELECT * FROM";
-        $join->{print}{stmt} = "SELECT * FROM";
+        $join->{stmt} = "SELECT * FROM";
         $join->{primary_keys} = [];
         $join->{foreign_keys} = [];
-        my @tables = map { "- $_" } @{$j->{tables}};
-        my $info = '  INFO';
+        my @tables = map { "- $_" } @$tbls;
+        my $info   = '  INFO';
         my @pre = ( undef );
         my $choices = [ @pre, @tables, $info ];
-        $self->__print_join_statement( $join->{print}{stmt} );
+        $sf->__print_join_statement( $join->{stmt} );
         # Choose
         my $idx = $stmt_v->choose(
             $choices,
@@ -318,24 +263,16 @@ sub __join_tables {
             return;
         }
         if ( $choices->[$idx] eq $info ) {
-            if ( ! defined $j->{tables_info} ) {
-                $j->{tables_info} = $self->__get_tables_info( $dbh, $db, $schema, $j, 'join' );
-            }
-            my $tbl_info = $self->__print_tables_info( $j );
-            # Choose
-            $stmt_v->choose(
-                $tbl_info,
-                { %{$self->{info}{lyt_3}}, prompt => '' }
-            );
+            $sf->__get_join_info( $dbh, $data );
+            $sf->__print_join_info( $data );
             next MASTER;
         }
         $idx -= @pre;
         ( my $master = splice( @tables, $idx, 1 ) ) =~ s/^-\s//;
         $join->{used_tables}  = [ $master ];
         $join->{avail_tables} = [ @tables ];
-        $join->{table_alias} = 'a';
-        $join->{quote}{stmt}  = "SELECT * FROM " . $dbh->quote_identifier( undef, $schema, $master ) . " AS " . $join->{table_alias};
-        $join->{print}{stmt}  = "SELECT * FROM " .                 $master . " AS " . $join->{table_alias};
+        $join->{table_alias} = $sf->{i}{driver} eq 'Pg' ? 'a' : 'A';
+        $join->{stmt}  = "SELECT * FROM " . $ax->quote_table( $dbh, $j->{tables}{$master} ) . " AS " . $join->{table_alias}; ###
         $join->{alias}{$master} = $join->{table_alias};
         my $backup_master = clone( $join );
 
@@ -347,11 +284,11 @@ sub __join_tables {
 
             SLAVE: while ( 1 ) {
                 my $choices = [ @pre, @{$join->{avail_tables}}, $info ];
-                $self->__print_join_statement( $join->{print}{stmt} );
+                $sf->__print_join_statement( $join->{stmt} );
                 # Choose
                 $idx = $stmt_v->choose(
                     $choices,
-                    { prompt => 'Add a SLAVE table:', index => 1, undef => $self->{info}{_reset} }
+                    { prompt => 'Add a SLAVE table:', index => 1, undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $idx || ! defined $choices->[$idx] ) {
                     if ( @{$join->{used_tables}} == 1 ) {
@@ -366,15 +303,8 @@ sub __join_tables {
                     last JOIN;
                 }
                 elsif ( $choices->[$idx] eq $info ) {
-                    if ( ! defined $j->{tables_info} ) {
-                        $j->{tables_info} = $self->__get_tables_info( $dbh, $db, $schema, $j, 'join' );
-                    }
-                    my $tbl_info = $self->__print_tables_info( $j );
-                    # Choose
-                    $stmt_v->choose(
-                        $tbl_info,
-                        { %{$self->{info}{lyt_3}}, prompt => '' }
-                    );
+                    $sf->__get_join_info( $dbh, $data );
+                    $sf->__print_join_info( $data );
                     next SLAVE;
                 }
                 else {
@@ -384,35 +314,35 @@ sub __join_tables {
             $idx -= @pre;
             ( my $slave = splice( @{$join->{avail_tables}}, $idx, 1 ) ) =~ s/^-\s//;
             $join->{table_alias}++;
-            $join->{quote}{stmt} .= " LEFT OUTER JOIN " . $dbh->quote_identifier( undef, $schema, $slave ) . " AS " . $join->{table_alias} . " ON";
-            $join->{print}{stmt} .= " LEFT OUTER JOIN " .                                         $slave .   " AS " . $join->{table_alias} . " ON";
+            $join->{stmt} .= " LEFT OUTER JOIN " . $ax->quote_table( $dbh, $j->{tables}{$slave} ) . " AS " . $join->{table_alias} . " ON";
             $join->{alias}{$slave} = $join->{table_alias};
             my %avail_pk_cols;
             for my $used_table ( @{$join->{used_tables}} ) {
                 for my $col ( @{$j->{col_names}{$used_table}} ) {
-                    $avail_pk_cols{ $join->{alias}{$used_table} . '.' . $col } = $dbh->quote_identifier( undef, $join->{alias}{$used_table}, $col );
+                    $avail_pk_cols{ $join->{alias}{$used_table} . '.' . $col } = $ax->quote_col_qualified( $dbh, [undef, $join->{alias}{$used_table}, $col ] ); #
                 }
             }
             my %avail_fk_cols;
             for my $col ( @{$j->{col_names}{$slave}} ) {
-                $avail_fk_cols{ $join->{alias}{$slave} . '.' . $col } = $dbh->quote_identifier( undef, $join->{alias}{$slave}, $col );
+                $avail_fk_cols{ $join->{alias}{$slave} . '.' . $col } = $ax->quote_col_qualified( $dbh, [ undef, $join->{alias}{$slave}, $col ] );
             }
+
             my $AND = '';
 
             ON: while ( 1 ) {
                 my @pre = ( undef );
-                $self->__print_join_statement( $join->{print}{stmt} );
-                push @pre, $self->{info}{_continue} if $AND;
+                $sf->__print_join_statement( $join->{stmt} );
+                push @pre, $sf->{i}{_continue} if $AND;
                 # Choose
                 my $pk_col = $stmt_v->choose(
                     [ @pre, map( "- $_", sort keys %avail_pk_cols ) ],
-                    { prompt => 'Choose PRIMARY KEY column:', undef => $self->{info}{_reset} }
+                    { prompt => 'Choose PRIMARY KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $pk_col ) {
                     $join = clone( $backup_join );
                     next JOIN;
                 }
-                if ( $pk_col eq $self->{info}{_continue} ) {
+                if ( $pk_col eq $sf->{i}{_continue} ) {
                     if ( @{$join->{primary_keys}} == @{$backup_join->{primary_keys}} ) {
                         $join = clone( $backup_join );
                         next JOIN;
@@ -421,15 +351,13 @@ sub __join_tables {
                 }
                 $pk_col =~ s/^-\s//;
                 push @{$join->{primary_keys}}, $avail_pk_cols{$pk_col};
-                $join->{quote}{stmt} .= $AND;
-                $join->{print}{stmt} .= $AND;
-                $join->{quote}{stmt} .= ' ' . $avail_pk_cols{$pk_col} . " =";
-                $join->{print}{stmt} .= ' ' .                $pk_col  . " =";
-                $self->__print_join_statement( $join->{print}{stmt} );
+                $join->{stmt} .= $AND;
+                $join->{stmt} .= ' ' . $avail_pk_cols{$pk_col} . " =";
+                $sf->__print_join_statement( $join->{stmt} );
                 # Choose
                 my $fk_col = $stmt_v->choose(
                     [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
-                    { prompt => 'Choose FOREIGN KEY column:', undef => $self->{info}{_reset} }
+                    { prompt => 'Choose FOREIGN KEY column:', undef => $sf->{i}{_reset} }
                 );
                 if ( ! defined $fk_col ) {
                     $join = clone( $backup_join );
@@ -437,8 +365,7 @@ sub __join_tables {
                 }
                 $fk_col =~ s/^-\s//;
                 push @{$join->{foreign_keys}}, $avail_fk_cols{$fk_col};
-                $join->{quote}{stmt} .= ' ' . $avail_fk_cols{$fk_col};
-                $join->{print}{stmt} .= ' ' .                $fk_col;
+                $join->{stmt} .= ' ' . $avail_fk_cols{$fk_col};
                 $AND = " AND";
             }
             push @{$join->{used_tables}}, $slave;
@@ -446,37 +373,86 @@ sub __join_tables {
         last MASTER;
     }
 
+    my $qt_columns = [];
     for my $table ( @{$join->{used_tables}} ) {
         for my $col ( @{$j->{col_names}{$table}} ) {
-            my $col_qt = $dbh->quote_identifier( undef, $join->{alias}{$table}, $col );
-            if ( any { $_ eq $col_qt } @{$join->{foreign_keys}} ) {
+            my $col_qt = $ax->quote_col_qualified( $dbh, [ undef, $join->{alias}{$table}, $col ] );
+            if ( any { $_ eq $col_qt } @{$join->{foreign_keys}} ) { ##
                 next;
             }
-            my $col_pr = $join->{alias}{$table} . '.' . $col;
-            #if ( any { $_ eq $col_pr } @not_unique_col ) {
-                $col_qt .= " AS " . $dbh->quote_identifier( $col . '-' . $table );
-            #}
-            push @{$sql->{print}{columns}}, $col_pr;
-            $sql->{quote}{columns}{$col_pr} = $col_qt;
+            push @$qt_columns, $col_qt;
         }
     }
-    my ( $qt_table ) = $join->{quote}{stmt} =~ /^SELECT\s\*\sFROM\s(.*)\z/;
-    $sql->{quote}{table} = $qt_table;
-    return 1;
+    my ( $qt_table ) = $join->{stmt} =~ /^SELECT\s\*\sFROM\s(.*)\z/;
+    return $qt_table, $qt_columns;
 }
 
 
 sub __print_join_statement {
-    my ( $self, $join_stmt_pr ) = @_;
-    $join_stmt_pr =~ s/(?=\sLEFT\sOUTER\sJOIN)/\n\ /g;
+    my ( $sf, $join_stmt_pr ) = @_;
+    $join_stmt_pr =~ s/(?=\sLEFT\sOUTER\sJOIN)/\n\ /g; ##
     $join_stmt_pr .= "\n\n";
-    print $self->{info}{clear_screen};
-    print line_fold( $join_stmt_pr, term_width() - 2, '', ' ' x $self->{info}{stmt_init_tab} );
+    print $sf->{i}{clear_screen};
+    print line_fold( $join_stmt_pr, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
 }
 
 
+sub __print_join_info {
+    my ( $sf, $data ) = @_;
+    my $pk = $data->{pk_info};
+    my $fk = $data->{fk_info};
+    my $aref = [ [ qw(PK_TABLE PK_COLUMN), ' ', qw(FK_TABLE FK_COLUMN) ] ];
+    my $r = 1;
+    for my $t ( sort keys %$pk ) {
+        $aref->[$r][0] = $pk->{$t}{TABLE_NAME};
+        $aref->[$r][1] = join( ', ', @{$pk->{$t}{COLUMN_NAME}} );
+        if ( defined $fk->{$t}->{FKCOLUMN_NAME} && @{$fk->{$t}{FKCOLUMN_NAME}} ) {
+            $aref->[$r][2] = 'ON';
+            $aref->[$r][3] = $fk->{$t}{FKTABLE_NAME};
+            $aref->[$r][4] = join( ', ', @{$fk->{$t}{FKCOLUMN_NAME}} );
+        }
+        else {
+            $aref->[$r][2] = '';
+            $aref->[$r][3] = '';
+            $aref->[$r][4] = '';
+        }
+        $r++;
+    }
+    print_table( $aref, { keep_header => 0, tab_width => 3 } );
+}
 
-
+sub __get_join_info {
+    my ( $sf, $dbh, $data ) = @_;
+    return if $data->{pk_info};
+    my $td = $data->{tables};
+    my $tables = $data->{user_tbls}; ###
+    my $pk = {};
+    for my $table ( @$tables ) {
+        my $sth = $dbh->primary_key_info( @{$td->{$table}} );
+        next if ! defined $sth;
+        while ( my $ref = $sth->fetchrow_hashref() ) {
+            next if ! defined $ref;
+            #$pk->{$table}{TABLE_SCHEM} =        $ref->{TABLE_SCHEM};
+            $pk->{$table}{TABLE_NAME}  =        $ref->{TABLE_NAME};
+            push @{$pk->{$table}{COLUMN_NAME}}, $ref->{COLUMN_NAME};
+            #push @{$pk->{$table}{KEY_SEQ}},     defined $ref->{KEY_SEQ} ? $ref->{KEY_SEQ} : $ref->{ORDINAL_POSITION};
+        }
+    }
+    my $fk = {};
+    for my $table ( @$tables ) {
+        my $sth = $dbh->foreign_key_info( @{$td->{$table}}, undef, undef, undef );
+        next if ! defined $sth;
+        while ( my $ref = $sth->fetchrow_hashref() ) {
+            next if ! defined $ref;
+            #$fk->{$table}{FKTABLE_SCHEM} =        defined $ref->{FKTABLE_SCHEM} ? $ref->{FKTABLE_SCHEM} : $ref->{FK_TABLE_SCHEM};
+            $fk->{$table}{FKTABLE_NAME}  =        defined $ref->{FKTABLE_NAME}  ? $ref->{FKTABLE_NAME}  : $ref->{FK_TABLE_NAME};
+            push @{$fk->{$table}{FKCOLUMN_NAME}}, defined $ref->{FKCOLUMN_NAME} ? $ref->{FKCOLUMN_NAME} : $ref->{FK_COLUMN_NAME};
+            #push @{$fk->{$table}{KEY_SEQ}},       defined $ref->{KEY_SEQ}       ? $ref->{KEY_SEQ}       : $ref->{ORDINAL_POSITION};
+        }
+    }
+    $data->{pk_info} = $pk;
+    $data->{fk_info} = $fk;
+}
 
 1;
 

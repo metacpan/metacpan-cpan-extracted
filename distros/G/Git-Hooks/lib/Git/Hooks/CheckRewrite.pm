@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '2.5.0';
+$Git::Hooks::CheckRewrite::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -163,10 +163,12 @@ EOS
     return 1;
 }
 
-# Install hooks
-PRE_COMMIT  \&record_commit_parents;
-POST_COMMIT \&check_commit_amend;
-PRE_REBASE  \&check_rebase;
+INIT: {
+    # Install hooks
+    PRE_COMMIT  \&record_commit_parents;
+    POST_COMMIT \&check_commit_amend;
+    PRE_REBASE  \&check_rebase;
+}
 
 1;
 
@@ -182,7 +184,7 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,10 @@
+0.48	- 2018-02-26, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Some doc cleanup
+    * It's 2018
+    * DDump now defaults to $_
+    * DP shortcut uses strict
+    * Remove META.yml from MANIFEST.skip
+
 0.47	- 2017-07-24, H.Merijn Brand   <h.m.brand@xs4all.nl>
     * It's 2017
     * Update ppport.h to Devel::PPPort-3.36

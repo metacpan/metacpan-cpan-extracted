@@ -1,6 +1,8 @@
 Lingua::EN::Titlecase::Simple
 
-
+This module capitalizes English text suitably for use as a headline,
+based on traditional editorial rules from *The New York Times Manual of
+Style*.
 
 INSTALLATION
 
@@ -21,7 +23,7 @@ Should you wish to install this module manually, the procedure is
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by John Gruber, Aristotle Pagaltzis.
+This software is Copyright (c) 2018 by John Gruber, Aristotle Pagaltzis.
 
 This is free software, licensed under:
 

@@ -2,7 +2,7 @@ package Test2::Harness::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use Carp qw/confess/;
 use Time::HiRes qw/time/;
@@ -71,6 +71,7 @@ sub TO_JSON {
     my $out = {%{$_[0]}};
     $out->{+FACET_DATA} = { %{$out->{+FACET_DATA}} };
     delete $out->{+FACET_DATA}->{harness_job_watcher};
+    delete $out->{+FACET_DATA}->{harness}->{closed_by};
     return $out;
 }
 

@@ -128,6 +128,7 @@ WriteMakefile(
 	'Fcntl'               => 0,
 	'IPC::Run'            => 0,
         'MIME::Base64'        => 0,
+	'Time::HiRes'         => 0,
         'Exporter'            => 0,
         'overload'            => 0,
         'base'                => 0,

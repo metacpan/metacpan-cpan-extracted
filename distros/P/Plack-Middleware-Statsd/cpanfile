@@ -14,6 +14,7 @@ on 'test' => sub {
   requires "HTTP::Request::Common" => "0";
   requires "Module::Metadata" => "0";
   requires "Plack::Builder" => "0";
+  requires "Plack::MIME" => "0";
   requires "Plack::Middleware::ContentLength" => "0";
   requires "Plack::Middleware::Head" => "0";
   requires "Plack::Test" => "0";

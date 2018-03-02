@@ -1,14 +1,18 @@
-#!/usr/bin/perl
-
-use Test::More 'no_plan';
+use Test::More;
 
 my $class  = 'Distribution::Cooker';
 my $module = 'Foo::Bar';
 
-use_ok( $class );
-can_ok( $class, 'init' );
+subtest setup => sub {
+	use_ok( $class );
+	can_ok( $class, 'init' );
+	};
 
-my $cooker = $class->new;
-isa_ok( $cooker, $class );
+subtest do_it => sub {
+	my $cooker = $class->new;
+	isa_ok( $cooker, $class );
 
-ok( $cooker->init, "init returns true" );
+	ok( $cooker->init, "init returns true" );
+	};
+
+done_testing();

@@ -10,16 +10,16 @@ $hash{stuff} = 'something else';
 
 my $x = 'f';
 
-ok($hash{key} eq 'value');
-ok($hash{'^s'} eq 'something else');
-ok($hash{qr'^s'} eq 'something else');
+is($hash{key}, 'value');
+is($hash{'^s'}, 'something else');
+is($hash{qr'^s'}, 'something else');
 ok(not defined $hash{blah});
-ok($hash{$x} eq 'something else');
+is($hash{$x}, 'something else');
 
 my @vals = tied(%hash)->FETCH('k');
-ok(@vals == 2);
+is(@vals, 2);
 delete $hash{stuff};
-ok(keys %hash == 2);
+is(keys %hash, 2);
 
 ok(exists $hash{key});
 ok(exists $hash{k});
@@ -28,7 +28,7 @@ ok(not exists $hash{zz});
 
 delete $hash{2};
 my @k = keys %hash;
-ok(@k == 1);
+is(@k, 1);
 delete $hash{qr/^k/};
 ok(not keys %hash);
 

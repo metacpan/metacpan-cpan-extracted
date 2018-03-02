@@ -5,7 +5,7 @@ use warnings;
 use Carp();
 use overload '""' => 'string';
 
-our $VERSION = '0.44';
+our $VERSION = '0.47';
 
 sub throw {
     my ( $class, $string ) = @_;
@@ -35,11 +35,11 @@ __END__
 
 =head1 NAME
 
-Firefox::Marionette::Exception - Represents an base exception class for exceptions thrown by Firefox::Marionette
+Firefox::Marionette::Exception - Represents an base exception class for exceptions for Firefox::Marionette
 
 =head1 VERSION
 
-Version 0.44
+Version 0.47
 
 =head1 SYNOPSIS
 

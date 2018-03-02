@@ -8632,7 +8632,7 @@ typedef struct SourceFileContext {
     chaz_MakeBinary *test_binary;
 } SourceFileContext;
 
-static const char cfc_version[]       = "0.6.2";
+static const char cfc_version[]       = "0.6.3";
 static const char cfc_major_version[] = "0.6";
 
 static void

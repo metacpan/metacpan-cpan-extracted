@@ -2,6 +2,16 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/briandfoy/module-release"><img src="https://travis-ci.org/briandfoy/module-release.svg?branch=master" /></a>
+
+=for HTML <a href='https://ci.appveyor.com/project/briandfoy/module-release'><img src='https://ci.appveyor.com/api/projects/status/os5nbby7leklvpas'></a>
+
+=for HTML <a href='https://coveralls.io/github/briandfoy/module-release?branch=master'><img src='https://coveralls.io/repos/github/briandfoy/module-release/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/briandfoy/module-release/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Module-Release.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Module::Release"><img src="https://img.shields.io/cpan/v/Module-Release.svg" /></A>
+
 =head1 The Module::Release module
 
 This is the I<README> for the L<Module::Release> Perl module. I created

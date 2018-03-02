@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '2.5.0';
+$Git::Hooks::CheckLog::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -24,7 +24,7 @@ sub _setup_config {
     $config->{lc $CFG} //= {};
 
     my $default = $config->{lc $CFG};
-    $default->{'title-required'}  //= [1];
+    $default->{'title-required'}  //= ['true'];
     $default->{'title-max-width'} //= [50];
     $default->{'title-period'}    //= ['deny'];
     $default->{'body-max-width'}  //= [72];
@@ -256,14 +256,31 @@ sub footer_errors {
 
     my $errors = 0;
 
-    if ($git->get_config_boolean($CFG => 'signed-off-by')) {
-        scalar($cmsg->get_footer_values('signed-off-by')) > 0
-            or $git->fault(<<"EOS")
+    my @signed_off_by = $cmsg->get_footer_values('signed-off-by');
+
+    if (@signed_off_by) {
+        # Check for duplicate Signed-off-by footers
+        my (%signed_off_by, @duplicates);
+        foreach my $person (@signed_off_by) {
+            $signed_off_by{$person} += 1;
+            if ($signed_off_by{$person} == 2) {
+                push @duplicates, $person;
+            }
+        }
+        if (@duplicates) {
+            $git->fault(<<EOS, {details => join("\n", sort @duplicates)});
+The commit $id have duplicate Signed-off-by footers.
+Please, amend it to remove the duplicates:
+EOS
+            ++$errors;
+        }
+    } elsif ($git->get_config_boolean($CFG => 'signed-off-by')) {
+        $git->fault(<<"EOS");
 The commit $id must have a Signed-off-by footer.
 This is required by the $CFG.signed-off-by option in your configuration.
 Please, amend your commit to add it.
 EOS
-                and ++$errors;
+        ++$errors;
     }
 
     return $errors;
@@ -376,13 +393,16 @@ sub check_patchset {
     return message_errors($git, $commit, $commit->message) == 0;
 }
 
-# Install hooks
-COMMIT_MSG       \&check_message_file;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+INIT: {
+    # Install hooks
+    APPLYPATCH_MSG   \&check_message_file;
+    COMMIT_MSG       \&check_message_file;
+    UPDATE           \&check_affected_refs;
+    PRE_RECEIVE      \&check_affected_refs;
+    REF_UPDATE       \&check_affected_refs;
+    PATCHSET_CREATED \&check_patchset;
+    DRAFT_PUBLISHED  \&check_patchset;
+}
 
 1;
 
@@ -398,7 +418,7 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -446,7 +466,7 @@ policies on the commit log messages.
 
 =over
 
-=item * B<commit-msg>
+=item * B<commit-msg>, B<applypatch-msg>
 
 This hook is invoked during the commit, to check if the commit log
 message complies.
@@ -605,6 +625,9 @@ language passing its ISO code to this option.
 
 This option requires the commit to have at least one C<Signed-off-by>
 footer.
+
+Despite of the value of this option, the plugin checks and complains if there
+are duplicate C<Signed-off-by> footers in the commit.
 
 =head2 githooks.checklog.deny-merge-revert BOOL
 

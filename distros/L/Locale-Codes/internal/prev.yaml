@@ -9403,7 +9403,7 @@ currency:
       PAB: Balboa
       PEN: Sol
       PGK: Kina
-      PHP: Philippine Peso
+      PHP: Philippine Piso
       PKR: Pakistan Rupee
       PLN: Zloty
       PYG: Guarani
@@ -9812,9 +9812,9 @@ currency:
       peso uruguayo: 
         - UYU
         - Peso Uruguayo
-      philippine peso: 
+      philippine piso: 
         - PHP
-        - Philippine Peso
+        - Philippine Piso
       platinum: 
         - XPT
         - Platinum
@@ -10090,7 +10090,7 @@ currency:
       598: Kina
       600: Guarani
       604: Sol
-      608: Philippine Peso
+      608: Philippine Piso
       634: Qatari Rial
       643: Russian Ruble
       646: Rwanda Franc
@@ -10519,9 +10519,9 @@ currency:
       peso uruguayo: 
         - 858
         - Peso Uruguayo
-      philippine peso: 
+      philippine piso: 
         - 608
-        - Philippine Peso
+        - Philippine Piso
       platinum: 
         - 962
         - Platinum

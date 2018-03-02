@@ -1,5 +1,10 @@
 Revision history for Business-Monzo
 
+0.12     2018-03-01
+        - Documentation for pagination support plus example script (GH #1)
+        - Added support for pots (GH #9, many thanks to devi4nt)
+        - Added account_type param for accounts (GH #10, many thanks to devi4nt)
+
 0.11     2017-08-18
         - Added some missing semi-colons to sample code (GH #7, thanks
           to davorg)

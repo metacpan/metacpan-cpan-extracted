@@ -1,5 +1,8 @@
 Revision history for Task-MetaSyntactic
 
+1.043 2018-02-27 BOOK
+    - add Acme::MetaSyntactic::legoworlds
+
 1.042 2017-02-22 BOOK
     - list WordList::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
     - list WordList::MetaSyntactic::dangdut under "OTHER METASYNTACTIC MODULES"

@@ -39,7 +39,7 @@ EOT
 {
     # some useful info when debugging problems
     print "OSNAME: $OSNAME\n";
-    my @envs = qw(LANG ODBCHOME LD_LIBRARY_PATH DBROOT WINDIR II_SYSTEM);
+    my @envs = qw(LANG ODBCHOME LD_LIBRARY_PATH DBROOT WINDIR II_SYSTEM DBD_ODBC_UNICODE);
     foreach (@envs) {
         print "$_: ", ($ENV{$_} ? $ENV{$_} : ''), "\n";
     }
@@ -166,6 +166,8 @@ my $opt_u = undef;              # build unicode version
 my $opt_e = undef;              # easysoft
 my $opt_x = undef;              # prefer unixODBC over iODBC
 my $opt_w = undef;              # enable -Wall (gcc only)
+
+$opt_u = 1 if $ENV{DBD_ODBC_UNICODE};
 
 my @options = ("g!" => \$opt_g,
                "o=s" => \$opt_o,

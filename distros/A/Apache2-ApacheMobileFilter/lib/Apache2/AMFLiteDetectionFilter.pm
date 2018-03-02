@@ -33,7 +33,7 @@ package Apache2::AMFLiteDetectionFilter;
   # 
 
   use vars qw($VERSION);
-  $VERSION= "4.20";;;
+  $VERSION= "4.21";;;
   my $CommonLib = new Apache2::AMFCommonLib ();
   my %MobileArray;#=$CommonLib->getMobileArray;
   my %MobileTabletArray;
@@ -367,7 +367,7 @@ sub isMobile {
   my $pair;
   my $length=0;
   foreach $pair (sort keys %MobileArray) {
-	if ($UserAgent =~ m/$pair/) {
+	if ($UserAgent =~ m/\Q$pair\E/) {
 		$isMobileValue='true';
 	}
   }
@@ -380,7 +380,7 @@ sub isTablet {
   my $pair;
   my $length=0;
   foreach $pair (sort keys %MobileTabletArray) {
-	if ($UserAgent =~ m/$pair/) {
+	if ($UserAgent =~ m/\Q$pair\E/) {
 		$isTabletValue='true';
 	}
   }
@@ -393,7 +393,7 @@ sub isTouch {
   my $pair;
   my $length=0;
   foreach $pair (sort keys %MobileTouchArray) {
-	if ($UserAgent =~ m/$pair/) {
+	if ($UserAgent =~ m/\Q$pair\E/) {
 		$isTouchValue='true';
 	}
   }
@@ -406,7 +406,7 @@ sub isTV {
   my $pair;
   my $length=0;
   foreach $pair (sort keys %MobileTVArray) {
-	if ($UserAgent =~ m/$pair/) {
+	if ($UserAgent =~ m/\Q$pair\E/) {
 		$isTVValue='true';
 	}
   }

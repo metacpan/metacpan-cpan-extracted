@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Hash;
 use Prty::Option;
 use Prty::String;
 use Scalar::Util ();
-use Prty::Perl;
+use Prty::Reference;
 
 # -----------------------------------------------------------------------------
 
@@ -4771,7 +4771,7 @@ sub whereExpr {
     if ($opExpr eq '') {
         return '';
     }
-    elsif (Prty::Perl->isArrayRef($expr)) {
+    elsif (Prty::Reference->isArrayRef($expr)) {
         return $opExpr;
     }
     else {
@@ -5259,7 +5259,7 @@ sub diff {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

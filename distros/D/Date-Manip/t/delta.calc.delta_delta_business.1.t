@@ -38,7 +38,7 @@ $obj2 = $obj1->new_delta();
 
 $tests="
 
-'+1:6:30:30 business'  '+1:3:45:45 business'  => 0:0:0:2:10:16:15
+'+1:6:30:30 business'  '+1:3:45:45 business'  => 0:0:0:3:1:46:15
 
 ";
 

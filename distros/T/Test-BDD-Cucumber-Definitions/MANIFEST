@@ -8,6 +8,10 @@ lib/Test/BDD/Cucumber/Definitions/Struct.pm
 lib/Test/BDD/Cucumber/Definitions/Struct/In.pm
 lib/Test/BDD/Cucumber/Definitions/Struct/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/Struct/Types.pm
+lib/Test/BDD/Cucumber/Definitions/Types.pm
+lib/Test/BDD/Cucumber/Definitions/Var.pm
+lib/Test/BDD/Cucumber/Definitions/Var/In.pm
+lib/Test/BDD/Cucumber/Definitions/Var/Ru.pm
 lib/Test/BDD/Cucumber/Definitions/Zip.pm
 lib/Test/BDD/Cucumber/Definitions/Zip/In.pm
 lib/Test/BDD/Cucumber/Definitions/Zip/Ru.pm

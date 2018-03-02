@@ -23,6 +23,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+readme.md
 script/install
 t/00-object.t
 t/01-exceptions-5.14.t
@@ -78,6 +79,7 @@ t/Object/SingletonExt.pm
 t/Object/ThirdPonyClass.pm
 t/Private/Ancestor.pm
 t/Private/Descendant.pm
+t/Purple/Object.pm
 t/Static/Base.pm
 t/Static/Issue.pm
 t/Static/Unstatic.pm

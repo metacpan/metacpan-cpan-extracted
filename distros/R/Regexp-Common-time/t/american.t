@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use feature 'unicode_strings';
+
 my (@match, $num_tests);
 
 # Get day/month names in current locale
@@ -168,3 +170,4 @@ foreach my $match (@match)
         }
     }
 }
+

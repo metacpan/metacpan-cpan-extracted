@@ -1,11 +1,8 @@
 use strict;
 use warnings;
 package CGI::Application::Plugin::DeclareREST;
-{
-  $CGI::Application::Plugin::DeclareREST::VERSION = '0.01';
-}
 # ABSTRACT: Declare RESTful API for CGI::Application
-
+$CGI::Application::Plugin::DeclareREST::VERSION = '0.03';
 use Exporter;
 use REST::Utils qw( request_method );
 use Routes::Tiny 0.11;
@@ -139,13 +136,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 CGI::Application::Plugin::DeclareREST - Declare RESTful API for CGI::Application
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -259,7 +258,7 @@ Aku Kauste <aku@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Aku Kauste.
+This software is copyright (c) 2018 by Aku Kauste.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -58,6 +58,18 @@ A better hotfix is to upgrade to Perl 5.20 or higher and use the native
 signatures support there. No other code change is needed, as this module will
 disable its functionality when it is run on a Perl supporting signatures.
 
+## Parentheses in default assignments
+
+Ancient versions of Perl before version 5.10 do not have recursive regular
+expressions. These will not be able to properly handle statements such
+as
+
+    sub foo ($timestamp = time()) {
+    }
+
+The hotfix is to rewrite these function signatures to not use parentheses. The
+better approach is to upgrade to Perl 5.20 or higher.
+
 ## Line Numbers
 
 Due to a peculiarity of how Filter::Simple treats here documents in some
@@ -139,7 +151,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

@@ -76,7 +76,7 @@ my $end = $delay->begin(0);
 # parse a URL - non-blocking - this revealed a bug, yay!
 $t->app->parse_feed(Mojo::URL->new("/atom.xml"),
   sub {
-    my ($c, $feed) = @_;
+    my ($feed) = @_;
     $end->($feed);
   });
 $delay->wait unless (Mojo::IOLoop->is_running);

@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '1.99';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.00';
 use 5.006;
 
 use strict;
@@ -318,7 +318,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 1.99
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -396,7 +396,7 @@ Dave Rolsky <autarch@urth.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2017 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2018 by David Pinkowitz <dapink@cpan.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

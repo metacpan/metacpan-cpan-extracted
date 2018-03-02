@@ -32,7 +32,7 @@ sub test_unitTest : Test(5) {
     $c->addBoolOption(
         '--landscape' => 1,
     );
-    $c->addOption(
+    $c->addLongOption(
         '--font' => 'Courier8',
     );
     $c->addString('2>/dev/null','|','ps2pdf','-');

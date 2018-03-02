@@ -92,6 +92,49 @@ sub create_campaign {
   return $campaign;
 }
 
+sub create_campaign_with_subtype {
+  my ($client, $advertising_type, $advertising_sub_type) = @_;
+
+  my $budget = get_api_package($client, "Budget", 1)->new({
+      name               => "Test " . uniqid(),
+      amount             => {microAmount => 50000000},
+      deliveryMethod     => "STANDARD",
+      isExplicitlyShared => "false"
+  });
+  my $budget_operation = get_api_package($client, "BudgetOperation", 1)->new({
+      operand  => $budget,
+      operator => "ADD"
+  });
+  $budget =
+    $client->BudgetService()->mutate({operations => ($budget_operation)})
+    ->get_value();
+
+  my $bidding_strategy =
+      get_api_package($client, "BiddingStrategyConfiguration", 1)->new({
+        biddingStrategyType => "MANUAL_CPC",
+        biddingScheme => get_api_package($client, "ManualCpcBiddingScheme", 1)
+          ->new({enhancedCpcEnabled => 0})});
+
+  my $campaign = get_api_package($client, "Campaign", 1)->new({
+      name                         => "Campaign #" . uniqid(),
+      biddingStrategyConfiguration => $bidding_strategy,
+      budget                       => $budget,
+      advertisingChannelType       => $advertising_type,
+      advertisingChannelSubType    => $advertising_sub_type
+  });
+
+  my $operation = get_api_package($client, "CampaignOperation", 1)->new({
+      operand  => $campaign,
+      operator => "ADD"
+  });
+
+  $campaign =
+    $client->CampaignService()->mutate({operations => [$operation]})
+    ->get_value();
+
+  return $campaign;
+}
+
 sub delete_campaign {
   my $client      = shift;
   my $campaign_id = shift;

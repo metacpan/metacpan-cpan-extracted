@@ -10,7 +10,7 @@ with (
     'Dist::Zilla::Role::PluginBundle::Config::Slicer',
 );
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
  
 sub configure {
     my ($self) = @_;
@@ -20,8 +20,22 @@ sub configure {
 
     my $remove = $self->payload->{ $self->plugin_remover_attribute } || [];
  
-    $self->add_plugins(qw(
-        Git::GatherDir
+    $self->add_plugins(
+        [
+            'Git::GatherDir' =>
+                GatherActualCode => {
+                    exclude_filename => [
+                        qw( LICENSE )
+                    ]
+                }
+        ],
+        [
+            CopyFilesFromBuild =>
+                CopyLicenseAndThings => {
+                    copy => [ qw( LICENSE ) ]
+                }
+        ],
+    qw(
         Prereqs::FromCPANfile
         PodWeaver
     ));

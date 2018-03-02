@@ -1,13 +1,15 @@
 package Distribution::Cooker;
-use strict;
-
-use warnings;
-no warnings;
+use v5.14;
 
 use subs qw();
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+use File::Basename qw(dirname);
+use File::Path qw(make_path);
+
+$VERSION = '1.022';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -16,6 +18,10 @@ Distribution::Cooker - Create a module directory from your own templates
 =head1 SYNOPSIS
 
 	use Distribution::Cooker;
+
+	Distribution::Cooker->run( ... );
+
+	# most of this should go through the dist_cooker sketch
 
 =head1 DESCRIPTION
 
@@ -49,12 +55,13 @@ sub run {
 	$self->pre_run;
 
 	$self->module(
-		$module || prompt( "Module name> " )
+		$module || prompt( "Module name" )
 		);
-	croak( "No module specified!" ) unless $self->module;
-
+	croak( "No module specified!\n" ) unless $self->module;
+	croak( "Illegal module name [$module]\n" )
+		unless $self->module =~ m/ \A [A-Za-z0-9_]+ ( :: [A-Za-z0-9_]+ )* \z /x;
 	$self->description(
-		$description || prompt( "Description> " )
+		$description || prompt( "Description" )
 		);
 
 	$self->dist(
@@ -75,7 +82,24 @@ something more powerful you can create a subclass.
 
 =cut
 
-sub new { bless {}, $_[0] }
+# There's got to be a better way to deal with the config
+sub new {
+	my $file = catfile( $ENV{HOME}, '.dist_cookerrc' );
+	my $config;
+	my( $name, $email ) = ( 'Frank Serpico', 'serpico@example.com' );
+
+	if( -e $file ) {
+		require Config::IniFiles;
+		$config = Config::IniFiles->new( -file => $file );
+		$name  = $config->val( 'user', 'name' );
+		$email = $config->val( 'user', 'email' );
+		}
+
+	bless {
+		name  => $name,
+		email => $email,
+		}, $_[0]
+	}
 
 =item init
 
@@ -142,6 +166,8 @@ these template variables:
 
 =item module_path => module path under lib/ (Foo/Bar.pm)
 
+=item repo_name   => lowercase module with hyphens (foo-bar)
+
 =item year        => the current year
 
 =back
@@ -152,28 +178,49 @@ F<CVS> directories.
 =cut
 
 sub cook {
+	my $self = shift;
+
 	my( $module, $dist, $path ) =
-		map { $_[0]->$_() } qw( module dist module_path );
+		map { $self->$_() } qw( module dist module_path );
 
 	mkdir $dist, 0755 or croak "mkdir $dist: $!";
 	chdir $dist       or croak "chdir $dist: $!";
 
 	my $cwd = cwd();
 	my $year = ( localtime )[5] + 1900;
+	my $repo_name = lc( $module =~ s/::/-/gr );
 
-	system $_[0]->ttree_command                 ,
-		"-s", $_[0]->distribution_template_dir  ,
+	my $email = $self->{email};
+	my $name  = $self->{name};
+	my $description = $self->description;
+
+	# this is a terrible way to do this. I'll get right on that.
+	my @command = ( $self->ttree_command                 ,
+		"-s", $self->distribution_template_dir  ,
 		"-d", cwd(),                            ,
 		"-define", qq|module='$module'|         ,
 		"-define", qq|module_dist='$dist'|      ,
 		"-define", qq|year='$year'|             ,
 		"-define", qq|module_path='$path'|      ,
-		q{--ignore=\\b(\\.git|\\.svn|CVS)\\b}   ,
-		;
+		"-define", qq|repo_name='$repo_name'|   ,
+		"-define", qq|description='$description'|   ,
+		"-define", qq|email='$email'|   ,
+		"-define", qq|name='$name'|   ,
+		q{--ignore='^.*'}   ,
+		);
 
-	rename
-		catfile( 'lib', $_[0]->module_template_basename ),
-		catfile( 'lib', $path ) or croak "Could not rename module template: $!";
+	system { $command[0] } @command;
+
+	my $dir = catfile( 'lib', dirname( $path ) );
+	print "dir is [$dir]\n";
+	make_path( $dir );
+	croak( "Directory [$dir] does not exist" ) unless -d $dir;
+
+	my $old = catfile( 'lib', $self->module_template_basename );
+	my $new = catfile( 'lib', $path );
+
+	rename $old => $new
+		or croak "Could not rename [$old] to [$new]: $!";
 	}
 
 =item ttree_command
@@ -322,7 +369,7 @@ give you as much flexibility with your templates.
 
 This module is in Github:
 
-	http://github.com/briandfoy/distribution--cooker/
+	http://github.com/briandfoy/distribution-cooker/
 
 =head1 AUTHOR
 
@@ -330,7 +377,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2008-2013, brian d foy, All Rights Reserved.
+Copyright © 2008-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 You may redistribute this under the same terms as Perl itself.
 

@@ -20,7 +20,7 @@ package Clownfish::CFC::Perl::Build::Charmonic;
 
 use base qw( Module::Build );
 
-our $VERSION = '0.006002';
+our $VERSION = '0.006003';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -101,7 +101,9 @@ sub ACTION_charmony {
     }
     # Perl 5.8.7 added support for CLONE_SKIP.
     # Thread support in 5.10.0 seems completely broken (CLOWNFISH-107).
-    if ( !$self->config('usethreads') || $^V lt v5.8.7 || $^V eq v5.10.0 ) {
+    # We also got some mysterious, thread-related CPAN Testers failures with
+    # several 5.8 releases, so disable thread support for 5.10.0 and earlier.
+    if ( !$self->config('usethreads') || $^V le v5.10.0 ) {
         push @command, '--disable-threads';
     }
     push @command, (
@@ -131,6 +133,7 @@ my $config;
 sub charmony {
     my ( undef, $key ) = @_;
     if (!$config) {
+        local @INC = ( @INC, '.' );
         eval { require 'Charmony.pm'; };
         if ( !$@ ) {
             $config = Charmony->config;

@@ -18,7 +18,7 @@ use warnings;
 
 package Clownfish::CFC::Perl::Build;
 use base qw( Module::Build );
-our $VERSION = '0.006002';
+our $VERSION = '0.006003';
 $VERSION = eval $VERSION;
 
 use File::Spec::Functions qw( catdir catfile curdir updir abs2rel rel2abs );
@@ -227,6 +227,7 @@ sub _compile_clownfish {
     $hierarchy->read_host_data_json;
 
     # Process all Binding classes in buildlib.
+    local @INC = ( @INC, '.' );
     my $pm_filepaths = $self->rscan_dir( $BUILDLIB_DIR, qr/\.pm$/ );
     for my $pm_filepath (@$pm_filepaths) {
         next unless $pm_filepath =~ /Binding/;

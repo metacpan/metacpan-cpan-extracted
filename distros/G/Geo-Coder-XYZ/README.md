@@ -2,6 +2,7 @@
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/81c3r325x8ytd7sn?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-xyz)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-XYZ/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-XYZ?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-XYZ)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/3980051779912539/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/3980051779912539/heads/master/)
 
 # Geo::Coder::XYZ
 
@@ -9,7 +10,7 @@ Provides a geocoding functionality using https://geocode.xyz
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -40,7 +41,6 @@ Geo::Coder::XYZ provides an interface to geocode.xyz, a free geocode database co
 
     @locations = $geocoder->geocode('Portland, USA');
     diag 'There are Portlands in ', join (', ', map { $_->{'state'} } @locations);
-        
 
 ## ua
 
@@ -78,6 +78,6 @@ Lots of thanks to the folks at geocode.xyz.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2018 Nigel Horne.
 
 This program is released under the following licence: GPL2

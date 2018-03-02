@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '2.5.0';
+$Git::Hooks::CheckWhitespace::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -105,13 +105,16 @@ EOS
     };
 }
 
-# Install hooks
-PRE_COMMIT       \&check_commit;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+INIT: {
+    # Install hooks
+    PRE_APPLYPATCH   \&check_commit;
+    PRE_COMMIT       \&check_commit;
+    UPDATE           \&check_affected_refs;
+    PRE_RECEIVE      \&check_affected_refs;
+    REF_UPDATE       \&check_affected_refs;
+    PATCHSET_CREATED \&check_patchset;
+    DRAFT_PUBLISHED  \&check_patchset;
+}
 
 1;
 
@@ -127,7 +130,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -150,6 +153,8 @@ errors as detected by C<git diff --check> command. If they don't, the
 commit/push is aborted.
 
 =over
+
+=item * B<pre-applypatch>
 
 =item * B<pre-commit>
 

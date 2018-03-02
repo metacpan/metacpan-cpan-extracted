@@ -1,5 +1,9 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.003   2018-02-28T11:17:15
+    - Remove words with potential to generate offensive phrases (Andy Beverley)
+
+
 1.002   2018-02-19T19:21:27
     - fix copyright year (spotted by koki)
     - add link to https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength (suggested by twitter.com/m_ueberall)

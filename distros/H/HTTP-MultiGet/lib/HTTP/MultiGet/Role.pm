@@ -88,6 +88,8 @@ Run Time State Settings ( modify at your own risk!! )
   block_for_more: array ref of additoinal ids to block for in a blocking context
   pending: hash ref that outbound request objects
   result_map: hash ref that contains the inbound result objects
+  false_id: int( -1 by default ) used to create job ids for non blocking results
+  jobs: anonymous hash, used to keep our results that never hit IO
 
 =cut
 
@@ -98,6 +100,19 @@ has agent=>(
   default=>sub {
     new AnyEvent::HTTP::MultiGet(%MULTIGET_ARRGS)
   },
+  lazy=>1,
+);
+
+has false_id=>(
+  is=>'rw',
+  isa=>Int,
+  default=>-1,
+  lazy=>1,
+);
+
+has jobs=>(
+  is=>'ro',
+  default=>sub { {} },
   lazy=>1,
 );
 
@@ -185,8 +200,9 @@ sub parse_response {
   my ($self,$request,$response)=@_;
 
   my $content=$response->decoded_content;
+  $content='' unless defined($content);
   if($response->is_success) {
-    if($content=~ /^\s*[\[\{]/s) {
+    if(length($content)!=0 and $content=~ /^\s*[\[\{]/s) {
       my $data=eval {$self->json->decode($content)};
       if($@) {
         return $self->new_false("Code: [".$response->code."] JSON Decode error [$@] Content:  $content");
@@ -215,6 +231,26 @@ sub queue_request {
   return $id;
 }
 
+=item * my $id=$self->queue_result($cb,$result);
+
+Alows for result objects to be placed in a result set without ever being executed.
+
+=cut
+
+sub queue_result {
+  my ($self,$cb,$result)=@_;
+  my $current=$self->false_id;
+  $current -=1;
+  $self->false_id($current);
+  $cb=$self->get_block_cb unless defined($cb);
+  
+  $self->jobs->{$current}=AnyEvent->timer(after=>0,cb=>sub { 
+    $cb->($self,$current,$result,undef,undef); 
+    $self->agent->results->{$current}=$result;
+    delete $self->jobs->{$current};
+  });
+  return $current;
+}
 
 =item * my $results=$self->block_on_ids(@ids);
 
@@ -226,7 +262,7 @@ Returns a list of array refrences.
 
 Each List refrence contains the follwing
 
-  0: Charter::Result
+  0: Data::Result 
   1: HTTP::Request
   2: HTTP::Result
 
@@ -409,7 +445,15 @@ sub AUTOLOAD {
   unless($self->can($que_method)) {
     croak "Undefined subroutine $method";
   }
+  my $t;
+
   my @ids=$self->$que_method($self->get_block_cb,@args);
+  NO_BLOCK_LOOP: {
+    $t=AnyEvent->timer(after=>0,cb=>sub { no warnings; last NO_BLOCK_LOOP});
+    AnyEvent::Loop::run;
+  }
+  undef $t;
+
   my $result=$self->block_on_ids(@ids)->[0]->[0];
   $self->is_blocking(0);
   return $result;

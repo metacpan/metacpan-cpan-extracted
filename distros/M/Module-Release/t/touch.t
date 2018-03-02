@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 1.0 'no_plan';
 use Test::Output;
 
 use Cwd;
@@ -14,8 +14,8 @@ use_ok( $class );
 can_ok( $class, 'new' );
 
 BEGIN {
-	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	use File::Spec::Functions qw(rel2abs catfile);
+	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
 	require $file;
 	}
 
@@ -40,11 +40,11 @@ foreach my $name ( @files )
 	{
 	open my($fh), ">", $name; close $fh;
 	ok( -e $name, "test file $name exists" );
-	
+
 	utime $past, $past, $name;
 	cmp_ok( -M $name, ">", 2, "File is older than two days" );
 	}
-	
+
 utime $future, $future, $files[-1];
 cmp_ok( -M $files[-1], "<", 2, "File is newer than two days (in the future)" );
 

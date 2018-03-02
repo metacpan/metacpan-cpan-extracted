@@ -21,7 +21,7 @@ require 5.004;
    use Test::More;
 
    $VERSION = '0.01';
-   $table_name = "PERL_DBD_TEST";
+   $table_name = "perl_dbd_test";
 
    $longstr = "THIS IS A STRING LONGER THAN 80 CHARS.  THIS SHOULD BE CHECKED FOR TRUNCATION AND COMPARED WITH ITSELF.";
    $longstr2 = $longstr . "  " . $longstr . "  " . $longstr . "  " . $longstr;
@@ -78,7 +78,7 @@ require 5.004;
            $fields .= "$f ";
            # print "-- $fields\n";
            my $row = get_type_for_column($dbh, $f);
-           $fields .= $row->{TYPE_NAME};    
+           $fields .= $row->{TYPE_NAME};
       if ($row->{CREATE_PARAMS}) {
                if ($drvname =~ /OdbcFb/i) {
                    # Firebird ODBC driver seems to be badly broken - for
@@ -265,4 +265,3 @@ require 5.004;
    }
    1;
 }
-

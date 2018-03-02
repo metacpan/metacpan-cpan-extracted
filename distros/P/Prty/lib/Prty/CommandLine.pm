@@ -4,9 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
-
-use Prty::Option;
+our $VERSION = 1.124;
 
 # -----------------------------------------------------------------------------
 
@@ -34,7 +32,7 @@ L<Prty::Hash>
         '--no-header' => 1,
         '--landscape' => 1,
     );
-    $c->addOption(
+    $c->addLongOption(
         '--font' => 'Courier8',
     );
     $c->addString('2>/dev/null','|','ps2pdf','-');
@@ -62,8 +60,8 @@ statisch sind, sondern variieren können.
 
 =head4 Synopsis
 
-    $c = $class->new(@opt);
-    $c = $class->new($str,@opt);
+    $c = $class->new;
+    $c = $class->new($str);
 
 =head4 Arguments
 
@@ -72,18 +70,6 @@ statisch sind, sondern variieren können.
 =item $str
 
 Anfang der Kommandozeile.
-
-=back
-
-=head4 Options
-
-=over 4
-
-=item -valSep => $char (Default: '=')
-
-Definiert das Trennzeichen bei langen Optionen - also mit I<zwei>
-Bindestrichen - das die Option vom Wert trenn. Anstelle des
-Defaults ('=') ist manchmal nur ein Leerzeichen (' ') erlaubt.
 
 =back
 
@@ -111,19 +97,10 @@ sub new {
     my $class = shift;
     my $cmd = shift // '';
 
-    # Optionen
-
-    my $valSep = '=';
-
-    Prty::Option->extract(\@_,
-        -valSep => \$valSep,
-    );
-
     # Instantiiere Objekt
     
     return $class->SUPER::new(
         cmd => $cmd,
-        valSep => $valSep,
     );
 }
     
@@ -288,19 +265,8 @@ nichts
 =head4 Description
 
 Ergänze die Kommandozeile um 0, 1 oder mehr Optionen mit
-zugehörigem Wert.
-
-=head4 Example
-
-    $c->addOption(
-        '--columns' => 2,
-        '--font' => 'Courier10',
-        '--margins' => '0:0:0:0',
-    );
-
-ergänzt die Kommandozeile um die Optionen
-
-    ... --columns=2 --font=Courier10 --margins=0:0:0:0
+zugehörigem Wert. Option und Wert werden durch ein Leerzeichen
+getrennt.
 
 =cut
 
@@ -323,8 +289,76 @@ sub addOption {
             if (length $$ref) {
                 $$ref .= ' ';
             }
-            my $valSep = substr($opt,0,2) eq '--'? $self->valSep: ' ';
-            $$ref .= $opt.$valSep.$val;
+            $$ref .= $opt.' '.$val;
+        }
+    }    
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 addLongOption() - Ergänze Option und ihre Werte
+
+=head4 Synopsis
+
+    $cmd->addLongOption(@optVal);
+
+=head4 Arguments
+
+=over 4
+
+=item @optVal
+
+Liste von Optionen, bestehend jeweils aus der Option und
+zugehörigem Wert.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Ergänze die Kommandozeile um 0, 1 oder mehr Optionen mit
+zugehörigem Wert. Option und Wert werden durch ein
+Gleichheitszeichen (=) getrennt.
+
+=head4 Example
+
+    $c->addLongOption(
+        '--columns' => 2,
+        '--font' => 'Courier10',
+        '--margins' => '0:0:0:0',
+    );
+
+ergänzt die Kommandozeile um die Optionen
+
+    ... --columns=2 --font=Courier10 --margins=0:0:0:0
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub addLongOption {
+    my $self = shift;
+    # @_: @optVal
+
+    my $ref = $self->getRef('cmd');
+        
+    while (@_) {
+        my $opt = shift;
+        my $val = $self->value(shift);
+
+        # Wir fügen das Option/Wert-Paar nur hinzu, wenn der Wert
+        # definiert und kein Leerstring ist
+
+        if (defined($val) && $val ne '') {
+            if (length $$ref) {
+                $$ref .= ' ';
+            }
+            $$ref .= $opt.'='.$val;
         }
     }    
 
@@ -495,7 +529,7 @@ sub value {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -19,6 +19,7 @@ our @ISA = qw(Script::Toolbox::Util Script::Toolbox::Util::Opt Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(Open Log Exit Table Usage Dir File FileC
 						           System Now Menue KeyMap Stat TmpFile
                                    DataMenue Menu DataMenu
+                                   CheckBox
                                   )]);
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -27,7 +28,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 
 # Preloaded methods go here.
@@ -44,6 +45,17 @@ Script::Toolbox - Framework for the daily business scripts
   use Script::Toolbox qw(:all);
 
   $e = Script::Toolbox->new();
+
+  #----------------------
+  # Command line options
+  #----------------------
+  $x    = {'file'=>{'mod'=>'=s','desc'=>'Description',    'mand'=>1, 'default'=>'/bin/cat'},
+           'int' =>{'mod'=>'=i','desc'=>'Integer option', 'mand'=>1, 'default'=>'10'      },
+           'flag'=>{            'desc'=>'Boolean option', 'mand'=>0                       },
+          };
+  $tb   = Script::Toolbox->new( $x );
+  $file = $tb->{'file'};
+  $old  = $tb->SetOpt('newFile');
 
   #---------
   # Logging 
@@ -92,17 +104,6 @@ Script::Toolbox - Framework for the daily business scripts
   print   $T->asString();       # table rows separated by \n
   print   $T->asString("\n\n"); # table rows separated by \n\n
 
-  #----------------------
-  # Command line options
-  #----------------------
-  $x    = {'file'=>{'mod'=>'=s','desc'=>'Description',    'mand'=>1, 'default'=>'/bin/cat'},
-           'int' =>{'mod'=>'=i','desc'=>'Integer option', 'mand'=>1, 'default'=>'10'      },
-           'flag'=>{            'desc'=>'Boolean option', 'mand'=>0                       },
-          };
-  $tb   = Script::Toolbox->new( $x );
-  $file = $tb->{'file'};
-  $old  = $tb->SetOpt('newFile');
-
   #--------------------------
   # Automatic usage messages
   #--------------------------
@@ -142,6 +143,12 @@ Script::Toolbox - Framework for the daily business scripts
   $fileHandle = TmpFile();                     # open new temporary file
   $arrRef     = TmpFile($fileHandle)           # read temp whole file
 
+  # IO::File operations on files
+  $fh = Open( '> /tmp/xx' ); # return an IO::File object with
+                             # /tmp/xx opened for write 
+                             # die with logfile entry if failed
+  $fh = Open( '/bin/ps |' ); # return an IO::File object
+                             # die with logfile entry if failed
 
   #---------------------------------------------
   # Key maps. Key maps are hashs of hashs like:
@@ -166,11 +173,6 @@ Script::Toolbox - Framework for the daily business scripts
                              # with code line reference,
                              # write exit message via Log()
 
-  $fh = Open( '> /tmp/xx' ); # return an IO::File object with
-                             # /tmp/xx opened for write 
-                             # die with logfile entry if failed
-  $fh = Open( '/bin/ps |' ); # return an IO::File object
-                             # die with logfile entry if failed
   $rc = System('/bin/ls')    # execute a system command and
                              # report it's output into the 
                              # logfile.
@@ -184,7 +186,7 @@ Script::Toolbox - Framework for the daily business scripts
   print  Now->{'epoch'};
   $now = Now({'format'=>'%A, %B %d, %Y'});      # Monday, October 10, 2005
   $now = Now({'offset'=>3600});                 # now + 1 hour
-  $diff= Now({'diff'=>time()+86400+3600+60+1}); # time+1d+1h+1min+1sec
+  $diff= Now({'diff'=>time()+86400+3600+60+1}); # time+1d+1h+1min+1sec (diff=now-refTime)
   print  $diff->{'seconds'};                    # 90061 
   print  $diff->{'minutes'};                    # 1501.016
   print  $diff->{'hours'};                      # 25.01694
@@ -196,7 +198,7 @@ Script::Toolbox - Framework for the daily business scripts
   # Menu handling
   #----------------
   # using Menu to start subroutines
-  my $mainMenu = [{'header'=>'This is the line on top'},
+  my $menuDef = [{'header'=>'This is the line on top'},
                    {'footer'=>'This is the bottom line.'},
                    {'label'=>'EXIT',          jump'=>\&_exit,     argv'=>0},
                    {'label'=>'Edit Hosts',    jump'=>\&editHosts, argv'=>$ops},
@@ -204,7 +206,7 @@ Script::Toolbox - Framework for the daily business scripts
                    {'label'=>'Changeable Value','value'=>10},
                    {'label'=>'Read only  Value','value'=>10, 'readOnly'=>1},
                   ];
-  while( 1 ) { my ($o,$mainMenu) = Menu($mainMenu); }
+  while( 1 ) { my ($o,$mainMenu) = Menu($menuDef); }
 
   # or ...
   my ($resp, $menue) = Menu([{'label'=>'One'},{'label'=>'Two'},{'label'=>'Three'}]);
@@ -268,6 +270,17 @@ Script::Toolbox - Framework for the daily business scripts
   $dataMenu = DataMenu($dataMenu)
   my $data   = DataMenu('aaa bbb ccc');
   my $data   = DataMenu('aaa bbb ccc',{'header'=>'Top Line', 'footer'=>'Bottom Line'});
+
+  #---------------
+  # CheckBox Menus
+  #---------------
+  my $x = CheckBox('Head2',',AAA,BBB,ccc','ccc|AAA'); # BBB is off
+  my $x = CheckBox('Head4',',AAA,BBB,ccc','ccc', 1 ); # radio-button, ccc is on
+  my $m = Script::Toolbox::Util::Menus->new();
+  my $x = CheckBox('Head7',',AAA,BBB,ccc',undef, 0,$m); # temp. in container $m
+  my $x = CheckBox('HeadC',',AAA,BBB,ccc','ccc', 1,$m,'testmenu');
+                                              #  testmenu perm. in container $m
+
 
 =head1 ABSTRACT
 
@@ -738,6 +751,17 @@ Return a hash with all label-value pairs of the menu.
 
 Return the current value of the running counter of the menu.
 
+=item setValues(<name>,<values>)
+
+This method provides setting of the value fields of options.
+<values> is a hash like {<label> => <value>}. Only updates on existing
+labels are allowed.
+
+=item setDefaults(<name>,<values>)
+
+This method provides setting of the default fields of options.
+<values> is a hash like {<label> => <value>}. Only updates on existing
+labels are allowed.
 
 =back
 
@@ -763,6 +787,49 @@ If a default is defined, like this:
 and the input is a single space character, then the 'default' will be
 assigned to 'value'.
 
+=item CheckBox(<head>,<opts>[,<preSel>[,<radio>[,<cont>[,<menName>]]]])
+
+Display the options <opts> as menu. Each of them has an autogenerated 
+value field with possible values of '' (means: OFF) or 'x' (means: ON).
+<preSel> is a regular expression like 'a|b|c', means the options with
+labels 'a', 'b' or 'c' gets in ON state. All other options are switched OFF.
+Selecting an option, toggles the value of the value field.
+
+CheckBox() returns a hash like {'on'=>[a,b],'off'=>[c,d,e]}.
+
+=over 4
+
+=item head
+
+The header of the check box menu.
+
+=item opts
+
+The option labels. May be given as array or as CSV-String. CSV-String
+means: ',a,b,c' with first character of the string as separator character.
+
+=item preSel
+
+A regular expression. Each option where label matching this regex gets
+in state ON.
+
+=item radio
+
+If true, radio-button behavior is active. Only one option can be in state ON.
+
+=item cont
+
+Menus container to store the check box in. Usualy used together with option
+menName. 
+
+=item menName
+
+Name of the check box menu. Usualy used together with option cont. In this case
+the check box menu is permanently stored. Subsequent calls presents the selection
+of the previous call.
+
+=back
+
 =back
 
 =head1 SIGNALS
@@ -787,7 +854,7 @@ Menues, Menue, DataMenue will be removed in version 1.0 ;-)
 L<IO::File>, L<Fatal>, L<Script::Toolbox::Util>,
 L<Script::Toolbox::Util::Open>,   L<Script::Toolbox::Util::Formatter>,
 L<Script::Toolbox::Util::Menus>, L<Script::Toolbox::TableO>,
-L<Time::ParseDate>
+L<Time::ParseDate (Time-modules.tar.gz)>
 
 
 =head1 AUTHOR

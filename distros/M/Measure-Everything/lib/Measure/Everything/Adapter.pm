@@ -8,7 +8,14 @@ use Module::Runtime qw(use_module);
 sub set {
     my ($self, $adapter, @args) = @_;
 
-    $Measure::Everything::global_stats = use_module('Measure::Everything::Adapter::'.$adapter)->new(@args);
+    my $module_name;
+    if ( $adapter =~ s/^\+// ) {
+        $module_name = $adapter;
+    } else {
+        $module_name = 'Measure::Everything::Adapter::'.$adapter;
+    }
+
+    $Measure::Everything::global_stats = use_module($module_name)->new(@args);
 }
 
 1;
@@ -25,7 +32,7 @@ Measure::Everything::Adapter - Tell Measure::Everything where to send the stats
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 

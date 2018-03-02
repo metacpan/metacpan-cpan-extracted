@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -405,7 +405,7 @@ sub run_command {
 
         $self->paint("Test runner exited badly: $exit\n") if $exit;
         $self->paint("Test runner exited badly: ?\n") unless defined $exit;
-        $self->paint("An exception was cought\n") if !$ok && !$sig;
+        $self->paint("An exception was caught\n") if !$ok && !$sig;
         $self->paint("Received SIG$sig\n") if $sig;
         $self->paint("$lost test file(s) were never run!\n") if $lost;
 

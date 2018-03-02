@@ -20,6 +20,7 @@ use English qw( -no_match_vars );
 use POSIX();
 use File::Spec();
 use URI();
+use Time::HiRes();
 use File::Temp();
 use FileHandle();
 use MIME::Base64();
@@ -39,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.44';
+our $VERSION = '0.47';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -56,6 +57,7 @@ sub _MIN_VERSION_FOR_SAFE_MODE      { return 55 }
 sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
 sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _DEFAULT_SOCKS_VERSION          { return 5 }
+sub _MILLISECONDS_IN_ONE_SECOND     { return 1000 }
 
 sub BY_XPATH {
     Carp::carp(
@@ -116,19 +118,18 @@ sub BY_PARTIAL {
 sub _download_directory {
     my ($self) = @_;
     my $context = $self->context();
-    my $directory;
-    while ( !$directory ) {
-        $self->context('chrome');
-        $directory =
-          $self->script( 'var branch = Components.classes["' . q[@]
-              . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
-          );
-        $self->context($context);
-        if ( !$directory ) {
-            sleep 1;
-        }
-    }
+    $self->context('chrome');
+    my $directory =
+      $self->script( 'var branch = Components.classes["' . q[@]
+          . 'mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch(""); return branch.getStringPref ? branch.getStringPref("browser.download.downloadDir") : branch.getComplexValue("browser.download.downloadDir", Components.interfaces.nsISupportsString).data;'
+      );
+    $self->context($context);
     return $directory;
+}
+
+sub mime_types {
+    my ($self) = @_;
+    return @{ $self->{mime_types} };
 }
 
 sub downloading {
@@ -173,9 +174,10 @@ sub downloads {
 sub new {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
-    $self->{last_message_id} = 0;
-    $self->{creation_pid}    = $PROCESS_ID;
-    $self->{mime_types}      = [
+    $self->{last_message_id}  = 0;
+    $self->{creation_pid}     = $PROCESS_ID;
+    $self->{sleep_time_in_ms} = $parameters{sleep_time_in_ms};
+    $self->{mime_types}       = [
         qw(
           application/x-gzip
           application/gzip
@@ -206,7 +208,7 @@ sub new {
           )
     ];
     my %known_mime_types;
-    foreach my $mime_type ( @{ $parameters{mime_types} } ) {
+    foreach my $mime_type ( @{ $self->{mime_types} } ) {
         $known_mime_types{$mime_type} = 1;
     }
     foreach my $mime_type ( @{ $parameters{mime_types} } ) {
@@ -1030,14 +1032,15 @@ sub _setup_local_connection_to_firefox {
 
 sub _setup_new_profile {
     my ( $self, $profile ) = @_;
-    my $profile_directory = File::Temp->newdir(
+    $self->{profile_directory} = File::Temp->newdir(
         File::Spec->catdir(
             File::Spec->tmpdir(), 'firefox_marionette_profile_XXXXXXXXXXX'
         )
       )
       or Firefox::Marionette::Exception->throw(
         "Failed to create temporary directory:$EXTENDED_OS_ERROR");
-    my $profile_path = File::Spec->catfile( $profile_directory, 'prefs.js' );
+    my $profile_path =
+      File::Spec->catfile( $self->{profile_directory}, 'prefs.js' );
     $self->{profile_path} = $profile_path;
     if ($profile) {
     }
@@ -1059,7 +1062,7 @@ sub _setup_new_profile {
         $profile->set_value( 'marionette.port',              $port );
     }
     $profile->save($profile_path);
-    return $profile_directory;
+    return $self->{profile_directory};
 }
 
 sub _get_port {
@@ -2629,6 +2632,65 @@ sub go {
     return $self;
 }
 
+sub sleep_time_in_ms {
+    my ( $self, $new ) = @_;
+    my $old = $self->{sleep_time_in_ms} || 1;
+    if ( defined $new ) {
+        $self->{sleep_time_in_ms} = $new;
+    }
+    return $old;
+}
+
+sub bye {
+    my ( $self, $code ) = @_;
+    my $found = 1;
+    while ( !$found ) {
+        eval { &{$code} } and do {
+            Time::HiRes::sleep(
+                $self->sleep_time_in_ms() / _MILLISECONDS_IN_ONE_SECOND() );
+          }
+          or do {
+            if (
+                ( ref $EVAL_ERROR )
+                && (
+                    ref $EVAL_ERROR eq
+                    'Firefox::Marionette::Exception::NotFound' )
+              )
+            {
+                $found = 0;
+            }
+            else {
+                Carp::croak($EVAL_ERROR);
+            }
+          };
+    }
+    return $self;
+}
+
+sub await {
+    my ( $self, $code ) = @_;
+    my $result;
+    while ( !$result ) {
+        $result = eval { &{$code} } or do {
+            if (
+                ( ref $EVAL_ERROR )
+                && (
+                    ref $EVAL_ERROR eq
+                    'Firefox::Marionette::Exception::NotFound' )
+              )
+            {
+                Time::HiRes::sleep(
+                    $self->sleep_time_in_ms() / _MILLISECONDS_IN_ONE_SECOND() );
+                next;
+            }
+            else {
+                Carp::croak($EVAL_ERROR);
+            }
+        };
+    }
+    return $result;
+}
+
 sub install {
     my ( $self, $path, $temporary ) = @_;
     my $message_id = $self->_new_message_id();
@@ -2834,7 +2896,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.44
+Version 0.47
 
 =head1 SYNOPSIS
 
@@ -2843,15 +2905,15 @@ Version 0.44
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
+    say $firefox->html();
+
     $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
 
     my $file_handle = $firefox->selfie(highlights => [ $firefox->find_name('lucky') ])
 
     $firefox->find('//button[@name="lucky"]')->click();
 
-    say $firefox->html();
-
-    $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+    $firefox->await(sub { $firefox->find_partial('Download') })->click();
 
 =head1 DESCRIPTION
 
@@ -2879,6 +2941,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * mime_types - any MIME types that Firefox will encounter during this session.  MIME types that are not specified will result in a hung browser (the File Download popup will appear).
 
+=item * sleep_time_in_ms - the amount of time (in milliseconds) that this module should sleep when unsuccessfully calling the subroutine provided to the L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods.  This defaults to "1" millisecond.
+
 =item * visible - should firefox be visible on the desktop.  This defaults to "0".
 
 =back
@@ -2899,12 +2963,11 @@ returns the current title of the window.
 
 =head2 find
 
-accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> expression> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
+accepts an L<xpath expression|https://en.wikipedia.org/wiki/XPath> as the first parameter and returns the first L<element|Firefox::Marionette::Element> that matches this expression.
 
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
@@ -2916,7 +2979,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_id
 
@@ -2925,7 +2988,6 @@ accepts an L<id|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attribu
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
@@ -2937,7 +2999,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_name
 
@@ -2946,7 +3008,6 @@ This method returns the first L<element|Firefox::Marionette::Element> with a mat
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_name('q')->type('Test::More');
@@ -2957,7 +3018,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_class
 
@@ -2966,7 +3027,6 @@ accepts a L<class name|https://developer.mozilla.org/en-US/docs/Web/HTML/Global_
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_class('form-control home-search-input')->type('Test::More');
@@ -2977,7 +3037,7 @@ This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit>
         $element->type('Test::More');
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_selector
 
@@ -2986,18 +3046,17 @@ accepts a L<CSS Selector|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Se
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_selector('input.home-search-input')->type('Test::More');
 
     # OR in list context 
 
-    foreach my $element ($firefox->list_by_selector('input.home-search-input')) {
+    foreach my $element ($firefox->find_selector('input.home-search-input')) {
         $element->type('Test::More');
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_tag
 
@@ -3006,18 +3065,17 @@ accepts a L<tag name|https://developer.mozilla.org/en-US/docs/Web/API/Element/ta
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     my $element = $firefox->find_tag('input');
 
     # OR in list context 
 
-    foreach my $element ($firefox->list_by_tag('input')) {
+    foreach my $element ($firefox->find_tag('input')) {
         # do something
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_link
 
@@ -3026,18 +3084,17 @@ accepts a text string as the first parameter and returns the first link L<elemen
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_link('API')->click();
 
     # OR in list context 
 
-    foreach my $element ($firefox->list_by_link('API')) {
+    foreach my $element ($firefox->find_link('API')) {
         $element->click();
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 find_partial
 
@@ -3046,18 +3103,17 @@ accepts a text string as the first parameter and returns the first link L<elemen
 This method is subject to the L<implicit|Firefox::Marionette::Timeouts#implicit> timeout.
 
     use Firefox::Marionette();
-    use v5.10;
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_partial('AP')->click();
 
     # OR in list context 
 
-    foreach my $element ($firefox->list_by_partial('AP')) {
+    foreach my $element ($firefox->find_partial('AP')) {
         $element->click();
     }
 
-If no elements are found, a L<Firefox::Marionette::Exception::NotFound|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
+If no elements are found, a L<not found|Firefox::Marionette::Exception::NotFound> exception will be thrown. 
 
 =head2 css
 
@@ -3071,13 +3127,69 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter and a 
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a scalar attribute name as the second parameter.  It returns the current value of the property with the supplied name.  This method will return the current content, the L<attribute|Firefox::Marionette#attribute> method will return the initial content.
 
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+=head2 mime_types
+
+returns a list of MIME types that will be downloaded by firefox and available from the L<downloads|Firefox::Marionette#downloads> method
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new(mime_types => [ 'application/pkcs10' ])
+
+    foreach my $mime_type ($firefox->mime_types()) {
+        say $mime_type;
+    }
+
 =head2 downloads
 
 returns a list of file paths (including partial downloads) of downloads during this Firefox session.
 
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    $firefox->find('//button[@name="lucky"]')->click();
+
+    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+
+    while(!$firefox->downloads()) { sleep 1 }
+
+    foreach my $path ($firefox->downloads()) {
+        say $path;
+    }
+
 =head2 downloading
 
-returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<<.part>>
+returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+
+    $firefox->find('//button[@name="lucky"]')->click();
+
+    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+
+    while(!$firefox->downloads()) { sleep 1 }
+
+    while($firefox->downloading()) { sleep 1 }
+
+    foreach my $path ($firefox->downloads()) {
+        say $path;
+    }
+
+=head2 downloading
+
+returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C<.part>
 
 =head2 script 
 
@@ -3118,6 +3230,44 @@ returns the contents of the cookie jar in scalar or list context.
 =head2 type
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a string as the second parameter.  It sends the string to the specified L<element|Firefox::Marionette::Element> in the current page, such as filling out a text box. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 await
+
+accepts a subroutine reference as a parameter and then executes the subroutine.  If a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When the subroutine executes successfully, it will return what the subroutine returns.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5)->go('https://metacpan.org/');
+
+    $firefox->find_id('search-input')->type('Test::More');
+
+    $firefox->find_name('lucky')->click();
+
+    $firefox->await(sub { $firefox->find_partial('Download') })->click();
+
+=head2 bye
+
+accepts a subroutine reference as a parameter and then executes the subroutine.  If the subroutine executes successfully, this method will sleep for L<sleep_time_in_ms|Firefox::Marionette#sleep_time_in_ms> milliseconds and then execute the subroutine again.  When a L<not found|Firefox::Marionette::Exception::NotFound> exception is thrown, this method will return L<itself|Firefox::Marionette> to aid in chaining methods.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
+
+    $firefox->find_id('search-input')->type('Test::More');
+
+    $firefox->find_name('lucky')->click();
+
+    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->find_partial('Download') })->click();
+
+=head2 sleep_time_in_ms
+
+accepts a new time to sleep in L<await|Firefox::Marionette#await> or L<bye|Firefox::Marionette#bye> methods and returns the previous time.  The defaule time is "1" millisecond.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(sleep_time_in_ms => 5); # setting default time to 5 milliseconds
+
+    my $old_time_in_ms = $firefox->sleep_time_in_ms(8); # setting default time to 8 milliseconds, returning 5 (milliseconds)
 
 =head2 is_displayed
 
@@ -3303,9 +3453,25 @@ returns identifiers for each open chrome window for tests interested in managing
 
 accepts the fully qualified path to an .xpi addon file as the first parameter and an optional true/false second parameter to indicate if the xpi addon file should be a temporary addition (just for the existance of this browser instance).  Unsigned xpi addon files may be loaded temporarily.  It returns the GUID for the addon which may be used as a parameter to the L<uninstall|Firefox::Marionette#uninstall> method.
 
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+
 =head2 uninstall
 
 accepts the GUID for the addon to uninstall.  The GUID is returned when from the L<install|Firefox::Marionette#install> method.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $extension_id = $firefox->install('/full/path/to/gnu_terry_pratchett-0.4-an+fx.xpi');
+
+    # do something
+
+    $firefox->uninstall($extension_id); # not recommended to uninstall this extension IRL.
 
 =head2 application_type
 
@@ -3374,6 +3540,14 @@ The module was unable to run the Firefox binary.  Check the path is correct and 
 =item C<< Failed to fork:%s >>
  
 The module was unable to fork itself, prior to executing a command.  Check the current C<ulimit> for max number of user processes.
+ 
+=item C<< Failed to open directory '%s':%s >>
+ 
+The module was unable to open a directory.  Something is seriously wrong with your environment.
+ 
+=item C<< Failed to close directory '%s':%s >>
+ 
+The module was unable to close a directory.  Something is seriously wrong with your environment.
  
 =item C<< Failed to open '%s' for writing:%s >>
  

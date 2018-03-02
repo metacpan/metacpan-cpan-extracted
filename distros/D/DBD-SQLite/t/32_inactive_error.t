@@ -7,7 +7,8 @@ BEGIN {
 }
 
 use Test::More tests => 4;
-use t::lib::Test;
+use lib "t/lib";
+use SQLiteTest;
 
 my $dbh = connect_ok( PrintError => 0, RaiseError => 0 );
 

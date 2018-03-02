@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+
 my @classes = qw(
 		Module::Release
 		Module::Release::Kwalitee
@@ -7,7 +10,7 @@ my @classes = qw(
 		Module::Release::MANIFEST
 		);
 
-use Test::More;
+use Test::More 1.0;
 
 foreach my $class ( @classes ) {
 	BAIL_OUT( "$class did not compile!" ) unless use_ok( $class );

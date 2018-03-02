@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.5.0';
+$Git::Hooks::CheckJira::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -31,8 +31,8 @@ sub _setup_config {
     # Default matchkey for matching default JIRA keys.
     $default->{matchkey}   //= ['\b[A-Z][A-Z]+-\d+\b'];
 
-    $default->{require}    //= [1];
-    $default->{unresolved} //= [1];
+    $default->{require}    //= ['true'];
+    $default->{unresolved} //= ['true'];
 
     return;
 }
@@ -222,6 +222,10 @@ EOS
         # Conjunct all terms in a single JQL expression
         my $JQL = '(' . join(') AND (', @jqls) . ')';
 
+        # Squeeze multiple whitespaces in a single space to make it appear
+        # neatly in error messages.
+        $JQL =~ s/\s{2,}/ /g;
+
         my $issues = _jql_query($git, $JQL);
 
         @issues{keys %$issues} = values %$issues; # cache all matched issues
@@ -232,11 +236,11 @@ EOS
         if (my $missed_set = $cited_set - $matched_set) {
             if ($missed_set->size == 1) {
                 $git->fault(<<"EOS");
-The commit $commit cites an invalid issue:
+The commit @{[$commit->commit]} cites an invalid issue:
 
   @{[$missed_set]}
 
-The issue does not match the JQL expression:
+The issue does not match the following JQL expression:
 
   $JQL
 
@@ -244,11 +248,11 @@ Please, update your issue or fix your $CFG git configuration.
 EOS
             } else {
                 $git->fault(<<"EOS");
-The commit $commit cites invalid issues:
+The commit @{[$commit->commit]} cites invalid issues:
 
   @{[$missed_set]}
 
-The issues do not match the JQL expression:
+The issues do not match the following JQL expression:
 
   $JQL
 
@@ -287,7 +291,7 @@ EOS
         while (my ($key, $issue) = each %issues) {
             if ($unresolved && defined $issue->{fields}{resolution}) {
                 $git->fault(<<"EOS");
-The commit cites issue $key which is already resolved.
+The commit @{[$commit->commit]} cites issue $key which is already resolved.
 
 The $CFG.unresolved option in your configuration requires
 that all JIRA issues be unresolved.
@@ -306,7 +310,7 @@ EOS
                     }
                 }
                 $git->fault(<<"EOS");
-The commit $commit cites issue $key which is invalid.
+The commit @{[$commit->commit]} cites issue $key which is invalid.
 
 Commits on '$ref' must cite issues associated with a fixVersion matching
 '$version' according to the $CFG.fixversion options in your configuration.
@@ -329,7 +333,7 @@ EOS
                     my $name = $assignee->{name};
                     $user eq $name
                         or $git->fault(<<"EOS")
-The commit $commit cites issue $key which is assigned to '$name'.
+The commit @{[$commit->commit]} cites issue $key which is assigned to '$name'.
 The $CFG.by-assignee configuration requires that cited issues be assigned
 to you ($user).
 Please, update your issue.
@@ -338,7 +342,7 @@ EOS
                         and next KEY;
                 } else {
                     $git->fault(<<"EOS");
-The commit $commit cites issue $key which is unassigned.
+The commit @{[$commit->commit]} cites issue $key which is unassigned.
 The $CFG.by-assignee configuration requires that cited issues be assigned
 to you ($user).
 Please, update your issue.
@@ -571,14 +575,17 @@ EOS
     return $errors == 0;
 }
 
-# Install hooks
-COMMIT_MSG       \&check_message_file;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-POST_RECEIVE     \&notify_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+INIT: {
+    # Install hooks
+    APPLYPATCH_MSG   \&check_message_file;
+    COMMIT_MSG       \&check_message_file;
+    UPDATE           \&check_affected_refs;
+    PRE_RECEIVE      \&check_affected_refs;
+    REF_UPDATE       \&check_affected_refs;
+    POST_RECEIVE     \&notify_affected_refs;
+    PATCHSET_CREATED \&check_patchset;
+    DRAFT_PUBLISHED  \&check_patchset;
+}
 1;
 
 __END__
@@ -593,7 +600,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -653,7 +660,7 @@ request (a.k.a. ticket) open.
 
 =over
 
-=item * B<commit-msg>
+=item * B<commit-msg>, B<applypatch-msg>
 
 This hook is invoked during the commit, to check if the commit message
 cites valid JIRA issues.

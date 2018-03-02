@@ -1,15 +1,16 @@
 package Screensaver::Any;
 
-our $DATE = '2017-03-31'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-02-28'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Exporter::Rinci qw(import);
 use File::Which qw(which);
-use IPC::System::Options qw(system readpipe);
+use IPC::System::Options 'system', 'readpipe', -log=>1;
 
 my $known_screensavers = [qw/kde gnome cinnamon xscreensaver/];
 my $sch_screensaver = ['str', in=>$known_screensavers];
@@ -61,10 +62,20 @@ sub detect_screensaver {
 
   KDE:
     {
-        last unless which("qdbus");
+        log_trace "Checking qdbus program ...";
+        unless (which("qdbus")) {
+            log_trace "qdbus doesn't exist";
+            last;
+        }
+        log_trace "qdbus exists";
         system({capture_stdout=>\my $dummy_out, capture_stderr=>\my $dummy_err},
                "qdbus", "org.kde.screensaver");
-        last if $?;
+        if ($?) {
+            log_trace "Couldn't check org.kde.screensaver dbus service";
+            last;
+        }
+        log_trace "org.kde.screensaver dbus service exists";
+        log_trace "Concluding screensaver is kde";
         return "kde";
     }
 
@@ -74,19 +85,37 @@ sub detect_screensaver {
 
   GNOME:
     {
-        last unless Proc::Find::proc_exists(name => "gnome-screensaver");
-        return "gnome";
+        log_trace "Checking whether gnome-screensaver process exists ...";
+        unless (Proc::Find::proc_exists(name => "gnome-screensaver")) {
+            log_trace "gnome-screensaver process doesn't exist";
+            last;
+        }
+        log_trace "gnome-screensaver process exists";
+        log_trace "Concluding screensaver is gnome (<= 3.6)";
+        return "gnome"; # <= 3.6
     }
 
   CINNAMON:
     {
-        last unless Proc::Find::proc_exists(name => "cinnamon-screensaver");
+        log_trace "Checking whether cinnamon-screensaver process exists ...";
+        unless (Proc::Find::proc_exists(name => "cinnamon-screensaver")) {
+            log_trace "cinnamon-screensaver process doesn't exist";
+            last;
+        }
+        log_trace "cinnamon-screensaver process exists";
+        log_trace "Concluding screensaver is cinnamon";
         return "cinnamon";
     }
 
   XSCREENSAVER:
     {
-        last unless Proc::Find::proc_exists(name => "xscreensaver");
+        log_trace "Checking whether xscreensaver process exists ...";
+        unless (Proc::Find::proc_exists(name => "xscreensaver")) {
+            log_trace "xscreensaver process doesn't exist";
+            last;
+        }
+        log_trace "xscreensaver process exists";
+        log_trace "Concluding screensaver is xscreensaver";
         return "xscreensaver";
     }
 
@@ -150,24 +179,68 @@ sub _get_or_set_screensaver_timeout {
     }
 
     if ($screensaver eq 'kde') {
-        my $path = "$ENV{HOME}/.kde/share/config/kscreensaverrc";
-        my $ct = File::Slurper::read_text($path);
-        if ($which eq 'set') {
-            my $secs = $mins*60;
-            $ct =~ s/^(Timeout\s*=\s*)(\S+)/${1}$secs/m
-                or return [500, "Can't subtitute Timeout setting in $path"];
-            File::Slurper::write_text($path, $ct);
+        my $path;
+
+        {
+            $path = "$ENV{HOME}/.kde/share/config/kscreensaverrc";
+            log_trace "Checking $path ...";
+            unless (-f $path) {
+                log_trace "$path doesn't exist";
+                last;
+            }
+            log_trace "$path exists";
+            my $ct = File::Slurper::read_text($path);
+            if ($which eq 'set') {
+                my $secs = $mins*60;
+                $ct =~ s/^(Timeout\s*=\s*)(\S+)/${1}$secs/m
+                    or return [500, "Can't subtitute Timeout setting in $path"];
+                File::Slurper::write_text($path, $ct);
+            }
+            $ct =~ /^Timeout\s*=\s*(\d+)\s*$/m
+                or return [500, "Can't get Timeout setting in $path"];
+            my $val = $1;
+            return [200, "OK", ($which eq 'set' ? undef : $val), {
+                'func.timeout' => $val,
+                'func.screensaver'=>'kde-plasma',
+            }];
         }
-        $ct =~ /^Timeout\s*=\s*(\d+)\s*$/m
-            or return [500, "Can't get Timeout setting in $path"];
-        my $val = $1;
-        return [200, "OK", ($which eq 'set' ? undef : $val), {
-            'func.timeout' => $val,
-            'func.screensaver'=>'kde-plasma',
-        }];
+
+        {
+            $path = "$ENV{HOME}/.config/kscreenlockerrc";
+            log_trace "Checking $path ...";
+            unless (-f $path) {
+                log_trace "$path doesn't exist";
+                last;
+            }
+            log_trace "$path exists";
+            my $ct = File::Slurper::read_text($path);
+            if ($which eq 'set') {
+                if ($ct =~ /^Timeout/m) {
+                    log_trace "Replacing Timeout setting in $path ...";
+                    $ct =~ s/^(Timeout\s*=\s*)(\S+)/${1}$mins/m
+                        or return [500, "Can't subtitute Timeout setting in $path"];
+                } else {
+                    log_trace "Adding Timeout setting in $path ...";
+                    $ct .= "\n[Daemon]\nTimeout=$mins\n";
+                }
+                File::Slurper::write_text($path, $ct);
+            }
+            my $val;
+            if ($ct =~ /^Timeout\s*=\s*(\d+)\s*$/m) {
+                $val = $1*60;
+                log_trace "Got Timeout setting from $path";
+            } else {
+                $val = 5*60;
+                log_trace "Assuming default of 5 minutes in $path";
+            }
+            return [200, "OK", ($which eq 'set' ? undef : $val), {
+                'func.timeout' => $val,
+                'func.screensaver'=>'kde-plasma',
+            }];
+        }
     }
 
-    [412, "Unknown screensaver '$screensaver'"];
+    [412, "Cannot get/set screensaver timeout (screensaver=$screensaver)"];
 }
 
 $SPEC{get_screensaver_timeout} = {
@@ -271,6 +344,13 @@ $SPEC{enable_screensaver} = {
 };
 sub enable_screensaver {
     my %args = @_;
+    my $screensaver = $args{screensaver} // detect_screensaver();
+
+    if ($screensaver eq 'gnome') {
+        system "gsettings", "set", "org.gnome.desktop.lockdown", "disable-lock-screen", "false";
+        if ($?) { return [500, "Failed"] } else { return [200, "OK"] }
+    }
+
     [501, "Not yet implemented"];
 }
 
@@ -283,6 +363,13 @@ $SPEC{disable_screensaver} = {
 };
 sub disable_screensaver {
     my %args = @_;
+    my $screensaver = $args{screensaver} // detect_screensaver();
+
+    if ($screensaver eq 'gnome') {
+        system "gsettings", "set", "org.gnome.desktop.lockdown", "disable-lock-screen", "true";
+        if ($?) { return [500, "Failed"] } else { return [200, "OK"] }
+    }
+
     [501, "Not yet implemented"];
 }
 
@@ -481,7 +568,7 @@ Screensaver::Any - Common interface to screensaver/screenlocker functions
 
 =head1 VERSION
 
-This document describes version 0.002 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2017-03-31.
+This document describes version 0.004 of Screensaver::Any (from Perl distribution Screensaver-Any), released on 2018-02-28.
 
 =head1 DESCRIPTION
 
@@ -491,6 +578,15 @@ This module provides common functions related to screensaver.
 Supported screensavers: KDE Plasma's kscreenlocker (C<kde>), GNOME screensaver
 (C<gnome>), Cinnamon screensaver (C<cinnamon>), and C<xscreensaver>. Support for
 more screensavers, e.g. Windows is more than welcome.
+
+=head1 NOTES
+
+In GNOME 3.8 and later, C<gnome-screensaver> command has been removed (one of
+the reasons is consideration of the eventual move to Wayland). Locking/unlocking
+screen can be done if you install C<gnome-screensaver> separately, or use other
+screensaver like C<xscreensaver>, or use C<gdm> (in which case you can use a
+command like C<< dbus-send --type=method_call --dest=org.gnome.ScreenSaver
+/org/gnome/ScreenSaver org.gnome.ScreenSaver.Lock >>).
 
 =head1 FUNCTIONS
 
@@ -863,7 +959,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

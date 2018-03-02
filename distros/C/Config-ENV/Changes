@@ -1,5 +1,8 @@
 Revision history for Perl extension Config-ENV
 
+0.17 2018-03-02T05:52:38Z
+	- FIX: regression on 0.16 (by kga)
+
 0.16 2018-02-21T05:13:46Z
 	- FIX: for perl 5.26 (by kga)
 

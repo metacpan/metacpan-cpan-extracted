@@ -7,7 +7,7 @@ use vars qw($VERSION);
 
 our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-$VERSION = '2.123';
+$VERSION = '2.125';
 
 =encoding utf8
 
@@ -18,7 +18,7 @@ Module::Release::Prereq - Check pre-requisites list in build file
 =head1 SYNOPSIS
 
 The release script automatically loads this module and checks your
-prerequisite declaration against what you actaully used in the
+prerequisite declaration against what you actually used in the
 tests.
 
 =head1 DESCRIPTION
@@ -34,19 +34,29 @@ It looks in local_name to get the name of the distribution file.
 
 =cut
 
+
+my %Prereq_modules = (
+	'' => 'Test::Prereq',
+	'Makefile.PL' => 'Test::Prereq',
+	'Build.PL' => 'Test::Prereq::Build',
+	);
+
 sub check_prereqs
 	{
-	eval "require Test::Prereq; 1 " or
-		$_[0]->_die( "You need Test::Prereq to check prereqs" );
+	my $prereqs_type = $_[0]->config->makefile_PL;
+	my $test_prereqs = $Prereq_modules{$prereqs_type // ''} || 'Test::Prereq';
 
-	$_[0]->_print( "Checking prereqs... " );
+	eval "require $test_prereqs; 1 " or
+		$_[0]->_die( "You need $test_prereqs to check prereqs" );
+
+	$_[0]->_print( "Checking prereqs with $test_prereqs... " );
 
 	my $perl = $_[0]->{perl};
 
 	my @ignore = $_[0]->_get_prereq_ignore_list;
 
 	my $messages = $_[0]->run(
-		qq|$perl -MTest::Prereq -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"|
+		qq|$perl -M$test_prereqs -e "prereq_ok( undef, undef, [ qw(@ignore) ] )"|
 		);
 
 	$_[0]->_die( "Prereqs had a problem:\n$messages\n" )
@@ -68,7 +78,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in Github:
+This source is in GitHub
 
 	https://github.com/briandfoy/module-release
 
@@ -78,9 +88,10 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2007-2016, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2007-2018, brian d foy C<< <bdfoy@cpan.org> >>. All rights reserved.
 
-You may redistribute this under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the Artistic License 2.0.
 
 =cut
 

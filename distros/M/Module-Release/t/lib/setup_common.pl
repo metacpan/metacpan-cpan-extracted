@@ -4,7 +4,7 @@ use diagnostics;
 use Cwd;
 use File::Spec;
 use File::Path;
-use Test::More 1;
+use Test::More 1.0;
 
 my $old_dir = cwd;
 
@@ -24,7 +24,8 @@ subtest test_dir => sub {
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create empty configuration file
 subtest create_empty_conf => sub {
-	my $rc = open my $fh, '>:utf8', conf_file();
+
+	my $rc = open my $fh, '>:encoding(UTF-8)', conf_file();
 	my $error = $! unless $rc;
 
 	ok( $rc, "Opened empty " . conf_file() );
@@ -37,4 +38,5 @@ subtest create_empty_conf => sub {
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Clean up
+
 

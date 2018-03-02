@@ -10,3 +10,5 @@
 ^MYMETA\.yml$
 ^MYMETA\.json$
 \.tar\.gz$
+\.DS_Store
+Pony-Object-*

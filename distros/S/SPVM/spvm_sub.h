@@ -12,6 +12,7 @@ struct SPVM_sub {
   SPVM_OP* op_constant;
   SPVM_LIST* op_args;
   SPVM_LIST* op_mys;
+  SPVM_LIST* on_stack_replacement_jump_opcode_indexes;
   void* native_address;
   const char* abs_name;
   const char* file_name;
@@ -20,7 +21,7 @@ struct SPVM_sub {
   int32_t call_sub_arg_stack_max;
   int32_t id;
   int32_t eval_stack_max_length;
-  int32_t loop_block_count;
+  int32_t loop_count;
   _Bool is_native;
   _Bool is_constant;
   _Bool is_destructor;

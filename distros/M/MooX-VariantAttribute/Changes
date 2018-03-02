@@ -12,3 +12,6 @@ Revision history for MooX-VariantAttribute
 
 0.07    27/03/2017
         - replace %cry with combine_keys
+
+0.09    26/02/2018
+        - Update deps to include Type::Tiny - Types::Standard not declared as dependency - Andreas Koenig

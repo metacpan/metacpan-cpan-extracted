@@ -45,6 +45,7 @@ do { my $x = {
                                    'HTTP::Request::Common' => '0',
                                    'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
+                                   'Plack::MIME' => '0',
                                    'Plack::Middleware::ContentLength' => '0',
                                    'Plack::Middleware::Head' => '0',
                                    'Plack::Test' => '0',

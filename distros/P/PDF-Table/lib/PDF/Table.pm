@@ -1,10 +1,13 @@
-package PDF::Table;
+#!/usr/bin/env perl
 
 use 5.006;
 use strict;
 use warnings;
+
+package PDF::Table;
+
 use Carp;
-our $VERSION = '0.9.14';
+our $VERSION = '0.10.0';
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if($ENV{'PDF_TABLE_DEBUG'});
 
@@ -48,9 +51,9 @@ sub _init
 }
 
 sub set_defaults{
-	my $self = shift;
+    my $self = shift;
 
-	$self->{'font_size'} = 12;
+    $self->{'font_size'} = 12;
 }
 
 sub set_pdf{
@@ -308,6 +311,7 @@ sub table
         vertical_borders      => 1,
         font                  => 1,
         font_size             => 1,
+        font_underline        => 1,
         font_color            => 1,
         font_color_even       => 1,
         font_color_odd        => 1,
@@ -356,9 +360,10 @@ sub table
     my $txt     = $page->text;
 
     # Set Default Properties
-    my $fnt_name    = $arg{'font'            } || $pdf->corefont('Times',-encode => 'utf8');
-    my $fnt_size    = $arg{'font_size'       } || 12;
-    my $max_word_len= $arg{'max_word_length' } || 20;
+    my $fnt_name       = $arg{'font'            } || $pdf->corefont('Times',-encode => 'utf8');
+    my $fnt_size       = $arg{'font_size'       } || 12;
+    my $fnt_underline  = $arg{'font_underline'  } || undef; # merely stating undef is the intended default
+    my $max_word_len   = $arg{'max_word_length' } || 20;
 
     #=====================================
     # Table Header Section
@@ -377,6 +382,7 @@ sub table
         $header_props->{'font'          } = $header_props->{'font'          } || $fnt_name;
         $header_props->{'font_color'    } = $header_props->{'font_color'    } || '#000066';
         $header_props->{'font_size'     } = $header_props->{'font_size'     } || $fnt_size + 2;
+        $header_props->{'font_underline'} = $header_props->{'font_underline'} || $fnt_underline;
         $header_props->{'bg_color'      } = $header_props->{'bg_color'      } || '#FFFFAA';
         $header_props->{'justify'       } = $header_props->{'justify'       };
     }
@@ -439,7 +445,7 @@ sub table
 
     # Scalars that hold sum of the maximum and minimum widths of all columns
     my ( $max_col_w  , $min_col_w   ) = ( 0,0 );
-    my ( $row, $col_name, $col_fnt_size, $space_w );
+    my ( $row, $col_name, $col_fnt_size, $col_fnt_underline, $space_w );
 
     my $word_widths  = {};
     my $rows_height  = [];
@@ -454,12 +460,13 @@ sub table
         for( my $column_idx = 0; $column_idx < scalar(@{$data->[$row_idx]}) ; $column_idx++ )
         {
             # look for font information for this column
-            my ($cell_font, $cell_font_size);
+            my ($cell_font, $cell_font_size, $cell_font_underline);
 
             if( !$row_idx and ref $header_props )
             {
-                $cell_font      = $header_props->{'font'};
-                $cell_font_size = $header_props->{'font_size'};
+                $cell_font           = $header_props->{'font'};
+                $cell_font_size      = $header_props->{'font_size'};
+                $cell_font_underline = $header_props->{'font_underline'};
             }
 
             # Get the most specific value if none was already set from header_props
@@ -470,6 +477,12 @@ sub table
             $cell_font_size ||= $cell_props->[$row_idx][$column_idx]->{'font_size'}
                             ||  $col_props->[$column_idx]->{'font_size'}
                             ||  $fnt_size;
+
+            $cell_font_underline ||= $cell_props->[$row_idx][$column_idx]->{'font_underline'}
+                                 ||  $col_props->[$column_idx]->{'font_underline'}
+                                 ||  $fnt_underline;
+
+            # Set Font
 
             # Set Font
             $txt->font( $cell_font, $cell_font_size );
@@ -545,7 +558,8 @@ sub table
     # Each iteration adds a new page as neccessary
     while(scalar(@{$data}))
     {
-        my ($page_header, $columns_number);
+        my ($page_header);
+        my $columns_number = 0;
 
         if($pg_cnt == 1)
         {
@@ -621,9 +635,9 @@ sub table
             # Remove the next item from $data
             my $record = shift @{$data};
 
-            # Get columns number to know later how many vertical lines to draw
-            # TODO: get the max number of columns per page as currently last row's columns overrides
-            $columns_number = scalar(@$record);
+            # Get max columns number to know later how many vertical lines to draw
+            $columns_number = scalar(@$record)
+                if scalar(@$record) > $columns_number;
 
             # Get the next set of row related settings
             # Row Height
@@ -666,14 +680,15 @@ sub table
                 $leftovers->[$column_idx] = undef;
 
                 # look for font information for this cell
-                my ($cell_font, $cell_font_size, $cell_font_color, $justify);
+                my ($cell_font, $cell_font_size, $cell_font_color, $cell_font_underline, $justify);
 
                 if( $first_row and ref $header_props)
                 {
-                    $cell_font       = $header_props->{'font'};
-                    $cell_font_size  = $header_props->{'font_size'};
-                    $cell_font_color = $header_props->{'font_color'};
-                    $justify         = $header_props->{'justify'};
+                    $cell_font           = $header_props->{'font'};
+                    $cell_font_size      = $header_props->{'font_size'};
+                    $cell_font_color     = $header_props->{'font_color'};
+                    $cell_font_underline = $header_props->{'font_underline'};
+                    $justify             = $header_props->{'justify'};
                 }
 
                 # Get the most specific value if none was already set from header_props
@@ -688,6 +703,11 @@ sub table
                 $cell_font_color ||= $cell_props->[$row_index][$column_idx]->{'font_color'}
                                  ||  $col_props->[$column_idx]->{'font_color'}
                                  ||  $font_color;
+
+                $cell_font_underline ||= $cell_props->[$row_index][$column_idx]->{'font_underline'}
+                                     ||  $col_props->[$column_idx]->{'font_underline'}
+                                     ||  $fnt_underline;
+
 
                 $justify         ||= $cell_props->[$row_index][$column_idx]->{'justify'}
                                  ||  $col_props->[$column_idx]->{'justify'}
@@ -718,7 +738,9 @@ sub table
                         $space = ($calc_column_widths->[$column_idx] - $txt->advancewidth($record->[$column_idx])) / 2;
                     }
                     $txt->translate( $cur_x + $space, $text_start );
-                    $txt->text( $record->[$column_idx] );
+                    my %text_options;
+                    $text_options{'-underline'} = $cell_font_underline if $cell_font_underline;
+                    $txt->text( $record->[$column_idx], %text_options );
                 }
                 # Otherwise just use the $page->text() method
                 else
@@ -1167,6 +1189,11 @@ B<Default:> 12
 
 =item B<font_color_even> - Font color for even rows
 
+=item B<font_underline> - Font underline of the header row
+
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Default:> none
+
 =item B<background_color_odd> - Background color for odd rows
 
 =item B<background_color_even> - Background color for even rows
@@ -1249,6 +1276,11 @@ B<Default:> 'font_size' of the table + 2
 B<Value:> Color specifier as 'name' or 'HEX'
 B<Default:> '#000066'
 
+=item B<font_underline> - Font underline of the header row
+
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Default:> none
+
 =item B<bg_color> - Background color of the header row
 
 B<Value:> Color specifier as 'name' or 'HEX'
@@ -1311,6 +1343,11 @@ B<Default:> 'font_size' of the table.
 B<Value:> Color specifier as 'name' or 'HEX'
 B<Default:> 'font_color' of the table.
 
+=item B<font_underline> - Font underline of this cell
+
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Default:> none
+
 =item B<background_color> - Background color of this column
 
 B<Value:> Color specifier as 'name' or 'HEX'
@@ -1367,6 +1404,11 @@ B<Default:> 'font_size' of the table.
 B<Value:> Color specifier as 'name' or 'HEX'
 B<Default:> 'font_color' of the table.
 
+=item B<font_underline> - Font underline of this cell
+
+B<Value:> 'auto', integer of distance, or arrayref of distance & thickness (more than one pair will provide mlultiple underlines. Negative distance gives strike-through.
+B<Default:> none
+
 =item B<background_color> - Background color of this cell
 
 B<Value:> Color specifier as 'name' or 'HEX'
@@ -1384,6 +1426,7 @@ Example:
             {    #Row 1 cell 1
                 background_color => '#AAAA00',
                 font_color       => 'yellow',
+                font_underline   => [ 2, 2 ],
             },
 
             # etc.

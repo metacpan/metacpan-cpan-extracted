@@ -3,33 +3,57 @@ package GUIDeFATE;
    use strict;
    use warnings;
    
-   our $VERSION = '0.052';
+   our $VERSION = '0.065';
    
    use Exporter 'import';
    
-   our $frame;
    our @EXPORT_OK      = qw<$frame>;  # allows manipulation of frame from main.
-   
+   our $target="wx";
+   our $AppObject;
+   our $winX=30;
+   our $winY=30;
+   our $winWidth;
+   our $winHeight;
+   our $winTitle;
+   our $winScale=6.5;     
    my  $autoGen="";
    my  $log="";
 
 sub new{
-	my $class= shift;
-	my $target=shift;
-	if (!$target || ($target =~m/wx/i)){
-		 use GFwx qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale $frame $winScale $winWidth $winHeight $winTitle>;
-		 return GFwx->new();
+	my ($class,$textGUI,$target,$assist)=@_;
+	if ((!$target)||($target=~/wx/i)){
+		$target="wx";
+		eval " use GFwx qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale
+		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
+		convert($textGUI,$assist);
+		return GFwx->new(); ;
 	}
+	elsif ($target =~m/tk/i){
+		eval " use GFtk qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale 
+		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
+		convert($textGUI, $target);
+		return GFtk->new(); 
+	}
+	elsif ($target =~m/win32/i){
+		eval " use GFwin32 qw<addButton addStatText addTextCtrl addMenuBits addPanel setScale 
+		           \$frame \$winScale \$winWidth \$winHeight \$winTitle>;";
+		convert($textGUI, $target);
+		return GFwin32->new(); 
+	}
+	
 }
 
+
 sub convert{
-	
-	my @lines=(split /\n/ ,shift) ;
-	my $assist=shift; if (!$assist){$assist="q"};
+	my($textGUI,$assist)=@_;
+	my @lines=(split /\n/ ,$textGUI) ;
+	if (!$assist){$assist="q"};
+		           
 	my $verbose= $assist=~/v/;
 	my $debug= $assist=~/d/;
 	my $auto= $assist=~/a/;
 	
+	if (!exists &{"setScale"}){print "Error exists in GF$target\n"; return;}
 	setScale($winScale);  # makes scaling in the two modules match
 	
 	if ($lines[0] =~ /\-(\d+)x(\d+)-/){
@@ -63,6 +87,7 @@ sub convert{
 			}
 			$fh++;
 			if ($ps  && ($fh-2)) {
+				$content=~s/^\s+|\s+$//g;
 				$log="SubPanel '$panelType' Id $bid found position  $ps height $fh width $fl at row $l with content $content \n";##
 				if ($verbose){ print $log; }
 				if ($auto){ $autoGen.="#".$log; }
@@ -73,11 +98,11 @@ sub convert{
 		
 		
 		while ($line =~m/(\{([^}]*)\})/g){   # buttons are made from { <label> } 
-			my $ps=length($`);
-			$log= "Button with label '". $2."' calls function &btn$bid\n"; ##
+			my $ps=length($`);my $label=$2; my $len=length ($label);$label=~s/^(\s+)|(\s+)$//g;
+			$log= "Button with label '$label' calls function &btn$bid\n"; ##
 			if ($verbose){ print $log; }
-			if ($auto){ $autoGen.=makeSub("btn$bid", "button with label $2 "); }			
-			addButton([$bid, $2,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*(length($2)*2+3),$winScale*4], \&{"main::btn".$bid++}]);
+			if ($auto){ $autoGen.=makeSub("btn$bid", "button with label $label "); }			
+			addButton([$bid, $label,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*($len*2+3),$winScale*4], \&{"main::btn".$bid++}]);
 			$line=~s/(\{([^}]*)\})/" " x length($1)/e;     #remove buttons replacing with spaces
 		}
 		while ($line=~m/(\[([^\]]+)\])/g){   # text ctrls are made from [ default text ] 
@@ -85,7 +110,9 @@ sub convert{
 			$log= "Text Control with default text ' $content ', calls function &textctrl$bid \n"; ##
 			if ($verbose){ print $log; }
 			if ($auto){ $autoGen.=makeSub("textctrl$bid","Text Control with default text ' $content '" ); }	
-			addTextCtrl([$bid, $content,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*(length($content)*2+3),$winScale*4], \&{"main::textctrl".$bid++}]);
+			my $trimmed=$content; $trimmed=~s/(\s+)|(\s+)$//g; 
+			addTextCtrl([$bid, $trimmed,[$winScale*($ps*2-1),$winScale*$l*4],[$winScale*(length($content)*2+3),$winScale*4], \&{"main::textctrl".$bid}]);
+			$bid++;
 			$line=~s/(\[([^\]]+)\])/" " x length($1)/e;     #remove text controls replacing with spaces
 		}
 		if ($line !~ m/\+/){
@@ -159,8 +186,8 @@ sub convert{
 		}
 	
 	sub makeSub{
-	  my ($subName, $trigger)=@_;
-	  return "sub $subName #called using $trigger\n  {\n  # subroutione code goes here\n   };\n\n";
+	  my ($subName,$trigger)=@_;
+	  return "sub $subName #called using $trigger {\n  # subroutione code goes here\n   };\n\n";
     }
 
 
@@ -171,11 +198,13 @@ sub convert{
 		  print $deb."\n";
 	}
   }
-}	
+}
+
+1;
 
 =head1 GUIDeFATE
 
-GUIDeFATE  -  Grapghical User Interface Design From A Text Editor
+GUIDeFATE  -  Graphical User Interface Design From A Text Editor
 
 =head1 SYNOPSIS
 
@@ -197,14 +226,14 @@ GUIDeFATE  -  Grapghical User Interface Design From A Text Editor
 
     END
 
-    GUIDeFATE::convert($window);
-    my $gui=GUIDeFATE->new();
-    $frame->{stattext21}->SetForegroundColour( Wx::Colour->new(255, 0, 0) );
+    my $gui=GUIDeFATE->new($window);
+    $frame=$gui->getFrame;
     $gui->MainLoop;
 
 =head1 REQUIRES
 
-Perl5.8.8, Exporter, Wx, Wx::Perl::Imagick
+Perl5.8.8, Exporter, Wx, Wx::Perl::Imagick (for Wx interface)
+Perl5.8.8, Exporter, Tk, Image::Imagick, Tk::JPEG, MIME::Base64 (for Tk interface)
 
 =head1 EXPORTS
 
@@ -212,9 +241,10 @@ $frame
 
 =head1 DESCRIPTION
 
-GUIDeFATE enables the user to convert a textual representtaion into a Graphical user Interface
-It attempts to abstract out the underlying framework.  A visually recognisable pattern is passed
-as a string to GUIDeFATE and this is transformed into an Interactive Interface.
+GUIDeFATE enables the user to convert a textual representtaion into a
+Graphical user Interfac. It attempts to abstract out the underlying
+framework.  A visually recognisable pattern is passed as a string to
+GUIDeFATE and this is transformed into an Interactive Interface.
 
 =head1 METHODS
 
@@ -222,13 +252,19 @@ as a string to GUIDeFATE and this is transformed into an Interactive Interface.
 
 =over 4
 
-=item GUIDeFATE::convert($window, $options)
+=item my $gui=GUIDeFATE->new($window, $backend, $options);
 
-Extracts dimensions and wdigets in a window from the etxual representation
+Extracts dimensions and wdigets in a window from the textual
+representation.
+If $options not pprovided, defaults to "Wx"; options are Wx and Tk.
+If $options contains "v", then a verbose output is sent to console,
+if it contains "a", and autogenerated file is produced with all the
+called functions
 
-=item new GUIDeFATE("wx")
+=item my $frame=$gui->getFrame;
 
-Creates and returns a new Application using a previously converted frame
+Returns reference to the frame for both abstracted and backend
+specific functions.
 
 =back
 
@@ -238,8 +274,6 @@ Saif Ahmed, SAIFTYNET { at } gmail.com
 
 =head1 SEE ALSO
 
-Wx, Wx::Perl::Imagick
+L<Wx>, L<Tk>, L<Image::Magick>, L<Wx::Perl::Imagick>,
 
 =cut
-
-1;

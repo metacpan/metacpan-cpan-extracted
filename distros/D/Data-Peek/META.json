@@ -1,38 +1,43 @@
 {
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
-   "release_status" : "stable",
-   "version" : "0.47",
-   "license" : [
-      "perl_5"
-   ],
-   "provides" : {
-      "Data::Peek" : {
-         "version" : "0.47",
-         "file" : "Peek.pm"
-      }
-   },
-   "name" : "Data-Peek",
-   "dynamic_config" : 1,
-   "abstract" : "Modified and extended debugging facilities",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "type" : "git",
          "web" : "https://github.com/Tux/Data-Peek",
          "url" : "https://github.com/Tux/Data-Peek"
       },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "x_IRC" : "irc://irc.perl.org/#csv"
    },
+   "release_status" : "stable",
+   "abstract" : "Modified and extended debugging facilities",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   ],
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   },
    "generated_by" : "Author",
+   "name" : "Data-Peek",
+   "provides" : {
+      "Data::Peek" : {
+         "version" : "0.48",
+         "file" : "Peek.pm"
+      }
+   },
+   "version" : "0.48",
    "prereqs" : {
-      "configure" : {
+      "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Data::Dumper" : "0",
+            "DynaLoader" : "0",
+            "perl" : "5.008"
+         },
+         "recommends" : {
+            "Perl::Tidy" : "0",
+            "Data::Dumper" : "2.167"
          }
       },
       "build" : {
@@ -40,28 +45,23 @@
             "perl" : "5.008"
          }
       },
-      "runtime" : {
+      "configure" : {
          "requires" : {
-            "perl" : "5.008",
-            "DynaLoader" : "0",
-            "Data::Dumper" : "0"
-         },
-         "recommends" : {
-            "Perl::Tidy" : "0",
-            "Data::Dumper" : "2.167"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "test" : {
-         "recommends" : {
-            "Test::More" : "1.302086"
-         },
          "requires" : {
             "Test::More" : "0.88",
             "Test::NoWarnings" : "0"
+         },
+         "recommends" : {
+            "Test::More" : "1.302125"
          }
       }
    },
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+   "dynamic_config" : 1,
+   "license" : [
+      "perl_5"
    ]
 }

@@ -20,7 +20,7 @@ CtrlO::Crypt::XkcdPassword::Wordlist::en_gb - default word list for CtrlO::Crypt
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 DESCRIPTION
 
@@ -119,7 +119,6 @@ abolish
 abolition
 aborigine
 abort
-abortion
 abortive
 abound
 about
@@ -148,8 +147,6 @@ absurdity
 absurdly
 abundance
 abundant
-abuse
-abuser
 abusive
 abysmal
 academic
@@ -641,7 +638,6 @@ ascent
 ascertain
 ascetic
 ascribe
-asexual
 ashcan
 ashen
 ashore
@@ -660,8 +656,6 @@ aspirin
 assail
 assailant
 assassin
-assault
-assaulter
 assemble
 assembler
 assembly
@@ -859,7 +853,6 @@ barbarian
 barbaric
 barbecue
 barber
-bareback
 barefoot
 barely
 barer
@@ -895,7 +888,6 @@ basil
 basin
 basket
 bassoon
-bastard
 baste
 batch
 bathe
@@ -1019,14 +1011,10 @@ beware
 bewilder
 bewitch
 beyond
-bible
-biblical
 bicker
 bicycle
 bidden
 biennial
-bigamist
-bigamy
 bigger
 bigot
 bigotry
@@ -1053,7 +1041,6 @@ birthmark
 biscuit
 bishop
 bison
-bitch
 bitmap
 bitten
 bitter
@@ -1135,7 +1122,6 @@ blown
 blowout
 blowtorch
 blubber
-bludgeon
 bluebell
 blueberry
 bluebird
@@ -1170,11 +1156,9 @@ bologna
 bolster
 bombard
 bomber
-bondage
 bonfire
 bonier
 bonnet
-booby
 bookcase
 bookend
 booklet
@@ -1199,7 +1183,6 @@ boringly
 borne
 borough
 borrow
-bosom
 bossier
 bossy
 botanical
@@ -1270,7 +1253,6 @@ breakable
 breakdown
 breakfast
 breakneck
-breast
 breath
 breathe
 breather
@@ -1362,7 +1344,6 @@ buffalo
 buffer
 buffet
 buffoon
-bugger
 buggier
 buggy
 bugle
@@ -1383,7 +1364,6 @@ bullfrog
 bullion
 bully
 bumblebee
-bummer
 bumper
 bumpier
 bumpy
@@ -1430,7 +1410,6 @@ butter
 buttercup
 butterfly
 buttery
-buttock
 button
 buxom
 buyer
@@ -1846,7 +1825,6 @@ clearance
 clearer
 clearly
 cleat
-cleavage
 cleave
 cleaver
 cleft
@@ -1925,7 +1903,6 @@ cobble
 cobbler
 cobra
 cobweb
-cocaine
 cockier
 cockpit
 cockroach
@@ -2003,7 +1980,6 @@ commonly
 commotion
 communal
 commune
-communion
 communism
 communist
 community
@@ -2055,7 +2031,6 @@ condemn
 condense
 condiment
 condition
-condom
 condone
 condor
 conducive
@@ -2720,7 +2695,6 @@ deviant
 deviate
 deviation
 device
-devil
 devoid
 devolve
 devote
@@ -3168,7 +3142,6 @@ eighth
 eightieth
 eighty
 either
-ejaculate
 eject
 ejection
 elaborate
@@ -3388,11 +3361,9 @@ erase
 eraser
 erasure
 erect
-erection
 ergonomic
 erode
 erosion
-erotic
 errand
 errant
 erratic
@@ -3586,7 +3557,6 @@ factory
 factual
 factually
 faculty
-faggot
 failure
 faint
 fainter
@@ -3712,8 +3682,6 @@ fickle
 fickler
 fiction
 fictional
-fiddle
-fiddler
 fiddly
 fidelity
 fidget
@@ -3958,12 +3926,10 @@ foreman
 foremen
 foremost
 forensic
-foreplay
 foresaw
 foresee
 foreseen
 foresight
-foreskin
 forestall
 forestry
 foretaste
@@ -4240,8 +4206,6 @@ genial
 genially
 genie
 genii
-genital
-genocide
 genre
 gentile
 gentility
@@ -4287,7 +4251,6 @@ gingerly
 gingham
 giraffe
 girder
-girdle
 girlhood
 girlish
 girth
@@ -4823,7 +4786,6 @@ holler
 hollow
 hollower
 holly
-holocaust
 holster
 homage
 homeland
@@ -5474,10 +5436,7 @@ keyword
 khaki
 kickback
 kickoff
-kidnap
-kidnapper
 kidney
-killer
 kilobyte
 kilogram
 kilometre
@@ -5505,7 +5464,6 @@ knead
 kneecap
 kneel
 knelt
-knife
 knight
 knock
 knocker
@@ -5663,7 +5621,6 @@ leopard
 leotard
 leper
 leprosy
-lesbian
 lesion
 lessen
 lesser
@@ -5886,7 +5843,6 @@ lyric
 lyrical
 macabre
 macaroni
-machete
 machine
 machinery
 machinist
@@ -5945,7 +5901,6 @@ malign
 malignant
 mallard
 malleable
-mallet
 maltreat
 mamma
 mammal
@@ -6002,7 +5957,6 @@ margin
 marginal
 maria
 marigold
-marijuana
 marina
 marinate
 marine
@@ -6036,7 +5990,6 @@ masculine
 masochist
 mason
 masonry
-massacre
 massage
 massive
 massively
@@ -6824,7 +6777,6 @@ organ
 organic
 organism
 organist
-orgasm
 orient
 oriental
 orientate
@@ -7966,7 +7918,6 @@ rapid
 rapider
 rapidity
 rapidly
-rapist
 rapport
 rapture
 rarely
@@ -8074,7 +8025,6 @@ rectal
 rectangle
 rectify
 rector
-rectum
 recur
 recurrent
 recursion
@@ -8520,9 +8470,6 @@ sacrilege
 sadden
 sadder
 saddle
-sadism
-sadist
-sadistic
 sadly
 safari
 safeguard
@@ -8585,7 +8532,6 @@ sarcastic
 sardine
 sassier
 sassy
-satanic
 satchel
 satellite
 satin
@@ -8779,7 +8725,6 @@ selfish
 seller
 semantic
 semblance
-semen
 semester
 semicolon
 semifinal
@@ -8848,11 +8793,6 @@ severer
 severity
 sewage
 sewer
-sexism
-sexist
-sexual
-sexuality
-sexually
 shabbier
 shabbily
 shabby
@@ -9106,9 +9046,7 @@ slander
 slang
 slant
 slapstick
-slash
 slate
-slaughter
 slave
 slavery
 slavish
@@ -9267,7 +9205,6 @@ sociology
 socket
 sodden
 sodium
-sodomy
 softball
 soften
 softer
@@ -9319,8 +9256,6 @@ sooty
 sophistry
 sophomore
 soprano
-sorcerer
-sorcery
 sordid
 sorely
 sorer
@@ -9398,7 +9333,6 @@ speller
 spelt
 spend
 spent
-sperm
 sphere
 spherical
 sphinx
@@ -9478,7 +9412,6 @@ sprout
 spruce
 sprucer
 sprung
-spunk
 spurn
 spurt
 sputter
@@ -9622,7 +9555,6 @@ stifle
 stigma
 stigmata
 still
-stillborn
 stiller
 stimulant
 stimulate
@@ -10777,9 +10709,6 @@ vacillate
 vacuum
 vagabond
 vagary
-vagina
-vaginae
-vaginal
 vagrant
 vague
 vaguely
@@ -10908,8 +10837,6 @@ violet
 violin
 viper
 viral
-virgin
-virginity
 virile
 virility
 virtual

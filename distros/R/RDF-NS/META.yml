@@ -4,9 +4,9 @@ author:
   - 'Jakob Voß'
 build_requires: {}
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build::Tiny: '0.039'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,9 +27,10 @@ resources:
   bugtracker: https://github.com/nichtich/RDF-NS/issues
   homepage: https://github.com/nichtich/RDF-NS
   repository: https://github.com/nichtich/RDF-NS.git
-version: '20180213'
+version: '20180227'
 x_contributors:
   - 'Andreas Koenig <andk@cpan.org>'
   - 'Jakob Voss <jakob@nichtich.de>'
   - 'Jakob Voss <voss@gbv.de>'
+  - 'Kjetil Kjernsmo <kjetil@kjernsmo.net>'
   - 'Sergey Romanov <complefor@rambler.ru>'

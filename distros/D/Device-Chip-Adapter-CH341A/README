@@ -1,0 +1,32 @@
+NAME
+
+    Device::Chip::Adapter::CH341A - a Device::Chip::Adapter implementation
+
+DESCRIPTION
+
+    This class implements the Device::Chip::Adapter interface for the
+    CH341A USB interface chip, allowing an instance of a Device::Chip
+    driver to communicate with actual chip hardware using this adapter.
+
+    The CH341A is often found in cheap USB serial memory programmers and
+    similar devices, for programming SPI or I²C EEPROM and flash memory
+    chips.
+
+CONSTRUCTOR
+
+ new
+
+       $adapter = Device::Chip::Adapter::CH341A->new
+
+    Returns a new instance of a Device::Chip::Adapter::CH341A.
+
+PROTOCOLS
+
+    The following Device::Chip::Adapter protocol types are supported
+
+      * SPI
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

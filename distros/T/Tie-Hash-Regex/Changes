@@ -1,93 +1,125 @@
-2008-03-08  dave
+2018-02-23  Dave Cross <dave@dave.org.uk>
 
-	* [r23] MANIFEST:
-	  Added Build.PL to MANIFEST
-	* [r22] MANIFEST:
-	  Moved Regex.pm in MANIFEST
-	* [r21] lib/Tie/Hash/Regex.pm:
-	  Removed old CVS log.
-	  Switched references from dave.org.uk to mag-sol.com.
-	  Forced use of Perl >= 5.6.
-	  Used "our" instead of "use vars".
-	  Added "use warnings".
-	  Added LICENSE (sic) section.
-	* [r20] t/pod.t, t/test.t:
-	  Switched to using Test::More.
-	  Removed old Test comments.
-	  Added t/pod.t.
-	* [r19] MANIFEST:
-	  Removed COPYING from MANIFEST
-	* [r18] COPYING:
-	  Removed COPYING
-	* [r17] Regex.pm, lib, lib/Tie, lib/Tie/Hash,
-	  lib/Tie/Hash/Regex.pm:
-	  Moved Regex.pm to lib
-	* [r16] Build.PL, Makefile.PL:
-	  Switch from Makefile.PL to Build.PL
+  * Build.PL: Missed a version number.
 
-2006-06-01  dave
+  * README, README.xml, lib/Tie/Hash/Regex.pm: Replace README.xml with plain
+  text README. Bump version.
 
-	* [r15] Regex.pm:
-	  Raising to version 1.0
-	* [r14] MANIFEST, t/pod_coverage.t:
-	  Added t/pod_coverage.t
+  * .travis.yml: Added more Perl versions to .travis.yml.
 
-2004-10-23  dave
+2016-10-04  Dave Cross <dave@dave.org.uk>
 
-	* [r13] Regex.pm, t/test.t:
-	  Improve test coverage.
+  * t/slices.t: Skip the skip_all
 
-2004-05-22  dave
+  * t/slices.t: More tests that won't compile
 
-	* [r12] t/test.t:
-	  Added some new tests
+  * t/slices.t: Comment out TODO blocks  As they still need to compile on older
+  versions of Perl.
 
-2004-05-12  dave
+2016-05-18  Dave Cross <dave@dave.org.uk>
 
-	* [r11] COPYING, MANIFEST, Makefile.PL, README.xml:
-	  Added various files to cvs
-	* [r10] t, t/test.t:
-	  Added test file to CVS
+  * t/slices.t: Skip slice tests if hash slices are unsupported.
 
-2002-09-23  dave
+  * t/test.t: Use 'is' instead of 'ok' when appropriate.
 
-	* [r9] Regex.pm:
-	  Fixed to work with Perl 5.8.0.
+  * t/slices.t: Better tests (and mark some as TODO)
 
-2002-07-28  dave
+  * lib/Tie/Hash/Regex.pm: Fix some typos that have been there for a very long
+  time
 
-	* [r8] Regex.pm:
-	  Applied "exists" hash from Steffen M�ller.
+2015-08-17  Theodorus Van Hoesel <tvanhoesel@mmw-thvanhoesel.local>
 
-2002-07-12  dave
+  * t/slices.t: added test for 5.20 where regex should return more than one
 
-	* [r7] Regex.pm:
-	  Corrected Attribute::Handler dependencies
+2015-07-18  Dave Cross <dave@dave.org.uk>
 
-2001-12-09  dave
+  * .travis.yml: Added .travis.yml
 
-	* [r6] Regex.pm:
-	  Doc fixes.
-	* [r5] Regex.pm:
-	  Added Attribute::Handlers interface.
+2015-07-17  Dave Cross <dave@dave.org.uk>
 
-2001-09-03  dave
+  * .gitignore: Added .gitignore
 
-	* [r4] Regex.pm:
-	  Minor fixes.
+  * MANIFEST: Added META.json to MANIFEST
 
-2001-09-02  dave
+2009-02-21  Dave Cross <dave@dave.org.uk>
 
-	* [r3] Regex.pm:
-	  Added ref to Tie::RegexpHash.
+  * lib/Tie/Hash/Regex.pm: Changed versioning system.
 
-2001-06-03  dave
+2008-06-30  Dave Cross <dave@dave.org.uk>
 
-	* [r2] Regex.pm:
-	  Put into RCS.
+  * README.xml: Typo
 
-2001-06-03  
+2008-03-14  Dave Cross <dave@dave.org.uk>
 
-	* [r1] .:
-	  New repository initialized by cvs2svn.
+  * README.xml: Fixed broken XML
 
+2008-03-08  Dave Cross <dave@dave.org.uk>
+
+  * MANIFEST: Added Build.PL to MANIFEST
+
+  * MANIFEST: Moved Regex.pm in MANIFEST
+
+  * lib/Tie/Hash/Regex.pm: Removed old CVS log. Switched references from
+  dave.org.uk to mag-sol.com. Forced use of Perl >= 5.6. Used "our" instead of
+  "use vars". Added "use warnings". Added LICENSE (sic) section.
+
+  * t/pod.t, t/test.t: Switched to using Test::More. Removed old Test comments.
+  Added t/pod.t.
+
+  * MANIFEST: Removed COPYING from MANIFEST
+
+  * COPYING: Removed COPYING
+
+  * Regex.pm => lib/Tie/Hash/Regex.pm: Moved Regex.pm to lib
+
+  * Build.PL, Makefile.PL: Switch from Makefile.PL to Build.PL
+
+2006-06-01  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Raising to version 1.0
+
+  * MANIFEST, t/pod_coverage.t: Added t/pod_coverage.t
+
+2004-10-23  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm, t/test.t: Improve test coverage.
+
+2004-05-22  Dave Cross <dave@dave.org.uk>
+
+  * t/test.t: Added some new tests
+
+2004-05-12  Dave Cross <dave@dave.org.uk>
+
+  * COPYING, MANIFEST, Makefile.PL, README.xml: Added various files to cvs
+
+  * t/test.t: Added test file to CVS
+
+2002-09-23  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Fixed to work with Perl 5.8.0.
+
+2002-07-28  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Applied "exists" hash from Steffen M�ller.
+
+2002-07-12  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Corrected Attribute::Handler dependencies
+
+2001-12-09  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Doc fixes.
+
+  * Regex.pm: Added Attribute::Handlers interface.
+
+2001-09-03  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Minor fixes.
+
+2001-09-02  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Added ref to Tie::RegexpHash.
+
+2001-06-03  Dave Cross <dave@dave.org.uk>
+
+  * Regex.pm: Put into RCS.

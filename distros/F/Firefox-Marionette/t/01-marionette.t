@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 314;
+use Test::More tests => 320;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -34,23 +34,24 @@ sub start_firefox {
 		diag("Exception in $source at line $line during new:$exception");
 	}
 	if ($exception =~ /^(Firefox exited with a 11|Firefox killed by a SEGV signal \(11\))/) {
-		diag("Caught a SEGV type exception.  Running any appliable memory checks");
-		if ($^O eq 'linux') {
-			diag("grep -r Mem /proc/meminfo");
-			diag(`grep -r Mem /proc/meminfo`);
-			diag("ulimit -a | grep -i mem");
-			diag(`ulimit -a | grep -i mem`);
-		} elsif ($^O =~ /bsd/i) {
-			diag("sysctl hw | egrep 'hw.(phys|user|real)'");
-			diag(`sysctl hw | egrep 'hw.(phys|user|real)'`);
-			diag("ulimit -a | grep -i mem");
-			diag(`ulimit -a | grep -i mem`);
-		}
+		diag("Caught a SEGV type exception");
 		if ($at_least_one_success) {
 			$skip_message = "SEGV detected.  No need to restart";
 			$segv_detected = 1;
 			return ($skip_message, undef);
 		} else {
+			diag("Running any appliable memory checks");
+			if ($^O eq 'linux') {
+				diag("grep -r Mem /proc/meminfo");
+				diag(`grep -r Mem /proc/meminfo`);
+				diag("ulimit -a | grep -i mem");
+				diag(`ulimit -a | grep -i mem`);
+			} elsif ($^O =~ /bsd/i) {
+				diag("sysctl hw | egrep 'hw.(phys|user|real)'");
+				diag(`sysctl hw | egrep 'hw.(phys|user|real)'`);
+				diag("ulimit -a | grep -i mem");
+				diag(`ulimit -a | grep -i mem`);
+			}
 			my $time_to_recover = 2; # magic number.  No science behind it. Trying to give time to allow O/S to recover.
 			diag("About to sleep for $time_to_recover seconds to allow O/S to recover");
 			sleep $time_to_recover;
@@ -232,14 +233,18 @@ $profile->set_value('security.OCSP.GET.enabled', 'false');
 $profile->clear_value('security.OCSP.enabled');  # just testing
 $profile->set_value('security.OCSP.enabled', 0); 
 SKIP: {
-	($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile);
+	($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile, mime_types => [ 'application/pkcs10', 'application/pdf' ]);
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 29);
+		skip($skip_message, 34);
 	}
 	ok($firefox, "Firefox has started in Marionette mode");
+	ok((scalar grep { /^application\/pkcs10$/ } $firefox->mime_types()), "application/pkcs10 has been added to mime_types");
+	ok((scalar grep { /^application\/pdf$/ } $firefox->mime_types()), "application/pdf was already in mime_types");
+	ok((scalar grep { /^application\/x\-gzip$/ } $firefox->mime_types()), "application/x-gzip was already in mime_types");
+	ok((!scalar grep { /^text\/html$/ } $firefox->mime_types()), "text/html should not be in mime_types");
 	my $capabilities = $firefox->capabilities();
 	ok(!defined $capabilities->proxy(), "\$capabilities->proxy() is undefined");
 	diag("Browser version is " . $capabilities->browser_version());
@@ -254,6 +259,7 @@ SKIP: {
 	ok($firefox->application_type(), "\$firefox->application_type() returns " . $firefox->application_type());
 	ok($firefox->marionette_protocol(), "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
 	ok($firefox->window_type() eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':" . $firefox->window_type());
+	ok($firefox->sleep_time_in_ms() == 1, "\$firefox->sleep_time_in_ms() is 1 millisecond");
 	my $new_x = 3;
 	my $new_y = 9;
 	my $new_height = 452;
@@ -315,14 +321,15 @@ SKIP: {
 	my $daemon = HTTP::Daemon->new() || die "Failed to create HTTP::Daemon";
 	my $localPort = URI->new($daemon->url())->port();
 	my $proxy = Firefox::Marionette::Proxy->new( type => 'manual', http => 'localhost:' . $localPort, https => 'proxy.example.org:4343', ftp => 'ftp.example.org:2121', none => [ 'local.example.org' ], socks => 'socks.example.org:1081' );
-	($skip_message, $firefox) = start_firefox(0, debug => 1, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
+	($skip_message, $firefox) = start_firefox(0, debug => 1, sleep_time_in_ms => 5, profile => $profile, capabilities => Firefox::Marionette::Capabilities->new(proxy => $proxy, moz_headless => 1, accept_insecure_certs => 1, page_load_strategy => 'eager', moz_webdriver_click => 1, moz_accessibility_checks => 1));
 	if (!$skip_message) {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 16);
+		skip($skip_message, 17);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to known values");
+	ok($firefox->sleep_time_in_ms() == 5, "\$firefox->sleep_time_in_ms() is 5 milliseconds");
 	my $capabilities = $firefox->capabilities();
 	ok((ref $capabilities) eq 'Firefox::Marionette::Capabilities', "\$firefox->capabilities() returns a Firefox::Marionette::Capabilities object");
 	ok($capabilities->page_load_strategy() eq 'eager', "\$capabilities->page_load_strategy() is 'eager'");
@@ -488,7 +495,7 @@ SKIP: {
 		$result = $firefox->switch_to_window($original_window_handle);
 	} or do {
 		chomp $@;
-		if (!$firefox->addons()) {
+		if ($firefox->addons()) {
 			diag("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@");
 			skip("\$firefox->switch_to_window(\$window_id) is not working for $major_version.$minor_version:$@", 213);
 		}
@@ -845,19 +852,11 @@ SKIP: {
 			if ($@ =~ /^(Firefox exited with a 11|Firefox killed by a SEGV signal \(11\))/) {
 				$segv_detected = 1;
 				diag(qq[SEGV crash when pressing "I'm feeling Lucky" on metacpan.org:$@]);
-				skip("Firefox crashed during navigation to a new page", 29);
+				skip("Firefox crashed during navigation to a new page", 31);
 			}	
 		};
 	}
-	while(not eval { $firefox->find_partial('Download') }) {
-		if (($@) && ($@->isa('Firefox::Marionette::Exception::NotFound'))) {
-			diag("Firefox::Marionette::Exception::NotFound thrown during find of Download link");
-		} else {
-			die $@;
-		}
-		sleep 1;
-	}
-	ok($firefox->find_partial('Download')->click(), "Clicked on the download link");
+	ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->find_partial('Download') })->click(), "Clicked on the download link");
 	while(!$firefox->downloads()) {
 		sleep 1;
 	}

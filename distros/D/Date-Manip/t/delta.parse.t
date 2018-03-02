@@ -18,10 +18,10 @@ sub test {
   $err = $obj->parse(@test);
   if ($err) {
      $err = $obj->err();
-     return ($obj->value(),$err);
+     return ($err);
   } else {
      @val = $obj->value();
-     return (@val,$$obj{"data"}{"business"});
+     return (@val,($$obj{"data"}{"mode"} eq 'business' ? 1 : 0));
   }
 }
 
@@ -34,7 +34,7 @@ $tests="
 
 1:2:3:4:5:6:7               => 1 2 3 4 5 6 7 0
 
-'in 1:2:3:4:5:6:7'          => __blank__ '[parse] Invalid delta string'
+'in 1:2:3:4:5:6:7'          => '[parse] Invalid delta string'
 
 -1:2:3:4:5:6:7              => -1 -2 -3 -4 -5 -6 -7 0
 
@@ -52,13 +52,13 @@ $tests="
 
 +1:+1:-1:+1                 => 0 0 0 1 0 59 1 0
 
-+1:-1:+1:+1                 => 0 0 0 1 0 -58 -59 0
++1:-1:+1:+1                 => 0 0 0 0 23 1 1 0
 
 +1:+1:-1:-1                 => 0 0 0 1 0 58 59 0
 
-+1:-1:+1:-1                 => 0 0 0 1 0 -59 -1 0
++1:-1:+1:-1                 => 0 0 0 0 23 0 59 0
 
-+1:-1:-1:+1                 => 0 0 0 1 -1 0 -59 0
++1:-1:-1:+1                 => 0 0 0 0 22 59 1 0
 
 -0:1:+0:0:0:0:0             => 0 -1 0 0 0 0 0 0
 
@@ -86,7 +86,7 @@ $tests="
 
 '+ 35 y, -10 month 15mn'    => 34 2 0 0 0 -15 0 0
 
-'+35x 10 month'             => __blank__ '[parse] Invalid delta string'
+'+35x 10 month'             => '[parse] Invalid delta string'
 
 'two weeks ago'             => 0 0 -2 0 0 0 0 0
 

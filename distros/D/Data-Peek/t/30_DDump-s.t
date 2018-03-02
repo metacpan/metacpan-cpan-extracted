@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # I would like more tests, but contents change over every perl version
-use Test::More tests => 6;
+use Test::More tests => 7;
 use Test::NoWarnings;
 
 use Data::Peek;
@@ -27,8 +27,16 @@ foreach my $test (@tests) {
     my ($in, $expect) = split m/\n--\n/ => $test;
     $in eq "" and next;
     SKIP: {
-	eval "\$var = $in;";
-	my $dump = DDump ($var);
+	my $dump;
+	if ($in eq "DEFSV") {
+	    $_ = undef;
+	    $_ = "DEFSV";
+	    $dump = DDump;
+	    }
+	else {
+	    eval "\$var = $in;";
+	    $dump = DDump ($var);
+	    }
 
 	if ($in =~ m/20ac/) {
 	    if ($] < 5.008) {
@@ -56,12 +64,11 @@ foreach my $test (@tests) {
 
 	$in   =~ s/[\s\n]+/ /g;
 
-	my @match = grep { $dump eq $_ } @expect;
-	if (@match == 1) {
+	if (my @match = grep { $dump eq $_ } @expect) {
 	    is ($dump, $match[0], "DDump ($in)");
 	    }
 	else {
-	    my $match = shift @expect;
+	    my $match = pop @expect;
 	    is ($dump, $match, "DDump ($in)");
 	    diag ("DDump ($in) neither matches\n$_") for @expect;
 	    }
@@ -161,3 +168,20 @@ SV = PVIV(0x****) at 0x****
   CUR = 0
   LEN = 8
   COW_REFCNT = 0
+==
+DEFSV
+--
+SV = PV(0x****) at 0x****
+  REFCNT = 1
+  FLAGS = (POK,pPOK)
+  PV = 0x**** "DEFSV"\0
+  CUR = 5
+  LEN = 8
+| # as of 5.19.3
+SV = PV(0x****) at 0x****
+  REFCNT = 1
+  FLAGS = (POK,IsCOW,pPOK)
+  PV = 0x**** "DEFSV"\0
+  CUR = 5
+  LEN = 8
+  COW_REFCNT = 1

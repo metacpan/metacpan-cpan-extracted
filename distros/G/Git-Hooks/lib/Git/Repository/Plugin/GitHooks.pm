@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.5.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.6.3';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -584,9 +584,9 @@ sub get_config {
         }
 
         # Set default values for undefined ones.
-        $config{githooks}{externals}       //= [1];
-        $config{githooks}{gerrit}{enabled} //= [1];
-        $config{githooks}{'abort-commit'}  //= [1];
+        $config{githooks}{externals}       //= ['true'];
+        $config{githooks}{gerrit}{enabled} //= ['true'];
+        $config{githooks}{'abort-commit'}  //= ['true'];
 
         $git->{_plugin_githooks}{config} = \%config;
     }
@@ -682,7 +682,7 @@ sub fault {
     $info //= {};
     my $prefix = exists $info->{prefix} ? $info->{prefix} : caller(1);
     chomp $message;             # strip trailing newlines
-    $message =~ s/\b([0-9a-f]{40})\b/$git->run('rev-parse', '--short', $1)/eg; # shorten SHA1s in the message
+    $message =~ s/\b[0-9a-f]{40}\b/$git->run('rev-parse', '--short', ${^MATCH})/egp; # shorten SHA1s in the message
     my $fmtmsg = "\n[$prefix] $message";
     if (my $details = $info->{details}) {
         $details =~ s/\n*$//s; # strip trailing newlines
@@ -1254,7 +1254,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 

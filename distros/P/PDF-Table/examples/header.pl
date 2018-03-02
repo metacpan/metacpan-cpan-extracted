@@ -41,6 +41,7 @@ $pdftable->table(
 	# some optional params
 	border          => 0,
 	font_size       => 20,
+	font_underline  => [3 ,2],
 	max_word_length => 13,
 	header_props    => {
 		background_color => 'yellow',

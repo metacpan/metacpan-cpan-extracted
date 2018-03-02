@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.5.0';
+$Git::Hooks::CheckReference::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -15,6 +15,8 @@ use List::MoreUtils qw/any none/;
 sub check_ref {
     my ($git, $ref) = @_;
 
+    my $errors = 0;
+
     my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
 
     # Check names of newly created refs
@@ -25,11 +27,25 @@ sub check_ref {
 The reference name '$ref' is not allowed.
 Please, check the $CFG.deny options in your configuration.
 EOS
-            return 0;
+            ++$errors;
         }
     }
 
-    return 1;
+    if ($ref =~ m:^refs/tags/:
+            && $git->get_config_boolean($CFG => 'require-annotated-tags')) {
+        my $rev_type = $git->run('cat-file', '-t', $new_commit);
+        if ($rev_type ne 'tag') {
+            $git->fault(<<EOS);
+The tag '$ref' is a lightweight tag.
+The $CFG.require-annotated-tags option in your configuration
+accepts only annotated tags.
+Please, recreate your tag as an annotated tag (option -a).
+EOS
+            ++$errors;
+        }
+    }
+
+    return $errors;
 }
 
 # This routine can act both as an update or a pre-receive hook.
@@ -48,10 +64,12 @@ sub check_affected_refs {
     return $errors == 0;
 }
 
-# Install hooks
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
+INIT: {
+    # Install hooks
+    UPDATE       \&check_affected_refs;
+    PRE_RECEIVE  \&check_affected_refs;
+    REF_UPDATE   \&check_affected_refs;
+}
 
 1;
 
@@ -67,7 +85,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -81,6 +99,7 @@ may configure it in a Git configuration file like this:
   [githooks "checkreference"]
     deny  = ^refs/heads/
     allow = ^refs/heads/(?:feature|release|hotfix)/
+    require-annotated-tags = true
 
 The first section enables the plugin and defines the users C<joe> and C<molly>
 as administrators, effectivelly exempting them from any restrictions the plugin
@@ -90,6 +109,9 @@ The second instance enables C<some> of the options specific to this plugin.
 
 The C<deny> and C<allow> options conspire to only allow the creation of branches
 which names begin with C<feature/>, C<release/>, and C<hotfix/>.
+
+The C<require-annotated-tags> option rejects pushes with lightweight tags in
+them.
 
 =head1 DESCRIPTION
 
@@ -143,6 +165,12 @@ denying all others.
         allow = ^refs/heads/(?:feature|release|hotfix)/
 
 Note that the order of the directives is irrelevant.
+
+=head2 githooks.checkreference.require-annotated-tags BOOL
+
+By default one can push lightweight or annotated tags but if you want to require
+that only annotated tags be pushed to the repository you can set this option to
+true.
 
 =head1 AUTHOR
 

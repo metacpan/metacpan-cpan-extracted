@@ -1,6 +1,6 @@
 package Lingua::EN::Inflect::Phrase;
 our $AUTHORITY = 'cpan:AVAR';
-$Lingua::EN::Inflect::Phrase::VERSION = '0.19';
+$Lingua::EN::Inflect::Phrase::VERSION = '0.20';
 use strict;
 use warnings;
 use Exporter 'import';

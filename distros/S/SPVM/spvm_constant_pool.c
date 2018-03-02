@@ -222,6 +222,7 @@ int32_t SPVM_CONSTANT_POOL_push_sub(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL*
   constant_pool_sub.is_destructor = sub->is_destructor;
   constant_pool_sub.is_jit = sub->is_jit;
   constant_pool_sub.eval_stack_max_length = sub->eval_stack_max_length;
+  constant_pool_sub.loop_count = sub->loop_count;
   
   if (sub->op_return_type->uv.type->code == SPVM_TYPE_C_CODE_VOID) {
     constant_pool_sub.is_void = 1;
@@ -297,6 +298,16 @@ int32_t SPVM_CONSTANT_POOL_push_sub(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL*
       }
     }
     constant_pool_sub.object_mys_length = object_mys_length;
+  }
+  
+  // on_stack_replacement_jump_opcode_indexes_base
+  constant_pool_sub.on_stack_replacement_jump_opcode_indexes_base = constant_pool->length;
+  {
+    int32_t i;
+    for (i = 0; i < constant_pool_sub.loop_count; i++) {
+      // Temporary
+      SPVM_CONSTANT_POOL_push_int(compiler, constant_pool, 0);
+    }
   }
   
   // Push sub name to constant pool

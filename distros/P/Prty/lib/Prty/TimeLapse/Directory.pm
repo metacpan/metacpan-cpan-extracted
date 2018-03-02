@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Path;
 use Prty::TimeLapse::File;
@@ -66,14 +66,24 @@ L<Prty::Hash>
     
     # Lookup eines Bildes
     $img = $tdr->image(422); # liefert undef, wenn nicht existent
+    
+    # Liefere das Objekt mit den Range- und Clip-Definitionen. Über
+    # dieses Objekt können die Bildfolgen von Ranges und Clips gezielt
+    # abgerufen werden. Details siehe Prty::TimeLapse::RangeDef
+    $trd = $tdr->rangeDef;
 
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse repräsentiert ein Verzeichnis, das eine
-geordnete Liste von Bildern enthält. Die Bilder können einzeln
-über ihre Bildnummer oder als Bildfolge über die Angabe eines
-Nummern-Bereichs oder eines Bereichs-Bezeichners (definiert in der
-Datei range.def) abgefragt werden.
+geordnete Liste von Bildern enthält, ggf. verteilt über mehrere
+Unterverzeichnisse. Die Bilder können einzeln über ihre Bildnummer
+oder als Bildfolge über die Angabe eines Nummern-Bereichs oder
+eines Range- oder Clip-Bezeichners (definiert in der Datei
+range.def) abgefragt werden.
+
+Mit der Liste von Bildern kann eine Bildfolge
+(Prty::TimeLapse::Sequence) instantiiert werden, aus welcher
+u.a. ein Video generiert werden kann. Siehe die Doku dieser Klasse.
 
 =head1 ATTRIBUTES
 
@@ -128,8 +138,9 @@ Referenz auf Bildverzeichnis-Objekt
 
 Instantiiere ein Bildverzeichnis-Objekt aus den Bildern in der
 Verzeichnisstruktur $dir und liefere eine Referenz auf dieses
-Objekt zurück. Die Verzeichnisstuktur wird per find() nach Bilddateien
-durchsucht und kann daher beliebig tief verschachtelt sein.
+Objekt zurück. Die Verzeichnisstuktur wird per find() nach
+Bilddateien durchsucht und kann daher beliebig tief verschachtelt
+sein.
 
 =cut
 
@@ -945,7 +956,7 @@ sub reorganize {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -1,6 +1,15 @@
 Revision history for Dist-Iller-Config-Author-Csson
 
-0.0319 2017-08-31 22:09:24 UTC
+0.0320 2018-02-28 19:06:16 UTC
+ [Config Changes]
+ - Stop testing *prereq_matches use (due to unexpected failures)
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 3 insertions(+), 4 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0319 --> 0.0320
+
+0.0319 2017-08-31T22:09:24Z UTC
  [Stats & Dependency Changes]
  - 3 files changed, 4 insertions(+), 4 deletions(-)
  - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale 0.053 --> 0.054

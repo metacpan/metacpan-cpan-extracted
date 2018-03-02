@@ -1,6 +1,6 @@
 # file: Changes
 # CGI::Authenticate - Simple CGI Authentication in Perl
-# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+# (c) 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
 # $Date: $
 # $Id: $
 
@@ -29,3 +29,8 @@ Revision history for Perl extension CGI::Authenticate
 	- fixed change to package main before requiring
   	  configuration.pl
 	- make module abstract more standard
+
+1.1  Wed Feb 28 16:12:07 AST 2018
+	- documentation improvements
+	- implemented CAS - Central Authentication Service, client and
+	  server code

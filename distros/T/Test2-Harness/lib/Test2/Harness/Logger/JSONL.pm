@@ -2,7 +2,7 @@ package Test2::Harness::Logger::JSONL;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use IO::Handle;
 
@@ -23,10 +23,7 @@ sub init {
     }
 }
 
-*log_raw_event       = \&log_event;
-*log_processed_event = \&log_event;
-
-sub log_event {
+sub log_processed_event {
     my $self = shift;
     my ($event) = @_;
 

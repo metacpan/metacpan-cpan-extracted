@@ -7,7 +7,8 @@ BEGIN {
 }
 
 use Test::More tests => 21;
-use t::lib::Test;
+use lib "t/lib";
+use SQLiteTest;
 
 # 1-4. Connect & create tables
 my $dbh = connect_ok(dbfile => 'foo');

@@ -1,5 +1,9 @@
 Revision history for Perl extension Directory::Scanner
 
+0.04 2018-03-02
+    - switch to use `parent`, `roles` and `slots` pragmas
+      instead of doing it longhand
+
 0.03 2018-01-29
     [!!BREAKING CHANGES!!]
     - major re-arrangement of the internals for building

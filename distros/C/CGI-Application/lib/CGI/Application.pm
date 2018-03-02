@@ -2,8 +2,9 @@ package CGI::Application;
 use Carp;
 use strict;
 use Class::ISA;
+use Scalar::Util;
 
-$CGI::Application::VERSION = '4.50';
+$CGI::Application::VERSION = '4.61';
 
 my %INSTALLED_CALLBACKS = (
 #	hook name          package                 sub
@@ -37,7 +38,7 @@ sub new {
 	#
 	# We set them up here and not in the setup() because a subclass
 	# which implements setup() still needs default values!
-	
+
 	$self->header_type('header');
 	$self->mode_param('rm');
 	$self->start_mode('start');
@@ -196,19 +197,38 @@ sub run {
 	# Call cgiapp_postrun() hook
 	$self->call_hook('postrun', \$body);
 
-    my $return_value;
-    if ($self->{__IS_PSGI}) {
-        my ($status, $headers) = $self->_send_psgi_headers();
-        $return_value = [ $status, $headers, [ $body ]];
-    }
-    else {
-        # Set up HTTP headers non-PSGI responses
-        my $headers = $self->_send_headers();
+	my $return_value;
+	if ($self->{__IS_PSGI}) {
+		my ($status, $headers) = $self->_send_psgi_headers();
 
-        # Build up total output
-        $return_value  = $headers.$body;
-        print $return_value unless $ENV{CGI_APP_RETURN_ONLY};
-    }
+		if (ref($body) eq 'GLOB' || (Scalar::Util::blessed($body) && $body->can('getline'))) {
+			# body a file handle - return it
+			$return_value = [ $status, $headers, $body];
+		}
+		elsif (ref($body) eq 'CODE') {
+
+			# body is a subref, or an explicit callback method is set
+			$return_value = sub {
+				my $respond = shift;
+
+				my $writer = $respond->([ $status, $headers ]);
+
+				&$body($writer);
+			};
+		}
+		else {
+
+			$return_value = [ $status, $headers, [ $body ]];
+		}
+	}
+	else {
+		# Set up HTTP headers non-PSGI responses
+		my $headers = $self->_send_headers();
+
+		# Build up total output
+		$return_value  = $headers.$body;
+		print $return_value unless $ENV{CGI_APP_RETURN_ONLY};
+	}
 
 	# clean up operations
 	$self->call_hook('teardown');
@@ -223,11 +243,12 @@ sub psgi_app {
 
     return sub {
         my $env = shift;
-
-        if (not defined $args_to_new->{QUERY}) {
+	
+	# PR from alter https://github.com/markstos/CGI--Application/pull/17
+        #if (not defined $args_to_new->{QUERY}) {
             require CGI::PSGI;
             $args_to_new->{QUERY} = CGI::PSGI->new($env);
-        }
+        #}
 
         my $webapp = $class->new($args_to_new);
         return $webapp->run_as_psgi;
@@ -312,10 +333,11 @@ sub dump {
 	$output .= "Current Run mode: '$current_runmode'\n";
 
 	# Dump Params
+	# updated ->param to ->multi_param to silence CGI.pm warning
 	$output .= "\nQuery Parameters:\n";
-	my @params = $self->query->param();
+	my @params = $self->query->multi_param();
 	foreach my $p (sort(@params)) {
-		my @data = $self->query->param($p);
+		my @data = $self->query->multi_param($p);
 		my $data_str = "'".join("', '", @data)."'";
 		$output .= "\t$p => $data_str\n";
 	}
@@ -338,7 +360,7 @@ sub dump_html {
 	# Dump run-mode
 	my $current_runmode = $self->get_current_runmode();
 	$output .= "<p>Current Run-mode:
-'<strong>$current_runmode</strong>'</p>\n";
+	'<strong>$current_runmode</strong>'</p>\n";
 
 	# Dump Params
 	$output .= "<p>Query Parameters:</p>\n";
@@ -355,6 +377,30 @@ sub dump_html {
 	}
 	$output .= "</ol>\n";
 
+	return $output;
+}
+
+
+sub no_runmodes {
+
+	my $self   = shift;
+	my $query  = $self->query();
+	my $output = $query->start_html;
+	
+	# If no runmodes specified by app return error message 
+	my $current_runmode = $self->get_current_runmode();
+	my $query_params = $query->Dump;
+	
+	$output .= qq{
+		<h2>Error - No runmodes specified.</h2>
+		<p>Runmode called: $current_runmode"</p>
+		<p>Query paramaters:</p> $query_params
+		<p>Your application has not specified any runmodes.</p>
+		<p>Please read the <a href="https://metacpan.org/pod/CGI::Application">
+		CGI::Application</a> documentation.</p>
+	};
+	
+	$output .= $query->end_html();
 	return $output;
 }
 
@@ -385,7 +431,7 @@ sub _header_props_update {
 	# If data is provided, set it!
 	if (scalar(@data)) {
         if ($self->header_type eq 'none') {
-		    warn "header_props called while header_type set to 'none', headers will NOT be sent!" 
+		    warn "header_props called while header_type set to 'none', headers will NOT be sent!"
         }
 		# Is it a hash, or hash-ref?
 		if (ref($data[0]) eq 'HASH') {
@@ -513,7 +559,7 @@ sub run_modes {
 	my (@data) = (@_);
 
 	# First use?  Create new __RUN_MODES!
-    $self->{__RUN_MODES} = { 'start' => 'dump_html' } unless (exists($self->{__RUN_MODES}));
+	$self->{__RUN_MODES} = { 'start' => 'no_runmodes' } unless (exists($self->{__RUN_MODES}));
 
 	my $rr_m = $self->{__RUN_MODES};
 
@@ -661,7 +707,7 @@ sub _send_psgi_headers {
 # Make all hash keys CAPITAL
 # although this method is internal, some other extensions
 # have come to rely on it, so any changes here should be
-# made with great care or avoided. 
+# made with great care or avoided.
 sub _cap_hash {
 	my $self = shift;
 	my $rhash = shift;
@@ -733,10 +779,10 @@ environments, and a high performance choice in persistent environments like
 FastCGI or mod_perl.
 
 By adding L<PLUG-INS> as your needs grow, you can add advanced and complex
-features when you need them. 
+features when you need them.
 
 First released in 2000 and used and expanded by a number of professional
-website developers, CGI::Application is a stable, reliable choice. 
+website developers, CGI::Application is a stable, reliable choice.
 
 =head1 USAGE EXAMPLE
 
@@ -908,7 +954,7 @@ CGI::Application will run equally well on NT/IIS or any other
 CGI-compatible environment.  CGI::Application-based projects
 are, however, ripe for use on Apache/mod_perl servers, as they
 naturally encourage Good Programming Practices and will often work
-in persistent environments without modification. 
+in persistent environments without modification.
 
 For more information on using CGI::Application with mod_perl, please see our
 website at http://www.cgi-app.org/, as well as
@@ -919,7 +965,7 @@ L<CGI::Application::Plugin::Apache>, which integrates with L<Apache::Request>.
 It is intended that your Application Module will be implemented as a sub-class
 of CGI::Application. This is done simply as follows:
 
-    package My::App; 
+    package My::App;
     use base 'CGI::Application';
 
 B<Notation and Conventions>
@@ -987,7 +1033,7 @@ design allows you to define project wide configuration objects used by many
 several instance scripts. There are several plugins which simplify the syntax
 for this and provide lazy loading. Here's an example using
 L<CGI::Application::Plugin::ConfigAuto>, which uses L<Config::Auto> to support
-many configuration file formats. 
+many configuration file formats.
 
  my $app = WebApp->new(PARAMS => { cfg_file => 'config.pl' });
 
@@ -995,7 +1041,7 @@ many configuration file formats.
  my %cfg = $self->cfg()
  # or ... $self->cfg('HTML_ROOT_DIR');
 
-See the list of of plugins below for more config file integration solutions.
+See the list of plugins below for more config file integration solutions.
 
 =head3 run()
 
@@ -1080,6 +1126,32 @@ The final result might look like this:
         $webapp->run_as_psgi;
     };
 
+=head2 Additional PSGI Return Values
+
+The PSGI Specification allows for returning a file handle or a subroutine reference instead of byte strings.  In PSGI mode this is supported directly by CGI::Application.  Have your run mode return a file handle or compatible subref as follows:
+
+	sub returning_a_file_handle {
+	    my $self = shift;
+
+	    $self->header_props(-type => 'text/plain');
+
+        open my $fh, "<", 'test_file.txt' or die "OOPS! $!";
+
+	    return $fh;
+	}
+
+    sub returning_a_subref {
+        my $self = shift;
+
+        $self->header_props(-type => 'text/plain');
+        return sub {
+           my $writer = shift;
+           foreach my $i (1..10) {
+               #sleep 1;
+               $writer->write("check $i: " . time . "\n");
+    		}
+    	};
+    }
 
 =head2 Methods to possibly override
 
@@ -1118,7 +1190,7 @@ Your setup() method might be implemented something like this:
 	}
 
 However, often times all that needs to be in setup() is defining your run modes
-and your start mode. L<CGI::Application::Plugin::AutoRunmode> allows you to do  
+and your start mode. L<CGI::Application::Plugin::AutoRunmode> allows you to do
 this with a simple syntax, using run mode attributes:
 
  use CGI::Application::Plugin::AutoRunmode;
@@ -1270,19 +1342,19 @@ modes, and when a C<param()> is a particular value.
  my $q = $webapp->cgiapp_get_query;
 
 Override this method to retrieve the query object if you wish to use a
-different query interface instead of CGI.pm.  
+different query interface instead of CGI.pm.
 
 CGI.pm is only loaded if it is used on a given request.
 
 If you can use an alternative to CGI.pm, it needs to have some compatibility
 with the CGI.pm API. For normal use, just having a compatible C<param> method
-should be sufficient. 
+should be sufficient.
 
 If you use the C<path_info> option to the mode_param() method, then we will call
 the C<path_info()> method on the query object.
 
 If you use the C<Dump> method in CGI::Application, we will call the C<Dump> and
-C<escapeHTML> methods on the query object. 
+C<escapeHTML> methods on the query object.
 
 =head2 Essential Application Methods
 
@@ -1299,7 +1371,7 @@ of them to get any application up and running.  These functions are listed in al
     my $tmpl_obj = $webapp->load_tmpl( FILEHANDLE );
 
 This method takes the name of a template file, a reference to template data
-or a FILEHANDLE and returns an HTML::Template object. If the filename is undefined or missing, CGI::Application will default to trying to use the current run mode name, plus the extension ".html". 
+or a FILEHANDLE and returns an HTML::Template object. If the filename is undefined or missing, CGI::Application will default to trying to use the current run mode name, plus the extension ".html".
 
 If you use the default template naming system, you should also use
 L<CGI::Application::Plugin::Forward>, which simply helps to keep the current
@@ -1343,13 +1415,13 @@ If your application requires more specialized behavior than this, you can
 always replace it by overriding load_tmpl() by implementing your own
 load_tmpl() in your CGI::Application sub-class application module.
 
-First, you may want to check out the template related plugins. 
+First, you may want to check out the template related plugins.
 
 L<CGI::Application::Plugin::TT> focuses just on Template Toolkit integration,
 and features pre-and-post features, singleton support and more.
 
 L<CGI::Application::Plugin::Stream> can help if you want to return a stream and
-not a file. It features a simple syntax and MIME-type detection. 
+not a file. It features a simple syntax and MIME-type detection.
 
 B<specifying the template class with html_tmpl_class()>
 
@@ -1364,14 +1436,14 @@ provide at least the following parts of the HTML::Template API:
  $t = $class->new( scalarref => ... );  # If you use scalarref templates
  $t = $class->new( filehandle => ... ); # If you use filehandle templates
  $t = $class->new( filename => ... );
- $t->param(...); 
+ $t->param(...);
 
 Here's an example case allowing you to precisely test what's sent to your
 templates:
 
     $ENV{CGI_APP_RETURN_ONLY} = 1;
     my $webapp = WebApp->new;
-       $webapp->html_tmpl_class('HTML::Template::Dumper'); 
+       $webapp->html_tmpl_class('HTML::Template::Dumper');
     my $out_str = $webapp->run;
     my $tmpl_href = eval "$out_str";
 
@@ -1391,20 +1463,20 @@ will be executed just before load_tmpl() returns:
 
   $self->add_callback('load_tmpl',\&your_method);
 
-When C<your_method()> is executed, it will be passed three arguments: 
+When C<your_method()> is executed, it will be passed three arguments:
 
  1. A hash reference of the extra params passed into C<load_tmpl>
- 2. Followed by a hash reference to template parameters. 
-    With both of these, you can modify them by reference to affect 
+ 2. Followed by a hash reference to template parameters.
+    With both of these, you can modify them by reference to affect
     values that are actually passed to the new() and param() methods of the
     template object.
- 3. The name of the template file.    
+ 3. The name of the template file.
 
-Here's an example stub for a load_tmpl() callback: 
+Here's an example stub for a load_tmpl() callback:
 
     sub my_load_tmpl_callback {
         my ($c, $ht_params, $tmpl_params, $tmpl_file) = @_
-        # modify $ht_params or $tmpl_params by reference...    
+        # modify $ht_params or $tmpl_params by reference...
     }
 
 =head3 param()
@@ -1469,8 +1541,8 @@ If, for some reason, you want to use your own CGI query object, the new()
 method supports passing in your existing query object on construction using
 the QUERY attribute.
 
-There are a few rare situations where you want your own query object to be 
-used after your Application Module has already been constructed. In that case 
+There are a few rare situations where you want your own query object to be
+used after your Application Module has already been constructed. In that case
 you can pass it to c<query()> like this:
 
     $webapp->query($new_query_object);
@@ -1486,13 +1558,13 @@ you can pass it to c<query()> like this:
 
    # With a hashref, use a different name or a code ref
    $webapp->run_modes(
-           'mode1' => 'some_sub_by_name', 
+           'mode1' => 'some_sub_by_name',
            'mode2' => \&some_other_sub_by_ref
     );
 
 This accessor/mutator specifies the dispatch table for the
-application states, using the syntax examples above. It returns 
-the dispatch table as a hash. 
+application states, using the syntax examples above. It returns
+the dispatch table as a hash.
 
 The run_modes() method may be called more than once.  Additional values passed
 into run_modes() will be added to the run modes table.  In the case that an
@@ -1537,7 +1609,7 @@ Specifying the run modes by array reference:
 
     $webapp->run_modes([ 'mode1', 'mode2', 'mode3' ]);
 
-Is is the same as using a hash, with keys equal to values
+This is the same as using a hash, with keys equal to values
 
     $webapp->run_modes(
         'mode1' => 'mode1',
@@ -1617,7 +1689,7 @@ pass in a text scalar or an array reference of multiple paths.
 
 =head2 More Application Methods
 
-You can skip this section if you are just getting started. 
+You can skip this section if you are just getting started.
 
 The following additional methods are inherited from CGI::Application, and are
 available to be called by your application within your Application Module.
@@ -1653,7 +1725,8 @@ Useful for outputting to STDERR.
 The dump_html() method is a debugging function which will return
 a chunk of text which contains all the environment and web form
 data of the request, formatted nicely for human readability via
-a web browser.  Useful for outputting to a browser.
+a web browser.  Useful for outputting to a browser. Please consider
+the security implications of using this in production code.
 
 =head3 error_mode()
 
@@ -1665,7 +1738,7 @@ as a run mode, passing $@ as the only parameter.
 
 Plugins authors will be interested to know that just before C<error_mode()> is
 called, the C<error> hook will be executed, with the error message passed in as
-the only parameter. 
+the only parameter.
 
 No C<error_mode> is defined by default.  The death of your C<error_mode()> run
 mode is not trapped, so you can also use it to die in your own special way.
@@ -1700,7 +1773,7 @@ headers. If a scalar value is passed to C<header_add()> it will replace
 the existing value for that key.
 
 If an array reference is passed as a value to C<header_add()>, values in
-that array ref will be appended to any existing values values for that key.
+that array ref will be appended to any existing values for that key.
 This is primarily useful for setting an additional cookie after one has already
 been set.
 
@@ -1712,8 +1785,8 @@ been set.
     # clobber / reset all headers
     %set_headers = $webapp->header_props({});
 
-    # Just retrieve the headers 
-    %set_headers = $webapp->header_props(); 
+    # Just retrieve the headers
+    %set_headers = $webapp->header_props();
 
 The C<header_props()> method expects a hash of CGI.pm-compatible
 HTTP header properties.  These properties will be passed directly
@@ -1749,15 +1822,15 @@ the HTTP header properly.
     $webapp->header_type('none');
 
 This method used to declare that you are setting a redirection header,
-or that you want no header to be returned by the framework. 
+or that you want no header to be returned by the framework.
 
-The value of 'header' is almost never used, as it is the default. 
+The value of 'header' is almost never used, as it is the default.
 
 B<Example of redirecting>:
 
   sub some_redirect_mode {
     my $self = shift;
-    # do stuff here.... 
+    # do stuff here....
     $self->header_type('redirect');
     $self->header_props(-url=>  "http://site/path/doc.html" );
   }
@@ -1768,14 +1841,14 @@ To simplify that further, use L<CGI::Application::Plugin::Redirect>:
 
 Setting the header to 'none' may be useful if you are streaming content.
 In other contexts, it may be more useful to set C<$ENV{CGI_APP_RETURN_ONLY} = 1;>,
-which supresses all printing, including headers, and returns the output instead.
+which suppresses all printing, including headers, and returns the output instead.
 
 That's commonly used for testing, or when using L<CGI::Application> as a controller
 for a cron script!
 
 =cut
 
-sub html_tmpl_class { 
+sub html_tmpl_class {
     my $self = shift;
     my $tmpl_class = shift;
 
@@ -1817,7 +1890,7 @@ sub load_tmpl {
 
     # Define a default template name based on the current run mode
     unless (defined $tmpl_file) {
-        $tmpl_file = $self->get_current_runmode . $self->{__CURRENT_TMPL_EXTENSION};    
+        $tmpl_file = $self->get_current_runmode . $self->{__CURRENT_TMPL_EXTENSION};
     }
 
     $self->call_hook('load_tmpl', \%ht_params, \%tmpl_params, $tmpl_file);
@@ -1849,7 +1922,7 @@ sub load_tmpl {
 =head3 mode_param()
 
  # Name the CGI form parameter that contains the run mode name.
- # This is the the default behavior, and is often sufficient.
+ # This is the default behavior, and is often sufficient.
  $webapp->mode_param('rm');
 
  # Set the run mode name directly from a code ref
@@ -1898,7 +1971,7 @@ This also demonstrates that you don't need to pass in the C<param> hash key. It 
 still default to C<rm>.
 
 You can also set C<path_info> to a negative value. This works just like a negative
-list index: if it is -1 the run mode name will be taken from the last part of 
+list index: if it is -1 the run mode name will be taken from the last part of
 $ENV{PATH_INFO}, if it is -2, the one before that, and so on.
 
 
@@ -1917,7 +1990,7 @@ example form submission using this syntax:
 
 	<form action="/cgi-bin/instance.cgi/edit_form" method=post>
 		<input type="hidden" name="breed_id" value="4">
-	
+
 Here the run mode would be set to "edit_form". Here's another example with a
 query string:
 
@@ -1954,9 +2027,9 @@ sub mode_param {
 			my $idx = $p{path_info};
 			# two cases: negative or positive index
 			# negative index counts from the end of path_info
-			# positive index needs to be fixed because 
+			# positive index needs to be fixed because
 			#    computer scientists like to start counting from zero.
-			$idx -= 1 if ($idx > 0) ;	
+			$idx -= 1 if ($idx > 0) ;
 
 			# remove the leading slash
 			$pi =~ s!^/!!;
@@ -2025,7 +2098,7 @@ prerun_mode() elsewhere, such as in setup() or a run mode method.
 =head2 Dispatching Clean URIs to run modes
 
 Modern web frameworks dispense with cruft in URIs, providing in clean
-URIs instead. Instead of: 
+URIs instead. Instead of:
 
  /cgi-bin/item.cgi?rm=view&id=15
 
@@ -2040,31 +2113,25 @@ layer you can fairly easily add to an application later.
 =head2 Offline website development
 
 You can work on your CGI::Application project on your desktop or laptop without
-installing a full-featured web-server like Apache. Instead, install 
+installing a full-featured web-server like Apache. Instead, install
 L<CGI::Application::Server> from CPAN. After a few minutes of setup, you'll
-have your own private application server up and running. 
+have your own private application server up and running.
 
 =head2 Automated Testing
 
-There a couple of testing modules specifically made for CGI::Application.
-
 L<Test::WWW::Mechanize::CGIApp> allows functional testing of a CGI::App-based project
 without starting a web server. L<Test::WWW::Mechanize> could be used to test the app
-through a real web server. 
-
-L<Test::WWW::Selenium::CGIApp> is similar, but uses Selenium for the testing,
-meaning that a local web-browser would be used, allowing testing of websites
-that contain JavaScript.
+through a real web server.
 
 Direct testing is also easy. CGI::Application will normally print the output of it's
-run modes directly to STDOUT. This can be suppressed with an enviroment variable, 
+run modes directly to STDOUT. This can be suppressed with an environment variable,
 CGI_APP_RETURN_ONLY. For example:
 
   $ENV{CGI_APP_RETURN_ONLY} = 1;
   $output = $webapp->run();
   like($output, qr/good/, "output is good");
 
-Examples of this style can be seen in our own test suite. 
+Examples of this style can be seen in our own test suite.
 
 =head1 PLUG-INS
 
@@ -2073,30 +2140,30 @@ to develop new plug-ins for.
 
 =head2 Recommended Plug-ins
 
-The following plugins are recommended for general purpose web/db development:  
+The following plugins are recommended for general purpose web/db development:
 
 =over 4
 
-=item * 
+=item *
 
-L<CGI::Application::Plugin::Redirect> - is a simple plugin to provide a shorter syntax for executing a redirect. 
+L<CGI::Application::Plugin::Redirect> - is a simple plugin to provide a shorter syntax for executing a redirect.
 
 =item *
 
-L<CGI::Application::Plugin::ConfigAuto> - Keeping your config details in a separate file is recommended for every project. This one integrates with L<Config::Auto>. Several more config plugin options are listed below.  
+L<CGI::Application::Plugin::ConfigAuto> - Keeping your config details in a separate file is recommended for every project. This one integrates with L<Config::Auto>. Several more config plugin options are listed below.
 
 =item *
 
-L<CGI::Application::Plugin::DBH> - Provides easy management of one or more database handles and can delay making the database connection until the moment it is actually used. 
+L<CGI::Application::Plugin::DBH> - Provides easy management of one or more database handles and can delay making the database connection until the moment it is actually used.
 
 =item *
 
-L<CGI::Application::Plugin::FillInForm> - makes it a breeze to fill in an HTML form from data originating from a CGI query or a database record. 
+L<CGI::Application::Plugin::FillInForm> - makes it a breeze to fill in an HTML form from data originating from a CGI query or a database record.
 
 =item *
 
 L<CGI::Application::Plugin::Session> - For a project that requires session
-management, this plugin provides a useful wrapper around L<CGI::Session> 
+management, this plugin provides a useful wrapper around L<CGI::Session>
 
 =item *
 
@@ -2121,9 +2188,9 @@ L<CGI::Application::Plugin::AnyTemplate> - Use any templating system from within
 
 L<CGI::Application::Plugin::Apache> - Use Apache::* modules without interference
 
-=item * 
+=item *
 
-L<CGI::Application::Plugin::AutoRunmode> - Automatically register runmodes 
+L<CGI::Application::Plugin::AutoRunmode> - Automatically register runmodes
 
 
 =item *
@@ -2138,7 +2205,7 @@ L<CGI::Application::Plugin::Config::General> - Integration with L<Config::Genera
 
 L<CGI::Application::Plugin::Config::Simple> - Integration with L<Config::Simple>.
 
-=item * 
+=item *
 
 L<CGI::Application::Plugin::CompressGzip> - Add Gzip compression
 
@@ -2155,7 +2222,7 @@ L<CGI::Application::Plugin::Stream> - Help stream files to the browser
 
 L<CGI::Application::Plugin::TemplateRunner> - Allows for more of an ASP-style
 code structure, with the difference that code and HTML for each screen are in
-separate files. 
+separate files.
 
 =item *
 
@@ -2330,7 +2397,7 @@ at the given hook.  It is used in conjunction with the C<new_hook> method which
 allows you to create a new hook location.
 
 The first argument to C<call_hook> is the hook name. Any remaining arguments
-are passed to every callback executed at the hook location. So, a stub for a 
+are passed to every callback executed at the hook location. So, a stub for a
 callback at the 'pretemplate' hook would look like this:
 
  sub my_hook {
@@ -2456,29 +2523,24 @@ L<http://www.cgi-app.org>
 B<Support Mailing List>
 
 If you have any questions, comments, bug reports or feature suggestions,
-post them to the support mailing list!  To join the mailing list, simply
-send a blank message to "cgiapp-subscribe@lists.erlbaum.net".
-
-B<IRC>
-
-You can also drop by C<#cgiapp> on C<irc.perl.org> with a good chance of finding 
-some people involved with the project there. 
+post them to the support mailing list!  To join the mailing list, visit 
+http://lists.openlib.org/mailman/listinfo/cgiapp
 
 B<Source Code>
 
 This project is managed using git and is available on Github:
 
-    https://github.com/markstos/CGI--Application
+L<https://github.com/MartinMcGrath/CGI--Application>
 
 =head1 SEE ALSO
 
 =over 4
 
-=item o 
+=item o
 
 L<CGI>
 
-=item o 
+=item o
 
 L<HTML::Template>
 
@@ -2507,13 +2569,14 @@ they provide to the Perl community!
 
 Jesse Erlbaum <jesse@erlbaum.net>
 
-Mark Stosberg has served as a co-maintainer since version 3.2, with the help of
-the numerous contributors documented in the Changes file.
+Mark Stosberg has served as a co-maintainer since version 3.2, Martin McGrath 
+became a co-maintainer as of version 4.51, with the help of the numerous 
+contributors documented in the Changes file.
 
 =head1 CREDITS
 
 CGI::Application was originally developed by The Erlbaum Group, a software
-engineering and consulting firm in New York City. 
+engineering and consulting firm in New York City.
 
 Thanks to Vanguard Media (http://www.vm.com) for funding the initial
 development of this library and for encouraging Jesse Erlbaum to release it to
@@ -2529,8 +2592,8 @@ which are documented in the C<Changes> file.
 
 Thanks also to all the members of the CGI-App mailing list!
 Your ideas, suggestions, insights (and criticism!) have helped
-shape this module immeasurably.  (To join the mailing list, simply
-send a blank message to "cgiapp-subscribe@lists.erlbaum.net".)
+shape this module immeasurably.  (To join the mailing list, visit 
+http://lists.openlib.org/mailman/listinfo/cgiapp )
 
 =head1 LICENSE
 

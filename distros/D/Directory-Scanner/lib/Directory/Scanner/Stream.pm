@@ -8,27 +8,23 @@ use Carp         ();
 use Scalar::Util ();
 use Path::Tiny   ();
 
-use UNIVERSAL::Object;
-use Directory::Scanner::API::Stream;
-
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use constant DEBUG => $ENV{DIR_SCANNER_STREAM_DEBUG} // 0;
 
 ## ...
 
-our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object', 'Directory::Scanner::API::Stream') }
-our %HAS; BEGIN {
-	%HAS = (
-		origin     => sub { die 'You must supply a `origin` directory path' },
-		# internal state ...
-		_head      => sub {},
-		_handle    => sub {},
-		_is_done   => sub { 0 },
-		_is_closed => sub { 0 },
-	)
-}
+use parent 'UNIVERSAL::Object';
+use roles 'Directory::Scanner::API::Stream';
+use slots (
+	origin     => sub { die 'You must supply a `origin` directory path' },
+	# internal state ...
+	_head      => sub {},
+	_handle    => sub {},
+	_is_done   => sub { 0 },
+	_is_closed => sub { 0 },
+);
 
 ## ...
 
@@ -141,7 +137,7 @@ Directory::Scanner::Stream - Streaming directory iterator
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -157,7 +153,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stevan Little.
+This software is copyright (c) 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

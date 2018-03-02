@@ -1,5 +1,43 @@
 Revision history for CGI::Application.
 
+4.61
+
+    - Release fix in 4.60_1
+
+4.60_1
+
+    [BUGS]
+    - Revert MANIFEST changes which seemed to have caused some issues
+      https://github.com/MartinMcGrath/CGI--Application/issues/5
+
+    [DOCUMENTATION]
+    - Fix minor POD typo.
+
+4.60
+    
+    - Release, includes all changes from 4.50_50, 4.50_51
+
+4.50_51 (developer release) 2015-07-16
+
+    [BUGS]
+    - Create new CGI::PSGI object unconditionally in psgi_app()/Bug #88506 (allter)
+    
+    [DOCUMENTATION]
+    - Introduced Travis CI (Martin McGrath)
+
+4.50_50 (developer release) Fri Jun 23, 2014
+
+    - Add PSGI Streaming methods (Mike Tonks)
+    - Added CGI.pm dependency, it is no longer a core module (Martin McGrath)
+
+    [BUGS]
+    - Fixed rt #84403 - Security problem: missing "start" mode dumps ENV to output page. (Martin McGrath)
+    - Ensure dump_html() returns valid HTML. (Martin McGrath)
+	
+    [DOCUMENTATION]
+    - Changes to repository URL and bug tracker, added Martin McGrath as a co-maintainer
+    - Typo fixes (David Steinbrunner)
+
 4.50 Thu Jun 16, 2011
 
     [FEATURES]

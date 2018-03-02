@@ -88,27 +88,24 @@ sub add_crm_based_user_list {
       push @members, $member;
     }
 
-    # Adding address info is currently available on a whitelist-only basis.
-    # This code demonstrates how to do it, and you can uncomment it if you are
-    # on the whitelist.
-    # my $first_name   = "John";
-    # my $last_name    = "Doe";
-    # my $country_code = "US";
-    # my $zip_code     = "10011";
-    #
-    # my $address_info = Google::Ads::AdWords::v201708::AddressInfo->new({
-    #   # First and last name must be normalized and hashed.
-    #   hashedFirstName => sha256_hex(_to_normalized_string($first_name)),
-    #   hashedLastName  => sha256_hex(_to_normalized_string($last_name)),
-    #   # Country code and zip code are sent in plaintext.
-    #   countryCode => $country_code,
-    #   zipCode     => $zip_code
-    # });
-    #
-    # my $member_by_address = Google::Ads::AdWords::v201708::Member->new({
-    #   addressInfo => $address_info
-    # });
-    # push @members, $member_by_address;
+    my $first_name   = "John";
+    my $last_name    = "Doe";
+    my $country_code = "US";
+    my $zip_code     = "10011";
+
+    my $address_info = Google::Ads::AdWords::v201708::AddressInfo->new({
+      # First and last name must be normalized and hashed.
+      hashedFirstName => sha256_hex(_to_normalized_string($first_name)),
+      hashedLastName  => sha256_hex(_to_normalized_string($last_name)),
+      # Country code and zip code are sent in plaintext.
+      countryCode => $country_code,
+      zipCode     => $zip_code
+    });
+
+    my $member_by_address = Google::Ads::AdWords::v201708::Member->new({
+      addressInfo => $address_info
+    });
+    push @members, $member_by_address;
 
     my $userlist_id = $result->get_value()->[0]->get_id();
     my $operand     = Google::Ads::AdWords::v201708::MutateMembersOperand->new({

@@ -43,8 +43,12 @@ test_c() {
 }
 
 test_perl() {
+    # Test::Harness defaults to PERL_USE_UNSAFE_INC=1
+    export PERL_USE_UNSAFE_INC=0
+
     source ~/perl5/perlbrew/etc/bashrc
-    perlbrew switch $PERL_VERSION
+    perlbrew switch $PERL_VERSION ||
+        perlbrew install --switch --notest --noman --thread $PERL_VERSION
     perlbrew list
     export PERL5LIB="$install_dir/lib/perl5"
 

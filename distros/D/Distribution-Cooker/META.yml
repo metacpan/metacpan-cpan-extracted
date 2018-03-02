@@ -1,26 +1,37 @@
---- #YAML:1.0
-name:               Distribution-Cooker
-version:            1.01
-abstract:           Create a module directory from your own templates
+---
+abstract: 'Create a module directory from your own templates'
 author:
-    - brian d foy <bdfoy@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Config::IniFiles:  0
-    Template:          0
-    Test::More:        0.94
-resources:
-    Repository:  http://github.com/briandfoy/distribution-cooker/
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Distribution-Cooker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Config::IniFiles: '0'
+  Cwd: '0'
+  File::Spec::Functions: '0'
+  Template: '0'
+  perl: '5.008'
+  strict: '0'
+  subs: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/briandfoy/distribution-cooker/issues
+  homepage: https://github.com/briandfoy/distribution-cooker
+  repository: https://github.com/briandfoy/distribution-cooker.git
+version: '1.022'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

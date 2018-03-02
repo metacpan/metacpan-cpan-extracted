@@ -9,6 +9,7 @@ lib/Prty/ClassLoader.pm
 lib/Prty/Color.pm
 lib/Prty/ColumnFormat.pm
 lib/Prty/CommandLine.pm
+lib/Prty/Concat.pm
 lib/Prty/Config.pm
 lib/Prty/Confluence/Client.pm
 lib/Prty/Confluence/Markup.pm
@@ -91,7 +92,9 @@ lib/Prty/JQuery/DataTable.pm
 lib/Prty/JQuery/Form/ViewEdit.pm
 lib/Prty/JQuery/Function.pm
 lib/Prty/JQuery/Tabs.pm
-lib/Prty/LaTeX/Generator.pm
+lib/Prty/LaTeX/Code.pm
+lib/Prty/LaTeX/Document.pm
+lib/Prty/LaTeX/Figure.pm
 lib/Prty/LaTeX/LongTable.pm
 lib/Prty/LineProcessor.pm
 lib/Prty/LineProcessor/Line.pm
@@ -111,6 +114,7 @@ lib/Prty/Process.pm
 lib/Prty/Program.pm
 lib/Prty/Progress.pm
 lib/Prty/Record.pm
+lib/Prty/Reference.pm
 lib/Prty/Rsync.pm
 lib/Prty/Sdoc.pm
 lib/Prty/Sdoc/Box.pm
@@ -149,6 +153,7 @@ lib/Prty/Template.pm
 lib/Prty/Terminal.pm
 lib/Prty/Test/Class.pm
 lib/Prty/Test/Class/Method.pm
+lib/Prty/TeX/Code.pm
 lib/Prty/Time.pm
 lib/Prty/Time/RFC822.pm
 lib/Prty/TimeLapse/Directory.pm
@@ -176,6 +181,7 @@ t/bin/Prty/ClassLoader.t
 t/bin/Prty/Color.t
 t/bin/Prty/ColumnFormat.t
 t/bin/Prty/CommandLine.t
+t/bin/Prty/Concat.t
 t/bin/Prty/Config.t
 t/bin/Prty/Confluence/Client.t
 t/bin/Prty/Confluence/Markup.t
@@ -258,7 +264,9 @@ t/bin/Prty/JQuery/DataTable.t
 t/bin/Prty/JQuery/Form/ViewEdit.t
 t/bin/Prty/JQuery/Function.t
 t/bin/Prty/JQuery/Tabs.t
-t/bin/Prty/LaTeX/Generator.t
+t/bin/Prty/LaTeX/Code.t
+t/bin/Prty/LaTeX/Document.t
+t/bin/Prty/LaTeX/Figure.t
 t/bin/Prty/LaTeX/LongTable.t
 t/bin/Prty/LineProcessor.t
 t/bin/Prty/LineProcessor/Line.t
@@ -278,6 +286,7 @@ t/bin/Prty/Process.t
 t/bin/Prty/Program.t
 t/bin/Prty/Progress.t
 t/bin/Prty/Record.t
+t/bin/Prty/Reference.t
 t/bin/Prty/Rsync.t
 t/bin/Prty/Sdoc.t
 t/bin/Prty/Sdoc/Box.t
@@ -316,6 +325,7 @@ t/bin/Prty/Template.t
 t/bin/Prty/Terminal.t
 t/bin/Prty/Test/Class.t
 t/bin/Prty/Test/Class/Method.t
+t/bin/Prty/TeX/Code.t
 t/bin/Prty/Time.t
 t/bin/Prty/Time/RFC822.t
 t/bin/Prty/TimeLapse/Directory.t

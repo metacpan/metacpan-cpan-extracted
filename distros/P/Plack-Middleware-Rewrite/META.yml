@@ -30,4 +30,4 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Plack-Middleware-Rewrite/issues
   repository: git://github.com/ap/Plack-Middleware-Rewrite.git
-version: 2.100
+version: 2.101

@@ -1,0 +1,6 @@
+name = "Acme-YAPC-Okinawa-Bus"
+# badges = ["travis"]
+authority="cpan:ANATOFUZ"
+
+module_maker="ModuleBuildTiny"
+

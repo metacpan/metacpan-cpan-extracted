@@ -57,7 +57,7 @@
    "provides" : {
       "Config::ENV" : {
          "file" : "lib/Config/ENV.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/cho45/Config-ENV"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_contributors" : [
       "Masayuki Matsuki <y.songmu@gmail.com>",
       "ysasaki <aloelight@gmail.com>",

@@ -27,7 +27,7 @@ package Apache2::AMFCarrierDetection;
   use IO::Uncompress::Unzip qw(unzip $UnzipError) ;
   use constant BUFF_LEN => 1024;
   use vars qw($VERSION);
-  $VERSION= "4.20";;;
+  $VERSION= "4.21";;;
   #
   # Define the global environment
   #

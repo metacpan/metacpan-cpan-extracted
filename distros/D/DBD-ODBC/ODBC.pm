@@ -18,7 +18,7 @@ require 5.008;
 # see discussion on dbi-users at
 # http://www.nntp.perl.org/group/perl.dbi.dev/2010/07/msg6096.html and
 # http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
-$DBD::ODBC::VERSION = '1.56';
+$DBD::ODBC::VERSION = '1.57';
 
 {
     ## no critic (ProhibitMagicNumbers ProhibitExplicitISA)
@@ -671,7 +671,7 @@ DBD::ODBC - ODBC Driver for DBI
 
 =head1 VERSION
 
-This documentation refers to DBD::ODBC version 1.56.
+This documentation refers to DBD::ODBC version 1.57.
 
 
 =head1 WARNING
@@ -1250,6 +1250,12 @@ an argument to Makefile.PL (e.g. C<perl Makefile.PL -nou>). On non-Windows
 platforms the WITH_UNICODE macro is B<not> enabled by default and to enable
 you need to specify the -u argument to Makefile.PL. Please bear in mind
 that some ODBC drivers do not support SQL_Wxxx columns or parameters.
+
+You can also specify that you want UNICODE support by setting the
+C<DBD_ODBC_UNICODE> environment variable prior to install:
+
+  export DBD_ODBC_UNICODE=1
+  cpanm DBD::ODBC
 
 UNICODE support in ODBC Drivers differs considerably. Please read the
 README.unicode file for further details.

@@ -1,4 +1,4 @@
-# Copyright (c) 1995-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -49,7 +49,7 @@ We think in terms which cannot be expressed exactly.
 
 For example, most people would look at those two dates and think:
 
-   Percieved: 1 month, 2 days, 1 hour
+   Perceived: 1 month, 2 days, 1 hour
 
 But the two dates:
 
@@ -74,7 +74,7 @@ unexpected results.  The following calculation illustrates this:
    Result: Nov 6, 2011 01:30 EST
 
 This immediately causes most people to redefine a day as the amount of time
-between the same wallclock time.  For example, the amount of time between noon
+between the same wall clock time.  For example, the amount of time between noon
 one day and noon the next (regardless of daylight saving time changes).
 
 This definition doesn't work either.  For example:
@@ -110,7 +110,7 @@ Calculations involving exact deltas are unambiguous in all cases.
 A second class of delta is called a semi-exact delta, and these add
 days (and weeks) to the delta, and treats days as a "same time next day"
 at all times except the two cases where the resulting date falls in the
-period where a daylight saving time transition is occuring.  Then it
+period where a daylight saving time transition is occurring.  Then it
 falls back to the 24 hour definition.
 
 A final class of delta is an approximate delta which includes all of

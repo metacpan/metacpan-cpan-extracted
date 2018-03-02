@@ -1,5 +1,5 @@
 package CanvasCloud;
-$CanvasCloud::VERSION = '0.004';
+$CanvasCloud::VERSION = '0.005';
 # ABSTRACT: Perl access for Canvas LMS API
 
 use Moose;
@@ -7,9 +7,9 @@ use namespace::autoclean;
 use Module::Load;
 
 my %LOADER = (
-                 'CanvasCloud::API::Account::Report'    => { small => 'reports',    short => 'Account::Report',    wanted => [qw/domain token account_id/] },
-                 'CanvasCloud::API::Account::Term'      => { small => 'terms',      short => 'Account::Term',      wanted => [qw/domain token account_id/] },
-                 'CanvasCloud::API::Account::SISImport' => { small => 'sisimports', short => 'Account::SISImport', wanted => [qw/domain token account_id/] },
+                 'CanvasCloud::API::Account::Report'    => { small => 'reports',    short => 'Account::Report'    },
+                 'CanvasCloud::API::Account::Term'      => { small => 'terms',      short => 'Account::Term'      },
+                 'CanvasCloud::API::Account::SISImport' => { small => 'sisimports', short => 'Account::SISImport' },
              );
 
              
@@ -17,25 +17,27 @@ has config => ( is => 'rw', isa => 'HashRef', required => 1 );
 
 
 sub api {
-    my $self = shift;
-    my $type = shift;
-    my @extra = @_;
+    my $self  = shift;
+    my $type  = shift;
+    my %args = @_;
 
+    my $load;
+  
     for my $k ( keys %LOADER ) {
-        if ( $type eq $LOADER{$k}{small} || $type eq $LOADER{$k}{short} ) {
-            $type = $k;
+        if ( $type eq $k or $type eq $LOADER{$k}{small} or $type eq $LOADER{$k}{short} ) {
+            $load = $k;
             last;
         }
     }
-    if ( $type =~ /^CanvasCloud::API::\w+/ && exists $LOADER{$type} ) {
-        load $type;
-        my %wanted;
-        for my $arg ( @{ $LOADER{$type}{wanted} } ) {
-            $wanted{$arg} = $self->config->{$arg} if ( exists $self->config->{$arg} && defined $self->config->{$arg} );
+    die 'Unable to create CanvasCloud->api(', $type, ") -- $type not found!\n" unless ( $load );
+    load $load;
+
+    for my $attr ( $load->meta->get_all_attributes ) {
+        if ( !exists $args{ $attr->name } && exists $self->config->{ $attr->name } && $attr->is_required ) {
+            $args{ $attr->name } = $self->config->{ $attr->name };
         }
-        return $type->new( %wanted, @extra );
     }
-    die 'Unable to create CanvasCloud->api(', $type, ") -- $type not found!\n";
+    return $load->new( %args );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -54,7 +56,7 @@ CanvasCloud - Perl access for Canvas LMS API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use File::ShareDir::Install;
 
 install_share 'share';
 
-my @scripts = qw (RNAalisplit.pl);
+my @scripts = qw (RNAalisplit.pl eval_alignment.pl);
 
 WriteMakefile(
 	      NAME               => 'Bio::RNA::RNAaliSplit',
@@ -25,6 +25,8 @@ WriteMakefile(
 				     'Test::Prereq' => 0,
 				    },
 	      PREREQ_PM          => {
+				     "Cwd" => "0",
+				     "diagnostics" => "0",
 				     "lib" => "0",
 				     "strict" => "0",
 				     "warnings" => "0",
@@ -33,11 +35,14 @@ WriteMakefile(
 				     "Bio::Root::Version" => '1.00690001',
 				     "Bio::AlignIO" => '0',
 				     "Carp" => '0',
+				     "constant" => '0',
 				     "Data::Dumper" => '0',,
 				     "Digest::MD5" => '0',
 				     "File::Basename" => '0',
 				     "File::Path" => '0',
+				     "File::Share" => '0',
 				     "File::Spec" => '0',
+				     "FindBin" => '0',
 				     "Getopt::Long" => '2.0',
 				     "IO::Dir" => '0',
 				     "IPC::Cmd" => '0',
@@ -46,6 +51,7 @@ WriteMakefile(
 				     "Moose::Util::TypeConstraints" => '0',
 				     "Path::Class" => '0',
 				     "Path::Class::Dir" => '0',
+				     "Path::Class::File" => '0',
 				     "Pod::Usage" => '0',
 				     "RNA" => "2.3.4",
 				     "Storable" => '0',

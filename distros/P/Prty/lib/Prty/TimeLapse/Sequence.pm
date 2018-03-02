@@ -4,13 +4,14 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Duration;
 use Prty::Path;
 use Prty::Progress;
-use Prty::Option;
 use Prty::ImageMagick;
+use File::Temp ();
+use Prty::Option;
 use Prty::FFmpeg;
 use Image::Size ();
 use Digest::SHA ();
@@ -87,7 +88,7 @@ sub new {
 
 =head4 Synopsis
 
-    $n = $tdr->count;
+    $n = $tsq->count;
 
 =head4 Returns
 
@@ -112,7 +113,7 @@ sub count {
 
 =head4 Synopsis
 
-    $duration = $tdr->duration($framerate);
+    $duration = $tsq->duration($framerate);
 
 =head4 Returns
 
@@ -139,7 +140,17 @@ sub duration {
 
 =head4 Synopsis
 
-    $tdr->export($destDir);
+    $tsq->export($destDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $destDir
+
+Pfad des Zielverzeichnisses.
+
+=back
 
 =head4 Returns
 
@@ -148,7 +159,7 @@ nichts
 =head4 Description
 
 Exportiere die Bildsequenz nach Verzeichnis $destDir. Existiert
-$destDir nicht wird es erzeugt. Existiert das Verzeichnis, wird
+$destDir nicht, wird es erzeugt. Existiert das Verzeichnis, wird
 die Bildsequenz angehängt.
 
 =cut
@@ -171,6 +182,84 @@ sub export {
         my $destFile = sprintf '%s/%06d.%s',$dir,$max+$i,$img->type;
         print $pro->msg($i,'%s: i/n x% t/t(t) x/s: %s','link',$destFile);
         Prty::Path->symlinkRelative($img->path,$destFile);
+    }
+    print $pro->msg;
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 morph() - Exportiere Bildsequenz mit Zwischenbildern
+
+=head4 Synopsis
+
+    $tsq->morph($n,$destDir);
+
+=head4 Arguments
+
+=over 4
+
+=item $n
+
+Anzahl der Zwischenbilder.
+
+=item $destDir
+
+Pfad des Zielverzeichnisses.
+
+=back
+
+=head4 Returns
+
+nichts
+
+=head4 Description
+
+Exportiere die Bildsequenz nach Verzeichnis $destDir mit jeweils
+$n gemorphten Zwischenbildern. Existiert $destDir nicht, wird es
+erzeugt. Existiert das Verzeichnis, wird die Bildsequenz
+angehängt.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub morph {
+    my ($self,$n,$dir) = @_;
+
+    Prty::Path->mkdir($dir,-recursive=>1);
+    
+    my $max = Prty::Path->maxFileNumber($dir);
+
+    $| = 1;
+    my $pro = Prty::Progress->new(($self->count-1)*($n+1)+1,
+        -show=>1,
+    );
+
+    my $j = 0;
+    my $imageA = $self->images;
+    for (my $i = 0; $i < @$imageA-1; $i++) {
+        my $img1 = $imageA->[$i];
+        my $img2 = $imageA->[$i+1];
+        my $ext = $img1->type;
+
+        my $tmpDir = File::Temp::tempdir(CLEANUP=>1);
+        
+        my $cmd = Prty::ImageMagick->morph($img1,$img2,
+            "$tmpDir/%02d.$ext",$n);
+        $cmd->execute;
+
+        my @files = Prty::Path->glob("$tmpDir/*");
+        if ($i < @$imageA-2) {
+            pop @files;
+        }
+        for my $srcFile (@files) {
+            $j++;
+            my $destFile = sprintf '%s/%06d.%s',$dir,$max+$j,$ext;
+            print $pro->msg($j,'i/n x% t/t(t) x/s: %s',$destFile);
+            Prty::Path->copy($srcFile,$destFile);
+        }
     }
     print $pro->msg;
 
@@ -404,8 +493,12 @@ SHA1 Digest
 =head4 Description
 
 Berechne den SHA1 Hash-Wert für die Sequenz und liefere diesen zurück.
-Der Hash-Wert wird gebildet über Pfad der Bilddatei, deren
-letztem Änderungszeitpunkt und deren Größe für alle Bilddateien.
+Der Hash-Wert wird gebildet über allen Bilddateien, derem Pfad,
+deren Größe und Änderungszeitpunkt.
+
+Anhand des SHA1 Hash-Werts läßt sich prüfen, ob eine Änderung an
+der Bildsequenz stattgefunden hat und eine teure Operation wie das
+(erneute) Rendern eines Video notwendig ist.
 
 =cut
 
@@ -436,7 +529,7 @@ sub sha1 {
 
 =head4 Synopsis
 
-    $tdr = $tdr->pick($n);
+    $tsq = $tsq->pick($n);
 
 =head4 Returns
 
@@ -469,7 +562,7 @@ sub pick {
 
 =head4 Synopsis
 
-    $tdr = $tdr->reverse;
+    $tsq = $tsq->reverse;
 
 =head4 Returns
 
@@ -496,7 +589,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

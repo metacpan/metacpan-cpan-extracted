@@ -4,11 +4,13 @@ MANIFEST
 README.md
 end_to_end_emulated.sh
 bin/monzojo
+bin/monzo_transactions
 lib/Business/Monzo.pm
 lib/Business/Monzo/Account.pm
 lib/Business/Monzo/Address.pm
 lib/Business/Monzo/Attachment.pm
 lib/Business/Monzo/Balance.pm
+lib/Business/Monzo/Pot.pm
 lib/Business/Monzo/Client.pm
 lib/Business/Monzo/Currency.pm
 lib/Business/Monzo/Exception.pm
@@ -27,6 +29,7 @@ t/business/monzo/account.t
 t/business/monzo/address.t
 t/business/monzo/attachment.t
 t/business/monzo/balance.t
+t/business/monzo/pot.t
 t/business/monzo/client.t
 t/business/monzo/exception.t
 t/business/monzo/merchant.t

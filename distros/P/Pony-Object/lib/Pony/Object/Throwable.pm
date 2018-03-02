@@ -3,13 +3,15 @@
 
 # "The owls are not what they seem"
 package Pony::Object::Throwable {
+  our $VERSION = "1.04";
+
   use Pony::Object;
-  
+
   protected message => '';
   protected package => '';
   protected file    => '';
   protected line    => '';
-  
+
   # Method: throw
   #   Say "hello" and raise Exception.
   #
@@ -21,10 +23,10 @@ package Pony::Object::Throwable {
     $this = $this->new unless ref $this;
     $this->message = shift || "no comments";
     ($this->package, $this->file, $this->line) = @_ || caller;
-    
+
     printf STDERR "\n\"%s\" at %s (%s:%s)\n",
       $this->message, $this->package, $this->file, $this->line;
-    
+
     die $this;
   }
 }
@@ -62,14 +64,14 @@ Nested try works for perl-5.14 or higher.
 
   package MyFile {
     use Pony::Object qw/:exceptions/;
-    
+
     protected 'file';
     protected 'data' => undef;
-    
+
     sub init : Public($this, $file) {
       $this->file = $file;
     }
-    
+
     sub read : Public($this) {
       $this->data = try {
         open F, $this->file or
@@ -86,7 +88,7 @@ Nested try works for perl-5.14 or higher.
       };
     }
   }
-  
+
   1;
 
 =head1 COPYRIGHT AND LICENSE

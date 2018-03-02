@@ -10,7 +10,7 @@ $| = 1;
 my $has_test_nowarnings = 1;
 eval "require Test::NoWarnings";
 $has_test_nowarnings = undef if $@;
-my $tests = 15;
+my $tests = 16;
 $tests += 1 if $has_test_nowarnings;
 plan tests => $tests;
 
@@ -59,6 +59,7 @@ $sth->finish();
 $dbh->rollback();
 pass("finished and rolled back");
 
+$dbh->{RaiseError} = 1;
 $sth = $dbh->prepare("SELECT * FROM $ODBCTEST::table_name WHERE 1 = 0");
 $sth->execute();
 @row = $sth->fetchrow();
@@ -78,32 +79,49 @@ while (@row = $sth->fetchrow()) {
 }
 $sth->finish();
 
-$sth->execute();
-$sth->bind_col(1, \$a);
-$sth->bind_col(2, \$b);
-while ($sth->fetch()) {
-    print " bind_col a,b:", $a, ",", $b, "\n";
-    unless (defined($a) && defined($b)) {
-        print "not ";
-        last;
-	}
+my $skip;
+eval {$sth->execute()};
+if (my $ev = $@) {
+    if ($ev =~ /No query has been executed/) {
+        fail("Looks like you might be using Postgres ODBC driver which will fail this test " .
+                 "unless you add UseDeclareFetch=1 to your DSN");
+    } else {
+        fail("reexecute on prepared statement - $ev");
+    }
+    $skip = 1;
+} else {
+    ok('rexecute on prepared statement');
 }
-pass("?");
-$sth->finish();
 
-($a, $b) = (undef, undef);
-$sth->execute();
-$sth->bind_columns(undef, \$b, \$a);
-while ($sth->fetch()) {
-    print " bind_columns a,b:", $b, ",", $a, "\n";
-    unless (defined($a) && defined($b)) {
-        print "not ";
-        last;
-	}
-}
-pass("??");
+SKIP: {
+    skip "reexecute failed", 2 if $skip;
 
-$sth->finish();
+    $sth->bind_col(1, \$a);
+    $sth->bind_col(2, \$b);
+    while ($sth->fetch()) {
+        print " bind_col a,b:", $a, ",", $b, "\n";
+        unless (defined($a) && defined($b)) {
+            print "not ";
+            last;
+        }
+    }
+    pass("?");
+    $sth->finish();
+
+    ($a, $b) = (undef, undef);
+    $sth->execute();
+    $sth->bind_columns(undef, \$b, \$a);
+    while ($sth->fetch()) {
+        print " bind_columns a,b:", $b, ",", $a, "\n";
+        unless (defined($a) && defined($b)) {
+            print "not ";
+            last;
+        }
+    }
+    pass("??");
+
+    $sth->finish();
+};
 
 # turn off error warnings.  We expect one here (invalid transaction state)
 $dbh->{RaiseError} = 0;
@@ -126,4 +144,3 @@ print $DBI::errstr;
 # (XXX not reliable, iodbc-2.12 with "INTERSOLV dBase IV ODBC Driver" == -1)
 #print "# DBI::err=$DBI::err\nnot " if $DBI::err ne "25000";
 #print "ok 7\n";
-

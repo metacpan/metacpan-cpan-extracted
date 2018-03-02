@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.4.1;
+package Pcore::SMTP v0.4.3;
 
 use Pcore -dist, -const, -class, -result;
 use Pcore::AE::Handle qw[:TLS_CTX];
@@ -527,11 +527,42 @@ Pcore::SMTP - non-blocking SMTP protocol implementation
 
 =head1 SYNOPSIS
 
+    my $smtp = Pcore::SMTP->new( {
+        host     => 'smtp.gmail.com',
+        port     => 465,
+        username => 'username@gmail.com',
+        password => 'password',
+        tls      => 1,
+    } );
+
+    $smtp->sendmail(
+        from     => 'from@host',
+        reply_to => 'from@host',
+        to       => 'to@host',
+        cc       => 'cc@host',
+        bcc      => 'bcc@host',
+        subject  => 'email subject',
+        body     => $message_body,
+        sub ($res) {
+            say $res;
+
+            $cb->();
+
+            return;
+        }
+    );
+
 =head1 DESCRIPTION
+
+AnyEvent based SMTP protocol implementation.
 
 =head1 ATTRIBUTES
 
 =head1 METHODS
+
+=head1 NOTES
+
+If you are using gmail and get error 534 "Please log in via your web browser", go to L<https://myaccount.google.com/lesssecureapps> and allow less secure apps.
 
 =head1 SEE ALSO
 

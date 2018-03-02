@@ -21,4 +21,4 @@ requires: {}
 resources:
   bugtracker: https://github.com/kamenov/PDF-Table/issues
   repository: https://github.com/kamenov/PDF-Table
-version: v0.9.14
+version: v0.10.0

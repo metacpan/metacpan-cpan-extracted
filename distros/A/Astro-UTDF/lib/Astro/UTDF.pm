@@ -14,7 +14,10 @@ use constant PI => atan2( 0, -1 );
 use constant TWO_PI => 2 * PI;
 use constant SPEED_OF_LIGHT => 299792.458;	# Km/sec, per U.S. NIST
 
-our $VERSION = '0.006';
+use constant ARRAY_REF	=> ref [];
+use constant CODE_REF	=> ref sub {};
+
+our $VERSION = '0.007';
 
 sub new {
     my $class = shift;
@@ -181,9 +184,9 @@ sub data_interval {
 	    or return $self->$method( @args );
 	my $type = ref $dcdr
 	    or return sprintf $dcdr, $self->$method( @args );
-	'ARRAY' eq $type
+	ARRAY_REF eq $type
 	    and return $dcdr->[ $self->$method( @args ) ];
-	'CODE' eq $type
+	CODE_REF eq $type
 	    and return $dcdr->( $self, $method, @args );
 	confess "Programming error -- decoder for $method is $type";
     }
@@ -459,7 +462,7 @@ sub receive_antenna_geometry_code {
     my %my_arg = map { $_ => 1 } qw{ file };
 
     sub slurp {
-	my ( $class, @in_args ) = @_;
+	my ( undef, @in_args ) = @_;		# Invocant unused
 
 	@in_args % 2 and unshift @in_args, 'file';
 	my ( %arg, @attrib );
@@ -1769,7 +1772,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2016 Thomas R. Wyant, III
+Copyright (C) 2010-2018 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 1.0 'no_plan';
 use Test::Output;
 
 use Cwd;
@@ -14,8 +14,8 @@ use_ok( $class );
 can_ok( $class, 'new' );
 
 BEGIN {
-	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	use File::Spec::Functions qw(rel2abs catfile);
+	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
 	require $file;
 	}
 
@@ -74,7 +74,7 @@ like( $at, qr/Could not open command/, "Error message with bad command" );
 {
 stderr_like
 	{ eval { $release->run( qq|$^X -e "exit 255"| ) } }
-	qr/didn't close cleanly/, 
+	qr/didn't close cleanly/,
 	"Error message with bad close";
 }
 

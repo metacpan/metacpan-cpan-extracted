@@ -15,6 +15,7 @@ package Apache2::AMFImageRendering;
   use warnings;
   use POSIX qw(ceil);
   use Apache2::AMFCommonLib ();
+  use Apache2::RequestIO;
   
   use Apache2::RequestRec ();
   use Apache2::RequestUtil ();
@@ -36,7 +37,7 @@ package Apache2::AMFImageRendering;
   # 
 
   use vars qw($VERSION);
-  $VERSION= "4.20";;;
+  $VERSION= "4.21";;;
   my $CommonLib = new Apache2::AMFCommonLib ();
   my %Capability;
   my %Array_fb;

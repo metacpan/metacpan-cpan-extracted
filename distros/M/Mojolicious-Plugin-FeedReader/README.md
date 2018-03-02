@@ -50,12 +50,12 @@ Mojolicious::Plugin::FeedReader - Mojolicious plugin to find and parse RSS & Ato
 
 # DESCRIPTION
 
-__Mojolicious::Plugin::FeedReader__ implements minimalistic helpers for identifying,
+**Mojolicious::Plugin::FeedReader** implements minimalistic helpers for identifying,
 fetching and parsing RSS and Atom Feeds.  It has minimal dependencies, relying as
 much as possible on Mojolicious components - Mojo::UserAgent for fetching feeds and
 checking URLs, Mojo::DOM for XML/HTML parsing.
 It is therefore rather fragile and naive, and should be considered Experimental/Toy
-code - __use at your own risk__.
+code - **use at your own risk**.
 
 # METHODS
 
@@ -71,7 +71,7 @@ listed below in your Mojolicious application.
 
 # HELPERS
 
-__Mojolicious::Plugin::FeedReader__ implements the following helpers.
+**Mojolicious::Plugin::FeedReader** implements the following helpers.
 
 ## find\_feeds
 
@@ -105,7 +105,7 @@ If given a callback function as an additional argument, execution will be non-bl
 
     # non-blocking
     $self->parse_feed($url, sub {
-      my ($c, $feed) = @_;
+      my ($feed) = @_;
       $c->render(text => "Feed tagline: " . $feed->{tagline});
     });
 
@@ -148,12 +148,37 @@ Each item in the items array is a hashref with the following keys:
 - tags (optional) - array ref of tags, categories or dc:subjects.
 - \_raw - XML serialized text of the item's Mojo::DOM node. Note that this can be different from the original XML text in the feed.
 
+## parse\_opml
+
+    my @subscriptions = app->parse_opml( 'mysubs.opml' );
+    foreach my $sub (@subscriptions) {
+      say 'RSS URL is: ',     $sub->{xmlUrl};
+      say 'Website URL is: ', $sub->{htmlUrl};
+      say 'categories: ', join ',', @{$sub->{categories}};
+    }
+
+Parse an OPML subscriptions file and return the list of feeds as an array of hashrefs.
+
+Each hashref will contain an array ref in the key 'categories' listing the folders (parent nodes) in the OPML tree the subscription item appears in.
+
+# STAND-ALONE USE
+
+[Mojolicious::Plugin::FeedReader](https://metacpan.org/pod/Mojolicious::Plugin::FeedReader) can also be used directly, rather than as a plugin:
+
+    use Mojolicious::Plugin::FeedReader;
+    my $fr = Mojolicious::Plugin::FeedReader->new( ua => Mojo::UserAgent->new );
+    my ($feed) = $fr->find_feeds($url);
+    ...
+
+In the future, the feed-parsing code will probably move into its own module.
+
 # CREDITS
 
-Some tests adapted from [Feed::Find](https://metacpan.org/pod/Feed::Find) and [XML::Feed](https://metacpan.org/pod/XML::Feed). Feed autodiscovery adapted from l<Feed::Find>.
+Dotan Dimet
 
-Test data (web pages, feeds and excerpts) included in this package is intended for testing purposes only, and is not meant in anyway
-to infringe on the rights of the respective authors.
+Mario Domgoergen
+
+Some tests adapted from [Feed::Find](https://metacpan.org/pod/Feed::Find) and [XML:Feed](XML:Feed), Feed autodiscovery adapted from [Feed::Find](https://metacpan.org/pod/Feed::Find).
 
 # COPYRIGHT AND LICENSE
 
@@ -161,6 +186,9 @@ Copyright (C) 2014, Dotan Dimet.
 
 This program is free software, you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.
+
+Test data (web pages, feeds and excerpts) included in this package is intended for testing purposes only, and is not meant in any way
+to infringe on the rights of the respective authors.
 
 # SEE ALSO
 

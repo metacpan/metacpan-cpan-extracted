@@ -6,7 +6,7 @@ use Plack::Util;
 
 our $VERSION = "0.06";
 
-# ABSTRACT: Plack::Middleware which sets removes body for HTTP response if it's not required
+# ABSTRACT: Plack::Middleware which removes body for HTTP response if it's not required
 
 sub call {
     my ($self, $env) = @_;
@@ -15,12 +15,9 @@ sub call {
 
     return $self->response_cb($res, sub {
         my $response = shift;
-        my $status = $response->[0];
-        my $headers = Plack::Util::headers($response->[1]); # first index contains HTTP header
-        if( Plack::Util::status_with_no_entity_body($response->[0]) ) {
-            $response->[2] = [];
-            $headers->remove("Content-Length");
-	}
+        return if ( !Plack::Util::status_with_no_entity_body($response->[0]) );
+        $response->[2] = [];
+        Plack::Util::header_remove($response->[1], "Content-Length");
         return;
     });
 }
@@ -35,11 +32,11 @@ __END__
 
 =head1 NAME
 
-Plack::Middleware::RemoveRedundantBody - Plack::Middleware which sets removes body for HTTP response if it's not required
+Plack::Middleware::RemoveRedundantBody - Plack::Middleware which removes body for HTTP response if it's not required
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -65,13 +62,15 @@ John Napiorkowski <jjn1056@yahoo.com>
 
 Karen Etheridge <ether@cpan.org>
 
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
 =head1 AUTHOR
 
 Upasana <me@upasana.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Upasana.
+This software is copyright (c) 2018 by Upasana.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

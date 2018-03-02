@@ -5,7 +5,7 @@ use warnings;
 
 use lib qw{ inc };
 
-use base qw{ My::Module::Build };
+use My::Module::Build;
 
 use Config;
 use FileHandle;

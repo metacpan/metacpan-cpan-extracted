@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.008001;
 
 use ExtUtils::MakeMaker;
 
@@ -15,24 +15,21 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Lingua-EN-Titlecase-Simple",
   "EXE_FILES" => [],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Lingua::EN::Titlecase::Simple",
   "PREREQ_PM" => {
-    "Exporter::Tidy" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
-    "File::Find" => 0,
-    "File::Temp" => 0,
-    "Test::More" => "0.88",
+    "Test::More" => 0,
     "constant" => 0,
     "if" => 0,
     "open" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,11 +38,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
-  "Exporter::Tidy" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "File::Find" => 0,
-  "File::Temp" => 0,
-  "Test::More" => "0.88",
+  "Test::More" => 0,
   "constant" => 0,
   "if" => 0,
   "open" => 0,

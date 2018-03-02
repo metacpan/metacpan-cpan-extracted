@@ -1,7 +1,7 @@
 package Module::FatPack;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.17'; # VERSION
+our $DATE = '2018-02-27'; # DATE
+our $VERSION = '0.180'; # VERSION
 
 use 5.010001;
 use strict;
@@ -277,7 +277,7 @@ Module::FatPack - Generate source code that contains fatpacked modules
 
 =head1 VERSION
 
-This document describes version 0.17 of Module::FatPack (from Perl distribution Module-FatPack), released on 2017-07-14.
+This document describes version 0.180 of Module::FatPack (from Perl distribution Module-FatPack), released on 2018-02-27.
 
 =head1 FUNCTIONS
 
@@ -409,13 +409,19 @@ L<App::depak> for more options e.g. use various tracing methods, etc.
 
 L<fatpack-modules>, CLI for C<fatpack_modules>
 
+L<Module::DataPack>, which implements an alternative technique to fatpacking
+called datapacking. The modules are embedded not in a variable in Perl code
+(which still needs to be parsed by perl), but instead in the __DATA__ section
+(whch does not need to be parsed by perl). A script with lots of modules to
+embed can benefit from datapacking technique and lower its startup overhead.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

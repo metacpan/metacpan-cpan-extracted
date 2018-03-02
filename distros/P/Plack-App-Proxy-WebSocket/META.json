@@ -1,29 +1,51 @@
 {
    "abstract" : "proxy HTTP and WebSocket connections",
    "author" : [
-      "Charles McGarvey <ccm@cpan.org>"
+      "Charles McGarvey <chazmcgarvey@brokenzipper.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-App-Proxy-WebSocket",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::CCM" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0"
          }
       },
       "runtime" : {
@@ -36,15 +58,30 @@
             "Plack::App::Proxy" : "0",
             "Plack::Request" : "0",
             "URI" : "0",
+            "namespace::clean" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Plack::App::Proxy::WebSocket" : {
+         "file" : "lib/Plack/App/Proxy/WebSocket.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -52,13 +89,15 @@
       "bugtracker" : {
          "web" : "https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket/issues"
       },
-      "homepage" : "http://search.cpan.org/~ccm/Plack-App-Proxy-WebSocket",
+      "homepage" : "https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket.git",
+         "url" : "https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket.git",
          "web" : "https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_authority" : "cpan:CCM",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

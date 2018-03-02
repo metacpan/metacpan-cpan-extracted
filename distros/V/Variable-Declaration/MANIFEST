@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Variable/Declaration.pm
+minil.toml
+t/00_compile.t
+t/01_define.t
+t/02_level.t
+t/10_render_declaration.t
+t/20_parse.t
+t/21_parse_type_varlist.t
+t/22_parse_type_var.t
+META.yml
+MANIFEST

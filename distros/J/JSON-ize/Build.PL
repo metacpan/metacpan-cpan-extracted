@@ -4,6 +4,7 @@ my $build = Module::Build->new(
   dist_abstract => 'Use JSON easily in one-liners',
   dist_author => 'Mark A. Jensen',
   dist_version_from => 'lib/JSON/ize.pm',
+  license => 'apache',
   requires => {
     'JSON' => 2,
    },

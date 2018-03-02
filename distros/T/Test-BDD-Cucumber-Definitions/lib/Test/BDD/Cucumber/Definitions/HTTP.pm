@@ -12,11 +12,12 @@ use HTTP::Response;
 use HTTP::Tiny;
 use Params::ValidationCompiler qw(validation_for);
 use Test::BDD::Cucumber::Definitions qw(S);
+use Test::BDD::Cucumber::Definitions::Types qw(:all);
 use Test::BDD::Cucumber::Definitions::HTTP::Types qw(:all);
 use Test::More;
 use Try::Tiny;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 our @EXPORT_OK = qw(
     request_send
@@ -50,7 +51,7 @@ my $validator_header_set = validation_for(
         { type => HttpHeader },
 
         # http request header value
-        { type => HttpString }
+        { type => TbcdStr }
     ]
 );
 
@@ -66,7 +67,7 @@ my $validator_content_set = validation_for(
     params => [
 
         # http request content
-        { type => HttpString },
+        { type => TbcdStr },
     ]
 );
 
@@ -147,7 +148,7 @@ my $validator_header_eq = validation_for(
         { type => HttpHeader },
 
         # http response header value
-        { type => HttpString },
+        { type => TbcdStr },
 
     ]
 );
@@ -169,7 +170,7 @@ my $validator_header_re = validation_for(
         { type => HttpHeader },
 
         # http response header value
-        { type => HttpRegexp }
+        { type => TbcdRegexpRef }
     ]
 );
 
@@ -188,7 +189,7 @@ my $validator_content_eq = validation_for(
     params => [
 
         # http response content
-        { type => HttpString },
+        { type => TbcdStr },
 
     ]
 );
@@ -207,7 +208,7 @@ my $validator_content_re = validation_for(
     params => [
 
         # http response content
-        { type => HttpRegexp }
+        { type => TbcdRegexpRef }
     ]
 );
 

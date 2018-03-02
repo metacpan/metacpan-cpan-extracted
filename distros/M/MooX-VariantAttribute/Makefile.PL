@@ -25,7 +25,8 @@ WriteMakefile(
         'Combine::Keys' => 0.09,
         'Moo' => 0,
         'MooX::ReturnModifiers' => 0.09,
-    },
+		'Type::Tiny' => 1.002001
+	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-VariantAttribute-*' },
     META_MERGE => {

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 1.0 'no_plan';
 use Test::Output;
 
 use Cwd;
@@ -14,8 +14,8 @@ use_ok( $class );
 can_ok( $class, 'new' );
 
 BEGIN {
-	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	use File::Spec::Functions qw(rel2abs catfile);
+	my $file = rel2abs( catfile( qw( t lib setup_common.pl) ) );
 	require $file;
 	}
 
@@ -31,7 +31,7 @@ my @makefile_targets = qw(
 	test
 	disttest
 	);
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Create test object
 my $release = $class->new;
@@ -43,7 +43,7 @@ can_ok( $release, @makefile_pl_targets, @makefile_targets );
 {
 can_ok( $release, 'dist_test' );
 
-stderr_like 
+stderr_like
 	{ $release->dist_test }
 	qr/deprecated/i,
 	'dist_test gives deprecation warning';
@@ -86,7 +86,7 @@ foreach my $target ( @makefile_targets, @makefile_pl_targets )
 		qr/no Makefile.*skipping/,
 		"Skipping $target with no Makefile"
 	}
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # No Makefile, but Makefile.PL present
 {
@@ -105,7 +105,7 @@ foreach my $target ( @makefile_targets )
 		qr/no Makefile.*skipping/,
 		"Skipping $target with no Makefile"
 	}
-	
+
 foreach my $target ( @makefile_pl_targets )
 	{
 	ok( -e 'Makefile.PL', 'Makefile.PL is not there' );
@@ -115,7 +115,7 @@ foreach my $target ( @makefile_pl_targets )
 		qr/done/,
 		"Target $target completes"
 	}
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Makefile and Makefile.PL present, for simple targets
 {
@@ -129,18 +129,18 @@ my %target_needs_more = map { $_, 1 } qw(dist test disttest);
 foreach my $target ( @makefile_targets, @makefile_pl_targets )
 	{
 	next if exists $target_needs_more{$target};
-	
+
 	ok( -e 'Makefile',    'Makefile is there'    );
 	ok( -e 'Makefile.PL', 'Makefile.PL is not there' );
-	
+
 	stdout_like
 		{ eval { $release->$target() } }
 		qr/done/,
 		"Target $target completes"
 	}
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# test and dist_test needs output from run to see if 
+# test and dist_test needs output from run to see if
 # all tests were successful
 foreach my $target ( qw(test disttest ) )
 	{
@@ -148,7 +148,7 @@ foreach my $target ( qw(test disttest ) )
 		{ eval { $release->$target() } }
 		qr/Checking make $target.../,
 		"Target test runs";
-	
+
 	{
 	local $run_output = '';
 	my $rc = eval { $release->turn_quiet_on; $release->$target(); 1 };
@@ -157,17 +157,17 @@ foreach my $target ( qw(test disttest ) )
 	like( $at, qr/Tests failed/i, "make test dies because tests did not pass" );
 	$release->turn_quiet_off;
 	}
-	
+
 	{
 	local $run_output = 'All tests successful';
-	
+
 	stdout_like
 		{ eval { $release->$target() } }
 		qr/pass/,
 		"All tests pass with right run output";
 	}
 	}
-	
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # dist needs output from run to see if all tests were successful
 # It also needs to see an archive file after it is done
@@ -184,7 +184,7 @@ $release->turn_quiet_off;
 {
 $release->local_file( undef );
 ok( ! defined $release->local_file, "Local file is not defined (good)" );
-	
+
 {
 local $run_output = '';
 $release->turn_quiet_on;
@@ -194,7 +194,7 @@ ok( ! defined $rc, "make dist dies when local file is missing" );
 like( $at, qr/Couldn't guess/i, "dist fails whenit can't guess local name" );
 $release->turn_quiet_off;
 }
-	
+
 is( $release->local_file, undef, "Local file is undef (good)" );
 }
 
@@ -226,7 +226,7 @@ ok( ! defined $rc, "make dist dies when missing local file" );
 like( $at, qr/ does not exist/i, "dist claims local file does not exist" );
 $release->turn_quiet_off;
 }
-	
+
 is( $release->local_file, 'foo.tar.gz', "Local file guessed from output" );
 }
 
@@ -270,11 +270,11 @@ local $run_output = 'gzip foo.tar';
 
 $release->local_file( undef );
 ok( ! defined $release->local_file, "Local file is not defined (good)" );
-	
+
 stdout_like
 	{ eval{ $release->dist } }
 	qr/done/,
 	"Target dist runs and finishes";
-	
+
 is( $release->local_file, 'foo.tar.gz', "Local file guessed from output" );
 }

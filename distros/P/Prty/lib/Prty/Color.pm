@@ -4,9 +4,9 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
-use Prty::Perl;
+use Prty::Reference;
 
 # -----------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ sub new {
         @rgb = @_;
     }
     elsif (@_ == 1) {
-        if (Prty::Perl->isArrayRef($_[0])) {
+        if (Prty::Reference->isArrayRef($_[0])) {
             @rgb = @{$_[0]};
         }
         elsif ($_[0] =~ /^#?(\w\w)(\w\w)(\w\w)$/) {
@@ -259,7 +259,7 @@ sub rgb {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

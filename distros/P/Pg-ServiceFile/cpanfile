@@ -1,7 +1,7 @@
 requires 'perl', '5.008005';
 
 requires 'Config::Pg::ServiceFile';
-requires 'Moo';
+requires 'Moo', '1.006000';             # for `coerce => 1`
 requires 'Types::Path::Tiny';
 requires 'Types::Standard';
 

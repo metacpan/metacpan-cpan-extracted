@@ -2,6 +2,7 @@ package App::MechaCPAN::Install;
 
 use v5.14;
 
+use Carp;
 use Config;
 use Cwd qw/cwd/;
 use JSON::PP qw//;
@@ -180,7 +181,7 @@ TARGET:
 
         if ( $opts->{'stop-on-error'} )
         {
-          die $err;
+          croak $err;
         }
 
         next TARGET;
@@ -289,7 +290,7 @@ sub _configure
   {
     run( $^X, 'Build.PL' );
     my $configured = -e -f 'Build';
-    die 'Unable to configure Buid.PL for ' . $target->{src_name}
+    croak 'Unable to configure Buid.PL for ' . $target->{src_name}
       unless $configured;
     $maker = 'mb';
   }
@@ -298,12 +299,12 @@ sub _configure
   {
     run( $^X, 'Makefile.PL' );
     my $configured = -e 'Makefile';
-    die 'Unable to configure Makefile.PL for ' . $target->{src_name}
+    croak 'Unable to configure Makefile.PL for ' . $target->{src_name}
       unless $configured;
     $maker = 'mm';
   }
 
-  die 'Unable to configure ' . $target->{src_name}
+  croak 'Unable to configure ' . $target->{src_name}
     if !defined $maker;
 
   $target->{maker} = $maker;
@@ -398,7 +399,7 @@ sub _prereq_verify
     error $target->{key}, $line;
     logmsg "Missing requirements: "
       . join( ", ", map { $_->{src_name} } @incomplete_deps );
-    die 'Error with prerequisites';
+    croak 'Error with prerequisites';
   }
 
   return $target;
@@ -427,7 +428,7 @@ sub _build
     return $target;
   }
 
-  die 'Unable to determine how to install ' . $target->{meta}->name;
+  croak 'Unable to determine how to install ' . $target->{meta}->name;
 }
 
 sub _test
@@ -458,7 +459,7 @@ sub _test
     return $target;
   }
 
-  die 'Unable to determine how to install ' . $target->{meta}->name;
+  croak 'Unable to determine how to install ' . $target->{meta}->name;
 }
 
 sub _install
@@ -484,7 +485,7 @@ sub _install
     return $target;
   }
 
-  die 'Unable to determine how to install ' . $target->{meta}->name;
+  croak 'Unable to determine how to install ' . $target->{meta}->name;
 }
 
 sub _write_meta
@@ -702,7 +703,7 @@ sub _search_metacpan
   my $json_info = '';
   my $where = $ff->fetch( to => \$json_info );
 
-  die "Could not find module $src on metacpan"
+  croak "Could not find module $src on metacpan"
     if !defined $where;
 
   my $result = JSON::PP::decode_json($json_info);
@@ -727,6 +728,13 @@ sub _get_targz
   # git
   if ( $src =~ git_re )
   {
+    my $min_git_ver = min_git_ver;
+    croak "System has git version < $min_git_ver, cannot retrieve git URL"
+      unless has_updated_git;
+
+    croak "System does not have git, cannot retrieve git URL"
+      unless has_git;
+
     my ( $git_url, $commit ) = $src =~ git_extract_re;
 
     my $dir
@@ -797,13 +805,13 @@ sub _get_targz
     $ff->scheme('http')
       if $ff->scheme eq 'https';
     my $where = $ff->fetch( to => $dest_dir );
-    die $ff->error || "Could not download $url"
+    croak $ff->error || "Could not download $url"
       if !defined $where;
 
     return $where;
   }
 
-  die "Cannot find $src\n";
+  croak "Cannot find $src\n";
 }
 
 sub _get_mod_ver
@@ -969,7 +977,7 @@ sub _source_translate
       return $src_name;
     }
 
-    die "Unable to locate $src_name from the sources list\n";
+    croak "Unable to locate $src_name from the sources list\n";
   }
 
   return defined $new_src ? $new_src : $src_name;

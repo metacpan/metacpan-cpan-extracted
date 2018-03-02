@@ -24,7 +24,7 @@ use File::HomeDir;
 use File::Spec::Functions;
 
 # Main version number that the rest of the modules pick up off of.
-our $VERSION = qv("5.1.0");
+our $VERSION = qv("5.2.0");
 
 use constant DEFAULT_PROPERTIES_FILE =>
   catfile(File::HomeDir->my_home, "adwords.properties");
@@ -36,7 +36,7 @@ use constant PROXY_FORMAT_STRING => "%s/api/adwords/%s/%s/%s";
 
 # Default current version used if the client is created without the version
 # parameter.
-use constant DEFAULT_VERSION => "v201708";
+use constant DEFAULT_VERSION => "v201802";
 
 # Default alternate URL that points to production servers.
 use constant DEFAULT_ALTERNATE_URL => "https://adwords.google.com";
@@ -90,6 +90,7 @@ our %SERVICE_TO_GROUP = (
   DraftService                    => "cm",
   ExperimentService               => "cm",
   FeedItemService                 => "cm",
+  FeedItemTargetService           => "cm",
   FeedMappingService              => "cm",
   FeedService                     => "cm",
   GeoLocationService              => "cm",

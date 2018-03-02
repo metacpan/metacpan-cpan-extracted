@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 2009-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -27,9 +27,77 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-=head1 VERSION 6.61 (planned 2017-12-01)
+=head1 VERSION 6.73 (planned 2018-12-01)
 
-=head1 VERSION 6.60 (planned 2017-09-01)
+=head1 VERSION 6.72 (planned 2018-09-01)
+
+=head1 VERSION 6.71 (planned 2018-06-01)
+
+=head1 VERSION 6.70 (2018-03-01)
+
+=over 4
+
+=item B<(*) (!) Changes to deltas>
+
+Improved handling of deltas to better support the different types of
+deltas.  Formalized how the semi-exact portions of the delta are used
+to produce the results that most people would expect.
+
+The type can now be specified to guarantee several behaviors.
+Changed the arguments (in a backward compatible way) to several
+methods.  Explicitly added a new type (estimated) which was there
+previously, but could not be manually specified.
+
+The convert function continues to support converting from a less exact
+type to a more exact type, but this is deprecated and will be removed in
+version 7.00.
+
+This was prompted by a bug reported by Ian Gibbs.
+
+=item B<(*) (!) Deprecated some parts of Date::Manip::Delta>
+
+The options passed to the B<set> and B<parse> methods have changed.  The
+old style will be removed in version 7.00.
+
+Deltas will also no longer support the 'exact' and 'approximate' strings
+(which have not been supported for some time).  These will be removed
+in 7.00 as well.
+
+=item Deprecation of TZ postponed
+
+The deprecation of the TZ variable has been postponed to version 7.00.
+
+=item Some speed improvements
+
+I converted some of the functions to use faster algorithms.  Previously, the
+steps were worked out using logical time/calendar based calculations.  These
+were replaced with non-intuitive numerical calculations that gave the same
+result faster.
+
+=item Changed behavior if timezone not determined
+
+If the system timezone cannot be determined using any of the methods
+supplied by Date::Manip, operations will be done in the GMT timezone.
+Previously, Date::Manip would simply fail to load.  Based on RT 123229.
+
+=item Fixed Makefile.PL
+
+The list of what what is provided did not include the path to the file
+providing each module.  I've fixed the Makefile.PL as well as the META
+files.  Graham Knop (GitHub #13)
+
+=item Time zone fixes
+
+Newest zoneinfo data (tzdata 2018c)
+
+=item Documentation fixes
+
+Rewrote Date::Manip::Delta page to reflect changes, and clean up the
+documentation in general.
+
+=back
+
+=head1 VERSION 6.60 (2017-09-01)
 
 =over 4
 

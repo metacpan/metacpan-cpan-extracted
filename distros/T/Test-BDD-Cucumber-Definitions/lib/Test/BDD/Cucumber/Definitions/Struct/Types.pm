@@ -16,7 +16,7 @@ use MooseX::Types (
     ]
 );
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 subtype(
     StructJsonpath,

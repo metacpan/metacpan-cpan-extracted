@@ -38,8 +38,14 @@ use Cwd;
 my $R = getcwd;
 
 my $ua = LWP::UserAgent->new();
-my $webhook_url = sprintf( 'http://%s:%d/webhook/?channel=test&network=local&squash_threshold=1&use_color=0',
-    $test_bot->addr, $test_bot->port );
+my $webhook_url = sprintf(
+    'http://%s:%d/webhook/?%s',
+    $test_bot->addr,
+    $test_bot->port,
+    join( '&',
+        'channel=test',       'network=local',
+        'squash_threshold=1', 'use_color=0' ),
+);
 
 sub webhook_post {
     my $response = $ua->post(
@@ -88,9 +94,72 @@ TestBot->expect(
     join( ' ',
         '#test Test User',
         'master checkou test-repo',
-        '* pushed 2 commits',
+        '* pushed 2 commits (first 1 follow)',
         '* http://git/test/compare/before...after' )
 );
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'master b9b5587 test-repo',
+        'mod-one file-one rm-one',
+        '* Commit three files (add, mod, rm)',
+        '* http://git/b9b55876e288bba29d1579d308eea5758bc148ef' )
+);
+
+$resp = webhook_post(
+    {   object_kind   => 'push',
+        before        => 'before',
+        after         => 'after6',
+        ref           => 'refs/heads/master',
+        checkout_sha  => 'checkout',
+        user_name     => 'Test User',
+        user_username => 'ser',
+        project       => {
+            name => 'test-repo',
+            homepage => 'http://git/test',
+        },
+        commits       => [
+            {   id      => 'b9b55876e288bba29d1579d308eea5758bc148ef',
+                message => "Commit three files (add, mod, rm)",
+                url => "http://git/b9b55876e288bba29d1579d308eea5758bc148ef",
+                author => { name => 'Test User', },
+                added    => [ 'file-one' ],
+                modified => [ 'mod-one' ],
+                removed  => [ 'rm-one' ],
+            },
+            {   id      => '284ffdd4c525547f6ae848d768fff92ff9a89743',
+                message => "Commit six files (2×(add, mod, rm))\n\nThese were all needed",
+                url => "http://git/284ffdd4c525547f6ae848d768fff92ff9a89743",
+                author => { name => 'Test User', },
+                added    => [ 'file-one', 'file-two.txt' ],
+                modified => [ 'mod-one',  'mod-two.txt' ],
+                removed  => [ 'rm-one',   'rm-two.txt' ],
+            },
+        ],
+        total_commits_count => 6,
+    }
+);
+
+is( $resp->code, 202, 'response status is 202' ) or diag $resp->as_string;
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'master checkou test-repo',
+        '* pushed 6 commits (first 1 follow)',
+        '* http://git/test/compare/before...after6' )
+);
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'master b9b5587 test-repo',
+        'mod-one file-one rm-one',
+        '* Commit three files (add, mod, rm)',
+        '* http://git/b9b55876e288bba29d1579d308eea5758bc148ef' )
+);
+
 
 diag `cat t/bot/kgb-bot.log`;
 

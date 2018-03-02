@@ -5,7 +5,7 @@ use warnings;
 
 use MooseX::Types::Common::String qw(NonEmptyStr);
 use MooseX::Types::Moose qw(Str Int RegexpRef);
-use Try::Tiny;
+use Test::BDD::Cucumber::Definitions qw(S);
 
 use MooseX::Types (
     -declare => [
@@ -14,13 +14,11 @@ use MooseX::Types (
             HttpMethod
             HttpUrl
             HttpCode
-            HttpString
-            HttpRegexp
             )
     ]
 );
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 subtype(
     HttpHeader,
@@ -63,37 +61,6 @@ subtype(
     as Int,
     message {
         qq{"$_" is not a valid HTTP code}
-    }
-);
-
-subtype(
-    HttpString,
-    as Str,
-    message {
-        qq{"$_" is not a valid HTTP string}
-    }
-);
-
-subtype(
-    HttpRegexp,
-    as RegexpRef,
-    message {
-        qq{"$_" is not a valid HTTP regexp}
-    }
-);
-
-coerce(
-    HttpRegexp,
-    from Str,
-    via {
-        my $value = $_;
-
-        try {
-            qr/$value/;    ## no critic [RegularExpressions::RequireExtendedFormatting]
-        }
-        catch {
-            return $value;
-        };
     }
 );
 

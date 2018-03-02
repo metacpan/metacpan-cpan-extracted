@@ -25,5 +25,5 @@ requires:
   IO::File: '1'
   Time::ParseDate: '1'
   UNIVERSAL: '1'
-version: '0.56'
+version: '0.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

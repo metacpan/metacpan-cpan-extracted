@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "workflow",
       "module",
@@ -14,7 +14,7 @@
       "testing"
    ],
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -41,14 +41,18 @@
          "requires" : {
             "CACertOrg::CA" : "0",
             "ConfigReader::Simple" : "0",
+            "DateTime" : "0",
             "IO::Null" : "0",
             "Mojolicious" : "4.50",
+            "Term::ReadKey" : "0",
             "URI" : "0",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Temp" : "0",
             "Test::More" : "1",
             "Test::Output" : "0",
             "Test::Without::Module" : "0"
@@ -62,5 +66,6 @@
          "web" : "https://github.com/briandfoy/module-release"
       }
    },
-   "version" : "2.123"
+   "version" : "2.125",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

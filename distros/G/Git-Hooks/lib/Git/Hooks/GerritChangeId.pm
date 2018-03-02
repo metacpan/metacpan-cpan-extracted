@@ -2,7 +2,7 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '2.5.0';
+$Git::Hooks::GerritChangeId::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -84,8 +84,11 @@ sub rewrite_message {
     return 1;
 }
 
-# Install hooks
-COMMIT_MSG \&rewrite_message;
+INIT: {
+    # Install hooks
+    APPLYPATCH_MSG \&rewrite_message;
+    COMMIT_MSG     \&rewrite_message;
+}
 
 1;
 
@@ -101,7 +104,7 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -118,11 +121,11 @@ may impose.
 
 =head1 DESCRIPTION
 
-This L<Git::Hooks> plugin hooks itself to the C<commit-msg> hook. It is a
-reimplementation of Gerrit's official commit-msg hook for inserting
-change-ids in git commit messages.  It's does not produce the same
-C<Change-Id> for the same message, but this is not really necessary, since
-it keeps existing Change-Id footers unmodified.
+This L<Git::Hooks> plugin hooks itself to the C<commit-msg> and the
+C<applypatch-msg> hooks. It is a reimplementation of Gerrit's official
+commit-msg hook for inserting change-ids in git commit messages.  It's does not
+produce the same C<Change-Id> for the same message, but this is not really
+necessary, since it keeps existing Change-Id footers unmodified.
 
 (What follows is a partial copy of that document's DESCRIPTION
 section.)

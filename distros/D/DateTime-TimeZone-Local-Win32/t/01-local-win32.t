@@ -3,7 +3,6 @@ use warnings;
 
 use constant {
     DT_TZ_MIN => 2.10,
-    SECONDS_PER_MINUTE => 60,
     SECONDS_PER_HOUR => 60 * 60,
     MINUTES_PER_HOUR => 60,
 };
@@ -86,6 +85,133 @@ my $WindowsTZKey;
 
 done_testing();
 
+sub get_dt_by_week_and_day {
+    my $year = shift;
+    my $month = shift;
+    my $day_of_week = shift || 7; # Windows representation of Sunday is 0 while DateTime is 7
+    my $week = shift;
+    my $hour = shift;
+    my $minute = shift;
+    my $second = shift;
+    my $millisecond = shift;
+    my $time_zone = shift;
+
+    my $dt = DateTime->last_day_of_month(
+        time_zone => $time_zone,
+        year => $year,
+        month => $month,
+        hour => 12 # setting to noon local time to avoid any time invalid times (will be updated later in this subroutine)
+    );
+
+    my $day = $dt->day();
+    if ( ( my $date_difference = abs( 7 - abs( $dt->day_of_week() - $day_of_week ) ) ) < 7 ) {
+        $day -= $date_difference;
+    }
+
+    if ( $week != 5 ) {
+        use integer;
+        $day = $day - (( $day / 7 ) - ( 0 + ( $day % 7 == 0 ))) * 7 + ( $week - 1 ) * 7;
+    }
+
+    eval {
+        $dt->set(
+            day => $day,
+            hour => $hour,
+            minute => $minute,
+            second => $second,
+            nanosecond => $millisecond * 1000
+        );
+    };
+    if ($@ =~ /^Invalid local time/) {
+        $hour++;
+
+        $dt->set(
+            day => $day,
+            hour => $hour,
+            minute => $minute,
+            second => $second,
+            nanosecond => $millisecond * 1000
+        );
+    }
+
+    return $dt;
+}
+
+sub get_windows_timezone_offsets {
+    my $dt = shift;
+    my $feb_dt = shift;
+    my $aug_dt = shift;
+    my $windows_tz_info = shift;
+    
+    # Daylight Savings Time not configured for this time zone
+    if ( $windows_tz_info->{'standardMonth'} == 0 ) {
+        return (
+            $windows_tz_info->{'bias'} * -1,
+            $windows_tz_info->{'bias'} * -1,
+            $windows_tz_info->{'bias'} * -1
+        );
+    }
+    
+    my @offsets;
+
+    foreach my $date ( $dt, $feb_dt, $aug_dt ) {
+    
+        # standard time
+        my $standard_date = get_dt_by_week_and_day(
+            $date->year(),
+            $windows_tz_info->{'standardMonth'},
+            $windows_tz_info->{'standardDayOfWeek'},
+            $windows_tz_info->{'standardWeekOfMonth'},
+            $windows_tz_info->{'standardHour'},
+            $windows_tz_info->{'standardMinute'},
+            $windows_tz_info->{'standardSecond'},
+            $windows_tz_info->{'standardMilliseconds'},
+            $date->time_zone_long_name(),
+        );
+
+        # daylight time
+        my $daylight_date = get_dt_by_week_and_day(
+            $date->year(),
+            $windows_tz_info->{'daylightMonth'},
+            $windows_tz_info->{'daylightDayOfWeek'},
+            $windows_tz_info->{'daylightWeekOfMonth'},
+            $windows_tz_info->{'daylightHour'},
+            $windows_tz_info->{'daylightMinute'},
+            $windows_tz_info->{'daylightSecond'},
+            $windows_tz_info->{'daylightMilliseconds'},
+            $date->time_zone_long_name(),
+        );
+
+        my $bias = $windows_tz_info->{'bias'};
+        if ( DateTime->compare( $standard_date, $daylight_date ) < 0 ) {
+            if (
+                    ( DateTime->compare( $standard_date, $date ) <= 0 )
+                    && ( DateTime->compare( $date, $daylight_date ) < 0 )
+                ) {
+                $bias += $windows_tz_info->{'standardBias'};
+            }
+            else {
+                $bias += $windows_tz_info->{'daylightBias'};
+            }
+        }
+        else {
+            if (
+                    ( DateTime->compare( $daylight_date, $date ) <= 0 )
+                    && ( DateTime->compare( $date, $standard_date ) < 0 )
+                ) {
+                $bias += $windows_tz_info->{'daylightBias'};
+            }
+            else {
+                $bias += $windows_tz_info->{'standardBias'};
+            }
+        }
+        $bias *= -1;
+        push @offsets, $bias;
+    }
+
+    return @offsets;
+}
+
 sub windows_tz_names {
     $WindowsTZKey = $Registry->Open(
         'LMachine/SOFTWARE/Microsoft/Windows NT/CurrentVersion/Time Zones/',
@@ -137,10 +263,7 @@ sub test_windows_zone {
     my $windows_tz_name = shift;
     my $iana_name      = shift;
     my $registry_writable = shift;
-    my %KnownBad = map { $_ => 1 } ( 
-            'Namibia Standard Time', 
-            'Turks And Caicos Standard Time'
-        );
+    my %KnownBad = map { $_ => 1 } ( );
 
 
     my $tz;
@@ -196,33 +319,58 @@ sub test_windows_zone {
             # and attempting to avoid Ramadan as Morocco suspends daylight savings during Ramadan
             my $feb_dt = DateTime->new(
                 time_zone => $tz->name(),
-                year => $dt->month() < 2? $dt->year() : $dt->year() + 1,
+                year => $dt->year(),
                 month => 2,
                 day => 1,
             );
             my $aug_dt = DateTime->new(
                 time_zone => $tz->name(),
-                year => $dt->month() < 8? $dt->year() : $dt->year() + 1,
+                year => $dt->year(),
                 month => 8,
                 day => 1,
             );
 
             # Windows time zone offsets are defined in a structure defined here and offsets are in minutes):
             #     https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
-            my ($bias, $standardBias, $daylightBias) = unpack("lll", $WindowsTZKey->{"${windows_tz_name}/TZI"});
-            my $windows_offset = ($bias + $standardBias) * -1;
+            my $windows_tz_info = {};
+            @{$windows_tz_info}{
+                    'bias',
+                    'standardBias',
+                    'daylightBias',
+                    'standardYear',
+                    'standardMonth',
+                    'standardDayOfWeek',
+                    'standardWeekOfMonth',
+                    'standardHour',
+                    'standardMinute',
+                    'standardSecond',
+                    'standardMilliseconds',
+                    'daylightYear',
+                    'daylightMonth',
+                    'daylightDayOfWeek',
+                    'daylightWeekOfMonth',
+                    'daylightHour',
+                    'daylightMinute',
+                    'daylightSecond',
+                    'daylightMilliseconds'
+                } = unpack("lllvvvvvvvvvvvvvvvv", $WindowsTZKey->{"${windows_tz_name}/TZI"});
+
+            my ($windows_offset, $windows_feb_offset, $windows_aug_offset) =
+                get_windows_timezone_offsets( $dt, $feb_dt, $aug_dt, $windows_tz_info );
 
             # offsets in DateTime::TimeZone are in seconds
-            my $dt_offset = $dt->is_dst()? $dt->offset() + ($daylightBias * SECONDS_PER_MINUTE) : $dt->offset();
-            my $feb_dt_offset = $feb_dt->is_dst()? $feb_dt->offset() + ($daylightBias * SECONDS_PER_MINUTE) : $feb_dt->offset();
-            my $aug_dt_offset = $aug_dt->is_dst()? $aug_dt->offset()  + ($daylightBias * SECONDS_PER_MINUTE) : $aug_dt->offset();
+            my $dt_offset = $dt->offset();
+            my $feb_dt_offset = $feb_dt->offset();
+            my $aug_dt_offset = $aug_dt->offset();
 
             # convert offsets from seconds or minutes before or after UTC to hours
             $dt_offset /= SECONDS_PER_HOUR;
             $feb_dt_offset /= SECONDS_PER_HOUR;
             $aug_dt_offset /= SECONDS_PER_HOUR;
             $windows_offset /= MINUTES_PER_HOUR;
-
+            $windows_feb_offset /= MINUTES_PER_HOUR;
+            $windows_aug_offset /= MINUTES_PER_HOUR;
+            
             if ( $KnownBad{$windows_tz_name} ) {
             TODO: {
                     local $TODO
@@ -234,12 +382,12 @@ sub test_windows_zone {
                     );
 
                     is(
-                        $windows_offset, $feb_dt_offset,
+                        $windows_feb_offset, $feb_dt_offset,
                         "$windows_tz_name - Windows offset matches IANA offset for time set February 1"
                     );
 
                     is(
-                        $windows_offset, $aug_dt_offset,
+                        $windows_aug_offset, $aug_dt_offset,
                         "$windows_tz_name - Windows offset matches IANA offset for time set August 1"
                     );
                     return;
@@ -260,12 +408,12 @@ sub test_windows_zone {
                 );
 
                 is(
-                    $windows_offset, $feb_dt_offset,
+                    $windows_feb_offset, $feb_dt_offset,
                     "$windows_tz_name - Windows offset matches IANA offset for time set February 1"
                 );
 
                 is(
-                    $windows_offset, $aug_dt_offset,
+                    $windows_aug_offset, $aug_dt_offset,
                     "$windows_tz_name - Windows offset matches IANA offset for time set August 1"
                 );
             }

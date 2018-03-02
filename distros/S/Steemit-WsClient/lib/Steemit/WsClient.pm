@@ -2,22 +2,19 @@ package Steemit::WsClient;
 
 =head1 NAME
 
-Steemit::WsClient - perl lirary for interacting with the steemit websocket services!
+Steemit::WsClient - perl library for interacting with the steemit websocket services!
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
     use Steemit::WsClient;
 
@@ -55,14 +52,9 @@ Perhaps a little code snippet.
 
 you will need some packages.
 openssl support for https
+libgmp-dev for large integer aritmetic needd for the eliptical curve calculations
 
-   libssl-dev libssl1.0-dev zlib1g-dev
-
-for signing transactions you will need the GMP modules installed.
-It will most likely work without but be a great deal slower.
-
-   libgmp-dev
-
+   libssl-dev zlib1g-dev libgmp-dev
 
 
 =head1 SUBROUTINES/METHODS
@@ -75,8 +67,8 @@ use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json encode_json);
 use Data::Dumper;
 
-has url                => 'https://steemd.steemitstage.com';
-has ua                 =>  sub { Mojo::UserAgent->new };
+has url                => 'https://api.steemit.com/';
+has ua                 => sub { Mojo::UserAgent->new };
 has posting_key        => undef;
 has plain_posting_key  => \&_transform_private_key;
 
@@ -155,11 +147,61 @@ L<https://github.com/steemit/steem/blob/master/libraries/app/database_api.cpp>
       get_state
       get_withdraw_routes
 
+
+=head2 get_discussions_by_xxxxxx
+
+all those methods will sort the results differently and accept one query parameter with the values:
+
+   {
+      tag   => 'tagtosearch',   # optional
+      limit => 1,               # max 100
+      filter_tags => [],        # tags to filter out
+      select_authors => [],     # only those authors
+      truncate_body  => 0       # the number of bytes of the post body to return, 0 for all
+      start_author   => ''      # used together with the start_permlink gor pagination
+      start_permlink => ''      #
+      parent_author  => ''      #
+      parent_permlink => ''     #
+   }
+
+so one example on how to get 200 discussions would be
+
+
+   my $discussions = $steem->get_discussions_by_created({
+         limit => 100,
+         truncate_body => 1,
+   });
+
+   my $discussion = $discussions[-1];
+
+   push @$discussions, $steem->get_discussions_by_created({
+         limit => 100,
+         truncate_body => 1,
+         start_author   => $discussion->{author},
+         start_permlink => $discussion->{permlink},
+   });
+
+
+=head2 vote
+
+this requires you to initialize the module with your private posting key like this:
+
+
+   my $steem = Steemit::WsClient->new(
+      posting_key => 'copy this one from the steemit site',
+
+   );
+
+   $steem->vote($discossion,$weight)
+
+weight is optional default is 10000 wich equals to 100%
+
+
 =cut
 
 sub _request {
    my( $self, $api, $method, @params ) = @_;
-   my $response = $self->ua->get( $self->url, json => {
+   my $response = $self->ua->post( $self->url, json => {
       jsonrpc => '2.0',
       method  => 'call',
       params  => [$api,$method,[@params]],
@@ -184,7 +226,7 @@ _install_methods();
 sub _install_methods {
    my %definition = _get_api_definition();
    for my $api ( keys %definition ){
-      for my $method ( $definition{$api}->@* ){
+      for my $method ( @{ $definition{$api} } ){
          no strict 'subs';
          no strict 'refs';
          my $package_sub = join '::', __PACKAGE__, $method;
@@ -422,7 +464,7 @@ L<https://github.com/snkoehn/perlSteemit>
 
 =head1 AUTHOR
 
-snkoehn, C<< <koehn.sebastian at gmail.com> >>
+snkoehn, C<< <snkoehn at cpan.org> >>
 
 =head1 BUGS
 

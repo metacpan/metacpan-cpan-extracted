@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Option;
 use Prty::Path;
@@ -350,7 +350,7 @@ sub type {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

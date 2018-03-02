@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+use 5.10.1;
+use strict;
+use warnings;
+
+use FindBin qw( $Bin );
+use lib $Bin. '/../lib';
+
+my $VERSION = '0.1';
+
+use Getopt::Long qw(:config no_ignore_case bundling no_auto_abbrev);
+use Pod::Usage;
+use Data::Dump qw(pp);
+
+use Opsview::RestAPI;
+
+my %options = (
+    'help|h|?'     => 0,
+    'man'          => 0,
+    'debug:+'      => 0,
+    'url|U=s'      => 0,
+    'username|u=s' => 0,
+    'password|p=s' => 0,
+    'noreload|R'   => 0,
+    'large|l'      => 0,
+);
+
+GetOptions( \%options, keys(%options) ) || pod2usage( -verbose => 1 );
+pod2usage( -verbose => 1 ) if ( $options{'?'}  || $options{help} );
+pod2usage( -verbose => 2 ) if ( $options{HELP} || $options{man} );
+die 'opsview_diag version: ', $VERSION, $/ if ( $options{version} );
+
+my $rest = Opsview::RestAPI->new(%options);
+
+say "Opsview API Version: ", pp( $rest->api_version );
+
+$rest->login;
+
+say "Connected to '", $rest->url, "' as user '", $rest->username, "'.";
+my $opsview_info = $rest->opsview_info;
+say "Opsview Version ", $opsview_info->{opsview_version};
+
+say "Ensuring Servicegroup 'AAA' exists";
+$rest->put(
+    api  => 'config/servicegroup',
+    data => { name => 'AAA' },
+);
+say '';
+
+say "Searching for host 'MyHost0'";
+my $hosts = $rest->get(
+    api    => 'config/host',
+    params => { 'json_filter' => '{"name":"MyHost0"}', }
+);
+if($hosts->{summary}->{rows} != 1) {
+    say "Too many matching hosts found";
+}
+my $myhost = $hosts->{list}->[0];
+say "Opsview Host ID: ", $myhost->{id};
+say "Hostgroup: ", $myhost->{hostgroup}->{name};
+say "IP Address: ", $myhost->{ip};
+
+say '';
+say "Amending IP address to '127.10.10.10'";
+
+$myhost->{ip} = '127.10.10.10';
+my $result = $rest->put(
+    api  => 'config/host/2',
+    data => { %$myhost, },
+);
+
+pp($result);
+
+say "Searching for host 'DoesNotExist'";
+$hosts = $rest->get(
+    api    => 'config/host',
+    params => { 'json_filter' => '{"name":"DoesNotExist"}', }
+);
+
+if(! $hosts->{summary}->{rows}) {
+    say "No host found matching name 'DoesNotExist'";
+}
+
+pp($hosts);
+
+$rest->logout;

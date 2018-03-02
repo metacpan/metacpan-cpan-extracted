@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Shell;
 use Prty::FileHandle;
@@ -39,7 +39,8 @@ L<Prty::Object>
 
 Liefere die Anzahl der CPUs des Systems. Diese Methode ist nicht
 portabel, sie basiert auf /proc/cpuinfo des Linux-Kernels bzw.
-dem dem Kommando 'sysctl -n hw.ncpu' von FreeBSD.
+dem dem Kommando 'sysctl -n hw.ncpu' von FreeBSD. Im Falle eines
+unbekannten Systems liefert die Methode 1.
 
 =cut
 
@@ -55,7 +56,7 @@ sub numberOfCpus {
             $n = Prty::Shell->exec('sysctl -n hw.ncpu',-capture=>'stdout');
             chomp $n;
         }
-        else {
+        elsif ($^O eq 'linux') {
             my $fh = Prty::FileHandle->new('<','/proc/cpuinfo');
             while (<$fh>) {
                 if (/^processor/) {
@@ -63,6 +64,10 @@ sub numberOfCpus {
                 }
             }
             $fh->close;
+        }
+        else {
+            # Default
+            $n = 1;
         }
     }
 
@@ -298,7 +303,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

@@ -8,6 +8,8 @@ use Encode qw(decode_utf8 encode_utf8);
 use MIME::Base64 qw(decode_base64);
 use List::Pairwise qw(mapp);
 use List::MoreUtils qw(all pairwise);
+use Date::Format qw(strftime);
+use File::MMagic;
 use Data::Dumper;
 
 =head1 NAME
@@ -23,6 +25,8 @@ Net::CardDAVTalk::VCard - A wrapper for VCard files
 Create a basic VCard object with no fields set
 
 =cut
+
+my $FileMagic = File::MMagic->new;
 
 sub new {
   my $Proto = shift;
@@ -123,6 +127,10 @@ Get or set the uid field of the card.
 sub uid {
   my $Self = shift;
   $Self->V('uid', 'value', @_);
+}
+sub rev {
+  my $Self = shift;
+  $Self->V('rev', 'value', @_);
 }
 
 # }}}
@@ -327,7 +335,7 @@ sub Normalise {
   my $Online = $Props->{online} = [];
 
   # URL:foo.com
-  for (@{$Props->{url}}) {
+  for (@{$Props->{url} // []}) {
     $_->{online_type}  = 'web';
     $_->{online_value} = $_->{value};
 
@@ -335,7 +343,7 @@ sub Normalise {
   }
 
   # IMPP;X-SERVICE-TYPE=Skype;type=pref:skype:someskype
-  for (@{$Props->{impp}}) {
+  for (@{$Props->{impp} // []}) {
     my $Type  = lc(($_->{params}->{'x-service-type'} // [])->[0] // '');
     my $Value = $_->{value};
     my $ProtoPrefixes = $IMPPProtoPrefixes{$Type} // ['x-apple'];
@@ -347,7 +355,7 @@ sub Normalise {
   }
 
   # X-SOCIALPROFILE;type=twitter;x-user=sometwitter:http://twitter.com/sometwitter
-  for (@{$Props->{'x-socialprofile'}}) {
+  for (@{$Props->{'x-socialprofile'} // []}) {
     my $Type  = lc(($_->{params}->{type} // [])->[0] // '');
     my $Value = $_->{params}->{'x-user'}->[0] // $_->{value};
     $_->{online_type}  = $XSocialProfileTypeMap{$Type} // 'other';
@@ -358,7 +366,7 @@ sub Normalise {
 
   # X-YAHOO:someyahoo
   for my $Type (keys %XServiceTypeMap) {
-    for (@{$Props->{"x-$Type"}}) {
+    for (@{$Props->{"x-$Type"} // []}) {
       $_->{online_type}  = $XServiceTypeMap{$Type};
       $_->{online_value} = $_->{value};
 
@@ -382,13 +390,25 @@ sub Normalise {
       $_->{contact_type} = $ContactType // 'other';
     }
   }
+
+  # Check N, FN and VERSION fields are present
+  if (!$Props->{version}) {
+    $Self->V('version', 'value', '3.0');
+  }
+  if (!$Props->{n}) {
+    $Self->V('n', 'surnames', '');
+  }
+  if (!$Props->{fn}) {
+    $Self->VRebuildFN();
+  }
+
 }
 
 sub DeleteUnusedLabels {
   my ($Self) = @_;
   my $Props = $Self->{properties};
 
-  for (@{$Props->{'x-ablabel'}}) {
+  for (@{$Props->{'x-ablabel'} // []}) {
     my $Group = $Self->{groups}->{$_->{group}};
     my $NumItems = grep { !$_->{deleted} } @$Group;
     $_->{deleted} = 1 if $NumItems <= 1;
@@ -450,7 +470,7 @@ sub V {
       $V->{$Item} = $_ // '';
 
       # Uggg, for compound value, delete if all values empty
-      if ($V->{values} && all { $$_ eq '' } @{$V->{values}} ) {
+      if ($Prop ne 'n' && $V->{values} && all { $$_ eq '' } @{$V->{values}} ) {
         my $E = shift @{$Props->{$Prop}};
         $E->{deleted} = 1;
       }
@@ -932,6 +952,45 @@ sub MChanged {
 sub MClearChanged {
   my $Self = shift;
   delete $Self->{metachanged};
+}
+
+sub VPhoto {
+  my $Self = shift;
+  !@_ || die "You can't set a photo on a contact (yet)";
+  my $Prop = $Self->{properties}->{photo}->[0] // undef;
+  return unless $Prop;
+
+  # XXX assuming binary (inline)
+  # v2.1: implied
+  # v3:   param VALUE=BINARY
+  # v4:   data: URI
+
+  # XXX assuming v2.1/v3 TYPE= param
+  my $Type = exists $Prop->{params}->{type}->[0] ? "image/$Prop->{params}->{type}->[0]" : $FileMagic->checktype_contents($Prop->{value});
+
+  # XXX using REV for modified, probably safe
+  my $Modified = $Self->{properties}->{rev}->[0]->{value} // strftime("%Y%m%dT%H%M%SZ", @{[gmtime]});
+
+  # X-ABCROP-RECTANGLE=ABClipRect_1&0&248&640&640&RulkMf15QMtW5L8kpxRZBw==
+  my $Crop;
+  if (exists $Prop->{params}->{'x-abcrop-rectangle'}) {
+    my ($Label, $X, $Y, $W, $H, $Checksum) = split '&', $Prop->{params}->{'x-abcrop-rectangle'}->[0];
+    $Crop = {
+      X => $X,
+      Y => $Y,
+      W => $W,
+      H => $H,
+    };
+  }
+
+  # bundle it all up
+  return {
+    Data     => $Prop->{value},
+    Type     => $Type,
+    Size     => length $Prop->{value},
+    Modified => $Modified,
+    ($Crop ? (Crop => $Crop) : ()),
+  }
 }
 
 # }}}

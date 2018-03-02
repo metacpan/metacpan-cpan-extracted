@@ -1,6 +1,6 @@
 package App::MechaCPAN::Perl;
 
-use strict;
+use v5.14;
 use autodie;
 use Config;
 use File::Fetch qw//;
@@ -11,8 +11,12 @@ our @args = (
   'skip-tests!',
   'skip-local!',
   'skip-lib!',
+  'smart-tests!',
   'devel!',
 );
+
+my $perl5_ver_re = qr/v? 5 [.] (\d{1,2}) (?: [.] (\d{1,2}) )?/xms;
+my $perl5_re     = qr/^ $perl5_ver_re $/xms;
 
 sub go
 {
@@ -31,8 +35,32 @@ sub go
   my @orig_dir = File::Spec->splitdir("$orig_dir");
   my $orig_len = $#orig_dir;
   my $dest_dir = "$orig_dir/perl";
+  my $pv_ver;    # Version in .perl-version file
 
-  my ( $src_tz, $version ) = _get_targz($src);
+  # Attempt to find the perl version if none was given
+  if ( -f '.perl-version' )
+  {
+    open my $pvFH, '<', '.perl-version';
+    $pv_ver = do { local $/; <$pvFH> };
+    $pv_ver =~ s/\s+//xmsg;
+    if ( $pv_ver !~ $perl5_re )
+    {
+      info "$pv_ver in .perl-version doesn't look like a perl5 version";
+      undef $pv_ver;
+    }
+  }
+
+  my ( $src_tz, $version ) = _get_targz( $src // $pv_ver );
+
+  # If _get_targz couldn't find a version, guess based on the file
+  if ( !$version && $src_tz =~ $perl5_ver_re )
+  {
+    my $major = $1;
+    my $minor = $2;
+
+    $version = "5.$major.$minor";
+    info("Looks like $src_tz is perl $version, assuming that's true");
+  }
 
   if ( -e -x "$dest_dir/bin/perl" )
   {
@@ -54,8 +82,8 @@ sub go
     return 0;
   }
 
-  $version = "perl $version";
-  info $version, "Fetching $version";
+  my $verstr = "perl $version";
+  info $verstr, "Fetching $verstr";
 
   my $src_dir = inflate_archive($src_tz);
 
@@ -71,15 +99,14 @@ sub go
     chdir $files[0];
   }
 
-  my $local_dir = [ @orig_dir, qw/lib perl5/ ];
-  my $lib_dir = [ @orig_dir[ 0 .. $orig_len - 1 ], qw/lib perl5/ ];
+  my $local_dir = File::Spec->catdir( @orig_dir, qw/lib perl5/ );
+  my $lib_dir
+    = File::Spec->catdir( @orig_dir[ 0 .. $orig_len - 1 ], qw/lib/ );
 
   my @otherlib = (
-    !$opts->{skip_local} ? () : $local_dir,
-    !$opts->{skip_lib} && -d $lib_dir ? $lib_dir : (),
+    !$opts->{'skip-local'} ? $local_dir : (),
+    !$opts->{'skip-lib'} && -d $lib_dir ? $lib_dir : (),
   );
-
-  @otherlib = map { File::Spec->catdir(@$_) } @otherlib;
 
   my @config = (
     q[-des],
@@ -87,7 +114,6 @@ sub go
     q[-Accflags=-DAPPLLIB_EXP=\"] . join( ":", @otherlib ) . q[\"],
     qq[-A'eval:scriptdir=$dest_dir/bin'],
   );
-  my @make = ( $Config{make} );
 
   if ( $opts->{threads} )
   {
@@ -106,26 +132,34 @@ sub go
 
   eval {
     require Devel::PatchPerl;
-    info $version, "Patching $version";
+    info $verstr, "Patching $verstr";
     Devel::PatchPerl->patch_source();
   };
 
-  info $version, "Configuring $version";
-  run qw[sh Configure], @config;
+  info $verstr, "Configuring $verstr";
+  _run_configure(@config);
 
-  info $version, "Building $version";
-  run @make;
+  info $verstr, "Building $verstr";
+  _run_make();
 
-  if ( !$opts->{'skip-tests'} )
+  my $skip_tests = $opts->{'skip-tests'};
+
+  error $verstr;
+  if ( !$skip_tests && $opts->{'smart-tests'} )
   {
-    info $version, "Testing $version";
-    run @make, 'test_harness';
+    $skip_tests = $pv_ver eq $version;
   }
 
-  info $version, "Installing $version";
-  run @make, 'install';
+  if ( !$skip_tests )
+  {
+    info $verstr, "Testing $verstr";
+    _run_make('test_harness');
+  }
 
-  success "Installed $version";
+  info $verstr, "Installing $verstr";
+  _run_make('install');
+
+  success "Installed $verstr";
 
   chdir $orig_dir;
 
@@ -134,7 +168,19 @@ sub go
   return 0;
 }
 
-my $perl5_re = qr/^ v? 5 [.] (\d{1,2}) (?: [.] (\d{1,2}) )? $/xms;
+# These are split out mostly so we can control testing
+sub _run_configure
+{
+  my @config = @_;
+  run qw[sh Configure], @config;
+}
+
+sub _run_make
+{
+  my @cmd = @_;
+  state $make = $Config{make};
+  run $make, @cmd;
+}
 
 sub _dnld_url
 {
@@ -150,15 +196,6 @@ sub _get_targz
   my $src = shift;
 
   local $File::Fetch::WARN;
-
-  # Attempt to find the perl version if none was given
-  if ( !defined $src && -f '.perl-version' )
-  {
-    open my $pvFH, '<', '.perl-version';
-    my $pv = do { local $/; <$pvFH> };
-
-    #($src) = $pv =~ m[($perl5_re)]xms;
-  }
 
   # If there's no src, find the newest version.
   if ( !defined $src )
@@ -294,6 +331,12 @@ By default, perl is compiled without threads. If you'd like to enable threads, u
 =head3 skip-tests
 
 Test for perl are ran by default. If you are sure that the tests will pass and you want to save some time, you can skip the testing phase with this option.
+
+=head3 smart-tests
+
+As an alternative to telling C<App::MechaCPAN::Perl> to use tests or not, C<App::MechaCPAN::Perl> can try to be clever and guess if it needs to run tests. If there is a C<.perl-version> file and it is the same version that is being installed, then tests will be skips. The thinking is that if there is a C<.perl-version> file, then it is likely that perl has been installed and tested before.
+
+C<smart-tests> are off by default, but are enabled by L<App::MechaCPAN::Deploy> when there is a C<cpanfile.snapshot> file. See L<App::MechaCPAN::Install/smart-tests>.
 
 =head3 skip-local
 

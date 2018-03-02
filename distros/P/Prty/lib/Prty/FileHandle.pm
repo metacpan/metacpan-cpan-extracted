@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Option;
 use Scalar::Util ();
@@ -789,7 +789,7 @@ sub captureStderr {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

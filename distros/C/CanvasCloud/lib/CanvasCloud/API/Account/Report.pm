@@ -1,5 +1,5 @@
 package CanvasCloud::API::Account::Report;
-$CanvasCloud::API::Account::Report::VERSION = '0.004';
+$CanvasCloud::API::Account::Report::VERSION = '0.005';
 # ABSTRACT: extends L<CanvasCloud::API::Account>
 
 use Moose;
@@ -37,6 +37,25 @@ sub run {
 }
 
 
+
+sub get {
+    my ( $self, $report, $args ) = @_;
+
+    my $result = $self->run( $report, $args );
+    
+    while ( $result->{status} eq 'running' ) {
+        sleep 10; 
+        $result = $self->check( $report, $result->{id} );
+    }
+
+    if ( exists $result->{attachment} && exists $result->{attachment}{url} ) {
+        my $resp = $self->ua->get( $result->{attachment}{url} ); ## Download report without using class specific headers
+        die $resp->status_line unless ( $resp->is_success );
+        return $resp->decoded_content( charset => 'none' );
+    }
+    return undef; ## never should but nothing would be retured
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;
@@ -53,7 +72,7 @@ CanvasCloud::API::Account::Report - extends L<CanvasCloud::API::Account>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 ATTRIBUTES
 
@@ -71,13 +90,17 @@ return data object response from GET ->uri
 
 return data object response from GET ->uri / $report / $report_id 
 
-=head2 run( $report, { term_id => 1 } )
+=head2 run( $report, { 'parameters[enrollment_term_id]' => 1 } )
 
 return data object response from POST ->uri / $report
 
 arguments are POST'ed
 
   note(*): Most arguments will be in the form of parameters[named_argument_for_report] = "value"
+
+=head2 get( $report, { 'parameters[enrollment_term_id]' => 1 } )
+
+perform the self->run( ... ) && self->check( ... ) until report is finished returning the text.
 
 =head1 AUTHOR
 

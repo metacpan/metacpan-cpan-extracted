@@ -1,9 +1,28 @@
 ==================================================
-Changes from 2016-07-12 00:00:00 +0000 to present.
+Changes from 2017-02-28 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.005 at 2017-07-12 01:27:30 +0000
+version 0.006 at 2018-02-28 21:56:26 +0000
+------------------------------------------
+
+  Change: 60668ad2bb314cd6f50d392d4ff010b805405b35
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2018-02-28 14:56:17 +0000
+
+    version bump 
+
+  Change: 8b55fbbf2c1de32f5de5ddc39c0e305838e496cc
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2018-02-28 14:53:36 +0000
+
+    Changes to new URL's api.dlocal.com is now the main domain, retiring
+    the astropay legacy
+
+    Also fixes a warning on missing CVV when not passed in. 
+
+------------------------------------------
+version 0.005 at 2017-07-12 01:27:19 +0000
 ------------------------------------------
 
   Change: ab9ead958aa8977df9e38c13b3a460d4437bbac1
@@ -81,301 +100,6 @@ version 0.003 at 2017-05-02 19:30:42 +0000
 
     add support for error_message and result_code 
 
-------------------------------------------
-version 0.002 at 2017-02-01 17:31:10 +0000
-------------------------------------------
-
-  Change: 69c8abed06d2fc35deb835232b66d019bb5dbe9d
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-02-01 10:31:10 +0000
-
-    v0.002 
-
-  Change: 59f2f1a5cbb744562d91251bce4754de630cba99
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-02-01 10:30:17 +0000
-
-    Allow for a dirty .gitignore 
-
-  Change: ed1c3bc1b125cdb6c56eefb74454e33f5c11a862
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-02-01 10:26:56 +0000
-
-    Fix tests to properly skip correctly if there are no credentials..
-    This allows for base testing by cpants that won't have credentials 
-
-  Change: ac8f71b5e1e3a9317bef09c89295357a23009d87
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-31 16:00:55 +0000
-
-    Allow for README.pod now 
-
-------------------------------------------
-version 0.001 at 2017-01-31 22:52:42 +0000
-------------------------------------------
-
-  Change: 9e82af55dce97a798b9b04c1b32dd80c63aa02a2
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-31 15:52:42 +0000
-
-    Documentation, Pod::Weaver 
-
-  Change: 4363d8d8b1fe74e6be71fc7370e510112b8360ca
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-31 14:23:16 +0000
-
-    Add in tests for SALE failure messaging 
-
-  Change: e37af25f1a04bae0496a819f3f6d1783a6cd60d4
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-31 13:57:24 +0000
-
-    Move two tests into new names Introduce test_cards array, and loop
-    for positive tests finding out which are working, and which had
-    feature requirements 
-
-  Change: ae656f513e4ae9e644b83adb1ce505ffaa24707c
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-30 10:02:47 +0000
-
-    Merge branch 'master' of
-    https://github.com/oaxlin/Business-OnlinePayment-DLocal into
-    test-breakout 
-
-  Change: eb6a311cdcb7d8fc6e1ec4c98be810fe163e8eaa
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 15:46:11 +0000
-
-    maintain state of test_transaction 
-
-  Change: 65ffa49483194518aa131ffba0ce646da0744b28
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-27 15:02:23 +0000
-
-    Merge branch 'master' of
-    https://github.com/oaxlin/Business-OnlinePayment-DLocal into
-    test-breakout 
-
-  Change: f25a6aed2ee05617bb6cc3f16f8c38c917419b19
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-27 15:01:04 +0000
-
-    Adding in a "positive" sale, is getting a bad response right now
-    though 
-
-  Change: 5f11f12af72f071dc4c08cbdbcdb1c6428d7ee0b
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 14:59:35 +0000
-
-    tests for refundstatus 
-
-  Change: 2ea63671d32bf83f69ff593595ac4bfbcbf61539
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 14:33:20 +0000
-
-    new tests 
-
-  Change: cfb8dbc4653912d8195becbc939d13d274e0f119
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 14:32:56 +0000
-
-    simple mocking works 
-
-  Change: ef53d316c4824dd02bf55536893797965417caa3
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 14:27:29 +0000
-
-    basic query functions work 
-
-  Change: 5c0ed192f28d13dbd8300dbb9b11a9c0a3c5b4e9
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-27 12:23:21 +0000
-
-    Merge branch 'master' of
-    https://github.com/oaxlin/Business-OnlinePayment-DLocal into
-    test-breakout 
-
-  Change: 1b020ff487b415f75be16671ba04c06e74f229ff
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 12:20:59 +0000
-
-    refactor/simplify 
-
-  Change: be7b0fbef190684cdb9c9e410c9973ea875b26b4
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-27 10:08:11 +0000
-
-    Will not support 5.8, so let's not even waste the time 
-
-  Change: ffa7c6b118c500b326f8d8cb0e72bc7a3e2c2259
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-27 10:04:27 +0000
-
-    Move auth/capture tests into their own file, also create a mastercard
-    test along with the visa.. copy/pasta first run 
-
-  Change: 3ad4c3e36dad97ed83ebe72ce7211178423ec9e2
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-27 09:36:44 +0000
-
-    fix skip block 
-
-  Change: 318c53f0ca10b199aa9dfc1a750e46b126478d0a
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-26 15:51:03 +0000
-
-    basic paystatus functionality 
-
-  Change: 0691a7d86b659119500ac2f662bb859572c2d033
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-26 15:48:43 +0000
-
-    auth/capture basic functionality 
-
-  Change: 129f7e6574275a38e797d7f2016dd224340cf5ef
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-26 15:31:03 +0000
-
-    make remap_fields work with multiple key names since DLOCAL uses 3
-    different APIs, start working on auth/capture. Fix some typos. 
-
-  Change: 455ad622568e2327075151a0681c17979539b204
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-26 11:16:00 +0000
-
-    Fix to allow web reporting credentials for query API Fix some test
-    data to documented settings 
-
-  Change: dfc57836db5ea4afb82a6f0f632996b92453e712
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-24 14:46:05 +0000
-
-    Merge branch 'master' of
-    https://github.com/oaxlin/Business-OnlinePayment-DLocal 
-
-  Change: c5aa166b331c68b6f6c6dff2f1553577b85ca580
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 14:43:18 +0000
-
-    add paystatus (not working yet) 
-
-  Change: ff87087855abd5b345fa1797793072f13bd20011
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 14:14:44 +0000
-
-    add pod file 
-
-  Change: 4d4fbee9da36556e7ad728654f409c10d3c99981
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-24 14:05:07 +0000
-
-    Still trying to clean up deps auto-pulling 
-
-  Change: dc733ed427a38d9f99e307eb7b8cfade734c05c4
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 13:48:13 +0000
-
-    refunds work 
-
-  Change: 2276991427e352aa17b5090da325ad9c70abe04a
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 13:31:55 +0000
-
-    add tokenization code/tests 
-
-  Change: 0f854927ab181deb1fb37eb4faf96121b92bacf8
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 11:32:06 +0000
-
-    use json 
-
-  Change: 9f8c26b1c7717a5bc3f0d2c157546d0f1d45440e
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 11:10:29 +0000
-
-    fix copy pasta 
-
-  Change: 4df6a2e47b1c327d2d4f9044ba949c563e678c2e
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 11:07:09 +0000
-
-    cleanup 
-
-  Change: 55914a555918e9f8826dccf5d517999056efaf88
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 10:47:19 +0000
-
-    proper control created 
-
-  Change: 9b8b81d88f8dbc13d2006ba45820d36488cdf3b7
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 10:27:38 +0000
-
-    secret as env 
-
-  Change: 8fba397f9aa63702f0e3a2342cc6c380a6f6ac79
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 10:24:51 +0000
-
-    initial test commit 
-
-  Change: 3b694daeb9cfbf219a02c3e16a3b34029409e886
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 10:24:04 +0000
-
-    add name as a combo field 
-
-  Change: 9d83c130cc11cebe63584de54f0721cefefe954c
-  Author: Jason Terry <jterry@bluehost.com>
-  Date : 2017-01-24 09:25:11 +0000
-
-    basic connection working (bad control error) 
-
-  Change: d88913a4f323b66de4f2b6e0c628f973a82d16d9
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-19 11:29:15 +0000
-
-    Remove Kwalitee for a little bit so we can actually test the very
-    basics 
-
-  Change: 4870ef9afbd800e8b6ff804d5b982c9184c9cfaa
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-19 11:25:01 +0000
-
-    add Module::CPANTS::Analyse 
-
-  Change: 9a19a6adbe771223cf1d7298bbf8dd584c7c27ce
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-19 11:20:51 +0000
-
-    travis is dying on this missing module, some downstream dep. Probably
-    will find more as we work through this 
-
-  Change: 20de9def9e142000e3ad5e76b8528a7ac27ea8be
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-19 11:04:15 +0000
-
-    add in 'SALE' method fields into key translation. Doesn't include any
-    remap that needs to happen yet, just notes for them 
-
-  Change: ca4eed4d5abf48cf0e2ec7701d31c9e19d67a3fb
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-19 09:58:43 +0000
-
-    Add in some dzil featureset, gitignore 
-
-  Change: 5b55c02041993a9e0c07bec40f84f94bcff3af7f
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-18 14:55:12 +0000
-
-    Add in a travis config 
-
-  Change: be2e452cc6b6d3ec30e142c3fe7b59ff80719343
-  Author: Jason Hall <jayce@lug-nut.com>
-  Date : 2017-01-18 14:50:23 +0000
-
-    Initialization 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2017-02-28 00:00:00 +0000.
+================================================

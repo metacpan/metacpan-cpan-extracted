@@ -3,7 +3,7 @@
 package main;
 # PODNAME: koha-auth
 # ABSTRACT: Generate authorities from bibliographic records
-$main::VERSION = '0.052';
+$main::VERSION = '0.053';
 use 5.010;
 use utf8;
 use strict;
@@ -90,7 +90,7 @@ koha-auth - Generate authorities from bibliographic records
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 DESCRIPTION
 
@@ -158,7 +158,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Fréderic Démians.
+This software is Copyright (c) 2018 by Fréderic Démians.
 
 This is free software, licensed under:
 

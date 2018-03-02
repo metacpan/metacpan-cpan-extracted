@@ -9,7 +9,7 @@ configure_requires:
   Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,11 +17,12 @@ name: JSON-ize
 provides:
   JSON::ize:
     file: lib/JSON/ize.pm
-    version: '0.101'
+    version: '0.102'
 requires:
   JSON: '2'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=JSONize
+  license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/majensen/jsonize
-version: '0.101'
+version: '0.102'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

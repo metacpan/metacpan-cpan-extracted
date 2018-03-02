@@ -1,0 +1,353 @@
+NAME
+    Screensaver::Any - Common interface to screensaver/screenlocker
+    functions
+
+VERSION
+    This document describes version 0.004 of Screensaver::Any (from Perl
+    distribution Screensaver-Any), released on 2018-02-28.
+
+DESCRIPTION
+    This module provides common functions related to screensaver.
+
+    Supported screensavers: KDE Plasma's kscreenlocker ("kde"), GNOME
+    screensaver ("gnome"), Cinnamon screensaver ("cinnamon"), and
+    "xscreensaver". Support for more screensavers, e.g. Windows is more than
+    welcome.
+
+NOTES
+    In GNOME 3.8 and later, "gnome-screensaver" command has been removed
+    (one of the reasons is consideration of the eventual move to Wayland).
+    Locking/unlocking screen can be done if you install "gnome-screensaver"
+    separately, or use other screensaver like "xscreensaver", or use "gdm"
+    (in which case you can use a command like "dbus-send --type=method_call
+    --dest=org.gnome.ScreenSaver /org/gnome/ScreenSaver
+    org.gnome.ScreenSaver.Lock").
+
+FUNCTIONS
+  activate_screensaver
+    Usage:
+
+     activate_screensaver(%args) -> [status, msg, result, meta]
+
+    Activate screensaver immediately and lock screen.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  deactivate_screensaver
+    Usage:
+
+     deactivate_screensaver(%args) -> [status, msg, result, meta]
+
+    Deactivate screensaver and unblank the screen.
+
+    If screen is not being blank (screensaver is not activated) then nothing
+    happens. If screen is being blanked (screensaver is activated) then
+    unblank the screen.
+
+    Often the screen is also locked when being blanked. On some
+    screensavers, like xscreensaver, deactivating won't unlock the screen
+    and user will need to unlock the screen herself first. Some other
+    screensavers, like GNOME/cinnamon, will happily unlock the screen
+    automatically.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  detect_screensaver
+    Usage:
+
+     detect_screensaver() -> str
+
+    Detect which screensaver program is currently running.
+
+    Will return a string containing name of screensaver program, e.g. "kde",
+    "gnome", "cinnamon", "xscreensaver". Will return undef if no known
+    screensaver is detected.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Return value: (str)
+
+  disable_screensaver
+    Usage:
+
+     disable_screensaver(%args) -> [status, msg, result, meta]
+
+    Disable screensaver so screen will not go blank or lock after being
+    idle.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  enable_screensaver
+    Usage:
+
+     enable_screensaver(%args) -> [status, msg, result, meta]
+
+    Enable screensaver that has been previously disabled.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_screensaver_timeout
+    Usage:
+
+     get_screensaver_timeout(%args) -> [status, msg, result, meta]
+
+    Get screensaver idle timeout, in number of seconds.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: Timeout value, in seconds (float)
+
+  prevent_screensaver_activated
+    Usage:
+
+     prevent_screensaver_activated() -> [status, msg, result, meta]
+
+    Prevent screensaver from being activated by resetting idle timer.
+
+    You can use this function to prevent screensaver from being activated,
+    if it is not yet being activated. This is usually done by resetting the
+    idle counter. With KDE, this is called "simulating user activity". With
+    xscreensaver, one can use the -deactivate on the CLI.
+
+    This function will need to be run periodically and often enough (more
+    often than the idle timeout period) to actually keep the screensaver
+    from ever being activated.
+
+    If screensaver is already activated, then nothing happens.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  screensaver_is_active
+    Usage:
+
+     screensaver_is_active(%args) -> [status, msg, result, meta]
+
+    Check if screensaver is being activated.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  set_screensaver_timeout
+    Usage:
+
+     set_screensaver_timeout(%args) -> [status, msg, result, meta]
+
+    Set screensaver idle timeout.
+
+    Examples:
+
+    *   Set timeout to 5 minutes:
+
+         set_screensaver_timeout( timeout => 300);
+
+    *   xscreensaver
+
+        To set timeout for xscreensaver, the program finds this line in
+        "~/.xscreensaver":
+
+          timeout:    0:05:00
+
+        modifies the line, save the file, and HUP the xscreensaver process.
+
+    *   gnome-screensaver
+
+        To set timeout for gnome-screensaver, the program executes this
+        command:
+
+          gsettings set org.gnome.desktop.session idle-delay 300
+
+    *   cinnamon
+
+        Not yet supported.
+
+    *   KDE
+
+        To set timeout for the KDE screen locker, the program looks for this
+        line in "~/.kde/share/config/kscreensaverrc":
+
+          Timeout=300
+
+        modifies the line, save the file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   screensaver => *str*
+
+        Explicitly set screensaver program to use.
+
+        The default, when left undef, is to detect what screensaver is
+        running,
+
+    *   timeout => *duration*
+
+        Value.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: Timeout value, in seconds (float)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Screensaver-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Screensaver-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Screensaver-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

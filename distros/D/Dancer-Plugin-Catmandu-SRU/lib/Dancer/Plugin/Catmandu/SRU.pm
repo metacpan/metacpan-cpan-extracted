@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::SRU - SRU server backed by a searchable Catmandu::Stor
 
 =cut
 
-our $VERSION = '0.0501';
+our $VERSION = '0.0502';
 
 use Catmandu::Sane;
 use Dancer::Plugin;
@@ -89,8 +89,9 @@ sub sru_provider {
 
             my $transport   = request->scheme;
             my $database    = substr request->path, 1;
-            my $host        = request->host; $host =~ s/:.+//;
-            my $port        = request->port;
+            my $uri         = request->uri_for( request->path_info() );
+            my $host        = $uri->host;
+            my $port        = $uri->port;
             $response->record(SRU::Response::Record->new(
                 recordSchema => 'http://explain.z3950.org/dtd/2.1/',
                 recordData   => <<XML,
@@ -132,8 +133,8 @@ XML
                 $cql = "( $setting->{cql_filter}) and ( $cql)";
             }
 
-            my $first = $request->startRecord || 1;
-            my $limit = $request->maximumRecords || $default_limit;
+            my $first = $request->startRecord // 1;
+            my $limit = $request->maximumRecords // $default_limit;
             if ($limit > $maximum_limit) {
                 $limit = $maximum_limit;
             }

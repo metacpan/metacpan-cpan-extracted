@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-Rewrite
 
+2.101 Mon 26 Feb 2018
+	- Minor documentation copyedit and packaging fix
+
 2.100 Mon 26 Feb 2018
 	- Response status code rewriting support
 

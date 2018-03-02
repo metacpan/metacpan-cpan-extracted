@@ -1,3 +1,17 @@
+5.2.0
+- Added support and examples for v201802.
+- Added new example add_shopping_dynamic_remarketing_campaign.pl showing how to
+add a display campaign linked to a merchant account and a remarketing list.
+- Updated the add_universal_app_campaign.pl example to include appVendor.
+- Updated add_audience.pl and add_conversion_trackers.pl to use gtag instead
+of a snippet.
+- Updated the create_account.pl example to show whitelisted users how to use
+inviteeEmail and inviteeRole.
+- Updated add_crm_based_user_list.pl example to demonstrate that a whitelist
+is no longer needed for AddressInfo and that uploadKeyType is now required.
+- Updated get_keyword_bid_simulations.pl to include new fields.
+- Updated upload_offline_data.pl example to use new partial error handling.
+
 5.1.0
 - Removed examples and support for v201702. For future sunset dates, see
 https://developers.google.com/adwords/api/docs/sunset-dates

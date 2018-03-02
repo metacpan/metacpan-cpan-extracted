@@ -91,7 +91,7 @@ $mech->content_is('foo 123 bar');
 $mech->get_ok('/foo/123/footer');
 $mech->content_is('id: 123 section: footer');
 
-$mech->post_ok('anything/something');
+$mech->post_ok('/anything/something');
 $mech->content_is('something goes');
 
 $mech->get_ok('/number/123');

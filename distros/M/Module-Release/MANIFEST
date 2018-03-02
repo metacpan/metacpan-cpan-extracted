@@ -2,7 +2,6 @@ Changes
 examples/README
 INSTALL.SKIP
 lib/Module/Release.pm
-lib/Module/Release/FTP.pm
 lib/Module/Release/Kwalitee.pm
 lib/Module/Release/MANIFEST.pm
 lib/Module/Release/PAUSE.pm
@@ -16,9 +15,14 @@ MANIFEST.SKIP
 README.pod
 script/release
 t/abstract.t
+t/changes.t
 t/compile.t
+t/contributors.t
+t/dates.t
 t/defaults.t
 t/dist_version.t
+t/get_env_var.t
+t/input.t
 t/kwalitee/check_kwalitee.t
 t/lib/setup_common.pl
 t/load.t
@@ -28,6 +32,7 @@ t/mixins.t
 t/new.t
 t/no_releaserc_can_die.t
 t/output.t
+t/passwords.t
 t/perls.t
 t/pod.t
 t/pod_coverage.t

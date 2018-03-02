@@ -3,13 +3,15 @@ package My::Module::Build;
 use strict;
 use warnings;
 
-use base qw{ Module::Build };
+use Module::Build;
+our @ISA = qw{ Module::Build };
 
 use Carp;
 
 
 sub ACTION_authortest {
-    my ( $self, @args ) = @_;
+##  my ( $self, @args ) = @_;
+    my ( $self ) = @_;			# Arguments unused
 
     local $ENV{AUTHOR_TESTING} = 1;
 
@@ -77,7 +79,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009, 2012-2016 Thomas R. Wyant, III
+Copyright (C) 2009, 2012-2018 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

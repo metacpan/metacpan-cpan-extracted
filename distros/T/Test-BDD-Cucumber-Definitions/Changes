@@ -1,5 +1,20 @@
 Revision history for Test-BDD-Cucumber-Definitions
 
+0.21    2018-03-01
+        [ All ]
+        - Types common to all modules have been added (::Types)
+        
+        [ HTTP ]
+        - The HTTP module uses common types from ::Types
+        
+        [ Var ]
+        - Module Var was added
+
+0.20    2018-02-28
+        [ HTTP ]
+        - In the values specified in the HTTP module, you can use scenario variables
+            (but you can not specify the variables in the step, only manually)
+
 0.19    2018-02-25
         [ Zip ]
         - Steps to work with Zip archives are added

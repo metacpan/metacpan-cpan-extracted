@@ -4,7 +4,7 @@ use base qw/Prty::Section::Object Prty::ClassConfig/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 # -----------------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ sub contentAllowed {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

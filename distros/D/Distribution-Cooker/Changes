@@ -1,15 +1,24 @@
-0.10_01 - Thu Aug 14 22:57:09 2008
+Revision history for Perl module Distribution::Cooker
+
+1.022 2018-03-02T12:02:47Z
+	* Make this a stable release
+
+1.021_01 2016-04-26T01:32:54Z
+	* Actually use the config file, and set repo_name for the templates.
+
+1.01 - 2013-02-07
+	* Rename the module file to the conventional location under
+	lib/
+	* Provide a template variable for the year
+
+0.11 - 2008-10-28
+	* Bump to a release version.
+
+
+0.10_01 - 2008-08-14
 	* This is the modulino version of my module_cooker
 	script, complete with my set of templates.
 	* If you want to use this, you should develop your
 	own templates, and probably write a subclass for your
 	own use.
-
-1.01 - Thu Feb  7 21:49:15 2013
-	* Rename the module file to the conventional location under
-	lib/
-	* Provide a template variable for the year
-
-0.11 - Tue Oct 28 17:20:38 2008
-	* Bump to a release version.
 

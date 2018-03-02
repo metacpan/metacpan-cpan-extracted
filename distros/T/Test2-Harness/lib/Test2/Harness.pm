@@ -2,7 +2,7 @@ package Test2::Harness;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use Carp qw/croak/;
 use List::Util qw/sum/;
@@ -129,6 +129,7 @@ sub iteration {
             # Log first, before the watchers transform the events.
             $_->log_raw_event($event) for @{$self->{+LOGGERS}};
 
+            my @delayed;
             if ($job_id) {
                 my $watcher = $self->{+WATCHERS}->{$job_id};
 
@@ -146,13 +147,11 @@ sub iteration {
                     $self->{+ACTIVE}->{$job_id} = $watcher if $live;
                 }
 
-                # This will transform the events, possibly by adding facets
-                my $f;
-                ($event, $f) = $watcher->process($event);
+                # This will transform the events, possibly by adding facets,
+                # any return items are new events it produced.
+                @delayed = $watcher->process($event);
 
-                next unless $event;
-
-
+                my $f = $event->{facet_data};
                 if ($f && $f->{harness_job_end}) {
                     $f->{harness_job_end}->{file} = $watcher->file;
                     $f->{harness_job_end}->{fail} = $watcher->fail ? 1 : 0;
@@ -160,7 +159,7 @@ sub iteration {
                     my $plan = $watcher->plan;
                     $f->{harness_job_end}->{skip} = $plan->{details} || "No reason given" if $plan && !$plan->{count};
 
-                    push @{$f->{info}} => $watcher->fail_info_facet_list;
+                    push @{$f->{errors}} => $watcher->fail_error_facet_list;
 
                     $self->send_notices($watcher, $event) if $watcher->fail;
 
@@ -168,10 +167,15 @@ sub iteration {
                 }
             }
 
-            # Render it now that the watchers have done their thing.
-            $event->{processed} = time;
-            $_->render_event($event)        for @{$self->{+RENDERERS}};
-            $_->log_processed_event($event) for @{$self->{+LOGGERS}};
+            for my $re (@delayed, $event) {
+                $_->log_processed_event($re) for @{$self->{+LOGGERS}};
+
+                my $rf = $re->{facet_data};
+                next if $rf->{harness_watcher}->{no_render};
+
+                # Render it now that the watchers have done their thing.
+                $_->render_event($re) for @{$self->{+RENDERERS}};
+            }
         }
     }
 
@@ -333,9 +337,13 @@ sub timeout {
 
     $msg .= <<"    EOT";
 
-You can turn this off on a per-test basis by adding the comment
+If you do not want this test to time-out you can turn timeouts off on a
+per-test basis by adding the following comment to the top of your test file.
+
 # HARNESS-NO-TIMEOUT
-to the top of your test file (but below the #! line).
+
+CAUTION: THIS IS ALMOST ALWAYS THE WRONG THING TO DO!
+         A test suite can hang forever when you turn timeouts off.
     EOT
 
     my @info = (

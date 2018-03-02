@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 0.95;
+use Test::More  1.0;
 
 my $class = 'Module::Release';
 
@@ -41,19 +41,27 @@ subtest 'formatting dev version' => sub {
 		'Development version stays in there'
 		);
 
+	$mock = bless { remote_file => 'Foo-1.125_039.tar.gz' }, $class;
+	is(
+		$mock->dist_version, '1.125_039',
+		'Development version handles more than two decimal places'
+		);
 	};
 
 subtest 'formatting release version' => sub {
 	my $mock = bless { remote_file => 'Foo-3.45.tar.gz' }, $class;
-	my $got = $mock->dist_version;
 	is( $mock->dist_version, '3.45',
 		"Without development version it's fine"
+		);
+
+	$mock = bless { remote_file => 'Foo-1.001.tar.gz' }, $class;
+	is( $mock->dist_version, '1.001',
+		"Three decimal places are retained in version number"
 		);
 	};
 
 subtest 'formatting integer version' => sub {
 	my $mock = bless { remote_file => 'Foo-20160101.tar.gz' }, $class;
-	my $got = $mock->dist_version;
 	is( $mock->dist_version, '20160101',
 		"Single integer version extracts correct number"
 		);
@@ -61,7 +69,6 @@ subtest 'formatting integer version' => sub {
 
 subtest 'formatting three digit minor version' => sub {
 	my $mock = bless { remote_file => 'Foo-3.045.tar.gz' }, $class;
-	my $got = $mock->dist_version;
 	is( $mock->dist_version, '3.045',
 		"Without development version it's fine"
 		);
@@ -102,8 +109,7 @@ subtest 'three part versions' => sub {
         ['Foo'        => '', "...with no suffix"],
     );
 
-    my $case;
-    foreach $case (@cases) {
+    foreach my $case (@cases) {
         my ($dist_name, $expected_version, $descr) = @$case;
         my $mock = bless { remote_file => $dist_name }, $class;
         my $got_version = $mock->dist_version;

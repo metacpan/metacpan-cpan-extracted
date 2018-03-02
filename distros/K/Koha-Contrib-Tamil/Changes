@@ -1,6 +1,10 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
-0.052 2012-12-18
+0.053 2018-02-28
+
+  - Update koha-coce-url for Koha 17.11
+
+0.052 2018-12-18
 
   - Update koha-coce-url
 

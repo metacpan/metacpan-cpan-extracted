@@ -3,7 +3,7 @@
 #
 #   file: t/text-templater.t
 #
-#   Copyright © 2015, 2016 Van de Bugger.
+#   Copyright © 2015, 2016, 2018 Van de Bugger.
 #
 #   This file is part of perl-Dist-Zilla-Role-TextTemplater.
 #
@@ -18,10 +18,11 @@
 #   You should have received a copy of the GNU General Public License along with
 #   perl-Dist-Zilla-Role-TextTemplater. If not, see <http://www.gnu.org/licenses/>.
 #
+#   SPDX-License-Identifier: GPL-3.0-or-later
+#
 #   ---------------------------------------------------------------------- copyright and license ---
 
-use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC';
-use lib 't/lib';        # Make TextTemplaterTestPlugin accessible.
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use lib 't/lib';        # Make TextTemplaterTestPlugin accessible.
 use strict;
 use version 0.77;
 use warnings;
@@ -41,7 +42,7 @@ with 'TextTemplaterTester';
 # --------------------------------------------------------------------------------------------------
 
 my $aborting = isa( 'Dist::Zilla::Role::ErrorLogger::Exception::Abort' );
-    # REQUIRE: Dist::Zilla::Role::ErrorLogger v0.9.0
+    ## REQUIRE: Dist::Zilla::Role::ErrorLogger v0.9.0
 my $E        = qr{^\s*\^\^\^ };
 
 run_me 'Nothing to substitute' => {
@@ -214,26 +215,26 @@ run_me 'Die' => {
 #   skipped to keep error message reasonable small.
 run_me 'Long template' => {
     text => [
-        '1        template line  1',
-        '2        template line  2',
-        '3        template line  3',
-        '4        template line  4',
-        '5        template line  5',
-        '{{     # template line  6, code line  1',
-        '7;     # template line  7, code line  2',
-        '8;     # template line  8, code line  3',
-        '9;     # template line  9, code line  4',
-        '10;    # template line 10, code line  5',
-        '11;    # template line 11, code line  6',
-        '12;    # template line 12, code line  7',
-        '13;    # template line 13, code line  8',
-        'die;   # template line 14, code line  9',
-        '15;    # template line 15, code line 10',
-        '16;    # template line 16, code line 11',
-        '17;    # template line 17, code line 12',
-        '18;    # template line 18, code line 13',
-        '19;    # template line 19, code line 14 }}',
-        '20       template line 20'
+        '1         template line  1',
+        '2         template line  2',
+        '3         template line  3',
+        '4         template line  4',
+        '5         template line  5',
+        '{{      # template line  6, code line  1',
+        '$OUT .= # template line  7, code line  2',
+        '8 .     # template line  8, code line  3',
+        '9 .     # template line  9, code line  4',
+        '10 .    # template line 10, code line  5',
+        '11 .    # template line 11, code line  6',
+        '12 .    # template line 12, code line  7',
+        '13;     # template line 13, code line  8',
+        'die;    # template line 14, code line  9',
+        '$OUT .= # template line 15, code line 10',
+        '16 .    # template line 16, code line 11',
+        '17 .    # template line 17, code line 12',
+        '18 .    # template line 18, code line 13',
+        '19;     # template line 19, code line 14 }}',
+        '20        template line 20'
     ],
     expected => {
         exception => $aborting,
@@ -242,19 +243,19 @@ run_me 'Long template' => {
             '    Bad code fragment begins at template line 6.',
             'template:',
             '        ... skipped 3 lines ...',
-            '    04: 4        template line  4',
-            '    05: 5        template line  5',
-            '    06: {{     # template line  6, code line  1',
+            '    04: 4         template line  4',
+            '    05: 5         template line  5',
+            '    06: {{      # template line  6, code line  1',
             re( qr{$E\QBad code fragment begins at template line 6.\E} ),
-            '    07: 7;     # template line  7, code line  2',
-            '    08: 8;     # template line  8, code line  3',
+            '    07: $OUT .= # template line  7, code line  2',
+            '    08: 8 .     # template line  8, code line  3',
             '        ... skipped 3 lines ...',
-            '    12: 12;    # template line 12, code line  7',
-            '    13: 13;    # template line 13, code line  8',
-            '    14: die;   # template line 14, code line  9',
+            '    12: 12 .    # template line 12, code line  7',
+            '    13: 13;     # template line 13, code line  8',
+            '    14: die;    # template line 14, code line  9',
             re( qr{$E\QDied at template line 14\E\b} ),
-            '    15: 15;    # template line 15, code line 10',
-            '    16: 16;    # template line 16, code line 11',
+            '    15: $OUT .= # template line 15, code line 10',
+            '    16: 16 .    # template line 16, code line 11',
             '        ... skipped 4 lines ...',
         ],
     },
@@ -265,19 +266,19 @@ run_me 'Long template' => {
 #   This template shortened so skips should not occur.
 run_me 'Not so long template' => {
     text => [
-        '1        template line  1',                    # Should not be skipped.
-        '2        template line  2',
-        '3        template line  3',
-        '{{     # template line  4, code line  1',
-        '5;     # template line  5, code line  2',
-        '6;     # template line  6, code line  3',
-        '7;     # template line  7, code line  4',      # Should not be skipped.
-        '8;     # template line  8, code line  5',
-        '9;     # template line  9, code line  6',
-        'die;   # template line 10, code line  7',
-        '11;    # template line 11, code line  8',
-        '12;    # template line 12, code line  9 }}',
-        '13       template line 13'                     # Should not be skipped.
+        '1         template line  1',                    # Should not be skipped.
+        '2         template line  2',
+        '3         template line  3',
+        '{{      # template line  4, code line  1',
+        '$OUT .= # template line  5, code line  2',
+        '6 .     # template line  6, code line  3',
+        '7 .     # template line  7, code line  4',      # Should not be skipped.
+        '8 .     # template line  8, code line  5',
+        '9;      # template line  9, code line  6',
+        'die;    # template line 10, code line  7',
+        '$OUT .= # template line 11, code line  8',
+        '12;     # template line 12, code line  9 }}',
+        '13        template line 13'                     # Should not be skipped.
     ],
     expected => {
         exception => $aborting,
@@ -285,21 +286,21 @@ run_me 'Not so long template' => {
             re( qr{^Died at template line 10\b} ),
             '    Bad code fragment begins at template line 4.',
             'template:',
-            '    01: 1        template line  1',
-            '    02: 2        template line  2',
-            '    03: 3        template line  3',
-            '    04: {{     # template line  4, code line  1',
+            '    01: 1         template line  1',
+            '    02: 2         template line  2',
+            '    03: 3         template line  3',
+            '    04: {{      # template line  4, code line  1',
             re( qr{$E\QBad code fragment begins at template line 4.\E} ),
-            '    05: 5;     # template line  5, code line  2',
-            '    06: 6;     # template line  6, code line  3',
-            '    07: 7;     # template line  7, code line  4',
-            '    08: 8;     # template line  8, code line  5',
-            '    09: 9;     # template line  9, code line  6',
-            '    10: die;   # template line 10, code line  7',
+            '    05: $OUT .= # template line  5, code line  2',
+            '    06: 6 .     # template line  6, code line  3',
+            '    07: 7 .     # template line  7, code line  4',
+            '    08: 8 .     # template line  8, code line  5',
+            '    09: 9;      # template line  9, code line  6',
+            '    10: die;    # template line 10, code line  7',
             re( qr{$E\QDied at template line 10\E\b} ),
-            '    11: 11;    # template line 11, code line  8',
-            '    12: 12;    # template line 12, code line  9 }}',
-            '    13: 13       template line 13',
+            '    11: $OUT .= # template line 11, code line  8',
+            '    12: 12;     # template line 12, code line  9 }}',
+            '    13: 13        template line 13',
         ],
     },
 };
@@ -600,7 +601,7 @@ run_me 'Fill_in_file error message + filename has no effect' => {
         } );
         return $self->fill_in_file( $file, undef, { filename => 'QWERTY.TXT' } );
     },
-    text          => [
+    text => [
         'line   1',
         '{{   # 2',
         'die; # 3',

@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::APIcast:
     file: lib/Test/APIcast.pm
-    version: '0.10'
+    version: '0.11'
   Test::APIcast::Blackbox:
     file: lib/Test/APIcast/Blackbox.pm
 requires:
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/3scale/Test-APIcast/issues
   homepage: https://github.com/3scale/Test-APIcast
   repository: git://github.com/3scale/Test-APIcast.git
-version: '0.10'
+version: '0.11'
 x_authority: cpan:MCICHRA
 x_contributors:
   - 'David Ortiz <z.david.ortiz@gmail.com>'

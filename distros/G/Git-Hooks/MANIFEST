@@ -20,9 +20,12 @@ lib/Git/Hooks/CheckRewrite.pm
 lib/Git/Hooks/CheckWhitespace.pm
 lib/Git/Hooks/GerritChangeId.pm
 lib/Git/Hooks/Notify.pm
+lib/Git/Hooks/PrepareLog.pm
 lib/Git/Hooks/Test.pm
+lib/Git/Hooks/Tutorial.pod
 lib/Git/Message.pm
 lib/Git/Repository/Plugin/GitHooks.pm
+script/githooks.pl
 t/00-load.t
 t/01-setup.t
 t/02-check-acls.t
@@ -37,6 +40,7 @@ t/02-externals.t
 t/02-gerrit-change-id.t
 t/02-noplugin.t
 t/02-notify.t
+t/02-prepare-log.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/make-debug-environment.sh

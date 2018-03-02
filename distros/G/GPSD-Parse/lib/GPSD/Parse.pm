@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use IO::Socket::INET;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 BEGIN {
 
@@ -92,6 +92,9 @@ sub poll {
     return $gps_json_data if defined $args{return} && $args{return} eq 'json';
     return $gps_perl_data;
 }
+
+# tpv methods
+
 sub tpv {
     my ($self, $stat) = @_;
 
@@ -101,27 +104,29 @@ sub tpv {
     }
     return $self->{tpv};
 }
+sub lon {
+    return $_[0]->tpv('lon');
+}
+sub lat {
+    return $_[0]->tpv('lat');
+}
+sub alt {
+    return $_[0]->tpv('alt');
+}
+sub climb {
+    return $_[0]->tpv('climb');
+}
+sub speed {
+    return $_[0]->tpv('speed');
+}
+sub track {
+    return $_[0]->tpv('track');
+}
+
+# sky methods
+
 sub sky {
     return shift->{sky};
-}
-sub time {
-    return shift->{time};
-}
-sub device {
-    return shift->{device};
-}
-sub direction {
-    shift if @_ > 1;
-
-    my ($deg) = @_;
-
-    my @directions = qw(
-        N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW N
-    );
-
-    my $calc = (($deg % 360) / 22.5) + .5;
-
-    return $directions[$calc];
 }
 sub satellites {
     my ($self, $sat_num, $stat) = @_;
@@ -135,6 +140,31 @@ sub satellites {
         return $self->{satellites}{$sat_num}{$stat};
     }
     return $self->{satellites};
+}
+
+# device methods
+
+sub device {
+    return shift->{device};
+}
+sub time {
+    return shift->{time};
+}
+
+# helper/convenience methods
+
+sub direction {
+    shift if @_ > 1;
+
+    my ($deg) = @_;
+
+    my @directions = qw(
+        N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW N
+    );
+
+    my $calc = (($deg % 360) / 22.5) + .5;
+
+    return $directions[$calc];
 }
 sub feet {
     return $_[0]->_is_metric(0);
@@ -198,6 +228,9 @@ sub unsigned {
 
     return ($lat, $lon);
 }
+
+# private methods
+
 sub _convert {
     my $self = shift;
 
@@ -330,6 +363,11 @@ GPSD::Parse - Parse, extract use the JSON output from GPS units
 
     print $gps->tpv('lat');
     print $gps->tpv('lon');
+
+    # ...or
+
+    print $gps->lat;
+    print $gps->lon;
 
     # timestamp of the most recent poll
 
@@ -464,13 +502,40 @@ Returns:
 The raw poll data as either a Perl hash reference structure or as the
 original JSON string.
 
+=head2 lon
+
+Returns the longitude. Alias for C<< $gps->tpv('lon') >>.
+
+=head2 lat
+
+Returns the latitude. Alias for C<< $gps->tpv('lat') >>.
+
+=head2 alt
+
+Returns the altitude. Alias for C<< $gps->tpv('alt') >>.
+
+=head2 climb
+
+Returns the rate of ascent/decent. Alias for C<< $gps->tpv('climb') >>.
+
+=head2 speed
+
+Returns the rate of movement. Alias for C<< $gps->tpv('speed') >>.
+
+=head2 track
+
+Returns the direction of movement, in degrees. Alias for
+C<< $gps->tpv('track') >>.
+
 =head2 tpv($stat)
 
 C<TPV> stands for "Time Position Velocity". This is the data that represents
 your location and other vital statistics.
 
 By default, we return a hash reference. The format of the hash is depicted
-below.
+below. Note also that the most frequently used stats also have their own
+methods that can be called on the object as opposed to having to reach into
+a hash reference.
 
 Parameters:
 
@@ -576,7 +641,7 @@ Parameters:
 Mandatory, Ineger/Decimal: A decimal ranging from 0-360. Returns the direction
 representing the degree from true north. A common example would be:
 
-    my $heading = $gps->direction($gps->tpv('track'));
+    my $heading = $gps->direction($gps->track);
 
 Degree/direction map:
 
@@ -693,15 +758,15 @@ C<tpv()> to get a good grasp on what can be fetched.
 
     $gps->poll;
 
-    my $lat = $gps->tpv('lat');
-    my $lon = $gps->tpv('lon');
+    my $lat = $gps->lat;
+    my $lon = $gps->lon;
 
-    my $heading = $gps->tpv('track');
-    my $direction = $gps->direction($heading);
+    my $heading = $gps->track; # degrees
+    my $direction = $gps->direction($heading); # ENE etc
 
-    my $altitude = $gps->tpv('alt');
+    my $altitude = $gps->alt;
 
-    my $speed = $gps->tpv('speed');
+    my $speed = $gps->speed;
 
     say "latitude:  $lat";
     say "longitude: $lon\n";
@@ -824,7 +889,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Steve Bertrand.
+Copyright 2018 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

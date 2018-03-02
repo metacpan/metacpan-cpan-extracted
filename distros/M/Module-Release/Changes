@@ -1,10 +1,38 @@
 Revision history for Perl module Module::Release
 
+2.125 2018-02-27T10:55:54Z
+	* Make this a stable release
+
+2.124_02 2018-02-26T21:12:00Z
+	* Remove the FTP module from MANIFEST
+
+2.124_01 2018-02-26T21:05:24Z
+	* Fix a test issue when App::CPANTS::Lint is missing (optional feature)
+	* Clean up tests for lack of . in @INC to load common file
+
+2.124 2018-02-26T12:24:12Z
+	* Make this a stable release
+
+2.123_04 2017-11-13T17:35:47Z
+	* Many internal improvements from Paul Cochrane thanks to
+	Hacktoberfest.
+
+2.123_03 2017-08-24T21:19:47Z
+	* Remove hack to get around OpenSSL problem with TLS. I don't
+	need that anymore.
+
+2.123_02 2017-04-25T18:49:34Z
+	* Test on AppVeyor, fix other minor dist things
+
+2.123_01 2017-04-18T09:24:25Z
+	* Fix the relative path requires. v5.26 will remove the . from
+	@INC.
+
 2.123 2016-12-05T18:39:56Z
 	* Catch up with latest Test::More and perl behavior
 
 2.122_01 2016-11-16T01:15:00Z
-	* Try harder to find out what's going on with Dan Collins's 
+	* Try harder to find out what's going on with Dan Collins's
 	testers setup.
 
 2.122 2016-03-04T23:38:14Z

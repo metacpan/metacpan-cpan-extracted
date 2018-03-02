@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.422",
    "license" : [
-      "unknown"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,7 +34,7 @@
    "provides" : {
       "JSON::ize" : {
          "file" : "lib/JSON/ize.pm",
-         "version" : "0.101"
+         "version" : "0.102"
       }
    },
    "release_status" : "stable",
@@ -42,10 +42,13 @@
       "bugtracker" : {
          "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=JSONize"
       },
+      "license" : [
+         "http://www.apache.org/licenses/LICENSE-2.0.txt"
+      ],
       "repository" : {
          "url" : "https://github.com/majensen/jsonize"
       }
    },
-   "version" : "0.101",
+   "version" : "0.102",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

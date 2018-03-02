@@ -33,6 +33,11 @@ severity	= harsh
 
 severity	= gentle
 
+[Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
+
+severity	= stern
+private_name_regex	= _(?!_)\w+
+
 [Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 
 short_subroutine_statements	= 3
@@ -62,5 +67,5 @@ severity	= harsh
 [Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter]
 
 add_themes	= core
-allow_unused_subroutine_arguments	= 1
+allow_unused_subroutine_arguments	= 0
 severity	= stern

@@ -3,7 +3,7 @@ abstract: 'Read and write configuration data through Augeas'
 author:
   - 'Dominique Dumont (ddumont at cpan dot org)'
 build_requires:
-  Config::Model: '2.116'
+  Config::Model: '2.117'
   Config::Model::Itself: '2.012'
   Test::Differences: '0'
   Test::Exception: '0'
@@ -22,13 +22,13 @@ name: Config-Model-Backend-Augeas
 provides:
   Config::Model::Backend::Augeas:
     file: lib/Config/Model/Backend/Augeas.pm
-    version: '0.123'
+    version: '0.124'
 requires:
   Config::Augeas: '0.303'
-  Config::Model: '2.111'
+  Config::Model: '2.117'
   Log::Log4perl: '1.11'
   Mouse: '0'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
-version: '0.123'
+version: '0.124'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

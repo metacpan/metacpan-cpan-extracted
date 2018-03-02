@@ -1,3 +1,7 @@
+0.11 20180228
+    + Support parentheses in default assignments on Perl 5.10 onwards
+	    sub foo( $now = time() ) {
+
 0.10 20170628
     + Support multiline signatures
 	. We also attempt to keep the line numbers correct

@@ -23,6 +23,8 @@ WriteMakefile(
         'XML::Spice'        => '0.04',
         'Net::DAVTalk'      => '0.08',
         'Text::VCardFast'   => '0.07',
+        'File::MMagic'      => '1.30',
+        'Date::Format'      => '2.24',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Net-CardDAVTalk-*' },

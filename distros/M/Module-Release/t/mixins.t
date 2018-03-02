@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More 1.0 'no_plan';
 
 my $class = 'Module::Release';
 

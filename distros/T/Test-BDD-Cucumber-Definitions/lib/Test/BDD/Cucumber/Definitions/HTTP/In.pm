@@ -6,7 +6,7 @@ use warnings;
 use Test::BDD::Cucumber::Definitions qw(C Given When Then);
 use Test::BDD::Cucumber::Definitions::HTTP qw(:util);
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 ## no critic [RegularExpressions::ProhibitCaptureWithoutTest]
 ## no critic [RegularExpressions::RequireExtendedFormatting]

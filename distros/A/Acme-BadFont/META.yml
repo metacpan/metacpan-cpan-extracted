@@ -1,0 +1,28 @@
+---
+abstract: 'Cope with a bad font in your editor'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-BadFont
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Scalar::Util: '1.10'
+  perl: '5.008001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-BadFont
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/haarg/Acme-BadFont
+version: '1.000000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

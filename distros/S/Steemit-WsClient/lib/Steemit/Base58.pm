@@ -3,7 +3,7 @@ use Modern::Perl;
 
 =head1 NAME
 
-Steemit::Base58 - perl lirary for base58 encoding the bitcoin way
+Steemit::Base58 - perl library for base58 encoding the bitcoin way
 
 =head1 SYNOPSIS
 

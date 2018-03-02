@@ -1,32 +1,51 @@
 ---
 abstract: 'proxy HTTP and WebSocket connections'
 author:
-  - 'Charles McGarvey <ccm@cpan.org>'
+  - 'Charles McGarvey <chazmcgarvey@brokenzipper.com>'
 build_requires:
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Plack-App-Proxy-WebSocket
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Plack::App::Proxy::WebSocket:
+    file: lib/Plack/App/Proxy/WebSocket.pm
+    version: '0.04'
 requires:
-  AnyEvent::Handle: 0
-  AnyEvent::Socket: 0
-  HTTP::Headers: 0
-  HTTP::Parser::XS: 0
-  HTTP::Request: 0
-  Plack::App::Proxy: 0
-  Plack::Request: 0
-  URI: 0
-  parent: 0
-  strict: 0
-  warnings: 0
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  HTTP::Headers: '0'
+  HTTP::Parser::XS: '0'
+  HTTP::Request: '0'
+  Plack::App::Proxy: '0'
+  Plack::Request: '0'
+  URI: '0'
+  namespace::clean: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket/issues
-  homepage: http://search.cpan.org/~ccm/Plack-App-Proxy-WebSocket
-  repository: git://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket.git
-version: 0.03
+  homepage: https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket
+  repository: https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket.git
+version: '0.04'
+x_authority: cpan:CCM
+x_serialization_backend: 'YAML::Tiny version 1.70'

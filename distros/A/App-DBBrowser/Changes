@@ -1,6 +1,45 @@
 Revision history for App-DBBrowser
 
 
+2.001    2018-03-01
+        - Bugfix: don't close the Temp file handle zu early.
+        - Minimum version "Term::Choose::Util" is "0.057".
+        - Removed option "SQLite_directories"
+
+2.000    2018-02-28
+        - New feature for SQLite: Attach database.
+        - New option: "quote identifiers".
+        - New option: "qualified table names".
+        - Database Plugins: backward incompatible changes.
+        - Bugfixes and Improvements.
+        - Code refactoring
+        - Update documentation.
+        - Minimum version "Term::TablePrint" is "0.064".
+        - Minimum version "Term::Choose" is "1.512".
+        - Minimum version "Term::Choose::Util" is "0.056".
+        - Minimum version "Term::Form" is "0.313".
+
+1.060_06    2018-02-26
+        - Developer release
+
+1.060_05    2018-02-25
+        - Developer release
+
+1.060_04    2018-02-23
+        - Developer release
+
+1.060_03    2018-02-22
+        - Developer release
+
+1.060_02    2018-02-20
+        - Developer release
+
+1.060_01    2018-02-18
+        - Developer release
+
+1.059   2018-01-25
+        - Bugfix: set_insert back to config_insert.
+
 1.058   2018-01-22
         - No "Auto Limit" when showing the table before drop table.
 

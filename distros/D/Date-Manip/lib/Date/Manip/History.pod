@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2017 Sullivan Beck. All rights reserved.
+# Copyright (c) 2015-2018 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -121,11 +121,10 @@ This period featured 13 releases (6.00 to 6.14) with an additional
 
 =item Active maintenance (2010-present)
 
-Although primarily in maintenance mode (due to the fact
-that Date::Manip does pretty much everything that it was designed to do),
-active maintenance continues.  There is also some development and
-a large number of significant improvements have been made in this
-period.
+Although primarily in maintenance mode (due to the fact that it does
+pretty much everything that it was designed to do), active maintenance
+continues.  There is also some development and a large number of
+significant improvements have been made in this period.
 
 I make regular releases to update the timezone information, fix bugs,
 and add the occasional new features.
@@ -133,8 +132,7 @@ and add the occasional new features.
 For the foreseeable future, Date::Manip will remain active, and fully
 capable of handling any common date operation.
 
-Since 6.14, there have been 36 releases to date (6.20 to 6.59) which is
-averaging about 5 releases per year.
+Since 6.14, there have been an average of about 5 releases per year.
 
 =back
 
@@ -144,7 +142,7 @@ I was curious to see how many other modules are out there that have
 survived as long as Date::Manip.
 
 The first public release of Date::Manip (though it was not a module
-yet of course) was version 4.0 on 13-Aug-1995.  The first public
+at that point) was version 4.0 on 13-Aug-1995.  The first public
 release to CPAN was version 4.2 released on 23-Oct-1995.
 
 I got a list of all CPAN modules from the wayback machine for 2000

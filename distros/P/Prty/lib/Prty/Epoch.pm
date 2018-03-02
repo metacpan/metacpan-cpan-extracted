@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Time::HiRes ();
 use POSIX ();
@@ -135,7 +135,7 @@ sub as {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

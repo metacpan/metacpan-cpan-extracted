@@ -1,5 +1,9 @@
 Revision history for Perl module RT::Client::REST
 
+0.51	Tue Feb 27 2017 "Dmitri Tikhonov" <dmitri@cpan.org>
+  - Add method to retrieve attachment metadata. Thanks Oriol Soriano.
+  - Fix filename parsing bug in get_attachment_ids(). Thanks djstauffer.
+
 0.50	Fri Dec 11 2015 "Sarvesh Das" <sarveshd@opmbx.org>
   - Added the 'disabled' attribute to RT::Client::REST::Group and
     RT::Client::REST::Queue to match the addition in RT 4.2.2 --

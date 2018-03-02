@@ -49,7 +49,7 @@ my %WriteMakefile = (
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
 	'VERSION_FROM'  => $main_file,
-	'LICENSE'       => 'perl',
+	'LICENSE'       => 'artistic2',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
 
 	'EXE_FILES'    =>  [ 'script/release' ],
@@ -65,12 +65,16 @@ my %WriteMakefile = (
 	'PREREQ_PM'    => {
 		'CACertOrg::CA'         => '0',
 		'ConfigReader::Simple'  => '0',
+		'DateTime'              => '0',
 		'IO::Null'              => '0',
 		'Mojolicious'           => '4.50',
+		'Term::ReadKey'         => '0',
 		'URI'                   => '0',
 		},
 
 	'TEST_REQUIRES' => {
+ 		'Capture::Tiny'         => '0',
+		'File::Temp'            => '0',
 		'Test::More'            => '1',
 		'Test::Output'          => '0',
 		'Test::Without::Module' => '0',

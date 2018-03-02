@@ -1,31 +1,31 @@
 ---
-abstract: 'A FTP over SSL/TLS class'
+abstract: 'A FTP over TLS/SSL class'
 author:
   - 'Curtis Leach <cleach at cpan dot org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.120351'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-FTPSSL
 no_index:
   directory:
     - t
     - inc
 requires:
-  File::Basename: 0
-  File::Copy: 0
-  IO::Socket::INET: 0
-  IO::Socket::SSL: 1.26
-  Net::HTTPTunnel: 0.5
-  Net::SSLeay: 0
-  Net::SSLeay::Handle: 0
-  Sys::Hostname: 0
-  Time::Local: 0
-  perl: 5.006001
-version: 0.39
+  File::Basename: '0'
+  File::Copy: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::SSL: '1.26'
+  Net::HTTPTunnel: '0.5'
+  Net::SSLeay: '0'
+  Net::SSLeay::Handle: '0'
+  Sys::Hostname: '0'
+  Time::Local: '0'
+  perl: '5.006001'
+version: '0.40'

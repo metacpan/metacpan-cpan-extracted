@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.5.0';
+$Git::Hooks::CheckAcls::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -122,10 +122,12 @@ sub check_affected_refs {
     return 1;
 }
 
-# Install hooks
-UPDATE      \&check_affected_refs;
-PRE_RECEIVE \&check_affected_refs;
-REF_UPDATE  \&check_affected_refs;
+INIT: {
+    # Install hooks
+    UPDATE      \&check_affected_refs;
+    PRE_RECEIVE \&check_affected_refs;
+    REF_UPDATE  \&check_affected_refs;
+}
 
 1;
 
@@ -141,7 +143,7 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 

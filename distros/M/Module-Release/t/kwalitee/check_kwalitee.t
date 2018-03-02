@@ -3,13 +3,20 @@ use strict;
 use warnings;
 
 BEGIN {
-use Test::More;
-eval "use  Module::CPANTS::Analyse";
-my $at = $@;
-plan $at ? 
-	( 'skip_all', 'You need  Module::CPANTS::Analyse to check Kwalitee' ) 
-	: 
-	'no_plan';
+use Test::More 1.0;
+eval "use Module::CPANTS::Analyse";
+my $at = !! $@;
+
+eval "use App::CPANTS::Lint";
+$at += !! $@;
+
+if( $at ) {
+	plan 'skip_all', 'You need Module::CPANTS::Analyse and App::CPANTS::Lint to check Kwalitee';
+	exit;
+	}
+else {
+	plan 'no_plan';
+	}
 }
 
 use Test::Output;
@@ -24,7 +31,7 @@ can_ok( $class, 'new' );
 
 BEGIN {
 	use File::Spec;
-	my $file = File::Spec->catfile( qw(t lib setup_common.pl) );
+	my $file = File::Spec->catfile( qw(. t lib setup_common.pl) );
 	require $file;
 	}
 
@@ -41,10 +48,10 @@ isa_ok( $release, $class );
 # Create test object
 ok( ! $release->can( 'check_kwalitee' ), 'check_kwalitee not loaded yet' );
 
-ok( 
-	$release->load_mixin( 'Module::Release::Kwalitee' ), 
-	"Loaded Kwalitee mixin" 
-	);
+ok(
+	$release->load_mixin( 'Module::Release::Kwalitee' ),
+	"Loaded Kwalitee mixin"
+	) or BAIL_OUT( "Couldn't load the Module::Release::Kwalitee. Giving up hope." );
 
 can_ok( $release, @subs );
 
@@ -106,3 +113,4 @@ ok( defined $at, "check_kwalitee dies when kwalitee doesn't pass" );
 like( $at, qr/suck/, "CPANTS reports that I suck" );
 }
 
+done_testing();

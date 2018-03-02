@@ -14,11 +14,11 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'        => '0',
-        'Math::BigInt::GMP' => '0',
+        'Math::BigInt::GMP' => '1.6',
         'Math::BigInt'      => '1.999810',
     },
     requires => {
-        'Math::BigInt::GMP' => '0',
+        'Math::BigInt::GMP' => '1.6',
         'Math::BigInt'      => '1.999810',
         'Modern::Perl'     => '0',
         'Mojo::Base'       => '0',

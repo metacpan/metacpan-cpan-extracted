@@ -19,8 +19,6 @@ prereqs:
 plugins:
  - +config: Author::CSSON
 
- - +remove_plugin: Test::Kwalitee::Extra
-
 ---
 doctype: weaver
 

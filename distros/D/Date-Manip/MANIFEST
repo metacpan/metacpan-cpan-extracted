@@ -535,6 +535,9 @@ lib/Date/Manip/Offset/off433.pm
 lib/Date/Manip/Offset/off434.pm
 lib/Date/Manip/Offset/off435.pm
 lib/Date/Manip/Offset/off436.pm
+lib/Date/Manip/Offset/off437.pm
+lib/Date/Manip/Offset/off438.pm
+lib/Date/Manip/Offset/off439.pm
 lib/Date/Manip/Problems.pod
 lib/Date/Manip/Recur.pm
 lib/Date/Manip/Recur.pod
@@ -550,12 +553,14 @@ lib/Date/Manip/TZ/afcasa00.pm
 lib/Date/Manip/TZ/afceut00.pm
 lib/Date/Manip/TZ/afel_a00.pm
 lib/Date/Manip/TZ/afjoha00.pm
+lib/Date/Manip/TZ/afjuba00.pm
 lib/Date/Manip/TZ/afkhar00.pm
 lib/Date/Manip/TZ/aflago00.pm
 lib/Date/Manip/TZ/afmapu00.pm
 lib/Date/Manip/TZ/afmonr00.pm
 lib/Date/Manip/TZ/afnair00.pm
 lib/Date/Manip/TZ/afndja00.pm
+lib/Date/Manip/TZ/afsao_00.pm
 lib/Date/Manip/TZ/aftrip00.pm
 lib/Date/Manip/TZ/aftuni00.pm
 lib/Date/Manip/TZ/afwind00.pm
@@ -1070,7 +1075,7 @@ t/date.week_of_year.1.t
 t/delta.calc.delta_delta_approx.t
 t/delta.calc.delta_delta_business.0.t
 t/delta.calc.delta_delta_business.1.t
-t/delta.calc.delta_delta_exact.t
+t/delta.calc.delta_delta_semi.t
 t/delta.cmp.t
 t/delta.convert.t
 t/delta.init_args.t
@@ -1078,7 +1083,9 @@ t/delta.is.t
 t/delta.parse.fract.t
 t/delta.parse.t
 t/delta.printf.t
-t/delta.set.t
+t/delta.set.1.t
+t/delta.set.2.t
+t/delta.set.3.t
 t/delta.type.t
 t/delta.value.t
 t/dm5.convtz.t

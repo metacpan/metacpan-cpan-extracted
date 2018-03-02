@@ -4,10 +4,13 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
-use Prty::Perl;
+use Prty::Option;
+use Prty::Reference;
 use Prty::Path;
+use Prty::Unindent;
+use Prty::Perl;
 use Prty::Process;
 
 # -----------------------------------------------------------------------------
@@ -82,10 +85,21 @@ Verzeichnis über einen Dienst wie FTP:
 
 =head4 Synopsis
 
-    [1] $cfg = $class->new($file);
-    [2] $cfg = $class->new(\@dirs,$file);
+    [1] $cfg = $class->new($file,@opt);
+    [2] $cfg = $class->new(\@dirs,$file,@opt);
     [3] $cfg = $class->new($str);
     [4] $cfg = $class->new(@keyVal);
+
+=head4 Options
+
+=over 4
+
+=item -create => $text
+
+Falls die Konfigurationsdatei nicht existert, erzeuge sie mit
+dem Inhalt $text.
+
+=back
 
 =head4 Description
 
@@ -113,6 +127,16 @@ sub new {
     my $class = shift;
     # @_: $file -or- \@dirs,$file -or- $str
 
+    # Optionen
+
+    my $create = undef;
+
+    Prty::Option->extract(\@_,
+        -create => \$create,
+    );
+
+    # Operation ausführen
+
     my %cfg;
     if (@_ == 1 && $_[0] =~ /=>/) { # "$key => $val, ..."
         %cfg = eval shift;
@@ -121,10 +145,12 @@ sub new {
         %cfg = @_;
     }
     else {
-        # Parameter
+        # $file -or- \@dirs,$file
+
+        # Datei suchen
 
         my $dirA;
-        if (Prty::Perl->isArrayRef($_[0])) { # \@dirs
+        if (Prty::Reference->isArrayRef($_[0])) { # \@dirs
             $dirA = shift;
         }
         my $cfgFile = Prty::Path->expandTilde(shift);
@@ -151,9 +177,15 @@ sub new {
         }
     
         if (!-e $cfgFile) {
-            $class->throw(q~CFG-00002: Konfigurationsdatei nicht gefunden~,
-                ConfigFile=>$cfgFile,
-            );
+            if (defined $create) {
+                $create = Prty::Unindent->trimNl($create);
+                Prty::Path->write($cfgFile,$create,-recursive=>1);
+            }
+            else {
+                $class->throw(q~CFG-00002: Config file not found~,
+                    ConfigFile=>$cfgFile,
+                );
+            }
         }
 
         %cfg = Prty::Perl->perlDoFile($cfgFile);
@@ -254,7 +286,7 @@ sub try {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

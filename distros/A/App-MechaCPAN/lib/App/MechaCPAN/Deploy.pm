@@ -140,8 +140,11 @@ sub go
       {
         if ( exists $srcs{$provide} )
         {
-          die
-            "Found dumplicate distributions ($src and $srcs{$provide}) that provides the same module ($provide)\n";
+          error "Found duplicate distribution for $provide in $file.snapshot";
+          info "  $src and $srcs{$provide} both provide the same module";
+          info "  This will cause an error if it is used as a dependency";
+          $srcs{$provide} = undef;
+          next;
         }
         $srcs{$provide} = $src;
       }

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::File::Video;
 use POSIX ();
@@ -46,6 +46,7 @@ Methoden Methoden befinden sich im Abschnitt L</"Klassenmethoden (vollständige 
 =head4 Synopsis
 
     $cmd = $class->new;
+    $cmd = $class->new($str);
 
 =head4 Description
 
@@ -57,10 +58,10 @@ dieses Objekt zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my $class = shift;
+    my ($class,$str) = @_;
 
     return $class->SUPER::new(
-        cmd=>'',
+        cmd=>$str // '',
         inputA=>[],
         inputObjectA=>[],
         outputA=>[],
@@ -882,6 +883,10 @@ ffmpeg die Größe der Bilder.
 
 Video-Bitrate in kbit/s.
 
+=item -videoFilter => $filter
+
+Optionale Filterangabe. Z.B. -videoFilter => 'lutyuv=y=val*1.4,hue=s=10'
+
 =item -videoFramerate => $n (Default: 24)
 
 Framerate des Video.
@@ -910,8 +915,9 @@ sub imagesToVideo {
     my $play = 0;
     my $preset = undef;
     my $size = undef;
-    my $videoFramerate = 24;
     my $videoBitrate = 60_000;
+    my $videoFilter = undef;
+    my $videoFramerate = 24;
 
     Prty::Option->extract(\@_,
         -audio=>\$audio,
@@ -922,6 +928,7 @@ sub imagesToVideo {
         -preset=>\$preset,
         -size=>\$size,
         -videoBitrate=>\$videoBitrate,
+        -videoFilter=>\$videoFilter,
         -videoFramerate=>\$videoFramerate,
     );
     if (@_ == 0 || @_ > 2) {
@@ -933,7 +940,7 @@ sub imagesToVideo {
     # Operation ausführen
 
     # * Command-Objekt instantiieren    
-    my $self = $class->new;
+    my $self = $class->new('ffmpeg -y');
     
     # * Input
 
@@ -961,12 +968,18 @@ sub imagesToVideo {
     # ** scale
 
     push @filter,$self->scaleFilter($size);
-    if ($play) {
+    if ($play && !$size) {
         push @filter,$self->scaleFilter('720*a',720);
     }
 
     # ** YUV color space (laut ffmpeg-Doku aus Kompatibilitätsgründen nötig)
     push @filter,'format=yuv420p';
+
+    # ** Optionale Video-Filter
+
+    if ($videoFilter) {
+        push @filter,$videoFilter;
+    }
 
     $self->addFilter(-vf=>\@filter,',');
 
@@ -989,10 +1002,15 @@ sub imagesToVideo {
     # * Output
 
     if ($play) {
-        $self->prependString($play == 1? 'ffplay -autoexit': 'ffplay');
+        $self->addOption(-f=>'avi');
+        if ($play == 1) {
+            $self->addString('- 2>/dev/null | ffplay -autoexit - 2>/dev/null');
+        }
+        else {
+            $self->addString('- 2>/dev/null | ffplay - 2>/dev/null');
+        }
     }
     else {
-        $self->prependString('ffmpeg -y');
         $self->addOutput($output);
     }
              
@@ -1503,7 +1521,7 @@ sub execute {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

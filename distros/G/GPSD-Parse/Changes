@@ -1,5 +1,10 @@
 Revision history for GPSD-Parse
 
+1.02    2018-02-28
+        - added convenience methods lon(), lat(), alt(), climb(), speed() and
+          track(). This alleviates a user from having to expand the indivitual
+          statistic from tpv()
+
 1.01    2017-05-26
         - slight code cleanup
         - POD fixes

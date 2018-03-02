@@ -2,7 +2,7 @@
 # `make test'. After `make install' it should work as `perl 1.t'
 
 
-use Test::More tests => 19;
+use Test::More tests => 32;
 BEGIN { use_ok('Script::Toolbox') };
 
 #########################
@@ -24,6 +24,22 @@ foreach my $x ( keys %{$d} )
 }
 
 ############################### TEST 3-15 #####################################
+$d = $F->Stat('./t/');
+ok( $d->{'10_Stat.t'}{atime} 	>  0 );
+ok( $d->{'10_Stat.t'}{blksize} 	>  0 );
+ok( $d->{'10_Stat.t'}{blocks} 	>  0 );
+ok( $d->{'10_Stat.t'}{ctime} 	>  0 );
+ok( $d->{'10_Stat.t'}{dev} 		>  0 );
+ok( $d->{'10_Stat.t'}{gid} 		>= 0 );
+ok( $d->{'10_Stat.t'}{ino} 		>  0 );
+ok( $d->{'10_Stat.t'}{mode} 	>  0 );
+ok( $d->{'10_Stat.t'}{mtime} 	>  0 );
+ok( $d->{'10_Stat.t'}{nlink} 	>  0 );
+ok( $d->{'10_Stat.t'}{rdev} 	>= 0 );
+ok( $d->{'10_Stat.t'}{size} 	>  0 );
+ok( $d->{'10_Stat.t'}{uid} 		>= 0 );
+
+############################### TEST 16-28 #####################################
 $d = $F->Stat('./t/','10_Stat.t');
 ok( $d->{'10_Stat.t'}{atime} 	>  0 );
 ok( $d->{'10_Stat.t'}{blksize} 	>  0 );
@@ -39,8 +55,7 @@ ok( $d->{'10_Stat.t'}{rdev} 	>= 0 );
 ok( $d->{'10_Stat.t'}{size} 	>  0 );
 ok( $d->{'10_Stat.t'}{uid} 		>= 0 );
 
-
-############################### TEST 16-17 #####################################
+############################### TEST 29-30 #####################################
 $F->File("> /tmp/__KEY__", "a,b,AAA\n");
 $F->File("/tmp/__KEY__",   "a,c,BBB\n");
 

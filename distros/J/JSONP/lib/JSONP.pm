@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.82';
+our $VERSION = '1.83';
 
 =encoding utf8
 
@@ -751,7 +751,7 @@ sub serialize
 	my $out;
 	my $pretty = reftype $self eq 'HASH' && $self->{_pretty} ? 1 : 0;
 	eval{
-		$out = JSON->new->ascii->pretty($pretty)->allow_blessed->convert_blessed->encode($self);
+		$out = JSON->new->pretty($pretty)->convert_blessed->encode($self);
 	} || $@;
 }
 

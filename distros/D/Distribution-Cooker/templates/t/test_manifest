@@ -1,4 +1,3 @@
-# $Id$
 load.t
 pod.t
 pod_coverage.t

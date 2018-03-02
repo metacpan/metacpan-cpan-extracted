@@ -3,15 +3,12 @@
 Business::Monzo - Perl library for interacting with the Monzo API
 (https://api.monzo.com)
 
-<div>
-
-    <a href='https://travis-ci.org/leejo/business-monzo?branch=master'><img src='https://travis-ci.org/leejo/business-monzo.svg?branch=master' alt='Build Status' /></a>
-    <a href='https://coveralls.io/r/leejo/business-monzo?branch=master'><img src='https://coveralls.io/repos/leejo/business-monzo/badge.png?branch=master' alt='Coverage Status' /></a>
-</div>
+[![Build Status](https://travis-ci.org/leejo/business-monzo.svg?branch=master)](https://travis-ci.org/leejo/business-monzo?branch=master)
+[![Coverage Status](https://coveralls.io/repos/leejo/business-monzo/badge.png?branch=master)](https://coveralls.io/r/leejo/business-monzo?branch=master)
 
 # VERSION
 
-0.08
+0.12
 
 # DESCRIPTION
 
@@ -78,6 +75,9 @@ will, for the most part, return new instances of objects.
         $Webhook->delete
     }
 
+    # pots
+    my @pots = $monzo->pots();
+
     # attachments
     my $Attachment = $monzo->upload_attachment(
         file_name => 'foo.png',
@@ -107,10 +107,10 @@ appropriate error catching code (ideally a module from CPAN):
         say $e->response; # HTTP status message
 
         # ->request may not always be present
-        say $e->request->{path}    if $e->request
-        say $e->request->{params}  if $e->request
-        say $e->request->{headers} if $e->request
-        say $e->request->{content} if $e->request
+        say $e->request->{path}    if $e->request;
+        say $e->request->{params}  if $e->request;
+        say $e->request->{headers} if $e->request;
+        say $e->request->{content} if $e->request;
     }
     catch ( $e ) {
         # some other failure?
@@ -172,16 +172,52 @@ Get a transaction. Will return a [Business::Monzo::Transaction](https://metacpan
 
 ## accounts
 
-    $monzo->accounts;
+    $monzo->accounts;                                   # all accounts
+    $monzo->accounts( account_type => "uk_prepaid" );   # prepaid accounts
+    $monzo->accounts( account_type => "uk_retail" );    # current accounts
 
 Get a list of accounts. Will return a list of [Business::Monzo::Account](https://metacpan.org/pod/Business::Monzo::Account)
 objects
+
+## pots
+
+    $monzo->pots;
+
+Get a list of pots. Will return a list of [Business::Monzo::Pot](https://metacpan.org/pod/Business::Monzo::Pot)
+objects
+
+# PAGINATION
+
+As per the Monzo docs: [https://monzo.com/docs/#pagination](https://monzo.com/docs/#pagination) - you can pass
+through arguments to the methods (e.g. `transactions`) to limit the return
+data or set date ranges, etc:
+
+    # last three months transactions, but only show 5
+    my $since = DateTime->now->subtract( months => 3 )->iso8601 . "Z";
+    my $limit = 5;
+
+    foreach my $transaction (
+        $monzo->transactions(
+            account_id => $account_id,
+            limit      => $limit,
+            since      => $since,
+        )
+    {
+        ...
+    }
+
+The supported pagination keys are `limit`, `since`, and `before` - where
+`since` can be an RFC 3339-encoded timestamp or an object id, and `before`
+can be an RFC 3339-encoded timestamp. `limit` should always be an integer.
 
 # EXAMPLES
 
 See the t/002\_end\_to\_end.t test included with this distribution. you can run
 this test against the Monzo emulator by running end\_to\_end\_emulated.sh (this
 is advised, don't run it against a live endpoint).
+
+You can also see the scripts in the bin/ directory included in this dist for
+more examples.
 
 # SEE ALSO
 
@@ -198,6 +234,12 @@ is advised, don't run it against a live endpoint).
 # AUTHOR
 
 Lee Johnson - `leejo@cpan.org`
+
+With contributions from:
+
+    Chris Merry
+    Aaron Moses
+    Dave Cross
 
 # LICENSE
 

@@ -50,6 +50,7 @@
             "Sys::Hostname" : "0",
             "Test::More" : "0.88",
             "constant" : "0",
+            "integer" : "0",
             "lib" : "0"
          }
       }
@@ -57,7 +58,7 @@
    "provides" : {
       "DateTime::TimeZone::Local::Win32" : {
          "file" : "lib/DateTime/TimeZone/Local/Win32.pm",
-         "version" : "1.99"
+         "version" : "2.00"
       }
    },
    "release_status" : "stable",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/dapink/DateTime-TimeZone-Local-Win32"
       }
    },
-   "version" : "1.99",
+   "version" : "2.00",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"

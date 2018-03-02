@@ -68,11 +68,38 @@ is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->a
 TestBot->expect(
     join( ' ',
         '#test Test User',
+        'pipeline',
         'test-repo',
         '42',
-        '* Pipeline #42 finished in 1 hour, 1 minute and 5 seconds. Status: success',
+        '* [1 hour, 1 minute and 5 seconds] success',
     )
 );
+
+$resp = webhook_post(
+    {   object_kind => 'pipeline',
+        user        => { name => 'Test User' },
+        project     => { name => 'test-rep', },
+        object_attributes =>
+            { id => 43, status => 'success', duration => 3666, },
+        builds => [
+            { name => 'staging',     status => 'created' },
+            { name => 'build-image', status => 'success' },
+        ],
+    }
+);
+
+is( $resp->code, 202, 'pipeline event response status is 202' ) or diag $resp->as_string;
+
+TestBot->expect(
+    join( ' ',
+        '#test Test User',
+        'pipeline',
+        'test-rep',
+        '43',
+        '* [1 hour, 1 minute and 6 seconds] success (staging: created; build-image: success)',
+    )
+);
+
 
 diag `cat t/bot/kgb-bot.log`;
 

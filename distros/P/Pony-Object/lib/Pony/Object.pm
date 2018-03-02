@@ -12,7 +12,7 @@ package Pony::Object {
   BEGIN {
     if (DEBUG) {
       say STDERR "\n[!] Pony::Object DEBUGing mode is turning on!\n";
-      
+
       *{dumper} = sub {
         use Data::Dumper;
         $Data::Dumper::Indent = 1;
@@ -22,7 +22,7 @@ package Pony::Object {
     }
   }
 
-  our $VERSION = "1.02";
+  our $VERSION = "1.04";
 
   # Var: $DEFAULT
   #   Use it to redefine default Pony's options.
@@ -39,55 +39,55 @@ package Pony::Object {
   #   makes caller more strict and modern,
   #   create from simple package almost normal class.
   #   Also it provides some useful methods.
-  #   
+  #
   #   Don't forget: it's still OOP with blessed refs,
   #   but now it looks better - more sugar for your code.
   sub import {
     my $this = shift;
     my $call = caller;
-    
+
     # Modify caller just once.
     # We suppose, that only we can create function ALL.
     return if defined *{$call.'::ALL'};
-    
+
     # Parse parameters.
     my $default = dclone $DEFAULT;
     my $profile;
-    
+
     # Get predefined params.
     for my $prefix (sort {length $b <=> length $a} keys %$DEFAULT) {
       if ($call =~ /^$prefix/) {
         my @doesnt_exist = grep {
           not exists $profile->{$_}
         } keys %{ $default->{$prefix} };
-        
+
         $profile->{$_} = $default->{$prefix}->{$_} for @doesnt_exist;
         next;
       }
-      
+
       last if keys %{$default->{''}} == keys %{$default->{$call}};
     }
-    
+
     $profile->{isAbstract} = 0; # don't do default object abstract.
     $profile->{isSingleton} = 0; # don't do default object singleton.
     $profile = parseParams($call, $profile, @_);
-    
+
     # Keywords, base methods, attributes.
     predefine($call, $profile);
-    
+
     # Pony objects must be strict and modern.
     strict  ->import;
     warnings->import;
     feature ->import(':5.10');
     feature ->import('signatures') if $] >= 5.020;
-    
+
     unless ($profile->{noObject}) {
       # Base classes and params.
       prepareClass($call, "${call}::ISA", $profile);
-      
+
       methodsInheritance($call);
       propertiesInheritance($call);
-      
+
       *{$call.'::new'} = sub { importNew($call, @_) };
     }
   }
@@ -102,30 +102,30 @@ package Pony::Object {
   #   self
   sub importNew {
     my $call = shift;
-    
+
     if ($call->META->{isAbstract}) {
       confess "Trying to use an abstract class $call";
     } else {
       $call->AFTER_LOAD_CHECK;
     }
-    
+
     # For singletons.
     return ${$call.'::instance'} if defined ${$call.'::instance'};
-    
+
     my $this = shift;
     my $obj = dclone { %{${this}.'::ALL'} };
-    
+
     while (my ($k, $p) = each %{$this->META->{properties}}) {
       if (grep {$_ eq 'static'} @{$p->{access}}) {
         tie $obj->{$k}, 'Pony::Object::TieStatic',
           $call->META->{static}, $k, $call->META->{static}->{$k} || $obj->{$k};
       }
     }
-    
+
     $this = bless $obj, $this;
-    
+
     ${$call.'::instance'} = $this if $call->META->{isSingleton};
-    
+
     # 'After hook' for user.
     $this->init(@_) if $call->can('init');
     return $this;
@@ -143,50 +143,50 @@ package Pony::Object {
   #   HashRef - $profile
   sub parseParams {
     my ($call, $profile, @params) = @_;
-    
+
     for my $param (@params) {
-      
+
       # Define singleton class.
       if ($param =~ /^-?singleton$/) {
         $profile->{isSingleton} = 1;
         next;
       }
-      
+
       # Define abstract class.
       elsif ($param =~ /^-?abstract$/) {
         $profile->{isAbstract} = 1;
         next;
       }
-      
+
       # Features:
-      
+
       # Use exceptions featureset.
       elsif ($param =~ /^:exceptions?$/ || $param =~ /^:try$/) {
         $profile->{withExceptions} = 1;
         next;
       }
-      
+
       # Don't use exceptions featureset.
       elsif ($param =~ /^:noexceptions?$/ || $param =~ /^:notry$/) {
         $profile->{withExceptions} = 0;
         next;
       }
-      
+
       # Don't create an object.
       # Just make package strict modern and add some staff.
       elsif ($param =~ /^:noobject$/) {
         $profile->{noObject} = 1;
         next;
       }
-      
+
       # Base classes:
-      
+
       # Save class' base classes.
       else {
         push @{$profile->{baseClass}}, $param;
       }
     }
-    
+
     return $profile;
   }
 
@@ -219,7 +219,7 @@ package Pony::Object {
   #   $profile - HashRef
   sub predefine {
     my ($call, $profile) = @_;
-    
+
     # Only for objects.
     unless ($profile->{noObject}) {
       # Predefine ALL and META.
@@ -233,14 +233,14 @@ package Pony::Object {
       ${$call.'::META'}{symcache}   = {};
       ${$call.'::META'}{checked}    = 0;
       ${$call.'::META'}{static}     = {};
-      
+
       # Access for properties.
       *{$call.'::has'}      = sub { addProperty ($call, @_) };
       *{$call.'::static'}   = sub { addStatic   ($call, @_) };
       *{$call.'::public'}   = sub { addPublic   ($call, @_) };
       *{$call.'::private'}  = sub { addPrivate  ($call, @_) };
       *{$call.'::protected'}= sub { addProtected($call, @_) };
-      
+
       # Convert object's data into hash.
       # Uses ALL() to get properties' list.
       *{$call.'::toHash'} = *{$call.'::to_h'} = sub {
@@ -248,19 +248,19 @@ package Pony::Object {
         my %hash = map { $_, $this->{$_} } keys %{ $this->ALL() };
         return \%hash;
       };
-      
+
       *{$call.'::AFTER_LOAD_CHECK'} = sub { checkImplementations($call) };
-      
+
       # Save method's attributes.
       *{$call.'::MODIFY_CODE_ATTRIBUTES'} = sub {
         my ($pkg, $ref, @attrs) = @_;
         my $sym = findsym($pkg, $ref);
-        
+
         $call->META->{methods}->{ *{$sym}{NAME} } = {
           attributes => \@attrs,
           package => $pkg
         };
-        
+
         for my $attr (@attrs) {
           if    ($attr eq 'Public'   ) { makePublic   ($pkg, $sym, $ref) }
           elsif ($attr eq 'Protected') { makeProtected($pkg, $sym, $ref) }
@@ -269,19 +269,19 @@ package Pony::Object {
         }
         return;
       };
-      
+
       # Getters for REFs to special variables %ALL and %META.
       *{$call.'::ALL'}  = sub { \%{ $call.'::ALL' } };
       *{$call.'::META'} = sub { \%{ $call.'::META'} };
     }
-    
+
     # Try, Catch, Finally.
     # Define them if user wants.
     if ($profile->{withExceptions}) {
       *{$call.'::try'} = sub (&;@) {
         my($try, $catch, $finally) = @_;
         local $@;
-        
+
         # If some one wanna to get some
         # values from try/catch/finally blocks.
         if (defined wantarray) {
@@ -307,11 +307,11 @@ package Pony::Object {
       *{$call.'::catch'} = sub (&;@) { @_ };
       *{$call.'::finally'} = sub (&) { @_ };
     }
-    
+
     # This method provides deep copy
     # for Pony::Objects
     *{$call.'::clone'}  = sub { dclone shift };
-    
+
     # Simple Data::Dumper wrapper.
     *{$call.'::dump'} = sub {
       use Data::Dumper;
@@ -327,17 +327,17 @@ package Pony::Object {
   #   $this - Str - caller package.
   sub methodsInheritance {
     my $this = shift;
-    
+
     for my $base ( @{$this.'::ISA'} ) {
       # All Pony-like classes.
       if ($base->can('META')) {
         my $methods = $base->META->{methods};
-        
+
         while (my($k, $v) = each %$methods) {
           $this->META->{methods}->{$k} = $v
             unless exists $this->META->{methods}->{$k};
         }
-        
+
         # Abstract classes.
         if ($base->META->{isAbstract}) {
           my $abstracts = $base->META->{abstracts};
@@ -355,16 +355,16 @@ package Pony::Object {
   #   $this - Str - caller package.
   sub checkImplementations {
     my $this = shift;
-    
+
     return if $this->META->{checked};
     $this->META->{checked} = 1;
-    
+
     # Check: does all abstract methods implemented.
     for my $base (@{$this.'::ISA'}) {
       if ( $base->can('META') && $base->META->{isAbstract} ) {
         my $methods = $base->META->{abstracts};
         my @bad;
-        
+
         # Find Abstract methods,
         # which was not implements.
         for my $method (@$methods) {
@@ -372,12 +372,12 @@ package Pony::Object {
           push @bad, $method
             if grep { $_ eq 'Abstract' }
               @{ $base->META->{methods}->{$method}->{attributes} };
-          
+
           # Get abstract methods,
           # which doesn't implement.
           @bad = grep { !exists $this->META->{methods}->{$_} } @bad;
         }
-        
+
         if (@bad) {
           my @messages = map
             {"Didn't find method ${this}::$_() defined in $base."}
@@ -398,7 +398,7 @@ package Pony::Object {
   #   $value - Mixed - default value of property.
   sub addProperty {
     my ($this, $attr, $value) = @_;
-    
+
     # Properties
     if (ref $value ne 'CODE') {
       if ($attr =~ /^__/) {
@@ -409,13 +409,13 @@ package Pony::Object {
         return addPublic(@_);
       }
     }
-    
+
     # Methods
     else {
       *{$this."::$attr"} = $value;
       my $sym = findsym($this, $value);
       my @attrs = qw/Public/;
-      
+
       if ($attr =~ /^__/) {
         @attrs = qw/Private/;
         return makePrivate($this, $sym, $value);
@@ -425,7 +425,7 @@ package Pony::Object {
       } else {
         return makePublic($this, $sym, $value);
       }
-      
+
       $this->META->{methods}->{ *{$sym}{NAME} } = {
         attributes => \@attrs,
         package => $this
@@ -464,19 +464,19 @@ package Pony::Object {
     my $access = shift;
     my $call = shift;
     my ($name, $value) = @_;
-    
+
     my $props = $call->META->{properties};
-    
+
     # Delete inhieritated properties for polymorphism.
     delete $call->META->{properties}->{$name} if
       exists $call->META->{properties}->{$name} &&
       $call->META->{properties}->{$name}->{package} ne $call;
-    
+
     # Create if doesn't exist
     %$props = (%$props, $name => {access => []}) if
       not exists $props->{$name} ||
       ( $props->{$name}->{package} && $props->{$name}->{package} ne $call );
-    
+
     push @{$props->{$name}->{access}}, $access;
     $props->{$name}->{package} = $call;
   }
@@ -493,7 +493,7 @@ package Pony::Object {
     my $call = shift;
     my ($name, $value) = @_;
     addPropertyToMeta('public', $call, @_);
-    
+
     # Save pair (property name => default value)
     %{ $call.'::ALL' } = ( %{ $call.'::ALL' }, $name => $value );
     *{$call."::$name"} = sub : lvalue { my $call = shift; $call->{$name} };
@@ -513,10 +513,10 @@ package Pony::Object {
     my $pkg = shift;
     my ($name, $value) = @_;
     addPropertyToMeta('protected', $pkg, @_);
-    
+
     # Save pair (property name => default value)
     %{$pkg.'::ALL'} = (%{$pkg.'::ALL'}, $name => $value);
-    
+
     *{$pkg."::$name"} = sub : lvalue {
       my $this = shift;
       my $call = caller;
@@ -540,10 +540,10 @@ package Pony::Object {
     my $pkg = shift;
     my ($name, $value) = @_;
     addPropertyToMeta('private', $pkg, @_);
-    
+
     # Save pair (property name => default value)
     %{ $pkg.'::ALL' } = ( %{ $pkg.'::ALL' }, $name => $value );
-    
+
     *{$pkg."::$name"} = sub : lvalue {
       my $this = shift;
       my $call = caller;
@@ -566,9 +566,9 @@ package Pony::Object {
   sub makeProtected {
     my ($pkg, $symbol, $ref) = @_;
     my $method = *{$symbol}{NAME};
-    
+
     no warnings 'redefine';
-    
+
     *{$symbol} = sub {
       my $this = $_[0];
       my $call = caller;
@@ -590,9 +590,9 @@ package Pony::Object {
   sub makePrivate {
     my ($pkg, $symbol, $ref) = @_;
     my $method = *{$symbol}{NAME};
-    
+
     no warnings 'redefine';
-    
+
     *{$symbol} = sub {
       my $this = $_[0];
       my $call = caller;
@@ -628,18 +628,18 @@ package Pony::Object {
   sub makeAbstract {
     my ($pkg, $symbol, $ref) = @_;
     my $method = *{$symbol}{NAME};
-    
+
     # Can't define abstract method
     # in none-abstract class.
     confess "Abstract ${pkg}::$method() defined in non-abstract class"
       unless $pkg->META->{isAbstract};
-    
+
     # Push abstract method
     # into object meta.
     push @{ $pkg->META->{abstracts} }, $method;
-    
+
     no warnings 'redefine';
-    
+
     # Can't call abstract method.
     *{$symbol} = sub { confess "Abstract ${pkg}::$method() called" };
   }
@@ -657,7 +657,7 @@ package Pony::Object {
     my @classes = @{ $this.'::ISA' };
     my @base;
     my %props;
-    
+
     # Get all parent's properties
     while (@classes) {
       my $c = pop @classes;
@@ -666,7 +666,7 @@ package Pony::Object {
       push @base, $c;
       push @classes, @{$c.'::ISA'};
     }
-    
+
     for my $base (reverse @base) {
       if ($base->can('ALL')) {
         # Default values
@@ -700,14 +700,14 @@ package Pony::Object {
   sub findsym {
     my ($pkg, $ref) = @_;
     my $symcache = $pkg->META->{symcache};
-    
+
     return $symcache->{$pkg, $ref} if $symcache->{$pkg, $ref};
-    
+
     my $type = 'CODE';
-    
+
     for my $sym (values %{$pkg."::"}) {
       next unless ref ( \$sym ) eq 'GLOB';
-      
+
       return $symcache->{$pkg, $ref} = \$sym
         if *{$sym}{$type} && *{$sym}{$type} == $ref;
     }
@@ -781,12 +781,12 @@ may use Pony::Object. Also Pony::Objects are strict and modern.
   package MyArticle {
     use Pony::Object qw(-abstract :exceptions);
     use MyArticle::Exception::IO; # Based on Pony::Object::Throwable class.
-    
+
     protected date => undef;
     protected authors => [];
     public title => '';
     public text => '';
-    
+
     # Function: init
     #   Constructor.
     #
@@ -796,7 +796,7 @@ may use Pony::Object. Also Pony::Objects are strict and modern.
     sub init : Public($this) {
       ($this->date, $this->authors) = @_;
     }
-    
+
     # Function: getDate
     #   Get formatted date.
     #
@@ -805,7 +805,7 @@ may use Pony::Object. Also Pony::Objects are strict and modern.
     sub getDate : Public($this) {
       return $this->dateFormat($this->date);
     }
-    
+
     # Function: dateFormat
     #   Convert Unix time to good looking string. Not implemented.
     #
@@ -815,7 +815,7 @@ may use Pony::Object. Also Pony::Objects are strict and modern.
     # Returns:
     #   String
     sub dateFormat : Abstract;
-    
+
     # Function: from_pdf
     #   Trying to create article from pdf file.
     #
@@ -825,20 +825,20 @@ may use Pony::Object. Also Pony::Objects are strict and modern.
       try {
         open F, $file or
           throw MyArticle::Exception::IO(action => "read", file => $file);
-        
+
         # do smth
-        
+
         close F;
       } catch {
         my $e = shift; # get exception object
-        
+
         if ($e->isa('MyArticle::Exception::IO')) {
           # handler for MyArticle::Exception::IO exceptions
         }
       };
     }
   }
-  
+
   1;
 
 =head1 Methods and properties
@@ -849,18 +849,18 @@ Keyword C<has> declares new property. Also you can define methods via C<has>.
 
   package News;
   use Pony::Object;
-    
+
     # Properties:
     has 'title';
     has text => '';
     has authors => [ qw/Alice Bob/ ];
-    
+
     # Methods:
     has printTitle => sub {
       my $this = shift;
       say $this->title;
     };
-    
+
     sub printAuthors {
       my $this = shift;
       print @{$this->authors};
@@ -886,16 +886,16 @@ what you wish write in C<new>. C<init> is after-hook for C<new>.
 
   package News;
   use Pony::Object;
-    
+
     has title => undef;
     has lower => undef;
-    
+
     sub init {
       my $this = shift;
       $this->title = shift;
       $this->lower = lc $this->title;
     }
-    
+
   1;
 
   package main;
@@ -905,20 +905,20 @@ what you wish write in C<new>. C<init> is after-hook for C<new>.
 
 =head2 public, protected, private properties
 
-You can use C<has> keyword to define property. If your variable starts with "_", variable becomes 
+You can use C<has> keyword to define property. If your variable starts with "_", variable becomes
 protected. "__" for private.
 
   package News;
   use Pony::Object;
-  
+
     has text => '';
     has __authors => [ qw/Alice Bob/ ];
-    
+
     sub getAuthorString {
       my $this = shift;
       return join(' ', @{$this->__authors});
     }
-    
+
   1;
 
 
@@ -932,15 +932,15 @@ The same but with keywords C<public>, C<protected> and C<private>.
 
   package News;
   use Pony::Object;
-    
+
     public text => '';
     private authors => [ qw/Alice Bob/ ];
-    
+
     sub getAuthorString {
       my $this = shift;
       return join(' ', @{$this->authors});
     }
-    
+
   1;
 
 
@@ -956,23 +956,23 @@ Use attributes C<Public>, C<Private> and C<Protected> to define method's access 
 
   package News;
   use Pony::Object;
-    
+
     public text => '';
     private authors => [ qw/Alice Bob/ ];
-    
+
     sub getAuthorString : Public
       {
         return shift->joinAuthors(', ');
       }
-    
+
     sub joinAuthors : Private
       {
         my $this = shift;
         my $delim = shift;
-        
+
         return join( $delim, @{$this->authors} );
       }
-    
+
   1;
 
 
@@ -988,23 +988,23 @@ Just say "C<static>" and property will the same in all objects of class.
 
   package News;
   use Pony::Object;
-    
+
     public static 'default_publisher' => 'Georgy';
     public 'publisher';
-    
+
     sub init : Public
       {
         my $this = shift;
         $this->publisher = $this->default_publisher;
       }
-    
+
   1;
 
 
 
   package main;
   use News;
-  
+
   my $n1 = new News;
   $n1->default_publisher = 'Bazhukov';
   my $n2 = new News;
@@ -1019,10 +1019,10 @@ Get object's data structure and return this as a hash.
 
   package News;
   use Pony::Object;
-    
+
     has title => 'World';
     has text => 'Hello';
-    
+
   1;
 
 
@@ -1039,10 +1039,10 @@ Shows object's current struct.
 
   package News;
   use Pony::Object;
-    
+
     has title => 'World';
     has text => 'Hello';
-    
+
   1;
 
 
@@ -1066,10 +1066,10 @@ If you like functions C<say>, C<dump>, C<try>/C<catch>, you can use them without
 Use C<:noobject> option to enable them but do not create object/making class.
 
   use Pony::Object qw/:noobject :try/;
-  
+
   my $a = {deep => [{deep => ['structure']}]};
   say dump $a;
-  
+
   my $data = try {
     local $/;
     open my $fh, './some/file' or die;
@@ -1079,7 +1079,7 @@ Use C<:noobject> option to enable them but do not create object/making class.
   } catch {
     return '';
   };
-  
+
   say "\$data: $data";
 
 =head1 Classes
@@ -1091,16 +1091,16 @@ For example, C<use Pony::Object 'Base::Class';>
 
   package BaseCar;
   use Pony::Object;
-    
+
     public speed => 0;
     protected model => "Base Car";
-    
+
     sub get_status_line : Public {
       my $this = shift;
       my $status = ($this->speed ? "Moving" : "Stopped");
       return $this->model . " " . $status;
     }
-    
+
   1;
 
 
@@ -1108,15 +1108,15 @@ For example, C<use Pony::Object 'Base::Class';>
   package MyCar;
   # extends BaseCar
   use Pony::Object qw/BaseCar/;
-    
+
     protected model => "My Car";
     protected color => undef;
-    
+
     sub set_color : Public {
       my $this = shift;
       ($this->color) = @_;
     }
-    
+
   1;
 
 
@@ -1135,41 +1135,41 @@ Pony::Object has simple syntax for singletons . You can declare this via C<use> 
 
   package Notes;
   use Pony::Object 'singleton';
-    
+
     protected list => [];
-    
+
     sub add : Public {
       my $this = shift;
       push @{ $this->list }, @_;
     }
-    
+
     sub show : Public {
       my $this = shift;
       say for @{$this->list};
     }
-    
+
     sub flush : Public {
       my $this = shift;
       $this->list = [];
     }
-    
+
   1;
 
 
 
   package main;
   use Notes;
-  
+
   my $n1 = new Notes;
   my $n2 = new Notes;
-  
+
   $n1->add(qw/eat sleep/);
   $n1->add('Meet with Mary at 8 o`clock');
-  
+
   $n2->flush;
-  
+
   $n1->show();  # Print nothing.
-                # Em... When I should meet Mary? 
+                # Em... When I should meet Mary?
 
 =head2 Abstract methods and classes
 
@@ -1179,10 +1179,10 @@ You can use abstract methods and classes follows way:
   package Text::Interface;
   use Pony::Object -abstract; # Use 'abstract' or '-abstract'
                               # params to define abstract class.
-    
+
     sub getText : Abstract; # Use 'Abstract' attribute to
     sub setText : Abstract; # define abstract method.
-    
+
   1;
 
 
@@ -1191,14 +1191,14 @@ You can use abstract methods and classes follows way:
   # It's abstract too but now it has some code.
   package Text::Base;
   use Pony::Object qw/abstract Text::Interface/;
-    
+
     protected text => '';
-    
+
     sub getText : Public {
       my $this = shift;
       return $this->text;
     }
-    
+
   1;
 
 
@@ -1206,12 +1206,12 @@ You can use abstract methods and classes follows way:
   # In the end we can write Text class.
   package Text;
   use Pony::Object 'Text::Base';
-    
+
     sub setText : Public {
       my $this = shift;
       $this->text = shift;
     }
-  
+
   1;
 
 
@@ -1220,9 +1220,9 @@ You can use abstract methods and classes follows way:
   package main;
   use Text;
   use Text::Base;
-  
+
   my $textBase = new Text::Base;  # Raises an error!
-  
+
   my $text = new Text;
   $text->setText('some text');
   print $text->getText();   # Returns 'some text';
@@ -1244,11 +1244,11 @@ you can call C<ALL> method. I don't know why you need them, but you can.
 
   package News;
   use Pony::Object;
-    
+
     has 'title';
     has text => '';
     has authors => [ qw/Alice Bob/ ];
-    
+
   1;
 
 
@@ -1275,7 +1275,7 @@ Use it carefully.
   # Startup script
   ...
   use Pony::Object;
-  
+
   BEGIN {
     # Use exceptions by default.
     $Pony::Object::DEFAULT->{''}->{withExceptions} = 1;
@@ -1291,13 +1291,13 @@ One more example:
   # Startup script
   ...
   use Pony::Object;
-  
+
   BEGIN {
     $Pony::Object::DEFAULT->{'My::Awesome::Project'} = {
       withExceptions => 1,
       baseClass => [],
     };
-    
+
     $Pony::Object::DEFAULT->{'My::Awesome::Project::Model'} = {
       withExceptions => 1,
       baseClass => [qw/My::Awesome::Project::Model::Abstract/],
@@ -1317,7 +1317,7 @@ L<https://github.com/bugov/pony-object>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 - 2017, Georgy Bazhukov.
+Copyright (C) 2011 - 2018, Georgy Bazhukov.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

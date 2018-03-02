@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use lib qw{ inc };
-use Astro::UTDF::Test;
+use My::Module::Test;
 use Astro::UTDF;
 
 plan( tests => 131 );

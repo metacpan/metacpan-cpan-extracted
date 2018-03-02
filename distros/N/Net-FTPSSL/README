@@ -1,4 +1,4 @@
-Net-FTPSSL version 0.38
+Net-FTPSSL version 0.40
 =======================
 
 Net::FTPSSL is an object oriented Perl module which implements a simple
@@ -61,10 +61,11 @@ best attempt to figure out what options are required and the individual test
 cases should work.  But I'd need to see the log files generated to figure out
 why individual tests may fail.
 
-The 1st two tests assume that your FTPS server doesn't require certificates,
-and the 3rd one assumes that your FTPS server does require certificates.  If
-certificates are required, you'll have to modify the 3rd test script to point
-to your client certificate, see the instructions for that below.
+The 1st two tests assume that your FTPS server doesn't require client
+certificates, and the 3rd one assumes that your FTPS server does require client
+certificates.  If client certificates are required, you'll have to modify the
+3rd test script to point to your client certificate, see the instructions for
+that below.
 
 In most cases you'll probably only need to do one of the test cases to verify
 functionality.  Also all 3 test cases ask the same questions.
@@ -74,7 +75,7 @@ TEST # 1 (of 3)  [t/05-readonly.t]
 
 This is just a series of simple connectivity tests of read-only FTPS commands.
 It doesn't attempt a full test of the FTPS protocall.  It also doesn't attempt
-to use a client certificate.  So skip this test if your servers requirea client
+to use a client certificate.  So skip this test if your servers require client
 certificates to work.
 
 The log file for this test is: t/05-readonly.log.txt
@@ -265,6 +266,7 @@ export FTPSSL_USER=<your user name>
 export FTPSSL_PWD=<your password>
 export FTPSSL_DIR=<defaut dir on server>
 export FTPSSL_MODE=<defaut Encryption mode on server>
+export FTPSSL_SSL_VER=<default TLS/SSL version to use.>
 
 These variables are used if Net::HTTPTunnel is present
 export FTPSSL_PROXY_HOST=<your proxy server>

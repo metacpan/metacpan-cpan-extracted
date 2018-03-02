@@ -59,6 +59,6 @@
          "web" : "https://github.com/s31tz/Prty"
       }
    },
-   "version" : 1.123,
+   "version" : 1.124,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

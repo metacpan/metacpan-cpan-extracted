@@ -72,10 +72,16 @@ haven't already installed them with cpanm:
 
     $ dzil listdeps --missing --develop | cpanm
 
+You can instead combine these two steps into one command by installing
+Dist::Zilla::App::Command::installdeps then running:
+
+    $ dzil installdeps
+
 Once everything is installed, here are some dzil commands you might try:
 
     $ dzil build
     $ dzil test
+    $ dzil regenerate
 
 You can learn more about Dist::Zilla at http://dzil.org/
 

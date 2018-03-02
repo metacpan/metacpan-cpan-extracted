@@ -3,6 +3,7 @@ abstract: 'Date and time regexps.'
 author:
   - 'Eric J. Roode <eroode@barrack.com>'
 build_requires:
+  Modern::Perl: '0'
   Test::More: '0.40'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -20,11 +21,11 @@ no_index:
 provides:
   Regexp::Common::time:
     file: lib/Regexp/Common/time.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   Regexp::Common: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/manwar/Regexp-Common-time.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

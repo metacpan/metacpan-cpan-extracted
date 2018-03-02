@@ -2,7 +2,7 @@
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.5.0';
+$Git::Hooks::Notify::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -149,13 +149,13 @@ EOF
         my $html = HTML::Entities::encode_entities($body);
 
         # Replace all sha1's with HTML links
-        $html =~ s/\b([0-9a-f]{40})\b/sha1_link($git, $1, 'html')/eg;
+        $html =~ s/\b[0-9a-f]{40}\b/sha1_link($git, ${^MATCH}, 'html')/egp;
         # Force line breaks
         $html =~ s:$:<br/>:gm;
         # Force indentation of TO: header
         $html =~ s/(?<=^TO:) {3}/\&nbsp;\&nbsp;\&nbsp;/m;
         # Force indentation of commit message lines
-        $html =~ s:^( +):'&nbsp;' x length($1):egm;
+        $html =~ s:^ +:'&nbsp;' x length(${^MATCH}):egmp;
         # Force indentation of commit numstat lines
         $html =~ s[^(\d+|-)\t(\d+|-)\t]
             [$1 .
@@ -171,7 +171,7 @@ $html
 </html>
 EOF
     } else {
-        $body =~ s/\b([0-9a-f]{40})\b/sha1_link($git, $1)/eg;
+        $body =~ s/\b[0-9a-f]{40}\b/sha1_link($git, ${^MATCH})/egp;
     }
 
     my $email = Email::Simple->create(
@@ -250,8 +250,10 @@ sub notify_affected_refs {
     return $errors == 0;
 }
 
-# Install hooks
-POST_RECEIVE \&notify_affected_refs;
+INIT: {
+    # Install hooks
+    POST_RECEIVE \&notify_affected_refs;
+}
 
 1;
 
@@ -267,7 +269,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 

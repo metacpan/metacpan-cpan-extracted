@@ -4,7 +4,7 @@ use base qw/XML::LibXML/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Encode ();
 
@@ -110,7 +110,7 @@ $nod->removeChildNodes().
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

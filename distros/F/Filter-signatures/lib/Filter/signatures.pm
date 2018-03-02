@@ -3,7 +3,7 @@ use strict;
 use Filter::Simple;
 
 use vars '$VERSION';
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =head1 NAME
 
@@ -61,6 +61,18 @@ the misinterpreted regular expression:
 A better hotfix is to upgrade to Perl 5.20 or higher and use the native
 signatures support there. No other code change is needed, as this module will
 disable its functionality when it is run on a Perl supporting signatures.
+
+=head2 Parentheses in default assignments
+
+Ancient versions of Perl before version 5.10 do not have recursive regular
+expressions. These will not be able to properly handle statements such
+as
+
+    sub foo ($timestamp = time()) {
+    }
+
+The hotfix is to rewrite these function signatures to not use parentheses. The
+better approach is to upgrade to Perl 5.20 or higher.
 
 =head2 Line Numbers
 
@@ -122,8 +134,8 @@ my $have_signatures = eval {
 
 sub parse_argument_list {
     my( $name, $arglist, $whitespace ) = @_;
-    (my $args=$arglist) =~ s!^\((.*)\)!$1!;
-    my @args = split /\s*,\s*/, $args; # a most simple argument parser
+    (my $args=$arglist) =~ s!^\(\s*(.*)\s*\)!$1!s;
+    my @args = map { s!^\s*!!; s!\s*$!!; $_} split /\s*,\s*/, $args; # a most simple argument parser
     my $res;
     # Adjust how man newlines we gobble
     $whitespace ||= '';
@@ -160,6 +172,8 @@ sub parse_argument_list {
     return $res
 }
 
+# This is the version that is most downwards compatible but doesn't handle
+# parentheses in default assignments
 sub transform_arguments {
 	# This should also support
 	# sub foo($x,$y,@) { ... }, throwing away additional arguments
@@ -169,6 +183,45 @@ sub transform_arguments {
 		parse_argument_list("$2","$5","$1$3$4$6$7")
 	 }mge;
 	$_
+}
+
+if( $] >= 5.010 ) {
+    # Perl 5.10 onwards has recursive regex patterns, and comments, and stuff
+    no warnings 'redefine';
+    eval <<'PERL_5010_onwards';
+sub transform_arguments {
+	# This should also support
+	# sub foo($x,$y,@) { ... }, throwing away additional arguments
+	# Named or anonymous subs
+    # We also want to handle arbitrarily deeply nested balanced parentheses here
+	no warnings 'uninitialized';
+
+    # For Perl 5.10 onwards we have nice recursive patterns and comments
+	s{\bsub(\s*) #1
+           (\w*) #2
+           (\s*) #3
+           \(
+           (\s*) #4
+           (     #5
+                (          #6
+                   (?:
+                     (?>[^()]+)
+                     |
+                     \(\s*
+                         (?6)? # recurse for parentheses
+                     \s*\)
+                     )
+                )*
+             \@?
+           )
+           (\s*)\)
+           (\s*)\{}{
+		parse_argument_list("$2","$5","$1$3$4$8$9")
+	 }mgex;
+	$_
+}
+PERL_5010_onwards
+    die $@ if $@;
 }
 
 if( (! $have_signatures) or $ENV{FORCE_FILTER_SIGNATURES} ) {
@@ -223,7 +276,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

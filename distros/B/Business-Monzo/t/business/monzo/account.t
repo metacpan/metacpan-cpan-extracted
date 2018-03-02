@@ -143,7 +143,7 @@ ok( $Account->TO_JSON,'TO_JSON' );
     {
         "balance"     => 5000,
         "currency"    => 'GBP',
-        "soend_today" => 0,
+        "spend_today" => 0,
     };
 };
 

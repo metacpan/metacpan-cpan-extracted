@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Path;
 use Scalar::Util ();
-use Prty::Perl;
+use Prty::Reference;
 
 # -----------------------------------------------------------------------------
 
@@ -369,7 +369,7 @@ sub key {
     my ($self,$arg) = @_;
 
     if (ref $arg) {
-        if (Prty::Perl->isArrayRef($arg)) {
+        if (Prty::Reference->isArrayRef($arg)) {
             return $arg->[0];
         }
         else {
@@ -443,11 +443,11 @@ sub value {
         # Referenz auf Template-Objekt -> asString() aufrufen
         return $arg->asString;
     }
-    elsif (Prty::Perl->isArrayRef($arg)) {
+    elsif (Prty::Reference->isArrayRef($arg)) {
         # Array-Referenz -> Werte mit "\n" konkatenieren
         return join "\n",map {$self->value($_)} @$arg;
     }
-    elsif (Prty::Perl->isCodeRef($arg)) {
+    elsif (Prty::Reference->isCodeRef($arg)) {
         # Subroutine-Referenz -> Wert berechnen
         return $self->value($arg->());
     }
@@ -747,7 +747,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

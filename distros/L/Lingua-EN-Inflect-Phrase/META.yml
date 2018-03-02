@@ -12,6 +12,7 @@ build_requires:
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,6 +23,10 @@ name: Lingua-EN-Inflect-Phrase
 no_index:
   directory:
     - t
+provides:
+  Lingua::EN::Inflect::Phrase:
+    file: lib/Lingua/EN/Inflect/Phrase.pm
+    version: '0.20'
 requires:
   Exporter: '0'
   Lingua::EN::FindNumber: '0'
@@ -29,6 +34,7 @@ requires:
   Lingua::EN::Inflect::Number: '0'
   Lingua::EN::Number::IsOrdinal: '0'
   Lingua::EN::Tagger: '0'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
@@ -36,7 +42,7 @@ resources:
   homepage: http://metacpan.org/release/Lingua-EN-Inflect-Phrase
   license: http://dev.perl.org/licenses/
   repository: git://github.com/rkitover/lingua-en-inflect-phrase.git
-version: '0.19'
+version: '0.20'
 x_authority: cpan:AVAR
 x_contributors:
   - 'Zak B. Elep <zakame@zakame.net>'

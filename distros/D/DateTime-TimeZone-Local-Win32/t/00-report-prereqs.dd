@@ -34,6 +34,7 @@ do { my $x = {
                                    'Sys::Hostname' => '0',
                                    'Test::More' => '0.88',
                                    'constant' => '0',
+                                   'integer' => '0',
                                    'lib' => '0'
                                  }
                  }

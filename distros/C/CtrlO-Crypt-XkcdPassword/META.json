@@ -64,7 +64,7 @@
          "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

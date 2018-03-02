@@ -19,5 +19,5 @@ no_index:
 requires:
   Wx: '0'
   Wx::Perl::Imagick: '0'
-version: '0.052'
+version: '0.065'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

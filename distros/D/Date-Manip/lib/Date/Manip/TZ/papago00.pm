@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::papago00;
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 30 10:43:26 EDT 2017
-#    Data version: tzdata2017b
-#    Code version: tzcode2017b
+#    Generated on: Thu Mar  1 10:33:43 EST 2018
+#    Data version: tzdata2018c
+#    Code version: tzcode2018c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,21 +25,21 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.60';
+$VERSION='6.61';
 END { undef $VERSION; }
 
 %Dates         = (
    1    =>
      [
         [ [1,1,2,0,0,0],[1,1,2,12,37,12],'+12:37:12',[12,37,12],
-          'LMT',0,[1879,7,4,11,22,47],[1879,7,4,23,59,59],
-          '0001010200:00:00','0001010212:37:12','1879070411:22:47','1879070423:59:59' ],
+          'LMT',0,[1892,7,4,11,22,47],[1892,7,4,23,59,59],
+          '0001010200:00:00','0001010212:37:12','1892070411:22:47','1892070423:59:59' ],
      ],
-   1879 =>
+   1892 =>
      [
-        [ [1879,7,4,11,22,48],[1879,7,4,0,0,0],'-11:22:48',[-11,-22,-48],
+        [ [1892,7,4,11,22,48],[1892,7,4,0,0,0],'-11:22:48',[-11,-22,-48],
           'LMT',0,[1911,1,1,11,22,47],[1910,12,31,23,59,59],
-          '1879070411:22:48','1879070400:00:00','1911010111:22:47','1910123123:59:59' ],
+          '1892070411:22:48','1892070400:00:00','1911010111:22:47','1910123123:59:59' ],
      ],
    1911 =>
      [

@@ -1,4 +1,4 @@
-Geo::Coder::XYZ Version 0.06
+Geo::Coder::XYZ Version 0.07
 
 INSTALLATION
 
@@ -33,6 +33,6 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017 Nigel Horne
+Copyright (C) 2017-2018 Nigel Horne
 
 This program is released under the following licence: GPL

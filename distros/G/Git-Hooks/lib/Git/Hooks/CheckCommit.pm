@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.5.0';
+$Git::Hooks::CheckCommit::VERSION = '2.6.3';
 use 5.010;
 use utf8;
 use strict;
@@ -423,14 +423,18 @@ sub check_patchset {
     return commit_errors($git, $commit) == 0;
 }
 
-# Install hooks
-PRE_COMMIT       \&check_pre_commit;
-POST_COMMIT      \&check_post_commit;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+INIT: {
+    # Install hooks
+    PRE_APPLYPATCH   \&check_pre_commit;
+    POST_APPLYPATCH  \&check_post_commit;
+    PRE_COMMIT       \&check_pre_commit;
+    POST_COMMIT      \&check_post_commit;
+    UPDATE           \&check_affected_refs;
+    PRE_RECEIVE      \&check_affected_refs;
+    REF_UPDATE       \&check_affected_refs;
+    PATCHSET_CREATED \&check_patchset;
+    DRAFT_PUBLISHED  \&check_patchset;
+}
 
 1;
 
@@ -446,7 +450,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.5.0
+version 2.6.3
 
 =head1 SYNOPSIS
 
@@ -492,12 +496,12 @@ policies.
 
 =over
 
-=item * B<pre-commit>
+=item * B<pre-commit>, B<pre-applypatch>
 
 This hook is invoked before a commit is made to check the author and
 committer identities.
 
-=item * B<post-commit>
+=item * B<post-commit>, B<post-applypatch>
 
 This hook is invoked after a commit is made to check its signature. Note
 that the commit is checked after is has been made and any errors must be

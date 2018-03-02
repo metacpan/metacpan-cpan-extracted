@@ -4,6 +4,7 @@ use Test::Most;
 
 use HTTP::Request::Common;
 use Plack::Builder;
+use Plack::MIME;
 use Plack::Test;
 
 use lib "t/lib";
@@ -30,10 +31,12 @@ my $handler = builder {
 
     sub {
         my $env    = shift;
+        my $path   = $env->{PATH_INFO};
+        my $type   = Plack::MIME->mime_type($path);
         my $client = $env->{'psgix.monitor.statsd'};
         return [
             $client ? 200 : 500,
-            [ 'Content-Type' => 'text/plain; charset=utf8' ], ['Ok']
+            [ 'Content-Type' => $type || 'text/plain; charset=utf8' ], ['Ok']
         ];
     };
 };
@@ -130,6 +133,34 @@ test_psgi
           ],
           'errors logged'
           or note( explain \@logs );
+
+        @logs = ();
+    };
+
+    subtest 'head (favicon.ico)' => sub {
+
+        my $req = HEAD '/favicon.ico';
+        my $res = $cb->($req);
+
+        is $res->code, 200, join( " ", $req->method, $req->uri );
+
+        my @metrics = $stats->reset;
+
+        cmp_deeply \@metrics,
+          bag(
+            [ 'timing_ms', 'psgi.response.time',           ignore(), ],
+            [ 'timing_ms', 'psgi.request.content-length',  0, ],
+            [ 'increment', 'psgi.request.method.HEAD', ],
+            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'timing_ms', 'psgi.response.content-length', 0, ],
+            [ 'increment', 'psgi.response.content-type.image.vnd-microsoft-icon', ],
+            [ 'increment', 'psgi.response.status.200', ],
+          ),
+          'expected metrics'
+          or note( explain \@metrics );
+
+        is_deeply \@logs, [], 'nothing logged'
+            or note( explain \@logs);
 
     };
 

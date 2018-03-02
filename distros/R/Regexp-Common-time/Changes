@@ -1,5 +1,8 @@
 Revision history for Perl module Regexp::Common::time.
 
+0.16  2018-02-28 MANWAR
+      - Merged PR #1: make test pass, add setlocale, thanks @mishin.
+
 0.15  2018-01-26 MANWAR
       - Merged PR #3: Accept second fractions in ISO date time strings, thanks @jjatria.
 

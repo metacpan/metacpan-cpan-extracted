@@ -103,7 +103,7 @@ sub create_build_shared_lib_make_rule {
   $make_rule
     .= "$shared_lib_bilb_file :: @deps\n\n";
   $make_rule
-    .= "\tperl build_shared_lib.pl --object_dir=. $module_name\n\n";
+    .= "\tperl -Ilib -MSPVM::Build -e \"SPVM::Build->new->build_shared_lib_blib('$module_name')\"\n\n";
   
   return $make_rule;
 }
@@ -121,6 +121,22 @@ sub move_shared_lib_to_blib {
   # Move shared library file to blib directory
   move($shared_lib_file, $shared_lib_blib_file)
     or die "Can't move $shared_lib_file to $shared_lib_blib_file";
+}
+
+sub build_shared_lib_blib {
+  my ($self, $module_name) = @_;
+
+  my $spvm_build = SPVM::Build->new;
+
+  # Build shared library
+  my $shared_lib_file = $spvm_build->build_shared_lib(
+    module_name => $module_name,
+    module_dir => 'lib',
+    source_dir => 'lib_native',
+    object_dir => '.'
+  );
+  
+  $spvm_build->move_shared_lib_to_blib($shared_lib_file, $module_name);
 }
 
 sub build_shared_lib {

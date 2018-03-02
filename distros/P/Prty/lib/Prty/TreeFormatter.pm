@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Option;
 
@@ -463,7 +463,7 @@ sub asText {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

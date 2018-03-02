@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Firefox::Marionette::Exception::Response);
 
-our $VERSION = '0.44';
+our $VERSION = '0.47';
 
 sub throw {
     my ( $class, $response, $parameters ) = @_;
@@ -23,11 +23,11 @@ __END__
 
 =head1 NAME
 
-Firefox::Marionette::Exception::NotFound - Represents a 'no such element' exception thrown by Firefox in a Marionette Response
+Firefox::Marionette::Exception::NotFound - Represents a 'no such element' exception thrown by Firefox
 
 =head1 VERSION
 
-Version 0.44
+Version 0.47
 
 =head1 SYNOPSIS
 
@@ -36,7 +36,7 @@ Version 0.44
 
 =head1 DESCRIPTION
 
-This module handles the implementation of a 'no such element' error in a Marionette protocol response.  
+This module handles the implementation of a 'no such element' error thrown by Firefox
 
 =head1 SUBROUTINES/METHODS
 

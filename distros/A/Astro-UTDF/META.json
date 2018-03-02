@@ -4,13 +4,13 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-UTDF",
    "no_index" : {
@@ -42,13 +42,12 @@
    "provides" : {
       "Astro::UTDF" : {
          "file" : "lib/Astro/UTDF.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF"
       },
       "license" : [
@@ -60,6 +59,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-UTDF"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

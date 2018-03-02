@@ -8,7 +8,8 @@ BEGIN {
 	$^W = 1;
 }
 
-use t::lib::Test qw/connect_ok dbfile @CALL_FUNCS/;
+use lib "t/lib";
+use SQLiteTest qw/connect_ok dbfile @CALL_FUNCS/;
 use Test::More;
 use Test::NoWarnings;
 
@@ -61,7 +62,7 @@ foreach my $call_func (@CALL_FUNCS) {
 	};
 	ok($@);
 	if ($@) {
-	    print "# expected execute failure : $@";
+	    print "# expected execute failure : $@\n";
 	    $sth->finish;
 	    $dbh->rollback;
 	}

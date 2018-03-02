@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.006002;
 
 use lib qw{ inc };
 
@@ -22,6 +22,7 @@ my %args = (
 	perl => $meta->requires_perl(),
     ),
     license => 'perl',
+    add_to_cleanup	=> [ qw{ cover_db } ],
 );
 
 $mbv >= 0.28

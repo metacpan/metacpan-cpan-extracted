@@ -2,23 +2,19 @@ NAME
 
     Algorithm::Bertsekas - auction algorithm for the assignment problem.
 	
-	This is a perl implementation for the auction algorithm for the symmetric allocation problem.
-	
-	"Both, the auction algorithm and the Kuhn-Munkres algorithm have worst-case time complexity 
-	of (roughly) O(N^3). However, the average-case time complexity of the auction algorithm is 
-	much better. Thus, in practice, with respect to running time, the auction algorithm outperforms 
-	the Kuhn-Munkres (or Hungarian) algorithm significantly."
+	This is a perl implementation for the auction algorithm for the assymmetric (N<=M) allocation problem.
 
 DESCRIPTION
  
  The assignment problem in the general form can be stated as follows:
 
- "Given N jobs, M tasks and the effectiveness of each job for each task, the problem is to assign each job 
- to one and only one task in such a way that the measure of effectiveness is optimised (Maximised or Minimised)."
+ "Given N jobs (or persons), M tasks (or objects) and the effectiveness of each job for each task, 
+ the problem is to assign each job to one and only one task in such a way that the measure of 
+ effectiveness is optimised (Maximised or Minimised)."
  
- "Each assignment problem has associated with a table or matrix. Generally, the rows contain the jobs or people 
- we wish to assign, and the columns comprise the tasks or things we want them assigned to. The numbers in the 
- table are the costs associated with each particular assignment."
+ "Each assignment problem has associated with a table or matrix. Generally, the rows contain the 
+ jobs or people we wish to assign, and the columns comprise the tasks or objects we want them 
+ assigned to. The numbers in the table are the costs associated with each particular assignment."
  
  One application is to find the (nearest/more distant) neighbors. 
  The distance between neighbors can be represented by a matrix or a weight function, for example:
@@ -30,8 +26,8 @@ SYNOPSIS
 
  use Algorithm::Bertsekas qw(auction);
 
- my @array1 = ( 64.68, 47.56,  7.36, 80.90, 96.71, 50.10, 44.16 );
- my @array2 = (  3.91, 88.77, 45.56, 79.28 );
+ my @array1 = ( 19, 74, 58,  1 )
+ my @array2 = ( 94, 55, 90, 45, 56, 95, 90 );
  
  my $min = $#array1 < $#array2 ? $#array1 : $#array2;
  my $max = $#array1 < $#array2 ? $#array2 : $#array1;
@@ -46,58 +42,50 @@ SYNOPSIS
    push @input_matrix, \@weight_function;
  } 
  
-         3.91 88.77 45.56 79.28
+      94 55 90 45 56 95 90
 
- 64.68 [ 60.77 24.09 19.12 14.60 ]
- 47.56 [ 43.65 41.21  2.00 31.72 ]
-  7.36 [  3.45 81.41 38.20 71.92 ]
- 80.90 [ 76.99  7.87 35.34  1.62 ]
- 96.71 [ 92.80  7.94 51.15 17.43 ]
- 50.10 [ 46.19 38.67  4.54 29.18 ]
- 44.16 [ 40.25 44.61  1.40 35.12 ]
+ 19 [ 75 36 71 26 37 76 71 ]
+ 74 [ 20 19 16 29 18 21 16 ]
+ 58 [ 36  3 32 13  2 37 32 ]
+  1 [ 93 54 89 44 55 94 89 ]
 
  @input_matrix = (
- [ 60.77, 24.09, 19.12, 14.60 ],
- [ 43.65, 41.21,  2.00, 31.72 ],
- [  3.45, 81.41, 38.20, 71.92 ],
- [ 76.99,  7.87, 35.34,  1.62 ],
- [ 92.80,  7.94, 51.15, 17.43 ],
- [ 46.19, 38.67,  4.54, 29.18 ],
- [ 40.25, 44.61,  1.40, 35.12 ]
+ [ 75, 36, 71, 26, 37, 76, 71 ],
+ [ 20, 19, 16, 29, 18, 21, 16 ],
+ [ 36,  3, 32, 13,  2, 37, 32 ],
+ [ 93, 54, 89, 44, 55, 94, 89 ]
  );
+ 
+ my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 1, verbose => 3 );
 
- my ( $optimal, $assignement_ref, $output_index_ref ) = auction( matrix_ref => \@input_matrix, maximize_total_benefit => 0, verbose => 2 );
-
-Objective: to Minimize the total benefit
- Number of left nodes: 7
- Number of right nodes: 4
+Objective --> to Maximize the total benefit
+ Number of left nodes: 4
+ Number of right nodes: 7
  Number of edges: 28
 
-Solution:
- Optimal assignment: sum of values = 14.41
+Solution
+ Optimal assignment, sum of values = 230
  Feasible assignment condition: stepsize = 0.2 < 1/4 = 0.25
+ Number of iterations: 18
 
-Maximum index size    = [    0     1     2     3     4     5     6 ]
-@output_index indexes = [    6     5     0     3     1     4     2 ]
-@output_index values  = [             3.45  1.62  7.94        1.40 ]
+Maximum index size    = [ 0  1  2  3  4  5  6 ]
+@output_index indexes = [ 5  3  6  0  2  1  4 ]
+@output_index values  = [76 29 32 93          ]
 
- original matrix 7 x 4 with solution:
- [ 60.77   24.09   19.12   14.60  ]
- [ 43.65   41.21    2.00   31.72  ]
- [  3.45** 81.41   38.20   71.92  ]
- [ 76.99    7.87   35.34    1.62**]
- [ 92.80    7.94** 51.15   17.43  ]
- [ 46.19   38.67    4.54   29.18  ]
- [ 40.25   44.61    1.40** 35.12  ]
+ original matrix 4 x 7 with solution:
+ [ 75   36   71   26   37   76** 71  ]
+ [ 20   19   16   29** 18   21   16  ]
+ [ 36    3   32   13    2   37   32**]
+ [ 93** 54   89   44   55   94   89  ]
 
  Pairs (in ascending order of weight function values):
-   indexes ( 6, 2 ), weight value =  1.40 ; sum of values =  1.40
-   indexes ( 3, 3 ), weight value =  1.62 ; sum of values =  3.02
-   indexes ( 2, 0 ), weight value =  3.45 ; sum of values =  6.47
-   indexes ( 4, 1 ), weight value =  7.94 ; sum of values = 14.41
-   indexes ( 0, 6 ), weight value =       ; sum of values = 14.41
-   indexes ( 1, 5 ), weight value =       ; sum of values = 14.41
-   indexes ( 5, 4 ), weight value =       ; sum of values = 14.41
+   indexes ( 1, 3 ), weight value = 29 ; sum of values = 29
+   indexes ( 2, 6 ), weight value = 32 ; sum of values = 61
+   indexes ( 0, 5 ), weight value = 76 ; sum of values = 137
+   indexes ( 3, 0 ), weight value = 93 ; sum of values = 230
+   indexes ( 4, 2 ), weight value =    ; sum of values = 230
+   indexes ( 5, 1 ), weight value =    ; sum of values = 230
+   indexes ( 6, 4 ), weight value =    ; sum of values = 230
 
 
  Common use of the solution:
@@ -112,19 +100,6 @@ Maximum index size    = [    0     1     2     3     4     5     6 ]
    my $j = $output_index_ref->[$i];
    ...
  }
- 
- assignement hash --> $i =   2 e $value1 =  7.36; $j =   0 e $value2 =  3.91 ; difference =  3.45 ; sum =  3.45
- assignement hash --> $i =   3 e $value1 = 80.90; $j =   3 e $value2 = 79.28 ; difference =  1.62 ; sum =  5.07
- assignement hash --> $i =   4 e $value1 = 96.71; $j =   1 e $value2 = 88.77 ; difference =  7.94 ; sum = 13.01
- assignement hash --> $i =   6 e $value1 = 44.16; $j =   2 e $value2 = 45.56 ; difference =  1.40 ; sum = 14.41
-
- output_index array --> $i =   0 e $value1 = 64.68; $j =   6 e $value2 =       ; difference =       ; sum =  0.00
- output_index array --> $i =   1 e $value1 = 47.56; $j =   5 e $value2 =       ; difference =       ; sum =  0.00
- output_index array --> $i =   2 e $value1 =  7.36; $j =   0 e $value2 =  3.91 ; difference =  3.45 ; sum =  3.45
- output_index array --> $i =   3 e $value1 = 80.90; $j =   3 e $value2 = 79.28 ; difference =  1.62 ; sum =  5.07
- output_index array --> $i =   4 e $value1 = 96.71; $j =   1 e $value2 = 88.77 ; difference =  7.94 ; sum = 13.01
- output_index array --> $i =   5 e $value1 = 50.10; $j =   4 e $value2 =       ; difference =       ; sum = 13.01
- output_index array --> $i =   6 e $value1 = 44.16; $j =   2 e $value2 = 45.56 ; difference =  1.40 ; sum = 14.41
 
  
 OPTIONS
@@ -166,11 +141,10 @@ AUTHOR
 	February 2018
 	Sao Paulo, Brasil
 	claudiofsr@yahoo.com
-
+	
 COPYRIGHT AND LICENSE
 
 Copyright (c) 2018 Claudio Fernandes de Souza Rodrigues.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-

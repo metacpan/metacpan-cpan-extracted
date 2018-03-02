@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Iller::Config::Author::CSSON:
     file: lib/Dist/Iller/Config/Author/CSSON.pm
-    version: '0.0319'
+    version: '0.0320'
   Dist::Iller::Config::Author::CSSON::MapMetro:
     file: lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm
-    version: '0.0319'
+    version: '0.0320'
 requires:
   Dist::Iller: '0.1401'
   Moose: '2.0000'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON/issues
   homepage: https://metacpan.org/release/Dist-Iller-Config-Author-CSSON
   repository: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON.git
-version: '0.0319'
+version: '0.0320'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -221,7 +221,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
       name: Git::Check
       version: '2.042'
@@ -283,13 +283,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.9.3
+          git_version: 2.16.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
       version: '0.030'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
+      name: Test::Kwalitee::Extra
+      version: v0.2.1
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -389,7 +393,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -423,7 +427,7 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -436,11 +440,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0319'
+          tag: '0.0320'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -476,7 +480,7 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -490,7 +494,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.9.3
+          git_version: 2.16.1
           repo_root: .
       name: Git::Push
       version: '2.042'

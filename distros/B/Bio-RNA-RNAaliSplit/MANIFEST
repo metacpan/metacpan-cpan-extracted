@@ -6,16 +6,22 @@ lib/Bio/RNA/RNAaliSplit/Roles.pm
 lib/Bio/RNA/RNAaliSplit/WrapAnalyseDists.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAalifold.pm
 lib/Bio/RNA/RNAaliSplit/WrapRNAz.pm
+lib/Bio/RNA/RNAaliSplit/WrapRscape.pm
 Makefile.PL
 MANIFEST			This list of files
 README
 scripts/RNAalisplit.pl
+scripts/eval_alignment.pl
 share/aln/all.SL.JEVG.aln
 share/aln/all.SL.SPOVG.aln
+share/aln/all.SL.SPOVG.stk
 share/aln/all.SL.YFVG.aln
 t/00-load.t
 t/01-prereq.t
 t/02-version.t
+t/10-WrapRscape.t
+t/11-WrapRNAalifold.t
+t/12-WrapRscape.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

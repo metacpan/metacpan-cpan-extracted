@@ -1,5 +1,9 @@
 Revision history for Perl extension JSONP.
 
+1.83
+
+	- remove unnedeed options when encoding JSON in serialize method
+
 
 1.82
 

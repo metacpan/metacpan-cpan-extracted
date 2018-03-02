@@ -1,5 +1,5 @@
 package Task::MetaSyntactic;
-$Task::MetaSyntactic::VERSION = '1.042';
+$Task::MetaSyntactic::VERSION = '1.043';
 use strict;
 use warnings;
 
@@ -102,6 +102,8 @@ L<Acme::MetaSyntactic::legopiratesofthecaribbean> - LEGO Pirates of the Caribbea
 L<Acme::MetaSyntactic::legostarwarstheforceawakens> - LEGO Star Wars The Force Awakens theme (BINGOS)
 
 L<Acme::MetaSyntactic::legothehobbit> - LEGO The Hobbit game theme (BINGOS)
+
+L<Acme::MetaSyntactic::legoworlds> - LEGO Worlds theme (BINGOS)
 
 L<Acme::MetaSyntactic::mlpfim> - a meta syntactic variable for everypony! (SHLOMIF)
 

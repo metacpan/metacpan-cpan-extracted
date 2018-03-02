@@ -75,6 +75,7 @@ use Class::Method::Modifiers;
 use AnyEvent::HTTP::Request;
 use MooX::Types::MooseLike::Base qw(:all);
 use AnyEvent::HTTP::Response;
+use AnyEvent;
 use Carp qw(croak);
 use Ref::Util qw(is_plain_arrayref);
 require AnyEvent::HTTP;
@@ -83,7 +84,7 @@ BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.006';
+our $VERSION='1.008';
 
 sub BUILD {
   my ($self)=@_;
@@ -137,6 +138,7 @@ has loop_id=>(
   isa=>Num,
   default=>0,
 );
+
 has max_retry=>(
   is=>'rw',
   isa=>Num,
@@ -264,7 +266,7 @@ sub next_que_id {
 
 sub running_count {
   my ($self)=@_;
-  return scalar(%{$self->running});
+  return scalar(keys %{$self->running});
 }
 
 =item * my @ids=$self->add(@requests)
@@ -582,22 +584,23 @@ sub block_loop : BENCHMARK_DEBUG {
   my $result=$self->new_true();
   $self->log_info("There are: $self->{que_count} jobs in the in the que");
   
-  eval {
-    LOOP_CONTROL: {
-      $self->in_control_loop(1);
-      # make sure we don't run forever!
-      local $SIG{ALRM}=sub { 
-        $result=$self->new_false("Timed out before we got a response");
-        $self->log_die("Request Que timed out, Que Count is: ".$self->que_count);
-      };
-      $self->run_next;
-      alarm $self->timeout;
-      last LOOP_CONTROL if $self->{que_count}<=0;
+  my $t;
+  LOOP_CONTROL: {
+    $self->in_control_loop(1);
+    # make sure we don't run forever!
+    $t=AnyEvent->timer(after=>$self->timeout,sub { 
+      $result=$self->new_false("Timed out before we got a response");
+      $self->log_error("Request Que timed out, Que Count is: ".$self->que_count);
 
-       AnyEvent::Loop::run;
-      }
-  };
-  alarm 0;
+      no warnings;
+      last LOOP_CONTROL;
+    });
+    $self->run_next;
+    last LOOP_CONTROL if $self->{que_count}<=0;
+
+    AnyEvent::Loop::run;
+  }
+  undef $t;
   $self->in_control_loop(0);
   $self->loop_id($self->loop_id + 1);
   return $result;

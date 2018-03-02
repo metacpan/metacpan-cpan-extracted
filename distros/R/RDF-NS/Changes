@@ -1,3 +1,13 @@
+20180227  2018-02-27 20:35:38 CET
+ - 2086 prefixes
+ - added:   besluit bgt geo7 shui
+
+ - Merge pull request #21 from kjetilk/feature-band-example
+ - adjust the counts
+ - Do not load namespaces with example
+
+20180227  2018-02-27 20:35:38 CET
+
 20180213  2018-02-13 10:16:58 CET
  - 2082 prefixes
  - added:   add ago agr alethio alice allot aml amt aprov aseonto assoc
@@ -20,7 +30,7 @@
 
  - Test on Perl 5.26 instead of 5.12
 
-20180213  2018-02-13 10:16:58 CET
+20180227  2018-02-27 20:35:38 CET
 
 20170111  2017-01-11 17:02:03 CET
  - 1922 prefixes
@@ -40,7 +50,7 @@
             ogc res role san seas units verb wikipedia wp
 
 
-20180213  2018-02-13 10:16:58 CET
+20180227  2018-02-27 20:35:38 CET
 
 20160409  2016-04-09 14:03:22 CEST
  - 1793 prefixes

@@ -1,5 +1,13 @@
 Revision history for App-MechaCPAN
 
+0.21  2018-03-02 00:37:55 EST
+  - Having two distributions list the same module in provides is no longer
+    immediately fatal.
+  - Add the smart-tests option to installing perl
+  - Make the code surrounding git more robust and refuse to use use any
+    version of git < 1.7.7. (GH#6)
+  - Fix --skip-lib and --skip-local so they now actually turn a feature off
+
 0.20  2017-07-21 22:28:41 EDT
   - Improve the speed and reliability of installing a module. Much of this
     releases work went into this, which in turn makes deploy more dependable

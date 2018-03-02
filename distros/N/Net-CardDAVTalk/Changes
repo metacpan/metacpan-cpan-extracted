@@ -1,5 +1,8 @@
 Revision history for Net-CardDAVTalk
 
+0.09    Fri Mar  2 13:09 2018
+  - add VCard updates for 'n' setting on groups and VPhoto
+
 0.08    Wed Nov 15 16:04 2017
   - always request syncToken and fetch canSync
 

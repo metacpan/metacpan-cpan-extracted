@@ -1,3 +1,17 @@
+0.001053  2018-02-27 07:15:53-08:00 America/Los_Angeles
+
+    - No changes since last trial
+
+0.001052  2018-02-06 15:03:08-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix infinite recursion in closed subtests log json
+
+0.001051  2018-02-06 13:29:38-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Extract composer logic from Test2 formatter so it can be re-used
+    - Revamp Watcher to stop mangling events
+    - Onlt log processed events now by default (since mangling has stopped)
+
 0.001050  2018-02-01 13:31:58-08:00 America/Los_Angeles
 
     - Allow logging of both processed and unprocessed events

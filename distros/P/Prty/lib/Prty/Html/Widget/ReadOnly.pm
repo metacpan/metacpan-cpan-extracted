@@ -4,7 +4,7 @@ use base qw/Prty::Html::Widget/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 # -----------------------------------------------------------------------------
 
@@ -159,7 +159,7 @@ sub html {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

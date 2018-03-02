@@ -45,7 +45,7 @@ Measure::Everything::Adapter::InfluxDB::File - Write stats formatted as InfluxDB
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 

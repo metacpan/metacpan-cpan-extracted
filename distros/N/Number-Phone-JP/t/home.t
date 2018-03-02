@@ -6803,6 +6803,7 @@ ok($tel->set_number('03 45411234')->is_valid_number, 'checking for 03 45411234')
 ok($tel->set_number('03 45421234')->is_valid_number, 'checking for 03 45421234');
 ok($tel->set_number('03 45431234')->is_valid_number, 'checking for 03 45431234');
 ok($tel->set_number('03 45441234')->is_valid_number, 'checking for 03 45441234');
+ok($tel->set_number('03 45451234')->is_valid_number, 'checking for 03 45451234');
 ok($tel->set_number('03 45461234')->is_valid_number, 'checking for 03 45461234');
 ok($tel->set_number('03 45501234')->is_valid_number, 'checking for 03 45501234');
 ok($tel->set_number('03 45531234')->is_valid_number, 'checking for 03 45531234');
@@ -6816,6 +6817,7 @@ ok($tel->set_number('03 45631234')->is_valid_number, 'checking for 03 45631234')
 ok($tel->set_number('03 45641234')->is_valid_number, 'checking for 03 45641234');
 ok($tel->set_number('03 45651234')->is_valid_number, 'checking for 03 45651234');
 ok($tel->set_number('03 45661234')->is_valid_number, 'checking for 03 45661234');
+ok($tel->set_number('03 45671234')->is_valid_number, 'checking for 03 45671234');
 ok($tel->set_number('03 45701234')->is_valid_number, 'checking for 03 45701234');
 ok($tel->set_number('03 45711234')->is_valid_number, 'checking for 03 45711234');
 ok($tel->set_number('03 45721234')->is_valid_number, 'checking for 03 45721234');
@@ -6831,6 +6833,7 @@ ok($tel->set_number('03 45861234')->is_valid_number, 'checking for 03 45861234')
 ok($tel->set_number('03 45881234')->is_valid_number, 'checking for 03 45881234');
 ok($tel->set_number('03 45891234')->is_valid_number, 'checking for 03 45891234');
 ok($tel->set_number('03 45901234')->is_valid_number, 'checking for 03 45901234');
+ok($tel->set_number('03 45951234')->is_valid_number, 'checking for 03 45951234');
 ok($tel->set_number('03 45961234')->is_valid_number, 'checking for 03 45961234');
 ok($tel->set_number('03 50001234')->is_valid_number, 'checking for 03 50001234');
 ok($tel->set_number('03 50011234')->is_valid_number, 'checking for 03 50011234');
@@ -28614,7 +28617,6 @@ ok(!$tel->set_number('03 45341234')->is_valid_number, 'checking for 03 45341234'
 ok(!$tel->set_number('03 45371234')->is_valid_number, 'checking for 03 45371234');
 ok(!$tel->set_number('03 45381234')->is_valid_number, 'checking for 03 45381234');
 ok(!$tel->set_number('03 45391234')->is_valid_number, 'checking for 03 45391234');
-ok(!$tel->set_number('03 45451234')->is_valid_number, 'checking for 03 45451234');
 ok(!$tel->set_number('03 45471234')->is_valid_number, 'checking for 03 45471234');
 ok(!$tel->set_number('03 45481234')->is_valid_number, 'checking for 03 45481234');
 ok(!$tel->set_number('03 45491234')->is_valid_number, 'checking for 03 45491234');
@@ -28623,7 +28625,6 @@ ok(!$tel->set_number('03 45521234')->is_valid_number, 'checking for 03 45521234'
 ok(!$tel->set_number('03 45571234')->is_valid_number, 'checking for 03 45571234');
 ok(!$tel->set_number('03 45581234')->is_valid_number, 'checking for 03 45581234');
 ok(!$tel->set_number('03 45591234')->is_valid_number, 'checking for 03 45591234');
-ok(!$tel->set_number('03 45671234')->is_valid_number, 'checking for 03 45671234');
 ok(!$tel->set_number('03 45681234')->is_valid_number, 'checking for 03 45681234');
 ok(!$tel->set_number('03 45691234')->is_valid_number, 'checking for 03 45691234');
 ok(!$tel->set_number('03 45731234')->is_valid_number, 'checking for 03 45731234');
@@ -28636,7 +28637,6 @@ ok(!$tel->set_number('03 45911234')->is_valid_number, 'checking for 03 45911234'
 ok(!$tel->set_number('03 45921234')->is_valid_number, 'checking for 03 45921234');
 ok(!$tel->set_number('03 45931234')->is_valid_number, 'checking for 03 45931234');
 ok(!$tel->set_number('03 45941234')->is_valid_number, 'checking for 03 45941234');
-ok(!$tel->set_number('03 45951234')->is_valid_number, 'checking for 03 45951234');
 ok(!$tel->set_number('03 45971234')->is_valid_number, 'checking for 03 45971234');
 ok(!$tel->set_number('03 45981234')->is_valid_number, 'checking for 03 45981234');
 ok(!$tel->set_number('03 45991234')->is_valid_number, 'checking for 03 45991234');

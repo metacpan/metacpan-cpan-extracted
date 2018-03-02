@@ -6,7 +6,11 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Version 0.21 (Algorithm::Bertsekas-0.21 Released on 22th Feb 2018)
+    Version 0.23 (Algorithm::Bertsekas-0.23 Released on 27th Feb 2018)
+	    1. Added the 'delete_multiple_columns' subroutine.
+		2. some improvements.
+	
+	Version 0.21 (Algorithm::Bertsekas-0.21 Released on 22th Feb 2018)
 	    1. Modified the 'auction' subroutine.
 		2. removed the 'get_edges', 'mkbg' and 'bidding' subroutines.
 		3. Added the 'auctionRound' subroutine.

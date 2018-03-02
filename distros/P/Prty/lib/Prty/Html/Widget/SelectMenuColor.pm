@@ -4,7 +4,7 @@ use base qw/Prty::Html::Widget::SelectMenu/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Color;
 use Prty::String;
@@ -175,7 +175,7 @@ sub html {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

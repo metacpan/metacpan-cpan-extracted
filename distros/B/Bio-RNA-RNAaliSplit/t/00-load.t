@@ -2,7 +2,7 @@
 use 5.010;
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use IPC::Cmd qw(can_run);
 
 BEGIN {
@@ -12,6 +12,7 @@ BEGIN {
   use_ok( 'Bio::RNA::RNAaliSplit::WrapAnalyseDists' ) || print "Bail out! Bio::RNA::RNAaliSplit::WrapAnalyseDists\n";
   use_ok( 'Bio::RNA::RNAaliSplit::WrapRNAalifold' ) || print "Bail out! Bio::RNA::RNAaliSplit::WrapRNAalifold\n";
   use_ok( 'Bio::RNA::RNAaliSplit::WrapRNAz' ) || print "Bail out! Bio::RNA::RNAaliSplit::WrapRNAz\n";
+  use_ok( 'Bio::RNA::RNAaliSplit::WrapRscape' ) || print "Bail out! Bio::RNA::RNAaliSplit::WrapRscape\n";
 }
 
 diag( "Testing Vienna RNA $RNA::VERSION, Perl $], $^X" );
@@ -20,6 +21,7 @@ diag( "Testing Bio::RNA::RNAaliSplit::FileDir $Bio::RNA::RNAaliSplit::Roles::VER
 diag( "Testing Bio::RNA::RNAaliSplit::WrapAnalyseDists $Bio::RNA::RNAaliSplit::WrapAnalyseDists::VERSION, Perl $], $^X" );
 diag( "Testing Bio::RNA::RNAaliSplit::WrapRNAalifold $Bio::RNA::RNAaliSplit::WrapRNAalifold::VERSION, Perl $], $^X" );
 diag( "Testing Bio::RNA::RNAaliSplit::WrapRNAz $Bio::RNA::RNAaliSplit::WrapRNAz::VERSION, Perl $], $^X" );
+diag( "Testing Bio::RNA::RNAaliSplit::WrapRscape $Bio::RNA::RNAaliSplit::WrapRscape::VERSION, Perl $], $^X" );
 
 
 ok( defined(can_run('AnalyseDists')), 'Bail out! AnalyseDists not found');

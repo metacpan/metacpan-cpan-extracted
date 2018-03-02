@@ -1,4 +1,3 @@
-# $Id: Regex.pm 15 2006-06-01 18:50:38Z dave $
 
 =head1 NAME
 
@@ -19,7 +18,7 @@ Tie::Hash::Regex - Match hash keys using Regular Expressions
   print $h{2};    # prints 'another value'
   print $h{'^s'}; # prints 'something else'
 
-  print tied(%h)->FETCH(k); # prints 'value' and 'another value'
+  print tied(%h)->FETCH('k'); # prints 'value' and 'another value'
 
   delete $h{k};   # deletes $h{key} and $h{key2};
 
@@ -40,10 +39,10 @@ regex into the hash like this:
   my $val = $h{qr/key/};
 
 C<exists> and C<delete> also do regex matching. In the case of C<delete>
-I<all> vlaues matching your regex key will be deleted from the hash.
+I<all> values matching your regex key will be deleted from the hash.
 
 One slightly strange thing. Obviously if you give a hash a regex key, then
-it's possible that more than one key will match (consider c<$h{qw/./}>).
+it's possible that more than one key will match (consider C<$h{qw/./}>).
 It might be nice to be able to do stuff like:
 
   my @vals = $h{$pat};
@@ -77,7 +76,7 @@ use Attribute::Handlers autotie => { "__CALLER__::Regex" => __PACKAGE__ };
 @EXPORT = qw();
 @EXPORT_OK =();
 
-$VERSION = sprintf "%d", '$Revision: 15 $ ' =~ /(\d+)/;
+$VERSION = 1.12;
 
 =head1 METHODS
 
@@ -165,7 +164,7 @@ __END__
 
 Dave Cross <dave@mag-sol.com>
 
-Thanks to the Perlmonks <http://www.perlmonks.org> for the original idea
+Thanks to the Perlmonks L<http://www.perlmonks.org> for the original idea
 and to Jeff "japhy" Pinyan for some useful code suggestions.
 
 =head1 COPYRIGHT

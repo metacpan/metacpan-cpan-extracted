@@ -1,3 +1,20 @@
+0.06 2018-02-27
+-New ultra-fast parser and struct-based object written in C
+
+0.05 2018-02-27
+-Update required version of Test2::Suite to 0.000049 to include U in
+ Test2::Bundle::Extended
+
+0.04 2018-02-26
+-Faster uri_split implemented with Inline::C
+-Faster auth parsing implemented with Inline::C
+-Faster auth assembly implemented with Inline::C
+-Faster query param access by doing a regex for each access rather than parsing
+ and storing (who knew?)
+-This module no longer has common::sense
+-Bugfix: auth params now correctly url-encoded/decoded
+-See also that a SEE ALSO section was added to POD
+
 0.03 2018-02-20
 -10% speedup in stringification by not creating variables
 -Bugfix: setting auth or query did not clear sub-attributes

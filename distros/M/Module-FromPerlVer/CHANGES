@@ -1,4 +1,17 @@
+--  v0.0.2 Thu Mar  1 13:45:34 CST 2018
+
+    Add handling for Git, split low-level functions
+    for acquiring data into Dir and Git classes. 
+
+    Utility functions have a few changed names to make
+    them consistent with switching between subdir and 
+    git tags.
+
+    Git is largely untested.
+
+    Added tests & sanity checks.
+
 --  v0.0.1  Sun Feb 18 14:19:59 CST 2018
 
     Initial kwikhak... ah... er... "relase", yes,
-    that's the word release.
+    that's the word: release.

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 # -----------------------------------------------------------------------------
 
@@ -17,6 +17,65 @@ Prty::LaTeX::LongTable - Erzeuge LaTeX longtable
 =head1 BASE CLASS
 
 L<Prty::Hash>
+
+=head1 SYNOPSIS
+
+Der Code
+
+    use Prty::LaTeX::LongTable;
+    use Prty::LaTeX::Code;
+    
+    my $tab = Prty::LaTeX::LongTable->new(
+        alignments => ['l','r','c'],
+        caption => 'Ein Test',
+        titles => ['Links','Rechts','Zentriert'],
+        rows => [
+            ['A',1,'AB'],
+            ['AB',2,'CD'],
+            ['ABC',3,'EF'],
+            ['ABCD',4,'GH'],
+        ],
+    );
+    
+    my $l = Prty::LaTeX::Code->new;
+    my $code = $tab->latex($l);
+
+produziert
+
+    \begin{longtable}{|lrc|}
+    \hline
+    Links & Rechts & Zentriert \\ \hline
+    \endfirsthead
+    \multicolumn{3}{r}{\emph{Fortsetzung}} \
+    \hline
+    Links & Rechts & Zentriert \\ \hline
+    \endhead
+    \hline
+    \multicolumn{3}{r}{\emph{weiter}} \
+    \endfoot
+    \caption{Ein Test}
+    \endlastfoot
+    A & 1 & AB \\ \hline
+    AB & 2 & CD \\ \hline
+    ABC & 3 & EF \\ \hline
+    ABCD & 4 & GH \\ \hline
+    \end{longtable}
+
+was im LaTeX-Dokument in etwa so aussieht
+
+    +--------------------------+
+    | Links  Rechts  Zentriert |
+    +--------------------------+
+    | A           1     AB     |
+    +--------------------------+
+    | AB         12     CD     |
+    +--------------------------+
+    | ABC       123     EF     |
+    +--------------------------+
+    | ABCD     1234     GH     |
+    +--------------------------+
+    
+        Tabelle 1: Ein Test
 
 =head1 METHODS
 
@@ -32,35 +91,49 @@ L<Prty::Hash>
 
 =over 4
 
+=item align => $align (Default: 'c')
+
+Horizontale Ausrichtung der Tabelle auf der Seite. Mögliche Werte:
+'l', 'c'.
+
 =item alignments => \@alignments (Default: [])
 
 Liste der Kolumnen-Ausrichtungen. Mögliche Werte je Kolumne: 'l',
 'r', 'c'.
 
-=item border => $border (Default: 'hHV')
+=item border => $border (Default: 'hHV' oder 'hvHV' bei multiLine)
 
 Linien in und um die Tabelle. Der Wert ist eine Zeichenkette, die
 sich aus den Zeichen 't', 'h', 'v', 'H', 'V' zusammensetzt.
+
+=item callbackArguments => \@arr (Default: [])
+
+Liste von zusätzlichen Argumenten, die an die Funktionen
+C<rowCallback> und C<titleCallback> übergeben werden.
 
 =item caption => $str
 
 Unterschrift zur Tabelle.
 
+=item indent => $length
+
+Einrückung der Tabelle vom linken Rand. Die Option C<align> darf
+dann nicht gesetzt sein, auch nicht auf 'l'.
+
+=item label => $str
+
+Label der Tabelle, über welches sie referenziert werden kann.
+
 =item language => 'german'|'english'
 
 Die Sprache des LaTeX-Dokuments.
 
-=item makecell => $bool (Default: 0)
+=item multiLine => $bool (Default: undef)
 
-Wende C<\thead> (Titel) bzw. C<\makecell> (Daten) an. Diese Option
+Wende C<\makecell> auf alle Kolumnen an. Diese Option
 muss aktiviert werden, wenn mehrzeilige Zellen mehrzeilig
 dargestellt werden sollen, denn dies kann LaTeX nicht. Wird die
-Option aktiviert muss das Package C<makecell> geladen werden.
-Außderdem sollte der Titelfont eingestellt werden, da das Package
-eine seltsame Voreinstellung hat. Beispiel:
-
-    \usepackage{makecell}
-    \renewcommand{\theadfont}{\sffamily\bfseries\normalsize}
+Option aktiviert, muss das Package C<makecell> geladen werden.
 
 =item rows => \@rows (Default: [])
 
@@ -72,15 +145,28 @@ Subroutine, die für jede Zeile in @rows die Zeileninformation
 liefert, die in den LaTeX-Code eingesetzt wird. Default:
 
     sub {
-        my ($self,$gen,$row,$n) = @_;
+        my ($self,$l,$row,$n) = @_;
     
         my @row;
         for my $val (@$row) {
-            push @row,$gen->protect($val);
+            push @row,$l->protect($val);
         }
     
         return @row;
     }
+
+=item titleColor => $rgb
+
+Farbe der Titelzeile.
+
+=item titleWrapper => $code
+
+Zeichenkette, die um jeden Kolumnentitel gelegt wird. Für C<%s>
+wird der Titel eingesetzt. Auf diesem Weg kann ein Makro
+auf jeden Titel angewendet werden. Z.B. serifenlosen, fetten Font
+einstellen:
+
+    titleWrapper => '\textsf{\textbf{%s}}'
 
 =item titles => \@titles (Default: [])
 
@@ -92,8 +178,8 @@ Subroutine, die die Titelinformation liefert, die in den
 LaTeX-Code eingesetzt wird. Default:
 
     sub {
-        my ($self,$gen,$title,$n) = @_;
-        return $gen->protect($title);
+        my ($self,$l,$title,$n) = @_;
+        return $l->protect($title);
     }
 
 =back
@@ -116,26 +202,33 @@ sub new {
     # @_: @keyval
 
     my $self = $class->SUPER::new(
+        align => 'c',
         alignments => [],
-        border => 'hHV',
+        border => undef,
+        callbackArguments => [],
         caption => undef,
+        indent => undef,
+        label => undef,
         language => 'german',
-        makecell => 0,
+        multiLine => undef,
+        postVSpace => undef,
         rows => [],
         rowCallback => sub {
-            my ($self,$gen,$row,$n) = @_;
+            my ($self,$l,$row,$n) = @_;
 
             my @row;
             for my $val (@$row) {
-                push @row,$gen->protect($val);
+                push @row,$l->protect($val);
             }
 
             return @row;
         },
+        titleColor => undef,
+        titleWrapper => undef,
         titles => [],
         titleCallback => sub {
-            my ($self,$gen,$title,$n) = @_;
-            return $gen->protect($title);
+            my ($self,$l,$title,$n) = @_;
+            return $l->protect($title);
         },
     );
     $self->set(@_);
@@ -151,8 +244,8 @@ sub new {
 
 =head4 Synopsis
 
-    $code = $tab->latex($gen);
-    $code = $class->latex($gen,@keyVal);
+    $code = $tab->latex($l);
+    $code = $class->latex($l,@keyVal);
 
 =head4 Description
 
@@ -166,22 +259,30 @@ und mit den Attributen @keyVal instantiiert.
 
 sub latex {
     my $this = shift;
-    my $gen = shift;
+    my $l = shift;
 
     my $self = ref $this? $this: $this->new(@_);
 
-    my ($alignA,$border,$caption,$language,$makecell,$rowA,$rowCb,$titleA,
-        $titleCb) = $self->get(qw/alignments border caption language
-        makecell rows rowCallback titles titleCallback/);
+    my ($align,$alignA,$border,$cbArguments,$caption,$indent,$label,$language,
+        $multiLine,$postVSpace,$rowA,$rowCb,$titleColor,$titleWrapper,
+        $titleA,$titleCb) = $self->get(qw/align alignments border
+        callbackArguments caption indent label language multiLine postVSpace
+        rows rowCallback titleColor titleWrapper titles titleCallback/);
 
     if (!@$titleA && !@$rowA) {
         return '';
     }
 
-    my $code;
+    my $body;
 
     # Anzahl Kolumnen
     my $width = @$alignA;
+
+    # Default-Umrandung
+
+    if (!defined $border) {
+        $border = $multiLine? 'hvHV': 'hHV';
+    }
 
     # Linien
     
@@ -197,12 +298,24 @@ sub latex {
     if (@$titleA) {
         my @arr;
         for (my $i = 0; $i < @$titleA; $i++) {
-             my $val = $titleCb->($self,$gen,$titleA->[$i],$i);
-             if ($makecell) {
+             my $val = $titleCb->($self,$l,$titleA->[$i],$i,@$cbArguments);
+             if ($multiLine) {
                  $val =~ s|\n|\\\\|g;
-                 $val = sprintf '\thead[%sb]{%s}',$alignA->[$i],$val;
+                 $val = $l->ci('\makecell[%sb]{%s}',$alignA->[$i],$val);
+                 if ($titleColor) {
+                     # Hack, damit der gesamte Hintergrund farbig wird.
+                     # Ist nur bei \makecell nötig.
+                     $val = $l->ci('{\setlength{\fboxsep}{0pt}'.
+                         '\colorbox[HTML]{%s}{%s}}',$titleColor,$val);
+                 }
+             }
+             if ($titleWrapper) {
+                 $val = $l->ci($titleWrapper,$val);
              }
              push @arr,$val;
+        }
+        if ($titleColor) {
+            $titleLine .= $l->ci('\rowcolor[HTML]{%s} ',$titleColor);
         }
         $titleLine .= join(' & ',@arr).' \\\\';
         $titleLine .= $tBorder? ' \hline': '';
@@ -211,41 +324,54 @@ sub latex {
     
     # \firsthead
 
-    $code .= $HBorder? "\\hline\n": '';
-    $code .= $titleLine; # Leer, wenn kein Titel
-    $code .= "\\endfirsthead\n";
+    $body .= $HBorder? $l->c('\hline'): '';
+    $body .= $titleLine; # Leer, wenn kein Titel
+    if ($label) {
+        $body .= $l->c('\label{%s}',$label);
+    }
+    $body .= $l->c('\endfirsthead');
     
     # \endhead
         
     my $msg = $language eq 'german'? 'Fortsetzung': 'Continuation';
-    $code .= "\\multicolumn{$width}{r}{\\emph{$msg}} \\\\\n";
-    $code .= $HBorder? "\\hline\n": '';
-    $code .= $titleLine; # leer, wenn kein Titel
-    $code .= "\\endhead\n";
+    $body .= $l->c('\multicolumn{%s}{r}{\\emph{%s}} \\\\',$width,$msg);
+    $body .= $HBorder? $l->c('\hline'): '';
+    $body .= $titleLine; # leer, wenn kein Titel
+    $body .= $l->c('\endhead');
 
     # \endfoot
 
-    $code .= $HBorder? "\\hline\n": '';
+    $body .= $HBorder? $l->c('\hline'): '';
     $msg = $language eq 'german'? 'weiter': 'next';
-    $code .= "\\multicolumn{$width}{r}{\\emph{$msg}} \\\\\n";
-    $code .= "\\endfoot\n";
+    $body .= $l->c('\multicolumn{%s}{r}{\\emph{%s}} \\\\',$width,$msg);
+    $body .= $l->c('\endfoot');
 
     # \endlastfoot
 
     if ($caption) {
-        $code .= "\\caption{$caption}\n";
+        my @opt;
+        if ($align ne 'c') {
+            push @opt,'singlelinecheck=off';
+            if ($indent) {
+                push @opt,"margin=$indent";
+            }
+        }
+        if (@opt) {
+            $body .= $l->c('\captionsetup{%s}',\@opt);
+        }
+        $body .= $l->c('\caption{%s}',$caption);
     }
-    $code .= "\\endlastfoot\n";
+    $body .= "\\endlastfoot\n";
 
     # Body
 
     for (my $i = 0; $i < @$rowA; $i++) {
-        my @arr = $rowCb->($self,$gen,$rowA->[$i],$i);
-        if ($makecell) {
+        my @arr = $rowCb->($self,$l,$rowA->[$i],$i,@$cbArguments);
+        if ($multiLine) {
             for (my $j = 0; $j < @arr; $j++) {
                  if ($arr[$j] =~ s|\n|\\\\|g) {
-                     $arr[$j] = sprintf '\makecell[%st]{%s}',
-                         $alignA->[$j],$arr[$j];
+                     $arr[$j] = $l->ci('\makecell[%st]{%s}',
+                         $alignA->[$j],$arr[$j]);
                  }
             }
         }
@@ -253,7 +379,15 @@ sub latex {
         $line .= $i < @$rowA-1? $hBorder? ' \hline': '':
             $HBorder? ' \hline': '';
         $line .= "\n";
-        $code .= $line;
+        $body .= $line;
+    }
+
+    # Einrückung
+
+    my $code;
+    if ($align ne 'c' && $indent) {
+        $code .= $l->c('\setlength{\LTleft}{%s}',$indent);
+        $align = undef; # darf nicht gesetzt werden, wenn \LTleft
     }
 
     # Environment
@@ -263,16 +397,23 @@ sub latex {
         $colSpec = "|$colSpec|";
     }
 
-    return $gen->env('longtable',$code,
+    $code .= $l->env('longtable',$body,
+        -o => $align,
         -p => $colSpec,
     );
+
+    if (my $postVSpace = $self->postVSpace) {
+        $code .= $l->c('\vspace{%s}','--',$postVSpace);
+    }
+
+    return $code;
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

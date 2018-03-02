@@ -21,7 +21,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -37,6 +38,7 @@
             "Lingua::EN::Inflect::Number" : "0",
             "Lingua::EN::Number::IsOrdinal" : "0",
             "Lingua::EN::Tagger" : "0",
+            "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,6 +53,12 @@
             "lib" : "0",
             "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Lingua::EN::Inflect::Phrase" : {
+         "file" : "lib/Lingua/EN/Inflect/Phrase.pm",
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -69,7 +77,7 @@
          "web" : "http://github.com/rkitover/lingua-en-inflect-phrase"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_authority" : "cpan:AVAR",
    "x_contributors" : [
       "Zak B. Elep <zakame@zakame.net>"

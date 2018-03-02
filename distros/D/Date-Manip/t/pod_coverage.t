@@ -5,6 +5,7 @@
 #
 
 use strict;
+use warnings;
 use Test::More;
 
 # Don't run tests for installs
@@ -39,16 +40,14 @@ if (-f "$0") {
 
 my @ign = ();
 if (-f "$testdir/pod_coverage.ign") {
-   open(IN,"$testdir/pod_coverage.ign");
-   @ign = <IN>;
-   close(IN);
-   chomp(@ign);
+   open my $fh, '<', "$testdir/pod_coverage.ign";
+   chomp ( @ign = <$fh> );
+   close $fh;
 }
 
 chdir("..")  if ($testdir eq '.');
 
 if (@ign) {
-
    my @mod = all_modules();
 
    MOD:

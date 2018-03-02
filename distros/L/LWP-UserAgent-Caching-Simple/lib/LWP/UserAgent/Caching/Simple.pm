@@ -6,11 +6,11 @@ LWP::UserAgent::Caching::Simple - The first 'hard thing' made easy --- simple
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -83,7 +83,7 @@ sub get_from_json {
         [ Accept => 'application/json' ]
     );
     my $resp = _default_useragent()->request($rqst);
-    return from_json($resp->content()) if $resp->is_success;
+    return decode_json($resp->decoded_content()) if $resp->is_success;
     warn "HTTP Status message ${\$resp->code} [${\$resp->message}] GET $_[0]\n";
     return
     

@@ -1,0 +1,524 @@
+#!/usr/bin/env perl
+use 5.10.1;
+use strict;
+use warnings;
+use version;
+
+use Data::Dump qw(pp);
+use FindBin qw( $Bin );
+use lib $Bin. '/../lib';
+
+use Opsview::RestAPI;
+
+my $VERSION = '0.1';
+
+use Getopt::Long qw(:config no_ignore_case bundling no_auto_abbrev);
+use Pod::Usage;
+
+my %options = (
+    'help|h|?'     => 0,
+    'man'          => 0,
+    'debug:+'      => 0,
+    'url|U=s'      => 0,
+    'username|u=s' => 0,
+    'password|p=s' => 0,
+    'noreload|R'   => 0,
+);
+
+GetOptions( \%options, keys(%options) ) || pod2usage( -verbose => 1 );
+pod2usage( -verbose => 1 ) if ( $options{'?'}  || $options{help} );
+pod2usage( -verbose => 2 ) if ( $options{HELP} || $options{man} );
+die 'opsview_diag version: ', $VERSION, $/ if ( $options{version} );
+
+my $rest = Opsview::RestAPI->new(%options);
+
+$rest->login;
+
+say "Working on: ", $rest->url;
+
+say "Reconfiguring admin account";
+$rest->put(
+    api  => 'config/contact/1',
+    data => {
+        variables => [
+            { name => 'EMAIL', value => 'user@example.com' },
+            { name => 'PAGER', value => '07999999999' },
+        ],
+        notificationprofiles => [
+            {   name                => 'Default',
+                notificationmethods => [ { name => 'Email', }, ],
+            },
+        ],
+        enable_tips => 0,    # turn off tips for the user
+    },
+);
+
+say "Setting up 'monitor' user";
+$rest->put(
+    api  => 'config/contact',
+    data => {
+        name        => 'monitor',
+        fullname    => 'Monitor User',
+        password    => 'monitor',
+        role        => { name => 'View all, change none', },
+        enable_tips => 0,
+        variables   => [ { name => "EMAIL", value => 'user@example.com' }, ],
+        notificationprofiles => [
+            {   name                         => 'Default',
+                notificationmethods          => [ { name => 'Email', }, ],
+                host_notification_options    => "d,u,r,f",
+                service_notification_options => "w,r,u,c,f",
+            },
+        ],
+    },
+);
+
+say "Turning on email notification debugging";
+
+#$rest->put(
+#    api => 'config/notificationmethod',
+#    data => { name => 'Email', command => 'notify_by_email -d', },
+#);
+
+say "Servicegroup: AAA";
+$rest->put(
+    api  => 'config/servicegroup',
+    data => { name => 'AAA' },
+);
+
+say "Hosttemplate: AAA All My Host Template";
+$rest->put(
+    api  => 'config/hosttemplate',
+    data => { name => 'AAA All Checks My Hosts Template' },
+);
+
+say "Hosttemplate: AAA OK My Host Template";
+$rest->put(
+    api  => 'config/hosttemplate',
+    data => { name => 'AAA OK only My Hosts Template' },
+);
+
+say "Hosttemplate: AAA Not OK My Host Template";
+$rest->put(
+    api  => 'config/hosttemplate',
+    data => { name => 'AAA Not OK only My Hosts Template' },
+);
+
+say "Hosttemplate: AAA Random Host Template";
+$rest->put(
+    api  => 'config/hosttemplate',
+    data => { name => 'AAA Random My Hosts Template' },
+);
+
+for my $hashtag (qw/ MyHost MyHostProb/) {
+    say "Hashtag: $hashtag";
+    $rest->put(
+        api  => 'config/keyword',
+        data => {
+            name            => $hashtag,
+            enabled         => 1,
+            public          => 1,
+            description     => "My own $hashtag hashtag",
+            exclude_handled => 1,
+        },
+    );
+}
+
+say "Hashtag: MyHost10";
+$rest->put(
+    api  => 'config/keyword',
+    data => {
+        name              => 'MyHost10',
+        enabled           => 1,
+        public            => 1,
+        description       => 'My own MyHost10 hashtag',
+        exclude_handled   => 1,
+        all_servicechecks => 1,
+    },
+);
+
+# check to see if check_random exists for the below checks
+# if not, use check_dummy
+my $check_plugin = 'check_dummy';
+my $arg_prepend  = '';
+{
+    my $result = $rest->get(
+        api    => 'config/plugin/exists',
+        params => { name => 'check_random', }
+    );
+
+    if ( $result->{exists} == 1 ) {
+        $check_plugin = 'check_random';
+        $arg_prepend  = '-H $HOSTADDRESS$ -r ';
+    }
+    else {
+        say "** NOTE: ** check_random does not exist!";
+    }
+}
+
+say "Servicecheck: Random";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name           => 'Random Results',
+        plugin         => { name => $check_plugin },
+        servicegroup   => { name => 'AAA' },
+        checktype      => { name => 'Active Plugin' },
+        args           => '',
+        check_interval => $rest->interval(20)
+        ,    # set the interval correctly for 4.x and 5.x (seconds)
+        retry_check_interval   => $rest->interval(20),
+        check_attempts         => 1,
+        flap_detection_enabled => 0,
+        hosttemplates          => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA Random My Hosts Template' }
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostProb' }, ],
+        notification_options => 'w,c,r,u,f',
+    },
+);
+
+say "Servicecheck: Always OK";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name                 => 'Always OK',
+        plugin               => { name => $check_plugin },
+        servicegroup         => { name => 'AAA' },
+        checktype            => { name => 'Active Plugin' },
+        args                 => $arg_prepend . '0',
+        check_interval       => $rest->interval(60),           # every minute
+        retry_check_interval => $rest->interval(30)
+        ,    # every 30 seconds ( every minute for 4.x)
+        check_attempts         => 3,
+        flap_detection_enabled => 0,
+        hosttemplates          => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA OK only My Hosts Template' },
+        ],
+        keywords             => [ { name => 'MyHost' } ],
+        notification_options => 'w,c,r,u,f',
+    },
+);
+
+say "Servicecheck: Always WARNING";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name          => 'Always WARNING',
+        checktype     => { name => 'Active Plugin' },
+        plugin        => { name => $check_plugin },
+        args          => $arg_prepend . '1',
+        servicegroup  => { name => 'AAA' },
+        hosttemplates => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA Not OK only My Hosts Template' },
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostProb' }, ],
+        check_interval         => $rest->interval(20),
+        retry_check_interval   => $rest->interval(20),
+        check_attempts         => 1,
+        flap_detection_enabled => 0,
+        notification_options   => 'w,c,r,u,f',
+    },
+);
+
+say "Servicecheck: Always CRITICAL";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name          => 'Always CRITICAL',
+        checktype     => { name => 'Active Plugin' },
+        plugin        => { name => $check_plugin },
+        args          => $arg_prepend . '2',
+        servicegroup  => { name => 'AAA' },
+        hosttemplates => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA Not OK only My Hosts Template' },
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostProb' }, ],
+        check_interval         => $rest->interval(20),
+        retry_check_interval   => $rest->interval(20),
+        check_attempts         => 1,
+        flap_detection_enabled => 0,
+        notification_options   => 'w,c,r,u,f',
+    },
+);
+
+say "Servicecheck: Always Unknown";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name          => 'Always UNKNOWN',
+        checktype     => { name => 'Active Plugin' },
+        plugin        => { name => $check_plugin },
+        args          => $arg_prepend . '3',
+        servicegroup  => { name => 'AAA' },
+        hosttemplates => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA Not OK only My Hosts Template' },
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostProb' }, ],
+        check_interval         => $rest->interval(20),
+        retry_check_interval   => $rest->interval(20),
+        check_attempts         => 1,
+        flap_detection_enabled => 0,
+        notification_options   => 'w,c,r,u,f',
+    },
+);
+
+say "Servicecheck: Passive (reset to OK)";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name          => 'Passive To OK',
+        checktype     => { name => 'Passive' },
+        servicegroup  => { name => 'AAA' },
+        hosttemplates => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA OK only My Hosts Template' },
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostOK' }, ],
+        notification_options    => 'w,c,r,u,f',
+        stale_state             => 0,
+        stale_text              => 'Reset to OK',
+        stale_threshold_seconds => 60,
+    },
+);
+
+say "Servicecheck: Passive (reset to CRITICAL)";
+$rest->put(
+    api  => 'config/servicecheck',
+    data => {
+        name          => 'Passive To Critical',
+        checktype     => { name => 'Passive' },
+        servicegroup  => { name => 'AAA' },
+        hosttemplates => [
+            { name => 'AAA All Checks My Hosts Template' },
+            { name => 'AAA not OK only My Hosts Template' },
+        ],
+        keywords => [ { name => 'MyHost' }, { name => 'MyHostProb' }, ],
+        notification_options    => 'w,c,r,u,f',
+        stale_state             => 2,
+        stale_text              => 'Reset to CRITICAL',
+        stale_threshold_seconds => 60,
+    },
+);
+
+say "Hostgroup: AAA MyHosts";
+$rest->put(
+    api  => 'config/hostgroup',
+    data => { name => 'AAA MyHosts' },
+);
+
+for my $host ( 0 .. 3 ) {
+    say "Host: MyHost$host";
+    $rest->put(
+        api  => 'config/host',
+        data => {
+            ip             => "127.0.0.10$host",
+            name           => "MyHost$host",
+            hostgroup      => { name => 'AAA MyHosts' },
+            hostattributes => [
+                { 'name' => 'WINCREDENTIALS', 'value' => 'VALS' },
+                { 'name' => 'WINSERVICE',     'value' => 'something' },
+            ],
+            hosttemplates => [
+                { 'name' => 'Network - Base' },
+                { 'name' => 'AAA All Checks My Hosts Template' },
+                { name   => 'AAA OK only My Hosts Template' },
+                { name   => 'AAA Not OK only My Hosts Template' },
+                { name   => 'AAA Random My Hosts Template' },
+            ],
+            keywords             => [ { name => 'MyHost' } ],
+            notification_options => "u,d,r,f",
+        },
+    );
+}
+
+for my $host ( 0 .. 3 ) {
+    say "Host: MyHost10$host";
+    $rest->put(
+        api  => 'config/host',
+        data => {
+            ip             => "192.168.20.10$host",
+            name           => "MyHost10$host",
+            hostgroup      => { name => 'AAA MyHosts' },
+            hostattributes => [
+                { 'name' => 'WINCREDENTIALS', 'value' => 'VALS' },
+                { 'name' => 'WINSERVICE',     'value' => 'something' },
+            ],
+            hosttemplates => [
+                { name => 'Network - Base' },
+                { name => 'AAA All Checks My Hosts Template' },
+                { name => 'AAA OK only My Hosts Template' },
+                { name => 'AAA Not OK only My Hosts Template' },
+                { name => 'AAA Random My Hosts Template' },
+            ],
+            keywords             => [ { name => 'MyHost10' } ],
+            notification_options => "u,d,r,f",
+        },
+    );
+}
+
+sub make_slave_node {
+    my ( $name, $ip ) = @_;
+
+    say "Host: $name";
+
+    $rest->put(
+        api  => 'config/host',
+        data => {
+            ip            => $ip,
+            name          => $name,
+            hostgroup     => { name => 'Monitoring Servers' },
+            hosttemplates => [
+                { 'name' => 'Application - Opsview Common' },
+                { 'name' => 'OS - Unix Base' },
+                { 'name' => 'Network - Base' },
+            ],
+            keywords => [ { name => 'MyHost' } ],
+        },
+    );
+}
+
+make_slave_node( 'myslave1', '192.168.56.103' );
+make_slave_node( 'myslave2', '192.168.56.104' );
+
+say "Monitoring Server: slave (deactivated)";
+$rest->put(
+    api  => 'config/monitoringserver',
+    data => {
+        name      => 'My Slave Cluster',
+        nodes     => [ { 'name' => 'myslave1' }, { 'name' => 'myslave2' } ],
+        activated => 0,
+    },
+);
+
+say "Host: SNMP";
+$rest->put(
+    api  => 'config/host',
+    data => {
+        ip            => 'snmp',
+        name          => 'SNMP',
+        hostgroup     => { name => 'AAA MyHosts' },
+        hosttemplates => [
+            { 'name' => 'SNMP - MIB-II' }, { 'name' => 'Network - Base' },
+        ],
+        keywords       => [ { name => 'MyHost' } ],
+        enable_snmp    => 1,
+        snmp_version   => '2c',
+        snmp_community => 'public',
+        snmpinterfaces => [
+            {   discards_critical   => 15,
+                discards_warning    => '',
+                errors_critical     => 10,
+                errors_warning      => '',
+                id                  => 0,
+                ifAlias             => undef,
+                ifDescr             => '',
+                ifLink              => undef,
+                ifSpeed             => undef,
+                ifSpeedRaw          => undef,
+                ifStatus            => undef,
+                interfacename       => '',
+                throughput_critical => '0:50%',
+                throughput_warning  => '',
+            },
+            {   discards_critical   => '',
+                discards_warning    => '',
+                errors_critical     => '',
+                errors_warning      => '',
+                id                  => 2,
+                ifAlias             => '',
+                ifDescr             => 'eth0',
+                ifLink              => 'up',
+                ifSpeed             => '0kbit/s',
+                ifSpeedRaw          => 0,
+                ifStatus            => 'up',
+                interfacename       => 'eth0',
+                throughput_critical => '',
+                throughput_warning  => '',
+            },
+        ],
+    },
+);
+
+say "BSM Components";
+$rest->put(
+    api  => 'config/bsmcomponent',
+    data => {
+        name          => 'All My Checks',
+        host_template => { name => 'AAA All Checks My Hosts Template', },
+        hosts         => [
+            { name => 'MyHost0' },
+            { name => 'MyHost1' },
+            { name => 'MyHost2' },
+            { name => 'MyHost3' },
+        ],
+        quorum_pct => 50,
+    },
+);
+
+say "BSM Services";
+$rest->put(
+    api  => 'config/bsmservice',
+    data => {
+        name       => 'All My Checks',
+        components => [ { name => 'All My Checks', } ],
+    },
+);
+
+say "Amending 'View all, change none'; for BSM";
+$rest->put(
+    api  => 'config/role',
+    data => {
+        name         => 'View all, change none',
+        all_bsm_view => 1,
+        accesses     => [
+            { name => 'BSM' },
+            { name => 'DASHBOARD' },
+            { name => 'DASHBOARDEDIT' },
+            { name => 'DASHBOARDSHARE' },
+            { name => 'NAVOPTIONS' },
+            { name => 'NOTIFYSOME' },
+            { name => 'PASSWORDSAVE' },
+            { name => 'VIEWALL' },
+        ],
+    },
+);
+
+say "Creating Parented series";
+$rest->put(
+    api  => 'config/hostgroup',
+    data => { name => 'AAA Parented' },
+);
+
+for my $level ( 0 .. 3 ) {
+    my @parents;
+
+    if ( $level > 0 ) {
+        push @parents, { name => "level_" . ( $level - 1 ) };
+    }
+    $rest->put(
+        api  => 'config/host',
+        data => {
+            ip        => '127.100.1.' . $level,
+            name      => 'level_' . $level,
+            hostgroup => { name => 'AAA Parented' },
+            hosttemplates =>
+                [ { 'name' => 'AAA OK only My Hosts Template' }, ],
+            notification_options   => "u,d,r,f",
+            flap_detection_enabled => 0,
+            parents                => \@parents,
+        },
+    );
+}
+
+unless ( $options{noreload} ) {
+    say "Initiating reload";
+    $rest->reload;
+}
+
+$rest->logout;

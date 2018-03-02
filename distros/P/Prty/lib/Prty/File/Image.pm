@@ -4,11 +4,12 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.123;
+our $VERSION = 1.124;
 
 use Prty::Hash;
 use Prty::Path;
 use Prty::Image;
+use Prty::Array;
 use Image::Size ();
 
 # -----------------------------------------------------------------------------
@@ -44,6 +45,13 @@ dieses Objekt zurück.
 
 sub new {
     my ($class,$path) = @_;
+
+    if (!-e $path) {
+        $class->throw(
+             q~IMAGE-00001: File not found~,
+             Path => $path,
+        );
+    }
 
     # Objekt instantiieren
 
@@ -298,6 +306,39 @@ sub size {
 
 # -----------------------------------------------------------------------------
 
+=head3 scaleFactor() - Skalierungsfaktor für andere Breite, Höhe
+
+=head4 Synopsis
+
+    $scale = $img->scaleFactor($width,$height);
+
+=head4 Description
+
+Liefere den Skalierungsfaktor, wenn das Bild auf die Breite $width
+und die Höhe $height skaliert werden soll. Werden nicht-proportionale
+Werte für $width und $height angegeben, dass also für die Breite
+und die Höhe unterschiedliche Skalierungsfakoren berechnet werden,
+liefere von beiden den kleineren Wert.
+
+=head4 Example
+
+Das Bild hat die Größe 249 x 249 und soll skaliert werden auf
+die Größe 83 x 83:
+
+    $scale = $img->scaleFactor(83,83);
+    # 0.333333333333333
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub scaleFactor {
+    my ($self,$width,$height) = @_;
+    return Prty::Array->min([$width/$self->width,$height/$self->height]);
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 aspectRatio() - Seitenverhältnis
 
 =head4 Synopsis
@@ -399,7 +440,7 @@ sub analyzeFile {
 
 =head1 VERSION
 
-1.123
+1.124
 
 =head1 AUTHOR
 

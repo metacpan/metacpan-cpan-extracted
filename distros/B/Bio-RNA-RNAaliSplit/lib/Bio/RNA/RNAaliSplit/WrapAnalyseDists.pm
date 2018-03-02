@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-05-28 17:05:11 mtw>
+# Last changed Time-stamp: <2018-02-28 18:08:40 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapAnalyseDists.pm: Wrapper for computing
 # split decompositions
@@ -9,7 +9,7 @@
 
 package Bio::RNA::RNAaliSplit::WrapAnalyseDists;
 
-use version; our $VERSION = qv('0.05');
+use version; our $VERSION = qv('0.06');
 use Carp;
 use Data::Dumper;
 use Moose;

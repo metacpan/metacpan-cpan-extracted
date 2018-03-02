@@ -54,12 +54,11 @@ ywt =>
    Asia/Yangon
    Asia/Colombo
    Asia/Dhaka
-   Asia/Kolkata
 
 +06:30:00 dstonly =>
+   Asia/Kolkata
    Asia/Colombo
    Asia/Karachi
-   Asia/Kolkata
 
 +06:30:00 std =>
    Indian/Cocos
@@ -70,9 +69,9 @@ ywt =>
    Asia/Karachi
 
 +06:30:00 dst =>
+   Asia/Kolkata
    Asia/Colombo
    Asia/Karachi
-   Asia/Kolkata
    Indian/Cocos
    Asia/Yangon
    Asia/Dhaka
@@ -88,6 +87,7 @@ BST =>
    America/Adak
    America/Nome
    Europe/Gibraltar
+   America/La_Paz
    Europe/Dublin
 
 +01:00:00 BST =>

@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::amojin00;
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 30 10:43:18 EDT 2017
-#    Data version: tzdata2017b
-#    Code version: tzcode2017b
+#    Generated on: Thu Mar  1 10:33:46 EST 2018
+#    Data version: tzdata2018c
+#    Code version: tzcode2018c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.60';
+$VERSION='6.61';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -715,6 +715,15 @@ END { undef $VERSION; }
         [ [2067,11,6,8,0,0],[2067,11,6,1,0,0],'-07:00:00',[-7,0,0],
           'MST',0,[2068,3,11,8,59,59],[2068,3,11,1,59,59],
           '2067110608:00:00','2067110601:00:00','2068031108:59:59','2068031101:59:59' ],
+     ],
+   2068 =>
+     [
+        [ [2068,3,11,9,0,0],[2068,3,11,3,0,0],'-06:00:00',[-6,0,0],
+          'MDT',1,[2068,11,4,7,59,59],[2068,11,4,1,59,59],
+          '2068031109:00:00','2068031103:00:00','2068110407:59:59','2068110401:59:59' ],
+        [ [2068,11,4,8,0,0],[2068,11,4,1,0,0],'-07:00:00',[-7,0,0],
+          'MST',0,[2069,3,10,8,59,59],[2069,3,10,1,59,59],
+          '2068110408:00:00','2068110401:00:00','2069031008:59:59','2069031001:59:59' ],
      ],
 );
 

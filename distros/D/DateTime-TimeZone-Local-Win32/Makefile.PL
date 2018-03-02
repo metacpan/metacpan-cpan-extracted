@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "Sys::Hostname" => 0,
     "Test::More" => "0.88",
     "constant" => 0,
+    "integer" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.99",
+  "VERSION" => "2.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "Win32::TieRegistry" => "0.27",
   "constant" => 0,
+  "integer" => 0,
   "lib" => 0,
   "parent" => 0,
   "strict" => 0,

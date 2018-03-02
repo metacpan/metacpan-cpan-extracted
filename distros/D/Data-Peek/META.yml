@@ -16,11 +16,11 @@ name: Data-Peek
 provides: 
   Data::Peek: 
     file: Peek.pm
-    version: '0.47'
+    version: '0.48'
 recommends: 
   Data::Dumper: '2.167'
   Perl::Tidy: 0
-  Test::More: '1.302086'
+  Test::More: '1.302125'
 requires: 
   Data::Dumper: 0
   DynaLoader: 0
@@ -31,4 +31,4 @@ resources:
   IRC: irc://irc.perl.org/#csv
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Data-Peek
-version: '0.47'
+version: '0.48'

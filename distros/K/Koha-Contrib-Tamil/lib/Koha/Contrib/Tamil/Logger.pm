@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Logger;
 # ABSTRACT: Base class pour logger
-$Koha::Contrib::Tamil::Logger::VERSION = '0.052';
+$Koha::Contrib::Tamil::Logger::VERSION = '0.053';
 
 use Moose;
 use Modern::Perl;
@@ -56,7 +56,7 @@ Koha::Contrib::Tamil::Logger - Base class pour logger
 
 =head1 VERSION
 
-version 0.052
+version 0.053
 
 =head1 SYNOPSYS
 
@@ -85,7 +85,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Fréderic Démians.
+This software is Copyright (c) 2018 by Fréderic Démians.
 
 This is free software, licensed under:
 

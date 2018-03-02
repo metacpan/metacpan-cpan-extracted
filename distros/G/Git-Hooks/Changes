@@ -1,5 +1,51 @@
 Revision history for perl module Git-Hooks. -*- text -*-
 
+2.6.3     2018-02-28 09:31:25-03:00 America/Sao_Paulo
+
+  [Fix]
+
+  - PrepareLog: the tests required a feature implemented on Git 1.7.2. It was
+    rewritten to support Git 1.7.1.
+
+2.6.2     2018-02-27 14:24:12-03:00 America/Sao_Paulo
+
+  [Fix]
+
+  - CheckJira: some error messages weren't expanding the commit SHA1 correctly.
+
+2.6.1     2018-02-26 18:44:54-03:00 America/Sao_Paulo
+
+  [Fix]
+
+  - PrepareLog: require Git >= 2.8.0 in order to insert issues in the log
+    message trailers. Previously we required Git >= 2.7.0, but they didn't
+    implement a feature we use.
+
+2.6.0     2018-02-26 16:38:54-03:00 America/Sao_Paulo
+
+  [New features]
+
+  - The plugins which were associated with the pre-commit, commit-msg, and
+    post-commit hooks are now also associated with the pre-applypatch,
+    applypatch-msg, and post-applypatch hooks, when is makes sense.
+
+  - CheckLog: complains about duplicate Signed-off-by trailers in commit
+    messages.
+
+  - CheckReference: new option require-annotated-tag.
+
+  - PrepareLog: new plugin associated with the prepare-commit-msg hook. For now
+    it makes it possible to insert an issue ID in the commit message, inferring
+    it from the current branch's name.
+
+  - The distribution now installs a three-line script called githooks.pl which
+    can be used as a generic driver for Git::Hooks.
+
+  [Documentation]
+
+  - The README and Tutorials that were kept in the GitHub wiki are now
+    internalized in the distribution as POD files.
+
 2.5.0     2018-02-16 16:44:43-02:00 America/Sao_Paulo
 
   [Documentation]

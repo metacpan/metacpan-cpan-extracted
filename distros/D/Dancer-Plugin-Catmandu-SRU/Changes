@@ -1,5 +1,9 @@
 Revision history for Dancer-Plugin-Catmandu-SRU
 
+0.0502  2018-02-27 12:10:52 CET
+  - host and port are derived by Dancer (better support for reverse proxy)
+  - maximumRecords can be 0 (handy to check number of records)
+
 0.0501  2017-08-18 13:22:45 CEST
   - bump required version of Catmandu::Exporter::Template
 
@@ -11,19 +15,19 @@ Revision history for Dancer-Plugin-Catmandu-SRU
   - bugfixes
 
 0.0402  2016-02-09 16:33:08 CET
-    - support for default search parameters
+  - support for default search parameters
 
 0.0401  2016-02-02 14:02:09 CET
-    - fix capping of limit
-    - return diagnostic if schema is missing
+  - fix capping of limit
+  - return diagnostic if schema is missing
 
 0.04  2014-11-28 14:03:30 CET
-    - remove given/when
+  - remove given/when
 
 0.03  2014-05-08 12:25:30 CEST
-    - build with Dist::Milla
-    - docs
-    - tests
+  - build with Dist::Milla
+  - docs
+  - tests
 
-0.02    2012-12-04
-    - initial release
+0.02  2012-12-04
+  - initial release

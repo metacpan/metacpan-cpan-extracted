@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001050';
+our $VERSION = '0.001053';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -1189,7 +1189,7 @@ sub inject_signal_handlers {
 
         $self->{+SIGNAL} = $sig;
 
-        die "Cought SIG$sig, Attempting to shut down cleanly...\n";
+        die "Caught SIG$sig. Attempting to shut down cleanly...\n";
     };
 
     $SIG{INT}  = sub { $handle_sig->('INT') };

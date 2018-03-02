@@ -1,0 +1,38 @@
+#!perl
+
+use strict;
+use warnings;
+use feature qw/ say /;
+
+use Data::Dumper;
+use DateTime;
+use Try::Tiny;
+
+use Business::Monzo;
+
+$ENV{MONZO_DEBUG} = shift;
+
+my $monzo = Business::Monzo->new(
+	token => $ENV{MONZOJO_TOKEN}
+);
+
+# get the last three month's transactions, but limit to 5
+try {
+	my $since = DateTime->now->subtract( months => 3 )->iso8601 . "Z";
+
+	say "Since: $since";
+
+	foreach my $transaction (
+	   	$monzo->transactions(
+			account_id => $ENV{MONZOJO_ACCOUNT_ID},
+			limit      => 5,
+			since      => $since,
+		)
+	) {
+		say Dumper { $transaction->TO_JSON };
+	}
+
+
+} catch {
+	warn $_->message;
+}

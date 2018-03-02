@@ -1,5 +1,12 @@
 Release history for perl-Dist-Zilla-Role-TextTemplater
 
+v0.8.7 @ 2018-02-27 21:17 UTC
+
+    -   Source and tests updated to work with `Text::Template` >= v1.48.
+
+    -   `Text::Template` != 1.48, != 1.49 required because of `Text::Template` bug
+        <https://github.com/mschout/perl-text-template/issues/8>.
+
 v0.8.6 @ 2016-11-18 20:03 UTC
 
     -   Manual expanded.

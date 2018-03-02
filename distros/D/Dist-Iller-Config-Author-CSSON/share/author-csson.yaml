@@ -153,6 +153,7 @@ plugins:
 
  - +plugin: Test::Kwalitee::Extra
    +version: v0.2.1
+   arg: "!prereq_matches_use !build_prereq_matches_use"
 
  - +plugin: Test::NoTabs
    +version: 0.15

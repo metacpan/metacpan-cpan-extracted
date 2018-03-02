@@ -3,10 +3,11 @@
    "author" : [
       "Jesse Erlbaum <jesse@erlbaum.net>",
       "Mark Stosberg <mark@summersault.com>",
+      "Martin McGrath <mcgrath.martin@gmail.com>",
       "with the help of many others!"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +22,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -29,29 +30,38 @@
             "CGI::PSGI" : "0.09"
          },
          "requires" : {
-            "CGI" : 0,
-            "Carp" : 0,
-            "Class::ISA" : 0,
-            "HTML::Template" : 0,
-            "Test::More" : "0.47"
+            "CGI" : "4.21",
+            "Carp" : "0",
+            "Class::ISA" : "0",
+            "HTML::Template" : "0",
+            "Module::Build" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.47",
+            "Test::Requires" : "0"
          }
       }
    },
    "provides" : {
       "CGI::Application" : {
          "file" : "lib/CGI/Application.pm",
-         "version" : "4.50"
+         "version" : "4.61"
       },
       "CGI::Application::Mailform" : {
-         "file" : "lib/CGI/Application/Mailform.pm",
-         "version" : 0
+         "file" : "lib/CGI/Application/Mailform.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MartinMcGrath/CGI--Application/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/MartinMcGrath/CGI--Application"
+      }
    },
-   "version" : "4.50"
+   "version" : "4.61",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

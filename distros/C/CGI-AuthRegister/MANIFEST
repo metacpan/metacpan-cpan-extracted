@@ -1,8 +1,8 @@
 # <? read_starfish_conf(); &generate_header; !>
 #+
 # file: MANIFEST
-# CGI::AuthRegister - Simple CGI Authentication and Registration in Perl
-# (c) 2012-14 Vlado Keselj http://web.cs.dal.ca/~vlado
+# CGI::AuthRegister - AuthRegister Module for Simple CGI Authentication and Registration in Perl
+# (c) 2012-18 Vlado Keselj http://web.cs.dal.ca/~vlado
 # $Date: $
 # $Id: $
 #-
@@ -20,3 +20,4 @@ AuthRegister.pm
 #-
 examples/1/index.cgi
 examples/2/index.cgi
+META.json                                Module JSON meta-data (added by MakeMaker)

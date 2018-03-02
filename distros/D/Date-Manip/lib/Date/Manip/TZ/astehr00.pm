@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::astehr00;
-# Copyright (c) 2008-2017 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Tue May 30 10:43:25 EDT 2017
-#    Data version: tzdata2017b
-#    Code version: tzcode2017b
+#    Generated on: Thu Mar  1 10:33:47 EST 2018
+#    Data version: tzdata2018c
+#    Code version: tzcode2018c
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.60';
+$VERSION='6.61';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -836,8 +836,17 @@ END { undef $VERSION; }
           '+0430',1,[2076,9,20,19,29,59],[2076,9,20,23,59,59],
           '2076032020:30:00','2076032101:00:00','2076092019:29:59','2076092023:59:59' ],
         [ [2076,9,20,19,30,0],[2076,9,20,23,0,0],'+03:30:00',[3,30,0],
+          '+0330',0,[2077,3,20,20,29,59],[2077,3,20,23,59,59],
+          '2076092019:30:00','2076092023:00:00','2077032020:29:59','2077032023:59:59' ],
+     ],
+   2077 =>
+     [
+        [ [2077,3,20,20,30,0],[2077,3,21,1,0,0],'+04:30:00',[4,30,0],
+          '+0430',1,[2077,9,20,19,29,59],[2077,9,20,23,59,59],
+          '2077032020:30:00','2077032101:00:00','2077092019:29:59','2077092023:59:59' ],
+        [ [2077,9,20,19,30,0],[2077,9,20,23,0,0],'+03:30:00',[3,30,0],
           '+0330',0,[9999,12,31,0,0,0],[9999,12,31,3,30,0],
-          '2076092019:30:00','2076092023:00:00','9999123100:00:00','9999123103:30:00' ],
+          '2077092019:30:00','2077092023:00:00','9999123100:00:00','9999123103:30:00' ],
      ],
 );
 

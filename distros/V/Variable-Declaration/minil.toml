@@ -1,0 +1,6 @@
+name = "Variable-Declaration"
+badges = ["travis"]
+authority="cpan:KFLY"
+
+module_maker="ModuleBuildTiny"
+

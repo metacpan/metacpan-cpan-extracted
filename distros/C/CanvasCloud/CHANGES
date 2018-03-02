@@ -1,10 +1,28 @@
 ==================================================
-Changes from 2017-02-20 00:00:00 +0000 to present.
+Changes from 2017-02-28 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2018-02-20 20:31:26 +0000
+version 0.005 at 2018-02-28 16:09:43 +0000
 ------------------------------------------
+
+  Change: 247533760c4fee021b0f7102b8452153b7450214
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-28 10:07:01 +0000
+
+    version bump 
+
+  Change: 806a97a2f61a0f89216d69eac8b849a3e3f0dc01
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-22 09:04:10 +0000
+
+    Added get method for Report 
+
+  Change: 6044c23289644a1ff6018a37b69905c071a244f7
+  Author: tedkat <tedkat@cpan.org>
+  Date : 2018-02-22 09:03:11 +0000
+
+    Refactor Factory 
 
   Change: 84bb2eb0e43b80e972b10d0f69afa8b0948370eb
   Author: tedkat <tedkat@cpan.org>

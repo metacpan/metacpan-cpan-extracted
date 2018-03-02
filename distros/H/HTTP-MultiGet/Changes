@@ -18,3 +18,9 @@
   -- Updated Makefile.PL due to missing dep found in cpan unit test contribution
    Unit test results can be found here:
      http://www.cpantesters.org/cpan/report/62db39c6-8120-11e7-a074-e1beba07c9dd
+1.007
+  -- Removed the use of an alarm, switched to AnyEvent->timer
+  -- added supprot to lib/HTTP/MultiGet/Role.pm
+   Now supports Queing results without passing through the execution path
+1.008
+  -- Role now checks for content length and if content is defined before trying to parse json.

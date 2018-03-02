@@ -12,7 +12,7 @@ use Directory::Scanner::API::Stream;
 use Directory::Scanner::Stream;
 use Directory::Scanner::Stream::Concat;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## static builder constructors
@@ -25,7 +25,7 @@ sub for {
 sub concat {
     my (undef, @streams) = @_;
 
-    Carp::confess 'You provide at least two streams to concat'
+    Carp::confess 'You must provide at least two streams to concat'
         if scalar @streams < 2;
 
     return Directory::Scanner::Stream::Concat->new( streams => [ @streams ] );
@@ -43,7 +43,7 @@ Directory::Scanner - Streaming directory scanner
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ Stevan Little <stevan@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Stevan Little.
+This software is copyright (c) 2017, 2018 by Stevan Little.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -101,11 +101,16 @@ sub _get_accounts {
     return shift->_get_entities( shift,'account' );
 }
 
+sub _get_pots {
+    return shift->_get_entities( shift,'pot','pots/listV1' );
+}
+
 sub _get_entities {
-    my ( $self,$params,$entity ) = @_;
+    my ( $self,$params,$entity,$endpoint ) = @_;
 
     my $plural = $entity . 's';
-    my $data   = $self->_api_request( 'GET',$plural,$params );
+    $endpoint //= $plural;
+    my $data   = $self->_api_request( 'GET', $endpoint, $params );
     my $class  = "Business::Monzo::" . ucfirst( $entity );
     my @objects;
 
